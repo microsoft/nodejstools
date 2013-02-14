@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Include>
+  <?define ProductDescription = "Node.js Tools for Visual Studio" ?>
+
+  <!-- Product GUIDs: Must just be unique-->
+  <?define InstallerGuid=*?>
+  <?define InstallerUpgradeGuid=9291B031-A6DD-4AC2-A99C-421076160394?>
+  <?define ProductName = "Node.js Tools for Visual Studio 2012" ?>
+</Include>

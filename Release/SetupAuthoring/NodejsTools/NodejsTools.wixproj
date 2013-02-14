@@ -1,0 +1,36 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <Import Project="..\SetupProjectBefore.settings" />
+  <PropertyGroup>
+    <ProductVersion>3.5</ProductVersion>
+    <ProjectGuid>{48D35916-497E-43A4-88A7-A829B7BF0EF1}</ProjectGuid>
+    <SchemaVersion>2.0</SchemaVersion>
+    <OutputName>NodejsTools</OutputName>
+    <OutputType>Module</OutputType>
+    <DefineSolutionProperties>false</DefineSolutionProperties>
+    <SccProjectName>SAK</SccProjectName>
+    <SccProvider>SAK</SccProvider>
+    <SccAuxPath>SAK</SccAuxPath>
+    <SccLocalPath>SAK</SccLocalPath>
+    <DefineConstants>
+      ObjDir=$(BuildRoot)\Incubation\NTVS\Product\Node\Node\obj\$(Configuration);
+      BinariesDir=$(BuildRoot)\Incubation\NTVS\Product\Node\Node\bin\$(Configuration);
+      VSTargetVersion=$(VSTarget)
+    </DefineConstants>
+  </PropertyGroup>
+  <ItemGroup>
+    <Compile Include="NodejsTools.wxs" />
+    <Compile Include="NodejsToolsVsExt.wxs" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\..\Product\Node\Node\Node.csproj">
+      <Name>Microsoft.NodeTools</Name>
+      <Project>{BB05D7F2-1F7F-4E15-9D5F-D288ABEB29A5}</Project>
+      <Private>True</Private>
+      <RefProjectOutputGroups>Binaries;Content;Satellites</RefProjectOutputGroups>
+      <RefTargetDir>INSTALLLOCATION</RefTargetDir>
+      <DoNotHarvest>true</DoNotHarvest>
+    </ProjectReference>
+  </ItemGroup>
+  <Import Project="..\SetupProjectAfter.settings" />
+</Project>

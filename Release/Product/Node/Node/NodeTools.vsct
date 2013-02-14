@@ -1,0 +1,91 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<CommandTable xmlns="http://schemas.microsoft.com/VisualStudio/2005-10-18/CommandTable" xmlns:xs="http://www.w3.org/2001/XMLSchema">
+  <Extern href="stdidcmd.h"/>
+  <Extern href="vsshlids.h"/>
+  <Extern href="VSDbgCmd.h"/>
+  <Extern href="VsDebugGuids.h"/>
+
+  <KeyBindings>
+    <KeyBinding guid="guidNodeToolsCmdSet" id="cmdidReplWindow" key1="R" mod1="Alt" editor="guidVSStd97"/>
+  </KeyBindings>
+
+  <!--The Commands section is where we the commands, menus and menu groups are defined.
+      This section uses a Guid to identify the package that provides the command defined inside it. -->
+  <Commands package="guidNodeToolsPkg">
+    <!-- Inside this section we have different sub-sections: one for the menus, another  
+    for the menu groups, one for the buttons (the actual commands), one for the combos 
+    and the last one for the bitmaps used. Each element is identified by a command id that  
+    is a unique pair of guid and numeric identifier; the guid part of the identifier is usually  
+    called "command set" and is used to group different command inside a logically related  
+    group; your package should define its own command set in order to avoid collisions  
+    with command ids defined by other packages. -->
+
+    <!-- In this section you can define new menu groups. A menu group is a container for 
+         other menus or buttons (commands); from a visual point of view you can see the 
+         group as the part of a menu contained between two lines. The parent of a group 
+         must be a menu. -->
+    <Groups>      
+    </Groups>
+
+    <Menus>     
+    </Menus>
+
+    <!--Buttons section: buttons include both buttons on toolbars as well as individual menu items -->
+    <Buttons>
+      <!--To define a menu group you have to specify its ID, the parent menu and its display priority. 
+          The command is visible and enabled by default. If you need to change the visibility, status, etc, you can use
+          the CommandFlag node.
+          You can add more than one CommandFlag node e.g.:
+              <CommandFlag>DefaultInvisible</CommandFlag>
+              <CommandFlag>DynamicVisibility</CommandFlag>
+          If you do not want an image next to your command, remove the Icon node or set it to <Icon guid="guidOfficeIcon" id="msotcidNoIcon" /> -->
+
+      
+      <Button guid="guidNodeToolsCmdSet" id="cmdidReplWindow" priority="0x7f00" type="Button">
+        <Parent guid="guidSHLMainMenu" id="IDG_VS_WNDO_OTRWNDWS1"/>
+        <Icon guid="guidImages" id="nodeReplPic" />
+        <Strings>
+          <CommandName>cmdidReplWindow</CommandName>
+          <ButtonText>Node Interactive Window</ButtonText>
+        </Strings>
+      </Button>
+
+    </Buttons>
+
+
+    <!--The bitmaps section is used to define the bitmaps that are used for the commands.-->
+    <Bitmaps>
+      <!--  The bitmap id is defined in a way that is a little bit different from the others: 
+            the declaration starts with a guid for the bitmap strip, then there is the resource id of the 
+            bitmap strip containing the bitmaps and then there are the numeric ids of the elements used 
+            inside a button definition. An important aspect of this declaration is that the element id 
+            must be the actual index (1-based) of the bitmap inside the bitmap strip. -->
+
+      <Bitmap guid="guidImages" href="..\Icons\Images_32bit.png" usedList="nodeReplPic, bmpPic2, bmpPicSearch, bmpPicX, bmpPicArrows, nodeDebugRepl"/>
+    </Bitmaps>
+  </Commands>
+
+  <CommandPlacements>
+    
+  </CommandPlacements>
+
+  <Symbols>
+    <!-- This is the package guid. -->
+    <GuidSymbol name="guidNodeToolsPkg" value="{4219f2a8-fbf9-4659-a222-b7580a60eebb}" />
+
+    <!-- This is our command set GUID and associated commands -->
+    <GuidSymbol name="guidNodeToolsCmdSet" value="{695e37e2-c6df-4e0a-8833-f688e4c65f1f}">
+      <IDSymbol name="cmdidReplWindow" value="0x0201" />
+    </GuidSymbol>
+
+    <GuidSymbol name="guidImages" value="{C616533C-7A95-4A3D-A22A-A5361A8037D8}" >
+      <IDSymbol name="nodeReplPic" value="1" />
+      <IDSymbol name="bmpPic2" value="2" />
+      <IDSymbol name="bmpPicSearch" value="3" />
+      <IDSymbol name="bmpPicX" value="4" />
+      <IDSymbol name="bmpPicArrows" value="5" />
+      <IDSymbol name="nodeDebugRepl" value="6" />
+    </GuidSymbol>    
+  </Symbols>
+
+</CommandTable>
