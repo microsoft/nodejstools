@@ -1,0 +1,70 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+
+  <!-- Ensures that if this file changes it forces a rebuild -->
+  <PropertyGroup>                 
+    <MSBuildAllProjects>
+        $(MSBuildAllProjects);$(MSBuildThisFileFullPath)
+    </MSBuildAllProjects>        
+  </PropertyGroup>
+
+
+  <PropertyGroup>
+    <Configuration Condition="'$(Configuration)' == ''">Debug</Configuration>
+    <WixVersion Condition="$(WixVersion)==''">0.7.4100.000</WixVersion>
+    <!--Default Platform value is specified in the C#/C++ specific files imported below -->
+    
+    <RunFXCop Condition="'$(RunFXCop)' == ''">false</RunFXCop>
+    <RunStyleCop Condition="'$(RunStyleCop)' == ''">false</RunStyleCop>
+
+    <CodeCoverageEnabled Condition="'$(CodeCoverageEnabled)'==''">true</CodeCoverageEnabled>
+
+    <VisualStudioVersion Condition="'$(VisualStudioVersion)' == ''">10.0</VisualStudioVersion>
+    <VSTarget Condition="$(VSTarget)=='' and '$(VisualStudioVersion)'=='11.0'">11.0</VSTarget>
+    <VSTarget Condition="$(VSTarget)==''">10.0</VSTarget>
+    <TargetFrameworkVersion Condition="'$(VSTarget)' == '10.0'">v4.0</TargetFrameworkVersion>
+    <TargetFrameworkVersion Condition="'$(TargetFrameworkVersion)' == ''">v4.5</TargetFrameworkVersion>
+
+    <VSToolsPath Condition="'$(VSToolsPath)' == ''">$(MSBuildExtensionsPath32)\Microsoft\VisualStudio\v$(VisualStudioVersion)</VSToolsPath>
+
+    <BuildRoot Condition="'$(BuildRoot)' == ''">$([MSBuild]::GetDirectoryNameOfFileAbove($(MSBuildThisFileDirectory), build.root))</BuildRoot>
+    <TargetsPath>$(BuildRoot)\Build</TargetsPath>
+    <OutputPath Condition="'$(OutputPath)' == '' and '$(OutDir)' != '' and $(OutDir.EndsWith(`\`))">$(OutDir)</OutputPath>
+    <OutputPath Condition="'$(OutputPath)' == '' and '$(OutDir)' != '' and !$(OutDir.EndsWith(`\`))">$(OutDir)\</OutputPath>
+    <OutputPath Condition="'$(OutputPath)' == '' and '$(OutDir)' == ''">$(BuildRoot)\Binaries\$(Configuration)$(VSTarget)\</OutputPath>
+    <IntermediateOutputPath Condition="'$(IntermediateOutputPath)' == '' and '$(IntDir)' != '' and $(IntDir.EndsWith(`\`))">$(IntDir)</IntermediateOutputPath>
+    <IntermediateOutputPath Condition="'$(IntermediateOutputPath)' == '' and '$(IntDir)' != '' and !$(IntDir.EndsWith(`\`))">$(IntDir)\</IntermediateOutputPath>
+    <IntermediateOutputPath Condition="'$(IntermediateOutputPath)' == ''">obj\Dev$(VSTarget)\$(Configuration)\</IntermediateOutputPath>
+
+    <OutDir>$(OutputPath)</OutDir>
+    <IntDir>$(IntermediateOutputPath)</IntDir>
+  </PropertyGroup>
+
+
+
+  <PropertyGroup>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+    <TreatWarningsAsErrors Condition="'$(TreatWarningsAsErrors)' == ''">true</TreatWarningsAsErrors>
+    <RunCodeAnalysis>$(RunFXCop)</RunCodeAnalysis>
+    <StyleCopEnabled>$(RunStyleCop)</StyleCopEnabled>
+
+    <ResolveAssemblyWarnOrErrorOnTargetArchitectureMismatch>None</ResolveAssemblyWarnOrErrorOnTargetArchitectureMismatch>
+
+    <DevEnvDir>$(VS100COMNTOOLS)..\IDE</DevEnvDir>                  <!-- CHECK RELEVANCE -->
+  </PropertyGroup>
+
+  <Import Project="$(TargetsPath)\Common.Build.CSharp.settings" Condition="'$(MSBuildProjectExtension)' == '.csproj' or '$(MSBuildProjectExtension)' == '.tmp_proj'" />
+  <Import Project="$(TargetsPath)\Common.Build.Cpp.settings" Condition="'$(MSBuildProjectExtension)' == '.vcxproj'" />
+  <Import Project="$(TargetsPath)\Common.Build.Wix.settings" Condition="'$(MSBuildProjectExtension)' == '.wixproj'" />
+  <Import Project="$(TargetsPath)\CodeCoverage.proj" />
+
+  <ItemGroup>
+    <CodeAnalysisDictionary Include="$(BuildRoot)\Build\CustomDictionary.xml" />
+  </ItemGroup>
+
+  <PropertyGroup>
+    <CodeAnalysisRuleSet>$(TargetsPath)\TCWCS.ruleset</CodeAnalysisRuleSet>
+  </PropertyGroup>
+
+</Project>
