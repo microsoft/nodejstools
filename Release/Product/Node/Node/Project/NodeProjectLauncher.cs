@@ -25,9 +25,9 @@ using System.Windows.Forms;
 
 namespace Microsoft.NodeTools.Project {
     class NodeProjectLauncher : IProjectLauncher {
-        private readonly NodeProjectNode _project;
+        private readonly NodejsProjectNode _project;
 
-        public NodeProjectLauncher(NodeProjectNode project) {
+        public NodeProjectLauncher(NodejsProjectNode project) {
             _project = project;
         }
 

@@ -139,21 +139,6 @@ namespace TestUtilities.UI {
             return res.ToString();            
         }
 
-        public void WaitForTextStart(params string[] text) {
-            string expected = GetExpectedText(text);
-
-            for (int i = 0; i < 100; i++) {
-                string curText = Text;
-
-                if (Text.StartsWith(expected, StringComparison.CurrentCulture)) {
-                    return;
-                }
-                Thread.Sleep(100);
-            }
-
-            FailWrongText(expected);
-        }
-
         public void WaitForTextStartIPython(params string[] text) {
             string expected = GetExpectedText(text);
 
@@ -161,21 +146,6 @@ namespace TestUtilities.UI {
                 string curText = Text;
 
                 if (GetIPythonText().StartsWith(expected, StringComparison.CurrentCulture)) {
-                    return;
-                }
-                Thread.Sleep(100);
-            }
-
-            FailWrongText(expected);
-        }
-
-        public void WaitForTextEnd(params string[] text) {
-            string expected = GetExpectedText(text);
-
-            for (int i = 0; i < 100; i++) {
-                string curText = Text;
-
-                if (Text.EndsWith(expected, StringComparison.CurrentCulture)) {
                     return;
                 }
                 Thread.Sleep(100);
@@ -200,21 +170,7 @@ namespace TestUtilities.UI {
             Assert.Fail(msg.ToString());
         }
 
-        private static string GetExpectedText(IList<string> text) {
-            StringBuilder finalString = new StringBuilder();
-            for (int i = 0; i < text.Count; i++) {
-                if (i != 0) {
-                    finalString.Append(Environment.NewLine);
-                }
-
-                finalString.Append(text[i]);
-            }
-
-            string expected = finalString.ToString();
-            return expected;
-        }
-
-        private static void AppendRepr(StringBuilder msg, string str) {
+        internal static void AppendRepr(StringBuilder msg, string str) {
             for (int i = 0; i < str.Length; i++) {
                 if (str[i] >= 32) {
                     msg.Append(str[i]);

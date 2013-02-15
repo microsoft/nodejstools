@@ -31,6 +31,7 @@ function require(module) {
         case "zlib": return new zlib();
         case "os": return new os();
         case "cluster": return new cluster();
+        // **NTVS** INSERT USER MODULE SWITCH HERE **NTVS**
     }
 }
 
@@ -3217,3 +3218,4 @@ function cluster() {
     this.workers = undefined;
 } // module cluster
 
+// **NTVS** INSERT USER MODULES HERE **NTVS** 

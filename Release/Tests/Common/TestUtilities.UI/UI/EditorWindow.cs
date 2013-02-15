@@ -13,6 +13,8 @@
  * ***************************************************************************/
 
 using System;
+using System.Collections.Generic;
+using System.Text;
 using System.Threading;
 using System.Windows;
 using System.Windows.Automation;
@@ -94,6 +96,58 @@ namespace TestUtilities.UI {
             }
 
             Assert.AreEqual(text, Text);
+        }
+
+        public void WaitForTextStart(params string[] text) {
+            string expected = GetExpectedText(text);
+
+            for (int i = 0; i < 100; i++) {
+                string curText = Text;
+
+                if (Text.StartsWith(expected, StringComparison.CurrentCulture)) {
+                    return;
+                }
+                Thread.Sleep(100);
+            }
+
+            FailWrongText(expected);
+        }
+
+        public void WaitForTextEnd(params string[] text) {
+            string expected = GetExpectedText(text);
+
+            for (int i = 0; i < 100; i++) {
+                string curText = Text;
+
+                if (Text.EndsWith(expected, StringComparison.CurrentCulture)) {
+                    return;
+                }
+                Thread.Sleep(100);
+            }
+
+            FailWrongText(expected);
+        }
+
+        internal static string GetExpectedText(IList<string> text) {
+            StringBuilder finalString = new StringBuilder();
+            for (int i = 0; i < text.Count; i++) {
+                if (i != 0) {
+                    finalString.Append(Environment.NewLine);
+                }
+
+                finalString.Append(text[i]);
+            }
+
+            string expected = finalString.ToString();
+            return expected;
+        }
+
+        private void FailWrongText(string expected) {
+            StringBuilder msg = new StringBuilder("Did not get text: ");
+            InteractiveWindow.AppendRepr(msg, expected);
+            msg.Append(" instead got ");
+            InteractiveWindow.AppendRepr(msg, Text);
+            Assert.Fail(msg.ToString());
         }
 
         public void StartSmartTagSessionNoSession() {

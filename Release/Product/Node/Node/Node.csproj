@@ -490,6 +490,10 @@
       <Link>Project\TaskProgressBar.xaml.cs</Link>
       <DependentUpon>TaskProgressBar.xaml</DependentUpon>
     </Compile>
+    <Compile Include="CustomTrackingSpan.cs" />
+    <Compile Include="Project\NodejsFileNode.cs" />
+    <Compile Include="ProvideEditorExtension2Attribute.cs" />
+    <Compile Include="VsMenus.cs" />
     <Page Include="..\..\Python\PythonTools\PythonTools\Project\TaskProgressBar.xaml">
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
@@ -595,6 +599,8 @@
     <Compile Include="Navigation\IScopeNode.cs" />
     <Compile Include="Navigation\SourceLocation.cs" />
     <Compile Include="NodeConstants.cs" />
+    <Compile Include="NodejsEditorFactory.cs" />
+    <Compile Include="NodejsProjectionBuffer.cs" />
     <Compile Include="NodeProject.cs" />
     <Compile Include="NodeProjectFactory.cs" />
     <Compile Include="OAProject.cs" />
@@ -605,7 +611,7 @@
     <Compile Include="Project\NodeLibraryManager.cs" />
     <Compile Include="Project\NodeLibraryNode.cs" />
     <Compile Include="Project\NodeProjectLauncher.cs" />
-    <Compile Include="Project\NodeProjectNode.cs" />
+    <Compile Include="Project\NodejsProjectNode.cs" />
     <Compile Include="Project\NodeProjectNodeProperties.cs" />
     <Compile Include="Project\NodeProjectPackage.cs" />
     <Compile Include="Repl\NodeReplEvaluator.cs" />

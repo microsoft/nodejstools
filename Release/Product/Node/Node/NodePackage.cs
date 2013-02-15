@@ -62,10 +62,13 @@ namespace Microsoft.NodeTools {
     [ProvideProjectFactory(typeof(NodeProjectFactory), "JavaScript", "Node.js Project Files (*.njsproj);*.njsproj", "njsproj", "njsproj", ".\\NullPath", LanguageVsTemplate = "JavaScript")]
     [ProvideDebugPortSupplier("Node remote debugging", typeof(NodeRemoteDebugPortSupplier), NodeRemoteDebugPortSupplier.PortSupplierId)]
     [ProvideMenuResource(1000, 1)]                              // This attribute is needed to let the shell know that this package exposes some menus.
+    [ProvideEditorExtension2(typeof(NodejsEditorFactory), NodeJsFileType, 50, "*:1", ProjectGuid = "{78D985FC-2CA0-4D08-9B6B-35ACD5E5294A}", NameResourceID = 102, DefaultName = "server")]
+    [ProvideEditorExtension2(typeof(NodejsEditorFactoryPromptForEncoding), NodeJsFileType, 50, "*:1", ProjectGuid = "{78D985FC-2CA0-4D08-9B6B-35ACD5E5294A}", NameResourceID = 113, DefaultName = "server")]
     public sealed class NodePackage : CommonPackage {
         internal const string NodeExpressionEvaluatorGuid = "{F16F2A71-1C45-4BAB-BECE-09D28CFDE3E6}";
         private IContentType _contentType;
-        private static readonly Guid _jsLangSvcGuid = new Guid("{71d61d27-9011-4b17-9469-d20f798fb5c0}");
+        internal const string NodeJsFileType = ".njs";
+        internal static readonly Guid _jsLangSvcGuid = new Guid("{71d61d27-9011-4b17-9469-d20f798fb5c0}");
 
         /// <summary>
         /// Default constructor of the package.
@@ -91,8 +94,8 @@ namespace Microsoft.NodeTools {
             base.Initialize();
 
             RegisterProjectFactory(new NodeProjectFactory(this));
-
-            EnsureNodeReferenceGroup();
+            RegisterEditorFactory(new NodejsEditorFactory(this));
+            RegisterEditorFactory(new NodejsEditorFactoryPromptForEncoding(this));
 
             OleMenuCommandService mcs = GetService(typeof(IMenuCommandService)) as OleMenuCommandService;
             CommandID replWindowCmdId = new CommandID(GuidList.guidNodeCmdSet, PkgCmdId.cmdidReplWindow);
@@ -128,35 +131,6 @@ namespace Microsoft.NodeTools {
             }
         }
 
-        /// <summary>
-        /// Makes sure that the node reference group is installed.
-        /// </summary>
-        private void EnsureNodeReferenceGroup() {
-            var dte = (EnvDTE.DTE)GetGlobalService(typeof(EnvDTE.DTE));
-            var jsProps = dte.get_Properties("TextEditor", "JavaScript Specific");
-
-            var implicitRefs = jsProps.Item("ImplicitReferencesString");
-            var refGroups = (string)implicitRefs.Value;
-
-            string nodeFile = Path.Combine(
-                    Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location),
-                    "noderef.js");
-
-            var nodeFileIndex = refGroups.IndexOf(nodeFile);
-            if (nodeFileIndex == -1) {
-                const string implicitWeb = "Implicit (Web)|";
-
-                var webIndex = refGroups.IndexOf(implicitWeb);
-                if (webIndex != -1) {
-                    string newValue = refGroups.Substring(0, webIndex + implicitWeb.Length) +
-                                        nodeFile + "|" +
-                                        refGroups.Substring(webIndex + implicitWeb.Length);
-
-                    implicitRefs.Value = newValue;
-                }
-            }
-        }
-
         #endregion
 
         internal override PythonTools.Navigation.LibraryManager CreateLibraryManager(CommonPackage package) {
@@ -171,6 +145,10 @@ namespace Microsoft.NodeTools {
             var ext = Path.GetExtension(filename);
 
             return String.Equals(ext, NodeConstants.FileExtension, StringComparison.OrdinalIgnoreCase);
+        }
+
+        internal new object GetService(Type serviceType) {
+            return base.GetService(serviceType);
         }
 
         public static string NodePath {

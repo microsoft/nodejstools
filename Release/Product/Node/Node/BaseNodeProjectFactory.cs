@@ -30,7 +30,7 @@ namespace Microsoft.NodeTools {
         }
 
         protected override ProjectNode CreateProject() {
-            NodeProjectNode project = new NodeProjectNode((NodeProjectPackage)Package);
+            NodejsProjectNode project = new NodejsProjectNode((NodeProjectPackage)Package);
             project.SetSite((IOleServiceProvider)((IServiceProvider)Package).GetService(typeof(IOleServiceProvider)));
             return project;
         }
