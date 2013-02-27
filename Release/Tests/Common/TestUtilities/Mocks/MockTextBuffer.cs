@@ -148,16 +148,6 @@ namespace TestUtilities.Mocks {
             throw new NotImplementedException();
         }
 
-        private static readonly PythonClassifierProvider _classProvider = MakeClassifierProvider();
-
-        private static PythonClassifierProvider MakeClassifierProvider() {
-            var classReg = new MockClassificationTypeRegistryService();
-            
-            var provider = new PythonClassifierProvider(new MockContentTypeRegistryService());
-            provider._classificationRegistry = classReg;
-            return provider;
-        }
-
         public Microsoft.VisualStudio.Utilities.PropertyCollection Properties {
             get {
                 if (_properties == null) {
@@ -171,8 +161,6 @@ namespace TestUtilities.Mocks {
         }
 
         private void InitProperties() {
-            _classProvider.GetClassifier(this);
-
             _properties.AddProperty(typeof(ITextDocument), new MockTextDocument(_filename));
         }
 

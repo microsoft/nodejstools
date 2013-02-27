@@ -53,7 +53,7 @@ try {
         $guidregexp = "<\?define InstallerGuid=(.*)\?>"
         foreach ($product in $products)
         {
-            foreach ($line in ( Get-Content ([System.IO.Path]::Combine($buildroot, "Incubation\NTVS\SetupAuthoring", $product.wxi)) ))
+            foreach ($line in ( Get-Content ([System.IO.Path]::Combine($buildroot, "Release\SetupAuthoring", $product.wxi)) ))
             {
                 if ($line -match $guidregexp) { $guid = $matches[1] ; break }
             }
@@ -96,7 +96,7 @@ try {
         {
             if (-not $skiptests)
             {
-                msbuild /m /v:m /fl /flp:"Verbosity=n;LogFile=BuildRelease.$config.$($targetVs.number).tests.log" /p:Configuration=$config /p:WixVersion=$version /p:VSTarget=$($targetVs.number) /p:VisualStudioVersion=$($targetVs.number) Incubation\NTVS\Product\dirs.proj
+                msbuild /m /v:m /fl /flp:"Verbosity=n;LogFile=BuildRelease.$config.$($targetVs.number).tests.log" /p:Configuration=$config /p:WixVersion=$version /p:VSTarget=$($targetVs.number) /p:VisualStudioVersion=$($targetVs.number) Release\SetupAuthoring\dirs.proj
                 if ($LASTEXITCODE -gt 0)
                 {
                     Write-Error "Test build failed: $config"
@@ -104,14 +104,14 @@ try {
                 }
             }
             
-            msbuild /v:n /m /fl /flp:"Verbosity=n;LogFile=BuildRelease.$config.$($targetVs.number).log" /p:Configuration=$config /p:WixVersion=$version /p:VSTarget=$($targetVs.number) /p:VisualStudioVersion=$($targetVs.number) Incubation\NTVS\SetupAuthoring\dirs.proj
+            msbuild /v:n /m /fl /flp:"Verbosity=n;LogFile=BuildRelease.$config.$($targetVs.number).log" /p:Configuration=$config /p:WixVersion=$version /p:VSTarget=$($targetVs.number) /p:VisualStudioVersion=$($targetVs.number) Release\SetupAuthoring\dirs.proj
             if ($LASTEXITCODE -gt 0) {
                 Write-Error "Build failed: $config"
                 exit 3
             }
             
             $bindir = "$buildroot\Binaries\$config$($targetVs.number)"
-            $destdir = "$buildroot\Incubation\NTVS\$outdir\$($targetVs.name)\$config"
+            $destdir = "$outdir\$($targetVs.name)\$config"
             
             if (-not (Test-Path $destdir)) { mkdir $destdir }
             copy -force $bindir\*.msi $destdir\

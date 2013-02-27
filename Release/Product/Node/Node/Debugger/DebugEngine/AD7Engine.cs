@@ -51,7 +51,7 @@ namespace Microsoft.NodeTools.Debugger.DebugEngine {
         private bool _processLoadedRunning;
         private bool _loadComplete;
         private object _syncLock = new object();
-        private bool _attached, _pseudoAttach;
+        private bool _attached/*, _pseudoAttach*/;
         private BreakpointManager _breakpointManager;
         private Guid _ad7ProgramId;             // A unique identifier for the program being debugged.
         private static HashSet<WeakReference> _engines = new HashSet<WeakReference>();
@@ -603,9 +603,9 @@ namespace Microsoft.NodeTools.Debugger.DebugEngine {
                 detaching(this, new AD7EngineEventArgs(this));
             }
 
-            if (!_pseudoAttach) {
+            /*if (!_pseudoAttach) {
                 _process.Terminate();
-            } else {
+            } else*/ {
                 _process.Detach();
             }
 
@@ -951,9 +951,10 @@ namespace Microsoft.NodeTools.Debugger.DebugEngine {
 
         private void OnProcessLoaded(object sender, ProcessLoadedEventArgs e) {
             lock (_syncLock) {
+                /*
                 if (_pseudoAttach) {
                     _process.Unregister();
-                }
+                }*/
 
                 _processLoaded = true;
                 _processLoadedRunning = e.Running;

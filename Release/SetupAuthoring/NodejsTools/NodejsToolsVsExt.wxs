@@ -47,6 +47,9 @@
             <Component Id="cmp1B99A039DB5C4D0A888840A9BF4FFC47" Directory="DIR_ProjectTemplates_4DCCAA275A2C4923918F2CBC07199083" Guid="{3EDA7EF0-3F18-4A96-9A03-F72B9A9623CE}">
               <File Id="fil239F6342260D479E834466EDF4F32ED4" KeyPath="yes" Source="$(var.BinariesDir)\ProjectTemplates\NodeApp.zip" />
             </Component>
+            <Component Id="cmp7850D806C2DE45078426A78CBBEF66DA" Directory="Dir_NodejsToolsMsBuild" Guid="{6D84572F-D895-443F-BD25-712394273A4E}">
+                <File Id="filD2A9B63C22F547FD8C1C55BB14F22A8A" KeyPath="yes" Source="$(var.BinariesDir)\Microsoft.NodejsTools.targets" />
+            </Component>
 
           <!-- WebPI Components -->
 

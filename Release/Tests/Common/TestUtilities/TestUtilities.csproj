@@ -78,7 +78,6 @@
     </Compile>
     <Compile Include="Mocks\MockBufferGraph.cs" />
     <Compile Include="Mocks\MockClassificationType.cs" />
-    <Compile Include="Mocks\MockClassificationTypeRegistryService.cs" />
     <Compile Include="Mocks\MockComponentModel.cs" />
     <Compile Include="Mocks\MockContentType.cs" />
     <Compile Include="Mocks\MockContentTypeRegistryService.cs" />
@@ -99,6 +98,7 @@
     <Compile Include="Mocks\MockTextVersion.cs" />
     <Compile Include="Mocks\MockTextView.cs" />
     <Compile Include="Mocks\MockTrackingSpan.cs" />
+    <Compile Include="..\..\..\Product\Python\PythonTools\PythonTools\CommonUtils.cs"/>
     <Compile Include="NativeMethods.cs">
       <ExcludeFromStyleCop>true</ExcludeFromStyleCop>
     </Compile>
@@ -106,7 +106,6 @@
     <Compile Include="Properties\AssemblyInfo.cs">
       <ExcludeFromStyleCop>true</ExcludeFromStyleCop>
     </Compile>
-    <Compile Include="PythonPaths.cs" />
     <Compile Include="TestData.cs" />
     <Compile Include="TestExtensions.cs" />
     <Compile Include="TestMethod.cs" />
@@ -116,14 +115,6 @@
     <Compile Include="VSUtility.cs" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\..\..\Product\Python\Analysis\Analysis.csproj">
-      <Project>{A85D479D-67A9-4BDB-904A-7D86DAF68A6F}</Project>
-      <Name>Analysis</Name>
-    </ProjectReference>
-    <ProjectReference Include="..\..\..\Product\Python\PythonTools\PythonTools.csproj">
-      <Project>{FA7BE5F5-E04F-4613-B7AC-70CE10D1BB68}</Project>
-      <Name>PythonTools</Name>
-    </ProjectReference>
     <ProjectReference Include="..\..\..\Product\Python\ReplWindow\ReplWindow.csproj">
       <Project>{20BB6FAC-44D2-4D76-ABFE-0C1E163A1A4F}</Project>
       <Name>ReplWindow</Name>

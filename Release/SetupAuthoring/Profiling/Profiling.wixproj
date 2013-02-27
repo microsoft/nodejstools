@@ -12,9 +12,10 @@
     <SccProvider>SAK</SccProvider>
     <SccAuxPath>SAK</SccAuxPath>
     <SccLocalPath>SAK</SccLocalPath>
+    <VsTarget Condition="'$(VsTarget)' == ''">11.0</VsTarget>
     <DefineConstants>
-      ObjDir=$(BuildRoot)\Incubation\NTVS\Product\Node\Profiling\obj\$(Configuration);
-      BinariesDir=$(BuildRoot)\Incubation\NTVS\Product\Node\Profiling\bin\$(Configuration);
+      ObjDir=$(BuildRoot)\Release\Product\Node\Profiling\obj\Dev$(VSTarget)\$(Configuration);
+      BinariesDir=$(BuildRoot)\Binaries\$(Configuration)$(VsTarget);
       VSTargetVersion=$(VSTarget)
     </DefineConstants>
   </PropertyGroup>

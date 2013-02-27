@@ -13,7 +13,7 @@
     <SccAuxPath>SAK</SccAuxPath>
     <SccLocalPath>SAK</SccLocalPath>
     <DefineConstants>
-      NodejsToolsDir=$(BuildRoot)\Incubation\NTVS\Product\Node\Node;
+      NodejsToolsDir=$(BuildRoot)\Release\Product\Node\Node;
       MsiVersion=$(WixVersion);
       VSTargetVersion=$(VSTarget);
     </DefineConstants>

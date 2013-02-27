@@ -1432,7 +1432,7 @@ namespace Microsoft.NodeTools.Debugger {
         /// </summary>
         public event EventHandler<ProcessLoadedEventArgs> ProcessLoaded;
         public event EventHandler<ThreadEventArgs> ThreadCreated;
-        public event EventHandler<ThreadEventArgs> ThreadExited;
+        public event EventHandler<ThreadEventArgs> ThreadExited { add { } remove { } }
         public event EventHandler<ThreadEventArgs> EntryPointHit;
         public event EventHandler<ThreadEventArgs> StepComplete;
         public event EventHandler<ThreadEventArgs> AsyncBreakComplete;
@@ -1440,7 +1440,7 @@ namespace Microsoft.NodeTools.Debugger {
         public event EventHandler<ModuleLoadedEventArgs> ModuleLoaded;
         public event EventHandler<ExceptionRaisedEventArgs> ExceptionRaised;
         public event EventHandler<BreakpointHitEventArgs> BreakpointHit;
-        public event EventHandler<OutputEventArgs> DebuggerOutput;
+        public event EventHandler<OutputEventArgs> DebuggerOutput { add { } remove { } }
 
         #endregion
 

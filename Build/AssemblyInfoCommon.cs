@@ -12,7 +12,11 @@ using System.Runtime.InteropServices;
 // Properties\AssemblyInfo.cs file and remove any lines duplicating the ones below.
 // (See also AssemblyVersion.cs in this same directory.)
 [assembly: AssemblyCompany("Microsoft")]
+#if NODE_TOOLS
+[assembly: AssemblyProduct("Node.js Tools for Visual Studio")]
+#else
 [assembly: AssemblyProduct("Python Tools for Visual Studio")]
+#endif
 [assembly: AssemblyCopyright("Copyright © Microsoft 2012")]
 [assembly: AssemblyTrademark("")]
 [assembly: AssemblyCulture("")]

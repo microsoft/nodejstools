@@ -8,11 +8,6 @@ using System.Runtime.InteropServices;
 [assembly: AssemblyTitle("NodeLogConverter")]
 [assembly: AssemblyDescription("")]
 [assembly: AssemblyConfiguration("")]
-[assembly: AssemblyCompany("")]
-[assembly: AssemblyProduct("NodeLogConverter")]
-[assembly: AssemblyCopyright("Copyright ©  2012")]
-[assembly: AssemblyTrademark("")]
-[assembly: AssemblyCulture("")]
 
 // Setting ComVisible to false makes the types in this assembly not visible 
 // to COM components.  If you need to access a type in this assembly from 
@@ -32,6 +27,4 @@ using System.Runtime.InteropServices;
 // You can specify all the values or you can default the Build and Revision Numbers 
 // by using the '*' as shown below:
 // [assembly: AssemblyVersion("1.0.*")]
-[assembly: AssemblyVersion("1.0.0.0")]
-[assembly: AssemblyFileVersion("1.0.0.0")]
 [assembly: InternalsVisibleTo("ProfilerTests, PublicKey=002400000480000094000000060200000024000052534131000400000100010091171cd859fcc3a81b2db53eba4e10b6fa7f63b926df6396952ebe0ad42b82de9924f4607224551d88b1ffc2810c6614b6e6527c14872e0ecd68237892633de24e76eeb88809f9c225f30bcb87608d6df28da11cf8e34b913e84fd6e3d6979afe7312c787795249f771338c82622fc8925b36b1c0001c88a80f3fb56ae8ee9b7")]

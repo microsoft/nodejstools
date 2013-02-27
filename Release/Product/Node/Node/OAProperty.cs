@@ -37,7 +37,7 @@ namespace Microsoft.NodeTools {
             get { return 1; }
         }
 
-        public new object Object {
+        public object Object {
             get {
                 throw new NotImplementedException();
             }
