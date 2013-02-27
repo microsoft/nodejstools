@@ -19,6 +19,7 @@ using System.Diagnostics;
 using System.IO;
 using System.Runtime.InteropServices;
 using System.Xml;
+using Microsoft.NodeTools.Project;
 using Microsoft.PythonTools;
 using Microsoft.PythonTools.Project;
 using Microsoft.VisualStudio;
@@ -35,6 +36,7 @@ namespace Microsoft.NodeTools {
         internal NodePackage _package;
         private OleMenuCommandService _menuService;
         private List<OleMenuCommand> _commands = new List<OleMenuCommand>();
+        private IVsProjectFlavorCfgProvider _innerVsProjectFlavorCfgProvider;
 
         protected override void Close() {
             if (_menuService != null) {
@@ -147,6 +149,7 @@ namespace Microsoft.NodeTools {
             _innerProject = inner as IVsProject;
             _innerProject3 = inner as IVsProject3;
             _innerVsHierarchy = inner as IVsHierarchy;
+            _innerVsProjectFlavorCfgProvider = inner as IVsProjectFlavorCfgProvider;
 
             // Ensure we have a service provider as this is required for menu items to work
             if (this.serviceProvider == null)
@@ -542,7 +545,15 @@ namespace Microsoft.NodeTools {
             // want the web application project to influence our config as that alters our debug
             // launch story.  We control that w/ the Django project which is actually just letting the
             // base Python project handle it.  So we keep the base Python project config here.
-            ppFlavorCfg = pBaseProjectCfg as IVsProjectFlavorCfg;
+            IVsProjectFlavorCfg webCfg;
+            ErrorHandler.ThrowOnFailure(
+                _innerVsProjectFlavorCfgProvider.CreateProjectFlavorCfg(
+                    pBaseProjectCfg,
+                    out webCfg
+                )
+            );
+            ppFlavorCfg = new NodejsProjectConfig(pBaseProjectCfg, webCfg);
+
             return VSConstants.S_OK;
         }
 

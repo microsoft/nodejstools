@@ -223,6 +223,9 @@
     <Compile Include="..\..\Python\PythonTools\PythonTools\Project\Automation\AutomationScope.cs">
       <Link>Project\Automation\AutomationScope.cs</Link>
     </Compile>
+    <Compile Include="..\..\Python\PythonTools\PythonTools\Project\Automation\OAProjectConfigurationProperties.cs">
+      <Link>Project\Automation\OAProjectConfigurationProperties.cs</Link>
+    </Compile>
     <Compile Include="..\..\Python\PythonTools\PythonTools\Project\Automation\OAFileItem.cs">
       <Link>Project\Automation\OAFileItem.cs</Link>
     </Compile>
@@ -486,6 +489,7 @@
       <DependentUpon>TaskProgressBar.xaml</DependentUpon>
     </Compile>
     <Compile Include="CustomTrackingSpan.cs" />
+    <Compile Include="NodeProjectConfig.cs" />
     <Compile Include="Project\NodejsFileNode.cs" />
     <Compile Include="ProvideEditorExtension2Attribute.cs" />
     <Compile Include="VsMenus.cs" />
@@ -669,8 +673,8 @@
     </None>
   </ItemGroup>
   <ItemGroup>
-    <EmbeddedResource Include="NodeImageList.bmp" />
-    <EmbeddedResource Include="..\..\Python\Icons\Dev11.0\imagelis.bmp">
+    <EmbeddedResource Include="..\Icons\NodeImageList.bmp" />
+    <EmbeddedResource Include="..\Icons\imagelis.bmp">
       <Link>imagelis.bmp</Link>
       <ManifestResourceName>Microsoft.ProjectIcons.bmp</ManifestResourceName>
     </EmbeddedResource>

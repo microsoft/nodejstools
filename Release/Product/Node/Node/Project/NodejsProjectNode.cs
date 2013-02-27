@@ -31,7 +31,7 @@ namespace Microsoft.NodeTools.Project {
         internal readonly List<NodejsFileNode> _nodeFiles = new List<NodejsFileNode>();
 
         public NodejsProjectNode(NodeProjectPackage package)
-            : base(package, Utilities.GetImageList(typeof(NodejsProjectNode).Assembly.GetManifestResourceStream("Microsoft.Node.NodeImageList.bmp"))) {
+            : base(package, Utilities.GetImageList(typeof(NodejsProjectNode).Assembly.GetManifestResourceStream("Microsoft.NodeTools.NodeImageList.bmp"))) {
 
             Type projectNodePropsType = typeof(NodeProjectNodeProperties);
             AddCATIDMapping(projectNodePropsType, projectNodePropsType.GUID);
