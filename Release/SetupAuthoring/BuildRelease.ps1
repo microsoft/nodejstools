@@ -78,7 +78,7 @@ try {
     if ($skipdebug) { $targetConfigs = ("Release") }
     
     foreach ($targetVs in $targetVersions) {
-        $version = "0.5." + ([DateTime]::Now.Year - 2011 + 4).ToString() + [DateTime]::Now.Month.ToString('00') + [DateTime]::Now.Day.ToString('00') + ".0"
+        $version = "0.5." + ([DateTime]::Now.Year - 2013).ToString() + [DateTime]::Now.Month.ToString('00') + [DateTime]::Now.Day.ToString('00') + ".0"
         
         $asmverfileBackedUp = 0
         tf edit $asmverfile

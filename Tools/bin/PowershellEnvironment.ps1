@@ -52,3 +52,6 @@ prereq.exe
 
 "Environment Ready"
 ""
+
+# Update the title of Window
+(Get-Host).UI.RawUI.WindowTitle = "Python and Node.js Powershell Environment"
