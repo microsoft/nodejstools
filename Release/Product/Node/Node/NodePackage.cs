@@ -23,6 +23,7 @@ using Microsoft.VisualStudio.Repl;
 using Microsoft.VisualStudio.Shell;
 using Microsoft.VisualStudio.Shell.Interop;
 using Microsoft.VisualStudio.Utilities;
+using Microsoft.Win32;
 using System;
 using System.ComponentModel.Design;
 using System.Diagnostics;
@@ -151,10 +152,30 @@ namespace Microsoft.NodeTools {
             return base.GetService(serviceType);
         }
 
+        private static string nodePath = null;
+
         public static string NodePath {
             get {
-                // TODO: Find node
-                return @"C:\Program Files\nodejs\node.exe";;
+                if (nodePath != null)
+                    return nodePath;
+                //Fall back to a well known location if lookup fails
+                string installPath = System.IO.Path.Combine(Environment.GetEnvironmentVariable("ProgramFiles"), @"\nodejs");
+                try
+                {
+                    using (RegistryKey key = Registry.CurrentUser.OpenSubKey("Software").OpenSubKey("Node.js"))
+                    {
+                        if (key != null)
+                        {
+                            string keyValue = (string)key.GetValue("InstallPath", installPath);
+                            installPath = String.IsNullOrEmpty(keyValue) ? installPath : keyValue;
+                        }
+                    }                    
+                }
+                catch (Exception)
+                {
+                }
+                nodePath = System.IO.Path.Combine(installPath, @"\node.exe");
+                return nodePath;
             }
         }
 
