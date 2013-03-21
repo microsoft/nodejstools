@@ -14,7 +14,7 @@
 
 using Microsoft.VisualStudio;
 
-namespace Microsoft.NodeTools.Debugger.Remote {
+namespace Microsoft.NodejsTools.Debugger.Remote {
     internal class NodeRemoteEnumDebug<T>
         where T : class {
 

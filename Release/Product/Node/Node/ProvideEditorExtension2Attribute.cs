@@ -16,7 +16,7 @@ using System;
 using System.Globalization;
 using Microsoft.VisualStudio.Shell;
 
-namespace Microsoft.NodeTools {
+namespace Microsoft.NodejsTools {
 
     /// <include file='doc\ProvideEditorExtensionAttribute.uex' path='docs/doc[@for="ProvideEditorExtensionAttribute"]' />
     /// <devdoc>

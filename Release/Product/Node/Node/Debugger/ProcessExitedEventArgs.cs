@@ -14,7 +14,7 @@
 
 using System;
 
-namespace Microsoft.NodeTools.Debugger {
+namespace Microsoft.NodejsTools.Debugger {
     class ProcessExitedEventArgs : EventArgs {
         private readonly int _exitCode;
 

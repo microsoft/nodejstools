@@ -23,7 +23,7 @@ using Microsoft.VisualStudio.Debugger.Interop;
 // Most events sent the debugger are asynchronous events.
 
 
-namespace Microsoft.NodeTools.Debugger.DebugEngine {
+namespace Microsoft.NodejsTools.Debugger.DebugEngine {
     #region Event base classes
 
     class AD7AsynchronousEvent : IDebugEvent2 {

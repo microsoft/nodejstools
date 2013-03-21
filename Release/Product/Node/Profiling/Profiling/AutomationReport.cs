@@ -14,7 +14,7 @@
 
 using System.Runtime.InteropServices;
 
-namespace Microsoft.NodeTools.Profiling {
+namespace Microsoft.NodejsTools.Profiling {
     [ComVisible(true)]
     public sealed class ReportWrapper : INodePerformanceReport {
         private readonly Report _report;

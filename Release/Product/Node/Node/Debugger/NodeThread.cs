@@ -14,7 +14,7 @@
 
 using System.Collections.Generic;
 
-namespace Microsoft.NodeTools.Debugger {
+namespace Microsoft.NodejsTools.Debugger {
     class NodeThread {
         private readonly int _identity;
         private readonly NodeDebugger _process;

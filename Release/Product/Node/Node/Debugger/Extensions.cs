@@ -17,7 +17,7 @@ using System.Diagnostics;
 using System.Net.Sockets;
 using System.Text;
 
-namespace Microsoft.NodeTools.Debugger {
+namespace Microsoft.NodejsTools.Debugger {
     static class Extensions {
         /// <summary>
         /// Reads a string from the socket which is encoded as:

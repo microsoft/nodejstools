@@ -23,7 +23,7 @@ using System.Text;
 using System.Threading;
 using System.Web.Script.Serialization;
 
-namespace Microsoft.NodeTools.Debugger {
+namespace Microsoft.NodejsTools.Debugger {
     enum SteppingKind {
         None = 0,
         Over,

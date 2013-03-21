@@ -14,7 +14,7 @@
 
 using System;
 
-namespace Microsoft.NodeTools.Debugger {
+namespace Microsoft.NodejsTools.Debugger {
     /// <summary>
     /// Event args for start/stop of threads.
     /// </summary>

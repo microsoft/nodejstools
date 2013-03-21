@@ -19,7 +19,7 @@ using System.Diagnostics;
 using System.IO;
 using System.Runtime.InteropServices;
 using System.Xml;
-using Microsoft.NodeTools.Project;
+using Microsoft.NodejsTools.Project;
 using Microsoft.PythonTools;
 using Microsoft.PythonTools.Project;
 using Microsoft.VisualStudio;
@@ -28,7 +28,7 @@ using Microsoft.VisualStudio.Shell;
 using Microsoft.VisualStudio.Shell.Flavor;
 using Microsoft.VisualStudio.Shell.Interop;
 
-namespace Microsoft.NodeTools {
+namespace Microsoft.NodejsTools {
     [Guid("78D985FC-2CA0-4D08-9B6B-35ACD5E5294A")]
     class NodeProject : FlavoredProjectBase, IOleCommandTarget, IVsProjectFlavorCfgProvider, IVsProject, IVsProject2 {
         internal IVsProject _innerProject;

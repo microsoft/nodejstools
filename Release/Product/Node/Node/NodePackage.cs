@@ -12,10 +12,10 @@
  *
  * ***************************************************************************/
 
-using Microsoft.NodeTools.Debugger.DebugEngine;
-using Microsoft.NodeTools.Debugger.Remote;
-using Microsoft.NodeTools.Project;
-using Microsoft.NodeTools.Repl;
+using Microsoft.NodejsTools.Debugger.DebugEngine;
+using Microsoft.NodejsTools.Debugger.Remote;
+using Microsoft.NodejsTools.Project;
+using Microsoft.NodejsTools.Repl;
 using Microsoft.PythonTools;
 using Microsoft.VisualStudio;
 using Microsoft.VisualStudio.Debugger.Interop;
@@ -32,7 +32,7 @@ using System.IO;
 using System.Reflection;
 using System.Runtime.InteropServices;
 
-namespace Microsoft.NodeTools {
+namespace Microsoft.NodejsTools {
     /// <summary>
     /// This is the class that implements the package exposed by this assembly.
     ///

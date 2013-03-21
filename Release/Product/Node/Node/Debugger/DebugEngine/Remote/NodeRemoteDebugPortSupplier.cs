@@ -18,7 +18,7 @@ using System;
 using System.Runtime.InteropServices;
 using System.Text.RegularExpressions;
 
-namespace Microsoft.NodeTools.Debugger.Remote {
+namespace Microsoft.NodejsTools.Debugger.Remote {
     [ComVisible(true)]
     [Guid("A241707C-7DB3-464F-8D3E-F3D33E86AE99")]
     public class NodeRemoteDebugPortSupplier : IDebugPortSupplier2, IDebugPortSupplierDescription2 {

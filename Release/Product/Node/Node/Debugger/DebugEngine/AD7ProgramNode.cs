@@ -17,7 +17,7 @@ using Microsoft.VisualStudio.Debugger.Interop;
 using System;
 using System.Diagnostics;
 
-namespace Microsoft.NodeTools.Debugger.DebugEngine {
+namespace Microsoft.NodejsTools.Debugger.DebugEngine {
     // This class implements IDebugProgramNode2.
     // This interface represents a program that can be debugged.
     // A debug engine (DE) or a custom port supplier implements this interface to represent a program that can be debugged. 

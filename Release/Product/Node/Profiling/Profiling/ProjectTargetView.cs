@@ -14,7 +14,7 @@
 
 using System;
 
-namespace Microsoft.NodeTools.Profiling {
+namespace Microsoft.NodejsTools.Profiling {
     /// <summary>
     /// Provides a view model for the ProjectTarget class.
     /// </summary>

@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 
-namespace Microsoft.NodeTools {
+namespace Microsoft.NodejsTools {
     class OAProperty : EnvDTE.Property {
         private object _value;
         private readonly EnvDTE.Properties _properties;

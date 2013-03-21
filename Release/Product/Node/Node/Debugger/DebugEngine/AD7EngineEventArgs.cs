@@ -14,7 +14,7 @@
 
 using System;
 
-namespace Microsoft.NodeTools.Debugger.DebugEngine {
+namespace Microsoft.NodejsTools.Debugger.DebugEngine {
     /// <summary>
     /// Event args for start/stop of engines.
     /// </summary>

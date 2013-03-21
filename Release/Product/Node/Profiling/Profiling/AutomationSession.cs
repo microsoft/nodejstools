@@ -15,7 +15,7 @@
 using System.IO;
 using System.Runtime.InteropServices;
 
-namespace Microsoft.NodeTools.Profiling {
+namespace Microsoft.NodejsTools.Profiling {
     [ComVisible(true)]
     public sealed class AutomationSession : INodeProfileSession {
         private readonly SessionNode _node;

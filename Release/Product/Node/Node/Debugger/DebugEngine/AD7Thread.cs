@@ -16,7 +16,7 @@ using System.Diagnostics;
 using Microsoft.VisualStudio;
 using Microsoft.VisualStudio.Debugger.Interop;
 
-namespace Microsoft.NodeTools.Debugger.DebugEngine {
+namespace Microsoft.NodejsTools.Debugger.DebugEngine {
     // This class implements IDebugThread2 which represents a thread running in a program.
     class AD7Thread : IDebugThread2, IDebugThread100 {
         private readonly AD7Engine _engine;

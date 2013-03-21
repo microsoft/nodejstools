@@ -1,8 +1,8 @@
 ﻿<ui:DialogWindowVersioningWorkaround
-    x:Class="Microsoft.NodeTools.Profiling.CompareReportsWindow"
+    x:Class="Microsoft.NodejsTools.Profiling.CompareReportsWindow"
     xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-    xmlns:ui="clr-namespace:Microsoft.NodeTools.Profiling"
+    xmlns:ui="clr-namespace:Microsoft.NodejsTools.Profiling"
     Title="Select analysis files for comparison"
     Width="380" Height="auto" SizeToContent="Height"
     WindowStartupLocation="CenterOwner"

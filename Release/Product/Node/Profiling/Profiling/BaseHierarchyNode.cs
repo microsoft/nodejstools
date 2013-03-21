@@ -19,7 +19,7 @@ using Microsoft.VisualStudio.Shell;
 using Microsoft.VisualStudio.Shell.Interop;
 using System.Linq;
 
-namespace Microsoft.NodeTools.Profiling {
+namespace Microsoft.NodejsTools.Profiling {
     /// <summary>
     /// Base class for boilerplate IVsUIHierarchy implementation.  
     /// 

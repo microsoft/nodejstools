@@ -16,7 +16,7 @@
 // MUST match guids.h
 using System;
 
-namespace Microsoft.NodeTools.Profiling
+namespace Microsoft.NodejsTools.Profiling
 {
     static class GuidList
     {

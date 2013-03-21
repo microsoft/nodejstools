@@ -23,7 +23,7 @@ using Microsoft.PythonTools.Project;
 using Microsoft.VisualStudio;
 using Microsoft.VisualStudio.Shell.Interop;
 
-namespace Microsoft.NodeTools.Profiling {
+namespace Microsoft.NodejsTools.Profiling {
     /// <summary>
     /// Top level node for our UI Hierarchy which includes all of the various performance sessions.
     /// 

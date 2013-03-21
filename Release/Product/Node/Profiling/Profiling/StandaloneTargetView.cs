@@ -18,10 +18,10 @@ using System.Collections.ObjectModel;
 using System.ComponentModel;
 using System.Diagnostics;
 using System.IO;
-using Microsoft.NodeTools;
+using Microsoft.NodejsTools;
 using Microsoft.VisualStudio.ComponentModelHost;
 
-namespace Microsoft.NodeTools.Profiling {
+namespace Microsoft.NodejsTools.Profiling {
     /// <summary>
     /// Provides a view model for the StandaloneTarget class.
     /// </summary>

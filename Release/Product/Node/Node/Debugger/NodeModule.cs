@@ -14,7 +14,7 @@
 
 using System.IO;
 
-namespace Microsoft.NodeTools.Debugger {
+namespace Microsoft.NodejsTools.Debugger {
     class NodeModule {
         private readonly int _moduleId;
         private readonly string _fileName;

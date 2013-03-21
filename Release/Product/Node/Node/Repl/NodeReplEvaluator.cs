@@ -28,7 +28,7 @@ using System.Threading.Tasks;
 using System.Web.Script.Serialization;
 using System.Windows.Forms;
 
-namespace Microsoft.NodeTools.Repl {
+namespace Microsoft.NodejsTools.Repl {
     class NodeReplEvaluator : IReplEvaluator {
         private ListenerThread _listener;
         private IReplWindow _window;

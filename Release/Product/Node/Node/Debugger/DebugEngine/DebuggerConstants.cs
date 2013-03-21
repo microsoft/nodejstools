@@ -14,7 +14,7 @@
 
 using System;
 
-namespace Microsoft.NodeTools.Debugger.DebugEngine {
+namespace Microsoft.NodejsTools.Debugger.DebugEngine {
 
     class DebuggerConstants {
         public const int E_WIN32_INVALID_NAME = ((282) & 0x0000FFFF) | (7 << 16) | unchecked((int)0x80000000);

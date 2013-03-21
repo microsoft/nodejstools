@@ -19,7 +19,7 @@ using System.Net.Sockets;
 using System.Text;
 using System.Threading;
 
-namespace Microsoft.NodeTools {
+namespace Microsoft.NodejsTools {
     /// <summary>
     /// Base class for listening to a socket where we're communicating by sending JSON over
     /// the wire.  Usage is to subclass, set the socket, and then override ProcessPacket.

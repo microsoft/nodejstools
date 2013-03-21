@@ -14,7 +14,7 @@
 
 using Microsoft.VisualStudio.PlatformUI;
 
-namespace Microsoft.NodeTools.Profiling {
+namespace Microsoft.NodejsTools.Profiling {
     public class NotZeroConverter : ValueConverter<int, bool> {
         protected override bool Convert(int value, object parameter, System.Globalization.CultureInfo culture) {
             return value != 0;

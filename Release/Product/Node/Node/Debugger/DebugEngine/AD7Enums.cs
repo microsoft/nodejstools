@@ -17,7 +17,7 @@ using Microsoft.VisualStudio.Debugger.Interop;
 
 // These classes use a generic enumerator implementation to create the various enumerators required by the engine.
 // They allow the enumeration of everything from programs to breakpoints.
-namespace Microsoft.NodeTools.Debugger.DebugEngine {
+namespace Microsoft.NodejsTools.Debugger.DebugEngine {
     #region Base Class
     class AD7Enum<T, I> where I : class {
         readonly T[] m_data;

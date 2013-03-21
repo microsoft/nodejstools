@@ -15,7 +15,7 @@
 using System;
 using System.Runtime.InteropServices;
 
-namespace Microsoft.NodeTools.Profiling {
+namespace Microsoft.NodejsTools.Profiling {
     [Guid("7C711031-50B4-4263-901E-9EF86DD6DC57")]
     public interface INodeProfileSession {
         string Name {

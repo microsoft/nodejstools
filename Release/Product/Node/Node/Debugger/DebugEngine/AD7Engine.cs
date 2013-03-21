@@ -12,7 +12,7 @@
  *
  * ***************************************************************************/
 
-using Microsoft.NodeTools.Debugger.Remote;
+using Microsoft.NodejsTools.Debugger.Remote;
 using Microsoft.VisualStudio;
 using Microsoft.VisualStudio.Debugger.Interop;
 using System;
@@ -20,7 +20,7 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using System.Runtime.InteropServices;
 
-namespace Microsoft.NodeTools.Debugger.DebugEngine {
+namespace Microsoft.NodejsTools.Debugger.DebugEngine {
     // AD7Engine is the primary entrypoint object for the debugging engine. 
     //
     // It implements:

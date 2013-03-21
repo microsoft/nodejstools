@@ -20,7 +20,7 @@ using Microsoft.VisualStudio.Shell.Interop;
 using Microsoft.VisualStudio;
 using ShellConstants = Microsoft.VisualStudio.Shell.Interop.Constants;
 
-namespace Microsoft.NodeTools {
+namespace Microsoft.NodejsTools {
     class AzureSolutionListener : IVsSolutionEvents3, IDisposable {
         public readonly List<IVsHierarchy> OpenedHierarchies = new List<IVsHierarchy>();
         private readonly IServiceProvider _serviceProvider;

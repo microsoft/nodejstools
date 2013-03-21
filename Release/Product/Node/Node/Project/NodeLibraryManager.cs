@@ -8,7 +8,7 @@ using System.Runtime.InteropServices;
 using Microsoft.PythonTools.Project;
 using Microsoft.VisualStudio.Shell.Interop;
 
-namespace Microsoft.NodeTools.Project {
+namespace Microsoft.NodejsTools.Project {
 
     /// <summary>
     /// Implementation of the service that builds the information to expose to the symbols

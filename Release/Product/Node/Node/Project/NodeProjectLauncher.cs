@@ -12,7 +12,7 @@
  *
  * ***************************************************************************/
 
-using Microsoft.NodeTools.Debugger.DebugEngine;
+using Microsoft.NodejsTools.Debugger.DebugEngine;
 using Microsoft.PythonTools.Project;
 using Microsoft.VisualStudio;
 using Microsoft.VisualStudio.Shell;
@@ -23,7 +23,7 @@ using System.IO;
 using System.Runtime.InteropServices;
 using System.Windows.Forms;
 
-namespace Microsoft.NodeTools.Project {
+namespace Microsoft.NodejsTools.Project {
     class NodeProjectLauncher : IProjectLauncher {
         private readonly NodejsProjectNode _project;
 

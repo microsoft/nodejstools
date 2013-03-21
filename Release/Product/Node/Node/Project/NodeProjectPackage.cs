@@ -17,7 +17,7 @@ using System.ComponentModel;
 using System.Runtime.InteropServices;
 using Microsoft.VisualStudio.Shell;
 using Microsoft.VisualStudio;
-using Microsoft.NodeTools;
+using Microsoft.NodejsTools;
 #if DEV11
 using Microsoft.VisualStudio.Shell.Interop;
 #endif

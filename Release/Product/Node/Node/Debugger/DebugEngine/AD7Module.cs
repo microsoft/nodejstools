@@ -17,7 +17,7 @@ using Microsoft.VisualStudio.Debugger.Interop;
 using System;
 using System.Diagnostics;
 
-namespace Microsoft.NodeTools.Debugger.DebugEngine {
+namespace Microsoft.NodejsTools.Debugger.DebugEngine {
     // this class represents a module loaded in the debuggee process to the debugger. 
     class AD7Module : IDebugModule2, IDebugModule3 {
         public readonly NodeModule DebuggedModule;

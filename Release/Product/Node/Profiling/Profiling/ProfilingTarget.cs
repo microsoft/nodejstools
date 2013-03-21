@@ -16,7 +16,7 @@ using System;
 using System.IO;
 using System.Xml.Serialization;
 
-namespace Microsoft.NodeTools.Profiling {
+namespace Microsoft.NodejsTools.Profiling {
     [Serializable]
     public sealed class ProfilingTarget {
         internal static XmlSerializer Serializer = new XmlSerializer(typeof(ProfilingTarget));

@@ -14,7 +14,7 @@
 
 using System;
 
-namespace Microsoft.NodeTools.Debugger {
+namespace Microsoft.NodejsTools.Debugger {
     class ModuleLoadedEventArgs : EventArgs {
         private readonly NodeModule _module;
 

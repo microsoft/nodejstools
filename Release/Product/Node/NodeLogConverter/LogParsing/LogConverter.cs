@@ -21,11 +21,11 @@ using System.IO;
 using System.IO.Compression;
 using System.Runtime.InteropServices;
 using System.Text;
-using Microsoft.NodeTools.LogGeneration;
+using Microsoft.NodejsTools.LogGeneration;
 using NodeLogConverter;
 using NodeLogConverter.LogParsing;
 
-namespace Microsoft.NodeTools.LogParsing {
+namespace Microsoft.NodejsTools.LogParsing {
     /// <summary>
     /// Parses a V8 profiling log which is just a CSV file.  The CSV file includes several
     /// different record types including tick events with stack traces, code compilation events

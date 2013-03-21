@@ -15,7 +15,7 @@
 using Microsoft.VisualStudio;
 using Microsoft.VisualStudio.Debugger.Interop;
 
-namespace Microsoft.NodeTools.Debugger.Remote {
+namespace Microsoft.NodejsTools.Debugger.Remote {
     internal class NodeRemoteEnumDebugPrograms : NodeRemoteEnumDebug<IDebugProgram2>, IEnumDebugPrograms2 {
 
         public NodeRemoteEnumDebugPrograms(NodeRemoteDebugProcess process)

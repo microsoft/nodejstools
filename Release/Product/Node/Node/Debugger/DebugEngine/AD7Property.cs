@@ -17,7 +17,7 @@ using System.Threading;
 using Microsoft.VisualStudio;
 using Microsoft.VisualStudio.Debugger.Interop;
 
-namespace Microsoft.NodeTools.Debugger.DebugEngine {
+namespace Microsoft.NodejsTools.Debugger.DebugEngine {
     // An implementation of IDebugProperty2
     // This interface represents a stack frame property, a program document property, or some other property. 
     // The property is usually the result of an expression evaluation. 

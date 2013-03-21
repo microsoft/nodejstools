@@ -18,7 +18,7 @@ using System.Linq;
 using Microsoft.VisualStudio;
 using Microsoft.VisualStudio.Debugger.Interop;
 
-namespace Microsoft.NodeTools.Debugger.DebugEngine {
+namespace Microsoft.NodejsTools.Debugger.DebugEngine {
     // Represents a logical stack frame on the thread stack. 
     // Also implements the IDebugExpressionContext interface, which allows expression evaluation and watch windows.
     class AD7StackFrame : IDebugStackFrame2, IDebugExpressionContext2 {

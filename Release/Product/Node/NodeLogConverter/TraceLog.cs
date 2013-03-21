@@ -16,7 +16,7 @@ using System;
 using System.ComponentModel;
 using System.Runtime.InteropServices;
 
-namespace Microsoft.NodeTools.LogGeneration {
+namespace Microsoft.NodejsTools.LogGeneration {
     class TraceLog {
         private readonly ulong _handle;
         private readonly string _sessionName;

@@ -8,7 +8,7 @@ using EnvDTE;
 using Microsoft.VisualStudio;
 using Microsoft.VisualStudio.Shell.Interop;
 
-namespace Microsoft.NodeTools {
+namespace Microsoft.NodejsTools {
 #if FALSE
     [ComVisible(true)]
     public class OAProject : EnvDTE.Project, EnvDTE.ISupportVSProperties {

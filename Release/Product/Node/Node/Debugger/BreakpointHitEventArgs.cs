@@ -14,7 +14,7 @@
 
 using System;
 
-namespace Microsoft.NodeTools.Debugger {
+namespace Microsoft.NodejsTools.Debugger {
     class BreakpointHitEventArgs : EventArgs {
         private readonly NodeBreakpoint _breakpoint;
         private readonly NodeThread _thread;

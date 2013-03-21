@@ -14,7 +14,7 @@
 
 using System;
 
-namespace Microsoft.NodeTools.Debugger {
+namespace Microsoft.NodejsTools.Debugger {
     class ExceptionRaisedEventArgs : EventArgs {
         private readonly NodeException _exception;
         private readonly NodeThread _thread;

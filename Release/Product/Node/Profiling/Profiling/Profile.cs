@@ -13,7 +13,7 @@
  * ***************************************************************************/
 
 
-namespace Microsoft.NodeTools.Profiling {
+namespace Microsoft.NodejsTools.Profiling {
     class Profile {
         public readonly string Name;
 

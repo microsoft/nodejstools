@@ -13,7 +13,7 @@
  * ***************************************************************************/
 
 using System;
-using Microsoft.NodeTools.Repl;
+using Microsoft.NodejsTools.Repl;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using TestUtilities.Mocks;
 

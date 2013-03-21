@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 using Microsoft.PythonTools.Project;
 using System.Runtime.InteropServices;
 
-namespace Microsoft.NodeTools.Project {
+namespace Microsoft.NodejsTools.Project {
     [Guid("62E8E091-6914-498E-A47B-6F198DC1873D")]
     class NodeGeneralPropertyPage : CommonPropertyPage {
         public override System.Windows.Forms.Control Control {

@@ -15,7 +15,7 @@
 using System;
 using System.IO;
 using System.Runtime.InteropServices;
-using Microsoft.NodeTools.Project;
+using Microsoft.NodejsTools.Project;
 using Microsoft.VisualStudio;
 using Microsoft.VisualStudio.ComponentModelHost;
 using Microsoft.VisualStudio.Editor;
@@ -28,7 +28,7 @@ using Microsoft.VisualStudio.TextManager.Interop;
 using Microsoft.VisualStudio.Utilities;
 using IOleServiceProvider = Microsoft.VisualStudio.OLE.Interop.IServiceProvider;
 
-namespace Microsoft.NodeTools {
+namespace Microsoft.NodejsTools {
     /// <summary>
     /// Common factory for creating our editor
     /// </summary>    

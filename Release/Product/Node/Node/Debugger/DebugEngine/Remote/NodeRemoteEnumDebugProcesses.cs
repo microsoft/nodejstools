@@ -19,7 +19,7 @@ using System.Net;
 using System.Net.Sockets;
 using System.Windows.Forms;
 
-namespace Microsoft.NodeTools.Debugger.Remote {
+namespace Microsoft.NodejsTools.Debugger.Remote {
     internal class NodeRemoteEnumDebugProcesses : NodeRemoteEnumDebug<IDebugProcess2>, IEnumDebugProcesses2 {
         public NodeRemoteEnumDebugProcesses(NodeRemoteDebugPort port)
             : base(Connect(port)) {

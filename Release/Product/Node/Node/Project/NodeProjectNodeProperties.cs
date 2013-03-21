@@ -17,7 +17,7 @@ using System.Runtime.InteropServices;
 using Microsoft.PythonTools.Project;
 using Microsoft.PythonTools.Project.Automation;
 
-namespace Microsoft.NodeTools.Project {
+namespace Microsoft.NodejsTools.Project {
     [ComVisible(true)]
     [ClassInterface(ClassInterfaceType.AutoDual)]
     [Guid("04726C27-8125-471A-BAC0-2301D273DB5E")]

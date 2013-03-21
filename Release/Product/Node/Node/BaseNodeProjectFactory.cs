@@ -14,11 +14,11 @@
 
 using System;
 using System.Runtime.InteropServices;
-using Microsoft.NodeTools.Project;
+using Microsoft.NodejsTools.Project;
 using Microsoft.PythonTools.Project;
 using IOleServiceProvider = Microsoft.VisualStudio.OLE.Interop.IServiceProvider;
 
-namespace Microsoft.NodeTools {
+namespace Microsoft.NodejsTools {
     [Guid("9092AA53-FB77-4645-B42D-1CCCA6BD08BD")]
     class BaseNodeProjectFactory : ProjectFactory {
 #if FALSE

@@ -12,12 +12,12 @@
  *
  * ***************************************************************************/
 
-using Microsoft.NodeTools.Debugger.DebugEngine;
+using Microsoft.NodejsTools.Debugger.DebugEngine;
 using Microsoft.VisualStudio;
 using Microsoft.VisualStudio.Debugger.Interop;
 using System;
 
-namespace Microsoft.NodeTools.Debugger.Remote {
+namespace Microsoft.NodejsTools.Debugger.Remote {
     internal class NodeRemoteDebugProgram : IDebugProgram2 {
 
         private readonly NodeRemoteDebugProcess _process;

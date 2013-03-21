@@ -17,7 +17,7 @@ using Microsoft.VisualStudio.Debugger.Interop;
 using System;
 using System.Runtime.InteropServices;
 
-namespace Microsoft.NodeTools.Debugger.DebugEngine {
+namespace Microsoft.NodejsTools.Debugger.DebugEngine {
     // This class represents the information that describes a bound breakpoint.
     class AD7BreakpointResolution : IDebugBreakpointResolution2 {
         private AD7Engine m_engine;

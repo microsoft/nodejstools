@@ -18,7 +18,7 @@ using Microsoft.VisualStudio;
 using Microsoft.VisualStudio.Shell;
 using Microsoft.VisualStudio.Shell.Interop;
 
-namespace Microsoft.NodeTools.Profiling {
+namespace Microsoft.NodejsTools.Profiling {
     [Guid(WindowGuid)]
     class PerfToolWindow : ToolWindowPane {
         internal const string Title = "Node.js Performance";

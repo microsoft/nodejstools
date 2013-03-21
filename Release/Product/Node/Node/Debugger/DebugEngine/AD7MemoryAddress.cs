@@ -16,7 +16,7 @@ using System;
 using Microsoft.VisualStudio;
 using Microsoft.VisualStudio.Debugger.Interop;
 
-namespace Microsoft.NodeTools.Debugger.DebugEngine {
+namespace Microsoft.NodejsTools.Debugger.DebugEngine {
     // And implementation of IDebugCodeContext2 and IDebugMemoryContext2. 
     // IDebugMemoryContext2 represents a position in the address space of the machine running the program being debugged.
     // IDebugCodeContext2 represents the starting position of a code instruction. 

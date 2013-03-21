@@ -20,7 +20,7 @@ using System.Reflection;
 using System.Windows;
 using Microsoft.Win32;
 
-namespace Microsoft.NodeTools.Profiling {
+namespace Microsoft.NodejsTools.Profiling {
     class ProfiledProcess {
         private readonly string _exe, _args, _dir;
         private readonly ProcessorArchitecture _arch;

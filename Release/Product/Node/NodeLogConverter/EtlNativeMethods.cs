@@ -16,7 +16,7 @@ using System;
 using System.ComponentModel;
 using System.Runtime.InteropServices;
 
-namespace Microsoft.NodeTools.LogGeneration {
+namespace Microsoft.NodejsTools.LogGeneration {
     class EtlNativeMethods {
         [DllImport("advapi32.dll", CallingConvention = CallingConvention.StdCall)]
         public static extern uint CloseTrace(ulong handle);

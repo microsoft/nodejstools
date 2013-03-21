@@ -4,7 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace Microsoft.NodeTools {
+namespace Microsoft.NodejsTools {
     class NodeConstants {
         public const string FileExtension = ".js";
     }

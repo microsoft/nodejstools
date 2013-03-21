@@ -16,7 +16,7 @@ using System.IO;
 using Microsoft.PythonTools.Project;
 using Microsoft.VisualStudio;
 
-namespace Microsoft.NodeTools.Project {
+namespace Microsoft.NodejsTools.Project {
     class NodejsFileNode : CommonFileNode {
         private FileSystemWatcher _watcher;
         public string _currentText;

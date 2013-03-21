@@ -22,7 +22,7 @@ using Microsoft.PythonTools;
 using Microsoft.PythonTools.Project;
 using Microsoft.VisualStudio;
 
-namespace Microsoft.NodeTools.Project {
+namespace Microsoft.NodejsTools.Project {
     class NodejsProjectNode : CommonProjectNode {
         private static string _nodeRefCode = ReadNodeRefCode();
         internal string _referenceFilename = GetReferenceFilePath();

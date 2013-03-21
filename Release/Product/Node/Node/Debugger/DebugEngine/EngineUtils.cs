@@ -16,7 +16,7 @@ using System;
 using System.Runtime.InteropServices;
 using Microsoft.VisualStudio.Debugger.Interop;
 
-namespace Microsoft.NodeTools.Debugger.DebugEngine {
+namespace Microsoft.NodejsTools.Debugger.DebugEngine {
     static class EngineUtils {
         public static void CheckOk(int hr) {
             if (hr != 0) {

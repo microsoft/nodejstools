@@ -17,7 +17,7 @@ using System.Windows;
 using Microsoft.VisualStudio.PlatformUI;
 using Microsoft.Win32;
 
-namespace Microsoft.NodeTools.Profiling {
+namespace Microsoft.NodejsTools.Profiling {
     /// <summary>
     /// Interaction logic for CompareReportsWindow.xaml
     /// </summary>

@@ -15,7 +15,7 @@
 using System.ComponentModel.Composition;
 using Microsoft.VisualStudio.Repl;
 
-namespace Microsoft.NodeTools.Repl {
+namespace Microsoft.NodejsTools.Repl {
     [ReplRole("Reset"), ReplRole("Execution")]
     [Export(typeof(IReplEvaluatorProvider))]
     class NodeReplEvaluatorProvider : IReplEvaluatorProvider {

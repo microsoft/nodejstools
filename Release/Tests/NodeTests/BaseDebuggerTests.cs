@@ -13,7 +13,7 @@
  * ***************************************************************************/
 
 //using EnvDTE90;
-using Microsoft.NodeTools.Debugger;
+using Microsoft.NodejsTools.Debugger;
 //using Microsoft.Node.Parsing;
 //using Microsoft.TC.TestHostAdapters;
 using Microsoft.VisualStudio.TestTools.UnitTesting;

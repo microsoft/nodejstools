@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 using Microsoft.PythonTools.Navigation;
 using Microsoft.VisualStudio.Shell.Interop;
 
-namespace Microsoft.NodeTools.Project {
+namespace Microsoft.NodejsTools.Project {
     class NodeLibraryNode : CommonLibraryNode {
         public NodeLibraryNode(IScopeNode scope, string namePrefix, IVsHierarchy hierarchy, uint itemId) :
             base(scope, namePrefix, hierarchy, itemId) {

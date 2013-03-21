@@ -13,7 +13,7 @@
  * ***************************************************************************/
 
 
-namespace Microsoft.NodeTools.Debugger {
+namespace Microsoft.NodejsTools.Debugger {
     class NodeException {
         private readonly string _typeName, _description;
 

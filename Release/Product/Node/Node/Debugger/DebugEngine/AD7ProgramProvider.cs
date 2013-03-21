@@ -17,7 +17,7 @@ using System.Runtime.InteropServices;
 using Microsoft.VisualStudio;
 using Microsoft.VisualStudio.Debugger.Interop;
 
-namespace Microsoft.NodeTools.Debugger.DebugEngine {
+namespace Microsoft.NodejsTools.Debugger.DebugEngine {
     // This class implments IDebugProgramProvider2. 
     // This registered interface allows the session debug manager (SDM) to obtain information about programs 
     // that have been "published" through the IDebugProgramPublisher2 interface.

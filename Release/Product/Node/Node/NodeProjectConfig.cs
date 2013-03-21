@@ -17,7 +17,7 @@ using Microsoft.VisualStudio;
 using Microsoft.VisualStudio.OLE.Interop;
 using Microsoft.VisualStudio.Shell.Interop;
 
-namespace Microsoft.NodeTools.Project {
+namespace Microsoft.NodejsTools.Project {
     /// <summary>
     /// Merges the NTVS IVsCfg object with the Venus IVsCfg implementation redirecting
     /// things appropriately to either one.

@@ -15,7 +15,7 @@
 using System.Collections.Generic;
 using Microsoft.VisualStudio.Debugger.Interop;
 
-namespace Microsoft.NodeTools.Debugger.DebugEngine {
+namespace Microsoft.NodejsTools.Debugger.DebugEngine {
     // This class manages breakpoints for the engine. 
     class BreakpointManager {
         private AD7Engine m_engine;

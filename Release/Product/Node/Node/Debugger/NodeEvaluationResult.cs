@@ -16,7 +16,7 @@ using System;
 using System.Diagnostics;
 using System.Threading;
 
-namespace Microsoft.NodeTools.Debugger {
+namespace Microsoft.NodejsTools.Debugger {
     /// <summary>
     /// Represents the result of an evaluation of an expression against a given stack frame.
     /// </summary>

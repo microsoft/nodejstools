@@ -15,7 +15,7 @@
 using System;
 using System.Collections.Generic;
 
-namespace Microsoft.NodeTools.Debugger {
+namespace Microsoft.NodejsTools.Debugger {
     class NodeStackFrame {
         private int _lineNo;    // mutates on set next line
         private readonly string _frameName, _filename;

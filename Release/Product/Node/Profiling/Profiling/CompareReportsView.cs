@@ -19,7 +19,7 @@ using System.Text;
 using System.ComponentModel;
 using System.IO;
 
-namespace Microsoft.NodeTools.Profiling {
+namespace Microsoft.NodejsTools.Profiling {
     public sealed class CompareReportsView : INotifyPropertyChanged {
         private string _baselineFile;
         private string _comparisonFile;

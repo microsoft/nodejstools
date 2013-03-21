@@ -19,7 +19,7 @@ using System.Diagnostics;
 using System.Runtime.InteropServices;
 using System.Threading;
 
-namespace Microsoft.NodeTools.Debugger.DebugEngine {
+namespace Microsoft.NodejsTools.Debugger.DebugEngine {
     // This class represents a pending breakpoint which is an abstract representation of a breakpoint before it is bound.
     // When a user creates a new breakpoint, the pending breakpoint is created and is later bound. The bound breakpoints
     // become children of the pending breakpoint.

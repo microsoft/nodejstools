@@ -15,7 +15,7 @@
 using System;
 using System.Diagnostics;
 
-namespace Microsoft.NodeTools.Debugger {
+namespace Microsoft.NodejsTools.Debugger {
     class NodeBreakpoint {
         private readonly NodeDebugger _process;
         private readonly string _fileName;

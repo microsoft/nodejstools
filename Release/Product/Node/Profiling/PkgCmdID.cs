@@ -15,7 +15,7 @@
 // PkgCmdID.cs
 // MUST match PkgCmdID.h
 
-namespace Microsoft.NodeTools.Profiling {
+namespace Microsoft.NodejsTools.Profiling {
     static class PkgCmdIDList {
         public const uint cmdidStartNodeProfiling = 0x100;
         public const uint cmdidPerfExplorer = 0x101;

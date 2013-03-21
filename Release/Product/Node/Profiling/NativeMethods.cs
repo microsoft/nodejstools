@@ -15,7 +15,7 @@
 using System.Reflection;
 using System.Runtime.InteropServices;
 
-namespace Microsoft.NodeTools {
+namespace Microsoft.NodejsTools {
     internal static class NativeMethods {
         [DllImport("kernel32", EntryPoint = "GetBinaryTypeW", CharSet = CharSet.Unicode, CallingConvention = CallingConvention.Winapi)]
         private static extern bool _GetBinaryType(string lpApplicationName, out GetBinaryTypeResult lpBinaryType);

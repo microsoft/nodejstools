@@ -4,13 +4,13 @@ using System.Collections.ObjectModel;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
-using Microsoft.NodeTools.Project;
+using Microsoft.NodejsTools.Project;
 using Microsoft.VisualStudio.Text;
 using Microsoft.VisualStudio.Text.Projection;
 using Microsoft.VisualStudio.TextManager.Interop;
 using Microsoft.VisualStudio.Utilities;
 
-namespace Microsoft.NodeTools {
+namespace Microsoft.NodejsTools {
     /// <summary>
     /// Represents a projection buffer for Node.js code.  We wrap the user's code inside of a function body
     /// and include appropriate reference tags as well which are dynamically injected.

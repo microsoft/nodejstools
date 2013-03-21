@@ -14,7 +14,7 @@
 
 using System;
 
-namespace Microsoft.NodeTools.Debugger {
+namespace Microsoft.NodejsTools.Debugger {
     sealed class OutputEventArgs : EventArgs {
         private readonly string _output;
         private readonly NodeThread _thread;

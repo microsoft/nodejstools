@@ -17,7 +17,7 @@ using Microsoft.VisualStudio.Debugger.Interop;
 using System;
 using System.IO;
 
-namespace Microsoft.NodeTools.Debugger.Remote {
+namespace Microsoft.NodejsTools.Debugger.Remote {
     internal class NodeRemoteDebugProcess : IDebugProcess2, IDebugProcessSecurity2 {
 
         private readonly NodeRemoteDebugPort _port;

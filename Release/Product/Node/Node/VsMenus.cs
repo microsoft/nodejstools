@@ -15,7 +15,7 @@
 using System;
 using System.Diagnostics.CodeAnalysis;
 
-namespace Microsoft.NodeTools {
+namespace Microsoft.NodejsTools {
     /// <summary>
     /// Defines menu commands guids and menu command id's
     /// </summary>
