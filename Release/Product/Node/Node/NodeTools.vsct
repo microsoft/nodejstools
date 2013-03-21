@@ -46,7 +46,7 @@
         <Icon guid="guidImages" id="nodeReplPic" />
         <Strings>
           <CommandName>cmdidReplWindow</CommandName>
-          <ButtonText>Node Interactive Window</ButtonText>
+          <ButtonText>Node.js Interactive Window</ButtonText>
         </Strings>
       </Button>
 

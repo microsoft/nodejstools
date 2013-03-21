@@ -25,21 +25,51 @@ namespace NodeReferenceGenerator {
         }
 
         private string Generate() {
-            GenerateRequire(_output, _all);
+            _output.Append("function require(module) {\r\n");
 
-            foreach (var module in _all["modules"]) {
-                GenerateModule(module);
+            GenerateRequireBody(_output, _all);
+
+            _output.Append("// **NTVS** INSERT USER MODULE SWITCH HERE **NTVS**");
+
+            _output.Append(@"\r\n\r\n    }
+}
+");
+
+            foreach (var misc in _all["miscs"]) {
+                if (misc["name"] == "Global Objects") {
+                    GenerateGlobals(misc["globals"]);
+                    break;
+                }
             }
 
             return _output.ToString();
         }
 
+        private void GenerateGlobals(dynamic globals) {
+            foreach (var global in globals) {
+                if (global.ContainsKey("events") ||
+                    global.ContainsKey("methods") ||
+                    global.ContainsKey("properties") ||
+                    global.ContainsKey("classes")) {
+
+
+                    _output.AppendFormat("var {0} = new ", global["name"]);
+                    GenerateModuleWorker(global, 0, "__" + global["name"]);
+                    _output.Append(";");
+                }
+            }
+        }
+
         private void GenerateModule(dynamic module, int indentation = 0) {
-            var modName = FixModuleName(module["name"]);
-            
+            string modName = FixModuleName(module["name"]);
+
+            GenerateModuleWorker(module, indentation, modName);
+        }
+
+        private void GenerateModuleWorker(dynamic module, int indentation, string name) {
             _output.Append(' ', indentation * 4);
-            _output.AppendFormat("function {0}() {{\r\n", modName);
-            
+            _output.AppendFormat("function {0}() {{\r\n", name);
+
             if (module.ContainsKey("desc")) {
                 _output.Append(' ', (indentation + 1) * 4);
                 _output.AppendFormat("/// <summary>{0}</summary>\r\n", FixDescription(module["desc"]));
@@ -47,7 +77,7 @@ namespace NodeReferenceGenerator {
 
             if (module.ContainsKey("methods")) {
                 foreach (var method in module["methods"]) {
-                    GenerateMethod(modName, method, indentation + 1);
+                    GenerateMethod(name, method, indentation + 1);
                 }
             }
 
@@ -57,8 +87,7 @@ namespace NodeReferenceGenerator {
 
             if (module.ContainsKey("classes")) {
                 foreach (var klass in module["classes"]) {
-
-                    GenerateClass(modName, klass, indentation + 1);
+                    GenerateClass(name, klass, indentation + 1);
                 }
             }
 
@@ -66,7 +95,7 @@ namespace NodeReferenceGenerator {
                 GenerateProperties(module["properties"], indentation + 1);
             }
 
-            _output.AppendFormat("}} // module {0}\r\n\r\n", module["name"]);
+            _output.AppendFormat("}}", name);
         }
 
         private void GenerateClass(string modName, dynamic klass, int indentation) {
@@ -99,8 +128,8 @@ namespace NodeReferenceGenerator {
                     desc = prop["desc"];
 
                     _output.Append(' ', indentation * 4);
-                    _output.AppendFormat("/// <field name='{0}'>{1}</field>\r\n", 
-                        prop["name"], 
+                    _output.AppendFormat("/// <field name='{0}'>{1}</field>\r\n",
+                        prop["name"],
                         FixDescription(desc));
 
                 }
@@ -140,6 +169,9 @@ namespace NodeReferenceGenerator {
             _output.AppendLine("emitter = new Events().EventEmitter;");
 
             foreach (var ev in events) {
+                if (ev["name"].IndexOf(' ') != -1) {
+                    continue;
+                }
                 if (ev.ContainsKey("desc")) {
                     _output.Append(' ', indentation * 4);
                     _output.AppendFormat("/// <field name='{0}'>{1}</field>\r\n", ev["name"], FixDescription(ev["desc"]));
@@ -172,10 +204,10 @@ namespace NodeReferenceGenerator {
             _output.Append(") {\r\n");
 
             if (method.ContainsKey("desc")) {
-                _output.Append(' ', (indentation + 1)* 4);
+                _output.Append(' ', (indentation + 1) * 4);
                 _output.AppendFormat("/// <summary>{0}</summary>\r\n", FixDescription(method["desc"]));
             }
-            foreach(var curSig in method["signatures"]) {
+            foreach (var curSig in method["signatures"]) {
                 if (curSig["params"].Length > 0) {
                     _output.Append(' ', (indentation + 1) * 4);
                     _output.AppendLine("/// <signature>");
@@ -191,8 +223,8 @@ namespace NodeReferenceGenerator {
 
                         if (param.ContainsKey("desc")) {
                             _output.Append(param["desc"]);
-                        } 
-                        _output.AppendLine("</param>");                        
+                        }
+                        _output.AppendLine("</param>");
                     }
 
                     if (curSig.ContainsKey("return")) {
@@ -200,7 +232,7 @@ namespace NodeReferenceGenerator {
                         if (curSig["return"].ContainsKey("type")) {
                             returnType = FixModuleName(curSig["return"]["type"]);
                         }
-                        
+
                         if (curSig["return"].ContainsKey("desc")) {
                             returnDesc = curSig["return"]["desc"];
                         }
@@ -208,7 +240,7 @@ namespace NodeReferenceGenerator {
                         if (returnType != null || returnDesc != null) {
                             _output.Append(' ', (indentation + 1) * 4);
                             _output.Append("/// <returns");
-                            
+
                             if (returnType != null) {
                                 _output.AppendFormat(" type=\"{0}\">", returnType);
                             } else {
@@ -235,22 +267,19 @@ namespace NodeReferenceGenerator {
             _output.AppendLine("}");
         }
 
-        private static void GenerateRequire(StringBuilder res, dynamic all) {
+        private void GenerateRequireBody(StringBuilder res, dynamic all) {
             res.Append(@"
-function require(module) {
     switch (module) {
 ");
 
 
 
             foreach (var module in all["modules"]) {
-                res.AppendFormat("        case \"{0}\": return new {0}();\r\n", module["name"]);
+                res.AppendFormat("        case \"{0}\": return new ", module["name"]);
+                GenerateModule(module, 1);
+                res.Append(";\r\n");
             }
 
-            res.Append(@"    }
-}
-
-");
         }
 
 
@@ -264,7 +293,7 @@ function require(module) {
         }
 
         private static string FixDescription(string desc) {
-            return desc.Replace("\n", "");
+            return desc.Replace("\n", " ");
         }
 
         private string FixClassName(string name) {

@@ -7,7 +7,8 @@
     <Description xml:space="preserve">Provides support for profiling Node.js projects</Description>
     <Locale>1033</Locale>
     <InstalledByMsi>true</InstalledByMsi>
-    <Icon>PythonProject.ico</Icon>
+    <Icon>NodejsPackage.ico</Icon>
+    <PreviewImage>NodejsPackage.ico</PreviewImage>
     <SupportedProducts>
       <VisualStudio Version="11.0">
         <Edition>Ultimate</Edition>

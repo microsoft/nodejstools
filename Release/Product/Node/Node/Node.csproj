@@ -492,6 +492,9 @@
     <Compile Include="NodeProjectConfig.cs" />
     <Compile Include="Project\NodejsFileNode.cs" />
     <Compile Include="ProvideEditorExtension2Attribute.cs" />
+    <Compile Include="ProvideLanguageTemplates.cs" />
+    <Compile Include="Repl\ClearReplCommand.cs" />
+    <Compile Include="Repl\SaveReplCommand.cs" />
     <Compile Include="VsMenus.cs" />
     <Page Include="..\..\Python\PythonTools\PythonTools\Project\TaskProgressBar.xaml">
       <Generator>MSBuild:Compile</Generator>
@@ -655,6 +658,12 @@
       <ResourceName>1000</ResourceName>
       <SubType>Designer</SubType>
     </VSCTCompile>
+    <Content Include="FileTemplates\NewItem\EmptyJs.js">
+      <IncludeInVSIX>true</IncludeInVSIX>
+    </Content>
+    <Content Include="FileTemplates\NewItem\TextFile.txt">
+      <IncludeInVSIX>true</IncludeInVSIX>
+    </Content>
     <Content Include="ProjectTemplates\NodeApp.zip">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
       <IncludeInVSIX>true</IncludeInVSIX>
@@ -664,6 +673,9 @@
       <TargetPath>Microsoft.NodejsTools.Developer.targets</TargetPath>
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
       <SubType>Designer</SubType>
+    </Content>
+    <Content Include="FileTemplates\NewItem\NewItems.vsdir">
+      <IncludeInVSIX>true</IncludeInVSIX>
     </Content>
     <None Include="ProjectTemplates\NodeApp\NodeApp.njsproj">
       <SubType>Designer</SubType>
@@ -683,6 +695,11 @@
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
     <Content Include="ProjectTemplates\NodeApp\server.js" />
+    <Resource Include="..\Icons\NodejsPackage.ico" />
+    <Content Include="..\Icons\NodejsPackage.ico">
+      <IncludeInVSIX>true</IncludeInVSIX>
+      <VSIXSubpath>.</VSIXSubpath>
+    </Content>
     <Content Include="visualstudio_nodejs_repl.js">
       <IncludeInVSIX>true</IncludeInVSIX>
       <VSIXSubpath>.</VSIXSubpath>

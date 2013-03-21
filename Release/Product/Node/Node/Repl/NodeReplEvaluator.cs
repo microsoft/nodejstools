@@ -37,6 +37,7 @@ namespace Microsoft.NodejsTools.Repl {
 
         public Task<ExecutionResult> Initialize(IReplWindow window) {
             _window = window;
+            _window.SetOptionValue(ReplOptions.CommandPrefix, ".");
             _window.SetOptionValue(ReplOptions.PrimaryPrompt, "> ");
             _window.SetOptionValue(ReplOptions.SecondaryPrompt, ". ");
             _window.SetOptionValue(ReplOptions.DisplayPromptInMargin, false);
@@ -249,13 +250,16 @@ namespace Microsoft.NodejsTools.Repl {
 
             private void SendExecuteText(string text) {
                 AllowSetForegroundWindow(_process.Id);
-                string json = _serializer.Serialize(
-                    new Dictionary<string, object>() {
-                        { "type", "execute" },
-                        { "code", text },
-                    }
-                );
+                var request = new Dictionary<string, object>() {
+                    { "type", "execute" },
+                    { "code", text },
+                };
 
+                SendRequest(request);
+            }
+
+            internal void SendRequest(Dictionary<string, object> request) {
+                string json = _serializer.Serialize(request);
 
                 byte[] bytes = System.Text.Encoding.UTF8.GetBytes(json);
                 var length = "Content-length: " + bytes.Length + "\r\n\r\n";
@@ -360,10 +364,17 @@ namespace Microsoft.NodejsTools.Repl {
             }
 
             internal void Dispose() {
-                if (_process != null) {
-                    _process.Kill();
+                if (_process != null && !_process.HasExited) {
+                    try {
+                        _process.Kill();
+                    } catch (InvalidOperationException) {
+                    }
                 }
             }
+        }
+
+        internal void Clear() {
+            _listener.SendRequest(new Dictionary<string,object>() { { "type", "clear" }});
         }
     }
 }

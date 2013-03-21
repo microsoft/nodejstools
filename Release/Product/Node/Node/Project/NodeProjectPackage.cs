@@ -27,8 +27,8 @@ namespace Microsoft.PythonTools.Project {
     [PackageRegistration(UseManagedResourcesOnly = true)]
     [Description("Node Project Package")]
     [Guid("D861969D-CEC8-4411-AB85-C08EFE4100A2")]
-    [DeveloperActivity("JavaScript", typeof(NodeProjectPackage))]
-    [ProvideProjectFactory(typeof(BaseNodeProjectFactory), "JavaScript", NodeFileFilter, "njsproj", "njsproj", ".\\NullPath", LanguageVsTemplate = "JavaScript")]
+    [DeveloperActivity(NodeConstants.JavaScript, typeof(NodeProjectPackage))]
+    [ProvideProjectFactory(typeof(BaseNodeProjectFactory), NodeConstants.Nodejs, NodeFileFilter, "njsproj", "njsproj", ".\\NullPath", LanguageVsTemplate = NodeConstants.Nodejs)]
     public class NodeProjectPackage : CommonProjectPackage {
         internal const string NodeFileFilter = "Node.js Project Files (*.njsproj);*.njsproj";
 
@@ -71,7 +71,7 @@ namespace Microsoft.PythonTools.Project {
         /// displayed in the help about dialog.
         /// </summary>
         public override string GetProductName() {
-            return "JavaScript";
+            return "Node.js Project";
         }
 
         /// <summary>
@@ -79,7 +79,7 @@ namespace Microsoft.PythonTools.Project {
         /// displayed in the help about dialog.
         /// </summary>
         public override string GetProductDescription() {
-            return "Node.js";
+            return NodeConstants.Nodejs;
             //return Resources.ProductDescription;
         }
         /// <summary>

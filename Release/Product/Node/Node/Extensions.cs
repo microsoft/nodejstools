@@ -12,12 +12,18 @@
  *
  * ***************************************************************************/
 
+using Microsoft.NodejsTools.Project;
+using Microsoft.PythonTools;
 using Microsoft.VisualStudio;
 using Microsoft.VisualStudio.Shell.Interop;
 using Microsoft.VisualStudio.Text;
 
-namespace Microsoft.PythonTools {
+namespace Microsoft.NodejsTools {
     public static class Extensions {
+        internal static NodejsProjectNode GetNodeProject(this EnvDTE.Project project) {
+            return project.GetCommonProject() as NodejsProjectNode;
+        }
+
         internal static EnvDTE.Project GetProject(this IVsHierarchy hierarchy) {
             object project;
 

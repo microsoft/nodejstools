@@ -59,6 +59,10 @@ var context = global;
 context.require = require;
 context.module = module;
 
+util.inspect.styles['number'] = 'blue';
+util.inspect.styles['boolean'] = 'blue';
+util.inspect.colors['blue'] = [94, 39];
+
 function processRequest(command) {
     switch (command["type"]) {
         case "execute":
@@ -70,6 +74,9 @@ function processRequest(command) {
             } catch (err) {
                 send_response(client, { 'type': 'execute', 'error': err.toString() });
             }
+            break;
+        case "clear":
+            context = {};
             break;
         default:
             console.log("Unknown command: " + command["type"]);

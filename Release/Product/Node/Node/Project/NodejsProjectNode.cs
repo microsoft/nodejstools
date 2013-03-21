@@ -27,7 +27,6 @@ namespace Microsoft.NodejsTools.Project {
         private static string _nodeRefCode = ReadNodeRefCode();
         internal string _referenceFilename = GetReferenceFilePath();
         const string _userSwitchMarker = "// **NTVS** INSERT USER MODULE SWITCH HERE **NTVS**";
-        const string _userModuleMarker = "// **NTVS** INSERT USER MODULES HERE **NTVS**";
         internal readonly List<NodejsFileNode> _nodeFiles = new List<NodejsFileNode>();
 
         public NodejsProjectNode(NodeProjectPackage package)
@@ -135,12 +134,12 @@ namespace Microsoft.NodejsTools.Project {
             StringBuilder moduleCode = new StringBuilder();
 
             lock (_nodeFiles) {
-                UpdateReferenceFile(this, switchCode, moduleCode);
+                UpdateReferenceFile(this, switchCode);
 
                 try {
                     File.WriteAllText(
                         _referenceFilename,
-                        _nodeRefCode.Replace(_userSwitchMarker, switchCode.ToString()).Replace(_userModuleMarker, moduleCode.ToString())
+                        _nodeRefCode.Replace(_userSwitchMarker, switchCode.ToString())
                     );
                 } catch (IOException) {
                 }
@@ -150,26 +149,26 @@ namespace Microsoft.NodejsTools.Project {
         /// <summary>
         /// Walks the project and generates the reference code for each .js file present.
         /// </summary>
-        private void UpdateReferenceFile(HierarchyNode node, StringBuilder switchCode, StringBuilder moduleCode) {
+        private void UpdateReferenceFile(HierarchyNode node, StringBuilder switchCode) {
             foreach (var nodeFile in _nodeFiles) {
                 string name = CommonUtils.CreateFriendlyFilePath(
                         ProjectHome,
                         nodeFile.Url
                     ).Replace("\\", "/");
 
-                switchCode.AppendFormat("case \"./{0}\": return {1}();\r\n", 
-                    name, 
-                    FilenameToModuleName(name));
-
-                moduleCode.AppendFormat(@"
-function {0}() {{
+                switchCode.AppendFormat(@"case ""./{0}"": 
+function {1}() {{
 var exports = {{}};
-{1}
+{2}
 
 return exports;
 }}
 
-", FilenameToModuleName(name), nodeFile._currentText);
+return {1}();
+", 
+                    name, 
+                    FilenameToModuleName(name),
+                    nodeFile._currentText);
             }
         }
 
@@ -215,7 +214,6 @@ function require(module) {
     " + _userSwitchMarker + @"
     }
 }
-" + _userModuleMarker + @"
 ";
         }
     }

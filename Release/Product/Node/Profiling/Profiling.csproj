@@ -230,6 +230,13 @@
       <Name>Node</Name>
     </ProjectReference>
   </ItemGroup>
+  <ItemGroup>
+    <Resource Include="..\Icons\NodejsPackage.ico" />
+    <Content Include="..\Icons\NodejsPackage.ico">
+      <IncludeInVSIX>true</IncludeInVSIX>
+      <VSIXSubpath>.</VSIXSubpath>
+    </Content>
+  </ItemGroup>
   <PropertyGroup>
     <UseCodebase>true</UseCodebase>
     <RegisterOutputPackage>true</RegisterOutputPackage>

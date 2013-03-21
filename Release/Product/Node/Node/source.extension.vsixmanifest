@@ -9,6 +9,8 @@
     <MoreInfoUrl>http://nodetools.codeplex.com</MoreInfoUrl>
     <GettingStartedGuide>http://nodetools.codeplex.com</GettingStartedGuide>
     <InstalledByMsi>true</InstalledByMsi>
+    <Icon>NodejsPackage.ico</Icon>
+    <PreviewImage>NodejsPackage.ico</PreviewImage>
     <SupportedProducts>
       <VisualStudio Version="11.0">
         <Edition>Ultimate</Edition>
