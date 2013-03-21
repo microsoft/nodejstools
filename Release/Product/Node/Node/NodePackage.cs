@@ -159,7 +159,7 @@ namespace Microsoft.NodeTools {
                 if (nodePath != null)
                     return nodePath;
                 //Fall back to a well known location if lookup fails
-                string installPath = System.IO.Path.Combine(Environment.GetEnvironmentVariable("ProgramFiles"), @"\nodejs");
+                string installPath = System.IO.Path.Combine(Environment.GetEnvironmentVariable("ProgramFiles"), "nodejs");
                 try
                 {
                     using (RegistryKey key = Registry.CurrentUser.OpenSubKey("Software").OpenSubKey("Node.js"))
@@ -174,7 +174,7 @@ namespace Microsoft.NodeTools {
                 catch (Exception)
                 {
                 }
-                nodePath = System.IO.Path.Combine(installPath, @"\node.exe");
+                nodePath = System.IO.Path.Combine(installPath, "node.exe");
                 return nodePath;
             }
         }
