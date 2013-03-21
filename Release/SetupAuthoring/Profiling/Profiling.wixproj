@@ -25,7 +25,7 @@
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\..\Product\Node\Profiling\Profiling.csproj">
-      <Name>Microsoft.NodeTools.Profiling</Name>
+      <Name>Microsoft.NodejsTools.Profiling</Name>
       <Project>{C42B194E-3333-45E8-BB26-D69D1A51EF0B}</Project>
       <Private>True</Private>
       <DoNotHarvest>true</DoNotHarvest>
