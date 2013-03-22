@@ -14,8 +14,8 @@
 
 using System;
 using System.Runtime.InteropServices;
-using Microsoft.PythonTools.Project;
-using Microsoft.PythonTools.Project.Automation;
+using Microsoft.VisualStudioTools.Project;
+using Microsoft.VisualStudioTools.Project.Automation;
 
 namespace Microsoft.NodejsTools.Project {
     [ComVisible(true)]

@@ -13,7 +13,7 @@
  * ***************************************************************************/
 
 using System;
-using Microsoft.PythonTools;
+using Microsoft.VisualStudioTools;
 using Microsoft.VisualStudio.Text;
 using Microsoft.VisualStudio.Utilities;
 

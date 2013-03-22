@@ -14,13 +14,11 @@
 
 using System.Collections.Generic;
 using Microsoft.VisualStudio;
-using Microsoft.VisualStudio.Editor;
 using Microsoft.VisualStudio.OLE.Interop;
 using Microsoft.VisualStudio.Text.Editor;
-using Microsoft.VisualStudio.Text.Operations;
 using Microsoft.VisualStudio.TextManager.Interop;
 
-namespace Microsoft.PythonTools.Navigation {
+namespace Microsoft.VisualStudioTools.Navigation {
     class CodeWindowManager : IVsCodeWindowManager {
         private readonly IVsCodeWindow _window;
         private readonly IWpfTextView _textView;
@@ -33,23 +31,6 @@ namespace Microsoft.PythonTools.Navigation {
         public CodeWindowManager(IVsCodeWindow codeWindow, IWpfTextView textView) {
             _window = codeWindow;
             _textView = textView;
-
-#if FALSE
-            var model = PythonToolsPackage.ComponentModel;
-            var adaptersFactory = model.GetService<IVsEditorAdaptersFactoryService>();
-            IEditorOperationsFactoryService factory = model.GetService<IEditorOperationsFactoryService>();
-
-            EditFilter editFilter = _filter = new EditFilter(textView, factory.GetEditorOperations(textView));
-            IntellisenseController intellisenseController = IntellisenseControllerProvider.GetOrCreateController(model, textView);
-            var adapter = adaptersFactory.GetViewAdapter(textView);
-            editFilter.AttachKeyboardFilter(adapter);
-            intellisenseController.AttachKeyboardFilter();
-
-#if DEV11
-            var viewFilter = new TextViewFilter();
-            viewFilter.AttachFilter(adapter);
-#endif
-#endif
         }
 
         public static void OnIdle(IOleComponentManager compMgr) {

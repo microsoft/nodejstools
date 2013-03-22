@@ -21,7 +21,7 @@ using System.Runtime.InteropServices;
 using System.Xml;
 using Microsoft.NodejsTools;
 using Microsoft.NodejsTools.Project;
-using Microsoft.PythonTools.Project;
+using Microsoft.VisualStudioTools.Project;
 using Microsoft.VisualStudio;
 using Microsoft.VisualStudio.OLE.Interop;
 using Microsoft.VisualStudio.Shell;
@@ -490,17 +490,6 @@ namespace Microsoft.NodejsTools {
                                 writer.WriteAttributes(reader, true);
 
                                 if (!reader.IsEmptyElement) {
-                                    /*
-                                    if (reader.Name == "Imports" &&
-                                        elements.Count == 2 &&
-                                        elements[0] == "ServiceDefinition" &&
-                                        elements[1] == "WebRole") {
-
-                                        writer.WriteStartElement("Import");
-                                        writer.WriteAttributeString("moduleName", "PythonTools");
-                                        writer.WriteEndElement();
-                                    }*/
-
                                     elements.Add(reader.Name);
                                 } else {
                                     writer.WriteEndElement();

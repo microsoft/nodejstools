@@ -15,7 +15,7 @@
 using System;
 using System.Globalization;
 
-namespace Microsoft.PythonTools.Parsing {
+namespace Microsoft.VisualStudioTools.Parsing {
     /// <summary>
     /// Represents a location in source code.
     /// </summary>

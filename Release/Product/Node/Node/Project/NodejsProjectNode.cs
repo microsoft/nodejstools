@@ -18,9 +18,9 @@ using System.Globalization;
 using System.IO;
 using System.Reflection;
 using System.Text;
-using Microsoft.PythonTools;
-using Microsoft.PythonTools.Project;
 using Microsoft.VisualStudio;
+using Microsoft.VisualStudioTools;
+using Microsoft.VisualStudioTools.Project;
 
 namespace Microsoft.NodejsTools.Project {
     class NodejsProjectNode : CommonProjectNode {

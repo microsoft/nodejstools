@@ -19,7 +19,7 @@ using System.Drawing;
 using System.IO;
 using System.Reflection;
 using System.Windows.Forms;
-using Microsoft.PythonTools.Project;
+using Microsoft.VisualStudioTools.Project;
 using Microsoft.VisualStudio;
 using Microsoft.VisualStudio.Shell.Interop;
 
@@ -256,7 +256,7 @@ namespace Microsoft.NodejsTools.Profiling {
         #endregion
 
         private static ImageList InitImageList() {
-            var stream = Assembly.GetExecutingAssembly().GetManifestResourceStream("Microsoft.PythonTools.ProfilingTreeView.bmp");
+            var stream = Assembly.GetExecutingAssembly().GetManifestResourceStream("Microsoft.NodejsTools.Profiling.ProfilingTreeView.bmp");
             return Utilities.GetImageList(
                 stream
             );

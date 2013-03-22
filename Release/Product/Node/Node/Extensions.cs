@@ -13,10 +13,10 @@
  * ***************************************************************************/
 
 using Microsoft.NodejsTools.Project;
-using Microsoft.PythonTools;
 using Microsoft.VisualStudio;
 using Microsoft.VisualStudio.Shell.Interop;
 using Microsoft.VisualStudio.Text;
+using Microsoft.VisualStudioTools;
 
 namespace Microsoft.NodejsTools {
     public static class Extensions {

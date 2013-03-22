@@ -16,7 +16,7 @@ using Microsoft.NodejsTools.Debugger.DebugEngine;
 using Microsoft.NodejsTools.Debugger.Remote;
 using Microsoft.NodejsTools.Project;
 using Microsoft.NodejsTools.Repl;
-using Microsoft.PythonTools;
+using Microsoft.VisualStudioTools;
 using Microsoft.VisualStudio;
 using Microsoft.VisualStudio.Debugger.Interop;
 using Microsoft.VisualStudio.Repl;
@@ -192,7 +192,7 @@ namespace Microsoft.NodejsTools {
 
         #endregion
 
-        internal override PythonTools.Navigation.LibraryManager CreateLibraryManager(CommonPackage package) {
+        internal override VisualStudioTools.Navigation.LibraryManager CreateLibraryManager(CommonPackage package) {
             return new NodeLibraryManager(this);
         }
 

@@ -12,9 +12,9 @@
  *
  * ***************************************************************************/
 
-using Microsoft.PythonTools.Project;
+using Microsoft.VisualStudioTools.Project;
 
-namespace Microsoft.PythonTools.Navigation {
+namespace Microsoft.VisualStudioTools.Navigation {
     class NodeFileLibraryNode : LibraryNode {
         private readonly HierarchyNode _hierarchy;
         public NodeFileLibraryNode(HierarchyNode hierarchy, string name, string filename, LibraryNodeType libraryNodeType)

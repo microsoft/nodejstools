@@ -15,7 +15,7 @@
 using System;
 using System.Runtime.InteropServices;
 using Microsoft.NodejsTools.Project;
-using Microsoft.PythonTools.Project;
+using Microsoft.VisualStudioTools.Project;
 using IOleServiceProvider = Microsoft.VisualStudio.OLE.Interop.IServiceProvider;
 
 namespace Microsoft.NodejsTools {

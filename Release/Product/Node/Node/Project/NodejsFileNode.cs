@@ -13,7 +13,7 @@
  * ***************************************************************************/
 
 using System.IO;
-using Microsoft.PythonTools.Project;
+using Microsoft.VisualStudioTools.Project;
 using Microsoft.VisualStudio;
 
 namespace Microsoft.NodejsTools.Project {

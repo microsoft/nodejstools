@@ -15,6 +15,8 @@
 using System;
 using System.ComponentModel;
 using System.Runtime.InteropServices;
+using Microsoft.VisualStudioTools;
+using Microsoft.VisualStudioTools.Project;
 using Microsoft.VisualStudio.Shell;
 using Microsoft.VisualStudio;
 using Microsoft.NodejsTools;
@@ -22,10 +24,10 @@ using Microsoft.NodejsTools;
 using Microsoft.VisualStudio.Shell.Interop;
 #endif
 
-namespace Microsoft.PythonTools.Project {
+namespace Microsoft.NodejsTools.Project {
     //Set the projectsTemplatesDirectory to a non-existant path to prevent VS from including the working directory as a valid template path
     [PackageRegistration(UseManagedResourcesOnly = true)]
-    [Description("Node Project Package")]
+    [Description("Node.js Project Package")]
     [Guid("D861969D-CEC8-4411-AB85-C08EFE4100A2")]
     [DeveloperActivity(NodeConstants.JavaScript, typeof(NodeProjectPackage))]
     [ProvideProjectFactory(typeof(BaseNodeProjectFactory), NodeConstants.Nodejs, NodeFileFilter, "njsproj", "njsproj", ".\\NullPath", LanguageVsTemplate = NodeConstants.Nodejs)]

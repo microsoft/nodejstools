@@ -316,7 +316,7 @@ namespace Microsoft.NodejsTools {
                 IContentType contentType = SniffContentType(diskBuffer) ??
                                            contentRegistry.GetContentType("JavaScript");
 
-                var proj = Microsoft.PythonTools.VsExtensions.GetCommonProject(Microsoft.NodejsTools.Extensions.GetProject(_hierarchy)) as NodejsProjectNode;
+                var proj = Microsoft.VisualStudioTools.VsExtensions.GetCommonProject(Microsoft.NodejsTools.Extensions.GetProject(_hierarchy)) as NodejsProjectNode;
 
                 var projBuffer = new NodejsProjectionBuffer(contentRegistry, factService, diskBuffer, _compModel.GetService<IBufferGraphFactoryService>(), contentType, proj);
                 diskBuffer.Properties.AddProperty(typeof(NodejsProjectionBuffer), projBuffer);

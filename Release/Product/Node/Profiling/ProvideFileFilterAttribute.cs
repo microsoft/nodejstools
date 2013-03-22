@@ -16,7 +16,7 @@ using System;
 using System.IO;
 using Microsoft.VisualStudio.Shell;
 
-namespace Microsoft.PythonTools {
+namespace Microsoft.VisualStudioTools {
     class ProvideFileFilterAttribute : RegistrationAttribute {
         private readonly string _id, _name, _filter;
         private readonly int _sortPriority;

@@ -12,16 +12,16 @@
  *
  * ***************************************************************************/
 
-using Microsoft.NodejsTools.Debugger.DebugEngine;
-using Microsoft.PythonTools.Project;
-using Microsoft.VisualStudio;
-using Microsoft.VisualStudio.Shell;
-using Microsoft.VisualStudio.Shell.Interop;
 using System;
 using System.Diagnostics;
 using System.IO;
 using System.Runtime.InteropServices;
 using System.Windows.Forms;
+using Microsoft.NodejsTools.Debugger.DebugEngine;
+using Microsoft.VisualStudio;
+using Microsoft.VisualStudio.Shell;
+using Microsoft.VisualStudio.Shell.Interop;
+using Microsoft.VisualStudioTools.Project;
 
 namespace Microsoft.NodejsTools.Project {
     class NodeProjectLauncher : IProjectLauncher {
