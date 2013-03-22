@@ -69,7 +69,7 @@ namespace Microsoft.NodejsTools.Debugger.DebugEngine {
         int IDebugBoundBreakpoint2.Enable(int fEnable) {
             AssertMainThread();
 
-            if (!_breakpoint.SetEnabled(fEnable == 0)) {
+            if (!_breakpoint.SetEnabled(fEnable != 0)) {
                 return VSConstants.E_FAIL;
             }
             return VSConstants.S_OK;

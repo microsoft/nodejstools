@@ -12,13 +12,12 @@
  *
  * ***************************************************************************/
 
-//using EnvDTE90;
+using Microsoft.NodejsTools;
 using Microsoft.NodejsTools.Debugger;
-//using Microsoft.Node.Parsing;
-//using Microsoft.TC.TestHostAdapters;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.IO;
 using System.Linq;
 using System.Threading;
@@ -33,13 +32,6 @@ namespace DebuggerTests {
         internal virtual string DebuggerTestPath {
             get {
                 return TestData.GetPath(@"TestData\DebuggerProject\");
-            }
-        }
-
-        public static string NodePath {
-            get {
-                // TODO: Find node
-                return @"C:\Program Files\nodejs\node.exe"; ;
             }
         }
 
@@ -81,7 +73,7 @@ namespace DebuggerTests {
 
             // Load process
             AutoResetEvent processLoaded = new AutoResetEvent(false);
-            var process = new NodeDebugger(NodePath, arguments, dir, null, interpreterOptions, debugOptions, null);
+            NodeDebugger process = new NodeDebugger(NodePackage.NodePath, arguments, dir, null, interpreterOptions, debugOptions, null);
             if (onProcessCreated != null) {
                 onProcessCreated(process);
             }
@@ -93,6 +85,64 @@ namespace DebuggerTests {
                 processLoaded.Set();
             };
             process.Start();
+            AssertWaited(processLoaded);
+
+            // Resume, if requested
+            if (resumeOnProcessLoad) {
+                process.Resume();
+            }
+
+            return process;
+        }
+
+        internal Process StartNodeProcess(
+            string filename,
+            string interpreterOptions = null,
+            string cwd = null,
+            string arguments = "",
+            bool startBrokenAtEntryPoint = false
+        ) {
+            if (!Path.IsPathRooted(filename)) {
+                filename = DebuggerTestPath + filename;
+            }
+            string fullPath = Path.GetFullPath(filename);
+            string dir = cwd ?? Path.GetFullPath(Path.GetDirectoryName(filename));
+            arguments = 
+                (startBrokenAtEntryPoint ? "--debug-brk" : "--debug") +
+                " \"" + fullPath + "\"" +
+                (String.IsNullOrEmpty(arguments) ? "" : " " + arguments);
+
+            var psi = new ProcessStartInfo(NodePackage.NodePath, arguments);
+            psi.WorkingDirectory = dir;
+            var process = new Process();
+            process.StartInfo = psi;
+            process.EnableRaisingEvents = true;
+            process.Start();
+
+            return process;
+        }
+
+        internal NodeDebugger AttachToNodeProcess(
+            Action<NodeDebugger> onProcessCreated = null,
+            Action<NodeDebugger, NodeThread> onLoadComplete = null,
+            string hostName = "localhost",
+            ushort portNumber = 5858,
+            int id = 0,
+            bool resumeOnProcessLoad = false){
+            // Load process
+            AutoResetEvent processLoaded = new AutoResetEvent(false);
+            var process = new NodeDebugger(hostName, portNumber, id);
+            if (onProcessCreated != null) {
+                onProcessCreated(process);
+            }
+            process.ProcessLoaded += (sender, args) => {
+                // Invoke onLoadComplete delegate, if requested
+                if (onLoadComplete != null) {
+                    onLoadComplete(process, args.Thread);
+                }
+                processLoaded.Set();
+            };
+            process.StartListening();
             AssertWaited(processLoaded);
 
             // Resume, if requested
@@ -228,6 +278,7 @@ namespace DebuggerTests {
 
         internal enum TestAction {
             None = 0,
+            Wait,
             ResumeThread,
             ResumeProcess,
             StepOver,
@@ -235,7 +286,9 @@ namespace DebuggerTests {
             StepOut,
             AddBreakpoint,
             RemoveBreakpoint,
-            UpdateBreakpoint
+            UpdateBreakpoint,
+            KillProcess,
+            Detach,
         }
 
         internal struct TestStep {
@@ -304,6 +357,25 @@ namespace DebuggerTests {
                     resumeOnProcessLoad: false
                 );
 
+            TestDebuggerSteps(
+                process,
+                thread,
+                filename,
+                steps,
+                defaultExceptionTreatment,
+                exceptionTreatments,
+                waitForExit: true);
+        }
+
+        internal void TestDebuggerSteps(
+            NodeDebugger process,
+            NodeThread thread,
+            string filename,
+            IEnumerable<TestStep> steps,
+            ExceptionHitTreatment? defaultExceptionTreatment = null,
+            ICollection<KeyValuePair<string, ExceptionHitTreatment>> exceptionTreatments = null,
+            bool waitForExit = false
+        ) {
             if (defaultExceptionTreatment != null || exceptionTreatments != null) {
                 process.SetExceptionTreatment(defaultExceptionTreatment, exceptionTreatments);
             }
@@ -356,6 +428,9 @@ namespace DebuggerTests {
                 bool wait = false;
                 switch (step._action) {
                     case TestAction.None:
+                        break;
+                    case TestAction.Wait:
+                        wait = true;
                         break;
                     case TestAction.ResumeThread:
                         thread.Resume();
@@ -415,6 +490,12 @@ namespace DebuggerTests {
                         if (step._condition != null) {
                             Assert.IsTrue(breakpoint.SetCondition(step._condition));
                         }
+                        break;
+                    case TestAction.KillProcess:
+                        process.Terminate();
+                        break;
+                    case TestAction.Detach:
+                        process.Detach();
                         break;
                 }
 
@@ -488,7 +569,9 @@ namespace DebuggerTests {
                 }
             }
 
-            process.WaitForExit(20000);
+            if (waitForExit) {
+                process.WaitForExit(10000);
+            }
 
             AssertNotSet(entryPointHit);
             AssertNotSet(breakpointHit);

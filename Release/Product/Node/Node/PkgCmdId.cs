@@ -20,6 +20,7 @@ using System.Threading.Tasks;
 
 namespace Microsoft.NodejsTools {
     class PkgCmdId {
-        public const int cmdidReplWindow = 0x201;
+        public const int cmdidReplWindow                    = 0x201;
+        public const int cmdidOpenRemoteDebugProxyFolder    = 0x202;
     }
 }

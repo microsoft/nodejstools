@@ -38,76 +38,86 @@ namespace Microsoft.NodejsTools {
             int pos = 0;
             byte[] text = new byte[0];
 
+            // Use a local for Socket to keep nulling of _socket field (on non listener thread)
+            // from causing spurious null dereferences
+            var socket = _socket;
+
             try {
-                while (true) {
-                    if (!_socket.Connected) {
-                        break;
-                    }
-
-                    if (pos >= text.Length) {
-                        ReadMoreData(_socket.Receive(_socketBuffer), ref text, ref pos);
-                    }
-
-                    Dictionary<string, string> headers = new Dictionary<string, string>(StringComparer.OrdinalIgnoreCase);
-                    while (_socket.Connected) {
-                        int newPos = text.FirstNewLine(pos);
-                        if (newPos == pos) {
-                            // double \r\n, we're done with headers.
-                            pos += 2;
-                            break;
-                        } else if (newPos == -1) {
-                            // we need to get more data...
-                            ReadMoreData(_socket.Receive(_socketBuffer), ref text, ref pos);
-                        } else {
-                            // continue onto next header
-                            // save header, continue to the next one.
-                            int nameEnd = text.IndexOf((byte)':', pos, newPos - pos);
-                            if (nameEnd != -1) {
-                                var headerName = text.Substring(pos, nameEnd - pos);
-                                string headerNameStr = Encoding.UTF8.GetString(headerName).Trim();
-
-                                var headerValue = text.Substring(nameEnd + 1, newPos - nameEnd - 1);
-                                string headerValueStr = Encoding.UTF8.GetString(headerValue).Trim();
-                                headers[headerNameStr] = headerValueStr;
-                            }
-                            pos = newPos + 2;
+                if (socket != null) {
+                    // _socket == null || !_socket.Connected effectively stops listening and associated packet processing
+                    while (_socket != null && socket.Connected) {
+                        if (pos >= text.Length) {
+                            ReadMoreData(socket.Receive(_socketBuffer), ref text, ref pos);
                         }
-                    }
 
-                    string body = "";
-                    string contentLen;
-                    if (headers.TryGetValue("Content-Length", out contentLen)) {
-                        int lengthRemaining = Int32.Parse(contentLen);
-                        if (lengthRemaining != 0) {
-                            StringBuilder bodyBuilder = new StringBuilder();
+                        Dictionary<string, string> headers = new Dictionary<string, string>(StringComparer.OrdinalIgnoreCase);
+                        while (_socket != null && socket.Connected) {
+                            int newPos = text.FirstNewLine(pos);
+                            if (newPos == pos) {
+                                // double \r\n, we're done with headers.
+                                pos += 2;
+                                break;
+                            } else if (newPos == -1) {
+                                // we need to get more data...
+                                ReadMoreData(socket.Receive(_socketBuffer), ref text, ref pos);
+                            } else {
+                                // continue onto next header
+                                // save header, continue to the next one.
+                                int nameEnd = text.IndexOf((byte)':', pos, newPos - pos);
+                                if (nameEnd != -1) {
+                                    var headerName = text.Substring(pos, nameEnd - pos);
+                                    string headerNameStr = Encoding.UTF8.GetString(headerName).Trim();
 
-                            while (_socket.Connected) {
-                                int len = Math.Min(text.Length - pos, lengthRemaining);
-                                bodyBuilder.Append(Encoding.UTF8.GetString(text.Substring(pos, len)));
-                                pos += len;
-
-                                lengthRemaining -= len;
-
-                                if (lengthRemaining == 0) {
-                                    break;
+                                    var headerValue = text.Substring(nameEnd + 1, newPos - nameEnd - 1);
+                                    string headerValueStr = Encoding.UTF8.GetString(headerValue).Trim();
+                                    headers[headerNameStr] = headerValueStr;
                                 }
-
-                                ReadMoreData(_socket.Receive(_socketBuffer), ref text, ref pos);
+                                pos = newPos + 2;
                             }
-                            body = bodyBuilder.ToString();
+                        }
+
+                        string body = "";
+                        string contentLen;
+                        if (headers.TryGetValue("Content-Length", out contentLen)) {
+                            int lengthRemaining = Int32.Parse(contentLen);
+                            if (lengthRemaining != 0) {
+                                StringBuilder bodyBuilder = new StringBuilder();
+
+                                while (_socket != null && socket.Connected) {
+                                    int len = Math.Min(text.Length - pos, lengthRemaining);
+                                    bodyBuilder.Append(Encoding.UTF8.GetString(text.Substring(pos, len)));
+                                    pos += len;
+
+                                    lengthRemaining -= len;
+
+                                    if (lengthRemaining == 0) {
+                                        break;
+                                    }
+
+                                    ReadMoreData(socket.Receive(_socketBuffer), ref text, ref pos);
+                                }
+                                body = bodyBuilder.ToString();
+                            }
+                        }
+
+                        if (_socket != null && socket.Connected) {
+                            try {
+                                ProcessPacket(new JsonResponse(headers, body));
+                            } catch (Exception e) {
+                                Console.WriteLine("Error: {0}", e);
+                            }
                         }
                     }
 
-                    try {
-                        ProcessPacket(new JsonResponse(headers, body));
-                    } catch (Exception e) {
-                        Console.WriteLine("Error: {0}", e);
-                    }
                 }
             } catch (SocketException) {
+            } finally {
+                Debug.Assert(_socket == null || !_socket.Connected);
+                if (socket != null && socket.Connected) {
+                    socket.Disconnect(false);
+                }
+                OnSocketDisconnected();
             }
-            Debug.Assert(_socket == null || !_socket.Connected);
-            OnSocketDisconnected();
         }
 
         protected abstract void OnSocketDisconnected();

@@ -24,10 +24,35 @@
          other menus or buttons (commands); from a visual point of view you can see the 
          group as the part of a menu contained between two lines. The parent of a group 
          must be a menu. -->
-    <Groups>      
+    <Groups>
+        <!-- Our group of menu items which is displayed on Tools/NodeJS Tools/...  -->
+        <Group guid="guidNodeToolsCmdSet" id="ToolsMenuItemsGroup" priority="0x0500">
+            <Parent guid="guidNodeToolsCmdSet" id="ToolsMenu"/>
+        </Group>
+
+        <!-- Our group of menu items which is displayed on Tools/NodeJS Tools/Remote Debugging Proxy/...  -->
+        <Group guid="guidNodeToolsCmdSet" id="RemoteDebugProxyGroup" priority="0x0500">
+            <Parent guid="guidNodeToolsCmdSet" id="RemoteDebugProxyMenu"/>
+        </Group>
+
     </Groups>
 
-    <Menus>     
+    <Menus>
+        <Menu guid="guidNodeToolsCmdSet" id="ToolsMenu" priority="0x8009" type="Menu">
+            <Parent guid="guidSHLMainMenu" id="IDG_VS_TOOLS_OTHER2"/>
+            <Strings>
+                <ButtonText>Node.js Tools</ButtonText>
+                <CommandName>Node.&amp;js Tools</CommandName>
+            </Strings>
+        </Menu>
+
+        <Menu guid="guidNodeToolsCmdSet" id="RemoteDebugProxyMenu" priority="0x0500" type="Menu">
+            <Parent guid="guidNodeToolsCmdSet" id="ToolsMenuItemsGroup"/>
+            <Strings>
+                <ButtonText>Remote Debugging Proxy</ButtonText>
+                <CommandName>&amp;Remote Debugging Proxy</CommandName>
+            </Strings>
+        </Menu>
     </Menus>
 
     <!--Buttons section: buttons include both buttons on toolbars as well as individual menu items -->
@@ -40,13 +65,20 @@
               <CommandFlag>DynamicVisibility</CommandFlag>
           If you do not want an image next to your command, remove the Icon node or set it to <Icon guid="guidOfficeIcon" id="msotcidNoIcon" /> -->
 
-      
       <Button guid="guidNodeToolsCmdSet" id="cmdidReplWindow" priority="0x7f00" type="Button">
         <Parent guid="guidSHLMainMenu" id="IDG_VS_WNDO_OTRWNDWS1"/>
         <Icon guid="guidImages" id="nodeReplPic" />
         <Strings>
           <CommandName>cmdidReplWindow</CommandName>
           <ButtonText>Node.js Interactive Window</ButtonText>
+        </Strings>
+      </Button>
+
+      <Button guid="guidNodeToolsCmdSet" id="cmdidOpenRemoteDebugProxyFolder" priority="0x0500" type="Button">
+        <Parent guid="guidNodeToolsCmdSet" id="RemoteDebugProxyGroup"/>
+        <Strings>
+          <CommandName>cmdidOpenRemoteDebugProxyFolder</CommandName>
+          <ButtonText>&amp;Open Containing Folder</ButtonText>
         </Strings>
       </Button>
 
@@ -76,6 +108,15 @@
     <!-- This is our command set GUID and associated commands -->
     <GuidSymbol name="guidNodeToolsCmdSet" value="{695e37e2-c6df-4e0a-8833-f688e4c65f1f}">
       <IDSymbol name="cmdidReplWindow" value="0x0201" />
+      <IDSymbol name="cmdidOpenRemoteDebugProxyFolder" value="0x0202" />
+        
+      <!-- Groups -->
+      <IDSymbol name="ToolsMenuItemsGroup" value="0x1010" />
+      <IDSymbol name="RemoteDebugProxyGroup" value="0x1011" />
+      
+      <!-- Menus -->
+      <IDSymbol name="ToolsMenu" value ="0x2001" />
+      <IDSymbol name="RemoteDebugProxyMenu" value ="0x2002" />
     </GuidSymbol>
 
     <GuidSymbol name="guidImages" value="{C616533C-7A95-4A3D-A22A-A5361A8037D8}" >

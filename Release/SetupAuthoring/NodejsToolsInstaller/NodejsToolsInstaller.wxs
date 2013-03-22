@@ -42,11 +42,21 @@
         
         <Directory Id="APPLICATIONFOLDER" Name="[ApplicationFolderName]"  FileSource="$(var.TargetDir)">
           <Component Id="Comp_InstallDirItems" DiskId="1" Guid="F0C653EF-F90B-4C63-8AC6-7B1EC8F044A4">
+              <Condition>NOT ALLUSERS = 1</Condition>
               <File Id="File_License.html" Name="License.html" Source="$(var.NodejsToolsDir)\License.html" />
-              <RegistryValue Root='HKCU' Key='SOFTWARE\Microsoft\NodejsTools' Type='string' Value='Readme' KeyPath='yes' />              
+              <File Id="File_RemoteDebug.js" Name="RemoteDebug.js" Source="$(var.NodejsToolsDir)\RemoteDebug.js" />
+              <RegistryValue Root='HKCU' Key='SOFTWARE\Microsoft\NodejsTools' Type='string' Value='Readme' KeyPath='yes' />
+              <RegistryValue Root='HKCU' Key='SOFTWARE\Microsoft\NodejsTools' Type='string' Name='RemoteDebugProxyScript' Value='[WixPerUserFolder]\RemoteDebug.js' />
               <RemoveFolder Id='Comp_InstallDirItems' On='uninstall'/>
           </Component>
-
+          <Component Id="AllUsers_Comp_InstallDirItems" DiskId="1" Guid="0B12AA30-C3B3-40D6-9003-CAA5EE4B6FFD">
+              <Condition>ALLUSERS = 1</Condition>
+              <File Id="AllUsers_File_License.html" Name="License.html" Source="$(var.NodejsToolsDir)\License.html" />
+              <File Id="AllUsers_File_RemoteDebug.js" Name="RemoteDebug.js" Source="$(var.NodejsToolsDir)\RemoteDebug.js" />
+              <RegistryValue Root='HKLM' Key='SOFTWARE\Microsoft\NodejsTools' Type='string' Value='Readme' KeyPath='yes' />
+              <RegistryValue Root='HKLM' Key='SOFTWARE\Microsoft\NodejsTools' Type='string' Name='RemoteDebugProxyScript' Value='[WixPerMachineFolder]\RemoteDebug.js' />
+              <RemoveFolder Id='AllUsers_Comp_InstallDirItems' On='uninstall'/>
+          </Component>
         </Directory>
       </Directory>
 
@@ -64,6 +74,7 @@
     <Feature Id="ProductFeature" Title="$(var.ProductName)" Description="$(var.ProductName)"
              Display="expand" Level="1" AllowAdvertise="no" Absent="disallow"  >
       <ComponentRef Id="Comp_InstallDirItems" Primary="yes" />
+      <ComponentRef Id="AllUsers_Comp_InstallDirItems" Primary="yes" />
       
       <MergeRef Id="NodejsTools"/>
       <MergeRef Id="ReplWindow"/>

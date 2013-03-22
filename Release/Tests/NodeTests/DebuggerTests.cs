@@ -20,6 +20,7 @@ using Microsoft.VisualStudio.TestTools.UnitTesting;
 using System;
 using System.Collections.Generic;
 using System.IO;
+using System.Net;
 using System.Linq;
 using System.Threading;
 using TestUtilities;
@@ -27,11 +28,9 @@ using TestUtilities;
 namespace DebuggerTests {
     [TestClass]
     public class DebuggerTests : BaseDebuggerTests {
-        public const string DataSourcePath = @"Incubation\NTVS\Tests\Common\TestData";
-
         [ClassInitialize]
         public static void DoDeployment(TestContext context) {
-            TestData.Deploy(DataSourcePath);
+            TestData.Deploy();
         }
 
         #region Enum Children Tests
@@ -723,6 +722,50 @@ namespace DebuggerTests {
         #region Breakpoint Tests
 
         [TestMethod, Priority(0)]
+        public void CannonicalHelloWorldTest() {
+            AutoResetEvent textRead = new AutoResetEvent(false);
+            TestDebuggerSteps(
+                "HelloWorld.js",
+                new[] {
+                    new TestStep(action: TestAction.AddBreakpoint, targetBreakpoint: 4),
+                    new TestStep(action: TestAction.ResumeProcess),
+                    new TestStep(validation: (process, thread) => {
+                        ThreadPool.QueueUserWorkItem(new WaitCallback(stateinfo => {
+                            var req = (HttpWebRequest)WebRequest.Create("http://localhost:1337/");
+                            var resp = (HttpWebResponse)req.GetResponse();
+                            var stream = resp.GetResponseStream();
+                            var reader = new StreamReader(stream);
+                            var text = reader.ReadToEnd();
+                            Assert.AreEqual("Hello World\n", text);
+                            textRead.Set();
+                        }));
+                    }),
+                    new TestStep(action: TestAction.Wait, expectedBreakpointHit: 4),
+                    new TestStep(action: TestAction.StepOver, expectedStepComplete: 5),
+                    new TestStep(action: TestAction.ResumeProcess),
+                    new TestStep(validation: (process, thread) => {
+                        AssertWaited(textRead);
+                    }),
+                    new TestStep(action: TestAction.KillProcess),
+                }
+            );
+        }
+
+        [TestMethod, Priority(0)]
+        public void SetBreakpointWhileRunning() {
+            TestDebuggerSteps(
+                "RunForever.js",
+                new[] {
+                    new TestStep(action: TestAction.ResumeProcess),
+                    new TestStep(action: TestAction.AddBreakpoint, targetBreakpoint: 2),
+                    new TestStep(action: TestAction.Wait, expectedBreakpointHit: 2),
+                    new TestStep(action: TestAction.ResumeProcess, expectedBreakpointHit: 2),
+                    new TestStep(action: TestAction.KillProcess),
+                }
+            );
+        }
+
+        [TestMethod, Priority(0)]
         public void TestBreakpoints() {
             TestDebuggerSteps(
                 "BreakpointTest.js",
@@ -1117,7 +1160,7 @@ namespace DebuggerTests {
                 DebuggerTestPath + @"WellKnownUnhandledException.js",
                 ExceptionHitTreatment.BreakAlways,
                 null,
-                1,
+                8,
                 new ExceptionInfo("Error", "Error: Error description", 3)
             );
 
@@ -1126,7 +1169,7 @@ namespace DebuggerTests {
                 DebuggerTestPath + @"WellKnownUnhandledException.js",
                 ExceptionHitTreatment.BreakNever,
                 CollectExceptionTreatments("Error", ExceptionHitTreatment.BreakAlways),
-                1,
+                8,
                 new ExceptionInfo("Error", "Error: Error description", 3)
             );
 
@@ -1135,7 +1178,7 @@ namespace DebuggerTests {
                 DebuggerTestPath + @"WellKnownUnhandledException.js",
                 ExceptionHitTreatment.BreakAlways,
                 CollectExceptionTreatments("Error", ExceptionHitTreatment.BreakAlways),
-                1,
+                8,
                 new ExceptionInfo("Error", "Error: Error description", 3)
             );
 
@@ -1144,7 +1187,7 @@ namespace DebuggerTests {
                 DebuggerTestPath + @"WellKnownUnhandledException.js",
                 ExceptionHitTreatment.BreakOnUnhandled,
                 null,
-                1,
+                8,
                 new ExceptionInfo("Error", "Error: Error description", 3)
             );
 
@@ -1153,7 +1196,7 @@ namespace DebuggerTests {
                 DebuggerTestPath + @"WellKnownUnhandledException.js",
                 ExceptionHitTreatment.BreakNever,
                 CollectExceptionTreatments("Error", ExceptionHitTreatment.BreakOnUnhandled),
-                1,
+                8,
                 new ExceptionInfo("Error", "Error: Error description", 3)
             );
 
@@ -1162,7 +1205,7 @@ namespace DebuggerTests {
                 DebuggerTestPath + @"WellKnownUnhandledException.js",
                 ExceptionHitTreatment.BreakOnUnhandled,
                 CollectExceptionTreatments("Error", ExceptionHitTreatment.BreakOnUnhandled),
-                1,
+                8,
                 new ExceptionInfo("Error", "Error: Error description", 3)
             );
         }
@@ -1274,7 +1317,8 @@ namespace DebuggerTests {
                 "ExitException.js",
                 new[] {
                     new TestStep(action: TestAction.ResumeThread, expectedEntryPointHit: 1),
-                    new TestStep(action: TestAction.ResumeProcess, expectedExitCode: 1),
+                    new TestStep(action: TestAction.ResumeProcess, expectedExceptionRaised: new ExceptionInfo("Error", "Error: msg", 2)),
+                    new TestStep(action: TestAction.ResumeProcess, expectedExitCode: 8),
                 }
             );
 
@@ -1301,7 +1345,8 @@ namespace DebuggerTests {
                 "PassedArgs.js",
                 new[] {
                     new TestStep(action: TestAction.ResumeThread, expectedEntryPointHit: 1),
-                    new TestStep(action: TestAction.ResumeProcess, expectedExitCode: 1),
+                    new TestStep(action: TestAction.ResumeProcess, expectedExceptionRaised: new ExceptionInfo("Error", "Error: Invalid args", 4)),
+                    new TestStep(action: TestAction.ResumeProcess, expectedExitCode: 8),
                 }
             );
             TestDebuggerSteps(
@@ -1317,6 +1362,33 @@ namespace DebuggerTests {
         #endregion
 
         #region Attach Tests
+
+        [TestMethod, Priority(0)]
+        public void LocalAttach() {
+            var filename = "RunForever.js";
+
+            var sysProcess = StartNodeProcess(filename);
+
+            for (var i = 0; i < 3; ++i) {
+                var process = AttachToNodeProcess(id: sysProcess.Id);
+                var thread = process.GetThreads().First();
+                TestDebuggerSteps(
+                    process,
+                    thread,
+                    filename,
+                    new[] {
+                        new TestStep(action: TestAction.AddBreakpoint, targetBreakpoint: 2),
+                        new TestStep(action: TestAction.Wait, expectedBreakpointHit: 2),
+                        new TestStep(action: TestAction.ResumeProcess, expectedBreakpointHit: 2),
+                        new TestStep(action: TestAction.Detach),
+                    }
+                );
+            }
+
+            sysProcess.Kill();
+        }
+
+
 
 //        /// <summary>
 //        /// threading module imports thread.start_new_thread, verifies that we patch threading's method

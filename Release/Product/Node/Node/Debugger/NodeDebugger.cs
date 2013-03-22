@@ -75,14 +75,31 @@ namespace Microsoft.NodejsTools.Debugger {
         private readonly JavaScriptSerializer _serializer = new JavaScriptSerializer();
         private int _currentRequestSequence = 1;
         private readonly byte[] _socketBuffer = new byte[4096];
-        private bool _sentExited;
         private readonly Dictionary<string, NodeModule> _scripts = new Dictionary<string, NodeModule>(StringComparer.OrdinalIgnoreCase);
         private readonly Dictionary<int, object> _requestData = new Dictionary<int, object>();
-        private ExceptionHitTreatment _defaultExceptionTreatment;
-        private Dictionary<string, ExceptionHitTreatment> _exceptionTreatments = new Dictionary<string, ExceptionHitTreatment>();
+        private ExceptionHitTreatment _defaultExceptionTreatment = ExceptionHitTreatment.BreakAlways;
+        private Dictionary<string, ExceptionHitTreatment> _exceptionTreatments = GetDefaultExceptionTreatments();
         private bool _breakOnAllExceptions;
         private bool _breakOnUncaughtExceptions;
         private int _entryPointFrameCount;
+
+        private static Dictionary<string, ExceptionHitTreatment> GetDefaultExceptionTreatments() {
+            // Keep exception types in sync with those declared in ProvideDebugExceptionAttribute's in NodePackage.cs
+            string [] exceptionTypes = {
+                "Error",
+                "EvalError",
+                "RangeError",
+                "ReferenceError",
+                "SyntaxError",
+                "TypeError",
+                "URIError"
+            };
+            var defaultExceptionTreatments = new Dictionary<string, ExceptionHitTreatment>();
+            foreach (var exceptionType in exceptionTypes) {
+                defaultExceptionTreatments[exceptionType] = ExceptionHitTreatment.BreakAlways;
+            }
+            return defaultExceptionTreatments;
+        }
 
         public NodeDebugger(string exe, string args, string dir, string env, string interpreterOptions, NodeDebugOptions debugOptions, List<string[]> dirMapping) {
             args = "--debug-brk " + args;
@@ -95,7 +112,6 @@ namespace Microsoft.NodejsTools.Debugger {
             _process = new Process();
             _process.StartInfo = psi;
             _process.EnableRaisingEvents = true;
-            _process.Exited += new EventHandler(_process_Exited);
         }
 
         public NodeDebugger(string hostName, ushort portNumber, int id) {
@@ -125,23 +141,6 @@ namespace Microsoft.NodejsTools.Debugger {
             }
         }
 
-        private void _process_Exited(object sender, EventArgs e) {
-            if (!_sentExited) {
-                _sentExited = true;
-                var exited = ProcessExited;
-                if (exited != null) {
-                    int exitCode;
-                    try {
-                        exitCode = _process.HasExited ? _process.ExitCode : -1;
-                    } catch (InvalidOperationException) {
-                        // debug attach, we didn't start the process...
-                        exitCode = -1;
-                    }
-                    exited(this, new ProcessExitedEventArgs(exitCode));
-                }
-            }
-        }
-
         public void WaitForExit() {
             _process.WaitForExit();
         }
@@ -151,15 +150,15 @@ namespace Microsoft.NodejsTools.Debugger {
         }
 
         public void Terminate() {
+            Socket = null;
             if (_process != null && !_process.HasExited) {
-                Socket = null;
                 _process.Kill();
             }
         }
 
         public bool HasExited {
             get {
-                return _process != null ? _process.HasExited : Socket == null || !Socket.Connected;
+                return Socket == null || !Socket.Connected;
             }
         }
 
@@ -355,13 +354,13 @@ namespace Microsoft.NodejsTools.Debugger {
         public void ClearExceptionTreatment() {
             bool updated = false;
 
-            if (_defaultExceptionTreatment != default(ExceptionHitTreatment)) {
-                _defaultExceptionTreatment = default(ExceptionHitTreatment);
+            if (_defaultExceptionTreatment != ExceptionHitTreatment.BreakAlways) {
+                _defaultExceptionTreatment = ExceptionHitTreatment.BreakAlways;
                 updated = true;
             }
 
-            if (_exceptionTreatments.Count() > 0) {
-                _exceptionTreatments.Clear();
+            if (_exceptionTreatments.Values.Any(value => value != ExceptionHitTreatment.BreakAlways)) {
+                _exceptionTreatments = GetDefaultExceptionTreatments();
                 updated = true;
             }
 
@@ -469,7 +468,16 @@ namespace Microsoft.NodejsTools.Debugger {
                 _requestData[reqId] = responseHandler;
             }
 
-            Socket.Send(CreateRequest(command, args, reqId));
+            var socket = Socket;
+            if (socket == null) {
+                return false;
+            }
+            try {
+                socket.Send(CreateRequest(command, args, reqId));
+            }
+            catch (SocketException) {
+                return false;
+            }
 
             return (responseHandler != null) ? responseHandler.Wait() : true;
         }
@@ -507,18 +515,7 @@ namespace Microsoft.NodejsTools.Debugger {
             return Encoding.UTF8.GetBytes(requestStr);
         }
 
-        internal void Connected(Socket socket) {
-            Debug.WriteLine("Process Connected: ");
-
-            Socket = socket;
-            /*
-            if (!_delayUnregister) {
-                Unregister();
-            }*/
-        }
-
         internal void Unregister() {
-            //DebugConnectionListener.UnregisterProcess(_processGuid);
             GC.SuppressFinalize(this);
         }
 
@@ -532,17 +529,18 @@ namespace Microsoft.NodejsTools.Debugger {
             Socket.Connect(new DnsEndPoint(_hostName, _portNumber));
 
             StartListenerThread();
+
+            ProcessConnect();
         }
 
         protected override void OnSocketDisconnected() {
-            if (!_sentExited && _process == null) {
-                _sentExited = true;
-                var exited = ProcessExited;
-                if (exited != null) {
-                    // debug attach, we didn't start the process...
-                    int exitCode = -1;
-                    exited(this, new ProcessExitedEventArgs(exitCode));
-                }
+            Socket = null;
+            var exited = ProcessExited;
+            if (exited != null) {
+                // Fall back to using -1 for exit code if we cannot obtain one from the process
+                // This is the normal case for attach where there is no process to interrogate
+                int exitCode = _process != null && _process.HasExited ? _process.ExitCode : -1;
+                exited(this, new ProcessExitedEventArgs(exitCode));
             }
         }
 
@@ -558,7 +556,7 @@ namespace Microsoft.NodejsTools.Debugger {
             if (response.Headers.ContainsKey("type")) {
                 switch (response.Headers["type"]) {
                     case "connect":
-                        ProcessConnect();
+                        // No-op, as ProcessConnect() is called on the main thread
                         break;
                     default:
                         Debug.WriteLine(String.Format("Unknown header type: {0}", response.Headers["type"]));
@@ -621,24 +619,27 @@ namespace Microsoft.NodejsTools.Debugger {
         }
 
         private void AddScript(Dictionary<string, object> script) {
-            string name = (string)script["name"];
-            NodeModule existingModule;
-            if (!_scripts.TryGetValue(name, out existingModule)) {
-                int id = (int)script["id"];
-                var newModule = _scripts[name] = new NodeModule(id, name);
-                var modLoad = ModuleLoaded;
-                if (modLoad != null) {
-                    modLoad(this, new ModuleLoadedEventArgs(newModule));
-                }
+            object nameObj;
+            if (script.TryGetValue("name", out nameObj) && !string.IsNullOrEmpty((string)nameObj)) {
+                var name = (string)nameObj;
+                NodeModule existingModule;
+                if (!_scripts.TryGetValue(name, out existingModule)) {
+                    int id = (int)script["id"];
+                    var newModule = _scripts[name] = new NodeModule(id, name);
+                    var modLoad = ModuleLoaded;
+                    if (modLoad != null) {
+                        modLoad(this, new ModuleLoadedEventArgs(newModule));
+                    }
 
-                // Fixup breakpoints bound by name
-                // This is necessary to work around a bug in node which binds breakpoints by comparing case against that given to Require()
-                foreach (var breakpoint in _breakpoints.Values.Where(b => b.BoundByName)) {
-                    if (GetModuleForFilePath(breakpoint.FileName) == newModule && string.Compare(breakpoint.FileName, newModule.FileName) != 0) {
-                        id = breakpoint.Id;
-                        breakpoint.Id = 0;
-                        breakpoint.Add();
-                        RemoveBreakPoint(id);
+                    // Fixup breakpoints bound by name
+                    // This is necessary to work around a bug in node which binds breakpoints by comparing case against that given to Require()
+                    foreach (var breakpoint in _breakpoints.Values.Where(b => b.BoundByName)) {
+                        if (GetModuleForFilePath(breakpoint.FileName) == newModule && string.Compare(breakpoint.FileName, newModule.FileName) != 0) {
+                            id = breakpoint.Id;
+                            breakpoint.Id = 0;
+                            breakpoint.Add();
+                            RemoveBreakPoint(id);
+                        }
                     }
                 }
             }
@@ -843,11 +844,17 @@ namespace Microsoft.NodejsTools.Debugger {
                     if (!running) {
                         var mainThread = MainThread;
                         var body = (Dictionary<string, object>)json["body"];
-                        var frames = (object[])body["frames"];
+                        object[] frames = null;
+                        int frameCount = 0;
+                        object framesObj;
+                        if (body.TryGetValue("frames", out framesObj) && framesObj != null) {
+                            frames = (object[])framesObj;
+                            frameCount = frames.Length;
+                        }
 
-                        NodeStackFrame[] nodeFrames = new NodeStackFrame[frames.Length];
+                        NodeStackFrame[] nodeFrames = new NodeStackFrame[frameCount];
 
-                        for (int i = 0; i < frames.Length; i++) {
+                        for (int i = 0; i < frameCount; i++) {
                             var frame = (Dictionary<string, object>)frames[i];
 
                             var func = (Dictionary<string, object>)frame["func"];
@@ -1011,7 +1018,14 @@ namespace Microsoft.NodejsTools.Debugger {
 
         public void Detach() {
             DebugWriteCommand("Detach");
-            throw new NotImplementedException();
+
+            // Disconnect request has no response
+            SendRequest("disconnect");
+
+            if (Socket != null && Socket.Connected) {
+                Socket.Disconnect(false);
+            }
+            Socket = null;
         }
 
         internal void BindBreakpoint(NodeBreakpoint breakpoint, Action successHandler = null, Action failureHandler = null) {
@@ -1184,7 +1198,7 @@ namespace Microsoft.NodejsTools.Debugger {
                 json => {
                     // Handle success
                     var record = (Dictionary<string, object>)json["body"];
-                    completion(CreateNodeEvaluationResult(nodeStackFrame, text, record));
+                    completion(CreateNodeEvaluationResult(null, nodeStackFrame, text, record, false));
                 },
                 json => {
                     // Handle failure
@@ -1228,7 +1242,13 @@ namespace Microsoft.NodejsTools.Debugger {
                                 refRecord = GetRefRecord(refs, elementHandle);
                                 if (refRecord != null) {
                                     var elementName = string.Format("[{0}]", i - 1);
-                                    var childNodeEvaluationResult = CreateNodeEvaluationResult(nodeEvaluationResult.Frame, elementName, refRecord);
+                                    var childNodeEvaluationResult =
+                                        CreateNodeEvaluationResult(
+                                            nodeEvaluationResult,
+                                            nodeEvaluationResult.Frame,
+                                            elementName,
+                                            refRecord,
+                                            true);
                                     if (childNodeEvaluationResult != null) {
                                         childNodeEvaluationResults.Add(childNodeEvaluationResult);
                                     }
@@ -1242,7 +1262,13 @@ namespace Microsoft.NodejsTools.Debugger {
                             var propertyHandle = (int)property["ref"];
                             var refRecord = GetRefRecord(refs, propertyHandle);
                             if (refRecord != null) {
-                                var childNodeEvaluationResult = CreateNodeEvaluationResult(nodeEvaluationResult.Frame, propertyName, refRecord);
+                                var childNodeEvaluationResult = 
+                                    CreateNodeEvaluationResult(
+                                        nodeEvaluationResult,
+                                        nodeEvaluationResult.Frame,
+                                        propertyName,
+                                        refRecord,
+                                        false);
                                 if (childNodeEvaluationResult != null) {
                                     childNodeEvaluationResults.Add(childNodeEvaluationResult);
                                 }
@@ -1329,7 +1355,13 @@ namespace Microsoft.NodejsTools.Debugger {
                        );
         }
 
-        private NodeEvaluationResult CreateNodeEvaluationResult(NodeStackFrame nodeFrame, string name, Dictionary<string, object> valueContainer) {
+        private NodeEvaluationResult CreateNodeEvaluationResult(
+            NodeEvaluationResult parent,
+            NodeStackFrame nodeFrame,
+            string name,
+            Dictionary<string, object> valueContainer,
+            bool childIsIndex
+        ) {
             object valueObj;
             var value = valueContainer.TryGetValue("text", out valueObj) ? (string)valueObj : string.Empty;
             int? handle = null;
@@ -1375,15 +1407,25 @@ namespace Microsoft.NodejsTools.Debugger {
                     Debug.WriteLine(String.Format("Unhandled value type: {0}", type));
                     break;
             }
+
+            string expression = "";
+            string childName = "";
+            if (parent != null) {
+                expression = parent.Expression;
+                childName = name;
+            } else {
+                expression = name;
+            }
+
             return new NodeEvaluationResult(
                             this,
                             handle,
                             value,
                             "",
                             type,
-                            name,
-                            "",
-                            false,
+                            expression,
+                            childName,
+                            childIsIndex,
                             false,
                             nodeFrame,
                             expandable

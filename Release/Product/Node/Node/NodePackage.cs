@@ -12,12 +12,6 @@
  *
  * ***************************************************************************/
 
-using System;
-using System.ComponentModel.Design;
-using System.Diagnostics;
-using System.Globalization;
-using System.IO;
-using System.Runtime.InteropServices;
 using Microsoft.NodejsTools.Debugger.DebugEngine;
 using Microsoft.NodejsTools.Debugger.Remote;
 using Microsoft.NodejsTools.Project;
@@ -30,6 +24,13 @@ using Microsoft.VisualStudio.Shell;
 using Microsoft.VisualStudio.Shell.Interop;
 using Microsoft.VisualStudio.Utilities;
 using Microsoft.Win32;
+using System;
+using System.ComponentModel.Design;
+using System.Diagnostics;
+using System.Globalization;
+using System.IO;
+using System.Runtime.InteropServices;
+using System.Windows.Forms;
 
 namespace Microsoft.NodejsTools {
     /// <summary>
@@ -51,6 +52,7 @@ namespace Microsoft.NodejsTools {
     [Guid(GuidList.guidNodePkgString)]
     [ProvideDebugEngine("Node.js Debugging", typeof(AD7ProgramProvider), typeof(AD7Engine), AD7Engine.DebugEngineId)]
     [ProvideDebugLanguage(NodeConstants.JavaScript, "{65791609-BA29-49CF-A214-DBFF8AEC3BC2}", NodeExpressionEvaluatorGuid, AD7Engine.DebugEngineId)]
+    // Keep declared exceptions in sync with those given default values in NodeDebugger.GetDefaultExceptionTreatments()
     [ProvideDebugException(AD7Engine.DebugEngineId, "Node.js Exceptions", State = enum_EXCEPTION_STATE.EXCEPTION_STOP_FIRST_CHANCE)]
     [ProvideDebugException(AD7Engine.DebugEngineId, "Node.js Exceptions", "Error", State = enum_EXCEPTION_STATE.EXCEPTION_STOP_FIRST_CHANCE)]
     [ProvideDebugException(AD7Engine.DebugEngineId, "Node.js Exceptions", "EvalError", State = enum_EXCEPTION_STATE.EXCEPTION_STOP_FIRST_CHANCE)]
@@ -103,6 +105,10 @@ namespace Microsoft.NodejsTools {
             CommandID replWindowCmdId = new CommandID(GuidList.guidNodeCmdSet, PkgCmdId.cmdidReplWindow);
             MenuCommand replWindowCmd = new MenuCommand(OpenReplWindow, replWindowCmdId);
             mcs.AddCommand(replWindowCmd);
+
+            CommandID openRemoteDebugProxyFolderCmdId = new CommandID(GuidList.guidNodeCmdSet, PkgCmdId.cmdidOpenRemoteDebugProxyFolder);
+            MenuCommand openRemoteDebugProxyFolderCmd = new MenuCommand(OpenRemoteDebugProxyFolder, openRemoteDebugProxyFolderCmdId);
+            mcs.AddCommand(openRemoteDebugProxyFolderCmd);
         }
 
         private void OpenReplWindow(object sender, EventArgs args) {
@@ -122,6 +128,57 @@ namespace Microsoft.NodejsTools {
             IVsWindowFrame windowFrame = (IVsWindowFrame)((ToolWindowPane)window).Frame;
             ErrorHandler.ThrowOnFailure(windowFrame.Show());
             ((IReplWindow)window).Focus();
+        }
+
+        private void OpenRemoteDebugProxyFolder(object sender, EventArgs args) {
+            // Open explorer to folder
+            if (!File.Exists(RemoteDebugProxyFolder)) {
+                MessageBox.Show(String.Format("Remote Debug Proxy \"{0}\" does not exist.", RemoteDebugProxyFolder), "Node.js Tools for Visual Studio");
+            } else {
+                Process.Start("explorer", string.Format("/e,/select,{0}", RemoteDebugProxyFolder));
+            }
+        }
+
+        private static string remoteDebugProxyFolder = null;
+        public static string RemoteDebugProxyFolder {
+            get {
+                // Lazily evaluated
+                if (remoteDebugProxyFolder != null) {
+                    return remoteDebugProxyFolder;
+                }
+
+                // Try HKCU
+                try {
+                    using (
+                        RegistryKey software = Registry.CurrentUser.OpenSubKey("Software"),
+                        microsoft = software.OpenSubKey("Microsoft"),
+                        node = microsoft.OpenSubKey("NodeJSTools")
+                    ) {
+                        if (node != null) {
+                            remoteDebugProxyFolder = (string)node.GetValue("RemoteDebugProxyScript");
+                        }
+                    }
+                } catch (Exception) {
+                }
+
+                // Try HKLM
+                if (remoteDebugProxyFolder == null) {
+                    try {
+                        using (
+                            RegistryKey software = Registry.LocalMachine.OpenSubKey("Software"),
+                            microsoft = software.OpenSubKey("Microsoft"),
+                            node = microsoft.OpenSubKey("NodeJSTools")
+                        ) {
+                            if (node != null) {
+                                remoteDebugProxyFolder = (string)node.GetValue("RemoteDebugProxyScript");
+                            }
+                        }
+                    } catch (Exception) {
+                    }
+                }
+
+                return remoteDebugProxyFolder;
+            }
         }
 
         public IContentType ContentType {

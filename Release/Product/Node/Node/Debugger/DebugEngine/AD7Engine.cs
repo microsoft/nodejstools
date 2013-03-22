@@ -372,7 +372,7 @@ namespace Microsoft.NodejsTools.Debugger.DebugEngine {
         }
 
         int IDebugEngine2.RemoveAllSetExceptions(ref Guid guidType) {
-            if (guidType == DebugEngineGuid) {
+            if (guidType == DebugEngineGuid || guidType == Guid.Empty) {
                 _process.ClearExceptionTreatment();
             }
             return VSConstants.S_OK;
@@ -447,7 +447,6 @@ namespace Microsoft.NodejsTools.Debugger.DebugEngine {
             _events = ad7Callback;
 
             NodeDebugOptions debugOptions = NodeDebugOptions.None;
-            bool attachRunning = false;
             List<string[]> dirMapping = null;
             string interpreterOptions = null;           
             if (options != null) {
@@ -492,18 +491,8 @@ namespace Microsoft.NodejsTools.Debugger.DebugEngine {
                 }
             }
 
-            /*Guid processId;
-            if (attachRunning && Guid.TryParse(exe, out processId)) {
-                _process = DebugConnectionListener.GetProcess(processId);
-                _attached = true;
-                _pseudoAttach = true;
-            } else*/ {
-                _process = new NodeDebugger(exe, args, dir, env, interpreterOptions, debugOptions, dirMapping);
-            }
-
-            if (!attachRunning) {
-                _process.Start(false);
-            }
+            _process = new NodeDebugger(exe, args, dir, env, interpreterOptions, debugOptions, dirMapping);
+            _process.Start(false);
 
             AttachEvents(_process);
 
@@ -603,11 +592,7 @@ namespace Microsoft.NodejsTools.Debugger.DebugEngine {
                 detaching(this, new AD7EngineEventArgs(this));
             }
 
-            /*if (!_pseudoAttach) {
-                _process.Terminate();
-            } else*/ {
-                _process.Detach();
-            }
+            _process.Terminate();
 
             return VSConstants.S_OK;
         }
@@ -618,10 +603,7 @@ namespace Microsoft.NodejsTools.Debugger.DebugEngine {
 
         // Determines if a debug engine (DE) can detach from the program.
         public int CanDetach() {
-            if (_attached) {
-                return VSConstants.S_OK;
-            }
-            return VSConstants.S_FALSE;
+            return VSConstants.S_OK;
         }
 
         // The debugger calls CauseBreak when the user clicks on the pause button in VS. The debugger should respond by entering
@@ -951,11 +933,6 @@ namespace Microsoft.NodejsTools.Debugger.DebugEngine {
 
         private void OnProcessLoaded(object sender, ProcessLoadedEventArgs e) {
             lock (_syncLock) {
-                /*
-                if (_pseudoAttach) {
-                    _process.Unregister();
-                }*/
-
                 _processLoaded = true;
                 _processLoadedRunning = e.Running;
                 HandleLoadComplete();

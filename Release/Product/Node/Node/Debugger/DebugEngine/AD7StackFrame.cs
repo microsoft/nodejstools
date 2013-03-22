@@ -156,14 +156,14 @@ namespace Microsoft.NodejsTools.Debugger.DebugEngine {
 
             if (_locals != null) {
                 for (int i = 0; i < _locals.Length; i++) {
-                    AD7Property property = new AD7Property(this, _locals[i], true);
+                    AD7Property property = new AD7Property(this, _locals[i], false);
                     propInfo[i] = property.ConstructDebugPropertyInfo(radix, enum_DEBUGPROP_INFO_FLAGS.DEBUGPROP_INFO_STANDARD);
                 }
             }
 
             if (_parameters != null) {
                 for (int i = 0; i < _parameters.Length; i++) {
-                    AD7Property property = new AD7Property(this, _parameters[i], true);
+                    AD7Property property = new AD7Property(this, _parameters[i], false);
                     propInfo[localsLength + i] = property.ConstructDebugPropertyInfo(radix, enum_DEBUGPROP_INFO_FLAGS.DEBUGPROP_INFO_STANDARD);
                 }
             }
@@ -177,7 +177,7 @@ namespace Microsoft.NodejsTools.Debugger.DebugEngine {
             DEBUG_PROPERTY_INFO[] propInfo = new DEBUG_PROPERTY_INFO[_locals.Length];
 
             for (int i = 0; i < propInfo.Length; i++) {
-                AD7Property property = new AD7Property(this, _locals[i], true);
+                AD7Property property = new AD7Property(this, _locals[i], false);
                 propInfo[i] = property.ConstructDebugPropertyInfo(radix, enum_DEBUGPROP_INFO_FLAGS.DEBUGPROP_INFO_STANDARD);
             }
 
@@ -190,7 +190,7 @@ namespace Microsoft.NodejsTools.Debugger.DebugEngine {
             DEBUG_PROPERTY_INFO[] propInfo = new DEBUG_PROPERTY_INFO[_parameters.Length];
 
             for (int i = 0; i < propInfo.Length; i++) {
-                AD7Property property = new AD7Property(this, _parameters[i], true);
+                AD7Property property = new AD7Property(this, _parameters[i], false);
                 propInfo[i] = property.ConstructDebugPropertyInfo(radix, enum_DEBUGPROP_INFO_FLAGS.DEBUGPROP_INFO_STANDARD);
             }
 
@@ -329,7 +329,7 @@ namespace Microsoft.NodejsTools.Debugger.DebugEngine {
             if (_parameters != null) {
                 foreach (var currVariable in _parameters) {
                     if (String.CompareOrdinal(currVariable.Expression, pszCode) == 0) {
-                        ppExpr = new UncalculatedAD7Expression(this, currVariable.Expression, true);
+                        ppExpr = new UncalculatedAD7Expression(this, currVariable.Expression, false);
                         return VSConstants.S_OK;
                     }
                 }
@@ -338,7 +338,7 @@ namespace Microsoft.NodejsTools.Debugger.DebugEngine {
             if (_locals != null) {
                 foreach (var currVariable in _locals) {
                     if (String.CompareOrdinal(currVariable.Expression, pszCode) == 0) {
-                        ppExpr = new UncalculatedAD7Expression(this, currVariable.Expression, true);
+                        ppExpr = new UncalculatedAD7Expression(this, currVariable.Expression, false);
                         return VSConstants.S_OK;
                     }
                 }
@@ -350,7 +350,7 @@ namespace Microsoft.NodejsTools.Debugger.DebugEngine {
                 pichError = (uint)pbstrError.Length;
             }
 
-            ppExpr = new UncalculatedAD7Expression(this, pszCode);                                    
+            ppExpr = new UncalculatedAD7Expression(this, pszCode, true);                                    
             return VSConstants.S_OK;
         }
 
