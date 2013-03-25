@@ -21,9 +21,10 @@ using System.Text;
 using Microsoft.VisualStudio;
 using Microsoft.VisualStudioTools;
 using Microsoft.VisualStudioTools.Project;
+using Microsoft.VisualStudioTools.Project.Automation;
 
 namespace Microsoft.NodejsTools.Project {
-    class NodejsProjectNode : CommonProjectNode {
+    class NodejsProjectNode : CommonProjectNode, VsWebSite.VSWebSite {
         private static string _nodeRefCode = ReadNodeRefCode();
         internal string _referenceFilename = GetReferenceFilePath();
         const string _userSwitchMarker = "// **NTVS** INSERT USER MODULE SWITCH HERE **NTVS**";
@@ -216,5 +217,84 @@ function require(module) {
 }
 ";
         }
+
+        internal override object Object {
+            get {
+                return this;
+            }
+        }
+
+        protected override ReferenceContainerNode CreateReferenceContainerNode() {
+            return null;
+        }
+
+        #region VSWebSite Members
+
+        // This interface is just implemented so we don't get normal profiling which
+        // doesn't work with our projects anyway.
+
+        public EnvDTE.ProjectItem AddFromTemplate(string bstrRelFolderUrl, string bstrWizardName, string bstrLanguage, string bstrItemName, bool bUseCodeSeparation, string bstrMasterPage, string bstrDocType) {
+            throw new NotImplementedException();
+        }
+
+        public VsWebSite.CodeFolders CodeFolders {
+            get { throw new NotImplementedException(); }
+        }
+
+        public EnvDTE.DTE DTE {
+            get { return Project.DTE; }
+        }
+
+        public string EnsureServerRunning() {
+            throw new NotImplementedException();
+        }
+
+        public string GetUniqueFilename(string bstrFolder, string bstrRoot, string bstrDesiredExt) {
+            throw new NotImplementedException();
+        }
+
+        public bool PreCompileWeb(string bstrCompilePath, bool bUpdateable) {
+            throw new NotImplementedException();
+        }
+
+        public EnvDTE.Project Project {
+            get { return (OAProject)GetAutomationObject();  }
+        }
+
+        public VsWebSite.AssemblyReferences References {
+            get { throw new NotImplementedException(); }
+        }
+
+        public void Refresh() {
+        }
+
+        public string TemplatePath {
+            get { throw new NotImplementedException(); }
+        }
+
+        public string URL {
+            get { throw new NotImplementedException(); }
+        }
+
+        public string UserTemplatePath {
+            get { throw new NotImplementedException(); }
+        }
+
+        public VsWebSite.VSWebSiteEvents VSWebSiteEvents {
+            get { throw new NotImplementedException(); }
+        }
+
+        public void WaitUntilReady() {
+        }
+
+        public VsWebSite.WebReferences WebReferences {
+            get { throw new NotImplementedException(); }
+        }
+
+        public VsWebSite.WebServices WebServices {
+            get { throw new NotImplementedException(); }
+        }
+
+        #endregion
     }
 }

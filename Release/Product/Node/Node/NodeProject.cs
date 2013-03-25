@@ -373,7 +373,15 @@ namespace Microsoft.NodejsTools {
         }
 
         int IOleCommandTarget.QueryStatus(ref Guid pguidCmdGroup, uint cCmds, OLECMD[] prgCmds, IntPtr pCmdText) {
-            if (pguidCmdGroup == GuidList.guidVenusCmdId) {
+            if (pguidCmdGroup == GuidList.guidEureka) {
+                for (int i = 0; i < prgCmds.Length; i++) {
+                    switch (prgCmds[i].cmdID) {
+                        case 0x102: // View in Web Page Inspector from Eureka web tools
+                            prgCmds[i].cmdf = (uint)(OLECMDF.OLECMDF_INVISIBLE | OLECMDF.OLECMDF_SUPPORTED | OLECMDF.OLECMDF_ENABLED);
+                            return VSConstants.S_OK;
+                    }
+                }
+            } else if (pguidCmdGroup == GuidList.guidVenusCmdId) {
                 for (int i = 0; i < prgCmds.Length; i++) {
                     switch (prgCmds[i].cmdID) {
                         case 0x034: /* add app assembly folder */
@@ -393,7 +401,6 @@ namespace Microsoft.NodejsTools {
                 }
             } else if (pguidCmdGroup == GuidList.guidWebPackgeCmdId) {
                 if (prgCmds[0].cmdID == 0x101 /*  EnablePublishToWindowsAzureMenuItem*/) {
-                    Console.WriteLine("Hi!");
                 }
             } else if (pguidCmdGroup == GuidList.guidWebAppCmdId) {
                 for (int i = 0; i < prgCmds.Length; i++) {

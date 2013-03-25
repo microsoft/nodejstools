@@ -67,7 +67,7 @@ namespace Microsoft.NodejsTools.Profiling {
                 var psi = new ProcessStartInfo(
                         Path.Combine(
                             Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location),
-                            "Microsoft.NodeTools.NodeLogConverter.exe"
+                            "Microsoft.NodejsTools.NodeLogConverter.exe"
                         ),
                         "\"" + Path.Combine(_dir, "v8.log") + "\" " +
                         "\"" + filename + "\" " +
@@ -84,6 +84,7 @@ namespace Microsoft.NodejsTools.Profiling {
                 var procExited = ProcessExited;
                 if (procExited != null) {
                     procExited(this, EventArgs.Empty);
+                    File.Delete(Path.Combine(_dir, "v8.log"));
                 }
             };
 

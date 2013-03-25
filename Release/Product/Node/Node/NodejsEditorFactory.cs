@@ -23,6 +23,7 @@ using Microsoft.VisualStudio.OLE.Interop;
 using Microsoft.VisualStudio.Shell;
 using Microsoft.VisualStudio.Shell.Interop;
 using Microsoft.VisualStudio.Text;
+using Microsoft.VisualStudio.Text.Operations;
 using Microsoft.VisualStudio.Text.Projection;
 using Microsoft.VisualStudio.TextManager.Interop;
 using Microsoft.VisualStudio.Utilities;
@@ -313,6 +314,8 @@ namespace Microsoft.NodejsTools {
 
                 var fileExtRegistry = _compModel.GetService<IFileExtensionRegistryService>();
 
+                IEditorOperationsFactoryService factory = _compModel.GetService<IEditorOperationsFactoryService>();
+
                 IContentType contentType = SniffContentType(diskBuffer) ??
                                            contentRegistry.GetContentType("JavaScript");
 
@@ -330,6 +333,9 @@ namespace Microsoft.NodejsTools {
 
                 IVsTextView view;
                 ErrorHandler.ThrowOnFailure(_window.GetPrimaryView(out view));
+                var wpfView = adapterService.GetWpfTextView(view);
+                EditFilter editFilter = new EditFilter(wpfView, factory.GetEditorOperations(wpfView));
+                editFilter.AttachKeyboardFilter(view);
 
                 return VSConstants.S_OK;
             }

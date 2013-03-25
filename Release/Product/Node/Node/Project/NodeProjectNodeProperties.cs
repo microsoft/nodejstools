@@ -45,6 +45,5 @@ namespace Microsoft.NodejsTools.Project {
                 return 0x40000;
             }
         }
-
     }
 }
