@@ -95,6 +95,7 @@ foreach ($version in $versions) {
           
           $files = ("Microsoft.NodejsTools.NodeLogConverter.exe", 
                     "Microsoft.NodejsTools.dll", 
+                    "Microsoft.NodejsTools.AjaxMin.dll", 
                     "Microsoft.NodejsTools.Profiling.dll",
                     "Microsoft.NodejsTools.InteractiveWindow.dll")
           
