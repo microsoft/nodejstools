@@ -90,7 +90,7 @@ namespace Microsoft.NodejsTools.LogGeneration {
 
             EVENT_TRACE_PROPERTIES eventProps = new EVENT_TRACE_PROPERTIES();
             eventProps.Wnode.BufferSize = (uint)bufferSize;
-            eventProps.BufferSize = 1024 * 1024;
+            eventProps.BufferSize = 512;
             eventProps.Wnode.Guid = Guid.NewGuid();
             eventProps.LogFileMode = EVENT_TRACE_PRIVATE_IN_PROC | EVENT_TRACE_PRIVATE_LOGGER_MODE | EVENT_TRACE_FILE_MODE_SEQUENTIAL;
             eventProps.MaximumFileSize = 0;

@@ -572,7 +572,12 @@ public static void X{0:X}() {{
 
         private void RelogTrace(TimeSpan executionTime, int stackWalkCount, string filename) {
             // if we're on Win8 or later we want to re-write the timestamps using the relogger
-            var traceRelogger = (ITraceRelogger)Activator.CreateInstance(Type.GetTypeFromCLSID(EtlNativeMethods.CLSID_TraceRelogger));
+            ITraceRelogger traceRelogger = null;
+            try {
+                traceRelogger = (ITraceRelogger)Activator.CreateInstance(Type.GetTypeFromCLSID(EtlNativeMethods.CLSID_TraceRelogger));
+            } catch(COMException) {
+            }
+
             if (traceRelogger != null) {
                 var callback = new TraceReloggerCallback(executionTime, stackWalkCount);
                 ulong newTraceHandle;
@@ -585,8 +590,9 @@ public static void X{0:X}() {{
 
                 File.Copy(filename + ".tmp", filename, true);
             } else {
-                Console.WriteLine("Failed to create relogger");
+                Console.WriteLine("Failed to create relogger, timestamps will be incorrect");
             }
+
         }
 
         class TraceReloggerCallback : ITraceEventCallback {
