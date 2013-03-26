@@ -103,7 +103,7 @@ try {
                     exit 4
                 }
             }
-            
+
             msbuild /v:n /m /fl /flp:"Verbosity=n;LogFile=BuildRelease.$config.$($targetVs.number).log" /p:Configuration=$config /p:WixVersion=$version /p:VSTarget=$($targetVs.number) /p:VisualStudioVersion=$($targetVs.number) Release\SetupAuthoring\dirs.proj
             if ($LASTEXITCODE -gt 0) {
                 Write-Error "Build failed: $config"
@@ -125,8 +125,8 @@ try {
             copy -force -recurse $bindir\*.exe $destdir\Binaries\
             copy -force -recurse $bindir\*.pkgdef $destdir\Binaries\
             
-            if (-not (Test-Path $destdir\Binaries\ReplWindow)) { mkdir $destdir\Binaries\ReplWindow }
-            copy -force -recurse Release\Product\Python\ReplWindow\obj\Dev$($targetVs.number)\$config\extension.vsixmanifest $destdir\Binaries\ReplWindow
+            if (-not (Test-Path $destdir\Binaries\InteractiveWindow)) { mkdir $destdir\Binaries\InteractiveWindow }
+            copy -force -recurse Release\Product\Node\InteractiveWindow\obj\Dev$($targetVs.number)\$config\extension.vsixmanifest $destdir\Binaries\InteractiveWindow
         }
         
         if ($asmverfileBackedUp) {
@@ -144,7 +144,7 @@ try {
         tfpt scorch /noprompt
     }
     
-    if (-not $nocopy) { robocopy /s . $outdir\Sources /xd TestResults Binaries Servicing | Out-Null }
+    if (-not $nocopy) { robocopy /s . $outdir\Sources /xd TestResults Binaries Servicing Layouts | Out-Null }
 } finally {
     if ($asmverfileBackedUp) {
         copy -force ($asmverfile.FullName + ".bak") $asmverfile

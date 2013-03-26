@@ -16,7 +16,6 @@ using System;
 using System.IO;
 using Microsoft.NodejsTools;
 using Microsoft.NodejsTools.Repl;
-using Microsoft.VisualStudio.Repl;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using TestUtilities.Mocks;
 

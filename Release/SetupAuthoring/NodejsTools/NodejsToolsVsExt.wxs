@@ -22,12 +22,7 @@
             </Component>
             
             <!-- All user components -->
-<!--
-            <Component Id="cmp7A6ED313485B4F31AF9B1007A1CC6D3B" Directory="GAC" Guid="{B96C05C0-3F6C-4D29-9FFF-D1076DF4ADDE}" >
-              <Condition>ALLUSERS = 1</Condition>
-              <File Id="fil157118D23F2C490BB35835160101149A" KeyPath="yes" Source="$(var.ObjDir)\Microsoft.NodeTools.dll" Assembly=".net"/>
-            </Component>
--->          
+
             <!-- Both per user and all user components -->
             <Component Id="cmpE3F5BF4C28BA41A9A478DAC397C64098" Directory="INSTALLLOCATION" Guid="{DDBCEC41-C59C-4C5D-B7A2-77AB2F7684DB}">
               <File Id="fil47E7513578964CFA86B587D50FC280CB" KeyPath="yes" Source="$(var.ObjDir)\Microsoft.NodejsTools.dll" />

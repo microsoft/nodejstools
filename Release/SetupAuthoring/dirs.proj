@@ -14,7 +14,7 @@
   -->
   
   <ItemGroup>
-    <ProjectFile Include="ReplWindow\ReplWindow.wixproj"/>
+    <ProjectFile Include="InteractiveWindow\InteractiveWindow.wixproj"/>
     <ProjectFile Include="NodejsTools\NodejsTools.wixproj"/>
     <ProjectFile Include="NodejsToolsInstaller\NodejsToolsInstaller.wixproj"/>    
   </ItemGroup>

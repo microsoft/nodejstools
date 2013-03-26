@@ -19,9 +19,10 @@ using System.IO;
 using System.Text;
 using System.Threading.Tasks;
 using Microsoft.NodejsTools;
+using Microsoft.VisualStudio;
 using Microsoft.VisualStudio.Text;
 
-namespace Microsoft.VisualStudio.Repl {
+namespace Microsoft.NodejsTools.Repl {
 #if INTERACTIVE_WINDOW
     using IReplCommand = IInteractiveWindowCommand;
     using IReplWindow = IInteractiveWindow;    

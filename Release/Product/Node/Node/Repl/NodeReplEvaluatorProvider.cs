@@ -13,7 +13,7 @@
  * ***************************************************************************/
 
 using System.ComponentModel.Composition;
-using Microsoft.VisualStudio.Repl;
+using Microsoft.NodejsTools.Repl;
 
 namespace Microsoft.NodejsTools.Repl {
     [ReplRole("Reset"), ReplRole("Execution")]

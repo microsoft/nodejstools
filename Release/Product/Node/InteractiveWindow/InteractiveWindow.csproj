@@ -13,8 +13,8 @@
     </When>
   </Choose>
   <Import Project="$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props" Condition="Exists('$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props')" />
+  <Import Project="..\ProjectBefore.settings" />
   <PropertyGroup>
-    <VSToolsPath Condition="'$(VSToolsPath)' == ''">$(MSBuildExtensionsPath32)\Microsoft\VisualStudio\v$(VisualStudioVersion)</VSToolsPath>
     <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
     <Platform Condition=" '$(Platform)' == '' ">x86</Platform>
     <SchemaVersion>2.0</SchemaVersion>
@@ -22,9 +22,8 @@
     <ProjectTypeGuids>{82b43b9b-a64c-4715-b499-d71e9ca2bd60};{60dc8134-eba5-43b8-bcc9-bb4bc16c2548};{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}</ProjectTypeGuids>
     <OutputType>Library</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
-    <RootNamespace>Microsoft.VisualStudio</RootNamespace>
-    <AssemblyName Condition="'$(InteractiveWindow)' == ''">Microsoft.NodeTools.ReplWindow</AssemblyName>
-    <AssemblyName Condition="'$(InteractiveWindow)' != ''">Microsoft.VisualStudio.InteractiveWindow</AssemblyName>
+    <RootNamespace>Microsoft.NodejsTools.Repl</RootNamespace>
+    <AssemblyName>Microsoft.NodejsTools.InteractiveWindow</AssemblyName>
     <SccProjectName>SAK</SccProjectName>
     <SccLocalPath>SAK</SccLocalPath>
     <SccAuxPath>SAK</SccAuxPath>
@@ -34,10 +33,7 @@
     <StartArguments>/rootsuffix Exp</StartArguments>
     <DeployExtension>True</DeployExtension>
     <CreateVsixContainer>True</CreateVsixContainer>
-    <VsTarget>11.0</VsTarget>
-    <TargetFrameworkVersion>v4.5</TargetFrameworkVersion>
-    <TargetFrameworkProfile />
-    <AssemblyOriginatorKeyFile>..\Node\Key.snk</AssemblyOriginatorKeyFile>
+    <AssemblyOriginatorKeyFile>..\..\..\..\Build\FinalPublicKey.snk</AssemblyOriginatorKeyFile>
     <SignAssembly>True</SignAssembly>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Platform)' == 'x86' ">
@@ -48,7 +44,7 @@
     <DebugType>full</DebugType>
     <Optimize>false</Optimize>
     <OutputPath>bin\Debug\</OutputPath>
-    <DefineConstants>TRACE;DEBUG;DEV11;ALT_REPL</DefineConstants>
+    <DefineConstants>TRACE;DEBUG;DEV11</DefineConstants>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
     <Prefer32Bit>false</Prefer32Bit>
@@ -63,8 +59,8 @@
     <RunCodeAnalysis>false</RunCodeAnalysis>
     <Prefer32Bit>false</Prefer32Bit>
   </PropertyGroup>
-  <PropertyGroup Condition="'$(InteractiveWindow)' != ''">
-    <DefineConstants>$(DefineConstants);INTERACTIVE_WINDOW</DefineConstants>
+  <PropertyGroup>
+    <DefineConstants>$(DefineConstants);NTVS_FEATURE_INTERACTIVEWINDOW</DefineConstants>
   </PropertyGroup>
   <ItemGroup>
     <Reference Include="Microsoft.CSharp" />
@@ -165,63 +161,151 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="..\..\..\..\..\Release\Product\Python\ReplWindow\CommonConstants.cs" />
-    <Compile Include="Guids.cs" />
-    <Compile Include="..\..\..\..\..\Release\Product\Python\ReplWindow\Repl\IReplCommand2.cs" />
-    <Compile Include="..\..\..\..\..\Release\Product\Python\ReplWindow\Repl\Margin\GlyphPrompts.cs" />
-    <Compile Include="..\..\..\..\..\Release\Product\Python\ReplWindow\Repl\Margin\PromptMarginVisualManager.cs" />
-    <Compile Include="..\..\..\..\..\Release\Product\Python\ReplWindow\Repl\Margin\PromptMargin.cs" />
-    <Compile Include="..\..\..\..\..\Release\Product\Python\ReplWindow\Repl\OutputBuffer.cs" />
-    <Compile Include="..\..\..\..\..\Release\Product\Python\ReplWindow\Repl\OutputColors.cs" />
-    <Compile Include="..\..\..\..\..\Release\Product\Python\ReplWindow\Repl\ReplOutputClassificationFormatDefinitions.cs" />
-    <Compile Include="..\..\..\..\..\Release\Product\Python\ReplWindow\Repl\ReplOutputClassifier.cs" />
-    <Compile Include="..\..\..\..\..\Release\Product\Python\ReplWindow\Repl\ReplOutputClassifierProvider.cs" />
-    <Compile Include="..\..\..\..\..\Release\Product\Python\ReplWindow\Repl\ReplOutputContentType.cs" />
-    <Compile Include="..\..\..\..\..\Release\Product\Python\ReplWindow\Repl\CustomTrackingSpan.cs" />
-    <Compile Include="..\..\..\..\..\Release\Product\Python\ReplWindow\Repl\IContentTypeMetadata.cs" />
-    <Compile Include="..\..\..\..\..\Release\Product\Python\ReplWindow\Repl\IReplWindowCreationListener.cs" />
-    <Compile Include="..\..\..\..\..\Release\Product\Python\ReplWindow\Repl\ReplInput.cs" />
-    <Compile Include="..\..\..\..\..\Release\Product\Python\ReplWindow\Repl\Commands\CancelExecutionCommand.cs" />
-    <Compile Include="..\..\..\..\..\Release\Product\Python\ReplWindow\Repl\Commands\ClearScreenReplCommand.cs" />
-    <Compile Include="..\..\..\..\..\Release\Product\Python\ReplWindow\Repl\Commands\EchoReplCommand.cs" />
-    <Compile Include="..\..\..\..\..\Release\Product\Python\ReplWindow\Repl\Commands\ResetReplCommand.cs" />
-    <Compile Include="..\..\..\..\..\Release\Product\Python\ReplWindow\Repl\Commands\WaitReplCommand.cs" />
-    <Compile Include="..\..\..\..\..\Release\Product\Python\ReplWindow\Repl\ReplAggregateClassifier.cs" />
-    <Compile Include="..\..\..\..\..\Release\Product\Python\ReplWindow\Repl\ReplAggregateClassifierProvider.cs" />
-    <Compile Include="..\..\..\..\..\Release\Product\Python\ReplWindow\Repl\ReplConstants.cs" />
-    <Compile Include="..\..\..\..\..\Release\Product\Python\ReplWindow\Repl\ExecutionResult.cs" />
-    <Compile Include="..\..\..\..\..\Release\Product\Python\ReplWindow\Repl\History.cs" />
-    <Compile Include="..\..\..\..\..\Release\Product\Python\ReplWindow\Repl\IMultipleScopeEvaluator.cs" />
-    <Compile Include="..\..\..\..\..\Release\Product\Python\ReplWindow\Repl\InlineReplAdornment.cs" />
-    <Compile Include="..\..\..\..\..\Release\Product\Python\ReplWindow\Repl\IReplCommand.cs" />
-    <Compile Include="..\..\..\..\..\Release\Product\Python\ReplWindow\Repl\IReplEvaluator.cs" />
-    <Compile Include="..\..\..\..\..\Release\Product\Python\ReplWindow\Repl\IReplEvaluatorProvider.cs" />
-    <Compile Include="..\..\..\..\..\Release\Product\Python\ReplWindow\Repl\IReplWindow.cs" />
-    <Compile Include="..\..\..\..\..\Release\Product\Python\ReplWindow\Repl\IReplWindowProvider.cs" />
-    <Compile Include="..\..\..\..\..\Release\Product\Python\ReplWindow\Repl\ReplContentType.cs" />
-    <Compile Include="..\..\..\..\..\Release\Product\Python\ReplWindow\Repl\ReplOptions.cs" />
-    <Compile Include="..\..\..\..\..\Release\Product\Python\ReplWindow\Repl\ReplRoleAttribute.cs" />
-    <Compile Include="..\..\..\..\..\Release\Product\Python\ReplWindow\Repl\ReplWindow.cs" />
-    <Compile Include="..\..\..\..\..\Release\Product\Python\ReplWindow\Repl\ReplWindowExtensions.cs" />
-    <Compile Include="..\..\..\..\..\Release\Product\Python\ReplWindow\Repl\ReplWindowProvider.cs" />
-    <Compile Include="..\..\..\..\..\Release\Product\Python\ReplWindow\Repl\ResizingAdorner.cs" />
-    <Compile Include="..\..\..\..\..\Release\Product\Python\ReplWindow\Repl\ZoomableInlineAdornment.cs" />
-    <Compile Include="..\..\..\..\..\Release\Product\Python\ReplWindow\Resources.Designer.cs">
+    <Compile Include="..\..\Python\ReplWindow\CommonConstants.cs">
+      <Link>CommonConstants.cs</Link>
+    </Compile>
+    <Compile Include="..\..\Python\ReplWindow\Guids.cs">
+      <Link>Guids.cs</Link>
+    </Compile>
+    <Compile Include="..\..\Python\ReplWindow\Repl\IReplCommand2.cs">
+      <Link>Repl\IReplCommand2.cs</Link>
+    </Compile>
+    <Compile Include="..\..\Python\ReplWindow\Repl\Margin\GlyphPrompts.cs">
+      <Link>Repl\GlyphPrompts.cs</Link>
+    </Compile>
+    <Compile Include="..\..\Python\ReplWindow\Repl\Margin\PromptMarginVisualManager.cs">
+      <Link>Repl\PromptMarginVisualManager.cs</Link>
+    </Compile>
+    <Compile Include="..\..\Python\ReplWindow\Repl\Margin\PromptMargin.cs">
+      <Link>Repl\PromptMargin.cs</Link>
+    </Compile>
+    <Compile Include="..\..\Python\ReplWindow\Repl\OutputBuffer.cs">
+      <Link>Repl\OutputBuffer.cs</Link>
+    </Compile>
+    <Compile Include="..\..\Python\ReplWindow\Repl\OutputColors.cs">
+      <Link>Repl\OutputColors.cs</Link>
+    </Compile>
+    <Compile Include="..\..\Python\ReplWindow\Repl\ReplOutputClassificationFormatDefinitions.cs">
+      <Link>Repl\ReplOutputClassificationFormatDefinitions.cs</Link>
+    </Compile>
+    <Compile Include="..\..\Python\ReplWindow\Repl\ReplOutputClassifier.cs">
+      <Link>Repl\ReplOutputClassifier.cs</Link>
+    </Compile>
+    <Compile Include="..\..\Python\ReplWindow\Repl\ReplOutputClassifierProvider.cs">
+      <Link>Repl\ReplOutputClassifierProvider.cs</Link>
+    </Compile>
+    <Compile Include="..\..\Python\ReplWindow\Repl\ReplOutputContentType.cs">
+      <Link>Repl\ReplOutputContentType.cs</Link>
+    </Compile>
+    <Compile Include="..\..\Python\ReplWindow\Repl\CustomTrackingSpan.cs">
+      <Link>Repl\CustomTrackingSpan.cs</Link>
+    </Compile>
+    <Compile Include="..\..\Python\ReplWindow\Repl\IContentTypeMetadata.cs">
+      <Link>Repl\IContentTypeMetadata.cs</Link>
+    </Compile>
+    <Compile Include="..\..\Python\ReplWindow\Repl\IReplWindowCreationListener.cs">
+      <Link>Repl\IReplWindowCreationListener.cs</Link>
+    </Compile>
+    <Compile Include="..\..\Python\ReplWindow\Repl\ReplInput.cs">
+      <Link>Repl\ReplInput.cs</Link>
+    </Compile>
+    <Compile Include="..\..\Python\ReplWindow\Repl\Commands\CancelExecutionCommand.cs">
+      <Link>Repl\CancelExecutionCommand.cs</Link>
+    </Compile>
+    <Compile Include="..\..\Python\ReplWindow\Repl\Commands\ClearScreenReplCommand.cs">
+      <Link>Repl\ClearScreenReplCommand.cs</Link>
+    </Compile>
+    <Compile Include="..\..\Python\ReplWindow\Repl\Commands\EchoReplCommand.cs">
+      <Link>Repl\EchoReplCommand.cs</Link>
+    </Compile>
+    <Compile Include="..\..\Python\ReplWindow\Repl\Commands\ResetReplCommand.cs">
+      <Link>Repl\ResetReplCommand.cs</Link>
+    </Compile>
+    <Compile Include="..\..\Python\ReplWindow\Repl\Commands\WaitReplCommand.cs">
+      <Link>Repl\WaitReplCommand.cs</Link>
+    </Compile>
+    <Compile Include="..\..\Python\ReplWindow\Repl\ReplAggregateClassifier.cs">
+      <Link>Repl\ReplAggregateClassifier.cs</Link>
+    </Compile>
+    <Compile Include="..\..\Python\ReplWindow\Repl\ReplAggregateClassifierProvider.cs">
+      <Link>Repl\ReplAggregateClassifierProvider.cs</Link>
+    </Compile>
+    <Compile Include="..\..\Python\ReplWindow\Repl\ReplConstants.cs">
+      <Link>Repl\ReplConstants.cs</Link>
+    </Compile>
+    <Compile Include="..\..\Python\ReplWindow\Repl\ExecutionResult.cs">
+      <Link>Repl\ExecutionResult.cs</Link>
+    </Compile>
+    <Compile Include="..\..\Python\ReplWindow\Repl\History.cs">
+      <Link>Repl\History.cs</Link>
+    </Compile>
+    <Compile Include="..\..\Python\ReplWindow\Repl\IMultipleScopeEvaluator.cs">
+      <Link>Repl\IMultipleScopeEvaluator.cs</Link>
+    </Compile>
+    <Compile Include="..\..\Python\ReplWindow\Repl\InlineReplAdornment.cs">
+      <Link>Repl\InlineReplAdornment.cs</Link>
+    </Compile>
+    <Compile Include="..\..\Python\ReplWindow\Repl\IReplCommand.cs">
+      <Link>Repl\IReplCommand.cs</Link>
+    </Compile>
+    <Compile Include="..\..\Python\ReplWindow\Repl\IReplEvaluator.cs">
+      <Link>Repl\IReplEvaluator.cs</Link>
+    </Compile>
+    <Compile Include="..\..\Python\ReplWindow\Repl\IReplEvaluatorProvider.cs">
+      <Link>Repl\IReplEvaluatorProvider.cs</Link>
+    </Compile>
+    <Compile Include="..\..\Python\ReplWindow\Repl\IReplWindow.cs">
+      <Link>Repl\IReplWindow.cs</Link>
+    </Compile>
+    <Compile Include="..\..\Python\ReplWindow\Repl\IReplWindowProvider.cs">
+      <Link>Repl\IReplWindowProvider.cs</Link>
+    </Compile>
+    <Compile Include="..\..\Python\ReplWindow\Repl\ReplContentType.cs">
+      <Link>Repl\ReplContentType.cs</Link>
+    </Compile>
+    <Compile Include="..\..\Python\ReplWindow\Repl\ReplOptions.cs">
+      <Link>Repl\ReplOptions.cs</Link>
+    </Compile>
+    <Compile Include="..\..\Python\ReplWindow\Repl\ReplRoleAttribute.cs">
+      <Link>Repl\ReplRoleAttribute.cs</Link>
+    </Compile>
+    <Compile Include="..\..\Python\ReplWindow\Repl\ReplWindow.cs">
+      <Link>Repl\ReplWindow.cs</Link>
+    </Compile>
+    <Compile Include="..\..\Python\ReplWindow\Repl\ReplWindowExtensions.cs">
+      <Link>Repl\ReplWindowExtensions.cs</Link>
+    </Compile>
+    <Compile Include="..\..\Python\ReplWindow\Repl\ReplWindowProvider.cs">
+      <Link>Repl\ReplWindowProvider.cs</Link>
+    </Compile>
+    <Compile Include="..\..\Python\ReplWindow\Repl\ResizingAdorner.cs">
+      <Link>Repl\ResizingAdorner.cs</Link>
+    </Compile>
+    <Compile Include="..\..\Python\ReplWindow\Repl\ZoomableInlineAdornment.cs">
+      <Link>Repl\ZoomableInlineAdornment.cs</Link>
+    </Compile>
+    <Compile Include="..\..\Python\ReplWindow\GlobalSuppressions.cs">
+      <Link>Repl\GlobalSuppressions.cs</Link>
+    </Compile>
+    <Compile Include="..\..\Python\ReplWindow\ReplWindowPackage.cs">
+      <Link>ReplWindowPackage.cs</Link>
+    </Compile>
+    <Compile Include="..\..\Python\ReplWindow\PkgCmdID.cs">
+      <Link>PkgCmdID.cs</Link>
+    </Compile>
+    <Compile Include="Resources.Designer.cs">
       <AutoGen>True</AutoGen>
       <DesignTime>True</DesignTime>
       <DependentUpon>Resources.resx</DependentUpon>
     </Compile>
-    <Compile Include="..\..\..\..\..\Release\Product\Python\ReplWindow\GlobalSuppressions.cs" />
-    <Compile Include="..\..\..\..\..\Release\Product\Python\ReplWindow\ReplWindowPackage.cs" />
-    <Compile Include="..\..\..\..\..\Release\Product\Python\ReplWindow\PkgCmdID.cs" />
   </ItemGroup>
   <ItemGroup>
-    <EmbeddedResource Include="..\..\..\..\..\Release\Product\Python\ReplWindow\Resources.resx">
+    <EmbeddedResource Include="Resources.resx">
       <Generator>ResXFileCodeGenerator</Generator>
       <LastGenOutput>Resources.Designer.cs</LastGenOutput>
       <SubType>Designer</SubType>
     </EmbeddedResource>
-    <ConditionalEmbeddedResource Include="..\..\..\..\..\Release\Product\Python\ReplWindow\VSPackage.resx">
+    <ConditionalEmbeddedResource Include="VSPackage.resx">
       <MergeWithCTO>true</MergeWithCTO>
       <ManifestResourceName>Microsoft.VSPackage</ManifestResourceName>
       <SubType>Designer</SubType>
@@ -233,7 +317,7 @@
     </None>
   </ItemGroup>
   <ItemGroup>
-    <VSCTCompile Include="ReplWindow.vsct">
+    <VSCTCompile Include="InteractiveWindow.vsct">
       <ResourceName>Menus.ctmenu</ResourceName>
       <SubType>Designer</SubType>
     </VSCTCompile>
@@ -243,6 +327,9 @@
     <UseCodebase>true</UseCodebase>
     <RegisterOutputPackage>true</RegisterOutputPackage>
     <RegisterWithCodebase>true</RegisterWithCodebase>
+  </PropertyGroup>
+  <PropertyGroup>
+    <DelaySign>true</DelaySign>
   </PropertyGroup>
   <Target Name="ConditionalResx" BeforeTargets="MainResourcesGeneration" Condition="'@(ConditionalEmbeddedResource)' != ''">
     <WriteLinesToFile File="@(ConditionalEmbeddedResource->'%(RootDir)%(Directory)%(Filename).xform.resx')" Lines="$([System.IO.File]::ReadAllText('%(fullpath)').Replace(&quot;_VSVERSION_&quot;,&quot;$(VSTarget)&quot;))" Overwrite="true" />
@@ -257,6 +344,7 @@
   </Target>
   <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
   <Import Project="$(VSToolsPath)\VSSDK\Microsoft.VsSDK.targets" Condition="'$(VSToolsPath)' != ''" />
+  <Import Project="..\ProjectAfter.settings" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
        Other similar extension points exist, see Microsoft.Common.targets.
   <Target Name="BeforeBuild">

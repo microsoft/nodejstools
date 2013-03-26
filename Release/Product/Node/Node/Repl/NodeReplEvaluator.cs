@@ -12,7 +12,7 @@
  *
  * ***************************************************************************/
 
-using Microsoft.VisualStudio.Repl;
+using Microsoft.NodejsTools.Repl;
 using Microsoft.VisualStudio.Text;
 using System;
 using System.Collections.Generic;
@@ -217,14 +217,15 @@ namespace Microsoft.NodejsTools.Repl {
             }
 
             public Task<ExecutionResult> ExecuteText(string text) {
+                TaskCompletionSource<ExecutionResult> completion;
                 Debug.WriteLine("Executing text: " + text);
                 using (new SocketLock(this)) {
                     if (!_connected) {
                         // delay executing the text until we're connected
                         Debug.WriteLine("Delayed executing text");
-                        _completion = new TaskCompletionSource<ExecutionResult>();
+                        _completion = completion = new TaskCompletionSource<ExecutionResult>();
                         _executionText = text;
-                        return _completion.Task;
+                        return completion.Task;
                     }
 
                     try {
@@ -233,15 +234,15 @@ namespace Microsoft.NodejsTools.Repl {
                             return ExecutionResult.Failed;
                         }
 
-                        _completion = new TaskCompletionSource<ExecutionResult>();
-
+                        _completion = completion = new TaskCompletionSource<ExecutionResult>();
+                        
                         SendExecuteText(text);
                     } catch (SocketException) {
                         _eval._window.WriteError(_noReplProcess);
                         return ExecutionResult.Failed;
                     }
 
-                    return _completion.Task;
+                    return completion.Task;
                 }
             }
 
@@ -360,6 +361,7 @@ namespace Microsoft.NodejsTools.Repl {
             internal void Disconnect() {
                 if (_completion != null) {
                     _completion.SetResult(ExecutionResult.Failure);
+                    _completion = null;
                 }
             }
 

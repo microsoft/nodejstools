@@ -17,9 +17,9 @@ using System.Reflection;
 using System.Threading.Tasks;
 using System.Windows.Controls;
 using System.Windows.Media.Imaging;
-using Microsoft.NodejsTools.Repl;
+using Microsoft.VisualStudio;
 
-namespace Microsoft.VisualStudio.Repl {
+namespace Microsoft.NodejsTools.Repl {
 #if INTERACTIVE_WINDOW
     using IReplCommand = IInteractiveWindowCommand;
     using IReplWindow = IInteractiveWindow;    

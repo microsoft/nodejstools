@@ -62,7 +62,7 @@
 
       <!-- Install the tools into the VS directory -->
       <Directory Id="EXTENSION_INSTALLPATH">
-        <Merge Id="ReplWindow" Language="1033" SourceFile="$(var.TargetDir)ReplWindow.msm" DiskId="1" />
+        <Merge Id="InteractiveWindow" Language="1033" SourceFile="$(var.TargetDir)InteractiveWindow.msm" DiskId="1" />
         <Merge Id="NodejsTools" Language="1033" SourceFile="$(var.TargetDir)NodejsTools.msm" DiskId="1" />
         <Merge Id="NodejsProfiling" Language="1033" SourceFile="$(var.TargetDir)NodejsProfiling.msm" DiskId="1" />
       </Directory>
@@ -77,7 +77,7 @@
       <ComponentRef Id="AllUsers_Comp_InstallDirItems" Primary="yes" />
       
       <MergeRef Id="NodejsTools"/>
-      <MergeRef Id="ReplWindow"/>
+      <MergeRef Id="InteractiveWindow"/>
       <MergeRef Id="NodejsProfiling" />
     </Feature>
     

@@ -20,6 +20,12 @@
   <PropertyGroup Condition=" '$(Platform)' == 'x86' ">
     <PlatformTarget>x86</PlatformTarget>
   </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'Debug|x86'">
+    <DefineConstants>TRACE;DEBUG;DEV11;NTVS_FEATURE_INTERACTIVEWINDOW</DefineConstants>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'Release|x86'">
+    <DefineConstants>TRACE;DEV11;NTVS_FEATURE_INTERACTIVEWINDOW</DefineConstants>
+  </PropertyGroup>
   <ItemGroup>
     <Reference Include="Microsoft.TC.RemoteTest">
       <HintPath>..\..\..\..\Release\Public\TCTestHostAdapters\$(VSTarget)\Microsoft.TC.RemoteTest.dll</HintPath>
@@ -115,9 +121,9 @@
     <Compile Include="VSUtility.cs" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\..\..\Product\Python\ReplWindow\ReplWindow.csproj">
-      <Project>{20BB6FAC-44D2-4D76-ABFE-0C1E163A1A4F}</Project>
-      <Name>ReplWindow</Name>
+    <ProjectReference Include="..\..\..\Product\Node\InteractiveWindow\InteractiveWindow.csproj">
+      <Project>{24a3887f-da50-4989-8d6c-4a5b04d5d457}</Project>
+      <Name>InteractiveWindow</Name>
     </ProjectReference>
   </ItemGroup>
   <Target Name="BeforeCompile">

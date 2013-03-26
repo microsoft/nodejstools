@@ -84,11 +84,11 @@
   <ItemGroup>
     <ProjectReference Include="..\Common\TestUtilities.UI\TestUtilities.UI.csproj">
       <Project>{E8150EBC-6B62-40BF-BF91-1DC60149B530}</Project>
-      <Name>ReplWindow</Name>
+      <Name>TestUtilities.UI</Name>
     </ProjectReference>
     <ProjectReference Include="..\Common\TestUtilities\TestUtilities.csproj">
       <Project>{D092D54E-FF29-4D32-9AEE-4EF704C92F67}</Project>
-      <Name>TestUtilities.UI</Name>
+      <Name>TestUtilities</Name>
     </ProjectReference>
   </ItemGroup>
   <Import Project="..\TestProjectAfter.settings" />

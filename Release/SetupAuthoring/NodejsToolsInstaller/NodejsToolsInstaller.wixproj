@@ -28,8 +28,8 @@
     <Content Include="License.rtf" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\ReplWindow\ReplWindow.wixproj">
-      <Name>ReplWindow</Name>
+    <ProjectReference Include="..\InteractiveWindow\InteractiveWindow.wixproj">
+      <Name>InteractiveWindow</Name>
       <Project>{C0D64130-C0E9-4CAB-99BC-68F62357F010}</Project>
       <Private>True</Private>
       <RefProjectOutputGroups>Binaries;Content;Satellites</RefProjectOutputGroups>

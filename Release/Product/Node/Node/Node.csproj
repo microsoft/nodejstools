@@ -34,7 +34,7 @@
     <DebugSymbols>true</DebugSymbols>
     <DebugType>full</DebugType>
     <OutputPath>bin\Debug\</OutputPath>
-    <DefineConstants>TRACE;DEBUG;DEV11;NODEJS_TOOLS</DefineConstants>
+    <DefineConstants>TRACE;DEBUG;DEV11;NODEJS_TOOLS;NODE_TOOLS</DefineConstants>
     <TreatWarningsAsErrors>true</TreatWarningsAsErrors>
     <ErrorReport>prompt</ErrorReport>
   </PropertyGroup>
@@ -43,9 +43,12 @@
     <Optimize>true</Optimize>
     <DebugType>pdbonly</DebugType>
     <OutputPath>bin\Release\</OutputPath>
-    <DefineConstants>TRACE;DEV11;NODE_TOOLS</DefineConstants>
+    <DefineConstants>TRACE;DEV11;NODEJS_TOOLS;NODE_TOOLS</DefineConstants>
     <TreatWarningsAsErrors>true</TreatWarningsAsErrors>
     <ErrorReport>prompt</ErrorReport>
+  </PropertyGroup>
+  <PropertyGroup>
+    <DefineConstants>$(DefineConstants);NTVS_FEATURE_INTERACTIVEWINDOW</DefineConstants>
   </PropertyGroup>
   <ItemGroup>
     <Reference Include="Microsoft.Build" />
@@ -720,9 +723,9 @@
     </Content>
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\..\Python\ReplWindow\ReplWindow.csproj">
-      <Project>{20bb6fac-44d2-4d76-abfe-0c1e163a1a4f}</Project>
-      <Name>ReplWindow</Name>
+    <ProjectReference Include="..\InteractiveWindow\InteractiveWindow.csproj">
+      <Project>{24a3887f-da50-4989-8d6c-4a5b04d5d457}</Project>
+      <Name>InteractiveWindow</Name>
     </ProjectReference>
   </ItemGroup>
   <PropertyGroup>
