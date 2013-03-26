@@ -60,7 +60,7 @@ foreach ($version in $versions) {
     $contacts = "$env:username;dinov;smortaz;stevdo;gilbertw"
     
     $request = `
-    "BuildId=$buildid $($version.name) symbols
+    "BuildId=NTVS $buildid $($version.name) symbols
     BuildLabPhone=7058786
     BuildRemark=$build_name
     ContactPeople=$contacts
@@ -158,7 +158,7 @@ foreach ($version in $versions) {
             write-progress -activity $activity -status "Waiting for completion:" -percentcomplete $percent;
             $percent = ($percent + 1) % 100
             sleep -seconds 5
-        } while(-not $files -or $files.Length -ne $expectedFileLength);
+        } while(-not $files -or $files.Count -ne $expectedFileLength);
     }
     
     # save binaries to release share
@@ -174,7 +174,7 @@ foreach ($version in $versions) {
     # Index the signed binaries
         
     $request = `
-    "BuildId=$buildid $($version.name) binaries
+    "BuildId=NTVS $buildid $($version.name) binaries
     BuildLabPhone=7058786
     BuildRemark=$build_name
     ContactPeople=$contacts
@@ -260,14 +260,14 @@ foreach ($version in $versions) {
       }
     }
     
-    $activity = "Job ID $($job.JobID) still processing"
     $percent = 0
     do {
+        $activity = "Job ID $($job.JobID) still processing: $($job.JobCompletionPath)"
         $files = dir $job.JobCompletionPath
         write-progress -activity $activity -status "Waiting for completion:" -percentcomplete $percent;
         $percent = ($percent + 1) % 100
         sleep -seconds 5
-    } while(-not $files -or $files.Length -ne $expectedFileCount);
+    } while(-not $files -or $files.Count -ne $expectedFileCount);
     
     copy -force "$($job.JobCompletionPath)\NodejsToolsInstaller.msi" "$outDir\Release\Node.js Tools for Visual Studio $build_name $($version.name).msi"
 }

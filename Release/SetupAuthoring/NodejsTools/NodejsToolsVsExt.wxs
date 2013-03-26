@@ -25,7 +25,7 @@
 
             <!-- Both per user and all user components -->
             <Component Id="cmpE3F5BF4C28BA41A9A478DAC397C64098" Directory="INSTALLLOCATION" Guid="{DDBCEC41-C59C-4C5D-B7A2-77AB2F7684DB}">
-              <File Id="fil47E7513578964CFA86B587D50FC280CB" KeyPath="yes" Source="$(var.ObjDir)\Microsoft.NodejsTools.dll" />
+              <File Id="fil47E7513578964CFA86B587D50FC280CB" KeyPath="yes" Source="$(var.BinariesDir)\Microsoft.NodejsTools.dll" />
             </Component>
             <Component Id="cmpC4E8CE1ED04F4740A1B017ECE4DA9CD1" Directory="INSTALLLOCATION" Guid="{1CF7A1CB-228A-4FA1-97EC-A9CD4417FF63}">
               <File Id="fil617BFEB8AC8E419B80409E0DD6D4641B" KeyPath="yes" Source="$(var.ObjDir)\extension.vsixmanifest" />
