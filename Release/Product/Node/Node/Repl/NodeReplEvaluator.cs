@@ -12,8 +12,6 @@
  *
  * ***************************************************************************/
 
-using Microsoft.NodejsTools.Repl;
-using Microsoft.VisualStudio.Text;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
@@ -27,6 +25,8 @@ using System.Threading;
 using System.Threading.Tasks;
 using System.Web.Script.Serialization;
 using System.Windows.Forms;
+using Microsoft.Ajax.Utilities;
+using Microsoft.VisualStudio.Text;
 
 namespace Microsoft.NodejsTools.Repl {
     class NodeReplEvaluator : IReplEvaluator {
@@ -55,20 +55,42 @@ namespace Microsoft.NodejsTools.Repl {
         }
 
         public bool CanExecuteText(string text) {
-            // TODO: Do better than this
-            int openBraces = 0, closeBraces = 0;
-            for (int i = 0; i < text.Length; i++) {
-                if (text[i] == '{') {
-                    openBraces++;
-                } else if (text[i] == '}') {
-                    closeBraces++;
+            var parser = new JSParser(text);
+            var errorSink = new ErrorSink();
+            parser.CompilerError += errorSink.CompilerError;
+            parser.Parse(new CodeSettings());
+
+            return !errorSink.Unterminated;
+        }
+
+        class ErrorSink {
+            public bool Unterminated;
+
+            public void CompilerError(object sender, JScriptExceptionEventArgs e) {
+                switch(e.Exception.ErrorCode) {
+                    case JSError.NoCatch:
+                    case JSError.UnclosedFunction:
+                    case JSError.NoCommentEnd:
+                    case JSError.NoEndDebugDirective:
+                    case JSError.NoEndIfDirective:
+                    case JSError.NoIdentifier:
+                    case JSError.NoLabel:
+                    case JSError.NoLeftCurly:
+                    case JSError.NoLeftParenthesis:
+                    case JSError.NoMemberIdentifier:
+                    case JSError.NoRightBracket:
+                    case JSError.NoRightParenthesis:
+                    case JSError.NoRightParenthesisOrComma:
+                    case JSError.NoRightCurly:
+                    case JSError.NoEqual:
+                    case JSError.NoCommaOrTypeDefinitionError:
+                    case JSError.NoComma:
+                    case JSError.NoColon:
+                        Unterminated = true;
+                        break;
                 }
             }
 
-            if (openBraces > closeBraces) {
-                return false;
-            }
-            return true;
         }
 
         public Task<ExecutionResult> ExecuteText(string text) {

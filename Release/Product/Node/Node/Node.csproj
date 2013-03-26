@@ -723,6 +723,10 @@
     </Content>
   </ItemGroup>
   <ItemGroup>
+    <ProjectReference Include="..\AjaxMinDll\AjaxMinDll.csproj">
+      <Project>{dfdb930e-1162-4514-a91d-c8595a807f13}</Project>
+      <Name>AjaxMinDll</Name>
+    </ProjectReference>
     <ProjectReference Include="..\InteractiveWindow\InteractiveWindow.csproj">
       <Project>{24a3887f-da50-4989-8d6c-4a5b04d5d457}</Project>
       <Name>InteractiveWindow</Name>

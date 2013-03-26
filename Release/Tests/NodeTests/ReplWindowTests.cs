@@ -288,5 +288,17 @@ undefined";
             Assert.AreEqual(null, provider.GetEvaluator("Unknown"));
             Assert.AreNotEqual(null, provider.GetEvaluator("{E4AC36B7-EDC5-4AD2-B758-B5416D520705}"));
         }
+
+        [TestMethod, Priority(0)]
+        public void TestPartialInputs() {
+            using (var eval = new NodeReplEvaluator()) {
+                Assert.AreEqual(eval.CanExecuteText(@"function f() {"), false);
+                Assert.AreEqual(eval.CanExecuteText(@"function f() {}"), true);
+                Assert.AreEqual(eval.CanExecuteText(@"var net = require(""net""),"), false);
+                Assert.AreEqual(eval.CanExecuteText(@"var net = require(""net""),
+      repl = require(""repl"");"), true);
+            }
+        }
+
     }
 }
