@@ -26,13 +26,32 @@
         </DirectorySearch>
     </Property>
 
+<!--
+    <?if $(var.Msix64)?>
+      <Property Id="VisualStudioInstallRegistry" Value="SOFTWARE\Wow6432Node\Microsoft\VisualStudio\11.0"/>    
+    <?else?>
+      <Property Id="VisualStudioInstallRegistry" Value="SOFTWARE\Microsoft\VisualStudio\11.0\"/>
+    <?endif?>
+-->
+    <Property Id="VSPRO_INSTALLED" Secure="yes">
+      <RegistrySearch Id="ProInstallRegSearch" Root="HKLM" Key="SOFTWARE\Microsoft\VisualStudio\11.0\Setup\Microsoft Visual Studio Professional 2012" Name="InstallSuccess" Type="raw" />
+    </Property>
+
+    <Property Id="VSPREMIUM_INSTALLED" Secure="yes">
+      <RegistrySearch Id="PremiumInstallRegSearch" Root="HKLM" Key="SOFTWARE\Microsoft\VisualStudio\11.0\Setup\Microsoft Visual Studio Premium 2012" Name="InstallSuccess" Type="raw" />
+    </Property>
+
+    <Property Id="VSULTIMATE_INSTALLED" Secure="yes">
+      <RegistrySearch Id="UltimateInstallRegSearch" Root="HKLM" Key="SOFTWARE\Microsoft\VisualStudio\11.0\Setup\Microsoft Visual Studio Ultimate 2012" Name="InstallSuccess" Type="raw" />
+    </Property>
+
     <Property Id="DEVENV_PATH" Secure="yes">
       <RegistrySearch Id="DevEnvPath" Root="HKLM" Key="Software\Microsoft\VisualStudio\$(var.VSTargetVersion)\Setup\VS" Name="EnvironmentPath" Type="file" />
     </Property>
     
     <!-- Conditions for install -->
     
-    <Condition Message="Visual Studio 2012 must be installed.  The free integrated shell (and its dependent isolated shell) can be downloaded at http://www.microsoft.com/visualstudio/11/en-us/downloads#vs-shell"> VSINSTALLPATH OR Installed </Condition>
+    <Condition Message="Visual Studio 2012 (Professional, Premium, or Ultimate) must be installed."> VSPRO_INSTALLED OR VSPREMIUM_INSTALLED OR VSULTIMATE_INSTALLED OR Installed </Condition>
     
     <!-- Files/Components/MSMs to install -->
     
