@@ -24,11 +24,11 @@ namespace TestUtilities.UI.Nodejs {
             ClickButtonByName("Add Performance Session");
         }
 
-        public void LaunchSession() {
+        public void StartProfiling() {
             ClickButtonByName("Start Profiling");
         }
 
-        public void Stop() {
+        public void StopProfiling() {
             var button = FindByName("Stop Profiling");
             for (int i = 0; i < 100 && !button.Current.IsEnabled; i++) {
                 System.Threading.Thread.Sleep(100);

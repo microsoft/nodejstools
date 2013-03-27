@@ -34,7 +34,7 @@ namespace TestUtilities.UI.Nodejs {
         }
 
         /// <summary>
-        /// Opens and activates the solution explorer window.
+        /// Opens and activates the Node.js Performance explorer window.
         /// </summary>
         public void LaunchNodejsProfiling() {
             ThreadPool.QueueUserWorkItem(x => Dte.ExecuteCommand("Analyze.LaunchNode.jsProfiling"));
