@@ -113,6 +113,12 @@ namespace TestUtilities.UI {
         public void FocusLanguageNode(string name = "Python") {
 #if DEV11
             var item = InstalledTemplates.FindItem("Templates", name);
+            if (item == null) {
+                item = InstalledTemplates.FindItem("Templates", "Other Languages", name);
+            }
+            if (item == null) {
+                AutomationWrapper.DumpElement(InstalledTemplates.Element);
+            }
 #else
             var item = InstalledTemplates.FindItem("Other Languages", name);
             if (item == null) {

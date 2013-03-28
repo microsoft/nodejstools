@@ -22,5 +22,6 @@ namespace Microsoft.NodejsTools {
     class PkgCmdId {
         public const int cmdidReplWindow                    = 0x201;
         public const int cmdidOpenRemoteDebugProxyFolder    = 0x202;
+        public const int cmdidSetAsNodejsStartupFile        = 0x203;
     }
 }

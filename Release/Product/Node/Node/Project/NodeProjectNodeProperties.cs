@@ -13,6 +13,7 @@
  * ***************************************************************************/
 
 using System;
+using System.ComponentModel;
 using System.Runtime.InteropServices;
 using Microsoft.VisualStudioTools.Project;
 using Microsoft.VisualStudioTools.Project.Automation;
@@ -27,6 +28,7 @@ namespace Microsoft.NodejsTools.Project {
         }
 
         [PropertyNameAttribute("WebApplication.AspNetDebugging")]
+        [Browsable(false)]
         public bool AspNetDebugging {
             get {
                 return true;
@@ -34,12 +36,14 @@ namespace Microsoft.NodejsTools.Project {
         }
 
         [PropertyNameAttribute("WebApplication.NativeDebugging")]
+        [Browsable(false)]
         public bool NativeDebugging {
             get {
                 return false;
             }
         }
 
+        [Browsable(false)]
         public uint TargetFramework {
             get {
                 return 0x40000;

@@ -15,6 +15,7 @@
 using System;
 using System.Windows;
 using Microsoft.VisualStudio;
+using Microsoft.VisualStudio.Language.Intellisense;
 using Microsoft.VisualStudio.OLE.Interop;
 using Microsoft.VisualStudio.Text.Editor;
 using Microsoft.VisualStudio.Text.Operations;
@@ -24,11 +25,13 @@ namespace Microsoft.NodejsTools {
     internal sealed class EditFilter : IOleCommandTarget {
         private readonly ITextView _textView;
         private readonly IEditorOperations _editorOps;
+        private readonly IIntellisenseSessionStack _intellisenseStack;
         private IOleCommandTarget _next;
 
-        public EditFilter(ITextView textView, IEditorOperations editorOps) {
+        public EditFilter(ITextView textView, IEditorOperations editorOps, IIntellisenseSessionStack intellisenseStack) {
             _textView = textView;
             _editorOps = editorOps;
+            _intellisenseStack = intellisenseStack;
         }
 
         internal void AttachKeyboardFilter(IVsTextView vsTextView) {
@@ -43,7 +46,13 @@ namespace Microsoft.NodejsTools {
             if (pguidCmdGroup == VSConstants.VSStd2K) {
                 switch((VSConstants.VSStd2KCmdID)nCmdID) {
                     case VSConstants.VSStd2KCmdID.RETURN:
-                        _editorOps.InsertNewLine();
+                        if (_intellisenseStack.TopSession != null && 
+                            _intellisenseStack.TopSession is ICompletionSession &&
+                            !_intellisenseStack.TopSession.IsDismissed) {
+                            ((ICompletionSession)_intellisenseStack.TopSession).Commit();
+                        } else {
+                            _editorOps.InsertNewLine();
+                        }
                         return VSConstants.S_OK;
                     case VSConstants.VSStd2KCmdID.TYPECHAR:
                         var ch = (char)(ushort)System.Runtime.InteropServices.Marshal.GetObjectForNativeVariant(pvaIn);

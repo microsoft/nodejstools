@@ -30,6 +30,11 @@
             <Parent guid="guidNodeToolsCmdSet" id="ToolsMenu"/>
         </Group>
 
+        <!-- Group on normal project items -->
+        <Group guid="guidNodeToolsCmdSet" id="CodeFileGroup" priority="0x600">
+          <Parent guid="guidSHLMainMenu" id="IDM_VS_MENU_PROJECT"/>
+        </Group>
+
         <!-- Our group of menu items which is displayed on Tools/NodeJS Tools/Remote Debugging Proxy/...  -->
         <Group guid="guidNodeToolsCmdSet" id="RemoteDebugProxyGroup" priority="0x0500">
             <Parent guid="guidNodeToolsCmdSet" id="RemoteDebugProxyMenu"/>
@@ -65,6 +70,17 @@
               <CommandFlag>DynamicVisibility</CommandFlag>
           If you do not want an image next to your command, remove the Icon node or set it to <Icon guid="guidOfficeIcon" id="msotcidNoIcon" /> -->
 
+      <Button guid="guidNodeToolsCmdSet" id="cmdidSetAsNodejsStartupFile" priority="0x0300" type="Button">
+        <Parent guid="guidNodeToolsCmdSet" id="CodeFileGroup"/>
+        <CommandFlag>DynamicVisibility</CommandFlag>
+        <CommandFlag>DefaultInvisible</CommandFlag>
+        <Strings>
+          <CommandName>cmdidSetAsNodejsStartupFile</CommandName>          
+          <ButtonText>S&amp;et as Node.js Startup File</ButtonText>
+        </Strings>
+      </Button>
+
+
       <Button guid="guidNodeToolsCmdSet" id="cmdidReplWindow" priority="0x7f00" type="Button">
         <Parent guid="guidSHLMainMenu" id="IDG_VS_WNDO_OTRWNDWS1"/>
         <Icon guid="guidImages" id="nodeReplPic" />
@@ -98,6 +114,12 @@
   </Commands>
 
   <CommandPlacements>
+    <CommandPlacement guid="guidNodeToolsCmdSet" id="CodeFileGroup" priority="0x600">
+      <Parent guid="guidSHLMainMenu" id="IDM_VS_CTXT_ITEMNODE"/>
+    </CommandPlacement>
+    <CommandPlacement guid="guidNodeToolsCmdSet" id="CodeFileGroup" priority="0x600">
+      <Parent guid="guidSHLMainMenu" id="IDM_VS_CTXT_WEBITEMNODE"/>
+    </CommandPlacement>
     
   </CommandPlacements>
 
@@ -109,11 +131,13 @@
     <GuidSymbol name="guidNodeToolsCmdSet" value="{695e37e2-c6df-4e0a-8833-f688e4c65f1f}">
       <IDSymbol name="cmdidReplWindow" value="0x0201" />
       <IDSymbol name="cmdidOpenRemoteDebugProxyFolder" value="0x0202" />
-        
+      <IDSymbol name="cmdidSetAsNodejsStartupFile" value="0x0203" />
+
       <!-- Groups -->
       <IDSymbol name="ToolsMenuItemsGroup" value="0x1010" />
       <IDSymbol name="RemoteDebugProxyGroup" value="0x1011" />
-      
+      <IDSymbol name="CodeFileGroup" value="0x1012" />
+
       <!-- Menus -->
       <IDSymbol name="ToolsMenu" value ="0x2001" />
       <IDSymbol name="RemoteDebugProxyMenu" value ="0x2002" />

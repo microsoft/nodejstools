@@ -31,7 +31,9 @@ namespace NodeReferenceGenerator {
 
             _output.Append("// **NTVS** INSERT USER MODULE SWITCH HERE **NTVS**");
 
-            _output.Append(@"\r\n\r\n    }
+            _output.Append(@"
+            
+    }
 }
 ");
 

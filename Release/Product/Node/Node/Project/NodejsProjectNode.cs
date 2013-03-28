@@ -100,7 +100,8 @@ namespace Microsoft.NodejsTools.Project {
         }
 
         public override Type GetGeneralPropertyPageType() {
-            return typeof(NodeGeneralPropertyPage);
+            return null;
+            //return typeof(NodeGeneralPropertyPage);
         }
 
         public override Type GetLibraryManagerType() {
@@ -198,7 +199,7 @@ return {1}();
         private static string ReadNodeRefCode() {
             string nodeFile = Path.Combine(
                     Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location),
-                    "noderef.js");
+                    "nodejsref.js");
 
             if (File.Exists(nodeFile)) {
                 try {

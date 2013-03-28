@@ -19,6 +19,7 @@ using Microsoft.NodejsTools.Project;
 using Microsoft.VisualStudio;
 using Microsoft.VisualStudio.ComponentModelHost;
 using Microsoft.VisualStudio.Editor;
+using Microsoft.VisualStudio.Language.Intellisense;
 using Microsoft.VisualStudio.OLE.Interop;
 using Microsoft.VisualStudio.Shell;
 using Microsoft.VisualStudio.Shell.Interop;
@@ -334,7 +335,8 @@ namespace Microsoft.NodejsTools {
                 IVsTextView view;
                 ErrorHandler.ThrowOnFailure(_window.GetPrimaryView(out view));
                 var wpfView = adapterService.GetWpfTextView(view);
-                EditFilter editFilter = new EditFilter(wpfView, factory.GetEditorOperations(wpfView));
+                var intellisenseStack = _compModel.GetService<IIntellisenseSessionStackMapService>().GetStackForTextView(wpfView);
+                EditFilter editFilter = new EditFilter(wpfView, factory.GetEditorOperations(wpfView), intellisenseStack);
                 editFilter.AttachKeyboardFilter(view);
 
                 return VSConstants.S_OK;

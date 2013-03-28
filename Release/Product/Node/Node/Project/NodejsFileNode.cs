@@ -12,9 +12,12 @@
  *
  * ***************************************************************************/
 
+using System;
+using System.Diagnostics;
 using System.IO;
-using Microsoft.VisualStudioTools.Project;
 using Microsoft.VisualStudio;
+using Microsoft.VisualStudioTools;
+using Microsoft.VisualStudioTools.Project;
 
 namespace Microsoft.NodejsTools.Project {
     class NodejsFileNode : CommonFileNode {
@@ -23,14 +26,65 @@ namespace Microsoft.NodejsTools.Project {
 
         public NodejsFileNode(NodejsProjectNode root, MsBuildProjectElement e)
             : base(root, e) {
-            _watcher = new FileSystemWatcher(Path.GetDirectoryName(Url), Path.GetFileName(Url));
-            _watcher.EnableRaisingEvents = true;
-            _watcher.Changed += FileContentsChanged;
-            _watcher.NotifyFilter = NotifyFilters.LastWrite;
-            _currentText = File.ReadAllText(Url);
+            CreateWatcher(Url);
+            try {
+                _currentText = File.ReadAllText(Url);
+            } catch {
+                _currentText = "";
+            }
             lock (root._nodeFiles) {
                 root._nodeFiles.Add(this);
             }
+        }
+
+        protected override int ExecCommandOnNode(Guid guidCmdGroup, uint cmd, uint nCmdexecopt, IntPtr pvaIn, IntPtr pvaOut) {
+            Debug.Assert(this.ProjectMgr != null, "The Dynamic FileNode has no project manager");
+
+            Utilities.CheckNotNull(this.ProjectMgr);
+            if (guidCmdGroup == GuidList.guidNodeCmdSet) {
+                switch (cmd) {
+                    case PkgCmdId.cmdidSetAsNodejsStartupFile:
+                        // Set the StartupFile project property to the Url of this node
+                        ProjectMgr.SetProjectProperty(
+                            CommonConstants.StartupFile,
+                            CommonUtils.GetRelativeFilePath(this.ProjectMgr.ProjectHome, Url)
+                        );
+                        return VSConstants.S_OK;
+                }
+            }
+
+            return base.ExecCommandOnNode(guidCmdGroup, cmd, nCmdexecopt, pvaIn, pvaOut);
+        }
+
+        protected override int QueryStatusOnNode(Guid guidCmdGroup, uint cmd, IntPtr pCmdText, ref QueryStatusResult result) {
+            if (guidCmdGroup == GuidList.guidNodeCmdSet) {
+                if (this.ProjectMgr.IsCodeFile(this.Url)) {
+                    switch (cmd) {
+                        case PkgCmdId.cmdidSetAsNodejsStartupFile:
+                            //We enable "Set as StartUp File" command only on current language code files, 
+                            //the file is in project home dir and if the file is not the startup file already.
+                            string startupFile = ((CommonProjectNode)ProjectMgr).GetStartupFile();
+                            if (!CommonUtils.IsSamePath(startupFile, this.Url)) {
+                                result |= QueryStatusResult.SUPPORTED | QueryStatusResult.ENABLED;
+                            }
+                            return VSConstants.S_OK;
+                    }
+                }
+            }
+            return base.QueryStatusOnNode(guidCmdGroup, cmd, pCmdText, ref result);
+        }
+
+        private void CreateWatcher(string filename) {
+            _watcher = new FileSystemWatcher(Path.GetDirectoryName(filename), Path.GetFileName(filename));
+            _watcher.EnableRaisingEvents = true;
+            _watcher.Changed += FileContentsChanged;
+            _watcher.NotifyFilter = NotifyFilters.LastWrite;
+        }
+
+        protected override void RenameInStorage(string oldName, string newName) {
+            base.RenameInStorage(oldName, newName);
+            _watcher.Dispose();
+            CreateWatcher(newName);
         }
 
         private void FileContentsChanged(object sender, FileSystemEventArgs e) {
