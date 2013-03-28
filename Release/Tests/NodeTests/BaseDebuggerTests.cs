@@ -258,7 +258,7 @@ namespace DebuggerTests {
 
         internal void TestExceptions(
             string filename,
-            ExceptionHitTreatment defaultExceptionTreatment,
+            ExceptionHitTreatment? defaultExceptionTreatment,
             ICollection<KeyValuePair<string, ExceptionHitTreatment>> exceptionTreatments,
             int expectedExitCode,
             params ExceptionInfo[] exceptions

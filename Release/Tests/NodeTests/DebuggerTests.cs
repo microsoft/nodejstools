@@ -1249,6 +1249,23 @@ namespace DebuggerTests {
             );
         }
 
+        /// <summary>
+        /// http://nodejstools.codeplex.com/workitem/63
+        /// 
+        /// Exceptions shouldnt't be reported while calling Require, for alpha this means we don't break on ENOENT
+        /// by default.
+        /// </summary>
+        [TestMethod, Priority(0)]
+        public void TestRequireExceptions() {
+            TestExceptions(
+                DebuggerTestPath + @"RequireExceptions.js",
+                null,
+                null,
+                0
+            );
+        }
+
+
         #endregion
 
         #region Module Load Tests
