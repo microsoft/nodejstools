@@ -31,7 +31,7 @@ if (-not $fast) { tfpt scorch /noprompt $buildroot }
 
 $prevOutDir = $outDir
 
-$versions = @(@{number="11.0"; name="VS 2012"})
+$versions = @(@{number="11.0"; name="2012"})
 
 foreach ($version in $versions) {
     ###################################################################
@@ -270,8 +270,8 @@ foreach ($version in $versions) {
         sleep -seconds 5
     } while(-not $files -or $files.Count -ne $expectedFileCount);
     
-    copy -force "$($job.JobCompletionPath)\NodejsToolsInstaller.msi" "$outDir\Release\Node.js Tools for Visual Studio $build_name $($version.name).msi"
+    copy -force "$($job.JobCompletionPath)\NodejsToolsInstaller.msi" "$outDir\Release\Node.js Tools for Visual Studio $($version.name) ($build_name).msi"
 }
 
 echo "Copying source files ..."
-robocopy /s $buildRoot $prevOutDir\Sources /xd TestResults Binaries Servicing | Out-Null
+robocopy /s $buildRoot $prevOutDir\Sources /xd TestResults Binaries Servicing Layouts | Out-Null

@@ -69,14 +69,14 @@ try {
     
     if ($dev11InstallDir64 -or $dev11InstallDir) {
         if (-not $vsTarget -or $vsTarget -eq "11.0") {
-            echo "Will build for VS 2012"
-            $targetVersions.Add(@{number="11.0"; name="VS 2012"}) | Out-Null
+            echo "Adding Visual Studio 2012 to build targets"
+            $targetVersions.Add(@{number="11.0"; name="2012"}) | Out-Null
         }
     }
     
     $targetConfigs = ("Release", "Debug")
     if ($skipdebug) { $targetConfigs = ("Release") }
-    
+	    
     foreach ($targetVs in $targetVersions) {
         $version = "0.5." + ([DateTime]::Now.Year - 2013).ToString() + [DateTime]::Now.Month.ToString('00') + [DateTime]::Now.Day.ToString('00') + ".0"
         
@@ -94,9 +94,12 @@ try {
         
         foreach ($config in $targetConfigs)
         {
+		    $logdir = "$buildroot\Binaries\BuildLogs\$config$($targetVs.number)"
+			if (-not (Test-Path $logdir)) { mkdir $logdir }
+
             if (-not $skiptests)
             {
-                msbuild /m /v:m /fl /flp:"Verbosity=n;LogFile=BuildRelease.$config.$($targetVs.number).tests.log" /p:Configuration=$config /p:WixVersion=$version /p:VSTarget=$($targetVs.number) /p:VisualStudioVersion=$($targetVs.number) Release\SetupAuthoring\dirs.proj
+				msbuild /m /v:m /fl /flp:"Verbosity=diagnostic;LogFile=$logdir\BuildRelease.$config.$($targetVs.number).tests.log" /p:Configuration=$config /p:WixVersion=$version /p:VSTarget=$($targetVs.number) /p:VisualStudioVersion=$($targetVs.number) Release\Tests\NodejsTests.proj
                 if ($LASTEXITCODE -gt 0)
                 {
                     Write-Error "Test build failed: $config"
@@ -104,12 +107,12 @@ try {
                 }
             }
 
-            msbuild /v:n /m /fl /flp:"Verbosity=n;LogFile=BuildRelease.$config.$($targetVs.number).log" /p:Configuration=$config /p:WixVersion=$version /p:VSTarget=$($targetVs.number) /p:VisualStudioVersion=$($targetVs.number) Release\SetupAuthoring\dirs.proj
+            msbuild /v:n /m /fl /flp:"Verbosity=n;LogFile=$logdir\BuildRelease.$config.$($targetVs.number).log" /p:Configuration=$config /p:WixVersion=$version /p:VSTarget=$($targetVs.number) /p:VisualStudioVersion=$($targetVs.number) Release\SetupAuthoring\dirs.proj
             if ($LASTEXITCODE -gt 0) {
                 Write-Error "Build failed: $config"
                 exit 3
             }
-            
+						
             $bindir = "$buildroot\Binaries\$config$($targetVs.number)"
             $destdir = "$outdir\$($targetVs.name)\$config"
             
@@ -126,7 +129,7 @@ try {
             copy -force -recurse $bindir\*.pkgdef $destdir\Binaries\
             
             if (-not (Test-Path $destdir\Binaries\InteractiveWindow)) { mkdir $destdir\Binaries\InteractiveWindow }
-            copy -force -recurse Release\Product\Node\InteractiveWindow\obj\Dev$($targetVs.number)\$config\extension.vsixmanifest $destdir\Binaries\InteractiveWindow
+            copy -force -recurse Release\Product\Node\InteractiveWindow\obj\Dev$($targetVs.number)\$config\extension.vsixmanifest $destdir\Binaries\InteractiveWindow			            
         }
         
         if ($asmverfileBackedUp) {

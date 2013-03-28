@@ -26,7 +26,6 @@ namespace NodeTests {
         public void TestNumber() {
             using (var eval = new NodeReplEvaluator()) {
                 var window = new MockReplWindow(eval);
-                eval.Initialize(window);
                 var res = eval.ExecuteText("42");
                 Assert.IsTrue(res.Wait(10000));
                 Assert.AreEqual(window.Output, "42");
@@ -37,7 +36,6 @@ namespace NodeTests {
         public void TestRequire() {
             using (var eval = new NodeReplEvaluator()) {
                 var window = new MockReplWindow(eval);
-                eval.Initialize(window);
                 var res = eval.ExecuteText("require('http').constructor");
                 Assert.IsTrue(res.Wait(10000));
                 Assert.AreEqual("[Function: Object]", window.Output);
@@ -48,7 +46,6 @@ namespace NodeTests {
         public void TestFunctionDefinition() {
             using (var eval = new NodeReplEvaluator()) {
                 var window = new MockReplWindow(eval);
-                eval.Initialize(window);
                 var res = eval.ExecuteText("function f() { }");
                 Assert.IsTrue(res.Wait(10000));
                 Assert.AreEqual("undefined", window.Output);
@@ -64,7 +61,6 @@ namespace NodeTests {
         public void TestConsoleLog() {
             using (var eval = new NodeReplEvaluator()) {
                 var window = new MockReplWindow(eval);
-                eval.Initialize(window);
                 var res = eval.ExecuteText("console.log('hi')");
                 Assert.IsTrue(res.Wait(10000));
                 Assert.AreEqual("hi\r\nundefined", window.Output);
@@ -75,7 +71,6 @@ namespace NodeTests {
         public void TestConsoleWarn() {
             using (var eval = new NodeReplEvaluator()) {
                 var window = new MockReplWindow(eval);
-                eval.Initialize(window);
                 var res = eval.ExecuteText("console.warn('hi')");
                 Assert.IsTrue(res.Wait(10000));
                 Assert.AreEqual("hi\r\n", window.Error);
@@ -86,7 +81,6 @@ namespace NodeTests {
         public void TestConsoleError() {
             using (var eval = new NodeReplEvaluator()) {
                 var window = new MockReplWindow(eval);
-                eval.Initialize(window);
                 var res = eval.ExecuteText("console.error('hi')");
                 Assert.IsTrue(res.Wait(10000));
                 Assert.AreEqual("hi\r\n", window.Error);
@@ -97,7 +91,6 @@ namespace NodeTests {
         public void TestConsoleDir() {
             using (var eval = new NodeReplEvaluator()) {
                 var window = new MockReplWindow(eval);
-                eval.Initialize(window);
                 var res = eval.ExecuteText("console.dir({'abc': {'foo': [1,2,3,4,5,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23,24,25,26,27,28,29,30,31,32,33,34,35,36,37,38,39,40]}})");
                 var expected = @"{ abc: 
    { foo: 
@@ -159,7 +152,6 @@ undefined";
         public void LargeOutput() {
             using (var eval = new NodeReplEvaluator()) {
                 var window = new MockReplWindow(eval);
-                eval.Initialize(window);
                 var res = eval.ExecuteText("var x = 'abc'; for(i = 0; i<12; i++) { x += x; }; x");
                 string expected = "abc";
                 for (int i = 0; i < 12; i++) {
@@ -175,7 +167,6 @@ undefined";
         public void TestException() {
             using (var eval = new NodeReplEvaluator()) {
                 var window = new MockReplWindow(eval);
-                eval.Initialize(window);
                 var res = eval.ExecuteText("throw 'an error';");
 
                 Assert.IsTrue(res.Wait(10000));
@@ -188,7 +179,6 @@ undefined";
         public void TestProcessExit() {
             using (var eval = new NodeReplEvaluator()) {
                 var window = new MockReplWindow(eval);
-                eval.Initialize(window);
                 var res = eval.ExecuteText("process.exit(0);");
 
                 Assert.IsTrue(res.Wait(10000));
@@ -203,10 +193,33 @@ undefined";
         }
 
         [TestMethod, Priority(0)]
+        public void TestReset() {
+            using (var eval = new NodeReplEvaluator()) {
+                var window = new MockReplWindow(eval);
+
+                var res = eval.ExecuteText("1");
+                Assert.IsTrue(res.Wait(10000));
+                Assert.AreEqual("1", window.Output);
+                res = window.Reset();
+                Assert.IsTrue(res.Wait(10000));
+
+                Assert.AreEqual("The process has exited", window.Error);
+                window.ClearScreen();
+
+                //Check to ensure the REPL continues to work after Reset
+                res = eval.ExecuteText("var a = 1");
+                Assert.IsTrue(res.Wait(10000));
+                Assert.AreEqual("undefined", window.Output);
+                res = eval.ExecuteText("a");
+                Assert.IsTrue(res.Wait(10000));
+                Assert.AreEqual("undefined1", window.Output);                
+            }
+        }
+
+        [TestMethod, Priority(0)]
         public void TestSaveNoFile() {
             using (var eval = new NodeReplEvaluator()) {
                 var window = new MockReplWindow(eval);
-                eval.Initialize(window);
                 var res = eval.ExecuteText("function f() { }");
 
                 Assert.IsTrue(res.Wait(10000));
@@ -224,7 +237,6 @@ undefined";
         public void TestSaveBadFile() {
             using (var eval = new NodeReplEvaluator()) {
                 var window = new MockReplWindow(eval);
-                eval.Initialize(window);
                 var res = eval.ExecuteText("function f() { }");
 
                 Assert.IsTrue(res.Wait(10000));
@@ -242,7 +254,6 @@ undefined";
         public void TestSave() {
             using (var eval = new NodeReplEvaluator()) {
                 var window = new MockReplWindow(eval, NodeConstants.JavaScript);
-                eval.Initialize(window);
                 var res = window.Execute("function f() { }");
 
                 Assert.IsTrue(res.Wait(10000));
@@ -268,7 +279,6 @@ undefined";
         public void TestBadSave() {
             using (var eval = new NodeReplEvaluator()) {
                 var window = new MockReplWindow(eval);
-                eval.Initialize(window);
                 var res = eval.ExecuteText("function f() { }");
 
                 Assert.IsTrue(res.Wait(10000));

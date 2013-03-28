@@ -132,6 +132,7 @@ namespace Microsoft.NodejsTools.Repl {
         private void Connect() {
             if (_listener != null) {
                 _listener.Disconnect();
+                _listener.Dispose();
             }
 
             Socket socket;

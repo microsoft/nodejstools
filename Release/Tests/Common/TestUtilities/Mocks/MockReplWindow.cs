@@ -32,10 +32,11 @@ namespace TestUtilities.Mocks {
         private readonly MockTextView _view;
         private readonly string _contentType;
 
-        public MockReplWindow(IReplEvaluator eval, string contentType = "Python") {
+        public MockReplWindow(IReplEvaluator eval, string contentType = "Python") {            
             _eval = eval;
             _contentType = contentType;
             _view = new MockTextView(new MockTextBuffer("", "text"));
+            _eval.Initialize(this);
         }
 
         public Task<ExecutionResult> Execute(string text) {
@@ -88,7 +89,7 @@ namespace TestUtilities.Mocks {
             throw new NotImplementedException();
         }
 
-        public void Cancel() {
+        public void Cancel() {            
             throw new NotImplementedException();
         }
 
@@ -101,10 +102,11 @@ namespace TestUtilities.Mocks {
         }
 
         public System.Threading.Tasks.Task<ExecutionResult> Reset() {
-            return ExecutionResult.Succeeded;
+            return _eval.Reset();            
         }
 
         public void AbortCommand() {
+            _eval.AbortCommand();
         }
 
         public void WriteLine(string text) {

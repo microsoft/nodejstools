@@ -33,6 +33,12 @@
             <Component Id="cmp9FEF8767393C493A8B68D8BF6D4961B5" Directory="INSTALLLOCATION" Guid="{B43D5044-D8D5-42A8-BAEF-1A7DBC21AAE6}">
               <File Id="filE8D2A28B9CB64184A05AEAAF2A2EF4C8" KeyPath="yes" Source="$(var.BinariesDir)\Microsoft.NodejsTools.AjaxMin.dll" />
             </Component>
+            <Component Id="cmp8D98477436DB42B0ACE9B536469F60E1" Directory="INSTALLLOCATION" Guid="{0AE160E1-51FF-4153-9882-E89DDFAE07B5}">
+              <File Id="filEEA4A429F6A1428CAC96158BA6ADD3F1" KeyPath="yes" Source="$(var.BinariesDir)\NodejsProject.ico" />
+            </Component>
+            <Component Id="cmpA1538F6E77EE4170BEEC113CBCA174BB" Directory="INSTALLLOCATION" Guid="{60D3CA23-457C-4AA9-AD84-A8992687A234}">
+              <File Id="fil0A762C1A17F3488488BB00DB54D656A5" KeyPath="yes" Source="$(var.BinariesDir)\NodejsProjectBig.ico" />
+            </Component>
             <Component Id="cmpC4E8CE1ED04F4740A1B017ECE4DA9CD1" Directory="INSTALLLOCATION" Guid="{1CF7A1CB-228A-4FA1-97EC-A9CD4417FF63}">
               <File Id="fil617BFEB8AC8E419B80409E0DD6D4641B" KeyPath="yes" Source="$(var.ObjDir)\extension.vsixmanifest" />
             </Component>

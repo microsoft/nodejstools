@@ -678,6 +678,14 @@
     </Content>
     <Resource Include="ProjectTemplates\AzureNodeApp\blankwj.ico" />
     <Resource Include="ProjectTemplates\AzureNodeApp\blankwj.png" />
+    <Content Include="..\Icons\NodejsProject.ico">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+      <IncludeInVSIX>true</IncludeInVSIX>
+    </Content>
+    <Content Include="..\Icons\NodejsProjectBig.ico">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+      <IncludeInVSIX>true</IncludeInVSIX>
+    </Content>
     <Content Include="ProjectTemplates\AzureNodeApp\AzureNodeApp.vstemplate">
       <SubType>Designer</SubType>
     </Content>
@@ -750,6 +758,7 @@
       <Name>InteractiveWindow</Name>
     </ProjectReference>
   </ItemGroup>
+  <ItemGroup />
   <PropertyGroup>
     <!--
     To specify a different registry root to register your package, uncomment the TargetRegistryRoot

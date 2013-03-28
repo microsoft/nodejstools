@@ -84,6 +84,18 @@
         <Merge Id="InteractiveWindow" Language="1033" SourceFile="$(var.TargetDir)InteractiveWindow.msm" DiskId="1" />
         <Merge Id="NodejsTools" Language="1033" SourceFile="$(var.TargetDir)NodejsTools.msm" DiskId="1" />
         <Merge Id="NodejsProfiling" Language="1033" SourceFile="$(var.TargetDir)NodejsProfiling.msm" DiskId="1" />
+
+        <Component Id="Comp_NjsProgRegistration" DiskId="1" Guid="071B67E7-64C6-4C54-921A-3A7026824686">
+          <RegistryValue Root='HKCR' Key='.njsproj' Type='string' Name='PerceivedType' Value='text' />
+          <RegistryValue Root='HKCR' Key='VisualStudio.Launcher.njsproj.$(var.VSTargetVersion)\DefaultIcon' Type='string' Value='[VSINSTALLPATH]\Extensions\Microsoft\Node.js Tools for Visual Studio\0.5\NodejsProject.ico' />
+
+          <ProgId Id="VisualStudio.Launcher.njsproj.$(var.VSTargetVersion)" Description="Node.js Project">
+            <Extension Id="njsproj" ContentType="text/plain">
+              <Verb Id="Open" Command="Open" TargetProperty="VSLAUNCHER" Argument="&quot;%1&quot;"/>
+            </Extension>
+          </ProgId>
+        </Component>        
+        
       </Directory>
     </Directory>
 
@@ -94,6 +106,7 @@
              Display="expand" Level="1" AllowAdvertise="no" Absent="disallow"  >
       <ComponentRef Id="Comp_InstallDirItems" Primary="yes" />
       <ComponentRef Id="AllUsers_Comp_InstallDirItems" Primary="yes" />
+      <ComponentRef Id="Comp_NjsProgRegistration" Primary="yes" />
       
       <MergeRef Id="NodejsTools"/>
       <MergeRef Id="InteractiveWindow"/>
