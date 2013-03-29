@@ -100,15 +100,23 @@ namespace Microsoft.NodejsTools.Debugger.DebugEngine {
         public int EnumChildren(enum_DEBUGPROP_INFO_FLAGS dwFields, uint dwRadix, ref System.Guid guidFilter, enum_DBG_ATTRIB_FLAGS dwAttribFilter, string pszNameFilter, uint dwTimeout, out IEnumDebugPropertyInfo2 ppEnum) {
             ppEnum = null;
             var children = _evalResult.GetChildren((int)dwTimeout);
-            if (children != null) {
-                DEBUG_PROPERTY_INFO[] properties = new DEBUG_PROPERTY_INFO[children.Length];
+             if (children == null) {
+                return VSConstants.S_FALSE;
+            }
+
+            DEBUG_PROPERTY_INFO[] properties;
+            if (children.Length == 0) {
+                properties = new[] { new DEBUG_PROPERTY_INFO { dwFields = enum_DEBUGPROP_INFO_FLAGS.DEBUGPROP_INFO_NAME, bstrValue = "No children" } };
+            } else {
+                Array.Sort(children, (c1, c2) => StringComparer.OrdinalIgnoreCase.Compare(c1.ChildText, c2.ChildText));
+                properties = new DEBUG_PROPERTY_INFO[children.Length];
                 for (int i = 0; i < children.Length; i++) {
                     properties[i] = new AD7Property(_frame, children[i], true).ConstructDebugPropertyInfo(dwRadix, dwFields);
                 }
-                ppEnum = new AD7PropertyEnum(properties);
-                return VSConstants.S_OK;
             }
-            return VSConstants.S_FALSE;
+
+            ppEnum = new AD7PropertyEnum(properties);
+            return VSConstants.S_OK;
         }
 
         // Returns the property that describes the most-derived property of a property
