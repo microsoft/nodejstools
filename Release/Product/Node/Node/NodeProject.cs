@@ -43,8 +43,10 @@ namespace Microsoft.NodejsTools {
                 foreach (var command in _commands) {
                     _menuService.RemoveCommand(command);
                 }
+                _menuService.Dispose();
             }
             _commands.Clear();
+            base.Close();
         }
 
         protected override void InitializeForOuter(string fileName, string location, string name, uint flags, ref Guid guidProject, out bool cancel) {
