@@ -1,17 +1,9 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio 2012
-Project("{9092AA53-FB77-4645-B42D-1CCCA6BD08BD}") = "NodejsProfileTest", "NodejsProfileTest.njsproj", "{0D997B7D-661C-482F-BA12-A8F925899DE1}"
+Project("{3AF33F2E-1136-4D97-BBB7-1795711AC8B8}") = "NodejsProfileTest", "NodejsProfileTest.njsproj", "{0D997B7D-661C-482F-BA12-A8F925899DE1}"
 EndProject
 Global
-	GlobalSection(TeamFoundationVersionControl) = preSolution
-		SccNumberOfProjects = 2
-		SccEnterpriseProvider = {4CA58AB2-18FA-4F8D-95D4-32DDF27D184C}
-		SccTeamFoundationServer = http://tcvstf:8080/tfs/tc
-		SccLocalPath0 = .
-		SccProjectUniqueName1 = NodejsProfileTest.njsproj
-		SccLocalPath1 = .
-	EndGlobalSection
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
 		Release|Any CPU = Release|Any CPU
