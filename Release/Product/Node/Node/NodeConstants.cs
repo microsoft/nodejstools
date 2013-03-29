@@ -9,5 +9,6 @@ namespace Microsoft.NodejsTools {
         public const string FileExtension = ".js";
         public const string JavaScript = "JavaScript";
         public const string Nodejs = "Node.js";
+        public const string ProjectFileFilter = "Node.js Project File (*.njsproj)\n*.njsproj\nAll Files (*.*)\n*.*\n";
     }
 }

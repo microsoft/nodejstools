@@ -201,13 +201,13 @@ namespace Microsoft.NodejsTools.Repl {
 
             private void StdOutReceived(object sender, DataReceivedEventArgs args) {
                 if (args.Data != null) {
-                    _eval._window.WriteOutput(args.Data);
+                    _eval._window.WriteOutput(args.Data + Environment.NewLine);
                 }
             }
 
             private void StdErrReceived(object sender, DataReceivedEventArgs args) {
                 if (args.Data != null) {
-                    _eval._window.WriteError(args.Data);
+                    _eval._window.WriteError(args.Data + Environment.NewLine);
                 }
             }
 

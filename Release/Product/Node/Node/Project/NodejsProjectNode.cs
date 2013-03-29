@@ -96,7 +96,7 @@ namespace Microsoft.NodejsTools.Project {
         }
 
         public override string GetFormatList() {
-            return String.Format(CultureInfo.CurrentCulture, NodeConstants.FileExtension, "\0", "\0");
+            return NodeConstants.ProjectFileFilter;
         }
 
         public override Type GetGeneralPropertyPageType() {
