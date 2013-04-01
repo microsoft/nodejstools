@@ -158,8 +158,11 @@ namespace Microsoft.NodejsTools.Project {
                     ).Replace("\\", "/");
 
                 switchCode.AppendFormat(@"case ""./{0}"": 
+case ""./{3}"": 
 function {1}() {{
 var exports = {{}};
+var module = {{}};
+module.exports = exports;
 {2}
 
 return exports;
@@ -169,7 +172,8 @@ return {1}();
 ", 
                     name, 
                     FilenameToModuleName(name),
-                    nodeFile._currentText);
+                    nodeFile._currentText,
+                    Path.GetFileNameWithoutExtension(FilenameToModuleName(name)));
             }
         }
 

@@ -79,7 +79,7 @@ namespace Microsoft.NodejsTools {
         private string LeadingText {
             get {
                 // 
-                return "/// <reference path=\"" + _project._referenceFilename + "\" />\r\nfunction module_body() {\r\nexports = {};\r\n/// <Formatting IndentLevel=\"0\">\r\n";
+                return "/// <reference path=\"" + _project._referenceFilename + "\" />\r\nfunction module_body() {\r\nexports = {};\r\nvar module = {}; module.exports = exports;/// <Formatting IndentLevel=\"0\">\r\n";
             }
         }
 
