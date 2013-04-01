@@ -89,6 +89,7 @@
     <Compile Include="UI\CheckListView.cs" />
     <Compile Include="UI\ChooseLocationDialog.cs" />
     <Compile Include="UI\ComboBox.cs" />
+    <Compile Include="UI\OpenProjectDialog.cs" />
     <Compile Include="UI\CredentialsDialog.cs" />
     <Compile Include="UI\DetailPane.cs" />
     <Compile Include="UI\EditorWindow.cs" />

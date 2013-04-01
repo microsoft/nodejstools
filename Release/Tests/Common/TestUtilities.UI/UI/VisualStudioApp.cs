@@ -426,5 +426,15 @@ namespace TestUtilities.UI {
                 return _dte;
             }
         }
+
+        internal void OpenProject(string path) {
+            ThreadPool.QueueUserWorkItem((x) => Dte.ExecuteCommand("File.OpenProject"));
+            
+            var dialog = new OpenProjectDialog(WaitForDialog());
+            dialog.ProjectName = path;
+            dialog.Open();
+
+            WaitForDialogDismissed();
+        }
     }
 }

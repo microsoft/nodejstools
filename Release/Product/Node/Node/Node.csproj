@@ -717,9 +717,12 @@
       <IncludeInVSIX>true</IncludeInVSIX>
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
+    <None Include="ProjectTemplates\AzureNodeApp\ChangeConfig.ps1" />
+    <None Include="ProjectTemplates\AzureNodeApp\download.ps1" />
     <None Include="ProjectTemplates\AzureNodeApp\NodeApp.njsproj">
       <SubType>Designer</SubType>
     </None>
+    <None Include="ProjectTemplates\AzureNodeApp\setup_web.cmd" />
     <None Include="ProjectTemplates\AzureNodeApp\Web.cloud.config" />
     <None Include="ProjectTemplates\AzureNodeApp\Web.config" />
     <None Include="ProjectTemplates\NodeApp\NodeApp.njsproj">
