@@ -632,8 +632,8 @@
     <Compile Include="Project\NodejsProjectNode.cs" />
     <Compile Include="Project\NodejsProjectNodeProperties.cs" />
     <Compile Include="Project\NodejsProjectPackage.cs" />
-    <Compile Include="Repl\NodeReplEvaluator.cs" />
-    <Compile Include="Repl\NodeReplEvaluatorProvider.cs" />
+    <Compile Include="Repl\NodejsReplEvaluator.cs" />
+    <Compile Include="Repl\NodejsReplEvaluatorProvider.cs" />
     <Compile Include="Resources.Designer.cs">
       <AutoGen>True</AutoGen>
       <DesignTime>True</DesignTime>

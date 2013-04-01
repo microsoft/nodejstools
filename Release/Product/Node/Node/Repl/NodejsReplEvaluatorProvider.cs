@@ -18,14 +18,14 @@ using Microsoft.NodejsTools.Repl;
 namespace Microsoft.NodejsTools.Repl {
     [ReplRole("Reset"), ReplRole("Execution")]
     [Export(typeof(IReplEvaluatorProvider))]
-    class NodeReplEvaluatorProvider : IReplEvaluatorProvider {
+    class NodejsReplEvaluatorProvider : IReplEvaluatorProvider {
         internal const string NodeReplId = "{E4AC36B7-EDC5-4AD2-B758-B5416D520705}";
         
         #region IAltReplEvaluatorProvider Members
 
         public IReplEvaluator GetEvaluator(string replId) {
             if (replId == NodeReplId) {
-                return new NodeReplEvaluator();
+                return new NodejsReplEvaluator();
             }
             return null;
         }

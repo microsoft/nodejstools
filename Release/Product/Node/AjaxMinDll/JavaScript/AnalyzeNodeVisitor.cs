@@ -589,6 +589,10 @@ namespace Microsoft.Ajax.Utilities
                 {
                     foreach (var lexDecl in lexicalScope.LexicallyDeclaredNames)
                     {
+                        if (lexDecl == null) {
+                            // malformed code, such as catch w/o variable
+                            continue;
+                        }
                         var varDecl = lexicalScope.VarDeclaredName(lexDecl.Name);
                         if (varDecl != null)
                         {

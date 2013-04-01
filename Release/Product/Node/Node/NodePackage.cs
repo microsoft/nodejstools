@@ -199,13 +199,13 @@ namespace Microsoft.NodejsTools {
             var compModel = ComponentModel;
             var provider = compModel.GetService<IReplWindowProvider>();
 
-            var window = provider.FindReplWindow(NodeReplEvaluatorProvider.NodeReplId);
+            var window = provider.FindReplWindow(NodejsReplEvaluatorProvider.NodeReplId);
             if (window == null) {
                 window = provider.CreateReplWindow(
                     ContentType,
                     "Node.js Interactive Window",
                     _jsLangSvcGuid,
-                    NodeReplEvaluatorProvider.NodeReplId
+                    NodejsReplEvaluatorProvider.NodeReplId
                 );
             }
 

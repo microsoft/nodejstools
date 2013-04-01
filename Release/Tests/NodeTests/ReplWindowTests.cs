@@ -24,7 +24,7 @@ namespace NodeTests {
     public class ReplWindowTests {
         [TestMethod, Priority(0)]
         public void TestNumber() {
-            using (var eval = new NodeReplEvaluator()) {
+            using (var eval = new NodejsReplEvaluator()) {
                 var window = new MockReplWindow(eval);
                 var res = eval.ExecuteText("42");
                 Assert.IsTrue(res.Wait(10000));
@@ -34,7 +34,7 @@ namespace NodeTests {
 
         [TestMethod, Priority(0)]
         public void TestRequire() {
-            using (var eval = new NodeReplEvaluator()) {
+            using (var eval = new NodejsReplEvaluator()) {
                 var window = new MockReplWindow(eval);
                 var res = eval.ExecuteText("require('http').constructor");
                 Assert.IsTrue(res.Wait(10000));
@@ -44,7 +44,7 @@ namespace NodeTests {
 
         [TestMethod, Priority(0)]
         public void TestFunctionDefinition() {
-            using (var eval = new NodeReplEvaluator()) {
+            using (var eval = new NodejsReplEvaluator()) {
                 var window = new MockReplWindow(eval);
                 var res = eval.ExecuteText("function f() { }");
                 Assert.IsTrue(res.Wait(10000));
@@ -59,7 +59,7 @@ namespace NodeTests {
 
         [TestMethod, Priority(0)]
         public void TestConsoleLog() {
-            using (var eval = new NodeReplEvaluator()) {
+            using (var eval = new NodejsReplEvaluator()) {
                 var window = new MockReplWindow(eval);
                 var res = eval.ExecuteText("console.log('hi')");
                 Assert.IsTrue(res.Wait(10000));
@@ -69,7 +69,7 @@ namespace NodeTests {
 
         [TestMethod, Priority(0)]
         public void TestConsoleWarn() {
-            using (var eval = new NodeReplEvaluator()) {
+            using (var eval = new NodejsReplEvaluator()) {
                 var window = new MockReplWindow(eval);
                 var res = eval.ExecuteText("console.warn('hi')");
                 Assert.IsTrue(res.Wait(10000));
@@ -79,7 +79,7 @@ namespace NodeTests {
 
         [TestMethod, Priority(0)]
         public void TestConsoleError() {
-            using (var eval = new NodeReplEvaluator()) {
+            using (var eval = new NodejsReplEvaluator()) {
                 var window = new MockReplWindow(eval);
                 var res = eval.ExecuteText("console.error('hi')");
                 Assert.IsTrue(res.Wait(10000));
@@ -89,7 +89,7 @@ namespace NodeTests {
 
         [TestMethod, Priority(0)]
         public void TestConsoleDir() {
-            using (var eval = new NodeReplEvaluator()) {
+            using (var eval = new NodejsReplEvaluator()) {
                 var window = new MockReplWindow(eval);
                 var res = eval.ExecuteText("console.dir({'abc': {'foo': [1,2,3,4,5,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23,24,25,26,27,28,29,30,31,32,33,34,35,36,37,38,39,40]}})");
                 var expected = @"{ abc: 
@@ -150,7 +150,7 @@ undefined";
         // 
         [TestMethod, Priority(0)]
         public void LargeOutput() {
-            using (var eval = new NodeReplEvaluator()) {
+            using (var eval = new NodejsReplEvaluator()) {
                 var window = new MockReplWindow(eval);
                 var res = eval.ExecuteText("var x = 'abc'; for(i = 0; i<12; i++) { x += x; }; x");
                 string expected = "abc";
@@ -165,7 +165,7 @@ undefined";
 
         [TestMethod, Priority(0)]
         public void TestException() {
-            using (var eval = new NodeReplEvaluator()) {
+            using (var eval = new NodejsReplEvaluator()) {
                 var window = new MockReplWindow(eval);
                 var res = eval.ExecuteText("throw 'an error';");
 
@@ -177,7 +177,7 @@ undefined";
 
         [TestMethod, Priority(0)]
         public void TestProcessExit() {
-            using (var eval = new NodeReplEvaluator()) {
+            using (var eval = new NodejsReplEvaluator()) {
                 var window = new MockReplWindow(eval);
                 var res = eval.ExecuteText("process.exit(0);");
 
@@ -194,7 +194,7 @@ undefined";
 
         [TestMethod, Priority(0)]
         public void TestReset() {
-            using (var eval = new NodeReplEvaluator()) {
+            using (var eval = new NodejsReplEvaluator()) {
                 var window = new MockReplWindow(eval);
 
                 var res = eval.ExecuteText("1");
@@ -218,7 +218,7 @@ undefined";
 
         [TestMethod, Priority(0)]
         public void TestSaveNoFile() {
-            using (var eval = new NodeReplEvaluator()) {
+            using (var eval = new NodejsReplEvaluator()) {
                 var window = new MockReplWindow(eval);
                 var res = eval.ExecuteText("function f() { }");
 
@@ -235,7 +235,7 @@ undefined";
 
         [TestMethod, Priority(0)]
         public void TestSaveBadFile() {
-            using (var eval = new NodeReplEvaluator()) {
+            using (var eval = new NodejsReplEvaluator()) {
                 var window = new MockReplWindow(eval);
                 var res = eval.ExecuteText("function f() { }");
 
@@ -252,7 +252,7 @@ undefined";
 
         [TestMethod, Priority(0)]
         public void TestSave() {
-            using (var eval = new NodeReplEvaluator()) {
+            using (var eval = new NodejsReplEvaluator()) {
                 var window = new MockReplWindow(eval, NodeConstants.JavaScript);
                 var res = window.Execute("function f() { }");
 
@@ -277,7 +277,7 @@ undefined";
 
         [TestMethod, Priority(0)]
         public void TestBadSave() {
-            using (var eval = new NodeReplEvaluator()) {
+            using (var eval = new NodejsReplEvaluator()) {
                 var window = new MockReplWindow(eval);
                 var res = eval.ExecuteText("function f() { }");
 
@@ -294,19 +294,62 @@ undefined";
 
         [TestMethod, Priority(0)]
         public void ReplEvaluatorProvider() {
-            var provider = new NodeReplEvaluatorProvider();
+            var provider = new NodejsReplEvaluatorProvider();
             Assert.AreEqual(null, provider.GetEvaluator("Unknown"));
             Assert.AreNotEqual(null, provider.GetEvaluator("{E4AC36B7-EDC5-4AD2-B758-B5416D520705}"));
         }
 
+        private static string[] _partialInputs = {  "function f(",
+                                                    "function f() {",
+                                                    "x = {foo:",
+                                                    "{\r\nfoo:42",
+                                                    "function () {",
+                                                    "for(var i = 0; i<10; i++) {",
+                                                    "for(var i = 0; i<10; i++) {\r\nconsole.log('hi');",
+                                                    "while(true) {",
+                                                    "while(true) {\r\nbreak;",
+                                                    "do {",
+                                                    "do {\r\nbreak;",
+                                                    "if(true) {",
+                                                    "if(true) {\r\nconsole.log('hi');",
+                                                    "if(true) {\r\nconsole.log('hi');\r\n}else{",
+                                                    "if(true) {\r\nconsole.log('hi');\r\n}else{\r\nconsole.log('bye');",
+                                                    "switch(\"abc\") {",
+                                                    "switch(\"abc\") {\r\ncase \"foo\":",
+                                                    "switch(\"abc\") {\r\ncase \"foo\":\r\nbreak;",
+                                                    "switch(\"abc\") {\r\ncase \"foo\":\r\nbreak;\r\ncase \"abc\":",
+                                                    "switch(\"abc\") {\r\ncase \"foo\":\r\nbreak;\r\ncase \"abc\":console.log('hi');",
+                                                    "switch(\"abc\") {\r\ncase \"foo\":\r\nbreak;\r\ncase \"abc\":console.log('hi');\r\nbreak;",
+                                                    "[1,",
+                                                    "[1,\r\n2,",
+                                                    "var net = require('net'),"
+                                                   };
+        private static string[] _completeInputs = { "try {\r\nconsole.log('hi')\r\n} catch {\r\n}",
+                                                    "try {\r\nconsole.log('hi')\r\n} catch(a) {\r\n}",
+                                                    "function f(\r\na) {\r\n}\r\n\r\n};",
+                                                    "x = {foo}",
+                                                    "x = {foo:42}",
+                                                    "{\r\nfoo:42\r\n}",
+                                                    "function () {\r\nconsole.log('hi');\r\n}",
+                                                    "for(var i = 0; i<10; i++) {\r\nconsole.log('hi');\r\n}",
+                                                    "while(true) {\r\nbreak;\r\n}",
+                                                    "do {\r\nbreak;\r\n}while(true);",
+                                                    "if(true) {\r\nconsole.log('hi');\r\n}",
+                                                    "if(true) {\r\nconsole.log('hi');\r\n}else{\r\nconsole.log('bye');\r\n}",
+                                                    "switch('abc') {\r\ncase 'foo':\r\nbreak;\r\ncase 'abc':\r\nconsole.log('hi');\r\nbreak;\r\n}",
+                                                    "[1,\r\n2,\r\n3]",
+                                                    "var net = require('net'),\r\n      repl = require('repl');",
+                                                  };
+
         [TestMethod, Priority(0)]
         public void TestPartialInputs() {
-            using (var eval = new NodeReplEvaluator()) {
-                Assert.AreEqual(eval.CanExecuteText(@"function f() {"), false);
-                Assert.AreEqual(eval.CanExecuteText(@"function f() {}"), true);
-                Assert.AreEqual(eval.CanExecuteText(@"var net = require(""net""),"), false);
-                Assert.AreEqual(eval.CanExecuteText(@"var net = require(""net""),
-      repl = require(""repl"");"), true);
+            using (var eval = new NodejsReplEvaluator()) {
+                foreach (var partialInput in _partialInputs) {
+                    Assert.AreEqual(false, eval.CanExecuteText(partialInput), "Partial input successfully parsed: " + partialInput);
+                }
+                foreach (var completeInput in _completeInputs) {
+                    Assert.AreEqual(true, eval.CanExecuteText(completeInput), "Complete input failed to parse: " + completeInput);
+                }
             }
         }
 

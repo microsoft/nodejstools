@@ -158,6 +158,10 @@ namespace Microsoft.Ajax.Utilities
 
         private void DefineField(INameDeclaration nameDecl, FunctionObject fieldValue)
         {
+            if (nameDecl == null) {
+                // malformed code, for example catch w/o a variable.
+                return;
+            }
             var field = this[nameDecl.Name];
             if (nameDecl is ParameterDeclaration)
             {

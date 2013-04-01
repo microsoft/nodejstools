@@ -29,7 +29,7 @@ using Microsoft.Ajax.Utilities;
 using Microsoft.VisualStudio.Text;
 
 namespace Microsoft.NodejsTools.Repl {
-    class NodeReplEvaluator : IReplEvaluator {
+    class NodejsReplEvaluator : IReplEvaluator {
         private ListenerThread _listener;
         private IReplWindow _window;
 
@@ -56,7 +56,7 @@ namespace Microsoft.NodejsTools.Repl {
 
         public bool CanExecuteText(string text) {
             var parser = new JSParser(text);
-            var errorSink = new ErrorSink();
+            var errorSink = new ErrorSink(text);
             parser.CompilerError += errorSink.CompilerError;
             parser.Parse(new CodeSettings());
 
@@ -65,18 +65,22 @@ namespace Microsoft.NodejsTools.Repl {
 
         class ErrorSink {
             public bool Unterminated;
+            public readonly string Text;
+
+            public ErrorSink(string text) {
+                Text = text;
+            }
 
             public void CompilerError(object sender, JScriptExceptionEventArgs e) {
+                
                 switch(e.Exception.ErrorCode) {
                     case JSError.NoCatch:
                     case JSError.UnclosedFunction:
                     case JSError.NoCommentEnd:
                     case JSError.NoEndDebugDirective:
                     case JSError.NoEndIfDirective:
-                    case JSError.NoIdentifier:
                     case JSError.NoLabel:
                     case JSError.NoLeftCurly:
-                    case JSError.NoLeftParenthesis:
                     case JSError.NoMemberIdentifier:
                     case JSError.NoRightBracket:
                     case JSError.NoRightParenthesis:
@@ -85,8 +89,14 @@ namespace Microsoft.NodejsTools.Repl {
                     case JSError.NoEqual:
                     case JSError.NoCommaOrTypeDefinitionError:
                     case JSError.NoComma:
-                    case JSError.NoColon:
+                    case JSError.ErrorEndOfFile:
                         Unterminated = true;
+                        break;
+                    default:
+                        if (e.Exception.Context.StartPosition == Text.Length) {
+                            // EOF error
+                            Unterminated = true;
+                        }
                         break;
                 }
             }
@@ -170,7 +180,7 @@ namespace Microsoft.NodejsTools.Repl {
         }
 
         class ListenerThread : JsonListener {
-            private readonly NodeReplEvaluator _eval;
+            private readonly NodejsReplEvaluator _eval;
             private readonly Process _process;
             private readonly object _socketLock = new object();
             private Socket _acceptSocket;
@@ -183,7 +193,7 @@ namespace Microsoft.NodejsTools.Repl {
 #endif
             static string _noReplProcess = "Current interactive window is disconnected - please reset the process." + Environment.NewLine;
 
-            public ListenerThread(NodeReplEvaluator eval, Process process, Socket socket) {
+            public ListenerThread(NodejsReplEvaluator eval, Process process, Socket socket) {
                 _eval = eval;
                 _process = process;
                 _acceptSocket = socket;

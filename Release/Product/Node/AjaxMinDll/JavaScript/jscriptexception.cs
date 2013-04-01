@@ -67,6 +67,12 @@ namespace Microsoft.Ajax.Utilities
             }
         }
 
+        public Context Context {
+            get {
+                return m_context;
+            }
+        }
+
         public bool CanRecover
         {
             get { return m_canRecover; }

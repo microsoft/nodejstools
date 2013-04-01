@@ -30,7 +30,7 @@ namespace Microsoft.NodejsTools.Repl {
         #region IReplCommand Members
 
         public Task<ExecutionResult> Execute(IReplWindow window, string arguments) {
-            ((NodeReplEvaluator)window.Evaluator).Clear();
+            ((NodejsReplEvaluator)window.Evaluator).Clear();
             return ExecutionResult.Succeeded;
         }
 
