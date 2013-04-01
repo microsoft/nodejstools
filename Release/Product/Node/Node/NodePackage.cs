@@ -277,11 +277,11 @@ namespace Microsoft.NodejsTools {
         #endregion
 
         internal override VisualStudioTools.Navigation.LibraryManager CreateLibraryManager(CommonPackage package) {
-            return new NodeLibraryManager(this);
+            return new NodejsLibraryManager(this);
         }
 
         public override Type GetLibraryManagerType() {
-            return typeof(NodeLibraryManager);
+            return typeof(NodejsLibraryManager);
         }
 
         public override bool IsRecognizedFile(string filename) {

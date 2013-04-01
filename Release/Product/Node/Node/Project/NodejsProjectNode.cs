@@ -30,10 +30,10 @@ namespace Microsoft.NodejsTools.Project {
         const string _userSwitchMarker = "// **NTVS** INSERT USER MODULE SWITCH HERE **NTVS**";
         internal readonly List<NodejsFileNode> _nodeFiles = new List<NodejsFileNode>();
 
-        public NodejsProjectNode(NodeProjectPackage package)
+        public NodejsProjectNode(NodejsProjectPackage package)
             : base(package, Utilities.GetImageList(typeof(NodejsProjectNode).Assembly.GetManifestResourceStream("Microsoft.NodejsTools.NodeImageList.bmp"))) {
 
-            Type projectNodePropsType = typeof(NodeProjectNodeProperties);
+            Type projectNodePropsType = typeof(NodejsProjectNodeProperties);
             AddCATIDMapping(projectNodePropsType, projectNodePropsType.GUID);
         }
 
@@ -100,20 +100,19 @@ namespace Microsoft.NodejsTools.Project {
         }
 
         public override Type GetGeneralPropertyPageType() {
-            return null;
-            //return typeof(NodeGeneralPropertyPage);
+            return typeof(NodejsGeneralPropertyPage);
         }
 
         public override Type GetLibraryManagerType() {
-            return typeof(NodeLibraryManager);
+            return typeof(NodejsLibraryManager);
         }
 
         public override IProjectLauncher GetLauncher() {
-            return new NodeProjectLauncher(this);
+            return new NodejsProjectLauncher(this);
         }
 
         protected override NodeProperties CreatePropertiesObject() {
-            return new NodeProjectNodeProperties(this);
+            return new NodejsProjectNodeProperties(this);
         }
 
         protected override Stream ProjectIconsImageStripStream {

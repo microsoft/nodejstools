@@ -23,11 +23,11 @@ namespace Microsoft.NodejsTools {
     class BaseNodeProjectFactory : ProjectFactory {
         internal const string BaseNodeProjectGuid = "9092AA53-FB77-4645-B42D-1CCCA6BD08BD";
 
-        public BaseNodeProjectFactory(NodeProjectPackage package) : base(package) {
+        public BaseNodeProjectFactory(NodejsProjectPackage package) : base(package) {
         }
 
         protected override ProjectNode CreateProject() {
-            NodejsProjectNode project = new NodejsProjectNode((NodeProjectPackage)Package);
+            NodejsProjectNode project = new NodejsProjectNode((NodejsProjectPackage)Package);
             project.SetSite((IOleServiceProvider)((IServiceProvider)Package).GetService(typeof(IOleServiceProvider)));
             return project;
         }

@@ -22,8 +22,8 @@ namespace Microsoft.NodejsTools.Project {
     [ComVisible(true)]
     [ClassInterface(ClassInterfaceType.AutoDual)]
     [Guid("04726C27-8125-471A-BAC0-2301D273DB5E")]
-    public class NodeProjectNodeProperties : CommonProjectNodeProperties {
-        public NodeProjectNodeProperties(ProjectNode node)
+    public class NodejsProjectNodeProperties : CommonProjectNodeProperties {
+        public NodejsProjectNodeProperties(ProjectNode node)
             : base(node) {
         }
 

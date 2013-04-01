@@ -9,6 +9,13 @@ namespace Microsoft.NodejsTools {
         public const string FileExtension = ".js";
         public const string JavaScript = "JavaScript";
         public const string Nodejs = "Node.js";
+
+        public const string NodeExeLocation = "NodeExeLocation";
+        public const string NodeExeArguments = "NodeExeArguments";
+        public const string ScriptArguments = "ScriptArguments";
+        public const string NodejsPort = "NodejsPort";
+        public const string StartWebBrowser = "StartWebBrowser";
+        public const string LaunchUrl = "LaunchUrl";
         public const string ProjectFileFilter = "Node.js Project File (*.njsproj)\n*.njsproj\nAll Files (*.*)\n*.*\n";
     }
 }

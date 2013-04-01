@@ -501,6 +501,12 @@
     <Compile Include="EditFilter.cs" />
     <Compile Include="NodeProjectConfig.cs" />
     <Compile Include="Project\NodejsFileNode.cs" />
+    <Compile Include="Project\NodejsGeneralPropertyPageControl.cs">
+      <SubType>UserControl</SubType>
+    </Compile>
+    <Compile Include="Project\NodejsGeneralPropertyPageControl.Designer.cs">
+      <DependentUpon>NodejsGeneralPropertyPageControl.cs</DependentUpon>
+    </Compile>
     <Compile Include="ProvideEditorExtension2Attribute.cs" />
     <Compile Include="ProvideLanguageTemplates.cs" />
     <Compile Include="Repl\ClearReplCommand.cs" />
@@ -619,13 +625,13 @@
     <Compile Include="OAProperty.cs" />
     <Compile Include="PkgCmdId.cs" />
     <Compile Include="Project\NodeFileLibraryNode.cs" />
-    <Compile Include="Project\NodeGeneralPropertyPage.cs" />
-    <Compile Include="Project\NodeLibraryManager.cs" />
+    <Compile Include="Project\NodejsGeneralPropertyPage.cs" />
+    <Compile Include="Project\NodejsLibraryManager.cs" />
     <Compile Include="Project\NodeLibraryNode.cs" />
-    <Compile Include="Project\NodeProjectLauncher.cs" />
+    <Compile Include="Project\NodejsProjectLauncher.cs" />
     <Compile Include="Project\NodejsProjectNode.cs" />
-    <Compile Include="Project\NodeProjectNodeProperties.cs" />
-    <Compile Include="Project\NodeProjectPackage.cs" />
+    <Compile Include="Project\NodejsProjectNodeProperties.cs" />
+    <Compile Include="Project\NodejsProjectPackage.cs" />
     <Compile Include="Repl\NodeReplEvaluator.cs" />
     <Compile Include="Repl\NodeReplEvaluatorProvider.cs" />
     <Compile Include="Resources.Designer.cs">
@@ -651,6 +657,9 @@
     <EmbeddedResource Include="..\..\Python\PythonTools\PythonTools\Project\WebPiComponentPickerControl.resx">
       <Link>Project\WebPiComponentPickerControl.resx</Link>
       <SubType>Designer</SubType>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Project\NodejsGeneralPropertyPageControl.resx">
+      <DependentUpon>NodejsGeneralPropertyPageControl.cs</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="Resources.resx">
       <Generator>ResXFileCodeGenerator</Generator>

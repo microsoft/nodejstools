@@ -192,13 +192,25 @@ namespace Microsoft.NodejsTools.Debugger {
         }
 
         public NodeDebugger(string exe, string args, string dir, string env, string interpreterOptions, NodeDebugOptions debugOptions, List<string[]> dirMapping) {
-            args = "--debug-brk " + args;
+            string allArgs = "--debug-brk";
             if (!string.IsNullOrEmpty(interpreterOptions)) {
-                args += " " + interpreterOptions;
+                allArgs += " " + interpreterOptions;
             }
-            var psi = new ProcessStartInfo(exe, args);
+            allArgs += " " + args;
+
+            var psi = new ProcessStartInfo(exe, allArgs);
             psi.WorkingDirectory = dir;
-            // TODO: Env
+            psi.UseShellExecute = false;
+            if (env != null) {
+                string[] envValues = env.Split('\0');
+                foreach (var curValue in envValues) {
+                    string[] nameValue = curValue.Split(new[] { '=' }, 2);
+                    if (nameValue.Length == 2 && !String.IsNullOrWhiteSpace(nameValue[0])) {
+                        psi.EnvironmentVariables[nameValue[0]] = nameValue[1];
+                    }
+                }
+            }
+
             _process = new Process();
             _process.StartInfo = psi;
             _process.EnableRaisingEvents = true;
@@ -377,15 +389,15 @@ namespace Microsoft.NodejsTools.Debugger {
             BreakOn breakOn = new BreakOn(),
             string condition = null
             ) {
-                var res =
-                    new NodeBreakpoint(
-                        this,
-                        fileName,
-                        lineNo,
-                        enabled,
-                        breakOn,
-                        condition
-                    );
+            var res =
+                new NodeBreakpoint(
+                    this,
+                    fileName,
+                    lineNo,
+                    enabled,
+                    breakOn,
+                    condition
+                );
             return res;
         }
 
@@ -564,8 +576,7 @@ namespace Microsoft.NodejsTools.Debugger {
             }
             try {
                 socket.Send(CreateRequest(command, args, reqId));
-            }
-            catch (SocketException) {
+            } catch (SocketException) {
                 return false;
             }
 
