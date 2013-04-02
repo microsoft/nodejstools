@@ -40,8 +40,8 @@ namespace Microsoft.NodejsTools.Profiling {
             var componentService = (IComponentModel)(NodeProfilingPackage.GetGlobalService(typeof(SComponentModel)));
 
             _interpreterPath = NodePackage.NodePath;
-            _scriptPath = null;
-            _workingDirectory = null;
+            _scriptPath = String.Empty;
+            _workingDirectory = String.Empty;
             _arguments = null;
 
             _isValid = false;
@@ -55,7 +55,7 @@ namespace Microsoft.NodejsTools.Profiling {
         public StandaloneTargetView(StandaloneTarget template)
             : this() {
             ScriptPath = template.Script;
-            WorkingDirectory = template.WorkingDirectory;
+            WorkingDirectory = template.WorkingDirectory ?? string.Empty;
             Arguments = template.Arguments;
         }
 
@@ -146,7 +146,10 @@ namespace Microsoft.NodejsTools.Profiling {
             Debug.Assert(sender == this);
 
             if (e.PropertyName != "IsValid") {
-                IsValid = File.Exists(ScriptPath) &&
+                IsValid = ScriptPath.IndexOfAny(Path.GetInvalidPathChars()) == -1 &&
+                    WorkingDirectory.IndexOfAny(Path.GetInvalidPathChars()) == -1 &&
+                    (Path.IsPathRooted(ScriptPath) || Path.IsPathRooted(WorkingDirectory)) &&
+                    File.Exists(Path.Combine(WorkingDirectory, ScriptPath)) &&
                     (string.IsNullOrEmpty(WorkingDirectory) || Directory.Exists(WorkingDirectory)) &&
                     (File.Exists(InterpreterPath));
             }

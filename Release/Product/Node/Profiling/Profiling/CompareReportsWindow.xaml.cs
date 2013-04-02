@@ -13,6 +13,7 @@
  * ***************************************************************************/
 
 using System;
+using System.IO;
 using System.Windows;
 using Microsoft.VisualStudio.PlatformUI;
 using Microsoft.Win32;
@@ -42,8 +43,11 @@ namespace Microsoft.NodejsTools.Profiling {
             Close();
         }
 
-        private string OpenFileDialog() {
+        private string OpenFileDialog(string initialDir) {
             OpenFileDialog dialog = new OpenFileDialog();
+            if (initialDir != null) {
+                dialog.InitialDirectory = initialDir;
+            }
             dialog.Filter = _viewModel.PerformanceFileFilter;
             dialog.CheckFileExists = true;
             bool res = dialog.ShowDialog() ?? false;
@@ -54,14 +58,24 @@ namespace Microsoft.NodejsTools.Profiling {
         }
 
         private void BaselineBrowseClick(object sender, RoutedEventArgs e) {
-            var newFile = OpenFileDialog();
+            var newFile = OpenFileDialog(Path.GetDirectoryName(_viewModel.BaselineFile));
             if (!string.IsNullOrEmpty(newFile)) {
                 _viewModel.BaselineFile = newFile;
             }
         }
 
         private void CompareBrowseClick(object sender, RoutedEventArgs e) {
-            var newFile = OpenFileDialog();
+            // if we don't yet have a comparison file, use the baseline
+            // file which we start off with all the time.
+            string baseDir;
+            if (!String.IsNullOrWhiteSpace(_viewModel.ComparisonFile)) {
+                baseDir = _viewModel.ComparisonFile;
+            } else {
+                baseDir = _viewModel.BaselineFile;
+            }
+            baseDir = Path.GetDirectoryName(baseDir);
+
+            var newFile = OpenFileDialog(baseDir);
             if (!string.IsNullOrEmpty(newFile)) {
                 _viewModel.ComparisonFile = newFile;
             }

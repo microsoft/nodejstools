@@ -43,12 +43,12 @@ namespace Microsoft.NodejsTools.Profiling {
         public INodePerformanceReport GetReport(object item) {
             if (item is int) {
                 int id = (int)item - 1;
-                if (id >= 0 && id < _node.Reports.Length) {
+                if (id >= 0 && id < _node.Reports.Count) {
                     return new ReportWrapper(_node.Reports[id]);
                 }
             } else if (item is string) {
                 string filename = (string)item;
-                foreach (var report in _node.Reports) {
+                foreach (var report in _node.Reports.Values) {
                     if (filename == report.Filename || Path.GetFileNameWithoutExtension(report.Filename) == filename) {
                         return new ReportWrapper(report);
                     }

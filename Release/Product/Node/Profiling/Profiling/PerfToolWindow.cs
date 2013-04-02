@@ -24,10 +24,12 @@ namespace Microsoft.NodejsTools.Profiling {
         internal const string Title = "Node.js Performance";
         internal const string WindowGuid = "328AF5EC-350F-4A96-B847-90F38B18E9BF";
         private SessionsNode _sessions;
+        internal static PerfToolWindow Instance;
 
         public PerfToolWindow() {
             ToolClsid = GuidList.VsUIHierarchyWindow_guid;
             Caption = Title;
+            Instance = this;
         }
         
         public override void OnToolWindowCreated() {

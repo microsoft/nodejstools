@@ -403,7 +403,7 @@ namespace Microsoft.NodejsTools.LogParsing {
                     }
                 }
             }
-
+            
             return new FunctionInformation(ns, methodName, lineNo, filename);
         }
 
@@ -455,12 +455,20 @@ namespace Microsoft.NodejsTools.LogParsing {
             pdbCode.Append("class JavaScriptFunctions {");
 
             int id = 0;
-            string dllPath;
-            do {
-                dllPath = Path.Combine(Path.GetTempPath(), "JavaScriptFunctions_" + id + ".dll");
+            string dllDirectory;
+            for (; ; ) {
+                dllDirectory = Path.Combine(Path.GetTempPath(), "JavaScriptFunctions_" + id);
                 id++;
-            } while (File.Exists(dllPath));
+                if (!Directory.Exists(dllDirectory)) {
+                    try {
+                        Directory.CreateDirectory(dllDirectory);
+                        break;
+                    } catch {
+                    }
+                }
+            }             
 
+            string dllPath = Path.Combine(dllDirectory, "JavaScriptFunctions.dll");
             uint methodToken = 0x06000001;
             using (var reader = new StreamReader(_filename)) {
                 string line;

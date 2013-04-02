@@ -13,7 +13,9 @@
  * ***************************************************************************/
 
 using System;
+using System.Collections.Generic;
 using System.IO;
+using System.Linq;
 using System.Xml.Serialization;
 
 namespace Microsoft.NodejsTools.Profiling {
@@ -186,10 +188,21 @@ namespace Microsoft.NodejsTools.Profiling {
 
         [XmlElement("Report")]
         public Report[] Report {
+            get {
+                return AllReports.Values.ToArray();
+            }
+            set {
+                AllReports = new SortedDictionary<int, Report>();
+                for (int i = 0; i < value.Length; i++) {
+                    AllReports[i + SessionNode.StartingReportId] = value[i];
+                }
+            }
+        }
+
+        internal SortedDictionary<int, Report> AllReports {
             get;
             set;
         }
-
 
         internal Reports Clone() {
             var res = new Reports();

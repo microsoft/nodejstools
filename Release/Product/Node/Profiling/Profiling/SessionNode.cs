@@ -13,8 +13,10 @@
  * ***************************************************************************/
 
 using System;
+using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
+using System.Linq;
 using System.Runtime.InteropServices;
 using System.Windows;
 using Microsoft.NodejsTools;
@@ -49,7 +51,7 @@ namespace Microsoft.NodejsTools.Profiling {
 
         //private const int ConfigItemId = 0;
         private const int ReportsItemId = 1;
-        private const int StartingReportId = 2;
+        internal const int StartingReportId = 2;
 
         public SessionNode(SessionsNode parent, ProfilingTarget target, string filename) {
             _parent = parent;
@@ -80,15 +82,15 @@ namespace Microsoft.NodejsTools.Profiling {
             return _automationSession;
         }
 
-        public Report[] Reports {
+        public SortedDictionary<int, Report> Reports {
             get {
                 if (_target.Reports == null) {
                     _target.Reports = new Reports();
                 }
-                if (_target.Reports.Report == null) {
-                    _target.Reports.Report = new Report[0];
+                if (_target.Reports.AllReports == null) {
+                    _target.Reports.AllReports = new SortedDictionary<int, Report>();
                 }
-                return _target.Reports.Report;
+                return _target.Reports.AllReports;
             }
         }
 
@@ -138,21 +140,25 @@ namespace Microsoft.NodejsTools.Profiling {
                 case __VSHPROPID.VSHPROPID_FirstChild:
                     if (itemid == VSConstants.VSITEMID_ROOT) {
                         pvar = ReportsItemId;
-                    } else if (itemid == ReportsItemId && Reports.Length > 0) {
-                        pvar = StartingReportId;
+                    } else if (itemid == ReportsItemId && Reports.Count > 0) {
+                        pvar = Reports.First().Key;
                     } else {
                         pvar = VSConstants.VSITEMID_NIL;
                     }
                     break;
 
                 case __VSHPROPID.VSHPROPID_NextSibling:
-                    if (IsReportItem(itemid) && IsReportItem(itemid + 1)) {
-                        pvar = itemid + 1;
-                    } else {
-                        pvar = VSConstants.VSITEMID_NIL;
+                    pvar = VSConstants.VSITEMID_NIL;
+                    if (IsReportItem(itemid)) {
+                        var items = Reports.Keys.ToArray();
+                        for (int i = 0; i < items.Length; i++) {
+                            if (items[i] > (int)itemid) {
+                                pvar = itemid + 1;
+                                break;
+                            }
+                        }
                     }
                     break;
-
                 case __VSHPROPID.VSHPROPID_ItemDocCookie:
                     if (itemid == VSConstants.VSITEMID_ROOT) {
                         pvar = (int)_docCookie;
@@ -162,7 +168,7 @@ namespace Microsoft.NodejsTools.Profiling {
                 case __VSHPROPID.VSHPROPID_Expandable:
                     if (itemid == VSConstants.VSITEMID_ROOT) {
                         pvar = true;
-                    } else if (itemid == ReportsItemId && Reports.Length > 0) {
+                    } else if (itemid == ReportsItemId && Reports.Count > 0) {
                         pvar = true;
                     } else {
                         pvar = false;
@@ -283,7 +289,7 @@ namespace Microsoft.NodejsTools.Profiling {
             var item = GetReport(itemid);
 
             if (!File.Exists(item.Filename)) {
-                MessageBox.Show(String.Format("Performance report no longer exits: {0}", item.Filename), Resources.NodejsToolsForVS);
+                MessageBox.Show(String.Format("Performance report no longer exists: {0}", item.Filename), Resources.NodejsToolsForVS);
             } else {
                 var dte = (EnvDTE.DTE)NodeProfilingPackage.GetGlobalService(typeof(EnvDTE.DTE));
                 dte.ItemOperations.OpenFile(item.Filename);
@@ -393,11 +399,11 @@ namespace Microsoft.NodejsTools.Profiling {
         }
         
         private bool IsReportItem(uint itemid) {
-            return itemid >= StartingReportId && itemid - StartingReportId < Reports.Length;
+            return itemid >= StartingReportId && Reports.ContainsKey((int)itemid);
         }
 
         private Report GetReport(uint itemid) {
-            return Reports[(int)itemid - StartingReportId];
+            return Reports[(int)itemid];
         }
 
         public void AddProfile(string filename) {
@@ -408,15 +414,22 @@ namespace Microsoft.NodejsTools.Profiling {
                     _target.Reports.Report = new Report[0];
                 }
 
-                Report[] newReports = new Report[_target.Reports.Report.Length + 1];
-                Array.Copy(_target.Reports.Report, newReports, _target.Reports.Report.Length);
+                var reportIds = Reports.Keys.ToArray();
+                uint prevSibling, newId;
+                if (reportIds.Length > 0) {
+                    prevSibling = (uint)reportIds[reportIds.Length - 1];
+                    newId = prevSibling + 1;
+                } else {
+                    prevSibling = VSConstants.VSITEMID_NIL;
+                    newId = StartingReportId;
+                }
 
-                newReports[newReports.Length - 1] = new Report(filename);
-                Target.Reports.Report = newReports;
+                Reports[(int)newId] = new Report(filename);
 
-                OnItemAdded(ReportsItemId, 
-                    newReports.Length == 1 ? VSConstants.VSITEMID_NIL : (uint)(StartingReportId + newReports.Length - 2), 
-                    (uint)(StartingReportId + newReports.Length - 1)
+                OnItemAdded(
+                    ReportsItemId,
+                    prevSibling, 
+                    newId
                 );
             }
 
@@ -456,16 +469,9 @@ namespace Microsoft.NodejsTools.Profiling {
         public int DeleteItem(uint dwDelItemOp, uint itemid) {
             Debug.Assert(_target.Reports != null && _target.Reports.Report != null && _target.Reports.Report.Length > 0);
 
-            Report[] reports = new Report[_target.Reports.Report.Length - 1];
             var report = GetReport(itemid);
-            var deleting = itemid - StartingReportId;
-            for (int i = 0, write = 0; i < _target.Reports.Report.Length; i++) {                
-                if (i + StartingReportId != itemid) {
-                    reports[write++] = _target.Reports.Report[i];
-                }
-            }
+            Reports.Remove((int)itemid);
             
-            _target.Reports.Report = reports;
             OnItemDeleted(itemid);
             OnInvalidateItems(ReportsItemId);
 

@@ -22,8 +22,8 @@
     <Reference Id="Microsoft.VisualStudio.MPF" MinVersion="10.0">
       <Name>Visual Studio MPF</Name>
     </Reference>
-    <Reference Id="4219f2a8-fbf9-4659-a222-b7580a60eebb" MinVersion="1.0" MaxVersion="1.0">
-      <Name>Node</Name>
+    <Reference Id="4219f2a8-fbf9-4659-a222-b7580a60eebb" MinVersion="0.5" MaxVersion="0.5">
+      <Name>Node.js Tools for Visual Studio</Name>
     </Reference>
   </References>
   <Content>

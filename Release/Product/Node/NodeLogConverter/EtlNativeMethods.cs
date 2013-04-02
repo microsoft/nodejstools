@@ -116,14 +116,13 @@ namespace Microsoft.NodejsTools.LogGeneration {
         public byte ThreadFlags;
     };
 
-    // http://msdn.microsoft.com/en-us/library/windows/desktop/aa364095(v=vs.85).aspx
+    // http://msdn.microsoft.com/en-us/library/windows/desktop/aa964789(v=vs.85).aspx
     struct ProcessInfo {
         public uint UniqueProcessKey;
         public uint ProcessId;
         public uint ParentId;
         public uint SessionId;
         public uint ExitStatus;
-        public uint DirectoryTableBase;
         public uint UserSID;               // we'll write 0 here indicating no sid
     };
 
