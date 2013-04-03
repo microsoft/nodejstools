@@ -82,6 +82,7 @@ namespace Microsoft.NodejsTools.Debugger {
         private bool _breakOnAllExceptions;
         private bool _breakOnUncaughtExceptions;
         private int _entryPointFrameCount;
+        private Action _onSocketConnectedHandler;
 
         private static Dictionary<string, ExceptionHitTreatment> GetDefaultExceptionTreatments() {
             // Keep exception types in sync with those declared in ProvideDebugExceptionAttribute's in NodePackage.cs
@@ -191,7 +192,18 @@ namespace Microsoft.NodejsTools.Debugger {
             return defaultExceptionTreatments;
         }
 
-        public NodeDebugger(string exe, string args, string dir, string env, string interpreterOptions, NodeDebugOptions debugOptions, List<string[]> dirMapping) {
+        public NodeDebugger(
+            string exe,
+            string args,
+            string dir,
+            string env,
+            string interpreterOptions,
+            NodeDebugOptions debugOptions,
+            List<string[]> dirMapping,
+            Action onSocketConnectedHandler = null
+        ) {
+            _onSocketConnectedHandler = onSocketConnectedHandler;
+
             string allArgs = "--debug-brk";
             if (!string.IsNullOrEmpty(interpreterOptions)) {
                 allArgs += " " + interpreterOptions;
@@ -632,6 +644,13 @@ namespace Microsoft.NodejsTools.Debugger {
             StartListenerThread();
 
             ProcessConnect();
+        }
+
+        protected override void OnSocketConnected() {
+            if (_onSocketConnectedHandler != null) {
+                _onSocketConnectedHandler();
+                _onSocketConnectedHandler = null;
+            }
         }
 
         protected override void OnSocketDisconnected() {

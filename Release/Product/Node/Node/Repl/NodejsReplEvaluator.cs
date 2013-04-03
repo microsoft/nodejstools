@@ -302,6 +302,9 @@ namespace Microsoft.NodejsTools.Repl {
                 Socket.Send(bytes);
             }
 
+            protected override void OnSocketConnected() {
+            }
+
             protected override void OnSocketDisconnected() {
             }
 

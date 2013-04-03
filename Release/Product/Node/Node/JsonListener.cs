@@ -43,7 +43,9 @@ namespace Microsoft.NodejsTools {
             var socket = _socket;
 
             try {
-                if (socket != null) {
+                if (socket != null && socket.Connected) {
+                    OnSocketConnected();
+
                     // _socket == null || !_socket.Connected effectively stops listening and associated packet processing
                     while (_socket != null && socket.Connected) {
                         if (pos >= text.Length) {
@@ -120,6 +122,7 @@ namespace Microsoft.NodejsTools {
             }
         }
 
+        protected abstract void OnSocketConnected();
         protected abstract void OnSocketDisconnected();
         protected abstract void ProcessPacket(JsonResponse response);
 

@@ -31,6 +31,7 @@ using Microsoft.VisualStudio.Shell;
 using Microsoft.VisualStudio.Shell.Interop;
 using Microsoft.VisualStudioTools.Project;
 using Microsoft.Win32;
+using System.Web;
 
 namespace Microsoft.NodejsTools.Project {
     class NodejsProjectLauncher : IProjectLauncher {
@@ -57,6 +58,7 @@ namespace Microsoft.NodejsTools.Project {
                 startBrowser = true;
             }
             int? port = null;
+            string webBrowserUrl = null;
             if (startBrowser) {
                 var portStr = _project.GetProjectProperty(NodeConstants.NodejsPort);
                 int tmpPort;
@@ -67,10 +69,14 @@ namespace Microsoft.NodejsTools.Project {
                     port = tmpPort;
                 }
                 Debug.Assert(port != null);
+                webBrowserUrl = _project.GetProjectProperty(NodeConstants.LaunchUrl);
+                if (String.IsNullOrWhiteSpace(webBrowserUrl)) {
+                    webBrowserUrl = "http://localhost:" + port;
+                }
             }
 
             if (debug) {
-                StartWithDebugger(file, port);
+                StartWithDebugger(file, port, (webBrowserUrl != null) ? HttpUtility.UrlEncode(webBrowserUrl) : webBrowserUrl);
             } else {
                 var psi = new ProcessStartInfo();
                 psi.UseShellExecute = false;
@@ -82,16 +88,11 @@ namespace Microsoft.NodejsTools.Project {
                 psi.Arguments = GetFullArguments(file);
                 psi.WorkingDirectory = _project.GetWorkingDirectory();
                 Process.Start(psi);
-            }
 
-            if (startBrowser) {
-                string url = _project.GetProjectProperty(NodeConstants.LaunchUrl);
-                if (String.IsNullOrWhiteSpace(url)) {
+                if (webBrowserUrl != null) {
                     Debug.Assert(port != null);
-                    url = "http://localhost:" + port;
+                    ThreadPool.QueueUserWorkItem(StartBrowser, new BrowserStartInfo(port.Value, webBrowserUrl));
                 }
-
-                ThreadPool.QueueUserWorkItem(StartBrowser, new BrowserStartInfo(port.Value, url));
             }
             return VSConstants.S_OK;
         }
@@ -125,11 +126,11 @@ namespace Microsoft.NodejsTools.Project {
         /// <summary>
         /// Default implementation of the "Start Debugging" command.
         /// </summary>
-        private void StartWithDebugger(string startupFile, int? port) {
+        private void StartWithDebugger(string startupFile, int? port, string webBrowserUrl) {
             VsDebugTargetInfo dbgInfo = new VsDebugTargetInfo();
             dbgInfo.cbSize = (uint)Marshal.SizeOf(dbgInfo);
 
-            SetupDebugInfo(ref dbgInfo, startupFile, port);
+            SetupDebugInfo(ref dbgInfo, startupFile, port, webBrowserUrl);
 
             LaunchDebugger(_project.Site, dbgInfo);
         }
@@ -155,7 +156,7 @@ namespace Microsoft.NodejsTools.Project {
         /// <summary>
         /// Sets up debugger information.
         /// </summary>
-        private void SetupDebugInfo(ref VsDebugTargetInfo dbgInfo, string startupFile, int? port) {
+        private void SetupDebugInfo(ref VsDebugTargetInfo dbgInfo, string startupFile, int? port, string webBrowserUrl) {
             dbgInfo.dlo = DEBUG_LAUNCH_OPERATION.DLO_CreateProcess;
 
             dbgInfo.bstrExe = GetNodePath();
@@ -165,6 +166,13 @@ namespace Microsoft.NodejsTools.Project {
             var nodeArgs = _project.GetProjectProperty(NodeConstants.NodeExeArguments);
             if(!String.IsNullOrWhiteSpace(nodeArgs)) {
                 dbgInfo.bstrOptions = AD7Engine.InterpreterOptions + "=" + nodeArgs;
+            }
+            if (!String.IsNullOrWhiteSpace(webBrowserUrl)) {
+                if (!String.IsNullOrWhiteSpace(dbgInfo.bstrOptions)) {
+                    dbgInfo.bstrOptions += " " + AD7Engine.WebBrowserUrl + "=" + webBrowserUrl;
+                } else {
+                    dbgInfo.bstrOptions = AD7Engine.WebBrowserUrl + "=" + webBrowserUrl;
+                }
             }
 
             dbgInfo.fSendStdoutToOutputWindow = 0;

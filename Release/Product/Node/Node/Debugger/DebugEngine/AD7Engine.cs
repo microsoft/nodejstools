@@ -15,10 +15,13 @@
 using Microsoft.NodejsTools.Debugger.Remote;
 using Microsoft.VisualStudio;
 using Microsoft.VisualStudio.Debugger.Interop;
+using Microsoft.VisualStudio.Shell;
+using Microsoft.VisualStudio.Shell.Interop;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Runtime.InteropServices;
+using System.Web;
 
 namespace Microsoft.NodejsTools.Debugger.DebugEngine {
     // AD7Engine is the primary entrypoint object for the debugging engine. 
@@ -89,6 +92,11 @@ namespace Microsoft.NodejsTools.Debugger.DebugEngine {
         /// semi-colon.
         /// </summary>
         public const string InterpreterOptions = "INTERPRETER_OPTIONS";
+
+        /// <summary>
+        /// Specifies URL to which to open web browser on node debug connect.
+        /// </summary>
+        public const string WebBrowserUrl = "WEB_BROWSER_URL";
 
         /// <summary>
         /// Specifies a directory mapping in the form of:
@@ -448,7 +456,8 @@ namespace Microsoft.NodejsTools.Debugger.DebugEngine {
 
             NodeDebugOptions debugOptions = NodeDebugOptions.None;
             List<string[]> dirMapping = null;
-            string interpreterOptions = null;           
+            string interpreterOptions = null;
+            string webBrowserUrl = null;
             if (options != null) {
                 var splitOptions = SplitOptions(options);
                 
@@ -486,12 +495,32 @@ namespace Microsoft.NodejsTools.Debugger.DebugEngine {
                             case InterpreterOptions:
                                 interpreterOptions = setting[1];
                                 break;
+                            case WebBrowserUrl:
+                                webBrowserUrl = HttpUtility.UrlDecode(setting[1]);
+                                break;
                         }
                     }
                 }
             }
 
-            _process = new NodeDebugger(exe, args, dir, env, interpreterOptions, debugOptions, dirMapping);
+            _process =
+                new NodeDebugger(
+                    exe,
+                    args,
+                    dir,
+                    env,
+                    interpreterOptions,
+                    debugOptions,
+                    dirMapping,
+                    () => {
+                        if (webBrowserUrl != null) {
+                            VsShellUtilities.OpenBrowser(
+                                webBrowserUrl,
+                                (uint)__VSOSPFLAGS.OSP_LaunchNewBrowser);
+                        }
+                    }
+                );
+
             _process.Start(false);
 
             AttachEvents(_process);
