@@ -17,5 +17,10 @@ namespace Microsoft.NodejsTools {
         public const string StartWebBrowser = "StartWebBrowser";
         public const string LaunchUrl = "LaunchUrl";
         public const string ProjectFileFilter = "Node.js Project File (*.njsproj)\n*.njsproj\nAll Files (*.*)\n*.*\n";
+
+        public const string NodeModulesFolder = "node_modules";
+        public const string PackageJsonFile = "package.json";
+        public const string PackageJsonMainFileKey = "main";
+        public const string DefaultPackageMainFile = "index.js";
     }
 }

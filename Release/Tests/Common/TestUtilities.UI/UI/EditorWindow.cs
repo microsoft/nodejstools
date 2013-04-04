@@ -53,7 +53,7 @@ namespace TestUtilities.UI {
 
         public void MoveCaret(SnapshotPoint newPoint) {
             ((UIElement)TextView).Dispatcher.Invoke((Action)(() => {
-                TextView.Caret.MoveTo(newPoint);
+                TextView.Caret.MoveTo(newPoint.TranslateTo(newPoint.Snapshot.TextBuffer.CurrentSnapshot, PointTrackingMode.Positive));
             }));
         }
 
@@ -78,7 +78,7 @@ namespace TestUtilities.UI {
         /// Moves the caret to the 1 based line and column
         /// </summary>
         public void MoveCaret(int line, int column) {
-            var textLine = TextView.TextViewLines[line - 1];
+            var textLine = TextView.TextBuffer.CurrentSnapshot.GetLineFromLineNumber(line - 1);
             if (column - 1 == textLine.Length) {
                 MoveCaret(textLine.End);
             } else {

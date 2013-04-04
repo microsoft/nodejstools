@@ -1,6 +1,21 @@
-﻿using System;
+﻿/* ****************************************************************************
+ *
+ * Copyright (c) Microsoft Corporation. 
+ *
+ * This source code is subject to terms and conditions of the Apache License, Version 2.0. A 
+ * copy of the license can be found in the License.html file at the root of this distribution. If 
+ * you cannot locate the Apache License, Version 2.0, please send an email to 
+ * vspython@microsoft.com. By using this source code in any fashion, you are agreeing to be bound 
+ * by the terms of the Apache License, Version 2.0.
+ *
+ * You must not remove this notice, or any other, from this software.
+ *
+ * ***************************************************************************/
+
+using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
+using System.IO;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -46,12 +61,14 @@ namespace Microsoft.NodejsTools {
         private readonly IProjectionBuffer _projBuffer; // the buffer we project into        
         private readonly IProjectionBuffer _elisionBuffer;
         private readonly NodejsProjectNode _project;
+        private readonly string _filename;
 
-        public NodejsProjectionBuffer(IContentTypeRegistryService contentRegistry, IProjectionBufferFactoryService bufferFactory, ITextBuffer diskBuffer, IBufferGraphFactoryService bufferGraphFactory, IContentType contentType, NodejsProjectNode project) {
+        public NodejsProjectionBuffer(IContentTypeRegistryService contentRegistry, IProjectionBufferFactoryService bufferFactory, ITextBuffer diskBuffer, IBufferGraphFactoryService bufferGraphFactory, IContentType contentType, NodejsProjectNode project, string filename) {
             _diskBuffer = diskBuffer;
             _contentRegistry = contentRegistry;
             _contentType = contentType;
 
+            _filename = filename;
             _project = project;
             _projBuffer = CreateProjectionBuffer(bufferFactory);
             _elisionBuffer = CreateElisionBuffer(bufferFactory);
@@ -78,15 +95,47 @@ namespace Microsoft.NodejsTools {
 
         private string LeadingText {
             get {
-                // 
-                return "/// <reference path=\"" + _project._referenceFilename + "\" />\r\nfunction module_body() {\r\nexports = {};\r\nvar module = {}; module.exports = exports;/// <Formatting IndentLevel=\"0\">\r\n";
+                // __filename, _dirname http://nodejs.org/api/globals.html#globals_filename
+
+                return
+                    "/// <reference path=\"" + _project._referenceFilename + "\" />\r\n" +
+                    GetNodeFunctionWrapperHeader("module_body", _filename, false);
             }
         }
 
-        private string TrailingText {
+        /// <summary>
+        /// Gets the header function that we wrap code in to make it into the Node.js like
+        /// environment for intellisense.
+        /// </summary>
+        /// <param name="functionName">The name of the outer function</param>
+        /// <param name="filename">The .js file which we are emitting, for setting __filename and __dirname.</param>
+        /// <param name="localFilenames">True if __filename and __dirname are defined as locals, false to define as globals.  
+        /// 
+        /// When we emit into the require() body we want these to be locals so we don't have the different
+        /// modules trampling on each other.
+        /// </param>
+        /// <returns></returns>
+        internal static string GetNodeFunctionWrapperHeader(string functionName, string filename, bool localFilenames = true) {
+            string filenamePrefix = localFilenames ? "var " : "";
+            return "function " + functionName + "() {\r\n" +
+                filenamePrefix  + "__filename = \"" + filename.Replace("\\", "\\\\") + "\";\r\n" +
+                GetDirectoryNameFromFilename(filenamePrefix, filename) +
+                "var exports = {};\r\n" +
+                "var module = {};\r\n" +
+                "module.exports = exports;\r\n" ;
+        }
+
+        private static string GetDirectoryNameFromFilename(string filenamePrefix, string filename) {
+            if (String.IsNullOrWhiteSpace(filename)) {
+                return "";
+            }
+            return filenamePrefix + "__dirname = \"" + Path.GetDirectoryName(filename).Replace("\\", "\\\\") + "\";\r\n";
+        }
+
+        internal static string TrailingText {
             get {
                 // 
-                return "\r\n/// </Formatting>\r\nreturn exports;\r\n}";
+                return "\r\nreturn module.exports;\r\n}";
             }
         }
 

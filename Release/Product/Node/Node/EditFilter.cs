@@ -44,7 +44,7 @@ namespace Microsoft.NodejsTools {
             // disable JavaScript language services auto formatting features, this is because
             // they are not aware that we have an extra level of indentation
             if (pguidCmdGroup == VSConstants.VSStd2K) {
-                switch((VSConstants.VSStd2KCmdID)nCmdID) {
+                switch ((VSConstants.VSStd2KCmdID)nCmdID) {
                     case VSConstants.VSStd2KCmdID.RETURN:
                         if (_intellisenseStack.TopSession != null && 
                             _intellisenseStack.TopSession is ICompletionSession &&
@@ -71,6 +71,16 @@ namespace Microsoft.NodejsTools {
         }
 
         public int QueryStatus(ref Guid pguidCmdGroup, uint cCmds, OLECMD[] prgCmds, IntPtr pCmdText) {
+            if (pguidCmdGroup == VSConstants.GUID_VSStandardCommandSet97) {
+                for (int i = 0; i < cCmds; i++) {
+                    switch ((VSConstants.VSStd97CmdID)prgCmds[i].cmdID) {
+                        case VSConstants.VSStd97CmdID.GotoDefn:
+                            // disable goto definition, it goes to the wrong location.
+                            prgCmds[i].cmdf = (uint)(OLECMDF.OLECMDF_INVISIBLE | OLECMDF.OLECMDF_SUPPORTED);
+                            return VSConstants.S_OK;
+                    }
+                }
+            }
             return _next.QueryStatus(ref pguidCmdGroup, cCmds, prgCmds, pCmdText);
         }
     }

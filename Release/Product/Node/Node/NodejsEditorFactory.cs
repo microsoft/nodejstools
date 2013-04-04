@@ -28,6 +28,7 @@ using Microsoft.VisualStudio.Text.Operations;
 using Microsoft.VisualStudio.Text.Projection;
 using Microsoft.VisualStudio.TextManager.Interop;
 using Microsoft.VisualStudio.Utilities;
+using Microsoft.VisualStudioTools;
 using IOleServiceProvider = Microsoft.VisualStudio.OLE.Interop.IServiceProvider;
 
 namespace Microsoft.NodejsTools {
@@ -320,9 +321,24 @@ namespace Microsoft.NodejsTools {
                 IContentType contentType = SniffContentType(diskBuffer) ??
                                            contentRegistry.GetContentType("JavaScript");
 
-                var proj = Microsoft.VisualStudioTools.VsExtensions.GetCommonProject(Microsoft.NodejsTools.Extensions.GetProject(_hierarchy)) as NodejsProjectNode;
+                var proj = VsExtensions.GetCommonProject(Extensions.GetProject(_hierarchy)) as NodejsProjectNode;
 
-                var projBuffer = new NodejsProjectionBuffer(contentRegistry, factService, diskBuffer, _compModel.GetService<IBufferGraphFactoryService>(), contentType, proj);
+                string filename = String.Empty;
+                ITextDocument textDocument;
+                if (diskBuffer.Properties.TryGetProperty<ITextDocument>(typeof(ITextDocument), out textDocument)) {
+                    filename = textDocument.FilePath;
+                }
+
+                var projBuffer = new NodejsProjectionBuffer(
+                    contentRegistry, 
+                    factService, 
+                    diskBuffer, 
+                    _compModel.GetService<IBufferGraphFactoryService>(), 
+                    contentType, 
+                    proj,
+                    filename
+                );
+
                 diskBuffer.Properties.AddProperty(typeof(NodejsProjectionBuffer), projBuffer);
 
                 Guid langSvcGuid = NodePackage._jsLangSvcGuid;

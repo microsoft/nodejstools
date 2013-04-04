@@ -18,6 +18,7 @@ using System.Globalization;
 using System.IO;
 using System.Reflection;
 using System.Text;
+using System.Web.Script.Serialization;
 using Microsoft.VisualStudio;
 using Microsoft.VisualStudioTools;
 using Microsoft.VisualStudioTools.Project;
@@ -29,6 +30,7 @@ namespace Microsoft.NodejsTools.Project {
         internal string _referenceFilename = GetReferenceFilePath();
         const string _userSwitchMarker = "// **NTVS** INSERT USER MODULE SWITCH HERE **NTVS**";
         internal readonly List<NodejsFileNode> _nodeFiles = new List<NodejsFileNode>();
+        private readonly JavaScriptSerializer _serializer = new JavaScriptSerializer();
 
         public NodejsProjectNode(NodejsProjectPackage package)
             : base(package, Utilities.GetImageList(typeof(NodejsProjectNode).Assembly.GetManifestResourceStream("Microsoft.NodejsTools.NodeImageList.bmp"))) {
@@ -151,48 +153,181 @@ namespace Microsoft.NodejsTools.Project {
         /// Walks the project and generates the reference code for each .js file present.
         /// </summary>
         private void UpdateReferenceFile(HierarchyNode node, StringBuilder switchCode) {
-            foreach (var nodeFile in _nodeFiles) {
-                string name = CommonUtils.CreateFriendlyFilePath(
-                        ProjectHome,
+            // collect all of the node_modules folders
+            Dictionary<FileNode, CommonFolderNode> directoryPackages = GetModuleFolderMapping();
+
+            int moduleId = 0;
+            switchCode.Append("default:");
+            switchCode.Append(@"
+function relative_match(match_dir, dirname, mod_name, alt_mod_name, ref_path) {
+     if(ref_path.substr(0, 2) == './') {
+         var components = ref_path.split('/');
+         var upCount = 0;
+         for(var i = 1; i < components.length; i++) {
+             if (components[i] == '..') {
+                 upCount++;
+             } else {
+                 break;
+             }
+         }
+         if (upCount != 0) {
+             var dirComponents = dirname.split('\\');
+             for(var i = 0; i < upCount; i++) {
+                 dirComponents.pop();
+             }
+             for (var i = upCount + 1; i < (components.length - 1); i++) {
+                 dirComponents.push(components[i]);
+             }
+             var res = match_dir === dirComponents.join('\\') && (components[components.length - 1] == mod_name || components[components.length - 1] == alt_mod_name);
+             return res;
+         }
+     }
+     return false;
+}
+");
+            foreach (NodejsFileNode nodeFile in _nodeFiles) {
+                // for each file we setup if statements which check and see if the current
+                // file doing the require() call will match based upon the string being
+                // passed in.   
+                //
+                // __dirname is the directory that the file doing the require call exists 
+                // in during intellisense
+                //
+                // module is the string passed in by the user to require(...)
+                //
+
+                switchCode.Append("if(");
+                for (var curParent = nodeFile.Parent; curParent != null; curParent = curParent.Parent) {
+                    if (curParent != nodeFile.Parent) {
+                        switchCode.Append(" || ");
+                    }
+
+                    var baseDir = GetHierarchyNodeDirectory(curParent);
+                    var trimmedBaseDir = CommonUtils.TrimEndSeparator(baseDir);
+                    string name = CommonUtils.CreateFriendlyFilePath(
+                            baseDir,
+                            nodeFile.Url
+                        ).Replace("\\", "/");
+
+                    // For each parent above the file, the file can be accessed with a relative
+                    // path, e.g ./my/parent and with or without a .js extension
+                    switchCode.AppendFormat(
+                        "(__dirname == '{0}' && (module == './{1}' || module == './{2}')) || relative_match('{0}', __dirname, '{1}', '{2}', module)",
+                        trimmedBaseDir.Replace("\\", "\\\\"),
+                        Path.Combine(Path.GetDirectoryName(name), Path.GetFileNameWithoutExtension(name)).Replace('\\', '/'),
+                        name
+                    );
+
+                    if (String.Equals(Path.GetFileName(trimmedBaseDir), NodeConstants.NodeModulesFolder, StringComparison.OrdinalIgnoreCase)) {
+                        // when we're in node_modules we're accessible by a plain name as well, and
+                        // we're accessible from either our immediate parent directory or children
+                        // within the package.
+                        var filePath = CommonUtils.CreateFriendlyFilePath(baseDir, nodeFile.Url);
+                        string parentBaseDir = Path.GetDirectoryName(CommonUtils.TrimEndSeparator(baseDir));
+
+                        switchCode.AppendFormat(
+                            "|| ((__dirname == '{0}' || __dirname == '{1}') && (module == '{2}' || module == '{3}'))",
+                            parentBaseDir.Replace("\\", "\\\\"),
+                            trimmedBaseDir.Replace("\\", "\\\\"),
+                            Path.GetFileNameWithoutExtension(filePath),
+                            Path.GetFileName(filePath)
+                        );
+                    }
+
+                    CommonFolderNode folderPackage;
+                    if (directoryPackages.TryGetValue(nodeFile, out folderPackage)) {
+                        // this file is also exposed as the folder
+                        switchCode.AppendFormat(
+                            "|| ((__dirname == '{0}') && (module == '{1}'))",
+                            CommonUtils.TrimEndSeparator(GetHierarchyNodeDirectory(folderPackage.Parent.Parent)).Replace("\\", "\\\\"),
+                            Path.GetFileName(CommonUtils.TrimEndSeparator(folderPackage.Url))
+                        );
+                    }
+                }
+
+                switchCode.Append(") {");
+
+                switchCode.Append(
+                    NodejsProjectionBuffer.GetNodeFunctionWrapperHeader(
+                        "module_name" + moduleId,
                         nodeFile.Url
-                    ).Replace("\\", "/");
-
-                switchCode.AppendFormat(@"case ""./{0}"": 
-case ""./{3}"": 
-function {1}() {{
-var exports = {{}};
-var module = {{}};
-module.exports = exports;
-{2}
-
-return exports;
-}}
-
-return {1}();
-", 
-                    name, 
-                    FilenameToModuleName(name),
-                    nodeFile._currentText,
-                    Path.GetFileNameWithoutExtension(FilenameToModuleName(name)));
+                    )
+                );
+                switchCode.Append(nodeFile._currentText);
+                switchCode.Append(NodejsProjectionBuffer.TrailingText);
+                switchCode.AppendFormat("return module_name{0}();", moduleId);
+                switchCode.Append("}");
+                moduleId++;
             }
+            switchCode.Append("break;");
         }
 
         /// <summary>
-        /// Gets a valid identifier name for the module code based upon the filename.
-        /// 
-        /// This makes sure we're not generating invalid JavaScript.  We use names based upon
-        /// what the user gave us, but the name isn't exposed so we could use anything.
+        /// Generates a mapping from file node to folder node.  The file node is the node which
+        /// is the entry point for the folder in node_modules.  Typically the file will be index.js
+        /// or a file specified in package.json.
         /// </summary>
-        private static string FilenameToModuleName(string filename) {
-            if (filename.Length == 0 || (!Char.IsLetter(filename[0]) && filename[0] != '_')) {
-                filename = "dummy" + filename;
-            }
-            for (int i = 0; i < filename.Length; i++) {
-                if (!Char.IsLetterOrDigit(filename[i]) && filename[i] != '_') {
-                    return filename.Substring(0, i);
+        private Dictionary<FileNode, CommonFolderNode> GetModuleFolderMapping() {
+            List<CommonFolderNode> folderNodes = new List<CommonFolderNode>();
+            FindNodesOfType<CommonFolderNode>(folderNodes);
+            Dictionary<FileNode, CommonFolderNode> directoryPackages = new Dictionary<FileNode, CommonFolderNode>();
+
+            // collect all of the packages in node_modules folders and their associated entry point
+            foreach (var folderNode in folderNodes) {
+                if (String.Equals(
+                    Path.GetFileName(CommonUtils.TrimEndSeparator(folderNode.Url)),
+                    NodeConstants.NodeModulesFolder,
+                    StringComparison.OrdinalIgnoreCase)) {
+
+                    for (var curChild = folderNode.FirstChild; curChild != null; curChild = curChild.NextSibling) {
+                        CommonFolderNode folderChild = curChild as CommonFolderNode;
+                        if (folderChild != null) {
+                            var packageJsonChild = curChild.FindChild(Path.Combine(curChild.Url, NodeConstants.PackageJsonFile));
+
+                            Dictionary<string, object> packageJson = null;
+                            if (packageJsonChild != null && File.Exists(packageJsonChild.Url)) {
+                                try {
+                                    packageJson = (Dictionary<string, object>)_serializer.DeserializeObject(File.ReadAllText(packageJsonChild.Url));
+                                } catch(Exception e) {
+                                    // can't read, failed to deserialize json, fallback to index.js if it exists
+                                    var outputWindow = Package.GetOutputPane(VSConstants.OutputWindowPaneGuid.GeneralPane_guid, "General");
+                                    if (outputWindow != null) {
+                                        outputWindow.OutputStringThreadSafe(String.Format("Failed to parse {0}:\r\n\r\n{1}", packageJsonChild.Url, e.Message));
+                                    }
+                                }
+                            }
+
+                            object mainFile;
+                            string mainFileStr;
+                            if (packageJson != null &&
+                                packageJson.TryGetValue(NodeConstants.PackageJsonMainFileKey, out mainFile) &&
+                                (mainFileStr = mainFile as string) != null) {
+
+                                if (mainFileStr.StartsWith("./")) {
+                                    mainFileStr = mainFileStr.Substring(2);
+                                }
+                                mainFileStr = mainFileStr.Replace('/', '\\');
+
+                                var rootFile = curChild.FindChild(Path.Combine(curChild.Url, mainFileStr)) as FileNode;
+                                if (rootFile != null) {
+                                    directoryPackages[rootFile] = folderChild;
+                                }
+                            }
+
+
+                            var indexJsChild = curChild.FindChild(Path.Combine(curChild.Url, NodeConstants.DefaultPackageMainFile)) as FileNode;
+                            if (indexJsChild != null && File.Exists(indexJsChild.Url)) {
+                                directoryPackages[indexJsChild] = folderChild;
+                            }
+                        }
+                    }
                 }
             }
-            return filename;
+            return directoryPackages;
+        }
+
+        private string GetHierarchyNodeDirectory(HierarchyNode curParent) {
+            return curParent is NodejsProjectNode ? ProjectHome : curParent.Url;
         }
 
         /// <summary>

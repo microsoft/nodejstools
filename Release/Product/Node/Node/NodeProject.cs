@@ -214,7 +214,7 @@ namespace Microsoft.NodejsTools {
                             ErrorHandler.ThrowOnFailure(multiItemSelect.GetSelectedItems(flags, numberOfSelectedItems, vsItemSelections));
 
                             foreach (VSITEMSELECTION vsItemSelection in vsItemSelections) {
-                                yield return vsItemSelection;
+                                yield return new VSITEMSELECTION() { itemid = vsItemSelection .itemid, pHier = hierarchy};
                             }
                         }
                     }

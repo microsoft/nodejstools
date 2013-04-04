@@ -1,0 +1,29 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio 2012
+Project("{9092AA53-FB77-4645-B42D-1CCCA6BD08BD}") = "RequireTestApp", "RequireTestApp\RequireTestApp.njsproj", "{AC826CD2-4979-4622-843F-3415F1D9795B}"
+EndProject
+Global
+	GlobalSection(TeamFoundationVersionControl) = preSolution
+		SccNumberOfProjects = 2
+		SccEnterpriseProvider = {4CA58AB2-18FA-4F8D-95D4-32DDF27D184C}
+		SccTeamFoundationServer = http://tcvstf:8080/tfs/tc
+		SccLocalPath0 = .
+		SccProjectUniqueName1 = RequireTestApp\\RequireTestApp.njsproj
+		SccProjectName1 = RequireTestApp
+		SccLocalPath1 = RequireTestApp
+	EndGlobalSection
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|x86 = Debug|x86
+		Release|x86 = Release|x86
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{AC826CD2-4979-4622-843F-3415F1D9795B}.Debug|x86.ActiveCfg = Debug|x86
+		{AC826CD2-4979-4622-843F-3415F1D9795B}.Debug|x86.Build.0 = Debug|x86
+		{AC826CD2-4979-4622-843F-3415F1D9795B}.Release|x86.ActiveCfg = Release|x86
+		{AC826CD2-4979-4622-843F-3415F1D9795B}.Release|x86.Build.0 = Release|x86
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+EndGlobal
