@@ -16,6 +16,7 @@
       NodejsToolsDir=$(BuildRoot)\Release\Product\Node\Node;
       MsiVersion=$(WixVersion);
       VSTargetVersion=$(VSTarget);
+      CustomBuildIdentifier=$(CustomBuildIdentifier);
     </DefineConstants>
   </PropertyGroup>
   <PropertyGroup>

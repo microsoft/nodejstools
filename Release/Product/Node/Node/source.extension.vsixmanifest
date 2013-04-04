@@ -4,7 +4,7 @@
     <Name>Node.js Tools for Visual Studio</Name>
     <Author>Microsoft</Author>
     <Version>0.5</Version>
-    <Description xml:space="preserve">Adds support for developing and debugging Node.js apps in Visual Studio</Description>
+    <Description xml:space="preserve">Node.js Tools for Visual Studio provides intellisense, project support, project and item templates, as well as an Interactive window for Node.js development.</Description>
     <Locale>1033</Locale>
     <MoreInfoUrl>http://nodetools.codeplex.com</MoreInfoUrl>
     <GettingStartedGuide>http://nodetools.codeplex.com</GettingStartedGuide>

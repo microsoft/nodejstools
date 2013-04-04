@@ -1,4 +1,4 @@
-param( [string] $outdir, [switch] $skiptests, [switch] $noclean, [switch] $uninstall, [string] $reinstall, [switch] $scorch, [string] $vsTarget, [switch] $nocopy, [switch] $skipdebug)
+param( [string] $outdir, [string] $customBuildIdentifier, [switch] $skiptests, [switch] $noclean, [switch] $uninstall, [string] $reinstall, [switch] $scorch, [string] $vsTarget, [switch] $nocopy, [switch] $skipdebug)
 
 if (-not (get-command msbuild -EA 0))
 {
@@ -10,6 +10,11 @@ if (-not $outdir)
 {
     Write-Error "Must provide valid output directory: '$outdir'"
     exit 1
+}
+
+if (-not $customBuildIdentifier)
+{
+	$customBuildIdentifier = "SPECIALNULLVALUE"
 }
 
 if (-not $noclean)
@@ -78,7 +83,7 @@ try {
     if ($skipdebug) { $targetConfigs = ("Release") }
 	    
     foreach ($targetVs in $targetVersions) {
-        $version = "0.5." + ([DateTime]::Now.Year - 2013).ToString() + [DateTime]::Now.Month.ToString('00') + [DateTime]::Now.Day.ToString('00') + ".0"
+        $version = "0.5." + ([DateTime]::Now.Year - 2013).ToString() + [DateTime]::Now.Month.ToString('00') + [DateTime]::Now.Day.ToString('00') + ".00"
         
         $asmverfileBackedUp = 0
         tf edit $asmverfile
@@ -94,20 +99,34 @@ try {
         
         foreach ($config in $targetConfigs)
         {
-		    $logdir = "$buildroot\Binaries\BuildLogs\$config$($targetVs.number)"
-			if (-not (Test-Path $logdir)) { mkdir $logdir }
+            $logdir = "$buildroot\Binaries\BuildLogs\$config$($targetVs.number)"
+            if (-not (Test-Path $logdir)) { mkdir $logdir }
 
+			#NOT USED
+			#ideally we'd use this code in place of the repeated long args below
+			#there are issues with escaping at the moment preventing its use
+			[string[]]$msbuildArgs = @(
+                '/m',
+                '/fl',
+                '/v:n',
+                '/p:Configuration=' + $config.ToString(), 
+                '/p:WixVersion=' + $version.ToString(),
+                '/p:VSTarget=' + $($targetVs.number).ToString(),
+                '/p:VisualStudioVersion=' + $($targetVs.number).ToString(),
+				'/p:CustomBuildIdentifier= ' + $customBuildIdentifier.ToString()
+            )
+			                                    
             if (-not $skiptests)
-            {
-				msbuild /m /v:m /fl /flp:"Verbosity=diagnostic;LogFile=$logdir\BuildRelease.$config.$($targetVs.number).tests.log" /p:Configuration=$config /p:WixVersion=$version /p:VSTarget=$($targetVs.number) /p:VisualStudioVersion=$($targetVs.number) Release\Tests\NodejsTests.proj
+            {                
+                msbuild /m /v:m /fl /flp:"Verbosity=diagnostic;LogFile=$logdir\BuildRelease.$config.$($targetVs.number).tests.log" /p:Configuration=$config /p:WixVersion=$version /p:VSTarget=$($targetVs.number) /p:VisualStudioVersion=$($targetVs.number) /p:"CustomBuildIdentifier=$($customBuildIdentifier)" Release\Tests\NodejsTests.proj
                 if ($LASTEXITCODE -gt 0)
                 {
                     Write-Error "Test build failed: $config"
                     exit 4
                 }
             }
-
-            msbuild /v:n /m /fl /flp:"Verbosity=n;LogFile=$logdir\BuildRelease.$config.$($targetVs.number).log" /p:Configuration=$config /p:WixVersion=$version /p:VSTarget=$($targetVs.number) /p:VisualStudioVersion=$($targetVs.number) Release\SetupAuthoring\dirs.proj
+			
+			msbuild /v:n /m /fl /flp:"Verbosity=n;LogFile=$logdir\BuildRelease.$config.$($targetVs.number).log" /p:Configuration=$config /p:WixVersion=$version /p:VSTarget=$($targetVs.number) /p:VisualStudioVersion=$($targetVs.number) /p:"CustomBuildIdentifier=$($customBuildIdentifier)" Release\SetupAuthoring\dirs.proj
             if ($LASTEXITCODE -gt 0) {
                 Write-Error "Build failed: $config"
                 exit 3

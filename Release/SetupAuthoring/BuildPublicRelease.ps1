@@ -1,4 +1,4 @@
-param( $outDir, $build_name, [switch] $fast )
+param( $outDir, $build_name, [switch] $fast, [switch] $custombuildname)
 
 if (-not $outDir)
 {
@@ -42,9 +42,17 @@ foreach ($version in $versions) {
     echo "Building release to $outDir ..."
     
     if ($fast) {
-        & $buildroot\Release\SetupAuthoring\BuildRelease.ps1 $prevOutdir -vsTarget $version.number -noclean -nocopy -skiptests -skipdebug > $outDir\release_output.txt
+        if($custombuildname) {
+            & $buildroot\Release\SetupAuthoring\BuildRelease.ps1 $prevOutdir $build_name -vsTarget $version.number -noclean -nocopy -skiptests -skipdebug > $outDir\release_output.txt            
+        } else {
+            & $buildroot\Release\SetupAuthoring\BuildRelease.ps1 $prevOutdir -vsTarget $version.number -noclean -nocopy -skiptests -skipdebug > $outDir\release_output.txt
+        }
     } else {
-        & $buildroot\Release\SetupAuthoring\BuildRelease.ps1 $prevOutdir -vsTarget $version.number -noclean -nocopy > $outDir\release_output.txt
+        if($custombuildname) {
+            & $buildroot\Release\SetupAuthoring\BuildRelease.ps1 $prevOutdir $build_name -vsTarget $version.number -noclean -nocopy > $outDir\release_output.txt
+        } else {
+            & $buildroot\Release\SetupAuthoring\BuildRelease.ps1 $prevOutdir -vsTarget $version.number -noclean -nocopy > $outDir\release_output.txt
+        }
     }
 
     ###################################################################

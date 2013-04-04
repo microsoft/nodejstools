@@ -696,6 +696,10 @@
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
       <IncludeInVSIX>true</IncludeInVSIX>
     </Content>
+    <Content Include="..\Icons\NodejsToolsforVisualStudio.ico">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+      <IncludeInVSIX>true</IncludeInVSIX>
+    </Content>
     <Content Include="ProjectTemplates\AzureNodeApp\AzureNodeApp.vstemplate">
       <SubType>Designer</SubType>
     </Content>
