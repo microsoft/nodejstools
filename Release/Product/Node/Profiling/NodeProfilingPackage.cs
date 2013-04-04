@@ -83,6 +83,13 @@ namespace Microsoft.NodejsTools.Profiling {
             Trace.WriteLine(string.Format(CultureInfo.CurrentCulture, "Entering Initialize() of: {0}", this.ToString()));
             base.Initialize();
 
+            var shell = (IVsShell)GetService(typeof(SVsShell));
+
+            // we call into the Node.js package, so we need it loaded.
+            Guid nodePackage = typeof(NodePackage).GUID;
+            IVsPackage package;
+            shell.LoadPackage(ref nodePackage, out package);
+
             // Add our command handlers for menu (commands must exist in the .vsct file)
             OleMenuCommandService mcs = GetService(typeof(IMenuCommandService)) as OleMenuCommandService;
             if (null != mcs) {

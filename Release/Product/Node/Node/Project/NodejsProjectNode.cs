@@ -89,7 +89,7 @@ namespace Microsoft.NodejsTools.Project {
         }
 
         public override Type GetProjectFactoryType() {
-            return typeof(NodeProjectFactory);
+            return typeof(BaseNodeProjectFactory);
         }
 
         public override Type GetEditorFactoryType() {
