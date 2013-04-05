@@ -19,7 +19,7 @@ namespace Microsoft.NodejsTools.Debugger {
     class NodeBreakpoint {
         private readonly NodeDebugger _process;
         private readonly string _fileName;
-        private readonly int _lineNo;
+        private int _lineNo;
         private bool _enabled;
         private bool _engineEnabled;
         private BreakOn _breakOn;
@@ -29,6 +29,7 @@ namespace Microsoft.NodejsTools.Debugger {
         private uint _hitCountDelta;
         private int _engineIgnoreCount;
         private bool _boundByName;
+        private bool _pendingLocationFixup;
 
         public NodeBreakpoint(
             NodeDebugger process,
@@ -52,7 +53,7 @@ namespace Microsoft.NodejsTools.Debugger {
         /// Requests the remote process enable the break point.  An event will be raised on the process
         /// when the break point is received.
         /// </summary>
-        public void Add(Action successHandler = null, Action failureHandler = null) {
+        public void Add(Action<bool> successHandler = null, Action failureHandler = null) {
             _process.BindBreakpoint(this, successHandler, failureHandler);
         }
 
@@ -73,6 +74,9 @@ namespace Microsoft.NodejsTools.Debugger {
         public int LineNo {
             get {
                 return _lineNo;
+            }
+            set {
+                _lineNo = value;
             }
         }
 
@@ -109,6 +113,15 @@ namespace Microsoft.NodejsTools.Debugger {
             }
             set {
                 _boundByName = value;
+            }
+        }
+
+        internal bool PendingLocationFixup {
+            get {
+                return _pendingLocationFixup;
+            }
+            set {
+                _pendingLocationFixup = value;
             }
         }
 

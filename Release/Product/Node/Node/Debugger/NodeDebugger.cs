@@ -870,32 +870,95 @@ namespace Microsoft.NodejsTools.Debugger {
             ((Dictionary<string, object>)json["body"]).TryGetValue("breakpoints", out breakpointsObj);
             object[] breakpoints = breakpointsObj as object[];
 
-            // We need to get the backtrace before we break, so we request the backtrace
-            // and follow up with firing the appropriate event for the break
-            PerformBacktrace((running) => {
-                // Handle followup
-                Debug.Assert(!running);
-                if (breakpoints != null) {
-                    // Process breakpoint hit
-                    foreach (int breakpoint in breakpoints) {
-                        NodeBreakpoint nodeBreakpoint;
-                        if (_breakpoints.TryGetValue(breakpoint, out nodeBreakpoint)) {
-                            var breakpointHit = BreakpointHit;
-                            nodeBreakpoint.ProcessBreakpointHit(
-                                () => {
-                                    // Fire breakpoint hit event
-                                    if (breakpointHit != null) {
-                                        breakpointHit(this, new BreakpointHitEventArgs(nodeBreakpoint, MainThread));
-                                    }
-                                }
-                             );
-                        }
-                    }
-                } else {
-                    // Fallback to completing stepping
+            // Handle step break
+            if (breakpoints == null || breakpoints.Length == 0) {
+                // We need to get the backtrace before we break, so we request the backtrace
+                // and follow up with firing the appropriate event for the break
+                PerformBacktrace((running) => {
+                    // Handle followup
+                    Debug.Assert(!running);
                     CompleteStepping();
+                });
+                return;
+            }
+
+            // Collect fixup pending and normal breakpoints
+            List<NodeBreakpoint> locationFixupPendingBreakpoints = new List<NodeBreakpoint>();
+            List<NodeBreakpoint> normalBreakpoints = new List<NodeBreakpoint>();
+            foreach (int breakpoint in breakpoints) {
+                NodeBreakpoint nodeBreakpoint;
+                if (_breakpoints.TryGetValue(breakpoint, out nodeBreakpoint)) {
+                    if (nodeBreakpoint.PendingLocationFixup){
+                        locationFixupPendingBreakpoints.Add(nodeBreakpoint);
+                    } else {
+                        normalBreakpoints.Add(nodeBreakpoint);
+                    }
                 }
-            });
+            }
+
+            // Process breakpoints
+            // Collect hit breakpoints
+            // Handle last processed breakpoint by either breaking with breakpoint hit events or resuming
+            var breakpointsToProcess = breakpoints.Length;
+            List<NodeBreakpoint> hitBreakpoints = new List<NodeBreakpoint>();
+            Action<NodeBreakpoint> processBreakpoint = (nodeBreakpoint) => {
+                if (nodeBreakpoint != null) {
+                    // Collect hit breakpoints
+                    hitBreakpoints.Add(nodeBreakpoint);
+                }
+                if (--breakpointsToProcess == 0) {
+                    // Handle last processed breakpoint
+                    if (hitBreakpoints.Count > 0) {
+                        // We need to get the backtrace before we break, so we request the backtrace
+                        // and follow up with firing the appropriate events for the break
+                        PerformBacktrace((running) => {
+                            // Handle followup
+                            // Process hit breakpoints
+                            Debug.Assert(!running);
+                            foreach (NodeBreakpoint hitBreakpoint in hitBreakpoints) {
+                                var breakpointHit = BreakpointHit;
+                                nodeBreakpoint.ProcessBreakpointHit(
+                                    () => {
+                                        // Fire breakpoint hit event
+                                        if (breakpointHit != null) {
+                                            breakpointHit(this, new BreakpointHitEventArgs(hitBreakpoint, MainThread));
+                                        }
+                                    }
+                                    );
+                            }
+                        });
+                    } else {
+                        // No hit breakpoints, any must have been fixed up
+                        Resume();
+                    }
+                }
+            };
+
+            // Process fixup pending breakpoints
+            foreach (var locationFixupPendingBreakpoint in locationFixupPendingBreakpoints) {
+                RemoveBreakPoint(
+                    locationFixupPendingBreakpoint.Id,
+                    () => { // Success handler
+                        BindBreakpoint(
+                            locationFixupPendingBreakpoint,
+                            (fixedUpLocation) => { // Success handler
+                                processBreakpoint(fixedUpLocation ? locationFixupPendingBreakpoint : null);
+                            },
+                            () => { // Failure handler
+                                processBreakpoint(locationFixupPendingBreakpoint);
+                            }
+                        );
+                    },
+                    () => { // Failure handler
+                        processBreakpoint(locationFixupPendingBreakpoint);
+                    }
+                );
+            }
+
+            // Process normal breakpoints
+            foreach (var normalBreakpoint in normalBreakpoints) {
+                processBreakpoint(normalBreakpoint);
+            }
         }
 
         private void ProcessException(Dictionary<string, object> json) {
@@ -1181,7 +1244,7 @@ namespace Microsoft.NodejsTools.Debugger {
             Socket = null;
         }
 
-        internal void BindBreakpoint(NodeBreakpoint breakpoint, Action successHandler = null, Action failureHandler = null) {
+        internal void BindBreakpoint(NodeBreakpoint breakpoint, Action<bool> successHandler = null, Action failureHandler = null) {
             DebugWriteCommand(String.Format("Bind Breakpoint"));
 
             // Compose request arguments
@@ -1213,14 +1276,45 @@ namespace Microsoft.NodejsTools.Debugger {
 
             Action<Dictionary<string, object>> responseHandler = json => {
                 var success = (bool)json["success"];
+                bool fixedUpLocation = false;
                 if (success) {
-                    breakpoint.Id = (int)((Dictionary<string, object>)json["body"])["breakpoint"];
+                    var body = (Dictionary<string, object>)json["body"];
+                    breakpoint.Id = (int)body["breakpoint"];
                     _breakpoints[breakpoint.Id] = breakpoint;
-                    breakpoint.BoundByName = boundByName;                    
+                    breakpoint.BoundByName = boundByName;
+
+                    // Handle breakpoint actual location fixup
+                    // On initial breakpoint bind, just flag the breakpoint as "PendingLocationFixup"
+                    // On subsequent bind (during "when hit" for breakpoints flagged as "PendingLocationFixup"), do actual fixup, if still any
+                    var pendingLocationFixup = breakpoint.PendingLocationFixup;
+                    breakpoint.PendingLocationFixup = false;
+                    object actualLocationsObject;
+                    if (body.TryGetValue("actual_locations", out actualLocationsObject) && actualLocationsObject != null) {
+                        var actualLocations = (object[])actualLocationsObject;
+                        if (actualLocations.Length > 0) {
+                            Debug.Assert(actualLocations.Length == 1);
+                            var actualLocation = (int)((Dictionary<string, object>)actualLocations[0])["line"] + 1;
+                            if (actualLocation != breakpoint.LineNo) {
+                                if (!pendingLocationFixup) {
+                                    // Initial bind
+                                    breakpoint.PendingLocationFixup = true;
+                                } else {
+                                    // Subsequent bind
+                                    breakpoint.LineNo = actualLocation;
+                                }
+                                fixedUpLocation = true;
+                            }
+                        }
+                    }
                 }
-                Action bindResultHandler = success ? successHandler : failureHandler;
-                if (bindResultHandler != null) {
-                    bindResultHandler();
+                if (success) {
+                    if (successHandler != null) {
+                        successHandler(fixedUpLocation);
+                    }
+                } else {
+                    if (failureHandler != null) {
+                        failureHandler();
+                    }
                 }
             };
 
@@ -1597,7 +1691,7 @@ namespace Microsoft.NodejsTools.Debugger {
             return null;
         }
 
-        internal void RemoveBreakPoint(int id) {
+        internal void RemoveBreakPoint(int id, Action successHandler = null, Action failureHandler = null) {
             DebugWriteCommand("Remove Breakpoint");
 
             SendRequest(
@@ -1608,6 +1702,15 @@ namespace Microsoft.NodejsTools.Debugger {
                 json => {
                     // Handle success
                     _breakpoints.Remove(id);
+                    if (successHandler != null) {
+                        successHandler();
+                    }
+                },
+                json => {
+                    // Handle failure
+                    if (failureHandler != null) {
+                        failureHandler();
+                    }
                 }
             );
         }

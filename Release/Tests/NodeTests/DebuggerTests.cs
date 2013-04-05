@@ -752,6 +752,36 @@ namespace DebuggerTests {
         }
 
         [TestMethod, Priority(0)]
+        public void BreakOnFixedUpBreakpoint() {
+            AutoResetEvent textRead = new AutoResetEvent(false);
+            TestDebuggerSteps(
+                "HelloWorldWithClosure.js",
+                new[] {
+                    new TestStep(action: TestAction.AddBreakpoint, targetBreakpoint: 7),
+                    new TestStep(action: TestAction.ResumeProcess),
+                    new TestStep(validation: (process, thread) => {
+                        ThreadPool.QueueUserWorkItem(new WaitCallback(stateinfo => {
+                            var req = (HttpWebRequest)WebRequest.Create("http://localhost:1337/");
+                            var resp = (HttpWebResponse)req.GetResponse();
+                            var stream = resp.GetResponseStream();
+                            var reader = new StreamReader(stream);
+                            var text = reader.ReadToEnd();
+                            Assert.AreEqual("Hello World\n", text);
+                            textRead.Set();
+                        }));
+                    }),
+                    new TestStep(action: TestAction.Wait, expectedBreakpointHit: 7),
+                    new TestStep(action: TestAction.StepOver, expectedStepComplete: 8),
+                    new TestStep(action: TestAction.ResumeProcess),
+                    new TestStep(validation: (process, thread) => {
+                        AssertWaited(textRead);
+                    }),
+                    new TestStep(action: TestAction.KillProcess),
+                }
+            );
+        }
+
+        [TestMethod, Priority(0)]
         public void SetBreakpointWhileRunning() {
             TestDebuggerSteps(
                 "RunForever.js",

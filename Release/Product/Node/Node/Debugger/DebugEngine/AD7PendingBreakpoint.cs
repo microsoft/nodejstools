@@ -64,19 +64,17 @@ namespace Microsoft.NodejsTools.Debugger.DebugEngine {
 
         // Get the document context for this pending breakpoint. A document context is a abstract representation of a source file 
         // location.
-        public AD7DocumentContext GetDocumentContext() {
+        public AD7DocumentContext GetDocumentContext(NodeBreakpoint breakpoint) {
+            TEXT_POSITION textPosition = new TEXT_POSITION();
+            textPosition.dwLine = (uint)breakpoint.LineNo - 1;
+
             IDebugDocumentPosition2 docPosition = (IDebugDocumentPosition2)(Marshal.GetObjectForIUnknown(_bpRequestInfo.bpLocation.unionmember2));
             string documentName;
             EngineUtils.CheckOk(docPosition.GetFileName(out documentName));
 
-            // Get the location in the document that the breakpoint is in.
-            TEXT_POSITION[] startPosition = new TEXT_POSITION[1];
-            TEXT_POSITION[] endPosition = new TEXT_POSITION[1];
-            EngineUtils.CheckOk(docPosition.GetRange(startPosition, endPosition));
+            AD7MemoryAddress codeContext = new AD7MemoryAddress(_engine, documentName, textPosition.dwLine);
 
-            AD7MemoryAddress codeContext = new AD7MemoryAddress(_engine, documentName, startPosition[0].dwLine);
-
-            return new AD7DocumentContext(documentName, startPosition[0], startPosition[0], codeContext);
+            return new AD7DocumentContext(documentName, textPosition, textPosition, codeContext);
         }
 
         // Remove all of the bound breakpoints for this pending breakpoint
@@ -124,9 +122,9 @@ namespace Microsoft.NodejsTools.Debugger.DebugEngine {
                         _bpRequestInfo.bpCondition.bstrCondition
                     );
                 breakpoint.Add(
-                    () => {
+                    (fixedUpLocation) => {
                         // Success handler
-                        AD7BreakpointResolution breakpointResolution = new AD7BreakpointResolution(_engine, breakpoint, GetDocumentContext());
+                        AD7BreakpointResolution breakpointResolution = new AD7BreakpointResolution(_engine, breakpoint, GetDocumentContext(breakpoint));
                         AD7BoundBreakpoint boundBreakpoint = new AD7BoundBreakpoint(_engine, breakpoint, this, breakpointResolution, _enabled);
                         lock (_boundBreakpoints) {
                             _boundBreakpoints.Add(boundBreakpoint);

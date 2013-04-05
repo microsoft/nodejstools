@@ -42,7 +42,7 @@ namespace DebuggerTests {
             bool enabled = true,
             BreakOn breakOn = new BreakOn(),
             string condition = "",
-            Action successHandler = null,
+            Action<bool> successHandler = null,
             Action failureHandler = null
         ) {
             NodeBreakpoint breakPoint = newproc.AddBreakPoint(fileName, line, enabled, breakOn, condition);
@@ -463,7 +463,7 @@ namespace DebuggerTests {
                                 step._enabled ?? true,
                                 step._breakOn ?? new BreakOn(),
                                 step._condition,
-                                successHandler: () => {
+                                successHandler: (fixedUpLocation) => {
                                     breakpointBindSuccess.Set();
                                 }
                             );
