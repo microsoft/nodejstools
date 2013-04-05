@@ -58,7 +58,7 @@ namespace Microsoft.NodejsTools.Profiling {
     sealed class NodeProfilingPackage : Package {
         internal static NodeProfilingPackage Instance;
         private static ProfiledProcess _profilingProcess;   // process currently being profiled
-        internal static string NodeProjectGuid = "{3AF33F2E-1136-4D97-BBB7-1795711AC8B8}";
+        internal static string NodeProjectGuid = "{9092AA53-FB77-4645-B42D-1CCCA6BD08BD}";
         internal const string PerformanceFileFilter = "Performance Report Files|*.vspx;*.vsps";
         private AutomationProfiling _profilingAutomation;
         private static OleMenuCommand _stopCommand, _startCommand;
