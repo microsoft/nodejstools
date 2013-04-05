@@ -1,7 +1,7 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio 2012
-Project("{3AF33F2E-1136-4D97-BBB7-1795711AC8B8}") = "NodejsProfileTest", "NodejsProfileTest.njsproj", "{0D997B7D-661C-482F-BA12-A8F925899DE1}"
+Project("{9092AA53-FB77-4645-B42D-1CCCA6BD08BD}") = "NodejsProfileTest", "NodejsProfileTest.njsproj", "{0D997B7D-661C-482F-BA12-A8F925899DE1}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
