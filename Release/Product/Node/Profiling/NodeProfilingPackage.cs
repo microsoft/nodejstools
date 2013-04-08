@@ -63,7 +63,7 @@ namespace Microsoft.NodejsTools.Profiling {
         private AutomationProfiling _profilingAutomation;
         private static OleMenuCommand _stopCommand, _startCommand;
         internal const string PerfFileType = ".njsperf";
-
+        
         /// <summary>
         /// Default constructor of the package.
         /// Inside this method you can place any initialization code that does not require 
@@ -86,7 +86,10 @@ namespace Microsoft.NodejsTools.Profiling {
             var shell = (IVsShell)GetService(typeof(SVsShell));
 
             // we call into the Node.js package, so we need it loaded.
-            Guid nodePackage = typeof(NodePackage).GUID;
+            // TODO - Ideally this wouldn't be hardcoded in here but we don't have a good shared location
+            //    move this guid to be from a shared file
+            //   
+            Guid nodePackage = new Guid("4219f2a8-fbf9-4659-a222-b7580a60eebb");
             IVsPackage package;
             shell.LoadPackage(ref nodePackage, out package);
 
