@@ -13,6 +13,7 @@
  * ***************************************************************************/
 
 using System.IO;
+using System.Linq;
 using System.Runtime.InteropServices;
 
 namespace Microsoft.NodejsTools.Profiling {
@@ -44,7 +45,7 @@ namespace Microsoft.NodejsTools.Profiling {
             if (item is int) {
                 int id = (int)item - 1;
                 if (id >= 0 && id < _node.Reports.Count) {
-                    return new ReportWrapper(_node.Reports[id]);
+                    return new ReportWrapper(_node.Reports.Values.ToArray()[id]);
                 }
             } else if (item is string) {
                 string filename = (string)item;
