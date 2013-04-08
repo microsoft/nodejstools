@@ -160,6 +160,10 @@ namespace Microsoft.NodejsTools.Project {
             switchCode.Append("default:");
             switchCode.Append(@"
 function relative_match(match_dir, dirname, mod_name, alt_mod_name, ref_path) {
+     if(ref_path.substr(0, 3) == '../') {
+        // fall into ./ case below
+        ref_path = './' + ref_path;
+     }
      if(ref_path.substr(0, 2) == './') {
          var components = ref_path.split('/');
          var upCount = 0;
@@ -183,6 +187,10 @@ function relative_match(match_dir, dirname, mod_name, alt_mod_name, ref_path) {
          }
      }
      return false;
+}
+
+function starts_with(a, b) {
+    return a.substr(0, b.length) == b;
 }
 ");
             foreach (NodejsFileNode nodeFile in _nodeFiles) {
@@ -212,7 +220,7 @@ function relative_match(match_dir, dirname, mod_name, alt_mod_name, ref_path) {
                     // For each parent above the file, the file can be accessed with a relative
                     // path, e.g ./my/parent and with or without a .js extension
                     switchCode.AppendFormat(
-                        "(__dirname == '{0}' && (module == './{1}' || module == './{2}')) || relative_match('{0}', __dirname, '{1}', '{2}', module)",
+                        "    (__dirname == '{0}' && (module == './{1}' || module == './{2}')) || relative_match('{0}', __dirname, '{1}', '{2}', module)\r\n",
                         trimmedBaseDir.Replace("\\", "\\\\"),
                         Path.Combine(Path.GetDirectoryName(name), Path.GetFileNameWithoutExtension(name)).Replace('\\', '/'),
                         name
@@ -226,7 +234,7 @@ function relative_match(match_dir, dirname, mod_name, alt_mod_name, ref_path) {
                         string parentBaseDir = Path.GetDirectoryName(CommonUtils.TrimEndSeparator(baseDir));
 
                         switchCode.AppendFormat(
-                            "|| ((__dirname == '{0}' || __dirname == '{1}') && (module == '{2}' || module == '{3}'))",
+                            "    || ((__dirname == '{0}' || __dirname == '{1}') && (module == '{2}' || module == '{3}'))\r\n",
                             parentBaseDir.Replace("\\", "\\\\"),
                             trimmedBaseDir.Replace("\\", "\\\\"),
                             Path.GetFileNameWithoutExtension(filePath),
@@ -238,7 +246,7 @@ function relative_match(match_dir, dirname, mod_name, alt_mod_name, ref_path) {
                     if (directoryPackages.TryGetValue(nodeFile, out folderPackage)) {
                         // this file is also exposed as the folder
                         switchCode.AppendFormat(
-                            "|| ((__dirname == '{0}') && (module == '{1}'))",
+                            "    || (starts_with(__dirname, '{0}') && (module == '{1}'))\r\n",
                             CommonUtils.TrimEndSeparator(GetHierarchyNodeDirectory(folderPackage.Parent.Parent)).Replace("\\", "\\\\"),
                             Path.GetFileName(CommonUtils.TrimEndSeparator(folderPackage.Url))
                         );
@@ -246,17 +254,24 @@ function relative_match(match_dir, dirname, mod_name, alt_mod_name, ref_path) {
                 }
 
                 switchCode.Append(") {");
-
+                switchCode.AppendFormat("if(global[{0}] === undefined) {{ ", moduleId);
                 switchCode.Append(
                     NodejsProjectionBuffer.GetNodeFunctionWrapperHeader(
                         "module_name" + moduleId,
                         nodeFile.Url
                     )
                 );
+
+                // publish it at the start for recursive modules, may change later if user 
+                // does module.exports = .... in which case we will republish at the end.
+                switchCode.AppendFormat("global[{0}] = module.exports;", moduleId); 
+
                 switchCode.Append(nodeFile._currentText);
                 switchCode.Append(NodejsProjectionBuffer.TrailingText);
-                switchCode.AppendFormat("return module_name{0}();", moduleId);
-                switchCode.Append("}");
+                switchCode.AppendFormat("global[{0}] = module_name{0}();", moduleId);
+                switchCode.AppendLine("}");
+                switchCode.AppendFormat("return global[{0}];", moduleId);
+                switchCode.AppendLine("}");
                 moduleId++;
             }
             switchCode.Append("break;");

@@ -99,7 +99,7 @@ namespace Microsoft.NodejsTools {
 
                 return
                     "/// <reference path=\"" + _project._referenceFilename + "\" />\r\n" +
-                    GetNodeFunctionWrapperHeader("module_body", _filename, false);
+                    GetNodeFunctionWrapperHeader("module_body", _filename);
             }
         }
 
@@ -115,21 +115,20 @@ namespace Microsoft.NodejsTools {
         /// modules trampling on each other.
         /// </param>
         /// <returns></returns>
-        internal static string GetNodeFunctionWrapperHeader(string functionName, string filename, bool localFilenames = true) {
-            string filenamePrefix = localFilenames ? "var " : "";
+        internal static string GetNodeFunctionWrapperHeader(string functionName, string filename) {
             return "function " + functionName + "() {\r\n" +
-                filenamePrefix  + "__filename = \"" + filename.Replace("\\", "\\\\") + "\";\r\n" +
-                GetDirectoryNameFromFilename(filenamePrefix, filename) +
+                "__filename = \"" + filename.Replace("\\", "\\\\") + "\";\r\n" +
+                GetDirectoryNameFromFilename(filename) +
                 "var exports = {};\r\n" +
                 "var module = {};\r\n" +
                 "module.exports = exports;\r\n" ;
         }
 
-        private static string GetDirectoryNameFromFilename(string filenamePrefix, string filename) {
+        private static string GetDirectoryNameFromFilename(string filename) {
             if (String.IsNullOrWhiteSpace(filename)) {
                 return "";
             }
-            return filenamePrefix + "__dirname = \"" + Path.GetDirectoryName(filename).Replace("\\", "\\\\") + "\";\r\n";
+            return "__dirname = \"" + Path.GetDirectoryName(filename).Replace("\\", "\\\\") + "\";\r\n";
         }
 
         internal static string TrailingText {

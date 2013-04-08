@@ -25,15 +25,13 @@ namespace NodeReferenceGenerator {
         }
 
         private string Generate() {
+            _output.AppendLine("global = {};");
+
             _output.Append("function require(module) {\r\n");
 
             GenerateRequireBody(_output, _all);
 
-            _output.Append("// **NTVS** INSERT USER MODULE SWITCH HERE **NTVS**");
-
             _output.Append(@"
-            
-    }
 }
 ");
 
@@ -94,10 +92,41 @@ namespace NodeReferenceGenerator {
             }
 
             if (module.ContainsKey("properties")) {
-                GenerateProperties(module["properties"], indentation + 1);
+                Func<string, string> specializer;
+                PropertySpecializations.TryGetValue(name, out specializer);
+                GenerateProperties(module["properties"], indentation + 1, specializer);
             }
 
             _output.AppendFormat("}}", name);
+        }
+
+        private Dictionary<string, Func<string, string>> PropertySpecializations = MakePropertySpecializations();
+
+        private static Dictionary<string, Func<string, string>> MakePropertySpecializations() {
+            return new Dictionary<string, Func<string, string>>() {
+                { "__process", ProcessPropertySpecialization }
+            };
+        }
+
+        private static string ProcessPropertySpecialization(string propertyName) {
+            switch (propertyName) {
+                case "env":
+                    return "{}";
+                case "versions":
+                    return "{node: '0.10.0', v8: '3.14.5.8'}";
+                case "pid":
+                    return "0";
+                case "title":
+                    return "''";
+                case "platform":
+                    return "'win32'";
+                case "maxTickDepth":
+                    return "1000";
+                case "argv":
+                    return "[ 'node.exe' ]";
+
+            }
+            return null;
         }
 
         private void GenerateClass(string modName, dynamic klass, int indentation) {
@@ -116,14 +145,14 @@ namespace NodeReferenceGenerator {
             }
 
             if (klass.ContainsKey("properties")) {
-                GenerateProperties(klass["properties"], indentation + 1);
+                GenerateProperties(klass["properties"], indentation + 1, null);
             }
 
             _output.Append(' ', indentation * 4);
             _output.AppendLine("}");
         }
 
-        private void GenerateProperties(dynamic properties, int indentation) {
+        private void GenerateProperties(dynamic properties, int indentation, Func<string, string> specializer) {
             foreach (var prop in properties) {
                 string desc = "";
                 if (prop.ContainsKey("desc")) {
@@ -137,10 +166,11 @@ namespace NodeReferenceGenerator {
                 }
 
                 _output.Append(' ', indentation * 4);
+                string value = null;
                 if (desc.IndexOf("<code>Boolean</code>") != -1) {
-                    _output.AppendFormat("this.{0} = true;\r\n", prop["name"]);
+                    value = "true";
                 } else if (desc.IndexOf("<code>Number</code>") != -1) {
-                    _output.AppendFormat("this.{0} = 0;\r\n", prop["name"]);
+                    value = "0";
                 } else if (prop.ContainsKey("textRaw")) {
                     string textRaw = prop["textRaw"];
                     int start, end;
@@ -149,21 +179,25 @@ namespace NodeReferenceGenerator {
                         string typeName = textRaw.Substring(start, end - start);
                         switch (typeName) {
                             case "Boolean":
-                                _output.AppendFormat("this.{0} = true;\r\n", prop["name"]);
+                                value = "true";
                                 break;
                             case "Number":
-                                _output.AppendFormat("this.{0} = true;\r\n", prop["name"]);
-                                break;
-                            default:
-                                _output.AppendFormat("this.{0} = undefined;\r\n", prop["name"]);
+                                value = "0";
                                 break;
                         }
-                    } else {
-                        _output.AppendFormat("this.{0} = undefined;\r\n", prop["name"]);
                     }
-                } else {
-                    _output.AppendFormat("this.{0} = undefined;\r\n", prop["name"]);
                 }
+
+                if (value == null) {
+                    if (specializer != null) {
+                        value = specializer(prop["name"]) ?? "undefined";
+                    }
+
+                    if (value == null) {
+                        value = "undefined";
+                    }
+                }
+                _output.AppendFormat("this.{0} = {1};\r\n", prop["name"], value);
             }
         }
 
@@ -270,6 +304,9 @@ namespace NodeReferenceGenerator {
         }
 
         private void GenerateRequireBody(StringBuilder res, dynamic all) {
+            res.AppendLine("try { ");
+            res.AppendLine("var __prevFilename = __filename;");
+            res.AppendLine("var __prevDirname = __dirname;");
             res.Append(@"
     switch (module) {
 ");
@@ -282,6 +319,14 @@ namespace NodeReferenceGenerator {
                 res.Append(";\r\n");
             }
 
+            res.AppendLine("// **NTVS** INSERT USER MODULE SWITCH HERE **NTVS**");
+            res.AppendLine();
+            res.AppendLine("} // close switch");
+
+            res.AppendLine("} finally {");
+            res.AppendLine("__filename = __prevFilename;");
+            res.AppendLine("__dirname = __prevDirname;");
+            res.AppendLine("}");
         }
 
 

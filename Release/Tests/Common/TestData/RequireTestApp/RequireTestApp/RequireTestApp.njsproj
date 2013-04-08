@@ -62,6 +62,8 @@
     <Compile Include="node_modules\foo\node_modules\dup.js" />
     <Compile Include="node_modules\foo\node_modules\index.js" />
     <Compile Include="node_modules\mymod.js" />
+    <Compile Include="recursive2.js" />
+    <Compile Include="recursive1.js" />
   </ItemGroup>
   <Import Project="$(VSToolsPath)\Node.js Tools\Microsoft.NodejsTools.targets" />
   <ProjectExtensions>

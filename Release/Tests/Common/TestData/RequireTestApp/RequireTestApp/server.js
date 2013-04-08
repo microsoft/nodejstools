@@ -9,7 +9,7 @@ mymod2.mymod_export();  // mymod.f()
 
 try {
     var mymod3 = require('./mymod.js');
-    
+
 } catch (err) {
     console.log('./mymod.js fails');
 }
@@ -38,6 +38,7 @@ baz_dup.baz_dup('server.js')
 var baz_dup2 = require('./baz/dup');
 baz_dup2.baz_dup('server.js')
 
+var recursive = require('./recursive1.js');
 
 exports.bar = function abc() {
 };
