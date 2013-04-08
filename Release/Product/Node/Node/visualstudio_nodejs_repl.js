@@ -12,7 +12,7 @@ function send_response(socket, data) {
 }
 
 function findEndOfHeaders(buf) {
-    for (i = 0; i < buf.length - 4; i++) {
+    for (var i = 0; i < buf.length - 4; i++) {
         if (buf[i] == 13 &&
             buf[i + 1] == 10 &&
             buf[i + 2] == 13 &&

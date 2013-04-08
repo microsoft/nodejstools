@@ -353,5 +353,16 @@ undefined";
             }
         }
 
+        [TestMethod, Priority(0)]
+        public void TestVarI() {
+            using (var eval = new NodejsReplEvaluator()) {
+                var window = new MockReplWindow(eval);
+
+                var res = eval.ExecuteText("i");
+                Assert.IsTrue(res.Wait(10000));
+                Assert.AreEqual("undefined", window.Output);                
+            }
+        }
+
     }
 }
