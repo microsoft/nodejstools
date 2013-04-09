@@ -353,6 +353,18 @@ namespace Microsoft.NodejsTools.Debugger {
                 });
         }
 
+        private void AutoResume() {
+            // Continue stepping, if stepping
+            if (_steppingMode != SteppingKind.None) {
+                _resumingStepping = true;
+                CompleteStepping();
+                return;
+            }
+
+            // Fall back to continue, without stepping
+            Continue();
+        }
+
         private void CompleteStepping() {
             if (_resumingStepping) {
                 switch (_steppingMode) {
@@ -991,24 +1003,25 @@ namespace Microsoft.NodejsTools.Debugger {
                 exceptionTreatment = _defaultExceptionTreatment;
             }
 
-            // UNDONE Handle break on unhandled, once just my code is supported
-            // Node has a catch all, so there are no uncaught exceptions
-            // For now just break always or never
-            //if (exceptionTreatment == ExceptionHitTreatment.BreakNever ||
-            //    (exceptionTreatment == ExceptionHitTreatment.BreakOnUnhandled && !uncaught)) {
-            if (exceptionTreatment == ExceptionHitTreatment.BreakNever) {
-                Resume();
-                return;
-            }
-
             // We need to get the backtrace before we break, so we request the backtrace
             // and follow up with firing the appropriate event for the break
             PerformBacktrace((running) => {
                 // Handle followup
+
+                // UNDONE Handle break on unhandled, once just my code is supported
+                // Node has a catch all, so there are no uncaught exceptions
+                // For now just break always or never
+                //if (exceptionTreatment == ExceptionHitTreatment.BreakNever ||
+                //    (exceptionTreatment == ExceptionHitTreatment.BreakOnUnhandled && !uncaught)) {
+                if (exceptionTreatment == ExceptionHitTreatment.BreakNever) {
+                    AutoResume();
+                    return;
+                }
+
                 if (MainThread.Frames.Count() < _entryPointFrameCount) {
                     // Auto resume exceptions thrown up the stack from our entry point
                     // to avoid firing exception raised events for rethrow performed by Node
-                    Resume();
+                    AutoResume();
                     return;
                 }
                 Debug.Assert(!running);
@@ -1208,13 +1221,7 @@ namespace Microsoft.NodejsTools.Debugger {
             }
 
             // Handle tracepoint (auto-resumed "when hit" breakpoint) resume during stepping
-            if (_steppingMode != SteppingKind.None) {
-                _resumingStepping = true;
-                CompleteStepping();
-                return;
-            }
-
-            Continue();
+            AutoResume();
         }
 
         public void SendClearStepping(int threadId) {
