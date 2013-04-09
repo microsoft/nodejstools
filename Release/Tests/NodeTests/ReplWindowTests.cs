@@ -205,6 +205,8 @@ undefined";
 
                 Assert.AreEqual("The process has exited", window.Error);
                 window.ClearScreen();
+                Assert.AreEqual("", window.Output);
+                Assert.AreEqual("", window.Error);
 
                 //Check to ensure the REPL continues to work after Reset
                 res = eval.ExecuteText("var a = 1");
@@ -360,7 +362,14 @@ undefined";
 
                 var res = eval.ExecuteText("i");
                 Assert.IsTrue(res.Wait(10000));
-                Assert.AreEqual("undefined", window.Output);                
+                Assert.AreEqual("ReferenceError: i is not defined", window.Error);
+                Assert.AreEqual("", window.Output);
+                res = eval.ExecuteText("var i = 987654;");
+                Assert.IsTrue(res.Wait(10000));
+                Assert.AreEqual("undefined", window.Output);
+                res = eval.ExecuteText("i");
+                Assert.IsTrue(res.Wait(10000));
+                Assert.AreEqual("undefined987654", window.Output);
             }
         }
 
