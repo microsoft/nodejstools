@@ -243,7 +243,7 @@ namespace DebuggerTests {
         public void LocalsTest() {
             LocalsTest(
                 "LocalsTest.js",
-                2,
+                3,
                 expectedLocals: new string[] { "x" }
             );
 
@@ -255,7 +255,7 @@ namespace DebuggerTests {
 
             LocalsTest(
                 "LocalsTest3.js",
-                2,
+                3,
                 expectedParams: new string[] { "x" },
                 expectedLocals: new string[] { "y" }
             );
@@ -266,7 +266,7 @@ namespace DebuggerTests {
             LocalsTest(
                 "GlobalsTest.js",
                 4,
-                expectedParams: new string[] { "exports", "module", "__filename", "__dirname" },
+                expectedParams: new string[] { "exports", "require", "module", "__filename", "__dirname" },
                 expectedLocals: new[] { "y", "x" });
         }
 

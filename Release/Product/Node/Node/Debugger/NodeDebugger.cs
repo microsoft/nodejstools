@@ -1108,19 +1108,9 @@ namespace Microsoft.NodejsTools.Debugger {
         }
 
         private void GetFrameVariables(NodeStackFrame nodeFrame, Dictionary<string, object> frame) {
-            var jsonArgObjs = ((object[])frame["arguments"]).Where(
-                                jsonArgObj =>
-                                    String.Compare(
-                                        (string)(((Dictionary<string, object>)((Dictionary<string, object>)jsonArgObj)["value"])["type"]),
-                                        "function") != 0);
+            var jsonArgObjs = ((object[])frame["arguments"]);
             nodeFrame.SetArgCount(jsonArgObjs.Count());
-
-            var jsonVarObjs = jsonArgObjs.Concat(
-                                    ((object[])frame["locals"])).Where(
-                                        jsonVarObj =>
-                                            String.Compare(
-                                                (string)(((Dictionary<string, object>)((Dictionary<string, object>)jsonVarObj)["value"])["type"]),
-                                                "function") != 0);
+            var jsonVarObjs = jsonArgObjs.Concat(((object[])frame["locals"]));
 
             List<NodeEvaluationResult> childNodeEvaluationResults = new List<NodeEvaluationResult>();
             foreach (var jsonVarObj in jsonVarObjs) {
@@ -1579,10 +1569,14 @@ namespace Microsoft.NodejsTools.Debugger {
                     value = "null";
                     break;
                 case "undefined":
-                    value = "undefined";
-                    break;
-                case "function":
                     return null;
+                case "function":
+                    value = GetFunctionName(record);
+                    if (record.TryGetValue("ref", out valueObj)) {
+                        handle = (int)valueObj;
+                        expandable = true;
+                    }
+                    break;
                 default:
                     Debug.WriteLine(String.Format("Unhandled value type: {0}", type));
                     break;
@@ -1646,10 +1640,14 @@ namespace Microsoft.NodejsTools.Debugger {
                     value = "null";
                     break;
                 case "undefined":
-                    value = "undefined";
-                    break;
-                case "function":
                     return null;
+                case "function":
+                    value = GetFunctionName(valueContainer);
+                    if (valueContainer.TryGetValue("handle", out valueObj)) {
+                        handle = (int)valueObj;
+                        expandable = true;
+                    }
+                    break;
                 default:
                     Debug.WriteLine(String.Format("Unhandled value type: {0}", type));
                     break;
@@ -1677,6 +1675,18 @@ namespace Microsoft.NodejsTools.Debugger {
                             nodeFrame,
                             expandable
                        );
+        }
+
+        private static string GetFunctionName(Dictionary<string, object> valueContainer) {
+            object functionNameObj = null;
+            string functionName = null;
+            if (valueContainer.TryGetValue("name", out functionNameObj) && functionNameObj != null) {
+                functionName = (string)functionNameObj;
+            }
+            if (String.IsNullOrWhiteSpace(functionName) && valueContainer.TryGetValue("inferredName", out functionNameObj) && functionNameObj != null) {
+                functionName = (string)functionNameObj;
+            }
+            return String.Format("[Function{0}]", String.IsNullOrWhiteSpace(functionName) ? "" : ": " + functionName);
         }
 
         private Dictionary<string, object> GetRefRecord(object[] refs, int handle) {
