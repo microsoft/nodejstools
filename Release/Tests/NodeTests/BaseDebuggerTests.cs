@@ -345,6 +345,10 @@ namespace DebuggerTests {
             ExceptionHitTreatment? defaultExceptionTreatment = null,
             ICollection<KeyValuePair<string, ExceptionHitTreatment>> exceptionTreatments = null
         ) {
+            if (!Path.IsPathRooted(filename)) {
+                filename = DebuggerTestPath + filename;
+            }
+
             NodeThread thread = null;
             var process =
                 DebugProcess(
@@ -376,6 +380,10 @@ namespace DebuggerTests {
             ICollection<KeyValuePair<string, ExceptionHitTreatment>> exceptionTreatments = null,
             bool waitForExit = false
         ) {
+            if (!Path.IsPathRooted(filename)) {
+                filename = DebuggerTestPath + filename;
+            }
+
             if (defaultExceptionTreatment != null || exceptionTreatments != null) {
                 process.SetExceptionTreatment(defaultExceptionTreatment, exceptionTreatments);
             }

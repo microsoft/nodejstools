@@ -717,6 +717,28 @@ namespace DebuggerTests {
             );
         }
 
+        [TestMethod, Priority(0)]
+        public void Stepping_AcrossCaughtExceptions() {
+            TestDebuggerSteps(
+                "SteppingAcrossCaughtExceptions.js",
+                new[] {
+                    new TestStep(action: TestAction.AddBreakpoint, targetBreakpoint: 12),
+
+                    new TestStep(action: TestAction.ResumeThread, expectedEntryPointHit: 18),
+
+                    new TestStep(action: TestAction.ResumeProcess, expectedBreakpointHit: 12),
+                    new TestStep(action: TestAction.StepInto, expectedStepComplete: 3),
+                    new TestStep(action: TestAction.StepOut, expectedStepComplete: 13),
+                    new TestStep(action: TestAction.StepOver, expectedStepComplete: 14),
+                    new TestStep(action: TestAction.StepOut, expectedStepComplete: 19),
+
+                    new TestStep(action: TestAction.ResumeProcess, expectedExitCode: 0),
+                },
+                defaultExceptionTreatment: ExceptionHitTreatment.BreakNever,
+                exceptionTreatments: CollectExceptionTreatments("Error", ExceptionHitTreatment.BreakNever)
+            );
+        }
+
         #endregion
 
         #region Breakpoint Tests

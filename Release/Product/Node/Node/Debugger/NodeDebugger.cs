@@ -766,11 +766,25 @@ namespace Microsoft.NodejsTools.Debugger {
                     // Fixup breakpoints bound by name
                     // This is necessary to work around a bug in node which binds breakpoints by comparing case against that given to Require()
                     foreach (var breakpoint in _breakpoints.Values.Where(b => b.BoundByName)) {
-                        if (GetModuleForFilePath(breakpoint.FileName) == newModule && string.Compare(breakpoint.FileName, newModule.FileName) != 0) {
-                            id = breakpoint.Id;
-                            breakpoint.Id = 0;
-                            breakpoint.Add();
-                            RemoveBreakPoint(id);
+                        if (GetModuleForFilePath(breakpoint.FileName) == newModule) {
+                            // If we get here we have a name bound breakpoint with a path which maps to the new module.
+                            // Given node treats module/script and breakpoint paths in a case sensitive way, if the breakpoint path
+                            // does not match the new module path, case sensitive, we need to rebind the breakpoint to the module
+                            // for node to respect it.
+                            if (string.Compare(breakpoint.FileName, newModule.FileName, StringComparison.InvariantCulture) != 0) {
+                                // Paths differ 
+                                // Rebind name bound breakpoint (to script id)
+                                id = breakpoint.Id;
+                                breakpoint.Id = 0;
+                                breakpoint.Add();
+                                RemoveBreakPoint(id);
+                            } else {
+                                // Paths same
+                                // Clear BoundByName flag to keep from trying for other added scripts
+                                // In this case we don't rebind because we don't have to, and we avoid
+                                // a race between rebinding and the node process running past our breakpoint.
+                                breakpoint.BoundByName = false;
+                            }
                         }
                     }
                 }
@@ -1121,19 +1135,20 @@ namespace Microsoft.NodejsTools.Debugger {
         }
 
         private void GetFrameVariables(NodeStackFrame nodeFrame, Dictionary<string, object> frame) {
-            var jsonArgObjs = ((object[])frame["arguments"]);
-            nodeFrame.SetArgCount(jsonArgObjs.Count());
-            var jsonVarObjs = jsonArgObjs.Concat(((object[])frame["locals"]));
-
             List<NodeEvaluationResult> childNodeEvaluationResults = new List<NodeEvaluationResult>();
+            GetFrameVariables(nodeFrame, ((object[])frame["arguments"]), childNodeEvaluationResults);
+            nodeFrame.SetArgCount(childNodeEvaluationResults.Count());
+            GetFrameVariables(nodeFrame, ((object[])frame["locals"]), childNodeEvaluationResults);
+            nodeFrame.SetVariables(childNodeEvaluationResults.ToArray());
+        }
+
+        private void GetFrameVariables(NodeStackFrame nodeFrame, object[] jsonVarObjs, List<NodeEvaluationResult> childNodeEvaluationResults) {
             foreach (var jsonVarObj in jsonVarObjs) {
                 var childNodeEvaluationResult = CreateFrameVariableNodeEvaluationResult(nodeFrame, (Dictionary<string, object>)jsonVarObj);
                 if (childNodeEvaluationResult != null) {
                     childNodeEvaluationResults.Add(childNodeEvaluationResult);
                 }
             }
-
-            nodeFrame.SetVariables(childNodeEvaluationResults.ToArray());
         }
 
         private void ReadMoreData(int bytesRead, ref string text, ref int pos) {
@@ -1324,16 +1339,8 @@ namespace Microsoft.NodejsTools.Debugger {
         }
 
         internal NodeModule GetModuleForFilePath(string filePath) {
-            NodeModule module;
-            if (!_scripts.TryGetValue(filePath, out module) || module == null) {
-                var fileNameToLower = Path.GetFileName(filePath).ToLower();
-                foreach (var kvp in _scripts) {
-                    if (Path.GetFileName(kvp.Key).ToLower() == fileNameToLower && kvp.Value != null) {
-                        module = kvp.Value;
-                        break;
-                    }
-                }
-            }
+            NodeModule module = null;
+            _scripts.TryGetValue(filePath, out module);
             return module;
         }
 
