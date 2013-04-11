@@ -179,7 +179,7 @@ namespace Microsoft.NodejsTools.Repl {
             portNum = ((IPEndPoint)conn.LocalEndPoint).Port;
         }
 
-        class ListenerThread : JsonListener {
+        class ListenerThread : JsonListener, IDisposable {
             private readonly NodejsReplEvaluator _eval;
             private readonly Process _process;
             private readonly object _socketLock = new object();
@@ -188,6 +188,7 @@ namespace Microsoft.NodejsTools.Repl {
             private TaskCompletionSource<ExecutionResult> _completion;
             private string _executionText;
             private readonly JavaScriptSerializer _serializer = new JavaScriptSerializer();
+            private bool _disposed;
 #if DEBUG
             private Thread _socketLockedThread;
 #endif
@@ -367,6 +368,41 @@ namespace Microsoft.NodejsTools.Repl {
                 return res;
             }
 
+
+            internal void Disconnect() {
+                if (_completion != null) {
+                    _completion.SetResult(ExecutionResult.Failure);
+                    _completion = null;
+                }
+            }
+
+            public void Dispose() {
+                Dispose(true);
+                GC.SuppressFinalize(this);
+            }
+
+            protected virtual void Dispose(bool disposing) {
+                if (!_disposed) {
+                    if (_process != null && !_process.HasExited) {
+                        try {
+                            _process.Kill();
+                        } catch (InvalidOperationException) {
+                        } catch (NotSupportedException) {
+                        } catch (System.ComponentModel.Win32Exception) {
+                        }
+
+                        //Wait for no more than 10 seconds for the process to terminate
+                        _process.WaitForExit(10000);                        
+                    }
+                    
+                    if(_process != null) {
+                        _process.Dispose();
+                    }                    
+                    _disposed = true;
+                }
+            }
+
+
             /// <summary>
             /// Helper struct for locking and tracking the current holding thread.  This allows
             /// us to assert that our socket is always accessed while the lock is held.  The lock
@@ -374,6 +410,8 @@ namespace Microsoft.NodejsTools.Repl {
             /// executing text, etc...) won't become interleaved with interactions from the repl process 
             /// (output, execution completing, etc...).
             /// </summary>
+            #region SocketLock
+
             struct SocketLock : IDisposable {
                 private readonly ListenerThread _evaluator;
 
@@ -393,22 +431,7 @@ namespace Microsoft.NodejsTools.Repl {
                     Monitor.Exit(_evaluator._socketLock);
                 }
             }
-
-            internal void Disconnect() {
-                if (_completion != null) {
-                    _completion.SetResult(ExecutionResult.Failure);
-                    _completion = null;
-                }
-            }
-
-            internal void Dispose() {
-                if (_process != null && !_process.HasExited) {
-                    try {
-                        _process.Kill();
-                    } catch (InvalidOperationException) {
-                    }
-                }
-            }
+            #endregion
         }
 
         internal void Clear() {
