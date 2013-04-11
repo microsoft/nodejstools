@@ -65,6 +65,12 @@ namespace Microsoft.NodejsTools {
                         _editorOps.Paste();
                         return VSConstants.S_OK;
                 }
+            } else if (pguidCmdGroup == VSConstants.GUID_VSStandardCommandSet97) {
+                switch ((VSConstants.VSStd97CmdID)nCmdID) {
+                    case VSConstants.VSStd97CmdID.Paste:
+                        _editorOps.Paste();
+                        return VSConstants.S_OK;
+                }
             }
 
             return _next.Exec(ref pguidCmdGroup, nCmdID, nCmdexecopt, pvaIn, pvaOut);
