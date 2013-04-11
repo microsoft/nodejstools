@@ -223,12 +223,17 @@ namespace Microsoft.NodejsTools.Repl {
             }
 
             private void ProcessExited(object sender, EventArgs args) {
+                ProcessExitedWorker();
+            }
+
+            private void ProcessExitedWorker() {
                 _eval._window.WriteError("The process has exited");
                 using (new SocketLock(this)) {
                     if (_completion != null) {
                         _completion.SetResult(ExecutionResult.Failure);
                     }
-                }
+                    _completion = null;
+                }            
             }
 
             private void SocketConnectionAccepted(IAsyncResult result) {
@@ -378,25 +383,26 @@ namespace Microsoft.NodejsTools.Repl {
 
             public void Dispose() {
                 Dispose(true);
-                GC.SuppressFinalize(this);
+                GC.SuppressFinalize(this);                
             }
 
             protected virtual void Dispose(bool disposing) {
                 if (!_disposed) {
                     if (_process != null && !_process.HasExited) {
                         try {
+                            //Disconnect our event since we are forceably killing the process off
+                            //  We'll synchronously send the message to the user
+                            _process.Exited -= ProcessExited;
                             _process.Kill();
                         } catch (InvalidOperationException) {
                         } catch (NotSupportedException) {
                         } catch (System.ComponentModel.Win32Exception) {
                         }
-
-                        //Wait for no more than 10 seconds for the process to terminate
-                        _process.WaitForExit(10000);                        
+                        ProcessExitedWorker();
                     }
                     
                     if(_process != null) {
-                        _process.Dispose();
+                        _process.Dispose();                    
                     }                    
                     _disposed = true;
                 }
