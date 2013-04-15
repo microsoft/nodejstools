@@ -179,27 +179,26 @@ namespace DebuggerTests {
         public void TestBreakAll() {
             // Load process (running)
             NodeThread thread = null;
-            var process =
-                DebugProcess(
-                    "BreakAllTest.js",
-                    onLoadComplete: (newproc, newthread) => {
-                        thread = newthread;
-                    }
-                );
+            using (var process = DebugProcess(
+                "BreakAllTest.js",
+                onLoadComplete: (newproc, newthread) => {
+                    thread = newthread;
+                }
+            )) {
+                // BreakAll
+                Thread.Sleep(500);
+                AutoResetEvent breakComplete = new AutoResetEvent(false);
+                process.AsyncBreakComplete += (sender, args) => {
+                    Assert.AreEqual(thread, args.Thread);
+                    breakComplete.Set();
+                };
+                process.BreakAll();
+                AssertWaited(breakComplete);
+                breakComplete.Reset();
 
-            // BreakAll
-            Thread.Sleep(500);
-            AutoResetEvent breakComplete = new AutoResetEvent(false);
-            process.AsyncBreakComplete += (sender, args) => {
-                Assert.AreEqual(thread, args.Thread);
-                breakComplete.Set();
-            };
-            process.BreakAll();
-            AssertWaited(breakComplete);
-            breakComplete.Reset();
-
-            process.Terminate();
-            AssertNotSet(breakComplete);
+                process.Terminate();
+                AssertNotSet(breakComplete);
+            }
         }
 
         #endregion
@@ -736,6 +735,35 @@ namespace DebuggerTests {
                 },
                 defaultExceptionTreatment: ExceptionHitTreatment.BreakNever,
                 exceptionTreatments: CollectExceptionTreatments("Error", ExceptionHitTreatment.BreakNever)
+            );
+        }
+
+        [TestMethod, Priority(0)]
+        public void Breaking_InFunctionPassedFewerThanTakenParms() {
+            TestDebuggerSteps(
+                "FunctionPassedFewerThanTakenParms.js",
+                new[] {
+                    new TestStep(action: TestAction.AddBreakpoint, targetBreakpoint: 2),
+
+                    new TestStep(action: TestAction.ResumeThread, expectedEntryPointHit: 5),
+                    new TestStep(action: TestAction.ResumeProcess, expectedBreakpointHit: 2),
+
+                    new TestStep(action: TestAction.ResumeProcess, expectedExitCode: 0),
+                }
+            );
+        }
+
+        [TestMethod, Priority(0)]
+        public void Stepping_IntoFunctionPassedFewerThanTakenParms() {
+            TestDebuggerSteps(
+                "FunctionPassedFewerThanTakenParms.js",
+                new[] {
+                    new TestStep(action: TestAction.ResumeThread, expectedEntryPointHit: 5),
+
+                    new TestStep(action: TestAction.StepInto, expectedStepComplete: 2),
+
+                    new TestStep(action: TestAction.ResumeProcess, expectedExitCode: 0),
+                }
             );
         }
 
@@ -1436,25 +1464,26 @@ namespace DebuggerTests {
         public void LocalAttach() {
             var filename = "RunForever.js";
 
-            var sysProcess = StartNodeProcess(filename);
+            using (var sysProcess = StartNodeProcess(filename)) {
 
-            for (var i = 0; i < 3; ++i) {
-                var process = AttachToNodeProcess(id: sysProcess.Id);
-                var thread = process.GetThreads().First();
-                TestDebuggerSteps(
-                    process,
-                    thread,
-                    filename,
-                    new[] {
+                for (var i = 0; i < 3; ++i) {
+                    var process = AttachToNodeProcess(id: sysProcess.Id);
+                    var thread = process.GetThreads().First();
+                    TestDebuggerSteps(
+                        process,
+                        thread,
+                        filename,
+                        new[] {
                         new TestStep(action: TestAction.AddBreakpoint, targetBreakpoint: 2),
                         new TestStep(action: TestAction.Wait, expectedBreakpointHit: 2),
                         new TestStep(action: TestAction.ResumeProcess, expectedBreakpointHit: 2),
                         new TestStep(action: TestAction.Detach),
                     }
-                );
-            }
+                    );
+                }
 
-            sysProcess.Kill();
+                sysProcess.Kill();
+            }
         }
 
 

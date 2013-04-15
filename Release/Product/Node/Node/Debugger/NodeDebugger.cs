@@ -59,8 +59,9 @@ namespace Microsoft.NodejsTools.Debugger {
     /// <summary>
     /// Handles all interactions with a Node process which is being debugged.
     /// </summary>
-    class NodeDebugger : JsonListener {
-        private readonly Process _process;
+    class NodeDebugger : JsonListener, IDisposable {
+        private Process _process;
+        private bool _attached;
         private string _hostName = "localhost";
         private ushort _portNumber = 5858;
         private int? _id;
@@ -194,7 +195,7 @@ namespace Microsoft.NodejsTools.Debugger {
 
         public NodeDebugger(
             string exe,
-            string args,
+            string script,
             string dir,
             string env,
             string interpreterOptions,
@@ -204,11 +205,10 @@ namespace Microsoft.NodejsTools.Debugger {
         ) {
             _onSocketConnectedHandler = onSocketConnectedHandler;
 
-            string allArgs = "--debug-brk";
+            string allArgs = "--debug-brk " + script;
             if (!string.IsNullOrEmpty(interpreterOptions)) {
                 allArgs += " " + interpreterOptions;
             }
-            allArgs += " " + args;
 
             var psi = new ProcessStartInfo(exe, allArgs);
             psi.WorkingDirectory = dir;
@@ -232,6 +232,7 @@ namespace Microsoft.NodejsTools.Debugger {
             _hostName = hostName;
             _portNumber = portNumber;
             _id = id;
+            _attached = true;
         }
 
         #region Public Process API
@@ -256,17 +257,54 @@ namespace Microsoft.NodejsTools.Debugger {
         }
 
         public void WaitForExit() {
+            if (_process == null) {
+                return;
+            }
             _process.WaitForExit();
         }
 
         public bool WaitForExit(int milliseconds) {
+            if (_process == null) {
+                return true;
+            }
             return _process.WaitForExit(milliseconds);
         }
 
         public void Terminate() {
-            Socket = null;
-            if (_process != null && !_process.HasExited) {
-                _process.Kill();
+            lock (this) {
+                // Cleanup socket
+                Socket = null;
+
+                // Fall back to using -1 for exit code if we cannot obtain one from the process
+                // This is the normal case for attach where there is no process to interrogate
+                int exitCode =  -1;
+
+                if (_process != null) {
+                    // Cleanup process
+                    Debug.Assert(!_attached);
+                    try {
+                        if (!_process.HasExited) {
+                            _process.Kill();
+                        } else {
+                            exitCode = _process.ExitCode;
+                        }
+                    } catch {
+                    }
+                    _process.Dispose();
+                    _process = null;
+                } else {
+                    // Avoid multiple events fired if multiple calls to Terminate()
+                    if (!_attached) {
+                        return;
+                    }
+                    _attached = false;
+                }
+
+                // Fire event
+                var exited = ProcessExited;
+                if (exited != null) {
+                    exited(this, new ProcessExitedEventArgs(exitCode));
+                }
             }
         }
 
@@ -666,14 +704,7 @@ namespace Microsoft.NodejsTools.Debugger {
         }
 
         protected override void OnSocketDisconnected() {
-            Socket = null;
-            var exited = ProcessExited;
-            if (exited != null) {
-                // Fall back to using -1 for exit code if we cannot obtain one from the process
-                // This is the normal case for attach where there is no process to interrogate
-                int exitCode = _process != null && _process.HasExited ? _process.ExitCode : -1;
-                exited(this, new ProcessExitedEventArgs(exitCode));
-            }
+            Terminate();
         }
 
         protected override void ProcessPacket(JsonResponse response) {
@@ -1051,10 +1082,13 @@ namespace Microsoft.NodejsTools.Debugger {
         private int? GetExceptionCodeRef(Dictionary<string, object> json) {
             var body = (Dictionary<string, object>)json["body"];
             var exception = (Dictionary<string, object>)body["exception"];
-            var properties = (object[])exception["properties"];
-            foreach (Dictionary<string, object> property in properties) {
-                if (((string)property["name"]) == "code") {
-                    return (int)property["ref"];
+            object propertiesObj = null;
+            if (exception.TryGetValue("properties", out propertiesObj) && propertiesObj != null) {
+                var properties = (object[])propertiesObj;
+                foreach (Dictionary<string, object> property in properties) {
+                    if (((string)property["name"]) == "code") {
+                        return (int)property["ref"];
+                    }
                 }
             }
 
@@ -1768,5 +1802,19 @@ namespace Microsoft.NodejsTools.Debugger {
 
         internal void Close() {
         }
+
+        #region IDisposable
+        public void Dispose() {
+            Dispose(true);
+            GC.SuppressFinalize(this);
+        }
+
+        protected virtual void Dispose(bool disposing) {
+            if (disposing) {
+                //Clean up managed resources
+                Terminate();
+            }
+        }
+        #endregion
     }
 }

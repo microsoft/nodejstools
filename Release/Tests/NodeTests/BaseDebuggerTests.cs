@@ -350,25 +350,24 @@ namespace DebuggerTests {
             }
 
             NodeThread thread = null;
-            var process =
-                DebugProcess(
-                    filename,
-                    onProcessCreated: onProcessCreated,
-                    onLoadComplete: (newproc, newthread) => {
-                        thread = newthread;
-                    },
-                    interpreterOptions: interpreterOptions,
-                    resumeOnProcessLoad: false
-                );
-
-            TestDebuggerSteps(
-                process,
-                thread,
+            using (var process = DebugProcess(
                 filename,
-                steps,
-                defaultExceptionTreatment,
-                exceptionTreatments,
-                waitForExit: true);
+                onProcessCreated: onProcessCreated,
+                onLoadComplete: (newproc, newthread) => {
+                    thread = newthread;
+                },
+                interpreterOptions: interpreterOptions,
+                resumeOnProcessLoad: false
+            )) {
+                TestDebuggerSteps(
+                    process,
+                    thread,
+                    filename,
+                    steps,
+                    defaultExceptionTreatment,
+                    exceptionTreatments,
+                    waitForExit: true);
+            }
         }
 
         internal void TestDebuggerSteps(
