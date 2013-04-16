@@ -662,16 +662,17 @@ namespace Microsoft.NodejsTools {
         public int OpenItem(uint itemid, ref Guid rguidLogicalView, IntPtr punkDocDataExisting, out IVsWindowFrame ppWindowFrame) {
             if (_innerProject3 != null && IsJavaScriptFile(GetItemName(_innerVsHierarchy, itemid))) {
                 // force HTML files opened w/o an editor type to be opened w/ our editor factory.
-                Guid guid = GuidList.guidNodeEditorFactory;
-                return _innerProject3.OpenItemWithSpecific(
+                Guid ourEditor = typeof(NodejsEditorFactory).GUID;
+                Guid view = Guid.Empty;
+                int hr = ((IVsProject3)_innerVsHierarchy).ReopenItem(
                     itemid,
-                    0,
-                    ref guid,
+                    ref ourEditor,
                     null,
-                    rguidLogicalView,
-                    punkDocDataExisting,
+                    ref view,
+                    new IntPtr(-1),
                     out ppWindowFrame
                 );
+                return hr;
             }
 
             return _innerProject.OpenItem(itemid, rguidLogicalView, punkDocDataExisting, out ppWindowFrame);

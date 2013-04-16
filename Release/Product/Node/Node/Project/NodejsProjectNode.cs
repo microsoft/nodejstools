@@ -46,6 +46,12 @@ namespace Microsoft.NodejsTools.Project {
             return res;
         }
 
+        public override Guid SharedCommandGuid {
+            get {
+                return GuidList.guidNodeCmdSet;
+            }
+        }
+
         public override void Close() {
             base.Close();
             if (File.Exists(_referenceFilename)) {

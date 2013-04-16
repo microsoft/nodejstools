@@ -80,6 +80,17 @@
         </Strings>
       </Button>
 
+      <Button guid="guidNodeToolsCmdSet" id="cmdidAddExistingFolder" priority="0x500" type="Button">
+        <Parent guid="guidSHLMainMenu" id="IDG_VS_CTXT_PROJECT_ADD_ITEMS"/>
+        <CommandFlag>DefaultInvisible</CommandFlag>
+        <CommandFlag>DynamicVisibility</CommandFlag>
+        <!-- <Icon guid="guidImages" id="bmpPic2"/> -->
+
+        <Strings>
+          <ButtonText>Existing folder...</ButtonText>
+
+        </Strings>
+      </Button>
 
       <Button guid="guidNodeToolsCmdSet" id="cmdidReplWindow" priority="0x7f00" type="Button">
         <Parent guid="guidSHLMainMenu" id="IDG_VS_WNDO_OTRWNDWS1"/>
@@ -132,7 +143,10 @@
       <IDSymbol name="cmdidReplWindow" value="0x0201" />
       <IDSymbol name="cmdidOpenRemoteDebugProxyFolder" value="0x0202" />
       <IDSymbol name="cmdidSetAsNodejsStartupFile" value="0x0203" />
-
+      
+      <!-- Shared commands, defined in CommonConstants.cs -->
+      <IDSymbol name="cmdidAddExistingFolder" value="0x10001" />
+      
       <!-- Groups -->
       <IDSymbol name="ToolsMenuItemsGroup" value="0x1010" />
       <IDSymbol name="RemoteDebugProxyGroup" value="0x1011" />
