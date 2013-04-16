@@ -14,7 +14,6 @@
 
 using System;
 using System.Collections.Generic;
-using System.Globalization;
 using System.IO;
 using System.Reflection;
 using System.Text;
@@ -47,14 +46,11 @@ namespace Microsoft.NodejsTools.Project {
             return res;
         }
 
-        public override int Close() {
-            int res = base.Close();
-            if (ErrorHandler.Succeeded(res)) {
-                if (File.Exists(_referenceFilename)) {
-                    File.Delete(_referenceFilename);
-                }
+        public override void Close() {
+            base.Close();
+            if (File.Exists(_referenceFilename)) {
+                File.Delete(_referenceFilename);
             }
-            return res;
         }
 
         public override string[] CodeFileExtensions {
@@ -76,8 +72,8 @@ namespace Microsoft.NodejsTools.Project {
             return res;
         }
 
-        protected internal override FolderNode CreateFolderNode(string path, ProjectElement element) {
-            return new CommonFolderNode(this, path, element);
+        protected internal override FolderNode CreateFolderNode(ProjectElement element) {
+            return new CommonFolderNode(this, element);
         }
 
         public override CommonFileNode CreateCodeFileNode(MsBuildProjectElement item) {
@@ -210,7 +206,7 @@ function starts_with(a, b) {
                         switchCode.Append(" || ");
                     }
 
-                    var baseDir = GetHierarchyNodeDirectory(curParent);
+                    var baseDir = curParent.FullPathToChildren;
                     var trimmedBaseDir = CommonUtils.TrimEndSeparator(baseDir);
                     string name = CommonUtils.CreateFriendlyFilePath(
                             baseDir,
@@ -247,7 +243,7 @@ function starts_with(a, b) {
                         // this file is also exposed as the folder
                         switchCode.AppendFormat(
                             "    || (starts_with(__dirname, '{0}') && (module == '{1}'))\r\n",
-                            CommonUtils.TrimEndSeparator(GetHierarchyNodeDirectory(folderPackage.Parent.Parent)).Replace("\\", "\\\\"),
+                            CommonUtils.TrimEndSeparator(folderPackage.Parent.Parent.FullPathToChildren).Replace("\\", "\\\\"),
                             Path.GetFileName(CommonUtils.TrimEndSeparator(folderPackage.Url))
                         );
                     }
@@ -297,7 +293,7 @@ function starts_with(a, b) {
                     for (var curChild = folderNode.FirstChild; curChild != null; curChild = curChild.NextSibling) {
                         CommonFolderNode folderChild = curChild as CommonFolderNode;
                         if (folderChild != null) {
-                            var packageJsonChild = curChild.FindChild(Path.Combine(curChild.Url, NodeConstants.PackageJsonFile));
+                            var packageJsonChild = curChild.FindImmediateChildByName(NodeConstants.PackageJsonFile);
 
                             Dictionary<string, object> packageJson = null;
                             if (packageJsonChild != null && File.Exists(packageJsonChild.Url)) {
@@ -323,14 +319,17 @@ function starts_with(a, b) {
                                 }
                                 mainFileStr = mainFileStr.Replace('/', '\\');
 
-                                var rootFile = curChild.FindChild(Path.Combine(curChild.Url, mainFileStr)) as FileNode;
+                                var rootFile = curChild.FindImmediateChildByName(mainFileStr) as FileNode;
+                                if (rootFile == null && Path.GetExtension(mainFileStr) == "") {
+                                    rootFile = curChild.FindImmediateChildByName(mainFileStr + ".js") as FileNode;
+                                }
                                 if (rootFile != null) {
                                     directoryPackages[rootFile] = folderChild;
                                 }
                             }
 
 
-                            var indexJsChild = curChild.FindChild(Path.Combine(curChild.Url, NodeConstants.DefaultPackageMainFile)) as FileNode;
+                            var indexJsChild = curChild.FindImmediateChildByName(NodeConstants.DefaultPackageMainFile) as FileNode;
                             if (indexJsChild != null && File.Exists(indexJsChild.Url)) {
                                 directoryPackages[indexJsChild] = folderChild;
                             }
@@ -339,10 +338,6 @@ function starts_with(a, b) {
                 }
             }
             return directoryPackages;
-        }
-
-        private string GetHierarchyNodeDirectory(HierarchyNode curParent) {
-            return curParent is NodejsProjectNode ? ProjectHome : curParent.Url;
         }
 
         /// <summary>

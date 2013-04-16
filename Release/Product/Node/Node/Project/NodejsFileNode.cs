@@ -105,16 +105,13 @@ namespace Microsoft.NodejsTools.Project {
             _watcher.Dispose();
         }
 
-        public override int Close() {
-            int res;
-            if (ErrorHandler.Succeeded(res = base.Close())) {
-                _watcher.EnableRaisingEvents = false;
-                _watcher.Dispose();
-            }
+        public override void Close() {
+            base.Close();
+            _watcher.EnableRaisingEvents = false;
+            _watcher.Dispose();
             lock (((NodejsProjectNode)ProjectMgr)._nodeFiles) {
                 ((NodejsProjectNode)ProjectMgr)._nodeFiles.Remove(this);
             }
-            return res;
         }
     }
 }

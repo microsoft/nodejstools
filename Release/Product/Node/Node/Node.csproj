@@ -501,6 +501,7 @@
     <Compile Include="CustomTrackingSpan.cs" />
     <Compile Include="EditFilter.cs" />
     <Compile Include="NodeProjectConfig.cs" />
+    <Compile Include="Project\IDiskBasedNode.cs" />
     <Compile Include="Project\NodejsFileNode.cs" />
     <Compile Include="Project\NodejsGeneralPropertyPageControl.cs">
       <SubType>UserControl</SubType>
