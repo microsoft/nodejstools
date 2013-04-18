@@ -128,8 +128,7 @@ namespace Microsoft.NodejsTools.Project {
 
         public override void Remove(bool removeFromStorage) {
             base.Remove(removeFromStorage);
-            _watcher.EnableRaisingEvents = false;
-            _watcher.Dispose();
+            CloseWatcher();
         }
 
         public override void Close() {
