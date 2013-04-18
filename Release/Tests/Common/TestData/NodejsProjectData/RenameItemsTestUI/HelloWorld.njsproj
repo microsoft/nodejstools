@@ -28,6 +28,9 @@
   </PropertyGroup>
   <ItemGroup>
     <Content Include="server.js" />
+    <Folder Include="Sub1" />
+    <Folder Include="Sub1\Sub2" />
+    <Content Include="Sub1\Sub2\Foo.js" />
   </ItemGroup>
   <Import Project="$(VSToolsPath)\Node.js Tools\Microsoft.NodejsTools.targets" />
   <ProjectExtensions>

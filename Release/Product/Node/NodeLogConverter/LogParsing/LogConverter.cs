@@ -116,6 +116,7 @@ namespace Microsoft.NodejsTools.LogParsing {
             Guid pdbSig;
             uint pdbAge;
             string dllPath = CreatePdbFile(out pdbSig, out pdbAge);
+            _allMethods.Clear();
 
             int tickCount = 0;
             using (var reader = new StreamReader(_filename)) {
@@ -221,7 +222,11 @@ namespace Microsoft.NodejsTools.LogParsing {
                                 methodLoad.MethodFlags = 8;
 
                                 var funcInfo = ExtractNamespaceAndMethodName(records[4]);
-                                log.Trace(header, methodLoad, funcInfo.Namespace, funcInfo.Function, "" /* signature*/);
+                                string functionName = funcInfo.Function;
+                                if (funcInfo.IsRecompilation) {
+                                    functionName += " (recompiled)";
+                                }
+                                log.Trace(header, methodLoad, funcInfo.Namespace, functionName, "" /* signature*/);
 
                                 methodToken++;
                                 break;
@@ -354,16 +359,27 @@ namespace Microsoft.NodejsTools.LogParsing {
             public readonly string Function;
             public readonly string Filename;
             public readonly int? LineNumber;
+            public readonly bool IsRecompilation;
 
-            public FunctionInformation(string ns, string methodName, int? lineNo, string filename) {
+            public FunctionInformation(string ns, string methodName, int? lineNo, string filename, bool isRecompilation) {
                 Namespace = ns;
                 Function = methodName;
                 LineNumber = lineNo;
                 Filename = filename;
+                IsRecompilation = isRecompilation;
             }
         }
 
-        internal static FunctionInformation ExtractNamespaceAndMethodName(string method) {
+        private HashSet<string> _allMethods = new HashSet<string>();
+
+        internal FunctionInformation ExtractNamespaceAndMethodName(string method) {
+            bool isRecompilation = !_allMethods.Add(method);
+
+            return ExtractNamespaceAndMethodName(method, isRecompilation);
+        }
+
+        internal static FunctionInformation ExtractNamespaceAndMethodName(string method, bool isRecompilation) {
+            
             string methodName = method;
             string ns = "";
             int? lineNo = null;
@@ -403,8 +419,8 @@ namespace Microsoft.NodejsTools.LogParsing {
                     }
                 }
             }
-            
-            return new FunctionInformation(ns, methodName, lineNo, filename);
+
+            return new FunctionInformation(ns, methodName, lineNo, filename, isRecompilation);
         }
 
         private static EVENT_TRACE_HEADER NewMethodEventHeader() {

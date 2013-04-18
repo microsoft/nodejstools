@@ -74,17 +74,44 @@ namespace Microsoft.NodejsTools.Project {
             return base.QueryStatusOnNode(guidCmdGroup, cmd, pCmdText, ref result);
         }
 
+        private void CloseWatcher() {
+            if (_watcher == null) {
+                ProjectMgr.UnregisterFileChangeNotification(this);
+            } else {
+                _watcher.EnableRaisingEvents = false;
+                _watcher.Dispose();
+                _watcher = null;
+            }
+        }
+
         private void CreateWatcher(string filename) {
-            _watcher = new FileSystemWatcher(Path.GetDirectoryName(filename), Path.GetFileName(filename));
-            _watcher.EnableRaisingEvents = true;
-            _watcher.Changed += FileContentsChanged;
-            _watcher.NotifyFilter = NotifyFilters.LastWrite;
+            if (CommonUtils.IsSubpathOf(ProjectMgr.ProjectHome, filename)) {
+                // we want to subscribe to the project's file system watcher so users
+                // can continue to rename the directory which contains this file.
+                ProjectMgr.RegisterFileChangeNotification(this, FileContentsChanged);
+            } else {
+                // this is a link file which lives outside of our project directory,
+                // we'll need to watch the file directly, which means we're going to
+                // prevent it's parent directory from being renamed.
+                _watcher = new FileSystemWatcher(Path.GetDirectoryName(filename), Path.GetFileName(filename));
+                _watcher.EnableRaisingEvents = true;
+                _watcher.Changed += FileContentsChanged;
+                _watcher.NotifyFilter = NotifyFilters.LastWrite;
+            }
         }
 
         protected override void RenameInStorage(string oldName, string newName) {
+            CloseWatcher();
+
             base.RenameInStorage(oldName, newName);
-            _watcher.Dispose();
+
             CreateWatcher(newName);
+        }
+
+        public new NodejsProjectNode ProjectMgr {
+            get {
+                return (NodejsProjectNode)base.ProjectMgr;
+            }
         }
 
         private void FileContentsChanged(object sender, FileSystemEventArgs e) {
@@ -107,8 +134,9 @@ namespace Microsoft.NodejsTools.Project {
 
         public override void Close() {
             base.Close();
-            _watcher.EnableRaisingEvents = false;
-            _watcher.Dispose();
+            
+            CloseWatcher();
+
             lock (((NodejsProjectNode)ProjectMgr)._nodeFiles) {
                 ((NodejsProjectNode)ProjectMgr)._nodeFiles.Remove(this);
             }

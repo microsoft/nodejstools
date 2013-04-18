@@ -68,7 +68,7 @@ namespace Microsoft.NodejsTools.Profiling {
                 if (!File.Exists(v8log)) {
                     MessageBox.Show(String.Format("v8 log file was not successfully saved to:\r\n{0}\r\n\r\nNo profiling data is available.", v8log));
                     return;
-                }
+                }   
 
                 var psi = new ProcessStartInfo(
                         Path.Combine(
