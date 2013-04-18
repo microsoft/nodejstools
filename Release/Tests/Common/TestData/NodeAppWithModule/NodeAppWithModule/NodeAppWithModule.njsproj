@@ -28,6 +28,7 @@
   </PropertyGroup>
   <ItemGroup>
     <Content Include="mymod.js" />
+    <Content Include="intellisensemod.js" />
     <Content Include="mutatemod.js" />
     <Content Include="server.js" />
     <Content Include="Web.config" />

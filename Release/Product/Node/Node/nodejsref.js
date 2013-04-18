@@ -990,14 +990,14 @@ function require(module) {
                     /// <signature>
                     /// <param name="details"></param>
                     /// </signature>
-                    return new crypto.Credentials();
+                    return new this.Credentials();
                 }
                 this.createHash = function(algorithm) {
                     /// <summary><p>Creates and returns a hash object, a cryptographic hash with the given algorithm which can be used to generate hash digests.  </p> <p><code>algorithm</code> is dependent on the available algorithms supported by the version of OpenSSL on the platform. Examples are <code>&#39;sha1&#39;</code>, <code>&#39;md5&#39;</code>, <code>&#39;sha256&#39;</code>, <code>&#39;sha512&#39;</code>, etc.  On recent releases, <code>openssl list-message-digest-algorithms</code> will display the available digest algorithms.  </p> <p>Example: this program that takes the sha1 sum of a file  </p> <pre><code>var filename = process.argv[2]; var crypto = require(&#39;crypto&#39;); var fs = require(&#39;fs&#39;);  var shasum = crypto.createHash(&#39;sha1&#39;);  var s = fs.ReadStream(filename); s.on(&#39;data&#39;, function(d) {   shasum.update(d); });  s.on(&#39;end&#39;, function() {   var d = shasum.digest(&#39;hex&#39;);   console.log(d + &#39;  &#39; + filename); });</code></pre> </summary>
                     /// <signature>
                     /// <param name="algorithm"></param>
                     /// </signature>
-                    return new crypto.Hash();
+                    return new this.Hash();
                 }
                 this.createHmac = function(algorithm, key) {
                     /// <summary><p>Creates and returns a hmac object, a cryptographic hmac with the given algorithm and key.  </p> <p>It is a <a href="stream.html">stream</a> that is both readable and writable.  The written data is used to compute the hmac.  Once the writable side of the stream is ended, use the <code>read()</code> method to get the computed digest.  The legacy <code>update</code> and <code>digest</code> methods are also supported.  </p> <p><code>algorithm</code> is dependent on the available algorithms supported by OpenSSL - see createHash above.  <code>key</code> is the hmac key to be used.  </p> </summary>
@@ -1005,7 +1005,7 @@ function require(module) {
                     /// <param name="algorithm"></param>
                     /// <param name="key"></param>
                     /// </signature>
-                    return new crypto.Hmac();
+                    return new this.Hmac();
                 }
                 this.createCipher = function(algorithm, password) {
                     /// <summary><p>Creates and returns a cipher object, with the given algorithm and password.  </p> <p><code>algorithm</code> is dependent on OpenSSL, examples are <code>&#39;aes192&#39;</code>, etc.  On recent releases, <code>openssl list-cipher-algorithms</code> will display the available cipher algorithms.  <code>password</code> is used to derive key and IV, which must be a <code>&#39;binary&#39;</code> encoded string or a <a href="buffer.html">buffer</a>.  </p> <p>It is a <a href="stream.html">stream</a> that is both readable and writable.  The written data is used to compute the hash.  Once the writable side of the stream is ended, use the <code>read()</code> method to get the computed hash digest.  The legacy <code>update</code> and <code>digest</code> methods are also supported.  </p> </summary>
@@ -1013,7 +1013,7 @@ function require(module) {
                     /// <param name="algorithm"></param>
                     /// <param name="password"></param>
                     /// </signature>
-                    return new crypto.Cipher();
+                    return new this.Cipher();
                 }
                 this.createCipheriv = function(algorithm, key, iv) {
                     /// <summary><p>Creates and returns a cipher object, with the given algorithm, key and iv.  </p> <p><code>algorithm</code> is the same as the argument to <code>createCipher()</code>.  <code>key</code> is the raw key used by the algorithm.  <code>iv</code> is an <a href="http://en.wikipedia.org/wiki/Initialization_vector">initialization vector</a>.  </p> <p><code>key</code> and <code>iv</code> must be <code>&#39;binary&#39;</code> encoded strings or <a href="buffer.html">buffers</a>.  </p> </summary>
@@ -1022,7 +1022,7 @@ function require(module) {
                     /// <param name="key"></param>
                     /// <param name="iv"></param>
                     /// </signature>
-                    return new crypto.Cipheriv();
+                    return new this.Cipheriv();
                 }
                 this.createDecipher = function(algorithm, password) {
                     /// <summary><p>Creates and returns a decipher object, with the given algorithm and key.  This is the mirror of the [createCipher()][] above.  </p> </summary>
@@ -1030,7 +1030,7 @@ function require(module) {
                     /// <param name="algorithm"></param>
                     /// <param name="password"></param>
                     /// </signature>
-                    return new crypto.Decipher();
+                    return new this.Decipher();
                 }
                 this.createDecipheriv = function(algorithm, key, iv) {
                     /// <summary><p>Creates and returns a decipher object, with the given algorithm, key and iv.  This is the mirror of the [createCipheriv()][] above.  </p> </summary>
@@ -1039,28 +1039,28 @@ function require(module) {
                     /// <param name="key"></param>
                     /// <param name="iv"></param>
                     /// </signature>
-                    return new crypto.Decipheriv();
+                    return new this.Decipheriv();
                 }
                 this.createSign = function(algorithm) {
                     /// <summary><p>Creates and returns a signing object, with the given algorithm.  On recent OpenSSL releases, <code>openssl list-public-key-algorithms</code> will display the available signing algorithms. Examples are <code>&#39;RSA-SHA256&#39;</code>.  </p> </summary>
                     /// <signature>
                     /// <param name="algorithm"></param>
                     /// </signature>
-                    return new crypto.Sign();
+                    return new this.Sign();
                 }
                 this.createVerify = function(algorithm) {
                     /// <summary><p>Creates and returns a verification object, with the given algorithm. This is the mirror of the signing object above.  </p> </summary>
                     /// <signature>
                     /// <param name="algorithm"></param>
                     /// </signature>
-                    return new crypto.Verify();
+                    return new this.Verify();
                 }
                 this.createDiffieHellman = function(prime_length) {
                     /// <summary><p>Creates a Diffie-Hellman key exchange object and generates a prime of the given bit length. The generator used is <code>2</code>.  </p> </summary>
                     /// <signature>
                     /// <param name="prime_length"></param>
                     /// </signature>
-                    return new crypto.DiffieHellman();
+                    return new this.DiffieHellman();
                 }
                 this.createDiffieHellman = function(prime, encoding) {
                     /// <summary><p>Creates a Diffie-Hellman key exchange object using the supplied prime. The generator used is <code>2</code>. Encoding can be <code>&#39;binary&#39;</code>, <code>&#39;hex&#39;</code>, or <code>&#39;base64&#39;</code>.  If no encoding is specified, then a buffer is expected.  </p> </summary>
@@ -1068,7 +1068,7 @@ function require(module) {
                     /// <param name="prime"></param>
                     /// <param name="encoding"></param>
                     /// </signature>
-                    return new crypto.DiffieHellman();
+                    return new this.DiffieHellman();
                 }
                 this.getDiffieHellman = function(group_name) {
                     /// <summary><p>Creates a predefined Diffie-Hellman key exchange object.  The supported groups are: <code>&#39;modp1&#39;</code>, <code>&#39;modp2&#39;</code>, <code>&#39;modp5&#39;</code> (defined in [RFC 2412][]) and <code>&#39;modp14&#39;</code>, <code>&#39;modp15&#39;</code>, <code>&#39;modp16&#39;</code>, <code>&#39;modp17&#39;</code>, <code>&#39;modp18&#39;</code> (defined in [RFC 3526][]).  The returned object mimics the interface of objects created by [crypto.createDiffieHellman()][] above, but will not allow to change the keys (with [diffieHellman.setPublicKey()][] for example).  The advantage of using this routine is that the parties don&#39;t have to generate nor exchange group modulus beforehand, saving both processor and communication time.  </p> <p>Example (obtaining a shared secret):  </p> <pre><code>var crypto = require(&#39;crypto&#39;); var alice = crypto.getDiffieHellman(&#39;modp5&#39;); var bob = crypto.getDiffieHellman(&#39;modp5&#39;);  alice.generateKeys(); bob.generateKeys();  var alice_secret = alice.computeSecret(bob.getPublicKey(), null, &#39;hex&#39;); var bob_secret = bob.computeSecret(alice.getPublicKey(), null, &#39;hex&#39;);  /* alice_secret and bob_secret should be the same */ console.log(alice_secret == bob_secret);</code></pre> </summary>
@@ -1278,7 +1278,7 @@ function require(module) {
                     /// <param name="options"></param>
                     /// <param name="secureConnectionListener"></param>
                     /// </signature>
-                    return new tls_.Server();
+                    return new this.Server();
                 }
                 this.connect = function(port, host, options, callback) {
                     /// <summary><p>Creates a new client connection to the given <code>port</code> and <code>host</code> (old API) or <code>options.port</code> and <code>options.host</code>. (If <code>host</code> is omitted, it defaults to <code>localhost</code>.) <code>options</code> should be an object which specifies:  </p> <ul> <li><p><code>host</code>: Host the client should connect to</p> </li> <li><p><code>port</code>: Port the client should connect to</p> </li> <li><p><code>socket</code>: Establish secure connection on a given socket rather than creating a new socket. If this option is specified, <code>host</code> and <code>port</code> are ignored.</p> </li> <li><p><code>pfx</code>: A string or <code>Buffer</code> containing the private key, certificate and CA certs of the server in PFX or PKCS12 format.</p> </li> <li><p><code>key</code>: A string or <code>Buffer</code> containing the private key of the client in PEM format.</p> </li> <li><p><code>passphrase</code>: A string of passphrase for the private key or pfx.</p> </li> <li><p><code>cert</code>: A string or <code>Buffer</code> containing the certificate key of the client in PEM format.</p> </li> <li><p><code>ca</code>: An array of strings or <code>Buffer</code>s of trusted certificates. If this is omitted several well known &quot;root&quot; CAs will be used, like VeriSign. These are used to authorize connections.</p> </li> <li><p><code>rejectUnauthorized</code>: If <code>true</code>, the server certificate is verified against the list of supplied CAs. An <code>&#39;error&#39;</code> event is emitted if verification fails. Default: <code>true</code>.</p> </li> <li><p><code>NPNProtocols</code>: An array of string or <code>Buffer</code> containing supported NPN protocols. <code>Buffer</code> should have following format: <code>0x05hello0x05world</code>, where first byte is next protocol name&#39;s length. (Passing array should usually be much simpler: <code>[&#39;hello&#39;, &#39;world&#39;]</code>.)</p> </li> <li><p><code>servername</code>: Servername for SNI (Server Name Indication) TLS extension.</p> </li> </ul> <p>The <code>callback</code> parameter will be added as a listener for the [&#39;secureConnect&#39;][] event.  </p> <p><code>tls.connect()</code> returns a [CleartextStream][] object.  </p> <p>Here is an example of a client of echo server as described previously:  </p> <pre><code>var tls = require(&#39;tls&#39;); var fs = require(&#39;fs&#39;);  var options = {   // These are necessary only if using the client certificate authentication   key: fs.readFileSync(&#39;client-key.pem&#39;),   cert: fs.readFileSync(&#39;client-cert.pem&#39;),    // This is necessary only if the server uses the self-signed certificate   ca: [ fs.readFileSync(&#39;server-cert.pem&#39;) ] };  var cleartextStream = tls.connect(8000, options, function() {   console.log(&#39;client connected&#39;,               cleartextStream.authorized ? &#39;authorized&#39; : &#39;unauthorized&#39;);   process.stdin.pipe(cleartextStream);   process.stdin.resume(); }); cleartextStream.setEncoding(&#39;utf8&#39;); cleartextStream.on(&#39;data&#39;, function(data) {   console.log(data); }); cleartextStream.on(&#39;end&#39;, function() {   server.close(); });</code></pre> <p>Or  </p> <pre><code>var tls = require(&#39;tls&#39;); var fs = require(&#39;fs&#39;);  var options = {   pfx: fs.readFileSync(&#39;client.pfx&#39;) };  var cleartextStream = tls.connect(8000, options, function() {   console.log(&#39;client connected&#39;,               cleartextStream.authorized ? &#39;authorized&#39; : &#39;unauthorized&#39;);   process.stdin.pipe(cleartextStream);   process.stdin.resume(); }); cleartextStream.setEncoding(&#39;utf8&#39;); cleartextStream.on(&#39;data&#39;, function(data) {   console.log(data); }); cleartextStream.on(&#39;end&#39;, function() {   server.close(); });</code></pre> </summary>
@@ -1310,7 +1310,7 @@ function require(module) {
                     /// <param name="requestCert"></param>
                     /// <param name="rejectUnauthorized"></param>
                     /// </signature>
-                    return new tls_.SecurePair();
+                    return new this.SecurePair();
                 }
                 this.SecurePair = function() {
                     emitter = new Events().EventEmitter;
@@ -1929,7 +1929,7 @@ function require(module) {
                     /// <param name="path"></param>
                     /// <param name="options"></param>
                     /// </signature>
-                    return new fs.ReadStream();
+                    return new this.ReadStream();
                 }
                 this.createWriteStream = function(path, options) {
                     /// <summary><p>Returns a new WriteStream object (See <code>Writable Stream</code>).  </p> <p><code>options</code> is an object with the following defaults:  </p> <pre><code>{ flags: &#39;w&#39;,   encoding: null,   mode: 0666 }</code></pre> <p><code>options</code> may also include a <code>start</code> option to allow writing data at some position past the beginning of the file.  Modifying a file rather than replacing it may require a <code>flags</code> mode of <code>r+</code> rather than the default mode <code>w</code>.  </p> </summary>
@@ -1937,7 +1937,7 @@ function require(module) {
                     /// <param name="path"></param>
                     /// <param name="options"></param>
                     /// </signature>
-                    return new fs.WriteStream();
+                    return new this.WriteStream();
                 }
                 this.Stats = function() {
                 }
@@ -2021,7 +2021,7 @@ function require(module) {
                     /// <param name="options"></param>
                     /// <param name="connectionListener"></param>
                     /// </signature>
-                    return new net.Server();
+                    return new this.Server();
                 }
                 this.connect = function(options, connectionListener) {
                     /// <summary><p>Constructs a new socket object and opens the socket to the given location. When the socket is established, the [&#39;connect&#39;][] event will be emitted.  </p> <p>For TCP sockets, <code>options</code> argument should be an object which specifies:  </p> <ul> <li><p><code>port</code>: Port the client should connect to (Required).</p> </li> <li><p><code>host</code>: Host the client should connect to. Defaults to <code>&#39;localhost&#39;</code>.</p> </li> <li><p><code>localAddress</code>: Local interface to bind to for network connections.</p> </li> </ul> <p>For UNIX domain sockets, <code>options</code> argument should be an object which specifies:  </p> <ul> <li><code>path</code>: Path the client should connect to (Required).</li> </ul> <p>Common options are:  </p> <ul> <li><code>allowHalfOpen</code>: if <code>true</code>, the socket won&#39;t automatically send a FIN packet when the other end of the socket sends a FIN packet. Defaults to <code>false</code>.  See [&#39;end&#39;][] event for more information.</li> </ul> <p>The <code>connectListener</code> parameter will be added as an listener for the [&#39;connect&#39;][] event.  </p> <p>Here is an example of a client of echo server as described previously:  </p> <pre><code>var net = require(&#39;net&#39;); var client = net.connect({port: 8124},     function() { //&#39;connect&#39; listener   console.log(&#39;client connected&#39;);   client.write(&#39;world!\r\n&#39;); }); client.on(&#39;data&#39;, function(data) {   console.log(data.toString());   client.end(); }); client.on(&#39;end&#39;, function() {   console.log(&#39;client disconnected&#39;); });</code></pre> <p>To connect on the socket <code>/tmp/echo.sock</code> the second line would just be changed to  </p> <pre><code>var client = net.connect({path: &#39;/tmp/echo.sock&#39;},</code></pre> </summary>
@@ -2040,7 +2040,7 @@ function require(module) {
                     /// <param name="options"></param>
                     /// <param name="connectionListener"></param>
                     /// </signature>
-                    return new net.Connection();
+                    return new this.Connection();
                 }
                 this.connect = function(port, host, connectListener) {
                     /// <summary><p>Creates a TCP connection to <code>port</code> on <code>host</code>. If <code>host</code> is omitted, <code>&#39;localhost&#39;</code> will be assumed. The <code>connectListener</code> parameter will be added as an listener for the [&#39;connect&#39;][] event.  </p> </summary>
@@ -2062,7 +2062,7 @@ function require(module) {
                     /// <param name="host"></param>
                     /// <param name="connectListener"></param>
                     /// </signature>
-                    return new net.Connection();
+                    return new this.Connection();
                 }
                 this.connect = function(path, connectListener) {
                     /// <summary><p>Creates unix socket connection to <code>path</code>. The <code>connectListener</code> parameter will be added as an listener for the [&#39;connect&#39;][] event.  </p> </summary>
@@ -2081,7 +2081,7 @@ function require(module) {
                     /// <param name="path"></param>
                     /// <param name="connectListener"></param>
                     /// </signature>
-                    return new net.Connection();
+                    return new this.Connection();
                 }
                 this.isIP = function(input) {
                     /// <summary><p>Tests if input is an IP address. Returns 0 for invalid strings, returns 4 for IP version 4 addresses, and returns 6 for IP version 6 addresses.   </p> </summary>
@@ -2293,7 +2293,7 @@ function require(module) {
                     /// <param name="type"></param>
                     /// <param name="callback"></param>
                     /// </signature>
-                    return new dgram.Socket();
+                    return new this.Socket();
                 }
                 this.Socket = function() {
                     this.send = function(buf, offset, length, port, address, callback) {
@@ -2491,7 +2491,7 @@ function require(module) {
                     /// <signature>
                     /// <param name="requestListener"></param>
                     /// </signature>
-                    return new http.Server();
+                    return new this.Server();
                 }
                 this.createClient = function(port, host) {
                     /// <summary><p>This function is <strong>deprecated</strong>; please use [http.request()][] instead. Constructs a new HTTP client. <code>port</code> and <code>host</code> refer to the server to be connected to.  </p> </summary>
@@ -2499,7 +2499,7 @@ function require(module) {
                     /// <param name="port"></param>
                     /// <param name="host"></param>
                     /// </signature>
-                    return new http.Client();
+                    return new this.Client();
                 }
                 this.request = function(options, callback) {
                     /// <summary><p>Node maintains several connections per server to make HTTP requests. This function allows one to transparently issue requests.  </p> <p><code>options</code> can be an object or a string. If <code>options</code> is a string, it is automatically parsed with [url.parse()][].  </p> <p>Options:  </p> <ul> <li><code>host</code>: A domain name or IP address of the server to issue the request to. Defaults to <code>&#39;localhost&#39;</code>.</li> <li><code>hostname</code>: To support <code>url.parse()</code> <code>hostname</code> is preferred over <code>host</code></li> <li><code>port</code>: Port of remote server. Defaults to 80.</li> <li><code>localAddress</code>: Local interface to bind for network connections.</li> <li><code>socketPath</code>: Unix Domain Socket (use one of host:port or socketPath)</li> <li><code>method</code>: A string specifying the HTTP request method. Defaults to <code>&#39;GET&#39;</code>.</li> <li><code>path</code>: Request path. Defaults to <code>&#39;/&#39;</code>. Should include query string if any. E.G. <code>&#39;/index.html?page=12&#39;</code></li> <li><code>headers</code>: An object containing request headers.</li> <li><code>auth</code>: Basic authentication i.e. <code>&#39;user:password&#39;</code> to compute an Authorization header.</li> <li><code>agent</code>: Controls [Agent][] behavior. When an Agent is used request will default to <code>Connection: keep-alive</code>. Possible values:<ul> <li><code>undefined</code> (default): use [global Agent][] for this host and port.</li> <li><code>Agent</code> object: explicitly use the passed in <code>Agent</code>.</li> <li><code>false</code>: opts out of connection pooling with an Agent, defaults request to <code>Connection: close</code>.</li> </ul> </li> </ul> <p><code>http.request()</code> returns an instance of the <code>http.ClientRequest</code> class. The <code>ClientRequest</code> instance is a writable stream. If one needs to upload a file with a POST request, then write to the <code>ClientRequest</code> object.  </p> <p>Example:  </p> <pre><code>var options = {   hostname: &#39;www.google.com&#39;,   port: 80,   path: &#39;/upload&#39;,   method: &#39;POST&#39; };  var req = http.request(options, function(res) {   console.log(&#39;STATUS: &#39; + res.statusCode);   console.log(&#39;HEADERS: &#39; + JSON.stringify(res.headers));   res.setEncoding(&#39;utf8&#39;);   res.on(&#39;data&#39;, function (chunk) {     console.log(&#39;BODY: &#39; + chunk);   }); });  req.on(&#39;error&#39;, function(e) {   console.log(&#39;problem with request: &#39; + e.message); });  // write data to request body req.write(&#39;data\n&#39;); req.write(&#39;data\n&#39;); req.end();</code></pre> <p>Note that in the example <code>req.end()</code> was called. With <code>http.request()</code> one must always call <code>req.end()</code> to signify that you&#39;re done with the request - even if there is no data being written to the request body.  </p> <p>If any error is encountered during the request (be that with DNS resolution, TCP level errors, or actual HTTP parse errors) an <code>&#39;error&#39;</code> event is emitted on the returned request object.  </p> <p>There are a few special headers that should be noted.  </p> <ul> <li><p>Sending a &#39;Connection: keep-alive&#39; will notify Node that the connection to the server should be persisted until the next request.</p> </li> <li><p>Sending a &#39;Content-length&#39; header will disable the default chunked encoding.</p> </li> <li><p>Sending an &#39;Expect&#39; header will immediately send the request headers. Usually, when sending &#39;Expect: 100-continue&#39;, you should both set a timeout and listen for the <code>continue</code> event. See RFC2616 Section 8.2.3 for more information.</p> </li> <li><p>Sending an Authorization header will override using the <code>auth</code> option to compute basic authentication.</p> </li> </ul> </summary>
@@ -2725,7 +2725,7 @@ function require(module) {
                     /// <param name="options"></param>
                     /// <param name="requestListener"></param>
                     /// </signature>
-                    return new https.Server();
+                    return new this.Server();
                 }
                 this.request = function(options, callback) {
                     /// <summary><p>Makes a request to a secure web server.  </p> <p><code>options</code> can be an object or a string. If <code>options</code> is a string, it is automatically parsed with <a href="url.html#url.parse">url.parse()</a>.  </p> <p>All options from [http.request()][] are valid.  </p> <p>Example:  </p> <pre><code>var https = require(&#39;https&#39;);  var options = {   hostname: &#39;encrypted.google.com&#39;,   port: 443,   path: &#39;/&#39;,   method: &#39;GET&#39; };  var req = https.request(options, function(res) {   console.log(&quot;statusCode: &quot;, res.statusCode);   console.log(&quot;headers: &quot;, res.headers);    res.on(&#39;data&#39;, function(d) {     process.stdout.write(d);   }); }); req.end();  req.on(&#39;error&#39;, function(e) {   console.error(e); });</code></pre> <p>The options argument has the following options  </p> <ul> <li><code>host</code>: A domain name or IP address of the server to issue the request to. Defaults to <code>&#39;localhost&#39;</code>.</li> <li><code>hostname</code>: To support <code>url.parse()</code> <code>hostname</code> is preferred over <code>host</code></li> <li><code>port</code>: Port of remote server. Defaults to 443.</li> <li><code>method</code>: A string specifying the HTTP request method. Defaults to <code>&#39;GET&#39;</code>.</li> <li><code>path</code>: Request path. Defaults to <code>&#39;/&#39;</code>. Should include query string if any. E.G. <code>&#39;/index.html?page=12&#39;</code></li> <li><code>headers</code>: An object containing request headers.</li> <li><code>auth</code>: Basic authentication i.e. <code>&#39;user:password&#39;</code> to compute an Authorization header.</li> <li><code>agent</code>: Controls [Agent][] behavior. When an Agent is used request will default to <code>Connection: keep-alive</code>. Possible values:<ul> <li><code>undefined</code> (default): use [globalAgent][] for this host and port.</li> <li><code>Agent</code> object: explicitly use the passed in <code>Agent</code>.</li> <li><code>false</code>: opts out of connection pooling with an Agent, defaults request to <code>Connection: close</code>.</li> </ul> </li> </ul> <p>The following options from [tls.connect()][] can also be specified. However, a [globalAgent][] silently ignores these.  </p> <ul> <li><code>pfx</code>: Certificate, Private key and CA certificates to use for SSL. Default <code>null</code>.</li> <li><code>key</code>: Private key to use for SSL. Default <code>null</code>.</li> <li><code>passphrase</code>: A string of passphrase for the private key or pfx. Default <code>null</code>.</li> <li><code>cert</code>: Public x509 certificate to use. Default <code>null</code>.</li> <li><code>ca</code>: An authority certificate or array of authority certificates to check the remote host against.</li> <li><code>ciphers</code>: A string describing the ciphers to use or exclude. Consult <a href="http://www.openssl.org/docs/apps/ciphers.html#CIPHER_LIST_FORMAT">http://www.openssl.org/docs/apps/ciphers.html#CIPHER_LIST_FORMAT</a> for details on the format.</li> <li><code>rejectUnauthorized</code>: If <code>true</code>, the server certificate is verified against the list of supplied CAs. An <code>&#39;error&#39;</code> event is emitted if verification fails. Verification happens at the connection level, <em>before</em> the HTTP request is sent. Default <code>true</code>.</li> </ul> <p>In order to specify these options, use a custom <code>Agent</code>.  </p> <p>Example:  </p> <pre><code>var options = {   hostname: &#39;encrypted.google.com&#39;,   port: 443,   path: &#39;/&#39;,   method: &#39;GET&#39;,   key: fs.readFileSync(&#39;test/fixtures/keys/agent2-key.pem&#39;),   cert: fs.readFileSync(&#39;test/fixtures/keys/agent2-cert.pem&#39;) }; options.agent = new https.Agent(options);  var req = https.request(options, function(res) {   ... }</code></pre> <p>Or does not use an <code>Agent</code>.  </p> <p>Example:  </p> <pre><code>var options = {   hostname: &#39;encrypted.google.com&#39;,   port: 443,   path: &#39;/&#39;,   method: &#39;GET&#39;,   key: fs.readFileSync(&#39;test/fixtures/keys/agent2-key.pem&#39;),   cert: fs.readFileSync(&#39;test/fixtures/keys/agent2-cert.pem&#39;),   agent: false };  var req = https.request(options, function(res) {   ... }</code></pre> </summary>
@@ -2833,7 +2833,7 @@ function require(module) {
                     /// <signature>
                     /// <param name="options"></param>
                     /// </signature>
-                    return new readline.Interface();
+                    return new this.Interface();
                 }
                 this.Interface = function() {
                     this.setPrompt = function(prompt, length) {
@@ -2913,7 +2913,7 @@ function require(module) {
                     /// <signature>
                     /// <param name="initSandbox"></param>
                     /// </signature>
-                    return new vm.Context();
+                    return new this.Context();
                 }
                 this.createScript = function(code, filename) {
                     /// <summary><p><code>createScript</code> compiles <code>code</code> but does not run it. Instead, it returns a <code>vm.Script</code> object representing this compiled code. This script can be run later many times using methods below. The returned script is not bound to any global object. It is bound before each run, just for that run. <code>filename</code> is optional, it&#39;s only used in stack traces.  </p> <p>In case of syntax error in <code>code</code>, <code>createScript</code> prints the syntax error to stderr and throws an exception.   </p> </summary>
@@ -2921,7 +2921,7 @@ function require(module) {
                     /// <param name="code"></param>
                     /// <param name="filename"></param>
                     /// </signature>
-                    return new vm.Script();
+                    return new this.Script();
                 }
                 this.Script = function() {
                     this.runInThisContext = function() {
@@ -3160,49 +3160,49 @@ function require(module) {
                     /// <signature>
                     /// <param name="options"></param>
                     /// </signature>
-                    return new zlib.Gzip();
+                    return new this.Gzip();
                 }
                 this.createGunzip = function(options) {
                     /// <summary><p>Returns a new <a href="#zlib_class_zlib_gunzip">Gunzip</a> object with an <a href="#zlib_options">options</a>.  </p> </summary>
                     /// <signature>
                     /// <param name="options"></param>
                     /// </signature>
-                    return new zlib.Gunzip();
+                    return new this.Gunzip();
                 }
                 this.createDeflate = function(options) {
                     /// <summary><p>Returns a new <a href="#zlib_class_zlib_deflate">Deflate</a> object with an <a href="#zlib_options">options</a>.  </p> </summary>
                     /// <signature>
                     /// <param name="options"></param>
                     /// </signature>
-                    return new zlib.Deflate();
+                    return new this.Deflate();
                 }
                 this.createInflate = function(options) {
                     /// <summary><p>Returns a new <a href="#zlib_class_zlib_inflate">Inflate</a> object with an <a href="#zlib_options">options</a>.  </p> </summary>
                     /// <signature>
                     /// <param name="options"></param>
                     /// </signature>
-                    return new zlib.Inflate();
+                    return new this.Inflate();
                 }
                 this.createDeflateRaw = function(options) {
                     /// <summary><p>Returns a new <a href="#zlib_class_zlib_deflateraw">DeflateRaw</a> object with an <a href="#zlib_options">options</a>.  </p> </summary>
                     /// <signature>
                     /// <param name="options"></param>
                     /// </signature>
-                    return new zlib.DeflateRaw();
+                    return new this.DeflateRaw();
                 }
                 this.createInflateRaw = function(options) {
                     /// <summary><p>Returns a new <a href="#zlib_class_zlib_inflateraw">InflateRaw</a> object with an <a href="#zlib_options">options</a>.  </p> </summary>
                     /// <signature>
                     /// <param name="options"></param>
                     /// </signature>
-                    return new zlib.InflateRaw();
+                    return new this.InflateRaw();
                 }
                 this.createUnzip = function(options) {
                     /// <summary><p>Returns a new <a href="#zlib_class_zlib_unzip">Unzip</a> object with an <a href="#zlib_options">options</a>.   </p> </summary>
                     /// <signature>
                     /// <param name="options"></param>
                     /// </signature>
-                    return new zlib.Unzip();
+                    return new this.Unzip();
                 }
                 this.deflate = function(buf, callback) {
                     /// <summary><p>Compress a string with Deflate.  </p> </summary>

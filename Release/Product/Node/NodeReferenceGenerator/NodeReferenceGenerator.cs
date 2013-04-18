@@ -296,7 +296,7 @@ namespace NodeReferenceGenerator {
 
             if (method["name"].StartsWith("create") && method["name"].Length > 6) {
                 _output.Append(' ', indentation * 4);
-                _output.AppendFormat("return new {0}.{1}();", fullName, method["name"].Substring(6));
+                _output.AppendFormat("return new this.{1}();", fullName, method["name"].Substring(6));
                 _output.AppendLine();
             }
             _output.Append(' ', indentation * 4);
