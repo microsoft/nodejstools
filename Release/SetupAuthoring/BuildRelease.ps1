@@ -1,3 +1,4 @@
+[CmdletBinding()]
 param( [string] $outdir, [string] $customBuildIdentifier, [switch] $skiptests, [switch] $noclean, [switch] $uninstall, [string] $reinstall, [switch] $scorch, [string] $vsTarget, [switch] $nocopy, [switch] $skipdebug)
 
 if (-not (get-command msbuild -EA 0))

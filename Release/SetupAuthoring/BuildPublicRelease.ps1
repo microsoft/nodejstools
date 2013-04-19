@@ -1,3 +1,4 @@
+[CmdletBinding()]
 param( $outDir, $build_name, [switch] $fast, [switch] $custombuildname)
 
 if (-not $outDir)
