@@ -155,20 +155,29 @@ namespace Microsoft.NodejsTools.Repl {
                         "visualstudio_nodejs_repl.js"
                     ) + "\"";
 
-            Process proc;
+            var psi = new ProcessStartInfo(NodePackage.NodePath, scriptPath + " " + port);
+            psi.CreateNoWindow = true;
+            psi.UseShellExecute = false;
+            psi.RedirectStandardError = true;
+            psi.RedirectStandardOutput = true;
+                
+
+            string fileName, directory = null;
+
+            if (NodePackage.TryGetStartupFileAndDirectory(out fileName, out directory)) {
+                psi.WorkingDirectory = directory;
+            }
+
+            var process = new Process();
+            process.StartInfo = psi;
             try {
-                var psi = new ProcessStartInfo(NodePackage.NodePath, scriptPath + " " + port);
-                psi.CreateNoWindow = true;
-                psi.UseShellExecute = false;
-                psi.RedirectStandardError = true;
-                psi.RedirectStandardOutput = true;
-                proc = Process.Start(psi);
+                process.Start();
             } catch (Exception e) {
                 _window.WriteError(String.Format("Failed to start interactive process: {0}{1}{2}", Environment.NewLine, e.ToString(), Environment.NewLine));
                 return;
             }
 
-            _listener = new ListenerThread(this, proc, socket);
+            _listener = new ListenerThread(this, process, socket);
         }
 
 

@@ -214,6 +214,24 @@ namespace Microsoft.NodejsTools {
             ((IReplWindow)window).Focus();
         }
 
+        internal static bool TryGetStartupFileAndDirectory(out string fileName, out string directory) {
+            var startupProject = GetStartupProject();
+            if (startupProject != null) {
+                fileName = startupProject.GetStartupFile();
+                directory = startupProject.GetWorkingDirectory();                
+            } else {
+                var textView = CommonPackage.GetActiveTextView();
+                if (textView == null) {
+                    fileName = null;
+                    directory = null;
+                    return false;
+                }
+                fileName = textView.GetFilePath();
+                directory = Path.GetDirectoryName(fileName);
+            }
+            return true;
+        }
+
         private void OpenRemoteDebugProxyFolder(object sender, EventArgs args) {
             // Open explorer to folder
             if (!File.Exists(RemoteDebugProxyFolder)) {

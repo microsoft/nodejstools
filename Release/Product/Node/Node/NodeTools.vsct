@@ -80,15 +80,13 @@
         </Strings>
       </Button>
 
-      <Button guid="guidNodeToolsCmdSet" id="cmdidAddExistingFolder" priority="0x500" type="Button">
+      <Button guid="guidNodeToolsCmdSet" id="cmdidAddExistingFolder" priority="0x0500" type="Button">
         <Parent guid="guidSHLMainMenu" id="IDG_VS_CTXT_PROJECT_ADD_ITEMS"/>
         <CommandFlag>DefaultInvisible</CommandFlag>
         <CommandFlag>DynamicVisibility</CommandFlag>
         <!-- <Icon guid="guidImages" id="bmpPic2"/> -->
-
         <Strings>
-          <ButtonText>Existing folder...</ButtonText>
-
+          <ButtonText>Existing &amp;Folder...</ButtonText>
         </Strings>
       </Button>
 
