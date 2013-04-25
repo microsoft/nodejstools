@@ -31,7 +31,7 @@ namespace Microsoft.NodejsTools.Project {
         }
 
         public override void Apply() {
-            Project.SetProjectProperty(NodeConstants.NodeExeLocation, _control.NodeExeLocation);
+            Project.SetProjectProperty(NodeConstants.NodeExePath, _control.NodeExePath);
             Project.SetProjectProperty(NodeConstants.NodeExeArguments, _control.NodeExeArguments);
             Project.SetProjectProperty(NodeConstants.ScriptArguments, _control.ScriptArguments);
             Project.SetProjectProperty(NodeConstants.NodejsPort, _control.NodejsPort);
@@ -44,8 +44,8 @@ namespace Microsoft.NodejsTools.Project {
         public override void LoadSettings() {
             Loading = true;
             try {
-                _control.NodeExeArguments = Project.GetProjectProperty(NodeConstants.NodeExeArguments);
-                _control.NodeExeLocation = Project.GetProjectProperty(NodeConstants.NodeExeLocation);
+                _control.NodeExeArguments = Project.GetProjectProperty(NodeConstants.NodeExeArguments);                
+                _control.NodeExePath = Project.GetProjectProperty(NodeConstants.NodeExePath);
                 _control.ScriptArguments = Project.GetProjectProperty(NodeConstants.ScriptArguments);
                 _control.WorkingDirectory = Project.GetProjectProperty(CommonConstants.WorkingDirectory);
                 _control.LaunchUrl = Project.GetProjectProperty(NodeConstants.LaunchUrl);

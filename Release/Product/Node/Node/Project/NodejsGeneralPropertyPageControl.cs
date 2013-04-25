@@ -28,12 +28,12 @@ namespace Microsoft.NodejsTools.Project {
             InitializeComponent();
         }
 
-        public string NodeExeLocation {
+        public string NodeExePath {
             get {
-                return _nodeExeLocation.Text;
+                return _nodeExePath.Text;
             }
             set {
-                _nodeExeLocation.Text = value;
+                _nodeExePath.Text = value;
             }
         }
 

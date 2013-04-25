@@ -23,10 +23,10 @@
         /// the contents of this method with the code editor.
         /// </summary>
         private void InitializeComponent() {
-            this._nodeLocLabel = new System.Windows.Forms.Label();
+            this._nodeExePathLabel = new System.Windows.Forms.Label();
             this._nodeArguments = new System.Windows.Forms.Label();
             this._startBrowser = new System.Windows.Forms.CheckBox();
-            this._nodeExeLocation = new System.Windows.Forms.TextBox();
+            this._nodeExePath = new System.Windows.Forms.TextBox();
             this._nodeExeArguments = new System.Windows.Forms.TextBox();
             this._nodejsPort = new System.Windows.Forms.TextBox();
             this._nodePortLabel = new System.Windows.Forms.Label();
@@ -40,12 +40,12 @@
             // 
             // _nodeLocLabel
             // 
-            this._nodeLocLabel.AutoSize = true;
-            this._nodeLocLabel.Location = new System.Drawing.Point(14, 22);
-            this._nodeLocLabel.Name = "_nodeLocLabel";
-            this._nodeLocLabel.Size = new System.Drawing.Size(96, 13);
-            this._nodeLocLabel.TabIndex = 0;
-            this._nodeLocLabel.Text = "Node.exe &location:";
+            this._nodeExePathLabel.AutoSize = true;
+            this._nodeExePathLabel.Location = new System.Drawing.Point(14, 22);
+            this._nodeExePathLabel.Name = "_nodeExePathLabel";
+            this._nodeExePathLabel.Size = new System.Drawing.Size(96, 13);
+            this._nodeExePathLabel.TabIndex = 0;
+            this._nodeExePathLabel.Text = "Node.exe &path:";
             // 
             // _nodeArguments
             // 
@@ -69,11 +69,11 @@
             // 
             // _nodeExeLocation
             // 
-            this._nodeExeLocation.Location = new System.Drawing.Point(135, 19);
-            this._nodeExeLocation.Name = "_nodeExeLocation";
-            this._nodeExeLocation.Size = new System.Drawing.Size(290, 20);
-            this._nodeExeLocation.TabIndex = 1;
-            this._nodeExeLocation.TextChanged += new System.EventHandler(this.Changed);
+            this._nodeExePath.Location = new System.Drawing.Point(135, 19);
+            this._nodeExePath.Name = "_nodeExePath";
+            this._nodeExePath.Size = new System.Drawing.Size(290, 20);
+            this._nodeExePath.TabIndex = 1;
+            this._nodeExePath.TextChanged += new System.EventHandler(this.Changed);
             // 
             // _nodeExeArguments
             // 
@@ -124,7 +124,7 @@
             this._workingDirLabel.Name = "_workingDirLabel";
             this._workingDirLabel.Size = new System.Drawing.Size(95, 13);
             this._workingDirLabel.TabIndex = 6;
-            this._workingDirLabel.Text = "Working Director&y:";
+            this._workingDirLabel.Text = "Working director&y:";
             // 
             // _workingDir
             // 
@@ -160,14 +160,14 @@
             this.Controls.Add(this._workingDirLabel);
             this.Controls.Add(this._scriptArgsLabel);
             this.Controls.Add(this._nodeArguments);
-            this.Controls.Add(this._nodeLocLabel);
+            this.Controls.Add(this._nodeExePathLabel);
             this.Controls.Add(this._startBrowser);
             this.Controls.Add(this._nodejsPort);
             this.Controls.Add(this._launchUrl);
             this.Controls.Add(this._workingDir);
             this.Controls.Add(this._scriptArguments);
             this.Controls.Add(this._nodeExeArguments);
-            this.Controls.Add(this._nodeExeLocation);
+            this.Controls.Add(this._nodeExePath);
             this.Name = "NodejsGeneralPropertyPageControl";
             this.Size = new System.Drawing.Size(513, 302);
             this.ResumeLayout(false);
@@ -177,10 +177,10 @@
 
         #endregion
 
-        private System.Windows.Forms.Label _nodeLocLabel;
+        private System.Windows.Forms.Label _nodeExePathLabel;
         private System.Windows.Forms.Label _nodeArguments;
         private System.Windows.Forms.CheckBox _startBrowser;
-        private System.Windows.Forms.TextBox _nodeExeLocation;
+        private System.Windows.Forms.TextBox _nodeExePath;
         private System.Windows.Forms.TextBox _nodeExeArguments;
         private System.Windows.Forms.TextBox _nodejsPort;
         private System.Windows.Forms.Label _nodePortLabel;

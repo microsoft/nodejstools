@@ -10,7 +10,7 @@ namespace Microsoft.NodejsTools {
         public const string JavaScript = "JavaScript";
         public const string Nodejs = "Node.js";
 
-        public const string NodeExeLocation = "NodeExeLocation";
+        public const string NodeExePath = "NodeExePath";
         public const string NodeExeArguments = "NodeExeArguments";
         public const string ScriptArguments = "ScriptArguments";
         public const string NodejsPort = "NodejsPort";

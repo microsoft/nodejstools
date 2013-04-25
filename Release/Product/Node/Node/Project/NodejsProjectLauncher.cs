@@ -114,7 +114,7 @@ namespace Microsoft.NodejsTools.Project {
         }
 
         private string GetNodePath() {
-            var overridePath = _project.GetProjectProperty(NodeConstants.NodeExeLocation);
+            var overridePath = _project.GetProjectProperty(NodeConstants.NodeExePath);
             if (!String.IsNullOrWhiteSpace(overridePath)) {
                 return overridePath;
             }
