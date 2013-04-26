@@ -60,6 +60,7 @@
     <Compile Include="node_modules\bar\package.json" />
     <Compile Include="node_modules\bar\entry.js" />
     <Compile Include="node_modules\dup.js" />
+    <Compile Include="node_modules\foo\node_modules\nested.js" />
     <Compile Include="node_modules\foo\other.js" />
     <Compile Include="node_modules\foo\dup.js" />
     <Compile Include="node_modules\foo\index.js" />

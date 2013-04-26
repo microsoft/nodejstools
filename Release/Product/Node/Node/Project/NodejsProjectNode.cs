@@ -253,6 +253,10 @@ function starts_with(a, b) {
                             Path.GetFileName(CommonUtils.TrimEndSeparator(folderPackage.Url))
                         );
                     }
+
+                    if (String.Equals(Path.GetFileName(trimmedBaseDir), NodeConstants.NodeModulesFolder, StringComparison.OrdinalIgnoreCase)) {
+                        break;
+                    }
                 }
 
                 switchCode.Append(") {");

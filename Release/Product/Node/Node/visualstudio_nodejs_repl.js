@@ -68,7 +68,25 @@ function processRequest(command) {
         case "execute":
             // eval against the global object, in node this is process
             try {
-                var obj = eval.call(context, command["code"])
+                var obj;
+                // function f() { } should return undefined, wrapping it in parens
+                // produces a value, so ignore it if we have a function definition.
+                if (!/^\s*function/.test(command["code"])) {
+                    try {
+                        // object literals are ambigious, so first try w/ parens.
+                        obj = eval.call(context, '(' + command["code"] + ')');
+                    } catch (err) {
+                        // fallback to normal code if we can't parse this.
+                        if (err.toString().substr(0, 12) == 'SyntaxError:') {
+                            obj = eval.call(context, command["code"]);
+                        } else {
+                            throw err;
+                        }
+                    }
+                } else {
+                    obj = eval.call(context, command["code"]);
+                }
+                
                 var result = util.inspect(obj, undefined, undefined, true);
                 send_response(client, { 'type': 'execute', 'result': result });
             } catch (err) {

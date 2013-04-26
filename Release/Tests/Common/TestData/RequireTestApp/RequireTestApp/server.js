@@ -42,3 +42,10 @@ var recursive = require('./recursive1.js');
 
 exports.bar = function abc() {
 };
+
+try {
+    var nested = require('nested');
+    
+} catch (err) {
+    console.log('nested fails');
+}

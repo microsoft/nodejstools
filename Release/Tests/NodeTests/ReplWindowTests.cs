@@ -44,16 +44,20 @@ namespace NodeTests {
 
         [TestMethod, Priority(0)]
         public void TestFunctionDefinition() {
+            var whitespaces = new[] { "", "\r\n", "   ", "\r\n    " };
             using (var eval = new NodejsReplEvaluator()) {
-                var window = new MockReplWindow(eval);
-                var res = eval.ExecuteText("function f() { }");
-                Assert.IsTrue(res.Wait(10000));
-                Assert.AreEqual("undefined", window.Output);
-                window.ClearScreen();
+                foreach (var whitespace in whitespaces) {
+                    Console.WriteLine("Whitespace: {0}", whitespace);
+                    var window = new MockReplWindow(eval);
+                    var res = eval.ExecuteText(whitespace + "function f() { }");
+                    Assert.IsTrue(res.Wait(10000));
+                    Assert.AreEqual("undefined", window.Output);
+                    window.ClearScreen();
 
-                res = eval.ExecuteText("f");
-                Assert.IsTrue(res.Wait(10000));
-                Assert.AreEqual("[Function: f]", window.Output);
+                    res = eval.ExecuteText("f");
+                    Assert.IsTrue(res.Wait(10000));
+                    Assert.AreEqual("[Function: f]", window.Output);
+                }
             }
         }
 
@@ -331,6 +335,7 @@ undefined";
                                                     "function f(\r\na) {\r\n}\r\n\r\n};",
                                                     "x = {foo}",
                                                     "x = {foo:42}",
+                                                    "{x:42}",
                                                     "{\r\nfoo:42\r\n}",
                                                     "function () {\r\nconsole.log('hi');\r\n}",
                                                     "for(var i = 0; i<10; i++) {\r\nconsole.log('hi');\r\n}",
@@ -370,6 +375,16 @@ undefined";
                 res = eval.ExecuteText("i");
                 Assert.IsTrue(res.Wait(10000));
                 Assert.AreEqual("undefined987654", window.Output);
+            }
+        }
+
+        [TestMethod, Priority(0)]
+        public void TestObjectLiteral() {
+            using (var eval = new NodejsReplEvaluator()) {
+                var window = new MockReplWindow(eval);
+                var res = eval.ExecuteText("{x:42}");
+                Assert.IsTrue(res.Wait(10000));
+                Assert.AreEqual("{ x: 42 }", window.Output);
             }
         }
 
