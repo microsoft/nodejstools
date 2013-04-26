@@ -100,7 +100,7 @@ namespace Microsoft.NodejsTools.Project {
             }
         }
 
-        protected override void RenameInStorage(string oldName, string newName) {
+        internal override void RenameInStorage(string oldName, string newName) {
             CloseWatcher();
 
             base.RenameInStorage(oldName, newName);

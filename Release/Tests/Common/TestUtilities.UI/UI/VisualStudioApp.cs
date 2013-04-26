@@ -202,7 +202,6 @@ namespace TestUtilities.UI {
         /// Waits for a modal dialog to take over a given window and returns the HWND for the new dialog.
         /// </summary>
         /// <returns>An IntPtr which should be interpreted as an HWND</returns>
-
         public static IntPtr WaitForDialogToReplace(int originalHwndasInt) {
             IVsUIShell uiShell = VsIdeTestHostContext.ServiceProvider.GetService(typeof(IVsUIShell)) as IVsUIShell;
             IntPtr hwnd;
@@ -211,10 +210,12 @@ namespace TestUtilities.UI {
             for (int i = 0; i < 100 && hwnd.ToInt32() == originalHwndasInt; i++) {
                 System.Threading.Thread.Sleep(100);
                 uiShell.GetDialogOwnerHwnd(out hwnd);
-
-                DumpElement(AutomationElement.FromHandle(hwnd));
             }
 
+
+            if (hwnd.ToInt32() == originalHwndasInt) {
+                DumpElement(AutomationElement.FromHandle(hwnd));
+            }
             Assert.AreNotEqual(hwnd, IntPtr.Zero);
             Assert.AreNotEqual(hwnd.ToInt32(), originalHwndasInt);
             return hwnd;
@@ -436,5 +437,14 @@ namespace TestUtilities.UI {
 
             WaitForDialogDismissed();
         }
+
+        internal void WaitForMode(dbgDebugMode mode) {
+            for (int i = 0; i < 300 && Dte.Debugger.CurrentMode != mode; i++) {
+                System.Threading.Thread.Sleep(100);
+            }
+
+            Assert.AreEqual(VsIdeTestHostContext.Dte.Debugger.CurrentMode, mode);
+        }
+
     }
 }

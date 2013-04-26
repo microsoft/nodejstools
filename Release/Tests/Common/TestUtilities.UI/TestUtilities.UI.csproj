@@ -107,6 +107,7 @@
     <Compile Include="UI\NewItemDialog.cs" />
     <Compile Include="UI\NewProjectDialog.cs" />
     <Compile Include="UI\ObjectBrowser.cs" />
+    <Compile Include="UI\OverwriteFileDialog.cs" />
     <Compile Include="UI\ProjectPropertiesWindow.cs" />
     <Compile Include="UI\Python\ComparePerfReports.cs" />
     <Compile Include="UI\Python\Django\NewAppDialog.cs" />

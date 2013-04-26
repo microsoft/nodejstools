@@ -509,10 +509,14 @@
     <Compile Include="Project\NodejsGeneralPropertyPageControl.Designer.cs">
       <DependentUpon>NodejsGeneralPropertyPageControl.cs</DependentUpon>
     </Compile>
+    <Compile Include="Project\OverwriteFileDialog.xaml.cs">
+      <DependentUpon>OverwriteFileDialog.xaml</DependentUpon>
+    </Compile>
     <Compile Include="ProvideEditorExtension2Attribute.cs" />
     <Compile Include="ProvideLanguageTemplates.cs" />
     <Compile Include="Repl\ClearReplCommand.cs" />
     <Compile Include="Repl\SaveReplCommand.cs" />
+    <Compile Include="SharedCommands.cs" />
     <Compile Include="VsMenus.cs" />
     <Page Include="..\..\Python\PythonTools\PythonTools\Project\TaskProgressBar.xaml">
       <Generator>MSBuild:Compile</Generator>
@@ -644,6 +648,10 @@
     <Compile Include="GlobalSuppressions.cs" />
     <Compile Include="NodePackage.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Page Include="Project\OverwriteFileDialog.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
   </ItemGroup>
   <ItemGroup>
     <EmbeddedResource Include="..\..\Python\PythonTools\PythonTools\Project\ProjectResources.resx">

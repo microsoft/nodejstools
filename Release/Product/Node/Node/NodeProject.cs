@@ -76,9 +76,9 @@ namespace Microsoft.NodejsTools {
             var proj = extObject as EnvDTE.Project;
             if (proj != null) {
                 try {
-                    dynamic webAppExtender = proj.get_Extender("WebApplication");
-                    if (webAppExtender != null) {
-                        webAppExtender.StartWebServerOnDebug = false;
+                    object webAppExtender = proj.get_Extender("WebApplication");
+                    if (webAppExtender != null && webAppExtender is WebAppExtenderFilter) {
+                        ((dynamic)((WebAppExtenderFilter)webAppExtender).InnerObject).StartWebServerOnDebug = false;
                     }
                 } catch (COMException) {
                     // extender doesn't exist...

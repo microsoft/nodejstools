@@ -13,6 +13,7 @@
  * ***************************************************************************/
 
 using System;
+using System.Collections.Generic;
 using System.ComponentModel;
 using System.Runtime.InteropServices;
 using Microsoft.VisualStudioTools.Project;
@@ -22,7 +23,7 @@ namespace Microsoft.NodejsTools.Project {
     [ComVisible(true)]
     [ClassInterface(ClassInterfaceType.AutoDual)]
     [Guid("04726C27-8125-471A-BAC0-2301D273DB5E")]
-    public class NodejsProjectNodeProperties : CommonProjectNodeProperties {
+    public class NodejsProjectNodeProperties : CommonProjectNodeProperties, EnvDTE80.IInternalExtenderProvider {
         public NodejsProjectNodeProperties(ProjectNode node)
             : base(node) {
         }
@@ -49,5 +50,109 @@ namespace Microsoft.NodejsTools.Project {
                 return 0x40000;
             }
         }
+
+        object EnvDTE80.IInternalExtenderProvider.GetExtender(string extenderCATID, string extenderName, object extendeeObject, EnvDTE.IExtenderSite extenderSite, int cookie) {
+            EnvDTE80.IInternalExtenderProvider outerHierarchy = HierarchyNode.GetOuterHierarchy(this.Node) as EnvDTE80.IInternalExtenderProvider;
+
+            if (outerHierarchy != null) {
+                var res = outerHierarchy.GetExtender(extenderCATID, extenderName, extendeeObject, extenderSite, cookie);
+                if (extenderName == "WebApplication" && res is ICustomTypeDescriptor) {
+                    // we want to filter out the launch debug server option
+                    return new WebAppExtenderFilter((ICustomTypeDescriptor)res);
+                }
+                return res;
+            }
+
+            return null;
+        }
+
+    }
+
+    [ComVisible(true)]
+    [ClassInterface(ClassInterfaceType.AutoDual)] // This line triggers an FXCop warning, but is ok
+    public class WebAppExtenderFilter : ICustomTypeDescriptor {
+        private readonly ICustomTypeDescriptor _innerObject;
+
+        public WebAppExtenderFilter(ICustomTypeDescriptor innerObject) {
+            _innerObject = innerObject;
+        }
+
+        internal object InnerObject {
+            get {
+                return _innerObject;
+            }
+        }
+
+        #region ICustomTypeDescriptor Members
+
+        public AttributeCollection GetAttributes() {
+            return _innerObject.GetAttributes();
+        }
+
+        public string GetClassName() {
+            return _innerObject.GetClassName();
+        }
+
+        public string GetComponentName() {
+            return _innerObject.GetComponentName();
+        }
+
+        public TypeConverter GetConverter() {
+            return _innerObject.GetConverter();
+        }
+
+        public EventDescriptor GetDefaultEvent() {
+            return _innerObject.GetDefaultEvent();
+        }
+
+        public PropertyDescriptor GetDefaultProperty() {
+            return _innerObject.GetDefaultProperty();
+        }
+
+        public object GetEditor(Type editorBaseType) {
+            return _innerObject.GetEditor(editorBaseType);
+        }
+
+        public EventDescriptorCollection GetEvents(Attribute[] attributes) {
+            return _innerObject.GetEvents(attributes);
+        }
+
+        public EventDescriptorCollection GetEvents() {
+            return _innerObject.GetEvents();
+        }
+
+        public PropertyDescriptorCollection GetProperties(Attribute[] attributes) {
+            List<PropertyDescriptor> res = new List<PropertyDescriptor>();
+            var original = _innerObject.GetProperties(attributes);
+            foreach (PropertyDescriptor item in original) {
+                if (!IsFiltered(item)) {
+                    res.Add(item);
+                }
+            }
+
+            return new PropertyDescriptorCollection(res.ToArray());
+        }
+
+        private static bool IsFiltered(PropertyDescriptor item) {
+            return item.Name == "StartWebServerOnDebug";
+        }
+
+        public PropertyDescriptorCollection GetProperties() {
+            List<PropertyDescriptor> res = new List<PropertyDescriptor>();
+            var original = _innerObject.GetProperties();
+            foreach (PropertyDescriptor item in original) {
+                if (!IsFiltered(item)) {
+                    res.Add(item);
+                }
+            }
+
+            return new PropertyDescriptorCollection(res.ToArray());
+        }
+
+        public object GetPropertyOwner(PropertyDescriptor pd) {
+            return _innerObject.GetPropertyOwner(pd);
+        }
+
+        #endregion
     }
 }
