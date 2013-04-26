@@ -23,6 +23,7 @@
         /// the contents of this method with the code editor.
         /// </summary>
         private void InitializeComponent() {
+            this.components = new System.ComponentModel.Container();
             this._nodeExePathLabel = new System.Windows.Forms.Label();
             this._nodeArguments = new System.Windows.Forms.Label();
             this._startBrowser = new System.Windows.Forms.CheckBox();
@@ -36,14 +37,15 @@
             this._workingDir = new System.Windows.Forms.TextBox();
             this._launchUrl = new System.Windows.Forms.TextBox();
             this._launchUrlLabel = new System.Windows.Forms.Label();
+            this._tooltip = new System.Windows.Forms.ToolTip(this.components);
             this.SuspendLayout();
             // 
-            // _nodeLocLabel
+            // _nodeExePathLabel
             // 
             this._nodeExePathLabel.AutoSize = true;
             this._nodeExePathLabel.Location = new System.Drawing.Point(14, 22);
             this._nodeExePathLabel.Name = "_nodeExePathLabel";
-            this._nodeExePathLabel.Size = new System.Drawing.Size(96, 13);
+            this._nodeExePathLabel.Size = new System.Drawing.Size(80, 13);
             this._nodeExePathLabel.TabIndex = 0;
             this._nodeExePathLabel.Text = "Node.exe &path:";
             // 
@@ -67,7 +69,7 @@
             this._startBrowser.UseVisualStyleBackColor = true;
             this._startBrowser.CheckedChanged += new System.EventHandler(this.Changed);
             // 
-            // _nodeExeLocation
+            // _nodeExePath
             // 
             this._nodeExePath.Location = new System.Drawing.Point(135, 19);
             this._nodeExePath.Name = "_nodeExePath";
@@ -122,7 +124,7 @@
             this._workingDirLabel.AutoSize = true;
             this._workingDirLabel.Location = new System.Drawing.Point(14, 100);
             this._workingDirLabel.Name = "_workingDirLabel";
-            this._workingDirLabel.Size = new System.Drawing.Size(95, 13);
+            this._workingDirLabel.Size = new System.Drawing.Size(93, 13);
             this._workingDirLabel.TabIndex = 6;
             this._workingDirLabel.Text = "Working director&y:";
             // 
@@ -190,5 +192,6 @@
         private System.Windows.Forms.TextBox _workingDir;
         private System.Windows.Forms.TextBox _launchUrl;
         private System.Windows.Forms.Label _launchUrlLabel;
+        private System.Windows.Forms.ToolTip _tooltip;
     }
 }

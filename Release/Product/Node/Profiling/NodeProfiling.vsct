@@ -103,6 +103,7 @@
       <!-- Analyze menu items -->
       <Button guid="guidNodeProfilingCmdSet" id="cmdidStartNodeProfiling" priority="0x0100" type="Button">
         <Parent guid="guidPerfMenuGroup" id="IDG_PERF_BAR_GENERAL" />
+        <CommandFlag>DefaultDisabled</CommandFlag>
         <Strings>
           <CommandName>cmdidStartNodeProfiling</CommandName>
           <ButtonText>Launch &amp;Node.js Profiling...</ButtonText>
@@ -122,6 +123,7 @@
       <Button guid="guidNodeProfilingCmdSet" id="cmdidAddPerfSession" priority="0x0000" type="Button">
         <Parent guid="guidNodeProfilingCmdSet" id="perfToolbarGroup"/>
         <Icon guid="guidCmdBarImages" id="newSessionIcon"/>
+        <CommandFlag>DefaultDisabled</CommandFlag>
         <Strings>
           <ButtonText>Add Performance Session</ButtonText>
           <MenuText>Add Performance Session</MenuText>

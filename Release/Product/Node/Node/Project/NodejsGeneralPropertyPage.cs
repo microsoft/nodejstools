@@ -23,7 +23,7 @@ namespace Microsoft.NodejsTools.Project {
         private readonly NodejsGeneralPropertyPageControl _control;
 
         public NodejsGeneralPropertyPage() {
-            _control = new NodejsGeneralPropertyPageControl(this);
+            _control = new NodejsGeneralPropertyPageControl(this);            
         }
 
         public override System.Windows.Forms.Control Control {

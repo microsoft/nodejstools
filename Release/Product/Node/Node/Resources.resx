@@ -1,13 +1,4 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
-<!--
-    VS SDK Notes: This resx file contains the resources that will be consumed directly by your package.
-    For example, if you chose to create a tool window, there is a resource with ID 'CanNotCreateWindow'. This
-    is used in VsPkg.cs to determine the string to show the user if there is an error when attempting to create
-    the tool window.
-
-    Resources that are accessed directly from your package *by Visual Studio* are stored in the VSPackage.resx 
-    file.
--->
 <root>
   <!-- 
     Microsoft ResX Schema 
@@ -126,4 +117,25 @@
   <resheader name="writer">
     <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
   </resheader>
+  <data name="LaunchUrlToolTip" xml:space="preserve">
+    <value>Specifies the URL to open in the browser.  If unspecified http://localhost:port is used.\r\nIf a port is specified, it needs to be specified here as well.</value>
+  </data>
+  <data name="NodeExeArgumentsToolTip" xml:space="preserve">
+    <value>Specifies the options provided to node.exe, such as -e or -i.</value>
+  </data>
+  <data name="NodeExePathToolTip" xml:space="preserve">
+    <value>Specifies the path to the node.exe executable.</value>
+  </data>
+  <data name="NodejsPortToolTip" xml:space="preserve">
+    <value>Specifies the port number used for process.env.port, if unspecified a random port is generated.</value>
+  </data>
+  <data name="ScriptArgumentsToolTip" xml:space="preserve">
+    <value>Specifies the arguments passed to the script on launch.</value>
+  </data>
+  <data name="StartBrowserToolTip" xml:space="preserve">
+    <value>When checked a web browser is opened on launch</value>
+  </data>
+  <data name="WorkingDirToolTip" xml:space="preserve">
+    <value>Specifies the working directory where the node.exe process is launched.</value>
+  </data>
 </root>

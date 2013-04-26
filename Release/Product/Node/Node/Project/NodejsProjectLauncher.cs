@@ -87,11 +87,11 @@ namespace Microsoft.NodejsTools.Project {
                 psi.FileName = GetNodePath();
                 psi.Arguments = GetFullArguments(file);
                 psi.WorkingDirectory = _project.GetWorkingDirectory();
-                Process.Start(psi);
+                var process = Process.Start(psi);
 
                 if (webBrowserUrl != null) {
                     Debug.Assert(port != null);
-                    ThreadPool.QueueUserWorkItem(StartBrowser, new BrowserStartInfo(port.Value, webBrowserUrl));
+                    ThreadPool.QueueUserWorkItem(StartBrowser, new BrowserStartInfo(port.Value, webBrowserUrl, process));
                 }
             }
             return VSConstants.S_OK;
@@ -218,10 +218,12 @@ namespace Microsoft.NodejsTools.Project {
         class BrowserStartInfo {
             public readonly int Port;
             public readonly string Url;
+            public readonly Process Process;
 
-            public BrowserStartInfo(int port, string url) {
+            public BrowserStartInfo(int port, string url, Process process) {
                 Port = port;
                 Url = url;
+                Process = process;
             }
         }
 
@@ -229,7 +231,7 @@ namespace Microsoft.NodejsTools.Project {
             var startInfo = (BrowserStartInfo)browserStart;
             var socket = new Socket(AddressFamily.InterNetwork, SocketType.Stream, ProtocolType.Tcp);
             socket.Blocking = true;
-            for (int i = 0; i < 100; i++) {
+            for (int i = 0; i < 100 && !startInfo.Process.HasExited; i++) {
                 try {
                     socket.Connect(IPAddress.Loopback, startInfo.Port);
                     break;
@@ -238,7 +240,9 @@ namespace Microsoft.NodejsTools.Project {
                 }
             }
             socket.Close();
-            StartInBrowser(startInfo.Url);
+            if (!startInfo.Process.HasExited) {
+                StartInBrowser(startInfo.Url);
+            }
         }
 
         private static int GetFreePort() {

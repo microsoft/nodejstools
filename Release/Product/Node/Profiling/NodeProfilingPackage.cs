@@ -61,7 +61,7 @@ namespace Microsoft.NodejsTools.Profiling {
         internal static string NodeProjectGuid = "{9092AA53-FB77-4645-B42D-1CCCA6BD08BD}";
         internal const string PerformanceFileFilter = "Performance Report Files|*.vspx;*.vsps";
         private AutomationProfiling _profilingAutomation;
-        private static OleMenuCommand _stopCommand, _startCommand;
+        private static OleMenuCommand _stopCommand, _startCommand, _startWizard;
         internal const string PerfFileType = ".njsperf";
         
         /// <summary>
@@ -98,17 +98,20 @@ namespace Microsoft.NodejsTools.Profiling {
             if (null != mcs) {
                 // Create the command for the menu item.
                 CommandID menuCommandID = new CommandID(GuidList.guidNodeProfilingCmdSet, (int)PkgCmdIDList.cmdidStartNodeProfiling);
-                MenuCommand menuItem = new MenuCommand(StartProfilingWizard, menuCommandID);
-                mcs.AddCommand(menuItem);
+                var oleMenuItem = new OleMenuCommand(StartProfilingWizard, menuCommandID);
+                oleMenuItem.BeforeQueryStatus += IsProfilingActive;
+                _startWizard = oleMenuItem;
+                mcs.AddCommand(oleMenuItem);
 
                 // Create the command for the menu item.
                 menuCommandID = new CommandID(GuidList.guidNodeProfilingCmdSet, (int)PkgCmdIDList.cmdidPerfExplorer);
-                var oleMenuItem = new OleMenuCommand(ShowPeformanceExplorer, menuCommandID);
+                oleMenuItem = new OleMenuCommand(ShowPeformanceExplorer, menuCommandID);
                 mcs.AddCommand(oleMenuItem);
 
                 menuCommandID = new CommandID(GuidList.guidNodeProfilingCmdSet, (int)PkgCmdIDList.cmdidAddPerfSession);
-                menuItem = new MenuCommand(AddPerformanceSession, menuCommandID);
-                mcs.AddCommand(menuItem);
+                oleMenuItem = new OleMenuCommand(AddPerformanceSession, menuCommandID);
+                oleMenuItem.BeforeQueryStatus += IsProfilingActive;
+                mcs.AddCommand(oleMenuItem);
 
                 menuCommandID = new CommandID(GuidList.guidNodeProfilingCmdSet, (int)PkgCmdIDList.cmdidStartProfiling);
                 oleMenuItem = _startCommand = new OleMenuCommand(StartProfiling, menuCommandID);
@@ -206,9 +209,14 @@ namespace Microsoft.NodejsTools.Profiling {
         }
 
         internal static void ProfileProject(SessionNode session, EnvDTE.Project projectToProfile, bool openReport) {
-            var args = (string)projectToProfile.Properties.Item("CommandLineArguments").Value;
+            var interpreterArgs = (string)projectToProfile.Properties.Item("NodeExeArguments").Value;
+            var scriptArgs = (string)projectToProfile.Properties.Item("ScriptArguments").Value;
+            var startBrowser = (bool)projectToProfile.Properties.Item("StartWebBrowser").Value;
+            string launchUrl = (string)projectToProfile.Properties.Item("LaunchUrl").Value;
 
-            string interpreterPath = NodePackage.NodePath;
+            int? port = (int?)projectToProfile.Properties.Item("NodejsPort").Value;
+
+            string interpreterPath = (string)projectToProfile.Properties.Item("NodeExePath").Value;
 
             string startupFile = (string)projectToProfile.Properties.Item("StartupFile").Value;
             if (String.IsNullOrEmpty(startupFile)) {
@@ -224,24 +232,40 @@ namespace Microsoft.NodejsTools.Profiling {
                 }
             }
 
-            RunProfiler(session, interpreterPath, startupFile, args, workingDir, null, openReport);
+            RunProfiler(
+                session, 
+                interpreterPath, 
+                interpreterArgs, 
+                startupFile, 
+                scriptArgs, 
+                workingDir, 
+                null, 
+                openReport, 
+                launchUrl,
+                port,
+                startBrowser
+            );
         }
 
         private static void ProfileStandaloneTarget(SessionNode session, StandaloneTarget runTarget, bool openReport) {
             RunProfiler(
-                session,
-                runTarget.InterpreterPath,
-                runTarget.Script,
-                runTarget.Arguments,
-                runTarget.WorkingDirectory,
-                null,
-                openReport
+                session, 
+                runTarget.InterpreterPath, 
+                "",             // interpreter args
+                runTarget.Script, 
+                runTarget.Arguments, 
+                runTarget.WorkingDirectory, 
+                null,           // env vars
+                openReport, 
+                null,            // launch url,
+                null,            // port
+                false            // start browser
             );
         }
 
-        private static void RunProfiler(SessionNode session, string interpreter, string script, string arguments, string workingDir, Dictionary<string, string> env, bool openReport) {
+        private static void RunProfiler(SessionNode session, string interpreter, string interpreterArgs, string script, string scriptArgs, string workingDir, Dictionary<string, string> env, bool openReport, string launchUrl, int? port, bool startBrowser) {
             var arch = NativeMethods.GetBinaryType(interpreter);
-            var process = new ProfiledProcess(interpreter, script, arguments, workingDir, env, arch);
+            var process = new ProfiledProcess(interpreter, interpreterArgs, script, scriptArgs, workingDir, env, arch, launchUrl, port, startBrowser);
 
             string baseName = Path.GetFileNameWithoutExtension(session.Filename);
             string date = DateTime.Now.ToString("yyyyMMdd");
@@ -339,6 +363,16 @@ namespace Microsoft.NodejsTools.Profiling {
             }
         }
 
+        private void IsProfilingActive(object sender, EventArgs args) {
+            var oleMenu = sender as OleMenuCommand;
+
+            if (_profilingProcess != null) {
+                oleMenu.Enabled = false;
+            } else {
+                oleMenu.Enabled = true;
+            }
+        }
+        
         public bool IsProfiling {
             get {
                 return _profilingProcess != null;

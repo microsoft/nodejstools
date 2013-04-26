@@ -59,5 +59,68 @@ namespace Microsoft.NodejsTools {
                 resourceCulture = value;
             }
         }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Specifies the URL to open in the browser.  If unspecified http://localhost:port is used.\r\nIf a port is specified, it needs to be specified here as well..
+        /// </summary>
+        internal static string LaunchUrlToolTip {
+            get {
+                return ResourceManager.GetString("LaunchUrlToolTip", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Specifies the options provided to node.exe, such as -e or -i..
+        /// </summary>
+        internal static string NodeExeArgumentsToolTip {
+            get {
+                return ResourceManager.GetString("NodeExeArgumentsToolTip", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Specifies the path to the node.exe executable..
+        /// </summary>
+        internal static string NodeExePathToolTip {
+            get {
+                return ResourceManager.GetString("NodeExePathToolTip", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Specifies the port number used for process.env.port, if unspecified a random port is generated..
+        /// </summary>
+        internal static string NodejsPortToolTip {
+            get {
+                return ResourceManager.GetString("NodejsPortToolTip", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Specifies the arguments passed to the script on launch..
+        /// </summary>
+        internal static string ScriptArgumentsToolTip {
+            get {
+                return ResourceManager.GetString("ScriptArgumentsToolTip", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to When checked a web browser is opened on launch.
+        /// </summary>
+        internal static string StartBrowserToolTip {
+            get {
+                return ResourceManager.GetString("StartBrowserToolTip", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Specifies the working directory where the node.exe process is launched..
+        /// </summary>
+        internal static string WorkingDirToolTip {
+            get {
+                return ResourceManager.GetString("WorkingDirToolTip", resourceCulture);
+            }
+        }
     }
 }

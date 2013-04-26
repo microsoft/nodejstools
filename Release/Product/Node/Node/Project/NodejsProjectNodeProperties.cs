@@ -51,6 +51,91 @@ namespace Microsoft.NodejsTools.Project {
             }
         }
 
+        [SRCategoryAttribute(SR.General)]
+        [LocDisplayName(SR.NodeExePath)]
+        [SRDescriptionAttribute(SR.NodeExePathDescription)]
+        public string NodeExePath {
+            get {
+                var res = this.Node.ProjectMgr.GetProjectProperty(NodeConstants.NodeExePath, true);
+                if (String.IsNullOrWhiteSpace(res)) {
+                    return NodePackage.NodePath;
+                }
+                return res;
+            }
+            set {
+                Node.ProjectMgr.SetProjectProperty(NodeConstants.NodeExePath, value);
+            }
+        }
+
+        [SRCategoryAttribute(SR.General)]
+        [LocDisplayName(SR.NodeExeArguments)]
+        [SRDescriptionAttribute(SR.NodeExeArgumentsDescription)]
+        public string NodeExeArguments {
+            get {
+                return this.Node.ProjectMgr.GetProjectProperty(NodeConstants.NodeExeArguments, true);
+            }
+            set {
+                Node.ProjectMgr.SetProjectProperty(NodeConstants.NodeExeArguments, value);
+            }
+        }
+
+        [SRCategoryAttribute(SR.General)]
+        [LocDisplayName(SR.ScriptArguments)]
+        [SRDescriptionAttribute(SR.ScriptArgumentsDescription)]
+        public string ScriptArguments {
+            get {
+                return this.Node.ProjectMgr.GetProjectProperty(NodeConstants.ScriptArguments, true);
+            }
+            set {
+                Node.ProjectMgr.SetProjectProperty(NodeConstants.ScriptArguments, value);
+            }
+        }
+
+        [SRCategoryAttribute(SR.General)]
+        [LocDisplayName(SR.NodejsPort)]
+        [SRDescriptionAttribute(SR.NodejsPortDescription)]
+        public int? NodejsPort {
+            get {
+                int port;
+                if (Int32.TryParse(Node.ProjectMgr.GetProjectProperty(NodeConstants.NodejsPort, true), out port)) {
+                    return port;
+                }
+                return null;
+            }
+            set {
+                Node.ProjectMgr.SetProjectProperty(NodeConstants.NodejsPort, value != null ? value.ToString() : "");
+            }
+        }
+
+        [SRCategoryAttribute(SR.General)]
+        [LocDisplayName(SR.LaunchUrl)]
+        [SRDescriptionAttribute(SR.LaunchUrlDescription)]
+        public string LaunchUrl {
+            get {
+                return this.Node.ProjectMgr.GetProjectProperty(NodeConstants.LaunchUrl, true);
+            }
+            set {
+                Node.ProjectMgr.SetProjectProperty(NodeConstants.LaunchUrl, value);
+            }
+        }
+
+        [SRCategoryAttribute(SR.General)]
+        [LocDisplayName(SR.StartWebBrowser)]
+        [SRDescriptionAttribute(SR.StartWebBrowserDescription)]
+        public bool StartWebBrowser {
+            get {
+                bool res;
+                if (Boolean.TryParse(Node.ProjectMgr.GetProjectProperty(NodeConstants.StartWebBrowser, true), out res)) {
+                    return res;
+                }
+                return true;
+            }
+            set {
+                Node.ProjectMgr.SetProjectProperty(NodeConstants.LaunchUrl, value.ToString());
+            }
+        }
+
+
         object EnvDTE80.IInternalExtenderProvider.GetExtender(string extenderCATID, string extenderName, object extendeeObject, EnvDTE.IExtenderSite extenderSite, int cookie) {
             EnvDTE80.IInternalExtenderProvider outerHierarchy = HierarchyNode.GetOuterHierarchy(this.Node) as EnvDTE80.IInternalExtenderProvider;
 
