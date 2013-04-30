@@ -437,6 +437,9 @@
     <Compile Include="..\..\Python\PythonTools\PythonTools\Project\ProjectNode.CopyPaste.cs">
       <Link>Project\ProjectNode.CopyPaste.cs</Link>
     </Compile>
+    <Compile Include="..\..\Python\PythonTools\PythonTools\Project\ProjectNode.IOleCommandTarget.cs">
+      <Link>Project\ProjectNode.IOleCommandTarget.cs</Link>
+    </Compile>
     <Compile Include="..\..\Python\PythonTools\PythonTools\Project\ProjectNode.cs">
       <Link>Project\ProjectNode.cs</Link>
     </Compile>

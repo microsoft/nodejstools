@@ -37,7 +37,7 @@ namespace Microsoft.NodejsTools.Project {
             }
         }
 
-        protected override int ExecCommandOnNode(Guid guidCmdGroup, uint cmd, uint nCmdexecopt, IntPtr pvaIn, IntPtr pvaOut) {
+        internal override int ExecCommandOnNode(Guid guidCmdGroup, uint cmd, uint nCmdexecopt, IntPtr pvaIn, IntPtr pvaOut) {
             Debug.Assert(this.ProjectMgr != null, "The Dynamic FileNode has no project manager");
 
             Utilities.CheckNotNull(this.ProjectMgr);
@@ -56,7 +56,7 @@ namespace Microsoft.NodejsTools.Project {
             return base.ExecCommandOnNode(guidCmdGroup, cmd, nCmdexecopt, pvaIn, pvaOut);
         }
 
-        protected override int QueryStatusOnNode(Guid guidCmdGroup, uint cmd, IntPtr pCmdText, ref QueryStatusResult result) {
+        internal override int QueryStatusOnNode(Guid guidCmdGroup, uint cmd, IntPtr pCmdText, ref QueryStatusResult result) {
             if (guidCmdGroup == GuidList.guidNodeCmdSet) {
                 if (this.ProjectMgr.IsCodeFile(this.Url)) {
                     switch (cmd) {
