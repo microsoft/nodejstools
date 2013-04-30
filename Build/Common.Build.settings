@@ -2,10 +2,10 @@
 <Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
 
   <!-- Ensures that if this file changes it forces a rebuild -->
-  <PropertyGroup>                 
+  <PropertyGroup>
     <MSBuildAllProjects>
         $(MSBuildAllProjects);$(MSBuildThisFileFullPath)
-    </MSBuildAllProjects>        
+    </MSBuildAllProjects>
   </PropertyGroup>
 
 
@@ -21,6 +21,7 @@
     <CodeCoverageEnabled Condition="'$(CodeCoverageEnabled)'==''">true</CodeCoverageEnabled>
 
     <VisualStudioVersion Condition="'$(VisualStudioVersion)' == ''">10.0</VisualStudioVersion>
+    <VSTarget Condition="$(VSTarget)=='' and '$(VisualStudioVersion)'=='12.0'">12.0</VSTarget>
     <VSTarget Condition="$(VSTarget)=='' and '$(VisualStudioVersion)'=='11.0'">11.0</VSTarget>
     <VSTarget Condition="$(VSTarget)==''">10.0</VSTarget>
     <TargetFrameworkVersion Condition="'$(VSTarget)' == '10.0'">v4.0</TargetFrameworkVersion>
@@ -35,10 +36,12 @@
     <OutputPath Condition="'$(OutputPath)' == '' and '$(OutDir)' == ''">$(BuildRoot)\Binaries\$(Configuration)$(VSTarget)\</OutputPath>
     <IntermediateOutputPath Condition="'$(IntermediateOutputPath)' == '' and '$(IntDir)' != '' and $(IntDir.EndsWith(`\`))">$(IntDir)</IntermediateOutputPath>
     <IntermediateOutputPath Condition="'$(IntermediateOutputPath)' == '' and '$(IntDir)' != '' and !$(IntDir.EndsWith(`\`))">$(IntDir)\</IntermediateOutputPath>
-    <IntermediateOutputPath Condition="'$(IntermediateOutputPath)' == ''">obj\Dev$(VSTarget)\$(Configuration)\</IntermediateOutputPath>
+    <IntermediateOutputPath Condition="'$(IntermediateOutputPath)' == ''">$(MSBuildProjectDirectory)\obj\Dev$(VSTarget)\$(Configuration)\</IntermediateOutputPath>
 
     <OutDir>$(OutputPath)</OutDir>
     <IntDir>$(IntermediateOutputPath)</IntDir>
+
+    <SuppressCommonAssemblyMetadata Condition="'$(SuppressCommonAssemblyMetadata)' == ''">False</SuppressCommonAssemblyMetadata>
   </PropertyGroup>
 
 
@@ -47,12 +50,16 @@
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
     <TreatWarningsAsErrors Condition="'$(TreatWarningsAsErrors)' == ''">true</TreatWarningsAsErrors>
+    <!-- Suppress warning about multiply defined AssemblyVersionInfo -->
+    <NoWarn>436</NoWarn>
     <RunCodeAnalysis>$(RunFXCop)</RunCodeAnalysis>
     <StyleCopEnabled>$(RunStyleCop)</StyleCopEnabled>
 
     <ResolveAssemblyWarnOrErrorOnTargetArchitectureMismatch>None</ResolveAssemblyWarnOrErrorOnTargetArchitectureMismatch>
 
-    <DevEnvDir>$(VS100COMNTOOLS)..\IDE</DevEnvDir>                  <!-- CHECK RELEVANCE -->
+    <DevEnvDir Condition="'$(VSTarget)'=='10.0'">$(VS100COMNTOOLS)..\IDE\</DevEnvDir>
+    <DevEnvDir Condition="'$(VSTarget)'=='11.0'">$(VS110COMNTOOLS)..\IDE\</DevEnvDir>
+    <DevEnvDir Condition="'$(VSTarget)'=='12.0'">$(VS120COMNTOOLS)..\IDE\</DevEnvDir>
   </PropertyGroup>
 
   <Import Project="$(TargetsPath)\Common.Build.CSharp.settings" Condition="'$(MSBuildProjectExtension)' == '.csproj' or '$(MSBuildProjectExtension)' == '.tmp_proj'" />

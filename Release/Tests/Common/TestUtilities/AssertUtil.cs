@@ -16,9 +16,9 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
+using System.Text;
 using System.Threading;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
-using System.Text;
 
 namespace TestUtilities
 {
@@ -61,8 +61,7 @@ namespace TestUtilities
             }
         }
 
-        public static void MissingDependency(string dependency)
-        {
+        public static void MissingDependency(string dependency) {
             Assert.Inconclusive("Missing Dependency: {0}", dependency);
         }
 
@@ -148,6 +147,7 @@ namespace TestUtilities
             }
         }
 
+        [System.Diagnostics.DebuggerStepThrough]
         public static void Contains(string source, params string[] values) {
             foreach (var v in values) {
                 if (!source.Contains(v)) {
@@ -156,6 +156,7 @@ namespace TestUtilities
             }
         }
 
+        [System.Diagnostics.DebuggerStepThrough]
         public static void Contains<T>(IEnumerable<T> source, T value) {
             foreach (var v in source) {
                 if (v.Equals(value)) {
@@ -166,6 +167,7 @@ namespace TestUtilities
             Assert.Fail(String.Format("{0} does not contain {1}", MakeText(source), value));
         }
 
+        [System.Diagnostics.DebuggerStepThrough]
         public static void Equals<T>(IEnumerable<T> source, params T[] value) {
             var items = source.ToArray();
             Assert.AreEqual(value.Length, items.Length);
@@ -174,6 +176,7 @@ namespace TestUtilities
             }
         }
 
+        [System.Diagnostics.DebuggerStepThrough]
         public static void DoesntContain<T>(IEnumerable<T> source, T value) {
             foreach (var v in source) {
                 if (v.Equals(value)) {
@@ -183,19 +186,40 @@ namespace TestUtilities
 
         }
 
+        [System.Diagnostics.DebuggerStepThrough]
         public static void ContainsExactly<T>(IEnumerable<T> source, IEnumerable<T> values) {
             ContainsExactly(new HashSet<T>(source), values.ToArray());
         }
 
+        [System.Diagnostics.DebuggerStepThrough]
         public static void ContainsExactly<T>(IEnumerable<T> source, params T[] values) {
             ContainsExactly(new HashSet<T>(source), values);
         }
 
+        [System.Diagnostics.DebuggerStepThrough]
         public static void ContainsExactly<T>(HashSet<T> set, params T[] values) {
             if (set.ContainsExactly(values)) {
                 return;
             }
             Assert.Fail(String.Format("Expected {0}, got {1}", MakeText(values), MakeText(set)));
+        }
+
+        [System.Diagnostics.DebuggerStepThrough]
+        public static void ContainsAtLeast<T>(IEnumerable<T> source, IEnumerable<T> values) {
+            ContainsAtLeast(new HashSet<T>(source), values.ToArray());
+        }
+
+        [System.Diagnostics.DebuggerStepThrough]
+        public static void ContainsAtLeast<T>(IEnumerable<T> source, params T[] values) {
+            ContainsAtLeast(new HashSet<T>(source), values);
+        }
+
+        [System.Diagnostics.DebuggerStepThrough]
+        public static void ContainsAtLeast<T>(HashSet<T> set, params T[] values) {
+            if (set.IsSupersetOf(values)) {
+                return;
+            }
+            Assert.Fail(String.Format("Expected at least {0}, got {1}", MakeText(values), MakeText(set)));
         }
 
         public static string MakeText<T>(IEnumerable<T> values) {
@@ -204,8 +228,9 @@ namespace TestUtilities
                 if (sb.Length > 1) {
                     sb.Append(", ");
                 }
-                sb.Append(value.ToString());
+                sb.Append(value == null ? "(null)" : value.ToString());
             }
+        
             sb.Append("}");
             return sb.ToString();
         }

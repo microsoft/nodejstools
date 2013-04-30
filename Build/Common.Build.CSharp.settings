@@ -30,12 +30,32 @@
     <DefineConstants>TRACE</DefineConstants>
   </PropertyGroup>
 
-  <PropertyGroup Condition=" '$(VSTarget)' == '11.0' ">
-    <DefineConstants>$(DefineConstants);DEV11</DefineConstants>
+  <PropertyGroup Condition=" '$(VSTarget)' == '12.0' ">
+    <DefineConstants>$(DefineConstants);DEV12;DEV12_OR_LATER;DEV11_OR_LATER</DefineConstants>
   </PropertyGroup>
   
+  <PropertyGroup Condition=" '$(VSTarget)' == '11.0' ">
+    <DefineConstants>$(DefineConstants);DEV11;DEV11_OR_LATER</DefineConstants>
+  </PropertyGroup>
+
+  <PropertyGroup Condition=" '$(VSTarget)' == '10.0' ">
+    <DefineConstants>$(DefineConstants);DEV10</DefineConstants>
+  </PropertyGroup>
+
   <PropertyGroup>
-    <VSCTDefinitions Condition="'$(VSTarget)' != '10.0'">DEV11</VSCTDefinitions>
+    <VSCTDefinitions Condition="'$(VSTarget)' == '12.0'">DEV12;DEV_12_OR_LATER;DEV11_OR_LATER</VSCTDefinitions>
+  </PropertyGroup>
+
+  <PropertyGroup>
+    <VSCTDefinitions Condition="'$(VSTarget)' == '11.0'">DEV11;DEV11_OR_LATER</VSCTDefinitions>
+  </PropertyGroup>
+
+  <PropertyGroup>
+    <VSCTDefinitions Condition="'$(VSTarget)' == '10.0'">DEV10</VSCTDefinitions>
+  </PropertyGroup>
+
+  <PropertyGroup Condition="$(SuppressCommonAssemblyMetadata)">
+    <DefineConstants>$(DefineConstants);SUPPRESS_COMMON_ASSEMBLY_METADATA</DefineConstants>
   </PropertyGroup>
 
   <PropertyGroup>

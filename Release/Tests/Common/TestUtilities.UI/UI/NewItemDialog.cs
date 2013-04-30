@@ -44,7 +44,7 @@ namespace TestUtilities.UI {
                         TreeScope.Descendants,
                         new PropertyCondition(
                             AutomationElement.AutomationIdProperty,
-#if DEV11
+#if DEV11_OR_LATER
                             "Installed"
 #else
                             "Installed Templates"
@@ -58,7 +58,7 @@ namespace TestUtilities.UI {
                     // so we need to find the one that actually has our templates.
                     foreach (AutomationElement template in templates) {
                         var temp = new TreeView(template);
-#if DEV11
+#if DEV11_OR_LATER
                         var item = temp.FindItem("Templates");
 #else
                         var item = temp.FindItem("Visual C#");
@@ -99,19 +99,28 @@ namespace TestUtilities.UI {
 
         public string ProjectName {
             get {
-                var patterns = GetProjectNameBox().GetSupportedPatterns();
                 var filename = (ValuePattern)GetProjectNameBox().GetCurrentPattern(ValuePattern.Pattern);
                 return filename.Current.Value;
             }
             set {
-                var patterns = GetProjectNameBox().GetSupportedPatterns();
                 var filename = (ValuePattern)GetProjectNameBox().GetCurrentPattern(ValuePattern.Pattern);
                 filename.SetValue(value);
             }
         }
 
+        public string Location {
+            get {
+                var location = (ValuePattern)GetLocationBox().GetCurrentPattern(ValuePattern.Pattern);
+                return location.Current.Value;
+            }
+            set {
+                var location = (ValuePattern)GetLocationBox().GetCurrentPattern(ValuePattern.Pattern);
+                location.SetValue(value);
+            }
+        }
+
         public void FocusLanguageNode(string name = "Python") {
-#if DEV11
+#if DEV11_OR_LATER
             var item = InstalledTemplates.FindItem("Templates", name);
             if (item == null) {
                 item = InstalledTemplates.FindItem("Templates", "Other Languages", name);
@@ -126,6 +135,9 @@ namespace TestUtilities.UI {
                 item = InstalledTemplates.FindItem(name);
             }
 #endif
+            if (item == null) {
+                DumpElement(InstalledTemplates.Element);
+            }
             item.SetFocus();
         }
 
@@ -133,6 +145,15 @@ namespace TestUtilities.UI {
             return Element.FindFirst(TreeScope.Descendants,
                 new AndCondition(
                     new PropertyCondition(AutomationElement.AutomationIdProperty, "txt_Name"),
+                    new PropertyCondition(AutomationElement.ControlTypeProperty, ControlType.Edit)
+                )
+            );
+        }
+
+        private AutomationElement GetLocationBox() {
+            return Element.FindFirst(TreeScope.Descendants,
+                new AndCondition(
+                    new PropertyCondition(AutomationElement.AutomationIdProperty, "PART_EditableTextBox"),
                     new PropertyCondition(AutomationElement.ControlTypeProperty, ControlType.Edit)
                 )
             );

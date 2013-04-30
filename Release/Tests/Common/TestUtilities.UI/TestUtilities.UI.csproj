@@ -21,10 +21,10 @@
     <PlatformTarget>x86</PlatformTarget>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'Debug|x86'">
-    <DefineConstants>TRACE;DEBUG;DEV11;NTVS_FEATURE_INTERACTIVEWINDOW</DefineConstants>
+    <DefineConstants>$(DefineConstants);TRACE;DEBUG;NTVS_FEATURE_INTERACTIVEWINDOW</DefineConstants>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'Release|x86'">
-    <DefineConstants>TRACE;DEV11;NTVS_FEATURE_INTERACTIVEWINDOW</DefineConstants>
+    <DefineConstants>$(DefineConstants);TRACE;NTVS_FEATURE_INTERACTIVEWINDOW</DefineConstants>
   </PropertyGroup>
   <ItemGroup>
     <Reference Include="envdte, Version=8.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a">
@@ -104,6 +104,7 @@
     <Compile Include="UI\MenuItem.cs" />
     <Compile Include="UI\MessageBoxButton.cs" />
     <Compile Include="UI\Mouse.cs" />
+    <Compile Include="UI\NavigateToDialog.cs" />
     <Compile Include="UI\NewItemDialog.cs" />
     <Compile Include="UI\NewProjectDialog.cs" />
     <Compile Include="UI\ObjectBrowser.cs" />
@@ -112,6 +113,7 @@
     <Compile Include="UI\Python\ComparePerfReports.cs" />
     <Compile Include="UI\Python\Django\NewAppDialog.cs" />
     <Compile Include="UI\Python\Django\PythonProjectDebugProperties.cs" />
+    <Compile Include="UI\Python\FormattingOptionsTreeView.cs" />
     <Compile Include="UI\Python\PythonLaunchWithErrorsDialog.cs" />
     <Compile Include="UI\Python\PythonPerfExplorer.cs" />
     <Compile Include="UI\Python\PythonPerfTarget.cs" />

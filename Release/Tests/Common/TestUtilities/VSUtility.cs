@@ -39,11 +39,7 @@ namespace TestUtilities
         public const string VSAddInName = "TcVsIdeTestHost";
 
         private static readonly string ProgId = "VisualStudio.DTE." + Version;
-#if DEV11
-        public static readonly string Version = "11.0";
-#else
-        public static readonly string Version = "10.0";
-#endif
+        public static readonly string Version = AssemblyVersionInfo.VSVersion;
         private static readonly TimeSpan _ideStartupTimeout = TimeSpan.FromMinutes(2);
         private static readonly TimeSpan _addinWaitTimeout = TimeSpan.FromMinutes(1);
         private static readonly TimeSpan _baseSleepDuration = TimeSpan.FromMilliseconds(250);

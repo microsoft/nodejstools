@@ -34,7 +34,7 @@
     <DebugSymbols>true</DebugSymbols>
     <DebugType>full</DebugType>
     <OutputPath>bin\Debug\</OutputPath>
-    <DefineConstants>TRACE;DEBUG;DEV11;NODEJS_TOOLS;NODE_TOOLS</DefineConstants>
+    <DefineConstants>$(DefineConstants);TRACE;DEBUG</DefineConstants>
     <TreatWarningsAsErrors>true</TreatWarningsAsErrors>
     <ErrorReport>prompt</ErrorReport>
   </PropertyGroup>
@@ -43,12 +43,12 @@
     <Optimize>true</Optimize>
     <DebugType>pdbonly</DebugType>
     <OutputPath>bin\Release\</OutputPath>
-    <DefineConstants>TRACE;DEV11;NODEJS_TOOLS;NODE_TOOLS</DefineConstants>
+    <DefineConstants>$(DefineConstants);TRACE</DefineConstants>
     <TreatWarningsAsErrors>true</TreatWarningsAsErrors>
     <ErrorReport>prompt</ErrorReport>
   </PropertyGroup>
   <PropertyGroup>
-    <DefineConstants>$(DefineConstants);NTVS_FEATURE_INTERACTIVEWINDOW</DefineConstants>
+    <DefineConstants>$(DefineConstants);NODEJS_TOOLS;NTVS_FEATURE_INTERACTIVEWINDOW</DefineConstants>
   </PropertyGroup>
   <ItemGroup>
     <Reference Include="Microsoft.Build" />

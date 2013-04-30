@@ -37,7 +37,7 @@
     <DebugType>full</DebugType>
     <Optimize>false</Optimize>
     <OutputPath>bin\Debug\</OutputPath>
-    <DefineConstants>TRACE;DEBUG;DEV11;NODEJS_TOOLS</DefineConstants>
+    <DefineConstants>$(DefineConstants);DEBUG</DefineConstants>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
@@ -45,13 +45,15 @@
     <DebugType>pdbonly</DebugType>
     <Optimize>true</Optimize>
     <OutputPath>bin\Release\</OutputPath>
-    <DefineConstants>TRACE;DEV11;NODEJS_TOOLS</DefineConstants>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
     <RunCodeAnalysis>false</RunCodeAnalysis>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Platform)' == 'x86' ">
     <PlatformTarget>x86</PlatformTarget>
+  </PropertyGroup>
+  <PropertyGroup>
+    <DefineConstants>$(DefineConstants);TRACE;NODEJS_TOOLS</DefineConstants>
   </PropertyGroup>
   <ItemGroup>
     <ProjectReference Include="..\NodeLogConverter\NodeLogConverter.csproj">

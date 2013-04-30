@@ -1,8 +1,4 @@
 <Project xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
-  <PropertyGroup>
-    <DefineConstants>$(DefineConstants);NODE_TOOLS</DefineConstants>
-  </PropertyGroup>
-
   <Import Project="$(BuildRoot)\Build\Common.Build.targets" />
     <!--
     =================================================================================

@@ -65,7 +65,7 @@
     <CheckForOverflowUnderflow>false</CheckForOverflowUnderflow>
     <ConfigurationOverrideFile>
     </ConfigurationOverrideFile>
-    <DefineConstants>DEBUG;TRACE</DefineConstants>
+    <DefineConstants>$(DefineConstants);DEBUG;TRACE</DefineConstants>
     <DocumentationFile>
     </DocumentationFile>
     <DebugSymbols>true</DebugSymbols>
@@ -92,7 +92,7 @@
     <CheckForOverflowUnderflow>false</CheckForOverflowUnderflow>
     <ConfigurationOverrideFile>
     </ConfigurationOverrideFile>
-    <DefineConstants>TRACE</DefineConstants>
+    <DefineConstants>$(DefineConstants);TRACE</DefineConstants>
     <DocumentationFile>
     </DocumentationFile>
     <DebugSymbols>true</DebugSymbols>

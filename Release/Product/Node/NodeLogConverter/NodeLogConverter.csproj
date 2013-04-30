@@ -4,7 +4,7 @@
   <Import Project="..\ProjectBefore.settings" />
   <PropertyGroup>
     <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
-    <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
+    <Platform Condition=" '$(Platform)' == '' ">x86</Platform>
     <ProjectGuid>{9A69745F-546D-40A0-8770-7E5B9ED0C82F}</ProjectGuid>
     <OutputType>Exe</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
@@ -21,14 +21,14 @@
     <PlatformTarget>x86</PlatformTarget>
     <DebugSymbols>true</DebugSymbols>
     <DebugType>full</DebugType>
-    <DefineConstants>DEBUG</DefineConstants>
+    <DefineConstants>$(DefineConstants);DEBUG</DefineConstants>
     <TreatWarningsAsErrors>true</TreatWarningsAsErrors>
     <ErrorReport>prompt</ErrorReport>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'Release|x86'">
     <PlatformTarget>x86</PlatformTarget>
     <DebugType>pdbonly</DebugType>
-    <DefineConstants>TRACE</DefineConstants>
+    <DefineConstants>$(DefineConstants);TRACE</DefineConstants>
     <Optimize>true</Optimize>
     <TreatWarningsAsErrors>true</TreatWarningsAsErrors>
     <ErrorReport>prompt</ErrorReport>

@@ -21,6 +21,7 @@ using System.Windows.Automation;
 using System.Windows.Input;
 using EnvDTE;
 using Microsoft.TC.TestHostAdapters;
+using Microsoft.VisualStudio.ComponentModelHost;
 using Microsoft.VisualStudio.Shell.Interop;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using TestUtilities;
@@ -43,6 +44,12 @@ namespace TestUtilities.UI {
             : base(AutomationElement.FromHandle(windowHandle)) {
         }
 
+        public IComponentModel ComponentModel {
+            get {
+                return (IComponentModel)VsIdeTestHostContext.ServiceProvider.GetService(typeof(SComponentModel));
+            }
+        }
+
         /// <summary>
         /// File->Save
         /// </summary>
@@ -63,6 +70,14 @@ namespace TestUtilities.UI {
         public void OpenObjectBrowser()
         {
             Dte.ExecuteCommand("View.ObjectBrowser");
+        }
+
+        /// <summary>
+        /// Opens and activates the Navigate To window.
+        /// </summary>
+        public NavigateToDialog OpenNavigateTo() {
+            ThreadPool.QueueUserWorkItem(x => Dte.ExecuteCommand("Edit.NavigateTo"));
+            return new NavigateToDialog(WaitForDialog());
         }
 
         public SaveDialog SaveAs() {
@@ -239,6 +254,27 @@ namespace TestUtilities.UI {
             return hwnd;
         }
 
+        /// <summary>
+        /// Waits for no dialog. If a dialog appears before the timeout expires
+        /// then the test fails and the dialog is closed.
+        /// </summary>
+        public void WaitForNoDialog(TimeSpan timeout) {
+            IVsUIShell uiShell = VsIdeTestHostContext.ServiceProvider.GetService(typeof(IVsUIShell)) as IVsUIShell;
+            IntPtr hwnd;
+            uiShell.GetDialogOwnerHwnd(out hwnd);
+
+            for (int i = 0; i < 100 && hwnd.ToInt32() == Dte.MainWindow.HWnd; i++) {
+                System.Threading.Thread.Sleep((int)timeout.TotalMilliseconds / 100);
+                uiShell.GetDialogOwnerHwnd(out hwnd);
+            }
+
+            if (hwnd != (IntPtr)Dte.MainWindow.HWnd) {
+                AutomationWrapper.DumpElement(AutomationElement.FromHandle(hwnd));
+                NativeMethods.EndDialog(hwnd, (IntPtr)(int)MessageBoxButton.Cancel);
+                Assert.Fail("Dialog appeared - see output for details");
+            }
+        }
+
         internal static void CheckMessageBox(params string[] text) {
             CheckMessageBox(MessageBoxButton.Cancel, text);
         }
@@ -263,7 +299,8 @@ namespace TestUtilities.UI {
                 uiShell.GetDialogOwnerHwnd(out hwnd);
             }
 
-            Assert.IsTrue(hwnd.ToInt32() != VsIdeTestHostContext.Dte.MainWindow.HWnd && hwnd != IntPtr.Zero);
+            Assert.IsTrue(hwnd != IntPtr.Zero, "hwnd is null, We failed to get the dialog");
+            Assert.IsTrue(hwnd.ToInt32() != VsIdeTestHostContext.Dte.MainWindow.HWnd, "hwnd is Dte.MainWindow, We failed to get the dialog");
             AutomationWrapper.DumpElement(AutomationElement.FromHandle(hwnd));
             StringBuilder title = new StringBuilder(4096);
             Assert.AreNotEqual(NativeMethods.GetDlgItemText(hwnd, dlgField, title, title.Capacity), (uint)0);

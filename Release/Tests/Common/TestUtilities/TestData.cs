@@ -29,11 +29,7 @@ namespace TestUtilities {
 #else
             @"Release" + 
 #endif
-#if DEV11
-            @"11.0";
-#else
-            @"10.0";
-#endif
+            AssemblyVersionInfo.VSVersion;
         const string BinariesOutPath = "";
 
         const string DataAltSourcePath = @"TestData";
@@ -93,9 +89,13 @@ namespace TestUtilities {
             }
         }
 
-        public static void Deploy(string dataSourcePath = null) {
+        public static void Deploy(string dataSourcePath = null, bool includeTestData = true) {
             var sourceRoot = GetSolutionDir();
             var deployRoot = Path.GetDirectoryName((typeof(TestData)).Assembly.Location);
+
+            if (deployRoot.Length < 5) {
+                Debug.Fail("Invalid deploy root", string.Format("sourceRoot={0}\ndeployRoot={1}", sourceRoot, deployRoot));
+            }
 
             var binSource = Path.Combine(sourceRoot, BinariesSourcePath);
             if (!Directory.Exists(binSource)) {
@@ -107,19 +107,26 @@ namespace TestUtilities {
 
             var binDest = Path.Combine(deployRoot, BinariesOutPath);
             if (binSource == binDest) {
-                Debug.Fail("Select the default.testsettings file before running tests.");
-            }
-
-            var dataSource = Path.Combine(sourceRoot, dataSourcePath ?? DataSourcePath);
-            if (!Directory.Exists(dataSource)) {
-                dataSource = Path.Combine(sourceRoot, DataAltSourcePath);
-                if (!Directory.Exists(dataSource)) {
-                    Debug.Fail("Could not find location of test data.");
+                if (includeTestData) {
+                    Debug.Fail("Running tests inside build directory", "Select the default.testsettings file before running tests.");
+                } else {
+                    return;
                 }
             }
 
             CopyFiles(binSource, binDest);
-            CopyFiles(dataSource, Path.Combine(deployRoot, DataOutPath));
+
+            if (includeTestData) {
+                var dataSource = Path.Combine(sourceRoot, dataSourcePath ?? DataSourcePath);
+                if (!Directory.Exists(dataSource)) {
+                    dataSource = Path.Combine(sourceRoot, DataAltSourcePath);
+                    if (!Directory.Exists(dataSource)) {
+                        Debug.Fail("Could not find location of test data.");
+                    }
+                }
+
+                CopyFiles(dataSource, Path.Combine(deployRoot, DataOutPath));
+            }
         }
 
         /// <summary>

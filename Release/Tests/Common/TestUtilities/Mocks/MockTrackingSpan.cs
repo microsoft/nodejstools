@@ -87,7 +87,8 @@ namespace TestUtilities.Mocks {
         }
 
         public string GetText(ITextSnapshot snapshot) {
-            throw new NotImplementedException();
+            var span = GetSpan(snapshot.Version);
+            return snapshot.GetText(span);
         }
 
         public ITextBuffer TextBuffer {
