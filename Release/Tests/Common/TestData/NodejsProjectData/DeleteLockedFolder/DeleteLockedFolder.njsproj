@@ -3,8 +3,8 @@
   <PropertyGroup>
     <VisualStudioVersion Condition="'$(VisualStudioVersion)' == ''">11.0</VisualStudioVersion>
     <VSToolsPath Condition="'$(VSToolsPath)' == ''">$(MSBuildExtensionsPath32)\Microsoft\VisualStudio\v$(VisualStudioVersion)</VSToolsPath>
-    <Name>DragDropCopyCutPaste</Name>
-    <RootNamespace>DragDropCopyCutPaste</RootNamespace>
+    <Name>HelloWorld</Name>
+    <RootNamespace>HelloWorld</RootNamespace>
   </PropertyGroup>
   <Import Project="$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props" Condition="Exists('$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props')" />
   <PropertyGroup>
@@ -27,59 +27,9 @@
     <DebugSymbols>true</DebugSymbols>
   </PropertyGroup>
   <ItemGroup>
+    <Folder Include="Folder" />
     <Content Include="server.js" />
-  </ItemGroup>
-  <ItemGroup>
-    <Folder Include="CopyDuplicateFolderNameTarget\CopyDuplicateFolderName\" />
-    <Folder Include="CutDeletePaste\" />
-    <Folder Include="CutFolderAndFile\CutFolder\" />
-    <Folder Include="CutRenamePaste\CutRenamePasteFolder\" />
-    <Folder Include="DragDuringCopyDestination\" />
-    <Folder Include="CutFolderPasteOnSelf\" />
-    <Folder Include="DuplicateFolderNameTarget\DuplicateFolderName\" />
-    <Folder Include="DragFolderAndFileOntoSelf" />
-    <Folder Include="DragFolderAndFileToSameFolder\" />
-    <Folder Include="DropFolder\" />
-    <Folder Include="FolderWithItems\" />
-    <Folder Include="FolderWithItemsNotInProject\" />
-    <Folder Include="DuplicateFolderName\" />
-    <Folder Include="DuplicateFolderNameTarget\" />
-    <Folder Include="CopyDuplicateFolderName\" />
-    <Folder Include="CopyDuplicateFolderNameTarget\" />
-    <Folder Include="CopyFolderMissingItem" />
-    <Folder Include="DragFolderOntoSelf" />
-    <Folder Include="MoveDupFilename\" />
-    <Folder Include="MoveDupFilename\Foo\" />
-    <Folder Include="CutFolderAndFile\" />
-    <Folder Include="CopyDeletePaste\" />
-    <Folder Include="CutRenamePaste\" />
-    <Folder Include="!Source\" />
-    <Folder Include="ParentFolder\" />
-    <Folder Include="ParentFolder\ChildFolder\" />
-    <Folder Include="PasteFolder\" />
-  </ItemGroup>
-  <ItemGroup>
-    <Compile Include="!Source\DraggedToOtherProject.js" />
-    <Compile Include="CopiedBeforeDragPastedAfterDrop.js" />
-    <Compile Include="CutDeletePaste\CutDeletePaste.js" />
-    <Compile Include="CopyDeletePaste\CopyDeletePaste.js" />
-    <Compile Include="CopyDuplicateFolderName\JavaScript1.js" />
-    <Compile Include="CopyFolderMissingItem\JavaScript1.js" />
-    <Compile Include="CrossHierarchyCut.js" />
-    <Compile Include="CutFolderAndFile\CutFolder\CutFolderAndFile.js" />
-    <Compile Include="CutPastePasteItem.js" />
-    <Compile Include="CutFilePasteSameLocation.js" />
-    <Compile Include="CutRenamePaste\CutRenamePaste.js" />
-    <Compile Include="DragAndDroppedDuringCopy.js" />
-    <Compile Include="DragFolderAndFileToSameFolder\JavaScript1.js" />
-    <Compile Include="DragFolderOntoSelf\File.js" />
-    <Compile Include="DragFolderAndFileOntoSelf\File.js" />
-    <Compile Include="FolderWithItems\JavaScript1.js" />
-    <Compile Include="FolderWithItems\JavaScript2.js" />
-    <Compile Include="!Source\DoubleCrossHierarchy.js" />
-    <Compile Include="JavaScript1.js" />
-    <Compile Include="MoveDupFilename\Foo\JavaScript1.js" />
-    <Compile Include="MoveDupFilename\JavaScript1.js" />
+    <Content Include="Folder\Text.txt" />
   </ItemGroup>
   <Import Project="$(VSToolsPath)\Node.js Tools\Microsoft.NodejsTools.targets" />
   <ProjectExtensions>

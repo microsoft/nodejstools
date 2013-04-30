@@ -252,10 +252,10 @@ namespace Microsoft.NodejsTools {
                 return true;
             } else if (itemType == VSConstants.GUID_ItemType_PhysicalFile) {
                 // multiple files selected
-                res = ShowContextMenu(pvaIn, VsMenus.IDM_VS_CTXT_WEBITEMNODE);
+                res = ShowContextMenu(pvaIn, VsMenus.IDM_VS_CTXT_ITEMNODE);
                 return true;
             } else if (itemType == VSConstants.GUID_ItemType_PhysicalFolder) {
-                res = ShowContextMenu(pvaIn, VsMenus.IDM_VS_CTXT_WEBFOLDER);
+                res = ShowContextMenu(pvaIn, VsMenus.IDM_VS_CTXT_FOLDERNODE);
                 return true;
             }
             res = VSConstants.E_FAIL;
@@ -318,7 +318,8 @@ namespace Microsoft.NodejsTools {
                 }
             }
 
-            return base.ExecCommand(itemid, ref pguidCmdGroup, nCmdID, nCmdexecopt, pvaIn, pvaOut);
+            var result = base.ExecCommand(itemid, ref pguidCmdGroup, nCmdID, nCmdexecopt, pvaIn, pvaOut);
+            return result;
         }
 
         int IOleCommandTarget.Exec(ref Guid pguidCmdGroup, uint nCmdID, uint nCmdexecopt, IntPtr pvaIn, IntPtr pvaOut) {
@@ -631,7 +632,7 @@ namespace Microsoft.NodejsTools {
                 new IntPtr(-1),
                 out frame
             );
-            if (ErrorHandler.Succeeded(hr)) {
+            if (frame != null && ErrorHandler.Succeeded(hr)) {
                 hr = frame.Show();
             }
             return hr;
