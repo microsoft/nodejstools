@@ -92,7 +92,6 @@
     <Compile Include="Mocks\MockGlyphService.cs" />
     <Compile Include="Mocks\MockMappingPoint.cs" />
     <Compile Include="Mocks\MockNormalizedTextChangeCollection.cs" />
-    <Compile Include="Mocks\MockReplWindow.cs" />
     <Compile Include="Mocks\MockTextBuffer.cs" />
     <Compile Include="Mocks\MockTextCaret.cs" />
     <Compile Include="Mocks\MockTextChange.cs" />

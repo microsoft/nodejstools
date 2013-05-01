@@ -59,6 +59,15 @@
       <Project>{32ec5259-98da-40ca-9e2d-1b1b2e966f88}</Project>
       <Name>Node</Name>
     </ProjectReference>
+    <ProjectReference Include="..\TestUtilities.UI.Nodejs\TestUtilities.UI.Nodejs.csproj">
+      <Project>{a731c4c3-3741-4080-a946-c47574c1f3bf}</Project>
+      <Name>TestUtilities.UI.Nodejs</Name>
+    </ProjectReference>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="..\..\Product\Node\Node\visualstudio_nodejs_repl.js">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
   </ItemGroup>
   <Import Project="..\TestProjectAfter.settings" />
 </Project>

@@ -167,6 +167,18 @@
     </COMReference>
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="..\..\Python\PythonTools\PythonTools\Navigation\SourceLocation.cs">
+      <Link>Navigation\SourceLocation.cs</Link>
+    </Compile>
+    <Compile Include="..\..\Python\PythonTools\PythonTools\Project\OverwriteFileDialog.xaml.cs">
+      <DependentUpon>OverwriteFileDialog.xaml</DependentUpon>
+      <Link>Project\OverwriteFileDialog.xaml.cs</Link>
+    </Compile>
+    <Page Include="..\..\Python\PythonTools\PythonTools\Project\OverwriteFileDialog.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+      <Link>Project\OverwriteFileDialog.xaml</Link>
+    </Page>
     <Compile Include="..\..\Python\PythonTools\PythonTools\CommonConstants.cs">
       <Link>CommonConstants.cs</Link>
     </Compile>
@@ -485,9 +497,6 @@
     <Compile Include="..\..\Python\PythonTools\PythonTools\Project\SolutionListenerForBuildDependencyUpdate.cs">
       <Link>Project\SolutionListenerForBuildDependencyUpdate.cs</Link>
     </Compile>
-    <Compile Include="..\..\Python\PythonTools\PythonTools\Project\SolutionListenerForProjectEvents.cs">
-      <Link>Project\SolutionListenerForProjectEvents.cs</Link>
-    </Compile>
     <Compile Include="..\..\Python\PythonTools\PythonTools\Project\SolutionListenerForProjectOpen.cs">
       <Link>Project\SolutionListenerForProjectOpen.cs</Link>
     </Compile>
@@ -501,10 +510,15 @@
       <Link>Project\TaskProgressBar.xaml.cs</Link>
       <DependentUpon>TaskProgressBar.xaml</DependentUpon>
     </Compile>
+    <Compile Include="..\..\Python\PythonTools\PythonTools\Project\IDiskBasedNode.cs">
+      <Link>Project\IDiskBasedNode.cs</Link>
+    </Compile>
+    <Compile Include="..\..\Python\PythonTools\PythonTools\Project\SharedCommands.cs">
+      <Link>Project\SharedCommands.cs</Link>
+    </Compile>
     <Compile Include="CustomTrackingSpan.cs" />
     <Compile Include="EditFilter.cs" />
     <Compile Include="NodeProjectConfig.cs" />
-    <Compile Include="Project\IDiskBasedNode.cs" />
     <Compile Include="Project\NodejsFileNode.cs" />
     <Compile Include="Project\NodejsGeneralPropertyPageControl.cs">
       <SubType>UserControl</SubType>
@@ -512,14 +526,10 @@
     <Compile Include="Project\NodejsGeneralPropertyPageControl.Designer.cs">
       <DependentUpon>NodejsGeneralPropertyPageControl.cs</DependentUpon>
     </Compile>
-    <Compile Include="Project\OverwriteFileDialog.xaml.cs">
-      <DependentUpon>OverwriteFileDialog.xaml</DependentUpon>
-    </Compile>
     <Compile Include="ProvideEditorExtension2Attribute.cs" />
     <Compile Include="ProvideLanguageTemplates.cs" />
     <Compile Include="Repl\ClearReplCommand.cs" />
     <Compile Include="Repl\SaveReplCommand.cs" />
-    <Compile Include="SharedCommands.cs" />
     <Compile Include="VsMenus.cs" />
     <Page Include="..\..\Python\PythonTools\PythonTools\Project\TaskProgressBar.xaml">
       <Generator>MSBuild:Compile</Generator>
@@ -624,7 +634,6 @@
     <Compile Include="JsonListener.cs" />
     <Compile Include="Navigation\CodeWindowManager.cs" />
     <Compile Include="Navigation\IScopeNode.cs" />
-    <Compile Include="Navigation\SourceLocation.cs" />
     <Compile Include="NodeConstants.cs" />
     <Compile Include="NodejsEditorFactory.cs" />
     <Compile Include="NodejsProjectionBuffer.cs" />
@@ -651,10 +660,6 @@
     <Compile Include="GlobalSuppressions.cs" />
     <Compile Include="NodePackage.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
-    <Page Include="Project\OverwriteFileDialog.xaml">
-      <SubType>Designer</SubType>
-      <Generator>MSBuild:Compile</Generator>
-    </Page>
   </ItemGroup>
   <ItemGroup>
     <EmbeddedResource Include="..\..\Python\PythonTools\PythonTools\Project\ProjectResources.resx">

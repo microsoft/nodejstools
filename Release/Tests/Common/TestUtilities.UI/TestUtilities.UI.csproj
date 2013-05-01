@@ -96,7 +96,6 @@
     <Compile Include="UI\ExceptionButton.cs" />
     <Compile Include="UI\ExceptionHelperDialog.cs" />
     <Compile Include="UI\Header.cs" />
-    <Compile Include="UI\InteractiveWindow.cs" />
     <Compile Include="UI\Keyboard.cs" />
     <Compile Include="UI\ListItem.cs" />
     <Compile Include="UI\ListView.cs" />
@@ -110,15 +109,6 @@
     <Compile Include="UI\ObjectBrowser.cs" />
     <Compile Include="UI\OverwriteFileDialog.cs" />
     <Compile Include="UI\ProjectPropertiesWindow.cs" />
-    <Compile Include="UI\Python\ComparePerfReports.cs" />
-    <Compile Include="UI\Python\Django\NewAppDialog.cs" />
-    <Compile Include="UI\Python\Django\PythonProjectDebugProperties.cs" />
-    <Compile Include="UI\Python\FormattingOptionsTreeView.cs" />
-    <Compile Include="UI\Python\PythonLaunchWithErrorsDialog.cs" />
-    <Compile Include="UI\Python\PythonPerfExplorer.cs" />
-    <Compile Include="UI\Python\PythonPerfTarget.cs" />
-    <Compile Include="UI\Python\PythonPerfToolBar.cs" />
-    <Compile Include="UI\Python\PythonVisualStudioApp.cs" />
     <Compile Include="UI\RemoveItemDialog.cs" />
     <Compile Include="UI\SaveDialog.cs" />
     <Compile Include="UI\SaveProjectDialog.cs" />
@@ -134,10 +124,6 @@
     <Compile Include="UI\VisualStudioApp.cs" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\..\..\Product\Node\InteractiveWindow\InteractiveWindow.csproj">
-      <Project>{24a3887f-da50-4989-8d6c-4a5b04d5d457}</Project>
-      <Name>InteractiveWindow</Name>
-    </ProjectReference>
     <ProjectReference Include="..\TestUtilities\TestUtilities.csproj">
       <Project>{D092D54E-FF29-4D32-9AEE-4EF704C92F67}</Project>
       <Name>TestUtilities</Name>

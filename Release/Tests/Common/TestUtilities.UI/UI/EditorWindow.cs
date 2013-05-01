@@ -128,7 +128,7 @@ namespace TestUtilities.UI {
             FailWrongText(expected);
         }
 
-        internal static string GetExpectedText(IList<string> text) {
+        public static string GetExpectedText(IList<string> text) {
             StringBuilder finalString = new StringBuilder();
             for (int i = 0; i < text.Count; i++) {
                 if (i != 0) {
@@ -144,10 +144,26 @@ namespace TestUtilities.UI {
 
         private void FailWrongText(string expected) {
             StringBuilder msg = new StringBuilder("Did not get text: ");
-            InteractiveWindow.AppendRepr(msg, expected);
+            AppendRepr(msg, expected);
             msg.Append(" instead got ");
-            InteractiveWindow.AppendRepr(msg, Text);
+            AppendRepr(msg, Text);
             Assert.Fail(msg.ToString());
+        }
+
+        public static void AppendRepr(StringBuilder msg, string str) {
+            for (int i = 0; i < str.Length; i++) {
+                if (str[i] >= 32) {
+                    msg.Append(str[i]);
+                } else {
+                    switch (str[i]) {
+                        case '\n': msg.Append("\\n"); break;
+
+                        case '\r': msg.Append("\\r"); break;
+                        case '\t': msg.Append("\\t"); break;
+                        default: msg.AppendFormat("\\u00{0:D2}", (int)str[i]); break;
+                    }
+                }
+            }
         }
 
         public void StartSmartTagSessionNoSession() {

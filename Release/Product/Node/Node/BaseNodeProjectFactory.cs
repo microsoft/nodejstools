@@ -26,7 +26,7 @@ namespace Microsoft.NodejsTools {
         public BaseNodeProjectFactory(NodejsProjectPackage package) : base(package) {
         }
 
-        protected override ProjectNode CreateProject() {
+        internal override ProjectNode CreateProject() {
             NodejsProjectNode project = new NodejsProjectNode((NodejsProjectPackage)Package);
             project.SetSite((IOleServiceProvider)((IServiceProvider)Package).GetService(typeof(IOleServiceProvider)));
             return project;

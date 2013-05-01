@@ -98,5 +98,39 @@ namespace TestUtilities.UI.Nodejs {
             }
             throw new InvalidOperationException("Document not opened: " + docName);
         }
+
+        public InteractiveWindow GetInteractiveWindow(string title) {
+            string autoId = GetName(title);
+            AutomationElement element = null;
+            for (int i = 0; i < 5 && element == null; i++) {
+                element = Element.FindFirst(TreeScope.Descendants,
+                        new AndCondition(
+                            new PropertyCondition(
+                                AutomationElement.AutomationIdProperty,
+                                autoId
+                            ),
+                            new PropertyCondition(
+                                AutomationElement.ClassNameProperty,
+                                ""
+                            )
+                        )
+                    );
+                if (element == null) {
+                    System.Threading.Thread.Sleep(100);
+                }
+            }
+
+            return new InteractiveWindow(
+                title,
+                element.FindFirst(
+                    TreeScope.Descendants,
+                    new PropertyCondition(
+                        AutomationElement.AutomationIdProperty,
+                        "WpfTextView"
+                    )
+                )
+            );
+
+        }
     }
 }

@@ -174,22 +174,6 @@ namespace TestUtilities.UI {
             Assert.Fail(msg.ToString());
         }
 
-        internal static void AppendRepr(StringBuilder msg, string str) {
-            for (int i = 0; i < str.Length; i++) {
-                if (str[i] >= 32) {
-                    msg.Append(str[i]);
-                } else {
-                    switch (str[i]) {
-                        case '\n': msg.Append("\\n"); break;
-
-                        case '\r': msg.Append("\\r"); break;
-                        case '\t': msg.Append("\\t"); break;
-                        default: msg.AppendFormat("\\u00{0:D2}", (int)str[i]); break;
-                    }
-                }
-            }
-        }
-
         public void WaitForSessionDismissed() {
             var sessionStack = IntellisenseSessionStack;
             for (int i = 0; i < 100; i++) {

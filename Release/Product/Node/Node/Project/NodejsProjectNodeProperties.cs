@@ -24,7 +24,7 @@ namespace Microsoft.NodejsTools.Project {
     [ClassInterface(ClassInterfaceType.AutoDual)]
     [Guid("04726C27-8125-471A-BAC0-2301D273DB5E")]
     public class NodejsProjectNodeProperties : CommonProjectNodeProperties, EnvDTE80.IInternalExtenderProvider {
-        public NodejsProjectNodeProperties(ProjectNode node)
+        internal NodejsProjectNodeProperties(ProjectNode node)
             : base(node) {
         }
 
@@ -137,7 +137,7 @@ namespace Microsoft.NodejsTools.Project {
 
 
         object EnvDTE80.IInternalExtenderProvider.GetExtender(string extenderCATID, string extenderName, object extendeeObject, EnvDTE.IExtenderSite extenderSite, int cookie) {
-            EnvDTE80.IInternalExtenderProvider outerHierarchy = HierarchyNode.GetOuterHierarchy(this.Node) as EnvDTE80.IInternalExtenderProvider;
+            EnvDTE80.IInternalExtenderProvider outerHierarchy = Node.GetOuterInterface<EnvDTE80.IInternalExtenderProvider>();
 
             if (outerHierarchy != null) {
                 var res = outerHierarchy.GetExtender(extenderCATID, extenderName, extendeeObject, extenderSite, cookie);
