@@ -14,7 +14,8 @@
   <Import Project="$(TargetsPath)\ProcessMonitor.proj" />
 
   <ItemGroup>
-    <ProjectFile Include="Release\dirs.proj"/>
+    <ProjectFile Include="Nodejs\dirs.proj"/>
+    <ProjectFile Include="Python\dirs.proj"/>
   </ItemGroup>
 
   <Import Project="$(TargetsPath)\Common.Build.Traversal.targets" />
