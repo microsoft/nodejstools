@@ -1,0 +1,165 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio 2012
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Node", "Product\Nodejs\Node.csproj", "{32EC5259-98DA-40CA-9E2D-1B1B2E966F88}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ReferenceGenerator", "Product\ReferenceGenerator\ReferenceGenerator.csproj", "{81FBB417-19B2-4E70-857E-D4564B77AD8F}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Core", "Tests\Core\NodeTests.csproj", "{240A6D2B-1982-4BC5-B1EA-C6CB0492329D}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TestUtilities", "..\Common\Tests\Utilities\TestUtilities.csproj", "{D092D54E-FF29-4D32-9AEE-4EF704C92F67}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TestUtilities.UI", "..\Common\Tests\Utilities.UI\TestUtilities.UI.csproj", "{E8150EBC-6B62-40BF-BF91-1DC60149B530}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Profiling", "Product\Profiling\Profiling.csproj", "{C42B194E-3333-45E8-BB26-D69D1A51EF0B}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Profiling", "Tests\Profiling\ProfilerTests.csproj", "{F18AF6F7-F534-44BE-B5DE-44D6EFFF947D}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "LogConverter", "Product\LogConverter\LogConverter.csproj", "{9A69745F-546D-40A0-8770-7E5B9ED0C82F}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Profiling.UI", "Tests\Profiling.UI\ProfilerUITests.csproj", "{C88DF887-5CF2-4591-A268-69339D396D88}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Utilities.UI.Nodejs", "Tests\Utilities.UI\TestUtilities.UI.Nodejs.csproj", "{A731C4C3-3741-4080-A946-C47574C1F3BF}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Core.UI", "Tests\Core.UI\Nodejs.Tests.UI.csproj", "{8BA25AF0-477B-435C-8A23-970F2ADCED33}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "InteractiveWindow", "Product\InteractiveWindow\InteractiveWindow.csproj", "{24A3887F-DA50-4989-8D6C-4A5B04D5D457}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "AjaxMinDll", "Product\AjaxMinDll\AjaxMinDll.csproj", "{DFDB930E-1162-4514-A91D-C8595A807F13}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Product", "Product", "{F9719B35-F359-47A7-A2F8-34F42E53C809}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Tests", "Tests", "{850AC94A-310F-4F88-A553-2806D7732BD1}"
+EndProject
+Global
+	GlobalSection(TeamFoundationVersionControl) = preSolution
+		SccNumberOfProjects = 13
+		SccEnterpriseProvider = {4CA58AB2-18FA-4F8D-95D4-32DDF27D184C}
+		SccTeamFoundationServer = http://tcvstf:8080/tfs/tc
+		SccLocalPath0 = .
+		SccProjectUniqueName1 = Product\\AjaxMinDll\\AjaxMinDll.csproj
+		SccProjectTopLevelParentUniqueName1 = NodejsTools.sln
+		SccProjectName1 = Product/AjaxMinDll
+		SccLocalPath1 = Product\\AjaxMinDll
+		SccProjectUniqueName2 = Product\\InteractiveWindow\\InteractiveWindow.csproj
+		SccProjectTopLevelParentUniqueName2 = NodejsTools.sln
+		SccProjectName2 = Product/InteractiveWindow
+		SccLocalPath2 = Product\\InteractiveWindow
+		SccProjectUniqueName3 = Product\\Nodejs\\Node.csproj
+		SccProjectTopLevelParentUniqueName3 = NodejsTools.sln
+		SccProjectName3 = Product/Nodejs
+		SccLocalPath3 = Product\\Nodejs
+		SccProjectUniqueName4 = Product\\ReferenceGenerator\\ReferenceGenerator.csproj
+		SccProjectTopLevelParentUniqueName4 = NodejsTools.sln
+		SccProjectName4 = Product/ReferenceGenerator
+		SccLocalPath4 = Product\\ReferenceGenerator
+		SccProjectUniqueName5 = Product\\LogConverter\\LogConverter.csproj
+		SccProjectTopLevelParentUniqueName5 = NodejsTools.sln
+		SccProjectName5 = Product/LogConverter
+		SccLocalPath5 = Product\\LogConverter
+		SccProjectUniqueName6 = Product\\Profiling\\Profiling.csproj
+		SccProjectTopLevelParentUniqueName6 = NodejsTools.sln
+		SccProjectName6 = Product/Profiling
+		SccLocalPath6 = Product\\Profiling
+		SccProjectUniqueName7 = Tests\\Core\\NodeTests.csproj
+		SccProjectTopLevelParentUniqueName7 = NodejsTools.sln
+		SccProjectName7 = Tests/Core
+		SccLocalPath7 = Tests\\Core
+		SccProjectUniqueName8 = Tests\\Profiling\\ProfilerTests.csproj
+		SccProjectTopLevelParentUniqueName8 = NodejsTools.sln
+		SccProjectName8 = Tests/Profiling
+		SccLocalPath8 = Tests\\Profiling
+		SccProjectUniqueName9 = Tests\\Profiling.UI\\ProfilerUITests.csproj
+		SccProjectTopLevelParentUniqueName9 = NodejsTools.sln
+		SccProjectName9 = Tests/Profiling.UI
+		SccLocalPath9 = Tests\\Profiling.UI
+		SccProjectUniqueName10 = Tests\\Utilities.UI\\TestUtilities.UI.Nodejs.csproj
+		SccProjectTopLevelParentUniqueName10 = NodejsTools.sln
+		SccProjectName10 = Tests/Utilities.UI
+		SccLocalPath10 = Tests\\Utilities.UI
+		SccProjectUniqueName11 = Tests\\Core.UI\\Nodejs.Tests.UI.csproj
+		SccProjectTopLevelParentUniqueName11 = NodejsTools.sln
+		SccProjectName11 = Tests/Core.UI
+		SccLocalPath11 = Tests\\Core.UI
+		SccProjectUniqueName12 = ..\\Common\\Tests\\Utilities\\TestUtilities.csproj
+		SccProjectTopLevelParentUniqueName12 = NodejsTools.sln
+		SccProjectName12 = ../Common/Tests/Utilities
+		SccLocalPath12 = ..\\Common\\Tests\\Utilities
+	EndGlobalSection
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|x86 = Debug|x86
+		Release|x86 = Release|x86
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{32EC5259-98DA-40CA-9E2D-1B1B2E966F88}.Debug|x86.ActiveCfg = Debug|x86
+		{32EC5259-98DA-40CA-9E2D-1B1B2E966F88}.Debug|x86.Build.0 = Debug|x86
+		{32EC5259-98DA-40CA-9E2D-1B1B2E966F88}.Release|x86.ActiveCfg = Release|x86
+		{32EC5259-98DA-40CA-9E2D-1B1B2E966F88}.Release|x86.Build.0 = Release|x86
+		{81FBB417-19B2-4E70-857E-D4564B77AD8F}.Debug|x86.ActiveCfg = Debug|x86
+		{81FBB417-19B2-4E70-857E-D4564B77AD8F}.Debug|x86.Build.0 = Debug|x86
+		{81FBB417-19B2-4E70-857E-D4564B77AD8F}.Release|x86.ActiveCfg = Release|x86
+		{81FBB417-19B2-4E70-857E-D4564B77AD8F}.Release|x86.Build.0 = Release|x86
+		{240A6D2B-1982-4BC5-B1EA-C6CB0492329D}.Debug|x86.ActiveCfg = Debug|x86
+		{240A6D2B-1982-4BC5-B1EA-C6CB0492329D}.Debug|x86.Build.0 = Debug|x86
+		{240A6D2B-1982-4BC5-B1EA-C6CB0492329D}.Release|x86.ActiveCfg = Release|x86
+		{240A6D2B-1982-4BC5-B1EA-C6CB0492329D}.Release|x86.Build.0 = Release|x86
+		{D092D54E-FF29-4D32-9AEE-4EF704C92F67}.Debug|x86.ActiveCfg = Debug|x86
+		{D092D54E-FF29-4D32-9AEE-4EF704C92F67}.Debug|x86.Build.0 = Debug|x86
+		{D092D54E-FF29-4D32-9AEE-4EF704C92F67}.Release|x86.ActiveCfg = Release|x86
+		{D092D54E-FF29-4D32-9AEE-4EF704C92F67}.Release|x86.Build.0 = Release|x86
+		{E8150EBC-6B62-40BF-BF91-1DC60149B530}.Debug|x86.ActiveCfg = Debug|x86
+		{E8150EBC-6B62-40BF-BF91-1DC60149B530}.Debug|x86.Build.0 = Debug|x86
+		{E8150EBC-6B62-40BF-BF91-1DC60149B530}.Release|x86.ActiveCfg = Release|x86
+		{E8150EBC-6B62-40BF-BF91-1DC60149B530}.Release|x86.Build.0 = Release|x86
+		{C42B194E-3333-45E8-BB26-D69D1A51EF0B}.Debug|x86.ActiveCfg = Debug|x86
+		{C42B194E-3333-45E8-BB26-D69D1A51EF0B}.Debug|x86.Build.0 = Debug|x86
+		{C42B194E-3333-45E8-BB26-D69D1A51EF0B}.Release|x86.ActiveCfg = Release|x86
+		{C42B194E-3333-45E8-BB26-D69D1A51EF0B}.Release|x86.Build.0 = Release|x86
+		{F18AF6F7-F534-44BE-B5DE-44D6EFFF947D}.Debug|x86.ActiveCfg = Debug|x86
+		{F18AF6F7-F534-44BE-B5DE-44D6EFFF947D}.Debug|x86.Build.0 = Debug|x86
+		{F18AF6F7-F534-44BE-B5DE-44D6EFFF947D}.Release|x86.ActiveCfg = Release|x86
+		{F18AF6F7-F534-44BE-B5DE-44D6EFFF947D}.Release|x86.Build.0 = Release|x86
+		{9A69745F-546D-40A0-8770-7E5B9ED0C82F}.Debug|x86.ActiveCfg = Debug|x86
+		{9A69745F-546D-40A0-8770-7E5B9ED0C82F}.Debug|x86.Build.0 = Debug|x86
+		{9A69745F-546D-40A0-8770-7E5B9ED0C82F}.Release|x86.ActiveCfg = Release|x86
+		{9A69745F-546D-40A0-8770-7E5B9ED0C82F}.Release|x86.Build.0 = Release|x86
+		{C88DF887-5CF2-4591-A268-69339D396D88}.Debug|x86.ActiveCfg = Debug|x86
+		{C88DF887-5CF2-4591-A268-69339D396D88}.Debug|x86.Build.0 = Debug|x86
+		{C88DF887-5CF2-4591-A268-69339D396D88}.Release|x86.ActiveCfg = Release|x86
+		{C88DF887-5CF2-4591-A268-69339D396D88}.Release|x86.Build.0 = Release|x86
+		{A731C4C3-3741-4080-A946-C47574C1F3BF}.Debug|x86.ActiveCfg = Debug|x86
+		{A731C4C3-3741-4080-A946-C47574C1F3BF}.Debug|x86.Build.0 = Debug|x86
+		{A731C4C3-3741-4080-A946-C47574C1F3BF}.Release|x86.ActiveCfg = Release|x86
+		{A731C4C3-3741-4080-A946-C47574C1F3BF}.Release|x86.Build.0 = Release|x86
+		{8BA25AF0-477B-435C-8A23-970F2ADCED33}.Debug|x86.ActiveCfg = Debug|x86
+		{8BA25AF0-477B-435C-8A23-970F2ADCED33}.Debug|x86.Build.0 = Debug|x86
+		{8BA25AF0-477B-435C-8A23-970F2ADCED33}.Release|x86.ActiveCfg = Release|x86
+		{8BA25AF0-477B-435C-8A23-970F2ADCED33}.Release|x86.Build.0 = Release|x86
+		{24A3887F-DA50-4989-8D6C-4A5B04D5D457}.Debug|x86.ActiveCfg = Debug|x86
+		{24A3887F-DA50-4989-8D6C-4A5B04D5D457}.Debug|x86.Build.0 = Debug|x86
+		{24A3887F-DA50-4989-8D6C-4A5B04D5D457}.Release|x86.ActiveCfg = Release|x86
+		{24A3887F-DA50-4989-8D6C-4A5B04D5D457}.Release|x86.Build.0 = Release|x86
+		{DFDB930E-1162-4514-A91D-C8595A807F13}.Debug|x86.ActiveCfg = Debug|x86
+		{DFDB930E-1162-4514-A91D-C8595A807F13}.Debug|x86.Build.0 = Debug|x86
+		{DFDB930E-1162-4514-A91D-C8595A807F13}.Release|x86.ActiveCfg = Release|x86
+		{DFDB930E-1162-4514-A91D-C8595A807F13}.Release|x86.Build.0 = Release|x86
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(NestedProjects) = preSolution
+		{81FBB417-19B2-4E70-857E-D4564B77AD8F} = {F9719B35-F359-47A7-A2F8-34F42E53C809}
+		{C42B194E-3333-45E8-BB26-D69D1A51EF0B} = {F9719B35-F359-47A7-A2F8-34F42E53C809}
+		{9A69745F-546D-40A0-8770-7E5B9ED0C82F} = {F9719B35-F359-47A7-A2F8-34F42E53C809}
+		{24A3887F-DA50-4989-8D6C-4A5B04D5D457} = {F9719B35-F359-47A7-A2F8-34F42E53C809}
+		{DFDB930E-1162-4514-A91D-C8595A807F13} = {F9719B35-F359-47A7-A2F8-34F42E53C809}
+		{32EC5259-98DA-40CA-9E2D-1B1B2E966F88} = {F9719B35-F359-47A7-A2F8-34F42E53C809}
+		{F18AF6F7-F534-44BE-B5DE-44D6EFFF947D} = {850AC94A-310F-4F88-A553-2806D7732BD1}
+		{C88DF887-5CF2-4591-A268-69339D396D88} = {850AC94A-310F-4F88-A553-2806D7732BD1}
+		{A731C4C3-3741-4080-A946-C47574C1F3BF} = {850AC94A-310F-4F88-A553-2806D7732BD1}
+		{8BA25AF0-477B-435C-8A23-970F2ADCED33} = {850AC94A-310F-4F88-A553-2806D7732BD1}
+		{240A6D2B-1982-4BC5-B1EA-C6CB0492329D} = {850AC94A-310F-4F88-A553-2806D7732BD1}
+		{D092D54E-FF29-4D32-9AEE-4EF704C92F67} = {850AC94A-310F-4F88-A553-2806D7732BD1}
+		{E8150EBC-6B62-40BF-BF91-1DC60149B530} = {850AC94A-310F-4F88-A553-2806D7732BD1}
+	EndGlobalSection
+EndGlobal
