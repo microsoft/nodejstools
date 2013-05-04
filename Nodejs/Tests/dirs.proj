@@ -3,13 +3,13 @@
   <Import Project="TestProjectBefore.settings" />
 
   <ItemGroup>
-    <ProjectFile Include="Common\TestUtilities\TestUtilities.csproj" />
-    <ProjectFile Include="Common\TestUtilities.UI\TestUtilities.UI.csproj" />
-    <ProjectFile Include="NodeTests\NodeTests.csproj" />
-    <ProjectFile Include="Nodejs.Tests.UI\Nodejs.Tests.UI.csproj" />
-    <ProjectFile Include="ProfilerTests\ProfilerTests.csproj" />
-    <ProjectFile Include="ProfilerUITests\ProfilerUITests.csproj" />
-    <ProjectFile Include="TestUtilities.UI.Nodejs\TestUtilities.UI.Nodejs.csproj" />
+    <ProjectFile Include="$(BuildRoot)\Common\Tests\Utilities\TestUtilities.csproj" />
+    <ProjectFile Include="$(BuildRoot)\Common\Tests\Utilities.UI\TestUtilities.UI.csproj" />
+    <ProjectFile Include="$(BuildRoot)\Nodejs\Tests\Core\NodeTests.csproj" />
+    <ProjectFile Include="$(BuildRoot)\Nodejs\Tests\Core.UI\Nodejs.Tests.UI.csproj" />
+    <ProjectFile Include="$(BuildRoot)\Nodejs\Tests\Profiling\ProfilerTests.csproj" />
+    <ProjectFile Include="$(BuildRoot)\Nodejs\Tests\Profiling.UI\ProfilerUITests.csproj" />
+    <ProjectFile Include="$(BuildRoot)\Nodejs\Tests\Utilities.UI\TestUtilities.UI.Nodejs.csproj" />
   </ItemGroup>
 
   <Import Project="$(TargetsPath)\Common.Build.Traversal.targets" />
