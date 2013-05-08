@@ -24,13 +24,16 @@ namespace Microsoft.NodejsTools.Project {
         private FileSystemWatcher _watcher;
         public string _currentText;
 
-        public NodejsFileNode(NodejsProjectNode root, MsBuildProjectElement e)
+        public NodejsFileNode(NodejsProjectNode root, ProjectElement e)
             : base(root, e) {
             CreateWatcher(Url);
-            try {
-                _currentText = File.ReadAllText(Url);
-            } catch {
-                _currentText = "";
+            _currentText = "";
+            if (File.Exists(Url)) { // avoid the exception if we can
+                try {
+                    _currentText = File.ReadAllText(Url);
+                } catch {
+                }
+
             }
             lock (root._nodeFiles) {
                 root._nodeFiles.Add(this);

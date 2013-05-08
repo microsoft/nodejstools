@@ -82,7 +82,7 @@ namespace Microsoft.NodejsTools.Project {
             return new CommonFolderNode(this, element);
         }
 
-        public override CommonFileNode CreateCodeFileNode(MsBuildProjectElement item) {
+        public override CommonFileNode CreateCodeFileNode(ProjectElement item) {
             return new NodejsFileNode(this, item);
         }
 

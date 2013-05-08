@@ -170,6 +170,12 @@
     <Compile Include="$(BuildRoot)\Python\Product\PythonTools\PythonTools\Navigation\SourceLocation.cs">
       <Link>Navigation\SourceLocation.cs</Link>
     </Compile>
+    <Compile Include="$(BuildRoot)\Python\Product\PythonTools\PythonTools\Project\AllFilesProjectElement.cs">
+      <Link>Project\AllFilesProjectElement.cs</Link>
+    </Compile>
+    <Compile Include="$(BuildRoot)\Python\Product\PythonTools\PythonTools\Project\HierarchyNodeFlags.cs">
+      <Link>Project\HierarchyNodeFlags.cs</Link>
+    </Compile>
     <Compile Include="$(BuildRoot)\Python\Product\PythonTools\PythonTools\Project\OverwriteFileDialog.xaml.cs">
       <DependentUpon>OverwriteFileDialog.xaml</DependentUpon>
       <Link>Project\OverwriteFileDialog.xaml.cs</Link>

@@ -40,8 +40,7 @@ namespace TestUtilities {
             var dir = Path.GetDirectoryName((typeof(TestData)).Assembly.Location);
             while (!string.IsNullOrEmpty(dir) && 
                 Directory.Exists(dir) && 
-                !File.Exists(Path.Combine(dir, "build.root")) && 
-                !File.Exists(Path.Combine(dir, "dirs.proj"))) {
+                !File.Exists(Path.Combine(dir, "build.root"))) {
                 dir = Path.GetDirectoryName(dir);
             }
             return dir ?? "";
