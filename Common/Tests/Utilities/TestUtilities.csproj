@@ -105,7 +105,7 @@
     <Compile Include="Mocks\MockTextView.cs" />
     <Compile Include="Mocks\MockTrackingPoint.cs" />
     <Compile Include="Mocks\MockTrackingSpan.cs" />
-    <Compile Include="$(BuildRoot)\Python\Product\PythonTools\PythonTools\CommonUtils.cs" />
+    <Compile Include="$(BuildRoot)\Common\Product\SharedProject\CommonUtils.cs" />
     <Compile Include="NativeMethods.cs">
       <ExcludeFromStyleCop>true</ExcludeFromStyleCop>
     </Compile>
