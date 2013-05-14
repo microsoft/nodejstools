@@ -121,12 +121,6 @@
     </Compile>
     <Compile Include="VSUtility.cs" />
   </ItemGroup>
-  <ItemGroup>
-    <ProjectReference Include="$(BuildRoot)\Nodejs\Product\InteractiveWindow\InteractiveWindow.csproj">
-      <Project>{24a3887f-da50-4989-8d6c-4a5b04d5d457}</Project>
-      <Name>InteractiveWindow</Name>
-    </ProjectReference>
-  </ItemGroup>
   <Target Name="BeforeCompile">
     <Exec Command="taskkill /f /im QTAgent32.exe" IgnoreExitCode="true" ContinueOnError="true" IgnoreStandardErrorWarningFormat="true" />
   </Target>

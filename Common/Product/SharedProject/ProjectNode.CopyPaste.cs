@@ -51,9 +51,13 @@ namespace Microsoft.VisualStudioTools.Project {
         public int DragEnter(IOleDataObject pDataObject, uint grfKeyState, uint itemid, ref uint pdwEffect) {
             pdwEffect = (uint)DropEffect.None;
 
-            _dropType = QueryDropDataType(pDataObject);
-            if (_dropType != DropDataType.None) {
-                pdwEffect = (uint)QueryDropEffect(grfKeyState);
+            var item = NodeFromItemId(itemid);
+
+            if (item.GetDragTargetHandlerNode().CanAddFiles) {
+                _dropType = QueryDropDataType(pDataObject);
+                if (_dropType != DropDataType.None) {
+                    pdwEffect = (uint)QueryDropEffect(grfKeyState);
+                }
             }
 
             return VSConstants.S_OK;
@@ -335,7 +339,7 @@ namespace Microsoft.VisualStudioTools.Project {
                 IVsUIHierarchyWindow w = UIHierarchyUtilities.GetUIHierarchyWindow(this.site, HierarchyNode.SolutionExplorer);
                 if (w != null) {
                     foreach (HierarchyNode node in ItemsDraggedOrCutOrCopied) {
-                        ErrorHandler.ThrowOnFailure(w.ExpandItem((IVsUIHierarchy)this, node.ID, EXPANDFLAGS.EXPF_UnCutHighlightItem));
+                        node.ExpandItem(EXPANDFLAGS.EXPF_UnCutHighlightItem);
                     }
                 }
             }
@@ -391,10 +395,8 @@ namespace Microsoft.VisualStudioTools.Project {
 
             if (cutHighlightItems) {
                 bool first = true;
-                IVsUIHierarchyWindow w = UIHierarchyUtilities.GetUIHierarchyWindow(this.site, HierarchyNode.SolutionExplorer);
-
                 foreach (HierarchyNode node in this.ItemsDraggedOrCutOrCopied) {
-                    ErrorHandler.ThrowOnFailure(w.ExpandItem((IVsUIHierarchy)this, node.ID, first ? EXPANDFLAGS.EXPF_CutHighlightItem : EXPANDFLAGS.EXPF_AddCutHighlightItem));
+                    node.ExpandItem(first ? EXPANDFLAGS.EXPF_CutHighlightItem : EXPANDFLAGS.EXPF_AddCutHighlightItem);
                     first = false;
                 }
             }
@@ -841,12 +843,34 @@ folder you are copying, do you want to replace the existing files?", Path.GetFil
                     return null;
                 }
 
+                if (!File.Exists(moniker)) {
+                    VsShellUtilities.ShowMessageBox(
+                            Project.Site,
+                            String.Format("The source file '{0}' could not be found.", Path.GetFileName(moniker)),
+                            null,
+                            OLEMSGICON.OLEMSGICON_CRITICAL,
+                            OLEMSGBUTTON.OLEMSGBUTTON_OK,
+                            OLEMSGDEFBUTTON.OLEMSGDEFBUTTON_FIRST);
+                    return null;
+                }
 
                 string newPath = Path.Combine(targetFolder, Path.GetFileName(moniker));
                 var existingChild = Project.FindNodeByFullPath(moniker);
-                if (existingChild != null && existingChild.IsLinkFile && DropEffect == DropEffect.Move) {
-                    // moving a link file, just update it's location in the hierarchy
-                    return new ReparentLinkedFileAddition(Project, targetFolder, moniker);
+                if (existingChild != null && existingChild.IsLinkFile) {
+                    if (DropEffect == DropEffect.Move) {
+                        // moving a link file, just update it's location in the hierarchy
+                        return new ReparentLinkedFileAddition(Project, targetFolder, moniker);
+                    } else {
+                        // 
+                        VsShellUtilities.ShowMessageBox(
+                                Project.Site,
+                                String.Format("Cannot copy linked files within the same project. You cannot have more than one link to the same file in a project."),
+                                null,
+                                OLEMSGICON.OLEMSGICON_CRITICAL,
+                                OLEMSGBUTTON.OLEMSGBUTTON_OK,
+                                OLEMSGDEFBUTTON.OLEMSGDEFBUTTON_FIRST);
+                        return null;
+                    }
                 } else if (File.Exists(newPath) && CommonUtils.IsSamePath(newPath, moniker)) {
                     newPath = GetCopyName(newPath);
                 }
@@ -876,12 +900,14 @@ folder you are copying, do you want to replace the existing files?", Path.GetFil
                         if (overwrite == null) {
                             var dialog = new OverwriteFileDialog(String.Format("A file with the name '{0}' already exists.  Do you want to replace it?", Path.GetFileName(moniker)), true);
                             dialog.Owner = Application.Current.MainWindow;
-                            overwrite = dialog.ShowDialog();
+                            bool? dialogResult = dialog.ShowDialog();
 
-                            if (overwrite == null) {
+                            if (dialogResult != null && !dialogResult.Value) {
                                 // user cancelled
                                 return null;
                             }
+
+                            overwrite = dialog.ShouldOverwrite;
 
                             if (dialog.AllItems) {
                                 OverwriteAllItems = overwrite;
@@ -993,6 +1019,21 @@ folder you are copying, do you want to replace the existing files?", Path.GetFil
                     var newParent = TargetFolder == Project.ProjectHome ? Project : Project.FindNodeByFullPath(TargetFolder);
                     newParent.AddChild(existing);
                     Project.ItemsDraggedOrCutOrCopied.Remove(existing); // we don't need to remove the file after Paste
+
+                    var link = existing.ItemNode.GetMetadata(ProjectFileConstants.Link);
+                    if (link != null) {
+                        // update the link to the new location within solution explorer
+                        existing.ItemNode.SetMetadata(
+                            ProjectFileConstants.Link,
+                            Path.Combine(
+                                CommonUtils.GetRelativeDirectoryPath(
+                                    Project.ProjectHome,
+                                    TargetFolder
+                                ),
+                                Path.GetFileName(Moniker)
+                            )
+                        );
+                    }
                 }
             }
 
@@ -1035,7 +1076,14 @@ folder you are copying, do you want to replace the existing files?", Path.GetFil
                             if (String.Equals(TargetFolder, Project.FullPathToChildren, StringComparison.OrdinalIgnoreCase)) {
                                 Project.AddChild(fileNode);
                             } else {
-                                Project.CreateFolderNodes(TargetFolder).AddChild(fileNode);
+                                var targetFolder = Project.CreateFolderNodes(TargetFolder);
+                                if (targetFolder.IsNonMemberItem) {
+                                    // dropping/pasting folder into non-member folder, non member folder
+                                    // should get included into the project.
+                                    ErrorHandler.ThrowOnFailure(targetFolder.IncludeInProject(false));
+                                }
+
+                                targetFolder.AddChild(fileNode);
                             }
                         }
                     }

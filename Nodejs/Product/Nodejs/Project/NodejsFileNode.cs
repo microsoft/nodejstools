@@ -67,7 +67,8 @@ namespace Microsoft.NodejsTools.Project {
                             //We enable "Set as StartUp File" command only on current language code files, 
                             //the file is in project home dir and if the file is not the startup file already.
                             string startupFile = ((CommonProjectNode)ProjectMgr).GetStartupFile();
-                            if (!CommonUtils.IsSamePath(startupFile, this.Url)) {
+                            if (CommonUtils.IsSamePath(startupFile, this.Url) &&
+                                !IsNonMemberItem) {
                                 result |= QueryStatusResult.SUPPORTED | QueryStatusResult.ENABLED;
                             }
                             return VSConstants.S_OK;

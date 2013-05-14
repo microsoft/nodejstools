@@ -215,8 +215,11 @@ namespace Microsoft.VisualStudioTools.Project
             if (IsLinkFile)
             {
                 return new LinkFileNodeProperties(this);
+            } else if (IsNonMemberItem) {
+                return new FileNodeProperties(this);
             }
-            return new FileNodeProperties(this);
+
+            return new IncludedFileNodeProperties(this);
         }
 
         public override object GetIconHandle(bool open)
@@ -735,6 +738,10 @@ namespace Microsoft.VisualStudioTools.Project
                 return null;
             }
 
+            if (newParent.IsNonMemberItem) {
+                ErrorHandler.ThrowOnFailure(newParent.IncludeInProject(false));
+            }
+
             ProjectMgr.OnItemDeleted(this);
             this.Parent.RemoveChild(this);
             this.ID = this.ProjectMgr.ItemIdMap.Add(this);
@@ -750,8 +757,7 @@ namespace Microsoft.VisualStudioTools.Project
             DocumentManager.RenameDocument(this.ProjectMgr.Site, oldFileName, newFileName, ID);
 
             //Select the new node in the hierarchy
-            IVsUIHierarchyWindow uiWindow = UIHierarchyUtilities.GetUIHierarchyWindow(this.ProjectMgr.Site, SolutionExplorer);
-            ErrorHandler.ThrowOnFailure(uiWindow.ExpandItem(this.ProjectMgr, this.ID, EXPANDFLAGS.EXPF_SelectItem));
+            ExpandItem(EXPANDFLAGS.EXPF_SelectItem);
 
             RenameChildNodes(this);
 
@@ -982,8 +988,7 @@ namespace Microsoft.VisualStudioTools.Project
             ErrorHandler.ThrowOnFailure(shell.RefreshPropertyBrowser(0));
 
             //Select the new node in the hierarchy
-            IVsUIHierarchyWindow uiWindow = UIHierarchyUtilities.GetUIHierarchyWindow(this.ProjectMgr.Site, SolutionExplorer);
-            ErrorHandler.ThrowOnFailure(uiWindow.ExpandItem(this.ProjectMgr, this.ID, EXPANDFLAGS.EXPF_SelectItem));
+            ExpandItem(EXPANDFLAGS.EXPF_SelectItem);
         }
 
         #endregion

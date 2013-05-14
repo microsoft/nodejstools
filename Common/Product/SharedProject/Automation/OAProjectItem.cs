@@ -391,11 +391,7 @@ namespace Microsoft.VisualStudioTools.Project.Automation
 
             using (AutomationScope scope = new AutomationScope(this.Node.ProjectMgr.Site))
             {
-                IVsUIHierarchyWindow uiHierarchy = UIHierarchyUtilities.GetUIHierarchyWindow(this.node.ProjectMgr.Site, HierarchyNode.SolutionExplorer);
-                Utilities.CheckNotNull(uiHierarchy);
-
-                ErrorHandler.ThrowOnFailure(uiHierarchy.ExpandItem(this.node.ProjectMgr, this.node.ID, EXPANDFLAGS.EXPF_ExpandFolder));
-
+                node.ExpandItem(EXPANDFLAGS.EXPF_ExpandFolder);
             }
         }
 

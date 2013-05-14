@@ -231,6 +231,8 @@ namespace Microsoft.VisualStudioTools.Project
                     this.ID = ProjectMgr.ItemIdMap.Add(this);
                     this.Parent.AddChild(this);
 
+                    ExpandItem(EXPANDFLAGS.EXPF_SelectItem);
+
                     ProjectMgr.Tracker.OnFolderAdded(
                         path,
                         VSADDDIRECTORYFLAGS.VSADDDIRECTORYFLAGS_NoFlags
@@ -311,8 +313,11 @@ namespace Microsoft.VisualStudioTools.Project
                         return VSConstants.S_OK;
 
                     case VsCommands.NewFolder:
-                        result |= QueryStatusResult.SUPPORTED | QueryStatusResult.ENABLED;
-                        return VSConstants.S_OK;
+                        if (!IsNonMemberItem) {
+                            result |= QueryStatusResult.SUPPORTED | QueryStatusResult.ENABLED;
+                            return VSConstants.S_OK;
+                        }
+                        break;
                 }
             }
             else if (cmdGroup == VsMenus.guidStandardCommandSet2K)
@@ -479,9 +484,7 @@ namespace Microsoft.VisualStudioTools.Project
             ProjectMgr.Tracker.OnItemRenamed(oldPath, newPath, VSRENAMEFILEFLAGS.VSRENAMEFILEFLAGS_Directory);
 
             // Some of the previous operation may have changed the selection so set it back to us
-            IVsUIHierarchyWindow uiWindow = UIHierarchyUtilities.GetUIHierarchyWindow(this.ProjectMgr.Site, SolutionExplorer);
-            ErrorHandler.ThrowOnFailure(uiWindow.ExpandItem(this.ProjectMgr, this.ID, EXPANDFLAGS.EXPF_SelectItem));
-
+            ExpandItem(EXPANDFLAGS.EXPF_SelectItem);
         }
 
         /// <summary>

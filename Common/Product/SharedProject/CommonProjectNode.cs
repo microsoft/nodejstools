@@ -20,6 +20,7 @@ using System.Drawing;
 using System.IO;
 using System.Linq;
 using System.Runtime.InteropServices;
+using System.Text;
 using System.Windows.Forms;
 using System.Windows.Threading;
 using Microsoft.VisualStudio;
@@ -28,9 +29,9 @@ using Microsoft.VisualStudio.Shell.Interop;
 using Microsoft.VisualStudioTools.Navigation;
 using Microsoft.VisualStudioTools.Project.Automation;
 using Microsoft.Windows.Design.Host;
+using MSBuild = Microsoft.Build.Evaluation;
 using VsCommands2K = Microsoft.VisualStudio.VSConstants.VSStd2KCmdID;
 using VSConstants = Microsoft.VisualStudio.VSConstants;
-using MSBuild = Microsoft.Build.Evaluation;
 
 namespace Microsoft.VisualStudioTools.Project {
 
@@ -64,6 +65,7 @@ namespace Microsoft.VisualStudioTools.Project {
         private List<FileSystemChange> _fileSystemChanges;
         private UIThreadSynchronizer _uiSync;
         private MSBuild.Project userBuildProject;
+        private readonly Dictionary<string, FileSystemWatcher> _symlinkWatchers = new Dictionary<string, FileSystemWatcher>();
 
         public CommonProjectNode(CommonProjectPackage/*!*/ package, ImageList/*!*/ imageList) {
             Contract.Assert(package != null);
@@ -392,18 +394,23 @@ namespace Microsoft.VisualStudioTools.Project {
                 GetShowAllFilesSetting(BuildProject.GetPropertyValue(CommonConstants.ProjectView)) ??
                 false;
 
-            _watcher = new FileSystemWatcher(ProjectHome);
-            _watcher.NotifyFilter |= NotifyFilters.Attributes;
-            _watcher.IncludeSubdirectories = true;
-            _watcher.Created += new FileSystemEventHandler(FileExistanceChanged);
-            _watcher.Deleted += new FileSystemEventHandler(FileExistanceChanged);
-            _watcher.Renamed += new RenamedEventHandler(FileNameChanged);
-            _watcher.Changed += FileContentsChanged;
-            _watcher.Error += WatcherError;
-            _watcher.EnableRaisingEvents = true;
+            _watcher = CreateFileSystemWatcher(ProjectHome);
 
             // add everything that's on disk that we don't have in the project
             MergeDiskNodes(this, ProjectHome);
+        }
+
+        private FileSystemWatcher CreateFileSystemWatcher(string dir) {
+            var watcher = new FileSystemWatcher(dir);
+            watcher.NotifyFilter |= NotifyFilters.Attributes;
+            watcher.IncludeSubdirectories = true;
+            watcher.Created += new FileSystemEventHandler(FileExistanceChanged);
+            watcher.Deleted += new FileSystemEventHandler(FileExistanceChanged);
+            watcher.Renamed += new RenamedEventHandler(FileNameChanged);
+            watcher.Changed += FileContentsChanged;
+            watcher.Error += WatcherError;
+            watcher.EnableRaisingEvents = true;
+            return watcher;
         }
 
         /// <summary>
@@ -456,7 +463,9 @@ namespace Microsoft.VisualStudioTools.Project {
                 UpdateShowAllFiles(this, enabled: false);
             } else {
                 UpdateShowAllFiles(this, enabled: true);
+                ExpandItem(EXPANDFLAGS.EXPF_ExpandFolder);
             }
+
             _showingAllFiles = !_showingAllFiles;
 
             string newPropValue = _showingAllFiles ? CommonConstants.ShowAllFiles : CommonConstants.ProjectFiles;
@@ -516,6 +525,17 @@ namespace Microsoft.VisualStudioTools.Project {
                 if (IsFileHidden(curDir)) {
                     continue;
                 }
+
+                if (IsFileSymLink(curDir)) {
+                    if (IsRecursiveSymLink(dir, curDir)) {
+                        // don't add recursive sym links
+                        continue;
+                    }
+
+                    // track symlinks, we won't get events on the directory
+                    CreateSymLinkWatcher(curDir);
+                }
+
                 var existing = AddAllFilesFolder(curParent, curDir + Path.DirectorySeparatorChar);
 
                 MergeDiskNodes(existing, curDir);
@@ -526,6 +546,71 @@ namespace Microsoft.VisualStudioTools.Project {
                     continue;
                 }
                 AddAllFilesFile(curParent, file);
+            }
+        }
+
+        private static string GetFinalPathName(string dir) {
+            using (var dirHandle = NativeMethods.CreateFile(
+                dir,
+                NativeMethods.FileDesiredAccess.FILE_LIST_DIRECTORY,
+                NativeMethods.FileShareFlags.FILE_SHARE_DELETE |
+                    NativeMethods.FileShareFlags.FILE_SHARE_READ |
+                    NativeMethods.FileShareFlags.FILE_SHARE_WRITE,
+                IntPtr.Zero,
+                NativeMethods.FileCreationDisposition.OPEN_EXISTING,
+                NativeMethods.FileFlagsAndAttributes.FILE_FLAG_BACKUP_SEMANTICS,
+                IntPtr.Zero
+            )) {
+                if (!dirHandle.IsInvalid) {
+                    uint pathLen = NativeMethods.MAX_PATH + 1;
+                    uint res;
+                    StringBuilder filePathBuilder;
+                    for (; ; ) {
+                        filePathBuilder = new StringBuilder(checked((int)pathLen));
+                        res = NativeMethods.GetFinalPathNameByHandle(
+                            dirHandle,
+                            filePathBuilder,
+                            pathLen,
+                            0
+                        );
+                        if (res != 0 && res < pathLen) {
+                            // we had enough space, and got the filename.
+                            break;
+                        }
+                    }
+
+                    if (res != 0) {
+                        Debug.Assert(filePathBuilder.ToString().StartsWith("\\\\?\\"));
+                        return filePathBuilder.ToString().Substring(4);
+                    }
+                }
+            }
+            return dir;
+        }
+
+        private static bool IsRecursiveSymLink(string parentDir, string childDir) {
+            if (IsFileSymLink(parentDir)) {
+                // figure out the real parent dir so the check below works w/ multiple
+                // symlinks pointing at each other
+                parentDir = GetFinalPathName(parentDir);
+            }
+
+            string finalPath = GetFinalPathName(childDir);
+            // check and see if we're recursing infinitely...
+            if (CommonUtils.IsSubpathOf(finalPath, parentDir)) {
+                // skip this file
+                return true;
+            }
+            return false;
+        }
+
+        private static bool IsFileSymLink(string path) {
+            try {
+                return (File.GetAttributes(path) & FileAttributes.ReparsePoint) != 0;
+            } catch (DirectoryNotFoundException) {
+                return false;
+            } catch (FileNotFoundException) {
+                return false;
             }
         }
 
@@ -564,16 +649,9 @@ namespace Microsoft.VisualStudioTools.Project {
                 folderNode = CreateFolderNode(new AllFilesProjectElement(curDir, "Folder", this));
                 AddAllFilesNode(curParent, folderNode);
 
-                IVsUIHierarchyWindow uiHierarchy = UIHierarchyUtilities.GetUIHierarchyWindow(Site, HierarchyNode.SolutionExplorer);
-                if (uiHierarchy != null) {
-                    // Solution Explorer will expand the parent when an item is
-                    // added, which we don't want
-                    uiHierarchy.ExpandItem(
-                        GetOuterInterface<IVsUIHierarchy>(),
-                        folderNode.ID,
-                        EXPANDFLAGS.EXPF_CollapseFolder
-                    );
-                }
+                // Solution Explorer will expand the parent when an item is
+                // added, which we don't want
+                folderNode.ExpandItem(EXPANDFLAGS.EXPF_CollapseFolder);
             }
             return folderNode;
         }
@@ -680,6 +758,24 @@ namespace Microsoft.VisualStudioTools.Project {
             }
         }
 
+        internal void CreateSymLinkWatcher(string curDir) {
+            if (!CommonUtils.HasEndSeparator(curDir)) {
+                curDir = curDir + Path.DirectorySeparatorChar;
+            }
+            _symlinkWatchers[curDir] = CreateFileSystemWatcher(curDir);
+        }
+
+        internal bool TryDeactivateSymLinkWatcher(HierarchyNode child) {
+            FileSystemWatcher watcher;
+            if (_symlinkWatchers.TryGetValue(child.Url, out watcher)) {
+                _symlinkWatchers.Remove(child.Url);
+                watcher.EnableRaisingEvents = false;
+                watcher.Dispose();
+                return true;
+            }
+            return false;
+        }
+
         /// <summary>
         /// Processes the current file system changes on the UI thread.
         /// </summary>
@@ -766,6 +862,8 @@ namespace Microsoft.VisualStudioTools.Project {
                     // remove our children first
                     RemoveAllFilesChildren(current);
 
+                    _project.TryDeactivateSymLinkWatcher(current);
+
                     // then remove us if we're an all files node
                     if (current.ItemNode is AllFilesProjectElement) {
                         parent.RemoveChild(current);
@@ -789,6 +887,8 @@ namespace Microsoft.VisualStudioTools.Project {
 
             private void ChildDeleted(HierarchyNode child) {
                 if (child != null) {
+                    _project.TryDeactivateSymLinkWatcher(child);
+
                     if (child.ItemNode.IsExcluded) {
                         RemoveAllFilesChildren(child);
 
@@ -840,6 +940,16 @@ namespace Microsoft.VisualStudioTools.Project {
                     );
 
                     if (Directory.Exists(_path)) {
+                        if (IsFileSymLink(_path)) {
+                            if (IsRecursiveSymLink(parentDir, _path)) {
+                                // don't add recusrive sym link directory
+                                return;
+                            }
+
+                            // otherwise we're going to need a new file system watcher
+                            _project.CreateSymLinkWatcher(_path);
+                        }
+
                         var folderNode = _project.AddAllFilesFolder(parent, _path + Path.DirectorySeparatorChar);
                         // we may have just moved a directory from another location (e.g. drag and
                         // and drop in explorer), in which case we also need to process the items
@@ -860,11 +970,7 @@ namespace Microsoft.VisualStudioTools.Project {
                         // Solution Explorer will expand the parent when an item is
                         // added, which we don't want, so we check it's state before
                         // adding, and then collapse the folder if it was expanded.
-                        uiHierarchy.ExpandItem(
-                            _project.GetOuterInterface<IVsUIHierarchy>(),
-                            parent.ID,
-                            EXPANDFLAGS.EXPF_CollapseFolder
-                        );
+                        parent.ExpandItem(EXPANDFLAGS.EXPF_CollapseFolder);
                     }
                 }
             }
@@ -1194,13 +1300,13 @@ namespace Microsoft.VisualStudioTools.Project {
         /// Provide mapping from our browse objects and automation objects to our CATIDs
         /// </summary>
         private void InitializeCATIDs() {
-            Type fileNodePropsType = typeof(FileNodeProperties);
             // The following properties classes are specific to current language so we can use their GUIDs directly
             AddCATIDMapping(typeof(OAProject), typeof(OAProject).GUID);
             // The following is not language specific and as such we need a separate GUID
             AddCATIDMapping(typeof(FolderNodeProperties), new Guid(CommonConstants.FolderNodePropertiesGuid));
-            // This one we use the same as language file nodes since both refer to files
-            AddCATIDMapping(typeof(FileNodeProperties), fileNodePropsType.GUID);
+            // These ones we use the same as language file nodes since both refer to files
+            AddCATIDMapping(typeof(FileNodeProperties), typeof(FileNodeProperties).GUID);
+            AddCATIDMapping(typeof(IncludedFileNodeProperties), typeof(IncludedFileNodeProperties).GUID);
             // Because our property page pass itself as the object to display in its grid, 
             // we need to make it have the same CATID
             // as the browse object of the project node so that filtering is possible.

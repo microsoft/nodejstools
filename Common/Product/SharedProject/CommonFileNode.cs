@@ -254,6 +254,7 @@ namespace Microsoft.VisualStudioTools.Project {
                 return VSConstants.E_FAIL;
             }
 
+            ResetNodeProperties();
             ItemNode.RemoveFromProjectFile();
             if (!File.Exists(Url)) {
                 Parent.RemoveChild(this);
@@ -283,7 +284,9 @@ namespace Microsoft.VisualStudioTools.Project {
                 return VSConstants.E_FAIL;
             }
 
+            ResetNodeProperties();
             ItemNode = ProjectMgr.AddFileToMsBuild(Url);
+            IsVisible = true;
             ProjectMgr.OnInvalidateItems(this);
             ProjectMgr.ReDrawNode(this, UIHierarchyElement.Icon);
             return VSConstants.S_OK;

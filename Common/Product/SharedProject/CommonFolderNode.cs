@@ -108,6 +108,7 @@ namespace Microsoft.VisualStudioTools.Project {
                 }
             }
 
+            ResetNodeProperties();
             ItemNode.RemoveFromProjectFile();
             if (!Directory.Exists(CommonUtils.TrimEndSeparator(Url))) {
                 Parent.RemoveChild(this);
@@ -137,8 +138,12 @@ namespace Microsoft.VisualStudioTools.Project {
                 return VSConstants.E_FAIL;
             }
 
-            ItemNode = ProjectMgr.CreateMsBuildFileItem(Url, ProjectFileConstants.Folder);
-            ProjectMgr.ReDrawNode(this, UIHierarchyElement.Icon);
+            ResetNodeProperties();
+            ItemNode = ProjectMgr.CreateMsBuildFileItem(
+                CommonUtils.GetRelativeDirectoryPath(ProjectMgr.ProjectHome, Url), 
+                ProjectFileConstants.Folder
+            );
+            IsVisible = true;
 
             if (includeChildren) {
                 for (var child = FirstChild; child != null; child = child.NextSibling) {
@@ -149,16 +154,37 @@ namespace Microsoft.VisualStudioTools.Project {
                     }
                 }
             }
+            ProjectMgr.ReDrawNode(this, UIHierarchyElement.Icon);
+            
             return VSConstants.S_OK;
         }
 
         public override void RenameFolder(string newName) {
+            string oldName = Url;
             _project.SuppressFileChangeNotifications();
             try {
                 base.RenameFolder(newName);
             } finally {
                 _project.RestoreFileChangeNotifications();
             }
+
+            if (ProjectMgr.TryDeactivateSymLinkWatcher(this)) {
+                ProjectMgr.CreateSymLinkWatcher(Url);
+            }
+        }
+
+        public override void Remove(bool removeFromStorage) {
+            base.Remove(removeFromStorage);
+
+            // if we were a symlink folder, we need to stop watching now.
+            ProjectMgr.TryDeactivateSymLinkWatcher(this);
+        }
+
+        public override void Close() {
+            base.Close();
+
+            // make sure this thing isn't hanging around...
+            ProjectMgr.TryDeactivateSymLinkWatcher(this);
         }
 
         /// <summary>

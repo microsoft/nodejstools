@@ -54,6 +54,79 @@ namespace Microsoft.Nodejs.Tests.UI {
 
         [TestMethod, Priority(0), TestCategory("Core")]
         [HostType("TC Dynamic"), DynamicHostType(typeof(VsIdeHostAdapter))]
+        public void ShowAllFilesSymLinks() {
+            System.Diagnostics.Process.Start("cmd.exe", 
+                String.Format("/c mklink /J \"{0}\" \"{1}\"", 
+                    TestData.GetPath(@"TestData\NodejsProjectData\ShowAllFilesSymLink\SymFolder"), 
+                    TestData.GetPath(@"TestData\NodejsProjectData\ShowAllFilesSymLink\SubFolder")
+                )
+            );
+
+            System.Diagnostics.Process.Start("cmd.exe",
+                String.Format("/c mklink /J \"{0}\" \"{1}\"",
+                    TestData.GetPath(@"TestData\NodejsProjectData\ShowAllFilesSymLink\SubFolder\Infinite"),
+                    TestData.GetPath(@"TestData\NodejsProjectData\ShowAllFilesSymLink\SubFolder")
+                )
+            );
+
+            var project = BasicProjectTests.OpenProject(@"TestData\NodejsProjectData\ShowAllFilesSymLink.sln");
+            var app = new VisualStudioApp(VsIdeTestHostContext.Dte);
+            app.OpenSolutionExplorer();
+            var window = app.SolutionExplorerTreeView;
+
+            Assert.IsNotNull(window.WaitForItem("Solution 'ShowAllFilesSymLink' (1 project)", "HelloWorld", "SymFolder"));
+
+            // https://pytools.codeplex.com/workitem/1150 - infinite links, not displayed
+            Assert.IsNull(window.FindItem("Solution 'ShowAllFilesSymLink' (1 project)", "HelloWorld", "SubFolder", "Infinite"));
+
+            File.WriteAllText(
+                TestData.GetPath(@"TestData\NodejsProjectData\ShowAllFilesSymLink\SubFolder\Foo.txt"),
+                "Hi!"
+            );
+
+            // https://pytools.codeplex.com/workitem/1152 - watching the sym link folder
+            Assert.IsNotNull(window.WaitForItem("Solution 'ShowAllFilesSymLink' (1 project)", "HelloWorld", "SubFolder", "Foo.txt"));
+            Assert.IsNotNull(window.WaitForItem("Solution 'ShowAllFilesSymLink' (1 project)", "HelloWorld", "SymFolder", "Foo.txt"));
+        }
+
+        [TestMethod, Priority(0), TestCategory("Core")]
+        [HostType("TC Dynamic"), DynamicHostType(typeof(VsIdeHostAdapter))]
+        public void ShowAllFilesLinked() {
+            var project = BasicProjectTests.OpenProject(@"TestData\NodejsProjectData\ShowAllFilesLinked.sln");
+            var app = new VisualStudioApp(VsIdeTestHostContext.Dte);
+            app.OpenSolutionExplorer();
+            var window = app.SolutionExplorerTreeView;
+
+            var linkedNode = window.WaitForItem("Solution 'ShowAllFilesLinked' (1 project)", "HelloWorld", "File.js");
+            AutomationWrapper.Select(linkedNode);
+            Keyboard.ControlC();
+            System.Threading.Thread.Sleep(1000);
+
+            var subFolder = window.WaitForItem("Solution 'ShowAllFilesLinked' (1 project)", "HelloWorld", "SubFolder");
+            AutomationWrapper.Select(subFolder);
+
+            Keyboard.ControlV();
+            VisualStudioApp.CheckMessageBox("Cannot copy linked files within the same project. You cannot have more than one link to the same file in a project.");
+
+            linkedNode = window.WaitForItem("Solution 'ShowAllFilesLinked' (1 project)", "HelloWorld", "SubFolder", "LinkedFile.js");
+            AutomationWrapper.Select(linkedNode);
+
+            Keyboard.ControlX();
+            System.Threading.Thread.Sleep(1000);
+
+            var projectNode = window.WaitForItem("Solution 'ShowAllFilesLinked' (1 project)", "HelloWorld");
+            AutomationWrapper.Select(projectNode);
+
+            Keyboard.ControlV();
+            System.Threading.Thread.Sleep(1000);
+            project.Save();
+
+            var text = File.ReadAllText(@"TestData\NodejsProjectData\ShowAllFilesLinked\HelloWorld.njsproj");
+            Assert.IsTrue(text.IndexOf("<Link>LinkedFile.js</Link>") != -1);
+        }
+
+        [TestMethod, Priority(0), TestCategory("Core")]
+        [HostType("TC Dynamic"), DynamicHostType(typeof(VsIdeHostAdapter))]
         public void ShowAllFilesIncludeExclude() {
             var project = BasicProjectTests.OpenProject(@"TestData\NodejsProjectData\ShowAllFilesIncludeExclude.sln");
 
@@ -62,6 +135,20 @@ namespace Microsoft.Nodejs.Tests.UI {
             var window = app.SolutionExplorerTreeView;
 
             var projectNode = window.WaitForItem("Solution 'ShowAllFilesIncludeExclude' (1 project)", "HelloWorld");
+
+            var excludedFolder = project.ProjectItems.Item("ExcludeFolder1");
+            var itemTxt = excludedFolder.ProjectItems.Item("Item.txt");
+            var buildAction = itemTxt.Properties.Item("BuildAction");
+            Assert.IsNotNull(buildAction);
+
+            var notInProject = window.WaitForItem("Solution 'ShowAllFilesIncludeExclude' (1 project)", "HelloWorld", "NotInProject.js");
+            AutomationWrapper.Select(notInProject);
+            
+            try {
+                app.Dte.ExecuteCommand("Project.SetasNode.jsStartupFile");
+                Assert.Fail("Successfully set startup file on excluded item");
+            } catch (COMException) {
+            }
 
             var folder = window.WaitForItem("Solution 'ShowAllFilesIncludeExclude' (1 project)", "HelloWorld", "ExcludeFolder1");
             AutomationWrapper.Select(folder);
@@ -76,6 +163,14 @@ namespace Microsoft.Nodejs.Tests.UI {
             Assert.IsNotNull(window.WaitForItem("Solution 'ShowAllFilesIncludeExclude' (1 project)", "HelloWorld", "ExcludeFolder1"));
             Assert.IsNotNull(window.WaitForItem("Solution 'ShowAllFilesIncludeExclude' (1 project)", "HelloWorld", "ExcludeFolder1", "Item.txt"));
 
+            // https://pytools.codeplex.com/workitem/1153
+            // Shouldn't have a BuildAction property on excluded items
+            try {
+                project.ProjectItems.Item("ExcludedFolder1").ProjectItems.Item("Item.txt").Properties.Item("BuildAction");
+                Assert.Fail("Excluded item had BuildAction");
+            } catch (ArgumentException) {
+            }
+
             var file = window.WaitForItem("Solution 'ShowAllFilesIncludeExclude' (1 project)", "HelloWorld", "ExcludeFolder2", "Item.txt");
             AutomationWrapper.Select(file);
             app.Dte.ExecuteCommand("Project.ExcludeFromProject");
@@ -85,7 +180,27 @@ namespace Microsoft.Nodejs.Tests.UI {
             Assert.IsNull(window.WaitForItemRemoved("Solution 'ShowAllFilesIncludeExclude' (1 project)", "HelloWorld", "ExcludeFolder2", "Item.txt"));
             AutomationWrapper.Select(projectNode);
             app.Dte.ExecuteCommand("Project.ShowAllFiles"); // start showing all
-            Assert.IsNotNull(window.WaitForItem("Solution 'ShowAllFilesIncludeExclude' (1 project)", "HelloWorld", "ExcludeFolder2", "Item.txt"));
+
+            var itemTxtNode = window.WaitForItem("Solution 'ShowAllFilesIncludeExclude' (1 project)", "HelloWorld", "ExcludeFolder2", "Item.txt");
+            Assert.IsNotNull(itemTxtNode);
+
+            AutomationWrapper.Select(itemTxtNode);
+
+            // https://pytools.codeplex.com/workitem/1143
+            try {
+                VsIdeTestHostContext.Dte.ExecuteCommand("Project.AddNewItem");
+                Assert.Fail("Added a new item on excluded node");
+            } catch (COMException) {
+            }
+
+            var excludedFolderNode = window.WaitForItem("Solution 'ShowAllFilesIncludeExclude' (1 project)", "HelloWorld", "ExcludeFolder1");
+            Assert.IsNotNull(excludedFolderNode);
+            AutomationWrapper.Select(excludedFolderNode);
+            try {
+                VsIdeTestHostContext.Dte.ExecuteCommand("Project.NewFolder");
+                Assert.Fail("Added a new folder on excluded node");
+            } catch (COMException) {
+            }
 
             // include
             folder = window.WaitForItem("Solution 'ShowAllFilesIncludeExclude' (1 project)", "HelloWorld", "IncludeFolder1");
@@ -123,6 +238,24 @@ namespace Microsoft.Nodejs.Tests.UI {
             AutomationWrapper.Select(notOnDiskFolder);
             app.Dte.ExecuteCommand("Project.ExcludeFromProject");
             Assert.IsNull(window.WaitForItemRemoved("Solution 'ShowAllFilesIncludeExclude' (1 project)", "HelloWorld", "NotOnDiskFolder"));
+
+            // https://pytools.codeplex.com/workitem/1138
+            var server = window.FindItem("Solution 'ShowAllFilesIncludeExclude' (1 project)", "HelloWorld", "server.js");
+
+            AutomationWrapper.Select(server);
+            Keyboard.ControlC();
+            System.Threading.Thread.Sleep(1000);
+
+            var includeFolder3 = window.FindItem("Solution 'ShowAllFilesIncludeExclude' (1 project)", "HelloWorld", "IncludeFolder3");
+            AutomationWrapper.Select(includeFolder3);
+
+            Keyboard.ControlV();
+            System.Threading.Thread.Sleep(1000);
+
+            app.Dte.ExecuteCommand("Project.ShowAllFiles"); // stop showing all
+
+            // folder should now be included
+            Assert.IsNotNull(window.WaitForItem("Solution 'ShowAllFilesIncludeExclude' (1 project)", "HelloWorld", "IncludeFolder3"));
         }
 
         [TestMethod, Priority(0), TestCategory("Core")]

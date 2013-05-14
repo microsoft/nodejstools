@@ -57,6 +57,62 @@ namespace Microsoft.Nodejs.Tests.UI {
         /// </summary>
         [TestMethod, Priority(0), TestCategory("Core")]
         [HostType("TC Dynamic"), DynamicHostType(typeof(VsIdeHostAdapter))]
+        public void MultiPaste() {
+            BasicProjectTests.OpenProject(@"TestData\NodejsProjectData\MultiPaste.sln");
+
+            var app = new VisualStudioApp(VsIdeTestHostContext.Dte);
+            app.OpenSolutionExplorer();
+            var window = app.SolutionExplorerTreeView;
+
+            var server = window.FindItem("Solution 'MultiPaste' (1 project)", "HelloWorld", "server.js");
+            var server2 = window.FindItem("Solution 'MultiPaste' (1 project)", "HelloWorld", "server2.js");
+            
+            var point = server.GetClickablePoint();
+            Mouse.MoveTo(point);
+            Mouse.Click(MouseButton.Left);
+
+            Keyboard.Press(Key.LeftShift);
+            try {
+                point = server2.GetClickablePoint();
+                Mouse.MoveTo(point);
+                Mouse.Click(MouseButton.Left);
+            } finally {
+                Keyboard.Release(Key.LeftShift);
+            }
+            
+            Keyboard.ControlC();
+            System.Threading.Thread.Sleep(1000);
+
+            // https://pytools.codeplex.com/workitem/1144
+            var folder = window.FindItem("Solution 'MultiPaste' (1 project)", "HelloWorld", "SubFolder");
+            AutomationWrapper.Select(folder);
+
+            Keyboard.ControlV();
+            System.Threading.Thread.Sleep(1000);
+
+            // paste once, multiple items should be pasted
+            Assert.IsNotNull(window.WaitForItem("Solution 'MultiPaste' (1 project)", "HelloWorld", "SubFolder", "server.js"));
+            Assert.IsNotNull(window.WaitForItem("Solution 'MultiPaste' (1 project)", "HelloWorld", "SubFolder", "server2.js"));
+
+            AutomationWrapper.Select(folder);
+            Keyboard.ControlV();
+            System.Threading.Thread.Sleep(1000);
+
+            // paste again, we should get the replace prompts...
+
+            var dialog = new OverwriteFileDialog(app.WaitForDialog());
+            dialog.Cancel();
+
+            // https://pytools.codeplex.com/workitem/1154
+            // and we shouldn't get a second dialog after cancelling...
+            app.WaitForDialogDismissed();
+        }
+
+        /// <summary>
+        /// Cut item, paste into folder, paste into top-level, 2nd paste shouldn’t do anything
+        /// </summary>
+        [TestMethod, Priority(0), TestCategory("Core")]
+        [HostType("TC Dynamic"), DynamicHostType(typeof(VsIdeHostAdapter))]
         public void CutPastePasteItem() {
             BasicProjectTests.OpenProject(@"TestData\NodejsProjectData\DragDropCopyCutPaste.sln", expectedProjects: 2);
 
@@ -817,6 +873,31 @@ namespace Microsoft.Nodejs.Tests.UI {
 
             AssertFolderExists(window, "Solution 'DragDropCopyCutPaste' (2 projects)", "DragDropCopyCutPaste", "PasteFolder", "CopyFolderMissingItem");
             AssertFileDoesntExist(window, "Solution 'DragDropCopyCutPaste' (2 projects)", "DragDropCopyCutPaste", "PasteFolder", "JavaScript1.js");
+        }
+
+        /// <summary>
+        /// Copy missing file
+        /// 
+        /// https://pytools.codeplex.com/workitem/1141
+        /// </summary>
+        [TestMethod, Priority(0), TestCategory("Core")]
+        [HostType("TC Dynamic"), DynamicHostType(typeof(VsIdeHostAdapter))]
+        public void CopyPasteMissingFile() {
+            BasicProjectTests.OpenProject(@"TestData\NodejsProjectData\DragDropCopyCutPaste.sln", expectedProjects: 2);
+
+            var app = new VisualStudioApp(VsIdeTestHostContext.Dte);
+            app.OpenSolutionExplorer();
+            var window = app.SolutionExplorerTreeView;
+
+            var folder = window.FindItem("Solution 'DragDropCopyCutPaste' (2 projects)", "DragDropCopyCutPaste", "MissingFile.js");
+            var destFolder = window.FindItem("Solution 'DragDropCopyCutPaste' (2 projects)", "DragDropCopyCutPaste", "PasteFolder");
+
+            AutomationWrapper.Select(folder);
+            Keyboard.ControlC();
+            AutomationWrapper.Select(destFolder);
+            Keyboard.ControlV();
+
+            VisualStudioApp.CheckMessageBox("The source file 'MissingFile.js' could not be found.");
         }
 
         private static void AssertFileExists(SolutionExplorerTree window, params string[] path) {

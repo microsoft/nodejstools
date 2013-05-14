@@ -4617,8 +4617,18 @@ namespace Microsoft.VisualStudioTools.Project
                 var newChild = CreateFolderNode(fullPath);
                 n.AddChild(newChild);
                 targetFolder = newChild;
-            }
-            else if (promptOverwrite == null)
+            } 
+            else if (targetFolder.IsNonMemberItem) 
+            {
+                int hr = targetFolder.IncludeInProject(true);
+                if (ErrorHandler.Failed(hr))
+                {
+                    return hr;
+                }
+                ProjectMgr.OnItemAdded(targetFolder.Parent, targetFolder);
+                return hr;
+            } 
+            else if (promptOverwrite == null) 
             {
                 var res = MessageBox.Show(
                     String.Format(
@@ -4633,8 +4643,7 @@ If the files in the existing folder have the same names as files in the folder y
                 // no means don't prompt for any of the files
                 // cancel means forget what I'm doing
 
-                switch (res)
-                {
+                switch (res) {
                     case DialogResult.Cancel:
                         result[0] = VSADDRESULT.ADDRESULT_Cancel;
                         return (int)OleConstants.OLECMDERR_E_CANCELED;

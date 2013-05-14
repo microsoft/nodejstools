@@ -19,6 +19,7 @@ using Microsoft.VisualStudio;
 using Microsoft.VisualStudio.OLE.Interop;
 using Microsoft.VisualStudio.Shell.Interop;
 using Microsoft.VisualStudio.TextManager.Interop;
+using Microsoft.Win32.SafeHandles;
 
 namespace Microsoft.VisualStudioTools.Project {
     internal static class NativeMethods {
@@ -773,6 +774,49 @@ namespace Microsoft.VisualStudioTools.Project {
         [DllImport("kernel32.dll", SetLastError = true)]
         [return: MarshalAs(UnmanagedType.Bool)]
         public static extern bool CloseHandle(IntPtr handle);
+
+        [DllImport("kernel32.dll", SetLastError = true)]
+        public static extern uint GetFinalPathNameByHandle(
+            SafeHandle hFile,
+            [Out]StringBuilder lpszFilePath,
+            uint cchFilePath,
+            uint dwFlags
+        );
+
+        [DllImport("kernel32.dll", SetLastError = true)]
+        public static extern SafeFileHandle CreateFile(
+            string lpFileName,
+            FileDesiredAccess dwDesiredAccess,
+            FileShareFlags dwShareMode,
+            IntPtr lpSecurityAttributes,
+            FileCreationDisposition dwCreationDisposition,
+            FileFlagsAndAttributes dwFlagsAndAttributes,
+            IntPtr hTemplateFile
+        );
+
+        [Flags]
+        public enum FileDesiredAccess : uint {
+            FILE_LIST_DIRECTORY = 1
+        }
+
+        [Flags]
+        public enum FileShareFlags : uint {
+            FILE_SHARE_READ = 0x00000001,
+            FILE_SHARE_WRITE = 0x00000002,
+            FILE_SHARE_DELETE = 0x00000004
+        }
+
+        [Flags]
+        public enum FileCreationDisposition : uint {
+            OPEN_EXISTING = 3
+        }
+
+        [Flags]
+        public enum FileFlagsAndAttributes : uint {
+            FILE_FLAG_BACKUP_SEMANTICS = 0x02000000
+        }
+
+        public static IntPtr INVALID_FILE_HANDLE = new IntPtr(-1);
 
         public enum LogonType {
             LOGON32_LOGON_INTERACTIVE = 2,

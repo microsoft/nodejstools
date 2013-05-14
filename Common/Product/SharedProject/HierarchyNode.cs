@@ -216,22 +216,6 @@ namespace Microsoft.VisualStudioTools.Project
         }
 
         /// <summary>
-        /// Defines the properties attached to this node.
-        /// </summary>
-        public virtual NodeProperties NodeProperties
-        {
-            get
-            {
-                if (null == nodeProperties)
-                {
-                    nodeProperties = CreatePropertiesObject();
-                }
-                return this.nodeProperties;
-            }
-
-        }
-
-        /// <summary>
         /// Returns an object that is a special view over this object; this is the value
         /// returned by the Object property of the automation objects.
         /// </summary>
@@ -242,6 +226,21 @@ namespace Microsoft.VisualStudioTools.Project
         #endregion
 
         #region properties
+
+        /// <summary>
+        /// Defines the properties attached to this node.
+        /// </summary>
+        public NodeProperties NodeProperties 
+        {
+            get 
+            {
+                if (null == nodeProperties) 
+                {
+                    nodeProperties = CreatePropertiesObject();
+                }
+                return this.nodeProperties;
+            }
+        }
 
         public OleServiceProvider OleServiceProvider
         {
@@ -1066,8 +1065,7 @@ namespace Microsoft.VisualStudioTools.Project
                 folderNode.IsBeingCreated = true;
                 AddChild(folderNode);
 
-                IVsUIHierarchyWindow uiWindow = UIHierarchyUtilities.GetUIHierarchyWindow(this.projectMgr.Site, SolutionExplorer);
-                ErrorHandler.ThrowOnFailure(uiWindow.ExpandItem(this.projectMgr, folderNode.hierarchyId, EXPANDFLAGS.EXPF_SelectItem));
+                folderNode.ExpandItem(EXPANDFLAGS.EXPF_SelectItem);
                 IVsUIShell shell = this.projectMgr.Site.GetService(typeof(SVsUIShell)) as IVsUIShell;
 
                 // let the user rename the folder which will create the directory when finished
@@ -1378,8 +1376,11 @@ namespace Microsoft.VisualStudioTools.Project
                 {
                     case VsCommands.AddNewItem:
                     case VsCommands.AddExistingItem:
-                        result |= QueryStatusResult.SUPPORTED | QueryStatusResult.ENABLED;
-                        return VSConstants.S_OK;
+                        if (!IsNonMemberItem) {
+                            result |= QueryStatusResult.SUPPORTED | QueryStatusResult.ENABLED;
+                            return VSConstants.S_OK;
+                        }
+                        break;
                 }
             }
             else if (cmdGroup == VsMenus.guidStandardCommandSet2K)
@@ -1612,6 +1613,57 @@ namespace Microsoft.VisualStudioTools.Project
         #endregion
 
         #region public methods
+
+        /// <summary>
+        /// Clears the cached node properties so that it will be recreated on the next request.
+        /// </summary>
+        public void ResetNodeProperties() 
+        {
+            nodeProperties = null;
+        }
+
+        public void ExpandItem(EXPANDFLAGS flags) {
+            IVsUIHierarchyWindow2 windows = GetUIHierarchyWindow(
+                ProjectMgr.Site,
+                new Guid(ToolWindowGuids80.SolutionExplorer)) as IVsUIHierarchyWindow2;
+
+            ErrorHandler.ThrowOnFailure(windows.ExpandItem(ProjectMgr.GetOuterInterface<IVsUIHierarchy>(), ID, flags));
+        }
+
+        /// <summary>
+        /// Same as VsShellUtilities.GetUIHierarchyWindow, but it doesn't contain a useless cast to IVsWindowPane
+        /// which fails on Dev10 with the solution explorer window.
+        /// </summary>
+        private static IVsUIHierarchyWindow GetUIHierarchyWindow(System.IServiceProvider serviceProvider, Guid guidPersistenceSlot) {
+            Utilities.ArgumentNotNull("serviceProvider", serviceProvider);
+
+            IVsUIShell service = serviceProvider.GetService(typeof(SVsUIShell)) as IVsUIShell;
+            if (service == null) 
+            {
+                throw new InvalidOperationException();
+            }
+
+            object pvar = null;
+            IVsWindowFrame ppWindowFrame = null;
+            IVsUIHierarchyWindow window = null;
+            try 
+            {
+                ErrorHandler.ThrowOnFailure(service.FindToolWindow(0, ref guidPersistenceSlot, out ppWindowFrame));
+                ErrorHandler.ThrowOnFailure(ppWindowFrame.GetProperty(-3001, out pvar));
+            } 
+            catch (COMException exception) 
+            {
+                Trace.WriteLine("Exception :" + exception.Message);
+            } 
+            finally 
+            {
+                if (pvar != null) 
+                {
+                    window = (IVsUIHierarchyWindow)pvar;
+                }
+            }
+            return window;
+        }
 
         /// <summary>
         /// AddChild - add a node, sorted in the right location.
