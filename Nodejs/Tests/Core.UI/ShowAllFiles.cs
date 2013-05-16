@@ -211,8 +211,28 @@ namespace Microsoft.Nodejs.Tests.UI {
             Assert.IsNotNull(window.WaitForItem("Solution 'ShowAllFilesIncludeExclude' (1 project)", "HelloWorld", "IncludeFolder1"));
             Assert.IsNotNull(window.WaitForItem("Solution 'ShowAllFilesIncludeExclude' (1 project)", "HelloWorld", "IncludeFolder1", "Item.txt"));
 
+            // https://nodejstools.codeplex.com/workitem/242
+            // Rename Item.txt on disk
+            File.Move(
+                TestData.GetPath(@"TestData\NodejsProjectData\ShowAllFilesIncludeExclude\IncludeFolder1\Item.txt"),
+                TestData.GetPath(@"TestData\NodejsProjectData\ShowAllFilesIncludeExclude\IncludeFolder1\ItemNew.txt")
+            );
+
+            var includedItem = window.WaitForItem("Solution 'ShowAllFilesIncludeExclude' (1 project)", "HelloWorld", "IncludeFolder1", "Item.txt");
+            AutomationWrapper.Select(includedItem);
+            app.Dte.ExecuteCommand("Project.ExcludeFromProject");
+
+            // Rename it back
+            File.Move(
+                TestData.GetPath(@"TestData\NodejsProjectData\ShowAllFilesIncludeExclude\IncludeFolder1\ItemNew.txt"),
+                TestData.GetPath(@"TestData\NodejsProjectData\ShowAllFilesIncludeExclude\IncludeFolder1\Item.txt")
+            );
+
             AutomationWrapper.Select(projectNode);
             app.Dte.ExecuteCommand("Project.ShowAllFiles"); // start showing all
+
+            // item should be back
+            Assert.IsNotNull(window.WaitForItem("Solution 'ShowAllFilesIncludeExclude' (1 project)", "HelloWorld", "IncludeFolder1", "Item.txt"));
 
             folder = window.WaitForItem("Solution 'ShowAllFilesIncludeExclude' (1 project)", "HelloWorld", "IncludeFolder2", "Item.txt");
             AutomationWrapper.Select(folder);
@@ -541,6 +561,52 @@ namespace Microsoft.Nodejs.Tests.UI {
 
             var projectText = File.ReadAllText(TestData.GetPath(@"TestData\NodejsProjectData\ShowAllFilesDefault\HelloWorld.njsproj.user"));
             Assert.IsTrue(projectText.Contains("<ProjectView>ShowAllFiles</ProjectView>"));
+        }
+
+        /// <summary>
+        /// https://nodejstools.codeplex.com/workitem/240
+        /// </summary>
+        [TestMethod, Priority(0), TestCategory("Core")]
+        [HostType("TC Dynamic"), DynamicHostType(typeof(VsIdeHostAdapter))]
+        public void ShowAllMoveNotInProject() {
+            var project = BasicProjectTests.OpenProject(@"TestData\NodejsProjectData\ShowAllFilesMoveNotInProject.sln");
+
+            var app = new VisualStudioApp(VsIdeTestHostContext.Dte);
+            app.OpenSolutionExplorer();
+            var window = app.SolutionExplorerTreeView;
+
+            window.WaitForItem("Solution 'ShowAllFilesMoveNotInProject' (1 project)", "HelloWorld");
+
+            var file = window.WaitForItem("Solution 'ShowAllFilesMoveNotInProject' (1 project)", "HelloWorld", "NotInProject.js");
+            AutomationWrapper.Select(file);
+            Keyboard.ControlX();
+            System.Threading.Thread.Sleep(1000);
+
+            var folder = window.WaitForItem("Solution 'ShowAllFilesMoveNotInProject' (1 project)", "HelloWorld", "Folder");
+            AutomationWrapper.Select(folder);
+            Keyboard.ControlV();
+
+            Assert.IsNotNull(window.WaitForItem("Solution 'ShowAllFilesMoveNotInProject' (1 project)", "HelloWorld", "Folder", "NotInProject.js"));
+
+            app.Dte.ExecuteCommand("Project.ShowAllFiles"); // stop showing all
+
+            Assert.IsNull(window.WaitForItemRemoved("Solution 'ShowAllFilesMoveNotInProject' (1 project)", "HelloWorld", "Folder", "NotInProject.js"));
+
+            app.Dte.ExecuteCommand("Project.ShowAllFiles"); // start showing again
+
+            var subFolder = window.WaitForItem("Solution 'ShowAllFilesMoveNotInProject' (1 project)", "HelloWorld", "Folder", "SubFolder");
+            AutomationWrapper.Select(subFolder);
+
+            Keyboard.ControlX();
+            System.Threading.Thread.Sleep(1000);
+            var projectNode = window.WaitForItem("Solution 'ShowAllFilesMoveNotInProject' (1 project)", "HelloWorld");
+            AutomationWrapper.Select(projectNode);
+            Keyboard.ControlV();
+            Assert.IsNotNull(window.WaitForItem("Solution 'ShowAllFilesMoveNotInProject' (1 project)", "HelloWorld", "SubFolder"));
+
+            app.Dte.ExecuteCommand("Project.ShowAllFiles"); // stop showing all
+
+            Assert.IsNull(window.WaitForItemRemoved("Solution 'ShowAllFilesMoveNotInProject' (1 project)", "HelloWorld", "SubFolder"));
         }
     }
 }

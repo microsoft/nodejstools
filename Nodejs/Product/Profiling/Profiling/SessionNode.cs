@@ -48,6 +48,7 @@ namespace Microsoft.NodejsTools.Profiling {
         private readonly SessionsNode _parent;
         private ProfilingTarget _target;
         private AutomationSession _automationSession;
+        internal readonly uint ItemId;
 
         //private const int ConfigItemId = 0;
         private const int ReportsItemId = 1;
@@ -73,6 +74,8 @@ namespace Microsoft.NodejsTools.Profiling {
                 }
             }
             _docCookie = cookie;
+
+            ItemId = parent._sessionsCollection.Add(this);
         }
 
         public INodeProfileSession GetAutomationObject() {

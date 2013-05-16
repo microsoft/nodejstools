@@ -112,7 +112,7 @@ namespace Microsoft.VisualStudioTools.Project {
             ItemNode.RemoveFromProjectFile();
             if (!Directory.Exists(CommonUtils.TrimEndSeparator(Url))) {
                 Parent.RemoveChild(this);
-                ProjectMgr.OnInvalidateItems(Parent);
+                ProjectMgr.OnItemDeleted(this);
             } else {
                 ItemNode = new AllFilesProjectElement(Url, ItemNode.ItemTypeName, ProjectMgr);
                 if (!ProjectMgr.IsShowingAllFiles) {

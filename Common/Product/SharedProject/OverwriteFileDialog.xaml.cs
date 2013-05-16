@@ -38,11 +38,13 @@ namespace Microsoft.VisualStudioTools {
         
         private void YesClick(object sender, RoutedEventArgs e) {
             ShouldOverwrite = true;
+            DialogResult = true;
             Close();
         }
 
         private void NoClick(object sender, RoutedEventArgs e) {
             ShouldOverwrite = false;
+            DialogResult = true;
             Close();
         }
 

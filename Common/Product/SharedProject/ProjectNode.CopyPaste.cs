@@ -532,6 +532,17 @@ namespace Microsoft.VisualStudioTools.Project {
                 }
 
                 var targetPath = Path.Combine(targetFolderNode.FullPathToChildren, Path.GetFileName(CommonUtils.TrimEndSeparator(folder)));
+                if (File.Exists(targetPath)) {
+                    VsShellUtilities.ShowMessageBox(
+                       Project.Site,
+                       String.Format("Unable to add '{0}'. A file with that name already exists.", Path.GetFileName(CommonUtils.TrimEndSeparator(folder))),
+                       null,
+                       OLEMSGICON.OLEMSGICON_CRITICAL,
+                       OLEMSGBUTTON.OLEMSGBUTTON_OK,
+                       OLEMSGDEFBUTTON.OLEMSGDEFBUTTON_FIRST);
+                    return null;
+                }
+
                 if (Directory.Exists(targetPath)) {
                     if (DropEffect == DropEffect.Move) {
                         if (targetPath == folderToAdd) {
@@ -735,14 +746,21 @@ folder you are copying, do you want to replace the existing files?", Path.GetFil
                 }
 
                 public override void DoAddition() {
-                    Project.CreateFolderNodes(NewFolderPath);
+                    var newNode = Project.CreateFolderNodes(NewFolderPath);
 
                     foreach (var addition in Additions) {
                         addition.DoAddition();
                     }
 
+                    var sourceFolder = Project.FindNodeByFullPath(SourceFolder);
+                    if (sourceFolder != null && sourceFolder.IsNonMemberItem) {
+                        // copying or moving an existing excluded folder, new folder
+                        // is excluded too.
+                        ErrorHandler.ThrowOnFailure(newNode.ExcludeFromProject());
+                    }
+
                     if (DropEffect == DropEffect.Move) {
-                        Project.FindNodeByFullPath(SourceFolder).Remove(true);
+                        sourceFolder.Remove(true);
                     }
                 }
             }
@@ -812,7 +830,7 @@ folder you are copying, do you want to replace the existing files?", Path.GetFil
             /// </summary>
             /// <param name="projectRef"></param>
             /// <param name="targetNode"></param>
-            private Addition CanAddFileFromProjectReference(string projectRef, string targetFolder) {
+            private Addition CanAddFileFromProjectReference(string projectRef, string targetFolder, bool fromFolder = false) {
                 Utilities.ArgumentNotNullOrEmpty("projectRef", projectRef);
 
                 IVsSolution solution = Project.GetService(typeof(IVsSolution)) as IVsSolution;
@@ -846,7 +864,7 @@ folder you are copying, do you want to replace the existing files?", Path.GetFil
                 if (!File.Exists(moniker)) {
                     VsShellUtilities.ShowMessageBox(
                             Project.Site,
-                            String.Format("The source file '{0}' could not be found.", Path.GetFileName(moniker)),
+                            String.Format("The item '{0}' does not exist in the project directory. It may have been moved, renamed or deleted.", Path.GetFileName(moniker)),
                             null,
                             OLEMSGICON.OLEMSGICON_CRITICAL,
                             OLEMSGBUTTON.OLEMSGBUTTON_OK,
@@ -921,20 +939,6 @@ folder you are copying, do you want to replace the existing files?", Path.GetFil
                         }
                     }
 
-                    if (!File.Exists(moniker)) {
-                        // file isn't actually there, we won't copy it.
-                        if (DropEffect == DropEffect.Move) {
-                            VsShellUtilities.ShowMessageBox(
-                                Project.Site,
-                                String.Format("The item '{0}' does not exist in the project directory. It may have been moved, renamed or deleted.", Path.GetFileName(moniker)),
-                                null,
-                                OLEMSGICON.OLEMSGICON_CRITICAL,
-                                OLEMSGBUTTON.OLEMSGBUTTON_OK,
-                                OLEMSGDEFBUTTON.OLEMSGDEFBUTTON_FIRST);
-                            return null;
-                        }
-                        return NopAddition.Instance;
-                    }
                     if (newPath.Length >= NativeMethods.MAX_PATH) {
                         VsShellUtilities.ShowMessageBox(
                             Project.Site,
@@ -1376,6 +1380,25 @@ folder you are copying, do you want to replace the existing files?", Path.GetFil
                     // and pop up a nice progress bar.
                     AddExistingDirectories(ontoNode, filesDropped);
                 } else {
+                    foreach (var droppedFile in filesDropped) {
+                        if (Directory.Exists(droppedFile) &&
+                            CommonUtils.IsSubpathOf(droppedFile, nodePath)) {
+                            int cancelled = 0;
+                            waitDialog.EndWaitDialog(ref cancelled);
+                            waitResult = VSConstants.E_FAIL; // don't end twice
+
+                            VsShellUtilities.ShowMessageBox(
+                                Site,
+                                String.Format("Cannot add folder '{0}' as a child or decedent of self.", Path.GetFileName(CommonUtils.TrimEndSeparator(droppedFile))),
+                                null,
+                                OLEMSGICON.OLEMSGICON_CRITICAL,
+                                OLEMSGBUTTON.OLEMSGBUTTON_OK,
+                                OLEMSGDEFBUTTON.OLEMSGDEFBUTTON_FIRST);
+
+                            return;
+                        }
+                    }
+
                     // This is the code path when source is windows explorer
                     VSADDRESULT[] vsaddresults = new VSADDRESULT[1];
                     vsaddresults[0] = VSADDRESULT.ADDRESULT_Failure;

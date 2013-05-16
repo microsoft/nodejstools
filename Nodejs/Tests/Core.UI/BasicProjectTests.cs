@@ -312,6 +312,25 @@ namespace Microsoft.Nodejs.Tests.UI {
 
         [TestMethod, Priority(0), TestCategory("Core")]
         [HostType("TC Dynamic"), DynamicHostType(typeof(VsIdeHostAdapter))]
+        public void TestAddExistingFolderProject() {
+            var project = OpenProject(@"TestData\NodejsProjectData\AddExistingFolder.sln");
+            var app = new VisualStudioApp(VsIdeTestHostContext.Dte);
+            var solutionExplorer = app.SolutionExplorerTreeView;
+
+            var projectNode = solutionExplorer.WaitForItem("Solution 'AddExistingFolder' (1 project)", "AddExistingFolder");
+            AutomationWrapper.Select(projectNode);
+
+            var dialog = AddExistingFolder(app);
+            Assert.AreEqual(dialog.Address, Path.GetFullPath(@"TestData\NodejsProjectData\AddExistingFolder"));
+
+            dialog.FolderName = Path.GetFullPath(@"TestData\NodejsProjectData\AddExistingFolder");
+            dialog.SelectFolder();
+
+            VisualStudioApp.CheckMessageBox("Cannot add folder 'AddExistingFolder' to one of its own children.");
+        }
+
+        [TestMethod, Priority(0), TestCategory("Core")]
+        [HostType("TC Dynamic"), DynamicHostType(typeof(VsIdeHostAdapter))]
         public void TestAddExistingFolderDebugging() {
             var project = OpenProject(@"TestData\NodejsProjectData\AddExistingFolder.sln");
             var window = project.ProjectItems.Item("server.js").Open();

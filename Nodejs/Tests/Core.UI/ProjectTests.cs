@@ -496,9 +496,8 @@ sd.StringDecoder
                 app.Dte.Solution.Projects.Item(1).Name,
                 "mymod.js"
             );
-            
-            SelectionItemPattern selectionPattern = item.GetCurrentPattern(SelectionItemPattern.Pattern) as SelectionItemPattern;
-            selectionPattern.Select();
+
+            AutomationWrapper.Select(item);
             app.Dte.ExecuteCommand("Project.SetasNode.jsStartupFile");
             
             string startupFile = null;

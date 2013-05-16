@@ -272,7 +272,7 @@ namespace Microsoft.Nodejs.Tests.UI {
 
             AutomationWrapper.Select(serverCopy);
             Keyboard.ControlX();
-            
+
             AutomationWrapper.Select(folderNode);
             Keyboard.ControlV();
 
@@ -330,7 +330,7 @@ namespace Microsoft.Nodejs.Tests.UI {
 
             AutomationWrapper.Select(file);
             Keyboard.ControlC();
-            
+
             AutomationWrapper.Select(draggedFile);
             
             Mouse.MoveTo(draggedFile.GetClickablePoint());
@@ -339,9 +339,9 @@ namespace Microsoft.Nodejs.Tests.UI {
             Mouse.Up(MouseButton.Left);
 
             var folder = window.WaitForItem("Solution 'DragDropCopyCutPaste' (2 projects)", "DragDropCopyCutPaste", "PasteFolder");
-            AutomationWrapper.Select(folder);            
+            AutomationWrapper.Select(folder);
             Keyboard.ControlV();
-
+            
             AssertFileExists(window, "Solution 'DragDropCopyCutPaste' (2 projects)", "DragDropCopyCutPaste", "PasteFolder", "CopiedBeforeDragPastedAfterDrop.js");
             AssertFileExists(window, "Solution 'DragDropCopyCutPaste' (2 projects)", "DragDropCopyCutPaste", "CopiedBeforeDragPastedAfterDrop.js");
         }
@@ -460,8 +460,8 @@ namespace Microsoft.Nodejs.Tests.UI {
         }
 
         /// <summary>
-        /// Drag and drop a folder onto itself, nothing should happen
-        ///     Cannot move 'CutFilePasteSameLocation.js'. The destination folder is the same as the source folder.
+        /// Move a file to a location where a file with the name now already exists.  We should get an overwrite
+        /// dialog, and after answering yes to overwrite the file should be moved.
         /// </summary>
         [TestMethod, Priority(0), TestCategory("Core")]
         [HostType("TC Dynamic"), DynamicHostType(typeof(VsIdeHostAdapter))]
@@ -483,7 +483,7 @@ namespace Microsoft.Nodejs.Tests.UI {
             AutomationWrapper.Select(dest);
 
             Keyboard.ControlV();
-            
+
             var dialog = new OverwriteFileDialog(app.WaitForDialog());
             dialog.Yes();
 
@@ -515,9 +515,9 @@ namespace Microsoft.Nodejs.Tests.UI {
             }
 
             Keyboard.ControlX();
-            AutomationWrapper.Select(dest);            
+            AutomationWrapper.Select(dest);
             Keyboard.ControlV();
-            
+
             AssertFileExists(window, "Solution 'DragDropCopyCutPaste' (2 projects)", "DragDropCopyCutPaste", "CutFolder", "CutFolderAndFile.js");
             AssertFileDoesntExist(window, "Solution 'DragDropCopyCutPaste' (2 projects)", "DragDropCopyCutPaste", "CutFolderAndFile", "CutFolder");
         }
@@ -603,7 +603,7 @@ namespace Microsoft.Nodejs.Tests.UI {
 
             AutomationWrapper.Select(project);
             Keyboard.ControlV();
-            
+
             window.WaitForItem("Solution 'DragDropCopyCutPaste' (2 projects)", "DragDropCopyCutPaste", "CopiedFolderWithItemsNotInProject", "Class.cs");
 
             AssertFolderExists(window, "Solution 'DragDropCopyCutPaste' (2 projects)", "DragDropCopyCutPaste", "CopiedFolderWithItemsNotInProject");
@@ -679,10 +679,10 @@ namespace Microsoft.Nodejs.Tests.UI {
 
             AutomationWrapper.Select(folder);
             Keyboard.ControlX();
-            
+
             AutomationWrapper.Select(destFolder);
             Keyboard.ControlV();
-            
+
             VisualStudioApp.CheckMessageBox("Cannot move the folder 'DuplicateFolderName'. A folder with that name already exists in the destination directory.");
 
             // try again with drag and drop, which defaults to move
@@ -740,10 +740,10 @@ namespace Microsoft.Nodejs.Tests.UI {
 
             AutomationWrapper.Select(file);
             Keyboard.ControlX();
-            
-            AutomationWrapper.Select(destFolder);            
+
+            AutomationWrapper.Select(destFolder);
             Keyboard.ControlV();
-            
+
             AssertFileExists(window, "Solution 'DragDropCopyCutPaste' (2 projects)", "DragDropCopyCutPaste", "CrossHierarchyCut.cs");
             AssertFileDoesntExist(window, "Solution 'DragDropCopyCutPaste' (2 projects)", "ConsoleApplication1", "CrossHierarchyCut.cs");
         }
@@ -765,7 +765,7 @@ namespace Microsoft.Nodejs.Tests.UI {
 
             AutomationWrapper.Select(file);
             Keyboard.ControlX();
-                       
+
             AutomationWrapper.Select(destFolder);
             Keyboard.ControlV();
 
@@ -861,9 +861,10 @@ namespace Microsoft.Nodejs.Tests.UI {
             Keyboard.ControlV();
 
             // make sure no dialogs pop up
-            app.WaitForDialogDismissed();
+            VisualStudioApp.CheckMessageBox("The item 'JavaScript1.js' does not exist in the project directory. It may have been moved, renamed or deleted.");
 
-            AssertFolderExists(window, "Solution 'DragDropCopyCutPaste' (2 projects)", "DragDropCopyCutPaste", "PasteFolder", "CopyFolderMissingItem");
+            AssertFolderExists(window, "Solution 'DragDropCopyCutPaste' (2 projects)", "DragDropCopyCutPaste", "CopyFolderMissingItem");
+            AssertFolderDoesntExist(window, "Solution 'DragDropCopyCutPaste' (2 projects)", "DragDropCopyCutPaste", "PasteFolder", "CopyFolderMissingItem");
             AssertFileDoesntExist(window, "Solution 'DragDropCopyCutPaste' (2 projects)", "DragDropCopyCutPaste", "PasteFolder", "JavaScript1.js");
         }
 
@@ -889,7 +890,32 @@ namespace Microsoft.Nodejs.Tests.UI {
             AutomationWrapper.Select(destFolder);
             Keyboard.ControlV();
 
-            VisualStudioApp.CheckMessageBox("The source file 'MissingFile.js' could not be found.");
+            VisualStudioApp.CheckMessageBox("The item 'MissingFile.js' does not exist in the project directory. It may have been moved, renamed or deleted.");
+        }
+
+        /// <summary>
+        /// Copy missing file
+        /// 
+        /// https://nodejstools.codeplex.com/workitem/241
+        /// </summary>
+        [TestMethod, Priority(0), TestCategory("Core")]
+        [HostType("TC Dynamic"), DynamicHostType(typeof(VsIdeHostAdapter))]
+        public void MoveFolderExistingFile() {
+            BasicProjectTests.OpenProject(@"TestData\NodejsProjectData\DragDropCopyCutPaste.sln", expectedProjects: 2);
+
+            var app = new VisualStudioApp(VsIdeTestHostContext.Dte);
+            app.OpenSolutionExplorer();
+            var window = app.SolutionExplorerTreeView;
+
+            var folder = window.FindItem("Solution 'DragDropCopyCutPaste' (2 projects)", "DragDropCopyCutPaste", "FolderCollision");
+            var destFolder = window.FindItem("Solution 'DragDropCopyCutPaste' (2 projects)", "DragDropCopyCutPaste", "PasteFolder");
+
+            AutomationWrapper.Select(folder);
+            Keyboard.ControlX();
+            AutomationWrapper.Select(destFolder);
+            Keyboard.ControlV();
+
+            VisualStudioApp.CheckMessageBox("Unable to add 'FolderCollision'. A file with that name already exists.");
         }
 
         private static void AssertFileExists(SolutionExplorerTree window, params string[] path) {
