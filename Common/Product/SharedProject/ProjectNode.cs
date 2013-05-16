@@ -3218,7 +3218,7 @@ namespace Microsoft.VisualStudioTools.Project
             foreach (MSBuild.ProjectItem item in this.buildProject.Items.ToArray()) // copy the array, we could add folders while enumerating
             {
                 // Ignore items imported from .targets files. In particular, this will ignore the <Content>
-                // items that are generated from any <Compile> items in Microsoft.NodejsTools.targets.
+                // items that are generated from any <Compile> items in our .targets.
                 if (item.IsImported) {
                     continue;
                 }

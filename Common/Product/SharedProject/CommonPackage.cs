@@ -15,7 +15,6 @@
 using System;
 using System.ComponentModel.Design;
 using System.Runtime.InteropServices;
-using Microsoft.NodejsTools;
 using Microsoft.VisualStudioTools.Navigation;
 using Microsoft.VisualStudioTools.Project;
 using Microsoft.VisualStudio;

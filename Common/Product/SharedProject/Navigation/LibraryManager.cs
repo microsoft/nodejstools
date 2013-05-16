@@ -17,7 +17,6 @@ using System.Collections.Generic;
 using System.ComponentModel.Design;
 using System.Diagnostics.Contracts;
 using System.Runtime.InteropServices;
-using Microsoft.NodejsTools;
 using Microsoft.VisualStudio;
 using Microsoft.VisualStudio.ComponentModelHost;
 using Microsoft.VisualStudio.Editor;

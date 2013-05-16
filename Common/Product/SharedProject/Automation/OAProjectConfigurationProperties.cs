@@ -20,7 +20,7 @@ using Microsoft.VisualStudio.Shell.Interop;
 using Microsoft.VisualStudioTools.Project;
 using VSLangProj;
 
-namespace Microsoft.NodejsTools.Project.Automation {
+namespace Microsoft.VisualStudioTools.Project.Automation {
     class OAProjectConfigurationProperties : ConnectionPointContainer, ProjectConfigurationProperties, IConnectionPointContainer, IEventSource<IPropertyNotifySink> {
         private readonly ProjectNode _project;
         private readonly List<IPropertyNotifySink> _sinks = new List<IPropertyNotifySink>();

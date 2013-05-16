@@ -13,7 +13,6 @@
  * ***************************************************************************/
 
 
-using Microsoft.NodejsTools;
 using Microsoft.VisualStudioTools.Project;
 using Microsoft.VisualStudioTools.Project.Automation;
 using Microsoft.VisualStudio.Text.Editor;
