@@ -41,13 +41,13 @@ namespace Microsoft.Nodejs.Tests.UI {
 
         [TestCleanup]
         public void MyTestCleanup() {
-            for (int i = 0; i < 100; i++) {
+            for (int i = 0; i < 20; i++) {
                 try {
                     VsIdeTestHostContext.Dte.Solution.Close(false);
                     break;
                 } catch {
                     VsIdeTestHostContext.Dte.Documents.CloseAll(EnvDTE.vsSaveChanges.vsSaveChangesNo);
-                    System.Threading.Thread.Sleep(200);
+                    System.Threading.Thread.Sleep(500);
                 }
             }
         }
@@ -64,8 +64,8 @@ namespace Microsoft.Nodejs.Tests.UI {
             app.OpenSolutionExplorer();
             var window = app.SolutionExplorerTreeView;
 
-            var server = window.FindItem("Solution 'MultiPaste' (1 project)", "HelloWorld", "server.js");
-            var server2 = window.FindItem("Solution 'MultiPaste' (1 project)", "HelloWorld", "server2.js");
+            var server = window.WaitForItem("Solution 'MultiPaste' (1 project)", "HelloWorld", "server.js");
+            var server2 = window.WaitForItem("Solution 'MultiPaste' (1 project)", "HelloWorld", "server2.js");
             
             var point = server.GetClickablePoint();
             Mouse.MoveTo(point);
@@ -81,14 +81,11 @@ namespace Microsoft.Nodejs.Tests.UI {
             }
             
             Keyboard.ControlC();
-            System.Threading.Thread.Sleep(1000);
 
             // https://pytools.codeplex.com/workitem/1144
-            var folder = window.FindItem("Solution 'MultiPaste' (1 project)", "HelloWorld", "SubFolder");
+            var folder = window.WaitForItem("Solution 'MultiPaste' (1 project)", "HelloWorld", "SubFolder");
             AutomationWrapper.Select(folder);
-
             Keyboard.ControlV();
-            System.Threading.Thread.Sleep(1000);
 
             // paste once, multiple items should be pasted
             Assert.IsNotNull(window.WaitForItem("Solution 'MultiPaste' (1 project)", "HelloWorld", "SubFolder", "server.js"));
@@ -96,7 +93,6 @@ namespace Microsoft.Nodejs.Tests.UI {
 
             AutomationWrapper.Select(folder);
             Keyboard.ControlV();
-            System.Threading.Thread.Sleep(1000);
 
             // paste again, we should get the replace prompts...
 
@@ -120,9 +116,9 @@ namespace Microsoft.Nodejs.Tests.UI {
             app.OpenSolutionExplorer();
             var window = app.SolutionExplorerTreeView;
 
-            var project = window.FindItem("Solution 'DragDropCopyCutPaste' (2 projects)", "DragDropCopyCutPaste");
-            var folder = window.FindItem("Solution 'DragDropCopyCutPaste' (2 projects)", "DragDropCopyCutPaste", "PasteFolder");
-            var file = window.FindItem("Solution 'DragDropCopyCutPaste' (2 projects)", "DragDropCopyCutPaste", "CutPastePasteItem.js");
+            var project = window.WaitForItem("Solution 'DragDropCopyCutPaste' (2 projects)", "DragDropCopyCutPaste");
+            var folder = window.WaitForItem("Solution 'DragDropCopyCutPaste' (2 projects)", "DragDropCopyCutPaste", "PasteFolder");
+            var file = window.WaitForItem("Solution 'DragDropCopyCutPaste' (2 projects)", "DragDropCopyCutPaste", "CutPastePasteItem.js");
             AutomationWrapper.Select(file);
 
             Keyboard.ControlX();
@@ -151,8 +147,8 @@ namespace Microsoft.Nodejs.Tests.UI {
             app.OpenSolutionExplorer();
             var window = app.SolutionExplorerTreeView;
 
-            var project = window.FindItem("Solution 'DragDropCopyCutPaste' (2 projects)", "DragDropCopyCutPaste");
-            var file = window.FindItem("Solution 'DragDropCopyCutPaste' (2 projects)", "DragDropCopyCutPaste", "CutRenamePaste", "CutRenamePaste.js");
+            var project = window.WaitForItem("Solution 'DragDropCopyCutPaste' (2 projects)", "DragDropCopyCutPaste");
+            var file = window.WaitForItem("Solution 'DragDropCopyCutPaste' (2 projects)", "DragDropCopyCutPaste", "CutRenamePaste", "CutRenamePaste.js");
             
             AutomationWrapper.Select(file);
             Keyboard.ControlX();
@@ -181,8 +177,8 @@ namespace Microsoft.Nodejs.Tests.UI {
             app.OpenSolutionExplorer();
             var window = app.SolutionExplorerTreeView;
 
-            var project = window.FindItem("Solution 'DragDropCopyCutPaste' (2 projects)", "DragDropCopyCutPaste");
-            var file = window.FindItem("Solution 'DragDropCopyCutPaste' (2 projects)", "DragDropCopyCutPaste", "CutDeletePaste", "CutDeletePaste.js");
+            var project = window.WaitForItem("Solution 'DragDropCopyCutPaste' (2 projects)", "DragDropCopyCutPaste");
+            var file = window.WaitForItem("Solution 'DragDropCopyCutPaste' (2 projects)", "DragDropCopyCutPaste", "CutDeletePaste", "CutDeletePaste.js");
 
             AutomationWrapper.Select(file);
             Keyboard.ControlX();
@@ -210,7 +206,7 @@ namespace Microsoft.Nodejs.Tests.UI {
             var window = app.SolutionExplorerTreeView;
 
             // find server.js, send copy & paste, verify copy of file is there
-            var projectNode = window.FindItem("Solution 'LongFileNames' (1 project)", "LFN");
+            var projectNode = window.WaitForItem("Solution 'LongFileNames' (1 project)", "LFN");
             AutomationWrapper.Select(projectNode);
 
             Keyboard.PressAndRelease(Key.F10, Key.LeftCtrl, Key.LeftShift);
@@ -223,7 +219,7 @@ namespace Microsoft.Nodejs.Tests.UI {
             var folderNode = window.WaitForItem("Solution 'LongFileNames' (1 project)", "LFN", "01234567891");
             Assert.IsNotNull(folderNode);
 
-            var serverNode = window.FindItem("Solution 'LongFileNames' (1 project)", "LFN", "server.js");
+            var serverNode = window.WaitForItem("Solution 'LongFileNames' (1 project)", "LFN", "server.js");
             AutomationWrapper.Select(serverNode);
             Keyboard.ControlC();
             Keyboard.ControlV();
@@ -253,7 +249,7 @@ namespace Microsoft.Nodejs.Tests.UI {
             var window = app.SolutionExplorerTreeView;
 
             // find server.js, send copy & paste, verify copy of file is there
-            var projectNode = window.FindItem("Solution 'LongFileNames' (1 project)", "LFN");
+            var projectNode = window.WaitForItem("Solution 'LongFileNames' (1 project)", "LFN");
             AutomationWrapper.Select(projectNode);
 
             Keyboard.PressAndRelease(Key.F10, Key.LeftCtrl, Key.LeftShift);
@@ -276,8 +272,7 @@ namespace Microsoft.Nodejs.Tests.UI {
 
             AutomationWrapper.Select(serverCopy);
             Keyboard.ControlX();
-            System.Threading.Thread.Sleep(1000); // wait for control-x to happen
-
+            
             AutomationWrapper.Select(folderNode);
             Keyboard.ControlV();
 
@@ -296,8 +291,8 @@ namespace Microsoft.Nodejs.Tests.UI {
             app.OpenSolutionExplorer();
             var window = app.SolutionExplorerTreeView;
 
-            var project = window.FindItem("Solution 'DragDropCopyCutPaste' (2 projects)", "DragDropCopyCutPaste");
-            var file = window.FindItem("Solution 'DragDropCopyCutPaste' (2 projects)", "DragDropCopyCutPaste", "CutRenamePaste", "CutRenamePasteFolder");
+            var project = window.WaitForItem("Solution 'DragDropCopyCutPaste' (2 projects)", "DragDropCopyCutPaste");
+            var file = window.WaitForItem("Solution 'DragDropCopyCutPaste' (2 projects)", "DragDropCopyCutPaste", "CutRenamePaste", "CutRenamePasteFolder");
             AutomationWrapper.Select(file);
             Keyboard.ControlX();
 
@@ -324,26 +319,29 @@ namespace Microsoft.Nodejs.Tests.UI {
             app.OpenSolutionExplorer();
             var window = app.SolutionExplorerTreeView;
 
-            var project = window.FindItem("Solution 'DragDropCopyCutPaste' (2 projects)", "DragDropCopyCutPaste");
-            var file = window.FindItem("Solution 'DragDropCopyCutPaste' (2 projects)", "DragDropCopyCutPaste", "CopiedBeforeDragPastedAfterDrop.js");
-            var draggedFile = window.FindItem("Solution 'DragDropCopyCutPaste' (2 projects)", "DragDropCopyCutPaste", "DragAndDroppedDuringCopy.js");
-            var dragFolder = window.FindItem("Solution 'DragDropCopyCutPaste' (2 projects)", "DragDropCopyCutPaste", "DragDuringCopyDestination");
+            var project = window.WaitForItem("Solution 'DragDropCopyCutPaste' (2 projects)", "DragDropCopyCutPaste");
+            Assert.AreNotEqual(null, project);
+            var file = window.WaitForItem("Solution 'DragDropCopyCutPaste' (2 projects)", "DragDropCopyCutPaste", "CopiedBeforeDragPastedAfterDrop.js");
+            Assert.AreNotEqual(null, file);
+            var draggedFile = window.WaitForItem("Solution 'DragDropCopyCutPaste' (2 projects)", "DragDropCopyCutPaste", "DragAndDroppedDuringCopy.js");
+            Assert.AreNotEqual(null, draggedFile);
+            var dragFolder = window.WaitForItem("Solution 'DragDropCopyCutPaste' (2 projects)", "DragDropCopyCutPaste", "DragDuringCopyDestination");
+            Assert.AreNotEqual(null, dragFolder);
+
             AutomationWrapper.Select(file);
-
             Keyboard.ControlC();
-
+            
             AutomationWrapper.Select(draggedFile);
-            var point = draggedFile.GetClickablePoint();
-            Mouse.MoveTo(point);
+            
+            Mouse.MoveTo(draggedFile.GetClickablePoint());
             Mouse.Down(MouseButton.Left);
-
             Mouse.MoveTo(dragFolder.GetClickablePoint());
             Mouse.Up(MouseButton.Left);
 
-            var folder = window.FindItem("Solution 'DragDropCopyCutPaste' (2 projects)", "DragDropCopyCutPaste", "PasteFolder");
-            AutomationWrapper.Select(folder);
-            
+            var folder = window.WaitForItem("Solution 'DragDropCopyCutPaste' (2 projects)", "DragDropCopyCutPaste", "PasteFolder");
+            AutomationWrapper.Select(folder);            
             Keyboard.ControlV();
+
             AssertFileExists(window, "Solution 'DragDropCopyCutPaste' (2 projects)", "DragDropCopyCutPaste", "PasteFolder", "CopiedBeforeDragPastedAfterDrop.js");
             AssertFileExists(window, "Solution 'DragDropCopyCutPaste' (2 projects)", "DragDropCopyCutPaste", "CopiedBeforeDragPastedAfterDrop.js");
         }
@@ -360,8 +358,8 @@ namespace Microsoft.Nodejs.Tests.UI {
             app.OpenSolutionExplorer();
             var window = app.SolutionExplorerTreeView;
 
-            var draggedFile = window.FindItem("Solution 'DragDropCopyCutPaste' (2 projects)", "DragDropCopyCutPaste", "!Source", "DraggedToOtherProject.js");
-            var destProject = window.FindItem("Solution 'DragDropCopyCutPaste' (2 projects)", "ConsoleApplication1");
+            var draggedFile = window.WaitForItem("Solution 'DragDropCopyCutPaste' (2 projects)", "DragDropCopyCutPaste", "!Source", "DraggedToOtherProject.js");
+            var destProject = window.WaitForItem("Solution 'DragDropCopyCutPaste' (2 projects)", "ConsoleApplication1");
             AutomationWrapper.Select(draggedFile);
 
             var point = draggedFile.GetClickablePoint();
@@ -388,7 +386,7 @@ namespace Microsoft.Nodejs.Tests.UI {
             app.OpenSolutionExplorer();
             var window = app.SolutionExplorerTreeView;
 
-            var cutFolder = window.FindItem("Solution 'DragDropCopyCutPaste' (2 projects)", "DragDropCopyCutPaste", "CutFolderPasteOnSelf");
+            var cutFolder = window.WaitForItem("Solution 'DragDropCopyCutPaste' (2 projects)", "DragDropCopyCutPaste", "CutFolderPasteOnSelf");
             AutomationWrapper.Select(cutFolder);
 
             Keyboard.ControlX();
@@ -411,7 +409,7 @@ namespace Microsoft.Nodejs.Tests.UI {
             app.OpenSolutionExplorer();
             var window = app.SolutionExplorerTreeView;
 
-            var draggedFolder = window.FindItem("Solution 'DragDropCopyCutPaste' (2 projects)", "DragDropCopyCutPaste", "DragFolderOntoSelf");
+            var draggedFolder = window.WaitForItem("Solution 'DragDropCopyCutPaste' (2 projects)", "DragDropCopyCutPaste", "DragFolderOntoSelf");
             AutomationWrapper.Select(draggedFolder);
 
             var point = draggedFolder.GetClickablePoint();
@@ -439,8 +437,8 @@ namespace Microsoft.Nodejs.Tests.UI {
             app.OpenSolutionExplorer();
             var window = app.SolutionExplorerTreeView;
 
-            var draggedFolder = window.FindItem("Solution 'DragDropCopyCutPaste' (2 projects)", "DragDropCopyCutPaste", "ParentFolder");
-            var childFolder = window.FindItem("Solution 'DragDropCopyCutPaste' (2 projects)", "DragDropCopyCutPaste", "ParentFolder", "ChildFolder");
+            var draggedFolder = window.WaitForItem("Solution 'DragDropCopyCutPaste' (2 projects)", "DragDropCopyCutPaste", "ParentFolder");
+            var childFolder = window.WaitForItem("Solution 'DragDropCopyCutPaste' (2 projects)", "DragDropCopyCutPaste", "ParentFolder", "ChildFolder");
             AutomationWrapper.Select(draggedFolder);
 
             var point = draggedFolder.GetClickablePoint();
@@ -474,16 +472,18 @@ namespace Microsoft.Nodejs.Tests.UI {
             app.OpenSolutionExplorer();
             var window = app.SolutionExplorerTreeView;
 
-            var file = window.FindItem("Solution 'DragDropCopyCutPaste' (2 projects)", "DragDropCopyCutPaste", "MoveDupFilename", "Foo", "JavaScript1.js");
-            var dest = window.FindItem("Solution 'DragDropCopyCutPaste' (2 projects)", "DragDropCopyCutPaste", "MoveDupFilename");
+            var file = window.WaitForItem("Solution 'DragDropCopyCutPaste' (2 projects)", "DragDropCopyCutPaste", "MoveDupFilename", "Foo", "JavaScript1.js");
+            Assert.AreNotEqual(null, file);
+            var dest = window.WaitForItem("Solution 'DragDropCopyCutPaste' (2 projects)", "DragDropCopyCutPaste", "MoveDupFilename");
+            Assert.AreNotEqual(null, dest);
+
             AutomationWrapper.Select(file);
 
             Keyboard.ControlX();
-
             AutomationWrapper.Select(dest);
 
             Keyboard.ControlV();
-
+            
             var dialog = new OverwriteFileDialog(app.WaitForDialog());
             dialog.Yes();
 
@@ -500,9 +500,9 @@ namespace Microsoft.Nodejs.Tests.UI {
             app.OpenSolutionExplorer();
             var window = app.SolutionExplorerTreeView;
 
-            var folder = window.FindItem("Solution 'DragDropCopyCutPaste' (2 projects)", "DragDropCopyCutPaste", "CutFolderAndFile", "CutFolder");
-            var file = window.FindItem("Solution 'DragDropCopyCutPaste' (2 projects)", "DragDropCopyCutPaste", "CutFolderAndFile", "CutFolder", "CutFolderAndFile.js");
-            var dest = window.FindItem("Solution 'DragDropCopyCutPaste' (2 projects)", "DragDropCopyCutPaste");
+            var folder = window.WaitForItem("Solution 'DragDropCopyCutPaste' (2 projects)", "DragDropCopyCutPaste", "CutFolderAndFile", "CutFolder");
+            var file = window.WaitForItem("Solution 'DragDropCopyCutPaste' (2 projects)", "DragDropCopyCutPaste", "CutFolderAndFile", "CutFolder", "CutFolderAndFile.js");
+            var dest = window.WaitForItem("Solution 'DragDropCopyCutPaste' (2 projects)", "DragDropCopyCutPaste");
 
             Mouse.MoveTo(folder.GetClickablePoint());
             Mouse.Click(MouseButton.Left);
@@ -515,13 +515,9 @@ namespace Microsoft.Nodejs.Tests.UI {
             }
 
             Keyboard.ControlX();
-
-            System.Threading.Thread.Sleep(1000);
-
-            AutomationWrapper.Select(dest);
-            
+            AutomationWrapper.Select(dest);            
             Keyboard.ControlV();
-
+            
             AssertFileExists(window, "Solution 'DragDropCopyCutPaste' (2 projects)", "DragDropCopyCutPaste", "CutFolder", "CutFolderAndFile.js");
             AssertFileDoesntExist(window, "Solution 'DragDropCopyCutPaste' (2 projects)", "DragDropCopyCutPaste", "CutFolderAndFile", "CutFolder");
         }
@@ -539,14 +535,11 @@ namespace Microsoft.Nodejs.Tests.UI {
             app.OpenSolutionExplorer();
             var window = app.SolutionExplorerTreeView;
 
-            var project = window.FindItem("Solution 'DragDropCopyCutPaste' (2 projects)", "DragDropCopyCutPaste");
-            var cutFile = window.FindItem("Solution 'DragDropCopyCutPaste' (2 projects)", "DragDropCopyCutPaste", "CutFilePasteSameLocation.js");
+            var project = window.WaitForItem("Solution 'DragDropCopyCutPaste' (2 projects)", "DragDropCopyCutPaste");
+            var cutFile = window.WaitForItem("Solution 'DragDropCopyCutPaste' (2 projects)", "DragDropCopyCutPaste", "CutFilePasteSameLocation.js");
             AutomationWrapper.Select(cutFile);
 
             Keyboard.ControlX();
-
-            System.Threading.Thread.Sleep(1000); // let Control-X happen...
-
             AutomationWrapper.Select(project);
 
             Keyboard.ControlV();
@@ -569,8 +562,8 @@ namespace Microsoft.Nodejs.Tests.UI {
             app.OpenSolutionExplorer();
             var window = app.SolutionExplorerTreeView;
 
-            var folder = window.FindItem("Solution 'DragDropCopyCutPaste' (2 projects)", "DragDropCopyCutPaste", "DragFolderAndFileOntoSelf");
-            var file = window.FindItem("Solution 'DragDropCopyCutPaste' (2 projects)", "DragDropCopyCutPaste", "DragFolderAndFileOntoSelf", "File.js");
+            var folder = window.WaitForItem("Solution 'DragDropCopyCutPaste' (2 projects)", "DragDropCopyCutPaste", "DragFolderAndFileOntoSelf");
+            var file = window.WaitForItem("Solution 'DragDropCopyCutPaste' (2 projects)", "DragDropCopyCutPaste", "DragFolderAndFileOntoSelf", "File.js");
 
             Mouse.MoveTo(folder.GetClickablePoint());
             Mouse.Click(MouseButton.Left);
@@ -602,14 +595,16 @@ namespace Microsoft.Nodejs.Tests.UI {
             app.OpenSolutionExplorer();
             var window = app.SolutionExplorerTreeView;
 
-            var folder = window.FindItem("Solution 'DragDropCopyCutPaste' (2 projects)", "ConsoleApplication1", "CopiedFolderWithItemsNotInProject");
-            var project = window.FindItem("Solution 'DragDropCopyCutPaste' (2 projects)", "DragDropCopyCutPaste");
+            var folder = window.WaitForItem("Solution 'DragDropCopyCutPaste' (2 projects)", "ConsoleApplication1", "CopiedFolderWithItemsNotInProject");
+            var project = window.WaitForItem("Solution 'DragDropCopyCutPaste' (2 projects)", "DragDropCopyCutPaste");
 
             AutomationWrapper.Select(folder);
             Keyboard.ControlC();
 
             AutomationWrapper.Select(project);
             Keyboard.ControlV();
+            
+            window.WaitForItem("Solution 'DragDropCopyCutPaste' (2 projects)", "DragDropCopyCutPaste", "CopiedFolderWithItemsNotInProject", "Class.cs");
 
             AssertFolderExists(window, "Solution 'DragDropCopyCutPaste' (2 projects)", "DragDropCopyCutPaste", "CopiedFolderWithItemsNotInProject");
             AssertFileExists(window, "Solution 'DragDropCopyCutPaste' (2 projects)", "DragDropCopyCutPaste", "CopiedFolderWithItemsNotInProject", "Class.cs");
@@ -625,8 +620,8 @@ namespace Microsoft.Nodejs.Tests.UI {
             app.OpenSolutionExplorer();
             var window = app.SolutionExplorerTreeView;
 
-            var file = window.FindItem("Solution 'DragDropCopyCutPaste' (2 projects)", "DragDropCopyCutPaste", "CopyDeletePaste", "CopyDeletePaste.js");
-            var project = window.FindItem("Solution 'DragDropCopyCutPaste' (2 projects)", "DragDropCopyCutPaste");
+            var file = window.WaitForItem("Solution 'DragDropCopyCutPaste' (2 projects)", "DragDropCopyCutPaste", "CopyDeletePaste", "CopyDeletePaste.js");
+            var project = window.WaitForItem("Solution 'DragDropCopyCutPaste' (2 projects)", "DragDropCopyCutPaste");
 
             AutomationWrapper.Select(file);
             Keyboard.ControlC();
@@ -655,8 +650,8 @@ namespace Microsoft.Nodejs.Tests.UI {
             app.OpenSolutionExplorer();
             var window = app.SolutionExplorerTreeView;
 
-            var folder = window.FindItem("Solution 'DragDropCopyCutPaste' (2 projects)", "ConsoleApplication1", "CrossHierarchyFileDragAndDrop.cs");
-            var destFolder = window.FindItem("Solution 'DragDropCopyCutPaste' (2 projects)", "DragDropCopyCutPaste", "DropFolder");
+            var folder = window.WaitForItem("Solution 'DragDropCopyCutPaste' (2 projects)", "ConsoleApplication1", "CrossHierarchyFileDragAndDrop.cs");
+            var destFolder = window.WaitForItem("Solution 'DragDropCopyCutPaste' (2 projects)", "DragDropCopyCutPaste", "DropFolder");
 
             Mouse.MoveTo(folder.GetClickablePoint());
             Mouse.Down(MouseButton.Left);
@@ -679,15 +674,15 @@ namespace Microsoft.Nodejs.Tests.UI {
             app.OpenSolutionExplorer();
             var window = app.SolutionExplorerTreeView;
 
-            var folder = window.FindItem("Solution 'DragDropCopyCutPaste' (2 projects)", "DragDropCopyCutPaste", "DuplicateFolderName");
-            var destFolder = window.FindItem("Solution 'DragDropCopyCutPaste' (2 projects)", "DragDropCopyCutPaste", "DuplicateFolderNameTarget");
+            var folder = window.WaitForItem("Solution 'DragDropCopyCutPaste' (2 projects)", "DragDropCopyCutPaste", "DuplicateFolderName");
+            var destFolder = window.WaitForItem("Solution 'DragDropCopyCutPaste' (2 projects)", "DragDropCopyCutPaste", "DuplicateFolderNameTarget");
 
             AutomationWrapper.Select(folder);
             Keyboard.ControlX();
-
+            
             AutomationWrapper.Select(destFolder);
             Keyboard.ControlV();
-
+            
             VisualStudioApp.CheckMessageBox("Cannot move the folder 'DuplicateFolderName'. A folder with that name already exists in the destination directory.");
 
             // try again with drag and drop, which defaults to move
@@ -712,8 +707,8 @@ namespace Microsoft.Nodejs.Tests.UI {
             app.OpenSolutionExplorer();
             var window = app.SolutionExplorerTreeView;
 
-            var folder = window.FindItem("Solution 'DragDropCopyCutPaste' (2 projects)", "DragDropCopyCutPaste", "CopyDuplicateFolderName");
-            var destFolder = window.FindItem("Solution 'DragDropCopyCutPaste' (2 projects)", "DragDropCopyCutPaste", "CopyDuplicateFolderNameTarget");
+            var folder = window.WaitForItem("Solution 'DragDropCopyCutPaste' (2 projects)", "DragDropCopyCutPaste", "CopyDuplicateFolderName");
+            var destFolder = window.WaitForItem("Solution 'DragDropCopyCutPaste' (2 projects)", "DragDropCopyCutPaste", "CopyDuplicateFolderNameTarget");
 
             AutomationWrapper.Select(folder);
             Keyboard.ControlC();
@@ -740,15 +735,15 @@ namespace Microsoft.Nodejs.Tests.UI {
             app.OpenSolutionExplorer();
             var window = app.SolutionExplorerTreeView;
 
-            var file = window.FindItem("Solution 'DragDropCopyCutPaste' (2 projects)", "ConsoleApplication1", "CrossHierarchyCut.cs");
-            var destFolder = window.FindItem("Solution 'DragDropCopyCutPaste' (2 projects)", "DragDropCopyCutPaste");
+            var file = window.WaitForItem("Solution 'DragDropCopyCutPaste' (2 projects)", "ConsoleApplication1", "CrossHierarchyCut.cs");
+            var destFolder = window.WaitForItem("Solution 'DragDropCopyCutPaste' (2 projects)", "DragDropCopyCutPaste");
 
             AutomationWrapper.Select(file);
             Keyboard.ControlX();
-
-            AutomationWrapper.Select(destFolder);
+            
+            AutomationWrapper.Select(destFolder);            
             Keyboard.ControlV();
-
+            
             AssertFileExists(window, "Solution 'DragDropCopyCutPaste' (2 projects)", "DragDropCopyCutPaste", "CrossHierarchyCut.cs");
             AssertFileDoesntExist(window, "Solution 'DragDropCopyCutPaste' (2 projects)", "ConsoleApplication1", "CrossHierarchyCut.cs");
         }
@@ -765,16 +760,13 @@ namespace Microsoft.Nodejs.Tests.UI {
             app.OpenSolutionExplorer();
             var window = app.SolutionExplorerTreeView;
 
-            var file = window.FindItem("Solution 'DragDropCopyCutPaste' (2 projects)", "DragDropCopyCutPaste", "CrossHierarchyCut.js");
-            var destFolder = window.FindItem("Solution 'DragDropCopyCutPaste' (2 projects)", "ConsoleApplication1");
+            var file = window.WaitForItem("Solution 'DragDropCopyCutPaste' (2 projects)", "DragDropCopyCutPaste", "CrossHierarchyCut.js");
+            var destFolder = window.WaitForItem("Solution 'DragDropCopyCutPaste' (2 projects)", "ConsoleApplication1");
 
             AutomationWrapper.Select(file);
             Keyboard.ControlX();
-
-            System.Threading.Thread.Sleep(1000); // let cut happen
-
+                       
             AutomationWrapper.Select(destFolder);
-            System.Threading.Thread.Sleep(1000); 
             Keyboard.ControlV();
 
             AssertFileExists(window, "Solution 'DragDropCopyCutPaste' (2 projects)", "ConsoleApplication1", "CrossHierarchyCut.js");
@@ -795,7 +787,7 @@ namespace Microsoft.Nodejs.Tests.UI {
             var window = app.SolutionExplorerTreeView;
 
             var file = window.WaitForItem("Solution 'DragDropCopyCutPaste' (2 projects)", "DragDropCopyCutPaste", "!Source", "DoubleCrossHierarchy.js");
-            var destFolder = window.FindItem("Solution 'DragDropCopyCutPaste' (2 projects)", "ConsoleApplication1");
+            var destFolder = window.WaitForItem("Solution 'DragDropCopyCutPaste' (2 projects)", "ConsoleApplication1");
 
             AutomationWrapper.Select(file);
             Mouse.MoveTo(file.GetClickablePoint());
@@ -831,8 +823,8 @@ namespace Microsoft.Nodejs.Tests.UI {
             var window = app.SolutionExplorerTreeView;
 
             for (int i = 0; i < 2; i++) {
-                var file = window.FindItem("Solution 'DragDropCopyCutPaste' (2 projects)", "ConsoleApplication1", "DragTwiceAndOverwrite.cs");
-                var destFolder = window.FindItem("Solution 'DragDropCopyCutPaste' (2 projects)", "DragDropCopyCutPaste");
+                var file = window.WaitForItem("Solution 'DragDropCopyCutPaste' (2 projects)", "ConsoleApplication1", "DragTwiceAndOverwrite.cs");
+                var destFolder = window.WaitForItem("Solution 'DragDropCopyCutPaste' (2 projects)", "DragDropCopyCutPaste");
 
                 Mouse.MoveTo(file.GetClickablePoint());
                 Mouse.Down(MouseButton.Left);
@@ -860,8 +852,8 @@ namespace Microsoft.Nodejs.Tests.UI {
             app.OpenSolutionExplorer();
             var window = app.SolutionExplorerTreeView;
 
-            var folder = window.FindItem("Solution 'DragDropCopyCutPaste' (2 projects)", "DragDropCopyCutPaste", "CopyFolderMissingItem");
-            var destFolder = window.FindItem("Solution 'DragDropCopyCutPaste' (2 projects)", "DragDropCopyCutPaste", "PasteFolder");
+            var folder = window.WaitForItem("Solution 'DragDropCopyCutPaste' (2 projects)", "DragDropCopyCutPaste", "CopyFolderMissingItem");
+            var destFolder = window.WaitForItem("Solution 'DragDropCopyCutPaste' (2 projects)", "DragDropCopyCutPaste", "PasteFolder");
 
             AutomationWrapper.Select(folder);
             Keyboard.ControlC();
@@ -889,8 +881,8 @@ namespace Microsoft.Nodejs.Tests.UI {
             app.OpenSolutionExplorer();
             var window = app.SolutionExplorerTreeView;
 
-            var folder = window.FindItem("Solution 'DragDropCopyCutPaste' (2 projects)", "DragDropCopyCutPaste", "MissingFile.js");
-            var destFolder = window.FindItem("Solution 'DragDropCopyCutPaste' (2 projects)", "DragDropCopyCutPaste", "PasteFolder");
+            var folder = window.WaitForItem("Solution 'DragDropCopyCutPaste' (2 projects)", "DragDropCopyCutPaste", "MissingFile.js");
+            var destFolder = window.WaitForItem("Solution 'DragDropCopyCutPaste' (2 projects)", "DragDropCopyCutPaste", "PasteFolder");
 
             AutomationWrapper.Select(folder);
             Keyboard.ControlC();

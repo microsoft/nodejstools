@@ -76,12 +76,12 @@ namespace TestUtilities.UI {
         /// Opens and activates the Navigate To window.
         /// </summary>
         public NavigateToDialog OpenNavigateTo() {
-            ThreadPool.QueueUserWorkItem(x => Dte.ExecuteCommand("Edit.NavigateTo"));
+            TestUtils.DteExecuteCommandOnThreadPool("Edit.NavigateTo");
             return new NavigateToDialog(WaitForDialog());
         }
 
         public SaveDialog SaveAs() {
-            ThreadPool.QueueUserWorkItem(x => Dte.ExecuteCommand("File.SaveSelectedItemsAs"));
+            TestUtils.DteExecuteCommandOnThreadPool("File.SaveSelectedItemsAs");
             return new SaveDialog(WaitForDialog());
         }
 
@@ -137,7 +137,7 @@ namespace TestUtilities.UI {
             Element.SetFocus();
 
             // bring up Tools->Options
-            ThreadPool.QueueUserWorkItem(x => Dte.ExecuteCommand("Tools.Options"));
+            TestUtils.DteExecuteCommandOnThreadPool("Tools.Options");
 
             // wait for it...
             IntPtr dialog = WaitForDialog();
@@ -174,13 +174,13 @@ namespace TestUtilities.UI {
         }
 
         public NewProjectDialog FileNewProject() {
-            ThreadPool.QueueUserWorkItem(x => Dte.ExecuteCommand("File.NewProject"));
+            TestUtils.DteExecuteCommandOnThreadPool("File.NewProject");
             IntPtr dialog = WaitForDialog();
             return new NewProjectDialog(AutomationElement.FromHandle(dialog));
         }
 
         public AttachToProcessDialog OpenDebugAttach() {
-            ThreadPool.QueueUserWorkItem(x => Dte.ExecuteCommand("Debug.AttachtoProcess"));
+            TestUtils.DteExecuteCommandOnThreadPool("Debug.AttachtoProcess");
             return new AttachToProcessDialog(WaitForDialog());
         }
 
@@ -193,7 +193,7 @@ namespace TestUtilities.UI {
         }
 
         public ExceptionHelperDialog WaitForException() {
-            for (int i = 0; i < 100; i++) {
+            for (int i = 0; i < 20; i++) {
                 var window = FindByName("Exception Helper Indicator Window");
                 if (window != null) {
                     var innerPane = window.FindFirst(TreeScope.Descendants,
@@ -205,7 +205,7 @@ namespace TestUtilities.UI {
                     Assert.IsNotNull(innerPane);
                     return new ExceptionHelperDialog(innerPane);
                 }
-                System.Threading.Thread.Sleep(100);
+                System.Threading.Thread.Sleep(500);
             }
 
             Assert.Fail("Failed to find exception helper window");
@@ -222,8 +222,8 @@ namespace TestUtilities.UI {
             IntPtr hwnd;
             uiShell.GetDialogOwnerHwnd(out hwnd);
 
-            for (int i = 0; i < 100 && hwnd.ToInt32() == originalHwndasInt; i++) {
-                System.Threading.Thread.Sleep(100);
+            for (int i = 0; i < 20 && hwnd.ToInt32() == originalHwndasInt; i++) {
+                System.Threading.Thread.Sleep(500);
                 uiShell.GetDialogOwnerHwnd(out hwnd);
             }
 
@@ -294,8 +294,8 @@ namespace TestUtilities.UI {
             IntPtr hwnd;
             uiShell.GetDialogOwnerHwnd(out hwnd);
 
-            for (int i = 0; i < 100 && hwnd.ToInt32() == VsIdeTestHostContext.Dte.MainWindow.HWnd; i++) {
-                System.Threading.Thread.Sleep(100);
+            for (int i = 0; i < 20 && hwnd.ToInt32() == VsIdeTestHostContext.Dte.MainWindow.HWnd; i++) {
+                System.Threading.Thread.Sleep(500);
                 uiShell.GetDialogOwnerHwnd(out hwnd);
             }
 
@@ -382,7 +382,7 @@ namespace TestUtilities.UI {
                         );
                         if (element == null)
                         {
-                            System.Threading.Thread.Sleep(100);
+                            System.Threading.Thread.Sleep(500);
                         }
                     }
                     _objectBrowser = new ObjectBrowser(element);
@@ -415,7 +415,7 @@ namespace TestUtilities.UI {
         }
 
         public void MoveCurrentFileToProject(string projectName) {
-            ThreadPool.QueueUserWorkItem((x) => Dte.ExecuteCommand("file.ProjectPickerMoveInto"));
+            TestUtils.DteExecuteCommandOnThreadPool("file.ProjectPickerMoveInto");
             IntPtr dialog = WaitForDialog();
 
             var chooseDialog = new ChooseLocationDialog(dialog);
@@ -432,7 +432,7 @@ namespace TestUtilities.UI {
         }
 
         internal void OpenProject(string path) {
-            ThreadPool.QueueUserWorkItem((x) => Dte.ExecuteCommand("File.OpenProject"));
+            TestUtils.DteExecuteCommandOnThreadPool("File.OpenProject");
             
             var dialog = new OpenProjectDialog(WaitForDialog());
             dialog.ProjectName = path;
@@ -442,8 +442,8 @@ namespace TestUtilities.UI {
         }
 
         internal void WaitForMode(dbgDebugMode mode) {
-            for (int i = 0; i < 300 && Dte.Debugger.CurrentMode != mode; i++) {
-                System.Threading.Thread.Sleep(100);
+            for (int i = 0; i < 60 && Dte.Debugger.CurrentMode != mode; i++) {
+                System.Threading.Thread.Sleep(500);
             }
 
             Assert.AreEqual(VsIdeTestHostContext.Dte.Debugger.CurrentMode, mode);

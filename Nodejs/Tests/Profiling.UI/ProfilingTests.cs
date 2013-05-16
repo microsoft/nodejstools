@@ -42,13 +42,13 @@ namespace ProfilingUITests {
 
         [TestCleanup]
         public void MyTestCleanup() {
-            for (int i = 0; i < 100; i++) {
+            for (int i = 0; i < 20; i++) {
                 try {
                     VsIdeTestHostContext.Dte.Solution.Close(false);
                     break;
                 } catch {
                     VsIdeTestHostContext.Dte.Documents.CloseAll(EnvDTE.vsSaveChanges.vsSaveChangesNo);
-                    System.Threading.Thread.Sleep(200);
+                    System.Threading.Thread.Sleep(500);
                 }
             }
         }
@@ -203,7 +203,7 @@ namespace ProfilingUITests {
 
                 while (profiling.IsProfiling) {
                     // wait for profiling to finish...
-                    System.Threading.Thread.Sleep(100);
+                    System.Threading.Thread.Sleep(500);
                 }
             } finally {
                 profiling.RemoveSession(session, true);
@@ -223,7 +223,7 @@ namespace ProfilingUITests {
             var session = profiling.LaunchProject(project, false);
             try {
                 while (profiling.IsProfiling) {
-                    System.Threading.Thread.Sleep(100);
+                    System.Threading.Thread.Sleep(500);
                 }
 
                 var report = session.GetReport(1);
@@ -253,7 +253,7 @@ namespace ProfilingUITests {
             var session = profiling.LaunchProject(project, false);
             try {
                 while (profiling.IsProfiling) {
-                    System.Threading.Thread.Sleep(100);
+                    System.Threading.Thread.Sleep(500);
                 }
 
                 var report = session.GetReport(1);
@@ -321,13 +321,13 @@ namespace ProfilingUITests {
 
             var session = profiling.LaunchProject(project, false);
             try {
-                for (int i = 0; i < 100 && profiling.IsProfiling; i++) {
-                    System.Threading.Thread.Sleep(100);
+                for (int i = 0; i < 20 && profiling.IsProfiling; i++) {
+                    System.Threading.Thread.Sleep(500);
                 }
 
                 session.Launch(false);
-                for (int i = 0; i < 100 && profiling.IsProfiling; i++) {
-                    System.Threading.Thread.Sleep(100);
+                for (int i = 0; i < 20 && profiling.IsProfiling; i++) {
+                    System.Threading.Thread.Sleep(500);
                 }
 
                 var app = new NodejsVisualStudioApp(VsIdeTestHostContext.Dte);
@@ -367,13 +367,13 @@ namespace ProfilingUITests {
 
                         if (name.StartsWith("vsp://diff/?baseline=")) {
                             foundDiff = true;
-                            System.Threading.Thread.Sleep(1000);
+                            System.Threading.Thread.Sleep(500);
                             doc.Close(EnvDTE.vsSaveChanges.vsSaveChangesNo);
                             break;
                         }
                     }
                     if (!foundDiff) {
-                        System.Threading.Thread.Sleep(300);
+                        System.Threading.Thread.Sleep(500);
                     }
                 }
                 Assert.IsTrue(foundDiff);
@@ -439,7 +439,7 @@ namespace ProfilingUITests {
 
         private static void WaitForReport(INodeProfiling profiling, INodeProfileSession session, out INodePerformanceReport report, out NodejsVisualStudioApp app, out AutomationElement child) {
             while (profiling.IsProfiling) {
-                System.Threading.Thread.Sleep(100);
+                System.Threading.Thread.Sleep(500);
             }
 
             report = session.GetReport(1);
@@ -501,7 +501,7 @@ namespace ProfilingUITests {
             var session = profiling.LaunchProject(project, false);
             try {
                 while (profiling.IsProfiling) {
-                    System.Threading.Thread.Sleep(100);
+                    System.Threading.Thread.Sleep(500);
                 }
 
                 var app = new NodejsVisualStudioApp(VsIdeTestHostContext.Dte);
@@ -543,7 +543,7 @@ namespace ProfilingUITests {
             NodejsPerfTarget perfTarget = null;
             try {
                 while (profiling.IsProfiling) {
-                    System.Threading.Thread.Sleep(100);
+                    System.Threading.Thread.Sleep(500);
                 }
 
                 app = new NodejsVisualStudioApp(VsIdeTestHostContext.Dte);

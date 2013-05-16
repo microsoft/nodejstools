@@ -128,7 +128,7 @@ namespace Microsoft.Nodejs.Tests.UI {
 
                 string projPath = TestData.GetPath(@"TestData\NodejsProjectData\RenameProjectTest\HelloWorld3.njsproj");
                 string movePath = TestData.GetPath(@"TestData\NodejsProjectData\RenameProjectTest\HelloWorld_moved.njsproj");
-                try {                    
+                try {
                     File.Move(projPath, movePath);
                     AssertError<InvalidOperationException>(() => project.Name = "HelloWorld4");
                 } finally {
@@ -154,11 +154,11 @@ namespace Microsoft.Nodejs.Tests.UI {
         public void ProjectAddItem() {
             try {
                 var project = OpenProject(@"TestData\NodejsProjectData\HelloWorld.sln");
-                string fullPath = TestData.GetPath(@"TestData\NodejsProjectData\HelloWorld.sln");                
+                string fullPath = TestData.GetPath(@"TestData\NodejsProjectData\HelloWorld.sln");
 
                 Assert.AreEqual(1, project.ProjectItems.Count);
                 var item = project.ProjectItems.AddFromFile(TestData.GetPath(@"TestData\DebuggerProject\LocalsTest.js"));
-                
+
                 Assert.AreEqual("LocalsTest.js", item.Properties.Item("FileName").Value);
                 Assert.AreEqual(Path.Combine(Path.Combine(Path.GetDirectoryName(fullPath), "HelloWorld"), "LocalsTest.js"), item.Properties.Item("FullPath").Value);
                 Assert.AreEqual(".js", item.Properties.Item("Extension").Value);
@@ -246,7 +246,8 @@ namespace Microsoft.Nodejs.Tests.UI {
                 ProjectNewFolderWithName(app, solutionNode, projectNode, "A");
 
                 var folderA = project.ProjectItems.Item("A");
-                var folderANode = solutionExplorer.FindItem("Solution 'AddFolderExists' (1 project)", "AddFolderExists", "A");
+                var folderANode = solutionExplorer.WaitForItem("Solution 'AddFolderExists' (1 project)", "AddFolderExists", "A");
+                Assert.IsNotNull(folderANode);
 
                 Assert.AreEqual(TestData.GetPath("TestData\\NodejsProjectData\\AddFolderExists\\A\\"), folderA.Properties.Item("FullPath").Value);
                 Assert.IsTrue(Directory.Exists(TestData.GetPath("TestData\\NodejsProjectData\\AddFolderExists\\A\\")));
@@ -254,7 +255,8 @@ namespace Microsoft.Nodejs.Tests.UI {
                 ProjectNewFolderWithName(app, solutionNode, folderANode, "B");
 
                 var folderB = folderA.ProjectItems.Item("B");
-                var folderBNode = solutionExplorer.FindItem("Solution 'AddFolderExists' (1 project)", "AddFolderExists", "A", "B");
+                var folderBNode = solutionExplorer.WaitForItem("Solution 'AddFolderExists' (1 project)", "AddFolderExists", "A", "B");
+                Assert.IsNotNull(folderBNode);
 
                 Assert.AreEqual(TestData.GetPath("TestData\\NodejsProjectData\\AddFolderExists\\A\\B\\"), folderB.Properties.Item("FullPath").Value);
                 Assert.IsTrue(Directory.Exists(TestData.GetPath("TestData\\NodejsProjectData\\AddFolderExists\\A\\B\\")));
@@ -262,16 +264,15 @@ namespace Microsoft.Nodejs.Tests.UI {
                 ProjectNewFolderWithName(app, solutionNode, folderBNode, "C");
 
                 var folderC = folderB.ProjectItems.Item("C");
-                var folderCNode = solutionExplorer.FindItem("Solution 'AddFolderExists' (1 project)", "AddFolderExists", "A", "B", "C");
+                var folderCNode = solutionExplorer.WaitForItem("Solution 'AddFolderExists' (1 project)", "AddFolderExists", "A", "B", "C");
+                Assert.IsNotNull(folderCNode);
 
                 // 817 & 836: Nested subfolders
                 // Setting the wrong VirtualNodeName in FolderNode.FinishFolderAdd caused C's fullpath to be ...\AddFolderExists\B\C\
                 // instead of ...\AddFolderExists\A\B\C\.
                 Assert.AreEqual(TestData.GetPath("TestData\\NodejsProjectData\\AddFolderExists\\A\\B\\C\\"), folderC.Properties.Item("FullPath").Value);
                 Assert.IsTrue(Directory.Exists(TestData.GetPath("TestData\\NodejsProjectData\\AddFolderExists\\A\\B\\C\\")));
-            }
-            finally
-            {
+            } finally {
                 VsIdeTestHostContext.Dte.Solution.Close();
                 GC.Collect();
                 GC.WaitForPendingFinalizers();
@@ -301,6 +302,7 @@ namespace Microsoft.Nodejs.Tests.UI {
             AutomationWrapper.Select(subFolderNode);
 
             dialog = AddExistingFolder(app);
+
             Assert.AreEqual(dialog.Address, Path.GetFullPath(@"TestData\NodejsProjectData\AddExistingFolder\SubFolder"));
             dialog.FolderName = Path.GetFullPath(@"TestData\NodejsProjectData\AddExistingFolder\SubFolder\TestFolder2");
             dialog.SelectFolder();
@@ -328,7 +330,7 @@ namespace Microsoft.Nodejs.Tests.UI {
 
             try {
                 VsIdeTestHostContext.Dte.ExecuteCommand("ProjectandSolutionContextMenus.Project.Add.Existingfolder");
-                
+
                 // try and dismiss the dialog if we successfully executed
                 try {
                     var dialog = app.WaitForDialog();
@@ -354,7 +356,7 @@ namespace Microsoft.Nodejs.Tests.UI {
         }
 
         private static SelectFolderDialog AddExistingFolder(VisualStudioApp app) {
-            ThreadPool.QueueUserWorkItem((_) => VsIdeTestHostContext.Dte.ExecuteCommand("ProjectandSolutionContextMenus.Project.Add.Existingfolder"));
+            TestUtils.DteExecuteCommandOnThreadPool("ProjectandSolutionContextMenus.Project.Add.Existingfolder");
             var addFolderDialog = app.WaitForDialog();
             var dialog = new SelectFolderDialog(addFolderDialog);
             return dialog;
@@ -468,7 +470,6 @@ namespace Microsoft.Nodejs.Tests.UI {
                 project.ProjectItems.Item("ProgramX.js").Name = ".foo";
                 project.ProjectItems.Item(".foo").Name = "ProgramX.js";
                 AssertError<InvalidOperationException>(() => project.ProjectItems.Item("ProgramX.js").Name = "ProgramY.js");
-
                 project.ProjectItems.Item("ProgramX.js").Name = "PrOgRaMX.js";
                 project.ProjectItems.Item("ProgramX.js").Name = "ProgramX.js";
 
@@ -537,7 +538,7 @@ namespace Microsoft.Nodejs.Tests.UI {
         public void TestAutomationProperties() {
             try {
                 var project = OpenProject(@"TestData\NodejsProjectData\HelloWorld.sln");
-                
+
                 int propCount = 0;
                 foreach (Property prop in project.Properties) {
                     object intIndexValue;
@@ -659,22 +660,22 @@ namespace Microsoft.Nodejs.Tests.UI {
         [HostType("TC Dynamic"), DynamicHostType(typeof(VsIdeHostAdapter))]
         public void ProjectConfiguration() {
             var project = OpenProject(@"TestData\NodejsProjectData\HelloWorld.sln");
-            
+
             project.ConfigurationManager.AddConfigurationRow("NewConfig", "Debug", true);
             project.ConfigurationManager.AddConfigurationRow("NewConfig2", "UnknownConfig", true);
 
             AssertError<ArgumentException>(() => project.ConfigurationManager.DeleteConfigurationRow(null));
             project.ConfigurationManager.DeleteConfigurationRow("NewConfig");
             project.ConfigurationManager.DeleteConfigurationRow("NewConfig2");
-            
+
             var debug = project.ConfigurationManager.Item("Debug", "Any CPU");
-            Assert.AreEqual(debug.IsBuildable, true);            
+            Assert.AreEqual(debug.IsBuildable, true);
 
             Assert.AreEqual("Any CPU", ((object[])project.ConfigurationManager.PlatformNames)[0]);
             Assert.AreEqual("Any CPU", ((object[])project.ConfigurationManager.SupportedPlatforms)[0]);
 
             Assert.AreEqual(null, project.ConfigurationManager.ActiveConfiguration.Object);
-            
+
             //var workingDir = project.ConfigurationManager.ActiveConfiguration.Properties.Item("WorkingDirectory");
             //Assert.AreEqual(".", workingDir);
 
@@ -698,7 +699,7 @@ namespace Microsoft.Nodejs.Tests.UI {
             var solutionExplorer = app.SolutionExplorerTreeView;
 
             var solutionNode = solutionExplorer.FindItem("Solution 'AddFolderExists' (1 project)");
-            
+
 
             var projectNode = solutionExplorer.FindItem("Solution 'AddFolderExists' (1 project)", "AddFolderExists");
 
@@ -752,16 +753,14 @@ namespace Microsoft.Nodejs.Tests.UI {
             Mouse.MoveTo(serverNode.GetClickablePoint());
             Mouse.Click();
             Keyboard.ControlC();
-
             Keyboard.ControlV();
-            System.Threading.Thread.Sleep(2000);
 
             // Make sure that copy/paste directly under the project node works:
             // http://pytools.codeplex.com/workitem/738
             Assert.IsNotNull(solutionExplorer.WaitForItem("Solution 'AddFolderCopyAndPasteFile' (1 project)", "AddFolderCopyAndPasteFile", "server - Copy.js"));
 
             ProjectNewFolder(app, solutionNode, projectNode);
-            
+
             Keyboard.Type("Foo");
             Keyboard.Type(System.Windows.Input.Key.Return);
 
@@ -776,9 +775,8 @@ namespace Microsoft.Nodejs.Tests.UI {
             Mouse.Click();
 
             Keyboard.ControlV();
-            System.Threading.Thread.Sleep(2000);
 
-            Assert.IsNotNull(solutionExplorer.FindItem("Solution 'AddFolderCopyAndPasteFile' (1 project)", "AddFolderCopyAndPasteFile", "Foo", "server.js"));
+            Assert.IsNotNull(solutionExplorer.WaitForItem("Solution 'AddFolderCopyAndPasteFile' (1 project)", "AddFolderCopyAndPasteFile", "Foo", "server.js"));
         }
 
         [TestMethod, Priority(0), TestCategory("Core")]
@@ -814,8 +812,6 @@ namespace Microsoft.Nodejs.Tests.UI {
             // paste to folder node, make sure the files are there
             ToSTA(() => Clipboard.SetFileDropList(paths));
             Keyboard.ControlV();
-
-            System.Threading.Thread.Sleep(2000);
 
             Assert.IsNotNull(solutionExplorer.WaitForItem("Solution 'CopyAndPasteFolder' (1 project)", "CopyAndPasteFolder", "X", "CopiedFiles"));
             Assert.IsTrue(File.Exists(Path.Combine("TestData", "NodejsProjectData", "CopyAndPasteFolder", "X", "CopiedFiles", "SomeFile.js")));
@@ -856,8 +852,6 @@ namespace Microsoft.Nodejs.Tests.UI {
             // paste to folder node, make sure the files are there
             ToSTA(() => Clipboard.SetFileDropList(paths));
             Keyboard.ControlV();
-
-            System.Threading.Thread.Sleep(2000);
 
             Assert.IsNotNull(solutionExplorer.WaitForItem("Solution 'CopyAndPasteFolder' (1 project)", "CopyAndPasteFolder", "X", emptyFolderName));
             Assert.IsTrue(Directory.Exists(Path.Combine("TestData", "NodejsProjectData", "CopyAndPasteFolder", "X", emptyFolderName)));
@@ -915,7 +909,7 @@ namespace Microsoft.Nodejs.Tests.UI {
             CountIs(itemCount, "HelloWorld.js", 0);     // not included because the actual name is server.js
         }
 
-        private static void CountIs(Dictionary<string, int> count, string key, int expected){
+        private static void CountIs(Dictionary<string, int> count, string key, int expected) {
             int actual;
             if (!count.TryGetValue(key, out actual)) {
                 actual = 0;
@@ -942,20 +936,20 @@ namespace Microsoft.Nodejs.Tests.UI {
 
         private static void ProjectNewFolder(VisualStudioApp app, System.Windows.Automation.AutomationElement solutionNode, System.Windows.Automation.AutomationElement projectNode) {
             // Project menu can take a little while to appear...
-            for (int i = 0; i < 10; i++) {
+            for (int i = 0; i < 20; i++) {
                 AutomationWrapper.Select(projectNode);
                 projectNode.SetFocus();
                 try {
                     app.Dte.ExecuteCommand("Project.NewFolder");
                     break;
-                } catch(Exception e) {
+                } catch (Exception e) {
                     Debug.WriteLine("New folder failed: {0}", e);
                 }
 
                 Debug.WriteLine("Back to solution explorer...");
                 Mouse.MoveTo(solutionNode.GetClickablePoint());
                 Mouse.Click();
-                System.Threading.Thread.Sleep(1000);
+                System.Threading.Thread.Sleep(250);
             }
         }
 
@@ -963,24 +957,22 @@ namespace Microsoft.Nodejs.Tests.UI {
             Mouse.MoveTo(projectNode.GetClickablePoint());
             Mouse.Click(System.Windows.Input.MouseButton.Right);
 
-            System.Threading.Thread.Sleep(500);
-
             Keyboard.Type("d");
             Keyboard.PressAndRelease(System.Windows.Input.Key.Right);
             Keyboard.Type("d");
 
-            System.Threading.Thread.Sleep(500);
+            System.Threading.Thread.Sleep(250);
 
             Keyboard.Type(name);
             Keyboard.Type("\n");
 
-            System.Threading.Thread.Sleep(1000);
+            System.Threading.Thread.Sleep(500);
         }
 
         private static ProjectItem WaitForItem(Project project, string name) {
             bool found = false;
             ProjectItem item = null;
-            for (int i = 0; i < 10; i++) {
+            for (int i = 0; i < 40; i++) {
                 try {
                     item = project.ProjectItems.Item(name);
                     if (item != null) {
@@ -990,7 +982,7 @@ namespace Microsoft.Nodejs.Tests.UI {
                 } catch (ArgumentException) {
                 }
                 // wait for the edit to complete
-                System.Threading.Thread.Sleep(1000);
+                System.Threading.Thread.Sleep(250);
             }
             Assert.IsTrue(found);
             return item;
@@ -1043,6 +1035,13 @@ namespace Microsoft.Nodejs.Tests.UI {
 
             if (startItem != null && setStartupItem) {
                 project.SetStartupFile(startItem);
+                for (var i = 0; i < 20; i++) {
+                    //Wait for the startupItem to be set before returning from the project creation
+                    if (((string)project.Properties.Item("StartupFile").Value) == startItem) {
+                        break;
+                    }
+                    System.Threading.Thread.Sleep(250);
+                }
             }
 
             DeleteAllBreakPoints();

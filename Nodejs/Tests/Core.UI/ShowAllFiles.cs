@@ -55,19 +55,21 @@ namespace Microsoft.Nodejs.Tests.UI {
         [TestMethod, Priority(0), TestCategory("Core")]
         [HostType("TC Dynamic"), DynamicHostType(typeof(VsIdeHostAdapter))]
         public void ShowAllFilesSymLinks() {
-            System.Diagnostics.Process.Start("cmd.exe", 
+            using(System.Diagnostics.Process p = System.Diagnostics.Process.Start("cmd.exe",
                 String.Format("/c mklink /J \"{0}\" \"{1}\"", 
                     TestData.GetPath(@"TestData\NodejsProjectData\ShowAllFilesSymLink\SymFolder"), 
                     TestData.GetPath(@"TestData\NodejsProjectData\ShowAllFilesSymLink\SubFolder")
-                )
-            );
+                ))) {
+                p.WaitForExit();
+            }
 
-            System.Diagnostics.Process.Start("cmd.exe",
+            using(System.Diagnostics.Process p = System.Diagnostics.Process.Start("cmd.exe",
                 String.Format("/c mklink /J \"{0}\" \"{1}\"",
                     TestData.GetPath(@"TestData\NodejsProjectData\ShowAllFilesSymLink\SubFolder\Infinite"),
                     TestData.GetPath(@"TestData\NodejsProjectData\ShowAllFilesSymLink\SubFolder")
-                )
-            );
+                ))) {                
+                p.WaitForExit();                
+            }
 
             var project = BasicProjectTests.OpenProject(@"TestData\NodejsProjectData\ShowAllFilesSymLink.sln");
             var app = new VisualStudioApp(VsIdeTestHostContext.Dte);
@@ -100,7 +102,6 @@ namespace Microsoft.Nodejs.Tests.UI {
             var linkedNode = window.WaitForItem("Solution 'ShowAllFilesLinked' (1 project)", "HelloWorld", "File.js");
             AutomationWrapper.Select(linkedNode);
             Keyboard.ControlC();
-            System.Threading.Thread.Sleep(1000);
 
             var subFolder = window.WaitForItem("Solution 'ShowAllFilesLinked' (1 project)", "HelloWorld", "SubFolder");
             AutomationWrapper.Select(subFolder);
@@ -112,13 +113,11 @@ namespace Microsoft.Nodejs.Tests.UI {
             AutomationWrapper.Select(linkedNode);
 
             Keyboard.ControlX();
-            System.Threading.Thread.Sleep(1000);
 
             var projectNode = window.WaitForItem("Solution 'ShowAllFilesLinked' (1 project)", "HelloWorld");
             AutomationWrapper.Select(projectNode);
 
             Keyboard.ControlV();
-            System.Threading.Thread.Sleep(1000);
             project.Save();
 
             var text = File.ReadAllText(@"TestData\NodejsProjectData\ShowAllFilesLinked\HelloWorld.njsproj");

@@ -30,8 +30,8 @@ namespace TestUtilities.UI.Nodejs {
 
         public void StopProfiling() {
             var button = FindByName("Stop Profiling");
-            for (int i = 0; i < 100 && !button.Current.IsEnabled; i++) {
-                System.Threading.Thread.Sleep(100);
+            for (int i = 0; i < 20 && !button.Current.IsEnabled; i++) {
+                System.Threading.Thread.Sleep(500);
             }
 
             Invoke(button);

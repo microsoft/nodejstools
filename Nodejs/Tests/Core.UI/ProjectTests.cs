@@ -38,13 +38,13 @@ namespace Microsoft.Nodejs.Tests.UI {
 
         [TestCleanup]
         public void MyTestCleanup() {
-            for (int i = 0; i < 100; i++) {
+            for (int i = 0; i < 20; i++) {
                 try {
                     VsIdeTestHostContext.Dte.Solution.Close(false);
                     break;
                 } catch {
                     VsIdeTestHostContext.Dte.Documents.CloseAll(EnvDTE.vsSaveChanges.vsSaveChangesNo);
-                    System.Threading.Thread.Sleep(200);
+                    System.Threading.Thread.Sleep(500);
                 }
             }
         }
@@ -190,12 +190,15 @@ http.createServer(function (req, res) {
             string curFile = null;
             Window window;
             EditorWindow openFile = null;
+            var app = new VisualStudioApp(VsIdeTestHostContext.Dte);
+            app.OpenSolutionExplorer();
+            
             foreach (var testCase in testCases) {
                 if (testCase.File != curFile) {
                     openFile = OpenProjectItem(testCase.File, out window, @"TestData\RequireTestApp\RequireTestApp.sln");
+                    app.SolutionExplorerTreeView.WaitForItem("Solution 'RequireTestApp' (1 project)", "RequireTestApp", "References");
                     text = openFile.Text;
                     curFile = testCase.File;
-                    System.Threading.Thread.Sleep(5000);
                 }
 
                 Console.WriteLine("{0} {1}", testCase.Line, testCase.Type);
@@ -230,14 +233,12 @@ http.createServer(function (req, res) {
             Window window;
             
             //OpenProject();
-            //System.Threading.Thread.Sleep(200000);
             //var file = OpenProjectItem("server.js", out window);
             //var dispatcher = ((UIElement)file.TextView).Dispatcher;
 
             var app = new VisualStudioApp(VsIdeTestHostContext.Dte);
             app.OpenProject(Path.GetFullPath(@"TestData\NodeAppWithModule\NodeAppWithModule.sln"));
-            System.Threading.Thread.Sleep(200000);
-
+            
             var projectName = "NodeAppWithModule";
             var project = app.SolutionExplorerTreeView.WaitForItem(
                 "Solution '" + projectName + "' (1 project)",
@@ -304,14 +305,14 @@ http.createServer(function (req, res) {
             var openFile = OpenProjectItem("server.js", out window);
 
             var app = new VisualStudioApp(VsIdeTestHostContext.Dte);
-            ThreadPool.QueueUserWorkItem(x => VsIdeTestHostContext.Dte.ExecuteCommand("Project.AddNewItem"));
+            TestUtils.DteExecuteCommandOnThreadPool("Project.AddNewItem");
             app.WaitForDialog();
 
             var newItem = new NewItemDialog(AutomationElement.FromHandle(app.WaitForDialog()));
             newItem.FileName = "NewJSFile.js";
             newItem.ClickOK();
 
-            System.Threading.Thread.Sleep(1000);
+            System.Threading.Thread.Sleep(250);
 
             var solutionFolder = app.Dte.Solution.Projects.Item(1).ProjectItems;
             Assert.AreNotEqual(null, solutionFolder.Item("NewJSFile.js"));
@@ -324,9 +325,7 @@ http.createServer(function (req, res) {
             var openFile = OpenProjectItem("server.js", out window);
 
             openFile.MoveCaret(6, 1);
-            System.Threading.Thread.Sleep(3000);
             Keyboard.Type("http.");
-            System.Threading.Thread.Sleep(3000);
             Keyboard.Type("Cli\r");
             openFile.WaitForText(@"var http = require('http');
 
@@ -352,9 +351,7 @@ http.createServer(function (req, res) {
             var openFile = OpenProjectItem("intellisensemod.js", out window);
 
             openFile.MoveCaret(3, 1);
-            System.Threading.Thread.Sleep(3000);
             Keyboard.Type("server.");
-            System.Threading.Thread.Sleep(3000);
             Keyboard.Type("lis\r");
             openFile.WaitForText(@"var http = require('http');
 var server = http.createServer(null); // server.listen
@@ -367,7 +364,6 @@ var sd = require('stringdecoder');  // sd.StringDecoder();
 
             openFile.MoveCaret(6, 1);
             Keyboard.Type("sd.");
-            System.Threading.Thread.Sleep(3000);
             Keyboard.Type("Str\r");
             openFile.WaitForText(@"var http = require('http');
 var server = http.createServer(null); // server.listen
@@ -393,9 +389,9 @@ sd.StringDecoder
             
             newProjDialog.ClickOK();
 
-            // wait for new solution to load...
-            for (int i = 0; i < 100 && app.Dte.Solution.Projects.Count == 0; i++) {
-                System.Threading.Thread.Sleep(1000);
+            // wait for new solution to load...            
+            for (int i = 0; i < 40 && app.Dte.Solution.Projects.Count == 0; i++) {
+                System.Threading.Thread.Sleep(250);
             }
 
             app.SolutionExplorerTreeView.WaitForItem(
@@ -423,8 +419,8 @@ sd.StringDecoder
             newProjDialog.ClickOK();
 
             // wait for new solution to load...
-            for (int i = 0; i < 100 && app.Dte.Solution.Projects.Count == 0; i++) {
-                System.Threading.Thread.Sleep(1000);
+            for (int i = 0; i < 40 && app.Dte.Solution.Projects.Count == 0; i++) {
+                System.Threading.Thread.Sleep(250);
             }
 
             app.SolutionExplorerTreeView.WaitForItem(
@@ -491,8 +487,8 @@ sd.StringDecoder
             var project = OpenProject();
 
             // wait for new solution to load...
-            for (int i = 0; i < 100 && app.Dte.Solution.Projects.Count == 0; i++) {
-                System.Threading.Thread.Sleep(1000);
+            for (int i = 0; i < 40 && app.Dte.Solution.Projects.Count == 0; i++) {
+                System.Threading.Thread.Sleep(250);
             }
 
             var item = app.SolutionExplorerTreeView.WaitForItem(
@@ -506,12 +502,12 @@ sd.StringDecoder
             app.Dte.ExecuteCommand("Project.SetasNode.jsStartupFile");
             
             string startupFile = null;
-            for (int i = 0; i < 10; i++) {
+            for (int i = 0; i < 40; i++) {
                 startupFile = (string)project.Properties.Item("StartupFile").Value;
                 if (startupFile == "mymod.js") {
                     break;
                 }
-                System.Threading.Thread.Sleep(1000);
+                System.Threading.Thread.Sleep(250);
             }
             Assert.AreEqual(startupFile, Path.Combine(Environment.CurrentDirectory, @"TestData\NodeAppWithModule\NodeAppWithModule", "mymod.js"));
         }
@@ -604,7 +600,7 @@ sd.StringDecoder
                 var project = OpenProjectAndRun(@"TestData\NodejsProjectPropertiesTest\NodejsProjectPropertiesTest.sln", "server.js", true, debug: mode == 0);
 
                 for (int i = 0; i < 30 && !File.Exists(testFile); i++) {
-                    System.Threading.Thread.Sleep(1000);
+                    System.Threading.Thread.Sleep(250);
                 }
 
                 Assert.IsTrue(File.Exists(testFile), "test file not created");
@@ -631,7 +627,7 @@ sd.StringDecoder
                 var project = OpenProjectAndRun(@"TestData\NodejsProjectPropertiesTest\NodejsProjectPropertiesTest.sln", "server2.js", true, debug: mode == 0);
 
                 for (int i = 0; i < 30 && !File.Exists(testFile); i++) {
-                    System.Threading.Thread.Sleep(1000);
+                    System.Threading.Thread.Sleep(250);
                 }
 
                 Assert.IsTrue(File.Exists(testFile), "test file not created");

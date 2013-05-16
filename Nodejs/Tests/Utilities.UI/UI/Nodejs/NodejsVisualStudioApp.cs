@@ -37,7 +37,7 @@ namespace TestUtilities.UI.Nodejs {
         /// Opens and activates the Node.js Performance explorer window.
         /// </summary>
         public void LaunchNodejsProfiling() {
-            ThreadPool.QueueUserWorkItem(x => Dte.ExecuteCommand("Analyze.LaunchNode.jsProfiling"));
+            TestUtils.DteExecuteCommandOnThreadPool("Analyze.LaunchNode.jsProfiling");
         }
 
         /// <summary>
@@ -89,11 +89,11 @@ namespace TestUtilities.UI.Nodejs {
         }
 
         public Document WaitForDocument(string docName) {
-            for (int i = 0; i < 100; i++) {
+            for (int i = 0; i < 20; i++) {
                 try {
                     return Dte.Documents.Item(docName);
                 } catch {
-                    System.Threading.Thread.Sleep(100);
+                    System.Threading.Thread.Sleep(500);
                 }
             }
             throw new InvalidOperationException("Document not opened: " + docName);
@@ -116,7 +116,7 @@ namespace TestUtilities.UI.Nodejs {
                         )
                     );
                 if (element == null) {
-                    System.Threading.Thread.Sleep(100);
+                    System.Threading.Thread.Sleep(500);
                 }
             }
 
