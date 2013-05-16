@@ -326,7 +326,7 @@ namespace Microsoft.Nodejs.Tests.UI {
             dialog.FolderName = Path.GetFullPath(@"TestData\NodejsProjectData\AddExistingFolder");
             dialog.SelectFolder();
 
-            VisualStudioApp.CheckMessageBox("Cannot add folder 'AddExistingFolder' to one of its own children.");
+            VisualStudioApp.CheckMessageBox("Cannot add folder 'AddExistingFolder' as a child or decedent of self.");
         }
 
         [TestMethod, Priority(0), TestCategory("Core")]
