@@ -304,10 +304,9 @@ namespace Microsoft.Nodejs.Tests.UI {
             var projectNode = window.WaitForItem("Solution 'LongFileNames' (1 project)", "LFN");
             AutomationWrapper.Select(projectNode);
 
-            TestUtils.DteExecuteCommandOnThreadPool("Project.AddNewItem");
-            app.WaitForDialog();
-
-            var newItem = new NewItemDialog(AutomationElement.FromHandle(app.WaitForDialog()));
+            var dialog = app.OpenDialogWithDteExecuteCommand("Project.AddNewItem");
+            
+            var newItem = new NewItemDialog(AutomationElement.FromHandle(dialog));
             newItem.FileName = "NewJSFil.js";
             newItem.ClickOK();
 
@@ -331,10 +330,9 @@ namespace Microsoft.Nodejs.Tests.UI {
             var projectNode = window.WaitForItem("Solution 'LongFileNames' (1 project)", "LFN");
             AutomationWrapper.Select(projectNode);
 
-            TestUtils.DteExecuteCommandOnThreadPool("Project.AddNewItem");
-            app.WaitForDialog();
-
-            var newItem = new NewItemDialog(AutomationElement.FromHandle(app.WaitForDialog()));
+            var dialog = app.OpenDialogWithDteExecuteCommand("Project.AddNewItem");
+            
+            var newItem = new NewItemDialog(AutomationElement.FromHandle(dialog));
             newItem.FileName = "NewJSFile.js";
             newItem.ClickOK();
                                     

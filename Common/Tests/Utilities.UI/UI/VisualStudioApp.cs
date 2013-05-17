@@ -17,6 +17,7 @@ using System.Diagnostics;
 using System.IO;
 using System.Text;
 using System.Threading;
+using System.Threading.Tasks;
 using System.Windows.Automation;
 using System.Windows.Input;
 using EnvDTE;
@@ -72,17 +73,35 @@ namespace TestUtilities.UI {
             Dte.ExecuteCommand("View.ObjectBrowser");
         }
 
+        public IntPtr OpenDialogWithDteExecuteCommand(string commandName, string commandArgs = "") {
+
+            Task task = Task.Factory.StartNew(() => {
+                VsIdeTestHostContext.Dte.ExecuteCommand(commandName, commandArgs);                
+            });
+
+            var dialog = WaitForDialog(task);
+            if (dialog == IntPtr.Zero) {
+                if (task.IsFaulted && task.Exception != null) {
+                    Assert.Fail("Unexpected Exception - VsIdeTestHostContext.Dte.ExecuteCommand({0},{1}){2}{3}",
+                            commandName, commandArgs, Environment.NewLine, task.Exception.ToString());
+                }
+                Assert.Fail("Task failed - VsIdeTestHostContext.Dte.ExecuteCommand({0},{1})",
+                        commandName, commandArgs);
+            }
+            return dialog;
+        }
+
         /// <summary>
         /// Opens and activates the Navigate To window.
         /// </summary>
         public NavigateToDialog OpenNavigateTo() {
-            TestUtils.DteExecuteCommandOnThreadPool("Edit.NavigateTo");
-            return new NavigateToDialog(WaitForDialog());
+            var dialog = OpenDialogWithDteExecuteCommand("Edit.NavigateTo");
+            return new NavigateToDialog(dialog);
         }
 
         public SaveDialog SaveAs() {
-            TestUtils.DteExecuteCommandOnThreadPool("File.SaveSelectedItemsAs");
-            return new SaveDialog(WaitForDialog());
+            var dialog = OpenDialogWithDteExecuteCommand("File.SaveSelectedItemsAs");
+            return new SaveDialog(dialog);
         }
 
         /// <summary>
@@ -137,10 +156,7 @@ namespace TestUtilities.UI {
             Element.SetFocus();
 
             // bring up Tools->Options
-            TestUtils.DteExecuteCommandOnThreadPool("Tools.Options");
-
-            // wait for it...
-            IntPtr dialog = WaitForDialog();
+            var dialog = OpenDialogWithDteExecuteCommand("Tools.Options");
 
             // go to the tree view which lets us select a set of options...
             var treeView = new TreeView(AutomationElement.FromHandle(dialog).FindFirst(TreeScope.Descendants,
@@ -174,22 +190,57 @@ namespace TestUtilities.UI {
         }
 
         public NewProjectDialog FileNewProject() {
-            TestUtils.DteExecuteCommandOnThreadPool("File.NewProject");
-            IntPtr dialog = WaitForDialog();
+            var dialog = OpenDialogWithDteExecuteCommand("File.NewProject");
             return new NewProjectDialog(AutomationElement.FromHandle(dialog));
         }
 
         public AttachToProcessDialog OpenDebugAttach() {
-            TestUtils.DteExecuteCommandOnThreadPool("Debug.AttachtoProcess");
-            return new AttachToProcessDialog(WaitForDialog());
+            var dialog = OpenDialogWithDteExecuteCommand("Debug.AttachtoProcess");
+            return new AttachToProcessDialog(dialog);
+        }
+
+
+        public void DismissAllDialogs() {
+            int vsMainWindow = VsIdeTestHostContext.Dte.MainWindow.HWnd;            
+            int foundWindow = 2;
+
+            while(foundWindow != 0) {
+
+                IVsUIShell uiShell = VsIdeTestHostContext.ServiceProvider.GetService(typeof(IVsUIShell)) as IVsUIShell;
+                IntPtr hwnd;
+                uiShell.GetDialogOwnerHwnd(out hwnd);
+
+                for (int j = 0; j < 10 && hwnd.ToInt32() == VsIdeTestHostContext.Dte.MainWindow.HWnd; j++) {
+                    System.Threading.Thread.Sleep(100);
+                    uiShell.GetDialogOwnerHwnd(out hwnd);
+                }
+
+                //We didn't see any dialogs
+                if (hwnd == IntPtr.Zero || hwnd.ToInt32() == vsMainWindow) {
+                    foundWindow--;
+                    continue;
+                }
+                                
+                //MessageBoxButton.Abort
+                //MessageBoxButton.Cancel
+                //MessageBoxButton.No
+                //MessageBoxButton.Ok
+                //MessageBoxButton.Yes
+                //The second parameter is going to be the value returned... We always send Ok
+                NativeMethods.EndDialog(hwnd, new IntPtr(1));
+            }
         }
 
         /// <summary>
         /// Waits for a modal dialog to take over VS's main window and returns the HWND for the dialog.
         /// </summary>
         /// <returns></returns>
+        public IntPtr WaitForDialog(Task task) {
+            return WaitForDialogToReplace(Dte.MainWindow.HWnd, task);
+        }
+
         public IntPtr WaitForDialog() {
-            return WaitForDialogToReplace(Dte.MainWindow.HWnd);
+            return WaitForDialogToReplace(Dte.MainWindow.HWnd, null);
         }
 
         public ExceptionHelperDialog WaitForException() {
@@ -211,13 +262,17 @@ namespace TestUtilities.UI {
             Assert.Fail("Failed to find exception helper window");
             return null;
         }
-
-
+        
         /// <summary>
         /// Waits for a modal dialog to take over a given window and returns the HWND for the new dialog.
         /// </summary>
-        /// <returns>An IntPtr which should be interpreted as an HWND</returns>
+        /// <returns>An IntPtr which should be interpreted as an HWND</returns>        
         public static IntPtr WaitForDialogToReplace(int originalHwndasInt) {
+            return WaitForDialogToReplace(originalHwndasInt, null);
+        }
+
+
+        private static IntPtr WaitForDialogToReplace(int originalHwndasInt, Task task) {
             IVsUIShell uiShell = VsIdeTestHostContext.ServiceProvider.GetService(typeof(IVsUIShell)) as IVsUIShell;
             IntPtr hwnd;
             uiShell.GetDialogOwnerHwnd(out hwnd);
@@ -225,6 +280,9 @@ namespace TestUtilities.UI {
             for (int i = 0; i < 20 && hwnd.ToInt32() == originalHwndasInt; i++) {
                 System.Threading.Thread.Sleep(500);
                 uiShell.GetDialogOwnerHwnd(out hwnd);
+                if (task != null && task.IsFaulted) {
+                    return IntPtr.Zero;                    
+                }
             }
 
 
@@ -415,9 +473,8 @@ namespace TestUtilities.UI {
         }
 
         public void MoveCurrentFileToProject(string projectName) {
-            TestUtils.DteExecuteCommandOnThreadPool("file.ProjectPickerMoveInto");
-            IntPtr dialog = WaitForDialog();
-
+            var dialog = OpenDialogWithDteExecuteCommand("file.ProjectPickerMoveInto");
+            
             var chooseDialog = new ChooseLocationDialog(dialog);
             chooseDialog.FindProject(projectName);
             chooseDialog.ClickOK();
@@ -432,9 +489,9 @@ namespace TestUtilities.UI {
         }
 
         internal void OpenProject(string path) {
-            TestUtils.DteExecuteCommandOnThreadPool("File.OpenProject");
+            var hWnd = OpenDialogWithDteExecuteCommand("File.OpenProject");
             
-            var dialog = new OpenProjectDialog(WaitForDialog());
+            var dialog = new OpenProjectDialog(hWnd);
             dialog.ProjectName = path;
             dialog.Open();
 

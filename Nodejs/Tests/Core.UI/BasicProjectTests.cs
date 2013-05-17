@@ -375,9 +375,8 @@ namespace Microsoft.Nodejs.Tests.UI {
         }
 
         private static SelectFolderDialog AddExistingFolder(VisualStudioApp app) {
-            TestUtils.DteExecuteCommandOnThreadPool("ProjectandSolutionContextMenus.Project.Add.Existingfolder");
-            var addFolderDialog = app.WaitForDialog();
-            var dialog = new SelectFolderDialog(addFolderDialog);
+            var hWnd = app.OpenDialogWithDteExecuteCommand("ProjectandSolutionContextMenus.Project.Add.Existingfolder");
+            var dialog = new SelectFolderDialog(hWnd);
             return dialog;
         }
 

@@ -37,7 +37,7 @@ namespace TestUtilities.UI.Nodejs {
         /// Opens and activates the Node.js Performance explorer window.
         /// </summary>
         public void LaunchNodejsProfiling() {
-            TestUtils.DteExecuteCommandOnThreadPool("Analyze.LaunchNode.jsProfiling");
+            base.OpenDialogWithDteExecuteCommand("Analyze.LaunchNode.jsProfiling");
         }
 
         /// <summary>
