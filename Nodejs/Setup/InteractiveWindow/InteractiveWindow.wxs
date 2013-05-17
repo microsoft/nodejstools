@@ -1,0 +1,26 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Wix xmlns="http://schemas.microsoft.com/wix/2006/wi">
+  <?define InstallLocationName = "Node.js Interactive Window" ?>
+
+  <Module Id="ReplWindow" Language="1033" Version="1.0.0.0">
+    <Package Id="BF6BC19A-9714-42D9-B0B2-33823C19EA55" Manufacturer="Microsoft Corporation" InstallerVersion="200" />
+
+    <?include ..\InstallPath.wxi ?>
+    <?include ..\MergeModule.wxi ?>
+
+    <Directory Id="TARGETDIR" Name="SourceDir">
+      <Directory Id="EXTENSION_INSTALLPATH">
+        <Directory Id="_0AC62D6FF09F49DCB209A740D8BED631" Name="Extensions">
+          <Directory Id="_16BB2A4F12774B36AA7994C01AE3479A" Name="Microsoft">
+            <Directory Id="_871B6EB931744CE8A3B8A4156A4AF028" Name="Microsoft.NodejsTools.InteractiveWindow">
+              <Directory Id="INSTALLLOCATION" Name="0.5">
+              </Directory>
+            </Directory>
+          </Directory>
+        </Directory>
+      </Directory>
+    </Directory>
+
+    <ComponentGroupRef Id="InteractiveWindowExt"/>
+  </Module>
+</Wix>

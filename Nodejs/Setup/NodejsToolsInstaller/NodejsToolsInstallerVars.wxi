@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Include>
+  <?define ProductDescription = "Node.js Tools for Visual Studio" ?>
+
+  <!-- Product GUIDs: Must just be unique-->
+  <?define InstallerGuid=*?>
+  <?define InstallerUpgradeGuid=9291B031-A6DD-4AC2-A99C-421076160394?>
+  <!-- 
+       Preprocessor variables are slightly painful to work with.
+       You need them to always be set to something or Candle gives an error.
+       Therefore ./BuildRelease.ps1 sets the variable to a fairly unique string "SPECIALNULLVALUE"
+       if the user did not specify a $customBuildIdentifier.       
+  -->
+<?if $(var.CustomBuildIdentifier) = SPECIALNULLVALUE?>
+  <?define ProductName = "Node.js Tools for Visual Studio 2012" ?>
+<?else?>
+  <?define ProductName = "Node.js Tools for Visual Studio 2012 ($(var.CustomBuildIdentifier))" ?>  
+<?endif?>
+</Include>

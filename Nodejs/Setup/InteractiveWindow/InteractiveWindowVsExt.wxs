@@ -1,0 +1,42 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Wix xmlns="http://schemas.microsoft.com/wix/2006/wi">
+    <Fragment>
+        <DirectoryRef Id="INSTALLLOCATION">
+            <Directory Id="GAC" Name="GAC" />
+        </DirectoryRef>
+    </Fragment>
+    <Fragment>
+        <ComponentGroup Id="InteractiveWindowExt">
+            <!-- Per user components -->
+            <Component Id="PerUserInstallRegistry" Directory="INSTALLLOCATION" Guid="{D02050BD-AC66-4EFF-AF1C-E5C08A906CF1}">
+                <Condition>NOT ALLUSERS = 1</Condition>
+                <RegistryKey Root='HKCU' Key='Software\Microsoft\VisualStudio\$(var.VSTargetVersion)\ExtensionManager\EnabledExtensions'>
+                    <RegistryValue Type='string' Name='FF632CFA-E4C5-4D8E-B1E2-63BE3B8A8289,0.5' Value='[EXTENSION_INSTALLPATH]Extensions\Microsoft\Microsoft.NodejsTools.InteractiveWindow\0.5\'/>
+                </RegistryKey>
+                <RegistryKey Root='HKCU' Key='Software\Microsoft\VisualStudio\$(var.VSTargetVersion)\ExtensionManager\ExtensionTypes'>
+                    <RegistryValue Type='string' Name='FF632CFA-E4C5-4D8E-B1E2-63BE3B8A8289,0.5' Value='Tool'/>
+                </RegistryKey>
+            </Component>
+
+            <!-- All user components -->
+            <Component Id="cmpC9E9CDA70FA94A528B0B9EA47A57FA7A" Directory="GAC" Guid="{F877C6BA-2CE5-4BAB-A641-722B57484CBB}" >
+                <Condition>ALLUSERS = 1</Condition>
+                <File Id="fil8901C47B75D94C8CBED12BEAD2AF2C6F" KeyPath="yes" Source="$(var.TargetDir)\Microsoft.NodejsTools.InteractiveWindow.dll" Assembly=".net"/>
+            </Component>
+
+            <!-- Both per user and all user components -->
+            <Component Id="cmpB950A59A689542B2B3F29FCFA67E02EE" Directory="INSTALLLOCATION" Guid="{0DA89CC4-D0E2-4561-AEA6-15BBEBA8B44A}">
+                <File Id="fil9309B0CD0367446D8F55F9C6F9CFCB7A" KeyPath="yes" Source="$(var.TargetDir)\Microsoft.NodejsTools.InteractiveWindow.dll" />
+            </Component>
+            <Component Id="cmp63F444DC3425410892116D2F3387CE43" Directory="INSTALLLOCATION" Guid="{3016A34E-AE77-45EE-AEA2-89AB57C6EC68}">
+                <File Id="fil6590056DF2F0460D962F85EEB58736B9" KeyPath="yes" Source="$(var.TargetDir)\Microsoft.NodejsTools.InteractiveWindow.pkgdef" />
+            </Component>
+            <Component Id="cmp8EFE1806F9254D76BCD2961C333F2BD2" Directory="INSTALLLOCATION" Guid="{53D5DF7D-B1B6-40A3-A6EA-9DE79DFB0285}">
+                <File Id="filFB1BD281DD6948E8B044EC7BFCD3D0C3" KeyPath="yes" Source="$(var.ObjDir)\extension.vsixmanifest" />
+            </Component>
+        </ComponentGroup>
+    </Fragment>
+    <Fragment>
+        <DirectoryRef Id="dirBEC0D5FD22264A40A922EEF556B688CD" />
+    </Fragment>
+</Wix>

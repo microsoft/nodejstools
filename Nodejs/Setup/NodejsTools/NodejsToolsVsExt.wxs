@@ -1,0 +1,96 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Wix xmlns="http://schemas.microsoft.com/wix/2006/wi">
+    <Fragment>
+        <DirectoryRef Id="INSTALLLOCATION">
+            <Directory Id="DIR_ProjectTemplates_4DCCAA275A2C4923918F2CBC07199083" Name="ProjectTemplates" />
+            <Directory Id="DIR_FileTemplates_867246A15C254AAAA0099E75615C893A" Name="FileTemplates">
+              <Directory Id="DIR_NewItem_8C4602C9B0A2476697A95E2BF5B94B53" Name="NewItem"/>
+            </Directory>
+        </DirectoryRef>
+        <DirectoryRef Id="INSTALLLOCATION">
+            <Directory Id="GAC" Name="GAC" />
+        </DirectoryRef>
+    </Fragment>
+    <Fragment>
+        <ComponentGroup Id="NodejsToolsExt">
+            <!-- Per user components -->
+            <Component Id="PerUserInstallRegistry" Directory="INSTALLLOCATION" Guid="{07CBA996-E490-4F22-87C0-069BAF855D68}">
+                <Condition>NOT ALLUSERS = 1</Condition>
+                <RegistryKey Root='HKCU' Key='Software\Microsoft\VisualStudio\$(var.VSTargetVersion)\ExtensionManager\EnabledExtensions'>
+                    <RegistryValue Type='string' Name='4219f2a8-fbf9-4659-a222-b7580a60eebb,0.5' Value='[EXTENSION_INSTALLPATH]Extensions\Microsoft\Node.js Tools for Visual Studio\0.5\'/>
+                </RegistryKey>
+                <RegistryKey Root='HKCU' Key='Software\Microsoft\VisualStudio\$(var.VSTargetVersion)\ExtensionManager\ExtensionTypes'>
+                    <RegistryValue Type='string' Name='4219f2a8-fbf9-4659-a222-b7580a60eebb,0.5' Value='Tool'/>
+                </RegistryKey>
+            </Component>
+            
+            <!-- All user components -->
+
+            <!-- Both per user and all user components -->
+            <Component Id="cmpE3F5BF4C28BA41A9A478DAC397C64098" Directory="INSTALLLOCATION" Guid="{DDBCEC41-C59C-4C5D-B7A2-77AB2F7684DB}">
+              <File Id="fil47E7513578964CFA86B587D50FC280CB" KeyPath="yes" Source="$(var.BinariesDir)\Microsoft.NodejsTools.dll" />
+            </Component>
+            <Component Id="cmp9FEF8767393C493A8B68D8BF6D4961B5" Directory="INSTALLLOCATION" Guid="{B43D5044-D8D5-42A8-BAEF-1A7DBC21AAE6}">
+              <File Id="filE8D2A28B9CB64184A05AEAAF2A2EF4C8" KeyPath="yes" Source="$(var.BinariesDir)\Microsoft.NodejsTools.AjaxMin.dll" />
+            </Component>
+            <Component Id="cmp8D98477436DB42B0ACE9B536469F60E1" Directory="INSTALLLOCATION" Guid="{0AE160E1-51FF-4153-9882-E89DDFAE07B5}">
+              <File Id="filEEA4A429F6A1428CAC96158BA6ADD3F1" KeyPath="yes" Source="$(var.BinariesDir)\NodejsProject.ico" />
+            </Component>
+            <Component Id="cmpA1538F6E77EE4170BEEC113CBCA174BB" Directory="INSTALLLOCATION" Guid="{60D3CA23-457C-4AA9-AD84-A8992687A234}">
+              <File Id="fil0A762C1A17F3488488BB00DB54D656A5" KeyPath="yes" Source="$(var.BinariesDir)\NodejsProjectBig.ico" />
+            </Component>
+            <Component Id="cmpC4E8CE1ED04F4740A1B017ECE4DA9CD1" Directory="INSTALLLOCATION" Guid="{1CF7A1CB-228A-4FA1-97EC-A9CD4417FF63}">
+              <File Id="fil617BFEB8AC8E419B80409E0DD6D4641B" KeyPath="yes" Source="$(var.ObjDir)\extension.vsixmanifest" />
+            </Component>
+            <Component Id="cmp2F4D073922FD4DB199AC2AC8470BA750" Directory="INSTALLLOCATION" Guid="{99782EAC-E8DD-4FC7-8EBA-58F107CCEB9E}">
+              <File Id="fil530034032FEF4DFDBFD9E74C8411CB8C" KeyPath="yes" Source="$(var.BinariesDir)\Microsoft.NodejsTools.pkgdef" />
+            </Component>
+            <Component Id="cmp31BE00F937684CD0925BD24FB16D6D6D" Directory="INSTALLLOCATION" Guid="{8101FEA9-BE4C-4361-89A7-F438C0B5EB80}">
+              <File Id="fil226B6994EA9247808FCA9C6485906CB2" KeyPath="yes" Source="$(var.BinariesDir)\visualstudio_nodejs_repl.js" />
+            </Component>
+            <Component Id="cmp05C8461645AC4E30883B5F6FC70C2F9B" Directory="INSTALLLOCATION" Guid="{B87AE937-DA4A-4599-B2E9-B9EE139293D1}">
+              <File Id="filB3AE8C142D5449D0A2CB178BD4C5EF1F" KeyPath="yes" Source="$(var.BinariesDir)\nodejsref.js" />
+            </Component>
+            <Component Id="cmp1B99A039DB5C4D0A888840A9BF4FFC47" Directory="DIR_ProjectTemplates_4DCCAA275A2C4923918F2CBC07199083" Guid="{3EDA7EF0-3F18-4A96-9A03-F72B9A9623CE}">
+              <File Id="fil239F6342260D479E834466EDF4F32ED4" KeyPath="yes" Source="$(var.BinariesDir)\ProjectTemplates\NodejsApp.zip" />
+            </Component>
+            <Component Id="cmp83246B83300D48B6BA9BE9863A22E3CC" Directory="DIR_ProjectTemplates_4DCCAA275A2C4923918F2CBC07199083" Guid="{809831B0-4B05-4380-8C33-13F91953C9A2}">
+              <File Id="fil28DC82CBC4D24BB5867F8102AFDA0A7C" KeyPath="yes" Source="$(var.BinariesDir)\ProjectTemplates\AzureNodejsApp.zip" />
+            </Component>
+            <Component Id="cmp7850D806C2DE45078426A78CBBEF66DA" Directory="Dir_NodejsToolsMsBuild" Guid="{6D84572F-D895-443F-BD25-712394273A4E}">
+                <File Id="filD2A9B63C22F547FD8C1C55BB14F22A8A" KeyPath="yes" Source="$(var.BinariesDir)\Microsoft.NodejsTools.targets" />
+            </Component>
+
+            <Component Id="cmpDB983944C41346E38BA0413248958C3A" Directory="DIR_NewItem_8C4602C9B0A2476697A95E2BF5B94B53" Guid="{007564C3-0035-45B6-8929-E793159D0C72}">
+              <File Id="fil227A010D0980483B91EC09B5E42613E5" KeyPath="yes" Source="$(var.BinariesDir)\FileTemplates\NewItem\TextFile.txt" />
+            </Component>
+            <Component Id="cmpDF185097F0E246D8B0A178F91D9DBFD9" Directory="DIR_NewItem_8C4602C9B0A2476697A95E2BF5B94B53" Guid="{580F274E-4467-48FE-9EDC-80D1E75C1F1D}">
+              <File Id="filF10B1C2B44E844F9B012351640ADBC65" KeyPath="yes" Source="$(var.BinariesDir)\FileTemplates\NewItem\NewItems.vsdir" />
+            </Component>
+            <Component Id="cmp9608E5E0EB994452A7D3A8856F529C38" Directory="DIR_NewItem_8C4602C9B0A2476697A95E2BF5B94B53" Guid="{E4B83B18-E5EF-4D95-93A2-557FD1619A25}">
+              <File Id="fil0FF05115771C408E8CD4FFA986AF0459" KeyPath="yes" Source="$(var.BinariesDir)\FileTemplates\NewItem\EmptyJs.js" />
+            </Component>
+
+          <!-- WebPI Components -->
+
+        </ComponentGroup>
+    </Fragment>
+  <!--
+    <Fragment>
+      <DirectoryRef Id="DIR_Templates_ProjectTemplates_EBEE0B4C969248EA90D7CF43A9566C06" />
+    </Fragment>
+    <Fragment>
+      <DirectoryRef Id="DIR_Templates_ProjectTemplates_NodeAppProject_27837B82E64C4599AFADE3E577B2D5B3" />
+    </Fragment>
+    <Fragment>
+      <DirectoryRef Id="DIR_Templates_4DCCAA275A2C4923918F2CBC07199083">
+        <Directory Id="DIR_Templates_ProjectTemplates_EBEE0B4C969248EA90D7CF43A9566C06" Name="ProjectTemplates" />
+      </DirectoryRef>
+    </Fragment>
+    <Fragment>
+      <DirectoryRef Id="DIR_Templates_Projects_EBEE0B4C969248EA90D7CF43A9566C06">
+        <Directory Id="DIR_Templates_Projects_NodeAppProject_27837B82E64C4599AFADE3E577B2D5B3" Name="NodeAppProject" />
+      </DirectoryRef>
+    </Fragment>
+    -->
+</Wix>

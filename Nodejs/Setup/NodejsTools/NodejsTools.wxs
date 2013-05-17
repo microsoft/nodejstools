@@ -1,0 +1,43 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Wix xmlns="http://schemas.microsoft.com/wix/2006/wi">
+  <?define InstallLocationName = "Node.js Tools for Visual Studio" ?>
+
+  <Module Id="NodejsTools" Language="1033" Version="1.0.0.0">
+    <Package Id="590FDCAA-C383-4112-9D84-49FB1AFA060B" Manufacturer="Microsoft Corporation" InstallerVersion="200" />
+    
+    <?include ..\InstallPath.wxi ?>
+    <?include ..\MergeModule.wxi ?>
+
+    <Directory Id="TARGETDIR" Name="SourceDir">
+      <Directory Id="EXTENSION_INSTALLPATH">
+          <Directory Id="_0D6D364235164B24AC58E38A08968129" Name="Extensions">
+            <Directory Id="_8C5B593518EE4149B9ADAF76B704E2A6" Name="Microsoft">
+              <Directory Id="_4737EE92D34842BAB521438C6A4FAF3D" Name="Node.js Tools for Visual Studio">
+                <Directory Id="INSTALLLOCATION" Name="0.5">
+                  <Directory Id="X64INSTALL" Name="x64">
+                    </Directory>
+                </Directory>
+              </Directory>
+          </Directory>
+        </Directory>
+      </Directory>
+
+      <Directory Id="ProgramFilesFolder" Name="PFILES">
+          <Directory Id="Dir_MSBuild" Name="MSBuild"> 
+              <Directory Id="Dir_MSBuildMS" Name="Microsoft"> 
+                  <Directory Id="Dir_MSBuildVisualStudio" Name="VisualStudio"> 
+                      <Directory Id="Dir_VSVersion" Name="v$(var.VSTargetVersion)">
+                        <Directory Id="Dir_NodejsToolsMsBuild" Name="Node.js Tools"> 
+                        </Directory>
+                      </Directory>
+                  </Directory> 
+              </Directory> 
+          </Directory> 
+      </Directory>
+
+
+    </Directory>
+
+    <ComponentGroupRef Id="NodejsToolsExt"/>
+  </Module>
+</Wix>

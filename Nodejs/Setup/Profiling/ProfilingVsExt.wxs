@@ -1,0 +1,31 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Wix xmlns="http://schemas.microsoft.com/wix/2006/wi">
+    <Fragment>
+        <ComponentGroup Id="NodejsProfilingExt">
+            <!-- Per user components -->
+            <Component Id="PerUserInstallRegistry" Directory="INSTALLLOCATION" Guid="{1FA57071-B39A-4320-9678-ABE1AB4D04DD}">
+                <Condition>NOT ALLUSERS = 1</Condition>
+                <RegistryKey Root='HKCU' Key='Software\Microsoft\VisualStudio\$(var.VSTargetVersion)\ExtensionManager\EnabledExtensions'>
+                    <RegistryValue Type='string' Name='15507A01-D37D-4B20-BE11-E96472C98883,0.5' Value='[EXTENSION_INSTALLPATH]Extensions\Microsoft\Node.js Tools for Visual Studio, Profiling Support\0.5\'/>
+                </RegistryKey>
+                <RegistryKey Root='HKCU' Key='Software\Microsoft\VisualStudio\$(var.VSTargetVersion)\ExtensionManager\ExtensionTypes'>
+                    <RegistryValue Type='string' Name='15507A01-D37D-4B20-BE11-E96472C98883,0.5' Value='Microsoft.VisualStudio.VsPackage'/>
+                </RegistryKey>
+            </Component>
+
+            <!-- Both per user and all user components -->
+            <Component Id="cmp84A79756852F4D6FB60131F0ECA23AD2" Directory="INSTALLLOCATION" Guid="{6C4A6A5D-0FFC-4F35-84DD-EF909A0FA21A}">
+                <File Id="fil0562C0373D574C7AA1EC5AAF3506ACA8" KeyPath="yes" Source="$(var.BinariesDir)\Microsoft.NodejsTools.Profiling.dll" />
+            </Component>
+            <Component Id="cmpCB641C647A5D41EBA149FB7C4252E5B3" Directory="INSTALLLOCATION" Guid="{95CA82F5-6CD8-496F-A599-71C676FFBBAC}">
+                <File Id="fil59FF245359614F3E919152327FD3A561" KeyPath="yes" Source="$(var.BinariesDir)\Microsoft.NodejsTools.Profiling.pkgdef" />
+            </Component>
+            <Component Id="cmp3064B14A942E4EC995BE59A5313AB274" Directory="INSTALLLOCATION" Guid="{B4B631DD-833E-44C1-872E-D8BCB8EE2706}">
+                <File Id="filD1CD5852E25D497A94DEE967AFC0E37E" KeyPath="yes" Source="$(var.BinariesDir)\extension.vsixmanifest" />
+            </Component>
+            <Component Id="cmp98B7AD9DAC674A92B646DA698E631FB8" Directory="INSTALLLOCATION" Guid="{4F2CA623-F9B8-4C8A-A9E3-4D1C3E33E850}">
+                <File Id="fil1EDE8FF6143D41518E88685C95416915" KeyPath="yes" Source="$(var.BinariesDir)\Microsoft.NodejsTools.NodeLogConverter.exe" />
+            </Component>
+        </ComponentGroup>
+    </Fragment>
+</Wix>
