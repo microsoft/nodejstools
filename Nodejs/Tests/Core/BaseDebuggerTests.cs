@@ -73,7 +73,16 @@ namespace DebuggerTests {
 
             // Load process
             AutoResetEvent processLoaded = new AutoResetEvent(false);
-            NodeDebugger process = new NodeDebugger(NodePackage.NodePath, arguments, dir, null, interpreterOptions, debugOptions, null);
+            NodeDebugger process =
+                new NodeDebugger(
+                    NodePackage.NodePath,
+                    arguments,
+                    dir,
+                    null,
+                    interpreterOptions,
+                    debugOptions,
+                    null,
+                    createNodeWindow: false);
             if (onProcessCreated != null) {
                 onProcessCreated(process);
             }

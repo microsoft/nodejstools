@@ -80,10 +80,10 @@ namespace Microsoft.NodejsTools.Debugger {
         private readonly Dictionary<int, object> _requestData = new Dictionary<int, object>();
         private ExceptionHitTreatment _defaultExceptionTreatment = ExceptionHitTreatment.BreakAlways;
         private Dictionary<string, ExceptionHitTreatment> _exceptionTreatments = GetDefaultExceptionTreatments();
+        private Dictionary<int, string> _errorCodes = new Dictionary<int, string>();
         private bool _breakOnAllExceptions;
         private bool _breakOnUncaughtExceptions;
         private int _entryPointFrameCount;
-        private Action _onSocketConnectedHandler;
 
         private static Dictionary<string, ExceptionHitTreatment> GetDefaultExceptionTreatments() {
             // Keep exception types in sync with those declared in ProvideDebugExceptionAttribute's in NodePackage.cs
@@ -201,16 +201,15 @@ namespace Microsoft.NodejsTools.Debugger {
             string interpreterOptions,
             NodeDebugOptions debugOptions,
             List<string[]> dirMapping,
-            Action onSocketConnectedHandler = null
+            bool createNodeWindow = true
         ) {
-            _onSocketConnectedHandler = onSocketConnectedHandler;
-
             string allArgs = "--debug-brk " + script;
             if (!string.IsNullOrEmpty(interpreterOptions)) {
                 allArgs += " " + interpreterOptions;
             }
 
             var psi = new ProcessStartInfo(exe, allArgs);
+            psi.CreateNoWindow = !createNodeWindow;
             psi.WorkingDirectory = dir;
             psi.UseShellExecute = false;
             if (env != null) {
@@ -391,9 +390,21 @@ namespace Microsoft.NodejsTools.Debugger {
                 });
         }
 
-        private void AutoResume() {
+        private void AutoResume(bool needBacktrace = false) {
             // Continue stepping, if stepping
             if (_steppingMode != SteppingKind.None) {
+                if (needBacktrace) {
+                    // Get backtrace
+                    // Doing this here avoids doing a backtrace for all auto resumes
+                    PerformBacktrace((running) => {
+                        // Handle followup
+                        _resumingStepping = true;
+                        CompleteStepping();
+                    });
+                    return;
+                }
+
+                // Have backtrace
                 _resumingStepping = true;
                 CompleteStepping();
                 return;
@@ -694,13 +705,6 @@ namespace Microsoft.NodejsTools.Debugger {
             StartListenerThread();
 
             ProcessConnect();
-        }
-
-        protected override void OnSocketConnected() {
-            if (_onSocketConnectedHandler != null) {
-                _onSocketConnectedHandler();
-                _onSocketConnectedHandler = null;
-            }
         }
 
         protected override void OnSocketDisconnected() {
@@ -1025,44 +1029,54 @@ namespace Microsoft.NodejsTools.Debugger {
             var exceptionName = GetExceptionName(json);
             var errNo = GetExceptionCodeRef(json);
             if (errNo != null) {
-                SendRequest(
-                    "lookup",
-                    new Dictionary<string, object> {
-                        { "handles", new object[] {errNo.Value} },
-                        { "includeSource", false }
-                    },
-                    _ => {
-                        var errorCode = ((Dictionary<string, object>)((Dictionary<string, object>)_["body"])[errNo.ToString()])["value"].ToString();
-
-                        ReportException(body, uncaught, exceptionName + "(" + errorCode + ")");
-                    }
-                );
+                string errorCodeFromMap;
+                if (_errorCodes.TryGetValue(errNo.Value, out errorCodeFromMap)) {
+                    ReportException(body, uncaught, exceptionName, errorCodeFromMap);
+                } else {
+                    SendRequest(
+                        "lookup",
+                        new Dictionary<string, object> {
+                            { "handles", new object[] {errNo.Value} },
+                            { "includeSource", false }
+                        },
+                        lookupSuccessJson => {
+                            var errorCodeFromLookup = ((Dictionary<string, object>)((Dictionary<string, object>)lookupSuccessJson["body"])[errNo.ToString()])["value"].ToString();
+                            _errorCodes[errNo.Value] = errorCodeFromLookup;
+                            ReportException(body, uncaught, exceptionName, errorCodeFromLookup);
+                        },
+                        lookupFailureJson => {
+                            ReportException(body, uncaught, exceptionName);
+                        }
+                    );
+                }
             } else {
                 ReportException(body, uncaught, exceptionName);
             }
         }
 
+        private void ReportException(Dictionary<string, object> body, bool uncaught, string exceptionName, string errorCode) {
+            ReportException(body, uncaught, exceptionName + "(" + errorCode + ")");
+        }
+        
         private void ReportException(Dictionary<string, object> body, bool uncaught, string exceptionName) {
+            // UNDONE Handle break on unhandled, once just my code is supported
+            // Node has a catch all, so there are no uncaught exceptions
+            // For now just break always or never
+            //if (exceptionTreatment == ExceptionHitTreatment.BreakNever ||
+            //    (exceptionTreatment == ExceptionHitTreatment.BreakOnUnhandled && !uncaught)) {
             ExceptionHitTreatment exceptionTreatment;
             if (!_exceptionTreatments.TryGetValue(exceptionName, out exceptionTreatment)) {
                 exceptionTreatment = _defaultExceptionTreatment;
+            }
+            if (exceptionTreatment == ExceptionHitTreatment.BreakNever) {
+                AutoResume(needBacktrace: true);
+                return;
             }
 
             // We need to get the backtrace before we break, so we request the backtrace
             // and follow up with firing the appropriate event for the break
             PerformBacktrace((running) => {
                 // Handle followup
-
-                // UNDONE Handle break on unhandled, once just my code is supported
-                // Node has a catch all, so there are no uncaught exceptions
-                // For now just break always or never
-                //if (exceptionTreatment == ExceptionHitTreatment.BreakNever ||
-                //    (exceptionTreatment == ExceptionHitTreatment.BreakOnUnhandled && !uncaught)) {
-                if (exceptionTreatment == ExceptionHitTreatment.BreakNever) {
-                    AutoResume();
-                    return;
-                }
-
                 if (MainThread.Frames.Count() < _entryPointFrameCount) {
                     // Auto resume exceptions thrown up the stack from our entry point
                     // to avoid firing exception raised events for rethrow performed by Node
@@ -1574,6 +1588,7 @@ namespace Microsoft.NodejsTools.Debugger {
             object valueObj;
             record.TryGetValue("value", out valueObj);
             string value = string.Empty;
+            string hexValue = null;
             
             int? handle = null;
             var expandable = false;
@@ -1608,7 +1623,15 @@ namespace Microsoft.NodejsTools.Debugger {
                     value = "\"" + (string)valueObj + "\"";
                     break;
                 case "number":
-                    value = valueObj != null ? valueObj.ToString() : "null";
+                    if (valueObj == null) {
+                        value = "null";
+                    } else {
+                        value = valueObj.ToString();
+                        int intValue = 0;
+                        if (int.TryParse(value, out intValue)) {
+                            hexValue = String.Format("0x{0:X8}", intValue);
+                        }
+                    }
                     break;
                 case "boolean":
                     value = (bool)valueObj ? "true" : "false";
@@ -1633,7 +1656,7 @@ namespace Microsoft.NodejsTools.Debugger {
                             this,
                             handle,
                             value,
-                            "",
+                            hexValue ?? value,
                             type,
                             name,
                             "",
@@ -1653,6 +1676,7 @@ namespace Microsoft.NodejsTools.Debugger {
         ) {
             object valueObj;
             var value = valueContainer.TryGetValue("text", out valueObj) ? (string)valueObj : string.Empty;
+            string hexValue = null;
             int? handle = null;
             var expandable = false;
 
@@ -1682,6 +1706,11 @@ namespace Microsoft.NodejsTools.Debugger {
                     value = "\"" + value + "\"";
                     break;
                 case "number":
+                    int intValue = 0;
+                    if (int.TryParse(value, out intValue)) {
+                        hexValue = String.Format("0x{0:X8}", intValue);
+                    }
+                    break;
                 case "boolean":
                     break;
                 case "null":
@@ -1714,7 +1743,7 @@ namespace Microsoft.NodejsTools.Debugger {
                             this,
                             handle,
                             value,
-                            "",
+                            hexValue ?? value,
                             type,
                             expression,
                             childName,

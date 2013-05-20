@@ -91,7 +91,13 @@ namespace Microsoft.NodejsTools.Project {
 
                 if (webBrowserUrl != null) {
                     Debug.Assert(port != null);
-                    ThreadPool.QueueUserWorkItem(StartBrowser, new BrowserStartInfo(port.Value, webBrowserUrl, process));
+                    OnPortOpenedHandler.CreateHandler(
+                        port.Value,
+                        shortCircuitPredicate: () => process.HasExited,
+                        action: () => {
+                            VsShellUtilities.OpenBrowser(webBrowserUrl, (uint)__VSOSPFLAGS.OSP_LaunchNewBrowser);
+                        }
+                    );
                 }
             }
             return VSConstants.S_OK;
@@ -167,9 +173,16 @@ namespace Microsoft.NodejsTools.Project {
             if(!String.IsNullOrWhiteSpace(nodeArgs)) {
                 dbgInfo.bstrOptions = AD7Engine.InterpreterOptions + "=" + nodeArgs;
             }
+            if (port.HasValue) {
+                if (!String.IsNullOrWhiteSpace(dbgInfo.bstrOptions)) {
+                    dbgInfo.bstrOptions += ";" + AD7Engine.WebBrowserPort + "=" + port.Value.ToString();
+                } else {
+                    dbgInfo.bstrOptions = AD7Engine.WebBrowserPort + "=" + port.Value.ToString();
+                }
+            }
             if (!String.IsNullOrWhiteSpace(webBrowserUrl)) {
                 if (!String.IsNullOrWhiteSpace(dbgInfo.bstrOptions)) {
-                    dbgInfo.bstrOptions += " " + AD7Engine.WebBrowserUrl + "=" + webBrowserUrl;
+                    dbgInfo.bstrOptions += ";" + AD7Engine.WebBrowserUrl + "=" + webBrowserUrl;
                 } else {
                     dbgInfo.bstrOptions = AD7Engine.WebBrowserUrl + "=" + webBrowserUrl;
                 }
@@ -211,45 +224,97 @@ namespace Microsoft.NodejsTools.Project {
             }
         }
 
-        public void StartInBrowser(string url) {
-          VsShellUtilities.OpenBrowser(url, (uint)__VSOSPFLAGS.OSP_LaunchNewBrowser);
-        }
-
-        class BrowserStartInfo {
-            public readonly int Port;
-            public readonly string Url;
-            public readonly Process Process;
-
-            public BrowserStartInfo(int port, string url, Process process) {
-                Port = port;
-                Url = url;
-                Process = process;
-            }
-        }
-
-        private void StartBrowser(object browserStart) {
-            var startInfo = (BrowserStartInfo)browserStart;
-            var socket = new Socket(AddressFamily.InterNetwork, SocketType.Stream, ProtocolType.Tcp);
-            socket.Blocking = true;
-            for (int i = 0; i < 100 && !startInfo.Process.HasExited; i++) {
-                try {
-                    socket.Connect(IPAddress.Loopback, startInfo.Port);
-                    break;
-                } catch {
-                    System.Threading.Thread.Sleep(100);
-                }
-            }
-            socket.Close();
-            if (!startInfo.Process.HasExited) {
-                StartInBrowser(startInfo.Url);
-            }
-        }
-
         private static int GetFreePort() {
             return Enumerable.Range(new Random().Next(1200, 2000), 60000).Except(
                 from connection in IPGlobalProperties.GetIPGlobalProperties().GetActiveTcpConnections()
                 select connection.LocalEndPoint.Port
             ).First();
+        }
+        }
+
+    internal class OnPortOpenedHandler {
+
+        class OnPortOpenedInfo {
+            public readonly int Port;
+            public readonly TimeSpan Timeout;
+            public readonly int Sleep;
+            public readonly Func<bool> ShortCircuitPredicate;
+            public readonly Action Action;
+            public readonly DateTime StartTime;
+
+            public OnPortOpenedInfo(
+                int port,
+                int? timeout = null,
+                int? sleep = null,
+                Func<bool> shortCircuitPredicate = null,
+                Action action = null
+            ) {
+                Port = port;
+                Timeout = TimeSpan.FromMilliseconds(timeout ?? 60000);  // 1 min timeout
+                Sleep = sleep ?? 500;                                   // 1/2 second sleep
+                ShortCircuitPredicate = shortCircuitPredicate ?? (() => false);
+                Action = action ?? (() => {});
+                StartTime = System.DateTime.Now;
+            }
+        }
+
+        internal static void CreateHandler(
+            int port,
+            int? timeout = null,
+            int? sleep = null,
+            Func<bool> shortCircuitPredicate = null,
+            Action action = null
+        ) {
+            ThreadPool.QueueUserWorkItem(
+                OnPortOpened,
+                new OnPortOpenedInfo(
+                    port,
+                    timeout,
+                    sleep,
+                    shortCircuitPredicate,
+                    action
+                )
+            );
+        }
+
+        private static void OnPortOpened(object infoObj) {
+            var info = (OnPortOpenedInfo)infoObj;
+
+            using (var socket = new Socket(AddressFamily.InterNetwork, SocketType.Stream, ProtocolType.Tcp)) {
+                socket.Blocking = true;
+                try {
+                    while (true) {
+                        // Short circuit
+                        if (info.ShortCircuitPredicate()) {
+                            return;
+                        }
+
+                        // Try connect
+                        try {
+                            socket.Connect(IPAddress.Loopback, info.Port);
+                            break;
+                        } catch {
+                            // Connect failure
+                            // Fall through
+                        }
+
+                        // Timeout
+                        if ((System.DateTime.Now - info.StartTime) >= info.Timeout) {
+                            break;
+                        }
+
+                        // Sleep
+                        System.Threading.Thread.Sleep(info.Sleep);
+                    }
+                } finally {
+                    socket.Close();
+                }
+            }
+
+            // Launch browser (if not short-circuited)
+            if (!info.ShortCircuitPredicate()) {
+                info.Action();                
+            }
         }
     }
 }

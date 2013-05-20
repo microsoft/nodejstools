@@ -13,6 +13,7 @@
  * ***************************************************************************/
 
 using Microsoft.NodejsTools.Debugger.Remote;
+using Microsoft.NodejsTools.Project;
 using Microsoft.VisualStudio;
 using Microsoft.VisualStudio.Debugger.Interop;
 using Microsoft.VisualStudio.Shell;
@@ -59,6 +60,9 @@ namespace Microsoft.NodejsTools.Debugger.DebugEngine {
         private Guid _ad7ProgramId;             // A unique identifier for the program being debugged.
         private static HashSet<WeakReference> _engines = new HashSet<WeakReference>();
 
+        private string _webBrowserUrl = null;
+        private int? _webBrowserPort = null;
+
         internal static event EventHandler<AD7EngineEventArgs> EngineBreakpointHit;
         internal static event EventHandler<AD7EngineEventArgs> EngineAttached;
         internal static event EventHandler<AD7EngineEventArgs> EngineDetaching;
@@ -92,6 +96,11 @@ namespace Microsoft.NodejsTools.Debugger.DebugEngine {
         /// semi-colon.
         /// </summary>
         public const string InterpreterOptions = "INTERPRETER_OPTIONS";
+
+        /// <summary>
+        /// Specifies port to which to open web browser on node debug connect.
+        /// </summary>
+        public const string WebBrowserPort = "WEB_BROWSER_PORT";
 
         /// <summary>
         /// Specifies URL to which to open web browser on node debug connect.
@@ -457,7 +466,6 @@ namespace Microsoft.NodejsTools.Debugger.DebugEngine {
             NodeDebugOptions debugOptions = NodeDebugOptions.None;
             List<string[]> dirMapping = null;
             string interpreterOptions = null;
-            string webBrowserUrl = null;
             if (options != null) {
                 var splitOptions = SplitOptions(options);
                 
@@ -495,8 +503,11 @@ namespace Microsoft.NodejsTools.Debugger.DebugEngine {
                             case InterpreterOptions:
                                 interpreterOptions = setting[1];
                                 break;
+                            case WebBrowserPort:
+                                _webBrowserPort = int.Parse(setting[1]);
+                                break;
                             case WebBrowserUrl:
-                                webBrowserUrl = HttpUtility.UrlDecode(setting[1]);
+                                _webBrowserUrl = HttpUtility.UrlDecode(setting[1]);
                                 break;
                         }
                     }
@@ -511,14 +522,7 @@ namespace Microsoft.NodejsTools.Debugger.DebugEngine {
                     env,
                     interpreterOptions,
                     debugOptions,
-                    dirMapping,
-                    () => {
-                        if (webBrowserUrl != null) {
-                            VsShellUtilities.OpenBrowser(
-                                webBrowserUrl,
-                                (uint)__VSOSPFLAGS.OSP_LaunchNewBrowser);
-                        }
-                    }
+                    dirMapping
                 );
 
             _process.Start(false);
@@ -953,6 +957,34 @@ namespace Microsoft.NodejsTools.Debugger.DebugEngine {
         }
 
         private void OnEntryPointHit(object sender, ThreadEventArgs e) {
+            if (_webBrowserUrl != null) {
+                Debug.Assert(_webBrowserPort != null);
+                OnPortOpenedHandler.CreateHandler(
+                    _webBrowserPort.Value,
+                    shortCircuitPredicate: () => !_processLoaded,
+                    action: () => {
+                        var vsDebugger = (IVsDebugger2)ServiceProvider.GlobalProvider.GetService(typeof(SVsShellDebugger));;
+
+                        VsDebugTargetInfo2 info = new VsDebugTargetInfo2();
+                        var infoSize = Marshal.SizeOf(info);
+                        info.cbSize = (uint)infoSize;
+                        info.bstrExe = _webBrowserUrl;
+                        info.dlo = (uint)_DEBUG_LAUNCH_OPERATION3.DLO_LaunchBrowser;
+                        info.guidLaunchDebugEngine = DebugEngineGuid;
+                        IntPtr infoPtr = Marshal.AllocCoTaskMem(infoSize);
+                        Marshal.StructureToPtr(info, infoPtr, false);
+
+                        try {
+                            vsDebugger.LaunchDebugTargets2(1, infoPtr);
+                        } finally {
+                            if (infoPtr != IntPtr.Zero) {
+                                Marshal.FreeCoTaskMem(infoPtr);
+                            }
+                        }
+                    }
+                );
+            }
+
             Send(new AD7EntryPointEvent(), AD7EntryPointEvent.IID, _threads[e.Thread]);
         }
 
@@ -970,6 +1002,8 @@ namespace Microsoft.NodejsTools.Debugger.DebugEngine {
 
         private void OnProcessExited(object sender, ProcessExitedEventArgs e) {
             try {
+                _processLoaded = false;
+                _processLoadedRunning = false;
                 Send(new AD7ProgramDestroyEvent((uint)e.ExitCode), AD7ProgramDestroyEvent.IID, null);
             } catch (InvalidOperationException) {
                 // we can race at shutdown and deliver the event after the debugger is shutting down.
