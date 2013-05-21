@@ -354,6 +354,16 @@
     <Content Include="ProjectTemplates\NodeApp\NodeApp.vstemplate">
       <SubType>Designer</SubType>
     </Content>
+    <Compile Include="Resources.Designer.cs">
+      <AutoGen>True</AutoGen>
+      <DesignTime>True</DesignTime>
+      <DependentUpon>Resources.resx</DependentUpon>
+      <Visible>true</Visible>
+    </Compile>
+    <EmbeddedResource Include="Resources.resx">
+      <ManifestResourceName>Microsoft.NodejsTools.Resources</ManifestResourceName>
+      <Visible>true</Visible>
+    </EmbeddedResource>
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\AjaxMinDll\AjaxMinDll.csproj">

@@ -131,7 +131,7 @@ namespace Microsoft.NodejsTools.Project {
                 return true;
             }
             set {
-                Node.ProjectMgr.SetProjectProperty(NodeConstants.LaunchUrl, value.ToString());
+                Node.ProjectMgr.SetProjectProperty(NodeConstants.StartWebBrowser, value.ToString());
             }
         }
 

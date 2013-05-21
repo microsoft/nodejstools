@@ -548,12 +548,6 @@
       <Link>SharedProject\VsExtensions.cs</Link>
       <Visible>true</Visible>
     </Compile>
-    <Compile Include="Resources.Designer.cs">
-      <AutoGen>True</AutoGen>
-      <DesignTime>True</DesignTime>
-      <DependentUpon>Resources.resx</DependentUpon>
-      <Visible>true</Visible>
-    </Compile>
   </ItemGroup>
   <ItemGroup>
     <EmbeddedResource Include="$(_ProjectSystemFilesLocation)\ProjectResources.resx">

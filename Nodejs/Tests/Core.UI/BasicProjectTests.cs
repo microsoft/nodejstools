@@ -592,6 +592,31 @@ namespace Microsoft.Nodejs.Tests.UI {
                 Assert.AreEqual(propCount, project.Properties.Count);
 
                 Assert.AreEqual(project.Properties.DTE, VsIdeTestHostContext.Dte);
+
+                Assert.AreEqual(project.Properties.Item("StartWebBrowser").Value.GetType(), typeof(bool));
+                Assert.IsTrue(project.Properties.Item("NodejsPort").Value == null || project.Properties.Item("NodejsPort").Value.GetType() == typeof(int));
+
+                Assert.AreEqual(project.Properties.Item("LaunchUrl").Value, null);
+                Assert.AreEqual(project.Properties.Item("ScriptArguments").Value, null);
+                Assert.AreEqual(project.Properties.Item("NodeExeArguments").Value, null);
+                Assert.AreEqual(project.Properties.Item("NodeExePath").Value.GetType(), typeof(string));
+
+                project.Properties.Item("StartWebBrowser").Value = true;
+                Assert.AreEqual(project.Properties.Item("StartWebBrowser").Value, true);
+                project.Properties.Item("StartWebBrowser").Value = false;
+                Assert.AreEqual(project.Properties.Item("StartWebBrowser").Value, false);
+
+                project.Properties.Item("NodejsPort").Value = 10000;
+                Assert.AreEqual(project.Properties.Item("NodejsPort").Value, 10000);
+                project.Properties.Item("NodejsPort").Value = 5000;
+                Assert.AreEqual(project.Properties.Item("NodejsPort").Value, 5000);
+
+                foreach (var value in new[] { "LaunchUrl", "ScriptArguments", "NodeExeArguments", "NodeExePath" }) {
+                    string tmpValue = Guid.NewGuid().ToString();
+
+                    project.Properties.Item(value).Value = tmpValue;
+                    Assert.AreEqual(project.Properties.Item(value).Value, tmpValue);
+                }
             } finally {
                 VsIdeTestHostContext.Dte.Solution.Close();
                 GC.Collect();

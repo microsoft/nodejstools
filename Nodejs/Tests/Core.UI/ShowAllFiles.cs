@@ -24,8 +24,11 @@ using EnvDTE;
 using Microsoft.NodejsTools;
 using Microsoft.NodejsTools.Project;
 using Microsoft.TC.TestHostAdapters;
+using Microsoft.VisualStudio;
 using Microsoft.VisualStudio.Language.Intellisense;
+using Microsoft.VisualStudio.Shell.Interop;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
+using Microsoft.VisualStudioTools.Project;
 using TestUtilities;
 using TestUtilities.UI;
 using Keyboard = TestUtilities.UI.Keyboard;
@@ -50,6 +53,68 @@ namespace Microsoft.Nodejs.Tests.UI {
                     System.Threading.Thread.Sleep(200);
                 }
             }
+        }
+
+        [TestMethod, Priority(0), TestCategory("Core")]
+        [HostType("TC Dynamic"), DynamicHostType(typeof(VsIdeHostAdapter))]
+        public void ShowAllFilesToggle() {
+            var project = BasicProjectTests.OpenProject(@"TestData\NodejsProjectData\ShowAllFilesToggle.sln");
+
+            var app = new VisualStudioApp(VsIdeTestHostContext.Dte);
+            app.OpenSolutionExplorer();
+            var window = app.SolutionExplorerTreeView;
+
+            var projectNode = window.WaitForItem("Solution 'ShowAllFilesToggle' (1 project)", "HelloWorld", "SubFolder", "server.js");
+            AutomationWrapper.Select(projectNode);
+
+            app.Dte.ExecuteCommand("Project.ShowAllFiles"); // start showing all
+
+            Assert.IsTrue(GetIsFolderExpanded(project, "SubFolder"));
+        }
+
+        internal static bool GetIsFolderExpanded(Project project, string folder) {
+            return GetNodeState(project, folder, __VSHIERARCHYITEMSTATE.HIS_Expanded);
+        }
+
+        internal static bool GetIsItemBolded(Project project, string item) {
+            return GetNodeState(project, item, __VSHIERARCHYITEMSTATE.HIS_Bold);
+        }
+
+        internal static bool GetNodeState(Project project, string item, __VSHIERARCHYITEMSTATE state) {
+            var itemNode = (HierarchyNode)project.ProjectItems.Item(item).Properties.Item("Node").Value;
+            var id = itemNode.ID;
+
+            // make sure we're still expanded.
+            var solutionWindow = HierarchyNode.GetUIHierarchyWindow(
+                VsIdeTestHostContext.ServiceProvider,
+                new Guid(ToolWindowGuids80.SolutionExplorer)
+            );
+
+            uint result;
+            ErrorHandler.ThrowOnFailure(
+                solutionWindow.GetItemState(
+                    itemNode.ProjectMgr.GetOuterInterface<IVsUIHierarchy>(),
+                    id,
+                    (uint)state,
+                    out result
+                )
+            );
+            return (result & (uint)state) != 0;
+        }
+
+        [TestMethod, Priority(0), TestCategory("Core")]
+        [HostType("TC Dynamic"), DynamicHostType(typeof(VsIdeHostAdapter))]
+        public void ShowAllFilesFilesAlwaysHidden() {
+            var project = BasicProjectTests.OpenProject(@"TestData\NodejsProjectData\ShowAllFiles.sln");
+
+            var app = new VisualStudioApp(VsIdeTestHostContext.Dte);
+            app.OpenSolutionExplorer();
+            var window = app.SolutionExplorerTreeView;
+
+            var projectNode = window.WaitForItem("Solution 'ShowAllFiles' (1 project)", "HelloWorld");
+
+            Assert.IsNull(window.WaitForItemRemoved("Solution 'ShowAllFiles' (1 project)", "HelloWorld", "ShowAllFiles.sln"));
+            Assert.IsNull(window.WaitForItemRemoved("Solution 'ShowAllFiles' (1 project)", "HelloWorld", "ShowAllFiles.suo"));
         }
 
         [TestMethod, Priority(0), TestCategory("Core")]
@@ -161,6 +226,12 @@ namespace Microsoft.Nodejs.Tests.UI {
             app.Dte.ExecuteCommand("Project.ShowAllFiles"); // start showing all again
             Assert.IsNotNull(window.WaitForItem("Solution 'ShowAllFilesIncludeExclude' (1 project)", "HelloWorld", "ExcludeFolder1"));
             Assert.IsNotNull(window.WaitForItem("Solution 'ShowAllFilesIncludeExclude' (1 project)", "HelloWorld", "ExcludeFolder1", "Item.txt"));
+
+            // https://nodejstools.codeplex.com/workitem/250
+            var linkedFile = window.WaitForItem("Solution 'ShowAllFilesIncludeExclude' (1 project)", "HelloWorld", "LinkedFile.js");
+            AutomationWrapper.Select(linkedFile);
+            app.Dte.ExecuteCommand("Project.ExcludeFromProject");
+            Assert.IsNull(window.WaitForItemRemoved("Solution 'ShowAllFilesIncludeExclude' (1 project)", "HelloWorld", "LinkedFile.js"));
 
             // https://pytools.codeplex.com/workitem/1153
             // Shouldn't have a BuildAction property on excluded items
@@ -275,6 +346,37 @@ namespace Microsoft.Nodejs.Tests.UI {
 
             // folder should now be included
             Assert.IsNotNull(window.WaitForItem("Solution 'ShowAllFilesIncludeExclude' (1 project)", "HelloWorld", "IncludeFolder3"));
+
+            // https://nodejstools.codeplex.com/workitem/250
+            // Excluding the startup item, and then including it again, it should be bold
+            server = window.FindItem("Solution 'ShowAllFilesIncludeExclude' (1 project)", "HelloWorld", "server.js");
+            AutomationWrapper.Select(server);
+            app.Dte.ExecuteCommand("Project.ExcludeFromProject");
+
+            Assert.IsNull(window.WaitForItemRemoved("Solution 'ShowAllFilesIncludeExclude' (1 project)", "HelloWorld", "server.js"));
+            app.Dte.ExecuteCommand("Project.ShowAllFiles"); // start showing all
+            server = window.FindItem("Solution 'ShowAllFilesIncludeExclude' (1 project)", "HelloWorld", "server.js");
+            AutomationWrapper.Select(server);
+
+            app.Dte.ExecuteCommand("Project.IncludeInProject");
+            System.Threading.Thread.Sleep(2000);
+
+            Assert.IsTrue(GetIsItemBolded(project, "server.js"));
+        }
+
+        [TestMethod, Priority(0), TestCategory("Core")]
+        [HostType("TC Dynamic"), DynamicHostType(typeof(VsIdeHostAdapter))]
+        public void DumpProperties() {
+            var project = BasicProjectTests.OpenProject(@"C:\Source\ConsoleApplication7\ConsoleApplication7.sln");
+
+            var app = new VisualStudioApp(VsIdeTestHostContext.Dte);
+            app.OpenSolutionExplorer();
+            var window = app.SolutionExplorerTreeView;
+            window.WaitForItem("Solution 'ConsoleApplication7' (1 project)", "ConsoleApplication7", "Program - Copy.cs");
+            var item = project.ProjectItems.Item("Program - Copy.cs");
+            foreach (var x in item.Properties) {
+                Console.WriteLine(x);
+            }
         }
 
         [TestMethod, Priority(0), TestCategory("Core")]

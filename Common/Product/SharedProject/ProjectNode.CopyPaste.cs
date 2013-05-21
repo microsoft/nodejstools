@@ -566,14 +566,12 @@ If the files in the existing folder have the same names as files in the
 folder you are copying, do you want to replace the existing files?", Path.GetFileName(CommonUtils.TrimEndSeparator(folder))), false);
                     dialog.Owner = Application.Current.MainWindow;
                     var res = dialog.ShowDialog();
-                    if (res != true) {
-                        if (res == null) {
-                            // cancel, abort the whole copy
-                            return null;
-                        } else {
-                            // no, don't copy the folder
-                            return NopAddition.Instance;
-                        }
+                    if (res == null) {
+                        // cancel, abort the whole copy
+                        return null;
+                    } else if (!dialog.ShouldOverwrite) {
+                        // no, don't copy the folder
+                        return NopAddition.Instance;
                     }
                     // otherwise yes, and we'll prompt about the files.
                 }

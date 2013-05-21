@@ -256,7 +256,7 @@ namespace Microsoft.VisualStudioTools.Project {
 
             ResetNodeProperties();
             ItemNode.RemoveFromProjectFile();
-            if (!File.Exists(Url)) {
+            if (!File.Exists(Url) || IsLinkFile) {
                 Parent.RemoveChild(this);
                 ProjectMgr.OnItemDeleted(this);
             } else {
@@ -289,6 +289,11 @@ namespace Microsoft.VisualStudioTools.Project {
             IsVisible = true;
             ProjectMgr.OnInvalidateItems(this);
             ProjectMgr.ReDrawNode(this, UIHierarchyElement.Icon);
+
+            if (CommonUtils.IsSamePath(ProjectMgr.GetStartupFile(), Url)) {
+                ProjectMgr.BoldItem(this, true);
+            }
+
             return VSConstants.S_OK;
         }
 

@@ -499,7 +499,12 @@ namespace Microsoft.VisualStudioTools.Project {
                 var allFiles = curNode.ItemNode as AllFilesProjectElement;
                 if (allFiles != null) {
                     curNode.IsVisible = enabled;
-                    OnInvalidateItems(node);
+
+                    if (enabled) {
+                        ProjectMgr.OnItemAdded(node, curNode);
+                    } else {
+                        ProjectMgr.OnItemDeleted(curNode);
+                    }
                 }
             }
         }
@@ -616,7 +621,9 @@ namespace Microsoft.VisualStudioTools.Project {
 
         private bool IsFileHidden(string path) {
             if (String.Equals(path, FileName, StringComparison.OrdinalIgnoreCase) ||
-                String.Equals(path, FileName + ".user", StringComparison.OrdinalIgnoreCase)) {
+                String.Equals(path, FileName + ".user", StringComparison.OrdinalIgnoreCase) ||
+                String.Equals(Path.GetExtension(path), ".sln") ||
+                String.Equals(Path.GetExtension(path), ".suo")) {
                 return true;
             }
 
@@ -856,8 +863,6 @@ namespace Microsoft.VisualStudioTools.Project {
             }
 
             private void RemoveAllFilesChildren(HierarchyNode parent) {
-                bool removed = false;
-
                 for (var current = parent.FirstChild; current != null; current = current.NextSibling) {
                     // remove our children first
                     RemoveAllFilesChildren(current);
@@ -868,12 +873,7 @@ namespace Microsoft.VisualStudioTools.Project {
                     if (current.ItemNode is AllFilesProjectElement) {
                         parent.RemoveChild(current);
                         _project.OnItemDeleted(current);
-                        removed = true;
                     }
-                }
-
-                if (removed) {
-                    _project.OnInvalidateItems(parent);
                 }
             }
 
@@ -1231,34 +1231,6 @@ namespace Microsoft.VisualStudioTools.Project {
                         CommonUtils.GetAbsoluteFilePath(ProjectHome, e.NewValue));
                     break;
             }
-        }
-
-        /// <summary>
-        /// Same as VsShellUtilities.GetUIHierarchyWindow, but it doesn't contain a useless cast to IVsWindowPane
-        /// which fails on Dev10 with the solution explorer window.
-        /// </summary>
-        private static IVsUIHierarchyWindow GetUIHierarchyWindow(IServiceProvider serviceProvider, Guid guidPersistenceSlot) {
-            if (serviceProvider == null) {
-                throw new ArgumentException("serviceProvider");
-            }
-            IVsUIShell service = serviceProvider.GetService(typeof(SVsUIShell)) as IVsUIShell;
-            if (service == null) {
-                throw new InvalidOperationException();
-            }
-            object pvar = null;
-            IVsWindowFrame ppWindowFrame = null;
-            IVsUIHierarchyWindow window = null;
-            try {
-                ErrorHandler.ThrowOnFailure(service.FindToolWindow(0, ref guidPersistenceSlot, out ppWindowFrame));
-                ErrorHandler.ThrowOnFailure(ppWindowFrame.GetProperty(-3001, out pvar));
-            } catch (COMException exception) {
-                Trace.WriteLine("Exception :" + exception.Message);
-            } finally {
-                if (pvar != null) {
-                    window = (IVsUIHierarchyWindow)pvar;
-                }
-            }
-            return window;
         }
 
         /// <summary>

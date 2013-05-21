@@ -1634,7 +1634,7 @@ namespace Microsoft.VisualStudioTools.Project
         /// Same as VsShellUtilities.GetUIHierarchyWindow, but it doesn't contain a useless cast to IVsWindowPane
         /// which fails on Dev10 with the solution explorer window.
         /// </summary>
-        private static IVsUIHierarchyWindow GetUIHierarchyWindow(System.IServiceProvider serviceProvider, Guid guidPersistenceSlot) {
+        internal static IVsUIHierarchyWindow GetUIHierarchyWindow(System.IServiceProvider serviceProvider, Guid guidPersistenceSlot) {
             Utilities.ArgumentNotNull("serviceProvider", serviceProvider);
 
             IVsUIShell service = serviceProvider.GetService(typeof(SVsUIShell)) as IVsUIShell;

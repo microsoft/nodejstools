@@ -538,6 +538,9 @@ namespace Microsoft.Nodejs.Tests.UI {
 
             Assert.AreNotEqual(null, window.WaitForItem("Solution 'RenameItemsTestUI' (1 project)", "HelloWorld", "NewName.txt"));
 
+            var subJs = window.WaitForItem("Solution 'RenameItemsTestUI' (1 project)", "HelloWorld", "Sub1", "Sub2", "Foo.js");
+            Assert.IsNotNull(subJs);
+
             var sub1 = window.FindItem("Solution 'RenameItemsTestUI' (1 project)", "HelloWorld", "Sub1");
             AutomationWrapper.Select(sub1);
             Keyboard.PressAndRelease(Key.F2);
@@ -546,6 +549,17 @@ namespace Microsoft.Nodejs.Tests.UI {
             Keyboard.Type("FolderName");
             Keyboard.PressAndRelease(Key.Enter);
 
+            for (int i = 0; i < 20; i++) {
+                try {
+                    if (!ShowAllFiles.GetIsFolderExpanded(project, "FolderName")) {
+                        break;
+                    }
+                } catch (ArgumentException) {
+                }
+                System.Threading.Thread.Sleep(100);
+            }
+
+            Assert.IsFalse(ShowAllFiles.GetIsFolderExpanded(project, "FolderName"));
             Assert.AreNotEqual(null, window.WaitForItem("Solution 'RenameItemsTestUI' (1 project)", "HelloWorld", "FolderName", "Sub2", "Foo.js"));
         }
 

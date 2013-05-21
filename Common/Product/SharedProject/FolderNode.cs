@@ -484,6 +484,7 @@ namespace Microsoft.VisualStudioTools.Project
             ProjectMgr.Tracker.OnItemRenamed(oldPath, newPath, VSRENAMEFILEFLAGS.VSRENAMEFILEFLAGS_Directory);
 
             // Some of the previous operation may have changed the selection so set it back to us
+            ExpandItem(EXPANDFLAGS.EXPF_CollapseFolder);
             ExpandItem(EXPANDFLAGS.EXPF_SelectItem);
         }
 
