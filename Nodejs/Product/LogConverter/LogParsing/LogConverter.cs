@@ -221,7 +221,7 @@ namespace Microsoft.NodejsTools.LogParsing {
                                 methodLoad.MethodToken = methodToken;
                                 methodLoad.MethodFlags = 8;
 
-                                var funcInfo = ExtractNamespaceAndMethodName(records[4]);
+                                var funcInfo = ExtractNamespaceAndMethodName(records[4], records[1]);
                                 string functionName = funcInfo.Function;
                                 if (funcInfo.IsRecompilation) {
                                     functionName += " (recompiled)";
@@ -372,14 +372,13 @@ namespace Microsoft.NodejsTools.LogParsing {
 
         private HashSet<string> _allMethods = new HashSet<string>();
 
-        internal FunctionInformation ExtractNamespaceAndMethodName(string method) {
+        internal FunctionInformation ExtractNamespaceAndMethodName(string method, string type = "LazyCompile") {
             bool isRecompilation = !_allMethods.Add(method);
 
-            return ExtractNamespaceAndMethodName(method, isRecompilation);
+            return ExtractNamespaceAndMethodName(method, isRecompilation, type);
         }
 
-        internal static FunctionInformation ExtractNamespaceAndMethodName(string method, bool isRecompilation) {
-            
+        internal static FunctionInformation ExtractNamespaceAndMethodName(string method, bool isRecompilation, string type = "LazyCompile") {
             string methodName = method;
             string ns = "";
             int? lineNo = null;
@@ -388,6 +387,16 @@ namespace Microsoft.NodejsTools.LogParsing {
             if (method.StartsWith("\"") && method.EndsWith("\"")) {
                 // v8 usually includes quotes, strip them
                 method = method.Substring(1, method.Length - 2);
+            }
+
+            if (type == "Script" || type == "Function") {
+                // code-creation,Function,0xf1c38300,1928," assert.js:1",0xa6d4df58,~
+                // code-creation,Script,0xf1c38aa0,244,"assert.js",0xa6d4e050,~
+                // code-creation,Script,0xf1c141c0,844,"native runtime.js",0xa6d1aa98,~
+
+                // this is a top level script or module, report it as such
+                methodName = "<node module>";
+                return new FunctionInformation("<node module>", GetModuleName(method), 1, GetFileName(method), isRecompilation);
             }
 
             // " net.js:931"
@@ -421,6 +430,42 @@ namespace Microsoft.NodejsTools.LogParsing {
             }
 
             return new FunctionInformation(ns, methodName, lineNo, filename, isRecompilation);
+        }
+
+        private static char[] _invalidPathChars = Path.GetInvalidPathChars();
+
+        private static string GetModuleName(string method) {
+            method = StripLine(method);
+
+            if (method.IndexOfAny(_invalidPathChars) == -1) {
+                method = Path.GetFileName(method);
+            }
+
+            return method;
+        }
+
+        private static string GetFileName(string method) {
+            method = StripLine(method);
+
+            return method;
+        }
+
+        private static string StripLine(string method) {
+            method = method.Trim();
+
+            int colon;
+            if ((colon = method.LastIndexOf(':')) != -1) {
+                string lineNo = method.Substring(colon + 1, method.Length - (colon + 1));
+                int dummy;
+                // We need to deal with:
+                // C:\Foo\Bar\baz.js:1
+                //  and
+                // C:\Foo\Bar\baz.js
+                if (Int32.TryParse(lineNo, out dummy)) {
+                    method = method.Substring(0, colon);
+                }
+            }
+            return method;
         }
 
         private static EVENT_TRACE_HEADER NewMethodEventHeader() {

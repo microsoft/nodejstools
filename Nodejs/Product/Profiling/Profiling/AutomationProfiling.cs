@@ -73,7 +73,7 @@ namespace Microsoft.NodejsTools.Profiling {
                 if (session == _sessions.Sessions[i].GetAutomationObject()) {
                     _sessions.DeleteItem(
                         (uint)(deleteFromDisk ? __VSDELETEITEMOPERATION.DELITEMOP_DeleteFromStorage : __VSDELETEITEMOPERATION.DELITEMOP_RemoveFromProject),
-                        (uint)i
+                        (uint)_sessions.Sessions[i].ItemId
                     );
                     return;
                 }

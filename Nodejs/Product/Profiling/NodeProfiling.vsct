@@ -103,7 +103,7 @@
       <!-- Analyze menu items -->
       <Button guid="guidNodeProfilingCmdSet" id="cmdidStartNodeProfiling" priority="0x0100" type="Button">
         <Parent guid="guidPerfMenuGroup" id="IDG_PERF_BAR_GENERAL" />
-        <CommandFlag>DefaultDisabled</CommandFlag>
+        <CommandFlag>DynamicVisibility</CommandFlag>
         <Strings>
           <CommandName>cmdidStartNodeProfiling</CommandName>
           <ButtonText>Launch &amp;Node.js Profiling...</ButtonText>
@@ -132,7 +132,7 @@
       <Button guid="guidNodeProfilingCmdSet" id="cmdidStartProfiling" priority="0x0000" type="Button">
         <Parent guid="guidNodeProfilingCmdSet" id="perfToolbarGroup"/>
         <Icon guid="guidCmdBarImages" id="startIcon"/>
-        <CommandFlag>DefaultDisabled</CommandFlag>
+        <CommandFlag>DynamicVisibility</CommandFlag>
         <Strings>
           <ButtonText>Start Profiling</ButtonText>
           <MenuText>Start Profiling</MenuText>

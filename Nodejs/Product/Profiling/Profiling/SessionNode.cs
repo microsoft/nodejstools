@@ -410,15 +410,17 @@ namespace Microsoft.NodejsTools.Profiling {
         }
 
         public void AddProfile(string filename) {
+            uint prevSibling, newId;
             if (_target.Reports == null) {
                 _target.Reports = new Reports(new[] { new Report(filename) });
+                prevSibling = VSConstants.VSITEMID_NIL;
+                newId = StartingReportId;
             } else {
                 if (_target.Reports.Report == null) {
                     _target.Reports.Report = new Report[0];
                 }
 
                 var reportIds = Reports.Keys.ToArray();
-                uint prevSibling, newId;
                 if (reportIds.Length > 0) {
                     prevSibling = (uint)reportIds[reportIds.Length - 1];
                     newId = prevSibling + 1;
@@ -428,13 +430,13 @@ namespace Microsoft.NodejsTools.Profiling {
                 }
 
                 Reports[(int)newId] = new Report(filename);
-
-                OnItemAdded(
-                    ReportsItemId,
-                    prevSibling, 
-                    newId
-                );
             }
+
+            OnItemAdded(
+                ReportsItemId,
+                prevSibling,
+                newId
+            );
 
             MarkDirty();
         }

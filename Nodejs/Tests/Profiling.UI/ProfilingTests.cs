@@ -60,11 +60,11 @@ namespace ProfilingUITests {
 
             var app = new NodejsVisualStudioApp(VsIdeTestHostContext.Dte);
 
+            app.OpenNodejsPerformance();
             app.NodejsPerformanceExplorerToolBar.NewPerfSession();
-
+            
             var profiling = (INodeProfiling)VsIdeTestHostContext.Dte.GetObject("NodeProfiling");
 
-            app.OpenNodejsPerformance();
             var perf = app.NodejsPerformanceExplorerTreeView.WaitForItem("Performance *");
             Debug.Assert(perf != null);
             var session = profiling.GetSession(1);
@@ -99,6 +99,208 @@ namespace ProfilingUITests {
                 //Assert.AreEqual("Python 2.6", perfTarget.SelectedInterpreter);
                 Assert.AreEqual(TestData.GetPath(@"TestData\NodejsProfileTest\program.js"), perfTarget.ScriptName);
 
+            } finally {
+                if (perfTarget != null) {
+                    perfTarget.Cancel();
+                }
+                profiling.RemoveSession(session, true);
+            }
+        }
+
+        /// <summary>
+        /// https://nodejstools.codeplex.com/workitem/149
+        /// </summary>
+        [TestMethod, Priority(0), TestCategory("Core")]
+        [HostType("TC Dynamic"), DynamicHostType(typeof(VsIdeHostAdapter))]
+        public void LaunchNewProfilingSession() {
+            VsIdeTestHostContext.Dte.Solution.Close(false);
+
+            var app = new NodejsVisualStudioApp(VsIdeTestHostContext.Dte);
+
+            app.OpenNodejsPerformance();
+            app.NodejsPerformanceExplorerToolBar.NewPerfSession();
+
+            var profiling = (INodeProfiling)VsIdeTestHostContext.Dte.GetObject("NodeProfiling");
+
+            var perf = app.NodejsPerformanceExplorerTreeView.WaitForItem("Performance *");
+            Debug.Assert(perf != null);
+            var session = profiling.GetSession(1);
+            Assert.AreNotEqual(session, null);
+
+            NodejsPerfTarget perfTarget = null;
+            try {
+                Mouse.MoveTo(perf.GetClickablePoint());
+                Mouse.DoubleClick(System.Windows.Input.MouseButton.Left);
+
+                // wait for the dialog, set some settings, save them.
+                perfTarget = new NodejsPerfTarget(app.WaitForDialog());
+
+                perfTarget.SelectProfileScript();
+                perfTarget.InterpreterPath = NodePackage.NodePath;
+                perfTarget.ScriptName = TestData.GetPath(@"TestData\NodejsProfileTest\program.js");
+
+                try {
+                    perfTarget.Ok();
+                } catch (ElementNotEnabledException) {
+                    Assert.Fail("Settings were invalid:\n  ScriptName = {0}\n",
+                        perfTarget.ScriptName);
+                }
+                perfTarget = null;
+                app.WaitForDialogDismissed();
+
+                perf = app.NodejsPerformanceExplorerTreeView.WaitForItem("Performance *");
+                Mouse.MoveTo(perf.GetClickablePoint());
+                Mouse.Click(System.Windows.Input.MouseButton.Right);
+                Keyboard.Type("S");
+
+                var item = app.NodejsPerformanceExplorerTreeView.WaitForItem("Performance *", "Reports");
+                AutomationElement child = null;
+                for (int i = 0; i < 20; i++) {
+                    child = item.FindFirst(System.Windows.Automation.TreeScope.Descendants, Condition.TrueCondition);
+                    if (child != null) {
+                        break;
+                    }
+                    System.Threading.Thread.Sleep(100);
+                }
+                Assert.IsNotNull(child, "node not added");
+            } finally {
+                if (perfTarget != null) {
+                    perfTarget.Cancel();
+                }
+                profiling.RemoveSession(session, true);
+            }
+        }
+
+        /// <summary>
+        /// https://nodejstools.codeplex.com/workitem/145
+        /// </summary>
+        [TestMethod, Priority(0), TestCategory("Core")]
+        [HostType("TC Dynamic"), DynamicHostType(typeof(VsIdeHostAdapter))]
+        public void TestMultipleSessions() {
+            VsIdeTestHostContext.Dte.Solution.Close(false);
+
+            var app = new NodejsVisualStudioApp(VsIdeTestHostContext.Dte);
+
+            app.OpenNodejsPerformance();
+            app.NodejsPerformanceExplorerToolBar.NewPerfSession();
+
+            var profiling = (INodeProfiling)VsIdeTestHostContext.Dte.GetObject("NodeProfiling");
+
+            var perf = app.NodejsPerformanceExplorerTreeView.WaitForItem("Performance *");
+            Debug.Assert(perf != null);
+
+            app.NodejsPerformanceExplorerToolBar.NewPerfSession();
+            perf = app.NodejsPerformanceExplorerTreeView.WaitForItem("Performance1 *");
+            Debug.Assert(perf != null);
+            var session = profiling.GetSession(1);
+            Assert.AreNotEqual(session, null);
+
+            NodejsPerfTarget perfTarget = null;
+            try {
+                Mouse.MoveTo(perf.GetClickablePoint());
+                Mouse.DoubleClick(System.Windows.Input.MouseButton.Left);
+
+                // wait for the dialog, set some settings, save them.
+                perfTarget = new NodejsPerfTarget(app.WaitForDialog());
+
+                perfTarget.SelectProfileScript();
+                perfTarget.InterpreterPath = NodePackage.NodePath;
+                perfTarget.ScriptName = TestData.GetPath(@"TestData\NodejsProfileTest\program.js");
+
+                try {
+                    perfTarget.Ok();
+                } catch (ElementNotEnabledException) {
+                    Assert.Fail("Settings were invalid:\n  ScriptName = {0}\n",
+                        perfTarget.ScriptName);
+                }
+                perfTarget = null;
+                app.WaitForDialogDismissed();
+
+                perf = app.NodejsPerformanceExplorerTreeView.WaitForItem("Performance1 *");
+                Mouse.MoveTo(perf.GetClickablePoint());
+                Mouse.Click(System.Windows.Input.MouseButton.Right);
+                Keyboard.Type("S");
+
+                var item = app.NodejsPerformanceExplorerTreeView.WaitForItem("Performance1 *", "Reports");
+                AutomationElement child = null;
+                for (int i = 0; i < 20; i++) {
+                    child = item.FindFirst(System.Windows.Automation.TreeScope.Descendants, Condition.TrueCondition);
+                    if (child != null) {
+                        break;
+                    }
+                    System.Threading.Thread.Sleep(100);
+                }
+                Assert.IsNotNull(child, "node not added");
+            } finally {
+                if (perfTarget != null) {
+                    perfTarget.Cancel();
+                }
+                profiling.RemoveSession(session, true);
+            }
+        }
+
+        /// <summary>
+        /// https://nodejstools.codeplex.com/workitem/145
+        /// 
+        /// Same as TestMultipleSessions, but reversing the order of which one we launch from
+        /// </summary>
+        [TestMethod, Priority(0), TestCategory("Core")]
+        [HostType("TC Dynamic"), DynamicHostType(typeof(VsIdeHostAdapter))]
+        public void TestMultipleSessions2() {
+            VsIdeTestHostContext.Dte.Solution.Close(false);
+
+            var app = new NodejsVisualStudioApp(VsIdeTestHostContext.Dte);
+
+            app.OpenNodejsPerformance();
+            app.NodejsPerformanceExplorerToolBar.NewPerfSession();
+
+            var profiling = (INodeProfiling)VsIdeTestHostContext.Dte.GetObject("NodeProfiling");
+
+            var perf = app.NodejsPerformanceExplorerTreeView.WaitForItem("Performance *");
+            Debug.Assert(perf != null);
+
+            app.NodejsPerformanceExplorerToolBar.NewPerfSession();
+            perf = app.NodejsPerformanceExplorerTreeView.WaitForItem("Performance *");
+            Debug.Assert(perf != null);
+            var session = profiling.GetSession(1);
+            Assert.AreNotEqual(session, null);
+
+            NodejsPerfTarget perfTarget = null;
+            try {
+                Mouse.MoveTo(perf.GetClickablePoint());
+                Mouse.DoubleClick(System.Windows.Input.MouseButton.Left);
+
+                // wait for the dialog, set some settings, save them.
+                perfTarget = new NodejsPerfTarget(app.WaitForDialog());
+
+                perfTarget.SelectProfileScript();
+                perfTarget.InterpreterPath = NodePackage.NodePath;
+                perfTarget.ScriptName = TestData.GetPath(@"TestData\NodejsProfileTest\program.js");
+
+                try {
+                    perfTarget.Ok();
+                } catch (ElementNotEnabledException) {
+                    Assert.Fail("Settings were invalid:\n  ScriptName = {0}\n",
+                        perfTarget.ScriptName);
+                }
+                perfTarget = null;
+                app.WaitForDialogDismissed();
+
+                perf = app.NodejsPerformanceExplorerTreeView.WaitForItem("Performance *");
+                Mouse.MoveTo(perf.GetClickablePoint());
+                Mouse.Click(System.Windows.Input.MouseButton.Right);
+                Keyboard.Type("S");
+
+                var item = app.NodejsPerformanceExplorerTreeView.WaitForItem("Performance *", "Reports");
+                AutomationElement child = null;
+                for (int i = 0; i < 20; i++) {
+                    child = item.FindFirst(System.Windows.Automation.TreeScope.Descendants, Condition.TrueCondition);
+                    if (child != null) {
+                        break;
+                    }
+                    System.Threading.Thread.Sleep(100);
+                }
+                Assert.IsNotNull(child, "node not added");
             } finally {
                 if (perfTarget != null) {
                     perfTarget.Cancel();
@@ -591,6 +793,7 @@ namespace ProfilingUITests {
                 System.Threading.Thread.Sleep(1000);
                 Assert.IsTrue(profiling.IsProfiling);
                 var app = new NodejsVisualStudioApp(VsIdeTestHostContext.Dte);
+                app.OpenNodejsPerformance();
                 app.NodejsPerformanceExplorerToolBar.StopProfiling();
 
                 while (profiling.IsProfiling) {
@@ -626,6 +829,7 @@ namespace ProfilingUITests {
                 }
                 Assert.IsTrue(profiling.IsProfiling);
                 var app = new NodejsVisualStudioApp(VsIdeTestHostContext.Dte);
+                app.OpenNodejsPerformance();
 
                 try {
                     app.Dte.ExecuteCommand("Analyze.LaunchNode.jsProfiling");

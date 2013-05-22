@@ -1649,7 +1649,7 @@ namespace Microsoft.VisualStudioTools.Project
             try 
             {
                 ErrorHandler.ThrowOnFailure(service.FindToolWindow(0, ref guidPersistenceSlot, out ppWindowFrame));
-                ErrorHandler.ThrowOnFailure(ppWindowFrame.GetProperty(-3001, out pvar));
+                ErrorHandler.ThrowOnFailure(ppWindowFrame.GetProperty((int)__VSFPROPID.VSFPROPID_DocView, out pvar));
             } 
             catch (COMException exception) 
             {

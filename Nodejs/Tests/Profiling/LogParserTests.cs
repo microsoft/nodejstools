@@ -94,11 +94,38 @@ namespace ProfilerTests {
                 "C:\\Source\\NodeApp2\\NodeApp2\\server.js",
                 16
             );
+
+            // https://nodejstools.codeplex.com/workitem/125
+            AssertExpectedFileInfo(
+                "native array.js",
+                "<node module>",
+                "native array.js",
+                "native array.js",
+                1,
+                "Script"
+            );
+
+            AssertExpectedFileInfo(
+                @" C:\Users\dinov\visual studio 2012\Projects\NodeApp17\NodeApp17\server.js:1",
+                "<node module>",
+                "server.js",
+                @"C:\Users\dinov\visual studio 2012\Projects\NodeApp17\NodeApp17\server.js",
+                1,
+                "Function"
+            );
+            AssertExpectedFileInfo(
+                @"C:\Users\dinov\visual studio 2012\Projects\NodeApp17\NodeApp17\server.js",
+                "<node module>",
+                "server.js",
+                @"C:\Users\dinov\visual studio 2012\Projects\NodeApp17\NodeApp17\server.js",
+                1,
+                "Script"
+            );
         }
 
-        public void AssertExpectedFileInfo(string input, string ns, string function, string filename, int? lineNo) {
+        public void AssertExpectedFileInfo(string input, string ns, string function, string filename, int? lineNo, string type="LazyCompile") {
             foreach (var curInput in new[] { input, "\"" + input + "\"" }) {
-                var res = LogConverter.ExtractNamespaceAndMethodName(curInput, false);
+                var res = LogConverter.ExtractNamespaceAndMethodName(curInput, false, type);
                 Assert.AreEqual(ns, res.Namespace);
                 Assert.AreEqual(function, res.Function);
                 Assert.AreEqual(filename, res.Filename);
