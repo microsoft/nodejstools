@@ -172,9 +172,9 @@ if ($release -or $mockrelease) {
     Push-Location (Split-Path -Parent $MyInvocation.MyCommand.Definition)
     if ($mockrelease) {
         Set-Variable -Name DebugPreference -Value "Continue" -Scope "global"
-        Import-Module $buildroot\Common\Setup\ReleaseMockHelpers.psm1
+        Import-Module -force $buildroot\Common\Setup\ReleaseMockHelpers.psm1
     } else {
-        Import-Module $buildroot\Common\Setup\ReleaseHelpers.psm1
+        Import-Module -force $buildroot\Common\Setup\ReleaseHelpers.psm1
     }
     Pop-Location
 }
@@ -361,8 +361,10 @@ try {
             ######################################################################
             ##  BEGIN SIGNING CODE
             ######################################################################
-            if ($release -or $mockrelease) {
+            if ($release -or $mockrelease) {                
                 submit_symbols "NTVS$spacename" "$buildnumber $($targetvs.name)" "symbols" "$destdir\Symbols" $symbol_contacts
+
+                Write-Output "Signing binaries..."
 
                 $managed_files = @((
                     "Microsoft.NodejsTools.NodeLogConverter.exe", 
@@ -376,13 +378,15 @@ try {
                     $projectName $projectUrl "$projectName - managed code" $projectKeywords `
                     "authenticode;strongname"
 
-                end_sign_files @($job1)
+                end_sign_files @(,$job1)
+                Write-Output "Signing binaries Completed"
+
                 Copy-Item "$destdir\SignedBinaries" $bindir -Recurse -Force
 
                 submit_symbols "NTVS$spacename" "$buildnumber $($targetvs.name)" "binaries" "$destdir\SignedBinaries" $symbol_contacts
                 
                 foreach ($cmd in (Get-Content "BuildRelease.$config.$($targetVs.number).log") | Select-String "light.exe.+-out") {
-                    $targetdir = [regex]::Match($cmd, 'Setup\\Nodejs\\([^\\]+)').Groups[1].Value
+                    $targetdir = [regex]::Match($cmd, 'Nodejs\\Setup\\([^\\]+)').Groups[1].Value
 
                     Write-Output "Rebuilding MSI in $targetdir"
 
@@ -414,11 +418,12 @@ try {
                         name="Node.js Tools for Visual Studio$($_.signtag)"
                     }}
                 )
-                
+                Write-Output "Signing MSIs..."
                 $job = begin_sign_files $msi_files $destdir $approvers `
                     $projectName $projectUrl "$projectName - installer" $projectKeywords `
                     "authenticode"
-                end_sign_files @($job)
+                end_sign_files @(,$job)
+                Write-Output "Signing MSIs Completed"
             }
             ######################################################################
             ##  END SIGNING CODE
