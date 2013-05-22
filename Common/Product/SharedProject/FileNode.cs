@@ -216,7 +216,7 @@ namespace Microsoft.VisualStudioTools.Project
             {
                 return new LinkFileNodeProperties(this);
             } else if (IsNonMemberItem) {
-                return new FileNodeProperties(this);
+                return new ExcludedFileNodeProperties(this);
             }
 
             return new IncludedFileNodeProperties(this);
