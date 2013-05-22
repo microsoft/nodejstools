@@ -83,7 +83,6 @@ namespace Microsoft.NodejsTools.Debugger {
         private Dictionary<int, string> _errorCodes = new Dictionary<int, string>();
         private bool _breakOnAllExceptions;
         private bool _breakOnUncaughtExceptions;
-        private int _entryPointFrameCount;
 
         private static Dictionary<string, ExceptionHitTreatment> GetDefaultExceptionTreatments() {
             // Keep exception types in sync with those declared in ProvideDebugExceptionAttribute's in NodePackage.cs
@@ -755,11 +754,6 @@ namespace Microsoft.NodejsTools.Debugger {
             SetExceptionBreak();
 
             PerformBacktrace((running) => {
-                // Handle followup
-                if (!running) {
-                    _entryPointFrameCount = MainThread.Frames.Count();
-                }
-
                 // At this point we can fire events
                 var newThread = ThreadCreated;
                 if (newThread != null) {
@@ -1077,12 +1071,6 @@ namespace Microsoft.NodejsTools.Debugger {
             // and follow up with firing the appropriate event for the break
             PerformBacktrace((running) => {
                 // Handle followup
-                if (MainThread.Frames.Count() < _entryPointFrameCount) {
-                    // Auto resume exceptions thrown up the stack from our entry point
-                    // to avoid firing exception raised events for rethrow performed by Node
-                    AutoResume();
-                    return;
-                }
                 Debug.Assert(!running);
                 var exceptionRaised = ExceptionRaised;
                 if (exceptionRaised != null) {
