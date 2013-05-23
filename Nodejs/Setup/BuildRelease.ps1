@@ -380,11 +380,13 @@ try {
 
                 end_sign_files @(,$job1)
                 Write-Output "Signing binaries Completed"
-
-                Copy-Item "$destdir\SignedBinaries" $bindir -Recurse -Force
-
+                
                 submit_symbols "NTVS$spacename" "$buildnumber $($targetvs.name)" "binaries" "$destdir\SignedBinaries" $symbol_contacts
                 
+                #Copy the signed binaries back into the binaries directory
+                #  so that msi's are built with the signed binaries
+                Copy-Item "$destdir\SignedBinaries\*" $bindir -Recurse -Force
+
                 foreach ($cmd in (Get-Content "BuildRelease.$config.$($targetVs.number).log") | Select-String "light.exe.+-out") {
                     $targetdir = [regex]::Match($cmd, 'Nodejs\\Setup\\([^\\]+)').Groups[1].Value
 
