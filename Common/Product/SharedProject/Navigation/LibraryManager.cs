@@ -33,21 +33,20 @@ namespace Microsoft.VisualStudioTools.Navigation {
     /// navigation tools (class view or object browser) from the source files inside a
     /// hierarchy.
     /// </summary>
-    internal abstract class LibraryManager : IDisposable, IVsRunningDocTableEvents {
+    internal abstract partial class LibraryManager : IDisposable, IVsRunningDocTableEvents {
         private readonly CommonPackage/*!*/ _package;
         private readonly Dictionary<uint, TextLineEventListener> _documents;
-        private readonly Dictionary<IVsHierarchy, HierarchyListener> _hierarchies;
+        private readonly Dictionary<IVsHierarchy, HierarchyInfo> _hierarchies = new Dictionary<IVsHierarchy,HierarchyInfo>();
         private readonly Dictionary<ModuleId, LibraryNode> _files;
         private readonly Library _library;
         private readonly IVsEditorAdaptersFactoryService _adapterFactory;
         private uint _objectManagerCookie;
-        private uint _runningDocTableCookie;         
+        private uint _runningDocTableCookie;
         
         public LibraryManager(CommonPackage/*!*/ package) {
             Contract.Assert(package != null);
             _package = package;
             _documents = new Dictionary<uint, TextLineEventListener>();
-            _hierarchies = new Dictionary<IVsHierarchy, HierarchyListener>();
             _library = new Library(new Guid(CommonConstants.LibraryGuid));
             _library.LibraryCapabilities = (_LIB_FLAGS2)_LIB_FLAGS.LF_PROJECT;
             _files = new Dictionary<ModuleId, LibraryNode>();
@@ -63,11 +62,11 @@ namespace Microsoft.VisualStudioTools.Navigation {
             get { return _library; }
         }
 
-        protected abstract LibraryNode CreateLibraryNode(IScopeNode subItem, string namePrefix, IVsHierarchy hierarchy, uint itemid);
-        public virtual LibraryNode CreateFileLibraryNode(HierarchyNode hierarchy, string name, string filename, LibraryNodeType libraryNodeType) {
-            return new LibraryNode(name, filename, libraryNodeType);
+        protected abstract LibraryNode CreateLibraryNode(LibraryNode parent, IScopeNode subItem, string namePrefix, IVsHierarchy hierarchy, uint itemid);
+
+        public virtual LibraryNode CreateFileLibraryNode(LibraryNode parent, HierarchyNode hierarchy, string name, string filename, LibraryNodeType libraryNodeType) {
+            return new LibraryNode(null, name, filename, libraryNodeType);
         }
-       
 
         private object GetPackageService(Type/*!*/ type) {
             return ((System.IServiceProvider)_package).GetService(type);
@@ -104,12 +103,14 @@ namespace Microsoft.VisualStudioTools.Navigation {
             }
             
             RegisterLibrary();
-        
-            HierarchyListener listener = new HierarchyListener(hierarchy, _package);
-            listener.OnAddItem += new EventHandler<HierarchyEventArgs>(OnNewFile);
-            listener.OnDeleteItem += new EventHandler<HierarchyEventArgs>(OnDeleteFile);
+            var commonProject = hierarchy.GetProject().GetCommonProject();
+            HierarchyListener listener = new HierarchyListener(hierarchy, this);
+            var node = _hierarchies[hierarchy] = new HierarchyInfo(
+                listener,
+                new ProjectLibraryNode(commonProject)
+            );
+            _library.AddNode(node.ProjectLibraryNode);
             listener.StartListening(true);
-            _hierarchies.Add(hierarchy, listener);
             RegisterForRDTEvents();
         }
 
@@ -128,11 +129,12 @@ namespace Microsoft.VisualStudioTools.Navigation {
             if ((null == hierarchy) || !_hierarchies.ContainsKey(hierarchy)) {
                 return;
             }
-            HierarchyListener listener = _hierarchies[hierarchy];
-            if (null != listener) {
-                listener.Dispose();
+            HierarchyInfo info = _hierarchies[hierarchy];
+            if (null != info) {
+                info.Listener.Dispose();
             }
             _hierarchies.Remove(hierarchy);
+            _library.RemoveNode(info.ProjectLibraryNode);
             if (0 == _hierarchies.Count) {
                 UnregisterRDTEvents();
             }
@@ -163,9 +165,7 @@ namespace Microsoft.VisualStudioTools.Navigation {
             _documents[document].OnFileChangedImmediate += delegate(object sender, TextLineChange[] changes, int fLast) {
                 lineChanged(sender, changes, fLast);
             };
-            _documents[document].OnFileChanged += delegate(object sender, HierarchyEventArgs args) {
-                onIdle(args.TextBuffer);
-            };
+            _documents[document].OnFileChanged += (sender, args) => onIdle(args.TextBuffer);
         }
 
         #endregion
@@ -194,15 +194,17 @@ namespace Microsoft.VisualStudioTools.Navigation {
                 var project = task.ModuleID.Hierarchy.GetProject().GetCommonProject();
 
                 HierarchyNode fileNode = fileNode = project.NodeFromItemId(task.ModuleID.ItemID);
-                if (fileNode == null) {
+                HierarchyInfo parent;
+                if (fileNode == null || !_hierarchies.TryGetValue(task.ModuleID.Hierarchy, out parent)) {
                     return;
                 }
 
                 LibraryNode module = CreateFileLibraryNode(
+                    parent.ProjectLibraryNode,
                     fileNode,
                     System.IO.Path.GetFileName(task.FileName),
                     task.FileName,
-                    LibraryNodeType.PhysicalContainer
+                    LibraryNodeType.Classes
                 );
 
                 // TODO: Creating the module tree should be done lazily as needed
@@ -211,18 +213,18 @@ namespace Microsoft.VisualStudioTools.Navigation {
                 // finer grained and only update the changed nodes.  But then we
                 // need to make sure we're not mutating lists which are handed out.
 
-                CreateModuleTree(module, module, scope, task.FileName + ":", task.ModuleID);
-
+                CreateModuleTree(module, scope, task.FileName + ":", task.ModuleID);
                 if (null != task.ModuleID) {
                     LibraryNode previousItem = null;
                     lock (_files) {
                         if (_files.TryGetValue(task.ModuleID, out previousItem)) {
                             _files.Remove(task.ModuleID);
+                            parent.ProjectLibraryNode.RemoveNode(previousItem);
                         }
                     }
-                    _library.RemoveNode(previousItem);
                 }
-                _library.AddNode(module);
+                parent.ProjectLibraryNode.AddNode(module);
+                _library.Update();
                 if (null != task.ModuleID) {
                     lock (_files) {
                         _files.Add(task.ModuleID, module);
@@ -233,27 +235,22 @@ namespace Microsoft.VisualStudioTools.Navigation {
             }
         }
 
-        private void CreateModuleTree(LibraryNode root, LibraryNode current, IScopeNode scope, string namePrefix, ModuleId moduleId) {
-            if ((null == root) || (null == scope) || (null == scope.NestedScopes)) {
+        private void CreateModuleTree(LibraryNode current, IScopeNode scope, string namePrefix, ModuleId moduleId) {
+            if ((null == scope) || (null == scope.NestedScopes)) {
                 return;
             }
+
             foreach (IScopeNode subItem in scope.NestedScopes) {                
-                LibraryNode newNode = CreateLibraryNode(subItem, namePrefix, moduleId.Hierarchy, moduleId.ItemID);
+                LibraryNode newNode = CreateLibraryNode(current, subItem, namePrefix, moduleId.Hierarchy, moduleId.ItemID);
                 string newNamePrefix = namePrefix;
 
-                // The classes are always added to the root node, the functions to the
-                // current node.
-                
+                current.AddNode(newNode);
                 if ((newNode.NodeType & LibraryNodeType.Classes) != LibraryNodeType.None) {
-                    // Classes are always added to the root.
-                    root.AddNode(newNode);
                     newNamePrefix = namePrefix + newNode.Name + ".";
-                } else {
-                    current.AddNode(newNode);
                 }
 
                 // Now use recursion to get the other types.
-                CreateModuleTree(root, newNode, subItem, newNamePrefix, moduleId);
+                CreateModuleTree(newNode, subItem, newNamePrefix, moduleId);
             }
         }
         #endregion
@@ -262,7 +259,7 @@ namespace Microsoft.VisualStudioTools.Navigation {
 
         private void OnNewFile(object sender, HierarchyEventArgs args) {
             IVsHierarchy hierarchy = sender as IVsHierarchy;
-            if (null == hierarchy) {
+            if (null == hierarchy || IsNonMemberItem(hierarchy, args.ItemID)) {
                 return;
             }
 
@@ -271,20 +268,38 @@ namespace Microsoft.VisualStudioTools.Navigation {
                 buffer = _adapterFactory.GetDocumentBuffer(args.TextBuffer);
             }
 
+            var id = new ModuleId(hierarchy, args.ItemID);
             OnNewFile(new LibraryTask(args.CanonicalName, buffer, new ModuleId(hierarchy, args.ItemID)));
         }
 
+        /// <summary>
+        /// Handles the delete event, checking to see if this is a project item.
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="args"></param>
         private void OnDeleteFile(object sender, HierarchyEventArgs args) {
             IVsHierarchy hierarchy = sender as IVsHierarchy;
-            if (null == hierarchy) {
+            if (null == hierarchy || IsNonMemberItem(hierarchy, args.ItemID)) {
                 return;
             }
 
+            OnDeleteFile(hierarchy, args);
+        }
+
+        /// <summary>
+        /// Does a delete w/o checking if it's a non-meber item, for handling the
+        /// transition from member item to non-member item.
+        /// </summary>
+        private void OnDeleteFile(IVsHierarchy hierarchy, HierarchyEventArgs args) {
             ModuleId id = new ModuleId(hierarchy, args.ItemID);
             LibraryNode node = null;
             lock (_files) {
                 if (_files.TryGetValue(id, out node)) {
                     _files.Remove(id);
+                    HierarchyInfo parent;
+                    if (_hierarchies.TryGetValue(hierarchy, out parent)) {
+                        parent.ProjectLibraryNode.RemoveNode(node);
+                    }
                 }
             }
             if (null != node) {
@@ -292,14 +307,27 @@ namespace Microsoft.VisualStudioTools.Navigation {
             }
         }
 
+        private void IsNonMemberItemChanged(object sender, HierarchyEventArgs args) {
+            IVsHierarchy hierarchy = sender as IVsHierarchy;
+            if (null == hierarchy) {
+                return;
+            }
+
+            if (!IsNonMemberItem(hierarchy, args.ItemID)) {
+                OnNewFile(hierarchy, args);
+            } else {
+                OnDeleteFile(hierarchy, args);
+            }
+        }
+
         /// <summary>
-        /// Checks whether this hierarchy item is a project member (files in search path aren't
-        /// considered as project members).
+        /// Checks whether this hierarchy item is a project member (on disk items from show all
+        /// files aren't considered project members).
         /// </summary>
-        private bool IsProjectMember(IVsHierarchy hierarchy, uint itemId) {
+        protected bool IsNonMemberItem(IVsHierarchy hierarchy, uint itemId) {
             object val;
             int hr = hierarchy.GetProperty(itemId, (int)__VSHPROPID.VSHPROPID_IsNonMemberItem, out val);
-            return ErrorHandler.Succeeded(hr) && !(bool)val;
+            return ErrorHandler.Succeeded(hr) && (bool)val;
         }
 
         #endregion
@@ -434,8 +462,8 @@ namespace Microsoft.VisualStudioTools.Navigation {
 
         public void Dispose() {
             // Dispose all the listeners.
-            foreach (HierarchyListener listener in _hierarchies.Values) {
-                listener.Dispose();
+            foreach (var info in _hierarchies.Values) {
+                info.Listener.Dispose();
             }
             _hierarchies.Clear();
 
@@ -458,5 +486,15 @@ namespace Microsoft.VisualStudioTools.Navigation {
         }
 
         #endregion
+
+        class HierarchyInfo {
+            public readonly HierarchyListener Listener;
+            public readonly ProjectLibraryNode ProjectLibraryNode;
+
+            public HierarchyInfo(HierarchyListener listener, ProjectLibraryNode projectLibNode) {
+                Listener = listener;
+                ProjectLibraryNode = projectLibNode;
+            }
+        }
     }
 }

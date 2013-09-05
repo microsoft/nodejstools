@@ -148,38 +148,6 @@ namespace Microsoft.VisualStudioTools.Project
             DoNotTriggerTrackerQueryEvents = 4
         }
 
-        private class HierarchyEventsSink : IVsHierarchyEvents {
-            private readonly ProjectNode projectNode;
-
-            public HierarchyEventsSink(ProjectNode projectNode) {
-                this.projectNode = projectNode;
-            }
-
-            public int OnInvalidateIcon(IntPtr hicon) {
-                return VSConstants.S_OK;
-            }
-
-            public int OnInvalidateItems(uint itemidParent) {
-                return VSConstants.S_OK;
-            }
-
-            public int OnItemAdded(uint itemidParent, uint itemidSiblingPrev, uint itemidAdded) {
-                return VSConstants.S_OK;
-            }
-
-            public int OnItemDeleted(uint itemid) {
-                return VSConstants.S_OK;
-            }
-
-            public int OnItemsAppended(uint itemidParent) {
-                return VSConstants.S_OK;
-            }
-
-            public int OnPropertyChanged(uint itemid, int propid, uint flags) {
-                return VSConstants.S_OK;
-            }
-        }
-
         #endregion
 
         #region constants
@@ -333,7 +301,7 @@ namespace Microsoft.VisualStudioTools.Project
         /// <summary>
         /// Mapping from item names to their hierarchy nodes for all disk-based nodes.
         /// </summary>
-        private readonly Dictionary<string, HierarchyNode> _diskNodes = new Dictionary<string, HierarchyNode>(StringComparer.OrdinalIgnoreCase);
+        protected readonly Dictionary<string, HierarchyNode> _diskNodes = new Dictionary<string, HierarchyNode>(StringComparer.OrdinalIgnoreCase);
 
         // Has the object been disposed.
         private bool isDisposed;
@@ -342,7 +310,6 @@ namespace Microsoft.VisualStudioTools.Project
         private int parentHierarchyItemId;
 
         private List<HierarchyNode> itemsDraggedOrCutOrCopied;
-        private CopyPasteDragSource sourceDraggedOrCutOrCopied;
         /// <summary>
         /// Folder node in the process of being created.  First the hierarchy node
         /// is added, then the label is edited, and when that completes/cancels
@@ -459,22 +426,6 @@ namespace Microsoft.VisualStudioTools.Project
             }
             set {
                 _folderBeingCreated = value;
-            }
-        }
-
-        enum CopyPasteDragSource {
-            None,
-            Dragged,
-            Cut,
-            Copied
-        }
-
-        private CopyPasteDragSource SourceDraggedOrCutOrCopied {
-            get {
-                return this.sourceDraggedOrCutOrCopied;
-            }
-            set {
-                this.sourceDraggedOrCutOrCopied = value;
             }
         }
 
@@ -708,7 +659,7 @@ namespace Microsoft.VisualStudioTools.Project
                 {
                     projectHome = CommonUtils.GetAbsoluteDirectoryPath(
                         this.ProjectFolder,
-                        this.ProjectMgr.GetProjectProperty(CommonConstants.ProjectHome, true));
+                        this.GetProjectProperty(CommonConstants.ProjectHome, true));
                 }
 
                 Debug.Assert(projectHome != null, "ProjectHome should not be null");
@@ -1258,7 +1209,7 @@ namespace Microsoft.VisualStudioTools.Project
                 {
                     this.buildProject.ProjectCollection.UnloadProject(this.buildProject);
                     this.buildProject.ProjectCollection.UnloadProject(this.buildProject.Xml);
-                    this.buildProject = null;
+                    this.SetBuildProject(null);
                 }
 
                 if (null != imageHandler)
@@ -1652,6 +1603,7 @@ namespace Microsoft.VisualStudioTools.Project
         {
             using (new DebugTimer("ProjectLoad"))
             {
+                bool successful = false;
                 try
                 {
                     this.disableQueryEdit = true;
@@ -1679,7 +1631,7 @@ namespace Microsoft.VisualStudioTools.Project
                     // we also need to copy all the associated files with it.					
                     if ((flags & (uint)__VSCREATEPROJFLAGS.CPF_CLONEFILE) == (uint)__VSCREATEPROJFLAGS.CPF_CLONEFILE)
                     {
-                        Debug.Assert(!String.IsNullOrEmpty(fileName) && File.Exists(fileName), "Invalid filename passed to load the project. A valid filename is expected");
+                        Debug.Assert(File.Exists(fileName), "Invalid filename passed to load the project. A valid filename is expected");
 
                         // This should be a very fast operation if the build project is already initialized by the Factory.
                         SetBuildProject(Utilities.ReinitializeMsBuildProject(this.buildEngine, fileName, this.buildProject));
@@ -1727,7 +1679,7 @@ namespace Microsoft.VisualStudioTools.Project
 
                         ErrorHandler.ThrowOnFailure(this.Save(this.filename, 1, 0));
 
-                        string unresolvedProjectHome = this.ProjectMgr.GetProjectProperty(CommonConstants.ProjectHome);
+                        string unresolvedProjectHome = this.GetProjectProperty(CommonConstants.ProjectHome);
                         string basePath = CommonUtils.GetAbsoluteDirectoryPath(Path.GetDirectoryName(fileName), unresolvedProjectHome);
                         string baseLocation = CommonUtils.GetAbsoluteDirectoryPath(location, unresolvedProjectHome);
 
@@ -1770,10 +1722,15 @@ namespace Microsoft.VisualStudioTools.Project
 
                     // now reload to fix up references
                     this.Reload();
+                    successful = true;
                 }
                 finally
                 {
                     this.disableQueryEdit = false;
+                    if (!successful)
+                    {
+                        this.Close();
+                    }
                 }
             }
         }
@@ -1939,7 +1896,7 @@ namespace Microsoft.VisualStudioTools.Project
             if (String.Compare(oldValue, propertyValue, StringComparison.Ordinal) != 0)
             {
                 // Check out the project file.
-                if (!this.ProjectMgr.QueryEditProjectFile(false))
+                if (!this.QueryEditProjectFile(false))
                 {
                     throw Marshal.GetExceptionForHR(VSConstants.OLE_E_PROMPTSAVECANCELLED);
                 }
@@ -2181,21 +2138,25 @@ namespace Microsoft.VisualStudioTools.Project
             }
 
             
-            string[] parts = path.Split(new [] { Path.DirectorySeparatorChar }, StringSplitOptions.RemoveEmptyEntries);
+            string[] parts = strFullPath.Substring(ProjectHome.Length).Split(new [] { Path.DirectorySeparatorChar }, StringSplitOptions.RemoveEmptyEntries);
             if (parts.Length == 0)
             {
                 throw new ArgumentException("The path is invalid", "path");
             }
             path = parts[0];
-            HierarchyNode curParent = VerifySubFolderExists(path, this, createOnDisk);
+            string fullPath = Path.Combine(ProjectHome, path) + "\\";
+            string relPath = path;
+
+            HierarchyNode curParent = VerifySubFolderExists(path, fullPath, this, createOnDisk);
 
             // now we have an array of subparts....
             for (int i = 1; i < parts.Length; i++)
             {
                 if (parts[i].Length > 0)
                 {
-                    path = Path.Combine(path, parts[i]);
-                    curParent = VerifySubFolderExists(path, curParent, createOnDisk);
+                    fullPath = Path.Combine(fullPath, parts[i]) + "\\";
+                    relPath = Path.Combine(relPath, parts[i]);
+                    curParent = VerifySubFolderExists(relPath, fullPath, curParent, createOnDisk);
                 }
             }
             return curParent;
@@ -2243,44 +2204,42 @@ namespace Microsoft.VisualStudioTools.Project
         /// It is meant to be a helper method for CreateFolderNodes().
         /// For some scenario it may be useful to override.
         /// </summary>
-        /// <param name="path">full path to the subfolder we want to verify.</param>
+        /// <param name="relativePath">The relative path to the subfolder we want to create, without a trailing \</param>
+        /// <param name="fullPath">the full path to the subfolder we want to verify.</param>
         /// <param name="parent">the parent node where to add the subfolder if it does not exist.</param>
         /// <returns>the foldernode correcsponding to the path.</returns>
         [SuppressMessage("Microsoft.Naming", "CA1702:CompoundWordsShouldBeCasedCorrectly", MessageId = "SubFolder")]
-        protected virtual FolderNode VerifySubFolderExists(string path, HierarchyNode parent, bool createOnDisk = true)
+        protected virtual FolderNode VerifySubFolderExists(string relativePath, string fullPath, HierarchyNode parent, bool createOnDisk = true)
         {
+            Debug.Assert(!CommonUtils.HasEndSeparator(relativePath));
+
             FolderNode folderNode = null;
             uint uiItemId;
-            string strFullPath = CommonUtils.GetAbsoluteDirectoryPath(ProjectHome, path);
-            if (ErrorHandler.Succeeded(this.ParseCanonicalName(strFullPath, out uiItemId)) &&
+            if (ErrorHandler.Succeeded(this.ParseCanonicalName(fullPath, out uiItemId)) &&
                 uiItemId != 0)
             {
                 Debug.Assert(this.NodeFromItemId(uiItemId) is FolderNode, "Not a FolderNode");
                 folderNode = (FolderNode)this.NodeFromItemId(uiItemId);
             }
 
-            if (folderNode == null && strFullPath != null && parent != null)
+            if (folderNode == null && fullPath != null && parent != null)
             {
                 // folder does not exist yet...
                 // We could be in the process of loading so see if msbuild knows about it
                 ProjectElement item = null;
-                foreach (MSBuild.ProjectItem folder in buildProject.GetItems(ProjectFileConstants.Folder))
-                {
-                    var absPath = CommonUtils.GetAbsoluteDirectoryPath(ProjectHome, folder.EvaluatedInclude);
-                    if (CommonUtils.IsSameDirectory(absPath, strFullPath))
-                    {
-                        item = new MsBuildProjectElement(this, folder);
-                        break;
-                    }
+                var items = buildProject.GetItemsByEvaluatedInclude(relativePath);
+                if (items.Count == 0) {
+                    items = buildProject.GetItemsByEvaluatedInclude(relativePath + "\\");
                 }
-                // If MSBuild did not know about it, create a new one
-                if (item == null) {
-                    item = this.AddFolderToMsBuild(strFullPath);
+                if (items.Count != 0) {
+                    item = new MsBuildProjectElement(this, items.First());
+                } else {
+                    item = AddFolderToMsBuild(fullPath);
                 }
                 if (createOnDisk) {
-                    Directory.CreateDirectory(strFullPath);
+                    Directory.CreateDirectory(fullPath);
                 }
-                folderNode = this.CreateFolderNode(item);
+                folderNode = CreateFolderNode(item);
                 parent.AddChild(folderNode);
             }
 
@@ -2448,9 +2407,9 @@ namespace Microsoft.VisualStudioTools.Project
 
                 this.ProcessReferences();
 
-                this.ProcessFiles();
-
                 this.ProcessFolders();
+
+                this.ProcessFiles();
 
                 this.LoadNonBuildInformation();
 
@@ -2473,8 +2432,7 @@ namespace Microsoft.VisualStudioTools.Project
         protected virtual void RenameProjectFile(string newFile)
         {
             IVsUIShell shell = this.Site.GetService(typeof(SVsUIShell)) as IVsUIShell;
-            Debug.Assert(shell != null, "Could not get the ui shell from the project");
-            Utilities.CheckNotNull(shell);
+            Utilities.CheckNotNull(shell, "Could not get the UI shell from the project");
 
             // Figure out what the new full name is
             string oldFile = this.Url;
@@ -2815,8 +2773,7 @@ namespace Microsoft.VisualStudioTools.Project
             string oldName = this.filename;
 
             IVsSolution solution = this.Site.GetService(typeof(IVsSolution)) as IVsSolution;
-            Debug.Assert(solution != null, "Could not retrieve the solution form the service provider");
-            Utilities.CheckNotNull(solution);
+            Utilities.CheckNotNull(solution, "Could not retrieve the solution form the service provider");
 
             int canRenameContinue = 0;
             ErrorHandler.ThrowOnFailure(solution.QueryRenameProject(this.GetOuterInterface<IVsProject>(), this.filename, newFileName, 0, out canRenameContinue));
@@ -2843,8 +2800,7 @@ namespace Microsoft.VisualStudioTools.Project
                 ErrorHandler.ThrowOnFailure(solution.OnAfterRenameProject(this, oldName, this.filename, 0));
 
                 IVsUIShell shell = this.Site.GetService(typeof(SVsUIShell)) as IVsUIShell;
-                Debug.Assert(shell != null, "Could not get the ui shell from the project");
-                Utilities.CheckNotNull(shell);
+                Utilities.CheckNotNull(shell, "Could not get the UI shell from the project");
 
                 ErrorHandler.ThrowOnFailure(shell.RefreshPropertyBrowser(0));
             }
@@ -2938,17 +2894,6 @@ namespace Microsoft.VisualStudioTools.Project
             return newItem;
         }
 
-        /// <summary>
-        /// Determines whether an item can be owerwritten in the hierarchy.
-        /// </summary>
-        /// <param name="originalFileName">The orginal filname.</param>
-        /// <param name="computedNewFileName">The computed new file name, that will be copied to the project directory or into the folder .</param>
-        /// <returns>S_OK for success, or an error message</returns>
-        protected virtual int CanOverwriteExistingItem(string originalFileName, string computedNewFileName)
-        {
-            return CanOverwriteExistingItem(originalFileName, computedNewFileName, false);
-        }
-
         const int E_CANCEL_FILE_ADD = unchecked((int)0xA0010001);      // Severity = Error, Customer Bit set, Facility = 1, Error = 1
 
         /// <summary>
@@ -2964,7 +2909,7 @@ namespace Microsoft.VisualStudioTools.Project
         /// <param name="computedNewFileName"></param>
         /// <param name="canCancel"></param>
         /// <returns></returns>
-        protected virtual int CanOverwriteExistingItem(string originalFileName, string computedNewFileName, bool canCancel)
+        protected int CanOverwriteExistingItem(string originalFileName, string computedNewFileName, bool inProject = true)
         {
             if (String.IsNullOrEmpty(originalFileName) || String.IsNullOrEmpty(computedNewFileName))
             {
@@ -2993,13 +2938,9 @@ namespace Microsoft.VisualStudioTools.Project
 
 
             // File already exists in project... message box
-            message = String.Format(SR.GetString(SR.FileAlreadyInProject, CultureInfo.CurrentUICulture), Path.GetFileName(originalFileName));
+            message = String.Format(SR.GetString(inProject ? SR.FileAlreadyInProject : SR.FileAlreadyExists, CultureInfo.CurrentUICulture), Path.GetFileName(originalFileName));
             icon = OLEMSGICON.OLEMSGICON_QUERY;
             buttons = OLEMSGBUTTON.OLEMSGBUTTON_YESNO;
-            if (canCancel)
-            {
-                buttons = OLEMSGBUTTON.OLEMSGBUTTON_YESNOCANCEL;
-            }
             int msgboxResult = VsShellUtilities.ShowMessageBox(this.Site, title, message, icon, buttons, defaultButton);
             if (msgboxResult == NativeMethods.IDCANCEL)
             {
@@ -3011,15 +2952,6 @@ namespace Microsoft.VisualStudioTools.Project
             }
 
             return VSConstants.S_OK;
-        }
-
-        /// <summary>
-        /// Handle owerwriting of an existing item in the hierarchy.
-        /// </summary>
-        /// <param name="existingNode">The node that exists.</param>
-        protected virtual void OverwriteExistingItem(HierarchyNode existingNode)
-        {
-
         }
 
         /// <summary>
@@ -3193,7 +3125,7 @@ namespace Microsoft.VisualStudioTools.Project
         protected internal virtual void ProcessFolders()
         {
             // Process Folders (useful to persist empty folder)
-            foreach (MSBuild.ProjectItem folder in this.buildProject.GetItems(ProjectFileConstants.Folder))
+            foreach (MSBuild.ProjectItem folder in this.buildProject.GetItems(ProjectFileConstants.Folder).ToArray())
             {
                 string strPath = folder.EvaluatedInclude;
 
@@ -3357,7 +3289,6 @@ namespace Microsoft.VisualStudioTools.Project
         /// </summary>
         protected internal virtual int CompareNodes(HierarchyNode node1, HierarchyNode node2)
         {
-            Debug.Assert(node1 != null && node2 != null);
             Utilities.ArgumentNotNull("node1", node1);
             Utilities.ArgumentNotNull("node2", node2);
 
@@ -4321,7 +4252,7 @@ namespace Microsoft.VisualStudioTools.Project
                 return VSConstants.E_FAIL;
             }
 
-            if (!this.ProjectMgr.QueryEditProjectFile(false))
+            if (!this.QueryEditProjectFile(false))
             {
                 throw Marshal.GetExceptionForHR(VSConstants.OLE_E_PROMPTSAVECANCELLED);
             }
@@ -4344,6 +4275,11 @@ namespace Microsoft.VisualStudioTools.Project
                     // If the file to be added is an existing file part of the hierarchy then continue.
                     if (CommonUtils.IsSamePath(file, newFileName))
                     {
+                        if (child.IsNonMemberItem) 
+                        {
+                            // https://pytools.codeplex.com/workitem/1251
+                            ErrorHandler.ThrowOnFailure(child.IncludeInProject(false));
+                        }
                         result[0] = VSADDRESULT.ADDRESULT_Cancel;
                         continue;
                     }
@@ -4362,7 +4298,7 @@ namespace Microsoft.VisualStudioTools.Project
                     }
                     else
                     {
-                        int canOverWriteExistingItem = CanOverwriteExistingItem(file, newFileName, false);
+                        int canOverWriteExistingItem = CanOverwriteExistingItem(file, newFileName, !child.IsNonMemberItem);
                         if (canOverWriteExistingItem == E_CANCEL_FILE_ADD)
                         {
                             result[0] = VSADDRESULT.ADDRESULT_Cancel;
@@ -4472,7 +4408,7 @@ namespace Microsoft.VisualStudioTools.Project
                     else if (Directory.Exists(file))
                     {
                         // http://pytools.codeplex.com/workitem/546
-                        // http://nodejstools.codeplex.com/workitem/100
+
                         int hr = AddDirectory(result, n, file, promptOverwrite);
                         if (ErrorHandler.Failed(hr)) {
                             return hr;
@@ -4519,7 +4455,10 @@ namespace Microsoft.VisualStudioTools.Project
 
                 if (overwrite)
                 {
-                    this.OverwriteExistingItem(child);
+                    if (child.IsNonMemberItem) 
+                    {
+                        ErrorHandler.ThrowOnFailure(child.IncludeInProject(false));
+                    }
                 }
                 else if (linkedFile != null || isLink)
                 {
@@ -4625,7 +4564,7 @@ namespace Microsoft.VisualStudioTools.Project
                 {
                     return hr;
                 }
-                ProjectMgr.OnItemAdded(targetFolder.Parent, targetFolder);
+                OnItemAdded(targetFolder.Parent, targetFolder);
                 return hr;
             } 
             else if (promptOverwrite == null) 
@@ -4829,7 +4768,7 @@ If the files in the existing folder have the same names as files in the folder y
             else
             {
                 HierarchyNode child = this.FindNodeByFullPath(EnsureRootedPath(mkDoc));
-                if (child != null)
+                if (child != null && !child.IsNonMemberItem)
                 {
                     found = 1;
                     itemId = child.ID;
@@ -4944,7 +4883,7 @@ If the files in the existing folder have the same names as files in the folder y
         public virtual int TransferItem(string oldMkDoc, string newMkDoc, IVsWindowFrame frame)
         {
             // Fail if hierarchy already closed
-            if (this.ProjectMgr == null || this.ProjectMgr.IsClosed)
+            if (this.ProjectMgr == null || this.IsClosed)
             {
                 return VSConstants.E_FAIL;
             }
@@ -5448,7 +5387,7 @@ If the files in the existing folder have the same names as files in the folder y
                 throw new ArgumentException("Invalid item id", "item");
 
             if (node.ItemNode != null) {
-            attributeValue = node.ItemNode.GetMetadata(attributeName);
+                attributeValue = node.ItemNode.GetMetadata(attributeName);
             } else if(node == node.ProjectMgr) {
                 attributeName = node.ProjectMgr.GetProjectProperty(attributeName);
             }
@@ -5553,9 +5492,6 @@ If the files in the existing folder have the same names as files in the folder y
         {
             this.ID = VSConstants.VSITEMID_ROOT;
             this.tracker = new TrackDocumentsHelper(this);
-
-            uint cookie;
-            this.AdviseHierarchyEvents(new HierarchyEventsSink(this), out cookie);
         }
 
         /// <summary>
@@ -5618,8 +5554,13 @@ If the files in the existing folder have the same names as files in the folder y
             }
             else
             {
-                string absPath = CommonUtils.GetAbsoluteFilePath(ProjectHome, strPath);
+                HierarchyNode parent;
+                if (_diskNodes.TryGetValue(Path.GetDirectoryName(Path.Combine(ProjectHome, strPath)) + "\\", out parent)) {
+                    // fast path, filename is normalized, and the folder already exists
+                    return parent;
+                }
 
+                string absPath = CommonUtils.GetAbsoluteFilePath(ProjectHome, strPath);
                 if (CommonUtils.IsSubpathOf(ProjectHome, absPath))
                 {
                     strPath = CommonUtils.GetRelativeDirectoryPath(ProjectHome, Path.GetDirectoryName(absPath));
@@ -5804,12 +5745,22 @@ If the files in the existing folder have the same names as files in the folder y
         /// <param name="project">The new build project instance</param>
         private void SetBuildProject(MSBuild.Project project)
         {
+            bool isNewBuildProject = (this.buildProject != project);
             this.buildProject = project;
             if (this.buildProject != null)
             {
                 SetupProjectGlobalPropertiesThatAllProjectSystemsMustSet();
             }
+            if (isNewBuildProject)
+            {
+                NewBuildProject(project);
+            }
         }
+
+        /// <summary>
+        /// Called when a new value for <see cref="BuildProject"/> is available.
+        /// </summary>
+        protected virtual void NewBuildProject(MSBuild.Project project) { }
 
         /// <summary>
         /// Setup the global properties for project instance.
@@ -6134,16 +6085,14 @@ If the files in the existing folder have the same names as files in the folder y
                 // Walk the tree and close all nodes.
                 // This has to be done before the project closes, since we want still state available for the ProjectMgr on the nodes 
                 // when nodes are closing.
-                try {
-                    CloseAllNodes(this);
-                } finally {
-                    this.Dispose(true);
-                }
+                CloseAllNodes(this);
             } catch (COMException e) {
                 hr = e.ErrorCode;
             } finally {
                 Close();
             }
+
+            SetBuildProject(null);
 
             this.isClosed = true;
 
@@ -6314,7 +6263,7 @@ If the files in the existing folder have the same names as files in the folder y
                 return;
             }
 
-            HierarchyNode prev = child.PreviousSibling;
+            HierarchyNode prev = child.PreviousVisibleSibling;
             uint prevId = (prev != null) ? prev.HierarchyId : VSConstants.VSITEMID_NIL;
             foreach (IVsHierarchyEvents sink in _hierarchyEventSinks) {
                 int result = sink.OnItemAdded(parent.HierarchyId, prevId, child.HierarchyId);
@@ -6494,7 +6443,7 @@ If the files in the existing folder have the same names as files in the folder y
                 return VSConstants.E_INVALIDARG;
             }
 
-            HierarchyNode node = this.ProjectMgr.NodeFromItemId(itemid);
+            HierarchyNode node = this.NodeFromItemId(itemid);
             if (node == null) {
                 return VSConstants.E_FAIL;
             }
@@ -6606,7 +6555,7 @@ If the files in the existing folder have the same names as files in the folder y
         /// <param name="ignoreFlag">Flag indicating whether or not to ignore changes (1 to ignore, 0 to stop ignoring).</param>
         /// <returns>If the method succeeds, it returns S_OK. If it fails, it returns an error code.</returns>
         public virtual int IgnoreItemFileChanges(uint itemId, int ignoreFlag) {
-            HierarchyNode n = this.ProjectMgr.NodeFromItemId(itemId);
+            HierarchyNode n = this.NodeFromItemId(itemId);
             if (n != null) {
                 n.IgnoreItemFileChanges(ignoreFlag == 0 ? false : true);
             }
@@ -6624,7 +6573,7 @@ If the files in the existing folder have the same names as files in the folder y
         public virtual int IsItemReloadable(uint itemId, out int isReloadable) {
             isReloadable = 0;
 
-            HierarchyNode n = this.ProjectMgr.NodeFromItemId(itemId);
+            HierarchyNode n = this.NodeFromItemId(itemId);
             if (n != null) {
                 isReloadable = (n.IsItemReloadable()) ? 1 : 0;
             }
@@ -6639,7 +6588,7 @@ If the files in the existing folder have the same names as files in the folder y
         /// <param name="reserved">Reserved.</param>
         /// <returns>If the method succeeds, it returns S_OK. If it fails, it returns an error code. </returns>
         public virtual int ReloadItem(uint itemId, uint reserved) {
-            HierarchyNode n = this.ProjectMgr.NodeFromItemId(itemId);
+            HierarchyNode n = this.NodeFromItemId(itemId);
             if (n != null) {
                 n.ReloadItem(reserved);
             }
@@ -6649,5 +6598,10 @@ If the files in the existing folder have the same names as files in the folder y
 
         #endregion
 
+        public void UpdatePathForDeferredSave(string oldPath, string newPath) {
+            var existing = _diskNodes[oldPath];
+            _diskNodes.Remove(oldPath);
+            _diskNodes.Add(newPath, existing);
+        }
     }
 }

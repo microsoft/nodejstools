@@ -103,6 +103,17 @@ namespace Microsoft.VisualStudioTools.Project
         }
 
         /// <summary>
+        /// Returns true if the item should be included in search results
+        /// 
+        /// By default all items in the project are searchable.
+        /// </summary>
+        public virtual bool IsSearchable {
+            get {
+                return !IsNonMemberItem;
+            }
+        }
+
+        /// <summary>
         /// Gets the full path to where children of this node live on disk.
         /// 
         /// This should only be called on nodes which actually can have children, such
@@ -290,6 +301,20 @@ namespace Microsoft.VisualStudioTools.Project
         }
 
         /// <summary>
+        /// Returns a sequence containing all of this node's children.
+        /// </summary>
+        public IEnumerable<HierarchyNode> AllChildren
+        {
+            get
+            {
+                for (HierarchyNode node = this.firstChild; node != null; node = node.nextSibling)
+                {
+                    yield return node;
+                }
+            }
+        }
+
+        /// <summary>
         /// Gets or sets whether the node is currently visible in the hierarchy.
         /// 
         /// Enables subsetting or supersetting the hierarchy view.
@@ -310,6 +335,19 @@ namespace Microsoft.VisualStudioTools.Project
                 {
                     flags &= ~HierarchyNodeFlags.IsVisible;
                 }
+            }
+        }
+
+        public HierarchyNode PreviousVisibleSibling 
+        {
+            get 
+            {
+                var prev = PreviousSibling;
+                while (prev != null && !prev.IsVisible) 
+                {
+                    prev = prev.PreviousSibling;
+                }
+                return prev;
             }
         }
 
@@ -389,7 +427,17 @@ namespace Microsoft.VisualStudioTools.Project
                 return String.Empty;
             }
 
+            // we use Path.GetFileName and reverse it because it's much faster 
+            // than Path.GetDirectoryName
+            string filename = Path.GetFileName(path);
+            if (path.Substring(0, path.Length - filename.Length).IndexOf('.') != -1) {
+                // possibly non-canonical form...
             return CommonUtils.GetAbsoluteFilePath(this.ProjectMgr.ProjectHome, path);
+        }
+
+            // fast path, we know ProjectHome is canonical, and with no dots
+            // in the directory name, so is path.
+            return Path.Combine(ProjectMgr.ProjectHome, path);
         }
 
         [System.ComponentModel.BrowsableAttribute(false)]
@@ -642,6 +690,10 @@ namespace Microsoft.VisualStudioTools.Project
 
                 case __VSHPROPID.VSHPROPID_IsHiddenItem:
                     result = !IsVisible;
+                    break;
+
+                case __VSHPROPID.VSHPROPID_IsNonSearchable:
+                    result = !IsSearchable;
                     break;
 
                 case __VSHPROPID.VSHPROPID_FirstChild:
@@ -1157,6 +1209,10 @@ namespace Microsoft.VisualStudioTools.Project
         {
             Debug.Assert(this.ProjectMgr != null, " No project mananager available for this node " + ToString());
             Debug.Assert(this.ProjectMgr.ItemsDraggedOrCutOrCopied != null, " The itemsdragged list should have been initialized prior calling this method");
+            if (this.ProjectMgr == null || this.ProjectMgr.ItemsDraggedOrCutOrCopied == null)
+            {
+                return null;
+            }
 
             if (this.hierarchyId == VSConstants.VSITEMID_ROOT)
             {
@@ -1272,7 +1328,7 @@ namespace Microsoft.VisualStudioTools.Project
         {
             IVsUIShell shell = this.projectMgr.Site.GetService(typeof(SVsUIShell)) as IVsUIShell;
 
-            Debug.Assert(shell != null, "Could not get the ui shell from the project");
+            Debug.Assert(shell != null, "Could not get the UI shell from the project");
             if (shell == null)
             {
                 return VSConstants.E_FAIL;
@@ -1542,7 +1598,7 @@ namespace Microsoft.VisualStudioTools.Project
         [SuppressMessage("Microsoft.Naming", "CA1704:IdentifiersShouldBeSpelledCorrectly", MessageId = "Scc")]
         protected internal virtual void GetSccFiles(IList<string> files, IList<tagVsSccFilesFlags> flags)
         {
-            if (this.ExcludeNodeFromScc)
+            if (this.ExcludeNodeFromScc || this.IsNonMemberItem)
             {
                 return;
             }
@@ -1622,47 +1678,49 @@ namespace Microsoft.VisualStudioTools.Project
             nodeProperties = null;
         }
 
-        public void ExpandItem(EXPANDFLAGS flags) {
-            IVsUIHierarchyWindow2 windows = GetUIHierarchyWindow(
+        public void ExpandItem(EXPANDFLAGS flags)
+        {
+            if (ProjectMgr == null || ProjectMgr.Site == null)
+            {
+                return;
+            }
+
+            IVsUIHierarchyWindow2 windows = UIHierarchyUtilities.GetUIHierarchyWindow(
                 ProjectMgr.Site,
                 new Guid(ToolWindowGuids80.SolutionExplorer)) as IVsUIHierarchyWindow2;
+
+            if (windows == null)
+            {
+                return;
+            }
 
             ErrorHandler.ThrowOnFailure(windows.ExpandItem(ProjectMgr.GetOuterInterface<IVsUIHierarchy>(), ID, flags));
         }
 
-        /// <summary>
-        /// Same as VsShellUtilities.GetUIHierarchyWindow, but it doesn't contain a useless cast to IVsWindowPane
-        /// which fails on Dev10 with the solution explorer window.
-        /// </summary>
-        internal static IVsUIHierarchyWindow GetUIHierarchyWindow(System.IServiceProvider serviceProvider, Guid guidPersistenceSlot) {
-            Utilities.ArgumentNotNull("serviceProvider", serviceProvider);
-
-            IVsUIShell service = serviceProvider.GetService(typeof(SVsUIShell)) as IVsUIShell;
-            if (service == null) 
+        public bool GetIsExpanded() {
+            if (ProjectMgr == null || ProjectMgr.Site == null)
             {
-                throw new InvalidOperationException();
+                return false;
             }
 
-            object pvar = null;
-            IVsWindowFrame ppWindowFrame = null;
-            IVsUIHierarchyWindow window = null;
-            try 
+            IVsUIHierarchyWindow2 windows = UIHierarchyUtilities.GetUIHierarchyWindow(
+                ProjectMgr.Site,
+                new Guid(ToolWindowGuids80.SolutionExplorer)) as IVsUIHierarchyWindow2;
+
+            if (windows == null)
             {
-                ErrorHandler.ThrowOnFailure(service.FindToolWindow(0, ref guidPersistenceSlot, out ppWindowFrame));
-                ErrorHandler.ThrowOnFailure(ppWindowFrame.GetProperty((int)__VSFPROPID.VSFPROPID_DocView, out pvar));
+                return false;
             } 
-            catch (COMException exception) 
-            {
-                Trace.WriteLine("Exception :" + exception.Message);
-            } 
-            finally 
-            {
-                if (pvar != null) 
+
+            uint state;
+            if (ErrorHandler.Succeeded(windows.GetItemState(ProjectMgr.GetOuterInterface<IVsUIHierarchy>(),
+                ID,
+                (uint)__VSHIERARCHYITEMSTATE.HIS_Expanded,
+                out state)))
                 {
-                    window = (IVsUIHierarchyWindow)pvar;
-                }
+                return state != 0;
             }
-            return window;
+            return false;
         }
 
         /// <summary>
@@ -1712,7 +1770,14 @@ namespace Microsoft.VisualStudioTools.Project
             // so it'll rescan the children items and see that we're not visible.
             if (!node.IsVisible) 
             {
-                ProjectMgr.OnInvalidateItems(this);
+                if (previous != null) 
+                {
+                    ProjectMgr.OnPropertyChanged(previous, (int)__VSHPROPID.VSHPROPID_NextVisibleSibling, 0);
+                } 
+                else 
+                {
+                    ProjectMgr.OnPropertyChanged(this, (int)__VSHPROPID.VSHPROPID_FirstVisibleChild, 0);
+                }
             }
 #endif
         }
@@ -1721,7 +1786,7 @@ namespace Microsoft.VisualStudioTools.Project
         {
             Utilities.ArgumentNotNull("type", type);
 
-            if (this.projectMgr.Site == null) return null;
+            if (this.projectMgr == null || this.projectMgr.Site == null) return null;
             return this.projectMgr.Site.GetService(type);
         }
 
@@ -1779,12 +1844,14 @@ namespace Microsoft.VisualStudioTools.Project
             }
 
         /// <summary>
-        /// Searches the immediate children of this node for a file who's moniker's filename (w/o path) matches
+        /// Searches the immediate children of this node for a file who's filename (w/o path) matches
         /// the requested name.
         /// </summary>
         internal HierarchyNode FindImmediateChildByName(string name) {
+            Debug.Assert(!String.IsNullOrEmpty(GetMkDocument()));
+
             for (HierarchyNode child = this.firstChild; child != null; child = child.NextSibling) {
-                string filename = Path.GetFileName(CommonUtils.TrimEndSeparator(child.GetMkDocument()));
+                string filename = Path.GetFileName(CommonUtils.TrimEndSeparator(child.ItemNode.GetMetadata(ProjectFileConstants.Include)));
 
                 if (String.Equals(filename, name, StringComparison.OrdinalIgnoreCase)) {
                     return child;
@@ -1800,13 +1867,10 @@ namespace Microsoft.VisualStudioTools.Project
         /// <param name="nodes">A list of nodes of type T</param>
         [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Performance", "CA1811:AvoidUncalledPrivateCode")]
         internal void FindNodesOfType<T>(List<T> nodes)
-            where T : HierarchyNode
-            {
-            for (HierarchyNode n = this.FirstChild; n != null; n = n.NextSibling)
-        {
+            where T : HierarchyNode {
+            for (HierarchyNode n = this.FirstChild; n != null; n = n.NextSibling) {
                 T nodeAsT = n as T;
-                if (nodeAsT != null)
-        {
+                if (nodeAsT != null) {
                     nodes.Add(nodeAsT);
         }
 
@@ -1821,17 +1885,14 @@ namespace Microsoft.VisualStudioTools.Project
         /// <param name="nodes">A list of nodes of type T</param>
         [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Performance", "CA1811:AvoidUncalledPrivateCode")]
         internal IEnumerable<T> EnumNodesOfType<T>()
-            where T : HierarchyNode
-        {
-            for (HierarchyNode n = this.FirstChild; n != null; n = n.NextSibling)
-        {
+            where T : HierarchyNode {
+            for (HierarchyNode n = this.FirstChild; n != null; n = n.NextSibling) {
                 T nodeAsT = n as T;
-                if (nodeAsT != null)
-        {
+                if (nodeAsT != null) {
                     yield return nodeAsT;
         }
 
-                foreach(var node in n.EnumNodesOfType<T>()) {
+                foreach (var node in n.EnumNodesOfType<T>()) {
                     yield return node;
             }
         }
@@ -1855,5 +1916,6 @@ namespace Microsoft.VisualStudioTools.Project
             Link = 4
         };
         #endregion
+
     }
 }

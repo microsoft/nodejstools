@@ -13,7 +13,6 @@
  * ***************************************************************************/
 
 using System;
-using System.Collections.Generic;
 using System.Threading;
 using Microsoft.VisualStudio.OLE.Interop;
 using Microsoft.VisualStudio.Shell.Interop;
@@ -24,7 +23,7 @@ namespace Microsoft.VisualStudioTools.Navigation {
     /// <summary>
     /// Implements a simple library that tracks project symbols, objects etc.
     /// </summary>
-    public class Library : IVsSimpleLibrary2 {
+    class Library : IVsSimpleLibrary2 {
         private Guid _guid;
         private _LIB_FLAGS2 _capabilities;
         private LibraryNode _root;
@@ -32,7 +31,7 @@ namespace Microsoft.VisualStudioTools.Navigation {
 
         public Library(Guid libraryGuid) {
             _guid = libraryGuid;
-            _root = new LibraryNode(String.Empty, String.Empty, LibraryNodeType.Package);
+            _root = new LibraryNode(null, String.Empty, String.Empty, LibraryNodeType.Package);
         }
 
         public _LIB_FLAGS2 LibraryCapabilities {
@@ -84,6 +83,11 @@ namespace Microsoft.VisualStudioTools.Navigation {
         }
 
         public int GetList2(uint ListType, uint flags, VSOBSEARCHCRITERIA2[] pobSrch, out IVsSimpleObjectList2 ppIVsSimpleObjectList2) {
+            if ((flags & (uint)_LIB_LISTFLAGS.LLF_RESOURCEVIEW) != 0) {
+                ppIVsSimpleObjectList2 = null;
+                return VSConstants.E_NOTIMPL;
+            }
+
             ICustomSearchListProvider listProvider;
             if(pobSrch != null && 
                 pobSrch.Length > 0) {
@@ -102,12 +106,13 @@ namespace Microsoft.VisualStudioTools.Navigation {
                         int colonIndex;
                         if ((colonIndex = srchText.LastIndexOf(':')) != -1) {
                             string filename = srchText.Substring(0, srchText.LastIndexOf(':'));
-
-                            foreach (var item in _root.Children) {
-                                if (item.FullName == filename) {
-                                    ppIVsSimpleObjectList2 = item.DoSearch(pobSrch[0]);
-                                    if (ppIVsSimpleObjectList2 != null) {
-                                        return VSConstants.S_OK;
+                            foreach (ProjectLibraryNode project in _root.Children) {
+                                foreach (var item in project.Children) {
+                                    if (item.FullName == filename) {
+                                        ppIVsSimpleObjectList2 = item.DoSearch(pobSrch[0]);
+                                        if (ppIVsSimpleObjectList2 != null) {
+                                            return VSConstants.S_OK;
+                                        }
                                     }
                                 }
                             }
@@ -116,7 +121,7 @@ namespace Microsoft.VisualStudioTools.Navigation {
                         ppIVsSimpleObjectList2 = null;
                         return VSConstants.E_FAIL;
                     } else if (pobSrch[0].eSrchType == VSOBSEARCHTYPE.SO_SUBSTRING && ListType == (uint)_LIB_LISTTYPE.LLT_NAMESPACES) {
-                        var lib = new LibraryNode("Search results " + pobSrch[0].szName, "Search results " + pobSrch[0].szName, LibraryNodeType.Package);
+                        var lib = new LibraryNode(null, "Search results " + pobSrch[0].szName, "Search results " + pobSrch[0].szName, LibraryNodeType.Package);
                         foreach (var item in SearchNodes(pobSrch[0], new SimpleObjectList<LibraryNode>(), _root).Children) {
                             lib.Children.Add(item);
                         }
@@ -177,6 +182,10 @@ namespace Microsoft.VisualStudioTools.Navigation {
             return VSConstants.S_OK;
         }
 
+        public void Update() {
+            _updateCount++;
+            _root.Update();
+        }
         #endregion
     }
 }

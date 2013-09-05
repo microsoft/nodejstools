@@ -58,7 +58,7 @@ namespace Microsoft.VisualStudioTools.Project
             return SR.GetString(value, CultureInfo.CurrentUICulture);
         }
     }
-    internal sealed class SR
+    internal class SR
     {
         internal const string AddReferenceDialogTitle = "AddReferenceDialogTitle";
         internal const string AddToNullProjectError = "AddToNullProjectError";
@@ -159,6 +159,8 @@ namespace Microsoft.VisualStudioTools.Project
         internal const string ProjectFileDescription = "ProjectFileDescription";
         internal const string ProjectFolder = "ProjectFolder";
         internal const string ProjectFolderDescription = "ProjectFolderDescription";
+        internal const string ProjectHome = "ProjectHome";
+        internal const string ProjectHomeDescription = "ProjectHomeDescription";
         internal const string ProjectProperties = "ProjectProperties";
         internal const string Quiet = "Quiet";
         internal const string QueryReloadNestedProject = "QueryReloadNestedProject";
@@ -180,6 +182,7 @@ namespace Microsoft.VisualStudioTools.Project
         internal const string StartupFileDescription = "StartupFileDescription";
         internal const string StartWebBrowser = "StartWebBrowser";
         internal const string StartWebBrowserDescription = "StartWebBrowserDescription";
+        internal const string UnknownInParentheses = "UnknownInParentheses";
         internal const string URL = "URL";
         internal const string UseOfDeletedItemError = "UseOfDeletedItemError";
         internal const string v1 = "v1";

@@ -164,7 +164,7 @@ namespace Microsoft.VisualStudioTools.Project
 
                 //Refresh the properties in the properties window
                 IVsUIShell shell = this.ProjectMgr.GetService(typeof(SVsUIShell)) as IVsUIShell;
-                Debug.Assert(shell != null, "Could not get the ui shell from the project");
+                Utilities.CheckNotNull(shell, "Could not get the UI shell from the project");
                 ErrorHandler.ThrowOnFailure(shell.RefreshPropertyBrowser(0));
 
                 // Notify the listeners that the name of this folder is changed. This will
@@ -266,7 +266,7 @@ namespace Microsoft.VisualStudioTools.Project
         {
             get
             {
-                return CommonUtils.NormalizeDirectoryPath(GetAbsoluteUrlFromMsbuild());
+                return CommonUtils.EnsureEndSeparator(GetAbsoluteUrlFromMsbuild());
             }
         }
 
@@ -436,7 +436,11 @@ namespace Microsoft.VisualStudioTools.Project
         }
 
         void IDiskBasedNode.RenameForDeferredSave(string basePath, string baseNewPath) {
-            ItemNode.Rename(CommonUtils.GetAbsoluteDirectoryPath(baseNewPath, ItemNode.GetMetadata(ProjectFileConstants.Include)));
+            string oldPath = Path.Combine(basePath, ItemNode.GetMetadata(ProjectFileConstants.Include));
+            string newPath = Path.Combine(baseNewPath, ItemNode.GetMetadata(ProjectFileConstants.Include));
+            Directory.CreateDirectory(newPath);
+
+            ProjectMgr.UpdatePathForDeferredSave(oldPath, newPath);
         }
 
         #endregion
@@ -453,7 +457,7 @@ namespace Microsoft.VisualStudioTools.Project
             string oldPath = Url;
             if (!String.Equals(Path.GetFileName(Url), newName, StringComparison.Ordinal))
             {
-                RenameDirectory(CommonUtils.GetAbsoluteDirectoryPath(this.ProjectMgr.ProjectHome, newPath));
+                RenameDirectory(CommonUtils.GetAbsoluteDirectoryPath(ProjectMgr.ProjectHome, newPath));
             }
 
             // Reparent the folder
@@ -461,24 +465,33 @@ namespace Microsoft.VisualStudioTools.Project
             Parent.RemoveChild(this);
             ID = ProjectMgr.ItemIdMap.Add(this);
 
-            ItemNode.Rename(newPath);
+            ItemNode.Rename(CommonUtils.GetRelativeDirectoryPath(ProjectMgr.ProjectHome, newPath));
             ProjectMgr.SetProjectFileDirty(true);
 
             Parent.AddChild(this);
 
-            // Let all children know of the new path
-            for (HierarchyNode child = this.FirstChild; child != null; child = child.NextSibling)
+            var oldTriggerFlag = ProjectMgr.EventTriggeringFlag;
+            ProjectMgr.EventTriggeringFlag |= ProjectNode.EventTriggering.DoNotTriggerTrackerEvents;
+            try 
             {
-                FolderNode node = child as FolderNode;
+                // Let all children know of the new path
+                for (HierarchyNode child = this.FirstChild; child != null; child = child.NextSibling) 
+                {
+                    FolderNode node = child as FolderNode;
 
-                if (node == null)
-                {
-                    child.SetEditLabel(child.GetEditLabel());
+                    if (node == null) 
+                    {
+                        child.SetEditLabel(child.GetEditLabel());
+                    } 
+                    else 
+                    {
+                        node.RenameFolder(node.Caption);
+                    }
                 }
-                else
-                {
-                    node.RenameFolder(node.Caption);
-                }
+            } 
+            finally 
+            {
+                ProjectMgr.EventTriggeringFlag = oldTriggerFlag;
             }
 
             ProjectMgr.Tracker.OnItemRenamed(oldPath, newPath, VSRENAMEFILEFLAGS.VSRENAMEFILEFLAGS_Directory);

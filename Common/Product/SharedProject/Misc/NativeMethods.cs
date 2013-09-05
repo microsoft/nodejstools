@@ -13,6 +13,7 @@
  * ***************************************************************************/
 
 using System;
+using System.Reflection;
 using System.Runtime.InteropServices;
 using System.Text;
 using Microsoft.VisualStudio;
@@ -25,6 +26,8 @@ namespace Microsoft.VisualStudioTools.Project {
     internal static class NativeMethods {
         // IIDS
         public static readonly Guid IID_IUnknown = new Guid("{00000000-0000-0000-C000-000000000046}");
+
+        public const int ERROR_FILE_NOT_FOUND = 2;
 
         public const int
         CLSCTX_INPROC_SERVER = 0x1;
@@ -747,14 +750,40 @@ namespace Microsoft.VisualStudioTools.Project {
         [DllImport("user32.dll", EntryPoint = "IsDialogMessageA", SetLastError = true, CharSet = CharSet.Ansi, ExactSpelling = true, CallingConvention = CallingConvention.StdCall)]
         public static extern bool IsDialogMessageA(IntPtr hDlg, ref MSG msg);
 
-        /// <summary>
-        /// Indicates whether the file type is binary or not
-        /// </summary>
-        /// <param name="lpApplicationName">Full path to the file to check</param>
-        /// <param name="lpBinaryType">If file isbianry the bitness of the app is indicated by lpBinaryType value.</param>
-        /// <returns>True if the file is binary false otherwise</returns>
-        [DllImport("kernel32.dll")]
-        public static extern bool GetBinaryType([MarshalAs(UnmanagedType.LPWStr)]string lpApplicationName, out uint lpBinaryType);
+        [DllImport("kernel32", EntryPoint = "GetBinaryTypeW", CharSet = CharSet.Unicode, CallingConvention = CallingConvention.Winapi)]
+        private static extern bool _GetBinaryType(string lpApplicationName, out GetBinaryTypeResult lpBinaryType);
+
+        private enum GetBinaryTypeResult : uint {
+            SCS_32BIT_BINARY = 0,
+            SCS_DOS_BINARY = 1,
+            SCS_WOW_BINARY = 2,
+            SCS_PIF_BINARY = 3,
+            SCS_POSIX_BINARY = 4,
+            SCS_OS216_BINARY = 5,
+            SCS_64BIT_BINARY = 6
+        }
+
+        public static ProcessorArchitecture GetBinaryType(string path) {
+            GetBinaryTypeResult result;
+
+            if (_GetBinaryType(path, out result)) {
+                switch (result) {
+                    case GetBinaryTypeResult.SCS_32BIT_BINARY:
+                        return ProcessorArchitecture.X86;
+                    case GetBinaryTypeResult.SCS_64BIT_BINARY:
+                        return ProcessorArchitecture.Amd64;
+                    case GetBinaryTypeResult.SCS_DOS_BINARY:
+                    case GetBinaryTypeResult.SCS_WOW_BINARY:
+                    case GetBinaryTypeResult.SCS_PIF_BINARY:
+                    case GetBinaryTypeResult.SCS_POSIX_BINARY:
+                    case GetBinaryTypeResult.SCS_OS216_BINARY:
+                    default:
+                        break;
+                }
+            }
+
+            return ProcessorArchitecture.None;
+        }
 
 
         [DllImport("advapi32.dll", CharSet = CharSet.Auto, SetLastError = true)]
@@ -864,6 +893,14 @@ namespace Microsoft.VisualStudioTools.Project {
             Source = 4,  // run from source, CD or net
             Default = 5  // use default, local or source
         }
+
+
+        [DllImport("comctl32.dll", SetLastError = true)]
+        internal static extern int TaskDialogIndirect(
+            ref TASKDIALOGCONFIG pTaskConfig,
+            out int pnButton,
+            out int pnRadioButton,
+            [MarshalAs(UnmanagedType.Bool)] out bool pfverificationFlagChecked);
     }
 
 
@@ -1072,6 +1109,80 @@ namespace Microsoft.VisualStudioTools.Project {
         int SetHelpFile(string szHelpFile);
 
         int SetHelpContext(uint dwHelpContext);
+    }
+
+    internal enum TASKDIALOG_FLAGS {
+        TDF_ENABLE_HYPERLINKS = 0x0001,
+        TDF_USE_HICON_MAIN = 0x0002,
+        TDF_USE_HICON_FOOTER = 0x0004,
+        TDF_ALLOW_DIALOG_CANCELLATION = 0x0008,
+        TDF_USE_COMMAND_LINKS = 0x0010,
+        TDF_USE_COMMAND_LINKS_NO_ICON = 0x0020,
+        TDF_EXPAND_FOOTER_AREA = 0x0040,
+        TDF_EXPANDED_BY_DEFAULT = 0x0080,
+        TDF_VERIFICATION_FLAG_CHECKED = 0x0100,
+        TDF_SHOW_PROGRESS_BAR = 0x0200,
+        TDF_SHOW_MARQUEE_PROGRESS_BAR = 0x0400,
+        TDF_CALLBACK_TIMER = 0x0800,
+        TDF_POSITION_RELATIVE_TO_WINDOW = 0x1000,
+        TDF_RTL_LAYOUT = 0x2000,
+        TDF_NO_DEFAULT_RADIO_BUTTON = 0x4000,
+        TDF_CAN_BE_MINIMIZED = 0x8000,
+        TDF_SIZE_TO_CONTENT = 0x01000000
+    }
+
+    internal enum TASKDIALOG_COMMON_BUTTON_FLAGS {
+        TDCBF_OK_BUTTON = 0x0001,
+        TDCBF_YES_BUTTON = 0x0002,
+        TDCBF_NO_BUTTON = 0x0004,
+        TDCBF_CANCEL_BUTTON = 0x0008,
+        TDCBF_RETRY_BUTTON = 0x0010,
+        TDCBF_CLOSE_BUTTON = 0x0020
+    }
+
+    internal delegate int PFTASKDIALOGCALLBACK(IntPtr hwnd, uint uNotification, UIntPtr wParam, IntPtr lParam, IntPtr lpRefData);
+
+    [StructLayout(LayoutKind.Sequential, CharSet = CharSet.Unicode)]
+    internal struct TASKDIALOG_BUTTON {
+        public int nButtonID;
+        [MarshalAs(UnmanagedType.LPWStr)]
+        public string pszButtonText;
+    }
+
+    [StructLayout(LayoutKind.Sequential, CharSet = CharSet.Unicode)]
+    internal struct TASKDIALOGCONFIG {
+        public uint cbSize;
+        public IntPtr hwndParent;
+        public IntPtr hInstance;
+        public TASKDIALOG_FLAGS dwFlags;
+        public TASKDIALOG_COMMON_BUTTON_FLAGS dwCommonButtons;
+        [MarshalAs(UnmanagedType.LPWStr)]
+        public string pszWindowTitle;
+        public IntPtr hMainIcon;
+        [MarshalAs(UnmanagedType.LPWStr)]
+        public string pszMainInstruction;
+        [MarshalAs(UnmanagedType.LPWStr)]
+        public string pszContent;
+        public uint cButtons;
+        public IntPtr pButtons;
+        public int nDefaultButton;
+        public uint cRadioButtons;
+        public IntPtr pRadioButtons;
+        public int nDefaultRadioButton;
+        [MarshalAs(UnmanagedType.LPWStr)]
+        public string pszVerificationText;
+        [MarshalAs(UnmanagedType.LPWStr)]
+        public string pszExpandedInformation;
+        [MarshalAs(UnmanagedType.LPWStr)]
+        public string pszExpandedControlText;
+        [MarshalAs(UnmanagedType.LPWStr)]
+        public string pszCollapsedControlText;
+        public IntPtr hFooterIcon;
+        [MarshalAs(UnmanagedType.LPWStr)]
+        public string pszFooter;
+        public PFTASKDIALOGCALLBACK pfCallback;
+        public IntPtr lpCallbackData;
+        public uint cxWidth;
     }
 }
 

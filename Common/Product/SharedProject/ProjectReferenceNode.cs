@@ -278,7 +278,8 @@ namespace Microsoft.VisualStudioTools.Project
                 // Now get the name of the assembly from the project.
                 // Some project system throw if the property does not exist. We expect an ArgumentException.
                 EnvDTE.Property assemblyNameProperty = null;
-                if (ReferencedProjectObject != null)
+                if (ReferencedProjectObject != null && 
+                    !(ReferencedProjectObject is Automation.OAProject)) // our own projects don't have assembly names
                 {
                     try
                     {
@@ -474,7 +475,7 @@ namespace Microsoft.VisualStudioTools.Project
                 return false;
             }
 
-            return (!String.IsNullOrEmpty(this.referencedProjectFullPath) && File.Exists(this.referencedProjectFullPath));
+            return File.Exists(this.referencedProjectFullPath);
         }
 
         /// <summary>
@@ -528,7 +529,7 @@ namespace Microsoft.VisualStudioTools.Project
             {
                 IReferenceContainer referenceContainer = provider.GetReferenceContainer();
 
-                Debug.Assert(referenceContainer != null, "Could not found the References virtual node");
+                Utilities.CheckNotNull(referenceContainer, "Could not found the References virtual node");
 
                 foreach (ReferenceNode refNode in referenceContainer.EnumReferences())
                 {

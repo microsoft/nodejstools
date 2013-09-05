@@ -38,6 +38,31 @@ namespace Microsoft.VisualStudioTools.Project {
     internal partial class ProjectNode : IVsUIHierWinClipboardHelperEvents {
         private uint copyPasteCookie;
         private DropDataType _dropType;
+        /// <summary>
+        /// Current state of whether we have initiated a cut/copy from within our hierarchy.
+        /// </summary>
+        private CopyCutState _copyCutState;
+        /// <summary>
+        /// True if we initiated a drag from within our project, false if the drag
+        /// was initiated from another project or there is currently no drag/drop operation
+        /// in progress.
+        /// </summary>
+        private bool _dragging;
+
+        enum CopyCutState {
+            /// <summary>
+            /// Nothing has been copied to the clipboard from our project
+            /// </summary>
+            None,
+            /// <summary>
+            /// Something was cut from our project
+            /// </summary>
+            Cut,
+            /// <summary>
+            /// Something was copied from our project
+            /// </summary>
+            Copied
+        }
 
         #region override of IVsHierarchyDropDataTarget methods
         /// <summary>
@@ -153,7 +178,7 @@ namespace Microsoft.VisualStudioTools.Project {
             }
 
             ItemsDraggedOrCutOrCopied.Clear();
-            SourceDraggedOrCutOrCopied = CopyPasteDragSource.None;
+            _dragging = false;
 
             return returnValue;
         }
@@ -184,8 +209,7 @@ namespace Microsoft.VisualStudioTools.Project {
                 return VSConstants.E_NOTIMPL;
             }
 
-            SourceDraggedOrCutOrCopied = CopyPasteDragSource.Dragged;
-
+            _dragging = true;
             pdwOKEffects = (uint)(DropEffect.Move | DropEffect.Copy);
 
             ppDataObject = dataObject;
@@ -200,18 +224,13 @@ namespace Microsoft.VisualStudioTools.Project {
         /// The value of dwEffects passed to the source object via OnDropNotify method is the value of pdwEffects returned by Drop method.</param>
         /// <returns>If the method succeeds, it returns S_OK. If it fails, it returns an error code. </returns>
         public int OnDropNotify(int fDropped, uint dwEffects) {
-            if (SourceDraggedOrCutOrCopied == CopyPasteDragSource.None) {
-                return VSConstants.S_FALSE;
-            }
-
             if (dwEffects == (uint)DropEffect.Move) {
                 foreach (var item in ItemsDraggedOrCutOrCopied) {
                     item.Remove(true);
                 }
             }
             ItemsDraggedOrCutOrCopied.Clear();
-
-            SourceDraggedOrCutOrCopied = CopyPasteDragSource.None;
+            _dragging = false;
 
             return VSConstants.S_OK;
         }
@@ -302,15 +321,15 @@ namespace Microsoft.VisualStudioTools.Project {
         /// These should be the same visual effects used in OnDropNotify</param>
         /// <returns>If the method succeeds, it returns S_OK. If it fails, it returns an error code. </returns>
         public virtual int OnPaste(int wasCut, uint dropEffect) {
-            if (SourceDraggedOrCutOrCopied == CopyPasteDragSource.None) {
-                return VSConstants.S_FALSE;
-            }
-
             if (dropEffect == (uint)DropEffect.None) {
                 return OnClear(wasCut);
             }
 
-            if (wasCut != 0 || dropEffect == (uint)DropEffect.Move) {
+            // Check both values here.  If the paste is coming from another project system then
+            // they should always pass Move, and we'll know whether or not it's a cut from wasCut.
+            // If they copied it from the project system wasCut will be false, and DropEffect
+            // will still be Move, resulting in a copy.
+            if (wasCut != 0 && dropEffect == (uint)DropEffect.Move) {
                 // If we just did a cut, then we need to free the data object. Otherwise, we leave it
                 // alone so that you can continue to paste the data in new locations.
                 CleanAndFlushClipboard();
@@ -318,9 +337,9 @@ namespace Microsoft.VisualStudioTools.Project {
                     node.Remove(true);
                 }
                 ItemsDraggedOrCutOrCopied.Clear();
+                ClearCopyCutState();
             }
 
-            this.SourceDraggedOrCutOrCopied = CopyPasteDragSource.None;
             return VSConstants.S_OK;
         }
 
@@ -331,10 +350,6 @@ namespace Microsoft.VisualStudioTools.Project {
         /// rather than Copy (false), so the source knows whether to "un-cut-highlight" the items that were cut.</param>
         /// <returns>If the method succeeds, it returns S_OK. If it fails, it returns an error code. </returns>
         public virtual int OnClear(int wasCut) {
-            if (SourceDraggedOrCutOrCopied == CopyPasteDragSource.None) {
-                return VSConstants.S_FALSE;
-            }
-
             if (wasCut != 0) {
                 IVsUIHierarchyWindow w = UIHierarchyUtilities.GetUIHierarchyWindow(this.site, HierarchyNode.SolutionExplorer);
                 if (w != null) {
@@ -346,7 +361,7 @@ namespace Microsoft.VisualStudioTools.Project {
 
             ItemsDraggedOrCutOrCopied.Clear();
 
-            this.SourceDraggedOrCutOrCopied = CopyPasteDragSource.None;
+            ClearCopyCutState();
             return VSConstants.S_OK;
         }
         #endregion
@@ -428,7 +443,8 @@ namespace Microsoft.VisualStudioTools.Project {
 
             public ProjectReferenceFileAdder(ProjectNode project, HierarchyNode targetNode, string[] projectReferences, bool mouseDropping, DropEffect dropEffect) {
                 Utilities.ArgumentNotNull("targetNode", targetNode);
-                Debug.Assert(project != null);
+                Utilities.ArgumentNotNull("project", project);
+                Utilities.ArgumentNotNull("projectReferences", projectReferences);
 
                 TargetNode = targetNode;
                 Project = project;
@@ -633,7 +649,7 @@ folder you are copying, do you want to replace the existing files?", Path.GetFil
             /// <param name="targetNode">Node to start adding to</param>
             /// <param name="addSibblings">Typically false on first call and true after that</param>
             private bool WalkSourceProjectAndAdd(IVsHierarchy sourceHierarchy, uint itemId, string targetPath, bool addSiblings, List<Addition> additions, string name = null) {
-                Debug.Assert(sourceHierarchy != null);
+                Utilities.ArgumentNotNull("sourceHierarchy", sourceHierarchy);
 
                 if (itemId != VSConstants.VSITEMID_NIL) {
                     // Before we start the walk, add the current node
@@ -751,14 +767,14 @@ folder you are copying, do you want to replace the existing files?", Path.GetFil
                     }
 
                     var sourceFolder = Project.FindNodeByFullPath(SourceFolder);
-                    if (sourceFolder != null && sourceFolder.IsNonMemberItem) {
-                        // copying or moving an existing excluded folder, new folder
-                        // is excluded too.
-                        ErrorHandler.ThrowOnFailure(newNode.ExcludeFromProject());
-                    }
-
-                    if (DropEffect == DropEffect.Move) {
-                        sourceFolder.Remove(true);
+                    if (sourceFolder != null) {
+                        if (sourceFolder.IsNonMemberItem) {
+                            // copying or moving an existing excluded folder, new folder
+                            // is excluded too.
+                            ErrorHandler.ThrowOnFailure(newNode.ExcludeFromProject());
+                        } else if (DropEffect == DropEffect.Move) {
+                            sourceFolder.Remove(true);
+                        }
                     }
                 }
             }
@@ -1087,6 +1103,9 @@ folder you are copying, do you want to replace the existing files?", Path.GetFil
 
                                 targetFolder.AddChild(fileNode);
                             }
+                        } else if (existing.IsNonMemberItem) {
+                            // replacing item that already existed, just include it in the project.
+                            existing.IncludeInProject(false);
                         }
                     }
 
@@ -1158,7 +1177,7 @@ folder you are copying, do you want to replace the existing files?", Path.GetFil
             // Create our data object and change the selection to show item(s) being cut
             IOleDataObject dataObject = this.PackageSelectionDataObject(true);
             if (dataObject != null) {
-                this.SourceDraggedOrCutOrCopied = CopyPasteDragSource.Cut;
+                _copyCutState = CopyCutState.Cut;
 
                 // Add our cut item(s) to the clipboard
                 ErrorHandler.ThrowOnFailure(UnsafeNativeMethods.OleSetClipboard(dataObject));
@@ -1185,7 +1204,7 @@ folder you are copying, do you want to replace the existing files?", Path.GetFil
             // Create our data object and change the selection to show item(s) being copy
             IOleDataObject dataObject = this.PackageSelectionDataObject(false);
             if (dataObject != null) {
-                this.SourceDraggedOrCutOrCopied = CopyPasteDragSource.Copied;
+                _copyCutState = CopyCutState.Copied;
 
                 // Add our copy item(s) to the clipboard
                 ErrorHandler.ThrowOnFailure(UnsafeNativeMethods.OleSetClipboard(dataObject));
@@ -1227,7 +1246,13 @@ folder you are copying, do you want to replace the existing files?", Path.GetFil
                 DropEffect dropEffect = DropEffect.None;
                 DropDataType dropDataType = DropDataType.None;
                 try {
-                    dropEffect = SourceDraggedOrCutOrCopied == CopyPasteDragSource.Cut ? DropEffect.Move : DropEffect.Copy;
+                    // if we didn't initiate the cut, default to Move.  If we're dragging to another
+                    // project then their IVsUIHierWinClipboardHelperEvents.OnPaste method will
+                    // check both the drop effect AND whether or not a cut was initiated, and only
+                    // do a move if both are true.  Otherwise if we have a value non-None _copyCurState the
+                    // cut/copy initiated from within our project system and we're now pasting
+                    // back into ourselves, so we should simply respect it's value.
+                    dropEffect = _copyCutState == CopyCutState.Copied ? DropEffect.Copy : DropEffect.Move;
                     dropDataType = this.ProcessSelectionDataObject(dataObject, targetNode, false, dropEffect);
                     if (dropDataType == DropDataType.None) {
                         dropEffect = DropEffect.None;
@@ -1241,8 +1266,8 @@ folder you are copying, do you want to replace the existing files?", Path.GetFil
                         throw;
                     }
                 } finally {
-                    // Inform VS (UiHierarchyWindow) of the paste
-                    returnValue = clipboardHelper.Paste(dataObject, (uint)(SourceDraggedOrCutOrCopied == CopyPasteDragSource.None ? DropEffect.Move : dropEffect));
+                    // Inform VS (UiHierarchyWindow) of the paste 
+                    returnValue = clipboardHelper.Paste(dataObject, (uint)dropEffect);
                 }
             } catch (COMException e) {
                 Trace.WriteLine("Exception : " + e.Message);
@@ -1313,7 +1338,7 @@ folder you are copying, do you want to replace the existing files?", Path.GetFil
         /// </summary>
         /// <remarks>The targetNode is set if the method is called from a drop operation, otherwise it is null</remarks>
         internal DropDataType ProcessSelectionDataObject(IOleDataObject dataObject, HierarchyNode targetNode, bool drop, DropEffect dropEffect) {
-            Debug.Assert(targetNode != null);
+            Utilities.ArgumentNotNull("targetNode", targetNode);
 
             DropDataType dropDataType = DropDataType.None;
             bool isWindowsFormat = false;
@@ -1417,23 +1442,23 @@ folder you are copying, do you want to replace the existing files?", Path.GetFil
         internal void AddExistingDirectories(HierarchyNode node, string[] filesDropped) {
             List<KeyValuePair<HierarchyNode, HierarchyNode>> addedItems = new List<KeyValuePair<HierarchyNode, HierarchyNode>>();
 
-            var oldTriggerFlag = this.ProjectMgr.EventTriggeringFlag;
-            ProjectMgr.EventTriggeringFlag |= ProjectNode.EventTriggering.DoNotTriggerHierarchyEvents;
+            var oldTriggerFlag = this.EventTriggeringFlag;
+            EventTriggeringFlag |= ProjectNode.EventTriggering.DoNotTriggerHierarchyEvents;
             try {
 
                 foreach (var dir in filesDropped) {
                     AddExistingDirectory(GetOrAddDirectory(node, addedItems, dir), dir, addedItems);
                 }
             } finally {
-                ProjectMgr.EventTriggeringFlag = oldTriggerFlag;
+                EventTriggeringFlag = oldTriggerFlag;
             }
 
             if (addedItems.Count > 0) {
                 foreach (var item in addedItems) {
-                    ProjectMgr.OnItemAdded(item.Key, item.Value);
+                    OnItemAdded(item.Key, item.Value);
                     this.tracker.OnItemAdded(item.Value.Url, VSADDFILEFLAGS.VSADDFILEFLAGS_NoFlags);
                 }
-                ProjectMgr.OnInvalidateItems(node);
+                OnInvalidateItems(node);
                 SetProjectFileDirty(true);
             }
         }
@@ -1448,7 +1473,7 @@ folder you are copying, do you want to replace the existing files?", Path.GetFil
             foreach (var file in Directory.GetFiles(path)) {
                 var existingFile = node.FindImmediateChildByName(Path.GetFileName(file));
                 if (existingFile == null) {
-                    existingFile = ProjectMgr.CreateFileNode(file);
+                    existingFile = CreateFileNode(file);
                     addedItems.Add(new KeyValuePair<HierarchyNode, HierarchyNode>(node, existingFile));
                     node.AddChild(existingFile);
                 }
@@ -1458,7 +1483,7 @@ folder you are copying, do you want to replace the existing files?", Path.GetFil
         private HierarchyNode GetOrAddDirectory(HierarchyNode node, List<KeyValuePair<HierarchyNode, HierarchyNode>> addedItems, string dir) {
             var existingDir = node.FindImmediateChildByName(Path.GetFileName(dir));
             if (existingDir == null) {
-                existingDir = ProjectMgr.CreateFolderNode(dir);
+                existingDir = CreateFolderNode(dir);
                 addedItems.Add(new KeyValuePair<HierarchyNode, HierarchyNode>(node, existingDir));
                 node.AddChild(existingDir);
             }
@@ -1530,11 +1555,12 @@ folder you are copying, do you want to replace the existing files?", Path.GetFil
                 return DropEffect.Move;
 
             // no modifier
-            if (SourceDraggedOrCutOrCopied == CopyPasteDragSource.Cut ||
-                (ItemsDraggedOrCutOrCopied != null &&
-                ItemsDraggedOrCutOrCopied.Count > 0)) {
+            if (_dragging) {
+                // we are dragging from our project to our project, default to a Move
                 return DropEffect.Move;
             } else {
+                // we are dragging, but we didn't initiate it, so it's cross project.  Default to
+                // a copy.
                 return DropEffect.Copy;
             }
         }
@@ -1626,5 +1652,14 @@ folder you are copying, do you want to replace the existing files?", Path.GetFil
         }
 
         #endregion
+
+        /// <summary>
+        /// Clears our current copy/cut state - happens after a paste
+        /// </summary>
+        private void ClearCopyCutState() {
+            _copyCutState = CopyCutState.None;
+        }
+
+        
     }
 }

@@ -60,7 +60,7 @@ namespace Microsoft.VisualStudio.Repl {
             foreach (var provider in _evaluators) {
                 var evaluator = provider.GetEvaluator(replId);
                 if (evaluator != null) {
-                    string[] roles = provider.GetType().GetCustomAttributes(typeof(ReplRoleAttribute), true).Select(r => ((ReplRoleAttribute)r).Name).ToArray();
+                    string[] roles = evaluator.GetType().GetCustomAttributes(typeof(ReplRoleAttribute), true).Select(r => ((ReplRoleAttribute)r).Name).ToArray();
                     window = CreateReplWindowInternal(evaluator, contentType, roles, curId, title, languageServiceGuid, replId);
                     if ((null == window) || (null == window.Frame)) {
                         throw new NotSupportedException(Resources.CanNotCreateWindow);
@@ -93,7 +93,7 @@ namespace Microsoft.VisualStudio.Repl {
                 var evaluator = provider.GetEvaluator(replId);
 
                 if (evaluator != null) {
-                    roles = provider.GetType().GetCustomAttributes(typeof(ReplRoleAttribute), true).Select(r => ((ReplRoleAttribute)r).Name).ToArray();
+                    roles = evaluator.GetType().GetCustomAttributes(typeof(ReplRoleAttribute), true).Select(r => ((ReplRoleAttribute)r).Name).ToArray();
                     return evaluator;
                 }
             }
@@ -216,9 +216,13 @@ namespace Microsoft.VisualStudio.Repl {
             // we don't pass __VSCREATETOOLWIN.CTW_fMultiInstance because multi instance panes are
             // destroyed when closed.  We are really multi instance but we don't want to be closed.  This
             // seems to work fine.
+            var creationFlags = __VSCREATETOOLWIN.CTW_fInitNew;
+            if (!roles.Contains("DontPersist")) {
+                creationFlags |= __VSCREATETOOLWIN.CTW_fForceCreate;
+            }
             ErrorHandler.ThrowOnFailure(
                 service.CreateToolWindow(
-                    (uint)(__VSCREATETOOLWIN.CTW_fInitNew | __VSCREATETOOLWIN.CTW_fForceCreate),
+                    (uint)(creationFlags),
                     (uint)id,
                     replWindow.GetIVsWindowPane(),
                     ref clsId,

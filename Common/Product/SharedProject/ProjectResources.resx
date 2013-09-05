@@ -289,24 +289,6 @@ Files and folders cannot be:
   <data name="None" xml:space="preserve">
     <value>None</value>
   </data>
-  <data name="NodeExeArguments" xml:space="preserve">
-    <value>Node.exe arguments</value>
-  </data>
-  <data name="NodeExeArgumentsDescription" xml:space="preserve">
-    <value>Arguments passed to node.exe to be consumed by node, not the script</value>
-  </data>
-  <data name="NodeExePath" xml:space="preserve">
-    <value>Node.exe path</value>
-  </data>
-  <data name="NodeExePathDescription" xml:space="preserve">
-    <value>The path to Node.exe</value>
-  </data>
-  <data name="NodejsPort" xml:space="preserve">
-    <value>Node.js Port</value>
-  </data>
-  <data name="NodejsPortDescription" xml:space="preserve">
-    <value>The value specified for the process.env.port</value>
-  </data>
   <data name="Normal" xml:space="preserve">
     <value>Normal</value>
   </data>
@@ -594,5 +576,14 @@ Files and folders cannot be:
   </data>
   <data name="PathTooLongShortMessage" xml:space="preserve">
     <value>The filename or extension is too long.</value>
+  </data>
+  <data name="ProjectHome" xml:space="preserve">
+    <value>Project Home</value>
+  </data>
+  <data name="ProjectHomeDescription" xml:space="preserve">
+    <value>The base location for all files in the project</value>
+  </data>
+  <data name="UnknownInParentheses" xml:space="preserve">
+    <value>(Unknown)</value>
   </data>
 </root>

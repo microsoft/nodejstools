@@ -85,7 +85,7 @@ namespace Microsoft.Nodejs.Tests.UI {
             var id = itemNode.ID;
 
             // make sure we're still expanded.
-            var solutionWindow = HierarchyNode.GetUIHierarchyWindow(
+            var solutionWindow = UIHierarchyUtilities.GetUIHierarchyWindow(
                 VsIdeTestHostContext.ServiceProvider,
                 new Guid(ToolWindowGuids80.SolutionExplorer)
             );

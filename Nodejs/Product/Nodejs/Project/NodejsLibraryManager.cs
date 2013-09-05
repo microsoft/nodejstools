@@ -34,12 +34,12 @@ namespace Microsoft.NodejsTools.Project {
             _package = package;
         }
 
-        protected override LibraryNode CreateLibraryNode(IScopeNode subItem, string namePrefix, IVsHierarchy hierarchy, uint itemid) {
-            return new NodeLibraryNode(subItem, namePrefix, hierarchy, itemid);
+        protected override LibraryNode CreateLibraryNode(LibraryNode parent, IScopeNode subItem, string namePrefix, IVsHierarchy hierarchy, uint itemid) {
+            return new NodeLibraryNode(parent, subItem, namePrefix, hierarchy, itemid);
         }
 
-        public override LibraryNode CreateFileLibraryNode(HierarchyNode hierarchy, string name, string filename, LibraryNodeType libraryNodeType) {
-            return new NodeFileLibraryNode(hierarchy, hierarchy.Caption, filename, libraryNodeType);
+        public override LibraryNode CreateFileLibraryNode(LibraryNode parent, HierarchyNode hierarchy, string name, string filename, LibraryNodeType libraryNodeType) {
+            return new NodeFileLibraryNode(parent, hierarchy, hierarchy.Caption, filename, libraryNodeType);
         }
 
         protected override void OnNewFile(LibraryTask task) {

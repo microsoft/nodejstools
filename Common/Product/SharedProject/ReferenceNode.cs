@@ -115,15 +115,6 @@ namespace Microsoft.VisualStudioTools.Project
         }
 
         /// <summary>
-        /// This method is called by the interface method GetMkDocument to specify the item moniker.
-        /// </summary>
-        /// <returns>The moniker for this item</returns>
-        public override string GetMkDocument()
-        {
-            return this.Url;
-        }
-
-        /// <summary>
         /// Not supported.
         /// </summary>
         internal override int ExcludeFromProject()
@@ -189,7 +180,7 @@ namespace Microsoft.VisualStudioTools.Project
         public virtual void AddReference()
         {
             ReferenceContainerNode referencesFolder = this.ProjectMgr.GetReferenceContainer() as ReferenceContainerNode;
-            Debug.Assert(referencesFolder != null, "Could not find the References node");
+            Utilities.CheckNotNull(referencesFolder, "Could not find the References node");
 
             CannotAddReferenceErrorMessage referenceErrorMessageHandler = null;
 
@@ -255,7 +246,7 @@ namespace Microsoft.VisualStudioTools.Project
         protected virtual bool IsAlreadyAdded()
         {
             ReferenceContainerNode referencesFolder = this.ProjectMgr.GetReferenceContainer() as ReferenceContainerNode;
-            Debug.Assert(referencesFolder != null, "Could not find the References node");
+            Utilities.CheckNotNull(referencesFolder, "Could not find the References node");
 
             for (HierarchyNode n = referencesFolder.FirstChild; n != null; n = n.NextSibling)
             {
@@ -280,7 +271,7 @@ namespace Microsoft.VisualStudioTools.Project
         /// <returns></returns>
         protected virtual int ShowObjectBrowser()
         {
-            if (String.IsNullOrEmpty(this.Url) || !File.Exists(this.Url))
+            if (!File.Exists(this.Url))
             {
                 return (int)OleConstants.OLECMDERR_E_NOTSUPPORTED;
             }

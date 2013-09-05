@@ -86,12 +86,6 @@ namespace Microsoft.VisualStudioTools.Project {
 
         #region overridden properties
 
-        public override bool IsNonMemberItem {
-            get {
-                return ItemNode is AllFilesProjectElement;
-            }
-        }
-
         internal override object Object {
             get {
                 return this.VSProjectItem;
@@ -125,7 +119,7 @@ namespace Microsoft.VisualStudioTools.Project {
         /// </summary>
         protected override void DoDefaultAction() {
             FileDocumentManager manager = this.GetDocumentManager() as FileDocumentManager;
-            Debug.Assert(manager != null, "Could not get the FileDocumentManager");
+            Utilities.CheckNotNull(manager, "Could not get the FileDocumentManager");
 
             Guid viewGuid =
                 (IsFormSubType ? VSConstants.LOGVIEWID_Designer : VSConstants.LOGVIEWID_Code);
@@ -256,7 +250,7 @@ namespace Microsoft.VisualStudioTools.Project {
 
             ResetNodeProperties();
             ItemNode.RemoveFromProjectFile();
-            if (!File.Exists(Url) || IsLinkFile) {
+            if (!File.Exists(Url)) {
                 Parent.RemoveChild(this);
                 ProjectMgr.OnItemDeleted(this);
             } else {
@@ -266,6 +260,7 @@ namespace Microsoft.VisualStudioTools.Project {
                     ProjectMgr.OnInvalidateItems(Parent);
                 }
                 ProjectMgr.ReDrawNode(this, UIHierarchyElement.Icon);
+                ProjectMgr.OnPropertyChanged(this, (int)__VSHPROPID.VSHPROPID_IsNonMemberItem, 0);
             }
             return VSConstants.S_OK;
         }
@@ -285,15 +280,14 @@ namespace Microsoft.VisualStudioTools.Project {
             }
 
             ResetNodeProperties();
-            ItemNode = ProjectMgr.AddFileToMsBuild(Url);
+            ItemNode = ProjectMgr.CreateMsBuildFileItem(
+                CommonUtils.GetRelativeFilePath(ProjectMgr.ProjectHome, Url),
+                ProjectMgr.IsCodeFile(Url) ? ProjectFileConstants.Compile : ProjectFileConstants.Content
+            );
             IsVisible = true;
-            ProjectMgr.OnInvalidateItems(this);
+            ProjectMgr.OnInvalidateItems(Parent);
             ProjectMgr.ReDrawNode(this, UIHierarchyElement.Icon);
-
-            if (CommonUtils.IsSamePath(ProjectMgr.GetStartupFile(), Url)) {
-                ProjectMgr.BoldItem(this, true);
-            }
-
+            ProjectMgr.OnPropertyChanged(this, (int)__VSHPROPID.VSHPROPID_IsNonMemberItem, 0);
             return VSConstants.S_OK;
         }
 
@@ -309,7 +303,7 @@ namespace Microsoft.VisualStudioTools.Project {
                     case VsCommands2K.EXCLUDEFROMPROJECT:
                         if (ItemNode.IsExcluded) {
                             result |= QueryStatusResult.NOTSUPPORTED | QueryStatusResult.INVISIBLE;
-                            return VSConstants.S_OK;
+                        return VSConstants.S_OK;
                         }
                         break;
                     case VsCommands2K.INCLUDEINPROJECT:

@@ -15,6 +15,7 @@
 
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Diagnostics.CodeAnalysis;
 using System.Drawing;
 using System.Globalization;
@@ -132,11 +133,11 @@ namespace Microsoft.VisualStudioTools.Project
             return guids.ToArray();
         }
 
-        internal static void CheckNotNull(object value)
+        internal static void CheckNotNull(object value, string message = null)
         {
             if (value == null)
             {
-                throw new InvalidOperationException();
+                throw new InvalidOperationException(message);
             }
         }
 
@@ -672,7 +673,6 @@ namespace Microsoft.VisualStudioTools.Project
             }
         }
 
-
         /// <summary>
         /// Canonicalizes a file name, including:
         ///  - determines the full path to the file
@@ -712,5 +712,23 @@ namespace Microsoft.VisualStudioTools.Project
             return (String.Equals(extension, ".vstemplate", StringComparison.OrdinalIgnoreCase) || string.Equals(extension, ".vsz", StringComparison.OrdinalIgnoreCase));
         }
 
+        /// <summary>
+        /// Save dirty files
+        /// </summary>
+        /// <returns>Whether succeeded</returns>
+        public static bool SaveDirtyFiles() {
+            var rdt = ServiceProvider.GlobalProvider.GetService(typeof(SVsRunningDocumentTable)) as IVsRunningDocumentTable;
+            if (rdt != null) {
+                // Consider using (uint)(__VSRDTSAVEOPTIONS.RDTSAVEOPT_SaveIfDirty | __VSRDTSAVEOPTIONS.RDTSAVEOPT_PromptSave)
+                // when VS settings include prompt for save on build
+                var saveOpt = (uint)__VSRDTSAVEOPTIONS.RDTSAVEOPT_SaveIfDirty;
+                var hr = rdt.SaveDocuments(saveOpt, null, VSConstants.VSITEMID_NIL, VSConstants.VSCOOKIE_NIL);
+                if (hr == VSConstants.E_ABORT) {
+                    return false;
+                }
+            }
+
+            return true;
+        }
     }
 }

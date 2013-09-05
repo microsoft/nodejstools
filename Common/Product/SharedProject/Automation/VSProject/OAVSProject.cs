@@ -121,7 +121,7 @@ namespace Microsoft.VisualStudioTools.Project.Automation
                 ReferenceContainerNode references = project.GetReferenceContainer() as ReferenceContainerNode;
                 if (null == references)
                 {
-                    return new OAReferences(new ReferenceContainerNode(project));
+                    return null;
                 }
                 return references.Object as References;
             }
@@ -129,7 +129,6 @@ namespace Microsoft.VisualStudioTools.Project.Automation
 
         public virtual void Refresh()
         {
-            throw new NotImplementedException();
         }
 
         [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Design", "CA1065:DoNotRaiseExceptionsInUnexpectedLocations")]

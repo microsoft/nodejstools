@@ -161,6 +161,7 @@ namespace Microsoft.VisualStudio.Repl {
         //
         private readonly OutputBuffer _buffer;
         private readonly List<ColoredSpan> _outputColors = new List<ColoredSpan>();
+        private bool _addedLineBreakOnLastOutput;
 
         private string _commandPrefix = "%";
         private string _prompt = "» ";        // prompt for primary input
@@ -638,7 +639,7 @@ namespace Microsoft.VisualStudio.Repl {
                 edit.Delete(0, _outputBuffer.CurrentSnapshot.Length);
                 edit.Apply();
             }
-
+            _addedLineBreakOnLastOutput = false;
             using (var edit = _stdInputBuffer.CreateEdit(EditOptions.None, null, SuppressPromptInjectionTag)) {
                 edit.Delete(0, _stdInputBuffer.CurrentSnapshot.Length);
                 edit.Apply();
@@ -1016,7 +1017,9 @@ namespace Microsoft.VisualStudio.Repl {
                     PositionAffinity.Successor, 
                     _projectionBuffer
                 );
-                Debug.Assert(projectionPoint != null);
+                if (projectionPoint == null) {
+                    throw new InvalidOperationException("Could not map langLine to buffer");
+                }
 
                 //
                 // If the caret is already at the first non-whitespace character or
@@ -1073,7 +1076,9 @@ namespace Microsoft.VisualStudio.Repl {
                     PositionAffinity.Successor,
                     _projectionBuffer
                 );
-                Debug.Assert(projectionPoint != null);
+                if (projectionPoint == null) {
+                    throw new InvalidOperationException("Could not map langLine to buffer");
+                }
 
                 var moveTo = projectionPoint.Value;
 
@@ -2150,11 +2155,23 @@ namespace Microsoft.VisualStudio.Repl {
             // append the text to output buffer and make sure it ends with a line break:
             int newOutputLength = text.Length;
             using (var edit = _outputBuffer.CreateEdit()) {
+                if (_addedLineBreakOnLastOutput) {
+                    // appending additional output, remove the line break we previously injected
+                    var lineBreak = GetLineBreak();
+                    var deleteSpan = new Span(_outputBuffer.CurrentSnapshot.Length - lineBreak.Length, lineBreak.Length);
+                    Debug.Assert(_outputBuffer.CurrentSnapshot.GetText(deleteSpan) == lineBreak);
+                    edit.Delete(deleteSpan);
+                    oldBufferLength -= lineBreak.Length;
+                }
+
                 edit.Insert(oldBufferLength, text);
                 if (lastOutput && !_readingStdIn && !EndsWithLineBreak(text)) {
                     var lineBreak = GetLineBreak();
                     edit.Insert(oldBufferLength, lineBreak);
                     newOutputLength += lineBreak.Length;
+                    _addedLineBreakOnLastOutput = true;
+                } else {
+                    _addedLineBreakOnLastOutput = false;
                 }
                 
                 edit.Apply();
@@ -2231,7 +2248,35 @@ namespace Microsoft.VisualStudio.Repl {
             UIElement element = obj as UIElement;
             if (element != null) {
                 _buffer.Flush();
-                InlineReplAdornmentProvider.AddInlineAdornment(TextView, element, OnAdornmentLoaded);
+
+                // figure out where we're inserting the image
+                SnapshotPoint targetPoint = new SnapshotPoint(
+                    TextView.TextBuffer.CurrentSnapshot,
+                    TextView.TextBuffer.CurrentSnapshot.Length
+                );
+
+                for (int i = _projectionSpans.Count - 1; i >= 0; i--) {
+                    if (_projectionSpans[i].Kind == ReplSpanKind.Output ||
+                        (_projectionSpans[i].Kind == ReplSpanKind.Language && _isRunning)) {
+                        // we've had some output during the execution and we hit that buffer.
+                        // OR we hit a language input buffer, and we're running, and no output
+                        // has been produced yet.
+
+                        // In either case, this is where the image goes.
+                        break;
+                    }
+
+                    // adjust where we're going to insert based upon the length of the span
+                    targetPoint -= _projectionSpans[i].Length;
+
+                    if (_projectionSpans[i].Kind == ReplSpanKind.Prompt) {
+                        // we just walked past the primary input prompt, we want to put the
+                        // image right before it.
+                        break;
+                    }
+                }
+
+                InlineReplAdornmentProvider.AddInlineAdornment(TextView, element, OnAdornmentLoaded, targetPoint);
                 OnInlineAdornmentAdded();
                 WriteLine(String.Empty);
                 WriteLine(String.Empty);
@@ -2242,6 +2287,7 @@ namespace Microsoft.VisualStudio.Repl {
         }
 
         private void OnAdornmentLoaded(object source, EventArgs e) {
+            ((ZoomableInlineAdornment)source).Loaded -= OnAdornmentLoaded;
             // Make sure the caret line is rendered
             DoEvents();
             Caret.EnsureVisible();

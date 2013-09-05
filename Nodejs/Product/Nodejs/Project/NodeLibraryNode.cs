@@ -17,8 +17,8 @@ using Microsoft.VisualStudioTools.Navigation;
 
 namespace Microsoft.NodejsTools.Project {
     class NodeLibraryNode : CommonLibraryNode {
-        public NodeLibraryNode(IScopeNode scope, string namePrefix, IVsHierarchy hierarchy, uint itemId) :
-            base(scope, namePrefix, hierarchy, itemId) {
+        public NodeLibraryNode(LibraryNode parent, IScopeNode scope, string namePrefix, IVsHierarchy hierarchy, uint itemId) :
+            base(parent, scope, namePrefix, hierarchy, itemId) {
         }
     }
 }
