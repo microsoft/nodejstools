@@ -24,13 +24,14 @@ using System.Net;
 using System.Linq;
 using System.Threading;
 using TestUtilities;
+using TestUtilities.Nodejs;
 
 namespace DebuggerTests {
     [TestClass]
     public class DebuggerTests : BaseDebuggerTests {
         [ClassInitialize]
         public static void DoDeployment(TestContext context) {
-            TestData.Deploy();
+            NodejsTestData.Deploy();
         }
 
         #region Enum Children Tests

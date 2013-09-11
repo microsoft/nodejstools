@@ -30,6 +30,7 @@ using Microsoft.VisualStudio.Shell.Interop;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using Microsoft.VisualStudioTools.Project;
 using TestUtilities;
+using TestUtilities.Nodejs;
 using TestUtilities.UI;
 using Keyboard = TestUtilities.UI.Keyboard;
 using Mouse = TestUtilities.UI.Mouse;
@@ -39,7 +40,7 @@ namespace Microsoft.Nodejs.Tests.UI {
     public class ShowAllFiles {
         [ClassInitialize]
         public static void DoDeployment(TestContext context) {
-            TestData.Deploy();
+            NodejsTestData.Deploy();
         }
 
         [TestCleanup]

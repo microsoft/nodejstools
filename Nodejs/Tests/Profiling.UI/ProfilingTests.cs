@@ -27,6 +27,7 @@ using Microsoft.TC.TestHostAdapters;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using Microsoft.Win32;
 using TestUtilities;
+using TestUtilities.Nodejs;
 using TestUtilities.UI;
 using TestUtilities.UI.Nodejs;
 
@@ -37,7 +38,7 @@ namespace ProfilingUITests {
 
         [ClassInitialize]
         public static void DoDeployment(TestContext context) {
-            TestData.Deploy();
+            NodejsTestData.Deploy();
         }
 
         [TestCleanup]

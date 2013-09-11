@@ -26,6 +26,7 @@ using Microsoft.TC.TestHostAdapters;
 using Microsoft.VisualStudio.Language.Intellisense;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using TestUtilities;
+using TestUtilities.Nodejs;
 using TestUtilities.UI;
 
 namespace Microsoft.Nodejs.Tests.UI {
@@ -33,7 +34,7 @@ namespace Microsoft.Nodejs.Tests.UI {
     public class ProjectTests {
         [ClassInitialize]
         public static void DoDeployment(TestContext context) {
-            TestData.Deploy();
+            NodejsTestData.Deploy();
         }
 
         [TestCleanup]

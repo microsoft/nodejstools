@@ -33,7 +33,6 @@ namespace TestUtilities {
         const string BinariesOutPath = "";
 
         const string DataAltSourcePath = @"TestData";
-        const string DataSourcePath = @"Common\Tests\TestData";
         const string DataOutPath = @"TestData";
 
         private static string GetSolutionDir() {
@@ -88,7 +87,7 @@ namespace TestUtilities {
             }
         }
 
-        public static void Deploy(string dataSourcePath = null, bool includeTestData = true) {
+        public static void Deploy(string dataSourcePath, bool includeTestData = true) {
             var sourceRoot = GetSolutionDir();
             var deployRoot = Path.GetDirectoryName((typeof(TestData)).Assembly.Location);
 
@@ -116,7 +115,7 @@ namespace TestUtilities {
             CopyFiles(binSource, binDest);
 
             if (includeTestData) {
-                var dataSource = Path.Combine(sourceRoot, dataSourcePath ?? DataSourcePath);
+                var dataSource = Path.Combine(sourceRoot, dataSourcePath);
                 if (!Directory.Exists(dataSource)) {
                     dataSource = Path.Combine(sourceRoot, DataAltSourcePath);
                     if (!Directory.Exists(dataSource)) {

@@ -27,6 +27,7 @@ using Microsoft.TC.TestHostAdapters;
 using Microsoft.VisualStudio.Language.Intellisense;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using TestUtilities;
+using TestUtilities.Nodejs;
 using TestUtilities.UI;
 using Keyboard = TestUtilities.UI.Keyboard;
 using Mouse = TestUtilities.UI.Mouse;
@@ -36,7 +37,7 @@ namespace Microsoft.Nodejs.Tests.UI {
     public class DragDropCopyCutPaste {
         [ClassInitialize]
         public static void DoDeployment(TestContext context) {
-            TestData.Deploy();
+            NodejsTestData.Deploy();
         }
 
         [TestCleanup]

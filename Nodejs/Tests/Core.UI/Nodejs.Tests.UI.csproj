@@ -110,6 +110,10 @@
       <Project>{d092d54e-ff29-4d32-9aee-4ef704c92f67}</Project>
       <Name>TestUtilities</Name>
     </ProjectReference>
+    <ProjectReference Include="..\Utilities.Nodejs\TestUtilities.Nodejs.csproj">
+      <Project>{9e395ba3-765e-4f35-a520-19f1c323d625}</Project>
+      <Name>TestUtilities.Nodejs</Name>
+    </ProjectReference>
     <ProjectReference Include="..\Utilities.UI\TestUtilities.UI.Nodejs.csproj">
       <Project>{a731c4c3-3741-4080-a946-c47574c1f3bf}</Project>
       <Name>TestUtilities.UI.Nodejs</Name>

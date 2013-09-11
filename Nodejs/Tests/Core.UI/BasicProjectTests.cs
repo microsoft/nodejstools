@@ -27,6 +27,7 @@ using EnvDTE90a;
 using Microsoft.TC.TestHostAdapters;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using TestUtilities;
+using TestUtilities.Nodejs;
 using TestUtilities.UI;
 using VSLangProj;
 using ST = System.Threading;
@@ -36,7 +37,7 @@ namespace Microsoft.Nodejs.Tests.UI {
     public class BasicProjectTests {
         [ClassInitialize]
         public static void DoDeployment(TestContext context) {
-            TestData.Deploy();
+            NodejsTestData.Deploy();
         }
 
         [TestCleanup]
