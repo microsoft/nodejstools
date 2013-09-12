@@ -5,7 +5,7 @@
   <ItemGroup>
     <ProjectFile Include="$(BuildRoot)\Common\Tests\Utilities\TestUtilities.csproj" />
     <ProjectFile Include="$(BuildRoot)\Common\Tests\Utilities.UI\TestUtilities.UI.csproj" />
-    <ProjectFile Include="$(BuildRoot)\Nodejs\Tests\Core\NodeTests.csproj" />
+    <ProjectFile Include="$(BuildRoot)\Nodejs\Tests\Core\NodejsTests.csproj" />
     <ProjectFile Include="$(BuildRoot)\Nodejs\Tests\Core.UI\Nodejs.Tests.UI.csproj" />
     <ProjectFile Include="$(BuildRoot)\Nodejs\Tests\Profiling\ProfilerTests.csproj" />
     <ProjectFile Include="$(BuildRoot)\Nodejs\Tests\Profiling.UI\ProfilerUITests.csproj" />
