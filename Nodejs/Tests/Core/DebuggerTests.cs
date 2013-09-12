@@ -31,6 +31,7 @@ namespace DebuggerTests {
     public class DebuggerTests : BaseDebuggerTests {
         [ClassInitialize]
         public static void DoDeployment(TestContext context) {
+            AssertListener.Initialize();
             NodejsTestData.Deploy();
         }
 

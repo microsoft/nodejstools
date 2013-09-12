@@ -17,11 +17,17 @@ using System.IO;
 using Microsoft.NodejsTools;
 using Microsoft.NodejsTools.Repl;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
+using TestUtilities;
 using TestUtilities.Mocks;
 
 namespace NodeTests {
     [TestClass]
     public class ReplWindowTests {
+        [ClassInitialize]
+        public static void DoDeployment(TestContext context) {
+            AssertListener.Initialize();
+        }
+
         [TestMethod, Priority(0)]
         public void TestNumber() {
             using (var eval = new NodejsReplEvaluator()) {

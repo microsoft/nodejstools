@@ -40,6 +40,7 @@ namespace Microsoft.Nodejs.Tests.UI {
     public class ShowAllFiles {
         [ClassInitialize]
         public static void DoDeployment(TestContext context) {
+            AssertListener.Initialize();
             NodejsTestData.Deploy();
         }
 

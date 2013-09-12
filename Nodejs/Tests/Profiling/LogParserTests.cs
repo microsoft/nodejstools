@@ -16,10 +16,16 @@ using System;
 using Microsoft.NodejsTools.LogGeneration;
 using Microsoft.NodejsTools.LogParsing;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
+using TestUtilities;
 
 namespace ProfilerTests {
     [TestClass]
     public class LogParserTests {
+        [ClassInitialize]
+        public static void DoDeployment(TestContext context) {
+            AssertListener.Initialize();
+        }
+
         [TestMethod, Priority(0)]
         public void SplitRecord() {
             AssertExpectedRecords(@"shared-library,""C:\Program Files\nodejs\node.exe"",0x05c60000,0x06226000",

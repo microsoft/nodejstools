@@ -26,12 +26,17 @@
   </PropertyGroup>
   <ItemGroup>
     <Reference Include="Microsoft.VisualStudio.QualityTools.UnitTestFramework" />
+    <Reference Include="System" />
   </ItemGroup>
   <ItemGroup>
     <Compile Include="LogParserTests.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>
+    <ProjectReference Include="..\..\..\Common\Tests\Utilities\TestUtilities.csproj">
+      <Project>{d092d54e-ff29-4d32-9aee-4ef704c92f67}</Project>
+      <Name>TestUtilities</Name>
+    </ProjectReference>
     <ProjectReference Include="..\..\Product\LogConverter\LogConverter.csproj">
       <Project>{9a69745f-546d-40a0-8770-7e5b9ed0c82f}</Project>
       <Name>LogConverter</Name>

@@ -154,7 +154,9 @@ Global
 		{DFDB930E-1162-4514-A91D-C8595A807F13}.Release|x86.ActiveCfg = Release|x86
 		{DFDB930E-1162-4514-A91D-C8595A807F13}.Release|x86.Build.0 = Release|x86
 		{9E395BA3-765E-4F35-A520-19F1C323D625}.Debug|x86.ActiveCfg = Debug|Any CPU
+		{9E395BA3-765E-4F35-A520-19F1C323D625}.Debug|x86.Build.0 = Debug|Any CPU
 		{9E395BA3-765E-4F35-A520-19F1C323D625}.Release|x86.ActiveCfg = Release|Any CPU
+		{9E395BA3-765E-4F35-A520-19F1C323D625}.Release|x86.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

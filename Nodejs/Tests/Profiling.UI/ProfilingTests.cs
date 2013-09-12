@@ -38,6 +38,7 @@ namespace ProfilingUITests {
 
         [ClassInitialize]
         public static void DoDeployment(TestContext context) {
+            AssertListener.Initialize();
             NodejsTestData.Deploy();
         }
 

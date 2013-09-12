@@ -34,6 +34,7 @@ namespace Microsoft.Nodejs.Tests.UI {
     public class UITests {
         [ClassInitialize]
         public static void DoDeployment(TestContext context) {
+            AssertListener.Initialize();
             NodejsTestData.Deploy();
         }
 

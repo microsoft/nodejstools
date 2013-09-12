@@ -26,6 +26,11 @@ using TestUtilities.UI.Nodejs;
 namespace Microsoft.Nodejs.Tests.UI {
     [TestClass]
     public class ReplWindowTests {
+        [ClassInitialize]
+        public static void DoDeployment(TestContext context) {
+            AssertListener.Initialize();
+        }
+
         [TestMethod, Priority(0), TestCategory("Core")]
         [HostType("TC Dynamic"), DynamicHostType(typeof(VsIdeHostAdapter))]
         public void TestColorOutput() {
