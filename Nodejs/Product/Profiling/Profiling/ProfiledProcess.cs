@@ -60,6 +60,9 @@ namespace Microsoft.NodejsTools.Profiling {
             processInfo.UseShellExecute = false;
             processInfo.RedirectStandardOutput = false;
 
+            if (_startBrowser && _port == null) {
+                _port = GetFreePort();
+            }
             if (_port != null) {
                 if (envVars == null) {
                     envVars = new Dictionary<string, string>();
@@ -167,14 +170,14 @@ namespace Microsoft.NodejsTools.Profiling {
             _process.Start();
 
             if (_startBrowser) {
-                int port = _port ?? GetFreePort();
+                Debug.Assert(_port != null);
 
                 string webBrowserUrl = _launchUrl;
                 if (String.IsNullOrWhiteSpace(webBrowserUrl)) {
-                    webBrowserUrl = "http://localhost:" + port;
+                    webBrowserUrl = "http://localhost:" + _port;
                 }
 
-                ThreadPool.QueueUserWorkItem(StartBrowser, new BrowserStartInfo(port, webBrowserUrl));
+                ThreadPool.QueueUserWorkItem(StartBrowser, new BrowserStartInfo(_port.Value, webBrowserUrl));
             }
         }
 
