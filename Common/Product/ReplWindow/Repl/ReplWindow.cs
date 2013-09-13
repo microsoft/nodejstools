@@ -1683,6 +1683,9 @@ namespace Microsoft.VisualStudio.Repl {
             } else if (pguidCmdGroup == VSConstants.GUID_VSStandardCommandSet97) {
                 switch ((VSConstants.VSStd97CmdID)nCmdID) {
                     case VSConstants.VSStd97CmdID.Paste:
+                        if (!(_stdInputStart != null ? CaretInStandardInputRegion : CaretInActiveCodeRegion)) {
+                            MoveCaretToCurrentInputEnd();
+                        }
                         PasteClipboard();
                         return VSConstants.S_OK;
 

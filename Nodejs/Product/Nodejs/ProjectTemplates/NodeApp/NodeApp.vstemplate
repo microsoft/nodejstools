@@ -16,6 +16,8 @@
   <TemplateContent>
     <Project File="NodeApp.njsproj" ReplaceParameters="true">
       <ProjectItem OpenInEditor="true">server.js</ProjectItem>
+      <ProjectItem ReplaceParameters="true">package.json</ProjectItem>
+      <ProjectItem ReplaceParameters="true">README.md</ProjectItem>
     </Project>
   </TemplateContent>
 </VSTemplate>

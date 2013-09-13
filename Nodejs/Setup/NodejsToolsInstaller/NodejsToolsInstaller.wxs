@@ -37,15 +37,27 @@
     <?endif?>
 -->
     <Property Id="VSPRO_INSTALLED" Secure="yes">
-      <RegistrySearch Id="ProInstallRegSearch" Root="HKLM" Key="SOFTWARE\Microsoft\VisualStudio\11.0\Setup\Microsoft Visual Studio Professional 2012" Name="InstallSuccess" Type="raw" />
+      <?if "$(var.VSTargetVersion)" = "11.0" ?>
+        <RegistrySearch Id="ProInstallRegSearch" Root="HKLM" Key="SOFTWARE\Microsoft\VisualStudio\11.0\Setup\Microsoft Visual Studio Professional 2012" Name="InstallSuccess" Type="raw" />
+      <?elseif "$(var.VSTargetVersion)" = "12.0" ?>
+        <RegistrySearch Id="ProInstallRegSearch" Root="HKLM" Key="SOFTWARE\Microsoft\VisualStudio\12.0\Setup\Microsoft Visual Studio Professional 2013 RC" Name="InstallSuccess" Type="raw" />
+      <?endif ?>
     </Property>
 
     <Property Id="VSPREMIUM_INSTALLED" Secure="yes">
-      <RegistrySearch Id="PremiumInstallRegSearch" Root="HKLM" Key="SOFTWARE\Microsoft\VisualStudio\11.0\Setup\Microsoft Visual Studio Premium 2012" Name="InstallSuccess" Type="raw" />
+      <?if "$(var.VSTargetVersion)" = "11.0" ?>
+        <RegistrySearch Id="PremiumInstallRegSearch" Root="HKLM" Key="SOFTWARE\Microsoft\VisualStudio\11.0\Setup\Microsoft Visual Studio Premium 2012" Name="InstallSuccess" Type="raw" />
+      <?elseif "$(var.VSTargetVersion)" = "12.0" ?>
+        <RegistrySearch Id="PremiumInstallRegSearch" Root="HKLM" Key="SOFTWARE\Microsoft\VisualStudio\12.0\Setup\Microsoft Visual Studio Premium 2013 RC" Name="InstallSuccess" Type="raw" />
+      <?endif ?>
     </Property>
 
     <Property Id="VSULTIMATE_INSTALLED" Secure="yes">
-      <RegistrySearch Id="UltimateInstallRegSearch" Root="HKLM" Key="SOFTWARE\Microsoft\VisualStudio\11.0\Setup\Microsoft Visual Studio Ultimate 2012" Name="InstallSuccess" Type="raw" />
+      <?if "$(var.VSTargetVersion)" = "11.0" ?>
+        <RegistrySearch Id="UltimateInstallRegSearch" Root="HKLM" Key="SOFTWARE\Microsoft\VisualStudio\11.0\Setup\Microsoft Visual Studio Ultimate 2012" Name="InstallSuccess" Type="raw" />
+      <?elseif "$(var.VSTargetVersion)" = "12.0" ?>
+        <RegistrySearch Id="UltimateInstallRegSearch" Root="HKLM" Key="SOFTWARE\Microsoft\VisualStudio\12.0\Setup\Microsoft Visual Studio Ultimate 2013 RC" Name="InstallSuccess" Type="raw" />
+      <?endif ?>
     </Property>
 
     <Property Id="DEVENV_PATH" Secure="yes">
@@ -54,7 +66,11 @@
     
     <!-- Conditions for install -->
     
+    <?if "$(var.VSTargetVersion)" = "11.0" ?>
     <Condition Message="Visual Studio 2012 (Professional, Premium, or Ultimate) must be installed."> VSPRO_INSTALLED OR VSPREMIUM_INSTALLED OR VSULTIMATE_INSTALLED OR Installed </Condition>
+    <?elseif "$(var.VSTargetVersion)" = "12.0" ?>
+    <Condition Message="Visual Studio 2013 (Professional, Premium, or Ultimate) must be installed."> VSPRO_INSTALLED OR VSPREMIUM_INSTALLED OR VSULTIMATE_INSTALLED OR Installed </Condition>
+    <?endif ?>
     
     <!-- Files/Components/MSMs to install -->
 
@@ -63,7 +79,7 @@
         <!-- Read me in Program Files\Node.js Tools for Visual Studio -->
         
         <Directory Id="APPLICATIONFOLDER" Name="[ApplicationFolderName]"  FileSource="$(var.TargetDir)">
-          <Component Id="Comp_InstallDirItems" DiskId="1" Guid="F0C653EF-F90B-4C63-8AC6-7B1EC8F044A4">
+          <Component Id="Comp_InstallDirItems" DiskId="1" Guid="$(var.Comp_InstallDirItemGuid)">
               <Condition>NOT ALLUSERS = 1</Condition>
               <File Id="File_License.html" Name="License.html" Source="$(var.NodejsToolsDir)\License.html" />
               <File Id="File_RemoteDebug.js" Name="RemoteDebug.js" Source="$(var.NodejsToolsDir)\RemoteDebug.js" />
@@ -71,7 +87,7 @@
               <RegistryValue Root='HKCU' Key='SOFTWARE\Microsoft\NodejsTools' Type='string' Name='RemoteDebugProxyScript' Value='[WixPerUserFolder]\RemoteDebug.js' />
               <RemoveFolder Id='Comp_InstallDirItems' On='uninstall'/>
           </Component>
-          <Component Id="AllUsers_Comp_InstallDirItems" DiskId="1" Guid="0B12AA30-C3B3-40D6-9003-CAA5EE4B6FFD">
+          <Component Id="AllUsers_Comp_InstallDirItems" DiskId="1" Guid="$(var.Comp_AllUserInstallDirItemGuid)">
               <Condition>ALLUSERS = 1</Condition>
               <File Id="AllUsers_File_License.html" Name="License.html" Source="$(var.NodejsToolsDir)\License.html" />
               <File Id="AllUsers_File_RemoteDebug.js" Name="RemoteDebug.js" Source="$(var.NodejsToolsDir)\RemoteDebug.js" />
@@ -88,7 +104,7 @@
         <Merge Id="NodejsTools" Language="1033" SourceFile="$(var.TargetDir)NodejsTools.msm" DiskId="1" />
         <Merge Id="NodejsProfiling" Language="1033" SourceFile="$(var.TargetDir)NodejsProfiling.msm" DiskId="1" />
 
-        <Component Id="Comp_NjsProgRegistration" DiskId="1" Guid="071B67E7-64C6-4C54-921A-3A7026824686">
+        <Component Id="Comp_NjsProgRegistration" DiskId="1" Guid="$(var.Comp_NjsProjRegistrationGuid)">
           <RegistryValue Root='HKCR' Key='.njsproj' Type='string' Name='PerceivedType' Value='text' />
           <RegistryValue Root='HKCR' Key='VisualStudio.Launcher.njsproj.$(var.VSTargetVersion)\DefaultIcon' Type='string' Value='[VSINSTALLPATH]\Extensions\Microsoft\Node.js Tools for Visual Studio\0.5\NodejsProject.ico' />
 

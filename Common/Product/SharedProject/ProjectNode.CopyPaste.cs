@@ -940,6 +940,15 @@ folder you are copying, do you want to replace the existing files?", Path.GetFil
                             }
 
                             overwrite = dialog.ShouldOverwrite;
+                            if (DropEffect == DropEffect.Move &&
+                                !dialog.ShouldOverwrite && 
+                                Utilities.IsSameComObject(project, Project)) {
+                                var existing = Project.FindNodeByFullPath(moniker);
+                                if (existing != null) {
+                                    Project.ItemsDraggedOrCutOrCopied.Remove(existing);
+                                    existing.ExpandItem(EXPANDFLAGS.EXPF_UnCutHighlightItem);
+                                }
+                            }
 
                             if (dialog.AllItems) {
                                 OverwriteAllItems = overwrite;
@@ -951,6 +960,15 @@ folder you are copying, do you want to replace the existing files?", Path.GetFil
                         } else {
                             return NopAddition.Instance;
                         }
+                    } else if (Directory.Exists(newPath)) {
+                        VsShellUtilities.ShowMessageBox(
+                            Project.Site,
+                            String.Format("A directory with the name '{0}' already exists.", Path.GetFileName(CommonUtils.TrimEndSeparator(newPath))),
+                            null,
+                            OLEMSGICON.OLEMSGICON_CRITICAL,
+                            OLEMSGBUTTON.OLEMSGBUTTON_OK,
+                            OLEMSGDEFBUTTON.OLEMSGDEFBUTTON_FIRST);
+                        return null;
                     }
 
                     if (newPath.Length >= NativeMethods.MAX_PATH) {

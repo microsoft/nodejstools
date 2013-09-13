@@ -2,18 +2,39 @@
 <Include>
   <?define ProductDescription = "Node.js Tools for Visual Studio" ?>
 
-  <!-- Product GUIDs: Must just be unique-->
+  <!-- Product GUIDs: Must just be unique -->
   <?define InstallerGuid=*?>
-  <?define InstallerUpgradeGuid=9291B031-A6DD-4AC2-A99C-421076160394?>
-  <!-- 
-       Preprocessor variables are slightly painful to work with.
-       You need them to always be set to something or Candle gives an error.
-       Therefore ./BuildRelease.ps1 sets the variable to a fairly unique string "SPECIALNULLVALUE"
-       if the user did not specify a $customBuildIdentifier.       
-  -->
-<?if $(var.CustomBuildIdentifier) = SPECIALNULLVALUE?>
-  <?define ProductName = "Node.js Tools for Visual Studio 2012" ?>
-<?else?>
-  <?define ProductName = "Node.js Tools for Visual Studio 2012 ($(var.CustomBuildIdentifier))" ?>  
-<?endif?>
+
+  <?if "$(var.VSTargetVersion)" = "11.0" ?>
+    <?define InstallerGuid=*?>
+    <?define InstallerUpgradeGuid=9291B031-A6DD-4AC2-A99C-421076160394?>
+    <?define Comp_InstallLocationGuid=8C72E7BA-8D13-4768-A6FA-9362D2CF9BE8?>
+    <?define Comp_AllUserInstallDirItemGuid=133E49D5-31D9-4726-876C-243078F399BF?>
+    <?define Comp_InstallDirItemGuid=32ADB1E0-C9AE-4847-A731-423DFA1DF097?>
+    <?define Comp_NjsProjRegistrationGuid=428F728A-7A33-42D4-8692-B38E146BD21A?>
+    <?define ProductNameYear = 2012?>
+  <?elseif "$(var.VSTargetVersion)" = "12.0" ?>
+    <?define InstallerGuid=*?>
+    <?define InstallerUpgradeGuid=58AFA70A-C693-4A9A-894F-F16E9495DA9D?>  
+    <?define Comp_InstallLocationGuid=5003C0DF-725F-452E-962A-7373BA146099?>
+    <?define Comp_AllUserInstallDirItemGuid=DEAD96CB-1E67-4BDC-99C6-79ADE9A2F927?>
+    <?define Comp_InstallDirItemGuid=D3596841-CDE9-426E-901E-3A4580BA39A2?>
+    <?define Comp_NjsProjRegistrationGuid=566FD245-A9F5-432D-B98E-77DEE9DC442F?>
+    <?define ProductNameYear = 2013?>
+  <?else?>
+    <!--Unknown VS version, We'll insert a bunch of bogus values such that Wix will error out-->
+    <!--  To fix this define a new section above for the new VS version.  Leave this such that future new versions continue to crash on build-->
+    <?define InstallerGuid=UNKOWN_VSTARGET?>
+    <?define InstallerUpgradeGuid=UNKOWN_VSTARGET?>
+    <?define Comp_InstallLocationGuid=UNKOWN_VSTARGET?>
+    <?define Comp_AllUserInstallDirItemGuid=?>
+    <?define Comp_InstallDirItemGuid=?>
+    <?define ProductNameYear = UNKOWN_VSTARGET?>
+  <?endif ?>
+  
+  <?ifdef CustomBuildIdentifier?>
+    <?define ProductName = Node.js Tools for Visual Studio $(var.ProductNameYear) ($(var.CustomBuildIdentifier)) ?>
+  <?else?>
+    <?define ProductName = Node.js Tools for Visual Studio $(var.ProductNameYear) ?>
+  <?endif?>
 </Include>
