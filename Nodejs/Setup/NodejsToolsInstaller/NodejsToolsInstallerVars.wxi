@@ -24,12 +24,12 @@
   <?else?>
     <!--Unknown VS version, We'll insert a bunch of bogus values such that Wix will error out-->
     <!--  To fix this define a new section above for the new VS version.  Leave this such that future new versions continue to crash on build-->
-    <?define InstallerGuid=UNKOWN_VSTARGET?>
-    <?define InstallerUpgradeGuid=UNKOWN_VSTARGET?>
-    <?define Comp_InstallLocationGuid=UNKOWN_VSTARGET?>
+    <?define InstallerGuid=UNKNOWN_VSTARGET?>
+    <?define InstallerUpgradeGuid=UNKNOWN_VSTARGET?>
+    <?define Comp_InstallLocationGuid=UNKNOWN_VSTARGET?>
     <?define Comp_AllUserInstallDirItemGuid=?>
     <?define Comp_InstallDirItemGuid=?>
-    <?define ProductNameYear = UNKOWN_VSTARGET?>
+    <?define ProductNameYear = UNKNOWN_VSTARGET?>
   <?endif ?>
   
   <?ifdef CustomBuildIdentifier?>
