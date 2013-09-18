@@ -429,6 +429,7 @@ namespace Microsoft.VisualStudioTools.Project {
 
         private FileSystemWatcher CreateAttributesWatcher(string dir) {
             var watcher = new FileSystemWatcher(dir);
+            watcher.IncludeSubdirectories = true;
             watcher.NotifyFilter = NotifyFilters.Attributes;
             watcher.Changed += FileAttributesChanged;
             watcher.Error += WatcherError;
@@ -593,7 +594,7 @@ namespace Microsoft.VisualStudioTools.Project {
                         continue;
                     }
                     if (IsFileSymLink(curDir)) {
-                        if (IsRecursiveSymLink(_initialDir, curDir)) {
+                        if (IsRecursiveSymLink(dir.Name, curDir)) {
                             // don't add recursive sym links
                             continue;
                         }
@@ -1068,13 +1069,11 @@ namespace Microsoft.VisualStudioTools.Project {
                         // and drop in explorer), in which case we also need to process the items
                         // which are in the folder that we won't receive create notifications for.
 
-                        if (_isRename) {
-                            // First, make sure we don't have any children
-                            RemoveAllFilesChildren(folderNode);
+                        // First, make sure we don't have any children
+                        RemoveAllFilesChildren(folderNode);
 
-                            // then add the folder nodes
-                            _project.MergeDiskNodes(folderNode, _path);
-                        }
+                        // then add the folder nodes
+                        _project.MergeDiskNodes(folderNode, _path);
 
                         _project.OnInvalidateItems(folderNode);
                     } else {

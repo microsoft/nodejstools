@@ -368,21 +368,6 @@ namespace Microsoft.Nodejs.Tests.UI {
 
         [TestMethod, Priority(0), TestCategory("Core")]
         [HostType("TC Dynamic"), DynamicHostType(typeof(VsIdeHostAdapter))]
-        public void DumpProperties() {
-            var project = BasicProjectTests.OpenProject(@"C:\Source\ConsoleApplication7\ConsoleApplication7.sln");
-
-            var app = new VisualStudioApp(VsIdeTestHostContext.Dte);
-            app.OpenSolutionExplorer();
-            var window = app.SolutionExplorerTreeView;
-            window.WaitForItem("Solution 'ConsoleApplication7' (1 project)", "ConsoleApplication7", "Program - Copy.cs");
-            var item = project.ProjectItems.Item("Program - Copy.cs");
-            foreach (var x in item.Properties) {
-                Console.WriteLine(x);
-            }
-        }
-
-        [TestMethod, Priority(0), TestCategory("Core")]
-        [HostType("TC Dynamic"), DynamicHostType(typeof(VsIdeHostAdapter))]
         public void ShowAllFilesChanges() {
             var project = BasicProjectTests.OpenProject(@"TestData\NodejsProjectData\ShowAllFiles.sln");
 
