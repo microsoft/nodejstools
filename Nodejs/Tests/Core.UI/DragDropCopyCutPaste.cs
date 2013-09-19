@@ -315,19 +315,19 @@ namespace Microsoft.Nodejs.Tests.UI {
         [TestMethod, Priority(0), TestCategory("Core")]
         [HostType("TC Dynamic"), DynamicHostType(typeof(VsIdeHostAdapter))]
         public void CopiedBeforeDragPastedAfterDrop() {
-            BasicProjectTests.OpenProject(@"TestData\NodejsProjectData\DragDropCopyCutPaste.sln", expectedProjects: 2);
+            BasicProjectTests.OpenProject(@"TestData\NodejsProjectData\DragDropCopyCutPaste2.sln", expectedProjects: 2);
 
             var app = new VisualStudioApp(VsIdeTestHostContext.Dte);
             app.OpenSolutionExplorer();
             var window = app.SolutionExplorerTreeView;
 
-            var project = window.WaitForItem("Solution 'DragDropCopyCutPaste' (2 projects)", "DragDropCopyCutPaste");
+            var project = window.WaitForItem("Solution 'DragDropCopyCutPaste2' (2 projects)", "DragDropCopyCutPaste2");
             Assert.AreNotEqual(null, project);
-            var file = window.WaitForItem("Solution 'DragDropCopyCutPaste' (2 projects)", "DragDropCopyCutPaste", "CopiedBeforeDragPastedAfterDrop.js");
+            var file = window.WaitForItem("Solution 'DragDropCopyCutPaste2' (2 projects)", "DragDropCopyCutPaste2", "CopiedBeforeDragPastedAfterDrop.js");
             Assert.AreNotEqual(null, file);
-            var draggedFile = window.WaitForItem("Solution 'DragDropCopyCutPaste' (2 projects)", "DragDropCopyCutPaste", "DragAndDroppedDuringCopy.js");
+            var draggedFile = window.WaitForItem("Solution 'DragDropCopyCutPaste2' (2 projects)", "DragDropCopyCutPaste2", "DragAndDroppedDuringCopy.js");
             Assert.AreNotEqual(null, draggedFile);
-            var dragFolder = window.WaitForItem("Solution 'DragDropCopyCutPaste' (2 projects)", "DragDropCopyCutPaste", "DragDuringCopyDestination");
+            var dragFolder = window.WaitForItem("Solution 'DragDropCopyCutPaste2' (2 projects)", "DragDropCopyCutPaste2", "DragDuringCopyDestination");
             Assert.AreNotEqual(null, dragFolder);
 
             AutomationWrapper.Select(file);
@@ -340,12 +340,12 @@ namespace Microsoft.Nodejs.Tests.UI {
             Mouse.MoveTo(dragFolder.GetClickablePoint());
             Mouse.Up(MouseButton.Left);
 
-            var folder = window.WaitForItem("Solution 'DragDropCopyCutPaste' (2 projects)", "DragDropCopyCutPaste", "PasteFolder");
+            var folder = window.WaitForItem("Solution 'DragDropCopyCutPaste2' (2 projects)", "DragDropCopyCutPaste2", "PasteFolder");
             AutomationWrapper.Select(folder);
             Keyboard.ControlV();
             
-            AssertFileExists(window, "Solution 'DragDropCopyCutPaste' (2 projects)", "DragDropCopyCutPaste", "PasteFolder", "CopiedBeforeDragPastedAfterDrop.js");
-            AssertFileExists(window, "Solution 'DragDropCopyCutPaste' (2 projects)", "DragDropCopyCutPaste", "CopiedBeforeDragPastedAfterDrop.js");
+            AssertFileExists(window, "Solution 'DragDropCopyCutPaste2' (2 projects)", "DragDropCopyCutPaste2", "PasteFolder", "CopiedBeforeDragPastedAfterDrop.js");
+            AssertFileExists(window, "Solution 'DragDropCopyCutPaste2' (2 projects)", "DragDropCopyCutPaste2", "CopiedBeforeDragPastedAfterDrop.js");
         }
 
         /// <summary>
@@ -646,21 +646,21 @@ namespace Microsoft.Nodejs.Tests.UI {
         [TestMethod, Priority(0), TestCategory("Core")]
         [HostType("TC Dynamic"), DynamicHostType(typeof(VsIdeHostAdapter))]
         public void CrossHierarchyFileDragAndDrop() {
-            BasicProjectTests.OpenProject(@"TestData\NodejsProjectData\DragDropCopyCutPaste.sln", expectedProjects: 2);
+            BasicProjectTests.OpenProject(@"TestData\NodejsProjectData\DragDropCopyCutPaste2.sln", expectedProjects: 2);
 
             var app = new VisualStudioApp(VsIdeTestHostContext.Dte);
             app.OpenSolutionExplorer();
             var window = app.SolutionExplorerTreeView;
 
-            var folder = window.WaitForItem("Solution 'DragDropCopyCutPaste' (2 projects)", "ConsoleApplication1", "CrossHierarchyFileDragAndDrop.cs");
-            var destFolder = window.WaitForItem("Solution 'DragDropCopyCutPaste' (2 projects)", "DragDropCopyCutPaste", "DropFolder");
+            var folder = window.WaitForItem("Solution 'DragDropCopyCutPaste2' (2 projects)", "ConsoleApplication1", "CrossHierarchyFileDragAndDrop.cs");
+            var destFolder = window.WaitForItem("Solution 'DragDropCopyCutPaste2' (2 projects)", "DragDropCopyCutPaste2", "DropFolder");
 
             Mouse.MoveTo(folder.GetClickablePoint());
             Mouse.Down(MouseButton.Left);
             Mouse.MoveTo(destFolder.GetClickablePoint());
             Mouse.Up(MouseButton.Left);
 
-            AssertFileExists(window, "Solution 'DragDropCopyCutPaste' (2 projects)", "DragDropCopyCutPaste", "DropFolder", "CrossHierarchyFileDragAndDrop.cs");
+            AssertFileExists(window, "Solution 'DragDropCopyCutPaste2' (2 projects)", "DragDropCopyCutPaste2", "DropFolder", "CrossHierarchyFileDragAndDrop.cs");
         }
         
         /// <summary>

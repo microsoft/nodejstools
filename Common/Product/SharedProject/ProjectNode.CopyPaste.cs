@@ -177,7 +177,6 @@ namespace Microsoft.VisualStudioTools.Project {
                 returnValue = VSConstants.E_FAIL;
             }
 
-            ItemsDraggedOrCutOrCopied.Clear();
             _dragging = false;
 
             return returnValue;
