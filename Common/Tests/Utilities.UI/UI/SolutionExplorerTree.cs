@@ -23,20 +23,20 @@ namespace TestUtilities.UI {
             : base(element) {
         }
 
-        public void AssertFileExists(params string[] path) {
+        public void AssertFileExists(string projectLocation, params string[] path) {
             Assert.IsNotNull(WaitForItem(path), "Item not found in solution explorer" + String.Join("\\", path));
 
-            var basePath = Path.Combine("TestData", "NodejsProjectData");
+            var basePath = projectLocation;
             for (int i = 1; i < path.Length; i++) {
                 basePath = Path.Combine(basePath, path[i]);
             }
             Assert.IsTrue(File.Exists(basePath), "File doesn't exist: " + basePath);
         }
 
-        public void AssertFileDoesntExist(params string[] path) {
+        public void AssertFileDoesntExist(string projectLocation, params string[] path) {
             Assert.IsNull(FindItem(path), "Item exists in solution explorer: " + String.Join("\\", path));
 
-            var basePath = Path.Combine("TestData", "NodejsProjectData");
+            var basePath = projectLocation;
             for (int i = 1; i < path.Length; i++) {
                 basePath = Path.Combine(basePath, path[i]);
             }

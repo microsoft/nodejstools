@@ -908,7 +908,13 @@ folder you are copying, do you want to replace the existing files?", Path.GetFil
 
                 bool ok = false;
                 if (DropEffect == DropEffect.Move && Utilities.IsSameComObject(project, Project)) {
-                    ok = Project.Tracker.CanRenameItem(moniker, newPath, VSRENAMEFILEFLAGS.VSRENAMEFILEFLAGS_NoFlags);
+                    if (existingChild != null && existingChild.ItemNode != null && existingChild.ItemNode.IsExcluded) {
+                        // https://nodejstools.codeplex.com/workitem/271
+                        // The item is excluded, so we don't need to ask if we can rename it.
+                        ok = true;
+                    } else {
+                        ok = Project.Tracker.CanRenameItem(moniker, newPath, VSRENAMEFILEFLAGS.VSRENAMEFILEFLAGS_NoFlags);
+                    }
                 } else {
                     ok = Project.Tracker.CanAddItems(
                         new[] { newPath },
