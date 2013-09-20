@@ -27,9 +27,9 @@ namespace Microsoft.NodejsTools.Project {
     /// </summary>
     [Guid("1CCB584B-2876-4416-99B0-60C91B938147")]
     internal class NodejsLibraryManager : LibraryManager {
-        private readonly NodePackage/*!*/ _package;
+        private readonly NodejsPackage/*!*/ _package;
 
-        public NodejsLibraryManager(NodePackage/*!*/ package)
+        public NodejsLibraryManager(NodejsPackage/*!*/ package)
             : base(package) {
             _package = package;
         }

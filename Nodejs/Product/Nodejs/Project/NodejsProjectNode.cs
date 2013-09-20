@@ -61,7 +61,7 @@ namespace Microsoft.NodejsTools.Project {
 
         public override string[] CodeFileExtensions {
             get {
-                return new[] { NodeConstants.FileExtension };
+                return new[] { NodejsConstants.FileExtension };
             }
         }
 
@@ -100,7 +100,7 @@ namespace Microsoft.NodejsTools.Project {
         }
 
         public override string GetFormatList() {
-            return NodeConstants.ProjectFileFilter;
+            return NodejsConstants.ProjectFileFilter;
         }
 
         public override Type GetGeneralPropertyPageType() {
@@ -228,7 +228,7 @@ function starts_with(a, b) {
                         name
                     );
 
-                    if (String.Equals(Path.GetFileName(trimmedBaseDir), NodeConstants.NodeModulesFolder, StringComparison.OrdinalIgnoreCase)) {
+                    if (String.Equals(Path.GetFileName(trimmedBaseDir), NodejsConstants.NodeModulesFolder, StringComparison.OrdinalIgnoreCase)) {
                         // when we're in node_modules we're accessible by a plain name as well, and
                         // we're accessible from either our immediate parent directory or children
                         // within the package.
@@ -254,7 +254,7 @@ function starts_with(a, b) {
                         );
                     }
 
-                    if (String.Equals(Path.GetFileName(trimmedBaseDir), NodeConstants.NodeModulesFolder, StringComparison.OrdinalIgnoreCase)) {
+                    if (String.Equals(Path.GetFileName(trimmedBaseDir), NodejsConstants.NodeModulesFolder, StringComparison.OrdinalIgnoreCase)) {
                         break;
                     }
                 }
@@ -297,13 +297,13 @@ function starts_with(a, b) {
             foreach (var folderNode in folderNodes) {
                 if (String.Equals(
                     Path.GetFileName(CommonUtils.TrimEndSeparator(folderNode.Url)),
-                    NodeConstants.NodeModulesFolder,
+                    NodejsConstants.NodeModulesFolder,
                     StringComparison.OrdinalIgnoreCase)) {
 
                     for (var curChild = folderNode.FirstChild; curChild != null; curChild = curChild.NextSibling) {
                         CommonFolderNode folderChild = curChild as CommonFolderNode;
                         if (folderChild != null) {
-                            var packageJsonChild = curChild.FindImmediateChildByName(NodeConstants.PackageJsonFile);
+                            var packageJsonChild = curChild.FindImmediateChildByName(NodejsConstants.PackageJsonFile);
 
                             Dictionary<string, object> packageJson = null;
                             if (packageJsonChild != null && File.Exists(packageJsonChild.Url)) {
@@ -321,7 +321,7 @@ function starts_with(a, b) {
                             object mainFile;
                             string mainFileStr;
                             if (packageJson != null &&
-                                packageJson.TryGetValue(NodeConstants.PackageJsonMainFileKey, out mainFile) &&
+                                packageJson.TryGetValue(NodejsConstants.PackageJsonMainFileKey, out mainFile) &&
                                 (mainFileStr = mainFile as string) != null) {
 
                                 if (mainFileStr.StartsWith("./")) {
@@ -339,7 +339,7 @@ function starts_with(a, b) {
                             }
 
 
-                            var indexJsChild = curChild.FindImmediateChildByName(NodeConstants.DefaultPackageMainFile) as FileNode;
+                            var indexJsChild = curChild.FindImmediateChildByName(NodejsConstants.DefaultPackageMainFile) as FileNode;
                             if (indexJsChild != null && File.Exists(indexJsChild.Url)) {
                                 directoryPackages[indexJsChild] = folderChild;
                             }

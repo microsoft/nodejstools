@@ -29,9 +29,9 @@ namespace Microsoft.NodejsTools.Project {
     [PackageRegistration(UseManagedResourcesOnly = true)]
     [Description("Node.js Project Package")]
     [Guid("D861969D-CEC8-4411-AB85-C08EFE4100A2")]
-    [DeveloperActivity(NodeConstants.JavaScript, typeof(NodejsProjectPackage))]
+    [DeveloperActivity(NodejsConstants.JavaScript, typeof(NodejsProjectPackage))]
     [ProvideObject(typeof(NodejsGeneralPropertyPage))]
-    [ProvideProjectFactory(typeof(BaseNodeProjectFactory), NodeConstants.Nodejs, NodeFileFilter, "njsproj", "njsproj", ".\\NullPath", LanguageVsTemplate = NodeConstants.Nodejs)]
+    [ProvideProjectFactory(typeof(BaseNodeProjectFactory), NodejsConstants.Nodejs, NodeFileFilter, "njsproj", "njsproj", ".\\NullPath", LanguageVsTemplate = NodejsConstants.Nodejs)]
     public class NodejsProjectPackage : CommonProjectPackage {
         internal const string NodeFileFilter = "Node.js Project Files (*.njsproj);*.njsproj";
 
@@ -82,7 +82,7 @@ namespace Microsoft.NodejsTools.Project {
         /// displayed in the help about dialog.
         /// </summary>
         public override string GetProductDescription() {
-            return NodeConstants.Nodejs;
+            return NodejsConstants.Nodejs;
             //return Resources.ProductDescription;
         }
         /// <summary>

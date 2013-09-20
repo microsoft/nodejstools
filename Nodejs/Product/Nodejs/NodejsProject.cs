@@ -30,10 +30,10 @@ using Microsoft.VisualStudioTools.Project;
 
 namespace Microsoft.NodejsTools {
     [Guid("78D985FC-2CA0-4D08-9B6B-35ACD5E5294A")]
-    class NodeProject : FlavoredProjectBase, IOleCommandTarget, IVsProjectFlavorCfgProvider, IVsProject, IVsProject2 {
+    class NodejsProject : FlavoredProjectBase, IOleCommandTarget, IVsProjectFlavorCfgProvider, IVsProject, IVsProject2 {
         internal IVsProject _innerProject;
         internal IVsProject3 _innerProject3;
-        internal NodePackage _package;
+        internal NodejsPackage _package;
         private OleMenuCommandService _menuService;
         private List<OleMenuCommand> _commands = new List<OleMenuCommand>();
         private IVsProjectFlavorCfgProvider _innerVsProjectFlavorCfgProvider;
@@ -246,7 +246,7 @@ namespace Microsoft.NodejsTools {
         }
 
         private bool TryShowContextMenu(IntPtr pvaIn, Guid itemType, out int res) {
-            if (itemType == new Guid(NodeProjectFactory.NodeProjectGuid)) {
+            if (itemType == new Guid(NodejsProjectFactory.NodeProjectGuid)) {
                 // multiple Node prjoect nodes selected
                 res = ShowContextMenu(pvaIn, VsMenus.IDM_VS_CTXT_PROJNODE/*IDM_VS_CTXT_WEBPROJECT*/);
                 return true;

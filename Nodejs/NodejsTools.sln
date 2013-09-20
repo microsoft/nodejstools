@@ -1,7 +1,7 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio 2012
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Node", "Product\Nodejs\Node.csproj", "{32EC5259-98DA-40CA-9E2D-1B1B2E966F88}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Nodejs", "Product\Nodejs\Nodejs.csproj", "{32EC5259-98DA-40CA-9E2D-1B1B2E966F88}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ReferenceGenerator", "Product\ReferenceGenerator\ReferenceGenerator.csproj", "{81FBB417-19B2-4E70-857E-D4564B77AD8F}"
 EndProject
@@ -33,9 +33,11 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Tests", "Tests", "{850AC94A
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TestUtilities.Nodejs", "Tests\Utilities.Nodejs\TestUtilities.Nodejs.csproj", "{9E395BA3-765E-4F35-A520-19F1C323D625}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SharedProject", "..\Common\Tests\SharedProject\SharedProject.csproj", "{F8E4A9D2-7621-491F-9D37-C578E833AC02}"
+EndProject
 Global
 	GlobalSection(TeamFoundationVersionControl) = preSolution
-		SccNumberOfProjects = 15
+		SccNumberOfProjects = 16
 		SccEnterpriseProvider = {4CA58AB2-18FA-4F8D-95D4-32DDF27D184C}
 		SccTeamFoundationServer = http://tcvstf:8080/tfs/tc
 		SccLocalPath0 = .
@@ -47,54 +49,58 @@ Global
 		SccProjectTopLevelParentUniqueName2 = NodejsTools.sln
 		SccProjectName2 = Product/InteractiveWindow
 		SccLocalPath2 = Product\\InteractiveWindow
-		SccProjectUniqueName3 = Product\\Nodejs\\Node.csproj
+		SccProjectUniqueName3 = Product\\ReferenceGenerator\\ReferenceGenerator.csproj
 		SccProjectTopLevelParentUniqueName3 = NodejsTools.sln
-		SccProjectName3 = Product/Nodejs
-		SccLocalPath3 = Product\\Nodejs
-		SccProjectUniqueName4 = Product\\ReferenceGenerator\\ReferenceGenerator.csproj
+		SccProjectName3 = Product/ReferenceGenerator
+		SccLocalPath3 = Product\\ReferenceGenerator
+		SccProjectUniqueName4 = Product\\LogConverter\\LogConverter.csproj
 		SccProjectTopLevelParentUniqueName4 = NodejsTools.sln
-		SccProjectName4 = Product/ReferenceGenerator
-		SccLocalPath4 = Product\\ReferenceGenerator
-		SccProjectUniqueName5 = Product\\LogConverter\\LogConverter.csproj
+		SccProjectName4 = Product/LogConverter
+		SccLocalPath4 = Product\\LogConverter
+		SccProjectUniqueName5 = Product\\Profiling\\Profiling.csproj
 		SccProjectTopLevelParentUniqueName5 = NodejsTools.sln
-		SccProjectName5 = Product/LogConverter
-		SccLocalPath5 = Product\\LogConverter
-		SccProjectUniqueName6 = Product\\Profiling\\Profiling.csproj
+		SccProjectName5 = Product/Profiling
+		SccLocalPath5 = Product\\Profiling
+		SccProjectUniqueName6 = Tests\\Profiling\\ProfilerTests.csproj
 		SccProjectTopLevelParentUniqueName6 = NodejsTools.sln
-		SccProjectName6 = Product/Profiling
-		SccLocalPath6 = Product\\Profiling
-		SccProjectUniqueName7 = Tests\\Profiling\\ProfilerTests.csproj
+		SccProjectName6 = Tests/Profiling
+		SccLocalPath6 = Tests\\Profiling
+		SccProjectUniqueName7 = Tests\\Profiling.UI\\ProfilerUITests.csproj
 		SccProjectTopLevelParentUniqueName7 = NodejsTools.sln
-		SccProjectName7 = Tests/Profiling
-		SccLocalPath7 = Tests\\Profiling
-		SccProjectUniqueName8 = Tests\\Profiling.UI\\ProfilerUITests.csproj
+		SccProjectName7 = Tests/Profiling.UI
+		SccLocalPath7 = Tests\\Profiling.UI
+		SccProjectUniqueName8 = Tests\\Utilities.UI\\TestUtilities.UI.Nodejs.csproj
 		SccProjectTopLevelParentUniqueName8 = NodejsTools.sln
-		SccProjectName8 = Tests/Profiling.UI
-		SccLocalPath8 = Tests\\Profiling.UI
-		SccProjectUniqueName9 = Tests\\Utilities.UI\\TestUtilities.UI.Nodejs.csproj
+		SccProjectName8 = Tests/Utilities.UI
+		SccLocalPath8 = Tests\\Utilities.UI
+		SccProjectUniqueName9 = Tests\\Core.UI\\Nodejs.Tests.UI.csproj
 		SccProjectTopLevelParentUniqueName9 = NodejsTools.sln
-		SccProjectName9 = Tests/Utilities.UI
-		SccLocalPath9 = Tests\\Utilities.UI
-		SccProjectUniqueName10 = Tests\\Core.UI\\Nodejs.Tests.UI.csproj
+		SccProjectName9 = Tests/Core.UI
+		SccLocalPath9 = Tests\\Core.UI
+		SccProjectUniqueName10 = ..\\Common\\Tests\\Utilities\\TestUtilities.csproj
 		SccProjectTopLevelParentUniqueName10 = NodejsTools.sln
-		SccProjectName10 = Tests/Core.UI
-		SccLocalPath10 = Tests\\Core.UI
-		SccProjectUniqueName11 = ..\\Common\\Tests\\Utilities\\TestUtilities.csproj
+		SccProjectName10 = ../Common/Tests/Utilities
+		SccLocalPath10 = ..\\Common\\Tests\\Utilities
+		SccProjectUniqueName11 = ..\\Common\\Tests\\Utilities.UI\\TestUtilities.UI.csproj
 		SccProjectTopLevelParentUniqueName11 = NodejsTools.sln
-		SccProjectName11 = ../Common/Tests/Utilities
-		SccLocalPath11 = ..\\Common\\Tests\\Utilities
-		SccProjectUniqueName12 = ..\\Common\\Tests\\Utilities.UI\\TestUtilities.UI.csproj
+		SccProjectName11 = ../Common/Tests/Utilities.UI
+		SccLocalPath11 = ..\\Common\\Tests\\Utilities.UI
+		SccProjectUniqueName12 = Tests\\Utilities.Nodejs\\TestUtilities.Nodejs.csproj
 		SccProjectTopLevelParentUniqueName12 = NodejsTools.sln
-		SccProjectName12 = ../Common/Tests/Utilities.UI
-		SccLocalPath12 = ..\\Common\\Tests\\Utilities.UI
-		SccProjectUniqueName13 = Tests\\Utilities.Nodejs\\TestUtilities.Nodejs.csproj
+		SccProjectName12 = Tests/Utilities.Nodejs
+		SccLocalPath12 = Tests\\Utilities.Nodejs
+		SccProjectUniqueName13 = Tests\\Core\\NodejsTests.csproj
 		SccProjectTopLevelParentUniqueName13 = NodejsTools.sln
-		SccProjectName13 = Tests/Utilities.Nodejs
-		SccLocalPath13 = Tests\\Utilities.Nodejs
-		SccProjectUniqueName14 = Tests\\Core\\NodejsTests.csproj
+		SccProjectName13 = Tests/Core
+		SccLocalPath13 = Tests\\Core
+		SccProjectUniqueName14 = ..\\Common\\Tests\\SharedProject\\SharedProject.csproj
 		SccProjectTopLevelParentUniqueName14 = NodejsTools.sln
-		SccProjectName14 = Tests/Core
-		SccLocalPath14 = Tests\\Core
+		SccProjectName14 = ../Common/Tests/SharedProject
+		SccLocalPath14 = ..\\Common\\Tests\\SharedProject
+		SccProjectUniqueName15 = Product\\Nodejs\\Nodejs.csproj
+		SccProjectTopLevelParentUniqueName15 = NodejsTools.sln
+		SccProjectName15 = Product/Nodejs
+		SccLocalPath15 = Product\\Nodejs
 	EndGlobalSection
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|x86 = Debug|x86
@@ -157,6 +163,10 @@ Global
 		{9E395BA3-765E-4F35-A520-19F1C323D625}.Debug|x86.Build.0 = Debug|Any CPU
 		{9E395BA3-765E-4F35-A520-19F1C323D625}.Release|x86.ActiveCfg = Release|Any CPU
 		{9E395BA3-765E-4F35-A520-19F1C323D625}.Release|x86.Build.0 = Release|Any CPU
+		{F8E4A9D2-7621-491F-9D37-C578E833AC02}.Debug|x86.ActiveCfg = Debug|Any CPU
+		{F8E4A9D2-7621-491F-9D37-C578E833AC02}.Debug|x86.Build.0 = Debug|Any CPU
+		{F8E4A9D2-7621-491F-9D37-C578E833AC02}.Release|x86.ActiveCfg = Release|Any CPU
+		{F8E4A9D2-7621-491F-9D37-C578E833AC02}.Release|x86.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -176,5 +186,6 @@ Global
 		{8BA25AF0-477B-435C-8A23-970F2ADCED33} = {850AC94A-310F-4F88-A553-2806D7732BD1}
 		{240A6D2B-1982-4BC5-B1EA-C6CB0492329D} = {850AC94A-310F-4F88-A553-2806D7732BD1}
 		{9E395BA3-765E-4F35-A520-19F1C323D625} = {850AC94A-310F-4F88-A553-2806D7732BD1}
+		{F8E4A9D2-7621-491F-9D37-C578E833AC02} = {850AC94A-310F-4F88-A553-2806D7732BD1}
 	EndGlobalSection
 EndGlobal

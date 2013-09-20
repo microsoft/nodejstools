@@ -36,6 +36,7 @@
     <Reference Include="EnvDTE90a, Version=9.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a">
       <EmbedInteropTypes>False</EmbedInteropTypes>
     </Reference>
+    <Reference Include="Microsoft.Build" />
     <Reference Include="Microsoft.TC.TestHostAdapters, Version=1.0.0.0, Culture=neutral, PublicKeyToken=aa09a9889eb008f7, processorArchitecture=MSIL">
       <HintPath>..\..\Public\TCTestHostAdapters\$(VSTarget)\Microsoft.TC.TestHostAdapters.dll</HintPath>
     </Reference>
@@ -67,6 +68,7 @@
     <Reference Include="Microsoft.VisualStudio.TextManager.Interop, Version=7.1.40304.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a" />
     <Reference Include="PresentationCore" />
     <Reference Include="System" />
+    <Reference Include="System.ComponentModel.Composition" />
     <Reference Include="System.Core" />
     <Reference Include="System.Drawing" />
     <Reference Include="System.Xml.Linq" />
@@ -88,6 +90,8 @@
   <ItemGroup>
     <Compile Include="BasicProjectTests.cs" />
     <Compile Include="DragDropCopyCutPaste.cs" />
+    <Compile Include="NodejsProjectProcessor.cs" />
+    <Compile Include="NodejsTestDefintions.cs" />
     <Compile Include="ProjectTests.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="ReplWindowTests.cs" />
@@ -99,9 +103,9 @@
       <Project>{24a3887f-da50-4989-8d6c-4a5b04d5d457}</Project>
       <Name>InteractiveWindow</Name>
     </ProjectReference>
-    <ProjectReference Include="..\..\Product\Nodejs\Node.csproj">
+    <ProjectReference Include="..\..\Product\Nodejs\Nodejs.csproj">
       <Project>{32ec5259-98da-40ca-9e2d-1b1b2e966f88}</Project>
-      <Name>Node</Name>
+      <Name>Nodejs</Name>
     </ProjectReference>
     <ProjectReference Include="..\..\..\Common\Tests\Utilities.UI\TestUtilities.UI.csproj">
       <Project>{e8150ebc-6b62-40bf-bf91-1dc60149b530}</Project>

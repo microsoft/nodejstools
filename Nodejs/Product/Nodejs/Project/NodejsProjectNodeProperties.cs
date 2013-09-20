@@ -56,14 +56,14 @@ namespace Microsoft.NodejsTools.Project {
         [SRDescriptionAttribute(SR.NodeExePathDescription)]
         public string NodeExePath {
             get {
-                var res = this.Node.ProjectMgr.GetProjectProperty(NodeConstants.NodeExePath, true);
+                var res = this.Node.ProjectMgr.GetProjectProperty(NodejsConstants.NodeExePath, true);
                 if (String.IsNullOrWhiteSpace(res)) {
-                    return NodePackage.NodePath;
+                    return NodejsPackage.NodePath;
                 }
                 return res;
             }
             set {
-                Node.ProjectMgr.SetProjectProperty(NodeConstants.NodeExePath, value);
+                Node.ProjectMgr.SetProjectProperty(NodejsConstants.NodeExePath, value);
             }
         }
 
@@ -72,10 +72,10 @@ namespace Microsoft.NodejsTools.Project {
         [SRDescriptionAttribute(SR.NodeExeArgumentsDescription)]
         public string NodeExeArguments {
             get {
-                return this.Node.ProjectMgr.GetProjectProperty(NodeConstants.NodeExeArguments, true);
+                return this.Node.ProjectMgr.GetProjectProperty(NodejsConstants.NodeExeArguments, true);
             }
             set {
-                Node.ProjectMgr.SetProjectProperty(NodeConstants.NodeExeArguments, value);
+                Node.ProjectMgr.SetProjectProperty(NodejsConstants.NodeExeArguments, value);
             }
         }
 
@@ -84,10 +84,10 @@ namespace Microsoft.NodejsTools.Project {
         [SRDescriptionAttribute(SR.ScriptArgumentsDescription)]
         public string ScriptArguments {
             get {
-                return this.Node.ProjectMgr.GetProjectProperty(NodeConstants.ScriptArguments, true);
+                return this.Node.ProjectMgr.GetProjectProperty(NodejsConstants.ScriptArguments, true);
             }
             set {
-                Node.ProjectMgr.SetProjectProperty(NodeConstants.ScriptArguments, value);
+                Node.ProjectMgr.SetProjectProperty(NodejsConstants.ScriptArguments, value);
             }
         }
 
@@ -97,13 +97,13 @@ namespace Microsoft.NodejsTools.Project {
         public int? NodejsPort {
             get {
                 int port;
-                if (Int32.TryParse(Node.ProjectMgr.GetProjectProperty(NodeConstants.NodejsPort, true), out port)) {
+                if (Int32.TryParse(Node.ProjectMgr.GetProjectProperty(NodejsConstants.NodejsPort, true), out port)) {
                     return port;
                 }
                 return null;
             }
             set {
-                Node.ProjectMgr.SetProjectProperty(NodeConstants.NodejsPort, value != null ? value.ToString() : "");
+                Node.ProjectMgr.SetProjectProperty(NodejsConstants.NodejsPort, value != null ? value.ToString() : "");
             }
         }
 
@@ -112,10 +112,10 @@ namespace Microsoft.NodejsTools.Project {
         [SRDescriptionAttribute(SR.LaunchUrlDescription)]
         public string LaunchUrl {
             get {
-                return this.Node.ProjectMgr.GetProjectProperty(NodeConstants.LaunchUrl, true);
+                return this.Node.ProjectMgr.GetProjectProperty(NodejsConstants.LaunchUrl, true);
             }
             set {
-                Node.ProjectMgr.SetProjectProperty(NodeConstants.LaunchUrl, value);
+                Node.ProjectMgr.SetProjectProperty(NodejsConstants.LaunchUrl, value);
             }
         }
 
@@ -125,13 +125,13 @@ namespace Microsoft.NodejsTools.Project {
         public bool StartWebBrowser {
             get {
                 bool res;
-                if (Boolean.TryParse(Node.ProjectMgr.GetProjectProperty(NodeConstants.StartWebBrowser, true), out res)) {
+                if (Boolean.TryParse(Node.ProjectMgr.GetProjectProperty(NodejsConstants.StartWebBrowser, true), out res)) {
                     return res;
                 }
                 return true;
             }
             set {
-                Node.ProjectMgr.SetProjectProperty(NodeConstants.StartWebBrowser, value.ToString());
+                Node.ProjectMgr.SetProjectProperty(NodejsConstants.StartWebBrowser, value.ToString());
             }
         }
 

@@ -543,7 +543,7 @@ namespace TestUtilities.UI {
             Assert.AreEqual(VsIdeTestHostContext.Dte.Debugger.CurrentMode, mode);
         }
 
-        public Project OpenAndFindProject(string projName, string startItem = null, int expectedProjects = 1, string projectName = null, bool setStartupItem = true) {
+        public Project OpenProject(string projName, string startItem = null, int expectedProjects = 1, string projectName = null, bool setStartupItem = true) {
             string fullPath = TestData.GetPath(projName);
             Assert.IsTrue(File.Exists(fullPath), "Cannot find " + fullPath);
             Dte.Solution.Open(fullPath);
@@ -578,6 +578,13 @@ namespace TestUtilities.UI {
 
             if (startItem != null && setStartupItem) {
                 project.SetStartupFile(startItem);
+                for (var i = 0; i < 20; i++) {
+                    //Wait for the startupItem to be set before returning from the project creation
+                    if (((string)project.Properties.Item("StartupFile").Value) == startItem) {
+                        break;
+                    }
+                    System.Threading.Thread.Sleep(250);
+                }
             }
 
             DeleteAllBreakPoints();

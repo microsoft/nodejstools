@@ -265,7 +265,7 @@ undefined";
         [TestMethod, Priority(0)]
         public void TestSave() {
             using (var eval = new NodejsReplEvaluator()) {
-                var window = new MockReplWindow(eval, NodeConstants.JavaScript);
+                var window = new MockReplWindow(eval, NodejsConstants.JavaScript);
                 var res = window.Execute("function f() { }");
 
                 Assert.IsTrue(res.Wait(10000));

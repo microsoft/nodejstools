@@ -39,7 +39,7 @@ namespace Microsoft.NodejsTools.Profiling {
         public StandaloneTargetView() {
             var componentService = (IComponentModel)(NodeProfilingPackage.GetGlobalService(typeof(SComponentModel)));
 
-            _interpreterPath = NodePackage.NodePath;
+            _interpreterPath = NodejsPackage.NodePath;
             _scriptPath = String.Empty;
             _workingDirectory = String.Empty;
             _arguments = null;

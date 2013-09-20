@@ -31,27 +31,27 @@ namespace Microsoft.NodejsTools.Project {
         }
 
         public override void Apply() {
-            Project.SetProjectProperty(NodeConstants.NodeExePath, _control.NodeExePath);
-            Project.SetProjectProperty(NodeConstants.NodeExeArguments, _control.NodeExeArguments);
-            Project.SetProjectProperty(NodeConstants.ScriptArguments, _control.ScriptArguments);
-            Project.SetProjectProperty(NodeConstants.NodejsPort, _control.NodejsPort);
-            Project.SetProjectProperty(NodeConstants.StartWebBrowser, _control.StartWebBrowser.ToString());
+            Project.SetProjectProperty(NodejsConstants.NodeExePath, _control.NodeExePath);
+            Project.SetProjectProperty(NodejsConstants.NodeExeArguments, _control.NodeExeArguments);
+            Project.SetProjectProperty(NodejsConstants.ScriptArguments, _control.ScriptArguments);
+            Project.SetProjectProperty(NodejsConstants.NodejsPort, _control.NodejsPort);
+            Project.SetProjectProperty(NodejsConstants.StartWebBrowser, _control.StartWebBrowser.ToString());
             Project.SetProjectProperty(CommonConstants.WorkingDirectory, _control.WorkingDirectory);
-            Project.SetProjectProperty(NodeConstants.LaunchUrl, _control.LaunchUrl);
+            Project.SetProjectProperty(NodejsConstants.LaunchUrl, _control.LaunchUrl);
             IsDirty = false;
         }
 
         public override void LoadSettings() {
             Loading = true;
             try {
-                _control.NodeExeArguments = Project.GetProjectProperty(NodeConstants.NodeExeArguments);                
-                _control.NodeExePath = Project.GetProjectProperty(NodeConstants.NodeExePath);
-                _control.ScriptArguments = Project.GetProjectProperty(NodeConstants.ScriptArguments);
+                _control.NodeExeArguments = Project.GetProjectProperty(NodejsConstants.NodeExeArguments);                
+                _control.NodeExePath = Project.GetProjectProperty(NodejsConstants.NodeExePath);
+                _control.ScriptArguments = Project.GetProjectProperty(NodejsConstants.ScriptArguments);
                 _control.WorkingDirectory = Project.GetProjectProperty(CommonConstants.WorkingDirectory);
-                _control.LaunchUrl = Project.GetProjectProperty(NodeConstants.LaunchUrl);
-                _control.NodejsPort = Project.GetProjectProperty(NodeConstants.NodejsPort);
+                _control.LaunchUrl = Project.GetProjectProperty(NodejsConstants.LaunchUrl);
+                _control.NodejsPort = Project.GetProjectProperty(NodejsConstants.NodejsPort);
                 bool startWebBrowser;
-                if (!Boolean.TryParse(Project.GetProjectProperty(NodeConstants.StartWebBrowser), out startWebBrowser)) {
+                if (!Boolean.TryParse(Project.GetProjectProperty(NodejsConstants.StartWebBrowser), out startWebBrowser)) {
                     startWebBrowser = true;
                 }
                 _control.StartWebBrowser = startWebBrowser;

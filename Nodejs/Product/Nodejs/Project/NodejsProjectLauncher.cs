@@ -52,7 +52,7 @@ namespace Microsoft.NodejsTools.Project {
         }
 
         private int Start(string file, bool debug) {
-            var startBrowserStr = _project.GetProjectProperty(NodeConstants.StartWebBrowser);
+            var startBrowserStr = _project.GetProjectProperty(NodejsConstants.StartWebBrowser);
             bool startBrowser;
             if (!Boolean.TryParse(startBrowserStr, out startBrowser)) {
                 startBrowser = true;
@@ -60,7 +60,7 @@ namespace Microsoft.NodejsTools.Project {
             int? port = null;
             string webBrowserUrl = null;
             if (startBrowser) {
-                var portStr = _project.GetProjectProperty(NodeConstants.NodejsPort);
+                var portStr = _project.GetProjectProperty(NodejsConstants.NodejsPort);
                 int tmpPort;
                 if (String.IsNullOrWhiteSpace(portStr) || !Int32.TryParse(portStr, out tmpPort)) {
                     // make sure we know the port for when we start the browser
@@ -69,7 +69,7 @@ namespace Microsoft.NodejsTools.Project {
                     port = tmpPort;
                 }
                 Debug.Assert(port != null);
-                webBrowserUrl = _project.GetProjectProperty(NodeConstants.LaunchUrl);
+                webBrowserUrl = _project.GetProjectProperty(NodejsConstants.LaunchUrl);
                 if (String.IsNullOrWhiteSpace(webBrowserUrl)) {
                     webBrowserUrl = "http://localhost:" + port;
                 }
@@ -106,13 +106,13 @@ namespace Microsoft.NodejsTools.Project {
         private string GetFullArguments(string file, bool includeNodeArgs = true) {
             string res = "";
             if (includeNodeArgs) {
-                var nodeArgs = _project.GetProjectProperty(NodeConstants.NodeExeArguments);
+                var nodeArgs = _project.GetProjectProperty(NodejsConstants.NodeExeArguments);
                 if (!String.IsNullOrWhiteSpace(nodeArgs)) {
                     res = nodeArgs + " ";
                 }
             }
             res += "\"" + file + "\"";
-            var scriptArgs = _project.GetProjectProperty(NodeConstants.ScriptArguments);
+            var scriptArgs = _project.GetProjectProperty(NodejsConstants.ScriptArguments);
             if (!String.IsNullOrWhiteSpace(scriptArgs)) {
                 res += " " + scriptArgs;
             }
@@ -120,11 +120,11 @@ namespace Microsoft.NodejsTools.Project {
         }
 
         private string GetNodePath() {
-            var overridePath = _project.GetProjectProperty(NodeConstants.NodeExePath);
+            var overridePath = _project.GetProjectProperty(NodejsConstants.NodeExePath);
             if (!String.IsNullOrWhiteSpace(overridePath)) {
                 return overridePath;
             }
-            return NodePackage.NodePath;
+            return NodejsPackage.NodePath;
         }
 
         #endregion
@@ -169,7 +169,7 @@ namespace Microsoft.NodejsTools.Project {
             dbgInfo.bstrCurDir = _project.GetWorkingDirectory();
             dbgInfo.bstrArg = GetFullArguments(startupFile, includeNodeArgs: false);    // we need to supply node args via options
             dbgInfo.bstrRemoteMachine = null;
-            var nodeArgs = _project.GetProjectProperty(NodeConstants.NodeExeArguments);
+            var nodeArgs = _project.GetProjectProperty(NodejsConstants.NodeExeArguments);
             if(!String.IsNullOrWhiteSpace(nodeArgs)) {
                 dbgInfo.bstrOptions = AD7Engine.InterpreterOptions + "=" + nodeArgs;
             }

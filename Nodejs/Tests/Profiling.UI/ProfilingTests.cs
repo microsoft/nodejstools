@@ -81,7 +81,7 @@ namespace ProfilingUITests {
                 perfTarget = new NodejsPerfTarget(app.WaitForDialog());
 
                 perfTarget.SelectProfileScript();
-                perfTarget.InterpreterPath = NodePackage.NodePath;
+                perfTarget.InterpreterPath = NodejsPackage.NodePath;
                 perfTarget.ScriptName = TestData.GetPath(@"TestData\NodejsProfileTest\program.js");
 
                 try {
@@ -138,7 +138,7 @@ namespace ProfilingUITests {
                 perfTarget = new NodejsPerfTarget(app.WaitForDialog());
 
                 perfTarget.SelectProfileScript();
-                perfTarget.InterpreterPath = NodePackage.NodePath;
+                perfTarget.InterpreterPath = NodejsPackage.NodePath;
                 perfTarget.ScriptName = TestData.GetPath(@"TestData\NodejsProfileTest\program.js");
 
                 try {
@@ -206,7 +206,7 @@ namespace ProfilingUITests {
                 perfTarget = new NodejsPerfTarget(app.WaitForDialog());
 
                 perfTarget.SelectProfileScript();
-                perfTarget.InterpreterPath = NodePackage.NodePath;
+                perfTarget.InterpreterPath = NodejsPackage.NodePath;
                 perfTarget.ScriptName = TestData.GetPath(@"TestData\NodejsProfileTest\program.js");
 
                 try {
@@ -276,7 +276,7 @@ namespace ProfilingUITests {
                 perfTarget = new NodejsPerfTarget(app.WaitForDialog());
 
                 perfTarget.SelectProfileScript();
-                perfTarget.InterpreterPath = NodePackage.NodePath;
+                perfTarget.InterpreterPath = NodejsPackage.NodePath;
                 perfTarget.ScriptName = TestData.GetPath(@"TestData\NodejsProfileTest\program.js");
 
                 try {
@@ -736,7 +736,7 @@ namespace ProfilingUITests {
             // no sessions yet
             Assert.AreEqual(profiling.GetSession(1), null);
 
-            var session = profiling.LaunchProcess(NodePackage.NodePath,
+            var session = profiling.LaunchProcess(NodejsPackage.NodePath,
                 TestData.GetPath(@"TestData\NodejsProfileTest\program.js"),
                 TestData.GetPath(@"TestData\NodejsProfileTest"),
                 "",
@@ -760,7 +760,7 @@ namespace ProfilingUITests {
                 Mouse.DoubleClick(System.Windows.Input.MouseButton.Left);
 
                 perfTarget = new NodejsPerfTarget(app.WaitForDialog());
-                Assert.AreEqual(NodePackage.NodePath, perfTarget.InterpreterPath);
+                Assert.AreEqual(NodejsPackage.NodePath, perfTarget.InterpreterPath);
                 Assert.AreEqual("", perfTarget.Arguments);
                 Assert.IsTrue(perfTarget.ScriptName.EndsWith("program.js"));
                 Assert.IsTrue(perfTarget.ScriptName.StartsWith(perfTarget.WorkingDir));
@@ -784,7 +784,7 @@ namespace ProfilingUITests {
             // no sessions yet
             Assert.AreEqual(profiling.GetSession(1), null);
 
-            var session = profiling.LaunchProcess(NodePackage.NodePath,
+            var session = profiling.LaunchProcess(NodejsPackage.NodePath,
                 TestData.GetPath(@"TestData\NodejsProfileTest\infiniteProfile.js"),
                 TestData.GetPath(@"TestData\NodejsProfileTest"),
                 "",
@@ -818,7 +818,7 @@ namespace ProfilingUITests {
             // no sessions yet
             Assert.AreEqual(profiling.GetSession(1), null);
 
-            var session = profiling.LaunchProcess(NodePackage.NodePath,
+            var session = profiling.LaunchProcess(NodejsPackage.NodePath,
                 TestData.GetPath(@"TestData\NodejsProfileTest\infiniteProfile.js"),
                 TestData.GetPath(@"TestData\NodejsProfileTest"),
                 "",
@@ -903,7 +903,7 @@ namespace ProfilingUITests {
                 }
 
                 {
-                    session2 = profiling.LaunchProcess(NodePackage.NodePath,
+                    session2 = profiling.LaunchProcess(NodejsPackage.NodePath,
                         TestData.GetPath(@"TestData\NodejsProfileTest\program.js"),
                         TestData.GetPath(@"TestData\NodejsProfileTest"),
                         "",
@@ -963,7 +963,7 @@ namespace ProfilingUITests {
                 }
 
                 {
-                    session2 = profiling.LaunchProcess(NodePackage.NodePath,
+                    session2 = profiling.LaunchProcess(NodejsPackage.NodePath,
                         TestData.GetPath(@"TestData\NodejsProfileTest\program.js"),
                         TestData.GetPath(@"TestData\NodejsProfileTest"),
                         "",
@@ -1042,7 +1042,7 @@ namespace ProfilingUITests {
             // no sessions yet
             Assert.AreEqual(profiling.GetSession(1), null);
 
-            var session = profiling.LaunchProcess(NodePackage.NodePath,
+            var session = profiling.LaunchProcess(NodejsPackage.NodePath,
                 TestData.GetPath(@"TestData\NodejsProfileTest\program.js"),
                 TestData.GetPath(@"TestData\NodejsProfileTest"),
                 "",

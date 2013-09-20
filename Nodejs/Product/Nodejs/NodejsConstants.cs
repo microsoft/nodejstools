@@ -5,7 +5,7 @@ using System.Text;
 using System.Threading.Tasks;
 
 namespace Microsoft.NodejsTools {
-    class NodeConstants {
+    class NodejsConstants {
         public const string FileExtension = ".js";
         public const string JavaScript = "JavaScript";
         public const string Nodejs = "Node.js";

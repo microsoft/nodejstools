@@ -250,7 +250,7 @@ namespace Microsoft.NodejsTools.Profiling {
                         }
 
                         if (ctxMenu != null) {
-                            var uishell = (IVsUIShell)NodePackage.GetGlobalService(typeof(SVsUIShell));
+                            var uishell = (IVsUIShell)NodejsPackage.GetGlobalService(typeof(SVsUIShell));
                             if (uishell != null) {
                                 var pt = System.Windows.Forms.Cursor.Position;
                                 var pnts = new[] { new POINTS { x = (short)pt.X, y = (short)pt.Y } };

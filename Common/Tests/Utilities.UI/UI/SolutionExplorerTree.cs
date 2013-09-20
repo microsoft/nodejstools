@@ -12,12 +12,55 @@
  *
  * ***************************************************************************/
 
+using System;
+using System.IO;
 using System.Windows.Automation;
+using Microsoft.VisualStudio.TestTools.UnitTesting;
 
 namespace TestUtilities.UI {
     public class SolutionExplorerTree : TreeView {
         public SolutionExplorerTree(AutomationElement element)
             : base(element) {
+        }
+
+        public void AssertFileExists(params string[] path) {
+            Assert.IsNotNull(WaitForItem(path), "Item not found in solution explorer" + String.Join("\\", path));
+
+            var basePath = Path.Combine("TestData", "NodejsProjectData");
+            for (int i = 1; i < path.Length; i++) {
+                basePath = Path.Combine(basePath, path[i]);
+            }
+            Assert.IsTrue(File.Exists(basePath), "File doesn't exist: " + basePath);
+        }
+
+        public void AssertFileDoesntExist(params string[] path) {
+            Assert.IsNull(FindItem(path), "Item exists in solution explorer: " + String.Join("\\", path));
+
+            var basePath = Path.Combine("TestData", "NodejsProjectData");
+            for (int i = 1; i < path.Length; i++) {
+                basePath = Path.Combine(basePath, path[i]);
+            }
+            Assert.IsFalse(File.Exists(basePath), "File exists: " + basePath);
+        }
+
+        public void AssertFolderExists(string projectLocation, params string[] path) {
+            Assert.IsNotNull(WaitForItem(path), "Item not found in solution explorer" + String.Join("\\", path));
+
+            var basePath = projectLocation;
+            for (int i = 1; i < path.Length; i++) {
+                basePath = Path.Combine(basePath, path[i]);
+            }
+            Assert.IsTrue(Directory.Exists(basePath), "File doesn't exist: " + basePath);
+        }
+
+        public void AssertFolderDoesntExist(string projectLocation, params string[] path) {
+            Assert.IsNull(WaitForItemRemoved(path), "Item exists in solution explorer: " + String.Join("\\", path));
+
+            var basePath = projectLocation;
+            for (int i = 1; i < path.Length; i++) {
+                basePath = Path.Combine(basePath, path[i]);
+            }
+            Assert.IsFalse(Directory.Exists(basePath), "File exists: " + basePath);
         }
 
     }

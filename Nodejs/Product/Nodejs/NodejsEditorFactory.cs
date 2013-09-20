@@ -37,15 +37,15 @@ namespace Microsoft.NodejsTools {
     /// </summary>    
     [Guid(GuidList.guidNodeEditorFactoryString)]
     public class NodejsEditorFactory : IVsEditorFactory {
-        private NodePackage _package;
+        private NodejsPackage _package;
         private ServiceProvider _serviceProvider;
         private readonly bool _promptEncodingOnLoad;
 
-        public NodejsEditorFactory(NodePackage package) {
+        public NodejsEditorFactory(NodejsPackage package) {
             _package = package;
         }
 
-        public NodejsEditorFactory(NodePackage package, bool promptEncodingOnLoad) {
+        public NodejsEditorFactory(NodejsPackage package, bool promptEncodingOnLoad) {
             _package = package;
             _promptEncodingOnLoad = promptEncodingOnLoad;
         }
@@ -341,7 +341,7 @@ namespace Microsoft.NodejsTools {
 
                 diskBuffer.Properties.AddProperty(typeof(NodejsProjectionBuffer), projBuffer);
 
-                Guid langSvcGuid = NodePackage._jsLangSvcGuid;
+                Guid langSvcGuid = NodejsPackage._jsLangSvcGuid;
                 _textLines.SetLanguageServiceID(ref langSvcGuid);
 
                 adapterService.SetDataBuffer(_textLines, projBuffer.EllisionBuffer);
@@ -381,7 +381,7 @@ namespace Microsoft.NodejsTools {
 
     [Guid("C8576E92-EFB6-4414-8F63-C84D474A539E")]
     public class NodejsEditorFactoryPromptForEncoding : NodejsEditorFactory {
-        public NodejsEditorFactoryPromptForEncoding(NodePackage package) : base(package, true) { }
+        public NodejsEditorFactoryPromptForEncoding(NodejsPackage package) : base(package, true) { }
         public override int CreateEditorInstance(uint createEditorFlags, string documentMoniker, string physicalView, VisualStudio.Shell.Interop.IVsHierarchy hierarchy, uint itemid, IntPtr docDataExisting, out IntPtr docView, out IntPtr docData, out string editorCaption, out Guid commandUIGuid, out int createDocumentWindowFlags) {
             if (docDataExisting != IntPtr.Zero) {
                 docView = IntPtr.Zero;

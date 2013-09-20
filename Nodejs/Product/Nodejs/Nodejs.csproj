@@ -169,7 +169,7 @@
   <ItemGroup>
     <Compile Include="CustomTrackingSpan.cs" />
     <Compile Include="EditFilter.cs" />
-    <Compile Include="NodeProjectConfig.cs" />
+    <Compile Include="NodejsProjectConfig.cs" />
     <Compile Include="Project\NodejsFileNode.cs" />
     <Compile Include="Project\NodejsGeneralPropertyPageControl.cs">
       <SubType>UserControl</SubType>
@@ -231,11 +231,11 @@
     <Compile Include="Guids.cs" />
     <Compile Include="JsonListener.cs" />
     <Compile Include="Navigation\CodeWindowManager.cs" />
-    <Compile Include="NodeConstants.cs" />
+    <Compile Include="NodejsConstants.cs" />
     <Compile Include="NodejsEditorFactory.cs" />
     <Compile Include="NodejsProjectionBuffer.cs" />
-    <Compile Include="NodeProject.cs" />
-    <Compile Include="NodeProjectFactory.cs" />
+    <Compile Include="NodejsProject.cs" />
+    <Compile Include="NodejsProjectFactory.cs" />
     <Compile Include="OAProject.cs" />
     <Compile Include="OAProperty.cs" />
     <Compile Include="PkgCmdId.cs" />
@@ -250,7 +250,7 @@
     <Compile Include="Repl\NodejsReplEvaluator.cs" />
     <Compile Include="Repl\NodejsReplEvaluatorProvider.cs" />
     <Compile Include="GlobalSuppressions.cs" />
-    <Compile Include="NodePackage.cs" />
+    <Compile Include="NodejsPackage.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>
@@ -264,7 +264,7 @@
     </EmbeddedResource>
   </ItemGroup>
   <ItemGroup>
-    <VSCTCompile Include="NodeTools.vsct">
+    <VSCTCompile Include="NodejsTools.vsct">
       <ResourceName>1000</ResourceName>
       <SubType>Designer</SubType>
     </VSCTCompile>

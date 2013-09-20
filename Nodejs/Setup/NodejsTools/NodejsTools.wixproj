@@ -24,7 +24,7 @@
     <Compile Include="NodejsToolsVsExt.wxs" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="$(BuildRoot)\Nodejs\Product\Nodejs\Node.csproj">
+    <ProjectReference Include="$(BuildRoot)\Nodejs\Product\Nodejs\Nodejs.csproj">
       <Name>Microsoft.NodeTools</Name>
       <Project>{BB05D7F2-1F7F-4E15-9D5F-D288ABEB29A5}</Project>
       <Private>True</Private>

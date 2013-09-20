@@ -50,7 +50,7 @@ namespace Microsoft.NodejsTools {
     [InstalledProductRegistration("#110", "#112", "1.0", IconResourceID = 400)]
     [Guid(GuidList.guidNodePkgString)]
     [ProvideDebugEngine("Node.js Debugging", typeof(AD7ProgramProvider), typeof(AD7Engine), AD7Engine.DebugEngineId)]
-    [ProvideDebugLanguage(NodeConstants.JavaScript, "{65791609-BA29-49CF-A214-DBFF8AEC3BC2}", NodeExpressionEvaluatorGuid, AD7Engine.DebugEngineId)]
+    [ProvideDebugLanguage(NodejsConstants.JavaScript, "{65791609-BA29-49CF-A214-DBFF8AEC3BC2}", NodeExpressionEvaluatorGuid, AD7Engine.DebugEngineId)]
     // Keep declared exceptions in sync with those given default values in NodeDebugger.GetDefaultExceptionTreatments()
     [ProvideDebugException(AD7Engine.DebugEngineId, "Node.js Exceptions", State = enum_EXCEPTION_STATE.EXCEPTION_STOP_FIRST_CHANCE)]
     [ProvideDebugException(AD7Engine.DebugEngineId, "Node.js Exceptions", "Error", State = enum_EXCEPTION_STATE.EXCEPTION_STOP_FIRST_CHANCE)]
@@ -145,14 +145,14 @@ namespace Microsoft.NodejsTools {
     [ProvideDebugException(AD7Engine.DebugEngineId, "Node.js Exceptions", "SyntaxError", State = enum_EXCEPTION_STATE.EXCEPTION_STOP_FIRST_CHANCE)]
     [ProvideDebugException(AD7Engine.DebugEngineId, "Node.js Exceptions", "TypeError", State = enum_EXCEPTION_STATE.EXCEPTION_STOP_FIRST_CHANCE)]
     [ProvideDebugException(AD7Engine.DebugEngineId, "Node.js Exceptions", "URIError", State = enum_EXCEPTION_STATE.EXCEPTION_STOP_FIRST_CHANCE)]
-    [ProvideProjectFactory(typeof(NodeProjectFactory), null, null, null, null, ".\\NullPath", LanguageVsTemplate = NodeConstants.Nodejs)]   // outer flavor, no file extension
+    [ProvideProjectFactory(typeof(NodejsProjectFactory), null, null, null, null, ".\\NullPath", LanguageVsTemplate = NodejsConstants.Nodejs)]   // outer flavor, no file extension
     [ProvideDebugPortSupplier("Node remote debugging", typeof(NodeRemoteDebugPortSupplier), NodeRemoteDebugPortSupplier.PortSupplierId)]
     [ProvideMenuResource(1000, 1)]                              // This attribute is needed to let the shell know that this package exposes some menus.
     [ProvideEditorExtension2(typeof(NodejsEditorFactory), NodeJsFileType, 50, "*:1", ProjectGuid = "{78D985FC-2CA0-4D08-9B6B-35ACD5E5294A}", NameResourceID = 102, DefaultName = "server", TemplateDir="FileTemplates\\NewItem")]
     [ProvideEditorExtension2(typeof(NodejsEditorFactoryPromptForEncoding), NodeJsFileType, 50, "*:1", ProjectGuid = "{78D985FC-2CA0-4D08-9B6B-35ACD5E5294A}", NameResourceID = 113, DefaultName = "server")]
-    [ProvideProjectItem(typeof(BaseNodeProjectFactory), NodeConstants.Nodejs, "FileTemplates\\NewItem", 0)]
-    [ProvideLanguageTemplates("{349C5851-65DF-11DA-9384-00065B846F21}", NodeConstants.Nodejs, GuidList.guidNodePkgString, "Web", "Node.js Project Templates", "{" + BaseNodeProjectFactory.BaseNodeProjectGuid + "}", ".js", NodeConstants.Nodejs, "{" + BaseNodeProjectFactory.BaseNodeProjectGuid + "}")]
-    public sealed class NodePackage : CommonPackage {
+    [ProvideProjectItem(typeof(BaseNodeProjectFactory), NodejsConstants.Nodejs, "FileTemplates\\NewItem", 0)]
+    [ProvideLanguageTemplates("{349C5851-65DF-11DA-9384-00065B846F21}", NodejsConstants.Nodejs, GuidList.guidNodePkgString, "Web", "Node.js Project Templates", "{" + BaseNodeProjectFactory.BaseNodeProjectGuid + "}", ".js", NodejsConstants.Nodejs, "{" + BaseNodeProjectFactory.BaseNodeProjectGuid + "}")]
+    public sealed class NodejsPackage : CommonPackage {
         internal const string NodeExpressionEvaluatorGuid = "{F16F2A71-1C45-4BAB-BECE-09D28CFDE3E6}";
         private IContentType _contentType;
         internal const string NodeJsFileType = ".njs";
@@ -165,7 +165,7 @@ namespace Microsoft.NodejsTools {
         /// not sited yet inside Visual Studio environment. The place to do all the other 
         /// initialization is the Initialize method.
         /// </summary>
-        public NodePackage() {
+        public NodejsPackage() {
             Debug.WriteLine(string.Format(CultureInfo.CurrentCulture, "Entering constructor for: {0}", this.ToString()));
         }
 
@@ -181,7 +181,7 @@ namespace Microsoft.NodejsTools {
             Debug.WriteLine(string.Format(CultureInfo.CurrentCulture, "Entering Initialize() of: {0}", this.ToString()));
             base.Initialize();
 
-            RegisterProjectFactory(new NodeProjectFactory(this));
+            RegisterProjectFactory(new NodejsProjectFactory(this));
             RegisterEditorFactory(new NodejsEditorFactory(this));
             RegisterEditorFactory(new NodejsEditorFactoryPromptForEncoding(this));
 
@@ -286,7 +286,7 @@ namespace Microsoft.NodejsTools {
         public IContentType ContentType {
             get {
                 if (_contentType == null) {
-                    _contentType = ComponentModel.GetService<IContentTypeRegistryService>().GetContentType(NodeConstants.JavaScript);
+                    _contentType = ComponentModel.GetService<IContentTypeRegistryService>().GetContentType(NodejsConstants.JavaScript);
                 }
                 return _contentType;
             }
@@ -305,7 +305,7 @@ namespace Microsoft.NodejsTools {
         public override bool IsRecognizedFile(string filename) {
             var ext = Path.GetExtension(filename);
 
-            return String.Equals(ext, NodeConstants.FileExtension, StringComparison.OrdinalIgnoreCase);
+            return String.Equals(ext, NodejsConstants.FileExtension, StringComparison.OrdinalIgnoreCase);
         }
 
         internal new object GetService(Type serviceType) {

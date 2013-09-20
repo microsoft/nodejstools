@@ -155,7 +155,7 @@ namespace Microsoft.NodejsTools.Repl {
                         "visualstudio_nodejs_repl.js"
                     ) + "\"";
 
-            var psi = new ProcessStartInfo(NodePackage.NodePath, scriptPath + " " + port);
+            var psi = new ProcessStartInfo(NodejsPackage.NodePath, scriptPath + " " + port);
             psi.CreateNoWindow = true;
             psi.UseShellExecute = false;
             psi.RedirectStandardError = true;
@@ -164,7 +164,7 @@ namespace Microsoft.NodejsTools.Repl {
 
             string fileName, directory = null;
 
-            if (NodePackage.TryGetStartupFileAndDirectory(out fileName, out directory)) {
+            if (NodejsPackage.TryGetStartupFileAndDirectory(out fileName, out directory)) {
                 psi.WorkingDirectory = directory;
             }
 

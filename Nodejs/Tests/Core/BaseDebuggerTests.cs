@@ -75,7 +75,7 @@ namespace DebuggerTests {
             AutoResetEvent processLoaded = new AutoResetEvent(false);
             NodeDebugger process =
                 new NodeDebugger(
-                    NodePackage.NodePath,
+                    NodejsPackage.NodePath,
                     arguments,
                     dir,
                     null,
@@ -121,7 +121,7 @@ namespace DebuggerTests {
                 " \"" + fullPath + "\"" +
                 (String.IsNullOrEmpty(arguments) ? "" : " " + arguments);
 
-            var psi = new ProcessStartInfo(NodePackage.NodePath, arguments);
+            var psi = new ProcessStartInfo(NodejsPackage.NodePath, arguments);
             psi.WorkingDirectory = dir;
             var process = new Process();
             process.StartInfo = psi;

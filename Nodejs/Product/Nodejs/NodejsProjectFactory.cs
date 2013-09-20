@@ -18,16 +18,16 @@ using Microsoft.VisualStudio.Shell.Flavor;
 
 namespace Microsoft.NodejsTools {
     [Guid(NodeProjectGuid)]
-    public class NodeProjectFactory : FlavoredProjectFactoryBase {
+    public class NodejsProjectFactory : FlavoredProjectFactoryBase {
         internal const string NodeProjectGuid = "3AF33F2E-1136-4D97-BBB7-1795711AC8B8";
-        private NodePackage _package;
+        private NodejsPackage _package;
 
-        public NodeProjectFactory(NodePackage package) {
+        public NodejsProjectFactory(NodejsPackage package) {
             _package = package;
         }
 
         protected override object PreCreateForOuter(IntPtr outerProjectIUnknown) {
-            var res = new NodeProject();
+            var res = new NodejsProject();
             res._package = _package;
             return res;
         }

@@ -84,7 +84,7 @@ namespace Microsoft.NodejsTools.Repl {
         }
 
         private static bool IsJavaScriptBuffer(ITextBuffer buffer) {
-            return buffer.ContentType.IsOfType(NodeConstants.JavaScript);
+            return buffer.ContentType.IsOfType(NodejsConstants.JavaScript);
         }
 
         public object ButtonContent {

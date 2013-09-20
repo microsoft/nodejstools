@@ -228,9 +228,9 @@
     </Page>
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\Nodejs\Node.csproj">
+    <ProjectReference Include="..\Nodejs\Nodejs.csproj">
       <Project>{32ec5259-98da-40ca-9e2d-1b1b2e966f88}</Project>
-      <Name>Node</Name>
+      <Name>Nodejs</Name>
     </ProjectReference>
   </ItemGroup>
   <ItemGroup>

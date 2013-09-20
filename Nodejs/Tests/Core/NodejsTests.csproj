@@ -55,9 +55,9 @@
       <Project>{d092d54e-ff29-4d32-9aee-4ef704c92f67}</Project>
       <Name>TestUtilities</Name>
     </ProjectReference>
-    <ProjectReference Include="$(BuildRoot)\Nodejs\Product\Nodejs\Node.csproj">
+    <ProjectReference Include="..\..\Product\Nodejs\Nodejs.csproj">
       <Project>{32ec5259-98da-40ca-9e2d-1b1b2e966f88}</Project>
-      <Name>Node</Name>
+      <Name>Nodejs</Name>
     </ProjectReference>
     <ProjectReference Include="$(BuildRoot)\Nodejs\Tests\Utilities.UI\TestUtilities.UI.Nodejs.csproj">
       <Project>{a731c4c3-3741-4080-a946-c47574c1f3bf}</Project>

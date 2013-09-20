@@ -319,7 +319,7 @@ namespace Microsoft.NodejsTools.Profiling {
         }
 
         private void AddPerformanceSession(object sender, EventArgs e) {
-            var dte = (EnvDTE.DTE)NodePackage.GetGlobalService(typeof(EnvDTE.DTE));
+            var dte = (EnvDTE.DTE)NodejsPackage.GetGlobalService(typeof(EnvDTE.DTE));
             string filename = "Performance" + PerfFileType;
             bool save = false;
             if (dte.Solution.IsOpen && !String.IsNullOrEmpty(dte.Solution.FullName)) {
