@@ -57,6 +57,12 @@
             <Component Id="cmp83246B83300D48B6BA9BE9863A22E3CC" Directory="DIR_ProjectTemplates_4DCCAA275A2C4923918F2CBC07199083" Guid="{809831B0-4B05-4380-8C33-13F91953C9A2}">
               <File Id="fil28DC82CBC4D24BB5867F8102AFDA0A7C" KeyPath="yes" Source="$(var.BinariesDir)\ProjectTemplates\AzureNodejsApp.zip" />
             </Component>
+            <Component Id="cmpB526764FCE5A44EBB704BBD3E294EDDE" Directory="DIR_ProjectTemplates_4DCCAA275A2C4923918F2CBC07199083" Guid="{4009557F-F306-4977-9AFE-5B05357EA419}">
+              <File Id="fil3E7C088F81A34F56BBDFD4FC17A0B996" KeyPath="yes" Source="$(var.BinariesDir)\ProjectTemplates\WebNodejsApp.zip" />
+            </Component>
+            <Component Id="cmpCB8FB7A437D14E488A8FEC66B262C3AD" Directory="DIR_ProjectTemplates_4DCCAA275A2C4923918F2CBC07199083" Guid="{593DB047-D59A-4C40-A7BE-C95046238044}">
+              <File Id="filF80F32983A1F4A90B6C92303CF50CFC5" KeyPath="yes" Source="$(var.BinariesDir)\ProjectTemplates\WebAzureNodejsApp.zip" />
+            </Component>
             <Component Id="cmp7850D806C2DE45078426A78CBBEF66DA" Directory="Dir_NodejsToolsMsBuild" Guid="{6D84572F-D895-443F-BD25-712394273A4E}">
                 <File Id="filD2A9B63C22F547FD8C1C55BB14F22A8A" KeyPath="yes" Source="$(var.BinariesDir)\Microsoft.NodejsTools.targets" />
             </Component>

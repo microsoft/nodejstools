@@ -135,12 +135,6 @@ namespace Microsoft.VisualStudioTools.Project
         internal const string LinkedItemsAreNotSupported = "LinkedItemsAreNotSupported";
         internal const string Minimal = "Minimal";
         internal const string Misc = "Misc";
-        internal const string NodeExeArguments = "NodeExeArguments";
-        internal const string NodeExeArgumentsDescription = "NodeExeArgumentsDescription";
-        internal const string NodeExePath = "NodeExePath";
-        internal const string NodeExePathDescription = "NodeExePathDescription";
-        internal const string NodejsPort = "NodejsPort";
-        internal const string NodejsPortDescription = "NodejsPortDescription";
         internal const string None = "None";
         internal const string Normal = "Normal";
         internal const string NestedProjectFailedToReload = "NestedProjectFailedToReload";

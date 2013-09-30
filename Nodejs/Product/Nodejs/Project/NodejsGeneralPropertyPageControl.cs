@@ -109,5 +109,11 @@ namespace Microsoft.NodejsTools.Project {
         private void Changed(object sender, EventArgs e) {
             _propPage.IsDirty = true;
         }
+
+        private void NodejsPortKeyPress(object sender, KeyPressEventArgs e) {
+            if (!Char.IsDigit(e.KeyChar)) {
+                e.Handled = true;
+            }
+        }
     }
 }

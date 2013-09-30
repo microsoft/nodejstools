@@ -340,11 +340,11 @@ namespace TestUtilities.UI {
             }
         }
 
-        internal static void CheckMessageBox(params string[] text) {
+        public static void CheckMessageBox(params string[] text) {
             CheckMessageBox(MessageBoxButton.Cancel, text);
         }
 
-        internal static void CheckMessageBox(MessageBoxButton button, params string[] text) {
+        public static void CheckMessageBox(MessageBoxButton button, params string[] text) {
             CheckAndDismissDialog(text, 65535, new IntPtr((int)button));
         }
 

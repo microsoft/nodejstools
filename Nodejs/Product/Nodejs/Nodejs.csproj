@@ -170,6 +170,7 @@
     <Compile Include="CustomTrackingSpan.cs" />
     <Compile Include="EditFilter.cs" />
     <Compile Include="NodejsProjectConfig.cs" />
+    <Compile Include="Project\Attributes.cs" />
     <Compile Include="Project\NodejsFileNode.cs" />
     <Compile Include="Project\NodejsGeneralPropertyPageControl.cs">
       <SubType>UserControl</SubType>
@@ -294,6 +295,39 @@
       <SubType>Designer</SubType>
     </Content>
     <Content Include="ProjectTemplates\AzureNodeApp\server.js" />
+    <Resource Include="ProjectTemplates\WebNodeApp\blankwj.ico" />
+    <Resource Include="ProjectTemplates\WebNodeApp\blankwj.png" />
+    <Content Include="ProjectTemplates\WebAzureNodeApp\AzureNodeApp.vstemplate">
+      <SubType>Designer</SubType>
+    </Content>
+    <Resource Include="ProjectTemplates\WebAzureNodeApp\blankwj.ico" />
+    <Resource Include="ProjectTemplates\WebAzureNodeApp\blankwj.png" />
+    <Content Include="ProjectTemplates\WebAzureNodejsApp.zip">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+      <IncludeInVSIX>true</IncludeInVSIX>
+    </Content>
+    <None Include="ProjectTemplates\WebAzureNodeApp\NodeApp.njsproj">
+      <SubType>Designer</SubType>
+    </None>
+    <Content Include="ProjectTemplates\WebAzureNodeApp\server.js" />
+    <Content Include="ProjectTemplates\WebNodejsApp.zip">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+      <IncludeInVSIX>true</IncludeInVSIX>
+    </Content>
+    <None Include="ProjectTemplates\WebAzureNodeApp\ChangeConfig.ps1" />
+    <None Include="ProjectTemplates\WebAzureNodeApp\download.ps1" />
+    <None Include="ProjectTemplates\WebAzureNodeApp\package.json" />
+    <None Include="ProjectTemplates\WebAzureNodeApp\README.md" />
+    <None Include="ProjectTemplates\WebAzureNodeApp\setup_web.cmd" />
+    <None Include="ProjectTemplates\WebAzureNodeApp\Web.cloud.config" />
+    <None Include="ProjectTemplates\WebAzureNodeApp\Web.config" />
+    <None Include="ProjectTemplates\WebNodeApp\NodeApp.njsproj">
+      <SubType>Designer</SubType>
+    </None>
+    <Content Include="ProjectTemplates\WebNodeApp\NodeApp.vstemplate">
+      <SubType>Designer</SubType>
+    </Content>
+    <Content Include="ProjectTemplates\WebNodeApp\server.js" />
     <Content Include="ProjectTemplates\NodejsApp.zip">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
       <IncludeInVSIX>true</IncludeInVSIX>
@@ -322,11 +356,14 @@
     <None Include="ProjectTemplates\AzureNodeApp\setup_web.cmd" />
     <None Include="ProjectTemplates\AzureNodeApp\Web.cloud.config" />
     <None Include="ProjectTemplates\AzureNodeApp\Web.config" />
+    <None Include="ProjectTemplates\WebNodeApp\package.json" />
+    <None Include="ProjectTemplates\WebNodeApp\README.md" />
     <None Include="ProjectTemplates\NodeApp\NodeApp.njsproj">
       <SubType>Designer</SubType>
     </None>
     <None Include="ProjectTemplates\NodeApp\package.json" />
     <None Include="ProjectTemplates\NodeApp\README.md" />
+    <None Include="ProjectTemplates\WebNodeApp\WebApplication.webproj" />
     <None Include="source.extension.vsixmanifest">
       <SubType>Designer</SubType>
     </None>

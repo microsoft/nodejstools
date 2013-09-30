@@ -693,6 +693,13 @@ folder you are copying, do you want to replace the existing files?", Path.GetFil
                             return false;
                         }
 
+                        if (!Project.Tracker.CanRenameItem(
+                            source,
+                            newPath,
+                            VSRENAMEFILEFLAGS.VSRENAMEFILEFLAGS_Directory)) {
+                            return false;
+                        }
+
                         additions.Add(new FolderAddition(Project, Path.Combine(targetPath, name), source, DropEffect, nestedAdditions.ToArray()));
                     }
 
@@ -759,21 +766,45 @@ folder you are copying, do you want to replace the existing files?", Path.GetFil
                 }
 
                 public override void DoAddition() {
-                    var newNode = Project.CreateFolderNodes(NewFolderPath);
+                    bool wasExpanded = false;
+                    HierarchyNode newNode;
+                    var sourceFolder = Project.FindNodeByFullPath(SourceFolder) as FolderNode;
+                    if (sourceFolder == null || DropEffect != DropEffect.Move) {
+                        newNode = Project.CreateFolderNodes(NewFolderPath);
+                    } else {
+                        // Rename the folder & reparent our existing FolderNode w/ potentially w/ a new ID,
+                        // but don't update the children as we'll handle that w/ our file additions...
+                        wasExpanded = sourceFolder.GetIsExpanded();
+                        sourceFolder.ReparentFolder(NewFolderPath);
+                        Directory.CreateDirectory(NewFolderPath);
+                        newNode = sourceFolder;
+                    }
 
                     foreach (var addition in Additions) {
                         addition.DoAddition();
                     }
 
-                    var sourceFolder = Project.FindNodeByFullPath(SourceFolder);
                     if (sourceFolder != null) {
                         if (sourceFolder.IsNonMemberItem) {
                             // copying or moving an existing excluded folder, new folder
                             // is excluded too.
                             ErrorHandler.ThrowOnFailure(newNode.ExcludeFromProject());
-                        } else if (DropEffect == DropEffect.Move) {
-                            sourceFolder.Remove(true);
                         }
+
+                        if (DropEffect == DropEffect.Move) {
+                            Directory.Delete(SourceFolder);
+
+                            // we just handled the delete, the updated folder has the new filename,
+                            // and we don't want to delete where we just moved stuff...
+                            Project.ItemsDraggedOrCutOrCopied.Remove(sourceFolder);
+                        }
+                    }
+
+                    // Send OnItemRenamed for the folder now, after all of the children have been renamed
+                    Project.Tracker.OnItemRenamed(SourceFolder, NewFolderPath, VSRENAMEFILEFLAGS.VSRENAMEFILEFLAGS_Directory);
+                    
+                    if (wasExpanded) {
+                        sourceFolder.ExpandItem(EXPANDFLAGS.EXPF_ExpandFolder);
                     }
                 }
             }
@@ -1126,6 +1157,7 @@ folder you are copying, do you want to replace the existing files?", Path.GetFil
 
                                 targetFolder.AddChild(fileNode);
                             }
+                            Project.tracker.OnItemAdded(fileNode.Url, VSADDFILEFLAGS.VSADDFILEFLAGS_NoFlags);
                         } else if (existing.IsNonMemberItem) {
                             // replacing item that already existed, just include it in the project.
                             existing.IncludeInProject(false);

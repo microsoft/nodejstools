@@ -14,6 +14,7 @@
 
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.IO;
 using MSBuild = Microsoft.Build.Evaluation;
 
@@ -38,11 +39,23 @@ namespace TestUtilities.SharedProject {
         public static readonly ProjectType CSharp = new ProjectType(".cs", ".csproj", new Guid("FAE04EC0-301F-11D3-BF4B-00C04F79EFBC"), "class C { }");
 
         public ProjectType(string codeExtension, string projectExtension, Guid projectTypeGuid, string sampleCode = "", IProjectProcessor[] postProcess = null) {
+            Debug.Assert(!String.IsNullOrWhiteSpace(CodeExtension));
+
             CodeExtension = codeExtension;
             ProjectExtension = projectExtension;
             SampleCode = sampleCode;
             ProjectTypeGuid = projectTypeGuid;
             _processors = postProcess ?? new IProjectProcessor[0];
+        }
+
+        /// <summary>
+        /// Appends the code extension to a filename
+        /// </summary>
+        public string Code(string filename) {
+            if (String.IsNullOrWhiteSpace(filename)) {
+                throw new ArgumentException("no filename suppied", "filename");
+            }
+            return filename + CodeExtension;
         }
 
         public MSBuild.Project Generate(string location, string projectName, params ProjectContentGenerator[] items) {

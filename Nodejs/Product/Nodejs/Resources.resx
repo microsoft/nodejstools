@@ -120,11 +120,23 @@
   <data name="LaunchUrlToolTip" xml:space="preserve">
     <value>Specifies the URL to open in the browser.  If unspecified http://localhost:port is used.\r\nIf a port is specified, it needs to be specified here as well.</value>
   </data>
+  <data name="NodeExeArguments" xml:space="preserve">
+    <value>Arguments to Node.exe</value>
+  </data>
+  <data name="NodeExeArgumentsDescription" xml:space="preserve">
+    <value>Specifies the options provided to node.exe, such as -e or -i.</value>
+  </data>
   <data name="NodeExeArgumentsToolTip" xml:space="preserve">
     <value>Specifies the options provided to node.exe, such as -e or -i.</value>
   </data>
+  <data name="NodeExePath" xml:space="preserve">
+    <value>Node.exe path</value>
+  </data>
   <data name="NodeExePathToolTip" xml:space="preserve">
     <value>Specifies the path to the node.exe executable.</value>
+  </data>
+  <data name="NodejsPort" xml:space="preserve">
+    <value>Node.js Port</value>
   </data>
   <data name="NodejsPortToolTip" xml:space="preserve">
     <value>Specifies the port number used for process.env.port, if unspecified a random port is generated.</value>

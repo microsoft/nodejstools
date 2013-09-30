@@ -948,16 +948,54 @@ namespace Microsoft.VisualStudioTools.Project
             // Close the document window if opened.
             CloseDocumentWindow(this);
 
-            // Notify document tracker listeners that we have removed the item.
-            VSREMOVEFILEFLAGS[] removeFlags = this.GetRemoveFileFlags(filesToBeDeleted);
-            Debug.Assert(removeFlags != null, "At least an empty array should be returned for the GetRemoveFileFlags");
-            this.ProjectMgr.Tracker.OnItemRemoved(documentToRemove, removeFlags[0]);
+            RaiseOnItemRemoved(documentToRemove, filesToBeDeleted);
 
             // Notify hierarchy event listeners that items have been invalidated
             ProjectMgr.OnInvalidateItems(this);
 
             // Dispose the node now that is deleted.
             this.Dispose(true);
+        }
+
+        /// <summary>
+        /// Determines if the node should open with the designer by default, or if we should
+        /// just open with the default editor.
+        /// </summary>
+        public virtual bool DefaultOpensWithDesignView {
+            get {
+                // ASPX\ASCX files support design view but should be opened by default with
+                // LOGVIEWID_Primary - this is because they support design and html view which
+                // is a tools option setting for them. If we force designview this option
+                // gets bypassed. We do a similar thing for asax/asmx/xsd. By doing so, we don't force
+                // the designer to be invoked when double-clicking on the node - it will now go through the
+                // shell's standard open mechanism.
+                return false;
+            }
+        }
+
+        /// <summary>
+        /// Returns true if the node supports a design view.
+        /// </summary>
+        public virtual bool SupportsDesignView {
+            get {
+                return false;
+            }
+        }
+
+        /// <summary>
+        /// Returns true if the node represents a code behind file.
+        /// </summary>
+        public virtual bool IsCodeBehindFile {
+            get {
+                return false;
+            }
+        }
+
+        protected virtual void RaiseOnItemRemoved(string documentToRemove, string[] filesToBeDeleted) {
+            // Notify document tracker listeners that we have removed the item.
+            VSREMOVEFILEFLAGS[] removeFlags = this.GetRemoveFileFlags(filesToBeDeleted);
+            Debug.Assert(removeFlags != null, "At least an empty array should be returned for the GetRemoveFileFlags");
+            this.ProjectMgr.Tracker.OnItemRemoved(documentToRemove, removeFlags[0]);
         }
 
         internal void RemoveNonDocument(bool removeFromStorage)

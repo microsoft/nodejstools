@@ -1036,13 +1036,7 @@ namespace Microsoft.VisualStudioTools.Project {
                     }
 
                     // creating a new item, need to create the on all files node
-                    string parentDir = Path.GetDirectoryName(CommonUtils.TrimEndSeparator(_path)) + Path.DirectorySeparatorChar;
-                    HierarchyNode parent;
-                    if (CommonUtils.IsSamePath(parentDir, _project.ProjectHome)) {
-                        parent = _project;
-                    } else {
-                        parent = _project.FindNodeByFullPath(parentDir);
-                    }
+                    HierarchyNode parent = _project.GetParentFolderForPath(_path);
 
                     if (parent == null) {
                         // we've hit an error while adding too many files, the file system watcher
@@ -1055,6 +1049,7 @@ namespace Microsoft.VisualStudioTools.Project {
 
                     if (Directory.Exists(_path)) {
                         if (IsFileSymLink(_path)) {
+                            string parentDir = Path.GetDirectoryName(CommonUtils.TrimEndSeparator(_path)) + Path.DirectorySeparatorChar;
                             if (IsRecursiveSymLink(parentDir, _path)) {
                                 // don't add recusrive sym link directory
                                 return;

@@ -92,6 +92,7 @@
             this._nodejsPort.Size = new System.Drawing.Size(100, 20);
             this._nodejsPort.TabIndex = 11;
             this._nodejsPort.TextChanged += new System.EventHandler(this.Changed);
+            this._nodejsPort.KeyPress += new System.Windows.Forms.KeyPressEventHandler(this.NodejsPortKeyPress);
             // 
             // _nodePortLabel
             // 
