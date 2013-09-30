@@ -70,47 +70,11 @@ namespace Microsoft.NodejsTools {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Arguments to Node.exe.
-        /// </summary>
-        internal static string NodeExeArguments {
-            get {
-                return ResourceManager.GetString("NodeExeArguments", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   Looks up a localized string similar to Specifies the options provided to node.exe, such as -e or -i..
-        /// </summary>
-        internal static string NodeExeArgumentsDescription {
-            get {
-                return ResourceManager.GetString("NodeExeArgumentsDescription", resourceCulture);
-            }
-        }
-        
-        /// <summary>
         ///   Looks up a localized string similar to Specifies the options provided to node.exe, such as -e or -i..
         /// </summary>
         internal static string NodeExeArgumentsToolTip {
             get {
                 return ResourceManager.GetString("NodeExeArgumentsToolTip", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   Looks up a localized string similar to Your project is currently configured to look for Node.exe at &quot;{0}&quot; but the file does not exist..
-        /// </summary>
-        internal static string NodeExeDoesntExist {
-            get {
-                return ResourceManager.GetString("NodeExeDoesntExist", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   Looks up a localized string similar to Node.exe path.
-        /// </summary>
-        internal static string NodeExePath {
-            get {
-                return ResourceManager.GetString("NodeExePath", resourceCulture);
             }
         }
         
@@ -124,20 +88,11 @@ namespace Microsoft.NodejsTools {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Node.js does not appear to be installed.  Please download and install Node.js or configure a projects properties page so that it points to where you have installed node.exe..
+        ///   Looks up a localized string similar to Node.js does not appear to be installed.  Please download and install Node.js..
         /// </summary>
         internal static string NodejsNotInstalled {
             get {
                 return ResourceManager.GetString("NodejsNotInstalled", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   Looks up a localized string similar to Node.js Port.
-        /// </summary>
-        internal static string NodejsPort {
-            get {
-                return ResourceManager.GetString("NodejsPort", resourceCulture);
             }
         }
         
@@ -147,15 +102,6 @@ namespace Microsoft.NodejsTools {
         internal static string NodejsPortToolTip {
             get {
                 return ResourceManager.GetString("NodejsPortToolTip", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   Looks up a localized string similar to Node.js Tools for Visual Studio.
-        /// </summary>
-        internal static string NodejsToolsForVisualStudio {
-            get {
-                return ResourceManager.GetString("NodejsToolsForVisualStudio", resourceCulture);
             }
         }
         

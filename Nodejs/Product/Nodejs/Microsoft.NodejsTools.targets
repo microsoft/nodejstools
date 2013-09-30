@@ -83,6 +83,13 @@
     >
     <!-- Target used for generating a package which can be uploaded to web server -->
     <ItemGroup>
+      <_FoundWebConfig Include="@(Content)" Condition=" '%(Content.Filename)%(Content.Extension)' == 'web.config' " />
+      <_FoundWebConfig Include="@(Include)" Condition=" '%(Content.Filename)%(Content.Extension)' == 'web.config' " />
+    </ItemGroup>
+    <Error 
+      Text="web.config not found in project, to create a project to deploy to Windows Azure you must create a Windows Azure Node.js project." 
+      Condition="'@(_FoundWebConfig)' == ''"/>
+    <ItemGroup>
       <ContentFiles Include="@(Content)"></ContentFiles>
       <ContentFiles Include="@(Compile)"></ContentFiles>
       <ContentFiles Include="@(Include)"></ContentFiles>

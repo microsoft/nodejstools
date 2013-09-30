@@ -54,9 +54,9 @@ namespace Microsoft.NodejsTools.Profiling {
           ProjectGuid = "{9C34161A-379E-4933-A0DC-871FE64D34F1}",
           NameResourceID = 105,
           DefaultName = "NodejsPerfSession")]
-    [ProvideAutomationObject("NodeProfiling")]
-    sealed class NodeProfilingPackage : Package {
-        internal static NodeProfilingPackage Instance;
+    [ProvideAutomationObject("NodejsProfiling")]
+    sealed class NodejsProfilingPackage : Package {
+        internal static NodejsProfilingPackage Instance;
         private static ProfiledProcess _profilingProcess;   // process currently being profiled
         internal static string NodeProjectGuid = "{9092AA53-FB77-4645-B42D-1CCCA6BD08BD}";
         internal const string PerformanceFileFilter = "Performance Report Files|*.vspx;*.vsps";
@@ -71,7 +71,7 @@ namespace Microsoft.NodejsTools.Profiling {
         /// not sited yet inside Visual Studio environment. The place to do all the other 
         /// initialization is the Initialize method.
         /// </summary>
-        public NodeProfilingPackage() {
+        public NodejsProfilingPackage() {
             Instance = this;
         }
 
@@ -130,7 +130,7 @@ namespace Microsoft.NodejsTools.Profiling {
         }
 
         protected override object GetAutomationObject(string name) {
-            if (name == "NodeProfiling") {
+            if (name == "NodejsProfiling") {
                 if (_profilingAutomation == null) {
                     var pane = (PerfToolWindow)this.FindToolWindow(typeof(PerfToolWindow), 0, true);
                     _profilingAutomation = new AutomationProfiling(pane.Sessions);
@@ -190,7 +190,7 @@ namespace Microsoft.NodejsTools.Profiling {
             foreach (EnvDTE.Project project in dte.Solution.Projects) {
                 var kind = project.Kind;
 
-                if (String.Equals(kind, NodeProfilingPackage.NodeProjectGuid, StringComparison.OrdinalIgnoreCase)) {
+                if (String.Equals(kind, NodejsProfilingPackage.NodeProjectGuid, StringComparison.OrdinalIgnoreCase)) {
                     var guid = project.Properties.Item("Guid").Value as string;
 
                     Guid guidVal;
@@ -278,7 +278,7 @@ namespace Microsoft.NodejsTools.Profiling {
             }
 
             process.ProcessExited += (sender, args) => {
-                var dte = (EnvDTE.DTE)NodeProfilingPackage.GetGlobalService(typeof(EnvDTE.DTE));
+                var dte = (EnvDTE.DTE)NodejsProfilingPackage.GetGlobalService(typeof(EnvDTE.DTE));
                 _profilingProcess = null;
                 _stopCommand.Enabled = false;
                 _startCommand.Enabled = true;
@@ -319,7 +319,7 @@ namespace Microsoft.NodejsTools.Profiling {
         }
 
         private void AddPerformanceSession(object sender, EventArgs e) {
-            var dte = (EnvDTE.DTE)NodejsPackage.GetGlobalService(typeof(EnvDTE.DTE));
+            var dte = (EnvDTE.DTE)NodejsProfilingPackage.GetGlobalService(typeof(EnvDTE.DTE));
             string filename = "Performance" + PerfFileType;
             bool save = false;
             if (dte.Solution.IsOpen && !String.IsNullOrEmpty(dte.Solution.FullName)) {

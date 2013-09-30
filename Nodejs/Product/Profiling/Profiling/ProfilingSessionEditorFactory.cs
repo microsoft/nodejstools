@@ -29,11 +29,11 @@ namespace Microsoft.NodejsTools.Profiling {
     /// </summary>
     [Guid(GuidList.guidEditorFactoryString)]
     sealed class ProfilingSessionEditorFactory : IVsEditorFactory, IDisposable {
-        private readonly NodeProfilingPackage _editorPackage;
+        private readonly NodejsProfilingPackage _editorPackage;
         private ServiceProvider _vsServiceProvider;
 
 
-        public ProfilingSessionEditorFactory(NodeProfilingPackage package) {
+        public ProfilingSessionEditorFactory(NodejsProfilingPackage package) {
             Trace.WriteLine(string.Format(CultureInfo.CurrentCulture, "Entering {0} constructor", this.ToString()));
 
             this._editorPackage = package;

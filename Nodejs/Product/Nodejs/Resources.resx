@@ -138,6 +138,9 @@
   <data name="NodejsPort" xml:space="preserve">
     <value>Node.js Port</value>
   </data>
+  <data name="NodejsNotInstalled" xml:space="preserve">
+    <value>Node.js does not appear to be installed.  Please download and install Node.js or configure a projects properties page so that it points to where you have installed node.exe.</value>
+  </data>
   <data name="NodejsPortToolTip" xml:space="preserve">
     <value>Specifies the port number used for process.env.port, if unspecified a random port is generated.</value>
   </data>
@@ -149,5 +152,11 @@
   </data>
   <data name="WorkingDirToolTip" xml:space="preserve">
     <value>Specifies the working directory where the node.exe process is launched.</value>
+  </data>
+  <data name="NodeExeDoesntExist" xml:space="preserve">
+    <value>Your project is currently configured to look for Node.exe at "{0}" but the file does not exist.</value>
+  </data>
+  <data name="NodejsToolsForVisualStudio" xml:space="preserve">
+    <value>Node.js Tools for Visual Studio</value>
   </data>
 </root>

@@ -29,9 +29,19 @@ using Microsoft.Ajax.Utilities;
 using Microsoft.VisualStudio.Text;
 
 namespace Microsoft.NodejsTools.Repl {
-    class NodejsReplEvaluator : IReplEvaluator {
+    [ReplRole("Reset"), ReplRole("Execution")]
+    sealed class NodejsReplEvaluator : IReplEvaluator {
         private ListenerThread _listener;
         private IReplWindow _window;
+        private readonly INodejsReplSite _site;
+
+        public NodejsReplEvaluator()
+            : this(VsNodejsReplSite.Site) {
+        }
+
+        public NodejsReplEvaluator(INodejsReplSite site) {
+            _site = site;
+        }
 
         #region IReplEvaluator Members
 
@@ -105,6 +115,9 @@ namespace Microsoft.NodejsTools.Repl {
 
         public Task<ExecutionResult> ExecuteText(string text) {
             EnsureConnected();
+            if (_listener == null) {
+                return ExecutionResult.Failed;
+            }
 
             return _listener.ExecuteText(text);
         }
@@ -143,6 +156,18 @@ namespace Microsoft.NodejsTools.Repl {
             if (_listener != null) {
                 _listener.Disconnect();
                 _listener.Dispose();
+                _listener = null;
+            }
+
+            string nodeExePath = GetNodeExePath();
+            if (String.IsNullOrWhiteSpace(nodeExePath)) {
+                _window.WriteError(Resources.NodejsNotInstalled);
+                _window.WriteError(Environment.NewLine);
+                return;
+            } else if (!File.Exists(nodeExePath)) {
+                _window.WriteError(String.Format(Resources.NodeExeDoesntExist, nodeExePath));
+                _window.WriteError(Environment.NewLine);
+                return;
             }
 
             Socket socket;
@@ -155,7 +180,7 @@ namespace Microsoft.NodejsTools.Repl {
                         "visualstudio_nodejs_repl.js"
                     ) + "\"";
 
-            var psi = new ProcessStartInfo(NodejsPackage.NodePath, scriptPath + " " + port);
+            var psi = new ProcessStartInfo(nodeExePath, scriptPath + " " + port);
             psi.CreateNoWindow = true;
             psi.UseShellExecute = false;
             psi.RedirectStandardError = true;
@@ -164,8 +189,9 @@ namespace Microsoft.NodejsTools.Repl {
 
             string fileName, directory = null;
 
-            if (NodejsPackage.TryGetStartupFileAndDirectory(out fileName, out directory)) {
+            if (_site.TryGetStartupFileAndDirectory(out fileName, out directory)) {
                 psi.WorkingDirectory = directory;
+                psi.EnvironmentVariables["NODE_PATH"] = directory;
             }
 
             var process = new Process();
@@ -178,6 +204,20 @@ namespace Microsoft.NodejsTools.Repl {
             }
 
             _listener = new ListenerThread(this, process, socket);
+        }
+
+        private string GetNodeExePath() {
+            var startupProject = _site.GetStartupProject();
+            string nodeExePath;
+            if (startupProject != null) {
+                nodeExePath = startupProject.GetProjectProperty(NodejsConstants.NodeExePath);
+                if (String.IsNullOrWhiteSpace(nodeExePath)) {
+                    nodeExePath = Nodejs.NodeExePath;
+                }
+            } else {
+                nodeExePath = Nodejs.NodeExePath;
+            }
+            return nodeExePath;
         }
 
 

@@ -35,12 +35,12 @@ namespace Microsoft.NodejsTools.Profiling {
         /// Create a ProfilingTargetView with default values.
         /// </summary>
         public ProfilingTargetView() {
-            var dteService = (EnvDTE.DTE)(NodeProfilingPackage.GetGlobalService(typeof(EnvDTE.DTE)));
+            var dteService = (EnvDTE.DTE)(NodejsProfilingPackage.GetGlobalService(typeof(EnvDTE.DTE)));
 
             var availableProjects = new List<ProjectTargetView>();
             foreach (EnvDTE.Project project in dteService.Solution.Projects) {
                 var kind = project.Kind;
-                if (String.Equals(kind, NodeProfilingPackage.NodeProjectGuid, StringComparison.OrdinalIgnoreCase)) {
+                if (String.Equals(kind, NodejsProfilingPackage.NodeProjectGuid, StringComparison.OrdinalIgnoreCase)) {
                     availableProjects.Add(new ProjectTargetView(project));
                 }
             }

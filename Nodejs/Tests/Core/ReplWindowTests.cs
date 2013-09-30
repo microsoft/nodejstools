@@ -20,7 +20,7 @@ using Microsoft.VisualStudio.TestTools.UnitTesting;
 using TestUtilities;
 using TestUtilities.Mocks;
 
-namespace NodeTests {
+namespace NodejsTests {
     [TestClass]
     public class ReplWindowTests {
         [ClassInitialize]
@@ -30,7 +30,7 @@ namespace NodeTests {
 
         [TestMethod, Priority(0)]
         public void TestNumber() {
-            using (var eval = new NodejsReplEvaluator()) {
+            using (var eval = ProjectlessEvaluator()) {
                 var window = new MockReplWindow(eval);
                 var res = eval.ExecuteText("42");
                 Assert.IsTrue(res.Wait(10000));
@@ -38,9 +38,13 @@ namespace NodeTests {
             }
         }
 
+        private static NodejsReplEvaluator ProjectlessEvaluator() {
+            return new NodejsReplEvaluator(TestNodejsReplSite.Instance);
+        }
+
         [TestMethod, Priority(0)]
         public void TestRequire() {
-            using (var eval = new NodejsReplEvaluator()) {
+            using (var eval = ProjectlessEvaluator()) {
                 var window = new MockReplWindow(eval);
                 var res = eval.ExecuteText("require('http').constructor");
                 Assert.IsTrue(res.Wait(10000));
@@ -51,7 +55,7 @@ namespace NodeTests {
         [TestMethod, Priority(0)]
         public void TestFunctionDefinition() {
             var whitespaces = new[] { "", "\r\n", "   ", "\r\n    " };
-            using (var eval = new NodejsReplEvaluator()) {
+            using (var eval = ProjectlessEvaluator()) {
                 foreach (var whitespace in whitespaces) {
                     Console.WriteLine("Whitespace: {0}", whitespace);
                     var window = new MockReplWindow(eval);
@@ -69,7 +73,7 @@ namespace NodeTests {
 
         [TestMethod, Priority(0)]
         public void TestConsoleLog() {
-            using (var eval = new NodejsReplEvaluator()) {
+            using (var eval = ProjectlessEvaluator()) {
                 var window = new MockReplWindow(eval);
                 var res = eval.ExecuteText("console.log('hi')");
                 Assert.IsTrue(res.Wait(10000));
@@ -79,7 +83,7 @@ namespace NodeTests {
 
         [TestMethod, Priority(0)]
         public void TestConsoleWarn() {
-            using (var eval = new NodejsReplEvaluator()) {
+            using (var eval = ProjectlessEvaluator()) {
                 var window = new MockReplWindow(eval);
                 var res = eval.ExecuteText("console.warn('hi')");
                 Assert.IsTrue(res.Wait(10000));
@@ -89,7 +93,7 @@ namespace NodeTests {
 
         [TestMethod, Priority(0)]
         public void TestConsoleError() {
-            using (var eval = new NodejsReplEvaluator()) {
+            using (var eval = ProjectlessEvaluator()) {
                 var window = new MockReplWindow(eval);
                 var res = eval.ExecuteText("console.error('hi')");
                 Assert.IsTrue(res.Wait(10000));
@@ -99,7 +103,7 @@ namespace NodeTests {
 
         [TestMethod, Priority(0)]
         public void TestConsoleDir() {
-            using (var eval = new NodejsReplEvaluator()) {
+            using (var eval = ProjectlessEvaluator()) {
                 var window = new MockReplWindow(eval);
                 var res = eval.ExecuteText("console.dir({'abc': {'foo': [1,2,3,4,5,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23,24,25,26,27,28,29,30,31,32,33,34,35,36,37,38,39,40]}})");
                 var expected = @"{ abc: 
@@ -160,7 +164,7 @@ undefined";
         // 
         [TestMethod, Priority(0)]
         public void LargeOutput() {
-            using (var eval = new NodejsReplEvaluator()) {
+            using (var eval = ProjectlessEvaluator()) {
                 var window = new MockReplWindow(eval);
                 var res = eval.ExecuteText("var x = 'abc'; for(i = 0; i<12; i++) { x += x; }; x");
                 string expected = "abc";
@@ -175,7 +179,7 @@ undefined";
 
         [TestMethod, Priority(0)]
         public void TestException() {
-            using (var eval = new NodejsReplEvaluator()) {
+            using (var eval = ProjectlessEvaluator()) {
                 var window = new MockReplWindow(eval);
                 var res = eval.ExecuteText("throw 'an error';");
 
@@ -187,7 +191,7 @@ undefined";
 
         [TestMethod, Priority(0)]
         public void TestProcessExit() {
-            using (var eval = new NodejsReplEvaluator()) {
+            using (var eval = ProjectlessEvaluator()) {
                 var window = new MockReplWindow(eval);
                 var res = eval.ExecuteText("process.exit(0);");
 
@@ -204,7 +208,7 @@ undefined";
 
         [TestMethod, Priority(0)]
         public void TestReset() {
-            using (var eval = new NodejsReplEvaluator()) {
+            using (var eval = ProjectlessEvaluator()) {
                 var window = new MockReplWindow(eval);
 
                 var res = eval.ExecuteText("1");
@@ -230,7 +234,7 @@ undefined";
 
         [TestMethod, Priority(0)]
         public void TestSaveNoFile() {
-            using (var eval = new NodejsReplEvaluator()) {
+            using (var eval = ProjectlessEvaluator()) {
                 var window = new MockReplWindow(eval);
                 var res = eval.ExecuteText("function f() { }");
 
@@ -247,7 +251,7 @@ undefined";
 
         [TestMethod, Priority(0)]
         public void TestSaveBadFile() {
-            using (var eval = new NodejsReplEvaluator()) {
+            using (var eval = ProjectlessEvaluator()) {
                 var window = new MockReplWindow(eval);
                 var res = eval.ExecuteText("function f() { }");
 
@@ -264,7 +268,7 @@ undefined";
 
         [TestMethod, Priority(0)]
         public void TestSave() {
-            using (var eval = new NodejsReplEvaluator()) {
+            using (var eval = ProjectlessEvaluator()) {
                 var window = new MockReplWindow(eval, NodejsConstants.JavaScript);
                 var res = window.Execute("function f() { }");
 
@@ -289,7 +293,7 @@ undefined";
 
         [TestMethod, Priority(0)]
         public void TestBadSave() {
-            using (var eval = new NodejsReplEvaluator()) {
+            using (var eval = ProjectlessEvaluator()) {
                 var window = new MockReplWindow(eval);
                 var res = eval.ExecuteText("function f() { }");
 
@@ -356,7 +360,7 @@ undefined";
 
         [TestMethod, Priority(0)]
         public void TestPartialInputs() {
-            using (var eval = new NodejsReplEvaluator()) {
+            using (var eval = ProjectlessEvaluator()) {
                 foreach (var partialInput in _partialInputs) {
                     Assert.AreEqual(false, eval.CanExecuteText(partialInput), "Partial input successfully parsed: " + partialInput);
                 }
@@ -368,7 +372,7 @@ undefined";
 
         [TestMethod, Priority(0)]
         public void TestVarI() {
-            using (var eval = new NodejsReplEvaluator()) {
+            using (var eval = ProjectlessEvaluator()) {
                 var window = new MockReplWindow(eval);
 
                 var res = eval.ExecuteText("i");
@@ -386,11 +390,46 @@ undefined";
 
         [TestMethod, Priority(0)]
         public void TestObjectLiteral() {
-            using (var eval = new NodejsReplEvaluator()) {
+            using (var eval = ProjectlessEvaluator()) {
                 var window = new MockReplWindow(eval);
                 var res = eval.ExecuteText("{x:42}");
                 Assert.IsTrue(res.Wait(10000));
                 Assert.AreEqual("{ x: 42 }", window.Output);
+            }
+        }
+
+        /// <summary>
+        /// https://nodejstools.codeplex.com/workitem/279
+        /// </summary>
+        [TestMethod, Priority(0)]
+        public void TestRequireInProject() {
+            string testDir;
+            do {
+                testDir = Path.Combine(Path.GetTempPath(), Path.GetRandomFileName());
+            } while (Directory.Exists(testDir));
+            Directory.CreateDirectory(testDir);
+            var moduleDir = Path.Combine(testDir, "node_modules");
+            Directory.CreateDirectory(moduleDir);
+            File.WriteAllText(Path.Combine(moduleDir, "foo.js"), "exports.foo = function(a, b, c) { }");
+            File.WriteAllText(Path.Combine(testDir, "bar.js"), "exports.bar = function(a, b, c) { }");
+
+            try {
+                using (var eval = new NodejsReplEvaluator(new TestNodejsReplSite(null, testDir))) {
+                    var window = new MockReplWindow(eval);
+                    var res = eval.ExecuteText("require('foo.js');");
+                    Assert.IsTrue(res.Wait(10000));
+                    Assert.AreEqual(window.Output, "{ foo: [Function] }");
+                    window.ClearScreen();
+
+                    res = eval.ExecuteText("require('./bar.js');");
+                    Assert.IsTrue(res.Wait(10000));
+                    Assert.AreEqual(window.Output, "{ bar: [Function] }");
+                }
+            } finally {
+                try {
+                    Directory.Delete(testDir, true);
+                } catch (IOException) {
+                }
             }
         }
 

@@ -63,7 +63,7 @@ namespace Microsoft.NodejsTools.Profiling {
             // by responding to GetProperty for VSHPROPID_ItemDocCookie we will support Ctrl-S when one of our
             // files is dirty.
             // http://msdn.microsoft.com/en-us/library/bb164600(VS.80).aspx
-            IVsRunningDocumentTable rdt = NodeProfilingPackage.GetGlobalService(typeof(SVsRunningDocumentTable)) as IVsRunningDocumentTable;
+            IVsRunningDocumentTable rdt = NodejsProfilingPackage.GetGlobalService(typeof(SVsRunningDocumentTable)) as IVsRunningDocumentTable;
             uint cookie;
             IntPtr punkDocData = Marshal.GetIUnknownForObject(this);
             try {
@@ -250,7 +250,7 @@ namespace Microsoft.NodejsTools.Profiling {
                         }
 
                         if (ctxMenu != null) {
-                            var uishell = (IVsUIShell)NodejsPackage.GetGlobalService(typeof(SVsUIShell));
+                            var uishell = (IVsUIShell)NodejsProfilingPackage.GetGlobalService(typeof(SVsUIShell));
                             if (uishell != null) {
                                 var pt = System.Windows.Forms.Cursor.Position;
                                 var pnts = new[] { new POINTS { x = (short)pt.X, y = (short)pt.Y } };
@@ -294,7 +294,7 @@ namespace Microsoft.NodejsTools.Profiling {
             if (!File.Exists(item.Filename)) {
                 MessageBox.Show(String.Format("Performance report no longer exists: {0}", item.Filename), Resources.NodejsToolsForVS);
             } else {
-                var dte = (EnvDTE.DTE)NodeProfilingPackage.GetGlobalService(typeof(EnvDTE.DTE));
+                var dte = (EnvDTE.DTE)NodejsProfilingPackage.GetGlobalService(typeof(EnvDTE.DTE));
                 dte.ItemOperations.OpenFile(item.Filename);
             }
         }
@@ -337,7 +337,7 @@ namespace Microsoft.NodejsTools.Profiling {
                             var dialog = new CompareReportsWindow(compareView);
                             var res = dialog.ShowModal() ?? false;
                             if (res && compareView.IsValid) {
-                                IVsUIShellOpenDocument sod = NodeProfilingPackage.GetGlobalService(typeof(SVsUIShellOpenDocument)) as IVsUIShellOpenDocument;
+                                IVsUIShellOpenDocument sod = NodejsProfilingPackage.GetGlobalService(typeof(SVsUIShellOpenDocument)) as IVsUIShellOpenDocument;
                                 Debug.Assert(sod != null);
                                 Microsoft.VisualStudio.Shell.Interop.IVsWindowFrame frame = null;
                                 Guid guid = new Guid("{9C710F59-984F-4B83-B781-B6356C363B96}"); // performance diff guid
@@ -365,7 +365,7 @@ namespace Microsoft.NodejsTools.Profiling {
                         }
                         case PkgCmdIDList.cmdidReportsAddReport: {
                             var dialog = new OpenFileDialog();
-                            dialog.Filter = NodeProfilingPackage.PerformanceFileFilter;
+                            dialog.Filter = NodejsProfilingPackage.PerformanceFileFilter;
                             dialog.CheckFileExists = true;
                             var res = dialog.ShowDialog() ?? false;
                             if (res) {
@@ -465,7 +465,7 @@ namespace Microsoft.NodejsTools.Profiling {
         }
 
         internal void Removed() {
-            IVsRunningDocumentTable rdt = NodeProfilingPackage.GetGlobalService(typeof(SVsRunningDocumentTable)) as IVsRunningDocumentTable;
+            IVsRunningDocumentTable rdt = NodejsProfilingPackage.GetGlobalService(typeof(SVsRunningDocumentTable)) as IVsRunningDocumentTable;
             ErrorHandler.ThrowOnFailure(rdt.UnlockDocument((uint)_VSRDTFLAGS.RDT_EditLock, _docCookie));
         }
 
@@ -482,7 +482,7 @@ namespace Microsoft.NodejsTools.Profiling {
 
             if (File.Exists(report.Filename) && dwDelItemOp == (uint)__VSDELETEITEMOPERATION.DELITEMOP_DeleteFromStorage) {
                 // close the file if it's open before deleting it...
-                var dte = (EnvDTE.DTE)NodeProfilingPackage.GetGlobalService(typeof(EnvDTE.DTE));
+                var dte = (EnvDTE.DTE)NodejsProfilingPackage.GetGlobalService(typeof(EnvDTE.DTE));
                 if (dte.ItemOperations.IsFileOpen(report.Filename)) {
                     var doc = dte.Documents.Item(report.Filename);
                     doc.Close();
@@ -506,7 +506,7 @@ namespace Microsoft.NodejsTools.Profiling {
         #endregion
 
         internal void StartProfiling(bool openReport = true) {
-            NodeProfilingPackage.Instance.StartProfiling(_target, this, openReport);
+            NodejsProfilingPackage.Instance.StartProfiling(_target, this, openReport);
         }
 
         public void Save(string filename = null) {

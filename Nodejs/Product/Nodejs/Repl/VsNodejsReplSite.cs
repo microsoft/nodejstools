@@ -12,21 +12,20 @@
  *
  * ***************************************************************************/
 
-using System.ComponentModel.Composition;
-using Microsoft.NodejsTools.Repl;
+using Microsoft.VisualStudioTools.Project;
 
 namespace Microsoft.NodejsTools.Repl {
-    [Export(typeof(IReplEvaluatorProvider))]
-    class NodejsReplEvaluatorProvider : IReplEvaluatorProvider {
-        internal const string NodeReplId = "{E4AC36B7-EDC5-4AD2-B758-B5416D520705}";
-        
-        #region IAltReplEvaluatorProvider Members
+    class VsNodejsReplSite : INodejsReplSite {
+        internal static VsNodejsReplSite Site = new VsNodejsReplSite();
 
-        public IReplEvaluator GetEvaluator(string replId) {
-            if (replId == NodeReplId) {
-                return new NodejsReplEvaluator();
-            }
-            return null;
+        #region INodejsReplSite Members
+
+        public CommonProjectNode GetStartupProject() {
+            return NodejsPackage.GetStartupProject();
+        }
+
+        public bool TryGetStartupFileAndDirectory(out string fileName, out string directory) {
+            return NodejsPackage.TryGetStartupFileAndDirectory(out fileName, out directory);
         }
 
         #endregion

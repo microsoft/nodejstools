@@ -221,14 +221,6 @@ http.createServer(function (req, res) {
             }
         }
 
-        /*
-         // Test currently fails to reload the project.
-         // VS reports an error and we don't get any calls into our
-         // project system.  Even if we open the project using automation
-         // instead of DTE this happens.
-        /// <summary>
-        /// http://nodejstools.codeplex.com/workitem/49
-        /// </summary>
         [TestMethod, Priority(0), TestCategory("Core")]
         [HostType("TC Dynamic"), DynamicHostType(typeof(VsIdeHostAdapter))]
         public void GlobalIntellisenseProjectReload() {
@@ -284,7 +276,7 @@ http.createServer(function (req, res) {
             Assert.IsTrue(completions.Contains("abort"));
             Assert.IsTrue(completions.Contains("chdir"));
         }
-        */
+        
         [TestMethod, Priority(0), TestCategory("Core")]
         [HostType("TC Dynamic"), DynamicHostType(typeof(VsIdeHostAdapter))]
         public void UserModule() {

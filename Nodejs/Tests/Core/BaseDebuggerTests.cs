@@ -73,9 +73,10 @@ namespace DebuggerTests {
 
             // Load process
             AutoResetEvent processLoaded = new AutoResetEvent(false);
+            Assert.IsNotNull(Nodejs.NodeExePath, "Node isn't installed");
             NodeDebugger process =
                 new NodeDebugger(
-                    NodejsPackage.NodePath,
+                    Nodejs.NodeExePath,
                     arguments,
                     dir,
                     null,
@@ -121,7 +122,8 @@ namespace DebuggerTests {
                 " \"" + fullPath + "\"" +
                 (String.IsNullOrEmpty(arguments) ? "" : " " + arguments);
 
-            var psi = new ProcessStartInfo(NodejsPackage.NodePath, arguments);
+            Assert.IsNotNull(Nodejs.NodeExePath, "Node isn't installed");
+            var psi = new ProcessStartInfo(Nodejs.NodeExePath, arguments);
             psi.WorkingDirectory = dir;
             var process = new Process();
             process.StartInfo = psi;

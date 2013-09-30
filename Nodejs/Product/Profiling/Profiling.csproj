@@ -179,7 +179,7 @@
     <Compile Include="Profiling\TreeViewIconIndex.cs" />
     <Compile Include="ProvideFileFilterAttribute.cs" />
     <Compile Include="GlobalSuppressions.cs" />
-    <Compile Include="NodeProfilingPackage.cs" />
+    <Compile Include="NodejsProfilingPackage.cs" />
     <Compile Include="PkgCmdID.cs" />
     <Compile Include="Profiling\SessionsNode.cs" />
     <Compile Include="Resources.Designer.cs">

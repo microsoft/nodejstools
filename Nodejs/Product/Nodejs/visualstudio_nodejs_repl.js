@@ -4,6 +4,24 @@
     }
 }
 
+var path = require('path');
+
+// setup our filename and search paths to match how they would if the user
+// started inside of their own project...  When the REPL starts our CWD
+// is set to the project home.
+module.filename = path.join(process.cwd(), 'server.js');
+module.paths = []
+var curDir = process.cwd();
+for (; ;) {
+    module.paths.push(path.join(curDir, "node_modules"));
+    var nextDir = path.join(curDir, '..');
+    if (nextDir == curDir) {
+        break;
+    }
+    curDir = nextDir;
+}
+
+
 function send_response(socket, data) {
     var str = JSON.stringify(data);
     var buf = Buffer(str);

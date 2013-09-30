@@ -44,7 +44,7 @@ namespace Microsoft.NodejsTools.Profiling {
         }
 
         internal SessionNode AddTarget(ProfilingTarget target, string filename, bool save) {
-            Debug.Assert(filename.EndsWith(NodeProfilingPackage.PerfFileType));
+            Debug.Assert(filename.EndsWith(NodejsProfilingPackage.PerfFileType));
 
             // ensure a unique name
             string newBaseName = Path.GetFileNameWithoutExtension(filename);
@@ -64,7 +64,7 @@ namespace Microsoft.NodejsTools.Profiling {
                 }
             } while (dupFound);
 
-            string newFilename = newBaseName + NodeProfilingPackage.PerfFileType;
+            string newFilename = newBaseName + NodejsProfilingPackage.PerfFileType;
             // add directory name back if present...
             string dirName = Path.GetDirectoryName(filename);
             if (dirName != "") {

@@ -52,6 +52,12 @@ namespace Microsoft.NodejsTools.Project {
         }
 
         private int Start(string file, bool debug) {
+            string nodePath = GetNodePath();
+            if (nodePath == null) {
+                NodejsPackage.ShowNodejsNotInstalled();
+                return VSConstants.S_OK;
+            }
+
             var startBrowserStr = _project.GetProjectProperty(NodejsConstants.StartWebBrowser);
             bool startBrowser;
             if (!Boolean.TryParse(startBrowserStr, out startBrowser)) {
@@ -84,7 +90,7 @@ namespace Microsoft.NodejsTools.Project {
                     psi.EnvironmentVariables["PORT"] = port.ToString();
                 }
 
-                psi.FileName = GetNodePath();
+                psi.FileName = nodePath;
                 psi.Arguments = GetFullArguments(file);
                 psi.WorkingDirectory = _project.GetWorkingDirectory();
                 var process = Process.Start(psi);
@@ -124,7 +130,7 @@ namespace Microsoft.NodejsTools.Project {
             if (!String.IsNullOrWhiteSpace(overridePath)) {
                 return overridePath;
             }
-            return NodejsPackage.NodePath;
+            return Nodejs.NodeExePath;
         }
 
         #endregion

@@ -169,6 +169,7 @@
   <ItemGroup>
     <Compile Include="CustomTrackingSpan.cs" />
     <Compile Include="EditFilter.cs" />
+    <Compile Include="Nodejs.cs" />
     <Compile Include="NodejsProjectConfig.cs" />
     <Compile Include="Project\Attributes.cs" />
     <Compile Include="Project\NodejsFileNode.cs" />
@@ -181,7 +182,9 @@
     <Compile Include="ProvideEditorExtension2Attribute.cs" />
     <Compile Include="ProvideLanguageTemplates.cs" />
     <Compile Include="Repl\ClearReplCommand.cs" />
+    <Compile Include="Repl\INodejsReplSite.cs" />
     <Compile Include="Repl\SaveReplCommand.cs" />
+    <Compile Include="Repl\VsNodejsReplSite.cs" />
     <Compile Include="VsMenus.cs" />
     <Compile Include="AzureSolutionListener.cs" />
     <Compile Include="BaseNodeProjectFactory.cs" />
@@ -403,7 +406,9 @@
     </Compile>
     <EmbeddedResource Include="Resources.resx">
       <ManifestResourceName>Microsoft.NodejsTools.Resources</ManifestResourceName>
+      <Generator>ResXFileCodeGenerator</Generator>
       <Visible>true</Visible>
+      <LastGenOutput>Resources.Designer.cs</LastGenOutput>
     </EmbeddedResource>
   </ItemGroup>
   <ItemGroup>

@@ -60,16 +60,15 @@ namespace Microsoft.NodejsTools {
         private readonly IContentType _contentType;
         private readonly IProjectionBuffer _projBuffer; // the buffer we project into        
         private readonly IProjectionBuffer _elisionBuffer;
-        private readonly NodejsProjectNode _project;
-        private readonly string _filename;
+        private readonly string _filename, _referenceFilename;
 
-        public NodejsProjectionBuffer(IContentTypeRegistryService contentRegistry, IProjectionBufferFactoryService bufferFactory, ITextBuffer diskBuffer, IBufferGraphFactoryService bufferGraphFactory, IContentType contentType, NodejsProjectNode project, string filename) {
+        public NodejsProjectionBuffer(IContentTypeRegistryService contentRegistry, IProjectionBufferFactoryService bufferFactory, ITextBuffer diskBuffer, IBufferGraphFactoryService bufferGraphFactory, IContentType contentType, string filename, string referenceFileName) {
             _diskBuffer = diskBuffer;
             _contentRegistry = contentRegistry;
             _contentType = contentType;
 
             _filename = filename;
-            _project = project;
+            _referenceFilename = referenceFileName;
             _projBuffer = CreateProjectionBuffer(bufferFactory);
             _elisionBuffer = CreateElisionBuffer(bufferFactory);
         }
@@ -98,7 +97,7 @@ namespace Microsoft.NodejsTools {
                 // __filename, _dirname http://nodejs.org/api/globals.html#globals_filename
 
                 return
-                    "/// <reference path=\"" + _project._referenceFilename + "\" />\r\n" +
+                    "/// <reference path=\"" + _referenceFilename + "\" />\r\n" +
                     GetNodeFunctionWrapperHeader("module_body", _filename);
             }
         }

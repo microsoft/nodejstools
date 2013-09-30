@@ -57,9 +57,9 @@ namespace Microsoft.NodejsTools.Profiling {
                 baseName = "Performance";
             }
 
-            baseName = baseName + NodeProfilingPackage.PerfFileType;
+            baseName = baseName + NodejsProfilingPackage.PerfFileType;
 
-            var dte = (EnvDTE.DTE)NodejsPackage.GetGlobalService(typeof(EnvDTE.DTE));
+            var dte = (EnvDTE.DTE)NodejsProfilingPackage.GetGlobalService(typeof(EnvDTE.DTE));
             if (dte.Solution.IsOpen && !String.IsNullOrEmpty(dte.Solution.FullName)) {
                 save = true;
                 return Path.Combine(Path.GetDirectoryName(dte.Solution.FullName), baseName);

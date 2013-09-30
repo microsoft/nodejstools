@@ -26,7 +26,7 @@ using Microsoft.VisualStudioTools.Project.Automation;
 namespace Microsoft.NodejsTools.Project {
     class NodejsProjectNode : CommonProjectNode, VsWebSite.VSWebSite {
         private static string _nodeRefCode = ReadNodeRefCode();
-        internal string _referenceFilename = GetReferenceFilePath();
+        internal readonly string _referenceFilename = GetReferenceFilePath();
         const string _userSwitchMarker = "// **NTVS** INSERT USER MODULE SWITCH HERE **NTVS**";
         internal readonly List<NodejsFileNode> _nodeFiles = new List<NodejsFileNode>();
         private readonly JavaScriptSerializer _serializer = new JavaScriptSerializer();
@@ -136,7 +136,6 @@ namespace Microsoft.NodejsTools.Project {
         /// </summary>
         internal void UpdateReferenceFile() {
             StringBuilder switchCode = new StringBuilder();
-            StringBuilder moduleCode = new StringBuilder();
 
             lock (_nodeFiles) {
                 UpdateReferenceFile(this, switchCode);
@@ -355,9 +354,7 @@ function starts_with(a, b) {
         /// it'll use an empty skeleton.
         /// </summary>
         private static string ReadNodeRefCode() {
-            string nodeFile = Path.Combine(
-                    Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location),
-                    "nodejsref.js");
+            string nodeFile = NodejsPackage.NodejsReferencePath;
 
             if (File.Exists(nodeFile)) {
                 try {

@@ -7,7 +7,7 @@
     <ProjectGuid>{240A6D2B-1982-4BC5-B1EA-C6CB0492329D}</ProjectGuid>
     <OutputType>Library</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
-    <RootNamespace>NodeTests</RootNamespace>
+    <RootNamespace>NodejsTests</RootNamespace>
     <AssemblyName>NodeTests</AssemblyName>
     <TargetFrameworkVersion>v4.5</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
@@ -45,6 +45,7 @@
     <Compile Include="DebuggerTests.cs" />
     <Compile Include="ReplWindowTests.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="TestNodejsReplSite.cs" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="$(BuildRoot)\Nodejs\Product\InteractiveWindow\InteractiveWindow.csproj">

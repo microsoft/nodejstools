@@ -36,7 +36,7 @@ namespace Microsoft.NodejsTools {
     /// Common factory for creating our editor
     /// </summary>    
     [Guid(GuidList.guidNodeEditorFactoryString)]
-    public class NodejsEditorFactory : IVsEditorFactory {
+    class NodejsEditorFactory : IVsEditorFactory {
         private NodejsPackage _package;
         private ServiceProvider _serviceProvider;
         private readonly bool _promptEncodingOnLoad;
@@ -335,8 +335,8 @@ namespace Microsoft.NodejsTools {
                     diskBuffer, 
                     _compModel.GetService<IBufferGraphFactoryService>(), 
                     contentType, 
-                    proj,
-                    filename
+                    filename,
+                    proj != null ? proj._referenceFilename : NodejsPackage.NodejsReferencePath
                 );
 
                 diskBuffer.Properties.AddProperty(typeof(NodejsProjectionBuffer), projBuffer);
@@ -380,7 +380,7 @@ namespace Microsoft.NodejsTools {
 
 
     [Guid("C8576E92-EFB6-4414-8F63-C84D474A539E")]
-    public class NodejsEditorFactoryPromptForEncoding : NodejsEditorFactory {
+    class NodejsEditorFactoryPromptForEncoding : NodejsEditorFactory {
         public NodejsEditorFactoryPromptForEncoding(NodejsPackage package) : base(package, true) { }
         public override int CreateEditorInstance(uint createEditorFlags, string documentMoniker, string physicalView, VisualStudio.Shell.Interop.IVsHierarchy hierarchy, uint itemid, IntPtr docDataExisting, out IntPtr docView, out IntPtr docData, out string editorCaption, out Guid commandUIGuid, out int createDocumentWindowFlags) {
             if (docDataExisting != IntPtr.Zero) {

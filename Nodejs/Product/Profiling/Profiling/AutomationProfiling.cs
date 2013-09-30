@@ -49,7 +49,7 @@ namespace Microsoft.NodejsTools.Profiling {
             target.ProjectTarget.TargetProject = new Guid(projectToProfile.Properties.Item("Guid").Value as string);
             target.ProjectTarget.FriendlyName = projectToProfile.Name;
 
-            return NodeProfilingPackage.Instance.ProfileTarget(target, openReport).GetAutomationObject();
+            return NodejsProfilingPackage.Instance.ProfileTarget(target, openReport).GetAutomationObject();
         }
 
         INodeProfileSession INodeProfiling.LaunchProcess(string interpreter, string script, string workingDir, string arguments, bool openReport) {
@@ -65,7 +65,7 @@ namespace Microsoft.NodejsTools.Profiling {
                 throw new InvalidOperationException(String.Format("Invalid interpreter: {0}", interpreter));
             }
 
-            return NodeProfilingPackage.Instance.ProfileTarget(target, openReport).GetAutomationObject();
+            return NodejsProfilingPackage.Instance.ProfileTarget(target, openReport).GetAutomationObject();
         }
 
         void INodeProfiling.RemoveSession(INodeProfileSession session, bool deleteFromDisk) {
@@ -82,7 +82,7 @@ namespace Microsoft.NodejsTools.Profiling {
         }
 
         bool INodeProfiling.IsProfiling {
-            get { return NodeProfilingPackage.Instance.IsProfiling; }
+            get { return NodejsProfilingPackage.Instance.IsProfiling; }
         }
 
     }

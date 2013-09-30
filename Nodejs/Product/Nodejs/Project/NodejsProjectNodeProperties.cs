@@ -58,7 +58,7 @@ namespace Microsoft.NodejsTools.Project {
             get {
                 var res = this.Node.ProjectMgr.GetProjectProperty(NodejsConstants.NodeExePath, true);
                 if (String.IsNullOrWhiteSpace(res)) {
-                    return NodejsPackage.NodePath;
+                    return Nodejs.NodeExePath ?? "";
                 }
                 return res;
             }

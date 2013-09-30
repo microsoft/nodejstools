@@ -18,7 +18,7 @@ using Microsoft.VisualStudio.Shell.Flavor;
 
 namespace Microsoft.NodejsTools {
     [Guid(NodeProjectGuid)]
-    public class NodejsProjectFactory : FlavoredProjectFactoryBase {
+    class NodejsProjectFactory : FlavoredProjectFactoryBase {
         internal const string NodeProjectGuid = "3AF33F2E-1136-4D97-BBB7-1795711AC8B8";
         private NodejsPackage _package;
 

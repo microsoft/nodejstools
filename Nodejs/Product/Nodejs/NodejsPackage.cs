@@ -12,24 +12,25 @@
  *
  * ***************************************************************************/
 
-using Microsoft.NodejsTools.Debugger.DebugEngine;
-using Microsoft.NodejsTools.Debugger.Remote;
-using Microsoft.NodejsTools.Project;
-using Microsoft.NodejsTools.Repl;
-using Microsoft.VisualStudioTools;
-using Microsoft.VisualStudio;
-using Microsoft.VisualStudio.Debugger.Interop;
-using Microsoft.VisualStudio.Shell;
-using Microsoft.VisualStudio.Shell.Interop;
-using Microsoft.VisualStudio.Utilities;
-using Microsoft.Win32;
 using System;
 using System.ComponentModel.Design;
 using System.Diagnostics;
 using System.Globalization;
 using System.IO;
+using System.Reflection;
 using System.Runtime.InteropServices;
 using System.Windows.Forms;
+using Microsoft.NodejsTools.Debugger.DebugEngine;
+using Microsoft.NodejsTools.Debugger.Remote;
+using Microsoft.NodejsTools.Project;
+using Microsoft.NodejsTools.Repl;
+using Microsoft.VisualStudio;
+using Microsoft.VisualStudio.Debugger.Interop;
+using Microsoft.VisualStudio.Shell;
+using Microsoft.VisualStudio.Shell.Interop;
+using Microsoft.VisualStudio.Utilities;
+using Microsoft.VisualStudioTools;
+using Microsoft.Win32;
 
 namespace Microsoft.NodejsTools {
     /// <summary>
@@ -153,7 +154,7 @@ namespace Microsoft.NodejsTools {
     [ProvideEditorExtension2(typeof(NodejsEditorFactoryPromptForEncoding), NodeJsFileType, 50, "*:1", ProjectGuid = "{78D985FC-2CA0-4D08-9B6B-35ACD5E5294A}", NameResourceID = 113, DefaultName = "server")]
     [ProvideProjectItem(typeof(BaseNodeProjectFactory), NodejsConstants.Nodejs, "FileTemplates\\NewItem", 0)]
     [ProvideLanguageTemplates("{349C5851-65DF-11DA-9384-00065B846F21}", NodejsConstants.Nodejs, GuidList.guidNodePkgString, "Web", "Node.js Project Templates", "{" + BaseNodeProjectFactory.BaseNodeProjectGuid + "}", ".js", NodejsConstants.Nodejs, "{" + BaseNodeProjectFactory.BaseNodeProjectGuid + "}")]
-    public sealed class NodejsPackage : CommonPackage {
+    internal sealed class NodejsPackage : CommonPackage {
         internal const string NodeExpressionEvaluatorGuid = "{F16F2A71-1C45-4BAB-BECE-09D28CFDE3E6}";
         private IContentType _contentType;
         internal const string NodeJsFileType = ".njs";
@@ -313,32 +314,24 @@ namespace Microsoft.NodejsTools {
             return base.GetService(serviceType);
         }
 
-        private static string nodePath = null;
-
-        public static string NodePath {
+        public static string NodejsReferencePath {
             get {
-                if (nodePath != null)
-                    return nodePath;
-                //Fall back to a well known location if lookup fails
-                string installPath = System.IO.Path.Combine(Environment.GetEnvironmentVariable("ProgramFiles"), "nodejs");
-                try
-                {
-                    using (RegistryKey key = Registry.CurrentUser.OpenSubKey("Software").OpenSubKey("Node.js"))
-                    {
-                        if (key != null)
-                        {
-                            string keyValue = (string)key.GetValue("InstallPath", installPath);
-                            installPath = String.IsNullOrEmpty(keyValue) ? installPath : keyValue;
-                        }
-                    }                    
-                }
-                catch (Exception)
-                {
-                }
-                nodePath = System.IO.Path.Combine(installPath, "node.exe");
-                return nodePath;
+                return Path.Combine(
+                    Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location),
+                    "nodejsref.js"
+                );
             }
         }
+
+        internal static void ShowNodejsNotInstalled() {
+            MessageBox.Show(
+                Resources.NodejsNotInstalled, 
+                Resources.NodejsToolsForVisualStudio, 
+                MessageBoxButtons.OK, 
+                MessageBoxIcon.Error
+            );
+        }
+
 
 #if UNIT_TEST_INTEGRATION
         // var testCase = require('./test/test-doubled.js'); for(var x in testCase) { console.log(x); }

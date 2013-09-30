@@ -65,7 +65,7 @@ namespace ProfilingUITests {
             app.OpenNodejsPerformance();
             app.NodejsPerformanceExplorerToolBar.NewPerfSession();
             
-            var profiling = (INodeProfiling)VsIdeTestHostContext.Dte.GetObject("NodeProfiling");
+            var profiling = (INodeProfiling)VsIdeTestHostContext.Dte.GetObject("NodejsProfiling");
 
             var perf = app.NodejsPerformanceExplorerTreeView.WaitForItem("Performance *");
             Debug.Assert(perf != null);
@@ -81,7 +81,7 @@ namespace ProfilingUITests {
                 perfTarget = new NodejsPerfTarget(app.WaitForDialog());
 
                 perfTarget.SelectProfileScript();
-                perfTarget.InterpreterPath = NodejsPackage.NodePath;
+                perfTarget.InterpreterPath = NodeExePath;
                 perfTarget.ScriptName = TestData.GetPath(@"TestData\NodejsProfileTest\program.js");
 
                 try {
@@ -122,7 +122,7 @@ namespace ProfilingUITests {
             app.OpenNodejsPerformance();
             app.NodejsPerformanceExplorerToolBar.NewPerfSession();
 
-            var profiling = (INodeProfiling)VsIdeTestHostContext.Dte.GetObject("NodeProfiling");
+            var profiling = (INodeProfiling)VsIdeTestHostContext.Dte.GetObject("NodejsProfiling");
 
             var perf = app.NodejsPerformanceExplorerTreeView.WaitForItem("Performance *");
             Debug.Assert(perf != null);
@@ -138,7 +138,7 @@ namespace ProfilingUITests {
                 perfTarget = new NodejsPerfTarget(app.WaitForDialog());
 
                 perfTarget.SelectProfileScript();
-                perfTarget.InterpreterPath = NodejsPackage.NodePath;
+                perfTarget.InterpreterPath = NodeExePath;
                 perfTarget.ScriptName = TestData.GetPath(@"TestData\NodejsProfileTest\program.js");
 
                 try {
@@ -186,7 +186,7 @@ namespace ProfilingUITests {
             app.OpenNodejsPerformance();
             app.NodejsPerformanceExplorerToolBar.NewPerfSession();
 
-            var profiling = (INodeProfiling)VsIdeTestHostContext.Dte.GetObject("NodeProfiling");
+            var profiling = (INodeProfiling)VsIdeTestHostContext.Dte.GetObject("NodejsProfiling");
 
             var perf = app.NodejsPerformanceExplorerTreeView.WaitForItem("Performance *");
             Debug.Assert(perf != null);
@@ -206,7 +206,7 @@ namespace ProfilingUITests {
                 perfTarget = new NodejsPerfTarget(app.WaitForDialog());
 
                 perfTarget.SelectProfileScript();
-                perfTarget.InterpreterPath = NodejsPackage.NodePath;
+                perfTarget.InterpreterPath = NodeExePath;
                 perfTarget.ScriptName = TestData.GetPath(@"TestData\NodejsProfileTest\program.js");
 
                 try {
@@ -256,7 +256,7 @@ namespace ProfilingUITests {
             app.OpenNodejsPerformance();
             app.NodejsPerformanceExplorerToolBar.NewPerfSession();
 
-            var profiling = (INodeProfiling)VsIdeTestHostContext.Dte.GetObject("NodeProfiling");
+            var profiling = (INodeProfiling)VsIdeTestHostContext.Dte.GetObject("NodejsProfiling");
 
             var perf = app.NodejsPerformanceExplorerTreeView.WaitForItem("Performance *");
             Debug.Assert(perf != null);
@@ -276,7 +276,7 @@ namespace ProfilingUITests {
                 perfTarget = new NodejsPerfTarget(app.WaitForDialog());
 
                 perfTarget.SelectProfileScript();
-                perfTarget.InterpreterPath = NodejsPackage.NodePath;
+                perfTarget.InterpreterPath = NodeExePath;
                 perfTarget.ScriptName = TestData.GetPath(@"TestData\NodejsProfileTest\program.js");
 
                 try {
@@ -317,7 +317,7 @@ namespace ProfilingUITests {
             VsIdeTestHostContext.Dte.Solution.Close(false);
             var app = new NodejsVisualStudioApp(VsIdeTestHostContext.Dte);
 
-            var profiling = (INodeProfiling)VsIdeTestHostContext.Dte.GetObject("NodeProfiling");
+            var profiling = (INodeProfiling)VsIdeTestHostContext.Dte.GetObject("NodejsProfiling");
 
             // no sessions yet
             Assert.AreEqual(profiling.GetSession(1), null);
@@ -399,7 +399,7 @@ namespace ProfilingUITests {
             }
             app.WaitForDialogDismissed();
 
-            var profiling = (INodeProfiling)VsIdeTestHostContext.Dte.GetObject("NodeProfiling");
+            var profiling = (INodeProfiling)VsIdeTestHostContext.Dte.GetObject("NodejsProfiling");
             var session = profiling.GetSession(1);
 
             try {
@@ -417,7 +417,7 @@ namespace ProfilingUITests {
         [TestMethod, Priority(0), TestCategory("Core")]
         [HostType("TC Dynamic"), DynamicHostType(typeof(VsIdeHostAdapter))]
         public void LaunchProject() {
-            var profiling = (INodeProfiling)VsIdeTestHostContext.Dte.GetObject("NodeProfiling");
+            var profiling = (INodeProfiling)VsIdeTestHostContext.Dte.GetObject("NodejsProfiling");
 
             // no sessions yet
             Assert.AreEqual(profiling.GetSession(1), null);
@@ -447,7 +447,7 @@ namespace ProfilingUITests {
         [TestMethod, Priority(0), TestCategory("Core")]
         [HostType("TC Dynamic"), DynamicHostType(typeof(VsIdeHostAdapter))]
         public void TestSaveDirtySession() {
-            var profiling = (INodeProfiling)VsIdeTestHostContext.Dte.GetObject("NodeProfiling");
+            var profiling = (INodeProfiling)VsIdeTestHostContext.Dte.GetObject("NodejsProfiling");
 
             // no sessions yet
             Assert.AreEqual(profiling.GetSession(1), null);
@@ -490,7 +490,7 @@ namespace ProfilingUITests {
         [TestMethod, Priority(0), TestCategory("Core")]
         [HostType("TC Dynamic"), DynamicHostType(typeof(VsIdeHostAdapter))]
         public void TestDeleteReport() {
-            var profiling = (INodeProfiling)VsIdeTestHostContext.Dte.GetObject("NodeProfiling");
+            var profiling = (INodeProfiling)VsIdeTestHostContext.Dte.GetObject("NodejsProfiling");
 
             // no sessions yet
             Assert.AreEqual(profiling.GetSession(1), null);
@@ -516,7 +516,7 @@ namespace ProfilingUITests {
         [TestMethod, Priority(0), TestCategory("Core")]
         [HostType("TC Dynamic"), DynamicHostType(typeof(VsIdeHostAdapter))]
         public void TestCompareReports() {
-            var profiling = (INodeProfiling)VsIdeTestHostContext.Dte.GetObject("NodeProfiling");
+            var profiling = (INodeProfiling)VsIdeTestHostContext.Dte.GetObject("NodejsProfiling");
 
             // no sessions yet
             Assert.AreEqual(profiling.GetSession(1), null);
@@ -589,7 +589,7 @@ namespace ProfilingUITests {
         [TestMethod, Priority(0), TestCategory("Core")]
         [HostType("TC Dynamic"), DynamicHostType(typeof(VsIdeHostAdapter))]
         public void TestRemoveReport() {
-            var profiling = (INodeProfiling)VsIdeTestHostContext.Dte.GetObject("NodeProfiling");
+            var profiling = (INodeProfiling)VsIdeTestHostContext.Dte.GetObject("NodejsProfiling");
 
             // no sessions yet
             Assert.AreEqual(profiling.GetSession(1), null);
@@ -615,7 +615,7 @@ namespace ProfilingUITests {
         [TestMethod, Priority(0), TestCategory("Core")]
         [HostType("TC Dynamic"), DynamicHostType(typeof(VsIdeHostAdapter))]
         public void TestOpenReport() {
-            var profiling = (INodeProfiling)VsIdeTestHostContext.Dte.GetObject("NodeProfiling");
+            var profiling = (INodeProfiling)VsIdeTestHostContext.Dte.GetObject("NodejsProfiling");
 
             // no sessions yet
             Assert.AreEqual(profiling.GetSession(1), null);
@@ -667,7 +667,7 @@ namespace ProfilingUITests {
         [TestMethod, Priority(0), TestCategory("Core")]
         [HostType("TC Dynamic"), DynamicHostType(typeof(VsIdeHostAdapter))]
         public void TestOpenReportCtxMenu() {
-            var profiling = (INodeProfiling)VsIdeTestHostContext.Dte.GetObject("NodeProfiling");
+            var profiling = (INodeProfiling)VsIdeTestHostContext.Dte.GetObject("NodejsProfiling");
 
             // no sessions yet
             Assert.AreEqual(profiling.GetSession(1), null);
@@ -695,7 +695,7 @@ namespace ProfilingUITests {
         [TestMethod, Priority(0), TestCategory("Core")]
         [HostType("TC Dynamic"), DynamicHostType(typeof(VsIdeHostAdapter))]
         public void TestTargetPropertiesForProject() {
-            var profiling = (INodeProfiling)VsIdeTestHostContext.Dte.GetObject("NodeProfiling");
+            var profiling = (INodeProfiling)VsIdeTestHostContext.Dte.GetObject("NodejsProfiling");
 
             // no sessions yet
             Assert.AreEqual(profiling.GetSession(1), null);
@@ -731,12 +731,11 @@ namespace ProfilingUITests {
         [TestMethod, Priority(0), TestCategory("Core")]
         [HostType("TC Dynamic"), DynamicHostType(typeof(VsIdeHostAdapter))]
         public void TestTargetPropertiesForExecutable() {
-            var profiling = (INodeProfiling)VsIdeTestHostContext.Dte.GetObject("NodeProfiling");
+            var profiling = (INodeProfiling)VsIdeTestHostContext.Dte.GetObject("NodejsProfiling");
 
             // no sessions yet
             Assert.AreEqual(profiling.GetSession(1), null);
-
-            var session = profiling.LaunchProcess(NodejsPackage.NodePath,
+            var session = profiling.LaunchProcess(NodeExePath,
                 TestData.GetPath(@"TestData\NodejsProfileTest\program.js"),
                 TestData.GetPath(@"TestData\NodejsProfileTest"),
                 "",
@@ -760,7 +759,7 @@ namespace ProfilingUITests {
                 Mouse.DoubleClick(System.Windows.Input.MouseButton.Left);
 
                 perfTarget = new NodejsPerfTarget(app.WaitForDialog());
-                Assert.AreEqual(NodejsPackage.NodePath, perfTarget.InterpreterPath);
+                Assert.AreEqual(NodeExePath, perfTarget.InterpreterPath);
                 Assert.AreEqual("", perfTarget.Arguments);
                 Assert.IsTrue(perfTarget.ScriptName.EndsWith("program.js"));
                 Assert.IsTrue(perfTarget.ScriptName.StartsWith(perfTarget.WorkingDir));
@@ -779,12 +778,11 @@ namespace ProfilingUITests {
         [TestMethod, Priority(0), TestCategory("Core")]
         [HostType("TC Dynamic"), DynamicHostType(typeof(VsIdeHostAdapter))]
         public void TestStopProfiling() {
-            var profiling = (INodeProfiling)VsIdeTestHostContext.Dte.GetObject("NodeProfiling");
+            var profiling = (INodeProfiling)VsIdeTestHostContext.Dte.GetObject("NodejsProfiling");
 
             // no sessions yet
             Assert.AreEqual(profiling.GetSession(1), null);
-
-            var session = profiling.LaunchProcess(NodejsPackage.NodePath,
+            var session = profiling.LaunchProcess(NodeExePath,
                 TestData.GetPath(@"TestData\NodejsProfileTest\infiniteProfile.js"),
                 TestData.GetPath(@"TestData\NodejsProfileTest"),
                 "",
@@ -813,12 +811,11 @@ namespace ProfilingUITests {
         [TestMethod, Priority(0), TestCategory("Core")]
         [HostType("TC Dynamic"), DynamicHostType(typeof(VsIdeHostAdapter))]
         public void TestTwoProfilesAtTheSameTime() {
-            var profiling = (INodeProfiling)VsIdeTestHostContext.Dte.GetObject("NodeProfiling");
+            var profiling = (INodeProfiling)VsIdeTestHostContext.Dte.GetObject("NodejsProfiling");
 
             // no sessions yet
             Assert.AreEqual(profiling.GetSession(1), null);
-
-            var session = profiling.LaunchProcess(NodejsPackage.NodePath,
+            var session = profiling.LaunchProcess(NodeExePath,
                 TestData.GetPath(@"TestData\NodejsProfileTest\infiniteProfile.js"),
                 TestData.GetPath(@"TestData\NodejsProfileTest"),
                 "",
@@ -876,7 +873,7 @@ namespace ProfilingUITests {
         [TestMethod, Priority(0), TestCategory("Core")]
         [HostType("TC Dynamic"), DynamicHostType(typeof(VsIdeHostAdapter))]
         public void MultipleTargets() {
-            var profiling = (INodeProfiling)VsIdeTestHostContext.Dte.GetObject("NodeProfiling");
+            var profiling = (INodeProfiling)VsIdeTestHostContext.Dte.GetObject("NodejsProfiling");
 
             // no sessions yet
             Assert.AreEqual(profiling.GetSession(1), null);
@@ -903,7 +900,7 @@ namespace ProfilingUITests {
                 }
 
                 {
-                    session2 = profiling.LaunchProcess(NodejsPackage.NodePath,
+                    session2 = profiling.LaunchProcess(NodeExePath,
                         TestData.GetPath(@"TestData\NodejsProfileTest\program.js"),
                         TestData.GetPath(@"TestData\NodejsProfileTest"),
                         "",
@@ -936,7 +933,7 @@ namespace ProfilingUITests {
         [TestMethod, Priority(0), TestCategory("Core")]
         [HostType("TC Dynamic"), DynamicHostType(typeof(VsIdeHostAdapter))]
         public void MultipleTargetsWithProjectHome() {
-            var profiling = (INodeProfiling)VsIdeTestHostContext.Dte.GetObject("NodeProfiling");
+            var profiling = (INodeProfiling)VsIdeTestHostContext.Dte.GetObject("NodejsProfiling");
 
             // no sessions yet
             Assert.AreEqual(profiling.GetSession(1), null);
@@ -963,7 +960,7 @@ namespace ProfilingUITests {
                 }
 
                 {
-                    session2 = profiling.LaunchProcess(NodejsPackage.NodePath,
+                    session2 = profiling.LaunchProcess(NodeExePath,
                         TestData.GetPath(@"TestData\NodejsProfileTest\program.js"),
                         TestData.GetPath(@"TestData\NodejsProfileTest"),
                         "",
@@ -996,7 +993,7 @@ namespace ProfilingUITests {
         [TestMethod, Priority(0), TestCategory("Core")]
         [HostType("TC Dynamic"), DynamicHostType(typeof(VsIdeHostAdapter))]
         public void MultipleReports() {
-            var profiling = (INodeProfiling)VsIdeTestHostContext.Dte.GetObject("NodeProfiling");
+            var profiling = (INodeProfiling)VsIdeTestHostContext.Dte.GetObject("NodejsProfiling");
 
             // no sessions yet
             Assert.AreEqual(profiling.GetSession(1), null);
@@ -1037,12 +1034,11 @@ namespace ProfilingUITests {
         [TestMethod, Priority(0), TestCategory("Core")]
         [HostType("TC Dynamic"), DynamicHostType(typeof(VsIdeHostAdapter))]
         public void LaunchExecutable() {
-            var profiling = (INodeProfiling)VsIdeTestHostContext.Dte.GetObject("NodeProfiling");
+            var profiling = (INodeProfiling)VsIdeTestHostContext.Dte.GetObject("NodejsProfiling");
 
             // no sessions yet
             Assert.AreEqual(profiling.GetSession(1), null);
-
-            var session = profiling.LaunchProcess(NodejsPackage.NodePath,
+            var session = profiling.LaunchProcess(NodeExePath,
                 TestData.GetPath(@"TestData\NodejsProfileTest\program.js"),
                 TestData.GetPath(@"TestData\NodejsProfileTest"),
                 "",
@@ -1070,7 +1066,7 @@ namespace ProfilingUITests {
         [TestMethod, Priority(0), TestCategory("Core")]
         [HostType("TC Dynamic"), DynamicHostType(typeof(VsIdeHostAdapter))]
         public void TestProjectProperties() {
-            var profiling = (INodeProfiling)VsIdeTestHostContext.Dte.GetObject("NodeProfiling");
+            var profiling = (INodeProfiling)VsIdeTestHostContext.Dte.GetObject("NodejsProfiling");
 
             var testFile = Path.Combine(Path.GetTempPath(), "nodejstest.txt");
             if (File.Exists(testFile)) {
@@ -1102,7 +1098,7 @@ namespace ProfilingUITests {
         [TestMethod, Priority(0), TestCategory("Core")]
         [HostType("TC Dynamic"), DynamicHostType(typeof(VsIdeHostAdapter))]
         public void TestBrowserLaunch() {
-            var profiling = (INodeProfiling)VsIdeTestHostContext.Dte.GetObject("NodeProfiling");
+            var profiling = (INodeProfiling)VsIdeTestHostContext.Dte.GetObject("NodejsProfiling");
 
             var testFile = Path.Combine(Path.GetTempPath(), "nodejstest.txt");
             if (File.Exists(testFile)) {
@@ -1272,6 +1268,13 @@ namespace ProfilingUITests {
                 foreach (var bp in debug3.Breakpoints) {
                     ((Breakpoint3)bp).Delete();
                 }
+            }
+        }
+
+        public string NodeExePath {
+            get {
+                Assert.IsNotNull(Nodejs.NodeExePath, "Node isn't installed");
+                return Nodejs.NodeExePath;
             }
         }
     }

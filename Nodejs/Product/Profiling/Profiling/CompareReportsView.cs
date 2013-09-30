@@ -66,7 +66,7 @@ namespace Microsoft.NodejsTools.Profiling {
         /// </summary>
         public string PerformanceFileFilter {
             get {
-                return NodeProfilingPackage.PerformanceFileFilter;
+                return NodejsProfilingPackage.PerformanceFileFilter;
             }
         }
 

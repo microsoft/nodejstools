@@ -37,9 +37,9 @@ namespace Microsoft.NodejsTools.Profiling {
         /// Create a StandaloneTargetView with default values.
         /// </summary>
         public StandaloneTargetView() {
-            var componentService = (IComponentModel)(NodeProfilingPackage.GetGlobalService(typeof(SComponentModel)));
+            var componentService = (IComponentModel)(NodejsProfilingPackage.GetGlobalService(typeof(SComponentModel)));
 
-            _interpreterPath = NodejsPackage.NodePath;
+            _interpreterPath = Nodejs.NodeExePath ?? "";
             _scriptPath = String.Empty;
             _workingDirectory = String.Empty;
             _arguments = null;
