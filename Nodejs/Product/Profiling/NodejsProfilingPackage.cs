@@ -25,6 +25,7 @@ using Microsoft.VisualStudioTools;
 using Microsoft.VisualStudio;
 using Microsoft.VisualStudio.Shell;
 using Microsoft.VisualStudio.Shell.Interop;
+using Microsoft.VisualStudioTools.Project;
 
 namespace Microsoft.NodejsTools.Profiling {
     /// <summary>
@@ -168,6 +169,11 @@ namespace Microsoft.NodejsTools.Profiling {
         }
 
         internal void StartProfiling(ProfilingTarget target, SessionNode session, bool openReport = true) {
+            if (!Utilities.SaveDirtyFiles()) {
+                // Abort
+                return;
+            }
+
             if (target.ProjectTarget != null) {
                 ProfileProjectTarget(session, target.ProjectTarget, openReport);
             } else if (target.StandaloneTarget != null) {
@@ -264,12 +270,20 @@ namespace Microsoft.NodejsTools.Profiling {
         }
 
         private static void RunProfiler(SessionNode session, string interpreter, string interpreterArgs, string script, string scriptArgs, string workingDir, Dictionary<string, string> env, bool openReport, string launchUrl, int? port, bool startBrowser) {
+            if (String.IsNullOrWhiteSpace(interpreter)) {
+                Nodejs.ShowNodejsNotInstalled();
+                return;
+            } else if (!File.Exists(interpreter)) {
+                Nodejs.ShowNodejsPathNotFound(interpreter);
+                return;
+            }
+
             var arch = NativeMethods.GetBinaryType(interpreter);
             var process = new ProfiledProcess(interpreter, interpreterArgs, script, scriptArgs, workingDir, env, arch, launchUrl, port, startBrowser);
 
             string baseName = Path.GetFileNameWithoutExtension(session.Filename);
             string date = DateTime.Now.ToString("yyyyMMdd");
-            string outPath = Path.Combine(Path.GetTempPath(), baseName + "_" + date + ".vspx");
+            string outPath = Path.Combine(Path.GetDirectoryName(session.Filename), baseName + "_" + date + ".vspx");
 
             int count = 1;
             while (File.Exists(outPath)) {
@@ -320,12 +334,18 @@ namespace Microsoft.NodejsTools.Profiling {
 
         private void AddPerformanceSession(object sender, EventArgs e) {
             var dte = (EnvDTE.DTE)NodejsProfilingPackage.GetGlobalService(typeof(EnvDTE.DTE));
-            string filename = "Performance" + PerfFileType;
+
+            string filename;
+            int? id = null;
             bool save = false;
-            if (dte.Solution.IsOpen && !String.IsNullOrEmpty(dte.Solution.FullName)) {
-                filename = Path.Combine(Path.GetDirectoryName(dte.Solution.FullName), filename);
-                save = true;
-            }
+            do {
+                filename = "Performance" + id + PerfFileType;
+                if (dte.Solution.IsOpen && !String.IsNullOrEmpty(dte.Solution.FullName)) {
+                    filename = Path.Combine(Path.GetDirectoryName(dte.Solution.FullName), filename);
+                    save = true;
+                }
+                id = (id ?? 0) + 1;
+            } while (File.Exists(filename));
             ShowPerformanceExplorer().Sessions.AddTarget(new ProfilingTarget(), filename, save);
         }
 

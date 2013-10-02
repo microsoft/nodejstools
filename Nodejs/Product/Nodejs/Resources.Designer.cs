@@ -115,6 +115,15 @@ namespace Microsoft.NodejsTools {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to The specified Node.js interpreter does not exist..
+        /// </summary>
+        internal static string NodeExePathNotFound {
+            get {
+                return ResourceManager.GetString("NodeExePathNotFound", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Specifies the path to the node.exe executable..
         /// </summary>
         internal static string NodeExePathToolTip {
@@ -129,6 +138,15 @@ namespace Microsoft.NodejsTools {
         internal static string NodejsNotInstalled {
             get {
                 return ResourceManager.GetString("NodejsNotInstalled", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Node.js has not been detected on your computer.
+        /// </summary>
+        internal static string NodejsNotInstalledShort {
+            get {
+                return ResourceManager.GetString("NodejsNotInstalledShort", resourceCulture);
             }
         }
         

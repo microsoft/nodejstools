@@ -1219,12 +1219,29 @@ namespace Microsoft.VisualStudioTools.Project
         }
 
         /// <summary>
+        /// Handles the exclude from project command potentially displaying
+        /// a progress bar if the operation can take a long time.
+        /// </summary>
+        /// <returns></returns>
+        internal virtual int ExcludeFromProjectWithProgress() {
+            return ExcludeFromProject();
+        }
+             
+        /// <summary>
         /// Handles the include in project command.
         /// </summary>
         /// <returns></returns>
         internal virtual int IncludeInProject(bool includeChildren) 
         {
             return VSConstants.E_FAIL;
+        }
+
+        /// <summary>
+        /// Handles the include in project command showing a progress bar
+        /// if the operation can potentially take a long time.
+        /// </summary>
+        internal virtual int IncludeInProjectWithProgress(bool includeChildren) {
+            return IncludeInProject(includeChildren);
         }
 
         /// <summary>
@@ -1439,9 +1456,10 @@ namespace Microsoft.VisualStudioTools.Project
                 switch ((VsCommands2K)cmd)
                 {
                     case VsCommands2K.EXCLUDEFROMPROJECT:
-                        return this.ExcludeFromProject();
+                        return this.ExcludeFromProjectWithProgress();
                     case VsCommands2K.INCLUDEINPROJECT:
-                        return this.IncludeInProject(true);
+                        return this.IncludeInProjectWithProgress(true);
+
                 }
             }
 

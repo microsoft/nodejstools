@@ -54,7 +54,7 @@ namespace Microsoft.NodejsTools.Project {
         private int Start(string file, bool debug) {
             string nodePath = GetNodePath();
             if (nodePath == null) {
-                NodejsPackage.ShowNodejsNotInstalled();
+                Nodejs.ShowNodejsNotInstalled();
                 return VSConstants.S_OK;
             }
 

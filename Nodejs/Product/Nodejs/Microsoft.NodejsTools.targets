@@ -62,6 +62,8 @@
 
     <ItemGroup>
       <ScriptAndWebDeployFiles Include="@(FilesCopiedToIntermediate->'%(RootDir)%(Directory)%(Filename)%(Extension)')"/>
+      <NodejsBinFiles Include="bin\**\*" />
+      <ScriptAndWebDeployFiles Include="@(NodejsBinFiles->'%(RootDir)%(Directory)%(Filename)%(Extension)')"/>
     </ItemGroup>
     <Message Text="ScriptAndWebDeployFiles=@(ScriptAndWebDeployFiles)"  />
   </Target>

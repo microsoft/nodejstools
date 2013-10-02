@@ -13,23 +13,26 @@
  * ***************************************************************************/
 
 using System;
+using System.Drawing;
+using System.IO;
 using System.Windows.Forms;
+using Microsoft.VisualStudioTools.Project;
 
 namespace Microsoft.NodejsTools.Project {
     partial class NodejsGeneralPropertyPageControl : UserControl {
         private readonly NodejsGeneralPropertyPage _propPage;
+        private const string _exeFilter = "Executable Files (*.exe)|*.exe|All Files (*.*)|*.*";
 
         public NodejsGeneralPropertyPageControl() {
             InitializeComponent();
 
+            SetCueBanner();
+
             AddToolTips();
         }
 
-        public NodejsGeneralPropertyPageControl(NodejsGeneralPropertyPage page) {
+        public NodejsGeneralPropertyPageControl(NodejsGeneralPropertyPage page) : this() {
             _propPage = page;
-            InitializeComponent();
-
-            AddToolTips();
         }
 
         private void AddToolTips() {
@@ -52,10 +55,10 @@ namespace Microsoft.NodejsTools.Project {
         }
 
         public string NodeExeArguments {
-            get{
+            get {
                 return _nodeExeArguments.Text;
             }
-            set{
+            set {
                 _nodeExeArguments.Text = value;
             }
         }
@@ -113,6 +116,49 @@ namespace Microsoft.NodejsTools.Project {
         private void NodejsPortKeyPress(object sender, KeyPressEventArgs e) {
             if (!Char.IsDigit(e.KeyChar)) {
                 e.Handled = true;
+            }
+        }
+
+        private void SetCueBanner() {
+            string cueBanner = Nodejs.NodeExePath;
+            if (String.IsNullOrEmpty(cueBanner)) {
+                cueBanner = Resources.NodejsNotInstalledShort;
+            }
+
+            NativeMethods.SendMessageW(
+                _nodeExePath.Handle,
+                NativeMethods.EM_SETCUEBANNER,
+                new IntPtr(1),  // fDrawFocused == true
+                cueBanner
+            );
+        }
+
+        private void NodeExePathValidated(object sender, EventArgs e) {
+            if (String.IsNullOrEmpty(_nodeExePath.Text) || File.Exists(_nodeExePath.Text)) {
+                _nodeExeErrorProvider.SetError(_nodeExePath, String.Empty);
+            } else {
+                _nodeExeErrorProvider.SetError(_nodeExePath, Resources.NodeExePathNotFound);
+            }
+        }
+        
+        private void BrowsePathClick(object sender, EventArgs e) {
+            var dialog = new OpenFileDialog();
+            dialog.CheckFileExists = true;
+            dialog.Filter = _exeFilter;
+            if (dialog.ShowDialog() == DialogResult.OK) {
+                _nodeExePath.Text = dialog.FileName;
+                _nodeExePath.ForeColor = SystemColors.ControlText;
+            }
+        }
+
+        private void BrowseDirectoryClick(object sender, EventArgs e) {
+            string dir = _workingDir.Text;
+            if (string.IsNullOrEmpty(dir)) {
+                dir = _propPage.Project.ProjectHome;
+            }
+            var path = NodejsPackage.Instance.BrowseForDirectory(Handle, dir);
+            if (!string.IsNullOrEmpty(path)) {
+                _workingDir.Text = path;
             }
         }
     }

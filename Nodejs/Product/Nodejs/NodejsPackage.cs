@@ -159,6 +159,7 @@ namespace Microsoft.NodejsTools {
         private IContentType _contentType;
         internal const string NodeJsFileType = ".njs";
         internal static readonly Guid _jsLangSvcGuid = new Guid("{71d61d27-9011-4b17-9469-d20f798fb5c0}");
+        internal static NodejsPackage Instance;
 
         /// <summary>
         /// Default constructor of the package.
@@ -169,6 +170,8 @@ namespace Microsoft.NodejsTools {
         /// </summary>
         public NodejsPackage() {
             Debug.WriteLine(string.Format(CultureInfo.CurrentCulture, "Entering constructor for: {0}", this.ToString()));
+            Debug.Assert(Instance == null, "NodejsPackage created multiple times");
+            Instance = this;
         }
 
         /////////////////////////////////////////////////////////////////////////////
@@ -323,15 +326,50 @@ namespace Microsoft.NodejsTools {
             }
         }
 
-        internal static void ShowNodejsNotInstalled() {
-            MessageBox.Show(
-                Resources.NodejsNotInstalled, 
-                Resources.NodejsToolsForVisualStudio, 
-                MessageBoxButtons.OK, 
-                MessageBoxIcon.Error
-            );
-        }
+        public string BrowseForDirectory(IntPtr owner, string initialDirectory = null) {
+            IVsUIShell uiShell = GetService(typeof(SVsUIShell)) as IVsUIShell;
+            if (null == uiShell) {
+                using (var ofd = new FolderBrowserDialog()) {
+                    ofd.RootFolder = Environment.SpecialFolder.Desktop;
+                    ofd.ShowNewFolderButton = false;
+                    DialogResult result;
+                    if (owner == IntPtr.Zero) {
+                        result = ofd.ShowDialog();
+                    } else {
+                        result = ofd.ShowDialog(NativeWindow.FromHandle(owner));
+                    }
+                    if (result == DialogResult.OK) {
+                        return ofd.SelectedPath;
+                    } else {
+                        return null;
+                    }
+                }
+            }
 
+            if (owner == IntPtr.Zero) {
+                ErrorHandler.ThrowOnFailure(uiShell.GetDialogOwnerHwnd(out owner));
+            }
+
+            VSBROWSEINFOW[] browseInfo = new VSBROWSEINFOW[1];
+            browseInfo[0].lStructSize = (uint)Marshal.SizeOf(typeof(VSBROWSEINFOW));
+            browseInfo[0].pwzInitialDir = initialDirectory;
+            browseInfo[0].hwndOwner = owner;
+            browseInfo[0].nMaxDirName = 260;
+            IntPtr pDirName = IntPtr.Zero;
+            try {
+                browseInfo[0].pwzDirName = pDirName = Marshal.AllocCoTaskMem(520);
+                int hr = uiShell.GetDirectoryViaBrowseDlg(browseInfo);
+                if (hr == VSConstants.OLE_E_PROMPTSAVECANCELLED) {
+                    return null;
+                }
+                ErrorHandler.ThrowOnFailure(hr);
+                return Marshal.PtrToStringAuto(browseInfo[0].pwzDirName);
+            } finally {
+                if (pDirName != IntPtr.Zero) {
+                    Marshal.FreeCoTaskMem(pDirName);
+                }
+            }
+        }
 
 #if UNIT_TEST_INTEGRATION
         // var testCase = require('./test/test-doubled.js'); for(var x in testCase) { console.log(x); }

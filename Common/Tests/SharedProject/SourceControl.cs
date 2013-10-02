@@ -135,7 +135,8 @@ namespace Microsoft.VisualStudioTools.SharedProjectTests {
                     var projectDir = Path.GetDirectoryName(project.FullName);
                     
                     AssertDocumentEvents(projectDir,
-                        OnQueryAddFiles(projectType.Code(@"NewFile")),                         OnAfterAddFilesEx(projectType.Code(@"NewFile"))
+                        OnQueryAddFiles(projectType.Code(@"NewFile")), 
+                        OnAfterAddFilesEx(projectType.Code(@"NewFile"))
                     );
                 }
             }
@@ -172,7 +173,8 @@ namespace Microsoft.VisualStudioTools.SharedProjectTests {
                     var projectDir = Path.GetDirectoryName(project.FullName);
 
                     AssertDocumentEvents(projectDir,
-                        OnQueryRemoveFiles(projectType.Code(@"Program")),                         OnAfterRemoveFiles(projectType.Code(@"Program"))
+                        OnQueryRemoveFiles(projectType.Code(@"Program")), 
+                        OnAfterRemoveFiles(projectType.Code(@"Program"))
                     );
                 }
             }

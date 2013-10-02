@@ -14,6 +14,7 @@
 
 using System;
 using System.IO;
+using System.Windows.Forms;
 using Microsoft.Win32;
 
 namespace Microsoft.NodejsTools {
@@ -22,7 +23,7 @@ namespace Microsoft.NodejsTools {
 
         public static string NodeExePath {
             get {
-                if (_nodeExePath != null) {
+                if (_nodeExePath == null) {
                     //Fall back to a well known location if lookup fails
                     string installPath = null;
                     try {
@@ -73,5 +74,27 @@ namespace Microsoft.NodejsTools {
                 return _nodeExePath;
             }
         }
+
+        public static void ShowNodejsNotInstalled() {
+            MessageBox.Show(
+                Resources.NodejsNotInstalled,
+                Resources.NodejsToolsForVisualStudio,
+                MessageBoxButtons.OK,
+                MessageBoxIcon.Error
+            );
+        }
+
+        public static void ShowNodejsPathNotFound(string path) {
+            MessageBox.Show(
+                String.Format(
+                    Resources.NodeExeDoesntExist,
+                    path
+                ),
+                Resources.NodejsToolsForVisualStudio,
+                MessageBoxButtons.OK,
+                MessageBoxIcon.Error
+            );
+        }
+
     }
 }

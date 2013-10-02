@@ -159,4 +159,11 @@
   <data name="NodejsToolsForVisualStudio" xml:space="preserve">
     <value>Node.js Tools for Visual Studio</value>
   </data>
+  <data name="NodeExePathNotFound" xml:space="preserve">
+    <value>The specified Node.js interpreter does not exist.</value>
+  </data>
+  <data name="NodejsNotInstalledShort" xml:space="preserve">
+    <value>Node.js has not been detected on your computer</value>
+    <comment>Used in general property page when Node.exe isn't found</comment>
+  </data>
 </root>

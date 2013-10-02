@@ -17,6 +17,7 @@ using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.ComponentModel;
 using System.Diagnostics;
+using System.Linq;
 
 namespace Microsoft.NodejsTools.Profiling {
     /// <summary>
@@ -38,12 +39,19 @@ namespace Microsoft.NodejsTools.Profiling {
             var dteService = (EnvDTE.DTE)(NodejsProfilingPackage.GetGlobalService(typeof(EnvDTE.DTE)));
 
             var availableProjects = new List<ProjectTargetView>();
+            var startupProjects = ((object[])dteService.Solution.SolutionBuild.StartupProjects).Select(x => x.ToString());
+            ProjectTargetView selectedView = null;
             foreach (EnvDTE.Project project in dteService.Solution.Projects) {
                 var kind = project.Kind;
                 if (String.Equals(kind, NodejsProfilingPackage.NodeProjectGuid, StringComparison.OrdinalIgnoreCase)) {
                     availableProjects.Add(new ProjectTargetView(project));
+
+                    if (startupProjects.Contains(project.UniqueName, StringComparer.OrdinalIgnoreCase)) {
+                        selectedView = availableProjects.Last();
+                    }
                 }
             }
+
             _availableProjects = new ReadOnlyCollection<ProjectTargetView>(availableProjects);
 
             _project = null;
@@ -55,7 +63,9 @@ namespace Microsoft.NodejsTools.Profiling {
             PropertyChanged += new PropertyChangedEventHandler(ProfilingTargetView_PropertyChanged);
             _standalone.PropertyChanged += new PropertyChangedEventHandler(Standalone_PropertyChanged);
 
-            if (IsAnyAvailableProjects) {
+            if (selectedView != null) {
+                Project = selectedView;
+            } else if (IsAnyAvailableProjects) {
                 Project = AvailableProjects[0];
             } else {
                 IsStandaloneSelected = true;

@@ -127,6 +127,15 @@ namespace Microsoft.VisualStudioTools.Project {
             return VSConstants.S_OK;
         }
 
+        internal override int ExcludeFromProjectWithProgress() {
+            using(new WaitDialog(
+                "Excluding files and folders...",
+                "Excluding files and folders in your project, this may take several seconds...",
+                ProjectMgr.Site)) {
+                return ExcludeFromProject();
+            }
+        }
+
         internal override int IncludeInProject(bool includeChildren) {
             if (Parent.ItemNode != null && Parent.ItemNode.IsExcluded) {
                 // if our parent is excluded it needs to first be included
@@ -162,6 +171,16 @@ namespace Microsoft.VisualStudioTools.Project {
             ((IVsUIShell)GetService(typeof(SVsUIShell))).RefreshPropertyBrowser(0);
 
             return VSConstants.S_OK;
+        }
+
+        internal override int IncludeInProjectWithProgress(bool includeChildren) {
+            using (new WaitDialog(
+                "Including files and folders...",
+                "Including files and folders to your project, this may take several seconds...",
+                ProjectMgr.Site)) {
+                
+                return IncludeInProject(includeChildren);
+            }
         }
 
         public override void RenameFolder(string newName) {

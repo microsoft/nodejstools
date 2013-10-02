@@ -523,6 +523,10 @@
       <Link>SharedProject\VSShellUtilities.cs</Link>
       <Visible>true</Visible>
     </Compile>
+    <Compile Include="$(_ProjectSystemFilesLocation)\WaitDialog.cs">
+      <Link>SharedProject\WaitDialog.cs</Link>
+      <Visible>true</Visible>
+    </Compile>
     <Compile Include="$(_ProjectSystemFilesLocation)\WebPiComponentPickerControl.cs">
       <Link>SharedProject\WebPiComponentPickerControl.cs</Link>
       <SubType>UserControl</SubType>

@@ -312,7 +312,7 @@ function starts_with(a, b) {
                                     // can't read, failed to deserialize json, fallback to index.js if it exists
                                     var outputWindow = Package.GetOutputPane(VSConstants.OutputWindowPaneGuid.GeneralPane_guid, "General");
                                     if (outputWindow != null) {
-                                        outputWindow.OutputStringThreadSafe(String.Format("Failed to parse {0}:\r\n\r\n{1}", packageJsonChild.Url, e.Message));
+                                        outputWindow.OutputStringThreadSafe(String.Format("Failed to parse {0}:\r\n\r\n{1}\r\n\r\n", packageJsonChild.Url, e.Message));
                                     }
                                 }
                             }

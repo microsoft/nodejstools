@@ -651,6 +651,25 @@ namespace Microsoft.NodejsTools {
         #region IVsProject Members
 
         public int AddItem(uint itemidLoc, VSADDITEMOPERATION dwAddItemOperation, string pszItemName, uint cFilesToOpen, string[] rgpszFilesToOpen, IntPtr hwndDlgOwner, VSADDRESULT[] pResult) {
+            if (_innerProject3 != null && IsJavaScriptFile(pszItemName)) {
+                Guid ourEditor = typeof(NodejsEditorFactory).GUID;
+                Guid view = Guid.Empty;
+                return _innerProject3.AddItemWithSpecific(
+                    itemidLoc,
+                    dwAddItemOperation,
+                    pszItemName,
+                    cFilesToOpen,
+                    rgpszFilesToOpen,
+                    hwndDlgOwner,
+                    dwAddItemOperation == VSADDITEMOPERATION.VSADDITEMOP_CLONEFILE ? 
+                        (uint)__VSSPECIFICEDITORFLAGS.VSSPECIFICEDITOR_DoOpen : 
+                        0,
+                    ref ourEditor,
+                    "",
+                    ref view,
+                    pResult
+                );
+            }
             return _innerProject.AddItem(itemidLoc, dwAddItemOperation, pszItemName, cFilesToOpen, rgpszFilesToOpen, hwndDlgOwner, pResult);
         }
 
