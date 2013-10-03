@@ -110,6 +110,59 @@ namespace ProfilingUITests {
         }
 
         /// <summary>
+        /// https://nodejstools.codeplex.com/workitem/26
+        /// </summary>
+        [TestMethod, Priority(0), TestCategory("Core")]
+        [HostType("TC Dynamic"), DynamicHostType(typeof(VsIdeHostAdapter))]
+        public void TestStartAnalysisDebugMenu() {
+            var profiling = (INodeProfiling)VsIdeTestHostContext.Dte.GetObject("NodejsProfiling");
+
+            // no sessions yet
+            Assert.AreEqual(profiling.GetSession(1), null);
+
+            var project = OpenProject(NodejsProfileTest);
+            var app = new NodejsVisualStudioApp(VsIdeTestHostContext.Dte);
+            app.Dte.ExecuteCommand("Debug.StartNode.jsPerformanceAnalysis");
+            while (profiling.GetSession(1) == null) {
+                System.Threading.Thread.Sleep(100);
+            }
+            var session = profiling.GetSession(1);
+            try {
+                while (profiling.IsProfiling) {
+                    System.Threading.Thread.Sleep(500);
+                }
+
+                var report = session.GetReport(1);
+                var filename = report.Filename;
+                Assert.IsTrue(filename.Contains("NodejsProfileTest"));
+
+                Assert.AreEqual(session.GetReport(2), null);
+
+                Assert.AreNotEqual(session.GetReport(report.Filename), null);
+
+                VerifyReport(report, "program.f");
+            } finally {
+                profiling.RemoveSession(session, true);
+            }
+        }
+
+        /// <summary>
+        /// https://nodejstools.codeplex.com/workitem/26
+        /// </summary>
+        [TestMethod, Priority(0), TestCategory("Core")]
+        [HostType("TC Dynamic"), DynamicHostType(typeof(VsIdeHostAdapter))]
+        public void TestStartAnalysisDebugMenuNoProject() {
+            var app = new NodejsVisualStudioApp(VsIdeTestHostContext.Dte);
+            bool ok = true;
+            try {
+                app.Dte.ExecuteCommand("Debug.StartNode.jsPerformanceAnalysis");
+                ok = false;
+            } catch {
+            }
+            Assert.IsTrue(ok, "Could start perf analysis w/o a project open");
+        }
+
+        /// <summary>
         /// https://nodejstools.codeplex.com/workitem/149
         /// </summary>
         [TestMethod, Priority(0), TestCategory("Core")]
@@ -1159,7 +1212,7 @@ namespace ProfilingUITests {
                     csvFilename = Path.Combine(Path.GetTempPath(), "test") + DateTime.Now.Ticks + "_" + _counter++;
                 } while (File.Exists(csvFilename + "_FunctionSummary.csv"));
 
-                var psi = new ProcessStartInfo(perfReportPath, report.Filename + " /output:" + csvFilename + " /summary:function");
+                var psi = new ProcessStartInfo(perfReportPath, "\"" + report.Filename + "\"" + " /output:" + csvFilename + " /summary:function");
                 psi.UseShellExecute = false;
                 psi.RedirectStandardOutput = true;
                 psi.RedirectStandardError = true;

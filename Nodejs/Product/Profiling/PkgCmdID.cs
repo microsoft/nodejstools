@@ -28,6 +28,7 @@ namespace Microsoft.NodejsTools.Profiling {
         public const uint cmdidReportsAddReport = 0x107;
         public const uint cmdidOpenReport = 0x108;
         public const uint cmdidStopProfiling = 0x109;
+        public const uint cmdidStartPerformanceAnalysis = 0x10A;
 
         public const uint menuIdPerfToolbar = 0x2000;
         public const uint menuIdPerfContext = 0x2001;

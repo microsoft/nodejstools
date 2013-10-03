@@ -103,16 +103,30 @@
       <!-- Analyze menu items -->
       <Button guid="guidNodeProfilingCmdSet" id="cmdidStartNodeProfiling" priority="0x0100" type="Button">
         <Parent guid="guidPerfMenuGroup" id="IDG_PERF_BAR_GENERAL" />
+        <Icon guid="guidCmdBarImages" id="newSessionIcon"/>
         <CommandFlag>DynamicVisibility</CommandFlag>
         <Strings>
           <CommandName>cmdidStartNodeProfiling</CommandName>
           <ButtonText>Launch &amp;Node.js Profiling...</ButtonText>
         </Strings>
       </Button>
+
+      <!-- Debug menu items -->
+      <Button guid="guidNodeProfilingCmdSet" id="cmdidStartPerformanceAnalysis" priority="0x679" type="Button">
+        <Parent guid="guidVSDebugGroup" id="IDG_EXECUTION"/>
+        <Icon guid="guidCmdBarImages" id="startIcon"/>
+        <CommandFlag>DynamicVisibility</CommandFlag>
+        <CommandFlag>DefaultInvisible</CommandFlag>
+        <Strings>
+          <CommandName>cmdidStartPerformanceAnalysis</CommandName>
+          <ButtonText>Start Node.js Performance Analysis</ButtonText>
+        </Strings>
+      </Button>
       
       <!-- View->Other Windows items -->
       <Button guid="guidNodeProfilingCmdSet" id="cmdidPerfExplorer" priority="0x8000" type="Button">
         <Parent guid="guidDiagMenuGroup" id="IDG_VIEW_OTHERWINDOWS_DIAG_MENU"/>
+        <Icon guid="guidCmdBarImages" id="perfIcon"/>
         <Strings>
           <CommandName>cmdidPerfExplorer</CommandName>
           <ButtonText>Node.js Performance Explorer</ButtonText>
@@ -215,7 +229,7 @@
             bitmap strip containing the bitmaps and then there are the numeric ids of the elements used 
             inside a button definition. An important aspect of this declaration is that the element id 
             must be the actual index (1-based) of the bitmap inside the bitmap strip. -->
-      <Bitmap guid="guidCmdBarImages" href="..\Icons\ProfilingCmdBar.bmp" usedList="startIcon, newSessionIcon, stopIcon, compareReports"/>
+      <Bitmap guid="guidCmdBarImages" href="..\Icons\ProfilingCmdBar.bmp" usedList="startIcon, newSessionIcon, stopIcon, compareReports, perfIcon"/>
     </Bitmaps>
  
   </Commands>
@@ -267,6 +281,7 @@
       <IDSymbol name="cmdidReportsAddReport" value="0x107"/>
       <IDSymbol name="cmdidOpenReport" value="0x108"/>
       <IDSymbol name="cmdidStopProfiling" value="0x0109" />
+      <IDSymbol name="cmdidStartPerformanceAnalysis" value="0x010A" />
 
       <!-- Menus -->
       <IDSymbol name="menuIdPerfToolbar" value="0x2000"/>
@@ -288,6 +303,7 @@
       <IDSymbol name="newSessionIcon" value="2"/>
       <IDSymbol name="stopIcon" value="3"/>
       <IDSymbol name="compareReports" value="4"/>
+      <IDSymbol name="perfIcon" value="5"/>
     </GuidSymbol>
 
     <!-- External Guids and IDs which we need to hook into -->
@@ -300,6 +316,10 @@
     <GuidSymbol name="guidDiagMenuGroup" value="{CD68F8E6-2842-4F7E-AF7b-5A019631CEB5}">
       <IDSymbol name="IDG_DIAG_WINDOWS_MENU"      value="0x1003"/>
       <IDSymbol name="IDG_VIEW_OTHERWINDOWS_DIAG_MENU" value="0x2002"/>
+    </GuidSymbol>
+
+    <GuidSymbol name="guidVSDebugGroup" value="{C9DD4A58-47FB-11d2-83E7-00C04F9902C1}">
+      <IDSymbol name="IDG_EXECUTION" value="0x004"/>
     </GuidSymbol>
   </Symbols>
 

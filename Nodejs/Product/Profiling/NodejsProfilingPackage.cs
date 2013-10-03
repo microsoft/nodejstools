@@ -19,6 +19,7 @@ using System.ComponentModel.Design;
 using System.Diagnostics;
 using System.Globalization;
 using System.IO;
+using System.Linq;
 using System.Runtime.InteropServices;
 using System.Windows;
 using Microsoft.VisualStudioTools;
@@ -62,7 +63,7 @@ namespace Microsoft.NodejsTools.Profiling {
         internal static string NodeProjectGuid = "{9092AA53-FB77-4645-B42D-1CCCA6BD08BD}";
         internal const string PerformanceFileFilter = "Performance Report Files|*.vspx;*.vsps";
         private AutomationProfiling _profilingAutomation;
-        private static OleMenuCommand _stopCommand, _startCommand, _startWizard;
+        private static OleMenuCommand _stopCommand, _startCommand, _startWizard, _startProfiling;
         internal const string PerfFileType = ".njsperf";
         
         /// <summary>
@@ -124,10 +125,55 @@ namespace Microsoft.NodejsTools.Profiling {
                 oleMenuItem.BeforeQueryStatus += IsProfilingInactive;
 
                 mcs.AddCommand(oleMenuItem);
+
+                menuCommandID = new CommandID(GuidList.guidNodeProfilingCmdSet, (int)PkgCmdIDList.cmdidStartPerformanceAnalysis);
+                _startProfiling = oleMenuItem = new OleMenuCommand(StartPerfAnalysis, menuCommandID);
+                oleMenuItem.BeforeQueryStatus += IsNodejsProjectStartup;
+                mcs.AddCommand(oleMenuItem);
             }
 
             //Create Editor Factory. Note that the base Package class will call Dispose on it.
             base.RegisterEditorFactory(new ProfilingSessionEditorFactory(this));
+        }
+
+        private void StartPerfAnalysis(object sender, EventArgs e) {
+            var view = new ProfilingTargetView();
+            
+            var sessions = ShowPerformanceExplorer().Sessions;
+            SessionNode activeSession = sessions.ActiveSession;
+            if (activeSession == null ||
+                activeSession.Target.ProjectTarget == null ||
+                !ProjectTarget.IsSame(activeSession.Target.ProjectTarget, view.Project.GetTarget())) {
+                // need to create a new session
+                    var target = new ProfilingTarget() { ProjectTarget = view.Project.GetTarget() };
+                    
+                    activeSession = AddPerformanceSession(
+                        view.Project.Name, 
+                        target
+                    );
+            }
+
+            ProfileProjectTarget(activeSession, activeSession.Target.ProjectTarget, true);
+        }
+
+        private void IsNodejsProjectStartup(object sender, EventArgs e) {
+            bool foundStartupProject = false;
+            var dteService = (EnvDTE.DTE)(GetService(typeof(EnvDTE.DTE)));
+
+            var startupProjects = ((object[])dteService.Solution.SolutionBuild.StartupProjects).Select(x => x.ToString());
+            foreach (EnvDTE.Project project in dteService.Solution.Projects) {
+                var kind = project.Kind;
+                if (String.Equals(kind, NodejsProfilingPackage.NodeProjectGuid, StringComparison.OrdinalIgnoreCase)) {
+                    if (startupProjects.Contains(project.UniqueName, StringComparer.OrdinalIgnoreCase)) {
+                        foundStartupProject = true;
+                        break;
+                    }
+                }
+            }
+
+            var oleMenu = sender as OleMenuCommand;
+
+            oleMenu.Enabled = foundStartupProject;
         }
 
         protected override object GetAutomationObject(string name) {
@@ -333,20 +379,26 @@ namespace Microsoft.NodejsTools.Profiling {
         }
 
         private void AddPerformanceSession(object sender, EventArgs e) {
+            string baseName = "Performance";
+            var target = new ProfilingTarget();
+            AddPerformanceSession(baseName, target);
+        }
+
+        private SessionNode AddPerformanceSession(string baseName, ProfilingTarget target) {
             var dte = (EnvDTE.DTE)NodejsProfilingPackage.GetGlobalService(typeof(EnvDTE.DTE));
 
             string filename;
             int? id = null;
             bool save = false;
             do {
-                filename = "Performance" + id + PerfFileType;
+                filename = baseName + id + PerfFileType;
                 if (dte.Solution.IsOpen && !String.IsNullOrEmpty(dte.Solution.FullName)) {
                     filename = Path.Combine(Path.GetDirectoryName(dte.Solution.FullName), filename);
                     save = true;
                 }
                 id = (id ?? 0) + 1;
             } while (File.Exists(filename));
-            ShowPerformanceExplorer().Sessions.AddTarget(new ProfilingTarget(), filename, save);
+            return ShowPerformanceExplorer().Sessions.AddTarget(target, filename, save);
         }
 
         private void StartProfiling(object sender, EventArgs e) {

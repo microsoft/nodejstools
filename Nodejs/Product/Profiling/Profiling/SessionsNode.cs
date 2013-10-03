@@ -43,6 +43,15 @@ namespace Microsoft.NodejsTools.Profiling {
             _window = window;
         }
 
+        public SessionNode ActiveSession {
+            get {
+                if (_activeSession != VSConstants.VSITEMID_NIL) {
+                    return (SessionNode)_sessionsCollection[_activeSession];
+                }
+                return null;
+            }
+        }
+
         internal SessionNode AddTarget(ProfilingTarget target, string filename, bool save) {
             Debug.Assert(filename.EndsWith(NodejsProfilingPackage.PerfFileType));
 
