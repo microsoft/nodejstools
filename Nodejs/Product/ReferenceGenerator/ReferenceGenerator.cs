@@ -27,13 +27,7 @@ namespace NodeReferenceGenerator {
         private string Generate() {
             _output.AppendLine("global = {};");
 
-            _output.Append("function require(module) {\r\n");
-
-            GenerateRequireBody(_output, _all);
-
-            _output.Append(@"
-}
-");
+            GenerateRequire(_output, _all);
 
             foreach (var misc in _all["miscs"]) {
                 if (misc["name"] == "Global Objects") {
@@ -68,11 +62,13 @@ namespace NodeReferenceGenerator {
 
         private void GenerateModuleWorker(dynamic module, int indentation, string name) {
             _output.Append(' ', indentation * 4);
-            _output.AppendFormat("function {0}() {{\r\n", name);
+            _output.AppendFormat("function {0}() {{", name);
+            _output.AppendLine();
 
             if (module.ContainsKey("desc")) {
                 _output.Append(' ', (indentation + 1) * 4);
-                _output.AppendFormat("/// <summary>{0}</summary>\r\n", FixDescription(module["desc"]));
+                _output.AppendFormat("/// <summary>{0}</summary>", FixDescription(module["desc"]));
+                _output.AppendLine();
             }
 
             if (module.ContainsKey("methods")) {
@@ -132,7 +128,8 @@ namespace NodeReferenceGenerator {
         private void GenerateClass(string modName, dynamic klass, int indentation) {
             string className = FixClassName(klass["name"]);
             _output.Append(' ', indentation * 4);
-            _output.AppendFormat("this.{0} = function() {{\r\n", className);
+            _output.AppendFormat("this.{0} = function() {{", className);
+            _output.AppendLine();
 
             if (klass.ContainsKey("methods")) {
                 foreach (var method in klass["methods"]) {
@@ -159,10 +156,10 @@ namespace NodeReferenceGenerator {
                     desc = prop["desc"];
 
                     _output.Append(' ', indentation * 4);
-                    _output.AppendFormat("/// <field name='{0}'>{1}</field>\r\n",
+                    _output.AppendFormat("/// <field name='{0}'>{1}</field>",
                         prop["name"],
                         FixDescription(desc));
-
+                    _output.AppendLine();
                 }
 
                 _output.Append(' ', indentation * 4);
@@ -197,7 +194,8 @@ namespace NodeReferenceGenerator {
                         value = "undefined";
                     }
                 }
-                _output.AppendFormat("this.{0} = {1};\r\n", prop["name"], value);
+                _output.AppendFormat("this.{0} = {1};", prop["name"], value);
+                _output.AppendLine();
             }
         }
 
@@ -210,11 +208,13 @@ namespace NodeReferenceGenerator {
                 }
                 if (ev.ContainsKey("desc")) {
                     _output.Append(' ', indentation * 4);
-                    _output.AppendFormat("/// <field name='{0}'>{1}</field>\r\n", ev["name"], FixDescription(ev["desc"]));
+                    _output.AppendFormat("/// <field name='{0}'>{1}</field>", ev["name"], FixDescription(ev["desc"]));
+                    _output.AppendLine();
 
                 }
                 _output.Append(' ', indentation * 4);
-                _output.AppendFormat("this.{0} = new emitter();\r\n", ev["name"]);
+                _output.AppendFormat("this.{0} = new emitter();", ev["name"]);
+                _output.AppendLine();
             }
         }
 
@@ -237,11 +237,12 @@ namespace NodeReferenceGenerator {
                 // TODO: Optional?
             }
 
-            _output.Append(") {\r\n");
+            _output.AppendLine(") {");
 
             if (method.ContainsKey("desc")) {
                 _output.Append(' ', (indentation + 1) * 4);
-                _output.AppendFormat("/// <summary>{0}</summary>\r\n", FixDescription(method["desc"]));
+                _output.AppendFormat("/// <summary>{0}</summary>", FixDescription(method["desc"]));
+                _output.AppendLine();
             }
             foreach (var curSig in method["signatures"]) {
                 if (curSig["params"].Length > 0) {
@@ -303,30 +304,54 @@ namespace NodeReferenceGenerator {
             _output.AppendLine("}");
         }
 
-        private void GenerateRequireBody(StringBuilder res, dynamic all) {
-            res.AppendLine("try { ");
-            res.AppendLine("var __prevFilename = __filename;");
-            res.AppendLine("var __prevDirname = __dirname;");
-            res.Append(@"
-    switch (module) {
-");
-
-
+        private void GenerateRequire(StringBuilder res, dynamic all) {
+            res.AppendLine("require = function () {");
+            res.AppendLine("    var require_count = 0;");
+            res.AppendLine("    var cache = {");
 
             foreach (var module in all["modules"]) {
-                res.AppendFormat("        case \"{0}\": return new ", module["name"]);
-                GenerateModule(module, 1);
-                res.Append(";\r\n");
+                res.AppendFormat("        \"{0}\": null,", module["name"]);
+                res.AppendLine();
             }
 
-            res.AppendLine("// **NTVS** INSERT USER MODULE SWITCH HERE **NTVS**");
-            res.AppendLine();
-            res.AppendLine("} // close switch");
+            res.AppendLine("    }");
+            res.AppendLine("    function make_module(module_name) {");
+            res.AppendLine("        switch(module_name) { ");
+            foreach (var module in all["modules"]) {
+                res.AppendFormat("            case \"{0}\": return new ", module["name"]);
+                GenerateModule(module, 1);
+                res.AppendLine(";");
+            }
+            res.AppendLine("        }");
+            res.AppendLine("    }");
 
-            res.AppendLine("} finally {");
-            res.AppendLine("__filename = __prevFilename;");
-            res.AppendLine("__dirname = __prevDirname;");
-            res.AppendLine("}");
+            res.Append(@"    var f = function(module) { 
+        if(require_count++ >= 50) {
+            require_count = 0;
+            intellisense.progress();
+        }
+        var result = cache[module];
+        if(typeof result !== 'undefined') {
+            if(result === null) {
+                // we lazily create only the modules which are actually used
+                cache[module] = result = make_module(module);
+            }
+            return result;
+        }
+        // value not cached, see if we can look it up
+        try { 
+            var __prevFilename = __filename;
+            var __prevDirname = __dirname;
+            // **NTVS** INSERT USER MODULE SWITCH HERE **NTVS**
+        } finally {
+            __filename = __prevFilename;
+            __dirname = __prevDirname;
+        }
+    }
+    o.__proto__ = f.__proto__;
+    f.__proto__ = o;
+    return f;
+}()");
         }
 
 

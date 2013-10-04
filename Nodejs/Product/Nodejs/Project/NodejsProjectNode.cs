@@ -158,7 +158,6 @@ namespace Microsoft.NodejsTools.Project {
             Dictionary<FileNode, CommonFolderNode> directoryPackages = GetModuleFolderMapping();
 
             int moduleId = 0;
-            switchCode.Append("default:");
             switchCode.Append(@"
 function relative_match(match_dir, dirname, mod_name, alt_mod_name, ref_path) {
      if(ref_path.substr(0, 3) == '../') {
