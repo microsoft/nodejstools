@@ -2,19 +2,18 @@
   <TemplateData>
     <Name>Blank Windows Azure Node.js Application</Name>
     <Description>An empty Node.js application for Windows Azure.</Description>
-    <Icon>blankwj.ico</Icon>
+    <Icon Package="{4219f2a8-fbf9-4659-a222-b7580a60eebb}" ID="401" />
     <ProjectType>JavaScript</ProjectType>
-    <TemplateID>Microsoft.JavaScript.BlankNodeApp</TemplateID>
-    <SortOrder>10</SortOrder>
+    <TemplateID>Microsoft.JavaScript.AzureNodejsApp</TemplateID>
+    <SortOrder>140</SortOrder>
     <CreateNewFolder>false</CreateNewFolder>
-    <DefaultName>NodeApp</DefaultName>
+    <DefaultName>NodejsApp</DefaultName>
     <ProvideDefaultName>true</ProvideDefaultName>
     <NumberOfParentCategoriesToRollUp>1</NumberOfParentCategoriesToRollUp>
     <PromptForSaveOnCreation>true</PromptForSaveOnCreation>
-    <PreviewImage>blankwj.png</PreviewImage>
   </TemplateData>
   <TemplateContent>
-    <Project File="NodeApp.njsproj" ReplaceParameters="true">
+    <Project File="AzureNodejsApp.njsproj" ReplaceParameters="true">
       <ProjectItem OpenInEditor="true">server.js</ProjectItem>
       <ProjectItem>Web.config</ProjectItem>
       <ProjectItem>Web.cloud.config</ProjectItem>

@@ -1,0 +1,28 @@
+<VSTemplate Version="3.0.0" Type="Project" xmlns="http://schemas.microsoft.com/developer/vstemplate/2005">
+  <TemplateData>
+    <Name>Blank Node.js Application</Name>
+    <Description>An empty Node.js application.</Description>
+    <Icon Package="{4219f2a8-fbf9-4659-a222-b7580a60eebb}" ID="401" />
+    <ProjectType>Web</ProjectType>
+    <ProjectSubType>JavaScript</ProjectSubType>
+    <TemplateID>Microsoft.Web.JavaScript.WebNodejsApp</TemplateID>
+    <SortOrder>130</SortOrder>
+    <CreateNewFolder>false</CreateNewFolder>
+    <DefaultName>NodejsApp</DefaultName>
+    <ProvideDefaultName>true</ProvideDefaultName>
+    <NumberOfParentCategoriesToRollUp>1</NumberOfParentCategoriesToRollUp>
+    <PromptForSaveOnCreation>true</PromptForSaveOnCreation>
+    <PreviewImage>blankwj.png</PreviewImage>
+  </TemplateData>
+  <TemplateContent>
+    <Project File="WebNodejsApp.njsproj" ReplaceParameters="true">
+      <ProjectItem OpenInEditor="true">server.js</ProjectItem>
+      <ProjectItem ReplaceParameters="true">package.json</ProjectItem>
+      <ProjectItem ReplaceParameters="true">README.md</ProjectItem>
+    </Project>
+  </TemplateContent>
+  <WizardExtension>
+    <Assembly>Microsoft.VisualStudio.Web, Version=_VSVERSION_.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</Assembly>
+    <FullClassName>Microsoft.VisualStudio.Web.Wizard.EmptyWebTemplateWizard</FullClassName>
+  </WizardExtension>
+</VSTemplate>

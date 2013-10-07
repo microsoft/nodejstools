@@ -37,9 +37,11 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SharedProject", "..\Common\
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TestSccPackage", "..\Common\Tests\SccPackage\TestSccPackage.csproj", "{E75E5DB1-0EA0-4247-A830-FE467C016816}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ProjectWizard", "Product\ProjectWizard\ProjectWizard.csproj", "{DBC73DF7-1B4C-48BE-8B48-715297487E7A}"
+EndProject
 Global
 	GlobalSection(TeamFoundationVersionControl) = preSolution
-		SccNumberOfProjects = 17
+		SccNumberOfProjects = 18
 		SccEnterpriseProvider = {4CA58AB2-18FA-4F8D-95D4-32DDF27D184C}
 		SccTeamFoundationServer = http://tcvstf:8080/tfs/tc
 		SccLocalPath0 = .
@@ -107,6 +109,10 @@ Global
 		SccProjectTopLevelParentUniqueName16 = NodejsTools.sln
 		SccProjectName16 = ../Common/Tests/SccPackage
 		SccLocalPath16 = ..\\Common\\Tests\\SccPackage
+		SccProjectUniqueName17 = Product\\ProjectWizard\\ProjectWizard.csproj
+		SccProjectTopLevelParentUniqueName17 = NodejsTools.sln
+		SccProjectName17 = Product/ProjectWizard
+		SccLocalPath17 = Product\\ProjectWizard
 	EndGlobalSection
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|x86 = Debug|x86
@@ -177,6 +183,8 @@ Global
 		{E75E5DB1-0EA0-4247-A830-FE467C016816}.Debug|x86.Build.0 = Debug|x86
 		{E75E5DB1-0EA0-4247-A830-FE467C016816}.Release|x86.ActiveCfg = Release|x86
 		{E75E5DB1-0EA0-4247-A830-FE467C016816}.Release|x86.Build.0 = Release|x86
+		{DBC73DF7-1B4C-48BE-8B48-715297487E7A}.Debug|x86.ActiveCfg = Debug|Any CPU
+		{DBC73DF7-1B4C-48BE-8B48-715297487E7A}.Release|x86.ActiveCfg = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -188,6 +196,7 @@ Global
 		{24A3887F-DA50-4989-8D6C-4A5B04D5D457} = {F9719B35-F359-47A7-A2F8-34F42E53C809}
 		{DFDB930E-1162-4514-A91D-C8595A807F13} = {F9719B35-F359-47A7-A2F8-34F42E53C809}
 		{32EC5259-98DA-40CA-9E2D-1B1B2E966F88} = {F9719B35-F359-47A7-A2F8-34F42E53C809}
+		{DBC73DF7-1B4C-48BE-8B48-715297487E7A} = {F9719B35-F359-47A7-A2F8-34F42E53C809}
 		{D092D54E-FF29-4D32-9AEE-4EF704C92F67} = {850AC94A-310F-4F88-A553-2806D7732BD1}
 		{E8150EBC-6B62-40BF-BF91-1DC60149B530} = {850AC94A-310F-4F88-A553-2806D7732BD1}
 		{F18AF6F7-F534-44BE-B5DE-44D6EFFF947D} = {850AC94A-310F-4F88-A553-2806D7732BD1}
@@ -198,8 +207,5 @@ Global
 		{9E395BA3-765E-4F35-A520-19F1C323D625} = {850AC94A-310F-4F88-A553-2806D7732BD1}
 		{F8E4A9D2-7621-491F-9D37-C578E833AC02} = {850AC94A-310F-4F88-A553-2806D7732BD1}
 		{E75E5DB1-0EA0-4247-A830-FE467C016816} = {850AC94A-310F-4F88-A553-2806D7732BD1}
-	EndGlobalSection
-	GlobalSection(Performance) = preSolution
-		HasPerformanceSessions = true
 	EndGlobalSection
 EndGlobal

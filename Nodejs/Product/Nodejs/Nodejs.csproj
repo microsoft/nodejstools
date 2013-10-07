@@ -50,6 +50,14 @@
   <PropertyGroup>
     <DefineConstants>$(DefineConstants);NODEJS_TOOLS;NTVS_FEATURE_INTERACTIVEWINDOW</DefineConstants>
   </PropertyGroup>
+  <ItemDefinitionGroup>
+    <ZipProject>
+      <Language>JavaScript</Language>
+    </ZipProject>
+    <ZipItem>
+      <Language>JavaScript</Language>
+    </ZipItem>
+  </ItemDefinitionGroup>
   <ItemGroup>
     <Reference Include="Microsoft.Build" />
     <Reference Include="Microsoft.Build.Conversion.v4.0" />
@@ -77,6 +85,7 @@
     <Reference Include="Microsoft.VisualStudio.Shell.Interop.11.0">
       <EmbedInteropTypes>true</EmbedInteropTypes>
     </Reference>
+    <Reference Include="Microsoft.VisualStudio.TemplateWizardInterface, Version=8.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a, processorArchitecture=MSIL" />
     <Reference Include="Microsoft.VisualStudio.Text.Data, Version=$(VSTarget).0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a, processorArchitecture=MSIL" />
     <Reference Include="Microsoft.VisualStudio.Text.Logic, Version=$(VSTarget).0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a, processorArchitecture=MSIL" />
     <Reference Include="Microsoft.VisualStudio.Text.UI, Version=$(VSTarget).0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a, processorArchitecture=MSIL" />
@@ -269,6 +278,31 @@
     </EmbeddedResource>
   </ItemGroup>
   <ItemGroup>
+    <ZipProject Include="ProjectTemplates\WebExpressApp\WebExpressApp.njsproj">
+      <SubType>Designer</SubType>
+    </ZipProject>
+    <TransformedZipProject Include="ProjectTemplates\WebExpressApp\WebExpressApp.vstemplate.base">
+      <SubType>Designer</SubType>
+    </TransformedZipProject>
+    <ZipProject Include="ProjectTemplates\WebExpressApp\server.js" />
+    <ZipProject Include="ProjectTemplates\AzureExpressApp\AzureExpressApp.njsproj">
+      <SubType>Designer</SubType>
+    </ZipProject>
+    <ZipProject Include="ProjectTemplates\AzureExpressApp\AzureExpressApp.vstemplate">
+      <SubType>Designer</SubType>
+    </ZipProject>
+    <ZipProject Include="ProjectTemplates\AzureExpressApp\server.js" />
+    <ZipProject Include="ProjectTemplates\WebAzureExpressApp\WebAzureExpressApp.njsproj">
+      <SubType>Designer</SubType>
+    </ZipProject>
+    <TransformedZipProject Include="ProjectTemplates\WebAzureExpressApp\WebAzureExpressApp.vstemplate.base">
+      <SubType>Designer</SubType>
+    </TransformedZipProject>
+    <ZipProject Include="ProjectTemplates\WebAzureExpressApp\server.js" />
+    <Content Include="VSTemplateStore.pkgdef">
+      <IncludeInVSIX>true</IncludeInVSIX>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
     <VSCTCompile Include="NodejsTools.vsct">
       <ResourceName>1000</ResourceName>
       <SubType>Designer</SubType>
@@ -281,8 +315,7 @@
       <IncludeInVSIX>true</IncludeInVSIX>
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
-    <Resource Include="ProjectTemplates\AzureNodeApp\blankwj.ico" />
-    <Resource Include="ProjectTemplates\AzureNodeApp\blankwj.png" />
+    <ZipProject Include="ProjectTemplates\blankwj.ico" />
     <Content Include="..\Icons\NodejsProject.ico">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
       <IncludeInVSIX>true</IncludeInVSIX>
@@ -295,47 +328,38 @@
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
       <IncludeInVSIX>true</IncludeInVSIX>
     </Content>
-    <Content Include="ProjectTemplates\AzureNodeApp\AzureNodeApp.vstemplate">
+    <ZipProject Include="ProjectTemplates\AzureNodejsApp\AzureNodejsApp.vstemplate">
       <SubType>Designer</SubType>
-    </Content>
-    <Content Include="ProjectTemplates\AzureNodeApp\server.js" />
-    <Resource Include="ProjectTemplates\WebNodeApp\blankwj.ico" />
-    <Resource Include="ProjectTemplates\WebNodeApp\blankwj.png" />
-    <Content Include="ProjectTemplates\WebAzureNodeApp\AzureNodeApp.vstemplate">
+    </ZipProject>
+    <ZipProject Include="ProjectTemplates\AzureNodejsApp\server.js" />
+    <ZipProject Include="ProjectTemplates\ExpressApp\ExpressApp.njsproj">
       <SubType>Designer</SubType>
-    </Content>
-    <Resource Include="ProjectTemplates\WebAzureNodeApp\blankwj.ico" />
-    <Resource Include="ProjectTemplates\WebAzureNodeApp\blankwj.png" />
-    <Content Include="ProjectTemplates\WebAzureNodejsApp.zip">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-      <IncludeInVSIX>true</IncludeInVSIX>
-    </Content>
-    <None Include="ProjectTemplates\WebAzureNodeApp\NodeApp.njsproj">
+    </ZipProject>
+    <ZipProject Include="ProjectTemplates\ExpressApp\ExpressApp.vstemplate">
       <SubType>Designer</SubType>
-    </None>
-    <Content Include="ProjectTemplates\WebAzureNodeApp\server.js" />
-    <Content Include="ProjectTemplates\WebNodejsApp.zip">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-      <IncludeInVSIX>true</IncludeInVSIX>
-    </Content>
-    <None Include="ProjectTemplates\WebAzureNodeApp\ChangeConfig.ps1" />
-    <None Include="ProjectTemplates\WebAzureNodeApp\download.ps1" />
-    <None Include="ProjectTemplates\WebAzureNodeApp\package.json" />
-    <None Include="ProjectTemplates\WebAzureNodeApp\README.md" />
-    <None Include="ProjectTemplates\WebAzureNodeApp\setup_web.cmd" />
-    <None Include="ProjectTemplates\WebAzureNodeApp\Web.cloud.config" />
-    <None Include="ProjectTemplates\WebAzureNodeApp\Web.config" />
-    <None Include="ProjectTemplates\WebNodeApp\NodeApp.njsproj">
+    </ZipProject>
+    <ZipProject Include="ProjectTemplates\ExpressApp\server.js" />
+    <TransformedZipProject Include="ProjectTemplates\WebAzureNodejsApp\WebAzureNodejsApp.vstemplate.base">
       <SubType>Designer</SubType>
-    </None>
-    <Content Include="ProjectTemplates\WebNodeApp\NodeApp.vstemplate">
+    </TransformedZipProject>
+    <ZipProject Include="ProjectTemplates\WebAzureNodejsApp\WebAzureNodejsApp.njsproj">
       <SubType>Designer</SubType>
-    </Content>
-    <Content Include="ProjectTemplates\WebNodeApp\server.js" />
-    <Content Include="ProjectTemplates\NodejsApp.zip">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-      <IncludeInVSIX>true</IncludeInVSIX>
-    </Content>
+    </ZipProject>
+    <ZipProject Include="ProjectTemplates\WebAzureNodejsApp\server.js" />
+    <ZipProject Include="ProjectTemplates\WebAzureNodejsApp\ChangeConfig.ps1" />
+    <ZipProject Include="ProjectTemplates\WebAzureNodejsApp\download.ps1" />
+    <ZipProject Include="ProjectTemplates\WebAzureNodejsApp\package.json" />
+    <ZipProject Include="ProjectTemplates\WebAzureNodejsApp\README.md" />
+    <ZipProject Include="ProjectTemplates\WebAzureNodejsApp\setup_web.cmd" />
+    <ZipProject Include="ProjectTemplates\WebAzureNodejsApp\Web.cloud.config" />
+    <ZipProject Include="ProjectTemplates\WebAzureNodejsApp\Web.config" />
+    <ZipProject Include="ProjectTemplates\WebNodejsApp\WebNodejsApp.njsproj">
+      <SubType>Designer</SubType>
+    </ZipProject>
+    <TransformedZipProject Include="ProjectTemplates\WebNodejsApp\WebNodejsApp.vstemplate.base">
+      <SubType>Designer</SubType>
+    </TransformedZipProject>
+    <ZipProject Include="ProjectTemplates\WebNodejsApp\server.js" />
     <Content Include="Microsoft.NodejsTools.targets">
       <IncludeInVSIX>true</IncludeInVSIX>
       <TargetPath>Microsoft.NodejsTools.Developer.targets</TargetPath>
@@ -346,28 +370,42 @@
       <IncludeInVSIX>true</IncludeInVSIX>
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
-    <Content Include="ProjectTemplates\AzureNodejsApp.zip">
-      <IncludeInVSIX>true</IncludeInVSIX>
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </Content>
-    <None Include="ProjectTemplates\AzureNodeApp\ChangeConfig.ps1" />
-    <None Include="ProjectTemplates\AzureNodeApp\download.ps1" />
-    <None Include="ProjectTemplates\AzureNodeApp\NodeApp.njsproj">
+    <ZipProject Include="ProjectTemplates\AzureNodejsApp\ChangeConfig.ps1" />
+    <ZipProject Include="ProjectTemplates\AzureNodejsApp\download.ps1" />
+    <ZipProject Include="ProjectTemplates\AzureNodejsApp\AzureNodejsApp.njsproj">
       <SubType>Designer</SubType>
-    </None>
-    <None Include="ProjectTemplates\AzureNodeApp\package.json" />
-    <None Include="ProjectTemplates\AzureNodeApp\README.md" />
-    <None Include="ProjectTemplates\AzureNodeApp\setup_web.cmd" />
-    <None Include="ProjectTemplates\AzureNodeApp\Web.cloud.config" />
-    <None Include="ProjectTemplates\AzureNodeApp\Web.config" />
-    <None Include="ProjectTemplates\WebNodeApp\package.json" />
-    <None Include="ProjectTemplates\WebNodeApp\README.md" />
-    <None Include="ProjectTemplates\NodeApp\NodeApp.njsproj">
+    </ZipProject>
+    <ZipProject Include="ProjectTemplates\AzureNodejsApp\package.json" />
+    <ZipProject Include="ProjectTemplates\AzureNodejsApp\README.md" />
+    <ZipProject Include="ProjectTemplates\AzureNodejsApp\setup_web.cmd" />
+    <ZipProject Include="ProjectTemplates\AzureNodejsApp\Web.cloud.config" />
+    <ZipProject Include="ProjectTemplates\AzureNodejsApp\Web.config" />
+    <ZipProject Include="ProjectTemplates\WebNodejsApp\package.json" />
+    <ZipProject Include="ProjectTemplates\WebNodejsApp\README.md" />
+    <ZipProject Include="ProjectTemplates\NodejsApp\NodejsApp.njsproj">
       <SubType>Designer</SubType>
-    </None>
-    <None Include="ProjectTemplates\NodeApp\package.json" />
-    <None Include="ProjectTemplates\NodeApp\README.md" />
-    <None Include="ProjectTemplates\WebNodeApp\WebApplication.webproj" />
+    </ZipProject>
+    <ZipProject Include="ProjectTemplates\NodejsApp\package.json" />
+    <ZipProject Include="ProjectTemplates\NodejsApp\README.md" />
+    <ZipProject Include="ProjectTemplates\WebNodejsApp\WebApplication.webproj" />
+    <ZipProject Include="ProjectTemplates\ExpressApp\package.json" />
+    <ZipProject Include="ProjectTemplates\ExpressApp\README.md" />
+    <ZipProject Include="ProjectTemplates\WebExpressApp\package.json" />
+    <ZipProject Include="ProjectTemplates\WebExpressApp\README.md" />
+    <ZipProject Include="ProjectTemplates\AzureExpressApp\package.json" />
+    <ZipProject Include="ProjectTemplates\AzureExpressApp\README.md" />
+    <ZipProject Include="ProjectTemplates\AzureExpressApp\Web.config" />
+    <ZipProject Include="ProjectTemplates\AzureExpressApp\Web.cloud.config" />
+    <ZipProject Include="ProjectTemplates\AzureExpressApp\setup_web.cmd" />
+    <ZipProject Include="ProjectTemplates\AzureExpressApp\download.ps1" />
+    <ZipProject Include="ProjectTemplates\AzureExpressApp\ChangeConfig.ps1" />
+    <ZipProject Include="ProjectTemplates\WebAzureExpressApp\ChangeConfig.ps1" />
+    <ZipProject Include="ProjectTemplates\WebAzureExpressApp\download.ps1" />
+    <ZipProject Include="ProjectTemplates\WebAzureExpressApp\package.json" />
+    <ZipProject Include="ProjectTemplates\WebAzureExpressApp\README.md" />
+    <ZipProject Include="ProjectTemplates\WebAzureExpressApp\setup_web.cmd" />
+    <ZipProject Include="ProjectTemplates\WebAzureExpressApp\Web.cloud.config" />
+    <ZipProject Include="ProjectTemplates\WebAzureExpressApp\Web.config" />
     <None Include="source.extension.vsixmanifest">
       <SubType>Designer</SubType>
     </None>
@@ -382,7 +420,7 @@
       <IncludeInVSIX>true</IncludeInVSIX>
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
-    <Content Include="ProjectTemplates\NodeApp\server.js" />
+    <ZipProject Include="ProjectTemplates\NodejsApp\server.js" />
     <Resource Include="..\Icons\NodejsPackage.ico" />
     <Content Include="..\Icons\NodejsPackage.ico">
       <IncludeInVSIX>true</IncludeInVSIX>
@@ -394,11 +432,9 @@
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
     <Content Include="Resources\Package.ico" />
-    <Resource Include="ProjectTemplates\NodeApp\blankwj.ico" />
-    <Resource Include="ProjectTemplates\NodeApp\blankwj.png" />
-    <Content Include="ProjectTemplates\NodeApp\NodeApp.vstemplate">
+    <ZipProject Include="ProjectTemplates\NodejsApp\NodejsApp.vstemplate">
       <SubType>Designer</SubType>
-    </Content>
+    </ZipProject>
     <Compile Include="Resources.Designer.cs">
       <AutoGen>True</AutoGen>
       <DesignTime>True</DesignTime>
@@ -420,6 +456,12 @@
     <ProjectReference Include="..\InteractiveWindow\InteractiveWindow.csproj">
       <Project>{24a3887f-da50-4989-8d6c-4a5b04d5d457}</Project>
       <Name>InteractiveWindow</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\ProjectWizard\ProjectWizard.csproj">
+      <Project>{dbc73df7-1b4c-48be-8b48-715297487e7a}</Project>
+      <Name>ProjectWizard</Name>
+      <IncludeOutputGroupsInVSIX>BuiltProjectOutputGroup%3bBuiltProjectOutputGroupDependencies%3bGetCopyToOutputDirectoryItems%3bSatelliteDllsProjectOutputGroup%3b</IncludeOutputGroupsInVSIX>
+      <IncludeOutputGroupsInVSIXLocalOnly>DebugSymbolsProjectOutputGroup%3b</IncludeOutputGroupsInVSIXLocalOnly>
     </ProjectReference>
   </ItemGroup>
   <ItemGroup />

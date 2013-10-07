@@ -22,6 +22,7 @@
                 <RegistryKey Root='HKCU' Key='Software\Microsoft\VisualStudio\$(var.VSTargetVersion)\ExtensionManager\ExtensionTypes'>
                     <RegistryValue Type='string' Name='4219f2a8-fbf9-4659-a222-b7580a60eebb,0.5' Value='Tool'/>
                 </RegistryKey>
+                <File Id='filVSTemplateStore.pkgdef' Source='$(var.TargetDir)\VSTemplateStore.pkgdef' />
             </Component>
             
             <!-- All user components -->
@@ -29,6 +30,9 @@
             <!-- Both per user and all user components -->
             <Component Id="cmpE3F5BF4C28BA41A9A478DAC397C64098" Directory="INSTALLLOCATION" Guid="{DDBCEC41-C59C-4C5D-B7A2-77AB2F7684DB}">
               <File Id="fil47E7513578964CFA86B587D50FC280CB" KeyPath="yes" Source="$(var.BinariesDir)\Microsoft.NodejsTools.dll" />
+            </Component>
+            <Component Id="cmpMicrosoft.NodejsTools.ProjectWizard.dll" Directory="INSTALLLOCATION" Guid="{5B0F69FB-EBB6-42CF-8422-57C2A492E664}">
+              <File Id="filMicrosoft.NodejsTools.ProjectWizard.dll" KeyPath="yes" Source="$(var.BinariesDir)\Microsoft.NodejsTools.ProjectWizard.dll" />
             </Component>
             <Component Id="cmp9FEF8767393C493A8B68D8BF6D4961B5" Directory="INSTALLLOCATION" Guid="{B43D5044-D8D5-42A8-BAEF-1A7DBC21AAE6}">
               <File Id="filE8D2A28B9CB64184A05AEAAF2A2EF4C8" KeyPath="yes" Source="$(var.BinariesDir)\Microsoft.NodejsTools.AjaxMin.dll" />
@@ -51,17 +55,29 @@
             <Component Id="cmp05C8461645AC4E30883B5F6FC70C2F9B" Directory="INSTALLLOCATION" Guid="{B87AE937-DA4A-4599-B2E9-B9EE139293D1}">
               <File Id="filB3AE8C142D5449D0A2CB178BD4C5EF1F" KeyPath="yes" Source="$(var.BinariesDir)\nodejsref.js" />
             </Component>
-            <Component Id="cmp1B99A039DB5C4D0A888840A9BF4FFC47" Directory="DIR_ProjectTemplates_4DCCAA275A2C4923918F2CBC07199083" Guid="{3EDA7EF0-3F18-4A96-9A03-F72B9A9623CE}">
-              <File Id="fil239F6342260D479E834466EDF4F32ED4" KeyPath="yes" Source="$(var.BinariesDir)\ProjectTemplates\NodejsApp.zip" />
+            <Component Id="cmpAzureExpressApp.zip" Directory="DIR_ProjectTemplates_4DCCAA275A2C4923918F2CBC07199083" Guid="{D4213A93-048A-4A0C-BFE2-6ABC6D42644A}">
+              <File Id="filAzureExpressApp.zip" KeyPath="yes" Source="$(var.BinariesDir)\ProjectTemplates\JavaScript\AzureExpressApp.zip" />
             </Component>
-            <Component Id="cmp83246B83300D48B6BA9BE9863A22E3CC" Directory="DIR_ProjectTemplates_4DCCAA275A2C4923918F2CBC07199083" Guid="{809831B0-4B05-4380-8C33-13F91953C9A2}">
-              <File Id="fil28DC82CBC4D24BB5867F8102AFDA0A7C" KeyPath="yes" Source="$(var.BinariesDir)\ProjectTemplates\AzureNodejsApp.zip" />
+            <Component Id="cmpAzureNodejsApp.zip" Directory="DIR_ProjectTemplates_4DCCAA275A2C4923918F2CBC07199083" Guid="{94061A1E-94EF-4246-B10F-8E2FD990AC27}">
+              <File Id="filAzureNodejsApp.zip" KeyPath="yes" Source="$(var.BinariesDir)\ProjectTemplates\JavaScript\AzureNodejsApp.zip" />
             </Component>
-            <Component Id="cmpB526764FCE5A44EBB704BBD3E294EDDE" Directory="DIR_ProjectTemplates_4DCCAA275A2C4923918F2CBC07199083" Guid="{4009557F-F306-4977-9AFE-5B05357EA419}">
-              <File Id="fil3E7C088F81A34F56BBDFD4FC17A0B996" KeyPath="yes" Source="$(var.BinariesDir)\ProjectTemplates\WebNodejsApp.zip" />
+            <Component Id="cmpExpressApp.zip" Directory="DIR_ProjectTemplates_4DCCAA275A2C4923918F2CBC07199083" Guid="{D7612D7F-2AAA-4925-9818-3F638FA04C5C}">
+              <File Id="filExpressApp.zip" KeyPath="yes" Source="$(var.BinariesDir)\ProjectTemplates\JavaScript\ExpressApp.zip" />
             </Component>
-            <Component Id="cmpCB8FB7A437D14E488A8FEC66B262C3AD" Directory="DIR_ProjectTemplates_4DCCAA275A2C4923918F2CBC07199083" Guid="{593DB047-D59A-4C40-A7BE-C95046238044}">
-              <File Id="filF80F32983A1F4A90B6C92303CF50CFC5" KeyPath="yes" Source="$(var.BinariesDir)\ProjectTemplates\WebAzureNodejsApp.zip" />
+            <Component Id="cmpNodejsApp.zip" Directory="DIR_ProjectTemplates_4DCCAA275A2C4923918F2CBC07199083" Guid="{2A83D4D0-2334-4FFF-AB7B-8D1D96F0D3FC}">
+              <File Id="filNodejsApp.zip" KeyPath="yes" Source="$(var.BinariesDir)\ProjectTemplates\JavaScript\NodejsApp.zip" />
+            </Component>
+            <Component Id="cmpWebAzureExpressApp.zip" Directory="DIR_ProjectTemplates_4DCCAA275A2C4923918F2CBC07199083" Guid="{86749494-2D16-4AD4-9E86-B3A3ED72DB80}">
+              <File Id="filWebAzureExpressApp.zip" KeyPath="yes" Source="$(var.BinariesDir)\ProjectTemplates\JavaScript\WebAzureExpressApp.zip" />
+            </Component>
+            <Component Id="cmpWebAzureNodejsApp.zip" Directory="DIR_ProjectTemplates_4DCCAA275A2C4923918F2CBC07199083" Guid="{A1770285-15AE-446E-B843-7A3FA82AD3F7}">
+              <File Id="filWebAzureNodejsApp.zip" KeyPath="yes" Source="$(var.BinariesDir)\ProjectTemplates\JavaScript\WebAzureNodejsApp.zip" />
+            </Component>
+            <Component Id="cmpWebExpressApp.zip" Directory="DIR_ProjectTemplates_4DCCAA275A2C4923918F2CBC07199083" Guid="{99D43BE0-92B6-47F2-8512-29189F4117F1}">
+              <File Id="filWebExpressApp.zip" KeyPath="yes" Source="$(var.BinariesDir)\ProjectTemplates\JavaScript\WebExpressApp.zip" />
+            </Component>
+            <Component Id="cmpWebNodejsApp.zip" Directory="DIR_ProjectTemplates_4DCCAA275A2C4923918F2CBC07199083" Guid="{559C2DB8-DBAE-419A-95FE-9F7AE5623875}">
+              <File Id="filWebNodejsApp.zip" KeyPath="yes" Source="$(var.BinariesDir)\ProjectTemplates\JavaScript\WebNodejsApp.zip" />
             </Component>
             <Component Id="cmp7850D806C2DE45078426A78CBBEF66DA" Directory="Dir_NodejsToolsMsBuild" Guid="{6D84572F-D895-443F-BD25-712394273A4E}">
                 <File Id="filD2A9B63C22F547FD8C1C55BB14F22A8A" KeyPath="yes" Source="$(var.BinariesDir)\Microsoft.NodejsTools.targets" />
