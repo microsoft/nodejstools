@@ -65,16 +65,11 @@ namespace Microsoft.NodejsTools.Debugger.DebugEngine {
         // Get the document context for this pending breakpoint. A document context is a abstract representation of a source file 
         // location.
         public AD7DocumentContext GetDocumentContext(NodeBreakpoint breakpoint) {
-            TEXT_POSITION textPosition = new TEXT_POSITION();
-            textPosition.dwLine = (uint)breakpoint.LineNo - 1;
-
             IDebugDocumentPosition2 docPosition = (IDebugDocumentPosition2)(Marshal.GetObjectForIUnknown(_bpRequestInfo.bpLocation.unionmember2));
             string documentName;
             EngineUtils.CheckOk(docPosition.GetFileName(out documentName));
 
-            AD7MemoryAddress codeContext = new AD7MemoryAddress(_engine, documentName, textPosition.dwLine);
-
-            return new AD7DocumentContext(documentName, textPosition, textPosition, codeContext);
+            return new AD7DocumentContext(new AD7MemoryAddress(_engine, documentName, (uint)breakpoint.LineNo - 1));
         }
 
         // Remove all of the bound breakpoints for this pending breakpoint

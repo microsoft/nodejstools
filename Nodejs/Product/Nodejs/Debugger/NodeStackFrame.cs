@@ -18,17 +18,18 @@ using System.Collections.Generic;
 namespace Microsoft.NodejsTools.Debugger {
     class NodeStackFrame {
         private int _lineNo;    // mutates on set next line
-        private readonly string _frameName, _filename;
+        private readonly string _frameName;
         private readonly int _frameId;
         private readonly int _startLine, _endLine;
         private int _argCount;
         private NodeEvaluationResult[] _variables;
         private readonly NodeThread _thread;
+        private readonly NodeModule _module;
 
-        public NodeStackFrame(NodeThread thread, string frameName, string filename, int startLine, int endLine, int lineNo, int argCount, int frameId) {
+        public NodeStackFrame(NodeThread thread, NodeModule module, string frameName, int startLine, int endLine, int lineNo, int argCount, int frameId) {
             _thread = thread;
+            _module = module;
             _frameName = frameName;
-            _filename = filename;
             _argCount = argCount;
             _lineNo = lineNo;
             _frameId = frameId;
@@ -77,7 +78,13 @@ namespace Microsoft.NodejsTools.Debugger {
 
         public string FileName {
             get {
-                return _filename;
+                return _module.FileName;
+            }
+        }
+
+        public NodeModule Module {
+            get {
+                return _module;
             }
         }
 

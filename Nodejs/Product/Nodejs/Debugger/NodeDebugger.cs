@@ -20,6 +20,7 @@ using System.Linq;
 using System.Net;
 using System.Net.Sockets;
 using System.Text;
+using System.Text.RegularExpressions;
 using System.Threading;
 using System.Web.Script.Serialization;
 
@@ -83,6 +84,7 @@ namespace Microsoft.NodejsTools.Debugger {
         private Dictionary<int, string> _errorCodes = new Dictionary<int, string>();
         private bool _breakOnAllExceptions;
         private bool _breakOnUncaughtExceptions;
+        private static readonly NodeModule _unknownModule = new NodeModule(-1, "<unknown>");
 
         private static Dictionary<string, ExceptionHitTreatment> GetDefaultExceptionTreatments() {
             // Keep exception types in sync with those declared in ProvideDebugExceptionAttribute's in NodePackage.cs
@@ -791,31 +793,6 @@ namespace Microsoft.NodejsTools.Debugger {
                     if (modLoad != null) {
                         modLoad(this, new ModuleLoadedEventArgs(newModule));
                     }
-
-                    // Fixup breakpoints bound by name
-                    // This is necessary to work around a bug in node which binds breakpoints by comparing case against that given to Require()
-                    foreach (var breakpoint in _breakpoints.Values.Where(b => b.BoundByName)) {
-                        if (GetModuleForFilePath(breakpoint.FileName) == newModule) {
-                            // If we get here we have a name bound breakpoint with a path which maps to the new module.
-                            // Given node treats module/script and breakpoint paths in a case sensitive way, if the breakpoint path
-                            // does not match the new module path, case sensitive, we need to rebind the breakpoint to the module
-                            // for node to respect it.
-                            if (string.Compare(breakpoint.FileName, newModule.FileName, StringComparison.InvariantCulture) != 0) {
-                                // Paths differ 
-                                // Rebind name bound breakpoint (to script id)
-                                id = breakpoint.Id;
-                                breakpoint.Id = 0;
-                                breakpoint.Add();
-                                RemoveBreakPoint(id);
-                            } else {
-                                // Paths same
-                                // Clear BoundByName flag to keep from trying for other added scripts
-                                // In this case we don't rebind because we don't have to, and we avoid
-                                // a race between rebinding and the node process running past our breakpoint.
-                                breakpoint.BoundByName = false;
-                            }
-                        }
-                    }
                 }
             }
         }
@@ -1138,25 +1115,27 @@ namespace Microsoft.NodejsTools.Debugger {
 
                             var func = (Dictionary<string, object>)frame["func"];
                             object scriptIdObj;
-                            string scriptFilename = "<unknown>";
+                            var module = _unknownModule;
                             if (func.TryGetValue("scriptId", out scriptIdObj)) {
                                 foreach (var value in _scripts.Values) {
                                     if (value.ModuleId == (int)scriptIdObj) {
-                                        scriptFilename = value.FileName;
+                                        module = value;
+                                        break;
                                     }
                                 }
                             }
 
-                            var nodeFrame = nodeFrames[i] = new NodeStackFrame(
-                                mainThread,
-                                (string)func["name"],
-                                scriptFilename,
-                                (int)frame["line"] + 1,   // FIXME, should be function line start
-                                (int)frame["line"] + 1,   // FIXME, should be function line end
-                                (int)frame["line"] + 1,
-                                0,  // Let GetFrameVariables() set argCount
-                                i
-                            );
+                            var nodeFrame = nodeFrames[i] =
+                                new NodeStackFrame(
+                                    mainThread,
+                                    module,
+                                    (string)func["name"],
+                                    (int)frame["line"] + 1,   // FIXME, should be function line start
+                                    (int)frame["line"] + 1,   // FIXME, should be function line end
+                                    (int)frame["line"] + 1,
+                                    0,  // Let GetFrameVariables() set argCount
+                                    i
+                                );
 
                             GetFrameVariables(nodeFrame, frame);
                         }
@@ -1292,6 +1271,33 @@ namespace Microsoft.NodejsTools.Debugger {
             Socket = null;
         }
 
+        private string GetCaseInsensitiveRegex(string filePath) {
+            // NOTE: There is no way to pass a regex case insensitive modifier to the Node (V8) engine
+            var fileName = Path.GetFileName(filePath);
+            var qualified = fileName != filePath;
+            fileName = Regex.Escape(fileName);
+            var builder = new StringBuilder();
+            if (qualified) {
+                builder.Append("[" + Regex.Escape(Path.DirectorySeparatorChar.ToString() + Path.AltDirectorySeparatorChar.ToString()) + "]");
+            } else {
+                builder.Append('^');
+            }
+            foreach (var ch in fileName) {
+                var upper = ch.ToString().ToUpper();
+                var lower =  ch.ToString().ToLower();
+                if (upper != lower) {
+                    builder.Append('[');
+                    builder.Append(upper);
+                    builder.Append(lower);
+                    builder.Append(']');
+                } else {
+                    builder.Append(upper);
+                }
+            }
+            builder.Append("$");
+            return builder.ToString();
+        }
+
         internal void BindBreakpoint(NodeBreakpoint breakpoint, Action<bool> successHandler = null, Action failureHandler = null) {
             DebugWriteCommand(String.Format("Bind Breakpoint"));
 
@@ -1301,15 +1307,13 @@ namespace Microsoft.NodejsTools.Debugger {
                     { "line", breakpoint.LineNo - 1 },  // Zero based line numbers
                     { "column", 0 } // Zero based column numbers
                 };
-            bool boundByName = false;
             var module = GetModuleForFilePath(breakpoint.FileName);
             if (module != null) {
                 args["type"] = "scriptId";
                 args["target"]= module.ModuleId;
             } else {
-                args["type"] = "script";
-                args["target"] = breakpoint.FileName;
-                boundByName = true;
+                args["type"] = "scriptRegExp";
+                args["target"] = GetCaseInsensitiveRegex(breakpoint.FileName);
             }
             if (!breakpoint.GetEngineEnabled()) {
                 args["enabled"] = false;
@@ -1329,7 +1333,6 @@ namespace Microsoft.NodejsTools.Debugger {
                     var body = (Dictionary<string, object>)json["body"];
                     breakpoint.Id = (int)body["breakpoint"];
                     _breakpoints[breakpoint.Id] = breakpoint;
-                    breakpoint.BoundByName = boundByName;
 
                     // Handle breakpoint actual location fixup
                     // On initial breakpoint bind, just flag the breakpoint as "PendingLocationFixup"
@@ -1833,5 +1836,24 @@ namespace Microsoft.NodejsTools.Debugger {
             }
         }
         #endregion
+
+        internal string GetScriptText(int moduleId) {
+            DebugWriteCommand("GetScriptText: " + moduleId);
+
+            string scriptText = null;
+            SendRequest(
+                "scripts",
+                new Dictionary<string, object> {
+                        { "ids", new object[] {moduleId} },
+                        { "includeSource",  true },
+                },
+                successHandler: json => {
+                    var script = (Dictionary<string, object>)((object[])json["body"]).First();
+                    scriptText = (string)script["source"];
+                },
+                timeout: 3000
+            );
+            return scriptText;
+        }
     }
 }

@@ -12,12 +12,14 @@
  *
  * ***************************************************************************/
 
+using System;
 using System.IO;
 
 namespace Microsoft.NodejsTools.Debugger {
     class NodeModule {
         private readonly int _moduleId;
         private readonly string _fileName;
+        private object _document;
 
         public NodeModule(int moduleId, string fileName) {
             _moduleId = moduleId;
@@ -43,6 +45,22 @@ namespace Microsoft.NodejsTools.Debugger {
         public string FileName {
             get {
                 return _fileName;
+            }
+        }
+
+        public bool BuiltIn {
+            get {
+                // No directory separator characters implies builtin
+                return (_fileName.IndexOfAny(new [] { Path.DirectorySeparatorChar, Path.AltDirectorySeparatorChar }) == -1);
+            }
+        }
+
+        public object Document {
+            get {
+                return _document;
+            }
+            set {
+                _document = value;
             }
         }
     }

@@ -21,6 +21,7 @@ using Microsoft.VisualStudio.Shell.Interop;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
+using System.IO;
 using System.Runtime.InteropServices;
 using System.Web;
 
@@ -1076,5 +1077,46 @@ namespace Microsoft.NodejsTools.Debugger.DebugEngine {
         }
 
         #endregion
+
+        internal string GetFuzzyMatchFilename(string fileName) {
+            // Hande local launch or attach, by matching given filename
+            // UNDONE Detect local attach
+            if (!_attached) {
+                return fileName;
+            }
+
+            string fuzzyFileName = null;
+            var enumHierarchyItemsFactory = Package.GetGlobalService(typeof(SVsEnumHierarchyItemsFactory)) as IVsEnumHierarchyItemsFactory;
+            var solution = Package.GetGlobalService(typeof(SVsSolution)) as IVsSolution;
+            if (solution != null) {
+                foreach (var project in solution.EnumerateLoadedProjects(onlyNodeProjects: false)) {
+                    int pfFound;
+                    VSDOCUMENTPRIORITY[] pdwPriority = new VSDOCUMENTPRIORITY[1];
+                    uint pitemid;
+                    if (ErrorHandler.Succeeded(project.IsDocumentInProject(fileName, out pfFound, pdwPriority, out pitemid)) && pfFound != 0) {
+                        // Handle remote attach where given fully-qualified path found in project, by matching given filename
+                        return fileName;
+                    }
+
+                    if (fuzzyFileName == null) {
+                        foreach (var itemid in project.EnumerateProjectItems()) {
+                            string moniker;
+                            if (ErrorHandler.Succeeded(project.GetMkDocument(itemid, out moniker)) && moniker != null) {
+                                if (string.Compare(Path.GetFileName(fileName), Path.GetFileName(moniker), StringComparison.OrdinalIgnoreCase) == 0) {
+                                    // Handle remote attach where leaf name in project, by matching project item filename
+                                    fuzzyFileName = moniker;
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+            if (fuzzyFileName != null) {
+                return fuzzyFileName;
+            }
+
+            // Fallback to matching leaf name, which causes source to be downloaded
+            return Path.GetFileName(fileName);
+        }
     }
 }

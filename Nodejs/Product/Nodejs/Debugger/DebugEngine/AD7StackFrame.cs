@@ -25,6 +25,8 @@ namespace Microsoft.NodejsTools.Debugger.DebugEngine {
         private readonly AD7Engine _engine;
         private readonly AD7Thread _thread;
         private readonly NodeStackFrame _stackFrame;
+        private AD7MemoryAddress _codeContext;
+        private AD7DocumentContext _documentContext;
 
         // An array of this frame's parameters
         private NodeEvaluationResult[] _parameters;
@@ -56,6 +58,24 @@ namespace Microsoft.NodejsTools.Debugger.DebugEngine {
         public AD7Thread Thread {
             get {
                 return _thread;
+            }
+        }
+
+        private AD7MemoryAddress CodeContext {
+            get {
+                if (_codeContext == null) {
+                    _codeContext = new AD7MemoryAddress(_engine, _stackFrame);
+                }
+                return _codeContext;
+            }
+        }
+
+        private AD7DocumentContext DocumentContext {
+            get {
+                if (_documentContext == null) {
+                    _documentContext = new AD7DocumentContext(CodeContext);
+                }
+                return _documentContext;
             }
         }
 
@@ -229,7 +249,7 @@ namespace Microsoft.NodejsTools.Debugger.DebugEngine {
 
         // Gets the code context for this stack frame. The code context represents the current instruction pointer in this stack frame.
         int IDebugStackFrame2.GetCodeContext(out IDebugCodeContext2 memoryAddress) {
-            memoryAddress = new AD7MemoryAddress(_engine, _stackFrame.FileName, (uint)_stackFrame.LineNo, _stackFrame);
+            memoryAddress = CodeContext;
             return VSConstants.S_OK;
         }
 
@@ -243,16 +263,7 @@ namespace Microsoft.NodejsTools.Debugger.DebugEngine {
         // Gets the document context for this stack frame. The debugger will call this when the current stack frame is changed
         // and will use it to open the correct source document for this stack frame.
         int IDebugStackFrame2.GetDocumentContext(out IDebugDocumentContext2 docContext) {
-            docContext = null;
-            // Assume all lines begin and end at the beginning of the line.
-            TEXT_POSITION begTp = new TEXT_POSITION();
-            begTp.dwColumn = 0;
-            begTp.dwLine = (uint)_stackFrame.LineNo - 1;
-            TEXT_POSITION endTp = new TEXT_POSITION();
-            endTp.dwColumn = 0;
-            endTp.dwLine = (uint)_stackFrame.LineNo - 1;
-
-            docContext = new AD7DocumentContext(_stackFrame.FileName, begTp, endTp, null);
+            docContext = DocumentContext;
             return VSConstants.S_OK;
         }
 

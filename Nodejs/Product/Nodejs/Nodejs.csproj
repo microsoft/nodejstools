@@ -192,6 +192,7 @@
     <Compile Include="Debugger\BreakpointHitEventArgs.cs" />
     <Compile Include="Debugger\DebugEngine\AD7BoundBreakpoint.cs" />
     <Compile Include="Debugger\DebugEngine\AD7BreakpointResolution.cs" />
+    <Compile Include="Debugger\DebugEngine\AD7Document.cs" />
     <Compile Include="Debugger\DebugEngine\AD7DocumentContext.cs" />
     <Compile Include="Debugger\DebugEngine\AD7Engine.cs" />
     <Compile Include="Debugger\DebugEngine\AD7EngineEventArgs.cs" />

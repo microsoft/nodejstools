@@ -28,16 +28,38 @@ namespace Microsoft.NodejsTools.Debugger.DebugEngine {
         private readonly NodeStackFrame _frame;
         private IDebugDocumentContext2 _documentContext;
 
-
-        public AD7MemoryAddress(AD7Engine engine, string filename, uint lineno) {
+        private AD7MemoryAddress(AD7Engine engine, NodeStackFrame frame, string filename, uint lineNo) {
             _engine = engine;
-            _lineNo = (uint)lineno;
+            _frame = frame;
             _filename = filename;
+            _lineNo = lineNo;
         }
 
-        public AD7MemoryAddress(AD7Engine engine, string filename, uint lineno, NodeStackFrame frame)
-            : this(engine, filename, lineno) {
-            _frame = frame;
+
+        public AD7MemoryAddress(AD7Engine engine, string filename, uint lineNo)
+            : this(engine, null, filename, lineNo) {
+        }
+
+        public AD7MemoryAddress(AD7Engine engine, NodeStackFrame frame)
+            : this(engine, frame, null, (uint)frame.LineNo - 1) {
+        }
+
+        public AD7Engine Engine {
+            get {
+                return _engine;
+            }
+        }
+
+        public NodeModule Module {
+            get {
+                return _frame != null ? _frame.Module : null;
+            }
+        }
+
+        public string FileName {
+            get {
+                return _frame != null ? _frame.FileName : _filename;
+            }
         }
 
         public void SetDocumentContext(IDebugDocumentContext2 docContext) {
@@ -48,7 +70,7 @@ namespace Microsoft.NodejsTools.Debugger.DebugEngine {
 
         // Adds a specified value to the current context's address to create a new context.
         public int Add(ulong dwCount, out IDebugMemoryContext2 newAddress) {
-            newAddress = new AD7MemoryAddress(_engine, _filename, (uint)dwCount + _lineNo);
+            newAddress = new AD7MemoryAddress(_engine, _frame, _filename, _lineNo + (uint)dwCount);
             return VSConstants.S_OK;
         }
 
@@ -95,16 +117,16 @@ namespace Microsoft.NodejsTools.Debugger.DebugEngine {
                     case enum_CONTEXT_COMPARE.CONTEXT_SAME_SCOPE:
                     case enum_CONTEXT_COMPARE.CONTEXT_SAME_FUNCTION:
                         if (_frame != null) {
-                            result = compareTo._filename == _filename && (compareTo._lineNo + 1) >= _frame.StartLine && (compareTo._lineNo + 1) <= _frame.EndLine;
+                            result = compareTo.FileName == FileName && (compareTo._lineNo + 1) >= _frame.StartLine && (compareTo._lineNo + 1) <= _frame.EndLine;
                         } else if (compareTo._frame != null) {
-                            result = compareTo._filename == _filename && (_lineNo + 1) >= compareTo._frame.StartLine && (compareTo._lineNo + 1) <= compareTo._frame.EndLine;
+                            result = compareTo.FileName == FileName && (_lineNo + 1) >= compareTo._frame.StartLine && (compareTo._lineNo + 1) <= compareTo._frame.EndLine;
                         } else {
-                            result = this._lineNo == compareTo._lineNo && this._filename == compareTo._filename;
+                            result = this._lineNo == compareTo._lineNo && this.FileName == compareTo.FileName;
                         }
                         break;
 
                     case enum_CONTEXT_COMPARE.CONTEXT_SAME_MODULE:
-                        result = _filename == compareTo._filename;
+                        result = FileName == compareTo.FileName;
                         break;
 
                     case enum_CONTEXT_COMPARE.CONTEXT_SAME_PROCESS:
@@ -158,7 +180,7 @@ namespace Microsoft.NodejsTools.Debugger.DebugEngine {
 
         // Subtracts a specified value from the current context's address to create a new context.
         public int Subtract(ulong dwCount, out IDebugMemoryContext2 ppMemCxt) {
-            ppMemCxt = new AD7MemoryAddress(_engine, _filename, (uint)dwCount - _lineNo);
+            ppMemCxt = new AD7MemoryAddress(_engine, _frame, _filename, _lineNo - (uint)dwCount);
             return VSConstants.S_OK;
         }
 
