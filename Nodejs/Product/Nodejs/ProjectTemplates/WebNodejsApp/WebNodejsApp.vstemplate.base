@@ -12,7 +12,7 @@
     <ProvideDefaultName>true</ProvideDefaultName>
     <NumberOfParentCategoriesToRollUp>1</NumberOfParentCategoriesToRollUp>
     <PromptForSaveOnCreation>true</PromptForSaveOnCreation>
-    <PreviewImage>blankwj.png</PreviewImage>
+    <PreviewImage>Preview.png</PreviewImage>
   </TemplateData>
   <TemplateContent>
     <Project File="WebNodejsApp.njsproj" ReplaceParameters="true">

@@ -299,6 +299,13 @@
       <SubType>Designer</SubType>
     </TransformedZipProject>
     <ZipProject Include="ProjectTemplates\WebAzureExpressApp\server.js" />
+    <ZipProject Include="ProjectTemplates\NodejsApp\Preview.png" />
+    <ZipProject Include="ProjectTemplates\WebAzureNodejsApp\Preview.png" />
+    <ZipProject Include="ProjectTemplates\WebNodejsApp\Preview.png" />
+    <ZipProject Include="ProjectTemplates\AzureExpressApp\Preview.png" />
+    <ZipProject Include="ProjectTemplates\ExpressApp\Preview.png" />
+    <ZipProject Include="ProjectTemplates\WebAzureExpressApp\Preview.png" />
+    <ZipProject Include="ProjectTemplates\AzureNodejsApp\Preview.png" />
     <Content Include="VSTemplateStore.pkgdef">
       <IncludeInVSIX>true</IncludeInVSIX>
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
