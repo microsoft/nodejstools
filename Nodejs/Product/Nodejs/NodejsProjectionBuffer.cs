@@ -98,7 +98,7 @@ namespace Microsoft.NodejsTools {
 
                 return
                     "/// <reference path=\"" + _referenceFilename + "\" />\r\n" +
-                    GetNodeFunctionWrapperHeader("module_body", _filename);
+                    GetNodeFunctionWrapperHeader("nodejs_tools_for_visual_studio_hidden_module_body", _filename);
             }
         }
 

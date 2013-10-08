@@ -21,7 +21,8 @@ namespace NodeReferenceGenerator {
         static void Main(string[] args) {
             var res = new NodeReferenceGenerator().Generate();
             Console.WriteLine(res);
-            File.WriteAllText("all.js", res);
+            
+            File.WriteAllText("all.js", File.ReadAllText("IntellisenseHeader.js") + res);
         }
 
         private string Generate() {
