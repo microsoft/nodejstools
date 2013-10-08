@@ -64,6 +64,15 @@ namespace Microsoft.NodejsTools {
                     case VSConstants.VSStd2KCmdID.PASTE:
                         _editorOps.Paste();
                         return VSConstants.S_OK;
+                    case VSConstants.VSStd2KCmdID.TAB:
+                        if (_intellisenseStack.TopSession != null &&
+                            _intellisenseStack.TopSession is ICompletionSession &&
+                            !_intellisenseStack.TopSession.IsDismissed) {
+                            ((ICompletionSession)_intellisenseStack.TopSession).Commit();
+                        } else {
+                            _editorOps.Indent();
+                        }
+                        return VSConstants.S_OK;
                 }
             } else if (pguidCmdGroup == VSConstants.GUID_VSStandardCommandSet97) {
                 switch ((VSConstants.VSStd97CmdID)nCmdID) {
