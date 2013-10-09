@@ -39,7 +39,7 @@ namespace TestUtilities.SharedProject {
         public static readonly ProjectType CSharp = new ProjectType(".cs", ".csproj", new Guid("FAE04EC0-301F-11D3-BF4B-00C04F79EFBC"), "class C { }");
 
         public ProjectType(string codeExtension, string projectExtension, Guid projectTypeGuid, string sampleCode = "", IProjectProcessor[] postProcess = null) {
-            Debug.Assert(!String.IsNullOrWhiteSpace(CodeExtension));
+            Debug.Assert(!String.IsNullOrWhiteSpace(codeExtension));
 
             CodeExtension = codeExtension;
             ProjectExtension = projectExtension;
@@ -58,15 +58,17 @@ namespace TestUtilities.SharedProject {
             return filename + CodeExtension;
         }
 
-        public MSBuild.Project Generate(string location, string projectName, params ProjectContentGenerator[] items) {
+        public MSBuild.Project Generate(MSBuild.ProjectCollection collection, string location, string projectName, params ProjectContentGenerator[] items) {
             location = Path.Combine(location, projectName);
             Directory.CreateDirectory(location);
 
-            var project = new MSBuild.Project();
+            var project = new MSBuild.Project(collection);
             project.Save(Path.Combine(location, projectName) + ProjectExtension);
 
             var projGuid = Guid.NewGuid();
-            project.SetProperty("ProjectGuid", projGuid.ToString());
+            project.SetProperty("ProjectTypeGuid", ProjectTypeGuid.ToString());
+            project.SetProperty("Name", projectName);
+            project.SetProperty("ProjectGuid", projGuid.ToString("B"));
             project.SetProperty("SchemaVersion", "2.0");
 
             foreach (var processor in _processors) {

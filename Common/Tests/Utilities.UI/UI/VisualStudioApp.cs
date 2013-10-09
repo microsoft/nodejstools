@@ -61,8 +61,9 @@ namespace TestUtilities.UI {
         /// <summary>
         /// Opens and activates the solution explorer window.
         /// </summary>
-        public void OpenSolutionExplorer() {
-            Dte.ExecuteCommand("View.SolutionExplorer");            
+        public SolutionExplorerTree OpenSolutionExplorer() {
+            Dte.ExecuteCommand("View.SolutionExplorer");
+            return SolutionExplorerTreeView;
         }
 
         /// <summary>

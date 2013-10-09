@@ -42,27 +42,17 @@ namespace TestUtilities.SharedProject {
             var location = Path.Combine(Path.GetTempPath(), Path.GetRandomFileName());
             Directory.CreateDirectory(location);
 
+            MSBuild.ProjectCollection collection = new MSBuild.ProjectCollection();
             foreach (var project in toGenerate) {
-                projects.Add(project.ProjectType.Generate(location, project.Name, project.Items));
+                projects.Add(project.ProjectType.Generate(collection, location, project.Name, project.Items));
             }
 
 #if DEV10
-            StringBuilder slnFile = new StringBuilder(@"
-Microsoft Visual Studio Solution File, Format Version 11.00
-\u0023 Visual Studio 2010
-");
+            StringBuilder slnFile = new StringBuilder("\r\nMicrosoft Visual Studio Solution File, Format Version 11.00\r\n\u0023 Visual Studio 2010\r\n");
 #elif DEV11
-            StringBuilder slnFile = new StringBuilder(@"
-Microsoft Visual Studio Solution File, Format Version 12.00
-\u0023 Visual Studio 2012
-");
+            StringBuilder slnFile = new StringBuilder("\r\nMicrosoft Visual Studio Solution File, Format Version 12.00\r\n\u0023 Visual Studio 2012\r\n");
 #elif DEV12
-            StringBuilder slnFile = new StringBuilder(@"
-Microsoft Visual Studio Solution File, Format Version 12.00
-\u0023 Visual Studio 2013
-VisualStudioVersion = 12.0.20827.3
-MinimumVisualStudioVersion = 10.0.40219.1
-");
+            StringBuilder slnFile = new StringBuilder("\r\nMicrosoft Visual Studio Solution File, Format Version 12.00\r\n\u0023 Visual Studio 2013\r\nVisualStudioVersion = 12.0.20827.3\r\nMinimumVisualStudioVersion = 10.0.40219.1\r\n");
 #else
 #error Unsupported VS version
 #endif
@@ -98,6 +88,9 @@ EndProject
 	EndGlobalSection
 EndGlobal
 ");
+
+            collection.UnloadAllProjects();
+            collection.Dispose();
 
             var slnFilename = Path.Combine(location, solutionName + ".sln");
             File.WriteAllText(slnFilename, slnFile.ToString(), Encoding.UTF8);

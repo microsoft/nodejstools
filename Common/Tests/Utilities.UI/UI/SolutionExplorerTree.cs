@@ -14,6 +14,7 @@
 
 using System;
 using System.IO;
+using System.Linq;
 using System.Windows.Automation;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 
@@ -24,13 +25,24 @@ namespace TestUtilities.UI {
         }
 
         public void AssertFileExists(string projectLocation, params string[] path) {
-            Assert.IsNotNull(WaitForItem(path), "Item not found in solution explorer" + String.Join("\\", path));
+            AssertItemExistsInTree(path);
 
             var basePath = projectLocation;
             for (int i = 1; i < path.Length; i++) {
                 basePath = Path.Combine(basePath, path[i]);
             }
             Assert.IsTrue(File.Exists(basePath), "File doesn't exist: " + basePath);
+        }
+
+        public void AssertFileExistsWithContent(string projectLocation, string content, params string[] path) {
+            AssertItemExistsInTree(path);
+
+            var basePath = projectLocation;
+            for (int i = 1; i < path.Length; i++) {
+                basePath = Path.Combine(basePath, path[i]);
+            }
+            Assert.IsTrue(File.Exists(basePath), "File doesn't exist: " + basePath);
+            Assert.AreEqual(File.ReadAllText(basePath), content);
         }
 
         public void AssertFileDoesntExist(string projectLocation, params string[] path) {
@@ -44,7 +56,7 @@ namespace TestUtilities.UI {
         }
 
         public void AssertFolderExists(string projectLocation, params string[] path) {
-            Assert.IsNotNull(WaitForItem(path), "Item not found in solution explorer" + String.Join("\\", path));
+            AssertItemExistsInTree(path);
 
             var basePath = projectLocation;
             for (int i = 1; i < path.Length; i++) {
@@ -63,5 +75,19 @@ namespace TestUtilities.UI {
             Assert.IsFalse(Directory.Exists(basePath), "File exists: " + basePath);
         }
 
+        private void AssertItemExistsInTree(string[] path) {
+            var item = WaitForItem(path);
+            if(item == null) {
+                string msg = "Item not found in solution explorer " + String.Join("\\", path);
+                for (int i = 1; i < path.Length; i++) {
+                    item = FindItem(path.Take(i).ToArray());
+                    if (item == null) {
+                        msg += Environment.NewLine + "Item missing at: " + String.Join("\\", path.Take(i));
+                        break;
+                    }
+                }
+                Assert.IsNotNull(item, msg);
+            }
+        }
     }
 }
