@@ -32,15 +32,34 @@ namespace TestUtilities.SharedProject {
     /// </summary>
     public sealed class SolutionFile : IDisposable {
         public readonly string Filename;
+        public readonly ProjectDefinition[] Projects;
 
-        private SolutionFile(string slnFilename) {
+        private SolutionFile(string slnFilename, ProjectDefinition[] projects) {
             Filename = slnFilename;
+            Projects = projects;
         }
 
         public static SolutionFile Generate(string solutionName, params ProjectDefinition[] toGenerate) {
+            return Generate(solutionName, -1, toGenerate);
+        }
+
+        /// <summary>
+        /// Generates the solution file with the specified amount of space remaining relative
+        /// to MAX_PATH.
+        /// </summary>
+        /// <param name="solutionName">The solution name to be created</param>
+        /// <param name="pathSpaceRemaining">The amount of path space remaining, or -1 to generate normally</param>
+        /// <param name="toGenerate">The projects to be incldued in the generated solution</param>
+        /// <returns></returns>
+        public static SolutionFile Generate(string solutionName, int pathSpaceRemaining, params ProjectDefinition[] toGenerate) {
             List<MSBuild.Project> projects = new List<MSBuild.Project>();
             var location = Path.Combine(Path.GetTempPath(), Path.GetRandomFileName());
-            Directory.CreateDirectory(location);
+
+            if (pathSpaceRemaining >= 0) {
+                int targetPathLength = 260 - pathSpaceRemaining;
+                location = location + new string('X', targetPathLength - location.Length);
+            }
+            System.IO.Directory.CreateDirectory(location);
 
             MSBuild.ProjectCollection collection = new MSBuild.ProjectCollection();
             foreach (var project in toGenerate) {
@@ -94,14 +113,20 @@ EndGlobal
 
             var slnFilename = Path.Combine(location, solutionName + ".sln");
             File.WriteAllText(slnFilename, slnFile.ToString(), Encoding.UTF8);
-            return new SolutionFile(slnFilename);
+            return new SolutionFile(slnFilename, toGenerate);
+        }
+
+        public string Directory {
+            get {
+                return Path.GetDirectoryName(Filename);
+            }
         }
 
         #region IDisposable Members
 
         public void Dispose() {
             try {
-                Directory.Delete(Path.GetDirectoryName(Filename), true);
+                System.IO.Directory.Delete(Path.GetDirectoryName(Filename), true);
             } catch {
             }
         }
@@ -109,3 +134,4 @@ EndGlobal
         #endregion
     }
 }
+ 

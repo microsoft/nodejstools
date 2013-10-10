@@ -139,8 +139,8 @@ namespace TestUtilities.SharedProject {
         /// Helper function to create a CompileItem object to simply syntax in 
         /// defining project definitions.
         /// </summary>
-        public static CompileItem Compile(string name, bool isExcluded = false) {
-            return new CompileItem(name, isExcluded);
+        public static CompileItem Compile(string name, bool isExcluded = false, bool isMissing = false) {
+            return new CompileItem(name, isExcluded, isMissing);
         }
 
         /// <summary>

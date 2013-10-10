@@ -23,9 +23,11 @@ using System.Windows.Input;
 using EnvDTE;
 using Microsoft.TC.TestHostAdapters;
 using Microsoft.VisualStudio.ComponentModelHost;
+using Microsoft.VisualStudio.Shell;
 using Microsoft.VisualStudio.Shell.Interop;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using TestUtilities;
+using Task = System.Threading.Tasks.Task;
 
 namespace TestUtilities.UI {
     /// <summary>
@@ -600,6 +602,10 @@ namespace TestUtilities.UI {
                     ((EnvDTE90a.Breakpoint3)bp).Delete();
                 }
             }
+        }
+
+        internal void Invoke(Action action) {
+            ThreadHelper.Generic.Invoke(action);
         }
     }
 }

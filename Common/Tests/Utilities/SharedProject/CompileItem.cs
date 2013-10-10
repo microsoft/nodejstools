@@ -25,20 +25,24 @@ namespace TestUtilities.SharedProject {
     public sealed class CompileItem : ProjectContentGenerator {
         public readonly string Name;
         public readonly bool IsExcluded;
+        public readonly bool IsMissing;
 
         /// <summary>
         /// Creates a new compile item.  The item will be generated with the 
         /// projects code file extension and sample code.  If the item is excluded
         /// then the file will be written out but not added to the project.
         /// </summary>
-        public CompileItem(string name, bool isExcluded = false) {
+        public CompileItem(string name, bool isExcluded = false, bool isMissing = false) {
             Name = name;
             IsExcluded = isExcluded;
+            IsMissing = isMissing;
         }
 
         public override void Generate(ProjectType projectType, MSBuild.Project project) {
             var filename = Path.Combine(project.DirectoryPath, Name + projectType.CodeExtension);
-            File.WriteAllText(filename, projectType.SampleCode);
+            if (!IsMissing) {
+                File.WriteAllText(filename, projectType.SampleCode);
+            }
 
             if (!IsExcluded) {
                 project.AddItem("Compile", Name + projectType.CodeExtension);
