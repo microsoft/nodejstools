@@ -95,6 +95,7 @@
     <Compile Include="ProjectTests.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="ReplWindowTests.cs" />
+    <Compile Include="RequireIntellisense.cs" />
     <Compile Include="ShowAllFiles.cs" />
     <Compile Include="UITests.cs" />
   </ItemGroup>

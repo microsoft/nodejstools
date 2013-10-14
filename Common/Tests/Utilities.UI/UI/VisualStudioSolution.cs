@@ -18,6 +18,7 @@ using System.Linq;
 using System.Windows.Automation;
 using System.Windows.Input;
 using Microsoft.TC.TestHostAdapters;
+using Microsoft.VisualStudio.TestTools.UnitTesting;
 using TestUtilities.SharedProject;
 
 namespace TestUtilities.UI {
@@ -45,6 +46,35 @@ namespace TestUtilities.UI {
             get {
                 return _app;
             }
+        }
+
+        /// <summary>
+        /// Opens the specified filename from the specified project name.
+        /// </summary>
+        public EditorWindow OpenItem(string project, params string[] path) {
+            foreach (EnvDTE.Project proj in VsIdeTestHostContext.Dte.Solution.Projects) {
+                if (proj.Name == project) {
+                    var items = proj.ProjectItems;
+                    EnvDTE.ProjectItem item = null;
+                    foreach (var itemName in path) {
+                        item = items.Item(itemName);
+                        items = item.ProjectItems;
+                    }
+                    Assert.IsNotNull(item);
+                    var window = item.Open();
+                    window.Activate();
+                    return App.GetDocument(item.Document.FullName);
+                    
+                }
+            }
+
+            throw new InvalidOperationException(
+                String.Format(
+                    "Failed to find {0} item in project {1}",
+                    String.Join("\\", path),
+                    project
+                )
+            );
         }
 
         public AutomationElement FindItem(params string[] path) {

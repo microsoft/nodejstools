@@ -27,6 +27,9 @@ namespace Microsoft.Nodejs.Tests.UI {
         }
 
         public void PostProcess(MSBuild.Project project) {
+            // Node.js projects are flavored which enables a lot of our functionality, so
+            // setup our flavor.
+            project.SetProperty("ProjectTypeGuids", "{3AF33F2E-1136-4D97-BBB7-1795711AC8B8};{349c5851-65df-11da-9384-00065b846f21};{9092AA53-FB77-4645-B42D-1CCCA6BD08BD}");
         }
     }
 }

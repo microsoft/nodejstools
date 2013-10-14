@@ -17,6 +17,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using Microsoft.VisualStudio.Language.Intellisense;
 using TestUtilities.SharedProject;
 
 namespace TestUtilities.UI {
@@ -24,5 +25,14 @@ namespace TestUtilities.UI {
         public static VisualStudioSolution ToVs(this SolutionFile self) {
             return new VisualStudioSolution(self);
         }
+
+        public static string[] GetDisplayTexts(this ICompletionSession completionSession) {
+            return completionSession.CompletionSets.First().Completions.Select(x => x.DisplayText).ToArray();
+        }
+
+        public static string[] GetInsertionTexts(this ICompletionSession completionSession) {
+            return completionSession.CompletionSets.First().Completions.Select(x => x.InsertionText).ToArray();
+        }
+
     }
 }

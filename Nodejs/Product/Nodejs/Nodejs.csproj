@@ -178,6 +178,9 @@
   <ItemGroup>
     <Compile Include="CustomTrackingSpan.cs" />
     <Compile Include="EditFilter.cs" />
+    <Compile Include="Intellisense\CompletionSource.cs" />
+    <Compile Include="Intellisense\CompletionSourceProvider.cs" />
+    <Compile Include="Intellisense\CompletionSource.Modules.cs" />
     <Compile Include="Nodejs.cs" />
     <Compile Include="NodejsProjectConfig.cs" />
     <Compile Include="Project\Attributes.cs" />

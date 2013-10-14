@@ -493,7 +493,7 @@ require = function () {
         "buffer": null,
         "stream": null,
         "crypto": null,
-        "tls_(ssl)": null,
+        "tls": null,
         "stringdecoder": null,
         "fs": null,
         "path": null,
@@ -1698,7 +1698,7 @@ require = function () {
                 /// <field name='DEFAULT_ENCODING'><p>The default encoding to use for functions that can take either strings or buffers.  The default value is <code>&#39;buffer&#39;</code>, which makes it default to using Buffer objects.  This is here to make the crypto module more easily compatible with legacy programs that expected <code>&#39;binary&#39;</code> to be the default encoding.  </p> <p>Note that new programs will probably expect buffers, so only use this as a temporary measure.  </p> </field>
                 this.DEFAULT_ENCODING = undefined;
             };
-            case "tls_(ssl)": return new     function tls_() {
+            case "tls": return new     function tls() {
                 /// <summary><p>Use <code>require(&#39;tls&#39;)</code> to access this module.  </p> <p>The <code>tls</code> module uses OpenSSL to provide Transport Layer Security and/or Secure Socket Layer: encrypted stream communication.  </p> <p>TLS/SSL is a public/private key infrastructure. Each client and each server must have a private key. A private key is created like this  </p> <pre><code>openssl genrsa -out ryans-key.pem 1024</code></pre> <p>All severs and some clients need to have a certificate. Certificates are public keys signed by a Certificate Authority or self-signed. The first step to getting a certificate is to create a &quot;Certificate Signing Request&quot; (CSR) file. This is done with:  </p> <pre><code>openssl req -new -key ryans-key.pem -out ryans-csr.pem</code></pre> <p>To create a self-signed certificate with the CSR, do this:  </p> <pre><code>openssl x509 -req -in ryans-csr.pem -signkey ryans-key.pem -out ryans-cert.pem</code></pre> <p>Alternatively you can send the CSR to a Certificate Authority for signing.  </p> <p>(TODO: docs on creating a CA, for now interested users should just look at <code>test/fixtures/keys/Makefile</code> in the Node source code)  </p> <p>To create .pfx or .p12, do this:  </p> <pre><code>openssl pkcs12 -export -in agent5-cert.pem -inkey agent5-key.pem \     -certfile ca-cert.pem -out agent5.pfx</code></pre> <ul> <li><code>in</code>:  certificate</li> <li><code>inkey</code>: private key</li> <li><code>certfile</code>: all CA certs concatenated in one file like <code>cat ca1-cert.pem ca2-cert.pem &gt; ca-cert.pem</code></li> </ul> </summary>
                 this.getCiphers = function() {
                     /// <summary><p>Returns an array with the names of the supported SSL ciphers.  </p> <p>Example:  </p> <pre><code>var ciphers = tls.getCiphers(); console.log(ciphers); // [&#39;AES128-SHA&#39;, &#39;AES256-SHA&#39;, ...]</code></pre> </summary>
@@ -4072,4 +4072,4 @@ require = function () {
     this.platform = 'win32';
     /// <field name='maxTickDepth'><p>Callbacks passed to <code>process.nextTick</code> will <em>usually</em> be called at the end of the current flow of execution, and are thus approximately as fast as calling a function synchronously.  Left unchecked, this would starve the event loop, preventing any I/O from occurring.  </p> <p>Consider this code:  </p> <pre><code>process.nextTick(function foo() {   process.nextTick(foo); });</code></pre> <p>In order to avoid the situation where Node is blocked by an infinite loop of recursive series of nextTick calls, it defers to allow some I/O to be done every so often.  </p> <p>The <code>process.maxTickDepth</code> value is the maximum depth of nextTick-calling nextTick-callbacks that will be evaluated before allowing other forms of I/O to occur.  </p> </field>
     this.maxTickDepth = 1000;
-};
+};  

@@ -13,11 +13,16 @@
  * ***************************************************************************/
 
 using System;
+using System.Collections.Generic;
 using System.Windows;
+using Microsoft.NodejsTools.Intellisense;
 using Microsoft.VisualStudio;
+using Microsoft.VisualStudio.ComponentModelHost;
 using Microsoft.VisualStudio.Language.Intellisense;
 using Microsoft.VisualStudio.OLE.Interop;
+using Microsoft.VisualStudio.Text.Classification;
 using Microsoft.VisualStudio.Text.Editor;
+using Microsoft.VisualStudio.Text.IncrementalSearch;
 using Microsoft.VisualStudio.Text.Operations;
 using Microsoft.VisualStudio.TextManager.Interop;
 
@@ -26,12 +31,30 @@ namespace Microsoft.NodejsTools {
         private readonly ITextView _textView;
         private readonly IEditorOperations _editorOps;
         private readonly IIntellisenseSessionStack _intellisenseStack;
+        private readonly IComponentModel _compModel;
+        private readonly IClassifier _classifier;
+        private readonly IIncrementalSearch _incSearch;
+        private readonly ICompletionBroker _broker;
         private IOleCommandTarget _next;
+        private ICompletionSession _activeSession;
 
-        public EditFilter(ITextView textView, IEditorOperations editorOps, IIntellisenseSessionStack intellisenseStack) {
+        public EditFilter(ITextView textView, IEditorOperations editorOps, IIntellisenseSessionStack intellisenseStack, IComponentModel compModel) {
             _textView = textView;
             _editorOps = editorOps;
             _intellisenseStack = intellisenseStack;
+            _compModel = compModel;
+            var agg = _compModel.GetService<IClassifierAggregatorService>();
+            _classifier = agg.GetClassifier(textView.TextBuffer);
+            _incSearch = _compModel.GetService<IIncrementalSearchFactoryService>().GetIncrementalSearch(_textView);
+            _broker = _compModel.GetService<ICompletionBroker>();
+        }
+
+        private bool ShouldTriggerRequireIntellisense() {
+            return CompletionSource.ShouldTriggerRequireIntellisense(
+                _textView.Caret.Position.BufferPosition,
+                _classifier,
+                false
+            );
         }
 
         internal void AttachKeyboardFilter(IVsTextView vsTextView) {
@@ -39,6 +62,8 @@ namespace Microsoft.NodejsTools {
                 ErrorHandler.ThrowOnFailure(vsTextView.AddCommandFilter(this, out _next));
             }
         }
+
+        private static HashSet<char> _commitChars = new HashSet<char>("{}[](),:;+-*%&|^~=<>#\\");
 
         public int Exec(ref Guid pguidCmdGroup, uint nCmdID, uint nCmdexecopt, IntPtr pvaIn, IntPtr pvaOut) {
             // disable JavaScript language services auto formatting features, this is because
@@ -55,10 +80,35 @@ namespace Microsoft.NodejsTools {
                         }
                         return VSConstants.S_OK;
                     case VSConstants.VSStd2KCmdID.TYPECHAR:
-                        var ch = (char)(ushort)System.Runtime.InteropServices.Marshal.GetObjectForNativeVariant(pvaIn);
-                        if(ch == '}' || ch == ';') {
-                            _editorOps.InsertText(ch.ToString());
-                            return VSConstants.S_OK;
+                        if (!_incSearch.IsActive) {
+                            var ch = (char)(ushort)System.Runtime.InteropServices.Marshal.GetObjectForNativeVariant(pvaIn);
+
+                            if (_activeSession != null && !_activeSession.IsDismissed) {
+                                if (_activeSession.SelectedCompletionSet.SelectionStatus.IsSelected &&
+                                    _commitChars.Contains(ch)) {
+                                    _activeSession.Commit();
+                                } else if (!CompletionSource.IsIdentifierChar(ch) && ch != '.' && ch != '/') {
+                                    _activeSession.Dismiss();
+                                }
+                            }
+
+                            if (ch == '}' || ch == ';') {
+                                _editorOps.InsertText(ch.ToString());
+                                return VSConstants.S_OK;
+                            } else if ((ch == '(' || ch == '"' || ch == '\'') && 
+                                CompletionSource.ShouldTriggerRequireIntellisense(_textView.Caret.Position.BufferPosition, _classifier, ch != '(')) {
+                                // we don't want to forward the ( down to JS as it'll trigger a signature help
+                                // session.
+                                _editorOps.InsertText(ch.ToString());
+                                TriggerCompletionSession(false);
+                                return VSConstants.S_OK;
+                            }
+
+                            int hr = _next.Exec(ref pguidCmdGroup, nCmdID, nCmdexecopt, pvaIn, pvaOut);
+                            if (ErrorHandler.Succeeded(hr) && _activeSession != null && !_activeSession.IsDismissed) {
+                                _activeSession.Filter();
+                            }
+                            return hr;
                         }
                         break;
                     case VSConstants.VSStd2KCmdID.PASTE:
@@ -73,6 +123,19 @@ namespace Microsoft.NodejsTools {
                             _editorOps.Indent();
                         }
                         return VSConstants.S_OK;
+                    case VSConstants.VSStd2KCmdID.SHOWMEMBERLIST:
+                    case VSConstants.VSStd2KCmdID.COMPLETEWORD:
+                        TriggerCompletionSession((VSConstants.VSStd2KCmdID)nCmdID == VSConstants.VSStd2KCmdID.COMPLETEWORD);
+                        return VSConstants.S_OK;
+                    case VSConstants.VSStd2KCmdID.BACKSPACE:
+                    case VSConstants.VSStd2KCmdID.DELETE:
+                    case VSConstants.VSStd2KCmdID.DELETEWORDLEFT:
+                    case VSConstants.VSStd2KCmdID.DELETEWORDRIGHT:
+                        int res = _next.Exec(ref pguidCmdGroup, nCmdID, nCmdexecopt, pvaIn, pvaOut);
+                        if (_activeSession != null && !_activeSession.IsDismissed) {
+                            _activeSession.Filter();
+                        }
+                        return res;
                 }
             } else if (pguidCmdGroup == VSConstants.GUID_VSStandardCommandSet97) {
                 switch ((VSConstants.VSStd97CmdID)nCmdID) {
@@ -83,6 +146,37 @@ namespace Microsoft.NodejsTools {
             }
 
             return _next.Exec(ref pguidCmdGroup, nCmdID, nCmdexecopt, pvaIn, pvaOut);
+        }
+
+        private void Dismiss() {
+            while (_intellisenseStack.TopSession != null) {
+                _intellisenseStack.TopSession.Dismiss();
+            }
+        }
+
+        internal void TriggerCompletionSession(bool completeWord) {
+            Dismiss();
+
+            _activeSession = _broker.TriggerCompletion(_textView);
+
+            if (_activeSession != null) {
+                if (completeWord &&
+                    _activeSession.CompletionSets.Count == 1 &&
+                    _activeSession.CompletionSets[0].Completions.Count == 1) {
+                    _activeSession.Commit();
+                    _activeSession = null;
+                } else {
+                    _activeSession.Dismissed += OnCompletionSessionDismissed;
+                    _activeSession.Committed += OnCompletionSessionDismissed;
+                }
+            }
+        }
+
+        private void OnCompletionSessionDismissed(object sender, System.EventArgs e) {
+            // We've just been told that our active session was dismissed.  We should remove all references to it.
+            _activeSession.Dismissed -= OnCompletionSessionDismissed;
+            _activeSession.Committed -= OnCompletionSessionDismissed;
+            _activeSession = null;
         }
 
         public int QueryStatus(ref Guid pguidCmdGroup, uint cCmds, OLECMD[] prgCmds, IntPtr pCmdText) {

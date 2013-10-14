@@ -323,19 +323,12 @@ namespace Microsoft.NodejsTools {
 
                 var proj = VsExtensions.GetCommonProject(Extensions.GetProject(_hierarchy)) as NodejsProjectNode;
 
-                string filename = String.Empty;
-                ITextDocument textDocument;
-                if (diskBuffer.Properties.TryGetProperty<ITextDocument>(typeof(ITextDocument), out textDocument)) {
-                    filename = textDocument.FilePath;
-                }
-
                 var projBuffer = new NodejsProjectionBuffer(
                     contentRegistry, 
                     factService, 
                     diskBuffer, 
                     _compModel.GetService<IBufferGraphFactoryService>(), 
                     contentType, 
-                    filename,
                     proj != null ? proj._referenceFilename : NodejsPackage.NodejsReferencePath
                 );
 
@@ -352,7 +345,7 @@ namespace Microsoft.NodejsTools {
                 ErrorHandler.ThrowOnFailure(_window.GetPrimaryView(out view));
                 var wpfView = adapterService.GetWpfTextView(view);
                 var intellisenseStack = _compModel.GetService<IIntellisenseSessionStackMapService>().GetStackForTextView(wpfView);
-                EditFilter editFilter = new EditFilter(wpfView, factory.GetEditorOperations(wpfView), intellisenseStack);
+                EditFilter editFilter = new EditFilter(wpfView, factory.GetEditorOperations(wpfView), intellisenseStack, _compModel);
                 editFilter.AttachKeyboardFilter(view);
 
                 return VSConstants.S_OK;

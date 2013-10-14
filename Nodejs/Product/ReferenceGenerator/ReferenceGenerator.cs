@@ -6,6 +6,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using System.Web.Script.Serialization;
+using System.Xml;
 
 namespace NodeReferenceGenerator {
 
@@ -19,13 +20,100 @@ namespace NodeReferenceGenerator {
         }
 
         static void Main(string[] args) {
-            var res = new NodeReferenceGenerator().Generate();
-            Console.WriteLine(res);
+            var generator = new NodeReferenceGenerator();
+            var js = generator.GenerateJavaScript();
             
-            File.WriteAllText("all.js", File.ReadAllText("IntellisenseHeader.js") + res);
+            File.WriteAllText("all.js", File.ReadAllText("IntellisenseHeader.js") + js);
+
+            var cs = generator.GenerateCSharp();
+            File.WriteAllText("modules.cs", cs);
         }
 
-        private string Generate() {
+        private string GenerateCSharp() {
+            StringBuilder res = new StringBuilder();
+            res.Append(@"/* ****************************************************************************
+ *
+ * Copyright (c) Microsoft Corporation. 
+ *
+ * This source code is subject to terms and conditions of the Apache License, Version 2.0. A 
+ * copy of the license can be found in the License.html file at the root of this distribution. If 
+ * you cannot locate the Apache License, Version 2.0, please send an email to 
+ * vspython@microsoft.com. By using this source code in any fashion, you are agreeing to be bound 
+ * by the terms of the Apache License, Version 2.0.
+ *
+ * You must not remove this notice, or any other, from this software.
+ *
+ * ***************************************************************************/
+
+using System.Collections.Generic;
+using Microsoft.VisualStudio.Language.Intellisense;
+
+namespace Microsoft.NodejsTools.Intellisense {
+    sealed partial class CompletionSource : ICompletionSource {
+");
+            res.AppendLine("        private static Dictionary<string, string> _nodejsModules = new Dictionary<string, string>() {");
+            foreach (var module in _all["modules"]) {
+                var desc = (string)module["desc"];
+                StringBuilder output = new StringBuilder();
+                var reader = XmlReader.Create(
+                    new StringReader(
+                        "<html>" + desc+ "</html>"
+                    )
+                );
+
+                while (reader.Read()) {
+                    switch (reader.NodeType) {
+                        case XmlNodeType.Element:
+                            switch (reader.Name) {
+                                case "li": 
+                                    output.Append("* ");
+                                    break;
+                            }                            
+                            break;
+                        case XmlNodeType.Text:
+                            var text = reader.Value
+                                .Replace("\\", "\\\\")
+                                .Replace("\"", "\\\"")
+                                .Replace("\r\n", "\\r\\n")
+                                .Replace("\n", "\\r\\n");
+
+                            output.Append(text);
+                            break;
+                        case XmlNodeType.EndElement:
+                            switch (reader.Name) {
+                                case "p":
+                                case "li":
+                                case "h1":
+                                case "h2":
+                                case "h3":
+                                case "h4":
+                                case "h5":
+                                    output.Append("\\r\\n");
+                                    break;
+                            }
+                            break;
+
+                    }
+                }
+
+                // trim escaped newlines...
+                while (output.ToString().EndsWith("\\r\\n")) {
+                    output.Length -= 4;
+                }
+
+                res.AppendFormat("            {{\"{0}\", \"{1}\" }},",
+                    FixModuleName(module["name"]),
+                    output.ToString()
+                );
+                res.AppendLine();
+            }
+            res.AppendLine("        };");
+            res.AppendLine(@"    }
+}");
+            return res.ToString();
+        }
+
+        private string GenerateJavaScript() {
             _output.AppendLine("global = {};");
 
             GenerateRequire(_output, _all);
@@ -311,7 +399,7 @@ namespace NodeReferenceGenerator {
             res.AppendLine("    var cache = {");
 
             foreach (var module in all["modules"]) {
-                res.AppendFormat("        \"{0}\": null,", module["name"]);
+                res.AppendFormat("        \"{0}\": null,", FixModuleName(module["name"]));
                 res.AppendLine();
             }
 
@@ -319,7 +407,7 @@ namespace NodeReferenceGenerator {
             res.AppendLine("    function make_module(module_name) {");
             res.AppendLine("        switch(module_name) { ");
             foreach (var module in all["modules"]) {
-                res.AppendFormat("            case \"{0}\": return new ", module["name"]);
+                res.AppendFormat("            case \"{0}\": return new ", FixModuleName(module["name"]));
                 GenerateModule(module, 1);
                 res.AppendLine(";");
             }
@@ -357,6 +445,10 @@ namespace NodeReferenceGenerator {
 
 
         private static dynamic FixModuleName(string module) {
+            if (module == "tls_(ssl)") {
+                return "tls";
+            }
+
             for (int i = 0; i < module.Length; i++) {
                 if (!(Char.IsLetterOrDigit(module[i]) || module[i] == '_')) {
                     return module.Substring(0, i);
