@@ -1,4 +1,5 @@
 ﻿using System;
+using Microsoft.NodejsTools.Npm;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using Newtonsoft.Json;
 
@@ -20,8 +21,9 @@ namespace NpmTests
 
             dynamic json = JsonConvert.DeserializeObject( pkgJsonStr );
 
-            Assert.AreEqual( json.name, pkgJson.Name, "Names should match." );
-            Assert.AreEqual( json.version, pkgJson.Version.ToString() );
+            Assert.AreEqual( json.name, pkgJson.Name, "Mismatched package names." );
+            Assert.AreEqual( typeof( SemverVersion ), pkgJson.GetType(), "Mismatched types for package version." );
+            Assert.AreEqual( json.version, pkgJson.Version.ToString(), "Mismatched version strings." );
         }
     }
 }
