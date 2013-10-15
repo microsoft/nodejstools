@@ -479,6 +479,10 @@
       <Link>SharedProject\IDiskBasedNode.cs</Link>
       <Visible>true</Visible>
     </Compile>
+    <Compile Include="$(_ProjectSystemFilesLocation)\Command.cs">
+      <Link>SharedProject\Command.cs</Link>
+      <Visible>true</Visible>
+    </Compile>
     <Compile Include="$(_ProjectSystemFilesLocation)\SharedCommands.cs">
       <Link>SharedProject\SharedCommands.cs</Link>
       <Visible>true</Visible>

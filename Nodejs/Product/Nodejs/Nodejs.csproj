@@ -176,6 +176,9 @@
     </COMReference>
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Commands\OpenReplWindowCommand.cs" />
+    <Compile Include="Commands\OpenRemoteDebugProxyFolderCommand.cs" />
+    <Compile Include="Commands\SurveyNewsCommand.cs" />
     <Compile Include="CustomTrackingSpan.cs" />
     <Compile Include="EditFilter.cs" />
     <Compile Include="Intellisense\CompletionSource.cs" />
@@ -183,6 +186,20 @@
     <Compile Include="Intellisense\CompletionSource.Modules.cs" />
     <Compile Include="Nodejs.cs" />
     <Compile Include="NodejsProjectConfig.cs" />
+    <Compile Include="NodejsToolsInstallPath.cs" />
+    <Compile Include="Options\NodejsDialogPage.cs">
+      <SubType>Component</SubType>
+    </Compile>
+    <Compile Include="Options\NodejsGeneralOptionsPage.cs">
+      <SubType>Component</SubType>
+    </Compile>
+    <Compile Include="Options\NodejsGeneralOptionsControl.cs">
+      <SubType>UserControl</SubType>
+    </Compile>
+    <Compile Include="Options\NodejsGeneralOptionsControl.Designer.cs">
+      <DependentUpon>NodejsGeneralOptionsControl.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Options\SurveyNewsPolicy.cs" />
     <Compile Include="Project\Attributes.cs" />
     <Compile Include="Project\NodejsFileNode.cs" />
     <Compile Include="Project\NodejsGeneralPropertyPageControl.cs">
@@ -271,6 +288,9 @@
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>
+    <EmbeddedResource Include="Options\NodejsGeneralOptionsControl.resx">
+      <DependentUpon>NodejsGeneralOptionsControl.cs</DependentUpon>
+    </EmbeddedResource>
     <EmbeddedResource Include="Project\NodejsGeneralPropertyPageControl.resx">
       <DependentUpon>NodejsGeneralPropertyPageControl.cs</DependentUpon>
     </EmbeddedResource>
@@ -309,6 +329,10 @@
     <ZipProject Include="ProjectTemplates\ExpressApp\Preview.png" />
     <ZipProject Include="ProjectTemplates\WebAzureExpressApp\Preview.png" />
     <ZipProject Include="ProjectTemplates\AzureNodejsApp\Preview.png" />
+    <Content Include="NoSurveyNewsFeed.html">
+      <IncludeInVSIX>true</IncludeInVSIX>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
     <Content Include="VSTemplateStore.pkgdef">
       <IncludeInVSIX>true</IncludeInVSIX>
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>

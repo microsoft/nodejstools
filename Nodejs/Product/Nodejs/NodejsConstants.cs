@@ -22,5 +22,7 @@ namespace Microsoft.NodejsTools {
         public const string PackageJsonFile = "package.json";
         public const string PackageJsonMainFileKey = "main";
         public const string DefaultPackageMainFile = "index.js";
+
+        public const string BaseRegistryKey = "NodejsTools";
     }
 }

@@ -40,7 +40,7 @@
       <?if "$(var.VSTargetVersion)" = "11.0" ?>
         <RegistrySearch Id="ProInstallRegSearch" Root="HKLM" Key="SOFTWARE\Microsoft\VisualStudio\11.0\Setup\Microsoft Visual Studio Professional 2012" Name="InstallSuccess" Type="raw" />
       <?elseif "$(var.VSTargetVersion)" = "12.0" ?>
-        <RegistrySearch Id="ProInstallRegSearch" Root="HKLM" Key="SOFTWARE\Microsoft\VisualStudio\12.0\Setup\Microsoft Visual Studio Professional 2013 RC" Name="InstallSuccess" Type="raw" />
+        <RegistrySearch Id="ProInstallRegSearch" Root="HKLM" Key="SOFTWARE\Microsoft\VisualStudio\12.0\Setup\Microsoft Visual Studio Professional 2013" Name="InstallSuccess" Type="raw" />
       <?endif ?>
     </Property>
 
@@ -48,7 +48,7 @@
       <?if "$(var.VSTargetVersion)" = "11.0" ?>
         <RegistrySearch Id="PremiumInstallRegSearch" Root="HKLM" Key="SOFTWARE\Microsoft\VisualStudio\11.0\Setup\Microsoft Visual Studio Premium 2012" Name="InstallSuccess" Type="raw" />
       <?elseif "$(var.VSTargetVersion)" = "12.0" ?>
-        <RegistrySearch Id="PremiumInstallRegSearch" Root="HKLM" Key="SOFTWARE\Microsoft\VisualStudio\12.0\Setup\Microsoft Visual Studio Premium 2013 RC" Name="InstallSuccess" Type="raw" />
+        <RegistrySearch Id="PremiumInstallRegSearch" Root="HKLM" Key="SOFTWARE\Microsoft\VisualStudio\12.0\Setup\Microsoft Visual Studio Premium 2013" Name="InstallSuccess" Type="raw" />
       <?endif ?>
     </Property>
 
@@ -56,7 +56,7 @@
       <?if "$(var.VSTargetVersion)" = "11.0" ?>
         <RegistrySearch Id="UltimateInstallRegSearch" Root="HKLM" Key="SOFTWARE\Microsoft\VisualStudio\11.0\Setup\Microsoft Visual Studio Ultimate 2012" Name="InstallSuccess" Type="raw" />
       <?elseif "$(var.VSTargetVersion)" = "12.0" ?>
-        <RegistrySearch Id="UltimateInstallRegSearch" Root="HKLM" Key="SOFTWARE\Microsoft\VisualStudio\12.0\Setup\Microsoft Visual Studio Ultimate 2013 RC" Name="InstallSuccess" Type="raw" />
+        <RegistrySearch Id="UltimateInstallRegSearch" Root="HKLM" Key="SOFTWARE\Microsoft\VisualStudio\12.0\Setup\Microsoft Visual Studio Ultimate 2013" Name="InstallSuccess" Type="raw" />
       <?endif ?>
     </Property>
 
@@ -112,6 +112,12 @@
         <Merge Id="NodejsTools" Language="1033" SourceFile="$(var.TargetDir)NodejsTools.msm" DiskId="1" />
         <Merge Id="NodejsProfiling" Language="1033" SourceFile="$(var.TargetDir)NodejsProfiling.msm" DiskId="1" />
 
+        <Component Id="Comp_InstallLocation" Guid="$(var.Comp_InstallLocationGuid)">
+          <RegistryKey Root="HKMU" Key="Software\Microsoft\NodejsTools\$(var.VSTargetVersion)">
+            <RegistryValue Type="string" Name="InstallDir" Value="[INSTALLLOCATION]" KeyPath="yes"/>
+          </RegistryKey>
+        </Component>
+
         <Component Id="Comp_NjsProgRegistration" DiskId="1" Guid="$(var.Comp_NjsProjRegistrationGuid)">
           <RegistryValue Root='HKCR' Key='.njsproj' Type='string' Name='PerceivedType' Value='text' />
           <RegistryValue Root='HKCR' Key='VisualStudio.Launcher.njsproj.$(var.VSTargetVersion)\DefaultIcon' Type='string' Value='[INSTALLLOCATION]\NodejsProject.ico' />
@@ -134,7 +140,8 @@
       <ComponentRef Id="Comp_InstallDirItems" Primary="yes" />
       <ComponentRef Id="AllUsers_Comp_InstallDirItems" Primary="yes" />
       <ComponentRef Id="Comp_NjsProgRegistration" Primary="yes" />
-      
+      <ComponentRef Id="Comp_InstallLocation" Primary="yes" />
+
       <MergeRef Id="NodejsTools"/>
       <MergeRef Id="InteractiveWindow"/>
       <MergeRef Id="NodejsProfiling" />

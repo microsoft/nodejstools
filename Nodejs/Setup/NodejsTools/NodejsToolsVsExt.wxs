@@ -55,6 +55,9 @@
             <Component Id="cmp05C8461645AC4E30883B5F6FC70C2F9B" Directory="INSTALLLOCATION" Guid="{B87AE937-DA4A-4599-B2E9-B9EE139293D1}">
               <File Id="filB3AE8C142D5449D0A2CB178BD4C5EF1F" KeyPath="yes" Source="$(var.BinariesDir)\nodejsref.js" />
             </Component>
+            <Component Id="cmp3939064E04124AF7B8F790B3D2EAEFE7" Directory="INSTALLLOCATION" Guid="{8C7344A9-E311-4AF7-9E7F-B6232FD2FA29}">
+              <File Id="fil3B2605EA0CF2447BB2857277D59C650F" KeyPath="yes" Source="$(var.BinariesDir)\NoSurveyNewsFeed.html" />
+            </Component>
             <Component Id="cmpAzureExpressApp.zip" Directory="DIR_ProjectTemplates_4DCCAA275A2C4923918F2CBC07199083" Guid="{D4213A93-048A-4A0C-BFE2-6ABC6D42644A}">
               <File Id="filAzureExpressApp.zip" KeyPath="yes" Source="$(var.BinariesDir)\ProjectTemplates\JavaScript\AzureExpressApp.zip" />
             </Component>

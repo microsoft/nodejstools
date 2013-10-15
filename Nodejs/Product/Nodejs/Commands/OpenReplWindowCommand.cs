@@ -13,16 +13,16 @@
  * ***************************************************************************/
 
 using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+using Microsoft.VisualStudioTools;
 
-namespace Microsoft.NodejsTools {
-    class PkgCmdId {
-        public const int cmdidReplWindow                    = 0x201;
-        public const int cmdidOpenRemoteDebugProxyFolder    = 0x202;
-        public const int cmdidSetAsNodejsStartupFile        = 0x203;
-        public const int cmdidSurveyNews                    = 0x204;
+namespace Microsoft.NodejsTools.Commands {
+    internal sealed class OpenReplWindowCommand : Command {
+        public override void DoCommand(object sender, EventArgs args) {
+            NodejsPackage.Instance.OpenReplWindow();
+        }
+
+        public override int CommandId {
+            get { return (int)PkgCmdId.cmdidReplWindow; }
+        }
     }
 }

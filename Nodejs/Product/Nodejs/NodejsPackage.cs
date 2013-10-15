@@ -13,15 +13,20 @@
  * ***************************************************************************/
 
 using System;
+using System.Collections.Generic;
 using System.ComponentModel.Design;
 using System.Diagnostics;
 using System.Globalization;
 using System.IO;
 using System.Reflection;
 using System.Runtime.InteropServices;
+using System.Threading;
+using System.Web.Script.Serialization;
 using System.Windows.Forms;
+using Microsoft.NodejsTools.Commands;
 using Microsoft.NodejsTools.Debugger.DebugEngine;
 using Microsoft.NodejsTools.Debugger.Remote;
+using Microsoft.NodejsTools.Options;
 using Microsoft.NodejsTools.Project;
 using Microsoft.NodejsTools.Repl;
 using Microsoft.VisualStudio;
@@ -50,6 +55,7 @@ namespace Microsoft.NodejsTools {
     // in the Help/About dialog of Visual Studio.
     [InstalledProductRegistration("#110", "#112", "1.0", IconResourceID = 400)]
     [Guid(GuidList.guidNodePkgString)]
+    [ProvideOptionPage(typeof(NodejsGeneralOptionsPage), "Node.js Tools", "General", 114, 115, true)]
     [ProvideDebugEngine("Node.js Debugging", typeof(AD7ProgramProvider), typeof(AD7Engine), AD7Engine.DebugEngineId)]
     [ProvideDebugLanguage(NodejsConstants.JavaScript, "{65791609-BA29-49CF-A214-DBFF8AEC3BC2}", NodeExpressionEvaluatorGuid, AD7Engine.DebugEngineId)]
     [WebSiteProject("JavaScript", "JavaScript")]
@@ -160,6 +166,8 @@ namespace Microsoft.NodejsTools {
         internal const string NodeJsFileType = ".njs";
         internal static readonly Guid _jsLangSvcGuid = new Guid("{71d61d27-9011-4b17-9469-d20f798fb5c0}");
         internal static NodejsPackage Instance;
+        private string _surveyNewsUrl;
+        private object _surveyNewsUrlLock = new object();
 
         /// <summary>
         /// Default constructor of the package.
@@ -172,6 +180,12 @@ namespace Microsoft.NodejsTools {
             Debug.WriteLine(string.Format(CultureInfo.CurrentCulture, "Entering constructor for: {0}", this.ToString()));
             Debug.Assert(Instance == null, "NodejsPackage created multiple times");
             Instance = this;
+        }
+
+        public NodejsGeneralOptionsPage GeneralOptionsPage {
+            get {
+                return (NodejsGeneralOptionsPage)GetDialogPage(typeof(NodejsGeneralOptionsPage));
+            }
         }
 
         /////////////////////////////////////////////////////////////////////////////
@@ -190,17 +204,15 @@ namespace Microsoft.NodejsTools {
             RegisterEditorFactory(new NodejsEditorFactory(this));
             RegisterEditorFactory(new NodejsEditorFactoryPromptForEncoding(this));
 
-            OleMenuCommandService mcs = GetService(typeof(IMenuCommandService)) as OleMenuCommandService;
-            CommandID replWindowCmdId = new CommandID(GuidList.guidNodeCmdSet, PkgCmdId.cmdidReplWindow);
-            MenuCommand replWindowCmd = new MenuCommand(OpenReplWindow, replWindowCmdId);
-            mcs.AddCommand(replWindowCmd);
-
-            CommandID openRemoteDebugProxyFolderCmdId = new CommandID(GuidList.guidNodeCmdSet, PkgCmdId.cmdidOpenRemoteDebugProxyFolder);
-            MenuCommand openRemoteDebugProxyFolderCmd = new MenuCommand(OpenRemoteDebugProxyFolder, openRemoteDebugProxyFolderCmdId);
-            mcs.AddCommand(openRemoteDebugProxyFolderCmd);
+            // Add our command handlers for menu (commands must exist in the .vsct file)
+            RegisterCommands(new Command[] { 
+                new OpenReplWindowCommand(),
+                new OpenRemoteDebugProxyFolderCommand(),
+                new SurveyNewsCommand(),
+            }, GuidList.guidNodeCmdSet);
         }
 
-        private void OpenReplWindow(object sender, EventArgs args) {
+        internal void OpenReplWindow() {
             var compModel = ComponentModel;
             var provider = compModel.GetService<IReplWindowProvider>();
 
@@ -235,15 +247,6 @@ namespace Microsoft.NodejsTools {
                 directory = Path.GetDirectoryName(fileName);
             }
             return true;
-        }
-
-        private void OpenRemoteDebugProxyFolder(object sender, EventArgs args) {
-            // Open explorer to folder
-            if (!File.Exists(RemoteDebugProxyFolder)) {
-                MessageBox.Show(String.Format("Remote Debug Proxy \"{0}\" does not exist.", RemoteDebugProxyFolder), "Node.js Tools for Visual Studio");
-            } else {
-                Process.Start("explorer", string.Format("/e,/select,{0}", RemoteDebugProxyFolder));
-            }
         }
 
         private static string remoteDebugProxyFolder = null;
@@ -368,6 +371,140 @@ namespace Microsoft.NodejsTools {
                 if (pDirName != IntPtr.Zero) {
                     Marshal.FreeCoTaskMem(pDirName);
                 }
+            }
+        }
+
+        private void BrowseSurveyNewsOnIdle(object sender, ComponentManagerEventArgs e) {
+            this.OnIdle -= BrowseSurveyNewsOnIdle;
+
+            lock (_surveyNewsUrlLock) {
+                if (!string.IsNullOrEmpty(_surveyNewsUrl)) {
+                    OpenVsWebBrowser(_surveyNewsUrl);
+                    _surveyNewsUrl = null;
+                }
+            }
+        }
+
+        internal void BrowseSurveyNews(string url) {
+            lock (_surveyNewsUrlLock) {
+                _surveyNewsUrl = url;
+            }
+
+            this.OnIdle += BrowseSurveyNewsOnIdle;
+        }
+
+        private void CheckSurveyNewsThread(Uri url, bool warnIfNoneAvailable) {
+            // We can't use a simple WebRequest, because that doesn't have access
+            // to the browser's session cookies.  Cookies are used to remember
+            // which survey/news item the user has submitted/accepted.  The server 
+            // checks the cookies and returns the survey/news urls that are 
+            // currently available (availability is determined via the survey/news 
+            // item start and end date).
+            var th = new Thread(() => {
+                var br = new WebBrowser();
+                br.Tag = warnIfNoneAvailable;
+                br.DocumentCompleted += OnSurveyNewsDocumentCompleted;
+                br.Navigate(url);
+                Application.Run();
+            });
+            th.SetApartmentState(ApartmentState.STA);
+            th.Start();
+        }
+
+        private void OnSurveyNewsDocumentCompleted(object sender, WebBrowserDocumentCompletedEventArgs e) {
+            var br = (WebBrowser)sender;
+            var warnIfNoneAvailable = (bool)br.Tag;
+            if (br.Url == e.Url) {
+                List<string> available = null;
+
+                string json = br.DocumentText;
+                if (!string.IsNullOrEmpty(json)) {
+                    int startIndex = json.IndexOf("<PRE>");
+                    if (startIndex > 0) {
+                        int endIndex = json.IndexOf("</PRE>", startIndex);
+                        if (endIndex > 0) {
+                            json = json.Substring(startIndex + 5, endIndex - startIndex - 5);
+
+                            try {
+                                // Example JSON data returned by the server:
+                                //{
+                                // "cannotvoteagain": [], 
+                                // "notvoted": [
+                                //  "http://ptvs.azurewebsites.net/news/141", 
+                                //  "http://ptvs.azurewebsites.net/news/41", 
+                                // ], 
+                                // "canvoteagain": [
+                                //  "http://ptvs.azurewebsites.net/news/51"
+                                // ]
+                                //}
+
+                                // Description of each list:
+                                // voted: cookie found
+                                // notvoted: cookie not found
+                                // canvoteagain: cookie found, but multiple votes are allowed
+                                JavaScriptSerializer serializer = new JavaScriptSerializer();
+                                var results = serializer.Deserialize<Dictionary<string, List<string>>>(json);
+                                available = results["notvoted"];
+                            } catch (ArgumentException) {
+                            } catch (InvalidOperationException) {
+                            }
+                        }
+                    }
+                }
+
+                if (available != null && available.Count > 0) {
+                    BrowseSurveyNews(available[0]);
+                } else if (warnIfNoneAvailable) {
+                    if (available != null) {
+                        BrowseSurveyNews(GeneralOptionsPage.SurveyNewsIndexUrl);
+                    } else {
+                        BrowseSurveyNews(NodejsToolsInstallPath.GetFile("NoSurveyNewsFeed.html"));
+                    }
+                }
+
+                Application.ExitThread();
+            }
+        }
+
+        internal void CheckSurveyNews(bool forceCheckAndWarnIfNoneAvailable) {
+            bool shouldQueryServer = false;
+            if (forceCheckAndWarnIfNoneAvailable) {
+                shouldQueryServer = true;
+            } else {
+                shouldQueryServer = true;
+                var options = GeneralOptionsPage;
+                // Ensure that we don't prompt the user on their very first project creation.
+                // Delay by 3 days by pretending we checked 4 days ago (the default of check
+                // once a week ensures we'll check again in 3 days).
+                if (options.SurveyNewsLastCheck == DateTime.MinValue) {
+                    options.SurveyNewsLastCheck = DateTime.Now - TimeSpan.FromDays(4);
+                    options.SaveSettingsToStorage();
+                }
+
+                var elapsedTime = DateTime.Now - options.SurveyNewsLastCheck;
+                switch (options.SurveyNewsCheck) {
+                    case SurveyNewsPolicy.Disabled:
+                        break;
+                    case SurveyNewsPolicy.CheckOnceDay:
+                        shouldQueryServer = elapsedTime.TotalDays >= 1;
+                        break;
+                    case SurveyNewsPolicy.CheckOnceWeek:
+                        shouldQueryServer = elapsedTime.TotalDays >= 7;
+                        break;
+                    case SurveyNewsPolicy.CheckOnceMonth:
+                        shouldQueryServer = elapsedTime.TotalDays >= 30;
+                        break;
+                    default:
+                        Debug.Assert(false, String.Format("Unexpected SurveyNewsPolicy: {0}.", options.SurveyNewsCheck));
+                        break;
+                }
+            }
+
+            if (shouldQueryServer) {
+                var options = GeneralOptionsPage;
+                options.SurveyNewsLastCheck = DateTime.Now;
+                options.SaveSettingsToStorage();
+                CheckSurveyNewsThread(new Uri(options.SurveyNewsFeedUrl), forceCheckAndWarnIfNoneAvailable);
             }
         }
 
