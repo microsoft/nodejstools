@@ -179,6 +179,7 @@
     <Compile Include="Commands\OpenReplWindowCommand.cs" />
     <Compile Include="Commands\OpenRemoteDebugProxyFolderCommand.cs" />
     <Compile Include="Commands\SurveyNewsCommand.cs" />
+    <Compile Include="ClassifierMetadata.cs" />
     <Compile Include="CustomTrackingSpan.cs" />
     <Compile Include="EditFilter.cs" />
     <Compile Include="Intellisense\CompletionSource.cs" />
@@ -214,6 +215,7 @@
     <Compile Include="Repl\INodejsReplSite.cs" />
     <Compile Include="Repl\SaveReplCommand.cs" />
     <Compile Include="Repl\VsNodejsReplSite.cs" />
+    <Compile Include="SmartIndentProvider.cs" />
     <Compile Include="VsMenus.cs" />
     <Compile Include="AzureSolutionListener.cs" />
     <Compile Include="BaseNodeProjectFactory.cs" />

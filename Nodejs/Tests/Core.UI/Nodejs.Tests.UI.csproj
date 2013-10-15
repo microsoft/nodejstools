@@ -88,9 +88,11 @@
     <Reference Include="WindowsBase" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="SmartIndent.cs" />
     <Compile Include="BasicProjectTests.cs" />
     <Compile Include="DragDropCopyCutPaste.cs" />
     <Compile Include="NodejsProjectProcessor.cs" />
+    <Compile Include="NodejsProjectTest.cs" />
     <Compile Include="NodejsTestDefintions.cs" />
     <Compile Include="ProjectTests.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />

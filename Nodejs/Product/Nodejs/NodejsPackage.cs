@@ -294,7 +294,7 @@ namespace Microsoft.NodejsTools {
         public IContentType ContentType {
             get {
                 if (_contentType == null) {
-                    _contentType = ComponentModel.GetService<IContentTypeRegistryService>().GetContentType(NodejsConstants.JavaScript);
+                    _contentType = ComponentModel.GetService<IContentTypeRegistryService>().GetContentType(NodejsConstants.Nodejs);
                 }
                 return _contentType;
             }

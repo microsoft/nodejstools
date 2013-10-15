@@ -126,8 +126,9 @@ EndGlobal
 
         public void Dispose() {
             try {
-                System.IO.Directory.Delete(Path.GetDirectoryName(Filename), true);
-            } catch {
+                NativeMethods.RecursivelyDeleteDirectory(Path.GetDirectoryName(Filename));
+            } catch(Exception ex) {
+                Console.WriteLine("Failed to delete dir: {0}", ex);
             }
         }
 

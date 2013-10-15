@@ -26,8 +26,7 @@ using Microsoft.VisualStudio.Language.Intellisense;
 
 namespace Microsoft.Nodejs.Tests.UI {
     [TestClass]
-    public class RequireIntellisense : SharedProjectTest {
-        public static ProjectType NodejsProject = ProjectTypes.First(x => x.ProjectExtension == ".njsproj");
+    public class RequireIntellisense : NodejsProjectTest {
         public static ProjectDefinition BasicProject = RequireProject(
             Compile("server", ""),
             Compile("myapp"),
