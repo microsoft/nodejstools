@@ -82,6 +82,8 @@
     <Reference Include="WindowsBase" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="DragDropCopyCutPaste.cs" />
+    <Compile Include="ScriptProjectTests.cs" />
     <Compile Include="NewDragDropCopyCutPaste.cs" />
     <Compile Include="SourceControl.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />

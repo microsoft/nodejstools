@@ -160,15 +160,15 @@ namespace TestUtilities.UI {
             _solutionExplorer.AssertFileExists(Directory, AddSolutionToPath(path));
         }
 
-        internal void AssertFileDoesntExist(params string[] path) {
+        public void AssertFileDoesntExist(params string[] path) {
             _solutionExplorer.AssertFileDoesntExist(Directory, AddSolutionToPath(path));
         }
 
-        internal void AssertFolderExists(params string[] path) {
+        public void AssertFolderExists(params string[] path) {
             _solutionExplorer.AssertFolderExists(Directory, AddSolutionToPath(path));
         }
 
-        internal void AssertFolderDoesntExist(params string[] path) {
+        public void AssertFolderDoesntExist(params string[] path) {
             _solutionExplorer.AssertFolderDoesntExist(Directory, AddSolutionToPath(path));
         }
     }
