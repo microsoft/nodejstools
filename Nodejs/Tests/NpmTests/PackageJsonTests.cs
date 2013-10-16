@@ -17,13 +17,13 @@ namespace NpmTests
 }";
 
             var source = new MockPackageJsonSource( pkgJsonStr );
-            IPackageJson pkgJson = PackageJsonFactory.Create( source );
+            IPackageJson pkgJson = PackageJsonFactory.Create(source);
 
-            dynamic json = JsonConvert.DeserializeObject( pkgJsonStr );
+            dynamic json = JsonConvert.DeserializeObject(pkgJsonStr);
 
-            Assert.AreEqual( json.name, pkgJson.Name, "Mismatched package names." );
-            Assert.AreEqual( typeof( SemverVersion ), pkgJson.GetType(), "Mismatched types for package version." );
-            Assert.AreEqual( json.version, pkgJson.Version.ToString(), "Mismatched version strings." );
+            Assert.AreEqual(json.name, pkgJson.Name, "Mismatched package names.");
+            Assert.AreEqual(typeof(SemverVersion), pkgJson.GetType(), "Mismatched types for package version.");
+            Assert.AreEqual(json.version, pkgJson.Version.ToString(), "Mismatched version strings.");
         }
     }
 }

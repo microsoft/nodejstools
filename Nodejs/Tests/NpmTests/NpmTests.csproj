@@ -22,10 +22,10 @@
   </PropertyGroup>
   <ItemGroup>
     <Reference Include="Microsoft.CSharp" />
+    <Reference Include="Microsoft.VisualStudio.QualityTools.UnitTestFramework" />
     <Reference Include="Newtonsoft.Json, Version=4.5.0.0, Culture=neutral, PublicKeyToken=30ad4fe6b2a6aeed, processorArchitecture=MSIL">
       <HintPath>..\..\packages\Newtonsoft.Json.5.0.7\lib\net45\Newtonsoft.Json.dll</HintPath>
     </Reference>
-	<Reference Include="Microsoft.VisualStudio.QualityTools.UnitTestFramework" />
     <Reference Include="System" />
   </ItemGroup>
   <ItemGroup>
@@ -34,17 +34,13 @@
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\..\..\Common\Tests\Utilities\TestUtilities.csproj">
-      <Project>{d092d54e-ff29-4d32-9aee-4ef704c92f67}</Project>
-      <Name>TestUtilities</Name>
-    </ProjectReference>
-    <ProjectReference Include="..\..\Product\Npm\Npm.csproj">
-      <Project>{E5EF4B0A-AB41-4B98-8FA8-98D6348003A8}</Project>
-      <Name>Npm</Name>
-    </ProjectReference>
+    <None Include="packages.config" />
   </ItemGroup>
   <ItemGroup>
-    <None Include="packages.config" />
+    <ProjectReference Include="..\..\Product\Npm\Npm.csproj">
+      <Project>{e5ef4b0a-ab41-4b98-8fa8-98d6348003a8}</Project>
+      <Name>Npm</Name>
+    </ProjectReference>
   </ItemGroup>
   <Import Project="..\TestProjectAfter.settings" />
 </Project>
