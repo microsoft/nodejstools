@@ -957,6 +957,22 @@ namespace Microsoft.NodejsTools.Debugger.DebugEngine {
             }
         }
 
+        public static List<IVsDocumentPreviewer> GetDefaultBrowsers() {
+            List<IVsDocumentPreviewer> browserList = new List<IVsDocumentPreviewer>();
+            IVsUIShellOpenDocument3 doc3 = (IVsUIShellOpenDocument3)NodejsPackage.Instance.GetService(typeof(SVsUIShellOpenDocument));
+            IVsEnumDocumentPreviewers previewersEnum = doc3.DocumentPreviewersEnum;
+
+            IVsDocumentPreviewer[] rgPreviewers = new IVsDocumentPreviewer[1];
+            uint celtFetched;
+            while (ErrorHandler.Succeeded(previewersEnum.Next(1, rgPreviewers, out celtFetched)) && celtFetched == 1) {
+                if (rgPreviewers[0].IsDefault && !string.IsNullOrEmpty(rgPreviewers[0].Path)) {
+                    browserList.Add(rgPreviewers[0]);
+                }
+            }
+            return browserList;
+        }
+
+
         private void OnEntryPointHit(object sender, ThreadEventArgs e) {
             if (_webBrowserUrl != null) {
                 Debug.Assert(_webBrowserPort != null);
@@ -964,29 +980,42 @@ namespace Microsoft.NodejsTools.Debugger.DebugEngine {
                     _webBrowserPort.Value,
                     shortCircuitPredicate: () => !_processLoaded,
                     action: () => {
-                        var vsDebugger = (IVsDebugger2)ServiceProvider.GlobalProvider.GetService(typeof(SVsShellDebugger));;
-
-                        VsDebugTargetInfo2 info = new VsDebugTargetInfo2();
-                        var infoSize = Marshal.SizeOf(info);
-                        info.cbSize = (uint)infoSize;
-                        info.bstrExe = _webBrowserUrl;
-                        info.dlo = (uint)_DEBUG_LAUNCH_OPERATION3.DLO_LaunchBrowser;
-                        info.guidLaunchDebugEngine = DebugEngineGuid;
-                        IntPtr infoPtr = Marshal.AllocCoTaskMem(infoSize);
-                        Marshal.StructureToPtr(info, infoPtr, false);
-
-                        try {
-                            vsDebugger.LaunchDebugTargets2(1, infoPtr);
-                        } finally {
-                            if (infoPtr != IntPtr.Zero) {
-                                Marshal.FreeCoTaskMem(infoPtr);
-                            }
-                        }
+                        LaunchBrowserDebugger();
                     }
                 );
             }
 
             Send(new AD7EntryPointEvent(), AD7EntryPointEvent.IID, _threads[e.Thread]);
+        }
+
+        private void LaunchBrowserDebugger() {
+            var vsDebugger = (IVsDebugger2)ServiceProvider.GlobalProvider.GetService(typeof(SVsShellDebugger));
+
+            VsDebugTargetInfo2 info = new VsDebugTargetInfo2();
+            var infoSize = Marshal.SizeOf(info);
+            info.cbSize = (uint)infoSize;
+            info.bstrExe = _webBrowserUrl;
+            info.dlo = (uint)_DEBUG_LAUNCH_OPERATION3.DLO_LaunchBrowser;
+            var defaultBrowsers = GetDefaultBrowsers();
+            if (defaultBrowsers.Count != 1 || defaultBrowsers[0].DisplayName != "Internet Explorer") {
+                // if we use UseDefaultBrowser we lose the nice control & debugging of IE, so
+                // instead launch w/ no debugging when the user has selected a browser other than IE.
+                info.LaunchFlags |= (uint)__VSDBGLAUNCHFLAGS.DBGLAUNCH_StopDebuggingOnEnd  | 
+                                    (uint)__VSDBGLAUNCHFLAGS4.DBGLAUNCH_UseDefaultBrowser |
+                                    (uint)__VSDBGLAUNCHFLAGS.DBGLAUNCH_NoDebug;
+            }
+
+            info.guidLaunchDebugEngine = DebugEngineGuid;
+            IntPtr infoPtr = Marshal.AllocCoTaskMem(infoSize);
+            Marshal.StructureToPtr(info, infoPtr, false);
+
+            try {
+                vsDebugger.LaunchDebugTargets2(1, infoPtr);
+            } finally {
+                if (infoPtr != IntPtr.Zero) {
+                    Marshal.FreeCoTaskMem(infoPtr);
+                }
+            }
         }
 
         private void OnStepComplete(object sender, ThreadEventArgs e) {

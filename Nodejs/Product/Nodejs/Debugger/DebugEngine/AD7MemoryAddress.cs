@@ -162,11 +162,15 @@ namespace Microsoft.NodejsTools.Debugger.DebugEngine {
                 pinfo[0].dwFields |= enum_CONTEXT_INFO_FIELDS.CIF_ADDRESS;
             }
 
+            if ((dwFields & enum_CONTEXT_INFO_FIELDS.CIF_FUNCTION) != 0 && _frame != null) {
+                pinfo[0].bstrFunction = _frame.FunctionName;
+                pinfo[0].dwFields |= enum_CONTEXT_INFO_FIELDS.CIF_FUNCTION;
+            }
+
             // Fields not supported by the sample
             if ((dwFields & enum_CONTEXT_INFO_FIELDS.CIF_ADDRESSOFFSET) != 0) { }
             if ((dwFields & enum_CONTEXT_INFO_FIELDS.CIF_ADDRESSABSOLUTE) != 0) { }
             if ((dwFields & enum_CONTEXT_INFO_FIELDS.CIF_MODULEURL) != 0) { }
-            if ((dwFields & enum_CONTEXT_INFO_FIELDS.CIF_FUNCTION) != 0) { }
             if ((dwFields & enum_CONTEXT_INFO_FIELDS.CIF_FUNCTIONOFFSET) != 0) { }
 
             return VSConstants.S_OK;
