@@ -432,8 +432,8 @@ namespace Microsoft.VisualStudioTools.Project
             string filename = Path.GetFileName(path);
             if (path.Substring(0, path.Length - filename.Length).IndexOf('.') != -1) {
                 // possibly non-canonical form...
-            return CommonUtils.GetAbsoluteFilePath(this.ProjectMgr.ProjectHome, path);
-        }
+                return CommonUtils.GetAbsoluteFilePath(this.ProjectMgr.ProjectHome, path);
+            }
 
             // fast path, we know ProjectHome is canonical, and with no dots
             // in the directory name, so is path.
@@ -921,10 +921,13 @@ namespace Microsoft.VisualStudioTools.Project
 
             // Ask Document tracker listeners if we can remove the item.
             string[] filesToBeDeleted = new string[1] { documentToRemove };
-            VSQUERYREMOVEFILEFLAGS[] queryRemoveFlags = this.GetQueryRemoveFileFlags(filesToBeDeleted);
-            if (!this.ProjectMgr.Tracker.CanRemoveItems(filesToBeDeleted, queryRemoveFlags))
+            if (!String.IsNullOrWhiteSpace(documentToRemove)) 
             {
-                return;
+                VSQUERYREMOVEFILEFLAGS[] queryRemoveFlags = this.GetQueryRemoveFileFlags(filesToBeDeleted);
+                if (!this.ProjectMgr.Tracker.CanRemoveItems(filesToBeDeleted, queryRemoveFlags))
+                {
+                    return;
+                }
             }
 
             // Close the document if it has a manager.
@@ -992,10 +995,12 @@ namespace Microsoft.VisualStudioTools.Project
         }
 
         protected virtual void RaiseOnItemRemoved(string documentToRemove, string[] filesToBeDeleted) {
-            // Notify document tracker listeners that we have removed the item.
-            VSREMOVEFILEFLAGS[] removeFlags = this.GetRemoveFileFlags(filesToBeDeleted);
-            Debug.Assert(removeFlags != null, "At least an empty array should be returned for the GetRemoveFileFlags");
-            this.ProjectMgr.Tracker.OnItemRemoved(documentToRemove, removeFlags[0]);
+            if (!String.IsNullOrWhiteSpace(documentToRemove)) {
+                // Notify document tracker listeners that we have removed the item.
+                VSREMOVEFILEFLAGS[] removeFlags = this.GetRemoveFileFlags(filesToBeDeleted);
+                Debug.Assert(removeFlags != null, "At least an empty array should be returned for the GetRemoveFileFlags");
+                this.ProjectMgr.Tracker.OnItemRemoved(documentToRemove, removeFlags[0]);
+            }
         }
 
         internal void RemoveNonDocument(bool removeFromStorage)
@@ -1766,14 +1771,14 @@ namespace Microsoft.VisualStudioTools.Project
             if (windows == null)
             {
                 return false;
-            } 
+            }
 
             uint state;
             if (ErrorHandler.Succeeded(windows.GetItemState(ProjectMgr.GetOuterInterface<IVsUIHierarchy>(),
                 ID,
                 (uint)__VSHIERARCHYITEMSTATE.HIS_Expanded,
                 out state)))
-                {
+            {
                 return state != 0;
             }
             return false;
@@ -1911,7 +1916,7 @@ namespace Microsoft.VisualStudioTools.Project
 
                 if (String.Equals(filename, name, StringComparison.OrdinalIgnoreCase)) {
                     return child;
-        }
+                }
             }
             return null;
         }
@@ -1928,10 +1933,10 @@ namespace Microsoft.VisualStudioTools.Project
                 T nodeAsT = n as T;
                 if (nodeAsT != null) {
                     nodes.Add(nodeAsT);
-        }
+                }
 
                 n.FindNodesOfType<T>(nodes);
-        }
+            }
         }
 
         /// <summary>
@@ -1946,12 +1951,12 @@ namespace Microsoft.VisualStudioTools.Project
                 T nodeAsT = n as T;
                 if (nodeAsT != null) {
                     yield return nodeAsT;
-        }
+                }
 
                 foreach (var node in n.EnumNodesOfType<T>()) {
                     yield return node;
+                }
             }
-        }
         }
 
         #endregion

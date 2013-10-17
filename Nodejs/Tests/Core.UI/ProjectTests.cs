@@ -168,11 +168,12 @@ http.createServer(function (req, res) {
 
             openFile.MoveCaret(6, 1);
             Keyboard.Type("process.");
-            var session = openFile.WaitForSession<ICompletionSession>();
+            using (var session = openFile.WaitForSession<ICompletionSession>()) {
 
-            var completions = session.CompletionSets.First().Completions.Select(x => x.InsertionText);
-            Assert.IsTrue(completions.Contains("abort"));
-            Assert.IsTrue(completions.Contains("chdir"));
+                var completions = session.Session.CompletionSets.First().Completions.Select(x => x.InsertionText);
+                Assert.IsTrue(completions.Contains("abort"));
+                Assert.IsTrue(completions.Contains("chdir"));
+            }
         }
 
         [TestMethod, Priority(0), TestCategory("Core")]
@@ -235,15 +236,16 @@ http.createServer(function (req, res) {
                 openFile.Invoke(() => openFile.TextView.Caret.EnsureVisible());
                 openFile.SetFocus();
                 Keyboard.Type(testCase.Type);
-                var session = openFile.WaitForSession<ICompletionSession>();
-                var completions = session.CompletionSets.First().Completions.Select(x => x.InsertionText);
-                Assert.IsTrue(completions.Contains(testCase.Expected));
-                Keyboard.Type(System.Windows.Input.Key.Escape);
-                for (int i = 0; i < testCase.Type.Length; i++) {
-                    Keyboard.Type(System.Windows.Input.Key.Back);
-                }
+                using (var session = openFile.WaitForSession<ICompletionSession>()) {
+                    var completions = session.Session.CompletionSets.First().Completions.Select(x => x.InsertionText);
+                    Assert.IsTrue(completions.Contains(testCase.Expected));
+                    Keyboard.Type(System.Windows.Input.Key.Escape);
+                    for (int i = 0; i < testCase.Type.Length; i++) {
+                        Keyboard.Type(System.Windows.Input.Key.Back);
+                    }
 
-                openFile.WaitForText(text);
+                    openFile.WaitForText(text);
+                }
             }
         }
 
@@ -296,11 +298,12 @@ http.createServer(function (req, res) {
 
             openFile.MoveCaret(6, 1);
             Keyboard.Type("process.");
-            var session = openFile.WaitForSession<ICompletionSession>();
+            using (var session = openFile.WaitForSession<ICompletionSession>()) {
 
-            var completions = session.CompletionSets.First().Completions.Select(x => x.InsertionText);
-            Assert.IsTrue(completions.Contains("abort"));
-            Assert.IsTrue(completions.Contains("chdir"));
+                var completions = session.Session.CompletionSets.First().Completions.Select(x => x.InsertionText);
+                Assert.IsTrue(completions.Contains("abort"));
+                Assert.IsTrue(completions.Contains("chdir"));
+            }
         }
         
         [TestMethod, Priority(0), TestCategory("Core")]
@@ -311,11 +314,12 @@ http.createServer(function (req, res) {
 
             openFile.MoveCaret(6, 1);
             Keyboard.Type("mymod.");
-            var session = openFile.WaitForSession<ICompletionSession>();
+            using (var session = openFile.WaitForSession<ICompletionSession>()) {
 
-            var completions = session.CompletionSets.First().Completions.Select(x => x.InsertionText);
-            Assert.IsTrue(completions.Contains("area"));
-            Assert.IsTrue(completions.Contains("circumference"));
+                var completions = session.Session.CompletionSets.First().Completions.Select(x => x.InsertionText);
+                Assert.IsTrue(completions.Contains("area"));
+                Assert.IsTrue(completions.Contains("circumference"));
+            }
         }
 
         [TestMethod, Priority(0), TestCategory("Core")]
