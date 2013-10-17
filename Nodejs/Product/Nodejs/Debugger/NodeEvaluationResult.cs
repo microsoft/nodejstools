@@ -21,7 +21,8 @@ namespace Microsoft.NodejsTools.Debugger {
     /// Represents the result of an evaluation of an expression against a given stack frame.
     /// </summary>
     class NodeEvaluationResult {
-        private readonly string _expression, _objRepr, _typeName, _exceptionText, _childText, _hexRepr;
+        private readonly string _expression, _typeName, _exceptionText, _childText;
+        private string _objRepr, _hexRepr;
         private readonly NodeStackFrame _frame;
         private readonly NodeDebugger _process;
         private readonly bool _isExpandable, _childIsIndex, _childIsEnumerate;
@@ -103,6 +104,9 @@ namespace Microsoft.NodejsTools.Debugger {
             get {
                 return _objRepr;
             }
+            set {
+                _objRepr = value;
+            }
         }
 
         /// <summary>
@@ -111,6 +115,9 @@ namespace Microsoft.NodejsTools.Debugger {
         public string HexRepr {
             get {
                 return _hexRepr;
+            }
+            set {
+                _hexRepr = value;
             }
         }
 

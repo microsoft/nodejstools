@@ -262,6 +262,20 @@ namespace DebuggerTests {
             );
         }
 
+        /// <summary>
+        /// http://nodejstools.codeplex.com/workitem/13
+        /// </summary>
+        [TestMethod, Priority(0)]
+        public void SpecialNumberLocalsTest() {
+            LocalsTest(
+                "SpecialNumberLocalsTest.js",
+                7,
+                expectedLocals: new string[] { "posInf", "negInf", "nan", "nul" },
+                expectedValues: new string[] { "Infinity", "-Infinity", "NaN", "null" },
+                expectedHexValues: new string[] { "Infinity", "-Infinity", "NaN", "null" }
+            );
+        }
+
         [TestMethod, Priority(0)]
         public void GlobalsTest() {
             LocalsTest(

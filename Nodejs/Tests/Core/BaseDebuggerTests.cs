@@ -175,7 +175,9 @@ namespace DebuggerTests {
             int breakpoint,
             int frameIndex = 0,
             string[] expectedParams = null,
-            string[] expectedLocals = null
+            string[] expectedLocals = null,
+            string[] expectedValues = null,
+            string[] expectedHexValues = null
         ) {
             TestDebuggerSteps(
                 filename,
@@ -192,6 +194,41 @@ namespace DebuggerTests {
                             new HashSet<string>(expectedLocals ?? new string[] { }),
                             frame.Locals.Select(x => x.Expression)
                         );
+
+                        if (expectedValues != null || expectedHexValues != null) {
+                            foreach (var evaluationResult in frame.Parameters.Concat(frame.Locals)) {
+                                int i = 0;
+                                var match = -1;
+                                NodeEvaluationResult matchEvaluationResult = null;
+                                if (expectedParams != null) {
+                                    foreach (var expectedParam in expectedParams) {
+                                        if (evaluationResult.Expression == expectedParam) {
+                                            match = i;
+                                            matchEvaluationResult = evaluationResult;
+                                            break;
+                                        }
+                                        ++i;
+                                    }
+                                }
+                                if (match == -1 && expectedLocals != null) {
+                                    foreach (var expectedLocal in expectedLocals) {
+                                        if (evaluationResult.Expression == expectedLocal) {
+                                            matchEvaluationResult = evaluationResult;
+                                            match = i;
+                                            break;
+                                        }
+                                        ++i;
+                                    }
+                                }
+                                Assert.IsTrue(match > -1);
+                                if (expectedValues != null) {
+                                    Assert.AreEqual(expectedValues[match], evaluationResult.StringRepr);
+                                }
+                                if (expectedHexValues != null) {
+                                    Assert.AreEqual(expectedHexValues[match], evaluationResult.HexRepr);
+                                }
+                            }
+                        }
                     }),
                     new TestStep(action: TestAction.ResumeProcess, expectedExitCode: 0),
                 }
