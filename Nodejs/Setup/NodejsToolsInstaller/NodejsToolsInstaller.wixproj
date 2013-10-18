@@ -15,8 +15,11 @@
     <DefineConstants>
       NodejsToolsDir=$(BuildRoot)\Nodejs\Product\Nodejs;
       MsiVersion=$(WixVersion);
-      VSTargetVersion=$(VSTarget);
-      CustomBuildIdentifier=$(CustomBuildIdentifier);
+      VSTargetVersion=$(VSTarget)
+    </DefineConstants>
+    <DefineConstants Condition="'$(CustomBuildIdentifier)' != ''">
+      $(DefineConstants);
+      CustomBuildIdentifier=$(CustomBuildIdentifier)
     </DefineConstants>
   </PropertyGroup>
   <PropertyGroup>
