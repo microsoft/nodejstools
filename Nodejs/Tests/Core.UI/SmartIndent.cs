@@ -25,19 +25,6 @@ namespace Microsoft.Nodejs.Tests.UI {
     public class SmartIndent : NodejsProjectTest {
         public static ProjectDefinition BasicProject = new ProjectDefinition("AutoIndent", NodejsProject, Compile("server", ""));
 
-        [TestCleanup]
-        public void MyTestCleanup() {
-            for (int i = 0; i < 20; i++) {
-                try {
-                    VsIdeTestHostContext.Dte.Solution.Close(false);
-                    break;
-                } catch {
-                    VsIdeTestHostContext.Dte.Documents.CloseAll(EnvDTE.vsSaveChanges.vsSaveChangesNo);
-                    System.Threading.Thread.Sleep(500);
-                }
-            }
-        }
-
         [ClassInitialize]
         public static void DoDeployment(TestContext context) {
             AssertListener.Initialize();

@@ -148,6 +148,7 @@ namespace TestUtilities.UI {
             if (!_disposed) {
                 if (disposing) {
                     _solution.Dispose();
+                    _app.Dispose();
                 }
 
                 _disposed = true;
@@ -170,6 +171,10 @@ namespace TestUtilities.UI {
 
         public void AssertFolderDoesntExist(params string[] path) {
             _solutionExplorer.AssertFolderDoesntExist(Directory, AddSolutionToPath(path));
+        }
+
+        public void AssertFileExistsWithContent(string content, params string[] path) {
+            _solutionExplorer.AssertFileExistsWithContent(Directory, content, AddSolutionToPath(path));
         }
     }
 }

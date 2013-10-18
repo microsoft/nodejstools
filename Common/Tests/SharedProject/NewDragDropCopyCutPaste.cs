@@ -54,21 +54,14 @@ namespace Microsoft.VisualStudioTools.SharedProjectTests {
                     )
                 );
 
-                using (var solution = testDef.Generate()) {
-                    var app = new VisualStudioApp(VsIdeTestHostContext.Dte);
-                    app.OpenProject(solution.Filename);
-
-                    var window = app.OpenSolutionExplorer();
-
-                    SelectSolutionNode(window, "Solution 'MoveExcludedFolder' (1 project)");
-
+                using (var solution = testDef.Generate().ToVs()) {
                     mover(
-                        window.FindItem("Solution 'MoveExcludedFolder' (1 project)", "MoveExcludedFolder", "Baz"),
-                        window.FindItem("Solution 'MoveExcludedFolder' (1 project)", "MoveExcludedFolder", "Foo")
+                        solution.FindItem("Solution 'MoveExcludedFolder' (1 project)", "MoveExcludedFolder", "Baz"),
+                        solution.FindItem("Solution 'MoveExcludedFolder' (1 project)", "MoveExcludedFolder", "Foo")
                     );
 
-                    window.AssertFolderDoesntExist(Path.GetDirectoryName(solution.Filename), "Solution 'MoveExcludedFolder' (1 project)", "MoveExcludedFolder", "Foo");
-                    window.AssertFolderExists(Path.GetDirectoryName(solution.Filename), "Solution 'MoveExcludedFolder' (1 project)", "MoveExcludedFolder", "Baz", "Foo");
+                    solution.AssertFolderDoesntExist("MoveExcludedFolder", "Foo");
+                    solution.AssertFolderExists("MoveExcludedFolder", "Baz", "Foo");
                 }
             }
         }
@@ -98,21 +91,14 @@ namespace Microsoft.VisualStudioTools.SharedProjectTests {
                     )
                 );
 
-                using (var solution = testDef.Generate()) {
-                    var app = new VisualStudioApp(VsIdeTestHostContext.Dte);
-                    app.OpenProject(solution.Filename);
-
-                    var window = app.OpenSolutionExplorer();
-
-                    SelectSolutionNode(window, "Solution 'MoveExcludedItemToFolder' (1 project)");
-
+                using (var solution = testDef.Generate().ToVs()) {
                     mover(
-                        window.FindItem("Solution 'MoveExcludedItemToFolder' (1 project)", "MoveExcludedItemToFolder", "Folder"),
-                        window.FindItem("Solution 'MoveExcludedItemToFolder' (1 project)", "MoveExcludedItemToFolder", "codefile" + projectType.CodeExtension)
+                        solution.FindItem("MoveExcludedItemToFolder", "Folder"),
+                        solution.FindItem("MoveExcludedItemToFolder", "codefile" + projectType.CodeExtension)
                     );
 
-                    window.AssertFileDoesntExist(Path.GetDirectoryName(solution.Filename), "Solution 'MoveExcludedItemToFolder' (1 project)", "MoveExcludedItemToFolder", "codefile" + projectType.CodeExtension);
-                    window.AssertFileExists(Path.GetDirectoryName(solution.Filename), "Solution 'MoveExcludedItemToFolder' (1 project)", "MoveExcludedItemToFolder", "Folder", "codefile" + projectType.CodeExtension);
+                    solution.AssertFileDoesntExist("MoveExcludedItemToFolder", "codefile" + projectType.CodeExtension);
+                    solution.AssertFileExists(Path.GetDirectoryName(solution.Filename), "MoveExcludedItemToFolder", "Folder", "codefile" + projectType.CodeExtension);
                 }
             }
         }
@@ -143,26 +129,19 @@ namespace Microsoft.VisualStudioTools.SharedProjectTests {
                     )
                 );
 
-                using (var solution = testDef.Generate()) {
-                    var app = new VisualStudioApp(VsIdeTestHostContext.Dte);
-                    app.OpenProject(solution.Filename);
-
-                    var window = app.OpenSolutionExplorer();
-
-                    SelectSolutionNode(window, "Solution 'MoveDuplicateFileName' (1 project)");
-
+                using (var solution = testDef.Generate().ToVs()) {
                     mover(
-                        window.FindItem("Solution 'MoveDuplicateFileName' (1 project)", "MoveDuplicateFileName", "Folder"),
-                        window.FindItem("Solution 'MoveDuplicateFileName' (1 project)", "MoveDuplicateFileName", "textfile.txt")
+                        solution.FindItem("MoveDuplicateFileName", "Folder"),
+                        solution.FindItem("MoveDuplicateFileName", "textfile.txt")
                     );
 
-                    var dialog = new OverwriteFileDialog(app.WaitForDialog());
+                    var dialog = new OverwriteFileDialog(solution.App.WaitForDialog());
                     dialog.No();
 
-                    app.WaitForDialogDismissed();
+                    solution.App.WaitForDialogDismissed();
 
-                    window.AssertFileExistsWithContent(Path.GetDirectoryName(solution.Filename), "root", "Solution 'MoveDuplicateFileName' (1 project)", "MoveDuplicateFileName", "textfile.txt");
-                    window.AssertFileExistsWithContent(Path.GetDirectoryName(solution.Filename), "Folder", "Solution 'MoveDuplicateFileName' (1 project)", "MoveDuplicateFileName", "Folder", "textfile.txt");
+                    solution.AssertFileExistsWithContent("root", "MoveDuplicateFileName", "textfile.txt");
+                    solution.AssertFileExistsWithContent("Folder", "MoveDuplicateFileName", "Folder", "textfile.txt");
                 }
             }
         }
@@ -197,33 +176,27 @@ namespace Microsoft.VisualStudioTools.SharedProjectTests {
                     )
                 );
 
-                using (var solution = testDef.Generate()) {
-                    var app = new VisualStudioApp(VsIdeTestHostContext.Dte);
-                    app.OpenProject(solution.Filename);
-
-                    var window = app.OpenSolutionExplorer();
-
-                    SelectSolutionNode(window, "Solution 'MoveDuplicateFileName' (1 project)");
+                using (var solution = testDef.Generate().ToVs()) {
                     mover(
-                        window.FindItem("Solution 'MoveDuplicateFileName' (1 project)", "MoveDuplicateFileName", "Folder"),
-                        window.FindItem("Solution 'MoveDuplicateFileName' (1 project)", "MoveDuplicateFileName", "textfile1.txt"),
-                        window.FindItem("Solution 'MoveDuplicateFileName' (1 project)", "MoveDuplicateFileName", "textfile2.txt")
+                        solution.FindItem("MoveDuplicateFileName", "Folder"),
+                        solution.FindItem("MoveDuplicateFileName", "textfile1.txt"),
+                        solution.FindItem("MoveDuplicateFileName", "textfile2.txt")
                     );
 
-                    var dialog = new OverwriteFileDialog(app.WaitForDialog());
+                    var dialog = new OverwriteFileDialog(solution.App.WaitForDialog());
                     dialog.No();
 
                     System.Threading.Thread.Sleep(1000);
 
-                    dialog = new OverwriteFileDialog(app.WaitForDialog());
+                    dialog = new OverwriteFileDialog(solution.App.WaitForDialog());
                     dialog.Yes();
 
-                    app.WaitForDialogDismissed();
+                    solution.App.WaitForDialogDismissed();
 
-                    window.AssertFileExistsWithContent(Path.GetDirectoryName(solution.Filename), "root1", "Solution 'MoveDuplicateFileName' (1 project)", "MoveDuplicateFileName", "textfile1.txt");
-                    window.AssertFileDoesntExist(Path.GetDirectoryName(solution.Filename), "Solution 'MoveDuplicateFileName' (1 project)", "MoveDuplicateFileName", "textfile2.txt");
-                    window.AssertFileExistsWithContent(Path.GetDirectoryName(solution.Filename), "Folder1", "Solution 'MoveDuplicateFileName' (1 project)", "MoveDuplicateFileName", "Folder", "textfile1.txt");
-                    window.AssertFileExistsWithContent(Path.GetDirectoryName(solution.Filename), "root2", "Solution 'MoveDuplicateFileName' (1 project)", "MoveDuplicateFileName", "Folder", "textfile2.txt");
+                    solution.AssertFileExistsWithContent("root1", "MoveDuplicateFileName", "textfile1.txt");
+                    solution.AssertFileDoesntExist("MoveDuplicateFileName", "textfile2.txt");
+                    solution.AssertFileExistsWithContent("Folder1", "MoveDuplicateFileName", "Folder", "textfile1.txt");
+                    solution.AssertFileExistsWithContent("root2", "MoveDuplicateFileName", "Folder", "textfile2.txt");
                 }
             }
         }
@@ -265,36 +238,29 @@ namespace Microsoft.VisualStudioTools.SharedProjectTests {
                     )
                 };
 
-                using (var solution = SolutionFile.Generate("MoveDuplicateFileName", projectDefs)) {
-                    var app = new VisualStudioApp(VsIdeTestHostContext.Dte);
-                    app.OpenProject(solution.Filename, expectedProjects: 2);
-
-                    var window = app.OpenSolutionExplorer();
-
-                    SelectSolutionNode(window, "Solution 'MoveDuplicateFileName' (2 projects)");
-
-                    var item1 = window.FindItem("Solution 'MoveDuplicateFileName' (2 projects)", "MoveDuplicateFileName", "textfile1.txt");
-                    var item2 = window.FindItem("Solution 'MoveDuplicateFileName' (2 projects)", "MoveDuplicateFileName", "textfile2.txt");
+                using (var solution = SolutionFile.Generate("MoveDuplicateFileName", projectDefs).ToVs()) {
+                    var item1 = solution.FindItem("MoveDuplicateFileName", "textfile1.txt");
+                    var item2 = solution.FindItem("MoveDuplicateFileName", "textfile2.txt");
                     mover(
-                        window.FindItem("Solution 'MoveDuplicateFileName' (2 projects)", "MoveDuplicateFileName2"),
+                        solution.FindItem("MoveDuplicateFileName2"),
                         item1,
                         item2
                     );
 
-                    var dialog = new OverwriteFileDialog(app.WaitForDialog());
+                    var dialog = new OverwriteFileDialog(solution.App.WaitForDialog());
                     dialog.No();
 
                     System.Threading.Thread.Sleep(1000);
 
-                    dialog = new OverwriteFileDialog(app.WaitForDialog());
+                    dialog = new OverwriteFileDialog(solution.App.WaitForDialog());
                     dialog.Yes();
 
-                    app.WaitForDialogDismissed();
+                    solution.App.WaitForDialogDismissed();
 
-                    window.AssertFileExistsWithContent(Path.GetDirectoryName(solution.Filename), "textfile1 - lang", "Solution 'MoveDuplicateFileName' (2 projects)", "MoveDuplicateFileName", "textfile1.txt");
-                    window.AssertFileExistsWithContent(Path.GetDirectoryName(solution.Filename), "textfile2 - lang", "Solution 'MoveDuplicateFileName' (2 projects)", "MoveDuplicateFileName", "textfile2.txt");
-                    window.AssertFileExistsWithContent(Path.GetDirectoryName(solution.Filename), "textfile1 - 2", "Solution 'MoveDuplicateFileName' (2 projects)", "MoveDuplicateFileName2", "textfile1.txt");
-                    window.AssertFileExistsWithContent(Path.GetDirectoryName(solution.Filename), "textfile2 - lang", "Solution 'MoveDuplicateFileName' (2 projects)", "MoveDuplicateFileName2", "textfile2.txt");
+                    solution.AssertFileExistsWithContent("textfile1 - lang", "MoveDuplicateFileName", "textfile1.txt");
+                    solution.AssertFileExistsWithContent("textfile2 - lang", "MoveDuplicateFileName", "textfile2.txt");
+                    solution.AssertFileExistsWithContent("textfile1 - 2", "MoveDuplicateFileName2", "textfile1.txt");
+                    solution.AssertFileExistsWithContent("textfile2 - lang", "MoveDuplicateFileName2", "textfile2.txt");
                 }
             }
         }
@@ -334,26 +300,19 @@ namespace Microsoft.VisualStudioTools.SharedProjectTests {
                     )
                 };
 
-                using (var solution = SolutionFile.Generate("MoveDuplicateFileName", projectDefs)) {
-                    var app = new VisualStudioApp(VsIdeTestHostContext.Dte);
-                    app.OpenProject(solution.Filename, expectedProjects: 2);
-
-                    var window = app.OpenSolutionExplorer();
-
-                    SelectSolutionNode(window, "Solution 'MoveDuplicateFileName' (2 projects)");
-
+                using (var solution = SolutionFile.Generate("MoveDuplicateFileName", projectDefs).ToVs()) {
                     mover(
-                        window.FindItem("Solution 'MoveDuplicateFileName' (2 projects)", "MoveDuplicateFileName2"),
-                        window.FindItem("Solution 'MoveDuplicateFileName' (2 projects)", "MoveDuplicateFileName1", "textfile.txt")
+                        solution.FindItem("MoveDuplicateFileName2"),
+                        solution.FindItem("MoveDuplicateFileName1", "textfile.txt")
                     );
 
-                    var dialog = new OverwriteFileDialog(app.WaitForDialog());
+                    var dialog = new OverwriteFileDialog(solution.App.WaitForDialog());
                     dialog.No();
 
-                    app.WaitForDialogDismissed();
+                    solution.App.WaitForDialogDismissed();
 
-                    window.AssertFileExistsWithContent(Path.GetDirectoryName(solution.Filename), "MoveDuplicateFileName1", "Solution 'MoveDuplicateFileName' (2 projects)", "MoveDuplicateFileName1", "textfile.txt");
-                    window.AssertFileExistsWithContent(Path.GetDirectoryName(solution.Filename), "MoveDuplicateFileName2", "Solution 'MoveDuplicateFileName' (2 projects)", "MoveDuplicateFileName2", "textfile.txt");
+                    solution.AssertFileExistsWithContent("MoveDuplicateFileName1", "MoveDuplicateFileName1", "textfile.txt");
+                    solution.AssertFileExistsWithContent("MoveDuplicateFileName2", "MoveDuplicateFileName2", "textfile.txt");
                 }
 
             }
@@ -392,65 +351,52 @@ namespace Microsoft.VisualStudioTools.SharedProjectTests {
                     )
                 };
 
-                using (var solution = SolutionFile.Generate("MoveDuplicateFileName", projectDefs)) {
-                    var app = new VisualStudioApp(VsIdeTestHostContext.Dte);
-                    app.OpenProject(solution.Filename, expectedProjects: 2);
-
-                    
-                    var window = app.OpenSolutionExplorer();
-
-                    SelectSolutionNode(window, "Solution 'MoveDuplicateFileName' (2 projects)");
-
+                using (var solution = SolutionFile.Generate("MoveDuplicateFileName", projectDefs).ToVs()) {
                     mover(
-                        window.FindItem("Solution 'MoveDuplicateFileName' (2 projects)", "MoveDuplicateFileNameCS"),
-                        window.FindItem("Solution 'MoveDuplicateFileName' (2 projects)", "MoveDuplicateFileName1", "textfile.txt")
+                        solution.FindItem("MoveDuplicateFileNameCS"),
+                        solution.FindItem("MoveDuplicateFileName1", "textfile.txt")
                     );
 
                     // say no to replacing in the C# project system
-                    app.WaitForDialog();
+                    solution.App.WaitForDialog();
                     Keyboard.Type(Key.N);
 
-                    app.WaitForDialogDismissed();
+                    solution.App.WaitForDialogDismissed();
 
-                    window.AssertFileExistsWithContent(Path.GetDirectoryName(solution.Filename), "MoveDuplicateFileName1", "Solution 'MoveDuplicateFileName' (2 projects)", "MoveDuplicateFileName1", "textfile.txt");
-                    window.AssertFileExistsWithContent(Path.GetDirectoryName(solution.Filename), "MoveDuplicateFileNameCS", "Solution 'MoveDuplicateFileName' (2 projects)", "MoveDuplicateFileNameCS", "textfile.txt");
+                    solution.AssertFileExistsWithContent("MoveDuplicateFileName1", "MoveDuplicateFileName1", "textfile.txt");
+                    solution.AssertFileExistsWithContent("MoveDuplicateFileNameCS", "MoveDuplicateFileNameCS", "textfile.txt");
                 }
 
             }
         }
 
         /// <summary>
-        /// Selects the solution node using the mouse.
-        /// 
-        /// This is used to reset the state of the mouse before a test as some
-        /// tests can cause the mouse to be left in an odd state - the mouse up
-        /// event is delivered to solution explorer, but selecting items later
-        /// doesn't work because the mouse is left in an odd state.  If you
-        /// make this method a nop and try and run all of the tests you'll
-        /// see the bad behavior.
+        /// Selects the provided items with the mouse preparing for a drag and drop
         /// </summary>
-        private static void SelectSolutionNode(SolutionExplorerTree window, string name) {
-            Mouse.MoveTo(window.WaitForItem(name).GetClickablePoint());
-            Mouse.Click(MouseButton.Left);
+        /// <param name="source"></param>
+        private static void SelectItemsForDragAndDrop(AutomationElement[] source) {
+            AutomationWrapper.Select(source.First());
+            for (int i = 1; i < source.Length; i++) {
+                AutomationWrapper.AddToSelection(source[i]);
+            }
+
+            Mouse.MoveTo(source.Last().GetClickablePoint());
+            Mouse.Down(MouseButton.Left);
         }
 
         /// <summary>
         /// Moves one or more items in solution explorer to the destination using the mouse.
         /// </summary>
         private static void MoveByMouse(AutomationElement destination, params AutomationElement[] source) {
-            AutomationWrapper.Select(source.First());
-            for (int i = 1; i < source.Length; i++) {
-                AutomationWrapper.AddToSelection(source[i]);
-            }
-
-            var app = new VisualStudioApp(VsIdeTestHostContext.Dte);
-            Mouse.MoveTo(source.First().GetClickablePoint());
-            Mouse.Down(MouseButton.Left);
+            SelectItemsForDragAndDrop(source);
 
             try {
-                Keyboard.Press(Key.LeftShift);
-                Mouse.MoveTo(destination.GetClickablePoint());
-                Mouse.Up(MouseButton.Left);
+                try {
+                    Keyboard.Press(Key.LeftShift);
+                    Mouse.MoveTo(destination.GetClickablePoint());
+                } finally {
+                    Mouse.Up(MouseButton.Left);
+                }
             } finally {
                 Keyboard.Release(Key.LeftShift);
             }
