@@ -218,6 +218,7 @@
     <Compile Include="Repl\INodejsReplSite.cs" />
     <Compile Include="Repl\SaveReplCommand.cs" />
     <Compile Include="Repl\VsNodejsReplSite.cs" />
+    <Compile Include="SmartIndent.cs" />
     <Compile Include="SmartIndentProvider.cs" />
     <Compile Include="VsMenus.cs" />
     <Compile Include="AzureSolutionListener.cs" />

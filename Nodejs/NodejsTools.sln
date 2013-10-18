@@ -184,6 +184,7 @@ Global
 		{E75E5DB1-0EA0-4247-A830-FE467C016816}.Release|x86.ActiveCfg = Release|x86
 		{E75E5DB1-0EA0-4247-A830-FE467C016816}.Release|x86.Build.0 = Release|x86
 		{DBC73DF7-1B4C-48BE-8B48-715297487E7A}.Debug|x86.ActiveCfg = Debug|Any CPU
+		{DBC73DF7-1B4C-48BE-8B48-715297487E7A}.Debug|x86.Build.0 = Debug|Any CPU
 		{DBC73DF7-1B4C-48BE-8B48-715297487E7A}.Release|x86.ActiveCfg = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution

@@ -340,6 +340,7 @@ namespace Microsoft.NodejsTools {
                 adapterService.SetDataBuffer(_textLines, projBuffer.EllisionBuffer);
 
                 diskBuffer.ChangeContentType(contentRegistry.GetContentType(NodejsConstants.Nodejs), null);
+                
 
                 IVsTextView view;
                 ErrorHandler.ThrowOnFailure(_window.GetPrimaryView(out view));

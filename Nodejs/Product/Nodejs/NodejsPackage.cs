@@ -219,7 +219,7 @@ namespace Microsoft.NodejsTools {
             var window = provider.FindReplWindow(NodejsReplEvaluatorProvider.NodeReplId);
             if (window == null) {
                 window = provider.CreateReplWindow(
-                    ContentType,
+                    ReplContentType,
                     "Node.js Interactive Window",
                     _jsLangSvcGuid,
                     NodejsReplEvaluatorProvider.NodeReplId
@@ -291,10 +291,10 @@ namespace Microsoft.NodejsTools {
             }
         }
 
-        public IContentType ContentType {
+        private IContentType ReplContentType {
             get {
                 if (_contentType == null) {
-                    _contentType = ComponentModel.GetService<IContentTypeRegistryService>().GetContentType(NodejsConstants.Nodejs);
+                    _contentType = ComponentModel.GetService<IContentTypeRegistryService>().GetContentType(NodejsConstants.NodejsRepl);
                 }
                 return _contentType;
             }
