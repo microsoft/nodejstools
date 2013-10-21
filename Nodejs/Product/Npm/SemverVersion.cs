@@ -115,7 +115,21 @@ namespace Microsoft.NodejsTools.Npm
 
         public override string ToString()
         {
-            return string.Format( "{0}.{1}.{2}", Major, Minor, Patch );
+            var builder = new StringBuilder(string.Format( "{0}.{1}.{2}", Major, Minor, Patch ));
+            
+            if (HasPreReleaseVersion)
+            {
+                builder.Append('-');
+                builder.Append(PreReleaseVersion);
+            }
+
+            if (HasBuildMetadata)
+            {
+                builder.Append('+');
+                builder.Append(BuildMetadata);
+            }
+
+            return builder.ToString();
         }
 
         public override int GetHashCode()
