@@ -21,9 +21,14 @@ namespace NpmTests
 
             dynamic json = JsonConvert.DeserializeObject(pkgJsonStr);
 
-            Assert.AreEqual(json.name, pkgJson.Name, "Mismatched package names.");
-            Assert.AreEqual(typeof(SemverVersion), pkgJson.GetType(), "Mismatched types for package version.");
-            Assert.AreEqual(json.version, pkgJson.Version.ToString(), "Mismatched version strings.");
+            Assert.AreEqual(json.name.ToString(), pkgJson.Name, "Mismatched package names.");
+            Assert.AreEqual(json.version.ToString(), pkgJson.Version.ToString(), "Mismatched version strings.");
+
+            var expectedVersion = new SemverVersion( json.version.ToString() );
+            Assert.AreEqual( expectedVersion.Major, pkgJson.Version.Major, "Mismatched major versions." );
+            Assert.AreEqual( expectedVersion.Minor, pkgJson.Version.Minor, "Mismatched minor versions." );
+            Assert.AreEqual( expectedVersion.Patch, pkgJson.Version.Patch, "Mismatched patch versions." );
+            Assert.AreEqual( expectedVersion, pkgJson.Version, "Mismatch semantic version." );
         }
     }
 }

@@ -11,7 +11,7 @@ namespace Microsoft.NodejsTools.Npm
     {
         public static IPackageJson Create( IPackageJsonSource source )
         {
-            return new PackageJson();
+            return new PackageJson( source.Package );
         }
     }
 }

@@ -11,11 +11,11 @@ namespace NpmTests
     internal class MockPackageJsonSource : IPackageJsonSource
     {
 
-        private dynamic m_PackageJson;
-
         public MockPackageJsonSource( string packageJsonString )
         {
-            m_PackageJson = JsonConvert.DeserializeObject( packageJsonString );
+            Package = JsonConvert.DeserializeObject( packageJsonString );
         }
+
+        public dynamic Package { get; private set; }
     }
 }

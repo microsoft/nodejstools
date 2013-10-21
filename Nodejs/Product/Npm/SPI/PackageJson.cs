@@ -8,7 +8,22 @@ namespace Microsoft.NodejsTools.Npm.SPI
 {
     internal class PackageJson : IPackageJson
     {
-        public string Name { get; private set; }
-        public SemverVersion Version { get; private set; }
+
+        private dynamic m_Package;
+
+        public PackageJson( dynamic package )
+        {
+            m_Package = package;
+        }
+
+        public string Name
+        {
+            get { return m_Package.name.ToString(); }
+        }
+
+        public SemverVersion Version
+        {
+            get { return new SemverVersion( m_Package.version.ToString() ); }
+        }
     }
 }
