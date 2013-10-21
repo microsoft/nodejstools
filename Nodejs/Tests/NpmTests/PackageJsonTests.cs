@@ -24,7 +24,7 @@ namespace NpmTests
             Assert.AreEqual(json.name.ToString(), pkgJson.Name, "Mismatched package names.");
             Assert.AreEqual(json.version.ToString(), pkgJson.Version.ToString(), "Mismatched version strings.");
 
-            var expectedVersion = new SemverVersion( json.version.ToString() );
+            var expectedVersion = SemverVersion.Parse( json.version.ToString() );
             Assert.AreEqual( expectedVersion.Major, pkgJson.Version.Major, "Mismatched major versions." );
             Assert.AreEqual( expectedVersion.Minor, pkgJson.Version.Minor, "Mismatched minor versions." );
             Assert.AreEqual( expectedVersion.Patch, pkgJson.Version.Patch, "Mismatched patch versions." );

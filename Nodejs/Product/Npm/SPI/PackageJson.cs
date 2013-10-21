@@ -23,7 +23,7 @@ namespace Microsoft.NodejsTools.Npm.SPI
 
         public SemverVersion Version
         {
-            get { return new SemverVersion( m_Package.version.ToString() ); }
+            get { return SemverVersion.Parse( m_Package.version.ToString() ); }
         }
     }
 }
