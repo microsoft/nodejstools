@@ -16,14 +16,23 @@ namespace Microsoft.NodejsTools.Npm
 
         public static SemverVersion Parse( string versionString )
         {
-            var parts = versionString.Split('-');
-            var normalParts = parts[0].Split('.');
+            string  normalPart = versionString,
+                    optionalParts = null;
+            var index = normalPart.IndexOf( '-' );
+
+            if ( index >= 0 )
+            {
+                normalPart      = normalPart.Substring( 0, index );
+                optionalParts   = versionString.Substring( index + 1 );
+            }
+
+            var normalParts = normalPart.Split('.');
             if (normalParts.Length != 3)
             {
                 throw new SemverVersionFormatException(
-                    string.Format("Invalid semantic version: '{0}'. Unable to parse normal version from token '{1}'. The version number must consist of three numeric parts of the form MAJOR.MINOR.PATCH, with optional pre-release and/or build metadata, and may not contain any negative numbers.",
+                    string.Format("Invalid semantic version: '{0}'. Unable to parse normal version from token '{1}'. The version number must consist of three non-negative numeric parts of the form MAJOR.MINOR.PATCH, with optional pre-release and/or build metadata.",
                     versionString,
-                    parts[0] ) );
+                    normalParts.Length > 0 ? normalParts[0] : "<<no token available>>" ));
             }
 
             int major,
@@ -42,24 +51,16 @@ namespace Microsoft.NodejsTools.Npm
                     string.Format(
                         "Invalid semantic version: '{0}'. Unable to parse normal version from token '{1}'. The version number must consist of three numeric parts of the form MAJOR.MINOR.PATCH, with optional pre-release and/or build metadata, and may not contain negative numbers in any section.",
                         versionString,
-                        parts[ 0 ] ),
+                        normalPart[0]),
                     fe );
             }
 
             string  preReleaseVersion   = null,
                     buildMetadata       = null;
 
-            if (parts.Length > 1)
+            if ( null != optionalParts )
             {
-                if (parts.Length > 2)
-                {
-                    throw new SemverVersionFormatException(
-                        string.Format(
-                            "Invalid semantic version: '{0}'. Cannot have more than one pre-release version in a semantic version. Also negative numbers are not permitted for major, minor, patch versions, or as part of the pre-release version or build metadata.",
-                            versionString) );
-                }
-
-                parts = parts[1].Split('+');
+                var parts = optionalParts.Split('+');
                 preReleaseVersion = parts[0];
 
                 if (parts.Length > 1)
@@ -91,7 +92,7 @@ namespace Microsoft.NodejsTools.Npm
 
         private static bool IsValidOptionalFragment( string optional )
         {
-            return string.IsNullOrEmpty( optional ) || optional.All( ch => char.IsLetterOrDigit( ch ) || ch == '.' );
+            return string.IsNullOrEmpty( optional ) || optional.All( ch => char.IsLetterOrDigit( ch ) || ch == '.' || ch == '-' );
         }
 
         public SemverVersion( int major, int minor, int patch, string preReleaseVersion, string buildMetadata )
@@ -120,14 +121,14 @@ namespace Microsoft.NodejsTools.Npm
             if ( ! IsValidOptionalFragment( preReleaseVersion ) )
             {
                 throw new ArgumentException(
-                    "Invalid pre-release version: '{0}'. Must be a dot separated sequence of identifiers containing only characters [0-9a-zA-Z].",
+                    string.Format( "Invalid pre-release version: '{0}'. Must be a dot separated sequence of identifiers containing only characters [0-9a-zA-Z].", preReleaseVersion ),
                     "preReleaseVersion" );
             }
 
             if ( ! IsValidOptionalFragment( buildMetadata ) )
             {
                 throw new ArgumentException(
-                    "Invalid build metadata: '{0}'. Must be a dot separated sequence of identifiers containing only characters [0-9a-zA-Z].",
+                    string.Format( "Invalid build metadata: '{0}'. Must be a dot separated sequence of identifiers containing only characters [0-9a-zA-Z].", preReleaseVersion ),
                     "buildMetadata" );
             }
 

@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Runtime.InteropServices;
 using Microsoft.NodejsTools.Npm;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 
@@ -66,6 +67,42 @@ namespace NpmTests
         public void TestNonNumericPatchVersionFails()
         {
             SemverVersion.Parse("1.2.c");
+        }
+
+        [ TestMethod ]
+        public void TestAlphaPreRelease()
+        {
+            var version = SemverVersion.Parse( "1.2.3-alpha" );
+            Assert.AreEqual( 1, version.Major, "Major version mismatch." );
+            Assert.AreEqual( 2, version.Minor, "Minor version mismatch." );
+            Assert.AreEqual( 3, version.Patch, "Patch version mismatch." );
+            Assert.IsTrue( version.HasPreReleaseVersion, "Should have pre-release version." );
+            Assert.AreEqual( "alpha", version.PreReleaseVersion );
+            Assert.IsFalse( version.HasBuildMetadata, "Should not have build metadata." );
+        }
+
+        [ TestMethod ]
+        public void TestNumericPreRelease()
+        {
+            var version = SemverVersion.Parse("1.2.3-4.5.6");
+            Assert.AreEqual(1, version.Major, "Major version mismatch.");
+            Assert.AreEqual(2, version.Minor, "Minor version mismatch.");
+            Assert.AreEqual(3, version.Patch, "Patch version mismatch.");
+            Assert.IsTrue(version.HasPreReleaseVersion, "Should have pre-release version.");
+            Assert.AreEqual("4.5.6", version.PreReleaseVersion);
+            Assert.IsFalse(version.HasBuildMetadata, "Should not have build metadata.");
+        }
+
+        [ TestMethod ]
+        public void TestPreReleaseHypenatedIdentifier()
+        {
+            var version = SemverVersion.Parse("1.2.3-alpha-2.1");
+            Assert.AreEqual(1, version.Major, "Major version mismatch.");
+            Assert.AreEqual(2, version.Minor, "Minor version mismatch.");
+            Assert.AreEqual(3, version.Patch, "Patch version mismatch.");
+            Assert.IsTrue(version.HasPreReleaseVersion, "Should have pre-release version.");
+            Assert.AreEqual("alpha-2.1", version.PreReleaseVersion);
+            Assert.IsFalse(version.HasBuildMetadata, "Should not have build metadata.");
         }
     }
 }
