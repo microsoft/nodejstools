@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 
 namespace Microsoft.NodejsTools.Npm
@@ -14,70 +15,34 @@ namespace Microsoft.NodejsTools.Npm
     public struct SemverVersion
     {
 
+        private static readonly Regex RegexSemver = new Regex(
+            "^(?<major>[0-9]+)"
+            + "\\.(?<minor>[0-9]+)"
+            + "\\.(?<patch>[0-9]+)"
+            + "(?:-(?<prerelease>[0-9A-Za-z-]+(\\.[0-9A-Za-z-]+)*))?"
+            + "(?:\\+(?<buildmetadata>[0-9A-Za-z-]+))?$",
+            RegexOptions.IgnoreCase | RegexOptions.Singleline );
+
         public static SemverVersion Parse( string versionString )
         {
-            string  normalPart = versionString,
-                    optionalParts = null;
-            var index = normalPart.IndexOf( '-' );
-
-            if ( index >= 0 )
-            {
-                normalPart      = normalPart.Substring( 0, index );
-                optionalParts   = versionString.Substring( index + 1 );
-            }
-
-            var normalParts = normalPart.Split('.');
-            if (normalParts.Length != 3)
+            var matches = RegexSemver.Matches(versionString);
+            if ( matches.Count != 1 )
             {
                 throw new SemverVersionFormatException(
-                    string.Format("Invalid semantic version: '{0}'. Unable to parse normal version from token '{1}'. The version number must consist of three non-negative numeric parts of the form MAJOR.MINOR.PATCH, with optional pre-release and/or build metadata.",
-                    versionString,
-                    normalParts.Length > 0 ? normalParts[0] : "<<no token available>>" ));
+                    string.Format("Invalid semantic version: '{0}'. The version number must consist of three non-negative numeric parts of the form MAJOR.MINOR.PATCH, with optional pre-release and/or build metadata. The optional parts may only contain characters in the set [0-9A-Za-z-].",
+                    versionString ) );
             }
 
-            int major,
-                minor,
-                patch;
+            var match           = matches[ 0 ];
+            var preRelease      = match.Groups[ "prerelease" ];
+            var buildMetadata   = match.Groups[ "buildmetadata" ];
 
-            try
-            {
-                major = int.Parse(normalParts[0]);
-                minor = int.Parse(normalParts[1]);
-                patch = int.Parse( normalParts[ 2 ] );
-            }
-            catch ( FormatException fe )
-            {
-                throw new SemverVersionFormatException(
-                    string.Format(
-                        "Invalid semantic version: '{0}'. Unable to parse normal version from token '{1}'. The version number must consist of three numeric parts of the form MAJOR.MINOR.PATCH, with optional pre-release and/or build metadata, and may not contain negative numbers in any section.",
-                        versionString,
-                        normalPart[0]),
-                    fe );
-            }
-
-            string  preReleaseVersion   = null,
-                    buildMetadata       = null;
-
-            if ( null != optionalParts )
-            {
-                var parts = optionalParts.Split('+');
-                preReleaseVersion = parts[0];
-
-                if (parts.Length > 1)
-                {
-                    if (parts.Length > 2)
-                    {
-                        throw new SemverVersionFormatException(
-                            string.Format(
-                                "Invalid semantic version: '{0}'. Cannot have more than one build metadata chunk in a semantic version.",
-                                versionString) );
-                    }
-
-                    buildMetadata = parts[1];
-                }
-            }
-
-            return new SemverVersion( major, minor, patch, preReleaseVersion, buildMetadata );
+            return new SemverVersion(
+                int.Parse( match.Groups[ "major" ].Value ),
+                int.Parse( match.Groups[ "minor" ].Value ),
+                int.Parse( match.Groups[ "patch" ].Value ),
+                preRelease.Success ? preRelease.Value : null,
+                buildMetadata.Success ? buildMetadata.Value : null );
         }
 
         private int m_Major;
@@ -121,14 +86,14 @@ namespace Microsoft.NodejsTools.Npm
             if ( ! IsValidOptionalFragment( preReleaseVersion ) )
             {
                 throw new ArgumentException(
-                    string.Format( "Invalid pre-release version: '{0}'. Must be a dot separated sequence of identifiers containing only characters [0-9a-zA-Z].", preReleaseVersion ),
+                    string.Format( "Invalid pre-release version: '{0}'. Must be a dot separated sequence of identifiers containing only characters [0-9A-Za-z-].", preReleaseVersion ),
                     "preReleaseVersion" );
             }
 
             if ( ! IsValidOptionalFragment( buildMetadata ) )
             {
                 throw new ArgumentException(
-                    string.Format( "Invalid build metadata: '{0}'. Must be a dot separated sequence of identifiers containing only characters [0-9a-zA-Z].", preReleaseVersion ),
+                    string.Format( "Invalid build metadata: '{0}'. Must be a dot separated sequence of identifiers containing only characters [0-9A-Za-z-].", preReleaseVersion ),
                     "buildMetadata" );
             }
 
