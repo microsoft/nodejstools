@@ -20,7 +20,11 @@ namespace Microsoft.NodejsTools.Npm
             + "\\.(?<minor>[0-9]+)"
             + "\\.(?<patch>[0-9]+)"
             + "(?:-(?<prerelease>[0-9A-Za-z-]+(\\.[0-9A-Za-z-]+)*))?"
-            + "(?:\\+(?<buildmetadata>[0-9A-Za-z-]+))?$",
+            + "(?:\\+(?<buildmetadata>[0-9A-Za-z-]+(\\.[0-9A-Za-z-]+)*))?$",
+            RegexOptions.IgnoreCase | RegexOptions.Singleline );
+
+        private static readonly Regex RegexOptionalFragment = new Regex(
+            "^[0-9A-Za-z-]+(\\.[0-9A-Za-z-]+)*$",
             RegexOptions.IgnoreCase | RegexOptions.Singleline );
 
         public static SemverVersion Parse( string versionString )
@@ -57,7 +61,7 @@ namespace Microsoft.NodejsTools.Npm
 
         private static bool IsValidOptionalFragment( string optional )
         {
-            return string.IsNullOrEmpty( optional ) || optional.All( ch => char.IsLetterOrDigit( ch ) || ch == '.' || ch == '-' );
+            return string.IsNullOrEmpty(optional) || RegexOptionalFragment.IsMatch(optional);
         }
 
         public SemverVersion( int major, int minor, int patch, string preReleaseVersion, string buildMetadata )
