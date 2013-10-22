@@ -16,42 +16,10 @@ namespace NpmTests
     public class SemverVersionTests
     {
 
-        private static void AssertVersionsEqual(
-            int expectedMajor,
-            int expectedMinor,
-            int expectedPatch,
-            string expectedPreRelease,
-            string expectedBuildMetadata,
-            SemverVersion actual )
-        {
-            Assert.AreEqual( expectedMajor, actual.Major );
-            Assert.AreEqual( expectedMinor, actual.Minor, "Mismatched minor version.");
-            Assert.AreEqual( expectedPatch, actual.Patch, "Mismatched patch version.");
-            Assert.AreEqual( null != expectedPreRelease, actual.HasPreReleaseVersion, "Pre-release version info presence mismatch.");
-            Assert.AreEqual( expectedPreRelease, actual.PreReleaseVersion, "Pre-release version info mismatch.");
-            Assert.AreEqual( null != expectedBuildMetadata, actual.HasBuildMetadata, "Build metadata presence mismatch.");
-            Assert.AreEqual( expectedBuildMetadata, actual.BuildMetadata, "Build metadata mismatch.");
-
-            var   expected    = new StringBuilder( string.Format( "{0}.{1}.{2}", expectedMajor, expectedMinor, expectedPatch ) );
-            if (null != expectedPreRelease)
-            {
-                expected.Append('-');
-                expected.Append(expectedPreRelease);
-            }
-
-            if (null != expectedBuildMetadata)
-            {
-                expected.Append('+');
-                expected.Append(expectedBuildMetadata);
-            }
-
-            Assert.AreEqual(expected.ToString(), actual.ToString());
-        }
-
         [TestMethod]
         public void TestBasicMajorMinorPatchVersion()
         {
-            AssertVersionsEqual(
+            SemverVersionTestHelper.AssertVersionsEqual(
                 1,
                 2,
                 3,
@@ -105,19 +73,33 @@ namespace NpmTests
         [ TestMethod ]
         public void TestAlphaPreRelease()
         {
-            AssertVersionsEqual( 1, 2, 3, "alpha", null, SemverVersion.Parse( "1.2.3-alpha" ) );
+            SemverVersionTestHelper.AssertVersionsEqual(1, 2, 3, "alpha", null, SemverVersion.Parse("1.2.3-alpha"));
         }
 
         [ TestMethod ]
         public void TestNumericPreRelease()
         {
-            AssertVersionsEqual(1, 2, 3, "4.5.6", null, SemverVersion.Parse("1.2.3-4.5.6") );
+            SemverVersionTestHelper.AssertVersionsEqual(1, 2, 3, "4.5.6", null, SemverVersion.Parse("1.2.3-4.5.6"));
         }
 
         [ TestMethod ]
         public void TestPreReleaseHypenatedIdentifier()
         {
-            AssertVersionsEqual(1, 2, 3, "alpha-2.1", null, SemverVersion.Parse("1.2.3-alpha-2.1"));
+            SemverVersionTestHelper.AssertVersionsEqual(1, 2, 3, "alpha-2.1", null, SemverVersion.Parse("1.2.3-alpha-2.1"));
+        }
+
+        [TestMethod]
+        public void TestPreReleaseAndBuildMetadata()
+        {
+            // 1.0.0-alpha+001, 1.0.0+20130313144700, 1.0.0-beta+exp.sha.5114f85
+            SemverVersionTestHelper.AssertVersionsEqual(1, 0, 0, "alpha", "001", SemverVersion.Parse("1.0.0-alpha+001" ));
+            SemverVersionTestHelper.AssertVersionsEqual(1, 0, 0, "beta", "exp.sha.5114f85", SemverVersion.Parse("1.0.0-beta+exp.sha.5114f85"));
+        }
+
+        [TestMethod]
+        public void TestBuildMetadataOnly()
+        {
+            SemverVersionTestHelper.AssertVersionsEqual(1, 0, 0, null, "20130313144700", SemverVersion.Parse("1.0.0+20130313144700"));
         }
     }
 }
