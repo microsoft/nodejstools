@@ -28,11 +28,13 @@
   <ItemGroup>
     <Compile Include="IPackageJson.cs" />
     <Compile Include="IPackageJsonSource.cs" />
+    <Compile Include="IScripts.cs" />
     <Compile Include="PackageJsonFactory.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="SemverVersion.cs" />
     <Compile Include="SemverVersionFormatException.cs" />
     <Compile Include="SPI\PackageJson.cs" />
+    <Compile Include="SPI\Scripts.cs" />
   </ItemGroup>
   <Import Project="..\ProjectAfter.settings" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 

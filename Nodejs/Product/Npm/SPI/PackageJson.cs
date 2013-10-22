@@ -14,6 +14,7 @@ namespace Microsoft.NodejsTools.Npm.SPI
         public PackageJson( dynamic package )
         {
             m_Package = package;
+            Scripts = new Scripts();
         }
 
         public string Name
@@ -25,5 +26,7 @@ namespace Microsoft.NodejsTools.Npm.SPI
         {
             get { return SemverVersion.Parse( m_Package.version.ToString() ); }
         }
+
+        public IScripts Scripts { get; private set; }
     }
 }
