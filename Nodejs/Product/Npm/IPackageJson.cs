@@ -11,5 +11,6 @@ namespace Microsoft.NodejsTools.Npm
         string Name { get; }
         SemverVersion Version { get; }
         IScripts Scripts { get; }
+        string Description { get; }
     }
 }

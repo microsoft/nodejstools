@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Runtime.Remoting.Messaging;
 using System.Text;
 using System.Threading.Tasks;
 using Newtonsoft.Json.Linq;
@@ -20,12 +21,12 @@ namespace Microsoft.NodejsTools.Npm.SPI
 
         public string Name
         {
-            get { return m_Package.name.ToString(); }
+            get { return null == m_Package.name ? null : m_Package.name.ToString(); }
         }
 
         public SemverVersion Version
         {
-            get { return SemverVersion.Parse( m_Package.version.ToString() ); }
+            get { return null == m_Package.version ? new SemverVersion() : SemverVersion.Parse( m_Package.version.ToString() ); }
         }
 
         public IScripts Scripts
@@ -44,6 +45,14 @@ namespace Microsoft.NodejsTools.Npm.SPI
                 }
 
                 return m_Scripts;
+            }
+        }
+
+        public string Description
+        {
+            get
+            {
+                return null == m_Package.description ? null : m_Package.description.ToString();
             }
         }
     }
