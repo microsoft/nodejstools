@@ -38,6 +38,7 @@ namespace Microsoft.NodejsTools {
             _textView = textView;
             _editorOptions = editorOptions;
             _classifier = classifier;
+            _textView.Properties.AddProperty(typeof(SmartIndent), this);
         }
 
         #region ISmartIndent Members

@@ -120,6 +120,9 @@
   <data name="102" xml:space="preserve">
     <value>Node.js editor</value>
   </data>
+  <data name="106" xml:space="preserve">
+    <value>Node.js</value>
+  </data>
   <data name="110" xml:space="preserve">
     <value>Node.js Tools for Visual Studio</value>
   </data>

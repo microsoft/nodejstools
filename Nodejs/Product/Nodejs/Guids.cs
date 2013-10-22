@@ -23,6 +23,8 @@ namespace Microsoft.NodejsTools
         public const string guidNodePkgString = "4219f2a8-fbf9-4659-a222-b7580a60eebb";
         public const string guidNodeCmdSetString = "695e37e2-c6df-4e0a-8833-f688e4c65f1f";
         public const string guidNodeEditorFactoryString = "88941496-93F4-4E37-83AF-AFE087415334";
+        public const string guidNodeEditorFactoryStringPromptEncoding = "C8576E92-EFB6-4414-8F63-C84D474A539E";
+        public const string guidNodejsLanguageInfo = "ABD5E8A5-5A35-4BE9-BCAF-E10C1212CB40";
 
         public static readonly Guid guidNodeCmdSet = new Guid(guidNodeCmdSetString);
         public static readonly Guid guidNodeEditorFactory = new Guid(guidNodeEditorFactoryString);

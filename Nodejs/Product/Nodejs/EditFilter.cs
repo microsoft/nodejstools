@@ -14,7 +14,6 @@
 
 using System;
 using System.Collections.Generic;
-using System.Windows;
 using Microsoft.NodejsTools.Intellisense;
 using Microsoft.VisualStudio;
 using Microsoft.VisualStudio.ComponentModelHost;
@@ -63,6 +62,16 @@ namespace Microsoft.NodejsTools {
             }
         }
 
+        private SkipJsLsFilter SkipJsFilter {
+            get {
+                SkipJsLsFilter skipJsFilter;
+                if (_textView.Properties.TryGetProperty<SkipJsLsFilter>(typeof(SkipJsLsFilter), out skipJsFilter)) {
+                    return skipJsFilter;
+                }
+                return null;
+            }
+        }
+
         private static HashSet<char> _commitChars = new HashSet<char>("{}[](),:;+-*%&|^~=<>#\\");
 
         public int Exec(ref Guid pguidCmdGroup, uint nCmdID, uint nCmdexecopt, IntPtr pvaIn, IntPtr pvaOut) {
@@ -76,6 +85,23 @@ namespace Microsoft.NodejsTools {
                             !_intellisenseStack.TopSession.IsDismissed) {
                             ((ICompletionSession)_intellisenseStack.TopSession).Commit();
                         } else {
+                            if (SkipJsFilter != null) {                                
+                                var res = SkipJsFilter.Exec(ref pguidCmdGroup, nCmdID, nCmdexecopt, pvaIn, pvaOut);
+                                SmartIndent smartIndent;
+                                if (ErrorHandler.Succeeded(res) && _textView.Properties.TryGetProperty<SmartIndent>(typeof(SmartIndent), out smartIndent)) {
+                                    var indentation = smartIndent.GetDesiredIndentation(_textView.Caret.Position.BufferPosition.GetContainingLine());
+                                    if (indentation != null) {
+                                        _textView.Caret.MoveTo(
+                                            new VisualStudio.Text.VirtualSnapshotPoint(
+                                                _textView.Caret.Position.BufferPosition.GetContainingLine(),
+                                                indentation.Value
+                                            )
+                                        );
+                                    }
+                                }
+                                return res;
+                            }
+
                             _editorOps.InsertNewLine();
                         }
                         return VSConstants.S_OK;
@@ -93,6 +119,9 @@ namespace Microsoft.NodejsTools {
                             }
 
                             if (ch == '}' || ch == ';') {
+                                if (SkipJsFilter != null) {
+                                    return SkipJsFilter.Exec(ref pguidCmdGroup, nCmdID, nCmdexecopt, pvaIn, pvaOut);
+                                }
                                 _editorOps.InsertText(ch.ToString());
                                 return VSConstants.S_OK;
                             } else if ((ch == '(' || ch == '"' || ch == '\'') && 
@@ -112,6 +141,9 @@ namespace Microsoft.NodejsTools {
                         }
                         break;
                     case VSConstants.VSStd2KCmdID.PASTE:
+                        if (SkipJsFilter != null) {
+                            return SkipJsFilter.Exec(ref pguidCmdGroup, nCmdID, nCmdexecopt, pvaIn, pvaOut);
+                        }
                         _editorOps.Paste();
                         return VSConstants.S_OK;
                     case VSConstants.VSStd2KCmdID.TAB:
@@ -120,6 +152,10 @@ namespace Microsoft.NodejsTools {
                             !_intellisenseStack.TopSession.IsDismissed) {
                             ((ICompletionSession)_intellisenseStack.TopSession).Commit();
                         } else {
+                            if (SkipJsFilter != null) {
+                                return SkipJsFilter.Exec(ref pguidCmdGroup, nCmdID, nCmdexecopt, pvaIn, pvaOut);
+                            }
+
                             _editorOps.Indent();
                         }
                         return VSConstants.S_OK;
@@ -130,12 +166,13 @@ namespace Microsoft.NodejsTools {
                     case VSConstants.VSStd2KCmdID.BACKSPACE:
                     case VSConstants.VSStd2KCmdID.DELETE:
                     case VSConstants.VSStd2KCmdID.DELETEWORDLEFT:
-                    case VSConstants.VSStd2KCmdID.DELETEWORDRIGHT:
-                        int res = _next.Exec(ref pguidCmdGroup, nCmdID, nCmdexecopt, pvaIn, pvaOut);
-                        if (_activeSession != null && !_activeSession.IsDismissed) {
-                            _activeSession.Filter();
+                    case VSConstants.VSStd2KCmdID.DELETEWORDRIGHT: {
+                            int res = _next.Exec(ref pguidCmdGroup, nCmdID, nCmdexecopt, pvaIn, pvaOut);
+                            if (_activeSession != null && !_activeSession.IsDismissed) {
+                                _activeSession.Filter();
+                            }
+                            return res;
                         }
-                        return res;
                 }
             } else if (pguidCmdGroup == VSConstants.GUID_VSStandardCommandSet97) {
                 switch ((VSConstants.VSStd97CmdID)nCmdID) {

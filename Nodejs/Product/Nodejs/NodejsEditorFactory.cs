@@ -333,11 +333,15 @@ namespace Microsoft.NodejsTools {
                     diskBuffer.Properties.AddProperty(typeof(NodejsProjectionBuffer), projBuffer);
                     adapterService.SetDataBuffer(_textLines, projBuffer.EllisionBuffer);
 
-                    Guid langSvcGuid = NodejsPackage._jsLangSvcGuid;
+                    Guid langSvcGuid = typeof(NodejsLanguageInfo).GUID;
                     _textLines.SetLanguageServiceID(ref langSvcGuid);
                     
                     diskBuffer.ChangeContentType(contentRegistry.GetContentType(NodejsConstants.Nodejs), null);
                 }
+
+                IVsTextView view;
+                ErrorHandler.ThrowOnFailure(_window.GetPrimaryView(out view));
+                CodeWindowManager.AddSkipFilter(adapterService, view);
 
                 return VSConstants.S_OK;
             }
@@ -362,8 +366,23 @@ namespace Microsoft.NodejsTools {
         }
     }
 
+    class SkipJsLsFilter : IOleCommandTarget {
+        private readonly IOleCommandTarget _next;
 
-    [Guid("C8576E92-EFB6-4414-8F63-C84D474A539E")]
+        public SkipJsLsFilter(IVsTextView view) {
+            ErrorHandler.ThrowOnFailure(view.AddCommandFilter(this, out _next));
+        }
+
+        public int Exec(ref Guid pguidCmdGroup, uint nCmdID, uint nCmdexecopt, IntPtr pvaIn, IntPtr pvaOut) {
+            return _next.Exec(pguidCmdGroup, nCmdID, nCmdexecopt, pvaIn, pvaOut);
+        }
+
+        public int QueryStatus(ref Guid pguidCmdGroup, uint cCmds, OLECMD[] prgCmds, IntPtr pCmdText) {
+            return _next.QueryStatus(pguidCmdGroup, cCmds, prgCmds, pCmdText);
+        }
+    }
+
+    [Guid(GuidList.guidNodeEditorFactoryStringPromptEncoding)]
     class NodejsEditorFactoryPromptForEncoding : NodejsEditorFactory {
         public NodejsEditorFactoryPromptForEncoding(NodejsPackage package) : base(package, true) { }
         public override int CreateEditorInstance(uint createEditorFlags, string documentMoniker, string physicalView, VisualStudio.Shell.Interop.IVsHierarchy hierarchy, uint itemid, IntPtr docDataExisting, out IntPtr docView, out IntPtr docData, out string editorCaption, out Guid commandUIGuid, out int createDocumentWindowFlags) {

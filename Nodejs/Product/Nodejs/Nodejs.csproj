@@ -201,6 +201,7 @@
     </COMReference>
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="CodeWindowManager.cs" />
     <Compile Include="Commands\OpenReplWindowCommand.cs" />
     <Compile Include="Commands\OpenRemoteDebugProxyFolderCommand.cs" />
     <Compile Include="Commands\SurveyNewsCommand.cs" />
@@ -212,6 +213,7 @@
     <Compile Include="Intellisense\CompletionSource.Modules.cs" />
     <Compile Include="Intellisense\TextViewCreationListener.cs" />
     <Compile Include="Nodejs.cs" />
+    <Compile Include="NodejsLanguageInfo.cs" />
     <Compile Include="NodejsProjectConfig.cs" />
     <Compile Include="NodejsToolsInstallPath.cs" />
     <Compile Include="Options\NodejsDialogPage.cs">
@@ -235,6 +237,7 @@
     <Compile Include="Project\NodejsGeneralPropertyPageControl.Designer.cs">
       <DependentUpon>NodejsGeneralPropertyPageControl.cs</DependentUpon>
     </Compile>
+    <Compile Include="ProvideBraceCompletion.cs" />
     <Compile Include="ProvideEditorExtension2Attribute.cs" />
     <Compile Include="ProvideLanguageTemplates.cs" />
     <Compile Include="Repl\ClearReplCommand.cs" />
