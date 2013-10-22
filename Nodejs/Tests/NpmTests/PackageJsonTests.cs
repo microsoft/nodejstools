@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using Microsoft.NodejsTools.Npm;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using Newtonsoft.Json;
@@ -173,6 +174,45 @@ namespace NpmTests
                 "Sample package for CommonJS. This package demonstrates the required elements of a CommonJS package.",
                 pkg.Description,
                 "Description mismatch." );
+        }
+
+        [TestMethod]
+        public void TestReadEmptyKeywordsCountZero()
+        {
+            var pkg = LoadFrom(PkgEmpty);
+            var keywords = pkg.Keywords;
+            Assert.IsNotNull(keywords, "Keywords should not be null - if there are no keywords an empty collection should be returned.");
+            Assert.AreEqual(0, keywords.Count, "Keyword count should be 0.");
+        }
+
+        private void CheckRetrievedKeywords(ISet<string> retrieved)
+        {
+            Assert.AreEqual(2, retrieved.Count, "Keyword count mismatch.");
+            Assert.IsTrue(retrieved.Contains("package"), "Should contain keyword 'package'.");
+            Assert.IsTrue(retrieved.Contains("example"), "Should contain keyword 'example'.");
+        }
+
+        [TestMethod]
+        public void TestEnumerationOverKeywords()
+        {
+            var pkg = LoadFrom(PkgLarge);
+            var keywords = pkg.Keywords;
+            Assert.AreEqual(2, keywords.Count, "Keyword count mismatch.");
+
+            var retrieved = new HashSet<string>();
+            
+            foreach (var keyword in keywords)
+            {
+                retrieved.Add(keyword);
+            }
+            CheckRetrievedKeywords(retrieved);
+
+            retrieved = new HashSet<string>();
+            for (int index = 0, size = keywords.Count; index < size; ++index)
+            {
+                retrieved.Add(keywords[index]);
+            }
+            CheckRetrievedKeywords(retrieved);
         }
     }
 }

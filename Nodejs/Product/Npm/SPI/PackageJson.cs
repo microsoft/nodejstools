@@ -13,6 +13,7 @@ namespace Microsoft.NodejsTools.Npm.SPI
 
         private dynamic m_Package;
         private Scripts m_Scripts;
+        private Keywords m_Keywords;
 
         public PackageJson( dynamic package )
         {
@@ -53,6 +54,24 @@ namespace Microsoft.NodejsTools.Npm.SPI
             get
             {
                 return null == m_Package.description ? null : m_Package.description.ToString();
+            }
+        }
+
+        public IKeywords Keywords
+        {
+            get
+            {
+                if (null == m_Keywords)
+                {
+                    dynamic json = m_Package.keywords;
+                    if (null == json)
+                    {
+                        json = new JArray();
+                        m_Package.keywords = json;
+                    }
+                    m_Keywords = new Keywords(json);
+                }
+                return m_Keywords;
             }
         }
     }
