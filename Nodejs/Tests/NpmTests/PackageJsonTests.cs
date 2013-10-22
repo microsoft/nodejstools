@@ -1,5 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.ComponentModel;
+using System.Net.NetworkInformation;
 using Microsoft.NodejsTools.Npm;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using Newtonsoft.Json;
@@ -21,6 +23,12 @@ namespace NpmTests
     ""name"": ""TestPkg"",
     ""version"": ""0.1.0"",
     ""bugs"": ""http://www.mybugtracker.com/""
+}";
+
+        private const string PkgSingleLicenseType = @"{
+    ""name"": ""TestPkg"",
+    ""version"": ""0.1.0"",
+    ""license"" : ""BSD""
 }";
 
         private const string PkgStartScript = @"{
@@ -335,6 +343,38 @@ namespace NpmTests
         public void TestReadBugsUrlAndEmailNonCompliant()
         {
             TestReadBugsUrlAndEmail(PkgLargeNonCompliant);
+        }
+
+        [TestMethod]
+        public void TestReadNoLicensesEmpty()
+        {
+            var pkg = LoadFrom(PkgSimpleBugs);
+            var licenses = pkg.Licenses;
+            Assert.IsNotNull(licenses, "Licenses should not be null.");
+            Assert.AreEqual(0, licenses.Count, "Should not be any licenses.");
+        }
+
+        [TestMethod]
+        public void TestReadLicensesTypeOnly()
+        {
+            var pkg = LoadFrom(PkgSingleLicenseType);
+            var licenses = pkg.Licenses;
+            Assert.AreEqual(1, licenses.Count, "License count mismatch." );
+            var license = licenses[0];
+            Assert.IsNotNull(license, "License should not be null.");
+            Assert.AreEqual("BSD", license.Type, "License type mismatch.");
+        }
+
+        [TestMethod]
+        public void ReadLicensesTypeAndUrl()
+        {
+            var pkg = LoadFrom(PkgLargeCompliant);
+            var licenses = pkg.Licenses;
+            Assert.AreEqual(1, licenses.Count, "License count mismatch.");
+            var license = licenses[0];
+            Assert.IsNotNull(license, "License should not be null.");
+            Assert.AreEqual("GPLv2", license.Type, "License type mismatch.");
+            Assert.AreEqual("http://www.example.org/licenses/gpl.html", license.Url, "License URL mismatch.");
         }
     }
 }

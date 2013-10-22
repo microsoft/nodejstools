@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.ComponentModel;
 using System.Linq;
 using System.Runtime.Remoting.Messaging;
 using System.Text;
@@ -15,6 +16,7 @@ namespace Microsoft.NodejsTools.Npm.SPI
         private Scripts m_Scripts;
         private Keywords m_Keywords;
         private Bugs m_Bugs;
+        private Licenses m_Licenses;
 
         public PackageJson( dynamic package )
         {
@@ -93,6 +95,18 @@ namespace Microsoft.NodejsTools.Npm.SPI
                     m_Bugs = new Bugs(m_Package);
                 }
                 return m_Bugs;
+            }
+        }
+
+        public ILicenses Licenses
+        {
+            get
+            {
+                if (null == m_Licenses)
+                {
+                    m_Licenses  = new Licenses(m_Package);
+                }
+                return m_Licenses;
             }
         }
     }
