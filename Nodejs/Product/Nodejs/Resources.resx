@@ -166,4 +166,7 @@
     <value>Node.js has not been detected on your computer</value>
     <comment>Used in general property page when Node.exe isn't found</comment>
   </data>
+  <data name="InvalidPortNumber" xml:space="preserve">
+    <value>Invalid port number - the port should contain only digits.</value>
+  </data>
 </root>

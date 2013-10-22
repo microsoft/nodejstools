@@ -314,40 +314,30 @@ namespace Microsoft.NodejsTools {
 
                 var contentRegistry = _compModel.GetService<IContentTypeRegistryService>();
 
-                var fileExtRegistry = _compModel.GetService<IFileExtensionRegistryService>();
-
-                IEditorOperationsFactoryService factory = _compModel.GetService<IEditorOperationsFactoryService>();
-
                 IContentType contentType = SniffContentType(diskBuffer) ??
                                            contentRegistry.GetContentType("JavaScript");
 
                 var proj = VsExtensions.GetCommonProject(Extensions.GetProject(_hierarchy)) as NodejsProjectNode;
 
-                var projBuffer = new NodejsProjectionBuffer(
-                    contentRegistry, 
-                    factService, 
-                    diskBuffer, 
-                    _compModel.GetService<IBufferGraphFactoryService>(), 
-                    contentType, 
-                    proj != null ? proj._referenceFilename : NodejsPackage.NodejsReferencePath
-                );
+                NodejsProjectionBuffer projBuffer;
+                if (!diskBuffer.Properties.TryGetProperty(typeof(NodejsProjectionBuffer), out projBuffer)) {
+                    projBuffer = new NodejsProjectionBuffer(
+                        contentRegistry,
+                        factService,
+                        diskBuffer,
+                        _compModel.GetService<IBufferGraphFactoryService>(),
+                        contentType,
+                        proj != null ? proj._referenceFilename : NodejsPackage.NodejsReferencePath
+                    );
 
-                diskBuffer.Properties.AddProperty(typeof(NodejsProjectionBuffer), projBuffer);
+                    diskBuffer.Properties.AddProperty(typeof(NodejsProjectionBuffer), projBuffer);
+                    adapterService.SetDataBuffer(_textLines, projBuffer.EllisionBuffer);
 
-                Guid langSvcGuid = NodejsPackage._jsLangSvcGuid;
-                _textLines.SetLanguageServiceID(ref langSvcGuid);
-
-                adapterService.SetDataBuffer(_textLines, projBuffer.EllisionBuffer);
-
-                diskBuffer.ChangeContentType(contentRegistry.GetContentType(NodejsConstants.Nodejs), null);
-                
-
-                IVsTextView view;
-                ErrorHandler.ThrowOnFailure(_window.GetPrimaryView(out view));
-                var wpfView = adapterService.GetWpfTextView(view);
-                var intellisenseStack = _compModel.GetService<IIntellisenseSessionStackMapService>().GetStackForTextView(wpfView);
-                EditFilter editFilter = new EditFilter(wpfView, factory.GetEditorOperations(wpfView), intellisenseStack, _compModel);
-                editFilter.AttachKeyboardFilter(view);
+                    Guid langSvcGuid = NodejsPackage._jsLangSvcGuid;
+                    _textLines.SetLanguageServiceID(ref langSvcGuid);
+                    
+                    diskBuffer.ChangeContentType(contentRegistry.GetContentType(NodejsConstants.Nodejs), null);
+                }
 
                 return VSConstants.S_OK;
             }
