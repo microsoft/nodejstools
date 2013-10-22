@@ -159,6 +159,13 @@ namespace NpmTests
         }
 
         [TestMethod]
+        public void TestReadNoDescriptionNull()
+        {
+            var pkg = LoadFrom(PkgEmpty);
+            Assert.IsNull(pkg.Description, "Description should be null.");
+        }
+
+        [TestMethod]
         public void TestReadDescription()
         {
             var pkg = LoadFrom(PkgLarge);
