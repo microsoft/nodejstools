@@ -34,6 +34,7 @@
     <Compile Include="MockPackageJsonSource.cs" />
     <Compile Include="PackageJsonTests.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="SemverVersionTestHelper.cs" />
     <Compile Include="SemverVersionTests.cs" />
   </ItemGroup>
   <ItemGroup>
