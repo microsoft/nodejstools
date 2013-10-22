@@ -31,6 +31,7 @@ namespace NpmTests
        ""package"",
        ""example"" 
    ],
+   ""homepage"": ""http://www.mypackagehomepage.com/"",
    ""maintainers"": [
        {
            ""name"": ""Bill Smith"",
@@ -213,6 +214,20 @@ namespace NpmTests
                 retrieved.Add(keywords[index]);
             }
             CheckRetrievedKeywords(retrieved);
+        }
+
+        [TestMethod]
+        public void TestReadNoHomepageNull()
+        {
+            var pkg = LoadFrom(PkgSimple);
+            Assert.IsNull(pkg.Homepage, "Homepage should be null");
+        }
+
+        [TestMethod]
+        public void TestReadHomepage()
+        {
+            var pkg = LoadFrom(PkgLarge);
+            Assert.AreEqual("http://www.mypackagehomepage.com/", pkg.Homepage, "Homepage mismatch.");
         }
     }
 }

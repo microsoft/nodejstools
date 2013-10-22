@@ -13,5 +13,6 @@ namespace Microsoft.NodejsTools.Npm
         IScripts Scripts { get; }
         string Description { get; }
         IKeywords Keywords { get; }
+        string Homepage { get; }
     }
 }

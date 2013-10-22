@@ -74,5 +74,13 @@ namespace Microsoft.NodejsTools.Npm.SPI
                 return m_Keywords;
             }
         }
+
+        public string Homepage
+        {
+            get
+            {
+                return null == m_Package.homepage ? null : m_Package.homepage.ToString();
+            }
+        }
     }
 }
