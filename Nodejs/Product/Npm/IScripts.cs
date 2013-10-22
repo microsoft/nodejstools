@@ -3,5 +3,6 @@
     public interface IScripts
     {
         int Count { get; }
+        IScript this[string name] { get; }
     }
 }
