@@ -32,6 +32,7 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="IBugs.cs" />
     <Compile Include="IKeywords.cs" />
     <Compile Include="IPackageJson.cs" />
     <Compile Include="IPackageJsonSource.cs" />
@@ -42,6 +43,7 @@
     <Compile Include="ScriptName.cs" />
     <Compile Include="SemverVersion.cs" />
     <Compile Include="SemverVersionFormatException.cs" />
+    <Compile Include="SPI\Bugs.cs" />
     <Compile Include="SPI\Keywords.cs" />
     <Compile Include="SPI\PackageJson.cs" />
     <Compile Include="SPI\Script.cs" />

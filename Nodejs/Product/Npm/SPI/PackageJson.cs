@@ -14,6 +14,7 @@ namespace Microsoft.NodejsTools.Npm.SPI
         private dynamic m_Package;
         private Scripts m_Scripts;
         private Keywords m_Keywords;
+        private Bugs m_Bugs;
 
         public PackageJson( dynamic package )
         {
@@ -80,6 +81,18 @@ namespace Microsoft.NodejsTools.Npm.SPI
             get
             {
                 return null == m_Package.homepage ? null : m_Package.homepage.ToString();
+            }
+        }
+
+        public IBugs Bugs
+        {
+            get
+            {
+                if (null == m_Bugs && null != m_Package.bugs)
+                {
+                    m_Bugs = new Bugs(m_Package);
+                }
+                return m_Bugs;
             }
         }
     }

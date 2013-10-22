@@ -17,13 +17,82 @@ namespace NpmTests
     ""version"": ""0.1.0""
 }";
 
+        private const string PkgSimpleBugs = @"{
+    ""name"": ""TestPkg"",
+    ""version"": ""0.1.0"",
+    ""bugs"": ""http://www.mybugtracker.com/""
+}";
+
         private const string PkgStartScript = @"{
     ""name"": ""ScriptPkg"",
     ""version"": ""1.2.3"",
     ""scripts"": {""start"": ""node server.js""}
 }";
 
-        private const string PkgLarge = @"{
+        private const string PkgLargeCompliant = @"{
+   ""name"": ""mypackage"",
+   ""version"": ""0.7.0"",
+   ""description"": ""Sample package for CommonJS. This package demonstrates the required elements of a CommonJS package."",
+   ""keywords"": [
+       ""package"",
+       ""example"" 
+   ],
+   ""homepage"": ""http://www.mypackagehomepage.com/"",
+   ""maintainers"": [
+       {
+           ""name"": ""Bill Smith"",
+           ""email"": ""bills@example.com"",
+           ""web"": ""http://www.example.com"" 
+       } 
+   ],
+   ""contributors"": [
+       {
+           ""name"": ""Mary Brown"",
+           ""email"": ""maryb@embedthis.com"",
+           ""web"": ""http://www.embedthis.com"" 
+       } 
+   ],
+   ""bugs"": {
+       ""email"": ""dev@example.com"",
+       ""url"": ""http://www.example.com/bugs"" 
+   },
+   ""licenses"": [
+       {
+           ""type"": ""GPLv2"",
+           ""url"": ""http://www.example.org/licenses/gpl.html"" 
+       } 
+   ],
+   ""repositories"": [
+       {
+           ""type"": ""git"",
+           ""url"": ""http://hg.example.com/mypackage.git"" 
+       } 
+   ],
+   ""dependencies"": {
+       ""webkit"": ""1.2"",
+       ""ssl"": {
+           ""gnutls"": [""1.0"", ""2.0""],
+           ""openssl"": ""0.9.8"" 
+       } 
+   },
+   ""implements"": [""cjs-module-0.3"", ""cjs-jsgi-0.1""],
+   ""os"": [""linux"", ""macos"", ""win""],
+   ""cpu"": [""x86"", ""ppc"", ""x86_64""],
+   ""engines"": [""v8"", ""ejs"", ""node"", ""rhino""],
+   ""scripts"": {
+       ""install"": ""install.js"",
+       ""uninstall"": ""uninstall.js"",
+       ""build"": ""build.js"",
+       ""test"": ""test.js"" 
+   },
+   ""directories"": {
+       ""lib"": ""src/lib"",
+       ""bin"": ""local/binaries"",
+       ""jars"": ""java"" 
+   } 
+}";
+
+        private const string PkgLargeNonCompliant = @"{
    ""name"": ""mypackage"",
    ""version"": ""0.7.0"",
    ""description"": ""Sample package for CommonJS. This package demonstrates the required elements of a CommonJS package."",
@@ -170,7 +239,7 @@ namespace NpmTests
         [TestMethod]
         public void TestReadDescription()
         {
-            var pkg = LoadFrom(PkgLarge);
+            var pkg = LoadFrom(PkgLargeCompliant);
             Assert.AreEqual(
                 "Sample package for CommonJS. This package demonstrates the required elements of a CommonJS package.",
                 pkg.Description,
@@ -196,7 +265,7 @@ namespace NpmTests
         [TestMethod]
         public void TestEnumerationOverKeywords()
         {
-            var pkg = LoadFrom(PkgLarge);
+            var pkg = LoadFrom(PkgLargeCompliant);
             var keywords = pkg.Keywords;
             Assert.AreEqual(2, keywords.Count, "Keyword count mismatch.");
 
@@ -220,14 +289,52 @@ namespace NpmTests
         public void TestReadNoHomepageNull()
         {
             var pkg = LoadFrom(PkgSimple);
-            Assert.IsNull(pkg.Homepage, "Homepage should be null");
+            Assert.IsNull(pkg.Homepage, "Homepage should be null.");
         }
 
         [TestMethod]
         public void TestReadHomepage()
         {
-            var pkg = LoadFrom(PkgLarge);
+            var pkg = LoadFrom(PkgLargeCompliant);
             Assert.AreEqual("http://www.mypackagehomepage.com/", pkg.Homepage, "Homepage mismatch.");
+        }
+
+        [TestMethod]
+        public void TestReadNoBugsNull()
+        {
+            var pkg = LoadFrom(PkgSimple);
+            Assert.IsNull(pkg.Bugs, "Bugs should be null.");
+        }
+
+        [TestMethod]
+        public void TestReadBugsUrlOnly()
+        {
+            var pkg = LoadFrom(PkgSimpleBugs);
+            var bugs = pkg.Bugs;
+            Assert.IsNotNull(bugs, "Bugs should not be null.");
+            Assert.AreEqual("http://www.mybugtracker.com/", bugs.Url, "Bugs URL mismatch.");
+            Assert.IsNull(bugs.Email, "Bugs email should be null.");
+        }
+
+        private void TestReadBugsUrlAndEmail(string json)
+        {
+            var pkg = LoadFrom(json);
+            var bugs = pkg.Bugs;
+            Assert.IsNotNull(bugs, "Bugs should not be null.");
+            Assert.AreEqual("http://www.example.com/bugs", bugs.Url, "Bugs URL mismatch.");
+            Assert.AreEqual("dev@example.com", bugs.Email, "Bugs email mismatch.");
+        }
+
+        [TestMethod]
+        public void TestReadBugsUrlAndEmailCompliant()
+        {
+            TestReadBugsUrlAndEmail(PkgLargeCompliant);
+        }
+
+        [TestMethod]
+        public void TestReadBugsUrlAndEmailNonCompliant()
+        {
+            TestReadBugsUrlAndEmail(PkgLargeNonCompliant);
         }
     }
 }
