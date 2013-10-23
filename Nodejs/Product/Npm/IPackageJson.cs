@@ -16,5 +16,6 @@ namespace Microsoft.NodejsTools.Npm
         string Homepage { get; }
         IBugs Bugs { get; }
         ILicenses Licenses { get; }
+        IFiles Files { get; }
     }
 }

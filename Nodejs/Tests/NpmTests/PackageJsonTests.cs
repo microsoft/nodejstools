@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Net.NetworkInformation;
+using System.Runtime;
 using Microsoft.NodejsTools.Npm;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using Newtonsoft.Json;
@@ -93,6 +94,7 @@ namespace NpmTests
        ""build"": ""build.js"",
        ""test"": ""test.js"" 
    },
+   ""files"" : [""server.js"", ""customlib.js"", ""path/to/subfolder""],
    ""directories"": {
        ""lib"": ""src/lib"",
        ""bin"": ""local/binaries"",
@@ -263,16 +265,18 @@ namespace NpmTests
             Assert.AreEqual(0, keywords.Count, "Keyword count should be 0.");
         }
 
-        private void CheckRetrievedKeywords(ISet<string> retrieved)
+        private static void CheckContains(ISet<string> retrieved, IEnumerable<string> expected)
         {
-            Assert.AreEqual(2, retrieved.Count, "Keyword count mismatch.");
-            Assert.IsTrue(retrieved.Contains("package"), "Should contain keyword 'package'.");
-            Assert.IsTrue(retrieved.Contains("example"), "Should contain keyword 'example'.");
+            foreach (var value in expected)
+            {
+                Assert.IsTrue(retrieved.Contains(value), string.Format("Expected to find value '{0}'.", value));
+            }
         }
 
         [TestMethod]
         public void TestEnumerationOverKeywords()
         {
+            var expected = new string[] {"package", "example"};
             var pkg = LoadFrom(PkgLargeCompliant);
             var keywords = pkg.Keywords;
             Assert.AreEqual(2, keywords.Count, "Keyword count mismatch.");
@@ -283,14 +287,14 @@ namespace NpmTests
             {
                 retrieved.Add(keyword);
             }
-            CheckRetrievedKeywords(retrieved);
+            CheckContains(retrieved, expected);
 
             retrieved = new HashSet<string>();
             for (int index = 0, size = keywords.Count; index < size; ++index)
             {
                 retrieved.Add(keywords[index]);
             }
-            CheckRetrievedKeywords(retrieved);
+            CheckContains(retrieved, expected);
         }
 
         [TestMethod]
@@ -376,5 +380,41 @@ namespace NpmTests
             Assert.AreEqual("GPLv2", license.Type, "License type mismatch.");
             Assert.AreEqual("http://www.example.org/licenses/gpl.html", license.Url, "License URL mismatch.");
         }
+
+        [TestMethod]
+        public void TestReadEmptyFilesEmpty()
+        {
+            var pkg = LoadFrom(PkgSimple);
+            var files = pkg.Files;
+            Assert.IsNotNull(files, "Files should not be null.");
+            Assert.AreEqual(0, files.Count, "Shouldn't be any files listed.");
+        }
+
+        [TestMethod]
+        public void TestReadFiles()
+        {
+            var expected = new string[] { "server.js", "customlib.js", "path/to/subfolder" };
+            
+
+            var pkg = LoadFrom(PkgLargeCompliant);
+            var files = pkg.Files;
+            Assert.AreEqual(3, files.Count, "File count mismatch.");
+
+            var retrieved = new HashSet<string>();
+            foreach (string file in files)
+            {
+                retrieved.Add(file);
+            }
+            CheckContains(retrieved, expected);
+
+            retrieved = new HashSet<string>();
+            for (int index = 0, size = files.Count; index < size; ++index)
+            {
+                retrieved.Add(files[index]);
+            }
+            CheckContains(retrieved, expected);
+        }
+
+        //  TODO: authors, contributors, private
     }
 }

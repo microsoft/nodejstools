@@ -3,9 +3,7 @@ using System.Collections.Generic;
 
 namespace Microsoft.NodejsTools.Npm
 {
-    public interface IKeywords : IEnumerable<string>
+    public interface IKeywords : IPkgStringArray
     {
-        int Count { get; }
-        string this[ int index ] { get; }
     }
 }

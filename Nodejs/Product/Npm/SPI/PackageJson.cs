@@ -17,6 +17,7 @@ namespace Microsoft.NodejsTools.Npm.SPI
         private Keywords m_Keywords;
         private Bugs m_Bugs;
         private Licenses m_Licenses;
+        private PkgFiles m_Files;
 
         public PackageJson( dynamic package )
         {
@@ -66,13 +67,7 @@ namespace Microsoft.NodejsTools.Npm.SPI
             {
                 if (null == m_Keywords)
                 {
-                    dynamic json = m_Package.keywords;
-                    if (null == json)
-                    {
-                        json = new JArray();
-                        m_Package.keywords = json;
-                    }
-                    m_Keywords = new Keywords(json);
+                    m_Keywords = new Keywords(m_Package);
                 }
                 return m_Keywords;
             }
@@ -107,6 +102,18 @@ namespace Microsoft.NodejsTools.Npm.SPI
                     m_Licenses  = new Licenses(m_Package);
                 }
                 return m_Licenses;
+            }
+        }
+
+        public IFiles Files
+        {
+            get
+            {
+                if (null == m_Files)
+                {
+                    m_Files = new PkgFiles(m_Package);
+                }
+                return m_Files;
             }
         }
     }

@@ -33,11 +33,13 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="IBugs.cs" />
+    <Compile Include="IFiles.cs" />
     <Compile Include="IKeywords.cs" />
     <Compile Include="ILicense.cs" />
     <Compile Include="ILicenses.cs" />
     <Compile Include="IPackageJson.cs" />
     <Compile Include="IPackageJsonSource.cs" />
+    <Compile Include="IPkgStringArray.cs" />
     <Compile Include="IScript.cs" />
     <Compile Include="IScripts.cs" />
     <Compile Include="PackageJsonFactory.cs" />
@@ -50,6 +52,8 @@
     <Compile Include="SPI\License.cs" />
     <Compile Include="SPI\Licenses.cs" />
     <Compile Include="SPI\PackageJson.cs" />
+    <Compile Include="SPI\PkgStringArray.cs" />
+    <Compile Include="SPI\PkgFiles.cs" />
     <Compile Include="SPI\Script.cs" />
     <Compile Include="SPI\Scripts.cs" />
   </ItemGroup>
