@@ -101,7 +101,7 @@ namespace Microsoft.NodejsTools {
         }
 
         public int ValidateBreakpointLocation(IVsTextBuffer pBuffer, int iLine, int iCol, TextSpan[] pCodeSpan) {
-            // per the docs, even if we don't indend to validate, we need to set the span info:
+            // per the docs, even if we don't intend to validate, we need to set the span info:
             // http://msdn.microsoft.com/en-us/library/microsoft.visualstudio.textmanager.interop.ivslanguagedebuginfo.validatebreakpointlocation.aspx
             // 
             // Caution
@@ -109,7 +109,7 @@ namespace Microsoft.NodejsTools {
             // language does support breakpoints, you must implement this method and return a span 
             // that contains the specified line and column; otherwise, breakpoints cannot be set 
             // anywhere except line 1. You can return E_NOTIMPL to indicate that you do not otherwise 
-            // support this method but the span must always be set. The example shows how this can be done.
+            // support this method but the span must always be set. 
 
             // http://pytools.codeplex.com/workitem/787
             // We were previously returning S_OK here indicating to VS that we have in fact validated
