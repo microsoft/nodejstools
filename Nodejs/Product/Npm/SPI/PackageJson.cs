@@ -18,6 +18,7 @@ namespace Microsoft.NodejsTools.Npm.SPI
         private Bugs m_Bugs;
         private Licenses m_Licenses;
         private PkgFiles m_Files;
+        private Man m_Man;
 
         public PackageJson( dynamic package )
         {
@@ -114,6 +115,18 @@ namespace Microsoft.NodejsTools.Npm.SPI
                     m_Files = new PkgFiles(m_Package);
                 }
                 return m_Files;
+            }
+        }
+
+        public IMan Man
+        {
+            get
+            {
+                if (null == m_Man)
+                {
+                    m_Man = new Man(m_Package);
+                }
+                return m_Man;
             }
         }
     }

@@ -1,8 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.ComponentModel;
-using System.Net.NetworkInformation;
-using System.Runtime;
+﻿using System.Collections.Generic;
 using Microsoft.NodejsTools.Npm;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using Newtonsoft.Json;
@@ -94,6 +90,7 @@ namespace NpmTests
        ""build"": ""build.js"",
        ""test"": ""test.js"" 
    },
+   ""man"" : [ ""./man/foo.1"", ""./man/bar.1"" ],
    ""files"" : [""server.js"", ""customlib.js"", ""path/to/subfolder""],
    ""directories"": {
        ""lib"": ""src/lib"",
@@ -158,6 +155,7 @@ namespace NpmTests
        ""build"": ""build.js"",
        ""test"": ""test.js"" 
    },
+   ""man"" : ""./man/foo.1"",
    ""directories"": {
        ""lib"": ""src/lib"",
        ""bin"": ""local/binaries"",
@@ -224,7 +222,7 @@ namespace NpmTests
             var pkg = LoadFrom(PkgStartScript);
             var scripts = pkg.Scripts;
 
-            foreach (var name in new string[]
+            foreach (var name in new[]
             {
                 ScriptName.Install,
                 ScriptName.Postinstall,
@@ -256,15 +254,6 @@ namespace NpmTests
                 "Description mismatch." );
         }
 
-        [TestMethod]
-        public void TestReadEmptyKeywordsCountZero()
-        {
-            var pkg = LoadFrom(PkgEmpty);
-            var keywords = pkg.Keywords;
-            Assert.IsNotNull(keywords, "Keywords should not be null - if there are no keywords an empty collection should be returned.");
-            Assert.AreEqual(0, keywords.Count, "Keyword count should be 0.");
-        }
-
         private static void CheckContains(ISet<string> retrieved, IEnumerable<string> expected)
         {
             foreach (var value in expected)
@@ -273,28 +262,47 @@ namespace NpmTests
             }
         }
 
+        private static void CheckStringArrayContents(
+            IPkgStringArray array,
+            int expectedCount,
+            IEnumerable<string> expectedValues)
+        {
+            Assert.IsNotNull(array, "Array should not be null.");
+            Assert.AreEqual(expectedCount, array.Count, "Value count mismatch.");
+
+            var retrieved = new HashSet<string>();
+            foreach (string file in array)
+            {
+                retrieved.Add(file);
+            }
+            CheckContains(retrieved, expectedValues);
+
+            retrieved = new HashSet<string>();
+            for (int index = 0, size = array.Count; index < size; ++index)
+            {
+                retrieved.Add(array[index]);
+            }
+            CheckContains(retrieved, expectedValues);
+        }
+
+        private static void CheckEmptyArray(IPkgStringArray array)
+        {
+            CheckStringArrayContents(array, 0, new string[0]);
+        }
+
+        [TestMethod]
+        public void TestReadEmptyKeywordsCountZero()
+        {
+            CheckEmptyArray(LoadFrom(PkgEmpty).Keywords);
+        }
+
         [TestMethod]
         public void TestEnumerationOverKeywords()
         {
-            var expected = new string[] {"package", "example"};
-            var pkg = LoadFrom(PkgLargeCompliant);
-            var keywords = pkg.Keywords;
-            Assert.AreEqual(2, keywords.Count, "Keyword count mismatch.");
-
-            var retrieved = new HashSet<string>();
-            
-            foreach (var keyword in keywords)
-            {
-                retrieved.Add(keyword);
-            }
-            CheckContains(retrieved, expected);
-
-            retrieved = new HashSet<string>();
-            for (int index = 0, size = keywords.Count; index < size; ++index)
-            {
-                retrieved.Add(keywords[index]);
-            }
-            CheckContains(retrieved, expected);
+            CheckStringArrayContents(
+                LoadFrom(PkgLargeCompliant).Keywords,
+                2,
+                new[] { "package", "example" });
         }
 
         [TestMethod]
@@ -384,37 +392,42 @@ namespace NpmTests
         [TestMethod]
         public void TestReadEmptyFilesEmpty()
         {
-            var pkg = LoadFrom(PkgSimple);
-            var files = pkg.Files;
-            Assert.IsNotNull(files, "Files should not be null.");
-            Assert.AreEqual(0, files.Count, "Shouldn't be any files listed.");
+            CheckEmptyArray(LoadFrom(PkgSimple).Files);
         }
 
         [TestMethod]
         public void TestReadFiles()
         {
-            var expected = new string[] { "server.js", "customlib.js", "path/to/subfolder" };
-            
-
-            var pkg = LoadFrom(PkgLargeCompliant);
-            var files = pkg.Files;
-            Assert.AreEqual(3, files.Count, "File count mismatch.");
-
-            var retrieved = new HashSet<string>();
-            foreach (string file in files)
-            {
-                retrieved.Add(file);
-            }
-            CheckContains(retrieved, expected);
-
-            retrieved = new HashSet<string>();
-            for (int index = 0, size = files.Count; index < size; ++index)
-            {
-                retrieved.Add(files[index]);
-            }
-            CheckContains(retrieved, expected);
+            CheckStringArrayContents(
+                LoadFrom(PkgLargeCompliant).Files,
+                3,
+                new[] { "server.js", "customlib.js", "path/to/subfolder" });
         }
 
-        //  TODO: authors, contributors, private
+        [TestMethod]
+        public void TestReadEmptyManEmpty()
+        {
+            CheckEmptyArray(LoadFrom(PkgSimple).Man);
+        }
+
+        [TestMethod]
+        public void TestReadSingleMan()
+        {
+            CheckStringArrayContents(
+                LoadFrom(PkgLargeNonCompliant).Man,
+                1,
+                new[] { "./man/foo.1" });
+        }
+
+        [ TestMethod ]
+        public void TestReadMultiMan()
+        {
+            CheckStringArrayContents(
+                LoadFrom(PkgLargeCompliant).Man,
+                2,
+                new[] { "./man/foo.1", "./man/bar.1" });
+        }
+
+        //  TODO: authors, contributors, private, main, bin
     }
 }

@@ -37,6 +37,7 @@
     <Compile Include="IKeywords.cs" />
     <Compile Include="ILicense.cs" />
     <Compile Include="ILicenses.cs" />
+    <Compile Include="IMan.cs" />
     <Compile Include="IPackageJson.cs" />
     <Compile Include="IPackageJsonSource.cs" />
     <Compile Include="IPkgStringArray.cs" />
@@ -51,6 +52,7 @@
     <Compile Include="SPI\Keywords.cs" />
     <Compile Include="SPI\License.cs" />
     <Compile Include="SPI\Licenses.cs" />
+    <Compile Include="SPI\Man.cs" />
     <Compile Include="SPI\PackageJson.cs" />
     <Compile Include="SPI\PkgStringArray.cs" />
     <Compile Include="SPI\PkgFiles.cs" />

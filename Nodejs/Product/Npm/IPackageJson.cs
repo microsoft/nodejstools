@@ -17,5 +17,6 @@ namespace Microsoft.NodejsTools.Npm
         IBugs Bugs { get; }
         ILicenses Licenses { get; }
         IFiles Files { get; }
+        IMan Man { get; }
     }
 }
