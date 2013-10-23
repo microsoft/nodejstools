@@ -73,9 +73,6 @@ namespace Microsoft.NodejsTools.Debugger.DebugEngine {
         public const string DebugEngineId = "{0A638DAC-429B-4973-ADA0-E8DCDFB29B61}";
         public static Guid DebugEngineGuid = new Guid(DebugEngineId);
 
-        public const string LanguageId = "{F7FA31DA-C32A-11D0-B442-00A0244A1DD2}";
-        public static Guid LanguageGuid = new Guid(LanguageId);
-
         /// <summary>
         /// Specifies whether the process should prompt for input before exiting on an abnormal exit.
         /// </summary>
@@ -325,7 +322,7 @@ namespace Microsoft.NodejsTools.Debugger.DebugEngine {
 
             BP_REQUEST_INFO[] requestInfo = new BP_REQUEST_INFO[1];
             EngineUtils.CheckOk(pBPRequest.GetRequestInfo(enum_BPREQI_FIELDS.BPREQI_LANGUAGE, requestInfo));
-            if (requestInfo[0].guidLanguage != LanguageGuid) {
+            if (requestInfo[0].guidLanguage != GuidList.guidNodejsDebugLanguage) {
                 return VSConstants.E_FAIL;
             }
 

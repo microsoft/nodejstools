@@ -40,7 +40,7 @@ namespace Microsoft.NodejsTools.Debugger.DebugEngine {
             BP_REQUEST_INFO[] requestInfo = new BP_REQUEST_INFO[1];
             EngineUtils.CheckOk(_bpRequest.GetRequestInfo(enum_BPREQI_FIELDS.BPREQI_BPLOCATION | enum_BPREQI_FIELDS.BPREQI_CONDITION | enum_BPREQI_FIELDS.BPREQI_ALLFIELDS, requestInfo));
             _bpRequestInfo = requestInfo[0];
-            Debug.Assert(_bpRequestInfo.guidLanguage ==  AD7Engine.LanguageGuid);
+            Debug.Assert(_bpRequestInfo.guidLanguage == GuidList.guidNodejsDebugLanguage);
             
             _engine = engine;
             _bpManager = bpManager;

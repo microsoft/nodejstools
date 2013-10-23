@@ -58,7 +58,7 @@ namespace Microsoft.NodejsTools {
     [ProvideOptionPage(typeof(NodejsGeneralOptionsPage), "Node.js Tools", "General", 114, 115, true)]
     [ProvideDebugEngine("Node.js Debugging", typeof(AD7ProgramProvider), typeof(AD7Engine), AD7Engine.DebugEngineId)]
     [ProvideLanguageService(typeof(NodejsLanguageInfo), NodejsConstants.Nodejs, 106, RequestStockColors = true, ShowSmartIndent = true, ShowCompletion = true, DefaultToInsertSpaces = true, HideAdvancedMembersByDefault = true, EnableAdvancedMembersOption = true, ShowDropDownOptions = true)]
-    [ProvideDebugLanguage(NodejsConstants.JavaScript, "{65791609-BA29-49CF-A214-DBFF8AEC3BC2}", NodeExpressionEvaluatorGuid, AD7Engine.DebugEngineId)]
+    [ProvideDebugLanguage(NodejsConstants.Nodejs, GuidList.guidNodejsDebugLanguageStr, NodeExpressionEvaluatorGuid, AD7Engine.DebugEngineId)]
     [ProvideBraceCompletion(NodejsConstants.Nodejs)]
     [WebSiteProject("JavaScript", "JavaScript")]
     // Keep declared exceptions in sync with those given default values in NodeDebugger.GetDefaultExceptionTreatments()

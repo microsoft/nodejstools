@@ -28,7 +28,7 @@ namespace Microsoft.NodejsTools {
     /// should be switched over to using our TextViewCreationListener instead).
     /// </summary>
     [Guid(GuidList.guidNodejsLanguageInfo)]
-    internal sealed class NodejsLanguageInfo : IVsLanguageInfo {
+    internal sealed class NodejsLanguageInfo : IVsLanguageInfo, IVsLanguageDebugInfo {
         private readonly IServiceProvider _serviceProvider;
         private readonly IComponentModel _componentModel;
 
@@ -68,6 +68,59 @@ namespace Microsoft.NodejsTools {
             get {
                 return _serviceProvider;
             }
+        }
+
+        public int GetLanguageID(IVsTextBuffer pBuffer, int iLine, int iCol, out Guid pguidLanguageID) {
+            pguidLanguageID = GuidList.guidNodejsDebugLanguage;
+            return VSConstants.S_OK;
+        }
+
+        public int GetLocationOfName(string pszName, out string pbstrMkDoc, TextSpan[] pspanLocation) {
+            pbstrMkDoc = null;
+            return VSConstants.E_FAIL;
+        }
+
+        public int GetNameOfLocation(IVsTextBuffer pBuffer, int iLine, int iCol, out string pbstrName, out int piLineOffset) {
+            pbstrName = null;
+            piLineOffset = 0;
+            return VSConstants.E_FAIL;
+        }
+
+        public int GetProximityExpressions(IVsTextBuffer pBuffer, int iLine, int iCol, int cLines, out IVsEnumBSTR ppEnum) {
+            ppEnum = null;
+            return VSConstants.E_FAIL;
+        }
+
+        public int IsMappedLocation(IVsTextBuffer pBuffer, int iLine, int iCol) {
+            return VSConstants.E_FAIL;
+        }
+
+        public int ResolveName(string pszName, uint dwFlags, out IVsEnumDebugName ppNames) {
+            ppNames = null;
+            return VSConstants.E_FAIL;
+        }
+
+        public int ValidateBreakpointLocation(IVsTextBuffer pBuffer, int iLine, int iCol, TextSpan[] pCodeSpan) {
+            // per the docs, even if we don't indend to validate, we need to set the span info:
+            // http://msdn.microsoft.com/en-us/library/microsoft.visualstudio.textmanager.interop.ivslanguagedebuginfo.validatebreakpointlocation.aspx
+            // 
+            // Caution
+            // Even if you do not intend to support the ValidateBreakpointLocation method but your 
+            // language does support breakpoints, you must implement this method and return a span 
+            // that contains the specified line and column; otherwise, breakpoints cannot be set 
+            // anywhere except line 1. You can return E_NOTIMPL to indicate that you do not otherwise 
+            // support this method but the span must always be set. The example shows how this can be done.
+
+            // http://pytools.codeplex.com/workitem/787
+            // We were previously returning S_OK here indicating to VS that we have in fact validated
+            // the breakpoint.  Validating breakpoints actually interacts and effectively disables
+            // the "Highlight entire source line for breakpoints and current statement" option as instead
+            // VS highlights the validated region.  So we return E_NOTIMPL here to indicate that we have 
+            // not validated the breakpoint, and then VS will happily respect the option when we're in 
+            // design mode.
+            pCodeSpan[0].iStartLine = iLine;
+            pCodeSpan[0].iEndLine = iLine;
+            return VSConstants.E_NOTIMPL;
         }
     }
 }
