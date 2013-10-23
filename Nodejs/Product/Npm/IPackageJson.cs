@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -18,5 +17,6 @@ namespace Microsoft.NodejsTools.Npm
         ILicenses Licenses { get; }
         IFiles Files { get; }
         IMan Man { get; }
+        IDependencies Dependencies { get; }
     }
 }

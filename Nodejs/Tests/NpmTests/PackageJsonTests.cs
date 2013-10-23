@@ -6,15 +6,8 @@ using Newtonsoft.Json;
 namespace NpmTests
 {
     [TestClass]
-    public class PackageJsonTests
+    public class PackageJsonTests : AbstractPackageJsonTests
     {
-
-        private const string PkgEmpty = "{}";
-
-        private const string PkgSimple = @"{
-    ""name"": ""TestPkg"",
-    ""version"": ""0.1.0""
-}";
 
         private const string PkgSimpleBugs = @"{
     ""name"": ""TestPkg"",
@@ -162,11 +155,6 @@ namespace NpmTests
        ""jars"": ""java"" 
    } 
 }";
-
-        private IPackageJson LoadFrom(string json)
-        {
-            return PackageJsonFactory.Create(new MockPackageJsonSource(json));
-        }
 
         [TestMethod]
         public void TestReadNoNameNull()
@@ -428,6 +416,6 @@ namespace NpmTests
                 new[] { "./man/foo.1", "./man/bar.1" });
         }
 
-        //  TODO: authors, contributors, private, main, bin
+        //  TODO: authors, contributors, private, main, bin, directories (hash), repository, config, 
     }
 }

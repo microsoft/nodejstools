@@ -14,15 +14,17 @@ namespace Microsoft.NodejsTools.Npm.SPI
 
         private dynamic m_Package;
         private Scripts m_Scripts;
-        private Keywords m_Keywords;
         private Bugs m_Bugs;
-        private Licenses m_Licenses;
-        private PkgFiles m_Files;
-        private Man m_Man;
 
         public PackageJson( dynamic package )
         {
             m_Package = package;
+
+            Keywords = new Keywords(m_Package);
+            Licenses = new Licenses(m_Package);
+            Files = new PkgFiles(m_Package);
+            Man = new Man(m_Package);
+            Dependencies = new Dependencies(m_Package);
         }
 
         public string Name
@@ -62,17 +64,7 @@ namespace Microsoft.NodejsTools.Npm.SPI
             }
         }
 
-        public IKeywords Keywords
-        {
-            get
-            {
-                if (null == m_Keywords)
-                {
-                    m_Keywords = new Keywords(m_Package);
-                }
-                return m_Keywords;
-            }
-        }
+        public IKeywords Keywords { get; private set; }
 
         public string Homepage
         {
@@ -94,40 +86,12 @@ namespace Microsoft.NodejsTools.Npm.SPI
             }
         }
 
-        public ILicenses Licenses
-        {
-            get
-            {
-                if (null == m_Licenses)
-                {
-                    m_Licenses  = new Licenses(m_Package);
-                }
-                return m_Licenses;
-            }
-        }
+        public ILicenses Licenses { get; private set; }
 
-        public IFiles Files
-        {
-            get
-            {
-                if (null == m_Files)
-                {
-                    m_Files = new PkgFiles(m_Package);
-                }
-                return m_Files;
-            }
-        }
+        public IFiles Files { get; private set; }
 
-        public IMan Man
-        {
-            get
-            {
-                if (null == m_Man)
-                {
-                    m_Man = new Man(m_Package);
-                }
-                return m_Man;
-            }
-        }
+        public IMan Man { get; private set; }
+
+        public IDependencies Dependencies { get; private set; }
     }
 }

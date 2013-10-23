@@ -33,6 +33,9 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="IBugs.cs" />
+    <Compile Include="IDependencies.cs" />
+    <Compile Include="IDependency.cs" />
+    <Compile Include="IDependencyUrl.cs" />
     <Compile Include="IFiles.cs" />
     <Compile Include="IKeywords.cs" />
     <Compile Include="ILicense.cs" />
@@ -49,6 +52,8 @@
     <Compile Include="SemverVersion.cs" />
     <Compile Include="SemverVersionFormatException.cs" />
     <Compile Include="SPI\Bugs.cs" />
+    <Compile Include="SPI\Dependencies.cs" />
+    <Compile Include="SPI\Dependency.cs" />
     <Compile Include="SPI\Keywords.cs" />
     <Compile Include="SPI\License.cs" />
     <Compile Include="SPI\Licenses.cs" />
