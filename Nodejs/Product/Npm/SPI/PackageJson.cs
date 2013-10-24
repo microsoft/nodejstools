@@ -24,7 +24,9 @@ namespace Microsoft.NodejsTools.Npm.SPI
             Licenses = new Licenses(m_Package);
             Files = new PkgFiles(m_Package);
             Man = new Man(m_Package);
-            Dependencies = new Dependencies(m_Package);
+            Dependencies = new Dependencies(m_Package, "dependencies");
+            DevDependencies = new Dependencies(m_Package, "devDependencies");
+            BundledDependencies = new Dependencies(m_Package, "bundledDependencies", "bundleDependencies");
         }
 
         public string Name
@@ -93,5 +95,7 @@ namespace Microsoft.NodejsTools.Npm.SPI
         public IMan Man { get; private set; }
 
         public IDependencies Dependencies { get; private set; }
+        public IDependencies DevDependencies { get; private set; }
+        public IDependencies BundledDependencies { get; private set; }
     }
 }
