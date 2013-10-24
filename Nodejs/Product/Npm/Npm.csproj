@@ -32,6 +32,7 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="DependencyUrlType.cs" />
     <Compile Include="IBugs.cs" />
     <Compile Include="IDependencies.cs" />
     <Compile Include="IDependency.cs" />
@@ -54,6 +55,7 @@
     <Compile Include="SPI\Bugs.cs" />
     <Compile Include="SPI\Dependencies.cs" />
     <Compile Include="SPI\Dependency.cs" />
+    <Compile Include="SPI\DependencyUrl.cs" />
     <Compile Include="SPI\Keywords.cs" />
     <Compile Include="SPI\License.cs" />
     <Compile Include="SPI\Licenses.cs" />

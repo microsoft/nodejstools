@@ -2,5 +2,7 @@
 {
     public interface IDependencyUrl
     {
+        string Address { get; }
+        DependencyUrlType Type { get; }
     }
 }

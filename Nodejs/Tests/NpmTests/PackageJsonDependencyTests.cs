@@ -61,40 +61,74 @@ namespace NpmTests
             Assert.AreEqual(0, dependencies.Count, "Should not be any dependencies.");
         }
 
-        private void CheckDependencies(IDictionary<string, IDependency> retrieved)
+        private void CheckDependencies(IDictionary<string, IDependency> retrieved, IEnumerable<string[]> expected)
         {
             Assert.AreEqual(16, retrieved.Count, "Retrieved dependency count mismatch.");
-            foreach (var pair in new[]
-            {
-                new[] {"foo", "1.0.0 - 2.9999.9999"}
-                , new[] {"bar", ">=1.0.2 <2.1.2"}
-                , new[] {"baz", ">1.0.2 <=2.3.4"}
-                , new[] {"boo", "2.0.1"}
-                , new[] {"qux", "<1.0.0 || >=2.3.1 <2.4.5 || >=2.5.2 <3.0.0"}
-                , new[] {"til", "~1.2"}
-                , new[] {"elf", "~1.2.3"}
-                , new[] {"two", "2.x"}
-                , new[] {"thr", "3.3.x"}
-            })
+            foreach (var pair in expected)
             {
                 var dependency = retrieved[pair[0]];
                 Assert.IsNotNull(
                     dependency,
                     string.Format("Should have found a dependency on package '{0}'.", pair[0]));
 
-                Assert.IsNull(
-                    dependency.Url,
-                    string.Format("Dependency on package '{0}' should not specify a URL.", pair[0]));
+                if (pair[1].IndexOf('/') < 0) //  i.e., the dependency isn't specified with a URL
+                {
+                    Assert.IsNull(
+                        dependency.Url,
+                        string.Format("Dependency on package '{0}' should not specify a URL.", pair[0]));
 
-                Assert.AreEqual(
-                    pair[1],
-                    dependency.VersionRangeText,
-                    string.Format("Version range mismatch for package '{0}'.", pair[0]));
+                    Assert.AreEqual(
+                        pair[1],
+                        dependency.VersionRangeText,
+                        string.Format("Version range mismatch for package '{0}'.", pair[0]));
+                }
+                else
+                {
+                    Assert.IsNull(dependency.VersionRangeText, "Dependency with URL should not specify version range text.");
+                    IDependencyUrl url = dependency.Url;
+                    Assert.IsNotNull(url, "Dependency URL should not be null.");
+                    string address = url.Address;
+                    Assert.IsNotNull(address, "Dependency URL address should not be null.");
+                    var index = address.IndexOf("://");
+                    if (index < 0)
+                    {
+                        Assert.AreEqual(DependencyUrlType.GitHub, url.Type, "Dependency URL type should be GitHub");
+                    }
+                    else
+                    {
+                        var prefix = address.Substring(0, index);
+                        switch (prefix)
+                        {
+                            case "http":
+                                Assert.AreEqual(DependencyUrlType.Http, url.Type, "Dependency URL type should be Http.");
+                                break;
+
+                            case "git":
+                                Assert.AreEqual(DependencyUrlType.Git, url.Type, "Dependency URL type should be Git.");
+                                break;
+
+                            case "git+ssh":
+                                Assert.AreEqual(DependencyUrlType.GitSsh, url.Type, "Dependency URL type should be GitSsh.");
+                                break;
+
+                            case "git+http":
+                                Assert.AreEqual(DependencyUrlType.GitHttp, url.Type, "Dependency URL type should be GitHttp.");
+                                break;
+
+                            case "git+https":
+                                Assert.AreEqual(DependencyUrlType.GitHttps, url.Type, "Dependency URL type should be GitHttps.");
+                                break;
+
+                            default:
+                                Assert.Fail(string.Format("Unrecognised URL prefix: {0}", prefix));
+                                break;
+                        }
+                    }
+                }
             }
         }
 
-        [TestMethod]
-        public void TestReadDependencies()
+        private IDictionary<string, IDependency> ReadDependencies()
         {
             var pkg = LoadFrom(PkgDependencies);
             var dependencies = pkg.Dependencies;
@@ -105,7 +139,43 @@ namespace NpmTests
             {
                 retrieved[dependency.Name] = dependency;
             }
-            CheckDependencies(retrieved);
+            return retrieved;
+        }
+        
+        [TestMethod]
+        public void TestReadDependenciesWithVersionRange()
+        {
+            CheckDependencies(
+                ReadDependencies(),
+                new[]
+                {
+                    new[] {"foo", "1.0.0 - 2.9999.9999"}
+                    , new[] {"bar", ">=1.0.2 <2.1.2"}
+                    , new[] {"baz", ">1.0.2 <=2.3.4"}
+                    , new[] {"boo", "2.0.1"}
+                    , new[] {"qux", "<1.0.0 || >=2.3.1 <2.4.5 || >=2.5.2 <3.0.0"}
+                    , new[] {"til", "~1.2"}
+                    , new[] {"elf", "~1.2.3"}
+                    , new[] {"two", "2.x"}
+                    , new[] {"thr", "3.3.x"}
+                });
+        }
+
+        [TestMethod]
+        public void TestReadDependenciesWithUrls()
+        {
+            CheckDependencies(
+                ReadDependencies(),
+                new []
+                {
+                    new[] {"asd", "http://asdf.com/asdf.tar.gz"}
+                    , new[] {"git", "git://github.com/user/project.git#commit-ish"}
+                    , new[] {"gitssh", "git+ssh://user@hostname:project.git#commit-ish"}
+                    , new[] {"gitssh2", "git+ssh://user@hostname/project.git#commit-ish"}
+                    , new[] {"githttp", "git+http://user@hostname/project/blah.git#commit-ish"}
+                    , new[] {"githttps", "git+https://user@hostname/project/blah.git#commit-ish"}
+                    , new[] {"github", "username/projectname"}
+                });
         }
 
     }
