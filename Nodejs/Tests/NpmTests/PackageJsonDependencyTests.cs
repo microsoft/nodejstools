@@ -106,14 +106,6 @@ namespace NpmTests
                 retrieved[dependency.Name] = dependency;
             }
             CheckDependencies(retrieved);
-
-            //retrieved = new Dictionary<string, IDependency>();
-            //for (int index = 0, size = dependencies.Count; index < size; ++index)
-            //{
-            //    var dependency = dependencies[index];
-            //    retrieved[dependency.Name] = dependency;
-            //}
-            //CheckDependencies(retrieved);
         }
 
     }
