@@ -108,7 +108,25 @@ namespace NpmTests
         , ""githttp""
         , ""githttps""
         , ""github""
-          ]
+          ],
+    ""optionalDependencies"" :
+          { ""optionalfoo"" : ""1.0.0 - 2.9999.9999""
+          , ""optionalbar"" : "">=1.0.2 <2.1.2""
+          , ""optionalbaz"" : "">1.0.2 <=2.3.4""
+          , ""optionalboo"" : ""2.0.1""
+          , ""optionalqux"" : ""<1.0.0 || >=2.3.1 <2.4.5 || >=2.5.2 <3.0.0""
+          , ""optionalasd"" : ""http://asdf.com/asdf.tar.gz""
+          , ""optionaltil"" : ""~1.2""
+          , ""optionalelf"" : ""~1.2.3""
+          , ""optionaltwo"" : ""2.x""
+          , ""optionalthr"" : ""3.3.x""
+        , ""optionalgit"" : ""git://github.com/user/project.git#commit-ish""
+        , ""optionalgitssh"" : ""git+ssh://user@hostname:project.git#commit-ish""
+        , ""optionalgitssh2"" : ""git+ssh://user@hostname/project.git#commit-ish""
+        , ""optionalgithttp"" : ""git+http://user@hostname/project/blah.git#commit-ish""
+        , ""optionalgithttps"" : ""git+https://user@hostname/project/blah.git#commit-ish""
+        , ""optionalgithub"" : ""username/projectname""
+          }
 }";
 
         private const string PkgBundleDependencies = @"{
@@ -194,6 +212,30 @@ namespace NpmTests
                     , new[] {"github", "username/projectname"}
                 };
 
+        private static readonly string[][] OptionalVersionRangeDependencies = new[]
+                {
+                    new[] {"optionalfoo", "1.0.0 - 2.9999.9999"}
+                    , new[] {"optionalbar", ">=1.0.2 <2.1.2"}
+                    , new[] {"optionalbaz", ">1.0.2 <=2.3.4"}
+                    , new[] {"optionalboo", "2.0.1"}
+                    , new[] {"optionalqux", "<1.0.0 || >=2.3.1 <2.4.5 || >=2.5.2 <3.0.0"}
+                    , new[] {"optionaltil", "~1.2"}
+                    , new[] {"optionalelf", "~1.2.3"}
+                    , new[] {"optionaltwo", "2.x"}
+                    , new[] {"optionalthr", "3.3.x"}
+                };
+
+        private static readonly string[][] OptionalUrlDependencies = new[]
+                {
+                    new[] {"optionalasd", "http://asdf.com/asdf.tar.gz"}
+                    , new[] {"optionalgit", "git://github.com/user/project.git#commit-ish"}
+                    , new[] {"optionalgitssh", "git+ssh://user@hostname:project.git#commit-ish"}
+                    , new[] {"optionalgitssh2", "git+ssh://user@hostname/project.git#commit-ish"}
+                    , new[] {"optionalgithttp", "git+http://user@hostname/project/blah.git#commit-ish"}
+                    , new[] {"optionalgithttps", "git+https://user@hostname/project/blah.git#commit-ish"}
+                    , new[] {"optionalgithub", "username/projectname"}
+                };
+
         private static readonly string[][] DevVersionRangeDependencies = new[]
                 {
                     new[] {"devfoo", "1.0.0 - 2.9999.9999"}
@@ -238,13 +280,28 @@ namespace NpmTests
                     , "github"
                 };
 
+        private void CheckEmptyDependenciesNotNull(IDependencies dependencies)
+        {
+            Assert.IsNotNull(dependencies, "Dependencies should not be null.");
+            Assert.AreEqual(0, dependencies.Count, "Should not be any dependencies.");
+        }
+
         [TestMethod]
         public void TestReadEmptyDependenciesNotNull()
         {
-            var pkg = LoadFrom(PkgSimple);
-            var dependencies = pkg.Dependencies;
-            Assert.IsNotNull(dependencies, "Dependencies should not be null.");
-            Assert.AreEqual(0, dependencies.Count, "Should not be any dependencies.");
+            CheckEmptyDependenciesNotNull(LoadFrom(PkgSimple).Dependencies);
+        }
+
+        [TestMethod]
+        public void TestReadEmptyDevDependenciesNotNull()
+        {
+            CheckEmptyDependenciesNotNull(LoadFrom(PkgSimple).DevDependencies);
+        }
+
+        [TestMethod]
+        public void TestReadEmptyOptionalDependenciesNotNull()
+        {
+            CheckEmptyDependenciesNotNull(LoadFrom(PkgSimple).OptionalDependencies);
         }
 
         private void CheckDependencies(IDictionary<string, IDependency> retrieved, IEnumerable<string[]> expected)
@@ -336,29 +393,11 @@ namespace NpmTests
             return ReadDependencies(LoadFrom(PkgAllTheDependencies).DevDependencies);
         }
 
-        private ISet<string> ReadBundledDependencies(IPackageJson package)
+        private IDictionary<string, IDependency> ReadOptionalDependencies()
         {
-            var retrieved = new HashSet<string>();
-            var bundled = package.BundledDependencies;
-            Assert.IsNotNull(bundled, "Bundled dependencies should not be null.");
-            foreach (string name in bundled)
-            {
-                retrieved.Add(name);
-            }
-            return retrieved;
+            return ReadDependencies(LoadFrom(PkgAllTheDependencies).OptionalDependencies);
         }
-
-        //private ISet<string> ReadBundledDependencies()
-        //{
-        //    CheckStringArrayContents(LoadFrom(PkgAllTheDependencies).BundledDependencies, 16, );
-        //    return ReadDependencies(LoadFrom(PkgAllTheDependencies).BundledDependencies);
-        //}
-
-        //private ISet<string> ReadBundleDependencies()
-        //{
-        //    return ReadDependencies(LoadFrom(PkgBundleDependencies).BundledDependencies);
-        //}
-
+        
         [TestMethod]
         public void TestReadDependenciesWithVersionRange()
         {
@@ -393,6 +432,18 @@ namespace NpmTests
         public void TestReadBundleDependencies()
         {
             CheckStringArrayContents(LoadFrom(PkgBundleDependencies).BundledDependencies, 16, ExpectedBundledDependencies);
+        }
+
+        [TestMethod]
+        public void TestReadOptionalDependenciesWithVersionRange()
+        {
+            CheckDependencies(ReadOptionalDependencies(), OptionalVersionRangeDependencies);
+        }
+
+        [TestMethod]
+        public void TestReadOptionalDependenciesWithUrls()
+        {
+            CheckDependencies(ReadOptionalDependencies(), OptionalUrlDependencies);
         }
     }
 }

@@ -27,6 +27,7 @@ namespace Microsoft.NodejsTools.Npm.SPI
             Dependencies = new Dependencies(m_Package, "dependencies");
             DevDependencies = new Dependencies(m_Package, "devDependencies");
             BundledDependencies = new BundledDependencies(m_Package);
+            OptionalDependencies = new Dependencies(m_Package, "optionalDependencies");
         }
 
         public string Name
@@ -97,5 +98,6 @@ namespace Microsoft.NodejsTools.Npm.SPI
         public IDependencies Dependencies { get; private set; }
         public IDependencies DevDependencies { get; private set; }
         public IBundledDependencies BundledDependencies { get; private set; }
+        public IDependencies OptionalDependencies { get; private set; }
     }
 }

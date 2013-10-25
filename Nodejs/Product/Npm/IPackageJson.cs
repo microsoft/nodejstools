@@ -20,5 +20,6 @@ namespace Microsoft.NodejsTools.Npm
         IDependencies Dependencies { get; }
         IDependencies DevDependencies { get; }
         IBundledDependencies BundledDependencies { get; }
+        IDependencies OptionalDependencies { get; }
     }
 }
