@@ -753,6 +753,46 @@ namespace DebuggerTests {
                 exceptionTreatments: CollectExceptionTreatments("Error", ExceptionHitTreatment.BreakNever)
             );
         }
+        [TestMethod, Priority(0)]
+        public void DebuggingDownloaded() {
+            TestDebuggerSteps(
+                "DebuggingDownloaded.js",
+                new[] {
+                    new TestStep(action: TestAction.StepInto, expectedStepComplete: 205, expectedBreakFile: "node.js"),
+                    new TestStep(action: TestAction.StepOver, expectedStepComplete: 206, expectedBreakFile: "node.js"),
+                    new TestStep(action: TestAction.StepOut, expectedStepComplete: 1),
+                    new TestStep(action: TestAction.AddBreakpoint, targetBreakpointFile: "console.js", targetBreakpoint: 53),
+                    new TestStep(action: TestAction.ResumeProcess, expectedBreakpointHit: 53, expectedBreakFile: "console.js", validation:
+                        (process, thread) => {
+                            var module = thread.Frames[0].Module;
+
+                            // User data
+                            var obj = new object();
+                            module.Document = obj;
+                            Assert.AreEqual(obj, module.Document);
+                            module.Document = null;
+                            Assert.AreEqual(null, module.Document);
+
+                            // Download builtin
+                            Assert.IsTrue(module.BuiltIn);
+                            var scriptText = process.GetScriptText(module.ModuleId);
+                            Assert.IsTrue(scriptText.Contains("function Console("));
+
+                            // Download non-builtin
+                            module = thread.Frames[2].Module;
+                            Assert.IsFalse(module.BuiltIn);
+                            scriptText = process.GetScriptText(module.ModuleId);
+                            StreamReader streamReader = new StreamReader(module.FileName);
+                            var fileText = streamReader.ReadToEnd();
+                            streamReader.Close();
+                            Assert.IsTrue(scriptText.Contains(fileText));
+                        }
+                    ),
+                    new TestStep(action: TestAction.ResumeProcess, expectedExitCode: 0),
+                }
+            );
+        }
+
 
         [TestMethod, Priority(0)]
         public void Breaking_InFunctionPassedFewerThanTakenParms() {

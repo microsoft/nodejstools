@@ -352,7 +352,9 @@ namespace DebuggerTests {
             public int? _expectedEntryPointHit;
             public int? _expectedBreakpointHit;
             public int? _expectedStepComplete;
+            public string _expectedBreakFile;
             public ExceptionInfo _expectedExceptionRaised;
+            public string _targetBreakpointFile;
             public int? _targetBreakpoint;
             public uint? _expectedHitCount;
             public uint? _hitCount;
@@ -367,8 +369,10 @@ namespace DebuggerTests {
                 int? expectedEntryPointHit = null,
                 int? expectedBreakpointHit = null,
                 int? expectedStepComplete = null,
+                string expectedBreakFile = null,
                 ExceptionInfo expectedExceptionRaised = null,
                 int? targetBreakpoint = null,
+                string targetBreakpointFile = null,
                 uint? expectedHitCount = null,
                 uint? hitCount = null,
                 bool? enabled = null,
@@ -381,7 +385,9 @@ namespace DebuggerTests {
                 _expectedEntryPointHit = expectedEntryPointHit;
                 _expectedBreakpointHit = expectedBreakpointHit;
                 _expectedStepComplete = expectedStepComplete;
+                _expectedBreakFile = expectedBreakFile;
                 _expectedExceptionRaised = expectedExceptionRaised;
+                _targetBreakpointFile = targetBreakpointFile;
                 _targetBreakpoint = targetBreakpoint;
                 _expectedHitCount = expectedHitCount;
                 _hitCount = hitCount;
@@ -426,6 +432,15 @@ namespace DebuggerTests {
             }
         }
 
+        internal struct Breakpoint {
+            internal Breakpoint(string fileName, int line) {
+                _fileName = fileName;
+                _line = line;
+            }
+            public string _fileName;
+            public int _line;
+        }
+
         internal void TestDebuggerSteps(
             NodeDebugger process,
             NodeThread thread,
@@ -443,7 +458,7 @@ namespace DebuggerTests {
                 process.SetExceptionTreatment(defaultExceptionTreatment, exceptionTreatments);
             }
 
-            Dictionary<int, NodeBreakpoint> breakpoints = new Dictionary<int, NodeBreakpoint>();
+            Dictionary<Breakpoint, NodeBreakpoint> breakpoints = new Dictionary<Breakpoint, NodeBreakpoint>();
             AutoResetEvent breakpointBindSuccessHandled = new AutoResetEvent(false);
             AutoResetEvent breakpointBindFailureHandled = new AutoResetEvent(false);
 
@@ -506,8 +521,8 @@ namespace DebuggerTests {
                      (step._expectedBreakpointHit != null ? 1 : 0) +
                      (step._expectedStepComplete != null ? 1 : 0) +
                      (step._expectedExceptionRaised != null ? 1 : 0)) > 1);
-                NodeBreakpoint breakpoint;
                 bool wait = false;
+                NodeBreakpoint nodeBreakpoint;
                 switch (step._action) {
                     case TestAction.None:
                         break;
@@ -535,12 +550,14 @@ namespace DebuggerTests {
                         wait = true;
                         break;
                     case TestAction.AddBreakpoint:
+                        string breakpointFileName = step._targetBreakpointFile ?? filename;
                         int breakpointLine = step._targetBreakpoint.Value;
-                        Assert.IsFalse(breakpoints.TryGetValue(breakpointLine, out breakpoint));
-                        breakpoints[breakpointLine] =
+                        Breakpoint breakpoint = new Breakpoint(breakpointFileName, breakpointLine);
+                        Assert.IsFalse(breakpoints.TryGetValue(breakpoint, out nodeBreakpoint));
+                        breakpoints[breakpoint] =
                             AddBreakPoint(
                                 process,
-                                filename,
+                                breakpointFileName,
                                 breakpointLine,
                                 step._enabled ?? true,
                                 step._breakOn ?? new BreakOn(),
@@ -560,15 +577,20 @@ namespace DebuggerTests {
                         breakpointBindSuccessHandled.Reset();
                         break;
                     case TestAction.RemoveBreakpoint:
+                        breakpointFileName = step._targetBreakpointFile ?? filename;
                         breakpointLine = step._targetBreakpoint.Value;
-                        breakpoints[breakpointLine].Remove();
-                        breakpoints.Remove(breakpointLine);
+                        breakpoint = new Breakpoint(breakpointFileName, breakpointLine);
+                        breakpoints[breakpoint].Remove();
+                        breakpoints.Remove(breakpoint);
                         AssertWaited(breakpointUnbound);
                         breakpointUnbound.Reset();
                         break;
                     case TestAction.UpdateBreakpoint:
-                        breakpoint = breakpoints[step._targetBreakpoint.Value];
-                        foreach (var breakpointBinding in breakpoint.GetBindings()) {
+                        breakpointFileName = step._targetBreakpointFile ?? filename;
+                        breakpointLine = step._targetBreakpoint.Value;
+                        breakpoint = new Breakpoint(breakpointFileName, breakpointLine);
+                        nodeBreakpoint = breakpoints[breakpoint];
+                        foreach (var breakpointBinding in nodeBreakpoint.GetBindings()) {
                             if (step._hitCount != null) {
                                 Assert.IsTrue(breakpointBinding.SetHitCount(step._hitCount.Value));
                             }
@@ -645,10 +667,16 @@ namespace DebuggerTests {
                     }
                     exception = null;
                 }
+                if (step._expectedBreakFile != null) {
+                    Assert.AreEqual(step._expectedBreakFile, thread.Frames.First().FileName);
+                }
 
                 if (step._expectedHitCount != null) {
-                    breakpoint = breakpoints[step._targetBreakpoint.Value];
-                    foreach (var breakpointBinding in breakpoint.GetBindings()) {
+                    string breakpointFileName = step._targetBreakpointFile ?? filename;
+                    int breakpointLine = step._targetBreakpoint.Value;
+                    Breakpoint breakpoint = new Breakpoint(breakpointFileName, breakpointLine);
+                    nodeBreakpoint = breakpoints[breakpoint];
+                    foreach (var breakpointBinding in nodeBreakpoint.GetBindings()) {
                         Assert.AreEqual(step._expectedHitCount.Value, breakpointBinding.GetHitCount());
                     }
                 }
