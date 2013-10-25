@@ -34,6 +34,7 @@ namespace Microsoft.NodejsTools.Debugger.DebugEngine {
 
         private bool _enabled;
         private bool _deleted;
+        private string _documentName;
 
         public AD7PendingBreakpoint(IDebugBreakpointRequest2 pBPRequest, AD7Engine engine, BreakpointManager bpManager) {
             _bpRequest = pBPRequest;
@@ -60,16 +61,6 @@ namespace Microsoft.NodejsTools.Debugger.DebugEngine {
             }
 
             return true;
-        }
-
-        // Get the document context for this pending breakpoint. A document context is a abstract representation of a source file 
-        // location.
-        public AD7DocumentContext GetDocumentContext(NodeBreakpoint breakpoint) {
-            IDebugDocumentPosition2 docPosition = (IDebugDocumentPosition2)(Marshal.GetObjectForIUnknown(_bpRequestInfo.bpLocation.unionmember2));
-            string documentName;
-            EngineUtils.CheckOk(docPosition.GetFileName(out documentName));
-
-            return new AD7DocumentContext(new AD7MemoryAddress(_engine, documentName, (uint)breakpoint.LineNo - 1));
         }
 
         // Remove all of the bound breakpoints for this pending breakpoint
@@ -116,21 +107,14 @@ namespace Microsoft.NodejsTools.Debugger.DebugEngine {
                         AD7BoundBreakpoint.GetBreakOnForPassCount(_bpRequestInfo.bpPassCount),
                         _bpRequestInfo.bpCondition.bstrCondition
                     );
-                breakpoint.Add(
-                    (fixedUpLocation) => {
+                _bpManager.AddPendingBreakpoint(breakpoint, this);
+                breakpoint.Bind(
+                    (breakpointBinding) => {
                         // Success handler
-                        AD7BreakpointResolution breakpointResolution = new AD7BreakpointResolution(_engine, breakpoint, GetDocumentContext(breakpoint));
-                        AD7BoundBreakpoint boundBreakpoint = new AD7BoundBreakpoint(_engine, breakpoint, this, breakpointResolution, _enabled);
-                        lock (_boundBreakpoints) {
-                            _boundBreakpoints.Add(boundBreakpoint);
-                            _bpManager.AddBoundBreakpoint(breakpoint, boundBreakpoint);
-                        }
-                        _engine.OnBreakpointBindSucceeded(this, boundBreakpoint);
                         breakpointBindComplete.Set();
                     },
                     () => {
                         // Failure handler
-                        _engine.OnBreakpointBindFailed(this);
                         breakpointBindComplete.Set();
                     });
 
@@ -248,5 +232,15 @@ namespace Microsoft.NodejsTools.Debugger.DebugEngine {
         }
 
         #endregion
+
+        public string DocumentName {
+            get {
+                if (_documentName == null) {
+                    IDebugDocumentPosition2 docPosition = (IDebugDocumentPosition2)(Marshal.GetObjectForIUnknown(_bpRequestInfo.bpLocation.unionmember2));
+                    EngineUtils.CheckOk(docPosition.GetFileName(out _documentName));
+                }
+                return _documentName;
+            }
+        }
     }
 }

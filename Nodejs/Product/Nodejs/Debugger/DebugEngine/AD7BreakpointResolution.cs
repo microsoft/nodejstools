@@ -21,10 +21,10 @@ namespace Microsoft.NodejsTools.Debugger.DebugEngine {
     // This class represents the information that describes a bound breakpoint.
     class AD7BreakpointResolution : IDebugBreakpointResolution2 {
         private AD7Engine m_engine;
-        private NodeBreakpoint m_address;
+        private NodeBreakpointBinding m_address;
         private AD7DocumentContext m_documentContext;
 
-        public AD7BreakpointResolution(AD7Engine engine, NodeBreakpoint address, AD7DocumentContext documentContext) {
+        public AD7BreakpointResolution(AD7Engine engine, NodeBreakpointBinding address, AD7DocumentContext documentContext) {
             m_engine = engine;
             m_address = address;
             m_documentContext = documentContext;
@@ -66,25 +66,4 @@ namespace Microsoft.NodejsTools.Debugger.DebugEngine {
 
         #endregion
     }
-
-    class AD7ErrorBreakpointResolution : IDebugErrorBreakpointResolution2 {
-        #region IDebugErrorBreakpointResolution2 Members
-
-        int IDebugErrorBreakpointResolution2.GetBreakpointType(enum_BP_TYPE[] pBPType) {
-            throw new Exception("The method or operation is not implemented.");
-        }
-
-        int IDebugErrorBreakpointResolution2.GetResolutionInfo(enum_BPERESI_FIELDS dwFields, BP_ERROR_RESOLUTION_INFO[] pErrorResolutionInfo) {
-            if (((uint)dwFields & (uint)enum_BPERESI_FIELDS.BPERESI_BPRESLOCATION) != 0) { }
-            if (((uint)dwFields & (uint)enum_BPERESI_FIELDS.BPERESI_PROGRAM) != 0) { }
-            if (((uint)dwFields & (uint)enum_BPERESI_FIELDS.BPERESI_THREAD) != 0) { }
-            if (((uint)dwFields & (uint)enum_BPERESI_FIELDS.BPERESI_MESSAGE) != 0) { }
-            if (((uint)dwFields & (uint)enum_BPERESI_FIELDS.BPERESI_TYPE) != 0) { }
-
-            throw new Exception("The method or operation is not implemented.");
-        }
-
-        #endregion
-    }
-
 }

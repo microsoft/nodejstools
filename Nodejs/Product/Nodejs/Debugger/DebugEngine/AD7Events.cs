@@ -240,6 +240,33 @@ namespace Microsoft.NodejsTools.Debugger.DebugEngine {
         #endregion
     }
 
+    // This interface is sent when a bound breakpoint has been unbound in the debuggee.
+    sealed class AD7BreakpointUnboundEvent : AD7AsynchronousEvent, IDebugBreakpointUnboundEvent2 {
+        public const string IID = "78d1db4f-c557-4dc5-a2dd-5369d21b1c8c";
+
+        private AD7BoundBreakpoint m_boundBreakpoint;
+
+        public AD7BreakpointUnboundEvent(AD7BoundBreakpoint boundBreakpoint) {
+            m_boundBreakpoint = boundBreakpoint;
+        }
+
+        #region IDebugBreakpointUnboundEvent2 Members
+
+        int IDebugBreakpointUnboundEvent2.GetBreakpoint(out IDebugBoundBreakpoint2 ppBP)
+        {
+            ppBP = m_boundBreakpoint;
+            return VSConstants.S_OK;
+        }
+
+        int IDebugBreakpointUnboundEvent2.GetReason(enum_BP_UNBOUND_REASON[] pdwUnboundReason)
+        {
+            pdwUnboundReason[0] = enum_BP_UNBOUND_REASON.BPUR_BREAKPOINT_REBIND;
+            return VSConstants.S_OK;
+        }
+
+        #endregion
+}
+
     sealed class AD7BreakpointErrorEvent : AD7AsynchronousEvent, IDebugBreakpointErrorEvent2, IDebugErrorBreakpoint2, IDebugErrorBreakpointResolution2 {
         public const string IID = "abb0ca42-f82b-4622-84e4-6903ae90f210";
 

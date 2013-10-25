@@ -28,6 +28,14 @@ namespace DebuggerTests {
         NodeVersion_Unknown,
     };
 
+    internal static class Extensions {
+        internal static void Remove(this NodeBreakpoint breakpoint) {
+            foreach (var binding in breakpoint.GetBindings()) {
+                binding.Remove();
+            }
+        }
+    }
+
     public class BaseDebuggerTests {
         internal virtual string DebuggerTestPath {
             get {
@@ -42,11 +50,11 @@ namespace DebuggerTests {
             bool enabled = true,
             BreakOn breakOn = new BreakOn(),
             string condition = "",
-            Action<bool> successHandler = null,
+            Action<NodeBreakpointBinding> successHandler = null,
             Action failureHandler = null
         ) {
             NodeBreakpoint breakPoint = newproc.AddBreakPoint(fileName, line, enabled, breakOn, condition);
-            breakPoint.Add(successHandler, failureHandler);
+            breakPoint.Bind(successHandler, failureHandler);
             return breakPoint;
         }
 
@@ -436,8 +444,8 @@ namespace DebuggerTests {
             }
 
             Dictionary<int, NodeBreakpoint> breakpoints = new Dictionary<int, NodeBreakpoint>();
-            AutoResetEvent breakpointBindSuccess = new AutoResetEvent(false);
-            AutoResetEvent breakpointBindFailure = new AutoResetEvent(false);
+            AutoResetEvent breakpointBindSuccessHandled = new AutoResetEvent(false);
+            AutoResetEvent breakpointBindFailureHandled = new AutoResetEvent(false);
 
             AutoResetEvent entryPointHit = new AutoResetEvent(false);
             process.EntryPointHit += (sender, e) => {
@@ -445,10 +453,29 @@ namespace DebuggerTests {
                 entryPointHit.Set();
             };
 
+            AutoResetEvent breakpointBound = new AutoResetEvent(false);
+            BreakpointBindingEventArgs breakpointBind = null;
+            process.BreakpointBound += (sender, e) => {
+                breakpointBind = e;
+                breakpointBound.Set();
+            };
+
+            AutoResetEvent breakpointUnbound = new AutoResetEvent(false);
+            process.BreakpointUnbound += (sender, e) => {
+                breakpointBind = e;
+                breakpointUnbound.Set();
+            };
+
+            AutoResetEvent breakpointBindFailure = new AutoResetEvent(false);
+            process.BreakpointBindFailure += (sender, e) => {
+                breakpointBind = e;
+                breakpointBound.Set();
+            };
+
             AutoResetEvent breakpointHit = new AutoResetEvent(false);
             process.BreakpointHit += (sender, e) => {
                 Assert.AreEqual(thread, e.Thread);
-                Assert.AreEqual(thread.Frames.First().LineNo, e.Breakpoint.LineNo);
+                Assert.AreEqual(thread.Frames.First().LineNo, e.BreakpointBinding.LineNo);
                 breakpointHit.Set();
             };
 
@@ -518,32 +545,42 @@ namespace DebuggerTests {
                                 step._enabled ?? true,
                                 step._breakOn ?? new BreakOn(),
                                 step._condition,
-                                successHandler: (fixedUpLocation) => {
-                                    breakpointBindSuccess.Set();
+                                successHandler: (breakpointBinding) => {
+                                    breakpointBindSuccessHandled.Set();
+                                },
+                                failureHandler: () => {
+                                    breakpointBindFailureHandled.Set();
                                 }
                             );
-                        AssertWaited(breakpointBindSuccess);
+                        AssertWaited(breakpointBound);
+                        AssertWaited(breakpointBindSuccessHandled);
                         AssertNotSet(breakpointBindFailure);
-                        breakpointBindSuccess.Reset();
+                        AssertNotSet(breakpointBindFailureHandled);
+                        breakpointBound.Reset();
+                        breakpointBindSuccessHandled.Reset();
                         break;
                     case TestAction.RemoveBreakpoint:
                         breakpointLine = step._targetBreakpoint.Value;
                         breakpoints[breakpointLine].Remove();
                         breakpoints.Remove(breakpointLine);
+                        AssertWaited(breakpointUnbound);
+                        breakpointUnbound.Reset();
                         break;
                     case TestAction.UpdateBreakpoint:
                         breakpoint = breakpoints[step._targetBreakpoint.Value];
-                        if (step._hitCount != null) {
-                            Assert.IsTrue(breakpoint.SetHitCount(step._hitCount.Value));
-                        }
-                        if (step._enabled != null) {
-                            Assert.IsTrue(breakpoint.SetEnabled(step._enabled.Value));
-                        }
-                        if (step._breakOn != null) {
-                            Assert.IsTrue(breakpoint.SetBreakOn(step._breakOn.Value));
-                        }
-                        if (step._condition != null) {
-                            Assert.IsTrue(breakpoint.SetCondition(step._condition));
+                        foreach (var breakpointBinding in breakpoint.GetBindings()) {
+                            if (step._hitCount != null) {
+                                Assert.IsTrue(breakpointBinding.SetHitCount(step._hitCount.Value));
+                            }
+                            if (step._enabled != null) {
+                                Assert.IsTrue(breakpointBinding.SetEnabled(step._enabled.Value));
+                            }
+                            if (step._breakOn != null) {
+                                Assert.IsTrue(breakpointBinding.SetBreakOn(step._breakOn.Value));
+                            }
+                            if (step._condition != null) {
+                                Assert.IsTrue(breakpointBinding.SetCondition(step._condition));
+                            }
                         }
                         break;
                     case TestAction.KillProcess:
@@ -611,7 +648,9 @@ namespace DebuggerTests {
 
                 if (step._expectedHitCount != null) {
                     breakpoint = breakpoints[step._targetBreakpoint.Value];
-                    Assert.AreEqual(step._expectedHitCount.Value, breakpoint.GetHitCount());
+                    foreach (var breakpointBinding in breakpoint.GetBindings()) {
+                        Assert.AreEqual(step._expectedHitCount.Value, breakpointBinding.GetHitCount());
+                    }
                 }
 
                 if (step._validation != null) {

@@ -64,7 +64,6 @@ namespace Microsoft.NodejsTools.Debugger.DebugEngine {
         private string _webBrowserUrl = null;
         private int? _webBrowserPort = null;
 
-        internal static event EventHandler<AD7EngineEventArgs> EngineBreakpointHit;
         internal static event EventHandler<AD7EngineEventArgs> EngineAttached;
         internal static event EventHandler<AD7EngineEventArgs> EngineDetaching;
 
@@ -914,6 +913,10 @@ namespace Microsoft.NodejsTools.Debugger.DebugEngine {
             process.ModuleLoaded += OnModuleLoaded;
             process.ThreadCreated += OnThreadCreated;
 
+            process.BreakpointBound += OnBreakpointBound;
+            process.BreakpointUnbound += OnBreakpointUnbound;
+            process.BreakpointBindFailure += OnBreakpointBindFailure;
+
             process.BreakpointHit += OnBreakpointHit;
             process.AsyncBreakComplete += OnAsyncBreakComplete;
             process.ExceptionRaised += OnExceptionRaised;
@@ -1059,27 +1062,40 @@ namespace Microsoft.NodejsTools.Debugger.DebugEngine {
         }
 
         private void OnBreakpointHit(object sender, BreakpointHitEventArgs e) {
-
-            var breakpoint = _breakpointManager.GetBreakpoint(e.Breakpoint);
-            Send(new AD7BreakpointEvent(new AD7BoundBreakpointsEnum(new[] { breakpoint })), AD7BreakpointEvent.IID, _threads[e.Thread]);
+            var boundBreakpoint = _breakpointManager.GetBoundBreakpoint(e.BreakpointBinding);
+            Send(new AD7BreakpointEvent(new AD7BoundBreakpointsEnum(new[] { boundBreakpoint })), AD7BreakpointEvent.IID, _threads[e.Thread]);
         }
 
-        internal void OnBreakpointBindSucceeded(AD7PendingBreakpoint pendingBreakpoint, AD7BoundBreakpoint boundBreakpoint) {
+        private void OnBreakpointBound(object sender, BreakpointBindingEventArgs e) {
+            var pendingBreakpoint = _breakpointManager.GetPendingBreakpoint(e.Breakpoint);
+            var breakpointBinding = e.BreakpointBinding;
+            var codeContext = new AD7MemoryAddress(this, pendingBreakpoint.DocumentName, (uint)breakpointBinding.LineNo - 1);
+            var documentContext = new AD7DocumentContext(codeContext);
+            var breakpointResolution = new AD7BreakpointResolution(this, breakpointBinding, documentContext);
+            var boundBreakpoint = new AD7BoundBreakpoint(this, breakpointBinding, pendingBreakpoint, breakpointResolution, breakpointBinding.Enabled);
+            _breakpointManager.AddBoundBreakpoint(breakpointBinding, boundBreakpoint);
             Send(
-                new AD7BreakpointBoundEvent((AD7PendingBreakpoint)pendingBreakpoint, boundBreakpoint),
+                new AD7BreakpointBoundEvent(pendingBreakpoint, boundBreakpoint),
                 AD7BreakpointBoundEvent.IID,
                 null
             );
-
-            var breakpointHit = EngineBreakpointHit;
-            if (breakpointHit != null) {
-                breakpointHit(this, new AD7EngineEventArgs(this));
-            }
         }
 
-        internal void OnBreakpointBindFailed(AD7PendingBreakpoint pendingBreakpoint) {
+        private void OnBreakpointUnbound(object sender, BreakpointBindingEventArgs e) {
+            var breakpointBinding = e.BreakpointBinding;
+            var boundBreakpoint = _breakpointManager.GetBoundBreakpoint(breakpointBinding);
+            _breakpointManager.RemoveBoundBreakpoint(breakpointBinding);
             Send(
-                new AD7BreakpointErrorEvent((AD7PendingBreakpoint)pendingBreakpoint, this),
+                new AD7BreakpointUnboundEvent(boundBreakpoint),
+                AD7BreakpointUnboundEvent.IID,
+                null
+            );
+        }
+
+        private void OnBreakpointBindFailure(object sender, BreakpointBindingEventArgs e) {
+            var pendingBreakpoint = _breakpointManager.GetPendingBreakpoint(e.Breakpoint);
+            Send(
+                new AD7BreakpointErrorEvent(pendingBreakpoint, this),
                 AD7BreakpointErrorEvent.IID,
                 null
             );

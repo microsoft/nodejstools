@@ -15,16 +15,24 @@
 using System;
 
 namespace Microsoft.NodejsTools.Debugger {
-    class BreakpointEventArgs : EventArgs {
+    class BreakpointBindingEventArgs : EventArgs {
         private readonly NodeBreakpoint _breakpoint;
+        private readonly NodeBreakpointBinding _breakpointBinding;
 
-        public BreakpointEventArgs(NodeBreakpoint breakpoint) {
+        public BreakpointBindingEventArgs(NodeBreakpoint breakpoint, NodeBreakpointBinding breakpointBinding) {
             _breakpoint = breakpoint;
+            _breakpointBinding = breakpointBinding;
         }
 
         public NodeBreakpoint Breakpoint {
             get {
                 return _breakpoint;
+            }
+        }
+
+        public NodeBreakpointBinding BreakpointBinding {
+            get {
+                return _breakpointBinding;
             }
         }
     }
