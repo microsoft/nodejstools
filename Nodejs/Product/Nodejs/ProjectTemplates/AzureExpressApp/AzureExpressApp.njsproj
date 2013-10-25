@@ -36,6 +36,7 @@
     <Content Include="bin\ChangeConfig.ps1" />
     <Content Include="bin\download.ps1" />
     <Content Include="bin\setup_web.cmd" />
+    <Content Include="bin\node.cmd" />
   </ItemGroup>
 
   <Import Project="$(VSToolsPath)\Node.js Tools\Microsoft.NodejsTools.targets" />

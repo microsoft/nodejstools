@@ -70,7 +70,6 @@ namespace Microsoft.VisualStudioTools.Project {
         private DiskMerger _currentMerger;
         private readonly HashSet<HierarchyNode> _needBolding = new HashSet<HierarchyNode>();
         private int _idleTriggered;
-        private bool _isUserFileDirty;
 
         public CommonProjectNode(CommonProjectPackage/*!*/ package, ImageList/*!*/ imageList) {
             Contract.Assert(package != null);
@@ -177,13 +176,8 @@ namespace Microsoft.VisualStudioTools.Project {
 
         protected bool IsUserProjectFileDirty {
             get {
-                string document = this.GetMkDocument();
-
-                if (String.IsNullOrEmpty(document)) {
-                    return _isUserFileDirty;
-                }
-
-                return (_isUserFileDirty || !File.Exists(document + PerUserFileExtension));
+                return _userBuildProject != null && 
+                    _userBuildProject.Xml.HasUnsavedChanges;
             }
         }
 
@@ -423,6 +417,7 @@ namespace Microsoft.VisualStudioTools.Project {
             _watcher = CreateFileSystemWatcher(ProjectHome);
             _attributesWatcher = CreateAttributesWatcher(ProjectHome);
 
+            _currentMerger = new DiskMerger(this, this, ProjectHome);
         }
 
         private void BoldStartupItem() {
@@ -442,6 +437,9 @@ namespace Microsoft.VisualStudioTools.Project {
             watcher.Deleted += new FileSystemEventHandler(FileExistanceChanged);
             watcher.Renamed += new RenamedEventHandler(FileNameChanged);
             watcher.Changed += FileContentsChanged;
+#if DEV12_OR_LATER
+            watcher.Renamed += FileContentsChanged;
+#endif
             watcher.Error += WatcherError;
             watcher.EnableRaisingEvents = true;
             watcher.InternalBufferSize = 1024 * 4;  // 4k is minimum buffer size
@@ -477,7 +475,6 @@ namespace Microsoft.VisualStudioTools.Project {
 
             if (_userBuildProject != null) {
                 _userBuildProject.Save(FileName + PerUserFileExtension);
-                _isUserFileDirty = false;
             }
         }
 
@@ -486,7 +483,6 @@ namespace Microsoft.VisualStudioTools.Project {
 
             if (_userBuildProject != null) {
                 _userBuildProject.Save(filename + PerUserFileExtension);
-                _isUserFileDirty = false;
             }
         }
 
@@ -671,6 +667,7 @@ namespace Microsoft.VisualStudioTools.Project {
         }
 
         private void RemoveSubTree(HierarchyNode node) {
+            UIThread.Instance.MustBeCalledFromUIThread();
             foreach (var child in node.AllChildren) {
                 RemoveSubTree(child);
             }
@@ -1665,7 +1662,6 @@ namespace Microsoft.VisualStudioTools.Project {
                 _userBuildProject.FullPath = FileName + PerUserFileExtension;
             }
             _userBuildProject.SetProperty(propertyName, propertyValue ?? String.Empty);
-            _isUserFileDirty = true;
         }
 
         /// <summary>

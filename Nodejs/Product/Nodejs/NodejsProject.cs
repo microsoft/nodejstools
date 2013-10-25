@@ -560,6 +560,18 @@ namespace Microsoft.NodejsTools {
 
 
         protected override int GetProperty(uint itemId, int propId, out object property) {
+            switch ((__VSHPROPID)propId) {
+                case __VSHPROPID.VSHPROPID_IconIndex:
+                case __VSHPROPID.VSHPROPID_OpenFolderIconIndex:
+                    // Venus wants to change the icon for special folders using the IconIndex.  All of our
+                    // folders respond to IconHandles so we just force folders down that code path rather
+                    // than trying to hand out the correct IconIndex here
+                    if (GetItemType(new VSITEMSELECTION() { itemid = itemId, pHier = this }) == VSConstants.GUID_ItemType_PhysicalFolder) {
+                        property = null;
+                        return VSConstants.DISP_E_MEMBERNOTFOUND;
+                    }
+                    break;
+            }
             switch ((__VSHPROPID4)propId) {
 
                 case __VSHPROPID4.VSHPROPID_TargetFrameworkMoniker:

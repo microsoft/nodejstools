@@ -161,8 +161,10 @@ namespace Microsoft.NodejsTools {
                         return VSConstants.S_OK;
                     case VSConstants.VSStd2KCmdID.SHOWMEMBERLIST:
                     case VSConstants.VSStd2KCmdID.COMPLETEWORD:
-                        TriggerCompletionSession((VSConstants.VSStd2KCmdID)nCmdID == VSConstants.VSStd2KCmdID.COMPLETEWORD);
-                        return VSConstants.S_OK;
+                        if (TriggerCompletionSession((VSConstants.VSStd2KCmdID)nCmdID == VSConstants.VSStd2KCmdID.COMPLETEWORD)) {
+                            return VSConstants.S_OK;
+                        }
+                        break;
                     case VSConstants.VSStd2KCmdID.BACKSPACE:
                     case VSConstants.VSStd2KCmdID.DELETE:
                     case VSConstants.VSStd2KCmdID.DELETEWORDLEFT:
@@ -191,7 +193,7 @@ namespace Microsoft.NodejsTools {
             }
         }
 
-        internal void TriggerCompletionSession(bool completeWord) {
+        internal bool TriggerCompletionSession(bool completeWord) {
             Dismiss();
 
             _activeSession = _broker.TriggerCompletion(_textView);
@@ -206,7 +208,9 @@ namespace Microsoft.NodejsTools {
                     _activeSession.Dismissed += OnCompletionSessionDismissed;
                     _activeSession.Committed += OnCompletionSessionDismissed;
                 }
+                return true;
             }
+            return false;
         }
 
         private void OnCompletionSessionDismissed(object sender, System.EventArgs e) {

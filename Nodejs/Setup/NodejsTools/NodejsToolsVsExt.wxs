@@ -82,8 +82,11 @@
             <Component Id="cmpWebNodejsApp.zip" Directory="DIR_ProjectTemplates_4DCCAA275A2C4923918F2CBC07199083" Guid="{559C2DB8-DBAE-419A-95FE-9F7AE5623875}">
               <File Id="filWebNodejsApp.zip" KeyPath="yes" Source="$(var.BinariesDir)\ProjectTemplates\JavaScript\WebNodejsApp.zip" />
             </Component>
-            <Component Id="cmp7850D806C2DE45078426A78CBBEF66DA" Directory="Dir_NodejsToolsMsBuild" Guid="{6D84572F-D895-443F-BD25-712394273A4E}">
-                <File Id="filD2A9B63C22F547FD8C1C55BB14F22A8A" KeyPath="yes" Source="$(var.BinariesDir)\Microsoft.NodejsTools.targets" />
+            <Component Id="cmpNodejsTools.targets" Directory="Dir_NodejsToolsMsBuild" Guid="{6D84572F-D895-443F-BD25-712394273A4E}">
+                <File Id="filNodejsTools.targets" KeyPath="yes" Source="$(var.BinariesDir)\Microsoft.NodejsTools.targets" />
+            </Component>
+            <Component Id="cmpWebRole.dll" Directory="Dir_NodejsToolsMsBuild" Guid="{8E1C6566-4E0C-4F70-8735-081B9521660A}">
+                <File Id="filWebRole.dll" KeyPath="yes" Source="$(var.BinariesDir)\Microsoft.NodejsTools.WebRole.dll" />
             </Component>
 
             <Component Id="cmpDB983944C41346E38BA0413248958C3A" Directory="DIR_NewItem_8C4602C9B0A2476697A95E2BF5B94B53" Guid="{007564C3-0035-45B6-8929-E793159D0C72}">

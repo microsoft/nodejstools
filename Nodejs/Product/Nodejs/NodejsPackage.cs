@@ -162,6 +162,7 @@ namespace Microsoft.NodejsTools {
     [ProvideEditorExtension2(typeof(NodejsEditorFactoryPromptForEncoding), NodeJsFileType, 50, "*:1", ProjectGuid = "{78D985FC-2CA0-4D08-9B6B-35ACD5E5294A}", NameResourceID = 113, DefaultName = "server")]
     [ProvideProjectItem(typeof(BaseNodeProjectFactory), NodejsConstants.Nodejs, "FileTemplates\\NewItem", 0)]
     [ProvideLanguageTemplates("{349C5851-65DF-11DA-9384-00065B846F21}", NodejsConstants.Nodejs, GuidList.guidNodePkgString, "Web", "Node.js Project Templates", "{" + BaseNodeProjectFactory.BaseNodeProjectGuid + "}", ".js", NodejsConstants.Nodejs, "{" + BaseNodeProjectFactory.BaseNodeProjectGuid + "}")]
+    [ProvideTextEditorAutomation(NodejsConstants.Nodejs, 106, 102, ProfileMigrationType.PassThrough)]
     internal sealed class NodejsPackage : CommonPackage {
         internal const string NodeExpressionEvaluatorGuid = "{F16F2A71-1C45-4BAB-BECE-09D28CFDE3E6}";
         private IContentType _contentType;

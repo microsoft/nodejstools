@@ -372,7 +372,8 @@ try {
                     "Microsoft.NodejsTools.AjaxMin.dll", 
                     "Microsoft.NodejsTools.InteractiveWindow.dll",
                     "Microsoft.NodejsTools.Profiling.dll",
-                    "Microsoft.NodejsTools.ProjectWizard.dll"
+                    "Microsoft.NodejsTools.ProjectWizard.dll",
+                    "Microsoft.NodejsTools.WebRole.dll"
                     ) | ForEach {@{path="$destdir\Binaries\$_"; name=$projectName}})
                                 
                 $job1 = begin_sign_files $managed_files "$destdir\SignedBinaries" $approvers `

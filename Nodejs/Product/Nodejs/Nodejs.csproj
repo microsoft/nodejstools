@@ -419,6 +419,7 @@
     <ZipProject Include="ProjectTemplates\WebAzureNodejsApp\setup_web.cmd" />
     <ZipProject Include="ProjectTemplates\WebAzureNodejsApp\Web.cloud.config" />
     <ZipProject Include="ProjectTemplates\WebAzureNodejsApp\Web.config" />
+    <ZipProject Include="ProjectTemplates\WebAzureNodejsApp\node.cmd" />
     <ZipProject Include="ProjectTemplates\WebNodejsApp\WebNodejsApp.njsproj">
       <SubType>Designer</SubType>
     </ZipProject>
@@ -446,6 +447,7 @@
     <ZipProject Include="ProjectTemplates\AzureNodejsApp\setup_web.cmd" />
     <ZipProject Include="ProjectTemplates\AzureNodejsApp\Web.cloud.config" />
     <ZipProject Include="ProjectTemplates\AzureNodejsApp\Web.config" />
+    <ZipProject Include="ProjectTemplates\AzureNodejsApp\node.cmd" />
     <ZipProject Include="ProjectTemplates\WebNodejsApp\package.json" />
     <ZipProject Include="ProjectTemplates\WebNodejsApp\README.md" />
     <ZipProject Include="ProjectTemplates\NodejsApp\NodejsApp.njsproj">
@@ -465,6 +467,7 @@
     <ZipProject Include="ProjectTemplates\AzureExpressApp\setup_web.cmd" />
     <ZipProject Include="ProjectTemplates\AzureExpressApp\download.ps1" />
     <ZipProject Include="ProjectTemplates\AzureExpressApp\ChangeConfig.ps1" />
+    <ZipProject Include="ProjectTemplates\AzureExpressApp\node.cmd" />
     <ZipProject Include="ProjectTemplates\WebAzureExpressApp\ChangeConfig.ps1" />
     <ZipProject Include="ProjectTemplates\WebAzureExpressApp\download.ps1" />
     <ZipProject Include="ProjectTemplates\WebAzureExpressApp\package.json" />
@@ -472,6 +475,7 @@
     <ZipProject Include="ProjectTemplates\WebAzureExpressApp\setup_web.cmd" />
     <ZipProject Include="ProjectTemplates\WebAzureExpressApp\Web.cloud.config" />
     <ZipProject Include="ProjectTemplates\WebAzureExpressApp\Web.config" />
+    <ZipProject Include="ProjectTemplates\WebAzureExpressApp\node.cmd" />
     <None Include="source.extension.vsixmanifest">
       <SubType>Designer</SubType>
     </None>

@@ -23,6 +23,7 @@
       <ProjectItem TargetFileName="bin\ChangeConfig.ps1">ChangeConfig.ps1</ProjectItem>
       <ProjectItem TargetFileName="bin\download.ps1">download.ps1</ProjectItem>
       <ProjectItem TargetFileName="bin\setup_web.cmd">setup_web.cmd</ProjectItem>
+      <ProjectItem TargetFileName="bin\node.cmd">node.cmd</ProjectItem>
     </Project>
   </TemplateContent>
   <WizardExtension>

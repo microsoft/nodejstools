@@ -95,6 +95,7 @@
     <Reference Include="System.ComponentModel.Composition" />
     <Reference Include="System.Core" />
     <Reference Include="System.Drawing" />
+    <Reference Include="System.Windows.Forms" />
     <Reference Include="System.Xml.Linq" />
     <Reference Include="System.Data.DataSetExtensions" />
     <Reference Include="Microsoft.CSharp" />
@@ -112,6 +113,7 @@
     <Reference Include="WindowsBase" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="BasicIntellisense.cs" />
     <Compile Include="SmartIndent.cs" />
     <Compile Include="BasicProjectTests.cs" />
     <Compile Include="NodejsProjectProcessor.cs" />
@@ -149,6 +151,9 @@
       <Project>{a731c4c3-3741-4080-a946-c47574c1f3bf}</Project>
       <Name>TestUtilities.UI.Nodejs</Name>
     </ProjectReference>
+  </ItemGroup>
+  <ItemGroup>
+    <WCFMetadata Include="Service References\" />
   </ItemGroup>
   <Import Project="..\TestProjectAfter.settings" />
 </Project>

@@ -12,17 +12,13 @@
  *
  * ***************************************************************************/
 
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+using System.IO;
 using Microsoft.TC.TestHostAdapters;
+using Microsoft.VisualStudio.Language.Intellisense;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using TestUtilities;
-using TestUtilities.UI;
 using TestUtilities.SharedProject;
-using Microsoft.VisualStudio.Language.Intellisense;
+using TestUtilities.UI;
 
 namespace Microsoft.Nodejs.Tests.UI {
     [TestClass]
@@ -469,6 +465,37 @@ namespace Microsoft.Nodejs.Tests.UI {
                 server.AssertNoIntellisenseSession();
             }
         }
+
+        /// <summary>
+        /// https://nodejstools.codeplex.com/workitem/354
+        /// 
+        /// Make sure adding a module externally gets picked up
+        /// </summary>
+        [TestMethod, Priority(0), TestCategory("Core")]
+        [HostType("TC Dynamic"), DynamicHostType(typeof(VsIdeHostAdapter))]
+        public void AddModuleExternally() {
+            using (var solution = BasicProject.Generate().ToVs()) {
+                var server = solution.OpenItem("Require", "server.js");
+
+                File.WriteAllText(
+                    Path.Combine(solution.Directory, "Require", "node_modules", "blah.js"),
+                    "exports = function(a,b,c) { }"
+                );
+
+                System.Threading.Thread.Sleep(1000);
+
+                Keyboard.Type("require(");
+
+                using (var completionSession = server.WaitForSession<ICompletionSession>()) {
+                    Assert.AreEqual(1, completionSession.Session.CompletionSets.Count);
+                    AssertUtil.ContainsAtLeast(
+                        completionSession.Session.GetDisplayTexts(),
+                        "blah.js"
+                    );
+                }
+            }
+        }
+
 
         private static ProjectDefinition RequireProject(params ProjectContentGenerator[] items) {
             return new ProjectDefinition("Require", NodejsProject, items);

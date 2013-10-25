@@ -5574,6 +5574,8 @@ If the files in the existing folder have the same names as files in the folder y
         /// <returns>parent node</returns>
         internal HierarchyNode GetItemParentNode(MSBuild.ProjectItem item)
         {
+            UIThread.Instance.MustBeCalledFromUIThread();
+
             var link = item.GetMetadataValue(ProjectFileConstants.Link);
             HierarchyNode currentParent = this;
             string strPath = item.EvaluatedInclude;
@@ -6081,6 +6083,8 @@ If the files in the existing folder have the same names as files in the folder y
         /// Finds a node by it's full path on disk.
         /// </summary>
         internal HierarchyNode FindNodeByFullPath(string name) {
+            UIThread.Instance.MustBeCalledFromUIThread();
+
             Debug.Assert(Path.IsPathRooted(name));
             HierarchyNode res;
             _diskNodes.TryGetValue(name, out res);
@@ -6306,6 +6310,8 @@ If the files in the existing folder have the same names as files in the folder y
             Utilities.ArgumentNotNull("parent", parent);
             Utilities.ArgumentNotNull("child", child);
 
+            UIThread.Instance.MustBeCalledFromUIThread();
+
             IDiskBasedNode diskNode = child as IDiskBasedNode;
             if (diskNode != null) {
                 _diskNodes[diskNode.Url] = child;
@@ -6328,6 +6334,8 @@ If the files in the existing folder have the same names as files in the folder y
         }
 
         internal void OnItemDeleted(HierarchyNode deletedItem) {
+            UIThread.Instance.MustBeCalledFromUIThread();
+
             IDiskBasedNode diskNode = deletedItem as IDiskBasedNode;
             if (diskNode != null) {
                 _diskNodes.Remove(diskNode.Url);
@@ -6655,6 +6663,8 @@ If the files in the existing folder have the same names as files in the folder y
         #endregion
 
         public void UpdatePathForDeferredSave(string oldPath, string newPath) {
+            UIThread.Instance.MustBeCalledFromUIThread();
+
             var existing = _diskNodes[oldPath];
             _diskNodes.Remove(oldPath);
             _diskNodes.Add(newPath, existing);

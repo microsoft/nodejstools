@@ -161,6 +161,7 @@ namespace Microsoft.NodejsTools.Intellisense {
                     var tokenText = classifications.Current.Span.GetText();
 
                     atRequire =
+                        classifications.Current.Span.Start.GetContainingLine().LineNumber != triggerPoint.GetContainingLine().LineNumber ||
                         tokenText.EndsWith(";") || // f(x); has ); displayed as a single token
                         _allowRequireTokens.Contains(tokenText) || // require after a token which starts an expression
                         (tokenText.All(IsIdentifierChar) && !_keywords.Contains(tokenText));    // require after anything else that isn't a statement like keyword 
