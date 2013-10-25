@@ -19,6 +19,6 @@ namespace Microsoft.NodejsTools.Npm
         IMan Man { get; }
         IDependencies Dependencies { get; }
         IDependencies DevDependencies { get; }
-        IDependencies BundledDependencies { get; }
+        IBundledDependencies BundledDependencies { get; }
     }
 }

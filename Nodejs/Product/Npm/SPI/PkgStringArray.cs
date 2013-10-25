@@ -12,19 +12,32 @@ namespace Microsoft.NodejsTools.Npm.SPI
     {
 
         private readonly JObject m_Package;
-        private readonly string m_ArrayPropertyName;
+        private readonly string [] m_ArrayPropertyNames;
 
-        protected PkgStringArray(JObject package, string arrayPropertyName)
+        protected PkgStringArray(JObject package, params string [] arrayPropertyNames)
         {
             m_Package = package;
-            m_ArrayPropertyName = arrayPropertyName;
+            m_ArrayPropertyNames = arrayPropertyNames;
+        }
+
+        private JToken GetArrayProperty()
+        {
+            foreach (var name in m_ArrayPropertyNames)
+            {
+                var array = m_Package[name] as JToken;
+                if (null != array)
+                {
+                    return array;
+                }
+            }
+            return null;
         }
 
         public int Count
         {
             get
             {
-                var token = m_Package[m_ArrayPropertyName];
+                var token = GetArrayProperty();
                 if (null == token)
                 {
                     return 0;
@@ -54,7 +67,7 @@ namespace Microsoft.NodejsTools.Npm.SPI
                         "Cannot retrieve item from empty package.json string array." );
                 }
 
-                var token = m_Package[m_ArrayPropertyName];
+                var token = GetArrayProperty();
                 switch (token.Type)
                 {
                     case JTokenType.String:
@@ -85,7 +98,7 @@ namespace Microsoft.NodejsTools.Npm.SPI
 
                 default:
                     return
-                        (m_Package[m_ArrayPropertyName] as JArray).Select(value => value.Value<string>())
+                        (GetArrayProperty() as JArray).Select(value => value.Value<string>())
                             .ToList()
                             .GetEnumerator();
             }

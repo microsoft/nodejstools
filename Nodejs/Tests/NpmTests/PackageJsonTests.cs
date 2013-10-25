@@ -242,42 +242,6 @@ namespace NpmTests
                 "Description mismatch." );
         }
 
-        private static void CheckContains(ISet<string> retrieved, IEnumerable<string> expected)
-        {
-            foreach (var value in expected)
-            {
-                Assert.IsTrue(retrieved.Contains(value), string.Format("Expected to find value '{0}'.", value));
-            }
-        }
-
-        private static void CheckStringArrayContents(
-            IPkgStringArray array,
-            int expectedCount,
-            IEnumerable<string> expectedValues)
-        {
-            Assert.IsNotNull(array, "Array should not be null.");
-            Assert.AreEqual(expectedCount, array.Count, "Value count mismatch.");
-
-            var retrieved = new HashSet<string>();
-            foreach (string file in array)
-            {
-                retrieved.Add(file);
-            }
-            CheckContains(retrieved, expectedValues);
-
-            retrieved = new HashSet<string>();
-            for (int index = 0, size = array.Count; index < size; ++index)
-            {
-                retrieved.Add(array[index]);
-            }
-            CheckContains(retrieved, expectedValues);
-        }
-
-        private static void CheckEmptyArray(IPkgStringArray array)
-        {
-            CheckStringArrayContents(array, 0, new string[0]);
-        }
-
         [TestMethod]
         public void TestReadEmptyKeywordsCountZero()
         {

@@ -92,23 +92,23 @@ namespace NpmTests
         , ""devgithub"" : ""username/projectname""
           },
     ""bundledDependencies"" :
-          { ""bundledfoo"" : ""1.0.0 - 2.9999.9999""
-          , ""bundledbar"" : "">=1.0.2 <2.1.2""
-          , ""bundledbaz"" : "">1.0.2 <=2.3.4""
-          , ""bundledboo"" : ""2.0.1""
-          , ""bundledqux"" : ""<1.0.0 || >=2.3.1 <2.4.5 || >=2.5.2 <3.0.0""
-          , ""bundledasd"" : ""http://asdf.com/asdf.tar.gz""
-          , ""bundledtil"" : ""~1.2""
-          , ""bundledelf"" : ""~1.2.3""
-          , ""bundledtwo"" : ""2.x""
-          , ""bundledthr"" : ""3.3.x""
-        , ""bundledgit"" : ""git://github.com/user/project.git#commit-ish""
-        , ""bundledgitssh"" : ""git+ssh://user@hostname:project.git#commit-ish""
-        , ""bundledgitssh2"" : ""git+ssh://user@hostname/project.git#commit-ish""
-        , ""bundledgithttp"" : ""git+http://user@hostname/project/blah.git#commit-ish""
-        , ""bundledgithttps"" : ""git+https://user@hostname/project/blah.git#commit-ish""
-        , ""bundledgithub"" : ""username/projectname""
-          }
+          [ ""foo""
+          , ""bar""
+          , ""baz""
+          , ""boo""
+          , ""qux""
+          , ""asd""
+          , ""til""
+          , ""elf""
+          , ""two""
+          , ""thr""
+        , ""git""
+        , ""gitssh""
+        , ""gitssh2""
+        , ""githttp""
+        , ""githttps""
+        , ""github""
+          ]
 }";
 
         private const string PkgBundleDependencies = @"{
@@ -151,23 +151,23 @@ namespace NpmTests
         , ""devgithub"" : ""username/projectname""
           },
     ""bundleDependencies"" :
-          { ""bundledfoo"" : ""1.0.0 - 2.9999.9999""
-          , ""bundledbar"" : "">=1.0.2 <2.1.2""
-          , ""bundledbaz"" : "">1.0.2 <=2.3.4""
-          , ""bundledboo"" : ""2.0.1""
-          , ""bundledqux"" : ""<1.0.0 || >=2.3.1 <2.4.5 || >=2.5.2 <3.0.0""
-          , ""bundledasd"" : ""http://asdf.com/asdf.tar.gz""
-          , ""bundledtil"" : ""~1.2""
-          , ""bundledelf"" : ""~1.2.3""
-          , ""bundledtwo"" : ""2.x""
-          , ""bundledthr"" : ""3.3.x""
-        , ""bundledgit"" : ""git://github.com/user/project.git#commit-ish""
-        , ""bundledgitssh"" : ""git+ssh://user@hostname:project.git#commit-ish""
-        , ""bundledgitssh2"" : ""git+ssh://user@hostname/project.git#commit-ish""
-        , ""bundledgithttp"" : ""git+http://user@hostname/project/blah.git#commit-ish""
-        , ""bundledgithttps"" : ""git+https://user@hostname/project/blah.git#commit-ish""
-        , ""bundledgithub"" : ""username/projectname""
-          }
+          [ ""foo""
+          , ""bar""
+          , ""baz""
+          , ""boo""
+          , ""qux""
+          , ""asd""
+          , ""til""
+          , ""elf""
+          , ""two""
+          , ""thr""
+        , ""git""
+        , ""gitssh""
+        , ""gitssh2""
+        , ""githttp""
+        , ""githttps""
+        , ""github""
+          ]
 }";
 
         private static readonly string[][] VersionRangeDependencies = new[]
@@ -218,28 +218,24 @@ namespace NpmTests
                     , new[] {"devgithub", "username/projectname"}
                 };
 
-        private static readonly string[][] BundledVersionRangeDependencies = new[]
+        private static readonly string[] ExpectedBundledDependencies = new[]
                 {
-                    new[] {"bundledfoo", "1.0.0 - 2.9999.9999"}
-                    , new[] {"bundledbar", ">=1.0.2 <2.1.2"}
-                    , new[] {"bundledbaz", ">1.0.2 <=2.3.4"}
-                    , new[] {"bundledboo", "2.0.1"}
-                    , new[] {"bundledqux", "<1.0.0 || >=2.3.1 <2.4.5 || >=2.5.2 <3.0.0"}
-                    , new[] {"bundledtil", "~1.2"}
-                    , new[] {"bundledelf", "~1.2.3"}
-                    , new[] {"bundledtwo", "2.x"}
-                    , new[] {"bundledthr", "3.3.x"}
-                };
-
-        private static readonly string[][] BundledUrlDependencies = new[]
-                {
-                    new[] {"bundledasd", "http://asdf.com/asdf.tar.gz"}
-                    , new[] {"bundledgit", "git://github.com/user/project.git#commit-ish"}
-                    , new[] {"bundledgitssh", "git+ssh://user@hostname:project.git#commit-ish"}
-                    , new[] {"bundledgitssh2", "git+ssh://user@hostname/project.git#commit-ish"}
-                    , new[] {"bundledgithttp", "git+http://user@hostname/project/blah.git#commit-ish"}
-                    , new[] {"bundledgithttps", "git+https://user@hostname/project/blah.git#commit-ish"}
-                    , new[] {"bundledgithub", "username/projectname"}
+                    "foo"
+                    , "bar"
+                    , "baz"
+                    , "boo"
+                    , "qux"
+                    , "til"
+                    , "elf"
+                    , "two"
+                    , "thr"
+                    , "asd"
+                    , "git"
+                    , "gitssh"
+                    , "gitssh2"
+                    , "githttp"
+                    , "githttps"
+                    , "github"
                 };
 
         [TestMethod]
@@ -340,15 +336,28 @@ namespace NpmTests
             return ReadDependencies(LoadFrom(PkgAllTheDependencies).DevDependencies);
         }
 
-        private IDictionary<string, IDependency> ReadBundledDependencies()
+        private ISet<string> ReadBundledDependencies(IPackageJson package)
         {
-            return ReadDependencies(LoadFrom(PkgAllTheDependencies).BundledDependencies);
+            var retrieved = new HashSet<string>();
+            var bundled = package.BundledDependencies;
+            Assert.IsNotNull(bundled, "Bundled dependencies should not be null.");
+            foreach (string name in bundled)
+            {
+                retrieved.Add(name);
+            }
+            return retrieved;
         }
 
-        private IDictionary<string, IDependency> ReadBundleDependencies()
-        {
-            return ReadDependencies(LoadFrom(PkgBundleDependencies).BundledDependencies);
-        }
+        //private ISet<string> ReadBundledDependencies()
+        //{
+        //    CheckStringArrayContents(LoadFrom(PkgAllTheDependencies).BundledDependencies, 16, );
+        //    return ReadDependencies(LoadFrom(PkgAllTheDependencies).BundledDependencies);
+        //}
+
+        //private ISet<string> ReadBundleDependencies()
+        //{
+        //    return ReadDependencies(LoadFrom(PkgBundleDependencies).BundledDependencies);
+        //}
 
         [TestMethod]
         public void TestReadDependenciesWithVersionRange()
@@ -375,27 +384,15 @@ namespace NpmTests
         }
 
         [TestMethod]
-        public void TestReadBundledDependenciesWithVersionRange()
+        public void TestReadBundledDependencies()
         {
-            CheckDependencies(ReadBundledDependencies(), BundledVersionRangeDependencies);
+            CheckStringArrayContents(LoadFrom(PkgAllTheDependencies).BundledDependencies, 16, ExpectedBundledDependencies);
         }
 
         [TestMethod]
-        public void TestReadBundledDependenciesWithUrls()
+        public void TestReadBundleDependencies()
         {
-            CheckDependencies(ReadBundledDependencies(), BundledUrlDependencies);
-        }
-
-        [TestMethod]
-        public void TestReadBundleDependenciesWithVersionRange()
-        {
-            CheckDependencies(ReadBundleDependencies(), BundledVersionRangeDependencies);
-        }
-
-        [TestMethod]
-        public void TestReadBundleDependenciesWithUrls()
-        {
-            CheckDependencies(ReadBundleDependencies(), BundledUrlDependencies);
+            CheckStringArrayContents(LoadFrom(PkgBundleDependencies).BundledDependencies, 16, ExpectedBundledDependencies);
         }
     }
 }

@@ -12,25 +12,17 @@ namespace Microsoft.NodejsTools.Npm.SPI
     internal class Dependencies : IDependencies
     {
         private JObject m_Package;
-        private string [] m_DependencyPropertyNames;
+        private string m_DependencyPropertyName;
 
-        public Dependencies(JObject package, params string [] dependencyPropertyNames)
+        public Dependencies(JObject package, string dependencyPropertyName)
         {
             m_Package = package;
-            m_DependencyPropertyNames = dependencyPropertyNames;
+            m_DependencyPropertyName = dependencyPropertyName;
         }
 
         private JObject GetDependenciesProperty()
         {
-            foreach (var name in m_DependencyPropertyNames)
-            {
-                var dependencies = m_Package[name] as JObject;
-                if (null != dependencies)
-                {
-                    return dependencies;
-                }
-            }
-            return null;
+            return m_Package[m_DependencyPropertyName] as JObject;
         }
 
         public IEnumerator<IDependency> GetEnumerator()
