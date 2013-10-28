@@ -17,15 +17,15 @@ class AssemblyVersionInfo {
     // This version string (and the comments for StableVersion and Version)
     // should be updated manually between major releases.
     // Servicing branches should retain the value
-    public const string ReleaseVersion = "2.0";
+    public const string ReleaseVersion = "1.0";
     // This version string (and the comment for StableVersion) should be
     // updated manually between minor releases.
     // Servicing branches should retain the value
-    public const string MinorVersion = "1";
+    public const string MinorVersion = "0";
 
     // This version should never change from "4100.00"; BuildRelease.ps1
     // will replace it with a generated value.
-    public const string BuildNumber = "11017.00";
+    public const string BuildNumber = "4100.00";
 
 #if DEV10
     public const string VSMajorVersion = "10";
@@ -42,9 +42,9 @@ class AssemblyVersionInfo {
 
     public const string VSVersion = VSMajorVersion + ".0";
 
-    // Defaults to "2.0.1.(2010|2012|2013)"
+    // Defaults to "1.0.0.(2010|2012|2013)"
     public const string StableVersion = ReleaseVersion + "." + MinorVersion + "." + VSVersionSuffix;
 
-    // Defaults to "2.0.4100.00"
+    // Defaults to "1.0.4100.00"
     public const string Version = ReleaseVersion + "." + BuildNumber;
 }

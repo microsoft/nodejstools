@@ -173,141 +173,6 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="$(BuildRoot)\Common\Product\ReplWindow\Guids.cs">
-      <Link>Guids.cs</Link>
-    </Compile>
-    <Compile Include="$(BuildRoot)\Common\Product\ReplWindow\ReplMouseProcessor.cs">
-      <Link>ReplMouseProcessor.cs</Link>
-    </Compile>
-    <Compile Include="$(BuildRoot)\Common\Product\ReplWindow\Repl\InlineReplAdornmentManager.cs">
-      <Link>Repl\InlineReplAdornmentManager.cs</Link>
-    </Compile>
-    <Compile Include="$(BuildRoot)\Common\Product\ReplWindow\Repl\IReplCommand2.cs">
-      <Link>Repl\IReplCommand2.cs</Link>
-    </Compile>
-    <Compile Include="$(BuildRoot)\Common\Product\ReplWindow\Repl\Margin\GlyphPrompts.cs">
-      <Link>Repl\GlyphPrompts.cs</Link>
-    </Compile>
-    <Compile Include="$(BuildRoot)\Common\Product\ReplWindow\Repl\Margin\PromptMarginVisualManager.cs">
-      <Link>Repl\PromptMarginVisualManager.cs</Link>
-    </Compile>
-    <Compile Include="$(BuildRoot)\Common\Product\ReplWindow\Repl\Margin\PromptMargin.cs">
-      <Link>Repl\PromptMargin.cs</Link>
-    </Compile>
-    <Compile Include="$(BuildRoot)\Common\Product\ReplWindow\Repl\OutputBuffer.cs">
-      <Link>Repl\OutputBuffer.cs</Link>
-    </Compile>
-    <Compile Include="$(BuildRoot)\Common\Product\ReplWindow\Repl\OutputColors.cs">
-      <Link>Repl\OutputColors.cs</Link>
-    </Compile>
-    <Compile Include="$(BuildRoot)\Common\Product\ReplWindow\Repl\ReplOutputClassificationFormatDefinitions.cs">
-      <Link>Repl\ReplOutputClassificationFormatDefinitions.cs</Link>
-    </Compile>
-    <Compile Include="$(BuildRoot)\Common\Product\ReplWindow\Repl\ReplOutputClassifier.cs">
-      <Link>Repl\ReplOutputClassifier.cs</Link>
-    </Compile>
-    <Compile Include="$(BuildRoot)\Common\Product\ReplWindow\Repl\ReplOutputClassifierProvider.cs">
-      <Link>Repl\ReplOutputClassifierProvider.cs</Link>
-    </Compile>
-    <Compile Include="$(BuildRoot)\Common\Product\ReplWindow\Repl\ReplOutputContentType.cs">
-      <Link>Repl\ReplOutputContentType.cs</Link>
-    </Compile>
-    <Compile Include="$(BuildRoot)\Common\Product\ReplWindow\Repl\CustomTrackingSpan.cs">
-      <Link>Repl\CustomTrackingSpan.cs</Link>
-    </Compile>
-    <Compile Include="$(BuildRoot)\Common\Product\ReplWindow\Repl\IContentTypeMetadata.cs">
-      <Link>Repl\IContentTypeMetadata.cs</Link>
-    </Compile>
-    <Compile Include="$(BuildRoot)\Common\Product\ReplWindow\Repl\IReplWindowCreationListener.cs">
-      <Link>Repl\IReplWindowCreationListener.cs</Link>
-    </Compile>
-    <Compile Include="$(BuildRoot)\Common\Product\ReplWindow\Repl\ReplInput.cs">
-      <Link>Repl\ReplInput.cs</Link>
-    </Compile>
-    <Compile Include="$(BuildRoot)\Common\Product\ReplWindow\Repl\Commands\CancelExecutionCommand.cs">
-      <Link>Repl\CancelExecutionCommand.cs</Link>
-    </Compile>
-    <Compile Include="$(BuildRoot)\Common\Product\ReplWindow\Repl\Commands\ClearScreenReplCommand.cs">
-      <Link>Repl\ClearScreenReplCommand.cs</Link>
-    </Compile>
-    <Compile Include="$(BuildRoot)\Common\Product\ReplWindow\Repl\Commands\EchoReplCommand.cs">
-      <Link>Repl\EchoReplCommand.cs</Link>
-    </Compile>
-    <Compile Include="$(BuildRoot)\Common\Product\ReplWindow\Repl\Commands\ResetReplCommand.cs">
-      <Link>Repl\ResetReplCommand.cs</Link>
-    </Compile>
-    <Compile Include="$(BuildRoot)\Common\Product\ReplWindow\Repl\Commands\WaitReplCommand.cs">
-      <Link>Repl\WaitReplCommand.cs</Link>
-    </Compile>
-    <Compile Include="$(BuildRoot)\Common\Product\ReplWindow\Repl\ReplAggregateClassifier.cs">
-      <Link>Repl\ReplAggregateClassifier.cs</Link>
-    </Compile>
-    <Compile Include="$(BuildRoot)\Common\Product\ReplWindow\Repl\ReplAggregateClassifierProvider.cs">
-      <Link>Repl\ReplAggregateClassifierProvider.cs</Link>
-    </Compile>
-    <Compile Include="$(BuildRoot)\Common\Product\ReplWindow\Repl\ReplConstants.cs">
-      <Link>Repl\ReplConstants.cs</Link>
-    </Compile>
-    <Compile Include="$(BuildRoot)\Common\Product\ReplWindow\Repl\ExecutionResult.cs">
-      <Link>Repl\ExecutionResult.cs</Link>
-    </Compile>
-    <Compile Include="$(BuildRoot)\Common\Product\ReplWindow\Repl\History.cs">
-      <Link>Repl\History.cs</Link>
-    </Compile>
-    <Compile Include="$(BuildRoot)\Common\Product\ReplWindow\Repl\IMultipleScopeEvaluator.cs">
-      <Link>Repl\IMultipleScopeEvaluator.cs</Link>
-    </Compile>
-    <Compile Include="$(BuildRoot)\Common\Product\ReplWindow\Repl\InlineReplAdornment.cs">
-      <Link>Repl\InlineReplAdornment.cs</Link>
-    </Compile>
-    <Compile Include="$(BuildRoot)\Common\Product\ReplWindow\Repl\IReplCommand.cs">
-      <Link>Repl\IReplCommand.cs</Link>
-    </Compile>
-    <Compile Include="$(BuildRoot)\Common\Product\ReplWindow\Repl\IReplEvaluator.cs">
-      <Link>Repl\IReplEvaluator.cs</Link>
-    </Compile>
-    <Compile Include="$(BuildRoot)\Common\Product\ReplWindow\Repl\IReplEvaluatorProvider.cs">
-      <Link>Repl\IReplEvaluatorProvider.cs</Link>
-    </Compile>
-    <Compile Include="$(BuildRoot)\Common\Product\ReplWindow\Repl\IReplWindow.cs">
-      <Link>Repl\IReplWindow.cs</Link>
-    </Compile>
-    <Compile Include="$(BuildRoot)\Common\Product\ReplWindow\Repl\IReplWindowProvider.cs">
-      <Link>Repl\IReplWindowProvider.cs</Link>
-    </Compile>
-    <Compile Include="$(BuildRoot)\Common\Product\ReplWindow\Repl\ReplContentType.cs">
-      <Link>Repl\ReplContentType.cs</Link>
-    </Compile>
-    <Compile Include="$(BuildRoot)\Common\Product\ReplWindow\Repl\ReplOptions.cs">
-      <Link>Repl\ReplOptions.cs</Link>
-    </Compile>
-    <Compile Include="$(BuildRoot)\Common\Product\ReplWindow\Repl\ReplRoleAttribute.cs">
-      <Link>Repl\ReplRoleAttribute.cs</Link>
-    </Compile>
-    <Compile Include="$(BuildRoot)\Common\Product\ReplWindow\Repl\ReplWindow.cs">
-      <Link>Repl\ReplWindow.cs</Link>
-    </Compile>
-    <Compile Include="$(BuildRoot)\Common\Product\ReplWindow\Repl\ReplWindowExtensions.cs">
-      <Link>Repl\ReplWindowExtensions.cs</Link>
-    </Compile>
-    <Compile Include="$(BuildRoot)\Common\Product\ReplWindow\Repl\ReplWindowProvider.cs">
-      <Link>Repl\ReplWindowProvider.cs</Link>
-    </Compile>
-    <Compile Include="$(BuildRoot)\Common\Product\ReplWindow\Repl\ResizingAdorner.cs">
-      <Link>Repl\ResizingAdorner.cs</Link>
-    </Compile>
-    <Compile Include="$(BuildRoot)\Common\Product\ReplWindow\Repl\ZoomableInlineAdornment.cs">
-      <Link>Repl\ZoomableInlineAdornment.cs</Link>
-    </Compile>
-    <Compile Include="$(BuildRoot)\Common\Product\ReplWindow\GlobalSuppressions.cs">
-      <Link>Repl\GlobalSuppressions.cs</Link>
-    </Compile>
-    <Compile Include="$(BuildRoot)\Common\Product\ReplWindow\ReplWindowPackage.cs">
-      <Link>ReplWindowPackage.cs</Link>
-    </Compile>
-    <Compile Include="$(BuildRoot)\Common\Product\ReplWindow\PkgCmdID.cs">
-      <Link>PkgCmdID.cs</Link>
-    </Compile>
     <Compile Include="Resources.Designer.cs">
       <AutoGen>True</AutoGen>
       <DesignTime>True</DesignTime>
@@ -357,6 +222,7 @@
       </EmbeddedResource>
     </ItemGroup>
   </Target>
+  <Import Project="$(BuildRoot)\Common\Product\ReplWindow\ReplWindow.proj" />
   <Import Project="..\ProjectAfter.settings" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
        Other similar extension points exist, see Microsoft.Common.targets.

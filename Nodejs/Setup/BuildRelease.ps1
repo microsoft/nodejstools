@@ -194,7 +194,7 @@ $products = @(
 Push-Location $buildroot
 
 $asmverfileBackedUp = 0
-$asmverfile = Get-ChildItem Build\AssemblyVersion.cs
+$asmverfile = Get-ChildItem Nodejs\Product\AssemblyVersion.cs
 # Force use of a backup if there are pending changes to $asmverfile
 $asmverfileUseBackup = 0
 if ((tf status $asmverfile /format:detailed | Select-String ": edit")) {
@@ -225,7 +225,7 @@ if ([int]::Parse([regex]::Match($buildnumber, '^[0-9]+').Value) -ge 65535) {
 }
 
 $releaseVersion = [regex]::Match((Get-Content $asmverfile), 'ReleaseVersion = "([0-9.]+)";').Groups[1].Value
-$minorVersion = [regex]::Match((Get-Content $asmverfile), 'MinorVersion = "([0-9.]+)";').Groups[1].Value
+$stableBuildVersion = [regex]::Match((Get-Content $asmverfile), 'StableBuildVersion = "([0-9.]+)";').Groups[1].Value
 $version = "$releaseVersion.$buildnumber"
 
 if ($release -or $mockrelease -or $internal) {
@@ -266,7 +266,7 @@ if ($skipclean) {
 
 Write-Output "Output Dir: $outdir"
 Write-Output ""
-Write-Output "Product version: $releaseversion.$minorversion.`$(VS version)"
+Write-Output "Product version: $releaseversion.$stableBuildVersion.`$(VS version)"
 Write-Output "File version: $version"
 foreach ($targetVs in $targetversions) {
     Write-Output "Building for: $($targetVs.name)"
@@ -293,6 +293,8 @@ if (-not $skipclean) {
 if ($scorch) {
     tfpt scorch /noprompt
 }
+
+$failed_logs = @()
 
 try {
     $successful = $false
@@ -327,11 +329,12 @@ try {
                     Nodejs\Tests\dirs.proj
                 if ($LASTEXITCODE -gt 0) {
                     Write-Error -EA:Continue "Test build failed: $config"
+                    $failed_logs += Get-Item "BuildRelease.$config.$($targetVs.number).tests.log"
                     continue
                 }
             }
             
-            msbuild /v:n /m /fl /flp:"Verbosity=n;LogFile=BuildRelease.$config.$($targetVs.number).log" `
+            msbuild /v:n /m /fl /flp:"Verbosity=d;LogFile=BuildRelease.$config.$($targetVs.number).log" `
                 /t:$target `
                 /p:Configuration=$config `
                 /p:WixVersion=$version `
@@ -341,6 +344,7 @@ try {
                 Nodejs\Setup\dirs.proj
             if ($LASTEXITCODE -gt 0) {
                 Write-Error -EA:Continue "Build failed: $config"
+                $failed_logs += Get-Item "BuildRelease.$config.$($targetVs.number).log"
                 continue
             }
             
@@ -474,4 +478,12 @@ if ($successful) {
     Write-Output ""
     Write-Output "Installers were output to:"
     Write-Output "    $outdir"
+    if ($failed_logs.Count -ne 0) {
+        Write-Output ""
+        Write-Warning "Some configurations failed to build."
+        Write-Output "Review these log files for details:"
+        foreach ($name in $failed_logs) {
+            Write-Output "    $name"
+        }
+    }
 }
