@@ -12,26 +12,36 @@ namespace Microsoft.NodejsTools.Npm.SPI
     internal class Dependencies : IDependencies
     {
         private JObject m_Package;
-        private string m_DependencyPropertyName;
+        private string [] m_DependencyPropertyNames;
 
-        public Dependencies(JObject package, string dependencyPropertyName)
+        public Dependencies(JObject package, params string [] dependencyPropertyNames)
         {
             m_Package = package;
-            m_DependencyPropertyName = dependencyPropertyName;
+            m_DependencyPropertyNames = dependencyPropertyNames;
         }
 
-        private JObject GetDependenciesProperty()
+        private IEnumerable< JObject > GetDependenciesProperties()
         {
-            return m_Package[m_DependencyPropertyName] as JObject;
+            foreach (var propertyName in m_DependencyPropertyNames)
+            {
+                var property = m_Package[propertyName] as JObject;
+                if (null != property)
+                {
+                    yield return property;
+                }
+            }
         }
 
         public IEnumerator<IDependency> GetEnumerator()
         {
-            var dependencies = GetDependenciesProperty();
-            var properties = null == dependencies ? new List<JProperty>() : dependencies.Properties();
-            foreach (var property in properties)
+            var dependencyProps = GetDependenciesProperties();
+            foreach (var dependencies in dependencyProps)
             {
-                yield return new Dependency(property.Name, property.Value.Value<string>());
+                var properties = null == dependencies ? new List<JProperty>() : dependencies.Properties();
+                foreach (var property in properties)
+                {
+                    yield return new Dependency(property.Name, property.Value.Value<string>());
+                }
             }
         }
 
@@ -44,8 +54,7 @@ namespace Microsoft.NodejsTools.Npm.SPI
         {
             get
             {
-                var dependencies = GetDependenciesProperty();
-                return null == dependencies ? 0 : dependencies.Count;
+                return this.Count();
             }
         }
 
@@ -53,14 +62,15 @@ namespace Microsoft.NodejsTools.Npm.SPI
         {
             get
             {
-                var dependencies = GetDependenciesProperty();
-                if (null == dependencies)
+                foreach (var dependencies in GetDependenciesProperties())
                 {
-                    return null;
+                    var property = dependencies[name];
+                    if (null != property)
+                    {
+                        return new Dependency(name, property.Value<string>());
+                    }
                 }
-
-                var property = dependencies[name];
-                return null == property ? null : new Dependency(name, property.Value<string>());
+                return null;
             }
         }
     }

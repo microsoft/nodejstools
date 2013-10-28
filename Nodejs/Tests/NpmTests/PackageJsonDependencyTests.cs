@@ -304,9 +304,9 @@ namespace NpmTests
             CheckEmptyDependenciesNotNull(LoadFrom(PkgSimple).OptionalDependencies);
         }
 
-        private void CheckDependencies(IDictionary<string, IDependency> retrieved, IEnumerable<string[]> expected)
+        private void CheckDependencies(IDictionary<string, IDependency> retrieved, IEnumerable<string[]> expected, int expectedCount)
         {
-            Assert.AreEqual(16, retrieved.Count, "Retrieved dependency count mismatch.");
+            Assert.AreEqual(expectedCount, retrieved.Count, "Retrieved dependency count mismatch.");
             foreach (var pair in expected)
             {
                 var dependency = retrieved[pair[0]];
@@ -371,9 +371,14 @@ namespace NpmTests
             }
         }
 
-        private IDictionary<string, IDependency> ReadDependencies(IDependencies dependencies)
+        private void CheckDependencies(IDictionary<string, IDependency> retrieved, IEnumerable<string[]> expected)
         {
-            Assert.AreEqual(16, dependencies.Count, "Dependency count mismatch.");
+            CheckDependencies(retrieved, expected, 16);
+        }
+
+        private IDictionary<string, IDependency> ReadDependencies(IDependencies dependencies, int expectedCount)
+        {
+            Assert.AreEqual(expectedCount, dependencies.Count, "Dependency count mismatch.");
 
             var retrieved = new Dictionary<string, IDependency>();
             foreach (var dependency in dependencies)
@@ -381,6 +386,11 @@ namespace NpmTests
                 retrieved[dependency.Name] = dependency;
             }
             return retrieved;
+        }
+
+        private IDictionary<string, IDependency> ReadDependencies(IDependencies dependencies)
+        {
+            return ReadDependencies(dependencies, 16);
         }
 
         private IDictionary<string, IDependency> ReadDependencies()
@@ -397,7 +407,12 @@ namespace NpmTests
         {
             return ReadDependencies(LoadFrom(PkgAllTheDependencies).OptionalDependencies);
         }
-        
+
+        private IDictionary<string, IDependency> ReadAllDependencies()
+        {
+            return ReadDependencies(LoadFrom(PkgAllTheDependencies).AllDependencies, 48);
+        }
+
         [TestMethod]
         public void TestReadDependenciesWithVersionRange()
         {
@@ -444,6 +459,15 @@ namespace NpmTests
         public void TestReadOptionalDependenciesWithUrls()
         {
             CheckDependencies(ReadOptionalDependencies(), OptionalUrlDependencies);
+        }
+
+        [TestMethod]
+        public void TestReadAllDependencies()
+        {
+            CheckDependencies(
+                ReadAllDependencies(), 
+                UrlDependencies.Concat(VersionRangeDependencies).Concat(DevUrlDependencies).Concat(DevVersionRangeDependencies).Concat(OptionalUrlDependencies).Concat(OptionalVersionRangeDependencies),
+                48);
         }
     }
 }
