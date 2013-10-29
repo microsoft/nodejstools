@@ -31,9 +31,11 @@
     <Reference Include="System" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="AbstractFilesystemPackageJsonTests.cs" />
     <Compile Include="AbstractPackageJsonTests.cs" />
     <Compile Include="FileSystemPackageJsonTests.cs" />
     <Compile Include="MockPackageJsonSource.cs" />
+    <Compile Include="ModuleHierarchyTests.cs" />
     <Compile Include="PackageJsonDependencyTests.cs" />
     <Compile Include="PackageJsonTests.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />

@@ -12,27 +12,8 @@ namespace NpmTests
 {
 
     [TestClass]
-    public class FileSystemPackageJsonTests : AbstractPackageJsonTests
+    public class FileSystemPackageJsonTests : AbstractFilesystemPackageJsonTests
     {
-
-        private TemporaryFileManager m_TemporaryFileManager;
-
-        [TestInitialize]
-        public void Init()
-        {
-            m_TemporaryFileManager  = new TemporaryFileManager();
-        }
-
-        private void CreatePackageJson(string filename, string json)
-        {
-            using (var fout = new FileStream(filename, FileMode.Create, FileAccess.Write, FileShare.None))
-            {
-                using (var writer = new StreamWriter(fout))
-                {
-                    writer.Write(json);
-                }
-            }
-        }
 
         private static void CheckPackage(IPackageJson pkg)
         {
@@ -44,7 +25,7 @@ namespace NpmTests
         [TestMethod]
         public void TestReadFromFile()
         {
-            var dir = m_TemporaryFileManager.GetNewTempDirectory();
+            var dir = TempFileManager.GetNewTempDirectory();
             var path = Path.Combine(dir.FullName, "package.json");
             CreatePackageJson(path, PkgSimple);
             CheckPackage(PackageJsonFactory.Create(new FilePackageJsonSource(path)));
@@ -53,15 +34,9 @@ namespace NpmTests
         [TestMethod]
         public void TestReadFromDirectory()
         {
-            var dir = m_TemporaryFileManager.GetNewTempDirectory();
+            var dir = TempFileManager.GetNewTempDirectory();
             CreatePackageJson(Path.Combine(dir.FullName, "package.json"), PkgSimple);
             CheckPackage(PackageJsonFactory.Create(new DirectoryPackageJsonSource(dir.FullName)));
-        }
-
-        [TestCleanup]
-        public void Cleanup()
-        {
-            m_TemporaryFileManager.Dispose();
         }
     }
 }
