@@ -15,9 +15,13 @@ namespace Microsoft.NodejsTools.Npm.SPI
             var modulesBase = Path.Combine(parent.Path, "node_modules");
             if (Directory.Exists(modulesBase))
             {
+                var bin = string.Format("{0}.bin", Path.DirectorySeparatorChar);
                 foreach (var moduleDir in Directory.EnumerateDirectories(modulesBase))
                 {
-                    AddModule(new Package(parent, moduleDir));
+                    if (! moduleDir.EndsWith(bin))
+                    {
+                        AddModule(new Package(parent, moduleDir));
+                    }
                 }
             }
 

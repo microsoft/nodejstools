@@ -23,6 +23,14 @@ namespace NpmTests
     }
 }";
 
+        protected const string PkgSingleRecursiveDependency = @"{
+    ""name"": ""TestPkg"",
+    ""version"": ""0.1.0"",
+    ""dependencies"": {
+        ""express"": ""*""
+    }
+}";
+
         private string CreateRootPackage(string json)
         {
             var dir = TempFileManager.GetNewTempDirectory();
@@ -47,15 +55,18 @@ namespace NpmTests
             Assert.AreEqual(0, modules.Count, "Module count mismatch.");
         }
 
+        private static void RunNpmInstall(string rootDir)
+        {
+            var p = new Process { StartInfo = new ProcessStartInfo("npm", "install") { WorkingDirectory = rootDir } };
+            p.Start();
+            p.WaitForExit();
+        }
+
         [TestMethod]
         public void TestReadRootPackageOneDependency()
         {
             var rootDir = CreateRootPackage(PkgSingleDependency);
-
-            var info = new ProcessStartInfo("npm", "install") {WorkingDirectory = rootDir};
-            var p = new Process {StartInfo = info};
-            p.Start();
-            p.WaitForExit();
+            RunNpmInstall(rootDir);
 
             var pkg = RootPackageFactory.Create(rootDir);
 
@@ -134,5 +145,60 @@ namespace NpmTests
             Assert.IsFalse(module.HasPackageJson, "Missing module should not have its own package.json");
         }
 
+        [TestMethod]
+        public void TestReadRootDependencyRecursive()
+        {
+            var rootDir = CreateRootPackage(PkgSingleRecursiveDependency);
+            RunNpmInstall(rootDir);
+
+            var pkg = RootPackageFactory.Create(rootDir);
+
+            var json = pkg.PackageJson;
+            var dependencies = json.AllDependencies;
+            Assert.AreEqual(1, dependencies.Count, "Dependency count mismatch.");
+
+            IDependency dep = dependencies["express"];
+            Assert.IsNotNull(dep, "express dependency should not be null.");
+            Assert.AreEqual("*", dep.VersionRangeText, "Version range mismatch.");
+
+            var modules = pkg.Modules;
+            Assert.AreEqual(1, modules.Count, "Module count mismatch");
+
+            IPackage module = modules[0];
+            Assert.IsNotNull(module, "Module should not be null when retrieved by index.");
+            module = modules["express"];
+            Assert.IsNotNull(module, "Module should not be null when retrieved by name.");
+
+            Assert.AreEqual(modules[0], modules["express"], "Modules should be same whether retrieved by name or index.");
+
+            Assert.AreEqual("express", module.Name, "Module name mismatch.");
+
+            var expectedModules = new string[]
+            {
+                "methods", "fresh", "cookie-signature", "range-parser", "buffer-crc32", "cookie", "debug", "mkdirp",
+                "commander", "send", "connect"
+            };
+
+            modules = module.Modules;
+            Assert.AreEqual(module.PackageJson.AllDependencies.Count, modules.Count, "Sub-module count mismatch.");
+            foreach (var name in expectedModules)
+            {
+                var current = modules[name];
+                Assert.IsNotNull(current, "Module should not be null when retrieved by name.");
+
+                Assert.AreEqual(name, current.Name, "Module name mismatch.");
+
+                Assert.IsNotNull(current.PackageJson, "Module package.json should not be null.");
+
+                Assert.IsTrue(current.IsDependencyInParentPackageJson, "Should be listed as a dependency in parent package.json.");
+                Assert.IsFalse(current.IsMissing, "Should not be marked as missing.");
+                Assert.IsFalse(current.IsDevDependency, "Should not be marked as dev dependency.");
+                Assert.IsFalse(current.IsOptionalDependency, "Should not be marked as optional dependency.");
+                Assert.IsFalse(current.IsBundledDependency, "Should not be marked as bundled dependency.");
+
+                //  Redundant?
+                Assert.IsTrue(current.HasPackageJson, "Module should have its own package.json");
+            }
+        }
     }
 }

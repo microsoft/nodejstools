@@ -60,5 +60,10 @@ namespace Microsoft.NodejsTools.Npm.SPI
                 return null != parentPackageJson && parentPackageJson.BundledDependencies.Contains(Name);
             }
         }
+
+        public override string ToString()
+        {
+            return string.Format("{0} {1}", Name, Version);
+        }
     }
 }
