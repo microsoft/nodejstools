@@ -33,6 +33,8 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="DependencyUrlType.cs" />
+    <Compile Include="DirectoryPackageJsonSource.cs" />
+    <Compile Include="FilePackageJsonSource.cs" />
     <Compile Include="IBugs.cs" />
     <Compile Include="IBundledDependencies.cs" />
     <Compile Include="IDependencies.cs" />
