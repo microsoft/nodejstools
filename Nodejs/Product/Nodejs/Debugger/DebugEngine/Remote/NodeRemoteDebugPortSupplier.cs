@@ -22,7 +22,7 @@ namespace Microsoft.NodejsTools.Debugger.Remote {
     [ComVisible(true)]
     [Guid("A241707C-7DB3-464F-8D3E-F3D33E86AE99")]
     public class NodeRemoteDebugPortSupplier : IDebugPortSupplier2, IDebugPortSupplierDescription2 {
-        public const string PortSupplierId = "{FEB76325-D127-4E02-B59D-B16D93D46CF5}";
+        public const string PortSupplierId = "{9E16F805-5EFC-4CE5-8B67-9AE9B643EF80}";
         private static readonly Guid _guid = new Guid(PortSupplierId);
         private static readonly string _defaultHost = "localhost";
         private static readonly ushort _defaultPort = 5858;
