@@ -64,9 +64,6 @@ namespace Microsoft.NodejsTools.Debugger.DebugEngine {
         private string _webBrowserUrl = null;
         private int? _webBrowserPort = null;
 
-        internal static event EventHandler<AD7EngineEventArgs> EngineAttached;
-        internal static event EventHandler<AD7EngineEventArgs> EngineDetaching;
-
         // These constants are duplicated in HpcLauncher and cannot be changed
 
         public const string DebugEngineId = "{0A638DAC-429B-4973-ADA0-E8DCDFB29B61}";
@@ -253,9 +250,15 @@ namespace Microsoft.NodejsTools.Debugger.DebugEngine {
 
             _loadComplete = true;
 
-            var attached = EngineAttached;
-            if (attached != null) {
-                attached(this, new AD7EngineEventArgs(this));
+            if (_webBrowserUrl != null) {
+                Debug.Assert(_webBrowserPort != null);
+                OnPortOpenedHandler.CreateHandler(
+                    _webBrowserPort.Value,
+                    shortCircuitPredicate: () => !_processLoaded,
+                    action: () => {
+                        LaunchBrowserDebugger();
+                    }
+                );
             }
         }
 
@@ -617,11 +620,6 @@ namespace Microsoft.NodejsTools.Debugger.DebugEngine {
                 return VSConstants.S_FALSE;
             }
 
-            var detaching = EngineDetaching;
-            if (detaching != null) {
-                detaching(this, new AD7EngineEventArgs(this));
-            }
-
             _process.Terminate();
 
             return VSConstants.S_OK;
@@ -670,11 +668,6 @@ namespace Microsoft.NodejsTools.Debugger.DebugEngine {
             AssertMainThread();
 
             _breakpointManager.ClearBoundBreakpoints();
-
-            var detaching = EngineDetaching;
-            if (detaching != null) {
-                detaching(this, new AD7EngineEventArgs(this));
-            }
 
             _process.Detach();
             _ad7ProgramId = Guid.Empty;
@@ -974,17 +967,6 @@ namespace Microsoft.NodejsTools.Debugger.DebugEngine {
 
 
         private void OnEntryPointHit(object sender, ThreadEventArgs e) {
-            if (_webBrowserUrl != null) {
-                Debug.Assert(_webBrowserPort != null);
-                OnPortOpenedHandler.CreateHandler(
-                    _webBrowserPort.Value,
-                    shortCircuitPredicate: () => !_processLoaded,
-                    action: () => {
-                        LaunchBrowserDebugger();
-                    }
-                );
-            }
-
             Send(new AD7EntryPointEvent(), AD7EntryPointEvent.IID, _threads[e.Thread]);
         }
 

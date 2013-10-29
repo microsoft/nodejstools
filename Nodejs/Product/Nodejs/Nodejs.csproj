@@ -256,7 +256,6 @@
     <Compile Include="Debugger\DebugEngine\AD7Document.cs" />
     <Compile Include="Debugger\DebugEngine\AD7DocumentContext.cs" />
     <Compile Include="Debugger\DebugEngine\AD7Engine.cs" />
-    <Compile Include="Debugger\DebugEngine\AD7EngineEventArgs.cs" />
     <Compile Include="Debugger\DebugEngine\AD7Enums.cs" />
     <Compile Include="Debugger\DebugEngine\AD7Events.cs" />
     <Compile Include="Debugger\DebugEngine\AD7MemoryAddress.cs" />
