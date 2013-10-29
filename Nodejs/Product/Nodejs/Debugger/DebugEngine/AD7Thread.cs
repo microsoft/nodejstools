@@ -12,6 +12,7 @@
  *
  * ***************************************************************************/
 
+using System;
 using System.Diagnostics;
 using Microsoft.VisualStudio;
 using Microsoft.VisualStudio.Debugger.Interop;
@@ -42,9 +43,9 @@ namespace Microsoft.NodejsTools.Debugger.DebugEngine {
         #region IDebugThread2 Members
 
         // Determines whether the next statement can be set to the given stack frame and code context.
-        // We need to try the step to verify it accurately so we allow say ok here.
+        // NOTE: VS2013 and earlier do not use the result to disable the "set next statement" command
         int IDebugThread2.CanSetNextStatement(IDebugStackFrame2 stackFrame, IDebugCodeContext2 codeContext) {
-            return VSConstants.E_FAIL;
+            throw new NotSupportedException("Set Next Statement is not supported by Node.js.");
         }
 
         // Retrieves a list of the stack frames for this thread.
@@ -133,16 +134,7 @@ namespace Microsoft.NodejsTools.Debugger.DebugEngine {
 
         // Sets the next statement to the given stack frame and code context.
         int IDebugThread2.SetNextStatement(IDebugStackFrame2 stackFrame, IDebugCodeContext2 codeContext) {
-            var frame = (AD7StackFrame)stackFrame;
-            var context = (AD7MemoryAddress)codeContext;
-
-            if (frame.StackFrame.SetLineNumber((int)context.LineNumber + 1)) {
-                return VSConstants.S_OK;
-            } else if (frame.StackFrame.Thread.Process.StoppedForException) {
-                return E_CANNOT_SET_NEXT_STATEMENT_ON_EXCEPTION;
-            }
-
-            return VSConstants.E_FAIL;
+            return VSConstants.E_NOTIMPL;
         }
 
         // suspend a thread.

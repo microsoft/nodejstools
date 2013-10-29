@@ -43,7 +43,7 @@ namespace Microsoft.VisualStudioTools {
             engineKey.SetValue("CallstackBP", 1);
             engineKey.SetValue("ConditionalBP", 1);
             engineKey.SetValue("Exceptions", 1);
-            engineKey.SetValue("SetNextStatement", 1);
+            engineKey.SetValue("SetNextStatement", 0);
             engineKey.SetValue("RemoteDebugging", 1);
             engineKey.SetValue("HitCountBP", 0);
             engineKey.SetValue("JustMyCodeStepping", 1);
