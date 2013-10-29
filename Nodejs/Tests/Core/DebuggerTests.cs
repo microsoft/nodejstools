@@ -1482,6 +1482,25 @@ namespace DebuggerTests {
             );
         }
 
+        /// <summary>
+        /// https://nodejstools.codeplex.com/workitem/379
+        /// 
+        /// Test handling of exceptions in evaluated code
+        /// </summary>
+        [TestMethod, Priority(0)]
+        public void TestExceptionInEvaluatedCode() {
+            TestDebuggerSteps(
+                "ExceptionInEvaluatedCode.js",
+                new[] {
+                    new TestStep(action: TestAction.ResumeThread, expectedEntryPointHit: 2),
+                    new TestStep(action: TestAction.StepOver, expectedStepComplete: 3),
+                    new TestStep(action: TestAction.StepOver, expectedExceptionRaised: new ExceptionInfo("SyntaxError", "SyntaxError: Unexpected token )", 1)),
+                    new TestStep(action: TestAction.StepOver, expectedStepComplete: 5),
+                    new TestStep(action: TestAction.StepOver, expectedStepComplete: 7),
+                    new TestStep(action: TestAction.ResumeProcess, expectedExitCode: 0),
+                }
+            );
+        }
 
         #endregion
 

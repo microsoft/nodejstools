@@ -1152,23 +1152,33 @@ namespace Microsoft.NodejsTools.Debugger {
                             object scriptIdObj;
                             var module = _unknownModule;
                             if (func.TryGetValue("scriptId", out scriptIdObj)) {
-                                foreach (var value in _scripts.Values) {
-                                    if (value.ModuleId == (int)scriptIdObj) {
-                                        module = value;
+                                foreach (var script in _scripts.Values) {
+                                    if (script.ModuleId == (int)scriptIdObj) {
+                                        module = script;
                                         break;
                                     }
                                 }
+                            }
+                            
+                            object value;
+                            var name = "<unknown>";
+                            if (func.TryGetValue("name", out value)) {
+                                name = (string)value;
+                            }
+                            var line = 0;
+                            if (frame.TryGetValue("line", out value)) {
+                                line = (int)value;
                             }
 
                             var nodeFrame = nodeFrames[i] =
                                 new NodeStackFrame(
                                     mainThread,
                                     module,
-                                    (string)func["name"],
-                                    (int)frame["line"] + 1,   // FIXME, should be function line start
-                                    (int)frame["line"] + 1,   // FIXME, should be function line end
-                                    (int)frame["line"] + 1,
-                                    0,  // Let GetFrameVariables() set argCount
+                                    name,
+                                    line + 1,   // FIXME, should be function line start
+                                    line + 1,   // FIXME, should be function line end
+                                    line + 1,
+                                    0,          // Let GetFrameVariables() set argCount
                                     i
                                 );
 
