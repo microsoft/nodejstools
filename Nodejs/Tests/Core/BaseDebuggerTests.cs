@@ -361,6 +361,7 @@ namespace DebuggerTests {
             public bool? _enabled;
             public BreakOn? _breakOn;
             public string _condition;
+            public bool _builtin;
             public Action<NodeDebugger, NodeThread> _validation;
             public int? _expectedExitCode;
 
@@ -378,6 +379,7 @@ namespace DebuggerTests {
                 bool? enabled = null,
                 BreakOn? breakOn = null,
                 string condition = null,
+                bool builtin = false,
                 Action<NodeDebugger, NodeThread> validation = null,
                 int? expectedExitCode = null
             ) {
@@ -394,6 +396,7 @@ namespace DebuggerTests {
                 _enabled = enabled;
                 _breakOn = breakOn;
                 _condition = condition;
+                _builtin = builtin;
                 _validation = validation;
                 _expectedExitCode = expectedExitCode;
             }
@@ -550,7 +553,14 @@ namespace DebuggerTests {
                         wait = true;
                         break;
                     case TestAction.AddBreakpoint:
-                        string breakpointFileName = step._targetBreakpointFile ?? filename;
+                        string breakpointFileName = step._targetBreakpointFile;
+                        if (breakpointFileName != null) {
+                            if (!step._builtin && !Path.IsPathRooted(breakpointFileName)) {
+                                breakpointFileName = DebuggerTestPath + breakpointFileName;
+                            }
+                        } else {
+                            breakpointFileName = filename;
+                        }
                         int breakpointLine = step._targetBreakpoint.Value;
                         Breakpoint breakpoint = new Breakpoint(breakpointFileName, breakpointLine);
                         Assert.IsFalse(breakpoints.TryGetValue(breakpoint, out nodeBreakpoint));
@@ -667,8 +677,12 @@ namespace DebuggerTests {
                     }
                     exception = null;
                 }
-                if (step._expectedBreakFile != null) {
-                    Assert.AreEqual(step._expectedBreakFile, thread.Frames.First().FileName);
+                var expectedBreakFile = step._expectedBreakFile;
+                if (expectedBreakFile != null) {
+                    if (!step._builtin && !Path.IsPathRooted(expectedBreakFile)) {
+                        expectedBreakFile = DebuggerTestPath + expectedBreakFile;
+                    }
+                    Assert.AreEqual(expectedBreakFile, thread.Frames.First().FileName);
                 }
 
                 if (step._expectedHitCount != null) {

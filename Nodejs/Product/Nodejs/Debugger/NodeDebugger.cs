@@ -1415,11 +1415,19 @@ namespace Microsoft.NodejsTools.Debugger {
         internal void BindBreakpoint(NodeBreakpoint breakpoint, Action<NodeBreakpointBinding> successHandler = null, Action failureHandler = null) {
             DebugWriteCommand(String.Format("Bind Breakpoint"));
 
+            // Zero based line numbers
+            var line = breakpoint.LineNo - 1;
+
+            // Zero based column numbers
+            // Special case column to avoid (line 0, column 0) which
+            // Node (V8) treats specially for script loaded via require
+            var column = line == 0 ? 1 : 0;
+
             // Compose request arguments
             var args =
                 new Dictionary<string, object> { 
-                    { "line", breakpoint.LineNo - 1 },  // Zero based line numbers
-                    { "column", 0 } // Zero based column numbers
+                    { "line", line },
+                    { "column", column }
                 };
             var module = GetModuleForFilePath(breakpoint.FileName);
             if (module != null) {
