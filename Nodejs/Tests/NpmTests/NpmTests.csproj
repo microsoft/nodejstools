@@ -32,12 +32,14 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="AbstractPackageJsonTests.cs" />
+    <Compile Include="FileSystemPackageJsonTests.cs" />
     <Compile Include="MockPackageJsonSource.cs" />
     <Compile Include="PackageJsonDependencyTests.cs" />
     <Compile Include="PackageJsonTests.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="SemverVersionTestHelper.cs" />
     <Compile Include="SemverVersionTests.cs" />
+    <Compile Include="TemporaryFileManager.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="packages.config" />
