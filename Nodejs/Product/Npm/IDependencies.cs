@@ -6,5 +6,6 @@ namespace Microsoft.NodejsTools.Npm
     {
         int Count { get; }
         IDependency this[string name] { get; }
+        bool Contains(string name);
     }
 }

@@ -46,6 +46,7 @@
     <Compile Include="ILicenses.cs" />
     <Compile Include="IMan.cs" />
     <Compile Include="INodeModules.cs" />
+    <Compile Include="IPackage.cs" />
     <Compile Include="IPackageJson.cs" />
     <Compile Include="IPackageJsonSource.cs" />
     <Compile Include="IPkgStringArray.cs" />
@@ -68,6 +69,7 @@
     <Compile Include="SPI\Licenses.cs" />
     <Compile Include="SPI\Man.cs" />
     <Compile Include="SPI\NodeModules.cs" />
+    <Compile Include="SPI\Package.cs" />
     <Compile Include="SPI\PackageJson.cs" />
     <Compile Include="SPI\PkgStringArray.cs" />
     <Compile Include="SPI\PkgFiles.cs" />

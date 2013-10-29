@@ -9,10 +9,9 @@ namespace Microsoft.NodejsTools.Npm
 {
     public static class RootPackageFactory
     {
-        public static IRootPackage Create(
-            IPackageJsonSource packageJsonSource)
+        public static IRootPackage Create(string fullPathToRootDirectory)
         {
-            return new RootPackage(packageJsonSource);
+            return new RootPackage(fullPathToRootDirectory);
         }
     }
 }

@@ -12,11 +12,14 @@ namespace Microsoft.NodejsTools.Npm
     {
         public FilePackageJsonSource(string fullPathToFile)
         {
-            using (var fin = new FileStream(fullPathToFile, FileMode.Open, FileAccess.Read, FileShare.Read))
+            if (File.Exists(fullPathToFile))
             {
-                using (var reader = new StreamReader(fin))
+                using (var fin = new FileStream(fullPathToFile, FileMode.Open, FileAccess.Read, FileShare.Read))
                 {
-                    Package = JsonConvert.DeserializeObject(reader.ReadToEnd());
+                    using (var reader = new StreamReader(fin))
+                    {
+                        Package = JsonConvert.DeserializeObject(reader.ReadToEnd());
+                    }
                 }
             }
         }

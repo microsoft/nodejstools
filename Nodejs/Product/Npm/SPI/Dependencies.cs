@@ -73,5 +73,10 @@ namespace Microsoft.NodejsTools.Npm.SPI
                 return null;
             }
         }
+
+        public bool Contains(string name)
+        {
+            return this[name] != null;
+        }
     }
 }
