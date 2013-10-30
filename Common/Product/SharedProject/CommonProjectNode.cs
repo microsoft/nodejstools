@@ -1183,8 +1183,8 @@ namespace Microsoft.VisualStudioTools.Project {
                 }
                 return;
             }
-            
-            Debug.Assert(parentHierarchy != null, "dont call into the hierarchy before the project is loaded, it corrupts the hierarchy");
+
+            AssertHasParentHierarchy();
             IVsUIHierarchyWindow2 windows = UIHierarchyUtilities.GetUIHierarchyWindow(
                 Site as IServiceProvider,
                 new Guid(ToolWindowGuids80.SolutionExplorer)) as IVsUIHierarchyWindow2;
@@ -1249,7 +1249,7 @@ namespace Microsoft.VisualStudioTools.Project {
             }
             var items = _needBolding.ToArray();
 
-            Debug.Assert(parentHierarchy != null, "dont call into the hierarchy before the project is loaded, it corrupts the hierarchy");
+            AssertHasParentHierarchy();
             IVsUIHierarchyWindow2 windows = UIHierarchyUtilities.GetUIHierarchyWindow(
                 Site as IServiceProvider,
                 new Guid(ToolWindowGuids80.SolutionExplorer)) as IVsUIHierarchyWindow2;
@@ -1458,7 +1458,7 @@ namespace Microsoft.VisualStudioTools.Project {
         /// Returns first immediate child node (non-recursive) of a given type.
         /// </summary>
         private void RefreshStartupFile(HierarchyNode parent, string oldFile, string newFile) {
-            Debug.Assert(parentHierarchy != null, "dont call into the hierarchy before the project is loaded, it corrupts the hierarchy");
+            AssertHasParentHierarchy();
             IVsUIHierarchyWindow2 windows = UIHierarchyUtilities.GetUIHierarchyWindow(
                 Site,
                 new Guid(ToolWindowGuids80.SolutionExplorer)) as IVsUIHierarchyWindow2;

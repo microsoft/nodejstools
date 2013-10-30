@@ -306,7 +306,7 @@ namespace Microsoft.VisualStudioTools.Project
         // Has the object been disposed.
         private bool isDisposed;
 
-        internal IVsHierarchy parentHierarchy;
+        private IVsHierarchy parentHierarchy;
         private int parentHierarchyItemId;
 
         private List<HierarchyNode> itemsDraggedOrCutOrCopied;
@@ -6672,6 +6672,17 @@ If the files in the existing folder have the same names as files in the folder y
             var existing = _diskNodes[oldPath];
             _diskNodes.Remove(oldPath);
             _diskNodes.Add(newPath, existing);
+        }
+
+        [Conditional("DEBUG")]
+        internal void AssertHasParentHierarchy() {
+            // Calling into solution explorer before a parent hierarchy is assigned can
+            // cause us to corrupt solution explorer if we're using flavored projects.  We
+            // will call in with our inner project node and later we get wrapped in an
+            // aggregate COM object which has different object identity.  At that point
+            // solution explorer is confused because it uses object identity to track
+            // the hierarchies.
+            Debug.Assert(parentHierarchy != null, "dont call into the hierarchy before the project is loaded, it corrupts the hierarchy");
         }
     }
 }

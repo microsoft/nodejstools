@@ -1745,7 +1745,7 @@ namespace Microsoft.VisualStudioTools.Project
             {
                 return;
             }
-            Debug.Assert(ProjectMgr.parentHierarchy != null);
+            ProjectMgr.AssertHasParentHierarchy();
             IVsUIHierarchyWindow2 windows = UIHierarchyUtilities.GetUIHierarchyWindow(
                 ProjectMgr.Site,
                 new Guid(ToolWindowGuids80.SolutionExplorer)) as IVsUIHierarchyWindow2;
@@ -1763,7 +1763,7 @@ namespace Microsoft.VisualStudioTools.Project
             {
                 return false;
             }
-            Debug.Assert(ProjectMgr.parentHierarchy != null);
+            ProjectMgr.AssertHasParentHierarchy();
             IVsUIHierarchyWindow2 windows = UIHierarchyUtilities.GetUIHierarchyWindow(
                 ProjectMgr.Site,
                 new Guid(ToolWindowGuids80.SolutionExplorer)) as IVsUIHierarchyWindow2;

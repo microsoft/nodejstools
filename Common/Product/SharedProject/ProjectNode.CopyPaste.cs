@@ -348,7 +348,7 @@ namespace Microsoft.VisualStudioTools.Project {
         /// <returns>If the method succeeds, it returns S_OK. If it fails, it returns an error code. </returns>
         public virtual int OnClear(int wasCut) {
             if (wasCut != 0) {
-                Debug.Assert(parentHierarchy != null);
+                AssertHasParentHierarchy();
                 IVsUIHierarchyWindow w = UIHierarchyUtilities.GetUIHierarchyWindow(this.site, HierarchyNode.SolutionExplorer);
                 if (w != null) {
                     foreach (HierarchyNode node in ItemsDraggedOrCutOrCopied) {
