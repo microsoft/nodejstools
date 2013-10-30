@@ -17,58 +17,39 @@ using System.Collections.Generic;
 
 namespace Microsoft.NodejsTools.Debugger {
     class NodeStackFrame {
-        private int _lineNo;    // mutates on set next line
         private readonly string _frameName;
-        private readonly int _frameId;
-        private readonly int _startLine, _endLine;
-        private int _argCount;
-        private NodeEvaluationResult[] _variables;
         private readonly NodeThread _thread;
         private readonly NodeModule _module;
 
-        public NodeStackFrame(NodeThread thread, NodeModule module, string frameName, int startLine, int endLine, int lineNo, int argCount, int frameId) {
+        public NodeStackFrame(NodeThread thread, NodeModule module, string frameName, int startLine, int endLine, int lineNo, int frameId) {
             _thread = thread;
             _module = module;
             _frameName = frameName;
-            _argCount = argCount;
-            _lineNo = lineNo;
-            _frameId = frameId;
-            _startLine = startLine;
-            _endLine = endLine;
+            LineNo = lineNo;
+            FrameId = frameId;
+            StartLine = startLine;
+            EndLine = endLine;
         }
 
         /// <summary>
         /// The line nubmer where the current function/class/module starts
         /// </summary>
         public int StartLine {
-            get {
-                return _startLine;
-            }
+            get; private set;
         }
 
         /// <summary>
         /// The line number where the current function/class/module ends.
         /// </summary>
         public int EndLine {
-            get {
-                return _endLine;
-            }
+            get; private set;
         }
 
         public NodeThread Thread {
-            get {
-                return _thread;
-            }
+            get { return _thread; }
         }
 
-        public int LineNo {
-            get {
-                return _lineNo;
-            }
-            set {
-                _lineNo = value;
-            }
-        }
+        public int LineNo { get; private set; }
 
         public string FunctionName {
             get {
@@ -92,38 +73,12 @@ namespace Microsoft.NodejsTools.Debugger {
         /// Gets the ID of the frame.  Frame 0 is the currently executing frame, 1 is the caller of the currently executing frame, etc...
         /// </summary>
         public int FrameId {
-            get {
-                return _frameId;
-            }
+            get; private set;
         }
 
-        internal void SetArgCount(int argCount) {
-            _argCount = argCount;
-        }
+        public IList<NodeEvaluationResult> Locals { get; set; }
 
-        internal void SetVariables(NodeEvaluationResult[] variables) {
-            _variables = variables;
-        }
-
-        public IList<NodeEvaluationResult> Locals {
-            get {
-                NodeEvaluationResult[] res = new NodeEvaluationResult[_variables.Length - _argCount];
-                for (int i = _argCount; i < _variables.Length; i++) {
-                    res[i - _argCount] = _variables[i];
-                }
-                return res;
-            }
-        }
-
-        public IList<NodeEvaluationResult> Parameters {
-            get {
-                NodeEvaluationResult[] res = new NodeEvaluationResult[_argCount];
-                for (int i = 0; i < _argCount; i++) {
-                    res[i] = _variables[i];
-                }
-                return res;
-            }
-        }
+        public IList<NodeEvaluationResult> Parameters { get; set; }
 
         /// <summary>
         /// Attempts to parse the given text.  Returns true if the text is a valid expression.  Returns false if the text is not
@@ -153,7 +108,8 @@ namespace Microsoft.NodejsTools.Debugger {
         /// <summary>
         /// Executes the given text against this stack frame.
         /// </summary>
-        /// <param name="text"></param>
+        /// <param name="text">Text expression.</param>
+        /// <param name="completion">Completion callback.</param>
         public virtual void ExecuteText(string text, Action<NodeEvaluationResult> completion) {
             _thread.Process.ExecuteText(text, this, completion);
         }

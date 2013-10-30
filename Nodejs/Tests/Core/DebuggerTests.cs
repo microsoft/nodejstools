@@ -120,10 +120,10 @@ namespace DebuggerTests {
 
 
             if (children == null) {
-                Assert.IsTrue(!evalRes.IsExpandable);
+                Assert.IsTrue(!evalRes.Type.HasFlag(NodeExpressionType.Expandable));
                 Assert.IsTrue(evalRes.GetChildren(Int32.MaxValue) == null);
             } else {
-                Assert.IsTrue(evalRes.IsExpandable);
+                Assert.IsTrue(evalRes.Type.HasFlag(NodeExpressionType.Expandable));
                 var childrenReceived = new List<NodeEvaluationResult>(evalRes.GetChildren(Int32.MaxValue));
 
                 Assert.AreEqual(children.Length, childrenReceived.Count, String.Format("received incorrect number of children: {0} expected, received {1}", children.Length, childrenReceived.Count));
@@ -157,8 +157,8 @@ namespace DebuggerTests {
         }
 
         private bool ChildrenMatch(ChildInfo curChild, NodeEvaluationResult curReceived) {
-            return curReceived.ChildText == curChild.ChildText && 
-                (curReceived.StringRepr == curChild.Repr || curChild.Repr == null);
+            return curReceived.StringValue == curChild.ChildText && 
+                (curReceived.StringValue == curChild.Repr || curChild.Repr == null);
         }
 
         class ChildInfo {

@@ -222,7 +222,7 @@ namespace DebuggerTests {
                 Assert.AreEqual(expectedType, evaluationResult.TypeName);
             }
             if (expectedValue != null) {
-                Assert.AreEqual(expectedValue, evaluationResult.StringRepr);
+                Assert.AreEqual(expectedValue, evaluationResult.StringValue);
             }
             if (expectedException != null) {
                 Assert.AreEqual(expectedException, evaluationResult.ExceptionText);

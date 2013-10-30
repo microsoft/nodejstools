@@ -14,6 +14,7 @@
 
 using System;
 using System.Diagnostics;
+using System.Text.RegularExpressions;
 using System.Threading;
 
 namespace Microsoft.NodejsTools.Debugger {
@@ -21,46 +22,35 @@ namespace Microsoft.NodejsTools.Debugger {
     /// Represents the result of an evaluation of an expression against a given stack frame.
     /// </summary>
     class NodeEvaluationResult {
-        private readonly string _expression, _objRepr, _typeName, _exceptionText, _childText, _hexRepr;
         private readonly NodeStackFrame _frame;
         private readonly NodeDebugger _process;
-        private readonly bool _isExpandable, _childIsIndex, _childIsEnumerate;
         private readonly int? _handle;
+        private readonly Regex _stringLengthExpression = new Regex(@"\.\.\. \(length: ([0-9]+)\)$", RegexOptions.Compiled);
 
         /// <summary>
-        /// Creates a PythonObject for an expression which successfully returned a value.
+        /// Creates an evaluation result for an expression which successfully returned a value.
         /// </summary>
-        public NodeEvaluationResult(NodeDebugger process, int? handle, string objRepr, string hexRepr, string typeName, string expression, string childText, bool childIsIndex, bool childIsEnumerate, NodeStackFrame frame, bool isExpandable) {
+        public NodeEvaluationResult(NodeDebugger process, int? handle, string stringValue, string hexValue, string typeName, string expression, string fullName, NodeExpressionType type,
+            NodeStackFrame frame) {
             _handle = handle;
             _process = process;
-            _expression = expression;
             _frame = frame;
-            _objRepr = objRepr;
-            _hexRepr = hexRepr;
-            _typeName = typeName;
-            _isExpandable = isExpandable;
-            _childText = childText;
-            _childIsIndex = childIsIndex;
-            _childIsEnumerate = childIsEnumerate;
+            Expression = expression;
+            StringValue = stringValue;
+            HexValue = hexValue;
+            TypeName = typeName;
+            FullName = fullName;
+            Type = type;
         }
 
         /// <summary>
-        /// Creates a PythonObject for an expression which raised an exception instead of returning a value.
+        /// Creates an evaluation result for an expression which raised an exception instead of returning a value.
         /// </summary>
         public NodeEvaluationResult(NodeDebugger process, string exceptionText, string expression, NodeStackFrame frame) {
             _process = process;
-            _expression = expression;
             _frame = frame;
-            _exceptionText = exceptionText;
-        }
-
-        /// <summary>
-        /// Returns true if this object is expandable.  
-        /// </summary>
-        public bool IsExpandable {
-            get {
-                return _isExpandable;
-            }
+            Expression = expression;
+            ExceptionText = exceptionText;
         }
 
         /// <summary>
@@ -73,11 +63,11 @@ namespace Microsoft.NodejsTools.Debugger {
         /// Returns null if the object is not expandable.
         /// </summary>
         public NodeEvaluationResult[] GetChildren(int timeOut) {
-            if (!IsExpandable) {
+            if (!Type.HasFlag(NodeExpressionType.Expandable)) {
                 return null;
             }
 
-            AutoResetEvent childrenEnumed = new AutoResetEvent(false);
+            var childrenEnumed = new AutoResetEvent(false);
             NodeEvaluationResult[] res = null;
 
             Debug.Assert(Handle.HasValue);
@@ -99,62 +89,45 @@ namespace Microsoft.NodejsTools.Debugger {
         /// <summary>
         /// Gets the string representation of this evaluation or null if an exception was thrown.
         /// </summary>
-        public string StringRepr {
-            get {
-                return _objRepr;
-            }
+        public string StringValue { get; private set; }
+
+        /// <summary>
+        /// Gets the string representation length.
+        /// </summary>
+        public int StringLength {
+            get { return GetStringLength(StringValue); }
         }
 
         /// <summary>
         /// Gets the string representation of this evaluation in hexadecimal or null if the hex value was not computable.
         /// </summary>
-        public string HexRepr {
-            get {
-                return _hexRepr;
-            }
-        }
+        public string HexValue { get; private set; }
 
         /// <summary>
         /// Gets the type name of the result of this evaluation or null if an exception was thrown.
         /// </summary>
-        public string TypeName {
-            get {
-                return _typeName;
-            }
-        }
+        public string TypeName { get; private set; }
 
         /// <summary>
         /// Gets the text of the exception which was thrown when evaluating this expression, or null
         /// if no exception was thrown.
         /// </summary>
-        public string ExceptionText {
-            get {
-                return _exceptionText;
-            }
-        }
+        public string ExceptionText { get; private set; }
+
+        /// <summary>
+        /// Gets the expression text representation.
+        /// </summary>
+        public string Expression { get; private set; }
 
         /// <summary>
         /// Gets the expression which was evaluated to return this object.
         /// </summary>
-        public string Expression {
-            get {
-                if (!String.IsNullOrEmpty(_childText)) {
-                    if (_childIsIndex) {
-                        return _expression + _childText;
-                    } else {
-                        return _expression + "." + _childText;
-                    }
-                }
+        public string FullName { get; private set; }
 
-                return _expression;
-            }
-        }
-
-        public string ChildText {
-            get {
-                return _childText;
-            }
-        }
+        /// <summary>
+        /// Gets a type metadata for the expression.
+        /// </summary>
+        public NodeExpressionType Type { get; set; }
 
         /// <summary>
         /// Returns the stack frame in which this expression was evaluated.
@@ -174,14 +147,21 @@ namespace Microsoft.NodejsTools.Debugger {
             }
         }
 
-        public bool IsArray {
-            get {
-                return ((_handle != null) && (string.Compare(_objRepr, "Array") == 0));
-            }
+        public NodeDebugger Process {
+            get { return _process; }
         }
 
-        public NodeDebugger Process { get { return _process; } }
+        private int GetStringLength(string stringValue) {
+            if (string.IsNullOrEmpty(stringValue)) {
+                return 0;
+            }
 
-        public bool ChildIsIndex { get { return _childIsIndex;  } }
+            Match match = _stringLengthExpression.Match(stringValue);
+            if (!match.Success) {
+                return stringValue.Length;
+            }
+
+            return int.Parse(match.Groups[1].Value);
+        }
     }
 }

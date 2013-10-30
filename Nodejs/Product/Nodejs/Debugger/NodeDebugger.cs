@@ -17,12 +17,9 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
 using System.Linq;
-using System.Net;
-using System.Net.Sockets;
 using System.Text;
 using System.Text.RegularExpressions;
-using System.Threading;
-using System.Web.Script.Serialization;
+using Microsoft.NodejsTools.Debugger.Serialization;
 
 namespace Microsoft.NodejsTools.Debugger {
     enum SteppingKind {
@@ -60,11 +57,9 @@ namespace Microsoft.NodejsTools.Debugger {
     /// <summary>
     /// Handles all interactions with a Node process which is being debugged.
     /// </summary>
-    class NodeDebugger : JsonListener, IDisposable {
+    class NodeDebugger : IDisposable {
         private Process _process;
         private bool _attached;
-        private string _hostName = "localhost";
-        private ushort _portNumber = 5858;
         private int? _id;
         private readonly Dictionary<int, NodeBreakpoint> _breakpoints = new Dictionary<int, NodeBreakpoint>();
         private bool _loadCompleteHandled;
@@ -74,17 +69,38 @@ namespace Microsoft.NodejsTools.Debugger {
         private bool _resumingStepping;
         private readonly Dictionary<int, NodeThread> _threads = new Dictionary<int, NodeThread>();
         public readonly int MainThreadId = 1;
-        private readonly JavaScriptSerializer _serializer = new JavaScriptSerializer();
-        private int _currentRequestSequence = 1;
-        private readonly byte[] _socketBuffer = new byte[4096];
         private readonly Dictionary<string, NodeModule> _scripts = new Dictionary<string, NodeModule>(StringComparer.OrdinalIgnoreCase);
-        private readonly Dictionary<int, object> _requestData = new Dictionary<int, object>();
         private ExceptionHitTreatment _defaultExceptionTreatment = ExceptionHitTreatment.BreakAlways;
         private Dictionary<string, ExceptionHitTreatment> _exceptionTreatments = GetDefaultExceptionTreatments();
         private Dictionary<int, string> _errorCodes = new Dictionary<int, string>();
         private bool _breakOnAllExceptions;
         private bool _breakOnUncaughtExceptions;
-        private static readonly NodeModule _unknownModule = new NodeModule(-1, "<unknown>");
+        private INodeConnection _connection;
+
+        public INodeConnection Connection {
+            get {
+                return _connection;
+            }
+            set {
+                if (_connection == value) {
+                    return;
+                }
+
+                if (_connection != null) {
+                    _connection.SocketDisconnected -= OnSocketDisconnected;
+                    _connection.NodeEvent -= OnNodeEvent;
+                }
+
+                _connection = value;
+
+                if (_connection != null) {
+                    _connection.SocketDisconnected += OnSocketDisconnected;
+                    _connection.NodeEvent += OnNodeEvent;
+                }
+            }
+        }
+
+        public INodeResponseParser ResponseParser { get; set; }
 
         private static Dictionary<string, ExceptionHitTreatment> GetDefaultExceptionTreatments() {
             // Keep exception types in sync with those declared in ProvideDebugExceptionAttribute's in NodePackage.cs
@@ -194,6 +210,17 @@ namespace Microsoft.NodejsTools.Debugger {
             return defaultExceptionTreatments;
         }
 
+        private NodeDebugger() {
+            if (ResponseParser == null) {
+                var evaluationResultFactory = new NodeEvaluationResultFactory();
+                ResponseParser = new NodeResponseParser(evaluationResultFactory);
+            }
+
+            if (Connection == null) {
+                Connection = new NodeConnection();
+            }
+        }
+
         public NodeDebugger(
             string exe,
             string script,
@@ -202,8 +229,8 @@ namespace Microsoft.NodejsTools.Debugger {
             string interpreterOptions,
             NodeDebugOptions debugOptions,
             List<string[]> dirMapping,
-            bool createNodeWindow = true
-        ) {
+            bool createNodeWindow = true) : this() {
+
             string allArgs = "--debug-brk " + script;
             if (!string.IsNullOrEmpty(interpreterOptions)) {
                 allArgs += " " + interpreterOptions;
@@ -228,11 +255,11 @@ namespace Microsoft.NodejsTools.Debugger {
             _process.EnableRaisingEvents = true;
         }
 
-        public NodeDebugger(string hostName, ushort portNumber, int id) {
-            _hostName = hostName;
-            _portNumber = portNumber;
+        public NodeDebugger(string hostName, ushort portNumber, int id) : this() {
             _id = id;
             _attached = true;
+
+            Connection = new NodeConnection(hostName, portNumber);
         }
 
         #region Public Process API
@@ -272,8 +299,8 @@ namespace Microsoft.NodejsTools.Debugger {
 
         public void Terminate() {
             lock (this) {
-                // Cleanup socket
-                Socket = null;
+                // Disconnect
+                Connection.Disconnect();
 
                 // Fall back to using -1 for exit code if we cannot obtain one from the process
                 // This is the normal case for attach where there is no process to interrogate
@@ -309,9 +336,7 @@ namespace Microsoft.NodejsTools.Debugger {
         }
 
         public bool HasExited {
-            get {
-                return Socket == null || !Socket.Connected;
-            }
+            get { return !Connection.Connected; }
         }
 
         /// <summary>
@@ -320,7 +345,7 @@ namespace Microsoft.NodejsTools.Debugger {
         public void BreakAll() {
             DebugWriteCommand("BreakAll");
 
-            SendRequest(
+            Connection.SendRequest(
                 "suspend",
                 null,   // args
                 json => {
@@ -382,7 +407,7 @@ namespace Microsoft.NodejsTools.Debugger {
             _loadCompleteHandled = true;
             _handleEntryPointTracePoint = false;
 
-            SendRequest(
+            Connection.SendRequest(
                 "continue",
                 args,
                 json => {
@@ -549,147 +574,6 @@ namespace Microsoft.NodejsTools.Debugger {
 
         #region Debuggee Communcation
 
-        class ResponseHandler {
-            private Action<Dictionary<string, object>> _successHandler;
-            private Action<Dictionary<string, object>> _failureHandler;
-            private int? _timeout;
-            private Func<bool> _shortCircuitPredicate;
-            private AutoResetEvent _completedEvent;
-            public ResponseHandler(
-                Action<Dictionary<string, object>> successHandler = null,
-                Action<Dictionary<string, object>> failureHandler = null,
-                int? timeout = null,
-                Func<bool> shortCircuitPredicate = null
-            ) {
-                Debug.Assert(
-                    successHandler != null || failureHandler != null || timeout != null,
-                    "At least success handler, failure handler or timeout should be non-null");
-                _successHandler = successHandler;
-                _failureHandler = failureHandler;
-                _timeout = timeout;
-                _shortCircuitPredicate = shortCircuitPredicate;
-                if (timeout.HasValue) {
-                    _completedEvent = new AutoResetEvent(false);
-                }
-            }
-
-            public bool Wait() {
-                // Handle asynchronous (no wait)
-                if (_completedEvent == null) {
-                    Debug.Assert((_timeout == null), "No completedEvent implies no timeout");
-                    Debug.Assert((_shortCircuitPredicate == null), "No completedEvent implies no shortCircuitPredicate");
-                    return true;
-                }
-                Debug.Assert((_timeout != null) && _timeout > 0, "completedEvent implies timeout");
-
-                // Handle synchronous without short circuiting
-                int timeout = _timeout.Value;
-                if (_shortCircuitPredicate == null) {
-                    return _completedEvent.WaitOne(timeout);
-                }
-
-                // Handle synchronous with short circuiting
-                int interval = Math.Max(1, timeout / 10);
-                while (!_shortCircuitPredicate()) {
-                    if (_completedEvent.WaitOne(Math.Min(timeout, interval))) {
-                        return true;
-                    }
-
-                    timeout -= interval;
-                    if (timeout <= 0) {
-                        break;
-                    }
-                }
-                return false;
-            }
-
-            public void HandleResponse(Dictionary<string, object> json) {
-                if ((bool)json["success"]) {
-                    if (_successHandler != null) {
-                        _successHandler(json);
-                    }
-                } else {
-                    if (_failureHandler != null) {
-                        _failureHandler(json);
-                    }
-                }
-
-                if (_completedEvent != null) {
-                    _completedEvent.Set();
-                }
-            }
-        }
-
-        private bool SendRequest(
-            string command,
-            Dictionary<string, object> args = null,
-            Action<Dictionary<string, object>> successHandler = null,
-            Action<Dictionary<string, object>> failureHandler = null,
-            int? timeout = null,
-            Func<bool> shortCircuitPredicate = null
-        ) {
-            if (shortCircuitPredicate != null && shortCircuitPredicate()) {
-                if (failureHandler != null) {
-                    failureHandler(null);
-                }
-                return false;
-            }
-
-            int reqId = DispenseRequestId();
-
-            // Use response handler if followup (given success or failure handler) or synchronous (given timeout)
-            ResponseHandler responseHandler = null;
-            if ((successHandler != null) || (failureHandler != null) || (timeout != null)) {
-                responseHandler = new ResponseHandler(successHandler, failureHandler, timeout, shortCircuitPredicate);
-                _requestData[reqId] = responseHandler;
-            }
-
-            var socket = Socket;
-            if (socket == null) {
-                return false;
-            }
-            try {
-                socket.Send(CreateRequest(command, args, reqId));
-            } catch (SocketException) {
-                return false;
-            }
-
-            return (responseHandler != null) ? responseHandler.Wait() : true;
-        }
-
-        private int DispenseRequestId() {
-            return _currentRequestSequence++;
-        }
-
-        private byte[] CreateRequest(string command, Dictionary<string, object> args, int reqId) {
-            string json;
-
-            if (args != null) {
-                json = _serializer.Serialize(
-                    new {
-                        seq = reqId,
-                        type = "request",
-                        command = command,
-                        arguments = args
-                    }
-                );
-            } else {
-                json = _serializer.Serialize(
-                    new {
-                        seq = reqId,
-                        type = "request",
-                        command = command
-                    }
-                );
-            }
-
-            var requestStr = string.Format("Content-Length: {0}\r\n\r\n{1}", Encoding.UTF8.GetByteCount(json), json);
-
-            Debug.WriteLine(String.Format("Request: {0}", requestStr));
-
-            return Encoding.UTF8.GetBytes(requestStr);
-        }
-
         internal void Unregister() {
             GC.SuppressFinalize(this);
         }
@@ -699,52 +583,16 @@ namespace Microsoft.NodejsTools.Debugger {
         /// to give time to attach to debugger events.
         /// </summary>
         public void StartListening() {
-            Socket = new Socket(AddressFamily.InterNetwork, SocketType.Stream, ProtocolType.Tcp);
-            Socket.NoDelay = true;
-            Socket.Connect(new DnsEndPoint(_hostName, _portNumber));
-
-            StartListenerThread();
-
+            Connection.Connect();
             ProcessConnect();
         }
 
-        protected override void OnSocketDisconnected() {
+        private void OnSocketDisconnected(object sender, EventArgs args) {
             Terminate();
         }
 
-        protected override void ProcessPacket(JsonResponse response) {
-            Debug.WriteLine("Headers:");
-
-            foreach (var keyValue in response.Headers) {
-                Debug.WriteLine(String.Format("{0}: {1}", keyValue.Key, keyValue.Value));
-            }
-
-            Debug.WriteLine(String.Format("Body: {0}", string.IsNullOrEmpty(response.Body) ? string.Empty : response.Body));
-
-            if (response.Headers.ContainsKey("type")) {
-                switch (response.Headers["type"]) {
-                    case "connect":
-                        // No-op, as ProcessConnect() is called on the main thread
-                        break;
-                    default:
-                        Debug.WriteLine(String.Format("Unknown header type: {0}", response.Headers["type"]));
-                        break;
-                }
-                return;
-            }
-
-            var json = (Dictionary<string, object>)_serializer.DeserializeObject(response.Body);
-            switch ((string)json["type"]) {
-                case "response":
-                    ProcessCommandResponse(json);
-                    break;
-                case "event":
-                    ProcessEvent(json);
-                    break;
-                default:
-                    Debug.WriteLine(String.Format("Unknown body type: {0}", json["type"]));
-                    break;
-            }
+        private void OnNodeEvent(object sender, NodeEventEventArgs e) {
+            ProcessEvent(e.Data);
         }
 
         private void ProcessConnect() {
@@ -769,7 +617,7 @@ namespace Microsoft.NodejsTools.Debugger {
         }
 
         private void GetScripts() {
-            SendRequest(
+            Connection.SendRequest(
                 "scripts",
                 null,   // args
                 json => {
@@ -814,7 +662,7 @@ namespace Microsoft.NodejsTools.Debugger {
             }
 
             if (_breakOnAllExceptions != breakOnAllExceptions) {
-                if (!SendRequest(
+                if (!Connection.SendRequest(
                         "setexceptionbreak",
                         new Dictionary<string, object> {
                             { "type", "all" },
@@ -831,7 +679,7 @@ namespace Microsoft.NodejsTools.Debugger {
                 };
             }
             if (_breakOnUncaughtExceptions != breakOnUncaughtExceptions) {
-                if (!SendRequest(
+                if (!Connection.SendRequest(
                         "setexceptionbreak",
                         new Dictionary<string, object> {
                             { "type", "uncaught" },
@@ -849,26 +697,6 @@ namespace Microsoft.NodejsTools.Debugger {
             }
 
             return true;
-        }
-
-        private void ProcessCommandResponse(Dictionary<string, object> json) {
-            object reqIdObj;
-            if (!json.TryGetValue("request_seq", out reqIdObj)) {
-                return;
-            }
-            int reqId = (int)reqIdObj;
-
-            object responseHandlerObj;
-            if (!_requestData.TryGetValue(reqId, out responseHandlerObj)) {
-                return;
-            }
-            ResponseHandler responseHandler = responseHandlerObj as ResponseHandler;
-            if (responseHandler == null) {
-                return;
-            }
-            _requestData.Remove(reqId);
-
-            responseHandler.HandleResponse(json);
         }
 
         private void ProcessEvent(Dictionary<string, object> json) {
@@ -1004,7 +832,7 @@ namespace Microsoft.NodejsTools.Debugger {
                 if (_errorCodes.TryGetValue(errNo.Value, out errorCodeFromMap)) {
                     ReportException(body, uncaught, exceptionName, errorCodeFromMap);
                 } else {
-                    SendRequest(
+                    Connection.SendRequest(
                         "lookup",
                         new Dictionary<string, object> {
                             { "handles", new object[] {errNo.Value} },
@@ -1091,7 +919,7 @@ namespace Microsoft.NodejsTools.Debugger {
         }
 
         private void PerformBacktrace(Action<bool> followupHandler) {
-            SendRequest(
+            Connection.SendRequest(
                 "backtrace",
                 new Dictionary<string, object> { { "inlineRefs", true } },
                 json => {
@@ -1099,47 +927,8 @@ namespace Microsoft.NodejsTools.Debugger {
                     var running = (bool)json["running"];
                     if (!running) {
                         var mainThread = MainThread;
-                        var body = (Dictionary<string, object>)json["body"];
-                        object[] frames = null;
-                        int frameCount = 0;
-                        object framesObj;
-                        if (body.TryGetValue("frames", out framesObj) && framesObj != null) {
-                            frames = (object[])framesObj;
-                            frameCount = frames.Length;
-                        }
-
-                        NodeStackFrame[] nodeFrames = new NodeStackFrame[frameCount];
-
-                        for (int i = 0; i < frameCount; i++) {
-                            var frame = (Dictionary<string, object>)frames[i];
-
-                            var func = (Dictionary<string, object>)frame["func"];
-                            object scriptIdObj;
-                            var module = _unknownModule;
-                            if (func.TryGetValue("scriptId", out scriptIdObj)) {
-                                foreach (var value in _scripts.Values) {
-                                    if (value.ModuleId == (int)scriptIdObj) {
-                                        module = value;
-                                        break;
-                                    }
-                                }
-                            }
-
-                            var nodeFrame = nodeFrames[i] =
-                                new NodeStackFrame(
-                                    mainThread,
-                                    module,
-                                    (string)func["name"],
-                                    (int)frame["line"] + 1,   // FIXME, should be function line start
-                                    (int)frame["line"] + 1,   // FIXME, should be function line end
-                                    (int)frame["line"] + 1,
-                                    0,  // Let GetFrameVariables() set argCount
-                                    i
-                                );
-
-                            GetFrameVariables(nodeFrame, frame);
-                        }
-
+                        var jsonValue = new JsonValue(json);
+                        NodeStackFrame[] nodeFrames = ResponseParser.ProcessBacktrace(this, jsonValue);
                         mainThread.Frames = nodeFrames;
                     }
                     if (followupHandler != null) {
@@ -1147,29 +936,6 @@ namespace Microsoft.NodejsTools.Debugger {
                     }
                 }
             );
-        }
-
-        private void GetFrameVariables(NodeStackFrame nodeFrame, Dictionary<string, object> frame) {
-            List<NodeEvaluationResult> childNodeEvaluationResults = new List<NodeEvaluationResult>();
-            GetFrameVariables(nodeFrame, ((object[])frame["arguments"]), childNodeEvaluationResults);
-            nodeFrame.SetArgCount(childNodeEvaluationResults.Count());
-            GetFrameVariables(nodeFrame, ((object[])frame["locals"]), childNodeEvaluationResults);
-            nodeFrame.SetVariables(childNodeEvaluationResults.ToArray());
-        }
-
-        private void GetFrameVariables(NodeStackFrame nodeFrame, object[] jsonVarObjs, List<NodeEvaluationResult> childNodeEvaluationResults) {
-            foreach (var jsonVarObj in jsonVarObjs) {
-                var childNodeEvaluationResult = CreateFrameVariableNodeEvaluationResult(nodeFrame, (Dictionary<string, object>)jsonVarObj);
-                if (childNodeEvaluationResult != null) {
-                    childNodeEvaluationResults.Add(childNodeEvaluationResult);
-                }
-            }
-        }
-
-        private void ReadMoreData(int bytesRead, ref string text, ref int pos) {
-            var newText = Encoding.UTF8.GetString(_socketBuffer, 0, bytesRead);
-            text = text.Substring(pos) + newText;
-            pos = 0;
         }
 
         internal IList<NodeThread> GetThreads() {
@@ -1263,12 +1029,8 @@ namespace Microsoft.NodejsTools.Debugger {
             DebugWriteCommand("Detach");
 
             // Disconnect request has no response
-            SendRequest("disconnect");
-
-            if (Socket != null && Socket.Connected) {
-                Socket.Disconnect(false);
-            }
-            Socket = null;
+            Connection.SendRequest("disconnect");
+            Connection.Disconnect();
         }
 
         private string GetCaseInsensitiveRegex(string filePath) {
@@ -1369,7 +1131,7 @@ namespace Microsoft.NodejsTools.Debugger {
                 }
             };
 
-            SendRequest(
+            Connection.SendRequest(
                 "setbreakpoint",
                 args,
                 responseHandler,
@@ -1415,7 +1177,7 @@ namespace Microsoft.NodejsTools.Debugger {
 
             // Process request
             bool success = false;
-            SendRequest(
+            Connection.SendRequest(
                 "changebreakpoint",
                 args,
                 json => {
@@ -1442,7 +1204,7 @@ namespace Microsoft.NodejsTools.Debugger {
             int breakpointId
         ) {
             int? hitCount = null;
-            SendRequest(
+            Connection.SendRequest(
                 "listbreakpoints",
                 null,   // args
                 json => {
@@ -1467,28 +1229,20 @@ namespace Microsoft.NodejsTools.Debugger {
         internal void ExecuteText(string text, NodeStackFrame nodeStackFrame, Action<NodeEvaluationResult> completion) {
             DebugWriteCommand("ExecuteText to thread " + nodeStackFrame.Thread.Id + " " /*+ executeId*/);
 
-            SendRequest(
+            Connection.SendRequest(
                 "evaluate",
                 new Dictionary<string, object> {
                             { "expression", text },
                             { "frame",  nodeStackFrame.FrameId },
                             { "global", false },
                             { "disable_break", true },
-                            //{ "additional_context",  new object[] {
-                            //    new Dictionary<string, object> {
-                            //        { "name", "<name1>" },
-                            //        { "handle", "<handle1>" },
-                            //    },
-                            //    new Dictionary<string, object> {
-                            //        { "name", "<name2>" },
-                            //        { "handle", "<handle12" },
-                            //    },
-                            //} }
+                            { "maxStringLength", -1 }
                 },
                 json => {
                     // Handle success
-                    var record = (Dictionary<string, object>)json["body"];
-                    completion(CreateNodeEvaluationResult(null, nodeStackFrame, text, record, false));
+                    var jsonValue = new JsonValue(json);
+                    var evaluationResult = ResponseParser.ProcessEvaluate(this, nodeStackFrame, text, jsonValue);
+                    completion(evaluationResult);
                 },
                 json => {
                     // Handle failure
@@ -1505,7 +1259,7 @@ namespace Microsoft.NodejsTools.Debugger {
         internal void EnumChildren(NodeEvaluationResult nodeEvaluationResult, Action<NodeEvaluationResult[]> completion) {
             DebugWriteCommand("Enum Children");
 
-            SendRequest(
+            Connection.SendRequest(
                 "lookup",
                 new Dictionary<string, object> {
                             { "handles", new object[] {nodeEvaluationResult.Handle} },
@@ -1513,248 +1267,11 @@ namespace Microsoft.NodejsTools.Debugger {
                 },
                 json => {
                     // Handle success
-                    List<NodeEvaluationResult> childNodeEvaluationResults = new List<NodeEvaluationResult>();
-
-                    var refs = (object[])json["refs"];
-                    var body = (Dictionary<string, object>)json["body"];
-                    var record = (Dictionary<string, object>)body[nodeEvaluationResult.Handle.ToString()];
-                    var properties = (object[])record["properties"];
-
-                    if (nodeEvaluationResult.IsArray) {
-                        var countProperty = (Dictionary<string, object>)properties[0];
-                        var countHandle = (int)countProperty["ref"];
-                        var refRecord = GetRefRecord(refs, countHandle);
-                        if (refRecord != null) {
-                            var count = (int)refRecord["value"];
-                            for (var i = 1; i <= count; ++i) {
-                                var elementProperty = (Dictionary<string, object>)properties[i];
-                                var elementHandle = (int)elementProperty["ref"];
-                                refRecord = GetRefRecord(refs, elementHandle);
-                                if (refRecord != null) {
-                                    var elementName = string.Format("[{0}]", i - 1);
-                                    var childNodeEvaluationResult =
-                                        CreateNodeEvaluationResult(
-                                            nodeEvaluationResult,
-                                            nodeEvaluationResult.Frame,
-                                            elementName,
-                                            refRecord,
-                                            true);
-                                    if (childNodeEvaluationResult != null) {
-                                        childNodeEvaluationResults.Add(childNodeEvaluationResult);
-                                    }
-                                }
-                            }
-                        }
-                    } else {
-                        foreach (var propertyObj in properties) {
-                            var property = (Dictionary<string, object>)propertyObj;
-                            var propertyName = property["name"].ToString();
-                            var propertyHandle = (int)property["ref"];
-                            var refRecord = GetRefRecord(refs, propertyHandle);
-                            if (refRecord != null) {
-                                var childNodeEvaluationResult = 
-                                    CreateNodeEvaluationResult(
-                                        nodeEvaluationResult,
-                                        nodeEvaluationResult.Frame,
-                                        propertyName,
-                                        refRecord,
-                                        false);
-                                if (childNodeEvaluationResult != null) {
-                                    childNodeEvaluationResults.Add(childNodeEvaluationResult);
-                                }
-                            }
-                        }
-                    }
-
-                    completion(childNodeEvaluationResults.ToArray());
+                    var jsonValue = new JsonValue(json);
+                    var evaluationResults = ResponseParser.ProcessLookup(this, nodeEvaluationResult, jsonValue);
+                    completion(evaluationResults.ToArray());
                 }
             );
-        }
-
-        private NodeEvaluationResult CreateFrameVariableNodeEvaluationResult(NodeStackFrame nodeFrame, Dictionary<string, object> varRecord) {
-            object nameObj;
-            var name = varRecord.TryGetValue("name", out nameObj) ? (string)nameObj : "<unknown>";
-            var record = (Dictionary<string, object>)(varRecord["value"]);
-
-            object valueObj;
-            record.TryGetValue("value", out valueObj);
-            string value = string.Empty;
-            string hexValue = null;
-            
-            int? handle = null;
-            var expandable = false;
-
-            var type = (string)record["type"];
-            switch (type) {
-                case "object":
-                    expandable = true;
-                    object classNameObj;
-                    if (record.TryGetValue("className", out classNameObj)) {
-                        var className = (string)classNameObj;
-                        if (!string.IsNullOrEmpty(className)) {
-                            switch (className) {
-                                case "Date":
-                                    // UNDONE Evaluate frame var using followup request ('lookup', 'evaluate', ...),
-                                    // to workaround fact that 'backrace' response json does not include date values
-                                    type = "date";
-                                    value = (string)valueObj;
-                                    expandable = false;
-                                    break;
-                                default:
-                                    value = className;
-                                    break;
-                            }
-                        }
-                    }
-                    if (record.TryGetValue("ref", out valueObj)) {
-                        handle = (int)valueObj;
-                    }
-                    break;
-                case "string":
-                    value = "\"" + (string)valueObj + "\"";
-                    break;
-                case "number":
-                    if (valueObj == null) {
-                        value = "null";
-                    } else {
-                        value = valueObj.ToString();
-                        int intValue = 0;
-                        if (int.TryParse(value, out intValue)) {
-                            hexValue = String.Format("0x{0:X8}", intValue);
-                        }
-                    }
-                    break;
-                case "boolean":
-                    value = (bool)valueObj ? "true" : "false";
-                    break;
-                case "null":
-                    value = "null";
-                    break;
-                case "undefined":
-                    return null;
-                case "function":
-                    value = GetFunctionName(record);
-                    if (record.TryGetValue("ref", out valueObj)) {
-                        handle = (int)valueObj;
-                        expandable = true;
-                    }
-                    break;
-                default:
-                    Debug.WriteLine(String.Format("Unhandled value type: {0}", type));
-                    break;
-            }
-            return new NodeEvaluationResult(
-                            this,
-                            handle,
-                            value,
-                            hexValue ?? value,
-                            type,
-                            name,
-                            "",
-                            false,
-                            false,
-                            nodeFrame,
-                            expandable
-                       );
-        }
-
-        private NodeEvaluationResult CreateNodeEvaluationResult(
-            NodeEvaluationResult parent,
-            NodeStackFrame nodeFrame,
-            string name,
-            Dictionary<string, object> valueContainer,
-            bool childIsIndex
-        ) {
-            object valueObj;
-            var value = valueContainer.TryGetValue("text", out valueObj) ? (string)valueObj : string.Empty;
-            string hexValue = null;
-            int? handle = null;
-            var expandable = false;
-
-            var type = (string)valueContainer["type"];
-            switch (type) {
-                case "object":
-                    expandable = true;
-                    if (valueContainer.TryGetValue("className", out valueObj)) {
-                        var className = (string)valueObj;
-                        if (!string.IsNullOrEmpty(className)) {
-                            switch (className) {
-                                case "Date":
-                                    type = "date";
-                                    expandable = false;
-                                    break;
-                                default:
-                                    value = className;
-                                    break;
-                            }
-                        }
-                    }
-                    if (valueContainer.TryGetValue("handle", out valueObj)) {
-                        handle = (int)valueObj;
-                    }
-                    break;
-                case "string":
-                    value = "\"" + value + "\"";
-                    break;
-                case "number":
-                    int intValue = 0;
-                    if (int.TryParse(value, out intValue)) {
-                        hexValue = String.Format("0x{0:X8}", intValue);
-                    }
-                    break;
-                case "boolean":
-                    break;
-                case "null":
-                    value = "null";
-                    break;
-                case "undefined":
-                    return null;
-                case "function":
-                    value = GetFunctionName(valueContainer);
-                    if (valueContainer.TryGetValue("handle", out valueObj)) {
-                        handle = (int)valueObj;
-                        expandable = true;
-                    }
-                    break;
-                default:
-                    Debug.WriteLine(String.Format("Unhandled value type: {0}", type));
-                    break;
-            }
-
-            string expression = "";
-            string childName = "";
-            if (parent != null) {
-                expression = parent.Expression;
-                childName = name;
-            } else {
-                expression = name;
-            }
-
-            return new NodeEvaluationResult(
-                            this,
-                            handle,
-                            value,
-                            hexValue ?? value,
-                            type,
-                            expression,
-                            childName,
-                            childIsIndex,
-                            false,
-                            nodeFrame,
-                            expandable
-                       );
-        }
-
-        private static string GetFunctionName(Dictionary<string, object> valueContainer) {
-            object functionNameObj = null;
-            string functionName = null;
-            if (valueContainer.TryGetValue("name", out functionNameObj) && functionNameObj != null) {
-                functionName = (string)functionNameObj;
-            }
-            if (String.IsNullOrWhiteSpace(functionName) && valueContainer.TryGetValue("inferredName", out functionNameObj) && functionNameObj != null) {
-                functionName = (string)functionNameObj;
-            }
-            return String.Format("[Function{0}]", String.IsNullOrWhiteSpace(functionName) ? "" : ": " + functionName);
         }
 
         private Dictionary<string, object> GetRefRecord(object[] refs, int handle) {
@@ -1772,7 +1289,7 @@ namespace Microsoft.NodejsTools.Debugger {
         internal void RemoveBreakPoint(int id, Action successHandler = null, Action failureHandler = null) {
             DebugWriteCommand("Remove Breakpoint");
 
-            SendRequest(
+            Connection.SendRequest(
                 "clearbreakpoint",
                 new Dictionary<string, object> {
                     { "breakpoint", id }
@@ -1841,7 +1358,7 @@ namespace Microsoft.NodejsTools.Debugger {
             DebugWriteCommand("GetScriptText: " + moduleId);
 
             string scriptText = null;
-            SendRequest(
+            Connection.SendRequest(
                 "scripts",
                 new Dictionary<string, object> {
                         { "ids", new object[] {moduleId} },
