@@ -33,6 +33,8 @@
   <ItemGroup>
     <Compile Include="AbstractFilesystemPackageJsonTests.cs" />
     <Compile Include="AbstractPackageJsonTests.cs" />
+    <Compile Include="AsyncHelpers.cs" />
+    <Compile Include="InstallUninstallPackageTests.cs" />
     <Compile Include="FileSystemPackageJsonTests.cs" />
     <Compile Include="MockPackageJsonSource.cs" />
     <Compile Include="ModuleHierarchyTests.cs" />

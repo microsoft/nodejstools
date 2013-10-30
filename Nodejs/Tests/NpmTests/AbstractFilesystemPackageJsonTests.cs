@@ -35,5 +35,14 @@ namespace NpmTests
                 }
             }
         }
+
+        protected string CreateRootPackage(string json)
+        {
+            var dir = TempFileManager.GetNewTempDirectory();
+            var path = Path.Combine(dir.FullName, "package.json");
+            CreatePackageJson(path, json);
+            return dir.FullName;
+        }
+
     }
 }
