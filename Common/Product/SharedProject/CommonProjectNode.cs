@@ -425,7 +425,7 @@ namespace Microsoft.VisualStudioTools.Project {
             if (!string.IsNullOrEmpty(startupPath)) {
                 var startup = FindNodeByFullPath(startupPath);
                 if (startup != null) {
-                    BoldItem(startup, true);
+                    _needBolding.Add(startup);
                 }
             }
         }
@@ -495,6 +495,8 @@ namespace Microsoft.VisualStudioTools.Project {
         }
 
         protected internal override int ShowAllFiles() {
+            UIThread.Instance.MustBeCalledFromUIThread();
+
             if (!QueryEditProjectFile(false)) {
                 return VSConstants.E_FAIL;
             }
@@ -536,11 +538,10 @@ namespace Microsoft.VisualStudioTools.Project {
                 var allFiles = curNode.ItemNode as AllFilesProjectElement;
                 if (allFiles != null) {
                     curNode.IsVisible = enabled;
-
                     if (enabled) {
-                        ProjectMgr.OnItemAdded(node, curNode);
+                        OnItemAdded(node, curNode);
                     } else {
-                        ProjectMgr.OnItemDeleted(curNode);
+                        RaiseItemDeleted(curNode);
                     }
                 }
             }
@@ -1016,8 +1017,8 @@ namespace Microsoft.VisualStudioTools.Project {
 
                     // then remove us if we're an all files node
                     if (current.ItemNode is AllFilesProjectElement) {
-                        parent.RemoveChild(current);
                         _project.OnItemDeleted(current);
+                        parent.RemoveChild(current);
                     }
                 }
             }
@@ -1025,13 +1026,13 @@ namespace Microsoft.VisualStudioTools.Project {
             private void ChildDeleted(HierarchyNode child) {
                 if (child != null) {
                     _project.TryDeactivateSymLinkWatcher(child);
+                    UIThread.Instance.MustBeCalledFromUIThread();
 
                     if (child.ItemNode.IsExcluded) {
                         RemoveAllFilesChildren(child);
-
                         // deleting a show all files item, remove the node.
-                        child.Parent.RemoveChild(child);
                         _project.OnItemDeleted(child);
+                        child.Parent.RemoveChild(child);
                     } else {
                         Debug.Assert(!child.IsNonMemberItem);
                         // deleting an item in the project, fix the icon, also
@@ -1176,6 +1177,14 @@ namespace Microsoft.VisualStudioTools.Project {
         }
 
         public void BoldItem(HierarchyNode node, bool isBold) {
+            if ((EventTriggeringFlag & EventTriggering.DoNotTriggerHierarchyEvents) != 0) {
+                if (isBold) {
+                    _needBolding.Add(node);
+                }
+                return;
+            }
+            
+            Debug.Assert(parentHierarchy != null, "dont call into the hierarchy before the project is loaded, it corrupts the hierarchy");
             IVsUIHierarchyWindow2 windows = UIHierarchyUtilities.GetUIHierarchyWindow(
                 Site as IServiceProvider,
                 new Guid(ToolWindowGuids80.SolutionExplorer)) as IVsUIHierarchyWindow2;
@@ -1240,6 +1249,7 @@ namespace Microsoft.VisualStudioTools.Project {
             }
             var items = _needBolding.ToArray();
 
+            Debug.Assert(parentHierarchy != null, "dont call into the hierarchy before the project is loaded, it corrupts the hierarchy");
             IVsUIHierarchyWindow2 windows = UIHierarchyUtilities.GetUIHierarchyWindow(
                 Site as IServiceProvider,
                 new Guid(ToolWindowGuids80.SolutionExplorer)) as IVsUIHierarchyWindow2;
@@ -1448,6 +1458,7 @@ namespace Microsoft.VisualStudioTools.Project {
         /// Returns first immediate child node (non-recursive) of a given type.
         /// </summary>
         private void RefreshStartupFile(HierarchyNode parent, string oldFile, string newFile) {
+            Debug.Assert(parentHierarchy != null, "dont call into the hierarchy before the project is loaded, it corrupts the hierarchy");
             IVsUIHierarchyWindow2 windows = UIHierarchyUtilities.GetUIHierarchyWindow(
                 Site,
                 new Guid(ToolWindowGuids80.SolutionExplorer)) as IVsUIHierarchyWindow2;

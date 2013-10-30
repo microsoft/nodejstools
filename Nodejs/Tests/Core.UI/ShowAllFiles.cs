@@ -14,18 +14,10 @@
 
 using System;
 using System.IO;
-using System.Linq;
 using System.Runtime.InteropServices;
-using System.Threading;
-using System.Windows;
-using System.Windows.Automation;
-using System.Windows.Input;
 using EnvDTE;
-using Microsoft.NodejsTools;
-using Microsoft.NodejsTools.Project;
 using Microsoft.TC.TestHostAdapters;
 using Microsoft.VisualStudio;
-using Microsoft.VisualStudio.Language.Intellisense;
 using Microsoft.VisualStudio.Shell.Interop;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using Microsoft.VisualStudioTools.Project;
@@ -33,7 +25,6 @@ using TestUtilities;
 using TestUtilities.Nodejs;
 using TestUtilities.UI;
 using Keyboard = TestUtilities.UI.Keyboard;
-using Mouse = TestUtilities.UI.Mouse;
 
 namespace Microsoft.Nodejs.Tests.UI {
     [TestClass]

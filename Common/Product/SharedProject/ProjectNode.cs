@@ -306,7 +306,7 @@ namespace Microsoft.VisualStudioTools.Project
         // Has the object been disposed.
         private bool isDisposed;
 
-        private IVsHierarchy parentHierarchy;
+        internal IVsHierarchy parentHierarchy;
         private int parentHierarchyItemId;
 
         private List<HierarchyNode> itemsDraggedOrCutOrCopied;
@@ -6341,6 +6341,10 @@ If the files in the existing folder have the same names as files in the folder y
                 _diskNodes.Remove(diskNode.Url);
             }
 
+            RaiseItemDeleted(deletedItem);
+        }
+
+        internal void RaiseItemDeleted(HierarchyNode deletedItem) {
             if ((EventTriggeringFlag & ProjectNode.EventTriggering.DoNotTriggerHierarchyEvents) != 0) {
                 return;
             }

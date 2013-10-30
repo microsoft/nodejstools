@@ -97,6 +97,8 @@ namespace Microsoft.VisualStudioTools.Project {
         /// </summary>
         /// <returns></returns>
         internal override int ExcludeFromProject() {
+            UIThread.Instance.MustBeCalledFromUIThread();
+
             Debug.Assert(this.ProjectMgr != null, "The project item " + this.ToString() + " has not been initialised correctly. It has a null ProjectMgr");
             if (!ProjectMgr.QueryEditProjectFile(false) ||
                 !ProjectMgr.QueryFolderRemove(Parent, Url)) {
@@ -114,8 +116,8 @@ namespace Microsoft.VisualStudioTools.Project {
             ResetNodeProperties();
             ItemNode.RemoveFromProjectFile();
             if (!Directory.Exists(CommonUtils.TrimEndSeparator(Url))) {
-                Parent.RemoveChild(this);
                 ProjectMgr.OnItemDeleted(this);
+                Parent.RemoveChild(this);
             } else {
                 ItemNode = new AllFilesProjectElement(Url, ItemNode.ItemTypeName, ProjectMgr);
                 if (!ProjectMgr.IsShowingAllFiles) {
