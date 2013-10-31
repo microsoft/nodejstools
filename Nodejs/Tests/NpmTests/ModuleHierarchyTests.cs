@@ -86,7 +86,7 @@ namespace NpmTests
 
             Assert.IsNotNull(module.PackageJson, "Module package.json should not be null.");
 
-            Assert.IsTrue(module.IsDependencyInParentPackageJson, "Should be listed as a dependency in parent package.json.");
+            Assert.IsTrue(module.IsListedInParentPackageJson, "Should be listed as a dependency in parent package.json.");
             Assert.IsFalse(module.IsMissing, "Should not be marked as missing.");
             Assert.IsFalse(module.IsDevDependency, "Should not be marked as dev dependency.");
             Assert.IsFalse(module.IsOptionalDependency, "Should not be marked as optional dependency.");
@@ -127,7 +127,7 @@ namespace NpmTests
 
             Assert.IsNull(module.PackageJson, "Module package.json should be null for missing dependency.");
 
-            Assert.IsTrue(module.IsDependencyInParentPackageJson, "Should be listed as a dependency in parent package.json.");
+            Assert.IsTrue(module.IsListedInParentPackageJson, "Should be listed as a dependency in parent package.json.");
             Assert.IsTrue(module.IsMissing, "Should be marked as missing.");
             Assert.IsFalse(module.IsDevDependency, "Should not be marked as dev dependency.");
             Assert.IsFalse(module.IsOptionalDependency, "Should not be marked as optional dependency.");
@@ -182,7 +182,7 @@ namespace NpmTests
 
                 Assert.IsNotNull(current.PackageJson, "Module package.json should not be null.");
 
-                Assert.IsTrue(current.IsDependencyInParentPackageJson, "Should be listed as a dependency in parent package.json.");
+                Assert.IsTrue(current.IsListedInParentPackageJson, "Should be listed as a dependency in parent package.json.");
                 Assert.IsFalse(current.IsMissing, "Should not be marked as missing.");
                 Assert.IsFalse(current.IsDevDependency, "Should not be marked as dev dependency.");
                 Assert.IsFalse(current.IsOptionalDependency, "Should not be marked as optional dependency.");

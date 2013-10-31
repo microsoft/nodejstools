@@ -8,7 +8,7 @@ namespace Microsoft.NodejsTools.Npm
 {
     public interface IPackage : IRootPackage
     {
-        bool IsDependencyInParentPackageJson { get; }
+        bool IsListedInParentPackageJson { get; }
         bool IsMissing { get; }
         bool IsDevDependency { get; }
         bool IsOptionalDependency { get; }

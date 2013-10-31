@@ -17,7 +17,7 @@ namespace Microsoft.NodejsTools.Npm.SPI
             m_Parent = parent;
         }
 
-        public bool IsDependencyInParentPackageJson
+        public bool IsListedInParentPackageJson
         {
             get
             {
@@ -30,7 +30,7 @@ namespace Microsoft.NodejsTools.Npm.SPI
         {
             get
             {
-                return IsDependencyInParentPackageJson && ! Directory.Exists(Path);
+                return IsListedInParentPackageJson && ! Directory.Exists(Path);
             }
         }
 
