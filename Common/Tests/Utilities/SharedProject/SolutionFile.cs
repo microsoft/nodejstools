@@ -63,7 +63,7 @@ namespace TestUtilities.SharedProject {
 
             MSBuild.ProjectCollection collection = new MSBuild.ProjectCollection();
             foreach (var project in toGenerate) {
-                projects.Add(project.ProjectType.Generate(collection, location, project.Name, project.Items));
+                projects.Add(project.Save(collection, location));
             }
 
 #if DEV10
@@ -76,6 +76,10 @@ namespace TestUtilities.SharedProject {
 #error Unsupported VS version
 #endif
             for (int i = 0; i < projects.Count; i++) {
+                if (toGenerate[i].IsUserProject) {
+                    continue;
+                }
+
                 var project = projects[i];
                 var kind = toGenerate[i].ProjectType;
 
@@ -93,7 +97,12 @@ EndProject
 	EndGlobalSection
 	GlobalSection(ProjectConfigurationPlatforms) = postSolution
 ");
-            foreach (var project in projects) {
+            for (int i = 0; i < projects.Count; i++) {
+                if (toGenerate[i].IsUserProject) {
+                    continue;
+                }
+
+                var project = projects[i];
                 slnFile.AppendFormat(@"		{0:B}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{0:B}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{0:B}.Release|Any CPU.ActiveCfg = Release|Any CPU

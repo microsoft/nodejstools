@@ -1028,17 +1028,22 @@ namespace Microsoft.VisualStudioTools.Project {
                     _project.TryDeactivateSymLinkWatcher(child);
                     UIThread.Instance.MustBeCalledFromUIThread();
 
-                    if (child.ItemNode.IsExcluded) {
-                        RemoveAllFilesChildren(child);
-                        // deleting a show all files item, remove the node.
-                        _project.OnItemDeleted(child);
-                        child.Parent.RemoveChild(child);
-                    } else {
-                        Debug.Assert(!child.IsNonMemberItem);
-                        // deleting an item in the project, fix the icon, also
-                        // fix the icon of all children which we may have not
-                        // received delete notifications for
-                        RedrawIcon(child);
+                    // rapid changes can arrive out of order, if the file or directory 
+                    // actually exists ignore the event.
+                    if ((!File.Exists(child.Url) && !Directory.Exists(child.Url)) || 
+                        _project.IsFileHidden(child.Url)) {
+                        if (child.ItemNode.IsExcluded) {
+                            RemoveAllFilesChildren(child);
+                            // deleting a show all files item, remove the node.
+                            _project.OnItemDeleted(child);
+                            child.Parent.RemoveChild(child);
+                        } else {
+                            Debug.Assert(!child.IsNonMemberItem);
+                            // deleting an item in the project, fix the icon, also
+                            // fix the icon of all children which we may have not
+                            // received delete notifications for
+                            RedrawIcon(child);
+                        }
                     }
                 }
             }            
@@ -1089,7 +1094,7 @@ namespace Microsoft.VisualStudioTools.Project {
                         _project.MergeDiskNodes(folderNode, _path);
 
                         _project.OnInvalidateItems(folderNode);
-                    } else {
+                    } else if (File.Exists(_path)) { // rapid changes can arrive out of order, make sure the file still exists
                         _project.AddAllFilesFile(parent, _path);
                     }
 

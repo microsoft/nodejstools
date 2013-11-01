@@ -560,7 +560,7 @@ namespace Microsoft.Nodejs.Tests.UI {
 
                 for (int i = 0; i < 20; i++) {
                     try {
-                        if (!ShowAllFiles.GetIsFolderExpanded(project, "FolderName")) {
+                        if (!project.GetIsFolderExpanded("FolderName")) {
                             break;
                         }
                     } catch (ArgumentException) {
@@ -568,7 +568,7 @@ namespace Microsoft.Nodejs.Tests.UI {
                     System.Threading.Thread.Sleep(100);
                 }
 
-                Assert.IsFalse(ShowAllFiles.GetIsFolderExpanded(project, "FolderName"));
+                Assert.IsFalse(project.GetIsFolderExpanded("FolderName"));
                 Assert.AreNotEqual(null, window.WaitForItem("Solution 'RenameItemsTestUI' (1 project)", "HelloWorld", "FolderName", "Sub2", "Foo.js"));
             }
         }

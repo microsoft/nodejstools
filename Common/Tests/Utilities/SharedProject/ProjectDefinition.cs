@@ -12,7 +12,10 @@
  *
  * ***************************************************************************/
 
+using System;
 using System.Collections.Generic;
+using System.IO;
+using MSBuild = Microsoft.Build.Evaluation;
 
 namespace TestUtilities.SharedProject {
     /// <summary>
@@ -24,6 +27,7 @@ namespace TestUtilities.SharedProject {
         public readonly ProjectType ProjectType;
         public readonly string Name;
         public readonly ProjectContentGenerator[] Items;
+        public readonly bool IsUserProject;
 
         /// <summary>
         /// Creates a new project definition which can be included in a solution or generated.
@@ -37,12 +41,51 @@ namespace TestUtilities.SharedProject {
             Items = items;
         }
 
+        public ProjectDefinition(string name, ProjectType projectType, bool isUserProject, params ProjectContentGenerator[] items)
+            : this(name, projectType, items) {
+            IsUserProject = isUserProject;
+        }
+
         /// <summary>
         /// Helper function which generates the project and solution with just this 
         /// project in the solution.
         /// </summary>
         public SolutionFile Generate() {
             return SolutionFile.Generate(Name, this);
+        }
+
+        public MSBuild.Project Save(MSBuild.ProjectCollection collection, string location) {
+            location = Path.Combine(location, Name);
+            Directory.CreateDirectory(location);
+
+            var project = new MSBuild.Project(collection);
+            string projectFile = Path.Combine(location, Name) + ProjectType.ProjectExtension;
+            if (IsUserProject) {
+                projectFile += ".user";
+            }
+            project.Save(projectFile);
+
+            var projGuid = Guid.NewGuid();
+            project.SetProperty("ProjectTypeGuid", ProjectType.ProjectTypeGuid.ToString());
+            project.SetProperty("Name", Name);
+            project.SetProperty("ProjectGuid", projGuid.ToString("B"));
+            project.SetProperty("SchemaVersion", "2.0");
+
+            foreach (var processor in ProjectType.Processors) {
+                processor.PreProcess(project);
+            }
+
+            foreach (var item in Items) {
+                item.Generate(ProjectType, project);
+            }
+
+            foreach (var processor in ProjectType.Processors) {
+                processor.PostProcess(project);
+            }
+
+            project.Save();
+
+            return project;
         }
     }
 }
