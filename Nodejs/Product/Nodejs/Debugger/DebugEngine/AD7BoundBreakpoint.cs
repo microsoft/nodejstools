@@ -24,20 +24,20 @@ namespace Microsoft.NodejsTools.Debugger.DebugEngine {
         private readonly AD7PendingBreakpoint _pendingBreakpoint;
         private readonly AD7BreakpointResolution _breakpointResolution;
         private readonly AD7Engine _engine;
-        private readonly NodeBreakpoint _breakpoint;
+        private readonly NodeBreakpointBinding _breakpointBinding;
 
         private bool _enabled;
         private bool _deleted;
 
         public AD7BoundBreakpoint(
             AD7Engine engine,
-            NodeBreakpoint breakpoint,
+            NodeBreakpointBinding breakpointBinding,
             AD7PendingBreakpoint pendingBreakpoint,
             AD7BreakpointResolution breakpointResolution,
             bool enabled
         ) {
             _engine = engine;
-            _breakpoint = breakpoint;
+            _breakpointBinding = breakpointBinding;
             _pendingBreakpoint = pendingBreakpoint;
             _breakpointResolution = breakpointResolution;
             _enabled = enabled;
@@ -52,9 +52,8 @@ namespace Microsoft.NodejsTools.Debugger.DebugEngine {
 
             if (!_deleted) {
                 _deleted = true;
-                _breakpoint.Remove();
                 _pendingBreakpoint.OnBoundBreakpointDeleted(this);
-                _engine.BreakpointManager.RemoveBoundBreakpoint(_breakpoint);
+                _breakpointBinding.Remove();
             }
 
             return VSConstants.S_OK;
@@ -69,7 +68,7 @@ namespace Microsoft.NodejsTools.Debugger.DebugEngine {
         int IDebugBoundBreakpoint2.Enable(int fEnable) {
             AssertMainThread();
 
-            if (!_breakpoint.SetEnabled(fEnable != 0)) {
+            if (!_breakpointBinding.SetEnabled(fEnable != 0)) {
                 return VSConstants.E_FAIL;
             }
             return VSConstants.S_OK;
@@ -103,7 +102,7 @@ namespace Microsoft.NodejsTools.Debugger.DebugEngine {
         }
 
         int IDebugBoundBreakpoint2.GetHitCount(out uint pdwHitCount) {
-            pdwHitCount = _breakpoint.GetHitCount();
+            pdwHitCount = _breakpointBinding.GetHitCount();
             return VSConstants.S_OK;
         }
 
@@ -112,13 +111,13 @@ namespace Microsoft.NodejsTools.Debugger.DebugEngine {
                 return VSConstants.E_NOTIMPL;
             }
 
-            return _breakpoint.SetCondition(bpCondition.bstrCondition) ? VSConstants.S_OK : VSConstants.E_FAIL;
+            return _breakpointBinding.SetCondition(bpCondition.bstrCondition) ? VSConstants.S_OK : VSConstants.E_FAIL;
         }
 
         int IDebugBoundBreakpoint2.SetHitCount(uint dwHitCount) {
             AssertMainThread();
 
-            if (!_breakpoint.SetHitCount(dwHitCount)) {
+            if (!_breakpointBinding.SetHitCount(dwHitCount)) {
                 return VSConstants.E_FAIL;
             }
             return VSConstants.S_OK;
@@ -127,7 +126,7 @@ namespace Microsoft.NodejsTools.Debugger.DebugEngine {
         int IDebugBoundBreakpoint2.SetPassCount(BP_PASSCOUNT bpPassCount) {
             AssertMainThread();
 
-            if (!_breakpoint.SetBreakOn(GetBreakOnForPassCount(bpPassCount))) {
+            if (!_breakpointBinding.SetBreakOn(GetBreakOnForPassCount(bpPassCount))) {
                 return VSConstants.E_FAIL;
             }
             return VSConstants.S_OK;

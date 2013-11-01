@@ -1,0 +1,33 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Vsix xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xsd="http://www.w3.org/2001/XMLSchema" Version="1.0.0" xmlns="http://schemas.microsoft.com/developer/vsx-schema/2010">
+  <Identifier Id="FF632CFA-E4C5-4D8E-B1E2-63BE3B8A8289">
+    <Name>Microsoft.NodejsTools.InteractiveWindow</Name>
+    <Author>Microsoft</Author>
+    <Version>0.5</Version>
+    <Description xml:space="preserve">Node.js Tools for Visual Studio, Interactive Window</Description>
+    <Locale>1033</Locale>
+    <InstalledByMsi>true</InstalledByMsi>
+    <SystemComponent>false</SystemComponent>
+    <SupportedProducts>
+      <VisualStudio Version="11.0">
+        <Edition>Ultimate</Edition>
+        <Edition>Premium</Edition>
+        <Edition>Pro</Edition>
+        <Edition>VSTS</Edition>
+        <Edition>VSTD</Edition>
+      </VisualStudio>
+    </SupportedProducts>
+    <SupportedFrameworkRuntimeEdition MinVersion="4.0" />
+  </Identifier>
+  <References>
+    <Reference Id="Microsoft.VisualStudio.MPF" MinVersion="10.0">
+      <Name>Visual Studio MPF</Name>
+    </Reference>
+  </References>
+  <Content>
+    <VsPackage>|%CurrentProject%;PkgdefProjectOutputGroup|</VsPackage>
+    <MefComponent>|%CurrentProject%|</MefComponent>
+    <Assembly AssemblyName="NodejsTools.InteractiveWindow, Version=1.8.50330.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a">|%CurrentProject%|</Assembly>
+  </Content>
+
+</Vsix>

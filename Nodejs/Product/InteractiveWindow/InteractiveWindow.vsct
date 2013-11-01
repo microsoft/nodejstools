@@ -245,7 +245,9 @@
             inside a button definition. An important aspect of this declaration is that the element id 
             must be the actual index (1-based) of the bitmap inside the bitmap strip. -->
             <Bitmap guid="guidReplToolbarImages" href="..\..\..\Common\Product\Icons\Dev11.0\ReplToolBarImages.bmp" usedList="bmpCancelEval, bmpResetSession, bmpClearScreen"
-                    Condition="Defined(DEV11)"/>          
+                    Condition="Defined(DEV11)"/>
+            <Bitmap guid="guidReplToolbarImages" href="..\..\..\Common\Product\Icons\Dev12.0\ReplToolBarImages.bmp" usedList="bmpCancelEval, bmpResetSession, bmpClearScreen"
+                    Condition="Defined(DEV12)"/>
         </Bitmaps>
 
     </Commands>

@@ -63,7 +63,6 @@ namespace Microsoft.TestSccPackage {
         }
 
         public int RegisterSccProject(IVsSccProject2 pscp2Project, string pszSccProjectName, string pszSccAuxPath, string pszSccLocalPath, string pszProvider) {
-            
             if (ExpectedProjectName != null) {
                 AreEqual(ExpectedProjectName, pszSccProjectName);
             }

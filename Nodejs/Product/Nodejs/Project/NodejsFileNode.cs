@@ -100,6 +100,7 @@ namespace Microsoft.NodejsTools.Project {
                 _watcher = new FileSystemWatcher(Path.GetDirectoryName(filename), Path.GetFileName(filename));
                 _watcher.EnableRaisingEvents = true;
                 _watcher.Changed += FileContentsChanged;
+                _watcher.Renamed += FileContentsChanged;
                 _watcher.NotifyFilter = NotifyFilters.LastWrite;
             }
         }

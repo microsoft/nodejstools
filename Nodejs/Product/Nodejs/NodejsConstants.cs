@@ -20,6 +20,7 @@ namespace Microsoft.NodejsTools {
         public const string FileExtension = ".js";
         public const string JavaScript = "JavaScript";
         public const string Nodejs = "Node.js";
+        public const string NodejsRepl = "Node.jsRepl";
 
         public const string NodeExePath = "NodeExePath";
         public const string NodeExeArguments = "NodeExeArguments";
@@ -36,7 +37,10 @@ namespace Microsoft.NodejsTools {
 
         public const string BaseRegistryKey = "NodejsTools";
 
-        [Export, Name(Nodejs), BaseDefinition(JavaScript)]
+        [Export, Name(Nodejs), BaseDefinition("text")]
         internal static ContentTypeDefinition ContentTypeDefinition = null;
+
+        [Export, Name(NodejsRepl), BaseDefinition("JavaScript")]
+        internal static ContentTypeDefinition ReplContentTypeDefinition = null;
     }
 }

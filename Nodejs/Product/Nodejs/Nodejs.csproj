@@ -1,8 +1,30 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <Project DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003" ToolsVersion="4.0">
+  <Choose>
+    <When Condition=" '$(VisualStudioVersion)'=='11.0'  Or '$(TargetVisualStudioVersion)'=='VS110' ">
+      <PropertyGroup>
+        <VisualStudioVersion Condition="'$(VisualStudioVersion)' == ''">11.0</VisualStudioVersion>
+        <MinimumVisualStudioVersion>11.0</MinimumVisualStudioVersion>
+        <FileUpgradeFlags>
+        </FileUpgradeFlags>
+        <UpgradeBackupLocation>
+        </UpgradeBackupLocation>
+        <OldToolsVersion>4.0</OldToolsVersion>
+      </PropertyGroup>
+    </When>
+    <When Condition=" '$(VisualStudioVersion)'=='12.0'  Or '$(TargetVisualStudioVersion)'=='VS120' ">
+      <PropertyGroup>
+        <VisualStudioVersion Condition="'$(VisualStudioVersion)' == ''">12.0</VisualStudioVersion>
+        <MinimumVisualStudioVersion>12.0</MinimumVisualStudioVersion>
+        <FileUpgradeFlags>
+        </FileUpgradeFlags>
+        <UpgradeBackupLocation>
+        </UpgradeBackupLocation>
+        <OldToolsVersion>4.0</OldToolsVersion>
+      </PropertyGroup>
+    </When>
+  </Choose>
   <PropertyGroup>
-    <MinimumVisualStudioVersion>11.0</MinimumVisualStudioVersion>
-    <VisualStudioVersion>11.0</VisualStudioVersion>
     <VSToolsPath Condition="'$(VSToolsPath)' == ''">$(MSBuildExtensionsPath32)\Microsoft\VisualStudio\v$(VisualStudioVersion)</VSToolsPath>
     <SccProjectName>SAK</SccProjectName>
     <SccLocalPath>SAK</SccLocalPath>
@@ -83,6 +105,9 @@
     <Reference Include="Microsoft.VisualStudio.Shell.Interop.9.0" />
     <Reference Include="Microsoft.VisualStudio.Shell.Interop.10.0" />
     <Reference Include="Microsoft.VisualStudio.Shell.Interop.11.0">
+      <EmbedInteropTypes>true</EmbedInteropTypes>
+    </Reference>
+    <Reference Include="Microsoft.VisualStudio.Shell.Interop.12.0, Version=12.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a, processorArchitecture=MSIL" Condition="'$(VSTarget)' != '11.0'">
       <EmbedInteropTypes>true</EmbedInteropTypes>
     </Reference>
     <Reference Include="Microsoft.VisualStudio.TemplateWizardInterface, Version=8.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a, processorArchitecture=MSIL" />
@@ -177,6 +202,7 @@
     </COMReference>
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="CodeWindowManager.cs" />
     <Compile Include="Commands\OpenReplWindowCommand.cs" />
     <Compile Include="Commands\OpenRemoteDebugProxyFolderCommand.cs" />
     <Compile Include="Commands\SurveyNewsCommand.cs" />
@@ -206,7 +232,9 @@
     <Compile Include="Intellisense\CompletionSource.cs" />
     <Compile Include="Intellisense\CompletionSourceProvider.cs" />
     <Compile Include="Intellisense\CompletionSource.Modules.cs" />
+    <Compile Include="Intellisense\TextViewCreationListener.cs" />
     <Compile Include="Nodejs.cs" />
+    <Compile Include="NodejsLanguageInfo.cs" />
     <Compile Include="NodejsProjectConfig.cs" />
     <Compile Include="NodejsToolsInstallPath.cs" />
     <Compile Include="Options\NodejsDialogPage.cs">
@@ -230,24 +258,25 @@
     <Compile Include="Project\NodejsGeneralPropertyPageControl.Designer.cs">
       <DependentUpon>NodejsGeneralPropertyPageControl.cs</DependentUpon>
     </Compile>
+    <Compile Include="ProvideBraceCompletion.cs" />
     <Compile Include="ProvideEditorExtension2Attribute.cs" />
     <Compile Include="ProvideLanguageTemplates.cs" />
     <Compile Include="Repl\ClearReplCommand.cs" />
     <Compile Include="Repl\INodejsReplSite.cs" />
     <Compile Include="Repl\SaveReplCommand.cs" />
     <Compile Include="Repl\VsNodejsReplSite.cs" />
+    <Compile Include="SmartIndent.cs" />
     <Compile Include="SmartIndentProvider.cs" />
     <Compile Include="VsMenus.cs" />
     <Compile Include="AzureSolutionListener.cs" />
     <Compile Include="BaseNodeProjectFactory.cs" />
-    <Compile Include="Debugger\BreakpointEventArgs.cs" />
+    <Compile Include="Debugger\BreakpointBindingEventArgs.cs" />
     <Compile Include="Debugger\BreakpointHitEventArgs.cs" />
     <Compile Include="Debugger\DebugEngine\AD7BoundBreakpoint.cs" />
     <Compile Include="Debugger\DebugEngine\AD7BreakpointResolution.cs" />
     <Compile Include="Debugger\DebugEngine\AD7Document.cs" />
     <Compile Include="Debugger\DebugEngine\AD7DocumentContext.cs" />
     <Compile Include="Debugger\DebugEngine\AD7Engine.cs" />
-    <Compile Include="Debugger\DebugEngine\AD7EngineEventArgs.cs" />
     <Compile Include="Debugger\DebugEngine\AD7Enums.cs" />
     <Compile Include="Debugger\DebugEngine\AD7Events.cs" />
     <Compile Include="Debugger\DebugEngine\AD7MemoryAddress.cs" />
@@ -276,6 +305,7 @@
     <Compile Include="Debugger\ProcessLoadedEventArgs.cs" />
     <Compile Include="Debugger\ProcessExitedEventArgs.cs" />
     <Compile Include="Debugger\NodeBreakpoint.cs" />
+    <Compile Include="Debugger\NodeBreakpointBinding.cs" />
     <Compile Include="Debugger\NodeDebugOptions.cs" />
     <Compile Include="Debugger\NodeEvaluationResult.cs" />
     <Compile Include="Debugger\NodeException.cs" />
@@ -410,6 +440,7 @@
     <ZipProject Include="ProjectTemplates\WebAzureNodejsApp\setup_web.cmd" />
     <ZipProject Include="ProjectTemplates\WebAzureNodejsApp\Web.cloud.config" />
     <ZipProject Include="ProjectTemplates\WebAzureNodejsApp\Web.config" />
+    <ZipProject Include="ProjectTemplates\WebAzureNodejsApp\node.cmd" />
     <ZipProject Include="ProjectTemplates\WebNodejsApp\WebNodejsApp.njsproj">
       <SubType>Designer</SubType>
     </ZipProject>
@@ -437,6 +468,7 @@
     <ZipProject Include="ProjectTemplates\AzureNodejsApp\setup_web.cmd" />
     <ZipProject Include="ProjectTemplates\AzureNodejsApp\Web.cloud.config" />
     <ZipProject Include="ProjectTemplates\AzureNodejsApp\Web.config" />
+    <ZipProject Include="ProjectTemplates\AzureNodejsApp\node.cmd" />
     <ZipProject Include="ProjectTemplates\WebNodejsApp\package.json" />
     <ZipProject Include="ProjectTemplates\WebNodejsApp\README.md" />
     <ZipProject Include="ProjectTemplates\NodejsApp\NodejsApp.njsproj">
@@ -456,6 +488,7 @@
     <ZipProject Include="ProjectTemplates\AzureExpressApp\setup_web.cmd" />
     <ZipProject Include="ProjectTemplates\AzureExpressApp\download.ps1" />
     <ZipProject Include="ProjectTemplates\AzureExpressApp\ChangeConfig.ps1" />
+    <ZipProject Include="ProjectTemplates\AzureExpressApp\node.cmd" />
     <ZipProject Include="ProjectTemplates\WebAzureExpressApp\ChangeConfig.ps1" />
     <ZipProject Include="ProjectTemplates\WebAzureExpressApp\download.ps1" />
     <ZipProject Include="ProjectTemplates\WebAzureExpressApp\package.json" />
@@ -463,6 +496,7 @@
     <ZipProject Include="ProjectTemplates\WebAzureExpressApp\setup_web.cmd" />
     <ZipProject Include="ProjectTemplates\WebAzureExpressApp\Web.cloud.config" />
     <ZipProject Include="ProjectTemplates\WebAzureExpressApp\Web.config" />
+    <ZipProject Include="ProjectTemplates\WebAzureExpressApp\node.cmd" />
     <None Include="source.extension.vsixmanifest">
       <SubType>Designer</SubType>
     </None>

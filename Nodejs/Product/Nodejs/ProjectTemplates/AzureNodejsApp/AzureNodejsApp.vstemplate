@@ -23,6 +23,7 @@
       <ProjectItem TargetFileName="bin\setup_web.cmd">setup_web.cmd</ProjectItem>
       <ProjectItem ReplaceParameters="true">package.json</ProjectItem>
       <ProjectItem ReplaceParameters="true">README.md</ProjectItem>
+      <ProjectItem TargetFileName="bin\node.cmd">node.cmd</ProjectItem>
     </Project>
   </TemplateContent>
 </VSTemplate>

@@ -15,6 +15,7 @@
 using System;
 using System.Drawing;
 using System.IO;
+using System.Linq;
 using System.Windows.Forms;
 using Microsoft.VisualStudioTools.Project;
 
@@ -113,12 +114,6 @@ namespace Microsoft.NodejsTools.Project {
             _propPage.IsDirty = true;
         }
 
-        private void NodejsPortKeyPress(object sender, KeyPressEventArgs e) {
-            if (!Char.IsDigit(e.KeyChar)) {
-                e.Handled = true;
-            }
-        }
-
         private void SetCueBanner() {
             string cueBanner = Nodejs.NodeExePath;
             if (String.IsNullOrEmpty(cueBanner)) {
@@ -160,6 +155,15 @@ namespace Microsoft.NodejsTools.Project {
             if (!string.IsNullOrEmpty(path)) {
                 _workingDir.Text = path;
             }
+        }
+
+        private void NodejsPortValidated(object sender, EventArgs e) {
+            if (_nodejsPort.Text.Any(ch => !Char.IsDigit(ch))) {
+                _nodeExeErrorProvider.SetError(_nodejsPort, Resources.InvalidPortNumber);
+            } else {
+                _nodeExeErrorProvider.SetError(_nodejsPort, String.Empty);
+            }
+
         }
     }
 }

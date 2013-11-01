@@ -13,6 +13,7 @@
  * ***************************************************************************/
 
 using System;
+using System.Windows.Forms;
 using EnvDTE;
 using Microsoft.TC.TestHostAdapters;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
@@ -25,28 +26,22 @@ namespace Microsoft.Nodejs.Tests.UI {
     public class SmartIndent : NodejsProjectTest {
         public static ProjectDefinition BasicProject = new ProjectDefinition("AutoIndent", NodejsProject, Compile("server", ""));
 
-        [TestCleanup]
-        public void MyTestCleanup() {
-            for (int i = 0; i < 20; i++) {
-                try {
-                    VsIdeTestHostContext.Dte.Solution.Close(false);
-                    break;
-                } catch {
-                    VsIdeTestHostContext.Dte.Documents.CloseAll(EnvDTE.vsSaveChanges.vsSaveChangesNo);
-                    System.Threading.Thread.Sleep(500);
-                }
-            }
-        }
-
         [ClassInitialize]
-        public static void DoDeployment(TestContext context) {
+        public static void DoDeployment(TestContext context) {            
             AssertListener.Initialize();
         }
 
         [TestMethod, Priority(0), TestCategory("Core")]
         [HostType("TC Dynamic"), DynamicHostType(typeof(VsIdeHostAdapter))]
         public void SmartIndentBasic() {
-            var testCases = new[] {
+#if DEV12_OR_LATER
+            var props = VsIdeTestHostContext.Dte.get_Properties("TextEditor", "Node.js");
+            bool? oldValue = null;
+            try {
+                oldValue = (bool)props.Item("BraceCompletion").Value;
+                props.Item("BraceCompletion").Value = false;
+#endif
+                var testCases = new[] {
                 // grouping
                 new { 
                     Typed = "x = [1,\r2,\r3\r]",
@@ -122,6 +117,13 @@ bar*/
     f(x)
 }"
                 },
+                // auto dedent function call w/o params
+                new {
+                    Typed = "if (true) {\rfoo()\r\b}",
+                    Expected = @"if (true) {
+    foo()
+}"
+                },
                 // auto dedent normal statement ending in semicolon
                 new {
                     Typed = "if (true) {\rf(x);\r\b}",
@@ -131,17 +133,24 @@ bar*/
                 },
             };
 
-            using (var solution = BasicProject.Generate().ToVs()) {
-                foreach (var testCase in testCases) {
-                    Console.WriteLine("Typing  : {0}", testCase.Typed);
-                    Console.WriteLine("Expected: {0}", testCase.Expected);
-                    AutoIndentTest(
-                        solution,
-                        testCase.Typed,
-                        testCase.Expected
-                    );
+                using (var solution = BasicProject.Generate().ToVs()) {
+                    foreach (var testCase in testCases) {
+                        Console.WriteLine("Typing  : {0}", testCase.Typed);
+                        Console.WriteLine("Expected: {0}", testCase.Expected);
+                        AutoIndentTest(
+                            solution,
+                            testCase.Typed,
+                            testCase.Expected
+                        );
+                    }
+                }
+#if DEV12_OR_LATER
+            } finally {
+                if (oldValue != null) {
+                    props.Item("BraceCompletion").Value = oldValue;
                 }
             }
+#endif
         }
 
         private static void AutoIndentTest(VisualStudioSolution solution, string typedText, string expectedText) {

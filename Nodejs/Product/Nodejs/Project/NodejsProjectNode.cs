@@ -17,6 +17,7 @@ using System.Collections.Generic;
 using System.IO;
 using System.Reflection;
 using System.Text;
+using System.Threading;
 using System.Web.Script.Serialization;
 using Microsoft.VisualStudio;
 using Microsoft.VisualStudioTools;
@@ -30,12 +31,18 @@ namespace Microsoft.NodejsTools.Project {
         const string _userSwitchMarker = "// **NTVS** INSERT USER MODULE SWITCH HERE **NTVS**";
         internal readonly List<NodejsFileNode> _nodeFiles = new List<NodejsFileNode>();
         private readonly JavaScriptSerializer _serializer = new JavaScriptSerializer();
+        private readonly Timer _timer;
 
         public NodejsProjectNode(NodejsProjectPackage package)
             : base(package, Utilities.GetImageList(typeof(NodejsProjectNode).Assembly.GetManifestResourceStream("Microsoft.NodejsTools.NodeImageList.bmp"))) {
 
             Type projectNodePropsType = typeof(NodejsProjectNodeProperties);
             AddCATIDMapping(projectNodePropsType, projectNodePropsType.GUID);
+            _timer = new Timer(RefreshReferenceFile);
+        }
+
+        private void RefreshReferenceFile(object state) {
+            UpdateReferenceFile();
         }
 
         public override int InitializeForOuter(string filename, string location, string name, uint flags, ref Guid iid, out IntPtr projectPointer, out int canceled) {
@@ -83,6 +90,7 @@ namespace Microsoft.NodejsTools.Project {
         }
 
         public override CommonFileNode CreateCodeFileNode(ProjectElement item) {
+            _timer.Change(250, Timeout.Infinite);
             return new NodejsFileNode(this, item);
         }
 

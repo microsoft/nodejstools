@@ -263,6 +263,20 @@ namespace NodejsTests.Debugger {
             );
         }
 
+        /// <summary>
+        /// http://nodejstools.codeplex.com/workitem/13
+        /// </summary>
+        [TestMethod, Priority(0)]
+        public void SpecialNumberLocalsTest() {
+            LocalsTest(
+                "SpecialNumberLocalsTest.js",
+                7,
+                expectedLocals: new string[] { "posInf", "negInf", "nan", "nul" },
+                expectedValues: new string[] { "Infinity", "-Infinity", "NaN", "null" },
+                expectedHexValues: new string[] { "Infinity", "-Infinity", "NaN", "null" }
+            );
+        }
+
         [TestMethod, Priority(0)]
         public void GlobalsTest() {
             LocalsTest(
@@ -740,6 +754,46 @@ namespace NodejsTests.Debugger {
                 exceptionTreatments: CollectExceptionTreatments("Error", ExceptionHitTreatment.BreakNever)
             );
         }
+        [TestMethod, Priority(0)]
+        public void DebuggingDownloaded() {
+            TestDebuggerSteps(
+                "DebuggingDownloaded.js",
+                new[] {
+                    new TestStep(action: TestAction.StepInto, expectedStepComplete: 205, expectedBreakFile: "node.js", builtin: true),
+                    new TestStep(action: TestAction.StepOver, expectedStepComplete: 206, expectedBreakFile: "node.js", builtin: true),
+                    new TestStep(action: TestAction.StepOut, expectedStepComplete: 1),
+                    new TestStep(action: TestAction.AddBreakpoint, targetBreakpointFile: "console.js", targetBreakpoint: 53, builtin: true),
+                    new TestStep(action: TestAction.ResumeProcess, expectedBreakpointHit: 53, expectedBreakFile: "console.js", builtin: true, validation:
+                        (process, thread) => {
+                            var module = thread.Frames[0].Module;
+
+                            // User data
+                            var obj = new object();
+                            module.Document = obj;
+                            Assert.AreEqual(obj, module.Document);
+                            module.Document = null;
+                            Assert.AreEqual(null, module.Document);
+
+                            // Download builtin
+                            Assert.IsTrue(module.BuiltIn);
+                            var scriptText = process.GetScriptText(module.ModuleId);
+                            Assert.IsTrue(scriptText.Contains("function Console("));
+
+                            // Download non-builtin
+                            module = thread.Frames[2].Module;
+                            Assert.IsFalse(module.BuiltIn);
+                            scriptText = process.GetScriptText(module.ModuleId);
+                            StreamReader streamReader = new StreamReader(module.FileName);
+                            var fileText = streamReader.ReadToEnd();
+                            streamReader.Close();
+                            Assert.IsTrue(scriptText.Contains(fileText));
+                        }
+                    ),
+                    new TestStep(action: TestAction.ResumeProcess, expectedExitCode: 0),
+                }
+            );
+        }
+
 
         [TestMethod, Priority(0)]
         public void Breaking_InFunctionPassedFewerThanTakenParms() {
@@ -1178,6 +1232,87 @@ namespace NodejsTests.Debugger {
             );
         }
 
+        [TestMethod, Priority(0)]
+        public void TestBreakpointFixup() {
+            TestDebuggerSteps(
+                "FixupBreakpointOnComment.js",
+                new[] {
+                    new TestStep(action: TestAction.AddBreakpoint, targetBreakpoint: 1),
+                    new TestStep(action: TestAction.AddBreakpoint, targetBreakpoint: 4),
+                    new TestStep(action: TestAction.AddBreakpoint, targetBreakpoint: 7),
+                    new TestStep(action: TestAction.ResumeThread, expectedBreakpointHit: 2),
+                    new TestStep(action: TestAction.ResumeThread, expectedEntryPointHit: 2),
+                    new TestStep(action: TestAction.ResumeProcess, expectedBreakpointHit: 5),
+                    new TestStep(action: TestAction.ResumeProcess, expectedBreakpointHit: 10),
+                    new TestStep(action: TestAction.ResumeProcess, expectedExitCode: 0),
+                }
+            );
+            TestDebuggerSteps(
+                "FixupBreakpointOnBlankLine.js",
+                new[] {
+                    new TestStep(action: TestAction.AddBreakpoint, targetBreakpoint: 1),
+                    new TestStep(action: TestAction.AddBreakpoint, targetBreakpoint: 4),
+                    new TestStep(action: TestAction.AddBreakpoint, targetBreakpoint: 7),
+                    new TestStep(action: TestAction.ResumeThread, expectedBreakpointHit: 3),
+                    new TestStep(action: TestAction.ResumeThread, expectedEntryPointHit: 3),
+                    new TestStep(action: TestAction.ResumeProcess, expectedBreakpointHit: 6),
+                    new TestStep(action: TestAction.ResumeProcess, expectedBreakpointHit: 11),
+                    new TestStep(action: TestAction.ResumeProcess, expectedExitCode: 0),
+                }
+            );
+            TestDebuggerSteps(
+                "FixupBreakpointOnFunction.js",
+                new[] {
+                    new TestStep(action: TestAction.AddBreakpoint, targetBreakpoint: 2),
+                    new TestStep(action: TestAction.AddBreakpoint, targetBreakpoint: 6),
+                    new TestStep(action: TestAction.AddBreakpoint, targetBreakpoint: 11),
+                    new TestStep(action: TestAction.AddBreakpoint, targetBreakpoint: 16),
+                    new TestStep(action: TestAction.AddBreakpoint, targetBreakpoint: 20),
+                    new TestStep(action: TestAction.ResumeThread, expectedEntryPointHit: 25),
+                    new TestStep(action: TestAction.ResumeProcess, expectedBreakpointHit: 2),
+                    new TestStep(action: TestAction.ResumeProcess, expectedBreakpointHit: 7),
+                    new TestStep(action: TestAction.ResumeProcess, expectedBreakpointHit: 13),
+                    new TestStep(action: TestAction.ResumeProcess, expectedBreakpointHit: 16),
+                    new TestStep(action: TestAction.ResumeProcess, expectedBreakpointHit: 22),
+                    new TestStep(action: TestAction.ResumeProcess, expectedExitCode: 0),
+                }
+            );
+            TestDebuggerSteps(
+                "RequiresScriptsWithBreakpointFixup.js",
+                new[] {
+                    new TestStep(action: TestAction.AddBreakpoint, targetBreakpointFile: "FixupBreakpointOnComment.js", targetBreakpoint: 1),
+                    new TestStep(action: TestAction.AddBreakpoint, targetBreakpointFile: "FixupBreakpointOnComment.js", targetBreakpoint: 4),
+                    new TestStep(action: TestAction.AddBreakpoint, targetBreakpointFile: "FixupBreakpointOnComment.js", targetBreakpoint: 7),
+
+                    new TestStep(action: TestAction.AddBreakpoint, targetBreakpointFile: "FixupBreakpointOnBlankLine.js", targetBreakpoint: 1),
+                    new TestStep(action: TestAction.AddBreakpoint, targetBreakpointFile: "FixupBreakpointOnBlankLine.js", targetBreakpoint: 4),
+                    new TestStep(action: TestAction.AddBreakpoint, targetBreakpointFile: "FixupBreakpointOnBlankLine.js", targetBreakpoint: 7),
+
+                    new TestStep(action: TestAction.AddBreakpoint, targetBreakpointFile: "FixupBreakpointOnFunction.js", targetBreakpoint: 2),
+                    new TestStep(action: TestAction.AddBreakpoint, targetBreakpointFile: "FixupBreakpointOnFunction.js", targetBreakpoint: 6),
+                    new TestStep(action: TestAction.AddBreakpoint, targetBreakpointFile: "FixupBreakpointOnFunction.js", targetBreakpoint: 11),
+                    new TestStep(action: TestAction.AddBreakpoint, targetBreakpointFile: "FixupBreakpointOnFunction.js", targetBreakpoint: 16),
+                    new TestStep(action: TestAction.AddBreakpoint, targetBreakpointFile: "FixupBreakpointOnFunction.js", targetBreakpoint: 20),
+
+                    new TestStep(action: TestAction.ResumeProcess, expectedBreakFile: "FixupBreakpointOnComment.js", expectedBreakpointHit: 2),
+                    new TestStep(action: TestAction.ResumeProcess, expectedBreakFile: "FixupBreakpointOnComment.js", expectedBreakpointHit: 5),
+                    new TestStep(action: TestAction.ResumeProcess, expectedBreakFile: "FixupBreakpointOnComment.js", expectedBreakpointHit: 10),
+
+                    new TestStep(action: TestAction.ResumeProcess, expectedBreakFile: "FixupBreakpointOnBlankLine.js", expectedBreakpointHit: 3),
+                    new TestStep(action: TestAction.ResumeProcess, expectedBreakFile: "FixupBreakpointOnBlankLine.js", expectedBreakpointHit: 6),
+                    new TestStep(action: TestAction.ResumeProcess, expectedBreakFile: "FixupBreakpointOnBlankLine.js", expectedBreakpointHit: 11),
+
+                    new TestStep(action: TestAction.ResumeProcess, expectedBreakFile: "FixupBreakpointOnFunction.js", expectedBreakpointHit: 2),
+                    new TestStep(action: TestAction.ResumeProcess, expectedBreakFile: "FixupBreakpointOnFunction.js", expectedBreakpointHit: 7),
+                    new TestStep(action: TestAction.ResumeProcess, expectedBreakFile: "FixupBreakpointOnFunction.js", expectedBreakpointHit: 13),
+                    new TestStep(action: TestAction.ResumeProcess, expectedBreakFile: "FixupBreakpointOnFunction.js", expectedBreakpointHit: 16),
+                    new TestStep(action: TestAction.ResumeProcess, expectedBreakFile: "FixupBreakpointOnFunction.js", expectedBreakpointHit: 22),
+
+                    new TestStep(action: TestAction.ResumeProcess, expectedExitCode: 0),
+                }
+            );
+        }
+
         #endregion
 
         #region Exception Tests
@@ -1348,6 +1483,25 @@ namespace NodejsTests.Debugger {
             );
         }
 
+        /// <summary>
+        /// https://nodejstools.codeplex.com/workitem/379
+        /// 
+        /// Test handling of exceptions in evaluated code
+        /// </summary>
+        [TestMethod, Priority(0)]
+        public void TestExceptionInEvaluatedCode() {
+            TestDebuggerSteps(
+                "ExceptionInEvaluatedCode.js",
+                new[] {
+                    new TestStep(action: TestAction.ResumeThread, expectedEntryPointHit: 2),
+                    new TestStep(action: TestAction.StepOver, expectedStepComplete: 3),
+                    new TestStep(action: TestAction.StepOver, expectedExceptionRaised: new ExceptionInfo("SyntaxError", "SyntaxError: Unexpected token )", 1)),
+                    new TestStep(action: TestAction.StepOver, expectedStepComplete: 5),
+                    new TestStep(action: TestAction.StepOver, expectedStepComplete: 7),
+                    new TestStep(action: TestAction.ResumeProcess, expectedExitCode: 0),
+                }
+            );
+        }
 
         #endregion
 

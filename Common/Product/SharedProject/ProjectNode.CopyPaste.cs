@@ -255,19 +255,16 @@ namespace Microsoft.VisualStudioTools.Project {
             fCancelDrop = 0;
             bool dirty = false;
             foreach (HierarchyNode node in this.ItemsDraggedOrCutOrCopied) {
-                bool isDirty, isOpen, isOpenedByUs;
-                uint docCookie;
-                IVsPersistDocData ppIVsPersistDocData;
-                DocumentManager manager = node.GetDocumentManager();
                 if (node.IsLinkFile) {
                     continue;
                 }
-                if (manager != null) {
-                    manager.GetDocInfo(out isOpen, out isDirty, out isOpenedByUs, out docCookie, out ppIVsPersistDocData);
-                    if (isDirty && isOpenedByUs) {
-                        dirty = true;
-                        break;
-                    }
+
+                DocumentManager manager = node.GetDocumentManager();
+                if (manager != null &&
+                    manager.IsDirty && 
+                    manager.IsOpenedByUs) {
+                    dirty = true;
+                    break;
                 }
             }
 
@@ -294,6 +291,7 @@ namespace Microsoft.VisualStudioTools.Project {
 
                 default:
                     fCancelDrop = 1;
+                    ItemsDraggedOrCutOrCopied.Clear();
                     return VSConstants.S_OK;
             }
 
@@ -350,6 +348,7 @@ namespace Microsoft.VisualStudioTools.Project {
         /// <returns>If the method succeeds, it returns S_OK. If it fails, it returns an error code. </returns>
         public virtual int OnClear(int wasCut) {
             if (wasCut != 0) {
+                AssertHasParentHierarchy();
                 IVsUIHierarchyWindow w = UIHierarchyUtilities.GetUIHierarchyWindow(this.site, HierarchyNode.SolutionExplorer);
                 if (w != null) {
                     foreach (HierarchyNode node in ItemsDraggedOrCutOrCopied) {
@@ -773,6 +772,7 @@ folder you are copying, do you want to replace the existing files?", Path.GetFil
                     bool wasExpanded = false;
                     HierarchyNode newNode;
                     var sourceFolder = Project.FindNodeByFullPath(SourceFolder) as FolderNode;
+                    bool isNonMember = false;
                     if (sourceFolder == null || DropEffect != DropEffect.Move) {
                         newNode = Project.CreateFolderNodes(NewFolderPath);
                     } else {
@@ -782,6 +782,7 @@ folder you are copying, do you want to replace the existing files?", Path.GetFil
                         sourceFolder.ReparentFolder(NewFolderPath);
                         Directory.CreateDirectory(NewFolderPath);
                         newNode = sourceFolder;
+                        isNonMember = sourceFolder.IsNonMemberItem;
                     }
 
                     foreach (var addition in Additions) {
@@ -789,7 +790,7 @@ folder you are copying, do you want to replace the existing files?", Path.GetFil
                     }
 
                     if (sourceFolder != null) {
-                        if (sourceFolder.IsNonMemberItem) {
+                        if (isNonMember) {
                             // copying or moving an existing excluded folder, new folder
                             // is excluded too.
                             ErrorHandler.ThrowOnFailure(newNode.ExcludeFromProject());
@@ -1087,8 +1088,8 @@ folder you are copying, do you want to replace the existing files?", Path.GetFil
 
                 public override void DoAddition() {
                     var existing = Project.FindNodeByFullPath(Moniker);
-                    existing.Parent.RemoveChild(existing);
                     Project.OnItemDeleted(existing);
+                    existing.Parent.RemoveChild(existing);
 
                     existing.ID = Project.ItemIdMap.Add(existing);
                     

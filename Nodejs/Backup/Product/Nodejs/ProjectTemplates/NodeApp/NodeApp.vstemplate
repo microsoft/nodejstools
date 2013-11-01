@@ -1,0 +1,23 @@
+<VSTemplate Version="3.0.0" Type="Project" xmlns="http://schemas.microsoft.com/developer/vstemplate/2005">
+  <TemplateData>
+    <Name>Blank Node.js Application</Name>
+    <Description>An empty Node.js application.</Description>
+    <Icon>blankwj.ico</Icon>
+    <ProjectType>JavaScript</ProjectType>
+    <TemplateID>Microsoft.JavaScript.BlankNodeApp</TemplateID>
+    <SortOrder>10</SortOrder>
+    <CreateNewFolder>false</CreateNewFolder>
+    <DefaultName>NodeApp</DefaultName>
+    <ProvideDefaultName>true</ProvideDefaultName>
+    <NumberOfParentCategoriesToRollUp>1</NumberOfParentCategoriesToRollUp>
+    <PromptForSaveOnCreation>true</PromptForSaveOnCreation>
+    <PreviewImage>blankwj.png</PreviewImage>
+  </TemplateData>
+  <TemplateContent>
+    <Project File="NodeApp.njsproj" ReplaceParameters="true">
+      <ProjectItem OpenInEditor="true">server.js</ProjectItem>
+      <ProjectItem ReplaceParameters="true">package.json</ProjectItem>
+      <ProjectItem ReplaceParameters="true">README.md</ProjectItem>
+    </Project>
+  </TemplateContent>
+</VSTemplate>

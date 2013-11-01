@@ -96,35 +96,37 @@ namespace Microsoft.Nodejs.Tests.UI {
         /// Opens the interactive window, clears the screen.
         /// </summary>
         internal InteractiveWindow Prepare(bool reopenOnly = false) {
-            var app = new NodejsVisualStudioApp(VsIdeTestHostContext.Dte);
+            using (var app = new NodejsVisualStudioApp(VsIdeTestHostContext.Dte)) {
+                app.SuppressCloseAllOnDispose();
 
-            const string interpreterDescription = "Node.js Interactive Window";
-            VsIdeTestHostContext.Dte.ExecuteCommand("View.Node.jsInteractiveWindow");
-            var interactive = app.GetInteractiveWindow(interpreterDescription);
-            if (interactive == null) {
-                Assert.Inconclusive("Need " + interpreterDescription);
-            }
-            interactive.WaitForIdleState();
-            app.Element.SetFocus();
-            interactive.Element.SetFocus();
+                const string interpreterDescription = "Node.js Interactive Window";
+                VsIdeTestHostContext.Dte.ExecuteCommand("View.Node.jsInteractiveWindow");
+                var interactive = app.GetInteractiveWindow(interpreterDescription);
+                if (interactive == null) {
+                    Assert.Inconclusive("Need " + interpreterDescription);
+                }
+                interactive.WaitForIdleState();
+                app.Element.SetFocus();
+                interactive.Element.SetFocus();
 
-            if (!reopenOnly) {
-                interactive.ClearScreen();
-                interactive.ReplWindow.ClearHistory();
+                if (!reopenOnly) {
+                    interactive.ClearScreen();
+                    interactive.ReplWindow.ClearHistory();
+                    interactive.WaitForReadyState();
+
+                    interactive.Reset();
+                    interactive.ClearScreen();
+                    var task = interactive.ReplWindow.Evaluator.ExecuteText("console.log('READY')");
+                    Assert.IsTrue(task.Wait(10000), "ReplWindow did not initialize in time");
+                    Assert.AreEqual(ExecutionResult.Success, task.Result);
+                    interactive.WaitForTextEnd("READY", "undefined", "> ");
+
+                    interactive.ClearScreen();
+                    interactive.ReplWindow.ClearHistory();
+                }
                 interactive.WaitForReadyState();
-
-                interactive.Reset();
-                interactive.ClearScreen();
-                var task = interactive.ReplWindow.Evaluator.ExecuteText("console.log('READY')");
-                Assert.IsTrue(task.Wait(10000), "ReplWindow did not initialize in time");
-                Assert.AreEqual(ExecutionResult.Success, task.Result);
-                interactive.WaitForTextEnd("READY", "undefined", "> ");
-
-                interactive.ClearScreen();
-                interactive.ReplWindow.ClearHistory();
+                return interactive;
             }
-            interactive.WaitForReadyState();
-            return interactive;
         }
     }
 

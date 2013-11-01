@@ -33,19 +33,6 @@ namespace Microsoft.Nodejs.Tests.UI {
             AssertListener.Initialize();
         }
 
-        [TestCleanup]
-        public void MyTestCleanup() {
-            for (int i = 0; i < 20; i++) {
-                try {
-                    VsIdeTestHostContext.Dte.Solution.Close(false);
-                    break;
-                } catch {
-                    VsIdeTestHostContext.Dte.Documents.CloseAll(EnvDTE.vsSaveChanges.vsSaveChangesNo);
-                    System.Threading.Thread.Sleep(500);
-                }
-            }
-        }
-
         [TestMethod, Priority(0), TestCategory("Core")]
         [HostType("TC Dynamic"), DynamicHostType(typeof(VsIdeHostAdapter))]
         public void MultiPasteKeyboard() {

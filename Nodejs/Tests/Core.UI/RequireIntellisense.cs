@@ -12,17 +12,13 @@
  *
  * ***************************************************************************/
 
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+using System.IO;
 using Microsoft.TC.TestHostAdapters;
+using Microsoft.VisualStudio.Language.Intellisense;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using TestUtilities;
-using TestUtilities.UI;
 using TestUtilities.SharedProject;
-using Microsoft.VisualStudio.Language.Intellisense;
+using TestUtilities.UI;
 
 namespace Microsoft.Nodejs.Tests.UI {
     [TestClass]
@@ -41,19 +37,6 @@ namespace Microsoft.Nodejs.Tests.UI {
             Compile("SomeFolder\\baz", "")
         );
 
-        [TestCleanup]
-        public void MyTestCleanup() {
-            for (int i = 0; i < 20; i++) {
-                try {
-                    VsIdeTestHostContext.Dte.Solution.Close(false);
-                    break;
-                } catch {
-                    VsIdeTestHostContext.Dte.Documents.CloseAll(EnvDTE.vsSaveChanges.vsSaveChangesNo);
-                    System.Threading.Thread.Sleep(500);
-                }
-            }
-        }
-
         [ClassInitialize]
         public static void DoDeployment(TestContext context) {
             AssertListener.Initialize();
@@ -66,30 +49,31 @@ namespace Microsoft.Nodejs.Tests.UI {
                 var server = solution.OpenItem("Require", "SomeFolder", "baz.js");
                 Keyboard.Type("require(");
 
-                var completionSession = server.WaitForSession<ICompletionSession>();
-                Assert.AreEqual(1, completionSession.CompletionSets.Count);
+                using (var completionSession = server.WaitForSession<ICompletionSession>()) {
+                    Assert.AreEqual(1, completionSession.Session.CompletionSets.Count);
 
-                // we pick up built-ins, folders w/ package.json, and peers
-                AssertUtil.ContainsAtLeast(
-                    completionSession.GetDisplayTexts(),
-                    "http",
-                    "Foo",
-                    "quox.js"
-                );
+                    // we pick up built-ins, folders w/ package.json, and peers
+                    AssertUtil.ContainsAtLeast(
+                        completionSession.Session.GetDisplayTexts(),
+                        "http",
+                        "Foo",
+                        "quox.js"
+                    );
 
-                AssertUtil.DoesntContain(completionSession.GetDisplayTexts(), "./SomeFolder/baz.js");
-                AssertUtil.DoesntContain(completionSession.GetDisplayTexts(), "./myapp.js");
+                    AssertUtil.DoesntContain(completionSession.Session.GetDisplayTexts(), "./SomeFolder/baz.js");
+                    AssertUtil.DoesntContain(completionSession.Session.GetDisplayTexts(), "./myapp.js");
 
-                AssertUtil.ContainsAtLeast(
-                    completionSession.GetInsertionTexts(),
-                    "'http'",
-                    "'Foo'",
-                    "'quox.js'"
-                );
+                    AssertUtil.ContainsAtLeast(
+                        completionSession.Session.GetInsertionTexts(),
+                        "'http'",
+                        "'Foo'",
+                        "'quox.js'"
+                    );
 
-                Keyboard.Type("quo\t)");
+                    Keyboard.Type("quo\t)");
 
-                server.WaitForText("require('quox.js')");
+                    server.WaitForText("require('quox.js')");
+                }
             }
         }
 
@@ -100,44 +84,45 @@ namespace Microsoft.Nodejs.Tests.UI {
                 var server = solution.OpenItem("Require", "server.js");
                 Keyboard.Type("require(");
 
-                var completionSession = server.WaitForSession<ICompletionSession>();
-                Assert.AreEqual(1, completionSession.CompletionSets.Count);
+                using (var completionSession = server.WaitForSession<ICompletionSession>()) {
+                    Assert.AreEqual(1, completionSession.Session.CompletionSets.Count);
 
-                // we pick up built-ins, folders w/ package.json, and peers
-                AssertUtil.ContainsAtLeast(
-                    completionSession.GetDisplayTexts(),
-                    "http",
-                    "Foo",
-                    "./myapp.js",
-                    "./SomeFolder/baz.js",
-                    "quox.js"
-                );
+                    // we pick up built-ins, folders w/ package.json, and peers
+                    AssertUtil.ContainsAtLeast(
+                        completionSession.Session.GetDisplayTexts(),
+                        "http",
+                        "Foo",
+                        "./myapp.js",
+                        "./SomeFolder/baz.js",
+                        "quox.js"
+                    );
 
-                // we don't show our own file
-                AssertUtil.DoesntContain(completionSession.GetDisplayTexts(), "./server.js");
+                    // we don't show our own file
+                    AssertUtil.DoesntContain(completionSession.Session.GetDisplayTexts(), "./server.js");
 
-                AssertUtil.ContainsAtLeast(
-                    completionSession.GetInsertionTexts(),
-                    "'http'",
-                    "'Foo'",
-                    "'./myapp.js'",
-                    "'./SomeFolder/baz.js'",
-                    "'quox.js'"
-                );
+                    AssertUtil.ContainsAtLeast(
+                        completionSession.Session.GetInsertionTexts(),
+                        "'http'",
+                        "'Foo'",
+                        "'./myapp.js'",
+                        "'./SomeFolder/baz.js'",
+                        "'quox.js'"
+                    );
 
-                Keyboard.Type("htt");
-                server.WaitForText("require(htt");
+                    Keyboard.Type("htt");
+                    server.WaitForText("require(htt");
 
-                // we should be filtered down
-                AssertUtil.ContainsExactly(
-                    completionSession.GetDisplayTexts(),
-                    "http",
-                    "https"
-                );
+                    // we should be filtered down
+                    AssertUtil.ContainsExactly(
+                        completionSession.Session.GetDisplayTexts(),
+                        "http",
+                        "https"
+                    );
 
-                Keyboard.Type("\t)");
+                    Keyboard.Type("\t)");
 
-                server.WaitForText("require('http')");
+                    server.WaitForText("require('http')");
+                }
             }
         }
 
@@ -148,44 +133,45 @@ namespace Microsoft.Nodejs.Tests.UI {
                 var server = solution.OpenItem("Require", "server.js");
                 Keyboard.Type("require('");
 
-                var completionSession = server.WaitForSession<ICompletionSession>();
-                Assert.AreEqual(1, completionSession.CompletionSets.Count);
+                using (var completionSession = server.WaitForSession<ICompletionSession>()) {
+                    Assert.AreEqual(1, completionSession.Session.CompletionSets.Count);
 
-                // we pick up built-ins, folders w/ package.json, and peers
-                AssertUtil.ContainsAtLeast(
-                    completionSession.GetDisplayTexts(),
-                    "http",
-                    "Foo",
-                    "./myapp.js",
-                    "./SomeFolder/baz.js",
-                    "quox.js"
-                );
+                    // we pick up built-ins, folders w/ package.json, and peers
+                    AssertUtil.ContainsAtLeast(
+                        completionSession.Session.GetDisplayTexts(),
+                        "http",
+                        "Foo",
+                        "./myapp.js",
+                        "./SomeFolder/baz.js",
+                        "quox.js"
+                    );
 
-                // we don't show our own file
-                AssertUtil.DoesntContain(completionSession.GetDisplayTexts(), "./server.js");
+                    // we don't show our own file
+                    AssertUtil.DoesntContain(completionSession.Session.GetDisplayTexts(), "./server.js");
 
-                AssertUtil.ContainsAtLeast(
-                    completionSession.GetInsertionTexts(),
-                    "http'",
-                    "Foo'",
-                    "./myapp.js'",
-                    "./SomeFolder/baz.js'",
-                    "quox.js'"
-                );
+                    AssertUtil.ContainsAtLeast(
+                        completionSession.Session.GetInsertionTexts(),
+                        "http'",
+                        "Foo'",
+                        "./myapp.js'",
+                        "./SomeFolder/baz.js'",
+                        "quox.js'"
+                    );
 
-                Keyboard.Type("htt");
-                server.WaitForText("require('htt");
+                    Keyboard.Type("htt");
+                    server.WaitForText("require('htt");
 
-                // we should be filtered down
-                AssertUtil.ContainsExactly(
-                    completionSession.GetDisplayTexts(),
-                    "http",
-                    "https"
-                );
+                    // we should be filtered down
+                    AssertUtil.ContainsExactly(
+                        completionSession.Session.GetDisplayTexts(),
+                        "http",
+                        "https"
+                    );
 
-                Keyboard.Type("\t)");
+                    Keyboard.Type("\t)");
 
-                server.WaitForText("require('http')");
+                    server.WaitForText("require('http')");
+                }
             }
         }
 
@@ -196,44 +182,45 @@ namespace Microsoft.Nodejs.Tests.UI {
                 var server = solution.OpenItem("Require", "server.js");
                 Keyboard.Type("require(\"");
 
-                var completionSession = server.WaitForSession<ICompletionSession>();
-                Assert.AreEqual(1, completionSession.CompletionSets.Count);
+                using (var completionSession = server.WaitForSession<ICompletionSession>()) {
+                    Assert.AreEqual(1, completionSession.Session.CompletionSets.Count);
 
-                // we pick up built-ins, folders w/ package.json, and peers
-                AssertUtil.ContainsAtLeast(
-                    completionSession.GetDisplayTexts(),
-                    "http",
-                    "Foo",
-                    "./myapp.js",
-                    "./SomeFolder/baz.js",
-                    "quox.js"
-                );
+                    // we pick up built-ins, folders w/ package.json, and peers
+                    AssertUtil.ContainsAtLeast(
+                        completionSession.Session.GetDisplayTexts(),
+                        "http",
+                        "Foo",
+                        "./myapp.js",
+                        "./SomeFolder/baz.js",
+                        "quox.js"
+                    );
 
-                // we don't show our own file
-                AssertUtil.DoesntContain(completionSession.GetDisplayTexts(), "./server.js");
+                    // we don't show our own file
+                    AssertUtil.DoesntContain(completionSession.Session.GetDisplayTexts(), "./server.js");
 
-                AssertUtil.ContainsAtLeast(
-                    completionSession.GetInsertionTexts(),
-                    "http\"",
-                    "Foo\"",
-                    "./myapp.js\"",
-                    "./SomeFolder/baz.js\"",
-                    "quox.js\""
-                );
+                    AssertUtil.ContainsAtLeast(
+                        completionSession.Session.GetInsertionTexts(),
+                        "http\"",
+                        "Foo\"",
+                        "./myapp.js\"",
+                        "./SomeFolder/baz.js\"",
+                        "quox.js\""
+                    );
 
-                Keyboard.Type("htt");
-                server.WaitForText("require(\"htt");
+                    Keyboard.Type("htt");
+                    server.WaitForText("require(\"htt");
 
-                // we should be filtered down
-                AssertUtil.ContainsExactly(
-                    completionSession.GetDisplayTexts(),
-                    "http",
-                    "https"
-                );
+                    // we should be filtered down
+                    AssertUtil.ContainsExactly(
+                        completionSession.Session.GetDisplayTexts(),
+                        "http",
+                        "https"
+                    );
 
-                Keyboard.Type("\t)");
+                    Keyboard.Type("\t)");
 
-                server.WaitForText("require(\"http\")");
+                    server.WaitForText("require(\"http\")");
+                }
             }
         }
 
@@ -244,30 +231,31 @@ namespace Microsoft.Nodejs.Tests.UI {
                 var server = solution.OpenItem("Require", "server.js");
                 Keyboard.Type("require(");
 
-                var completionSession = server.WaitForSession<ICompletionSession>();
-                Assert.AreEqual(1, completionSession.CompletionSets.Count);
+                using (var completionSession = server.WaitForSession<ICompletionSession>()) {
+                    Assert.AreEqual(1, completionSession.Session.CompletionSets.Count);
 
-                // we pick up built-ins, folders w/ package.json, and peers
-                AssertUtil.ContainsAtLeast(
-                    completionSession.GetDisplayTexts(),
-                    "http",
-                    "timers",
-                    "module",
-                    "addons",
-                    "util",
-                    "tls",
-                    "path",
-                    "fs",
-                    "https",
-                    "url",
-                    "assert",
-                    "child_process",
-                    "zlib",
-                    "os",
-                    "cluster",
-                    "tty",
-                    "vm"
-                );
+                    // we pick up built-ins, folders w/ package.json, and peers
+                    AssertUtil.ContainsAtLeast(
+                        completionSession.Session.GetDisplayTexts(),
+                        "http",
+                        "timers",
+                        "module",
+                        "addons",
+                        "util",
+                        "tls",
+                        "path",
+                        "fs",
+                        "https",
+                        "url",
+                        "assert",
+                        "child_process",
+                        "zlib",
+                        "os",
+                        "cluster",
+                        "tty",
+                        "vm"
+                    );
+                }
             }
         }
 
@@ -279,12 +267,13 @@ namespace Microsoft.Nodejs.Tests.UI {
                 var server = solution.OpenItem("Require", "server.js");
                 Keyboard.Type("require(");
 
-                var completionSession = server.WaitForSession<ICompletionSession>();
-                Assert.AreEqual(1, completionSession.CompletionSets.Count);
+                using (var completionSession = server.WaitForSession<ICompletionSession>()) {
+                    Assert.AreEqual(1, completionSession.Session.CompletionSets.Count);
 
-                Keyboard.Type("ht)");
+                    Keyboard.Type("ht)");
 
-                server.WaitForText("require('http')");
+                    server.WaitForText("require('http')");
+                }
             }
         }
 
@@ -295,12 +284,13 @@ namespace Microsoft.Nodejs.Tests.UI {
                 var server = solution.OpenItem("Require", "server.js");
                 Keyboard.Type("require(");
 
-                var completionSession = server.WaitForSession<ICompletionSession>();
-                Assert.AreEqual(1, completionSession.CompletionSets.Count);
+                using (var completionSession = server.WaitForSession<ICompletionSession>()) {
+                    Assert.AreEqual(1, completionSession.Session.CompletionSets.Count);
 
-                Keyboard.Type("./mya\t)");
+                    Keyboard.Type("./mya\t)");
 
-                server.WaitForText("require('./myapp.js')");
+                    server.WaitForText("require('./myapp.js')");
+                }
             }
         }
 
@@ -311,12 +301,13 @@ namespace Microsoft.Nodejs.Tests.UI {
                 var server = solution.OpenItem("Require", "server.js");
                 Keyboard.Type("require(");
 
-                var completionSession = server.WaitForSession<ICompletionSession>();
-                Assert.AreEqual(1, completionSession.CompletionSets.Count);
+                using (var completionSession = server.WaitForSession<ICompletionSession>()) {
+                    Assert.AreEqual(1, completionSession.Session.CompletionSets.Count);
 
-                Keyboard.Type("./Some\t)");
+                    Keyboard.Type("./Some\t)");
 
-                server.WaitForText("require('./SomeFolder/baz.js')");
+                    server.WaitForText("require('./SomeFolder/baz.js')");
+                }
             }
         }
 
@@ -327,12 +318,13 @@ namespace Microsoft.Nodejs.Tests.UI {
                 var server = solution.OpenItem("Require", "server.js");
                 Keyboard.Type("require('");
 
-                var completionSession = server.WaitForSession<ICompletionSession>();
-                Assert.AreEqual(1, completionSession.CompletionSets.Count);
+                using (var completionSession = server.WaitForSession<ICompletionSession>()) {
+                    Assert.AreEqual(1, completionSession.Session.CompletionSets.Count);
 
-                Keyboard.Type("ht')");
+                    Keyboard.Type("ht')");
 
-                server.WaitForText("require('ht')");
+                    server.WaitForText("require('ht')");
+                }
             }
         }
 
@@ -343,12 +335,13 @@ namespace Microsoft.Nodejs.Tests.UI {
                 var server = solution.OpenItem("Require", "server.js");
                 Keyboard.Type("+require(");
 
-                var completionSession = server.WaitForSession<ICompletionSession>();
-                Assert.AreEqual(1, completionSession.CompletionSets.Count);
+                using (var completionSession = server.WaitForSession<ICompletionSession>()) {
+                    Assert.AreEqual(1, completionSession.Session.CompletionSets.Count);
 
-                Keyboard.Type("ht\t)");
+                    Keyboard.Type("ht\t)");
 
-                server.WaitForText("+require('http')");
+                    server.WaitForText("+require('http')");
+                }
             }
         }
 
@@ -359,12 +352,13 @@ namespace Microsoft.Nodejs.Tests.UI {
                 var server = solution.OpenItem("Require", "server.js");
                 Keyboard.Type("(require(");
 
-                var completionSession = server.WaitForSession<ICompletionSession>();
-                Assert.AreEqual(1, completionSession.CompletionSets.Count);
+                using (var completionSession = server.WaitForSession<ICompletionSession>()) {
+                    Assert.AreEqual(1, completionSession.Session.CompletionSets.Count);
 
-                Keyboard.Type("ht\t)");
+                    Keyboard.Type("ht\t)");
 
-                server.WaitForText("(require('http')");
+                    server.WaitForText("(require('http')");
+                }
             }
         }
 
@@ -375,12 +369,13 @@ namespace Microsoft.Nodejs.Tests.UI {
                 var server = solution.OpenItem("Require", "server.js");
                 Keyboard.Type("f(a, require(");
 
-                var completionSession = server.WaitForSession<ICompletionSession>();
-                Assert.AreEqual(1, completionSession.CompletionSets.Count);
+                using (var completionSession = server.WaitForSession<ICompletionSession>()) {
+                    Assert.AreEqual(1, completionSession.Session.CompletionSets.Count);
 
-                Keyboard.Type("ht\t)");
+                    Keyboard.Type("ht\t)");
 
-                server.WaitForText("f(a, require('http')");
+                    server.WaitForText("f(a, require('http')");
+                }
             }
         }
 
@@ -391,12 +386,13 @@ namespace Microsoft.Nodejs.Tests.UI {
                 var server = solution.OpenItem("Require", "server.js");
                 Keyboard.Type("var http = require(");
 
-                var completionSession = server.WaitForSession<ICompletionSession>();
-                Assert.AreEqual(1, completionSession.CompletionSets.Count);
+                using (var completionSession = server.WaitForSession<ICompletionSession>()) {
+                    Assert.AreEqual(1, completionSession.Session.CompletionSets.Count);
 
-                Keyboard.Type("ht\t)");
+                    Keyboard.Type("ht\t)");
 
-                server.WaitForText("var http = require('http')");
+                    server.WaitForText("var http = require('http')");
+                }
             }
         }
 
@@ -407,12 +403,13 @@ namespace Microsoft.Nodejs.Tests.UI {
                 var server = solution.OpenItem("Require", "server.js");
                 Keyboard.Type("return require(");
 
-                var completionSession = server.WaitForSession<ICompletionSession>();
-                Assert.AreEqual(1, completionSession.CompletionSets.Count);
+                using (var completionSession = server.WaitForSession<ICompletionSession>()) {
+                    Assert.AreEqual(1, completionSession.Session.CompletionSets.Count);
 
-                Keyboard.Type("ht\t)");
+                    Keyboard.Type("ht\t)");
 
-                server.WaitForText("return require('http')");
+                    server.WaitForText("return require('http')");
+                }
             }
         }
 
@@ -423,12 +420,13 @@ namespace Microsoft.Nodejs.Tests.UI {
                 var server = solution.OpenItem("Require", "server.js");
                 Keyboard.Type("f(x);\rrequire(");
 
-                var completionSession = server.WaitForSession<ICompletionSession>();
-                Assert.AreEqual(1, completionSession.CompletionSets.Count);
+                using (var completionSession = server.WaitForSession<ICompletionSession>()) {
+                    Assert.AreEqual(1, completionSession.Session.CompletionSets.Count);
 
-                Keyboard.Type("ht\t)");
+                    Keyboard.Type("ht\t)");
 
-                server.WaitForText("f(x);\r\nrequire('http')");
+                    server.WaitForText("f(x);\r\nrequire('http')");
+                }
             }
         }
 
@@ -467,6 +465,37 @@ namespace Microsoft.Nodejs.Tests.UI {
                 server.AssertNoIntellisenseSession();
             }
         }
+
+        /// <summary>
+        /// https://nodejstools.codeplex.com/workitem/354
+        /// 
+        /// Make sure adding a module externally gets picked up
+        /// </summary>
+        [TestMethod, Priority(0), TestCategory("Core")]
+        [HostType("TC Dynamic"), DynamicHostType(typeof(VsIdeHostAdapter))]
+        public void AddModuleExternally() {
+            using (var solution = BasicProject.Generate().ToVs()) {
+                var server = solution.OpenItem("Require", "server.js");
+
+                File.WriteAllText(
+                    Path.Combine(solution.Directory, "Require", "node_modules", "blah.js"),
+                    "exports = function(a,b,c) { }"
+                );
+
+                System.Threading.Thread.Sleep(1000);
+
+                Keyboard.Type("require(");
+
+                using (var completionSession = server.WaitForSession<ICompletionSession>()) {
+                    Assert.AreEqual(1, completionSession.Session.CompletionSets.Count);
+                    AssertUtil.ContainsAtLeast(
+                        completionSession.Session.GetDisplayTexts(),
+                        "blah.js"
+                    );
+                }
+            }
+        }
+
 
         private static ProjectDefinition RequireProject(params ProjectContentGenerator[] items) {
             return new ProjectDefinition("Require", NodejsProject, items);

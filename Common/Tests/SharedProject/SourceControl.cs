@@ -54,53 +54,54 @@ namespace Microsoft.VisualStudioTools.SharedProjectTests {
         [TestMethod, Priority(0), TestCategory("Core")]
         [HostType("TC Dynamic"), DynamicHostType(typeof(VsIdeHostAdapter))]
         public void MoveFolderWithItem() {
-            var app = new VisualStudioApp(VsIdeTestHostContext.Dte);
+            using (var app = new VisualStudioApp(VsIdeTestHostContext.Dte)) {
 
-            // close any projects before switching source control...
-            VsIdeTestHostContext.Dte.Solution.Close();
+                // close any projects before switching source control...
+                VsIdeTestHostContext.Dte.Solution.Close();
 
-            app.SelectSourceControlProvider("Test Source Provider");
+                app.SelectSourceControlProvider("Test Source Provider");
 
-            ExpectSourceControl();
+                ExpectSourceControl();
 
-            foreach (var projectType in ProjectTypes) {
-                var testDef = new ProjectDefinition("SourceControl", projectType,
-                    PropertyGroup(
-                        Property("SccProjectName", "HelloWorld"),
-                        Property("SccLocalPath", "LocalPath"),
-                        Property("SccAuxPath", "AuxPath"),
-                        Property("SccProvider", "TestProvider")
-                    ),
-                    ItemGroup(
-                        Folder("Foo"),
-                        Folder("Foo\\Bar"),
-                        Compile("Program"),
-                        Compile("Foo\\Bar\\Quox")
-                    )
-                );
-
-                using (var solution = testDef.Generate()) {
-                    TestSccProvider.DocumentEvents.Clear();
-
-                    var project = app.OpenProject(solution.Filename);
-                    var window = app.SolutionExplorerTreeView;
-                    var folder = window.WaitForItem("Solution 'SourceControl' (1 project)", "SourceControl", "Foo", "Bar");
-                    var point = folder.GetClickablePoint();
-                    Mouse.MoveTo(point);
-                    Mouse.Down(MouseButton.Left);
-
-                    var destFolder = window.WaitForItem("Solution 'SourceControl' (1 project)", "SourceControl");
-                    Mouse.MoveTo(destFolder.GetClickablePoint());
-                    Mouse.Up(MouseButton.Left);
-
-                    window.AssertFileExists(Path.GetDirectoryName(solution.Filename), "Solution 'SourceControl' (1 project)", "SourceControl", "Bar", "Quox" + projectType.CodeExtension);
-                    var projectDir = Path.GetDirectoryName(project.FullName);
-                    AssertDocumentEvents(projectDir,
-                        OnQueryRenameFiles(projectType.Code("Foo\\Bar\\Quox"), projectType.Code("Bar\\Quox"), VSQUERYRENAMEFILEFLAGS_NoFlags),
-                        OnQueryRenameFiles("Foo\\Bar\\", "Bar", VSQUERYRENAMEFILEFLAGS_Directory),
-                        OnAfterRenameFiles(projectType.Code("Foo\\Bar\\Quox"), projectType.Code("Bar\\Quox"), VSRENAMEFILEFLAGS_NoFlags),
-                        OnAfterRenameFiles("Foo\\Bar\\", "Bar", VSRENAMEFILEFLAGS_Directory)
+                foreach (var projectType in ProjectTypes) {
+                    var testDef = new ProjectDefinition("SourceControl", projectType,
+                        PropertyGroup(
+                            Property("SccProjectName", "HelloWorld"),
+                            Property("SccLocalPath", "LocalPath"),
+                            Property("SccAuxPath", "AuxPath"),
+                            Property("SccProvider", "TestProvider")
+                        ),
+                        ItemGroup(
+                            Folder("Foo"),
+                            Folder("Foo\\Bar"),
+                            Compile("Program"),
+                            Compile("Foo\\Bar\\Quox")
+                        )
                     );
+
+                    using (var solution = testDef.Generate()) {
+                        TestSccProvider.DocumentEvents.Clear();
+
+                        var project = app.OpenProject(solution.Filename);
+                        var window = app.SolutionExplorerTreeView;
+                        var folder = window.WaitForItem("Solution 'SourceControl' (1 project)", "SourceControl", "Foo", "Bar");
+                        var point = folder.GetClickablePoint();
+                        Mouse.MoveTo(point);
+                        Mouse.Down(MouseButton.Left);
+
+                        var destFolder = window.WaitForItem("Solution 'SourceControl' (1 project)", "SourceControl");
+                        Mouse.MoveTo(destFolder.GetClickablePoint());
+                        Mouse.Up(MouseButton.Left);
+
+                        window.AssertFileExists(Path.GetDirectoryName(solution.Filename), "Solution 'SourceControl' (1 project)", "SourceControl", "Bar", "Quox" + projectType.CodeExtension);
+                        var projectDir = Path.GetDirectoryName(project.FullName);
+                        AssertDocumentEvents(projectDir,
+                            OnQueryRenameFiles(projectType.Code("Foo\\Bar\\Quox"), projectType.Code("Bar\\Quox"), VSQUERYRENAMEFILEFLAGS_NoFlags),
+                            OnQueryRenameFiles("Foo\\Bar\\", "Bar", VSQUERYRENAMEFILEFLAGS_Directory),
+                            OnAfterRenameFiles(projectType.Code("Foo\\Bar\\Quox"), projectType.Code("Bar\\Quox"), VSRENAMEFILEFLAGS_NoFlags),
+                            OnAfterRenameFiles("Foo\\Bar\\", "Bar", VSRENAMEFILEFLAGS_Directory)
+                        );
+                    }
                 }
             }
         }
@@ -108,36 +109,37 @@ namespace Microsoft.VisualStudioTools.SharedProjectTests {
         [TestMethod, Priority(0), TestCategory("Core")]
         [HostType("TC Dynamic"), DynamicHostType(typeof(VsIdeHostAdapter))]
         public void AddNewItem() {
-            var app = new VisualStudioApp(VsIdeTestHostContext.Dte);
+            using (var app = new VisualStudioApp(VsIdeTestHostContext.Dte)) {
 
-            // close any projects before switching source control...
-            VsIdeTestHostContext.Dte.Solution.Close();
+                // close any projects before switching source control...
+                VsIdeTestHostContext.Dte.Solution.Close();
 
-            app.SelectSourceControlProvider("Test Source Provider");
-            foreach (var projectType in ProjectTypes) {
-                var testDef = SourceControlProject(projectType);
+                app.SelectSourceControlProvider("Test Source Provider");
+                foreach (var projectType in ProjectTypes) {
+                    var testDef = SourceControlProject(projectType);
 
-                using (var solution = testDef.Generate()) {
-                    TestSccProvider.DocumentEvents.Clear();
+                    using (var solution = testDef.Generate()) {
+                        TestSccProvider.DocumentEvents.Clear();
 
-                    var project = app.OpenProject(solution.Filename);
+                        var project = app.OpenProject(solution.Filename);
 
-                    var dialog = app.OpenDialogWithDteExecuteCommand("Project.AddNewItem");
+                        var dialog = app.OpenDialogWithDteExecuteCommand("Project.AddNewItem");
 
-                    var newItem = new NewItemDialog(AutomationElement.FromHandle(dialog));
-                    newItem.FileName = "NewFile" + projectType.CodeExtension;
-                    newItem.ClickOK();
+                        var newItem = new NewItemDialog(AutomationElement.FromHandle(dialog));
+                        newItem.FileName = "NewFile" + projectType.CodeExtension;
+                        newItem.ClickOK();
 
-                    System.Threading.Thread.Sleep(250);
+                        System.Threading.Thread.Sleep(250);
 
-                    var solutionFolder = app.Dte.Solution.Projects.Item(1).ProjectItems;
-                    Assert.AreNotEqual(null, solutionFolder.Item("NewFile" + projectType.CodeExtension));
-                    var projectDir = Path.GetDirectoryName(project.FullName);
-                    
-                    AssertDocumentEvents(projectDir,
-                        OnQueryAddFiles(projectType.Code(@"NewFile")), 
-                        OnAfterAddFilesEx(projectType.Code(@"NewFile"))
-                    );
+                        var solutionFolder = app.Dte.Solution.Projects.Item(1).ProjectItems;
+                        Assert.AreNotEqual(null, solutionFolder.Item("NewFile" + projectType.CodeExtension));
+                        var projectDir = Path.GetDirectoryName(project.FullName);
+
+                        AssertDocumentEvents(projectDir,
+                            OnQueryAddFiles(projectType.Code(@"NewFile")),
+                            OnAfterAddFilesEx(projectType.Code(@"NewFile"))
+                        );
+                    }
                 }
             }
         }
@@ -145,37 +147,38 @@ namespace Microsoft.VisualStudioTools.SharedProjectTests {
         [TestMethod, Priority(0), TestCategory("Core")]
         [HostType("TC Dynamic"), DynamicHostType(typeof(VsIdeHostAdapter))]
         public void RemoveItem() {
-            var app = new VisualStudioApp(VsIdeTestHostContext.Dte);
+            using (var app = new VisualStudioApp(VsIdeTestHostContext.Dte)) {
 
-            // close any projects before switching source control...
-            VsIdeTestHostContext.Dte.Solution.Close();
+                // close any projects before switching source control...
+                VsIdeTestHostContext.Dte.Solution.Close();
 
-            app.SelectSourceControlProvider("Test Source Provider");
-            foreach (var projectType in ProjectTypes) {
-                var testDef = SourceControlProject(projectType);
+                app.SelectSourceControlProvider("Test Source Provider");
+                foreach (var projectType in ProjectTypes) {
+                    var testDef = SourceControlProject(projectType);
 
-                using (var solution = testDef.Generate()) {
-                    TestSccProvider.DocumentEvents.Clear();
+                    using (var solution = testDef.Generate()) {
+                        TestSccProvider.DocumentEvents.Clear();
 
-                    var project = app.OpenProject(solution.Filename);
-                    var window = app.SolutionExplorerTreeView;
-                    var program = window.WaitForItem("Solution 'SourceControl' (1 project)", "SourceControl", "Program" + projectType.CodeExtension);
+                        var project = app.OpenProject(solution.Filename);
+                        var window = app.SolutionExplorerTreeView;
+                        var program = window.WaitForItem("Solution 'SourceControl' (1 project)", "SourceControl", "Program" + projectType.CodeExtension);
 
-                    AutomationWrapper.Select(program);
+                        AutomationWrapper.Select(program);
 
-                    Keyboard.Type(Key.Delete);
-                    app.WaitForDialog();
-                    VisualStudioApp.CheckMessageBox(MessageBoxButton.Ok, "will be deleted permanently");
-                    app.WaitForDialogDismissed();
+                        Keyboard.Type(Key.Delete);
+                        app.WaitForDialog();
+                        VisualStudioApp.CheckMessageBox(MessageBoxButton.Ok, "will be deleted permanently");
+                        app.WaitForDialogDismissed();
 
-                    window.WaitForItemRemoved("Solution 'SourceControl' (1 project)", "SourceControl", "Program" + projectType.CodeExtension);
+                        window.WaitForItemRemoved("Solution 'SourceControl' (1 project)", "SourceControl", "Program" + projectType.CodeExtension);
 
-                    var projectDir = Path.GetDirectoryName(project.FullName);
+                        var projectDir = Path.GetDirectoryName(project.FullName);
 
-                    AssertDocumentEvents(projectDir,
-                        OnQueryRemoveFiles(projectType.Code(@"Program")), 
-                        OnAfterRemoveFiles(projectType.Code(@"Program"))
-                    );
+                        AssertDocumentEvents(projectDir,
+                            OnQueryRemoveFiles(projectType.Code(@"Program")),
+                            OnAfterRemoveFiles(projectType.Code(@"Program"))
+                        );
+                    }
                 }
             }
         }
@@ -186,43 +189,44 @@ namespace Microsoft.VisualStudioTools.SharedProjectTests {
         [TestMethod, Priority(0), TestCategory("Core")]
         [HostType("TC Dynamic"), DynamicHostType(typeof(VsIdeHostAdapter))]
         public void BasicSourceControl() {
-            var app = new VisualStudioApp(VsIdeTestHostContext.Dte);
+            using (var app = new VisualStudioApp(VsIdeTestHostContext.Dte)) {
 
-            // close any projects before switching source control...
-            VsIdeTestHostContext.Dte.Solution.Close();
+                // close any projects before switching source control...
+                VsIdeTestHostContext.Dte.Solution.Close();
 
-            app.SelectSourceControlProvider("Test Source Provider");
+                app.SelectSourceControlProvider("Test Source Provider");
 
-            ExpectSourceControl();
+                ExpectSourceControl();
 
-            foreach (var projectType in ProjectTypes) {
-                var testDef = SourceControlProject(projectType);
+                foreach (var projectType in ProjectTypes) {
+                    var testDef = SourceControlProject(projectType);
 
-                using (var solution = testDef.Generate()) {
-                    var project = app.OpenProject(solution.Filename);
+                    using (var solution = testDef.Generate()) {
+                        var project = app.OpenProject(solution.Filename);
 
-                    Assert.AreEqual(1, TestSccProvider.LoadedProjects.Count);
+                        Assert.AreEqual(1, TestSccProvider.LoadedProjects.Count);
 
-                    TestSccProvider.ExpectedAuxPath = null;
-                    TestSccProvider.ExpectedLocalPath = null;
-                    TestSccProvider.ExpectedProvider = null;
-                    TestSccProvider.ExpectedProjectName = null;
+                        TestSccProvider.ExpectedAuxPath = null;
+                        TestSccProvider.ExpectedLocalPath = null;
+                        TestSccProvider.ExpectedProvider = null;
+                        TestSccProvider.ExpectedProjectName = null;
 
-                    TestSccProvider.LoadedProjects.First().SccProject.SetSccLocation(
-                        "NewProjectName",
-                        "NewAuxPath",
-                        "NewLocalPath",
-                        "NewProvider"
-                    );
+                        TestSccProvider.LoadedProjects.First().SccProject.SetSccLocation(
+                            "NewProjectName",
+                            "NewAuxPath",
+                            "NewLocalPath",
+                            "NewProvider"
+                        );
 
-                    app.Dte.Solution.Close();
+                        app.Dte.Solution.Close();
 
-                    Assert.AreEqual(0, TestSccProvider.LoadedProjects.Count);
-                    if (TestSccProvider.Failures.Count != 0) {
-                        Assert.Fail(String.Join(Environment.NewLine, TestSccProvider.Failures));
+                        Assert.AreEqual(0, TestSccProvider.LoadedProjects.Count);
+                        if (TestSccProvider.Failures.Count != 0) {
+                            Assert.Fail(String.Join(Environment.NewLine, TestSccProvider.Failures));
+                        }
+
+                        app.SelectSourceControlProvider("None");
                     }
-
-                    app.SelectSourceControlProvider("None");
                 }
             }
         }
@@ -233,47 +237,48 @@ namespace Microsoft.VisualStudioTools.SharedProjectTests {
         [TestMethod, Priority(0), TestCategory("Core")]
         [HostType("TC Dynamic"), DynamicHostType(typeof(VsIdeHostAdapter))]
         public void SourceControlGlyphChanged() {
-            var app = new VisualStudioApp(VsIdeTestHostContext.Dte);
+            using (var app = new VisualStudioApp(VsIdeTestHostContext.Dte)) {
 
-            // close any projects before switching source control...
-            VsIdeTestHostContext.Dte.Solution.Close();
+                // close any projects before switching source control...
+                VsIdeTestHostContext.Dte.Solution.Close();
 
-            app.SelectSourceControlProvider("Test Source Provider");
+                app.SelectSourceControlProvider("Test Source Provider");
 
-            foreach (var projectType in ProjectTypes) {
-                var testDef = SourceControlProject(projectType);
-                using (var solution = testDef.Generate()) {
-                    var project = app.OpenProject(solution.Filename);
+                foreach (var projectType in ProjectTypes) {
+                    var testDef = SourceControlProject(projectType);
+                    using (var solution = testDef.Generate()) {
+                        var project = app.OpenProject(solution.Filename);
 
-                    Assert.AreEqual(1, TestSccProvider.LoadedProjects.Count);
-                    var sccProject = TestSccProvider.LoadedProjects.First();
-                    Microsoft.TestSccPackage.FileInfo fileInfo = null;
-                    foreach (var curFile in sccProject.Files) {
-                        if (curFile.Key.EndsWith("Program" + projectType.CodeExtension)) {
-                            fileInfo = curFile.Value;
-                            break;
+                        Assert.AreEqual(1, TestSccProvider.LoadedProjects.Count);
+                        var sccProject = TestSccProvider.LoadedProjects.First();
+                        Microsoft.TestSccPackage.FileInfo fileInfo = null;
+                        foreach (var curFile in sccProject.Files) {
+                            if (curFile.Key.EndsWith("Program" + projectType.CodeExtension)) {
+                                fileInfo = curFile.Value;
+                                break;
+                            }
                         }
+                        Assert.AreNotEqual(null, fileInfo);
+
+                        fileInfo.GlyphChanged(VsStateIcon.STATEICON_CHECKEDOUTEXCLUSIVEOTHER);
+
+                        var programPy = project.ProjectItems.Item("Program" + projectType.CodeExtension);
+                        Assert.AreEqual(programPy.Properties.Item("SourceControlStatus").Value, "CHECKEDOUTEXCLUSIVEOTHER");
+
+                        fileInfo.StateIcon = VsStateIcon.STATEICON_READONLY;
+                        sccProject.AllGlyphsChanged();
+
+                        Assert.AreEqual(programPy.Properties.Item("SourceControlStatus").Value, "READONLY");
+
+                        app.Dte.Solution.Close();
+
+                        Assert.AreEqual(0, TestSccProvider.LoadedProjects.Count);
+                        if (TestSccProvider.Failures.Count != 0) {
+                            Assert.Fail(String.Join(Environment.NewLine, TestSccProvider.Failures));
+                        }
+
+                        app.SelectSourceControlProvider("None");
                     }
-                    Assert.AreNotEqual(null, fileInfo);
-
-                    fileInfo.GlyphChanged(VsStateIcon.STATEICON_CHECKEDOUTEXCLUSIVEOTHER);
-
-                    var programPy = project.ProjectItems.Item("Program" + projectType.CodeExtension);
-                    Assert.AreEqual(programPy.Properties.Item("SourceControlStatus").Value, "CHECKEDOUTEXCLUSIVEOTHER");
-
-                    fileInfo.StateIcon = VsStateIcon.STATEICON_READONLY;
-                    sccProject.AllGlyphsChanged();
-
-                    Assert.AreEqual(programPy.Properties.Item("SourceControlStatus").Value, "READONLY");
-
-                    app.Dte.Solution.Close();
-
-                    Assert.AreEqual(0, TestSccProvider.LoadedProjects.Count);
-                    if (TestSccProvider.Failures.Count != 0) {
-                        Assert.Fail(String.Join(Environment.NewLine, TestSccProvider.Failures));
-                    }
-
-                    app.SelectSourceControlProvider("None");
                 }
             }
         }
@@ -284,29 +289,30 @@ namespace Microsoft.VisualStudioTools.SharedProjectTests {
         [TestMethod, Priority(0), TestCategory("Core")]
         [HostType("TC Dynamic"), DynamicHostType(typeof(VsIdeHostAdapter))]
         public void SourceControlNoControl() {
-            var app = new VisualStudioApp(VsIdeTestHostContext.Dte);
+            using (var app = new VisualStudioApp(VsIdeTestHostContext.Dte)) {
 
-            // close any projects before switching source control...
-            VsIdeTestHostContext.Dte.Solution.Close();
+                // close any projects before switching source control...
+                VsIdeTestHostContext.Dte.Solution.Close();
 
-            app.SelectSourceControlProvider("Test Source Provider");
-            DontExpectSourceControl();
+                app.SelectSourceControlProvider("Test Source Provider");
+                DontExpectSourceControl();
 
-            foreach (var projectType in ProjectTypes) {
-                var testDef = NoSourceControlProject(projectType);
-                using (var solution = testDef.Generate()) {
-                    var project = app.OpenProject(solution.Filename);
+                foreach (var projectType in ProjectTypes) {
+                    var testDef = NoSourceControlProject(projectType);
+                    using (var solution = testDef.Generate()) {
+                        var project = app.OpenProject(solution.Filename);
 
-                    Assert.AreEqual(0, TestSccProvider.LoadedProjects.Count);
+                        Assert.AreEqual(0, TestSccProvider.LoadedProjects.Count);
 
-                    app.Dte.Solution.Close();
+                        app.Dte.Solution.Close();
 
-                    Assert.AreEqual(0, TestSccProvider.LoadedProjects.Count);
-                    if (TestSccProvider.Failures.Count != 0) {
-                        Assert.Fail(String.Join(Environment.NewLine, TestSccProvider.Failures));
+                        Assert.AreEqual(0, TestSccProvider.LoadedProjects.Count);
+                        if (TestSccProvider.Failures.Count != 0) {
+                            Assert.Fail(String.Join(Environment.NewLine, TestSccProvider.Failures));
+                        }
+
+                        app.SelectSourceControlProvider("None");
                     }
-
-                    app.SelectSourceControlProvider("None");
                 }
             }
         }

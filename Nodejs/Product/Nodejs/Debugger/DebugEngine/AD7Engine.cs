@@ -64,17 +64,10 @@ namespace Microsoft.NodejsTools.Debugger.DebugEngine {
         private string _webBrowserUrl = null;
         private int? _webBrowserPort = null;
 
-        internal static event EventHandler<AD7EngineEventArgs> EngineBreakpointHit;
-        internal static event EventHandler<AD7EngineEventArgs> EngineAttached;
-        internal static event EventHandler<AD7EngineEventArgs> EngineDetaching;
-
         // These constants are duplicated in HpcLauncher and cannot be changed
 
         public const string DebugEngineId = "{0A638DAC-429B-4973-ADA0-E8DCDFB29B61}";
         public static Guid DebugEngineGuid = new Guid(DebugEngineId);
-
-        public const string LanguageId = "{F7FA31DA-C32A-11D0-B442-00A0244A1DD2}";
-        public static Guid LanguageGuid = new Guid(LanguageId);
 
         /// <summary>
         /// Specifies whether the process should prompt for input before exiting on an abnormal exit.
@@ -257,9 +250,15 @@ namespace Microsoft.NodejsTools.Debugger.DebugEngine {
 
             _loadComplete = true;
 
-            var attached = EngineAttached;
-            if (attached != null) {
-                attached(this, new AD7EngineEventArgs(this));
+            if (_webBrowserUrl != null) {
+                Debug.Assert(_webBrowserPort != null);
+                OnPortOpenedHandler.CreateHandler(
+                    _webBrowserPort.Value,
+                    shortCircuitPredicate: () => !_processLoaded,
+                    action: () => {
+                        LaunchBrowserDebugger();
+                    }
+                );
             }
         }
 
@@ -325,7 +324,7 @@ namespace Microsoft.NodejsTools.Debugger.DebugEngine {
 
             BP_REQUEST_INFO[] requestInfo = new BP_REQUEST_INFO[1];
             EngineUtils.CheckOk(pBPRequest.GetRequestInfo(enum_BPREQI_FIELDS.BPREQI_LANGUAGE, requestInfo));
-            if (requestInfo[0].guidLanguage != LanguageGuid) {
+            if (requestInfo[0].guidLanguage != GuidList.guidNodejsDebugLanguage) {
                 return VSConstants.E_FAIL;
             }
 
@@ -621,11 +620,6 @@ namespace Microsoft.NodejsTools.Debugger.DebugEngine {
                 return VSConstants.S_FALSE;
             }
 
-            var detaching = EngineDetaching;
-            if (detaching != null) {
-                detaching(this, new AD7EngineEventArgs(this));
-            }
-
             _process.Terminate();
 
             return VSConstants.S_OK;
@@ -674,11 +668,6 @@ namespace Microsoft.NodejsTools.Debugger.DebugEngine {
             AssertMainThread();
 
             _breakpointManager.ClearBoundBreakpoints();
-
-            var detaching = EngineDetaching;
-            if (detaching != null) {
-                detaching(this, new AD7EngineEventArgs(this));
-            }
 
             _process.Detach();
             _ad7ProgramId = Guid.Empty;
@@ -917,6 +906,10 @@ namespace Microsoft.NodejsTools.Debugger.DebugEngine {
             process.ModuleLoaded += OnModuleLoaded;
             process.ThreadCreated += OnThreadCreated;
 
+            process.BreakpointBound += OnBreakpointBound;
+            process.BreakpointUnbound += OnBreakpointUnbound;
+            process.BreakpointBindFailure += OnBreakpointBindFailure;
+
             process.BreakpointHit += OnBreakpointHit;
             process.AsyncBreakComplete += OnAsyncBreakComplete;
             process.ExceptionRaised += OnExceptionRaised;
@@ -974,17 +967,6 @@ namespace Microsoft.NodejsTools.Debugger.DebugEngine {
 
 
         private void OnEntryPointHit(object sender, ThreadEventArgs e) {
-            if (_webBrowserUrl != null) {
-                Debug.Assert(_webBrowserPort != null);
-                OnPortOpenedHandler.CreateHandler(
-                    _webBrowserPort.Value,
-                    shortCircuitPredicate: () => !_processLoaded,
-                    action: () => {
-                        LaunchBrowserDebugger();
-                    }
-                );
-            }
-
             Send(new AD7EntryPointEvent(), AD7EntryPointEvent.IID, _threads[e.Thread]);
         }
 
@@ -1062,27 +1044,40 @@ namespace Microsoft.NodejsTools.Debugger.DebugEngine {
         }
 
         private void OnBreakpointHit(object sender, BreakpointHitEventArgs e) {
-
-            var breakpoint = _breakpointManager.GetBreakpoint(e.Breakpoint);
-            Send(new AD7BreakpointEvent(new AD7BoundBreakpointsEnum(new[] { breakpoint })), AD7BreakpointEvent.IID, _threads[e.Thread]);
+            var boundBreakpoint = _breakpointManager.GetBoundBreakpoint(e.BreakpointBinding);
+            Send(new AD7BreakpointEvent(new AD7BoundBreakpointsEnum(new[] { boundBreakpoint })), AD7BreakpointEvent.IID, _threads[e.Thread]);
         }
 
-        internal void OnBreakpointBindSucceeded(AD7PendingBreakpoint pendingBreakpoint, AD7BoundBreakpoint boundBreakpoint) {
+        private void OnBreakpointBound(object sender, BreakpointBindingEventArgs e) {
+            var pendingBreakpoint = _breakpointManager.GetPendingBreakpoint(e.Breakpoint);
+            var breakpointBinding = e.BreakpointBinding;
+            var codeContext = new AD7MemoryAddress(this, pendingBreakpoint.DocumentName, (uint)breakpointBinding.LineNo - 1);
+            var documentContext = new AD7DocumentContext(codeContext);
+            var breakpointResolution = new AD7BreakpointResolution(this, breakpointBinding, documentContext);
+            var boundBreakpoint = new AD7BoundBreakpoint(this, breakpointBinding, pendingBreakpoint, breakpointResolution, breakpointBinding.Enabled);
+            _breakpointManager.AddBoundBreakpoint(breakpointBinding, boundBreakpoint);
             Send(
-                new AD7BreakpointBoundEvent((AD7PendingBreakpoint)pendingBreakpoint, boundBreakpoint),
+                new AD7BreakpointBoundEvent(pendingBreakpoint, boundBreakpoint),
                 AD7BreakpointBoundEvent.IID,
                 null
             );
-
-            var breakpointHit = EngineBreakpointHit;
-            if (breakpointHit != null) {
-                breakpointHit(this, new AD7EngineEventArgs(this));
-            }
         }
 
-        internal void OnBreakpointBindFailed(AD7PendingBreakpoint pendingBreakpoint) {
+        private void OnBreakpointUnbound(object sender, BreakpointBindingEventArgs e) {
+            var breakpointBinding = e.BreakpointBinding;
+            var boundBreakpoint = _breakpointManager.GetBoundBreakpoint(breakpointBinding);
+            _breakpointManager.RemoveBoundBreakpoint(breakpointBinding);
             Send(
-                new AD7BreakpointErrorEvent((AD7PendingBreakpoint)pendingBreakpoint, this),
+                new AD7BreakpointUnboundEvent(boundBreakpoint),
+                AD7BreakpointUnboundEvent.IID,
+                null
+            );
+        }
+
+        private void OnBreakpointBindFailure(object sender, BreakpointBindingEventArgs e) {
+            var pendingBreakpoint = _breakpointManager.GetPendingBreakpoint(e.Breakpoint);
+            Send(
+                new AD7BreakpointErrorEvent(pendingBreakpoint, this),
                 AD7BreakpointErrorEvent.IID,
                 null
             );
