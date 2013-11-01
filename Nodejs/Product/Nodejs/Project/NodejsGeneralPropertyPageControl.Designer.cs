@@ -81,6 +81,7 @@
             this._nodeExePath.Name = "_nodeExePath";
             this._nodeExePath.Size = new System.Drawing.Size(258, 20);
             this._nodeExePath.TabIndex = 1;
+            this._nodeExePath.TextChanged += new System.EventHandler(this.Changed);
             this._nodeExePath.Validated += new System.EventHandler(this.NodeExePathValidated);
             // 
             // _nodeExeArguments

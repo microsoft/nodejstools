@@ -29,4 +29,18 @@
       </EmbeddedResource>
     </ItemGroup>
   </Target>
+
+  <Target Name="TransformZipProject"
+          BeforeTargets="MainResourcesGeneration"
+          Condition="'@(TransformedZipProject)' != ''"
+          >
+    <WriteLinesToFile 
+      File="@(TransformedZipProject->'%(RootDir)%(Directory)%(Filename)')" 
+      Lines="$([System.IO.File]::ReadAllText('%(fullpath)').Replace(&quot;_VSVERSION_&quot;,&quot;$(VSTarget)&quot;))" 
+      Overwrite="true"/> 
+      
+    <ItemGroup>
+      <ZipProject Include="@(TransformedZipProject->'%(RootDir)%(Directory)%(Filename)')" />
+    </ItemGroup>
+  </Target>
 </Project>

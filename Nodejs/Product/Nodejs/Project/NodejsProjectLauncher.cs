@@ -44,7 +44,7 @@ namespace Microsoft.NodejsTools.Project {
         #region IProjectLauncher Members
 
         public int LaunchProject(bool debug) {
-            return Start(_project.GetStartupFile(), debug);
+            return Start(ResolveStartupFile(), debug);
         }
 
         public int LaunchFile(string file, bool debug) {
@@ -236,7 +236,15 @@ namespace Microsoft.NodejsTools.Project {
                 select connection.LocalEndPoint.Port
             ).First();
         }
+
+        private string ResolveStartupFile() {
+            string startupFile = _project.GetStartupFile();
+            if (string.IsNullOrEmpty(startupFile)) {
+                throw new ApplicationException("No startup file is defined for the startup project.");
+            }
+            return startupFile;
         }
+    }
 
     internal class OnPortOpenedHandler {
 

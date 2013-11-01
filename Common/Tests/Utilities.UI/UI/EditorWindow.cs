@@ -214,6 +214,11 @@ namespace TestUtilities.UI {
             }
         }
 
+        public void AssertNoIntellisenseSession() {
+            Thread.Sleep(500);
+            Assert.IsNull(IntellisenseSessionStack.TopSession);
+        }
+
         public IClassifier Classifier {
             get {
 

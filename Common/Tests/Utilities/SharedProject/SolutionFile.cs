@@ -32,37 +32,46 @@ namespace TestUtilities.SharedProject {
     /// </summary>
     public sealed class SolutionFile : IDisposable {
         public readonly string Filename;
+        public readonly ProjectDefinition[] Projects;
 
-        private SolutionFile(string slnFilename) {
+        private SolutionFile(string slnFilename, ProjectDefinition[] projects) {
             Filename = slnFilename;
+            Projects = projects;
         }
 
         public static SolutionFile Generate(string solutionName, params ProjectDefinition[] toGenerate) {
+            return Generate(solutionName, -1, toGenerate);
+        }
+
+        /// <summary>
+        /// Generates the solution file with the specified amount of space remaining relative
+        /// to MAX_PATH.
+        /// </summary>
+        /// <param name="solutionName">The solution name to be created</param>
+        /// <param name="pathSpaceRemaining">The amount of path space remaining, or -1 to generate normally</param>
+        /// <param name="toGenerate">The projects to be incldued in the generated solution</param>
+        /// <returns></returns>
+        public static SolutionFile Generate(string solutionName, int pathSpaceRemaining, params ProjectDefinition[] toGenerate) {
             List<MSBuild.Project> projects = new List<MSBuild.Project>();
             var location = Path.Combine(Path.GetTempPath(), Path.GetRandomFileName());
-            Directory.CreateDirectory(location);
 
+            if (pathSpaceRemaining >= 0) {
+                int targetPathLength = 260 - pathSpaceRemaining;
+                location = location + new string('X', targetPathLength - location.Length);
+            }
+            System.IO.Directory.CreateDirectory(location);
+
+            MSBuild.ProjectCollection collection = new MSBuild.ProjectCollection();
             foreach (var project in toGenerate) {
-                projects.Add(project.ProjectType.Generate(location, project.Name, project.Items));
+                projects.Add(project.ProjectType.Generate(collection, location, project.Name, project.Items));
             }
 
 #if DEV10
-            StringBuilder slnFile = new StringBuilder(@"
-Microsoft Visual Studio Solution File, Format Version 11.00
-\u0023 Visual Studio 2010
-");
+            StringBuilder slnFile = new StringBuilder("\r\nMicrosoft Visual Studio Solution File, Format Version 11.00\r\n\u0023 Visual Studio 2010\r\n");
 #elif DEV11
-            StringBuilder slnFile = new StringBuilder(@"
-Microsoft Visual Studio Solution File, Format Version 12.00
-\u0023 Visual Studio 2012
-");
+            StringBuilder slnFile = new StringBuilder("\r\nMicrosoft Visual Studio Solution File, Format Version 12.00\r\n\u0023 Visual Studio 2012\r\n");
 #elif DEV12
-            StringBuilder slnFile = new StringBuilder(@"
-Microsoft Visual Studio Solution File, Format Version 12.00
-\u0023 Visual Studio 2013
-VisualStudioVersion = 12.0.20827.3
-MinimumVisualStudioVersion = 10.0.40219.1
-");
+            StringBuilder slnFile = new StringBuilder("\r\nMicrosoft Visual Studio Solution File, Format Version 12.00\r\n\u0023 Visual Studio 2013\r\nVisualStudioVersion = 12.0.20827.3\r\nMinimumVisualStudioVersion = 10.0.40219.1\r\n");
 #else
 #error Unsupported VS version
 #endif
@@ -99,20 +108,31 @@ EndProject
 EndGlobal
 ");
 
+            collection.UnloadAllProjects();
+            collection.Dispose();
+
             var slnFilename = Path.Combine(location, solutionName + ".sln");
             File.WriteAllText(slnFilename, slnFile.ToString(), Encoding.UTF8);
-            return new SolutionFile(slnFilename);
+            return new SolutionFile(slnFilename, toGenerate);
+        }
+
+        public string Directory {
+            get {
+                return Path.GetDirectoryName(Filename);
+            }
         }
 
         #region IDisposable Members
 
         public void Dispose() {
             try {
-                Directory.Delete(Path.GetDirectoryName(Filename), true);
-            } catch {
+                NativeMethods.RecursivelyDeleteDirectory(Path.GetDirectoryName(Filename));
+            } catch(Exception ex) {
+                Console.WriteLine("Failed to delete dir: {0}", ex);
             }
         }
 
         #endregion
     }
 }
+ 

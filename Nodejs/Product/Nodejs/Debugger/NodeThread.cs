@@ -26,7 +26,7 @@ namespace Microsoft.NodejsTools.Debugger {
             _process = process;
             _identity = identity;
             _isWorkerThread = isWorkerThread;
-            _name = "";
+            _name = "main thread";
         }
 
         public void StepInto() {

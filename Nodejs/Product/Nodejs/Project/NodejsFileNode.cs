@@ -112,6 +112,14 @@ namespace Microsoft.NodejsTools.Project {
             CreateWatcher(newName);
         }
 
+        public override int SetEditLabel(string label) {
+            var res = base.SetEditLabel(label);
+
+            ((NodejsProjectNode)this.ProjectMgr).UpdateReferenceFile();
+
+            return res;
+        }
+
         public new NodejsProjectNode ProjectMgr {
             get {
                 return (NodejsProjectNode)base.ProjectMgr;

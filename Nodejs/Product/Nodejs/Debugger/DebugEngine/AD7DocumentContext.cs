@@ -13,21 +13,51 @@
  * ***************************************************************************/
 
 using System;
+using System.IO;
 using Microsoft.VisualStudio;
 using Microsoft.VisualStudio.Debugger.Interop;
 
 namespace Microsoft.NodejsTools.Debugger.DebugEngine {
     // This class represents a document context to the debugger. A document context represents a location within a source file. 
     class AD7DocumentContext : IDebugDocumentContext2 {
-        private readonly string _fileName;
-        private readonly TEXT_POSITION _begPos, _endPos;
         private readonly AD7MemoryAddress _codeContext;
+        private string _fileName;
 
-        public AD7DocumentContext(string fileName, TEXT_POSITION begPos, TEXT_POSITION endPos, AD7MemoryAddress codeContext) {
-            _fileName = fileName;
-            _begPos = begPos;
-            _endPos = endPos;
+        public AD7DocumentContext(AD7MemoryAddress codeContext) {
             _codeContext = codeContext;
+        }
+
+        public AD7Engine Engine {
+            get {
+                return _codeContext.Engine;
+            }
+        }
+
+        public NodeModule Module {
+            get {
+                return _codeContext.Module;
+            }
+        }
+
+        public string FileName {
+            get {
+                if (_fileName == null) {
+                    // Perform "fuzzy" filename matching for non-builtin sources
+                    var module = Module;
+                    _fileName =
+                        (module == null) || module.BuiltIn ?
+                        _codeContext.FileName :
+                        Engine.GetFuzzyMatchFilename(_codeContext.FileName);
+                }
+                return _fileName;
+            }
+        }
+
+        public bool Downloaded {
+            get {
+                // No directory separator characters implies downloaded
+                return (FileName.IndexOf(Path.DirectorySeparatorChar) == -1);
+            }
         }
 
         #region IDebugDocumentContext2 Members
@@ -56,8 +86,20 @@ namespace Microsoft.NodejsTools.Debugger.DebugEngine {
         // This method is for those debug engines that supply documents directly to the IDE. Since the sample engine
         // does not do this, this method returns E_NOTIMPL.
         int IDebugDocumentContext2.GetDocument(out IDebugDocument2 ppDocument) {
+            // Expose document for downloaded modules
             ppDocument = null;
-            return VSConstants.E_FAIL;
+            if (Downloaded) {
+                var module = Module;
+                if (module != null) {
+                    // Lazily create document per module
+                    ppDocument = (AD7Document)module.Document;
+                    if (ppDocument == null) {
+                        ppDocument = new AD7Document(this);
+                        module.Document = ppDocument;
+                    }
+                }
+            }
+            return ppDocument != null ? VSConstants.S_OK : VSConstants.E_FAIL;
         }
 
         // Gets the language associated with this document context.
@@ -70,8 +112,8 @@ namespace Microsoft.NodejsTools.Debugger.DebugEngine {
 
         // Gets the displayable name of the document that contains this document context.
         int IDebugDocumentContext2.GetName(enum_GETNAME_TYPE gnType, out string pbstrFileName) {
-            pbstrFileName = _fileName;
-            return VSConstants.S_OK;
+            pbstrFileName = FileName;
+            return pbstrFileName != null ? VSConstants.S_OK : VSConstants.E_FAIL;
         }
 
         // Gets the source code range of this document context.
@@ -86,11 +128,11 @@ namespace Microsoft.NodejsTools.Debugger.DebugEngine {
         // Gets the file statement range of the document context.
         // A statement range is the range of the lines that contributed the code to which this document context refers.
         int IDebugDocumentContext2.GetStatementRange(TEXT_POSITION[] pBegPosition, TEXT_POSITION[] pEndPosition) {
-            pBegPosition[0].dwColumn = _begPos.dwColumn;
-            pBegPosition[0].dwLine = _begPos.dwLine;
+            pBegPosition[0].dwColumn = 0;
+            pBegPosition[0].dwLine = _codeContext.LineNumber;
 
-            pEndPosition[0].dwColumn = _endPos.dwColumn;
-            pEndPosition[0].dwLine = _endPos.dwLine;
+            pEndPosition[0].dwColumn = 0;
+            pEndPosition[0].dwLine = _codeContext.LineNumber;
 
             return VSConstants.S_OK;
         }

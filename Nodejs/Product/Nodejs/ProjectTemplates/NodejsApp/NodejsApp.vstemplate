@@ -1,0 +1,23 @@
+<VSTemplate Version="3.0.0" Type="Project" xmlns="http://schemas.microsoft.com/developer/vstemplate/2005">
+  <TemplateData>
+    <Name>Blank Node.js Application</Name>
+    <Description>An empty Node.js application.</Description>
+    <Icon Package="{4219f2a8-fbf9-4659-a222-b7580a60eebb}" ID="401" />
+    <ProjectType>JavaScript</ProjectType>
+    <TemplateID>Microsoft.JavaScript.NodejsApp</TemplateID>
+    <SortOrder>130</SortOrder>
+    <CreateNewFolder>false</CreateNewFolder>
+    <DefaultName>NodejsApp</DefaultName>
+    <ProvideDefaultName>true</ProvideDefaultName>
+    <NumberOfParentCategoriesToRollUp>1</NumberOfParentCategoriesToRollUp>
+    <PromptForSaveOnCreation>true</PromptForSaveOnCreation>
+    <PreviewImage>Preview.png</PreviewImage>
+  </TemplateData>
+  <TemplateContent>
+    <Project File="NodejsApp.njsproj" ReplaceParameters="true">
+      <ProjectItem OpenInEditor="true">server.js</ProjectItem>
+      <ProjectItem ReplaceParameters="true">package.json</ProjectItem>
+      <ProjectItem ReplaceParameters="true">README.md</ProjectItem>
+    </Project>
+  </TemplateContent>
+</VSTemplate>

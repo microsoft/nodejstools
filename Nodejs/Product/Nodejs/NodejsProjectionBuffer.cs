@@ -60,17 +60,17 @@ namespace Microsoft.NodejsTools {
         private readonly IContentType _contentType;
         private readonly IProjectionBuffer _projBuffer; // the buffer we project into        
         private readonly IProjectionBuffer _elisionBuffer;
-        private readonly string _filename, _referenceFilename;
+        private readonly string _referenceFilename;
 
-        public NodejsProjectionBuffer(IContentTypeRegistryService contentRegistry, IProjectionBufferFactoryService bufferFactory, ITextBuffer diskBuffer, IBufferGraphFactoryService bufferGraphFactory, IContentType contentType, string filename, string referenceFileName) {
+        public NodejsProjectionBuffer(IContentTypeRegistryService contentRegistry, IProjectionBufferFactoryService bufferFactory, ITextBuffer diskBuffer, IBufferGraphFactoryService bufferGraphFactory, IContentType contentType, string referenceFileName) {
             _diskBuffer = diskBuffer;
             _contentRegistry = contentRegistry;
             _contentType = contentType;
 
-            _filename = filename;
             _referenceFilename = referenceFileName;
             _projBuffer = CreateProjectionBuffer(bufferFactory);
             _elisionBuffer = CreateElisionBuffer(bufferFactory);
+            _elisionBuffer.Properties[typeof(NodejsProjectionBuffer)] = this;
         }
 
         private IProjectionBuffer CreateProjectionBuffer(IProjectionBufferFactoryService bufferFactory) {
@@ -98,7 +98,7 @@ namespace Microsoft.NodejsTools {
 
                 return
                     "/// <reference path=\"" + _referenceFilename + "\" />\r\n" +
-                    GetNodeFunctionWrapperHeader("module_body", _filename);
+                    GetNodeFunctionWrapperHeader("nodejs_tools_for_visual_studio_hidden_module_body", _diskBuffer.GetFilePath());
             }
         }
 
@@ -162,6 +162,12 @@ namespace Microsoft.NodejsTools {
         public IProjectionBuffer EllisionBuffer {
             get {
                 return _elisionBuffer;
+            }
+        }
+
+        public ITextBuffer DiskBuffer {
+            get {
+                return _diskBuffer;
             }
         }
     }

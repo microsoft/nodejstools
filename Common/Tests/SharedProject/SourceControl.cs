@@ -63,7 +63,7 @@ namespace Microsoft.VisualStudioTools.SharedProjectTests {
 
             ExpectSourceControl();
 
-            foreach (var projectType in ProjectKinds) {
+            foreach (var projectType in ProjectTypes) {
                 var testDef = new ProjectDefinition("SourceControl", projectType,
                     PropertyGroup(
                         Property("SccProjectName", "HelloWorld"),
@@ -114,7 +114,7 @@ namespace Microsoft.VisualStudioTools.SharedProjectTests {
             VsIdeTestHostContext.Dte.Solution.Close();
 
             app.SelectSourceControlProvider("Test Source Provider");
-            foreach (var projectType in ProjectKinds) {
+            foreach (var projectType in ProjectTypes) {
                 var testDef = SourceControlProject(projectType);
 
                 using (var solution = testDef.Generate()) {
@@ -151,7 +151,7 @@ namespace Microsoft.VisualStudioTools.SharedProjectTests {
             VsIdeTestHostContext.Dte.Solution.Close();
 
             app.SelectSourceControlProvider("Test Source Provider");
-            foreach (var projectType in ProjectKinds) {
+            foreach (var projectType in ProjectTypes) {
                 var testDef = SourceControlProject(projectType);
 
                 using (var solution = testDef.Generate()) {
@@ -195,7 +195,7 @@ namespace Microsoft.VisualStudioTools.SharedProjectTests {
 
             ExpectSourceControl();
 
-            foreach (var projectType in ProjectKinds) {
+            foreach (var projectType in ProjectTypes) {
                 var testDef = SourceControlProject(projectType);
 
                 using (var solution = testDef.Generate()) {
@@ -240,7 +240,7 @@ namespace Microsoft.VisualStudioTools.SharedProjectTests {
 
             app.SelectSourceControlProvider("Test Source Provider");
 
-            foreach (var projectType in ProjectKinds) {
+            foreach (var projectType in ProjectTypes) {
                 var testDef = SourceControlProject(projectType);
                 using (var solution = testDef.Generate()) {
                     var project = app.OpenProject(solution.Filename);
@@ -292,7 +292,7 @@ namespace Microsoft.VisualStudioTools.SharedProjectTests {
             app.SelectSourceControlProvider("Test Source Provider");
             DontExpectSourceControl();
 
-            foreach (var projectType in ProjectKinds) {
+            foreach (var projectType in ProjectTypes) {
                 var testDef = NoSourceControlProject(projectType);
                 using (var solution = testDef.Generate()) {
                     var project = app.OpenProject(solution.Filename);

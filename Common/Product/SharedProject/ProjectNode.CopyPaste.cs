@@ -502,11 +502,15 @@ namespace Microsoft.VisualStudioTools.Project {
                     }
                 }
 
+                bool result = true;
                 foreach (var addition in additions) {
                     addition.DoAddition();
+                    if (addition is SkipOverwriteAddition) {
+                        result = false;
+                    }
                 }
 
-                return true;
+                return result;
             }
 
             /// <summary>
@@ -586,7 +590,7 @@ folder you are copying, do you want to replace the existing files?", Path.GetFil
                         return null;
                     } else if (!dialog.ShouldOverwrite) {
                         // no, don't copy the folder
-                        return NopAddition.Instance;
+                        return SkipOverwriteAddition.Instance;
                     }
                     // otherwise yes, and we'll prompt about the files.
                 }
@@ -976,15 +980,6 @@ folder you are copying, do you want to replace the existing files?", Path.GetFil
                             }
 
                             overwrite = dialog.ShouldOverwrite;
-                            if (DropEffect == DropEffect.Move &&
-                                !dialog.ShouldOverwrite && 
-                                Utilities.IsSameComObject(project, Project)) {
-                                var existing = Project.FindNodeByFullPath(moniker);
-                                if (existing != null) {
-                                    Project.ItemsDraggedOrCutOrCopied.Remove(existing);
-                                    existing.ExpandItem(EXPANDFLAGS.EXPF_UnCutHighlightItem);
-                                }
-                            }
 
                             if (dialog.AllItems) {
                                 OverwriteAllItems = overwrite;
@@ -994,7 +989,7 @@ folder you are copying, do you want to replace the existing files?", Path.GetFil
                         if (overwrite.Value) {
                             return new OverwriteFileAddition(Project, targetFolder, DropEffect, moniker, Path.GetFileName(newPath), project);
                         } else {
-                            return NopAddition.Instance;
+                            return SkipOverwriteAddition.Instance;
                         }
                     } else if (Directory.Exists(newPath)) {
                         VsShellUtilities.ShowMessageBox(
@@ -1063,8 +1058,17 @@ folder you are copying, do you want to replace the existing files?", Path.GetFil
                 public abstract void DoAddition();
             }
 
-            class NopAddition : Addition {
-                internal static NopAddition Instance = new NopAddition();
+            /// <summary>
+            /// Addition which doesn't add anything.  It's used when the user answers no to
+            /// overwriting a file, which results in us reporting an overall failure to the 
+            /// copy and paste.  This causes the file not to be deleted if it was a move.
+            /// 
+            /// This also means that if you're moving multiple files and answer no to one 
+            /// of them but not the other that the files are not removed from the source
+            /// hierarchy.
+            /// </summary>
+            class SkipOverwriteAddition : Addition {
+                internal static SkipOverwriteAddition Instance = new SkipOverwriteAddition();
 
                 public override void DoAddition() {
                 }
@@ -1130,6 +1134,11 @@ folder you are copying, do you want to replace the existing files?", Path.GetFil
                     string newPath = Path.Combine(TargetFolder, NewFileName);
                     if (DropEffect == DropEffect.Move && Utilities.IsSameComObject(Project, SourceHierarchy)) {
                         // we are doing a move, we need to remove the old item, and add the new.
+                        // This also allows us to have better behavior if the user is selectively answering
+                        // no to files within the hierarchy.  We can do the rename of the individual items
+                        // which the user opts to move and not touch the ones they don't.  With a cross
+                        // hierarchy move if the user answers no to any of the items none of the items
+                        // are removed from the source hierarchy.
                         var fileNode = Project.FindNodeByFullPath(SourceMoniker);
                         Debug.Assert(fileNode is FileNode);
 

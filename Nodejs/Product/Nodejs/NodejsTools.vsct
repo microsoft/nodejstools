@@ -107,6 +107,14 @@
         </Strings>
       </Button>
 
+      <Button guid="guidNodeToolsCmdSet" id="cmdidSurveyNews" priority="0x005" type="Button">
+        <Parent guid="guidNodeToolsCmdSet" id="ToolsMenuItemsGroup"/>
+        <Strings>
+          <ButtonText>Survey/&amp;News...</ButtonText>
+          <CommandName>cmdidSurveyNews</CommandName>
+        </Strings>
+      </Button>
+
     </Buttons>
 
 
@@ -141,7 +149,8 @@
       <IDSymbol name="cmdidReplWindow" value="0x0201" />
       <IDSymbol name="cmdidOpenRemoteDebugProxyFolder" value="0x0202" />
       <IDSymbol name="cmdidSetAsNodejsStartupFile" value="0x0203" />
-      
+      <IDSymbol name="cmdidSurveyNews" value ="0x0204" />
+
       <!-- Shared commands, defined in CommonConstants.cs -->
       <IDSymbol name="cmdidAddExistingFolder" value="0x10001" />
       

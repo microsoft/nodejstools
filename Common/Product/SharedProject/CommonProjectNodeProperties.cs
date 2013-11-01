@@ -47,7 +47,10 @@ namespace Microsoft.VisualStudioTools.Project {
             set {
                 this.Node.ProjectMgr.SetProjectProperty(
                     CommonConstants.StartupFile,
-                    CommonUtils.GetRelativeFilePath(Node.ProjectMgr.ProjectHome, value)
+                    CommonUtils.GetRelativeFilePath(
+                        Node.ProjectMgr.ProjectHome, 
+                        Path.Combine(Node.ProjectMgr.ProjectHome, value)
+                    )
                 );
             }
         }

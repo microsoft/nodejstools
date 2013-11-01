@@ -35,7 +35,7 @@ namespace TestUtilities.SharedProject {
     [TestClass]
     public class SharedProjectTest {
         public static CompositionContainer Container;
-        public static IEnumerable<ProjectType> ProjectKinds { get; set; }
+        public static IEnumerable<ProjectType> ProjectTypes { get; set; }
 
         static SharedProjectTest() {
             var runningLoc = Path.GetDirectoryName(typeof(SharedProjectTest).Assembly.Location);
@@ -79,7 +79,7 @@ namespace TestUtilities.SharedProject {
                 );
 
             // Then create the ProjectTypes
-            ProjectKinds = container
+            ProjectTypes = container
                 .GetExports<ProjectTypeDefinition, IProjectTypeDefinitionMetadata>()
                 .Select(lazyVal => {
                     var md = lazyVal.Metadata;
@@ -96,7 +96,7 @@ namespace TestUtilities.SharedProject {
                 });
 
             // something's broken if we don't have any languages to test against, so fail the test.
-            Assert.IsTrue(ProjectKinds.Count() > 0, "no project types were registered and no tests will run");
+            Assert.IsTrue(ProjectTypes.Count() > 0, "no project types were registered and no tests will run");
         }
 
         private static void TryAddAssembly(List<AssemblyCatalog> catalogs, string file) {
@@ -139,8 +139,8 @@ namespace TestUtilities.SharedProject {
         /// Helper function to create a CompileItem object to simply syntax in 
         /// defining project definitions.
         /// </summary>
-        public static CompileItem Compile(string name, bool isExcluded = false) {
-            return new CompileItem(name, isExcluded);
+        public static CompileItem Compile(string name, string content = null, bool isExcluded = false, bool isMissing = false) {
+            return new CompileItem(name, content, isExcluded, isMissing);
         }
 
         /// <summary>

@@ -6,6 +6,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using System.Web.Script.Serialization;
+using System.Xml;
 
 namespace NodeReferenceGenerator {
 
@@ -19,21 +20,103 @@ namespace NodeReferenceGenerator {
         }
 
         static void Main(string[] args) {
-            var res = new NodeReferenceGenerator().Generate();
-            Console.WriteLine(res);
-            File.WriteAllText("all.js", res);
+            var generator = new NodeReferenceGenerator();
+            var js = generator.GenerateJavaScript();
+            
+            File.WriteAllText("all.js", File.ReadAllText("IntellisenseHeader.js") + js);
+
+            var cs = generator.GenerateCSharp();
+            File.WriteAllText("modules.cs", cs);
         }
 
-        private string Generate() {
+        private string GenerateCSharp() {
+            StringBuilder res = new StringBuilder();
+            res.Append(@"/* ****************************************************************************
+ *
+ * Copyright (c) Microsoft Corporation. 
+ *
+ * This source code is subject to terms and conditions of the Apache License, Version 2.0. A 
+ * copy of the license can be found in the License.html file at the root of this distribution. If 
+ * you cannot locate the Apache License, Version 2.0, please send an email to 
+ * vspython@microsoft.com. By using this source code in any fashion, you are agreeing to be bound 
+ * by the terms of the Apache License, Version 2.0.
+ *
+ * You must not remove this notice, or any other, from this software.
+ *
+ * ***************************************************************************/
+
+using System.Collections.Generic;
+using Microsoft.VisualStudio.Language.Intellisense;
+
+namespace Microsoft.NodejsTools.Intellisense {
+    sealed partial class CompletionSource : ICompletionSource {
+");
+            res.AppendLine("        private static Dictionary<string, string> _nodejsModules = new Dictionary<string, string>() {");
+            foreach (var module in _all["modules"]) {
+                var desc = (string)module["desc"];
+                StringBuilder output = new StringBuilder();
+                var reader = XmlReader.Create(
+                    new StringReader(
+                        "<html>" + desc+ "</html>"
+                    )
+                );
+
+                while (reader.Read()) {
+                    switch (reader.NodeType) {
+                        case XmlNodeType.Element:
+                            switch (reader.Name) {
+                                case "li": 
+                                    output.Append("* ");
+                                    break;
+                            }                            
+                            break;
+                        case XmlNodeType.Text:
+                            var text = reader.Value
+                                .Replace("\\", "\\\\")
+                                .Replace("\"", "\\\"")
+                                .Replace("\r\n", "\\r\\n")
+                                .Replace("\n", "\\r\\n");
+
+                            output.Append(text);
+                            break;
+                        case XmlNodeType.EndElement:
+                            switch (reader.Name) {
+                                case "p":
+                                case "li":
+                                case "h1":
+                                case "h2":
+                                case "h3":
+                                case "h4":
+                                case "h5":
+                                    output.Append("\\r\\n");
+                                    break;
+                            }
+                            break;
+
+                    }
+                }
+
+                // trim escaped newlines...
+                while (output.ToString().EndsWith("\\r\\n")) {
+                    output.Length -= 4;
+                }
+
+                res.AppendFormat("            {{\"{0}\", \"{1}\" }},",
+                    FixModuleName(module["name"]),
+                    output.ToString()
+                );
+                res.AppendLine();
+            }
+            res.AppendLine("        };");
+            res.AppendLine(@"    }
+}");
+            return res.ToString();
+        }
+
+        private string GenerateJavaScript() {
             _output.AppendLine("global = {};");
 
-            _output.Append("function require(module) {\r\n");
-
-            GenerateRequireBody(_output, _all);
-
-            _output.Append(@"
-}
-");
+            GenerateRequire(_output, _all);
 
             foreach (var misc in _all["miscs"]) {
                 if (misc["name"] == "Global Objects") {
@@ -68,11 +151,13 @@ namespace NodeReferenceGenerator {
 
         private void GenerateModuleWorker(dynamic module, int indentation, string name) {
             _output.Append(' ', indentation * 4);
-            _output.AppendFormat("function {0}() {{\r\n", name);
+            _output.AppendFormat("function {0}() {{", name);
+            _output.AppendLine();
 
             if (module.ContainsKey("desc")) {
                 _output.Append(' ', (indentation + 1) * 4);
-                _output.AppendFormat("/// <summary>{0}</summary>\r\n", FixDescription(module["desc"]));
+                _output.AppendFormat("/// <summary>{0}</summary>", FixDescription(module["desc"]));
+                _output.AppendLine();
             }
 
             if (module.ContainsKey("methods")) {
@@ -132,7 +217,8 @@ namespace NodeReferenceGenerator {
         private void GenerateClass(string modName, dynamic klass, int indentation) {
             string className = FixClassName(klass["name"]);
             _output.Append(' ', indentation * 4);
-            _output.AppendFormat("this.{0} = function() {{\r\n", className);
+            _output.AppendFormat("this.{0} = function() {{", className);
+            _output.AppendLine();
 
             if (klass.ContainsKey("methods")) {
                 foreach (var method in klass["methods"]) {
@@ -159,10 +245,10 @@ namespace NodeReferenceGenerator {
                     desc = prop["desc"];
 
                     _output.Append(' ', indentation * 4);
-                    _output.AppendFormat("/// <field name='{0}'>{1}</field>\r\n",
+                    _output.AppendFormat("/// <field name='{0}'>{1}</field>",
                         prop["name"],
                         FixDescription(desc));
-
+                    _output.AppendLine();
                 }
 
                 _output.Append(' ', indentation * 4);
@@ -197,7 +283,8 @@ namespace NodeReferenceGenerator {
                         value = "undefined";
                     }
                 }
-                _output.AppendFormat("this.{0} = {1};\r\n", prop["name"], value);
+                _output.AppendFormat("this.{0} = {1};", prop["name"], value);
+                _output.AppendLine();
             }
         }
 
@@ -210,11 +297,13 @@ namespace NodeReferenceGenerator {
                 }
                 if (ev.ContainsKey("desc")) {
                     _output.Append(' ', indentation * 4);
-                    _output.AppendFormat("/// <field name='{0}'>{1}</field>\r\n", ev["name"], FixDescription(ev["desc"]));
+                    _output.AppendFormat("/// <field name='{0}'>{1}</field>", ev["name"], FixDescription(ev["desc"]));
+                    _output.AppendLine();
 
                 }
                 _output.Append(' ', indentation * 4);
-                _output.AppendFormat("this.{0} = new emitter();\r\n", ev["name"]);
+                _output.AppendFormat("this.{0} = new emitter();", ev["name"]);
+                _output.AppendLine();
             }
         }
 
@@ -237,11 +326,12 @@ namespace NodeReferenceGenerator {
                 // TODO: Optional?
             }
 
-            _output.Append(") {\r\n");
+            _output.AppendLine(") {");
 
             if (method.ContainsKey("desc")) {
                 _output.Append(' ', (indentation + 1) * 4);
-                _output.AppendFormat("/// <summary>{0}</summary>\r\n", FixDescription(method["desc"]));
+                _output.AppendFormat("/// <summary>{0}</summary>", FixDescription(method["desc"]));
+                _output.AppendLine();
             }
             foreach (var curSig in method["signatures"]) {
                 if (curSig["params"].Length > 0) {
@@ -303,34 +393,62 @@ namespace NodeReferenceGenerator {
             _output.AppendLine("}");
         }
 
-        private void GenerateRequireBody(StringBuilder res, dynamic all) {
-            res.AppendLine("try { ");
-            res.AppendLine("var __prevFilename = __filename;");
-            res.AppendLine("var __prevDirname = __dirname;");
-            res.Append(@"
-    switch (module) {
-");
-
-
+        private void GenerateRequire(StringBuilder res, dynamic all) {
+            res.AppendLine("require = function () {");
+            res.AppendLine("    var require_count = 0;");
+            res.AppendLine("    var cache = {");
 
             foreach (var module in all["modules"]) {
-                res.AppendFormat("        case \"{0}\": return new ", module["name"]);
-                GenerateModule(module, 1);
-                res.Append(";\r\n");
+                res.AppendFormat("        \"{0}\": null,", FixModuleName(module["name"]));
+                res.AppendLine();
             }
 
-            res.AppendLine("// **NTVS** INSERT USER MODULE SWITCH HERE **NTVS**");
-            res.AppendLine();
-            res.AppendLine("} // close switch");
+            res.AppendLine("    }");
+            res.AppendLine("    function make_module(module_name) {");
+            res.AppendLine("        switch(module_name) { ");
+            foreach (var module in all["modules"]) {
+                res.AppendFormat("            case \"{0}\": return new ", FixModuleName(module["name"]));
+                GenerateModule(module, 1);
+                res.AppendLine(";");
+            }
+            res.AppendLine("        }");
+            res.AppendLine("    }");
 
-            res.AppendLine("} finally {");
-            res.AppendLine("__filename = __prevFilename;");
-            res.AppendLine("__dirname = __prevDirname;");
-            res.AppendLine("}");
+            res.Append(@"    var f = function(module) { 
+        if(require_count++ >= 50) {
+            require_count = 0;
+            intellisense.progress();
+        }
+        var result = cache[module];
+        if(typeof result !== 'undefined') {
+            if(result === null) {
+                // we lazily create only the modules which are actually used
+                cache[module] = result = make_module(module);
+            }
+            return result;
+        }
+        // value not cached, see if we can look it up
+        try { 
+            var __prevFilename = __filename;
+            var __prevDirname = __dirname;
+            // **NTVS** INSERT USER MODULE SWITCH HERE **NTVS**
+        } finally {
+            __filename = __prevFilename;
+            __dirname = __prevDirname;
+        }
+    }
+    o.__proto__ = f.__proto__;
+    f.__proto__ = o;
+    return f;
+}()");
         }
 
 
         private static dynamic FixModuleName(string module) {
+            if (module == "tls_(ssl)") {
+                return "tls";
+            }
+
             for (int i = 0; i < module.Length; i++) {
                 if (!(Char.IsLetterOrDigit(module[i]) || module[i] == '_')) {
                     return module.Substring(0, i);

@@ -28,7 +28,6 @@ namespace Microsoft.NodejsTools.Debugger {
         private uint _engineHitCount;
         private uint _hitCountDelta;
         private int _engineIgnoreCount;
-        private bool _boundByName;
         private bool _pendingLocationFixup;
 
         public NodeBreakpoint(
@@ -104,15 +103,6 @@ namespace Microsoft.NodejsTools.Debugger {
             }
             set {
                 _breakpointId = value;
-            }
-        }
-
-        internal bool BoundByName {
-            get {
-                return _boundByName;
-            }
-            set {
-                _boundByName = value;
             }
         }
 

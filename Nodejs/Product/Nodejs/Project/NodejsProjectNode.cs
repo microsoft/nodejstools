@@ -129,6 +129,12 @@ namespace Microsoft.NodejsTools.Project {
             return Path.GetExtension(fileName).Equals(".js", StringComparison.OrdinalIgnoreCase);
         }
 
+        protected override void Reload() {
+            base.Reload();
+
+            NodejsPackage.Instance.CheckSurveyNews(false);
+        }
+
         /// <summary>
         /// Updates our per-project reference .js file.  This file gets our baseline node reference file
         /// merged with all of the user's code as well.  This allows the user to do require('mymodule') and
@@ -158,7 +164,6 @@ namespace Microsoft.NodejsTools.Project {
             Dictionary<FileNode, CommonFolderNode> directoryPackages = GetModuleFolderMapping();
 
             int moduleId = 0;
-            switchCode.Append("default:");
             switchCode.Append(@"
 function relative_match(match_dir, dirname, mod_name, alt_mod_name, ref_path) {
      if(ref_path.substr(0, 3) == '../') {
