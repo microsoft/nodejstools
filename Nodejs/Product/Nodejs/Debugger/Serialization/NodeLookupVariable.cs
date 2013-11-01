@@ -12,11 +12,22 @@
  *
  * ***************************************************************************/
 
+using System;
 using System.Collections.Generic;
 
 namespace Microsoft.NodejsTools.Debugger.Serialization {
     class NodeLookupVariable : INodeVariable {
         public NodeLookupVariable(NodeEvaluationResult parent, JsonValue property, Dictionary<int, JsonValue> references) {
+            if (parent == null) {
+                throw new ArgumentNullException("parent");
+            }
+            if (property == null) {
+                throw new ArgumentNullException("property");
+            }
+            if (references == null) {
+                throw new ArgumentNullException("references");
+            }
+
             Id = property.GetValue<int>("ref");
             JsonValue reference = references[Id];
             Parent = parent;
@@ -26,8 +37,8 @@ namespace Microsoft.NodejsTools.Debugger.Serialization {
             Value = reference.GetValue<string>("value");
             Class = reference.GetValue<string>("className");
             Text = reference.GetValue<string>("text");
-            Attributes = (NodePropertyAttributes)property.GetValue<int>("attributes");
-            Type = (NodePropertyType)property.GetValue<int>("propertyType");
+            Attributes = (NodePropertyAttributes) property.GetValue<int>("attributes");
+            Type = (NodePropertyType) property.GetValue<int>("propertyType");
         }
 
         public int Id { get; private set; }

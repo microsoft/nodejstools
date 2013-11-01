@@ -100,7 +100,7 @@ namespace Microsoft.NodejsTools.Debugger {
             }
         }
 
-        public INodeResponseParser ResponseParser { get; set; }
+        public INodeResponseHandler ResponseHandler { get; set; }
 
         private static Dictionary<string, ExceptionHitTreatment> GetDefaultExceptionTreatments() {
             // Keep exception types in sync with those declared in ProvideDebugExceptionAttribute's in NodePackage.cs
@@ -211,9 +211,9 @@ namespace Microsoft.NodejsTools.Debugger {
         }
 
         private NodeDebugger() {
-            if (ResponseParser == null) {
+            if (ResponseHandler == null) {
                 var evaluationResultFactory = new NodeEvaluationResultFactory();
-                ResponseParser = new NodeResponseParser(evaluationResultFactory);
+                ResponseHandler = new NodeResponseHandler(evaluationResultFactory);
             }
 
             if (Connection == null) {
@@ -928,8 +928,7 @@ namespace Microsoft.NodejsTools.Debugger {
                     if (!running) {
                         var mainThread = MainThread;
                         var jsonValue = new JsonValue(json);
-                        NodeStackFrame[] nodeFrames = ResponseParser.ProcessBacktrace(this, jsonValue);
-                        mainThread.Frames = nodeFrames;
+                        mainThread.Frames = ResponseHandler.ProcessBacktrace(mainThread, jsonValue);
                     }
                     if (followupHandler != null) {
                         followupHandler(running);
@@ -1241,17 +1240,12 @@ namespace Microsoft.NodejsTools.Debugger {
                 json => {
                     // Handle success
                     var jsonValue = new JsonValue(json);
-                    var evaluationResult = ResponseParser.ProcessEvaluate(this, nodeStackFrame, text, jsonValue);
+                    var evaluationResult = ResponseHandler.ProcessEvaluate(nodeStackFrame, text, jsonValue);
                     completion(evaluationResult);
                 },
                 json => {
                     // Handle failure
-                    completion(new NodeEvaluationResult(
-                            this,
-                            (string)json["message"],
-                            text,
-                            nodeStackFrame
-                       ));
+                    completion(new NodeEvaluationResult((string)json["message"],text,nodeStackFrame));
                 }
             );
         }
@@ -1268,7 +1262,7 @@ namespace Microsoft.NodejsTools.Debugger {
                 json => {
                     // Handle success
                     var jsonValue = new JsonValue(json);
-                    var evaluationResults = ResponseParser.ProcessLookup(this, nodeEvaluationResult, jsonValue);
+                    var evaluationResults = ResponseHandler.ProcessLookup(nodeEvaluationResult, jsonValue);
                     completion(evaluationResults.ToArray());
                 }
             );

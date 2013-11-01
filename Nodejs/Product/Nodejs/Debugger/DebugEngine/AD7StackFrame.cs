@@ -30,7 +30,7 @@ namespace Microsoft.NodejsTools.Debugger.DebugEngine {
         private readonly NodeStackFrame _stackFrame;
         private readonly AD7Thread _thread;
         private AD7MemoryAddress _codeContext;
-        private readonly IComparer<string> _comparer = new NaturalStringComparer();
+        private readonly IComparer<string> _comparer = new NaturalSortComparer();
         private AD7DocumentContext _documentContext;
 
         // An array of this frame's parameters

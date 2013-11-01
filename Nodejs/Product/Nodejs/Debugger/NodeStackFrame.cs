@@ -45,24 +45,39 @@ namespace Microsoft.NodejsTools.Debugger {
             get; private set;
         }
 
+        /// <summary>
+        /// Gets a thread which executes stack frame.
+        /// </summary>
         public NodeThread Thread {
             get { return _thread; }
         }
 
+        /// <summary>
+        /// Gets a stack frame line number in the script.
+        /// </summary>
         public int LineNo { get; private set; }
 
+        /// <summary>
+        /// Gets a stack name.
+        /// </summary>
         public string FunctionName {
             get {
                 return _frameName;
             }
         }
 
+        /// <summary>
+        /// Gets a script file name which holds a code segment of the frame.
+        /// </summary>
         public string FileName {
             get {
                 return _module.FileName;
             }
         }
 
+        /// <summary>
+        /// Gets a script which holds a code segment of the frame.
+        /// </summary>
         public NodeModule Module {
             get {
                 return _module;
@@ -76,8 +91,14 @@ namespace Microsoft.NodejsTools.Debugger {
             get; private set;
         }
 
+        /// <summary>
+        /// Gets or sets a local variables of the frame.
+        /// </summary>
         public IList<NodeEvaluationResult> Locals { get; set; }
 
+        /// <summary>
+        /// Gets or sets an arguments of the frame.
+        /// </summary>
         public IList<NodeEvaluationResult> Parameters { get; set; }
 
         /// <summary>

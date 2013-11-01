@@ -12,9 +12,18 @@
  *
  * ***************************************************************************/
 
+using System;
+
 namespace Microsoft.NodejsTools.Debugger.Serialization {
     class NodeBacktraceVariable : INodeVariable {
         public NodeBacktraceVariable(NodeStackFrame stackFrame, JsonValue parameter) {
+            if (stackFrame == null) {
+                throw new ArgumentNullException("stackFrame");
+            }
+            if (parameter == null) {
+                throw new ArgumentNullException("parameter");
+            }
+
             JsonValue value = parameter["value"];
             Id = value.GetValue<int>("ref");
             Parent = null;

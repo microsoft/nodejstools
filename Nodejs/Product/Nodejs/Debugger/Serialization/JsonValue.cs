@@ -14,31 +14,51 @@
 
 using System;
 using System.Collections.Generic;
-using System.Linq;
 
 namespace Microsoft.NodejsTools.Debugger.Serialization {
+    /// <summary>
+    /// Wrapper around json object data.
+    /// </summary>
     class JsonValue {
         private readonly Dictionary<string, object> _json;
 
+        /// <summary>
+        /// Costructs a new instance based on json data.
+        /// </summary>
+        /// <param name="json">JSON data.</param>
         public JsonValue(Dictionary<string, object> json) {
+            if (json == null) {
+                throw new ArgumentNullException("json");
+            }
             _json = json;
         }
 
+        /// <summary>
+        /// Gets an object property value by name.
+        /// </summary>
+        /// <param name="name">Name.</param>
+        /// <returns>Value.</returns>
         public JsonValue this[string name] {
             get {
                 if (!_json.ContainsKey(name)) {
                     return null;
                 }
 
-                object value = _json[name];
+                var value = _json[name] as Dictionary<string, object>;
                 if (value == null) {
                     return null;
                 }
 
-                return new JsonValue((Dictionary<string, object>) value);
+                return new JsonValue(value);
             }
         }
 
+        /// <summary>
+        /// Gets a converted object value by name.
+        /// </summary>
+        /// <typeparam name="T">Type.</typeparam>
+        /// <param name="name">Name.</param>
+        /// <returns>Value</returns>
         public T GetValue<T>(string name) {
             if (!_json.ContainsKey(name)) {
                 return default(T);
@@ -52,18 +72,22 @@ namespace Microsoft.NodejsTools.Debugger.Serialization {
             return (T) Convert.ChangeType(value, typeof (T));
         }
 
-        public IList<JsonValue> GetArray(string name) {
+        /// <summary>
+        /// Gets an array by name.
+        /// </summary>
+        /// <param name="name">Name.</param>
+        /// <returns>Array.</returns>
+        public JsonArray GetArray(string name) {
             if (!_json.ContainsKey(name)) {
-                return new List<JsonValue>();
+                return null;
             }
 
-            object values = _json[name];
+            var values = (object[]) _json[name];
             if (values == null) {
-                return new List<JsonValue>();
+                return null;
             }
 
-            var objects = (object[]) values;
-            return objects.Select(p => new JsonValue((Dictionary<string, object>) p)).ToList();
+            return new JsonArray(values);
         }
     }
 }

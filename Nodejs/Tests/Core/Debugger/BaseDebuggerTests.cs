@@ -12,18 +12,18 @@
  *
  * ***************************************************************************/
 
-using Microsoft.NodejsTools;
-using Microsoft.NodejsTools.Debugger;
-using Microsoft.VisualStudio.TestTools.UnitTesting;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
 using System.Linq;
 using System.Threading;
+using Microsoft.NodejsTools;
+using Microsoft.NodejsTools.Debugger;
+using Microsoft.VisualStudio.TestTools.UnitTesting;
 using TestUtilities;
 
-namespace DebuggerTests {
+namespace NodejsTests.Debugger {
     internal enum NodeVersion {
         NodeVersion_Unknown,
     };
@@ -31,7 +31,7 @@ namespace DebuggerTests {
     public class BaseDebuggerTests {
         internal virtual string DebuggerTestPath {
             get {
-                return TestData.GetPath(@"TestData\DebuggerProject\");
+                return TestUtilities.TestData.GetPath(@"TestData\DebuggerProject\");
             }
         }
 

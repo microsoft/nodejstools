@@ -12,13 +12,13 @@
  *
  * ***************************************************************************/
 
-namespace Microsoft.NodejsTools.Debugger.Serialization {
-    interface INodeEvaluationResultFactory {
-        /// <summary>
-        /// Creates a new <see cref="NodeEvaluationResult" />.
-        /// </summary>
-        /// <param name="variable">Variable provider.</param>
-        /// <returns>Result.</returns>
-        NodeEvaluationResult Create(INodeVariable variable);
+using Microsoft.NodejsTools.Debugger;
+using Microsoft.NodejsTools.Debugger.Serialization;
+
+namespace NodejsTests.Mocks {
+    class MockNodeEvaluationResultFactory : INodeEvaluationResultFactory {
+        public NodeEvaluationResult Create(INodeVariable variable) {
+            return new NodeEvaluationResult(0, null, null, null, null, null, NodeExpressionType.None, null);
+        }
     }
 }

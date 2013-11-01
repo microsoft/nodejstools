@@ -39,12 +39,29 @@
     </Reference>
     <Reference Include="Microsoft.VisualStudio.Shell.Interop.8.0, Version=8.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a" />
     <Reference Include="Microsoft.VisualStudio.Shell.Interop.9.0, Version=9.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a" />
+    <Reference Include="System.Web.Extensions" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="BaseDebuggerTests.cs" />
-    <Compile Include="DebuggerTests.cs" />
+    <Compile Include="Debugger\BaseDebuggerTests.cs" />
+    <Compile Include="Debugger\DebuggerTests.cs" />
+    <Compile Include="Debugger\InfrastructureTests.cs" />
+    <Compile Include="Debugger\Serialization\NodeResponseHandlerTests.cs" />
+    <Compile Include="Debugger\Serialization\PrototypeVariableTests.cs" />
+    <Compile Include="Debugger\Serialization\LookupVariableTests.cs" />
+    <Compile Include="Debugger\Serialization\EvaluationVariableTests.cs" />
+    <Compile Include="Debugger\Serialization\JsonWrapperTests.cs" />
+    <Compile Include="Debugger\Serialization\BacktraceVariableTests.cs" />
+    <Compile Include="Mocks\MockNodeEvaluationResultFactory.cs" />
+    <Compile Include="Mocks\MockNodeVariable.cs" />
+    <Compile Include="Debugger\Serialization\NodeVariablesFactoryTests.cs" />
     <Compile Include="ReplWindowTests.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="Resources.Designer.cs">
+      <AutoGen>True</AutoGen>
+      <DesignTime>True</DesignTime>
+      <DependentUpon>Resources.resx</DependentUpon>
+    </Compile>
+    <Compile Include="TestData.cs" />
     <Compile Include="TestNodejsReplSite.cs" />
   </ItemGroup>
   <ItemGroup>
@@ -73,6 +90,12 @@
     <None Include="$(BuildRoot)\Nodejs\Product\Nodejs\visualstudio_nodejs_repl.js">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
+  </ItemGroup>
+  <ItemGroup>
+    <EmbeddedResource Include="Resources.resx">
+      <Generator>ResXFileCodeGenerator</Generator>
+      <LastGenOutput>Resources.Designer.cs</LastGenOutput>
+    </EmbeddedResource>
   </ItemGroup>
   <Import Project="..\TestProjectAfter.settings" />
 </Project>

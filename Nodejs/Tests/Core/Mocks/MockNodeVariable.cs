@@ -12,10 +12,20 @@
  *
  * ***************************************************************************/
 
-namespace Microsoft.NodejsTools.Debugger.Serialization {
-    interface INodeResponseParser {
-        NodeStackFrame[] ProcessBacktrace(NodeDebugger debugger, JsonValue message);
-        NodeEvaluationResult ProcessEvaluate(NodeDebugger debugger, NodeStackFrame stackFrame, string expression, JsonValue message);
-        NodeEvaluationResult[] ProcessLookup(NodeDebugger debugger, NodeEvaluationResult parent, JsonValue message);
+using Microsoft.NodejsTools.Debugger;
+using Microsoft.NodejsTools.Debugger.Serialization;
+
+namespace NodejsTests.Mocks {
+    class MockNodeVariable : INodeVariable {
+        public int Id { get; set; }
+        public NodeEvaluationResult Parent { get; set; }
+        public NodeStackFrame StackFrame { get; set; }
+        public string Name { get; set; }
+        public string TypeName { get; set; }
+        public string Value { get; set; }
+        public string Class { get; set; }
+        public string Text { get; set; }
+        public NodePropertyAttributes Attributes { get; set; }
+        public NodePropertyType Type { get; set; }
     }
 }

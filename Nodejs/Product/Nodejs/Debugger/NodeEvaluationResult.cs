@@ -13,7 +13,6 @@
  * ***************************************************************************/
 
 using System;
-using System.Diagnostics;
 using System.Text.RegularExpressions;
 using System.Threading;
 
@@ -23,17 +22,14 @@ namespace Microsoft.NodejsTools.Debugger {
     /// </summary>
     class NodeEvaluationResult {
         private readonly NodeStackFrame _frame;
-        private readonly NodeDebugger _process;
-        private readonly int? _handle;
+        private readonly int _handle;
         private readonly Regex _stringLengthExpression = new Regex(@"\.\.\. \(length: ([0-9]+)\)$", RegexOptions.Compiled);
 
         /// <summary>
         /// Creates an evaluation result for an expression which successfully returned a value.
         /// </summary>
-        public NodeEvaluationResult(NodeDebugger process, int? handle, string stringValue, string hexValue, string typeName, string expression, string fullName, NodeExpressionType type,
-            NodeStackFrame frame) {
+        public NodeEvaluationResult(int handle, string stringValue, string hexValue, string typeName, string expression, string fullName, NodeExpressionType type, NodeStackFrame frame) {
             _handle = handle;
-            _process = process;
             _frame = frame;
             Expression = expression;
             StringValue = stringValue;
@@ -46,44 +42,10 @@ namespace Microsoft.NodejsTools.Debugger {
         /// <summary>
         /// Creates an evaluation result for an expression which raised an exception instead of returning a value.
         /// </summary>
-        public NodeEvaluationResult(NodeDebugger process, string exceptionText, string expression, NodeStackFrame frame) {
-            _process = process;
+        public NodeEvaluationResult(string exceptionText, string expression, NodeStackFrame frame) {
             _frame = frame;
             Expression = expression;
             ExceptionText = exceptionText;
-        }
-
-        /// <summary>
-        /// Gets the list of children which this object contains.  The children can be either
-        /// members (x.foo, x.bar) or they can be indexes (x[0], x[1], etc...).  Calling this
-        /// causes the children to be determined by communicating with the debuggee.  These
-        /// objects can then later be evaluated.  The names returned here are in the form of
-        /// "foo" or "0" so they need additional work to append onto this expression.
-        /// 
-        /// Returns null if the object is not expandable.
-        /// </summary>
-        public NodeEvaluationResult[] GetChildren(int timeOut) {
-            if (!Type.HasFlag(NodeExpressionType.Expandable)) {
-                return null;
-            }
-
-            var childrenEnumed = new AutoResetEvent(false);
-            NodeEvaluationResult[] res = null;
-
-            Debug.Assert(Handle.HasValue);
-            _process.EnumChildren(this, children => {
-                res = children;
-                childrenEnumed.Set();
-            });
-
-            while (!_frame.Thread.Process.HasExited && !childrenEnumed.WaitOne(Math.Min(timeOut, 100))) {
-                if (timeOut <= 100) {
-                    break;
-                }
-                timeOut -= 100;
-            }
-
-            return res;
         }
 
         /// <summary>
@@ -133,22 +95,46 @@ namespace Microsoft.NodejsTools.Debugger {
         /// Returns the stack frame in which this expression was evaluated.
         /// </summary>
         public NodeStackFrame Frame {
-            get {
-                return _frame;
-            }
+            get { return _frame; }
         }
 
         /// <summary>
         /// Returns the handle for this evaluation result.
         /// </summary>
-        public int? Handle {
-            get {
-                return _handle;
-            }
+        public int Handle {
+            get { return _handle; }
         }
 
-        public NodeDebugger Process {
-            get { return _process; }
+        /// <summary>
+        /// Gets the list of children which this object contains.  The children can be either
+        /// members (x.foo, x.bar) or they can be indexes (x[0], x[1], etc...).  Calling this
+        /// causes the children to be determined by communicating with the debuggee.  These
+        /// objects can then later be evaluated.  The names returned here are in the form of
+        /// "foo" or "0" so they need additional work to append onto this expression.
+        /// Returns null if the object is not expandable.
+        /// </summary>
+        public NodeEvaluationResult[] GetChildren(int timeOut) {
+            if (!Type.HasFlag(NodeExpressionType.Expandable)) {
+                return null;
+            }
+
+            var childrenEnumed = new AutoResetEvent(false);
+            NodeEvaluationResult[] res = null;
+
+            _frame.Thread.Process.EnumChildren(this, children =>
+            {
+                res = children;
+                childrenEnumed.Set();
+            });
+
+            while (!_frame.Thread.Process.HasExited && !childrenEnumed.WaitOne(Math.Min(timeOut, 100))) {
+                if (timeOut <= 100) {
+                    break;
+                }
+                timeOut -= 100;
+            }
+
+            return res;
         }
 
         private int GetStringLength(string stringValue) {

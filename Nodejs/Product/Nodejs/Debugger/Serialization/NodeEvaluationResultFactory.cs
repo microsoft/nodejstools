@@ -12,15 +12,20 @@
  *
  * ***************************************************************************/
 
+using System;
+
 namespace Microsoft.NodejsTools.Debugger.Serialization {
     class NodeEvaluationResultFactory : INodeEvaluationResultFactory {
         /// <summary>
         /// Creates a new <see cref="NodeEvaluationResult" />.
         /// </summary>
-        /// <param name="debugger"></param>
         /// <param name="variable">Variable provider.</param>
         /// <returns>Result.</returns>
-        public NodeEvaluationResult Create(NodeDebugger debugger, INodeVariable variable) {
+        public NodeEvaluationResult Create(INodeVariable variable) {
+            if (variable == null) {
+                throw new ArgumentNullException("variable");
+            }
+
             int id = variable.Id;
             NodeStackFrame stackFrame = variable.StackFrame;
             NodeEvaluationResult parent = variable.Parent;
@@ -64,7 +69,7 @@ namespace Microsoft.NodejsTools.Debugger.Serialization {
                     break;
 
                 case "function":
-                    stringValue = string.IsNullOrEmpty(variable.Text) ? "{Function}" : variable.Text;
+                    stringValue = string.IsNullOrEmpty(variable.Text) ? string.Format("{{{0}}}", NodeVariableType.Function) : variable.Text;
                     typeName = NodeVariableType.Function;
                     type |= NodeExpressionType.Function | NodeExpressionType.Expandable;
                     break;
@@ -76,7 +81,7 @@ namespace Microsoft.NodejsTools.Debugger.Serialization {
                     break;
 
                 case "object":
-                    stringValue = variable.Class == "Object" ? "{...}" : string.Format("{{{0}}}", variable.Class);
+                    stringValue = variable.Class == NodeVariableType.Object ? "{...}" : string.Format("{{{0}}}", variable.Class);
                     typeName = NodeVariableType.Object;
                     type |= NodeExpressionType.Expandable;
                     break;
@@ -91,21 +96,20 @@ namespace Microsoft.NodejsTools.Debugger.Serialization {
                     break;
 
                 default:
-                    stringValue = variable.Value;
+                    stringValue = string.IsNullOrEmpty(variable.Value) ? variable.Text : variable.Value;
+                    typeName = NodeVariableType.Unknown;
                     break;
             }
 
-            if (variable.Attributes.HasFlag(NodePropertyAttributes.ReadOnly))
-            {
+            if (variable.Attributes.HasFlag(NodePropertyAttributes.ReadOnly)) {
                 type |= NodeExpressionType.ReadOnly;
             }
 
-            if (variable.Attributes.HasFlag(NodePropertyAttributes.DontEnum))
-            {
+            if (variable.Attributes.HasFlag(NodePropertyAttributes.DontEnum)) {
                 type |= NodeExpressionType.Private;
             }
 
-            return new NodeEvaluationResult(debugger, id, stringValue, hexValue, typeName, name, fullName, type, stackFrame);
+            return new NodeEvaluationResult(id, stringValue, hexValue, typeName, name, fullName, type, stackFrame);
         }
 
         private static string GetFullName(NodeEvaluationResult parent, string fullName, ref string name) {

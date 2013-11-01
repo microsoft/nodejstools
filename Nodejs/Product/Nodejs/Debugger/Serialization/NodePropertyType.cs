@@ -13,6 +13,9 @@
  * ***************************************************************************/
 
 namespace Microsoft.NodejsTools.Debugger.Serialization {
+    /// <summary>
+    /// Defines a node property type.
+    /// </summary>
     enum NodePropertyType {
         Normal = 0,
         Field = 1,

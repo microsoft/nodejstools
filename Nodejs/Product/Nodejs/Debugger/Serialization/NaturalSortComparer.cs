@@ -18,9 +18,9 @@ using System.Security;
 
 namespace Microsoft.NodejsTools.Debugger.Serialization {
     /// <summary>
-    /// Perfroms natural string compare.
+    /// Performs natural string compare.
     /// </summary>
-    public sealed class NaturalStringComparer : IComparer<string> {
+    sealed class NaturalSortComparer : IComparer<string> {
         public int Compare(string x, string y) {
             return SafeNativeMethods.StrCmpLogicalW(x, y);
         }

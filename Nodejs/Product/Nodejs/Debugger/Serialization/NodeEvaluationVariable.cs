@@ -12,9 +12,21 @@
  *
  * ***************************************************************************/
 
+using System;
+
 namespace Microsoft.NodejsTools.Debugger.Serialization {
     class NodeEvaluationVariable : INodeVariable {
         public NodeEvaluationVariable(NodeStackFrame stackFrame, string name, JsonValue message) {
+            if (stackFrame == null) {
+                throw new ArgumentNullException("stackFrame");
+            }
+            if (name == null) {
+                throw new ArgumentNullException("name");
+            }
+            if (message == null) {
+                throw new ArgumentNullException("message");
+            }
+
             Id = message.GetValue<int>("handle");
             Parent = null;
             StackFrame = stackFrame;

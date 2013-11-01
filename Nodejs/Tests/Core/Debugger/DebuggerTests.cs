@@ -13,20 +13,21 @@
  * ***************************************************************************/
 
 //using EnvDTE90;
-using Microsoft.NodejsTools.Debugger;
+
 //using Microsoft.NodeTools.Parsing;
 //using Microsoft.TC.TestHostAdapters;
-using Microsoft.VisualStudio.TestTools.UnitTesting;
 using System;
 using System.Collections.Generic;
 using System.IO;
-using System.Net;
 using System.Linq;
+using System.Net;
 using System.Threading;
+using Microsoft.NodejsTools.Debugger;
+using Microsoft.VisualStudio.TestTools.UnitTesting;
 using TestUtilities;
 using TestUtilities.Nodejs;
 
-namespace DebuggerTests {
+namespace NodejsTests.Debugger {
     [TestClass]
     public class DebuggerTests : BaseDebuggerTests {
         [ClassInitialize]
