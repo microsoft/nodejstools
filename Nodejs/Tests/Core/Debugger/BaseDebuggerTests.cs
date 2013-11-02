@@ -230,10 +230,10 @@ namespace NodejsTests.Debugger {
                                 }
                                 Assert.IsTrue(match > -1);
                                 if (expectedValues != null) {
-                                    Assert.AreEqual(expectedValues[match], evaluationResult.StringRepr);
+                                    Assert.AreEqual(expectedValues[match], evaluationResult.StringValue);
                                 }
                                 if (expectedHexValues != null) {
-                                    Assert.AreEqual(expectedHexValues[match], evaluationResult.HexRepr);
+                                    Assert.AreEqual(expectedHexValues[match], evaluationResult.HexValue);
                                 }
                             }
                         }
