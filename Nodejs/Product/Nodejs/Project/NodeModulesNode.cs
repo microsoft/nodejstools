@@ -9,6 +9,7 @@ using System.Windows.Documents;
 using System.Windows.Media.Animation;
 using Microsoft.NodejsTools.Npm;
 using Microsoft.VisualStudio;
+using Microsoft.VisualStudio.Shell.Interop;
 using Microsoft.VisualStudioTools.Project;
 
 namespace Microsoft.NodejsTools.Project
@@ -158,6 +159,7 @@ namespace Microsoft.NodejsTools.Project
                 var child = new DependencyNode(m_ProjectNode, parent as DependencyNode, package);
                 parent.AddChild(child);
                 ReloadHierarchy(child, package.Modules);
+                child.ExpandItem(EXPANDFLAGS.EXPF_CollapseFolder);
             }
         }
 
