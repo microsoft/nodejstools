@@ -10,12 +10,14 @@ namespace Microsoft.NodejsTools.Npm.SPI
     internal class RootPackage : IRootPackage
     {
 
-        public RootPackage(string fullPathToRootDirectory)
+        public RootPackage(
+            string fullPathToRootDirectory,
+            bool showMissingDevOptionalSubPackages)
         {
             Path = fullPathToRootDirectory;
             PackageJson = PackageJsonFactory.Create(new DirectoryPackageJsonSource(fullPathToRootDirectory));
 
-            Modules = new NodeModules(this);
+            Modules = new NodeModules(this, showMissingDevOptionalSubPackages);
         }
 
         public IPackageJson PackageJson { get; private set; }

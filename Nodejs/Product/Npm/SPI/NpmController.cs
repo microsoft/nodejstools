@@ -11,13 +11,18 @@ namespace Microsoft.NodejsTools.Npm.SPI
 {
     internal class NpmController : INpmController
     {
-        private string m_FullPathToRootPackageDirectory;
-        private string m_PathToNpm;
+        private string _fullPathToRootPackageDirectory;
+        private bool _showMissingDevOptionalSubPackages;
+        private string _pathToNpm;
 
-        public NpmController(string fullPathToRootPackageDirectory, string pathToNpm = null)
+        public NpmController(
+            string fullPathToRootPackageDirectory,
+            bool showMissingDevOptionalSubPackages = false,
+            string pathToNpm = null)
         {
-            m_FullPathToRootPackageDirectory = fullPathToRootPackageDirectory;
-            m_PathToNpm = pathToNpm;
+            _fullPathToRootPackageDirectory = fullPathToRootPackageDirectory;
+            _showMissingDevOptionalSubPackages = showMissingDevOptionalSubPackages;
+            _pathToNpm = pathToNpm;
             Refresh();
         }
 
@@ -46,52 +51,38 @@ namespace Microsoft.NodejsTools.Npm.SPI
         public void Refresh()
         {
             OnStartingRefresh();
-            RootPackage = RootPackageFactory.Create(m_FullPathToRootPackageDirectory);
+            RootPackage = RootPackageFactory.Create(
+                _fullPathToRootPackageDirectory,
+                _showMissingDevOptionalSubPackages);
             OnFinishedRefresh();
         }
 
         public IRootPackage RootPackage { get; private set; }
 
-        //private void ExecuteNpmAndRefresh(string arguments)
-        //{
-            
-
-        //    Refresh();
-        //}
-
         public async Task<bool> InstallPackageByVersionAsync(string packageName, string versionRange, DependencyType type)
         {
             var command = new NpmInstallCommand(
-                m_FullPathToRootPackageDirectory,
+                _fullPathToRootPackageDirectory,
                 packageName,
                 versionRange,
                 type,
-                m_PathToNpm);
+                _pathToNpm);
 
             bool retVal = await command.ExecuteAsync();
             Refresh();
             return retVal;
-            ////  TODO: Method should be async?
-            //ExecuteNpmAndRefresh(string.Format(
-            //    "install {0} \"{1}\" --{2}",
-            //    packageName,
-            //    versionRange,
-            //    type == DependencyType.Standard ? "save" : (type == DependencyType.Development ? "save-dev" : "save-optional")));
         }
 
         public async Task<bool> UninstallPackageAsync(string packageName)
         {
             var command = new NpmUninstallCommand(
-                m_FullPathToRootPackageDirectory,
+                _fullPathToRootPackageDirectory,
                 packageName,
-                m_PathToNpm);
+                _pathToNpm);
 
             bool retVal = await command.ExecuteAsync();
             Refresh();
             return retVal;
-            ////  TODO: Method should be async?
-            //ExecuteNpmAndRefresh(string.Format(
-            //    "uninstall {0) --save"));
         }
     }
 }

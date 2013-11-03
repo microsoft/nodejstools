@@ -9,9 +9,13 @@ namespace Microsoft.NodejsTools.Npm
 {
     public class NpmControllerFactory
     {
-        public static INpmController Create(string fullPathToRootPackageDirectory)
+        public static INpmController Create(
+            string fullPathToRootPackageDirectory,
+            bool showMissingDevOptionalSubPackages = false)
         {
-            return new NpmController(fullPathToRootPackageDirectory);
+            return new NpmController(
+                fullPathToRootPackageDirectory,
+                showMissingDevOptionalSubPackages);
         }
     }
 }

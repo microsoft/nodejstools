@@ -11,7 +11,7 @@ namespace Microsoft.NodejsTools.Npm.SPI
         private readonly List<IPackage> m_PackagesSorted = new List<IPackage>();
         private readonly IDictionary<string, IPackage> m_PackagesByName = new Dictionary<string, IPackage>(); 
 
-        public NodeModules(IRootPackage parent)
+        public NodeModules(IRootPackage parent, bool showMissingDevOptionalSubPackages)
         {
             var modulesBase = Path.Combine(parent.Path, "node_modules");
             if (Directory.Exists(modulesBase))
@@ -21,7 +21,7 @@ namespace Microsoft.NodejsTools.Npm.SPI
                 {
                     if (! moduleDir.EndsWith(bin))
                     {
-                        AddModule(new Package(parent, moduleDir));
+                        AddModule(new Package(parent, moduleDir, showMissingDevOptionalSubPackages));
                     }
                 }
             }
@@ -33,7 +33,11 @@ namespace Microsoft.NodejsTools.Npm.SPI
                 {
                     if (! Contains(dependency.Name))
                     {
-                        AddModule(new Package(parent, Path.Combine(modulesBase, dependency.Name)));
+                        var module = new Package(parent, Path.Combine(modulesBase, dependency.Name), showMissingDevOptionalSubPackages);
+                        if (parent as IPackage == null || !module.IsMissing || showMissingDevOptionalSubPackages)
+                        {
+                            AddModule(module);
+                        }
                     }
                 }
             }

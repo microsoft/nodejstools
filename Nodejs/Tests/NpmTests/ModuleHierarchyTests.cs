@@ -172,7 +172,7 @@ namespace NpmTests
             };
 
             modules = module.Modules;
-            Assert.AreEqual(module.PackageJson.AllDependencies.Count, modules.Count, "Sub-module count mismatch.");
+            Assert.AreEqual(module.PackageJson.Dependencies.Count, modules.Count, "Sub-module count mismatch.");
             foreach (var name in expectedModules)
             {
                 var current = modules[name];

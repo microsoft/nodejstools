@@ -9,9 +9,13 @@ namespace Microsoft.NodejsTools.Npm
 {
     public static class RootPackageFactory
     {
-        public static IRootPackage Create(string fullPathToRootDirectory)
+        public static IRootPackage Create(
+            string fullPathToRootDirectory,
+            bool showMissingDevOptionalSubPackages = false)
         {
-            return new RootPackage(fullPathToRootDirectory);
+            return new RootPackage(
+                fullPathToRootDirectory,
+                showMissingDevOptionalSubPackages);
         }
     }
 }

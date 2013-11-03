@@ -12,7 +12,11 @@ namespace Microsoft.NodejsTools.Npm.SPI
 
         private IRootPackage m_Parent;
 
-        public Package(IRootPackage parent, string fullPathToRootDirectory) : base(fullPathToRootDirectory)
+        public Package(
+            IRootPackage parent,
+            string fullPathToRootDirectory,
+            bool showMissingDevOptionalSubPackages)
+            : base(fullPathToRootDirectory, showMissingDevOptionalSubPackages)
         {
             m_Parent = parent;
         }
