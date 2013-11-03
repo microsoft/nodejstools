@@ -435,6 +435,7 @@ function require(module) {
             if ( null == ModulesNode )
             {
                 ModulesNode = new NodeModulesNode( this );
+                AddChild(ModulesNode);
             }
         }
 

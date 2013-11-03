@@ -20,7 +20,7 @@ namespace Microsoft.NodejsTools.Project
         public DependencyNode(
             NodejsProjectNode root,
             DependencyNode parent,
-            IPackage package )
+            IPackage package ) : base(root)
         {
             _projectNode = root;
             _parent = parent;

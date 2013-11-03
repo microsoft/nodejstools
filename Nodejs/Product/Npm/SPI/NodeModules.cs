@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System.Collections;
+using System.Collections.Generic;
 using System.IO;
 using System.Reflection;
 
@@ -7,7 +8,7 @@ namespace Microsoft.NodejsTools.Npm.SPI
     internal class NodeModules : INodeModules
     {
 
-        private readonly IList<IPackage> m_PackagesSorted = new List<IPackage>();
+        private readonly List<IPackage> m_PackagesSorted = new List<IPackage>();
         private readonly IDictionary<string, IPackage> m_PackagesByName = new Dictionary<string, IPackage>(); 
 
         public NodeModules(IRootPackage parent)
@@ -36,6 +37,8 @@ namespace Microsoft.NodejsTools.Npm.SPI
                     }
                 }
             }
+
+            m_PackagesSorted.Sort(new PackageComparer());
         }
 
         private void AddModule(IPackage package)
@@ -64,6 +67,16 @@ namespace Microsoft.NodejsTools.Npm.SPI
         public bool Contains(string name)
         {
             return this[name] != null;
+        }
+
+        public IEnumerator<IPackage> GetEnumerator()
+        {
+            return m_PackagesSorted.GetEnumerator();
+        }
+
+        IEnumerator IEnumerable.GetEnumerator()
+        {
+            return GetEnumerator();
         }
     }
 }

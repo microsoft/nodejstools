@@ -153,7 +153,14 @@ namespace Microsoft.NodejsTools.Project
 
         private void ReloadHierarchy( HierarchyNode parent, INodeModules modules )
         {
-            // TODO
+//            uint id = 0;
+            foreach (IPackage package in modules)
+            {
+                var child = new DependencyNode(m_ProjectNode, parent as DependencyNode, package);
+//                child.ID = id++;
+                parent.AddChild(child);
+                ReloadHierarchy(child, package.Modules);
+            }
         }
 
         #endregion
