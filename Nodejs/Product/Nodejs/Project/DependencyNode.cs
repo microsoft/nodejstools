@@ -109,7 +109,7 @@ namespace Microsoft.NodejsTools.Project
             }
             else
             {
-                imageIndex = Package.IsListedInParentPackageJson
+                imageIndex = ! Package.IsListedInParentPackageJson
                     ? _projectNode.ImageIndexDependencyNotListed
                     : ( Package.IsDevDependency
                         ? _projectNode.ImageIndexDependencyDev
@@ -117,7 +117,7 @@ namespace Microsoft.NodejsTools.Project
                             ? _projectNode.ImageIndexDependnecyOptional
                             : ( Package.IsBundledDependency
                                 ? _projectNode.ImageIndexDependencyBundled
-                                : _projectNode.ImageIndexDependencyMissing ) ) );
+                                : _projectNode.ImageIndexDependency ) ) );
             }
 
             return _projectNode.ImageHandler.GetIconHandle( imageIndex );
