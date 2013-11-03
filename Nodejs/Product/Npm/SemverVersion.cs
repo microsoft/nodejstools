@@ -140,5 +140,30 @@ namespace Microsoft.NodejsTools.Npm
         {
             return ToString().GetHashCode();
         }
+
+        public override bool Equals(object obj)
+        {
+            if (!(obj is SemverVersion))
+            {
+                return false;
+            }
+
+            var other = (SemverVersion) obj;
+            return Major == other.Major
+                   && Minor == other.Minor
+                   && Patch == other.Patch
+                   && PreReleaseVersion == PreReleaseVersion
+                   && BuildMetadata == BuildMetadata;
+        }
+
+        public static bool operator ==(SemverVersion v1, SemverVersion v2)
+        {
+            return v1.Equals(v2);
+        }
+
+        public static bool operator !=(SemverVersion v1, SemverVersion v2)
+        {
+            return ! (v1 == v2);
+        }
     }
 }

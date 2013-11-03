@@ -59,7 +59,7 @@ namespace Microsoft.NodejsTools.Project
             ExcludeNodeFromScc = true;
         }
 
-        public IPackage Package { get; private set; }
+        public IPackage Package { get; internal set; }
 
         #region HierarchyNode implementation
 

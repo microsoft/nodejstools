@@ -138,28 +138,77 @@ namespace Microsoft.NodejsTools.Project
 
         private void ReloadHierarchy()
         {
-            foreach ( var child in new List< HierarchyNode >( AllChildren ) )
-            {
-                RemoveChild(child);
-            }
+            INpmController controller;
 
             lock ( m_Lock )
             {
-                if ( null != m_NpmController )
-                {
-                    ReloadHierarchy(this, m_NpmController.RootPackage.Modules);
-                }
+                controller = m_NpmController;
+            }
+
+            if (null != controller)
+            {
+                ReloadHierarchy(this, controller.RootPackage.Modules);
             }
         }
 
         private void ReloadHierarchy( HierarchyNode parent, INodeModules modules )
         {
-            foreach (IPackage package in modules)
+            //  We're going to reuse nodes for which matching modules exist in the new set.
+            //  The reason for this is that we want to preserve the expansion state of the
+            //  hierarchy. If we just bin everything off and recreate it all from scratch
+            //  it'll all be in the collapsed state, which will be annoying for users who
+            //  have drilled down into the hierarchy
+            var recycle = new Dictionary<string, DependencyNode>();
+            var remove = new List<HierarchyNode>();
+            for (var current = parent.FirstChild; null != current; current = current.NextSibling)
             {
-                var child = new DependencyNode(m_ProjectNode, parent as DependencyNode, package);
+                var dep = current as DependencyNode;
+                if (null == dep)
+                {
+                    remove.Add(current);
+                    continue;
+                }
+
+                if (modules.Any(module =>
+                    module.Name == dep.Package.Name
+                    && module.Version == dep.Package.Version
+                    && module.IsBundledDependency == dep.Package.IsBundledDependency
+                    && module.IsDevDependency == dep.Package.IsDevDependency
+                    && module.IsListedInParentPackageJson == dep.Package.IsListedInParentPackageJson
+                    && module.IsMissing == dep.Package.IsMissing
+                    && module.IsOptionalDependency == dep.Package.IsOptionalDependency))
+                {
+                    recycle[dep.Package.Name] = dep;
+                }
+                else
+                {
+                    remove.Add(current);
+                }
+            }
+
+            foreach (var obsolete in remove)
+            {
+                parent.RemoveChild(obsolete);
+            }
+
+            foreach (var package in modules)
+            {
+                DependencyNode child;
+                if (recycle.ContainsKey(package.Name))
+                {
+                    child = recycle[package.Name];
+                    child.Package = package;
+                }
+                else
+                {
+                    child = new DependencyNode(m_ProjectNode, parent as DependencyNode, package);    
+                }
                 parent.AddChild(child);
                 ReloadHierarchy(child, package.Modules);
-                child.ExpandItem(EXPANDFLAGS.EXPF_CollapseFolder);
+                if (!recycle.ContainsKey(package.Name))
+                {
+                    child.ExpandItem(EXPANDFLAGS.EXPF_CollapseFolder);
+                }
             }
         }
 
