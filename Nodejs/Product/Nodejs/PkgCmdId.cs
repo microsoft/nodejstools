@@ -24,5 +24,7 @@ namespace Microsoft.NodejsTools {
         public const int cmdidOpenRemoteDebugProxyFolder    = 0x202;
         public const int cmdidSetAsNodejsStartupFile        = 0x203;
         public const int cmdidSurveyNews                    = 0x204;
+
+        public const uint menuIdNPM = 0x1000;
     }
 }

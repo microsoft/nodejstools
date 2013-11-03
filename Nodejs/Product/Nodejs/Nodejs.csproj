@@ -202,6 +202,8 @@
     </Compile>
     <Compile Include="Options\SurveyNewsPolicy.cs" />
     <Compile Include="Project\Attributes.cs" />
+    <Compile Include="Project\DependencyNode.cs" />
+    <Compile Include="Project\NodeModulesNode.cs" />
     <Compile Include="Project\NodejsFileNode.cs" />
     <Compile Include="Project\NodejsGeneralPropertyPageControl.cs">
       <SubType>UserControl</SubType>
@@ -335,6 +337,16 @@
       <IncludeInVSIX>true</IncludeInVSIX>
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
+    <EmbeddedResource Include="Resources\DependencyBundledMissing_16.png" />
+    <EmbeddedResource Include="Resources\DependencyBundled_16.png" />
+    <EmbeddedResource Include="Resources\DependencyDevMissing_16.png" />
+    <EmbeddedResource Include="Resources\DependencyDev_16.png" />
+    <EmbeddedResource Include="Resources\DependencyExtraneousBundled_16.png" />
+    <EmbeddedResource Include="Resources\DependencyExtraneous_16.png" />
+    <EmbeddedResource Include="Resources\DependencyMissing_16.png" />
+    <EmbeddedResource Include="Resources\DependencyOptionalMissing_16.png" />
+    <EmbeddedResource Include="Resources\DependencyOptional_16.png" />
+    <EmbeddedResource Include="Resources\Dependency_16.png" />
     <Content Include="VSTemplateStore.pkgdef">
       <IncludeInVSIX>true</IncludeInVSIX>
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
@@ -492,6 +504,10 @@
     <ProjectReference Include="..\InteractiveWindow\InteractiveWindow.csproj">
       <Project>{24a3887f-da50-4989-8d6c-4a5b04d5d457}</Project>
       <Name>InteractiveWindow</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\Npm\Npm.csproj">
+      <Project>{e5ef4b0a-ab41-4b98-8fa8-98d6348003a8}</Project>
+      <Name>Npm</Name>
     </ProjectReference>
     <ProjectReference Include="..\ProjectWizard\ProjectWizard.csproj">
       <Project>{dbc73df7-1b4c-48be-8b48-715297487e7a}</Project>
