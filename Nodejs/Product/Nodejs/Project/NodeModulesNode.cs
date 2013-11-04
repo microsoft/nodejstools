@@ -189,11 +189,13 @@ namespace Microsoft.NodejsTools.Project
             foreach (var obsolete in remove)
             {
                 parent.RemoveChild(obsolete);
+                ProjectMgr.OnItemDeleted(obsolete);
             }
 
             foreach (var package in modules)
             {
                 DependencyNode child;
+
                 if (recycle.ContainsKey(package.Name))
                 {
                     child = recycle[package.Name];
@@ -201,9 +203,10 @@ namespace Microsoft.NodejsTools.Project
                 }
                 else
                 {
-                    child = new DependencyNode(m_ProjectNode, parent as DependencyNode, package);    
+                    child = new DependencyNode(m_ProjectNode, parent as DependencyNode, package);
+                    parent.AddChild(child);
                 }
-                parent.AddChild(child);
+
                 ReloadHierarchy(child, package.Modules);
                 if (!recycle.ContainsKey(package.Name))
                 {
