@@ -1037,6 +1037,7 @@ namespace Microsoft.VisualStudioTools.Project {
                             // deleting a show all files item, remove the node.
                             _project.OnItemDeleted(child);
                             child.Parent.RemoveChild(child);
+                            child.Close();
                         } else {
                             Debug.Assert(!child.IsNonMemberItem);
                             // deleting an item in the project, fix the icon, also

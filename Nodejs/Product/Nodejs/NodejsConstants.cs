@@ -37,6 +37,9 @@ namespace Microsoft.NodejsTools {
 
         public const string BaseRegistryKey = "NodejsTools";
 
+        public const string NodejsHiddenUserModule = "nodejs_tools_for_visual_studio_hidden_usermodule_";
+        public const string NodejsHiddenUserModuleInstance = "nodejs_tools_for_visual_studio_hidden_module_instance_";
+
         [Export, Name(Nodejs), BaseDefinition("text")]
         internal static ContentTypeDefinition ContentTypeDefinition = null;
 

@@ -240,8 +240,8 @@ namespace Microsoft.NodejsTools.Intellisense {
 
                 FolderNode folder = n as FolderNode;
                 if (folder != null) {
-                    var package = folder.FindImmediateChildByName("package.json");
-                    if (package != null) {
+                    if (folder.FindImmediateChildByName(NodejsConstants.PackageJsonFile) != null || 
+                        folder.FindImmediateChildByName(NodejsConstants.DefaultPackageMainFile) != null) {
                         projectCompletions.Add(
                             MakeCompletion(
                                 nodeProj,
@@ -280,7 +280,7 @@ namespace Microsoft.NodejsTools.Intellisense {
         /// </summary>
         private void GetPeerAndChildModules(NodejsProjectNode nodeProj, HierarchyNode node, bool? doubleQuote, List<Completion> projectCompletions) {
             var folder = node.Parent;
-            foreach (var child in EnumCodeFilesExcludingNodeModules(folder)) {
+            foreach (HierarchyNode child in EnumCodeFilesExcludingNodeModules(folder)) {
                 if (child == node) {
                     // you can require yourself, but we don't show the completion
                     continue;
@@ -300,7 +300,7 @@ namespace Microsoft.NodejsTools.Intellisense {
         /// <summary>
         /// Enumerates the available code files excluding node modules whih we handle specially.
         /// </summary>
-        internal IEnumerable<NodejsFileNode> EnumCodeFilesExcludingNodeModules(HierarchyNode node) {
+        internal IEnumerable<HierarchyNode> EnumCodeFilesExcludingNodeModules(HierarchyNode node) {
             for (HierarchyNode n = node.FirstChild; n != null; n = n.NextSibling) {
                 var fileNode = n as NodejsFileNode;
                 if (fileNode != null) {
@@ -313,8 +313,13 @@ namespace Microsoft.NodejsTools.Intellisense {
                 if (folder != null) {
                     var folderName = Path.GetFileName(CommonUtils.TrimEndSeparator(folder.Url));
                     if (!folderName.Equals(NodejsConstants.NodeModulesFolder, StringComparison.OrdinalIgnoreCase)) {
-                        foreach (var childNode in EnumCodeFilesExcludingNodeModules(n)) {
-                            yield return childNode;
+                        if (folder.FindImmediateChildByName(NodejsConstants.PackageJsonFile) != null ||
+                            folder.FindImmediateChildByName(NodejsConstants.DefaultPackageMainFile) != null) {
+                            yield return folder;
+                        } else {
+                            foreach (var childNode in EnumCodeFilesExcludingNodeModules(n)) {
+                                yield return childNode;
+                            }
                         }
                     }
                 }

@@ -15,6 +15,7 @@
 using System;
 using System.Diagnostics;
 using System.IO;
+using System.Text;
 using Microsoft.VisualStudio;
 using Microsoft.VisualStudioTools;
 using Microsoft.VisualStudioTools.Project;
@@ -22,22 +23,52 @@ using Microsoft.VisualStudioTools.Project;
 namespace Microsoft.NodejsTools.Project {
     class NodejsFileNode : CommonFileNode {
         private FileSystemWatcher _watcher;
-        public string _currentText;
+        private string _currentText;
+        internal readonly string _tempFilePath;
+        internal int _fileId;
 
         public NodejsFileNode(NodejsProjectNode root, ProjectElement e)
             : base(root, e) {
             CreateWatcher(Url);
+            _tempFilePath = NodejsProjectNode.GetReferenceFilePath();
             _currentText = "";
+            _fileId = root._currentFileCounter++;
             if (File.Exists(Url)) { // avoid the exception if we can
                 try {
                     _currentText = File.ReadAllText(Url);
+                    GenerateReferenceFile();
                 } catch {
                 }
+            }
 
+            root._nodeFiles.Add(this);
+        }
+
+        internal string MangledModuleFunctionName {
+            get {
+                return NodejsConstants.NodejsHiddenUserModule + _fileId;
             }
-            lock (root._nodeFiles) {
-                root._nodeFiles.Add(this);
-            }
+        }
+
+        private void GenerateReferenceFile() {
+            // nodejs_tools_for_visual_studio_hidden_
+            StringBuilder code = new StringBuilder();
+            code.Append(
+                NodejsProjectionBuffer.GetNodeFunctionWrapperHeader(
+                    MangledModuleFunctionName,
+                    Url
+                )
+            );
+            // publish it at the start for recursive modules, may change later if user 
+            // does module.exports = .... in which case we will republish at the end.
+            code.AppendFormat(NodejsConstants.NodejsHiddenUserModuleInstance + "{0} = module.exports;", _fileId);
+            code.AppendLine();
+            code.Append(_currentText);
+            code.Append(NodejsProjectionBuffer.TrailingText);
+            code.AppendLine();
+            code.AppendFormat(NodejsConstants.NodejsHiddenUserModuleInstance + "{0} = {1}();", _fileId, MangledModuleFunctionName);
+            code.AppendLine();
+            File.WriteAllText(_tempFilePath, code.ToString());
         }
 
         internal override int ExecCommandOnNode(Guid guidCmdGroup, uint cmd, uint nCmdexecopt, IntPtr pvaIn, IntPtr pvaOut) {
@@ -136,7 +167,9 @@ namespace Microsoft.NodejsTools.Project {
                     System.Threading.Thread.Sleep(250);
                 }
             }
-            ((NodejsProjectNode)this.ProjectMgr).UpdateReferenceFile();
+            _fileId = ProjectMgr._currentFileCounter++;
+            GenerateReferenceFile();
+            ProjectMgr.UpdateReferenceFile(this);
         }
 
         public override void Remove(bool removeFromStorage) {
@@ -149,8 +182,12 @@ namespace Microsoft.NodejsTools.Project {
             
             CloseWatcher();
 
-            lock (((NodejsProjectNode)ProjectMgr)._nodeFiles) {
-                ((NodejsProjectNode)ProjectMgr)._nodeFiles.Remove(this);
+            ((NodejsProjectNode)ProjectMgr)._nodeFiles.Remove(this);
+
+            try {
+                File.Delete(_tempFilePath);
+            } catch (IOException) {
+            } catch (UnauthorizedAccessException) {
             }
         }
     }

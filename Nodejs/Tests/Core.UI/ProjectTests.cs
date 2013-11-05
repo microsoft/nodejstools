@@ -183,6 +183,7 @@ http.createServer(function (req, res) {
                 new { File="server.js", Line = 42, Type = "recursive.", Expected = "recursive1" },
                 new { File="server.js", Line = 42, Type = "recursive.", Expected = "recursive2" },
                 new { File="server.js", Line = 48, Type = "nested.", Expected = "__filename" },
+                new { File="server.js", Line = 54, Type = "indexfolder.", Expected = "indexfolder" },
 
                 new { File="node_modules\\mymod.js", Line = 5, Type = "dup.", Expected = "node_modules_dup" },
                 new { File="node_modules\\mymod.js", Line = 8, Type = "dup0.", Expected = "node_modules_dup" },
@@ -208,11 +209,11 @@ http.createServer(function (req, res) {
             Window window;
             EditorWindow openFile = null;
             using (var app = new VisualStudioApp(VsIdeTestHostContext.Dte)) {
-                app.OpenSolutionExplorer();
 
                 foreach (var testCase in testCases) {
                     if (testCase.File != curFile) {
                         openFile = OpenProjectItem(testCase.File, out window, @"TestData\RequireTestApp\RequireTestApp.sln");
+                        app.OpenSolutionExplorer();
                         app.SolutionExplorerTreeView.WaitForItem("Solution 'RequireTestApp' (1 project)", "RequireTestApp", "References");
                         text = openFile.Text;
                         curFile = testCase.File;
@@ -558,6 +559,8 @@ sd.StringDecoder
             Assert.IsNotNull(item);
 
             using (var app = new VisualStudioApp(VsIdeTestHostContext.Dte)) {
+                app.SuppressCloseAllOnDispose();
+
                 window = item.Open();
                 window.Activate();
                 return app.GetDocument(item.Document.FullName);
