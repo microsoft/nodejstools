@@ -108,4 +108,10 @@ Backup*/
 UpgradeLog*.XML
 
 *.DotSettings
+
 Binaries/
+VSPackage.xform.resx
+/Nodejs/Product/Nodejs/ProjectTemplates/WebAzureExpressApp/WebAzureExpressApp.vstemplate
+/Nodejs/Product/Nodejs/ProjectTemplates/WebAzureNodejsApp/WebAzureNodejsApp.vstemplate
+/Nodejs/Product/Nodejs/ProjectTemplates/WebExpressApp/WebExpressApp.vstemplate
+/Nodejs/Product/Nodejs/ProjectTemplates/WebNodejsApp/WebNodejsApp.vstemplate

@@ -12,10 +12,10 @@
  *
  * ***************************************************************************/
 
-using System;
 using System.Collections.Generic;
 using System.Globalization;
 using System.Linq;
+using Microsoft.VisualStudioTools.Project;
 
 namespace Microsoft.NodejsTools.Debugger.Serialization {
     class NodeResponseHandler : INodeResponseHandler {
@@ -26,9 +26,7 @@ namespace Microsoft.NodejsTools.Debugger.Serialization {
         /// </summary>
         /// <param name="evaluationResultFactory">Evaluation result factory.</param>
         public NodeResponseHandler(INodeEvaluationResultFactory evaluationResultFactory) {
-            if (evaluationResultFactory == null) {
-                throw new ArgumentNullException("evaluationResultFactory");
-            }
+            Utilities.ArgumentNotNull("evaluationResultFactory", evaluationResultFactory);
 
             _evaluationResultFactory = evaluationResultFactory;
         }
@@ -40,13 +38,8 @@ namespace Microsoft.NodejsTools.Debugger.Serialization {
         /// <param name="message">Message.</param>
         /// <returns>Array of stack frames.</returns>
         public NodeStackFrame[] ProcessBacktrace(NodeThread thread, JsonValue message) {
-            if (thread == null)
-            {
-                throw new ArgumentNullException("thread");
-            }
-            if (message == null) {
-                throw new ArgumentNullException("message");
-            }
+            Utilities.ArgumentNotNull("thread", thread);
+            Utilities.ArgumentNotNull("message", message);
 
             // Extract scripts
             JsonArray refs = message.GetArray("refs");
@@ -56,7 +49,7 @@ namespace Microsoft.NodejsTools.Debugger.Serialization {
             JsonValue body = message["body"];
             JsonArray frames = body.GetArray("frames");
             if (frames == null) {
-                return new NodeStackFrame[] {};
+                return new NodeStackFrame[] { };
             }
 
             var stackFrames = new List<NodeStackFrame>(frames.Count);
@@ -97,12 +90,8 @@ namespace Microsoft.NodejsTools.Debugger.Serialization {
         /// <param name="message">Message.</param>
         /// <returns>Array of evaluation results.</returns>
         public NodeEvaluationResult[] ProcessLookup(NodeEvaluationResult parent, JsonValue message) {
-            if (parent == null) {
-                throw new ArgumentNullException("parent");
-            }
-            if (message == null) {
-                throw new ArgumentNullException("message");
-            }
+            Utilities.ArgumentNotNull("parent", parent);
+            Utilities.ArgumentNotNull("message", message);
 
             // Retrieve references
             JsonArray refs = message.GetArray("refs");
@@ -148,15 +137,9 @@ namespace Microsoft.NodejsTools.Debugger.Serialization {
         /// <param name="message">Message.</param>
         /// <returns>Evaluation result.</returns>
         public NodeEvaluationResult ProcessEvaluate(NodeStackFrame stackFrame, string expression, JsonValue message) {
-            if (stackFrame == null) {
-                throw new ArgumentNullException("stackFrame");
-            }
-            if (expression == null) {
-                throw new ArgumentNullException("expression");
-            }
-            if (message == null) {
-                throw new ArgumentNullException("message");
-            }
+            Utilities.ArgumentNotNull("stackFrame", stackFrame);
+            Utilities.ArgumentNotNull("expression", expression);
+            Utilities.ArgumentNotNull("message", message);
 
             JsonValue body = message["body"];
             var variableProvider = new NodeEvaluationVariable(stackFrame, expression, body);

@@ -14,6 +14,7 @@
 
 using System;
 using System.Collections.Generic;
+using Microsoft.VisualStudioTools.Project;
 
 namespace Microsoft.NodejsTools.Debugger.Serialization {
     /// <summary>
@@ -27,9 +28,7 @@ namespace Microsoft.NodejsTools.Debugger.Serialization {
         /// </summary>
         /// <param name="data">JSON data.</param>
         public JsonArray(object[] data) {
-            if (data == null) {
-                throw new ArgumentNullException("data");
-            }
+            Utilities.ArgumentNotNull("data", data);
 
             _data = data;
         }
@@ -79,7 +78,7 @@ namespace Microsoft.NodejsTools.Debugger.Serialization {
                 return default(T);
             }
 
-            return (T) Convert.ChangeType(value, typeof (T));
+            return (T)Convert.ChangeType(value, typeof (T));
         }
 
         /// <summary>

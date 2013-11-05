@@ -13,6 +13,7 @@
  * ***************************************************************************/
 
 using System;
+using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Net;
@@ -27,7 +28,7 @@ namespace Microsoft.NodejsTools.Debugger {
     class NodeConnection : JsonListener, INodeConnection {
         private readonly string _hostName;
         private readonly ushort _portNumber;
-        private readonly Dictionary<int, object> _requestData = new Dictionary<int, object>();
+        private readonly ConcurrentDictionary<int, object> _requestData = new ConcurrentDictionary<int, object>();
         private readonly JavaScriptSerializer _serializer = new JavaScriptSerializer();
         private int _currentRequestSequence = 1;
 
@@ -70,74 +71,6 @@ namespace Microsoft.NodejsTools.Debugger {
             Socket = null;
         }
 
-        protected override void OnSocketDisconnected() {
-            EventHandler<EventArgs> socketDisconnected = SocketDisconnected;
-            if (socketDisconnected != null) {
-                socketDisconnected(this, EventArgs.Empty);
-            }
-        }
-
-        protected override void ProcessPacket(JsonResponse response) {
-            Debug.WriteLine("Headers:");
-
-            foreach (var keyValue in response.Headers) {
-                Debug.WriteLine("{0}: {1}", keyValue.Key, keyValue.Value);
-            }
-
-            Debug.WriteLine(String.Format("Body: {0}", string.IsNullOrEmpty(response.Body) ? string.Empty : response.Body));
-
-            if (response.Headers.ContainsKey("type")) {
-                switch (response.Headers["type"]) {
-                    case "connect":
-                        // No-op, as ProcessConnect() is called on the main thread
-                        break;
-                    default:
-                        Debug.WriteLine(String.Format("Unknown header type: {0}", response.Headers["type"]));
-                        break;
-                }
-                return;
-            }
-            var json = (Dictionary<string, object>) _serializer.DeserializeObject(response.Body);
-            switch ((string) json["type"]) {
-                case "response":
-                    ProcessCommandResponse(json);
-                    break;
-                case "event":
-                    EventHandler<NodeEventEventArgs> nodeEvent = NodeEvent;
-                    if (nodeEvent != null) {
-                        nodeEvent(this, new NodeEventEventArgs(json));
-                    }
-                    break;
-                default:
-                    Debug.WriteLine("Unknown body type: {0}", json["type"]);
-                    break;
-            }
-        }
-
-        private void ProcessCommandResponse(Dictionary<string, object> json) {
-            object reqIdObj;
-            if (!json.TryGetValue("request_seq", out reqIdObj)) {
-                return;
-            }
-            var reqId = (int) reqIdObj;
-
-            object responseHandlerObj;
-            if (!_requestData.TryGetValue(reqId, out responseHandlerObj)) {
-                return;
-            }
-            var responseHandler = responseHandlerObj as ResponseHandler;
-            if (responseHandler == null) {
-                return;
-            }
-            _requestData.Remove(reqId);
-
-            responseHandler.HandleResponse(json);
-        }
-
-        private int DispenseRequestId() {
-            return _currentRequestSequence++;
-        }
-
         /// <summary>
         /// Sends a command to the node debugger.
         /// </summary>
@@ -168,7 +101,9 @@ namespace Microsoft.NodejsTools.Debugger {
             ResponseHandler responseHandler = null;
             if ((successHandler != null) || (failureHandler != null) || (timeout != null)) {
                 responseHandler = new ResponseHandler(successHandler, failureHandler, timeout, shortCircuitPredicate);
-                _requestData[reqId] = responseHandler;
+                if (!_requestData.TryAdd(reqId, responseHandler)) {
+                    return false;
+                }
             }
 
             Socket socket = Socket;
@@ -185,13 +120,79 @@ namespace Microsoft.NodejsTools.Debugger {
             return responseHandler == null || responseHandler.Wait();
         }
 
+        protected override void OnSocketDisconnected() {
+            EventHandler<EventArgs> socketDisconnected = SocketDisconnected;
+            if (socketDisconnected != null) {
+                socketDisconnected(this, EventArgs.Empty);
+            }
+        }
+
+        protected override void ProcessPacket(JsonResponse response) {
+            Debug.WriteLine("Headers:");
+
+            foreach (var keyValue in response.Headers) {
+                Debug.WriteLine("{0}: {1}", keyValue.Key, keyValue.Value);
+            }
+
+            Debug.WriteLine(String.Format("Body: {0}", string.IsNullOrEmpty(response.Body) ? string.Empty : response.Body));
+
+            if (response.Headers.ContainsKey("type")) {
+                switch (response.Headers["type"]) {
+                    case "connect":
+                        // No-op, as ProcessConnect() is called on the main thread
+                        break;
+                    default:
+                        Debug.WriteLine(String.Format("Unknown header type: {0}", response.Headers["type"]));
+                        break;
+                }
+                return;
+            }
+            var json = (Dictionary<string, object>)_serializer.DeserializeObject(response.Body);
+            switch ((string)json["type"]) {
+                case "response":
+                    ProcessCommandResponse(json);
+                    break;
+                case "event":
+                    EventHandler<NodeEventEventArgs> nodeEvent = NodeEvent;
+                    if (nodeEvent != null) {
+                        nodeEvent(this, new NodeEventEventArgs(json));
+                    }
+                    break;
+                default:
+                    Debug.WriteLine("Unknown body type: {0}", json["type"]);
+                    break;
+            }
+        }
+
+        private void ProcessCommandResponse(Dictionary<string, object> json) {
+            object reqIdObj;
+            if (!json.TryGetValue("request_seq", out reqIdObj)) {
+                return;
+            }
+            var reqId = (int)reqIdObj;
+
+            object responseHandlerObj;
+            if (!_requestData.TryRemove(reqId, out responseHandlerObj)) {
+                return;
+            }
+            var responseHandler = responseHandlerObj as ResponseHandler;
+            if (responseHandler == null) {
+                return;
+            }
+
+            responseHandler.HandleResponse(json);
+        }
+
+        private int DispenseRequestId() {
+            return _currentRequestSequence++;
+        }
+
         private byte[] CreateRequest(string command, Dictionary<string, object> args, int reqId) {
             string json;
 
             if (args != null) {
                 json = _serializer.Serialize(
-                    new
-                    {
+                    new {
                         command,
                         seq = reqId,
                         type = "request",
@@ -199,8 +200,7 @@ namespace Microsoft.NodejsTools.Debugger {
                     });
             } else {
                 json = _serializer.Serialize(
-                    new
-                    {
+                    new {
                         command,
                         seq = reqId,
                         type = "request"

@@ -17,7 +17,7 @@ using System.Web.Script.Serialization;
 using Microsoft.NodejsTools.Debugger.Serialization;
 
 namespace NodejsTests {
-    static class TestData {
+    static class SerializationTestData {
         /// <summary>
         /// Gets a json object produced by <see cref="JavaScriptSerializer" />.
         /// </summary>
@@ -128,6 +128,10 @@ namespace NodejsTests {
             return references;
         }
 
+        /// <summary>
+        /// Gets a json lookup object prototype produced by <see cref="JavaScriptSerializer" />.
+        /// </summary>
+        /// <returns>JSON object.</returns>
         public static JsonValue GetLookupJsonPrototype() {
             string json = Resources.NodeLookupPrototypeObject;
             return DeserializeJsonValue(json);
@@ -135,13 +139,13 @@ namespace NodejsTests {
 
         private static JsonValue DeserializeJsonValue(string json) {
             var serializer = new JavaScriptSerializer();
-            var value = (Dictionary<string, object>) serializer.DeserializeObject(json);
+            var value = (Dictionary<string, object>)serializer.DeserializeObject(json);
             return new JsonValue(value);
         }
 
         private static JsonArray DeserializeJsonArray(string json) {
             var serializer = new JavaScriptSerializer();
-            var array = (object[]) serializer.DeserializeObject(json);
+            var array = (object[])serializer.DeserializeObject(json);
             return new JsonArray(array);
         }
     }

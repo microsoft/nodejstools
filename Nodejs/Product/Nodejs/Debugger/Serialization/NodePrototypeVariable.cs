@@ -12,21 +12,15 @@
  *
  * ***************************************************************************/
 
-using System;
 using System.Collections.Generic;
+using Microsoft.VisualStudioTools.Project;
 
 namespace Microsoft.NodejsTools.Debugger.Serialization {
     class NodePrototypeVariable : INodeVariable {
         public NodePrototypeVariable(NodeEvaluationResult parent, JsonValue prototype, Dictionary<int, JsonValue> references) {
-            if (parent == null) {
-                throw new ArgumentNullException("parent");
-            }
-            if (prototype == null) {
-                throw new ArgumentNullException("prototype");
-            }
-            if (references == null) {
-                throw new ArgumentNullException("references");
-            }
+            Utilities.ArgumentNotNull("parent", parent);
+            Utilities.ArgumentNotNull("prototype", prototype);
+            Utilities.ArgumentNotNull("references", references);
 
             Id = prototype.GetValue<int>("ref");
             JsonValue reference = references[Id];

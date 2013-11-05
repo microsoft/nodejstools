@@ -23,7 +23,7 @@ namespace NodejsTests.Debugger {
         public void NaturalSortComparerTest() {
             // Arrange
             var comparer = new NaturalSortComparer();
-            var source = new[] {"2name", "1name", "20name", "3name", "11name"};
+            var source = new[] { "2name", "1name", "20name", "3name", "11name" };
 
             // Act
             string[] destination = source.OrderBy(p => p, comparer).ToArray();

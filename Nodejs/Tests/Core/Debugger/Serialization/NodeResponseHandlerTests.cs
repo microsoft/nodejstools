@@ -27,7 +27,7 @@ namespace NodejsTests.Debugger.Serialization {
             var factory = new MockNodeEvaluationResultFactory();
             var handler = new NodeResponseHandler(factory);
             var thread = new NodeThread(null, 0, true);
-            JsonValue json = TestData.GetBacktraceResponse();
+            JsonValue json = SerializationTestData.GetBacktraceResponse();
 
             // Act
             NodeStackFrame[] frames = handler.ProcessBacktrace(thread, json);
@@ -42,7 +42,7 @@ namespace NodejsTests.Debugger.Serialization {
             // Arrange
             var factory = new MockNodeEvaluationResultFactory();
             var handler = new NodeResponseHandler(factory);
-            JsonValue json = TestData.GetBacktraceResponse();
+            JsonValue json = SerializationTestData.GetBacktraceResponse();
             NodeStackFrame[] frames = null;
             Exception exception = null;
 
@@ -89,7 +89,7 @@ namespace NodejsTests.Debugger.Serialization {
             var factory = new MockNodeEvaluationResultFactory();
             var handler = new NodeResponseHandler(factory);
             var stackFrame = new NodeStackFrame(null, null, null, 0, 0, 0, 0);
-            JsonValue json = TestData.GetEvaluateResponse();
+            JsonValue json = SerializationTestData.GetEvaluateResponse();
             const string name = "name";
 
             // Act
@@ -104,7 +104,7 @@ namespace NodejsTests.Debugger.Serialization {
             // Arrange
             var factory = new MockNodeEvaluationResultFactory();
             var handler = new NodeResponseHandler(factory);
-            JsonValue json = TestData.GetEvaluateResponse();
+            JsonValue json = SerializationTestData.GetEvaluateResponse();
             const string name = "name";
             NodeEvaluationResult result = null;
             Exception exception = null;
@@ -129,7 +129,7 @@ namespace NodejsTests.Debugger.Serialization {
             var factory = new MockNodeEvaluationResultFactory();
             var handler = new NodeResponseHandler(factory);
             var stackFrame = new NodeStackFrame(null, null, null, 0, 0, 0, 0);
-            JsonValue json = TestData.GetEvaluateResponse();
+            JsonValue json = SerializationTestData.GetEvaluateResponse();
             NodeEvaluationResult result = null;
             Exception exception = null;
 
@@ -177,7 +177,7 @@ namespace NodejsTests.Debugger.Serialization {
             var factory = new MockNodeEvaluationResultFactory();
             var handler = new NodeResponseHandler(factory);
             var parent = new NodeEvaluationResult(25, null, null, null, null, null, NodeExpressionType.None, null);
-            JsonValue json = TestData.GetLookupResponse();
+            JsonValue json = SerializationTestData.GetLookupResponse();
 
             // Act
             NodeEvaluationResult[] results = handler.ProcessLookup(parent, json);
@@ -192,7 +192,7 @@ namespace NodejsTests.Debugger.Serialization {
             // Arrange
             var factory = new MockNodeEvaluationResultFactory();
             var handler = new NodeResponseHandler(factory);
-            JsonValue json = TestData.GetLookupResponse();
+            JsonValue json = SerializationTestData.GetLookupResponse();
             Exception exception = null;
             NodeEvaluationResult[] results = null;
 

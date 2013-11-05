@@ -22,7 +22,7 @@ namespace NodejsTests.Debugger.Serialization {
         [TestMethod, Priority(0)]
         public void CreateJsonValue() {
             // Arrange
-            var jsonObject = (Dictionary<string, object>) TestData.GetDeserializedJsonObject();
+            var jsonObject = (Dictionary<string, object>)SerializationTestData.GetDeserializedJsonObject();
             var value = new JsonValue(jsonObject);
 
             // Act
@@ -41,7 +41,7 @@ namespace NodejsTests.Debugger.Serialization {
             Assert.AreEqual(jsonObject["numberValue"], numberValue);
 
             Assert.IsNotNull(objectValue);
-            var sourceObjectValue = (Dictionary<string, object>) jsonObject["objectValue"];
+            var sourceObjectValue = (Dictionary<string, object>)jsonObject["objectValue"];
             Assert.AreEqual(sourceObjectValue["value"], objectValue.GetValue<bool>("value"));
 
             Assert.IsNotNull(arrayValue);
@@ -57,7 +57,7 @@ namespace NodejsTests.Debugger.Serialization {
         [TestMethod, Priority(0)]
         public void CreatePrimitiveJsonArray() {
             // Arrange
-            var jsonArray = (object[]) TestData.GetDeserializedPrimitiveJsonArray();
+            var jsonArray = (object[])SerializationTestData.GetDeserializedPrimitiveJsonArray();
 
             // Act
             var array = new JsonArray(jsonArray);
@@ -72,7 +72,7 @@ namespace NodejsTests.Debugger.Serialization {
         [TestMethod, Priority(0)]
         public void CreateComplexJsonArray() {
             // Arrange
-            var jsonArray = (object[]) TestData.GetDeserializedComplexJsonArray();
+            var jsonArray = (object[])SerializationTestData.GetDeserializedComplexJsonArray();
             var array = new JsonArray(jsonArray);
 
             // Act
@@ -84,12 +84,12 @@ namespace NodejsTests.Debugger.Serialization {
             Assert.AreEqual(jsonArray.Length, array.Count);
 
             Assert.IsNotNull(person);
-            var firstItem = (Dictionary<string, object>) jsonArray[0];
+            var firstItem = (Dictionary<string, object>)jsonArray[0];
             Assert.AreEqual(firstItem["age"], person.GetValue<int>("age"));
             Assert.AreEqual(firstItem["fullName"], person.GetValue<string>("fullName"));
 
             Assert.IsNotNull(tags);
-            var secondItem = (Dictionary<string, object>) jsonArray[1];
+            var secondItem = (Dictionary<string, object>)jsonArray[1];
             Assert.AreEqual(secondItem["head"], tags.GetValue<string>("head"));
             Assert.AreEqual(secondItem["body"], tags.GetValue<string>("body"));
 

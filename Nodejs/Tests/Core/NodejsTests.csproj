@@ -84,7 +84,7 @@
       <DesignTime>True</DesignTime>
       <DependentUpon>Resources.resx</DependentUpon>
     </Compile>
-    <Compile Include="TestData.cs" />
+    <Compile Include="SerializationTestData.cs" />
     <Compile Include="TestNodejsReplSite.cs" />
   </ItemGroup>
   <ItemGroup>

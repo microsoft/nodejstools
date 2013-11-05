@@ -344,7 +344,7 @@ namespace Microsoft.NodejsTools.Debugger.DebugEngine {
             string errorMsg;
             if (!_stackFrame.TryParseText(pszCode, out errorMsg)) {
                 pbstrError = "Error: " + errorMsg;
-                pichError = (uint) pbstrError.Length;
+                pichError = (uint)pbstrError.Length;
             }
 
             ppExpr = new UncalculatedAD7Expression(this, pszCode, true);

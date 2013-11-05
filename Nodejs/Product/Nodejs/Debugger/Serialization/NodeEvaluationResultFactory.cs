@@ -12,7 +12,7 @@
  *
  * ***************************************************************************/
 
-using System;
+using Microsoft.VisualStudioTools.Project;
 
 namespace Microsoft.NodejsTools.Debugger.Serialization {
     class NodeEvaluationResultFactory : INodeEvaluationResultFactory {
@@ -22,9 +22,7 @@ namespace Microsoft.NodejsTools.Debugger.Serialization {
         /// <param name="variable">Variable provider.</param>
         /// <returns>Result.</returns>
         public NodeEvaluationResult Create(INodeVariable variable) {
-            if (variable == null) {
-                throw new ArgumentNullException("variable");
-            }
+            Utilities.ArgumentNotNull("variable", variable);
 
             int id = variable.Id;
             NodeStackFrame stackFrame = variable.StackFrame;

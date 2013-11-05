@@ -55,7 +55,7 @@ namespace Microsoft.NodejsTools.Debugger.DebugEngine {
                 if (!string.IsNullOrEmpty(_evaluationResult.ExceptionText)) {
                     propertyInfo.bstrValue = _evaluationResult.ExceptionText;
                 } else {
-                    var value = radix == 16 ? _evaluationResult.HexValue ?? _evaluationResult.StringValue : _evaluationResult.StringValue;
+                    string value = radix == 16 ? _evaluationResult.HexValue ?? _evaluationResult.StringValue : _evaluationResult.StringValue;
                     propertyInfo.bstrValue = _evaluationResult.Type.HasFlag(NodeExpressionType.String) ? string.Format("\"{0}\"", value) : value;
                 }
 
@@ -103,17 +103,16 @@ namespace Microsoft.NodejsTools.Debugger.DebugEngine {
 
         // Enumerates the children of a property. This provides support for dereferencing pointers, displaying members of an array, or fields of a class or struct.
         // The sample debugger only supports pointer dereferencing as children. This means there is only ever one child.
-        public int EnumChildren(enum_DEBUGPROP_INFO_FLAGS dwFields, uint dwRadix, ref Guid guidFilter, enum_DBG_ATTRIB_FLAGS dwAttribFilter, string pszNameFilter, uint dwTimeout,
-            out IEnumDebugPropertyInfo2 ppEnum) {
+        public int EnumChildren(enum_DEBUGPROP_INFO_FLAGS dwFields, uint dwRadix, ref Guid guidFilter, enum_DBG_ATTRIB_FLAGS dwAttribFilter, string pszNameFilter, uint dwTimeout, out IEnumDebugPropertyInfo2 ppEnum) {
             ppEnum = null;
-            var children = _evaluationResult.GetChildren((int) dwTimeout);
+            NodeEvaluationResult[] children = _evaluationResult.GetChildren((int)dwTimeout);
             if (children == null) {
                 return VSConstants.S_FALSE;
             }
 
             DEBUG_PROPERTY_INFO[] properties;
             if (children.Length == 0) {
-                properties = new[] {new DEBUG_PROPERTY_INFO {dwFields = enum_DEBUGPROP_INFO_FLAGS.DEBUGPROP_INFO_NAME, bstrValue = "No children"}};
+                properties = new[] { new DEBUG_PROPERTY_INFO { dwFields = enum_DEBUGPROP_INFO_FLAGS.DEBUGPROP_INFO_NAME, bstrValue = "No children" } };
             } else {
                 properties = new DEBUG_PROPERTY_INFO[children.Length];
                 for (int i = 0; i < children.Length; i++) {
@@ -129,18 +128,20 @@ namespace Microsoft.NodejsTools.Debugger.DebugEngine {
         // This is called to support object oriented languages. It allows the debug engine to return an IDebugProperty2 for the most-derived 
         // object in a hierarchy. This engine does not support this.
         public int GetDerivedMostProperty(out IDebugProperty2 ppDerivedMost) {
-            throw new Exception("The method or operation is not implemented.");
+            ppDerivedMost = null;
+            return VSConstants.E_NOTIMPL;
         }
 
         // This method exists for the purpose of retrieving information that does not lend itself to being retrieved by calling the IDebugProperty2::GetPropertyInfo 
         // method. This includes information about custom viewers, managed type slots and other information.
         // The sample engine does not support this.
         public int GetExtendedInfo(ref Guid guidExtendedInfo, out object pExtendedInfo) {
-            throw new Exception("The method or operation is not implemented.");
+            pExtendedInfo = null;
+            return VSConstants.E_NOTIMPL;
         }
 
         public int GetStringCharLength(out uint pLen) {
-            pLen = (uint) _evaluationResult.StringLength;
+            pLen = (uint)_evaluationResult.StringLength;
             return VSConstants.S_OK;
         }
 
@@ -164,19 +165,21 @@ namespace Microsoft.NodejsTools.Debugger.DebugEngine {
         }
 
         public int CreateObjectID() {
-            throw new NotImplementedException();
+            return VSConstants.E_NOTIMPL;
         }
 
         public int DestroyObjectID() {
-            throw new NotImplementedException();
+            return VSConstants.E_NOTIMPL;
         }
 
         public int GetCustomViewerCount(out uint pcelt) {
-            throw new NotImplementedException();
+            pcelt = 0;
+            return VSConstants.E_NOTIMPL;
         }
 
         public int GetCustomViewerList(uint celtSkip, uint celtRequested, DEBUG_CUSTOM_VIEWER[] rgViewers, out uint pceltFetched) {
-            throw new NotImplementedException();
+            pceltFetched = 0;
+            return VSConstants.E_NOTIMPL;
         }
 
         public int SetValueAsStringWithError(string pszValue, uint dwRadix, uint dwTimeout, out string errorString) {
@@ -186,18 +189,21 @@ namespace Microsoft.NodejsTools.Debugger.DebugEngine {
 
         // Returns the memory bytes for a property value.
         public int GetMemoryBytes(out IDebugMemoryBytes2 ppMemoryBytes) {
-            throw new Exception("The method or operation is not implemented.");
+            ppMemoryBytes = null;
+            return VSConstants.E_NOTIMPL;
         }
 
         // Returns the memory context for a property value.
         public int GetMemoryContext(out IDebugMemoryContext2 ppMemory) {
-            throw new Exception("The method or operation is not implemented.");
+            ppMemory = null;
+            return VSConstants.E_NOTIMPL;
         }
 
         // Returns the parent of a property.
         // The sample engine does not support obtaining the parent of properties.
         public int GetParent(out IDebugProperty2 ppParent) {
-            throw new Exception("The method or operation is not implemented.");
+            ppParent = null;
+            return VSConstants.E_NOTIMPL;
         }
 
         // Fills in a DEBUG_PROPERTY_INFO structure that describes a property.
@@ -209,18 +215,20 @@ namespace Microsoft.NodejsTools.Debugger.DebugEngine {
 
         //  Return an IDebugReference2 for this property. An IDebugReference2 can be thought of as a type and an address.
         public int GetReference(out IDebugReference2 ppReference) {
-            throw new Exception("The method or operation is not implemented.");
+            ppReference = null;
+            return VSConstants.E_NOTIMPL;
         }
 
         // Returns the size, in bytes, of the property value.
         public int GetSize(out uint pdwSize) {
-            throw new Exception("The method or operation is not implemented.");
+            pdwSize = 0;
+            return VSConstants.E_NOTIMPL;
         }
 
         // The debugger will call this when the user tries to edit the property's values
         // We only accept setting values as strings
         public int SetValueAsReference(IDebugReference2[] rgpArgs, uint dwArgCount, IDebugReference2 pValue, uint dwTimeout) {
-            throw new Exception("The method or operation is not implemented.");
+            return VSConstants.E_NOTIMPL;
         }
 
         // The debugger will call this when the user tries to edit the property's values in one of the debugger windows.
@@ -228,7 +236,7 @@ namespace Microsoft.NodejsTools.Debugger.DebugEngine {
             var completion = new AutoResetEvent(false);
             _evaluationResult.Frame.ExecuteText(_evaluationResult.FullName + " = " + pszValue, obj => completion.Set());
 
-            while (!_frame.StackFrame.Thread.Process.HasExited && !completion.WaitOne(Math.Min((int) dwTimeout, 100))) {
+            while (!_frame.StackFrame.Thread.Process.HasExited && !completion.WaitOne(Math.Min((int)dwTimeout, 100))) {
                 if (dwTimeout <= 100) {
                     break;
                 }
@@ -243,6 +251,5 @@ namespace Microsoft.NodejsTools.Debugger.DebugEngine {
         }
 
         #endregion
-
     }
 }

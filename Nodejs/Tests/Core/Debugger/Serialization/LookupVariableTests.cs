@@ -25,8 +25,8 @@ namespace NodejsTests.Debugger.Serialization {
         public void CreateLookupVariable() {
             // Arrange
             var parent = new NodeEvaluationResult(0, null, null, null, null, null, NodeExpressionType.None, null);
-            JsonValue json = TestData.GetLookupJsonProperty();
-            Dictionary<int, JsonValue> references = TestData.GetLookupJsonReferences();
+            JsonValue json = SerializationTestData.GetLookupJsonProperty();
+            Dictionary<int, JsonValue> references = SerializationTestData.GetLookupJsonReferences();
 
             // Act
             var result = new NodeLookupVariable(parent, json, references);
@@ -49,8 +49,8 @@ namespace NodejsTests.Debugger.Serialization {
         public void CreateLookupVariableWithNullParent() {
             // Arrange
             Exception exception = null;
-            JsonValue json = TestData.GetLookupJsonProperty();
-            Dictionary<int, JsonValue> references = TestData.GetLookupJsonReferences();
+            JsonValue json = SerializationTestData.GetLookupJsonProperty();
+            Dictionary<int, JsonValue> references = SerializationTestData.GetLookupJsonReferences();
             NodeLookupVariable result = null;
 
             // Act
@@ -72,7 +72,7 @@ namespace NodejsTests.Debugger.Serialization {
             // Arrange
             var parent = new NodeEvaluationResult(0, null, null, null, null, null, NodeExpressionType.None, null);
             Exception exception = null;
-            Dictionary<int, JsonValue> references = TestData.GetLookupJsonReferences();
+            Dictionary<int, JsonValue> references = SerializationTestData.GetLookupJsonReferences();
             NodeLookupVariable result = null;
 
             // Act
@@ -93,7 +93,7 @@ namespace NodejsTests.Debugger.Serialization {
         public void CreateLookupVariableWithNullJsonReferences() {
             // Arrange
             var parent = new NodeEvaluationResult(0, null, null, null, null, null, NodeExpressionType.None, null);
-            JsonValue json = TestData.GetLookupJsonProperty();
+            JsonValue json = SerializationTestData.GetLookupJsonProperty();
             Exception exception = null;
             NodeLookupVariable result = null;
 
