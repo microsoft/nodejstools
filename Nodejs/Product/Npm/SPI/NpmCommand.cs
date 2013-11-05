@@ -74,7 +74,7 @@ namespace Microsoft.NodejsTools.Npm.SPI
         public string StandardOutput { get; private set; }
         public string StandardError { get; private set; }
 
-        public async Task<bool> ExecuteAsync()
+        public virtual async Task<bool> ExecuteAsync()
         {
             
             using (var proc = new Process())

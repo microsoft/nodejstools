@@ -188,6 +188,21 @@
     <Compile Include="Nodejs.cs" />
     <Compile Include="NodejsProjectConfig.cs" />
     <Compile Include="NodejsToolsInstallPath.cs" />
+    <Compile Include="NpmUI\Annotations.cs" />
+    <Compile Include="NpmUI\FlagsConverter.cs" />
+    <Compile Include="NpmUI\FlagsToDescriptionConverter.cs" />
+    <Compile Include="NpmUI\FlagsToImageConverter.cs" />
+    <Compile Include="NpmUI\FlagsToInstallConverter.cs" />
+    <Compile Include="NpmUI\ModuleCommands.cs" />
+    <Compile Include="NpmUI\ModuleManager.xaml.cs">
+      <DependentUpon>ModuleManager.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="NpmUI\ModuleSourcesViewModel.cs" />
+    <Compile Include="NpmUI\UpdateDialog.xaml.cs">
+      <DependentUpon>UpdateDialog.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="NpmUI\UpdateDialogViewModel.cs" />
+    <Compile Include="NpmUI\VisibleToBoolConverter.cs" />
     <Compile Include="Options\NodejsDialogPage.cs">
       <SubType>Component</SubType>
     </Compile>
@@ -516,7 +531,20 @@
       <IncludeOutputGroupsInVSIXLocalOnly>DebugSymbolsProjectOutputGroup%3b</IncludeOutputGroupsInVSIXLocalOnly>
     </ProjectReference>
   </ItemGroup>
-  <ItemGroup />
+  <ItemGroup>
+    <Page Include="NpmUI\ModuleManager.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
+    </Page>
+    <Page Include="NpmUI\Styles.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
+    </Page>
+    <Page Include="NpmUI\UpdateDialog.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
+    </Page>
+  </ItemGroup>
   <PropertyGroup>
     <!--
     To specify a different registry root to register your package, uncomment the TargetRegistryRoot

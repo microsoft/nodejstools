@@ -7,6 +7,7 @@ using System.Threading;
 using System.Threading.Tasks;
 using System.Windows.Documents;
 using System.Windows.Media.Animation;
+using EnvDTE;
 using Microsoft.NodejsTools.Npm;
 using Microsoft.VisualStudio;
 using Microsoft.VisualStudio.Shell.Interop;
@@ -68,6 +69,12 @@ namespace Microsoft.NodejsTools.Project
                     {
                         m_FileSystemWatcherTimer.Dispose();
                         m_FileSystemWatcherTimer = null;
+                    }
+
+                    if ( null != m_NpmController )
+                    {
+                        m_NpmController.OutputLogged -= m_NpmController_OutputLogged;
+                        m_NpmController.ErrorLogged -= m_NpmController_ErrorLogged;
                     }
                 }
                 m_IsDisposed = true;
@@ -132,8 +139,51 @@ namespace Microsoft.NodejsTools.Project
         {
             lock ( m_Lock )
             {
-                m_NpmController = NpmControllerFactory.Create( m_ProjectNode.BuildProject.DirectoryPath );
+                if ( null == m_NpmController )
+                {
+                    m_NpmController = NpmControllerFactory.Create( m_ProjectNode.BuildProject.DirectoryPath );
+                    m_NpmController.OutputLogged += m_NpmController_OutputLogged;
+                    m_NpmController.ErrorLogged += m_NpmController_ErrorLogged;
+                }
+                else
+                {
+                    m_NpmController.Refresh();
+                }
             }
+        }
+
+        private static readonly Guid NpmOutputPaneGuid = new Guid( "25764421-33B8-4163-BD02-A94E299D52D8" );
+
+        private IVsOutputWindowPane GetNpmOutputPane()
+        {
+            var outputWindow = ( IVsOutputWindow ) m_ProjectNode.GetService( typeof ( SVsOutputWindow ) );
+            IVsOutputWindowPane pane;
+            if ( outputWindow.GetPane(NpmOutputPaneGuid, out pane) != VSConstants.S_OK )
+            {
+                outputWindow.CreatePane( NpmOutputPaneGuid, "Npm", 1, 1 );
+                outputWindow.GetPane( NpmOutputPaneGuid, out pane );
+            }
+
+            return pane;
+        }
+
+        private void WriteNpmLogToOutputWindow( NpmLogEventArgs args )
+        {
+            var pane = GetNpmOutputPane();
+            if ( null != pane )
+            {
+                pane.OutputStringThreadSafe( args.LogText );
+            }
+        }
+
+        void m_NpmController_ErrorLogged(object sender, NpmLogEventArgs e)
+        {
+            WriteNpmLogToOutputWindow( e );
+        }
+
+        void m_NpmController_OutputLogged(object sender, NpmLogEventArgs e)
+        {
+            WriteNpmLogToOutputWindow( e );
         }
 
         private void ReloadHierarchy()

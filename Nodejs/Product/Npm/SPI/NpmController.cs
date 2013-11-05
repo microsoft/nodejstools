@@ -14,6 +14,8 @@ namespace Microsoft.NodejsTools.Npm.SPI
         private string _fullPathToRootPackageDirectory;
         private bool _showMissingDevOptionalSubPackages;
         private string _pathToNpm;
+        private IRootPackage _rootPackage;
+        private readonly object _lock = new object();
 
         public NpmController(
             string fullPathToRootPackageDirectory,
@@ -51,13 +53,40 @@ namespace Microsoft.NodejsTools.Npm.SPI
         public void Refresh()
         {
             OnStartingRefresh();
-            RootPackage = RootPackageFactory.Create(
-                _fullPathToRootPackageDirectory,
-                _showMissingDevOptionalSubPackages);
+            lock ( _lock )
+            {
+                RootPackage = RootPackageFactory.Create(
+                    _fullPathToRootPackageDirectory,
+                    _showMissingDevOptionalSubPackages );
+            }
             OnFinishedRefresh();
         }
 
-        public IRootPackage RootPackage { get; private set; }
+        public IRootPackage RootPackage
+        {
+            get
+            {
+                lock ( _lock )
+                {
+                    return _rootPackage;
+                }
+            }
+
+            private set
+            {
+                lock ( _lock )
+                {
+                    _rootPackage = value;
+                }
+            }
+        }
+
+        //  TODO: events should be fired as data is logged, not in one massive barf at the end
+        private void FireLogEvents( NpmCommand command )
+        {
+            OnOutputLogged( command.StandardOutput );
+            OnErrorLogged( command.StandardError );
+        }
 
         public async Task<bool> InstallPackageByVersionAsync(string packageName, string versionRange, DependencyType type)
         {
@@ -69,6 +98,7 @@ namespace Microsoft.NodejsTools.Npm.SPI
                 _pathToNpm);
 
             bool retVal = await command.ExecuteAsync();
+            FireLogEvents( command );
             Refresh();
             return retVal;
         }
@@ -81,8 +111,36 @@ namespace Microsoft.NodejsTools.Npm.SPI
                 _pathToNpm);
 
             bool retVal = await command.ExecuteAsync();
+            FireLogEvents(command);
             Refresh();
             return retVal;
+        }
+
+        public Task< IEnumerable< IPackage > > SearchAsync( string searchText )
+        {
+            throw new NotImplementedException();
+        }
+
+        private void FireNpmLogEvent( string logText, EventHandler< NpmLogEventArgs > handlers )
+        {
+            if (null != handlers && ! string.IsNullOrEmpty( logText ) )
+            {
+                handlers(this, new NpmLogEventArgs(logText));
+            }
+        }
+
+        public event EventHandler< NpmLogEventArgs > OutputLogged;
+
+        private void OnOutputLogged( string logText )
+        {
+            FireNpmLogEvent( logText, OutputLogged );
+        }
+
+        public event EventHandler< NpmLogEventArgs > ErrorLogged;
+
+        private void OnErrorLogged( string logText )
+        {
+            FireNpmLogEvent( logText, ErrorLogged );
         }
     }
 }

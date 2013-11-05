@@ -10,6 +10,7 @@ namespace Microsoft.NodejsTools.Npm
         string Name { get; }
         SemverVersion Version { get; }
         IScripts Scripts { get; }
+        IPerson Author { get; }
         string Description { get; }
         IKeywords Keywords { get; }
         string Homepage { get; }

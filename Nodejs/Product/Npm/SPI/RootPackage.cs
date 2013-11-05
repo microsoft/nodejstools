@@ -39,6 +39,15 @@ namespace Microsoft.NodejsTools.Npm.SPI
             }
         }
 
+        public IPerson Author
+        {
+            get
+            {
+                return null == PackageJson ? null : PackageJson.Author;
+            }
+        }
+        public string Description { get; private set; }
+
         public string Path { get; private set; }
 
         public INodeModules Modules { get; private set; }

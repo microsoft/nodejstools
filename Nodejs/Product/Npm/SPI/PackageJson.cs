@@ -60,6 +60,15 @@ namespace Microsoft.NodejsTools.Npm.SPI
             }
         }
 
+        public IPerson Author
+        {
+            get
+            {
+                var author = m_Package.author;
+                return null == author ? null : new Person(author);
+            }
+        }
+
         public string Description
         {
             get

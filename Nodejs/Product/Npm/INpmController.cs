@@ -1,9 +1,10 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Threading.Tasks;
 
 namespace Microsoft.NodejsTools.Npm
 {
-    public interface INpmController
+    public interface INpmController : INpmLogSource
     {
         event EventHandler StartingRefresh;
         void Refresh();
@@ -11,5 +12,6 @@ namespace Microsoft.NodejsTools.Npm
         IRootPackage RootPackage { get; }
         Task<bool> InstallPackageByVersionAsync(string packageName, string versionRange, DependencyType type);
         Task<bool> UninstallPackageAsync(string packageName);
+        Task< IEnumerable< IPackage > > SearchAsync( string searchText );
     }
 }

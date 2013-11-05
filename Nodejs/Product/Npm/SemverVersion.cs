@@ -15,6 +15,8 @@ namespace Microsoft.NodejsTools.Npm
     public struct SemverVersion
     {
 
+        public static readonly SemverVersion UnknownVersion = new SemverVersion(0,0,0);
+
         private static readonly Regex RegexSemver = new Regex(
             "^(?<major>[0-9]+)"
             + "\\.(?<minor>[0-9]+)"
@@ -64,7 +66,12 @@ namespace Microsoft.NodejsTools.Npm
             return string.IsNullOrEmpty(optional) || RegexOptionalFragment.IsMatch(optional);
         }
 
-        public SemverVersion( int major, int minor, int patch, string preReleaseVersion, string buildMetadata )
+        public SemverVersion(
+            int major,
+            int minor,
+            int patch,
+            string preReleaseVersion = null,
+            string buildMetadata = null )
         {
             if ( major < 0 )
             {

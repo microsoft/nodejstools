@@ -21,6 +21,14 @@ namespace Microsoft.NodejsTools.Npm.SPI
             m_Parent = parent;
         }
 
+        public string RequestedVersionRange
+        {
+            get
+            {
+                return Version.ToString();
+            }
+        }
+
         public bool IsListedInParentPackageJson
         {
             get
@@ -62,6 +70,18 @@ namespace Microsoft.NodejsTools.Npm.SPI
             {
                 IPackageJson parentPackageJson = m_Parent.PackageJson;
                 return null != parentPackageJson && parentPackageJson.BundledDependencies.Contains(Name);
+            }
+        }
+
+        public PackageFlags Flags
+        {
+            get
+            {
+                return ( ! IsListedInParentPackageJson ? PackageFlags.NotListedAsDependency : 0 )
+                       | ( IsMissing ? PackageFlags.Missing : 0 )
+                       | ( IsDevDependency ? PackageFlags.Dev : 0 )
+                       | ( IsOptionalDependency ? PackageFlags.Optional : 0 )
+                       | ( IsBundledDependency ? PackageFlags.Bundled : 0 );
             }
         }
 
