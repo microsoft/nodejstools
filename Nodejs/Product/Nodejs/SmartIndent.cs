@@ -133,7 +133,9 @@ namespace Microsoft.NodejsTools {
                         if (indentStack.Count > 0) {
                             current = indentStack.Pop();
                         } else {
-                            current.NeedsUpdate = true;
+                            current = new LineInfo {
+                                Indentation = GetLeadingWhiteSpace(token.Span.Start.GetContainingLine().GetText())
+                            };
                         }
                     } else if (IsMultilineStringOrComment(token)) {
                         while (token != null && tokenStack.Count > 0) {

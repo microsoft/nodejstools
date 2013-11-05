@@ -30,6 +30,20 @@ namespace Microsoft.NodejsTools.Project {
             get { return _control; }
         }
 
+        internal override CommonProjectNode Project {
+            get {
+                return base.Project;
+            }
+            set {
+                if (value == null && base.Project != null) {
+                    base.Project.PropertyPage = null;
+                }
+                base.Project = value;
+                if (value != null) {
+                    ((NodejsProjectNode)value).PropertyPage = this;
+                }
+            }
+        }
         public override void Apply() {
             Project.SetProjectProperty(NodejsConstants.NodeExePath, _control.NodeExePath);
             Project.SetProjectProperty(NodejsConstants.NodeExeArguments, _control.NodeExeArguments);

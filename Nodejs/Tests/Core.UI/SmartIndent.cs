@@ -24,11 +24,40 @@ using TestUtilities.UI;
 namespace Microsoft.Nodejs.Tests.UI {
     [TestClass]
     public class SmartIndent : NodejsProjectTest {
-        public static ProjectDefinition BasicProject = new ProjectDefinition("AutoIndent", NodejsProject, Compile("server", ""));
+        public static ProjectDefinition BasicProject = new ProjectDefinition(
+            "AutoIndent", 
+            NodejsProject, 
+            Compile("server", ""),
+            Compile("Bug384", @"Foo.prototype.Bar = function (callback) {
+
+    var result = null;
+    for (var i = 0; i < 10; i++) {
+        if (i == 5) {
+            console.log(i);
+            break;
+        }        
+    }
+
+}")
+        );
 
         [ClassInitialize]
         public static void DoDeployment(TestContext context) {            
             AssertListener.Initialize();
+        }
+
+        [TestMethod, Priority(0), TestCategory("Core")]
+        [HostType("TC Dynamic"), DynamicHostType(typeof(VsIdeHostAdapter))]
+        public void SmartIndentBug384() {
+            using (var solution = BasicProject.Generate().ToVs()) {                
+                var doc = solution.OpenItem("AutoIndent", "Bug384.js");
+                doc.Invoke(() => doc.TextView.Caret.MoveTo(doc.TextView.TextViewLines[9]));
+                Keyboard.Type(System.Windows.Input.Key.End);
+                Assert.AreEqual(
+                    4,
+                    doc.TextView.Caret.Position.VirtualBufferPosition.VirtualSpaces
+                );
+            }
         }
 
         [TestMethod, Priority(0), TestCategory("Core")]

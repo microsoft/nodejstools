@@ -76,12 +76,11 @@ namespace Microsoft.NodejsTools.Debugger.DebugEngine {
                 if (!_writable) {
                     propertyInfo.dwAttrib |= enum_DBG_ATTRIB_FLAGS.DBG_ATTRIB_VALUE_READONLY;
                 }
-                
+
                 if (_evalResult.ExceptionText != null) {
                     propertyInfo.dwAttrib |= enum_DBG_ATTRIB_FLAGS.DBG_ATTRIB_VALUE_ERROR;
                 }
-                if (_evalResult.IsExpandable)
-                {
+                if (_evalResult.IsExpandable) {
                     propertyInfo.dwAttrib |= enum_DBG_ATTRIB_FLAGS.DBG_ATTRIB_OBJ_IS_EXPANDABLE;
                 }
             }
@@ -100,7 +99,7 @@ namespace Microsoft.NodejsTools.Debugger.DebugEngine {
         public int EnumChildren(enum_DEBUGPROP_INFO_FLAGS dwFields, uint dwRadix, ref System.Guid guidFilter, enum_DBG_ATTRIB_FLAGS dwAttribFilter, string pszNameFilter, uint dwTimeout, out IEnumDebugPropertyInfo2 ppEnum) {
             ppEnum = null;
             var children = _evalResult.GetChildren((int)dwTimeout);
-             if (children == null) {
+            if (children == null) {
                 return VSConstants.S_FALSE;
             }
 

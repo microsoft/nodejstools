@@ -6,7 +6,7 @@
   <Extern href="VsDebugGuids.h"/>
 
   <KeyBindings>
-    <KeyBinding guid="guidNodeToolsCmdSet" id="cmdidReplWindow" key1="R" mod1="Alt" editor="guidVSStd97"/>
+    <KeyBinding guid="guidNodeToolsCmdSet" id="cmdidReplWindow" key1="K" mod1="Control"  key2="N" editor="guidVSStd97"/>
   </KeyBindings>
 
   <!--The Commands section is where we the commands, menus and menu groups are defined.

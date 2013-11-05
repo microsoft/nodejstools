@@ -139,8 +139,57 @@ namespace Microsoft.NodejsTools.Project {
 
         protected override void Reload() {
             base.Reload();
-
+            
             NodejsPackage.Instance.CheckSurveyNews(false);
+        }
+
+        protected override void RaiseProjectPropertyChanged(string propertyName, string oldValue, string newValue) {
+            base.RaiseProjectPropertyChanged(propertyName, oldValue, newValue);
+
+            var propPage = GeneralPropertyPageControl;
+            if (propPage != null) {
+                switch (propertyName) {
+                    case NodejsConstants.NodejsPort:
+                        propPage.NodejsPort = newValue;
+                        break;
+                    case NodejsConstants.NodeExePath:
+                        propPage.NodeExePath = newValue;
+                        break;
+                    case NodejsConstants.NodeExeArguments:
+                        propPage.NodeExeArguments = newValue;
+                        break;
+                    case NodejsConstants.ScriptArguments:
+                        propPage.ScriptArguments = newValue;
+                        break;
+                    case NodejsConstants.LaunchUrl:
+                        propPage.LaunchUrl = newValue;
+                        break;
+                    case NodejsConstants.StartWebBrowser:
+                        bool value;
+                        if (Boolean.TryParse(newValue, out value)) {
+                            propPage.StartWebBrowser = value;
+                        }
+                        break;
+                    case CommonConstants.WorkingDirectory:
+                        propPage.WorkingDirectory = newValue;
+                        break;
+                    default:
+                        if (propPage != null) {
+                            PropertyPage.IsDirty = true;
+                        }
+                        break;
+                }
+            }
+        }
+
+        private NodejsGeneralPropertyPageControl GeneralPropertyPageControl {
+            get {
+                if (PropertyPage != null && PropertyPage.Control != null) {
+                    return (NodejsGeneralPropertyPageControl)PropertyPage.Control;
+                }
+
+                return null;
+            }
         }
 
         /// <summary>
