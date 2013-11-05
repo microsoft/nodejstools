@@ -1489,16 +1489,10 @@ namespace Microsoft.NodejsTools.Debugger {
                                                     // Treat as failure (for now)
                                                     wrappedFailureHandler();
                                                 },
-                                            failureHandler:
-                                                () => {
-                                                    wrappedFailureHandler();
-                                                }
+                                            failureHandler: wrappedFailureHandler
                                         );
                                     },
-                                failureHandler:
-                                    () => {
-                                        wrappedFailureHandler();
-                                    }
+                                failureHandler: wrappedFailureHandler
                             );
                             return;
                         }
@@ -1509,10 +1503,7 @@ namespace Microsoft.NodejsTools.Debugger {
                         return;
 
                     },
-                failureHandler:
-                    () => {
-                        wrappedFailureHandler();
-                    }
+                failureHandler: wrappedFailureHandler
             );
         }
 
