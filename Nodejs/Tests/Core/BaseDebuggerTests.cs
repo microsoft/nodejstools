@@ -362,6 +362,7 @@ namespace DebuggerTests {
             public BreakOn? _breakOn;
             public string _condition;
             public bool _builtin;
+            public bool _expectFailure;
             public Action<NodeDebugger, NodeThread> _validation;
             public int? _expectedExitCode;
 
@@ -380,6 +381,7 @@ namespace DebuggerTests {
                 BreakOn? breakOn = null,
                 string condition = null,
                 bool builtin = false,
+                bool expectFailure = false,
                 Action<NodeDebugger, NodeThread> validation = null,
                 int? expectedExitCode = null
             ) {
@@ -397,6 +399,7 @@ namespace DebuggerTests {
                 _breakOn = breakOn;
                 _condition = condition;
                 _builtin = builtin;
+                _expectFailure = expectFailure;
                 _validation = validation;
                 _expectedExitCode = expectedExitCode;
             }
@@ -487,7 +490,7 @@ namespace DebuggerTests {
             AutoResetEvent breakpointBindFailure = new AutoResetEvent(false);
             process.BreakpointBindFailure += (sender, e) => {
                 breakpointBind = e;
-                breakpointBound.Set();
+                breakpointBindFailure.Set();
             };
 
             AutoResetEvent breakpointHit = new AutoResetEvent(false);
@@ -579,12 +582,21 @@ namespace DebuggerTests {
                                     breakpointBindFailureHandled.Set();
                                 }
                             );
-                        AssertWaited(breakpointBound);
-                        AssertWaited(breakpointBindSuccessHandled);
-                        AssertNotSet(breakpointBindFailure);
-                        AssertNotSet(breakpointBindFailureHandled);
-                        breakpointBound.Reset();
-                        breakpointBindSuccessHandled.Reset();
+                        if (step._expectFailure) {
+                            AssertWaited(breakpointBindFailure);
+                            AssertWaited(breakpointBindFailureHandled);
+                            AssertNotSet(breakpointBound);
+                            AssertNotSet(breakpointBindSuccessHandled);
+                            breakpointBindFailure.Reset();
+                            breakpointBindFailureHandled.Reset();
+                        } else {
+                            AssertWaited(breakpointBound);
+                            AssertWaited(breakpointBindSuccessHandled);
+                            AssertNotSet(breakpointBindFailure);
+                            AssertNotSet(breakpointBindFailureHandled);
+                            breakpointBound.Reset();
+                            breakpointBindSuccessHandled.Reset();
+                        }
                         break;
                     case TestAction.RemoveBreakpoint:
                         breakpointFileName = step._targetBreakpointFile ?? filename;

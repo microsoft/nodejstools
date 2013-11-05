@@ -90,8 +90,15 @@ namespace Microsoft.NodejsTools.Debugger {
             }
         }
 
-        internal NodeBreakpointBinding CreateBinding(int lineNo, int breakpointID, int? scriptID) {
-            var binding = new NodeBreakpointBinding(this, lineNo, breakpointID, scriptID);
+        public bool HasPredicate {
+            get {
+                return (!string.IsNullOrEmpty(_condition) || NodeBreakpointBinding.GetEngineIgnoreCount(_breakOn, 0) > 0);
+
+            }
+        }
+
+        internal NodeBreakpointBinding CreateBinding(int lineNo, int breakpointID, int? scriptID, bool fullyBound) {
+            var binding = new NodeBreakpointBinding(this, lineNo, breakpointID, scriptID, fullyBound);
             _bindings[breakpointID] = binding;
             return binding;
         }

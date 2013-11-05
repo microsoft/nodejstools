@@ -68,7 +68,7 @@ namespace Microsoft.NodejsTools.Debugger {
         private int? _id;
         private readonly Dictionary<int, NodeBreakpointBinding> _breakpointBindings = new Dictionary<int, NodeBreakpointBinding>();
         private bool _loadCompleteHandled;
-        private bool _handleEntryPointTracePoint;
+        private bool _handleEntryPointHit;
         private SteppingKind _steppingMode;
         private int _steppingCallstackDepth;
         private bool _resumingStepping;
@@ -380,7 +380,7 @@ namespace Microsoft.NodejsTools.Debugger {
         private void Continue(Dictionary<string, object> args = null) {
             // Ensure load complete and entrypoint breakpoint/tracepoint handling disabled after first real continue
             _loadCompleteHandled = true;
-            _handleEntryPointTracePoint = false;
+            _handleEntryPointHit = false;
 
             SendRequest(
                 "continue",
@@ -898,110 +898,125 @@ namespace Microsoft.NodejsTools.Debugger {
         }
 
         private void ProcessBreak(Dictionary<string, object> json) {
+            //  Derive breakpoint bindings, if any
+            List<NodeBreakpointBinding> breakpointBindings = null;
             object breakpointsObj;
             ((Dictionary<string, object>)json["body"]).TryGetValue("breakpoints", out breakpointsObj);
             object[] breakpoints = breakpointsObj as object[];
+            if (breakpoints != null) {
+                breakpointBindings = new List<NodeBreakpointBinding>();
+                foreach (int breakpoint in breakpoints) {
+                    NodeBreakpointBinding nodeBreakpointBinding;
+                    if (_breakpointBindings.TryGetValue(breakpoint, out nodeBreakpointBinding)) {
+                        breakpointBindings.Add(nodeBreakpointBinding);
+                    }
+                }
+            }
 
-            // Handle step break
-            if (breakpoints == null || breakpoints.Length == 0) {
-                // We need to get the backtrace before we break, so we request the backtrace
-                // and follow up with firing the appropriate event for the break
-                PerformBacktrace((running) => {
-                    // Handle followup
+            // We need to get the backtrace to derive whether to break,
+            // and/or to fire the appropriate events for the break
+            PerformBacktrace(
+                (running) => {
                     Debug.Assert(!running);
-                    CompleteStepping();
-                });
+
+                    // Process break for breakpoint bindings, if any
+                    ProcessBreak(
+                        breakpointBindings,
+                        noBreakpointsHitHandler:
+                            () => {
+                                // Fall back to auto resume, when no breakpoints hit
+                                AutoResume();
+                            }
+                    );
+                }
+            );
+
+        }
+
+        private void ProcessBreak(List<NodeBreakpointBinding> breakpointBindings, Action noBreakpointsHitHandler, bool testFullyBound = false) {
+            // Handle step complete break
+            if (breakpointBindings == null) {
+                CompleteStepping();
                 return;
             }
 
-            // Collect rebind pending and normal breakpoints
-            List<NodeBreakpointBinding> rebindPendingBreakpointBindings = new List<NodeBreakpointBinding>();
-            List<NodeBreakpointBinding> normalBreakpointBindings = new List<NodeBreakpointBinding>();
-            foreach (int breakpoint in breakpoints) {
-                NodeBreakpointBinding nodeBreakpointBinding;
-                if (_breakpointBindings.TryGetValue(breakpoint, out nodeBreakpointBinding)) {
-                    // Rebind breakpoint binding flagged as not fully bound
-                    if (!nodeBreakpointBinding.FullyBound) {
-                        rebindPendingBreakpointBindings.Add(nodeBreakpointBinding);
-                    } else {
-                        normalBreakpointBindings.Add(nodeBreakpointBinding);
-                    }
-                }
+            // Handle breakpoint(s) but no matching binding(s)
+            // Indicated by non-null but empty breakpoint bindings collection
+            var bindingsToProcess = breakpointBindings.Count;
+            if (bindingsToProcess == 0) {
+                noBreakpointsHitHandler();
             }
 
-            // Process breakpoint bindings
-            // Collect hit candidates
-            // Handle last processed breakpoint by either breaking with breakpoint hit events or resuming
-            var bindingsToProcess = rebindPendingBreakpointBindings.Count + normalBreakpointBindings.Count;
-            List<NodeBreakpointBinding> candidateBindings = new List<NodeBreakpointBinding>();
-            Action<NodeBreakpointBinding> processBinding = (binding) => {
-                if (binding != null) {
-                    // Collect hit breakpoints
-                    candidateBindings.Add(binding);
-                }
-                if (--bindingsToProcess == 0) {
-                    // Handle last processed binding
-                    var candidatesToProcess = candidateBindings.Count;
-                    if (candidatesToProcess > 0) {
-                        // We need to get the backtrace before we break, so we request the backtrace
-                        // and follow up with firing the appropriate events for the break
-                        PerformBacktrace((running) => {
-                            // Handle followup
-                            // Process candidate bindings
-                            // Only "hit" binding if it matches current frame location
-                            // It is possible for a rebound breakpoint binding to not match
-                            Debug.Assert(!running);
-                            bool candidateMatch = false;
-                            Action processCandidate = () => {
-                                if (--candidatesToProcess == 0) {
-                                    // Handle last processed candidate
-                                    if (!candidateMatch) {
-                                        // No matching candidate, so resume
-                                        Resume();
-                                    }
-                                }
-                            };
-                            var matchingLineNo = MainThread.Frames[0].LineNo;
-                            var breakpointHit = BreakpointHit;
-                            foreach (var candidateBreakpointBinding in candidateBindings) {
-                                if (candidateBreakpointBinding.LineNo == matchingLineNo) {
-                                    candidateMatch = true;
-                                    candidateBreakpointBinding.ProcessBreakpointHit(
-                                        () => {
-                                            // Fire breakpoint hit event
-                                            if (breakpointHit != null) {
-                                                breakpointHit(this, new BreakpointHitEventArgs(candidateBreakpointBinding, MainThread));
-                                            }
-                                            processCandidate();
-                                        }
-                                    );
-                                } else {
-                                    processCandidate();
-                                }
-                            }
-                        });
-                    } else {
-                        // No candidates, so resume
-                        Resume();
+            // Process breakpoint binding
+            List<NodeBreakpointBinding> hitBindings = new List<NodeBreakpointBinding>();
+            Action<NodeBreakpointBinding> processBinding =
+                (binding) => {
+                    // Collect hit breakpoint bindings
+                    if (binding != null) {
+                        hitBindings.Add(binding);
                     }
-                }
-            };
 
-            // Process rebind pending breakpoints
-            foreach (var rebindPendingBreakpointBinding in rebindPendingBreakpointBindings) {
+                    // Handle last processed breakpoint binding by either breaking with breakpoint hit events or calling noBreakpointsHitHandler
+                    if (--bindingsToProcess == 0) {
+                        if (hitBindings.Count > 0) {
+                            // Fire breakpoint hit event(s)
+                            var breakpointHit = BreakpointHit;
+                            foreach (var hitBinding in hitBindings) {
+                                hitBinding.ProcessBreakpointHit(
+                                    () => {
+                                        if (breakpointHit != null) {
+                                            breakpointHit(this, new BreakpointHitEventArgs(hitBinding, MainThread));
+                                        }
+                                    }
+                                );
+                            }
+                        } else {
+                            // No breakpoints hit
+                            noBreakpointsHitHandler();
+                        }
+                    }
+                };
+
+            // Iterate over breakpoint bindings, processing them as fully bound or not
+            var currentLineNo = MainThread.Frames[0].LineNo;
+            foreach (var breakpointBinding in breakpointBindings) {
+                // Handle normal (fully bound) breakpoint binding
+                if (breakpointBinding.FullyBound) {
+                    if (testFullyBound) {
+                        // Process based on whether hit (based on hit count and/or condition predicates)
+                        breakpointBinding.TestAndProcessHit(processBinding);
+                        continue;
+                    }
+
+                    processBinding(breakpointBinding);
+                    continue;
+                }
+
+                // Handle fixed-up breakpoint binding
+                // Rebind breakpoint
                 RemoveBreakPoint(
-                    rebindPendingBreakpointBinding,
+                    breakpointBinding,
                     successHandler:
                         () => {
-                            BindBreakpoint(
-                                rebindPendingBreakpointBinding.Breakpoint,
+                            var breakpoint = breakpointBinding.Breakpoint;
+                            SetBreakpoint(
+                                breakpoint,
                                 successHandler:
-                                    (breakpointBinding) => {
-                                        // Consider rebound breakpoint binding fully bound if bound by script id and line fixup steady state
-                                        if (breakpointBinding.ScriptID.HasValue && breakpointBinding.LineNo == rebindPendingBreakpointBinding.LineNo) {
-                                            breakpointBinding.FullyBound = true;
+                                    (breakpointID, scriptID, lineNo) => {
+                                        // Treat rebound breakpoint binding as fully bound
+                                        var reboundbreakpointBinding = CreateBreakpointBinding(breakpoint, breakpointID, scriptID, lineNo, fullyBound: true);
+                                        HandleBindBreakpointSuccess(reboundbreakpointBinding, breakpoint);
+
+                                        // Handle invalid-line fixup (second bind matches current line)
+                                        if (reboundbreakpointBinding.LineNo == currentLineNo) {
+                                            // Process based on whether hit (based on hit count and/or condition predicates)
+                                            reboundbreakpointBinding.TestAndProcessHit(processBinding);
+                                            return;
                                         }
-                                        processBinding(breakpointBinding);
+
+                                        // Handle lambda-eval fixup (second bind does not match current line)
+                                        // Process as not hit
+                                        processBinding(null);
                                     },
                                 failureHandler:
                                     () => {
@@ -1010,15 +1025,10 @@ namespace Microsoft.NodejsTools.Debugger {
                             );
                         },
                     failureHandler:
-                        () => { // Failure handler
-                            processBinding(rebindPendingBreakpointBinding);
+                        () => {
+                            processBinding(breakpointBinding);
                         }
                 );
-            }
-
-            // Process normal breakpoints
-            foreach (var normalBreakpointBinding in normalBreakpointBindings) {
-                processBinding(normalBreakpointBinding);
             }
         }
 
@@ -1318,35 +1328,41 @@ namespace Microsoft.NodejsTools.Debugger {
             // Handle load complete resume
             if (!_loadCompleteHandled) {
                 _loadCompleteHandled = true;
+                _handleEntryPointHit = true;
 
-                // Handle case where breakpoint at entrypoint, by firing breakpoint hit event without actually resuming
+                // Handle breakpoint binding at entrypoint
+                // Attempt to fire breakpoint hit event without actually resuming
                 var topFrame = MainThread.Frames.First();
                 var breakLineNo = topFrame.LineNo;
                 var breakFileName = topFrame.FileName.ToLower();
                 var breakModule = GetModuleForFilePath(breakFileName);
+                List<NodeBreakpointBinding> breakpointBindings = new List<NodeBreakpointBinding>();
                 foreach (var breakpointBinding in _breakpointBindings.Values) {
                     if (breakpointBinding.Enabled && breakpointBinding.LineNo == breakLineNo && GetModuleForFilePath(breakpointBinding.FileName) == breakModule) {
-                        // Handle ignore count
-                        if (!breakpointBinding.TryIgnore()) {
-                            // Fire breakpoint/tracepoint hit and setup to handle entrypoint tracepoint resume
-                            var breakpointHit = BreakpointHit;
-                            if (breakpointHit != null) {
-                                breakpointHit(this, new BreakpointHitEventArgs(breakpointBinding, MainThread));
-                                _handleEntryPointTracePoint = true;
-                            }
-                        }
+                        breakpointBindings.Add(breakpointBinding);
                     }
                 }
-
-                if (!_handleEntryPointTracePoint) {
-                    // Fall back to firing entrypoint hit event without actually resuming
-                    // SDM will auto-resume on entrypoint hit for F5 launch, but not for F10/F11 launch
-                    var entryPointHit = EntryPointHit;
-                    if (entryPointHit != null) {
-                        entryPointHit(this, new ThreadEventArgs(MainThread));
-                    }
+                if (breakpointBindings.Count > 0) {
+                    // Delegate to ProcessBreak() which knows how to correctly
+                    // fire breakpoint hit events for given breakpoint bindings and current backtrace
+                    ProcessBreak(
+                        breakpointBindings,
+                        noBreakpointsHitHandler:
+                            () => {
+                                // Handle no breakpoints hit for current backtrace
+                                // Fire entrypoint hit event without actually resuming
+                                // SDM will auto-resume on entrypoint hit for F5 launch, but not for F10/F11 launch
+                                HandleEntryPointHit();
+                            },
+                        testFullyBound: true
+                    );
+                    return;
                 }
 
+                // Handle no breakpoint at entrypoint
+                // Fire entrypoint hit event without actually resuming
+                // SDM will auto-resume on entrypoint hit for F5 launch, but not for F10/F11 launch
+                HandleEntryPointHit();
                 return;
             }
 
@@ -1355,19 +1371,25 @@ namespace Microsoft.NodejsTools.Debugger {
             // By first firing breakpoint hit for a breakpoint/tracepoint at the entrypoint, and then falling back to firing entrypoint hit
             // when the breakpoint is a tracepoint (auto-resumed), the breakpoint's/tracepoint's side effects will be seen, including when effectively
             // breaking at the entrypoint for F10/F11 launch.            
-            if (_handleEntryPointTracePoint) {
-                _handleEntryPointTracePoint = false;
-
-                // SDM will auto-resume on entrypoint hit for F5 launch, but not for F10/F11 launch
-                var entryPointHit = EntryPointHit;
-                if (entryPointHit != null) {
-                    entryPointHit(this, new ThreadEventArgs(MainThread));
-                    return;
-                }
+            // SDM will auto-resume on entrypoint hit for F5 launch, but not for F10/F11 launch
+            if (HandleEntryPointHit()) {
+                return;
             }
 
             // Handle tracepoint (auto-resumed "when hit" breakpoint) resume during stepping
             AutoResume();
+        }
+
+        private bool HandleEntryPointHit() {
+            if (_handleEntryPointHit) {
+                _handleEntryPointHit = false;
+                var entryPointHit = EntryPointHit;
+                if (entryPointHit != null) {
+                    entryPointHit(this, new ThreadEventArgs(MainThread));
+                    return true;
+                }
+            }
+            return false;
         }
 
         public void SendClearStepping(int threadId) {
@@ -1422,8 +1444,80 @@ namespace Microsoft.NodejsTools.Debugger {
             return builder.ToString();
         }
 
-        internal void BindBreakpoint(NodeBreakpoint breakpoint, Action<NodeBreakpointBinding> successHandler = null, Action failureHandler = null) {
-            DebugWriteCommand(String.Format("Bind Breakpoint"));
+        public void BindBreakpoint(NodeBreakpoint breakpoint, Action<NodeBreakpointBinding> successHandler = null, Action failureHandler = null) {
+            // Wrap failure handler
+            Action wrappedFailureHandler = () => {
+                HandleBindBreakpointFailure(breakpoint);
+
+                if (failureHandler != null) {
+                    failureHandler();
+                }
+            };
+
+            SetBreakpoint(
+                breakpoint,
+                successHandler:
+                    (breakpointID, scriptID, lineNo) => {
+                        var fullyBound = (scriptID.HasValue && lineNo == breakpoint.LineNo);
+                        var breakpointBinding = CreateBreakpointBinding(breakpoint, breakpointID, scriptID, lineNo, fullyBound);
+
+                        // Fully bound (normal case)
+                        // Treat as success
+                        if (fullyBound) {
+                            HandleBindBreakpointSuccess(breakpointBinding, breakpoint);
+                            if (successHandler != null) {
+                                successHandler(breakpointBinding);
+                            }
+                            return;
+                        }
+
+                        // Not fully bound, with predicate
+                        // Rebind without predicate
+                        if (breakpoint.HasPredicate) {
+                            RemoveBreakPoint(
+                                breakpointBinding,
+                                successHandler:
+                                    () => {
+                                        SetBreakpoint(
+                                            breakpoint,
+                                            withoutPredicate: true,
+                                            successHandler:
+                                                (breakpointID2, scriptID2, lineNo2) => {
+                                                    Debug.Assert(!(scriptID2.HasValue && lineNo2 == breakpoint.LineNo));
+                                                    CreateBreakpointBinding(breakpoint, breakpointID2, scriptID2, lineNo2, fullyBound: false);
+
+                                                    // Treat as failure (for now)
+                                                    wrappedFailureHandler();
+                                                },
+                                            failureHandler:
+                                                () => {
+                                                    wrappedFailureHandler();
+                                                }
+                                        );
+                                    },
+                                failureHandler:
+                                    () => {
+                                        wrappedFailureHandler();
+                                    }
+                            );
+                            return;
+                        }
+
+                        // Not fully bound, without predicate
+                        // Treat as failure (for now)
+                        wrappedFailureHandler();
+                        return;
+
+                    },
+                failureHandler:
+                    () => {
+                        wrappedFailureHandler();
+                    }
+            );
+        }
+
+        internal void SetBreakpoint(NodeBreakpoint breakpoint, Action<int, int?, int> successHandler = null, Action failureHandler = null, bool withoutPredicate = false) {
+            DebugWriteCommand(String.Format("Set Breakpoint"));
 
             // Zero based line numbers
             var line = breakpoint.LineNo - 1;
@@ -1447,70 +1541,75 @@ namespace Microsoft.NodejsTools.Debugger {
                 args["type"] = "scriptRegExp";
                 args["target"] = GetCaseInsensitiveRegex(breakpoint.FileName, _attached);
             }
+
             if (!NodeBreakpointBinding.GetEngineEnabled(breakpoint.Enabled, breakpoint.BreakOn, 0)) {
                 args["enabled"] = false;
             }
-            var ignoreCount = NodeBreakpointBinding.GetEngineIgnoreCount(breakpoint.BreakOn, 0);
-            if (ignoreCount > 0) {
-                args["ignoreCount"] = ignoreCount;
-            }
-            if (!string.IsNullOrEmpty(breakpoint.Condition)) {
-                args["condition"] = breakpoint.Condition;
-            }
 
-            Action<Dictionary<string, object>> responseHandler = json => {
-                var success = (bool)json["success"];
-                if (success) {
-                    var body = (Dictionary<string, object>)json["body"];
-                    var breakpointID = (int)body["breakpoint"];
-                    int? scriptID = null;
-                    if (module != null) {
-                        scriptID = module.ModuleId;
-                    }
-
-                    // Handle breakpoint actual location fixup
-                    var lineNo = breakpoint.LineNo;
-                    object actualLocationsObject;
-                    if (body.TryGetValue("actual_locations", out actualLocationsObject) && actualLocationsObject != null) {
-                        var actualLocations = (object[])actualLocationsObject;
-                        if (actualLocations.Length > 0) {
-                            Debug.Assert(actualLocations.Length == 1);
-                            var actualLocation = (int)((Dictionary<string, object>)actualLocations[0])["line"] + 1;
-                            if (actualLocation != breakpoint.LineNo) {
-                                lineNo = actualLocation;
-                            }
-                        }
-                    }
-
-                    var breakpointBinding = breakpoint.CreateBinding(lineNo, breakpointID, scriptID);
-                    _breakpointBindings[breakpointID] = breakpointBinding;
-
-                    var breakpointBound = BreakpointBound;
-                    if (breakpointBound != null) {
-                        breakpointBound(this, new BreakpointBindingEventArgs(breakpoint, breakpointBinding));
-                    }
-
-                    if (successHandler != null) {
-                        successHandler(breakpointBinding);
-                    }
-                } else { // Failure
-                    var breakpointBindFailure = BreakpointBindFailure;
-                    if (breakpointBindFailure != null) {
-                        breakpointBindFailure(this, new BreakpointBindingEventArgs(breakpoint, null));
-                    }
-
-                    if (failureHandler != null) {
-                        failureHandler();
-                    }
+            if (!withoutPredicate) {
+                var ignoreCount = NodeBreakpointBinding.GetEngineIgnoreCount(breakpoint.BreakOn, 0);
+                if (ignoreCount > 0) {
+                    args["ignoreCount"] = ignoreCount;
                 }
-            };
+
+                if (!string.IsNullOrEmpty(breakpoint.Condition)) {
+                    args["condition"] = breakpoint.Condition;
+                }
+            }
 
             SendRequest(
                 "setbreakpoint",
                 args,
-                responseHandler,
-                responseHandler
+                successHandler:
+                    (json) => {
+                        var body = (Dictionary<string, object>)json["body"];
+                        var breakpointID = (int)body["breakpoint"];
+                        int? scriptID = null;
+                        if (module != null) {
+                            scriptID = module.ModuleId;
+                        }
+
+                        // Handle breakpoint actual location fixup
+                        var lineNo = breakpoint.LineNo;
+                        object actualLocationsObject;
+                        if (body.TryGetValue("actual_locations", out actualLocationsObject) && actualLocationsObject != null) {
+                            var actualLocations = (object[])actualLocationsObject;
+                            if (actualLocations.Length > 0) {
+                                Debug.Assert(actualLocations.Length == 1);
+                                var actualLocation = (int)((Dictionary<string, object>)actualLocations[0])["line"] + 1;
+                                if (actualLocation != breakpoint.LineNo) {
+                                    lineNo = actualLocation;
+                                }
+                            }
+                        }
+
+                        successHandler(breakpointID, scriptID, lineNo);
+                    },
+                failureHandler:
+                    (json) => {
+                        failureHandler();
+                    }
             );
+        }
+
+        private NodeBreakpointBinding CreateBreakpointBinding(NodeBreakpoint breakpoint, int breakpointID, int? scriptID, int lineNo, bool fullyBound) {
+            var breakpointBinding = breakpoint.CreateBinding(lineNo, breakpointID, scriptID, fullyBound);
+            _breakpointBindings[breakpointID] = breakpointBinding;
+            return breakpointBinding;
+        }
+
+        private void HandleBindBreakpointSuccess(NodeBreakpointBinding breakpointBinding, NodeBreakpoint breakpoint) {
+            var breakpointBound = BreakpointBound;
+            if (breakpointBound != null) {
+                breakpointBound(this, new BreakpointBindingEventArgs(breakpoint, breakpointBinding));
+            }
+        }
+
+        private void HandleBindBreakpointFailure(NodeBreakpoint breakpoint) {
+            var breakpointBindFailure = BreakpointBindFailure;
+            if (breakpointBindFailure != null) {
+                breakpointBindFailure(this, new BreakpointBindingEventArgs(breakpoint, null));
+            }
         }
 
         internal NodeModule GetModuleForFilePath(string filePath) {
@@ -1584,7 +1683,7 @@ namespace Microsoft.NodejsTools.Debugger {
                 json => {
                     // Handle success
                     var body = (Dictionary<string, object>)json["body"];
-                    var breakpoints = (object [])body["breakpoints"];
+                    var breakpoints = (object[])body["breakpoints"];
                     foreach (var breakpointObj in breakpoints) {
                         var breakpoint = (Dictionary<string, object>)breakpointObj;
                         if ((int)breakpoint["number"] == breakpointId) {
@@ -2014,5 +2113,33 @@ namespace Microsoft.NodejsTools.Debugger {
             );
             return scriptText;
         }
+
+        internal void TestPredicate(string expression, Action trueHandler, Action falseHandler) {
+            DebugWriteCommand("TestPredicate: " + expression);
+            
+            SendRequest(
+                "evaluate",
+                new Dictionary<string, object> {
+                        { "expression", "Boolean(" + expression + ")" },
+                        { "frame",  0 },
+                        { "global", false },
+                        { "disable_break", true },
+                },
+                successHandler:
+                    json => {
+                        var record = (Dictionary<string, object>)json["body"];
+                        if ((string)record["type"] == "boolean" && (bool)record["value"] == true) {
+                            trueHandler();
+                        } else {
+                            falseHandler();
+                        }
+                    },
+                failureHandler:
+                    json => {
+                        falseHandler();
+                    }
+            );
+        }
+
     }
 }

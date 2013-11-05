@@ -35,7 +35,8 @@ namespace Microsoft.NodejsTools.Debugger {
             NodeBreakpoint breakpoint,
             int lineNo,
             int breakpointId,
-            int? scriptID
+            int? scriptID,
+            bool fullyBound
         ) {
             _breakpoint = breakpoint;
             _lineNo = lineNo;
@@ -46,7 +47,7 @@ namespace Microsoft.NodejsTools.Debugger {
             _condition = breakpoint.Condition;
             _engineEnabled = GetEngineEnabled();
             _engineIgnoreCount = GetEngineIgnoreCount();
-            _fullyBound = (_scriptID.HasValue && _lineNo == _breakpoint.LineNo);
+            _fullyBound = fullyBound;
         }
 
         public NodeDebugger Process {
@@ -208,14 +209,6 @@ namespace Microsoft.NodejsTools.Debugger {
             }
         }
 
-        internal bool TryIgnore() {
-            if (GetEngineEnabled() && GetEngineIgnoreCount() > 0) {
-                --_hitCountDelta;
-                return SetBreakOn(_breakOn, force: true);
-            }
-            return false;
-        }
-
         internal bool GetEngineEnabled() {
             return GetEngineEnabled(_enabled, _breakOn, HitCount);
         }
@@ -250,6 +243,42 @@ namespace Microsoft.NodejsTools.Debugger {
                     break;
             }
             return count;
+        }
+
+        private void TestHit(Action trueHandler, Action falseHandler) {
+            // Not hit if any ignore count
+            if (GetEngineIgnoreCount() > 0) {
+                falseHandler();
+                return;
+            }
+
+            // Not hit if false condition
+            if (!string.IsNullOrEmpty(_condition)) {
+                Process.TestPredicate(_condition, trueHandler, falseHandler);
+                return;
+            }
+
+            // Otherwise, hit
+            trueHandler();
+        }
+
+        internal void TestAndProcessHit(Action<NodeBreakpointBinding> processBinding) {
+            // Process based on whether hit (based on hit count and/or condition predicates)
+            TestHit(
+                trueHandler:
+                    () => {
+                        // Fixup hit count
+                        _hitCountDelta = _engineHitCount - 1;
+
+                        // Process as hit
+                        processBinding(this);
+                    },
+                falseHandler:
+                    () => {
+                        // Process as not hit
+                        processBinding(null);
+                    }
+            );
         }
 
         private void SyncCounts() {

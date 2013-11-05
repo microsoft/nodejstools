@@ -1066,12 +1066,14 @@ namespace Microsoft.NodejsTools.Debugger.DebugEngine {
         private void OnBreakpointUnbound(object sender, BreakpointBindingEventArgs e) {
             var breakpointBinding = e.BreakpointBinding;
             var boundBreakpoint = _breakpointManager.GetBoundBreakpoint(breakpointBinding);
-            _breakpointManager.RemoveBoundBreakpoint(breakpointBinding);
-            Send(
-                new AD7BreakpointUnboundEvent(boundBreakpoint),
-                AD7BreakpointUnboundEvent.IID,
-                null
-            );
+            if (boundBreakpoint != null) {
+                _breakpointManager.RemoveBoundBreakpoint(breakpointBinding);
+                Send(
+                    new AD7BreakpointUnboundEvent(boundBreakpoint),
+                    AD7BreakpointUnboundEvent.IID,
+                    null
+                );
+            }
         }
 
         private void OnBreakpointBindFailure(object sender, BreakpointBindingEventArgs e) {
