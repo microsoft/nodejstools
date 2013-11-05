@@ -460,8 +460,10 @@ namespace Microsoft.VisualStudioTools.Project
                 RenameDirectory(CommonUtils.GetAbsoluteDirectoryPath(ProjectMgr.ProjectHome, newPath));
             }
 
-            ReparentFolder(newPath);
+            bool wasExpanded = GetIsExpanded();
 
+            ReparentFolder(newPath);
+            
             var oldTriggerFlag = ProjectMgr.EventTriggeringFlag;
             ProjectMgr.EventTriggeringFlag |= ProjectNode.EventTriggering.DoNotTriggerTrackerEvents;
             try 
@@ -489,7 +491,7 @@ namespace Microsoft.VisualStudioTools.Project
             ProjectMgr.Tracker.OnItemRenamed(oldPath, newPath, VSRENAMEFILEFLAGS.VSRENAMEFILEFLAGS_Directory);
 
             // Some of the previous operation may have changed the selection so set it back to us
-            ExpandItem(EXPANDFLAGS.EXPF_CollapseFolder);
+            ExpandItem(wasExpanded ? EXPANDFLAGS.EXPF_ExpandFolder : EXPANDFLAGS.EXPF_CollapseFolder);
             ExpandItem(EXPANDFLAGS.EXPF_SelectItem);
         }
 

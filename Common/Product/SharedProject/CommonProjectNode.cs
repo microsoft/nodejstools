@@ -605,7 +605,8 @@ namespace Microsoft.VisualStudioTools.Project {
                     // directory was deleted, we don't have access, etc...
                     return true;
                 }
-
+                
+                bool wasExpanded = dir.Parent.GetIsExpanded();
                 foreach (var curDir in dirs) {
                     if (_project.IsFileHidden(curDir)) {
                         continue;
@@ -619,17 +620,21 @@ namespace Microsoft.VisualStudioTools.Project {
                         // track symlinks, we won't get events on the directory
                         _project.CreateSymLinkWatcher(curDir);
                     }
-
+                    
                     var existing = _project.AddAllFilesFolder(dir.Parent, curDir + Path.DirectorySeparatorChar);
                     missingChildren.Remove(existing);
                     _remainingDirs.Push(new DirState(curDir, existing));
                 }
-
+                                
                 IEnumerable<string> files;
                 try {
                     files = Directory.EnumerateFiles(dir.Name);
                 } catch {
                     // directory was deleted, we don't have access, etc...
+                                        
+                    // We are about to return and some of the previous operations may have affect the Parent's Expanded
+                    // state.  Set it back to what it was
+                    dir.Parent.ExpandItem(wasExpanded ? EXPANDFLAGS.EXPF_ExpandFolder : EXPANDFLAGS.EXPF_CollapseFolder);
                     return true;
                 }
 
@@ -646,6 +651,8 @@ namespace Microsoft.VisualStudioTools.Project {
                         _project.RemoveSubTree(child);
                     }
                 }
+
+                dir.Parent.ExpandItem(wasExpanded ? EXPANDFLAGS.EXPF_ExpandFolder : EXPANDFLAGS.EXPF_CollapseFolder);
 
                 return true;
             }
@@ -791,7 +798,7 @@ namespace Microsoft.VisualStudioTools.Project {
 
                 // Solution Explorer will expand the parent when an item is
                 // added, which we don't want
-                folderNode.ExpandItem(EXPANDFLAGS.EXPF_CollapseFolder);
+                folderNode.ExpandItem(EXPANDFLAGS.EXPF_CollapseFolder);                
             }
             return folderNode;
         }
@@ -1083,28 +1090,20 @@ namespace Microsoft.VisualStudioTools.Project {
                             _project.CreateSymLinkWatcher(_path);
                         }
 
-                        var folderNode = _project.AddAllFilesFolder(parent, _path + Path.DirectorySeparatorChar);
-                        // we may have just moved a directory from another location (e.g. drag and
-                        // and drop in explorer), in which case we also need to process the items
-                        // which are in the folder that we won't receive create notifications for.
-
-                        // First, make sure we don't have any children
-                        RemoveAllFilesChildren(folderNode);
+                        var folderNode = _project.AddAllFilesFolder(parent, _path + Path.DirectorySeparatorChar);                                                
+                        bool folderNodeWasExpanded = folderNode.GetIsExpanded();
 
                         // then add the folder nodes
                         _project.MergeDiskNodes(folderNode, _path);
-
                         _project.OnInvalidateItems(folderNode);
+
+                        folderNode.ExpandItem(folderNodeWasExpanded ? EXPANDFLAGS.EXPF_ExpandFolder : EXPANDFLAGS.EXPF_CollapseFolder);
+
                     } else if (File.Exists(_path)) { // rapid changes can arrive out of order, make sure the file still exists
                         _project.AddAllFilesFile(parent, _path);
                     }
 
-                    if (!wasExpanded) {
-                        // Solution Explorer will expand the parent when an item is
-                        // added, which we don't want, so we check it's state before
-                        // adding, and then collapse the folder if it was expanded.
-                        parent.ExpandItem(EXPANDFLAGS.EXPF_CollapseFolder);
-                    }
+                    parent.ExpandItem(wasExpanded ? EXPANDFLAGS.EXPF_ExpandFolder: EXPANDFLAGS.EXPF_CollapseFolder);
                 }
             }
         }

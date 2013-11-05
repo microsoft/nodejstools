@@ -79,6 +79,7 @@ namespace Microsoft.VisualStudioTools.SharedProjectTests {
         }
 
         private void MoveExcludedItemToFolder(MoveDelegate mover) {
+            
             foreach (var projectType in ProjectTypes) {
                 var testDef = new ProjectDefinition("MoveExcludedItemToFolder", 
                     projectType, 
@@ -99,6 +100,8 @@ namespace Microsoft.VisualStudioTools.SharedProjectTests {
 
                     solution.AssertFileDoesntExist("MoveExcludedItemToFolder", "codefile" + projectType.CodeExtension);
                     solution.AssertFileExists("MoveExcludedItemToFolder", "Folder", "codefile" + projectType.CodeExtension);
+                    Assert.IsTrue(solution.Project.GetIsFolderExpanded("Folder"));
+                    
                 }
             }
         }

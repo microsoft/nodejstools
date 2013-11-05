@@ -364,6 +364,8 @@ namespace Microsoft.VisualStudioTools.SharedProjectTests {
                     var projectNode = solution.WaitForItem("ShowAllFiles");
                     AutomationWrapper.Select(projectNode);
 
+                    var dteProject = solution.Project;
+
                     Assert.IsNotNull(solution.WaitForItem("ShowAllFiles", "NotInProject" + projectType.CodeExtension));
 
                     // everything should be there...
@@ -372,52 +374,53 @@ namespace Microsoft.VisualStudioTools.SharedProjectTests {
                     Assert.IsNotNull(solution.WaitForItem("ShowAllFiles", "Folder", "File.txt"));
                     Assert.IsNotNull(solution.WaitForItem("ShowAllFiles", "Folder", "SubFolder"));
                     Assert.IsNotNull(solution.WaitForItem("ShowAllFiles", "Folder", "SubFolder", "SubFile.txt"));
-
+                                        
                     // create some stuff, it should show up...
                     File.WriteAllText(Path.Combine(solution.Directory, @"ShowAllFiles\NewFile.txt"), "");
                     Assert.IsNotNull(solution.WaitForItem("ShowAllFiles", "NewFile.txt"));
-
+                    
                     File.WriteAllText(Path.Combine(solution.Directory, @"ShowAllFiles\Folder\NewFile.txt"), "");
                     Assert.IsNotNull(solution.WaitForItem("ShowAllFiles", "Folder", "NewFile.txt"));
+                    Assert.IsTrue(dteProject.GetIsFolderExpanded(@"Folder"));
 
                     File.WriteAllText(Path.Combine(solution.Directory, @"ShowAllFiles\Folder\SubFolder\NewFile.txt"), "");
                     Assert.IsNotNull(solution.WaitForItem("ShowAllFiles", "Folder", "SubFolder", "NewFile.txt"));
 
                     Directory.CreateDirectory(Path.Combine(solution.Directory, @"ShowAllFiles\NewFolder"));
                     Assert.IsNotNull(solution.WaitForItem("ShowAllFiles", "NewFolder"));
-
+                    
                     Directory.CreateDirectory(Path.Combine(solution.Directory, @"ShowAllFiles\NewFolder\SubFolder"));
                     Assert.IsNotNull(solution.WaitForItem("ShowAllFiles", "NewFolder", "SubFolder"));
-
+                    
                     File.WriteAllText(Path.Combine(solution.Directory, @"ShowAllFiles\NewFolder\SubFolder\NewFile.txt"), "");
                     Assert.IsNotNull(solution.WaitForItem("ShowAllFiles", "NewFolder", "SubFolder", "NewFile.txt"));
-
+                    
                     // delete some stuff, it should go away
                     File.Delete(Path.Combine(solution.Directory, @"ShowAllFiles\Folder\File.txt"));
                     Assert.IsNull(solution.WaitForItemRemoved("ShowAllFiles", "Folder", "File.txt"));
-
+                    
                     File.Delete(Path.Combine(solution.Directory, @"ShowAllFiles\NewFile.txt"));
                     Assert.IsNull(solution.WaitForItemRemoved("ShowAllFiles", "NewFile.txt"));
-
+                    
                     File.Delete(Path.Combine(solution.Directory, @"ShowAllFiles\NewFolder\NewFile.txt"));
                     Assert.IsNull(solution.WaitForItemRemoved("ShowAllFiles", "NewFolder", "NewFile.txt"));
-
+                    
                     File.Delete(Path.Combine(solution.Directory, @"ShowAllFiles\NewFolder\SubFolder\NewFile.txt"));
                     Assert.IsNull(solution.WaitForItemRemoved("ShowAllFiles", "NewFolder", "SubFolder", "NewFile.txt"));
-
+                    
                     Directory.Delete(Path.Combine(solution.Directory, @"ShowAllFiles\NewFolder\SubFolder"));
                     Assert.IsNull(solution.WaitForItemRemoved("ShowAllFiles", "NewFolder", "SubFolder"));
-
+                    
                     Directory.Delete(Path.Combine(solution.Directory, @"ShowAllFiles\NewFolder"));
                     Assert.IsNull(solution.WaitForItemRemoved("ShowAllFiles", "NewFolder"));
-
+                    
                     Directory.Move(
                         Path.Combine(solution.Directory, @"MovedIntoShowAllFiles"),
                         Path.Combine(solution.Directory, @"ShowAllFiles\MovedIntoShowAllFiles")
                     );
 
                     Assert.IsNotNull(solution.WaitForItem("ShowAllFiles", "MovedIntoShowAllFiles", "Text.txt"));
-
+                    
                     // move it back
                     Directory.Move(
                         Path.Combine(solution.Directory, @"ShowAllFiles\MovedIntoShowAllFiles"),

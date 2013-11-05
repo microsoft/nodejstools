@@ -261,7 +261,7 @@ namespace Microsoft.VisualStudioTools.Project {
 
                 DocumentManager manager = node.GetDocumentManager();
                 if (manager != null &&
-                    manager.IsDirty && 
+                    manager.IsDirty &&
                     manager.IsOpenedByUs) {
                     dirty = true;
                     break;
@@ -608,7 +608,7 @@ folder you are copying, do you want to replace the existing files?", Path.GetFil
                     ReportMissingItem(folder);
                     return null;
                 }
-                
+
                 if (Path.Combine(targetFolderNode.FullPathToChildren, targetFileName).Length >= NativeMethods.MAX_FOLDER_PATH) {
                     VsShellUtilities.ShowMessageBox(
                         Project.Site,
@@ -779,8 +779,10 @@ folder you are copying, do you want to replace the existing files?", Path.GetFil
                         // Rename the folder & reparent our existing FolderNode w/ potentially w/ a new ID,
                         // but don't update the children as we'll handle that w/ our file additions...
                         wasExpanded = sourceFolder.GetIsExpanded();
-                        sourceFolder.ReparentFolder(NewFolderPath);
                         Directory.CreateDirectory(NewFolderPath);
+                        sourceFolder.ReparentFolder(NewFolderPath);
+
+                        sourceFolder.ExpandItem(wasExpanded ? EXPANDFLAGS.EXPF_ExpandFolder : EXPANDFLAGS.EXPF_CollapseFolder);
                         newNode = sourceFolder;
                         isNonMember = sourceFolder.IsNonMemberItem;
                     }
@@ -794,6 +796,10 @@ folder you are copying, do you want to replace the existing files?", Path.GetFil
                             // copying or moving an existing excluded folder, new folder
                             // is excluded too.
                             ErrorHandler.ThrowOnFailure(newNode.ExcludeFromProject());
+                        } else if (sourceFolder.Parent.IsNonMemberItem) {
+                            // We've moved an included folder to a show all files folder,
+                            //     add the parent to the project   
+                            ErrorHandler.ThrowOnFailure(sourceFolder.Parent.IncludeInProject(false));
                         }
 
                         if (DropEffect == DropEffect.Move) {
@@ -807,10 +813,8 @@ folder you are copying, do you want to replace the existing files?", Path.GetFil
 
                     // Send OnItemRenamed for the folder now, after all of the children have been renamed
                     Project.Tracker.OnItemRenamed(SourceFolder, NewFolderPath, VSRENAMEFILEFLAGS.VSRENAMEFILEFLAGS_Directory);
-                    
-                    if (wasExpanded) {
-                        sourceFolder.ExpandItem(EXPANDFLAGS.EXPF_ExpandFolder);
-                    }
+
+                    sourceFolder.ExpandItem(wasExpanded ? EXPANDFLAGS.EXPF_ExpandFolder : EXPANDFLAGS.EXPF_CollapseFolder);
                 }
             }
 
@@ -1092,7 +1096,7 @@ folder you are copying, do you want to replace the existing files?", Path.GetFil
                     existing.Parent.RemoveChild(existing);
 
                     existing.ID = Project.ItemIdMap.Add(existing);
-                    
+
                     var newParent = TargetFolder == Project.ProjectHome ? Project : Project.FindNodeByFullPath(TargetFolder);
                     newParent.AddChild(existing);
                     Project.ItemsDraggedOrCutOrCopied.Remove(existing); // we don't need to remove the file after Paste
@@ -1725,6 +1729,6 @@ folder you are copying, do you want to replace the existing files?", Path.GetFil
             _copyCutState = CopyCutState.None;
         }
 
-        
+
     }
 }
