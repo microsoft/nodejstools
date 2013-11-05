@@ -199,7 +199,7 @@ namespace Microsoft.NodejsTools.Project {
         /// get the correct intellisense back.
         /// </summary>
         internal void UpdateReferenceFile(NodejsFileNode changedFile = null) {
-            _uiSync.Invoke((Action<NodejsFileNode>)UpdateReferenceFileUIThread, changedFile);
+            _uiSync.BeginInvoke((Action<NodejsFileNode>)UpdateReferenceFileUIThread, changedFile);
         }
 
         private void UpdateReferenceFileUIThread(NodejsFileNode changedFile) {
