@@ -13,6 +13,7 @@
  * ***************************************************************************/
 
 using System;
+using System.ComponentModel.Design;
 using System.Runtime.InteropServices;
 using Microsoft.VisualStudioTools;
 using Microsoft.VisualStudioTools.Project;
@@ -45,6 +46,10 @@ namespace Microsoft.NodejsTools.Project {
             }
         }
         public override void Apply() {
+            if (_control.HasErrors) {
+                throw CheckoutException.Canceled;
+            }
+
             Project.SetProjectProperty(NodejsConstants.NodeExePath, _control.NodeExePath);
             Project.SetProjectProperty(NodejsConstants.NodeExeArguments, _control.NodeExeArguments);
             Project.SetProjectProperty(NodejsConstants.ScriptArguments, _control.ScriptArguments);

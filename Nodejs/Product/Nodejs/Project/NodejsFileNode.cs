@@ -68,7 +68,15 @@ namespace Microsoft.NodejsTools.Project {
             code.AppendLine();
             code.AppendFormat(NodejsConstants.NodejsHiddenUserModuleInstance + "{0} = {1}();", _fileId, MangledModuleFunctionName);
             code.AppendLine();
-            File.WriteAllText(_tempFilePath, code.ToString());
+
+            for (int i = 0; i < 10; i++) {
+                try {
+                    File.WriteAllText(_tempFilePath, code.ToString());
+                    break;
+                } catch (IOException) {
+                    System.Threading.Thread.Sleep(100);
+                }
+            }
         }
 
         internal override int ExecCommandOnNode(Guid guidCmdGroup, uint cmd, uint nCmdexecopt, IntPtr pvaIn, IntPtr pvaOut) {
@@ -179,7 +187,7 @@ namespace Microsoft.NodejsTools.Project {
 
         public override void Close() {
             base.Close();
-            
+
             CloseWatcher();
 
             ((NodejsProjectNode)ProjectMgr)._nodeFiles.Remove(this);

@@ -103,6 +103,7 @@
       <ContentFiles Include="@(Compile)"></ContentFiles>
       <ContentFiles Include="@(Include)"></ContentFiles>
       <ContentFiles Include="@(NodeModulesContent)"></ContentFiles>
+      <Content Include="@(NodeModulesContent)"/>
 
       <GeneratedFiles Include="@(NodejsAzureDeploymentFile)" />
       

@@ -13,6 +13,7 @@
  * ***************************************************************************/
 
 using System;
+using System.ComponentModel;
 using System.Drawing;
 using System.IO;
 using System.Linq;
@@ -34,6 +35,13 @@ namespace Microsoft.NodejsTools.Project {
 
         public NodejsGeneralPropertyPageControl(NodejsGeneralPropertyPage page) : this() {
             _propPage = page;
+        }
+
+        public bool HasErrors {
+            get {
+                return !String.IsNullOrEmpty(_nodeExeErrorProvider.GetError(_nodejsPort)) ||
+                       !String.IsNullOrEmpty(_nodeExeErrorProvider.GetError(_nodeExePath));
+            }
         }
 
         private void AddToolTips() {
@@ -128,12 +136,13 @@ namespace Microsoft.NodejsTools.Project {
             );
         }
 
-        private void NodeExePathValidated(object sender, EventArgs e) {
+        private void NodeExePathChanged(object sender, EventArgs e) {
             if (String.IsNullOrEmpty(_nodeExePath.Text) || File.Exists(_nodeExePath.Text)) {
                 _nodeExeErrorProvider.SetError(_nodeExePath, String.Empty);
             } else {
                 _nodeExeErrorProvider.SetError(_nodeExePath, Resources.NodeExePathNotFound);
             }
+            Changed(sender, e);
         }
         
         private void BrowsePathClick(object sender, EventArgs e) {
@@ -157,13 +166,13 @@ namespace Microsoft.NodejsTools.Project {
             }
         }
 
-        private void NodejsPortValidated(object sender, EventArgs e) {
+        private void NodejsPortChanged(object sender, EventArgs e) {
             if (_nodejsPort.Text.Any(ch => !Char.IsDigit(ch))) {
                 _nodeExeErrorProvider.SetError(_nodejsPort, Resources.InvalidPortNumber);
             } else {
                 _nodeExeErrorProvider.SetError(_nodejsPort, String.Empty);
             }
-
+            Changed(sender, e);
         }
     }
 }
