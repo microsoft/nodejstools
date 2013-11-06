@@ -40,6 +40,10 @@
             <Parent guid="guidNodeToolsCmdSet" id="RemoteDebugProxyMenu"/>
         </Group>
 
+        <Group guid="guidNodeToolsCmdSet" id="NpmInstallItemsGroup" priority="0x0700"></Group>
+
+        <Group guid="guidNodeToolsCmdSet" id="NpmUninstallItemsGroup" priority="0x0800"></Group>
+
     </Groups>
 
     <Menus>
@@ -58,6 +62,13 @@
                 <CommandName>&amp;Remote Debugging Proxy</CommandName>
             </Strings>
         </Menu>
+
+      <!--<Menu guid="guidNodeToolsCmdSet" id="NpmMenu" priority="0x8100" type="Menu">
+        <Strings>
+          <ButtonText>npm</ButtonText>
+          <CommandName>&amp;npm</CommandName>
+        </Strings>
+      </Menu>-->
     </Menus>
 
     <!--Buttons section: buttons include both buttons on toolbars as well as individual menu items -->
@@ -115,6 +126,30 @@
         </Strings>
       </Button>
 
+      <Button guid="guidNodeToolsCmdSet" id="cmdidNpmManageModules" priority="0x8000" type="Button">
+        <Parent guid="guidNodeToolsCmdSet" id="NpmInstallItemsGroup" />
+        <Strings>
+          <CommandName>cmdidNpmManageModules</CommandName>
+          <ButtonText>Mana&amp;ge Modules...</ButtonText>
+        </Strings>
+      </Button>
+
+      <Button guid="guidNodeToolsCmdSet" id="cmdidNpmUpdateModules" priority="0x8100" type="Button">
+        <Parent guid="guidNodeToolsCmdSet" id="NpmInstallItemsGroup" />
+        <Strings>
+          <CommandName>cmdidNpmUpdateModules</CommandName>
+          <ButtonText>Up&amp;date Modules</ButtonText>
+        </Strings>
+      </Button>
+
+      <Button guid="guidNodeToolsCmdSet" id="cmdidNpmUninstallModule" priority="0x8200" type="Button">
+        <Parent guid="guidNodeToolsCmdSet" id="NpmUninstallItemsGroup" />
+        <Strings>
+          <CommandName>cmdidNpmUninstallModules</CommandName>
+          <ButtonText>Unins&amp;tall Module</ButtonText>
+        </Strings>
+      </Button>
+
     </Buttons>
 
 
@@ -137,6 +172,18 @@
     <CommandPlacement guid="guidNodeToolsCmdSet" id="CodeFileGroup" priority="0x600">
       <Parent guid="guidSHLMainMenu" id="IDM_VS_CTXT_WEBITEMNODE"/>
     </CommandPlacement>
+
+    <CommandPlacement guid="guidNodeToolsCmdSet" id="NpmInstallItemsGroup" priority="0x0700">
+      <Parent guid="guidSHLMainMenu" id="IDM_VS_MENU_PROJECT" />
+    </CommandPlacement>
+
+    <CommandPlacement guid="guidNodeToolsCmdSet" id="NpmInstallItemsGroup" priority="0x0700">
+      <Parent guid="guidSHLMainMenu" id="IDM_VS_CTXT_PROJNODE" />
+    </CommandPlacement>
+
+    <CommandPlacement guid="guidNodeToolsCmdSet" id="NpmUninstallItemsGroup" priority="0x0700">
+      <Parent guid="guidSHLMainMenu" id="IDM_VS_CTXT_PROJNODE" />
+    </CommandPlacement>
     
   </CommandPlacements>
 
@@ -149,7 +196,10 @@
       <IDSymbol name="cmdidReplWindow" value="0x0201" />
       <IDSymbol name="cmdidOpenRemoteDebugProxyFolder" value="0x0202" />
       <IDSymbol name="cmdidSetAsNodejsStartupFile" value="0x0203" />
-      <IDSymbol name="cmdidSurveyNews" value ="0x0204" />
+      <IDSymbol name="cmdidSurveyNews" value="0x0204" />
+      <IDSymbol name="cmdidNpmManageModules" value="0x0205" />
+      <IDSymbol name="cmdidNpmUpdateModules" value="0x0206" />
+      <IDSymbol name="cmdidNpmUninstallModule" value="0x0207"/>
 
       <!-- Shared commands, defined in CommonConstants.cs -->
       <IDSymbol name="cmdidAddExistingFolder" value="0x10001" />
@@ -158,6 +208,8 @@
       <IDSymbol name="ToolsMenuItemsGroup" value="0x1010" />
       <IDSymbol name="RemoteDebugProxyGroup" value="0x1011" />
       <IDSymbol name="CodeFileGroup" value="0x1012" />
+      <IDSymbol name="NpmInstallItemsGroup" value="0x1013" />
+      <IDSymbol name="NpmUninstallItemsGroup" value="0x1014" />
 
       <!-- Menus -->
       <IDSymbol name="ToolsMenu" value ="0x2001" />
