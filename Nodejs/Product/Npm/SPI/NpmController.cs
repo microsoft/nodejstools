@@ -97,7 +97,7 @@ namespace Microsoft.NodejsTools.Npm.SPI
                 type,
                 _pathToNpm);
 
-            bool retVal = await command.ExecuteAsync();
+            var retVal = await command.ExecuteAsync();
             FireLogEvents( command );
             Refresh();
             return retVal;
@@ -110,15 +110,32 @@ namespace Microsoft.NodejsTools.Npm.SPI
                 packageName,
                 _pathToNpm);
 
-            bool retVal = await command.ExecuteAsync();
+            var retVal = await command.ExecuteAsync();
             FireLogEvents(command);
             Refresh();
             return retVal;
         }
 
-        public Task< IEnumerable< IPackage > > SearchAsync( string searchText )
+        public async Task< IEnumerable< IPackage > > SearchAsync( string searchText )
         {
-            throw new NotImplementedException();
+            var command = new NpmSearchCommand( _fullPathToRootPackageDirectory, searchText, _pathToNpm );
+            var success = await command.ExecuteAsync();
+            FireLogEvents( command );
+            return success ? command.Results : new List< IPackage >();
+        }
+
+        public async Task< bool > UpdatePackagesAsync()
+        {
+            return await UpdatePackagesAsync( new List< IPackage >() );
+        }
+
+        public async Task< bool > UpdatePackagesAsync( IEnumerable< IPackage > packages )
+        {
+            var command = new NpmUpdateCommand( _fullPathToRootPackageDirectory, packages, _pathToNpm );
+            var success = await command.ExecuteAsync();
+            FireLogEvents( command );
+            Refresh();
+            return success;
         }
 
         private void FireNpmLogEvent( string logText, EventHandler< NpmLogEventArgs > handlers )

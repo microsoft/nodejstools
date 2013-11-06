@@ -13,5 +13,7 @@ namespace Microsoft.NodejsTools.Npm
         Task<bool> InstallPackageByVersionAsync(string packageName, string versionRange, DependencyType type);
         Task<bool> UninstallPackageAsync(string packageName);
         Task< IEnumerable< IPackage > > SearchAsync( string searchText );
+        Task< bool > UpdatePackagesAsync();
+        Task<bool> UpdatePackagesAsync(IEnumerable<IPackage> packages);
     }
 }

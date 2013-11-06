@@ -9,7 +9,9 @@ using System.Windows.Documents;
 using System.Windows.Media.Animation;
 using EnvDTE;
 using Microsoft.NodejsTools.Npm;
+using Microsoft.NodejsTools.NpmUI;
 using Microsoft.VisualStudio;
+using Microsoft.VisualStudio.Shell;
 using Microsoft.VisualStudio.Shell.Interop;
 using Microsoft.VisualStudioTools.Project;
 
@@ -56,7 +58,15 @@ namespace Microsoft.NodejsTools.Project
             m_Watcher.EnableRaisingEvents = true;
         }
 
-        protected override void Dispose( bool disposing )
+        private void CheckNotDisposed()
+        {
+            if (m_IsDisposed)
+            {
+                throw new ObjectDisposedException("This NodeModulesNode has been disposed of and should no longer be used.");
+            }
+        }
+
+        protected override void Dispose(bool disposing)
         {
             if ( ! m_IsDisposed )
             {
@@ -87,7 +97,30 @@ namespace Microsoft.NodejsTools.Project
 
         #region Properties
 
-        public INpmController NpmController { get { return m_NpmController; } }
+        private INpmController GetNpmController( out bool created )
+        {
+            lock ( m_Lock )
+            {
+                created = false;
+                if ( null == m_NpmController )
+                {
+                    m_NpmController = NpmControllerFactory.Create( m_ProjectNode.BuildProject.DirectoryPath );
+                    m_NpmController.OutputLogged += m_NpmController_OutputLogged;
+                    m_NpmController.ErrorLogged += m_NpmController_ErrorLogged;
+                    created = true;
+                }
+                return m_NpmController;
+            }
+        }
+
+        public INpmController NpmController
+        {
+            get
+            {
+                bool created;
+                return GetNpmController( out created );
+            }
+        }
 
         #endregion
 
@@ -139,15 +172,11 @@ namespace Microsoft.NodejsTools.Project
         {
             lock ( m_Lock )
             {
-                if ( null == m_NpmController )
+                bool created;
+                var controller = GetNpmController( out created );
+                if ( ! created )
                 {
-                    m_NpmController = NpmControllerFactory.Create( m_ProjectNode.BuildProject.DirectoryPath );
-                    m_NpmController.OutputLogged += m_NpmController_OutputLogged;
-                    m_NpmController.ErrorLogged += m_NpmController_ErrorLogged;
-                }
-                else
-                {
-                    m_NpmController.Refresh();
+                    controller.Refresh();
                 }
             }
         }
@@ -302,6 +331,84 @@ namespace Microsoft.NodejsTools.Project
         public override int MenuCommandId
         {
             get { return (int)PkgCmdId.menuIdNPM; }
+        }
+
+        #endregion
+
+        #region Command handling
+
+        public void BeforeQueryStatus( object source, EventArgs args )
+        {
+            var command = source as OleMenuCommand;
+            if ( null == command )
+            {
+                return;
+            }
+
+            switch ( command.CommandID.ID )
+            {
+                case PkgCmdId.cmdidNpmManageModules:
+                    command.Enabled = true;
+                    command.Visible = true;
+                    break;
+
+                case PkgCmdId.cmdidNpmUpdateModules:
+                    command.Enabled = true;
+                    command.Visible = true;
+                    break;
+
+                case PkgCmdId.cmdidNpmUninstallModule:
+                    var selected = m_ProjectNode.GetSelectedNodes();
+                    bool enable = true;
+                    foreach ( var node in selected )
+                    {
+                        var dep = node as DependencyNode;
+                        if ( null == node || node.Parent != this )  //  Don't want to let people uninstall sub-modules
+                        {
+                            enable = false;
+                            break;
+                        }
+                    }
+                    command.Enabled = enable;
+                    command.Visible = enable;
+                    break;
+
+            }
+        }
+
+        public void ManageModules()
+        {
+            CheckNotDisposed();
+
+            var managerWindow = new ModuleManager(NpmController);
+            managerWindow.ShowModal();
+            ReloadHierarchy();
+        }
+
+        public void UpdateModules()
+        {
+            CheckNotDisposed();
+
+            var selected = m_ProjectNode.GetSelectedNodes();
+            if ( selected.Count == 1 && selected[ 0 ] == this )
+            {
+                NpmController.UpdatePackagesAsync();
+            }
+            else
+            {
+                NpmController.UpdatePackagesAsync( selected.OfType< DependencyNode >().Select( dep => dep.Package ).ToList() );
+            }
+        }
+
+        public void UninstallModules()
+        {
+            CheckNotDisposed();
+
+            var selected = m_ProjectNode.GetSelectedNodes();
+            foreach ( var name in selected.OfType< DependencyNode >().Select( dep => dep.Package.Name ).ToList() )
+            {
+                NpmController.UninstallPackageAsync( name );
+            }
         }
 
         #endregion
