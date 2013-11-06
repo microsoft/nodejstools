@@ -173,9 +173,9 @@
       <Parent guid="guidSHLMainMenu" id="IDM_VS_CTXT_WEBITEMNODE"/>
     </CommandPlacement>
 
-    <CommandPlacement guid="guidNodeToolsCmdSet" id="NpmInstallItemsGroup" priority="0x0700">
+    <!--<CommandPlacement guid="guidNodeToolsCmdSet" id="NpmInstallItemsGroup" priority="0x0700">
       <Parent guid="guidSHLMainMenu" id="IDM_VS_MENU_PROJECT" />
-    </CommandPlacement>
+    </CommandPlacement>-->
 
     <CommandPlacement guid="guidNodeToolsCmdSet" id="NpmInstallItemsGroup" priority="0x0700">
       <Parent guid="guidSHLMainMenu" id="IDM_VS_CTXT_PROJNODE" />
