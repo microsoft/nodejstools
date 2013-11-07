@@ -197,11 +197,47 @@
     <Compile Include="NpmUI\FlagsToDescriptionConverter.cs" />
     <Compile Include="NpmUI\FlagsToImageConverter.cs" />
     <Compile Include="NpmUI\FlagsToInstallConverter.cs" />
+    <Compile Include="NpmUI\InstalledPackageListControl.cs">
+      <SubType>UserControl</SubType>
+    </Compile>
+    <Compile Include="NpmUI\InstalledPackageListControl.Designer.cs">
+      <DependentUpon>InstalledPackageListControl.cs</DependentUpon>
+    </Compile>
+    <Compile Include="NpmUI\InstalledPackagesPane.cs">
+      <SubType>UserControl</SubType>
+    </Compile>
+    <Compile Include="NpmUI\InstalledPackagesPane.Designer.cs">
+      <DependentUpon>InstalledPackagesPane.cs</DependentUpon>
+    </Compile>
     <Compile Include="NpmUI\ModuleCommands.cs" />
+    <Compile Include="NpmUI\PackageInstallPane.cs">
+      <SubType>UserControl</SubType>
+    </Compile>
+    <Compile Include="NpmUI\PackageInstallPane.Designer.cs">
+      <DependentUpon>PackageInstallPane.cs</DependentUpon>
+    </Compile>
     <Compile Include="NpmUI\ModuleManager.xaml.cs">
       <DependentUpon>ModuleManager.xaml</DependentUpon>
     </Compile>
+    <Compile Include="NpmUI\PackageManagerDialog.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="NpmUI\PackageManagerDialog.Designer.cs">
+      <DependentUpon>PackageManagerDialog.cs</DependentUpon>
+    </Compile>
     <Compile Include="NpmUI\ModuleSourcesViewModel.cs" />
+    <Compile Include="NpmUI\PackageSearchPane.cs">
+      <SubType>UserControl</SubType>
+    </Compile>
+    <Compile Include="NpmUI\PackageSearchPane.Designer.cs">
+      <DependentUpon>PackageSearchPane.cs</DependentUpon>
+    </Compile>
+    <Compile Include="NpmUI\PackageSourcesPane.cs">
+      <SubType>UserControl</SubType>
+    </Compile>
+    <Compile Include="NpmUI\PackageSourcesPane.Designer.cs">
+      <DependentUpon>PackageSourcesPane.cs</DependentUpon>
+    </Compile>
     <Compile Include="NpmUI\UpdateDialog.xaml.cs">
       <DependentUpon>UpdateDialog.xaml</DependentUpon>
     </Compile>
@@ -311,6 +347,24 @@
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>
+    <EmbeddedResource Include="NpmUI\InstalledPackageListControl.resx">
+      <DependentUpon>InstalledPackageListControl.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="NpmUI\InstalledPackagesPane.resx">
+      <DependentUpon>InstalledPackagesPane.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="NpmUI\PackageInstallPane.resx">
+      <DependentUpon>PackageInstallPane.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="NpmUI\PackageManagerDialog.resx">
+      <DependentUpon>PackageManagerDialog.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="NpmUI\PackageSearchPane.resx">
+      <DependentUpon>PackageSearchPane.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="NpmUI\PackageSourcesPane.resx">
+      <DependentUpon>PackageSourcesPane.cs</DependentUpon>
+    </EmbeddedResource>
     <EmbeddedResource Include="Options\NodejsGeneralOptionsControl.resx">
       <DependentUpon>NodejsGeneralOptionsControl.cs</DependentUpon>
     </EmbeddedResource>
