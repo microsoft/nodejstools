@@ -391,8 +391,12 @@ namespace Microsoft.NodejsTools.Project
         {
             CheckNotDisposed();
 
-            var managerWindow = new ModuleManager(NpmController);
-            managerWindow.ShowModal();
+            //var managerWindow = new ModuleManager(NpmController);
+            //managerWindow.ShowModal();
+
+            var manager = new PackageManagerDialog( NpmController );
+            manager.ShowDialog();
+
             ReloadHierarchy();
         }
 
