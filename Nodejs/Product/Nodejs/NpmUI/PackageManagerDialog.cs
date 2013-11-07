@@ -40,8 +40,15 @@ namespace Microsoft.NodejsTools.NpmUI
 
         void _npmController_FinishedRefresh(object sender, EventArgs e)
         {
-            _paneInstalledPackages.LocalPackages = _npmController.RootPackage.Modules;
-            _paneInstalledPackages.GlobalPackages = _npmController.GlobalPackages;
+            if (InvokeRequired)
+            {
+                BeginInvoke(new EventHandler(_npmController_FinishedRefresh), sender, e);
+            }
+            else
+            {
+                _paneInstalledPackages.LocalPackages = _npmController.RootPackage.Modules;
+                _paneInstalledPackages.GlobalPackages = _npmController.GlobalPackages;
+            }
         }
 
         private void _paneInstalledPackages_SelectedPackageViewChanged(object sender, EventArgs e)
