@@ -322,10 +322,18 @@ namespace Microsoft.NodejsTools.Debugger.DebugEngine {
             Debug.Assert(_breakpointManager != null);
             ppPendingBP = null;
 
+            // Check whether breakpoint request for our language
             BP_REQUEST_INFO[] requestInfo = new BP_REQUEST_INFO[1];
-            EngineUtils.CheckOk(pBPRequest.GetRequestInfo(enum_BPREQI_FIELDS.BPREQI_LANGUAGE, requestInfo));
+            EngineUtils.CheckOk(pBPRequest.GetRequestInfo(enum_BPREQI_FIELDS.BPREQI_LANGUAGE | enum_BPREQI_FIELDS.BPREQI_BPLOCATION, requestInfo));
             if (requestInfo[0].guidLanguage != GuidList.guidNodejsDebugLanguage) {
-                return VSConstants.E_FAIL;
+                // Check whether breakpoint request for our "downloaded" script
+                // "Downloaded" script will have our IDebugDocument2
+                IDebugDocument2 debugDocument;
+                var debugDocumentPosition = Marshal.GetObjectForIUnknown(requestInfo[0].bpLocation.unionmember2) as IDebugDocumentPosition2;
+                if (debugDocumentPosition == null || VSConstants.S_OK != debugDocumentPosition.GetDocument(out debugDocument) || null == debugDocument as AD7Document) {
+                    // Not ours
+                    return VSConstants.E_FAIL;
+                }
             }
 
             _breakpointManager.CreatePendingBreakpoint(pBPRequest, out ppPendingBP);
@@ -667,7 +675,7 @@ namespace Microsoft.NodejsTools.Debugger.DebugEngine {
             Debug.WriteLine("NodeEngine Detach");
             AssertMainThread();
 
-            _breakpointManager.ClearBoundBreakpoints();
+            _breakpointManager.ClearBreakpointBindingResults();
 
             _process.Detach();
             _ad7ProgramId = Guid.Empty;
@@ -1078,11 +1086,9 @@ namespace Microsoft.NodejsTools.Debugger.DebugEngine {
 
         private void OnBreakpointBindFailure(object sender, BreakpointBindingEventArgs e) {
             var pendingBreakpoint = _breakpointManager.GetPendingBreakpoint(e.Breakpoint);
-            Send(
-                new AD7BreakpointErrorEvent(pendingBreakpoint, this),
-                AD7BreakpointErrorEvent.IID,
-                null
-            );
+            var breakpointErrorEvent = new AD7BreakpointErrorEvent(pendingBreakpoint, this);
+            pendingBreakpoint.AddBreakpointError(breakpointErrorEvent);
+            Send(breakpointErrorEvent, AD7BreakpointErrorEvent.IID, null );
         }
 
         private void OnAsyncBreakComplete(object sender, ThreadEventArgs e) {

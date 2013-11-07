@@ -30,7 +30,8 @@ namespace Microsoft.NodejsTools.Debugger.DebugEngine {
         private AD7Engine _engine;
         private BreakpointManager _bpManager;
 
-        private List<AD7BoundBreakpoint> _boundBreakpoints;
+        private List<AD7BoundBreakpoint> _boundBreakpoints = new System.Collections.Generic.List<AD7BoundBreakpoint>();
+        private List<AD7BreakpointErrorEvent> _breakpointErrors = new System.Collections.Generic.List<AD7BreakpointErrorEvent>();
 
         private bool _enabled;
         private bool _deleted;
@@ -41,11 +42,9 @@ namespace Microsoft.NodejsTools.Debugger.DebugEngine {
             BP_REQUEST_INFO[] requestInfo = new BP_REQUEST_INFO[1];
             EngineUtils.CheckOk(_bpRequest.GetRequestInfo(enum_BPREQI_FIELDS.BPREQI_BPLOCATION | enum_BPREQI_FIELDS.BPREQI_CONDITION | enum_BPREQI_FIELDS.BPREQI_ALLFIELDS, requestInfo));
             _bpRequestInfo = requestInfo[0];
-            Debug.Assert(_bpRequestInfo.guidLanguage == GuidList.guidNodejsDebugLanguage);
             
             _engine = engine;
             _bpManager = bpManager;
-            _boundBreakpoints = new System.Collections.Generic.List<AD7BoundBreakpoint>();
 
             _enabled = true;
             _deleted = false;
@@ -63,13 +62,18 @@ namespace Microsoft.NodejsTools.Debugger.DebugEngine {
             return true;
         }
 
+        public void AddBreakpointError(AD7BreakpointErrorEvent breakpointError) {
+            _breakpointErrors.Add(breakpointError);
+        }
+
         // Remove all of the bound breakpoints for this pending breakpoint
-        public void ClearBoundBreakpoints() {
+        public void ClearBreakpointBindingResults() {
             lock (_boundBreakpoints) {
                 for (int i = _boundBreakpoints.Count - 1; i >= 0; i--) {
                     ((IDebugBoundBreakpoint2)_boundBreakpoints[i]).Delete();
                 }
             }
+            _breakpointErrors.Clear();
         }
 
         // Called by bound breakpoints when they are being deleted.
@@ -150,12 +154,7 @@ namespace Microsoft.NodejsTools.Debugger.DebugEngine {
 
         // Deletes this pending breakpoint and all breakpoints bound from it.
         int IDebugPendingBreakpoint2.Delete() {
-            lock (_boundBreakpoints) {
-                for (int i = _boundBreakpoints.Count - 1; i >= 0; i--) {
-                    ((IDebugBoundBreakpoint2)_boundBreakpoints[i]).Delete();
-                }
-            }
-
+            ClearBreakpointBindingResults();
             return VSConstants.S_OK;
         }
 
@@ -184,11 +183,13 @@ namespace Microsoft.NodejsTools.Debugger.DebugEngine {
         // Enumerates all error breakpoints that resulted from this pending breakpoint.
         int IDebugPendingBreakpoint2.EnumErrorBreakpoints(enum_BP_ERROR_TYPE bpErrorType, out IEnumDebugErrorBreakpoints2 ppEnum) {
             // Called when a pending breakpoint could not be bound. This may occur for many reasons such as an invalid location, an invalid expression, etc...
-            // The sample engine does not support this, but a real world engine will want to send an instance of IDebugBreakpointErrorEvent2 to the
-            // UI and return a valid enumeration of IDebugErrorBreakpoint2 from IDebugPendingBreakpoint2::EnumErrorBreakpoints. The debugger will then
+            // Return a valid enumeration of IDebugErrorBreakpoint2 from IDebugPendingBreakpoint2::EnumErrorBreakpoints, allowing the debugger to
             // display information about why the breakpoint did not bind to the user.
-            ppEnum = null;
-            return VSConstants.E_NOTIMPL;
+            lock (_breakpointErrors) {
+                IDebugErrorBreakpoint2[] breakpointErrors = _breakpointErrors.ToArray();
+                ppEnum = new AD7ErrorBreakpointsEnum(breakpointErrors);
+            }
+            return VSConstants.S_OK;
         }
 
         // Gets the breakpoint request that was used to create this pending breakpoint

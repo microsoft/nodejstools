@@ -36,9 +36,9 @@ namespace Microsoft.NodejsTools.Debugger.DebugEngine {
         }
 
         // Called from the engine's detach method to remove the debugger's breakpoint instructions.
-        public void ClearBoundBreakpoints() {
+        public void ClearBreakpointBindingResults() {
             foreach (AD7PendingBreakpoint pendingBreakpoint in m_pendingBreakpoints) {
-                pendingBreakpoint.ClearBoundBreakpoints();
+                pendingBreakpoint.ClearBreakpointBindingResults();
             }
         }
 

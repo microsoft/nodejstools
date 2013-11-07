@@ -317,14 +317,14 @@ namespace Microsoft.NodejsTools.Debugger.DebugEngine {
                 pErrorResolutionInfo[0].pThread = (IDebugThread2)m_engine.MainThread;
             }
             if ((dwFields & enum_BPERESI_FIELDS.BPERESI_TYPE) != 0) {
-                pErrorResolutionInfo[0].dwType = enum_BP_ERROR_TYPE.BPET_TYPE_WARNING;
+                pErrorResolutionInfo[0].dwType = enum_BP_ERROR_TYPE.BPET_GENERAL_WARNING;
             }
             if ((dwFields & enum_BPERESI_FIELDS.BPERESI_BPRESLOCATION) != 0) {
                 pErrorResolutionInfo[0].bpResLocation =  new BP_RESOLUTION_LOCATION();
                 pErrorResolutionInfo[0].bpResLocation.bpType = (uint)enum_BP_TYPE.BPT_CODE;
             }
             if ((dwFields & enum_BPERESI_FIELDS.BPERESI_MESSAGE) != 0) {
-                pErrorResolutionInfo[0].bstrMessage = "Breakpoint bind failure";
+                pErrorResolutionInfo[0].bstrMessage = "No code has been loaded for this code location.";
             }
             return VSConstants.S_OK;
         }
