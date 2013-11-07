@@ -31,8 +31,8 @@
             this._labelHeader = new System.Windows.Forms.Label();
             this._tabCtrlInstalledPackages = new System.Windows.Forms.TabControl();
             this._tabLocalPackages = new System.Windows.Forms.TabPage();
-            this._tabGlobalPackages = new System.Windows.Forms.TabPage();
             this.installedPackageListControl1 = new Microsoft.NodejsTools.NpmUI.InstalledPackageListControl();
+            this._tabGlobalPackages = new System.Windows.Forms.TabPage();
             this.installedPackageListControl2 = new Microsoft.NodejsTools.NpmUI.InstalledPackageListControl();
             this._tabCtrlInstalledPackages.SuspendLayout();
             this._tabLocalPackages.SuspendLayout();
@@ -63,6 +63,7 @@
             this._tabCtrlInstalledPackages.SelectedIndex = 0;
             this._tabCtrlInstalledPackages.Size = new System.Drawing.Size(300, 573);
             this._tabCtrlInstalledPackages.TabIndex = 1;
+            this._tabCtrlInstalledPackages.SelectedIndexChanged += new System.EventHandler(this._tabCtrlInstalledPackages_SelectedIndexChanged);
             // 
             // _tabLocalPackages
             // 
@@ -75,6 +76,14 @@
             this._tabLocalPackages.Text = "Local Packages";
             this._tabLocalPackages.UseVisualStyleBackColor = true;
             // 
+            // installedPackageListControl1
+            // 
+            this.installedPackageListControl1.Dock = System.Windows.Forms.DockStyle.Fill;
+            this.installedPackageListControl1.Location = new System.Drawing.Point(3, 3);
+            this.installedPackageListControl1.Name = "installedPackageListControl1";
+            this.installedPackageListControl1.Size = new System.Drawing.Size(286, 531);
+            this.installedPackageListControl1.TabIndex = 0;
+            // 
             // _tabGlobalPackages
             // 
             this._tabGlobalPackages.Controls.Add(this.installedPackageListControl2);
@@ -85,14 +94,6 @@
             this._tabGlobalPackages.TabIndex = 1;
             this._tabGlobalPackages.Text = "Global Packages";
             this._tabGlobalPackages.UseVisualStyleBackColor = true;
-            // 
-            // installedPackageListControl1
-            // 
-            this.installedPackageListControl1.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.installedPackageListControl1.Location = new System.Drawing.Point(3, 3);
-            this.installedPackageListControl1.Name = "installedPackageListControl1";
-            this.installedPackageListControl1.Size = new System.Drawing.Size(286, 531);
-            this.installedPackageListControl1.TabIndex = 0;
             // 
             // installedPackageListControl2
             // 

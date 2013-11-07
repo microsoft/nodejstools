@@ -10,11 +10,19 @@ using System.Windows.Forms;
 
 namespace Microsoft.NodejsTools.NpmUI
 {
-    public partial class PackageSourcesPane : UserControl
+    internal partial class PackageSourcesPane : UserControl
     {
         public PackageSourcesPane()
         {
             InitializeComponent();
+        }
+
+        public PackageView SelectedPackageView
+        {
+            set
+            {
+                _btnInstall.Text = value == PackageView.Local ? "Install Locally" : "Install Globally";
+            }
         }
     }
 }

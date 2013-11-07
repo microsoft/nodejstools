@@ -29,11 +29,11 @@
         private void InitializeComponent()
         {
             this._panelFooter = new System.Windows.Forms.Panel();
-            this._btnClose = new System.Windows.Forms.Button();
-            this.packageSourcesPane1 = new Microsoft.NodejsTools.NpmUI.PackageSourcesPane();
-            this.installedPackagesPane1 = new Microsoft.NodejsTools.NpmUI.InstalledPackagesPane();
-            this._labelWarning = new System.Windows.Forms.Label();
             this._labelWarningText = new System.Windows.Forms.Label();
+            this._labelWarning = new System.Windows.Forms.Label();
+            this._btnClose = new System.Windows.Forms.Button();
+            this._panePackageSources = new Microsoft.NodejsTools.NpmUI.PackageSourcesPane();
+            this._paneInstalledPackages = new Microsoft.NodejsTools.NpmUI.InstalledPackagesPane();
             this._panelFooter.SuspendLayout();
             this.SuspendLayout();
             // 
@@ -49,32 +49,15 @@
             this._panelFooter.Size = new System.Drawing.Size(784, 45);
             this._panelFooter.TabIndex = 0;
             // 
-            // _btnClose
+            // _labelWarningText
             // 
-            this._btnClose.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
-            this._btnClose.Location = new System.Drawing.Point(698, 10);
-            this._btnClose.Name = "_btnClose";
-            this._btnClose.Size = new System.Drawing.Size(75, 25);
-            this._btnClose.TabIndex = 0;
-            this._btnClose.Text = "Close";
-            this._btnClose.UseVisualStyleBackColor = true;
-            // 
-            // packageSourcesPane1
-            // 
-            this.packageSourcesPane1.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.packageSourcesPane1.Location = new System.Drawing.Point(300, 0);
-            this.packageSourcesPane1.Name = "packageSourcesPane1";
-            this.packageSourcesPane1.Size = new System.Drawing.Size(484, 516);
-            this.packageSourcesPane1.TabIndex = 2;
-            // 
-            // installedPackagesPane1
-            // 
-            this.installedPackagesPane1.Dock = System.Windows.Forms.DockStyle.Left;
-            this.installedPackagesPane1.Font = new System.Drawing.Font("Segoe UI", 8.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.installedPackagesPane1.Location = new System.Drawing.Point(0, 0);
-            this.installedPackagesPane1.Name = "installedPackagesPane1";
-            this.installedPackagesPane1.Size = new System.Drawing.Size(300, 516);
-            this.installedPackagesPane1.TabIndex = 1;
+            this._labelWarningText.AutoSize = true;
+            this._labelWarningText.Font = new System.Drawing.Font("Segoe UI", 8.25F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this._labelWarningText.Location = new System.Drawing.Point(69, 16);
+            this._labelWarningText.Name = "_labelWarningText";
+            this._labelWarningText.Size = new System.Drawing.Size(403, 13);
+            this._labelWarningText.TabIndex = 2;
+            this._labelWarningText.Text = "Packages will be installed globally when the Global Packages tab is selected.";
             // 
             // _labelWarning
             // 
@@ -87,23 +70,41 @@
             this._labelWarning.TabIndex = 1;
             this._labelWarning.Text = "WARNING:";
             // 
-            // _labelWarningText
+            // _btnClose
             // 
-            this._labelWarningText.AutoSize = true;
-            this._labelWarningText.Font = new System.Drawing.Font("Segoe UI", 8.25F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this._labelWarningText.Location = new System.Drawing.Point(69, 16);
-            this._labelWarningText.Name = "_labelWarningText";
-            this._labelWarningText.Size = new System.Drawing.Size(403, 13);
-            this._labelWarningText.TabIndex = 2;
-            this._labelWarningText.Text = "Packages will be installed globally when the Global Packages tab is selected.";
+            this._btnClose.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
+            this._btnClose.Location = new System.Drawing.Point(698, 10);
+            this._btnClose.Name = "_btnClose";
+            this._btnClose.Size = new System.Drawing.Size(75, 25);
+            this._btnClose.TabIndex = 0;
+            this._btnClose.Text = "Close";
+            this._btnClose.UseVisualStyleBackColor = true;
+            // 
+            // _panePackageSources
+            // 
+            this._panePackageSources.Dock = System.Windows.Forms.DockStyle.Fill;
+            this._panePackageSources.Location = new System.Drawing.Point(300, 0);
+            this._panePackageSources.Name = "_panePackageSources";
+            this._panePackageSources.Size = new System.Drawing.Size(484, 516);
+            this._panePackageSources.TabIndex = 2;
+            // 
+            // _paneInstalledPackages
+            // 
+            this._paneInstalledPackages.Dock = System.Windows.Forms.DockStyle.Left;
+            this._paneInstalledPackages.Font = new System.Drawing.Font("Segoe UI", 8.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this._paneInstalledPackages.Location = new System.Drawing.Point(0, 0);
+            this._paneInstalledPackages.Name = "_paneInstalledPackages";
+            this._paneInstalledPackages.Size = new System.Drawing.Size(300, 516);
+            this._paneInstalledPackages.TabIndex = 1;
+            this._paneInstalledPackages.SelectedPackageViewChanged += new System.EventHandler(this._paneInstalledPackages_SelectedPackageViewChanged);
             // 
             // PackageManagerDialog
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.ClientSize = new System.Drawing.Size(784, 561);
-            this.Controls.Add(this.packageSourcesPane1);
-            this.Controls.Add(this.installedPackagesPane1);
+            this.Controls.Add(this._panePackageSources);
+            this.Controls.Add(this._paneInstalledPackages);
             this.Controls.Add(this._panelFooter);
             this.Font = new System.Drawing.Font("Segoe UI", 8.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             this.MaximizeBox = false;
@@ -122,8 +123,8 @@
 
         private System.Windows.Forms.Panel _panelFooter;
         private System.Windows.Forms.Button _btnClose;
-        private InstalledPackagesPane installedPackagesPane1;
-        private PackageSourcesPane packageSourcesPane1;
+        private InstalledPackagesPane _paneInstalledPackages;
+        private PackageSourcesPane _panePackageSources;
         private System.Windows.Forms.Label _labelWarningText;
         private System.Windows.Forms.Label _labelWarning;
     }
