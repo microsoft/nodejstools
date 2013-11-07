@@ -34,6 +34,7 @@
             this._txtPackageName = new System.Windows.Forms.TextBox();
             this._txtVersionTag = new System.Windows.Forms.TextBox();
             this._tooltip = new System.Windows.Forms.ToolTip(this.components);
+            this._labelNameRequired = new System.Windows.Forms.Label();
             this.SuspendLayout();
             // 
             // _labelPackageName
@@ -56,35 +57,42 @@
             // 
             // _txtPackageName
             // 
-            this._txtPackageName.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
-            | System.Windows.Forms.AnchorStyles.Right)));
             this._txtPackageName.Location = new System.Drawing.Point(94, 15);
             this._txtPackageName.Name = "_txtPackageName";
-            this._txtPackageName.Size = new System.Drawing.Size(398, 20);
+            this._txtPackageName.Size = new System.Drawing.Size(351, 20);
             this._txtPackageName.TabIndex = 2;
             this._tooltip.SetToolTip(this._txtPackageName, "Name of package. This must be an exact match.");
             // 
             // _txtVersionTag
             // 
-            this._txtVersionTag.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
-            | System.Windows.Forms.AnchorStyles.Right)));
-            this._txtVersionTag.Location = new System.Drawing.Point(95, 56);
+            this._txtVersionTag.Location = new System.Drawing.Point(94, 56);
             this._txtVersionTag.Name = "_txtVersionTag";
-            this._txtVersionTag.Size = new System.Drawing.Size(397, 20);
+            this._txtVersionTag.Size = new System.Drawing.Size(351, 20);
             this._txtVersionTag.TabIndex = 3;
             this._tooltip.SetToolTip(this._txtVersionTag, "Version, version range, or tag of required package.");
+            // 
+            // _labelNameRequired
+            // 
+            this._labelNameRequired.AutoSize = true;
+            this._labelNameRequired.ForeColor = System.Drawing.Color.Red;
+            this._labelNameRequired.Location = new System.Drawing.Point(448, 18);
+            this._labelNameRequired.Name = "_labelNameRequired";
+            this._labelNameRequired.Size = new System.Drawing.Size(11, 13);
+            this._labelNameRequired.TabIndex = 4;
+            this._labelNameRequired.Text = "*";
             // 
             // PackageInstallPane
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.BackColor = System.Drawing.Color.Transparent;
+            this.Controls.Add(this._labelNameRequired);
             this.Controls.Add(this._txtVersionTag);
             this.Controls.Add(this._txtPackageName);
             this.Controls.Add(this._labelVersionTag);
             this.Controls.Add(this._labelPackageName);
             this.Name = "PackageInstallPane";
-            this.Size = new System.Drawing.Size(508, 112);
+            this.Size = new System.Drawing.Size(470, 112);
             this.ResumeLayout(false);
             this.PerformLayout();
 
@@ -97,5 +105,6 @@
         private System.Windows.Forms.TextBox _txtPackageName;
         private System.Windows.Forms.ToolTip _tooltip;
         private System.Windows.Forms.TextBox _txtVersionTag;
+        private System.Windows.Forms.Label _labelNameRequired;
     }
 }
