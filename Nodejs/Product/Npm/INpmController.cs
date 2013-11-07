@@ -12,9 +12,11 @@ namespace Microsoft.NodejsTools.Npm
         IRootPackage RootPackage { get; }
         IEnumerable< IPackage > GlobalPackages { get; } 
         Task<bool> InstallPackageByVersionAsync(string packageName, string versionRange, DependencyType type);
+        Task<bool> InstallGlobalPackageByVersionAsync(string packageName, string versionRange);
         Task<bool> UninstallPackageAsync(string packageName);
         Task<bool> UninstallGlobalPackageAsync(string packageName);
         Task< IEnumerable< IPackage > > SearchAsync( string searchText );
+        Task< IEnumerable< IPackage > > GetRepositoryCatalogueAsync(); 
         Task< bool > UpdatePackagesAsync();
         Task<bool> UpdatePackagesAsync(IEnumerable<IPackage> packages);
     }

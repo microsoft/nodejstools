@@ -97,19 +97,34 @@ namespace Microsoft.NodejsTools.Npm.SPI
             OnErrorLogged( command.StandardError );
         }
 
-        public async Task<bool> InstallPackageByVersionAsync(string packageName, string versionRange, DependencyType type)
+        private async Task< bool > InstallPackageByVersionAsync(
+            string packageName,
+            string versionRange,
+            DependencyType type,
+            bool global )
         {
             var command = new NpmInstallCommand(
                 _fullPathToRootPackageDirectory,
                 packageName,
                 versionRange,
                 type,
+                global,
                 _pathToNpm);
 
             var retVal = await command.ExecuteAsync();
-            FireLogEvents( command );
+            FireLogEvents(command);
             Refresh();
             return retVal;
+        }
+
+        public async Task<bool> InstallPackageByVersionAsync(string packageName, string versionRange, DependencyType type)
+        {
+            return await InstallPackageByVersionAsync( packageName, versionRange, type, false );
+        }
+
+        public async Task< bool > InstallGlobalPackageByVersionAsync( string packageName, string versionRange )
+        {
+            return await InstallPackageByVersionAsync(packageName, versionRange, DependencyType.Standard, true);
         }
 
         private async Task< bool > UninstallPackageAsync( string packageName, bool global )
@@ -142,6 +157,11 @@ namespace Microsoft.NodejsTools.Npm.SPI
             var success = await command.ExecuteAsync();
             FireLogEvents( command );
             return success ? command.Results : new List< IPackage >();
+        }
+
+        public async Task< IEnumerable< IPackage > > GetRepositoryCatalogueAsync()
+        {
+            return await SearchAsync( null );
         }
 
         public async Task< bool > UpdatePackagesAsync()

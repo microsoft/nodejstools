@@ -28,7 +28,14 @@ namespace Microsoft.NodejsTools.NpmUI
             _labelInstallAs.Enabled = view == PackageView.Local;
             _comboDepType.Enabled = view == PackageView.Local;
 
-            //  TODO: update state of install button based on which tab is selected and whether there is valid input
+            if ( _tabCtrlPackageSources.SelectedIndex == 0 )
+            {
+                _btnInstall.Enabled = !string.IsNullOrEmpty( _paneInstallParms.PackageName ) && !string.IsNullOrEmpty( _paneInstallParms.PackageName.Trim() );
+            }
+            else
+            {
+                //  TODO: deal with selected search result
+            }
         }
 
         public PackageView SelectedPackageView
@@ -54,13 +61,52 @@ namespace Microsoft.NodejsTools.NpmUI
             var handlers = InstallPackageRequested;
             if ( null != handlers )
             {
-                handlers( this, new PackageInstallEventArgs( name, version, depType ) );
+                handlers( this, new PackageInstallEventArgs(
+                    name.Trim(),
+                    string.IsNullOrEmpty( version ) ? version : version.Trim(),
+                    depType ) );
             }
         }
 
         private void _tabCtrlPackageSources_SelectedIndexChanged(object sender, EventArgs e)
         {
             UpdateUIState();
+        }
+
+        private void _paneInstallParms_PackageInstallParmsChanged(object sender, EventArgs e)
+        {
+            UpdateUIState();
+        }
+
+        private void _btnInstall_Click(object sender, EventArgs e)
+        {
+            DependencyType dependencyType;
+            switch ( _comboDepType.SelectedIndex )
+            {
+                case 0:
+                    dependencyType = DependencyType.Standard;
+                    break;
+
+                case 1:
+                    dependencyType = DependencyType.Development;
+                    break;
+
+                default:
+                    dependencyType = DependencyType.Optional;
+                    break;
+            }
+
+            if ( _tabCtrlPackageSources.SelectedIndex == 0 )
+            {
+                OnInstallPackageRequested(
+                    _paneInstallParms.PackageName,
+                    _paneInstallParms.Version,
+                    dependencyType);
+            }
+            else
+            {
+                //  TODO: fire request for search results
+            }
         }
     }
 }

@@ -14,7 +14,9 @@ namespace Microsoft.NodejsTools.Npm.SPI
             string searchText,
             string pathToNpm = null ) : base( fullPathToRootPackageDirectory, pathToNpm )
         {
-            Arguments = string.Format( "search {0}", searchText );
+            Arguments = string.IsNullOrEmpty(searchText) || string.IsNullOrEmpty(searchText.Trim())
+                ? "search"
+                : string.Format( "search {0}", searchText );
         }
 
         public override async Task< bool > ExecuteAsync()

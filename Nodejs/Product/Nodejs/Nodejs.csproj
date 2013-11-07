@@ -211,6 +211,7 @@
     </Compile>
     <Compile Include="NpmUI\ModuleCommands.cs" />
     <Compile Include="NpmUI\PackageEventArgs.cs" />
+    <Compile Include="NpmUI\PackageInstallEventArgs.cs" />
     <Compile Include="NpmUI\PackageInstallPane.cs">
       <SubType>UserControl</SubType>
     </Compile>

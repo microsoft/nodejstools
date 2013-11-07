@@ -35,9 +35,9 @@
             this._btnInstall = new System.Windows.Forms.Button();
             this._tabCtrlPackageSources = new System.Windows.Forms.TabControl();
             this._tabPackageDetails = new System.Windows.Forms.TabPage();
+            this._paneInstallParms = new Microsoft.NodejsTools.NpmUI.PackageInstallPane();
             this._tabSearchRepository = new System.Windows.Forms.TabPage();
-            this.packageInstallPane1 = new Microsoft.NodejsTools.NpmUI.PackageInstallPane();
-            this.packageSearchPane1 = new Microsoft.NodejsTools.NpmUI.PackageSearchPane();
+            this._paneSearch = new Microsoft.NodejsTools.NpmUI.PackageSearchPane();
             this._panelFooter.SuspendLayout();
             this._tabCtrlPackageSources.SuspendLayout();
             this._tabPackageDetails.SuspendLayout();
@@ -100,6 +100,7 @@
             this._btnInstall.TabIndex = 0;
             this._btnInstall.Text = "Install Local";
             this._btnInstall.UseVisualStyleBackColor = true;
+            this._btnInstall.Click += new System.EventHandler(this._btnInstall_Click);
             // 
             // _tabCtrlPackageSources
             // 
@@ -117,7 +118,7 @@
             // _tabPackageDetails
             // 
             this._tabPackageDetails.BackColor = System.Drawing.Color.Transparent;
-            this._tabPackageDetails.Controls.Add(this.packageInstallPane1);
+            this._tabPackageDetails.Controls.Add(this._paneInstallParms);
             this._tabPackageDetails.Location = new System.Drawing.Point(4, 32);
             this._tabPackageDetails.Name = "_tabPackageDetails";
             this._tabPackageDetails.Padding = new System.Windows.Forms.Padding(3);
@@ -126,33 +127,34 @@
             this._tabPackageDetails.Text = "Package Details";
             this._tabPackageDetails.UseVisualStyleBackColor = true;
             // 
+            // _paneInstallParms
+            // 
+            this._paneInstallParms.BackColor = System.Drawing.Color.Transparent;
+            this._paneInstallParms.Dock = System.Windows.Forms.DockStyle.Fill;
+            this._paneInstallParms.Location = new System.Drawing.Point(3, 3);
+            this._paneInstallParms.Name = "_paneInstallParms";
+            this._paneInstallParms.Size = new System.Drawing.Size(470, 497);
+            this._paneInstallParms.TabIndex = 0;
+            this._paneInstallParms.PackageInstallParmsChanged += new System.EventHandler(this._paneInstallParms_PackageInstallParmsChanged);
+            // 
             // _tabSearchRepository
             // 
-            this._tabSearchRepository.Controls.Add(this.packageSearchPane1);
+            this._tabSearchRepository.Controls.Add(this._paneSearch);
             this._tabSearchRepository.Location = new System.Drawing.Point(4, 32);
             this._tabSearchRepository.Name = "_tabSearchRepository";
             this._tabSearchRepository.Padding = new System.Windows.Forms.Padding(3);
-            this._tabSearchRepository.Size = new System.Drawing.Size(492, 503);
+            this._tabSearchRepository.Size = new System.Drawing.Size(476, 503);
             this._tabSearchRepository.TabIndex = 1;
             this._tabSearchRepository.Text = "Search npm Repository";
             this._tabSearchRepository.UseVisualStyleBackColor = true;
             // 
-            // packageInstallPane1
+            // _paneSearch
             // 
-            this.packageInstallPane1.BackColor = System.Drawing.Color.Transparent;
-            this.packageInstallPane1.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.packageInstallPane1.Location = new System.Drawing.Point(3, 3);
-            this.packageInstallPane1.Name = "packageInstallPane1";
-            this.packageInstallPane1.Size = new System.Drawing.Size(470, 497);
-            this.packageInstallPane1.TabIndex = 0;
-            // 
-            // packageSearchPane1
-            // 
-            this.packageSearchPane1.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.packageSearchPane1.Location = new System.Drawing.Point(3, 3);
-            this.packageSearchPane1.Name = "packageSearchPane1";
-            this.packageSearchPane1.Size = new System.Drawing.Size(486, 497);
-            this.packageSearchPane1.TabIndex = 0;
+            this._paneSearch.Dock = System.Windows.Forms.DockStyle.Fill;
+            this._paneSearch.Location = new System.Drawing.Point(3, 3);
+            this._paneSearch.Name = "_paneSearch";
+            this._paneSearch.Size = new System.Drawing.Size(470, 497);
+            this._paneSearch.TabIndex = 0;
             // 
             // PackageSourcesPane
             // 
@@ -182,7 +184,7 @@
         private System.Windows.Forms.TabControl _tabCtrlPackageSources;
         private System.Windows.Forms.TabPage _tabPackageDetails;
         private System.Windows.Forms.TabPage _tabSearchRepository;
-        private PackageInstallPane packageInstallPane1;
-        private PackageSearchPane packageSearchPane1;
+        private PackageInstallPane _paneInstallParms;
+        private PackageSearchPane _paneSearch;
     }
 }

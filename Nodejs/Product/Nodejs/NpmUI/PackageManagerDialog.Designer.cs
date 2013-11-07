@@ -87,6 +87,7 @@
             this._panePackageSources.Name = "_panePackageSources";
             this._panePackageSources.Size = new System.Drawing.Size(484, 516);
             this._panePackageSources.TabIndex = 2;
+            this._panePackageSources.InstallPackageRequested += new System.EventHandler<Microsoft.NodejsTools.NpmUI.PackageInstallEventArgs>(this._panePackageSources_InstallPackageRequested);
             // 
             // _paneInstalledPackages
             // 

@@ -62,6 +62,7 @@
             this._txtPackageName.Size = new System.Drawing.Size(351, 20);
             this._txtPackageName.TabIndex = 2;
             this._tooltip.SetToolTip(this._txtPackageName, "Name of package. This must be an exact match.");
+            this._txtPackageName.KeyUp += new System.Windows.Forms.KeyEventHandler(this._txtPackageName_KeyUp);
             // 
             // _txtVersionTag
             // 
@@ -70,6 +71,7 @@
             this._txtVersionTag.Size = new System.Drawing.Size(351, 20);
             this._txtVersionTag.TabIndex = 3;
             this._tooltip.SetToolTip(this._txtVersionTag, "Version, version range, or tag of required package.");
+            this._txtVersionTag.KeyUp += new System.Windows.Forms.KeyEventHandler(this._txtVersionTag_KeyUp);
             // 
             // _labelNameRequired
             // 

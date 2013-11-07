@@ -58,5 +58,17 @@ namespace Microsoft.NodejsTools.NpmUI
         {
             _npmController.UninstallPackageAsync( e.Package.Name );
         }
+
+        private void _panePackageSources_InstallPackageRequested(object sender, PackageInstallEventArgs e)
+        {
+            if ( _paneInstalledPackages.SelectedPackageView == PackageView.Global )
+            {
+                _npmController.InstallGlobalPackageByVersionAsync(e.Name, e.Version);
+            }
+            else
+            {
+                _npmController.InstallPackageByVersionAsync( e.Name, e.Version, e.DependencyType );
+            }
+        }
     }
 }
