@@ -42,7 +42,7 @@ namespace Microsoft.Nodejs.Tests.UI {
         );
 
         [ClassInitialize]
-        public static void DoDeployment(TestContext context) {            
+        public static void DoDeployment(TestContext context) {
             AssertListener.Initialize();
         }
 
@@ -71,6 +71,42 @@ namespace Microsoft.Nodejs.Tests.UI {
                 props.Item("BraceCompletion").Value = false;
 #endif
                 var testCases = new[] {
+                // no {
+                new { 
+                    Typed = "if (true)\r42\relse\r100\r200",
+                    Expected = @"if (true)
+    42
+else
+    100
+200"              
+                },
+                new { 
+                    Typed = "if (true)\r42\relse if (true)\r100\r200",
+                    Expected = @"if (true)
+    42
+else if (true)
+    100
+200"              
+                },
+                new { 
+                    Typed = "for(var i = 0; i<100; i++)\r42\r100",
+                    Expected = @"for(var i = 0; i<100; i++)
+    42
+100"              
+                },
+                new { 
+                    Typed = "while(true)\r42\r100",
+                    Expected = @"while(true)
+    42
+100"              
+                },
+                new { 
+                    Typed = "do\r42\rwhile(false)\r100",
+                    Expected = @"do
+    42
+while(false)
+100"              
+                },
                 // grouping
                 new { 
                     Typed = "x = [1,\r2,\r3\r]",

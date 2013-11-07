@@ -264,6 +264,11 @@ function starts_with(a, b) {
 }
 ");
             foreach (NodejsFileNode nodeFile in _nodeFiles) {
+                if (nodeFile.Url.Length > NativeMethods.MAX_PATH) {
+                    // .NET can't handle long filename paths, so ignore these modules...
+                    continue;
+                }
+
                 // for each file we setup if statements which check and see if the current
                 // file doing the require() call will match based upon the string being
                 // passed in.   

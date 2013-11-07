@@ -16,10 +16,14 @@ using EnvDTE;
 using System.Collections.Generic;
 using System.Linq;
 using System.Xml.Linq;
+using Microsoft.VisualStudio.TestTools.UnitTesting;
 
 namespace TestUtilities {
     public static class TestExtensions {
         public static void SetStartupFile(this Project project, string name) {
+            Assert.IsNotNull(project, "null project");
+            Assert.IsNotNull(project.Properties, "null project properties");
+            Assert.IsNotNull(project.Properties.Item("StartupFile"), "null startup file property");
             project.Properties.Item("StartupFile").Value = name;
         }
 

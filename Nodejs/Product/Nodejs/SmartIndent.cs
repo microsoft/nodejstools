@@ -30,7 +30,10 @@ namespace Microsoft.NodejsTools {
 
         private static HashSet<string> _dedentKeywords = new HashSet<string>(new[] { "return", "continue", "break" });
         private static HashSet<string> _stmtKeywords = new HashSet<string>(
-                new[] { "try", "if", "switch", "while", "for", "do", "break", "return", "throw", "default", "var" }
+                new[] { "try", "if", "switch", "for", "do", "break", "return", "throw", "default", "var" }
+            );
+        private static HashSet<string> _indentKeywords = new HashSet<string>(
+                new[] { "try", "if", "while", "for", "do", "else" }
             );
 
 
@@ -65,7 +68,16 @@ namespace Microsoft.NodejsTools {
             public static readonly LineInfo Empty = new LineInfo();
             public bool NeedsUpdate;
             public int? Indentation;
-            //public bool ShouldIndentAfter;
+            public bool WasIndentKeyword;
+            /// <summary>
+            /// When we have an indent keyword this tracks whether or not it was "do",
+            /// which we need to know so that we don't do an indent after the closing while
+            /// if the user does:
+            /// do
+            ///     42
+            /// while(false);
+            /// </summary>
+            public bool WasDoKeyword;
             public bool ShouldDedentAfter;
         }
 
@@ -124,10 +136,27 @@ namespace Microsoft.NodejsTools {
                     if (token == null) {
                         current.NeedsUpdate = true;
                     } else if (IsOpenGrouping(token)) {
+                        if (current.WasIndentKeyword && token.Span.GetText() == "{") {
+                            // the indentation statement is followed by braces, go ahead
+                            // and remove the level of indentation now
+                            current.WasIndentKeyword = false;
+                            current.Indentation -= _editorOptions.GetTabSize();
+                        }
                         indentStack.Push(current);
                         var start = token.Span.Start;
                         current = new LineInfo {
-                            Indentation = GetLeadingWhiteSpace(start.GetContainingLine().GetText()) + _editorOptions.GetTabSize()
+                            Indentation = GetLeadingWhiteSpace(start.GetContainingLine().GetText()) + _editorOptions.GetTabSize(),
+                            WasIndentKeyword = _indentKeywords.Contains(token.Span.GetText())
+                        };
+                    } else if (_indentKeywords.Contains(token.Span.GetText()) && !current.WasDoKeyword) {
+                        // if (foo) 
+                        //      console.log('hi')
+                        // We should indent here
+                        var start = token.Span.Start;
+                        current = new LineInfo {
+                            Indentation = GetLeadingWhiteSpace(start.GetContainingLine().GetText()) + _editorOptions.GetTabSize(),
+                            WasIndentKeyword = true,
+                            WasDoKeyword = token.Span.GetText() == "do"
                         };
                     } else if (IsCloseGrouping(token)) {
                         if (indentStack.Count > 0) {
@@ -141,6 +170,13 @@ namespace Microsoft.NodejsTools {
                         while (token != null && tokenStack.Count > 0) {
                             token = tokenStack.Pop();
                         }
+                    } else if (current.WasIndentKeyword) {
+                        // we've encountered a token after the opening of the indented
+                        // statement, go ahead and decrement our indentation level now.
+                        current = new LineInfo {
+                            Indentation = current.Indentation - _editorOptions.GetTabSize(),
+                            WasDoKeyword = current.WasDoKeyword
+                        };
                     } else if (current.NeedsUpdate) {
                         var line2 = token.Span.Start.GetContainingLine();
                         current = new LineInfo {
