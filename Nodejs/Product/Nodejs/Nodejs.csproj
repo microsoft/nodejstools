@@ -176,10 +176,14 @@
     </COMReference>
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Commands\AbstractNpmCommand.cs" />
+    <Compile Include="Commands\ManageModulesCommand.cs" />
     <Compile Include="Commands\OpenReplWindowCommand.cs" />
     <Compile Include="Commands\OpenRemoteDebugProxyFolderCommand.cs" />
     <Compile Include="Commands\SurveyNewsCommand.cs" />
     <Compile Include="ClassifierMetadata.cs" />
+    <Compile Include="Commands\UninstallModulesCommand.cs" />
+    <Compile Include="Commands\UpdateModulesCommand.cs" />
     <Compile Include="CustomTrackingSpan.cs" />
     <Compile Include="EditFilter.cs" />
     <Compile Include="Intellisense\CompletionSource.cs" />

@@ -8,6 +8,7 @@ using System.Threading.Tasks;
 using System.Windows.Documents;
 using System.Windows.Media.Animation;
 using EnvDTE;
+using Microsoft.NodejsTools.Commands;
 using Microsoft.NodejsTools.Npm;
 using Microsoft.NodejsTools.NpmUI;
 using Microsoft.VisualStudio;
@@ -53,6 +54,11 @@ namespace Microsoft.NodejsTools.Project
             m_ProjectNode = root;
             ExcludeNodeFromScc = true;
 
+            foreach ( var command in NodejsPackage.Instance.NpmCommands )
+            {
+                command.ModulesNode = this;
+            }
+
             m_Watcher = new FileSystemWatcher(m_ProjectNode.BuildProject.DirectoryPath) { NotifyFilter = NotifyFilters.LastWrite };
             m_Watcher.Changed += m_Watcher_Changed;
             m_Watcher.EnableRaisingEvents = true;
@@ -85,6 +91,11 @@ namespace Microsoft.NodejsTools.Project
                     {
                         m_NpmController.OutputLogged -= m_NpmController_OutputLogged;
                         m_NpmController.ErrorLogged -= m_NpmController_ErrorLogged;
+                    }
+
+                    foreach (var command in NodejsPackage.Instance.NpmCommands)
+                    {
+                        command.ModulesNode = null;
                     }
                 }
                 m_IsDisposed = true;

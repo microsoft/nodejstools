@@ -204,13 +204,25 @@ namespace Microsoft.NodejsTools {
             RegisterEditorFactory(new NodejsEditorFactory(this));
             RegisterEditorFactory(new NodejsEditorFactoryPromptForEncoding(this));
 
+            var npmCommands = new List< AbstractNpmCommand >();
+            npmCommands.Add( new ManageModulesCommand() );
+            npmCommands.Add( new UpdateModulesCommand() );
+            npmCommands.Add( new UninstallModulesCommand() );
+
+            NpmCommands = npmCommands;
+
             // Add our command handlers for menu (commands must exist in the .vsct file)
             RegisterCommands(new Command[] { 
                 new OpenReplWindowCommand(),
                 new OpenRemoteDebugProxyFolderCommand(),
                 new SurveyNewsCommand(),
+                npmCommands[ 0 ],
+                npmCommands[ 1 ],
+                npmCommands[ 2 ]
             }, GuidList.guidNodeCmdSet);
         }
+
+        public IEnumerable<AbstractNpmCommand> NpmCommands { get; private set; } 
 
         internal void OpenReplWindow() {
             var compModel = ComponentModel;
