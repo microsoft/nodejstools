@@ -29,7 +29,7 @@
         private void InitializeComponent()
         {
             this._btnUninstall = new System.Windows.Forms.Button();
-            this._listPackages = new System.Windows.Forms.ListBox();
+            this._listPackages = new System.Windows.Forms.ListView();
             this.SuspendLayout();
             // 
             // _btnUninstall
@@ -45,11 +45,12 @@
             // _listPackages
             // 
             this._listPackages.Dock = System.Windows.Forms.DockStyle.Fill;
-            this._listPackages.FormattingEnabled = true;
             this._listPackages.Location = new System.Drawing.Point(0, 0);
             this._listPackages.Name = "_listPackages";
+            this._listPackages.OwnerDraw = true;
             this._listPackages.Size = new System.Drawing.Size(296, 520);
             this._listPackages.TabIndex = 1;
+            this._listPackages.UseCompatibleStateImageBehavior = false;
             // 
             // InstalledPackageListControl
             // 
@@ -66,6 +67,6 @@
         #endregion
 
         private System.Windows.Forms.Button _btnUninstall;
-        private System.Windows.Forms.ListBox _listPackages;
+        private System.Windows.Forms.ListView _listPackages;
     }
 }

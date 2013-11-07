@@ -29,8 +29,8 @@
         private void InitializeComponent()
         {
             this._panelFind = new System.Windows.Forms.Panel();
-            this._labelFind = new System.Windows.Forms.Label();
             this._txtFind = new System.Windows.Forms.TextBox();
+            this._labelFind = new System.Windows.Forms.Label();
             this._listResults = new System.Windows.Forms.ListView();
             this._panelFind.SuspendLayout();
             this.SuspendLayout();
@@ -46,6 +46,14 @@
             this._panelFind.Size = new System.Drawing.Size(636, 24);
             this._panelFind.TabIndex = 0;
             // 
+            // _txtFind
+            // 
+            this._txtFind.Dock = System.Windows.Forms.DockStyle.Fill;
+            this._txtFind.Location = new System.Drawing.Point(35, 0);
+            this._txtFind.Name = "_txtFind";
+            this._txtFind.Size = new System.Drawing.Size(601, 20);
+            this._txtFind.TabIndex = 1;
+            // 
             // _labelFind
             // 
             this._labelFind.Dock = System.Windows.Forms.DockStyle.Left;
@@ -56,19 +64,12 @@
             this._labelFind.Text = "Find:";
             this._labelFind.TextAlign = System.Drawing.ContentAlignment.MiddleLeft;
             // 
-            // _txtFind
-            // 
-            this._txtFind.Dock = System.Windows.Forms.DockStyle.Fill;
-            this._txtFind.Location = new System.Drawing.Point(35, 0);
-            this._txtFind.Name = "_txtFind";
-            this._txtFind.Size = new System.Drawing.Size(601, 20);
-            this._txtFind.TabIndex = 1;
-            // 
             // _listResults
             // 
             this._listResults.Dock = System.Windows.Forms.DockStyle.Fill;
             this._listResults.Location = new System.Drawing.Point(0, 24);
             this._listResults.Name = "_listResults";
+            this._listResults.OwnerDraw = true;
             this._listResults.Size = new System.Drawing.Size(636, 433);
             this._listResults.TabIndex = 1;
             this._listResults.UseCompatibleStateImageBehavior = false;

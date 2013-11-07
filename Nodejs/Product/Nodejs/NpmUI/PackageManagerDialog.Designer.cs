@@ -32,12 +32,16 @@
             this._btnClose = new System.Windows.Forms.Button();
             this.packageSourcesPane1 = new Microsoft.NodejsTools.NpmUI.PackageSourcesPane();
             this.installedPackagesPane1 = new Microsoft.NodejsTools.NpmUI.InstalledPackagesPane();
+            this._labelWarning = new System.Windows.Forms.Label();
+            this._labelWarningText = new System.Windows.Forms.Label();
             this._panelFooter.SuspendLayout();
             this.SuspendLayout();
             // 
             // _panelFooter
             // 
-            this._panelFooter.BackColor = System.Drawing.SystemColors.AppWorkspace;
+            this._panelFooter.BackColor = System.Drawing.SystemColors.Control;
+            this._panelFooter.Controls.Add(this._labelWarningText);
+            this._panelFooter.Controls.Add(this._labelWarning);
             this._panelFooter.Controls.Add(this._btnClose);
             this._panelFooter.Dock = System.Windows.Forms.DockStyle.Bottom;
             this._panelFooter.Location = new System.Drawing.Point(0, 516);
@@ -72,6 +76,27 @@
             this.installedPackagesPane1.Size = new System.Drawing.Size(300, 516);
             this.installedPackagesPane1.TabIndex = 1;
             // 
+            // _labelWarning
+            // 
+            this._labelWarning.AutoSize = true;
+            this._labelWarning.Font = new System.Drawing.Font("Segoe UI", 8.25F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this._labelWarning.ForeColor = System.Drawing.Color.Red;
+            this._labelWarning.Location = new System.Drawing.Point(6, 16);
+            this._labelWarning.Name = "_labelWarning";
+            this._labelWarning.Size = new System.Drawing.Size(65, 13);
+            this._labelWarning.TabIndex = 1;
+            this._labelWarning.Text = "WARNING:";
+            // 
+            // _labelWarningText
+            // 
+            this._labelWarningText.AutoSize = true;
+            this._labelWarningText.Font = new System.Drawing.Font("Segoe UI", 8.25F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this._labelWarningText.Location = new System.Drawing.Point(69, 16);
+            this._labelWarningText.Name = "_labelWarningText";
+            this._labelWarningText.Size = new System.Drawing.Size(403, 13);
+            this._labelWarningText.TabIndex = 2;
+            this._labelWarningText.Text = "Packages will be installed globally when the Global Packages tab is selected.";
+            // 
             // PackageManagerDialog
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
@@ -88,6 +113,7 @@
             this.StartPosition = System.Windows.Forms.FormStartPosition.CenterParent;
             this.Text = "PackageManagerDialog";
             this._panelFooter.ResumeLayout(false);
+            this._panelFooter.PerformLayout();
             this.ResumeLayout(false);
 
         }
@@ -98,5 +124,7 @@
         private System.Windows.Forms.Button _btnClose;
         private InstalledPackagesPane installedPackagesPane1;
         private PackageSourcesPane packageSourcesPane1;
+        private System.Windows.Forms.Label _labelWarningText;
+        private System.Windows.Forms.Label _labelWarning;
     }
 }
