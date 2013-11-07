@@ -11,9 +11,12 @@ namespace Microsoft.NodejsTools.Npm.SPI
         public NpmUninstallCommand(
             string fullPathToRootPackageDirectory,
             string packageName,
+            bool global = false,
             string pathToNpm = null) : base(fullPathToRootPackageDirectory, pathToNpm)
         {
-            Arguments = string.Format("uninstall {0} --save", packageName);
+            Arguments = global
+                ? string.Format("uninstall {0} --g", packageName)
+                : string.Format("uninstall {0} --save", packageName);
         }
     }
 }

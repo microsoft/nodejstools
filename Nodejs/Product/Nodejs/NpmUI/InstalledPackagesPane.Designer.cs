@@ -31,9 +31,9 @@
             this._labelHeader = new System.Windows.Forms.Label();
             this._tabCtrlInstalledPackages = new System.Windows.Forms.TabControl();
             this._tabLocalPackages = new System.Windows.Forms.TabPage();
-            this.installedPackageListControl1 = new Microsoft.NodejsTools.NpmUI.InstalledPackageListControl();
+            this._listLocalPackages = new Microsoft.NodejsTools.NpmUI.InstalledPackageListControl();
             this._tabGlobalPackages = new System.Windows.Forms.TabPage();
-            this.installedPackageListControl2 = new Microsoft.NodejsTools.NpmUI.InstalledPackageListControl();
+            this._listGlobalPackages = new Microsoft.NodejsTools.NpmUI.InstalledPackageListControl();
             this._tabCtrlInstalledPackages.SuspendLayout();
             this._tabLocalPackages.SuspendLayout();
             this._tabGlobalPackages.SuspendLayout();
@@ -67,7 +67,7 @@
             // 
             // _tabLocalPackages
             // 
-            this._tabLocalPackages.Controls.Add(this.installedPackageListControl1);
+            this._tabLocalPackages.Controls.Add(this._listLocalPackages);
             this._tabLocalPackages.Location = new System.Drawing.Point(4, 32);
             this._tabLocalPackages.Name = "_tabLocalPackages";
             this._tabLocalPackages.Padding = new System.Windows.Forms.Padding(3);
@@ -76,17 +76,18 @@
             this._tabLocalPackages.Text = "Local Packages";
             this._tabLocalPackages.UseVisualStyleBackColor = true;
             // 
-            // installedPackageListControl1
+            // _listLocalPackages
             // 
-            this.installedPackageListControl1.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.installedPackageListControl1.Location = new System.Drawing.Point(3, 3);
-            this.installedPackageListControl1.Name = "installedPackageListControl1";
-            this.installedPackageListControl1.Size = new System.Drawing.Size(286, 531);
-            this.installedPackageListControl1.TabIndex = 0;
+            this._listLocalPackages.Dock = System.Windows.Forms.DockStyle.Fill;
+            this._listLocalPackages.Location = new System.Drawing.Point(3, 3);
+            this._listLocalPackages.Name = "_listLocalPackages";
+            this._listLocalPackages.Size = new System.Drawing.Size(286, 531);
+            this._listLocalPackages.TabIndex = 0;
+            this._listLocalPackages.UninstallPackageRequested += new System.EventHandler<Microsoft.NodejsTools.NpmUI.PackageEventArgs>(this._listLocalPackages_UninstallPackageRequested);
             // 
             // _tabGlobalPackages
             // 
-            this._tabGlobalPackages.Controls.Add(this.installedPackageListControl2);
+            this._tabGlobalPackages.Controls.Add(this._listGlobalPackages);
             this._tabGlobalPackages.Location = new System.Drawing.Point(4, 32);
             this._tabGlobalPackages.Name = "_tabGlobalPackages";
             this._tabGlobalPackages.Padding = new System.Windows.Forms.Padding(3);
@@ -95,13 +96,14 @@
             this._tabGlobalPackages.Text = "Global Packages";
             this._tabGlobalPackages.UseVisualStyleBackColor = true;
             // 
-            // installedPackageListControl2
+            // _listGlobalPackages
             // 
-            this.installedPackageListControl2.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.installedPackageListControl2.Location = new System.Drawing.Point(3, 3);
-            this.installedPackageListControl2.Name = "installedPackageListControl2";
-            this.installedPackageListControl2.Size = new System.Drawing.Size(286, 531);
-            this.installedPackageListControl2.TabIndex = 0;
+            this._listGlobalPackages.Dock = System.Windows.Forms.DockStyle.Fill;
+            this._listGlobalPackages.Location = new System.Drawing.Point(3, 3);
+            this._listGlobalPackages.Name = "_listGlobalPackages";
+            this._listGlobalPackages.Size = new System.Drawing.Size(286, 531);
+            this._listGlobalPackages.TabIndex = 0;
+            this._listGlobalPackages.UninstallPackageRequested += new System.EventHandler<Microsoft.NodejsTools.NpmUI.PackageEventArgs>(this._listGlobalPackages_UninstallPackageRequested);
             // 
             // InstalledPackagesPane
             // 
@@ -125,7 +127,7 @@
         private System.Windows.Forms.TabControl _tabCtrlInstalledPackages;
         private System.Windows.Forms.TabPage _tabLocalPackages;
         private System.Windows.Forms.TabPage _tabGlobalPackages;
-        private InstalledPackageListControl installedPackageListControl1;
-        private InstalledPackageListControl installedPackageListControl2;
+        private InstalledPackageListControl _listLocalPackages;
+        private InstalledPackageListControl _listGlobalPackages;
     }
 }

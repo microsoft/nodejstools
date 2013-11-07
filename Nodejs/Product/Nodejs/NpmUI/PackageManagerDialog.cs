@@ -40,12 +40,23 @@ namespace Microsoft.NodejsTools.NpmUI
 
         void _npmController_FinishedRefresh(object sender, EventArgs e)
         {
-            //  TODO: reload lists of locally and globally installed packages
+            _paneInstalledPackages.LocalPackages = _npmController.RootPackage.Modules;
+            _paneInstalledPackages.GlobalPackages = _npmController.GlobalPackages;
         }
 
         private void _paneInstalledPackages_SelectedPackageViewChanged(object sender, EventArgs e)
         {
             UpdateUIState();
+        }
+
+        private void _paneInstalledPackages_UninstallGloballPackageRequested(object sender, PackageEventArgs e)
+        {
+            _npmController.UninstallGlobalPackageAsync(e.Package.Name);
+        }
+
+        private void _paneInstalledPackages_UninstallLocalPackageRequested(object sender, PackageEventArgs e)
+        {
+            _npmController.UninstallPackageAsync( e.Package.Name );
         }
     }
 }

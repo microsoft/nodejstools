@@ -41,6 +41,7 @@
             this._btnUninstall.TabIndex = 0;
             this._btnUninstall.Text = "Uninstall";
             this._btnUninstall.UseVisualStyleBackColor = true;
+            this._btnUninstall.Click += new System.EventHandler(this._btnUninstall_Click);
             // 
             // _listPackages
             // 
@@ -51,6 +52,7 @@
             this._listPackages.Size = new System.Drawing.Size(296, 520);
             this._listPackages.TabIndex = 1;
             this._listPackages.UseCompatibleStateImageBehavior = false;
+            this._listPackages.SelectedIndexChanged += new System.EventHandler(this._listPackages_SelectedIndexChanged);
             // 
             // InstalledPackageListControl
             // 

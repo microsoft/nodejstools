@@ -97,6 +97,8 @@
             this._paneInstalledPackages.Size = new System.Drawing.Size(300, 516);
             this._paneInstalledPackages.TabIndex = 1;
             this._paneInstalledPackages.SelectedPackageViewChanged += new System.EventHandler(this._paneInstalledPackages_SelectedPackageViewChanged);
+            this._paneInstalledPackages.UninstallLocalPackageRequested += new System.EventHandler<Microsoft.NodejsTools.NpmUI.PackageEventArgs>(this._paneInstalledPackages_UninstallLocalPackageRequested);
+            this._paneInstalledPackages.UninstallGloballPackageRequested += new System.EventHandler<Microsoft.NodejsTools.NpmUI.PackageEventArgs>(this._paneInstalledPackages_UninstallGloballPackageRequested);
             // 
             // PackageManagerDialog
             // 

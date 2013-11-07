@@ -210,6 +210,7 @@
       <DependentUpon>InstalledPackagesPane.cs</DependentUpon>
     </Compile>
     <Compile Include="NpmUI\ModuleCommands.cs" />
+    <Compile Include="NpmUI\PackageEventArgs.cs" />
     <Compile Include="NpmUI\PackageInstallPane.cs">
       <SubType>UserControl</SubType>
     </Compile>
@@ -238,6 +239,7 @@
     <Compile Include="NpmUI\PackageSourcesPane.Designer.cs">
       <DependentUpon>PackageSourcesPane.cs</DependentUpon>
     </Compile>
+    <Compile Include="NpmUI\PackageView.cs" />
     <Compile Include="NpmUI\UpdateDialog.xaml.cs">
       <DependentUpon>UpdateDialog.xaml</DependentUpon>
     </Compile>

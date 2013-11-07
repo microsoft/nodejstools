@@ -81,6 +81,15 @@ namespace Microsoft.NodejsTools.Npm.SPI
             }
         }
 
+        public IEnumerable< IPackage > GlobalPackages
+        {
+            get
+            {
+                //  TODO: retrieve global packages on refresh
+                return new List< IPackage >();
+            }
+        }
+
         //  TODO: events should be fired as data is logged, not in one massive barf at the end
         private void FireLogEvents( NpmCommand command )
         {
@@ -103,17 +112,28 @@ namespace Microsoft.NodejsTools.Npm.SPI
             return retVal;
         }
 
-        public async Task<bool> UninstallPackageAsync(string packageName)
+        private async Task< bool > UninstallPackageAsync( string packageName, bool global )
         {
             var command = new NpmUninstallCommand(
                 _fullPathToRootPackageDirectory,
                 packageName,
+                global,
                 _pathToNpm);
 
             var retVal = await command.ExecuteAsync();
             FireLogEvents(command);
             Refresh();
             return retVal;
+        }
+
+        public async Task<bool> UninstallPackageAsync(string packageName)
+        {
+            return await UninstallPackageAsync( packageName, false );
+        }
+
+        public async Task< bool > UninstallGlobalPackageAsync( string packageName )
+        {
+            return await UninstallPackageAsync(packageName, true);
         }
 
         public async Task< IEnumerable< IPackage > > SearchAsync( string searchText )
