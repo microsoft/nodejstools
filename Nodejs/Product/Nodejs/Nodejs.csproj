@@ -193,6 +193,18 @@
     <Compile Include="NodejsProjectConfig.cs" />
     <Compile Include="NodejsToolsInstallPath.cs" />
     <Compile Include="NpmUI\Annotations.cs" />
+    <Compile Include="NpmUI\BusyControl.cs">
+      <SubType>UserControl</SubType>
+    </Compile>
+    <Compile Include="NpmUI\BusyControl.Designer.cs">
+      <DependentUpon>BusyControl.cs</DependentUpon>
+    </Compile>
+    <Compile Include="NpmUI\BusyPopup.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="NpmUI\BusyPopup.Designer.cs">
+      <DependentUpon>BusyPopup.cs</DependentUpon>
+    </Compile>
     <Compile Include="NpmUI\FlagsConverter.cs" />
     <Compile Include="NpmUI\FlagsToDescriptionConverter.cs" />
     <Compile Include="NpmUI\FlagsToImageConverter.cs" />
@@ -350,6 +362,12 @@
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>
+    <EmbeddedResource Include="NpmUI\BusyControl.resx">
+      <DependentUpon>BusyControl.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="NpmUI\BusyPopup.resx">
+      <DependentUpon>BusyPopup.cs</DependentUpon>
+    </EmbeddedResource>
     <EmbeddedResource Include="NpmUI\InstalledPackageListControl.resx">
       <DependentUpon>InstalledPackageListControl.cs</DependentUpon>
     </EmbeddedResource>
