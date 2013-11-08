@@ -17,10 +17,10 @@
             <Component Id="PerUserInstallRegistry" Directory="INSTALLLOCATION" Guid="{07CBA996-E490-4F22-87C0-069BAF855D68}">
                 <Condition>NOT ALLUSERS = 1</Condition>
                 <RegistryKey Root='HKCU' Key='Software\Microsoft\VisualStudio\$(var.VSTargetVersion)\ExtensionManager\EnabledExtensions'>
-                    <RegistryValue Type='string' Name='4219f2a8-fbf9-4659-a222-b7580a60eebb,0.5' Value='[EXTENSION_INSTALLPATH]Extensions\Microsoft\Node.js Tools for Visual Studio\0.5\'/>
+                    <RegistryValue Type='string' Name='4219f2a8-fbf9-4659-a222-b7580a60eebb,1.0' Value='[EXTENSION_INSTALLPATH]Extensions\Microsoft\Node.js Tools\1.0\'/>
                 </RegistryKey>
                 <RegistryKey Root='HKCU' Key='Software\Microsoft\VisualStudio\$(var.VSTargetVersion)\ExtensionManager\ExtensionTypes'>
-                    <RegistryValue Type='string' Name='4219f2a8-fbf9-4659-a222-b7580a60eebb,0.5' Value='Tool'/>
+                    <RegistryValue Type='string' Name='4219f2a8-fbf9-4659-a222-b7580a60eebb,1.0' Value='Tool'/>
                 </RegistryKey>
                 <File Id='filVSTemplateStore.pkgdef' Source='$(var.TargetDir)\VSTemplateStore.pkgdef' />
             </Component>

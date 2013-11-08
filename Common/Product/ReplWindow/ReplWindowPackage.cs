@@ -43,7 +43,7 @@ namespace Microsoft.VisualStudio.Repl {
     // a package.
     [PackageRegistration(UseManagedResourcesOnly = true)]
 #if NTVS_FEATURE_INTERACTIVEWINDOW
-    [Description("Node.js Tools for Visual Studio, Interactive Window")]
+    [Description("Node.js Tools - Interactive Window")]
 #else
     [Description("Visual Studio Interactive Window")]
 #endif

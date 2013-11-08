@@ -22,9 +22,9 @@
       CustomBuildIdentifier=$(CustomBuildIdentifier)
     </DefineConstants>
   </PropertyGroup>
-  <PropertyGroup>
-    <LinkerAdditionalOptions>-ext WixUIExtension -ext WixUtilExtension</LinkerAdditionalOptions>
-  </PropertyGroup>
+  <ItemGroup>
+    <WixExtension Include="WixUIExtension;WixUtilExtension;WixDependencyExtension" />
+  </ItemGroup>
   <ItemGroup>
     <Compile Include="NodejsToolsInstaller.wxs" />
   </ItemGroup>
