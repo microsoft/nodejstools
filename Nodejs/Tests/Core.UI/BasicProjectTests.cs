@@ -287,7 +287,7 @@ namespace Microsoft.Nodejs.Tests.UI {
                 AutomationWrapper.Select(projectNode);
 
                 var dialog = AddExistingFolder(app);
-                Assert.AreEqual(dialog.Address, Path.GetFullPath(@"TestData\NodejsProjectData\AddExistingFolder"));
+                Assert.AreEqual(dialog.Address.ToLower(), Path.GetFullPath(@"TestData\NodejsProjectData\AddExistingFolder").ToLower());
 
                 dialog.FolderName = Path.GetFullPath(@"TestData\NodejsProjectData\AddExistingFolder\TestFolder");
                 dialog.SelectFolder();
@@ -319,7 +319,7 @@ namespace Microsoft.Nodejs.Tests.UI {
                 AutomationWrapper.Select(projectNode);
 
                 var dialog = AddExistingFolder(app);
-                Assert.AreEqual(dialog.Address, Path.GetFullPath(@"TestData\NodejsProjectData\AddExistingFolder"));
+                Assert.AreEqual(dialog.Address.ToLower(), Path.GetFullPath(@"TestData\NodejsProjectData\AddExistingFolder").ToLower());
 
                 dialog.FolderName = Path.GetFullPath(@"TestData\NodejsProjectData\AddExistingFolder");
                 dialog.SelectFolder();
@@ -365,7 +365,7 @@ namespace Microsoft.Nodejs.Tests.UI {
                 AutomationWrapper.Select(projectNode);
 
                 var addDialog = AddExistingFolder(app);
-                Assert.AreEqual(addDialog.Address, Path.GetFullPath(@"TestData\NodejsProjectData\AddExistingFolder"));
+                Assert.AreEqual(addDialog.Address.ToLower(), Path.GetFullPath(@"TestData\NodejsProjectData\AddExistingFolder").ToLower());
 
                 addDialog.FolderName = Path.GetFullPath(@"TestData\NodejsProjectData\AddExistingFolder\TestFolder");
                 addDialog.SelectFolder();

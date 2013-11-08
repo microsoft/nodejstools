@@ -1,7 +1,8 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <Project DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
-  <PropertyGroup Condition="'$(VisualStudioVersion)' == '' or '$(VisualStudioVersion)' &lt; '11.0'">
-    <VisualStudioVersion>11.0</VisualStudioVersion>
+  <PropertyGroup>
+    <VisualStudioVersion Condition="'$(VisualStudioVersion)' == ''">11.0</VisualStudioVersion>
+    <VSToolsPath Condition="'$(VSToolsPath)' == ''">$(MSBuildExtensionsPath32)\Microsoft\VisualStudio\v$(VisualStudioVersion)</VSToolsPath>
   </PropertyGroup>
   <Import Project="$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props" Condition="Exists('$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props')" />
   <PropertyGroup>
@@ -40,93 +41,7 @@
   <ItemGroup>
     <Folder Include="bin\" />
   </ItemGroup>
-  <Import Project="$(MSBuildToolsPath)\Microsoft.Common.targets" />
-  <Target Name="GetTargetFrameworkVersion" Returns="$(TargetFrameworkVersion)" />
-  <Target Name="GetTargetFrameworkDirectories" Returns="" />
-  <Target Name="GetTargetFrameworkMoniker" Returns="" />
-  <Target Name="GetTargetFrameworkMonikerDisplayName" Returns="" />
-  <Target Name="GetTargetFrameworkVersion" Returns="$(TargetFrameworkVersion)" />
-  <Target Name="CreateManifestResourceNames" Returns="" />
-  <Target Name="Build">
-    <Message Text="Content=@(Content->'%(RelativeDir)%(Filename)%(Extension)')" />
-    <Copy SourceFiles="@(Compile)" DestinationFiles="@(Compile->'$(IntermediateOutputPath)%(RelativeDir)%(Filename)%(Extension)')" SkipUnchangedFiles="true">
-      <!-- <Output TaskParameter="DestinationFiles" ItemName="FilesCopiedToIntermediate"/> -->
-    </Copy>
-    <Copy SourceFiles="@(Include)" DestinationFiles="@(Include->'$(IntermediateOutputPath)%(RelativeDir)%(Filename)%(Extension)')" SkipUnchangedFiles="true">
-      <!-- <Output TaskParameter="DestinationFiles" ItemName="FilesCopiedToIntermediate"/> -->
-    </Copy>
-    <Copy SourceFiles="@(Content)" DestinationFiles="@(Content->'$(IntermediateOutputPath)%(RelativeDir)%(Filename)%(Extension)')" SkipUnchangedFiles="true">
-      <!-- <Output TaskParameter="DestinationFiles" ItemName="FilesCopiedToIntermediate"/> -->
-    </Copy>
-  </Target>
-  <Target Name="GetTargetPath" DependsOnTargets="Build" Returns="@(ScriptAndWebDeployFiles)">
-    <ItemGroup>
-      <ScriptAndWebDeployFiles Include="@(FilesCopiedToIntermediate->'%(RootDir)%(Directory)%(Filename)%(Extension)')" />
-    </ItemGroup>
-    <Message Text="ScriptAndWebDeployFiles=@(ScriptAndWebDeployFiles)" />
-  </Target>
-  <Target Name="WatGetTargetFrameworkDirectories" Returns="" />
-  <Target Name="BuiltProjectOutputGroupDependencies" Returns="" />
-  <Target Name="WatGetTargetFrameworkMoniker" Returns="" />
-  <Target Name="WatGetTargetFrameworkMonikerDisplayName" Returns="" />
-  <Import Project="$(VSToolsPath)\WebApplications\Microsoft.WebApplication.targets" Condition="'$(VSToolsPath)' != ''" />
-  <Target Name="PipelineTransformPhase" DependsOnTargets="Build" Returns="@(TransformedFilenames)">
-    <!-- Target used for generating a package which can be uploaded to web server -->
-    <ItemGroup>
-      <ContentFiles Include="@(Content)">
-      </ContentFiles>
-      <ContentFiles Include="@(Compile)">
-      </ContentFiles>
-      <ContentFiles Include="@(Include)">
-      </ContentFiles>
-      <TransformedFilenames Include="@(ContentFiles->'%(FullPath)')">
-        <DestinationRelativePath>%(RelativeDir)%(Filename)%(Extension)</DestinationRelativePath>
-        <Exclude>false</Exclude>
-        <FromTarget>Unknown</FromTarget>
-        <Category>Run</Category>
-        <ProjectFileType>Default</ProjectFileType>
-      </TransformedFilenames>
-    </ItemGroup>
-  </Target>
-  <Target Name="GenerateManifests" Returns="" />
-  <Target Name="PrepareForBuild" DependsOnTargets="$(PrepareForBuildDependsOn)">
-    <!-- 
-        These CreateProperty calls are required because TargetDir and TargetPath are defined 
-        to contain an item list. We want that item list to be expanded so that it can be used
-        as a regular property value and not as an item-list-with-transform.
-        -->
-    <!-- 
-        Choose exactly one app.config to be the main app.config that is copied to the destination folder. 
-        
-        The search order is:
-        
-            (1) Choose the value $(AppConfig) set in the main project.
-            (2) Choose @(None) App.Config in the same folder as the project.
-            (3) Choose @(Content) App.Config in the same folder as the project.
-            (4) Choose @(None) App.Config in any subfolder in the project.
-            (5) Choose @(Content) App.Config in any subfolder in the project.
-        
-        If an app.config is not found in one of these locations then there is no app.config for this project.
-        -->
-    <CreateProperty Value="%(None.Identity)" Condition="'$(AppConfig)'=='' and '%(RelativeDir)%(Filename)%(Extension)'=='App.Config'">
-      <Output TaskParameter="Value" PropertyName="AppConfig" />
-    </CreateProperty>
-    <CreateProperty Value="%(Content.Identity)" Condition="'$(AppConfig)'=='' and '%(RelativeDir)%(Filename)%(Extension)'=='App.Config'">
-      <Output TaskParameter="Value" PropertyName="AppConfig" />
-    </CreateProperty>
-    <CreateProperty Value="%(None.Identity)" Condition="'$(AppConfig)'=='' and '%(Filename)%(Extension)'=='App.Config'">
-      <Output TaskParameter="Value" PropertyName="AppConfig" />
-    </CreateProperty>
-    <CreateProperty Value="%(Content.Identity)" Condition="'$(AppConfig)'=='' and '%(Filename)%(Extension)'=='App.Config'">
-      <Output TaskParameter="Value" PropertyName="AppConfig" />
-    </CreateProperty>
-    <!-- Dump the single app.config into an item list with TargetPath set. -->
-    <CreateItem Include="$(AppConfig)" AdditionalMetadata="TargetPath=$(TargetFileName).config">
-      <Output TaskParameter="Include" ItemName="AppConfigWithTargetPath" />
-    </CreateItem>
-    <!-- Create the directories for intermediate and final build products. -->
-    <MakeDir Directories="$(OutDir);$(IntermediateOutputPath);@(DocFileItem->'%(RelativeDir)')" />
-  </Target>
+  <Import Project="$(VSToolsPath)\Node.js Tools\Microsoft.NodejsTools.targets" />
   <ProjectExtensions>
     <VisualStudio>
       <FlavorProperties GUID="{349c5851-65df-11da-9384-00065b846f21}">
