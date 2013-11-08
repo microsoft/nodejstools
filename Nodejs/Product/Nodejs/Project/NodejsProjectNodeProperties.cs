@@ -47,7 +47,7 @@ namespace Microsoft.NodejsTools.Project {
         [Browsable(false)]
         public uint TargetFramework {
             get {
-                return 0x40000;
+                return 0x40005;
             }
         }
 

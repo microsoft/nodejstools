@@ -577,7 +577,7 @@ namespace Microsoft.NodejsTools {
                 case __VSHPROPID4.VSHPROPID_TargetFrameworkMoniker:
                     // really only here for testing so WAP projects load correctly...
                     // But this also impacts the toolbox by filtering what available items there are.
-                    property = ".NETFramework,Version=v4.0,Profile=Client";
+                    property = ".NETFramework,Version=v4.5,Profile=Client";
                     return VSConstants.S_OK;
             }
             switch ((__VSHPROPID2)propId) {
