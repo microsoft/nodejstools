@@ -49,9 +49,11 @@
             this._listPackages.Location = new System.Drawing.Point(0, 0);
             this._listPackages.Name = "_listPackages";
             this._listPackages.OwnerDraw = true;
+            this._listPackages.ShowGroups = false;
             this._listPackages.Size = new System.Drawing.Size(296, 520);
             this._listPackages.TabIndex = 1;
             this._listPackages.UseCompatibleStateImageBehavior = false;
+            this._listPackages.View = System.Windows.Forms.View.List;
             this._listPackages.DrawItem += new System.Windows.Forms.DrawListViewItemEventHandler(this._listPackages_DrawItem);
             this._listPackages.SelectedIndexChanged += new System.EventHandler(this._listPackages_SelectedIndexChanged);
             // 
