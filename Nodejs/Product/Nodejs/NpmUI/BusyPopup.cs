@@ -16,5 +16,31 @@ namespace Microsoft.NodejsTools.NpmUI
         {
             InitializeComponent();
         }
+
+        public string Message
+        {
+            get { return _busyControl.Message; }
+            set { _busyControl.Message = value; }
+        }
+
+        private void Completed()
+        {
+            if ( InvokeRequired )
+            {
+                BeginInvoke( new Action( Completed ) );
+            }
+
+            DialogResult = DialogResult.OK;
+            Close();
+        }
+
+        public void ShowPopup( IWin32Window parent, Action action )
+        {
+            Task t = new Task( action );
+            t.ContinueWith( t2 => Completed() );
+            t.Start();
+
+            ShowDialog( parent );
+        }
     }
 }

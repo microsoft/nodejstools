@@ -58,23 +58,38 @@ namespace Microsoft.NodejsTools.NpmUI
 
         private void _paneInstalledPackages_UninstallGloballPackageRequested(object sender, PackageEventArgs e)
         {
-            _npmController.UninstallGlobalPackageAsync(e.Package.Name);
+            using ( var popup = new BusyPopup() )
+            {
+                popup.Message = string.Format( "Uninstalling package '{0}'...", e.Package.Name );
+                popup.ShowPopup(this, () => _npmController.UninstallGlobalPackageAsync(e.Package.Name));
+            }
         }
 
         private void _paneInstalledPackages_UninstallLocalPackageRequested(object sender, PackageEventArgs e)
         {
-            _npmController.UninstallPackageAsync( e.Package.Name );
+            using ( var popup = new BusyPopup() )
+            {
+                popup.Message = string.Format( "Uninstalling package '{0}'...", e.Package.Name );
+                popup.ShowPopup(this, () => _npmController.UninstallPackageAsync(e.Package.Name));
+            }
         }
 
         private void _panePackageSources_InstallPackageRequested(object sender, PackageInstallEventArgs e)
         {
-            if ( _paneInstalledPackages.SelectedPackageView == PackageView.Global )
+            using ( var popup = new BusyPopup() )
             {
-                _npmController.InstallGlobalPackageByVersionAsync(e.Name, e.Version);
-            }
-            else
-            {
-                _npmController.InstallPackageByVersionAsync( e.Name, e.Version, e.DependencyType );
+                popup.Message = string.Format( "Installing package '{0}'...", e.Name );
+                popup.ShowPopup( this, () =>
+                {
+                    if ( _paneInstalledPackages.SelectedPackageView == PackageView.Global )
+                    {
+                        _npmController.InstallGlobalPackageByVersionAsync( e.Name, e.Version );
+                    }
+                    else
+                    {
+                        _npmController.InstallPackageByVersionAsync( e.Name, e.Version, e.DependencyType );
+                    }
+                } );
             }
         }
     }
