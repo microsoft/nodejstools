@@ -27,20 +27,20 @@ using EnvDTE90a;
 using Microsoft.TC.TestHostAdapters;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using TestUtilities;
-using TestUtilities.Nodejs;
+using TestUtilities.SharedProject;
 using TestUtilities.UI;
 using VSLangProj;
 using ST = System.Threading;
 
-namespace Microsoft.Nodejs.Tests.UI {
+namespace Microsoft.VisualStudioTools.SharedProjectTests {
     [TestClass]
-    public class BasicProjectTests {
+    public class BasicProjectTests : SharedProjectTest {
         [ClassInitialize]
         public static void DoDeployment(TestContext context) {
             AssertListener.Initialize();
-            NodejsTestData.Deploy();
         }
 
+#if FALSE
         [TestMethod, Priority(0), TestCategory("Core")]
         [HostType("TC Dynamic"), DynamicHostType(typeof(VsIdeHostAdapter))]
         public void LoadNodejsProject() {
@@ -145,7 +145,60 @@ namespace Microsoft.Nodejs.Tests.UI {
             }
 
         }
+#endif
 
+        private static ProjectDefinition BasicProject(ProjectType projectType) {
+            return new ProjectDefinition(
+                "HelloWorld", 
+                projectType, 
+                Compile("server"), 
+                Compile("..\\Extra", isExcluded:true)
+            );
+        }
+
+        [TestMethod, Priority(0), TestCategory("Core")]
+        [HostType("TC Dynamic"), DynamicHostType(typeof(VsIdeHostAdapter))]
+        public void ProjectAddItem() {
+            try {
+                foreach (var projectType in ProjectTypes) {
+                    using (var solution = BasicProject(projectType).Generate().ToVs()) {
+                        var project = solution.Project;
+
+                        Assert.AreEqual(1, project.ProjectItems.Count);
+                        
+                        var item = project.ProjectItems.AddFromFile(Path.Combine(solution.Directory, "Extra" + projectType.CodeExtension));
+
+                        Assert.AreEqual("Extra" + projectType.CodeExtension, item.Properties.Item("FileName").Value);
+                        Assert.AreEqual(Path.Combine(solution.Directory, "HelloWorld", "Extra" + projectType.CodeExtension), item.Properties.Item("FullPath").Value);
+                        Assert.AreEqual(projectType.CodeExtension, item.Properties.Item("Extension").Value);
+
+                        Assert.IsTrue(item.Object is VSProjectItem);
+                        var vsProjItem = (VSProjectItem)item.Object;
+                        Assert.AreEqual(vsProjItem.DTE, VsIdeTestHostContext.Dte);
+                        Assert.AreEqual(vsProjItem.ContainingProject, project);
+                        Assert.AreEqual(vsProjItem.ProjectItem.ContainingProject, project);
+                        vsProjItem.ProjectItem.Open();
+                        Assert.AreEqual(true, vsProjItem.ProjectItem.IsOpen);
+                        Assert.AreEqual(true, vsProjItem.ProjectItem.Saved);
+                        vsProjItem.ProjectItem.Document.Close(vsSaveChanges.vsSaveChangesNo);
+                        Assert.AreEqual(false, vsProjItem.ProjectItem.IsOpen);
+                        Assert.AreEqual(VsIdeTestHostContext.Dte, vsProjItem.ProjectItem.DTE);
+
+                        Assert.AreEqual(2, project.ProjectItems.Count);
+
+                        // add an existing item
+                        project.ProjectItems.AddFromFile(Path.Combine(solution.Directory, "HelloWorld", "server" + projectType.CodeExtension));
+
+                        Assert.AreEqual(2, project.ProjectItems.Count);
+                    }
+                }
+            } finally {
+                VsIdeTestHostContext.Dte.Solution.Close();
+                GC.Collect();
+                GC.WaitForPendingFinalizers();
+            }
+        }
+#if FALSE
         [TestMethod, Priority(0), TestCategory("Core")]
         [HostType("TC Dynamic"), DynamicHostType(typeof(VsIdeHostAdapter))]
         public void ProjectAddFolder() {
@@ -261,7 +314,7 @@ namespace Microsoft.Nodejs.Tests.UI {
 
                 dialog = AddExistingFolder(app);
 
-                Assert.AreEqual(dialog.Address.ToLower(), Path.GetFullPath(@"TestData\NodejsProjectData\AddExistingFolder\SubFolder").ToLower());
+                Assert.AreEqual(dialog.Address, Path.GetFullPath(@"TestData\NodejsProjectData\AddExistingFolder\SubFolder"));
                 dialog.FolderName = Path.GetFullPath(@"TestData\NodejsProjectData\AddExistingFolder\SubFolder\TestFolder2");
                 dialog.SelectFolder();
 
@@ -1068,5 +1121,6 @@ namespace Microsoft.Nodejs.Tests.UI {
                 }
             }
         }
+#endif
     }
 }

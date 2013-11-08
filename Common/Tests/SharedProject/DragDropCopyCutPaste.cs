@@ -25,7 +25,7 @@ using TestUtilities.UI;
 using Keyboard = TestUtilities.UI.Keyboard;
 using Mouse = TestUtilities.UI.Mouse;
 
-namespace Microsoft.Nodejs.Tests.UI {
+namespace Microsoft.VisualStudioTools.SharedProjectTests {
     [TestClass]
     public class DragDropCopyCutPaste : SharedProjectTest {
         [ClassInitialize]
