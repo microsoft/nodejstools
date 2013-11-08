@@ -127,11 +127,34 @@ namespace Microsoft.NodejsTools.Npm.SPI
             return await InstallPackageByVersionAsync(packageName, versionRange, DependencyType.Standard, true);
         }
 
+        private DependencyType GetDependencyType( string packageName )
+        {
+            var type = DependencyType.Standard;
+            var root = RootPackage;
+            if ( null != root )
+            {
+                var match = root.Modules[ packageName ];
+                if ( null != match )
+                {
+                    if ( match.IsDevDependency )
+                    {
+                        type = DependencyType.Development;
+                    }
+                    else if ( match.IsOptionalDependency )
+                    {
+                        type = DependencyType.Optional;
+                    }
+                }
+            }
+            return type;
+        }
+
         private async Task< bool > UninstallPackageAsync( string packageName, bool global )
         {
             var command = new NpmUninstallCommand(
                 _fullPathToRootPackageDirectory,
                 packageName,
+                GetDependencyType( packageName ),
                 global,
                 _pathToNpm);
 
