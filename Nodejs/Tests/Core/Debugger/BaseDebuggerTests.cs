@@ -12,18 +12,18 @@
  *
  * ***************************************************************************/
 
-using Microsoft.NodejsTools;
-using Microsoft.NodejsTools.Debugger;
-using Microsoft.VisualStudio.TestTools.UnitTesting;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
 using System.Linq;
 using System.Threading;
+using Microsoft.NodejsTools;
+using Microsoft.NodejsTools.Debugger;
+using Microsoft.VisualStudio.TestTools.UnitTesting;
 using TestUtilities;
 
-namespace DebuggerTests {
+namespace NodejsTests.Debugger {
     internal enum NodeVersion {
         NodeVersion_Unknown,
     };
@@ -39,7 +39,7 @@ namespace DebuggerTests {
     public class BaseDebuggerTests {
         internal virtual string DebuggerTestPath {
             get {
-                return TestData.GetPath(@"TestData\DebuggerProject\");
+                return TestUtilities.TestData.GetPath(@"TestData\DebuggerProject\");
             }
         }
 
@@ -230,10 +230,10 @@ namespace DebuggerTests {
                                 }
                                 Assert.IsTrue(match > -1);
                                 if (expectedValues != null) {
-                                    Assert.AreEqual(expectedValues[match], evaluationResult.StringRepr);
+                                    Assert.AreEqual(expectedValues[match], evaluationResult.StringValue);
                                 }
                                 if (expectedHexValues != null) {
-                                    Assert.AreEqual(expectedHexValues[match], evaluationResult.HexRepr);
+                                    Assert.AreEqual(expectedHexValues[match], evaluationResult.HexValue);
                                 }
                             }
                         }
@@ -267,7 +267,7 @@ namespace DebuggerTests {
                 Assert.AreEqual(expectedType, evaluationResult.TypeName);
             }
             if (expectedValue != null) {
-                Assert.AreEqual(expectedValue, evaluationResult.StringRepr);
+                Assert.AreEqual(expectedValue, evaluationResult.StringValue);
             }
             if (expectedException != null) {
                 Assert.AreEqual(expectedException, evaluationResult.ExceptionText);
