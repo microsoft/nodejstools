@@ -17,9 +17,12 @@ using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.IO;
 using System.Linq;
+using System.Runtime.InteropServices;
 using System.Text;
 using System.Threading.Tasks;
 using Microsoft.NodejsTools.Project;
+using Microsoft.VisualStudio;
+using Microsoft.VisualStudio.Shell.Interop;
 using Microsoft.VisualStudio.Text;
 using Microsoft.VisualStudio.Text.Projection;
 using Microsoft.VisualStudio.TextManager.Interop;
@@ -94,10 +97,40 @@ namespace Microsoft.NodejsTools {
 
         private string LeadingText {
             get {
-                // __filename, _dirname http://nodejs.org/api/globals.html#globals_filename
+                IVsRunningDocumentTable rdt = NodejsPackage.GetGlobalService(typeof(SVsRunningDocumentTable)) as IVsRunningDocumentTable;
+                IVsHierarchy hierarchy;
+                uint itemid;
+                IntPtr docData = IntPtr.Zero;
+                uint docCookie;
+                string asyncFilePath = null;
+                try {
+                    ErrorHandler.ThrowOnFailure(
+                        rdt.FindAndLockDocument(
+                            (uint)_VSRDTFLAGS.RDT_NoLock, 
+                            _diskBuffer.GetFilePath(), 
+                            out hierarchy, 
+                            out itemid, 
+                            out docData, 
+                            out docCookie
+                        )
+                    );
+
+                    var nodejsProject = hierarchy.GetProject().GetNodeProject();
+                    if (nodejsProject != null) {
+                        var node = nodejsProject.FindNodeByFullPath(_diskBuffer.GetFilePath()) as NodejsFileNode;
+                        if (node != null) {
+                            asyncFilePath = node._asyncFilePath;
+                        }
+                    }
+                } finally {
+                    if (docData != IntPtr.Zero) {
+                        Marshal.Release(docData);
+                    }
+                }
 
                 return
                     "/// <reference path=\"" + _referenceFilename + "\" />\r\n" +
+                    (asyncFilePath != null ? ("/// <reference path=\"" + asyncFilePath + "\" />\r\n") : "") +
                     GetNodeFunctionWrapperHeader("nodejs_tools_for_visual_studio_hidden_module_body", _diskBuffer.GetFilePath());
             }
         }
@@ -115,15 +148,20 @@ namespace Microsoft.NodejsTools {
         /// </param>
         /// <returns></returns>
         internal static string GetNodeFunctionWrapperHeader(string functionName, string filename) {
+            // __filename, _dirname http://nodejs.org/api/globals.html#globals_filename
             return "function " + functionName + "() {\r\n" +
-                "__filename = \"" + filename.Replace("\\", "\\\\") + "\";\r\n" +
-                GetDirectoryNameFromFilename(filename) +
+                GetFileNameAssignment(filename) +
+                GetDirectoryNameAssignment(filename) +
                 "var exports = {};\r\n" +
                 "var module = {};\r\n" +
                 "module.exports = exports;\r\n" ;
         }
 
-        private static string GetDirectoryNameFromFilename(string filename) {
+        internal static string GetFileNameAssignment(string filename) {
+            return "__filename = \"" + filename.Replace("\\", "\\\\") + "\";\r\n";
+        }
+
+        internal static string GetDirectoryNameAssignment(string filename) {
             if (String.IsNullOrWhiteSpace(filename)) {
                 return "";
             }

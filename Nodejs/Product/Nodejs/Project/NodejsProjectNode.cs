@@ -19,6 +19,7 @@ using System.Reflection;
 using System.Text;
 using System.Threading;
 using System.Web.Script.Serialization;
+using Microsoft.NodejsTools.Intellisense;
 using Microsoft.VisualStudio;
 using Microsoft.VisualStudioTools;
 using Microsoft.VisualStudioTools.Project;
@@ -30,8 +31,9 @@ namespace Microsoft.NodejsTools.Project {
         internal readonly string _referenceFilename = GetReferenceFilePath();
         const string _userSwitchMarker = "// **NTVS** INSERT USER MODULE SWITCH HERE **NTVS**";
         internal readonly List<NodejsFileNode> _nodeFiles = new List<NodejsFileNode>();
-        private readonly JavaScriptSerializer _serializer = new JavaScriptSerializer();
+        private readonly JavaScriptSerializer _serializer = new JavaScriptSerializer();        
         private readonly Timer _timer;
+        internal readonly ReferenceGroupDispenser _refGroupDispenser = new ReferenceGroupDispenser();
         internal int _currentFileCounter;
 
         public NodejsProjectNode(NodejsProjectPackage package)
@@ -140,7 +142,7 @@ namespace Microsoft.NodejsTools.Project {
 
         protected override void Reload() {
             base.Reload();
-            
+
             NodejsPackage.Instance.CheckSurveyNews(false);
         }
 
@@ -203,19 +205,28 @@ namespace Microsoft.NodejsTools.Project {
         }
 
         private void UpdateReferenceFileUIThread(NodejsFileNode changedFile) {
-            StringBuilder switchCode = new StringBuilder();
-            UpdateReferenceFile(this, switchCode);
-            String header = "";
-            foreach (NodejsFileNode nodeFile in _nodeFiles) {
-                header += "/// <reference path=\"" + nodeFile._tempFilePath + "\" />\r\n";
+            StringBuilder header = new StringBuilder();
+            foreach (var refGroup in _refGroupDispenser.Groups) {
+                header.AppendLine("/// <reference path=\"" + refGroup.Filename + "\" />");
             }
 
-            try {
-                File.WriteAllText(
-                    _referenceFilename,
-                    header + _nodeRefCode.Replace(_userSwitchMarker, switchCode.ToString())
-                );
-            } catch (IOException) {
+            StringBuilder switchCode = new StringBuilder();
+            UpdateReferenceFile(this, switchCode);
+            
+            WriteReferenceFile(
+                _referenceFilename, 
+                header + _nodeRefCode.Replace(_userSwitchMarker, switchCode.ToString())
+            );
+        }
+
+        internal static void WriteReferenceFile(string filename, string output) {
+            for (int i = 0; i < 10; i++) {
+                try {
+                    File.WriteAllText(filename, output);
+                    break;
+                } catch (IOException) {
+                    System.Threading.Thread.Sleep(100);
+                }
             }
         }
 
@@ -225,8 +236,6 @@ namespace Microsoft.NodejsTools.Project {
         private void UpdateReferenceFile(HierarchyNode node, StringBuilder switchCode) {
             // collect all of the node_modules folders
             Dictionary<FileNode, CommonFolderNode> directoryPackages = GetModuleFolderMapping();
-
-            int moduleId = 0;
 
             switchCode.Append(@"
 function relative_match(match_dir, dirname, mod_name, alt_mod_name, ref_path) {
@@ -341,12 +350,40 @@ function starts_with(a, b) {
                 }
 
                 switchCode.Append(") {");
-                switchCode.AppendLine(String.Format("_$asyncRequests.add({{ src: '{0}'}}) " + Environment.NewLine, nodeFile._tempFilePath.Replace("\\", "\\\\")));
+                switchCode.AppendLine("intellisense.progress();");
+                switchCode.AppendFormat("if (typeof {0}{1} == 'undefined') {{",
+                    NodejsConstants.NodejsHiddenUserModuleInstance,
+                    nodeFile._fileId
+                );
+
+                // Scale back the depth of analysis based upon how many requires a package does
+                // The reference file automatically restores max_require_depth back to it's default
+                // after this require finishes executing.
+                if (nodeFile._requireCount >= 50) {
+                    switchCode.AppendLine("max_require_depth -= 3;");
+                } else if (nodeFile._requireCount >= 25) {
+                    switchCode.AppendLine("max_require_depth -= 2;");
+                } else if (nodeFile._requireCount >= 10) {
+                    switchCode.AppendLine("max_require_depth -= 1;");
+                }
+
+                // if we're analyzing too much code bail (if the module was already analyzed at a lower
+                // level we'll have already short-circuited and returned its value)
+                switchCode.AppendLine("if (require_depth > max_require_depth) { return undefined; }");
+
+                switchCode.AppendFormat("{0}{1} = {2}{1}();",
+                    NodejsConstants.NodejsHiddenUserModuleInstance,
+                    nodeFile._fileId,
+                    NodejsConstants.NodejsHiddenUserModule
+                );
+                switchCode.AppendLine("}");
                 switchCode.AppendFormat("return " + NodejsConstants.NodejsHiddenUserModuleInstance + "{0};", nodeFile._fileId);
                 switchCode.AppendLine("}");
-                moduleId++;
             }
-            switchCode.Append("break;");
+
+#if DEBUG
+            switchCode.AppendLine("intellisense.logMessage('Intellisense failed to resolve module: ' + module + ' in ' + __filename);");
+#endif
         }
 
         /// <summary>

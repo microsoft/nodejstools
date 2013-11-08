@@ -211,6 +211,8 @@
     <Compile Include="Intellisense\CompletionSource.cs" />
     <Compile Include="Intellisense\CompletionSourceProvider.cs" />
     <Compile Include="Intellisense\CompletionSource.Modules.cs" />
+    <Compile Include="Intellisense\ReferenceGroup.cs" />
+    <Compile Include="Intellisense\ReferenceGroupDispenser.cs" />
     <Compile Include="Intellisense\TextViewCreationListener.cs" />
     <Compile Include="Nodejs.cs" />
     <Compile Include="NodejsLanguageInfo.cs" />
