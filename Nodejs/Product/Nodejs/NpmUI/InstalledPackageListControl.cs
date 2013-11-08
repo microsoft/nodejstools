@@ -64,5 +64,39 @@ namespace Microsoft.NodejsTools.NpmUI
                 }
             }
         }
+
+        private void _listPackages_DrawItem(object sender, DrawListViewItemEventArgs e)
+        {
+            Graphics g = e.Graphics;
+            Color foreColor, backColor, lineColor;
+
+            if ( ( e.State & ListViewItemStates.Selected ) == ListViewItemStates.Selected )
+            {
+                foreColor = SystemColors.HighlightText;
+                backColor = SystemColors.Highlight;
+            }
+            else
+            {
+                foreColor = SystemColors.WindowText;
+                backColor = Color.Red; //SystemColors.Control;
+            }
+
+            lineColor = ColorUtils.MidPoint( foreColor, backColor );
+            var bounds = e.Bounds;
+
+            using ( var bg = new SolidBrush( backColor ) )
+            {
+                g.FillRectangle(bg, bounds);
+            }
+
+            using ( var line = new Pen( lineColor, 1F ) )
+            {
+                g.DrawLine( line, bounds.Left + 4, bounds.Height - 1, bounds.Right - 4, bounds.Height - 1 );
+            }
+
+            var pkg = e.Item.Tag as IPackage;
+
+            TextRenderer.DrawText( g, pkg.Name, new Font(Font, FontStyle.Bold), new Point(0, 0), foreColor, TextFormatFlags.Default);
+        }
     }
 }

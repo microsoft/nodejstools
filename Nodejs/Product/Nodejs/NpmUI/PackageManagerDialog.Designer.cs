@@ -79,6 +79,7 @@
             this._btnClose.TabIndex = 0;
             this._btnClose.Text = "Close";
             this._btnClose.UseVisualStyleBackColor = true;
+            this._btnClose.Click += new System.EventHandler(this._btnClose_Click);
             // 
             // _panePackageSources
             // 

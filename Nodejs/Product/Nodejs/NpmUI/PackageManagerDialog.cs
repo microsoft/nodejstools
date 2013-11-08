@@ -29,6 +29,12 @@ namespace Microsoft.NodejsTools.NpmUI
             UpdateUIState();
         }
 
+        private void _btnClose_Click(object sender, EventArgs e)
+        {
+            DialogResult = DialogResult.OK;
+            Close();
+        }
+
         /// <summary>
         /// This is a bit of a do everything method that updates the state of relevant controls based
         /// on which tabs, etc., are selected.

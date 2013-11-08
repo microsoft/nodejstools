@@ -205,10 +205,12 @@
     <Compile Include="NpmUI\BusyPopup.Designer.cs">
       <DependentUpon>BusyPopup.cs</DependentUpon>
     </Compile>
+    <Compile Include="NpmUI\ColorUtils.cs" />
     <Compile Include="NpmUI\FlagsConverter.cs" />
     <Compile Include="NpmUI\FlagsToDescriptionConverter.cs" />
     <Compile Include="NpmUI\FlagsToImageConverter.cs" />
     <Compile Include="NpmUI\FlagsToInstallConverter.cs" />
+    <Compile Include="NpmUI\HSV.cs" />
     <Compile Include="NpmUI\InstalledPackageListControl.cs">
       <SubType>UserControl</SubType>
     </Compile>
