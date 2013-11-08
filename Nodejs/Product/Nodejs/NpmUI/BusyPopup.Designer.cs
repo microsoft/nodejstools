@@ -49,6 +49,7 @@
             this.Controls.Add(this._busyControl);
             this.FormBorderStyle = System.Windows.Forms.FormBorderStyle.None;
             this.Name = "BusyPopup";
+            this.StartPosition = System.Windows.Forms.FormStartPosition.CenterParent;
             this.Text = "BusyPopup";
             this.ResumeLayout(false);
 

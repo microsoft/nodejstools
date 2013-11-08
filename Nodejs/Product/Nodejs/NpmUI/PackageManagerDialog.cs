@@ -92,62 +92,51 @@ namespace Microsoft.NodejsTools.NpmUI
             UpdateUIState();
         }
 
-        private void _paneInstalledPackages_UninstallGloballPackageRequested(object sender, PackageEventArgs e)
+        private void DoWithPopup(string popupMessage, Action action)
         {
-            using ( var popup = new BusyPopup() )
+            using (var popup = new BusyPopup())
             {
                 SetWait();
-                popup.Message = string.Format( "Uninstalling package '{0}'...", e.Package.Name );
-                popup.ShowPopup(this, () =>
-                {
-                    _npmController.UninstallGlobalPackageAsync(e.Package.Name);
-                    WaitForClearWait();
-                });
+                popup.Message = popupMessage;
+                popup.ShowPopup(
+                    this,
+                    () =>
+                    {
+                        action();
+                        WaitForClearWait();
+                    });
             }
+        }
+
+        private void _paneInstalledPackages_UninstallGloballPackageRequested(object sender, PackageEventArgs e)
+        {
+            DoWithPopup(
+                string.Format("Uninstalling global package '{0}'...", e.Package.Name),
+                () => _npmController.UninstallGlobalPackageAsync(e.Package.Name));
         }
 
         private void _paneInstalledPackages_UninstallLocalPackageRequested(object sender, PackageEventArgs e)
         {
-            using ( var popup = new BusyPopup() )
-            {
-                SetWait();
-                popup.Message = string.Format( "Uninstalling package '{0}'...", e.Package.Name );
-                popup.ShowPopup(this, () =>
-                {
-                    _npmController.UninstallPackageAsync(e.Package.Name);
-                    WaitForClearWait();
-                });
-            }
+            DoWithPopup(
+                string.Format("Uninstalling local package '{0}'...", e.Package.Name),
+                () => _npmController.UninstallPackageAsync(e.Package.Name));
         }
 
         private void _panePackageSources_InstallPackageRequested(
             object sender,
             PackageInstallEventArgs e)
         {
-            using ( var popup = new BusyPopup() )
+            if (_paneInstalledPackages.SelectedPackageView == PackageView.Global)
             {
-                SetWait();
-                popup.Message = string.Format( "Installing package '{0}'...", e.Name );
-                if (_paneInstalledPackages.SelectedPackageView == PackageView.Global)
-                {
-                    popup.ShowPopup(
-                        this,
-                        () =>
-                        {
-                            _npmController.InstallGlobalPackageByVersionAsync(e.Name, e.Version);
-                            WaitForClearWait();
-                        });
-                }
-                else
-                {
-                    popup.ShowPopup(
-                        this,
-                        () =>
-                        {
-                            _npmController.InstallPackageByVersionAsync(e.Name, e.Version, e.DependencyType);
-                            WaitForClearWait();
-                        });
-                }
+                DoWithPopup(
+                    string.Format("Installing global package '{0}'...", e.Name),
+                    () => _npmController.InstallGlobalPackageByVersionAsync(e.Name, e.Version));
+            }
+            else
+            {
+                DoWithPopup(
+                    string.Format("Installing local package '{0}'...", e.Name),
+                    () => _npmController.InstallPackageByVersionAsync(e.Name, e.Version, e.DependencyType));
             }
         }
     }

@@ -27,6 +27,7 @@ namespace Microsoft.NodejsTools.NpmUI
             _btnInstall.Text = view == PackageView.Local ? "Install Locally" : "Install Globally";
             _labelInstallAs.Enabled = view == PackageView.Local;
             _comboDepType.Enabled = view == PackageView.Local;
+            _comboDepType.SelectedIndex = 0;
 
             if ( _tabCtrlPackageSources.SelectedIndex == 0 )
             {
