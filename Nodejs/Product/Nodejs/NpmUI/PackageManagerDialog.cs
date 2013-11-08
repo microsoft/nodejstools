@@ -5,6 +5,7 @@ using System.Data;
 using System.Drawing;
 using System.Linq;
 using System.Text;
+using System.Threading;
 using System.Threading.Tasks;
 using System.Windows.Forms;
 using Microsoft.NodejsTools.Npm;
@@ -14,7 +15,9 @@ namespace Microsoft.NodejsTools.NpmUI
     public partial class PackageManagerDialog : Form
     {
 
-        private INpmController _npmController;
+        private readonly INpmController _npmController;
+        private bool _wait;
+        private readonly object _lock = new object();
 
         public PackageManagerDialog(INpmController controller)
         {
@@ -38,6 +41,35 @@ namespace Microsoft.NodejsTools.NpmUI
             _panePackageSources.SelectedPackageView = _paneInstalledPackages.SelectedPackageView;
         }
 
+        private void SetWait()
+        {
+            lock (_lock)
+            {
+                _wait = true;
+                Monitor.PulseAll(_lock);
+            }
+        }
+
+        private void ClearWait()
+        {
+            lock (_lock)
+            {
+                _wait = false;
+                Monitor.PulseAll(_lock);
+            }
+        }
+
+        private void WaitForClearWait()
+        {
+            lock (_lock)
+            {
+                while (_wait)
+                {
+                    Monitor.Wait(_lock);
+                }
+            }
+        }
+
         void _npmController_FinishedRefresh(object sender, EventArgs e)
         {
             if (InvokeRequired)
@@ -46,8 +78,12 @@ namespace Microsoft.NodejsTools.NpmUI
             }
             else
             {
-                _paneInstalledPackages.LocalPackages = _npmController.RootPackage.Modules;
-                _paneInstalledPackages.GlobalPackages = _npmController.GlobalPackages;
+                lock (_lock)
+                {
+                    _paneInstalledPackages.LocalPackages = _npmController.RootPackage.Modules;
+                    _paneInstalledPackages.GlobalPackages = _npmController.GlobalPackages;
+                    ClearWait();
+                }
             }
         }
 
@@ -60,8 +96,13 @@ namespace Microsoft.NodejsTools.NpmUI
         {
             using ( var popup = new BusyPopup() )
             {
+                SetWait();
                 popup.Message = string.Format( "Uninstalling package '{0}'...", e.Package.Name );
-                popup.ShowPopup(this, () => _npmController.UninstallGlobalPackageAsync(e.Package.Name));
+                popup.ShowPopup(this, () =>
+                {
+                    _npmController.UninstallGlobalPackageAsync(e.Package.Name);
+                    WaitForClearWait();
+                });
             }
         }
 
@@ -69,27 +110,44 @@ namespace Microsoft.NodejsTools.NpmUI
         {
             using ( var popup = new BusyPopup() )
             {
+                SetWait();
                 popup.Message = string.Format( "Uninstalling package '{0}'...", e.Package.Name );
-                popup.ShowPopup(this, () => _npmController.UninstallPackageAsync(e.Package.Name));
+                popup.ShowPopup(this, () =>
+                {
+                    _npmController.UninstallPackageAsync(e.Package.Name);
+                    WaitForClearWait();
+                });
             }
         }
 
-        private void _panePackageSources_InstallPackageRequested(object sender, PackageInstallEventArgs e)
+        private void _panePackageSources_InstallPackageRequested(
+            object sender,
+            PackageInstallEventArgs e)
         {
             using ( var popup = new BusyPopup() )
             {
+                SetWait();
                 popup.Message = string.Format( "Installing package '{0}'...", e.Name );
-                popup.ShowPopup( this, () =>
+                if (_paneInstalledPackages.SelectedPackageView == PackageView.Global)
                 {
-                    if ( _paneInstalledPackages.SelectedPackageView == PackageView.Global )
-                    {
-                        _npmController.InstallGlobalPackageByVersionAsync( e.Name, e.Version );
-                    }
-                    else
-                    {
-                        _npmController.InstallPackageByVersionAsync( e.Name, e.Version, e.DependencyType );
-                    }
-                } );
+                    popup.ShowPopup(
+                        this,
+                        () =>
+                        {
+                            _npmController.InstallGlobalPackageByVersionAsync(e.Name, e.Version);
+                            WaitForClearWait();
+                        });
+                }
+                else
+                {
+                    popup.ShowPopup(
+                        this,
+                        () =>
+                        {
+                            _npmController.InstallPackageByVersionAsync(e.Name, e.Version, e.DependencyType);
+                            WaitForClearWait();
+                        });
+                }
             }
         }
     }

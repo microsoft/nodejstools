@@ -15,6 +15,7 @@ namespace Microsoft.NodejsTools.NpmUI
         public BusyPopup()
         {
             InitializeComponent();
+            CreateHandle();
         }
 
         public string Message
@@ -25,13 +26,11 @@ namespace Microsoft.NodejsTools.NpmUI
 
         private void Completed()
         {
-            if ( InvokeRequired )
+            BeginInvoke(new Action(() =>
             {
-                BeginInvoke( new Action( Completed ) );
-            }
-
-            DialogResult = DialogResult.OK;
-            Close();
+                DialogResult = DialogResult.OK;
+                Close();
+            }));
         }
 
         public void ShowPopup( IWin32Window parent, Action action )
