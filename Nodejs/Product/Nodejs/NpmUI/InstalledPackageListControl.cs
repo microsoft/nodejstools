@@ -204,7 +204,7 @@ namespace Microsoft.NodejsTools.NpmUI
                 string.Format( "@{0}", pkg.Version ),
                 Font,
                 new Point(( int ) ( bounds.X + 4 + size.Width + img.Width ), bounds.Y + 2 ),
-                ColorUtils.Mix( ForeColor, BackColor, 5, 5 ),
+                ColorUtils.Mix( foreColor, backColor, 5, 5 ),
                 TextFormatFlags.Default);
 
             var author = "by (unknown author)";
@@ -218,7 +218,7 @@ namespace Microsoft.NodejsTools.NpmUI
                 author,
                 Font,
                 new Point((int) (bounds.Right - 2 - size.Width), bounds.Y + 2),
-                ColorUtils.Mix( ForeColor, BackColor, 5, 5 ),
+                ColorUtils.Mix( foreColor, BackColor, 5, 5 ),
                 TextFormatFlags.Default);
 
 
