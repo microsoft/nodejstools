@@ -443,6 +443,10 @@
     <EmbeddedResource Include="Resources\DependencyOptionalMissing_16.png" />
     <EmbeddedResource Include="Resources\DependencyOptional_16.png" />
     <EmbeddedResource Include="Resources\Dependency_16.png" />
+    <EmbeddedResource Include="Resources\Warning_16.png" />
+    <EmbeddedResource Include="Resources\DependencyDev_32.png" />
+    <EmbeddedResource Include="Resources\DependencyOptional_32.png" />
+    <EmbeddedResource Include="Resources\Dependendy_32.png" />
     <Content Include="VSTemplateStore.pkgdef">
       <IncludeInVSIX>true</IncludeInVSIX>
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
