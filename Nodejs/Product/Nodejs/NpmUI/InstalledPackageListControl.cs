@@ -25,7 +25,7 @@ namespace Microsoft.NodejsTools.NpmUI
 
             //  Hack to force the row height
             var images = new ImageList();
-            images.ImageSize = new Size( 40, 56 );
+            images.ImageSize = new Size( 40, 40 );
             _listPackages.SmallImageList = images;
             _listPackages.LargeImageList = images;
             //  /hack
