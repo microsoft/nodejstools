@@ -92,7 +92,7 @@ namespace Microsoft.NodejsTools.NpmUI
             else
             {
                 foreColor = SystemColors.WindowText;
-                backColor = Color.Red; //SystemColors.Control;
+                backColor = SystemColors.Control;
             }
 
             lineColor = ColorUtils.MidPoint( foreColor, backColor );
@@ -105,7 +105,7 @@ namespace Microsoft.NodejsTools.NpmUI
 
             using ( var line = new Pen( lineColor, 1F ) )
             {
-                g.DrawLine( line, bounds.Left + 4, bounds.Height - 1, bounds.Right - 4, bounds.Height - 1 );
+                g.DrawLine( line, bounds.Left + 4, bounds.Bottom - 1, bounds.Right - 4, bounds.Bottom - 1 );
             }
 
             var pkg = e.Item.Tag as IPackage;

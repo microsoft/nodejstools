@@ -26,6 +26,7 @@ namespace Microsoft.NodejsTools.NpmUI
             _npmController = controller;
             _npmController.FinishedRefresh += _npmController_FinishedRefresh;
 
+            LoadPackageInfo();
             UpdateUIState();
         }
 
@@ -76,6 +77,16 @@ namespace Microsoft.NodejsTools.NpmUI
             }
         }
 
+        private void LoadPackageInfo()
+        {
+            lock (_lock)
+            {
+                _paneInstalledPackages.LocalPackages = _npmController.RootPackage.Modules;
+                _paneInstalledPackages.GlobalPackages = _npmController.GlobalPackages;
+                ClearWait();
+            }
+        }
+
         void _npmController_FinishedRefresh(object sender, EventArgs e)
         {
             if (InvokeRequired)
@@ -84,12 +95,7 @@ namespace Microsoft.NodejsTools.NpmUI
             }
             else
             {
-                lock (_lock)
-                {
-                    _paneInstalledPackages.LocalPackages = _npmController.RootPackage.Modules;
-                    _paneInstalledPackages.GlobalPackages = _npmController.GlobalPackages;
-                    ClearWait();
-                }
+                LoadPackageInfo();
             }
         }
 
