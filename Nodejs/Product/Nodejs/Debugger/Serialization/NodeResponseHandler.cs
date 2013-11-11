@@ -12,6 +12,7 @@
  *
  * ***************************************************************************/
 
+using System;
 using System.Collections.Generic;
 using System.Globalization;
 using System.Linq;
@@ -20,6 +21,7 @@ using Microsoft.VisualStudioTools.Project;
 namespace Microsoft.NodejsTools.Debugger.Serialization {
     class NodeResponseHandler : INodeResponseHandler {
         private readonly INodeEvaluationResultFactory _evaluationResultFactory;
+        private readonly NodeModule _unknownModule = new NodeModule(-1, "<unknown>");
 
         /// <summary>
         /// Instantiates response message parser..
@@ -37,7 +39,7 @@ namespace Microsoft.NodejsTools.Debugger.Serialization {
         /// <param name="thread">Thread.</param>
         /// <param name="message">Message.</param>
         /// <returns>Array of stack frames.</returns>
-        public NodeStackFrame[] ProcessBacktrace(NodeThread thread, JsonValue message) {
+        public void ProcessBacktrace(NodeThread thread, JsonValue message, Action<NodeStackFrame[]> successHandler) {
             Utilities.ArgumentNotNull("thread", thread);
             Utilities.ArgumentNotNull("message", message);
 
@@ -49,7 +51,10 @@ namespace Microsoft.NodejsTools.Debugger.Serialization {
             JsonValue body = message["body"];
             JsonArray frames = body.GetArray("frames");
             if (frames == null) {
-                return new NodeStackFrame[] { };
+                if (successHandler != null) {
+                    successHandler(new NodeStackFrame[] { });
+                }
+                return;
             }
 
             var stackFrames = new List<NodeStackFrame>(frames.Count);
@@ -60,7 +65,11 @@ namespace Microsoft.NodejsTools.Debugger.Serialization {
                 // Create stack frame
                 string name = GetFrameName(frame);
                 var moduleId = frame["func"].GetValue<int>("scriptId");
-                NodeModule module = modules[moduleId];
+                NodeModule module;
+                if (!modules.TryGetValue(moduleId, out module)) {
+                    module = _unknownModule;
+                }
+
                 int line = frame.GetValue<int>("line") + 1;
                 var stackFrameId = frame.GetValue<int>("index");
 
@@ -80,7 +89,9 @@ namespace Microsoft.NodejsTools.Debugger.Serialization {
                 stackFrames.Add(stackFrame);
             }
 
-            return stackFrames.ToArray();
+            if (successHandler != null) {
+                successHandler(stackFrames.ToArray());
+            }
         }
 
         /// <summary>

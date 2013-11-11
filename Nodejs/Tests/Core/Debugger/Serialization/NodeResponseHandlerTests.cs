@@ -30,7 +30,15 @@ namespace NodejsTests.Debugger.Serialization {
             JsonValue json = SerializationTestData.GetBacktraceResponse();
 
             // Act
-            NodeStackFrame[] frames = handler.ProcessBacktrace(thread, json);
+            NodeStackFrame[] frames = null;
+            handler.ProcessBacktrace(
+                thread,
+                json,
+                successHandler:
+                    backtraceFrames => {
+                        frames = backtraceFrames;
+                    }
+            );
 
             // Assert
             Assert.IsNotNull(frames);
@@ -48,7 +56,14 @@ namespace NodejsTests.Debugger.Serialization {
 
             // Act
             try {
-                frames = handler.ProcessBacktrace(null, json);
+                handler.ProcessBacktrace(
+                    null,
+                    json,
+                    successHandler:
+                        backtraceFrames => {
+                            frames = backtraceFrames;
+                        }
+                );
             }
             catch (Exception e) {
                 exception = e;
@@ -71,7 +86,14 @@ namespace NodejsTests.Debugger.Serialization {
 
             // Act
             try {
-                frames = handler.ProcessBacktrace(thread, null);
+                handler.ProcessBacktrace(
+                    thread,
+                    null,
+                    successHandler:
+                        backtraceFrames => {
+                            frames = backtraceFrames;
+                        }
+                );
             }
             catch (Exception e) {
                 exception = e;

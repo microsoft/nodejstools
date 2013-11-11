@@ -12,6 +12,8 @@
  *
  * ***************************************************************************/
 
+using System;
+
 namespace Microsoft.NodejsTools.Debugger.Serialization {
     /// <summary>
     /// Defines an interface of node message handler.
@@ -23,7 +25,7 @@ namespace Microsoft.NodejsTools.Debugger.Serialization {
         /// <param name="thread">Thread.</param>
         /// <param name="message">Message.</param>
         /// <returns>Array of stack frames.</returns>
-        NodeStackFrame[] ProcessBacktrace(NodeThread thread, JsonValue message);
+        void ProcessBacktrace(NodeThread thread, JsonValue message, Action<NodeStackFrame[]> successHandler);
 
         /// <summary>
         /// Handles evaluate response message.

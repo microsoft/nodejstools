@@ -963,17 +963,101 @@ namespace Microsoft.NodejsTools.Debugger {
                 new Dictionary<string, object> { { "inlineRefs", true } },
                 successHandler:
                     json => {
-                        var running = (bool) json["running"];
-                        if (!running) {
-                            var mainThread = MainThread;
-                            var jsonValue = new JsonValue(json);
-                            mainThread.Frames = ResponseHandler.ProcessBacktrace(mainThread, jsonValue);
+                        var running = (bool)json["running"];
+                        if (running) {
+                            if (followupHandler != null) {
+                                followupHandler(running);
+                            }
+                            return;
                         }
-                        if (followupHandler != null) {
-                            followupHandler(running);
-                        }
+
+                        var mainThread = MainThread;
+                        var jsonValue = new JsonValue(json);
+                        ResponseHandler.ProcessBacktrace(
+                            mainThread,
+                            jsonValue,
+                            successHandler:
+                                frames => {
+                                    FixupBacktrace(frames, followupHandler);
+                                }
+                        );
                     }
                 );
+        }
+
+        private static void AddFixupHandler(
+            Dictionary<NodeEvaluationResult, List<Action<NodeEvaluationResult, Dictionary<string, object>>>> evaluationResultHandlers,
+            NodeEvaluationResult evaluationResult,
+            Action<NodeEvaluationResult, Dictionary<string, object>> handler
+        ) {
+            List<Action<NodeEvaluationResult, Dictionary<string, object>>> handlers;
+            if (!evaluationResultHandlers.TryGetValue(evaluationResult, out handlers)) {
+                handlers = new List<Action<NodeEvaluationResult, Dictionary<string, object>>>();
+                evaluationResultHandlers[evaluationResult] = handlers;
+            }
+            handlers.Add(handler);
+        }
+
+        private void FixupBacktrace(NodeStackFrame[] nodeFrames, Action<bool> followupHandler) {
+            // Wrap followup handler
+            Action followup = () => {
+                MainThread.Frames = nodeFrames;
+                if (followupHandler != null) {
+                    followupHandler(false);
+                }
+            };
+
+            // Collect evaluation results requiring fixup and map to fixup handlers
+            // Allow for multiple fixup handlers per evaluation result
+            Dictionary<NodeEvaluationResult, List<Action<NodeEvaluationResult, Dictionary<string, object>>>> evaluationResultHandlers = new Dictionary<NodeEvaluationResult, List<Action<NodeEvaluationResult, Dictionary<string, object>>>>();
+            foreach (var nodeFrame in nodeFrames) {
+                foreach (var evaluationResult in nodeFrame.Parameters.Concat(nodeFrame.Locals)) {
+                    if (evaluationResult.Handle > 0) {
+                        if (evaluationResult.TypeName == "Number" && evaluationResult.StringValue == null) {
+                            AddFixupHandler(
+                                evaluationResultHandlers,
+                                evaluationResult,
+                                (fixupEvaluationResult, record) => {
+                                    fixupEvaluationResult.StringValue = fixupEvaluationResult.HexValue = (string)record["text"];
+                                }
+                            );
+                        }
+                    }
+                }
+            }
+            if (evaluationResultHandlers.Count == 0) {
+                // No fixup
+                followup();
+                return;
+            }
+
+            // Perform lookup on evaluation result handles
+            var handles = evaluationResultHandlers.Keys.Select(r => r.Handle).Cast<object>().ToArray();
+            Connection.SendRequest(
+                "lookup",
+                new Dictionary<string, object> {
+                    { "handles", handles },
+                    { "includeSource", false }
+                },
+                successHandler:
+                    json => {
+                        // Invoke fixup handlers, passing associated evaluation result and "lookup" response record
+                        // For multiple fixup handlers per evaluation result, process in order of handler adds
+                        var body = (Dictionary<string, object>)json["body"];
+                        foreach (var evaluationResult in evaluationResultHandlers.Keys) {
+                            var record = (Dictionary<string, object>)body[evaluationResult.Handle.ToString()];
+                            foreach (var handler in evaluationResultHandlers[evaluationResult]) {
+                                handler(evaluationResult, record);
+                            }
+                        }
+                        followup();
+                    },
+                failureHandler:
+                    json => {
+                        // No fixup
+                        followup();
+                    }
+            );
         }
 
         internal IList<NodeThread> GetThreads() {

@@ -213,11 +213,11 @@ namespace NodejsTests.Debugger {
                     new TestStep(action: TestAction.ResumeThread, expectedEntryPointHit: 9),
                     new TestStep(action: TestAction.ResumeProcess, expectedBreakpointHit: 2),
                     new TestStep(validation: (process, thread) => {
-                            ExecTest(thread, expression: "x + 1", expectedType: "number", expectedValue: "43", expectedFrame: "f");
+                            ExecTest(thread, expression: "x + 1", expectedType: "Number", expectedValue: "43", expectedFrame: "f");
                         }
                     ),
                     new TestStep(validation: (process, thread) => {
-                            ExecTest(thread, frameIndex: 1, expression: "baz - 1", expectedType: "number", expectedValue: "41", expectedFrame: "g");
+                            ExecTest(thread, frameIndex: 1, expression: "baz - 1", expectedType: "Number", expectedValue: "41", expectedFrame: "g");
                         }
                     ),
                     new TestStep(validation: (process, thread) => {
@@ -267,9 +267,9 @@ namespace NodejsTests.Debugger {
             LocalsTest(
                 "SpecialNumberLocalsTest.js",
                 7,
-                expectedLocals: new string[] { "posInf", "negInf", "nan", "nul" },
-                expectedValues: new string[] { "Infinity", "-Infinity", "NaN", "null" },
-                expectedHexValues: new string[] { "Infinity", "-Infinity", "NaN", "null" }
+                expectedLocals: new string[] { "nan", "negInf", "nul", "posInf" },
+                expectedValues: new string[] { "NaN", "-Infinity", "null", "Infinity" },
+                expectedHexValues: new string[] { "NaN", "-Infinity", null, "Infinity" }
             );
         }
 

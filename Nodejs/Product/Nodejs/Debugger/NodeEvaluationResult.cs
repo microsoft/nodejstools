@@ -51,7 +51,7 @@ namespace Microsoft.NodejsTools.Debugger {
         /// <summary>
         /// Gets the string representation of this evaluation or null if an exception was thrown.
         /// </summary>
-        public string StringValue { get; private set; }
+        public string StringValue { get; set; }
 
         /// <summary>
         /// Gets the string representation length.
@@ -63,7 +63,7 @@ namespace Microsoft.NodejsTools.Debugger {
         /// <summary>
         /// Gets the string representation of this evaluation in hexadecimal or null if the hex value was not computable.
         /// </summary>
-        public string HexValue { get; private set; }
+        public string HexValue { get; set; }
 
         /// <summary>
         /// Gets the type name of the result of this evaluation or null if an exception was thrown.
