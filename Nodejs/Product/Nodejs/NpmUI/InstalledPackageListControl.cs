@@ -126,9 +126,23 @@ namespace Microsoft.NodejsTools.NpmUI
             TextRenderer.DrawText( 
                 g,
                 string.Format( "@{0}", pkg.Version ),
-                font,
+                Font,
                 new Point(( int ) ( bounds.X + 2 + size.Width ), bounds.Y + 2 ),
-                ColorUtils.Mix( ForeColor, BackColor, 6, 4 ),
+                ColorUtils.Mix( ForeColor, BackColor, 5, 5 ),
+                TextFormatFlags.Default);
+
+            var author = "(unknown author)";
+            if ( pkg.HasPackageJson && pkg.Author != null )
+            {
+                author = pkg.Author.Name;
+            }
+            size = TextRenderer.MeasureText( g, author, Font );
+            TextRenderer.DrawText( 
+                g,
+                author,
+                Font,
+                new Point((int) (bounds.Right - 2 - size.Width), bounds.Y + 2),
+                ColorUtils.Mix( ForeColor, BackColor, 5, 5 ),
                 TextFormatFlags.Default);
 
 
