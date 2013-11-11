@@ -131,10 +131,10 @@ namespace Microsoft.NodejsTools.NpmUI
                 ColorUtils.Mix( ForeColor, BackColor, 5, 5 ),
                 TextFormatFlags.Default);
 
-            var author = "(unknown author)";
-            if ( pkg.HasPackageJson && pkg.Author != null )
+            var author = "by (unknown author)";
+            if ( pkg.HasPackageJson && null != pkg.Author && ! string.IsNullOrEmpty( pkg.Author.Name ) )
             {
-                author = pkg.Author.Name;
+                author = string.Format( "by {0}", pkg.Author.Name);
             }
             size = TextRenderer.MeasureText( g, author, Font );
             TextRenderer.DrawText( 
