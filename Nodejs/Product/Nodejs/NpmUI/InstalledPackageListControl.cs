@@ -16,6 +16,11 @@ namespace Microsoft.NodejsTools.NpmUI
         public InstalledPackageListControl()
         {
             InitializeComponent();
+
+            var header = _listPackages.Columns.Add( "Package", "Package" );
+            header.Width = -2;
+            _listPackages.HeaderStyle = ColumnHeaderStyle.None;
+
             UpdateUIState();
         }
 

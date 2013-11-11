@@ -53,7 +53,7 @@
             this._listPackages.Size = new System.Drawing.Size(296, 520);
             this._listPackages.TabIndex = 1;
             this._listPackages.UseCompatibleStateImageBehavior = false;
-            this._listPackages.View = System.Windows.Forms.View.List;
+            this._listPackages.View = System.Windows.Forms.View.Details;
             this._listPackages.DrawItem += new System.Windows.Forms.DrawListViewItemEventHandler(this._listPackages_DrawItem);
             this._listPackages.SelectedIndexChanged += new System.EventHandler(this._listPackages_SelectedIndexChanged);
             // 
