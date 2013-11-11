@@ -176,14 +176,18 @@ namespace Microsoft.NodejsTools.NpmUI
             g.DrawImage(
                 img,
                 bounds.Left + 2,
-                bounds.Top + (bounds.Height - img.Height) / 2 );
+                bounds.Top + (bounds.Height - img.Height) / 2,
+                img.Width,
+                img.Height);
 
             if ( pkg.IsMissing )
             {
                 g.DrawImage( 
                     Warning,
                     bounds.Left + 2,
-                    bounds.Top + (bounds.Height - img.Height) / 2 + img.Height - Warning.Height );
+                    bounds.Top + (bounds.Height - img.Height) / 2 + img.Height - Warning.Height,
+                    Warning.Width,
+                    Warning.Height);
             }
 
             var font = new Font( Font, FontStyle.Bold );
