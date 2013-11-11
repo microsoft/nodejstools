@@ -89,10 +89,15 @@ namespace Microsoft.NodejsTools.NpmUI
                 foreColor = SystemColors.HighlightText;
                 backColor = SystemColors.Highlight;
             }
+            else if ( ( e.State & ListViewItemStates.Hot ) == ListViewItemStates.Hot )
+            {
+                foreColor = SystemColors.WindowText;
+                backColor = ColorUtils.MidPoint(SystemColors.Highlight, SystemColors.AppWorkspace);
+            }
             else
             {
                 foreColor = SystemColors.WindowText;
-                backColor = SystemColors.Control;
+                backColor = SystemColors.Window;
             }
 
             lineColor = ColorUtils.MidPoint( foreColor, backColor );

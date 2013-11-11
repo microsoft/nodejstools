@@ -46,7 +46,14 @@ namespace Microsoft.NodejsTools.Npm.SPI
                 return null == PackageJson ? null : PackageJson.Author;
             }
         }
-        public string Description { get; private set; }
+
+        public string Description
+        {
+            get
+            {
+                return null == PackageJson ? null : PackageJson.Description;
+            }
+        }
 
         public string Path { get; private set; }
 

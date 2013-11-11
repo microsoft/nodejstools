@@ -45,8 +45,11 @@
             // 
             // _listPackages
             // 
+            this._listPackages.Activation = System.Windows.Forms.ItemActivation.OneClick;
             this._listPackages.Dock = System.Windows.Forms.DockStyle.Fill;
+            this._listPackages.FullRowSelect = true;
             this._listPackages.Location = new System.Drawing.Point(0, 0);
+            this._listPackages.MultiSelect = false;
             this._listPackages.Name = "_listPackages";
             this._listPackages.OwnerDraw = true;
             this._listPackages.ShowGroups = false;
