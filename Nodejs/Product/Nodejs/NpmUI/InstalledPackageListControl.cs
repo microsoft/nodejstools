@@ -17,9 +17,18 @@ namespace Microsoft.NodejsTools.NpmUI
         {
             InitializeComponent();
 
+            //  Hack to get a single auto-sized column
             var header = _listPackages.Columns.Add( "Package", "Package" );
             header.Width = -2;
             _listPackages.HeaderStyle = ColumnHeaderStyle.None;
+            //  /hack
+
+            //  Hack to force the row height
+            var images = new ImageList();
+            images.ImageSize = new Size( 40, 40 );
+            _listPackages.SmallImageList = images;
+            _listPackages.LargeImageList = images;
+            //  /hack
 
             UpdateUIState();
         }
