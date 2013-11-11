@@ -25,7 +25,7 @@ namespace Microsoft.NodejsTools.NpmUI
 
             //  Hack to force the row height
             var images = new ImageList();
-            images.ImageSize = new Size( 40, 72 );
+            images.ImageSize = new Size( 40, 56 );
             _listPackages.SmallImageList = images;
             _listPackages.LargeImageList = images;
             //  /hack
@@ -114,14 +114,23 @@ namespace Microsoft.NodejsTools.NpmUI
             }
 
             var pkg = e.Item.Tag as IPackage;
-
+            var font = new Font( Font, FontStyle.Bold );
             TextRenderer.DrawText(
                 g,
                 pkg.Name,
-                new Font(Font, FontStyle.Bold),
+                font,
                 new Point(bounds.X + 2, bounds.Y + 2),
                 foreColor,
                 TextFormatFlags.Default);
+            var size = TextRenderer.MeasureText( g, pkg.Name, font );
+            TextRenderer.DrawText( 
+                g,
+                string.Format( "@{0}", pkg.Version ),
+                font,
+                new Point(( int ) ( bounds.X + 2 + size.Width ), bounds.Y + 2 ),
+                ColorUtils.Mix( ForeColor, BackColor, 6, 4 ),
+                TextFormatFlags.Default);
+
 
             TextRenderer.DrawText( 
                 g,
