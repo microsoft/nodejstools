@@ -17,6 +17,7 @@ using System.Diagnostics;
 using System.IO;
 using System.Runtime.InteropServices;
 using System.Text;
+using System.Threading;
 using System.Threading.Tasks;
 using System.Windows.Automation;
 using EnvDTE;
@@ -56,21 +57,7 @@ namespace ProfilingUITests {
             });
             var dialog = app.WaitForDialog(task);
             if (dialog != IntPtr.Zero) {
-                var saveDialog = new SaveDialog(dialog);
-
-                var originalDestName = Path.Combine(saveDirectory, Path.GetFileName(saveDialog.FileName));
-                var destName = originalDestName;
-
-                while (File.Exists(destName)) {
-                    destName = string.Format("{0} {1}{2}",
-                        Path.GetFileNameWithoutExtension(originalDestName),
-                        Guid.NewGuid(),
-                        Path.GetExtension(originalDestName)
-                    );
-                }
-
-                saveDialog.FileName = destName;
-                saveDialog.Save();
+                SavePerfFile(saveDirectory, dialog);
                 try {
                     task.Wait(TimeSpan.FromSeconds(5.0));
                     Assert.Fail("Task did not fault");
@@ -79,6 +66,24 @@ namespace ProfilingUITests {
             }
             Assert.IsNotNull(session, "Session was not correctly initialized");
             return session;
+        }
+
+        private static void SavePerfFile(string saveDirectory, IntPtr dialog) {
+            var saveDialog = new SaveDialog(dialog);
+
+            var originalDestName = Path.Combine(saveDirectory, Path.GetFileName(saveDialog.FileName));
+            var destName = originalDestName;
+
+            while (File.Exists(destName)) {
+                destName = string.Format("{0} {1}{2}",
+                    Path.GetFileNameWithoutExtension(originalDestName),
+                    Guid.NewGuid(),
+                    Path.GetExtension(originalDestName)
+                );
+            }
+
+            saveDialog.FileName = destName;
+            saveDialog.Save();
         }
 
         private static INodeProfileSession LaunchProcess(
@@ -268,6 +273,7 @@ namespace ProfilingUITests {
                     Mouse.MoveTo(perf.GetClickablePoint());
                     Mouse.Click(System.Windows.Input.MouseButton.Right);
                     Keyboard.Type("S");
+                    SavePerfFile(TestData.GetPath(@"TestData\NodejsProfileTest"), app.WaitForDialog());
 
                     var item = app.NodejsPerformanceExplorerTreeView.WaitForItem("Performance *", "Reports");
                     AutomationElement child = null;
@@ -332,11 +338,13 @@ namespace ProfilingUITests {
                     }
                     perfTarget = null;
                     app.WaitForDialogDismissed();
-
+                    
                     perf = app.NodejsPerformanceExplorerTreeView.WaitForItem("Performance1 *");
                     Mouse.MoveTo(perf.GetClickablePoint());
                     Mouse.Click(System.Windows.Input.MouseButton.Right);
                     Keyboard.Type("S");
+                    SavePerfFile(TestData.GetPath(@"TestData\NodejsProfileTest"), app.WaitForDialog());
+                    SavePerfFile(TestData.GetPath(@"TestData\NodejsProfileTest"), app.WaitForDialog());
 
                     var item = app.NodejsPerformanceExplorerTreeView.WaitForItem("Performance1 *", "Reports");
                     AutomationElement child = null;
@@ -408,6 +416,8 @@ namespace ProfilingUITests {
                     Mouse.MoveTo(perf.GetClickablePoint());
                     Mouse.Click(System.Windows.Input.MouseButton.Right);
                     Keyboard.Type("S");
+                    SavePerfFile(TestData.GetPath(@"TestData\NodejsProfileTest"), app.WaitForDialog());
+                    SavePerfFile(TestData.GetPath(@"TestData\NodejsProfileTest"), app.WaitForDialog());
 
                     var item = app.NodejsPerformanceExplorerTreeView.WaitForItem("Performance *", "Reports");
                     AutomationElement child = null;
@@ -694,8 +704,8 @@ namespace ProfilingUITests {
 
                             if (name.StartsWith("vsp://diff/?baseline=")) {
                                 foundDiff = true;
-                                System.Threading.Thread.Sleep(500);
-                                doc.Close(EnvDTE.vsSaveChanges.vsSaveChangesNo);
+                                System.Threading.Thread.Sleep(5000);    // let the file get opened and processed
+                                ThreadPool.QueueUserWorkItem(x => doc.Close(EnvDTE.vsSaveChanges.vsSaveChangesNo));
                                 break;
                             }
                         }
@@ -1314,7 +1324,6 @@ namespace ProfilingUITests {
                 psi.RedirectStandardOutput = true;
                 psi.RedirectStandardError = true;
                 var process = System.Diagnostics.Process.Start(psi);
-                process.Start();
                 var output = new StringBuilder();
                 process.OutputDataReceived += (sender, args) => {
                     output.Append(args.Data);
@@ -1331,7 +1340,7 @@ namespace ProfilingUITests {
                     } else {
                         Console.WriteLine("Failed to convert: {0}", output.ToString());
                         Console.WriteLine("--------------");
-                        System.Threading.Thread.Sleep(1000);
+                        System.Threading.Thread.Sleep(3000);
                         continue;
                     }
                 }

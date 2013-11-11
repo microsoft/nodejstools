@@ -39,7 +39,9 @@ namespace Microsoft.NodejsTools.Profiling {
             var dteService = (EnvDTE.DTE)(NodejsProfilingPackage.GetGlobalService(typeof(EnvDTE.DTE)));
 
             var availableProjects = new List<ProjectTargetView>();
-            var startupProjects = ((object[])dteService.Solution.SolutionBuild.StartupProjects).Select(x => x.ToString());
+            var startupProjects = dteService.Solution.SolutionBuild.StartupProjects != null ?
+                ((object[])dteService.Solution.SolutionBuild.StartupProjects).Select(x => x.ToString()) :
+                new string[0];
             ProjectTargetView selectedView = null;
             foreach (EnvDTE.Project project in dteService.Solution.Projects) {
                 var kind = project.Kind;
