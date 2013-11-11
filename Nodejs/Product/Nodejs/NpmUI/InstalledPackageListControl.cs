@@ -13,6 +13,54 @@ namespace Microsoft.NodejsTools.NpmUI
 {
     internal partial class InstalledPackageListControl : UserControl
     {
+
+#region Static image members
+
+        static InstalledPackageListControl()
+        {
+            Dependency =
+                Image.FromStream(
+                    typeof ( InstalledPackageListControl ).Assembly.GetManifestResourceStream(
+                        "Microsoft.NodejsTools.Resources.Dependency_32.png" ) );
+
+            DependencyDev =
+                Image.FromStream(
+                    typeof(InstalledPackageListControl).Assembly.GetManifestResourceStream(
+                        "Microsoft.NodejsTools.Resources.DependencyDev_32.png"));
+
+            DependencyOptional =
+                Image.FromStream(
+                    typeof(InstalledPackageListControl).Assembly.GetManifestResourceStream(
+                        "Microsoft.NodejsTools.Resources.DependencyOptional_32.png"));
+
+            Warning =
+                Image.FromStream(
+                    typeof(InstalledPackageListControl).Assembly.GetManifestResourceStream(
+                        "Microsoft.NodejsTools.Resources.Warning_16.png"));
+        }
+
+        internal static Image Dependency
+        {
+            get; private set;
+        }
+
+        internal static Image DependencyDev
+        {
+            get; private set;
+        }
+
+        internal static Image DependencyOptional
+        {
+            get; private set;
+        }
+
+        internal static Image Warning
+        {
+            get; private set;
+        }
+
+#endregion
+
         public InstalledPackageListControl()
         {
             InitializeComponent();
@@ -114,12 +162,36 @@ namespace Microsoft.NodejsTools.NpmUI
             }
 
             var pkg = e.Item.Tag as IPackage;
+
+            var img = Dependency;
+            if ( pkg.IsDevDependency )
+            {
+                img = DependencyDev;
+            }
+            else if ( pkg.IsOptionalDependency )
+            {
+                img = DependencyOptional;
+            }
+
+            g.DrawImage(
+                img,
+                bounds.Left + 2,
+                bounds.Top + (bounds.Height - img.Height) / 2 );
+
+            if ( pkg.IsMissing )
+            {
+                g.DrawImage( 
+                    Warning,
+                    bounds.Left + 2,
+                    bounds.Top + (bounds.Height - img.Height) / 2 + img.Height - Warning.Height );
+            }
+
             var font = new Font( Font, FontStyle.Bold );
             TextRenderer.DrawText(
                 g,
                 pkg.Name,
                 font,
-                new Point(bounds.X + 2, bounds.Y + 2),
+                new Point(bounds.X + 4 + img.Width, bounds.Y + 2),
                 foreColor,
                 TextFormatFlags.Default);
             var size = TextRenderer.MeasureText( g, pkg.Name, font );
@@ -127,7 +199,7 @@ namespace Microsoft.NodejsTools.NpmUI
                 g,
                 string.Format( "@{0}", pkg.Version ),
                 Font,
-                new Point(( int ) ( bounds.X + 2 + size.Width ), bounds.Y + 2 ),
+                new Point(( int ) ( bounds.X + 4 + size.Width + img.Width ), bounds.Y + 2 ),
                 ColorUtils.Mix( ForeColor, BackColor, 5, 5 ),
                 TextFormatFlags.Default);
 
@@ -151,9 +223,9 @@ namespace Microsoft.NodejsTools.NpmUI
                 pkg.Description,
                 Font,
                 new Rectangle(
-                    bounds.X + 2,
+                    bounds.X + 4 + img.Width,
                     bounds.Y + 2 + Font.Height + 6,
-                    bounds.Width - 4,
+                    bounds.Width - 6 - img.Width,
                     bounds.Height - ( 2 + Font.Height + 6 ) ),
                 foreColor,
                 TextFormatFlags.WordEllipsis);
