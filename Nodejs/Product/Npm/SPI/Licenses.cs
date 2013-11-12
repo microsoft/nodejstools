@@ -1,35 +1,22 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.ComponentModel;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using Newtonsoft.Json.Linq;
 
-namespace Microsoft.NodejsTools.Npm.SPI
-{
-    internal class Licenses : ILicenses
-    {
-
+namespace Microsoft.NodejsTools.Npm.SPI{
+    internal class Licenses : ILicenses{
         private dynamic _package;
 
-        public Licenses(dynamic package)
-        {
+        public Licenses(dynamic package){
             _package = package;
         }
 
-        public int Count
-        {
-            get
-            {
-                if (_package.license != null)
-                {
+        public int Count{
+            get{
+                if (_package.license != null){
                     return 1;
                 }
 
                 var json = _package.licenses;
-                if (null == json)
-                {
+                if (null == json){
                     return 0;
                 }
 
@@ -38,23 +25,18 @@ namespace Microsoft.NodejsTools.Npm.SPI
             }
         }
 
-        public ILicense this[int index]
-        {
-            get
-            {
-                if (index < 0)
-                {
+        public ILicense this[int index]{
+            get{
+                if (index < 0){
                     throw new IndexOutOfRangeException("Cannot retrieve license for index less than 0.");
                 }
 
-                if (index == 0 && _package.license != null)
-                {
+                if (index == 0 && _package.license != null){
                     return new License(_package.license.ToString());
                 }
 
                 var json = _package.licenses;
-                if (null == json)
-                {
+                if (null == json){
                     throw new IndexOutOfRangeException("Cannot retrieve license from empty license collection.");
                 }
 

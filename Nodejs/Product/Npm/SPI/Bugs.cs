@@ -1,41 +1,26 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using Newtonsoft.Json.Linq;
+﻿using Newtonsoft.Json.Linq;
 
-namespace Microsoft.NodejsTools.Npm.SPI
-{
-    internal class Bugs : IBugs
-    {
+namespace Microsoft.NodejsTools.Npm.SPI{
+    internal class Bugs : IBugs{
         private readonly dynamic _package;
 
-        public Bugs(dynamic package)
-        {
+        public Bugs(dynamic package){
             _package = package;
         }
 
 
-        public string Url
-        {
-            get
-            {
+        public string Url{
+            get{
                 string url = null;
                 var bugs = _package.bugs;
-                if (null != bugs)
-                {
+                if (null != bugs){
                     var token = bugs as JToken;
-                    if (token.Type == JTokenType.Object)
-                    {
+                    if (token.Type == JTokenType.Object){
                         var temp = bugs.url ?? bugs.web;
-                        if (null != temp)
-                        {
+                        if (null != temp){
                             url = temp.ToString();
                         }
-                    }
-                    else
-                    {
+                    } else{
                         url = token.Value<string>();
                     }
                 }
@@ -43,20 +28,15 @@ namespace Microsoft.NodejsTools.Npm.SPI
             }
         }
 
-        public string Email
-        {
-            get
-            {
+        public string Email{
+            get{
                 string email = null;
                 var bugs = _package.bugs;
-                if (null != bugs)
-                {
+                if (null != bugs){
                     var token = bugs as JToken;
-                    if (token.Type == JTokenType.Object)
-                    {
+                    if (token.Type == JTokenType.Object){
                         var temp = bugs.email ?? bugs.mail;
-                        if (null != temp)
-                        {
+                        if (null != temp){
                             email = temp.ToString();
                         }
                     }

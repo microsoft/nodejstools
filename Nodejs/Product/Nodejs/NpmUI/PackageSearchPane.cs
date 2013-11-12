@@ -1,28 +1,20 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.ComponentModel;
 using System.Drawing;
-using System.Data;
-using System.Linq;
-using System.Text;
 using System.Threading;
-using System.Threading.Tasks;
 using System.Windows.Forms;
 using Microsoft.NodejsTools.Npm;
 using Timer = System.Windows.Forms.Timer;
 
-namespace Microsoft.NodejsTools.NpmUI
-{
-    internal partial class PackageSearchPane : UserControl
-    {
+namespace Microsoft.NodejsTools.NpmUI{
+    internal partial class PackageSearchPane : UserControl{
         private BusyControl _busy;
         private Timer _keypressFilterDelayTimer;
         private INpmController _npmController;
-        private IEnumerable< IPackage > _allPackages;
-        private IList< IPackage > _filteredPackages; 
+        private IEnumerable<IPackage> _allPackages;
+        private IList<IPackage> _filteredPackages;
 
-        public PackageSearchPane()
-        {
+        public PackageSearchPane(){
             InitializeComponent();
 
             //  Hack to get a single auto-sized column
@@ -39,20 +31,15 @@ namespace Microsoft.NodejsTools.NpmUI
             //  /hack
         }
 
-        private async void LoadCatalogue()
-        {
+        private async void LoadCatalogue(){
             _listResults.Hide();
-            if ( null == _busy )
-            {
-                _busy = new BusyControl
-                {
+            if (null == _busy){
+                _busy = new BusyControl{
                     Message = "Loading published package list...",
                     Dock = DockStyle.Fill
                 };
-                this.Controls.Add( _busy );
-            }
-            else
-            {
+                this.Controls.Add(_busy);
+            } else{
                 _busy.Show();
             }
 
@@ -62,119 +49,98 @@ namespace Microsoft.NodejsTools.NpmUI
             StartFilter();
         }
 
-        private void StartFilter()
-        {
+        private void StartFilter(){
             ThreadPool.QueueUserWorkItem(o => Filter(_txtFind.Text));
         }
 
-        private void Filter(string filterString)
-        {
+        private void Filter(string filterString){
             filterString = filterString.ToLower();
 
-            var target = new List< IPackage >();
-            foreach ( var package in _allPackages )
-            {
-                if ( string.IsNullOrEmpty( filterString ) || package.Name.ToLower().Contains( filterString ) )
-                {
-                    target.Add( package );
+            var target = new List<IPackage>();
+            foreach (var package in _allPackages){
+                if (string.IsNullOrEmpty(filterString) || package.Name.ToLower().Contains(filterString)){
+                    target.Add(package);
                     continue;
                 }
 
                 string description = package.Description;
-                if ( null != description && description.ToLower().Contains( filterString ) )
-                {
-                    target.Add( package );
+                if (null != description && description.ToLower().Contains(filterString)){
+                    target.Add(package);
                 }
 
                 //  TODO: match on keywords also!
             }
 
-            target.Sort( new NpmSearchComparer( filterString ) );
-            BeginInvoke( new Action( () => SetListData( target ) ) );
+            target.Sort(new NpmSearchComparer(filterString));
+            BeginInvoke(new Action(() => SetListData(target)));
         }
 
-        private void SetListData( IList< IPackage > filtered )
-        {
+        private void SetListData(IList<IPackage> filtered){
             _filteredPackages = filtered;
             _listResults.VirtualListSize = _filteredPackages.Count;
             _listResults.Invalidate();
         }
 
-        public INpmController NpmController
-        {
-            set
-            {
+        public INpmController NpmController{
+            set{
                 _npmController = value;
-                BeginInvoke( new Action( LoadCatalogue ) );
+                BeginInvoke(new Action(LoadCatalogue));
             }
         }
 
-        private void _listResults_RetrieveVirtualItem(object sender, RetrieveVirtualItemEventArgs e)
-        {
-            e.Item = new ListViewItem() { Tag = _filteredPackages[ e.ItemIndex ] };
+        private void _listResults_RetrieveVirtualItem(object sender, RetrieveVirtualItemEventArgs e){
+            e.Item = new ListViewItem(){Tag = _filteredPackages[e.ItemIndex]};
         }
 
-        private void _listResults_DrawItem(object sender, DrawListViewItemEventArgs e)
-        {
-            PackageListItemPainter.DrawItem( this, e );
+        private void _listResults_DrawItem(object sender, DrawListViewItemEventArgs e){
+            PackageListItemPainter.DrawItem(this, e);
         }
 
-        private void _txtFind_KeyUp(object sender, KeyEventArgs e)
-        {
-            if ( null == _keypressFilterDelayTimer )
-            {
+        private void _txtFind_KeyUp(object sender, KeyEventArgs e){
+            if (null == _keypressFilterDelayTimer){
                 _keypressFilterDelayTimer = new Timer();
                 _keypressFilterDelayTimer.Interval = 1000;
                 _keypressFilterDelayTimer.Tick += _keypressFilterDelayTimer_Tick;
-            }
-            else
-            {
+            } else{
                 _keypressFilterDelayTimer.Stop();
             }
             _keypressFilterDelayTimer.Start();
         }
 
-        void _keypressFilterDelayTimer_Tick(object sender, EventArgs e)
-        {
+        private void _keypressFilterDelayTimer_Tick(object sender, EventArgs e){
             _keypressFilterDelayTimer.Stop();
             _keypressFilterDelayTimer.Tick -= _keypressFilterDelayTimer_Tick;
             _keypressFilterDelayTimer.Dispose();
             _keypressFilterDelayTimer = null;
 
-            BeginInvoke( new Action( StartFilter ) );
+            BeginInvoke(new Action(StartFilter));
         }
 
         public event EventHandler SelectedPackageChanged;
 
-        private void OnSelectedPackageChanged()
-        {
+        private void OnSelectedPackageChanged(){
             var handlers = SelectedPackageChanged;
-            if ( null != handlers )
-            {
-                handlers( this, EventArgs.Empty );
+            if (null != handlers){
+                handlers(this, EventArgs.Empty);
             }
         }
 
-        public IPackage SelectedPackage
-        {
-            get
-            {
+        public IPackage SelectedPackage{
+            get{
                 var indices = _listResults.SelectedIndices;
-                if ( null == indices
+                if (null == indices
                     || indices.Count == 0
-                    || indices[ 0 ] < 0
+                    || indices[0] < 0
                     || null == _filteredPackages
-                    || indices[ 0 ] >= _filteredPackages.Count )
-                {
+                    || indices[0] >= _filteredPackages.Count){
                     return null;
                 }
 
-                return _filteredPackages[ indices[ 0 ] ];
+                return _filteredPackages[indices[0]];
             }
         }
 
-        private void _listResults_SelectedIndexChanged(object sender, EventArgs e)
-        {
+        private void _listResults_SelectedIndexChanged(object sender, EventArgs e){
             OnSelectedPackageChanged();
         }
     }

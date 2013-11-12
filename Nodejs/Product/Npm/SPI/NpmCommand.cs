@@ -1,44 +1,35 @@
 ﻿using System;
 using System.Collections;
-using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
-using System.Linq;
-using System.Text;
 using System.Threading.Tasks;
 
-namespace Microsoft.NodejsTools.Npm.SPI
-{
-    internal abstract class NpmCommand
-    {
-
+namespace Microsoft.NodejsTools.Npm.SPI{
+    internal abstract class NpmCommand{
         private readonly string _fullPathToRootPackageDirectory;
         private string _pathToNpm;
 
         protected NpmCommand(
             string fullPathToRootPackageDirectory,
-            string pathToNpm = null)
-        {
+            string pathToNpm = null){
             _fullPathToRootPackageDirectory = fullPathToRootPackageDirectory;
             _pathToNpm = pathToNpm;
         }
 
         protected string Arguments { get; set; }
 
-        private string GetPathToNpm()
-        {
-            if (null == _pathToNpm)
-            {
+        private string GetPathToNpm(){
+            if (null == _pathToNpm){
                 string match = null;
-                foreach (var potential in Environment.GetEnvironmentVariable("path").Split(Path.PathSeparator))
-                {
+                foreach (var potential in Environment.GetEnvironmentVariable("path").Split(Path.PathSeparator)){
                     var path = Path.Combine(potential, "npm.cmd");
-                    if (File.Exists(path))
-                    {
+                    if (File.Exists(path)){
                         if (null == match ||
-                            path.Contains(string.Format("{0}nodejs{1}", Path.DirectorySeparatorChar,
-                                Path.DirectorySeparatorChar)))
-                        {
+                            path.Contains(
+                                string.Format(
+                                    "{0}nodejs{1}",
+                                    Path.DirectorySeparatorChar,
+                                    Path.DirectorySeparatorChar))){
                             match = path;
                         }
                     }
@@ -48,16 +39,13 @@ namespace Microsoft.NodejsTools.Npm.SPI
             return _pathToNpm;
         }
 
-        private void CopyEnvironmentVariables(ProcessStartInfo target)
-        {
-            foreach (DictionaryEntry kvp in Environment.GetEnvironmentVariables())
-            {
+        private void CopyEnvironmentVariables(ProcessStartInfo target){
+            foreach (DictionaryEntry kvp in Environment.GetEnvironmentVariables()){
                 target.EnvironmentVariables[(string) kvp.Key] = (string) kvp.Value;
             }
         }
 
-        private ProcessStartInfo BuildStartInfo()
-        {
+        private ProcessStartInfo BuildStartInfo(){
             var info = new ProcessStartInfo(GetPathToNpm(), Arguments);
             info.WorkingDirectory = _fullPathToRootPackageDirectory;
             //info.UseShellExecute = true;
@@ -74,11 +62,8 @@ namespace Microsoft.NodejsTools.Npm.SPI
         public string StandardOutput { get; private set; }
         public string StandardError { get; private set; }
 
-        public virtual async Task<bool> ExecuteAsync()
-        {
-            
-            using (var proc = new Process())
-            {
+        public virtual async Task<bool> ExecuteAsync(){
+            using (var proc = new Process()){
                 proc.StartInfo = BuildStartInfo();
                 proc.Start();
 

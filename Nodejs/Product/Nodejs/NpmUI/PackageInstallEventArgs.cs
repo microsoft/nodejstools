@@ -1,20 +1,12 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using Microsoft.NodejsTools.Npm;
 
-namespace Microsoft.NodejsTools.NpmUI
-{
-    internal class PackageInstallEventArgs : EventArgs
-    {
-
+namespace Microsoft.NodejsTools.NpmUI{
+    internal class PackageInstallEventArgs : EventArgs{
         public PackageInstallEventArgs(
             string name,
             string version,
-            DependencyType depType )
-        {
+            DependencyType depType){
             Name = name;
             Version = version;
             DependencyType = depType;

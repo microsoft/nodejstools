@@ -1,19 +1,10 @@
-﻿using System;
-using System.Collections.Generic;
-using System.IO;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿using System.IO;
 
-namespace Microsoft.NodejsTools.Npm.SPI
-{
-    internal class RootPackage : IRootPackage
-    {
-
+namespace Microsoft.NodejsTools.Npm.SPI{
+    internal class RootPackage : IRootPackage{
         public RootPackage(
             string fullPathToRootDirectory,
-            bool showMissingDevOptionalSubPackages)
-        {
+            bool showMissingDevOptionalSubPackages){
             Path = fullPathToRootDirectory;
             PackageJson = PackageJsonFactory.Create(new DirectoryPackageJsonSource(fullPathToRootDirectory));
 
@@ -21,38 +12,25 @@ namespace Microsoft.NodejsTools.Npm.SPI
         }
 
         public IPackageJson PackageJson { get; private set; }
-        public bool HasPackageJson { get { return null != PackageJson; } }
 
-        public string Name
-        {
-            get
-            {
-                return null == PackageJson ? new DirectoryInfo(Path).Name : PackageJson.Name;
-            }
+        public bool HasPackageJson{
+            get { return null != PackageJson; }
         }
 
-        public SemverVersion Version
-        {
-            get
-            {
-                return null == PackageJson ? new SemverVersion() : PackageJson.Version;
-            }
+        public string Name{
+            get { return null == PackageJson ? new DirectoryInfo(Path).Name : PackageJson.Name; }
         }
 
-        public IPerson Author
-        {
-            get
-            {
-                return null == PackageJson ? null : PackageJson.Author;
-            }
+        public SemverVersion Version{
+            get { return null == PackageJson ? new SemverVersion() : PackageJson.Version; }
         }
 
-        public string Description
-        {
-            get
-            {
-                return null == PackageJson ? null : PackageJson.Description;
-            }
+        public IPerson Author{
+            get { return null == PackageJson ? null : PackageJson.Author; }
+        }
+
+        public string Description{
+            get { return null == PackageJson ? null : PackageJson.Description; }
         }
 
         public string Path { get; private set; }

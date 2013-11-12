@@ -1,6 +1,3 @@
-﻿namespace Microsoft.NodejsTools.Npm
-{
-    public interface IMan : IPkgStringArray
-    {
-    }
+﻿namespace Microsoft.NodejsTools.Npm{
+    public interface IMan : IPkgStringArray{}
 }

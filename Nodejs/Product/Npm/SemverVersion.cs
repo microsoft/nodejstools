@@ -1,21 +1,14 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
 using System.Text;
 using System.Text.RegularExpressions;
-using System.Threading.Tasks;
 
-namespace Microsoft.NodejsTools.Npm
-{
-
+namespace Microsoft.NodejsTools.Npm{
     /// <summary>
     /// Represents a semantic version as defined at http://semver.org/
     /// and used by the npm semantic versioner: https://npmjs.org/doc/misc/semver.html.
     /// </summary>
-    public struct SemverVersion
-    {
-
-        public static readonly SemverVersion UnknownVersion = new SemverVersion(0,0,0);
+    public struct SemverVersion{
+        public static readonly SemverVersion UnknownVersion = new SemverVersion(0, 0, 0);
 
         private static readonly Regex RegexSemver = new Regex(
             "^(?<major>[0-9]+)"
@@ -23,39 +16,37 @@ namespace Microsoft.NodejsTools.Npm
             + "\\.(?<patch>[0-9]+)"
             + "(?:-(?<prerelease>[0-9A-Za-z-]+(\\.[0-9A-Za-z-]+)*))?"
             + "(?:\\+(?<buildmetadata>[0-9A-Za-z-]+(\\.[0-9A-Za-z-]+)*))?$",
-            RegexOptions.IgnoreCase | RegexOptions.Singleline );
+            RegexOptions.IgnoreCase | RegexOptions.Singleline);
 
         private static readonly Regex RegexOptionalFragment = new Regex(
             "^[0-9A-Za-z-]+(\\.[0-9A-Za-z-]+)*$",
-            RegexOptions.IgnoreCase | RegexOptions.Singleline );
+            RegexOptions.IgnoreCase | RegexOptions.Singleline);
 
-        public static SemverVersion Parse( string versionString )
-        {
+        public static SemverVersion Parse(string versionString){
             var matches = RegexSemver.Matches(versionString);
-            if ( matches.Count != 1 )
-            {
+            if (matches.Count != 1){
                 throw new SemverVersionFormatException(
-                    string.Format("Invalid semantic version: '{0}'. The version number must consist of three non-negative numeric parts of the form MAJOR.MINOR.PATCH, with optional pre-release and/or build metadata. The optional parts may only contain characters in the set [0-9A-Za-z-].",
-                    versionString ) );
+                    string.Format(
+                        "Invalid semantic version: '{0}'. The version number must consist of three non-negative numeric parts of the form MAJOR.MINOR.PATCH, with optional pre-release and/or build metadata. The optional parts may only contain characters in the set [0-9A-Za-z-].",
+                        versionString));
             }
 
-            var match           = matches[ 0 ];
-            var preRelease      = match.Groups[ "prerelease" ];
-            var buildMetadata   = match.Groups[ "buildmetadata" ];
+            var match = matches[0];
+            var preRelease = match.Groups["prerelease"];
+            var buildMetadata = match.Groups["buildmetadata"];
 
-            try
-            {
+            try{
                 return new SemverVersion(
                     ulong.Parse(match.Groups["major"].Value),
                     ulong.Parse(match.Groups["minor"].Value),
                     ulong.Parse(match.Groups["patch"].Value),
                     preRelease.Success ? preRelease.Value : null,
                     buildMetadata.Success ? buildMetadata.Value : null);
-            }
-            catch (OverflowException oe)
-            {
+            } catch (OverflowException oe){
                 throw new SemverVersionFormatException(
-                    string.Format("Invalid semantic version: '{0}'. One or more of the integer parts is large enough to overflow a 64-bit int.", versionString),
+                    string.Format(
+                        "Invalid semantic version: '{0}'. One or more of the integer parts is large enough to overflow a 64-bit int.",
+                        versionString),
                     oe);
             }
         }
@@ -74,8 +65,7 @@ namespace Microsoft.NodejsTools.Npm
         private string _preReleaseVersion;
         private string _buildMetadata;
 
-        private static bool IsValidOptionalFragment( string optional )
-        {
+        private static bool IsValidOptionalFragment(string optional){
             return string.IsNullOrEmpty(optional) || RegexOptionalFragment.IsMatch(optional);
         }
 
@@ -84,50 +74,67 @@ namespace Microsoft.NodejsTools.Npm
             ulong minor,
             ulong patch,
             string preReleaseVersion = null,
-            string buildMetadata = null )
-        {
-            if ( ! IsValidOptionalFragment( preReleaseVersion ) )
-            {
+            string buildMetadata = null){
+            if (! IsValidOptionalFragment(preReleaseVersion)){
                 throw new ArgumentException(
-                    string.Format( "Invalid pre-release version: '{0}'. Must be a dot separated sequence of identifiers containing only characters [0-9A-Za-z-].", preReleaseVersion ),
-                    "preReleaseVersion" );
+                    string.Format(
+                        "Invalid pre-release version: '{0}'. Must be a dot separated sequence of identifiers containing only characters [0-9A-Za-z-].",
+                        preReleaseVersion),
+                    "preReleaseVersion");
             }
 
-            if ( ! IsValidOptionalFragment( buildMetadata ) )
-            {
+            if (! IsValidOptionalFragment(buildMetadata)){
                 throw new ArgumentException(
-                    string.Format( "Invalid build metadata: '{0}'. Must be a dot separated sequence of identifiers containing only characters [0-9A-Za-z-].", preReleaseVersion ),
-                    "buildMetadata" );
+                    string.Format(
+                        "Invalid build metadata: '{0}'. Must be a dot separated sequence of identifiers containing only characters [0-9A-Za-z-].",
+                        preReleaseVersion),
+                    "buildMetadata");
             }
 
-            _major             = major;
-            _minor             = minor;
-            _patch             = patch;
+            _major = major;
+            _minor = minor;
+            _patch = patch;
             _preReleaseVersion = preReleaseVersion;
-            _buildMetadata     = buildMetadata;
+            _buildMetadata = buildMetadata;
         }
 
-        public ulong Major { get { return _major; } }
-        public ulong Minor { get { return _minor; } }
-        public ulong Patch { get { return _patch; } }
+        public ulong Major{
+            get { return _major; }
+        }
 
-        public bool HasPreReleaseVersion { get { return ! string.IsNullOrEmpty( PreReleaseVersion ); } }
-        public string PreReleaseVersion { get { return _preReleaseVersion; } }
-        public bool HasBuildMetadata { get { return ! string.IsNullOrEmpty( BuildMetadata ); } }
-        public string BuildMetadata { get { return _buildMetadata; } }
+        public ulong Minor{
+            get { return _minor; }
+        }
 
-        public override string ToString()
-        {
-            var builder = new StringBuilder(string.Format( "{0}.{1}.{2}", Major, Minor, Patch ));
-            
-            if (HasPreReleaseVersion)
-            {
+        public ulong Patch{
+            get { return _patch; }
+        }
+
+        public bool HasPreReleaseVersion{
+            get { return ! string.IsNullOrEmpty(PreReleaseVersion); }
+        }
+
+        public string PreReleaseVersion{
+            get { return _preReleaseVersion; }
+        }
+
+        public bool HasBuildMetadata{
+            get { return ! string.IsNullOrEmpty(BuildMetadata); }
+        }
+
+        public string BuildMetadata{
+            get { return _buildMetadata; }
+        }
+
+        public override string ToString(){
+            var builder = new StringBuilder(string.Format("{0}.{1}.{2}", Major, Minor, Patch));
+
+            if (HasPreReleaseVersion){
                 builder.Append('-');
                 builder.Append(PreReleaseVersion);
             }
 
-            if (HasBuildMetadata)
-            {
+            if (HasBuildMetadata){
                 builder.Append('+');
                 builder.Append(BuildMetadata);
             }
@@ -135,15 +142,12 @@ namespace Microsoft.NodejsTools.Npm
             return builder.ToString();
         }
 
-        public override int GetHashCode()
-        {
+        public override int GetHashCode(){
             return ToString().GetHashCode();
         }
 
-        public override bool Equals(object obj)
-        {
-            if (!(obj is SemverVersion))
-            {
+        public override bool Equals(object obj){
+            if (!(obj is SemverVersion)){
                 return false;
             }
 
@@ -155,13 +159,11 @@ namespace Microsoft.NodejsTools.Npm
                    && BuildMetadata == BuildMetadata;
         }
 
-        public static bool operator ==(SemverVersion v1, SemverVersion v2)
-        {
+        public static bool operator ==(SemverVersion v1, SemverVersion v2){
             return v1.Equals(v2);
         }
 
-        public static bool operator !=(SemverVersion v1, SemverVersion v2)
-        {
+        public static bool operator !=(SemverVersion v1, SemverVersion v2){
             return ! (v1 == v2);
         }
     }

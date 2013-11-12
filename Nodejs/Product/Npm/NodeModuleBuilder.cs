@@ -1,27 +1,18 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Security.Cryptography;
-using System.Text;
-using System.Threading.Tasks;
+﻿using System.Collections.Generic;
 using Microsoft.NodejsTools.Npm.SPI;
 
-namespace Microsoft.NodejsTools.Npm
-{
+namespace Microsoft.NodejsTools.Npm{
     /// <summary>
     /// Mutable class for building immutable node module descriptions
     /// </summary>
-    public class NodeModuleBuilder
-    {
+    public class NodeModuleBuilder{
         private readonly List<IPackage> _dependencies;
 
-        public NodeModuleBuilder()
-        {
+        public NodeModuleBuilder(){
             _dependencies = new List<IPackage>();
         }
 
-        public NodeModuleBuilder(IPackage module)
-        {
+        public NodeModuleBuilder(IPackage module){
             Name = module.Name;
             Author = module.Author;
             Version = module.Version;
@@ -40,8 +31,7 @@ namespace Microsoft.NodejsTools.Npm
 
         public string Description { get; set; }
 
-        public IEnumerable<IPackage> Dependencies
-        {
+        public IEnumerable<IPackage> Dependencies{
             get { return _dependencies; }
         }
 
@@ -49,18 +39,15 @@ namespace Microsoft.NodejsTools.Npm
 
         public string RequestedVersionRange { get; set; }
 
-        public void AddDependency(IPackage module)
-        {
+        public void AddDependency(IPackage module){
             _dependencies.Add(module);
         }
 
-        public void AddDependencies(IEnumerable<IPackage> packages)
-        {
+        public void AddDependencies(IEnumerable<IPackage> packages){
             _dependencies.AddRange(packages);
         }
 
-        public IPackage Build()
-        {
+        public IPackage Build(){
             PackageProxy proxy = new PackageProxy();
             proxy.Author = Author;
             proxy.Name = Name;
@@ -70,9 +57,8 @@ namespace Microsoft.NodejsTools.Npm
             proxy.Flags = Flags;
 
             var modules = new NodeModulesProxy();
-            foreach ( var dep in Dependencies )
-            {
-                modules.AddModule( dep );
+            foreach (var dep in Dependencies){
+                modules.AddModule(dep);
             }
             proxy.Modules = modules;
             return proxy;

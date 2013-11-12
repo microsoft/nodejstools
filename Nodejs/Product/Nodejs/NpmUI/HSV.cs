@@ -1,17 +1,11 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Drawing;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
-namespace Microsoft.NodejsTools.NpmUI
-{
+namespace Microsoft.NodejsTools.NpmUI{
     /// <summary>
     /// Summary description for HSV.
     /// </summary>
-    public class HSV
-    {
+    public class HSV{
         // All values are between 0 and 255.
         public int Hue;
         public int Saturation;
@@ -25,37 +19,31 @@ namespace Microsoft.NodejsTools.NpmUI
         public const int MaxSaturation = 255;
         public const int MaxHue = 255;
 
-        public HSV(int H, int S, int V)
-        {
+        public HSV(int H, int S, int V){
             Hue = H;
             Saturation = S;
             Value = V;
         }
 
-        public override string ToString()
-        {
+        public override string ToString(){
             return String.Format("({0}, {1}, {2})", Hue, Saturation, Value);
         }
 
-        public static RGB HSVtoRGB(int H, int S, int V)
-        {
+        public static RGB HSVtoRGB(int H, int S, int V){
             // H, S, and V must all be between 0 and 255.
             return HSVtoRGB(new HSV(H, S, V));
         }
 
-        public static Color HSVtoColor(HSV hsv)
-        {
+        public static Color HSVtoColor(HSV hsv){
             RGB RGB = HSVtoRGB(hsv);
             return Color.FromArgb(RGB.Red, RGB.Green, RGB.Blue);
         }
 
-        public static Color HSVtoColor(int H, int S, int V)
-        {
+        public static Color HSVtoColor(int H, int S, int V){
             return HSVtoColor(new HSV(H, S, V));
         }
 
-        public static RGB HSVtoRGB(HSV HSV)
-        {
+        public static RGB HSVtoRGB(HSV HSV){
             // HSV contains values scaled as in the color wheel:
             // that is, all from 0 to 255. 
 
@@ -74,20 +62,17 @@ namespace Microsoft.NodejsTools.NpmUI
 
             // Scale Hue to be between 0 and 360. Saturation
             // and value scale to be between 0 and 1.
-            h = ((double)HSV.Hue / 255 * 360) % 360;
-            s = (double)HSV.Saturation / 255;
-            v = (double)HSV.Value / 255;
+            h = ((double) HSV.Hue / 255 * 360) % 360;
+            s = (double) HSV.Saturation / 255;
+            v = (double) HSV.Value / 255;
 
-            if (s == 0)
-            {
+            if (s == 0){
                 // If s is 0, all colors are the same.
                 // This is some flavor of gray.
                 r = v;
                 g = v;
                 b = v;
-            }
-            else
-            {
+            } else{
                 double p;
                 double q;
                 double t;
@@ -99,7 +84,7 @@ namespace Microsoft.NodejsTools.NpmUI
                 // The color wheel consists of 6 sectors.
                 // Figure out which sector you//re in.
                 sectorPos = h / 60;
-                sectorNumber = (int)(Math.Floor(sectorPos));
+                sectorNumber = (int) (Math.Floor(sectorPos));
 
                 // get the fractional part of the sector.
                 // That is, how many degrees into the sector
@@ -114,8 +99,7 @@ namespace Microsoft.NodejsTools.NpmUI
 
                 // Assign the fractional colors to r, g, and b
                 // based on the sector the angle is in.
-                switch (sectorNumber)
-                {
+                switch (sectorNumber){
                     case 0:
                         r = v;
                         g = t;
@@ -155,16 +139,14 @@ namespace Microsoft.NodejsTools.NpmUI
             }
             // return an RGB structure, with values scaled
             // to be between 0 and 255.
-            return new RGB((int)(r * 255), (int)(g * 255), (int)(b * 255));
+            return new RGB((int) (r * 255), (int) (g * 255), (int) (b * 255));
         }
 
-        public static HSV ColorToHSV(Color col)
-        {
+        public static HSV ColorToHSV(Color col){
             return RGBtoHSV(new RGB(col.R, col.G, col.B));
         }
 
-        public static HSV RGBtoHSV(RGB RGB)
-        {
+        public static HSV RGBtoHSV(RGB RGB){
             // In this function, R, G, and B values must be scaled 
             // to be between 0 and 1.
             // HSV.Hue will be a value between 0 and 360, and 
@@ -176,9 +158,9 @@ namespace Microsoft.NodejsTools.NpmUI
             double max;
             double delta;
 
-            double r = (double)RGB.Red / 255;
-            double g = (double)RGB.Green / 255;
-            double b = (double)RGB.Blue / 255;
+            double r = (double) RGB.Red / 255;
+            double g = (double) RGB.Green / 255;
+            double b = (double) RGB.Blue / 255;
 
             double h;
             double s;
@@ -188,66 +170,56 @@ namespace Microsoft.NodejsTools.NpmUI
             max = Math.Max(Math.Max(r, g), b);
             v = max;
             delta = max - min;
-            if (max == 0 || delta == 0)
-            {
+            if (max == 0 || delta == 0){
                 // R, G, and B must be 0, or all the same.
                 // In this case, S is 0, and H is undefined.
                 // Using H = 0 is as good as any...
                 s = 0;
                 h = 0;
-            }
-            else
-            {
+            } else{
                 s = delta / max;
-                if (r == max)
-                {
+                if (r == max){
                     // Between Yellow and Magenta
                     h = (g - b) / delta;
-                }
-                else if (g == max)
-                {
+                } else if (g == max){
                     // Between Cyan and Yellow
                     h = 2 + (b - r) / delta;
-                }
-                else
-                {
+                } else{
                     // Between Magenta and Cyan
                     h = 4 + (r - g) / delta;
                 }
-
             }
             // Scale h to be between 0 and 360. 
             // This may require adding 360, if the value
             // is negative.
             h *= 60;
-            if (h < 0)
-            {
+            if (h < 0){
                 h += 360;
             }
 
             // Scale to the requirements of this 
             // application. All values are between 0 and 255.
-            return new HSV((int)(h / 360 * 255), (int)(s * 255), (int)(v * 255));
+            return new HSV(
+                (int) (h / 360 * 255),
+                (int) (s * 255),
+                (int) (v * 255));
         }
     }
 
-    public class RGB
-    {
+    public class RGB{
         // All values are between 0 and 255.
         public int Red;
         public int Green;
         public int Blue;
 
-        public RGB(int R, int G, int B)
-        {
+        public RGB(int R, int G, int B){
             Red = R;
             Green = G;
             Blue = B;
         }
 
-        public override string ToString()
-        {
+        public override string ToString(){
             return String.Format("({0}, {1}, {2})", Red, Green, Blue);
         }
-    } 
+    }
 }

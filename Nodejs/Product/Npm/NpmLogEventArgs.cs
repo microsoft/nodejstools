@@ -1,11 +1,8 @@
 ﻿using System;
 
-namespace Microsoft.NodejsTools.Npm
-{
-    public class NpmLogEventArgs : EventArgs
-    {
-        public NpmLogEventArgs( string logText )
-        {
+namespace Microsoft.NodejsTools.Npm{
+    public class NpmLogEventArgs : EventArgs{
+        public NpmLogEventArgs(string logText){
             LogText = logText;
         }
 
