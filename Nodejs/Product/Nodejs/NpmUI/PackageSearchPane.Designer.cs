@@ -74,13 +74,16 @@
             // _listResults
             // 
             this._listResults.Dock = System.Windows.Forms.DockStyle.Fill;
+            this._listResults.FullRowSelect = true;
             this._listResults.Location = new System.Drawing.Point(0, 24);
             this._listResults.MultiSelect = false;
             this._listResults.Name = "_listResults";
             this._listResults.OwnerDraw = true;
+            this._listResults.ShowGroups = false;
             this._listResults.Size = new System.Drawing.Size(636, 433);
             this._listResults.TabIndex = 1;
             this._listResults.UseCompatibleStateImageBehavior = false;
+            this._listResults.View = System.Windows.Forms.View.Details;
             this._listResults.VirtualMode = true;
             this._listResults.DrawItem += new System.Windows.Forms.DrawListViewItemEventHandler(this._listResults_DrawItem);
             this._listResults.RetrieveVirtualItem += new System.Windows.Forms.RetrieveVirtualItemEventHandler(this._listResults_RetrieveVirtualItem);

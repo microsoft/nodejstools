@@ -43,17 +43,30 @@ namespace Microsoft.NodejsTools.Npm
             var preRelease      = match.Groups[ "prerelease" ];
             var buildMetadata   = match.Groups[ "buildmetadata" ];
 
-            return new SemverVersion(
-                int.Parse( match.Groups[ "major" ].Value ),
-                int.Parse( match.Groups[ "minor" ].Value ),
-                int.Parse( match.Groups[ "patch" ].Value ),
-                preRelease.Success ? preRelease.Value : null,
-                buildMetadata.Success ? buildMetadata.Value : null );
+            try
+            {
+                return new SemverVersion(
+                    ulong.Parse(match.Groups["major"].Value),
+                    ulong.Parse(match.Groups["minor"].Value),
+                    ulong.Parse(match.Groups["patch"].Value),
+                    preRelease.Success ? preRelease.Value : null,
+                    buildMetadata.Success ? buildMetadata.Value : null);
+            }
+            catch (OverflowException oe)
+            {
+                throw new SemverVersionFormatException(
+                    string.Format("Invalid semantic version: '{0}'. One or more of the integer parts is large enough to overflow a 64-bit int.", versionString),
+                    oe);
+            }
         }
 
-        private int m_Major;
-        private int m_Minor;
-        private int m_Patch;
+        //  You may very well ask why these are now all ulongs. Well, you can thank the author of the so-called
+        //  classy package for that. He saw fit to give his package a version number of 0.3.130506190513602.
+        //  Wait! What?!? Does that mean there have been 130506190513601 previous patch releases of classy 0.3?
+        //  No. No it doesn't. It means he can't read the semver spec.
+        private ulong _major;
+        private ulong _minor;
+        private ulong _patch;
 
         //  N.B. Both of these are series of dot separated identifiers, but since we don't really particularly
         //  care about them at the moment, can defer comparisons to semver, and won't need to do anything beyond
@@ -67,33 +80,12 @@ namespace Microsoft.NodejsTools.Npm
         }
 
         public SemverVersion(
-            int major,
-            int minor,
-            int patch,
+            ulong major,
+            ulong minor,
+            ulong patch,
             string preReleaseVersion = null,
             string buildMetadata = null )
         {
-            if ( major < 0 )
-            {
-                throw new ArgumentOutOfRangeException(
-                    "major",
-                    string.Format( "Invalid major version, {0}: may not be negative.", major ) );
-            }
-
-            if ( minor < 0 )
-            {
-                throw new ArgumentOutOfRangeException(
-                    "minor",
-                    string.Format( "Invalid minor version, {0}: may not be negative.", minor ) );
-            }
-
-            if ( patch < 0 )
-            {
-                throw new ArgumentOutOfRangeException(
-                    "patch",
-                    string.Format( "Invalid patch version, {0}: may not be negative.", patch ) );
-            }
-
             if ( ! IsValidOptionalFragment( preReleaseVersion ) )
             {
                 throw new ArgumentException(
@@ -108,16 +100,16 @@ namespace Microsoft.NodejsTools.Npm
                     "buildMetadata" );
             }
 
-            m_Major             = major;
-            m_Minor             = minor;
-            m_Patch             = patch;
+            _major             = major;
+            _minor             = minor;
+            _patch             = patch;
             m_PreReleaseVersion = preReleaseVersion;
             m_BuildMetadata     = buildMetadata;
         }
 
-        public int Major { get { return m_Major; } }
-        public int Minor { get { return m_Minor; } }
-        public int Patch { get { return m_Patch; } }
+        public ulong Major { get { return _major; } }
+        public ulong Minor { get { return _minor; } }
+        public ulong Patch { get { return _patch; } }
 
         public bool HasPreReleaseVersion { get { return ! string.IsNullOrEmpty( PreReleaseVersion ); } }
         public string PreReleaseVersion { get { return m_PreReleaseVersion; } }

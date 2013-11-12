@@ -24,6 +24,19 @@ namespace Microsoft.NodejsTools.NpmUI
         public PackageSearchPane()
         {
             InitializeComponent();
+
+            //  Hack to get a single auto-sized column
+            var header = _listResults.Columns.Add("Package", "Package");
+            header.Width = -2;
+            _listResults.HeaderStyle = ColumnHeaderStyle.None;
+            //  /hack
+
+            //  Hack to force the row height
+            var images = new ImageList();
+            images.ImageSize = new Size(40, 40);
+            _listResults.SmallImageList = images;
+            _listResults.LargeImageList = images;
+            //  /hack
         }
 
         private async void LoadCatalogue()

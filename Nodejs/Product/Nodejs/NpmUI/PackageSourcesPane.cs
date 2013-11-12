@@ -39,6 +39,11 @@ namespace Microsoft.NodejsTools.NpmUI
             }
         }
 
+        public INpmController NpmController
+        {
+            set { _paneSearch.NpmController = value; }
+        }
+
         public PackageView SelectedPackageView
         {
             set

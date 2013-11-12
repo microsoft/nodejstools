@@ -24,10 +24,16 @@ namespace Microsoft.NodejsTools.NpmUI
             InitializeComponent();
 
             _npmController = controller;
-            _npmController.FinishedRefresh += _npmController_FinishedRefresh;
+        }
 
+        protected override void OnLoad(EventArgs e)
+        {
+            base.OnLoad(e);
+
+            _npmController.FinishedRefresh += _npmController_FinishedRefresh;
             LoadPackageInfo();
             UpdateUIState();
+            _panePackageSources.NpmController = _npmController;
         }
 
         private void _btnClose_Click(object sender, EventArgs e)
