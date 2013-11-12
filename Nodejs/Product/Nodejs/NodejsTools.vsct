@@ -130,7 +130,7 @@
         <Parent guid="guidNodeToolsCmdSet" id="NpmInstallItemsGroup" />
         <Strings>
           <CommandName>cmdidNpmManageModules</CommandName>
-          <ButtonText>Mana&amp;ge Modules...</ButtonText>
+          <ButtonText>Mana&amp;ge npm Modules...</ButtonText>
         </Strings>
       </Button>
 
@@ -138,7 +138,7 @@
         <Parent guid="guidNodeToolsCmdSet" id="NpmInstallItemsGroup" />
         <Strings>
           <CommandName>cmdidNpmUpdateModules</CommandName>
-          <ButtonText>Up&amp;date Modules</ButtonText>
+          <ButtonText>Up&amp;date npm Modules</ButtonText>
         </Strings>
       </Button>
 
@@ -146,7 +146,7 @@
         <Parent guid="guidNodeToolsCmdSet" id="NpmUninstallItemsGroup" />
         <Strings>
           <CommandName>cmdidNpmUninstallModules</CommandName>
-          <ButtonText>Unins&amp;tall Module</ButtonText>
+          <ButtonText>Unins&amp;tall npm Module</ButtonText>
         </Strings>
       </Button>
 
@@ -173,6 +173,7 @@
       <Parent guid="guidSHLMainMenu" id="IDM_VS_CTXT_WEBITEMNODE"/>
     </CommandPlacement>
 
+    <!-- Bombs - unsure why! -->
     <!--<CommandPlacement guid="guidNodeToolsCmdSet" id="NpmInstallItemsGroup" priority="0x0700">
       <Parent guid="guidSHLMainMenu" id="IDM_VS_MENU_PROJECT" />
     </CommandPlacement>-->
