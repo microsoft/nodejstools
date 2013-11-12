@@ -218,7 +218,7 @@ namespace Microsoft.NodejsTools.NpmUI
                 author,
                 Font,
                 new Point((int) (bounds.Right - 2 - size.Width), bounds.Y + 2),
-                ColorUtils.Mix( foreColor, BackColor, 5, 5 ),
+                ColorUtils.Mix( foreColor, backColor, 5, 5 ),
                 TextFormatFlags.Default);
 
 
