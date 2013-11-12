@@ -11,6 +11,11 @@ namespace Microsoft.NodejsTools.Npm.SPI
 {
     internal class NpmController : INpmController
     {
+
+        //  *Really* don't want to retrieve this more than once:
+        //  47,000 packages takes a while.
+        private static IEnumerable<IPackage> _sRepoCatalogue;
+
         private string _fullPathToRootPackageDirectory;
         private bool _showMissingDevOptionalSubPackages;
         private string _pathToNpm;
@@ -199,7 +204,15 @@ namespace Microsoft.NodejsTools.Npm.SPI
 
         public async Task< IEnumerable< IPackage > > GetRepositoryCatalogueAsync()
         {
-            return await SearchAsync( null );
+            //  This should really be thread-safe but await can't be inside a lock so
+            //  we'll just have to hope and pray this doesn't happen concurrently. Worst
+            //  case is we'll end up with two retrievals, one of which will be binned,
+            //  which isn't the end of the world.
+            if ( null == _sRepoCatalogue )
+            {
+                _sRepoCatalogue = await SearchAsync( null );
+            }
+            return _sRepoCatalogue;
         }
 
         public async Task< bool > UpdatePackagesAsync()
