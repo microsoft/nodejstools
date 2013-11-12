@@ -130,7 +130,7 @@ namespace Microsoft.NodejsTools.NpmUI
             this.ShowIcon = false;
             this.ShowInTaskbar = false;
             this.StartPosition = System.Windows.Forms.FormStartPosition.CenterParent;
-            this.Text = "PackageManagerDialog";
+            this.Text = "npm Package Management";
             this._panelFooter.ResumeLayout(false);
             this._panelFooter.PerformLayout();
             this.ResumeLayout(false);

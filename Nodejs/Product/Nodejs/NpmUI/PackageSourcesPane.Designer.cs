@@ -138,7 +138,7 @@ namespace Microsoft.NodejsTools.NpmUI
             this._tabPackageDetails.Padding = new System.Windows.Forms.Padding(3);
             this._tabPackageDetails.Size = new System.Drawing.Size(476, 503);
             this._tabPackageDetails.TabIndex = 0;
-            this._tabPackageDetails.Text = "Package Details";
+            this._tabPackageDetails.Text = "Specify Package Details";
             this._tabPackageDetails.UseVisualStyleBackColor = true;
             // 
             // _paneInstallParms
