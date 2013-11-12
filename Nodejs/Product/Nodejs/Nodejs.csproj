@@ -192,7 +192,6 @@
     <Compile Include="Nodejs.cs" />
     <Compile Include="NodejsProjectConfig.cs" />
     <Compile Include="NodejsToolsInstallPath.cs" />
-    <Compile Include="NpmUI\Annotations.cs" />
     <Compile Include="NpmUI\BusyControl.cs">
       <SubType>UserControl</SubType>
     </Compile>
@@ -206,10 +205,6 @@
       <DependentUpon>BusyPopup.cs</DependentUpon>
     </Compile>
     <Compile Include="NpmUI\ColorUtils.cs" />
-    <Compile Include="NpmUI\FlagsConverter.cs" />
-    <Compile Include="NpmUI\FlagsToDescriptionConverter.cs" />
-    <Compile Include="NpmUI\FlagsToImageConverter.cs" />
-    <Compile Include="NpmUI\FlagsToInstallConverter.cs" />
     <Compile Include="NpmUI\HSV.cs" />
     <Compile Include="NpmUI\InstalledPackageListControl.cs">
       <SubType>UserControl</SubType>
@@ -224,7 +219,6 @@
       <DependentUpon>InstalledPackagesPane.cs</DependentUpon>
     </Compile>
     <Compile Include="NpmUI\PackageListItemPainter.cs" />
-    <Compile Include="NpmUI\ModuleCommands.cs" />
     <Compile Include="NpmUI\NpmSearchComparer.cs" />
     <Compile Include="NpmUI\PackageEventArgs.cs" />
     <Compile Include="NpmUI\PackageInstallEventArgs.cs" />
@@ -234,16 +228,12 @@
     <Compile Include="NpmUI\PackageInstallPane.Designer.cs">
       <DependentUpon>PackageInstallPane.cs</DependentUpon>
     </Compile>
-    <Compile Include="NpmUI\ModuleManager.xaml.cs">
-      <DependentUpon>ModuleManager.xaml</DependentUpon>
-    </Compile>
     <Compile Include="NpmUI\PackageManagerDialog.cs">
       <SubType>Form</SubType>
     </Compile>
     <Compile Include="NpmUI\PackageManagerDialog.Designer.cs">
       <DependentUpon>PackageManagerDialog.cs</DependentUpon>
     </Compile>
-    <Compile Include="NpmUI\ModuleSourcesViewModel.cs" />
     <Compile Include="NpmUI\PackageSearchPane.cs">
       <SubType>UserControl</SubType>
     </Compile>
@@ -257,11 +247,6 @@
       <DependentUpon>PackageSourcesPane.cs</DependentUpon>
     </Compile>
     <Compile Include="NpmUI\PackageView.cs" />
-    <Compile Include="NpmUI\UpdateDialog.xaml.cs">
-      <DependentUpon>UpdateDialog.xaml</DependentUpon>
-    </Compile>
-    <Compile Include="NpmUI\UpdateDialogViewModel.cs" />
-    <Compile Include="NpmUI\VisibleToBoolConverter.cs" />
     <Compile Include="Options\NodejsDialogPage.cs">
       <SubType>Component</SubType>
     </Compile>
@@ -617,20 +602,6 @@
       <IncludeOutputGroupsInVSIX>BuiltProjectOutputGroup%3bBuiltProjectOutputGroupDependencies%3bGetCopyToOutputDirectoryItems%3bSatelliteDllsProjectOutputGroup%3b</IncludeOutputGroupsInVSIX>
       <IncludeOutputGroupsInVSIXLocalOnly>DebugSymbolsProjectOutputGroup%3b</IncludeOutputGroupsInVSIXLocalOnly>
     </ProjectReference>
-  </ItemGroup>
-  <ItemGroup>
-    <Page Include="NpmUI\ModuleManager.xaml">
-      <Generator>MSBuild:Compile</Generator>
-      <SubType>Designer</SubType>
-    </Page>
-    <Page Include="NpmUI\Styles.xaml">
-      <Generator>MSBuild:Compile</Generator>
-      <SubType>Designer</SubType>
-    </Page>
-    <Page Include="NpmUI\UpdateDialog.xaml">
-      <Generator>MSBuild:Compile</Generator>
-      <SubType>Designer</SubType>
-    </Page>
   </ItemGroup>
   <PropertyGroup>
     <!--
