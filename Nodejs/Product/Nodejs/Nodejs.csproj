@@ -356,13 +356,13 @@
     </EmbeddedResource>
   </ItemGroup>
   <ItemGroup>
-    <ZipProject Include="ProjectTemplates\WebExpressApp\WebExpressApp.njsproj">
+    <ZipProject Include="ProjectTemplates\AddWebSiteExpressApp\AddWebSiteExpressApp.njsproj">
       <SubType>Designer</SubType>
     </ZipProject>
-    <TransformedZipProject Include="ProjectTemplates\WebExpressApp\WebExpressApp.vstemplate.base">
+    <TransformedZipProject Include="ProjectTemplates\AddWebSiteExpressApp\AddWebSiteExpressApp.vstemplate.base">
       <SubType>Designer</SubType>
     </TransformedZipProject>
-    <ZipProject Include="ProjectTemplates\WebExpressApp\server.js" />
+    <ZipProject Include="ProjectTemplates\AddWebSiteExpressApp\server.js" />
     <ZipProject Include="ProjectTemplates\AzureExpressApp\AzureExpressApp.njsproj">
       <SubType>Designer</SubType>
     </ZipProject>
@@ -370,19 +370,19 @@
       <SubType>Designer</SubType>
     </ZipProject>
     <ZipProject Include="ProjectTemplates\AzureExpressApp\server.js" />
-    <ZipProject Include="ProjectTemplates\WebAzureExpressApp\WebAzureExpressApp.njsproj">
+    <ZipProject Include="ProjectTemplates\AddWebSiteAzureExpressApp\AddWebSiteAzureExpressApp.njsproj">
       <SubType>Designer</SubType>
     </ZipProject>
-    <TransformedZipProject Include="ProjectTemplates\WebAzureExpressApp\WebAzureExpressApp.vstemplate.base">
+    <TransformedZipProject Include="ProjectTemplates\AddWebSiteAzureExpressApp\AddWebSiteAzureExpressApp.vstemplate.base">
       <SubType>Designer</SubType>
     </TransformedZipProject>
-    <ZipProject Include="ProjectTemplates\WebAzureExpressApp\server.js" />
+    <ZipProject Include="ProjectTemplates\AddWebSiteAzureExpressApp\server.js" />
     <ZipProject Include="ProjectTemplates\NodejsWebApp\Preview.png" />
-    <ZipProject Include="ProjectTemplates\WebAzureNodejsApp\Preview.png" />
-    <ZipProject Include="ProjectTemplates\WebNodejsApp\Preview.png" />
+    <ZipProject Include="ProjectTemplates\AddWebSiteAzureNodejsApp\Preview.png" />
+    <ZipProject Include="ProjectTemplates\AddWebSiteNodejsWebApp\Preview.png" />
     <ZipProject Include="ProjectTemplates\AzureExpressApp\Preview.png" />
     <ZipProject Include="ProjectTemplates\ExpressApp\Preview.png" />
-    <ZipProject Include="ProjectTemplates\WebAzureExpressApp\Preview.png" />
+    <ZipProject Include="ProjectTemplates\AddWebSiteAzureExpressApp\Preview.png" />
     <ZipProject Include="ProjectTemplates\AzureNodejsApp\Preview.png" />
     <ZipProject Include="ProjectTemplates\NodejsConsoleApp\Preview.png" />
     <Content Include="NoSurveyNewsFeed.html">
@@ -429,28 +429,28 @@
       <SubType>Designer</SubType>
     </ZipProject>
     <ZipProject Include="ProjectTemplates\ExpressApp\server.js" />
-    <TransformedZipProject Include="ProjectTemplates\WebAzureNodejsApp\WebAzureNodejsApp.vstemplate.base">
+    <TransformedZipProject Include="ProjectTemplates\AddWebSiteAzureNodejsApp\AddWebSiteAzureNodejsApp.vstemplate.base">
       <SubType>Designer</SubType>
     </TransformedZipProject>
-    <ZipProject Include="ProjectTemplates\WebAzureNodejsApp\WebAzureNodejsApp.njsproj">
+    <ZipProject Include="ProjectTemplates\AddWebSiteAzureNodejsApp\AddWebSiteAzureNodejsApp.njsproj">
       <SubType>Designer</SubType>
     </ZipProject>
-    <ZipProject Include="ProjectTemplates\WebAzureNodejsApp\server.js" />
-    <ZipProject Include="ProjectTemplates\WebAzureNodejsApp\ChangeConfig.ps1" />
-    <ZipProject Include="ProjectTemplates\WebAzureNodejsApp\download.ps1" />
-    <ZipProject Include="ProjectTemplates\WebAzureNodejsApp\package.json" />
-    <ZipProject Include="ProjectTemplates\WebAzureNodejsApp\README.md" />
-    <ZipProject Include="ProjectTemplates\WebAzureNodejsApp\setup_web.cmd" />
-    <ZipProject Include="ProjectTemplates\WebAzureNodejsApp\Web.cloud.config" />
-    <ZipProject Include="ProjectTemplates\WebAzureNodejsApp\Web.config" />
-    <ZipProject Include="ProjectTemplates\WebAzureNodejsApp\node.cmd" />
-    <ZipProject Include="ProjectTemplates\WebNodejsApp\WebNodejsApp.njsproj">
+    <ZipProject Include="ProjectTemplates\AddWebSiteAzureNodejsApp\server.js" />
+    <ZipProject Include="ProjectTemplates\AddWebSiteAzureNodejsApp\ChangeConfig.ps1" />
+    <ZipProject Include="ProjectTemplates\AddWebSiteAzureNodejsApp\download.ps1" />
+    <ZipProject Include="ProjectTemplates\AddWebSiteAzureNodejsApp\package.json" />
+    <ZipProject Include="ProjectTemplates\AddWebSiteAzureNodejsApp\README.md" />
+    <ZipProject Include="ProjectTemplates\AddWebSiteAzureNodejsApp\setup_web.cmd" />
+    <ZipProject Include="ProjectTemplates\AddWebSiteAzureNodejsApp\Web.cloud.config" />
+    <ZipProject Include="ProjectTemplates\AddWebSiteAzureNodejsApp\Web.config" />
+    <ZipProject Include="ProjectTemplates\AddWebSiteAzureNodejsApp\node.cmd" />
+    <ZipProject Include="ProjectTemplates\AddWebSiteNodejsWebApp\AddWebSiteNodejsWebApp.njsproj">
       <SubType>Designer</SubType>
     </ZipProject>
-    <TransformedZipProject Include="ProjectTemplates\WebNodejsApp\WebNodejsApp.vstemplate.base">
+    <TransformedZipProject Include="ProjectTemplates\AddWebSiteNodejsWebApp\AddWebSiteNodejsWebApp.vstemplate.base">
       <SubType>Designer</SubType>
     </TransformedZipProject>
-    <ZipProject Include="ProjectTemplates\WebNodejsApp\server.js" />
+    <ZipProject Include="ProjectTemplates\AddWebSiteNodejsWebApp\server.js" />
     <Content Include="Microsoft.NodejsTools.targets">
       <IncludeInVSIX>true</IncludeInVSIX>
       <TargetPath>Microsoft.NodejsTools.Developer.targets</TargetPath>
@@ -472,18 +472,18 @@
     <ZipProject Include="ProjectTemplates\AzureNodejsApp\Web.cloud.config" />
     <ZipProject Include="ProjectTemplates\AzureNodejsApp\Web.config" />
     <ZipProject Include="ProjectTemplates\AzureNodejsApp\node.cmd" />
-    <ZipProject Include="ProjectTemplates\WebNodejsApp\package.json" />
-    <ZipProject Include="ProjectTemplates\WebNodejsApp\README.md" />
+    <ZipProject Include="ProjectTemplates\AddWebSiteNodejsWebApp\package.json" />
+    <ZipProject Include="ProjectTemplates\AddWebSiteNodejsWebApp\README.md" />
     <ZipProject Include="ProjectTemplates\NodejsWebApp\NodejsWebApp.njsproj">
       <SubType>Designer</SubType>
     </ZipProject>
     <ZipProject Include="ProjectTemplates\NodejsWebApp\package.json" />
     <ZipProject Include="ProjectTemplates\NodejsWebApp\README.md" />
-    <ZipProject Include="ProjectTemplates\WebNodejsApp\WebApplication.webproj" />
+    <ZipProject Include="ProjectTemplates\AddWebSiteNodejsWebApp\WebApplication.webproj" />
     <ZipProject Include="ProjectTemplates\ExpressApp\package.json" />
     <ZipProject Include="ProjectTemplates\ExpressApp\README.md" />
-    <ZipProject Include="ProjectTemplates\WebExpressApp\package.json" />
-    <ZipProject Include="ProjectTemplates\WebExpressApp\README.md" />
+    <ZipProject Include="ProjectTemplates\AddWebSiteExpressApp\package.json" />
+    <ZipProject Include="ProjectTemplates\AddWebSiteExpressApp\README.md" />
     <ZipProject Include="ProjectTemplates\AzureExpressApp\package.json" />
     <ZipProject Include="ProjectTemplates\AzureExpressApp\README.md" />
     <ZipProject Include="ProjectTemplates\AzureExpressApp\Web.config" />
@@ -492,14 +492,14 @@
     <ZipProject Include="ProjectTemplates\AzureExpressApp\download.ps1" />
     <ZipProject Include="ProjectTemplates\AzureExpressApp\ChangeConfig.ps1" />
     <ZipProject Include="ProjectTemplates\AzureExpressApp\node.cmd" />
-    <ZipProject Include="ProjectTemplates\WebAzureExpressApp\ChangeConfig.ps1" />
-    <ZipProject Include="ProjectTemplates\WebAzureExpressApp\download.ps1" />
-    <ZipProject Include="ProjectTemplates\WebAzureExpressApp\package.json" />
-    <ZipProject Include="ProjectTemplates\WebAzureExpressApp\README.md" />
-    <ZipProject Include="ProjectTemplates\WebAzureExpressApp\setup_web.cmd" />
-    <ZipProject Include="ProjectTemplates\WebAzureExpressApp\Web.cloud.config" />
-    <ZipProject Include="ProjectTemplates\WebAzureExpressApp\Web.config" />
-    <ZipProject Include="ProjectTemplates\WebAzureExpressApp\node.cmd" />
+    <ZipProject Include="ProjectTemplates\AddWebSiteAzureExpressApp\ChangeConfig.ps1" />
+    <ZipProject Include="ProjectTemplates\AddWebSiteAzureExpressApp\download.ps1" />
+    <ZipProject Include="ProjectTemplates\AddWebSiteAzureExpressApp\package.json" />
+    <ZipProject Include="ProjectTemplates\AddWebSiteAzureExpressApp\README.md" />
+    <ZipProject Include="ProjectTemplates\AddWebSiteAzureExpressApp\setup_web.cmd" />
+    <ZipProject Include="ProjectTemplates\AddWebSiteAzureExpressApp\Web.cloud.config" />
+    <ZipProject Include="ProjectTemplates\AddWebSiteAzureExpressApp\Web.config" />
+    <ZipProject Include="ProjectTemplates\AddWebSiteAzureExpressApp\node.cmd" />
     <ZipProject Include="ProjectTemplates\NodejsConsoleApp\package.json" />
     <ZipProject Include="ProjectTemplates\NodejsConsoleApp\README.md" />
     <ZipProject Include="ProjectTemplates\NodejsConsoleApp\app.js" />

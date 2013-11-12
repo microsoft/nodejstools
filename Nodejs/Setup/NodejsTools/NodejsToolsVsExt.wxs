@@ -67,20 +67,23 @@
             <Component Id="cmpExpressApp.zip" Directory="DIR_ProjectTemplates_4DCCAA275A2C4923918F2CBC07199083" Guid="{D7612D7F-2AAA-4925-9818-3F638FA04C5C}">
               <File Id="filExpressApp.zip" KeyPath="yes" Source="$(var.BinariesDir)\ProjectTemplates\JavaScript\ExpressApp.zip" />
             </Component>
-            <Component Id="cmpNodejsApp.zip" Directory="DIR_ProjectTemplates_4DCCAA275A2C4923918F2CBC07199083" Guid="{2A83D4D0-2334-4FFF-AB7B-8D1D96F0D3FC}">
-              <File Id="filNodejsApp.zip" KeyPath="yes" Source="$(var.BinariesDir)\ProjectTemplates\JavaScript\NodejsApp.zip" />
+            <Component Id="cmpNodejsWebApp.zip" Directory="DIR_ProjectTemplates_4DCCAA275A2C4923918F2CBC07199083" Guid="{2A83D4D0-2334-4FFF-AB7B-8D1D96F0D3FC}">
+              <File Id="filNodejsWebApp.zip" KeyPath="yes" Source="$(var.BinariesDir)\ProjectTemplates\JavaScript\NodejsWebApp.zip" />
             </Component>
-            <Component Id="cmpWebAzureExpressApp.zip" Directory="DIR_ProjectTemplates_4DCCAA275A2C4923918F2CBC07199083" Guid="{86749494-2D16-4AD4-9E86-B3A3ED72DB80}">
-              <File Id="filWebAzureExpressApp.zip" KeyPath="yes" Source="$(var.BinariesDir)\ProjectTemplates\JavaScript\WebAzureExpressApp.zip" />
+            <Component Id="cmpNodejsConsoleApp.zip" Directory="DIR_ProjectTemplates_4DCCAA275A2C4923918F2CBC07199083" Guid="{8EA6B5E7-ACBD-4177-94F4-10C7C8458BCD}">
+              <File Id="filNodejsConsoleApp.zip" KeyPath="yes" Source="$(var.BinariesDir)\ProjectTemplates\JavaScript\NodejsConsoleApp.zip" />
             </Component>
-            <Component Id="cmpWebAzureNodejsApp.zip" Directory="DIR_ProjectTemplates_4DCCAA275A2C4923918F2CBC07199083" Guid="{A1770285-15AE-446E-B843-7A3FA82AD3F7}">
-              <File Id="filWebAzureNodejsApp.zip" KeyPath="yes" Source="$(var.BinariesDir)\ProjectTemplates\JavaScript\WebAzureNodejsApp.zip" />
+            <Component Id="cmpAddWebSiteAzureExpressApp.zip" Directory="DIR_ProjectTemplates_4DCCAA275A2C4923918F2CBC07199083" Guid="{86749494-2D16-4AD4-9E86-B3A3ED72DB80}">
+              <File Id="filAddWebSiteAzureExpressApp.zip" KeyPath="yes" Source="$(var.BinariesDir)\ProjectTemplates\JavaScript\AddWebSiteAzureExpressApp.zip" />
             </Component>
-            <Component Id="cmpWebExpressApp.zip" Directory="DIR_ProjectTemplates_4DCCAA275A2C4923918F2CBC07199083" Guid="{99D43BE0-92B6-47F2-8512-29189F4117F1}">
-              <File Id="filWebExpressApp.zip" KeyPath="yes" Source="$(var.BinariesDir)\ProjectTemplates\JavaScript\WebExpressApp.zip" />
+            <Component Id="cmpAddWebSiteAzureNodejsApp.zip" Directory="DIR_ProjectTemplates_4DCCAA275A2C4923918F2CBC07199083" Guid="{A1770285-15AE-446E-B843-7A3FA82AD3F7}">
+              <File Id="filAddWebSiteAzureNodejsApp.zip" KeyPath="yes" Source="$(var.BinariesDir)\ProjectTemplates\JavaScript\AddWebSiteAzureNodejsApp.zip" />
             </Component>
-            <Component Id="cmpWebNodejsApp.zip" Directory="DIR_ProjectTemplates_4DCCAA275A2C4923918F2CBC07199083" Guid="{559C2DB8-DBAE-419A-95FE-9F7AE5623875}">
-              <File Id="filWebNodejsApp.zip" KeyPath="yes" Source="$(var.BinariesDir)\ProjectTemplates\JavaScript\WebNodejsApp.zip" />
+            <Component Id="cmpAddWebSiteExpressApp.zip" Directory="DIR_ProjectTemplates_4DCCAA275A2C4923918F2CBC07199083" Guid="{99D43BE0-92B6-47F2-8512-29189F4117F1}">
+              <File Id="filAddWebSiteExpressApp.zip" KeyPath="yes" Source="$(var.BinariesDir)\ProjectTemplates\JavaScript\AddWebSiteExpressApp.zip" />
+            </Component>
+            <Component Id="cmpAddWebSiteNodejsWebApp.zip" Directory="DIR_ProjectTemplates_4DCCAA275A2C4923918F2CBC07199083" Guid="{559C2DB8-DBAE-419A-95FE-9F7AE5623875}">
+              <File Id="filAddWebSiteNodejsWebApp.zip" KeyPath="yes" Source="$(var.BinariesDir)\ProjectTemplates\JavaScript\AddWebSiteNodejsWebApp.zip" />
             </Component>
             <Component Id="cmpNodejsTools.targets" Directory="Dir_NodejsToolsMsBuild" Guid="{6D84572F-D895-443F-BD25-712394273A4E}">
                 <File Id="filNodejsTools.targets" KeyPath="yes" Source="$(var.BinariesDir)\Microsoft.NodejsTools.targets" />
