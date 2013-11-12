@@ -17,6 +17,12 @@
             {
                 components.Dispose();
             }
+
+            if (disposing && null != _busy)
+            {
+                _busy.Dispose();
+            }
+
             base.Dispose(disposing);
         }
 
