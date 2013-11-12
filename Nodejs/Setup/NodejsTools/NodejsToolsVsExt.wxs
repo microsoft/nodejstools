@@ -1,4 +1,4 @@
-﻿<?xml version="1.0" encoding="utf-8"?>
+<?xml version="1.0" encoding="utf-8"?>
 <Wix xmlns="http://schemas.microsoft.com/wix/2006/wi">
     <Fragment>
         <DirectoryRef Id="INSTALLLOCATION">
@@ -30,6 +30,9 @@
             <!-- Both per user and all user components -->
             <Component Id="cmpE3F5BF4C28BA41A9A478DAC397C64098" Directory="INSTALLLOCATION" Guid="{DDBCEC41-C59C-4C5D-B7A2-77AB2F7684DB}">
               <File Id="fil47E7513578964CFA86B587D50FC280CB" KeyPath="yes" Source="$(var.BinariesDir)\Microsoft.NodejsTools.dll" />
+            </Component>
+            <Component Id="cmpMicrosoft.NodejsTools.Npm.dll" Directory="INSTALLLOCATION" Guid="{6BEB23FF-398F-4E40-8775-E6DF3E2E76AB}">
+              <File Id="filMicrosoft.NodejsTools.Npm.dll" KeyPath="yes" Source="$(var.BinariesDir)\Microsoft.NodejsTools.Npm.dll" />
             </Component>
             <Component Id="cmpMicrosoft.NodejsTools.ProjectWizard.dll" Directory="INSTALLLOCATION" Guid="{5B0F69FB-EBB6-42CF-8422-57C2A492E664}">
               <File Id="filMicrosoft.NodejsTools.ProjectWizard.dll" KeyPath="yes" Source="$(var.BinariesDir)\Microsoft.NodejsTools.ProjectWizard.dll" />
