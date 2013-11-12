@@ -1,21 +1,12 @@
-﻿using System;
-using System.Collections.Generic;
-using System.IO;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿using System.IO;
 using Microsoft.NodejsTools.Npm;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 
-namespace NpmTests
-{
+namespace NpmTests{
     [TestClass]
-    public class InstallUninstallPackageTests : AbstractFilesystemPackageJsonTests
-    {
-
+    public class InstallUninstallPackageTests : AbstractFilesystemPackageJsonTests{
         [TestMethod]
-        public void TestAddPackageToSimplePackageJsonThenUninstall()
-        {
+        public void TestAddPackageToSimplePackageJsonThenUninstall(){
             var rootDir = CreateRootPackage(PkgSimple);
             var controller = NpmControllerFactory.Create(rootDir);
             var rootPackage = controller.RootPackage;
@@ -23,8 +14,11 @@ namespace NpmTests
             Assert.AreEqual(0, rootPackage.Modules.Count, "Should be no modules before package install.");
 
             AsyncHelpers.RunSync(() => controller.InstallPackageByVersionAsync("sax", "*", DependencyType.Standard));
-            
-            Assert.AreNotEqual(rootPackage, controller.RootPackage, "Root package should be different after package installed.");
+
+            Assert.AreNotEqual(
+                rootPackage,
+                controller.RootPackage,
+                "Root package should be different after package installed.");
 
             rootPackage = controller.RootPackage;
             Assert.IsNotNull(rootPackage, "Root package should not be null after package installed.");
@@ -34,7 +28,9 @@ namespace NpmTests
             Assert.IsNotNull(module, "Installed package should not be null.");
             Assert.AreEqual("sax", module.Name, "Module name mismatch.");
             Assert.IsNotNull(module.PackageJson, "Module package.json should not be null.");
-            Assert.IsTrue(module.IsListedInParentPackageJson, "Should be listed as a dependency in parent package.json.");
+            Assert.IsTrue(
+                module.IsListedInParentPackageJson,
+                "Should be listed as a dependency in parent package.json.");
             Assert.IsFalse(module.IsMissing, "Should not be marked as missing.");
             Assert.IsFalse(module.IsDevDependency, "Should not be marked as dev dependency.");
             Assert.IsFalse(module.IsOptionalDependency, "Should not be marked as optional dependency.");
@@ -42,8 +38,11 @@ namespace NpmTests
             Assert.IsTrue(module.HasPackageJson, "Module should have its own package.json");
 
             AsyncHelpers.RunSync(() => controller.UninstallPackageAsync("sax"));
-            
-            Assert.AreNotEqual(rootPackage, controller.RootPackage, "Root package should be different after package uninstalled.");
+
+            Assert.AreNotEqual(
+                rootPackage,
+                controller.RootPackage,
+                "Root package should be different after package uninstalled.");
 
             rootPackage = controller.RootPackage;
             Assert.IsNotNull(rootPackage, "Root package should not be null after package uninstalled.");
@@ -51,8 +50,7 @@ namespace NpmTests
         }
 
         [TestMethod]
-        public void TestAddPackageNoPackageJsonThenUninstall()
-        {
+        public void TestAddPackageNoPackageJsonThenUninstall(){
             var rootDir = CreateRootPackage(PkgSimple);
             File.Delete(Path.Combine(rootDir, "package.json"));
             var controller = NpmControllerFactory.Create(rootDir);
@@ -62,7 +60,10 @@ namespace NpmTests
 
             AsyncHelpers.RunSync(() => controller.InstallPackageByVersionAsync("sax", "*", DependencyType.Standard));
 
-            Assert.AreNotEqual(rootPackage, controller.RootPackage, "Root package should be different after package installed.");
+            Assert.AreNotEqual(
+                rootPackage,
+                controller.RootPackage,
+                "Root package should be different after package installed.");
 
             rootPackage = controller.RootPackage;
             Assert.IsNotNull(rootPackage, "Root package should not be null after package installed.");
@@ -72,7 +73,9 @@ namespace NpmTests
             Assert.IsNotNull(module, "Installed package should not be null.");
             Assert.AreEqual("sax", module.Name, "Module name mismatch.");
             Assert.IsNotNull(module.PackageJson, "Module package.json should not be null.");
-            Assert.IsFalse(module.IsListedInParentPackageJson, "Should be listed as a dependency in parent package.json.");
+            Assert.IsFalse(
+                module.IsListedInParentPackageJson,
+                "Should be listed as a dependency in parent package.json.");
             Assert.IsFalse(module.IsMissing, "Should not be marked as missing.");
             Assert.IsFalse(module.IsDevDependency, "Should not be marked as dev dependency.");
             Assert.IsFalse(module.IsOptionalDependency, "Should not be marked as optional dependency.");
@@ -81,7 +84,10 @@ namespace NpmTests
 
             AsyncHelpers.RunSync(() => controller.UninstallPackageAsync("sax"));
 
-            Assert.AreNotEqual(rootPackage, controller.RootPackage, "Root package should be different after package uninstalled.");
+            Assert.AreNotEqual(
+                rootPackage,
+                controller.RootPackage,
+                "Root package should be different after package uninstalled.");
 
             rootPackage = controller.RootPackage;
             Assert.IsNotNull(rootPackage, "Root package should not be null after package uninstalled.");

@@ -1,20 +1,10 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Diagnostics;
-using System.IO;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿using System.Diagnostics;
 using Microsoft.NodejsTools.Npm;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 
-namespace NpmTests
-{
-
+namespace NpmTests{
     [TestClass]
-    public class ModuleHierarchyTests : AbstractFilesystemPackageJsonTests
-    {
-
+    public class ModuleHierarchyTests : AbstractFilesystemPackageJsonTests{
         protected const string PkgSingleDependency = @"{
     ""name"": ""TestPkg"",
     ""version"": ""0.1.0"",
@@ -32,8 +22,7 @@ namespace NpmTests
 }";
 
         [TestMethod]
-        public void TestReadRootPackageNoDependencies()
-        {
+        public void TestReadRootPackageNoDependencies(){
             var rootDir = CreateRootPackage(PkgSimple);
             var pkg = RootPackageFactory.Create(rootDir);
             Assert.IsNotNull(pkg, "Root package should not be null.");
@@ -47,16 +36,14 @@ namespace NpmTests
             Assert.AreEqual(0, modules.Count, "Module count mismatch.");
         }
 
-        private static void RunNpmInstall(string rootDir)
-        {
-            var p = new Process { StartInfo = new ProcessStartInfo("npm", "install") { WorkingDirectory = rootDir } };
+        private static void RunNpmInstall(string rootDir){
+            var p = new Process{StartInfo = new ProcessStartInfo("npm", "install"){WorkingDirectory = rootDir}};
             p.Start();
             p.WaitForExit();
         }
 
         [TestMethod]
-        public void TestReadRootPackageOneDependency()
-        {
+        public void TestReadRootPackageOneDependency(){
             var rootDir = CreateRootPackage(PkgSingleDependency);
             RunNpmInstall(rootDir);
 
@@ -86,7 +73,9 @@ namespace NpmTests
 
             Assert.IsNotNull(module.PackageJson, "Module package.json should not be null.");
 
-            Assert.IsTrue(module.IsListedInParentPackageJson, "Should be listed as a dependency in parent package.json.");
+            Assert.IsTrue(
+                module.IsListedInParentPackageJson,
+                "Should be listed as a dependency in parent package.json.");
             Assert.IsFalse(module.IsMissing, "Should not be marked as missing.");
             Assert.IsFalse(module.IsDevDependency, "Should not be marked as dev dependency.");
             Assert.IsFalse(module.IsOptionalDependency, "Should not be marked as optional dependency.");
@@ -97,8 +86,7 @@ namespace NpmTests
         }
 
         [TestMethod]
-        public void TestReadRootPackageMissingDependency()
-        {
+        public void TestReadRootPackageMissingDependency(){
             var rootDir = CreateRootPackage(PkgSingleDependency);
 
             var pkg = RootPackageFactory.Create(rootDir);
@@ -127,7 +115,9 @@ namespace NpmTests
 
             Assert.IsNull(module.PackageJson, "Module package.json should be null for missing dependency.");
 
-            Assert.IsTrue(module.IsListedInParentPackageJson, "Should be listed as a dependency in parent package.json.");
+            Assert.IsTrue(
+                module.IsListedInParentPackageJson,
+                "Should be listed as a dependency in parent package.json.");
             Assert.IsTrue(module.IsMissing, "Should be marked as missing.");
             Assert.IsFalse(module.IsDevDependency, "Should not be marked as dev dependency.");
             Assert.IsFalse(module.IsOptionalDependency, "Should not be marked as optional dependency.");
@@ -138,8 +128,7 @@ namespace NpmTests
         }
 
         [TestMethod]
-        public void TestReadRootDependencyRecursive()
-        {
+        public void TestReadRootDependencyRecursive(){
             var rootDir = CreateRootPackage(PkgSingleRecursiveDependency);
             RunNpmInstall(rootDir);
 
@@ -161,20 +150,30 @@ namespace NpmTests
             module = modules["express"];
             Assert.IsNotNull(module, "Module should not be null when retrieved by name.");
 
-            Assert.AreEqual(modules[0], modules["express"], "Modules should be same whether retrieved by name or index.");
+            Assert.AreEqual(
+                modules[0],
+                modules["express"],
+                "Modules should be same whether retrieved by name or index.");
 
             Assert.AreEqual("express", module.Name, "Module name mismatch.");
 
-            var expectedModules = new string[]
-            {
-                "methods", "fresh", "cookie-signature", "range-parser", "buffer-crc32", "cookie", "debug", "mkdirp",
-                "commander", "send", "connect"
+            var expectedModules = new string[]{
+                "methods",
+                "fresh",
+                "cookie-signature",
+                "range-parser",
+                "buffer-crc32",
+                "cookie",
+                "debug",
+                "mkdirp",
+                "commander",
+                "send",
+                "connect"
             };
 
             modules = module.Modules;
             Assert.AreEqual(module.PackageJson.Dependencies.Count, modules.Count, "Sub-module count mismatch.");
-            foreach (var name in expectedModules)
-            {
+            foreach (var name in expectedModules){
                 var current = modules[name];
                 Assert.IsNotNull(current, "Module should not be null when retrieved by name.");
 
@@ -182,7 +181,9 @@ namespace NpmTests
 
                 Assert.IsNotNull(current.PackageJson, "Module package.json should not be null.");
 
-                Assert.IsTrue(current.IsListedInParentPackageJson, "Should be listed as a dependency in parent package.json.");
+                Assert.IsTrue(
+                    current.IsListedInParentPackageJson,
+                    "Should be listed as a dependency in parent package.json.");
                 Assert.IsFalse(current.IsMissing, "Should not be marked as missing.");
                 Assert.IsFalse(current.IsDevDependency, "Should not be marked as dev dependency.");
                 Assert.IsFalse(current.IsOptionalDependency, "Should not be marked as optional dependency.");
