@@ -17,5 +17,12 @@ namespace Microsoft.NodejsTools.Npm
                 fullPathToRootDirectory,
                 showMissingDevOptionalSubPackages);
         }
+
+        public static IGlobalPackages Create(
+            string fullPathToGlobalPackages)
+        {
+            return new GlobalPackages(
+                fullPathToGlobalPackages );
+        }
     }
 }

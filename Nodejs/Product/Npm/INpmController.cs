@@ -10,7 +10,7 @@ namespace Microsoft.NodejsTools.Npm
         void Refresh();
         event EventHandler FinishedRefresh;
         IRootPackage RootPackage { get; }
-        IEnumerable< IPackage > GlobalPackages { get; } 
+        IGlobalPackages GlobalPackages { get; } 
         Task<bool> InstallPackageByVersionAsync(string packageName, string versionRange, DependencyType type);
         Task<bool> InstallGlobalPackageByVersionAsync(string packageName, string versionRange);
         Task<bool> UninstallPackageAsync(string packageName);

@@ -82,7 +82,11 @@ namespace Microsoft.NodejsTools.NpmUI
             lock (_lock)
             {
                 _paneInstalledPackages.LocalPackages = _npmController.RootPackage.Modules;
-                _paneInstalledPackages.GlobalPackages = _npmController.GlobalPackages;
+                var globals = _npmController.GlobalPackages;
+                if (null != globals)
+                {
+                    _paneInstalledPackages.GlobalPackages = globals.Modules;
+                }
                 ClearWait();
             }
         }

@@ -15,6 +15,7 @@ namespace Microsoft.NodejsTools.Npm.SPI
         private bool _showMissingDevOptionalSubPackages;
         private string _pathToNpm;
         private IRootPackage _rootPackage;
+        private IGlobalPackages _globalPackage;
         private readonly object _lock = new object();
 
         public NpmController(
@@ -58,6 +59,11 @@ namespace Microsoft.NodejsTools.Npm.SPI
                 RootPackage = RootPackageFactory.Create(
                     _fullPathToRootPackageDirectory,
                     _showMissingDevOptionalSubPackages );
+
+                var command = new NpmLsCommand(_fullPathToRootPackageDirectory, true, _pathToNpm);
+                GlobalPackages = AsyncHelpers.RunSync<bool>(() => command.ExecuteAsync())
+                    ? RootPackageFactory.Create(command.ListBaseDirectory)
+                    : null;
             }
             OnFinishedRefresh();
         }
@@ -81,12 +87,21 @@ namespace Microsoft.NodejsTools.Npm.SPI
             }
         }
 
-        public IEnumerable< IPackage > GlobalPackages
+        public IGlobalPackages GlobalPackages
         {
             get
             {
-                //  TODO: retrieve global packages on refresh
-                return new List< IPackage >();
+                lock (_lock)
+                {
+                    return _globalPackage;
+                }
+            }
+            private set
+            {
+                lock (_lock)
+                {
+                    _globalPackage = value;
+                }
             }
         }
 

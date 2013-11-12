@@ -10,7 +10,7 @@ namespace Microsoft.NodejsTools.Npm.SPI
     internal class Package : RootPackage, IPackage
     {
 
-        private IRootPackage m_Parent;
+        private IRootPackage _parent;
 
         public Package(
             IRootPackage parent,
@@ -18,7 +18,7 @@ namespace Microsoft.NodejsTools.Npm.SPI
             bool showMissingDevOptionalSubPackages)
             : base(fullPathToRootDirectory, showMissingDevOptionalSubPackages)
         {
-            m_Parent = parent;
+            _parent = parent;
         }
 
         public string RequestedVersionRange
@@ -33,8 +33,8 @@ namespace Microsoft.NodejsTools.Npm.SPI
         {
             get
             {
-                IPackageJson parentPackageJson = m_Parent.PackageJson;
-                return null != parentPackageJson && parentPackageJson.AllDependencies.Contains(Name);
+                IPackageJson parentPackageJson = _parent.PackageJson;
+                return _parent is IGlobalPackages || ( null != parentPackageJson && parentPackageJson.AllDependencies.Contains(Name) );
             }
         }
 
@@ -50,7 +50,7 @@ namespace Microsoft.NodejsTools.Npm.SPI
         {
             get
             {
-                IPackageJson parentPackageJson = m_Parent.PackageJson;
+                IPackageJson parentPackageJson = _parent.PackageJson;
                 return null != parentPackageJson && parentPackageJson.DevDependencies.Contains(Name);
             }
         }
@@ -59,7 +59,7 @@ namespace Microsoft.NodejsTools.Npm.SPI
         {
             get
             {
-                IPackageJson parentPackageJson = m_Parent.PackageJson;
+                IPackageJson parentPackageJson = _parent.PackageJson;
                 return null != parentPackageJson && parentPackageJson.OptionalDependencies.Contains(Name);
             }
         }
@@ -68,7 +68,7 @@ namespace Microsoft.NodejsTools.Npm.SPI
         {
             get
             {
-                IPackageJson parentPackageJson = m_Parent.PackageJson;
+                IPackageJson parentPackageJson = _parent.PackageJson;
                 return null != parentPackageJson && parentPackageJson.BundledDependencies.Contains(Name);
             }
         }

@@ -28,6 +28,7 @@
     <Reference Include="Microsoft.CSharp" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="AsyncHelpers.cs" />
     <Compile Include="DependencyType.cs" />
     <Compile Include="DependencyUrlType.cs" />
     <Compile Include="DirectoryPackageJsonSource.cs" />
@@ -38,6 +39,7 @@
     <Compile Include="IDependency.cs" />
     <Compile Include="IDependencyUrl.cs" />
     <Compile Include="IFiles.cs" />
+    <Compile Include="IGlobalPackages.cs" />
     <Compile Include="IKeywords.cs" />
     <Compile Include="ILicense.cs" />
     <Compile Include="ILicenses.cs" />
@@ -70,6 +72,7 @@
     <Compile Include="SPI\Dependencies.cs" />
     <Compile Include="SPI\Dependency.cs" />
     <Compile Include="SPI\DependencyUrl.cs" />
+    <Compile Include="SPI\GlobalPackages.cs" />
     <Compile Include="SPI\Keywords.cs" />
     <Compile Include="SPI\License.cs" />
     <Compile Include="SPI\Licenses.cs" />
@@ -79,6 +82,7 @@
     <Compile Include="SPI\NpmCommand.cs" />
     <Compile Include="SPI\NpmController.cs" />
     <Compile Include="SPI\NpmInstallCommand.cs" />
+    <Compile Include="SPI\NpmLsCommand.cs" />
     <Compile Include="SPI\NpmSearchCommand.cs" />
     <Compile Include="SPI\NpmUninstallCommand.cs" />
     <Compile Include="SPI\NpmUpdateCommand.cs" />

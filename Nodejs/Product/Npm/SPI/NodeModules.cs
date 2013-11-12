@@ -39,7 +39,7 @@ namespace Microsoft.NodejsTools.Npm.SPI
                 }
             }
 
-            m_PackagesSorted.Sort(new PackageComparer());
+            _packagesSorted.Sort(new PackageComparer());
         }
 
     }

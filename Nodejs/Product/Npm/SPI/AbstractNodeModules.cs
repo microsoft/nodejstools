@@ -9,20 +9,20 @@ namespace Microsoft.NodejsTools.Npm.SPI
 {
     internal abstract class AbstractNodeModules : INodeModules
     {
-        protected readonly List<IPackage> m_PackagesSorted = new List<IPackage>();
-        private readonly IDictionary<string, IPackage> m_PackagesByName = new Dictionary<string, IPackage>();
+        protected readonly List<IPackage> _packagesSorted = new List<IPackage>();
+        private readonly IDictionary<string, IPackage> _packagesByName = new Dictionary<string, IPackage>();
 
         protected virtual void AddModule(IPackage package)
         {
-            m_PackagesSorted.Add(package);
-            m_PackagesByName[package.Name] = package;
+            _packagesSorted.Add(package);
+            _packagesByName[package.Name] = package;
         }
 
-        public int Count { get { return m_PackagesSorted.Count; } }
+        public int Count { get { return _packagesSorted.Count; } }
 
         public IPackage this[int index]
         {
-            get { return m_PackagesSorted[index]; }
+            get { return _packagesSorted[index]; }
         }
 
         public IPackage this[string name]
@@ -30,7 +30,7 @@ namespace Microsoft.NodejsTools.Npm.SPI
             get
             {
                 IPackage pkg;
-                m_PackagesByName.TryGetValue(name, out pkg);
+                _packagesByName.TryGetValue(name, out pkg);
                 return pkg;
             }
         }
@@ -42,7 +42,7 @@ namespace Microsoft.NodejsTools.Npm.SPI
 
         public IEnumerator<IPackage> GetEnumerator()
         {
-            return m_PackagesSorted.GetEnumerator();
+            return _packagesSorted.GetEnumerator();
         }
 
         IEnumerator IEnumerable.GetEnumerator()
