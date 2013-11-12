@@ -361,6 +361,7 @@ namespace ProfilingUITests {
                         perfTarget.Cancel();
                     }
                     profiling.RemoveSession(session, true);
+                    profiling.RemoveSession(profiling.GetSession(1), true);
                 }
             }
         }
@@ -434,6 +435,7 @@ namespace ProfilingUITests {
                         perfTarget.Cancel();
                     }
                     profiling.RemoveSession(session, true);
+                    profiling.RemoveSession(profiling.GetSession(1), true);
                 }
             }
         }
@@ -1340,7 +1342,7 @@ namespace ProfilingUITests {
                     } else {
                         Console.WriteLine("Failed to convert: {0}", output.ToString());
                         Console.WriteLine("--------------");
-                        System.Threading.Thread.Sleep(3000);
+                        System.Threading.Thread.Sleep(1000);
                         continue;
                     }
                 }

@@ -34,6 +34,7 @@ namespace Microsoft.NodejsTools.Project {
         private readonly JavaScriptSerializer _serializer = new JavaScriptSerializer();        
         private readonly Timer _timer;
         internal readonly ReferenceGroupDispenser _refGroupDispenser = new ReferenceGroupDispenser();
+        private readonly HashSet<ReferenceGroup> _pendingRefGroupGenerations = new HashSet<ReferenceGroup>();
         internal int _currentFileCounter;
 
         public NodejsProjectNode(NodejsProjectPackage package)
@@ -93,8 +94,16 @@ namespace Microsoft.NodejsTools.Project {
         }
 
         public override CommonFileNode CreateCodeFileNode(ProjectElement item) {
+            var res = new NodejsFileNode(this, item);
+
+            if (ParentHierarchy != null) {
+                lock (_pendingRefGroupGenerations) {
+                    _pendingRefGroupGenerations.Add(res._refGroup);
+                }
+            }
+
             _timer.Change(250, Timeout.Infinite);
-            return new NodejsFileNode(this, item);
+            return res;
         }
 
         public override string GetProjectName() {
@@ -142,6 +151,12 @@ namespace Microsoft.NodejsTools.Project {
 
         protected override void Reload() {
             base.Reload();
+
+            SyncFileSystem();
+
+            foreach (var group in _refGroupDispenser.Groups) {
+                group.GenerateReferenceFile();
+            }
 
             NodejsPackage.Instance.CheckSurveyNews(false);
         }
@@ -205,6 +220,13 @@ namespace Microsoft.NodejsTools.Project {
         }
 
         private void UpdateReferenceFileUIThread(NodejsFileNode changedFile) {
+            lock (_pendingRefGroupGenerations) {
+                foreach (var refGroup in _pendingRefGroupGenerations) {
+                    refGroup.GenerateReferenceFile();
+                }
+                _pendingRefGroupGenerations.Clear();
+            }
+
             StringBuilder header = new StringBuilder();
             foreach (var refGroup in _refGroupDispenser.Groups) {
                 header.AppendLine("/// <reference path=\"" + refGroup.Filename + "\" />");
@@ -337,7 +359,7 @@ function starts_with(a, b) {
                             );
                         } else {
                             switchCode.AppendFormat(
-                                "    || (starts_with(__dirname, '{0}') && (module == './{1}'))\r\n",
+                                "    || (starts_with(__dirname, '{0}') && (module == './{1}' || module == './{1}/'))\r\n",
                                 CommonUtils.TrimEndSeparator(folderPackage.Parent.FullPathToChildren).Replace("\\", "\\\\"),
                                 Path.GetFileName(CommonUtils.TrimEndSeparator(folderPackage.Url))
                             );
@@ -359,9 +381,7 @@ function starts_with(a, b) {
                 // Scale back the depth of analysis based upon how many requires a package does
                 // The reference file automatically restores max_require_depth back to it's default
                 // after this require finishes executing.
-                if (nodeFile._requireCount >= 50) {
-                    switchCode.AppendLine("max_require_depth -= 3;");
-                } else if (nodeFile._requireCount >= 25) {
+                if (nodeFile._requireCount >= 25) {
                     switchCode.AppendLine("max_require_depth -= 2;");
                 } else if (nodeFile._requireCount >= 10) {
                     switchCode.AppendLine("max_require_depth -= 1;");

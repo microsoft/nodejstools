@@ -6674,6 +6674,12 @@ If the files in the existing folder have the same names as files in the folder y
             _diskNodes.Add(newPath, existing);
         }
 
+        public IVsHierarchy ParentHierarchy {
+            get {
+                return parentHierarchy;
+            }
+        }
+
         [Conditional("DEBUG")]
         internal void AssertHasParentHierarchy() {
             // Calling into solution explorer before a parent hierarchy is assigned can

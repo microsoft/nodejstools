@@ -26,7 +26,7 @@ namespace Microsoft.NodejsTools.Project {
     class NodejsFileNode : CommonFileNode {
         private FileSystemWatcher _watcher;
         private string _currentText;
-        internal int _requireCount;
+        internal int _requireCount = -1;
         internal readonly string _tempFilePath, _asyncFilePath;
         internal readonly ReferenceGroup _refGroup;
         internal int _fileId;
@@ -43,8 +43,7 @@ namespace Microsoft.NodejsTools.Project {
             _fileId = root._currentFileCounter++;
             if (File.Exists(Url)) { // avoid the exception if we can
                 try {
-                    _currentText = File.ReadAllText(Url);
-                    GenerateReferenceFile();
+                    GenerateReferenceFile(File.ReadAllText(Url));
                 } catch {
                 }
             }
@@ -58,29 +57,35 @@ namespace Microsoft.NodejsTools.Project {
             }
         }
 
-        private void GenerateReferenceFile() {
-            _refGroup.GenerateReferenceFile();
-                
-            StringBuilder code = new StringBuilder();
-            code.AppendLine(NodejsProjectionBuffer.GetFileNameAssignment(Url));
-            code.AppendLine(NodejsProjectionBuffer.GetDirectoryNameAssignment(Url));
+        internal void GenerateReferenceFile(string newText) {
+            _currentText = newText;
 
-            int requireCount = 0;
-            foreach (Match match in _requireRegexSingleQuote.Matches(_currentText)) {
-                code.AppendFormat("require({0});", match.Groups[1]);
-                code.AppendLine();
-                requireCount++;
-            }
-            foreach (Match match in _requireRegexDoubleQuote.Matches(_currentText)) {
-                code.AppendFormat("require({0});", match.Groups[1]);
-                code.AppendLine();
-                requireCount++;
-            }
-            _requireCount = requireCount;
-            code.AppendLine();
+            var singleMatches = _requireRegexSingleQuote.Matches(newText);
+            var doubleMatches = _requireRegexDoubleQuote.Matches(newText);
+            int requireCount = singleMatches.Count + doubleMatches.Count;
 
-            NodejsProjectNode.WriteReferenceFile(_tempFilePath, code.ToString());
-            NodejsProjectNode.WriteReferenceFile(_asyncFilePath, "_$asyncRequests.add({ src: '" + _tempFilePath.Replace("\\", "\\\\") + "'});\r\n");
+            if (requireCount != _requireCount || !File.Exists(_tempFilePath)) {
+                StringBuilder code = new StringBuilder();
+                code.AppendLine(NodejsProjectionBuffer.GetFileNameAssignment(Url));
+                code.AppendLine(NodejsProjectionBuffer.GetDirectoryNameAssignment(Url));
+
+                foreach (Match match in singleMatches) {
+                    code.AppendFormat("require({0});", match.Groups[1]);
+                    code.AppendLine();
+                }
+                foreach (Match match in doubleMatches) {
+                    code.AppendFormat("require({0});", match.Groups[1]);
+                    code.AppendLine();
+                }
+                _requireCount = requireCount;
+                code.AppendLine();
+
+                NodejsProjectNode.WriteReferenceFile(_tempFilePath, code.ToString());
+            }
+
+            if (!File.Exists(_asyncFilePath)) {
+                NodejsProjectNode.WriteReferenceFile(_asyncFilePath, "_$asyncRequests.add({ src: '" + _tempFilePath.Replace("\\", "\\\\") + "'});\r\n");
+            }
         }
 
         internal string GenerateReferenceCode() {
@@ -194,16 +199,17 @@ namespace Microsoft.NodejsTools.Project {
         }
 
         private void FileContentsChanged(object sender, FileSystemEventArgs e) {
+            string newText = String.Empty;
             for (int i = 0; i < 10; i++) {
                 try {
-                    _currentText = File.ReadAllText(Url);
+                    newText = File.ReadAllText(Url);
                     break;
                 } catch {
                     System.Threading.Thread.Sleep(250);
                 }
             }
-            _fileId = ProjectMgr._currentFileCounter++;
-            GenerateReferenceFile();
+            GenerateReferenceFile(newText);
+            _refGroup.GenerateReferenceFile();
 
             // Uncomment this line when working on the generated reference file.  It'll enable updating
             // it via a simple file save.  During normal development the reference file only needs to be

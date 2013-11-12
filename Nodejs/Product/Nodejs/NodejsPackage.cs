@@ -33,6 +33,7 @@ using Microsoft.VisualStudio;
 using Microsoft.VisualStudio.Debugger.Interop;
 using Microsoft.VisualStudio.Shell;
 using Microsoft.VisualStudio.Shell.Interop;
+using Microsoft.VisualStudio.Text;
 using Microsoft.VisualStudio.Utilities;
 using Microsoft.VisualStudioTools;
 using Microsoft.Win32;
@@ -170,6 +171,7 @@ namespace Microsoft.NodejsTools {
         internal static NodejsPackage Instance;
         private string _surveyNewsUrl;
         private object _surveyNewsUrlLock = new object();
+        internal HashSet<ITextBuffer> ChangedBuffers = new HashSet<ITextBuffer>();
 
         /// <summary>
         /// Default constructor of the package.
@@ -182,6 +184,20 @@ namespace Microsoft.NodejsTools {
             Debug.WriteLine(string.Format(CultureInfo.CurrentCulture, "Entering constructor for: {0}", this.ToString()));
             Debug.Assert(Instance == null, "NodejsPackage created multiple times");
             Instance = this;
+        }
+
+        public override int FDoIdle(uint grfidlef) {
+            if (ChangedBuffers.Count > 0) {
+                foreach (var buffer in ChangedBuffers) {
+                    var fileNode = ((NodejsProjectionBuffer)buffer.Properties[typeof(NodejsProjectionBuffer)]).GetFileNode();
+                    if (fileNode != null) {
+                        fileNode.GenerateReferenceFile(buffer.CurrentSnapshot.GetText());
+                    }
+                }
+                ChangedBuffers.Clear();
+            }
+
+            return base.FDoIdle(grfidlef);
         }
 
         public NodejsGeneralOptionsPage GeneralOptionsPage {
