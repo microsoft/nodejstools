@@ -12,51 +12,51 @@ namespace Microsoft.NodejsTools.Npm.SPI
     internal class PackageJson : IPackageJson
     {
 
-        private dynamic m_Package;
-        private Scripts m_Scripts;
-        private Bugs m_Bugs;
+        private dynamic _package;
+        private Scripts _scripts;
+        private Bugs _bugs;
 
         public PackageJson( dynamic package )
         {
-            m_Package = package;
+            _package = package;
 
-            Keywords = new Keywords(m_Package);
-            Licenses = new Licenses(m_Package);
-            Files = new PkgFiles(m_Package);
-            Man = new Man(m_Package);
-            Dependencies = new Dependencies(m_Package, "dependencies");
-            DevDependencies = new Dependencies(m_Package, "devDependencies");
-            BundledDependencies = new BundledDependencies(m_Package);
-            OptionalDependencies = new Dependencies(m_Package, "optionalDependencies");
-            AllDependencies = new Dependencies(m_Package, "dependencies", "devDependencies", "optionalDependencies");
+            Keywords = new Keywords(_package);
+            Licenses = new Licenses(_package);
+            Files = new PkgFiles(_package);
+            Man = new Man(_package);
+            Dependencies = new Dependencies(_package, "dependencies");
+            DevDependencies = new Dependencies(_package, "devDependencies");
+            BundledDependencies = new BundledDependencies(_package);
+            OptionalDependencies = new Dependencies(_package, "optionalDependencies");
+            AllDependencies = new Dependencies(_package, "dependencies", "devDependencies", "optionalDependencies");
         }
 
         public string Name
         {
-            get { return null == m_Package.name ? null : m_Package.name.ToString(); }
+            get { return null == _package.name ? null : _package.name.ToString(); }
         }
 
         public SemverVersion Version
         {
-            get { return null == m_Package.version ? new SemverVersion() : SemverVersion.Parse( m_Package.version.ToString() ); }
+            get { return null == _package.version ? new SemverVersion() : SemverVersion.Parse( _package.version.ToString() ); }
         }
 
         public IScripts Scripts
         {
             get
             {
-                if (null == m_Scripts)
+                if (null == _scripts)
                 {
-                    dynamic scriptsJson = m_Package.scripts;
+                    dynamic scriptsJson = _package.scripts;
                     if (null == scriptsJson)
                     {
                         scriptsJson = new JObject();
-                        m_Package.scripts = scriptsJson;
+                        _package.scripts = scriptsJson;
                     }
-                    m_Scripts   = new Scripts( scriptsJson );
+                    _scripts   = new Scripts( scriptsJson );
                 }
 
-                return m_Scripts;
+                return _scripts;
             }
         }
 
@@ -64,7 +64,7 @@ namespace Microsoft.NodejsTools.Npm.SPI
         {
             get
             {
-                var author = m_Package.author;
+                var author = _package.author;
                 return null == author ? null : new Person(author);
             }
         }
@@ -73,7 +73,7 @@ namespace Microsoft.NodejsTools.Npm.SPI
         {
             get
             {
-                return null == m_Package.description ? null : m_Package.description.ToString();
+                return null == _package.description ? null : _package.description.ToString();
             }
         }
 
@@ -83,7 +83,7 @@ namespace Microsoft.NodejsTools.Npm.SPI
         {
             get
             {
-                return null == m_Package.homepage ? null : m_Package.homepage.ToString();
+                return null == _package.homepage ? null : _package.homepage.ToString();
             }
         }
 
@@ -91,11 +91,11 @@ namespace Microsoft.NodejsTools.Npm.SPI
         {
             get
             {
-                if (null == m_Bugs && null != m_Package.bugs)
+                if (null == _bugs && null != _package.bugs)
                 {
-                    m_Bugs = new Bugs(m_Package);
+                    _bugs = new Bugs(_package);
                 }
-                return m_Bugs;
+                return _bugs;
             }
         }
 

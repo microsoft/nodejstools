@@ -11,23 +11,23 @@ namespace Microsoft.NodejsTools.Npm.SPI
     internal class Licenses : ILicenses
     {
 
-        private dynamic m_Package;
+        private dynamic _package;
 
         public Licenses(dynamic package)
         {
-            m_Package = package;
+            _package = package;
         }
 
         public int Count
         {
             get
             {
-                if (m_Package.license != null)
+                if (_package.license != null)
                 {
                     return 1;
                 }
 
-                var json = m_Package.licenses;
+                var json = _package.licenses;
                 if (null == json)
                 {
                     return 0;
@@ -47,12 +47,12 @@ namespace Microsoft.NodejsTools.Npm.SPI
                     throw new IndexOutOfRangeException("Cannot retrieve license for index less than 0.");
                 }
 
-                if (index == 0 && m_Package.license != null)
+                if (index == 0 && _package.license != null)
                 {
-                    return new License(m_Package.license.ToString());
+                    return new License(_package.license.ToString());
                 }
 
-                var json = m_Package.licenses;
+                var json = _package.licenses;
                 if (null == json)
                 {
                     throw new IndexOutOfRangeException("Cannot retrieve license from empty license collection.");

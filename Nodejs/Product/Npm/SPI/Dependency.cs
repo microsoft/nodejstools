@@ -9,26 +9,26 @@ namespace Microsoft.NodejsTools.Npm.SPI
     internal class Dependency : IDependency
     {
 
-        private string m_VersionRangeUrlText;
+        private string _versionRangeUrlText;
 
         public Dependency(string name, string retreivalInfo)
         {
             Name = name;
-            m_VersionRangeUrlText = retreivalInfo;
+            _versionRangeUrlText = retreivalInfo;
         }
 
         public string Name { get; private set; }
 
         private bool IsVersionRange
         {
-            get { return m_VersionRangeUrlText.IndexOf('/') < 0; }
+            get { return _versionRangeUrlText.IndexOf('/') < 0; }
         }
 
         public IDependencyUrl Url
         {
             get
             {
-                return IsVersionRange ? null : new DependencyUrl(m_VersionRangeUrlText);
+                return IsVersionRange ? null : new DependencyUrl(_versionRangeUrlText);
             }
         }
 
@@ -36,7 +36,7 @@ namespace Microsoft.NodejsTools.Npm.SPI
         {
             get
             {
-                return IsVersionRange ? m_VersionRangeUrlText : null;
+                return IsVersionRange ? _versionRangeUrlText : null;
             }
         }
     }

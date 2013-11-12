@@ -22,7 +22,7 @@ namespace Microsoft.NodejsTools.Npm
             {
                 return 1;
             }
-
+            //  TODO: should take into account versions!
             return x.Name.CompareTo(y.Name);
         }
     }

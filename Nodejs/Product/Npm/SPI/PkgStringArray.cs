@@ -11,20 +11,20 @@ namespace Microsoft.NodejsTools.Npm.SPI
     internal abstract class PkgStringArray : IPkgStringArray
     {
 
-        private readonly JObject m_Package;
-        private readonly string [] m_ArrayPropertyNames;
+        private readonly JObject _package;
+        private readonly string [] arrayPropertyNames;
 
         protected PkgStringArray(JObject package, params string [] arrayPropertyNames)
         {
-            m_Package = package;
-            m_ArrayPropertyNames = arrayPropertyNames;
+            _package = package;
+            this.arrayPropertyNames = arrayPropertyNames;
         }
 
         private JToken GetArrayProperty()
         {
-            foreach (var name in m_ArrayPropertyNames)
+            foreach (var name in arrayPropertyNames)
             {
-                var array = m_Package[name] as JToken;
+                var array = _package[name] as JToken;
                 if (null != array)
                 {
                     return array;

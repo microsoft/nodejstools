@@ -9,11 +9,11 @@ namespace Microsoft.NodejsTools.Npm.SPI
 {
     internal class Bugs : IBugs
     {
-        private readonly dynamic m_Package;
+        private readonly dynamic _package;
 
         public Bugs(dynamic package)
         {
-            m_Package = package;
+            _package = package;
         }
 
 
@@ -22,7 +22,7 @@ namespace Microsoft.NodejsTools.Npm.SPI
             get
             {
                 string url = null;
-                var bugs = m_Package.bugs;
+                var bugs = _package.bugs;
                 if (null != bugs)
                 {
                     var token = bugs as JToken;
@@ -48,7 +48,7 @@ namespace Microsoft.NodejsTools.Npm.SPI
             get
             {
                 string email = null;
-                var bugs = m_Package.bugs;
+                var bugs = _package.bugs;
                 if (null != bugs)
                 {
                     var token = bugs as JToken;

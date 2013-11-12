@@ -10,13 +10,13 @@ namespace Microsoft.NodejsTools.Npm
     public class DirectoryPackageJsonSource : IPackageJsonSource
     {
 
-        private readonly FilePackageJsonSource m_Source;
+        private readonly FilePackageJsonSource _source;
 
         public DirectoryPackageJsonSource(string fullDirectoryPath)
         {
-            m_Source = new FilePackageJsonSource(Path.Combine(fullDirectoryPath, "package.json"));
+            _source = new FilePackageJsonSource(Path.Combine(fullDirectoryPath, "package.json"));
         }
 
-        public dynamic Package { get { return m_Source.Package;  } }
+        public dynamic Package { get { return _source.Package;  } }
     }
 }

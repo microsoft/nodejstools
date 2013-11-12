@@ -11,20 +11,20 @@ namespace Microsoft.NodejsTools.Npm.SPI
 {
     internal class Dependencies : IDependencies
     {
-        private JObject m_Package;
-        private string [] m_DependencyPropertyNames;
+        private JObject _package;
+        private string [] _dependencyPropertyNames;
 
         public Dependencies(JObject package, params string [] dependencyPropertyNames)
         {
-            m_Package = package;
-            m_DependencyPropertyNames = dependencyPropertyNames;
+            _package = package;
+            _dependencyPropertyNames = dependencyPropertyNames;
         }
 
         private IEnumerable< JObject > GetDependenciesProperties()
         {
-            foreach (var propertyName in m_DependencyPropertyNames)
+            foreach (var propertyName in _dependencyPropertyNames)
             {
-                var property = m_Package[propertyName] as JObject;
+                var property = _package[propertyName] as JObject;
                 if (null != property)
                 {
                     yield return property;

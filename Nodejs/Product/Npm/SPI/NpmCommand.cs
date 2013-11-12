@@ -12,22 +12,22 @@ namespace Microsoft.NodejsTools.Npm.SPI
     internal abstract class NpmCommand
     {
 
-        private readonly string m_FullPathToRootPackageDirectory;
-        private string m_PathToNpm;
+        private readonly string _fullPathToRootPackageDirectory;
+        private string _pathToNpm;
 
         protected NpmCommand(
             string fullPathToRootPackageDirectory,
             string pathToNpm = null)
         {
-            m_FullPathToRootPackageDirectory = fullPathToRootPackageDirectory;
-            m_PathToNpm = pathToNpm;
+            _fullPathToRootPackageDirectory = fullPathToRootPackageDirectory;
+            _pathToNpm = pathToNpm;
         }
 
         protected string Arguments { get; set; }
 
         private string GetPathToNpm()
         {
-            if (null == m_PathToNpm)
+            if (null == _pathToNpm)
             {
                 string match = null;
                 foreach (var potential in Environment.GetEnvironmentVariable("path").Split(Path.PathSeparator))
@@ -42,10 +42,10 @@ namespace Microsoft.NodejsTools.Npm.SPI
                             match = path;
                         }
                     }
-                    m_PathToNpm = match;
+                    _pathToNpm = match;
                 }
             }
-            return m_PathToNpm;
+            return _pathToNpm;
         }
 
         private void CopyEnvironmentVariables(ProcessStartInfo target)
@@ -59,7 +59,7 @@ namespace Microsoft.NodejsTools.Npm.SPI
         private ProcessStartInfo BuildStartInfo()
         {
             var info = new ProcessStartInfo(GetPathToNpm(), Arguments);
-            info.WorkingDirectory = m_FullPathToRootPackageDirectory;
+            info.WorkingDirectory = _fullPathToRootPackageDirectory;
             //info.UseShellExecute = true;
             info.UseShellExecute = false;
             info.RedirectStandardOutput = true;

@@ -2,12 +2,12 @@
 {
     internal class Script : IScript
     {
-        private dynamic m_Code;
+        private dynamic _code;
 
         public Script(string name, dynamic code)
         {
             Name = name;
-            m_Code = code;
+            _code = code;
         }
 
         public string Name { get; private set; }
@@ -16,7 +16,7 @@
         {
             get
             {
-                return m_Code.ToString();
+                return _code.ToString();
             }
         }
     }

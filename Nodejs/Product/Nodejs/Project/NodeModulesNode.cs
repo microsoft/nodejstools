@@ -26,7 +26,7 @@ namespace Microsoft.NodejsTools.Project
         /// <summary>
         /// The caption to display for this node
         /// </summary>
-        private const string c_Caption = "Node Modules";
+        private const string _cCaption = "Node Modules";
 
         /// <summary>
         /// The GUID for this node
@@ -37,13 +37,13 @@ namespace Microsoft.NodejsTools.Project
 
         #region Member variables
 
-        private readonly NodejsProjectNode m_ProjectNode;
-        private FileSystemWatcher m_Watcher;
-        private Timer m_FileSystemWatcherTimer;
-        private INpmController m_NpmController; //  TODO: This is totally not the right place for this!!
-        private readonly object m_Lock = new object();
+        private readonly NodejsProjectNode _projectNode;
+        private FileSystemWatcher _watcher;
+        private Timer _fileSystemWatcherTimer;
+        private INpmController _npmController; //  TODO: This is totally not the right place for this!!
+        private readonly object _lock = new object();
 
-        private bool m_IsDisposed;
+        private bool _isDisposed;
 
         #endregion
 
@@ -51,7 +51,7 @@ namespace Microsoft.NodejsTools.Project
 
         public NodeModulesNode(NodejsProjectNode root) : base( root )
         {
-            m_ProjectNode = root;
+            _projectNode = root;
             ExcludeNodeFromScc = true;
 
             foreach ( var command in NodejsPackage.Instance.NpmCommands )
@@ -59,14 +59,14 @@ namespace Microsoft.NodejsTools.Project
                 command.ModulesNode = this;
             }
 
-            m_Watcher = new FileSystemWatcher(m_ProjectNode.BuildProject.DirectoryPath) { NotifyFilter = NotifyFilters.LastWrite };
-            m_Watcher.Changed += m_Watcher_Changed;
-            m_Watcher.EnableRaisingEvents = true;
+            _watcher = new FileSystemWatcher(_projectNode.BuildProject.DirectoryPath) { NotifyFilter = NotifyFilters.LastWrite };
+            _watcher.Changed += m_Watcher_Changed;
+            _watcher.EnableRaisingEvents = true;
         }
 
         private void CheckNotDisposed()
         {
-            if (m_IsDisposed)
+            if (_isDisposed)
             {
                 throw new ObjectDisposedException("This NodeModulesNode has been disposed of and should no longer be used.");
             }
@@ -74,23 +74,23 @@ namespace Microsoft.NodejsTools.Project
 
         protected override void Dispose(bool disposing)
         {
-            if ( ! m_IsDisposed )
+            if ( ! _isDisposed )
             {
-                lock ( m_Lock )
+                lock ( _lock )
                 {
-                    m_Watcher.Changed -= m_Watcher_Changed;
-                    m_Watcher.Dispose();
+                    _watcher.Changed -= m_Watcher_Changed;
+                    _watcher.Dispose();
 
-                    if ( null != m_FileSystemWatcherTimer )
+                    if ( null != _fileSystemWatcherTimer )
                     {
-                        m_FileSystemWatcherTimer.Dispose();
-                        m_FileSystemWatcherTimer = null;
+                        _fileSystemWatcherTimer.Dispose();
+                        _fileSystemWatcherTimer = null;
                     }
 
-                    if ( null != m_NpmController )
+                    if ( null != _npmController )
                     {
-                        m_NpmController.OutputLogged -= m_NpmController_OutputLogged;
-                        m_NpmController.ErrorLogged -= m_NpmController_ErrorLogged;
+                        _npmController.OutputLogged -= m_NpmController_OutputLogged;
+                        _npmController.ErrorLogged -= m_NpmController_ErrorLogged;
                     }
 
                     foreach (var command in NodejsPackage.Instance.NpmCommands)
@@ -98,7 +98,7 @@ namespace Microsoft.NodejsTools.Project
                         command.ModulesNode = null;
                     }
                 }
-                m_IsDisposed = true;
+                _isDisposed = true;
             }
 
             base.Dispose( disposing );
@@ -110,17 +110,17 @@ namespace Microsoft.NodejsTools.Project
 
         private INpmController GetNpmController( out bool created )
         {
-            lock ( m_Lock )
+            lock ( _lock )
             {
                 created = false;
-                if ( null == m_NpmController )
+                if ( null == _npmController )
                 {
-                    m_NpmController = NpmControllerFactory.Create( m_ProjectNode.BuildProject.DirectoryPath );
-                    m_NpmController.OutputLogged += m_NpmController_OutputLogged;
-                    m_NpmController.ErrorLogged += m_NpmController_ErrorLogged;
+                    _npmController = NpmControllerFactory.Create( _projectNode.BuildProject.DirectoryPath );
+                    _npmController.OutputLogged += m_NpmController_OutputLogged;
+                    _npmController.ErrorLogged += m_NpmController_ErrorLogged;
                     created = true;
                 }
-                return m_NpmController;
+                return _npmController;
             }
         }
 
@@ -145,25 +145,25 @@ namespace Microsoft.NodejsTools.Project
                 return;
             }
 
-            lock (m_Lock)
+            lock (_lock)
             {
-                if ( null != m_FileSystemWatcherTimer )
+                if ( null != _fileSystemWatcherTimer )
                 {
-                    m_FileSystemWatcherTimer.Dispose();
+                    _fileSystemWatcherTimer.Dispose();
                 }
 
-                m_FileSystemWatcherTimer = new Timer(o => UpdateModulesFromTimer(), null, 1000, Timeout.Infinite);
+                _fileSystemWatcherTimer = new Timer(o => UpdateModulesFromTimer(), null, 1000, Timeout.Infinite);
             }
         }
 
         private void UpdateModulesFromTimer()
         {
-            lock ( m_Lock )
+            lock ( _lock )
             {
-                if ( null != m_FileSystemWatcherTimer )
+                if ( null != _fileSystemWatcherTimer )
                 {
-                    m_FileSystemWatcherTimer.Dispose();
-                    m_FileSystemWatcherTimer = null;
+                    _fileSystemWatcherTimer.Dispose();
+                    _fileSystemWatcherTimer = null;
                 }
 
                 ReloadModules();
@@ -181,7 +181,7 @@ namespace Microsoft.NodejsTools.Project
 
         private void ReloadModules()
         {
-            lock ( m_Lock )
+            lock ( _lock )
             {
                 bool created;
                 var controller = GetNpmController( out created );
@@ -196,7 +196,7 @@ namespace Microsoft.NodejsTools.Project
 
         private IVsOutputWindowPane GetNpmOutputPane()
         {
-            var outputWindow = ( IVsOutputWindow ) m_ProjectNode.GetService( typeof ( SVsOutputWindow ) );
+            var outputWindow = ( IVsOutputWindow ) _projectNode.GetService( typeof ( SVsOutputWindow ) );
             IVsOutputWindowPane pane;
             if ( outputWindow.GetPane(NpmOutputPaneGuid, out pane) != VSConstants.S_OK )
             {
@@ -215,7 +215,7 @@ namespace Microsoft.NodejsTools.Project
         {
             if (null == _errorListProvider)
             {
-                _errorListProvider = new ErrorListProvider(m_ProjectNode.ProjectMgr.Site);
+                _errorListProvider = new ErrorListProvider(_projectNode.ProjectMgr.Site);
             }
             return _errorListProvider;
         }
@@ -278,9 +278,9 @@ namespace Microsoft.NodejsTools.Project
         {
             INpmController controller;
 
-            lock ( m_Lock )
+            lock ( _lock )
             {
-                controller = m_NpmController;
+                controller = _npmController;
             }
 
             if (null != controller)
@@ -341,7 +341,7 @@ namespace Microsoft.NodejsTools.Project
                 }
                 else
                 {
-                    child = new DependencyNode(m_ProjectNode, parent as DependencyNode, package);
+                    child = new DependencyNode(_projectNode, parent as DependencyNode, package);
                     parent.AddChild(child);
                 }
 
@@ -379,7 +379,7 @@ namespace Microsoft.NodejsTools.Project
 
         public override string Caption
         {
-            get { return c_Caption; }
+            get { return _cCaption; }
         }
 
         public override Guid ItemTypeGuid
@@ -417,7 +417,7 @@ namespace Microsoft.NodejsTools.Project
                     break;
 
                 case PkgCmdId.cmdidNpmUninstallModule:
-                    var selected = m_ProjectNode.GetSelectedNodes();
+                    var selected = _projectNode.GetSelectedNodes();
                     bool enable = true;
                     foreach ( var node in selected )
                     {
@@ -451,7 +451,7 @@ namespace Microsoft.NodejsTools.Project
         {
             CheckNotDisposed();
 
-            var selected = m_ProjectNode.GetSelectedNodes();
+            var selected = _projectNode.GetSelectedNodes();
             if ( selected.Count == 1 && selected[ 0 ] == this )
             {
                 NpmController.UpdatePackagesAsync();
@@ -466,7 +466,7 @@ namespace Microsoft.NodejsTools.Project
         {
             CheckNotDisposed();
 
-            var selected = m_ProjectNode.GetSelectedNodes();
+            var selected = _projectNode.GetSelectedNodes();
             foreach ( var name in selected.OfType< DependencyNode >().Select( dep => dep.Package.Name ).ToList() )
             {
                 NpmController.UninstallPackageAsync( name );

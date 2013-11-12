@@ -71,8 +71,8 @@ namespace Microsoft.NodejsTools.Npm
         //  N.B. Both of these are series of dot separated identifiers, but since we don't really particularly
         //  care about them at the moment, can defer comparisons to semver, and won't need to do anything beyond
         //  let the user specify a value, I've just implemented them as strings.
-        private string m_PreReleaseVersion;
-        private string m_BuildMetadata;
+        private string _preReleaseVersion;
+        private string _buildMetadata;
 
         private static bool IsValidOptionalFragment( string optional )
         {
@@ -103,8 +103,8 @@ namespace Microsoft.NodejsTools.Npm
             _major             = major;
             _minor             = minor;
             _patch             = patch;
-            m_PreReleaseVersion = preReleaseVersion;
-            m_BuildMetadata     = buildMetadata;
+            _preReleaseVersion = preReleaseVersion;
+            _buildMetadata     = buildMetadata;
         }
 
         public ulong Major { get { return _major; } }
@@ -112,9 +112,9 @@ namespace Microsoft.NodejsTools.Npm
         public ulong Patch { get { return _patch; } }
 
         public bool HasPreReleaseVersion { get { return ! string.IsNullOrEmpty( PreReleaseVersion ); } }
-        public string PreReleaseVersion { get { return m_PreReleaseVersion; } }
+        public string PreReleaseVersion { get { return _preReleaseVersion; } }
         public bool HasBuildMetadata { get { return ! string.IsNullOrEmpty( BuildMetadata ); } }
-        public string BuildMetadata { get { return m_BuildMetadata; } }
+        public string BuildMetadata { get { return _buildMetadata; } }
 
         public override string ToString()
         {

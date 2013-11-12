@@ -11,18 +11,18 @@ namespace Microsoft.NodejsTools.Npm.SPI
     internal class Scripts : IScripts
     {
 
-        private dynamic m_Scripts;
+        private dynamic _scripts;
 
         public Scripts(dynamic scripts)
         {
-            m_Scripts = scripts;
+            _scripts = scripts;
         }
 
         public int Count
         {
             get
             {
-                JObject temp = m_Scripts;
+                JObject temp = _scripts;
                 return null == temp ? 0 : temp.Count;
             }
         }
@@ -32,7 +32,7 @@ namespace Microsoft.NodejsTools.Npm.SPI
             get
             {
                 IScript script  = null;
-                dynamic json    = m_Scripts[ name ];
+                dynamic json    = _scripts[ name ];
                 if (null != json)
                 {
                     script = new Script(name, json);

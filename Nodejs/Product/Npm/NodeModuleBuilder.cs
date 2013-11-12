@@ -13,11 +13,11 @@ namespace Microsoft.NodejsTools.Npm
     /// </summary>
     public class NodeModuleBuilder
     {
-        private readonly List<IPackage> m_dependencies;
+        private readonly List<IPackage> _dependencies;
 
         public NodeModuleBuilder()
         {
-            m_dependencies = new List<IPackage>();
+            _dependencies = new List<IPackage>();
         }
 
         public NodeModuleBuilder(IPackage module)
@@ -28,8 +28,8 @@ namespace Microsoft.NodejsTools.Npm
             RequestedVersionRange = module.RequestedVersionRange;
             Description = module.Description;
             Flags = module.Flags;
-            m_dependencies = new List<IPackage>();
-            m_dependencies.AddRange(module.Modules);
+            _dependencies = new List<IPackage>();
+            _dependencies.AddRange(module.Modules);
         }
 
         public IPerson Author { get; set; }
@@ -42,7 +42,7 @@ namespace Microsoft.NodejsTools.Npm
 
         public IEnumerable<IPackage> Dependencies
         {
-            get { return m_dependencies; }
+            get { return _dependencies; }
         }
 
         public PackageFlags Flags { get; set; }
@@ -51,12 +51,12 @@ namespace Microsoft.NodejsTools.Npm
 
         public void AddDependency(IPackage module)
         {
-            m_dependencies.Add(module);
+            _dependencies.Add(module);
         }
 
         public void AddDependencies(IEnumerable<IPackage> packages)
         {
-            m_dependencies.AddRange(packages);
+            _dependencies.AddRange(packages);
         }
 
         public IPackage Build()

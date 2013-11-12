@@ -13,7 +13,7 @@ namespace Microsoft.NodejsTools.NpmUI
     public sealed class ColorUtils
     {
 
-        private static readonly Random s_Random = new Random();
+        private static readonly Random _sRandom = new Random();
 
         private ColorUtils() { }
 
@@ -96,9 +96,9 @@ namespace Microsoft.NodejsTools.NpmUI
         {
             return Color.FromArgb(
                 255,
-                s_Random.Next(256),
-                s_Random.Next(256),
-                s_Random.Next(256));
+                _sRandom.Next(256),
+                _sRandom.Next(256),
+                _sRandom.Next(256));
         }
 
         public static Color GetRandomNormalisedColor()
