@@ -35,7 +35,7 @@ namespace Microsoft.NodejsTools.NpmUI
             }
             else
             {
-                //  TODO: deal with selected search result
+                _btnInstall.Enabled = _paneSearch.SelectedPackage != null;
             }
         }
 
@@ -84,6 +84,11 @@ namespace Microsoft.NodejsTools.NpmUI
             UpdateUIState();
         }
 
+        private void _paneSearch_SelectedPackageChanged(object sender, EventArgs e)
+        {
+            UpdateUIState();
+        }
+
         private void _btnInstall_Click(object sender, EventArgs e)
         {
             DependencyType dependencyType;
@@ -111,7 +116,14 @@ namespace Microsoft.NodejsTools.NpmUI
             }
             else
             {
-                //  TODO: fire request for search results
+                var package = _paneSearch.SelectedPackage;
+                if ( null != package )
+                {
+                    OnInstallPackageRequested(
+                        package.Name,
+                        null,   //  Just want to install the latest version, at present - TODO: especially whilst version retrieval from npm catalogue is questionable
+                        dependencyType );
+                }
             }
         }
     }

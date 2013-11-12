@@ -87,6 +87,7 @@
             this._listResults.VirtualMode = true;
             this._listResults.DrawItem += new System.Windows.Forms.DrawListViewItemEventHandler(this._listResults_DrawItem);
             this._listResults.RetrieveVirtualItem += new System.Windows.Forms.RetrieveVirtualItemEventHandler(this._listResults_RetrieveVirtualItem);
+            this._listResults.SelectedIndexChanged += new System.EventHandler(this._listResults_SelectedIndexChanged);
             // 
             // PackageSearchPane
             // 

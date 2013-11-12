@@ -143,5 +143,39 @@ namespace Microsoft.NodejsTools.NpmUI
 
             BeginInvoke( new Action( StartFilter ) );
         }
+
+        public event EventHandler SelectedPackageChanged;
+
+        private void OnSelectedPackageChanged()
+        {
+            var handlers = SelectedPackageChanged;
+            if ( null != handlers )
+            {
+                handlers( this, EventArgs.Empty );
+            }
+        }
+
+        public IPackage SelectedPackage
+        {
+            get
+            {
+                var indices = _listResults.SelectedIndices;
+                if ( null == indices
+                    || indices.Count == 0
+                    || indices[ 0 ] < 0
+                    || null == _filteredPackages
+                    || indices[ 0 ] >= _filteredPackages.Count )
+                {
+                    return null;
+                }
+
+                return _filteredPackages[ indices[ 0 ] ];
+            }
+        }
+
+        private void _listResults_SelectedIndexChanged(object sender, EventArgs e)
+        {
+            OnSelectedPackageChanged();
+        }
     }
 }

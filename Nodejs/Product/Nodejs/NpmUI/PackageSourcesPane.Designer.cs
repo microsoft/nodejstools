@@ -155,6 +155,7 @@
             this._paneSearch.Name = "_paneSearch";
             this._paneSearch.Size = new System.Drawing.Size(470, 497);
             this._paneSearch.TabIndex = 0;
+            this._paneSearch.SelectedPackageChanged += new System.EventHandler(this._paneSearch_SelectedPackageChanged);
             // 
             // PackageSourcesPane
             // 
