@@ -97,7 +97,7 @@ namespace Microsoft.NodejsTools.NpmUI
             this._listLocalPackages.Name = "_listLocalPackages";
             this._listLocalPackages.Size = new System.Drawing.Size(286, 531);
             this._listLocalPackages.TabIndex = 0;
-            this._listLocalPackages.UninstallPackageRequested += new System.EventHandler<Microsoft.NodejsTools.NpmUI.PackageEventArgs>(this._listLocalPackages_UninstallPackageRequested);
+            this._listLocalPackages.UninstallPackageRequested += new System.EventHandler<Microsoft.NodejsTools.Npm.PackageEventArgs>(this._listLocalPackages_UninstallPackageRequested);
             // 
             // _tabGlobalPackages
             // 
@@ -117,7 +117,7 @@ namespace Microsoft.NodejsTools.NpmUI
             this._listGlobalPackages.Name = "_listGlobalPackages";
             this._listGlobalPackages.Size = new System.Drawing.Size(286, 531);
             this._listGlobalPackages.TabIndex = 0;
-            this._listGlobalPackages.UninstallPackageRequested += new System.EventHandler<Microsoft.NodejsTools.NpmUI.PackageEventArgs>(this._listGlobalPackages_UninstallPackageRequested);
+            this._listGlobalPackages.UninstallPackageRequested += new System.EventHandler<Microsoft.NodejsTools.Npm.PackageEventArgs>(this._listGlobalPackages_UninstallPackageRequested);
             // 
             // InstalledPackagesPane
             // 

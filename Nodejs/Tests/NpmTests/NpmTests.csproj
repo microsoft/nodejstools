@@ -37,6 +37,7 @@
     <Compile Include="FileSystemPackageJsonTests.cs" />
     <Compile Include="MockPackageJsonSource.cs" />
     <Compile Include="ModuleHierarchyTests.cs" />
+    <Compile Include="NpmSearchTests.cs" />
     <Compile Include="PackageJsonDependencyTests.cs" />
     <Compile Include="PackageJsonTests.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
@@ -48,9 +49,17 @@
     <None Include="packages.config" />
   </ItemGroup>
   <ItemGroup>
+    <ProjectReference Include="..\..\..\Common\Tests\Utilities\TestUtilities.csproj">
+      <Project>{d092d54e-ff29-4d32-9aee-4ef704c92f67}</Project>
+      <Name>TestUtilities</Name>
+    </ProjectReference>
     <ProjectReference Include="..\..\Product\Npm\Npm.csproj">
       <Project>{e5ef4b0a-ab41-4b98-8fa8-98d6348003a8}</Project>
       <Name>Npm</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\Utilities.Nodejs\TestUtilities.Nodejs.csproj">
+      <Project>{9e395ba3-765e-4f35-a520-19f1c323d625}</Project>
+      <Name>TestUtilities.Nodejs</Name>
     </ProjectReference>
   </ItemGroup>
   <Import Project="..\TestProjectAfter.settings" />

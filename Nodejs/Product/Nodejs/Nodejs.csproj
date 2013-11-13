@@ -271,7 +271,6 @@
     </Compile>
     <Compile Include="NpmUI\PackageListItemPainter.cs" />
     <Compile Include="NpmUI\NpmSearchComparer.cs" />
-    <Compile Include="NpmUI\PackageEventArgs.cs" />
     <Compile Include="NpmUI\PackageInstallEventArgs.cs" />
     <Compile Include="NpmUI\PackageInstallPane.cs">
       <SubType>UserControl</SubType>

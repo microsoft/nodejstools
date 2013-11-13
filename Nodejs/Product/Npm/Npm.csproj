@@ -47,6 +47,8 @@
     <Compile Include="INodeModules.cs" />
     <Compile Include="INpmController.cs" />
     <Compile Include="INpmLogSource.cs" />
+    <Compile Include="INpmSearchLexer.cs" />
+    <Compile Include="INpmSearchParser.cs" />
     <Compile Include="IPackage.cs" />
     <Compile Include="IPackageJson.cs" />
     <Compile Include="IPackageJsonSource.cs" />
@@ -58,7 +60,9 @@
     <Compile Include="NodeModuleBuilder.cs" />
     <Compile Include="NpmControllerFactory.cs" />
     <Compile Include="NpmLogEventArgs.cs" />
+    <Compile Include="NpmSearchParserFactory.cs" />
     <Compile Include="PackageComparer.cs" />
+    <Compile Include="PackageEventArgs.cs" />
     <Compile Include="PackageFlags.cs" />
     <Compile Include="PackageJsonFactory.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
