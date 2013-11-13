@@ -28,7 +28,7 @@ namespace NpmTests
             IDictionary<string, IPackage> byName = new Dictionary<string, IPackage>();
             INpmSearchLexer lexer = NpmSearchParserFactory.CreateLexer();
             INpmSearchParser parser = NpmSearchParserFactory.CreateParser(lexer);
-            parser.PackageParsed += (source, args) => {
+            parser.Package += (source, args) => {
                 target.Add(args.Package);
                 byName[args.Package.Name] = args.Package;
             };

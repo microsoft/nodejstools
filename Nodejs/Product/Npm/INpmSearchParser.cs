@@ -2,6 +2,6 @@
 
 namespace Microsoft.NodejsTools.Npm{
     public interface INpmSearchParser{
-        event EventHandler<PackageEventArgs> PackageParsed;
+        event EventHandler<PackageEventArgs> Package;
     }
 }
