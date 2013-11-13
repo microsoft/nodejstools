@@ -560,12 +560,24 @@ namespace Microsoft.NodejsTools {
 
 
         protected override int GetProperty(uint itemId, int propId, out object property) {
+            switch ((__VSHPROPID)propId) {
+                case __VSHPROPID.VSHPROPID_IconIndex:
+                case __VSHPROPID.VSHPROPID_OpenFolderIconIndex:
+                    // Venus wants to change the icon for special folders using the IconIndex.  All of our
+                    // folders respond to IconHandles so we just force folders down that code path rather
+                    // than trying to hand out the correct IconIndex here
+                    if (GetItemType(new VSITEMSELECTION() { itemid = itemId, pHier = this }) == VSConstants.GUID_ItemType_PhysicalFolder) {
+                        property = null;
+                        return VSConstants.DISP_E_MEMBERNOTFOUND;
+                    }
+                    break;
+            }
             switch ((__VSHPROPID4)propId) {
 
                 case __VSHPROPID4.VSHPROPID_TargetFrameworkMoniker:
                     // really only here for testing so WAP projects load correctly...
                     // But this also impacts the toolbox by filtering what available items there are.
-                    property = ".NETFramework,Version=v4.0,Profile=Client";
+                    property = ".NETFramework,Version=v4.5,Profile=Client";
                     return VSConstants.S_OK;
             }
             switch ((__VSHPROPID2)propId) {

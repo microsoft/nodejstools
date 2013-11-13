@@ -13,8 +13,10 @@
  * ***************************************************************************/
 
 using System;
+using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using Microsoft.NodejsTools.Debugger.Serialization;
 using Microsoft.VisualStudio;
 using Microsoft.VisualStudio.Debugger.Interop;
 
@@ -23,42 +25,35 @@ namespace Microsoft.NodejsTools.Debugger.DebugEngine {
     // Also implements the IDebugExpressionContext interface, which allows expression evaluation and watch windows.
     class AD7StackFrame : IDebugStackFrame2, IDebugExpressionContext2 {
         private readonly AD7Engine _engine;
-        private readonly AD7Thread _thread;
+        private readonly IList<NodeEvaluationResult> _locals;
+        private readonly IList<NodeEvaluationResult> _parameters;
         private readonly NodeStackFrame _stackFrame;
+        private readonly AD7Thread _thread;
         private AD7MemoryAddress _codeContext;
+        private readonly IComparer<string> _comparer = new NaturalSortComparer();
         private AD7DocumentContext _documentContext;
 
         // An array of this frame's parameters
-        private NodeEvaluationResult[] _parameters;
-
-        // An array of this frame's locals
-        private NodeEvaluationResult[] _locals;
 
         public AD7StackFrame(AD7Engine engine, AD7Thread thread, NodeStackFrame threadContext) {
             _engine = engine;
             _thread = thread;
             _stackFrame = threadContext;
 
-            _parameters = threadContext.Parameters.ToArray();
-            _locals = threadContext.Locals.ToArray();
+            _parameters = threadContext.Parameters;
+            _locals = threadContext.Locals;
         }
 
         public NodeStackFrame StackFrame {
-            get {
-                return _stackFrame;
-            }
+            get { return _stackFrame; }
         }
 
         public AD7Engine Engine {
-            get {
-                return _engine;
-            }
+            get { return _engine; }
         }
 
         public AD7Thread Thread {
-            get {
-                return _thread;
-            }
+            get { return _thread; }
         }
 
         private AD7MemoryAddress CodeContext {
@@ -92,7 +87,7 @@ namespace Microsoft.NodejsTools.Debugger.DebugEngine {
                 string funcName = _stackFrame.FunctionName;
                 if (funcName == "<module>") {
                     if (_stackFrame.FileName.IndexOfAny(Path.GetInvalidPathChars()) == -1) {
-                        funcName = Path.GetFileNameWithoutExtension(_stackFrame.FileName) + " module";
+                        funcName = Path.GetFileName(_stackFrame.FileName) + " module";
                     } else if (_stackFrame.FileName.EndsWith("<string>")) {
                         funcName = "<exec or eval>";
                     } else {
@@ -100,12 +95,12 @@ namespace Microsoft.NodejsTools.Debugger.DebugEngine {
                     }
                 } else {
                     if (_stackFrame.FileName != "<unknown>") {
-                        funcName = funcName + " in " + Path.GetFileNameWithoutExtension(_stackFrame.FileName);
+                        funcName = string.Format("{0} [{1}]", funcName, Path.GetFileName(_stackFrame.FileName));
                     } else {
                         funcName = funcName + " in <unknown>";
                     }
                 }
-                frameInfo.m_bstrFuncName = funcName + " line " + this._stackFrame.LineNo;
+                frameInfo.m_bstrFuncName = funcName + " Line " + _stackFrame.LineNo;
                 frameInfo.m_dwValidFields |= enum_FRAMEINFO_FLAGS.FIF_FUNCNAME;
             }
 
@@ -117,7 +112,7 @@ namespace Microsoft.NodejsTools.Debugger.DebugEngine {
             // The debugger is requesting the name of the module for this stack frame.
             if ((dwFieldSpec & enum_FRAMEINFO_FLAGS.FIF_MODULE) != 0) {
                 if (_stackFrame.FileName.IndexOfAny(Path.GetInvalidPathChars()) == -1) {
-                    frameInfo.m_bstrModule = Path.GetFileNameWithoutExtension(this._stackFrame.FileName);
+                    frameInfo.m_bstrModule = Path.GetFileName(_stackFrame.FileName);
                 } else if (_stackFrame.FileName.EndsWith("<string>")) {
                     frameInfo.m_bstrModule = "<exec/eval>";
                 } else {
@@ -159,62 +154,54 @@ namespace Microsoft.NodejsTools.Debugger.DebugEngine {
         }
 
         // Construct an instance of IEnumDebugPropertyInfo2 for the combined locals and parameters.
-        private void CreateLocalsPlusArgsProperties(uint radix, out uint elementsReturned, out IEnumDebugPropertyInfo2 enumObject) {
-            elementsReturned = 0;
-
-            int localsLength = 0;
+        private List<DEBUG_PROPERTY_INFO> CreateLocalsPlusArgsProperties(uint radix) {
+            var properties = new List<DEBUG_PROPERTY_INFO>();
 
             if (_locals != null) {
-                localsLength = _locals.Length;
-                elementsReturned += (uint)localsLength;
-            }
-
-            if (_parameters != null) {
-                elementsReturned += (uint)_parameters.Length;
-            }
-            DEBUG_PROPERTY_INFO[] propInfo = new DEBUG_PROPERTY_INFO[elementsReturned];
-
-            if (_locals != null) {
-                for (int i = 0; i < _locals.Length; i++) {
-                    AD7Property property = new AD7Property(this, _locals[i], false);
-                    propInfo[i] = property.ConstructDebugPropertyInfo(radix, enum_DEBUGPROP_INFO_FLAGS.DEBUGPROP_INFO_STANDARD);
+                for (int i = 0; i < _locals.Count; i++) {
+                    var property = new AD7Property(this, _locals[i]);
+                    properties.Add(property.ConstructDebugPropertyInfo(radix, enum_DEBUGPROP_INFO_FLAGS.DEBUGPROP_INFO_STANDARD));
                 }
             }
 
             if (_parameters != null) {
-                for (int i = 0; i < _parameters.Length; i++) {
-                    AD7Property property = new AD7Property(this, _parameters[i], false);
-                    propInfo[localsLength + i] = property.ConstructDebugPropertyInfo(radix, enum_DEBUGPROP_INFO_FLAGS.DEBUGPROP_INFO_STANDARD);
+                for (int i = 0; i < _parameters.Count; i++) {
+                    var property = new AD7Property(this, _parameters[i]);
+                    properties.Add(property.ConstructDebugPropertyInfo(radix, enum_DEBUGPROP_INFO_FLAGS.DEBUGPROP_INFO_STANDARD));
                 }
             }
 
-            enumObject = new AD7PropertyInfoEnum(propInfo);
+            return properties;
         }
 
         // Construct an instance of IEnumDebugPropertyInfo2 for the locals collection only.
-        private void CreateLocalProperties(uint radix, out uint elementsReturned, out IEnumDebugPropertyInfo2 enumObject) {
-            elementsReturned = (uint)_locals.Length;
-            DEBUG_PROPERTY_INFO[] propInfo = new DEBUG_PROPERTY_INFO[_locals.Length];
-
-            for (int i = 0; i < propInfo.Length; i++) {
-                AD7Property property = new AD7Property(this, _locals[i], false);
-                propInfo[i] = property.ConstructDebugPropertyInfo(radix, enum_DEBUGPROP_INFO_FLAGS.DEBUGPROP_INFO_STANDARD);
+        private List<DEBUG_PROPERTY_INFO> CreateLocalProperties(uint radix) {
+            var properties = new List<DEBUG_PROPERTY_INFO>();
+            if (_locals == null) {
+                return properties;
             }
 
-            enumObject = new AD7PropertyInfoEnum(propInfo);
+            for (int i = 0; i < _locals.Count; i++) {
+                var property = new AD7Property(this, _locals[i]);
+                properties.Add(property.ConstructDebugPropertyInfo(radix, enum_DEBUGPROP_INFO_FLAGS.DEBUGPROP_INFO_STANDARD));
+            }
+
+            return properties;
         }
 
         // Construct an instance of IEnumDebugPropertyInfo2 for the parameters collection only.
-        private void CreateParameterProperties(uint radix, out uint elementsReturned, out IEnumDebugPropertyInfo2 enumObject) {
-            elementsReturned = (uint)_parameters.Length;
-            DEBUG_PROPERTY_INFO[] propInfo = new DEBUG_PROPERTY_INFO[_parameters.Length];
-
-            for (int i = 0; i < propInfo.Length; i++) {
-                AD7Property property = new AD7Property(this, _parameters[i], false);
-                propInfo[i] = property.ConstructDebugPropertyInfo(radix, enum_DEBUGPROP_INFO_FLAGS.DEBUGPROP_INFO_STANDARD);
+        private List<DEBUG_PROPERTY_INFO> CreateParameterProperties(uint radix) {
+            var properties = new List<DEBUG_PROPERTY_INFO>();
+            if (_parameters == null) {
+                return properties;
             }
 
-            enumObject = new AD7PropertyInfoEnum(propInfo);
+            for (int i = 0; i < _parameters.Count; i++) {
+                var property = new AD7Property(this, _parameters[i]);
+                properties.Add(property.ConstructDebugPropertyInfo(radix, enum_DEBUGPROP_INFO_FLAGS.DEBUGPROP_INFO_STANDARD));
+            }
+
+            return properties;
         }
 
         #endregion
@@ -225,26 +212,26 @@ namespace Microsoft.NodejsTools.Debugger.DebugEngine {
         // The sample engine only supports returning locals and parameters. Other possible values include
         // class fields (this pointer), registers, exceptions...
         int IDebugStackFrame2.EnumProperties(enum_DEBUGPROP_INFO_FLAGS dwFields, uint nRadix, ref Guid guidFilter, uint dwTimeout, out uint elementsReturned, out IEnumDebugPropertyInfo2 enumObject) {
-            int hr;
-
+            List<DEBUG_PROPERTY_INFO> properties;
             elementsReturned = 0;
             enumObject = null;
 
             if (guidFilter == DebuggerConstants.guidFilterLocalsPlusArgs ||
-                    guidFilter == DebuggerConstants.guidFilterAllLocalsPlusArgs ||
-                    guidFilter == DebuggerConstants.guidFilterAllLocals) {
-                CreateLocalsPlusArgsProperties(nRadix, out elementsReturned, out enumObject);
-                hr = VSConstants.S_OK;
+                guidFilter == DebuggerConstants.guidFilterAllLocalsPlusArgs ||
+                guidFilter == DebuggerConstants.guidFilterAllLocals) {
+                properties = CreateLocalsPlusArgsProperties(nRadix);
             } else if (guidFilter == DebuggerConstants.guidFilterLocals) {
-                CreateLocalProperties(nRadix, out elementsReturned, out enumObject);
-                hr = VSConstants.S_OK;
+                properties = CreateLocalProperties(nRadix);
             } else if (guidFilter == DebuggerConstants.guidFilterArgs) {
-                CreateParameterProperties(nRadix, out elementsReturned, out enumObject);
-                hr = VSConstants.S_OK;
+                properties = CreateParameterProperties(nRadix);
             } else {
-                hr = VSConstants.E_NOTIMPL;
+                return VSConstants.E_NOTIMPL;
             }
-            return hr;
+
+            elementsReturned = (uint) properties.Count;
+            enumObject = new AD7PropertyInfoEnum(properties.OrderBy(p => p.bstrName, _comparer).ToArray());
+
+            return VSConstants.S_OK;
         }
 
         // Gets the code context for this stack frame. The code context represents the current instruction pointer in this stack frame.
@@ -272,7 +259,7 @@ namespace Microsoft.NodejsTools.Debugger.DebugEngine {
         // Call the IDebugExpressionContext2::ParseText method to parse an expression and then call the resulting IDebugExpression2::EvaluateSync 
         // or IDebugExpression2::EvaluateAsync methods to evaluate the parsed expression.
         int IDebugStackFrame2.GetExpressionContext(out IDebugExpressionContext2 ppExprCxt) {
-            ppExprCxt = (IDebugExpressionContext2)this;
+            ppExprCxt = this;
             return VSConstants.S_OK;
         }
 
@@ -286,15 +273,15 @@ namespace Microsoft.NodejsTools.Debugger.DebugEngine {
         // Gets the language associated with this stack frame. 
         // In this sample, all the supported stack frames are C++
         int IDebugStackFrame2.GetLanguageInfo(ref string pbstrLanguage, ref Guid pguidLanguage) {
-            pbstrLanguage = NodejsConstants.JavaScript;
-            pguidLanguage = DebuggerConstants.guidLanguageJavascript;   // TODO: Language guid
+            pbstrLanguage = NodejsConstants.Nodejs;
+            pguidLanguage = GuidList.guidNodejsDebugLanguage;
             return VSConstants.S_OK;
         }
 
         // Gets the name of the stack frame.
         // The name of a stack frame is typically the name of the method being executed.
         int IDebugStackFrame2.GetName(out string name) {
-            name = this._stackFrame.FunctionName;
+            name = _stackFrame.FunctionName;
             return 0;
         }
 
@@ -321,35 +308,34 @@ namespace Microsoft.NodejsTools.Debugger.DebugEngine {
         // that refers to this exact evaluation context. For example, in C++ the name is as follows: 
         // "{ function-name, source-file-name, module-file-name }"
         int IDebugExpressionContext2.GetName(out string pbstrName) {
-            pbstrName = String.Format("{{ {0} {1} }}", this._stackFrame.FunctionName, this._stackFrame.FileName);
+            pbstrName = String.Format("{{ {0} {1} }}", _stackFrame.FunctionName, _stackFrame.FileName);
             return VSConstants.S_OK;
         }
 
         // Parses a text-based expression for evaluation.
         // The engine sample only supports locals and parameters so the only task here is to check the names in those collections.
         int IDebugExpressionContext2.ParseText(string pszCode,
-                                                enum_PARSEFLAGS dwFlags,
-                                                uint nRadix,
-                                                out IDebugExpression2 ppExpr,
-                                                out string pbstrError,
-                                                out uint pichError) {
+            enum_PARSEFLAGS dwFlags,
+            uint nRadix,
+            out IDebugExpression2 ppExpr,
+            out string pbstrError,
+            out uint pichError) {
             pbstrError = "";
             pichError = 0;
-            ppExpr = null;
 
             if (_parameters != null) {
-                foreach (var currVariable in _parameters) {
+                foreach (NodeEvaluationResult currVariable in _parameters) {
                     if (String.CompareOrdinal(currVariable.Expression, pszCode) == 0) {
-                        ppExpr = new UncalculatedAD7Expression(this, currVariable.Expression, false);
+                        ppExpr = new UncalculatedAD7Expression(this, currVariable.Expression);
                         return VSConstants.S_OK;
                     }
                 }
             }
 
             if (_locals != null) {
-                foreach (var currVariable in _locals) {
+                foreach (NodeEvaluationResult currVariable in _locals) {
                     if (String.CompareOrdinal(currVariable.Expression, pszCode) == 0) {
-                        ppExpr = new UncalculatedAD7Expression(this, currVariable.Expression, false);
+                        ppExpr = new UncalculatedAD7Expression(this, currVariable.Expression);
                         return VSConstants.S_OK;
                     }
                 }
@@ -361,11 +347,10 @@ namespace Microsoft.NodejsTools.Debugger.DebugEngine {
                 pichError = (uint)pbstrError.Length;
             }
 
-            ppExpr = new UncalculatedAD7Expression(this, pszCode, true);                                    
+            ppExpr = new UncalculatedAD7Expression(this, pszCode, true);
             return VSConstants.S_OK;
         }
 
         #endregion
     }
 }
-

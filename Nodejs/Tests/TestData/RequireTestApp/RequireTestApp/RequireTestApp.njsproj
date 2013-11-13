@@ -46,6 +46,7 @@
   </ItemGroup>
   <ItemGroup>
     <Folder Include="baz\" />
+    <Folder Include="indexfolder\" />
     <Folder Include="node_modules\" />
     <Folder Include="node_modules\bar2\sub_folder\" />
     <Folder Include="node_modules\foo\" />
@@ -56,6 +57,7 @@
   <ItemGroup>
     <Compile Include="baz\dup.js" />
     <Compile Include="dup.js" />
+    <Compile Include="indexfolder\index.js" />
     <Compile Include="node_modules\bar2\sub_folder\entry.js" />
     <Compile Include="node_modules\bar\package.json" />
     <Compile Include="node_modules\bar\entry.js" />

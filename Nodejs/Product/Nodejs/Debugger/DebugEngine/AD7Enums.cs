@@ -148,4 +148,14 @@ namespace Microsoft.NodejsTools.Debugger.DebugEngine {
         }
     }
 
+    class AD7ErrorBreakpointsEnum : AD7Enum<IDebugErrorBreakpoint2, IEnumDebugErrorBreakpoints2>, IEnumDebugErrorBreakpoints2 {
+        public AD7ErrorBreakpointsEnum(IDebugErrorBreakpoint2[] breakpoints)
+            : base(breakpoints) {
+
+        }
+
+        public int Next(uint celt, IDebugErrorBreakpoint2[] rgelt, ref uint celtFetched) {
+            return Next(celt, rgelt, out celtFetched);
+        }
+    }
 }

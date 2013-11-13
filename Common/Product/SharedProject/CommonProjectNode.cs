@@ -65,7 +65,7 @@ namespace Microsoft.VisualStudioTools.Project {
         private Queue<FileSystemChange> _fileSystemChanges = new Queue<FileSystemChange>();
         private object _fileSystemChangesLock = new object();
         internal UIThreadSynchronizer _uiSync;
-        private MSBuild.Project userBuildProject;
+        private MSBuild.Project _userBuildProject;
         private readonly Dictionary<string, FileSystemWatcher> _symlinkWatchers = new Dictionary<string, FileSystemWatcher>();
         private DiskMerger _currentMerger;
         private readonly HashSet<HierarchyNode> _needBolding = new HashSet<HierarchyNode>();
@@ -166,6 +166,19 @@ namespace Microsoft.VisualStudioTools.Project {
         public CommonPropertyPage PropertyPage {
             get { return _propPage; }
             set { _propPage = value; }
+        }
+
+        protected internal MSBuild.Project UserBuildProject {
+            get {
+                return _userBuildProject;
+            }
+        }
+
+        protected bool IsUserProjectFileDirty {
+            get {
+                return _userBuildProject != null && 
+                    _userBuildProject.Xml.HasUnsavedChanges;
+            }
         }
 
         #endregion
@@ -377,13 +390,7 @@ namespace Microsoft.VisualStudioTools.Project {
         protected override void Reload() {
             base.Reload();
 
-            var startupPath = GetStartupFile();
-            if (!string.IsNullOrEmpty(startupPath)) {
-                var startup = FindNodeByFullPath(startupPath);
-                if (startup != null) {
-                    BoldItem(startup, true);
-                }
-            }
+            BoldStartupItem();
 
             OnProjectPropertyChanged += CommonProjectNode_OnProjectPropertyChanged;
 
@@ -393,14 +400,14 @@ namespace Microsoft.VisualStudioTools.Project {
                 _watcher.Dispose();
             }
 
-            string userProjectFilename = FileName + ".user";
+            string userProjectFilename = FileName + PerUserFileExtension;
             if (File.Exists(userProjectFilename)) {
-                userBuildProject = BuildProject.ProjectCollection.LoadProject(userProjectFilename);
+                _userBuildProject = BuildProject.ProjectCollection.LoadProject(userProjectFilename);
             }
 
             bool? showAllFiles = null;
-            if (userBuildProject != null) {
-                showAllFiles = GetShowAllFilesSetting(userBuildProject.GetPropertyValue(CommonConstants.ProjectView));
+            if (_userBuildProject != null) {
+                showAllFiles = GetShowAllFilesSetting(_userBuildProject.GetPropertyValue(CommonConstants.ProjectView));
             }
 
             _showingAllFiles = showAllFiles ??
@@ -410,8 +417,17 @@ namespace Microsoft.VisualStudioTools.Project {
             _watcher = CreateFileSystemWatcher(ProjectHome);
             _attributesWatcher = CreateAttributesWatcher(ProjectHome);
 
-            // add everything that's on disk that we don't have in the project
-            MergeDiskNodes(this, ProjectHome);
+            _currentMerger = new DiskMerger(this, this, ProjectHome);
+        }
+
+        private void BoldStartupItem() {
+            var startupPath = GetStartupFile();
+            if (!string.IsNullOrEmpty(startupPath)) {
+                var startup = FindNodeByFullPath(startupPath);
+                if (startup != null) {
+                    _needBolding.Add(startup);
+                }
+            }
         }
 
         private FileSystemWatcher CreateFileSystemWatcher(string dir) {
@@ -421,6 +437,9 @@ namespace Microsoft.VisualStudioTools.Project {
             watcher.Deleted += new FileSystemEventHandler(FileExistanceChanged);
             watcher.Renamed += new RenamedEventHandler(FileNameChanged);
             watcher.Changed += FileContentsChanged;
+#if DEV12_OR_LATER
+            watcher.Renamed += FileContentsChanged;
+#endif
             watcher.Error += WatcherError;
             watcher.EnableRaisingEvents = true;
             watcher.InternalBufferSize = 1024 * 4;  // 4k is minimum buffer size
@@ -454,28 +473,30 @@ namespace Microsoft.VisualStudioTools.Project {
         protected override void SaveMSBuildProjectFileAs(string newFileName) {
             base.SaveMSBuildProjectFileAs(newFileName);
 
-            if (userBuildProject != null) {
-                userBuildProject.Save(FileName + ".user");
+            if (_userBuildProject != null) {
+                _userBuildProject.Save(FileName + PerUserFileExtension);
             }
         }
 
         protected override void SaveMSBuildProjectFile(string filename) {
             base.SaveMSBuildProjectFile(filename);
 
-            if (userBuildProject != null) {
-                userBuildProject.Save(filename + ".user");
+            if (_userBuildProject != null) {
+                _userBuildProject.Save(filename + PerUserFileExtension);
             }
         }
 
         protected override void Dispose(bool disposing) {
             base.Dispose(disposing);
-            if (this.userBuildProject != null) {
-                userBuildProject.ProjectCollection.UnloadProject(userBuildProject);
+            if (this._userBuildProject != null) {
+                _userBuildProject.ProjectCollection.UnloadProject(_userBuildProject);
             }
             _package.OnIdle -= OnIdle;
         }
 
         protected internal override int ShowAllFiles() {
+            UIThread.Instance.MustBeCalledFromUIThread();
+
             if (!QueryEditProjectFile(false)) {
                 return VSConstants.E_FAIL;
             }
@@ -486,6 +507,8 @@ namespace Microsoft.VisualStudioTools.Project {
                 UpdateShowAllFiles(this, enabled: true);
                 ExpandItem(EXPANDFLAGS.EXPF_ExpandFolder);
             }
+
+            BoldStartupItem();
 
             _showingAllFiles = !_showingAllFiles;
 
@@ -499,12 +522,7 @@ namespace Microsoft.VisualStudioTools.Project {
                 BuildProject.SetProperty(CommonConstants.ProjectView, newPropValue);
             } else {
                 // save setting in user project file
-                if (userBuildProject == null) {
-                    // user project file doesn't exist yet, create it.
-                    userBuildProject = new MSBuild.Project(BuildProject.ProjectCollection);
-                    userBuildProject.FullPath = FileName + ".user";
-                }
-                userBuildProject.SetProperty(CommonConstants.ProjectView, newPropValue);
+                SetUserProjectProperty(CommonConstants.ProjectView, newPropValue);
                 
             }
             SetProjectFileDirty(true);
@@ -520,11 +538,10 @@ namespace Microsoft.VisualStudioTools.Project {
                 var allFiles = curNode.ItemNode as AllFilesProjectElement;
                 if (allFiles != null) {
                     curNode.IsVisible = enabled;
-
                     if (enabled) {
-                        ProjectMgr.OnItemAdded(node, curNode);
+                        OnItemAdded(node, curNode);
                     } else {
-                        ProjectMgr.OnItemDeleted(curNode);
+                        RaiseItemDeleted(curNode);
                     }
                 }
             }
@@ -588,7 +605,8 @@ namespace Microsoft.VisualStudioTools.Project {
                     // directory was deleted, we don't have access, etc...
                     return true;
                 }
-
+                
+                bool wasExpanded = dir.Parent.GetIsExpanded();
                 foreach (var curDir in dirs) {
                     if (_project.IsFileHidden(curDir)) {
                         continue;
@@ -602,17 +620,21 @@ namespace Microsoft.VisualStudioTools.Project {
                         // track symlinks, we won't get events on the directory
                         _project.CreateSymLinkWatcher(curDir);
                     }
-
+                    
                     var existing = _project.AddAllFilesFolder(dir.Parent, curDir + Path.DirectorySeparatorChar);
                     missingChildren.Remove(existing);
                     _remainingDirs.Push(new DirState(curDir, existing));
                 }
-
+                                
                 IEnumerable<string> files;
                 try {
                     files = Directory.EnumerateFiles(dir.Name);
                 } catch {
                     // directory was deleted, we don't have access, etc...
+                                        
+                    // We are about to return and some of the previous operations may have affect the Parent's Expanded
+                    // state.  Set it back to what it was
+                    dir.Parent.ExpandItem(wasExpanded ? EXPANDFLAGS.EXPF_ExpandFolder : EXPANDFLAGS.EXPF_CollapseFolder);
                     return true;
                 }
 
@@ -629,6 +651,8 @@ namespace Microsoft.VisualStudioTools.Project {
                         _project.RemoveSubTree(child);
                     }
                 }
+
+                dir.Parent.ExpandItem(wasExpanded ? EXPANDFLAGS.EXPF_ExpandFolder : EXPANDFLAGS.EXPF_CollapseFolder);
 
                 return true;
             }
@@ -651,6 +675,7 @@ namespace Microsoft.VisualStudioTools.Project {
         }
 
         private void RemoveSubTree(HierarchyNode node) {
+            UIThread.Instance.MustBeCalledFromUIThread();
             foreach (var child in node.AllChildren) {
                 RemoveSubTree(child);
             }
@@ -773,7 +798,7 @@ namespace Microsoft.VisualStudioTools.Project {
 
                 // Solution Explorer will expand the parent when an item is
                 // added, which we don't want
-                folderNode.ExpandItem(EXPANDFLAGS.EXPF_CollapseFolder);
+                folderNode.ExpandItem(EXPANDFLAGS.EXPF_CollapseFolder);                
             }
             return folderNode;
         }
@@ -999,8 +1024,8 @@ namespace Microsoft.VisualStudioTools.Project {
 
                     // then remove us if we're an all files node
                     if (current.ItemNode is AllFilesProjectElement) {
-                        parent.RemoveChild(current);
                         _project.OnItemDeleted(current);
+                        parent.RemoveChild(current);
                     }
                 }
             }
@@ -1008,19 +1033,25 @@ namespace Microsoft.VisualStudioTools.Project {
             private void ChildDeleted(HierarchyNode child) {
                 if (child != null) {
                     _project.TryDeactivateSymLinkWatcher(child);
+                    UIThread.Instance.MustBeCalledFromUIThread();
 
-                    if (child.ItemNode.IsExcluded) {
-                        RemoveAllFilesChildren(child);
-
-                        // deleting a show all files item, remove the node.
-                        child.Parent.RemoveChild(child);
-                        _project.OnItemDeleted(child);
-                    } else {
-                        Debug.Assert(!child.IsNonMemberItem);
-                        // deleting an item in the project, fix the icon, also
-                        // fix the icon of all children which we may have not
-                        // received delete notifications for
-                        RedrawIcon(child);
+                    // rapid changes can arrive out of order, if the file or directory 
+                    // actually exists ignore the event.
+                    if ((!File.Exists(child.Url) && !Directory.Exists(child.Url)) || 
+                        _project.IsFileHidden(child.Url)) {
+                        if (child.ItemNode.IsExcluded) {
+                            RemoveAllFilesChildren(child);
+                            // deleting a show all files item, remove the node.
+                            _project.OnItemDeleted(child);
+                            child.Parent.RemoveChild(child);
+                            child.Close();
+                        } else {
+                            Debug.Assert(!child.IsNonMemberItem);
+                            // deleting an item in the project, fix the icon, also
+                            // fix the icon of all children which we may have not
+                            // received delete notifications for
+                            RedrawIcon(child);
+                        }
                     }
                 }
             }            
@@ -1059,28 +1090,20 @@ namespace Microsoft.VisualStudioTools.Project {
                             _project.CreateSymLinkWatcher(_path);
                         }
 
-                        var folderNode = _project.AddAllFilesFolder(parent, _path + Path.DirectorySeparatorChar);
-                        // we may have just moved a directory from another location (e.g. drag and
-                        // and drop in explorer), in which case we also need to process the items
-                        // which are in the folder that we won't receive create notifications for.
-
-                        // First, make sure we don't have any children
-                        RemoveAllFilesChildren(folderNode);
+                        var folderNode = _project.AddAllFilesFolder(parent, _path + Path.DirectorySeparatorChar);                                                
+                        bool folderNodeWasExpanded = folderNode.GetIsExpanded();
 
                         // then add the folder nodes
                         _project.MergeDiskNodes(folderNode, _path);
-
                         _project.OnInvalidateItems(folderNode);
-                    } else {
+
+                        folderNode.ExpandItem(folderNodeWasExpanded ? EXPANDFLAGS.EXPF_ExpandFolder : EXPANDFLAGS.EXPF_CollapseFolder);
+
+                    } else if (File.Exists(_path)) { // rapid changes can arrive out of order, make sure the file still exists
                         _project.AddAllFilesFile(parent, _path);
                     }
 
-                    if (!wasExpanded) {
-                        // Solution Explorer will expand the parent when an item is
-                        // added, which we don't want, so we check it's state before
-                        // adding, and then collapse the folder if it was expanded.
-                        parent.ExpandItem(EXPANDFLAGS.EXPF_CollapseFolder);
-                    }
+                    parent.ExpandItem(wasExpanded ? EXPANDFLAGS.EXPF_ExpandFolder: EXPANDFLAGS.EXPF_CollapseFolder);
                 }
             }
         }
@@ -1159,6 +1182,14 @@ namespace Microsoft.VisualStudioTools.Project {
         }
 
         public void BoldItem(HierarchyNode node, bool isBold) {
+            if ((EventTriggeringFlag & EventTriggering.DoNotTriggerHierarchyEvents) != 0) {
+                if (isBold) {
+                    _needBolding.Add(node);
+                }
+                return;
+            }
+
+            AssertHasParentHierarchy();
             IVsUIHierarchyWindow2 windows = UIHierarchyUtilities.GetUIHierarchyWindow(
                 Site as IServiceProvider,
                 new Guid(ToolWindowGuids80.SolutionExplorer)) as IVsUIHierarchyWindow2;
@@ -1223,6 +1254,7 @@ namespace Microsoft.VisualStudioTools.Project {
             }
             var items = _needBolding.ToArray();
 
+            AssertHasParentHierarchy();
             IVsUIHierarchyWindow2 windows = UIHierarchyUtilities.GetUIHierarchyWindow(
                 Site as IServiceProvider,
                 new Guid(ToolWindowGuids80.SolutionExplorer)) as IVsUIHierarchyWindow2;
@@ -1340,7 +1372,7 @@ namespace Microsoft.VisualStudioTools.Project {
 
         public override int IsDirty(out int isDirty) {
             isDirty = 0;
-            if (IsProjectFileDirty) {
+            if (IsProjectFileDirty || IsUserProjectFileDirty) {
                 isDirty = 1;
                 return VSConstants.S_OK;
             }
@@ -1431,6 +1463,7 @@ namespace Microsoft.VisualStudioTools.Project {
         /// Returns first immediate child node (non-recursive) of a given type.
         /// </summary>
         private void RefreshStartupFile(HierarchyNode parent, string oldFile, string newFile) {
+            AssertHasParentHierarchy();
             IVsUIHierarchyWindow2 windows = UIHierarchyUtilities.GetUIHierarchyWindow(
                 Site,
                 new Guid(ToolWindowGuids80.SolutionExplorer)) as IVsUIHierarchyWindow2;
@@ -1631,6 +1664,36 @@ namespace Microsoft.VisualStudioTools.Project {
             }
         }
 
+        /// <summary>
+        /// Set value of user project property
+        /// </summary>
+        /// <param name="propertyName">Name of property</param>
+        /// <param name="propertyValue">Value of property</param>
+        public virtual void SetUserProjectProperty(string propertyName, string propertyValue) {
+            Utilities.ArgumentNotNull("propertyName", propertyName);
+
+            if (_userBuildProject == null) {
+                // user project file doesn't exist yet, create it.
+                _userBuildProject = new MSBuild.Project(BuildProject.ProjectCollection);
+                _userBuildProject.FullPath = FileName + PerUserFileExtension;
+            }
+            _userBuildProject.SetProperty(propertyName, propertyValue ?? String.Empty);
+        }
+
+        /// <summary>
+        /// Get value of user project property
+        /// </summary>
+        /// <param name="propertyName">Name of property</param>
+        public virtual string GetUserProjectProperty(string propertyName) {
+            Utilities.ArgumentNotNull("propertyName", propertyName);
+
+            if (_userBuildProject == null)
+                return null;
+
+            // If user project file exists during project load/reload userBuildProject is initiated 
+            return _userBuildProject.GetPropertyValue(propertyName);
+        }
+
         #endregion
 
         #region IVsProjectSpecificEditorMap2 Members
@@ -1763,16 +1826,16 @@ namespace Microsoft.VisualStudioTools.Project {
         private void MoveFilesForDeferredSave(HierarchyNode node, string basePath, string baseNewPath) {
             if (node != null) {
                 for (var child = node.FirstChild; child != null; child = child.NextSibling) {
-                    bool isOpen, isDirty, isOpenedByUs;
-                    uint docCookie;
-                    IVsPersistDocData persist;
                     var docMgr = child.GetDocumentManager();
-                    if (docMgr != null) {
-                        docMgr.GetDocInfo(out isOpen, out isDirty, out isOpenedByUs, out docCookie, out persist);
+                    if (docMgr != null && docMgr.IsDirty) {
                         int cancelled;
-                        if (isDirty) {
-                            child.ProjectMgr.SaveItem(VSSAVEFLAGS.VSSAVE_Save, null, docCookie, IntPtr.Zero, out cancelled);
-                        }
+                        child.ProjectMgr.SaveItem(
+                            VSSAVEFLAGS.VSSAVE_Save, 
+                            null, 
+                            docMgr.DocCookie, 
+                            IntPtr.Zero, 
+                            out cancelled
+                        );
                     }
 
                     IDiskBasedNode diskNode = child as IDiskBasedNode;

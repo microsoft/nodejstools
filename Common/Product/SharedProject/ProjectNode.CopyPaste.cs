@@ -255,19 +255,16 @@ namespace Microsoft.VisualStudioTools.Project {
             fCancelDrop = 0;
             bool dirty = false;
             foreach (HierarchyNode node in this.ItemsDraggedOrCutOrCopied) {
-                bool isDirty, isOpen, isOpenedByUs;
-                uint docCookie;
-                IVsPersistDocData ppIVsPersistDocData;
-                DocumentManager manager = node.GetDocumentManager();
                 if (node.IsLinkFile) {
                     continue;
                 }
-                if (manager != null) {
-                    manager.GetDocInfo(out isOpen, out isDirty, out isOpenedByUs, out docCookie, out ppIVsPersistDocData);
-                    if (isDirty && isOpenedByUs) {
-                        dirty = true;
-                        break;
-                    }
+
+                DocumentManager manager = node.GetDocumentManager();
+                if (manager != null &&
+                    manager.IsDirty &&
+                    manager.IsOpenedByUs) {
+                    dirty = true;
+                    break;
                 }
             }
 
@@ -294,6 +291,7 @@ namespace Microsoft.VisualStudioTools.Project {
 
                 default:
                     fCancelDrop = 1;
+                    ItemsDraggedOrCutOrCopied.Clear();
                     return VSConstants.S_OK;
             }
 
@@ -350,6 +348,7 @@ namespace Microsoft.VisualStudioTools.Project {
         /// <returns>If the method succeeds, it returns S_OK. If it fails, it returns an error code. </returns>
         public virtual int OnClear(int wasCut) {
             if (wasCut != 0) {
+                AssertHasParentHierarchy();
                 IVsUIHierarchyWindow w = UIHierarchyUtilities.GetUIHierarchyWindow(this.site, HierarchyNode.SolutionExplorer);
                 if (w != null) {
                     foreach (HierarchyNode node in ItemsDraggedOrCutOrCopied) {
@@ -609,7 +608,7 @@ folder you are copying, do you want to replace the existing files?", Path.GetFil
                     ReportMissingItem(folder);
                     return null;
                 }
-                
+
                 if (Path.Combine(targetFolderNode.FullPathToChildren, targetFileName).Length >= NativeMethods.MAX_FOLDER_PATH) {
                     VsShellUtilities.ShowMessageBox(
                         Project.Site,
@@ -773,15 +772,19 @@ folder you are copying, do you want to replace the existing files?", Path.GetFil
                     bool wasExpanded = false;
                     HierarchyNode newNode;
                     var sourceFolder = Project.FindNodeByFullPath(SourceFolder) as FolderNode;
+                    bool isNonMember = false;
                     if (sourceFolder == null || DropEffect != DropEffect.Move) {
                         newNode = Project.CreateFolderNodes(NewFolderPath);
                     } else {
                         // Rename the folder & reparent our existing FolderNode w/ potentially w/ a new ID,
                         // but don't update the children as we'll handle that w/ our file additions...
                         wasExpanded = sourceFolder.GetIsExpanded();
-                        sourceFolder.ReparentFolder(NewFolderPath);
                         Directory.CreateDirectory(NewFolderPath);
+                        sourceFolder.ReparentFolder(NewFolderPath);
+
+                        sourceFolder.ExpandItem(wasExpanded ? EXPANDFLAGS.EXPF_ExpandFolder : EXPANDFLAGS.EXPF_CollapseFolder);
                         newNode = sourceFolder;
+                        isNonMember = sourceFolder.IsNonMemberItem;
                     }
 
                     foreach (var addition in Additions) {
@@ -789,10 +792,14 @@ folder you are copying, do you want to replace the existing files?", Path.GetFil
                     }
 
                     if (sourceFolder != null) {
-                        if (sourceFolder.IsNonMemberItem) {
+                        if (isNonMember) {
                             // copying or moving an existing excluded folder, new folder
                             // is excluded too.
                             ErrorHandler.ThrowOnFailure(newNode.ExcludeFromProject());
+                        } else if (sourceFolder.Parent.IsNonMemberItem) {
+                            // We've moved an included folder to a show all files folder,
+                            //     add the parent to the project   
+                            ErrorHandler.ThrowOnFailure(sourceFolder.Parent.IncludeInProject(false));
                         }
 
                         if (DropEffect == DropEffect.Move) {
@@ -806,10 +813,8 @@ folder you are copying, do you want to replace the existing files?", Path.GetFil
 
                     // Send OnItemRenamed for the folder now, after all of the children have been renamed
                     Project.Tracker.OnItemRenamed(SourceFolder, NewFolderPath, VSRENAMEFILEFLAGS.VSRENAMEFILEFLAGS_Directory);
-                    
-                    if (wasExpanded) {
-                        sourceFolder.ExpandItem(EXPANDFLAGS.EXPF_ExpandFolder);
-                    }
+
+                    sourceFolder.ExpandItem(wasExpanded ? EXPANDFLAGS.EXPF_ExpandFolder : EXPANDFLAGS.EXPF_CollapseFolder);
                 }
             }
 
@@ -1087,11 +1092,11 @@ folder you are copying, do you want to replace the existing files?", Path.GetFil
 
                 public override void DoAddition() {
                     var existing = Project.FindNodeByFullPath(Moniker);
-                    existing.Parent.RemoveChild(existing);
                     Project.OnItemDeleted(existing);
+                    existing.Parent.RemoveChild(existing);
 
                     existing.ID = Project.ItemIdMap.Add(existing);
-                    
+
                     var newParent = TargetFolder == Project.ProjectHome ? Project : Project.FindNodeByFullPath(TargetFolder);
                     newParent.AddChild(existing);
                     Project.ItemsDraggedOrCutOrCopied.Remove(existing); // we don't need to remove the file after Paste
@@ -1724,6 +1729,6 @@ folder you are copying, do you want to replace the existing files?", Path.GetFil
             _copyCutState = CopyCutState.None;
         }
 
-        
+
     }
 }

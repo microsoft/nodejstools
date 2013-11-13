@@ -317,6 +317,8 @@ namespace Microsoft.VisualStudioTools.Project
         /// </summary>
         private FolderNode _folderBeingCreated;
 
+        private readonly ExtensibilityEventsDispatcher extensibilityEventsDispatcher;
+
         #endregion
 
         #region abstract properties
@@ -415,6 +417,18 @@ namespace Microsoft.VisualStudioTools.Project
         #endregion
 
         #region properties
+
+        internal bool IsProjectOpened {
+            get {
+                return projectOpened;
+            }
+        }
+
+        internal ExtensibilityEventsDispatcher ExtensibilityEventsDispatcher {
+            get {
+                return extensibilityEventsDispatcher; 
+            }
+        }
 
         /// <summary>
         /// Gets the folder node which is currently being added to the project via
@@ -919,6 +933,7 @@ namespace Microsoft.VisualStudioTools.Project
 
         protected ProjectNode()
         {
+            this.extensibilityEventsDispatcher = new ExtensibilityEventsDispatcher(this);
             this.Initialize();
         }
 
@@ -5559,6 +5574,8 @@ If the files in the existing folder have the same names as files in the folder y
         /// <returns>parent node</returns>
         internal HierarchyNode GetItemParentNode(MSBuild.ProjectItem item)
         {
+            UIThread.Instance.MustBeCalledFromUIThread();
+
             var link = item.GetMetadataValue(ProjectFileConstants.Link);
             HierarchyNode currentParent = this;
             string strPath = item.EvaluatedInclude;
@@ -5597,6 +5614,11 @@ If the files in the existing folder have the same names as files in the folder y
 
         private MSBuildExecution.ProjectPropertyInstance GetMsBuildProperty(string propertyName, bool resetCache)
         {
+            if (isDisposed)
+            {
+                throw new ObjectDisposedException(null);
+            }
+
             if (resetCache || this.currentConfig == null)
             {
                 // Get properties from project file and cache it
@@ -6061,6 +6083,8 @@ If the files in the existing folder have the same names as files in the folder y
         /// Finds a node by it's full path on disk.
         /// </summary>
         internal HierarchyNode FindNodeByFullPath(string name) {
+            UIThread.Instance.MustBeCalledFromUIThread();
+
             Debug.Assert(Path.IsPathRooted(name));
             HierarchyNode res;
             _diskNodes.TryGetValue(name, out res);
@@ -6286,6 +6310,8 @@ If the files in the existing folder have the same names as files in the folder y
             Utilities.ArgumentNotNull("parent", parent);
             Utilities.ArgumentNotNull("child", child);
 
+            UIThread.Instance.MustBeCalledFromUIThread();
+
             IDiskBasedNode diskNode = child as IDiskBasedNode;
             if (diskNode != null) {
                 _diskNodes[diskNode.Url] = child;
@@ -6294,6 +6320,8 @@ If the files in the existing folder have the same names as files in the folder y
             if ((EventTriggeringFlag & ProjectNode.EventTriggering.DoNotTriggerHierarchyEvents) != 0) {
                 return;
             }
+
+            ExtensibilityEventsDispatcher.FireItemAdded(child);
 
             HierarchyNode prev = child.PreviousVisibleSibling;
             uint prevId = (prev != null) ? prev.HierarchyId : VSConstants.VSITEMID_NIL;
@@ -6306,14 +6334,22 @@ If the files in the existing folder have the same names as files in the folder y
         }
 
         internal void OnItemDeleted(HierarchyNode deletedItem) {
+            UIThread.Instance.MustBeCalledFromUIThread();
+
             IDiskBasedNode diskNode = deletedItem as IDiskBasedNode;
             if (diskNode != null) {
                 _diskNodes.Remove(diskNode.Url);
             }
 
+            RaiseItemDeleted(deletedItem);
+        }
+
+        internal void RaiseItemDeleted(HierarchyNode deletedItem) {
             if ((EventTriggeringFlag & ProjectNode.EventTriggering.DoNotTriggerHierarchyEvents) != 0) {
                 return;
             }
+
+            ExtensibilityEventsDispatcher.FireItemRemoved(deletedItem);
 
             if (_hierarchyEventSinks.Count > 0) {
                 // Note that in some cases (deletion of project node for example), an Advise
@@ -6631,9 +6667,22 @@ If the files in the existing folder have the same names as files in the folder y
         #endregion
 
         public void UpdatePathForDeferredSave(string oldPath, string newPath) {
+            UIThread.Instance.MustBeCalledFromUIThread();
+
             var existing = _diskNodes[oldPath];
             _diskNodes.Remove(oldPath);
             _diskNodes.Add(newPath, existing);
+        }
+
+        [Conditional("DEBUG")]
+        internal void AssertHasParentHierarchy() {
+            // Calling into solution explorer before a parent hierarchy is assigned can
+            // cause us to corrupt solution explorer if we're using flavored projects.  We
+            // will call in with our inner project node and later we get wrapped in an
+            // aggregate COM object which has different object identity.  At that point
+            // solution explorer is confused because it uses object identity to track
+            // the hierarchies.
+            Debug.Assert(parentHierarchy != null, "dont call into the hierarchy before the project is loaded, it corrupts the hierarchy");
         }
     }
 }

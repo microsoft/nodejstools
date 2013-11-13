@@ -201,11 +201,11 @@ namespace Microsoft.NodejsTools.Debugger.DebugEngine {
         // Gets the language information for this code context.
         public int GetLanguageInfo(ref string pbstrLanguage, ref Guid pguidLanguage) {
             if (_documentContext != null) {
-                _documentContext.GetLanguageInfo(ref pbstrLanguage, ref pguidLanguage);
-                return VSConstants.S_OK;
-            } else {
-                return VSConstants.S_FALSE;
+                return _documentContext.GetLanguageInfo(ref pbstrLanguage, ref pguidLanguage);
             }
+            pbstrLanguage = NodejsConstants.Nodejs;
+            pguidLanguage = GuidList.guidNodejsDebugLanguage;
+            return VSConstants.S_OK;
         }
 
         #endregion

@@ -15,6 +15,9 @@
 using System;
 using System.Diagnostics;
 using System.IO;
+using System.Text;
+using System.Text.RegularExpressions;
+using Microsoft.NodejsTools.Intellisense;
 using Microsoft.VisualStudio;
 using Microsoft.VisualStudioTools;
 using Microsoft.VisualStudioTools.Project;
@@ -22,22 +25,85 @@ using Microsoft.VisualStudioTools.Project;
 namespace Microsoft.NodejsTools.Project {
     class NodejsFileNode : CommonFileNode {
         private FileSystemWatcher _watcher;
-        public string _currentText;
+        private string _currentText;
+        internal int _requireCount;
+        internal readonly string _tempFilePath, _asyncFilePath;
+        internal readonly ReferenceGroup _refGroup;
+        internal int _fileId;
+        private static Regex _requireRegexSingleQuote = new Regex("require\\(('.*')\\)", RegexOptions.Compiled);
+        private static Regex _requireRegexDoubleQuote = new Regex("require\\((\".*\")\\)", RegexOptions.Compiled);
 
         public NodejsFileNode(NodejsProjectNode root, ProjectElement e)
             : base(root, e) {
             CreateWatcher(Url);
+            _tempFilePath = NodejsProjectNode.GetReferenceFilePath();
+            _asyncFilePath = NodejsProjectNode.GetReferenceFilePath();
             _currentText = "";
+            _refGroup = root._refGroupDispenser.AddFile(this);
+            _fileId = root._currentFileCounter++;
             if (File.Exists(Url)) { // avoid the exception if we can
                 try {
                     _currentText = File.ReadAllText(Url);
+                    GenerateReferenceFile();
                 } catch {
                 }
+            }
 
+            root._nodeFiles.Add(this);
+        }
+
+        internal string MangledModuleFunctionName {
+            get {
+                return NodejsConstants.NodejsHiddenUserModule + _fileId;
             }
-            lock (root._nodeFiles) {
-                root._nodeFiles.Add(this);
+        }
+
+        private void GenerateReferenceFile() {
+            _refGroup.GenerateReferenceFile();
+                
+            StringBuilder code = new StringBuilder();
+            code.AppendLine(NodejsProjectionBuffer.GetFileNameAssignment(Url));
+            code.AppendLine(NodejsProjectionBuffer.GetDirectoryNameAssignment(Url));
+
+            int requireCount = 0;
+            foreach (Match match in _requireRegexSingleQuote.Matches(_currentText)) {
+                code.AppendFormat("require({0});", match.Groups[1]);
+                code.AppendLine();
+                requireCount++;
             }
+            foreach (Match match in _requireRegexDoubleQuote.Matches(_currentText)) {
+                code.AppendFormat("require({0});", match.Groups[1]);
+                code.AppendLine();
+                requireCount++;
+            }
+            _requireCount = requireCount;
+            code.AppendLine();
+
+            NodejsProjectNode.WriteReferenceFile(_tempFilePath, code.ToString());
+            NodejsProjectNode.WriteReferenceFile(_asyncFilePath, "_$asyncRequests.add({ src: '" + _tempFilePath.Replace("\\", "\\\\") + "'});\r\n");
+        }
+
+        internal string GenerateReferenceCode() {
+            StringBuilder code = new StringBuilder();
+
+            code.Append(
+                NodejsProjectionBuffer.GetNodeFunctionWrapperHeader(
+                    MangledModuleFunctionName,
+                    Url
+                )
+            );
+            // publish it at the start for recursive modules, may change later if user 
+            // does module.exports = .... in which case we will republish at the end.
+            code.AppendFormat(NodejsConstants.NodejsHiddenUserModuleInstance + "{0} = module.exports;", _fileId);
+            code.AppendLine();
+
+            code.Append(_currentText);
+            code.AppendLine();
+            code.AppendFormat(NodejsConstants.NodejsHiddenUserModuleInstance + "{0} = module.exports;", _fileId);
+            code.Append(NodejsProjectionBuffer.TrailingText);
+            code.AppendLine();
+            code.AppendLine();
+            return code.ToString();
         }
 
         internal override int ExecCommandOnNode(Guid guidCmdGroup, uint cmd, uint nCmdexecopt, IntPtr pvaIn, IntPtr pvaOut) {
@@ -100,6 +166,7 @@ namespace Microsoft.NodejsTools.Project {
                 _watcher = new FileSystemWatcher(Path.GetDirectoryName(filename), Path.GetFileName(filename));
                 _watcher.EnableRaisingEvents = true;
                 _watcher.Changed += FileContentsChanged;
+                _watcher.Renamed += FileContentsChanged;
                 _watcher.NotifyFilter = NotifyFilters.LastWrite;
             }
         }
@@ -135,7 +202,13 @@ namespace Microsoft.NodejsTools.Project {
                     System.Threading.Thread.Sleep(250);
                 }
             }
-            ((NodejsProjectNode)this.ProjectMgr).UpdateReferenceFile();
+            _fileId = ProjectMgr._currentFileCounter++;
+            GenerateReferenceFile();
+
+            // Uncomment this line when working on the generated reference file.  It'll enable updating
+            // it via a simple file save.  During normal development the reference file only needs to be
+            // updated when the files in the project and/or on disk change.
+            //ProjectMgr.UpdateReferenceFile(this);
         }
 
         public override void Remove(bool removeFromStorage) {
@@ -145,11 +218,16 @@ namespace Microsoft.NodejsTools.Project {
 
         public override void Close() {
             base.Close();
-            
+
             CloseWatcher();
 
-            lock (((NodejsProjectNode)ProjectMgr)._nodeFiles) {
-                ((NodejsProjectNode)ProjectMgr)._nodeFiles.Remove(this);
+            ((NodejsProjectNode)ProjectMgr)._refGroupDispenser.RemoveFile(this);
+            ((NodejsProjectNode)ProjectMgr)._nodeFiles.Remove(this);
+
+            try {
+                File.Delete(_tempFilePath);
+            } catch (IOException) {
+            } catch (UnauthorizedAccessException) {
             }
         }
     }

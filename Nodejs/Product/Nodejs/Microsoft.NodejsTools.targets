@@ -7,30 +7,23 @@
 
   <!-- *********************************************************************************** -->
   <!-- Normal install environment, use the current version -->
-  <PropertyGroup Condition="$(NTVS_DEV) == '' and $(MSBuildThisFile)!='Microsoft.NodejsTools.Developer.targets'">
+  <PropertyGroup>
     <TargetFrameworkVersion>v4.0</TargetFrameworkVersion>
     <NodejsSupportPath>$(MSBuildExtensionsPath)\Microsoft\VisualStudio\v$(VisualStudioVersion)\Node.js Tools\</NodejsSupportPath>
     <PTVSSupportPath>$(MSBuildExtensionsPath)\Microsoft\VisualStudio\v$(VisualStudioVersion)\Node.js Tools\</PTVSSupportPath>
   </PropertyGroup>
-  <!-- *********************************************************************************** -->
-  <!-- Dev environment for PTVS, use the current version -->
-  <PropertyGroup Condition="$(NTVS_DEV) == 'true' or $(MSBuildThisFile)=='Microsoft.NodejsTools.Developer.targets'">
-    <TargetFrameworkVersion>v4.0</TargetFrameworkVersion>
-    <NodejsSupportVersion>0.5</NodejsSupportVersion>
-    <NodejsSupportPath
-      Condition="Exists('$(LOCALAPPDATA)\Microsoft\VisualStudio\$(VisualStudioVersion)Exp\Extensions\Microsoft\Node.js Tools for Visual Studio, Django Support\$(NodejsSupportVersion)\wfastcgi.py')">$(LOCALAPPDATA)\Microsoft\VisualStudio\$(VisualStudioVersion)Exp\Extensions\Microsoft\Node.js Tools for Visual Studio, Django Support\$(NodejsSupportVersion)\</NodejsSupportPath>
 
-    <PTVSSupportPath
-      Condition="Exists('$(LOCALAPPDATA)\Microsoft\VisualStudio\$(VisualStudioVersion)Exp\Extensions\Microsoft\Node.js Tools for Visual Studio\$(NodejsSupportVersion)\WebPICmdLine.exe')">$(LOCALAPPDATA)\Microsoft\VisualStudio\$(VisualStudioVersion)Exp\Extensions\Microsoft\Node.js Tools for Visual Studio\$(NodejsSupportVersion)\</PTVSSupportPath>
-  </PropertyGroup>
+  <Target Name="GetTargetFrameworkVersion" Returns="$(TargetFrameworkVersion)" />
+  <Target Name="GetTargetFrameworkDirectories" Returns="" />
+  <Target Name="GetTargetFrameworkMoniker" Returns="" />
+  <Target Name="GetTargetFrameworkMonikerDisplayName" Returns="" />
+  <Target Name="CreateManifestResourceNames" Returns=""/>
 
-  <Target Name="GetTargetFrameworkVersion" Returns="$(TargetFrameworkVersion)" Condition="$(NTVS_DEV) == '' or $(MSBuildThisFile)=='Microsoft.NodejsTools.Developer.targets'"/>
-  <Target Name="GetTargetFrameworkDirectories" Returns="" Condition="$(NTVS_DEV) == '' or $(MSBuildThisFile)=='Microsoft.NodejsTools.Developer.targets'"/>
-  <Target Name="GetTargetFrameworkMoniker" Returns="" Condition="$(NTVS_DEV) == '' or $(MSBuildThisFile)=='Microsoft.NodejsTools.Developer.targets'"/>
-  <Target Name="GetTargetFrameworkMonikerDisplayName" Returns="" Condition="$(NTVS_DEV) == '' or $(MSBuildThisFile)=='Microsoft.NodejsTools.Developer.targets'"/>
-  <Target Name="CreateManifestResourceNames" Returns="" Condition="$(NTVS_DEV) == '' or $(MSBuildThisFile)=='Microsoft.NodejsTools.Developer.targets'"/>
-
-  <Import Project="$(MSBuildToolsPath)\Microsoft.Common.targets" Condition="$(NTVS_DEV) == '' or $(MSBuildThisFile)=='Microsoft.NodejsTools.Developer.targets'"/>
+  <Import Project="$(MSBuildToolsPath)\Microsoft.Common.targets"/>
+  
+  <ItemGroup>
+    <NodeModulesContent Include="$(ProjectHome)\node_modules\**\*.*"/>
+  </ItemGroup>
 
   <Target Name="Build">
     <Message Text="Content=@(Content->'%(RelativeDir)%(Filename)%(Extension)')"/>
@@ -50,27 +43,40 @@
           SkipUnchangedFiles="true">
       <!-- <Output TaskParameter="DestinationFiles" ItemName="FilesCopiedToIntermediate"/> -->
     </Copy>
+    <Copy SourceFiles="@(NodeModulesContent)"
+          DestinationFiles="@(NodeModulesContent->'$(IntermediateOutputPath)%(RelativeDir)%(Filename)%(Extension)')"
+          SkipUnchangedFiles="true">    
+    </Copy>
+    <Copy SourceFiles="@(NodejsAzureDeploymentFile)"
+          DestinationFolder="bin"
+          SkipUnchangedFiles="true">
+      <Output TaskParameter="DestinationFiles" ItemName="FilesCopiedToIntermediate"/>
+    </Copy>
   </Target>
-  
+
+  <ItemGroup>
+    <NodejsAzureDeploymentFile Include="$(NodejsSupportPath)Microsoft.NodejsTools.WebRole.dll"></NodejsAzureDeploymentFile>
+  </ItemGroup>
   <Target
     Name="GetTargetPath"
     DependsOnTargets="Build"
     Returns="@(ScriptAndWebDeployFiles)"
-    Condition="$(NTVS_DEV) == '' or $(MSBuildThisFile)=='Microsoft.NodejsTools.Developer.targets'"
     >
-    <Warning Text="!!!!!!!!! USING DEVELOPMENT VERSION OF Microsoft.NodejsTools.targets" Condition="$(MSBuildThisFile)=='Microsoft.NodejsTools.Developer.targets'"/>
-
     <ItemGroup>
-      <ScriptAndWebDeployFiles Include="@(FilesCopiedToIntermediate->'%(RootDir)%(Directory)%(Filename)%(Extension)')"/>
-      <NodejsBinFiles Include="bin\**\*" />
+      <NodejsBinFiles Include="bin\**\*"  Exclude="bin\Microsoft.NodejsTools.WebRole.dll"/>
       <ScriptAndWebDeployFiles Include="@(NodejsBinFiles->'%(RootDir)%(Directory)%(Filename)%(Extension)')"/>
+      <ScriptAndWebDeployFiles Include="@(FilesCopiedToIntermediate->'%(RootDir)%(Directory)%(Filename)%(Extension)')" />
+<!-- 
+      <NodejsAzureDeploymentFileLocal Include="@(NodejsAzureDeploymentFile->'bin\%(Filename)%(Extension)')" />
+      <ScriptAndWebDeployFiles Include="@(NodejsAzureDeploymentFileLocal->'%(RootDir)%(Directory)%(Filename)%(Extension)')"/>
+      -->
     </ItemGroup>
     <Message Text="ScriptAndWebDeployFiles=@(ScriptAndWebDeployFiles)"  />
   </Target>
-  <Target Name="WatGetTargetFrameworkDirectories" Returns="" Condition="$(NTVS_DEV) == '' or $(MSBuildThisFile)=='Microsoft.NodejsTools.Developer.targets'" />
-  <Target Name="BuiltProjectOutputGroupDependencies" Returns="" Condition="$(NTVS_DEV) == '' or $(MSBuildThisFile)=='Microsoft.NodejsTools.Developer.targets'" />
-  <Target Name="WatGetTargetFrameworkMoniker" Returns="" Condition="$(NTVS_DEV) == '' or $(MSBuildThisFile)=='Microsoft.NodejsTools.Developer.targets'"/>
-  <Target Name="WatGetTargetFrameworkMonikerDisplayName" Returns="" Condition="$(NTVS_DEV) == '' or $(MSBuildThisFile)=='Microsoft.NodejsTools.Developer.targets'" />
+  <Target Name="WatGetTargetFrameworkDirectories" Returns="" />
+  <Target Name="BuiltProjectOutputGroupDependencies" Returns="" />
+  <Target Name="WatGetTargetFrameworkMoniker" Returns="" />
+  <Target Name="WatGetTargetFrameworkMonikerDisplayName" Returns="" />
 
   <PropertyGroup>
     <CleanWPPAllFilesInSingleFolder Condition="'$(CleanWPPAllFilesInSingleFolder)' == ''">false</CleanWPPAllFilesInSingleFolder>
@@ -88,6 +94,7 @@
       <_FoundWebConfig Include="@(Content)" Condition=" '%(Content.Filename)%(Content.Extension)' == 'web.config' " />
       <_FoundWebConfig Include="@(Include)" Condition=" '%(Content.Filename)%(Content.Extension)' == 'web.config' " />
     </ItemGroup>
+
     <Error 
       Text="web.config not found in project, to create a project to deploy to Windows Azure you must create a Windows Azure Node.js project." 
       Condition="'@(_FoundWebConfig)' == ''"/>
@@ -95,9 +102,21 @@
       <ContentFiles Include="@(Content)"></ContentFiles>
       <ContentFiles Include="@(Compile)"></ContentFiles>
       <ContentFiles Include="@(Include)"></ContentFiles>
+      <ContentFiles Include="@(NodeModulesContent)"></ContentFiles>
+      <Content Include="@(NodeModulesContent)"/>
 
+      <GeneratedFiles Include="@(NodejsAzureDeploymentFile)" />
+      
       <TransformedFilenames Include="@(ContentFiles->'%(FullPath)')">
         <DestinationRelativePath>%(RelativeDir)%(Filename)%(Extension)</DestinationRelativePath>
+        <Exclude>false</Exclude>
+        <FromTarget>Unknown</FromTarget>
+        <Category>Run</Category>
+        <ProjectFileType>Default</ProjectFileType>
+      </TransformedFilenames>
+
+      <TransformedFilenames Include="@(GeneratedFiles)">
+        <DestinationRelativePath>bin\%(Filename)%(Extension)</DestinationRelativePath>
         <Exclude>false</Exclude>
         <FromTarget>Unknown</FromTarget>
         <Category>Run</Category>
@@ -106,8 +125,8 @@
     </ItemGroup>
   </Target>
 
-  <Target Name="GenerateManifests" Returns="" Condition="$(NTVS_DEV) == '' or $(MSBuildThisFile)=='Microsoft.NodejsTools.Developer.targets'"/>
-  <Target Name="PrepareForBuild" DependsOnTargets="$(PrepareForBuildDependsOn)" Condition="$(NTVS_DEV) == '' or $(MSBuildThisFile)=='Microsoft.NodejsTools.Developer.targets'">
+  <Target Name="GenerateManifests" Returns="" />
+  <Target Name="PrepareForBuild" DependsOnTargets="$(PrepareForBuildDependsOn)" >
     <!-- 
         These CreateProperty calls are required because TargetDir and TargetPath are defined 
         to contain an item list. We want that item list to be expanded so that it can be used
@@ -158,7 +177,4 @@
     <!-- Node.js compile files are actually content -->
     <Content Include="@(Compile)" />
   </ItemGroup>
-
- 
-  <Import Project="$(NodejsSupportPath)Microsoft.NodejsTools.Developer.targets" Condition="$(NTVS_DEV) == 'true' and $(MSBuildThisFile)=='Microsoft.NodejsTools.targets'"/>
 </Project>

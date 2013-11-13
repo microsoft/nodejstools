@@ -32,6 +32,14 @@
       <RefTargetDir>INSTALLLOCATION</RefTargetDir>
       <DoNotHarvest>true</DoNotHarvest>
     </ProjectReference>
+    <ProjectReference Include="$(BuildRoot)\Nodejs\Product\WebRole\WebRole.csproj">
+      <Name>Microsoft.NodeTools.WebRole</Name>
+      <Project>{712D84EC-B2A6-46D1-B030-BA697AE5E554}</Project>
+      <Private>True</Private>
+      <RefProjectOutputGroups>Binaries;Content;Satellites</RefProjectOutputGroups>
+      <RefTargetDir>INSTALLLOCATION</RefTargetDir>
+      <DoNotHarvest>true</DoNotHarvest>
+    </ProjectReference>
   </ItemGroup>
   <Import Project="..\SetupProjectAfter.settings" />
 </Project>

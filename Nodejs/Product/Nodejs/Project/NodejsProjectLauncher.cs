@@ -250,7 +250,7 @@ namespace Microsoft.NodejsTools.Project {
 
         class OnPortOpenedInfo {
             public readonly int Port;
-            public readonly TimeSpan Timeout;
+            public readonly TimeSpan? Timeout;
             public readonly int Sleep;
             public readonly Func<bool> ShortCircuitPredicate;
             public readonly Action Action;
@@ -264,7 +264,9 @@ namespace Microsoft.NodejsTools.Project {
                 Action action = null
             ) {
                 Port = port;
-                Timeout = TimeSpan.FromMilliseconds(timeout ?? 60000);  // 1 min timeout
+                if (timeout.HasValue) {
+                    Timeout = TimeSpan.FromMilliseconds(Convert.ToDouble(timeout));
+                }
                 Sleep = sleep ?? 500;                                   // 1/2 second sleep
                 ShortCircuitPredicate = shortCircuitPredicate ?? (() => false);
                 Action = action ?? (() => {});
@@ -313,7 +315,7 @@ namespace Microsoft.NodejsTools.Project {
                         }
 
                         // Timeout
-                        if ((System.DateTime.Now - info.StartTime) >= info.Timeout) {
+                        if (info.Timeout.HasValue && (System.DateTime.Now - info.StartTime) >= info.Timeout) {
                             break;
                         }
 

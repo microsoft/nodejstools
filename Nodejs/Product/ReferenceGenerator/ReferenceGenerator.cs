@@ -396,6 +396,8 @@ namespace Microsoft.NodejsTools.Intellisense {
         private void GenerateRequire(StringBuilder res, dynamic all) {
             res.AppendLine("require = function () {");
             res.AppendLine("    var require_count = 0;");
+            res.AppendLine("    var require_depth = 0;");
+            res.AppendLine("    var max_require_depth = 5;");
             res.AppendLine("    var cache = {");
 
             foreach (var module in all["modules"]) {
@@ -431,10 +433,17 @@ namespace Microsoft.NodejsTools.Intellisense {
         try { 
             var __prevFilename = __filename;
             var __prevDirname = __dirname;
-            // **NTVS** INSERT USER MODULE SWITCH HERE **NTVS**
+            var __prevMaxRequireDepth = max_require_depth;
+            require_depth++;
+            try {
+                // **NTVS** INSERT USER MODULE SWITCH HERE **NTVS**
+            } finally {
+                require_depth--;
+            }
         } finally {
             __filename = __prevFilename;
             __dirname = __prevDirname;
+            max_require_depth = __prevMaxRequireDepth;
         }
     }
     o.__proto__ = f.__proto__;

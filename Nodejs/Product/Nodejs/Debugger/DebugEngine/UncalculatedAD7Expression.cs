@@ -46,13 +46,11 @@ namespace Microsoft.NodejsTools.Debugger.DebugEngine {
         //
         // This is primarily used for the immediate window which this engine does not currently support.
         int IDebugExpression2.EvaluateAsync(enum_EVALFLAGS dwFlags, IDebugEventCallback2 pExprCallback) {
-            _frame.StackFrame.ExecuteText(_expression, (obj) => {
-                _frame.Engine.Send(
-                    new AD7ExpressionEvaluationCompleteEvent(this, new AD7Property(_frame, obj, _writable)), 
-                    AD7ExpressionEvaluationCompleteEvent.IID, 
-                    _frame.Engine, 
-                    _frame.Thread);
-            });
+            _frame.StackFrame.ExecuteText(_expression, obj => _frame.Engine.Send(
+                new AD7ExpressionEvaluationCompleteEvent(this, new AD7Property(_frame, obj)), 
+                AD7ExpressionEvaluationCompleteEvent.IID, 
+                _frame.Engine, 
+                _frame.Thread));
             return VSConstants.S_OK;
         }
 
@@ -60,7 +58,7 @@ namespace Microsoft.NodejsTools.Debugger.DebugEngine {
         int IDebugExpression2.EvaluateSync(enum_EVALFLAGS dwFlags, uint dwTimeout, IDebugEventCallback2 pExprCallback, out IDebugProperty2 ppResult) {
             AutoResetEvent completion = new AutoResetEvent(false);
             NodeEvaluationResult result = null;
-            _frame.StackFrame.ExecuteText(_expression, (obj) => {
+            _frame.StackFrame.ExecuteText(_expression, obj => {
                 result = obj;
                 completion.Set();
             });
@@ -75,11 +73,20 @@ namespace Microsoft.NodejsTools.Debugger.DebugEngine {
             if (_frame.StackFrame.Thread.Process.HasExited || result == null) {
                 ppResult = null;
                 return VSConstants.E_FAIL;
-            } else if (result == null) {
+            }
+            if (result == null) {
                 ppResult = null;
                 return DebuggerConstants.E_EVALUATE_TIMEOUT;
             }
-            ppResult = new AD7Property(_frame, result, _writable);
+            if (!string.IsNullOrEmpty(result.ExceptionText)) {
+                ppResult = null;
+                return VSConstants.E_FAIL;
+            }
+            if (!_writable) {
+                result.Type |= NodeExpressionType.ReadOnly;
+            }
+
+            ppResult = new AD7Property(_frame, result);
 
             return VSConstants.S_OK;
         }

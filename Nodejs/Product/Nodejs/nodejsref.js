@@ -483,6 +483,8 @@ intellisense.addEventListener('statementcompletion', function (event) {
 global = {};
 require = function () {
     var require_count = 0;
+    var require_depth = 0;
+    var max_require_depth = 5;
     var cache = {
         "timers": null,
         "module": null,
@@ -3885,10 +3887,17 @@ require = function () {
         try { 
             var __prevFilename = __filename;
             var __prevDirname = __dirname;
-            // **NTVS** INSERT USER MODULE SWITCH HERE **NTVS**
+            var __prevMaxRequireDepth = max_require_depth;
+            require_depth++;
+            try {
+                // **NTVS** INSERT USER MODULE SWITCH HERE **NTVS**
+            } finally {
+                require_depth--;
+            }
         } finally {
             __filename = __prevFilename;
             __dirname = __prevDirname;
+            max_require_depth = __prevMaxRequireDepth;
         }
     }
     o.__proto__ = f.__proto__;
@@ -4072,4 +4081,4 @@ require = function () {
     this.platform = 'win32';
     /// <field name='maxTickDepth'><p>Callbacks passed to <code>process.nextTick</code> will <em>usually</em> be called at the end of the current flow of execution, and are thus approximately as fast as calling a function synchronously.  Left unchecked, this would starve the event loop, preventing any I/O from occurring.  </p> <p>Consider this code:  </p> <pre><code>process.nextTick(function foo() {   process.nextTick(foo); });</code></pre> <p>In order to avoid the situation where Node is blocked by an infinite loop of recursive series of nextTick calls, it defers to allow some I/O to be done every so often.  </p> <p>The <code>process.maxTickDepth</code> value is the maximum depth of nextTick-calling nextTick-callbacks that will be evaluated before allowing other forms of I/O to occur.  </p> </field>
     this.maxTickDepth = 1000;
-};  
+};

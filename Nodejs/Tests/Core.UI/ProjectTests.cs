@@ -38,19 +38,6 @@ namespace Microsoft.Nodejs.Tests.UI {
             NodejsTestData.Deploy();
         }
 
-        [TestCleanup]
-        public void MyTestCleanup() {
-            for (int i = 0; i < 20; i++) {
-                try {
-                    VsIdeTestHostContext.Dte.Solution.Close(false);
-                    break;
-                } catch {
-                    VsIdeTestHostContext.Dte.Documents.CloseAll(EnvDTE.vsSaveChanges.vsSaveChangesNo);
-                    System.Threading.Thread.Sleep(500);
-                }
-            }
-        }
-
         /// <summary>
         /// https://nodejstools.codeplex.com/workitem/270
         /// </summary>
@@ -154,10 +141,11 @@ http.createServer(function (req, res) {
             Window window;
             var openFile = OpenProjectItem("server.js", out window);
 
-            var app = new VisualStudioApp(VsIdeTestHostContext.Dte);
-            app.OpenSolutionExplorer();
-            var solutionExplorer = app.SolutionExplorerTreeView;
-            solutionExplorer.WaitForItemRemoved("Solution 'NodeAppWithModule' (1 project)", "NodeAppWithModule", "References");
+            using (var app = new VisualStudioApp(VsIdeTestHostContext.Dte)) {
+                app.OpenSolutionExplorer();
+                var solutionExplorer = app.SolutionExplorerTreeView;
+                solutionExplorer.WaitForItemRemoved("Solution 'NodeAppWithModule' (1 project)", "NodeAppWithModule", "References");
+            }
         }
 
         [TestMethod, Priority(0), TestCategory("Core")]
@@ -168,11 +156,12 @@ http.createServer(function (req, res) {
 
             openFile.MoveCaret(6, 1);
             Keyboard.Type("process.");
-            var session = openFile.WaitForSession<ICompletionSession>();
+            using (var session = openFile.WaitForSession<ICompletionSession>()) {
 
-            var completions = session.CompletionSets.First().Completions.Select(x => x.InsertionText);
-            Assert.IsTrue(completions.Contains("abort"));
-            Assert.IsTrue(completions.Contains("chdir"));
+                var completions = session.Session.CompletionSets.First().Completions.Select(x => x.InsertionText);
+                Assert.IsTrue(completions.Contains("abort"));
+                Assert.IsTrue(completions.Contains("chdir"));
+            }
         }
 
         [TestMethod, Priority(0), TestCategory("Core")]
@@ -194,6 +183,7 @@ http.createServer(function (req, res) {
                 new { File="server.js", Line = 42, Type = "recursive.", Expected = "recursive1" },
                 new { File="server.js", Line = 42, Type = "recursive.", Expected = "recursive2" },
                 new { File="server.js", Line = 48, Type = "nested.", Expected = "__filename" },
+                new { File="server.js", Line = 54, Type = "indexfolder.", Expected = "indexfolder" },
 
                 new { File="node_modules\\mymod.js", Line = 5, Type = "dup.", Expected = "node_modules_dup" },
                 new { File="node_modules\\mymod.js", Line = 8, Type = "dup0.", Expected = "node_modules_dup" },
@@ -218,32 +208,34 @@ http.createServer(function (req, res) {
             string curFile = null;
             Window window;
             EditorWindow openFile = null;
-            var app = new VisualStudioApp(VsIdeTestHostContext.Dte);
-            app.OpenSolutionExplorer();
-            
-            foreach (var testCase in testCases) {
-                if (testCase.File != curFile) {
-                    openFile = OpenProjectItem(testCase.File, out window, @"TestData\RequireTestApp\RequireTestApp.sln");
-                    app.SolutionExplorerTreeView.WaitForItem("Solution 'RequireTestApp' (1 project)", "RequireTestApp", "References");
-                    text = openFile.Text;
-                    curFile = testCase.File;
+            using (var app = new VisualStudioApp(VsIdeTestHostContext.Dte)) {
+
+                foreach (var testCase in testCases) {
+                    if (testCase.File != curFile) {
+                        openFile = OpenProjectItem(testCase.File, out window, @"TestData\RequireTestApp\RequireTestApp.sln");
+                        app.OpenSolutionExplorer();
+                        app.SolutionExplorerTreeView.WaitForItem("Solution 'RequireTestApp' (1 project)", "RequireTestApp", "References");
+                        text = openFile.Text;
+                        curFile = testCase.File;
+                    }
+
+                    Console.WriteLine("{0} {1}", testCase.Line, testCase.Type);
+
+                    openFile.MoveCaret(testCase.Line, 1);
+                    openFile.Invoke(() => openFile.TextView.Caret.EnsureVisible());
+                    openFile.SetFocus();
+                    Keyboard.Type(testCase.Type);
+                    using (var session = openFile.WaitForSession<ICompletionSession>()) {
+                        var completions = session.Session.CompletionSets.First().Completions.Select(x => x.InsertionText);
+                        Assert.IsTrue(completions.Contains(testCase.Expected));
+                        Keyboard.Type(System.Windows.Input.Key.Escape);
+                        for (int i = 0; i < testCase.Type.Length; i++) {
+                            Keyboard.Type(System.Windows.Input.Key.Back);
+                        }
+
+                        openFile.WaitForText(text);
+                    }
                 }
-
-                Console.WriteLine("{0} {1}", testCase.Line, testCase.Type);
-
-                openFile.MoveCaret(testCase.Line, 1);
-                openFile.Invoke(() => openFile.TextView.Caret.EnsureVisible());
-                openFile.SetFocus();
-                Keyboard.Type(testCase.Type);
-                var session = openFile.WaitForSession<ICompletionSession>();
-                var completions = session.CompletionSets.First().Completions.Select(x => x.InsertionText);
-                Assert.IsTrue(completions.Contains(testCase.Expected));
-                Keyboard.Type(System.Windows.Input.Key.Escape);
-                for (int i = 0; i < testCase.Type.Length; i++) {
-                    Keyboard.Type(System.Windows.Input.Key.Back);
-                }
-
-                openFile.WaitForText(text);
             }
         }
 
@@ -251,58 +243,60 @@ http.createServer(function (req, res) {
         [HostType("TC Dynamic"), DynamicHostType(typeof(VsIdeHostAdapter))]
         public void GlobalIntellisenseProjectReload() {
             Window window;
-            
+
             //OpenProject();
             //var file = OpenProjectItem("server.js", out window);
             //var dispatcher = ((UIElement)file.TextView).Dispatcher;
 
-            var app = new VisualStudioApp(VsIdeTestHostContext.Dte);
-            app.OpenProject(Path.GetFullPath(@"TestData\NodeAppWithModule\NodeAppWithModule.sln"));
-            
-            var projectName = "NodeAppWithModule";
-            var project = app.SolutionExplorerTreeView.WaitForItem(
-                "Solution '" + projectName + "' (1 project)",
-                projectName);
+            using (var app = new VisualStudioApp(VsIdeTestHostContext.Dte)) {
+                app.OpenProject(Path.GetFullPath(@"TestData\NodeAppWithModule\NodeAppWithModule.sln"));
+
+                var projectName = "NodeAppWithModule";
+                var project = app.SolutionExplorerTreeView.WaitForItem(
+                    "Solution '" + projectName + "' (1 project)",
+                    projectName);
 
 
-            var projectNode = new TreeNode(project);
-            projectNode.SetFocus();
+                var projectNode = new TreeNode(project);
+                projectNode.SetFocus();
 
-            System.Threading.Thread.Sleep(2000);
-            Keyboard.Type(System.Windows.Input.Key.Apps);
-            Keyboard.Type(System.Windows.Input.Key.L);
-            //dispatcher.Invoke(() => VsIdeTestHostContext.Dte.ExecuteCommand("Project.UnloadProject"));
+                System.Threading.Thread.Sleep(2000);
+                Keyboard.Type(System.Windows.Input.Key.Apps);
+                Keyboard.Type(System.Windows.Input.Key.L);
+                //dispatcher.Invoke(() => VsIdeTestHostContext.Dte.ExecuteCommand("Project.UnloadProject"));
 
-            project = app.SolutionExplorerTreeView.WaitForItem(
-                "Solution '" + projectName + "' (0 projects)",
-                projectName + " (unavailable)");
+                project = app.SolutionExplorerTreeView.WaitForItem(
+                    "Solution '" + projectName + "' (0 projects)",
+                    projectName + " (unavailable)");
 
-            projectNode = new TreeNode(project);
-            projectNode.SetFocus();
+                projectNode = new TreeNode(project);
+                projectNode.SetFocus();
 
-            System.Threading.Thread.Sleep(2000);
+                System.Threading.Thread.Sleep(2000);
 
-            Keyboard.Type(System.Windows.Input.Key.Apps);
-            Keyboard.Type(System.Windows.Input.Key.L);
-            //dispatcher.Invoke(() => VsIdeTestHostContext.Dte.ExecuteCommand("Project.ReloadProject"));
+                Keyboard.Type(System.Windows.Input.Key.Apps);
+                Keyboard.Type(System.Windows.Input.Key.L);
+                //dispatcher.Invoke(() => VsIdeTestHostContext.Dte.ExecuteCommand("Project.ReloadProject"));
 
-            app.SolutionExplorerTreeView.WaitForItem(
-                "Solution '" + projectName + "' (1 project)",
-                projectName,
-                "server.js"
-            );
+                app.SolutionExplorerTreeView.WaitForItem(
+                    "Solution '" + projectName + "' (1 project)",
+                    projectName,
+                    "server.js"
+                );
 
-            var openFile = OpenItem("server.js", VsIdeTestHostContext.Dte.Solution.Projects.Item(1), out window);
+                var openFile = OpenItem("server.js", VsIdeTestHostContext.Dte.Solution.Projects.Item(1), out window);
 
-            openFile.MoveCaret(6, 1);
-            Keyboard.Type("process.");
-            var session = openFile.WaitForSession<ICompletionSession>();
+                openFile.MoveCaret(6, 1);
+                Keyboard.Type("process.");
+                using (var session = openFile.WaitForSession<ICompletionSession>()) {
 
-            var completions = session.CompletionSets.First().Completions.Select(x => x.InsertionText);
-            Assert.IsTrue(completions.Contains("abort"));
-            Assert.IsTrue(completions.Contains("chdir"));
+                    var completions = session.Session.CompletionSets.First().Completions.Select(x => x.InsertionText);
+                    Assert.IsTrue(completions.Contains("abort"));
+                    Assert.IsTrue(completions.Contains("chdir"));
+                }
+            }
         }
-        
+
         [TestMethod, Priority(0), TestCategory("Core")]
         [HostType("TC Dynamic"), DynamicHostType(typeof(VsIdeHostAdapter))]
         public void UserModule() {
@@ -311,11 +305,12 @@ http.createServer(function (req, res) {
 
             openFile.MoveCaret(6, 1);
             Keyboard.Type("mymod.");
-            var session = openFile.WaitForSession<ICompletionSession>();
+            using (var session = openFile.WaitForSession<ICompletionSession>()) {
 
-            var completions = session.CompletionSets.First().Completions.Select(x => x.InsertionText);
-            Assert.IsTrue(completions.Contains("area"));
-            Assert.IsTrue(completions.Contains("circumference"));
+                var completions = session.Session.CompletionSets.First().Completions.Select(x => x.InsertionText);
+                Assert.IsTrue(completions.Contains("area"));
+                Assert.IsTrue(completions.Contains("circumference"));
+            }
         }
 
         [TestMethod, Priority(0), TestCategory("Core")]
@@ -324,17 +319,18 @@ http.createServer(function (req, res) {
             Window window;
             var openFile = OpenProjectItem("server.js", out window);
 
-            var app = new VisualStudioApp(VsIdeTestHostContext.Dte);
-            var dialog = app.OpenDialogWithDteExecuteCommand("Project.AddNewItem");
-            
-            var newItem = new NewItemDialog(AutomationElement.FromHandle(dialog));
-            newItem.FileName = "NewJSFile.js";
-            newItem.ClickOK();
+            using (var app = new VisualStudioApp(VsIdeTestHostContext.Dte)) {
+                var dialog = app.OpenDialogWithDteExecuteCommand("Project.AddNewItem");
 
-            System.Threading.Thread.Sleep(250);
+                var newItem = new NewItemDialog(AutomationElement.FromHandle(dialog));
+                newItem.FileName = "NewJSFile.js";
+                newItem.ClickOK();
 
-            var solutionFolder = app.Dte.Solution.Projects.Item(1).ProjectItems;
-            Assert.AreNotEqual(null, solutionFolder.Item("NewJSFile.js"));
+                System.Threading.Thread.Sleep(250);
+
+                var solutionFolder = app.Dte.Solution.Projects.Item(1).ProjectItems;
+                Assert.AreNotEqual(null, solutionFolder.Item("NewJSFile.js"));
+            }
         }
 
         [TestMethod, Priority(0), TestCategory("Core")]
@@ -398,60 +394,62 @@ sd.StringDecoder
         [TestMethod, Priority(0), TestCategory("Core")]
         [HostType("TC Dynamic"), DynamicHostType(typeof(VsIdeHostAdapter))]
         public void TestNewProject() {
-            var app = new VisualStudioApp(VsIdeTestHostContext.Dte);
-            var newProjDialog = app.FileNewProject();
+            using (var app = new VisualStudioApp(VsIdeTestHostContext.Dte)) {
+                var newProjDialog = app.FileNewProject();
 
-            newProjDialog.FocusLanguageNode("JavaScript");
+                newProjDialog.FocusLanguageNode("JavaScript");
 
-            var djangoApp = newProjDialog.ProjectTypes.FindItem("Blank Node.js Application");
-            djangoApp.Select();
-            
-            newProjDialog.ClickOK();
+                var djangoApp = newProjDialog.ProjectTypes.FindItem("Blank Node.js Application");
+                djangoApp.Select();
 
-            // wait for new solution to load...            
-            for (int i = 0; i < 40 && app.Dte.Solution.Projects.Count == 0; i++) {
-                System.Threading.Thread.Sleep(250);
+                newProjDialog.ClickOK();
+
+                // wait for new solution to load...            
+                for (int i = 0; i < 40 && app.Dte.Solution.Projects.Count == 0; i++) {
+                    System.Threading.Thread.Sleep(250);
+                }
+
+                app.SolutionExplorerTreeView.WaitForItem(
+                    "Solution '" + app.Dte.Solution.Projects.Item(1).Name + "' (1 project)",
+                    app.Dte.Solution.Projects.Item(1).Name,
+                    "server.js"
+                );
+                var projItem = app.SolutionExplorerTreeView.WaitForItemRemoved(
+                    "Solution '" + app.Dte.Solution.Projects.Item(1).Name + "' (1 project)",
+                    app.Dte.Solution.Projects.Item(1).Name,
+                    "Web.config"
+                );
             }
-
-            app.SolutionExplorerTreeView.WaitForItem(
-                "Solution '" + app.Dte.Solution.Projects.Item(1).Name + "' (1 project)",
-                app.Dte.Solution.Projects.Item(1).Name,
-                "server.js"
-            );
-            var projItem = app.SolutionExplorerTreeView.WaitForItemRemoved(
-                "Solution '" + app.Dte.Solution.Projects.Item(1).Name + "' (1 project)",
-                app.Dte.Solution.Projects.Item(1).Name,
-                "Web.config"
-            );
         }
 
         [TestMethod, Priority(0), TestCategory("Core")]
         [HostType("TC Dynamic"), DynamicHostType(typeof(VsIdeHostAdapter))]
         public void TestNewAzureProject() {
-            var app = new VisualStudioApp(VsIdeTestHostContext.Dte);
-            var newProjDialog = app.FileNewProject();
+            using (var app = new VisualStudioApp(VsIdeTestHostContext.Dte)) {
+                var newProjDialog = app.FileNewProject();
 
-            newProjDialog.FocusLanguageNode("JavaScript");
+                newProjDialog.FocusLanguageNode("JavaScript");
 
-            var djangoApp = newProjDialog.ProjectTypes.FindItem("Blank Windows Azure Node.js Application");
-            djangoApp.Select();
-            newProjDialog.ClickOK();
+                var djangoApp = newProjDialog.ProjectTypes.FindItem("Blank Windows Azure Node.js Application");
+                djangoApp.Select();
+                newProjDialog.ClickOK();
 
-            // wait for new solution to load...
-            for (int i = 0; i < 40 && app.Dte.Solution.Projects.Count == 0; i++) {
-                System.Threading.Thread.Sleep(250);
+                // wait for new solution to load...
+                for (int i = 0; i < 40 && app.Dte.Solution.Projects.Count == 0; i++) {
+                    System.Threading.Thread.Sleep(250);
+                }
+
+                app.SolutionExplorerTreeView.WaitForItem(
+                    "Solution '" + app.Dte.Solution.Projects.Item(1).Name + "' (1 project)",
+                    app.Dte.Solution.Projects.Item(1).Name,
+                    "server.js"
+                );
+                app.SolutionExplorerTreeView.WaitForItem(
+                    "Solution '" + app.Dte.Solution.Projects.Item(1).Name + "' (1 project)",
+                    app.Dte.Solution.Projects.Item(1).Name,
+                    "Web.config"
+                );
             }
-
-            app.SolutionExplorerTreeView.WaitForItem(
-                "Solution '" + app.Dte.Solution.Projects.Item(1).Name + "' (1 project)",
-                app.Dte.Solution.Projects.Item(1).Name,
-                "server.js"
-            );
-            app.SolutionExplorerTreeView.WaitForItem(
-                "Solution '" + app.Dte.Solution.Projects.Item(1).Name + "' (1 project)",
-                app.Dte.Solution.Projects.Item(1).Name,
-                "Web.config"
-            );
         }
 
         [TestMethod, Priority(0), TestCategory("Core")]
@@ -502,32 +500,33 @@ sd.StringDecoder
         [TestMethod, Priority(0), TestCategory("Core")]
         [HostType("TC Dynamic"), DynamicHostType(typeof(VsIdeHostAdapter))]
         public void SetAsStartupFile() {
-            var app = new VisualStudioApp(VsIdeTestHostContext.Dte);
-            var project = OpenProject();
+            using (var app = new VisualStudioApp(VsIdeTestHostContext.Dte)) {
+                var project = OpenProject();
 
-            // wait for new solution to load...
-            for (int i = 0; i < 40 && app.Dte.Solution.Projects.Count == 0; i++) {
-                System.Threading.Thread.Sleep(250);
-            }
-
-            var item = app.SolutionExplorerTreeView.WaitForItem(
-                "Solution '" + app.Dte.Solution.Projects.Item(1).Name + "' (1 project)",
-                app.Dte.Solution.Projects.Item(1).Name,
-                "mymod.js"
-            );
-
-            AutomationWrapper.Select(item);
-            app.Dte.ExecuteCommand("Project.SetasNode.jsStartupFile");
-            
-            string startupFile = null;
-            for (int i = 0; i < 40; i++) {
-                startupFile = (string)project.Properties.Item("StartupFile").Value;
-                if (startupFile == "mymod.js") {
-                    break;
+                // wait for new solution to load...
+                for (int i = 0; i < 40 && app.Dte.Solution.Projects.Count == 0; i++) {
+                    System.Threading.Thread.Sleep(250);
                 }
-                System.Threading.Thread.Sleep(250);
+
+                var item = app.SolutionExplorerTreeView.WaitForItem(
+                    "Solution '" + app.Dte.Solution.Projects.Item(1).Name + "' (1 project)",
+                    app.Dte.Solution.Projects.Item(1).Name,
+                    "mymod.js"
+                );
+
+                AutomationWrapper.Select(item);
+                app.Dte.ExecuteCommand("Project.SetasNode.jsStartupFile");
+
+                string startupFile = null;
+                for (int i = 0; i < 40; i++) {
+                    startupFile = (string)project.Properties.Item("StartupFile").Value;
+                    if (startupFile == "mymod.js") {
+                        break;
+                    }
+                    System.Threading.Thread.Sleep(250);
+                }
+                Assert.AreEqual(startupFile, Path.Combine(Environment.CurrentDirectory, @"TestData\NodeAppWithModule\NodeAppWithModule", "mymod.js"));
             }
-            Assert.AreEqual(startupFile, Path.Combine(Environment.CurrentDirectory, @"TestData\NodeAppWithModule\NodeAppWithModule", "mymod.js"));
         }
 
         private static void AssertError<T>(Action action) where T : Exception {
@@ -559,10 +558,13 @@ sd.StringDecoder
 
             Assert.IsNotNull(item);
 
-            var app = new VisualStudioApp(VsIdeTestHostContext.Dte);
-            window = item.Open();
-            window.Activate();
-            return app.GetDocument(item.Document.FullName);
+            using (var app = new VisualStudioApp(VsIdeTestHostContext.Dte)) {
+                app.SuppressCloseAllOnDispose();
+
+                window = item.Open();
+                window.Activate();
+                return app.GetDocument(item.Document.FullName);
+            }
         }
 
         internal static Project OpenProject(string projName = @"TestData\NodeAppWithModule\NodeAppWithModule.sln", string startItem = null, int expectedProjects = 1, string projectName = null, bool setStartupItem = true) {
@@ -571,7 +573,7 @@ sd.StringDecoder
             VsIdeTestHostContext.Dte.Solution.Open(fullPath);
 
             Assert.IsTrue(VsIdeTestHostContext.Dte.Solution.IsOpen, "The solution is not open");
-            
+
             int count = VsIdeTestHostContext.Dte.Solution.Projects.Count;
             if (expectedProjects != count) {
                 // if we have other files open we can end up with a bonus project...
@@ -584,7 +586,7 @@ sd.StringDecoder
 
                 Assert.IsTrue(i == expectedProjects, String.Format("Loading project resulted in wrong number of loaded projects, expected 1, received {0}", VsIdeTestHostContext.Dte.Solution.Projects.Count));
             }
-            
+
             var iter = VsIdeTestHostContext.Dte.Solution.Projects.GetEnumerator();
             iter.MoveNext();
 
@@ -597,7 +599,7 @@ sd.StringDecoder
                     }
                     project = (Project)iter.Current;
                 }
-            }            
+            }
 
             if (startItem != null && setStartupItem) {
                 project.SetStartupFile(startItem);
@@ -610,47 +612,47 @@ sd.StringDecoder
         [HostType("TC Dynamic"), DynamicHostType(typeof(VsIdeHostAdapter))]
         public void TestProjectProperties() {
             for (int mode = 0; mode < 2; mode++) {
-                var testFile = Path.Combine(Path.GetTempPath(), "nodejstest.txt");
-                if (File.Exists(testFile)) {
-                    File.Delete(testFile);
+                using (var app = new VisualStudioApp(VsIdeTestHostContext.Dte)) {
+                    var testFile = Path.Combine(Path.GetTempPath(), "nodejstest.txt");
+                    if (File.Exists(testFile)) {
+                        File.Delete(testFile);
+                    }
+
+                    var project = OpenProjectAndRun(@"TestData\NodejsProjectPropertiesTest\NodejsProjectPropertiesTest.sln", "server.js", true, debug: mode == 0);
+
+                    for (int i = 0; i < 30 && !File.Exists(testFile); i++) {
+                        System.Threading.Thread.Sleep(250);
+                    }
+
+                    Assert.IsTrue(File.Exists(testFile), "test file not created");
+                    var lines = File.ReadAllLines(testFile);
+
+                    Assert.IsTrue(lines[0].Contains("scriptargs"), "no scriptargs");
+                    Assert.IsTrue(lines[0].Contains("server.js"), "missing filename");
+                    Assert.AreEqual(lines[1], "port: 1234");
+                    Assert.AreEqual(lines[2], "cwd: C:\\");
                 }
-
-                var project = OpenProjectAndRun(@"TestData\NodejsProjectPropertiesTest\NodejsProjectPropertiesTest.sln", "server.js", true, debug: mode == 0);
-
-                for (int i = 0; i < 30 && !File.Exists(testFile); i++) {
-                    System.Threading.Thread.Sleep(250);
-                }
-
-                Assert.IsTrue(File.Exists(testFile), "test file not created");
-                var lines = File.ReadAllLines(testFile);
-
-                Assert.IsTrue(lines[0].Contains("scriptargs"), "no scriptargs");
-                Assert.IsTrue(lines[0].Contains("server.js"), "missing filename");
-                Assert.AreEqual(lines[1], "port: 1234");
-                Assert.AreEqual(lines[2], "cwd: C:\\");
-
-                MyTestCleanup();
             }
         }
 
         [TestMethod, Priority(0), TestCategory("Core")]
         [HostType("TC Dynamic"), DynamicHostType(typeof(VsIdeHostAdapter))]
         public void TestBrowserLaunch() {
-            for (int mode = 0; mode < 2;  mode++) {
-                var testFile = Path.Combine(Path.GetTempPath(), "nodejstest.txt");
-                if (File.Exists(testFile)) {
-                    File.Delete(testFile);
+            for (int mode = 0; mode < 2; mode++) {
+                using (var app = new VisualStudioApp(VsIdeTestHostContext.Dte)) {
+                    var testFile = Path.Combine(Path.GetTempPath(), "nodejstest.txt");
+                    if (File.Exists(testFile)) {
+                        File.Delete(testFile);
+                    }
+
+                    var project = OpenProjectAndRun(@"TestData\NodejsProjectPropertiesTest\NodejsProjectPropertiesTest.sln", "server2.js", true, debug: mode == 0);
+
+                    for (int i = 0; i < 30 && !File.Exists(testFile); i++) {
+                        System.Threading.Thread.Sleep(250);
+                    }
+
+                    Assert.IsTrue(File.Exists(testFile), "test file not created");
                 }
-
-                var project = OpenProjectAndRun(@"TestData\NodejsProjectPropertiesTest\NodejsProjectPropertiesTest.sln", "server2.js", true, debug: mode == 0);
-
-                for (int i = 0; i < 30 && !File.Exists(testFile); i++) {
-                    System.Threading.Thread.Sleep(250);
-                }
-
-                Assert.IsTrue(File.Exists(testFile), "test file not created");
-
-                MyTestCleanup();
             }
         }
 

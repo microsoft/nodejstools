@@ -81,8 +81,7 @@
             this._nodeExePath.Name = "_nodeExePath";
             this._nodeExePath.Size = new System.Drawing.Size(258, 20);
             this._nodeExePath.TabIndex = 1;
-            this._nodeExePath.TextChanged += new System.EventHandler(this.Changed);
-            this._nodeExePath.Validated += new System.EventHandler(this.NodeExePathValidated);
+            this._nodeExePath.TextChanged += new System.EventHandler(this.NodeExePathChanged);
             // 
             // _nodeExeArguments
             // 
@@ -98,8 +97,7 @@
             this._nodejsPort.Name = "_nodejsPort";
             this._nodejsPort.Size = new System.Drawing.Size(100, 20);
             this._nodejsPort.TabIndex = 13;
-            this._nodejsPort.TextChanged += new System.EventHandler(this.Changed);
-            this._nodejsPort.KeyPress += new System.Windows.Forms.KeyPressEventHandler(this.NodejsPortKeyPress);
+            this._nodejsPort.TextChanged += new System.EventHandler(this.NodejsPortChanged);
             // 
             // _nodePortLabel
             // 

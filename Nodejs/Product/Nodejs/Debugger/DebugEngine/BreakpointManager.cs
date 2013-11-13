@@ -20,7 +20,8 @@ namespace Microsoft.NodejsTools.Debugger.DebugEngine {
     class BreakpointManager {
         private AD7Engine m_engine;
         private System.Collections.Generic.List<AD7PendingBreakpoint> m_pendingBreakpoints;
-        private Dictionary<NodeBreakpoint, AD7BoundBreakpoint> _breakpointMap = new Dictionary<NodeBreakpoint, AD7BoundBreakpoint>();
+        private Dictionary<NodeBreakpoint, AD7PendingBreakpoint> _breakpointMap = new Dictionary<NodeBreakpoint, AD7PendingBreakpoint>();
+        private Dictionary<NodeBreakpointBinding, AD7BoundBreakpoint> _breakpointBindingMap = new Dictionary<NodeBreakpointBinding, AD7BoundBreakpoint>();
 
         public BreakpointManager(AD7Engine engine) {
             m_engine = engine;
@@ -35,22 +36,35 @@ namespace Microsoft.NodejsTools.Debugger.DebugEngine {
         }
 
         // Called from the engine's detach method to remove the debugger's breakpoint instructions.
-        public void ClearBoundBreakpoints() {
+        public void ClearBreakpointBindingResults() {
             foreach (AD7PendingBreakpoint pendingBreakpoint in m_pendingBreakpoints) {
-                pendingBreakpoint.ClearBoundBreakpoints();
+                pendingBreakpoint.ClearBreakpointBindingResults();
             }
         }
 
-        public void AddBoundBreakpoint(NodeBreakpoint breakpoint, AD7BoundBreakpoint boundBreakpoint) {
-            _breakpointMap[breakpoint] = boundBreakpoint;
+        public void AddPendingBreakpoint(NodeBreakpoint breakpoint, AD7PendingBreakpoint pendingBreakpoint) {
+            _breakpointMap[breakpoint] = pendingBreakpoint;
         }
 
-        public void RemoveBoundBreakpoint(NodeBreakpoint breakpoint) {
+        public void RemovePendingBreakpoint(NodeBreakpoint breakpoint) {
             _breakpointMap.Remove(breakpoint);
         }
 
-        public AD7BoundBreakpoint GetBreakpoint(NodeBreakpoint breakpoint) {
+        public AD7PendingBreakpoint GetPendingBreakpoint(NodeBreakpoint breakpoint) {
             return _breakpointMap[breakpoint];
+        }
+
+        public void AddBoundBreakpoint(NodeBreakpointBinding breakpointBinding, AD7BoundBreakpoint boundBreakpoint) {
+            _breakpointBindingMap[breakpointBinding] = boundBreakpoint;
+        }
+
+        public void RemoveBoundBreakpoint(NodeBreakpointBinding breakpointBinding) {
+            _breakpointBindingMap.Remove(breakpointBinding);
+        }
+
+        public AD7BoundBreakpoint GetBoundBreakpoint(NodeBreakpointBinding breakpointBinding) {
+            AD7BoundBreakpoint boundBreakpoint;
+            return _breakpointBindingMap.TryGetValue(breakpointBinding, out boundBreakpoint) ? boundBreakpoint : null;
         }
     }
 }

@@ -53,11 +53,12 @@ namespace Microsoft.NodejsTools {
     [PackageRegistration(UseManagedResourcesOnly = true)]
     // This attribute is used to register the information needed to show this package
     // in the Help/About dialog of Visual Studio.
-    [InstalledProductRegistration("#110", "#112", "1.0", IconResourceID = 400)]
+    [InstalledProductRegistration("#110", "#112", AssemblyVersionInfo.Version, IconResourceID = 400)]
     [Guid(GuidList.guidNodePkgString)]
     [ProvideOptionPage(typeof(NodejsGeneralOptionsPage), "Node.js Tools", "General", 114, 115, true)]
     [ProvideDebugEngine("Node.js Debugging", typeof(AD7ProgramProvider), typeof(AD7Engine), AD7Engine.DebugEngineId)]
-    [ProvideDebugLanguage(NodejsConstants.JavaScript, "{65791609-BA29-49CF-A214-DBFF8AEC3BC2}", NodeExpressionEvaluatorGuid, AD7Engine.DebugEngineId)]
+    [ProvideLanguageService(typeof(NodejsLanguageInfo), NodejsConstants.Nodejs, 106, RequestStockColors = true, ShowSmartIndent = true, ShowCompletion = true, DefaultToInsertSpaces = true, HideAdvancedMembersByDefault = true, EnableAdvancedMembersOption = true, ShowDropDownOptions = true)]
+    [ProvideDebugLanguage(NodejsConstants.Nodejs, GuidList.guidNodejsDebugLanguageStr, NodeExpressionEvaluatorGuid, AD7Engine.DebugEngineId)]
     [WebSiteProject("JavaScript", "JavaScript")]
     // Keep declared exceptions in sync with those given default values in NodeDebugger.GetDefaultExceptionTreatments()
     [ProvideDebugException(AD7Engine.DebugEngineId, "Node.js Exceptions", State = enum_EXCEPTION_STATE.EXCEPTION_STOP_FIRST_CHANCE)]
@@ -160,6 +161,7 @@ namespace Microsoft.NodejsTools {
     [ProvideEditorExtension2(typeof(NodejsEditorFactoryPromptForEncoding), NodeJsFileType, 50, "*:1", ProjectGuid = "{78D985FC-2CA0-4D08-9B6B-35ACD5E5294A}", NameResourceID = 113, DefaultName = "server")]
     [ProvideProjectItem(typeof(BaseNodeProjectFactory), NodejsConstants.Nodejs, "FileTemplates\\NewItem", 0)]
     [ProvideLanguageTemplates("{349C5851-65DF-11DA-9384-00065B846F21}", NodejsConstants.Nodejs, GuidList.guidNodePkgString, "Web", "Node.js Project Templates", "{" + BaseNodeProjectFactory.BaseNodeProjectGuid + "}", ".js", NodejsConstants.Nodejs, "{" + BaseNodeProjectFactory.BaseNodeProjectGuid + "}")]
+    [ProvideTextEditorAutomation(NodejsConstants.Nodejs, 106, 102, ProfileMigrationType.PassThrough)]
     internal sealed class NodejsPackage : CommonPackage {
         internal const string NodeExpressionEvaluatorGuid = "{F16F2A71-1C45-4BAB-BECE-09D28CFDE3E6}";
         private IContentType _contentType;
@@ -200,6 +202,9 @@ namespace Microsoft.NodejsTools {
             Debug.WriteLine(string.Format(CultureInfo.CurrentCulture, "Entering Initialize() of: {0}", this.ToString()));
             base.Initialize();
 
+            var langService = new NodejsLanguageInfo(this);
+            ((IServiceContainer)this).AddService(langService.GetType(), langService, true);
+
             RegisterProjectFactory(new NodejsProjectFactory(this));
             RegisterEditorFactory(new NodejsEditorFactory(this));
             RegisterEditorFactory(new NodejsEditorFactoryPromptForEncoding(this));
@@ -231,7 +236,7 @@ namespace Microsoft.NodejsTools {
             var window = provider.FindReplWindow(NodejsReplEvaluatorProvider.NodeReplId);
             if (window == null) {
                 window = provider.CreateReplWindow(
-                    ContentType,
+                    ReplContentType,
                     "Node.js Interactive Window",
                     _jsLangSvcGuid,
                     NodejsReplEvaluatorProvider.NodeReplId
@@ -303,10 +308,10 @@ namespace Microsoft.NodejsTools {
             }
         }
 
-        public IContentType ContentType {
+        private IContentType ReplContentType {
             get {
                 if (_contentType == null) {
-                    _contentType = ComponentModel.GetService<IContentTypeRegistryService>().GetContentType(NodejsConstants.Nodejs);
+                    _contentType = ComponentModel.GetService<IContentTypeRegistryService>().GetContentType(NodejsConstants.NodejsRepl);
                 }
                 return _contentType;
             }

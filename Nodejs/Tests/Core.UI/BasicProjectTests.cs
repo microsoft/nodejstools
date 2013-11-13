@@ -41,11 +41,6 @@ namespace Microsoft.Nodejs.Tests.UI {
             NodejsTestData.Deploy();
         }
 
-        [TestCleanup]
-        public void MyTestCleanup() {
-            VsIdeTestHostContext.Dte.Solution.Close(false);
-        }
-
         [TestMethod, Priority(0), TestCategory("Core")]
         [HostType("TC Dynamic"), DynamicHostType(typeof(VsIdeHostAdapter))]
         public void LoadNodejsProject() {
@@ -153,45 +148,6 @@ namespace Microsoft.Nodejs.Tests.UI {
 
         [TestMethod, Priority(0), TestCategory("Core")]
         [HostType("TC Dynamic"), DynamicHostType(typeof(VsIdeHostAdapter))]
-        public void ProjectAddItem() {
-            try {
-                var project = OpenProject(@"TestData\NodejsProjectData\HelloWorld.sln");
-                string fullPath = TestData.GetPath(@"TestData\NodejsProjectData\HelloWorld.sln");
-
-                Assert.AreEqual(1, project.ProjectItems.Count);
-                var item = project.ProjectItems.AddFromFile(TestData.GetPath(@"TestData\DebuggerProject\LocalsTest.js"));
-
-                Assert.AreEqual("LocalsTest.js", item.Properties.Item("FileName").Value);
-                Assert.AreEqual(Path.Combine(Path.Combine(Path.GetDirectoryName(fullPath), "HelloWorld"), "LocalsTest.js"), item.Properties.Item("FullPath").Value);
-                Assert.AreEqual(".js", item.Properties.Item("Extension").Value);
-
-                Assert.IsTrue(item.Object is VSProjectItem);
-                var vsProjItem = (VSProjectItem)item.Object;
-                Assert.AreEqual(vsProjItem.DTE, VsIdeTestHostContext.Dte);
-                Assert.AreEqual(vsProjItem.ContainingProject, project);
-                Assert.AreEqual(vsProjItem.ProjectItem.ContainingProject, project);
-                vsProjItem.ProjectItem.Open();
-                Assert.AreEqual(true, vsProjItem.ProjectItem.IsOpen);
-                Assert.AreEqual(true, vsProjItem.ProjectItem.Saved);
-                vsProjItem.ProjectItem.Document.Close(vsSaveChanges.vsSaveChangesNo);
-                Assert.AreEqual(false, vsProjItem.ProjectItem.IsOpen);
-                Assert.AreEqual(VsIdeTestHostContext.Dte, vsProjItem.ProjectItem.DTE);
-
-                Assert.AreEqual(2, project.ProjectItems.Count);
-
-                // add an existing item
-                project.ProjectItems.AddFromFile(TestData.GetPath(@"TestData\NodejsProjectData\HelloWorld\server.js"));
-
-                Assert.AreEqual(2, project.ProjectItems.Count);
-            } finally {
-                VsIdeTestHostContext.Dte.Solution.Close();
-                GC.Collect();
-                GC.WaitForPendingFinalizers();
-            }
-        }
-
-        [TestMethod, Priority(0), TestCategory("Core")]
-        [HostType("TC Dynamic"), DynamicHostType(typeof(VsIdeHostAdapter))]
         public void ProjectAddFolder() {
             try {
                 string fullPath = TestData.GetPath(@"TestData\NodejsProjectData\HelloWorld.sln");
@@ -239,43 +195,43 @@ namespace Microsoft.Nodejs.Tests.UI {
         public void ProjectAddFolderThroughUI() {
             try {
                 var project = OpenProject(@"TestData\NodejsProjectData\AddFolderExists.sln");
-                var app = new VisualStudioApp(VsIdeTestHostContext.Dte);
-                var solutionExplorer = app.SolutionExplorerTreeView;
+                using (var app = new VisualStudioApp(VsIdeTestHostContext.Dte)) {
+                    var solutionExplorer = app.SolutionExplorerTreeView;
 
-                var solutionNode = solutionExplorer.FindItem("Solution 'AddFolderExists' (1 project)");
-                var projectNode = solutionExplorer.FindItem("Solution 'AddFolderExists' (1 project)", "AddFolderExists");
+                    var solutionNode = solutionExplorer.FindItem("Solution 'AddFolderExists' (1 project)");
+                    var projectNode = solutionExplorer.FindItem("Solution 'AddFolderExists' (1 project)", "AddFolderExists");
 
-                ProjectNewFolderWithName(app, solutionNode, projectNode, "A");
+                    ProjectNewFolderWithName(app, solutionNode, projectNode, "A");
 
-                var folderA = project.ProjectItems.Item("A");
-                var folderANode = solutionExplorer.WaitForItem("Solution 'AddFolderExists' (1 project)", "AddFolderExists", "A");
-                Assert.IsNotNull(folderANode);
+                    var folderA = project.ProjectItems.Item("A");
+                    var folderANode = solutionExplorer.WaitForItem("Solution 'AddFolderExists' (1 project)", "AddFolderExists", "A");
+                    Assert.IsNotNull(folderANode);
 
-                Assert.AreEqual(TestData.GetPath("TestData\\NodejsProjectData\\AddFolderExists\\A\\"), folderA.Properties.Item("FullPath").Value);
-                Assert.IsTrue(Directory.Exists(TestData.GetPath("TestData\\NodejsProjectData\\AddFolderExists\\A\\")));
+                    Assert.AreEqual(TestData.GetPath("TestData\\NodejsProjectData\\AddFolderExists\\A\\"), folderA.Properties.Item("FullPath").Value);
+                    Assert.IsTrue(Directory.Exists(TestData.GetPath("TestData\\NodejsProjectData\\AddFolderExists\\A\\")));
 
-                ProjectNewFolderWithName(app, solutionNode, folderANode, "B");
+                    ProjectNewFolderWithName(app, solutionNode, folderANode, "B");
 
-                var folderB = folderA.ProjectItems.Item("B");
-                var folderBNode = solutionExplorer.WaitForItem("Solution 'AddFolderExists' (1 project)", "AddFolderExists", "A", "B");
-                Assert.IsNotNull(folderBNode);
+                    var folderB = folderA.ProjectItems.Item("B");
+                    var folderBNode = solutionExplorer.WaitForItem("Solution 'AddFolderExists' (1 project)", "AddFolderExists", "A", "B");
+                    Assert.IsNotNull(folderBNode);
 
-                Assert.AreEqual(TestData.GetPath("TestData\\NodejsProjectData\\AddFolderExists\\A\\B\\"), folderB.Properties.Item("FullPath").Value);
-                Assert.IsTrue(Directory.Exists(TestData.GetPath("TestData\\NodejsProjectData\\AddFolderExists\\A\\B\\")));
+                    Assert.AreEqual(TestData.GetPath("TestData\\NodejsProjectData\\AddFolderExists\\A\\B\\"), folderB.Properties.Item("FullPath").Value);
+                    Assert.IsTrue(Directory.Exists(TestData.GetPath("TestData\\NodejsProjectData\\AddFolderExists\\A\\B\\")));
 
-                ProjectNewFolderWithName(app, solutionNode, folderBNode, "C");
+                    ProjectNewFolderWithName(app, solutionNode, folderBNode, "C");
 
-                var folderC = folderB.ProjectItems.Item("C");
-                var folderCNode = solutionExplorer.WaitForItem("Solution 'AddFolderExists' (1 project)", "AddFolderExists", "A", "B", "C");
-                Assert.IsNotNull(folderCNode);
+                    var folderC = folderB.ProjectItems.Item("C");
+                    var folderCNode = solutionExplorer.WaitForItem("Solution 'AddFolderExists' (1 project)", "AddFolderExists", "A", "B", "C");
+                    Assert.IsNotNull(folderCNode);
 
-                // 817 & 836: Nested subfolders
-                // Setting the wrong VirtualNodeName in FolderNode.FinishFolderAdd caused C's fullpath to be ...\AddFolderExists\B\C\
-                // instead of ...\AddFolderExists\A\B\C\.
-                Assert.AreEqual(TestData.GetPath("TestData\\NodejsProjectData\\AddFolderExists\\A\\B\\C\\"), folderC.Properties.Item("FullPath").Value);
-                Assert.IsTrue(Directory.Exists(TestData.GetPath("TestData\\NodejsProjectData\\AddFolderExists\\A\\B\\C\\")));
+                    // 817 & 836: Nested subfolders
+                    // Setting the wrong VirtualNodeName in FolderNode.FinishFolderAdd caused C's fullpath to be ...\AddFolderExists\B\C\
+                    // instead of ...\AddFolderExists\A\B\C\.
+                    Assert.AreEqual(TestData.GetPath("TestData\\NodejsProjectData\\AddFolderExists\\A\\B\\C\\"), folderC.Properties.Item("FullPath").Value);
+                    Assert.IsTrue(Directory.Exists(TestData.GetPath("TestData\\NodejsProjectData\\AddFolderExists\\A\\B\\C\\")));
+                }
             } finally {
-                VsIdeTestHostContext.Dte.Solution.Close();
                 GC.Collect();
                 GC.WaitForPendingFinalizers();
             }
@@ -285,50 +241,52 @@ namespace Microsoft.Nodejs.Tests.UI {
         [HostType("TC Dynamic"), DynamicHostType(typeof(VsIdeHostAdapter))]
         public void TestAddExistingFolder() {
             var project = OpenProject(@"TestData\NodejsProjectData\AddExistingFolder.sln");
-            var app = new VisualStudioApp(VsIdeTestHostContext.Dte);
-            var solutionExplorer = app.SolutionExplorerTreeView;
+            using (var app = new VisualStudioApp(VsIdeTestHostContext.Dte)) {
+                var solutionExplorer = app.SolutionExplorerTreeView;
 
-            var projectNode = solutionExplorer.WaitForItem("Solution 'AddExistingFolder' (1 project)", "AddExistingFolder");
-            AutomationWrapper.Select(projectNode);
+                var projectNode = solutionExplorer.WaitForItem("Solution 'AddExistingFolder' (1 project)", "AddExistingFolder");
+                AutomationWrapper.Select(projectNode);
 
-            var dialog = AddExistingFolder(app);
-            Assert.AreEqual(dialog.Address, Path.GetFullPath(@"TestData\NodejsProjectData\AddExistingFolder"));
+                var dialog = AddExistingFolder(app);
+                Assert.AreEqual(dialog.Address.ToLower(), Path.GetFullPath(@"TestData\NodejsProjectData\AddExistingFolder").ToLower());
 
-            dialog.FolderName = Path.GetFullPath(@"TestData\NodejsProjectData\AddExistingFolder\TestFolder");
-            dialog.SelectFolder();
+                dialog.FolderName = Path.GetFullPath(@"TestData\NodejsProjectData\AddExistingFolder\TestFolder");
+                dialog.SelectFolder();
 
-            Assert.AreNotEqual(solutionExplorer.WaitForItem("Solution 'AddExistingFolder' (1 project)", "AddExistingFolder", "TestFolder"), null);
-            Assert.AreNotEqual(solutionExplorer.WaitForItem("Solution 'AddExistingFolder' (1 project)", "AddExistingFolder", "TestFolder", "TestFile.txt"), null);
+                Assert.AreNotEqual(solutionExplorer.WaitForItem("Solution 'AddExistingFolder' (1 project)", "AddExistingFolder", "TestFolder"), null);
+                Assert.AreNotEqual(solutionExplorer.WaitForItem("Solution 'AddExistingFolder' (1 project)", "AddExistingFolder", "TestFolder", "TestFile.txt"), null);
 
-            var subFolderNode = solutionExplorer.WaitForItem("Solution 'AddExistingFolder' (1 project)", "AddExistingFolder", "SubFolder");
-            AutomationWrapper.Select(subFolderNode);
+                var subFolderNode = solutionExplorer.WaitForItem("Solution 'AddExistingFolder' (1 project)", "AddExistingFolder", "SubFolder");
+                AutomationWrapper.Select(subFolderNode);
 
-            dialog = AddExistingFolder(app);
+                dialog = AddExistingFolder(app);
 
-            Assert.AreEqual(dialog.Address, Path.GetFullPath(@"TestData\NodejsProjectData\AddExistingFolder\SubFolder"));
-            dialog.FolderName = Path.GetFullPath(@"TestData\NodejsProjectData\AddExistingFolder\SubFolder\TestFolder2");
-            dialog.SelectFolder();
+                Assert.AreEqual(dialog.Address.ToLower(), Path.GetFullPath(@"TestData\NodejsProjectData\AddExistingFolder\SubFolder").ToLower());
+                dialog.FolderName = Path.GetFullPath(@"TestData\NodejsProjectData\AddExistingFolder\SubFolder\TestFolder2");
+                dialog.SelectFolder();
 
-            Assert.AreNotEqual(solutionExplorer.WaitForItem("Solution 'AddExistingFolder' (1 project)", "AddExistingFolder", "SubFolder", "TestFolder2"), null);
+                Assert.AreNotEqual(solutionExplorer.WaitForItem("Solution 'AddExistingFolder' (1 project)", "AddExistingFolder", "SubFolder", "TestFolder2"), null);
+            }
         }
 
         [TestMethod, Priority(0), TestCategory("Core")]
         [HostType("TC Dynamic"), DynamicHostType(typeof(VsIdeHostAdapter))]
         public void TestAddExistingFolderProject() {
             var project = OpenProject(@"TestData\NodejsProjectData\AddExistingFolder.sln");
-            var app = new VisualStudioApp(VsIdeTestHostContext.Dte);
-            var solutionExplorer = app.SolutionExplorerTreeView;
+            using (var app = new VisualStudioApp(VsIdeTestHostContext.Dte)) {
+                var solutionExplorer = app.SolutionExplorerTreeView;
 
-            var projectNode = solutionExplorer.WaitForItem("Solution 'AddExistingFolder' (1 project)", "AddExistingFolder");
-            AutomationWrapper.Select(projectNode);
+                var projectNode = solutionExplorer.WaitForItem("Solution 'AddExistingFolder' (1 project)", "AddExistingFolder");
+                AutomationWrapper.Select(projectNode);
 
-            var dialog = AddExistingFolder(app);
-            Assert.AreEqual(dialog.Address, Path.GetFullPath(@"TestData\NodejsProjectData\AddExistingFolder"));
+                var dialog = AddExistingFolder(app);
+                Assert.AreEqual(dialog.Address.ToLower(), Path.GetFullPath(@"TestData\NodejsProjectData\AddExistingFolder").ToLower());
 
-            dialog.FolderName = Path.GetFullPath(@"TestData\NodejsProjectData\AddExistingFolder");
-            dialog.SelectFolder();
+                dialog.FolderName = Path.GetFullPath(@"TestData\NodejsProjectData\AddExistingFolder");
+                dialog.SelectFolder();
 
-            VisualStudioApp.CheckMessageBox("Cannot add folder 'AddExistingFolder' as a child or decedent of self.");
+                VisualStudioApp.CheckMessageBox("Cannot add folder 'AddExistingFolder' as a child or decedent of self.");
+            }
         }
 
         [TestMethod, Priority(0), TestCategory("Core")]
@@ -338,42 +296,43 @@ namespace Microsoft.Nodejs.Tests.UI {
             var window = project.ProjectItems.Item("server.js").Open();
             window.Activate();
 
-            var app = new VisualStudioApp(VsIdeTestHostContext.Dte);
-            var docWindow = app.GetDocument(window.Document.FullName);
+            using (var app = new VisualStudioApp(VsIdeTestHostContext.Dte)) {
+                var docWindow = app.GetDocument(window.Document.FullName);
 
-            var solutionExplorer = app.SolutionExplorerTreeView;
-            app.Dte.ExecuteCommand("Debug.Start");
-            app.WaitForMode(dbgDebugMode.dbgRunMode);
+                var solutionExplorer = app.SolutionExplorerTreeView;
+                app.Dte.ExecuteCommand("Debug.Start");
+                app.WaitForMode(dbgDebugMode.dbgRunMode);
 
-            app.OpenSolutionExplorer();
-            var projectNode = solutionExplorer.WaitForItem("Solution 'AddExistingFolder' (1 project)", "AddExistingFolder");
-            AutomationWrapper.Select(projectNode);
+                app.OpenSolutionExplorer();
+                var projectNode = solutionExplorer.WaitForItem("Solution 'AddExistingFolder' (1 project)", "AddExistingFolder");
+                AutomationWrapper.Select(projectNode);
 
-            try {
-                VsIdeTestHostContext.Dte.ExecuteCommand("ProjectandSolutionContextMenus.Project.Add.Existingfolder");
-
-                // try and dismiss the dialog if we successfully executed
                 try {
-                    var dialog = app.WaitForDialog();
-                    Keyboard.Type(System.Windows.Input.Key.Escape);
-                } finally {
-                    Assert.Fail("Was able to add an existing folder");
+                    VsIdeTestHostContext.Dte.ExecuteCommand("ProjectandSolutionContextMenus.Project.Add.Existingfolder");
+
+                    // try and dismiss the dialog if we successfully executed
+                    try {
+                        var dialog = app.WaitForDialog();
+                        Keyboard.Type(System.Windows.Input.Key.Escape);
+                    } finally {
+                        Assert.Fail("Was able to add an existing folder");
+                    }
+                } catch (COMException) {
                 }
-            } catch (COMException) {
+                app.Dte.ExecuteCommand("Debug.StopDebugging");
+                app.WaitForMode(dbgDebugMode.dbgDesignMode);
+
+                projectNode = solutionExplorer.WaitForItem("Solution 'AddExistingFolder' (1 project)", "AddExistingFolder");
+                AutomationWrapper.Select(projectNode);
+
+                var addDialog = AddExistingFolder(app);
+                Assert.AreEqual(addDialog.Address.ToLower(), Path.GetFullPath(@"TestData\NodejsProjectData\AddExistingFolder").ToLower());
+
+                addDialog.FolderName = Path.GetFullPath(@"TestData\NodejsProjectData\AddExistingFolder\TestFolder");
+                addDialog.SelectFolder();
+
+                Assert.AreNotEqual(solutionExplorer.WaitForItem("Solution 'AddExistingFolder' (1 project)", "AddExistingFolder", "TestFolder"), null);
             }
-            app.Dte.ExecuteCommand("Debug.StopDebugging");
-            app.WaitForMode(dbgDebugMode.dbgDesignMode);
-
-            projectNode = solutionExplorer.WaitForItem("Solution 'AddExistingFolder' (1 project)", "AddExistingFolder");
-            AutomationWrapper.Select(projectNode);
-
-            var addDialog = AddExistingFolder(app);
-            Assert.AreEqual(addDialog.Address, Path.GetFullPath(@"TestData\NodejsProjectData\AddExistingFolder"));
-
-            addDialog.FolderName = Path.GetFullPath(@"TestData\NodejsProjectData\AddExistingFolder\TestFolder");
-            addDialog.SelectFolder();
-
-            Assert.AreNotEqual(solutionExplorer.WaitForItem("Solution 'AddExistingFolder' (1 project)", "AddExistingFolder", "TestFolder"), null);
         }
 
         private static SelectFolderDialog AddExistingFolder(VisualStudioApp app) {
@@ -394,20 +353,21 @@ namespace Microsoft.Nodejs.Tests.UI {
         public void ProjectAddAndRenameFolder() {
             try {
                 var project = OpenProject(@"TestData\NodejsProjectData\HelloWorld.sln");
-                var app = new VisualStudioApp(VsIdeTestHostContext.Dte);
-                var solutionExplorer = app.SolutionExplorerTreeView;
+                using (var app = new VisualStudioApp(VsIdeTestHostContext.Dte)) {
+                    var solutionExplorer = app.SolutionExplorerTreeView;
 
-                var folder = project.ProjectItems.AddFolder("AddAndRenameFolder");
-                var subfolderNode = solutionExplorer.FindItem("Solution 'HelloWorld' (1 project)", "HelloWorld", "AddAndRenameFolder");
+                    var folder = project.ProjectItems.AddFolder("AddAndRenameFolder");
+                    var subfolderNode = solutionExplorer.FindItem("Solution 'HelloWorld' (1 project)", "HelloWorld", "AddAndRenameFolder");
 
-                // rename it
-                AutomationWrapper.Select(subfolderNode);
-                Keyboard.Type(System.Windows.Input.Key.F2);
-                Keyboard.Type("AddAndRenameFolderNewName");
-                Keyboard.Type(System.Windows.Input.Key.Enter);
+                    // rename it
+                    AutomationWrapper.Select(subfolderNode);
+                    Keyboard.Type(System.Windows.Input.Key.F2);
+                    Keyboard.Type("AddAndRenameFolderNewName");
+                    Keyboard.Type(System.Windows.Input.Key.Enter);
 
-                subfolderNode = solutionExplorer.WaitForItem("Solution 'HelloWorld' (1 project)", "HelloWorld", "AddAndRenameFolderNewName");
-                Assert.IsTrue(Directory.Exists(@"TestData\NodejsProjectData\HelloWorld\AddAndRenameFolderNewName"));
+                    subfolderNode = solutionExplorer.WaitForItem("Solution 'HelloWorld' (1 project)", "HelloWorld", "AddAndRenameFolderNewName");
+                    Assert.IsTrue(Directory.Exists(@"TestData\NodejsProjectData\HelloWorld\AddAndRenameFolderNewName"));
+                }
             } finally {
                 VsIdeTestHostContext.Dte.Solution.Close();
                 GC.Collect();
@@ -426,33 +386,34 @@ namespace Microsoft.Nodejs.Tests.UI {
         public void ProjectAddAndMoveRenamedFolder() {
             try {
                 var project = OpenProject(@"TestData\NodejsProjectData\HelloWorld.sln");
-                var app = new VisualStudioApp(VsIdeTestHostContext.Dte);
-                var solutionExplorer = app.SolutionExplorerTreeView;
+                using (var app = new VisualStudioApp(VsIdeTestHostContext.Dte)) {
+                    var solutionExplorer = app.SolutionExplorerTreeView;
 
-                var folder = project.ProjectItems.AddFolder("AddAndMoveRenamedFolder\\AddAndMoveRenamedSubFolder");
-                var subfolderNode = solutionExplorer.FindItem("Solution 'HelloWorld' (1 project)", "HelloWorld", "AddAndMoveRenamedFolder", "AddAndMoveRenamedSubFolder");
+                    var folder = project.ProjectItems.AddFolder("AddAndMoveRenamedFolder\\AddAndMoveRenamedSubFolder");
+                    var subfolderNode = solutionExplorer.FindItem("Solution 'HelloWorld' (1 project)", "HelloWorld", "AddAndMoveRenamedFolder", "AddAndMoveRenamedSubFolder");
 
-                // rename it
-                AutomationWrapper.Select(subfolderNode);
-                Keyboard.Type(System.Windows.Input.Key.F2);
-                Keyboard.Type("AddAndMoveRenamedNewName");
-                Keyboard.Type(System.Windows.Input.Key.Enter);
+                    // rename it
+                    AutomationWrapper.Select(subfolderNode);
+                    Keyboard.Type(System.Windows.Input.Key.F2);
+                    Keyboard.Type("AddAndMoveRenamedNewName");
+                    Keyboard.Type(System.Windows.Input.Key.Enter);
 
-                subfolderNode = solutionExplorer.WaitForItem("Solution 'HelloWorld' (1 project)", "HelloWorld", "AddAndMoveRenamedFolder", "AddAndMoveRenamedNewName");
+                    subfolderNode = solutionExplorer.WaitForItem("Solution 'HelloWorld' (1 project)", "HelloWorld", "AddAndMoveRenamedFolder", "AddAndMoveRenamedNewName");
 
-                Assert.IsTrue(Directory.Exists(@"TestData\NodejsProjectData\HelloWorld\AddAndMoveRenamedFolder\AddAndMoveRenamedNewName"));
+                    Assert.IsTrue(Directory.Exists(@"TestData\NodejsProjectData\HelloWorld\AddAndMoveRenamedFolder\AddAndMoveRenamedNewName"));
 
-                AutomationWrapper.Select(subfolderNode);
-                Keyboard.ControlX();
+                    AutomationWrapper.Select(subfolderNode);
+                    Keyboard.ControlX();
 
-                var projNode = solutionExplorer.WaitForItem("Solution 'HelloWorld' (1 project)", "HelloWorld");
-                AutomationWrapper.Select(projNode);
+                    var projNode = solutionExplorer.WaitForItem("Solution 'HelloWorld' (1 project)", "HelloWorld");
+                    AutomationWrapper.Select(projNode);
 
-                Keyboard.ControlV();
+                    Keyboard.ControlV();
 
-                var movedNode = solutionExplorer.WaitForItem("Solution 'HelloWorld' (1 project)", "HelloWorld", "AddAndMoveRenamedNewName");
+                    var movedNode = solutionExplorer.WaitForItem("Solution 'HelloWorld' (1 project)", "HelloWorld", "AddAndMoveRenamedNewName");
 
-                Assert.IsTrue(Directory.Exists(@"TestData\NodejsProjectData\HelloWorld\AddAndMoveRenamedNewName"));
+                    Assert.IsTrue(Directory.Exists(@"TestData\NodejsProjectData\HelloWorld\AddAndMoveRenamedNewName"));
+                }
             } finally {
                 VsIdeTestHostContext.Dte.Solution.Close();
                 GC.Collect();
@@ -740,166 +701,170 @@ namespace Microsoft.Nodejs.Tests.UI {
             Directory.CreateDirectory(TestData.GetPath(@"TestData\NodejsProjectData\\AddFolderExists\\Y"));
 
             var project = OpenProject(@"TestData\NodejsProjectData\AddFolderExists.sln");
-            var app = new VisualStudioApp(VsIdeTestHostContext.Dte);
-            var solutionExplorer = app.SolutionExplorerTreeView;
+            using (var app = new VisualStudioApp(VsIdeTestHostContext.Dte)) {
+                var solutionExplorer = app.SolutionExplorerTreeView;
 
-            var solutionNode = solutionExplorer.FindItem("Solution 'AddFolderExists' (1 project)");
+                var solutionNode = solutionExplorer.FindItem("Solution 'AddFolderExists' (1 project)");
 
 
-            var projectNode = solutionExplorer.FindItem("Solution 'AddFolderExists' (1 project)", "AddFolderExists");
+                var projectNode = solutionExplorer.FindItem("Solution 'AddFolderExists' (1 project)", "AddFolderExists");
 
-            ProjectNewFolder(app, solutionNode, projectNode);
+                ProjectNewFolder(app, solutionNode, projectNode);
 
-            System.Threading.Thread.Sleep(1000);
-            Keyboard.Type("."); // bad filename
-            Keyboard.Type(System.Windows.Input.Key.Enter);
+                System.Threading.Thread.Sleep(1000);
+                Keyboard.Type("."); // bad filename
+                Keyboard.Type(System.Windows.Input.Key.Enter);
 
 #if DEV11
-            VisualStudioApp.CheckMessageBox(MessageBoxButton.Ok, "Directory names cannot contain any of the following characters");
+                VisualStudioApp.CheckMessageBox(MessageBoxButton.Ok, "Directory names cannot contain any of the following characters");
 #else
             VisualStudioApp.CheckMessageBox(MessageBoxButton.Ok, ". is an invalid filename");
 #endif
-            System.Threading.Thread.Sleep(1000);
+                System.Threading.Thread.Sleep(1000);
 
-            Keyboard.Type(".."); // another bad filename
-            Keyboard.Type(System.Windows.Input.Key.Enter);
+                Keyboard.Type(".."); // another bad filename
+                Keyboard.Type(System.Windows.Input.Key.Enter);
 
 #if DEV11
-            VisualStudioApp.CheckMessageBox(MessageBoxButton.Ok, "Directory names cannot contain any of the following characters");
+                VisualStudioApp.CheckMessageBox(MessageBoxButton.Ok, "Directory names cannot contain any of the following characters");
 #else
             VisualStudioApp.CheckMessageBox(MessageBoxButton.Ok, ".. is an invalid filename");
 #endif
-            System.Threading.Thread.Sleep(1000);
+                System.Threading.Thread.Sleep(1000);
 
-            Keyboard.Type("Y"); // another bad filename
-            Keyboard.Type(System.Windows.Input.Key.Enter);
+                Keyboard.Type("Y"); // another bad filename
+                Keyboard.Type(System.Windows.Input.Key.Enter);
 
-            VisualStudioApp.CheckMessageBox(MessageBoxButton.Ok, "The folder Y already exists.");
-            System.Threading.Thread.Sleep(1000);
+                VisualStudioApp.CheckMessageBox(MessageBoxButton.Ok, "The folder Y already exists.");
+                System.Threading.Thread.Sleep(1000);
 
-            Keyboard.Type("X");
-            Keyboard.Type(System.Windows.Input.Key.Enter);
+                Keyboard.Type("X");
+                Keyboard.Type(System.Windows.Input.Key.Enter);
 
-            // item should be successfully added now.
-            WaitForItem(project, "X");
+                // item should be successfully added now.
+                WaitForItem(project, "X");
+            }
         }
 
         [TestMethod, Priority(0), TestCategory("Core")]
         [HostType("TC Dynamic"), DynamicHostType(typeof(VsIdeHostAdapter))]
         public void AddFolderCopyAndPasteFile() {
             var project = OpenProject(@"TestData\NodejsProjectData\AddFolderCopyAndPasteFile.sln");
-            var app = new VisualStudioApp(VsIdeTestHostContext.Dte);
-            var solutionExplorer = app.SolutionExplorerTreeView;
-            var solutionNode = solutionExplorer.FindItem("Solution 'AddFolderCopyAndPasteFile' (1 project)");
+            using (var app = new VisualStudioApp(VsIdeTestHostContext.Dte)) {
+                var solutionExplorer = app.SolutionExplorerTreeView;
+                var solutionNode = solutionExplorer.FindItem("Solution 'AddFolderCopyAndPasteFile' (1 project)");
 
-            var projectNode = solutionExplorer.FindItem("Solution 'AddFolderCopyAndPasteFile' (1 project)", "AddFolderCopyAndPasteFile");
+                var projectNode = solutionExplorer.FindItem("Solution 'AddFolderCopyAndPasteFile' (1 project)", "AddFolderCopyAndPasteFile");
 
-            var serverNode = solutionExplorer.FindItem("Solution 'AddFolderCopyAndPasteFile' (1 project)", "AddFolderCopyAndPasteFile", "server.js");
-            Mouse.MoveTo(serverNode.GetClickablePoint());
-            Mouse.Click();
-            Keyboard.ControlC();
-            Keyboard.ControlV();
+                var serverNode = solutionExplorer.FindItem("Solution 'AddFolderCopyAndPasteFile' (1 project)", "AddFolderCopyAndPasteFile", "server.js");
+                Mouse.MoveTo(serverNode.GetClickablePoint());
+                Mouse.Click();
+                Keyboard.ControlC();
+                Keyboard.ControlV();
 
-            // Make sure that copy/paste directly under the project node works:
-            // http://pytools.codeplex.com/workitem/738
-            Assert.IsNotNull(solutionExplorer.WaitForItem("Solution 'AddFolderCopyAndPasteFile' (1 project)", "AddFolderCopyAndPasteFile", "server - Copy.js"));
+                // Make sure that copy/paste directly under the project node works:
+                // http://pytools.codeplex.com/workitem/738
+                Assert.IsNotNull(solutionExplorer.WaitForItem("Solution 'AddFolderCopyAndPasteFile' (1 project)", "AddFolderCopyAndPasteFile", "server - Copy.js"));
 
-            ProjectNewFolder(app, solutionNode, projectNode);
+                ProjectNewFolder(app, solutionNode, projectNode);
 
-            Keyboard.Type("Foo");
-            Keyboard.Type(System.Windows.Input.Key.Return);
+                Keyboard.Type("Foo");
+                Keyboard.Type(System.Windows.Input.Key.Return);
 
-            WaitForItem(project, "Foo");
+                WaitForItem(project, "Foo");
 
-            Mouse.MoveTo(serverNode.GetClickablePoint());
-            Mouse.Click();
-            Keyboard.ControlC();
+                Mouse.MoveTo(serverNode.GetClickablePoint());
+                Mouse.Click();
+                Keyboard.ControlC();
 
-            var folderNode = solutionExplorer.FindItem("Solution 'AddFolderCopyAndPasteFile' (1 project)", "AddFolderCopyAndPasteFile", "Foo");
-            Mouse.MoveTo(folderNode.GetClickablePoint());
-            Mouse.Click();
+                var folderNode = solutionExplorer.FindItem("Solution 'AddFolderCopyAndPasteFile' (1 project)", "AddFolderCopyAndPasteFile", "Foo");
+                Mouse.MoveTo(folderNode.GetClickablePoint());
+                Mouse.Click();
 
-            Keyboard.ControlV();
+                Keyboard.ControlV();
 
-            Assert.IsNotNull(solutionExplorer.WaitForItem("Solution 'AddFolderCopyAndPasteFile' (1 project)", "AddFolderCopyAndPasteFile", "Foo", "server.js"));
+                Assert.IsNotNull(solutionExplorer.WaitForItem("Solution 'AddFolderCopyAndPasteFile' (1 project)", "AddFolderCopyAndPasteFile", "Foo", "server.js"));
+            }
         }
 
         [TestMethod, Priority(0), TestCategory("Core")]
         [HostType("TC Dynamic"), DynamicHostType(typeof(VsIdeHostAdapter))]
         public void CopyAndPasteFolder() {
             var project = OpenProject(@"TestData\NodejsProjectData\CopyAndPasteFolder.sln");
-            var app = new VisualStudioApp(VsIdeTestHostContext.Dte);
-            var solutionExplorer = app.SolutionExplorerTreeView;
-            var solutionNode = solutionExplorer.FindItem("Solution 'CopyAndPasteFolder' (1 project)");
+            using (var app = new VisualStudioApp(VsIdeTestHostContext.Dte)) {
+                var solutionExplorer = app.SolutionExplorerTreeView;
+                var solutionNode = solutionExplorer.FindItem("Solution 'CopyAndPasteFolder' (1 project)");
 
-            var projectNode = solutionExplorer.FindItem("Solution 'CopyAndPasteFolder' (1 project)", "CopyAndPasteFolder");
+                var projectNode = solutionExplorer.FindItem("Solution 'CopyAndPasteFolder' (1 project)", "CopyAndPasteFolder");
 
-            var folderNode = solutionExplorer.FindItem("Solution 'CopyAndPasteFolder' (1 project)", "CopyAndPasteFolder", "X");
+                var folderNode = solutionExplorer.FindItem("Solution 'CopyAndPasteFolder' (1 project)", "CopyAndPasteFolder", "X");
 
-            // paste to project node, make sure the files are there
-            StringCollection paths = new StringCollection() {
+                // paste to project node, make sure the files are there
+                StringCollection paths = new StringCollection() {
                 Path.Combine(Directory.GetCurrentDirectory(), "TestData", "NodejsProjectData", "CopiedFiles")
             };
 
-            ToSTA(() => Clipboard.SetFileDropList(paths));
+                ToSTA(() => Clipboard.SetFileDropList(paths));
 
-            Mouse.MoveTo(projectNode.GetClickablePoint());
-            Mouse.Click();
-            Keyboard.ControlV();
+                Mouse.MoveTo(projectNode.GetClickablePoint());
+                Mouse.Click();
+                Keyboard.ControlV();
 
-            Assert.IsNotNull(solutionExplorer.WaitForItem("Solution 'CopyAndPasteFolder' (1 project)", "CopyAndPasteFolder", "CopiedFiles"));
-            Assert.IsTrue(File.Exists(Path.Combine("TestData", "NodejsProjectData", "CopyAndPasteFolder", "CopiedFiles", "SomeFile.js")));
-            Assert.IsTrue(File.Exists(Path.Combine("TestData", "NodejsProjectData", "CopyAndPasteFolder", "CopiedFiles", "Foo", "SomeOtherFile.js")));
+                Assert.IsNotNull(solutionExplorer.WaitForItem("Solution 'CopyAndPasteFolder' (1 project)", "CopyAndPasteFolder", "CopiedFiles"));
+                Assert.IsTrue(File.Exists(Path.Combine("TestData", "NodejsProjectData", "CopyAndPasteFolder", "CopiedFiles", "SomeFile.js")));
+                Assert.IsTrue(File.Exists(Path.Combine("TestData", "NodejsProjectData", "CopyAndPasteFolder", "CopiedFiles", "Foo", "SomeOtherFile.js")));
 
-            Mouse.MoveTo(folderNode.GetClickablePoint());
-            Mouse.Click();
+                Mouse.MoveTo(folderNode.GetClickablePoint());
+                Mouse.Click();
 
-            // paste to folder node, make sure the files are there
-            ToSTA(() => Clipboard.SetFileDropList(paths));
-            Keyboard.ControlV();
+                // paste to folder node, make sure the files are there
+                ToSTA(() => Clipboard.SetFileDropList(paths));
+                Keyboard.ControlV();
 
-            Assert.IsNotNull(solutionExplorer.WaitForItem("Solution 'CopyAndPasteFolder' (1 project)", "CopyAndPasteFolder", "X", "CopiedFiles"));
-            Assert.IsTrue(File.Exists(Path.Combine("TestData", "NodejsProjectData", "CopyAndPasteFolder", "X", "CopiedFiles", "SomeFile.js")));
-            Assert.IsTrue(File.Exists(Path.Combine("TestData", "NodejsProjectData", "CopyAndPasteFolder", "X", "CopiedFiles", "Foo", "SomeOtherFile.js")));
+                Assert.IsNotNull(solutionExplorer.WaitForItem("Solution 'CopyAndPasteFolder' (1 project)", "CopyAndPasteFolder", "X", "CopiedFiles"));
+                Assert.IsTrue(File.Exists(Path.Combine("TestData", "NodejsProjectData", "CopyAndPasteFolder", "X", "CopiedFiles", "SomeFile.js")));
+                Assert.IsTrue(File.Exists(Path.Combine("TestData", "NodejsProjectData", "CopyAndPasteFolder", "X", "CopiedFiles", "Foo", "SomeOtherFile.js")));
+            }
         }
 
         [TestMethod, Priority(0), TestCategory("Core")]
         [HostType("TC Dynamic"), DynamicHostType(typeof(VsIdeHostAdapter))]
         public void CopyAndPasteEmptyFolder() {
             var project = OpenProject(@"TestData\NodejsProjectData\CopyAndPasteFolder.sln");
-            var app = new VisualStudioApp(VsIdeTestHostContext.Dte);
-            var solutionExplorer = app.SolutionExplorerTreeView;
-            var solutionNode = solutionExplorer.FindItem("Solution 'CopyAndPasteFolder' (1 project)");
+            using (var app = new VisualStudioApp(VsIdeTestHostContext.Dte)) {
+                var solutionExplorer = app.SolutionExplorerTreeView;
+                var solutionNode = solutionExplorer.FindItem("Solution 'CopyAndPasteFolder' (1 project)");
 
-            var projectNode = solutionExplorer.FindItem("Solution 'CopyAndPasteFolder' (1 project)", "CopyAndPasteFolder");
+                var projectNode = solutionExplorer.FindItem("Solution 'CopyAndPasteFolder' (1 project)", "CopyAndPasteFolder");
 
-            var folderNode = solutionExplorer.FindItem("Solution 'CopyAndPasteFolder' (1 project)", "CopyAndPasteFolder", "X");
+                var folderNode = solutionExplorer.FindItem("Solution 'CopyAndPasteFolder' (1 project)", "CopyAndPasteFolder", "X");
 
-            var emptyFolderName = "EmptyFolder" + Guid.NewGuid();
-            Directory.CreateDirectory(emptyFolderName);
-            // paste to project node, make sure the files are there
-            StringCollection paths = new StringCollection() {
+                var emptyFolderName = "EmptyFolder" + Guid.NewGuid();
+                Directory.CreateDirectory(emptyFolderName);
+                // paste to project node, make sure the files are there
+                StringCollection paths = new StringCollection() {
                 Path.Combine(Directory.GetCurrentDirectory(), emptyFolderName)
             };
 
-            ToSTA(() => Clipboard.SetFileDropList(paths));
+                ToSTA(() => Clipboard.SetFileDropList(paths));
 
-            Mouse.MoveTo(projectNode.GetClickablePoint());
-            Mouse.Click();
-            Keyboard.ControlV();
+                Mouse.MoveTo(projectNode.GetClickablePoint());
+                Mouse.Click();
+                Keyboard.ControlV();
 
-            Assert.IsNotNull(solutionExplorer.WaitForItem("Solution 'CopyAndPasteFolder' (1 project)", "CopyAndPasteFolder", emptyFolderName));
-            Assert.IsTrue(Directory.Exists(Path.Combine("TestData", "NodejsProjectData", "CopyAndPasteFolder", emptyFolderName)));
+                Assert.IsNotNull(solutionExplorer.WaitForItem("Solution 'CopyAndPasteFolder' (1 project)", "CopyAndPasteFolder", emptyFolderName));
+                Assert.IsTrue(Directory.Exists(Path.Combine("TestData", "NodejsProjectData", "CopyAndPasteFolder", emptyFolderName)));
 
-            Mouse.MoveTo(folderNode.GetClickablePoint());
-            Mouse.Click();
+                Mouse.MoveTo(folderNode.GetClickablePoint());
+                Mouse.Click();
 
-            // paste to folder node, make sure the files are there
-            ToSTA(() => Clipboard.SetFileDropList(paths));
-            Keyboard.ControlV();
+                // paste to folder node, make sure the files are there
+                ToSTA(() => Clipboard.SetFileDropList(paths));
+                Keyboard.ControlV();
 
-            Assert.IsNotNull(solutionExplorer.WaitForItem("Solution 'CopyAndPasteFolder' (1 project)", "CopyAndPasteFolder", "X", emptyFolderName));
-            Assert.IsTrue(Directory.Exists(Path.Combine("TestData", "NodejsProjectData", "CopyAndPasteFolder", "X", emptyFolderName)));
+                Assert.IsNotNull(solutionExplorer.WaitForItem("Solution 'CopyAndPasteFolder' (1 project)", "CopyAndPasteFolder", "X", emptyFolderName));
+                Assert.IsTrue(Directory.Exists(Path.Combine("TestData", "NodejsProjectData", "CopyAndPasteFolder", "X", emptyFolderName)));
+            }
         }
 
         private static void ToSTA(ST.ThreadStart code) {
@@ -917,23 +882,24 @@ namespace Microsoft.Nodejs.Tests.UI {
         public void CopyFolderWithMultipleItems() {
             // http://mpfproj10.codeplex.com/workitem/11618
             var project = OpenProject(@"TestData\NodejsProjectData\FolderMultipleItems.sln");
-            var app = new VisualStudioApp(VsIdeTestHostContext.Dte);
-            var solutionExplorer = app.SolutionExplorerTreeView;
-            var solutionNode = solutionExplorer.FindItem("Solution 'FolderMultipleItems' (1 project)");
+            using (var app = new VisualStudioApp(VsIdeTestHostContext.Dte)) {
+                var solutionExplorer = app.SolutionExplorerTreeView;
+                var solutionNode = solutionExplorer.FindItem("Solution 'FolderMultipleItems' (1 project)");
 
-            var projectNode = solutionExplorer.FindItem("Solution 'FolderMultipleItems' (1 project)", "FolderMultipleItems");
+                var projectNode = solutionExplorer.FindItem("Solution 'FolderMultipleItems' (1 project)", "FolderMultipleItems");
 
-            var folderNode = solutionExplorer.FindItem("Solution 'FolderMultipleItems' (1 project)", "FolderMultipleItems", "A");
+                var folderNode = solutionExplorer.FindItem("Solution 'FolderMultipleItems' (1 project)", "FolderMultipleItems", "A");
 
-            Mouse.MoveTo(folderNode.GetClickablePoint());
-            Mouse.Click();
-            Keyboard.ControlC();
+                Mouse.MoveTo(folderNode.GetClickablePoint());
+                Mouse.Click();
+                Keyboard.ControlC();
 
-            Keyboard.ControlV();
-            WaitForItem(project, "A - Copy");
+                Keyboard.ControlV();
+                WaitForItem(project, "A - Copy");
 
-            Assert.IsNotNull(solutionExplorer.FindItem("Solution 'FolderMultipleItems' (1 project)", "FolderMultipleItems", "A - Copy", "a.js"));
-            Assert.IsNotNull(solutionExplorer.FindItem("Solution 'FolderMultipleItems' (1 project)", "FolderMultipleItems", "A - Copy", "b.js"));
+                Assert.IsNotNull(solutionExplorer.FindItem("Solution 'FolderMultipleItems' (1 project)", "FolderMultipleItems", "A - Copy", "a.js"));
+                Assert.IsNotNull(solutionExplorer.FindItem("Solution 'FolderMultipleItems' (1 project)", "FolderMultipleItems", "A - Copy", "b.js"));
+            }
         }
 
         [TestMethod, Priority(0), TestCategory("Core")]

@@ -182,6 +182,10 @@ namespace TestUtilities.UI {
                 }
                 System.Threading.Thread.Sleep(500);
             }
+
+            while (sessionStack.TopSession != null) {
+                sessionStack.TopSession.Dismiss();
+            }
             Assert.AreEqual(null, sessionStack.TopSession);
         }
 

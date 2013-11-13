@@ -62,10 +62,18 @@ foreach($singleUrl in $url -split ";")
     copyOnVerify $dest $final
     if (Test-Path -LiteralPath $final)
     {
-       cd $downloaddir
-       Start-Process -FilePath $final -ArgumentList -y -Wait
-       $cmd = $downloaddir + "\setup.cmd"
-       Start-Process -FilePath $cmd  -Wait
+      cd $downloaddir
+      if ($host.Version.Major -eq 3)
+      {
+        .\runtime.exe -y | Out-Null
+        .\setup.cmd
+      }
+      else
+      {
+        Start-Process -FilePath $final -ArgumentList -y -Wait 
+        $cmd = $downloaddir + "\setup.cmd"
+        Start-Process -FilePath $cmd -Wait
+      }
     }
     else
     {

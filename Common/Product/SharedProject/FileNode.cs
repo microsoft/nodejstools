@@ -758,20 +758,25 @@ namespace Microsoft.VisualStudioTools.Project
                 return null;
             }
 
-            if (newParent.IsNonMemberItem) {
+            //If we are included in the project and our parent isn't then
+            //we need to bring our parent into the project
+            if (!this.IsNonMemberItem && newParent.IsNonMemberItem) {
                 ErrorHandler.ThrowOnFailure(newParent.IncludeInProject(false));
             }
-
-            ProjectMgr.OnItemDeleted(this);
-            this.Parent.RemoveChild(this);
-            this.ID = this.ProjectMgr.ItemIdMap.Add(this);
-            this.ItemNode.Rename(CommonUtils.GetRelativeFilePath(ProjectMgr.ProjectHome, newFileName));
-            this.ItemNode.RefreshProperties();
-            this.ProjectMgr.SetProjectFileDirty(true);
-            newParent.AddChild(this);
-            this.Parent = newParent;
+            using (this.ProjectMgr.ExtensibilityEventsDispatcher.Suspend()) {
+                ProjectMgr.OnItemDeleted(this);
+                this.Parent.RemoveChild(this);
+                this.ID = this.ProjectMgr.ItemIdMap.Add(this);
+                this.ItemNode.Rename(CommonUtils.GetRelativeFilePath(ProjectMgr.ProjectHome, newFileName));
+                this.ItemNode.RefreshProperties();
+                this.ProjectMgr.SetProjectFileDirty(true);
+                newParent.AddChild(this);
+                this.Parent = newParent;
+            }
 
             ProjectMgr.ReDrawNode(this, UIHierarchyElement.Caption);
+
+            this.ProjectMgr.ExtensibilityEventsDispatcher.FireItemRenamed(this, Path.GetFileName(newFileName));
 
             //Update the new document in the RDT.
             DocumentManager.RenameDocument(this.ProjectMgr.Site, oldFileName, newFileName, ID);

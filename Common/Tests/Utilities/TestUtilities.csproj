@@ -132,6 +132,7 @@
     <Compile Include="SharedProject\SampleCodeAttribute.cs" />
     <Compile Include="SharedProject\SharedProjectTest.cs" />
     <Compile Include="SharedProject\SolutionFile.cs" />
+    <Compile Include="SharedProject\StartupFileProjectProperty.cs" />
     <Compile Include="TestData.cs" />
     <Compile Include="TestExtensions.cs" />
     <Compile Include="TestMethod.cs" />

@@ -49,3 +49,7 @@ try {
 } catch (err) {
     console.log('nested fails');
 }
+
+var indexfolder = require('./indexfolder');
+
+extravariable = 0;

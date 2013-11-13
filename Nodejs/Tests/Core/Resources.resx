@@ -1,0 +1,156 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<root>
+  <!-- 
+    Microsoft ResX Schema 
+    
+    Version 2.0
+    
+    The primary goals of this format is to allow a simple XML format 
+    that is mostly human readable. The generation and parsing of the 
+    various data types are done through the TypeConverter classes 
+    associated with the data types.
+    
+    Example:
+    
+    ... ado.net/XML headers & schema ...
+    <resheader name="resmimetype">text/microsoft-resx</resheader>
+    <resheader name="version">2.0</resheader>
+    <resheader name="reader">System.Resources.ResXResourceReader, System.Windows.Forms, ...</resheader>
+    <resheader name="writer">System.Resources.ResXResourceWriter, System.Windows.Forms, ...</resheader>
+    <data name="Name1"><value>this is my long string</value><comment>this is a comment</comment></data>
+    <data name="Color1" type="System.Drawing.Color, System.Drawing">Blue</data>
+    <data name="Bitmap1" mimetype="application/x-microsoft.net.object.binary.base64">
+        <value>[base64 mime encoded serialized .NET Framework object]</value>
+    </data>
+    <data name="Icon1" type="System.Drawing.Icon, System.Drawing" mimetype="application/x-microsoft.net.object.bytearray.base64">
+        <value>[base64 mime encoded string representing a byte array form of the .NET Framework object]</value>
+        <comment>This is a comment</comment>
+    </data>
+                
+    There are any number of "resheader" rows that contain simple 
+    name/value pairs.
+    
+    Each data row contains a name, and value. The row also contains a 
+    type or mimetype. Type corresponds to a .NET class that support 
+    text/value conversion through the TypeConverter architecture. 
+    Classes that don't support this are serialized and stored with the 
+    mimetype set.
+    
+    The mimetype is used for serialized objects, and tells the 
+    ResXResourceReader how to depersist the object. This is currently not 
+    extensible. For a given mimetype the value must be set accordingly:
+    
+    Note - application/x-microsoft.net.object.binary.base64 is the format 
+    that the ResXResourceWriter will generate, however the reader can 
+    read any of the formats listed below.
+    
+    mimetype: application/x-microsoft.net.object.binary.base64
+    value   : The object must be serialized with 
+            : System.Runtime.Serialization.Formatters.Binary.BinaryFormatter
+            : and then encoded with base64 encoding.
+    
+    mimetype: application/x-microsoft.net.object.soap.base64
+    value   : The object must be serialized with 
+            : System.Runtime.Serialization.Formatters.Soap.SoapFormatter
+            : and then encoded with base64 encoding.
+
+    mimetype: application/x-microsoft.net.object.bytearray.base64
+    value   : The object must be serialized into a byte array 
+            : using a System.ComponentModel.TypeConverter
+            : and then encoded with base64 encoding.
+    -->
+  <xsd:schema id="root" xmlns="" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:msdata="urn:schemas-microsoft-com:xml-msdata">
+    <xsd:import namespace="http://www.w3.org/XML/1998/namespace" />
+    <xsd:element name="root" msdata:IsDataSet="true">
+      <xsd:complexType>
+        <xsd:choice maxOccurs="unbounded">
+          <xsd:element name="metadata">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" />
+              </xsd:sequence>
+              <xsd:attribute name="name" use="required" type="xsd:string" />
+              <xsd:attribute name="type" type="xsd:string" />
+              <xsd:attribute name="mimetype" type="xsd:string" />
+              <xsd:attribute ref="xml:space" />
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="assembly">
+            <xsd:complexType>
+              <xsd:attribute name="alias" type="xsd:string" />
+              <xsd:attribute name="name" type="xsd:string" />
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="data">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" msdata:Ordinal="1" />
+                <xsd:element name="comment" type="xsd:string" minOccurs="0" msdata:Ordinal="2" />
+              </xsd:sequence>
+              <xsd:attribute name="name" type="xsd:string" use="required" msdata:Ordinal="1" />
+              <xsd:attribute name="type" type="xsd:string" msdata:Ordinal="3" />
+              <xsd:attribute name="mimetype" type="xsd:string" msdata:Ordinal="4" />
+              <xsd:attribute ref="xml:space" />
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="resheader">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" msdata:Ordinal="1" />
+              </xsd:sequence>
+              <xsd:attribute name="name" type="xsd:string" use="required" />
+            </xsd:complexType>
+          </xsd:element>
+        </xsd:choice>
+      </xsd:complexType>
+    </xsd:element>
+  </xsd:schema>
+  <resheader name="resmimetype">
+    <value>text/microsoft-resx</value>
+  </resheader>
+  <resheader name="version">
+    <value>2.0</value>
+  </resheader>
+  <resheader name="reader">
+    <value>System.Resources.ResXResourceReader, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </resheader>
+  <resheader name="writer">
+    <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </resheader>
+  <data name="NodeBacktraceResponse" xml:space="preserve">
+    <value>{"seq":24,"request_seq":13,"type":"response","command":"backtrace","success":true,"body":{"fromFrame":0,"toFrame":7,"totalFrames":7,"frames":[{"type":"frame","index":0,"receiver":{"ref":1,"type":"object","className":"Object"},"func":{"ref":0,"type":"function","name":"","inferredName":"","scriptId":33},"script":{"ref":12},"constructCall":false,"atReturn":false,"debuggerFrame":false,"arguments":[{"name":"exports","value":{"ref":1,"type":"object","className":"Object"}},{"name":"require","value":{"ref":6,"type":"function","name":"require","inferredName":"","scriptId":23}},{"name":"module","value":{"ref":7,"type":"object","className":"Object"}},{"name":"__filename","value":{"ref":9,"type":"string","value":"C:\\Users\\Tester\\documents\\visual studio 2012\\Projects\\NodejsApp1\\NodejsApp1\\serv... (length: 85)"}},{"name":"__dirname","value":{"ref":10,"type":"string","value":"C:\\Users\\Tester\\documents\\visual studio 2012\\Projects\\NodejsApp1\\NodejsApp1"}}],"locals":[{"name":"http","value":{"ref":15,"type":"object","className":"Object"}},{"name":"myXml","value":{"ref":16,"type":"string","value":"&lt;tag&gt;Value&lt;/tag&gt;"}},{"name":"arr","value":{"ref":17,"type":"object","className":"Array"}},{"name":"port","value":{"ref":18,"type":"string","value":"1278"}},{"name":"xs","value":{"ref":19,"type":"object","className":"Array"}},{"name":"v_null","value":{"ref":5,"type":"null","value":null}},{"name":"v_number","value":{"ref":20,"type":"number","value":55}},{"name":"v_boolean","value":{"ref":21,"type":"boolean","value":false}},{"name":"v_regex","value":{"ref":22,"type":"regexp","value":"/^[0-9]/"}},{"name":"v_function","value":{"ref":23,"type":"function","name":"","inferredName":"v_function","scriptId":33}},{"name":"v_string","value":{"ref":24,"type":"string","value":"string"}},{"name":"v_object","value":{"ref":25,"type":"object","className":"Object"}},{"name":"v_error","value":{"ref":26,"type":"error","value":"Error: dsfdsf"}},{"name":"v_variable","value":{"ref":27,"type":"object","className":"Date"}},{"name":"v_undefined","value":{"ref":3,"type":"undefined"}}],"position":698,"line":22,"column":0,"sourceLineText":"var v_undefined = 55;","scopes":[{"type":1,"index":0},{"type":0,"index":1}],"text":"#00 #&lt;Object&gt;.[anonymous](exports=#&lt;Object&gt;, require=function require(path) {\n    return self.require(path);\n  }, module=#&lt;Module&gt;, __filename=C:\\Users\\Tester\\documents\\visual studio 2012\\Projects\\NodejsApp1\\NodejsApp1\\serv... (length: 85), __dirname=C:\\Users\\Tester\\documents\\visual studio 2012\\Projects\\NodejsApp1\\NodejsApp1) C:\\Users\\Tester\\documents\\visual studio 2012\\Projects\\NodejsApp1\\NodejsApp1\\server.js line 23 column 1 (position 699)"},{"type":"frame","index":1,"receiver":{"ref":7,"type":"object","className":"Object"},"func":{"ref":28,"type":"function","name":"","inferredName":"Module._compile","scriptId":23},"script":{"ref":14},"constructCall":false,"atReturn":false,"debuggerFrame":false,"arguments":[{"name":"content","value":{"ref":29,"type":"string","value":"var http = require('http');\r\nvar myXml = \"&lt;tag&gt;Value&lt;/tag&gt;\";\r\nvar arr = [22, \"ds... (length: 679)"}},{"name":"filename","value":{"ref":9,"type":"string","value":"C:\\Users\\Tester\\documents\\visual studio 2012\\Projects\\NodejsApp1\\NodejsApp1\\serv... (length: 85)"}}],"locals":[{"name":"require","value":{"ref":6,"type":"function","name":"require","inferredName":"","scriptId":23}},{"name":"dirname","value":{"ref":10,"type":"string","value":"C:\\Users\\Tester\\documents\\visual studio 2012\\Projects\\NodejsApp1\\NodejsApp1"}},{"name":"sandbox","value":{"ref":3,"type":"undefined"}},{"name":"k","value":{"ref":3,"type":"undefined"}},{"name":"wrapper","value":{"ref":30,"type":"string","value":"(function (exports, require, module, __filename, __dirname) { var http = require... (length: 745)"}},{"name":"compiledWrapper","value":{"ref":0,"type":"function","name":"","inferredName":"","scriptId":33}},{"name":"args","value":{"ref":31,"type":"object","className":"Array"}},{"name":"self","value":{"ref":7,"type":"object","className":"Object"}}],"position":12854,"line":455,"column":25,"sourceLineText":"  return compiledWrapper.apply(self.exports, args);","scopes":[{"type":1,"index":0},{"type":3,"index":1},{"type":0,"index":2}],"text":"#01 #&lt;Module&gt;._compile(content=var http = require('http');\r\nvar myXml = \"&lt;tag&gt;Value&lt;/tag&gt;\";\r\nvar arr = [22, \"ds... (length: 679), filename=C:\\Users\\Tester\\documents\\visual studio 2012\\Projects\\NodejsApp1\\NodejsApp1\\serv... (length: 85)) module.js line 456 column 26 (position 12855)"},{"type":"frame","index":2,"receiver":{"ref":33,"type":"object","className":"Object"},"func":{"ref":34,"type":"function","name":"","inferredName":"Module._extensions..js","scriptId":23},"script":{"ref":14},"constructCall":false,"atReturn":false,"debuggerFrame":false,"arguments":[{"name":"module","value":{"ref":7,"type":"object","className":"Object"}},{"name":"filename","value":{"ref":9,"type":"string","value":"C:\\Users\\Tester\\documents\\visual studio 2012\\Projects\\NodejsApp1\\NodejsApp1\\serv... (length: 85)"}}],"locals":[{"name":"content","value":{"ref":29,"type":"string","value":"var http = require('http');\r\nvar myXml = \"&lt;tag&gt;Value&lt;/tag&gt;\";\r\nvar arr = [22, \"ds... (length: 679)"}}],"position":13365,"line":473,"column":9,"sourceLineText":"  module._compile(stripBOM(content), filename);","scopes":[{"type":1,"index":0},{"type":3,"index":1},{"type":0,"index":2}],"text":"#02 #&lt;Object&gt;..js(module=#&lt;Module&gt;, filename=C:\\Users\\Tester\\documents\\visual studio 2012\\Projects\\NodejsApp1\\NodejsApp1\\serv... (length: 85)) module.js line 474 column 10 (position 13366)"},{"type":"frame","index":3,"receiver":{"ref":7,"type":"object","className":"Object"},"func":{"ref":35,"type":"function","name":"","inferredName":"Module.load","scriptId":23},"script":{"ref":14},"constructCall":false,"atReturn":false,"debuggerFrame":false,"arguments":[{"name":"filename","value":{"ref":9,"type":"string","value":"C:\\Users\\Tester\\documents\\visual studio 2012\\Projects\\NodejsApp1\\NodejsApp1\\serv... (length: 85)"}}],"locals":[{"name":"extension","value":{"ref":36,"type":"string","value":".js"}}],"position":10114,"line":355,"column":31,"sourceLineText":"  Module._extensions[extension](this, filename);","scopes":[{"type":1,"index":0},{"type":3,"index":1},{"type":0,"index":2}],"text":"#03 #&lt;Module&gt;.load(filename=C:\\Users\\Tester\\documents\\visual studio 2012\\Projects\\NodejsApp1\\NodejsApp1\\serv... (length: 85)) module.js line 356 column 32 (position 10115)"},{"type":"frame","index":4,"receiver":{"ref":8,"type":"function","name":"Module","inferredName":"","scriptId":23},"func":{"ref":37,"type":"function","name":"","inferredName":"Module._load","scriptId":23},"script":{"ref":14},"constructCall":false,"atReturn":false,"debuggerFrame":false,"arguments":[{"name":"request","value":{"ref":9,"type":"string","value":"C:\\Users\\Tester\\documents\\visual studio 2012\\Projects\\NodejsApp1\\NodejsApp1\\serv... (length: 85)"}},{"name":"parent","value":{"ref":5,"type":"null","value":null}},{"name":"isMain","value":{"ref":38,"type":"boolean","value":true}}],"locals":[{"name":"filename","value":{"ref":9,"type":"string","value":"C:\\Users\\Tester\\documents\\visual studio 2012\\Projects\\NodejsApp1\\NodejsApp1\\serv... (length: 85)"}},{"name":"cachedModule","value":{"ref":3,"type":"undefined"}},{"name":"replModule","value":{"ref":3,"type":"undefined"}},{"name":"module","value":{"ref":7,"type":"object","className":"Object"}},{"name":"hadException","value":{"ref":38,"type":"boolean","value":true}}],"position":8947,"line":311,"column":11,"sourceLineText":"    module.load(filename);","scopes":[{"type":1,"index":0},{"type":3,"index":1},{"type":0,"index":2}],"text":"#04 function Module(id, parent) {\n  this.id = id;\n  this.exports = {};\n  this.parent = parent;\n  if (parent &amp;&amp; parent.children) {\n    parent.children.push(this);\n  }\n\n  this.filename = null;\n  this.loaded = false;\n  this.children = [];\n}._load(request=C:\\Users\\Tester\\documents\\visual studio 2012\\Projects\\NodejsApp1\\NodejsApp1\\serv... (length: 85), parent=null, isMain=true) module.js line 312 column 12 (position 8948)"},{"type":"frame","index":5,"receiver":{"ref":40,"type":"object","className":"Object"},"func":{"ref":41,"type":"function","name":"","inferredName":"Module.runMain","scriptId":23},"script":{"ref":14},"constructCall":false,"atReturn":false,"debuggerFrame":false,"arguments":[],"locals":[],"position":13920,"line":496,"column":9,"sourceLineText":"  Module._load(process.argv[1], null, true);","scopes":[{"type":1,"index":0},{"type":3,"index":1},{"type":0,"index":2}],"text":"#05 #&lt;Object&gt;._onTimeout() module.js line 497 column 10 (position 13921)"},{"type":"frame","index":6,"receiver":{"ref":44,"type":"object","className":"Timer"},"func":{"ref":45,"type":"function","name":"listOnTimeout","inferredName":"","scriptId":24},"script":{"ref":47},"constructCall":false,"atReturn":false,"debuggerFrame":false,"arguments":[{"value":{"ref":48,"type":"number","value":0}}],"locals":[{"name":"msecs","value":{"ref":49,"type":"number","value":50}},{"name":"now","value":{"ref":50,"type":"number","value":1383252998052}},{"name":"first","value":{"ref":40,"type":"object","className":"Object"}},{"name":"diff","value":{"ref":51,"type":"number","value":64}},{"name":"domain","value":{"ref":3,"type":"undefined"}},{"name":"threw","value":{"ref":38,"type":"boolean","value":true}},{"name":"list","value":{"ref":44,"type":"object","className":"Timer"}}],"position":3529,"line":109,"column":14,"sourceLineText":"        first._onTimeout();","scopes":[{"type":1,"index":0},{"type":3,"index":1},{"type":0,"index":2}],"text":"#06 #&lt;Timer&gt;.ontimeout(aka listOnTimeout)(0) timers.js line 110 column 15 (position 3530)"}]},"refs":[{"handle":12,"type":"script","name":"C:\\Users\\Tester\\documents\\visual studio 2012\\Projects\\NodejsApp1\\NodejsApp1\\server.js","id":33,"lineOffset":0,"columnOffset":0,"lineCount":26,"sourceStart":"(function (exports, require, module, __filename, __dirname) { var http = require","sourceLength":745,"scriptType":2,"compilationType":0,"context":{"ref":11},"text":"C:\\Users\\Tester\\documents\\visual studio 2012\\Projects\\NodejsApp1\\NodejsApp1\\server.js (lines: 26)"},{"handle":14,"type":"script","name":"module.js","id":23,"lineOffset":0,"columnOffset":0,"lineCount":539,"sourceStart":"(function (exports, require, module, __filename, __dirname) { // Copyright Joyen","sourceLength":14908,"scriptType":2,"compilationType":0,"context":{"ref":13},"text":"module.js (lines: 539)"},{"handle":47,"type":"script","name":"timers.js","id":24,"lineOffset":0,"columnOffset":0,"lineCount":485,"sourceStart":"(function (exports, require, module, __filename, __dirname) { // Copyright Joyen","sourceLength":11580,"scriptType":2,"compilationType":0,"context":{"ref":46},"text":"timers.js (lines: 485)"}],"running":false}</value>
+  </data>
+  <data name="NodeBacktraceVariableObject" xml:space="preserve">
+    <value>{"name":"v_boolean","value":{"ref":21,"type":"boolean","value":false}}</value>
+  </data>
+  <data name="NodeBacktraceVariableObjectWithoutName" xml:space="preserve">
+    <value>{"value":{"ref":21,"type":"boolean","value":false}}</value>
+  </data>
+  <data name="NodeComplexArray" xml:space="preserve">
+    <value>[{fullName: "full name", age: 123}, {head:"head", body:"body"}, [0, 1, 2]]</value>
+  </data>
+  <data name="NodeEvaluationResponse" xml:space="preserve">
+    <value>{"seq":21,"request_seq":15,"type":"response","command":"evaluate","success":true,"body":{"handle":16,"type":"string","value":"&lt;tag&gt;Value&lt;/tag&gt;","length":16,"text":"&lt;tag&gt;Value&lt;/tag&gt;"},"refs":[],"running":false}</value>
+  </data>
+  <data name="NodeEvaluationVariableObject" xml:space="preserve">
+    <value>{"handle":16,"type":"string","value":"&lt;tag&gt;Value&lt;/tag&gt;","length":16,"text":"&lt;tag&gt;Value&lt;/tag&gt;"}</value>
+  </data>
+  <data name="NodeLookupPrototypeObject" xml:space="preserve">
+    <value>{"ref":4}</value>
+  </data>
+  <data name="NodeLookupReferencesArray" xml:space="preserve">
+    <value>[{"handle":2,"type":"function","className":"Function","constructorFunction":{"ref":56},"protoObject":{"ref":39},"prototypeObject":{"ref":4},"name":"Object","inferredName":"","resolved":true,"source":"function Object() { [native code] }","scopes":[],"properties":[{"name":"length","attributes":7,"propertyType":3,"ref":54},{"name":"name","attributes":7,"propertyType":3,"ref":57},{"name":"arguments","attributes":7,"propertyType":3,"ref":5},{"name":"caller","attributes":7,"propertyType":3,"ref":5},{"name":"prototype","attributes":7,"propertyType":3,"ref":4},{"name":"keys","attributes":2,"propertyType":2,"ref":58},{"name":"create","attributes":2,"propertyType":2,"ref":59},{"name":"defineProperty","attributes":2,"propertyType":2,"ref":60},{"name":"defineProperties","attributes":2,"propertyType":2,"ref":61},{"name":"freeze","attributes":2,"propertyType":2,"ref":62},{"name":"getPrototypeOf","attributes":2,"propertyType":2,"ref":63},{"name":"getOwnPropertyDescriptor","attributes":2,"propertyType":2,"ref":64},{"name":"getOwnPropertyNames","attributes":2,"propertyType":2,"ref":65},{"name":"is","attributes":2,"propertyType":2,"ref":66},{"name":"isExtensible","attributes":2,"propertyType":2,"ref":67},{"name":"isFrozen","attributes":2,"propertyType":2,"ref":68},{"name":"isSealed","attributes":2,"propertyType":2,"ref":69},{"name":"preventExtensions","attributes":2,"propertyType":2,"ref":70},{"name":"seal","attributes":2,"propertyType":2,"ref":71}],"text":"function Object() { [native code] }"},{"handle":4,"type":"object","className":"Object","constructorFunction":{"ref":2},"protoObject":{"ref":5},"prototypeObject":{"ref":3},"properties":[{"name":"constructor","attributes":2,"propertyType":2,"ref":2},{"name":"toString","attributes":2,"propertyType":2,"ref":72},{"name":"toLocaleString","attributes":2,"propertyType":2,"ref":73},{"name":"valueOf","attributes":2,"propertyType":2,"ref":74},{"name":"hasOwnProperty","attributes":2,"propertyType":2,"ref":75},{"name":"isPrototypeOf","attributes":2,"propertyType":2,"ref":76},{"name":"propertyIsEnumerable","attributes":2,"propertyType":2,"ref":77},{"name":"__defineGetter__","attributes":2,"propertyType":2,"ref":78},{"name":"__lookupGetter__","attributes":2,"propertyType":2,"ref":79},{"name":"__defineSetter__","attributes":2,"propertyType":2,"ref":80},{"name":"__lookupSetter__","attributes":2,"propertyType":2,"ref":81}],"text":"#&lt;Object&gt;"},{"handle":3,"type":"undefined","text":"undefined"},{"handle":54,"type":"number","value":1,"text":"1"},{"handle":55,"type":"number","value":2,"text":"2"}]</value>
+  </data>
+  <data name="NodeLookupResponse" xml:space="preserve">
+    <value>{"seq":15,"request_seq":9,"type":"response","command":"lookup","success":true,"body":{"25":{"handle":25,"type":"object","className":"Object","constructorFunction":{"ref":2},"protoObject":{"ref":4},"prototypeObject":{"ref":3},"properties":[{"name":"first","propertyType":1,"ref":54},{"name":"second","propertyType":1,"ref":55}],"text":"#&lt;Object&gt;"}},"refs":[{"handle":2,"type":"function","className":"Function","constructorFunction":{"ref":56},"protoObject":{"ref":39},"prototypeObject":{"ref":4},"name":"Object","inferredName":"","resolved":true,"source":"function Object() { [native code] }","scopes":[],"properties":[{"name":"length","attributes":7,"propertyType":3,"ref":54},{"name":"name","attributes":7,"propertyType":3,"ref":57},{"name":"arguments","attributes":7,"propertyType":3,"ref":5},{"name":"caller","attributes":7,"propertyType":3,"ref":5},{"name":"prototype","attributes":7,"propertyType":3,"ref":4},{"name":"keys","attributes":2,"propertyType":2,"ref":58},{"name":"create","attributes":2,"propertyType":2,"ref":59},{"name":"defineProperty","attributes":2,"propertyType":2,"ref":60},{"name":"defineProperties","attributes":2,"propertyType":2,"ref":61},{"name":"freeze","attributes":2,"propertyType":2,"ref":62},{"name":"getPrototypeOf","attributes":2,"propertyType":2,"ref":63},{"name":"getOwnPropertyDescriptor","attributes":2,"propertyType":2,"ref":64},{"name":"getOwnPropertyNames","attributes":2,"propertyType":2,"ref":65},{"name":"is","attributes":2,"propertyType":2,"ref":66},{"name":"isExtensible","attributes":2,"propertyType":2,"ref":67},{"name":"isFrozen","attributes":2,"propertyType":2,"ref":68},{"name":"isSealed","attributes":2,"propertyType":2,"ref":69},{"name":"preventExtensions","attributes":2,"propertyType":2,"ref":70},{"name":"seal","attributes":2,"propertyType":2,"ref":71}],"text":"function Object() { [native code] }"},{"handle":4,"type":"object","className":"Object","constructorFunction":{"ref":2},"protoObject":{"ref":5},"prototypeObject":{"ref":3},"properties":[{"name":"constructor","attributes":2,"propertyType":2,"ref":2},{"name":"toString","attributes":2,"propertyType":2,"ref":72},{"name":"toLocaleString","attributes":2,"propertyType":2,"ref":73},{"name":"valueOf","attributes":2,"propertyType":2,"ref":74},{"name":"hasOwnProperty","attributes":2,"propertyType":2,"ref":75},{"name":"isPrototypeOf","attributes":2,"propertyType":2,"ref":76},{"name":"propertyIsEnumerable","attributes":2,"propertyType":2,"ref":77},{"name":"__defineGetter__","attributes":2,"propertyType":2,"ref":78},{"name":"__lookupGetter__","attributes":2,"propertyType":2,"ref":79},{"name":"__defineSetter__","attributes":2,"propertyType":2,"ref":80},{"name":"__lookupSetter__","attributes":2,"propertyType":2,"ref":81}],"text":"#&lt;Object&gt;"},{"handle":3,"type":"undefined","text":"undefined"},{"handle":54,"type":"number","value":1,"text":"1"},{"handle":55,"type":"number","value":2,"text":"2"}],"running":false}</value>
+  </data>
+  <data name="NodeLookupVariableObject" xml:space="preserve">
+    <value>{"name":"first","propertyType":1,"ref":54}</value>
+  </data>
+  <data name="NodeSimpleArray" xml:space="preserve">
+    <value>[0, 1, 2]</value>
+  </data>
+  <data name="NodeVariable" xml:space="preserve">
+    <value>{stringValue: "stringValue", numberValue: 555, objectValue: {value: true}, arrayValue: [0, 1, 2]}</value>
+  </data>
+</root>
