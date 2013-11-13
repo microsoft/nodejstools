@@ -13,6 +13,8 @@
  * ***************************************************************************/
 
 using System.Collections.Generic;
+using System.Reflection.Emit;
+using System.Text;
 using Microsoft.NodejsTools.Npm.SPI;
 
 namespace Microsoft.NodejsTools.Npm{
@@ -21,6 +23,8 @@ namespace Microsoft.NodejsTools.Npm{
     /// </summary>
     public class NodeModuleBuilder{
         private readonly List<IPackage> _dependencies;
+        private StringBuilder _descriptionBuff = new StringBuilder();
+        private StringBuilder _authorBuff = new StringBuilder();
 
         public NodeModuleBuilder(){
             _dependencies = new List<IPackage>();
@@ -31,19 +35,46 @@ namespace Microsoft.NodejsTools.Npm{
             Author = module.Author;
             Version = module.Version;
             RequestedVersionRange = module.RequestedVersionRange;
-            Description = module.Description;
+            AppendToDescription( module.Description );
             Flags = module.Flags;
             _dependencies = new List<IPackage>();
             _dependencies.AddRange(module.Modules);
         }
 
-        public IPerson Author { get; set; }
+        public void Reset(){
+            Name = null;
+            _descriptionBuff.Length = 0;
+            _authorBuff.Length = 0;
+        }
+
+        public void AddAuthor(string text){
+            if (_authorBuff.Length > 0){
+                _authorBuff.Append(' ');
+            }
+            _authorBuff.Append(text);
+        }
+
+        public IPerson Author{
+            get{
+                var text = _authorBuff.ToString().Trim();
+                return string.IsNullOrEmpty(text) ? null : new Person(text);
+            }
+        }
 
         public string Name { get; set; }
 
         public SemverVersion Version { get; set; }
 
-        public string Description { get; set; }
+        public void AppendToDescription(string text){
+            _descriptionBuff.Append(text);
+        }
+
+        public string Description{
+            get{
+                var text = _descriptionBuff.ToString().Trim();
+                return string.IsNullOrEmpty(text) ? null : text;
+            }
+        }
 
         public IEnumerable<IPackage> Dependencies{
             get { return _dependencies; }
