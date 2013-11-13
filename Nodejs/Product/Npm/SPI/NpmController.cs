@@ -14,6 +14,7 @@
 
 using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Threading.Tasks;
 
 namespace Microsoft.NodejsTools.Npm.SPI{
@@ -60,14 +61,18 @@ namespace Microsoft.NodejsTools.Npm.SPI{
         public void Refresh(){
             OnStartingRefresh();
             lock (_lock){
-                RootPackage = RootPackageFactory.Create(
-                    _fullPathToRootPackageDirectory,
-                    _showMissingDevOptionalSubPackages);
+                try {
+                    RootPackage = RootPackageFactory.Create(
+                        _fullPathToRootPackageDirectory,
+                        _showMissingDevOptionalSubPackages);
 
-                var command = new NpmLsCommand(_fullPathToRootPackageDirectory, true, _pathToNpm);
-                GlobalPackages = AsyncHelpers.RunSync<bool>(() => command.ExecuteAsync())
-                                     ? RootPackageFactory.Create(command.ListBaseDirectory)
-                                     : null;
+                    var command = new NpmLsCommand(_fullPathToRootPackageDirectory, true, _pathToNpm);
+                    GlobalPackages = AsyncHelpers.RunSync<bool>(() => command.ExecuteAsync())
+                        ? RootPackageFactory.Create(command.ListBaseDirectory)
+                        : null;
+                } catch (IOException) {
+                    // Can sometimes happen when packages are still installing because the file may still be used by another process
+                }
             }
             OnFinishedRefresh();
         }

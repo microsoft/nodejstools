@@ -141,7 +141,8 @@ namespace Microsoft.NodejsTools.Project{
                     _fileSystemWatcherTimer.Dispose();
                 }
 
-                _fileSystemWatcherTimer = new Timer(o => UpdateModulesFromTimer(), null, 1000, Timeout.Infinite);
+                // I've upped the time to 2000ms because I noticed a few too many spurious updates going through.
+                _fileSystemWatcherTimer = new Timer(o => UpdateModulesFromTimer(), null, 2000, Timeout.Infinite);
             }
         }
 

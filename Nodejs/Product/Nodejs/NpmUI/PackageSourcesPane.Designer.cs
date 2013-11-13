@@ -95,6 +95,7 @@ namespace Microsoft.NodejsTools.NpmUI
             // _comboDepType
             // 
             this._comboDepType.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left)));
+            this._comboDepType.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
             this._comboDepType.FormattingEnabled = true;
             this._comboDepType.Items.AddRange(new object[] {
             "Standard Dependency",
@@ -110,7 +111,7 @@ namespace Microsoft.NodejsTools.NpmUI
             this._btnInstall.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left)));
             this._btnInstall.Location = new System.Drawing.Point(237, 4);
             this._btnInstall.Name = "_btnInstall";
-            this._btnInstall.Size = new System.Drawing.Size(91, 23);
+            this._btnInstall.Size = new System.Drawing.Size(158, 23);
             this._btnInstall.TabIndex = 0;
             this._btnInstall.Text = "Install Local";
             this._btnInstall.UseVisualStyleBackColor = true;

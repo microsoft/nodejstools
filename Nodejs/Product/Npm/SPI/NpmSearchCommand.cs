@@ -67,9 +67,13 @@ namespace Microsoft.NodejsTools.Npm.SPI{
                     var remainder = split.Where(s => !s.StartsWith("=")).ToArray();
 
                     if (remainder.Length >= 3){
-                        try{
-                            moduleBuilder.Version = SemverVersion.Parse(remainder[2]);
-                        } catch (SemverVersionFormatException){
+                        if (char.IsDigit(remainder[2][0])){
+                            try{
+                                moduleBuilder.Version = SemverVersion.Parse(remainder[2]);
+                            } catch (SemverVersionFormatException) {
+                                moduleBuilder.Version = SemverVersion.UnknownVersion;
+                            }
+                        } else {
                             moduleBuilder.Version = SemverVersion.UnknownVersion;
                         }
                     }
