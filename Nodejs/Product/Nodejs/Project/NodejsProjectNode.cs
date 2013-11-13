@@ -268,21 +268,48 @@ function relative_match(match_dir, dirname, mod_name, alt_mod_name, ref_path) {
      if(ref_path.substr(0, 2) == './') {
          var components = ref_path.split('/');
          var upCount = 0;
-         for(var i = 1; i < components.length; i++) {
+
+        // loops are unrolled here so that the JavaScript language service will always fully process
+        // them, otherwise it may stop executing them if execution takes too long, and then
+        // we get incorrect results.
+         if(components.length >= 2 && components[1] == '..') {
+            upCount++;
+         }
+         if(components.length >= 3 && components[2] == '..') {
+            upCount++;
+         }
+         if(components.length >= 4 && components[3] == '..') {
+            upCount++;
+         }
+         if(components.length >= 5 && components[4] == '..') {
+            upCount++;
+         }
+         for(var i = 5; i < components.length; i++) {
              if (components[i] == '..') {
                  upCount++;
              } else {
                  break;
              }
          }
+
          if (upCount != 0) {
              var dirComponents = dirname.split('\\');
-             for(var i = 0; i < upCount; i++) {
+             if(upCount > 0) {
+                dirComponents.pop();
+             }
+             if(upCount > 1) {
+                dirComponents.pop();
+             }
+             if(upCount > 2) {
+                dirComponents.pop();
+             }
+             if(upCount > 3) {
+                dirComponents.pop();
+             }
+             for(var i = 4; i < upCount; i++) {
                  dirComponents.pop();
              }
-             for (var i = upCount + 1; i < (components.length - 1); i++) {
-                 dirComponents.push(components[i]);
-             }
+             dirComponents = dirComponents.concat(components.slice(upCount+1, components.length-1));
              var res = match_dir === dirComponents.join('\\') && (components[components.length - 1] == mod_name || components[components.length - 1] == alt_mod_name);
              return res;
          }
@@ -401,9 +428,7 @@ function starts_with(a, b) {
                 switchCode.AppendLine("}");
             }
 
-#if DEBUG
             switchCode.AppendLine("intellisense.logMessage('Intellisense failed to resolve module: ' + module + ' in ' + __filename);");
-#endif
         }
 
         /// <summary>

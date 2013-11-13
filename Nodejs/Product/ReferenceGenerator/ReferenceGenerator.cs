@@ -456,6 +456,8 @@ namespace Microsoft.NodejsTools.Intellisense {
         private static dynamic FixModuleName(string module) {
             if (module == "tls_(ssl)") {
                 return "tls";
+            } else if (module == "Events") {
+                return "events";
             }
 
             for (int i = 0; i < module.Length; i++) {

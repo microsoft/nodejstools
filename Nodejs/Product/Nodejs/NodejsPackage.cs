@@ -31,9 +31,11 @@ using Microsoft.NodejsTools.Project;
 using Microsoft.NodejsTools.Repl;
 using Microsoft.VisualStudio;
 using Microsoft.VisualStudio.Debugger.Interop;
+using Microsoft.VisualStudio.OLE.Interop;
 using Microsoft.VisualStudio.Shell;
 using Microsoft.VisualStudio.Shell.Interop;
 using Microsoft.VisualStudio.Text;
+using Microsoft.VisualStudio.TextManager.Interop;
 using Microsoft.VisualStudio.Utilities;
 using Microsoft.VisualStudioTools;
 using Microsoft.Win32;
@@ -172,6 +174,7 @@ namespace Microsoft.NodejsTools {
         private string _surveyNewsUrl;
         private object _surveyNewsUrlLock = new object();
         internal HashSet<ITextBuffer> ChangedBuffers = new HashSet<ITextBuffer>();
+        private LanguagePreferences _langPrefs;
 
         /// <summary>
         /// Default constructor of the package.
@@ -231,6 +234,18 @@ namespace Microsoft.NodejsTools {
                 new OpenRemoteDebugProxyFolderCommand(),
                 new SurveyNewsCommand(),
             }, GuidList.guidNodeCmdSet);
+
+            IVsTextManager textMgr = (IVsTextManager)Instance.GetService(typeof(SVsTextManager));
+            var langPrefs = new LANGPREFERENCES[1];
+            langPrefs[0].guidLang = typeof(NodejsLanguageInfo).GUID;
+            ErrorHandler.ThrowOnFailure(textMgr.GetUserPreferences(null, null, langPrefs, null));
+            _langPrefs = new LanguagePreferences(langPrefs[0]);
+
+            Guid guid = typeof(IVsTextManagerEvents2).GUID;
+            IConnectionPoint connectionPoint;
+            ((IConnectionPointContainer)textMgr).FindConnectionPoint(ref guid, out connectionPoint);
+            uint cookie;
+            connectionPoint.Advise(_langPrefs, out cookie);
         }
 
         internal void OpenReplWindow() {
@@ -271,6 +286,13 @@ namespace Microsoft.NodejsTools {
         }
 
         private static string remoteDebugProxyFolder = null;
+
+        internal LanguagePreferences LangPrefs {
+            get {
+                return _langPrefs;
+            }
+        }
+
         public static string RemoteDebugProxyFolder {
             get {
                 // Lazily evaluated

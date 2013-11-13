@@ -235,6 +235,14 @@ namespace Microsoft.NodejsTools.Project {
             } catch (IOException) {
             } catch (UnauthorizedAccessException) {
             }
+
+            try {
+                File.Delete(_asyncFilePath);
+            } catch (IOException) {
+            } catch (UnauthorizedAccessException) {
+            }
+
+            ProjectMgr.UpdateReferenceFile(this);
         }
     }
 }

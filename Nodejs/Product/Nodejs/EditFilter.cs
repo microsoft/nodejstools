@@ -118,7 +118,10 @@ namespace Microsoft.NodejsTools {
                                 }
                             }
 
-                            if (ch == '}' || ch == ';') {
+                            if ((ch == '.' && !NodejsPackage.Instance.LangPrefs.AutoListMembers) ||
+                                (ch == '(' && !NodejsPackage.Instance.LangPrefs.AutoListParams)) {
+                                return (SkipJsFilter ?? _next).Exec(ref pguidCmdGroup, nCmdID, nCmdexecopt, pvaIn, pvaOut);
+                            } else if (ch == '}' || ch == ';') {
                                 if (SkipJsFilter != null) {
                                     return SkipJsFilter.Exec(ref pguidCmdGroup, nCmdID, nCmdexecopt, pvaIn, pvaOut);
                                 }
@@ -133,7 +136,13 @@ namespace Microsoft.NodejsTools {
                                 return VSConstants.S_OK;
                             }
 
-                            int hr = _next.Exec(ref pguidCmdGroup, nCmdID, nCmdexecopt, pvaIn, pvaOut);
+                            int hr;
+                            if (!NodejsPackage.Instance.LangPrefs.AutoListMembers) {
+                                hr = (SkipJsFilter ?? _next).Exec(ref pguidCmdGroup, nCmdID, nCmdexecopt, pvaIn, pvaOut);
+                            } else {
+                                hr = _next.Exec(ref pguidCmdGroup, nCmdID, nCmdexecopt, pvaIn, pvaOut);
+                            }
+                            
                             if (ErrorHandler.Succeeded(hr) && _activeSession != null && !_activeSession.IsDismissed) {
                                 _activeSession.Filter();
                             }

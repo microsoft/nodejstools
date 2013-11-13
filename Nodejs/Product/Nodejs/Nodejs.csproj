@@ -119,6 +119,7 @@
     <Reference Include="Microsoft.VisualStudio.Shell.$(VSTarget), Version=$(VSTarget).0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a, processorArchitecture=MSIL" />
     <Reference Include="Microsoft.VisualStudio.Shell.Immutable.11.0" />
     <Reference Include="Microsoft.VisualStudio.Shell.Immutable.10.0" />
+    <Reference Include="Microsoft.VisualStudio.TextManager.Interop.8.0, Version=8.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a" />
     <Reference Include="Microsoft.Windows.Design.Host, Version=4.1.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
       <HintPath>$(DevEnvDir)PrivateAssemblies\Microsoft.Windows.Design.Host.dll</HintPath>
@@ -235,6 +236,7 @@
     <Compile Include="Intellisense\ReferenceGroup.cs" />
     <Compile Include="Intellisense\ReferenceGroupDispenser.cs" />
     <Compile Include="Intellisense\TextViewCreationListener.cs" />
+    <Compile Include="LanguagePreferences.cs" />
     <Compile Include="Nodejs.cs" />
     <Compile Include="NodejsLanguageInfo.cs" />
     <Compile Include="NodejsProjectConfig.cs" />
