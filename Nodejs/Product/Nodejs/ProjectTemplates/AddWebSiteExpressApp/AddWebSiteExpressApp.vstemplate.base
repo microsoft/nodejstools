@@ -7,7 +7,7 @@
     <ProjectSubType>JavaScript</ProjectSubType>
     <TemplateID>Microsoft.JavaScript.AddWebSiteExpressApp</TemplateID>
     <SortOrder>135</SortOrder>
-    <CreateNewFolder>false</CreateNewFolder>
+    <CreateNewFolder>true</CreateNewFolder>
     <DefaultName>ExpressApp</DefaultName>
     <ProvideDefaultName>true</ProvideDefaultName>
     <NumberOfParentCategoriesToRollUp>1</NumberOfParentCategoriesToRollUp>

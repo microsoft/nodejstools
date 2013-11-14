@@ -115,6 +115,16 @@
         </Strings>
       </Button>
 
+      <Button guid="guidNodeToolsCmdSet" id="cmdidImportWizard" priority="0x010" type="Button">
+        <Parent guid="guidNodeToolsCmdSet" id="ToolsMenuItemsGroup"/>
+        <CommandFlag>DefaultInvisible</CommandFlag>
+        <Strings>
+          <ButtonText>Import Existing &amp;Project...</ButtonText>
+          <MenuText>Import Existing &amp;Project...</MenuText>
+          <ToolTipText>Import Existing Project...</ToolTipText>
+          <CommandName>Import Existing Project...</CommandName>
+        </Strings>
+      </Button>
     </Buttons>
 
 
@@ -150,6 +160,7 @@
       <IDSymbol name="cmdidOpenRemoteDebugProxyFolder" value="0x0202" />
       <IDSymbol name="cmdidSetAsNodejsStartupFile" value="0x0203" />
       <IDSymbol name="cmdidSurveyNews" value ="0x0204" />
+      <IDSymbol name="cmdidImportWizard" value ="0x0205" />
 
       <!-- Shared commands, defined in CommonConstants.cs -->
       <IDSymbol name="cmdidAddExistingFolder" value="0x10001" />

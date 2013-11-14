@@ -12,18 +12,15 @@
  *
  * ***************************************************************************/
 
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+using System.Windows.Controls;
 
-namespace Microsoft.NodejsTools {
-    class PkgCmdId {
-        public const int cmdidReplWindow                    = 0x201;
-        public const int cmdidOpenRemoteDebugProxyFolder    = 0x202;
-        public const int cmdidSetAsNodejsStartupFile        = 0x203;
-        public const int cmdidSurveyNews                    = 0x204;
-        public const int cmdidImportWizard                  = 0x205;
+namespace Microsoft.NodejsTools.Project.ImportWizard {
+    /// <summary>
+    /// Interaction logic for FileSourcePage.xaml
+    /// </summary>
+    internal partial class StartupPage : Page {
+        public StartupPage() {
+            InitializeComponent();
+        }
     }
 }

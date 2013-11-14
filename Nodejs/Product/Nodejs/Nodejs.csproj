@@ -204,6 +204,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="CodeWindowManager.cs" />
+    <Compile Include="Commands\ImportWizardCommand.cs" />
     <Compile Include="Commands\OpenReplWindowCommand.cs" />
     <Compile Include="Commands\OpenRemoteDebugProxyFolderCommand.cs" />
     <Compile Include="Commands\SurveyNewsCommand.cs" />
@@ -254,6 +255,44 @@
       <DependentUpon>NodejsGeneralOptionsControl.cs</DependentUpon>
     </Compile>
     <Compile Include="Options\SurveyNewsPolicy.cs" />
+    <Compile Include="Project\ImportWizard\StartupPage.xaml.cs">
+      <DependentUpon>StartupPage.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="Project\ImportWizard\SaveProjectPage.xaml.cs">
+      <DependentUpon>SaveProjectPage.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="Project\ImportWizard\FileSourcePage.xaml.cs">
+      <DependentUpon>FileSourcePage.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="Project\ImportWizard\ImportSettings.cs" />
+    <Compile Include="Project\ImportWizard\ImportWizard.xaml.cs">
+      <DependentUpon>ImportWizard.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="Wpf\Commands.cs" />
+    <Compile Include="Wpf\Controls.cs" />
+    <Compile Include="Wpf\LabelledButton.cs" />
+    <Compile Include="Wpf\LabelledControl.cs" />
+    <Compile Include="Wpf\NativeMethods.cs" />
+    <Page Include="Project\ImportWizard\StartupPage.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
+    </Page>
+    <Page Include="Project\ImportWizard\SaveProjectPage.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
+    </Page>
+    <Page Include="Project\ImportWizard\FileSourcePage.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="Project\ImportWizard\ImportWizard.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="Project\ImportWizard\ImportWizardDictionary.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
     <Compile Include="Project\Attributes.cs" />
     <Compile Include="Project\NodejsFileNode.cs" />
     <Compile Include="Project\NodejsGeneralPropertyPageControl.cs">
@@ -343,6 +382,10 @@
     <Compile Include="GlobalSuppressions.cs" />
     <Compile Include="NodejsPackage.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Resource Include="Wpf\Controls.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
+    </Resource>
   </ItemGroup>
   <ItemGroup>
     <EmbeddedResource Include="Options\NodejsGeneralOptionsControl.resx">
@@ -387,10 +430,17 @@
     <ZipProject Include="ProjectTemplates\AddWebSiteAzureExpressApp\Preview.png" />
     <ZipProject Include="ProjectTemplates\AzureNodejsApp\Preview.png" />
     <ZipProject Include="ProjectTemplates\NodejsConsoleApp\Preview.png" />
+    <Resource Include="NodejsProjectBig.ico" />
     <Content Include="NoSurveyNewsFeed.html">
       <IncludeInVSIX>true</IncludeInVSIX>
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
+    <ZipProject Include="ProjectTemplates\FromExistingCode\FromExistingCode.njsproj">
+      <SubType>Designer</SubType>
+    </ZipProject>
+    <ZipProject Include="ProjectTemplates\FromExistingCode\FromExistingCode.vstemplate">
+      <SubType>Designer</SubType>
+    </ZipProject>
     <Content Include="VSTemplateStore.pkgdef">
       <IncludeInVSIX>true</IncludeInVSIX>
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
@@ -409,10 +459,6 @@
     </Content>
     <ZipProject Include="ProjectTemplates\blankwj.ico" />
     <Content Include="..\Icons\NodejsProject.ico">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-      <IncludeInVSIX>true</IncludeInVSIX>
-    </Content>
-    <Content Include="..\Icons\NodejsProjectBig.ico">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
       <IncludeInVSIX>true</IncludeInVSIX>
     </Content>

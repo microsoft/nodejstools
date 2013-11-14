@@ -216,10 +216,13 @@ namespace Microsoft.NodejsTools.Project {
         /// get the correct intellisense back.
         /// </summary>
         internal void UpdateReferenceFile(NodejsFileNode changedFile = null) {
-            _uiSync.BeginInvoke((Action<NodejsFileNode>)UpdateReferenceFileUIThread, changedFile);
+            // don't update if we're closing the project
+            if (!IsClosed) {
+                _uiSync.BeginInvoke((Action<NodejsFileNode>)UpdateReferenceFileUIThread, changedFile);
+            }
         }
 
-        private void UpdateReferenceFileUIThread(NodejsFileNode changedFile) {
+        private void UpdateReferenceFileUIThread(NodejsFileNode changedFile) {            
             lock (_pendingRefGroupGenerations) {
                 foreach (var refGroup in _pendingRefGroupGenerations) {
                     refGroup.GenerateReferenceFile();

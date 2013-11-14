@@ -6,9 +6,9 @@
     <ProjectType>JavaScript</ProjectType>
     <TemplateID>Microsoft.JavaScript.NodejsWebApp</TemplateID>
     <SortOrder>130</SortOrder>
-    <CreateNewFolder>false</CreateNewFolder>
+    <CreateNewFolder>true</CreateNewFolder>
     <DefaultName>NodejsApp</DefaultName>
-    <ProvideDefaultName>true</ProvideDefaultName>
+      <ProvideDefaultName>true</ProvideDefaultName>
     <NumberOfParentCategoriesToRollUp>1</NumberOfParentCategoriesToRollUp>
     <PromptForSaveOnCreation>true</PromptForSaveOnCreation>
     <PreviewImage>Preview.png</PreviewImage>

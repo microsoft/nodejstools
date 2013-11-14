@@ -489,7 +489,7 @@ namespace Microsoft.NodejsTools {
 
                                     writer.WriteStartElement("Variable");
                                     writer.WriteAttributeString("name", "RUNTIMEURL");
-                                    writer.WriteAttributeString("value", "http://nodertncu.blob.core.windows.net/node/0.6.20.exe;http://nodertncu.blob.core.windows.net/iisnode/0.1.21.exe");
+                                    writer.WriteAttributeString("value", "http://az413943.vo.msecnd.net/node/0.10.21.exe;http://nodertncu.blob.core.windows.net/iisnode/0.1.21.exe");
                                     writer.WriteEndElement(); // Variable
 
                                     writer.WriteEndElement(); // Environment

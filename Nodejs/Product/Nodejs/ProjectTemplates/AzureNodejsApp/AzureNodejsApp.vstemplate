@@ -6,7 +6,7 @@
     <ProjectType>JavaScript</ProjectType>
     <TemplateID>Microsoft.JavaScript.AzureNodejsApp</TemplateID>
     <SortOrder>140</SortOrder>
-    <CreateNewFolder>false</CreateNewFolder>
+    <CreateNewFolder>true</CreateNewFolder>
     <DefaultName>NodejsApp</DefaultName>
     <ProvideDefaultName>true</ProvideDefaultName>
     <NumberOfParentCategoriesToRollUp>1</NumberOfParentCategoriesToRollUp>
