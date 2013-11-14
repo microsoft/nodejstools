@@ -160,14 +160,24 @@ namespace Microsoft.NodejsTools.Debugger.DebugEngine {
             if (_locals != null) {
                 for (int i = 0; i < _locals.Count; i++) {
                     var property = new AD7Property(this, _locals[i]);
-                    properties.Add(property.ConstructDebugPropertyInfo(radix, enum_DEBUGPROP_INFO_FLAGS.DEBUGPROP_INFO_STANDARD));
+                    properties.Add(
+                        property.ConstructDebugPropertyInfo(
+                            radix,
+                            enum_DEBUGPROP_INFO_FLAGS.DEBUGPROP_INFO_STANDARD | enum_DEBUGPROP_INFO_FLAGS.DEBUGPROP_INFO_FULLNAME
+                        )
+                    );
                 }
             }
 
             if (_parameters != null) {
                 for (int i = 0; i < _parameters.Count; i++) {
                     var property = new AD7Property(this, _parameters[i]);
-                    properties.Add(property.ConstructDebugPropertyInfo(radix, enum_DEBUGPROP_INFO_FLAGS.DEBUGPROP_INFO_STANDARD));
+                    properties.Add(
+                        property.ConstructDebugPropertyInfo(
+                            radix,
+                            enum_DEBUGPROP_INFO_FLAGS.DEBUGPROP_INFO_STANDARD | enum_DEBUGPROP_INFO_FLAGS.DEBUGPROP_INFO_FULLNAME
+                        )
+                    );
                 }
             }
 
@@ -183,7 +193,12 @@ namespace Microsoft.NodejsTools.Debugger.DebugEngine {
 
             for (int i = 0; i < _locals.Count; i++) {
                 var property = new AD7Property(this, _locals[i]);
-                properties.Add(property.ConstructDebugPropertyInfo(radix, enum_DEBUGPROP_INFO_FLAGS.DEBUGPROP_INFO_STANDARD));
+                properties.Add(
+                        property.ConstructDebugPropertyInfo(
+                            radix,
+                            enum_DEBUGPROP_INFO_FLAGS.DEBUGPROP_INFO_STANDARD | enum_DEBUGPROP_INFO_FLAGS.DEBUGPROP_INFO_FULLNAME
+                        )
+                    );
             }
 
             return properties;
@@ -198,7 +213,12 @@ namespace Microsoft.NodejsTools.Debugger.DebugEngine {
 
             for (int i = 0; i < _parameters.Count; i++) {
                 var property = new AD7Property(this, _parameters[i]);
-                properties.Add(property.ConstructDebugPropertyInfo(radix, enum_DEBUGPROP_INFO_FLAGS.DEBUGPROP_INFO_STANDARD));
+                properties.Add(
+                        property.ConstructDebugPropertyInfo(
+                            radix,
+                            enum_DEBUGPROP_INFO_FLAGS.DEBUGPROP_INFO_STANDARD | enum_DEBUGPROP_INFO_FLAGS.DEBUGPROP_INFO_FULLNAME
+                        )
+                    );
             }
 
             return properties;
