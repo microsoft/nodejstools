@@ -12,11 +12,13 @@
  *
  * ***************************************************************************/
 
+using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Windows.Forms;
 using EnvDTE;
 using Microsoft.VisualStudio.Shell;
+using Microsoft.VisualStudio.Shell.Interop;
 using Microsoft.VisualStudio.TemplateWizard;
 
 namespace Microsoft.NodejsTools.ProjectWizard {
@@ -44,6 +46,15 @@ namespace Microsoft.NodejsTools.ProjectWizard {
             if (dte == null) {
                 MessageBox.Show("Unable to start wizard: no automation object available.", "Node.js Tools for Visual Studio");
             } else {
+                // https://nodejstools.codeplex.com/workitem/462
+                // we need to make sure our package is loaded before invoking our command
+                Guid packageGuid = new Guid(GuidList.guidNodePkgString);
+                IVsPackage package;
+                ((IVsShell)Package.GetGlobalService(typeof(SVsShell))).LoadPackage(
+                    ref packageGuid,
+                    out package
+                );
+
                 System.Threading.Tasks.Task.Factory.StartNew(() => {
                     object inObj = null, outObj = null;
                     dte.Commands.Raise(GuidList.guidNodeCmdSet.ToString("B"), (int)PkgCmdId.cmdidImportWizard, ref inObj, ref outObj);
