@@ -52,4 +52,6 @@ try {
 
 var indexfolder = require('./indexfolder');
 
+var indexfolder2 = require('./indexfolder/');
+
 extravariable = 0;

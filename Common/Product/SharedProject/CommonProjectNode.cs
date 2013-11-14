@@ -1264,7 +1264,7 @@ namespace Microsoft.VisualStudioTools.Project {
         }
 
         private void BoldDeferredItems() {
-            if (_needBolding.Count == 0) {
+            if (_needBolding.Count == 0 || ParentHierarchy == null) {
                 return;
             }
             if (IsClosed) {
