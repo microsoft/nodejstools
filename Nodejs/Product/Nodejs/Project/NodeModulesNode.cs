@@ -106,11 +106,26 @@ namespace Microsoft.NodejsTools.Project{
 
         #region Properties
 
+        private string GetNpmPathFromNodePathInProject(){
+            var props = ProjectMgr.NodeProperties as NodejsProjectNodeProperties;
+            if (null != props){
+                var nodePath = props.NodeExePath;
+                if (!string.IsNullOrEmpty(nodePath)){
+                    var dir = Path.GetDirectoryName(nodePath);
+                    return string.IsNullOrEmpty(dir) ? null : Path.Combine(dir, "npm.cmd");
+                }
+            }
+            return null;
+        }
+
         private INpmController GetNpmController(out bool created){
             lock (_lock){
                 created = false;
                 if (null == _npmController){
-                    _npmController = NpmControllerFactory.Create(_projectNode.BuildProject.DirectoryPath);
+                    _npmController = NpmControllerFactory.Create(
+                        _projectNode.BuildProject.DirectoryPath,
+                        false,
+                        GetNpmPathFromNodePathInProject());
                     _npmController.OutputLogged += m_NpmController_OutputLogged;
                     _npmController.ErrorLogged += m_NpmController_ErrorLogged;
                     created = true;

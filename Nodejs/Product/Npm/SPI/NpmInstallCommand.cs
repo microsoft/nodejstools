@@ -21,7 +21,10 @@ namespace Microsoft.NodejsTools.Npm.SPI
             string versionRange,
             DependencyType type,
             bool global = false,
-            string pathToNpm = null) : base(fullPathToRootPackageDirectory, pathToNpm){
+            string pathToNpm = null,
+            bool useFallbackIfNpmNotFound = true)
+            : base(fullPathToRootPackageDirectory, pathToNpm, useFallbackIfNpmNotFound)
+        {
             Arguments = string.Format(
                 "install {0} -{1}",
                 string.IsNullOrEmpty(versionRange)

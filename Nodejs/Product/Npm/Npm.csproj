@@ -59,7 +59,9 @@
     <Compile Include="IScripts.cs" />
     <Compile Include="NodeModuleBuilder.cs" />
     <Compile Include="NpmControllerFactory.cs" />
+    <Compile Include="NpmExecutionException.cs" />
     <Compile Include="NpmLogEventArgs.cs" />
+    <Compile Include="NpmNotFoundException.cs" />
     <Compile Include="NpmSearchParserFactory.cs" />
     <Compile Include="PackageComparer.cs" />
     <Compile Include="PackageEventArgs.cs" />

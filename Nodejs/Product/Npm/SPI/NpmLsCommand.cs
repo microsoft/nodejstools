@@ -22,7 +22,10 @@ namespace Microsoft.NodejsTools.Npm.SPI{
         public NpmLsCommand(
             string fullPathToRootPackageDirectory,
             bool global,
-            string pathToNpm = null) : base(fullPathToRootPackageDirectory, pathToNpm){
+            string pathToNpm = null,
+            bool useFallbackIfNpmNotFound = true)
+            : base(fullPathToRootPackageDirectory, pathToNpm, useFallbackIfNpmNotFound)
+        {
             var buff = new StringBuilder("ls");
             if (global){
                 buff.Append(" -g");

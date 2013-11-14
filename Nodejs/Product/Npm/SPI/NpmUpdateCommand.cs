@@ -23,7 +23,10 @@ namespace Microsoft.NodejsTools.Npm.SPI{
         public NpmUpdateCommand(
             string fullPathToRootPackageDirectory,
             IEnumerable<IPackage> packages,
-            string pathToNpm = null) : base(fullPathToRootPackageDirectory, pathToNpm){
+            string pathToNpm = null,
+            bool useFallbackIfNpmNotFound = true)
+            : base(fullPathToRootPackageDirectory, pathToNpm, useFallbackIfNpmNotFound)
+        {
             var buff = new StringBuilder("update");
             foreach (var package in packages){
                 buff.Append(' ');

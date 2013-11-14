@@ -26,6 +26,7 @@ namespace Microsoft.NodejsTools.Npm.SPI{
         private string _fullPathToRootPackageDirectory;
         private bool _showMissingDevOptionalSubPackages;
         private string _pathToNpm;
+        private bool _useFallbackIfNpmNotFound;
         private IRootPackage _rootPackage;
         private IGlobalPackages _globalPackage;
         private readonly object _lock = new object();
@@ -33,10 +34,13 @@ namespace Microsoft.NodejsTools.Npm.SPI{
         public NpmController(
             string fullPathToRootPackageDirectory,
             bool showMissingDevOptionalSubPackages = false,
-            string pathToNpm = null){
+            string pathToNpm = null,
+            bool useFallbackIfNpmNotFound = true)
+        {
             _fullPathToRootPackageDirectory = fullPathToRootPackageDirectory;
             _showMissingDevOptionalSubPackages = showMissingDevOptionalSubPackages;
             _pathToNpm = pathToNpm;
+            _useFallbackIfNpmNotFound = useFallbackIfNpmNotFound;
             Refresh();
         }
 
@@ -66,7 +70,7 @@ namespace Microsoft.NodejsTools.Npm.SPI{
                         _fullPathToRootPackageDirectory,
                         _showMissingDevOptionalSubPackages);
 
-                    var command = new NpmLsCommand(_fullPathToRootPackageDirectory, true, _pathToNpm);
+                    var command = new NpmLsCommand(_fullPathToRootPackageDirectory, true, _pathToNpm, _useFallbackIfNpmNotFound);
                     GlobalPackages = AsyncHelpers.RunSync<bool>(() => command.ExecuteAsync())
                         ? RootPackageFactory.Create(command.ListBaseDirectory)
                         : null;
@@ -121,7 +125,8 @@ namespace Microsoft.NodejsTools.Npm.SPI{
                 versionRange,
                 type,
                 global,
-                _pathToNpm);
+                _pathToNpm,
+                _useFallbackIfNpmNotFound);
 
             var retVal = await command.ExecuteAsync();
             FireLogEvents(command);
@@ -162,7 +167,8 @@ namespace Microsoft.NodejsTools.Npm.SPI{
                 packageName,
                 GetDependencyType(packageName),
                 global,
-                _pathToNpm);
+                _pathToNpm,
+                _useFallbackIfNpmNotFound);
 
             var retVal = await command.ExecuteAsync();
             FireLogEvents(command);
@@ -179,7 +185,7 @@ namespace Microsoft.NodejsTools.Npm.SPI{
         }
 
         public async Task<IEnumerable<IPackage>> SearchAsync(string searchText){
-            var command = new NpmSearchCommand(_fullPathToRootPackageDirectory, searchText, _pathToNpm);
+            var command = new NpmSearchCommand(_fullPathToRootPackageDirectory, searchText, _pathToNpm, _useFallbackIfNpmNotFound);
             var success = await command.ExecuteAsync();
             FireLogEvents(command);
             return success ? command.Results : new List<IPackage>();
@@ -201,7 +207,7 @@ namespace Microsoft.NodejsTools.Npm.SPI{
         }
 
         public async Task<bool> UpdatePackagesAsync(IEnumerable<IPackage> packages){
-            var command = new NpmUpdateCommand(_fullPathToRootPackageDirectory, packages, _pathToNpm);
+            var command = new NpmUpdateCommand(_fullPathToRootPackageDirectory, packages, _pathToNpm, _useFallbackIfNpmNotFound);
             var success = await command.ExecuteAsync();
             FireLogEvents(command);
             Refresh();

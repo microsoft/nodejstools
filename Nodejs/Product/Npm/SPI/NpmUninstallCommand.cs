@@ -20,7 +20,10 @@ namespace Microsoft.NodejsTools.Npm.SPI
             string packageName,
             DependencyType type,
             bool global = false,
-            string pathToNpm = null) : base(fullPathToRootPackageDirectory, pathToNpm){
+            string pathToNpm = null,
+            bool useFallbackIfNpmNotFound = true)
+            : base(fullPathToRootPackageDirectory, pathToNpm, useFallbackIfNpmNotFound)
+        {
             Arguments = global
                             ? string.Format("uninstall {0} --g", packageName)
                             : string.Format(

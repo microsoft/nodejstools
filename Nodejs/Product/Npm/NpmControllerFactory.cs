@@ -18,10 +18,14 @@ namespace Microsoft.NodejsTools.Npm{
     public class NpmControllerFactory{
         public static INpmController Create(
             string fullPathToRootPackageDirectory,
-            bool showMissingDevOptionalSubPackages = false){
+            bool showMissingDevOptionalSubPackages = false,
+            string pathToNpm = null,
+            bool useFallbackIfNpmNotFound = true){
             return new NpmController(
                 fullPathToRootPackageDirectory,
-                showMissingDevOptionalSubPackages);
+                showMissingDevOptionalSubPackages,
+                pathToNpm,
+                useFallbackIfNpmNotFound);
         }
     }
 }
