@@ -18,5 +18,6 @@ namespace Microsoft.NodejsTools.Npm
         Newline         = 0x0040,
         LeadingEquals   = 0x0080,
         Other           = 0x0100,
+        ThatsAllFolks   = 0x8000
     }
 }

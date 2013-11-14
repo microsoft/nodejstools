@@ -77,6 +77,8 @@ namespace Microsoft.NodejsTools.Npm.SPI
             if (buff.Length > 0){
                 OnToken(buff.ToString(), flags, leadingEqualsCount);
             }
+
+            OnToken(null, TokenFlags.ThatsAllFolks, 0);
         }
 
         public event EventHandler<TokenEventArgs> Token;

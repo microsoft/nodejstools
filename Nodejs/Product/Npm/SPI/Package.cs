@@ -12,6 +12,7 @@
  *
  * ***************************************************************************/
 
+using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 
@@ -27,9 +28,13 @@ namespace Microsoft.NodejsTools.Npm.SPI{
             _parent = parent;
         }
 
+        public string PublishDateTimeString { get { return null; } }
+
         public string RequestedVersionRange{
             get { return Version.ToString(); }
         }
+
+        public IEnumerable<string> Keywords { get { return new List<string>(); } }
 
         public bool IsListedInParentPackageJson{
             get{

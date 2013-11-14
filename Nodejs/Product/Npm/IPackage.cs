@@ -12,10 +12,16 @@
  *
  * ***************************************************************************/
 
+using System.Collections;
+using System.Collections.Generic;
+
 namespace Microsoft.NodejsTools.Npm
 {
     public interface IPackage : IRootPackage{
+        string PublishDateTimeString { get; }
+
         string RequestedVersionRange { get; }
+        IEnumerable<string> Keywords { get; }
 
         bool IsListedInParentPackageJson { get; }
         bool IsMissing { get; }

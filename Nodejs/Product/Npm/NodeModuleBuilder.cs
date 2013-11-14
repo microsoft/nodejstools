@@ -22,29 +22,30 @@ namespace Microsoft.NodejsTools.Npm{
     /// Mutable class for building immutable node module descriptions
     /// </summary>
     public class NodeModuleBuilder{
-        private readonly List<IPackage> _dependencies;
+        private List<IPackage> _dependencies = new List<IPackage>();
         private StringBuilder _descriptionBuff = new StringBuilder();
         private StringBuilder _authorBuff = new StringBuilder();
+        private StringBuilder _publishDateTime = new StringBuilder();
+        private List<string> _keywords = new List<string>(); 
 
         public NodeModuleBuilder(){
-            _dependencies = new List<IPackage>();
-        }
-
-        public NodeModuleBuilder(IPackage module){
-            Name = module.Name;
-            Author = module.Author;
-            Version = module.Version;
-            RequestedVersionRange = module.RequestedVersionRange;
-            AppendToDescription( module.Description );
-            Flags = module.Flags;
-            _dependencies = new List<IPackage>();
-            _dependencies.AddRange(module.Modules);
         }
 
         public void Reset(){
             Name = null;
+            Version = new SemverVersion();
+            Flags = PackageFlags.None;
+            RequestedVersionRange = null;
+
+            //  These *have* to be reinitialised or they'll be cleared
+            //  in any packages that have been created using the builder
+            //  because they're passed by reference.
+            _dependencies = new List<IPackage>();
+            _keywords = new List<string>();
+
             _descriptionBuff.Length = 0;
             _authorBuff.Length = 0;
+            _publishDateTime.Length = 0;
         }
 
         public void AddAuthor(string text){
@@ -76,30 +77,60 @@ namespace Microsoft.NodejsTools.Npm{
             }
         }
 
+        public void AppendToDate(string text){
+            if (_publishDateTime.Length > 0){
+                _publishDateTime.Append(' ');
+            }
+            _publishDateTime.Append(text);
+        }
+
+        public string PublishDateTimeString{
+            get{
+                var text = _publishDateTime.ToString().Trim();
+                return string.IsNullOrEmpty(text) ? null : text;
+            }
+        }
+
         public IEnumerable<IPackage> Dependencies{
             get { return _dependencies; }
+        }
+
+        public void AddDependency(IPackage module)
+        {
+            _dependencies.Add(module);
+        }
+
+        public void AddDependencies(IEnumerable<IPackage> packages)
+        {
+            _dependencies.AddRange(packages);
         }
 
         public PackageFlags Flags { get; set; }
 
         public string RequestedVersionRange { get; set; }
 
-        public void AddDependency(IPackage module){
-            _dependencies.Add(module);
+        public void AddKeyword(string keyword){
+            _keywords.Add(keyword);
         }
 
-        public void AddDependencies(IEnumerable<IPackage> packages){
-            _dependencies.AddRange(packages);
+        public IEnumerable<string> Keywords{
+            get{
+                return _keywords;
+            }
         }
 
         public IPackage Build(){
-            PackageProxy proxy = new PackageProxy();
+            var proxy = new PackageProxy();
             proxy.Author = Author;
             proxy.Name = Name;
             proxy.Version = Version;
             proxy.Description = Description;
+            proxy.PublishDateTimeString = PublishDateTimeString;
             proxy.RequestedVersionRange = RequestedVersionRange;
             proxy.Flags = Flags;
+
+            _keywords.Sort();
+            proxy.Keywords = _keywords;
 
             var modules = new NodeModulesProxy();
             foreach (var dep in Dependencies){

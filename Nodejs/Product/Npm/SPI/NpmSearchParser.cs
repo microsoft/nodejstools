@@ -13,7 +13,7 @@ namespace Microsoft.NodejsTools.Npm.SPI
             Name = 0,
             Description,
             Author,
-            Date,
+            DateTime,
             Version,
             Keywords
         }
@@ -33,7 +33,8 @@ namespace Microsoft.NodejsTools.Npm.SPI
                 _builder = new NodeModuleBuilder();
             }
 
-            if ((e.Flags & TokenFlags.Newline) == TokenFlags.Newline){
+            if ((e.Flags & TokenFlags.Newline) == TokenFlags.Newline
+                || (e.Flags & TokenFlags.ThatsAllFolks) == TokenFlags.ThatsAllFolks){
                 if (!string.IsNullOrEmpty(_builder.Name)){
                     OnPackage(_builder.Build());
                 }
@@ -52,21 +53,53 @@ namespace Microsoft.NodejsTools.Npm.SPI
                         if (e.LeadingEqualsCount != 1 || e.Value.Length == 1){
                             _builder.AppendToDescription(e.Value);
                         } else{
-                            _builder.AddAuthor(e.Value);
+                            _builder.AddAuthor(e.Value.Substring(1));
                             _nextToken = NextToken.Author;
                         }
                         break;
                     case NextToken.Author:
-
+                        if (e.LeadingEqualsCount == 1){
+                            if (e.Value.Length > 1){
+                                _builder.AddAuthor(e.Value.Substring(1));
+                            }
+                        }
+                        else if ((e.Flags & TokenFlags.Digits) == TokenFlags.Digits
+                                 && ((e.Flags & TokenFlags.Dashes) == TokenFlags.Dashes)){
+                            _builder.AppendToDate(e.Value);
+                            _nextToken = NextToken.DateTime;
+                        }
                         break;
-                    case NextToken.Date:
+                    case NextToken.DateTime:
+                        if ((e.Flags & TokenFlags.Digits) == TokenFlags.Digits
+                            && (e.Flags & TokenFlags.Colons) == TokenFlags.Colons){
+                            _builder.AppendToDate(e.Value);
+                            _nextToken = NextToken.Version;
+                        }
                         break;
                     case NextToken.Version:
+                        if ((e.Flags & TokenFlags.Digits) == TokenFlags.Digits
+                            && (e.Flags & TokenFlags.Dots) == TokenFlags.Dots){
+                            try{
+                                _builder.Version = SemverVersion.Parse(e.Value);
+                            } catch (SemverVersionFormatException){
+                                _builder.Version = new SemverVersion();
+                                _builder.AddKeyword(e.Value);
+                            }
+                            _nextToken = NextToken.Keywords;
+                        }
+                        else if ((e.Flags & TokenFlags.Whitespace) == TokenFlags.None){
+                            _builder.AddKeyword(e.Value);
+                            _nextToken = NextToken.Keywords;
+                        }
                         break;
                     case NextToken.Keywords:
+                        if ((e.Flags & TokenFlags.Whitespace) == TokenFlags.None){
+                            _builder.AddKeyword(e.Value);
+                        }
                         break;
                     default:
-                        throw new ArgumentOutOfRangeException();
+                        throw new InvalidOperationException(
+                            string.Format("npm search results parser is in an invalid token expectation state: {0}", _nextToken) );
                 }
             }
         }

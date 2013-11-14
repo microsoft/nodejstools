@@ -12,6 +12,8 @@
  *
  * ***************************************************************************/
 
+using System.Collections.Generic;
+
 namespace Microsoft.NodejsTools.Npm.SPI
 {
     internal class PackageProxy : IPackage{
@@ -23,7 +25,9 @@ namespace Microsoft.NodejsTools.Npm.SPI
         public IPerson Author { get; internal set; }
         public string Description { get; internal set; }
         public string Path { get; internal set; }
+        public string PublishDateTimeString { get; internal set; }
         public string RequestedVersionRange { get; internal set; }
+        public IEnumerable<string> Keywords { get; internal set; }
         public bool IsListedInParentPackageJson { get; internal set; }
         public bool IsMissing { get; internal set; }
         public bool IsDevDependency { get; internal set; }
