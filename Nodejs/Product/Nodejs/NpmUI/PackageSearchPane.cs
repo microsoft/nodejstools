@@ -68,6 +68,10 @@ namespace Microsoft.NodejsTools.NpmUI{
         }
 
         private void Filter(string filterString){
+            if (null == _allPackages){
+                return;
+            }
+
             filterString = filterString.ToLower();
 
             var target = new List<IPackage>();
