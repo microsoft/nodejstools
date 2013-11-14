@@ -41,7 +41,6 @@ namespace Microsoft.NodejsTools.Npm.SPI{
             _showMissingDevOptionalSubPackages = showMissingDevOptionalSubPackages;
             _pathToNpm = pathToNpm;
             _useFallbackIfNpmNotFound = useFallbackIfNpmNotFound;
-            Refresh();
         }
 
         public event EventHandler StartingRefresh;

@@ -181,6 +181,8 @@ namespace Microsoft.NodejsTools.Project {
             base.Reload();
 
             NodejsPackage.Instance.CheckSurveyNews(false);
+
+            ModulesNode.ReloadHierarchySafe();
         }
 
         protected override void RaiseProjectPropertyChanged(string propertyName, string oldValue, string newValue) {
@@ -532,6 +534,8 @@ function require(module) {
         }
 
         public NodeModulesNode ModulesNode { get; private set; }
+
+
 
         protected internal override void ProcessReferences()
         {

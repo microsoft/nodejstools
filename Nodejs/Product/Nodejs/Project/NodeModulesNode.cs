@@ -67,6 +67,8 @@ namespace Microsoft.NodejsTools.Project{
             };
             _watcher.Changed += m_Watcher_Changed;
             _watcher.EnableRaisingEvents = true;
+
+            CreateNpmController();
         }
 
         private void CheckNotDisposed(){
@@ -118,9 +120,8 @@ namespace Microsoft.NodejsTools.Project{
             return null;
         }
 
-        private INpmController GetNpmController(out bool created){
+        private INpmController CreateNpmController(){
             lock (_lock){
-                created = false;
                 if (null == _npmController){
                     _npmController = NpmControllerFactory.Create(
                         _projectNode.BuildProject.DirectoryPath,
@@ -128,7 +129,7 @@ namespace Microsoft.NodejsTools.Project{
                         GetNpmPathFromNodePathInProject());
                     _npmController.OutputLogged += m_NpmController_OutputLogged;
                     _npmController.ErrorLogged += m_NpmController_ErrorLogged;
-                    created = true;
+                    _npmController.Refresh();
                 }
                 return _npmController;
             }
@@ -136,8 +137,7 @@ namespace Microsoft.NodejsTools.Project{
 
         public INpmController NpmController{
             get{
-                bool created;
-                return GetNpmController(out created);
+                return _npmController;
             }
         }
 
@@ -161,6 +161,17 @@ namespace Microsoft.NodejsTools.Project{
             }
         }
 
+        internal void ReloadHierarchySafe(){
+            if (UIThread.Instance.IsUIThread)
+            {
+                ReloadHierarchy();
+            }
+            else
+            {
+                UIThread.Instance.Run(ReloadHierarchy);
+            }
+        }
+
         private void UpdateModulesFromTimer(){
             lock (_lock){
                 if (null != _fileSystemWatcherTimer){
@@ -171,20 +182,12 @@ namespace Microsoft.NodejsTools.Project{
                 ReloadModules();
             }
 
-            if (UIThread.Instance.IsUIThread){
-                ReloadHierarchy();
-            } else{
-                UIThread.Instance.Run(ReloadHierarchy);
-            }
+            ReloadHierarchySafe();
         }
 
         private void ReloadModules(){
             lock (_lock){
-                bool created;
-                var controller = GetNpmController(out created);
-                if (! created){
-                    controller.Refresh();
-                }
+                NpmController.Refresh();
             }
         }
 
