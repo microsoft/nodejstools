@@ -67,6 +67,9 @@
             <Component Id="cmpExpressApp.zip" Directory="DIR_ProjectTemplates_4DCCAA275A2C4923918F2CBC07199083" Guid="{D7612D7F-2AAA-4925-9818-3F638FA04C5C}">
               <File Id="filExpressApp.zip" KeyPath="yes" Source="$(var.BinariesDir)\ProjectTemplates\JavaScript\ExpressApp.zip" />
             </Component>
+            <Component Id="cmpFromExistingCode.zip" Directory="DIR_ProjectTemplates_4DCCAA275A2C4923918F2CBC07199083" Guid="{552FDAC5-C143-40EB-980E-678DF4DA714C}">
+              <File Id="filFromExistingCode.zip" KeyPath="yes" Source="$(var.BinariesDir)\ProjectTemplates\JavaScript\FromExistingCode.zip" />
+            </Component>
             <Component Id="cmpNodejsWebApp.zip" Directory="DIR_ProjectTemplates_4DCCAA275A2C4923918F2CBC07199083" Guid="{2A83D4D0-2334-4FFF-AB7B-8D1D96F0D3FC}">
               <File Id="filNodejsWebApp.zip" KeyPath="yes" Source="$(var.BinariesDir)\ProjectTemplates\JavaScript\NodejsWebApp.zip" />
             </Component>
