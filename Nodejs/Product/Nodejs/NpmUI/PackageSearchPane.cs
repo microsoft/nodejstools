@@ -86,7 +86,9 @@ namespace Microsoft.NodejsTools.NpmUI{
             }
 
             target.Sort(new NpmSearchComparer(filterString));
-            BeginInvoke(new Action(() => SetListData(target)));
+            if (!IsDisposed){
+                BeginInvoke(new Action(() => SetListData(target)));
+            }
         }
 
         private void SetListData(IList<IPackage> filtered){
