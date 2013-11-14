@@ -45,18 +45,18 @@ port = 1337;
 
 Note that Node.js has its own specific menu item under the Analyze menu
 
-![](./images/prof-menu.png) 
+![](Images/prof-menu.png) 
 
 
 By default the current Open project is selected.  You can also select a specific script.  Click Start:
 
-![](./images/prof-launch.png)
+![](Images/prof-launch.png)
 
 ### 3. Refresh the browser
 
 Switch to your browser, localhost:1337.  Hit F5 a few times to get some samples:
 
-![](./images/prof-ie.png) 
+![](Images/prof-ie.png) 
 
 
 **Note**: if your functions don't do much work, they will not show up in the profile!
@@ -64,13 +64,13 @@ Switch to your browser, localhost:1337.  Hit F5 a few times to get some samples:
 ### 4. Exit node
 Now kill node to start processing the profile data.  This may take from seconds to minutes, depending  on the amount of samples collected:
 
-![](./images/prof-node.png) 
+![](Images/prof-node.png) 
 
 
 ### 5. View the Profile
 This is the Summary view you will see first and it will give you a standard time line vs CPU overview:
 
-![](./images/prof-overview.png) 
+![](Images/prof-overview.png) 
 
 - You can immediately see the hottest path in your code
 - You can also see which functions take the most time
@@ -80,38 +80,38 @@ This is the Summary view you will see first and it will give you a standard time
 
 A useful initial view is “Functions”.  Here we see the three spin functions displayed.  If the functions called other function, you'd see the Inclusive/Exclusive amounts displayed as well (but see warning below):
 
-![](./images/prof-functions.png) 
+![](Images/prof-functions.png) 
 
 
 Here's the Call tree view:
 
-![](./images/prof-calltree.png)
+![](Images/prof-calltree.png)
 
 The Calltree view can include a lot of noise which you can get rid off by choosing Configure and selecting thresholds for Trimming and Folding. 
 
 Yet another useful view is the Caller/Callee relationship.   Here you can select a function and see who called it and what it called.  See below about "Unknown" functions.
 
-![](./images/prof-callercalee.png) 
+![](Images/prof-callercalee.png) 
 
 
 
 If you click on a particular function, you can see the Function Details, along with its source:
 
-![](./images/prof-source.png) 
+![](Images/prof-source.png) 
 
 You can filter the perf data in multiple ways.  One way is to simply drag a region in the summary view graph and selecting Filter by Selection:
 
-![](./images/prof-drag.png) 
+![](Images/prof-drag.png) 
 
 
 Another is to use a filter expression and choose particular fields and values to narrow down the data:
 
-![](./images/prof-filter.png) 
+![](Images/prof-filter.png) 
 
 
 Finally, you can compare reports from different runs to see how your code change affected performance.  Select Compare Reports and specify the two perf files.  You can selected which Tables, Columns and set a Threshold to filter the display:
 
-![](./images/prof-compare-result.png) 
+![](Images/prof-compare-result.png) 
 
 ## Caution about Profiling and Optimization:
 There are two points to keep in mind when Profiling node/V8:

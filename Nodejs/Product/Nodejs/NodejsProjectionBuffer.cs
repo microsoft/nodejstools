@@ -179,7 +179,19 @@ namespace Microsoft.NodejsTools {
             if (String.IsNullOrWhiteSpace(filename)) {
                 return "";
             }
-            return "__dirname = \"" + Path.GetDirectoryName(filename).Replace("\\", "\\\\") + "\";\r\n";
+
+            string dirname;
+            
+            try {
+                dirname = Path.GetDirectoryName(filename);
+            } catch (PathTooLongException) {
+                //We should always have a \ present in the path we get
+                //  to be safe we'll check and fall back to supplying the full path
+                int indexOfBackslash = filename.LastIndexOf('\\');                
+                dirname = indexOfBackslash > 0 ? filename.Substring(0, indexOfBackslash) : filename;            
+            }
+
+            return "__dirname = \"" + dirname.Replace("\\", "\\\\") + "\";\r\n";
         }
 
         internal static string TrailingText {
