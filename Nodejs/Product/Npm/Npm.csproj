@@ -66,6 +66,7 @@
     <Compile Include="PackageComparer.cs" />
     <Compile Include="PackageEventArgs.cs" />
     <Compile Include="PackageFlags.cs" />
+    <Compile Include="PackageJsonException.cs" />
     <Compile Include="PackageJsonFactory.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="RootPackageFactory.cs" />

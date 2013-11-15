@@ -16,6 +16,7 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Threading.Tasks;
+using Newtonsoft.Json;
 
 namespace Microsoft.NodejsTools.Npm.SPI{
     internal class NpmController : INpmController{
@@ -64,16 +65,17 @@ namespace Microsoft.NodejsTools.Npm.SPI{
         public void Refresh(){
             OnStartingRefresh();
             lock (_lock){
-                try {
+                try{
                     RootPackage = RootPackageFactory.Create(
                         _fullPathToRootPackageDirectory,
                         _showMissingDevOptionalSubPackages);
 
-                    var command = new NpmLsCommand(_fullPathToRootPackageDirectory, true, _pathToNpm, _useFallbackIfNpmNotFound);
+                    var command = new NpmLsCommand(_fullPathToRootPackageDirectory, true, _pathToNpm,
+                        _useFallbackIfNpmNotFound);
                     GlobalPackages = AsyncHelpers.RunSync<bool>(() => command.ExecuteAsync())
                         ? RootPackageFactory.Create(command.ListBaseDirectory)
                         : null;
-                } catch (IOException) {
+                } catch (IOException){
                     // Can sometimes happen when packages are still installing because the file may still be used by another process
                 }
             }

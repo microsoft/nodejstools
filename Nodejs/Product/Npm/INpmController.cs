@@ -23,13 +23,44 @@ namespace Microsoft.NodejsTools.Npm{
         event EventHandler FinishedRefresh;
         IRootPackage RootPackage { get; }
         IGlobalPackages GlobalPackages { get; }
+
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="packageName"></param>
+        /// <param name="versionRange"></param>
+        /// <param name="type"></param>
+        /// <exception cref="PackageJsonException">If there is an error reading a package.json file when modules are refreshed.</exception>
+        /// <returns></returns>
         Task<bool> InstallPackageByVersionAsync(string packageName, string versionRange, DependencyType type);
+
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="packageName"></param>
+        /// <param name="versionRange"></param>
+        /// <exception cref="PackageJsonException">If there is an error reading a package.json file when modules are refreshed.</exception>
+        /// <returns></returns>
         Task<bool> InstallGlobalPackageByVersionAsync(string packageName, string versionRange);
+
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="packageName"></param>
+        /// <exception cref="PackageJsonException">If there is an error reading a package.json file when modules are refreshed.</exception>
+        /// <returns></returns>
         Task<bool> UninstallPackageAsync(string packageName);
         Task<bool> UninstallGlobalPackageAsync(string packageName);
         Task<IEnumerable<IPackage>> SearchAsync(string searchText);
         Task<IEnumerable<IPackage>> GetRepositoryCatalogueAsync();
         Task<bool> UpdatePackagesAsync();
+
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="packages"></param>
+        /// <exception cref="PackageJsonException">If there is an error reading a package.json file when modules are refreshed.</exception>
+        /// <returns></returns>
         Task<bool> UpdatePackagesAsync(IEnumerable<IPackage> packages);
     }
 }

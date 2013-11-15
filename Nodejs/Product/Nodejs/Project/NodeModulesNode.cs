@@ -17,6 +17,7 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Threading;
+using System.Windows;
 using Microsoft.NodejsTools.Npm;
 using Microsoft.NodejsTools.NpmUI;
 using Microsoft.VisualStudio;
@@ -129,7 +130,7 @@ namespace Microsoft.NodejsTools.Project{
                         GetNpmPathFromNodePathInProject());
                     _npmController.OutputLogged += m_NpmController_OutputLogged;
                     _npmController.ErrorLogged += m_NpmController_ErrorLogged;
-                    _npmController.Refresh();
+                    ReloadModules();
                 }
                 return _npmController;
             }
@@ -186,8 +187,12 @@ namespace Microsoft.NodejsTools.Project{
         }
 
         private void ReloadModules(){
-            lock (_lock){
-                NpmController.Refresh();
+            try{
+                lock (_lock){
+                    NpmController.Refresh();
+                }
+            } catch (PackageJsonException pje) {
+                MessageBox.Show(pje.Message, "Error Loading npm Modules", MessageBoxButton.OK, MessageBoxImage.Error);
             }
         }
 

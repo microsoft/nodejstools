@@ -19,10 +19,19 @@ namespace Microsoft.NodejsTools.Npm{
     public class FilePackageJsonSource : IPackageJsonSource{
         public FilePackageJsonSource(string fullPathToFile){
             if (File.Exists(fullPathToFile)){
-                using (var fin = new FileStream(fullPathToFile, FileMode.Open, FileAccess.Read, FileShare.Read)){
-                    using (var reader = new StreamReader(fin)){
-                        Package = JsonConvert.DeserializeObject(reader.ReadToEnd());
+                try{
+                    using (var fin = new FileStream(fullPathToFile, FileMode.Open, FileAccess.Read, FileShare.Read)){
+                        using (var reader = new StreamReader(fin)){
+                            Package = JsonConvert.DeserializeObject(reader.ReadToEnd());
+                        }
                     }
+                } catch (JsonReaderException jre){
+                    throw new PackageJsonException(
+                        string.Format(@"Unable to read package.json file at '{0}'. Please ensure the file is valid JSON.
+Reading failed because the following error occurred:
+
+{1}", fullPathToFile, jre.Message),
+                        jre);
                 }
             }
         }
