@@ -110,11 +110,21 @@ Publish to Cloud Service
 This section describes how to use the **Publish** 
 command to deploy your Node.js project to a Windows Azure Cloud Service (Web Role).
 
+**Requirements**: Cloud Service support requires the following components which can be installed using Web Platform Installer by clicking on these links:
+
+- [Windows Azure SDK for .NET for VS 2013](http://go.microsoft.com/fwlink/p/?linkid=323510&clcid=0x409) 
+- [Windows Azure SDK for .NET for VS 2012](http://go.microsoft.com/fwlink/p/?linkid=323511&clcid=0x409) 
+- [Windows Azure SDK for Node.js](http://go.microsoft.com/fwlink/?linkid=254279&clcid=0x409)
+
+**Notes**:
+
+- The **Windows Azure SDK for Node.js** is currently **not compatible** with the 64-bit version Node.js. 
+- The **Windows Azure SDK for Node.js** is required for running in the Windows Azure emulator / IIS Node, but optional for Publish to Azure.
+- The **Windows Azure SDK for .NET** provides the Visual Studio integration for Cloud Services.  The command to convert to a Cloud Service Project won't be available if you don't have the SDK installed.
+
 To use this functionality, make sure to create a Windows Azure project. Windows Azure project templates have additional functionality for deploying to Windows Azure. There is a web.config file which configures Node.js for running under IIS Node as well as deployment scripts for starting a Node.js application on a Windows Azure web role.
 
 You first need to add a cloud service project to your solution. Right-click on on the project in Solution Explorer and select **Convert to Windows Azure Cloud Service Project** menu item.
-
-**Important**: Cloud Service support requires the **Windows Azure .NET SDK**, which you can install using the **Web Platform Installer**.  You will not see the command to convert to a Cloud Service Project if you don't have the SDK installed. The documentation here is based on version 2.2 of the SDK.
 
 ![Convert to Windows Azure Cloud Service Project](Images/AzureCloudServiceConvertCommand.png)
 
