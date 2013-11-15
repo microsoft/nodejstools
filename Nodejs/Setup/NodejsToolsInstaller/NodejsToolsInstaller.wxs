@@ -113,6 +113,7 @@
       <Component Id="Comp_InstallDirItems" DiskId="1" Guid="$(var.Comp_InstallDirItemGuid)">
         <File Id="File_License.html" Name="License.html" Source="$(var.NodejsToolsDir)\License.html" />
         <File Id="File_RemoteDebug.js" Name="RemoteDebug.js" Source="$(var.NodejsToolsDir)\RemoteDebug.js" />
+        <File Id="File_RemoteDebugging.html" Name="RemoteDebugging.html" Source="$(var.NodejsToolsDir)\RemoteDebugging.html" />
         <RegistryValue Root='HKCU' Key='SOFTWARE\Microsoft\NodejsTools' Type='string' Value='Readme' KeyPath='yes' />
         <RegistryValue Root='HKCU' Key='SOFTWARE\Microsoft\NodejsTools' Type='string' Name='RemoteDebugProxyScript' Value='[INSTALLLOCATION]RemoteDebug.js' />
         <RemoveFolder Id='Comp_InstallDirItems' On='uninstall'/>

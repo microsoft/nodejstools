@@ -39,13 +39,15 @@ namespace Microsoft.NodejsTools.Debugger.Serialization {
         /// <param name="thread">Thread.</param>
         /// <param name="message">Message.</param>
         /// <returns>Array of stack frames.</returns>
-        public void ProcessBacktrace(NodeThread thread, JsonValue message, Action<NodeStackFrame[]> successHandler) {
+        public void ProcessBacktrace(NodeThread thread, Dictionary<int, NodeModule> modules, JsonValue message, Action<NodeStackFrame[]> successHandler) {
             Utilities.ArgumentNotNull("thread", thread);
             Utilities.ArgumentNotNull("message", message);
 
-            // Extract scripts
-            JsonArray refs = message.GetArray("refs");
-            Dictionary<int, NodeModule> modules = GetScripts(refs);
+            // Extract scripts (if not provided)
+            if (modules == null) {
+                JsonArray refs = message.GetArray("refs");
+                modules = GetScripts(refs);
+            }
 
             // Extract frames
             JsonValue body = message["body"];

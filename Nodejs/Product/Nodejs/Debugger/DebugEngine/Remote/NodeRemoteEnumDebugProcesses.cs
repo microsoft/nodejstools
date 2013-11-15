@@ -56,7 +56,14 @@ namespace Microsoft.NodejsTools.Debugger.Remote {
                     catch (SocketException) {
                     }
                 }
-                string errText = string.Format("Could not connect to remote Node process at '{0}:{1}'. Make sure that the process is running, and has been started with the '--debug' argument.", port.HostName, port.PortNumber);
+                string errText =
+                    string.Format(
+                        "Could not attach to Node.js process at '{0}:{1}'. " +
+                        "Make sure that the process is running behind the remote debug proxy (RemoteDebug.js), " +
+                        "and that the debuger port (default 5858) has been opened on the target host.",
+                        port.HostName,
+                        port.PortNumber
+                    );
                 DialogResult dlgRes = MessageBox.Show(errText, null, MessageBoxButtons.RetryCancel, MessageBoxIcon.Error);
                 if (dlgRes != DialogResult.Retry) {
                     break;

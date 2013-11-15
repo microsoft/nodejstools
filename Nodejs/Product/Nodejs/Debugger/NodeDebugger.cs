@@ -69,7 +69,8 @@ namespace Microsoft.NodejsTools.Debugger {
         private bool _resumingStepping;
         private readonly Dictionary<int, NodeThread> _threads = new Dictionary<int, NodeThread>();
         public readonly int MainThreadId = 1;
-        private readonly Dictionary<string, NodeModule> _scripts = new Dictionary<string, NodeModule>(StringComparer.OrdinalIgnoreCase);
+        private readonly Dictionary<string, NodeModule> _mapNameToScript = new Dictionary<string, NodeModule>(StringComparer.OrdinalIgnoreCase);
+        private readonly Dictionary<int, NodeModule> _mapIdToScript = new Dictionary<int, NodeModule>();
         private ExceptionHitTreatment _defaultExceptionTreatment = ExceptionHitTreatment.BreakAlways;
         private Dictionary<string, ExceptionHitTreatment> _exceptionTreatments = GetDefaultExceptionTreatments();
         private Dictionary<int, string> _errorCodes = new Dictionary<int, string>();
@@ -633,13 +634,15 @@ namespace Microsoft.NodejsTools.Debugger {
             object nameObj;
             if (script.TryGetValue("name", out nameObj) && !string.IsNullOrEmpty((string)nameObj)) {
                 var name = (string)nameObj;
-                NodeModule existingModule;
-                if (!_scripts.TryGetValue(name, out existingModule)) {
+                NodeModule module;
+                if (!_mapNameToScript.TryGetValue(name, out module)) {
                     int id = (int)script["id"];
-                    var newModule = _scripts[name] = new NodeModule(id, name);
+                    module = new NodeModule(id, name);
+                    _mapNameToScript[name] = module;
+                    _mapIdToScript[id] = module;
                     var modLoad = ModuleLoaded;
                     if (modLoad != null) {
-                        modLoad(this, new ModuleLoadedEventArgs(newModule));
+                        modLoad(this, new ModuleLoadedEventArgs(module));
                     }
                 }
             }
@@ -975,6 +978,7 @@ namespace Microsoft.NodejsTools.Debugger {
                         var jsonValue = new JsonValue(json);
                         ResponseHandler.ProcessBacktrace(
                             mainThread,
+                            _mapIdToScript,
                             jsonValue,
                             successHandler:
                                 frames => {
@@ -1363,7 +1367,7 @@ namespace Microsoft.NodejsTools.Debugger {
 
         internal NodeModule GetModuleForFilePath(string filePath) {
             NodeModule module = null;
-            _scripts.TryGetValue(filePath, out module);
+            _mapNameToScript.TryGetValue(filePath, out module);
             return module;
         }
 

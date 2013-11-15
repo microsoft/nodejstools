@@ -13,6 +13,7 @@
  * ***************************************************************************/
 
 using System;
+using System.Collections.Generic;
 
 namespace Microsoft.NodejsTools.Debugger.Serialization {
     /// <summary>
@@ -25,7 +26,7 @@ namespace Microsoft.NodejsTools.Debugger.Serialization {
         /// <param name="thread">Thread.</param>
         /// <param name="message">Message.</param>
         /// <returns>Array of stack frames.</returns>
-        void ProcessBacktrace(NodeThread thread, JsonValue message, Action<NodeStackFrame[]> successHandler);
+        void ProcessBacktrace(NodeThread thread, Dictionary<int, NodeModule> modules, JsonValue message, Action<NodeStackFrame[]> successHandler);
 
         /// <summary>
         /// Handles evaluate response message.

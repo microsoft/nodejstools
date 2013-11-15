@@ -33,6 +33,7 @@ namespace NodejsTests.Debugger.Serialization {
             NodeStackFrame[] frames = null;
             handler.ProcessBacktrace(
                 thread,
+                null,
                 json,
                 successHandler:
                     backtraceFrames => {
@@ -57,6 +58,7 @@ namespace NodejsTests.Debugger.Serialization {
             // Act
             try {
                 handler.ProcessBacktrace(
+                    null,
                     null,
                     json,
                     successHandler:
@@ -88,6 +90,7 @@ namespace NodejsTests.Debugger.Serialization {
             try {
                 handler.ProcessBacktrace(
                     thread,
+                    null,
                     null,
                     successHandler:
                         backtraceFrames => {
