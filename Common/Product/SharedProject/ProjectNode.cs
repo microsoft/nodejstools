@@ -229,7 +229,7 @@ namespace Microsoft.VisualStudioTools.Project
 
         private Guid projectIdGuid;
 
-        private bool isClosed;
+        private bool isClosed, isClosing;
 
         private EventTriggering eventTriggeringFlag = EventTriggering.TriggerAll;
 
@@ -740,6 +740,17 @@ namespace Microsoft.VisualStudioTools.Project
             get
             {
                 return this.isClosed;
+            }
+        }
+
+        /// <summary>
+        /// Gets whether or not the project has begun closing.
+        /// </summary>
+        public bool IsClosing
+        {
+            get 
+            {
+                return this.isClosing;
             }
         }
 
@@ -6137,6 +6148,7 @@ If the files in the existing folder have the same names as files in the folder y
         /// <returns>A success or failure value.</returns>
         int IVsHierarchy.Close() {
             int hr = VSConstants.S_OK;
+            isClosing = true;
             try {
                 // Walk the tree and close all nodes.
                 // This has to be done before the project closes, since we want still state available for the ProjectMgr on the nodes 
@@ -6151,6 +6163,7 @@ If the files in the existing folder have the same names as files in the folder y
             SetBuildProject(null);
 
             this.isClosed = true;
+            isClosing = false;
 
             return hr;
         }

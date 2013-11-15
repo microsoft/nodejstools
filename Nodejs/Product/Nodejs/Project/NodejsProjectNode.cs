@@ -217,7 +217,7 @@ namespace Microsoft.NodejsTools.Project {
         /// </summary>
         internal void UpdateReferenceFile(NodejsFileNode changedFile = null) {
             // don't update if we're closing the project
-            if (!IsClosed) {
+            if (!IsClosed && !IsClosing) {
                 _uiSync.BeginInvoke((Action<NodejsFileNode>)UpdateReferenceFileUIThread, changedFile);
             }
         }

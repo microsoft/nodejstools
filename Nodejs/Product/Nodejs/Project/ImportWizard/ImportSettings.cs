@@ -32,7 +32,7 @@ namespace Microsoft.NodejsTools.Project.ImportWizard {
         public ImportSettings() {
             TopLevelJavaScriptFiles = new BulkObservableCollection<string>();
 
-            Filters = "*.txt;*.htm;*.html;*.css;*.png;*.jpg;*.gif;*.bmp;*.ico;*.svg;*.json;*.md";
+            Filters = "*.txt;*.htm;*.html;*.css;*.png;*.jpg;*.gif;*.bmp;*.ico;*.svg;*.json;*.md;*.ejs;*.styl;*.jade;*.xml";
         }
 
         public string ProjectPath {
