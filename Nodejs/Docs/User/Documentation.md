@@ -14,7 +14,7 @@ Features in Depth
 -----------------
 
 * [wiki:"IntelliSense and Editing" Features Intellisense]
-* [wiki:"Debugging" Node.js Debugger]
+* [wiki:"Debugging" Debugging]
 * [wiki:"Projects" Features Projects]
 * [wiki:"Profiling" Profiling]
 * [wiki:"Azure Deployment" AzureDeployment]
