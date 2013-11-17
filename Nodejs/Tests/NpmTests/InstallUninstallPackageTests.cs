@@ -23,6 +23,7 @@ namespace NpmTests{
         public void TestAddPackageToSimplePackageJsonThenUninstall(){
             var rootDir = CreateRootPackage(PkgSimple);
             var controller = NpmControllerFactory.Create(rootDir);
+            controller.Refresh();
             var rootPackage = controller.RootPackage;
             Assert.IsNotNull(rootPackage, "Root package with no dependencies should not be null.");
             Assert.AreEqual(0, rootPackage.Modules.Count, "Should be no modules before package install.");
@@ -72,6 +73,7 @@ namespace NpmTests{
             var rootDir = CreateRootPackage(PkgSimple);
             File.Delete(Path.Combine(rootDir, "package.json"));
             var controller = NpmControllerFactory.Create(rootDir);
+            controller.Refresh();
             var rootPackage = controller.RootPackage;
             Assert.IsNotNull(rootPackage, "Root package with no dependencies should not be null.");
             Assert.AreEqual(0, rootPackage.Modules.Count, "Should be no modules before package install.");
