@@ -12,7 +12,9 @@
  *
  * ***************************************************************************/
 
+using System;
 using System.IO;
+using Microsoft.CSharp.RuntimeBinder;
 
 namespace Microsoft.NodejsTools.Npm.SPI{
     internal class RootPackage : IRootPackage{
@@ -20,7 +22,19 @@ namespace Microsoft.NodejsTools.Npm.SPI{
             string fullPathToRootDirectory,
             bool showMissingDevOptionalSubPackages){
             Path = fullPathToRootDirectory;
-            PackageJson = PackageJsonFactory.Create(new DirectoryPackageJsonSource(fullPathToRootDirectory));
+            try{
+                PackageJson = PackageJsonFactory.Create(new DirectoryPackageJsonSource(fullPathToRootDirectory));
+            } catch (RuntimeBinderException rbe){
+                throw new PackageJsonException(
+                    string.Format(@"Error processing package.json at '{0}'. The file was successfully read, and may be valid JSON, but the objects may not match the expected form for a package.json file.
+
+The following error was reported:
+
+{1}",
+                    System.IO.Path.Combine(fullPathToRootDirectory, "package.json"),
+                    rbe.Message),
+                    rbe);
+            }
 
             Modules = new NodeModules(this, showMissingDevOptionalSubPackages);
         }
