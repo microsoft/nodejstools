@@ -163,20 +163,25 @@ namespace Microsoft.NodejsTools.Project{
 
         #region Updating module hierarchy
 
+        private void RestartFileSystemWatcherTimer(){
+            lock (_lock)
+            {
+                if (null != _fileSystemWatcherTimer)
+                {
+                    _fileSystemWatcherTimer.Dispose();
+                }
+
+                _fileSystemWatcherTimer = new Timer(o => UpdateModulesFromTimer(), null, 1000, Timeout.Infinite);
+            }
+        }
+
         private void m_Watcher_Changed(object sender, FileSystemEventArgs e){
             string path = e.FullPath;
             if (!path.EndsWith("package.json") && !path.Contains("\\node_modules")){
                 return;
             }
 
-            lock (_lock){
-                if (null != _fileSystemWatcherTimer){
-                    _fileSystemWatcherTimer.Dispose();
-                }
-
-                // I've upped the time to 2000ms because I noticed a few too many spurious updates going through.
-                _fileSystemWatcherTimer = new Timer(o => UpdateModulesFromTimer(), null, 2000, Timeout.Infinite);
-            }
+            RestartFileSystemWatcherTimer();
         }
 
         internal void ReloadHierarchySafe(){
@@ -212,6 +217,8 @@ namespace Microsoft.NodejsTools.Project{
                 MessageBox.Show(pje.Message, "Error Reading package.json", MessageBoxButton.OK, MessageBoxImage.Error);
             } catch (AggregateException ae){
                 ErrorHelper.ReportNpmNotInstalled(null, ae);
+            } catch (FileLoadException){    //  Fixes bug reported in work item 447 - just wait a bit and retry!
+                RestartFileSystemWatcherTimer();
             }
         }
 

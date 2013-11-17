@@ -124,7 +124,7 @@ namespace Microsoft.NodejsTools.NpmUI{
         private void _txtFind_KeyUp(object sender, KeyEventArgs e){
             if (null == _keypressFilterDelayTimer){
                 _keypressFilterDelayTimer = new Timer();
-                _keypressFilterDelayTimer.Interval = 1000;
+                _keypressFilterDelayTimer.Interval = 500;
                 _keypressFilterDelayTimer.Tick += _keypressFilterDelayTimer_Tick;
             } else{
                 _keypressFilterDelayTimer.Stop();
