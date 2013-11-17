@@ -87,23 +87,27 @@ namespace Microsoft.NodejsTools.Project{
         public override object GetIconHandle(bool open){
             int imageIndex = _projectNode.ImageIndexDependency;
             if (Package.IsMissing){
-                imageIndex = Package.IsDevDependency
-                                 ? _projectNode.ImageIndexDependencyDevMissing
-                                 : (Package.IsOptionalDependency
-                                        ? _projectNode.ImageIndexDependencyOptionalMissing
-                                        : (Package.IsBundledDependency
-                                               ? _projectNode.ImageIndexDependencyOptionalMissing
-                                               : _projectNode.ImageIndexDependencyMissing));
+                if (Package.IsDevDependency){
+                    imageIndex = _projectNode.ImageIndexDependencyDevMissing;
+                } else if (Package.IsOptionalDependency){
+                    imageIndex = _projectNode.ImageIndexDependencyOptionalMissing;
+                } else if (Package.IsBundledDependency){
+                    imageIndex = _projectNode.ImageIndexDependencyBundledMissing;
+                } else{
+                    imageIndex = _projectNode.ImageIndexDependencyMissing;
+                }
             } else{
-                imageIndex = ! Package.IsListedInParentPackageJson
-                                 ? _projectNode.ImageIndexDependencyNotListed
-                                 : (Package.IsDevDependency
-                                        ? _projectNode.ImageIndexDependencyDev
-                                        : (Package.IsOptionalDependency
-                                               ? _projectNode.ImageIndexDependnecyOptional
-                                               : (Package.IsBundledDependency
-                                                      ? _projectNode.ImageIndexDependencyBundled
-                                                      : _projectNode.ImageIndexDependency)));
+                if (! Package.IsListedInParentPackageJson){
+                    imageIndex = _projectNode.ImageIndexDependencyNotListed;
+                } else if (Package.IsDevDependency){
+                    imageIndex = _projectNode.ImageIndexDependencyDev;
+                } else if (Package.IsOptionalDependency){
+                    imageIndex = _projectNode.ImageIndexDependnecyOptional;
+                } else if (Package.IsBundledDependency){
+                    imageIndex = _projectNode.ImageIndexDependencyBundled;
+                } else{
+                    imageIndex = _projectNode.ImageIndexDependency;
+                }
             }
 
             return _projectNode.ImageHandler.GetIconHandle(imageIndex);

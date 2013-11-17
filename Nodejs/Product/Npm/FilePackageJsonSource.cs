@@ -12,6 +12,7 @@
  *
  * ***************************************************************************/
 
+using System;
 using System.IO;
 using Newtonsoft.Json;
 
@@ -33,6 +34,14 @@ Reading failed because the following error occurred:
 
 {1}", fullPathToFile, jre.Message),
                         jre);
+                } catch (ArgumentException ae){
+                    throw new PackageJsonException(
+                        string.Format(@"Error reading package.json file at '{0}'. The file may be parseable JSON but may contain objects with duplicate properties.
+
+The following error occurred:
+
+{1}", fullPathToFile, ae.Message),
+                        ae);
                 }
             }
         }

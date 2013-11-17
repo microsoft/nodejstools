@@ -17,6 +17,7 @@ using System.Collections;
 using System.ComponentModel;
 using System.Diagnostics;
 using System.IO;
+using System.Text;
 using System.Threading.Tasks;
 
 namespace Microsoft.NodejsTools.Npm.SPI{
@@ -24,7 +25,11 @@ namespace Microsoft.NodejsTools.Npm.SPI{
         private readonly string _fullPathToRootPackageDirectory;
         private string _pathToNpm;
         private bool _useFallbackIfNpmNotFound;
+        private bool _cancelled;
         private Process _process;
+        private StringBuilder _output = new StringBuilder();
+        private StringBuilder _error = new StringBuilder();
+        private object _bufferLock = new object();
 
         protected NpmCommand(
             string fullPathToRootPackageDirectory,
@@ -97,14 +102,34 @@ namespace Microsoft.NodejsTools.Npm.SPI{
             return info;
         }
 
-        public string StandardOutput { get; private set; }
-        public string StandardError { get; private set; }
+        public string StandardOutput{
+            get{
+                lock (_bufferLock){
+                    return _output.ToString();
+                }
+            }
+        }
+
+        public string StandardError{
+            get{
+                lock (_bufferLock){
+                    return _error.ToString();
+                }
+            }
+        }
 
         public void CancelCurrentTask(){
             if (null != _process){
                 try{
                     _process.Kill();
                 } catch (Win32Exception){} catch (InvalidOperationException){}
+                _cancelled = true;
+            }
+        }
+
+        private void WaitForExit(){
+            while (!_process.HasExited && !_cancelled){
+                _process.WaitForExit(5000);
             }
         }
 
@@ -120,15 +145,36 @@ namespace Microsoft.NodejsTools.Npm.SPI{
                         we);
                 }
 
-                var stdout = _process.StandardOutput;
-                var stderr = _process.StandardError;
+                _process.ErrorDataReceived += _process_ErrorDataReceived;
+                _process.OutputDataReceived += _process_OutputDataReceived;
 
-                await Task.Run(() => StandardOutput = stdout.ReadToEnd());
-                await Task.Run(() => StandardError = stderr.ReadToEnd());
-                await Task.Run(() => _process.WaitForExit());
+                _process.BeginErrorReadLine();
+                _process.BeginOutputReadLine();
+
+                await Task.Run(() => WaitForExit());
             }
 
             return true;
+        }
+
+        void _process_OutputDataReceived(object sender, DataReceivedEventArgs e)
+        {
+            lock (_bufferLock){
+                if (_output.Length > 0){
+                    _output.Append(Environment.NewLine);
+                }
+                _output.Append(e.Data);
+            }
+        }
+
+        void _process_ErrorDataReceived(object sender, DataReceivedEventArgs e)
+        {
+            lock (_bufferLock){
+                if (_error.Length > 0){
+                    _error.Append(Environment.NewLine);
+                }
+                _error.Append(e.Data);
+            }
         }
     }
 }
