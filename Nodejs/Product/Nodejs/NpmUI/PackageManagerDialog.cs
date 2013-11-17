@@ -20,7 +20,6 @@ using Microsoft.NodejsTools.Npm;
 namespace Microsoft.NodejsTools.NpmUI{
     public partial class PackageManagerDialog : Form{
         private readonly INpmController _npmController;
-        private bool _wait;
         private readonly object _lock = new object();
 
         public PackageManagerDialog(INpmController controller){
@@ -57,28 +56,6 @@ namespace Microsoft.NodejsTools.NpmUI{
                 _paneInstalledPackages.SelectedPackageView;
         }
 
-        private void SetWait(){
-            lock (_lock){
-                _wait = true;
-                Monitor.PulseAll(_lock);
-            }
-        }
-
-        private void ClearWait(){
-            lock (_lock){
-                _wait = false;
-                Monitor.PulseAll(_lock);
-            }
-        }
-
-        private void WaitForClearWait(){
-            lock (_lock){
-                while (_wait){
-                    Monitor.Wait(_lock);
-                }
-            }
-        }
-
         private void LoadPackageInfo(){
             lock (_lock){
                 _paneInstalledPackages.LocalPackages =
@@ -87,7 +64,6 @@ namespace Microsoft.NodejsTools.NpmUI{
                 if (null != globals){
                     _paneInstalledPackages.GlobalPackages = globals.Modules;
                 }
-                ClearWait();
             }
         }
 
@@ -113,19 +89,11 @@ namespace Microsoft.NodejsTools.NpmUI{
             Action action,
             INpmCommander commander){
             using (var popup = new BusyPopup()){
-                SetWait();
                 popup.Message = popupMessage;
                 popup.ShowPopup(
                     this,
                     commander,
-                    () =>
-                    {
-                        action();
-                        //if (!popup.WithErrors){
-                        //    WaitForClearWait();
-                        //}
-                    }
-                    );
+                    action);
             }
         }
 
