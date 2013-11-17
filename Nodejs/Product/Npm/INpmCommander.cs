@@ -9,6 +9,11 @@ namespace Microsoft.NodejsTools.Npm
     public interface INpmCommander : INpmLogSource, IDisposable{
 
         /// <summary>
+        /// Fired whenever a command is completed, regardless of whether or not it was successful.
+        /// </summary>
+        event EventHandler CommandCompleted;
+
+        /// <summary>
         /// Cancels the currently running command
         /// </summary>
         void CancelCurrentCommand();

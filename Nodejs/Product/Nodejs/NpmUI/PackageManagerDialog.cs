@@ -118,15 +118,13 @@ namespace Microsoft.NodejsTools.NpmUI{
                 popup.ShowPopup(
                     this,
                     commander,
-                    action
-                    //() =>{
-                    //    try{
-                    //        action();
-                    //        WaitForClearWait();
-                    //    } catch (NpmNotFoundException){
-                    //        throw;
-                    //    }
-                    //}
+                    () =>
+                    {
+                        action();
+                        //if (!popup.WithErrors){
+                        //    WaitForClearWait();
+                        //}
+                    }
                     );
             }
         }
@@ -139,7 +137,7 @@ namespace Microsoft.NodejsTools.NpmUI{
                     string.Format(
                         "Uninstalling global package '{0}'...",
                         e.Package.Name),
-                    () => commander.UninstallGlobalPackageAsync(e.Package.Name),
+                    async () => await commander.UninstallGlobalPackageAsync(e.Package.Name),
                     commander);
             }
         }
@@ -152,7 +150,7 @@ namespace Microsoft.NodejsTools.NpmUI{
                     string.Format(
                         "Uninstalling local package '{0}'...",
                         e.Package.Name),
-                    () => commander.UninstallPackageAsync(e.Package.Name),
+                    async () => await commander.UninstallPackageAsync(e.Package.Name),
                     commander);
             }
         }
@@ -164,8 +162,7 @@ namespace Microsoft.NodejsTools.NpmUI{
                 if (_paneInstalledPackages.SelectedPackageView == PackageView.Global){
                     DoWithPopup(
                         string.Format("Installing global package '{0}'...", e.Name),
-                        async () =>
-                            await commander.InstallGlobalPackageByVersionAsync(
+                        async () => await commander.InstallGlobalPackageByVersionAsync(
                                 e.Name,
                                 e.Version),
                         commander);

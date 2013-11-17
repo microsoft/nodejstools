@@ -16,6 +16,7 @@ using System;
 using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Forms;
+using EnvDTE;
 using Microsoft.NodejsTools.Npm;
 
 namespace Microsoft.NodejsTools.NpmUI{
@@ -32,6 +33,10 @@ namespace Microsoft.NodejsTools.NpmUI{
             CreateHandle();
 
             _btnClose.Visible = false;
+        }
+
+        public bool WithErrors{
+            get { return _withErrors; }
         }
 
         public string Message{
@@ -74,9 +79,11 @@ namespace Microsoft.NodejsTools.NpmUI{
             commander.OutputLogged += commander_OutputLogged;
             commander.ErrorLogged += commander_ErrorLogged;
             commander.ExceptionLogged += commander_ExceptionLogged;
+            commander.CommandCompleted += commander_CommandCompleted;
 
             using (_task = new Task(action)){
-                _task.ContinueWith(t2 => Completed());
+                //  N.B. This WON'T work because you're effectively passing in an async void that will "complete" immediately - grr
+                //_task.ContinueWith(t2 => Completed());
                 _task.Start();
 
                 ShowDialog(parent);
@@ -84,7 +91,13 @@ namespace Microsoft.NodejsTools.NpmUI{
                 commander.OutputLogged -= commander_OutputLogged;
                 commander.ErrorLogged -= commander_ErrorLogged;
                 commander.ExceptionLogged -= commander_ExceptionLogged;
+                commander.CommandCompleted -= commander_CommandCompleted;
             }
+        }
+
+        void commander_CommandCompleted(object sender, EventArgs e)
+        {
+            Completed();
         }
 
         private void WriteOutput(string output){

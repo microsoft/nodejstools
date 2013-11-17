@@ -129,7 +129,13 @@ namespace Microsoft.NodejsTools.Project{
             internal NpmPathProvider(NodeModulesNode owner){
                 _owner = owner;
             }
-            public string PathToNpm { get { return _owner.GetNpmPathFromNodePathInProject(); } }
+
+            public string PathToNpm{
+                get{
+                    return "C:\\fudgeweasel.exe";
+                    //return _owner.GetNpmPathFromNodePathInProject();
+                }
+            }
         }
 
         private INpmController CreateNpmController(){
@@ -138,7 +144,7 @@ namespace Microsoft.NodejsTools.Project{
                     _npmController = NpmControllerFactory.Create(
                         _projectNode.BuildProject.DirectoryPath,
                         false,
-                        new NpmPathProvider(this));
+                        new NpmPathProvider(this), false);
                     _npmController.OutputLogged += _npmController_OutputLogged;
                     _npmController.ErrorLogged += _npmController_ErrorLogged;
                     _npmController.ExceptionLogged += _npmController_ExceptionLogged;
