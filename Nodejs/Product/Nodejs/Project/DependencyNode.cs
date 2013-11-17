@@ -120,7 +120,9 @@ namespace Microsoft.NodejsTools.Project{
         public async void Uninstall(){
             var modulesNode = _projectNode.ModulesNode;
             if (null != modulesNode){
-                await modulesNode.NpmController.UninstallPackageAsync(Package.Name);
+                using (var commander = modulesNode.NpmController.CreateNpmCommander()){
+                    await commander.UninstallPackageAsync(Package.Name);
+                }
             }
         }
 

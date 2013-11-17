@@ -57,10 +57,15 @@ namespace Microsoft.NodejsTools.NpmUI{
                 _busy.Show();
             }
 
-            _allPackages = await _npmController.GetRepositoryCatalogueAsync();
-            _busy.Hide();
-            _listResults.Show();
-            StartFilter();
+            try{
+                _allPackages = await _npmController.GetRepositoryCatalogueAsync();
+                _busy.Hide();
+                _listResults.Show();
+                StartFilter();
+            } catch (NpmNotFoundException){
+                _busy.Finished = true;
+                _busy.Message = "Catalog retrieval aborted - npm.cmd not found";
+            }
         }
 
         private void StartFilter(){

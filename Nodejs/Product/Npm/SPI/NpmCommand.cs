@@ -24,6 +24,7 @@ namespace Microsoft.NodejsTools.Npm.SPI{
         private readonly string _fullPathToRootPackageDirectory;
         private string _pathToNpm;
         private bool _useFallbackIfNpmNotFound;
+        private Process _process;
 
         protected NpmCommand(
             string fullPathToRootPackageDirectory,
@@ -99,24 +100,32 @@ namespace Microsoft.NodejsTools.Npm.SPI{
         public string StandardOutput { get; private set; }
         public string StandardError { get; private set; }
 
+        public void CancelCurrentTask(){
+            if (null != _process){
+                try{
+                    _process.Kill();
+                } catch (Win32Exception){} catch (InvalidOperationException){}
+            }
+        }
+
         public virtual async Task<bool> ExecuteAsync(){
-            using (var proc = new Process()){
-                proc.StartInfo = BuildStartInfo();
+            using (_process = new Process()){
+                _process.StartInfo = BuildStartInfo();
 
                 try{
-                    proc.Start();
+                    _process.Start();
                 } catch (Win32Exception we){
                     throw new NpmExecutionException(
                         string.Format("Error executing npm - unable to start the npm process: {0}", we.Message),
                         we);
                 }
 
-                var stdout = proc.StandardOutput;
-                var stderr = proc.StandardError;
+                var stdout = _process.StandardOutput;
+                var stderr = _process.StandardError;
 
                 await Task.Run(() => StandardOutput = stdout.ReadToEnd());
                 await Task.Run(() => StandardError = stderr.ReadToEnd());
-                await Task.Run(() => proc.WaitForExit());
+                await Task.Run(() => _process.WaitForExit());
             }
 
             return true;

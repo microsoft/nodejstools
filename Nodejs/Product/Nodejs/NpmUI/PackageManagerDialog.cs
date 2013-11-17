@@ -108,57 +108,76 @@ namespace Microsoft.NodejsTools.NpmUI{
             UpdateUIState();
         }
 
-        private void DoWithPopup(string popupMessage, Action action){
+        private void DoWithPopup(
+            string popupMessage,
+            Action action,
+            INpmCommander commander){
             using (var popup = new BusyPopup()){
                 SetWait();
                 popup.Message = popupMessage;
                 popup.ShowPopup(
                     this,
-                    () =>{
-                        action();
-                        WaitForClearWait();
-                    });
+                    commander,
+                    action
+                    //() =>{
+                    //    try{
+                    //        action();
+                    //        WaitForClearWait();
+                    //    } catch (NpmNotFoundException){
+                    //        throw;
+                    //    }
+                    //}
+                    );
             }
         }
 
         private void _paneInstalledPackages_UninstallGloballPackageRequested(
             object sender,
             PackageEventArgs e){
-            DoWithPopup(
-                string.Format(
-                    "Uninstalling global package '{0}'...",
-                    e.Package.Name),
-                () => _npmController.UninstallGlobalPackageAsync(e.Package.Name));
+            using (var commander = _npmController.CreateNpmCommander()){
+                DoWithPopup(
+                    string.Format(
+                        "Uninstalling global package '{0}'...",
+                        e.Package.Name),
+                    () => commander.UninstallGlobalPackageAsync(e.Package.Name),
+                    commander);
+            }
         }
 
         private void _paneInstalledPackages_UninstallLocalPackageRequested(
             object sender,
             PackageEventArgs e){
-            DoWithPopup(
-                string.Format(
-                    "Uninstalling local package '{0}'...",
-                    e.Package.Name),
-                () => _npmController.UninstallPackageAsync(e.Package.Name));
+            using (var commander = _npmController.CreateNpmCommander()){
+                DoWithPopup(
+                    string.Format(
+                        "Uninstalling local package '{0}'...",
+                        e.Package.Name),
+                    () => commander.UninstallPackageAsync(e.Package.Name),
+                    commander);
+            }
         }
 
         private void _panePackageSources_InstallPackageRequested(
             object sender,
             PackageInstallEventArgs e){
-            if (_paneInstalledPackages.SelectedPackageView == PackageView.Global){
-                DoWithPopup(
-                    string.Format("Installing global package '{0}'...", e.Name),
-                    () =>
-                    _npmController.InstallGlobalPackageByVersionAsync(
-                        e.Name,
-                        e.Version));
-            } else{
-                DoWithPopup(
-                    string.Format("Installing local package '{0}'...", e.Name),
-                    () =>
-                    _npmController.InstallPackageByVersionAsync(
-                        e.Name,
-                        e.Version,
-                        e.DependencyType));
+            using (var commander = _npmController.CreateNpmCommander()){
+                if (_paneInstalledPackages.SelectedPackageView == PackageView.Global){
+                    DoWithPopup(
+                        string.Format("Installing global package '{0}'...", e.Name),
+                        async () =>
+                            await commander.InstallGlobalPackageByVersionAsync(
+                                e.Name,
+                                e.Version),
+                        commander);
+                } else{
+                    DoWithPopup(
+                        string.Format("Installing local package '{0}'...", e.Name),
+                        async () => await commander.InstallPackageByVersionAsync(
+                                    e.Name,
+                                    e.Version,
+                                    e.DependencyType),
+                        commander);
+                }
             }
         }
     }

@@ -28,6 +28,7 @@ namespace Microsoft.NodejsTools.Npm{
                 } catch (JsonReaderException jre){
                     throw new PackageJsonException(
                         string.Format(@"Unable to read package.json file at '{0}'. Please ensure the file is valid JSON.
+
 Reading failed because the following error occurred:
 
 {1}", fullPathToFile, jre.Message),

@@ -61,7 +61,7 @@ namespace Microsoft.NodejsTools.Npm{
                         ret = await task();
                     } catch (Exception e){
                         synch.InnerException = e;
-                        throw;
+                        //throw;
                     } finally{
                         synch.EndMessageLoop();
                     }

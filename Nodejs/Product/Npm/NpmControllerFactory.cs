@@ -19,12 +19,12 @@ namespace Microsoft.NodejsTools.Npm{
         public static INpmController Create(
             string fullPathToRootPackageDirectory,
             bool showMissingDevOptionalSubPackages = false,
-            string pathToNpm = null,
+            INpmPathProvider npmPathProvider = null,
             bool useFallbackIfNpmNotFound = true){
             return new NpmController(
                 fullPathToRootPackageDirectory,
                 showMissingDevOptionalSubPackages,
-                pathToNpm,
+                npmPathProvider,
                 useFallbackIfNpmNotFound);
         }
     }

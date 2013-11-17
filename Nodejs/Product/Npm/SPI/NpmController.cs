@@ -26,7 +26,7 @@ namespace Microsoft.NodejsTools.Npm.SPI{
 
         private string _fullPathToRootPackageDirectory;
         private bool _showMissingDevOptionalSubPackages;
-        private string _pathToNpm;
+        private INpmPathProvider _npmPathProvider;
         private bool _useFallbackIfNpmNotFound;
         private IRootPackage _rootPackage;
         private IGlobalPackages _globalPackage;
@@ -35,13 +35,25 @@ namespace Microsoft.NodejsTools.Npm.SPI{
         public NpmController(
             string fullPathToRootPackageDirectory,
             bool showMissingDevOptionalSubPackages = false,
-            string pathToNpm = null,
+            INpmPathProvider npmPathProvider = null,
             bool useFallbackIfNpmNotFound = true)
         {
             _fullPathToRootPackageDirectory = fullPathToRootPackageDirectory;
             _showMissingDevOptionalSubPackages = showMissingDevOptionalSubPackages;
-            _pathToNpm = pathToNpm;
+            _npmPathProvider = npmPathProvider;
             _useFallbackIfNpmNotFound = useFallbackIfNpmNotFound;
+        }
+
+        internal string FullPathToRootPackageDirectory{
+            get { return _fullPathToRootPackageDirectory; }
+        }
+
+        internal string PathToNpm{
+            get { return null == _npmPathProvider ? null : _npmPathProvider.PathToNpm; }
+        }
+
+        internal bool UseFallbackIfNpmNotFound{
+            get { return _useFallbackIfNpmNotFound; }
         }
 
         public event EventHandler StartingRefresh;
@@ -70,7 +82,7 @@ namespace Microsoft.NodejsTools.Npm.SPI{
                         _fullPathToRootPackageDirectory,
                         _showMissingDevOptionalSubPackages);
 
-                    var command = new NpmLsCommand(_fullPathToRootPackageDirectory, true, _pathToNpm,
+                    var command = new NpmLsCommand(_fullPathToRootPackageDirectory, true, PathToNpm,
                         _useFallbackIfNpmNotFound);
                     GlobalPackages = AsyncHelpers.RunSync<bool>(() => command.ExecuteAsync())
                         ? RootPackageFactory.Create(command.ListBaseDirectory)
@@ -109,128 +121,52 @@ namespace Microsoft.NodejsTools.Npm.SPI{
             }
         }
 
-        //  TODO: events should be fired as data is logged, not in one massive barf at the end
-        private void FireLogEvents(NpmCommand command){
-            OnOutputLogged(command.StandardOutput);
-            OnErrorLogged(command.StandardError);
+        public INpmCommander CreateNpmCommander(){
+            return new NpmCommander(this);
         }
 
-        private async Task<bool> InstallPackageByVersionAsync(
-            string packageName,
-            string versionRange,
-            DependencyType type,
-            bool global){
-            var command = new NpmInstallCommand(
-                _fullPathToRootPackageDirectory,
-                packageName,
-                versionRange,
-                type,
-                global,
-                _pathToNpm,
-                _useFallbackIfNpmNotFound);
+        public event EventHandler<NpmLogEventArgs> OutputLogged;
+        public event EventHandler<NpmLogEventArgs> ErrorLogged;
+        public event EventHandler<NpmExceptionEventArgs> ExceptionLogged;
 
-            var retVal = await command.ExecuteAsync();
-            FireLogEvents(command);
-            Refresh();
-            return retVal;
-        }
-
-        public async Task<bool> InstallPackageByVersionAsync(
-            string packageName,
-            string versionRange,
-            DependencyType type){
-            return await InstallPackageByVersionAsync(packageName, versionRange, type, false);
-        }
-
-        public async Task<bool> InstallGlobalPackageByVersionAsync(string packageName, string versionRange){
-            return await InstallPackageByVersionAsync(packageName, versionRange, DependencyType.Standard, true);
-        }
-
-        private DependencyType GetDependencyType(string packageName){
-            var type = DependencyType.Standard;
-            var root = RootPackage;
-            if (null != root){
-                var match = root.Modules[packageName];
-                if (null != match){
-                    if (match.IsDevDependency){
-                        type = DependencyType.Development;
-                    } else if (match.IsOptionalDependency){
-                        type = DependencyType.Optional;
-                    }
-                }
+        public void LogOutput(object sender, NpmLogEventArgs e){
+            var handlers = OutputLogged;
+            if (null != handlers){
+                handlers(this, e);
             }
-            return type;
         }
 
-        private async Task<bool> UninstallPackageAsync(string packageName, bool global){
-            var command = new NpmUninstallCommand(
-                _fullPathToRootPackageDirectory,
-                packageName,
-                GetDependencyType(packageName),
-                global,
-                _pathToNpm,
-                _useFallbackIfNpmNotFound);
-
-            var retVal = await command.ExecuteAsync();
-            FireLogEvents(command);
-            Refresh();
-            return retVal;
+        public void LogError(object sender, NpmLogEventArgs e){
+            var handlers = ErrorLogged;
+            if (null != handlers){
+                handlers(this, e);
+            }
         }
 
-        public async Task<bool> UninstallPackageAsync(string packageName){
-            return await UninstallPackageAsync(packageName, false);
+        public void LogException(object sender, NpmExceptionEventArgs e){
+            var handlers = ExceptionLogged;
+            if (null != handlers){
+                handlers(this, e);
+            }
         }
 
-        public async Task<bool> UninstallGlobalPackageAsync(string packageName){
-            return await UninstallPackageAsync(packageName, true);
-        }
-
-        public async Task<IEnumerable<IPackage>> SearchAsync(string searchText){
-            var command = new NpmSearchCommand(_fullPathToRootPackageDirectory, searchText, _pathToNpm, _useFallbackIfNpmNotFound);
-            var success = await command.ExecuteAsync();
-            FireLogEvents(command);
-            return success ? command.Results : new List<IPackage>();
-        }
-
-        public async Task<IEnumerable<IPackage>> GetRepositoryCatalogueAsync(){
+        public async Task<IEnumerable<IPackage>> GetRepositoryCatalogueAsync()
+        {
             //  This should really be thread-safe but await can't be inside a lock so
             //  we'll just have to hope and pray this doesn't happen concurrently. Worst
             //  case is we'll end up with two retrievals, one of which will be binned,
             //  which isn't the end of the world.
             if (null == _sRepoCatalogue){
-                _sRepoCatalogue = await SearchAsync(null);
+                Exception ex = null;
+                using (var commander = CreateNpmCommander()){
+                    commander.ExceptionLogged += (sender, args) => ex = args.Exception;
+                    _sRepoCatalogue = await commander.SearchAsync(null);
+                }
+                if (null != ex){
+                    throw ex;
+                }
             }
             return _sRepoCatalogue;
-        }
-
-        public async Task<bool> UpdatePackagesAsync(){
-            return await UpdatePackagesAsync(new List<IPackage>());
-        }
-
-        public async Task<bool> UpdatePackagesAsync(IEnumerable<IPackage> packages){
-            var command = new NpmUpdateCommand(_fullPathToRootPackageDirectory, packages, _pathToNpm, _useFallbackIfNpmNotFound);
-            var success = await command.ExecuteAsync();
-            FireLogEvents(command);
-            Refresh();
-            return success;
-        }
-
-        private void FireNpmLogEvent(string logText, EventHandler<NpmLogEventArgs> handlers){
-            if (null != handlers && ! string.IsNullOrEmpty(logText)){
-                handlers(this, new NpmLogEventArgs(logText));
-            }
-        }
-
-        public event EventHandler<NpmLogEventArgs> OutputLogged;
-
-        private void OnOutputLogged(string logText){
-            FireNpmLogEvent(logText, OutputLogged);
-        }
-
-        public event EventHandler<NpmLogEventArgs> ErrorLogged;
-
-        private void OnErrorLogged(string logText){
-            FireNpmLogEvent(logText, ErrorLogged);
         }
     }
 }

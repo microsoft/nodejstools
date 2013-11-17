@@ -27,7 +27,9 @@ namespace NpmTests{
             Assert.IsNotNull(rootPackage, "Root package with no dependencies should not be null.");
             Assert.AreEqual(0, rootPackage.Modules.Count, "Should be no modules before package install.");
 
-            AsyncHelpers.RunSync(() => controller.InstallPackageByVersionAsync("sax", "*", DependencyType.Standard));
+            using (var commander = controller.CreateNpmCommander()){
+                AsyncHelpers.RunSync(() => commander.InstallPackageByVersionAsync("sax", "*", DependencyType.Standard));
+            }
 
             Assert.AreNotEqual(
                 rootPackage,
@@ -51,7 +53,9 @@ namespace NpmTests{
             Assert.IsFalse(module.IsBundledDependency, "Should not be marked as bundled dependency.");
             Assert.IsTrue(module.HasPackageJson, "Module should have its own package.json");
 
-            AsyncHelpers.RunSync(() => controller.UninstallPackageAsync("sax"));
+            using (var commander = controller.CreateNpmCommander()){
+                AsyncHelpers.RunSync(() => commander.UninstallPackageAsync("sax"));
+            }
 
             Assert.AreNotEqual(
                 rootPackage,
@@ -72,7 +76,9 @@ namespace NpmTests{
             Assert.IsNotNull(rootPackage, "Root package with no dependencies should not be null.");
             Assert.AreEqual(0, rootPackage.Modules.Count, "Should be no modules before package install.");
 
-            AsyncHelpers.RunSync(() => controller.InstallPackageByVersionAsync("sax", "*", DependencyType.Standard));
+            using (var commander = controller.CreateNpmCommander()){
+                AsyncHelpers.RunSync(() => commander.InstallPackageByVersionAsync("sax", "*", DependencyType.Standard));
+            }
 
             Assert.AreNotEqual(
                 rootPackage,
@@ -96,7 +102,9 @@ namespace NpmTests{
             Assert.IsFalse(module.IsBundledDependency, "Should not be marked as bundled dependency.");
             Assert.IsTrue(module.HasPackageJson, "Module should have its own package.json");
 
-            AsyncHelpers.RunSync(() => controller.UninstallPackageAsync("sax"));
+            using (var commander = controller.CreateNpmCommander()){
+                AsyncHelpers.RunSync(() => commander.UninstallPackageAsync("sax"));
+            }
 
             Assert.AreNotEqual(
                 rootPackage,

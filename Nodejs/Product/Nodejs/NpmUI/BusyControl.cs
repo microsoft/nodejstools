@@ -18,8 +18,16 @@ using System.Windows.Forms;
 
 namespace Microsoft.NodejsTools.NpmUI{
     public partial class BusyControl : UserControl{
+
+        private bool _finished;
+
         public BusyControl(){
             InitializeComponent();
+        }
+
+        protected override void OnLoad(EventArgs e){
+            base.OnLoad(e);
+
             ArrangeControls();
         }
 
@@ -47,6 +55,19 @@ namespace Microsoft.NodejsTools.NpmUI{
         public string Message{
             get { return _labelMessage.Text; }
             set { _labelMessage.Text = value; }
+        }
+
+        public bool Finished{
+            get { return _finished; }
+            set{
+                _finished = value;
+                if (_finished){
+                    _progress.Style = ProgressBarStyle.Continuous;
+                    _progress.Value = 100;
+                } else{
+                    _progress.Style = ProgressBarStyle.Marquee;
+                }
+            }
         }
     }
 }

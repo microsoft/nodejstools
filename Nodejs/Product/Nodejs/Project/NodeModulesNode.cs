@@ -18,12 +18,15 @@ using System.IO;
 using System.Linq;
 using System.Threading;
 using System.Windows;
+using System.Windows.Forms;
 using Microsoft.NodejsTools.Npm;
 using Microsoft.NodejsTools.NpmUI;
 using Microsoft.VisualStudio;
 using Microsoft.VisualStudio.Shell;
 using Microsoft.VisualStudio.Shell.Interop;
 using Microsoft.VisualStudioTools.Project;
+using MessageBox = System.Windows.MessageBox;
+using Timer = System.Threading.Timer;
 
 namespace Microsoft.NodejsTools.Project{
     internal class NodeModulesNode : HierarchyNode{
@@ -91,8 +94,8 @@ namespace Microsoft.NodejsTools.Project{
                     }
 
                     if (null != _npmController){
-                        _npmController.OutputLogged -= m_NpmController_OutputLogged;
-                        _npmController.ErrorLogged -= m_NpmController_ErrorLogged;
+                        _npmController.OutputLogged -= _npmController_OutputLogged;
+                        _npmController.ErrorLogged -= _npmController_ErrorLogged;
                     }
 
                     foreach (var command in NodejsPackage.Instance.NpmCommands){
@@ -121,15 +124,24 @@ namespace Microsoft.NodejsTools.Project{
             return null;
         }
 
+        private class NpmPathProvider : INpmPathProvider{
+            private NodeModulesNode _owner;
+            internal NpmPathProvider(NodeModulesNode owner){
+                _owner = owner;
+            }
+            public string PathToNpm { get { return _owner.GetNpmPathFromNodePathInProject(); } }
+        }
+
         private INpmController CreateNpmController(){
             lock (_lock){
                 if (null == _npmController){
                     _npmController = NpmControllerFactory.Create(
                         _projectNode.BuildProject.DirectoryPath,
                         false,
-                        GetNpmPathFromNodePathInProject());
-                    _npmController.OutputLogged += m_NpmController_OutputLogged;
-                    _npmController.ErrorLogged += m_NpmController_ErrorLogged;
+                        new NpmPathProvider(this));
+                    _npmController.OutputLogged += _npmController_OutputLogged;
+                    _npmController.ErrorLogged += _npmController_ErrorLogged;
+                    _npmController.ExceptionLogged += _npmController_ExceptionLogged;
                     ReloadModules();
                 }
                 return _npmController;
@@ -191,8 +203,10 @@ namespace Microsoft.NodejsTools.Project{
                 lock (_lock){
                     NpmController.Refresh();
                 }
-            } catch (PackageJsonException pje) {
-                MessageBox.Show(pje.Message, "Error Loading npm Modules", MessageBoxButton.OK, MessageBoxImage.Error);
+            } catch (PackageJsonException pje){
+                MessageBox.Show(pje.Message, "Error Reading package.json", MessageBoxButton.OK, MessageBoxImage.Error);
+            } catch (AggregateException ae){
+                ErrorHelper.ReportNpmNotInstalled(null, ae);
             }
         }
 
@@ -251,25 +265,35 @@ namespace Microsoft.NodejsTools.Project{
 
         #endif
 
-        private void WriteNpmLogToOutputWindow(NpmLogEventArgs args){
+        private void WriteNpmLogToOutputWindow(string logText){
             var pane = GetNpmOutputPane();
             if (null != pane){
-                pane.OutputStringThreadSafe(args.LogText);
+                pane.OutputStringThreadSafe(logText);
             }
 
 #if INTEGRATE_WITH_ERROR_LIST
 
             WriteNpmErrorsToErrorList(args);
 
-            #endif
+#endif
         }
 
-        private void m_NpmController_ErrorLogged(object sender, NpmLogEventArgs e){
+        private void WriteNpmLogToOutputWindow(NpmLogEventArgs args)
+        {
+            WriteNpmLogToOutputWindow(args.LogText);
+        }
+
+        private void _npmController_ErrorLogged(object sender, NpmLogEventArgs e){
             WriteNpmLogToOutputWindow(e);
         }
 
-        private void m_NpmController_OutputLogged(object sender, NpmLogEventArgs e){
+        private void _npmController_OutputLogged(object sender, NpmLogEventArgs e){
             WriteNpmLogToOutputWindow(e);
+        }
+
+        void _npmController_ExceptionLogged(object sender, NpmExceptionEventArgs e)
+        {
+            WriteNpmLogToOutputWindow(ErrorHelper.GetExceptionDetailsText(e.Exception));
         }
 
         private void ReloadHierarchy(){
@@ -422,20 +446,33 @@ namespace Microsoft.NodejsTools.Project{
         public void UpdateModules(){
             CheckNotDisposed();
 
-            var selected = _projectNode.GetSelectedNodes();
-            if (selected.Count == 1 && selected[0] == this){
-                NpmController.UpdatePackagesAsync();
-            } else{
-                NpmController.UpdatePackagesAsync(selected.OfType<DependencyNode>().Select(dep => dep.Package).ToList());
+            try{
+                var selected = _projectNode.GetSelectedNodes();
+                using (var commander = NpmController.CreateNpmCommander()){
+                    if (selected.Count == 1 && selected[0] == this){
+                        commander.UpdatePackagesAsync();
+                    } else{
+                        commander.UpdatePackagesAsync(
+                            selected.OfType<DependencyNode>().Select(dep => dep.Package).ToList());
+                    }
+                }
+            } catch (NpmNotFoundException nnfe){
+                ErrorHelper.ReportNpmNotInstalled(null, nnfe);
             }
         }
 
         public void UninstallModules(){
             CheckNotDisposed();
 
-            var selected = _projectNode.GetSelectedNodes();
-            foreach (var name in selected.OfType<DependencyNode>().Select(dep => dep.Package.Name).ToList()){
-                NpmController.UninstallPackageAsync(name);
+            try{
+                var selected = _projectNode.GetSelectedNodes();
+                using (var commander = NpmController.CreateNpmCommander()){
+                    foreach (var name in selected.OfType<DependencyNode>().Select(dep => dep.Package.Name).ToList()){
+                        commander.UninstallPackageAsync(name);
+                    }
+                }
+            } catch (NpmNotFoundException nnfe){
+                ErrorHelper.ReportNpmNotInstalled(null, nnfe);
             }
         }
 

@@ -13,14 +13,25 @@
  * ***************************************************************************/
 
 using System;
+using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Forms;
+using Microsoft.NodejsTools.Npm;
 
 namespace Microsoft.NodejsTools.NpmUI{
     public partial class BusyPopup : Form{
+
+        private INpmCommander _commander;
+        private Task _task;
+        private bool _withErrors;
+        private bool _cancelled;
+        private StringBuilder _rtf = new StringBuilder();
+
         public BusyPopup(){
             InitializeComponent();
             CreateHandle();
+
+            _btnClose.Visible = false;
         }
 
         public string Message{
@@ -28,21 +39,144 @@ namespace Microsoft.NodejsTools.NpmUI{
             set { _busyControl.Message = value; }
         }
 
-        private void Completed(){
-            BeginInvoke(
-                new Action(
-                    () =>{
-                        DialogResult = DialogResult.OK;
-                        Close();
-                    }));
+        private void HandleCompletion(){
+            _busyControl.Finished = true;
+
+            var exception = _task.Exception;
+            if (null != exception){
+                _withErrors = true;
+                WriteLines(ErrorHelper.GetExceptionDetailsText(exception), true);
+            }
+
+            if (_cancelled || _withErrors){
+                _busyControl.Message = _cancelled
+                    ? "npm Operation Cancelled..."
+                    : "npm Operation Failed...";
+            } else{
+                _busyControl.Message = "npm Operation Completed Successfully...";
+            }
+
+            _btnClose.Location = _btnCancel.Location;
+            _btnCancel.Visible = false;
+            _btnClose.Visible = true;
         }
 
-        public void ShowPopup(IWin32Window parent, Action action){
-            Task t = new Task(action);
-            t.ContinueWith(t2 => Completed());
-            t.Start();
+        private void Completed(){
+            BeginInvoke(
+                new Action(HandleCompletion));
+        }
 
-            ShowDialog(parent);
+        public void ShowPopup(
+            IWin32Window parent,
+            INpmCommander commander,
+            Action action){
+            _commander = commander;
+            commander.OutputLogged += commander_OutputLogged;
+            commander.ErrorLogged += commander_ErrorLogged;
+            commander.ExceptionLogged += commander_ExceptionLogged;
+
+            using (_task = new Task(action)){
+                _task.ContinueWith(t2 => Completed());
+                _task.Start();
+
+                ShowDialog(parent);
+
+                commander.OutputLogged -= commander_OutputLogged;
+                commander.ErrorLogged -= commander_ErrorLogged;
+                commander.ExceptionLogged -= commander_ExceptionLogged;
+            }
+        }
+
+        private void WriteOutput(string output){
+            if (_rtf.Length == 0){
+                _rtf.Append(@"{\rtf1\ansi\deff0 {\fonttbl {\f0 Consolas;}}
+{\colortbl;\red255\green255\blue255;\red255\green0\blue0;\red255\green255\blue0;}\fs16
+");
+            }
+
+            if (output.Length > 0 && output[0] != '\\'){
+                //  Apply default text color
+                _rtf.Append(@"\cf1");
+            }
+
+            _rtf.Append(output);
+            _rtf.Append("\\line\r\n");
+
+            //  There surely has to be a nicer way to do this but
+            //  AppendText() just appends plaintext, hence the use
+            //  of the buffer, and the following...
+            _textOutput.Rtf = _rtf.ToString();
+            _textOutput.SelectionStart = _rtf.Length;
+            _textOutput.ScrollToCaret();
+        }
+
+        private void WriteError(string error){
+            _withErrors = true;
+            WriteOutput(@"\cf2" + error);
+        }
+
+        private void WriteWarning(string warning){
+            WriteOutput(@"\cf3" + warning);
+        }
+
+        private void WriteLine(string line, bool forceError){
+            if (forceError || line.StartsWith("npm ERR!")){
+                WriteError(line);
+            }
+            else if (line.StartsWith("npm WARN")){
+                WriteWarning(line);
+            } else{
+                WriteOutput(line);
+            }
+        }
+
+        private string EscapeBackslashes(string source){
+            var buff = new StringBuilder();
+            foreach (var ch in source){
+                if (ch == '\\'){
+                    buff.Append("\\'5c");
+                } else{
+                    buff.Append(ch);
+                }
+            }
+            return buff.ToString();
+        }
+
+        private void WriteLines(string text, bool forceError){
+            text = EscapeBackslashes(text);
+            foreach (var line in text.Split(new string[]{"\r\n", "\n"}, StringSplitOptions.None)){
+                WriteLine(line, forceError);
+            }
+        }
+
+        private void commander_ErrorLogged(object sender, NpmLogEventArgs e){
+            BeginInvoke(new Action(() => WriteLines(e.LogText, false)));
+        }
+
+        private void commander_OutputLogged(object sender, NpmLogEventArgs e){
+            BeginInvoke(new Action(() => WriteLines(e.LogText, false)));
+        }
+
+        void commander_ExceptionLogged(object sender, NpmExceptionEventArgs e){
+            BeginInvoke(new Action(() => WriteLines(ErrorHelper.GetExceptionDetailsText(e.Exception), true)));
+        }
+
+        private void DoClose(){
+            DialogResult = DialogResult.OK;
+            Close();
+        }
+
+        private void _btnClose_Click(object sender, EventArgs e)
+        {
+            DoClose();
+        }
+
+        private void _btnCancel_Click(object sender, EventArgs e)
+        {
+            if (null != _commander){
+                _cancelled = true;
+                _commander.CancelCurrentCommand();
+            }
         }
     }
 }
