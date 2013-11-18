@@ -25,5 +25,6 @@ namespace Microsoft.NodejsTools {
         public const int cmdidSetAsNodejsStartupFile        = 0x203;
         public const int cmdidSurveyNews                    = 0x204;
         public const int cmdidImportWizard                  = 0x205;
+        public const int cmdidOpenRemoteDebugDocumentation  = 0x206;
     }
 }

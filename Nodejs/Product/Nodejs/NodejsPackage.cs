@@ -238,6 +238,7 @@ namespace Microsoft.NodejsTools {
             RegisterCommands(new Command[] { 
                 new OpenReplWindowCommand(),
                 new OpenRemoteDebugProxyFolderCommand(),
+                new OpenRemoteDebugDocumentationCommand(),
                 new SurveyNewsCommand(),
                 new ImportWizardCommand()
             }, GuidList.guidNodeCmdSet);
@@ -307,15 +308,13 @@ namespace Microsoft.NodejsTools {
                     return remoteDebugProxyFolder;
                 }
 
+                const string ROOT_KEY = "Software\\Microsoft\\NodeJSTools\\" + AssemblyVersionInfo.VSVersion;
+
                 // Try HKCU
                 try {
-                    using (
-                        RegistryKey software = Registry.CurrentUser.OpenSubKey("Software"),
-                        microsoft = software.OpenSubKey("Microsoft"),
-                        node = microsoft.OpenSubKey("NodeJSTools")
-                    ) {
+                    using (RegistryKey node = Registry.CurrentUser.OpenSubKey(ROOT_KEY)) {
                         if (node != null) {
-                            remoteDebugProxyFolder = (string)node.GetValue("RemoteDebugProxyScript");
+                            remoteDebugProxyFolder = (string)node.GetValue("RemoteDebugProxyFolder");
                         }
                     }
                 } catch (Exception) {
@@ -324,13 +323,9 @@ namespace Microsoft.NodejsTools {
                 // Try HKLM
                 if (remoteDebugProxyFolder == null) {
                     try {
-                        using (
-                            RegistryKey software = Registry.LocalMachine.OpenSubKey("Software"),
-                            microsoft = software.OpenSubKey("Microsoft"),
-                            node = microsoft.OpenSubKey("NodeJSTools")
-                        ) {
+                        using (RegistryKey node = Registry.LocalMachine.OpenSubKey(ROOT_KEY)) {
                             if (node != null) {
-                                remoteDebugProxyFolder = (string)node.GetValue("RemoteDebugProxyScript");
+                                remoteDebugProxyFolder = (string)node.GetValue("RemoteDebugProxyFolder");
                             }
                         }
                     } catch (Exception) {

@@ -80,7 +80,9 @@
         <Directory Id="_C4404CF0638F4D569707EC3680C13E5F" Name="Extensions">
           <Directory Id="_942B894A8C5749A3998ECCA325E88902" Name="Microsoft">
             <Directory Id="_CDA62BE31FDD4AA9B82B0ECA65B30854" Name="Node.js Tools">
-              <Directory Id="INSTALLLOCATION" Name="1.0" />
+              <Directory Id="INSTALLLOCATION" Name="1.0">
+                <Directory Id="Dir_RemoteDebug" Name="RemoteDebug"/>
+              </Directory>
             </Directory>
           </Directory>
         </Directory>
@@ -109,13 +111,13 @@
       </Directory>
     </Directory>
 
-    <DirectoryRef Id="INSTALLLOCATION">
+    <DirectoryRef Id="Dir_RemoteDebug">
       <Component Id="Comp_InstallDirItems" DiskId="1" Guid="$(var.Comp_InstallDirItemGuid)">
         <File Id="File_License.html" Name="License.html" Source="$(var.NodejsToolsDir)\License.html" />
         <File Id="File_RemoteDebug.js" Name="RemoteDebug.js" Source="$(var.NodejsToolsDir)\RemoteDebug.js" />
         <File Id="File_RemoteDebugging.html" Name="RemoteDebugging.html" Source="$(var.NodejsToolsDir)\RemoteDebugging.html" />
-        <RegistryValue Root='HKCU' Key='SOFTWARE\Microsoft\NodejsTools' Type='string' Value='Readme' KeyPath='yes' />
-        <RegistryValue Root='HKCU' Key='SOFTWARE\Microsoft\NodejsTools' Type='string' Name='RemoteDebugProxyScript' Value='[INSTALLLOCATION]RemoteDebug.js' />
+        <RegistryValue Root='HKMU' Key='SOFTWARE\Microsoft\NodejsTools\$(var.VSTargetVersion)' Type='string' Value='Readme' KeyPath='yes' />
+        <RegistryValue Root='HKMU' Key='SOFTWARE\Microsoft\NodejsTools\$(var.VSTargetVersion)' Type='string' Name='RemoteDebugProxyFolder' Value='[Dir_RemoteDebug]' />
         <RemoveFolder Id='Comp_InstallDirItems' On='uninstall'/>
 
         <util:RestartResource Path="[DEVENV_PATH]" />

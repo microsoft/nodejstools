@@ -64,14 +64,19 @@ function parseCommandLine() {
 
     if (error) {
         console.log('Remote Debug Proxy');
-        console.log('    Runs a given nodejs script in debug mode, exposing the debugging protocol over a machine port');
+        console.log('    Runs a given nodejs script in debug mode, exposing the debugging protocol');
+        console.log('    over a machine port.');
         console.log('Usage:');
         console.log('    Node RemoteDebug.js [args] <script to debug> [script args]');
         console.log('Args:');
-        console.log('    -localport <port num>   - Local host port used by node to expose debugging protocol (defaults to 5859)');
-        console.log('    -machineport <port num> - Proxied machine port for use by remote debugger (defaults to 5858)');
-        console.log('    -waitforattach          - Wait until remote debugger attach before starting node running/debugging script');
-        console.log('    -breakatentrypoint      - Break at entrypoint when starting node running/debugging script');
+        console.log('    -localport <port num>   - Local host port used by node to expose debugging');
+        console.log('                              protocol (defaults to 5859)');
+        console.log('    -machineport <port num> - Proxied machine port for use by remote debugger');
+        console.log('                              (defaults to 5858)');
+        console.log('    -waitforattach          - Wait until remote debugger attach before');
+        console.log('                              starting node running/debugging script');
+        console.log('    -breakatentrypoint      - Break at entrypoint when starting node');
+        console.log('                              running/debugging script');
         console.log('    -help                   - Show this help text');
         process.exit();
     }
@@ -112,7 +117,7 @@ function ensureDebugeeStarted() {
 
 function ensureLocalClientSocketConnected() {
     ensureDebugeeStarted();
-    if (localClientSocket == null){
+    if (localClientSocket == null) {
         localClientSocket = new net.Socket();
         localClientSocket.on('data', function (data) {
             if (remoteServerSocket != null) {

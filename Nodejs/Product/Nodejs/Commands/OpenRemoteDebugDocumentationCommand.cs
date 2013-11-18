@@ -19,19 +19,19 @@ using System.Windows.Forms;
 using Microsoft.VisualStudioTools;
 
 namespace Microsoft.NodejsTools.Commands {
-    internal sealed class OpenRemoteDebugProxyFolderCommand : Command {
+    internal sealed class OpenRemoteDebugDocumentationCommand : Command {
         public override void DoCommand(object sender, EventArgs args) {
             // Open explorer to folder
-            var filePath = Path.Combine(NodejsPackage.RemoteDebugProxyFolder, "RemoteDebug.js");
+            var filePath = Path.Combine(NodejsPackage.RemoteDebugProxyFolder, "RemoteDebugging.html");
             if (!File.Exists(filePath)) {
-                MessageBox.Show(String.Format("Remote Debug Proxy \"{0}\" does not exist.", filePath), "Node.js Tools for Visual Studio");
+                MessageBox.Show(String.Format("Remote Debug Documentation \"{0}\" does not exist.", filePath), "Node.js Tools for Visual Studio");
             } else {
-                Process.Start("explorer", string.Format("/e,/select,{0}", filePath));
+                Process.Start(filePath);
             }
         }
 
         public override int CommandId {
-            get { return (int)PkgCmdId.cmdidOpenRemoteDebugProxyFolder; }
+            get { return (int)PkgCmdId.cmdidOpenRemoteDebugDocumentation; }
         }
     }
 }

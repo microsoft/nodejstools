@@ -46,16 +46,16 @@
         <Menu guid="guidNodeToolsCmdSet" id="ToolsMenu" priority="0x8009" type="Menu">
             <Parent guid="guidSHLMainMenu" id="IDG_VS_TOOLS_OTHER2"/>
             <Strings>
-                <ButtonText>Node.js Tools</ButtonText>
-                <CommandName>Node.&amp;js Tools</CommandName>
+                <ButtonText>Node.&amp;js Tools</ButtonText>
+                <CommandName>Node.js Tools</CommandName>
             </Strings>
         </Menu>
 
         <Menu guid="guidNodeToolsCmdSet" id="RemoteDebugProxyMenu" priority="0x0500" type="Menu">
             <Parent guid="guidNodeToolsCmdSet" id="ToolsMenuItemsGroup"/>
             <Strings>
-                <ButtonText>Remote Debugging Proxy</ButtonText>
-                <CommandName>&amp;Remote Debugging Proxy</CommandName>
+                <ButtonText>&amp;Remote Debugging Proxy</ButtonText>
+                <CommandName>Remote Debugging Proxy</CommandName>
             </Strings>
         </Menu>
     </Menus>
@@ -75,7 +75,7 @@
         <CommandFlag>DynamicVisibility</CommandFlag>
         <CommandFlag>DefaultInvisible</CommandFlag>
         <Strings>
-          <CommandName>cmdidSetAsNodejsStartupFile</CommandName>          
+          <CommandName>Set as Node.js Startup File</CommandName>          
           <ButtonText>S&amp;et as Node.js Startup File</ButtonText>
         </Strings>
       </Button>
@@ -94,7 +94,7 @@
         <Parent guid="guidSHLMainMenu" id="IDG_VS_WNDO_OTRWNDWS1"/>
         <Icon guid="guidImages" id="nodeReplPic" />
         <Strings>
-          <CommandName>cmdidReplWindow</CommandName>
+          <CommandName>Node.js Interactive Window</CommandName>
           <ButtonText>Node.js Interactive Window</ButtonText>
         </Strings>
       </Button>
@@ -102,8 +102,16 @@
       <Button guid="guidNodeToolsCmdSet" id="cmdidOpenRemoteDebugProxyFolder" priority="0x0500" type="Button">
         <Parent guid="guidNodeToolsCmdSet" id="RemoteDebugProxyGroup"/>
         <Strings>
-          <CommandName>cmdidOpenRemoteDebugProxyFolder</CommandName>
+          <CommandName>Open Containing Folder</CommandName>
           <ButtonText>&amp;Open Containing Folder</ButtonText>
+        </Strings>
+      </Button>
+
+      <Button guid="guidNodeToolsCmdSet" id="cmdidOpenRemoteDebugDocumentation" priority="0x0510" type="Button">
+        <Parent guid="guidNodeToolsCmdSet" id="RemoteDebugProxyGroup"/>
+        <Strings>
+          <CommandName>Open Documentation</CommandName>
+          <ButtonText>Open &amp;Documentation</ButtonText>
         </Strings>
       </Button>
 
@@ -111,7 +119,7 @@
         <Parent guid="guidNodeToolsCmdSet" id="ToolsMenuItemsGroup"/>
         <Strings>
           <ButtonText>Survey/&amp;News...</ButtonText>
-          <CommandName>cmdidSurveyNews</CommandName>
+          <CommandName>Survey/News...</CommandName>
         </Strings>
       </Button>
 
@@ -161,6 +169,7 @@
       <IDSymbol name="cmdidSetAsNodejsStartupFile" value="0x0203" />
       <IDSymbol name="cmdidSurveyNews" value ="0x0204" />
       <IDSymbol name="cmdidImportWizard" value ="0x0205" />
+      <IDSymbol name="cmdidOpenRemoteDebugDocumentation" value="0x0206" />
 
       <!-- Shared commands, defined in CommonConstants.cs -->
       <IDSymbol name="cmdidAddExistingFolder" value="0x10001" />
