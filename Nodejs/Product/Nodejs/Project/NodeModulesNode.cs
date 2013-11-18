@@ -47,7 +47,7 @@ namespace Microsoft.NodejsTools.Project{
         #region Member variables
 
         private readonly NodejsProjectNode _projectNode;
-        private FileSystemWatcher _watcher;
+        private readonly FileSystemWatcher _watcher;
         private Timer _fileSystemWatcherTimer;
         private INpmController _npmController; //  TODO: This is totally not the right place for this!!
         private readonly object _lock = new object();
