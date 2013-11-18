@@ -144,6 +144,13 @@ namespace Microsoft.NodejsTools.Project.ImportWizard {
                                 s.TopLevelJavaScriptFiles.Add(file);
                             }
                         }
+                        if (fileList.Contains("server.js")) {
+                            s.StartupFile = "server.js";
+                        } else if (fileList.Contains("app.js")) {
+                            s.StartupFile = "app.js";
+                        } else if (fileList.Count > 0) {
+                            s.StartupFile = fileList.First();
+                        }
                     }));
                 });
             } else {
