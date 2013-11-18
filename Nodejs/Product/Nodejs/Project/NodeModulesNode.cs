@@ -66,7 +66,7 @@ namespace Microsoft.NodejsTools.Project{
                 command.ModulesNode = this;
             }
 
-            _watcher = new FileSystemWatcher(_projectNode.BuildProject.DirectoryPath){
+            _watcher = new FileSystemWatcher(_projectNode.ProjectHome){
                 NotifyFilter = NotifyFilters.LastWrite
             };
             _watcher.Changed += m_Watcher_Changed;
