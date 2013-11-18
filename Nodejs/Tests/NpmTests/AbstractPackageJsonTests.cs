@@ -13,6 +13,8 @@
  * ***************************************************************************/
 
 using System.Collections.Generic;
+using System.IO;
+using System.Text;
 using Microsoft.NodejsTools.Npm;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 
@@ -27,6 +29,16 @@ namespace NpmTests{
 
         protected IPackageJson LoadFrom(string json){
             return PackageJsonFactory.Create(new MockPackageJsonSource(json));
+        }
+
+        protected IPackageJson LoadFromResource(string manifestResourceName){
+            using (
+                var reader =
+                    new StreamReader(
+                        typeof (AbstractPackageJsonTests).Assembly.GetManifestResourceStream(
+                            manifestResourceName))){
+                return LoadFrom(reader.ReadToEnd());
+            }
         }
 
         private static void CheckContains(ISet<string> retrieved, IEnumerable<string> expected){

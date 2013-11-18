@@ -21,7 +21,7 @@ namespace Microsoft.NodejsTools.Npm{
         public FilePackageJsonSource(string fullPathToFile){
             if (File.Exists(fullPathToFile)){
                 try{
-                    using (var fin = new FileStream(fullPathToFile, FileMode.Open, FileAccess.Read, FileShare.Read)){
+                    using (var fin = new FileStream(fullPathToFile, FileMode.Open, FileAccess.Read, FileShare.ReadWrite)){
                         using (var reader = new StreamReader(fin)){
                             Package = JsonConvert.DeserializeObject(reader.ReadToEnd());
                         }

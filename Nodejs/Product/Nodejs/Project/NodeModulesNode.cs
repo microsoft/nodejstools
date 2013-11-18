@@ -35,7 +35,7 @@ namespace Microsoft.NodejsTools.Project{
         /// <summary>
         /// The caption to display for this node
         /// </summary>
-        private const string _cCaption = "Node Modules";
+        private const string _cCaption = "npm";
 
         /// <summary>
         /// The virtual name of this node.
@@ -208,17 +208,34 @@ namespace Microsoft.NodejsTools.Project{
             ReloadHierarchySafe();
         }
 
+        private int _refreshRetryCount;
+
         private void ReloadModules(){
-            try{
-                lock (_lock){
+            lock (_lock){
+                var retry = false;
+                Exception ex = null;
+                try{
                     NpmController.Refresh();
+                } catch (PackageJsonException pje){
+                    retry = true;
+                    ex = pje;
+                } catch (AggregateException ae){
+                    retry = true;
+                    ex = ae;
+                } catch (FileLoadException fle){
+                    //  Fixes bug reported in work item 447 - just wait a bit and retry!
+                    retry = true;
+                    ex = fle;
                 }
-            } catch (PackageJsonException pje){
-                MessageBox.Show(pje.Message, "Error Reading package.json", MessageBoxButton.OK, MessageBoxImage.Error);
-            } catch (AggregateException ae){
-                ErrorHelper.ReportNpmNotInstalled(null, ae);
-            } catch (FileLoadException){    //  Fixes bug reported in work item 447 - just wait a bit and retry!
-                RestartFileSystemWatcherTimer();
+
+                if (retry){
+                    if (_refreshRetryCount < 5){
+                        ++_refreshRetryCount;
+                        RestartFileSystemWatcherTimer();
+                    } else {
+                        WriteNpmLogToOutputWindow(ErrorHelper.GetExceptionDetailsText(ex));
+                    }
+                }
             }
         }
 
