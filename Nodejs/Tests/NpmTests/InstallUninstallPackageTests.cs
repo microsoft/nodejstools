@@ -13,6 +13,7 @@
  * ***************************************************************************/
 
 using System.IO;
+using System.Threading.Tasks;
 using Microsoft.NodejsTools.Npm;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 
@@ -29,7 +30,8 @@ namespace NpmTests{
             Assert.AreEqual(0, rootPackage.Modules.Count, "Should be no modules before package install.");
 
             using (var commander = controller.CreateNpmCommander()){
-                AsyncHelpers.RunSync(() => commander.InstallPackageByVersionAsync("sax", "*", DependencyType.Standard));
+                Task<bool> task = commander.InstallPackageByVersionAsync("sax", "*", DependencyType.Standard);
+                task.Wait();
             }
 
             Assert.AreNotEqual(
@@ -55,7 +57,8 @@ namespace NpmTests{
             Assert.IsTrue(module.HasPackageJson, "Module should have its own package.json");
 
             using (var commander = controller.CreateNpmCommander()){
-                AsyncHelpers.RunSync(() => commander.UninstallPackageAsync("sax"));
+                Task<bool> task = commander.UninstallPackageAsync("sax");
+                task.Wait();
             }
 
             Assert.AreNotEqual(
@@ -79,7 +82,8 @@ namespace NpmTests{
             Assert.AreEqual(0, rootPackage.Modules.Count, "Should be no modules before package install.");
 
             using (var commander = controller.CreateNpmCommander()){
-                AsyncHelpers.RunSync(() => commander.InstallPackageByVersionAsync("sax", "*", DependencyType.Standard));
+                Task<bool> task = commander.InstallPackageByVersionAsync("sax", "*", DependencyType.Standard);
+                task.Wait();
             }
 
             Assert.AreNotEqual(
@@ -105,7 +109,8 @@ namespace NpmTests{
             Assert.IsTrue(module.HasPackageJson, "Module should have its own package.json");
 
             using (var commander = controller.CreateNpmCommander()){
-                AsyncHelpers.RunSync(() => commander.UninstallPackageAsync("sax"));
+                Task<bool> task = commander.UninstallPackageAsync("sax");
+                task.Wait();
             }
 
             Assert.AreNotEqual(

@@ -28,7 +28,6 @@
     <Reference Include="Microsoft.CSharp" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="AsyncHelpers.cs" />
     <Compile Include="DependencyType.cs" />
     <Compile Include="DependencyUrlType.cs" />
     <Compile Include="DirectoryPackageJsonSource.cs" />
