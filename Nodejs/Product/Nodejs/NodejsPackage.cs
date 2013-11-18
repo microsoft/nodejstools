@@ -211,8 +211,9 @@ namespace Microsoft.NodejsTools {
 
             var npmCommands = new List< AbstractNpmCommand >();
             npmCommands.Add( new ManageModulesCommand() );
-            npmCommands.Add( new UpdateModulesCommand() );
-            npmCommands.Add( new UninstallModulesCommand() );
+            //  Temporarily taking out for alpha
+            //npmCommands.Add( new UpdateModulesCommand() );
+            //npmCommands.Add( new UninstallModulesCommand() );
 
             NpmCommands = npmCommands;
 
@@ -222,8 +223,9 @@ namespace Microsoft.NodejsTools {
                 new OpenRemoteDebugProxyFolderCommand(),
                 new SurveyNewsCommand(),
                 npmCommands[ 0 ],
-                npmCommands[ 1 ],
-                npmCommands[ 2 ]
+                //  Temporarily taking out for alpha
+                //npmCommands[ 1 ],
+                //npmCommands[ 2 ]
             }, GuidList.guidNodeCmdSet);
         }
 

@@ -134,7 +134,8 @@
         </Strings>
       </Button>
 
-      <Button guid="guidNodeToolsCmdSet" id="cmdidNpmUpdateModules" priority="0x8100" type="Button">
+      <!-- Just taking these out for alpha -->
+      <!--<Button guid="guidNodeToolsCmdSet" id="cmdidNpmUpdateModules" priority="0x8100" type="Button">
         <Parent guid="guidNodeToolsCmdSet" id="NpmInstallItemsGroup" />
         <Strings>
           <CommandName>cmdidNpmUpdateModules</CommandName>
@@ -148,7 +149,7 @@
           <CommandName>cmdidNpmUninstallModules</CommandName>
           <ButtonText>Unins&amp;tall npm Module</ButtonText>
         </Strings>
-      </Button>
+      </Button>-->
 
     </Buttons>
 
