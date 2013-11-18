@@ -84,14 +84,34 @@ namespace Microsoft.NodejsTools.Npm.SPI{
 
                     var command = new NpmLsCommand(_fullPathToRootPackageDirectory, true, PathToNpm,
                         _useFallbackIfNpmNotFound);
-                    GlobalPackages = AsyncHelpers.RunSync<bool>(() => command.ExecuteAsync())
-                        ? RootPackageFactory.Create(command.ListBaseDirectory)
-                        : null;
+
+                    //  Method 3
+                    command.ExecuteAsync().ContinueWith(task =>{
+                        try{
+                            GlobalPackages = task.Result
+                                ? RootPackageFactory.Create(command.ListBaseDirectory)
+                                : null;
+                        } catch (IOException){}
+                        OnFinishedRefresh();
+                    });
+
+                    //  Method 2
+                    //Task<bool> task = command.ExecuteAsync();
+                    //task.Wait();
+
+                    //GlobalPackages = task.Result
+                    //    ? RootPackageFactory.Create(command.ListBaseDirectory)
+                    //    : null;
+
+                    //  Method 1
+                    //GlobalPackages = AsyncHelpers.RunSync<bool>(() => command.ExecuteAsync())
+                    //    ? RootPackageFactory.Create(command.ListBaseDirectory)
+                    //    : null;
                 } catch (IOException){
                     // Can sometimes happen when packages are still installing because the file may still be used by another process
                 }
             }
-            OnFinishedRefresh();
+            //OnFinishedRefresh();
         }
 
         public IRootPackage RootPackage{
