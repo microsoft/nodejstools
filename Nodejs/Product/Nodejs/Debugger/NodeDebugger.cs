@@ -200,6 +200,7 @@ namespace Microsoft.NodejsTools.Debugger {
             };
             string[] breakNeverTypes = { // should probably be break on unhandled when we have just my code support
                 "Error(ENOENT)",
+                "SyntaxError",
             };
             var defaultExceptionTreatments = new Dictionary<string, ExceptionHitTreatment>();
             foreach (var exceptionType in exceptionTypes) {
