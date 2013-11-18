@@ -257,7 +257,6 @@
     </Compile>
     <Compile Include="NpmUI\ColorUtils.cs" />
     <Compile Include="NpmUI\ErrorHelper.cs" />
-    <Compile Include="NpmUI\HSV.cs" />
     <Compile Include="NpmUI\InstalledPackageListControl.cs">
       <SubType>UserControl</SubType>
     </Compile>

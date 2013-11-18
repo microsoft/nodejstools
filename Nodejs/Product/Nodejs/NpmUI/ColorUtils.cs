@@ -24,39 +24,6 @@ namespace Microsoft.NodejsTools.NpmUI{
 
         private ColorUtils(){}
 
-        //public static Color Mix( Color color1, Color color2, float fraction1, float fraction2 )
-        //{
-        //    if ( fraction1 < 0 )
-        //    {
-        //        throw new ArgumentOutOfRangeException(
-        //            "fraction1",
-        //            fraction1,
-        //            string.Format( "{0} is not a valid value for fraction1.", fraction1 ));
-        //    }
-        //    else if ( fraction2 < 0 )
-        //    {
-        //        throw new ArgumentOutOfRangeException(
-        //            "fraction2",
-        //            fraction2,
-        //            string.Format( "{0} is not a valid value for fraction2.", fraction2 ) );
-        //    }
-        //    float	total	= fraction1 + fraction2;
-        //    if ( 0 == total )	//	Should never happen
-        //    {
-        //        total = 2;
-        //    }
-        //    int	alpha	= ( int ) ( ( color1.A * fraction1 + color2.A * fraction2 ) / total );
-        //    if ( alpha < 0 )
-        //    {
-        //        alpha	= 0;
-        //    }
-        //    return Color.FromArgb(
-        //        alpha,
-        //        ( int ) ( ( color1.R * fraction1 + color2.R * fraction2 ) / total ),
-        //        ( int ) ( ( color1.G * fraction1 + color2.G * fraction2 ) / total ),
-        //        ( int ) ( ( color1.B * fraction1 + color2.B * fraction2 ) / total ) );
-        //}
-
         /// <summary>
         /// Creates a color that is a mixture of the two specified colors in the
         /// proportions specified.
@@ -194,45 +161,6 @@ namespace Microsoft.NodejsTools.NpmUI{
                     Color.Black.R,
                     Color.Black.G,
                     Color.Black.B));
-        }
-
-        /// <summary>
-        /// Checks whether or not the supplied color is very close to being black.
-        /// </summary>
-        /// <param name="source">Source color.</param>
-        /// <returns>
-        /// <strong>true</strong> if the color is black, or very close to it, otherwise <strong>false</strong>.
-        /// </returns>
-        public static bool IsDamnNearBlack(Color source){
-            return HSV.ColorToHSV(source).Value < 5;
-        }
-
-        /// <summary>
-        /// Gets the complementary color to the supplied color in the HSV color space.
-        /// </summary>
-        /// <param name="source">Source color.</param>
-        /// <returns>
-        /// Complementary color in HSV color space.
-        /// </returns>
-        public static Color ComplementUsingHSV(Color source){
-            HSV hsv = HSV.ColorToHSV(source);
-            hsv.Hue = (hsv.Hue + 128) % 256;
-            return HSV.HSVtoColor(hsv);
-        }
-
-        /// <summary>
-        /// Creates a negative of the supplied color only in terms of brightness;
-        /// the hue remains unchanged.
-        /// </summary>
-        /// <param name="source">Source color.</param>
-        /// <returns>
-        /// Color that is a negative of the supplied color in terms of brightness.
-        /// </returns>
-        public static Color NegativeUsingHSVBrightnessOnly(Color source){
-            HSV hsv = HSV.ColorToHSV(source);
-            hsv.Saturation = 255 - hsv.Saturation;
-            hsv.Value = 255 - hsv.Value;
-            return HSV.HSVtoColor(hsv);
         }
     }
 }
