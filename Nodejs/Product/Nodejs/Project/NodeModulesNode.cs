@@ -38,7 +38,7 @@ namespace Microsoft.NodejsTools.Project{
         private const string _cCaption = "Node Modules";
 
         /// <summary>
-        /// The GUID for this node
+        /// The virtual name of this node.
         /// </summary>
         public const string NodeModulesVirtualName = "NodeModules";
 
