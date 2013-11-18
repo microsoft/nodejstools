@@ -69,7 +69,7 @@ namespace Microsoft.NodejsTools.Project{
             _watcher = new FileSystemWatcher(_projectNode.ProjectHome){
                 NotifyFilter = NotifyFilters.LastWrite
             };
-            _watcher.Changed += m_Watcher_Changed;
+            _watcher.Changed += Watcher_Changed;
             _watcher.EnableRaisingEvents = true;
 
             CreateNpmController();
@@ -85,7 +85,7 @@ namespace Microsoft.NodejsTools.Project{
         protected override void Dispose(bool disposing){
             if (! _isDisposed){
                 lock (_lock){
-                    _watcher.Changed -= m_Watcher_Changed;
+                    _watcher.Changed -= Watcher_Changed;
                     _watcher.Dispose();
 
                     if (null != _fileSystemWatcherTimer){
@@ -175,7 +175,7 @@ namespace Microsoft.NodejsTools.Project{
             }
         }
 
-        private void m_Watcher_Changed(object sender, FileSystemEventArgs e){
+        private void Watcher_Changed(object sender, FileSystemEventArgs e){
             string path = e.FullPath;
             if (!path.EndsWith("package.json") && !path.Contains("\\node_modules")){
                 return;
