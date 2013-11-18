@@ -43,13 +43,13 @@ namespace Microsoft.NodejsTools.NpmUI
         private void InitializeComponent()
         {
             this._panelButtons = new System.Windows.Forms.Panel();
-            this._btnCancel = new System.Windows.Forms.Button();
             this._btnClose = new System.Windows.Forms.Button();
+            this._btnCancel = new System.Windows.Forms.Button();
             this._textOutput = new System.Windows.Forms.RichTextBox();
             this._busyControl = new Microsoft.NodejsTools.NpmUI.BusyControl();
             this._panelOutput = new System.Windows.Forms.Panel();
-            this._panelLeftPd = new System.Windows.Forms.Panel();
             this._panelPadRight = new System.Windows.Forms.Panel();
+            this._panelLeftPd = new System.Windows.Forms.Panel();
             this._panelButtons.SuspendLayout();
             this._panelOutput.SuspendLayout();
             this.SuspendLayout();
@@ -64,17 +64,6 @@ namespace Microsoft.NodejsTools.NpmUI
             this._panelButtons.Size = new System.Drawing.Size(608, 49);
             this._panelButtons.TabIndex = 1;
             // 
-            // _btnCancel
-            // 
-            this._btnCancel.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
-            this._btnCancel.Location = new System.Drawing.Point(521, 14);
-            this._btnCancel.Name = "_btnCancel";
-            this._btnCancel.Size = new System.Drawing.Size(75, 23);
-            this._btnCancel.TabIndex = 0;
-            this._btnCancel.Text = "Cancel";
-            this._btnCancel.UseVisualStyleBackColor = true;
-            this._btnCancel.Click += new System.EventHandler(this._btnCancel_Click);
-            // 
             // _btnClose
             // 
             this._btnClose.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
@@ -85,6 +74,17 @@ namespace Microsoft.NodejsTools.NpmUI
             this._btnClose.Text = "Close";
             this._btnClose.UseVisualStyleBackColor = true;
             this._btnClose.Click += new System.EventHandler(this._btnClose_Click);
+            // 
+            // _btnCancel
+            // 
+            this._btnCancel.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
+            this._btnCancel.Location = new System.Drawing.Point(521, 14);
+            this._btnCancel.Name = "_btnCancel";
+            this._btnCancel.Size = new System.Drawing.Size(75, 23);
+            this._btnCancel.TabIndex = 0;
+            this._btnCancel.Text = "Cancel";
+            this._btnCancel.UseVisualStyleBackColor = true;
+            this._btnCancel.Click += new System.EventHandler(this._btnCancel_Click);
             // 
             // _textOutput
             // 
@@ -100,6 +100,7 @@ namespace Microsoft.NodejsTools.NpmUI
             // _busyControl
             // 
             this._busyControl.Dock = System.Windows.Forms.DockStyle.Top;
+            this._busyControl.Finished = false;
             this._busyControl.Location = new System.Drawing.Point(0, 0);
             this._busyControl.Message = "Hey, I\'m busy doing some work...";
             this._busyControl.Name = "_busyControl";
@@ -117,14 +118,6 @@ namespace Microsoft.NodejsTools.NpmUI
             this._panelOutput.Size = new System.Drawing.Size(608, 202);
             this._panelOutput.TabIndex = 3;
             // 
-            // _panelLeftPd
-            // 
-            this._panelLeftPd.Dock = System.Windows.Forms.DockStyle.Left;
-            this._panelLeftPd.Location = new System.Drawing.Point(0, 0);
-            this._panelLeftPd.Name = "_panelLeftPd";
-            this._panelLeftPd.Size = new System.Drawing.Size(8, 202);
-            this._panelLeftPd.TabIndex = 0;
-            // 
             // _panelPadRight
             // 
             this._panelPadRight.Dock = System.Windows.Forms.DockStyle.Right;
@@ -133,18 +126,29 @@ namespace Microsoft.NodejsTools.NpmUI
             this._panelPadRight.Size = new System.Drawing.Size(8, 202);
             this._panelPadRight.TabIndex = 1;
             // 
+            // _panelLeftPd
+            // 
+            this._panelLeftPd.Dock = System.Windows.Forms.DockStyle.Left;
+            this._panelLeftPd.Location = new System.Drawing.Point(0, 0);
+            this._panelLeftPd.Name = "_panelLeftPd";
+            this._panelLeftPd.Size = new System.Drawing.Size(8, 202);
+            this._panelLeftPd.TabIndex = 0;
+            // 
             // BusyPopup
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.ClientSize = new System.Drawing.Size(608, 335);
+            this.ControlBox = false;
             this.Controls.Add(this._panelOutput);
             this.Controls.Add(this._panelButtons);
             this.Controls.Add(this._busyControl);
-            this.FormBorderStyle = System.Windows.Forms.FormBorderStyle.None;
+            this.FormBorderStyle = System.Windows.Forms.FormBorderStyle.SizableToolWindow;
             this.Name = "BusyPopup";
+            this.ShowIcon = false;
+            this.ShowInTaskbar = false;
             this.StartPosition = System.Windows.Forms.FormStartPosition.CenterParent;
-            this.Text = "BusyPopup";
+            this.Text = "npm Status";
             this._panelButtons.ResumeLayout(false);
             this._panelOutput.ResumeLayout(false);
             this.ResumeLayout(false);
