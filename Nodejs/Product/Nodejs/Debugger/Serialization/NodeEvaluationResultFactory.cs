@@ -115,7 +115,7 @@ namespace Microsoft.NodejsTools.Debugger.Serialization {
                 return fullName;
             }
 
-            fullName = string.Format(@"{0}[""{1}""]", parent.FullName, name);
+            fullName = string.Format(!char.IsLetter(name[0]) ? @"{0}[""{1}""]" : @"{0}.{1}", parent.FullName, name);
 
             if (parent.TypeName != NodeVariableType.Object) {
                 return fullName;
