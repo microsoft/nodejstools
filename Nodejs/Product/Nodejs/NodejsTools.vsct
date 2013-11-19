@@ -146,6 +146,8 @@
 
       <Button guid="guidNodeToolsCmdSet" id="cmdidNpmManageModules" priority="0x8000" type="Button">
         <Parent guid="guidNodeToolsCmdSet" id="CodeFileGroup" />
+        <CommandFlag>DefaultInvisible</CommandFlag>
+        <CommandFlag>DynamicVisibility</CommandFlag>
         <Strings>
           <CommandName>cmdidNpmManageModules</CommandName>
           <ButtonText>Mana&amp;ge npm Modules...</ButtonText>
