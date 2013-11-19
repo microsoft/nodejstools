@@ -243,6 +243,60 @@
     <Compile Include="NodejsLanguageInfo.cs" />
     <Compile Include="NodejsProjectConfig.cs" />
     <Compile Include="NodejsToolsInstallPath.cs" />
+    <Compile Include="NpmUI\BusyControl.cs">
+      <SubType>UserControl</SubType>
+    </Compile>
+    <Compile Include="NpmUI\BusyControl.Designer.cs">
+      <DependentUpon>BusyControl.cs</DependentUpon>
+    </Compile>
+    <Compile Include="NpmUI\BusyPopup.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="NpmUI\BusyPopup.Designer.cs">
+      <DependentUpon>BusyPopup.cs</DependentUpon>
+    </Compile>
+    <Compile Include="NpmUI\ColorUtils.cs" />
+    <Compile Include="NpmUI\ErrorHelper.cs" />
+    <Compile Include="NpmUI\InstalledPackageListControl.cs">
+      <SubType>UserControl</SubType>
+    </Compile>
+    <Compile Include="NpmUI\InstalledPackageListControl.Designer.cs">
+      <DependentUpon>InstalledPackageListControl.cs</DependentUpon>
+    </Compile>
+    <Compile Include="NpmUI\InstalledPackagesPane.cs">
+      <SubType>UserControl</SubType>
+    </Compile>
+    <Compile Include="NpmUI\InstalledPackagesPane.Designer.cs">
+      <DependentUpon>InstalledPackagesPane.cs</DependentUpon>
+    </Compile>
+    <Compile Include="NpmUI\PackageListItemPainter.cs" />
+    <Compile Include="NpmUI\NpmSearchComparer.cs" />
+    <Compile Include="NpmUI\PackageInstallEventArgs.cs" />
+    <Compile Include="NpmUI\PackageInstallPane.cs">
+      <SubType>UserControl</SubType>
+    </Compile>
+    <Compile Include="NpmUI\PackageInstallPane.Designer.cs">
+      <DependentUpon>PackageInstallPane.cs</DependentUpon>
+    </Compile>
+    <Compile Include="NpmUI\PackageManagerDialog.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="NpmUI\PackageManagerDialog.Designer.cs">
+      <DependentUpon>PackageManagerDialog.cs</DependentUpon>
+    </Compile>
+    <Compile Include="NpmUI\PackageSearchPane.cs">
+      <SubType>UserControl</SubType>
+    </Compile>
+    <Compile Include="NpmUI\PackageSearchPane.Designer.cs">
+      <DependentUpon>PackageSearchPane.cs</DependentUpon>
+    </Compile>
+    <Compile Include="NpmUI\PackageSourcesPane.cs">
+      <SubType>UserControl</SubType>
+    </Compile>
+    <Compile Include="NpmUI\PackageSourcesPane.Designer.cs">
+      <DependentUpon>PackageSourcesPane.cs</DependentUpon>
+    </Compile>
+    <Compile Include="NpmUI\PackageView.cs" />
     <Compile Include="Options\NodejsDialogPage.cs">
       <SubType>Component</SubType>
     </Compile>
@@ -295,6 +349,8 @@
       <Generator>MSBuild:Compile</Generator>
     </Page>
     <Compile Include="Project\Attributes.cs" />
+    <Compile Include="Project\DependencyNode.cs" />
+    <Compile Include="Project\NodeModulesNode.cs" />
     <Compile Include="Project\NodejsFileNode.cs" />
     <Compile Include="Project\NodejsGeneralPropertyPageControl.cs">
       <SubType>UserControl</SubType>
@@ -389,6 +445,30 @@
     </Resource>
   </ItemGroup>
   <ItemGroup>
+    <EmbeddedResource Include="NpmUI\BusyControl.resx">
+      <DependentUpon>BusyControl.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="NpmUI\BusyPopup.resx">
+      <DependentUpon>BusyPopup.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="NpmUI\InstalledPackageListControl.resx">
+      <DependentUpon>InstalledPackageListControl.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="NpmUI\InstalledPackagesPane.resx">
+      <DependentUpon>InstalledPackagesPane.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="NpmUI\PackageInstallPane.resx">
+      <DependentUpon>PackageInstallPane.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="NpmUI\PackageManagerDialog.resx">
+      <DependentUpon>PackageManagerDialog.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="NpmUI\PackageSearchPane.resx">
+      <DependentUpon>PackageSearchPane.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="NpmUI\PackageSourcesPane.resx">
+      <DependentUpon>PackageSourcesPane.cs</DependentUpon>
+    </EmbeddedResource>
     <EmbeddedResource Include="Options\NodejsGeneralOptionsControl.resx">
       <DependentUpon>NodejsGeneralOptionsControl.cs</DependentUpon>
     </EmbeddedResource>
@@ -446,6 +526,20 @@
     <ZipProject Include="ProjectTemplates\FromExistingCode\FromExistingCode.vstemplate">
       <SubType>Designer</SubType>
     </ZipProject>
+    <EmbeddedResource Include="Resources\DependencyBundledMissing_16.png" />
+    <EmbeddedResource Include="Resources\DependencyBundled_16.png" />
+    <EmbeddedResource Include="Resources\DependencyDevMissing_16.png" />
+    <EmbeddedResource Include="Resources\DependencyDev_16.png" />
+    <EmbeddedResource Include="Resources\DependencyExtraneousBundled_16.png" />
+    <EmbeddedResource Include="Resources\DependencyExtraneous_16.png" />
+    <EmbeddedResource Include="Resources\DependencyMissing_16.png" />
+    <EmbeddedResource Include="Resources\DependencyOptionalMissing_16.png" />
+    <EmbeddedResource Include="Resources\DependencyOptional_16.png" />
+    <EmbeddedResource Include="Resources\Dependency_16.png" />
+    <EmbeddedResource Include="Resources\Warning_16.png" />
+    <EmbeddedResource Include="Resources\DependencyDev_32.png" />
+    <EmbeddedResource Include="Resources\DependencyOptional_32.png" />
+    <EmbeddedResource Include="Resources\Dependency_32.png" />
     <Content Include="VSTemplateStore.pkgdef">
       <IncludeInVSIX>true</IncludeInVSIX>
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
@@ -608,6 +702,10 @@
     <ProjectReference Include="..\InteractiveWindow\InteractiveWindow.csproj">
       <Project>{24a3887f-da50-4989-8d6c-4a5b04d5d457}</Project>
       <Name>InteractiveWindow</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\Npm\Npm.csproj">
+      <Project>{e5ef4b0a-ab41-4b98-8fa8-98d6348003a8}</Project>
+      <Name>Npm</Name>
     </ProjectReference>
     <ProjectReference Include="..\ProjectWizard\ProjectWizard.csproj">
       <Project>{dbc73df7-1b4c-48be-8b48-715297487e7a}</Project>

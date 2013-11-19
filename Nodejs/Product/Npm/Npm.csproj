@@ -1,0 +1,126 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <Import Project="$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props" Condition="Exists('$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props')" />
+  <Import Project="..\ProjectBefore.settings" />
+  <PropertyGroup>
+    <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
+    <Platform Condition=" '$(Platform)' == '' ">x86</Platform>
+    <ProjectGuid>{E5EF4B0A-AB41-4B98-8FA8-98D6348003A8}</ProjectGuid>
+    <OutputType>Library</OutputType>
+    <AppDesignerFolder>Properties</AppDesignerFolder>
+    <RootNamespace>Microsoft.NodejsTools.Npm</RootNamespace>
+    <AssemblyName>Microsoft.NodejsTools.Npm</AssemblyName>
+    <TargetFrameworkVersion>v4.5</TargetFrameworkVersion>
+    <FileAlignment>512</FileAlignment>
+    <SolutionDir Condition="$(SolutionDir) == '' Or $(SolutionDir) == '*Undefined*'">..\..\</SolutionDir>
+    <RestorePackages>true</RestorePackages>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Platform)' == 'x86' ">
+    <PlatformTarget>x86</PlatformTarget>
+  </PropertyGroup>
+  <ItemGroup>
+    <Reference Include="Newtonsoft.Json, Version=4.5.0.0, Culture=neutral, PublicKeyToken=30ad4fe6b2a6aeed, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\..\packages\Newtonsoft.Json.5.0.8\lib\net45\Newtonsoft.Json.dll</HintPath>
+    </Reference>
+    <Reference Include="System" />
+    <Reference Include="System.Core" />
+    <Reference Include="Microsoft.CSharp" />
+  </ItemGroup>
+  <ItemGroup>
+    <Compile Include="DependencyType.cs" />
+    <Compile Include="DependencyUrlType.cs" />
+    <Compile Include="DirectoryPackageJsonSource.cs" />
+    <Compile Include="FilePackageJsonSource.cs" />
+    <Compile Include="IBugs.cs" />
+    <Compile Include="IBundledDependencies.cs" />
+    <Compile Include="IDependencies.cs" />
+    <Compile Include="IDependency.cs" />
+    <Compile Include="IDependencyUrl.cs" />
+    <Compile Include="IFiles.cs" />
+    <Compile Include="IGlobalPackages.cs" />
+    <Compile Include="IKeywords.cs" />
+    <Compile Include="ILicense.cs" />
+    <Compile Include="ILicenses.cs" />
+    <Compile Include="IMan.cs" />
+    <Compile Include="INodeModules.cs" />
+    <Compile Include="INpmCommander.cs" />
+    <Compile Include="INpmController.cs" />
+    <Compile Include="INpmLogSource.cs" />
+    <Compile Include="INpmPathProvider.cs" />
+    <Compile Include="INpmSearchLexer.cs" />
+    <Compile Include="INpmSearchParser.cs" />
+    <Compile Include="IPackage.cs" />
+    <Compile Include="IPackageJson.cs" />
+    <Compile Include="IPackageJsonSource.cs" />
+    <Compile Include="IPerson.cs" />
+    <Compile Include="IPkgStringArray.cs" />
+    <Compile Include="IRootPackage.cs" />
+    <Compile Include="IScript.cs" />
+    <Compile Include="IScripts.cs" />
+    <Compile Include="NodeModuleBuilder.cs" />
+    <Compile Include="NpmControllerFactory.cs" />
+    <Compile Include="NpmExceptionEventArgs.cs" />
+    <Compile Include="NpmExecutionException.cs" />
+    <Compile Include="NpmLogEventArgs.cs" />
+    <Compile Include="NpmNotFoundException.cs" />
+    <Compile Include="NpmSearchParserFactory.cs" />
+    <Compile Include="PackageComparer.cs" />
+    <Compile Include="PackageEventArgs.cs" />
+    <Compile Include="PackageFlags.cs" />
+    <Compile Include="PackageJsonException.cs" />
+    <Compile Include="PackageJsonFactory.cs" />
+    <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="RootPackageFactory.cs" />
+    <Compile Include="ScriptName.cs" />
+    <Compile Include="SPI\NpmCommander.cs" />
+    <Compile Include="SPI\NpmGetCatalogueCommand.cs" />
+    <Compile Include="TokenEventArgs.cs" />
+    <Compile Include="SemverVersion.cs" />
+    <Compile Include="SemverVersionFormatException.cs" />
+    <Compile Include="SPI\AbstractNodeModules.cs" />
+    <Compile Include="SPI\Bugs.cs" />
+    <Compile Include="SPI\BundledDependencies.cs" />
+    <Compile Include="SPI\Dependencies.cs" />
+    <Compile Include="SPI\Dependency.cs" />
+    <Compile Include="SPI\DependencyUrl.cs" />
+    <Compile Include="SPI\GlobalPackages.cs" />
+    <Compile Include="SPI\Keywords.cs" />
+    <Compile Include="SPI\License.cs" />
+    <Compile Include="SPI\Licenses.cs" />
+    <Compile Include="SPI\Man.cs" />
+    <Compile Include="SPI\NodeModules.cs" />
+    <Compile Include="SPI\NodeModulesProxy.cs" />
+    <Compile Include="SPI\NpmCommand.cs" />
+    <Compile Include="SPI\NpmController.cs" />
+    <Compile Include="SPI\NpmInstallCommand.cs" />
+    <Compile Include="SPI\NpmLsCommand.cs" />
+    <Compile Include="SPI\NpmSearchCommand.cs" />
+    <Compile Include="SPI\NpmSearchLexer.cs" />
+    <Compile Include="SPI\NpmSearchParser.cs" />
+    <Compile Include="SPI\NpmUninstallCommand.cs" />
+    <Compile Include="SPI\NpmUpdateCommand.cs" />
+    <Compile Include="SPI\Package.cs" />
+    <Compile Include="SPI\PackageJson.cs" />
+    <Compile Include="SPI\PackageProxy.cs" />
+    <Compile Include="SPI\Person.cs" />
+    <Compile Include="SPI\PkgStringArray.cs" />
+    <Compile Include="SPI\PkgFiles.cs" />
+    <Compile Include="SPI\RootPackage.cs" />
+    <Compile Include="SPI\Script.cs" />
+    <Compile Include="SPI\Scripts.cs" />
+    <Compile Include="TokenFlags.cs" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="packages.config" />
+  </ItemGroup>
+  <Import Project="..\ProjectAfter.settings" />
+  <Import Project="$(SolutionDir)\.nuget\nuget.targets" />
+  <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
+       Other similar extension points exist, see Microsoft.Common.targets.
+  <Target Name="BeforeBuild">
+  </Target>
+  <Target Name="AfterBuild">
+  </Target>
+  -->
+</Project>

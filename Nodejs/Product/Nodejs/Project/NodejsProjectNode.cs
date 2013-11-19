@@ -14,9 +14,11 @@
 
 using System;
 using System.Collections.Generic;
+using System.Drawing;
 using System.IO;
 using System.Reflection;
 using System.Text;
+using System.Xaml;
 using System.Threading;
 using System.Web.Script.Serialization;
 using Microsoft.NodejsTools.Intellisense;
@@ -42,8 +44,43 @@ namespace Microsoft.NodejsTools.Project {
 
             Type projectNodePropsType = typeof(NodejsProjectNodeProperties);
             AddCATIDMapping(projectNodePropsType, projectNodePropsType.GUID);
+            InitDependencyImages();
             _timer = new Timer(RefreshReferenceFile);
         }
+
+        private void InitDependencyImages()
+        {
+            var images = ImageHandler.ImageList.Images;
+            ImageIndexDependency = images.Count;
+            images.Add(Image.FromStream(typeof(NodejsProjectNode).Assembly.GetManifestResourceStream("Microsoft.NodejsTools.Resources.Dependency_16.png")));
+            ImageIndexDependencyDev = images.Count;
+            images.Add(Image.FromStream(typeof(NodejsProjectNode).Assembly.GetManifestResourceStream("Microsoft.NodejsTools.Resources.DependencyDev_16.png")));
+            ImageIndexDependnecyOptional = images.Count;
+            images.Add(Image.FromStream(typeof(NodejsProjectNode).Assembly.GetManifestResourceStream("Microsoft.NodejsTools.Resources.DependencyOptional_16.png")));
+            ImageIndexDependencyNotListed = images.Count;
+            images.Add(Image.FromStream(typeof(NodejsProjectNode).Assembly.GetManifestResourceStream("Microsoft.NodejsTools.Resources.DependencyExtraneous_16.png")));
+            ImageIndexDependencyBundled = images.Count;
+            images.Add(Image.FromStream(typeof(NodejsProjectNode).Assembly.GetManifestResourceStream("Microsoft.NodejsTools.Resources.DependencyBundled_16.png")));
+            ImageIndexDependencyMissing = images.Count;
+            images.Add(Image.FromStream(typeof(NodejsProjectNode).Assembly.GetManifestResourceStream("Microsoft.NodejsTools.Resources.DependencyMissing_16.png")));
+            ImageIndexDependencyDevMissing = images.Count;
+            images.Add(Image.FromStream(typeof(NodejsProjectNode).Assembly.GetManifestResourceStream("Microsoft.NodejsTools.Resources.DependencyDevMissing_16.png")));
+            ImageIndexDependencyOptionalMissing = images.Count;
+            images.Add(Image.FromStream(typeof(NodejsProjectNode).Assembly.GetManifestResourceStream("Microsoft.NodejsTools.Resources.DependencyOptionalMissing_16.png")));
+            ImageIndexDependencyBundledMissing = images.Count;
+            images.Add(Image.FromStream(typeof(NodejsProjectNode).Assembly.GetManifestResourceStream("Microsoft.NodejsTools.Resources.DependencyBundledMissing_16.png")));
+        }
+
+        public int ImageIndexDependency { get; private set; }
+        public int ImageIndexDependencyDev { get; private set; }
+        public int ImageIndexDependnecyOptional { get; private set; }
+        public int ImageIndexDependencyNotListed { get; private set; }
+        public int ImageIndexDependencyBundled { get; private set; }
+
+        public int ImageIndexDependencyMissing { get; private set; }
+        public int ImageIndexDependencyDevMissing { get; private set; }
+        public int ImageIndexDependencyOptionalMissing { get; private set; }
+        public int ImageIndexDependencyBundledMissing { get; private set; }
 
         private void RefreshReferenceFile(object state) {
             UpdateReferenceFile();
@@ -159,6 +196,7 @@ namespace Microsoft.NodejsTools.Project {
             }
 
             NodejsPackage.Instance.CheckSurveyNews(false);
+            ModulesNode.ReloadHierarchySafe();
         }
 
         protected override void RaiseProjectPropertyChanged(string propertyName, string oldValue, string newValue) {
@@ -540,6 +578,21 @@ function require(module) {
 
         protected override ReferenceContainerNode CreateReferenceContainerNode() {
             return null;
+        }
+
+        public NodeModulesNode ModulesNode { get; private set; }
+
+
+
+        protected internal override void ProcessReferences()
+        {
+            base.ProcessReferences();
+
+            if ( null == ModulesNode )
+            {
+                ModulesNode = new NodeModulesNode( this );
+                AddChild(ModulesNode);
+            }
         }
 
         #region VSWebSite Members
