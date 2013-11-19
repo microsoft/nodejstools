@@ -19,6 +19,7 @@ using System.Linq;
 using System.Threading;
 using System.Windows;
 using System.Windows.Forms;
+using System.Windows.Media;
 using Microsoft.NodejsTools.Npm;
 using Microsoft.NodejsTools.NpmUI;
 using Microsoft.VisualStudio;
@@ -62,10 +63,6 @@ namespace Microsoft.NodejsTools.Project{
             _projectNode = root;
             ExcludeNodeFromScc = true;
 
-            foreach (var command in NodejsPackage.Instance.NpmCommands){
-                command.ModulesNode = this;
-            }
-
             _watcher = new FileSystemWatcher(_projectNode.ProjectHome){
                 NotifyFilter = NotifyFilters.LastWrite,
                 IncludeSubdirectories = true
@@ -101,10 +98,6 @@ namespace Microsoft.NodejsTools.Project{
                     if (null != _npmController){
                         _npmController.OutputLogged -= _npmController_OutputLogged;
                         _npmController.ErrorLogged -= _npmController_ErrorLogged;
-                    }
-
-                    foreach (var command in NodejsPackage.Instance.NpmCommands){
-                        command.ModulesNode = null;
                     }
                 }
                 _isDisposed = true;
@@ -426,45 +419,83 @@ namespace Microsoft.NodejsTools.Project{
         }
 
         public override int MenuCommandId{
-            get { return (int) PkgCmdId.menuIdNPM; }
+            get { return VsMenus.IDM_VS_CTXT_ITEMNODE; }
         }
 
         #endregion
 
         #region Command handling
 
-        public void BeforeQueryStatus(object source, EventArgs args){
-            var command = source as OleMenuCommand;
-            if (null == command){
-                return;
+        //public void BeforeQueryStatus(object source, EventArgs args){
+        //    var command = source as OleMenuCommand;
+        //    if (null == command){
+        //        return;
+        //    }
+
+        //    switch (command.CommandID.ID){
+        //        case PkgCmdId.cmdidNpmManageModules:
+        //            command.Enabled = true;
+        //            command.Visible = true;
+        //            break;
+
+        //        case PkgCmdId.cmdidNpmUpdateModules:
+        //            command.Enabled = true;
+        //            command.Visible = true;
+        //            break;
+
+        //        case PkgCmdId.cmdidNpmUninstallModule:
+        //            var selected = _projectNode.GetSelectedNodes();
+        //            bool enable = true;
+        //            foreach (var node in selected){
+        //                var dep = node as DependencyNode;
+        //                if (null == node || node.Parent != this) //  Don't want to let people uninstall sub-modules
+        //                {
+        //                    enable = false;
+        //                    break;
+        //                }
+        //            }
+        //            command.Enabled = enable;
+        //            command.Visible = enable;
+        //            break;
+        //    }
+        //}
+
+        internal override int QueryStatusOnNode(Guid cmdGroup, uint cmd, IntPtr pCmdText, ref QueryStatusResult result){
+            if (cmdGroup == GuidList.guidNodeCmdSet){
+                switch (cmd){
+                    case PkgCmdId.cmdidNpmManageModules:
+                    case PkgCmdId.cmdidNpmUpdateModules:
+                    case PkgCmdId.cmdidNpmUninstallModule:
+                        result = QueryStatusResult.ENABLED | QueryStatusResult.SUPPORTED;
+                        break;
+
+                }
             }
 
-            switch (command.CommandID.ID){
-                case PkgCmdId.cmdidNpmManageModules:
-                    command.Enabled = true;
-                    command.Visible = true;
-                    break;
+            return base.QueryStatusOnNode(cmdGroup, cmd, pCmdText, ref result);
+        }
 
-                case PkgCmdId.cmdidNpmUpdateModules:
-                    command.Enabled = true;
-                    command.Visible = true;
-                    break;
+        internal override int ExecCommandOnNode(Guid cmdGroup, uint cmd, uint nCmdexecopt, IntPtr pvaIn, IntPtr pvaOut){
+            if (cmdGroup == GuidList.guidNodeCmdSet)
+            {
+                switch (cmd)
+                {
+                    case PkgCmdId.cmdidNpmManageModules:
+                        ManageModules();
+                        return VSConstants.S_OK;
 
-                case PkgCmdId.cmdidNpmUninstallModule:
-                    var selected = _projectNode.GetSelectedNodes();
-                    bool enable = true;
-                    foreach (var node in selected){
-                        var dep = node as DependencyNode;
-                        if (null == node || node.Parent != this) //  Don't want to let people uninstall sub-modules
-                        {
-                            enable = false;
-                            break;
-                        }
-                    }
-                    command.Enabled = enable;
-                    command.Visible = enable;
-                    break;
+                    case PkgCmdId.cmdidNpmUpdateModules:
+                        UpdateModules();
+                        return VSConstants.S_OK;
+
+                    case PkgCmdId.cmdidNpmUninstallModule:
+                        UninstallModules();
+                        return VSConstants.S_OK;
+
+                }
             }
+
+            return base.ExecCommandOnNode(cmdGroup, cmd, nCmdexecopt, pvaIn, pvaOut);
         }
 
         public void ManageModules(){
