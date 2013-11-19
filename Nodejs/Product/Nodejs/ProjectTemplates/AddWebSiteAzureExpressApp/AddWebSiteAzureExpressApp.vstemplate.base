@@ -16,7 +16,7 @@
   </TemplateData>
   <TemplateContent>
     <Project File="AddWebSiteAzureExpressApp.njsproj" ReplaceParameters="true">
-      <ProjectItem OpenInEditor="true">server.js</ProjectItem>
+      <ProjectItem OpenInEditor="true">app.js</ProjectItem>
       <ProjectItem ReplaceParameters="true">package.json</ProjectItem>
       <ProjectItem ReplaceParameters="true">README.md</ProjectItem>
       <ProjectItem>Web.config</ProjectItem>
