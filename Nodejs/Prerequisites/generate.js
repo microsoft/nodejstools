@@ -29,6 +29,7 @@ var assemblies = [
     'Microsoft.NodejsTools.InteractiveWindow',
     'Microsoft.NodejsTools.AjaxMin',
     'Microsoft.NodejsTools.WebRole',
+    'Microsoft.NodejsTools.Npm.dll'
 ].sort();
 
 var files = [
