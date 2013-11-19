@@ -426,48 +426,18 @@ namespace Microsoft.NodejsTools.Project{
 
         #region Command handling
 
-        //public void BeforeQueryStatus(object source, EventArgs args){
-        //    var command = source as OleMenuCommand;
-        //    if (null == command){
-        //        return;
-        //    }
-
-        //    switch (command.CommandID.ID){
-        //        case PkgCmdId.cmdidNpmManageModules:
-        //            command.Enabled = true;
-        //            command.Visible = true;
-        //            break;
-
-        //        case PkgCmdId.cmdidNpmUpdateModules:
-        //            command.Enabled = true;
-        //            command.Visible = true;
-        //            break;
-
-        //        case PkgCmdId.cmdidNpmUninstallModule:
-        //            var selected = _projectNode.GetSelectedNodes();
-        //            bool enable = true;
-        //            foreach (var node in selected){
-        //                var dep = node as DependencyNode;
-        //                if (null == node || node.Parent != this) //  Don't want to let people uninstall sub-modules
-        //                {
-        //                    enable = false;
-        //                    break;
-        //                }
-        //            }
-        //            command.Enabled = enable;
-        //            command.Visible = enable;
-        //            break;
-        //    }
-        //}
-
         internal override int QueryStatusOnNode(Guid cmdGroup, uint cmd, IntPtr pCmdText, ref QueryStatusResult result){
             if (cmdGroup == GuidList.guidNodeCmdSet){
                 switch (cmd){
                     case PkgCmdId.cmdidNpmManageModules:
                     case PkgCmdId.cmdidNpmUpdateModules:
                     case PkgCmdId.cmdidNpmUninstallModule:
-                        result = QueryStatusResult.ENABLED | QueryStatusResult.SUPPORTED;
-                        break;
+                        if (! ProjectMgr.IsCurrentStateASuppressCommandsMode()){
+                            result = QueryStatusResult.ENABLED | QueryStatusResult.SUPPORTED;
+                        } else{
+                            result = QueryStatusResult.SUPPORTED;
+                        }
+                        return VSConstants.S_OK;
 
                 }
             }
