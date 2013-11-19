@@ -459,6 +459,12 @@ namespace Microsoft.VisualStudioTools.Project
 
         #region overridden properties
 
+        public override bool CanOpenCommandPrompt {
+            get {
+                return true;
+            }
+        }
+
         internal override string FullPathToChildren {
             get {
                 return ProjectHome;
@@ -1311,7 +1317,7 @@ namespace Microsoft.VisualStudioTools.Project
 
                 }
             }
-            else
+            else if(cmdGroup != SharedCommandGuid)
             {
                 return (int)OleConstants.OLECMDERR_E_UNKNOWNGROUP;
             }

@@ -86,7 +86,17 @@ namespace Microsoft.VisualStudioTools.Project {
                 switch ((SharedCommands)cmd) {
                     case SharedCommands.AddExistingFolder:
                         return ProjectMgr.AddExistingFolderToNode(this);
-            }
+                    case SharedCommands.OpenCommandPromptHere:
+                        var psi = new ProcessStartInfo(
+                            Path.Combine(
+                                Environment.SystemDirectory,
+                                "cmd.exe"
+                            )
+                        );
+                        psi.WorkingDirectory = FullPathToChildren;
+                        Process.Start(psi);
+                        return VSConstants.S_OK;
+                }
             }
 
             return base.ExecCommandOnNode(cmdGroup, cmd, nCmdexecopt, pvaIn, pvaOut);
