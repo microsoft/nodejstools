@@ -132,6 +132,8 @@ This will add a new project to your solution.
 
 ![Solution Explorer](Images/AzureCloudServiceSolutionExplorer.png)
 
+**Important Known Issue Workaround**:  Now save, close and reopen the solution.  There is an known issue where a published Node.js application won't work properly unless you do this after the Cloud Service project is created.
+
 Right-click on the new project's node in Solution Explorer, and choose **Publish...**.
 
 ![Publish](Images/AzureCloudServicePublishCommand.png)
@@ -160,4 +162,7 @@ When it's done, click on the **Website URL** link in the Windows Azure Activity 
 
 Known issues
 ------------
+
 - If your site contains a deep nested hierarchy of node_modules folders publishing can fail if a path exceeds 260 characters.  This is a limitation of Windows file APIs.  If you encounter this you'll need to move your project to a directory with a shorter path.
+
+- A Node.js application published to a **Windows Azure Cloud Service** may not work properly due to a timing issue when the Windows Azure Cloud Service project is created.  If this happens, you'll get a **500 Internal Server error** when browsing to the Cloud Service url.  To avoid this problem, **save, close and reopen the solution after creating the Cloud Service project** (Convert to Windows Azure Cloud Service Project command).
