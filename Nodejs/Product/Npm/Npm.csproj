@@ -74,6 +74,7 @@
     <Compile Include="RootPackageFactory.cs" />
     <Compile Include="ScriptName.cs" />
     <Compile Include="SPI\NpmCommander.cs" />
+    <Compile Include="SPI\NpmGetCatalogueCommand.cs" />
     <Compile Include="TokenEventArgs.cs" />
     <Compile Include="SemverVersion.cs" />
     <Compile Include="SemverVersionFormatException.cs" />

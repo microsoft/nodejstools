@@ -32,21 +32,27 @@ namespace Microsoft.NodejsTools.Npm.SPI{
                             : string.Format("search {0}", searchText);
         }
 
+        protected void ParseResultsFromReader(TextReader source){
+            IList<IPackage> results = new List<IPackage>();
+
+            var lexer = NpmSearchParserFactory.CreateLexer();
+            var parser = NpmSearchParserFactory.CreateParser(lexer);
+            parser.Package += (sender, args) =>
+            {
+                results.Add(args.Package);
+            };
+            lexer.Lex(source);
+            Results = results;
+        }
+
         public override async Task<bool> ExecuteAsync(){
             bool success = await base.ExecuteAsync();
 
             if (success){
-                IList<IPackage> results = new List<IPackage>();
-
-                var lexer = NpmSearchParserFactory.CreateLexer();
-                var parser = NpmSearchParserFactory.CreateParser(lexer);
-                parser.Package += (sender, args) => {
-                    results.Add(args.Package);
-                };
-                using (var reader = new StringReader(StandardOutput)){
-                    lexer.Lex(reader);
+                using (var reader = new StringReader(StandardOutput))
+                {
+                    ParseResultsFromReader(reader);
                 }
-                Results = results;
             }
 
             return success;

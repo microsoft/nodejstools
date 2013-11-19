@@ -58,7 +58,7 @@ namespace Microsoft.NodejsTools.NpmUI{
             }
 
             try{
-                _allPackages = await _npmController.GetRepositoryCatalogueAsync();
+                _allPackages = await _npmController.GetRepositoryCatalogueAsync(false);
                 _busy.Hide();
                 _listResults.Show();
                 StartFilter();

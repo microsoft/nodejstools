@@ -15,14 +15,16 @@
 using System;
 using System.Collections.Generic;
 using System.IO;
+using System.Linq;
 using System.Threading.Tasks;
 using Newtonsoft.Json;
 
 namespace Microsoft.NodejsTools.Npm.SPI{
     internal class NpmController : INpmController{
+
         //  *Really* don't want to retrieve this more than once:
         //  47,000 packages takes a while.
-        private static IEnumerable<IPackage> _sRepoCatalogue;
+        private static IList<IPackage> _sRepoCatalogue;
 
         private string _fullPathToRootPackageDirectory;
         private bool _showMissingDevOptionalSubPackages;
@@ -156,13 +158,13 @@ namespace Microsoft.NodejsTools.Npm.SPI{
             }
         }
 
-        public async Task<IEnumerable<IPackage>> GetRepositoryCatalogueAsync()
+        public async Task<IList<IPackage>> GetRepositoryCatalogueAsync(bool forceDownload)
         {
             //  This should really be thread-safe but await can't be inside a lock so
             //  we'll just have to hope and pray this doesn't happen concurrently. Worst
             //  case is we'll end up with two retrievals, one of which will be binned,
             //  which isn't the end of the world.
-            if (null == _sRepoCatalogue){
+            if (null == _sRepoCatalogue || _sRepoCatalogue.Count == 0){
                 Exception ex = null;
                 using (var commander = CreateNpmCommander()){
                     commander.ExceptionLogged += (sender, args) => ex = args.Exception;

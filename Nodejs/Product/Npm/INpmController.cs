@@ -25,6 +25,6 @@ namespace Microsoft.NodejsTools.Npm{
         IGlobalPackages GlobalPackages { get; }
         INpmCommander CreateNpmCommander();
 
-        Task<IEnumerable<IPackage>> GetRepositoryCatalogueAsync();
+        Task<IList<IPackage>> GetRepositoryCatalogueAsync(bool forceDownload);
     }
 }

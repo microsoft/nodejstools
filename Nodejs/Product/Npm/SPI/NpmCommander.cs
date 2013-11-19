@@ -164,7 +164,7 @@ namespace Microsoft.NodejsTools.Npm.SPI{
             return await UninstallPackageAsync(packageName, true);
         }
 
-        public async Task<IEnumerable<IPackage>> SearchAsync(string searchText){
+        public async Task<IList<IPackage>> SearchAsync(string searchText){
             IList<IPackage> results = null;
             try{
                 _command = new NpmSearchCommand(
@@ -180,6 +180,33 @@ namespace Microsoft.NodejsTools.Npm.SPI{
             } catch (Exception e){
                 OnExceptionLogged(e);
             } finally{
+                OnCommandCompleted();
+            }
+            return results ?? new List<IPackage>();
+        }
+
+        public async Task<IList<IPackage>> GetCatalogueAsync(bool forceDownload){
+            IList<IPackage> results = null;
+            try
+            {
+                _command = new NpmGetCatalogueCommand(
+                    _npmController.FullPathToRootPackageDirectory,
+                    forceDownload,
+                    _npmController.PathToNpm,
+                    _npmController.UseFallbackIfNpmNotFound);
+                var success = await _command.ExecuteAsync();
+                FireLogEvents(_command);
+                if (success)
+                {
+                    results = (_command as NpmSearchCommand).Results;
+                }
+            }
+            catch (Exception e)
+            {
+                OnExceptionLogged(e);
+            }
+            finally
+            {
                 OnCommandCompleted();
             }
             return results ?? new List<IPackage>();
