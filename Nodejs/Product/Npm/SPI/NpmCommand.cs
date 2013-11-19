@@ -91,7 +91,6 @@ namespace Microsoft.NodejsTools.Npm.SPI{
         private ProcessStartInfo BuildStartInfo(){
             var info = new ProcessStartInfo(GetPathToNpm(), Arguments);
             info.WorkingDirectory = _fullPathToRootPackageDirectory;
-            //info.UseShellExecute = true;
             info.UseShellExecute = false;
             info.RedirectStandardOutput = true;
             info.RedirectStandardError = true;
@@ -157,24 +156,25 @@ namespace Microsoft.NodejsTools.Npm.SPI{
             return true;
         }
 
-        void _process_OutputDataReceived(object sender, DataReceivedEventArgs e)
-        {
+        private void AppendToBuffer(StringBuilder buffer, DataReceivedEventArgs e){
             lock (_bufferLock){
-                if (_output.Length > 0){
-                    _output.Append(Environment.NewLine);
+                if (buffer.Length > 0){
+                    buffer.Append(Environment.NewLine);
                 }
-                _output.Append(e.Data);
+
+                var data = e.Data;
+                if (!string.IsNullOrEmpty(data)){
+                    buffer.Append(Encoding.UTF8.GetString(Console.OutputEncoding.GetBytes(e.Data)));
+                }
             }
         }
 
-        void _process_ErrorDataReceived(object sender, DataReceivedEventArgs e)
-        {
-            lock (_bufferLock){
-                if (_error.Length > 0){
-                    _error.Append(Environment.NewLine);
-                }
-                _error.Append(e.Data);
-            }
+        void _process_OutputDataReceived(object sender, DataReceivedEventArgs e){
+            AppendToBuffer(_output, e);
+        }
+
+        void _process_ErrorDataReceived(object sender, DataReceivedEventArgs e){
+            AppendToBuffer(_error, e);
         }
     }
 }

@@ -102,7 +102,9 @@ namespace Microsoft.NodejsTools.NpmUI{
 
         private void WriteOutput(string output){
             if (_rtf.Length == 0){
-                _rtf.Append(@"{\rtf1\ansi\deff0 {\fonttbl {\f0 Consolas;}}
+                _rtf.Append(@"{\rtf1\ansicpg"
+                    + Console.OutputEncoding.CodePage
+                    + @"\deff0 {\fonttbl {\f0 Consolas;}}
 {\colortbl;\red255\green255\blue255;\red255\green0\blue0;\red255\green255\blue0;}\fs16
 ");
             }
