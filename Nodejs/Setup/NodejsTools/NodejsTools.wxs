@@ -12,8 +12,8 @@
       <Directory Id="EXTENSION_INSTALLPATH">
           <Directory Id="_0D6D364235164B24AC58E38A08968129" Name="Extensions">
             <Directory Id="_8C5B593518EE4149B9ADAF76B704E2A6" Name="Microsoft">
-              <Directory Id="_4737EE92D34842BAB521438C6A4FAF3D" Name="Node.js Tools for Visual Studio">
-                <Directory Id="INSTALLLOCATION" Name="0.5">
+              <Directory Id="_4737EE92D34842BAB521438C6A4FAF3D" Name="Node.js Tools">
+                <Directory Id="INSTALLLOCATION" Name="1.0">
                   <Directory Id="X64INSTALL" Name="x64">
                     </Directory>
                 </Directory>

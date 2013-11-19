@@ -36,6 +36,7 @@ namespace Microsoft.NodejsTools.Project {
         private readonly JavaScriptSerializer _serializer = new JavaScriptSerializer();        
         private readonly Timer _timer;
         internal readonly ReferenceGroupDispenser _refGroupDispenser = new ReferenceGroupDispenser();
+        private readonly HashSet<ReferenceGroup> _pendingRefGroupGenerations = new HashSet<ReferenceGroup>();
         internal int _currentFileCounter;
 
         public NodejsProjectNode(NodejsProjectPackage package)
@@ -130,8 +131,16 @@ namespace Microsoft.NodejsTools.Project {
         }
 
         public override CommonFileNode CreateCodeFileNode(ProjectElement item) {
+            var res = new NodejsFileNode(this, item);
+
+            if (ParentHierarchy != null) {
+                lock (_pendingRefGroupGenerations) {
+                    _pendingRefGroupGenerations.Add(res._refGroup);
+                }
+            }
+
             _timer.Change(250, Timeout.Infinite);
-            return new NodejsFileNode(this, item);
+            return res;
         }
 
         public override string GetProjectName() {
@@ -180,8 +189,13 @@ namespace Microsoft.NodejsTools.Project {
         protected override void Reload() {
             base.Reload();
 
-            NodejsPackage.Instance.CheckSurveyNews(false);
+            SyncFileSystem();
 
+            foreach (var group in _refGroupDispenser.Groups) {
+                group.GenerateReferenceFile();
+            }
+
+            NodejsPackage.Instance.CheckSurveyNews(false);
             ModulesNode.ReloadHierarchySafe();
         }
 
@@ -240,10 +254,20 @@ namespace Microsoft.NodejsTools.Project {
         /// get the correct intellisense back.
         /// </summary>
         internal void UpdateReferenceFile(NodejsFileNode changedFile = null) {
-            _uiSync.BeginInvoke((Action<NodejsFileNode>)UpdateReferenceFileUIThread, changedFile);
+            // don't update if we're closing the project
+            if (!IsClosed && !IsClosing) {
+                _uiSync.BeginInvoke((Action<NodejsFileNode>)UpdateReferenceFileUIThread, changedFile);
+            }
         }
 
-        private void UpdateReferenceFileUIThread(NodejsFileNode changedFile) {
+        private void UpdateReferenceFileUIThread(NodejsFileNode changedFile) {            
+            lock (_pendingRefGroupGenerations) {
+                foreach (var refGroup in _pendingRefGroupGenerations) {
+                    refGroup.GenerateReferenceFile();
+                }
+                _pendingRefGroupGenerations.Clear();
+            }
+
             StringBuilder header = new StringBuilder();
             foreach (var refGroup in _refGroupDispenser.Groups) {
                 header.AppendLine("/// <reference path=\"" + refGroup.Filename + "\" />");
@@ -285,21 +309,48 @@ function relative_match(match_dir, dirname, mod_name, alt_mod_name, ref_path) {
      if(ref_path.substr(0, 2) == './') {
          var components = ref_path.split('/');
          var upCount = 0;
-         for(var i = 1; i < components.length; i++) {
+
+        // loops are unrolled here so that the JavaScript language service will always fully process
+        // them, otherwise it may stop executing them if execution takes too long, and then
+        // we get incorrect results.
+         if(components.length >= 2 && components[1] == '..') {
+            upCount++;
+         }
+         if(components.length >= 3 && components[2] == '..') {
+            upCount++;
+         }
+         if(components.length >= 4 && components[3] == '..') {
+            upCount++;
+         }
+         if(components.length >= 5 && components[4] == '..') {
+            upCount++;
+         }
+         for(var i = 5; i < components.length; i++) {
              if (components[i] == '..') {
                  upCount++;
              } else {
                  break;
              }
          }
+
          if (upCount != 0) {
              var dirComponents = dirname.split('\\');
-             for(var i = 0; i < upCount; i++) {
+             if(upCount > 0) {
+                dirComponents.pop();
+             }
+             if(upCount > 1) {
+                dirComponents.pop();
+             }
+             if(upCount > 2) {
+                dirComponents.pop();
+             }
+             if(upCount > 3) {
+                dirComponents.pop();
+             }
+             for(var i = 4; i < upCount; i++) {
                  dirComponents.pop();
              }
-             for (var i = upCount + 1; i < (components.length - 1); i++) {
-                 dirComponents.push(components[i]);
-             }
+             dirComponents = dirComponents.concat(components.slice(upCount+1, components.length-1));
              var res = match_dir === dirComponents.join('\\') && (components[components.length - 1] == mod_name || components[components.length - 1] == alt_mod_name);
              return res;
          }
@@ -376,7 +427,7 @@ function starts_with(a, b) {
                             );
                         } else {
                             switchCode.AppendFormat(
-                                "    || (starts_with(__dirname, '{0}') && (module == './{1}'))\r\n",
+                                "    || (starts_with(__dirname, '{0}') && (module == './{1}' || module == './{1}/'))\r\n",
                                 CommonUtils.TrimEndSeparator(folderPackage.Parent.FullPathToChildren).Replace("\\", "\\\\"),
                                 Path.GetFileName(CommonUtils.TrimEndSeparator(folderPackage.Url))
                             );
@@ -398,9 +449,7 @@ function starts_with(a, b) {
                 // Scale back the depth of analysis based upon how many requires a package does
                 // The reference file automatically restores max_require_depth back to it's default
                 // after this require finishes executing.
-                if (nodeFile._requireCount >= 50) {
-                    switchCode.AppendLine("max_require_depth -= 3;");
-                } else if (nodeFile._requireCount >= 25) {
+                if (nodeFile._requireCount >= 25) {
                     switchCode.AppendLine("max_require_depth -= 2;");
                 } else if (nodeFile._requireCount >= 10) {
                     switchCode.AppendLine("max_require_depth -= 1;");
@@ -420,9 +469,7 @@ function starts_with(a, b) {
                 switchCode.AppendLine("}");
             }
 
-#if DEBUG
             switchCode.AppendLine("intellisense.logMessage('Intellisense failed to resolve module: ' + module + ' in ' + __filename);");
-#endif
         }
 
         /// <summary>

@@ -1163,15 +1163,28 @@ folder you are copying, do you want to replace the existing files?", Path.GetFil
                                 Project.AddChild(fileNode);
                             } else {
                                 var targetFolder = Project.CreateFolderNodes(TargetFolder);
-                                if (targetFolder.IsNonMemberItem) {
+
+                                //If a race occurrs simply treat the source as a non-included item
+                                bool wasMemberItem = false;
+                                var sourceItem = Project.FindNodeByFullPath(SourceMoniker);
+                                if (sourceItem != null) {                                    
+                                    wasMemberItem = !sourceItem.IsNonMemberItem;
+                                }                                
+                                                               
+                                if (wasMemberItem && targetFolder.IsNonMemberItem) {
                                     // dropping/pasting folder into non-member folder, non member folder
                                     // should get included into the project.
                                     ErrorHandler.ThrowOnFailure(targetFolder.IncludeInProject(false));
                                 }
 
                                 targetFolder.AddChild(fileNode);
+                                if (!wasMemberItem) {
+                                    // added child by default is included,
+                                    //   non-member copies are not added to the project
+                                    ErrorHandler.ThrowOnFailure(fileNode.ExcludeFromProject());
+                                }
                             }
-                            Project.tracker.OnItemAdded(fileNode.Url, VSADDFILEFLAGS.VSADDFILEFLAGS_NoFlags);
+                            Project.tracker.OnItemAdded(fileNode.Url, VSADDFILEFLAGS.VSADDFILEFLAGS_NoFlags);                            
                         } else if (existing.IsNonMemberItem) {
                             // replacing item that already existed, just include it in the project.
                             existing.IncludeInProject(false);

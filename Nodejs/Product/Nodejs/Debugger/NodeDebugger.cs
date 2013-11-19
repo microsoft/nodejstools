@@ -69,7 +69,8 @@ namespace Microsoft.NodejsTools.Debugger {
         private bool _resumingStepping;
         private readonly Dictionary<int, NodeThread> _threads = new Dictionary<int, NodeThread>();
         public readonly int MainThreadId = 1;
-        private readonly Dictionary<string, NodeModule> _scripts = new Dictionary<string, NodeModule>(StringComparer.OrdinalIgnoreCase);
+        private readonly Dictionary<string, NodeModule> _mapNameToScript = new Dictionary<string, NodeModule>(StringComparer.OrdinalIgnoreCase);
+        private readonly Dictionary<int, NodeModule> _mapIdToScript = new Dictionary<int, NodeModule>();
         private ExceptionHitTreatment _defaultExceptionTreatment = ExceptionHitTreatment.BreakAlways;
         private Dictionary<string, ExceptionHitTreatment> _exceptionTreatments = GetDefaultExceptionTreatments();
         private Dictionary<int, string> _errorCodes = new Dictionary<int, string>();
@@ -199,6 +200,7 @@ namespace Microsoft.NodejsTools.Debugger {
             };
             string[] breakNeverTypes = { // should probably be break on unhandled when we have just my code support
                 "Error(ENOENT)",
+                "SyntaxError",
             };
             var defaultExceptionTreatments = new Dictionary<string, ExceptionHitTreatment>();
             foreach (var exceptionType in exceptionTypes) {
@@ -633,13 +635,15 @@ namespace Microsoft.NodejsTools.Debugger {
             object nameObj;
             if (script.TryGetValue("name", out nameObj) && !string.IsNullOrEmpty((string)nameObj)) {
                 var name = (string)nameObj;
-                NodeModule existingModule;
-                if (!_scripts.TryGetValue(name, out existingModule)) {
+                NodeModule module;
+                if (!_mapNameToScript.TryGetValue(name, out module)) {
                     int id = (int)script["id"];
-                    var newModule = _scripts[name] = new NodeModule(id, name);
+                    module = new NodeModule(id, name);
+                    _mapNameToScript[name] = module;
+                    _mapIdToScript[id] = module;
                     var modLoad = ModuleLoaded;
                     if (modLoad != null) {
-                        modLoad(this, new ModuleLoadedEventArgs(newModule));
+                        modLoad(this, new ModuleLoadedEventArgs(module));
                     }
                 }
             }
@@ -963,17 +967,102 @@ namespace Microsoft.NodejsTools.Debugger {
                 new Dictionary<string, object> { { "inlineRefs", true } },
                 successHandler:
                     json => {
-                        var running = (bool) json["running"];
-                        if (!running) {
-                            var mainThread = MainThread;
-                            var jsonValue = new JsonValue(json);
-                            mainThread.Frames = ResponseHandler.ProcessBacktrace(mainThread, jsonValue);
+                        var running = (bool)json["running"];
+                        if (running) {
+                            if (followupHandler != null) {
+                                followupHandler(running);
+                            }
+                            return;
                         }
-                        if (followupHandler != null) {
-                            followupHandler(running);
-                        }
+
+                        var mainThread = MainThread;
+                        var jsonValue = new JsonValue(json);
+                        ResponseHandler.ProcessBacktrace(
+                            mainThread,
+                            _mapIdToScript,
+                            jsonValue,
+                            successHandler:
+                                frames => {
+                                    FixupBacktrace(frames, followupHandler);
+                                }
+                        );
                     }
                 );
+        }
+
+        private static void AddFixupHandler(
+            Dictionary<NodeEvaluationResult, List<Action<NodeEvaluationResult, Dictionary<string, object>>>> evaluationResultHandlers,
+            NodeEvaluationResult evaluationResult,
+            Action<NodeEvaluationResult, Dictionary<string, object>> handler
+        ) {
+            List<Action<NodeEvaluationResult, Dictionary<string, object>>> handlers;
+            if (!evaluationResultHandlers.TryGetValue(evaluationResult, out handlers)) {
+                handlers = new List<Action<NodeEvaluationResult, Dictionary<string, object>>>();
+                evaluationResultHandlers[evaluationResult] = handlers;
+            }
+            handlers.Add(handler);
+        }
+
+        private void FixupBacktrace(NodeStackFrame[] nodeFrames, Action<bool> followupHandler) {
+            // Wrap followup handler
+            Action followup = () => {
+                MainThread.Frames = nodeFrames;
+                if (followupHandler != null) {
+                    followupHandler(false);
+                }
+            };
+
+            // Collect evaluation results requiring fixup and map to fixup handlers
+            // Allow for multiple fixup handlers per evaluation result
+            Dictionary<NodeEvaluationResult, List<Action<NodeEvaluationResult, Dictionary<string, object>>>> evaluationResultHandlers = new Dictionary<NodeEvaluationResult, List<Action<NodeEvaluationResult, Dictionary<string, object>>>>();
+            foreach (var nodeFrame in nodeFrames) {
+                foreach (var evaluationResult in nodeFrame.Parameters.Concat(nodeFrame.Locals)) {
+                    if (evaluationResult.Handle > 0) {
+                        if (evaluationResult.TypeName == "Number" && evaluationResult.StringValue == null) {
+                            AddFixupHandler(
+                                evaluationResultHandlers,
+                                evaluationResult,
+                                (fixupEvaluationResult, record) => {
+                                    fixupEvaluationResult.StringValue = fixupEvaluationResult.HexValue = (string)record["text"];
+                                }
+                            );
+                        }
+                    }
+                }
+            }
+            if (evaluationResultHandlers.Count == 0) {
+                // No fixup
+                followup();
+                return;
+            }
+
+            // Perform lookup on evaluation result handles
+            var handles = evaluationResultHandlers.Keys.Select(r => r.Handle).Cast<object>().ToArray();
+            Connection.SendRequest(
+                "lookup",
+                new Dictionary<string, object> {
+                    { "handles", handles },
+                    { "includeSource", false }
+                },
+                successHandler:
+                    json => {
+                        // Invoke fixup handlers, passing associated evaluation result and "lookup" response record
+                        // For multiple fixup handlers per evaluation result, process in order of handler adds
+                        var body = (Dictionary<string, object>)json["body"];
+                        foreach (var evaluationResult in evaluationResultHandlers.Keys) {
+                            var record = (Dictionary<string, object>)body[evaluationResult.Handle.ToString()];
+                            foreach (var handler in evaluationResultHandlers[evaluationResult]) {
+                                handler(evaluationResult, record);
+                            }
+                        }
+                        followup();
+                    },
+                failureHandler:
+                    json => {
+                        // No fixup
+                        followup();
+                    }
+            );
         }
 
         internal IList<NodeThread> GetThreads() {
@@ -1279,7 +1368,7 @@ namespace Microsoft.NodejsTools.Debugger {
 
         internal NodeModule GetModuleForFilePath(string filePath) {
             NodeModule module = null;
-            _scripts.TryGetValue(filePath, out module);
+            _mapNameToScript.TryGetValue(filePath, out module);
             return module;
         }
 

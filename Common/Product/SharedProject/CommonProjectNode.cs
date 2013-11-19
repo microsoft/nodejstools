@@ -420,6 +420,19 @@ namespace Microsoft.VisualStudioTools.Project {
             _currentMerger = new DiskMerger(this, this, ProjectHome);
         }
 
+        /// <summary>
+        /// Called to ensure that the hierarchy's show all files nodes are in
+        /// sync with the file system.
+        /// </summary>
+        protected void SyncFileSystem() {
+            if (_currentMerger == null) {
+                _currentMerger = new DiskMerger(this, this, ProjectHome);
+            }
+            while (_currentMerger.ContinueMerge(ParentHierarchy != null)) {
+            }
+            _currentMerger = null;
+        }
+
         private void BoldStartupItem() {
             var startupPath = GetStartupFile();
             if (!string.IsNullOrEmpty(startupPath)) {
@@ -587,7 +600,7 @@ namespace Microsoft.VisualStudioTools.Project {
             /// 
             /// Returns true if the merge needs to continue, or false if the merge has completed.
             /// </summary>
-            public bool ContinueMerge() {
+            public bool ContinueMerge(bool hierarchyCreated = true) {
                 if (_remainingDirs.Count == 0) {   // all done
                     return false;
                 }
@@ -606,7 +619,7 @@ namespace Microsoft.VisualStudioTools.Project {
                     return true;
                 }
                 
-                bool wasExpanded = dir.Parent.GetIsExpanded();
+                bool wasExpanded = hierarchyCreated ? dir.Parent.GetIsExpanded() : false;
                 foreach (var curDir in dirs) {
                     if (_project.IsFileHidden(curDir)) {
                         continue;
@@ -621,7 +634,7 @@ namespace Microsoft.VisualStudioTools.Project {
                         _project.CreateSymLinkWatcher(curDir);
                     }
                     
-                    var existing = _project.AddAllFilesFolder(dir.Parent, curDir + Path.DirectorySeparatorChar);
+                    var existing = _project.AddAllFilesFolder(dir.Parent, curDir + Path.DirectorySeparatorChar, hierarchyCreated);
                     missingChildren.Remove(existing);
                     _remainingDirs.Push(new DirState(curDir, existing));
                 }
@@ -634,7 +647,9 @@ namespace Microsoft.VisualStudioTools.Project {
                                         
                     // We are about to return and some of the previous operations may have affect the Parent's Expanded
                     // state.  Set it back to what it was
-                    dir.Parent.ExpandItem(wasExpanded ? EXPANDFLAGS.EXPF_ExpandFolder : EXPANDFLAGS.EXPF_CollapseFolder);
+                    if (hierarchyCreated) {
+                        dir.Parent.ExpandItem(wasExpanded ? EXPANDFLAGS.EXPF_ExpandFolder : EXPANDFLAGS.EXPF_CollapseFolder);
+                    }
                     return true;
                 }
 
@@ -652,7 +667,9 @@ namespace Microsoft.VisualStudioTools.Project {
                     }
                 }
 
-                dir.Parent.ExpandItem(wasExpanded ? EXPANDFLAGS.EXPF_ExpandFolder : EXPANDFLAGS.EXPF_CollapseFolder);
+                if (hierarchyCreated) {
+                    dir.Parent.ExpandItem(wasExpanded ? EXPANDFLAGS.EXPF_ExpandFolder : EXPANDFLAGS.EXPF_CollapseFolder);
+                }
 
                 return true;
             }
@@ -790,15 +807,17 @@ namespace Microsoft.VisualStudioTools.Project {
         /// <summary>
         /// Adds a folder which is displayed when Show All files is enabled
         /// </summary>
-        private HierarchyNode AddAllFilesFolder(HierarchyNode curParent, string curDir) {
+        private HierarchyNode AddAllFilesFolder(HierarchyNode curParent, string curDir, bool hierarchyCreated = true) {
             var folderNode = FindNodeByFullPath(curDir);
             if (folderNode == null) {
                 folderNode = CreateFolderNode(new AllFilesProjectElement(curDir, "Folder", this));
                 AddAllFilesNode(curParent, folderNode);
 
-                // Solution Explorer will expand the parent when an item is
-                // added, which we don't want
-                folderNode.ExpandItem(EXPANDFLAGS.EXPF_CollapseFolder);                
+                if (hierarchyCreated) {
+                    // Solution Explorer will expand the parent when an item is
+                    // added, which we don't want
+                    folderNode.ExpandItem(EXPANDFLAGS.EXPF_CollapseFolder);
+                }
             }
             return folderNode;
         }
@@ -1245,7 +1264,7 @@ namespace Microsoft.VisualStudioTools.Project {
         }
 
         private void BoldDeferredItems() {
-            if (_needBolding.Count == 0) {
+            if (_needBolding.Count == 0 || ParentHierarchy == null) {
                 return;
             }
             if (IsClosed) {

@@ -88,9 +88,9 @@ namespace Microsoft.NodejsTools.Debugger.Remote {
 
         public int GetDescription(enum_PORT_SUPPLIER_DESCRIPTION_FLAGS[] pdwFlags, out string pbstrText) {
             pbstrText =
-                "Allows debugging a Node.js process on a remote machine running any OS, if it can be connected to via TCP, " +
-                "and the process has enabled remote debugging by running Node.exe with the --debug argument. " +
-                "Specify the hostname and port to connect to in the 'Qualifier' textbox, e.g. 'localhost:5858'. " +
+                "Allows attaching to Node.js processes running behind a remote debug proxy (RemoteDebug.js). " +
+                "Related documentation can be found under the 'Tools\\Node.js Tool\\Remote Debug Proxy' menu. " +
+                "Specify the target hostname and debugger port in the 'Qualifier' textbox, e.g. 'targethost:5858'. " +
                 "This transport is not secure, and should not be used on a network that might have hostile traffic.";
             return VSConstants.S_OK;
         }

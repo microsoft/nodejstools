@@ -325,7 +325,7 @@ namespace Microsoft.NodejsTools.Debugger.DebugEngine {
             // Check whether breakpoint request for our language
             BP_REQUEST_INFO[] requestInfo = new BP_REQUEST_INFO[1];
             EngineUtils.CheckOk(pBPRequest.GetRequestInfo(enum_BPREQI_FIELDS.BPREQI_LANGUAGE | enum_BPREQI_FIELDS.BPREQI_BPLOCATION, requestInfo));
-            if (requestInfo[0].guidLanguage != GuidList.guidNodejsDebugLanguage) {
+            if (requestInfo[0].guidLanguage != GuidList.guidNodejsDebugLanguage && requestInfo[0].guidLanguage != GuidList.guidScriptDebugLanguage) {
                 // Check whether breakpoint request for our "downloaded" script
                 // "Downloaded" script will have our IDebugDocument2
                 IDebugDocument2 debugDocument;
@@ -1121,6 +1121,9 @@ namespace Microsoft.NodejsTools.Debugger.DebugEngine {
             var enumHierarchyItemsFactory = Package.GetGlobalService(typeof(SVsEnumHierarchyItemsFactory)) as IVsEnumHierarchyItemsFactory;
             var solution = Package.GetGlobalService(typeof(SVsSolution)) as IVsSolution;
             if (solution != null) {
+                int bestMatchCount = 0;
+                var leafName = Path.GetFileName(fileName);
+                var reverseFileName = NormalizedReversedPath(fileName);
                 foreach (var project in solution.EnumerateLoadedProjects(onlyNodeProjects: false)) {
                     int pfFound;
                     VSDOCUMENTPRIORITY[] pdwPriority = new VSDOCUMENTPRIORITY[1];
@@ -1134,9 +1137,13 @@ namespace Microsoft.NodejsTools.Debugger.DebugEngine {
                         foreach (var itemid in project.EnumerateProjectItems()) {
                             string moniker;
                             if (ErrorHandler.Succeeded(project.GetMkDocument(itemid, out moniker)) && moniker != null) {
-                                if (string.Compare(Path.GetFileName(fileName), Path.GetFileName(moniker), StringComparison.OrdinalIgnoreCase) == 0) {
-                                    // Handle remote attach where leaf name in project, by matching project item filename
-                                    fuzzyFileName = moniker;
+                                if (string.Compare(leafName, Path.GetFileName(moniker), StringComparison.OrdinalIgnoreCase) == 0) {
+                                    var matchCount = CountCharMatch(reverseFileName, NormalizedReversedPath(moniker));
+                                    if (matchCount > bestMatchCount) {
+                                        bestMatchCount = matchCount;
+                                        // Handle remote attach where leaf name in project, by matching project item filename
+                                        fuzzyFileName = moniker;
+                                    }
                                 }
                             }
                         }
@@ -1149,6 +1156,19 @@ namespace Microsoft.NodejsTools.Debugger.DebugEngine {
 
             // Fallback to matching leaf name, which causes source to be downloaded
             return Path.GetFileName(fileName);
+        }
+
+        private char[] NormalizedReversedPath(string path) {
+            var array = path.Replace('/', '\\').ToLower().ToCharArray();
+            Array.Reverse(array);
+            return array;
+        }
+
+        private int CountCharMatch(char[] array1, char[] array2) {
+            var maxCount = Math.Min(array1.Length, array2.Length);
+            int matchCount = 0;
+            for (matchCount = 0; matchCount < maxCount && array1[matchCount] == array2[matchCount]; ++matchCount);
+            return matchCount;
         }
     }
 }

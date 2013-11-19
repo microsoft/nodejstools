@@ -74,6 +74,11 @@ namespace Microsoft.NodejsTools {
             _projBuffer = CreateProjectionBuffer(bufferFactory);
             _elisionBuffer = CreateElisionBuffer(bufferFactory);
             _elisionBuffer.Properties[typeof(NodejsProjectionBuffer)] = this;
+            _diskBuffer.Changed += DiskBufferChanged;
+        }
+
+        private void DiskBufferChanged(object sender, TextContentChangedEventArgs e) {
+            NodejsPackage.Instance.ChangedBuffers.Add(e.After.TextBuffer);
         }
 
         private IProjectionBuffer CreateProjectionBuffer(IProjectionBufferFactoryService bufferFactory) {
@@ -97,35 +102,10 @@ namespace Microsoft.NodejsTools {
 
         private string LeadingText {
             get {
-                IVsRunningDocumentTable rdt = NodejsPackage.GetGlobalService(typeof(SVsRunningDocumentTable)) as IVsRunningDocumentTable;
-                IVsHierarchy hierarchy;
-                uint itemid;
-                IntPtr docData = IntPtr.Zero;
-                uint docCookie;
                 string asyncFilePath = null;
-                try {
-                    ErrorHandler.ThrowOnFailure(
-                        rdt.FindAndLockDocument(
-                            (uint)_VSRDTFLAGS.RDT_NoLock, 
-                            _diskBuffer.GetFilePath(), 
-                            out hierarchy, 
-                            out itemid, 
-                            out docData, 
-                            out docCookie
-                        )
-                    );
-
-                    var nodejsProject = hierarchy.GetProject().GetNodeProject();
-                    if (nodejsProject != null) {
-                        var node = nodejsProject.FindNodeByFullPath(_diskBuffer.GetFilePath()) as NodejsFileNode;
-                        if (node != null) {
-                            asyncFilePath = node._asyncFilePath;
-                        }
-                    }
-                } finally {
-                    if (docData != IntPtr.Zero) {
-                        Marshal.Release(docData);
-                    }
+                NodejsFileNode node = GetFileNode();
+                if (node != null) {
+                    asyncFilePath = node._asyncFilePath;
                 }
 
                 return
@@ -133,6 +113,40 @@ namespace Microsoft.NodejsTools {
                     (asyncFilePath != null ? ("/// <reference path=\"" + asyncFilePath + "\" />\r\n") : "") +
                     GetNodeFunctionWrapperHeader("nodejs_tools_for_visual_studio_hidden_module_body", _diskBuffer.GetFilePath());
             }
+        }
+
+        /// <summary>
+        /// Gets the FileNode for the this projection buffer if one exists.
+        /// </summary>
+        internal NodejsFileNode GetFileNode() {
+            NodejsFileNode node = null;
+            IVsRunningDocumentTable rdt = NodejsPackage.GetGlobalService(typeof(SVsRunningDocumentTable)) as IVsRunningDocumentTable;
+            IVsHierarchy hierarchy;
+            uint itemid;
+            IntPtr docData = IntPtr.Zero;
+            uint docCookie;
+            try {
+                ErrorHandler.ThrowOnFailure(
+                    rdt.FindAndLockDocument(
+                        (uint)_VSRDTFLAGS.RDT_NoLock,
+                        _diskBuffer.GetFilePath(),
+                        out hierarchy,
+                        out itemid,
+                        out docData,
+                        out docCookie
+                    )
+                );
+
+                var nodejsProject = hierarchy.GetProject().GetNodeProject();
+                if (nodejsProject != null) {
+                    node = nodejsProject.FindNodeByFullPath(_diskBuffer.GetFilePath()) as NodejsFileNode;
+                }
+            } finally {
+                if (docData != IntPtr.Zero) {
+                    Marshal.Release(docData);
+                }
+            }
+            return node;
         }
 
         /// <summary>
@@ -165,7 +179,19 @@ namespace Microsoft.NodejsTools {
             if (String.IsNullOrWhiteSpace(filename)) {
                 return "";
             }
-            return "__dirname = \"" + Path.GetDirectoryName(filename).Replace("\\", "\\\\") + "\";\r\n";
+
+            string dirname;
+            
+            try {
+                dirname = Path.GetDirectoryName(filename);
+            } catch (PathTooLongException) {
+                //We should always have a \ present in the path we get
+                //  to be safe we'll check and fall back to supplying the full path
+                int indexOfBackslash = filename.LastIndexOf('\\');                
+                dirname = indexOfBackslash > 0 ? filename.Substring(0, indexOfBackslash) : filename;            
+            }
+
+            return "__dirname = \"" + dirname.Replace("\\", "\\\\") + "\";\r\n";
         }
 
         internal static string TrailingText {

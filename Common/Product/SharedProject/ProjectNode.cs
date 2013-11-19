@@ -229,7 +229,7 @@ namespace Microsoft.VisualStudioTools.Project
 
         private Guid projectIdGuid;
 
-        private bool isClosed;
+        private bool isClosed, isClosing;
 
         private EventTriggering eventTriggeringFlag = EventTriggering.TriggerAll;
 
@@ -458,6 +458,12 @@ namespace Microsoft.VisualStudioTools.Project
         }
 
         #region overridden properties
+
+        public override bool CanOpenCommandPrompt {
+            get {
+                return true;
+            }
+        }
 
         internal override string FullPathToChildren {
             get {
@@ -740,6 +746,17 @@ namespace Microsoft.VisualStudioTools.Project
             get
             {
                 return this.isClosed;
+            }
+        }
+
+        /// <summary>
+        /// Gets whether or not the project has begun closing.
+        /// </summary>
+        public bool IsClosing
+        {
+            get 
+            {
+                return this.isClosing;
             }
         }
 
@@ -1300,7 +1317,7 @@ namespace Microsoft.VisualStudioTools.Project
 
                 }
             }
-            else
+            else if(cmdGroup != SharedCommandGuid)
             {
                 return (int)OleConstants.OLECMDERR_E_UNKNOWNGROUP;
             }
@@ -6137,6 +6154,7 @@ If the files in the existing folder have the same names as files in the folder y
         /// <returns>A success or failure value.</returns>
         int IVsHierarchy.Close() {
             int hr = VSConstants.S_OK;
+            isClosing = true;
             try {
                 // Walk the tree and close all nodes.
                 // This has to be done before the project closes, since we want still state available for the ProjectMgr on the nodes 
@@ -6151,6 +6169,7 @@ If the files in the existing folder have the same names as files in the folder y
             SetBuildProject(null);
 
             this.isClosed = true;
+            isClosing = false;
 
             return hr;
         }
@@ -6672,6 +6691,12 @@ If the files in the existing folder have the same names as files in the folder y
             var existing = _diskNodes[oldPath];
             _diskNodes.Remove(oldPath);
             _diskNodes.Add(newPath, existing);
+        }
+
+        public IVsHierarchy ParentHierarchy {
+            get {
+                return parentHierarchy;
+            }
         }
 
         [Conditional("DEBUG")]

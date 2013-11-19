@@ -1,0 +1,291 @@
+<html>
+
+<head>
+<meta http-equiv=Content-Type content="text/html; charset=windows-1252">
+<meta name=Generator content="Microsoft Word 15 (filtered)">
+<style>
+<!--
+ /* Font Definitions */
+ @font-face
+	{font-family:Helvetica;
+	panose-1:2 11 6 4 2 2 2 2 2 4;}
+@font-face
+	{font-family:"Cambria Math";
+	panose-1:2 4 5 3 5 4 6 3 2 4;}
+@font-face
+	{font-family:Calibri;
+	panose-1:2 15 5 2 2 2 4 3 2 4;}
+@font-face
+	{font-family:Consolas;
+	panose-1:2 11 6 9 2 2 4 3 2 4;}
+ /* Style Definitions */
+ p.MsoNormal, li.MsoNormal, div.MsoNormal
+	{margin-top:0in;
+	margin-right:0in;
+	margin-bottom:8.0pt;
+	margin-left:0in;
+	line-height:107%;
+	font-size:11.0pt;
+	font-family:"Calibri","sans-serif";}
+h1
+	{mso-style-link:"Heading 1 Char";
+	margin-right:0in;
+	margin-left:0in;
+	font-size:24.0pt;
+	font-family:"Times New Roman","serif";
+	font-weight:bold;}
+h3
+	{mso-style-link:"Heading 3 Char";
+	margin-right:0in;
+	margin-left:0in;
+	font-size:13.5pt;
+	font-family:"Times New Roman","serif";
+	font-weight:bold;}
+p
+	{margin-right:0in;
+	margin-left:0in;
+	font-size:12.0pt;
+	font-family:"Times New Roman","serif";}
+code
+	{font-family:"Courier New";}
+pre
+	{mso-style-link:"HTML Preformatted Char";
+	margin:0in;
+	margin-bottom:.0001pt;
+	font-size:10.0pt;
+	font-family:"Courier New";}
+span.Heading1Char
+	{mso-style-name:"Heading 1 Char";
+	mso-style-link:"Heading 1";
+	font-family:"Times New Roman","serif";
+	font-weight:bold;}
+span.Heading3Char
+	{mso-style-name:"Heading 3 Char";
+	mso-style-link:"Heading 3";
+	font-family:"Times New Roman","serif";
+	font-weight:bold;}
+span.HTMLPreformattedChar
+	{mso-style-name:"HTML Preformatted Char";
+	mso-style-link:"HTML Preformatted";
+	font-family:"Courier New";}
+.MsoChpDefault
+	{font-family:"Calibri","sans-serif";}
+.MsoPapDefault
+	{margin-bottom:8.0pt;
+	line-height:107%;}
+@page WordSection1
+	{size:8.5in 11.0in;
+	margin:1.0in 1.0in 1.0in 1.0in;}
+div.WordSection1
+	{page:WordSection1;}
+ /* List Definitions */
+ ol
+	{margin-bottom:0in;}
+ul
+	{margin-bottom:0in;}
+-->
+</style>
+
+</head>
+
+<body lang=EN-US>
+
+<div class=WordSection1>
+
+<p class=MsoNormal style='margin-bottom:7.5pt;line-height:normal;background:
+white'><b><span style='font-size:21.0pt;font-family:"Helvetica","sans-serif";
+color:black'>NTVS Remote Debugging (Windows, Linux, Mac)</span></b></p>
+
+<p class=MsoNormal style='margin-top:7.5pt;margin-right:0in;margin-bottom:11.25pt;
+margin-left:0in;line-height:normal;background:white'><span style='font-size:
+10.5pt;font-family:"Helvetica","sans-serif";color:#333333'>Node.js Tools for
+Visual Studio (NTVS) supports attaching to and debugging Node.js processes
+running behind the remote debugging proxy (RemoteDebug.js). The proxy is
+necessary to expose the Node.exe debugger port from the target host to the NTVS
+debugger. Node.exe only exposes its debugger port to the local host where it is
+running. The remote debug proxy exposes the local port through a remotely
+accessible port.</span></p>
+
+<p class=MsoNormal style='margin-top:11.25pt;margin-right:0in;margin-bottom:
+11.25pt;margin-left:0in;line-height:normal;background:white'><span
+style='font-size:10.5pt;font-family:"Helvetica","sans-serif";color:#333333'>Starting
+NTVS remote debugging requires both preparing the target host, and attaching
+the NTVS debugger to the remote Node.exe process.</span></p>
+
+<p class=MsoNormal style='margin-top:15.0pt;margin-right:0in;margin-bottom:
+7.5pt;margin-left:0in;line-height:normal;background:white'><b><span
+style='font-size:13.5pt;font-family:"Helvetica","sans-serif";color:#333333'>Target
+Host Preparation</span></b></p>
+
+<p class=MsoNormal style='margin-top:7.5pt;margin-right:0in;margin-bottom:11.25pt;
+margin-left:0in;line-height:normal;background:white'><span style='font-size:
+10.5pt;font-family:"Helvetica","sans-serif";color:#333333'>Preparing a target
+host for remote debugging is as simple as running your target Node.exe behind
+the remote debug proxy, on the remote host. Where you would normally start a
+Node.exe process directly with:</span></p>
+
+<div style='border:solid #CCCCCC 1.0pt;padding:5.0pt 8.0pt 5.0pt 8.0pt;
+background:#F8F8F8'>
+
+<p class=MsoNormal style='margin-bottom:0in;margin-bottom:.0001pt;line-height:
+14.25pt;background:#F8F8F8;border:none;padding:0in'><span style='font-size:
+9.0pt;font-family:Consolas;color:#333333'>node.exe script.js</span></p>
+
+</div>
+
+<p class=MsoNormal style='margin-top:11.25pt;margin-right:0in;margin-bottom:
+11.25pt;margin-left:0in;line-height:normal;background:white'><span
+style='font-size:10.5pt;font-family:"Helvetica","sans-serif";color:#333333'>Instead
+start the Node.exe process with the remote debug proxy, passing it the script
+to be remotely debugged:</span></p>
+
+<div style='border:solid #CCCCCC 1.0pt;padding:5.0pt 8.0pt 5.0pt 8.0pt;
+background:#F8F8F8'>
+
+<p class=MsoNormal style='margin-bottom:0in;margin-bottom:.0001pt;line-height:
+14.25pt;background:#F8F8F8;border:none;padding:0in'><span style='font-size:
+9.0pt;font-family:Consolas;color:#333333'>node.exe RemoteDebug.js script.js</span></p>
+
+</div>
+
+<p class=MsoNormal style='margin-top:11.25pt;margin-right:0in;margin-bottom:
+11.25pt;margin-left:0in;line-height:normal;background:white'><span
+style='font-size:10.5pt;font-family:"Helvetica","sans-serif";color:#333333'>The
+remote debug proxy (RemoteDebug.js) can be found in the folder opened using the
+'Tools\Node.js Tools\Remote Debug Proxy' menu.</span></p>
+
+<p class=MsoNormal style='margin-top:11.25pt;margin-right:0in;margin-bottom:
+11.25pt;margin-left:0in;line-height:normal;background:white'><span
+style='font-size:10.5pt;font-family:"Helvetica","sans-serif";color:#333333'>By
+default the remote debug proxy proxies a Node.exe debugger to port 5858 on the
+remote host. This can be configured using the remote debug proxy command line
+arguments:</span></p>
+
+<div style='border:solid #CCCCCC 1.0pt;padding:5.0pt 8.0pt 5.0pt 8.0pt;
+background:#F8F8F8'>
+
+<p class=MsoNormal style='margin-bottom:0in;margin-bottom:.0001pt;line-height:
+14.25pt;background:#F8F8F8;border:none;padding:0in'><span style='font-size:
+9.0pt;font-family:Consolas;color:#333333'>node.exe RemoteDebug.js -machineport
+5860 script.js</span></p>
+
+</div>
+
+<p class=MsoNormal style='margin-top:11.25pt;margin-right:0in;margin-bottom:
+11.25pt;margin-left:0in;line-height:normal;background:white'><span
+style='font-size:10.5pt;font-family:"Helvetica","sans-serif";color:#333333'>For
+configuration details, consult the remote debug proxy help, viewed by running
+it with the -help command line argument:</span></p>
+
+<div style='border:solid #CCCCCC 1.0pt;padding:5.0pt 8.0pt 5.0pt 8.0pt;
+background:#F8F8F8'>
+
+<p class=MsoNormal style='margin-bottom:0in;margin-bottom:.0001pt;line-height:
+14.25pt;background:#F8F8F8;border:none;padding:0in'><span style='font-size:
+9.0pt;font-family:Consolas;color:#333333'>node.exe RemoteDebug.js -help</span></p>
+
+</div>
+
+<p class=MsoNormal style='margin-top:11.25pt;margin-right:0in;margin-bottom:
+11.25pt;margin-left:0in;line-height:normal;background:white'><span
+style='font-size:10.5pt;font-family:"Helvetica","sans-serif";color:#333333'>Note:
+The remote debug proxy's host debugger port, default (5858) or configured, must
+be accessible to the machine attaching the NTVS debugger.</span></p>
+
+<p class=MsoNormal style='margin-top:15.0pt;margin-right:0in;margin-bottom:
+7.5pt;margin-left:0in;line-height:normal;background:white'><b><span
+style='font-size:13.5pt;font-family:"Helvetica","sans-serif";color:#333333'>Attaching
+the NTVS debugger</span></b></p>
+
+<p class=MsoNormal style='margin-top:7.5pt;margin-right:0in;margin-bottom:11.25pt;
+margin-left:0in;line-height:normal;background:white'><span style='font-size:
+10.5pt;font-family:"Helvetica","sans-serif";color:#333333'>Attaching the NTVS
+debugger entails walking through the VS &quot;Attach to process&quot; UI. The
+steps are as follows:</span></p>
+
+<p class=MsoNormal style='margin-top:0in;margin-right:0in;margin-bottom:0in;
+margin-left:.25in;margin-bottom:.0001pt;text-indent:-.25in;line-height:normal;
+background:white'><span style='font-size:10.5pt;font-family:"Helvetica","sans-serif";
+color:#333333'>1.<span style='font:7.0pt "Times New Roman"'>&nbsp;&nbsp;&nbsp; </span></span><span
+style='font-size:10.5pt;font-family:"Helvetica","sans-serif";color:#333333'>Launch
+the &quot;Attach to process&quot; dialog from the 'Debug\Attach to
+Process' menu</span></p>
+
+<p class=MsoNormal style='margin-top:0in;margin-right:0in;margin-bottom:0in;
+margin-left:.25in;margin-bottom:.0001pt;text-indent:-.25in;line-height:normal;
+background:white'><span style='font-size:10.5pt;font-family:"Helvetica","sans-serif";
+color:#333333'>2.<span style='font:7.0pt "Times New Roman"'>&nbsp;&nbsp;&nbsp; </span></span><span
+style='font-size:10.5pt;font-family:"Helvetica","sans-serif";color:#333333'>For
+'Transport', choose 'Node remote debugging'</span></p>
+
+<p class=MsoNormal style='margin-top:0in;margin-right:0in;margin-bottom:0in;
+margin-left:.25in;margin-bottom:.0001pt;text-indent:-.25in;line-height:normal;
+background:white'><span style='font-size:10.5pt;font-family:"Helvetica","sans-serif";
+color:#333333'>3.<span style='font:7.0pt "Times New Roman"'>&nbsp;&nbsp;&nbsp; </span></span><span
+style='font-size:10.5pt;font-family:"Helvetica","sans-serif";color:#333333'>For
+'Qualifier', provide the target host and debugger port (ex. myhost:5858) and
+hit enter</span></p>
+
+<p class=MsoNormal style='margin-top:0in;margin-right:0in;margin-bottom:0in;
+margin-left:.25in;margin-bottom:.0001pt;text-indent:-.25in;line-height:normal;
+background:white'><span style='font-size:10.5pt;font-family:"Helvetica","sans-serif";
+color:#333333'>4.<span style='font:7.0pt "Times New Roman"'>&nbsp;&nbsp;&nbsp; </span></span><span
+style='font-size:10.5pt;font-family:"Helvetica","sans-serif";color:#333333'>In
+'Available Processes' choose the target node.exe process</span></p>
+
+<p class=MsoNormal style='margin-top:0in;margin-right:0in;margin-bottom:0in;
+margin-left:.25in;margin-bottom:.0001pt;text-indent:-.25in;line-height:normal;
+background:white'><span style='font-size:10.5pt;font-family:"Helvetica","sans-serif";
+color:#333333'>5.<span style='font:7.0pt "Times New Roman"'>&nbsp;&nbsp;&nbsp; </span></span><span
+style='font-size:10.5pt;font-family:"Helvetica","sans-serif";color:#333333'>Choose
+'Attach'</span></p>
+
+<p class=MsoNormal style='margin-top:15.0pt;margin-right:0in;margin-bottom:
+7.5pt;margin-left:0in;line-height:normal;background:white'><b><span
+style='font-size:13.5pt;font-family:"Helvetica","sans-serif";color:#333333'>Local
+Attach</span></b></p>
+
+<p class=MsoNormal style='margin-top:7.5pt;margin-right:0in;margin-bottom:11.25pt;
+margin-left:0in;line-height:normal;background:white'><span style='font-size:
+10.5pt;font-family:"Helvetica","sans-serif";color:#333333'>It is also possible
+to attach to locally running Node.exe processes, if they were started
+with debugging enabled, using the '--debug' command line argument:</span></p>
+
+<div style='border:solid #CCCCCC 1.0pt;padding:5.0pt 8.0pt 5.0pt 8.0pt;
+background:#F8F8F8'>
+
+<p class=MsoNormal style='margin-bottom:0in;margin-bottom:.0001pt;line-height:
+14.25pt;background:#F8F8F8;border:none;padding:0in'><span style='font-size:
+9.0pt;font-family:Consolas;color:#333333'>node.exe --debug server.js</span></p>
+
+</div>
+
+<p class=MsoNormal style='margin-top:11.25pt;margin-right:0in;margin-bottom:
+11.25pt;margin-left:0in;line-height:normal;background:white'><span
+style='font-size:10.5pt;font-family:"Helvetica","sans-serif";color:#333333'>To
+attach to such local Node.exe processes, Follow the attach instructions above,
+providing localhost:5858 for 'Qualifier'.</span></p>
+
+<p class=MsoNormal style='margin-top:11.25pt;margin-right:0in;margin-bottom:
+11.25pt;margin-left:0in;line-height:normal;background:white'><span
+style='font-size:10.5pt;font-family:"Helvetica","sans-serif";color:#333333'>Note:
+It is possible to run Node.exe with a non-default local debugger port. This is
+accomplished by providing the desired port with the '--debug' command line
+argument:</span></p>
+
+<div style='border:solid #CCCCCC 1.0pt;padding:5.0pt 8.0pt 5.0pt 8.0pt;
+background:#F8F8F8'>
+
+<p class=MsoNormal style='margin-bottom:0in;margin-bottom:.0001pt;line-height:
+14.25pt;background:#F8F8F8;border:none;padding:0in'><span style='font-size:
+9.0pt;font-family:Consolas;color:#333333'>node.exe --debug:5860 server.js</span></p>
+
+</div>
+
+<p class=MsoNormal>&nbsp;</p>
+
+</div>
+
+</body>
+
+</html>

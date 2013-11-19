@@ -44,7 +44,12 @@ namespace Microsoft.VisualStudioTools.Project
         #endregion
 
         #region overridden properties
-        
+        public override bool CanOpenCommandPrompt {
+            get {
+                return true;
+            }
+        }
+
         internal override string FullPathToChildren {
             get {
                 return Url;
@@ -328,7 +333,7 @@ namespace Microsoft.VisualStudioTools.Project
                     return VSConstants.S_OK;
                 }
             }
-            else
+            else if(cmdGroup != ProjectMgr.SharedCommandGuid)
             {
                 return (int)OleConstants.OLECMDERR_E_UNKNOWNGROUP;
             }

@@ -94,6 +94,12 @@ namespace Microsoft.VisualStudioTools.Project
 
         #region virtual properties
 
+        public virtual bool CanOpenCommandPrompt {
+            get {
+                return false;
+            }
+        }
+
         public virtual bool IsNonMemberItem 
         {
             get 
@@ -1466,6 +1472,21 @@ namespace Microsoft.VisualStudioTools.Project
                         return this.IncludeInProjectWithProgress(true);
 
                 }
+            } 
+            else if (cmdGroup == ProjectMgr.SharedCommandGuid) 
+            {
+                switch ((SharedCommands)cmd) {
+                    case SharedCommands.OpenCommandPromptHere:
+                        var psi = new ProcessStartInfo(
+                            Path.Combine(
+                                Environment.SystemDirectory,
+                                "cmd.exe"
+                            )
+                        );
+                        psi.WorkingDirectory = FullPathToChildren;
+                        Process.Start(psi);
+                        return VSConstants.S_OK;
+                }
             }
 
             return (int)OleConstants.OLECMDERR_E_NOTSUPPORTED;
@@ -1521,6 +1542,15 @@ namespace Microsoft.VisualStudioTools.Project
                         result |= QueryStatusResult.NOTSUPPORTED | QueryStatusResult.INVISIBLE;
                     }
                     return VSConstants.S_OK;
+                }
+            } else if (cmdGroup == ProjectMgr.SharedCommandGuid) {
+                switch ((SharedCommands)cmd) {
+                    case SharedCommands.OpenCommandPromptHere:
+                        if (CanOpenCommandPrompt) {
+                            result |= QueryStatusResult.SUPPORTED | QueryStatusResult.ENABLED;
+                            return VSConstants.S_OK;
+                        }
+                        break;
                 }
             }
 

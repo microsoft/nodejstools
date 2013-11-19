@@ -1,10 +1,10 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <Vsix xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xsd="http://www.w3.org/2001/XMLSchema" Version="1.0.0" xmlns="http://schemas.microsoft.com/developer/vsx-schema/2010">
   <Identifier Id="FF632CFA-E4C5-4D8E-B1E2-63BE3B8A8289">
-    <Name>Microsoft.NodejsTools.InteractiveWindow</Name>
+    <Name>Node.js Tools - Interactive Window</Name>
     <Author>Microsoft</Author>
-    <Version>0.5</Version>
-    <Description xml:space="preserve">Node.js Tools for Visual Studio, Interactive Window</Description>
+    <Version>1.0</Version>
+    <Description xml:space="preserve">Node.js Tools - Interactive Window</Description>
     <Locale>1033</Locale>
     <InstalledByMsi>true</InstalledByMsi>
     <SystemComponent>false</SystemComponent>

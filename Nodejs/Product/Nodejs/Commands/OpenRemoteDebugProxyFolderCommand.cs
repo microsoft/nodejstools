@@ -22,10 +22,11 @@ namespace Microsoft.NodejsTools.Commands {
     internal sealed class OpenRemoteDebugProxyFolderCommand : Command {
         public override void DoCommand(object sender, EventArgs args) {
             // Open explorer to folder
-            if (!File.Exists(NodejsPackage.RemoteDebugProxyFolder)) {
-                MessageBox.Show(String.Format("Remote Debug Proxy \"{0}\" does not exist.", NodejsPackage.RemoteDebugProxyFolder), "Node.js Tools for Visual Studio");
+            var filePath = Path.Combine(NodejsPackage.RemoteDebugProxyFolder, "RemoteDebug.js");
+            if (!File.Exists(filePath)) {
+                MessageBox.Show(String.Format("Remote Debug Proxy \"{0}\" does not exist.", filePath), "Node.js Tools for Visual Studio");
             } else {
-                Process.Start("explorer", string.Format("/e,/select,{0}", NodejsPackage.RemoteDebugProxyFolder));
+                Process.Start("explorer", string.Format("/e,/select,{0}", filePath));
             }
         }
 

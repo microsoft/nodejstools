@@ -31,8 +31,11 @@ using Microsoft.NodejsTools.Project;
 using Microsoft.NodejsTools.Repl;
 using Microsoft.VisualStudio;
 using Microsoft.VisualStudio.Debugger.Interop;
+using Microsoft.VisualStudio.OLE.Interop;
 using Microsoft.VisualStudio.Shell;
 using Microsoft.VisualStudio.Shell.Interop;
+using Microsoft.VisualStudio.Text;
+using Microsoft.VisualStudio.TextManager.Interop;
 using Microsoft.VisualStudio.Utilities;
 using Microsoft.VisualStudioTools;
 using Microsoft.Win32;
@@ -61,99 +64,99 @@ namespace Microsoft.NodejsTools {
     [ProvideDebugLanguage(NodejsConstants.Nodejs, GuidList.guidNodejsDebugLanguageStr, NodeExpressionEvaluatorGuid, AD7Engine.DebugEngineId)]
     [WebSiteProject("JavaScript", "JavaScript")]
     // Keep declared exceptions in sync with those given default values in NodeDebugger.GetDefaultExceptionTreatments()
-    [ProvideDebugException(AD7Engine.DebugEngineId, "Node.js Exceptions", State = enum_EXCEPTION_STATE.EXCEPTION_STOP_FIRST_CHANCE)]
-    [ProvideDebugException(AD7Engine.DebugEngineId, "Node.js Exceptions", "Error", State = enum_EXCEPTION_STATE.EXCEPTION_STOP_FIRST_CHANCE)]
+    [ProvideDebugException(AD7Engine.DebugEngineId, "Node.js Exceptions", State = enum_EXCEPTION_STATE.EXCEPTION_STOP_ALL)]
+    [ProvideDebugException(AD7Engine.DebugEngineId, "Node.js Exceptions", "Error", State = enum_EXCEPTION_STATE.EXCEPTION_STOP_ALL)]
     [ProvideDebugException(AD7Engine.DebugEngineId, "Node.js Exceptions", "Error", "Error(ENOENT)", State = enum_EXCEPTION_STATE.EXCEPTION_NONE)]
-    [ProvideDebugException(AD7Engine.DebugEngineId, "Node.js Exceptions", "Error", "Error(EACCES)", State = enum_EXCEPTION_STATE.EXCEPTION_STOP_FIRST_CHANCE)]
-    [ProvideDebugException(AD7Engine.DebugEngineId, "Node.js Exceptions", "Error", "Error(EADDRINUSE)", State = enum_EXCEPTION_STATE.EXCEPTION_STOP_FIRST_CHANCE)]
-    [ProvideDebugException(AD7Engine.DebugEngineId, "Node.js Exceptions", "Error", "Error(EADDRNOTAVAIL)", State = enum_EXCEPTION_STATE.EXCEPTION_STOP_FIRST_CHANCE)]
-    [ProvideDebugException(AD7Engine.DebugEngineId, "Node.js Exceptions", "Error", "Error(EAFNOSUPPORT)", State = enum_EXCEPTION_STATE.EXCEPTION_STOP_FIRST_CHANCE)]
-    [ProvideDebugException(AD7Engine.DebugEngineId, "Node.js Exceptions", "Error", "Error(EAGAIN)", State = enum_EXCEPTION_STATE.EXCEPTION_STOP_FIRST_CHANCE)]
-    [ProvideDebugException(AD7Engine.DebugEngineId, "Node.js Exceptions", "Error", "Error(EWOULDBLOCK)", State = enum_EXCEPTION_STATE.EXCEPTION_STOP_FIRST_CHANCE)]
-    [ProvideDebugException(AD7Engine.DebugEngineId, "Node.js Exceptions", "Error", "Error(EALREADY)", State = enum_EXCEPTION_STATE.EXCEPTION_STOP_FIRST_CHANCE)]
-    [ProvideDebugException(AD7Engine.DebugEngineId, "Node.js Exceptions", "Error", "Error(EBADF)", State = enum_EXCEPTION_STATE.EXCEPTION_STOP_FIRST_CHANCE)]
-    [ProvideDebugException(AD7Engine.DebugEngineId, "Node.js Exceptions", "Error", "Error(EBADMSG)", State = enum_EXCEPTION_STATE.EXCEPTION_STOP_FIRST_CHANCE)]
-    [ProvideDebugException(AD7Engine.DebugEngineId, "Node.js Exceptions", "Error", "Error(EBUSY)", State = enum_EXCEPTION_STATE.EXCEPTION_STOP_FIRST_CHANCE)]
-    [ProvideDebugException(AD7Engine.DebugEngineId, "Node.js Exceptions", "Error", "Error(ECANCELED)", State = enum_EXCEPTION_STATE.EXCEPTION_STOP_FIRST_CHANCE)]
-    [ProvideDebugException(AD7Engine.DebugEngineId, "Node.js Exceptions", "Error", "Error(ECHILD)", State = enum_EXCEPTION_STATE.EXCEPTION_STOP_FIRST_CHANCE)]
-    [ProvideDebugException(AD7Engine.DebugEngineId, "Node.js Exceptions", "Error", "Error(ECONNABORTED)", State = enum_EXCEPTION_STATE.EXCEPTION_STOP_FIRST_CHANCE)]
-    [ProvideDebugException(AD7Engine.DebugEngineId, "Node.js Exceptions", "Error", "Error(ECONNREFUSED)", State = enum_EXCEPTION_STATE.EXCEPTION_STOP_FIRST_CHANCE)]
-    [ProvideDebugException(AD7Engine.DebugEngineId, "Node.js Exceptions", "Error", "Error(ECONNRESET)", State = enum_EXCEPTION_STATE.EXCEPTION_STOP_FIRST_CHANCE)]
-    [ProvideDebugException(AD7Engine.DebugEngineId, "Node.js Exceptions", "Error", "Error(EDEADLK)", State = enum_EXCEPTION_STATE.EXCEPTION_STOP_FIRST_CHANCE)]
-    [ProvideDebugException(AD7Engine.DebugEngineId, "Node.js Exceptions", "Error", "Error(EDESTADDRREQ)", State = enum_EXCEPTION_STATE.EXCEPTION_STOP_FIRST_CHANCE)]
-    [ProvideDebugException(AD7Engine.DebugEngineId, "Node.js Exceptions", "Error", "Error(EDOM)", State = enum_EXCEPTION_STATE.EXCEPTION_STOP_FIRST_CHANCE)]
-    [ProvideDebugException(AD7Engine.DebugEngineId, "Node.js Exceptions", "Error", "Error(EEXIST)", State = enum_EXCEPTION_STATE.EXCEPTION_STOP_FIRST_CHANCE)]
-    [ProvideDebugException(AD7Engine.DebugEngineId, "Node.js Exceptions", "Error", "Error(EFAULT)", State = enum_EXCEPTION_STATE.EXCEPTION_STOP_FIRST_CHANCE)]
-    [ProvideDebugException(AD7Engine.DebugEngineId, "Node.js Exceptions", "Error", "Error(EFBIG)", State = enum_EXCEPTION_STATE.EXCEPTION_STOP_FIRST_CHANCE)]
-    [ProvideDebugException(AD7Engine.DebugEngineId, "Node.js Exceptions", "Error", "Error(EHOSTUNREACH)", State = enum_EXCEPTION_STATE.EXCEPTION_STOP_FIRST_CHANCE)]
-    [ProvideDebugException(AD7Engine.DebugEngineId, "Node.js Exceptions", "Error", "Error(EIDRM)", State = enum_EXCEPTION_STATE.EXCEPTION_STOP_FIRST_CHANCE)]
-    [ProvideDebugException(AD7Engine.DebugEngineId, "Node.js Exceptions", "Error", "Error(EILSEQ)", State = enum_EXCEPTION_STATE.EXCEPTION_STOP_FIRST_CHANCE)]
-    [ProvideDebugException(AD7Engine.DebugEngineId, "Node.js Exceptions", "Error", "Error(EINPROGRESS)", State = enum_EXCEPTION_STATE.EXCEPTION_STOP_FIRST_CHANCE)]
-    [ProvideDebugException(AD7Engine.DebugEngineId, "Node.js Exceptions", "Error", "Error(EINTR)", State = enum_EXCEPTION_STATE.EXCEPTION_STOP_FIRST_CHANCE)]
-    [ProvideDebugException(AD7Engine.DebugEngineId, "Node.js Exceptions", "Error", "Error(EINVAL)", State = enum_EXCEPTION_STATE.EXCEPTION_STOP_FIRST_CHANCE)]
-    [ProvideDebugException(AD7Engine.DebugEngineId, "Node.js Exceptions", "Error", "Error(EIO)", State = enum_EXCEPTION_STATE.EXCEPTION_STOP_FIRST_CHANCE)]
-    [ProvideDebugException(AD7Engine.DebugEngineId, "Node.js Exceptions", "Error", "Error(EISCONN)", State = enum_EXCEPTION_STATE.EXCEPTION_STOP_FIRST_CHANCE)]
-    [ProvideDebugException(AD7Engine.DebugEngineId, "Node.js Exceptions", "Error", "Error(EISDIR)", State = enum_EXCEPTION_STATE.EXCEPTION_STOP_FIRST_CHANCE)]
-    [ProvideDebugException(AD7Engine.DebugEngineId, "Node.js Exceptions", "Error", "Error(ELOOP)", State = enum_EXCEPTION_STATE.EXCEPTION_STOP_FIRST_CHANCE)]
-    [ProvideDebugException(AD7Engine.DebugEngineId, "Node.js Exceptions", "Error", "Error(EMFILE)", State = enum_EXCEPTION_STATE.EXCEPTION_STOP_FIRST_CHANCE)]
-    [ProvideDebugException(AD7Engine.DebugEngineId, "Node.js Exceptions", "Error", "Error(EMLINK)", State = enum_EXCEPTION_STATE.EXCEPTION_STOP_FIRST_CHANCE)]
-    [ProvideDebugException(AD7Engine.DebugEngineId, "Node.js Exceptions", "Error", "Error(EMSGSIZE)", State = enum_EXCEPTION_STATE.EXCEPTION_STOP_FIRST_CHANCE)]
-    [ProvideDebugException(AD7Engine.DebugEngineId, "Node.js Exceptions", "Error", "Error(ENAMETOOLONG)", State = enum_EXCEPTION_STATE.EXCEPTION_STOP_FIRST_CHANCE)]
-    [ProvideDebugException(AD7Engine.DebugEngineId, "Node.js Exceptions", "Error", "Error(ENETDOWN)", State = enum_EXCEPTION_STATE.EXCEPTION_STOP_FIRST_CHANCE)]
-    [ProvideDebugException(AD7Engine.DebugEngineId, "Node.js Exceptions", "Error", "Error(ENETRESET)", State = enum_EXCEPTION_STATE.EXCEPTION_STOP_FIRST_CHANCE)]
-    [ProvideDebugException(AD7Engine.DebugEngineId, "Node.js Exceptions", "Error", "Error(ENETUNREACH)", State = enum_EXCEPTION_STATE.EXCEPTION_STOP_FIRST_CHANCE)]
-    [ProvideDebugException(AD7Engine.DebugEngineId, "Node.js Exceptions", "Error", "Error(ENFILE)", State = enum_EXCEPTION_STATE.EXCEPTION_STOP_FIRST_CHANCE)]
-    [ProvideDebugException(AD7Engine.DebugEngineId, "Node.js Exceptions", "Error", "Error(ENOBUFS)", State = enum_EXCEPTION_STATE.EXCEPTION_STOP_FIRST_CHANCE)]
-    [ProvideDebugException(AD7Engine.DebugEngineId, "Node.js Exceptions", "Error", "Error(ENODATA)", State = enum_EXCEPTION_STATE.EXCEPTION_STOP_FIRST_CHANCE)]
-    [ProvideDebugException(AD7Engine.DebugEngineId, "Node.js Exceptions", "Error", "Error(ENODEV)", State = enum_EXCEPTION_STATE.EXCEPTION_STOP_FIRST_CHANCE)]
-    [ProvideDebugException(AD7Engine.DebugEngineId, "Node.js Exceptions", "Error", "Error(ENOENT)", State = enum_EXCEPTION_STATE.EXCEPTION_STOP_FIRST_CHANCE)]
-    [ProvideDebugException(AD7Engine.DebugEngineId, "Node.js Exceptions", "Error", "Error(ENOEXEC)", State = enum_EXCEPTION_STATE.EXCEPTION_STOP_FIRST_CHANCE)]
-    [ProvideDebugException(AD7Engine.DebugEngineId, "Node.js Exceptions", "Error", "Error(ENOLINK)", State = enum_EXCEPTION_STATE.EXCEPTION_STOP_FIRST_CHANCE)]
-    [ProvideDebugException(AD7Engine.DebugEngineId, "Node.js Exceptions", "Error", "Error(ENOLCK)", State = enum_EXCEPTION_STATE.EXCEPTION_STOP_FIRST_CHANCE)]
-    [ProvideDebugException(AD7Engine.DebugEngineId, "Node.js Exceptions", "Error", "Error(ENOMEM)", State = enum_EXCEPTION_STATE.EXCEPTION_STOP_FIRST_CHANCE)]
-    [ProvideDebugException(AD7Engine.DebugEngineId, "Node.js Exceptions", "Error", "Error(ENOMSG)", State = enum_EXCEPTION_STATE.EXCEPTION_STOP_FIRST_CHANCE)]
-    [ProvideDebugException(AD7Engine.DebugEngineId, "Node.js Exceptions", "Error", "Error(ENOPROTOOPT)", State = enum_EXCEPTION_STATE.EXCEPTION_STOP_FIRST_CHANCE)]
-    [ProvideDebugException(AD7Engine.DebugEngineId, "Node.js Exceptions", "Error", "Error(ENOSPC)", State = enum_EXCEPTION_STATE.EXCEPTION_STOP_FIRST_CHANCE)]
-    [ProvideDebugException(AD7Engine.DebugEngineId, "Node.js Exceptions", "Error", "Error(ENOSR)", State = enum_EXCEPTION_STATE.EXCEPTION_STOP_FIRST_CHANCE)]
-    [ProvideDebugException(AD7Engine.DebugEngineId, "Node.js Exceptions", "Error", "Error(ENOSTR)", State = enum_EXCEPTION_STATE.EXCEPTION_STOP_FIRST_CHANCE)]
-    [ProvideDebugException(AD7Engine.DebugEngineId, "Node.js Exceptions", "Error", "Error(ENOSYS)", State = enum_EXCEPTION_STATE.EXCEPTION_STOP_FIRST_CHANCE)]
-    [ProvideDebugException(AD7Engine.DebugEngineId, "Node.js Exceptions", "Error", "Error(ENOTCONN)", State = enum_EXCEPTION_STATE.EXCEPTION_STOP_FIRST_CHANCE)]
-    [ProvideDebugException(AD7Engine.DebugEngineId, "Node.js Exceptions", "Error", "Error(ENOTDIR)", State = enum_EXCEPTION_STATE.EXCEPTION_STOP_FIRST_CHANCE)]
-    [ProvideDebugException(AD7Engine.DebugEngineId, "Node.js Exceptions", "Error", "Error(ENOTEMPTY)", State = enum_EXCEPTION_STATE.EXCEPTION_STOP_FIRST_CHANCE)]
-    [ProvideDebugException(AD7Engine.DebugEngineId, "Node.js Exceptions", "Error", "Error(ENOTSOCK)", State = enum_EXCEPTION_STATE.EXCEPTION_STOP_FIRST_CHANCE)]
-    [ProvideDebugException(AD7Engine.DebugEngineId, "Node.js Exceptions", "Error", "Error(ENOTSUP)", State = enum_EXCEPTION_STATE.EXCEPTION_STOP_FIRST_CHANCE)]
-    [ProvideDebugException(AD7Engine.DebugEngineId, "Node.js Exceptions", "Error", "Error(ENOTTY)", State = enum_EXCEPTION_STATE.EXCEPTION_STOP_FIRST_CHANCE)]
-    [ProvideDebugException(AD7Engine.DebugEngineId, "Node.js Exceptions", "Error", "Error(ENXIO)", State = enum_EXCEPTION_STATE.EXCEPTION_STOP_FIRST_CHANCE)]
-    [ProvideDebugException(AD7Engine.DebugEngineId, "Node.js Exceptions", "Error", "Error(EOVERFLOW)", State = enum_EXCEPTION_STATE.EXCEPTION_STOP_FIRST_CHANCE)]
-    [ProvideDebugException(AD7Engine.DebugEngineId, "Node.js Exceptions", "Error", "Error(EPERM)", State = enum_EXCEPTION_STATE.EXCEPTION_STOP_FIRST_CHANCE)]
-    [ProvideDebugException(AD7Engine.DebugEngineId, "Node.js Exceptions", "Error", "Error(EPIPE)", State = enum_EXCEPTION_STATE.EXCEPTION_STOP_FIRST_CHANCE)]
-    [ProvideDebugException(AD7Engine.DebugEngineId, "Node.js Exceptions", "Error", "Error(EPROTO)", State = enum_EXCEPTION_STATE.EXCEPTION_STOP_FIRST_CHANCE)]
-    [ProvideDebugException(AD7Engine.DebugEngineId, "Node.js Exceptions", "Error", "Error(EPROTONOSUPPORT)", State = enum_EXCEPTION_STATE.EXCEPTION_STOP_FIRST_CHANCE)]
-    [ProvideDebugException(AD7Engine.DebugEngineId, "Node.js Exceptions", "Error", "Error(EPROTOTYPE)", State = enum_EXCEPTION_STATE.EXCEPTION_STOP_FIRST_CHANCE)]
-    [ProvideDebugException(AD7Engine.DebugEngineId, "Node.js Exceptions", "Error", "Error(ERANGE)", State = enum_EXCEPTION_STATE.EXCEPTION_STOP_FIRST_CHANCE)]
-    [ProvideDebugException(AD7Engine.DebugEngineId, "Node.js Exceptions", "Error", "Error(EROFS)", State = enum_EXCEPTION_STATE.EXCEPTION_STOP_FIRST_CHANCE)]
-    [ProvideDebugException(AD7Engine.DebugEngineId, "Node.js Exceptions", "Error", "Error(ESPIPE)", State = enum_EXCEPTION_STATE.EXCEPTION_STOP_FIRST_CHANCE)]
-    [ProvideDebugException(AD7Engine.DebugEngineId, "Node.js Exceptions", "Error", "Error(ESRCH)", State = enum_EXCEPTION_STATE.EXCEPTION_STOP_FIRST_CHANCE)]
-    [ProvideDebugException(AD7Engine.DebugEngineId, "Node.js Exceptions", "Error", "Error(ETIME)", State = enum_EXCEPTION_STATE.EXCEPTION_STOP_FIRST_CHANCE)]
-    [ProvideDebugException(AD7Engine.DebugEngineId, "Node.js Exceptions", "Error", "Error(ETIMEDOUT)", State = enum_EXCEPTION_STATE.EXCEPTION_STOP_FIRST_CHANCE)]
-    [ProvideDebugException(AD7Engine.DebugEngineId, "Node.js Exceptions", "Error", "Error(ETXTBSY)", State = enum_EXCEPTION_STATE.EXCEPTION_STOP_FIRST_CHANCE)]
-    [ProvideDebugException(AD7Engine.DebugEngineId, "Node.js Exceptions", "Error", "Error(EXDEV)", State = enum_EXCEPTION_STATE.EXCEPTION_STOP_FIRST_CHANCE)]
-    [ProvideDebugException(AD7Engine.DebugEngineId, "Node.js Exceptions", "Error", "Error(SIGHUP)", State = enum_EXCEPTION_STATE.EXCEPTION_STOP_FIRST_CHANCE)]
-    [ProvideDebugException(AD7Engine.DebugEngineId, "Node.js Exceptions", "Error", "Error(SIGINT)", State = enum_EXCEPTION_STATE.EXCEPTION_STOP_FIRST_CHANCE)]
-    [ProvideDebugException(AD7Engine.DebugEngineId, "Node.js Exceptions", "Error", "Error(SIGILL)", State = enum_EXCEPTION_STATE.EXCEPTION_STOP_FIRST_CHANCE)]
-    [ProvideDebugException(AD7Engine.DebugEngineId, "Node.js Exceptions", "Error", "Error(SIGABRT)", State = enum_EXCEPTION_STATE.EXCEPTION_STOP_FIRST_CHANCE)]
-    [ProvideDebugException(AD7Engine.DebugEngineId, "Node.js Exceptions", "Error", "Error(SIGFPE)", State = enum_EXCEPTION_STATE.EXCEPTION_STOP_FIRST_CHANCE)]
-    [ProvideDebugException(AD7Engine.DebugEngineId, "Node.js Exceptions", "Error", "Error(SIGKILL)", State = enum_EXCEPTION_STATE.EXCEPTION_STOP_FIRST_CHANCE)]
-    [ProvideDebugException(AD7Engine.DebugEngineId, "Node.js Exceptions", "Error", "Error(SIGSEGV)", State = enum_EXCEPTION_STATE.EXCEPTION_STOP_FIRST_CHANCE)]
-    [ProvideDebugException(AD7Engine.DebugEngineId, "Node.js Exceptions", "Error", "Error(SIGTERM)", State = enum_EXCEPTION_STATE.EXCEPTION_STOP_FIRST_CHANCE)]
-    [ProvideDebugException(AD7Engine.DebugEngineId, "Node.js Exceptions", "Error", "Error(SIGBREAK)", State = enum_EXCEPTION_STATE.EXCEPTION_STOP_FIRST_CHANCE)]
-    [ProvideDebugException(AD7Engine.DebugEngineId, "Node.js Exceptions", "Error", "Error(SIGWINCH)", State = enum_EXCEPTION_STATE.EXCEPTION_STOP_FIRST_CHANCE)]
-    [ProvideDebugException(AD7Engine.DebugEngineId, "Node.js Exceptions", "EvalError", State = enum_EXCEPTION_STATE.EXCEPTION_STOP_FIRST_CHANCE)]
-    [ProvideDebugException(AD7Engine.DebugEngineId, "Node.js Exceptions", "RangeError", State = enum_EXCEPTION_STATE.EXCEPTION_STOP_FIRST_CHANCE)]
-    [ProvideDebugException(AD7Engine.DebugEngineId, "Node.js Exceptions", "ReferenceError", State = enum_EXCEPTION_STATE.EXCEPTION_STOP_FIRST_CHANCE)]
-    [ProvideDebugException(AD7Engine.DebugEngineId, "Node.js Exceptions", "SyntaxError", State = enum_EXCEPTION_STATE.EXCEPTION_STOP_FIRST_CHANCE)]
-    [ProvideDebugException(AD7Engine.DebugEngineId, "Node.js Exceptions", "TypeError", State = enum_EXCEPTION_STATE.EXCEPTION_STOP_FIRST_CHANCE)]
-    [ProvideDebugException(AD7Engine.DebugEngineId, "Node.js Exceptions", "URIError", State = enum_EXCEPTION_STATE.EXCEPTION_STOP_FIRST_CHANCE)]
+    [ProvideDebugException(AD7Engine.DebugEngineId, "Node.js Exceptions", "Error", "Error(EACCES)", State = enum_EXCEPTION_STATE.EXCEPTION_STOP_ALL)]
+    [ProvideDebugException(AD7Engine.DebugEngineId, "Node.js Exceptions", "Error", "Error(EADDRINUSE)", State = enum_EXCEPTION_STATE.EXCEPTION_STOP_ALL)]
+    [ProvideDebugException(AD7Engine.DebugEngineId, "Node.js Exceptions", "Error", "Error(EADDRNOTAVAIL)", State = enum_EXCEPTION_STATE.EXCEPTION_STOP_ALL)]
+    [ProvideDebugException(AD7Engine.DebugEngineId, "Node.js Exceptions", "Error", "Error(EAFNOSUPPORT)", State = enum_EXCEPTION_STATE.EXCEPTION_STOP_ALL)]
+    [ProvideDebugException(AD7Engine.DebugEngineId, "Node.js Exceptions", "Error", "Error(EAGAIN)", State = enum_EXCEPTION_STATE.EXCEPTION_STOP_ALL)]
+    [ProvideDebugException(AD7Engine.DebugEngineId, "Node.js Exceptions", "Error", "Error(EWOULDBLOCK)", State = enum_EXCEPTION_STATE.EXCEPTION_STOP_ALL)]
+    [ProvideDebugException(AD7Engine.DebugEngineId, "Node.js Exceptions", "Error", "Error(EALREADY)", State = enum_EXCEPTION_STATE.EXCEPTION_STOP_ALL)]
+    [ProvideDebugException(AD7Engine.DebugEngineId, "Node.js Exceptions", "Error", "Error(EBADF)", State = enum_EXCEPTION_STATE.EXCEPTION_STOP_ALL)]
+    [ProvideDebugException(AD7Engine.DebugEngineId, "Node.js Exceptions", "Error", "Error(EBADMSG)", State = enum_EXCEPTION_STATE.EXCEPTION_STOP_ALL)]
+    [ProvideDebugException(AD7Engine.DebugEngineId, "Node.js Exceptions", "Error", "Error(EBUSY)", State = enum_EXCEPTION_STATE.EXCEPTION_STOP_ALL)]
+    [ProvideDebugException(AD7Engine.DebugEngineId, "Node.js Exceptions", "Error", "Error(ECANCELED)", State = enum_EXCEPTION_STATE.EXCEPTION_STOP_ALL)]
+    [ProvideDebugException(AD7Engine.DebugEngineId, "Node.js Exceptions", "Error", "Error(ECHILD)", State = enum_EXCEPTION_STATE.EXCEPTION_STOP_ALL)]
+    [ProvideDebugException(AD7Engine.DebugEngineId, "Node.js Exceptions", "Error", "Error(ECONNABORTED)", State = enum_EXCEPTION_STATE.EXCEPTION_STOP_ALL)]
+    [ProvideDebugException(AD7Engine.DebugEngineId, "Node.js Exceptions", "Error", "Error(ECONNREFUSED)", State = enum_EXCEPTION_STATE.EXCEPTION_STOP_ALL)]
+    [ProvideDebugException(AD7Engine.DebugEngineId, "Node.js Exceptions", "Error", "Error(ECONNRESET)", State = enum_EXCEPTION_STATE.EXCEPTION_STOP_ALL)]
+    [ProvideDebugException(AD7Engine.DebugEngineId, "Node.js Exceptions", "Error", "Error(EDEADLK)", State = enum_EXCEPTION_STATE.EXCEPTION_STOP_ALL)]
+    [ProvideDebugException(AD7Engine.DebugEngineId, "Node.js Exceptions", "Error", "Error(EDESTADDRREQ)", State = enum_EXCEPTION_STATE.EXCEPTION_STOP_ALL)]
+    [ProvideDebugException(AD7Engine.DebugEngineId, "Node.js Exceptions", "Error", "Error(EDOM)", State = enum_EXCEPTION_STATE.EXCEPTION_STOP_ALL)]
+    [ProvideDebugException(AD7Engine.DebugEngineId, "Node.js Exceptions", "Error", "Error(EEXIST)", State = enum_EXCEPTION_STATE.EXCEPTION_STOP_ALL)]
+    [ProvideDebugException(AD7Engine.DebugEngineId, "Node.js Exceptions", "Error", "Error(EFAULT)", State = enum_EXCEPTION_STATE.EXCEPTION_STOP_ALL)]
+    [ProvideDebugException(AD7Engine.DebugEngineId, "Node.js Exceptions", "Error", "Error(EFBIG)", State = enum_EXCEPTION_STATE.EXCEPTION_STOP_ALL)]
+    [ProvideDebugException(AD7Engine.DebugEngineId, "Node.js Exceptions", "Error", "Error(EHOSTUNREACH)", State = enum_EXCEPTION_STATE.EXCEPTION_STOP_ALL)]
+    [ProvideDebugException(AD7Engine.DebugEngineId, "Node.js Exceptions", "Error", "Error(EIDRM)", State = enum_EXCEPTION_STATE.EXCEPTION_STOP_ALL)]
+    [ProvideDebugException(AD7Engine.DebugEngineId, "Node.js Exceptions", "Error", "Error(EILSEQ)", State = enum_EXCEPTION_STATE.EXCEPTION_STOP_ALL)]
+    [ProvideDebugException(AD7Engine.DebugEngineId, "Node.js Exceptions", "Error", "Error(EINPROGRESS)", State = enum_EXCEPTION_STATE.EXCEPTION_STOP_ALL)]
+    [ProvideDebugException(AD7Engine.DebugEngineId, "Node.js Exceptions", "Error", "Error(EINTR)", State = enum_EXCEPTION_STATE.EXCEPTION_STOP_ALL)]
+    [ProvideDebugException(AD7Engine.DebugEngineId, "Node.js Exceptions", "Error", "Error(EINVAL)", State = enum_EXCEPTION_STATE.EXCEPTION_STOP_ALL)]
+    [ProvideDebugException(AD7Engine.DebugEngineId, "Node.js Exceptions", "Error", "Error(EIO)", State = enum_EXCEPTION_STATE.EXCEPTION_STOP_ALL)]
+    [ProvideDebugException(AD7Engine.DebugEngineId, "Node.js Exceptions", "Error", "Error(EISCONN)", State = enum_EXCEPTION_STATE.EXCEPTION_STOP_ALL)]
+    [ProvideDebugException(AD7Engine.DebugEngineId, "Node.js Exceptions", "Error", "Error(EISDIR)", State = enum_EXCEPTION_STATE.EXCEPTION_STOP_ALL)]
+    [ProvideDebugException(AD7Engine.DebugEngineId, "Node.js Exceptions", "Error", "Error(ELOOP)", State = enum_EXCEPTION_STATE.EXCEPTION_STOP_ALL)]
+    [ProvideDebugException(AD7Engine.DebugEngineId, "Node.js Exceptions", "Error", "Error(EMFILE)", State = enum_EXCEPTION_STATE.EXCEPTION_STOP_ALL)]
+    [ProvideDebugException(AD7Engine.DebugEngineId, "Node.js Exceptions", "Error", "Error(EMLINK)", State = enum_EXCEPTION_STATE.EXCEPTION_STOP_ALL)]
+    [ProvideDebugException(AD7Engine.DebugEngineId, "Node.js Exceptions", "Error", "Error(EMSGSIZE)", State = enum_EXCEPTION_STATE.EXCEPTION_STOP_ALL)]
+    [ProvideDebugException(AD7Engine.DebugEngineId, "Node.js Exceptions", "Error", "Error(ENAMETOOLONG)", State = enum_EXCEPTION_STATE.EXCEPTION_STOP_ALL)]
+    [ProvideDebugException(AD7Engine.DebugEngineId, "Node.js Exceptions", "Error", "Error(ENETDOWN)", State = enum_EXCEPTION_STATE.EXCEPTION_STOP_ALL)]
+    [ProvideDebugException(AD7Engine.DebugEngineId, "Node.js Exceptions", "Error", "Error(ENETRESET)", State = enum_EXCEPTION_STATE.EXCEPTION_STOP_ALL)]
+    [ProvideDebugException(AD7Engine.DebugEngineId, "Node.js Exceptions", "Error", "Error(ENETUNREACH)", State = enum_EXCEPTION_STATE.EXCEPTION_STOP_ALL)]
+    [ProvideDebugException(AD7Engine.DebugEngineId, "Node.js Exceptions", "Error", "Error(ENFILE)", State = enum_EXCEPTION_STATE.EXCEPTION_STOP_ALL)]
+    [ProvideDebugException(AD7Engine.DebugEngineId, "Node.js Exceptions", "Error", "Error(ENOBUFS)", State = enum_EXCEPTION_STATE.EXCEPTION_STOP_ALL)]
+    [ProvideDebugException(AD7Engine.DebugEngineId, "Node.js Exceptions", "Error", "Error(ENODATA)", State = enum_EXCEPTION_STATE.EXCEPTION_STOP_ALL)]
+    [ProvideDebugException(AD7Engine.DebugEngineId, "Node.js Exceptions", "Error", "Error(ENODEV)", State = enum_EXCEPTION_STATE.EXCEPTION_STOP_ALL)]
+    [ProvideDebugException(AD7Engine.DebugEngineId, "Node.js Exceptions", "Error", "Error(ENOENT)", State = enum_EXCEPTION_STATE.EXCEPTION_STOP_ALL)]
+    [ProvideDebugException(AD7Engine.DebugEngineId, "Node.js Exceptions", "Error", "Error(ENOEXEC)", State = enum_EXCEPTION_STATE.EXCEPTION_STOP_ALL)]
+    [ProvideDebugException(AD7Engine.DebugEngineId, "Node.js Exceptions", "Error", "Error(ENOLINK)", State = enum_EXCEPTION_STATE.EXCEPTION_STOP_ALL)]
+    [ProvideDebugException(AD7Engine.DebugEngineId, "Node.js Exceptions", "Error", "Error(ENOLCK)", State = enum_EXCEPTION_STATE.EXCEPTION_STOP_ALL)]
+    [ProvideDebugException(AD7Engine.DebugEngineId, "Node.js Exceptions", "Error", "Error(ENOMEM)", State = enum_EXCEPTION_STATE.EXCEPTION_STOP_ALL)]
+    [ProvideDebugException(AD7Engine.DebugEngineId, "Node.js Exceptions", "Error", "Error(ENOMSG)", State = enum_EXCEPTION_STATE.EXCEPTION_STOP_ALL)]
+    [ProvideDebugException(AD7Engine.DebugEngineId, "Node.js Exceptions", "Error", "Error(ENOPROTOOPT)", State = enum_EXCEPTION_STATE.EXCEPTION_STOP_ALL)]
+    [ProvideDebugException(AD7Engine.DebugEngineId, "Node.js Exceptions", "Error", "Error(ENOSPC)", State = enum_EXCEPTION_STATE.EXCEPTION_STOP_ALL)]
+    [ProvideDebugException(AD7Engine.DebugEngineId, "Node.js Exceptions", "Error", "Error(ENOSR)", State = enum_EXCEPTION_STATE.EXCEPTION_STOP_ALL)]
+    [ProvideDebugException(AD7Engine.DebugEngineId, "Node.js Exceptions", "Error", "Error(ENOSTR)", State = enum_EXCEPTION_STATE.EXCEPTION_STOP_ALL)]
+    [ProvideDebugException(AD7Engine.DebugEngineId, "Node.js Exceptions", "Error", "Error(ENOSYS)", State = enum_EXCEPTION_STATE.EXCEPTION_STOP_ALL)]
+    [ProvideDebugException(AD7Engine.DebugEngineId, "Node.js Exceptions", "Error", "Error(ENOTCONN)", State = enum_EXCEPTION_STATE.EXCEPTION_STOP_ALL)]
+    [ProvideDebugException(AD7Engine.DebugEngineId, "Node.js Exceptions", "Error", "Error(ENOTDIR)", State = enum_EXCEPTION_STATE.EXCEPTION_STOP_ALL)]
+    [ProvideDebugException(AD7Engine.DebugEngineId, "Node.js Exceptions", "Error", "Error(ENOTEMPTY)", State = enum_EXCEPTION_STATE.EXCEPTION_STOP_ALL)]
+    [ProvideDebugException(AD7Engine.DebugEngineId, "Node.js Exceptions", "Error", "Error(ENOTSOCK)", State = enum_EXCEPTION_STATE.EXCEPTION_STOP_ALL)]
+    [ProvideDebugException(AD7Engine.DebugEngineId, "Node.js Exceptions", "Error", "Error(ENOTSUP)", State = enum_EXCEPTION_STATE.EXCEPTION_STOP_ALL)]
+    [ProvideDebugException(AD7Engine.DebugEngineId, "Node.js Exceptions", "Error", "Error(ENOTTY)", State = enum_EXCEPTION_STATE.EXCEPTION_STOP_ALL)]
+    [ProvideDebugException(AD7Engine.DebugEngineId, "Node.js Exceptions", "Error", "Error(ENXIO)", State = enum_EXCEPTION_STATE.EXCEPTION_STOP_ALL)]
+    [ProvideDebugException(AD7Engine.DebugEngineId, "Node.js Exceptions", "Error", "Error(EOVERFLOW)", State = enum_EXCEPTION_STATE.EXCEPTION_STOP_ALL)]
+    [ProvideDebugException(AD7Engine.DebugEngineId, "Node.js Exceptions", "Error", "Error(EPERM)", State = enum_EXCEPTION_STATE.EXCEPTION_STOP_ALL)]
+    [ProvideDebugException(AD7Engine.DebugEngineId, "Node.js Exceptions", "Error", "Error(EPIPE)", State = enum_EXCEPTION_STATE.EXCEPTION_STOP_ALL)]
+    [ProvideDebugException(AD7Engine.DebugEngineId, "Node.js Exceptions", "Error", "Error(EPROTO)", State = enum_EXCEPTION_STATE.EXCEPTION_STOP_ALL)]
+    [ProvideDebugException(AD7Engine.DebugEngineId, "Node.js Exceptions", "Error", "Error(EPROTONOSUPPORT)", State = enum_EXCEPTION_STATE.EXCEPTION_STOP_ALL)]
+    [ProvideDebugException(AD7Engine.DebugEngineId, "Node.js Exceptions", "Error", "Error(EPROTOTYPE)", State = enum_EXCEPTION_STATE.EXCEPTION_STOP_ALL)]
+    [ProvideDebugException(AD7Engine.DebugEngineId, "Node.js Exceptions", "Error", "Error(ERANGE)", State = enum_EXCEPTION_STATE.EXCEPTION_STOP_ALL)]
+    [ProvideDebugException(AD7Engine.DebugEngineId, "Node.js Exceptions", "Error", "Error(EROFS)", State = enum_EXCEPTION_STATE.EXCEPTION_STOP_ALL)]
+    [ProvideDebugException(AD7Engine.DebugEngineId, "Node.js Exceptions", "Error", "Error(ESPIPE)", State = enum_EXCEPTION_STATE.EXCEPTION_STOP_ALL)]
+    [ProvideDebugException(AD7Engine.DebugEngineId, "Node.js Exceptions", "Error", "Error(ESRCH)", State = enum_EXCEPTION_STATE.EXCEPTION_STOP_ALL)]
+    [ProvideDebugException(AD7Engine.DebugEngineId, "Node.js Exceptions", "Error", "Error(ETIME)", State = enum_EXCEPTION_STATE.EXCEPTION_STOP_ALL)]
+    [ProvideDebugException(AD7Engine.DebugEngineId, "Node.js Exceptions", "Error", "Error(ETIMEDOUT)", State = enum_EXCEPTION_STATE.EXCEPTION_STOP_ALL)]
+    [ProvideDebugException(AD7Engine.DebugEngineId, "Node.js Exceptions", "Error", "Error(ETXTBSY)", State = enum_EXCEPTION_STATE.EXCEPTION_STOP_ALL)]
+    [ProvideDebugException(AD7Engine.DebugEngineId, "Node.js Exceptions", "Error", "Error(EXDEV)", State = enum_EXCEPTION_STATE.EXCEPTION_STOP_ALL)]
+    [ProvideDebugException(AD7Engine.DebugEngineId, "Node.js Exceptions", "Error", "Error(SIGHUP)", State = enum_EXCEPTION_STATE.EXCEPTION_STOP_ALL)]
+    [ProvideDebugException(AD7Engine.DebugEngineId, "Node.js Exceptions", "Error", "Error(SIGINT)", State = enum_EXCEPTION_STATE.EXCEPTION_STOP_ALL)]
+    [ProvideDebugException(AD7Engine.DebugEngineId, "Node.js Exceptions", "Error", "Error(SIGILL)", State = enum_EXCEPTION_STATE.EXCEPTION_STOP_ALL)]
+    [ProvideDebugException(AD7Engine.DebugEngineId, "Node.js Exceptions", "Error", "Error(SIGABRT)", State = enum_EXCEPTION_STATE.EXCEPTION_STOP_ALL)]
+    [ProvideDebugException(AD7Engine.DebugEngineId, "Node.js Exceptions", "Error", "Error(SIGFPE)", State = enum_EXCEPTION_STATE.EXCEPTION_STOP_ALL)]
+    [ProvideDebugException(AD7Engine.DebugEngineId, "Node.js Exceptions", "Error", "Error(SIGKILL)", State = enum_EXCEPTION_STATE.EXCEPTION_STOP_ALL)]
+    [ProvideDebugException(AD7Engine.DebugEngineId, "Node.js Exceptions", "Error", "Error(SIGSEGV)", State = enum_EXCEPTION_STATE.EXCEPTION_STOP_ALL)]
+    [ProvideDebugException(AD7Engine.DebugEngineId, "Node.js Exceptions", "Error", "Error(SIGTERM)", State = enum_EXCEPTION_STATE.EXCEPTION_STOP_ALL)]
+    [ProvideDebugException(AD7Engine.DebugEngineId, "Node.js Exceptions", "Error", "Error(SIGBREAK)", State = enum_EXCEPTION_STATE.EXCEPTION_STOP_ALL)]
+    [ProvideDebugException(AD7Engine.DebugEngineId, "Node.js Exceptions", "Error", "Error(SIGWINCH)", State = enum_EXCEPTION_STATE.EXCEPTION_STOP_ALL)]
+    [ProvideDebugException(AD7Engine.DebugEngineId, "Node.js Exceptions", "EvalError", State = enum_EXCEPTION_STATE.EXCEPTION_STOP_ALL)]
+    [ProvideDebugException(AD7Engine.DebugEngineId, "Node.js Exceptions", "RangeError", State = enum_EXCEPTION_STATE.EXCEPTION_STOP_ALL)]
+    [ProvideDebugException(AD7Engine.DebugEngineId, "Node.js Exceptions", "ReferenceError", State = enum_EXCEPTION_STATE.EXCEPTION_STOP_ALL)]
+    [ProvideDebugException(AD7Engine.DebugEngineId, "Node.js Exceptions", "SyntaxError", State = enum_EXCEPTION_STATE.EXCEPTION_NONE)]
+    [ProvideDebugException(AD7Engine.DebugEngineId, "Node.js Exceptions", "TypeError", State = enum_EXCEPTION_STATE.EXCEPTION_STOP_ALL)]
+    [ProvideDebugException(AD7Engine.DebugEngineId, "Node.js Exceptions", "URIError", State = enum_EXCEPTION_STATE.EXCEPTION_STOP_ALL)]
     [ProvideProjectFactory(typeof(NodejsProjectFactory), null, null, null, null, ".\\NullPath", LanguageVsTemplate = NodejsConstants.Nodejs)]   // outer flavor, no file extension
     [ProvideDebugPortSupplier("Node remote debugging", typeof(NodeRemoteDebugPortSupplier), NodeRemoteDebugPortSupplier.PortSupplierId)]
     [ProvideMenuResource(1000, 1)]                              // This attribute is needed to let the shell know that this package exposes some menus.
@@ -170,6 +173,8 @@ namespace Microsoft.NodejsTools {
         internal static NodejsPackage Instance;
         private string _surveyNewsUrl;
         private object _surveyNewsUrlLock = new object();
+        internal HashSet<ITextBuffer> ChangedBuffers = new HashSet<ITextBuffer>();
+        private LanguagePreferences _langPrefs;
 
         /// <summary>
         /// Default constructor of the package.
@@ -184,9 +189,29 @@ namespace Microsoft.NodejsTools {
             Instance = this;
         }
 
+        public override int FDoIdle(uint grfidlef) {
+            if (ChangedBuffers.Count > 0) {
+                foreach (var buffer in ChangedBuffers) {
+                    var fileNode = ((NodejsProjectionBuffer)buffer.Properties[typeof(NodejsProjectionBuffer)]).GetFileNode();
+                    if (fileNode != null) {
+                        fileNode.GenerateReferenceFile(buffer.CurrentSnapshot.GetText());
+                    }
+                }
+                ChangedBuffers.Clear();
+            }
+
+            return base.FDoIdle(grfidlef);
+        }
+
         public NodejsGeneralOptionsPage GeneralOptionsPage {
             get {
                 return (NodejsGeneralOptionsPage)GetDialogPage(typeof(NodejsGeneralOptionsPage));
+            }
+        }
+
+        public EnvDTE.DTE DTE {
+            get {
+                return (EnvDTE.DTE)GetService(typeof(EnvDTE.DTE));
             }
         }
 
@@ -213,8 +238,22 @@ namespace Microsoft.NodejsTools {
             RegisterCommands(new Command[] { 
                 new OpenReplWindowCommand(),
                 new OpenRemoteDebugProxyFolderCommand(),
+                new OpenRemoteDebugDocumentationCommand(),
                 new SurveyNewsCommand(),
+                new ImportWizardCommand()
             }, GuidList.guidNodeCmdSet);
+
+            IVsTextManager textMgr = (IVsTextManager)Instance.GetService(typeof(SVsTextManager));
+            var langPrefs = new LANGPREFERENCES[1];
+            langPrefs[0].guidLang = typeof(NodejsLanguageInfo).GUID;
+            ErrorHandler.ThrowOnFailure(textMgr.GetUserPreferences(null, null, langPrefs, null));
+            _langPrefs = new LanguagePreferences(langPrefs[0]);
+
+            Guid guid = typeof(IVsTextManagerEvents2).GUID;
+            IConnectionPoint connectionPoint;
+            ((IConnectionPointContainer)textMgr).FindConnectionPoint(ref guid, out connectionPoint);
+            uint cookie;
+            connectionPoint.Advise(_langPrefs, out cookie);
         }
 
         internal void OpenReplWindow() {
@@ -255,6 +294,13 @@ namespace Microsoft.NodejsTools {
         }
 
         private static string remoteDebugProxyFolder = null;
+
+        internal LanguagePreferences LangPrefs {
+            get {
+                return _langPrefs;
+            }
+        }
+
         public static string RemoteDebugProxyFolder {
             get {
                 // Lazily evaluated
@@ -262,15 +308,13 @@ namespace Microsoft.NodejsTools {
                     return remoteDebugProxyFolder;
                 }
 
+                const string ROOT_KEY = "Software\\Microsoft\\NodeJSTools\\" + AssemblyVersionInfo.VSVersion;
+
                 // Try HKCU
                 try {
-                    using (
-                        RegistryKey software = Registry.CurrentUser.OpenSubKey("Software"),
-                        microsoft = software.OpenSubKey("Microsoft"),
-                        node = microsoft.OpenSubKey("NodeJSTools")
-                    ) {
+                    using (RegistryKey node = Registry.CurrentUser.OpenSubKey(ROOT_KEY)) {
                         if (node != null) {
-                            remoteDebugProxyFolder = (string)node.GetValue("RemoteDebugProxyScript");
+                            remoteDebugProxyFolder = (string)node.GetValue("RemoteDebugProxyFolder");
                         }
                     }
                 } catch (Exception) {
@@ -279,13 +323,9 @@ namespace Microsoft.NodejsTools {
                 // Try HKLM
                 if (remoteDebugProxyFolder == null) {
                     try {
-                        using (
-                            RegistryKey software = Registry.LocalMachine.OpenSubKey("Software"),
-                            microsoft = software.OpenSubKey("Microsoft"),
-                            node = microsoft.OpenSubKey("NodeJSTools")
-                        ) {
+                        using (RegistryKey node = Registry.LocalMachine.OpenSubKey(ROOT_KEY)) {
                             if (node != null) {
-                                remoteDebugProxyFolder = (string)node.GetValue("RemoteDebugProxyScript");
+                                remoteDebugProxyFolder = (string)node.GetValue("RemoteDebugProxyFolder");
                             }
                         }
                     } catch (Exception) {
@@ -331,6 +371,114 @@ namespace Microsoft.NodejsTools {
                     Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location),
                     "nodejsref.js"
                 );
+            }
+        }
+
+        public string BrowseForFileOpen(IntPtr owner, string filter, string initialPath = null) {
+            if (string.IsNullOrEmpty(initialPath)) {
+                initialPath = Environment.GetFolderPath(Environment.SpecialFolder.Personal) + Path.DirectorySeparatorChar;
+            }
+
+            IVsUIShell uiShell = GetService(typeof(SVsUIShell)) as IVsUIShell;
+            if (null == uiShell) {
+                using (var sfd = new System.Windows.Forms.OpenFileDialog()) {
+                    sfd.AutoUpgradeEnabled = true;
+                    sfd.Filter = filter;
+                    sfd.FileName = Path.GetFileName(initialPath);
+                    sfd.InitialDirectory = Path.GetDirectoryName(initialPath);
+                    DialogResult result;
+                    if (owner == IntPtr.Zero) {
+                        result = sfd.ShowDialog();
+                    } else {
+                        result = sfd.ShowDialog(NativeWindow.FromHandle(owner));
+                    }
+                    if (result == DialogResult.OK) {
+                        return sfd.FileName;
+                    } else {
+                        return null;
+                    }
+                }
+            }
+
+            if (owner == IntPtr.Zero) {
+                ErrorHandler.ThrowOnFailure(uiShell.GetDialogOwnerHwnd(out owner));
+            }
+
+            VSOPENFILENAMEW[] openInfo = new VSOPENFILENAMEW[1];
+            openInfo[0].lStructSize = (uint)Marshal.SizeOf(typeof(VSOPENFILENAMEW));
+            openInfo[0].pwzFilter = filter.Replace('|', '\0') + "\0";
+            openInfo[0].hwndOwner = owner;
+            openInfo[0].nMaxFileName = 260;
+            var pFileName = Marshal.AllocCoTaskMem(520);
+            openInfo[0].pwzFileName = pFileName;
+            openInfo[0].pwzInitialDir = Path.GetDirectoryName(initialPath);
+            var nameArray = (Path.GetFileName(initialPath) + "\0").ToCharArray();
+            Marshal.Copy(nameArray, 0, pFileName, nameArray.Length);
+            try {
+                int hr = uiShell.GetOpenFileNameViaDlg(openInfo);
+                if (hr == VSConstants.OLE_E_PROMPTSAVECANCELLED) {
+                    return null;
+                }
+                ErrorHandler.ThrowOnFailure(hr);
+                return Marshal.PtrToStringAuto(openInfo[0].pwzFileName);
+            } finally {
+                if (pFileName != IntPtr.Zero) {
+                    Marshal.FreeCoTaskMem(pFileName);
+                }
+            }
+        }
+
+        public string BrowseForFileSave(IntPtr owner, string filter, string initialPath = null) {
+            if (string.IsNullOrEmpty(initialPath)) {
+                initialPath = Environment.GetFolderPath(Environment.SpecialFolder.Personal) + Path.DirectorySeparatorChar;
+            }
+
+            IVsUIShell uiShell = GetService(typeof(SVsUIShell)) as IVsUIShell;
+            if (null == uiShell) {
+                using (var sfd = new System.Windows.Forms.SaveFileDialog()) {
+                    sfd.AutoUpgradeEnabled = true;
+                    sfd.Filter = filter;
+                    sfd.FileName = Path.GetFileName(initialPath);
+                    sfd.InitialDirectory = Path.GetDirectoryName(initialPath);
+                    DialogResult result;
+                    if (owner == IntPtr.Zero) {
+                        result = sfd.ShowDialog();
+                    } else {
+                        result = sfd.ShowDialog(NativeWindow.FromHandle(owner));
+                    }
+                    if (result == DialogResult.OK) {
+                        return sfd.FileName;
+                    } else {
+                        return null;
+                    }
+                }
+            }
+
+            if (owner == IntPtr.Zero) {
+                ErrorHandler.ThrowOnFailure(uiShell.GetDialogOwnerHwnd(out owner));
+            }
+
+            VSSAVEFILENAMEW[] saveInfo = new VSSAVEFILENAMEW[1];
+            saveInfo[0].lStructSize = (uint)Marshal.SizeOf(typeof(VSSAVEFILENAMEW));
+            saveInfo[0].pwzFilter = filter.Replace('|', '\0') + "\0";
+            saveInfo[0].hwndOwner = owner;
+            saveInfo[0].nMaxFileName = 260;
+            var pFileName = Marshal.AllocCoTaskMem(520);
+            saveInfo[0].pwzFileName = pFileName;
+            saveInfo[0].pwzInitialDir = Path.GetDirectoryName(initialPath);
+            var nameArray = (Path.GetFileName(initialPath) + "\0").ToCharArray();
+            Marshal.Copy(nameArray, 0, pFileName, nameArray.Length);
+            try {
+                int hr = uiShell.GetSaveFileNameViaDlg(saveInfo);
+                if (hr == VSConstants.OLE_E_PROMPTSAVECANCELLED) {
+                    return null;
+                }
+                ErrorHandler.ThrowOnFailure(hr);
+                return Marshal.PtrToStringAuto(saveInfo[0].pwzFileName);
+            } finally {
+                if (pFileName != IntPtr.Zero) {
+                    Marshal.FreeCoTaskMem(pFileName);
+                }
             }
         }
 

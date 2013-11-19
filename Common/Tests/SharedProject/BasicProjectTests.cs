@@ -1122,5 +1122,39 @@ namespace Microsoft.VisualStudioTools.SharedProjectTests {
             }
         }
 #endif
+        [TestMethod, Priority(0), TestCategory("Core")]
+        [HostType("TC Dynamic"), DynamicHostType(typeof(VsIdeHostAdapter))]
+        public void OpenCommandHere() {
+            var existing = System.Diagnostics.Process.GetProcesses().Select(x => x.Id).ToSet();
+
+            foreach (var projectType in ProjectTypes) {
+                var def = new ProjectDefinition(
+                    "HelloWorld",
+                    projectType,
+                    Compile("server"),
+                    Folder("Folder", isExcluded: true)
+                );
+
+                using (var solution = def.Generate().ToVs()) {
+                    var folder = solution.WaitForItem("HelloWorld", "Folder");
+                    AutomationWrapper.Select(folder);
+                    VsIdeTestHostContext.Dte.ExecuteCommand("ProjectandSolutionContextMenus.Project.OpenCommandPromptHere");
+
+                    var after = System.Diagnostics.Process.GetProcesses();
+                    var newProcs = after.Where(x => !existing.Contains(x.Id) && x.ProcessName == "cmd");
+                    Assert.AreEqual(1, newProcs.Count(), string.Join(";", after.Select(x => x.ProcessName)));                    
+                    newProcs.First().Kill();
+
+                    var project = solution.WaitForItem("HelloWorld");
+                    AutomationWrapper.Select(folder);
+                    VsIdeTestHostContext.Dte.ExecuteCommand("ProjectandSolutionContextMenus.Project.OpenCommandPromptHere");
+
+                    after = System.Diagnostics.Process.GetProcesses();
+                    newProcs = after.Where(x => !existing.Contains(x.Id) && x.ProcessName == "cmd");
+                    Assert.AreEqual(1, newProcs.Count(), string.Join(";", after.Select(x => x.ProcessName)));
+                    newProcs.First().Kill();
+                }
+            }
+        }
     }
 }

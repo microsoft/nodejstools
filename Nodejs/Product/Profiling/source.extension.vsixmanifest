@@ -1,9 +1,9 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <Vsix xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xsd="http://www.w3.org/2001/XMLSchema" Version="1.0.0" xmlns="http://schemas.microsoft.com/developer/vsx-schema/2010">
   <Identifier Id="15507A01-D37D-4B20-BE11-E96472C98883">
-    <Name>Node.js Tools for Visual Studio, Profiling Support</Name>
+    <Name>Node.js Tools - Profiling</Name>
     <Author>Microsoft</Author>
-    <Version>0.5</Version>
+    <Version>1.0</Version>
     <Description xml:space="preserve">Provides support for profiling Node.js projects</Description>
     <Locale>1033</Locale>
     <InstalledByMsi>true</InstalledByMsi>
@@ -22,7 +22,7 @@
     <Reference Id="Microsoft.VisualStudio.MPF" MinVersion="10.0">
       <Name>Visual Studio MPF</Name>
     </Reference>
-    <Reference Id="4219f2a8-fbf9-4659-a222-b7580a60eebb" MinVersion="0.5" MaxVersion="0.5">
+    <Reference Id="4219f2a8-fbf9-4659-a222-b7580a60eebb" MinVersion="1.0" MaxVersion="1.0">
       <Name>Node.js Tools for Visual Studio</Name>
     </Reference>
   </References>

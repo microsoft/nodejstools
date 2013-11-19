@@ -490,7 +490,7 @@ require = function () {
         "module": null,
         "addons": null,
         "util": null,
-        "Events": null,
+        "events": null,
         "domain": null,
         "buffer": null,
         "stream": null,
@@ -664,7 +664,7 @@ require = function () {
                     /// </signature>
                 }
             };
-            case "Events": return new     function Events() {
+            case "events": return new     function events() {
                 /// <summary><p>Many objects in Node emit events: a <code>net.Server</code> emits an event each time a peer connects to it, a <code>fs.readStream</code> emits an event when the file is opened. All objects which emit events are instances of <code>events.EventEmitter</code>. You can access this module by doing: <code>require(&quot;events&quot;);</code>  </p> <p>Typically, event names are represented by a camel-cased string, however, there aren&#39;t any strict restrictions on that, as any string will be accepted.  </p> <p>Functions can then be attached to objects, to be executed when an event is emitted. These functions are called <em>listeners</em>. Inside a listener function, <code>this</code> refers to the <code>EventEmitter</code> that the listener was attached to.   </p> </summary>
                 this.EventEmitter = function() {
                     this.addListener = function(event, listener) {

@@ -26,6 +26,7 @@ namespace Microsoft.NodejsTools
         public const string guidNodeEditorFactoryStringPromptEncoding = "C8576E92-EFB6-4414-8F63-C84D474A539E";
         public const string guidNodejsLanguageInfo = "ABD5E8A5-5A35-4BE9-BCAF-E10C1212CB40";
         public const string guidNodejsDebugLanguageStr = "{65791609-BA29-49CF-A214-DBFF8AEC3BC2}";
+        public const string guidScriptDebugLanguageStr = "{F7FA31DA-C32A-11D0-B442-00A0244A1DD2}";
 
         public static readonly Guid guidNodeCmdSet = new Guid(guidNodeCmdSetString);
         public static readonly Guid guidNodeEditorFactory = new Guid(guidNodeEditorFactoryString);
@@ -36,5 +37,6 @@ namespace Microsoft.NodejsTools
         public static readonly Guid guidWebPackageGuid = new Guid("d9a342d1-a429-4059-808a-e55ee6351f7f");
         public static readonly Guid guidWebAppCmdId = new Guid("CB26E292-901A-419c-B79D-49BD45C43929");
         public static readonly Guid guidNodejsDebugLanguage = new Guid(guidNodejsDebugLanguageStr);
+        public static readonly Guid guidScriptDebugLanguage = new Guid(guidScriptDebugLanguageStr);
     };
 }

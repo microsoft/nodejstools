@@ -12,8 +12,8 @@
       <Directory Id="EXTENSION_INSTALLPATH">
           <Directory Id="_0D6D364235164B24AC58E38A08968129" Name="Extensions">
             <Directory Id="_8C5B593518EE4149B9ADAF76B704E2A6" Name="Microsoft">
-              <Directory Id="_3453B56831F34B48935E1DD6A1B44AC1" Name="Node.js Tools for Visual Studio, Profiling Support">
-                <Directory Id="INSTALLLOCATION" Name="0.5">
+              <Directory Id="_3453B56831F34B48935E1DD6A1B44AC1" Name="Node.js Tools - Profiling">
+                <Directory Id="INSTALLLOCATION" Name="1.0">
                 </Directory>
               </Directory>
           </Directory>

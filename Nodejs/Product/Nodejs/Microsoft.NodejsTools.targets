@@ -27,6 +27,22 @@
 
   <Target Name="Build">
     <Message Text="Content=@(Content->'%(RelativeDir)%(Filename)%(Extension)')"/>
+    <!-- Target used for generating a package which can be uploaded to web server -->
+    <ItemGroup>
+      <_FoundWebConfig Include="@(Content)" Condition=" '%(Content.Filename)%(Content.Extension)' == 'web.config' " />
+      <_FoundWebConfig Include="@(Include)" Condition=" '%(Include.Filename)%(Include.Extension)' == 'web.config' " />
+      <_FoundWebCloudConfig Include="@(Content)" Condition=" '%(Content.Filename)%(Content.Extension)' == 'web.cloud.config' " />
+      <_FoundWebCloudConfig Include="@(Include)" Condition=" '%(Include.Filename)%(Include.Extension)' == 'web.cloud.config' " />
+    </ItemGroup>
+    <PropertyGroup>
+      <!-- Turn the item into a property -->
+      <HasWebCloudConfig Condition="'@(_FoundWebCloudConfig)' != ''">true</HasWebCloudConfig>
+
+      <!-- Property which specifies whether or not we're deploying Web.cloud.config instead of web.config -->
+      <DeployingCloudConfig Condition="'$(HasWebCloudConfig)' == 'true' and '$(_NodejsDeploymentMethod)' == 'WebDeploy'">true</DeployingCloudConfig>
+      <DeployingCloudConfig Condition="'$(DeployingCloudConfig)' == ''">false</DeployingCloudConfig>
+    </PropertyGroup>
+
     <Copy
         SourceFiles="@(Compile)"
         DestinationFiles="@(Compile->'$(IntermediateOutputPath)%(RelativeDir)%(Filename)%(Extension)')"
@@ -34,7 +50,7 @@
       <!-- <Output TaskParameter="DestinationFiles" ItemName="FilesCopiedToIntermediate"/> -->
     </Copy>
     <Copy SourceFiles="@(Include)"
-          DestinationFiles="@(Include->'$(IntermediateOutputPath)%(RelativeDir)%(Filename)%(Extension)')"
+          DestinationFiles="@(Include->'$(IntermediateOutputPath)%(RelativeDir)%(Filename)%(Extension)')"          
           SkipUnchangedFiles="true">
       <!-- <Output TaskParameter="DestinationFiles" ItemName="FilesCopiedToIntermediate"/> -->
     </Copy>
@@ -52,7 +68,13 @@
           SkipUnchangedFiles="true">
       <Output TaskParameter="DestinationFiles" ItemName="FilesCopiedToIntermediate"/>
     </Copy>
+    <!-- If we have a web.cloud.config we want to deploy that as web.config instead, so we won't include
+         web.config or web.cloud.config.  Instead we will copy web.cloud.config to the intermediate directory 
+         as web.config and include that.
+      -->
+    <Copy SourceFiles="@(_FoundWebCloudConfig)" DestinationFiles="$(IntermediateOutputPath)\web.config" Condition="$(DeployingCloudConfig)" SkipUnchangedFiles="true"/>
   </Target>
+
 
   <ItemGroup>
     <NodejsAzureDeploymentFile Include="$(NodejsSupportPath)Microsoft.NodejsTools.WebRole.dll"></NodejsAzureDeploymentFile>
@@ -84,29 +106,34 @@
   
   <Import Project="$(VSToolsPath)\WebApplications\Microsoft.WebApplication.targets" Condition="'$(VSToolsPath)' != ''" />
 
+  <!--- Detects if we're deploying via web deploy, and sets _NodejsDeploymentMethod appropriately.
+        Otherwise we'll assume we're deploying to cloud service. -->
+  <Target Name="_HostDeployDetectTarget" BeforeTargets="GenerateGlobalPublishSetting">
+    <Message Text="Running _HostDeployDetectTarget"/>
+    <PropertyGroup>
+      <!-- We are deploying via web deploy to a shared host -->
+      <_NodejsDeploymentMethod>WebDeploy</_NodejsDeploymentMethod>
+    </PropertyGroup>
+  </Target>
+
   <Target
     Name="PipelineTransformPhase"
     DependsOnTargets="Build"
     Returns="@(TransformedFilenames)"
     >
-    <!-- Target used for generating a package which can be uploaded to web server -->
-    <ItemGroup>
-      <_FoundWebConfig Include="@(Content)" Condition=" '%(Content.Filename)%(Content.Extension)' == 'web.config' " />
-      <_FoundWebConfig Include="@(Include)" Condition=" '%(Content.Filename)%(Content.Extension)' == 'web.config' " />
-    </ItemGroup>
 
     <Error 
       Text="web.config not found in project, to create a project to deploy to Windows Azure you must create a Windows Azure Node.js project." 
       Condition="'@(_FoundWebConfig)' == ''"/>
-    <ItemGroup>
-      <ContentFiles Include="@(Content)"></ContentFiles>
-      <ContentFiles Include="@(Compile)"></ContentFiles>
-      <ContentFiles Include="@(Include)"></ContentFiles>
-      <ContentFiles Include="@(NodeModulesContent)"></ContentFiles>
-      <Content Include="@(NodeModulesContent)"/>
 
+    <ItemGroup>
+      <ContentFiles Include="@(Content)" />
+      <ContentFiles Include="@(Include)" />
+      <ContentFiles Include="@(Compile)" />
+      <ContentFiles Include="@(NodeModulesContent)" />
+      <ContentFiles Remove="web.config;web.cloud.config" Condition="$(DeployingCloudConfig)"/>
+      <Content Include="@(NodeModulesContent)"/>
       <GeneratedFiles Include="@(NodejsAzureDeploymentFile)" />
-      
       <TransformedFilenames Include="@(ContentFiles->'%(FullPath)')">
         <DestinationRelativePath>%(RelativeDir)%(Filename)%(Extension)</DestinationRelativePath>
         <Exclude>false</Exclude>
@@ -115,6 +142,14 @@
         <ProjectFileType>Default</ProjectFileType>
       </TransformedFilenames>
 
+      <TransformedFilenames Include="$(IntermediateOutputPath)web.config" Condition="$(DeployingCloudConfig)">
+        <DestinationRelativePath>web.config</DestinationRelativePath>
+        <Exclude>false</Exclude>
+        <FromTarget>Unknown</FromTarget>
+        <Category>Run</Category>
+        <ProjectFileType>Default</ProjectFileType>
+      </TransformedFilenames>
+    
       <TransformedFilenames Include="@(GeneratedFiles)">
         <DestinationRelativePath>bin\%(Filename)%(Extension)</DestinationRelativePath>
         <Exclude>false</Exclude>
@@ -177,4 +212,27 @@
     <!-- Node.js compile files are actually content -->
     <Content Include="@(Compile)" />
   </ItemGroup>
+  
+  <!-- Override content collection to look in the intermediate directory where we've copied
+      all of our items.  This enables us to pick the correct web.config when doing a deployment.
+    -->
+  <Target Name="CollectFilesFromContent"
+        DependsOnTargets="$(CollectFilesFromContentDependsOn)"
+        Condition="'@(Content)'!=''">
+    <ItemGroup>
+      <FilesForPackagingFromProject Include="@(Content->'$(IntermediateOutputPath)%(Identity)')" Condition="'%(Content.Link)'==''">
+        <DestinationRelativePath>%(Content.Identity)</DestinationRelativePath>
+        <FromTarget>CollectFilesFromContent</FromTarget>
+        <Category>Run</Category>
+      </FilesForPackagingFromProject>
+      <FilesForPackagingFromProject Include="@(Content->'$(IntermediateOutputPath)%(Identity)')" Condition="'%(Content.Link)'!='' And $(EnableCollectLinkFilesInProject)">
+        <DestinationRelativePath>%(Content.Link)</DestinationRelativePath>
+        <FromTarget>CollectFilesFromContent</FromTarget>
+        <Category>Run</Category>
+        <Exclude>$(ExcludeLinkFilesInProject)</Exclude>
+        <ProjectFileType>Link</ProjectFileType>
+      </FilesForPackagingFromProject>
+    </ItemGroup>
+    <CallTarget Targets="$(OnAfterCollectFilesFromContent)" RunEachTargetSeparately="false" />
+  </Target>
 </Project>
