@@ -460,6 +460,12 @@ namespace NodejsTests.Debugger {
                 filename = DebuggerTestPath + filename;
             }
 
+            // Since Alpha does not support break on unhandled, and the commonly used Express module has handled SyntaxError exceptions,
+            // for alpha we have SyntaxErrors set to BreakNever by default.  Here we set it to BreakAlways so unit tests can run
+            // assuming BreakAlways is the default.            
+            // TODO: Remove once exception treatment is updated for just my code support when it is added after Alpha
+            process.SetExceptionTreatment(null, CollectExceptionTreatments("SyntaxError", ExceptionHitTreatment.BreakAlways));
+
             if (defaultExceptionTreatment != null || exceptionTreatments != null) {
                 process.SetExceptionTreatment(defaultExceptionTreatment, exceptionTreatments);
             }
