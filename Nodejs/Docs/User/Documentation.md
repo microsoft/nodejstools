@@ -1,12 +1,10 @@
 Node.js Tools for Visual Studio Documentation
 =============================================
 
-This being Alpha and we not having writers, the documentation is a bit sparse. We'll improve our docs for Beta. Feel free to edit/add useful info you come across!
-
 Getting Started
 ---------------
 
-[wiki:"NTVS Installation" How to Install Node.js Tools for Visual Studio]
+[wiki:"NTVS Installation" Installation]
 
 Overview video: [http://vimeo.com/71449031](http://vimeo.com/71449031)  pwd: toomanynodes
 
