@@ -536,7 +536,7 @@
     <EmbeddedResource Include="Resources\DependencyDev_32.png" />
     <EmbeddedResource Include="Resources\DependencyOptional_32.png" />
     <EmbeddedResource Include="Resources\Dependency_32.png" />
-	<ZipProject Include="ProjectTemplates\AzureExpressApp\app.js" />
+    <ZipProject Include="ProjectTemplates\AzureExpressApp\app.js" />
     <ZipProject Include="ProjectTemplates\AzureExpressApp\index.js" />
     <ZipProject Include="ProjectTemplates\AzureExpressApp\user.js" />
     <ZipProject Include="ProjectTemplates\AddWebSiteExpressApp\app.js" />
@@ -545,6 +545,7 @@
     <ZipProject Include="ProjectTemplates\AddWebSiteAzureExpressApp\app.js" />
     <ZipProject Include="ProjectTemplates\AddWebSiteAzureExpressApp\index.js" />
     <ZipProject Include="ProjectTemplates\AddWebSiteAzureExpressApp\user.js" />
+    <ZipProject Include="ProjectTemplates\AddWebSiteAzureNodejsApp\server.js" />
     <Content Include="VSTemplateStore.pkgdef">
       <IncludeInVSIX>true</IncludeInVSIX>
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
