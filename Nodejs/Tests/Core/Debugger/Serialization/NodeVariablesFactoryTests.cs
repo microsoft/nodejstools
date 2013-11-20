@@ -453,7 +453,7 @@ namespace NodejsTests.Debugger.Serialization {
             // Arrange
             var variable = new MockNodeVariable {
                 Id = 19,
-                Parent = new NodeEvaluationResult(0, null, null, "Array", "v_array", "v_array", NodeExpressionType.Expandable, null),
+                Parent = new NodeEvaluationResult(0, null, null, "Object", "v_array", "v_array", NodeExpressionType.Expandable, null),
                 StackFrame = null,
                 Name = "0",
                 TypeName = "number",
@@ -469,9 +469,9 @@ namespace NodejsTests.Debugger.Serialization {
             // Assert
             Assert.IsNotNull(result);
             Assert.IsNull(result.ExceptionText);
-            Assert.AreEqual(variable.Name, result.Expression);
+            Assert.AreEqual(string.Format("[{0}]", variable.Name), result.Expression);
             Assert.IsNull(result.Frame);
-            Assert.AreEqual(string.Format(@"{0}[""{1}""]", variable.Parent.Expression, variable.Name), result.FullName);
+            Assert.AreEqual(string.Format(@"{0}[{1}]", variable.Parent.Expression, variable.Name), result.FullName);
             Assert.AreEqual(variable.Id, result.Handle);
             Assert.AreEqual(string.Format("0x{0:x}", int.Parse(variable.Value)), result.HexValue);
             Assert.AreEqual(variable.Value, result.StringValue);
@@ -503,6 +503,37 @@ namespace NodejsTests.Debugger.Serialization {
             Assert.AreEqual(variable.Name, result.Expression);
             Assert.IsNull(result.Frame);
             Assert.AreEqual(string.Format(@"{0}.{1}", variable.Parent.Expression, variable.Name), result.FullName);
+            Assert.AreEqual(variable.Id, result.Handle);
+            Assert.AreEqual(string.Format("0x{0:x}", int.Parse(variable.Value)), result.HexValue);
+            Assert.AreEqual(variable.Value, result.StringValue);
+            Assert.AreEqual(result.Type, NodeExpressionType.None);
+            Assert.AreEqual(NodeVariableType.Number, result.TypeName);
+        }
+        
+        [TestMethod, Priority(0)]
+        public void CreateObjectElementWithInvalidIdentifierEvaluationResult() {
+            // Arrange
+            var variable = new MockNodeVariable {
+                Id = 19,
+                Parent = new NodeEvaluationResult(0, null, null, "Object", "v_object", "v_object", NodeExpressionType.Expandable, null),
+                StackFrame = null,
+                Name = "123name",
+                TypeName = "number",
+                Value = "0",
+                Class = "Number",
+                Text = null
+            };
+            var factory = new NodeEvaluationResultFactory();
+
+            // Act
+            NodeEvaluationResult result = factory.Create(variable);
+
+            // Assert
+            Assert.IsNotNull(result);
+            Assert.IsNull(result.ExceptionText);
+            Assert.AreEqual(variable.Name, result.Expression);
+            Assert.IsNull(result.Frame);
+            Assert.AreEqual(string.Format(@"{0}[""{1}""]", variable.Parent.Expression, variable.Name), result.FullName);
             Assert.AreEqual(variable.Id, result.Handle);
             Assert.AreEqual(string.Format("0x{0:x}", int.Parse(variable.Value)), result.HexValue);
             Assert.AreEqual(variable.Value, result.StringValue);
