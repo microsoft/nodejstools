@@ -111,7 +111,7 @@ UpgradeLog*.XML
 
 Binaries/
 VSPackage.xform.resx
-/Nodejs/Product/Nodejs/ProjectTemplates/WebAzureExpressApp/WebAzureExpressApp.vstemplate
-/Nodejs/Product/Nodejs/ProjectTemplates/WebAzureNodejsApp/WebAzureNodejsApp.vstemplate
-/Nodejs/Product/Nodejs/ProjectTemplates/WebExpressApp/WebExpressApp.vstemplate
-/Nodejs/Product/Nodejs/ProjectTemplates/WebNodejsApp/WebNodejsApp.vstemplate
+/Nodejs/Product/Nodejs/ProjectTemplates/AddWebSiteAzureExpressApp/AddWebSiteAzureExpressApp.vstemplate
+/Nodejs/Product/Nodejs/ProjectTemplates/AddWebSiteAzureNodejsApp/AddWebSiteAzureNodejsApp.vstemplate
+/Nodejs/Product/Nodejs/ProjectTemplates/AddWebSiteExpressApp/AddWebSiteExpressApp.vstemplate
+/Nodejs/Product/Nodejs/ProjectTemplates/AddWebSiteNodejsWebApp/AddWebSiteNodejsWebApp.vstemplate
