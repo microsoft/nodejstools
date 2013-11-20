@@ -12,9 +12,8 @@
  *
  * ***************************************************************************/
 
-namespace Microsoft.NodejsTools.Npm.SPI
-{
-    internal class NpmInstallCommand : NpmCommand{
+namespace Microsoft.NodejsTools.Npm.SPI {
+    internal class NpmInstallCommand : NpmCommand {
         public NpmInstallCommand(
             string fullPathToRootPackageDirectory,
             string packageName,
@@ -23,8 +22,7 @@ namespace Microsoft.NodejsTools.Npm.SPI
             bool global = false,
             string pathToNpm = null,
             bool useFallbackIfNpmNotFound = true)
-            : base(fullPathToRootPackageDirectory, pathToNpm, useFallbackIfNpmNotFound)
-        {
+            : base(fullPathToRootPackageDirectory, pathToNpm, useFallbackIfNpmNotFound) {
             Arguments = string.Format(
                 "install {0} -{1}",
                 string.IsNullOrEmpty(versionRange)

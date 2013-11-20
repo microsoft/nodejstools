@@ -16,9 +16,9 @@ using System.Diagnostics;
 using Microsoft.NodejsTools.Npm;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 
-namespace NpmTests{
+namespace NpmTests {
     [TestClass]
-    public class ModuleHierarchyTests : AbstractFilesystemPackageJsonTests{
+    public class ModuleHierarchyTests : AbstractFilesystemPackageJsonTests {
         protected const string PkgSingleDependency = @"{
     ""name"": ""TestPkg"",
     ""version"": ""0.1.0"",
@@ -36,7 +36,7 @@ namespace NpmTests{
 }";
 
         [TestMethod]
-        public void TestReadRootPackageNoDependencies(){
+        public void TestReadRootPackageNoDependencies() {
             var rootDir = CreateRootPackage(PkgSimple);
             var pkg = RootPackageFactory.Create(rootDir);
             Assert.IsNotNull(pkg, "Root package should not be null.");
@@ -50,14 +50,14 @@ namespace NpmTests{
             Assert.AreEqual(0, modules.Count, "Module count mismatch.");
         }
 
-        private static void RunNpmInstall(string rootDir){
-            var p = new Process{StartInfo = new ProcessStartInfo("npm", "install"){WorkingDirectory = rootDir}};
+        private static void RunNpmInstall(string rootDir) {
+            var p = new Process { StartInfo = new ProcessStartInfo("npm", "install") { WorkingDirectory = rootDir } };
             p.Start();
             p.WaitForExit();
         }
 
         [TestMethod]
-        public void TestReadRootPackageOneDependency(){
+        public void TestReadRootPackageOneDependency() {
             var rootDir = CreateRootPackage(PkgSingleDependency);
             RunNpmInstall(rootDir);
 
@@ -100,7 +100,7 @@ namespace NpmTests{
         }
 
         [TestMethod]
-        public void TestReadRootPackageMissingDependency(){
+        public void TestReadRootPackageMissingDependency() {
             var rootDir = CreateRootPackage(PkgSingleDependency);
 
             var pkg = RootPackageFactory.Create(rootDir);
@@ -142,7 +142,7 @@ namespace NpmTests{
         }
 
         [TestMethod]
-        public void TestReadRootDependencyRecursive(){
+        public void TestReadRootDependencyRecursive() {
             var rootDir = CreateRootPackage(PkgSingleRecursiveDependency);
             RunNpmInstall(rootDir);
 
@@ -187,7 +187,7 @@ namespace NpmTests{
 
             modules = module.Modules;
             Assert.AreEqual(module.PackageJson.Dependencies.Count, modules.Count, "Sub-module count mismatch.");
-            foreach (var name in expectedModules){
+            foreach (var name in expectedModules) {
                 var current = modules[name];
                 Assert.IsNotNull(current, "Module should not be null when retrieved by name.");
 

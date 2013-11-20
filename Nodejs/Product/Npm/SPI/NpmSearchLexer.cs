@@ -1,4 +1,18 @@
-﻿using System;
+﻿/* ****************************************************************************
+ *
+ * Copyright (c) Microsoft Corporation. 
+ *
+ * This source code is subject to terms and conditions of the Apache License, Version 2.0. A 
+ * copy of the license can be found in the License.html file at the root of this distribution. If 
+ * you cannot locate the Apache License, Version 2.0, please send an email to 
+ * vspython@microsoft.com. By using this source code in any fashion, you are agreeing to be bound 
+ * by the terms of the Apache License, Version 2.0.
+ *
+ * You must not remove this notice, or any other, from this software.
+ *
+ * ***************************************************************************/
+
+using System;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.IO;
@@ -6,75 +20,65 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace Microsoft.NodejsTools.Npm.SPI
-{
-    class NpmSearchLexer : INpmSearchLexer
-    {
+namespace Microsoft.NodejsTools.Npm.SPI {
+    class NpmSearchLexer : INpmSearchLexer {
 
-        private void DiscardFirstLine(TextReader reader){
+        private void DiscardFirstLine(TextReader reader) {
             int ch;
-            do{
+            do {
                 ch = reader.Read();
             } while (ch >= 0 && ch != '\n');
         }
 
-        public void Lex(TextReader reader){
+        public void Lex(TextReader reader) {
             DiscardFirstLine(reader);
 
             var buff = new StringBuilder();
             var flags = TokenFlags.None;
             var leadingEqualsCount = 0;
             int raw;
-            while ((raw = reader.Read()) >= 0){
-                var ch = (char) raw;
-                if (buff.Length > 0 && (ch =='\n'
+            while ((raw = reader.Read()) >= 0) {
+                var ch = (char)raw;
+                if (buff.Length > 0 && (ch == '\n'
                                         ||
                                         char.IsWhiteSpace(ch) && ((flags & TokenFlags.Whitespace) == 0 || (flags & TokenFlags.Newline) == TokenFlags.Newline)
                                         ||
-                                        !char.IsWhiteSpace(ch) && ((flags & TokenFlags.Whitespace) == TokenFlags.Whitespace || (flags & TokenFlags.Newline) == TokenFlags.Newline)))
-                {
+                                        !char.IsWhiteSpace(ch) && ((flags & TokenFlags.Whitespace) == TokenFlags.Whitespace || (flags & TokenFlags.Newline) == TokenFlags.Newline))) {
                     OnToken(buff.ToString(), flags, leadingEqualsCount);
                     buff.Length = 0;
                     flags = TokenFlags.None;
                     leadingEqualsCount = 0;
                 }
 
-                if (ch == '='){
-                    if (buff.Length == leadingEqualsCount){
+                if (ch == '=') {
+                    if (buff.Length == leadingEqualsCount) {
                         ++leadingEqualsCount;
                         flags |= TokenFlags.LeadingEquals;
                     }
-                }
-                else if (char.IsDigit(ch)){
+                } else if (char.IsDigit(ch)) {
                     flags |= TokenFlags.Digits;
-                }
-                else if (char.IsLetter(ch)){
+                } else if (char.IsLetter(ch)) {
                     flags |= TokenFlags.Letters;
-                }
-                else if (char.IsWhiteSpace(ch)){
+                } else if (char.IsWhiteSpace(ch)) {
                     flags |= TokenFlags.Whitespace;
-                }
-                else if (ch == '.'){
+                } else if (ch == '.') {
                     flags |= TokenFlags.Dots;
-                }
-                else if (ch == ':'){
+                } else if (ch == ':') {
                     flags |= TokenFlags.Colons;
-                }
-                else if (ch == '-'){
+                } else if (ch == '-') {
                     flags |= TokenFlags.Dashes;
-                }
-                else if (ch != '\n'){
+                } else if (ch != '\n') {
                     flags |= TokenFlags.Other;
                 }
 
-                if (ch == '\n'){
+                if (ch == '\n') {
                     flags |= TokenFlags.Newline;
                 }
 
                 buff.Append(ch);
             }
 
-            if (buff.Length > 0){
+            if (buff.Length > 0) {
                 OnToken(buff.ToString(), flags, leadingEqualsCount);
             }
 
@@ -86,9 +90,9 @@ namespace Microsoft.NodejsTools.Npm.SPI
         private void OnToken(
             string value,
             TokenFlags flags,
-            int leadingEqualsCount){
+            int leadingEqualsCount) {
             var handlers = Token;
-            if (null != handlers){
+            if (null != handlers) {
                 handlers(this, new TokenEventArgs(value, flags, leadingEqualsCount));
             }
         }

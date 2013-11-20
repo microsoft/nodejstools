@@ -1,4 +1,18 @@
-﻿using System;
+﻿/* ****************************************************************************
+ *
+ * Copyright (c) Microsoft Corporation. 
+ *
+ * This source code is subject to terms and conditions of the Apache License, Version 2.0. A 
+ * copy of the license can be found in the License.html file at the root of this distribution. If 
+ * you cannot locate the Apache License, Version 2.0, please send an email to 
+ * vspython@microsoft.com. By using this source code in any fashion, you are agreeing to be bound 
+ * by the terms of the Apache License, Version 2.0.
+ *
+ * You must not remove this notice, or any other, from this software.
+ *
+ * ***************************************************************************/
+
+using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
@@ -10,14 +24,12 @@ using Microsoft.VisualStudio.TestTools.UnitTesting;
 using TestUtilities;
 using TestUtilities.Nodejs;
 
-namespace NpmTests
-{
+namespace NpmTests {
 
     [TestClass]
-    public class NpmSearchTests
-    {
+    public class NpmSearchTests {
 
-        private TextReader GetCatalogueReader(){
+        private TextReader GetCatalogueReader() {
             //NodejsTestData.Deploy();
             //return new StreamReader(TestData.GetPath(@"NpmSearchData\npmsearchfullcatalog.txt"));
             return new StreamReader(@"C:\GitWork\rgnpm01\Nodejs\Tests\TestData\NpmSearchData\npmsearchfullcatalog.txt");
@@ -30,7 +42,7 @@ namespace NpmTests
             string expectedAuthor,
             string expectedPublishDateTime,
             SemverVersion expectedVersion,
-            IEnumerable<string> expectedKeywords){
+            IEnumerable<string> expectedKeywords) {
 
             Assert.AreEqual(expectedName, package.Name, "Invalid name.");
             Assert.AreEqual(expectedDescription, package.Description, "Invalid description.");
@@ -38,12 +50,12 @@ namespace NpmTests
             Assert.AreEqual(expectedPublishDateTime, package.PublishDateTimeString, "Invalid publish date/time.");
             Assert.AreEqual(expectedVersion, package.Version, "Invalid version.");
 
-            if (null == expectedKeywords){
+            if (null == expectedKeywords) {
                 expectedKeywords = new List<string>();
             }
 
             var actual = new HashSet<string>();
-            foreach (var keyword in package.Keywords){
+            foreach (var keyword in package.Keywords) {
                 actual.Add(keyword);
             }
 
@@ -54,7 +66,7 @@ namespace NpmTests
             //  However, either because the author misunderstands how keywords work, or because of
             //  a bug in the way npm search reports keywords (for our purposes, it doesn't matter which),
             //  what actually happens is the keyword "pdf" appears three times in the list.
-            foreach (var keyword in expectedKeywords){
+            foreach (var keyword in expectedKeywords) {
                 Assert.IsTrue(
                     actual.Contains(keyword),
                     string.Format("Missing keyword: {0}", keyword));
@@ -63,15 +75,15 @@ namespace NpmTests
 
         private void CheckPackage(
             IList<IPackage> packages,
-            IDictionary<string, IPackage> packagesByName, 
+            IDictionary<string, IPackage> packagesByName,
             int expectedIndex,
             string expectedName,
             string expectedDescription,
             string expectedAuthor,
             string expectedPublishDateTime,
             SemverVersion expectedVersion,
-            IEnumerable<string> expectedKeywords){
-            if (expectedIndex >= 0){
+            IEnumerable<string> expectedKeywords) {
+            if (expectedIndex >= 0) {
                 CheckPackage(
                     packages[expectedIndex],
                     expectedName,
@@ -92,7 +104,7 @@ namespace NpmTests
         }
 
         [TestMethod]
-        public void TestParseModuleCatalogue(){
+        public void TestParseModuleCatalogue() {
             IList<IPackage> target = new List<IPackage>();
             IDictionary<string, IPackage> byName = new Dictionary<string, IPackage>();
             INpmSearchLexer lexer = NpmSearchParserFactory.CreateLexer();
@@ -102,7 +114,7 @@ namespace NpmTests
                 byName[args.Package.Name] = args.Package;
             };
 
-            using (var reader = GetCatalogueReader()){
+            using (var reader = GetCatalogueReader()) {
                 lexer.Lex(reader);
             }
 
@@ -143,7 +155,7 @@ namespace NpmTests
                 "pscheit",
                 "2013-09-30 21:53",
                 SemverVersion.Parse("1.3.0-95847e2"),
-                new [] { "cms", "framework" });
+                new[] { "cms", "framework" });
 
             //  Multiple authors listed
             CheckPackage(
@@ -155,7 +167,7 @@ namespace NpmTests
                 "woloski jfromaniello",
                 "2013-09-06 19:09",
                 SemverVersion.Parse("0.8.1"),
-                new [] {"saml", "wsfed", "passport", "auth0", "azure", "auth", "authn", "authentication", "identity", "adfs"});
+                new[] { "saml", "wsfed", "passport", "auth0", "azure", "auth", "authn", "authentication", "identity", "adfs" });
 
             //  Equals in description field
             CheckPackage(
@@ -180,7 +192,7 @@ namespace NpmTests
                 "trevor@kimenye.com",
                 "2012-04-14 12:47",
                 SemverVersion.Parse("0.0.2"),
-                new [] {"pdf", "writer", "generator", "graphics", "document", "vector"});
+                new[] { "pdf", "writer", "generator", "graphics", "document", "vector" });
         }
     }
 }

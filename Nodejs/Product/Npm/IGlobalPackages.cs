@@ -12,7 +12,6 @@
  *
  * ***************************************************************************/
 
-namespace Microsoft.NodejsTools.Npm
-{
-    public interface IGlobalPackages : IRootPackage{}
+namespace Microsoft.NodejsTools.Npm {
+    public interface IGlobalPackages : IRootPackage { }
 }

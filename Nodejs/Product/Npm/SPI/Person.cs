@@ -15,8 +15,8 @@
 using System.Text.RegularExpressions;
 using Newtonsoft.Json.Linq;
 
-namespace Microsoft.NodejsTools.Npm.SPI{
-    internal class Person : IPerson{
+namespace Microsoft.NodejsTools.Npm.SPI {
+    internal class Person : IPerson {
         private static readonly Regex RegexPerson = new Regex(
             "^"
             + "(?<name>[^<]+)"
@@ -25,9 +25,9 @@ namespace Microsoft.NodejsTools.Npm.SPI{
             + "$",
             RegexOptions.IgnoreCase | RegexOptions.Singleline);
 
-        public Person(dynamic source){
+        public Person(dynamic source) {
             var tok = source as JToken;
-            switch (tok.Type){
+            switch (tok.Type) {
                 case JTokenType.Object:
                     Name = source.name;
                     Email = source.email;
@@ -40,28 +40,28 @@ namespace Microsoft.NodejsTools.Npm.SPI{
             }
         }
 
-        public Person(string source){
+        public Person(string source) {
             InitFromString(source);
         }
 
-        private void InitFromString(string source){
+        private void InitFromString(string source) {
             var matches = RegexPerson.Matches(source);
-            if (matches.Count != 1){
+            if (matches.Count != 1) {
                 Name = source;
-            } else{
+            } else {
                 var match = matches[0];
                 var group = match.Groups["name"];
-                if (group.Success){
+                if (group.Success) {
                     Name = group.Value;
                 }
 
                 group = match.Groups["email"];
-                if (group.Success){
+                if (group.Success) {
                     Email = group.Value;
                 }
 
                 group = match.Groups["url"];
-                if (group.Success){
+                if (group.Success) {
                     Url = group.Value;
                 }
             }

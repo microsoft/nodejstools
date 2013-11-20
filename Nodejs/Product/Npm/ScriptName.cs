@@ -12,9 +12,8 @@
  *
  * ***************************************************************************/
 
-namespace Microsoft.NodejsTools.Npm
-{
-    public static class ScriptName{
+namespace Microsoft.NodejsTools.Npm {
+    public static class ScriptName {
         public const string Prepublish = "prepublish";
         public const string Publish = "publish";
         public const string Postpublish = "postpublish";

@@ -20,8 +20,8 @@ using System.IO;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace Microsoft.NodejsTools.Npm.SPI{
-    internal abstract class NpmCommand{
+namespace Microsoft.NodejsTools.Npm.SPI {
+    internal abstract class NpmCommand {
         private readonly string _fullPathToRootPackageDirectory;
         private string _pathToNpm;
         private bool _useFallbackIfNpmNotFound;
@@ -34,7 +34,7 @@ namespace Microsoft.NodejsTools.Npm.SPI{
         protected NpmCommand(
             string fullPathToRootPackageDirectory,
             string pathToNpm = null,
-            bool useFallbackIfNpmNotFound = true){
+            bool useFallbackIfNpmNotFound = true) {
             _fullPathToRootPackageDirectory = fullPathToRootPackageDirectory;
             _pathToNpm = pathToNpm;
             _useFallbackIfNpmNotFound = useFallbackIfNpmNotFound;
@@ -42,39 +42,36 @@ namespace Microsoft.NodejsTools.Npm.SPI{
 
         protected string Arguments { get; set; }
 
-        private string GetPathToNpm(){
-            if (null == _pathToNpm || ! File.Exists(_pathToNpm)){
-                if (_useFallbackIfNpmNotFound){
+        private string GetPathToNpm() {
+            if (null == _pathToNpm || !File.Exists(_pathToNpm)) {
+                if (_useFallbackIfNpmNotFound) {
                     string match = null;
-                    foreach (var potential in Environment.GetEnvironmentVariable("path").Split(Path.PathSeparator))
-                    {
+                    foreach (var potential in Environment.GetEnvironmentVariable("path").Split(Path.PathSeparator)) {
                         var path = Path.Combine(potential, "npm.cmd");
-                        if (File.Exists(path))
-                        {
+                        if (File.Exists(path)) {
                             if (null == match ||
                                 path.Contains(
                                     string.Format(
                                         "{0}nodejs{1}",
                                         Path.DirectorySeparatorChar,
-                                        Path.DirectorySeparatorChar)))
-                            {
+                                        Path.DirectorySeparatorChar))) {
                                 match = path;
                             }
                         }
                     }
 
-                    if (null != match){
+                    if (null != match) {
                         _pathToNpm = match;
                     }
 
                     //  That second condition deals with the situation where no match is found.
-                    if (null == _pathToNpm || ! File.Exists(_pathToNpm)){
+                    if (null == _pathToNpm || !File.Exists(_pathToNpm)) {
                         throw new NpmNotFoundException(
                             string.Format(
                                 "Cannot find npm.cmd at '{0}' nor on your system PATH. Ensure node.js is installed.",
                                 _pathToNpm));
                     }
-                } else{
+                } else {
                     throw new NpmNotFoundException(
                         string.Format("Cannot find npm.cmd at specified path: {0}", _pathToNpm));
                 }
@@ -82,13 +79,13 @@ namespace Microsoft.NodejsTools.Npm.SPI{
             return _pathToNpm;
         }
 
-        private void CopyEnvironmentVariables(ProcessStartInfo target){
-            foreach (DictionaryEntry kvp in Environment.GetEnvironmentVariables()){
-                target.EnvironmentVariables[(string) kvp.Key] = (string) kvp.Value;
+        private void CopyEnvironmentVariables(ProcessStartInfo target) {
+            foreach (DictionaryEntry kvp in Environment.GetEnvironmentVariables()) {
+                target.EnvironmentVariables[(string)kvp.Key] = (string)kvp.Value;
             }
         }
 
-        private ProcessStartInfo BuildStartInfo(){
+        private ProcessStartInfo BuildStartInfo() {
             var info = new ProcessStartInfo(GetPathToNpm(), Arguments);
             info.WorkingDirectory = _fullPathToRootPackageDirectory;
             info.UseShellExecute = false;
@@ -101,44 +98,44 @@ namespace Microsoft.NodejsTools.Npm.SPI{
             return info;
         }
 
-        public string StandardOutput{
-            get{
-                lock (_bufferLock){
+        public string StandardOutput {
+            get {
+                lock (_bufferLock) {
                     return _output.ToString();
                 }
             }
         }
 
-        public string StandardError{
-            get{
-                lock (_bufferLock){
+        public string StandardError {
+            get {
+                lock (_bufferLock) {
                     return _error.ToString();
                 }
             }
         }
 
-        public void CancelCurrentTask(){
-            if (null != _process){
-                try{
+        public void CancelCurrentTask() {
+            if (null != _process) {
+                try {
                     _process.Kill();
-                } catch (Win32Exception){} catch (InvalidOperationException){}
+                } catch (Win32Exception) { } catch (InvalidOperationException) { }
                 _cancelled = true;
             }
         }
 
-        private void WaitForExit(){
-            while (!_process.HasExited && !_cancelled){
+        private void WaitForExit() {
+            while (!_process.HasExited && !_cancelled) {
                 _process.WaitForExit(5000);
             }
         }
 
-        public virtual async Task<bool> ExecuteAsync(){
-            using (_process = new Process()){
+        public virtual async Task<bool> ExecuteAsync() {
+            using (_process = new Process()) {
                 _process.StartInfo = BuildStartInfo();
 
-                try{
+                try {
                     _process.Start();
-                } catch (Win32Exception we){
+                } catch (Win32Exception we) {
                     throw new NpmExecutionException(
                         string.Format("Error executing npm - unable to start the npm process: {0}", we.Message),
                         we);
@@ -156,24 +153,24 @@ namespace Microsoft.NodejsTools.Npm.SPI{
             return true;
         }
 
-        private void AppendToBuffer(StringBuilder buffer, DataReceivedEventArgs e){
-            lock (_bufferLock){
-                if (buffer.Length > 0){
+        private void AppendToBuffer(StringBuilder buffer, DataReceivedEventArgs e) {
+            lock (_bufferLock) {
+                if (buffer.Length > 0) {
                     buffer.Append(Environment.NewLine);
                 }
 
                 var data = e.Data;
-                if (!string.IsNullOrEmpty(data)){
+                if (!string.IsNullOrEmpty(data)) {
                     buffer.Append(Encoding.UTF8.GetString(Console.OutputEncoding.GetBytes(e.Data)));
                 }
             }
         }
 
-        void _process_OutputDataReceived(object sender, DataReceivedEventArgs e){
+        void _process_OutputDataReceived(object sender, DataReceivedEventArgs e) {
             AppendToBuffer(_output, e);
         }
 
-        void _process_ErrorDataReceived(object sender, DataReceivedEventArgs e){
+        void _process_ErrorDataReceived(object sender, DataReceivedEventArgs e) {
             AppendToBuffer(_error, e);
         }
     }

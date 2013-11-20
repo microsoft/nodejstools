@@ -16,15 +16,15 @@ using System;
 using System.IO;
 using Microsoft.CSharp.RuntimeBinder;
 
-namespace Microsoft.NodejsTools.Npm.SPI{
-    internal class RootPackage : IRootPackage{
+namespace Microsoft.NodejsTools.Npm.SPI {
+    internal class RootPackage : IRootPackage {
         public RootPackage(
             string fullPathToRootDirectory,
-            bool showMissingDevOptionalSubPackages){
+            bool showMissingDevOptionalSubPackages) {
             Path = fullPathToRootDirectory;
-            try{
+            try {
                 PackageJson = PackageJsonFactory.Create(new DirectoryPackageJsonSource(fullPathToRootDirectory));
-            } catch (RuntimeBinderException rbe){
+            } catch (RuntimeBinderException rbe) {
                 throw new PackageJsonException(
                     string.Format(@"Error processing package.json at '{0}'. The file was successfully read, and may be valid JSON, but the objects may not match the expected form for a package.json file.
 
@@ -41,23 +41,23 @@ The following error was reported:
 
         public IPackageJson PackageJson { get; private set; }
 
-        public bool HasPackageJson{
+        public bool HasPackageJson {
             get { return null != PackageJson; }
         }
 
-        public string Name{
+        public string Name {
             get { return null == PackageJson ? new DirectoryInfo(Path).Name : PackageJson.Name; }
         }
 
-        public SemverVersion Version{
+        public SemverVersion Version {
             get { return null == PackageJson ? new SemverVersion() : PackageJson.Version; }
         }
 
-        public IPerson Author{
+        public IPerson Author {
             get { return null == PackageJson ? null : PackageJson.Author; }
         }
 
-        public string Description{
+        public string Description {
             get { return null == PackageJson ? null : PackageJson.Description; }
         }
 

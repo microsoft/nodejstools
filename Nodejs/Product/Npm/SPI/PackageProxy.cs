@@ -14,9 +14,8 @@
 
 using System.Collections.Generic;
 
-namespace Microsoft.NodejsTools.Npm.SPI
-{
-    internal class PackageProxy : IPackage{
+namespace Microsoft.NodejsTools.Npm.SPI {
+    internal class PackageProxy : IPackage {
         public INodeModules Modules { get; internal set; }
         public IPackageJson PackageJson { get; internal set; }
         public bool HasPackageJson { get; internal set; }
