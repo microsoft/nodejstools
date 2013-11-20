@@ -1,7 +1,7 @@
 ## npm
 
 
-Npm is Node's package manager and allows you to include functionality provided by other modules - both your own, and those in the public npm repository - in your Node application.
+Npm is Node's package manager and allows you to install packages for use in your Node apps. You can install both packages from the public npm repository, as well as packages you've authored yourself.
 
 
 ## Managing installed packages with npm
@@ -10,7 +10,7 @@ Npm is Node's package manager and allows you to include functionality provided b
 ### 1. The npm Package Management dialog
 
 
-To access npm's functionality right-click on the **npm** node in Solution Explorer, and then click **Manage npm Modules**.
+To use npm in your _Node Tools for Visual Studio_ project, right-click on the **npm** node in Solution Explorer, then click **Manage npm Modules**.
 
 
 ![](Images/npm-context-menu.png)
@@ -63,6 +63,8 @@ If you already know the name of the package you want to install the easiest way 
 
 ![](Images/npm-install-from-details.png)
 
+![](Images/npm-install-from-details-log.png)
+
 
 Note that whilst you can cancel the installation this is _not_ a transactional operation and will generally leave you with a partially installed package hierarchy. Fortunately this is easy to fix: please see **Troubleshooting** below.
 
@@ -84,6 +86,10 @@ Searching npm's package repository can often be the best way to find and install
 
 3. Enter your search term in the **Find** field. Once the module catalog list has populated it will filter automatically as you type.
 
+
+![](Images/npm-search-filtering.png)
+
+
 4. Click on the module in the list that you would like to install to select it.
 
 5. Click **Install Locally** or **Install Globally** to install the package.
@@ -92,6 +98,8 @@ Searching npm's package repository can often be the best way to find and install
 
 
 ![](Images/npm-install-from-search.png)
+
+![](Images/npm-install-from-search-log.png)
 
 
 Note that whilst you can cancel the installation this is _not_ a transactional operation and will generally leave you with a partially installed package hierarchy. Fortunately this is easy to fix: please see **Troubleshooting** below.
@@ -143,12 +151,16 @@ To uninstall a package from your project:
 
 2. In the list of installed packages, select the package you'd like to uninstall.
 
+
+![](Images/npm-uninstall.png)
+
+
 3. Click **Uninstall**.
 
-4. A window will appear showing npm's progress and log, including any errors that occur during uninstall.
+4. A window will appear showing npm's progress and log, including any errors that occur during uninstall. Generally the log is much less extensive than for an install.
 
 
-![](Images/npm-uninstall-local.png)
+![](Images/npm-uninstall-local-log.png)
 
 
 Note that whilst you can cancel the uninstall this is _not_ a transactional operation and will generally leave you with a partially uninstalled package hierarchy. Fortunately this is easy to fix: please see **Troubleshooting** below.
@@ -196,10 +208,17 @@ Notes:
 - You can obviously install and uninstall packages both from within Visual Studio using the **npm Package Management** dialog, and from the command-line. The **npm** node will track your changes regardless of how you make them, but you may sometimes notice a short delay before the tree updates.
 
 
+## 8. Viewing the npm log
+
+
+TODO!!!
+
+
 ## Troubleshooting
 
 
 ### I see a message that says npm cannot be found
+
 
 If you see this it means that either Node.js is installed in a non-default location on your system, and isn't on your PATH, or that it's not installed at all.
 
@@ -219,7 +238,9 @@ If you already have it installed you just need to tell NTVS where to find it. To
 
 You should now be able to install and uninstall packages. NTVS uses the location of _Node.exe_ to work out where to find _npm.cmd_. Node has included npm since version 0.6.3. If you are using an earlier version of node you should consider upgrading! If you have to install npm manually you should ensure that _npm.cmd_ is installed in the same directory as _node.exe_ otherwise NTVS won't be able to find it.
 
+
 ### How do I install missing modules?
+
 
 In this release there is no **npm install** support for installing missing modules. **This will be available in the beta and, before that, will appear in dev builds within the next week or two.**
 
@@ -229,7 +250,11 @@ There are two options to workaround this:
 
 2. Open up the **npm Package Management** dialog, select the **Local Packages** tab, go to **Specify Package Details** and, for each missing package, enter the package name in the **Package Name** field and click **Install Locally**.
 
+
 ### YAAARGH! I cancelled a package install/uninstall and now I have a partially installed/uninstalled package in my project. What do I do?
+
+
+TODO - improve this
 
 If this happens you can fix it by:
 
