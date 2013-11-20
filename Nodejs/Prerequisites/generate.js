@@ -22,6 +22,7 @@ var assemblies = [
     'Nodejs.Tests.UI',
     'NodejsProfilingUITests',
     'ProfilerTests',
+    'NpmTests',
     'Microsoft.NodejsTools',
     'Microsoft.NodejsTools.Profiling',
     'Microsoft.NodejsTools.ProjectWizard',
@@ -29,7 +30,7 @@ var assemblies = [
     'Microsoft.NodejsTools.InteractiveWindow',
     'Microsoft.NodejsTools.AjaxMin',
     'Microsoft.NodejsTools.WebRole',
-    'Microsoft.NodejsTools.Npm.dll'
+    'Microsoft.NodejsTools.Npm'
 ].sort();
 
 var files = [
