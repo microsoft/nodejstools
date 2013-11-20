@@ -1,7 +1,9 @@
 ## npm
 
 
-Npm is Node's package manager and allows you to install packages for use in your Node apps. You can install both packages from the public npm repository, as well as packages you've authored yourself.
+**Npm** is Node's package manager and allows you to install packages for use in your Node apps. You can install packages from the public **npm** repository, as well as packages you've authored yourself.
+
+_Node Tools for Visual Studio_ provides an easy to use interface to **npm** and, over the coming months, will significantly expand **npm** integration within Visual Studio.
 
 
 ## Managing installed packages with npm
@@ -10,33 +12,39 @@ Npm is Node's package manager and allows you to install packages for use in your
 ### 1. The npm Package Management dialog
 
 
-To use npm in your _Node Tools for Visual Studio_ project, right-click on the **npm** node in Solution Explorer, then click **Manage npm Modules**.
+To use **npm** in your _Node Tools for Visual Studio_ project, right-click on the **npm** node in **Solution Explorer**, then click **Manage npm Modules**.
 
 
 ![](Images/npm-context-menu.png)
 
 
-This will bring up the **npm Package Management** dialog. From here you can manage both local packages that will be available to your application, and global packages that are available to all Node applications. You can also easily search the public npm repository which, as of this writing, contains over 48,000 packages!
+This will bring up the **npm Package Management** dialog. From here you can manage both local packages, what will be available only to your application, and global packages, what are available to all Node applications. You can also quickly and easily search and install packages from the public **npm** repository which, as of this writing, contains over 48,000 packages!
 
 
 ![](Images/npm-package-manager.png)
 
 
-The **npm Package Management** dialog is divided into two main areas. On the left you can see packages that are installed, with separate tabs for local and global packages, whilst on the right you can see tabs that provide functionality for installing packages.
+The **npm Package Management** dialog is divided into two main areas. On the left you can see packages that are installed, with separate tabs for local and global packages, whilst on the right you can see tabs that allow you to install packages.
 
 
 ### 2. Local and global packages
 
 
-If you created a blank Node project the **Local Packages** tab will be empty but, if you created your project using, for example, the express template you should see that some packages have automatically been included in your project. Local packages are available only to your application, and each application you create will have its own copies of whatever local packages you install. Thus it's perfectly fine to have different applications depend upon different versions of a given package.
+If you created a blank **Node** project the **Local Packages** tab will be empty. If on the other hand you used, for example, the express template you should see that some packages have automatically been included in your project.
 
-As its name suggests, the **Global Packages** tab contains Node packages that have been installed globally and are therefore available to all applications. Depending upon whether or not you already have some Node applications installed that have installed global packages this list may or may not be empty. You should be careful about making changes to global packages because these changes can impact other applications and may stop them working properly, or at all. The **npm Package Management** dialog will warn you about this when the **Global Packages** tab is selected, as shown below.
+Local packages are available only to your application, and each application you create will have its own copies of whatever local packages you install. Thus it's perfectly fine to have different applications depend upon different versions of a given package.
+
+As its name suggests, the **Global Packages** tab contains Node packages that have been installed globally and are therefore available to all applications. Depending upon whether or not you already have some **Node** applications installed on your machine that have installed global packages, this list may or may not be empty.
+
+You should be careful about making changes to global packages because these changes can impact other applications and may stop them working properly, or indeed at all. The **npm Package Management** dialog will therefore warn you when you are operating on global packages, as shown below.
 
 
 ![](Images/npm-global-warning.png)
 
 
-You should also beware that some packages do not work well when installed globally, whereas for some a global install is preferred. If you are unsure refer to the package documentation to find out whether it should be installed globally or locally. We recommend that in general you install packages locally first and only install them globally where absolutely required.
+You should also beware that some packages do not work well when installed globally, whereas for some a global install is preferred. If you are unsure whether to install a package locally or globally, refer to its documentation.
+
+We recommend that in general you install packages locally first and only install them globally where absolutely required.
 
 
 ### 3. Installing packages by name (and version)
@@ -49,7 +57,7 @@ If you already know the name of the package you want to install the easiest way 
 2. Click on **Specify Package Details**. You'll see a pane, as follows, that allows you to enter the details of your package:
 
 
-![](Images/npm-specify-package-details.png)
+	![](Images/npm-specify-package-details.png)
 
 
 3. Enter the package name in the **Package Name** field.
@@ -61,12 +69,12 @@ If you already know the name of the package you want to install the easiest way 
 6. A window will appear showing npm's progress and log, including any errors that occur during installation.
 
 
-![](Images/npm-install-from-details.png)
+	![](Images/npm-install-from-details.png)
 
-![](Images/npm-install-from-details-log.png)
+	![](Images/npm-install-from-details-log.png)
 
 
-Note that whilst you can cancel the installation this is _not_ a transactional operation and will generally leave you with a partially installed package hierarchy. Fortunately this is easy to fix: please see **Troubleshooting** below.
+	Note that whilst you can cancel the installation this is _not_ a transactional operation and will generally leave you with a partially installed package hierarchy. Fortunately this is easy to fix: please see **Troubleshooting** below.
 
 7. Click **Close** on the progress window.
 
@@ -81,13 +89,13 @@ Searching npm's package repository can often be the best way to find and install
 2. Click on Search npm Repository. The search pane will appear. If this is the first time you've opened the **npm Package Management** dialog during your session you'll see that the repository catalog is being downloaded. In future the catalog will be cached between sessions to allow for quicker searching straight away. There will be an option to manually refresh the catalog from the npm repository whenever you need to.
 
 
-![](Images/npm-catalog-retrieval.png)
+	![](Images/npm-catalog-retrieval.png)
 
 
 3. Enter your search term in the **Find** field. Once the module catalog list has populated it will filter automatically as you type.
 
 
-![](Images/npm-search-filtering.png)
+	![](Images/npm-search-filtering.png)
 
 
 4. Click on the module in the list that you would like to install to select it.
@@ -97,12 +105,12 @@ Searching npm's package repository can often be the best way to find and install
 6. A window will appear showing npm's progress and log, including any errors that occur during installation.
 
 
-![](Images/npm-install-from-search.png)
+	![](Images/npm-install-from-search.png)
 
-![](Images/npm-install-from-search-log.png)
+	![](Images/npm-install-from-search-log.png)
 
 
-Note that whilst you can cancel the installation this is _not_ a transactional operation and will generally leave you with a partially installed package hierarchy. Fortunately this is easy to fix: please see **Troubleshooting** below.
+	Note that whilst you can cancel the installation this is _not_ a transactional operation and will generally leave you with a partially installed package hierarchy. Fortunately this is easy to fix: please see **Troubleshooting** below.
 
 7. Click **Close** on the progress window.
 
@@ -118,13 +126,13 @@ This will generally be what you want, but npm also supports two special types of
 
 - **Optional dependencies**: These are packages that allow your app to provide additional functionality but, without which, it will still work with gracefully degraded function. **Note that it is YOUR responsibility to check whether or not optional packages are installed in code and gracefully handle the situation where they are not.**
 
-To install dev and optional dependencies use the **Install As** combo at the bottom of the **npm Package Management** dialog. (Note that this is only available when **Local Packages** is selected, since it makes no sense for global packages.)
+To install dev and optional dependencies use the **Install As** dropdown at the bottom of the **npm Package Management** dialog. (Note that this is only available when **Local Packages** is selected, since it makes no sense for global packages.)
 
 
 ![](Images/npm-install-as-combo.png)
 
 
-This combo has three values:
+This dropdown has three values:
 
 - **Standard Dependency**: packages are required to run your app and will be added to the **dependencies** collection in _package.json_.
 - **Dev Dependency**: packages are required only for development and will be added to the **devDependencies** collection in _package.json_. Packages should _not_ be required to run your app.
@@ -152,7 +160,7 @@ To uninstall a package from your project:
 2. In the list of installed packages, select the package you'd like to uninstall.
 
 
-![](Images/npm-uninstall.png)
+	![](Images/npm-uninstall.png)
 
 
 3. Click **Uninstall**.
@@ -160,10 +168,10 @@ To uninstall a package from your project:
 4. A window will appear showing npm's progress and log, including any errors that occur during uninstall. Generally the log is much less extensive than for an install.
 
 
-![](Images/npm-uninstall-local-log.png)
+	![](Images/npm-uninstall-local-log.png)
 
 
-Note that whilst you can cancel the uninstall this is _not_ a transactional operation and will generally leave you with a partially uninstalled package hierarchy. Fortunately this is easy to fix: please see **Troubleshooting** below.
+	Note that whilst you can cancel the uninstall this is _not_ a transactional operation and will generally leave you with a partially uninstalled package hierarchy. Fortunately this is easy to fix: please see **Troubleshooting** below.
 
 5. Click **Close** on the progress window.
 
@@ -208,10 +216,25 @@ Notes:
 - You can obviously install and uninstall packages both from within Visual Studio using the **npm Package Management** dialog, and from the command-line. The **npm** node will track your changes regardless of how you make them, but you may sometimes notice a short delay before the tree updates.
 
 
-## 8. Viewing the npm log
+### 8. Viewing the npm log
 
 
-TODO!!!
+If you've already installed some packages you'll have seen that we capture and display the npm output for the current command. However, you can also view the npm output for your entire Visual Studio session. To see this:
+
+
+1. Click **View > Output** on the Visual Studio main menu.
+
+2. In the **Show output from** dropdown, select **Npm**.
+
+3. You should see something similar to the following:
+
+
+	![](Images/npm-log.png)
+
+
+The exact content of the log will obviously depend upon what actions you have performed.
+
+Note that we do not include the npm output from the repository catalogue retrieval simply because it's huge and not terribly interesting.
 
 
 ## Troubleshooting
@@ -254,25 +277,38 @@ There are two options to workaround this:
 ### YAAARGH! I cancelled a package install/uninstall and now I have a partially installed/uninstalled package in my project. What do I do?
 
 
-TODO - improve this
+If npm fails to install a package it will often be able to rollback the operation so that your packages are in their previous state.
 
-If this happens you can fix it by:
+If, however, you cancel an npm operation you are simply killing the process, so no rollback occurs. This means that you will usually end up in a situation where a package is partially installed or uninstalled.
 
-- Uninstalling the package
-- Manually deleting the package directory from the filesystem
-- Installing the package, if you unintentionally cancelled installation
+Fortunately this is not a huge problem. You can fix it by:
 
+- Uninstalling the package, either in the **npm Package Management** dialog, or via the command line.
+
+- Manually deleting the package directory from the filesystem - again, you can do this in Visual Studio via the Solution Explorer, from the command line, or in Windows Explorer.
+
+- Installing the package, either in the **npm Package Management** dialog, or via the command line, which will restore the package and any damaged/partially removed sub-packages
+
+In a future release of Node Tools for Visual Studio we may implement an explicit rollback when you cancel an npm operation if enough people request it.
 
 
 ## Coming Soon
 
 
-- Install all packages in _package.json_ with **npm install**, and install missing packages in **npm Package Management** dialog without having to first uninstall them
-- Caching of npm repository catalogue to speed searches on first run of the **npm Package Management** dialog within a session
-- Update dependencies in _package.json_ to match modules installed on filesystem
-- Detection of "out of date" packages and update to latest versions with **npm update**
-- Uninstall packages directly from **Solution Explorer** context menu
-- _package.json_ editor
-- Install packages from tarballs, folders, and URLs
-- Support for bundled dependencies - very useful for reliable deployment of Node apps
-- Publishing
+- Install all packages in _package.json_ with **npm install**, and install missing packages in **npm Package Management** dialog without having to first uninstall them.
+
+- Caching of npm repository catalogue to speed searches on first run of the **npm Package Management** dialog within a session.
+
+- Update dependencies in _package.json_ to match modules installed on filesystem.
+
+- Detection of "out of date" packages and update to latest versions with **npm update**.
+
+- Uninstall packages directly from **Solution Explorer** context menu.
+
+- _package.json_ editor.
+
+- Install packages from tarballs, folders, and URLs.
+
+- Support for bundled dependencies - very useful for reliable deployment of Node apps.
+
+- Publishing to the **npm** repository.
