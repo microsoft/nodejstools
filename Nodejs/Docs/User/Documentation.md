@@ -6,12 +6,12 @@ Getting Started
 
 [wiki:"NTVS Installation" Installation]
 
-Overview video: [http://vimeo.com/71449031](http://vimeo.com/71449031)  pwd: toomanynodes
+Overview video: [https://www.youtube.com/watch?v=W_1_UqUDx2s](https://www.youtube.com/watch?v=W_1_UqUDx2s)
 
 Features in Depth
 -----------------
 
-* [wiki:"IntelliSense and Editing" Features Intellisense]
+* [wiki:"IntelliSense and Editing" Editor]
 * [wiki:"Debugging" Debugging]
 * [wiki:"Projects" Projects]
 * [wiki:"Profiling" Profiling]
