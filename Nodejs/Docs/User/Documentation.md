@@ -13,6 +13,8 @@ Features in Depth
 
 * [wiki:"IntelliSense and Editing" Editor]
 * [wiki:"Debugging" Debugging]
+	* [wiki:"Advanced Debugging" AdvancedDebugging]
+	* [wiki:"Remote Debugging Linux" NodeJSOnLinuxOnAzure]
 * [wiki:"Projects" Projects]
 * [wiki:"Profiling" Profiling]
 * [wiki:"Azure Deployment" AzureDeployment]
