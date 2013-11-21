@@ -63,7 +63,9 @@ Installing Node.js on a Linux VM
 Using a remote command line shell, like PuTTY ([http://www.chiark.greenend.org.uk/~sgtatham/putty/download.html](http://www.chiark.greenend.org.uk/~sgtatham/putty/download.html)), install Node.js on the Linux VM.  You will need to login to your VM as 'azureuser' with the password you provided when creating the VM.  On the remote command line, install Node.js with sudo.
 
 
-    sudo apt-get install nodejs
+```
+sudo apt-get install nodejs
+```
 
 ![Install Node.js](Images/DebuggingAzureInstallNodeJS.png)
 
@@ -80,7 +82,9 @@ Running App Behind Remote Debug Proxy
 Back in your remote command line shell, run your app behind the remote debug proxy by running nodejs on the remote debug proxy and passing your app's startup script on the command line.
 
 
-    nodejs RemoteDebug.js server.js
+```
+nodejs RemoteDebug.js server.js
+```
 
 ![Run App Behind Proxy](Images/DebuggingAzureRunAppBehindProxy.png)
 

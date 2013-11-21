@@ -72,11 +72,15 @@ Starting NTVS remote debugging requires both preparing the target host, and atta
 
 Preparing a target host for remote debugging is as simple as running your target app behind the remote debug proxy, on the remote host. Where you would normally start a Node.js process directly with:
 
-    node.exe script.js
+```
+node.exe script.js
+```
 
 Instead start the Node.js process with the remote debug proxy, passing it the script to be remotely debugged:
 
-    node.exe RemoteDebug.js script.js
+```
+node.exe RemoteDebug.js script.js
+```
 
 The remote debug proxy (RemoteDebug.js) can be found in the folder opened using the 'Tools\Node.js Tools\Remote Debug Proxy' menu.  It is generally easiest to copy the remote debug proxy to the folder containing the script you would like to debug (as is assumed above).
 
@@ -86,11 +90,15 @@ The remote debug proxy (RemoteDebug.js) can be found in the folder opened using 
 
 By default the remote debug proxy proxies a Node.exe debugger to port 5858 on the remote host. This can be configured using the remote debug proxy command line arguments:
 
-    node.exe RemoteDebug.js -machineport 5860 script.js
+```
+node.exe RemoteDebug.js -machineport 5860 script.js
+```
 
 For configuration details, consult the remote debug proxy help, viewed by running it with the -help command line argument:
 
-    node.exe RemoteDebug.js -help
+```
+node.exe RemoteDebug.js -help
+```
 
 Note: The remote debug proxy's host debugger port, default (5858) or configured, must be accessible to the machine attaching the NTVS debugger.
 
@@ -98,7 +106,9 @@ Note: The remote debug proxy's host debugger port, default (5858) or configured,
 
 On a Linux machine, by convention, the Node.js exectable is named nodejs.  For this reason, when preparing a Linux target host for remote debugging, substitute nodejs for node.exe above.  For example:
 
-    nodejs RemoteDebug.js script.js
+```
+nodejs RemoteDebug.js script.js
+```
 
 ### Attaching the NTVS debugger
 
@@ -128,10 +138,14 @@ Unless you immediately hit a breakpoint, the only indication that the debugger h
 
 It is also possible to attach to a locally running Node.exe process, if it was started with debugging enabled, using the '--debug' command line argument:
 
-    node.exe --debug server.js
+```
+node.exe --debug server.js
+```
 
 To attach to such a locally running Node.exe process, follow the attach instructions above, providing localhost:5858 for 'Qualifier'.
 
 Note: It is possible to run Node.exe with a non-default local debugger port. This is accomplished by providing the desired port with the '--debug' command line argument:
 
-    node.exe --debug:5860 server.js
+```
+node.exe --debug:5860 server.js
+```

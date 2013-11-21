@@ -1,5 +1,5 @@
 ﻿{
-    "AdvancedDebugging.html": "341901a8937c24bf10481da90f47e2bdb5fbc319f1a26d322382bab030987726", 
+    "AdvancedDebugging.html": "10b8aa92b0bb444c961fbd28b9e08bfef4d7a49ddfa9ca2e205a0ac6aa96c3f6", 
     "AzureDeployment.html": "c72d260435b64a58e1e4e7ac29735f57ca9a4f6e99c40688716b4b61cf473cd2", 
     "Debugging.html": "2a7db2c48ce4ff4a66933e6b8d98288eb5ddc9c707c52e86cb4e67483b233e89", 
     "Documentation.html": "3d30f75e4caf94722d8ec456ad9852dc1ac0edc7f66f3d8f1dc26be9ddc48de2", 
@@ -110,7 +110,7 @@
     "Images\\prof-overview.png": "http://www.codeplex.com/Download?ProjectName=nodejstools&DownloadId=760452", 
     "Images\\prof-source.png": "http://www.codeplex.com/Download?ProjectName=nodejstools&DownloadId=760438", 
     "Installation.html": "6b1bcbc6b39e1e5cc17380f057f5d5e4291daa4420b657b6c96a4d01bb44d0d0", 
-    "NodeJSOnLinuxOnAzure.html": "6ec4d4cda9741720219115179b69453afe53a80d880cbeb376c3ebf8e8aac681", 
+    "NodeJSOnLinuxOnAzure.html": "71ac76301393dd2f1f0d18336c64ba15907ee1f1c30603a489089c2f036f0f05", 
     "Profiling.html": "db5a3e880b93e08f9ba34caa7411c66b6cbc38f0f0420acbeae9a717664bc95f", 
     "Projects.html": "4b328548dba3000ca0d806539ed74c39fbb5b1a4f0d335b2a466c1e01ebee4bc"
 }
