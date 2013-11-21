@@ -35,7 +35,7 @@ namespace NpmTests {
     }
 }";
 
-        [TestMethod]
+        [TestMethod, Priority(0)]
         public void TestReadRootPackageNoDependencies() {
             var rootDir = CreateRootPackage(PkgSimple);
             var pkg = RootPackageFactory.Create(rootDir);
@@ -56,7 +56,7 @@ namespace NpmTests {
             p.WaitForExit();
         }
 
-        [TestMethod]
+        [TestMethod, Priority(0)]
         public void TestReadRootPackageOneDependency() {
             var rootDir = CreateRootPackage(PkgSingleDependency);
             RunNpmInstall(rootDir);
@@ -99,7 +99,7 @@ namespace NpmTests {
             Assert.IsTrue(module.HasPackageJson, "Module should have its own package.json");
         }
 
-        [TestMethod]
+        [TestMethod, Priority(0)]
         public void TestReadRootPackageMissingDependency() {
             var rootDir = CreateRootPackage(PkgSingleDependency);
 
@@ -141,7 +141,7 @@ namespace NpmTests {
             Assert.IsFalse(module.HasPackageJson, "Missing module should not have its own package.json");
         }
 
-        [TestMethod]
+        [TestMethod, Priority(0)]
         public void TestReadRootDependencyRecursive() {
             var rootDir = CreateRootPackage(PkgSingleRecursiveDependency);
             RunNpmInstall(rootDir);

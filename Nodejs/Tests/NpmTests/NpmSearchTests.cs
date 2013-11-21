@@ -103,7 +103,7 @@ namespace NpmTests {
                     expectedKeywords);
         }
 
-        [TestMethod]
+        [TestMethod, Priority(0)]
         public void TestParseModuleCatalogue() {
             IList<IPackage> target = new List<IPackage>();
             IDictionary<string, IPackage> byName = new Dictionary<string, IPackage>();

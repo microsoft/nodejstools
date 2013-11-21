@@ -20,7 +20,7 @@ using Microsoft.VisualStudio.TestTools.UnitTesting;
 namespace NpmTests {
     [TestClass]
     public class InstallUninstallPackageTests : AbstractFilesystemPackageJsonTests {
-        [TestMethod]
+        [TestMethod, Priority(0)]
         public void TestAddPackageToSimplePackageJsonThenUninstall() {
             var rootDir = CreateRootPackage(PkgSimple);
             var controller = NpmControllerFactory.Create(rootDir);
@@ -71,7 +71,7 @@ namespace NpmTests {
             Assert.AreEqual(0, rootPackage.Modules.Count, "Should be no modules after package installed.");
         }
 
-        [TestMethod]
+        [TestMethod, Priority(0)]
         public void TestAddPackageNoPackageJsonThenUninstall() {
             var rootDir = CreateRootPackage(PkgSimple);
             File.Delete(Path.Combine(rootDir, "package.json"));

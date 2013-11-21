@@ -166,19 +166,19 @@ namespace NpmTests {
    } 
 }";
 
-        [TestMethod]
+        [TestMethod, Priority(0)]
         public void TestReadNoNameNull() {
             var pkg = LoadFrom(PkgEmpty);
             Assert.IsNull(pkg.Name, "Name should be null.");
         }
 
-        [TestMethod]
+        [TestMethod, Priority(0)]
         public void TestReadNoVersionIsZeroed() {
             var pkg = LoadFrom(PkgEmpty);
             Assert.AreEqual(new SemverVersion(), pkg.Version, "Empty version mismatch.");
         }
 
-        [TestMethod]
+        [TestMethod, Priority(0)]
         public void TestReadNameAndVersion() {
             var pkgJson = LoadFrom(PkgSimple);
 
@@ -190,7 +190,7 @@ namespace NpmTests {
             SemverVersionTestHelper.AssertVersionsEqual(0, 1, 0, null, null, pkgJson.Version);
         }
 
-        [TestMethod]
+        [TestMethod, Priority(0)]
         public void TestGetEmptyScripts() {
             var pkg = LoadFrom(PkgSimple);
             var scripts = pkg.Scripts;
@@ -198,7 +198,7 @@ namespace NpmTests {
             Assert.AreEqual(0, scripts.Count, "Shouldn't find any scripts.");
         }
 
-        [TestMethod]
+        [TestMethod, Priority(0)]
         public void TestReadSingleStartScript() {
             var pkg = LoadFrom(PkgStartScript);
             var scripts = pkg.Scripts;
@@ -209,7 +209,7 @@ namespace NpmTests {
             Assert.AreEqual("node server.js", start.Code, "Script code mismatch.");
         }
 
-        [TestMethod]
+        [TestMethod, Priority(0)]
         public void TestReadNonExistentScriptsNull() {
             var pkg = LoadFrom(PkgStartScript);
             var scripts = pkg.Scripts;
@@ -227,13 +227,13 @@ namespace NpmTests {
             }
         }
 
-        [TestMethod]
+        [TestMethod, Priority(0)]
         public void TestReadNoDescriptionNull() {
             var pkg = LoadFrom(PkgEmpty);
             Assert.IsNull(pkg.Description, "Description should be null.");
         }
 
-        [TestMethod]
+        [TestMethod, Priority(0)]
         public void TestReadDescription() {
             var pkg = LoadFrom(PkgLargeCompliant);
             Assert.AreEqual(
@@ -242,12 +242,12 @@ namespace NpmTests {
                 "Description mismatch.");
         }
 
-        [TestMethod]
+        [TestMethod, Priority(0)]
         public void TestReadEmptyKeywordsCountZero() {
             CheckEmptyArray(LoadFrom(PkgEmpty).Keywords);
         }
 
-        [TestMethod]
+        [TestMethod, Priority(0)]
         public void TestEnumerationOverKeywords() {
             CheckStringArrayContents(
                 LoadFrom(PkgLargeCompliant).Keywords,
@@ -255,25 +255,25 @@ namespace NpmTests {
                 new[] { "package", "example" });
         }
 
-        [TestMethod]
+        [TestMethod, Priority(0)]
         public void TestReadNoHomepageNull() {
             var pkg = LoadFrom(PkgSimple);
             Assert.IsNull(pkg.Homepage, "Homepage should be null.");
         }
 
-        [TestMethod]
+        [TestMethod, Priority(0)]
         public void TestReadHomepage() {
             var pkg = LoadFrom(PkgLargeCompliant);
             Assert.AreEqual("http://www.mypackagehomepage.com/", pkg.Homepage, "Homepage mismatch.");
         }
 
-        [TestMethod]
+        [TestMethod, Priority(0)]
         public void TestReadNoBugsNull() {
             var pkg = LoadFrom(PkgSimple);
             Assert.IsNull(pkg.Bugs, "Bugs should be null.");
         }
 
-        [TestMethod]
+        [TestMethod, Priority(0)]
         public void TestReadBugsUrlOnly() {
             var pkg = LoadFrom(PkgSimpleBugs);
             var bugs = pkg.Bugs;
@@ -290,17 +290,17 @@ namespace NpmTests {
             Assert.AreEqual("dev@example.com", bugs.Email, "Bugs email mismatch.");
         }
 
-        [TestMethod]
+        [TestMethod, Priority(0)]
         public void TestReadBugsUrlAndEmailCompliant() {
             TestReadBugsUrlAndEmail(PkgLargeCompliant);
         }
 
-        [TestMethod]
+        [TestMethod, Priority(0)]
         public void TestReadBugsUrlAndEmailNonCompliant() {
             TestReadBugsUrlAndEmail(PkgLargeNonCompliant);
         }
 
-        [TestMethod]
+        [TestMethod, Priority(0)]
         public void TestReadNoLicensesEmpty() {
             var pkg = LoadFrom(PkgSimpleBugs);
             var licenses = pkg.Licenses;
@@ -308,7 +308,7 @@ namespace NpmTests {
             Assert.AreEqual(0, licenses.Count, "Should not be any licenses.");
         }
 
-        [TestMethod]
+        [TestMethod, Priority(0)]
         public void TestReadLicensesTypeOnly() {
             var pkg = LoadFrom(PkgSingleLicenseType);
             var licenses = pkg.Licenses;
@@ -318,7 +318,7 @@ namespace NpmTests {
             Assert.AreEqual("BSD", license.Type, "License type mismatch.");
         }
 
-        [TestMethod]
+        [TestMethod, Priority(0)]
         public void ReadLicensesTypeAndUrl() {
             var pkg = LoadFrom(PkgLargeCompliant);
             var licenses = pkg.Licenses;
@@ -329,12 +329,12 @@ namespace NpmTests {
             Assert.AreEqual("http://www.example.org/licenses/gpl.html", license.Url, "License URL mismatch.");
         }
 
-        [TestMethod]
+        [TestMethod, Priority(0)]
         public void TestReadEmptyFilesEmpty() {
             CheckEmptyArray(LoadFrom(PkgSimple).Files);
         }
 
-        [TestMethod]
+        [TestMethod, Priority(0)]
         public void TestReadFiles() {
             CheckStringArrayContents(
                 LoadFrom(PkgLargeCompliant).Files,
@@ -342,12 +342,12 @@ namespace NpmTests {
                 new[] { "server.js", "customlib.js", "path/to/subfolder" });
         }
 
-        [TestMethod]
+        [TestMethod, Priority(0)]
         public void TestReadEmptyManEmpty() {
             CheckEmptyArray(LoadFrom(PkgSimple).Man);
         }
 
-        [TestMethod]
+        [TestMethod, Priority(0)]
         public void TestReadSingleMan() {
             CheckStringArrayContents(
                 LoadFrom(PkgLargeNonCompliant).Man,
@@ -355,7 +355,7 @@ namespace NpmTests {
                 new[] { "./man/foo.1" });
         }
 
-        [TestMethod]
+        [TestMethod, Priority(0)]
         public void TestReadMultiMan() {
             CheckStringArrayContents(
                 LoadFrom(PkgLargeCompliant).Man,

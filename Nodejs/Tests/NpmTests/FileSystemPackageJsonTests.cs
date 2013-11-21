@@ -25,7 +25,7 @@ namespace NpmTests {
             Assert.AreEqual(SemverVersion.Parse("0.1.0"), pkg.Version, "Package version mismatch.");
         }
 
-        [TestMethod]
+        [TestMethod, Priority(0)]
         public void TestReadFromFile() {
             var dir = TempFileManager.GetNewTempDirectory();
             var path = Path.Combine(dir.FullName, "package.json");
@@ -33,7 +33,7 @@ namespace NpmTests {
             CheckPackage(PackageJsonFactory.Create(new FilePackageJsonSource(path)));
         }
 
-        [TestMethod]
+        [TestMethod, Priority(0)]
         public void TestReadFromDirectory() {
             var dir = TempFileManager.GetNewTempDirectory();
             CreatePackageJson(Path.Combine(dir.FullName, "package.json"), PkgSimple);

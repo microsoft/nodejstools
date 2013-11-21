@@ -22,7 +22,7 @@ using Microsoft.VisualStudio.TestTools.UnitTesting;
 namespace NpmTests {
     [TestClass]
     public class ProblematicPackageJsonTests : AbstractPackageJsonTests {
-        [TestMethod]
+        [TestMethod, Priority(0)]
         public void TestFreshPackageJsonParseFromResource() {
             var pkg = LoadFromResource("NpmTests.Resources.fresh_package.json");
             Assert.IsNotNull(pkg, "Fresh package should not be null.");
