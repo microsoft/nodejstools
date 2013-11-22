@@ -41,6 +41,14 @@ namespace NpmTests{
             }
         }
 
+        protected IPackageJson LoadFromFile(string fullPathToFile){
+            return PackageJsonFactory.Create(new FilePackageJsonSource(fullPathToFile));
+        }
+
+        protected IPackageJson LoadFrom(TextReader reader){
+            return PackageJsonFactory.Create(new ReaderPackageJsonSource(reader));
+        }
+
         private static void CheckContains(ISet<string> retrieved, IEnumerable<string> expected){
             foreach (var value in expected){
                 Assert.IsTrue(retrieved.Contains(value), string.Format("Expected to find value '{0}'.", value));

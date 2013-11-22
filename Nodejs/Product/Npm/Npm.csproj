@@ -71,6 +71,7 @@
     <Compile Include="PackageJsonException.cs" />
     <Compile Include="PackageJsonFactory.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="ReaderPackageJsonSource.cs" />
     <Compile Include="RootPackageFactory.cs" />
     <Compile Include="ScriptName.cs" />
     <Compile Include="SPI\NpmCommander.cs" />
