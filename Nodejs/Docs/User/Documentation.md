@@ -16,6 +16,7 @@ Features in Depth
 	* [wiki:"Advanced Debugging" AdvancedDebugging]
 	* [wiki:"Remote Debugging Linux" NodeJSOnLinuxOnAzure]
 * [wiki:"Projects" Projects]
+* [wiki:"npm" Npm]
 * [wiki:"Profiling" Profiling]
 * [wiki:"Azure Deployment" AzureDeployment]
 
