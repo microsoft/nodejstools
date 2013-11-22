@@ -19,6 +19,12 @@ namespace Microsoft.NodejsTools.Npm
         void CancelCurrentCommand();
 
         /// <summary>
+        /// Executes npm install to install all packages in package.json.
+        /// </summary>
+        /// <returns></returns>
+        Task<bool> Install();
+
+        /// <summary>
         /// 
         /// </summary>
         /// <param name="packageName"></param>

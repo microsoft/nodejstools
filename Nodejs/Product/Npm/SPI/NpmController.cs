@@ -92,14 +92,13 @@ namespace Microsoft.NodejsTools.Npm.SPI{
                             GlobalPackages = task.Result
                                 ? RootPackageFactory.Create(command.ListBaseDirectory)
                                 : null;
-                        } catch (IOException){}
+                        } catch (IOException){} catch (AggregateException){}    //  Latter for npm not installed.
                         OnFinishedRefresh();
                     });
                 } catch (IOException){
                     // Can sometimes happen when packages are still installing because the file may still be used by another process
                 }
             }
-            //OnFinishedRefresh();
         }
 
         public IRootPackage RootPackage{

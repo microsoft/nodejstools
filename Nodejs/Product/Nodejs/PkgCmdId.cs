@@ -28,8 +28,9 @@ namespace Microsoft.NodejsTools {
         public const int cmdidImportWizard                  = 0x205;
         public const int cmdidOpenRemoteDebugDocumentation  = 0x206;
         public const int cmdidNpmManageModules              = 0x207;
-        public const int cmdidNpmUpdateModules              = 0x208;
-        public const int cmdidNpmUninstallModule            = 0x209;
+        public const int cmdidNpmInstallModules             = 0x208;
+        public const int cmdidNpmUpdateModules              = 0x209;
+        public const int cmdidNpmUninstallModule            = 0x20A;
 
         public const uint menuIdNPM = 0x1000;
     }

@@ -20,6 +20,7 @@ using System.Threading;
 using System.Windows;
 using System.Windows.Forms;
 using System.Windows.Media;
+using EnvDTE;
 using Microsoft.NodejsTools.Npm;
 using Microsoft.NodejsTools.NpmUI;
 using Microsoft.VisualStudio;
@@ -250,6 +251,11 @@ namespace Microsoft.NodejsTools.Project{
             return pane;
         }
 
+        private void ShowNpmOutputPane(){
+            var pane = GetNpmOutputPane();
+            pane.Activate();
+        }
+
 #if INTEGRATE_WITH_ERROR_LIST
 
         private ErrorListProvider _errorListProvider;
@@ -382,7 +388,7 @@ namespace Microsoft.NodejsTools.Project{
                 }
 
                 ReloadHierarchy(child, package.Modules);
-                if (!recycle.ContainsKey(package.Name)){
+                if (ProjectMgr.ParentHierarchy != null && !recycle.ContainsKey(package.Name)){
                     child.ExpandItem(EXPANDFLAGS.EXPF_CollapseFolder);
                 }
             }
@@ -430,6 +436,7 @@ namespace Microsoft.NodejsTools.Project{
             if (cmdGroup == GuidList.guidNodeCmdSet){
                 switch (cmd){
                     case PkgCmdId.cmdidNpmManageModules:
+                    case PkgCmdId.cmdidNpmInstallModules:
                     case PkgCmdId.cmdidNpmUpdateModules:
                     case PkgCmdId.cmdidNpmUninstallModule:
                         if (! ProjectMgr.IsCurrentStateASuppressCommandsMode()){
@@ -452,6 +459,10 @@ namespace Microsoft.NodejsTools.Project{
                 {
                     case PkgCmdId.cmdidNpmManageModules:
                         ManageModules();
+                        return VSConstants.S_OK;
+
+                    case PkgCmdId.cmdidNpmInstallModules:
+                        InstallMissingModules();
                         return VSConstants.S_OK;
 
                     case PkgCmdId.cmdidNpmUpdateModules:
@@ -478,16 +489,30 @@ namespace Microsoft.NodejsTools.Project{
             ReloadHierarchy();
         }
 
-        public void UpdateModules(){
+        public async void InstallMissingModules(){
+            CheckNotDisposed();
+
+            ShowNpmOutputPane();
+
+            try{
+                using (var commander = NpmController.CreateNpmCommander()){
+                    await commander.Install();
+                }
+            } catch (NpmNotFoundException nnfe){
+                ErrorHelper.ReportNpmNotInstalled(null, nnfe);
+            }
+        }
+
+        public async void UpdateModules(){
             CheckNotDisposed();
 
             try{
                 var selected = _projectNode.GetSelectedNodes();
                 using (var commander = NpmController.CreateNpmCommander()){
                     if (selected.Count == 1 && selected[0] == this){
-                        commander.UpdatePackagesAsync();
+                        await commander.UpdatePackagesAsync();
                     } else{
-                        commander.UpdatePackagesAsync(
+                        await commander.UpdatePackagesAsync(
                             selected.OfType<DependencyNode>().Select(dep => dep.Package).ToList());
                     }
                 }
@@ -496,14 +521,14 @@ namespace Microsoft.NodejsTools.Project{
             }
         }
 
-        public void UninstallModules(){
+        public async void UninstallModules(){
             CheckNotDisposed();
 
             try{
                 var selected = _projectNode.GetSelectedNodes();
                 using (var commander = NpmController.CreateNpmCommander()){
                     foreach (var name in selected.OfType<DependencyNode>().Select(dep => dep.Package.Name).ToList()){
-                        commander.UninstallPackageAsync(name);
+                        await commander.UninstallPackageAsync(name);
                     }
                 }
             } catch (NpmNotFoundException nnfe){

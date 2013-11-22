@@ -80,6 +80,31 @@ namespace Microsoft.NodejsTools.Npm.SPI{
             OnErrorLogged(command.StandardError);
         }
 
+        public async Task<bool> Install()
+        {
+            bool retVal = false;
+            try
+            {
+                _command = new NpmInstallCommand(
+                    _npmController.FullPathToRootPackageDirectory,
+                    _npmController.PathToNpm,
+                    _npmController.UseFallbackIfNpmNotFound);
+
+                retVal = await _command.ExecuteAsync();
+                FireLogEvents(_command);
+                _npmController.Refresh();
+            }
+            catch (Exception e)
+            {
+                OnExceptionLogged(e);
+            }
+            finally
+            {
+                OnCommandCompleted();
+            }
+            return retVal;
+        }
+
         private async Task<bool> InstallPackageByVersionAsync(
             string packageName,
             string versionRange,
