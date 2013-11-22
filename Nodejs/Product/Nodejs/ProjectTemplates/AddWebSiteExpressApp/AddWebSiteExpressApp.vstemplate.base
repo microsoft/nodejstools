@@ -16,7 +16,22 @@
   </TemplateData>
   <TemplateContent>
     <Project File="AddWebSiteExpressApp.njsproj" ReplaceParameters="true">
-      <ProjectItem OpenInEditor="true">server.js</ProjectItem>
+      <Folder Name="public">
+        <Folder Name="images"/>
+        <Folder Name="javascripts"/>
+        <Folder Name="stylesheets">
+          <ProjectItem>style.styl</ProjectItem>
+        </Folder>
+      </Folder>
+      <Folder Name="routes">
+        <ProjectItem>index.js</ProjectItem>
+        <ProjectItem>user.js</ProjectItem>
+      </Folder>
+      <Folder Name="views">
+        <ProjectItem>index.jade</ProjectItem>
+        <ProjectItem>layout.jade</ProjectItem>
+      </Folder>
+      <ProjectItem OpenInEditor="true">app.js</ProjectItem>
       <ProjectItem ReplaceParameters="true">package.json</ProjectItem>
       <ProjectItem ReplaceParameters="true">README.md</ProjectItem>
     </Project>

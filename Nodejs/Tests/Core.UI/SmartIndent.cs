@@ -73,10 +73,10 @@ namespace Microsoft.Nodejs.Tests.UI {
                 var testCases = new[] {
                 // no {
                 new { 
-                    Typed = "if (true)\r42\relse\r100\r200",
+                    Typed = "if (true)\r42\relse \r100\r200",
                     Expected = @"if (true)
     42
-else
+else 
     100
 200"              
                 },
@@ -101,8 +101,8 @@ else if (true)
 100"              
                 },
                 new { 
-                    Typed = "do\r42\rwhile(false)\r100",
-                    Expected = @"do
+                    Typed = "do \r42\rwhile(false)\r100",
+                    Expected = @"do 
     42
 while(false)
 100"              
@@ -125,10 +125,10 @@ while(false)
 }"              },
                 // nested function, dedent keyword
                 new { 
-                    Typed = "function a() {\rfunction b() {\rfoo\r\b}\r\b}",
+                    Typed = "function a() {\rfunction b() {\rfoo \r\b}\r\b}",
                     Expected = @"function a() {
     function b() {
-        foo
+        foo 
     }
 }"              },
                 // basic indentation
@@ -156,23 +156,23 @@ bar*/
                 },
                 // auto dedent after return
                 new {
-                    Typed = "if (true) {\rreturn\r}",
+                    Typed = "if (true) {\rreturn \r}",
                     Expected = @"if (true) {
-    return
+    return 
 }"
                 },
                 // auto dedent after return;
                 new {
-                    Typed = "if (true) {\rreturn;\r}",
+                    Typed = "if (true) {\rreturn; \r}",
                     Expected = @"if (true) {
-    return;
+    return; 
 }"
                 },
                 // auto dedent after return;
                 new {
-                    Typed = "if (true) {\rreturn;;\r}",
+                    Typed = "if (true) {\rreturn;; \r}",
                     Expected = @"if (true) {
-    return;;
+    return;; 
 }"
                 },
                 // auto dedent normal statement

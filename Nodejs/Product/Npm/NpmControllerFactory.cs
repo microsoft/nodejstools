@@ -14,13 +14,13 @@
 
 using Microsoft.NodejsTools.Npm.SPI;
 
-namespace Microsoft.NodejsTools.Npm{
-    public class NpmControllerFactory{
+namespace Microsoft.NodejsTools.Npm {
+    public class NpmControllerFactory {
         public static INpmController Create(
             string fullPathToRootPackageDirectory,
             bool showMissingDevOptionalSubPackages = false,
             INpmPathProvider npmPathProvider = null,
-            bool useFallbackIfNpmNotFound = true){
+            bool useFallbackIfNpmNotFound = true) {
             return new NpmController(
                 fullPathToRootPackageDirectory,
                 showMissingDevOptionalSubPackages,

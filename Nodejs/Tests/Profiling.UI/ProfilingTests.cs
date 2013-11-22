@@ -149,6 +149,7 @@ namespace ProfilingUITests {
 
                     try {
                         perfTarget.Ok();
+                        perfTarget = null;
                     } catch (ElementNotEnabledException) {
                         Assert.Fail("Settings were invalid:\n  ScriptName = {0}\n",
                             perfTarget.ScriptName);
@@ -262,11 +263,11 @@ namespace ProfilingUITests {
 
                     try {
                         perfTarget.Ok();
+                        perfTarget = null;
                     } catch (ElementNotEnabledException) {
                         Assert.Fail("Settings were invalid:\n  ScriptName = {0}\n",
                             perfTarget.ScriptName);
                     }
-                    perfTarget = null;
                     app.WaitForDialogDismissed();
 
                     perf = app.NodejsPerformanceExplorerTreeView.WaitForItem("Performance *");
@@ -285,6 +286,7 @@ namespace ProfilingUITests {
                         System.Threading.Thread.Sleep(100);
                     }
                     Assert.IsNotNull(child, "node not added");
+                    System.Threading.Thread.Sleep(7500);    // give time for report to open
                 } finally {
                     if (perfTarget != null) {
                         perfTarget.Cancel();
@@ -332,11 +334,11 @@ namespace ProfilingUITests {
 
                     try {
                         perfTarget.Ok();
+                        perfTarget = null;
                     } catch (ElementNotEnabledException) {
                         Assert.Fail("Settings were invalid:\n  ScriptName = {0}\n",
                             perfTarget.ScriptName);
                     }
-                    perfTarget = null;
                     app.WaitForDialogDismissed();
                     
                     perf = app.NodejsPerformanceExplorerTreeView.WaitForItem("Performance1 *");
@@ -406,11 +408,11 @@ namespace ProfilingUITests {
 
                     try {
                         perfTarget.Ok();
+                        perfTarget = null;
                     } catch (ElementNotEnabledException) {
                         Assert.Fail("Settings were invalid:\n  ScriptName = {0}\n",
                             perfTarget.ScriptName);
                     }
-                    perfTarget = null;
                     app.WaitForDialogDismissed();
 
                     perf = app.NodejsPerformanceExplorerTreeView.WaitForItem("Performance *");
@@ -477,6 +479,7 @@ namespace ProfilingUITests {
 
                     try {
                         perfTarget.Ok();
+                        perfTarget = null;
                     } catch (ElementNotEnabledException) {
                         Assert.Fail("Settings were invalid:\n  SelectedProject = {0}",
                             perfTarget.SelectedProjectComboBox.GetSelectedItemName());

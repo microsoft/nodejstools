@@ -49,7 +49,7 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "NpmTests", "Tests\NpmTests\
 EndProject
 Global
 	GlobalSection(TeamFoundationVersionControl) = preSolution
-		SccNumberOfProjects = 19
+		SccNumberOfProjects = 21
 		SccEnterpriseProvider = {4CA58AB2-18FA-4F8D-95D4-32DDF27D184C}
 		SccTeamFoundationServer = http://tcvstf:8080/tfs/tc
 		SccLocalPath0 = .
@@ -125,6 +125,14 @@ Global
 		SccProjectTopLevelParentUniqueName18 = NodejsTools.sln
 		SccProjectName18 = Product/WebRole
 		SccLocalPath18 = Product\\WebRole
+		SccProjectUniqueName19 = Product\\Npm\\Npm.csproj
+		SccProjectTopLevelParentUniqueName19 = NodejsTools.sln
+		SccProjectName19 = Product/Npm
+		SccLocalPath19 = Product\\Npm
+		SccProjectUniqueName20 = Tests\\NpmTests\\NpmTests.csproj
+		SccProjectTopLevelParentUniqueName20 = NodejsTools.sln
+		SccProjectName20 = Tests/NpmTests
+		SccLocalPath20 = Tests\\NpmTests
 	EndGlobalSection
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|x86 = Debug|x86
@@ -200,20 +208,12 @@ Global
 		{DBC73DF7-1B4C-48BE-8B48-715297487E7A}.Release|x86.ActiveCfg = Release|Any CPU
 		{712D84EC-B2A6-46D1-B030-BA697AE5E554}.Debug|x86.ActiveCfg = Debug|Any CPU
 		{712D84EC-B2A6-46D1-B030-BA697AE5E554}.Release|x86.ActiveCfg = Release|Any CPU
-		{E5EF4B0A-AB41-4B98-8FA8-98D6348003A8}.Debug|Mixed Platforms.ActiveCfg = Debug|x86
-		{E5EF4B0A-AB41-4B98-8FA8-98D6348003A8}.Debug|Mixed Platforms.Build.0 = Debug|x86
 		{E5EF4B0A-AB41-4B98-8FA8-98D6348003A8}.Debug|x86.ActiveCfg = Debug|x86
 		{E5EF4B0A-AB41-4B98-8FA8-98D6348003A8}.Debug|x86.Build.0 = Debug|x86
-		{E5EF4B0A-AB41-4B98-8FA8-98D6348003A8}.Release|Mixed Platforms.ActiveCfg = Release|x86
-		{E5EF4B0A-AB41-4B98-8FA8-98D6348003A8}.Release|Mixed Platforms.Build.0 = Release|x86
 		{E5EF4B0A-AB41-4B98-8FA8-98D6348003A8}.Release|x86.ActiveCfg = Release|x86
 		{E5EF4B0A-AB41-4B98-8FA8-98D6348003A8}.Release|x86.Build.0 = Release|x86
-		{95494195-DCA4-4633-B78B-2087836C11D0}.Debug|Mixed Platforms.ActiveCfg = Debug|x86
-		{95494195-DCA4-4633-B78B-2087836C11D0}.Debug|Mixed Platforms.Build.0 = Debug|x86
 		{95494195-DCA4-4633-B78B-2087836C11D0}.Debug|x86.ActiveCfg = Debug|x86
 		{95494195-DCA4-4633-B78B-2087836C11D0}.Debug|x86.Build.0 = Debug|x86
-		{95494195-DCA4-4633-B78B-2087836C11D0}.Release|Mixed Platforms.ActiveCfg = Release|x86
-		{95494195-DCA4-4633-B78B-2087836C11D0}.Release|Mixed Platforms.Build.0 = Release|x86
 		{95494195-DCA4-4633-B78B-2087836C11D0}.Release|x86.ActiveCfg = Release|x86
 		{95494195-DCA4-4633-B78B-2087836C11D0}.Release|x86.Build.0 = Release|x86
 	EndGlobalSection

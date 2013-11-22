@@ -15,13 +15,13 @@
 using Microsoft.CSharp.RuntimeBinder;
 using Newtonsoft.Json.Linq;
 
-namespace Microsoft.NodejsTools.Npm.SPI{
-    internal class PackageJson : IPackageJson{
+namespace Microsoft.NodejsTools.Npm.SPI {
+    internal class PackageJson : IPackageJson {
         private dynamic _package;
         private Scripts _scripts;
         private Bugs _bugs;
 
-        public PackageJson(dynamic package){
+        public PackageJson(dynamic package) {
             _package = package;
 
             InitKeywords();
@@ -138,21 +138,21 @@ The following error occurred:
             }
         }
 
-        public string Name{
+        public string Name {
             get { return null == _package.name ? null : _package.name.ToString(); }
         }
 
-        public SemverVersion Version{
-            get{
+        public SemverVersion Version {
+            get {
                 return null == _package.version ? new SemverVersion() : SemverVersion.Parse(_package.version.ToString());
             }
         }
 
-        public IScripts Scripts{
-            get{
-                if (null == _scripts){
+        public IScripts Scripts {
+            get {
+                if (null == _scripts) {
                     dynamic scriptsJson = _package.scripts;
-                    if (null == scriptsJson){
+                    if (null == scriptsJson) {
                         scriptsJson = new JObject();
                         _package.scripts = scriptsJson;
                     }
@@ -163,26 +163,26 @@ The following error occurred:
             }
         }
 
-        public IPerson Author{
-            get{
+        public IPerson Author {
+            get {
                 var author = _package.author;
                 return null == author ? null : new Person(author);
             }
         }
 
-        public string Description{
+        public string Description {
             get { return null == _package.description ? null : _package.description.ToString(); }
         }
 
         public IKeywords Keywords { get; private set; }
 
-        public string Homepage{
+        public string Homepage {
             get { return null == _package.homepage ? null : _package.homepage.ToString(); }
         }
 
-        public IBugs Bugs{
-            get{
-                if (null == _bugs && null != _package.bugs){
+        public IBugs Bugs {
+            get {
+                if (null == _bugs && null != _package.bugs) {
                     _bugs = new Bugs(_package);
                 }
                 return _bugs;

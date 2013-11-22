@@ -14,18 +14,16 @@
 
 using System;
 using System.IO;
-using Newtonsoft.Json;
 
 namespace Microsoft.NodejsTools.Npm{
     public class FilePackageJsonSource : IPackageJsonSource{
 
-        private ReaderPackageJsonSource _source;
+        private readonly ReaderPackageJsonSource _source;
 
         public FilePackageJsonSource(string fullPathToFile){
             if (File.Exists(fullPathToFile)){
                 try{
-                    using (var fin = new FileStream(fullPathToFile, FileMode.Open, FileAccess.Read, FileShare.ReadWrite)
-                        ){
+                    using (var fin = new FileStream(fullPathToFile, FileMode.Open, FileAccess.Read, FileShare.ReadWrite)){
                         using (var reader = new StreamReader(fin)){
                             _source = new ReaderPackageJsonSource(reader);
                         }
@@ -44,6 +42,6 @@ namespace Microsoft.NodejsTools.Npm{
                         ex);
         }
 
-        public dynamic Package { get { return _source.Package; } }
+        public dynamic Package { get { return null == _source ? null : _source.Package; } }
     }
 }

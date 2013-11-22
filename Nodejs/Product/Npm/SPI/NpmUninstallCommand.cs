@@ -12,9 +12,8 @@
  *
  * ***************************************************************************/
 
-namespace Microsoft.NodejsTools.Npm.SPI
-{
-    internal class NpmUninstallCommand : NpmCommand{
+namespace Microsoft.NodejsTools.Npm.SPI {
+    internal class NpmUninstallCommand : NpmCommand {
         public NpmUninstallCommand(
             string fullPathToRootPackageDirectory,
             string packageName,
@@ -22,8 +21,7 @@ namespace Microsoft.NodejsTools.Npm.SPI
             bool global = false,
             string pathToNpm = null,
             bool useFallbackIfNpmNotFound = true)
-            : base(fullPathToRootPackageDirectory, pathToNpm, useFallbackIfNpmNotFound)
-        {
+            : base(fullPathToRootPackageDirectory, pathToNpm, useFallbackIfNpmNotFound) {
             Arguments = global
                             ? string.Format("uninstall {0} --g", packageName)
                             : string.Format(

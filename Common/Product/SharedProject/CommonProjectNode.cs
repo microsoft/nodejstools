@@ -478,7 +478,7 @@ namespace Microsoft.VisualStudioTools.Project {
             lock (_fileSystemChanges) {
                 _fileSystemChanges.Clear(); // none of the other changes matter now, we'll rescan the world
                 _currentMerger = null;  // abort any current merge now that we have a new one
-                _fileSystemChanges.Enqueue(new FileSystemChange(this, WatcherChangeTypes.All, null));
+                _fileSystemChanges.Enqueue(new FileSystemChange(this, WatcherChangeTypes.All, null, watcher: sender as FileSystemWatcher));
                 TriggerIdle();
             }
         }
@@ -587,11 +587,13 @@ namespace Microsoft.VisualStudioTools.Project {
             private readonly string _initialDir;
             private readonly Stack<DirState> _remainingDirs = new Stack<DirState>();
             private readonly CommonProjectNode _project;
+            private readonly FileSystemWatcher _watcher;
 
-            public DiskMerger(CommonProjectNode project, HierarchyNode parent, string dir) {
+            public DiskMerger(CommonProjectNode project, HierarchyNode parent, string dir, FileSystemWatcher watcher = null) {
                 _project = project;
                 _initialDir = dir;
                 _remainingDirs.Push(new DirState(dir, parent));
+                _watcher = watcher;
             }
 
             /// <summary>
@@ -602,6 +604,9 @@ namespace Microsoft.VisualStudioTools.Project {
             /// </summary>
             public bool ContinueMerge(bool hierarchyCreated = true) {
                 if (_remainingDirs.Count == 0) {   // all done
+                    if (_watcher != null) {
+                        _watcher.EnableRaisingEvents = true;
+                    }
                     return false;
                 }
 
@@ -963,7 +968,7 @@ namespace Microsoft.VisualStudioTools.Project {
                     try {
 #endif
                         if (change._type == WatcherChangeTypes.All) {
-                            _currentMerger = new DiskMerger(this, this, ProjectHome);
+                            _currentMerger = new DiskMerger(this, this, ProjectHome, change._watcher);
                             continue;
                         } else {
                             change.ProcessChange();
@@ -987,12 +992,14 @@ namespace Microsoft.VisualStudioTools.Project {
             internal readonly WatcherChangeTypes _type;
             private readonly string _path;
             private readonly bool _isRename;
+            internal readonly FileSystemWatcher _watcher;
 
-            public FileSystemChange(CommonProjectNode node, WatcherChangeTypes changeType, string path, bool isRename = false) {
+            public FileSystemChange(CommonProjectNode node, WatcherChangeTypes changeType, string path, bool isRename = false, FileSystemWatcher watcher = null) {
                 _project = node;
                 _type = changeType;
                 _path = path;
                 _isRename = isRename;
+                _watcher = watcher;
             }
 
             public override string ToString() {

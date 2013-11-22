@@ -17,9 +17,9 @@ using System.Linq;
 using Microsoft.NodejsTools.Npm;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 
-namespace NpmTests{
+namespace NpmTests {
     [TestClass]
-    public class PackageJsonDependencyTests : AbstractPackageJsonTests{
+    public class PackageJsonDependencyTests : AbstractPackageJsonTests {
         /*
          { "dependencies" :
           { "foo" : "1.0.0 - 2.9999.9999"
@@ -337,32 +337,32 @@ namespace NpmTests{
             "github"
         };
 
-        private void CheckEmptyDependenciesNotNull(IDependencies dependencies){
+        private void CheckEmptyDependenciesNotNull(IDependencies dependencies) {
             Assert.IsNotNull(dependencies, "Dependencies should not be null.");
             Assert.AreEqual(0, dependencies.Count, "Should not be any dependencies.");
         }
 
-        [TestMethod]
-        public void TestReadEmptyDependenciesNotNull(){
+        [TestMethod, Priority(0)]
+        public void TestReadEmptyDependenciesNotNull() {
             CheckEmptyDependenciesNotNull(LoadFrom(PkgSimple).Dependencies);
         }
 
-        [TestMethod]
-        public void TestReadEmptyDevDependenciesNotNull(){
+        [TestMethod, Priority(0)]
+        public void TestReadEmptyDevDependenciesNotNull() {
             CheckEmptyDependenciesNotNull(LoadFrom(PkgSimple).DevDependencies);
         }
 
-        [TestMethod]
-        public void TestReadEmptyOptionalDependenciesNotNull(){
+        [TestMethod, Priority(0)]
+        public void TestReadEmptyOptionalDependenciesNotNull() {
             CheckEmptyDependenciesNotNull(LoadFrom(PkgSimple).OptionalDependencies);
         }
 
         private void CheckDependencies(
             IDictionary<string, IDependency> retrieved,
             IEnumerable<string[]> expected,
-            int expectedCount){
+            int expectedCount) {
             Assert.AreEqual(expectedCount, retrieved.Count, "Retrieved dependency count mismatch.");
-            foreach (var pair in expected){
+            foreach (var pair in expected) {
                 var dependency = retrieved[pair[0]];
                 Assert.IsNotNull(
                     dependency,
@@ -378,7 +378,7 @@ namespace NpmTests{
                         pair[1],
                         dependency.VersionRangeText,
                         string.Format("Version range mismatch for package '{0}'.", pair[0]));
-                } else{
+                } else {
                     Assert.IsNull(
                         dependency.VersionRangeText,
                         "Dependency with URL should not specify version range text.");
@@ -387,11 +387,11 @@ namespace NpmTests{
                     string address = url.Address;
                     Assert.IsNotNull(address, "Dependency URL address should not be null.");
                     var index = address.IndexOf("://");
-                    if (index < 0){
+                    if (index < 0) {
                         Assert.AreEqual(DependencyUrlType.GitHub, url.Type, "Dependency URL type should be GitHub");
-                    } else{
+                    } else {
                         var prefix = address.Substring(0, index);
-                        switch (prefix){
+                        switch (prefix) {
                             case "http":
                                 Assert.AreEqual(DependencyUrlType.Http, url.Type, "Dependency URL type should be Http.");
                                 break;
@@ -430,88 +430,88 @@ namespace NpmTests{
             }
         }
 
-        private void CheckDependencies(IDictionary<string, IDependency> retrieved, IEnumerable<string[]> expected){
+        private void CheckDependencies(IDictionary<string, IDependency> retrieved, IEnumerable<string[]> expected) {
             CheckDependencies(retrieved, expected, 16);
         }
 
-        private IDictionary<string, IDependency> ReadDependencies(IDependencies dependencies, int expectedCount){
+        private IDictionary<string, IDependency> ReadDependencies(IDependencies dependencies, int expectedCount) {
             Assert.AreEqual(expectedCount, dependencies.Count, "Dependency count mismatch.");
 
             var retrieved = new Dictionary<string, IDependency>();
-            foreach (var dependency in dependencies){
+            foreach (var dependency in dependencies) {
                 retrieved[dependency.Name] = dependency;
             }
             return retrieved;
         }
 
-        private IDictionary<string, IDependency> ReadDependencies(IDependencies dependencies){
+        private IDictionary<string, IDependency> ReadDependencies(IDependencies dependencies) {
             return ReadDependencies(dependencies, 16);
         }
 
-        private IDictionary<string, IDependency> ReadDependencies(){
+        private IDictionary<string, IDependency> ReadDependencies() {
             return ReadDependencies(LoadFrom(PkgDependencies).Dependencies);
         }
 
-        private IDictionary<string, IDependency> ReadDevDependencies(){
+        private IDictionary<string, IDependency> ReadDevDependencies() {
             return ReadDependencies(LoadFrom(PkgAllTheDependencies).DevDependencies);
         }
 
-        private IDictionary<string, IDependency> ReadOptionalDependencies(){
+        private IDictionary<string, IDependency> ReadOptionalDependencies() {
             return ReadDependencies(LoadFrom(PkgAllTheDependencies).OptionalDependencies);
         }
 
-        private IDictionary<string, IDependency> ReadAllDependencies(){
+        private IDictionary<string, IDependency> ReadAllDependencies() {
             return ReadDependencies(LoadFrom(PkgAllTheDependencies).AllDependencies, 48);
         }
 
-        [TestMethod]
-        public void TestReadDependenciesWithVersionRange(){
+        [TestMethod, Priority(0)]
+        public void TestReadDependenciesWithVersionRange() {
             CheckDependencies(ReadDependencies(), VersionRangeDependencies);
         }
 
-        [TestMethod]
-        public void TestReadDependenciesWithUrls(){
+        [TestMethod, Priority(0)]
+        public void TestReadDependenciesWithUrls() {
             CheckDependencies(ReadDependencies(), UrlDependencies);
         }
 
-        [TestMethod]
-        public void TestReadDevDependenciesWithVersionRange(){
+        [TestMethod, Priority(0)]
+        public void TestReadDevDependenciesWithVersionRange() {
             CheckDependencies(ReadDevDependencies(), DevVersionRangeDependencies);
         }
 
-        [TestMethod]
-        public void TestReadDevDependenciesWithUrls(){
+        [TestMethod, Priority(0)]
+        public void TestReadDevDependenciesWithUrls() {
             CheckDependencies(ReadDevDependencies(), DevUrlDependencies);
         }
 
-        [TestMethod]
-        public void TestReadBundledDependencies(){
+        [TestMethod, Priority(0)]
+        public void TestReadBundledDependencies() {
             CheckStringArrayContents(
                 LoadFrom(PkgAllTheDependencies).BundledDependencies,
                 16,
                 ExpectedBundledDependencies);
         }
 
-        [TestMethod]
-        public void TestReadBundleDependencies(){
+        [TestMethod, Priority(0)]
+        public void TestReadBundleDependencies() {
             CheckStringArrayContents(
                 LoadFrom(PkgBundleDependencies).BundledDependencies,
                 16,
                 ExpectedBundledDependencies);
         }
 
-        [TestMethod]
-        public void TestReadOptionalDependenciesWithVersionRange(){
+        [TestMethod, Priority(0)]
+        public void TestReadOptionalDependenciesWithVersionRange() {
             CheckDependencies(ReadOptionalDependencies(), OptionalVersionRangeDependencies);
         }
 
-        [TestMethod]
-        public void TestReadOptionalDependenciesWithUrls(){
+        [TestMethod, Priority(0)]
+        public void TestReadOptionalDependenciesWithUrls() {
             CheckDependencies(ReadOptionalDependencies(), OptionalUrlDependencies);
         }
 
-        [TestMethod]
-        public void TestReadAllDependencies(){
+        [TestMethod, Priority(0)]
+        public void TestReadAllDependencies() {
             CheckDependencies(
                 ReadAllDependencies(),
                 UrlDependencies.Concat(VersionRangeDependencies)

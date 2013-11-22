@@ -14,9 +14,9 @@
 
 using System;
 
-namespace Microsoft.NodejsTools.Npm{
-    public class PackageEventArgs : EventArgs{
-        public PackageEventArgs(IPackage package){
+namespace Microsoft.NodejsTools.Npm {
+    public class PackageEventArgs : EventArgs {
+        public PackageEventArgs(IPackage package) {
             Package = package;
         }
 

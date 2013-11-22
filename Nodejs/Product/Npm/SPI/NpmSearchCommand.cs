@@ -18,39 +18,36 @@ using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
 
-namespace Microsoft.NodejsTools.Npm.SPI{
-    internal class NpmSearchCommand : NpmCommand{
+namespace Microsoft.NodejsTools.Npm.SPI {
+    internal class NpmSearchCommand : NpmCommand {
         public NpmSearchCommand(
             string fullPathToRootPackageDirectory,
             string searchText,
             string pathToNpm = null,
             bool useFallbackIfNpmNotFound = true)
-            : base(fullPathToRootPackageDirectory, pathToNpm, useFallbackIfNpmNotFound)
-        {
+            : base(fullPathToRootPackageDirectory, pathToNpm, useFallbackIfNpmNotFound) {
             Arguments = string.IsNullOrEmpty(searchText) || string.IsNullOrEmpty(searchText.Trim())
                             ? "search"
                             : string.Format("search {0}", searchText);
         }
 
-        protected void ParseResultsFromReader(TextReader source){
+        protected void ParseResultsFromReader(TextReader source) {
             IList<IPackage> results = new List<IPackage>();
 
             var lexer = NpmSearchParserFactory.CreateLexer();
             var parser = NpmSearchParserFactory.CreateParser(lexer);
-            parser.Package += (sender, args) =>
-            {
+            parser.Package += (sender, args) => {
                 results.Add(args.Package);
             };
             lexer.Lex(source);
             Results = results;
         }
 
-        public override async Task<bool> ExecuteAsync(){
+        public override async Task<bool> ExecuteAsync() {
             bool success = await base.ExecuteAsync();
 
-            if (success){
-                using (var reader = new StringReader(StandardOutput))
-                {
+            if (success) {
+                using (var reader = new StringReader(StandardOutput)) {
                     ParseResultsFromReader(reader);
                 }
             }

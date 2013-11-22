@@ -1,21 +1,21 @@
 Node.js Tools for Visual Studio Documentation
 =============================================
 
-This being Alpha and we not having writers, the documentation is a bit sparse. We'll improve our docs for Beta. Feel free to edit/add useful info you come across!
-
 Getting Started
 ---------------
 
-[wiki:"NTVS Installation" How to Install Node.js Tools for Visual Studio]
+[wiki:"NTVS Installation" Installation]
 
-Overview video: [http://vimeo.com/71449031](http://vimeo.com/71449031)  pwd: toomanynodes
+Overview video: [https://www.youtube.com/watch?v=W_1_UqUDx2s](https://www.youtube.com/watch?v=W_1_UqUDx2s)
 
 Features in Depth
 -----------------
 
-* [wiki:"IntelliSense and Editing" Features Intellisense]
+* [wiki:"IntelliSense and Editing" Editor]
 * [wiki:"Debugging" Debugging]
-* [wiki:"Projects" Features Projects]
+	* [wiki:"Advanced Debugging" AdvancedDebugging]
+	* [wiki:"Remote Debugging Linux" NodeJSOnLinuxOnAzure]
+* [wiki:"Projects" Projects]
 * [wiki:"Profiling" Profiling]
 * [wiki:"Azure Deployment" AzureDeployment]
 

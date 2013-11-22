@@ -388,7 +388,7 @@ namespace Microsoft.NodejsTools.Project{
                 }
 
                 ReloadHierarchy(child, package.Modules);
-                if (ProjectMgr.ParentHierarchy != null && !recycle.ContainsKey(package.Name)){
+                if (!recycle.ContainsKey(package.Name) && ProjectMgr.ParentHierarchy != null){
                     child.ExpandItem(EXPANDFLAGS.EXPF_CollapseFolder);
                 }
             }

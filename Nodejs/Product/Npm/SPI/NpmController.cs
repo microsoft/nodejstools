@@ -19,8 +19,8 @@ using System.Linq;
 using System.Threading.Tasks;
 using Newtonsoft.Json;
 
-namespace Microsoft.NodejsTools.Npm.SPI{
-    internal class NpmController : INpmController{
+namespace Microsoft.NodejsTools.Npm.SPI {
+    internal class NpmController : INpmController {
 
         //  *Really* don't want to retrieve this more than once:
         //  47,000 packages takes a while.
@@ -38,48 +38,47 @@ namespace Microsoft.NodejsTools.Npm.SPI{
             string fullPathToRootPackageDirectory,
             bool showMissingDevOptionalSubPackages = false,
             INpmPathProvider npmPathProvider = null,
-            bool useFallbackIfNpmNotFound = true)
-        {
+            bool useFallbackIfNpmNotFound = true) {
             _fullPathToRootPackageDirectory = fullPathToRootPackageDirectory;
             _showMissingDevOptionalSubPackages = showMissingDevOptionalSubPackages;
             _npmPathProvider = npmPathProvider;
             _useFallbackIfNpmNotFound = useFallbackIfNpmNotFound;
         }
 
-        internal string FullPathToRootPackageDirectory{
+        internal string FullPathToRootPackageDirectory {
             get { return _fullPathToRootPackageDirectory; }
         }
 
-        internal string PathToNpm{
+        internal string PathToNpm {
             get { return null == _npmPathProvider ? null : _npmPathProvider.PathToNpm; }
         }
 
-        internal bool UseFallbackIfNpmNotFound{
+        internal bool UseFallbackIfNpmNotFound {
             get { return _useFallbackIfNpmNotFound; }
         }
 
         public event EventHandler StartingRefresh;
 
-        private void Fire(EventHandler handlers){
-            if (null != handlers){
+        private void Fire(EventHandler handlers) {
+            if (null != handlers) {
                 handlers(this, EventArgs.Empty);
             }
         }
 
-        private void OnStartingRefresh(){
+        private void OnStartingRefresh() {
             Fire(StartingRefresh);
         }
 
         public event EventHandler FinishedRefresh;
 
-        private void OnFinishedRefresh(){
+        private void OnFinishedRefresh() {
             Fire(FinishedRefresh);
         }
 
-        public void Refresh(){
+        public void Refresh() {
             OnStartingRefresh();
-            lock (_lock){
-                try{
+            lock (_lock) {
+                try {
                     RootPackage = RootPackageFactory.Create(
                         _fullPathToRootPackageDirectory,
                         _showMissingDevOptionalSubPackages);
@@ -87,48 +86,48 @@ namespace Microsoft.NodejsTools.Npm.SPI{
                     var command = new NpmLsCommand(_fullPathToRootPackageDirectory, true, PathToNpm,
                         _useFallbackIfNpmNotFound);
 
-                    command.ExecuteAsync().ContinueWith(task =>{
-                        try{
+                    command.ExecuteAsync().ContinueWith(task => {
+                        try {
                             GlobalPackages = task.Result
                                 ? RootPackageFactory.Create(command.ListBaseDirectory)
                                 : null;
                         } catch (IOException){} catch (AggregateException){}    //  Latter for npm not installed.
                         OnFinishedRefresh();
                     });
-                } catch (IOException){
+                } catch (IOException) {
                     // Can sometimes happen when packages are still installing because the file may still be used by another process
                 }
             }
         }
 
-        public IRootPackage RootPackage{
-            get{
-                lock (_lock){
+        public IRootPackage RootPackage {
+            get {
+                lock (_lock) {
                     return _rootPackage;
                 }
             }
 
-            private set{
-                lock (_lock){
+            private set {
+                lock (_lock) {
                     _rootPackage = value;
                 }
             }
         }
 
-        public IGlobalPackages GlobalPackages{
-            get{
-                lock (_lock){
+        public IGlobalPackages GlobalPackages {
+            get {
+                lock (_lock) {
                     return _globalPackage;
                 }
             }
-            private set{
-                lock (_lock){
+            private set {
+                lock (_lock) {
                     _globalPackage = value;
                 }
             }
         }
 
-        public INpmCommander CreateNpmCommander(){
+        public INpmCommander CreateNpmCommander() {
             return new NpmCommander(this);
         }
 
@@ -136,40 +135,39 @@ namespace Microsoft.NodejsTools.Npm.SPI{
         public event EventHandler<NpmLogEventArgs> ErrorLogged;
         public event EventHandler<NpmExceptionEventArgs> ExceptionLogged;
 
-        public void LogOutput(object sender, NpmLogEventArgs e){
+        public void LogOutput(object sender, NpmLogEventArgs e) {
             var handlers = OutputLogged;
-            if (null != handlers){
+            if (null != handlers) {
                 handlers(this, e);
             }
         }
 
-        public void LogError(object sender, NpmLogEventArgs e){
+        public void LogError(object sender, NpmLogEventArgs e) {
             var handlers = ErrorLogged;
-            if (null != handlers){
+            if (null != handlers) {
                 handlers(this, e);
             }
         }
 
-        public void LogException(object sender, NpmExceptionEventArgs e){
+        public void LogException(object sender, NpmExceptionEventArgs e) {
             var handlers = ExceptionLogged;
-            if (null != handlers){
+            if (null != handlers) {
                 handlers(this, e);
             }
         }
 
-        public async Task<IList<IPackage>> GetRepositoryCatalogueAsync(bool forceDownload)
-        {
+        public async Task<IList<IPackage>> GetRepositoryCatalogueAsync(bool forceDownload) {
             //  This should really be thread-safe but await can't be inside a lock so
             //  we'll just have to hope and pray this doesn't happen concurrently. Worst
             //  case is we'll end up with two retrievals, one of which will be binned,
             //  which isn't the end of the world.
-            if (null == _sRepoCatalogue || _sRepoCatalogue.Count == 0){
+            if (null == _sRepoCatalogue || _sRepoCatalogue.Count == 0) {
                 Exception ex = null;
-                using (var commander = CreateNpmCommander()){
+                using (var commander = CreateNpmCommander()) {
                     commander.ExceptionLogged += (sender, args) => ex = args.Exception;
                     _sRepoCatalogue = await commander.SearchAsync(null);
                 }
-                if (null != ex){
+                if (null != ex) {
                     throw ex;
                 }
             }

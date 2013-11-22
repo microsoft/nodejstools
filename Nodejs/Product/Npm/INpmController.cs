@@ -16,8 +16,8 @@ using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 
-namespace Microsoft.NodejsTools.Npm{
-    public interface INpmController : INpmLogSource{
+namespace Microsoft.NodejsTools.Npm {
+    public interface INpmController : INpmLogSource {
         event EventHandler StartingRefresh;
         void Refresh();
         event EventHandler FinishedRefresh;
