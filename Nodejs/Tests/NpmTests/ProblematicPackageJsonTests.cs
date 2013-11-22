@@ -148,6 +148,16 @@ namespace NpmTests {
             TestFreshPackage("unescapedquote");
         }
 
+        private void ParseFromBuff(StringBuilder buff){
+            try{
+                using (var reader = new StringReader(buff.ToString())){
+                    LoadFrom(reader);
+                }
+            } catch (PackageJsonException){
+                //  This is fine -> do nothing
+            }
+        }
+
         [TestMethod, Priority(0)]
         public void TestParseFromEveryCharValue(){
             var buff = new StringBuilder();
@@ -155,13 +165,45 @@ namespace NpmTests {
             do{
                 buff.Append(ch);
 
-                try{
-                    using (var reader = new StringReader(buff.ToString())){
-                        LoadFrom(reader);
-                    }
-                } catch (PackageJsonException){
-                    //  This is fine -> do nothing
-                }
+                ParseFromBuff(buff);
+   
+                buff.Length = 0;
+                ++ch;
+            } while (ch != 0);
+        }
+
+        [TestMethod, Priority(0)]
+        public void VeryEvilRandom1CharCorruptionTest(){
+            var original = LoadStringFromResource("NpmTests.Resources.fresh_package.json");
+            var buff = new StringBuilder();
+            var generator = new Random();
+
+            var ch = (char) 0;
+            do{
+                buff.Append(original);
+                buff[generator.Next(buff.Length)] = ch;
+
+                ParseFromBuff(buff);
+
+                buff.Length = 0;
+                ++ch;
+            } while (ch != 0);
+        }
+
+        [TestMethod, Priority(0)]
+        public void VeryEvilRandom1CharInsertionTest()
+        {
+            var original = LoadStringFromResource("NpmTests.Resources.fresh_package.json");
+            var buff = new StringBuilder();
+            var generator = new Random();
+
+            var ch = (char)0;
+            do
+            {
+                buff.Append(original);
+                buff.Insert(generator.Next(buff.Length), ch);
+
+                ParseFromBuff(buff);
 
                 buff.Length = 0;
                 ++ch;
