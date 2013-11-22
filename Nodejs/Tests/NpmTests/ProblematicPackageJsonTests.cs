@@ -179,15 +179,28 @@ namespace NpmTests {
             var generator = new Random();
 
             var ch = (char) 0;
-            do{
-                buff.Append(original);
-                buff[generator.Next(buff.Length)] = ch;
+            var index = 0;
 
-                ParseFromBuff(buff);
+            try{
+                do{
+                    buff.Append(original);
+                    index = generator.Next(buff.Length);
+                    buff[index] = ch;
 
-                buff.Length = 0;
-                ++ch;
-            } while (ch != 0);
+                    ParseFromBuff(buff);
+
+                    buff.Length = 0;
+                    ++ch;
+                } while (ch != 0);
+            } catch (Exception ex){
+                throw new PackageJsonException(
+                    string.Format(@"Corruption/replacement test failed replacing with character code {0:x} at index {1} in content:
+
+{2}
+
+Exception message: {3}", (int) ch, index, buff, ex.Message ),
+                       ex);
+            }
         }
 
         [TestMethod, Priority(0)]
@@ -198,16 +211,30 @@ namespace NpmTests {
             var generator = new Random();
 
             var ch = (char)0;
-            do
+            var index = 0;
+
+            try{
+                do{
+                    buff.Append(original);
+                    index = generator.Next(buff.Length);
+                    buff.Insert(index, ch);
+
+                    ParseFromBuff(buff);
+
+                    buff.Length = 0;
+                    ++ch;
+                } while (ch != 0);
+            }
+            catch (Exception ex)
             {
-                buff.Append(original);
-                buff.Insert(generator.Next(buff.Length), ch);
+                throw new PackageJsonException(
+                    string.Format(@"Insertion test failed inserting character code {0:x} at index {1} in content:
 
-                ParseFromBuff(buff);
+{2}
 
-                buff.Length = 0;
-                ++ch;
-            } while (ch != 0);
+Exception message: {3}", (int)ch, index, buff, ex.Message),
+                       ex);
+            }
         }
     }
 }
