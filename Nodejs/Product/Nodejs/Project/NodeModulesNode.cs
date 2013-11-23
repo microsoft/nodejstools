@@ -252,6 +252,8 @@ namespace Microsoft.NodejsTools.Project{
         }
 
         private void ShowNpmOutputPane(){
+            OutputWindowRedirector.GetGeneral(ProjectMgr.Package).ShowAndActivate();
+
             var pane = GetNpmOutputPane();
             pane.Activate();
         }
