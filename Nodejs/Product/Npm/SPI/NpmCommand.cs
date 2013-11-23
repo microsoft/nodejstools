@@ -133,8 +133,9 @@ namespace Microsoft.NodejsTools.Npm.SPI {
             var success = false;
             using (_process = new Process()) {
                 _process.StartInfo = BuildStartInfo();
+                OnOutputLogged(string.Format("====Executing command 'npm {0} '====\r\n\r\n", _process.StartInfo.Arguments));
 
-                try {
+                try{
                     _process.Start();
 
                     _process.ErrorDataReceived += _process_ErrorDataReceived;
@@ -145,12 +146,19 @@ namespace Microsoft.NodejsTools.Npm.SPI {
 
                     await Task.Run(() => WaitForExit());
                     success = true;
-                }
-                catch (Exception e)
-                {
+                } catch (Exception e){
                     OnExceptionLogged(new NpmExecutionException(
                         string.Format("Error executing npm - unable to start the npm process: {0}", e.Message),
                         e));
+                } finally{
+                    _process.CancelErrorRead();
+                    _process.CancelOutputRead();
+
+                    OnOutputLogged(
+                        string.Format(
+                            "\r\n====npm command {0} with exit code {1}====\r\n\r\n",
+                            _cancelled ? "cancelled" : "completed",
+                            _process.ExitCode));
                 }
             }
             return success;
