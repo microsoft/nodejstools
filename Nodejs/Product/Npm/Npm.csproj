@@ -78,6 +78,7 @@
     <Compile Include="ReaderPackageJsonSource.cs" />
     <Compile Include="RootPackageFactory.cs" />
     <Compile Include="ScriptName.cs" />
+    <Compile Include="SPI\AbstractNpmLogSource.cs" />
     <Compile Include="SPI\NpmCommander.cs" />
     <Compile Include="SPI\NpmGetCatalogueCommand.cs" />
     <Compile Include="TokenEventArgs.cs" />

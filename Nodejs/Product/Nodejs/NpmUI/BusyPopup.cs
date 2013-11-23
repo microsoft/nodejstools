@@ -114,8 +114,9 @@ namespace Microsoft.NodejsTools.NpmUI{
                 _rtf.Append(@"\cf1");
             }
 
-            _rtf.Append(output);
-            _rtf.Append("\\line\r\n");
+            _rtf.Append(output.EndsWith(Environment.NewLine) ? output.Substring(0, output.Length - Environment.NewLine.Length) : output);
+            _rtf.Append("\\line");
+            _rtf.Append(Environment.NewLine);
 
             //  There surely has to be a nicer way to do this but
             //  AppendText() just appends plaintext, hence the use
@@ -145,7 +146,7 @@ namespace Microsoft.NodejsTools.NpmUI{
             }
         }
 
-        private string EscapeBackslashes(string source){
+        private string Preprocess(string source){
             var buff = new StringBuilder();
             foreach (var ch in source){
                 if (ch == '\\'){
@@ -154,11 +155,12 @@ namespace Microsoft.NodejsTools.NpmUI{
                     buff.Append(ch);
                 }
             }
-            return buff.ToString();
+            var result = buff.ToString();
+            return result.EndsWith(Environment.NewLine) ? result.Substring(0, result.Length - Environment.NewLine.Length) : result;
         }
 
         private void WriteLines(string text, bool forceError){
-            text = EscapeBackslashes(text);
+            text = Preprocess(text);
             foreach (var line in text.Split(new string[]{"\r\n", "\n"}, StringSplitOptions.None)){
                 WriteLine(line, forceError);
             }

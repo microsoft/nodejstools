@@ -20,7 +20,7 @@ using System.Threading.Tasks;
 using Newtonsoft.Json;
 
 namespace Microsoft.NodejsTools.Npm.SPI {
-    internal class NpmController : INpmController {
+    internal class NpmController : AbstractNpmLogSource, INpmController {
 
         //  *Really* don't want to retrieve this more than once:
         //  47,000 packages takes a while.
@@ -131,29 +131,16 @@ namespace Microsoft.NodejsTools.Npm.SPI {
             return new NpmCommander(this);
         }
 
-        public event EventHandler<NpmLogEventArgs> OutputLogged;
-        public event EventHandler<NpmLogEventArgs> ErrorLogged;
-        public event EventHandler<NpmExceptionEventArgs> ExceptionLogged;
-
         public void LogOutput(object sender, NpmLogEventArgs e) {
-            var handlers = OutputLogged;
-            if (null != handlers) {
-                handlers(this, e);
-            }
+            OnOutputLogged(e.LogText);
         }
 
         public void LogError(object sender, NpmLogEventArgs e) {
-            var handlers = ErrorLogged;
-            if (null != handlers) {
-                handlers(this, e);
-            }
+            OnErrorLogged(e.LogText);
         }
 
         public void LogException(object sender, NpmExceptionEventArgs e) {
-            var handlers = ExceptionLogged;
-            if (null != handlers) {
-                handlers(this, e);
-            }
+            OnExceptionLogged(e.Exception);
         }
 
         public async Task<IList<IPackage>> GetRepositoryCatalogueAsync(bool forceDownload) {
