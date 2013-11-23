@@ -434,6 +434,20 @@ namespace Microsoft.NodejsTools.Project{
 
         #region Command handling
 
+        private bool _suppressCommands;
+
+        private bool IsCurrentStateASuppressCommandsMode(){
+            return _suppressCommands || ProjectMgr.IsCurrentStateASuppressCommandsMode();
+        }
+
+        private void SuppressCommands(){
+            _suppressCommands = true;
+        }
+
+        private void AllowCommands(){
+            _suppressCommands = false;
+        }
+
         internal override int QueryStatusOnNode(Guid cmdGroup, uint cmd, IntPtr pCmdText, ref QueryStatusResult result){
             if (cmdGroup == GuidList.guidNodeCmdSet){
                 switch (cmd){
@@ -441,7 +455,7 @@ namespace Microsoft.NodejsTools.Project{
                     case PkgCmdId.cmdidNpmInstallModules:
                     case PkgCmdId.cmdidNpmUpdateModules:
                     case PkgCmdId.cmdidNpmUninstallModule:
-                        if (! ProjectMgr.IsCurrentStateASuppressCommandsMode()){
+                        if (! IsCurrentStateASuppressCommandsMode()){
                             result = QueryStatusResult.ENABLED | QueryStatusResult.SUPPORTED;
                         } else{
                             result = QueryStatusResult.SUPPORTED;
@@ -491,23 +505,27 @@ namespace Microsoft.NodejsTools.Project{
             ReloadHierarchy();
         }
 
-        public async void InstallMissingModules(){
+        private void DoPreCommandActions(){
             CheckNotDisposed();
-
+            SuppressCommands();
             ShowNpmOutputPane();
+        }
 
+        public async void InstallMissingModules(){
+            DoPreCommandActions();
             try{
                 using (var commander = NpmController.CreateNpmCommander()){
                     await commander.Install();
                 }
             } catch (NpmNotFoundException nnfe){
                 ErrorHelper.ReportNpmNotInstalled(null, nnfe);
+            } finally{
+                AllowCommands();
             }
         }
 
         public async void UpdateModules(){
-            CheckNotDisposed();
-
+            DoPreCommandActions();
             try{
                 var selected = _projectNode.GetSelectedNodes();
                 using (var commander = NpmController.CreateNpmCommander()){
@@ -520,12 +538,13 @@ namespace Microsoft.NodejsTools.Project{
                 }
             } catch (NpmNotFoundException nnfe){
                 ErrorHelper.ReportNpmNotInstalled(null, nnfe);
+            } finally{
+                AllowCommands();
             }
         }
 
         public async void UninstallModules(){
-            CheckNotDisposed();
-
+            DoPreCommandActions();
             try{
                 var selected = _projectNode.GetSelectedNodes();
                 using (var commander = NpmController.CreateNpmCommander()){
@@ -535,6 +554,8 @@ namespace Microsoft.NodejsTools.Project{
                 }
             } catch (NpmNotFoundException nnfe){
                 ErrorHelper.ReportNpmNotInstalled(null, nnfe);
+            } finally{
+                AllowCommands();
             }
         }
 
