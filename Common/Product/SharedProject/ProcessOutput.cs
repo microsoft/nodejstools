@@ -305,7 +305,11 @@ namespace Microsoft.VisualStudioTools.Project{
                 _process.ErrorDataReceived += OnErrorDataReceived;
             }
 
-            try {
+            _process.Exited += OnExited;
+            _process.EnableRaisingEvents = true;
+
+            try
+            {
                 _process.Start();
             } catch (Exception ex) {
                 _error.AddRange(SplitLines(ex.ToString()));
@@ -313,8 +317,6 @@ namespace Microsoft.VisualStudioTools.Project{
             }
 
             if (_process != null) {
-                _process.Exited += OnExited;
-                _process.EnableRaisingEvents = true;
                 if (_process.StartInfo.RedirectStandardOutput) {
                     _process.BeginOutputReadLine();
                 } if (_process.StartInfo.RedirectStandardError) {
