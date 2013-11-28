@@ -258,6 +258,12 @@ namespace Microsoft.NodejsTools.Project{
             pane.Activate();
         }
 
+        private void ConditionallyShowNpmOutputPane(){
+            if (NodejsPackage.Instance.GeneralOptionsPage.ShowOutputWindowWhenExecutingNpm){
+                ShowNpmOutputPane();
+            }
+        }
+
 #if INTEGRATE_WITH_ERROR_LIST
 
         private ErrorListProvider _errorListProvider;
@@ -508,7 +514,7 @@ namespace Microsoft.NodejsTools.Project{
         private void DoPreCommandActions(){
             CheckNotDisposed();
             SuppressCommands();
-            ShowNpmOutputPane();
+            ConditionallyShowNpmOutputPane();
         }
 
         public async void InstallMissingModules(){
