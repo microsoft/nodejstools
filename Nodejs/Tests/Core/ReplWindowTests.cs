@@ -14,6 +14,7 @@
 
 using System;
 using System.IO;
+using System.Reflection;
 using Microsoft.NodejsTools;
 using Microsoft.NodejsTools.Repl;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
@@ -26,6 +27,12 @@ namespace NodejsTests {
         [ClassInitialize]
         public static void DoDeployment(TestContext context) {
             AssertListener.Initialize();
+            if (!File.Exists("visualstudio_nodejs_repl.js")) {
+                File.WriteAllText(
+                    "visualstudio_nodejs_repl.js",
+                    new StreamReader(Assembly.GetExecutingAssembly().GetManifestResourceStream("NodejsTests.visualstudio_nodejs_repl.js")).ReadToEnd()
+                );
+            }
         }
 
         [TestMethod, Priority(0)]
@@ -190,6 +197,30 @@ undefined";
         }
 
         [TestMethod, Priority(0)]
+        public void TestExceptionNull() {
+            using (var eval = ProjectlessEvaluator()) {
+                var window = new MockReplWindow(eval);
+                var res = eval.ExecuteText("throw null;");
+
+                Assert.IsTrue(res.Wait(10000));
+
+                Assert.AreEqual("undefined", window.Output);
+            }
+        }
+
+        [TestMethod, Priority(0)]
+        public void TestExceptionUndefined() {
+            using (var eval = ProjectlessEvaluator()) {
+                var window = new MockReplWindow(eval);
+                var res = eval.ExecuteText("throw undefined;");
+
+                Assert.IsTrue(res.Wait(10000));
+
+                Assert.AreEqual("undefined", window.Output);
+            }
+        }
+
+        [TestMethod, Priority(0)]
         public void TestProcessExit() {
             using (var eval = ProjectlessEvaluator()) {
                 var window = new MockReplWindow(eval);
@@ -197,7 +228,7 @@ undefined";
 
                 Assert.IsTrue(res.Wait(10000));
 
-                Assert.AreEqual("The process has exited", window.Error);
+                Assert.AreEqual("The process has exited" + Environment.NewLine, window.Error);
                 window.ClearScreen();
 
                 res = eval.ExecuteText("42");
@@ -217,7 +248,7 @@ undefined";
                 res = window.Reset();
                 Assert.IsTrue(res.Wait(10000));
 
-                Assert.AreEqual("The process has exited", window.Error);
+                Assert.AreEqual("The process has exited" + Environment.NewLine, window.Error);
                 window.ClearScreen();
                 Assert.AreEqual("", window.Output);
                 Assert.AreEqual("", window.Error);

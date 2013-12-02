@@ -29,6 +29,7 @@ namespace Microsoft.NodejsTools.Profiling {
         private ProjectTargetView _project;
         private bool _isProjectSelected;
         private StandaloneTargetView _standalone;
+        private readonly string _startText;
 
         private bool _isValid;
         
@@ -72,6 +73,7 @@ namespace Microsoft.NodejsTools.Profiling {
             } else {
                 IsStandaloneSelected = true;
             }
+            _startText = Resources.ProfilingStart;
         }
 
         /// <summary>
@@ -87,6 +89,7 @@ namespace Microsoft.NodejsTools.Profiling {
                 Standalone = new StandaloneTargetView(template.StandaloneTarget);
                 IsStandaloneSelected = true;
             }
+            _startText = Resources.ProfilingOk;
         }
 
         /// <summary>
@@ -217,6 +220,12 @@ namespace Microsoft.NodejsTools.Profiling {
                     _isValid = value;
                     OnPropertyChanged("IsValid");
                 }
+            }
+        }
+
+        public string StartText {
+            get {
+                return _startText;
             }
         }
 

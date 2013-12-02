@@ -108,7 +108,13 @@ function processRequest(command) {
                 var result = util.inspect(obj, undefined, undefined, true);
                 send_response(client, { 'type': 'execute', 'result': result });
             } catch (err) {
-                send_response(client, { 'type': 'execute', 'error': err.toString() });
+                if (err === null || err == undefined) {
+                    var result = util.inspect(undefined, undefined, undefined, true);
+                    send_response(client, { 'type': 'execute', 'result': result });
+                } else {
+                    send_response(client, { 'type': 'execute', 'error': err.toString() });
+                }
+
             }
             break;
         case "clear":

@@ -276,7 +276,7 @@ namespace Microsoft.NodejsTools.Repl {
             }
 
             private void ProcessExitedWorker() {
-                _eval._window.WriteError("The process has exited");
+                _eval._window.WriteError("The process has exited" + Environment.NewLine);
                 using (new SocketLock(this)) {
                     if (_completion != null) {
                         _completion.SetResult(ExecutionResult.Failure);

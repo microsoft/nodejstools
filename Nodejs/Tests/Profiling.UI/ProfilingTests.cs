@@ -168,6 +168,7 @@ namespace ProfilingUITests {
                 } finally {
                     if (perfTarget != null) {
                         perfTarget.Cancel();
+                        app.WaitForDialogDismissed();
                     }
                     profiling.RemoveSession(session, true);
                 }
@@ -290,6 +291,7 @@ namespace ProfilingUITests {
                 } finally {
                     if (perfTarget != null) {
                         perfTarget.Cancel();
+                        app.WaitForDialogDismissed();
                     }
                     profiling.RemoveSession(session, true);
                 }
@@ -361,6 +363,7 @@ namespace ProfilingUITests {
                 } finally {
                     if (perfTarget != null) {
                         perfTarget.Cancel();
+                        app.WaitForDialogDismissed();
                     }
                     profiling.RemoveSession(session, true);
                     profiling.RemoveSession(profiling.GetSession(1), true);
@@ -435,6 +438,7 @@ namespace ProfilingUITests {
                 } finally {
                     if (perfTarget != null) {
                         perfTarget.Cancel();
+                        app.WaitForDialogDismissed();
                     }
                     profiling.RemoveSession(session, true);
                     profiling.RemoveSession(profiling.GetSession(1), true);
@@ -456,11 +460,10 @@ namespace ProfilingUITests {
                 var project = OpenProject(NodejsProfileTest);
 
                 app.OpenNodejsPerformance();
-                var perf = app.NodejsPerformanceExplorerTreeView.WaitForItem("Performance *");
-
                 app.NodejsPerformanceExplorerToolBar.NewPerfSession();
-                perf = app.NodejsPerformanceExplorerTreeView.WaitForItem("Performance");
-                Debug.Assert(perf != null);
+
+                var perf = app.NodejsPerformanceExplorerTreeView.WaitForItem("Performance");
+                Debug.Assert(perf != null, "failed to find performance session");
 
                 var session = profiling.GetSession(1);
                 Assert.AreNotEqual(session, null);
@@ -480,7 +483,7 @@ namespace ProfilingUITests {
                     try {
                         perfTarget.Ok();
                         perfTarget = null;
-                    } catch (ElementNotEnabledException) {
+                    } catch (ElementNotEnabledException) {                        
                         Assert.Fail("Settings were invalid:\n  SelectedProject = {0}",
                             perfTarget.SelectedProjectComboBox.GetSelectedItemName());
                     }
@@ -488,7 +491,7 @@ namespace ProfilingUITests {
 
                     Mouse.MoveTo(perf.GetClickablePoint());
                     Mouse.DoubleClick(System.Windows.Input.MouseButton.Left);
-
+                    
                     // re-open the dialog, verify the settings
                     perfTarget = new NodejsPerfTarget(app.WaitForDialog());
 
@@ -496,6 +499,7 @@ namespace ProfilingUITests {
                 } finally {
                     if (perfTarget != null) {
                         perfTarget.Cancel();
+                        app.WaitForDialogDismissed();
                     }
                     profiling.RemoveSession(session, true);
                 }
@@ -527,6 +531,7 @@ namespace ProfilingUITests {
                 } finally {
                     if (perfTarget != null) {
                         perfTarget.Cancel();
+                        app.WaitForDialogDismissed();
                         perfTarget = null;
                     }
                 }
@@ -908,9 +913,7 @@ namespace ProfilingUITests {
                 } finally {
                     if (perfTarget != null) {
                         perfTarget.Cancel();
-                        if (app != null) {
-                            app.WaitForDialogDismissed();
-                        }
+                        app.WaitForDialogDismissed();
                     }
                     profiling.RemoveSession(session, true);
                 }

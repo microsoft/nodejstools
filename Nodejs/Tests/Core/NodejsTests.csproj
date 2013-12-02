@@ -115,9 +115,7 @@
     </ProjectReference>
   </ItemGroup>
   <ItemGroup>
-    <None Include="$(BuildRoot)\Nodejs\Product\Nodejs\visualstudio_nodejs_repl.js">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </None>
+    <EmbeddedResource Include="$(BuildRoot)\Nodejs\Product\Nodejs\visualstudio_nodejs_repl.js" />
   </ItemGroup>
   <ItemGroup>
     <EmbeddedResource Include="Resources.resx">
