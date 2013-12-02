@@ -29,8 +29,8 @@ using Microsoft.VisualStudioTools.Project;
 using MessageBox = System.Windows.MessageBox;
 using Timer = System.Threading.Timer;
 
-namespace Microsoft.NodejsTools.Project{
-    internal class NodeModulesNode : HierarchyNode{
+namespace Microsoft.NodejsTools.Project {
+    internal class NodeModulesNode : HierarchyNode {
         #region Constants
 
         /// <summary>
@@ -59,11 +59,12 @@ namespace Microsoft.NodejsTools.Project{
 
         #region Initialisation
 
-        public NodeModulesNode(NodejsProjectNode root) : base(root){
+        public NodeModulesNode(NodejsProjectNode root)
+            : base(root) {
             _projectNode = root;
             ExcludeNodeFromScc = true;
 
-            _watcher = new FileSystemWatcher(_projectNode.ProjectHome){
+            _watcher = new FileSystemWatcher(_projectNode.ProjectHome) {
                 NotifyFilter = NotifyFilters.LastWrite,
                 IncludeSubdirectories = true
             };
@@ -75,27 +76,27 @@ namespace Microsoft.NodejsTools.Project{
             CreateNpmController();
         }
 
-        private void CheckNotDisposed(){
-            if (_isDisposed){
+        private void CheckNotDisposed() {
+            if (_isDisposed) {
                 throw new ObjectDisposedException(
                     "This NodeModulesNode has been disposed of and should no longer be used.");
             }
         }
 
-        protected override void Dispose(bool disposing){
-            if (! _isDisposed){
-                lock (_lock){
+        protected override void Dispose(bool disposing) {
+            if (!_isDisposed) {
+                lock (_lock) {
                     _watcher.Changed -= Watcher_Modified;
                     _watcher.Created -= Watcher_Modified;
                     _watcher.Deleted -= Watcher_Modified;
                     _watcher.Dispose();
 
-                    if (null != _fileSystemWatcherTimer){
+                    if (null != _fileSystemWatcherTimer) {
                         _fileSystemWatcherTimer.Dispose();
                         _fileSystemWatcherTimer = null;
                     }
 
-                    if (null != _npmController){
+                    if (null != _npmController) {
                         _npmController.OutputLogged -= _npmController_OutputLogged;
                         _npmController.ErrorLogged -= _npmController_ErrorLogged;
                     }
@@ -110,11 +111,11 @@ namespace Microsoft.NodejsTools.Project{
 
         #region Properties
 
-        private string GetNpmPathFromNodePathInProject(){
+        private string GetNpmPathFromNodePathInProject() {
             var props = ProjectMgr.NodeProperties as NodejsProjectNodeProperties;
-            if (null != props){
+            if (null != props) {
                 var nodePath = props.NodeExePath;
-                if (!string.IsNullOrEmpty(nodePath)){
+                if (!string.IsNullOrEmpty(nodePath)) {
                     var dir = Path.GetDirectoryName(nodePath);
                     return string.IsNullOrEmpty(dir) ? null : Path.Combine(dir, "npm.cmd");
                 }
@@ -122,22 +123,22 @@ namespace Microsoft.NodejsTools.Project{
             return null;
         }
 
-        private class NpmPathProvider : INpmPathProvider{
+        private class NpmPathProvider : INpmPathProvider {
             private NodeModulesNode _owner;
-            internal NpmPathProvider(NodeModulesNode owner){
+            internal NpmPathProvider(NodeModulesNode owner) {
                 _owner = owner;
             }
 
-            public string PathToNpm{
-                get{
+            public string PathToNpm {
+                get {
                     return _owner.GetNpmPathFromNodePathInProject();
                 }
             }
         }
 
-        private INpmController CreateNpmController(){
-            lock (_lock){
-                if (null == _npmController){
+        private INpmController CreateNpmController() {
+            lock (_lock) {
+                if (null == _npmController) {
                     _npmController = NpmControllerFactory.Create(
                         _projectNode.BuildProject.DirectoryPath,
                         false,
@@ -151,8 +152,8 @@ namespace Microsoft.NodejsTools.Project{
             }
         }
 
-        public INpmController NpmController{
-            get{
+        public INpmController NpmController {
+            get {
                 return _npmController;
             }
         }
@@ -161,11 +162,9 @@ namespace Microsoft.NodejsTools.Project{
 
         #region Updating module hierarchy
 
-        private void RestartFileSystemWatcherTimer(){
-            lock (_lock)
-            {
-                if (null != _fileSystemWatcherTimer)
-                {
+        private void RestartFileSystemWatcherTimer() {
+            lock (_lock) {
+                if (null != _fileSystemWatcherTimer) {
                     _fileSystemWatcherTimer.Dispose();
                 }
 
@@ -173,29 +172,26 @@ namespace Microsoft.NodejsTools.Project{
             }
         }
 
-        private void Watcher_Modified(object sender, FileSystemEventArgs e){
+        private void Watcher_Modified(object sender, FileSystemEventArgs e) {
             string path = e.FullPath;
-            if (!path.EndsWith("package.json") && !path.Contains("\\node_modules")){
+            if (!path.EndsWith("package.json") && !path.Contains("\\node_modules")) {
                 return;
             }
 
             RestartFileSystemWatcherTimer();
         }
 
-        internal void ReloadHierarchySafe(){
-            if (UIThread.Instance.IsUIThread)
-            {
+        internal void ReloadHierarchySafe() {
+            if (UIThread.Instance.IsUIThread) {
                 ReloadHierarchy();
-            }
-            else
-            {
+            } else {
                 UIThread.Instance.Run(ReloadHierarchy);
             }
         }
 
-        private void UpdateModulesFromTimer(){
-            lock (_lock){
-                if (null != _fileSystemWatcherTimer){
+        private void UpdateModulesFromTimer() {
+            lock (_lock) {
+                if (null != _fileSystemWatcherTimer) {
                     _fileSystemWatcherTimer.Dispose();
                     _fileSystemWatcherTimer = null;
                 }
@@ -208,26 +204,26 @@ namespace Microsoft.NodejsTools.Project{
 
         private int _refreshRetryCount;
 
-        private void ReloadModules(){
-            lock (_lock){
+        private void ReloadModules() {
+            lock (_lock) {
                 var retry = false;
                 Exception ex = null;
-                try{
+                try {
                     NpmController.Refresh();
-                } catch (PackageJsonException pje){
+                } catch (PackageJsonException pje) {
                     retry = true;
                     ex = pje;
-                } catch (AggregateException ae){
+                } catch (AggregateException ae) {
                     retry = true;
                     ex = ae;
-                } catch (FileLoadException fle){
+                } catch (FileLoadException fle) {
                     //  Fixes bug reported in work item 447 - just wait a bit and retry!
                     retry = true;
                     ex = fle;
                 }
 
-                if (retry){
-                    if (_refreshRetryCount < 5){
+                if (retry) {
+                    if (_refreshRetryCount < 5) {
                         ++_refreshRetryCount;
                         RestartFileSystemWatcherTimer();
                     } else {
@@ -239,10 +235,10 @@ namespace Microsoft.NodejsTools.Project{
 
         private static readonly Guid NpmOutputPaneGuid = new Guid("25764421-33B8-4163-BD02-A94E299D52D8");
 
-        private IVsOutputWindowPane GetNpmOutputPane(){
-            var outputWindow = (IVsOutputWindow) _projectNode.GetService(typeof (SVsOutputWindow));
+        private IVsOutputWindowPane GetNpmOutputPane() {
+            var outputWindow = (IVsOutputWindow)_projectNode.GetService(typeof(SVsOutputWindow));
             IVsOutputWindowPane pane;
-            if (outputWindow.GetPane(NpmOutputPaneGuid, out pane) != VSConstants.S_OK){
+            if (outputWindow.GetPane(NpmOutputPaneGuid, out pane) != VSConstants.S_OK) {
                 outputWindow.CreatePane(NpmOutputPaneGuid, "Npm", 1, 1);
                 outputWindow.GetPane(NpmOutputPaneGuid, out pane);
             }
@@ -290,11 +286,11 @@ namespace Microsoft.NodejsTools.Project{
             }
         }
 
-        #endif
+#endif
 
-        private void WriteNpmLogToOutputWindow(string logText){
+        private void WriteNpmLogToOutputWindow(string logText) {
             var pane = GetNpmOutputPane();
-            if (null != pane){
+            if (null != pane) {
                 pane.OutputStringThreadSafe(logText);
             }
 
@@ -305,37 +301,35 @@ namespace Microsoft.NodejsTools.Project{
 #endif
         }
 
-        private void WriteNpmLogToOutputWindow(NpmLogEventArgs args)
-        {
+        private void WriteNpmLogToOutputWindow(NpmLogEventArgs args) {
             WriteNpmLogToOutputWindow(args.LogText);
         }
 
-        private void _npmController_ErrorLogged(object sender, NpmLogEventArgs e){
+        private void _npmController_ErrorLogged(object sender, NpmLogEventArgs e) {
             WriteNpmLogToOutputWindow(e);
         }
 
-        private void _npmController_OutputLogged(object sender, NpmLogEventArgs e){
+        private void _npmController_OutputLogged(object sender, NpmLogEventArgs e) {
             WriteNpmLogToOutputWindow(e);
         }
 
-        void _npmController_ExceptionLogged(object sender, NpmExceptionEventArgs e)
-        {
+        void _npmController_ExceptionLogged(object sender, NpmExceptionEventArgs e) {
             WriteNpmLogToOutputWindow(ErrorHelper.GetExceptionDetailsText(e.Exception));
         }
 
-        private void ReloadHierarchy(){
+        private void ReloadHierarchy() {
             INpmController controller;
 
-            lock (_lock){
+            lock (_lock) {
                 controller = _npmController;
             }
 
-            if (null != controller){
+            if (null != controller) {
                 ReloadHierarchy(this, controller.RootPackage.Modules);
             }
         }
 
-        private void ReloadHierarchy(HierarchyNode parent, INodeModules modules){
+        private void ReloadHierarchy(HierarchyNode parent, INodeModules modules) {
             //  We're going to reuse nodes for which matching modules exist in the new set.
             //  The reason for this is that we want to preserve the expansion state of the
             //  hierarchy. If we just bin everything off and recreate it all from scratch
@@ -343,9 +337,9 @@ namespace Microsoft.NodejsTools.Project{
             //  have drilled down into the hierarchy
             var recycle = new Dictionary<string, DependencyNode>();
             var remove = new List<HierarchyNode>();
-            for (var current = parent.FirstChild; null != current; current = current.NextSibling){
+            for (var current = parent.FirstChild; null != current; current = current.NextSibling) {
                 var dep = current as DependencyNode;
-                if (null == dep){
+                if (null == dep) {
                     remove.Add(current);
                     continue;
                 }
@@ -358,31 +352,31 @@ namespace Microsoft.NodejsTools.Project{
                     && module.IsDevDependency == dep.Package.IsDevDependency
                     && module.IsListedInParentPackageJson == dep.Package.IsListedInParentPackageJson
                     && module.IsMissing == dep.Package.IsMissing
-                    && module.IsOptionalDependency == dep.Package.IsOptionalDependency)){
+                    && module.IsOptionalDependency == dep.Package.IsOptionalDependency)) {
                     recycle[dep.Package.Name] = dep;
-                } else{
+                } else {
                     remove.Add(current);
                 }
             }
 
-            foreach (var obsolete in remove){
+            foreach (var obsolete in remove) {
                 parent.RemoveChild(obsolete);
                 ProjectMgr.OnItemDeleted(obsolete);
             }
 
-            foreach (var package in modules){
+            foreach (var package in modules) {
                 DependencyNode child;
 
-                if (recycle.ContainsKey(package.Name)){
+                if (recycle.ContainsKey(package.Name)) {
                     child = recycle[package.Name];
                     child.Package = package;
-                } else{
+                } else {
                     child = new DependencyNode(_projectNode, parent as DependencyNode, package);
                     parent.AddChild(child);
                 }
 
                 ReloadHierarchy(child, package.Modules);
-                if (!recycle.ContainsKey(package.Name) && ProjectMgr.ParentHierarchy != null){
+                if (!recycle.ContainsKey(package.Name) && ProjectMgr.ParentHierarchy != null) {
                     child.ExpandItem(EXPANDFLAGS.EXPF_CollapseFolder);
                 }
             }
@@ -392,33 +386,33 @@ namespace Microsoft.NodejsTools.Project{
 
         #region HierarchyNode implementation
 
-        public override string GetEditLabel(){
+        public override string GetEditLabel() {
             return null;
         }
 
-        public override int SortPriority{
+        public override int SortPriority {
             get { return DefaultSortOrderNode.ReferenceContainerNode + 1; }
         }
 
-        public override object GetIconHandle(bool open){
+        public override object GetIconHandle(bool open) {
             return
                 ProjectMgr.ImageHandler.GetIconHandle(
-                    open ? (int) ProjectNode.ImageName.OpenReferenceFolder : (int) ProjectNode.ImageName.ReferenceFolder);
+                    open ? (int)ProjectNode.ImageName.OpenReferenceFolder : (int)ProjectNode.ImageName.ReferenceFolder);
         }
 
-        public override string Url{
+        public override string Url {
             get { return NodeModulesVirtualName; }
         }
 
-        public override string Caption{
+        public override string Caption {
             get { return _cCaption; }
         }
 
-        public override Guid ItemTypeGuid{
+        public override Guid ItemTypeGuid {
             get { return VSConstants.GUID_ItemType_VirtualFolder; }
         }
 
-        public override int MenuCommandId{
+        public override int MenuCommandId {
             get { return VsMenus.IDM_VS_CTXT_ITEMNODE; }
         }
 
@@ -426,15 +420,15 @@ namespace Microsoft.NodejsTools.Project{
 
         #region Command handling
 
-        internal override int QueryStatusOnNode(Guid cmdGroup, uint cmd, IntPtr pCmdText, ref QueryStatusResult result){
-            if (cmdGroup == GuidList.guidNodeCmdSet){
-                switch (cmd){
+        internal override int QueryStatusOnNode(Guid cmdGroup, uint cmd, IntPtr pCmdText, ref QueryStatusResult result) {
+            if (cmdGroup == GuidList.guidNodeCmdSet) {
+                switch (cmd) {
                     case PkgCmdId.cmdidNpmManageModules:
                     case PkgCmdId.cmdidNpmUpdateModules:
                     case PkgCmdId.cmdidNpmUninstallModule:
-                        if (! ProjectMgr.IsCurrentStateASuppressCommandsMode()){
+                        if (!ProjectMgr.IsCurrentStateASuppressCommandsMode()) {
                             result = QueryStatusResult.ENABLED | QueryStatusResult.SUPPORTED;
-                        } else{
+                        } else {
                             result = QueryStatusResult.SUPPORTED;
                         }
                         return VSConstants.S_OK;
@@ -445,11 +439,9 @@ namespace Microsoft.NodejsTools.Project{
             return base.QueryStatusOnNode(cmdGroup, cmd, pCmdText, ref result);
         }
 
-        internal override int ExecCommandOnNode(Guid cmdGroup, uint cmd, uint nCmdexecopt, IntPtr pvaIn, IntPtr pvaOut){
-            if (cmdGroup == GuidList.guidNodeCmdSet)
-            {
-                switch (cmd)
-                {
+        internal override int ExecCommandOnNode(Guid cmdGroup, uint cmd, uint nCmdexecopt, IntPtr pvaIn, IntPtr pvaOut) {
+            if (cmdGroup == GuidList.guidNodeCmdSet) {
+                switch (cmd) {
                     case PkgCmdId.cmdidNpmManageModules:
                         ManageModules();
                         return VSConstants.S_OK;
@@ -468,45 +460,45 @@ namespace Microsoft.NodejsTools.Project{
             return base.ExecCommandOnNode(cmdGroup, cmd, nCmdexecopt, pvaIn, pvaOut);
         }
 
-        public void ManageModules(){
+        public void ManageModules() {
             CheckNotDisposed();
 
-            using (var manager = new PackageManagerDialog(NpmController)){
+            using (var manager = new PackageManagerDialog(NpmController)) {
                 manager.ShowDialog();
             }
 
             ReloadHierarchy();
         }
 
-        public void UpdateModules(){
+        public void UpdateModules() {
             CheckNotDisposed();
 
-            try{
+            try {
                 var selected = _projectNode.GetSelectedNodes();
-                using (var commander = NpmController.CreateNpmCommander()){
-                    if (selected.Count == 1 && selected[0] == this){
+                using (var commander = NpmController.CreateNpmCommander()) {
+                    if (selected.Count == 1 && selected[0] == this) {
                         commander.UpdatePackagesAsync();
-                    } else{
+                    } else {
                         commander.UpdatePackagesAsync(
                             selected.OfType<DependencyNode>().Select(dep => dep.Package).ToList());
                     }
                 }
-            } catch (NpmNotFoundException nnfe){
+            } catch (NpmNotFoundException nnfe) {
                 ErrorHelper.ReportNpmNotInstalled(null, nnfe);
             }
         }
 
-        public void UninstallModules(){
+        public void UninstallModules() {
             CheckNotDisposed();
 
-            try{
+            try {
                 var selected = _projectNode.GetSelectedNodes();
-                using (var commander = NpmController.CreateNpmCommander()){
-                    foreach (var name in selected.OfType<DependencyNode>().Select(dep => dep.Package.Name).ToList()){
+                using (var commander = NpmController.CreateNpmCommander()) {
+                    foreach (var name in selected.OfType<DependencyNode>().Select(dep => dep.Package.Name).ToList()) {
                         commander.UninstallPackageAsync(name);
                     }
                 }
-            } catch (NpmNotFoundException nnfe){
+            } catch (NpmNotFoundException nnfe) {
                 ErrorHelper.ReportNpmNotInstalled(null, nnfe);
             }
         }
