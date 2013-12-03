@@ -463,7 +463,13 @@ namespace ProfilingUITests {
                 app.NodejsPerformanceExplorerToolBar.NewPerfSession();
 
                 var perf = app.NodejsPerformanceExplorerTreeView.WaitForItem("Performance");
-                Debug.Assert(perf != null, "failed to find performance session");
+                if (perf == null) {
+                    var tmpSession = profiling.GetSession(1);
+                    if (tmpSession != null) {
+                        profiling.RemoveSession(tmpSession, true);
+                    }
+                    Debug.Fail("failed to find performance session, found " + tmpSession != null ? tmpSession.Name : "<nothing>");
+                }
 
                 var session = profiling.GetSession(1);
                 Assert.AreNotEqual(session, null);
