@@ -20,13 +20,17 @@ namespace Microsoft.VisualStudioTools {
     [AttributeUsage(AttributeTargets.Class, AllowMultiple = true)]
     class ProvideDebugEngineAttribute : RegistrationAttribute {
         private readonly string _id, _name;
+        private readonly bool _setNextStatement, _hitCountBp, _justMyCodeStepping;
         private readonly Type _programProvider, _debugEngine;
 
-        public ProvideDebugEngineAttribute(string name, Type programProvider, Type debugEngine, string id) {
+        public ProvideDebugEngineAttribute(string name, Type programProvider, Type debugEngine, string id, bool setNextStatement = true, bool hitCountBp = false, bool justMyCodeStepping = true) {
             _name = name;
             _programProvider = programProvider;
             _debugEngine = debugEngine;
             _id = id;
+            _setNextStatement = setNextStatement;
+            _hitCountBp = hitCountBp;
+            _justMyCodeStepping = justMyCodeStepping;
         }
 
         public override void Register(RegistrationContext context) {
@@ -43,10 +47,10 @@ namespace Microsoft.VisualStudioTools {
             engineKey.SetValue("CallstackBP", 1);
             engineKey.SetValue("ConditionalBP", 1);
             engineKey.SetValue("Exceptions", 1);
-            engineKey.SetValue("SetNextStatement", 0);
+            engineKey.SetValue("SetNextStatement", _setNextStatement ? 1 : 0);
             engineKey.SetValue("RemoteDebugging", 1);
-            engineKey.SetValue("HitCountBP", 1);
-            engineKey.SetValue("JustMyCodeStepping", 0);
+            engineKey.SetValue("HitCountBP", _hitCountBp ? 1 : 0);
+            engineKey.SetValue("JustMyCodeStepping", _justMyCodeStepping ? 1 : 0);
             //engineKey.SetValue("FunctionBP", 1); // TODO: Implement PythonLanguageInfo.ResolveName
 
             // provide class / assembly so we can be created remotely from the GAC w/o registering a CLSID 
