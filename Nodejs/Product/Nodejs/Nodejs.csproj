@@ -687,7 +687,6 @@
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
     <ZipProject Include="ProjectTemplates\NodejsWebApp\server.js" />
-    <Resource Include="..\Icons\NodejsPackage.ico" />
     <Content Include="..\Icons\NodejsPackage.ico">
       <IncludeInVSIX>true</IncludeInVSIX>
       <VSIXSubpath>.</VSIXSubpath>
