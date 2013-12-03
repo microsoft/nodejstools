@@ -175,5 +175,13 @@ namespace TestUtilities.SharedProject {
         public static ProjectContentGroup ItemGroup(params ProjectContentGenerator[] properties) {
             return new ProjectContentGroup(properties);
         }
+
+        /// <summary>
+        /// Returns a new SolutionFolder object which can be used to create
+        /// a solution folder in the generated project.
+        /// </summary>
+        public static SolutionFolder SolutionFolder(string name) {
+            return new SolutionFolder(name);
+        }
     }
 }

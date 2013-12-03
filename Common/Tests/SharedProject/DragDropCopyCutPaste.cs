@@ -1117,6 +1117,39 @@ namespace Microsoft.VisualStudioTools.SharedProjectTests {
             }
         }
 
+        [TestMethod, Priority(0), TestCategory("Core")]
+        [HostType("TC Dynamic"), DynamicHostType(typeof(VsIdeHostAdapter))]
+        public void MoveProjectToSolutionFolderKeyboard() {
+            MoveProjectToSolutionFolder(MoveByKeyboard);
+        }
+
+        [TestMethod, Priority(0), TestCategory("Core")]
+        [HostType("TC Dynamic"), DynamicHostType(typeof(VsIdeHostAdapter))]
+        public void MoveProjectToSolutionFolderMouse() {
+            MoveProjectToSolutionFolder(MoveByMouse);
+        }
+
+        /// <summary>
+        /// Cut an item from our project, paste into another project, item should be removed from our project
+        /// </summary>
+        private void MoveProjectToSolutionFolder(MoveDelegate mover) {
+            foreach (var projectType in ProjectTypes) {
+                var projects = new ISolutionElement[] {
+                    new ProjectDefinition("DragDropCopyCutPaste", projectType),
+                    SolutionFolder("SolFolder")
+                };
+
+                using (var solution = SolutionFile.Generate("DragDropCopyCutPaste", projects).ToVs()) {
+                    mover(
+                        solution.WaitForItem("SolFolder"),
+                        solution.WaitForItem("DragDropCopyCutPaste")
+                    );
+
+                    Assert.IsNotNull(solution.WaitForItem("SolFolder", "DragDropCopyCutPaste"));
+                }
+            }
+        }
+
         private delegate void MoveDelegate(AutomationElement destination, params AutomationElement[] source);
 
         /// <summary>

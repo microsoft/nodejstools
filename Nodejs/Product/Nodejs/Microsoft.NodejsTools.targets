@@ -9,8 +9,7 @@
   <!-- Normal install environment, use the current version -->
   <PropertyGroup>
     <TargetFrameworkVersion>v4.0</TargetFrameworkVersion>
-    <NodejsSupportPath>$(MSBuildExtensionsPath)\Microsoft\VisualStudio\v$(VisualStudioVersion)\Node.js Tools\</NodejsSupportPath>
-    <PTVSSupportPath>$(MSBuildExtensionsPath)\Microsoft\VisualStudio\v$(VisualStudioVersion)\Node.js Tools\</PTVSSupportPath>
+    <NodejsSupportPath>$(MSBuildThisFileDirectory)</NodejsSupportPath>
   </PropertyGroup>
 
   <Target Name="GetTargetFrameworkVersion" Returns="$(TargetFrameworkVersion)" />

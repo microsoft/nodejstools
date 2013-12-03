@@ -23,11 +23,11 @@ namespace TestUtilities.SharedProject {
     /// the items in the project (which will be generated at test time) as well as
     /// MSBuild project properties.
     /// </summary>
-    public sealed class ProjectDefinition {
+    public sealed class ProjectDefinition : ISolutionElement {
+        private readonly bool _isUserProject;
         public readonly ProjectType ProjectType;
-        public readonly string Name;
+        private readonly string _name;
         public readonly ProjectContentGenerator[] Items;
-        public readonly bool IsUserProject;
 
         /// <summary>
         /// Creates a new project definition which can be included in a solution or generated.
@@ -37,13 +37,13 @@ namespace TestUtilities.SharedProject {
         /// <param name="items">The items included in the project</param>
         public ProjectDefinition(string name, ProjectType projectType, params ProjectContentGenerator[] items) {
             ProjectType = projectType;
-            Name = name;
+            _name = name;
             Items = items;
         }
 
         public ProjectDefinition(string name, ProjectType projectType, bool isUserProject, params ProjectContentGenerator[] items)
             : this(name, projectType, items) {
-            IsUserProject = isUserProject;
+            _isUserProject  = isUserProject;
         }
 
         /// <summary>
@@ -51,23 +51,23 @@ namespace TestUtilities.SharedProject {
         /// project in the solution.
         /// </summary>
         public SolutionFile Generate() {
-            return SolutionFile.Generate(Name, this);
+            return SolutionFile.Generate(_name, this);
         }
 
         public MSBuild.Project Save(MSBuild.ProjectCollection collection, string location) {
-            location = Path.Combine(location, Name);
+            location = Path.Combine(location, _name);
             Directory.CreateDirectory(location);
 
             var project = new MSBuild.Project(collection);
-            string projectFile = Path.Combine(location, Name) + ProjectType.ProjectExtension;
-            if (IsUserProject) {
+            string projectFile = Path.Combine(location, _name) + ProjectType.ProjectExtension;
+            if (_isUserProject) {
                 projectFile += ".user";
             }
             project.Save(projectFile);
 
             var projGuid = Guid.NewGuid();
-            project.SetProperty("ProjectTypeGuid", ProjectType.ProjectTypeGuid.ToString());
-            project.SetProperty("Name", Name);
+            project.SetProperty("ProjectTypeGuid", TypeGuid.ToString());
+            project.SetProperty("Name", _name);
             project.SetProperty("ProjectGuid", projGuid.ToString("B"));
             project.SetProperty("SchemaVersion", "2.0");
 
@@ -87,5 +87,15 @@ namespace TestUtilities.SharedProject {
 
             return project;
         }
+
+        public Guid TypeGuid {
+            get { return ProjectType.ProjectTypeGuid; }
+        }
+
+        public SolutionElementFlags Flags {
+            get { return _isUserProject ? SolutionElementFlags.ExcludeFromSolution : SolutionElementFlags.None; }
+        }
+
+        public string Name { get { return _name; } }
     }
 }

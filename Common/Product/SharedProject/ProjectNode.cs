@@ -1635,6 +1635,8 @@ namespace Microsoft.VisualStudioTools.Project
         {
             using (new DebugTimer("ProjectLoad"))
             {
+                _diskNodes.Clear();
+
                 bool successful = false;
                 try
                 {
@@ -1751,6 +1753,7 @@ namespace Microsoft.VisualStudioTools.Project
                     {
                         this.filename = fileName;
                     }
+                    _diskNodes[this.filename] = this;
 
                     // now reload to fix up references
                     this.Reload();
@@ -2860,7 +2863,9 @@ namespace Microsoft.VisualStudioTools.Project
             this.buildProject.FullPath = newFileName;
 
 
+            _diskNodes.Remove(this.filename);
             this.filename = newFileName;
+            _diskNodes[this.filename] = this;
 
             string newFileNameWithoutExtension = Path.GetFileNameWithoutExtension(newFileName);
 
@@ -2869,7 +2874,6 @@ namespace Microsoft.VisualStudioTools.Project
 
             // Saves the project file on disk.
             this.buildProject.Save(newFileName);
-
         }
 
         /// <summary>
@@ -4043,11 +4047,10 @@ namespace Microsoft.VisualStudioTools.Project
             return isDirty;
         }
 
-        public virtual int Load(string fileName, uint mode, int readOnly)
+        int IPersistFileFormat.Load(string fileName, uint mode, int readOnly)
         {
-            this.filename = fileName;
-            this.Reload();
-            return VSConstants.S_OK;
+            // This isn't how projects are loaded, C#, VB, and CPS all fail this call
+            return VSConstants.E_NOTIMPL;
         }
 
         public virtual int Save(string fileToBeSaved, int remember, uint formatIndex)
