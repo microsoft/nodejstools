@@ -58,7 +58,7 @@
       <Link>SharedProject\CommonLibraryNode.cs</Link>
       <Visible>true</Visible>
     </Compile>
-    <Compile Include="..\..\..\Common\Product\SharedProject\Navigation\ProjectLibraryNode.cs">
+    <Compile Include="$(_ProjectSystemFilesLocation)\Navigation\ProjectLibraryNode.cs">
       <Link>SharedProject\Navigation\ProjectLibraryNode.cs</Link>
       <Visible>true</Visible>
     </Compile>
@@ -541,6 +541,7 @@
       <Visible>true</Visible>
     </Compile>
     <Compile Include="$(_ProjectSystemFilesLocation)\WebPiComponentPickerControl.Designer.cs">
+      <DependentUpon>WebPiComponentPickerControl.cs</DependentUpon>
       <Link>SharedProject\WebPiComponentPickerControl.Designer.cs</Link>
       <Visible>true</Visible>
     </Compile>
@@ -585,6 +586,7 @@
       <Visible>true</Visible>
     </EmbeddedResource>
     <EmbeddedResource Include="$(_ProjectSystemFilesLocation)\WebPiComponentPickerControl.resx">
+      <DependentUpon>WebPiComponentPickerControl.cs</DependentUpon>
       <Link>SharedProject\WebPiComponentPickerControl.resx</Link>
       <SubType>Designer</SubType>
       <Visible>true</Visible>

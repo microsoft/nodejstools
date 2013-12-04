@@ -134,7 +134,9 @@ namespace TestUtilities.UI {
         /// see the bad behavior.
         /// </summary>
         public void SelectSolutionNode() {
-            Mouse.MoveTo(SolutionExplorer.WaitForItem(SolutionNodeText).GetClickablePoint());
+            var item = SolutionExplorer.WaitForItem(SolutionNodeText);
+            SolutionExplorer.CenterInView(item);
+            Mouse.MoveTo(item.GetClickablePoint());
             Mouse.Click(MouseButton.Left);
         }
 

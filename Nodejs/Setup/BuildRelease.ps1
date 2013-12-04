@@ -197,7 +197,7 @@ $asmverfileBackedUp = 0
 $asmverfile = Get-ChildItem Nodejs\Product\AssemblyVersion.cs
 # Force use of a backup if there are pending changes to $asmverfile
 $asmverfileUseBackup = 0
-if ((tf status $asmverfile /format:detailed | Select-String ": edit")) {
+if (-not (tf status $asmverfile /format:detailed | Select-String "There are no pending changes.")) {
     Write-Output "$asmverfile has pending changes. Using backup instead of tf undo."
     $asmverfileUseBackup = 1
 }

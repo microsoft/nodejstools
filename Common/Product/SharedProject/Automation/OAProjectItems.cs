@@ -56,10 +56,7 @@ namespace Microsoft.VisualStudioTools.Project.Automation {
                 foreach (var extension in this.Project.ProjectNode.CodeFileExtensions) {
                     foreach (string filename in Directory.EnumerateFiles(directory, "*" + extension)) {
                         result.ProjectItems.AddFromFile(Path.Combine(directory, filename));
-                }
-                    foreach (string filename in Directory.EnumerateFiles(directory, "*" + extension)) {
-                        result.ProjectItems.AddFromFile(Path.Combine(directory, filename));
-        }
+                    }
                 }
                 return result;
             });
@@ -168,8 +165,7 @@ namespace Microsoft.VisualStudioTools.Project.Automation {
         /// <param name="fileName">The file name of the item to add as a project item. </param>
         /// <returns>A ProjectItem object. </returns>
         public override EnvDTE.ProjectItem AddFromFile(string fileName) {
-            // TODO: VSADDITEMOP_LINKTOFILE
-            return this.AddItem(fileName, VSADDITEMOPERATION.VSADDITEMOP_OPENFILE);
+            return this.AddItem(fileName, VSADDITEMOPERATION.VSADDITEMOP_LINKTOFILE);
         }
 
         #endregion
@@ -184,35 +180,25 @@ namespace Microsoft.VisualStudioTools.Project.Automation {
         protected virtual EnvDTE.ProjectItem AddItem(string path, VSADDITEMOPERATION op) {
             CheckProjectIsValid();
             return UIThread.Instance.RunSync<EnvDTE.ProjectItem>(() => {
-                string ext = Path.GetExtension(path);
-                foreach (var extension in this.Project.ProjectNode.CodeFileExtensions) {
-                    // http://pytools.codeplex.com/workitem/617
-                    // We are currently in create project from existing code mode.  The wizard walks all of the top-level
-                    // files and adds them.  It then lets us handle any subdirectories by calling AddFromDirectory.
-                    // But we want to filter the files for both top-level and subdirectories.  Therefore we derive from
-                    // PageManager and track when we're running the wizard and adding files for the wizard.  If we are
-                    // currently adding them ignore anything other than a .py/.pyw files - returnning null is fine
-                    // here, the wizard doesn't care about the result.
-                    if (String.Compare(ext, extension, StringComparison.OrdinalIgnoreCase) == 0) {
-                        ProjectNode proj = this.Project.ProjectNode;
+                ProjectNode proj = this.Project.ProjectNode;
+                EnvDTE.ProjectItem itemAdded = null;
+                using (AutomationScope scope = new AutomationScope(this.Project.ProjectNode.Site)) {
+                    VSADDRESULT[] result = new VSADDRESULT[1];
+                    ErrorHandler.ThrowOnFailure(proj.AddItem(this.NodeWithItems.ID, op, path, 0, new string[1] { path }, IntPtr.Zero, result));
 
-                        EnvDTE.ProjectItem itemAdded = null;
-                        using (AutomationScope scope = new AutomationScope(this.Project.ProjectNode.Site)) {
-                            VSADDRESULT[] result = new VSADDRESULT[1];
-                            ErrorHandler.ThrowOnFailure(proj.AddItem(this.NodeWithItems.ID, op, path, 0, new string[1] { path }, IntPtr.Zero, result));
-
-                            string fileName = System.IO.Path.GetFileName(path);
-                            string fileDirectory = proj.GetBaseDirectoryForAddingFiles(this.NodeWithItems);
-                            string filePathInProject = System.IO.Path.Combine(fileDirectory, fileName);
-
-                            itemAdded = this.EvaluateAddResult(result[0], filePathInProject);
+                    string realPath = null;
+                    if (op != VSADDITEMOPERATION.VSADDITEMOP_LINKTOFILE) {
+                        string fileName = Path.GetFileName(path);
+                        string fileDirectory = proj.GetBaseDirectoryForAddingFiles(this.NodeWithItems);
+                        realPath = Path.Combine(fileDirectory, fileName);
+                    } else {
+                        realPath = path;
                     }
 
-                        return itemAdded;
-                    }
+                    itemAdded = this.EvaluateAddResult(result[0], realPath);
                 }
 
-                return null;
+                return itemAdded;
             });
         }
 
@@ -225,16 +211,17 @@ namespace Microsoft.VisualStudioTools.Project.Automation {
         [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Performance", "CA1800:DoNotCastUnnecessarily")]
         private EnvDTE.ProjectItem EvaluateAddResult(VSADDRESULT result, string path) {
             return UIThread.Instance.RunSync<EnvDTE.ProjectItem>(() => {
-                if (result == VSADDRESULT.ADDRESULT_Success) {
-                    if (Directory.Exists(path) && !CommonUtils.HasEndSeparator(path)) {
-                        path = path + Path.DirectorySeparatorChar;
+                if (result != VSADDRESULT.ADDRESULT_Failure) {
+                    if (Directory.Exists(path)) {
+                        path = CommonUtils.EnsureEndSeparator(path);
                     }
                     HierarchyNode nodeAdded = this.NodeWithItems.ProjectMgr.FindNodeByFullPath(path);
                     Debug.Assert(nodeAdded != null, "We should have been able to find the new element in the hierarchy");
                     if (nodeAdded != null) {
                         EnvDTE.ProjectItem item = null;
-                        if (nodeAdded is FileNode) {
-                            item = new OAFileItem(this.Project, nodeAdded as FileNode);
+                        var fileNode = nodeAdded as FileNode;
+                        if (fileNode != null) {
+                            item = new OAFileItem(this.Project, fileNode);
                         } else {
                             item = new OAProjectItem(this.Project, nodeAdded);
                         }

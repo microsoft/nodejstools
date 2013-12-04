@@ -3,11 +3,12 @@
   <Import Project="$([MSBuild]::GetDirectoryNameOfFileAbove($(MSBuildThisFileDirectory), build.root))\Build\Common.Build.settings" />
 
   <ItemGroup>
-    <ProjectFile Include="Common\dirs.proj"/>
-    <ProjectFile Include="Python\dirs.proj"/>
+    <ProjectFile Include="Utilities\TestUtilities.csproj"/>
+    <ProjectFile Include="Utilities.UI\TestUtilities.UI.csproj"/>
+    <ProjectFile Include="SccPackage\TestSccPackage.csproj"/>
+    <ProjectFile Include="SharedProjectTests\SharedProjectTests.csproj"/>
   </ItemGroup>
 
   <Import Project="$(TargetsPath)\Common.Build.Traversal.targets" />
+
 </Project>
-  
-  

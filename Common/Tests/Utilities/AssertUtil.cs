@@ -17,6 +17,7 @@ using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using System.Text.RegularExpressions;
 using System.Threading;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 
@@ -170,9 +171,16 @@ namespace TestUtilities
         [System.Diagnostics.DebuggerStepThrough]
         public static void Equals<T>(IEnumerable<T> source, params T[] value) {
             var items = source.ToArray();
-            Assert.AreEqual(value.Length, items.Length);
+            var message = string.Format(
+                "Expected: <{0}>. Actual: <{1}>.",
+                string.Join(", ", value),
+                string.Join(", ", items)
+            );
+            Console.WriteLine(message);
+
+            Assert.AreEqual(value.Length, items.Length, message);
             for (int i = 0; i < value.Length; i++) {
-                Assert.AreEqual(items[i], value[i]);
+                Assert.AreEqual(value[i], items[i]);
             }
         }
 
@@ -235,5 +243,11 @@ namespace TestUtilities
             return sb.ToString();
         }
 
+
+        public static void AreEqual(Regex expected, string actual, string message = null) {
+            if (!expected.IsMatch(actual)) {
+                Assert.Fail(string.Format("Expected <{0}>. Actual <{1}>. {2}", expected, actual, message ?? ""));
+            }
+        }
     }
 }

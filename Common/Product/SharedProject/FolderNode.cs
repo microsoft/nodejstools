@@ -110,7 +110,10 @@ namespace Microsoft.VisualStudioTools.Project
 
         public override object GetIconHandle(bool open)
         {
-            return this.ProjectMgr.ImageHandler.GetIconHandle(open ? (int)ProjectNode.ImageName.OpenFolder : (int)ProjectNode.ImageName.Folder);
+            return ProjectMgr.GetIconHandleByName(open ?
+                ProjectNode.ImageName.OpenFolder :
+                ProjectNode.ImageName.Folder
+            );
         }
 
         /// <summary>
@@ -516,7 +519,6 @@ namespace Microsoft.VisualStudioTools.Project
             ID = ProjectMgr.ItemIdMap.Add(this);
 
             ItemNode.Rename(CommonUtils.GetRelativeDirectoryPath(ProjectMgr.ProjectHome, newPath));
-            ProjectMgr.SetProjectFileDirty(true);
             var parent = ProjectMgr.GetParentFolderForPath(newPath);
             Debug.Assert(parent != null, "ReparentFolder called without full path to parent being created");
             parent.AddChild(this);

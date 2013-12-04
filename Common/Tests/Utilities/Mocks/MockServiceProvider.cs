@@ -1,4 +1,4 @@
-/* ****************************************************************************
+﻿/* ****************************************************************************
  *
  * Copyright (c) Microsoft Corporation. 
  *
@@ -13,16 +13,16 @@
  * ***************************************************************************/
 
 using System;
+using System.Collections.Generic;
 
-namespace Microsoft.VisualStudioTools.Project {
-    internal partial class ProjectNode {
-        public event EventHandler<ProjectPropertyChangedArgs> OnProjectPropertyChanged;
+namespace TestUtilities.Mocks {
+    public class MockServiceProvider : IServiceProvider {
+        public readonly Dictionary<string, object> Services = new Dictionary<string, object>();
         
-        protected virtual void RaiseProjectPropertyChanged(string propertyName, string oldValue, string newValue) {
-            var onPropChanged = OnProjectPropertyChanged;
-            if (onPropChanged != null) {
-                onPropChanged(this, new ProjectPropertyChangedArgs(propertyName, oldValue, newValue));
-            }
+        public object GetService(Type serviceType) {
+            object service;
+            Services.TryGetValue(serviceType.Name, out service);
+            return service;
         }
     }
 }
