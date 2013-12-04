@@ -35,7 +35,7 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Tests", "Tests", "{850AC94A
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TestUtilities.Nodejs", "Tests\Utilities.Nodejs\TestUtilities.Nodejs.csproj", "{9E395BA3-765E-4F35-A520-19F1C323D625}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SharedProject", "..\Common\Tests\SharedProject\SharedProject.csproj", "{F8E4A9D2-7621-491F-9D37-C578E833AC02}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SharedProjectTests", "..\Common\Tests\SharedProjectTests\SharedProjectTests.csproj", "{F8E4A9D2-7621-491F-9D37-C578E833AC02}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TestSccPackage", "..\Common\Tests\SccPackage\TestSccPackage.csproj", "{E75E5DB1-0EA0-4247-A830-FE467C016816}"
 EndProject
@@ -105,10 +105,10 @@ Global
 		SccProjectTopLevelParentUniqueName13 = NodejsTools.sln
 		SccProjectName13 = Tests/Core
 		SccLocalPath13 = Tests\\Core
-		SccProjectUniqueName14 = ..\\Common\\Tests\\SharedProject\\SharedProject.csproj
+		SccProjectUniqueName14 = ..\\Common\\Tests\\SharedProjectTests\\SharedProjectTests.csproj
 		SccProjectTopLevelParentUniqueName14 = NodejsTools.sln
-		SccProjectName14 = ../Common/Tests/SharedProject
-		SccLocalPath14 = ..\\Common\\Tests\\SharedProject
+		SccProjectName14 = ../Common/Tests/SharedProjectTests
+		SccLocalPath14 = ..\\Common\\Tests\\SharedProjectTests
 		SccProjectUniqueName15 = Product\\Nodejs\\Nodejs.csproj
 		SccProjectTopLevelParentUniqueName15 = NodejsTools.sln
 		SccProjectName15 = Product/Nodejs
