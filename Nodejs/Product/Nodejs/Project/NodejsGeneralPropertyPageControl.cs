@@ -31,6 +31,8 @@ namespace Microsoft.NodejsTools.Project {
             SetCueBanner();
 
             AddToolTips();
+            _nodeExeErrorProvider.SetIconAlignment(_nodeExePath, ErrorIconAlignment.MiddleLeft);
+            _nodeExeErrorProvider.SetIconAlignment(_workingDir, ErrorIconAlignment.MiddleLeft);
         }
 
         public NodejsGeneralPropertyPageControl(NodejsGeneralPropertyPage page) : this() {
@@ -171,6 +173,15 @@ namespace Microsoft.NodejsTools.Project {
                 _nodeExeErrorProvider.SetError(_nodejsPort, Resources.InvalidPortNumber);
             } else {
                 _nodeExeErrorProvider.SetError(_nodejsPort, String.Empty);
+            }
+            Changed(sender, e);
+        }
+
+        private void WorkingDirTextChanged(object sender, EventArgs e) {
+            if (_workingDir.Text.IndexOfAny(Path.GetInvalidPathChars()) != -1 || !Directory.Exists(_workingDir.Text)) {
+                _nodeExeErrorProvider.SetError(_workingDir, Resources.WorkingDirInvalidOrMissing);
+            } else {
+                _nodeExeErrorProvider.SetError(_workingDir, String.Empty);
             }
             Changed(sender, e);
         }
