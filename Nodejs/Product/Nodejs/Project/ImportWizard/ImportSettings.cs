@@ -21,7 +21,6 @@ using System.Text;
 using System.Threading.Tasks;
 using System.Windows;
 using System.Xml;
-using Microsoft.NodejsTools;
 using Microsoft.VisualStudio.Language.Intellisense;
 using Microsoft.VisualStudioTools;
 
@@ -115,7 +114,7 @@ namespace Microsoft.NodejsTools.Project.ImportWizard {
                 if (File.Exists(newPath + ".njsproj")) {
                     string candidateNewPath;
                     do {
-                        candidateNewPath = string.Format("{0} {1}", newPath, ++index);
+                        candidateNewPath = string.Format("{0}{1}", newPath, ++index);
                     } while (File.Exists(candidateNewPath + ".njsproj"));
                     newPath = candidateNewPath;
                 }
@@ -278,7 +277,17 @@ namespace Microsoft.NodejsTools.Project.ImportWizard {
             writer.WriteAttributeString("Condition", "'$(Configuration)' == 'Release'");
             writer.WriteEndElement();
 
-            var folders = new HashSet<string>();
+            var folders = new HashSet<string>(
+                Directory.EnumerateDirectories(sourcePath, "*", SearchOption.AllDirectories)
+                    .Select(dirName => 
+                        CommonUtils.TrimEndSeparator(
+                            CommonUtils.GetRelativeDirectoryPath(sourcePath, dirName)
+                        )
+                    )
+            );
+            if (excludeNodeModules) {
+                folders.Remove("node_modules");
+            }
             writer.WriteStartElement("ItemGroup");
             foreach (var file in EnumerateAllFiles(sourcePath, filters, excludeNodeModules)) {
                 var ext = Path.GetExtension(file);
@@ -287,7 +296,6 @@ namespace Microsoft.NodejsTools.Project.ImportWizard {
                 } else {
                     writer.WriteStartElement("Content");
                 }
-                folders.Add(Path.GetDirectoryName(file));
                 writer.WriteAttributeString("Include", file);
                 writer.WriteEndElement();
             }
