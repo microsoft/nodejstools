@@ -13,24 +13,15 @@
  * ***************************************************************************/
 
 using System;
-using System.Collections.Generic;
-using System.Collections.Specialized;
-using System.Diagnostics;
 using System.IO;
 using System.Linq;
-using System.Runtime.InteropServices;
-using System.Threading;
-using System.Windows;
 using EnvDTE;
-using EnvDTE90;
-using EnvDTE90a;
 using Microsoft.TC.TestHostAdapters;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using TestUtilities;
 using TestUtilities.SharedProject;
 using TestUtilities.UI;
 using VSLangProj;
-using ST = System.Threading;
 
 namespace Microsoft.VisualStudioTools.SharedProjectTests {
     [TestClass]
@@ -190,6 +181,58 @@ namespace Microsoft.VisualStudioTools.SharedProjectTests {
                         project.ProjectItems.AddFromFile(Path.Combine(solution.Directory, "HelloWorld", "server" + projectType.CodeExtension));
 
                         Assert.AreEqual(2, project.ProjectItems.Count);
+                    }
+                }
+            } finally {
+                VsIdeTestHostContext.Dte.Solution.Close();
+                GC.Collect();
+                GC.WaitForPendingFinalizers();
+            }
+        }
+
+        [TestMethod, Priority(0), TestCategory("Core")]
+        [HostType("TC Dynamic"), DynamicHostType(typeof(VsIdeHostAdapter))]
+        public void CleanSolution() {
+            try {
+                foreach (var projectType in ProjectTypes) {
+                    var proj = new ProjectDefinition(
+                        "HelloWorld",
+                        projectType,
+                        Compile("server"),
+                        Target(
+                            "Clean", 
+                            Tasks.Message("Hello Clean World!")
+                        )
+                    );
+                    using (var solution = proj.Generate().ToVs()) {
+                        VsIdeTestHostContext.Dte.ExecuteCommand("Build.CleanSolution");
+                        solution.App.WaitForOutputWindowText("Build", "Hello Clean World!");
+                    }
+                }
+            } finally {
+                VsIdeTestHostContext.Dte.Solution.Close();
+                GC.Collect();
+                GC.WaitForPendingFinalizers();
+            }
+        }
+
+        [TestMethod, Priority(0), TestCategory("Core")]
+        [HostType("TC Dynamic"), DynamicHostType(typeof(VsIdeHostAdapter))]
+        public void BuildSolution() {
+            try {
+                foreach (var projectType in ProjectTypes) {
+                    var proj = new ProjectDefinition(
+                        "HelloWorld",
+                        projectType,
+                        Compile("server"),
+                        Target(
+                            "Build",
+                            Tasks.Message("Hello Build World!")
+                        )
+                    );
+                    using (var solution = proj.Generate().ToVs()) {
+                        VsIdeTestHostContext.Dte.ExecuteCommand("Build.BuildSolution");
+                        solution.App.WaitForOutputWindowText("Build", "Hello Build World!");
                     }
                 }
             } finally {

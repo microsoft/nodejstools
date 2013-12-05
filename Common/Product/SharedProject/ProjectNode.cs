@@ -1864,6 +1864,9 @@ namespace Microsoft.VisualStudioTools.Project
         [SuppressMessage("Microsoft.Naming", "CA1704:IdentifiersShouldBeSpelledCorrectly", MessageId = "vsopts")]
         internal virtual void BuildAsync(uint vsopts, string config, IVsOutputWindowPane output, string target, Action<MSBuildResult, string> uiThreadCallback)
         {
+            BuildPrelude(output);
+            SetBuildConfigurationProperties(config);
+            DoAsyncMSBuildSubmission(target, uiThreadCallback);
         }
 
         /// <summary>
@@ -2571,21 +2574,8 @@ namespace Microsoft.VisualStudioTools.Project
             // Create our logger, if it was not specified
             if (!this.useProvidedLogger || this.buildLogger == null)
             {
-                // Because we may be aggregated, we need to make sure to get the outer IVsHierarchy
-                IntPtr unknown = IntPtr.Zero;
-                IVsHierarchy hierarchy = null;
-                try
-                {
-                    unknown = Marshal.GetIUnknownForObject(this);
-                    hierarchy = Marshal.GetTypedObjectForIUnknown(unknown, typeof(IVsHierarchy)) as IVsHierarchy;
-                }
-                finally
-                {
-                    if (unknown != IntPtr.Zero)
-                        Marshal.Release(unknown);
-                }
                 // Create the logger
-                this.BuildLogger = new IDEBuildLogger(output, this.TaskProvider, hierarchy);
+                this.BuildLogger = new IDEBuildLogger(output, this.TaskProvider, GetOuterInterface<IVsHierarchy>());
 
                 // To retrive the verbosity level, the build logger depends on the registry root 
                 // (otherwise it will used an hardcoded default)
@@ -2643,9 +2633,10 @@ namespace Microsoft.VisualStudioTools.Project
         [SuppressMessage("Microsoft.Naming", "CA1709:IdentifiersShouldBeCasedCorrectly", MessageId = "Ms")]
         protected virtual MSBuildResult InvokeMsBuild(string target)
         {
+            UIThread.Instance.MustBeCalledFromUIThread();
+
             MSBuildResult result = MSBuildResult.Failed;
             const bool designTime = true;
-            bool requiresUIThread = UIThread.Instance.IsUIThread; // we don't run tasks that require calling the STA thread, so unless we're ON it, we don't need it.
 
             IVsBuildManagerAccessor accessor = this.Site.GetService(typeof(SVsBuildManagerAccessor)) as IVsBuildManagerAccessor;
             BuildSubmission submission = null;
@@ -2655,7 +2646,7 @@ namespace Microsoft.VisualStudioTools.Project
                 // Do the actual Build
                 if (this.buildProject != null)
                 {
-                    if (!TryBeginBuild(designTime, requiresUIThread))
+                    if (!TryBeginBuild(designTime, true))
                     {
                         throw new InvalidOperationException("A build is already in progress.");
                     }
@@ -2682,12 +2673,74 @@ namespace Microsoft.VisualStudioTools.Project
             }
             finally
             {
-                EndBuild(submission, designTime, requiresUIThread);
+                EndBuild(submission, designTime, true);
             }
 
             return result;
         }
 
+        /// <summary>
+        /// Start MSBuild build submission
+        /// </summary>
+        /// <param name="target">target to build</param>
+        /// <param name="projectInstance">project instance to build; if null, this.BuildProject.CreateProjectInstance() is used to populate</param>
+        /// <param name="uiThreadCallback">callback to be run UI thread </param>
+        /// <returns>A Build submission instance.</returns>
+        protected virtual BuildSubmission DoAsyncMSBuildSubmission(string target, Action<MSBuildResult, string> uiThreadCallback) {
+            const bool designTime = false;
+
+            IVsBuildManagerAccessor accessor = (IVsBuildManagerAccessor)this.Site.GetService(typeof(SVsBuildManagerAccessor));
+            Utilities.CheckNotNull(accessor);
+
+            if (!TryBeginBuild(designTime, false)) {
+                if (uiThreadCallback != null) {
+                    uiThreadCallback(MSBuildResult.Failed, target);
+                }
+
+                return null;
+            }
+
+            string[] targetsToBuild = new string[target != null ? 1 : 0];
+            if (target != null) {
+                targetsToBuild[0] = target;
+            }
+
+            MSBuildExecution.ProjectInstance projectInstance = BuildProject.CreateProjectInstance();
+
+            projectInstance.SetProperty(GlobalProperty.VisualStudioStyleErrors.ToString(), "true");
+            projectInstance.SetProperty("UTFOutput", "true");
+            projectInstance.SetProperty(GlobalProperty.BuildingInsideVisualStudio.ToString(), "true");
+
+            BuildProject.ProjectCollection.HostServices.SetNodeAffinity(projectInstance.FullPath, NodeAffinity.InProc);
+            BuildRequestData requestData = new BuildRequestData(projectInstance, targetsToBuild, this.BuildProject.ProjectCollection.HostServices, BuildRequestDataFlags.ReplaceExistingProjectInstance);
+            BuildSubmission submission = BuildManager.DefaultBuildManager.PendBuildRequest(requestData);
+            try {
+                if (useProvidedLogger && buildLogger != null) {
+                    ErrorHandler.ThrowOnFailure(accessor.RegisterLogger(submission.SubmissionId, buildLogger));
+                }
+
+                submission.ExecuteAsync(sub => {
+                    UIThread.Instance.Run(() => {
+                        IDEBuildLogger ideLogger = this.buildLogger as IDEBuildLogger;
+                        if (ideLogger != null) {
+                            ideLogger.FlushBuildOutput();
+                        }
+                        EndBuild(sub, designTime, false);
+                        uiThreadCallback((sub.BuildResult.OverallResult == BuildResultCode.Success) ? MSBuildResult.Successful : MSBuildResult.Failed, target);
+                    });
+                }, null);
+            } catch (Exception e) {
+                Debug.Fail(e.ToString());
+                EndBuild(submission, designTime, false);
+                if (uiThreadCallback != null) {
+                    uiThreadCallback(MSBuildResult.Failed, target);
+                }
+
+                throw;
+            }
+
+            return submission;
+        }
 
         /// <summary>
         /// Initialize common project properties with default value if they are empty
@@ -3331,7 +3384,9 @@ namespace Microsoft.VisualStudioTools.Project
         /// </summary>
         public MSBuildResult Build(string target)
         {
-            return this.Build(0, String.Empty, null, target);
+            UIThread.Instance.MustBeCalledFromUIThread();
+
+            return this.Build(String.Empty, target);
         }
 
         /// <summary>
@@ -3340,10 +3395,12 @@ namespace Microsoft.VisualStudioTools.Project
         ///  PrepareBuild mainly creates directories and cleans house if cleanBuild is true
         /// </summary>
         public virtual void PrepareBuild(string config, bool cleanBuild) {
+            UIThread.Instance.MustBeCalledFromUIThread();
+
             string outputPath = Path.GetDirectoryName(GetProjectProperty("OutputPath"));
 
             if (cleanBuild && this.currentConfig.Targets.ContainsKey(MsBuildTarget.Clean)) {
-                InvokeMsBuild(MsBuildTarget.Clean);
+                Build(config, MsBuildTarget.Clean);
             }
 
             PackageUtilities.EnsureOutputPath(outputPath);
@@ -3353,26 +3410,36 @@ namespace Microsoft.VisualStudioTools.Project
         /// Do the build by invoking msbuild
         /// </summary>
         [SuppressMessage("Microsoft.Naming", "CA1704:IdentifiersShouldBeSpelledCorrectly", MessageId = "vsopts")]
-        public virtual MSBuildResult Build(uint vsopts, string config, IVsOutputWindowPane output, string target)
+        public virtual MSBuildResult Build(string config, string target)
         {
+            UIThread.Instance.MustBeCalledFromUIThread();
+
             lock (ProjectNode.BuildLock)
             {
+                IVsOutputWindowPane output = null;
+                var outputWindow = (IVsOutputWindow)GetService(typeof(SVsOutputWindow));
+                if (outputWindow != null && 
+                    ErrorHandler.Failed(outputWindow.GetPane(VSConstants.GUID_BuildOutputWindowPane, out output))) {
+                    outputWindow.CreatePane(VSConstants.GUID_BuildOutputWindowPane, "Build", 1, 1);
+                    outputWindow.GetPane(VSConstants.GUID_BuildOutputWindowPane, out output);
+                }
+
                 bool engineLogOnlyCritical = this.BuildPrelude(output);
 
                 MSBuildResult result = MSBuildResult.Failed;
 
                 try
                 {
-                    this.SetBuildConfigurationProperties(config);
+                    SetBuildConfigurationProperties(config);
 
-                    result = this.InvokeMsBuild(target);
+                    result = InvokeMsBuild(target);
                 }
                 finally
                 {
                     // Unless someone specifically request to use an output window pane, we should not output to it
                     if (null != output)
                     {
-                        this.SetOutputLogger(null);
+                        SetOutputLogger(null);
                         BuildEngine.OnlyLogCriticalEvents = engineLogOnlyCritical;
                     }
                 }
@@ -4987,6 +5054,8 @@ If the files in the existing folder have the same names as files in the folder y
         /// <param name="pResult">Result to be returned to the caller</param>
         public virtual int AddComponent(VSADDCOMPOPERATION dwAddCompOperation, uint cComponents, System.IntPtr[] rgpcsdComponents, System.IntPtr hwndDialog, VSADDCOMPRESULT[] pResult)
         {
+            UIThread.Instance.MustBeCalledFromUIThread();
+
             if (rgpcsdComponents == null || pResult == null)
             {
                 return VSConstants.E_FAIL;
@@ -5862,10 +5931,10 @@ If the files in the existing folder have the same names as files in the folder y
                 // If the SVsBuildManagerAccessor service is absent, we're not running within Visual Studio.
                 if (accessor != null)
                 {
-                    if (requiresUIThread)
+                    if (requiresUIThread) 
                     {
                         int result = accessor.ClaimUIThreadForBuild();
-                        if (result < 0)
+                        if (result < 0) 
                         {
                             // Not allowed to claim the UI thread right now. Try again later.
                             return false;
@@ -5917,7 +5986,7 @@ If the files in the existing folder have the same names as files in the folder y
         /// <remarks>
         /// This method must be called on the UI thread.
         /// </remarks>
-        private void EndBuild(BuildSubmission submission, bool designTime, bool requiresUIThread = false)
+        private void EndBuild(BuildSubmission submission, bool designTime, bool requiresUIThread = false) 
         {
             IVsBuildManagerAccessor accessor = null;
 
@@ -5966,7 +6035,7 @@ If the files in the existing folder have the same names as files in the folder y
 
                 try
                 {
-                    if (requiresUIThread)
+                    if (requiresUIThread) 
                     {
                         Marshal.ThrowExceptionForHR(accessor.ReleaseUIThreadForBuild());
                     }

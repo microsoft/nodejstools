@@ -151,6 +151,7 @@
     <Compile Include="SharedProject\SolutionFile.cs" />
     <Compile Include="SharedProject\StartupFileProjectProperty.cs" />
     <Compile Include="SharedProject\SolutionFolder.cs" />
+    <Compile Include="SharedProject\TargetDefinition.cs" />
     <Compile Include="TestData.cs" />
     <Compile Include="TestExtensions.cs" />
     <Compile Include="TestMethod.cs" />

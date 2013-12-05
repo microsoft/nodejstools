@@ -21,12 +21,6 @@ namespace Microsoft.Nodejs.Tests.UI {
     [ProjectExtension(".njsproj")]
     public class NodejsProjectProcessor : IProjectProcessor {
         public void PreProcess(MSBuild.Project project) {
-            project.SetProperty("ProjectHome", ".");
-            project.SetProperty("WorkingDirectory", ".");
-            project.SetProperty("ProjectView", "ShowAllFiles");
-        }
-
-        public void PostProcess(MSBuild.Project project) {
             if (project.ProjectFileLocation.File.EndsWith(".user", System.StringComparison.OrdinalIgnoreCase)) {
                 return;
             }
@@ -43,7 +37,14 @@ namespace Microsoft.Nodejs.Tests.UI {
             var import = project.Xml.AddImport("$(MSBuildExtensionsPath)\\$(MSBuildToolsVersion)\\Microsoft.Common.props");
             import.Condition = "Exists('$(MSBuildExtensionsPath)\\$(MSBuildToolsVersion)\\Microsoft.Common.props')";
             project.Xml.AddImport("$(VSToolsPath)\\Node.js Tools\\Microsoft.NodejsTools.targets");
-            
+
+            project.SetProperty("ProjectHome", ".");
+            project.SetProperty("WorkingDirectory", ".");
+            project.SetProperty("ProjectView", "ShowAllFiles");
+            project.SetProperty("OutputPath", ".");
+        }
+
+        public void PostProcess(MSBuild.Project project) {
             var projectExt = project.Xml.CreateProjectExtensionsElement();
             projectExt.Content = @"
     <VisualStudio>

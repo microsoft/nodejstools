@@ -17,24 +17,16 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
 using System.Linq;
-using System.Runtime.InteropServices;
 using System.Text;
-using System.Threading;
-using System.Threading.Tasks;
 using System.Windows.Automation;
-using System.Windows.Input;
 using EnvDTE;
+using EnvDTE80;
 using Microsoft.TC.TestHostAdapters;
 using Microsoft.VisualStudio;
 using Microsoft.VisualStudio.ComponentModelHost;
-using Microsoft.VisualStudio.OLE.Interop;
 using Microsoft.VisualStudio.Shell;
 using Microsoft.VisualStudio.Shell.Interop;
-using Microsoft.VisualStudio.TestTools.Execution;
-using Microsoft.VisualStudio.TestTools.TestAdapter;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
-using Microsoft.Win32;
-using TestUtilities;
 using Task = System.Threading.Tasks.Task;
 
 namespace TestUtilities.UI {
@@ -290,6 +282,27 @@ namespace TestUtilities.UI {
             return new AttachToProcessDialog(dialog);
         }
 
+        public OutputWindowPane GetOutputWindow(string name) {
+            return ((DTE2)VsIdeTestHostContext.Dte).ToolWindows.OutputWindow.OutputWindowPanes.Item(name);
+        }
+
+        public string GetOutputWindowText(string name) {
+            var window = GetOutputWindow(name);
+            var doc = window.TextDocument;
+            doc.Selection.SelectAll();
+            return doc.Selection.Text;
+        }
+
+        public void WaitForOutputWindowText(string name, string containsText) {
+            for (int i = 0; i < 10; i++) {
+                var text = GetOutputWindowText(name);
+                if (text.Contains(containsText)) {
+                    return;
+                }
+            }
+
+            Assert.Fail("Failed to find {0} in output window {1}, found:\r\n{2}", containsText, name, GetOutputWindowText(name));
+        }
 
         public void DismissAllDialogs() {
             int foundWindow = 2;
