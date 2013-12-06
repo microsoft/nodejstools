@@ -8,6 +8,12 @@
     <?include ..\InstallPath.wxi ?>
     <?include ..\MergeModule.wxi ?>
 
+    <Property Id="VSLAUNCHER" >
+        <DirectorySearch Path="[ProgramFilesFolder]\Common Files\Microsoft Shared\MSEnv" Depth="4" Id="FindVSLauncher">
+            <FileSearch Name="VSLauncher.exe" />
+        </DirectorySearch>
+    </Property>
+
     <Directory Id="TARGETDIR" Name="SourceDir">
       <Directory Id="EXTENSION_INSTALLPATH">
           <Directory Id="_0D6D364235164B24AC58E38A08968129" Name="Extensions">
@@ -18,6 +24,8 @@
               </Directory>
           </Directory>
         </Directory>
+      </Directory>
+      <Directory Id="ProgramFilesFolder" Name="PFILES">
       </Directory>
     </Directory>
 

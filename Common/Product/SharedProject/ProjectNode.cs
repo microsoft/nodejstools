@@ -2999,21 +2999,6 @@ namespace Microsoft.VisualStudioTools.Project
             OLEMSGBUTTON buttons = OLEMSGBUTTON.OLEMSGBUTTON_OK;
             OLEMSGDEFBUTTON defaultButton = OLEMSGDEFBUTTON.OLEMSGDEFBUTTON_FIRST;
 
-            // If the document is open then return error message.
-            IVsUIHierarchy hier;
-            IVsWindowFrame windowFrame;
-            uint itemid = VSConstants.VSITEMID_NIL;
-
-            bool isOpen = VsShellUtilities.IsDocumentOpen(this.Site, computedNewFileName, Guid.Empty, out hier, out itemid, out windowFrame);
-
-            if (isOpen)
-            {
-                message = String.Format(CultureInfo.CurrentCulture, SR.GetString(SR.CannotAddFileThatIsOpenInEditor, CultureInfo.CurrentUICulture), Path.GetFileName(computedNewFileName));
-                VsShellUtilities.ShowMessageBox(this.Site, title, message, icon, buttons, defaultButton);
-                return VSConstants.E_ABORT;
-            }
-
-
             // File already exists in project... message box
             message = String.Format(SR.GetString(inProject ? SR.FileAlreadyInProject : SR.FileAlreadyExists, CultureInfo.CurrentUICulture), Path.GetFileName(originalFileName));
             icon = OLEMSGICON.OLEMSGICON_QUERY;

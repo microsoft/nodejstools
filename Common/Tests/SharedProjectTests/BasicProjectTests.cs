@@ -13,8 +13,10 @@
  * ***************************************************************************/
 
 using System;
+using System.Collections.Specialized;
 using System.IO;
 using System.Linq;
+using System.Windows;
 using EnvDTE;
 using Microsoft.TC.TestHostAdapters;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
@@ -1196,6 +1198,48 @@ namespace Microsoft.VisualStudioTools.SharedProjectTests {
                     newProcs = after.Where(x => !existing.Contains(x.Id) && x.ProcessName == "cmd");
                     Assert.AreEqual(1, newProcs.Count(), string.Join(";", after.Select(x => x.ProcessName)));
                     newProcs.First().Kill();
+                }
+            }
+        }
+
+        [TestMethod, Priority(0), TestCategory("Core")]
+        [HostType("TC Dynamic"), DynamicHostType(typeof(VsIdeHostAdapter))]
+        public void PasteFileWhileOpenInEditor() {
+            foreach (var projectType in ProjectTypes) {
+                var proj = new ProjectDefinition(
+                    "HelloWorld",
+                    projectType,
+                    Compile("server"),
+                    Folder("Folder", isExcluded: true),
+                    Compile("Folder\\server", isExcluded: true)
+                );
+                using (var solution = proj.Generate().ToVs()) {
+                    var window = solution.Project.ProjectItems.Item(projectType.Code("server")).Open();
+                    window.Activate();
+
+                    var docWindow = solution.App.GetDocument(window.Document.FullName);
+                    var copyPath = Path.Combine(solution.Directory, "HelloWorld", "Folder", projectType.Code("server"));
+
+                    docWindow.Invoke((Action)(() => {
+                        Clipboard.SetFileDropList(
+                            new StringCollection() { copyPath }
+                        );
+                    }));
+
+                    AutomationWrapper.Select(solution.WaitForItem("HelloWorld"));
+
+                    Keyboard.ControlV();
+
+                    // paste again, we should get the replace prompts...
+                    VisualStudioApp.CheckMessageBox(
+                        TestUtilities.UI.MessageBoxButton.Yes, 
+                        "is already part of the project. Do you want to overwrite it?"
+                    );
+
+                    System.Threading.Thread.Sleep(1000);
+
+                    var dlg = solution.App.WaitForDialog(); // not a simple dialog we can check
+                    NativeMethods.EndDialog(dlg, new IntPtr((int)TestUtilities.UI.MessageBoxButton.Yes));
                 }
             }
         }
