@@ -36,7 +36,7 @@ namespace NodejsTests.Debugger.Serialization {
             Assert.AreEqual(NodePropertyAttributes.DontEnum, result.Attributes);
             Assert.AreEqual(NodeVariableType.Object, result.Class);
             Assert.AreEqual(4, result.Id);
-            Assert.AreEqual("[prototype]", result.Name);
+            Assert.AreEqual("__proto__", result.Name);
             Assert.AreEqual(parent, result.Parent);
             Assert.IsNull(result.StackFrame);
             Assert.AreEqual("#<Object>", result.Text);
