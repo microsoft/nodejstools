@@ -45,7 +45,7 @@ namespace Microsoft.NodejsTools.Debugger.DebugEngine {
         // Determines whether the next statement can be set to the given stack frame and code context.
         // NOTE: VS2013 and earlier do not use the result to disable the "set next statement" command
         int IDebugThread2.CanSetNextStatement(IDebugStackFrame2 stackFrame, IDebugCodeContext2 codeContext) {
-            return VSConstants.E_NOTIMPL;
+            throw new NotSupportedException("Set Next Statement is not supported by Node.js.");
         }
 
         // Retrieves a list of the stack frames for this thread.
