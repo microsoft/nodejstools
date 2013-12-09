@@ -170,8 +170,12 @@
     </COMReference>
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="..\Nodejs\Guids.cs">
+      <Link>Guids.cs</Link>
+    </Compile>
     <Compile Include="AssemblyInfo.cs" />
     <Compile Include="DialogWindowVersioningWorkaround.cs" />
+    <Compile Include="Extensions.cs" />
     <Compile Include="NativeMethods.cs" />
     <Compile Include="Profiling\AutomationProfiling.cs" />
     <Compile Include="Profiling\AutomationReport.cs" />
@@ -185,7 +189,6 @@
     <Compile Include="Profiling\INodeProfiling.cs" />
     <Compile Include="Profiling\ProfilingSessionEditorFactory.cs" />
     <Compile Include="Profiling\ProjectTargetView.cs" />
-    <Compile Include="Guids.cs" />
     <Compile Include="Profiling\BaseHierarchyNode.cs" />
     <Compile Include="Profiling\LaunchProfiling.xaml.cs">
       <DependentUpon>LaunchProfiling.xaml</DependentUpon>

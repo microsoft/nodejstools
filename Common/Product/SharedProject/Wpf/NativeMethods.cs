@@ -15,7 +15,7 @@
 using System;
 using System.Runtime.InteropServices;
 
-namespace Microsoft.NodejsTools.Wpf {
+namespace Microsoft.VisualStudioTools.Wpf {
     static class NativeMethods {
         [StructLayoutAttribute(LayoutKind.Sequential, CharSet = CharSet.Unicode)]
         public struct SHSTOCKICONINFO {

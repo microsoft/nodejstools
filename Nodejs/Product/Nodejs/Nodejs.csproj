@@ -323,11 +323,6 @@
     <Compile Include="Project\ImportWizard\ImportWizard.xaml.cs">
       <DependentUpon>ImportWizard.xaml</DependentUpon>
     </Compile>
-    <Compile Include="Wpf\Commands.cs" />
-    <Compile Include="Wpf\Controls.cs" />
-    <Compile Include="Wpf\LabelledButton.cs" />
-    <Compile Include="Wpf\LabelledControl.cs" />
-    <Compile Include="Wpf\NativeMethods.cs" />
     <Page Include="Project\ImportWizard\StartupPage.xaml">
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
@@ -439,10 +434,6 @@
     <Compile Include="GlobalSuppressions.cs" />
     <Compile Include="NodejsPackage.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
-    <Resource Include="Wpf\Controls.xaml">
-      <Generator>MSBuild:Compile</Generator>
-      <SubType>Designer</SubType>
-    </Resource>
   </ItemGroup>
   <ItemGroup>
     <EmbeddedResource Include="NpmUI\BusyControl.resx">

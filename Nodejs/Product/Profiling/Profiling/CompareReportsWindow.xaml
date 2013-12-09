@@ -3,23 +3,29 @@
     xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
     xmlns:ui="clr-namespace:Microsoft.NodejsTools.Profiling"
+    xmlns:wpf="clr-namespace:Microsoft.VisualStudioTools.Wpf;assembly=Microsoft.NodejsTools"
     Title="Select analysis files for comparison"
-    Width="380" Height="auto" SizeToContent="Height"
+    MinWidth="300" MinHeight="220"
+    Width="500" Height="auto" SizeToContent="Height"
     WindowStartupLocation="CenterOwner"
-    Background="{x:Static SystemColors.ControlBrush}"
+    Background="{DynamicResource {x:Static wpf:Controls.BackgroundKey}}"
+    TextElement.Foreground="{DynamicResource {x:Static wpf:Controls.ForegroundKey}}"
     TextOptions.TextFormattingMode="Display"
-    ResizeMode="NoResize">
+    ResizeMode="CanResizeWithGrip">
     <Window.Resources>
-        <Style x:Key="BrowseButtonStyle" TargetType="{x:Type Button}">
-            <Setter Property="Content" Value="Browse..." />
-            <Setter Property="Margin" Value="8 1 0 1" />
-            <Setter Property="Padding" Value="11 2" />
-        </Style>
-        
-        <Style x:Key="{x:Type Label}" TargetType="{x:Type Label}">
-            <Setter Property="Margin" Value="7 7 0 2" />
-            <Setter Property="Padding" Value="0" />
-        </Style>
+        <ResourceDictionary>
+            <ResourceDictionary.MergedDictionaries>
+                <ResourceDictionary Source="pack://application:,,,/Microsoft.NodejsTools;component/SharedProject/Wpf/Controls.xaml" />
+
+                <ResourceDictionary>
+                    <Style x:Key="BrowseButtonStyle" TargetType="{x:Type Button}" BasedOn="{StaticResource {x:Type Button}}">
+                        <Setter Property="Content" Value="Browse..." />
+                        <Setter Property="Margin" Value="8 1 0 1" />
+                        <Setter Property="Padding" Value="11 2" />
+                    </Style>
+                </ResourceDictionary>
+            </ResourceDictionary.MergedDictionaries>
+        </ResourceDictionary>
     </Window.Resources>
     
     <Grid Margin="12 4 12 12">
@@ -31,23 +37,27 @@
             <RowDefinition Height="auto" />
         </Grid.RowDefinitions>
         <Label Grid.Row="0" Content="_Baseline File:" />
-        <Grid Grid.Row="1">
+        <Grid Grid.Row="1" Margin="0 0 0 6">
             <Grid.ColumnDefinitions>
                 <ColumnDefinition Width="*" />
                 <ColumnDefinition Width="auto" />
             </Grid.ColumnDefinitions>
-            <TextBox Grid.Column="0" Text="{Binding BaselineFile,UpdateSourceTrigger=PropertyChanged}"
+            <TextBox Grid.Column="0"
+                     Text="{Binding BaselineFile,UpdateSourceTrigger=PropertyChanged}"
+                     VerticalContentAlignment="Center"
                      AutomationProperties.AutomationId="BaselineFile" />
             <Button Grid.Column="1" Click="BaselineBrowseClick" Style="{StaticResource BrowseButtonStyle}" />
         </Grid>
 
         <Label Grid.Row="2" Content="Co_mparison File:" />
-        <Grid Grid.Row="3">
+        <Grid Grid.Row="3" Margin="0 0 0 6">
             <Grid.ColumnDefinitions>
                 <ColumnDefinition Width="*" />
                 <ColumnDefinition Width="auto" />
             </Grid.ColumnDefinitions>
-            <TextBox Grid.Column="0" Text="{Binding ComparisonFile,UpdateSourceTrigger=PropertyChanged}"
+            <TextBox Grid.Column="0"
+                     Text="{Binding ComparisonFile,UpdateSourceTrigger=PropertyChanged}"
+                     VerticalContentAlignment="Center"
                      AutomationProperties.AutomationId="ComparisonFile" />
             <Button Grid.Column="1" Click="CompareBrowseClick" Style="{StaticResource BrowseButtonStyle}" />
         </Grid>
@@ -56,7 +66,7 @@
                     HorizontalAlignment="Right" VerticalAlignment="Bottom"
                     Margin="0 12 0 0">
             <Button IsDefault="True" Click="OkClick" IsEnabled="{Binding IsValid}"
-                    MinWidth="86" MinHeight="24" Margin="0 0 9 0"
+                    MinWidth="86" MinHeight="24"
                     AutomationProperties.AutomationId="Ok">
                 _OK
             </Button>
