@@ -217,7 +217,7 @@ namespace Microsoft.NodejsTools.Intellisense {
         private void GenerateClass(string modName, dynamic klass, int indentation) {
             string className = FixClassName(klass["name"]);
             _output.Append(' ', indentation * 4);
-            _output.AppendFormat("this.{0} = function() {{", className);
+            _output.AppendFormat("function _{0}() {{", className);
             _output.AppendLine();
 
             if (klass.ContainsKey("methods")) {
@@ -236,11 +236,19 @@ namespace Microsoft.NodejsTools.Intellisense {
 
             _output.Append(' ', indentation * 4);
             _output.AppendLine("}");
+
+            _output.AppendLine();
+            _output.AppendFormat("this.{0} = function() {{", className);
+            _output.AppendLine();
+            _output.AppendFormat("return new _{0}();", className);
+            _output.AppendLine();
+            _output.AppendLine("}");
         }
 
         private void GenerateProperties(dynamic properties, int indentation, Func<string, string> specializer) {
             foreach (var prop in properties) {
                 string desc = "";
+                
                 if (prop.ContainsKey("desc")) {
                     desc = prop["desc"];
 
@@ -251,14 +259,22 @@ namespace Microsoft.NodejsTools.Intellisense {
                     _output.AppendLine();
                 }
 
+                string textRaw = "";
+                if (prop.ContainsKey("textRaw")) {
+                    textRaw = prop["textRaw"];
+                }
+
                 _output.Append(' ', indentation * 4);
                 string value = null;
                 if (desc.IndexOf("<code>Boolean</code>") != -1) {
                     value = "true";
                 } else if (desc.IndexOf("<code>Number</code>") != -1) {
                     value = "0";
-                } else if (prop.ContainsKey("textRaw")) {
-                    string textRaw = prop["textRaw"];
+                } else if (desc.IndexOf("<code>Readable Stream</code>") != -1) {
+                    value = "require('stream').Readable()";
+                } else if (desc.IndexOf("<code>Writable Stream</code>") != -1 || textRaw == "process.stderr") {
+                    value = "require('stream').Writable()";
+                } else if (!String.IsNullOrWhiteSpace(textRaw)) {
                     int start, end;
                     if ((start = textRaw.IndexOf('{')) != -1 && (end = textRaw.IndexOf('}')) != -1 &&
                         start < end) {
@@ -289,22 +305,65 @@ namespace Microsoft.NodejsTools.Intellisense {
         }
 
         private void GenerateEvents(dynamic events, int indentation) {
-            _output.AppendLine("emitter = new Events().EventEmitter;");
-
+            StringBuilder eventsDoc = new StringBuilder();
+            eventsDoc.AppendLine();
+            eventsDoc.Append(' ', indentation * 4);
+            eventsDoc.AppendLine("/// <summary>");
+            eventsDoc.Append(' ', indentation * 4);
+            eventsDoc.AppendLine("/// Supported events: &#10;");
+            StringBuilder eventNames = new StringBuilder();
             foreach (var ev in events) {
                 if (ev["name"].IndexOf(' ') != -1) {
                     continue;
                 }
-                if (ev.ContainsKey("desc")) {
-                    _output.Append(' ', indentation * 4);
-                    _output.AppendFormat("/// <field name='{0}'>{1}</field>", ev["name"], FixDescription(ev["desc"]));
-                    _output.AppendLine();
-
+                if (eventNames.Length != 0) {
+                    eventNames.Append(", ");
                 }
-                _output.Append(' ', indentation * 4);
-                _output.AppendFormat("this.{0} = new emitter();", ev["name"]);
-                _output.AppendLine();
+                eventNames.Append(ev["name"]);
+                
+                eventsDoc.Append(' ', indentation * 4);
+                eventsDoc.Append("/// ");
+                eventsDoc.Append(ev["name"]);                
+                if (ev.ContainsKey("desc")) {
+                    eventsDoc.Append(": ");
+                    eventsDoc.Append(LimitDescription(ev["desc"]));
+                }
+                eventsDoc.Append("&#10;");
+                eventsDoc.AppendLine();
             }
+            eventsDoc.Append(' ', indentation * 4);
+            eventsDoc.AppendLine("/// </summary>");
+
+            string supportedEvents = String.Format("/// <summary>Supported Events: {0}</summary>", eventNames.ToString());
+            _output.AppendLine("this.addListener = function(event, listener) {");
+            _output.AppendLine(eventsDoc.ToString());
+            _output.AppendLine("}");
+
+            _output.AppendLine("this.once = function(event, listener) {");
+            _output.AppendLine(eventsDoc.ToString());
+            _output.AppendLine("}");
+
+            _output.AppendLine("this.removeListener = function(event, listener) {");
+            _output.AppendLine(supportedEvents);
+            _output.AppendLine("}");
+            
+            _output.AppendLine("this.removeAllListeners = function(event) {");
+            _output.AppendLine(supportedEvents);
+            _output.AppendLine("}");
+
+            _output.AppendLine("this.setMaxListeners = function(n) { }");
+            
+            _output.AppendLine("this.listeners = function(event) {");
+            _output.AppendLine(supportedEvents);
+            _output.AppendLine("}");
+
+            _output.AppendLine("this.emit = function(event, arguments) {");
+            _output.AppendLine(eventsDoc.ToString());
+            _output.AppendLine("}");
+
+            _output.AppendLine("this.on = function(event, listener) {");
+            _output.AppendLine(eventsDoc.ToString());
+            _output.AppendLine("}");
         }
 
         private void GenerateMethod(string fullName, dynamic method, int indentation = 1) {
@@ -469,7 +528,15 @@ namespace Microsoft.NodejsTools.Intellisense {
         }
 
         private static string FixDescription(string desc) {
-            return desc.Replace("\n", " ");
+            return desc.Replace("\n", "&#10;");
+        }
+
+        private static string LimitDescription(string desc) {
+            int newLine;
+            if ((newLine = desc.IndexOf('\n')) != -1) {
+                return desc.Substring(0, newLine).Replace("<p>", "").Replace("</p>", "") + " ...";
+            }
+            return desc.Replace("<p>", "").Replace("</p>", "");
         }
 
         private string FixClassName(string name) {

@@ -12,47 +12,80 @@
  *
  * ***************************************************************************/
 
+using System.Collections.Generic;
 using Microsoft.VisualStudio.Text;
 
 namespace Microsoft.NodejsTools {
     /// <summary>
-    /// This is a custom span which is like an EdgeInclusive span.  We need a custom span because elision buffers
-    /// do not allow EdgeInclusive unless it spans the entire buffer.  We create snippets of our language spans
-    /// and these are initially zero length.  When we insert at the beginning of these we'll end up keeping the
-    /// span zero length if we're just EdgePostivie tracking.
+    /// Custom tracking span to track the bounds of the user's code that is surrounded by
+    /// the a helper function and reference tags.
+    /// 
+    /// The surrounding code can currently grow only from the beginning.  The user code can
+    /// obviously have arbitrary edits.  We just need to remember the start of the user's
+    /// code based upon edits which happen in the beginning code (which changes when reference
+    /// tags in the users code change).
     /// </summary>
     class CustomTrackingSpan : ITrackingSpan {
-        private readonly ITrackingPoint _start, _end;
         private readonly ITextBuffer _buffer;
+        private ITextVersion _cachedVersion;
+        private int _currentStart;
 
-        public CustomTrackingSpan(ITextSnapshot snapshot, Span span, PointTrackingMode startTrackingMode, PointTrackingMode endTrackingMode) {
+        public CustomTrackingSpan(ITextSnapshot snapshot, NodejsProjectionBuffer buffer) {
             _buffer = snapshot.TextBuffer;
-            _start = snapshot.CreateTrackingPoint(span.Start, startTrackingMode);
-            _end = snapshot.CreateTrackingPoint(span.End, endTrackingMode);
+            _cachedVersion = snapshot.Version;
+            _currentStart = buffer.LeadingText.Length;
         }
 
         #region ITrackingSpan Members
 
         public SnapshotPoint GetEndPoint(ITextSnapshot snapshot) {
-            return _end.GetPoint(snapshot);
+            return GetSpan(snapshot).End;
         }
 
         public Span GetSpan(ITextVersion version) {
-            var start = _start.GetPosition(version);
-            var end = _end.GetPosition(version);
+            if (version != _cachedVersion) {
+                int curStart = _currentStart;
+                if (version.VersionNumber > _cachedVersion.VersionNumber) {
+                    // roll forward
+                    for (var currentVersion = _cachedVersion;
+                        currentVersion != version;
+                        currentVersion = currentVersion.Next) {
 
-            if (start > end) {
-                // start has positive tracking, end has negative, everything has been deleted
-                // and our spans have become inverted.
-                return new Span(
-                    start,
-                    0
-                );
+                        foreach (ITextChange change in currentVersion.Changes) {
+                            if (change.OldPosition < curStart) {
+                                curStart += change.Delta;
+                            }
+                        }
+                    }
+                } else {
+                    // roll back
+                    List<ITextVersion> versions = new List<ITextVersion>();
+                    for (var currentVersion = _cachedVersion;
+                        version != currentVersion;
+                        currentVersion = currentVersion.Next) {
+                            versions.Add(currentVersion);
+                    }
+
+                    foreach (var curVersion in versions) {
+                        foreach (ITextChange change in curVersion.Changes) {
+                            if (change.OldPosition < curStart) {
+                                curStart -= change.Delta;
+                            }
+                        }
+                    }
+                }
+                _currentStart = curStart;
+                _cachedVersion = version;
             }
+            
             return Span.FromBounds(
-                _start.GetPosition(version),
-                _end.GetPosition(version)
+                _currentStart,
+                GetEndPositionForVersion(version)
             );
+        }
+
+        private static int GetEndPositionForVersion(ITextVersion version) {
+            return version.Length - NodejsProjectionBuffer.TrailingText.Length;
         }
 
         public SnapshotSpan GetSpan(ITextSnapshot snapshot) {
@@ -63,7 +96,7 @@ namespace Microsoft.NodejsTools {
         }
 
         public SnapshotPoint GetStartPoint(ITextSnapshot snapshot) {
-            return _start.GetPoint(snapshot);
+            return GetSpan(snapshot).Start;
         }
 
         public string GetText(ITextSnapshot snapshot) {

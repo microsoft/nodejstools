@@ -15,11 +15,13 @@
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
+using System.Diagnostics;
 using System.IO;
 using System.Linq;
 using System.Runtime.InteropServices;
 using System.Text;
 using System.Threading.Tasks;
+using Microsoft.Ajax.Utilities;
 using Microsoft.NodejsTools.Project;
 using Microsoft.VisualStudio;
 using Microsoft.VisualStudio.Shell.Interop;
@@ -65,12 +67,17 @@ namespace Microsoft.NodejsTools {
         private readonly IProjectionBuffer _elisionBuffer;
         private readonly string _referenceFilename;
 
+        private int _endOfComments;
+        private string _leadingText;
+
         public NodejsProjectionBuffer(IContentTypeRegistryService contentRegistry, IProjectionBufferFactoryService bufferFactory, ITextBuffer diskBuffer, IBufferGraphFactoryService bufferGraphFactory, IContentType contentType, string referenceFileName) {
             _diskBuffer = diskBuffer;
+            _referenceFilename = referenceFileName;
+            UpdateLeadingText(_diskBuffer.CurrentSnapshot);
+
             _contentRegistry = contentRegistry;
             _contentType = contentType;
 
-            _referenceFilename = referenceFileName;
             _projBuffer = CreateProjectionBuffer(bufferFactory);
             _elisionBuffer = CreateElisionBuffer(bufferFactory);
             _elisionBuffer.Properties[typeof(NodejsProjectionBuffer)] = this;
@@ -78,7 +85,50 @@ namespace Microsoft.NodejsTools {
         }
 
         private void DiskBufferChanged(object sender, TextContentChangedEventArgs e) {
+            foreach (var change in e.Changes) {
+                if (change.OldPosition <= _endOfComments) {
+                    string oldLeading = _leadingText;
+
+                    UpdateLeadingText(e.After);
+
+                    if (oldLeading != _leadingText) {
+                        _projBuffer.ReplaceSpans(
+                            0,
+                            1,
+                            new[] { _leadingText },
+                            EditOptions.None,
+                            new ProjectionBufferBoundsEdit(_leadingText.Length)
+                        );
+                    }
+                    break;
+                }
+            }
+            
             NodejsPackage.Instance.ChangedBuffers.Add(e.After.TextBuffer);
+        }
+
+        private void UpdateLeadingText(ITextSnapshot current) {
+            // change in the leading comments, update our list of leading comments
+            var fullText = current.GetText();
+            var document = new DocumentContext(null, fullText);
+            var scanner = new JSScanner(new Context(document));
+
+            var tokenContext = scanner.ScanNextToken(false);
+            while (tokenContext.Token != JSToken.EndOfFile) {
+                if (tokenContext.Token != JSToken.MultipleLineComment &&
+                    tokenContext.Token != JSToken.SingleLineComment &&
+                    tokenContext.Token != JSToken.EndOfLine) {
+                    break;
+                }
+
+                tokenContext = scanner.ScanNextToken(false);
+            }
+
+            // special case divide for when the user is typing the first / at the beginning
+            // of the file for adding a comment.
+            _endOfComments = tokenContext.Token == JSToken.Divide ? tokenContext.EndPosition : tokenContext.StartPosition;
+            string commentText = fullText.Substring(0, _endOfComments);
+            _leadingText = commentText + GetBaseLeadingText();
         }
 
         private IProjectionBuffer CreateProjectionBuffer(IProjectionBufferFactoryService bufferFactory) {
@@ -100,19 +150,23 @@ namespace Microsoft.NodejsTools {
             return res;
         }
 
-        private string LeadingText {
+        public string LeadingText {
             get {
-                string asyncFilePath = null;
-                NodejsFileNode node = GetFileNode();
-                if (node != null) {
-                    asyncFilePath = node._asyncFilePath;
-                }
-
-                return
-                    "/// <reference path=\"" + _referenceFilename + "\" />\r\n" +
-                    (asyncFilePath != null ? ("/// <reference path=\"" + asyncFilePath + "\" />\r\n") : "") +
-                    GetNodeFunctionWrapperHeader("nodejs_tools_for_visual_studio_hidden_module_body", _diskBuffer.GetFilePath());
+                return _leadingText;
             }
+        }
+
+        private string GetBaseLeadingText() {
+            string asyncFilePath = null;
+            NodejsFileNode node = GetFileNode();
+            if (node != null) {
+                asyncFilePath = node._asyncFilePath;
+            }
+
+            return
+                "/// <reference path=\"" + _referenceFilename + "\" />\r\n" +
+                (asyncFilePath != null ? ("/// <reference path=\"" + asyncFilePath + "\" />\r\n") : "") +
+                GetNodeFunctionWrapperHeader("nodejs_tools_for_visual_studio_hidden_module_body", _diskBuffer.GetFilePath());
         }
 
         /// <summary>
@@ -207,9 +261,7 @@ namespace Microsoft.NodejsTools {
                 new object[] { 
                     new CustomTrackingSpan(
                         _projBuffer.CurrentSnapshot,
-                        new Span(LeadingText.Length, _projBuffer.CurrentSnapshot.Length - LeadingText.Length - TrailingText.Length),
-                        PointTrackingMode.Negative,
-                        PointTrackingMode.Positive
+                        this
                     )
                 },
                 ProjectionBufferOptions.None
@@ -233,6 +285,13 @@ namespace Microsoft.NodejsTools {
             get {
                 return _diskBuffer;
             }
+        }
+    }
+
+    class ProjectionBufferBoundsEdit {
+        public readonly int Start;
+        public ProjectionBufferBoundsEdit(int start) {
+            Start = start;
         }
     }
 }
