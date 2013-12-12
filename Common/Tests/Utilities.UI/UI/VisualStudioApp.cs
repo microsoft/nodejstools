@@ -299,6 +299,7 @@ namespace TestUtilities.UI {
                 if (text.Contains(containsText)) {
                     return;
                 }
+                System.Threading.Thread.Sleep(500);
             }
 
             Assert.Fail("Failed to find {0} in output window {1}, found:\r\n{2}", containsText, name, GetOutputWindowText(name));
