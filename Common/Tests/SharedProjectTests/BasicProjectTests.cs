@@ -157,9 +157,9 @@ namespace Microsoft.VisualStudioTools.SharedProjectTests {
                     using (var solution = BasicProject(projectType).Generate().ToVs()) {
                         var project = solution.Project;
 
-                        Assert.AreEqual(1, project.ProjectItems.Count);
+                        Assert.AreEqual(2, project.ProjectItems.Count);
                         
-                        var item = project.ProjectItems.AddFromFile(Path.Combine(solution.Directory, "Extra" + projectType.CodeExtension));
+                        var item = project.ProjectItems.AddFromFileCopy(Path.Combine(solution.Directory, "Extra" + projectType.CodeExtension));
 
                         Assert.AreEqual("Extra" + projectType.CodeExtension, item.Properties.Item("FileName").Value);
                         Assert.AreEqual(Path.Combine(solution.Directory, "HelloWorld", "Extra" + projectType.CodeExtension), item.Properties.Item("FullPath").Value);
@@ -177,12 +177,12 @@ namespace Microsoft.VisualStudioTools.SharedProjectTests {
                         Assert.AreEqual(false, vsProjItem.ProjectItem.IsOpen);
                         Assert.AreEqual(VsIdeTestHostContext.Dte, vsProjItem.ProjectItem.DTE);
 
-                        Assert.AreEqual(2, project.ProjectItems.Count);
+                        Assert.AreEqual(3, project.ProjectItems.Count);
 
                         // add an existing item
                         project.ProjectItems.AddFromFile(Path.Combine(solution.Directory, "HelloWorld", "server" + projectType.CodeExtension));
 
-                        Assert.AreEqual(2, project.ProjectItems.Count);
+                        Assert.AreEqual(3, project.ProjectItems.Count);
                     }
                 }
             } finally {

@@ -722,7 +722,7 @@ namespace Microsoft.Nodejs.Tests.UI {
 #if DEV11_OR_LATER
                 VisualStudioApp.CheckMessageBox(MessageBoxButton.Ok, "Directory names cannot contain any of the following characters");
 #else
-            VisualStudioApp.CheckMessageBox(MessageBoxButton.Ok, ". is an invalid filename");
+                VisualStudioApp.CheckMessageBox(MessageBoxButton.Ok, ". is an invalid filename");
 #endif
                 System.Threading.Thread.Sleep(1000);
 
@@ -732,7 +732,7 @@ namespace Microsoft.Nodejs.Tests.UI {
 #if DEV11_OR_LATER
                 VisualStudioApp.CheckMessageBox(MessageBoxButton.Ok, "Directory names cannot contain any of the following characters");
 #else
-            VisualStudioApp.CheckMessageBox(MessageBoxButton.Ok, ".. is an invalid filename");
+                VisualStudioApp.CheckMessageBox(MessageBoxButton.Ok, ".. is an invalid filename");
 #endif
                 System.Threading.Thread.Sleep(1000);
 

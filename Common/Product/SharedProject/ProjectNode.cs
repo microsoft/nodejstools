@@ -2171,7 +2171,8 @@ namespace Microsoft.VisualStudioTools.Project
             string[] parts = strFullPath.Substring(ProjectHome.Length).Split(new [] { Path.DirectorySeparatorChar }, StringSplitOptions.RemoveEmptyEntries);
             if (parts.Length == 0)
             {
-                throw new ArgumentException("The path is invalid", "path");
+                // pointing at the project home, it already exists
+                return this;
             }
             path = parts[0];
             string fullPath = Path.Combine(ProjectHome, path) + "\\";
@@ -4300,6 +4301,7 @@ namespace Microsoft.VisualStudioTools.Project
                             if (isLink && CommonUtils.IsSubpathOf(ProjectHome, file))
                             {
                                 // creating a link to a file that's actually in the project, it's not really a link.
+                                Console.WriteLine("Adding link {0} {1}", file, Path.GetDirectoryName(file));
                                 isLink = false;
                                 newFileName = file;
                                 n = this.CreateFolderNodes(Path.GetDirectoryName(file));
