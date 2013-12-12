@@ -24,6 +24,8 @@ namespace Microsoft.NodejsTools.NpmUI
                 buff.Append(current.Message);
                 buff.Append("\r\n");
 #if DEBUG
+                buff.Append(current.GetType());
+                buff.Append("\r\n");
                 buff.Append(current.StackTrace);
 #endif
                 current = current.InnerException;
