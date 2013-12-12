@@ -44,12 +44,13 @@ namespace Microsoft.Nodejs.Tests.UI {
         [TestMethod, Priority(0), TestCategory("Core")]
         [HostType("TC Dynamic"), DynamicHostType(typeof(VsIdeHostAdapter))]
         public void TestSnippetsDisabled() {
-            Window window;
-            var openFile = OpenProjectItem("server.js", out window);
+            using (var app = new VisualStudioApp(VsIdeTestHostContext.Dte)) {
+                Window window;
+                var openFile = OpenProjectItem("server.js", out window);
 
-            openFile.MoveCaret(7, 1);
-            Keyboard.Type("function\t");
-            openFile.WaitForText(@"var http = require('http');
+                openFile.MoveCaret(7, 1);
+                Keyboard.Type("function\t");
+                openFile.WaitForText(@"var http = require('http');
 
 var port = process.env.port || 1337;
 var mymod = require('./mymod.js');
@@ -61,18 +62,20 @@ http.createServer(function (req, res) {
     res.end('Hello World\n');
 }).listen(port);
 ");
+            }
         }
 
 
         [TestMethod, Priority(0), TestCategory("Core")]
         [HostType("TC Dynamic"), DynamicHostType(typeof(VsIdeHostAdapter))]
         public void TestNoAutoFormattingEnter() {
-            Window window;
-            var openFile = OpenProjectItem("server.js", out window);
+            using (var app = new VisualStudioApp(VsIdeTestHostContext.Dte)) {
+                Window window;
+                var openFile = OpenProjectItem("server.js", out window);
 
-            openFile.MoveCaret(8, 40);
-            Keyboard.Type("\r");
-            openFile.WaitForText(@"var http = require('http');
+                openFile.MoveCaret(8, 40);
+                Keyboard.Type("\r");
+                openFile.WaitForText(@"var http = require('http');
 
 var port = process.env.port || 1337;
 var mymod = require('./mymod.js');
@@ -85,18 +88,20 @@ http.createServer(function (req, res) {
     res.end('Hello World\n');
 }).listen(port);
 ");
+            }
         }
 
         [TestMethod, Priority(0), TestCategory("Core")]
         [HostType("TC Dynamic"), DynamicHostType(typeof(VsIdeHostAdapter))]
         public void TestNoAutoFormattingCloseFunction() {
-            Window window;
-            var openFile = OpenProjectItem("server.js", out window);
+            using (var app = new VisualStudioApp(VsIdeTestHostContext.Dte)) {
+                Window window;
+                var openFile = OpenProjectItem("server.js", out window);
 
-            openFile.MoveCaret(8, 40);
-            Keyboard.Type("\r\tfunction f() { }");
-            var text = openFile.Text;
-            openFile.WaitForText(@"var http = require('http');
+                openFile.MoveCaret(8, 40);
+                Keyboard.Type("\rfunction f() { }");
+                var text = openFile.Text;
+                openFile.WaitForText(@"var http = require('http');
 
 var port = process.env.port || 1337;
 var mymod = require('./mymod.js');
@@ -109,18 +114,20 @@ http.createServer(function (req, res) {
     res.end('Hello World\n');
 }).listen(port);
 ");
+            }
         }
 
         [TestMethod, Priority(0), TestCategory("Core")]
         [HostType("TC Dynamic"), DynamicHostType(typeof(VsIdeHostAdapter))]
         public void TestNoAutoFormattingPaste() {
-            Window window;
-            var openFile = OpenProjectItem("server.js", out window);
+            using (var app = new VisualStudioApp(VsIdeTestHostContext.Dte)) {
+                Window window;
+                var openFile = OpenProjectItem("server.js", out window);
 
-            openFile.MoveCaret(8, 40);
-            openFile.Invoke(() => Clipboard.SetText("\r\n"));
-            Keyboard.ControlV();
-            openFile.WaitForText(@"var http = require('http');
+                openFile.MoveCaret(8, 40);
+                openFile.Invoke(() => Clipboard.SetText("\r\n"));
+                Keyboard.ControlV();
+                openFile.WaitForText(@"var http = require('http');
 
 var port = process.env.port || 1337;
 var mymod = require('./mymod.js');
@@ -133,6 +140,7 @@ http.createServer(function (req, res) {
     res.end('Hello World\n');
 }).listen(port);
 ");
+            }
         }
 
         [TestMethod, Priority(0), TestCategory("Core")]
@@ -301,16 +309,18 @@ http.createServer(function (req, res) {
         [TestMethod, Priority(0), TestCategory("Core")]
         [HostType("TC Dynamic"), DynamicHostType(typeof(VsIdeHostAdapter))]
         public void UserModule() {
-            Window window;
-            var openFile = OpenProjectItem("server.js", out window);
+            using (var app = new VisualStudioApp(VsIdeTestHostContext.Dte)) {
+                Window window;
+                var openFile = OpenProjectItem("server.js", out window);
 
-            openFile.MoveCaret(6, 1);
-            Keyboard.Type("mymod.");
-            using (var session = openFile.WaitForSession<ICompletionSession>()) {
+                openFile.MoveCaret(6, 1);
+                Keyboard.Type("mymod.");
+                using (var session = openFile.WaitForSession<ICompletionSession>()) {
 
-                var completions = session.Session.CompletionSets.First().Completions.Select(x => x.InsertionText);
-                Assert.IsTrue(completions.Contains("area"));
-                Assert.IsTrue(completions.Contains("circumference"));
+                    var completions = session.Session.CompletionSets.First().Completions.Select(x => x.InsertionText);
+                    Assert.IsTrue(completions.Contains("area"));
+                    Assert.IsTrue(completions.Contains("circumference"));
+                }
             }
         }
 
@@ -342,6 +352,7 @@ http.createServer(function (req, res) {
 
             openFile.MoveCaret(6, 1);
             Keyboard.Type("http.");
+            System.Threading.Thread.Sleep(3000);
             Keyboard.Type("Cli\r");
             openFile.WaitForText(@"var http = require('http');
 
@@ -368,6 +379,7 @@ http.createServer(function (req, res) {
 
             openFile.MoveCaret(3, 1);
             Keyboard.Type("server.");
+            System.Threading.Thread.Sleep(3000);
             Keyboard.Type("lis\r");
             openFile.WaitForText(@"var http = require('http');
 var server = http.createServer(null); // server.listen
@@ -380,6 +392,7 @@ var sd = require('stringdecoder');  // sd.StringDecoder();
 
             openFile.MoveCaret(6, 1);
             Keyboard.Type("sd.");
+            System.Threading.Thread.Sleep(3000);
             Keyboard.Type("Str\r");
             openFile.WaitForText(@"var http = require('http');
 var server = http.createServer(null); // server.listen

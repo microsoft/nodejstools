@@ -70,15 +70,16 @@ namespace Microsoft.Nodejs.Tests.UI {
                 // try too long of a file
                 try {
                     project.SaveAs("TempFileTempFileTempFileTempFileTempFileTempFileTempFileTempFileTempFileTempFileTempFileTempFileTempFileTempFileTempFileTempFileTempFileTempFileTempFileTempFileTempFileTempFileTempFileTempFileTempFileTempFileTempFileTempFileTempFileTempFileTempFileTempFileTempFileTempFileTempFileTempFileTempFileTempFileTempFileTempFileTempFileTempFileTempFileTempFileTempFileTempFileTempFileTempFileTempFileTempFileTempFileTempFileTempFileTempFileTempFileTempFileTempFileTempFileTempFileTempFileTempFileTempFileTempFileTempFileTempFileTempFileTempFileTempFileTempFileTempFileTempFileTempFileTempFileTempFileTempFileTempFileTempFileTempFileTempFileTempFileTempFileTempFileTempFileTempFileTempFileTempFileTempFileTempFileTempFileTempFileTempFileTempFileTempFileTempFileTempFileTempFileTempFileTempFileTempFileTempFileTempFileTempFileTempFileTempFileTempFileTempFileTempFileTempFileTempFileTempFileTempFileTempFileTempFileTempFileTempFileTempFileTempFileTempFileTempFileTempFileTempFileTempFileTempFileTempFileTempFileTempFileTempFileTempFileTempFileTempFileTempFileTempFileTempFileTempFileTempFileTempFileTempFileTempFileTempFileTempFileTempFileTempFileTempFileTempFileTempFileTempFileTempFileTempFileTempFileTempFileTempFileTempFileTempFileTempFileTempFileTempFileTempFileTempFileTempFileTempFileTempFileTempFileTempFileTempFileTempFileTempFileTempFileTempFile.njsproj");
-                    Assert.Fail();
+                    Assert.Fail("was able to save with long file name");
                 } catch (InvalidOperationException e) {
                     Assert.IsTrue(e.ToString().Contains("exceeds the maximum number of"));
                 }
 
                 // save to a new location
+                bool couldSaveToC = false;
                 try {
                     project.SaveAs("C:\\TempFile.njsproj");
-                    Assert.Fail();
+                    couldSaveToC = true;
                 } catch (UnauthorizedAccessException e) {
                     // Saving to a new location is now permitted, but this location will not succeed.
                     Assert.IsTrue(e.ToString().Contains("Access to the path 'C:\\TempFile.njsproj' is denied."));
@@ -89,6 +90,9 @@ namespace Microsoft.Nodejs.Tests.UI {
                 project.SaveAs(TestData.GetPath(@"TestData\NodejsProjectData\TempFile.njsproj"));
                 project.Save("");   // empty string means just save
                 project.Delete();
+                if (couldSaveToC) {
+                    Assert.Inconclusive("could save to C:\\");
+                }
             } finally {
                 VsIdeTestHostContext.Dte.Solution.Close(false);
                 GC.Collect();
@@ -400,7 +404,7 @@ namespace Microsoft.Nodejs.Tests.UI {
 
                     subfolderNode = solutionExplorer.WaitForItem("Solution 'HelloWorld' (1 project)", "HelloWorld", "AddAndMoveRenamedFolder", "AddAndMoveRenamedNewName");
 
-                    Assert.IsTrue(Directory.Exists(@"TestData\NodejsProjectData\HelloWorld\AddAndMoveRenamedFolder\AddAndMoveRenamedNewName"));
+                    Assert.IsTrue(Directory.Exists(@"TestData\NodejsProjectData\HelloWorld\AddAndMoveRenamedFolder\AddAndMoveRenamedNewName"), "AddAndMoveRenamedFolder\\AddAndMoveRenamedNewName doesn't exist");
 
                     AutomationWrapper.Select(subfolderNode);
                     Keyboard.ControlX();
@@ -412,7 +416,7 @@ namespace Microsoft.Nodejs.Tests.UI {
 
                     var movedNode = solutionExplorer.WaitForItem("Solution 'HelloWorld' (1 project)", "HelloWorld", "AddAndMoveRenamedNewName");
 
-                    Assert.IsTrue(Directory.Exists(@"TestData\NodejsProjectData\HelloWorld\AddAndMoveRenamedNewName"));
+                    Assert.IsTrue(Directory.Exists(@"TestData\NodejsProjectData\HelloWorld\AddAndMoveRenamedNewName"), "HelloWorld\\AddAndMoveRenamedNewName doesn't exist");
                 }
             } finally {
                 VsIdeTestHostContext.Dte.Solution.Close();
@@ -715,7 +719,7 @@ namespace Microsoft.Nodejs.Tests.UI {
                 Keyboard.Type("."); // bad filename
                 Keyboard.Type(System.Windows.Input.Key.Enter);
 
-#if DEV11
+#if DEV11_OR_LATER
                 VisualStudioApp.CheckMessageBox(MessageBoxButton.Ok, "Directory names cannot contain any of the following characters");
 #else
             VisualStudioApp.CheckMessageBox(MessageBoxButton.Ok, ". is an invalid filename");
@@ -725,7 +729,7 @@ namespace Microsoft.Nodejs.Tests.UI {
                 Keyboard.Type(".."); // another bad filename
                 Keyboard.Type(System.Windows.Input.Key.Enter);
 
-#if DEV11
+#if DEV11_OR_LATER
                 VisualStudioApp.CheckMessageBox(MessageBoxButton.Ok, "Directory names cannot contain any of the following characters");
 #else
             VisualStudioApp.CheckMessageBox(MessageBoxButton.Ok, ".. is an invalid filename");
@@ -742,7 +746,11 @@ namespace Microsoft.Nodejs.Tests.UI {
                 Keyboard.Type(System.Windows.Input.Key.Enter);
 
                 // item should be successfully added now.
-                WaitForItem(project, "X");
+                VisualStudioApp.CheckMessageBox(MessageBoxButton.Ok, "The folder X already exists.");
+
+                Keyboard.Type("Z");
+                Keyboard.Type(System.Windows.Input.Key.Enter);
+                WaitForItem(project, "Z");
             }
         }
 
@@ -915,7 +923,7 @@ namespace Microsoft.Nodejs.Tests.UI {
             CountIs(itemCount, "B", 1);
             CountIs(itemCount, "a.js", 1);
             CountIs(itemCount, "b.js", 1);
-            CountIs(itemCount, "server.js", 1);
+            CountIs(itemCount, "server.js", 2);
             CountIs(itemCount, "HelloWorld.njsproj", 1);
             CountIs(itemCount, "HelloWorld.js", 0);     // not included because the actual name is server.js
         }

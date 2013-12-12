@@ -15,6 +15,8 @@
 using System;
 using System.Diagnostics;
 using System.Windows.Automation;
+using Microsoft.TC.TestHostAdapters;
+using Microsoft.VisualStudio.Shell.Interop;
 
 namespace TestUtilities.UI {
     public class AutomationWrapper {
@@ -250,6 +252,16 @@ namespace TestUtilities.UI {
         }
 
         #endregion
+
+        /// <summary>
+        /// Dumps the current top-level window in VS
+        /// </summary>
+        public static void DumpVS() {
+            IVsUIShell uiShell = VsIdeTestHostContext.ServiceProvider.GetService(typeof(IVsUIShell)) as IVsUIShell;
+            IntPtr hwnd;
+            uiShell.GetDialogOwnerHwnd(out hwnd);
+            AutomationWrapper.DumpElement(AutomationElement.FromHandle(hwnd));
+        }
 
         public static void DumpElement(AutomationElement element) {
             Console.WriteLine("Name    ClassName      ControlType    AutomationID");

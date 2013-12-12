@@ -136,14 +136,19 @@ namespace TestUtilities.UI {
                 Dte.ExecuteCommand(commandName, commandArgs);
             });
 
-            var dialog = WaitForDialog(task);
-            if (dialog == IntPtr.Zero) {
-                if (task.IsFaulted && task.Exception != null) {
-                    Assert.Fail("Unexpected Exception - VsIdeTestHostContext.Dte.ExecuteCommand({0},{1}){2}{3}",
-                            commandName, commandArgs, Environment.NewLine, task.Exception.ToString());
+            IntPtr dialog = IntPtr.Zero;
+
+            try {
+                dialog = WaitForDialog(task);
+            } finally {
+                if (dialog == IntPtr.Zero) {
+                    if (task.IsFaulted && task.Exception != null) {
+                        Assert.Fail("Unexpected Exception - VsIdeTestHostContext.Dte.ExecuteCommand({0},{1}){2}{3}",
+                                commandName, commandArgs, Environment.NewLine, task.Exception.ToString());
+                    }
+                    Assert.Fail("Task failed - VsIdeTestHostContext.Dte.ExecuteCommand({0},{1})",
+                            commandName, commandArgs);
                 }
-                Assert.Fail("Task failed - VsIdeTestHostContext.Dte.ExecuteCommand({0},{1})",
-                        commandName, commandArgs);
             }
             return dialog;
         }
@@ -330,6 +335,8 @@ namespace TestUtilities.UI {
                 //MessageBoxButton.Ok
                 //MessageBoxButton.Yes
                 //The second parameter is going to be the value returned... We always send Ok
+                Debug.WriteLine("Dismissing dialog");
+                AutomationWrapper.DumpElement(AutomationElement.FromHandle(hwnd));
                 NativeMethods.EndDialog(hwnd, new IntPtr(1));
             }
         }
