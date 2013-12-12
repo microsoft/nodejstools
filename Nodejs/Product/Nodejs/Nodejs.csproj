@@ -232,11 +232,13 @@
     <Compile Include="Debugger\Serialization\NodePrototypeVariable.cs" />
     <Compile Include="Debugger\Serialization\NodeVariableType.cs" />
     <Compile Include="EditFilter.cs" />
+    <Compile Include="Intellisense\CompletionInfo.cs" />
     <Compile Include="Intellisense\CompletionSource.cs" />
     <Compile Include="Intellisense\CompletionSourceProvider.cs" />
     <Compile Include="Intellisense\CompletionSource.Modules.cs" />
     <Compile Include="Intellisense\ReferenceGroup.cs" />
     <Compile Include="Intellisense\ReferenceGroupDispenser.cs" />
+    <Compile Include="Intellisense\RequireCompletionCache.cs" />
     <Compile Include="Intellisense\TextViewCreationListener.cs" />
     <Compile Include="LanguagePreferences.cs" />
     <Compile Include="Nodejs.cs" />

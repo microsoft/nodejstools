@@ -37,6 +37,7 @@ namespace Microsoft.NodejsTools.Project {
         private readonly Timer _timer;
         internal readonly ReferenceGroupDispenser _refGroupDispenser = new ReferenceGroupDispenser();
         private readonly HashSet<ReferenceGroup> _pendingRefGroupGenerations = new HashSet<ReferenceGroup>();
+        internal readonly RequireCompletionCache _requireCompletionCache = new RequireCompletionCache();
         internal int _currentFileCounter;
 
         public NodejsProjectNode(NodejsProjectPackage package)
@@ -275,6 +276,8 @@ namespace Microsoft.NodejsTools.Project {
 
             StringBuilder switchCode = new StringBuilder();
             UpdateReferenceFile(this, switchCode);
+
+            _requireCompletionCache.Clear();
             
             WriteReferenceFile(
                 _referenceFilename, 
