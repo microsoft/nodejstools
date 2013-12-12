@@ -306,10 +306,34 @@ namespace Microsoft.NodejsTools.Project{
 
         #endif
 
+        private void UpdateStatusBarWithNpmActivity(string activity){
+            if (string.IsNullOrEmpty(activity) || string.IsNullOrEmpty(activity.Trim())){
+                return;
+            }
+
+            if (!activity.Contains("npm")){
+                activity = string.Format("npm: {0}", activity);
+            }
+
+            var statusBar = (IVsStatusbar) _projectNode.GetService(typeof (SVsStatusbar));
+            if (null != statusBar){
+                statusBar.SetText(activity);
+            }
+        }
+
         private void WriteNpmLogToOutputWindow(string logText){
             var pane = GetNpmOutputPane();
             if (null != pane){
                 pane.OutputStringThreadSafe(logText);
+            }
+
+            if (UIThread.Instance.IsUIThread)
+            {
+                UpdateStatusBarWithNpmActivity(logText);
+            }
+            else
+            {
+                UIThread.Instance.Run(() => UpdateStatusBarWithNpmActivity(logText));
             }
 
 #if INTEGRATE_WITH_ERROR_LIST
