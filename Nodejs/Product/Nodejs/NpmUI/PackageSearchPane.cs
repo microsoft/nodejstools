@@ -21,7 +21,7 @@ using Microsoft.NodejsTools.Npm;
 using Timer = System.Windows.Forms.Timer;
 
 namespace Microsoft.NodejsTools.NpmUI{
-    internal partial class PackageSearchPane : UserControl{
+    internal partial class PackageSearchPane : UserControl, IListViewWrapper{
         private BusyControl _busy;
         private Timer _keypressFilterDelayTimer;
         private INpmController _npmController;
@@ -168,5 +168,7 @@ namespace Microsoft.NodejsTools.NpmUI{
         private void _listResults_SelectedIndexChanged(object sender, EventArgs e){
             OnSelectedPackageChanged();
         }
+
+        public ListView ListView { get { return _listResults; } }
     }
 }

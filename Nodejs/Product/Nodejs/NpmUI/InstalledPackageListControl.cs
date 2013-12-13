@@ -19,7 +19,7 @@ using System.Windows.Forms;
 using Microsoft.NodejsTools.Npm;
 
 namespace Microsoft.NodejsTools.NpmUI{
-    internal partial class InstalledPackageListControl : UserControl{
+    internal partial class InstalledPackageListControl : UserControl, IListViewWrapper{
         public InstalledPackageListControl(){
             InitializeComponent();
 
@@ -83,5 +83,7 @@ namespace Microsoft.NodejsTools.NpmUI{
             DrawListViewItemEventArgs e){
             PackageListItemPainter.DrawItem(this, e);
         }
+
+        public ListView ListView { get { return _listPackages; } }
     }
 }

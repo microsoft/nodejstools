@@ -12,6 +12,7 @@
  *
  * ***************************************************************************/
 
+using System;
 using System.Drawing;
 using System.Windows.Forms;
 using Microsoft.NodejsTools.Npm;
@@ -75,7 +76,19 @@ namespace Microsoft.NodejsTools.NpmUI{
             }
 
             lineColor = ColorUtils.MidPoint(foreColor, backColor);
+
             var bounds = e.Bounds;
+            var wrapper = owner as IListViewWrapper;
+            if (null != wrapper){
+                var view = wrapper.ListView;
+                if (null != view){
+                    var display = view.DisplayRectangle;
+                    if (view.VirtualMode && view.VirtualListSize * bounds.Height > display.Height
+                        || view.Items.Count * bounds.Height > display.Height){
+                        bounds.Width -= SystemInformation.VerticalScrollBarWidth;
+                    }
+                }
+            }
 
             using (var bg = new SolidBrush(backColor)){
                 g.FillRectangle(bg, bounds);
@@ -136,7 +149,7 @@ namespace Microsoft.NodejsTools.NpmUI{
                 TextFormatFlags.Default);
 
             var author = "by (unknown author)";
-            if (pkg.HasPackageJson && null != pkg.Author &&
+            if (null != pkg.Author &&
                 !string.IsNullOrEmpty(pkg.Author.Name)){
                 author = string.Format("by {0}", pkg.Author.Name);
             }
