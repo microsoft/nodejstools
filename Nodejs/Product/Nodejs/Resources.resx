@@ -169,4 +169,7 @@
   <data name="InvalidPortNumber" xml:space="preserve">
     <value>Invalid port number - the port should contain only digits.</value>
   </data>
+  <data name="WorkingDirInvalidOrMissing" xml:space="preserve">
+    <value>The specified working directory is invalid or missing.</value>
+  </data>
 </root>

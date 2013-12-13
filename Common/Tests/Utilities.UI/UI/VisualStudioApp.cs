@@ -13,25 +13,20 @@
  * ***************************************************************************/
 
 using System;
+using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
-using System.Runtime.InteropServices;
+using System.Linq;
 using System.Text;
-using System.Threading;
-using System.Threading.Tasks;
 using System.Windows.Automation;
-using System.Windows.Input;
 using EnvDTE;
+using EnvDTE80;
 using Microsoft.TC.TestHostAdapters;
+using Microsoft.VisualStudio;
 using Microsoft.VisualStudio.ComponentModelHost;
-using Microsoft.VisualStudio.OLE.Interop;
 using Microsoft.VisualStudio.Shell;
 using Microsoft.VisualStudio.Shell.Interop;
-using Microsoft.VisualStudio.TestTools.Execution;
-using Microsoft.VisualStudio.TestTools.TestAdapter;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
-using Microsoft.Win32;
-using TestUtilities;
 using Task = System.Threading.Tasks.Task;
 
 namespace TestUtilities.UI {
@@ -43,7 +38,7 @@ namespace TestUtilities.UI {
         private ObjectBrowser _objectBrowser, _resourceView;
         private IntPtr _mainWindowHandle;
         private readonly DTE _dte;
-        private bool _isDisposed;
+        private bool _isDisposed, _skipCloseAll;
 
         public VisualStudioApp(DTE dte)
             : this(new IntPtr(dte.MainWindow.HWnd)) {
@@ -55,12 +50,20 @@ namespace TestUtilities.UI {
             _mainWindowHandle = windowHandle;
         }
 
-        protected void Dispose(bool disposing) {
+        public bool IsDisposed {
+            get { return _isDisposed; }
+        }
+
+        protected virtual void Dispose(bool disposing) {
             if (!_isDisposed) {
                 _isDisposed = true;
                 try {
+                    if (_dte != null && _dte.Debugger.CurrentMode != dbgDebugMode.dbgDesignMode) {
+                        _dte.Debugger.TerminateAll();
+                        _dte.Debugger.Stop();
+                    }
                     DismissAllDialogs();
-                    for (int i = 0; i < 100; i++) {
+                    for (int i = 0; i < 100 && !_skipCloseAll; i++) {
                         try {
                             _dte.Solution.Close(false);
                             break;
@@ -80,7 +83,7 @@ namespace TestUtilities.UI {
         }
 
         public void SuppressCloseAllOnDispose() {
-            _isDisposed = true;
+            _skipCloseAll = true;
         }
 
         public IComponentModel ComponentModel {
@@ -110,7 +113,7 @@ namespace TestUtilities.UI {
         /// Opens and activates the solution explorer window.
         /// </summary>
         public SolutionExplorerTree OpenSolutionExplorer() {
-            Dte.ExecuteCommand("View.SolutionExplorer");            
+            Dte.ExecuteCommand("View.SolutionExplorer");
             return SolutionExplorerTreeView;
         }
 
@@ -133,14 +136,19 @@ namespace TestUtilities.UI {
                 Dte.ExecuteCommand(commandName, commandArgs);
             });
 
-            var dialog = WaitForDialog(task);
-            if (dialog == IntPtr.Zero) {
-                if (task.IsFaulted && task.Exception != null) {
-                    Assert.Fail("Unexpected Exception - VsIdeTestHostContext.Dte.ExecuteCommand({0},{1}){2}{3}",
-                            commandName, commandArgs, Environment.NewLine, task.Exception.ToString());
+            IntPtr dialog = IntPtr.Zero;
+
+            try {
+                dialog = WaitForDialog(task);
+            } finally {
+                if (dialog == IntPtr.Zero) {
+                    if (task.IsFaulted && task.Exception != null) {
+                        Assert.Fail("Unexpected Exception - VsIdeTestHostContext.Dte.ExecuteCommand({0},{1}){2}{3}",
+                                commandName, commandArgs, Environment.NewLine, task.Exception.ToString());
+                    }
+                    Assert.Fail("Task failed - VsIdeTestHostContext.Dte.ExecuteCommand({0},{1})",
+                            commandName, commandArgs);
                 }
-                Assert.Fail("Task failed - VsIdeTestHostContext.Dte.ExecuteCommand({0},{1})",
-                        commandName, commandArgs);
             }
             return dialog;
         }
@@ -149,8 +157,29 @@ namespace TestUtilities.UI {
         /// Opens and activates the Navigate To window.
         /// </summary>
         public NavigateToDialog OpenNavigateTo() {
+#if DEV12_OR_LATER
+            Dte.ExecuteCommand("Edit.NavigateTo");
+
+            for (int retries = 10; retries > 0; --retries) {
+                foreach (var element in Element.FindAll(
+                    TreeScope.Descendants,
+                    new PropertyCondition(AutomationElement.ClassNameProperty, "Window")
+                ).OfType<AutomationElement>()) {
+                    if (element.FindAll(TreeScope.Children, new OrCondition(
+                        new PropertyCondition(AutomationElement.AutomationIdProperty, "PART_SearchHost"),
+                        new PropertyCondition(AutomationElement.AutomationIdProperty, "PART_ResultList")
+                    )).Count == 2) {
+                        return new NavigateToDialog(element);
+                    }
+                }
+                System.Threading.Thread.Sleep(500);
+            }
+            Assert.Fail("Could not find Navigate To window");
+            return null;
+#else
             var dialog = OpenDialogWithDteExecuteCommand("Edit.NavigateTo");
             return new NavigateToDialog(dialog);
+#endif
         }
 
         public SaveDialog SaveAs() {
@@ -165,7 +194,7 @@ namespace TestUtilities.UI {
             Debug.Assert(Path.IsPathRooted(filename));
 
             string windowName = Path.GetFileName(filename);
-            var elem = Element.FindFirst(TreeScope.Descendants, 
+            var elem = Element.FindFirst(TreeScope.Descendants,
                 new AndCondition(
                     new PropertyCondition(
                         AutomationElement.ClassNameProperty,
@@ -213,14 +242,14 @@ namespace TestUtilities.UI {
             var dialog = AutomationElement.FromHandle(OpenDialogWithDteExecuteCommand("Tools.Options"));
 
             try {
-            // go to the tree view which lets us select a set of options...
+                // go to the tree view which lets us select a set of options...
                 var treeView = new TreeView(dialog.FindFirst(TreeScope.Descendants,
                 new PropertyCondition(
                     AutomationElement.ClassNameProperty,
                     "SysTreeView32")
                 ));
-            
-            treeView.FindItem("Source Control", "Plug-in Selection").SetFocus();
+
+                treeView.FindItem("Source Control", "Plug-in Selection").SetFocus();
 
                 var currentSourceControl = new ComboBox(dialog.FindFirst(
                     TreeScope.Descendants,
@@ -234,13 +263,12 @@ namespace TestUtilities.UI {
                            "ComboBox"
                        )
                     )
-                )
-            );
+                ));
 
-            currentSourceControl.SelectItem(providerName);
+                currentSourceControl.SelectItem(providerName);
 
                 new AutomationWrapper(dialog).ClickButtonByName("OK");
-            WaitForDialogDismissed();
+                WaitForDialogDismissed();
                 dialog = null;
             } finally {
                 if (dialog != null) {
@@ -259,6 +287,28 @@ namespace TestUtilities.UI {
             return new AttachToProcessDialog(dialog);
         }
 
+        public OutputWindowPane GetOutputWindow(string name) {
+            return ((DTE2)VsIdeTestHostContext.Dte).ToolWindows.OutputWindow.OutputWindowPanes.Item(name);
+        }
+
+        public string GetOutputWindowText(string name) {
+            var window = GetOutputWindow(name);
+            var doc = window.TextDocument;
+            doc.Selection.SelectAll();
+            return doc.Selection.Text;
+        }
+
+        public void WaitForOutputWindowText(string name, string containsText) {
+            for (int i = 0; i < 10; i++) {
+                var text = GetOutputWindowText(name);
+                if (text.Contains(containsText)) {
+                    return;
+                }
+                System.Threading.Thread.Sleep(500);
+            }
+
+            Assert.Fail("Failed to find {0} in output window {1}, found:\r\n{2}", containsText, name, GetOutputWindowText(name));
+        }
 
         public void DismissAllDialogs() {
             int foundWindow = 2;
@@ -278,13 +328,15 @@ namespace TestUtilities.UI {
                     foundWindow--;
                     continue;
                 }
-                                
+
                 //MessageBoxButton.Abort
                 //MessageBoxButton.Cancel
                 //MessageBoxButton.No
                 //MessageBoxButton.Ok
                 //MessageBoxButton.Yes
                 //The second parameter is going to be the value returned... We always send Ok
+                Debug.WriteLine("Dismissing dialog");
+                AutomationWrapper.DumpElement(AutomationElement.FromHandle(hwnd));
                 NativeMethods.EndDialog(hwnd, new IntPtr(1));
             }
         }
@@ -320,7 +372,7 @@ namespace TestUtilities.UI {
             Assert.Fail("Failed to find exception helper window");
             return null;
         }
-        
+
         /// <summary>
         /// Waits for a modal dialog to take over a given window and returns the HWND for the new dialog.
         /// </summary>
@@ -339,7 +391,7 @@ namespace TestUtilities.UI {
                 System.Threading.Thread.Sleep(500);
                 uiShell.GetDialogOwnerHwnd(out hwnd);
                 if (task != null && task.IsFaulted) {
-                    return IntPtr.Zero;                    
+                    return IntPtr.Zero;
                 }
             }
 
@@ -353,21 +405,26 @@ namespace TestUtilities.UI {
         }
 
         /// <summary>
-        /// Waits for a modal dialog to take over VS's main window and returns the HWND for the dialog.
+        /// Waits for the VS main window to receive the focus.
         /// </summary>
-        /// <returns></returns>
-        public IntPtr WaitForDialogDismissed() {
+        /// <returns>
+        /// True if the main window has the focus. Otherwise, false.
+        /// </returns>
+        public bool WaitForDialogDismissed(bool assertIfFailed = true, int timeout = 100000) {
             IVsUIShell uiShell = GetService<IVsUIShell>(typeof(IVsUIShell));
             IntPtr hwnd;
             uiShell.GetDialogOwnerHwnd(out hwnd);
 
-            for (int i = 0; i < 100 && hwnd != _mainWindowHandle; i++) {
+            for (int i = 0; i < (timeout / 100) && hwnd != _mainWindowHandle; i++) {
                 System.Threading.Thread.Sleep(100);
                 uiShell.GetDialogOwnerHwnd(out hwnd);
             }
 
-            Assert.AreEqual(_mainWindowHandle, hwnd);
-            return hwnd;
+            if (assertIfFailed) {
+                Assert.AreEqual(_mainWindowHandle, hwnd);
+                return true;
+            }
+            return _mainWindowHandle == hwnd;
         }
 
         /// <summary>
@@ -418,7 +475,9 @@ namespace TestUtilities.UI {
 
             Assert.AreNotEqual(IntPtr.Zero, hwnd, "hwnd is null, We failed to get the dialog");
             Assert.AreNotEqual(handle, hwnd, "hwnd is Dte.MainWindow, We failed to get the dialog");
+            Console.WriteLine("Ending dialog: ");
             AutomationWrapper.DumpElement(AutomationElement.FromHandle(hwnd));
+            Console.WriteLine("--------");
             StringBuilder title = new StringBuilder(4096);
             Assert.AreNotEqual(NativeMethods.GetDlgItemText(hwnd, dlgField, title, title.Capacity), (uint)0);
 
@@ -558,7 +617,7 @@ namespace TestUtilities.UI {
 
         public void MoveCurrentFileToProject(string projectName) {
             var dialog = OpenDialogWithDteExecuteCommand("file.ProjectPickerMoveInto");
-            
+
             var chooseDialog = new ChooseLocationDialog(dialog);
             chooseDialog.FindProject(projectName);
             chooseDialog.ClickOK();
@@ -583,6 +642,7 @@ namespace TestUtilities.UI {
         public Project OpenProject(string projName, string startItem = null, int? expectedProjects = null, string projectName = null, bool setStartupItem = true) {
             string fullPath = TestData.GetPath(projName);
             Assert.IsTrue(File.Exists(fullPath), "Cannot find " + fullPath);
+            Console.WriteLine("Opening {0}", fullPath);
             Dte.Solution.Open(fullPath);
 
             Assert.IsTrue(Dte.Solution.IsOpen, "The solution is not open");
@@ -597,7 +657,7 @@ namespace TestUtilities.UI {
                     }
                 }
 
-                Assert.IsTrue(i == expectedProjects, String.Format("Loading project resulted in wrong number of loaded projects, expected 1, received {0}", Dte.Solution.Projects.Count));
+                Assert.AreEqual(expectedProjects, i, "Wrong number of loaded projects");
             }
 
             var iter = Dte.Solution.Projects.GetEnumerator();
@@ -606,20 +666,24 @@ namespace TestUtilities.UI {
             Project project = (Project)iter.Current;
             if (projectName != null) {
                 while (project.Name != projectName) {
-                    if (!iter.MoveNext()) {
-                        Assert.Fail("Failed to find project named " + projectName);
-                    }
+                    Assert.IsTrue(iter.MoveNext(), "Failed to find project named " + projectName);
                     project = (Project)iter.Current;
                 }
             }
+
+            Assert.IsNotNull(project, "No project loaded");
+            Assert.IsNotNull(project.Properties, "No project loaded");
+            Assert.IsTrue(project.Properties.GetEnumerator().MoveNext(), "No project loaded");
 
             if (startItem != null && setStartupItem) {
                 project.SetStartupFile(startItem);
                 for (var i = 0; i < 20; i++) {
                     //Wait for the startupItem to be set before returning from the project creation
-                    if (((string)project.Properties.Item("StartupFile").Value) == startItem) {
-                        break;
-                    }
+                    try {
+                        if (((string)project.Properties.Item("StartupFile").Value) == startItem) {
+                            break;
+                        }
+                    } catch { }
                     System.Threading.Thread.Sleep(250);
                 }
             }
@@ -640,6 +704,37 @@ namespace TestUtilities.UI {
 
         internal void Invoke(Action action) {
             ThreadHelper.Generic.Invoke(action);
+        }
+
+        public List<IVsTaskItem> WaitForErrorListItems(int expectedCount) {
+            var errorList = GetService<IVsTaskList>(typeof(SVsErrorList));
+            var allItems = new List<IVsTaskItem>();
+
+            if (expectedCount == 0) {
+                // Allow time for errors to appear. Otherwise when we expect 0
+                // errors we will get a false pass.
+                System.Threading.Thread.Sleep(5000);
+            }
+
+            for (int retries = 10; retries > 0; --retries) {
+                allItems.Clear();
+                IVsEnumTaskItems items;
+                ErrorHandler.ThrowOnFailure(errorList.EnumTaskItems(out items));
+
+                IVsTaskItem[] taskItems = new IVsTaskItem[1];
+
+                uint[] itemCnt = new uint[1];
+
+                while (ErrorHandler.Succeeded(items.Next(1, taskItems, itemCnt)) && itemCnt[0] == 1) {
+                    allItems.Add(taskItems[0]);
+                }
+                if (allItems.Count >= expectedCount) {
+                    break;
+                }
+                // give time for errors to process...
+                System.Threading.Thread.Sleep(1000);
+            }
+            return allItems;
         }
     }
 }

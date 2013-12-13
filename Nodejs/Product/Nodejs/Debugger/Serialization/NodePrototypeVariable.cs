@@ -26,7 +26,7 @@ namespace Microsoft.NodejsTools.Debugger.Serialization {
             JsonValue reference = references[Id];
             Parent = parent;
             StackFrame = parent.Frame;
-            Name = "[prototype]";
+            Name = "__proto__";
             TypeName = reference.GetValue<string>("type");
             Value = reference.GetValue<string>("value");
             Class = reference.GetValue<string>("className");

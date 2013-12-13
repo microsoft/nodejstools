@@ -37,6 +37,7 @@ namespace Microsoft.NodejsTools.Project {
         private readonly Timer _timer;
         internal readonly ReferenceGroupDispenser _refGroupDispenser = new ReferenceGroupDispenser();
         private readonly HashSet<ReferenceGroup> _pendingRefGroupGenerations = new HashSet<ReferenceGroup>();
+        internal readonly RequireCompletionCache _requireCompletionCache = new RequireCompletionCache();
         internal int _currentFileCounter;
 
         public NodejsProjectNode(NodejsProjectPackage package)
@@ -275,6 +276,8 @@ namespace Microsoft.NodejsTools.Project {
 
             StringBuilder switchCode = new StringBuilder();
             UpdateReferenceFile(this, switchCode);
+
+            _requireCompletionCache.Clear();
             
             WriteReferenceFile(
                 _referenceFilename, 
@@ -298,7 +301,7 @@ namespace Microsoft.NodejsTools.Project {
         /// </summary>
         private void UpdateReferenceFile(HierarchyNode node, StringBuilder switchCode) {
             // collect all of the node_modules folders
-            Dictionary<FileNode, CommonFolderNode> directoryPackages = GetModuleFolderMapping();
+            Dictionary<FileNode, List<CommonFolderNode>> directoryPackages = GetModuleFolderMapping();
 
             switchCode.Append(@"
 function relative_match(match_dir, dirname, mod_name, alt_mod_name, ref_path) {
@@ -416,21 +419,23 @@ function starts_with(a, b) {
                         );
                     }
 
-                    CommonFolderNode folderPackage;
-                    if (directoryPackages.TryGetValue(nodeFile, out folderPackage)) {
-                        // this file is also exposed as the folder
-                        if (Path.GetFileName(CommonUtils.TrimEndSeparator(folderPackage.Parent.Url)) == NodejsConstants.NodeModulesFolder) {
-                            switchCode.AppendFormat(
-                                "    || (starts_with(__dirname, '{0}') && (module == '{1}'))\r\n",
-                                CommonUtils.TrimEndSeparator(folderPackage.Parent.Parent.FullPathToChildren).Replace("\\", "\\\\"),
-                                Path.GetFileName(CommonUtils.TrimEndSeparator(folderPackage.Url))
-                            );
-                        } else {
-                            switchCode.AppendFormat(
-                                "    || (starts_with(__dirname, '{0}') && (module == './{1}' || module == './{1}/'))\r\n",
-                                CommonUtils.TrimEndSeparator(folderPackage.Parent.FullPathToChildren).Replace("\\", "\\\\"),
-                                Path.GetFileName(CommonUtils.TrimEndSeparator(folderPackage.Url))
-                            );
+                    List<CommonFolderNode> folderPackageList;
+                    if (directoryPackages.TryGetValue(nodeFile, out folderPackageList)) {
+                        foreach (var folderPackage in folderPackageList) {
+                                // this file is also exposed as the folder
+                            if (Path.GetFileName(CommonUtils.TrimEndSeparator(folderPackage.Parent.Url)) == NodejsConstants.NodeModulesFolder) {
+                                switchCode.AppendFormat(
+                                    "    || (starts_with(__dirname, '{0}') && (module == '{1}'))\r\n",
+                                    CommonUtils.TrimEndSeparator(folderPackage.Parent.Parent.FullPathToChildren).Replace("\\", "\\\\"),
+                                    Path.GetFileName(CommonUtils.TrimEndSeparator(folderPackage.Url))
+                                );
+                            } else {
+                                switchCode.AppendFormat(
+                                    "    || (starts_with(__dirname, '{0}') && (module == './{1}' || module == './{1}/'))\r\n",
+                                    CommonUtils.TrimEndSeparator(folderPackage.Parent.FullPathToChildren).Replace("\\", "\\\\"),
+                                    Path.GetFileName(CommonUtils.TrimEndSeparator(folderPackage.Url))
+                                );
+                            }
                         }
                     }
 
@@ -477,10 +482,10 @@ function starts_with(a, b) {
         /// is the entry point for the folder in node_modules.  Typically the file will be index.js
         /// or a file specified in package.json.
         /// </summary>
-        private Dictionary<FileNode, CommonFolderNode> GetModuleFolderMapping() {
+        private Dictionary<FileNode, List<CommonFolderNode>> GetModuleFolderMapping() {
             List<CommonFolderNode> folderNodes = new List<CommonFolderNode>();
             FindNodesOfType<CommonFolderNode>(folderNodes);
-            Dictionary<FileNode, CommonFolderNode> directoryPackages = new Dictionary<FileNode, CommonFolderNode>();
+            var directoryPackages = new Dictionary<FileNode, List<CommonFolderNode>>();
 
             // collect all of the packages in node_modules folders and their associated entry point
             foreach (var folderNode in folderNodes) {
@@ -521,28 +526,39 @@ function starts_with(a, b) {
                                 var rootFile = FindNodeByFullPath(pathToRootFile) as FileNode;
                                 if (rootFile == null) {
                                     rootFile = FindNodeByFullPath(pathToRootFile + NodejsConstants.FileExtension) as FileNode;
+                                    if (rootFile == null) {
+                                        rootFile = FindNodeByFullPath(Path.Combine(pathToRootFile, "index.js")) as FileNode;
+                                    }
                                 }
 
                                 if (rootFile != null) {
-                                    directoryPackages[rootFile] = folderChild;
+                                    AddFolderForFile(directoryPackages, rootFile, folderChild);
                                 }
                             }
 
 
                             var indexJsChild = curChild.FindImmediateChildByName(NodejsConstants.DefaultPackageMainFile) as FileNode;
                             if (indexJsChild != null && File.Exists(indexJsChild.Url)) {
-                                directoryPackages[indexJsChild] = folderChild;
+                                AddFolderForFile(directoryPackages, indexJsChild, folderChild);
                             }
                         }
                     }
                 } else {
                     var indexJsChild = folderNode.FindImmediateChildByName(NodejsConstants.DefaultPackageMainFile) as FileNode;
                     if (indexJsChild != null && File.Exists(indexJsChild.Url)) {
-                        directoryPackages[indexJsChild] = folderNode;
+                        AddFolderForFile(directoryPackages, indexJsChild, folderNode);
                     }
                 }
             }
             return directoryPackages;
+        }
+
+        private static void AddFolderForFile(Dictionary<FileNode, List<CommonFolderNode>> directoryPackages, FileNode rootFile, CommonFolderNode folderChild) {
+            List<CommonFolderNode> folders;
+            if (!directoryPackages.TryGetValue(rootFile, out folders)) {
+                directoryPackages[rootFile] = folders = new List<CommonFolderNode>();
+            }
+            folders.Add(folderChild);
         }
 
         /// <summary>

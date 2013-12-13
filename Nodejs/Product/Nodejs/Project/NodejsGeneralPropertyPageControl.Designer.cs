@@ -75,6 +75,8 @@
             // 
             // _nodeExePath
             // 
+            this._nodeExePath.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
+            | System.Windows.Forms.AnchorStyles.Right)));
             this._nodeExePath.AutoCompleteMode = System.Windows.Forms.AutoCompleteMode.Suggest;
             this._nodeExePath.AutoCompleteSource = System.Windows.Forms.AutoCompleteSource.FileSystem;
             this._nodeExePath.Location = new System.Drawing.Point(135, 19);
@@ -85,6 +87,8 @@
             // 
             // _nodeExeArguments
             // 
+            this._nodeExeArguments.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
+            | System.Windows.Forms.AnchorStyles.Right)));
             this._nodeExeArguments.Location = new System.Drawing.Point(135, 45);
             this._nodeExeArguments.Name = "_nodeExeArguments";
             this._nodeExeArguments.Size = new System.Drawing.Size(290, 20);
@@ -95,7 +99,7 @@
             // 
             this._nodejsPort.Location = new System.Drawing.Point(135, 150);
             this._nodejsPort.Name = "_nodejsPort";
-            this._nodejsPort.Size = new System.Drawing.Size(100, 20);
+            this._nodejsPort.Size = new System.Drawing.Size(105, 20);
             this._nodejsPort.TabIndex = 13;
             this._nodejsPort.TextChanged += new System.EventHandler(this.NodejsPortChanged);
             // 
@@ -119,6 +123,8 @@
             // 
             // _scriptArguments
             // 
+            this._scriptArguments.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
+            | System.Windows.Forms.AnchorStyles.Right)));
             this._scriptArguments.Location = new System.Drawing.Point(135, 71);
             this._scriptArguments.Name = "_scriptArguments";
             this._scriptArguments.Size = new System.Drawing.Size(290, 20);
@@ -136,14 +142,18 @@
             // 
             // _workingDir
             // 
+            this._workingDir.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
+            | System.Windows.Forms.AnchorStyles.Right)));
             this._workingDir.Location = new System.Drawing.Point(135, 97);
             this._workingDir.Name = "_workingDir";
             this._workingDir.Size = new System.Drawing.Size(258, 20);
             this._workingDir.TabIndex = 8;
-            this._workingDir.TextChanged += new System.EventHandler(this.Changed);
+            this._workingDir.TextChanged += new System.EventHandler(this.WorkingDirTextChanged);
             // 
             // _launchUrl
             // 
+            this._launchUrl.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
+            | System.Windows.Forms.AnchorStyles.Right)));
             this._launchUrl.Location = new System.Drawing.Point(135, 124);
             this._launchUrl.Name = "_launchUrl";
             this._launchUrl.Size = new System.Drawing.Size(290, 20);
@@ -161,6 +171,7 @@
             // 
             // _browsePath
             // 
+            this._browsePath.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
             this._browsePath.Location = new System.Drawing.Point(399, 17);
             this._browsePath.Name = "_browsePath";
             this._browsePath.Size = new System.Drawing.Size(26, 23);
@@ -171,6 +182,7 @@
             // 
             // _browseDirectory
             // 
+            this._browseDirectory.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
             this._browseDirectory.Location = new System.Drawing.Point(399, 95);
             this._browseDirectory.Name = "_browseDirectory";
             this._browseDirectory.Size = new System.Drawing.Size(26, 23);
@@ -202,8 +214,9 @@
             this.Controls.Add(this._scriptArguments);
             this.Controls.Add(this._nodeExeArguments);
             this.Controls.Add(this._nodeExePath);
+            this.MinimumSize = new System.Drawing.Size(303, 0);
             this.Name = "NodejsGeneralPropertyPageControl";
-            this.Size = new System.Drawing.Size(513, 302);
+            this.Size = new System.Drawing.Size(488, 302);
             ((System.ComponentModel.ISupportInitialize)(this._nodeExeErrorProvider)).EndInit();
             this.ResumeLayout(false);
             this.PerformLayout();

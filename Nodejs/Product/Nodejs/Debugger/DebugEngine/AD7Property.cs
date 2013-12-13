@@ -13,7 +13,10 @@
  * ***************************************************************************/
 
 using System;
+using System.Collections.Generic;
+using System.Linq;
 using System.Threading;
+using Microsoft.NodejsTools.Debugger.Serialization;
 using Microsoft.VisualStudio;
 using Microsoft.VisualStudio.Debugger.Interop;
 
@@ -26,6 +29,7 @@ namespace Microsoft.NodejsTools.Debugger.DebugEngine {
     class AD7Property : IDebugProperty3 {
         private readonly NodeEvaluationResult _evaluationResult;
         private readonly AD7StackFrame _frame;
+        private readonly IComparer<string> _comparer = new NaturalSortComparer();
 
         public AD7Property(AD7StackFrame frame, NodeEvaluationResult evaluationResult) {
             _evaluationResult = evaluationResult;
@@ -120,7 +124,7 @@ namespace Microsoft.NodejsTools.Debugger.DebugEngine {
                 }
             }
 
-            ppEnum = new AD7PropertyEnum(properties);
+            ppEnum = new AD7PropertyEnum(properties.OrderBy(p => p.bstrName, _comparer).ToArray());
             return VSConstants.S_OK;
         }
 

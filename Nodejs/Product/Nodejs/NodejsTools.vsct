@@ -51,7 +51,7 @@
             <Parent guid="guidSHLMainMenu" id="IDG_VS_TOOLS_OTHER2"/>
             <Strings>
                 <ButtonText>Node.&amp;js Tools</ButtonText>
-                <CommandName>Node.js Tools</CommandName>
+                <CommandName>Node.&amp;js Tools</CommandName>
             </Strings>
         </Menu>
 
@@ -59,7 +59,7 @@
             <Parent guid="guidNodeToolsCmdSet" id="ToolsMenuItemsGroup"/>
             <Strings>
                 <ButtonText>&amp;Remote Debugging Proxy</ButtonText>
-                <CommandName>Remote Debugging Proxy</CommandName>
+                <CommandName>&amp;Remote Debugging Proxy</CommandName>
             </Strings>
         </Menu>
 

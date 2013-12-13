@@ -496,6 +496,50 @@ namespace Microsoft.Nodejs.Tests.UI {
             }
         }
 
+        /// <summary>
+        /// https://nodejstools.codeplex.com/workitem/494
+        /// 
+        /// We should include submodules (like quox) and not just the top-level
+        /// module when index.js is present.
+        /// </summary>
+        [TestMethod, Priority(0), TestCategory("Core")]
+        [HostType("TC Dynamic"), DynamicHostType(typeof(VsIdeHostAdapter))]
+        public void SubmodulesFiles() {
+            var project = Project("RequireSubmodules",
+                Compile("server", ""),
+                Folder("mymod"),
+                Compile("mymod\\index", ""),
+                Compile("mymod\\quox", "")
+            );
+
+            using (var solution = project.Generate().ToVs()) {
+                var server = solution.OpenItem("RequireSubmodules", "server.js");
+
+                server.MoveCaret(1, 1);
+
+                Keyboard.Type("require('./mymod/q\t)");
+                server.WaitForText("require('./mymod/quox.js')");
+            }
+        }
+
+        [TestMethod, Priority(0), TestCategory("Core")]
+        [HostType("TC Dynamic"), DynamicHostType(typeof(VsIdeHostAdapter))]
+        public void SubmodulesFiles2() {
+            var project = Project("RequireSubmodules",
+                Compile("server", ""),
+                Folder("mymod"),
+                Compile("mymod\\quox", "")
+            );
+
+            using (var solution = project.Generate().ToVs()) {
+                var server = solution.OpenItem("RequireSubmodules", "server.js");
+
+                server.MoveCaret(1, 1);
+
+                Keyboard.Type("require('./mymod/q\t)");
+                server.WaitForText("require('./mymod/quox.js')");
+            }
+        }
 
         private static ProjectDefinition RequireProject(params ProjectContentGenerator[] items) {
             return new ProjectDefinition("Require", NodejsProject, items);

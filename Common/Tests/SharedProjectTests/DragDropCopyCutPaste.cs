@@ -542,8 +542,8 @@ namespace Microsoft.VisualStudioTools.SharedProjectTests {
                     projectType,
                     ItemGroup(
                         Folder("MoveDupFilename"),
-                        Folder("MoveDupFilename\\Foo"),
-                        Compile("MoveDupFilename\\Foo\\server"),
+                        Folder("MoveDupFilename\\Fob"),
+                        Compile("MoveDupFilename\\Fob\\server"),
                         Compile("MoveDupFilename\\server")
                     )
                 );
@@ -551,14 +551,14 @@ namespace Microsoft.VisualStudioTools.SharedProjectTests {
                 using (var solution = testDef.Generate().ToVs()) {
                     MoveByKeyboard(
                         solution.WaitForItem("DragDropCopyCutPaste", "MoveDupFilename"),
-                        solution.WaitForItem("DragDropCopyCutPaste", "MoveDupFilename", "Foo", "server" + projectType.CodeExtension)
+                        solution.WaitForItem("DragDropCopyCutPaste", "MoveDupFilename", "Fob", "server" + projectType.CodeExtension)
                     );
 
                     var dialog = new OverwriteFileDialog(solution.App.WaitForDialog());
                     dialog.Yes();
 
                     solution.AssertFileExists("DragDropCopyCutPaste", "MoveDupFilename", "server" + projectType.CodeExtension);
-                    solution.AssertFileDoesntExist("DragDropCopyCutPaste", "MoveDupFilename", "Foo", "server" + projectType.CodeExtension);
+                    solution.AssertFileDoesntExist("DragDropCopyCutPaste", "MoveDupFilename", "Fob", "server" + projectType.CodeExtension);
                 }
             }
         }
@@ -1117,7 +1117,40 @@ namespace Microsoft.VisualStudioTools.SharedProjectTests {
             }
         }
 
-        private delegate void MoveDelegate(AutomationElement destination, params AutomationElement[] source);
+        [TestMethod, Priority(0), TestCategory("Core")]
+        [HostType("TC Dynamic"), DynamicHostType(typeof(VsIdeHostAdapter))]
+        public void MoveProjectToSolutionFolderKeyboard() {
+            MoveProjectToSolutionFolder(MoveByKeyboard);
+        }
+
+        [TestMethod, Priority(0), TestCategory("Core")]
+        [HostType("TC Dynamic"), DynamicHostType(typeof(VsIdeHostAdapter))]
+        public void MoveProjectToSolutionFolderMouse() {
+            MoveProjectToSolutionFolder(MoveByMouse);
+        }
+
+        /// <summary>
+        /// Cut an item from our project, paste into another project, item should be removed from our project
+        /// </summary>
+        private void MoveProjectToSolutionFolder(MoveDelegate mover) {
+            foreach (var projectType in ProjectTypes) {
+                var projects = new ISolutionElement[] {
+                    new ProjectDefinition("DragDropCopyCutPaste", projectType),
+                    SolutionFolder("SolFolder")
+                };
+
+                using (var solution = SolutionFile.Generate("DragDropCopyCutPaste", projects).ToVs()) {
+                    mover(
+                        solution.WaitForItem("SolFolder"),
+                        solution.WaitForItem("DragDropCopyCutPaste")
+                    );
+
+                    Assert.IsNotNull(solution.WaitForItem("SolFolder", "DragDropCopyCutPaste"));
+                }
+            }
+        }
+
+        internal delegate void MoveDelegate(AutomationElement destination, params AutomationElement[] source);
 
         /// <summary>
         /// Moves one or more items in solution explorer to the destination using the mouse.
@@ -1154,7 +1187,7 @@ namespace Microsoft.VisualStudioTools.SharedProjectTests {
         /// <summary>
         /// Moves one or more items in solution explorer to the destination using the mouse.
         /// </summary>
-        private static void CopyByMouse(AutomationElement destination, params AutomationElement[] source) {
+        internal static void CopyByMouse(AutomationElement destination, params AutomationElement[] source) {
             SelectItemsForDragAndDrop(source);
 
             try {
@@ -1205,7 +1238,7 @@ namespace Microsoft.VisualStudioTools.SharedProjectTests {
         /// </summary>
         /// <param name="destination"></param>
         /// <param name="source"></param>
-        private static void CopyByKeyboard(AutomationElement destination, params AutomationElement[] source) {
+        internal static void CopyByKeyboard(AutomationElement destination, params AutomationElement[] source) {
             AutomationWrapper.Select(source.First());
             for (int i = 1; i < source.Length; i++) {
                 AutomationWrapper.AddToSelection(source[i]);

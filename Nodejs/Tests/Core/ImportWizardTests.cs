@@ -13,7 +13,9 @@
  * ***************************************************************************/
 
 using System;
+using System.IO;
 using System.Linq;
+using System.Windows;
 using System.Windows.Threading;
 using System.Xml.Linq;
 using Microsoft.NodejsTools;
@@ -33,77 +35,74 @@ namespace NodejsTests {
 
         [TestMethod, Priority(0)]
         public void ImportWizardSimple() {
-            var settings = new ImportSettings();
+            DispatcherTest(async () => {
+                var settings = new ImportSettings();
 
-            settings.SourcePath = TestData.GetPath("TestData\\HelloWorld\\");
-            settings.Filters = "*.js;*.njsproj";
-            settings.ProjectPath = TestData.GetPath("TestData\\TestDestination\\Subdirectory\\ProjectName.njsproj");
-            RunDispatcher(settings);
-            Assert.AreEqual("server.js", settings.StartupFile);
+                settings.SourcePath = TestData.GetPath("TestData\\HelloWorld\\");
+                settings.Filters = "*.js;*.njsproj";
+                settings.ProjectPath = TestData.GetPath("TestData\\TestDestination\\Subdirectory\\ProjectName.njsproj");
+                await Dispatcher.Yield();
+                Assert.AreEqual("server.js", settings.StartupFile);
 
-            var path = settings.CreateRequestedProject();
+                var path = settings.CreateRequestedProject();
 
-            Assert.AreEqual(settings.ProjectPath, path);
-            var proj = XDocument.Load(path);
+                Assert.AreEqual(settings.ProjectPath, path);
+                var proj = XDocument.Load(path);
 
-            Assert.AreEqual("..\\..\\HelloWorld\\", proj.Descendant("ProjectHome").Value);
-            AssertUtil.ContainsExactly(proj.Descendants(proj.GetName("Compile")).Select(x => x.Attribute("Include").Value),
-                "server.js");
-            AssertUtil.ContainsExactly(proj.Descendants(proj.GetName("Content")).Select(x => x.Attribute("Include").Value),
-                "HelloWorld.njsproj");
-        }
-
-        private static void RunDispatcher(ImportSettings settings) {
-            settings.Dispatcher.BeginInvoke(
-                (Action)(() => {
-                    Dispatcher.CurrentDispatcher.BeginInvokeShutdown(DispatcherPriority.Normal);
-                }), DispatcherPriority.SystemIdle);
-
-            Dispatcher.Run();
+                Assert.AreEqual("..\\..\\HelloWorld\\", proj.Descendant("ProjectHome").Value);
+                AssertUtil.ContainsExactly(proj.Descendants(proj.GetName("Compile")).Select(x => x.Attribute("Include").Value),
+                    "server.js");
+                AssertUtil.ContainsExactly(proj.Descendants(proj.GetName("Content")).Select(x => x.Attribute("Include").Value),
+                    "HelloWorld.njsproj");
+            });
         }
 
         [TestMethod, Priority(0)]
         public void ImportWizardSimpleApp() {
-            var settings = new ImportSettings();
+            DispatcherTest(async () => {                
+                var settings = new ImportSettings();
 
-            settings.SourcePath = TestData.GetPath("TestData\\HelloWorldApp\\");
-            settings.Filters = "*.js;*.njsproj";
-            settings.ProjectPath = TestData.GetPath("TestData\\TestDestination\\Subdirectory\\ProjectName.njsproj");
-            RunDispatcher(settings);
-            Assert.AreEqual("app.js", settings.StartupFile);
+                settings.SourcePath = TestData.GetPath("TestData\\HelloWorldApp\\");
+                settings.Filters = "*.js;*.njsproj";
+                settings.ProjectPath = TestData.GetPath("TestData\\TestDestination\\Subdirectory\\ProjectName.njsproj");
+                await Dispatcher.Yield();
+                Assert.AreEqual("app.js", settings.StartupFile);
 
-            var path = settings.CreateRequestedProject();
+                var path = settings.CreateRequestedProject();
 
-            Assert.AreEqual(settings.ProjectPath, path);
-            var proj = XDocument.Load(path);
+                Assert.AreEqual(settings.ProjectPath, path);
+                var proj = XDocument.Load(path);
 
-            Assert.AreEqual("..\\..\\HelloWorldApp\\", proj.Descendant("ProjectHome").Value);
-            AssertUtil.ContainsExactly(proj.Descendants(proj.GetName("Compile")).Select(x => x.Attribute("Include").Value),
-                "app.js");
-            AssertUtil.ContainsExactly(proj.Descendants(proj.GetName("Content")).Select(x => x.Attribute("Include").Value),
-                "HelloWorld.njsproj");
+                Assert.AreEqual("..\\..\\HelloWorldApp\\", proj.Descendant("ProjectHome").Value);
+                AssertUtil.ContainsExactly(proj.Descendants(proj.GetName("Compile")).Select(x => x.Attribute("Include").Value),
+                    "app.js");
+                AssertUtil.ContainsExactly(proj.Descendants(proj.GetName("Content")).Select(x => x.Attribute("Include").Value),
+                    "HelloWorld.njsproj");
+            });
         }
 
         [TestMethod, Priority(0)]
         public void ImportWizardSimpleOther() {
-            var settings = new ImportSettings();
+            DispatcherTest(async () => {
+                var settings = new ImportSettings();
 
-            settings.SourcePath = TestData.GetPath("TestData\\HelloWorldOther\\");
-            settings.Filters = "*.js;*.njsproj";
-            settings.ProjectPath = TestData.GetPath("TestData\\TestDestination\\Subdirectory\\ProjectName.njsproj");
-            RunDispatcher(settings);
-            Assert.AreEqual("other.js", settings.StartupFile);
+                settings.SourcePath = TestData.GetPath("TestData\\HelloWorldOther\\");
+                settings.Filters = "*.js;*.njsproj";
+                settings.ProjectPath = TestData.GetPath("TestData\\TestDestination\\Subdirectory\\ProjectName.njsproj");
+                await Dispatcher.Yield();
+                Assert.AreEqual("other.js", settings.StartupFile);
 
-            var path = settings.CreateRequestedProject();
+                var path = settings.CreateRequestedProject();
 
-            Assert.AreEqual(settings.ProjectPath, path);
-            var proj = XDocument.Load(path);
+                Assert.AreEqual(settings.ProjectPath, path);
+                var proj = XDocument.Load(path);
 
-            Assert.AreEqual("..\\..\\HelloWorldOther\\", proj.Descendant("ProjectHome").Value);
-            AssertUtil.ContainsExactly(proj.Descendants(proj.GetName("Compile")).Select(x => x.Attribute("Include").Value),
-                "other.js");
-            AssertUtil.ContainsExactly(proj.Descendants(proj.GetName("Content")).Select(x => x.Attribute("Include").Value),
-                "HelloWorld.njsproj");
+                Assert.AreEqual("..\\..\\HelloWorldOther\\", proj.Descendant("ProjectHome").Value);
+                AssertUtil.ContainsExactly(proj.Descendants(proj.GetName("Compile")).Select(x => x.Attribute("Include").Value),
+                    "other.js");
+                AssertUtil.ContainsExactly(proj.Descendants(proj.GetName("Content")).Select(x => x.Attribute("Include").Value),
+                    "HelloWorld.njsproj");
+            });
         }
 
         [TestMethod, Priority(0)]
@@ -205,6 +204,82 @@ namespace NodejsTests {
 
             AssertUtil.ContainsExactly(proj.Descendants(proj.GetName("Compile")).Select(x => x.Attribute("Include").Value),
                 "server.js");
+        }
+
+
+        [TestMethod, Priority(0)]
+        public void ImportWizardEmptyFolders() {
+            var settings = new ImportSettings();
+
+            settings.SourcePath = TestData.GetPath("TestData\\HelloWorld4");
+            settings.Filters = "*.js";
+            settings.StartupFile = "server.js";
+            settings.ExcludeNodeModules = true;
+            settings.ProjectPath = TestData.GetPath("TestData\\TestDestination\\Subdirectory\\ProjectName.njsproj");
+
+            var path = settings.CreateRequestedProject();
+
+            Assert.AreEqual(settings.ProjectPath, path);
+            var proj = XDocument.Load(path);
+
+            AssertUtil.ContainsExactly(proj.Descendants(proj.GetName("Folder")).Select(x => x.Attribute("Include").Value),
+                "Baz");
+        }
+
+        [TestMethod, Priority(0)]
+        public void ImportWizardEmptyFoldersDontExcludeNodeModules() {
+            var settings = new ImportSettings();
+
+            settings.SourcePath = TestData.GetPath("TestData\\HelloWorld4\\");
+            settings.Filters = "*.js";
+            settings.StartupFile = "server.js";
+            settings.ExcludeNodeModules = false;
+            settings.ProjectPath = TestData.GetPath("TestData\\TestDestination\\Subdirectory\\ProjectName.njsproj");
+
+            var path = settings.CreateRequestedProject();
+
+            Assert.AreEqual(settings.ProjectPath, path);
+            var proj = XDocument.Load(path);
+
+            AssertUtil.ContainsExactly(proj.Descendants(proj.GetName("Folder")).Select(x => x.Attribute("Include").Value),
+                "Baz", "node_modules");
+        }
+
+        [TestMethod, Priority(0)]
+        public void ProjectFileAlreadyExists() {
+            DispatcherTest(async () => {
+                var settings = new ImportSettings();
+
+                settings.SourcePath = TestData.GetPath("TestData\\HelloWorld3");
+                settings.Filters = "*.js";
+                settings.StartupFile = "server.js";
+                settings.ExcludeNodeModules = true;
+                await Dispatcher.Yield();
+                Assert.AreEqual("HelloWorld31.njsproj", Path.GetFileName(settings.ProjectPath));
+            });
+        }
+
+        /// <summary>
+        /// Creates a new window so that we have an active dispatcher for
+        /// test cases which depend upon posting async events back and having
+        /// them get processed at some point.
+        /// 
+        /// Test cases need to do a await Dispatcher.Yield() in order to have
+        /// any actual message processing occur.
+        /// </summary>
+        /// <param name="testCase"></param>
+        private static void DispatcherTest(Action testCase) {
+            var window = new Window();
+            window.ShowInTaskbar = false;
+            window.MaxHeight = 0;
+            window.MaxWidth = 0;
+            window.WindowStyle = WindowStyle.None;
+            window.Activated += (sender, args) => {
+                testCase();
+                window.Close();
+            };
+            window.ShowDialog();
+            Dispatcher.CurrentDispatcher.InvokeShutdown();
         }
     }
 }

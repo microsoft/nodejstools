@@ -283,13 +283,15 @@ namespace Microsoft.VisualStudio.Repl {
             // Create and inititalize text view adapter.
             // WARNING: This might trigger various services like IntelliSense, margins, taggers, etc.
             IVsTextView textViewAdapter = adapterFactory.CreateVsTextViewAdapter(provider, CreateRoleSet());
-            
+
+#if NTVS_FEATURE_INTERACTIVEWINDOW
             // work around a bug w/ JS language service, force tool tips to not do anything by putting
             // our own text view filter in.  Otherwise when you hover you get an unhandled exception.
             IOleCommandTarget next;
             var filter = new TextViewFilter();
             textViewAdapter.AddCommandFilter(filter, out next);
             filter._next = next;
+#endif
 
             // make us a code window so we'll have the same colors as a normal code window.
             IVsTextEditorPropertyContainer propContainer;
@@ -341,6 +343,7 @@ namespace Microsoft.VisualStudio.Repl {
             _textViewHost = res;
         }
 
+#if NTVS_FEATURE_INTERACTIVEWINDOW
         class TextViewFilter : IOleCommandTarget, IVsTextViewFilter {
             internal IOleCommandTarget _next;
 
@@ -373,6 +376,7 @@ namespace Microsoft.VisualStudio.Repl {
 
             #endregion
         }
+#endif
 
         private static IEnumerable<IReplWindowCreationListener> GetCreationListeners(IComponentModel model, string contentType) {
             return
@@ -717,8 +721,6 @@ namespace Microsoft.VisualStudio.Repl {
                 UIThread(CancelStandardInput);
             }
             
-            WriteLine("Resetting execution engine");
-
             return Evaluator.Reset().
                 ContinueWith(completed => {
                     // flush output produced by the process before it was killed:
@@ -3026,6 +3028,7 @@ namespace Microsoft.VisualStudio.Repl {
 
             AppendProjectionSpan(new ReplSpan(trackingSpan, ReplSpanKind.Output));
 
+#if NTVS_FEATURE_INTERACTIVEWINDOW
             // Work around bug in JS language service.  We need to make sure they don't
             // provide intellisense or quick tips, which can be done by making sure we have
             // 2 JS buffers in the projection buffer.  Otherwise you get intellisense on
@@ -3038,7 +3041,7 @@ namespace Microsoft.VisualStudio.Repl {
                 PointTrackingMode.Negative
             );
             AppendProjectionSpan(new ReplSpan(trackingSpan, ReplSpanKind.Output));
-
+#endif
         }
 
         private void AppendProjectionSpan(ReplSpan span) {

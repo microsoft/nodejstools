@@ -23,6 +23,7 @@ using System.Windows.Forms.Design;
 using System.Windows.Threading;
 using Microsoft.Build.Framework;
 using Microsoft.Build.Utilities;
+using Microsoft.VisualStudio;
 using Microsoft.VisualStudio.Shell;
 using Microsoft.VisualStudio.Shell.Interop;
 using Microsoft.Win32;
@@ -55,7 +56,7 @@ namespace Microsoft.VisualStudioTools.Project
 
         // Queues to manage Tasks and Error output plus message logging
         private ConcurrentQueue<Func<ErrorTask>> taskQueue;
-        private ConcurrentQueue<string> outputQueue;
+        private ConcurrentQueue<OutputQueueEntry> outputQueue;
 
         #endregion
 
@@ -121,10 +122,10 @@ namespace Microsoft.VisualStudioTools.Project
         /// </summary>
         public IDEBuildLogger(IVsOutputWindowPane output, TaskProvider taskProvider, IVsHierarchy hierarchy)
         {
-            if (taskProvider == null)
-                throw new ArgumentNullException("taskProvider");
-            if (hierarchy == null)
-                throw new ArgumentNullException("hierarchy");
+            UIThread.Instance.MustBeCalledFromUIThread();
+
+            Utilities.ArgumentNotNull("taskProvider", taskProvider);
+            Utilities.ArgumentNotNull("hierarchy", hierarchy);
 
             Trace.WriteLineIf(Thread.CurrentThread.GetApartmentState() != ApartmentState.STA, "WARNING: IDEBuildLogger constructor running on the wrong thread.");
 
@@ -147,13 +148,10 @@ namespace Microsoft.VisualStudioTools.Project
         /// </summary>
         public override void Initialize(IEventSource eventSource)
         {
-            if (null == eventSource)
-            {
-                throw new ArgumentNullException("eventSource");
-            }
+            Utilities.ArgumentNotNull("eventSource", eventSource);
 
             this.taskQueue = new ConcurrentQueue<Func<ErrorTask>>();
-            this.outputQueue = new ConcurrentQueue<string>();
+            this.outputQueue = new ConcurrentQueue<OutputQueueEntry>();
 
             eventSource.BuildStarted += new BuildStartedEventHandler(BuildStartedHandler);
             eventSource.BuildFinished += new BuildFinishedEventHandler(BuildFinishedHandler);
@@ -164,7 +162,7 @@ namespace Microsoft.VisualStudioTools.Project
             eventSource.TaskStarted += new TaskStartedEventHandler(TaskStartedHandler);
             eventSource.TaskFinished += new TaskFinishedEventHandler(TaskFinishedHandler);
             eventSource.CustomEventRaised += new CustomBuildEventHandler(CustomHandler);
-            eventSource.ErrorRaised += new BuildErrorEventHandler(ErrorHandler);
+            eventSource.ErrorRaised += new BuildErrorEventHandler(ErrorRaisedHandler);
             eventSource.WarningRaised += new BuildWarningEventHandler(WarningHandler);
             eventSource.MessageRaised += new BuildMessageEventHandler(MessageHandler);
         }
@@ -275,7 +273,7 @@ namespace Microsoft.VisualStudioTools.Project
         /// <summary>
         /// This is the delegate for error events.
         /// </summary>
-        protected virtual void ErrorHandler(object sender, BuildErrorEventArgs errorEvent)
+        protected virtual void ErrorRaisedHandler(object sender, BuildErrorEventArgs errorEvent)
         {
             // NOTE: This may run on a background thread!
             QueueOutputText(GetFormattedErrorMessage(errorEvent.File, errorEvent.LineNumber, errorEvent.ColumnNumber, false, errorEvent.Code, errorEvent.Message));
@@ -336,7 +334,7 @@ namespace Microsoft.VisualStudioTools.Project
             if (this.OutputWindowPane != null)
             {
                 // Enqueue the output text
-                this.outputQueue.Enqueue(text);
+                this.outputQueue.Enqueue(new OutputQueueEntry(text, OutputWindowPane));
 
                 // We want to interactively report the output. But we dont want to dispatch
                 // more than one at a time, otherwise we might overflow the main thread's
@@ -364,23 +362,21 @@ namespace Microsoft.VisualStudioTools.Project
         {
             // NOTE: This may run on a background thread!
             // We need to output this on the main thread. We must use BeginInvoke because the main thread may not be pumping events yet.
-            BeginInvokeWithErrorMessage(this.serviceProvider, this.dispatcher, () => {
-                if (this.OutputWindowPane != null)
-                {
-                    string outputString;
+            BeginInvokeWithErrorMessage(this.serviceProvider, this.dispatcher, FlushBuildOutput);
+        }
 
-                    while (this.outputQueue.TryDequeue(out outputString))
-                    {
-                        Microsoft.VisualStudio.ErrorHandler.ThrowOnFailure(this.OutputWindowPane.OutputString(outputString));
-                    }
-                }
-            });
+        internal void FlushBuildOutput() {
+            OutputQueueEntry output;
+
+            while (this.outputQueue.TryDequeue(out output)) {
+                ErrorHandler.ThrowOnFailure(output.Pane.OutputString(output.Message));
+            }
         }
 
         private void ClearQueuedOutput()
         {
             // NOTE: This may run on a background thread!
-            this.outputQueue = new ConcurrentQueue<string>();
+            this.outputQueue = new ConcurrentQueue<OutputQueueEntry>();
         }
 
         #endregion output queue
@@ -610,5 +606,17 @@ namespace Microsoft.VisualStudioTools.Project
         }
 
         #endregion exception handling helpers
+
+        class OutputQueueEntry 
+        {
+            public readonly string Message;
+            public readonly IVsOutputWindowPane Pane;
+
+            public OutputQueueEntry(string message, IVsOutputWindowPane pane) 
+            {
+                Message = message;
+                Pane = pane;
+            }
+        }
     }
 }

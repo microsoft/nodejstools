@@ -15,7 +15,7 @@
 using System.Windows;
 using System.Windows.Controls;
 
-namespace Microsoft.NodejsTools.Wpf {
+namespace Microsoft.VisualStudioTools.Wpf {
     sealed class LabelledControl : ContentControl {
         public string Title {
             get { return (string)GetValue(TitleProperty); }

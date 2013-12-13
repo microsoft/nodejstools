@@ -120,4 +120,10 @@
   <data name="NodejsToolsForVS" xml:space="preserve">
     <value>Node.js Tools for Visual Studio</value>
   </data>
+  <data name="ProfilingOk" xml:space="preserve">
+    <value>_OK</value>
+  </data>
+  <data name="ProfilingStart" xml:space="preserve">
+    <value>_Start</value>
+  </data>
 </root>

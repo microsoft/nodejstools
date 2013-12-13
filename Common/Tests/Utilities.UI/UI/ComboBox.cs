@@ -25,59 +25,25 @@ namespace TestUtilities.UI {
         public void SelectItem(string name) {
             ExpandCollapsePattern pat = (ExpandCollapsePattern)Element.GetCurrentPattern(ExpandCollapsePattern.Pattern);
             pat.Expand();
+            try {
+                var item = Element.FindFirst(TreeScope.Descendants, new PropertyCondition(AutomationElement.NameProperty, name));
 
-            var item = Element.FindFirst(TreeScope.Descendants, new PropertyCondition(AutomationElement.NameProperty, name));
-
-            if (item == null) {
-                throw new ElementNotAvailableException(name + " is not in the combobox");
+                if (item == null) {
+                    throw new ElementNotAvailableException(name + " is not in the combobox");
+                }
+                ((SelectionItemPattern)item.GetCurrentPattern(SelectionItemPattern.Pattern)).Select();
+            } finally {
+                pat.Collapse();
             }
-            ((SelectionItemPattern)item.GetCurrentPattern(SelectionItemPattern.Pattern)).Select();
-
-            pat.Collapse();
         }
 
         public string GetSelectedItemName() {
-            ExpandCollapsePattern pat = (ExpandCollapsePattern)Element.GetCurrentPattern(ExpandCollapsePattern.Pattern);
-            pat.Expand();
-            try {
-                var items = Element.FindAll(TreeScope.Descendants,
-                    new OrCondition(
-                        new PropertyCondition(AutomationElement.ClassNameProperty, "ListBoxItem"),
-                        new PropertyCondition(AutomationElement.ControlTypeProperty, ControlType.ListItem)
-                    )
-                );
-
-                foreach (AutomationElement item in items) {
-                    if (((SelectionItemPattern)item.GetCurrentPattern(SelectionItemPattern.Pattern)).Current.IsSelected) {
-                        return item.Current.Name;
-                    }
-                }
+            var pat = (SelectionPattern)Element.GetCurrentPattern(SelectionPattern.Pattern);
+            var selection = pat.Current.GetSelection();
+            if (selection == null || selection.Length == 0) {
                 return null;
-            } finally {
-                pat.Collapse();
             }
-        }
-
-        public string GetSelectedItemText() {
-            ExpandCollapsePattern pat = (ExpandCollapsePattern)Element.GetCurrentPattern(ExpandCollapsePattern.Pattern);
-            pat.Expand();
-            try {
-                var items = Element.FindAll(TreeScope.Descendants,
-                    new OrCondition(
-                        new PropertyCondition(AutomationElement.ClassNameProperty, "ListBoxItem"),
-                        new PropertyCondition(AutomationElement.ControlTypeProperty, ControlType.ListItem)
-                    )
-                );
-
-                foreach (AutomationElement item in items) {
-                    if (((SelectionItemPattern)item.GetCurrentPattern(SelectionItemPattern.Pattern)).Current.IsSelected) {
-                        return new AutomationWrapper(item).FindFirstByControlType(ControlType.Text).Current.Name;
-                    }
-                }
-                return null;
-            } finally {
-                pat.Collapse();
-            }
+            return selection[0].Current.Name;
         }
 
         public string GetEnteredText() {

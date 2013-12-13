@@ -66,7 +66,7 @@
       <Link>SharedProject\CommonLibraryNode.cs</Link>
       <Visible>true</Visible>
     </Compile>
-    <Compile Include="..\..\..\Common\Product\SharedProject\Navigation\ProjectLibraryNode.cs">
+    <Compile Include="$(_ProjectSystemFilesLocation)\Navigation\ProjectLibraryNode.cs">
       <Link>SharedProject\Navigation\ProjectLibraryNode.cs</Link>
       <Visible>true</Visible>
     </Compile>
@@ -549,6 +549,7 @@
       <Visible>true</Visible>
     </Compile>
     <Compile Include="$(_ProjectSystemFilesLocation)\WebPiComponentPickerControl.Designer.cs">
+      <DependentUpon>WebPiComponentPickerControl.cs</DependentUpon>
       <Link>SharedProject\WebPiComponentPickerControl.Designer.cs</Link>
       <Visible>true</Visible>
     </Compile>
@@ -580,6 +581,36 @@
       <Link>SharedProject\SolutionEventsListener.cs</Link>
       <Visible>true</Visible>
     </Compile>
+    <Compile Include="$(_ProjectSystemFilesLocation)\Wpf\Commands.cs">
+      <Link>SharedProject\Wpf\Commands.cs</Link>
+      <Visible>true</Visible>
+    </Compile>
+    <Compile Include="$(_ProjectSystemFilesLocation)\Wpf\LabelledButton.cs">
+      <Link>SharedProject\Wpf\LabelledButton.cs</Link>
+      <Visible>true</Visible>
+    </Compile>
+    <Compile Include="$(_ProjectSystemFilesLocation)\Wpf\LabelledControl.cs">
+      <Link>SharedProject\Wpf\LabelledControl.cs</Link>
+      <Visible>true</Visible>
+    </Compile>
+    <Compile Include="$(_ProjectSystemFilesLocation)\Wpf\Controls.cs">
+      <Link>SharedProject\Wpf\Controls.cs</Link>
+      <Visible>true</Visible>
+    </Compile>
+    <Compile Include="$(_ProjectSystemFilesLocation)\Wpf\NativeMethods.cs">
+      <Link>SharedProject\Wpf\NativeMethods.cs</Link>
+      <Visible>true</Visible>
+    </Compile>
+    <Compile Include="$(_ProjectSystemFilesLocation)\Wpf\Dialogs.cs">
+      <Link>SharedProject\Wpf\Dialogs.cs</Link>
+      <Visible>true</Visible>
+    </Compile>
+    <Resource Include="$(_ProjectSystemFilesLocation)\Wpf\Controls.xaml">
+      <Link>SharedProject\Wpf\Controls.xaml</Link>
+      <Visible>true</Visible>
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
+    </Resource>
   </ItemGroup>
   <ItemGroup>
     <EmbeddedResource Include="$(_ProjectSystemFilesLocation)\ProjectResources.resx">
@@ -593,6 +624,7 @@
       <Visible>true</Visible>
     </EmbeddedResource>
     <EmbeddedResource Include="$(_ProjectSystemFilesLocation)\WebPiComponentPickerControl.resx">
+      <DependentUpon>WebPiComponentPickerControl.cs</DependentUpon>
       <Link>SharedProject\WebPiComponentPickerControl.resx</Link>
       <SubType>Designer</SubType>
       <Visible>true</Visible>

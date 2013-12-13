@@ -13,7 +13,7 @@ var assemblies = [
     'ProfilingUITests',
     'ReplWindowUITests',
     'TestSccPackage',
-    'SharedProject',
+    'SharedProjectTests',
     'TestUtilities',
     'TestUtilities.UI',
     'TestUtilities.Nodejs',

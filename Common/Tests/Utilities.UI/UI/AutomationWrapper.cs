@@ -15,6 +15,8 @@
 using System;
 using System.Diagnostics;
 using System.Windows.Automation;
+using Microsoft.TC.TestHostAdapters;
+using Microsoft.VisualStudio.Shell.Interop;
 
 namespace TestUtilities.UI {
     public class AutomationWrapper {
@@ -221,6 +223,17 @@ namespace TestUtilities.UI {
             }
         }
 
+        /// <summary>
+        /// Collapses the selected item.  The item must support the expand/collapse pattern.
+        /// </summary>
+        /// <param name="node"></param>
+        public static void Collapse(AutomationElement node) {
+            ExpandCollapsePattern pat = (ExpandCollapsePattern)node.GetCurrentPattern(ExpandCollapsePattern.Pattern);
+            if (pat.Current.ExpandCollapseState != ExpandCollapseState.Collapsed) {
+                pat.Collapse();
+            }
+        }
+
 
         /// <summary>
         /// Gets the specified value from this element.  The element must support the value pattern.
@@ -240,18 +253,30 @@ namespace TestUtilities.UI {
 
         #endregion
 
+        /// <summary>
+        /// Dumps the current top-level window in VS
+        /// </summary>
+        public static void DumpVS() {
+            IVsUIShell uiShell = VsIdeTestHostContext.ServiceProvider.GetService(typeof(IVsUIShell)) as IVsUIShell;
+            IntPtr hwnd;
+            uiShell.GetDialogOwnerHwnd(out hwnd);
+            AutomationWrapper.DumpElement(AutomationElement.FromHandle(hwnd));
+        }
+
         public static void DumpElement(AutomationElement element) {
-            Debug.WriteLine("Name    ClassName      ControlType    AutomationID");
+            Console.WriteLine("Name    ClassName      ControlType    AutomationID");
             DumpElement(element, 0);
         }
 
         private static void DumpElement(AutomationElement element, int depth) {
-            Debug.WriteLine(String.Format("{0} {1}\t{2}\t{3}\t{4}", 
+            Console.WriteLine(String.Format(
+                "{0} {1}\t{2}\t{3}\t{4}", 
                 new string(' ', depth * 4), 
                 element.Current.Name, 
                 element.Current.ControlType.ProgrammaticName, 
                 element.Current.ClassName,
-                element.Current.AutomationId));
+                element.Current.AutomationId
+            ));
 
             var children = element.FindAll(TreeScope.Children, Condition.TrueCondition);
             foreach (AutomationElement child in children) {
@@ -261,6 +286,31 @@ namespace TestUtilities.UI {
 
         public void SetFocus() {
             Element.SetFocus();
+        }
+
+        public void Invoke() {
+            Invoke(Element);
+        }
+    }
+
+    public static class AutomationElementExtensions {
+        public static AutomationWrapper AsWrapper(this AutomationElement element) {
+            if (element == null) {
+                return null;
+            }
+            return new AutomationWrapper(element);
+        }
+
+        public static void Select(this AutomationElement element) {
+            AutomationWrapper.Select(element);
+        }
+
+        public static void EnsureExpanded(this AutomationElement node) {
+            AutomationWrapper.EnsureExpanded(node);
+        }
+
+        public static void Collapse(this AutomationElement node) {
+            AutomationWrapper.Collapse(node);
         }
     }
 } 

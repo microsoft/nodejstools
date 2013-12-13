@@ -110,8 +110,10 @@ namespace Microsoft.VisualStudioTools.Project
 
         public override object GetIconHandle(bool open)
         {
-            int offset = (this.CanShowDefaultIcon() ? (int)ProjectNode.ImageName.Reference : (int)ProjectNode.ImageName.DanglingReference);
-            return this.ProjectMgr.ImageHandler.GetIconHandle(offset);
+            return ProjectMgr.GetIconHandleByName(CanShowDefaultIcon() ?
+                ProjectNode.ImageName.Reference :
+                ProjectNode.ImageName.DanglingReference
+            );
         }
 
         /// <summary>
@@ -179,6 +181,8 @@ namespace Microsoft.VisualStudioTools.Project
         /// </summary>
         public virtual void AddReference()
         {
+            UIThread.Instance.MustBeCalledFromUIThread();
+
             ReferenceContainerNode referencesFolder = this.ProjectMgr.GetReferenceContainer() as ReferenceContainerNode;
             Utilities.CheckNotNull(referencesFolder, "Could not find the References node");
 

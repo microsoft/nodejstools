@@ -1,5 +1,6 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <Wix xmlns="http://schemas.microsoft.com/wix/2006/wi">
+    <?include ProfilingVars.wxi ?>
     <Fragment>
         <ComponentGroup Id="NodejsProfilingExt">
             <!-- Per user components -->
@@ -26,6 +27,20 @@
             <Component Id="cmp98B7AD9DAC674A92B646DA698E631FB8" Directory="INSTALLLOCATION" Guid="{4F2CA623-F9B8-4C8A-A9E3-4D1C3E33E850}">
                 <File Id="fil1EDE8FF6143D41518E88685C95416915" KeyPath="yes" Source="$(var.BinariesDir)\Microsoft.NodejsTools.NodeLogConverter.exe" />
             </Component>
+            <Component Id="cmpNodejsProject.ico" Directory="INSTALLLOCATION" Guid="{351C08C3-1B35-48AB-A9D0-BC923F70CBC9}">
+                <File Id="filNodejsProject.ico" KeyPath="yes" Source="$(var.BinariesDir)\NodejsProject.ico" />
+            </Component>
+            <Component Id="Comp_NjsPerfRegistration" DiskId="1" Guid="$(var.Comp_NjsPerfRegistrationGuid)" Directory="INSTALLLOCATION">
+              <RegistryValue Root='HKCR' Key='.njsperf' Type='string' Name='PerceivedType' Value='text' />
+              <RegistryValue Root='HKCR' Key='VisualStudio.Launcher.njsperf.$(var.VSTargetVersion)\DefaultIcon' Type='string' Value='[INSTALLLOCATION]\NodejsProject.ico' />
+
+              <ProgId Id="VisualStudio.Launcher.njsperf.$(var.VSTargetVersion)" Description="Node.js Performance File">
+                <Extension Id="njsperf" ContentType="text/plain">
+                  <Verb Id="Open" Command="Open" TargetProperty="VSLAUNCHER" Argument="&quot;%1&quot;"/>
+                </Extension>
+              </ProgId>
+            </Component>        
+
         </ComponentGroup>
     </Fragment>
 </Wix>

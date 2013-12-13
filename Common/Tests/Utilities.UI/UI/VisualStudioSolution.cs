@@ -108,7 +108,7 @@ namespace TestUtilities.UI {
 
         private string SolutionNodeText {
             get {
-                if (_solution.Projects.Count(sln => !sln.IsUserProject) > 1) {
+                if (_solution.Projects.Count(sln => !sln.Flags.HasFlag(SolutionElementFlags.ExcludeFromConfiguration) && !sln.Flags.HasFlag(SolutionElementFlags.ExcludeFromSolution)) > 1) {
                     return String.Format(
                         "Solution '{0}' ({1} projects)",
                         Path.GetFileNameWithoutExtension(_solution.Filename),
@@ -134,7 +134,9 @@ namespace TestUtilities.UI {
         /// see the bad behavior.
         /// </summary>
         public void SelectSolutionNode() {
-            Mouse.MoveTo(SolutionExplorer.WaitForItem(SolutionNodeText).GetClickablePoint());
+            var item = SolutionExplorer.WaitForItem(SolutionNodeText);
+            SolutionExplorer.CenterInView(item);
+            Mouse.MoveTo(item.GetClickablePoint());
             Mouse.Click(MouseButton.Left);
         }
 

@@ -18,6 +18,7 @@ using System.Collections.ObjectModel;
 using System.ComponentModel;
 using System.Diagnostics;
 using System.Linq;
+using Microsoft.VisualStudio.Shell.Interop;
 
 namespace Microsoft.NodejsTools.Profiling {
     /// <summary>
@@ -27,8 +28,9 @@ namespace Microsoft.NodejsTools.Profiling {
         private ReadOnlyCollection<ProjectTargetView> _availableProjects;
         
         private ProjectTargetView _project;
-        private bool _isProjectSelected;
+        private bool _isProjectSelected, _isStandaloneSelected;
         private StandaloneTargetView _standalone;
+        private readonly string _startText;
 
         private bool _isValid;
         
@@ -36,24 +38,12 @@ namespace Microsoft.NodejsTools.Profiling {
         /// Create a ProfilingTargetView with default values.
         /// </summary>
         public ProfilingTargetView() {
-            var dteService = (EnvDTE.DTE)(NodejsProfilingPackage.GetGlobalService(typeof(EnvDTE.DTE)));
-
+            var solution = NodejsProfilingPackage.Instance.Solution;
+            
             var availableProjects = new List<ProjectTargetView>();
-            var startupProjects = dteService.Solution.SolutionBuild.StartupProjects != null ?
-                ((object[])dteService.Solution.SolutionBuild.StartupProjects).Select(x => x.ToString()) :
-                new string[0];
-            ProjectTargetView selectedView = null;
-            foreach (EnvDTE.Project project in dteService.Solution.Projects) {
-                var kind = project.Kind;
-                if (String.Equals(kind, NodejsProfilingPackage.NodeProjectGuid, StringComparison.OrdinalIgnoreCase)) {
-                    availableProjects.Add(new ProjectTargetView(project));
-
-                    if (startupProjects.Contains(project.UniqueName, StringComparer.OrdinalIgnoreCase)) {
-                        selectedView = availableProjects.Last();
-                    }
-                }
+            foreach (var project in solution.EnumerateLoadedProjects()) {
+                availableProjects.Add(new ProjectTargetView((IVsHierarchy)project));
             }
-
             _availableProjects = new ReadOnlyCollection<ProjectTargetView>(availableProjects);
 
             _project = null;
@@ -65,13 +55,17 @@ namespace Microsoft.NodejsTools.Profiling {
             PropertyChanged += new PropertyChangedEventHandler(ProfilingTargetView_PropertyChanged);
             _standalone.PropertyChanged += new PropertyChangedEventHandler(Standalone_PropertyChanged);
 
-            if (selectedView != null) {
-                Project = selectedView;
-            } else if (IsAnyAvailableProjects) {
-                Project = AvailableProjects[0];
+            var startupProject = NodejsProfilingPackage.Instance.GetStartupProjectGuid();
+            Project = AvailableProjects.FirstOrDefault(p => p.Guid == startupProject) ??
+                AvailableProjects.FirstOrDefault();
+            if (Project != null) {
+                IsStandaloneSelected = false;
+                IsProjectSelected = true;
             } else {
+                IsProjectSelected = false;
                 IsStandaloneSelected = true;
             }
+            _startText = Resources.ProfilingStart;
         }
 
         /// <summary>
@@ -82,11 +76,14 @@ namespace Microsoft.NodejsTools.Profiling {
             : this() {
             if (template.ProjectTarget != null) {
                 Project = new ProjectTargetView(template.ProjectTarget);
+                IsStandaloneSelected = false;
                 IsProjectSelected = true;
             } else if (template.StandaloneTarget != null) {
                 Standalone = new StandaloneTargetView(template.StandaloneTarget);
+                IsProjectSelected = false;
                 IsStandaloneSelected = true;
             }
+            _startText = Resources.ProfilingOk;
         }
 
         /// <summary>
@@ -145,7 +142,6 @@ namespace Microsoft.NodejsTools.Profiling {
                 if (_isProjectSelected != value) {
                     _isProjectSelected = value;
                     OnPropertyChanged("IsProjectSelected");
-                    OnPropertyChanged("IsStandaloneSelected");
                 }
             }
         }
@@ -177,10 +173,13 @@ namespace Microsoft.NodejsTools.Profiling {
         /// </summary>
         public bool IsStandaloneSelected {
             get {
-                return !IsProjectSelected;
+                return _isStandaloneSelected;
             }
             set {
-                IsProjectSelected = !value;
+                if (_isStandaloneSelected != value) {
+                    _isStandaloneSelected = value;
+                    OnPropertyChanged("IsStandaloneSelected");
+                }
             }
         }
 
@@ -188,12 +187,14 @@ namespace Microsoft.NodejsTools.Profiling {
         /// <summary>
         /// Receives our own property change events to update IsValid.
         /// </summary>
-        private void ProfilingTargetView_PropertyChanged(object sender, PropertyChangedEventArgs e) {
+        void ProfilingTargetView_PropertyChanged(object sender, PropertyChangedEventArgs e) {
             Debug.Assert(sender == this);
 
             if (e.PropertyName != "IsValid") {
-                IsValid = (IsProjectSelected && Project != null) ||
-                    (IsStandaloneSelected && Standalone != null && Standalone.IsValid);
+                IsValid = (IsProjectSelected != IsStandaloneSelected) &&
+                    (IsProjectSelected ?
+                        Project != null :
+                        (Standalone != null && Standalone.IsValid));
             }
         }
 
@@ -204,6 +205,7 @@ namespace Microsoft.NodejsTools.Profiling {
             Debug.Assert(Standalone == sender);
             OnPropertyChanged("Standalone");
         }
+
 
         /// <summary>
         /// True if all settings are valid; otherwise, false.
@@ -217,6 +219,12 @@ namespace Microsoft.NodejsTools.Profiling {
                     _isValid = value;
                     OnPropertyChanged("IsValid");
                 }
+            }
+        }
+
+        public string StartText {
+            get {
+                return _startText;
             }
         }
 

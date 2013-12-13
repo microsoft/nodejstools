@@ -98,7 +98,7 @@ namespace Microsoft.NodejsTools.Intellisense {
                 }
 
                 var completions = GenerateBuiltinCompletions(doubleQuote);
-                GetProjectCompletions(completions, doubleQuote);
+                completions.AddRange(GetProjectCompletions(doubleQuote));
                 completions.Sort(CompletionSorter);
 
                 completionSets.Add(
@@ -120,7 +120,7 @@ namespace Microsoft.NodejsTools.Intellisense {
         private int CompletionSorter(Completion x, Completion y) {
             if (x.DisplayText.StartsWith(".")) {
                 if (y.DisplayText.StartsWith(".")) {
-                    String.Compare(x.DisplayText, y.DisplayText);
+                    return String.Compare(x.DisplayText, y.DisplayText);
                 }
                 return 1;
             } else if (y.DisplayText.StartsWith(".")) {
@@ -177,7 +177,7 @@ namespace Microsoft.NodejsTools.Intellisense {
         }
 
 
-        private void GetProjectCompletions(List<Completion> completions, bool? doubleQuote) {
+        private IEnumerable<Completion> GetProjectCompletions(bool? doubleQuote) {
             var projBuffer = _textBuffer.Properties.GetProperty<NodejsProjectionBuffer>(typeof(NodejsProjectionBuffer));
             var filePath = projBuffer.DiskBuffer.GetFilePath();
 
@@ -187,6 +187,7 @@ namespace Microsoft.NodejsTools.Intellisense {
             IntPtr punk = IntPtr.Zero;
             uint cookie;
             int hr;
+            CompletionInfo[] res = null;
             try {
                 hr = rdt.FindAndLockDocument((uint)_VSRDTFLAGS.RDT_NoLock, filePath, out hierarchy, out itemId, out punk, out cookie);
                 if (ErrorHandler.Succeeded(hr) && hierarchy != null) {
@@ -195,11 +196,17 @@ namespace Microsoft.NodejsTools.Intellisense {
                         var nodeProj = dteProj.GetNodeProject();
                         if (nodeProj != null) {
                             // file is open in our project, we can provide completions...
-                            var node = nodeProj.FindNodeByFullPath(filePath);
+                            var node = nodeProj.FindNodeByFullPath(filePath) as FileNode;
                             Debug.Assert(node != null);
 
-                            GetParentNodeModules(nodeProj, node.Parent, doubleQuote, completions);
-                            GetPeerAndChildModules(nodeProj, node, doubleQuote, completions);
+                            if (!nodeProj._requireCompletionCache.TryGetCompletions(node, out res)) {
+                                List<CompletionInfo> completions = new List<CompletionInfo>();
+
+                                GetParentNodeModules(nodeProj, node.Parent, completions);
+                                GetPeerAndChildModules(nodeProj, node, completions);
+
+                                nodeProj._requireCompletionCache.CacheCompletions(node, res = completions.ToArray());
+                            }
                         }
                     }
                 }
@@ -208,19 +215,23 @@ namespace Microsoft.NodejsTools.Intellisense {
                     Marshal.Release(punk);
                 }
             }
+            if (res != null) {
+                return res.Select(x => x.ToCompletion(doubleQuote));
+            }
+            return Enumerable.Empty<Completion>();
         }
 
-        private void GetParentNodeModules(NodejsProjectNode nodeProj, HierarchyNode parent, bool? doubleQuote, List<Completion> projectCompletions) {
+        private void GetParentNodeModules(NodejsProjectNode nodeProj, HierarchyNode parent, List<CompletionInfo> projectCompletions) {
             do {
                 var modulesFolder = parent.FindImmediateChildByName(NodejsConstants.NodeModulesFolder);
                 if (modulesFolder != null) {
-                    GetParentNodeModules(nodeProj, modulesFolder, parent, doubleQuote, projectCompletions);
+                    GetParentNodeModules(nodeProj, modulesFolder, parent, projectCompletions);
                 }
                 parent = parent.Parent;
             } while (parent != null);
         }
 
-        private void GetParentNodeModules(NodejsProjectNode nodeProj, HierarchyNode modulesFolder, HierarchyNode fromFolder, bool? doubleQuote, List<Completion> projectCompletions) {
+        private void GetParentNodeModules(NodejsProjectNode nodeProj, HierarchyNode modulesFolder, HierarchyNode fromFolder, List<CompletionInfo> projectCompletions) {
             for (HierarchyNode n = modulesFolder.FirstChild; n != null; n = n.NextSibling) {
                 FileNode file = n as FileNode;
                 if (file != null &&
@@ -228,10 +239,9 @@ namespace Microsoft.NodejsTools.Intellisense {
                         Path.GetExtension(file.Url),
                         StringComparison.OrdinalIgnoreCase
                     )) {
-                    projectCompletions.Add(
+                    projectCompletions.Add(                        
                         MakeCompletion(
                             nodeProj,
-                            doubleQuote,
                             file,
                             MakeNodePath(fromFolder, file).Substring(NodejsConstants.NodeModulesFolder.Length + 1)
                         )
@@ -245,7 +255,6 @@ namespace Microsoft.NodejsTools.Intellisense {
                         projectCompletions.Add(
                             MakeCompletion(
                                 nodeProj,
-                                doubleQuote,
                                 folder,
                                 MakeNodePath(fromFolder, folder).Substring(NodejsConstants.NodeModulesFolder.Length + 1)
                             )
@@ -254,7 +263,7 @@ namespace Microsoft.NodejsTools.Intellisense {
                         // but we don't include those in the available completions.
                     } else if (!NodejsConstants.NodeModulesFolder.Equals(Path.GetFileName(folder.Url), StringComparison.OrdinalIgnoreCase)) {
                         // recurse into folder and make available members...
-                        GetParentNodeModules(nodeProj, folder, fromFolder, doubleQuote, projectCompletions);
+                        GetParentNodeModules(nodeProj, folder, fromFolder, projectCompletions);
                     }
                 }
             }
@@ -264,13 +273,11 @@ namespace Microsoft.NodejsTools.Intellisense {
             return CommonUtils.CreateFriendlyFilePath(relativeTo.FullPathToChildren, CommonUtils.TrimEndSeparator(node.Url)).Replace("\\", "/");
         }
 
-        private Completion MakeCompletion(NodejsProjectNode nodeProj, bool? doubleQuote, HierarchyNode node, string displayText) {
-            return new Completion(
+        private CompletionInfo MakeCompletion(NodejsProjectNode nodeProj, HierarchyNode node, string displayText) {
+            return new CompletionInfo(
                 displayText,
-                GetInsertionQuote(doubleQuote, displayText),
                 CommonUtils.CreateFriendlyFilePath(nodeProj.ProjectHome, node.Url) + " (in project)",
-                _glyphService.GetGlyph(StandardGlyphGroup.GlyphGroupModule, StandardGlyphItem.GlyphItemProtected),
-                null
+                _glyphService.GetGlyph(StandardGlyphGroup.GlyphGroupModule, StandardGlyphItem.GlyphItemProtected)
             );
         }
 
@@ -278,7 +285,7 @@ namespace Microsoft.NodejsTools.Intellisense {
         /// Finds available modules which are children of the folder where we're doing require
         /// completions from.
         /// </summary>
-        private void GetPeerAndChildModules(NodejsProjectNode nodeProj, HierarchyNode node, bool? doubleQuote, List<Completion> projectCompletions) {
+        private void GetPeerAndChildModules(NodejsProjectNode nodeProj, HierarchyNode node, List<CompletionInfo> projectCompletions) {
             var folder = node.Parent;
             foreach (HierarchyNode child in EnumCodeFilesExcludingNodeModules(folder)) {
                 if (child == node) {
@@ -289,7 +296,6 @@ namespace Microsoft.NodejsTools.Intellisense {
                 projectCompletions.Add(
                     MakeCompletion(
                         nodeProj,
-                        doubleQuote,
                         child,
                         "./" + MakeNodePath(folder, child)
                     )
@@ -316,20 +322,14 @@ namespace Microsoft.NodejsTools.Intellisense {
                         if (folder.FindImmediateChildByName(NodejsConstants.PackageJsonFile) != null ||
                             folder.FindImmediateChildByName(NodejsConstants.DefaultPackageMainFile) != null) {
                             yield return folder;
-                        } else {
-                            foreach (var childNode in EnumCodeFilesExcludingNodeModules(n)) {
-                                yield return childNode;
-                            }
+                        } 
+
+                        foreach (var childNode in EnumCodeFilesExcludingNodeModules(n)) {
+                            yield return childNode;
                         }
                     }
                 }
             }
-        }
-
-        private static string GetInsertionQuote(bool? doubleQuote, string filename) {
-            return doubleQuote == null ?
-                "\'" + filename + "\'" :
-                doubleQuote.Value ? filename + "\"" : filename + "'";
         }
 
         private static bool EatToken(IEnumerator<ClassificationSpan> classifications, string tokenText) {
@@ -375,7 +375,7 @@ namespace Microsoft.NodejsTools.Intellisense {
                 res.Add(
                     new Completion(
                         module,
-                        GetInsertionQuote(doubleQuote, module),
+                        CompletionInfo.GetInsertionQuote(doubleQuote, module),
                         _nodejsModules[module],
                         _glyphService.GetGlyph(StandardGlyphGroup.GlyphGroupModule, StandardGlyphItem.GlyphItemPublic),
                         null

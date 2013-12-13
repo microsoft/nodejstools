@@ -3,7 +3,7 @@
   <Import Project="TestProjectBefore.settings" />
 
   <ItemGroup>
-    <ProjectFile Include="$(BuildRoot)\Common\Tests\SharedProject\SharedProject.csproj" />
+    <ProjectFile Include="$(BuildRoot)\Common\Tests\SharedProjectTests\SharedProjectTests.csproj" />
     <ProjectFile Include="$(BuildRoot)\Common\Tests\Utilities\TestUtilities.csproj" />
     <ProjectFile Include="$(BuildRoot)\Common\Tests\Utilities.UI\TestUtilities.UI.csproj" />
     <ProjectFile Include="$(BuildRoot)\Nodejs\Tests\Core\NodejsTests.csproj" />
