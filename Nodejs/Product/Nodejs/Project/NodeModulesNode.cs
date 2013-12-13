@@ -369,7 +369,10 @@ namespace Microsoft.NodejsTools.Project{
             }
 
             if (null != controller){
-                ReloadHierarchy(this, controller.RootPackage.Modules);
+                var root = controller.RootPackage;
+                if (null != root){
+                    ReloadHierarchy(this, root.Modules);
+                }
             }
         }
 
