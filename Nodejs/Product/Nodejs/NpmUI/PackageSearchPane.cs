@@ -177,5 +177,10 @@ namespace Microsoft.NodejsTools.NpmUI{
         }
 
         public ListView ListView { get { return _listResults; } }
+
+        private void _buttonRefresh_Click(object sender, EventArgs e)
+        {
+
+        }
     }
 }
