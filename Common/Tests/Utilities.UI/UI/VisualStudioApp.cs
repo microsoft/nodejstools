@@ -475,7 +475,9 @@ namespace TestUtilities.UI {
 
             Assert.AreNotEqual(IntPtr.Zero, hwnd, "hwnd is null, We failed to get the dialog");
             Assert.AreNotEqual(handle, hwnd, "hwnd is Dte.MainWindow, We failed to get the dialog");
+            Console.WriteLine("Ending dialog: ");
             AutomationWrapper.DumpElement(AutomationElement.FromHandle(hwnd));
+            Console.WriteLine("--------");
             StringBuilder title = new StringBuilder(4096);
             Assert.AreNotEqual(NativeMethods.GetDlgItemText(hwnd, dlgField, title, title.Capacity), (uint)0);
 

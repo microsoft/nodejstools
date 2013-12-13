@@ -203,7 +203,7 @@ namespace Microsoft.VisualStudioTools.SharedProjectTests {
                         Compile("server"),
                         Target(
                             "Clean", 
-                            Tasks.Message("Hello Clean World!")
+                            Tasks.Message("Hello Clean World!", importance: "high")
                         )
                     );
                     using (var solution = proj.Generate().ToVs()) {
@@ -229,7 +229,7 @@ namespace Microsoft.VisualStudioTools.SharedProjectTests {
                         Compile("server"),
                         Target(
                             "Build",
-                            Tasks.Message("Hello Build World!")
+                            Tasks.Message("Hello Build World!", importance: "high")
                         )
                     );
                     using (var solution = proj.Generate().ToVs()) {
@@ -1211,7 +1211,7 @@ namespace Microsoft.VisualStudioTools.SharedProjectTests {
                     projectType,
                     Compile("server"),
                     Folder("Folder", isExcluded: true),
-                    Compile("Folder\\server", isExcluded: true)
+                    Compile("Folder\\server", content:"// new server", isExcluded: true)
                 );
                 using (var solution = proj.Generate().ToVs()) {
                     var window = solution.Project.ProjectItems.Item(projectType.Code("server")).Open();
@@ -1237,6 +1237,7 @@ namespace Microsoft.VisualStudioTools.SharedProjectTests {
                     );
 
                     System.Threading.Thread.Sleep(1000);
+                    solution.AssertFileExistsWithContent("// new server", "HelloWorld", "server.js");
 
                     var dlg = solution.App.WaitForDialog(); // not a simple dialog we can check
                     NativeMethods.EndDialog(dlg, new IntPtr((int)TestUtilities.UI.MessageBoxButton.Yes));

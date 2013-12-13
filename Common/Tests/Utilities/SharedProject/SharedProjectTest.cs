@@ -201,10 +201,13 @@ namespace TestUtilities.SharedProject {
             /// <summary>
             /// Creates a task which outputs a message during the build.
             /// </summary>
-            public static Action<ProjectTargetElement> Message(string message) {
+            public static Action<ProjectTargetElement> Message(string message, string importance = null) {
                 return target => {
                     var messageTask = target.AddTask("Message");
                     messageTask.SetParameter("Text", message);
+                    if (importance != null) {
+                        messageTask.SetParameter("Importance", importance);
+                    }
                 };
             }
         }
