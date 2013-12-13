@@ -258,7 +258,10 @@ namespace Microsoft.VisualStudioTools.Project.Automation
 
         #region _dispReferencesEvents_Event Members
         public event _dispReferencesEvents_ReferenceAddedEventHandler ReferenceAdded;
-        public event _dispReferencesEvents_ReferenceChangedEventHandler ReferenceChanged;
+        public event _dispReferencesEvents_ReferenceChangedEventHandler ReferenceChanged {
+            add { }
+            remove { }
+        }
         public event _dispReferencesEvents_ReferenceRemovedEventHandler ReferenceRemoved;
         #endregion
 
