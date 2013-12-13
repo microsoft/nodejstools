@@ -689,9 +689,10 @@ namespace ProfilingUITests {
                     var child = item.FindFirst(System.Windows.Automation.TreeScope.Descendants, Condition.TrueCondition);
 
                     AutomationWrapper.EnsureExpanded(child);
+                    app.NodejsPerformanceExplorerTreeView.CenterInView(child);
                     child.SetFocus();
 
-                    Mouse.MoveTo(child.GetClickablePoint());
+                    Mouse.MoveTo(child.GetClickablePoint());                    
                     Mouse.Click(System.Windows.Input.MouseButton.Right);
                     Keyboard.PressAndRelease(System.Windows.Input.Key.C);
 
