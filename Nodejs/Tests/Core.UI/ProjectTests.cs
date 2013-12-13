@@ -252,49 +252,55 @@ http.createServer(function (req, res) {
         [HostType("TC Dynamic"), DynamicHostType(typeof(VsIdeHostAdapter))]
         public void GlobalIntellisenseProjectReload() {
             Window window;
+            try {
+                using (var app = new VisualStudioApp(VsIdeTestHostContext.Dte)) {
+                    app.OpenProject(Path.GetFullPath(@"TestData\NodeAppWithModule\NodeAppWithModule.sln"));
 
-            using (var app = new VisualStudioApp(VsIdeTestHostContext.Dte)) {
-                app.OpenProject(Path.GetFullPath(@"TestData\NodeAppWithModule\NodeAppWithModule.sln"));
-
-                var projectName = "NodeAppWithModule";
-                var project = app.SolutionExplorerTreeView.WaitForItem(
-                    "Solution '" + projectName + "' (1 project)",
-                    projectName);
+                    var projectName = "NodeAppWithModule";
+                    var project = app.SolutionExplorerTreeView.WaitForItem(
+                        "Solution '" + projectName + "' (1 project)",
+                        projectName);
 
 
-                var projectNode = new TreeNode(project);
-                projectNode.SetFocus();
+                    var projectNode = new TreeNode(project);
+                    projectNode.SetFocus();
 
-                System.Threading.Thread.Sleep(2000);
-                VsIdeTestHostContext.Dte.ExecuteCommand("Project.UnloadProject");
+                    System.Threading.Thread.Sleep(2000);
+                    VsIdeTestHostContext.Dte.ExecuteCommand("Project.UnloadProject");
 
-                project = app.SolutionExplorerTreeView.WaitForItem(
-                    "Solution '" + projectName + "' (0 projects)",
-                    projectName + " (unavailable)");
+                    project = app.SolutionExplorerTreeView.WaitForItem(
+                        "Solution '" + projectName + "' (0 projects)",
+                        projectName + " (unavailable)");
 
-                projectNode = new TreeNode(project);
-                projectNode.SetFocus();
+                    projectNode = new TreeNode(project);
+                    projectNode.SetFocus();
 
-                System.Threading.Thread.Sleep(2000);
+                    System.Threading.Thread.Sleep(2000);
 
-                VsIdeTestHostContext.Dte.ExecuteCommand("Project.ReloadProject");
+                    VsIdeTestHostContext.Dte.ExecuteCommand("Project.ReloadProject");
 
-                app.SolutionExplorerTreeView.WaitForItem(
-                    "Solution '" + projectName + "' (1 project)",
-                    projectName,
-                    "server.js"
-                );
+                    app.SolutionExplorerTreeView.WaitForItem(
+                        "Solution '" + projectName + "' (1 project)",
+                        projectName,
+                        "server.js"
+                    );
 
-                var openFile = OpenItem("server.js", VsIdeTestHostContext.Dte.Solution.Projects.Item(1), out window);
+                    var openFile = OpenItem("server.js", VsIdeTestHostContext.Dte.Solution.Projects.Item(1), out window);
 
-                openFile.MoveCaret(6, 1);
-                Keyboard.Type("process.");
-                using (var session = openFile.WaitForSession<ICompletionSession>()) {
+                    openFile.MoveCaret(6, 1);
+                    Keyboard.Type("process.");
+                    using (var session = openFile.WaitForSession<ICompletionSession>()) {
 
-                    var completions = session.Session.CompletionSets.First().Completions.Select(x => x.InsertionText);
-                    Assert.IsTrue(completions.Contains("abort"));
-                    Assert.IsTrue(completions.Contains("chdir"));
+                        var completions = session.Session.CompletionSets.First().Completions.Select(x => x.InsertionText);
+                        Assert.IsTrue(completions.Contains("abort"));
+                        Assert.IsTrue(completions.Contains("chdir"));
+                    }
                 }
+            } finally {
+                // if the test fails while the project is unloaded then the .suo file will 
+                // indicate that the project shouldn't be loaded which will cause tests
+                // which are using the same project to fail later during the run.
+                File.Delete(Path.GetFullPath(@"TestData\NodeAppWithModule\NodeAppWithModule.v" + AssemblyVersionInfo.VSMajorVersion + ".suo"));
             }
         }
 
