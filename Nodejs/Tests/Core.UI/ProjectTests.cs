@@ -223,7 +223,7 @@ http.createServer(function (req, res) {
                     if (testCase.File != curFile) {
                         openFile = OpenProjectItem(testCase.File, out window, @"TestData\RequireTestApp\RequireTestApp.sln");
                         app.OpenSolutionExplorer();
-                        app.SolutionExplorerTreeView.WaitForItem("Solution 'RequireTestApp' (1 project)", "RequireTestApp", "References");
+                        app.SolutionExplorerTreeView.WaitForItem("Solution 'RequireTestApp' (1 project)", "RequireTestApp", "dup.js");
                         text = openFile.Text;
                         curFile = testCase.File;
                     }
@@ -253,10 +253,6 @@ http.createServer(function (req, res) {
         public void GlobalIntellisenseProjectReload() {
             Window window;
 
-            //OpenProject();
-            //var file = OpenProjectItem("server.js", out window);
-            //var dispatcher = ((UIElement)file.TextView).Dispatcher;
-
             using (var app = new VisualStudioApp(VsIdeTestHostContext.Dte)) {
                 app.OpenProject(Path.GetFullPath(@"TestData\NodeAppWithModule\NodeAppWithModule.sln"));
 
@@ -270,9 +266,7 @@ http.createServer(function (req, res) {
                 projectNode.SetFocus();
 
                 System.Threading.Thread.Sleep(2000);
-                Keyboard.Type(System.Windows.Input.Key.Apps);
-                Keyboard.Type(System.Windows.Input.Key.L);
-                //dispatcher.Invoke(() => VsIdeTestHostContext.Dte.ExecuteCommand("Project.UnloadProject"));
+                VsIdeTestHostContext.Dte.ExecuteCommand("Project.UnloadProject");
 
                 project = app.SolutionExplorerTreeView.WaitForItem(
                     "Solution '" + projectName + "' (0 projects)",
@@ -283,9 +277,7 @@ http.createServer(function (req, res) {
 
                 System.Threading.Thread.Sleep(2000);
 
-                Keyboard.Type(System.Windows.Input.Key.Apps);
-                Keyboard.Type(System.Windows.Input.Key.L);
-                //dispatcher.Invoke(() => VsIdeTestHostContext.Dte.ExecuteCommand("Project.ReloadProject"));
+                VsIdeTestHostContext.Dte.ExecuteCommand("Project.ReloadProject");
 
                 app.SolutionExplorerTreeView.WaitForItem(
                     "Solution '" + projectName + "' (1 project)",
