@@ -4301,7 +4301,6 @@ namespace Microsoft.VisualStudioTools.Project
                             if (isLink && CommonUtils.IsSubpathOf(ProjectHome, file))
                             {
                                 // creating a link to a file that's actually in the project, it's not really a link.
-                                Console.WriteLine("Adding link {0} {1}", file, Path.GetDirectoryName(file));
                                 isLink = false;
                                 newFileName = file;
                                 n = this.CreateFolderNodes(Path.GetDirectoryName(file));
