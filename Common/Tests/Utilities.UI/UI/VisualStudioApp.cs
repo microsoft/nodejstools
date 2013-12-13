@@ -134,6 +134,7 @@ namespace TestUtilities.UI {
         public IntPtr OpenDialogWithDteExecuteCommand(string commandName, string commandArgs = "") {
             Task task = Task.Factory.StartNew(() => {
                 Dte.ExecuteCommand(commandName, commandArgs);
+                Console.WriteLine("Successfully executed command {0} {1}", commandName, commandArgs);
             });
 
             IntPtr dialog = IntPtr.Zero;
@@ -636,7 +637,7 @@ namespace TestUtilities.UI {
                 System.Threading.Thread.Sleep(500);
             }
 
-            Assert.AreEqual(VsIdeTestHostContext.Dte.Debugger.CurrentMode, mode);
+            Assert.AreEqual(mode, VsIdeTestHostContext.Dte.Debugger.CurrentMode);
         }
 
         public Project OpenProject(string projName, string startItem = null, int? expectedProjects = null, string projectName = null, bool setStartupItem = true) {
