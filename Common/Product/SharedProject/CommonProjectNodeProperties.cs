@@ -40,7 +40,7 @@ namespace Microsoft.VisualStudioTools.Project {
             get {
                 return UIThread.Instance.RunSync(() => {
                     var res = Node.ProjectMgr.GetProjectProperty(CommonConstants.StartupFile, true);
-                    if (!Path.IsPathRooted(res)) {
+                    if (res != null && !Path.IsPathRooted(res)) {
                         res = CommonUtils.GetAbsoluteFilePath(Node.ProjectMgr.ProjectHome, res);
                     }
                     return res;

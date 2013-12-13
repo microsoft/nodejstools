@@ -651,6 +651,8 @@ sd.StringDecoder
         [HostType("TC Dynamic"), DynamicHostType(typeof(VsIdeHostAdapter))]
         public void TestBrowserLaunch() {
             for (int mode = 0; mode < 2; mode++) {
+                var startingProcesses = System.Diagnostics.Process.GetProcessesByName("iexplore").Select(x => x.Id).ToSet();
+
                 using (var app = new VisualStudioApp(VsIdeTestHostContext.Dte)) {
                     var testFile = Path.Combine(Path.GetTempPath(), "nodejstest.txt");
                     if (File.Exists(testFile)) {
@@ -664,6 +666,22 @@ sd.StringDecoder
                     }
 
                     Assert.IsTrue(File.Exists(testFile), "test file not created");
+                }
+
+                System.Threading.Thread.Sleep(2000);
+                var endingProcesses = System.Diagnostics.Process.GetProcessesByName("iexplore").Select(x => x.Id);
+                var newProcesses = endingProcesses.Except(startingProcesses).ToArray();
+
+                if (mode == 0) {
+                    // new processes should have been shutdown when debugging stopped
+                    Assert.AreEqual(0, newProcesses.Length);
+                } else {
+                    // no debugging, process will hang around
+                    Assert.IsTrue(newProcesses.Length > 0);
+                    foreach (var proc in newProcesses) {
+                        Console.WriteLine("Killing process {0}", proc);
+                        System.Diagnostics.Process.GetProcessById(proc).Kill();
+                    }
                 }
             }
         }
