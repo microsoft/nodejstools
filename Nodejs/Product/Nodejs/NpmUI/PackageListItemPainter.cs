@@ -78,6 +78,7 @@ namespace Microsoft.NodejsTools.NpmUI{
             lineColor = ColorUtils.MidPoint(foreColor, backColor);
 
             var bounds = e.Bounds;
+
             var wrapper = owner as IListViewWrapper;
             if (null != wrapper){
                 var view = wrapper.ListView;
@@ -104,29 +105,34 @@ namespace Microsoft.NodejsTools.NpmUI{
             }
 
             var pkg = e.Item.Tag as IPackage;
+            var imgSize = new Size(0, 0);
 
-            var img = Dependency;
-            if (pkg.IsDevDependency){
-                img = DependencyDev;
-            } else if (pkg.IsOptionalDependency){
-                img = DependencyOptional;
-            }
+            if (!(owner is PackageSearchPane)){
+                var img = Dependency;
+                if (pkg.IsDevDependency){
+                    img = DependencyDev;
+                } else if (pkg.IsOptionalDependency){
+                    img = DependencyOptional;
+                }
 
-            g.DrawImage(
-                img,
-                bounds.Left + 2,
-                bounds.Top + (bounds.Height - img.Height) / 2,
-                img.Width,
-                img.Height);
-
-            if (pkg.IsMissing){
                 g.DrawImage(
-                    Warning,
+                    img,
                     bounds.Left + 2,
-                    bounds.Top + (bounds.Height - img.Height) / 2 + img.Height -
-                    Warning.Height,
-                    Warning.Width,
-                    Warning.Height);
+                    bounds.Top + (bounds.Height - img.Height) / 2,
+                    img.Width,
+                    img.Height);
+
+                if (pkg.IsMissing){
+                    g.DrawImage(
+                        Warning,
+                        bounds.Left + 2,
+                        bounds.Top + (bounds.Height - img.Height) / 2 + img.Height -
+                        Warning.Height,
+                        Warning.Width,
+                        Warning.Height);
+                }
+
+                imgSize = img.Size;
             }
 
             var font = new Font(owner.Font, FontStyle.Bold);
@@ -134,7 +140,7 @@ namespace Microsoft.NodejsTools.NpmUI{
                 g,
                 pkg.Name,
                 font,
-                new Point(bounds.X + 4 + img.Width, bounds.Y + 2),
+                new Point(bounds.X + 4 + imgSize.Width, bounds.Y + 2),
                 foreColor,
                 TextFormatFlags.Default);
             var size = TextRenderer.MeasureText(g, pkg.Name, font);
@@ -143,7 +149,7 @@ namespace Microsoft.NodejsTools.NpmUI{
                 string.Format("@{0}", pkg.Version),
                 owner.Font,
                 new Point(
-                    (int) (bounds.X + 4 + size.Width + img.Width),
+                    (int) (bounds.X + 4 + size.Width + imgSize.Width),
                     bounds.Y + 2),
                 ColorUtils.Mix(foreColor, backColor, 5, 5),
                 TextFormatFlags.Default);
@@ -168,9 +174,9 @@ namespace Microsoft.NodejsTools.NpmUI{
                 pkg.Description,
                 owner.Font,
                 new Rectangle(
-                    bounds.X + 4 + img.Width,
+                    bounds.X + 4 + imgSize.Width,
                     bounds.Y + 2 + owner.Font.Height + 6,
-                    bounds.Width - 6 - img.Width,
+                    bounds.Width - 6 - imgSize.Width,
                     bounds.Height - (2 + owner.Font.Height + 6)),
                 foreColor,
                 TextFormatFlags.WordEllipsis);
