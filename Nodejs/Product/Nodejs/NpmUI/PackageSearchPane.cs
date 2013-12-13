@@ -25,7 +25,7 @@ namespace Microsoft.NodejsTools.NpmUI{
         private BusyControl _busy;
         private Timer _keypressFilterDelayTimer;
         private INpmController _npmController;
-        private IEnumerable<IPackage> _allPackages;
+        private IPackageCatalog _allPackages;
         private IList<IPackage> _filteredPackages;
 
         public PackageSearchPane(){
@@ -36,12 +36,19 @@ namespace Microsoft.NodejsTools.NpmUI{
             header.Width = -2;
             _listResults.HeaderStyle = ColumnHeaderStyle.None;
             //  /hack
+        }
 
-            //  Hack to force the row height
-            var images = new ImageList();
-            images.ImageSize = new Size(40, 40);
-            _listResults.SmallImageList = images;
-            _listResults.LargeImageList = images;
+        protected override void OnLoad(EventArgs e){
+            base.OnLoad(e);
+
+            //  Hack to force the row height - should work with high DPI as well
+            using (Graphics g = CreateGraphics())
+            {
+                var images = new ImageList();
+                images.ImageSize = new Size((int) (40 * g.DpiX / 96f + 0.5f), (int) (40 * g.DpiY / 96f + 0.5f));
+                _listResults.SmallImageList = images;
+                _listResults.LargeImageList = images;
+            }
             //  /hack
         }
 
@@ -80,7 +87,7 @@ namespace Microsoft.NodejsTools.NpmUI{
             filterString = filterString.ToLower();
 
             var target = new List<IPackage>();
-            foreach (var package in _allPackages){
+            foreach (var package in _allPackages.Results){
                 if (string.IsNullOrEmpty(filterString) || package.Name.ToLower().Contains(filterString)){
                     target.Add(package);
                     continue;

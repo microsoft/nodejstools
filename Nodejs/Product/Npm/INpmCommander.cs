@@ -73,7 +73,7 @@ namespace Microsoft.NodejsTools.Npm {
 
         Task<IList<IPackage>> SearchAsync(string searchText);
 
-        Task<IList<IPackage>> GetCatalogueAsync(bool forceDownload);
+        Task<IPackageCatalog> GetCatalogueAsync(bool forceDownload);
 
         Task<bool> UpdatePackagesAsync();
 

@@ -24,7 +24,7 @@ namespace Microsoft.NodejsTools.Npm.SPI {
 
         //  *Really* don't want to retrieve this more than once:
         //  47,000 packages takes a while.
-        private static IList<IPackage> _sRepoCatalogue;
+        private static IPackageCatalog _sRepoCatalogue;
 
         private string _fullPathToRootPackageDirectory;
         private bool _showMissingDevOptionalSubPackages;
@@ -143,16 +143,16 @@ namespace Microsoft.NodejsTools.Npm.SPI {
             OnExceptionLogged(e.Exception);
         }
 
-        public async Task<IList<IPackage>> GetRepositoryCatalogueAsync(bool forceDownload) {
+        public async Task<IPackageCatalog> GetRepositoryCatalogueAsync(bool forceDownload) {
             //  This should really be thread-safe but await can't be inside a lock so
             //  we'll just have to hope and pray this doesn't happen concurrently. Worst
             //  case is we'll end up with two retrievals, one of which will be binned,
             //  which isn't the end of the world.
-            if (null == _sRepoCatalogue || _sRepoCatalogue.Count == 0) {
+            if (null == _sRepoCatalogue || _sRepoCatalogue.Results.Count == 0 || forceDownload) {
                 Exception ex = null;
                 using (var commander = CreateNpmCommander()) {
                     commander.ExceptionLogged += (sender, args) => ex = args.Exception;
-                    _sRepoCatalogue = await commander.SearchAsync(null);
+                    _sRepoCatalogue = await commander.GetCatalogueAsync(forceDownload);
                 }
                 if (null != ex) {
                     throw ex;

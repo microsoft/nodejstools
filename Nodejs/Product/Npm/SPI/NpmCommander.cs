@@ -194,14 +194,14 @@ namespace Microsoft.NodejsTools.Npm.SPI {
             return success ? (_command as NpmSearchCommand).Results : new List<IPackage>();
         }
 
-        public async Task<IList<IPackage>> GetCatalogueAsync(bool forceDownload) {
+        public async Task<IPackageCatalog> GetCatalogueAsync(bool forceDownload) {
             _command = new NpmGetCatalogueCommand(
                 _npmController.FullPathToRootPackageDirectory,
                 forceDownload,
                 _npmController.PathToNpm,
                 _npmController.UseFallbackIfNpmNotFound);
-            var success = await DoCommandExecute(false);
-            return success ? (_command as NpmSearchCommand).Results : new List<IPackage>();
+            await DoCommandExecute(false);
+            return (_command as NpmGetCatalogueCommand).Catalog;
         }
 
         public async Task<bool> UpdatePackagesAsync() {

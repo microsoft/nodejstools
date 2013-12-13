@@ -55,6 +55,7 @@
     <Compile Include="INpmSearchLexer.cs" />
     <Compile Include="INpmSearchParser.cs" />
     <Compile Include="IPackage.cs" />
+    <Compile Include="IPackageCatalog.cs" />
     <Compile Include="IPackageJson.cs" />
     <Compile Include="IPackageJsonSource.cs" />
     <Compile Include="IPerson.cs" />
