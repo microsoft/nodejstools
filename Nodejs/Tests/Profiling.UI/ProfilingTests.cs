@@ -68,7 +68,7 @@ namespace ProfilingUITests {
             return session;
         }
 
-        private static void SavePerfFile(string saveDirectory, IntPtr dialog) {
+        private static string SavePerfFile(string saveDirectory, IntPtr dialog) {
             var saveDialog = new SaveDialog(dialog);
 
             var originalDestName = Path.Combine(saveDirectory, Path.GetFileName(saveDialog.FileName));
@@ -84,6 +84,7 @@ namespace ProfilingUITests {
 
             saveDialog.FileName = destName;
             saveDialog.Save();
+            return destName;
         }
 
         private static INodeProfileSession LaunchProcess(
@@ -251,6 +252,7 @@ namespace ProfilingUITests {
                 Assert.AreNotEqual(session, null);
 
                 NodejsPerfTarget perfTarget = null;
+                string savedFile = null;
                 try {
                     Mouse.MoveTo(perf.GetClickablePoint());
                     Mouse.DoubleClick(System.Windows.Input.MouseButton.Left);
@@ -275,7 +277,7 @@ namespace ProfilingUITests {
                     Mouse.MoveTo(perf.GetClickablePoint());
                     Mouse.Click(System.Windows.Input.MouseButton.Right);
                     Keyboard.Type("S");
-                    SavePerfFile(TestData.GetPath(@"TestData\NodejsProfileTest"), app.WaitForDialog());
+                    savedFile = SavePerfFile(TestData.GetPath(@"TestData\NodejsProfileTest"), app.WaitForDialog());
 
                     var item = app.NodejsPerformanceExplorerTreeView.WaitForItem("Performance *", "Reports");
                     AutomationElement child = null;
@@ -292,6 +294,9 @@ namespace ProfilingUITests {
                     if (perfTarget != null) {
                         perfTarget.Cancel();
                         app.WaitForDialogDismissed();
+                    }
+                    if (!String.IsNullOrEmpty(savedFile)) {
+                        File.Delete(savedFile);
                     }
                     profiling.RemoveSession(session, true);
                 }
@@ -685,8 +690,12 @@ namespace ProfilingUITests {
                     }
 
                     var pyPerf = app.NodejsPerformanceExplorerTreeView;
-                    var item = pyPerf.FindItem("NodejsProfileTest *", "Reports");
-                    var child = item.FindFirst(System.Windows.Automation.TreeScope.Descendants, Condition.TrueCondition);
+
+                    var child = pyPerf.FindItem(
+                        "NodejsProfileTest *", 
+                        "Reports", 
+                        Path.GetFileNameWithoutExtension(profiling.GetSession(1).GetReport(1).Filename)
+                    );
 
                     AutomationWrapper.EnsureExpanded(child);
                     app.NodejsPerformanceExplorerTreeView.CenterInView(child);
