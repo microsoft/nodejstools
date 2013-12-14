@@ -827,31 +827,7 @@ namespace Microsoft.Nodejs.Tests.UI {
                 Assert.AreNotEqual(null, window.WaitForItem("Solution 'MultiSelectCopyAndPaste' (1 project)", "MultiSelectCopyAndPaste", "server3 - Copy.js"));
             }
         }
-
-        [TestMethod, Priority(0), TestCategory("Core")]
-        [HostType("TC Dynamic"), DynamicHostType(typeof(VsIdeHostAdapter))]
-        public void NewProject() {
-            using (var app = new VisualStudioApp(VsIdeTestHostContext.Dte)) {
-                var newProjDialog = app.FileNewProject();
-
-                newProjDialog.FocusLanguageNode("JavaScript");
-
-                var consoleApp = newProjDialog.ProjectTypes.FindItem("Blank Node.js Application");
-                consoleApp.Select();
-
-                newProjDialog.ClickOK();
-
-                // wait for new solution to load...
-                for (int i = 0; i < 40 && app.Dte.Solution.Projects.Count == 0; i++) {
-                    System.Threading.Thread.Sleep(250);
-                }
-
-                Assert.AreEqual(1, app.Dte.Solution.Projects.Count);
-
-                Assert.AreNotEqual(null, app.Dte.Solution.Projects.Item(1).ProjectItems.Item("server.js"));
-            }
-        }
-
+        
         [TestMethod, Priority(0), TestCategory("Core")]
         [HostType("TC Dynamic"), DynamicHostType(typeof(VsIdeHostAdapter))]
         public void TransferItem() {

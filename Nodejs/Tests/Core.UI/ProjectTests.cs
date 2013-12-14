@@ -411,8 +411,8 @@ sd.StringDecoder
 
                 newProjDialog.FocusLanguageNode("JavaScript");
 
-                var djangoApp = newProjDialog.ProjectTypes.FindItem("Blank Node.js Application");
-                djangoApp.Select();
+                var nodejsApp = newProjDialog.ProjectTypes.FindItem("Blank Node.js Web Application");
+                nodejsApp.Select();
 
                 newProjDialog.ClickOK();
 
