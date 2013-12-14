@@ -49,14 +49,14 @@ namespace Microsoft.Nodejs.Tests.UI {
                 var openFile = OpenProjectItem("server.js", out window);
 
                 openFile.MoveCaret(7, 1);
-                Keyboard.Type("function\t");
+                Keyboard.Type("functio\t");
                 openFile.WaitForText(@"var http = require('http');
 
 var port = process.env.port || 1337;
 var mymod = require('./mymod.js');
 var mutatemod = require('./mutatemod.js');
 
-function    
+function
 http.createServer(function (req, res) {
     res.writeHead(200, { 'Content-Type': 'text/plain' });
     res.end('Hello World\n');

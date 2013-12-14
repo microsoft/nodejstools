@@ -482,7 +482,7 @@ namespace Microsoft.Nodejs.Tests.UI {
                     "exports = function(a,b,c) { }"
                 );
 
-                System.Threading.Thread.Sleep(1000);
+                System.Threading.Thread.Sleep(3000);
 
                 Keyboard.Type("require(");
 

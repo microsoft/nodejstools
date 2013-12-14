@@ -436,7 +436,7 @@ namespace Microsoft.Nodejs.Tests.UI {
 
                 var folderNode = window.WaitForItem("Solution 'HelloWorld' (1 project)", "HelloWorld", "FolderX");
 
-                Assert.AreNotEqual(null, folderNode);
+                Assert.AreNotEqual(null, folderNode, "failed to find folder X");
 
                 AutomationWrapper.Select(folderNode);
 
@@ -449,7 +449,7 @@ namespace Microsoft.Nodejs.Tests.UI {
 
                 var innerFolderNode = window.WaitForItem("Solution 'HelloWorld' (1 project)", "HelloWorld", "FolderX", "FolderY");
 
-                Assert.AreNotEqual(null, innerFolderNode);
+                Assert.AreNotEqual(null, innerFolderNode, "failed to find folder Y");
 
                 AutomationWrapper.Select(innerFolderNode);
 
@@ -457,7 +457,7 @@ namespace Microsoft.Nodejs.Tests.UI {
                     TestData.GetPath(@"TestData\DebuggerProject\BreakpointBreakOn.js")
                 );
 
-                Assert.AreNotEqual(null, window.WaitForItem("Solution 'HelloWorld' (1 project)", "HelloWorld", "FolderX", "FolderY", "BreakpointBreakOn.js"));
+                Assert.AreNotEqual(null, window.WaitForItem("Solution 'HelloWorld' (1 project)", "HelloWorld", "FolderX", "FolderY", "BreakpointBreakOn.js"), "failed to find added file");
             }
         }
 
