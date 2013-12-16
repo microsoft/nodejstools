@@ -148,6 +148,33 @@ namespace NpmTests {
             TestFreshPackage("unescapedquote");
         }
 
+        [TestMethod, Priority(0)]
+        public void TestParseCppStyleComment_WorkItem563(){
+            var buff = new StringBuilder(@"{
+  ""name"": ""angular-app-server"",
+  ""description"": ""Back end server to support our angular app"",
+  ""version"": ""0.0.1"",
+  ""private"": true,
+  ""dependencies"": {
+    ""express"": ""~3.0"",
+    ""passport"": ""~0.1.12"",
+    //""passport-local"": ""~0.1.6"",
+    ""express-namespace"": ""~0.1.1"",
+    ""open"": ""0.0.3"",
+    ""request"": ""~2.16.6""
+  },
+  ""devDependencies"": {
+    ""rewire"": ""~1.0.3"",
+    ""supervisor"": ""~0.4.1"",
+    ""grunt"": ""~0.4"",
+    ""grunt-contrib-jshint"": ""~0.2.0"",
+    ""grunt-contrib-nodeunit"": ""~0.1.2""
+  }
+}
+");
+            ParseFromBuff(buff);
+        }
+
         private void ParseFromBuff(StringBuilder buff){
             try{
                 using (var reader = new StringReader(buff.ToString())){
