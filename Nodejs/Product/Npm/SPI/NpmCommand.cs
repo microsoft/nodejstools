@@ -132,10 +132,10 @@ namespace Microsoft.NodejsTools.Npm.SPI {
         public virtual async Task<bool> ExecuteAsync(){
             var success = false;
             using (_process = new Process()) {
-                _process.StartInfo = BuildStartInfo();
-                OnOutputLogged(string.Format("====Executing command 'npm {0} '====\r\n\r\n", _process.StartInfo.Arguments));
-
                 try{
+                    _process.StartInfo = BuildStartInfo();
+                    OnOutputLogged(string.Format("====Executing command 'npm {0} '====\r\n\r\n", _process.StartInfo.Arguments));
+
                     _process.Start();
 
                     _process.ErrorDataReceived += _process_ErrorDataReceived;
@@ -151,14 +151,26 @@ namespace Microsoft.NodejsTools.Npm.SPI {
                         string.Format("Error executing npm - unable to start the npm process: {0}", e.Message),
                         e));
                 } finally{
-                    _process.CancelErrorRead();
-                    _process.CancelOutputRead();
+                    //  These invalid operation exceptions can occur if node isn't installed:
+                    //  if npm can't be found the process's start info will never be created,
+                    //  the process will never be started, and the calls to BeginXXXReadLine
+                    //  will never occur.
+                    try{
+                        _process.CancelErrorRead();
+                    } catch (InvalidOperationException){}
+                    try{
+                        _process.CancelOutputRead();
+                    } catch (InvalidOperationException){}
 
-                    OnOutputLogged(
-                        string.Format(
-                            "\r\n====npm command {0} with exit code {1}====\r\n\r\n",
-                            _cancelled ? "cancelled" : "completed",
-                            _process.ExitCode));
+                    try{
+                        OnOutputLogged(
+                            string.Format(
+                                "\r\n====npm command {0} with exit code {1}====\r\n\r\n",
+                                _cancelled ? "cancelled" : "completed",
+                                _process.ExitCode));
+                    } catch (InvalidOperationException){    //  Again, if node not installed.
+                        OnOutputLogged("\r\n====Unable to execute npm====\r\n\r\n");
+                    }
                 }
             }
             return success;
