@@ -51,7 +51,8 @@ namespace Microsoft.NodejsTools.Project {
         private readonly NodejsProjectNode _projectNode;
         private readonly FileSystemWatcher _watcher;
         private Timer _fileSystemWatcherTimer;
-        private INpmController _npmController; //  TODO: This is totally not the right place for this!!
+        private INpmController _npmController;
+        private int _npmCommandsExecuting;
         private readonly object _lock = new object();
 
         private bool _isDisposed;
@@ -144,9 +145,11 @@ namespace Microsoft.NodejsTools.Project {
                         _projectNode.BuildProject.DirectoryPath,
                         false,
                         new NpmPathProvider(this));
+                    _npmController.CommandStarted += _npmController_CommandStarted;
                     _npmController.OutputLogged += _npmController_OutputLogged;
                     _npmController.ErrorLogged += _npmController_ErrorLogged;
                     _npmController.ExceptionLogged += _npmController_ExceptionLogged;
+                    _npmController.CommandCompleted += _npmController_CommandCompleted;
                     ReloadModules();
                 }
                 return _npmController;
@@ -157,6 +160,189 @@ namespace Microsoft.NodejsTools.Project {
             get {
                 return _npmController;
             }
+        }
+
+        #endregion
+
+        #region Logging and status bar updates
+
+        private static readonly Guid NpmOutputPaneGuid = new Guid("25764421-33B8-4163-BD02-A94E299D52D8");
+
+        private IVsOutputWindowPane GetNpmOutputPane()
+        {
+            var outputWindow = (IVsOutputWindow)_projectNode.GetService(typeof(SVsOutputWindow));
+            IVsOutputWindowPane pane;
+            if (outputWindow.GetPane(NpmOutputPaneGuid, out pane) != VSConstants.S_OK)
+            {
+                outputWindow.CreatePane(NpmOutputPaneGuid, "Npm", 1, 1);
+                outputWindow.GetPane(NpmOutputPaneGuid, out pane);
+            }
+
+            return pane;
+        }
+
+        private void ShowNpmOutputPane()
+        {
+            OutputWindowRedirector.GetGeneral(ProjectMgr.Package).ShowAndActivate();
+
+            var pane = GetNpmOutputPane();
+            pane.Activate();
+        }
+
+        private void ConditionallyShowNpmOutputPane()
+        {
+            if (NodejsPackage.Instance.GeneralOptionsPage.ShowOutputWindowWhenExecutingNpm)
+            {
+                ShowNpmOutputPane();
+            }
+        }
+
+#if INTEGRATE_WITH_ERROR_LIST
+
+        private ErrorListProvider _errorListProvider;
+
+        private ErrorListProvider GetErrorListProvider()
+        {
+            if (null == _errorListProvider)
+            {
+                _errorListProvider = new ErrorListProvider(_projectNode.ProjectMgr.Site);
+            }
+            return _errorListProvider;
+        }
+
+        private void WriteNpmErrorsToErrorList(NpmLogEventArgs args)
+        {
+            var provider = GetErrorListProvider();
+            foreach (var line in args.LogText.Split(new[] {'\n' }))
+            {
+                var trimmed = line.Trim();
+                if (trimmed.StartsWith("npm ERR!"))
+                {
+                    provider.Tasks.Add(new ErrorTask()
+                    {
+                        Category = TaskCategory.User,
+                        ErrorCategory = TaskErrorCategory.Error,
+                        Text = trimmed
+                    });
+                }
+                else if (trimmed.StartsWith("npm WARN"))
+                {
+                    provider.Tasks.Add(new ErrorTask()
+                    {
+                        Category = TaskCategory.User,
+                        ErrorCategory = TaskErrorCategory.Warning,
+                        Text = trimmed
+                    });
+                }
+            }
+        }
+
+#endif
+
+        private void ForceUpdateStatusBarWithNpmActivity(string activity){
+            if (string.IsNullOrEmpty(activity) || string.IsNullOrEmpty(activity.Trim()))
+            {
+                return;
+            }
+
+            if (!activity.Contains("npm"))
+            {
+                activity = string.Format("npm: {0}", activity);
+            }
+
+            var statusBar = (IVsStatusbar)_projectNode.GetService(typeof(SVsStatusbar));
+            if (null != statusBar)
+            {
+                statusBar.SetText(activity);
+            }
+        }
+
+        private void ForceUpdateStatusBarWithNpmActivitySafe(string activity){
+            if (UIThread.Instance.IsUIThread)
+            {
+                ForceUpdateStatusBarWithNpmActivity(activity);
+            }
+            else
+            {
+                UIThread.Instance.Run(() => ForceUpdateStatusBarWithNpmActivity(activity));
+            }
+        }
+
+        private void UpdateStatusBarWithNpmActivity(string activity)
+        {
+            lock (_lock){
+                if (_npmCommandsExecuting == 0){
+                    return;
+                }
+            }
+
+            ForceUpdateStatusBarWithNpmActivitySafe(activity);
+        }
+
+        private void WriteNpmLogToOutputWindow(string logText)
+        {
+            var pane = GetNpmOutputPane();
+            if (null != pane)
+            {
+                pane.OutputStringThreadSafe(logText);
+            }
+
+            UpdateStatusBarWithNpmActivity(logText);
+
+#if INTEGRATE_WITH_ERROR_LIST
+            WriteNpmErrorsToErrorList(args);
+#endif
+        }
+
+        private void WriteNpmLogToOutputWindow(NpmLogEventArgs args)
+        {
+            WriteNpmLogToOutputWindow(args.LogText);
+        }
+
+        void _npmController_CommandStarted(object sender, EventArgs e)
+        {
+            lock (_lock){
+                ++_npmCommandsExecuting;
+            }
+        }
+
+        private void _npmController_ErrorLogged(object sender, NpmLogEventArgs e)
+        {
+            WriteNpmLogToOutputWindow(e);
+        }
+
+        private void _npmController_OutputLogged(object sender, NpmLogEventArgs e)
+        {
+            WriteNpmLogToOutputWindow(e);
+        }
+
+        void _npmController_ExceptionLogged(object sender, NpmExceptionEventArgs e)
+        {
+            WriteNpmLogToOutputWindow(ErrorHelper.GetExceptionDetailsText(e.Exception));
+        }
+
+        void _npmController_CommandCompleted(object sender, NpmCommandCompletedEventArgs e)
+        {
+            lock (_lock){
+                --_npmCommandsExecuting;
+                if (_npmCommandsExecuting < 0){
+                    _npmCommandsExecuting = 0;
+                }
+            }
+
+            string message;
+            if (e.WithErrors){
+                message = e.Cancelled
+                    ? string.Format(Resources.NpmCancelledWithErrors, e.CommandText)
+                    : string.Format(Resources.NpmCompletedWithErrors, e.CommandText);
+            }
+            else if (e.Cancelled){
+                message = string.Format(Resources.NpmCancelled, e.CommandText);
+            } else{
+                message = string.Format(Resources.NpmSuccessfullyCompleted, e.CommandText);
+            }
+
+            ForceUpdateStatusBarWithNpmActivitySafe(message);
         }
 
         #endregion
@@ -232,127 +418,6 @@ namespace Microsoft.NodejsTools.Project {
                     }
                 }
             }
-        }
-
-        private static readonly Guid NpmOutputPaneGuid = new Guid("25764421-33B8-4163-BD02-A94E299D52D8");
-
-        private IVsOutputWindowPane GetNpmOutputPane() {
-            var outputWindow = (IVsOutputWindow)_projectNode.GetService(typeof(SVsOutputWindow));
-            IVsOutputWindowPane pane;
-            if (outputWindow.GetPane(NpmOutputPaneGuid, out pane) != VSConstants.S_OK) {
-                outputWindow.CreatePane(NpmOutputPaneGuid, "Npm", 1, 1);
-                outputWindow.GetPane(NpmOutputPaneGuid, out pane);
-            }
-
-            return pane;
-        }
-
-        private void ShowNpmOutputPane(){
-            OutputWindowRedirector.GetGeneral(ProjectMgr.Package).ShowAndActivate();
-
-            var pane = GetNpmOutputPane();
-            pane.Activate();
-        }
-
-        private void ConditionallyShowNpmOutputPane(){
-            if (NodejsPackage.Instance.GeneralOptionsPage.ShowOutputWindowWhenExecutingNpm){
-                ShowNpmOutputPane();
-            }
-        }
-
-#if INTEGRATE_WITH_ERROR_LIST
-
-        private ErrorListProvider _errorListProvider;
-
-        private ErrorListProvider GetErrorListProvider()
-        {
-            if (null == _errorListProvider)
-            {
-                _errorListProvider = new ErrorListProvider(_projectNode.ProjectMgr.Site);
-            }
-            return _errorListProvider;
-        }
-
-        private void WriteNpmErrorsToErrorList(NpmLogEventArgs args)
-        {
-            var provider = GetErrorListProvider();
-            foreach (var line in args.LogText.Split(new[] {'\n' }))
-            {
-                var trimmed = line.Trim();
-                if (trimmed.StartsWith("npm ERR!"))
-                {
-                    provider.Tasks.Add(new ErrorTask()
-                    {
-                        Category = TaskCategory.User,
-                        ErrorCategory = TaskErrorCategory.Error,
-                        Text = trimmed
-                    });
-                }
-                else if (trimmed.StartsWith("npm WARN"))
-                {
-                    provider.Tasks.Add(new ErrorTask()
-                    {
-                        Category = TaskCategory.User,
-                        ErrorCategory = TaskErrorCategory.Warning,
-                        Text = trimmed
-                    });
-                }
-            }
-        }
-
-#endif
-
-        private void UpdateStatusBarWithNpmActivity(string activity){
-            if (string.IsNullOrEmpty(activity) || string.IsNullOrEmpty(activity.Trim())){
-                return;
-            }
-
-            if (!activity.Contains("npm")){
-                activity = string.Format("npm: {0}", activity);
-            }
-
-            var statusBar = (IVsStatusbar) _projectNode.GetService(typeof (SVsStatusbar));
-            if (null != statusBar){
-                statusBar.SetText(activity);
-            }
-        }
-
-        private void WriteNpmLogToOutputWindow(string logText) {
-            var pane = GetNpmOutputPane();
-            if (null != pane) {
-                pane.OutputStringThreadSafe(logText);
-            }
-
-            if (UIThread.Instance.IsUIThread)
-            {
-                UpdateStatusBarWithNpmActivity(logText);
-            }
-            else
-            {
-                UIThread.Instance.Run(() => UpdateStatusBarWithNpmActivity(logText));
-            }
-
-#if INTEGRATE_WITH_ERROR_LIST
-
-            WriteNpmErrorsToErrorList(args);
-
-#endif
-        }
-
-        private void WriteNpmLogToOutputWindow(NpmLogEventArgs args) {
-            WriteNpmLogToOutputWindow(args.LogText);
-        }
-
-        private void _npmController_ErrorLogged(object sender, NpmLogEventArgs e) {
-            WriteNpmLogToOutputWindow(e);
-        }
-
-        private void _npmController_OutputLogged(object sender, NpmLogEventArgs e) {
-            WriteNpmLogToOutputWindow(e);
-        }
-
-        void _npmController_ExceptionLogged(object sender, NpmExceptionEventArgs e) {
-            WriteNpmLogToOutputWindow(ErrorHelper.GetExceptionDetailsText(e.Exception));
         }
 
         private void ReloadHierarchy() {

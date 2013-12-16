@@ -64,6 +64,7 @@
     <Compile Include="IScript.cs" />
     <Compile Include="IScripts.cs" />
     <Compile Include="NodeModuleBuilder.cs" />
+    <Compile Include="NpmCommandCompletedEventArgs.cs" />
     <Compile Include="NpmControllerFactory.cs" />
     <Compile Include="NpmExceptionEventArgs.cs" />
     <Compile Include="NpmExecutionException.cs" />

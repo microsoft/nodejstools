@@ -26,26 +26,21 @@ namespace Microsoft.NodejsTools.Npm.SPI {
 
         public NpmCommander(NpmController controller) {
             _npmController = controller;
+            CommandStarted += _npmController.LogCommandStarted;
             OutputLogged += _npmController.LogOutput;
             ErrorLogged += _npmController.LogError;
             ExceptionLogged += _npmController.LogException;
+            CommandCompleted += _npmController.LogCommandCompleted;
         }
 
         public void Dispose() {
             if (!_disposed) {
                 _disposed = true;
+                CommandStarted -= _npmController.LogCommandStarted;
                 OutputLogged -= _npmController.LogOutput;
                 ErrorLogged -= _npmController.LogError;
                 ExceptionLogged -= _npmController.LogException;
-            }
-        }
-
-        public event EventHandler CommandCompleted;
-
-        private void OnCommandCompleted() {
-            var handlers = CommandCompleted;
-            if (null != handlers) {
-                handlers(this, new EventArgs());
+                CommandCompleted -= _npmController.LogCommandCompleted;
             }
         }
 
@@ -67,6 +62,11 @@ namespace Microsoft.NodejsTools.Npm.SPI {
         //    OnErrorLogged(command.StandardError);
         //}
 
+        void command_CommandStarted(object sender, EventArgs e)
+        {
+            OnCommandStarted();
+        }
+
         void command_ExceptionLogged(object sender, NpmExceptionEventArgs e)
         {
             OnExceptionLogged(e.Exception);
@@ -82,15 +82,22 @@ namespace Microsoft.NodejsTools.Npm.SPI {
             OnOutputLogged(e.LogText);
         }
 
+        void command_CommandCompleted(object sender, NpmCommandCompletedEventArgs e)
+        {
+            OnCommandCompleted(e.Arguments, e.WithErrors, e.Cancelled);
+        }
+
         private void RegisterLogEvents(NpmCommand command)
         {
             if (command is NpmSearchCommand || command is NpmGetCatalogueCommand){
                 return;
             }
 
+            command.CommandStarted += command_CommandStarted;
             command.OutputLogged += command_OutputLogged;
             command.ErrorLogged += command_ErrorLogged;
             command.ExceptionLogged += command_ExceptionLogged;
+            command.CommandCompleted += command_CommandCompleted;
         }
 
         private void UnregisterLogEvents(NpmCommand command){
@@ -99,9 +106,11 @@ namespace Microsoft.NodejsTools.Npm.SPI {
                 return;
             }
 
+            command.CommandStarted -= command_CommandStarted;
             command.OutputLogged -= command_OutputLogged;
             command.ErrorLogged -= command_ErrorLogged;
             command.ExceptionLogged -= command_ExceptionLogged;
+            command.CommandCompleted -= command_CommandCompleted;
         }
 
         private async Task<bool> DoCommandExecute(bool refreshNpmController){
@@ -109,7 +118,6 @@ namespace Microsoft.NodejsTools.Npm.SPI {
             bool success = await _command.ExecuteAsync();
             UnregisterLogEvents(_command);
             _npmController.Refresh();
-            OnCommandCompleted();
             return success;
         }
 

@@ -130,6 +130,7 @@ namespace Microsoft.NodejsTools.Npm.SPI {
         }
 
         public virtual async Task<bool> ExecuteAsync(){
+            OnCommandStarted();
             var success = false;
             using (_process = new Process()) {
                 try{
@@ -173,6 +174,7 @@ namespace Microsoft.NodejsTools.Npm.SPI {
                     }
                 }
             }
+            OnCommandCompleted(Arguments, !success, _cancelled);
             return success;
         }
 

@@ -131,6 +131,10 @@ namespace Microsoft.NodejsTools.Npm.SPI {
             return new NpmCommander(this);
         }
 
+        public void LogCommandStarted(object sender, EventArgs args){
+            OnCommandStarted();
+        }
+
         public void LogOutput(object sender, NpmLogEventArgs e) {
             OnOutputLogged(e.LogText);
         }
@@ -141,6 +145,10 @@ namespace Microsoft.NodejsTools.Npm.SPI {
 
         public void LogException(object sender, NpmExceptionEventArgs e) {
             OnExceptionLogged(e.Exception);
+        }
+
+        public void LogCommandCompleted(object sender, NpmCommandCompletedEventArgs e){
+            OnCommandCompleted(e.Arguments, e.WithErrors, e.Cancelled);
         }
 
         public async Task<IPackageCatalog> GetRepositoryCatalogueAsync(bool forceDownload) {

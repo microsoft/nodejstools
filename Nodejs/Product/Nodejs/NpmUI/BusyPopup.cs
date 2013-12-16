@@ -95,7 +95,7 @@ namespace Microsoft.NodejsTools.NpmUI{
             }
         }
 
-        void commander_CommandCompleted(object sender, EventArgs e)
+        void commander_CommandCompleted(object sender, NpmCommandCompletedEventArgs e)
         {
             Completed();
         }

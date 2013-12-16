@@ -187,6 +187,42 @@ namespace Microsoft.NodejsTools {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to {0} cancelled.
+        /// </summary>
+        internal static string NpmCancelled {
+            get {
+                return ResourceManager.GetString("NpmCancelled", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to {0} cancelled with errors - see Output window for details.
+        /// </summary>
+        internal static string NpmCancelledWithErrors {
+            get {
+                return ResourceManager.GetString("NpmCancelledWithErrors", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to {0} completed with errors - see Output window for details.
+        /// </summary>
+        internal static string NpmCompletedWithErrors {
+            get {
+                return ResourceManager.GetString("NpmCompletedWithErrors", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to {0} successfully completed.
+        /// </summary>
+        internal static string NpmSuccessfullyCompleted {
+            get {
+                return ResourceManager.GetString("NpmSuccessfullyCompleted", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Yesterday at {0}.
         /// </summary>
         internal static string PackageCatalogRefresh1Day {
