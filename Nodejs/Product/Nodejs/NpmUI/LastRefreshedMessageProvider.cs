@@ -18,6 +18,7 @@ using System.Globalization;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using Microsoft.VisualStudio.Text.Differencing;
 
 namespace Microsoft.NodejsTools.NpmUI
 {
@@ -25,11 +26,9 @@ namespace Microsoft.NodejsTools.NpmUI
     {
 
         public static int GetNumberOfDaysSinceLastRefresh(DateTime lastRefreshTime){
-            if (DateTime.MinValue == lastRefreshTime){
-                return -1;
-            }
-
-
+            return DateTime.MinValue == lastRefreshTime
+                ? -1
+                : (DateTime.Now - lastRefreshTime.Date).Days;
         }
 
         public static string GetMessageFor(DateTime lastRefreshTime){

@@ -52,8 +52,34 @@ namespace Microsoft.NodejsTools.NpmUI{
             //  /hack
         }
 
-        private async void LoadCatalogue(){
+        private void SetLastUpdateTimeMessage(
+            string text,
+            Color color,
+            bool bold){
+            _labelLastUpdateTime.Text = text;
+            _labelLastUpdateTime.ForeColor = color;
+            _labelLastUpdateTime.Font = new Font(_labelLastUpdateTime.Font, bold ? FontStyle.Bold : FontStyle.Regular);
+        }
+
+        private void LoadCatalogue(){
+            LoadCatalogue(false);
+        }
+
+        private void RefreshCatalogue(){
+            LoadCatalogue(true);
+        }
+
+        private void SetRefreshControlsVisible(bool visible){
+            _buttonRefresh.Visible = visible;
+            _labelLastUpdated.Visible = visible;
+            _labelLastUpdateTime.Visible = visible;
+        }
+
+        private async void LoadCatalogue(bool forceRefresh){
             _listResults.Hide();
+            SetRefreshControlsVisible(false);
+            SetLastUpdateTimeMessage(Resources.PackageCatalogRefreshing, SystemColors.WindowText, false);
+            
             if (null == _busy){
                 _busy = new BusyControl{
                     Message = "Loading published package list...",
@@ -65,7 +91,7 @@ namespace Microsoft.NodejsTools.NpmUI{
             }
 
             try{
-                _allPackages = await _npmController.GetRepositoryCatalogueAsync(false);
+                _allPackages = await _npmController.GetRepositoryCatalogueAsync(forceRefresh);
                 _busy.Hide();
                 _listResults.Show();
                 StartFilter();
@@ -111,6 +137,13 @@ namespace Microsoft.NodejsTools.NpmUI{
             _filteredPackages = filtered;
             _listResults.VirtualListSize = _filteredPackages.Count;
             _listResults.Invalidate();
+
+            var days = LastRefreshedMessageProvider.GetNumberOfDaysSinceLastRefresh(_allPackages.LastRefreshed);
+            SetLastUpdateTimeMessage(
+                LastRefreshedMessageProvider.GetMessageFor(_allPackages.LastRefreshed),
+                days > 14 ? Color.Red : SystemColors.WindowText,
+                days > 7);
+            SetRefreshControlsVisible(true);
         }
 
         public INpmController NpmController{
@@ -180,7 +213,7 @@ namespace Microsoft.NodejsTools.NpmUI{
 
         private void _buttonRefresh_Click(object sender, EventArgs e)
         {
-
+            RefreshCatalogue();
         }
     }
 }

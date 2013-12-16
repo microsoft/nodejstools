@@ -53,9 +53,9 @@ namespace Microsoft.NodejsTools.NpmUI
             this._labelFind = new System.Windows.Forms.Label();
             this._listResults = new System.Windows.Forms.ListView();
             this._panelRefresh = new System.Windows.Forms.Panel();
-            this._labelLastUpdated = new System.Windows.Forms.Label();
-            this._labelLastUpdateTime = new System.Windows.Forms.Label();
             this._buttonRefresh = new System.Windows.Forms.Button();
+            this._labelLastUpdateTime = new System.Windows.Forms.Label();
+            this._labelLastUpdated = new System.Windows.Forms.Label();
             this._panelFind.SuspendLayout();
             this._panelRefresh.SuspendLayout();
             this.SuspendLayout();
@@ -119,24 +119,6 @@ namespace Microsoft.NodejsTools.NpmUI
             this._panelRefresh.Size = new System.Drawing.Size(636, 27);
             this._panelRefresh.TabIndex = 2;
             // 
-            // _labelLastUpdated
-            // 
-            this._labelLastUpdated.AutoSize = true;
-            this._labelLastUpdated.Location = new System.Drawing.Point(4, 9);
-            this._labelLastUpdated.Name = "_labelLastUpdated";
-            this._labelLastUpdated.Size = new System.Drawing.Size(107, 13);
-            this._labelLastUpdated.TabIndex = 0;
-            this._labelLastUpdated.Text = "Catalog last updated:";
-            // 
-            // _labelLastUpdateTime
-            // 
-            this._labelLastUpdateTime.AutoSize = true;
-            this._labelLastUpdateTime.Location = new System.Drawing.Point(109, 9);
-            this._labelLastUpdateTime.Name = "_labelLastUpdateTime";
-            this._labelLastUpdateTime.Size = new System.Drawing.Size(95, 13);
-            this._labelLastUpdateTime.TabIndex = 1;
-            this._labelLastUpdateTime.Text = "Today at 10:00AM";
-            // 
             // _buttonRefresh
             // 
             this._buttonRefresh.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
@@ -147,6 +129,26 @@ namespace Microsoft.NodejsTools.NpmUI
             this._buttonRefresh.Text = "&Refresh Catalog";
             this._buttonRefresh.UseVisualStyleBackColor = true;
             this._buttonRefresh.Click += new System.EventHandler(this._buttonRefresh_Click);
+            // 
+            // _labelLastUpdateTime
+            // 
+            this._labelLastUpdateTime.AutoSize = true;
+            this._labelLastUpdateTime.BackColor = System.Drawing.Color.Transparent;
+            this._labelLastUpdateTime.Location = new System.Drawing.Point(118, 9);
+            this._labelLastUpdateTime.Name = "_labelLastUpdateTime";
+            this._labelLastUpdateTime.Size = new System.Drawing.Size(95, 13);
+            this._labelLastUpdateTime.TabIndex = 1;
+            this._labelLastUpdateTime.Text = "Today at 10:00AM";
+            // 
+            // _labelLastUpdated
+            // 
+            this._labelLastUpdated.AutoSize = true;
+            this._labelLastUpdated.BackColor = System.Drawing.Color.Transparent;
+            this._labelLastUpdated.Location = new System.Drawing.Point(4, 9);
+            this._labelLastUpdated.Name = "_labelLastUpdated";
+            this._labelLastUpdated.Size = new System.Drawing.Size(107, 13);
+            this._labelLastUpdated.TabIndex = 0;
+            this._labelLastUpdated.Text = "Catalog last updated:";
             // 
             // PackageSearchPane
             // 

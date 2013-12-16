@@ -232,7 +232,7 @@ namespace Microsoft.NodejsTools {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to When Steve Martin was funny.
+        ///   Looks up a localized string similar to More than 3 months ago.
         /// </summary>
         internal static string PackageCatalogRefresh3Months {
             get {
@@ -250,11 +250,20 @@ namespace Microsoft.NodejsTools {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Before Happy Days jumped the shark.
+        ///   Looks up a localized string similar to Far too long ago.
         /// </summary>
         internal static string PackageCatalogRefresh6Months {
             get {
                 return ResourceManager.GetString("PackageCatalogRefresh6Months", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Currently refreshing.
+        /// </summary>
+        internal static string PackageCatalogRefreshing {
+            get {
+                return ResourceManager.GetString("PackageCatalogRefreshing", resourceCulture);
             }
         }
         

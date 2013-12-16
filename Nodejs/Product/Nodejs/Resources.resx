@@ -172,6 +172,9 @@
   <data name="WorkingDirInvalidOrMissing" xml:space="preserve">
     <value>The specified working directory is invalid or missing.</value>
   </data>
+  <data name="PackageCatalogRefreshing" xml:space="preserve">
+    <value>Currently refreshing</value>
+  </data>
   <data name="PackageCatalogRefreshNever" xml:space="preserve">
     <value>Never</value>
   </data>
@@ -197,9 +200,9 @@
     <value>More than 1 month ago</value>
   </data>
   <data name="PackageCatalogRefresh3Months" xml:space="preserve">
-    <value>When Steve Martin was funny</value>
+    <value>More than 3 months ago</value>
   </data>
   <data name="PackageCatalogRefresh6Months" xml:space="preserve">
-    <value>Before Happy Days jumped the shark</value>
+    <value>Far too long ago</value>
   </data>
 </root>
