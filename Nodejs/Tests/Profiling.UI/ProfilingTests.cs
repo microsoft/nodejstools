@@ -691,18 +691,15 @@ namespace ProfilingUITests {
 
                     var pyPerf = app.NodejsPerformanceExplorerTreeView;
 
-                    var child = pyPerf.FindItem(
+                    var child = pyPerf.WaitForItem(
                         "NodejsProfileTest *", 
                         "Reports", 
                         Path.GetFileNameWithoutExtension(profiling.GetSession(1).GetReport(1).Filename)
                     );
 
-                    AutomationWrapper.EnsureExpanded(child);
-                    app.NodejsPerformanceExplorerTreeView.CenterInView(child);
                     child.SetFocus();
 
-                    Mouse.MoveTo(child.GetClickablePoint());                    
-                    Mouse.Click(System.Windows.Input.MouseButton.Right);
+                    Keyboard.PressAndRelease(System.Windows.Input.Key.Apps);
                     Keyboard.PressAndRelease(System.Windows.Input.Key.C);
 
                     var cmpReports = new ComparePerfReports(app.WaitForDialog());

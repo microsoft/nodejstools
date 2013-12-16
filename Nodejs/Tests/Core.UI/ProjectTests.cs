@@ -49,7 +49,10 @@ namespace Microsoft.Nodejs.Tests.UI {
                 var openFile = OpenProjectItem("server.js", out window);
 
                 openFile.MoveCaret(7, 1);
-                Keyboard.Type("functio\t");
+
+                Keyboard.Type("functio");
+                System.Threading.Thread.Sleep(2000);
+                Keyboard.Type("\t");
                 openFile.WaitForText(@"var http = require('http');
 
 var port = process.env.port || 1337;
@@ -273,16 +276,19 @@ http.createServer(function (req, res) {
                         projectName + " (unavailable)");
 
                     projectNode = new TreeNode(project);
-                    projectNode.SetFocus();
+                    projectNode.Select();
 
                     System.Threading.Thread.Sleep(2000);
 
                     VsIdeTestHostContext.Dte.ExecuteCommand("Project.ReloadProject");
 
-                    app.SolutionExplorerTreeView.WaitForItem(
-                        "Solution '" + projectName + "' (1 project)",
-                        projectName,
-                        "server.js"
+                    Assert.IsNotNull(
+                        app.SolutionExplorerTreeView.WaitForItem(
+                            "Solution '" + projectName + "' (1 project)",
+                            projectName,
+                            "server.js"
+                        ),
+                        "project not reloaded"
                     );
 
                     var openFile = OpenItem("server.js", VsIdeTestHostContext.Dte.Solution.Projects.Item(1), out window);

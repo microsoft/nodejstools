@@ -73,7 +73,7 @@
         <CommandFlag>AlwaysCreate</CommandFlag>
         <Strings>
           <ButtonText>Performance Reports Context</ButtonText>
-          <CommandName>Performance Reports Context</CommandName>
+          <CommandName>Node.js Performance Reports Context</CommandName>
         </Strings> 
       </Menu>
 
