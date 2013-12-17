@@ -37,6 +37,9 @@
             <Component Id="cmpMicrosoft.NodejsTools.ProjectWizard.dll" Directory="INSTALLLOCATION" Guid="{5B0F69FB-EBB6-42CF-8422-57C2A492E664}">
               <File Id="filMicrosoft.NodejsTools.ProjectWizard.dll" KeyPath="yes" Source="$(var.BinariesDir)\Microsoft.NodejsTools.ProjectWizard.dll" />
             </Component>
+            <Component Id="cmpMicrosoft.NodejsTools.TestAdapter.dll" Directory="INSTALLLOCATION" Guid="{7566BE04-67D4-4E6B-948F-0DD6F74F114F}">
+              <File Id="filMicrosoft.NodejsTools.TestAdapter.dll" KeyPath="yes" Source="$(var.BinariesDir)\Microsoft.NodejsTools.TestAdapter.dll" />
+            </Component>
             <Component Id="cmp9FEF8767393C493A8B68D8BF6D4961B5" Directory="INSTALLLOCATION" Guid="{B43D5044-D8D5-42A8-BAEF-1A7DBC21AAE6}">
               <File Id="filE8D2A28B9CB64184A05AEAAF2A2EF4C8" KeyPath="yes" Source="$(var.BinariesDir)\Microsoft.NodejsTools.AjaxMin.dll" />
             </Component>
@@ -106,6 +109,9 @@
             </Component>
             <Component Id="cmp9608E5E0EB994452A7D3A8856F529C38" Directory="DIR_NewItem_8C4602C9B0A2476697A95E2BF5B94B53" Guid="{E4B83B18-E5EF-4D95-93A2-557FD1619A25}">
               <File Id="fil0FF05115771C408E8CD4FFA986AF0459" KeyPath="yes" Source="$(var.BinariesDir)\FileTemplates\NewItem\EmptyJs.js" />
+            </Component>
+            <Component Id="cmpFileTemplate_NewItem_UnitTestJS" Directory="DIR_NewItem_8C4602C9B0A2476697A95E2BF5B94B53" Guid="{0CAB0566-88D4-4955-A10B-F1C41F40FA5E}">
+              <File Id="fil_FileTemplates_NewItem_UnitTestJS" KeyPath="yes" Source="$(var.BinariesDir)\FileTemplates\NewItem\UnitTest.js" />
             </Component>
 
           <!-- WebPI Components -->

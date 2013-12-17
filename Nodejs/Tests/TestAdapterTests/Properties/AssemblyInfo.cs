@@ -12,23 +12,12 @@
  *
  * ***************************************************************************/
 
-using System;
+using System.Reflection;
 using System.Runtime.InteropServices;
-using Microsoft.VisualStudio.Shell.Flavor;
 
-namespace Microsoft.NodejsTools {
-    [Guid(GuidList.NodejsProjectFactoryString)]
-    class NodejsProjectFactory : FlavoredProjectFactoryBase {
-        private NodejsPackage _package;
+[assembly: AssemblyTitle("TestAdapterTests")]
+[assembly: AssemblyDescription("")]
+[assembly: AssemblyConfiguration("")]
 
-        public NodejsProjectFactory(NodejsPackage package) {
-            _package = package;
-        }
-
-        protected override object PreCreateForOuter(IntPtr outerProjectIUnknown) {
-            var res = new NodejsProject();
-            res._package = _package;
-            return res;
-        }
-    }
-}
+[assembly: ComVisible(false)]
+[assembly: Guid("e75ad75e-e61b-499b-b985-a46339fb7bb3")]

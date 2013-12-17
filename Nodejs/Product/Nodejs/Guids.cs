@@ -27,7 +27,7 @@ namespace Microsoft.NodejsTools
         public const string guidNodejsLanguageInfo = "ABD5E8A5-5A35-4BE9-BCAF-E10C1212CB40";
         public const string guidNodejsDebugLanguageStr = "{65791609-BA29-49CF-A214-DBFF8AEC3BC2}";
         public const string guidScriptDebugLanguageStr = "{F7FA31DA-C32A-11D0-B442-00A0244A1DD2}";
-        
+        public const string NodejsProjectFactoryString = "3AF33F2E-1136-4D97-BBB7-1795711AC8B8";
         public const string NodejsBaseProjectFactoryString = "9092AA53-FB77-4645-B42D-1CCCA6BD08BD";
         public static readonly Guid NodejsBaseProjectFactory = new Guid(NodejsBaseProjectFactoryString);
 

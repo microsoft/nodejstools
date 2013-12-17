@@ -13,22 +13,15 @@
  * ***************************************************************************/
 
 using System;
-using System.Runtime.InteropServices;
-using Microsoft.VisualStudio.Shell.Flavor;
+using System.Collections.Generic;
+using Microsoft.VisualStudio.TestPlatform.ObjectModel.Logging;
 
-namespace Microsoft.NodejsTools {
-    [Guid(GuidList.NodejsProjectFactoryString)]
-    class NodejsProjectFactory : FlavoredProjectFactoryBase {
-        private NodejsPackage _package;
+namespace TestAdapterTests {
+    class MockMessageLogger : IMessageLogger {
+        public readonly List<Tuple<TestMessageLevel, string>> Messages = new List<Tuple<TestMessageLevel, string>>();
 
-        public NodejsProjectFactory(NodejsPackage package) {
-            _package = package;
-        }
-
-        protected override object PreCreateForOuter(IntPtr outerProjectIUnknown) {
-            var res = new NodejsProject();
-            res._package = _package;
-            return res;
+        public void SendMessage(TestMessageLevel testMessageLevel, string message) {
+            this.Messages.Add(new Tuple<TestMessageLevel, string>(testMessageLevel, message));
         }
     }
 }

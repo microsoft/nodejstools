@@ -249,7 +249,7 @@ namespace Microsoft.NodejsTools {
         }
 
         private bool TryShowContextMenu(IntPtr pvaIn, Guid itemType, out int res) {
-            if (itemType == new Guid(NodejsProjectFactory.NodeProjectGuid)) {
+            if (itemType == new Guid(GuidList.NodejsProjectFactoryString)) {
                 // multiple Node prjoect nodes selected
                 res = ShowContextMenu(pvaIn, VsMenus.IDM_VS_CTXT_PROJNODE/*IDM_VS_CTXT_WEBPROJECT*/);
                 return true;

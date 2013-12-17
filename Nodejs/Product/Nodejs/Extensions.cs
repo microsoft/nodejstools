@@ -29,7 +29,7 @@ namespace Microsoft.NodejsTools {
                 onlyNodeProjects ?
                 (uint)(__VSENUMPROJFLAGS.EPF_LOADEDINSOLUTION | __VSENUMPROJFLAGS.EPF_MATCHTYPE) :
                 (uint)(__VSENUMPROJFLAGS.EPF_LOADEDINSOLUTION | __VSENUMPROJFLAGS.EPF_ALLVIRTUAL);
-            var guid = new Guid(NodejsProjectFactory.NodeProjectGuid);
+            var guid = new Guid(GuidList.NodejsProjectFactoryString);
             IEnumHierarchies hierarchies;
             ErrorHandler.ThrowOnFailure((solution.GetProjectEnum(
                 flags,

@@ -47,9 +47,13 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Npm", "Product\Npm\Npm.cspr
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "NpmTests", "Tests\NpmTests\NpmTests.csproj", "{95494195-DCA4-4633-B78B-2087836C11D0}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TestAdapter", "Product\TestAdapter\TestAdapter.csproj", "{5085DF35-3A32-4894-835E-E5A3956D4F57}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TestAdapterTests", "Tests\TestAdapterTests\TestAdapterTests.csproj", "{3FC57837-519D-4980-A8E8-DC5879DDA002}"
+EndProject
 Global
 	GlobalSection(TeamFoundationVersionControl) = preSolution
-		SccNumberOfProjects = 21
+		SccNumberOfProjects = 23
 		SccEnterpriseProvider = {4CA58AB2-18FA-4F8D-95D4-32DDF27D184C}
 		SccTeamFoundationServer = http://tcvstf:8080/tfs/tc
 		SccLocalPath0 = .
@@ -133,6 +137,14 @@ Global
 		SccProjectTopLevelParentUniqueName20 = NodejsTools.sln
 		SccProjectName20 = Tests/NpmTests
 		SccLocalPath20 = Tests\\NpmTests
+		SccProjectUniqueName21 = Product\\TestAdapter\\TestAdapter.csproj
+		SccProjectTopLevelParentUniqueName21 = NodejsTools.sln
+		SccProjectName21 = Product/TestAdapter
+		SccLocalPath21 = Product\\TestAdapter
+		SccProjectUniqueName22 = Tests\\TestAdapterTests\\TestAdapterTests.csproj
+		SccProjectTopLevelParentUniqueName22 = NodejsTools.sln
+		SccProjectName22 = Tests/TestAdapterTests
+		SccLocalPath22 = Tests\\TestAdapterTests
 	EndGlobalSection
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|x86 = Debug|x86
@@ -216,6 +228,14 @@ Global
 		{95494195-DCA4-4633-B78B-2087836C11D0}.Debug|x86.Build.0 = Debug|x86
 		{95494195-DCA4-4633-B78B-2087836C11D0}.Release|x86.ActiveCfg = Release|x86
 		{95494195-DCA4-4633-B78B-2087836C11D0}.Release|x86.Build.0 = Release|x86
+		{5085DF35-3A32-4894-835E-E5A3956D4F57}.Debug|x86.ActiveCfg = Debug|x86
+		{5085DF35-3A32-4894-835E-E5A3956D4F57}.Debug|x86.Build.0 = Debug|x86
+		{5085DF35-3A32-4894-835E-E5A3956D4F57}.Release|x86.ActiveCfg = Release|x86
+		{5085DF35-3A32-4894-835E-E5A3956D4F57}.Release|x86.Build.0 = Release|x86
+		{3FC57837-519D-4980-A8E8-DC5879DDA002}.Debug|x86.ActiveCfg = Debug|x86
+		{3FC57837-519D-4980-A8E8-DC5879DDA002}.Debug|x86.Build.0 = Debug|x86
+		{3FC57837-519D-4980-A8E8-DC5879DDA002}.Release|x86.ActiveCfg = Release|x86
+		{3FC57837-519D-4980-A8E8-DC5879DDA002}.Release|x86.Build.0 = Release|x86
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -230,6 +250,7 @@ Global
 		{DBC73DF7-1B4C-48BE-8B48-715297487E7A} = {F9719B35-F359-47A7-A2F8-34F42E53C809}
 		{712D84EC-B2A6-46D1-B030-BA697AE5E554} = {F9719B35-F359-47A7-A2F8-34F42E53C809}
 		{E5EF4B0A-AB41-4B98-8FA8-98D6348003A8} = {F9719B35-F359-47A7-A2F8-34F42E53C809}
+		{5085DF35-3A32-4894-835E-E5A3956D4F57} = {F9719B35-F359-47A7-A2F8-34F42E53C809}
 		{D092D54E-FF29-4D32-9AEE-4EF704C92F67} = {850AC94A-310F-4F88-A553-2806D7732BD1}
 		{E8150EBC-6B62-40BF-BF91-1DC60149B530} = {850AC94A-310F-4F88-A553-2806D7732BD1}
 		{F18AF6F7-F534-44BE-B5DE-44D6EFFF947D} = {850AC94A-310F-4F88-A553-2806D7732BD1}
@@ -241,5 +262,6 @@ Global
 		{F8E4A9D2-7621-491F-9D37-C578E833AC02} = {850AC94A-310F-4F88-A553-2806D7732BD1}
 		{E75E5DB1-0EA0-4247-A830-FE467C016816} = {850AC94A-310F-4F88-A553-2806D7732BD1}
 		{95494195-DCA4-4633-B78B-2087836C11D0} = {850AC94A-310F-4F88-A553-2806D7732BD1}
+		{3FC57837-519D-4980-A8E8-DC5879DDA002} = {850AC94A-310F-4F88-A553-2806D7732BD1}
 	EndGlobalSection
 EndGlobal

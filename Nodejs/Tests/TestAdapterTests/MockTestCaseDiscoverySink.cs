@@ -12,23 +12,20 @@
  *
  * ***************************************************************************/
 
-using System;
-using System.Runtime.InteropServices;
-using Microsoft.VisualStudio.Shell.Flavor;
+using System.Collections.Generic;
+using Microsoft.VisualStudio.TestPlatform.ObjectModel;
+using Microsoft.VisualStudio.TestPlatform.ObjectModel.Adapter;
 
-namespace Microsoft.NodejsTools {
-    [Guid(GuidList.NodejsProjectFactoryString)]
-    class NodejsProjectFactory : FlavoredProjectFactoryBase {
-        private NodejsPackage _package;
+namespace TestAdapterTests {
+    class MockTestCaseDiscoverySink : ITestCaseDiscoverySink {
+        public readonly List<TestCase> Tests = new List<TestCase>();
 
-        public NodejsProjectFactory(NodejsPackage package) {
-            _package = package;
+        #region ITestCaseDiscoverySink Members
+
+        public void SendTestCase(TestCase discoveredTest) {
+            this.Tests.Add(discoveredTest);
         }
 
-        protected override object PreCreateForOuter(IntPtr outerProjectIUnknown) {
-            var res = new NodejsProject();
-            res._package = _package;
-            return res;
-        }
+        #endregion
     }
 }

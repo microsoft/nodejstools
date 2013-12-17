@@ -13,22 +13,12 @@
  * ***************************************************************************/
 
 using System;
-using System.Runtime.InteropServices;
-using Microsoft.VisualStudio.Shell.Flavor;
 
-namespace Microsoft.NodejsTools {
-    [Guid(GuidList.NodejsProjectFactoryString)]
-    class NodejsProjectFactory : FlavoredProjectFactoryBase {
-        private NodejsPackage _package;
-
-        public NodejsProjectFactory(NodejsPackage package) {
-            _package = package;
-        }
-
-        protected override object PreCreateForOuter(IntPtr outerProjectIUnknown) {
-            var res = new NodejsProject();
-            res._package = _package;
-            return res;
-        }
+namespace Microsoft.NodejsTools.Project
+{
+    public enum NodejsItemType
+    {
+        NodejsItemTypeJavascript = 0,
+        NodejsItemTypeJavascriptTest = 1,
     }
 }

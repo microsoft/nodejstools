@@ -6116,9 +6116,10 @@ If the files in the existing folder have the same names as files in the folder y
             UIThread.Instance.MustBeCalledFromUIThread();
 
             Debug.Assert(Path.IsPathRooted(name));
+            
             HierarchyNode res;
             _diskNodes.TryGetValue(name, out res);
-            return res;
+            return res;            
         }
 
         /// <summary>

@@ -13,22 +13,12 @@
  * ***************************************************************************/
 
 using System;
-using System.Runtime.InteropServices;
-using Microsoft.VisualStudio.Shell.Flavor;
+using Microsoft.VisualStudio.TestPlatform.ObjectModel.Adapter;
 
-namespace Microsoft.NodejsTools {
-    [Guid(GuidList.NodejsProjectFactoryString)]
-    class NodejsProjectFactory : FlavoredProjectFactoryBase {
-        private NodejsPackage _package;
-
-        public NodejsProjectFactory(NodejsPackage package) {
-            _package = package;
-        }
-
-        protected override object PreCreateForOuter(IntPtr outerProjectIUnknown) {
-            var res = new NodejsProject();
-            res._package = _package;
-            return res;
+namespace TestAdapterTests {
+    class MockDiscoveryContext : IDiscoveryContext {
+        public IRunSettings RunSettings {
+            get { throw new NotImplementedException(); }
         }
     }
 }

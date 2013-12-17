@@ -12,23 +12,21 @@
  *
  * ***************************************************************************/
 
-using System;
-using System.Runtime.InteropServices;
-using Microsoft.VisualStudio.Shell.Flavor;
+using System.Collections.Generic;
+using System.ComponentModel.Composition;
+using Microsoft.VisualStudio.TestWindow.Extensibility;
 
-namespace Microsoft.NodejsTools {
-    [Guid(GuidList.NodejsProjectFactoryString)]
-    class NodejsProjectFactory : FlavoredProjectFactoryBase {
-        private NodejsPackage _package;
+namespace Microsoft.NodejsTools.TestAdapter {
+    [Export(typeof(IRunFromContextFileExtensions))]
+    class RunFromContextFileExtensions : IRunFromContextFileExtensions {
+        #region IRunFromContextFileExtensions Members
 
-        public NodejsProjectFactory(NodejsPackage package) {
-            _package = package;
+        public IEnumerable<string> FileTypes {
+            get { 
+                return new[] { NodejsConstants.FileExtension };
+            }
         }
 
-        protected override object PreCreateForOuter(IntPtr outerProjectIUnknown) {
-            var res = new NodejsProject();
-            res._package = _package;
-            return res;
-        }
+        #endregion
     }
 }

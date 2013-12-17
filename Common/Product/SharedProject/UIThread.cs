@@ -95,7 +95,7 @@ namespace Microsoft.VisualStudioTools.Project
         [Conditional("DEBUG")]
         internal void MustBeCalledFromUIThread()
         {
-            Debug.Assert(this.uithread == System.Threading.Thread.CurrentThread || this.isUnitTestingMode, "This must be called from the GUI thread");
+            Debug.Assert(IsUIThread || this.isUnitTestingMode, "This must be called from the GUI thread");
         }
 
         /// <summary>

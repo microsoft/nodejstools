@@ -144,6 +144,9 @@
   <data name="3008" xml:space="preserve">
     <value>Text file</value>
   </data>
+  <data name="3009" xml:space="preserve">
+    <value>JavaScript UnitTest file</value>
+  </data>
   <data name="3011" xml:space="preserve">
     <value>An Empty JavaScript file</value>
   </data>
@@ -155,6 +158,12 @@
   </data>
   <data name="3014" xml:space="preserve">
     <value>Text</value>
+  </data>
+  <data name="3015" xml:space="preserve">
+    <value>A basic JavaScript UnitTest file</value>
+  </data>
+  <data name="3016" xml:space="preserve">
+    <value>UnitTest</value>
   </data>
   <assembly alias="System.Windows.Forms" name="System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089" />
   <data name="400" type="System.Resources.ResXFileRef, System.Windows.Forms">
