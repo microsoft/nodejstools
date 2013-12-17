@@ -17,33 +17,33 @@ using System.Drawing;
 using System.Windows.Forms;
 using Microsoft.NodejsTools.Npm;
 
-namespace Microsoft.NodejsTools.NpmUI{
-    internal static class PackageListItemPainter{
-        static PackageListItemPainter(){
+namespace Microsoft.NodejsTools.NpmUI {
+    internal static class PackageListItemPainter {
+        static PackageListItemPainter() {
             Dependency =
                 Image.FromStream(
-                    typeof (InstalledPackageListControl).Assembly
+                    typeof(InstalledPackageListControl).Assembly
                                                         .GetManifestResourceStream
                         (
                             "Microsoft.NodejsTools.Resources.Dependency_32.png"));
 
             DependencyDev =
                 Image.FromStream(
-                    typeof (InstalledPackageListControl).Assembly
+                    typeof(InstalledPackageListControl).Assembly
                                                         .GetManifestResourceStream
                         (
                             "Microsoft.NodejsTools.Resources.DependencyDev_32.png"));
 
             DependencyOptional =
                 Image.FromStream(
-                    typeof (InstalledPackageListControl).Assembly
+                    typeof(InstalledPackageListControl).Assembly
                                                         .GetManifestResourceStream
                         (
                             "Microsoft.NodejsTools.Resources.DependencyOptional_32.png"));
 
             Warning =
                 Image.FromStream(
-                    typeof (InstalledPackageListControl).Assembly
+                    typeof(InstalledPackageListControl).Assembly
                                                         .GetManifestResourceStream
                         (
                             "Microsoft.NodejsTools.Resources.Warning_16.png"));
@@ -57,20 +57,20 @@ namespace Microsoft.NodejsTools.NpmUI{
 
         internal static Image Warning { get; private set; }
 
-        public static void DrawItem(Control owner, DrawListViewItemEventArgs e){
+        public static void DrawItem(Control owner, DrawListViewItemEventArgs e) {
             Graphics g = e.Graphics;
             Color foreColor, backColor, lineColor;
 
             if ((e.State & ListViewItemStates.Selected) ==
-                ListViewItemStates.Selected){
+                ListViewItemStates.Selected) {
                 foreColor = SystemColors.HighlightText;
                 backColor = SystemColors.Highlight;
-            } else if ((e.State & ListViewItemStates.Hot) == ListViewItemStates.Hot){
+            } else if ((e.State & ListViewItemStates.Hot) == ListViewItemStates.Hot) {
                 foreColor = SystemColors.WindowText;
                 backColor = ColorUtils.MidPoint(
                     SystemColors.Highlight,
                     SystemColors.AppWorkspace);
-            } else{
+            } else {
                 foreColor = SystemColors.WindowText;
                 backColor = SystemColors.Window;
             }
@@ -79,23 +79,23 @@ namespace Microsoft.NodejsTools.NpmUI{
 
             var bounds = e.Bounds;
 
-            var wrapper = owner as IListViewWrapper;
-            if (null != wrapper){
+            var wrapper = owner as IPackageListViewWrapper;
+            if (null != wrapper) {
                 var view = wrapper.ListView;
-                if (null != view){
+                if (null != view) {
                     var display = view.DisplayRectangle;
                     if (view.VirtualMode && view.VirtualListSize * bounds.Height > display.Height
-                        || view.Items.Count * bounds.Height > display.Height){
+                        || view.Items.Count * bounds.Height > display.Height) {
                         bounds.Width -= SystemInformation.VerticalScrollBarWidth;
                     }
                 }
             }
 
-            using (var bg = new SolidBrush(backColor)){
+            using (var bg = new SolidBrush(backColor)) {
                 g.FillRectangle(bg, bounds);
             }
 
-            using (var line = new Pen(lineColor, 1F)){
+            using (var line = new Pen(lineColor, 1F)) {
                 g.DrawLine(
                     line,
                     bounds.Left + 4,
@@ -107,11 +107,11 @@ namespace Microsoft.NodejsTools.NpmUI{
             var pkg = e.Item.Tag as IPackage;
             var imgSize = new Size(0, 0);
 
-            if (!(owner is PackageSearchPane)){
+            if (!(owner is PackageSearchPane)) {
                 var img = Dependency;
-                if (pkg.IsDevDependency){
+                if (pkg.IsDevDependency) {
                     img = DependencyDev;
-                } else if (pkg.IsOptionalDependency){
+                } else if (pkg.IsOptionalDependency) {
                     img = DependencyOptional;
                 }
 
@@ -122,7 +122,7 @@ namespace Microsoft.NodejsTools.NpmUI{
                     img.Width,
                     img.Height);
 
-                if (pkg.IsMissing){
+                if (pkg.IsMissing) {
                     g.DrawImage(
                         Warning,
                         bounds.Left + 2,
@@ -149,14 +149,14 @@ namespace Microsoft.NodejsTools.NpmUI{
                 string.Format("@{0}", pkg.Version),
                 owner.Font,
                 new Point(
-                    (int) (bounds.X + 4 + size.Width + imgSize.Width),
+                    (int)(bounds.X + 4 + size.Width + imgSize.Width),
                     bounds.Y + 2),
                 ColorUtils.Mix(foreColor, backColor, 5, 5),
                 TextFormatFlags.Default);
 
             var author = "by (unknown author)";
             if (null != pkg.Author &&
-                !string.IsNullOrEmpty(pkg.Author.Name)){
+                !string.IsNullOrEmpty(pkg.Author.Name)) {
                 author = string.Format("by {0}", pkg.Author.Name);
             }
             size = TextRenderer.MeasureText(g, author, owner.Font);
@@ -164,7 +164,7 @@ namespace Microsoft.NodejsTools.NpmUI{
                 g,
                 author,
                 owner.Font,
-                new Point((int) (bounds.Right - 2 - size.Width), bounds.Y + 2),
+                new Point((int)(bounds.Right - 2 - size.Width), bounds.Y + 2),
                 ColorUtils.Mix(foreColor, backColor, 5, 5),
                 TextFormatFlags.Default);
 

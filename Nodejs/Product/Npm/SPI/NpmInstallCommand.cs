@@ -18,7 +18,7 @@ namespace Microsoft.NodejsTools.Npm.SPI {
             string fullPathToRootPackageDirectory,
             string pathToNpm = null,
             bool useFallbackIfNpmNotFound = true)
-            : base(fullPathToRootPackageDirectory, pathToNpm, useFallbackIfNpmNotFound){
+            : base(fullPathToRootPackageDirectory, pathToNpm, useFallbackIfNpmNotFound) {
             Arguments = "install";
         }
 
@@ -32,7 +32,7 @@ namespace Microsoft.NodejsTools.Npm.SPI {
             string pathToNpm = null,
             bool useFallbackIfNpmNotFound = true)
             : base(fullPathToRootPackageDirectory, pathToNpm, useFallbackIfNpmNotFound) {
-            if (global || saveToPackageJson){
+            if (global || saveToPackageJson) {
                 Arguments = string.Format(
                     "install {0} -{1}",
                     string.IsNullOrEmpty(versionRange)
@@ -43,7 +43,7 @@ namespace Microsoft.NodejsTools.Npm.SPI {
                         : (type == DependencyType.Standard
                             ? "-save"
                             : (type == DependencyType.Development ? "-save-dev" : "-save-optional")));
-            } else{
+            } else {
                 Arguments = string.Format(
                     "install {0}",
                     string.IsNullOrEmpty(versionRange)

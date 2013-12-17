@@ -101,8 +101,11 @@ namespace Microsoft.NodejsTools.Project {
                     }
 
                     if (null != _npmController) {
-                        _npmController.OutputLogged -= _npmController_OutputLogged;
-                        _npmController.ErrorLogged -= _npmController_ErrorLogged;
+                        _npmController.CommandStarted -= NpmController_CommandStarted;
+                        _npmController.OutputLogged -= NpmController_OutputLogged;
+                        _npmController.ErrorLogged -= NpmController_ErrorLogged;
+                        _npmController.ExceptionLogged -= NpmController_ExceptionLogged;
+                        _npmController.CommandCompleted -= NpmController_CommandCompleted;
                     }
                 }
                 _isDisposed = true;
@@ -147,11 +150,11 @@ namespace Microsoft.NodejsTools.Project {
                         _projectNode.BuildProject.DirectoryPath,
                         false,
                         new NpmPathProvider(this));
-                    _npmController.CommandStarted += _npmController_CommandStarted;
-                    _npmController.OutputLogged += _npmController_OutputLogged;
-                    _npmController.ErrorLogged += _npmController_ErrorLogged;
-                    _npmController.ExceptionLogged += _npmController_ExceptionLogged;
-                    _npmController.CommandCompleted += _npmController_CommandCompleted;
+                    _npmController.CommandStarted += NpmController_CommandStarted;
+                    _npmController.OutputLogged += NpmController_OutputLogged;
+                    _npmController.ErrorLogged += NpmController_ErrorLogged;
+                    _npmController.ExceptionLogged += NpmController_ExceptionLogged;
+                    _npmController.CommandCompleted += NpmController_CommandCompleted;
                     ReloadModules();
                 }
                 return _npmController;
@@ -164,36 +167,29 @@ namespace Microsoft.NodejsTools.Project {
             }
         }
 
-        private IRootPackage RootPackage
-        {
-            get{
+        private IRootPackage RootPackage {
+            get {
                 var controller = NpmController;
                 return null == controller ? null : controller.RootPackage;
             }
         }
 
-        private INodeModules RootModules
-        {
-            get
-            {
+        private INodeModules RootModules {
+            get {
                 var root = RootPackage;
                 return null == root ? null : root.Modules;
             }
         }
 
-        private bool HasMissingModules
-        {
-            get
-            {
+        private bool HasMissingModules {
+            get {
                 var modules = RootModules;
                 return null != modules && modules.HasMissingModules;
             }
         }
 
-        private bool HasModules
-        {
-            get
-            {
+        private bool HasModules {
+            get {
                 var modules = RootModules;
                 return null != modules && modules.Count > 0;
             }
@@ -205,31 +201,26 @@ namespace Microsoft.NodejsTools.Project {
 
         private static readonly Guid NpmOutputPaneGuid = new Guid("25764421-33B8-4163-BD02-A94E299D52D8");
 
-        private IVsOutputWindowPane GetNpmOutputPane()
-        {
+        private IVsOutputWindowPane GetNpmOutputPane() {
             var outputWindow = (IVsOutputWindow)_projectNode.GetService(typeof(SVsOutputWindow));
             IVsOutputWindowPane pane;
-            if (outputWindow.GetPane(NpmOutputPaneGuid, out pane) != VSConstants.S_OK)
-            {
+            if (outputWindow.GetPane(NpmOutputPaneGuid, out pane) != VSConstants.S_OK) {
                 outputWindow.CreatePane(NpmOutputPaneGuid, "Npm", 1, 1);
                 outputWindow.GetPane(NpmOutputPaneGuid, out pane);
             }
-
             return pane;
         }
 
-        private void ShowNpmOutputPane()
-        {
+        private void ShowNpmOutputPane() {
             OutputWindowRedirector.GetGeneral(ProjectMgr.Package).ShowAndActivate();
-
             var pane = GetNpmOutputPane();
-            pane.Activate();
+            if (null != pane) {
+                pane.Activate();
+            }
         }
 
-        private void ConditionallyShowNpmOutputPane()
-        {
-            if (NodejsPackage.Instance.GeneralOptionsPage.ShowOutputWindowWhenExecutingNpm)
-            {
+        private void ConditionallyShowNpmOutputPane() {
+            if (NodejsPackage.Instance.GeneralOptionsPage.ShowOutputWindowWhenExecutingNpm) {
                 ShowNpmOutputPane();
             }
         }
@@ -238,34 +229,25 @@ namespace Microsoft.NodejsTools.Project {
 
         private ErrorListProvider _errorListProvider;
 
-        private ErrorListProvider GetErrorListProvider()
-        {
-            if (null == _errorListProvider)
-            {
+        private ErrorListProvider GetErrorListProvider() {
+            if (null == _errorListProvider) {
                 _errorListProvider = new ErrorListProvider(_projectNode.ProjectMgr.Site);
             }
             return _errorListProvider;
         }
 
-        private void WriteNpmErrorsToErrorList(NpmLogEventArgs args)
-        {
+        private void WriteNpmErrorsToErrorList(NpmLogEventArgs args) {
             var provider = GetErrorListProvider();
-            foreach (var line in args.LogText.Split(new[] {'\n' }))
-            {
+            foreach (var line in args.LogText.Split(new[] {'\n' })) {
                 var trimmed = line.Trim();
-                if (trimmed.StartsWith("npm ERR!"))
-                {
-                    provider.Tasks.Add(new ErrorTask()
-                    {
+                if (trimmed.StartsWith("npm ERR!")) {
+                    provider.Tasks.Add(new ErrorTask() {
                         Category = TaskCategory.User,
                         ErrorCategory = TaskErrorCategory.Error,
                         Text = trimmed
                     });
-                }
-                else if (trimmed.StartsWith("npm WARN"))
-                {
-                    provider.Tasks.Add(new ErrorTask()
-                    {
+                } else if (trimmed.StartsWith("npm WARN")) {
+                    provider.Tasks.Add(new ErrorTask() {
                         Category = TaskCategory.User,
                         ErrorCategory = TaskErrorCategory.Warning,
                         Text = trimmed
@@ -276,39 +258,32 @@ namespace Microsoft.NodejsTools.Project {
 
 #endif
 
-        private void ForceUpdateStatusBarWithNpmActivity(string activity){
-            if (string.IsNullOrEmpty(activity) || string.IsNullOrEmpty(activity.Trim()))
-            {
+        private void ForceUpdateStatusBarWithNpmActivity(string activity) {
+            if (string.IsNullOrEmpty(activity) || string.IsNullOrEmpty(activity.Trim())) {
                 return;
             }
 
-            if (!activity.Contains("npm"))
-            {
+            if (!activity.Contains("npm")) {
                 activity = string.Format("npm: {0}", activity);
             }
 
             var statusBar = (IVsStatusbar)_projectNode.GetService(typeof(SVsStatusbar));
-            if (null != statusBar)
-            {
+            if (null != statusBar) {
                 statusBar.SetText(activity);
             }
         }
 
-        private void ForceUpdateStatusBarWithNpmActivitySafe(string activity){
-            if (UIThread.Instance.IsUIThread)
-            {
+        private void ForceUpdateStatusBarWithNpmActivitySafe(string activity) {
+            if (UIThread.Instance.IsUIThread) {
                 ForceUpdateStatusBarWithNpmActivity(activity);
-            }
-            else
-            {
+            } else {
                 UIThread.Instance.Run(() => ForceUpdateStatusBarWithNpmActivity(activity));
             }
         }
 
-        private void UpdateStatusBarWithNpmActivity(string activity)
-        {
-            lock (_lock){
-                if (_npmCommandsExecuting == 0){
+        private void UpdateStatusBarWithNpmActivity(string activity) {
+            lock (_lock) {
+                if (_npmCommandsExecuting == 0) {
                     return;
                 }
             }
@@ -316,11 +291,9 @@ namespace Microsoft.NodejsTools.Project {
             ForceUpdateStatusBarWithNpmActivitySafe(activity);
         }
 
-        private void WriteNpmLogToOutputWindow(string logText)
-        {
+        private void WriteNpmLogToOutputWindow(string logText) {
             var pane = GetNpmOutputPane();
-            if (null != pane)
-            {
+            if (null != pane) {
                 pane.OutputStringThreadSafe(logText);
             }
 
@@ -331,51 +304,44 @@ namespace Microsoft.NodejsTools.Project {
 #endif
         }
 
-        private void WriteNpmLogToOutputWindow(NpmLogEventArgs args)
-        {
+        private void WriteNpmLogToOutputWindow(NpmLogEventArgs args) {
             WriteNpmLogToOutputWindow(args.LogText);
         }
 
-        void _npmController_CommandStarted(object sender, EventArgs e)
-        {
-            lock (_lock){
+        private void NpmController_CommandStarted(object sender, EventArgs e) {
+            lock (_lock) {
                 ++_npmCommandsExecuting;
             }
         }
 
-        private void _npmController_ErrorLogged(object sender, NpmLogEventArgs e)
-        {
+        private void NpmController_ErrorLogged(object sender, NpmLogEventArgs e) {
             WriteNpmLogToOutputWindow(e);
         }
 
-        private void _npmController_OutputLogged(object sender, NpmLogEventArgs e)
-        {
+        private void NpmController_OutputLogged(object sender, NpmLogEventArgs e) {
             WriteNpmLogToOutputWindow(e);
         }
 
-        void _npmController_ExceptionLogged(object sender, NpmExceptionEventArgs e)
-        {
+        private void NpmController_ExceptionLogged(object sender, NpmExceptionEventArgs e) {
             WriteNpmLogToOutputWindow(ErrorHelper.GetExceptionDetailsText(e.Exception));
         }
 
-        void _npmController_CommandCompleted(object sender, NpmCommandCompletedEventArgs e)
-        {
-            lock (_lock){
+        private void NpmController_CommandCompleted(object sender, NpmCommandCompletedEventArgs e) {
+            lock (_lock) {
                 --_npmCommandsExecuting;
-                if (_npmCommandsExecuting < 0){
+                if (_npmCommandsExecuting < 0) {
                     _npmCommandsExecuting = 0;
                 }
             }
 
             string message;
-            if (e.WithErrors){
+            if (e.WithErrors) {
                 message = e.Cancelled
                     ? string.Format(Resources.NpmCancelledWithErrors, e.CommandText)
                     : string.Format(Resources.NpmCompletedWithErrors, e.CommandText);
-            }
-            else if (e.Cancelled){
+            } else if (e.Cancelled) {
                 message = string.Format(Resources.NpmCancelled, e.CommandText);
-            } else{
+            } else {
                 message = string.Format(Resources.NpmSuccessfullyCompleted, e.CommandText);
             }
 
@@ -464,9 +430,9 @@ namespace Microsoft.NodejsTools.Project {
                 controller = _npmController;
             }
 
-            if (null != controller){
+            if (null != controller) {
                 var root = controller.RootPackage;
-                if (null != root){
+                if (null != root) {
                     ReloadHierarchy(this, root.Modules);
                 }
             }
@@ -563,21 +529,21 @@ namespace Microsoft.NodejsTools.Project {
 
         #region Command handling
 
-        internal bool IsCurrentStateASuppressCommandsMode(){
+        internal bool IsCurrentStateASuppressCommandsMode() {
             return _suppressCommands || ProjectMgr.IsCurrentStateASuppressCommandsMode();
         }
 
-        private void SuppressCommands(){
+        private void SuppressCommands() {
             _suppressCommands = true;
         }
 
-        private void AllowCommands(){
+        private void AllowCommands() {
             _suppressCommands = false;
         }
 
-        internal override int QueryStatusOnNode(Guid cmdGroup, uint cmd, IntPtr pCmdText, ref QueryStatusResult result){
-            if (cmdGroup == GuidList.guidNodeCmdSet){
-                switch (cmd){
+        internal override int QueryStatusOnNode(Guid cmdGroup, uint cmd, IntPtr pCmdText, ref QueryStatusResult result) {
+            if (cmdGroup == GuidList.guidNodeCmdSet) {
+                switch (cmd) {
                     case PkgCmdId.cmdidNpmManageModules:
                         result = IsCurrentStateASuppressCommandsMode()
                             ? QueryStatusResult.SUPPORTED
@@ -585,24 +551,24 @@ namespace Microsoft.NodejsTools.Project {
                         return VSConstants.S_OK;
 
                     case PkgCmdId.cmdidNpmInstallModules:
-                        if (IsCurrentStateASuppressCommandsMode()){
+                        if (IsCurrentStateASuppressCommandsMode()) {
                             result = QueryStatusResult.SUPPORTED;
-                        } else{
-                            if (HasMissingModules){
+                        } else {
+                            if (HasMissingModules) {
                                 result = QueryStatusResult.ENABLED | QueryStatusResult.SUPPORTED;
-                            } else{
+                            } else {
                                 result = QueryStatusResult.SUPPORTED;
                             }
                         }
                         return VSConstants.S_OK;
 
                     case PkgCmdId.cmdidNpmUpdateModules:
-                        if (IsCurrentStateASuppressCommandsMode()){
+                        if (IsCurrentStateASuppressCommandsMode()) {
                             result = QueryStatusResult.SUPPORTED;
-                        } else{
-                            if (HasModules){
+                        } else {
+                            if (HasModules) {
                                 result = QueryStatusResult.ENABLED | QueryStatusResult.SUPPORTED;
-                            } else{
+                            } else {
                                 result = QueryStatusResult.SUPPORTED;
                             }
                         }
@@ -649,125 +615,118 @@ namespace Microsoft.NodejsTools.Project {
             ReloadHierarchy();
         }
 
-        private void DoPreCommandActions(){
+        private void DoPreCommandActions() {
             CheckNotDisposed();
             SuppressCommands();
             ConditionallyShowNpmOutputPane();
         }
 
-        public async void InstallMissingModules(){
+        public async void InstallMissingModules() {
             DoPreCommandActions();
-            try{
-                using (var commander = NpmController.CreateNpmCommander()){
+            try {
+                using (var commander = NpmController.CreateNpmCommander()) {
                     await commander.Install();
                 }
-            } catch (NpmNotFoundException nnfe){
+            } catch (NpmNotFoundException nnfe) {
                 ErrorHelper.ReportNpmNotInstalled(null, nnfe);
-            } finally{
+            } finally {
                 AllowCommands();
             }
         }
 
-        public async void InstallMissingModule(IPackage package){
-            if (null == package){
+        public async void InstallMissingModule(IPackage package) {
+            if (null == package) {
                 return;
             }
 
             var root = _npmController.RootPackage;
-            if (null == root){
+            if (null == root) {
                 return;
             }
 
             var pkgJson = root.PackageJson;
-            if (null == pkgJson){
+            if (null == pkgJson) {
                 return;
             }
 
             var dep = root.PackageJson.AllDependencies[package.Name];
 
             DoPreCommandActions();
-            try{
-                using (var commander = NpmController.CreateNpmCommander()){
+            try {
+                using (var commander = NpmController.CreateNpmCommander()) {
                     await commander.InstallPackageByVersionAsync(
                         package.Name,
                         null == dep ? "*" : dep.VersionRangeText,
                         DependencyType.Standard,
                         false);
                 }
-            } catch (NpmNotFoundException nnfe){
+            } catch (NpmNotFoundException nnfe) {
                 ErrorHelper.ReportNpmNotInstalled(null, nnfe);
-            } finally{
+            } finally {
                 AllowCommands();
             }
         }
 
-        public async void UpdateModules(){
+        public async void UpdateModules() {
             DoPreCommandActions();
-            try{
+            try {
                 var selected = _projectNode.GetSelectedNodes();
-                using (var commander = NpmController.CreateNpmCommander()){
-                    if (selected.Count == 1 && selected[0] == this){
+                using (var commander = NpmController.CreateNpmCommander()) {
+                    if (selected.Count == 1 && selected[0] == this) {
                         await commander.UpdatePackagesAsync();
-                    } else{
+                    } else {
                         await commander.UpdatePackagesAsync(
                             selected.OfType<DependencyNode>().Select(dep => dep.Package).ToList());
                     }
                 }
             } catch (NpmNotFoundException nnfe) {
                 ErrorHelper.ReportNpmNotInstalled(null, nnfe);
-            } finally{
+            } finally {
                 AllowCommands();
             }
         }
 
-        public async void UpdateModule(IPackage package){
+        public async void UpdateModule(IPackage package) {
             DoPreCommandActions();
-            try{
-                using (var commander = NpmController.CreateNpmCommander()){
-                    await commander.UpdatePackagesAsync(new[]{package});
+            try {
+                using (var commander = NpmController.CreateNpmCommander()) {
+                    await commander.UpdatePackagesAsync(new[] { package });
                 }
-            } catch (NpmNotFoundException nnfe){
+            } catch (NpmNotFoundException nnfe) {
                 ErrorHelper.ReportNpmNotInstalled(null, nnfe);
-            } finally{
+            } finally {
                 AllowCommands();
             }
         }
 
-        public async void UninstallModules(){
+        public async void UninstallModules() {
             DoPreCommandActions();
-            try{
+            try {
                 var selected = _projectNode.GetSelectedNodes();
-                using (var commander = NpmController.CreateNpmCommander()){
-                    foreach (var name in selected.OfType<DependencyNode>().Select(dep => dep.Package.Name).ToList()){
+                using (var commander = NpmController.CreateNpmCommander()) {
+                    foreach (var name in selected.OfType<DependencyNode>().Select(dep => dep.Package.Name).ToList()) {
                         await commander.UninstallPackageAsync(name);
                     }
                 }
             } catch (NpmNotFoundException nnfe) {
                 ErrorHelper.ReportNpmNotInstalled(null, nnfe);
-            } finally{
+            } finally {
                 AllowCommands();
             }
         }
 
-        public async void UninstallModule(IPackage package)
-        {
-            if (null == package){
+        public async void UninstallModule(IPackage package) {
+            if (null == package) {
                 return;
             }
             DoPreCommandActions();
-            try
-            {
-                using (var commander = NpmController.CreateNpmCommander())
-                {
+            try {
+                using (var commander = NpmController.CreateNpmCommander()) {
                     await commander.UninstallPackageAsync(package.Name);
                 }
-            }
-            catch (NpmNotFoundException nnfe)
-            {
+            } catch (NpmNotFoundException nnfe) {
                 ErrorHelper.ReportNpmNotInstalled(null, nnfe);
-            }
-            finally
-            {
+            } finally {
                 AllowCommands();
             }
         }

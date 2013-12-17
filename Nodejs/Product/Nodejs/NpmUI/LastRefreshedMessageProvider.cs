@@ -13,27 +13,18 @@
  * ***************************************************************************/
 
 using System;
-using System.Collections.Generic;
-using System.Globalization;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using Microsoft.VisualStudio.Text.Differencing;
 
-namespace Microsoft.NodejsTools.NpmUI
-{
-    internal static class LastRefreshedMessageProvider
-    {
-
-        public static int GetNumberOfDaysSinceLastRefresh(DateTime lastRefreshTime){
+namespace Microsoft.NodejsTools.NpmUI {
+    internal static class LastRefreshedMessageProvider {
+        public static int GetNumberOfDaysSinceLastRefresh(DateTime lastRefreshTime) {
             return DateTime.MinValue == lastRefreshTime
                 ? -1
                 : (DateTime.Now - lastRefreshTime.Date).Days;
         }
 
-        public static string GetMessageFor(DateTime lastRefreshTime){
+        public static string GetMessageFor(DateTime lastRefreshTime) {
             var days = GetNumberOfDaysSinceLastRefresh(lastRefreshTime);
-            switch (days){
+            switch (days) {
                 case -1:
                     return Resources.PackageCatalogRefreshNever;
 
@@ -58,23 +49,23 @@ namespace Microsoft.NodejsTools.NpmUI
                         days);
 
                 default:
-                    if (days > 183){
+                    if (days > 183) {
                         return Resources.PackageCatalogRefresh6Months;
                     }
-                    
-                    if (days > 92){
+
+                    if (days > 92) {
                         return Resources.PackageCatalogRefresh3Months;
                     }
 
-                    if (days > 31){
+                    if (days > 31) {
                         return Resources.PackageCatalogRefresh1Month;
                     }
 
-                    if (days > 21){
+                    if (days > 21) {
                         return Resources.PackageCatalogRefresh3Weeks;
                     }
 
-                    if (days > 14){
+                    if (days > 14) {
                         return Resources.PackageCatalogRefresh2Weeks;
                     }
 

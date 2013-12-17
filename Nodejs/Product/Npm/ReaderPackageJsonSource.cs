@@ -16,18 +16,18 @@ using System;
 using System.IO;
 using Newtonsoft.Json;
 
-namespace Microsoft.NodejsTools.Npm{
-    public class ReaderPackageJsonSource : IPackageJsonSource{
-        public ReaderPackageJsonSource(TextReader reader){
-            try{
+namespace Microsoft.NodejsTools.Npm {
+    public class ReaderPackageJsonSource : IPackageJsonSource {
+        public ReaderPackageJsonSource(TextReader reader) {
+            try {
                 Package = JsonConvert.DeserializeObject(reader.ReadToEnd());
-            } catch (JsonReaderException jre){
+            } catch (JsonReaderException jre) {
                 WrapExceptionAndRethrow(jre);
-            } catch (JsonSerializationException jse){
+            } catch (JsonSerializationException jse) {
                 WrapExceptionAndRethrow(jse);
-            } catch (FormatException fe){
+            } catch (FormatException fe) {
                 WrapExceptionAndRethrow(fe);
-            } catch (ArgumentException ae){
+            } catch (ArgumentException ae) {
                 throw new PackageJsonException(
                     string.Format(@"Error reading package.json. The file may be parseable JSON but may contain objects with duplicate properties.
 
@@ -39,7 +39,7 @@ The following error occurred:
         }
 
         private void WrapExceptionAndRethrow(
-            Exception ex){
+            Exception ex) {
             throw new PackageJsonException(
                 string.Format(@"Unable to read package.json. Please ensure the file is valid JSON.
 

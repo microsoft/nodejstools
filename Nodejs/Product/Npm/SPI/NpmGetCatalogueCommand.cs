@@ -47,7 +47,7 @@ namespace Microsoft.NodejsTools.Npm.SPI {
                 string.Format("npmcatalog{0}.txt", NpmCatalogueCacheGuid));
             if (!_forceDownload) {
                 try {
-                    if (File.Exists(filename)){
+                    if (File.Exists(filename)) {
                         using (var stream = new FileStream(filename, FileMode.Open, FileAccess.Read, FileShare.Read)) {
                             using (var reader = new StreamReader(stream)) {
                                 ParseResultsFromReader(reader);
@@ -75,6 +75,6 @@ namespace Microsoft.NodejsTools.Npm.SPI {
 
         public DateTime LastRefreshed { get; private set; }
 
-        public IPackageCatalog Catalog{ get{ return this; } }
+        public IPackageCatalog Catalog { get { return this; } }
     }
 }

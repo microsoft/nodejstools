@@ -124,8 +124,7 @@ namespace NpmTests {
         }
 
         [TestMethod, Priority(0)]
-        public void TestAddPackageNoSavePackageJsonThenUninstall()
-        {
+        public void TestAddPackageNoSavePackageJsonThenUninstall() {
             var rootDir = CreateRootPackage(PkgSimple);
             var controller = NpmControllerFactory.Create(rootDir);
             controller.Refresh();
@@ -133,8 +132,7 @@ namespace NpmTests {
             Assert.IsNotNull(rootPackage, "Root package with no dependencies should not be null.");
             Assert.AreEqual(0, rootPackage.Modules.Count, "Should be no modules before package install.");
 
-            using (var commander = controller.CreateNpmCommander())
-            {
+            using (var commander = controller.CreateNpmCommander()) {
                 Task<bool> task = commander.InstallPackageByVersionAsync("sax", "*", DependencyType.Standard, false);
                 task.Wait();
             }
@@ -161,8 +159,7 @@ namespace NpmTests {
             Assert.IsFalse(module.IsBundledDependency, "Should not be marked as bundled dependency.");
             Assert.IsTrue(module.HasPackageJson, "Module should have its own package.json");
 
-            using (var commander = controller.CreateNpmCommander())
-            {
+            using (var commander = controller.CreateNpmCommander()) {
                 Task<bool> task = commander.UninstallPackageAsync("sax");
                 task.Wait();
             }

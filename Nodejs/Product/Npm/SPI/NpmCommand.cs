@@ -21,7 +21,7 @@ using System.Text;
 using System.Threading.Tasks;
 
 namespace Microsoft.NodejsTools.Npm.SPI {
-    internal abstract class NpmCommand : AbstractNpmLogSource, INpmLogSource {
+    internal abstract class NpmCommand : AbstractNpmLogSource {
         private readonly string _fullPathToRootPackageDirectory;
         private string _pathToNpm;
         private bool _useFallbackIfNpmNotFound;
@@ -129,11 +129,11 @@ namespace Microsoft.NodejsTools.Npm.SPI {
             }
         }
 
-        public virtual async Task<bool> ExecuteAsync(){
+        public virtual async Task<bool> ExecuteAsync() {
             OnCommandStarted();
             var success = false;
             using (_process = new Process()) {
-                try{
+                try {
                     _process.StartInfo = BuildStartInfo();
                     OnOutputLogged(string.Format("====Executing command 'npm {0} '====\r\n\r\n", _process.StartInfo.Arguments));
 
@@ -147,29 +147,29 @@ namespace Microsoft.NodejsTools.Npm.SPI {
 
                     await Task.Run(() => WaitForExit());
                     success = true;
-                } catch (Exception e){
+                } catch (Exception e) {
                     OnExceptionLogged(new NpmExecutionException(
                         string.Format("Error executing npm - unable to start the npm process: {0}", e.Message),
                         e));
-                } finally{
+                } finally {
                     //  These invalid operation exceptions can occur if node isn't installed:
                     //  if npm can't be found the process's start info will never be created,
                     //  the process will never be started, and the calls to BeginXXXReadLine
                     //  will never occur.
-                    try{
+                    try {
                         _process.CancelErrorRead();
-                    } catch (InvalidOperationException){}
-                    try{
+                    } catch (InvalidOperationException) { }
+                    try {
                         _process.CancelOutputRead();
-                    } catch (InvalidOperationException){}
+                    } catch (InvalidOperationException) { }
 
-                    try{
+                    try {
                         OnOutputLogged(
                             string.Format(
                                 "\r\n====npm command {0} with exit code {1}====\r\n\r\n",
                                 _cancelled ? "cancelled" : "completed",
                                 _process.ExitCode));
-                    } catch (InvalidOperationException){    //  Again, if node not installed.
+                    } catch (InvalidOperationException) {    //  Again, if node not installed.
                         OnOutputLogged("\r\n====Unable to execute npm====\r\n\r\n");
                     }
                 }
@@ -179,19 +179,17 @@ namespace Microsoft.NodejsTools.Npm.SPI {
         }
 
         private string AppendToBuffer(StringBuilder buffer, DataReceivedEventArgs e) {
-            lock (_bufferLock){
+            lock (_bufferLock) {
                 var data = e.Data;
-                if (null != data){
+                if (null != data) {
                     data = Encoding.UTF8.GetString(Console.OutputEncoding.GetBytes(data)) + Environment.NewLine;
-                    if (!string.IsNullOrEmpty(data)){
-                        buffer.Append(data);
-                    }
+                    buffer.Append(data);
                 }
                 return data;
             }
         }
 
-        void _process_OutputDataReceived(object sender, DataReceivedEventArgs e){
+        void _process_OutputDataReceived(object sender, DataReceivedEventArgs e) {
             OnOutputLogged(AppendToBuffer(_output, e));
         }
 

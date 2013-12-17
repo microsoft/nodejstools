@@ -50,46 +50,28 @@ namespace Microsoft.NodejsTools.Npm.SPI {
             }
         }
 
-        ////  TODO: events should be fired as data is logged, not in one massive barf at the end
-        //private void FireLogEvents(NpmCommand command) {
-        //    //  Filter this out because we ony using search to return the entire module catalogue,
-        //    //  which will spew 47,000+ lines of total guff that the user probably isn't interested
-        //    //  in to the npm log in the output window.
-        //    if (command is NpmSearchCommand) {
-        //        return;
-        //    }
-        //    OnOutputLogged(command.StandardOutput);
-        //    OnErrorLogged(command.StandardError);
-        //}
-
-        void command_CommandStarted(object sender, EventArgs e)
-        {
+        private void command_CommandStarted(object sender, EventArgs e) {
             OnCommandStarted();
         }
 
-        void command_ExceptionLogged(object sender, NpmExceptionEventArgs e)
-        {
+        private void command_ExceptionLogged(object sender, NpmExceptionEventArgs e) {
             OnExceptionLogged(e.Exception);
         }
 
-        void command_ErrorLogged(object sender, NpmLogEventArgs e)
-        {
+        private void command_ErrorLogged(object sender, NpmLogEventArgs e) {
             OnErrorLogged(e.LogText);
         }
 
-        void command_OutputLogged(object sender, NpmLogEventArgs e)
-        {
+        private void command_OutputLogged(object sender, NpmLogEventArgs e) {
             OnOutputLogged(e.LogText);
         }
 
-        void command_CommandCompleted(object sender, NpmCommandCompletedEventArgs e)
-        {
+        private void command_CommandCompleted(object sender, NpmCommandCompletedEventArgs e) {
             OnCommandCompleted(e.Arguments, e.WithErrors, e.Cancelled);
         }
 
-        private void RegisterLogEvents(NpmCommand command)
-        {
-            if (command is NpmSearchCommand || command is NpmGetCatalogueCommand){
+        private void RegisterLogEvents(NpmCommand command) {
+            if (command is NpmSearchCommand || command is NpmGetCatalogueCommand) {
                 return;
             }
 
@@ -100,9 +82,8 @@ namespace Microsoft.NodejsTools.Npm.SPI {
             command.CommandCompleted += command_CommandCompleted;
         }
 
-        private void UnregisterLogEvents(NpmCommand command){
-            if (command is NpmSearchCommand || command is NpmGetCatalogueCommand)
-            {
+        private void UnregisterLogEvents(NpmCommand command) {
+            if (command is NpmSearchCommand || command is NpmGetCatalogueCommand) {
                 return;
             }
 
@@ -113,7 +94,7 @@ namespace Microsoft.NodejsTools.Npm.SPI {
             command.CommandCompleted -= command_CommandCompleted;
         }
 
-        private async Task<bool> DoCommandExecute(bool refreshNpmController){
+        private async Task<bool> DoCommandExecute(bool refreshNpmController) {
             RegisterLogEvents(_command);
             bool success = await _command.ExecuteAsync();
             UnregisterLogEvents(_command);
@@ -121,8 +102,7 @@ namespace Microsoft.NodejsTools.Npm.SPI {
             return success;
         }
 
-        public async Task<bool> Install()
-        {
+        public async Task<bool> Install() {
             _command = new NpmInstallCommand(
                 _npmController.FullPathToRootPackageDirectory,
                 _npmController.PathToNpm,

@@ -45,10 +45,10 @@ namespace Microsoft.NodejsTools.Npm.SPI {
             return this[name] != null;
         }
 
-        public bool HasMissingModules{
-            get{
-                foreach (IPackage pkg in this){
-                    if (pkg.IsMissing){
+        public bool HasMissingModules {
+            get {
+                foreach (IPackage pkg in this) {
+                    if (pkg.IsMissing) {
                         return true;
                     }
                 }

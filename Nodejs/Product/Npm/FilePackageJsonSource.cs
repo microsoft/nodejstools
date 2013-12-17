@@ -15,20 +15,20 @@
 using System;
 using System.IO;
 
-namespace Microsoft.NodejsTools.Npm{
-    public class FilePackageJsonSource : IPackageJsonSource{
+namespace Microsoft.NodejsTools.Npm {
+    public class FilePackageJsonSource : IPackageJsonSource {
 
         private readonly ReaderPackageJsonSource _source;
 
-        public FilePackageJsonSource(string fullPathToFile){
-            if (File.Exists(fullPathToFile)){
-                try{
-                    using (var fin = new FileStream(fullPathToFile, FileMode.Open, FileAccess.Read, FileShare.ReadWrite)){
-                        using (var reader = new StreamReader(fin)){
+        public FilePackageJsonSource(string fullPathToFile) {
+            if (File.Exists(fullPathToFile)) {
+                try {
+                    using (var fin = new FileStream(fullPathToFile, FileMode.Open, FileAccess.Read, FileShare.ReadWrite)) {
+                        using (var reader = new StreamReader(fin)) {
                             _source = new ReaderPackageJsonSource(reader);
                         }
                     }
-                } catch (PackageJsonException pje){
+                } catch (PackageJsonException pje) {
                     WrapExceptionAndRethrow(fullPathToFile, pje);
                 }
             }
@@ -36,7 +36,7 @@ namespace Microsoft.NodejsTools.Npm{
 
         private void WrapExceptionAndRethrow(
             string fullPathToFile,
-            Exception ex){
+            Exception ex) {
             throw new PackageJsonException(
                         string.Format(@"Error reading package.json at '{0}': {1}", fullPathToFile, ex.Message),
                         ex);

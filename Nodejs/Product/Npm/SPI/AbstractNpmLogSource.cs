@@ -14,40 +14,40 @@
 
 using System;
 
-namespace Microsoft.NodejsTools.Npm.SPI{
-    internal abstract class AbstractNpmLogSource : INpmLogSource{
+namespace Microsoft.NodejsTools.Npm.SPI {
+    internal abstract class AbstractNpmLogSource : INpmLogSource {
         public event EventHandler CommandStarted;
 
-        protected void OnCommandStarted(){
+        protected void OnCommandStarted() {
             var handlers = CommandStarted;
-            if (null != handlers){
+            if (null != handlers) {
                 handlers(this, EventArgs.Empty);
             }
         }
 
-        protected void FireNpmLogEvent(string logText, EventHandler<NpmLogEventArgs> handlers){
-            if (null != handlers && !string.IsNullOrEmpty(logText)){
+        protected void FireNpmLogEvent(string logText, EventHandler<NpmLogEventArgs> handlers) {
+            if (null != handlers && !string.IsNullOrEmpty(logText)) {
                 handlers(this, new NpmLogEventArgs(logText));
             }
         }
 
         public event EventHandler<NpmLogEventArgs> OutputLogged;
 
-        protected void OnOutputLogged(string logText){
+        protected void OnOutputLogged(string logText) {
             FireNpmLogEvent(logText, OutputLogged);
         }
 
         public event EventHandler<NpmLogEventArgs> ErrorLogged;
 
-        protected void OnErrorLogged(string logText){
+        protected void OnErrorLogged(string logText) {
             FireNpmLogEvent(logText, ErrorLogged);
         }
 
         public event EventHandler<NpmExceptionEventArgs> ExceptionLogged;
 
-        protected void OnExceptionLogged(Exception e){
+        protected void OnExceptionLogged(Exception e) {
             var handlers = ExceptionLogged;
-            if (null != handlers){
+            if (null != handlers) {
                 handlers(this, new NpmExceptionEventArgs(e));
             }
         }
@@ -57,9 +57,9 @@ namespace Microsoft.NodejsTools.Npm.SPI{
         protected void OnCommandCompleted(
             string arguments,
             bool withErrors,
-            bool cancelled){
+            bool cancelled) {
             var handlers = CommandCompleted;
-            if (null != handlers){
+            if (null != handlers) {
                 handlers(this, new NpmCommandCompletedEventArgs(arguments, withErrors, cancelled));
             }
         }

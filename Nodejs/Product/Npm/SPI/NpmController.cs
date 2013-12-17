@@ -91,7 +91,7 @@ namespace Microsoft.NodejsTools.Npm.SPI {
                             GlobalPackages = task.Result
                                 ? RootPackageFactory.Create(command.ListBaseDirectory)
                                 : null;
-                        } catch (IOException){} catch (AggregateException){}    //  Latter for npm not installed.
+                        } catch (IOException) { } catch (AggregateException) { }    //  Latter for npm not installed.
                         OnFinishedRefresh();
                     });
                 } catch (IOException) {
@@ -131,7 +131,7 @@ namespace Microsoft.NodejsTools.Npm.SPI {
             return new NpmCommander(this);
         }
 
-        public void LogCommandStarted(object sender, EventArgs args){
+        public void LogCommandStarted(object sender, EventArgs args) {
             OnCommandStarted();
         }
 
@@ -147,7 +147,7 @@ namespace Microsoft.NodejsTools.Npm.SPI {
             OnExceptionLogged(e.Exception);
         }
 
-        public void LogCommandCompleted(object sender, NpmCommandCompletedEventArgs e){
+        public void LogCommandCompleted(object sender, NpmCommandCompletedEventArgs e) {
             OnCommandCompleted(e.Arguments, e.WithErrors, e.Cancelled);
         }
 

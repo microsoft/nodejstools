@@ -25,10 +25,10 @@ using TestUtilities.Nodejs;
 
 namespace NpmTests {
     [TestClass]
-    public class ProblematicPackageJsonTests : AbstractPackageJsonTests{
+    public class ProblematicPackageJsonTests : AbstractPackageJsonTests {
 
         [ClassInitialize]
-        public static void Init(TestContext context){
+        public static void Init(TestContext context) {
             NodejsTestData.Deploy();
         }
 
@@ -38,7 +38,7 @@ namespace NpmTests {
             Assert.IsNotNull(pkg, "Fresh package should not be null.");
         }
 
-        private void TestParseFromFile(string filename){
+        private void TestParseFromFile(string filename) {
             string file = TestData.GetPath(@"TestData\NpmPackageJsonData\" + filename);
             var pkg = LoadFromFile(file);
             Assert.IsNotNull(
@@ -47,109 +47,109 @@ namespace NpmTests {
         }
 
         [TestMethod, Priority(0)]
-        public void TestFreshPackageParseFromFile(){
+        public void TestFreshPackageParseFromFile() {
             TestParseFromFile("fresh_package.json");
         }
 
-        private void TestFreshPackage(string suffix){
+        private void TestFreshPackage(string suffix) {
             TestParseFromFile(string.Format("fresh_package_{0}.json", suffix));
         }
 
         [TestMethod, Priority(0)]
         [ExpectedException(typeof(PackageJsonException))]
-        public void TestParseDoubleColon(){
+        public void TestParseDoubleColon() {
             TestFreshPackage("doublecolon");
         }
 
         [TestMethod, Priority(0)]
         [ExpectedException(typeof(PackageJsonException))]
-        public void TestParseDoubleComma(){
+        public void TestParseDoubleComma() {
             TestFreshPackage("doublecomma");
         }
 
         [TestMethod, Priority(0)]
         [ExpectedException(typeof(PackageJsonException))]
-        public void TestParseDuplicateProperty(){
+        public void TestParseDuplicateProperty() {
             TestFreshPackage("duplicateproperty");
         }
 
         [TestMethod, Priority(0)]
         [ExpectedException(typeof(PackageJsonException))]
-        public void TestParseLeadingBrace(){
+        public void TestParseLeadingBrace() {
             TestFreshPackage("leadingbrace");
         }
 
         [TestMethod, Priority(0)]
         [ExpectedException(typeof(PackageJsonException))]
-        public void TestParseLeadingLetter(){
+        public void TestParseLeadingLetter() {
             TestFreshPackage("leadingletter");
         }
 
         [TestMethod, Priority(0)]
         [ExpectedException(typeof(PackageJsonException))]
-        public void TestParseLeadingSquareBrace(){
+        public void TestParseLeadingSquareBrace() {
             TestFreshPackage("leadingsquarebrace");
         }
 
         [TestMethod, Priority(0)]
         [ExpectedException(typeof(PackageJsonException))]
-        public void TestParseMissingColon(){
+        public void TestParseMissingColon() {
             TestFreshPackage("missingcolon");
         }
 
         [TestMethod, Priority(0)]
         [ExpectedException(typeof(PackageJsonException))]
-        public void TestParseMissingComma(){
+        public void TestParseMissingComma() {
             TestFreshPackage("missingcomma");
         }
 
         [TestMethod, Priority(0)]
         [ExpectedException(typeof(PackageJsonException))]
-        public void TestParseMissingLeadingBrace(){
+        public void TestParseMissingLeadingBrace() {
             TestFreshPackage("missingleadingbrace");
         }
 
         [TestMethod, Priority(0)]
         [ExpectedException(typeof(PackageJsonException))]
-        public void TestParseMissingLeadingListBrace(){
+        public void TestParseMissingLeadingListBrace() {
             TestFreshPackage("missingleadinglistbrace");
         }
 
         [TestMethod, Priority(0)]
         [ExpectedException(typeof(PackageJsonException))]
-        public void TestParseMissingLeadingPropNameQuote(){
+        public void TestParseMissingLeadingPropNameQuote() {
             TestFreshPackage("missingleadingpropnamequote");
         }
 
         [TestMethod, Priority(0)]
         [ExpectedException(typeof(PackageJsonException))]
-        public void TestParseMissingOnePropNameQuote(){
+        public void TestParseMissingOnePropNameQuote() {
             TestFreshPackage("missingonepropnamequote");
         }
 
         [TestMethod, Priority(0)]
-        public void TestParseMissingPropNameQuotes(){
+        public void TestParseMissingPropNameQuotes() {
             TestFreshPackage("missingpropnamequotes");
         }
 
         [TestMethod, Priority(0)]
-        public void TestParseMissingTrailingBrace(){
+        public void TestParseMissingTrailingBrace() {
             TestFreshPackage("missingtrailingbrace");
         }
 
         [TestMethod, Priority(0)]
-        public void TestParseMissingTrailingListBrace(){
+        public void TestParseMissingTrailingListBrace() {
             TestFreshPackage("missingtrailinglistbrace");
         }
 
         [TestMethod, Priority(0)]
         [ExpectedException(typeof(PackageJsonException))]
-        public void TestParseUnescapedQuote(){
+        public void TestParseUnescapedQuote() {
             TestFreshPackage("unescapedquote");
         }
 
         [TestMethod, Priority(0)]
-        public void TestParseCppStyleComment_WorkItem563(){
+        public void TestParseCppStyleComment_WorkItem563() {
             var buff = new StringBuilder(@"{
   ""name"": ""angular-app-server"",
   ""description"": ""Back end server to support our angular app"",
@@ -175,41 +175,41 @@ namespace NpmTests {
             ParseFromBuff(buff);
         }
 
-        private void ParseFromBuff(StringBuilder buff){
-            try{
-                using (var reader = new StringReader(buff.ToString())){
+        private void ParseFromBuff(StringBuilder buff) {
+            try {
+                using (var reader = new StringReader(buff.ToString())) {
                     LoadFrom(reader);
                 }
-            } catch (PackageJsonException){
+            } catch (PackageJsonException) {
                 //  This is fine -> do nothing
             }
         }
 
         [TestMethod, Priority(0)]
-        public void TestParseFromEveryCharValue(){
+        public void TestParseFromEveryCharValue() {
             var buff = new StringBuilder();
-            var ch = (char) 0;
-            do{
+            var ch = (char)0;
+            do {
                 buff.Append(ch);
 
                 ParseFromBuff(buff);
-   
+
                 buff.Length = 0;
                 ++ch;
             } while (ch != 0);
         }
 
         [TestMethod, Priority(0)]
-        public void VeryEvilRandom1CharCorruptionTest(){
+        public void VeryEvilRandom1CharCorruptionTest() {
             var original = LoadStringFromResource("NpmTests.Resources.fresh_package.json");
             var buff = new StringBuilder();
             var generator = new Random();
 
-            var ch = (char) 0;
+            var ch = (char)0;
             var index = 0;
 
-            try{
-                do{
+            try {
+                do {
                     buff.Append(original);
                     index = generator.Next(buff.Length);
                     buff[index] = ch;
@@ -219,20 +219,19 @@ namespace NpmTests {
                     buff.Length = 0;
                     ++ch;
                 } while (ch != 0);
-            } catch (Exception ex){
+            } catch (Exception ex) {
                 throw new PackageJsonException(
                     string.Format(@"Corruption/replacement test failed replacing with character code {0:x} at index {1} in content:
 
 {2}
 
-Exception message: {3}", (int) ch, index, buff, ex.Message ),
+Exception message: {3}", (int)ch, index, buff, ex.Message),
                        ex);
             }
         }
 
         [TestMethod, Priority(0)]
-        public void VeryEvilRandom1CharInsertionTest()
-        {
+        public void VeryEvilRandom1CharInsertionTest() {
             var original = LoadStringFromResource("NpmTests.Resources.fresh_package.json");
             var buff = new StringBuilder();
             var generator = new Random();
@@ -240,8 +239,8 @@ Exception message: {3}", (int) ch, index, buff, ex.Message ),
             var ch = (char)0;
             var index = 0;
 
-            try{
-                do{
+            try {
+                do {
                     buff.Append(original);
                     index = generator.Next(buff.Length);
                     buff.Insert(index, ch);
@@ -251,9 +250,7 @@ Exception message: {3}", (int) ch, index, buff, ex.Message ),
                     buff.Length = 0;
                     ++ch;
                 } while (ch != 0);
-            }
-            catch (Exception ex)
-            {
+            } catch (Exception ex) {
                 throw new PackageJsonException(
                     string.Format(@"Insertion test failed inserting character code {0:x} at index {1} in content:
 

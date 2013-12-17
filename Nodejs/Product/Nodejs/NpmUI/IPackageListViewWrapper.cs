@@ -14,10 +14,8 @@
 
 using System.Windows.Forms;
 
-namespace Microsoft.NodejsTools.NpmUI
-{
-    internal interface IListViewWrapper
-    {
+namespace Microsoft.NodejsTools.NpmUI {
+    internal interface IPackageListViewWrapper {
         ListView ListView { get; }
     }
 }
