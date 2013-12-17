@@ -115,6 +115,16 @@ Searching npm's package repository can often be the best way to find and install
 7. Click **Close** on the progress window.
 
 
+*(New in NTVS 1.0 Beta)*
+
+
+Since the **npm** package catalogue can take a while to retrieve from the repository, we now cache the results and reuse them next time you open Visual Studio so you won't have to wait.
+
+This is fine but, obviously, new packages are being published all the time: in the last month alone some 3000 more packages have been added to the repository. This means that your cache can become out of date quite quickly. This may not matter so much if you're using only popular, tried and true modules - such as express - but will be more problematic if you want to use modules that have only just been published.
+
+You therefore need some way to make sure your cache is brought up to date on a regular basis. Rather than force you to update your cache on a schedule, we've added a **Refresh Catalog** button to the **Search npm Repository** tab that you can use to refresh the cache whenever you need.
+
+
 ### Working with dev, optional, and bundled dependencies
 
 
@@ -184,8 +194,15 @@ To uninstall a package from your project:
 5. Click **Close** on the progress window.
 
 
-### The npm node in Solution Explorer
+### npm in Solution Explorer
 
+Visual Studio's Solution Explorer provides a visual representation of the packages you are using under the **npm** node in your project.
+
+*(New in NTVS 1.0 Beta)*
+
+It also allows you to execute some **npm** commands directly without needing to open the **npm Package Management** dialog.
+
+#### The npm node
 
 The **npm** node in solution explorer provides a high-level view of the packages installed in your Node app. You can also drill further into these packages to see which other packages they depend upon.
 
@@ -226,6 +243,31 @@ Notes:
 - If you need to run npm from the command line, the easiest way to do this is to right-click on your **Node** project node in **Solution Explorer**, then click on **Open Command Prompt Here** in the context menu.
 
 
+#### npm commands in Solution Explorer *(New in NTVS 1.0 Beta)*
+
+
+**npm** commands can be found in two places in Solution Explorer:
+
+- On the **npm** node context menu
+- On the context menus for packages immediately below the **npm** node in the hierarchy.
+
+**npm** commands are not available for sub-packages since these represent dependencies required by the packages you are using in your app. If you were to try to manage them manually with npm your app would almost certainly break, or start to behave strangely.
+
+Commands on the **npm** node context menu are as follows:
+
+- **Manage npm Modules** - brings up the **npm Package Management** dialog, described above.
+- **Install Missing npm Modules** - executes **npm install** to install any modules listed in *package.json* that are not already installed; only enabled if missing modules are listed.
+- **Update npm Modules** - updates all **npm** modules listed in *package.json* to their latest versions; only enabled when one or more modules is installed, or listed as missing.
+
+Commands on the top level modules listed underneath the **npm** node:
+
+- **Install Missing npm Module** - executes **npm install** to install the missing module you have selected; only enabled on missing modules.
+- **Update Module** - updates the selected **npm** module to the latest version.
+- **Uninstall npm Module** - uninstalls the selected **npm** module.
+
+When you execute **npm** commands in Solution Explorer, the output from these commands is written to the Output window, and the Visual Studio status bar so that you can always see when **npm** is executing.
+
+
 ### Viewing the npm log
 
 
@@ -244,7 +286,21 @@ If you've already installed some packages you'll have seen that we capture and d
 
 The exact content of the log will obviously depend upon what actions you have performed.
 
-Note that we do not include the npm output from the repository catalogue retrieval simply because it's huge and not terribly interesting.
+Note that we do not include the **npm** output from the repository catalogue retrieval simply because it's huge and not terribly interesting.
+
+*(New in NTVS 1.0 Beta)*
+
+To configure whether or not the Output window should open automatically when you execute an **npm** command:
+
+1. Click **Tools > Options** on the *Visual Studio* main menu.
+
+2. In the options tree on the left select **Node.js Tools > General**.
+
+3. Check or uncheck **Show Output window when executing npm**, depending upon your preference. By default this setting is checked.
+
+Output from **npm** will always be visible in the status bar so that you know when **npm** is running and can tell whether it completed successfully, or whether there were errors.
+
+If any errors occur whilst executing **npm** you can always see them by clicking **View > Output**, as described above.
 
 
 ## Troubleshooting
@@ -275,7 +331,34 @@ You should now be able to install and uninstall packages. NTVS uses the location
 ### How do I install missing modules?
 
 
-In this release there is no **npm install** support for installing missing modules. **This will be available in the beta and, before that, within dev builds.**
+*(New in NTVS 1.0 Beta)*
+
+To install all missing modules:
+
+
+1. Right-click on the **npm** node in Solution Explorer.
+
+2. Click on **Install Missing npm Modules** on the context menu.
+
+
+All missing modules will be installed.
+
+To install a single missing module:
+
+
+1. Right-click on the module's node in Solution Explorer.
+
+2. Click on **Install Missing npm Module** on the context menu.
+
+
+The missing module will be installed.
+
+In both cases **npm**'s output, including any errors, will be written to the **Output** window. The status bar will show whether or not **npm** ran successfully.
+
+
+*(Alpha release only)*
+
+In the alpha release there is no **npm install** support for installing missing modules. **This will be available in the beta and, before that, within dev builds.**
 
 There are two options to workaround this:
 
@@ -303,19 +386,23 @@ The easiest way to open a command prompt in the correct location is to right-cli
 
 In a future release of *Node Tools for Visual Studio* we may implement an explicit rollback when you cancel an **npm** operation if enough people request it.
 
+*(New in NTVS 1.0 Beta)*
+
+If you choose to install or uninstall the package using **npm** you can now also do this in Solution Explorer via the right-click context menus on the **npm** node, or the packages that are partially installed/uninstalled.
+
 
 ## Coming Soon
 
 
-- Install all packages in *package.json* with **npm install**, and install missing packages in **npm Package Management** dialog without having to first uninstall them.
+- Install all packages in *package.json* with **npm install** *(New in NTVS 1.0 Beta)*, and install missing packages in **npm Package Management** dialog without having to first uninstall them.
 
-- Caching of **npm** repository catalogue to speed searches on first run of the **npm Package Management** dialog within a session.
+- Caching of **npm** repository catalogue to speed searches on first run of the **npm Package Management** dialog within a session. *(New in NTVS 1.0 Beta)*
 
 - Update dependencies in *package.json* to match modules installed on filesystem.
 
 - Detection of "out of date" packages and update to latest versions with **npm update**.
 
-- Uninstall packages directly from **Solution Explorer** context menu.
+- Uninstall packages directly from **Solution Explorer** context menu. *(New in NTVS 1.0 Beta)*
 
 - *package.json* editor.
 
