@@ -55,7 +55,8 @@ namespace Microsoft.NodejsTools.Project {
         private int _npmCommandsExecuting;
         private bool _suppressCommands;
 
-        private readonly object _lock = new object();
+        private readonly object _fileBitsLock = new object();
+        private readonly object _commandCountLock = new object();
 
         private bool _isDisposed;
 
@@ -89,25 +90,26 @@ namespace Microsoft.NodejsTools.Project {
 
         protected override void Dispose(bool disposing) {
             if (!_isDisposed) {
-                lock (_lock) {
+                lock (_fileBitsLock) {
                     _watcher.Changed -= Watcher_Modified;
                     _watcher.Created -= Watcher_Modified;
                     _watcher.Deleted -= Watcher_Modified;
                     _watcher.Dispose();
-
-                    if (null != _fileSystemWatcherTimer) {
-                        _fileSystemWatcherTimer.Dispose();
-                        _fileSystemWatcherTimer = null;
-                    }
-
-                    if (null != _npmController) {
-                        _npmController.CommandStarted -= NpmController_CommandStarted;
-                        _npmController.OutputLogged -= NpmController_OutputLogged;
-                        _npmController.ErrorLogged -= NpmController_ErrorLogged;
-                        _npmController.ExceptionLogged -= NpmController_ExceptionLogged;
-                        _npmController.CommandCompleted -= NpmController_CommandCompleted;
-                    }
                 }
+
+                if (null != _fileSystemWatcherTimer) {
+                    _fileSystemWatcherTimer.Dispose();
+                    _fileSystemWatcherTimer = null;
+                }
+
+                if (null != _npmController) {
+                    _npmController.CommandStarted -= NpmController_CommandStarted;
+                    _npmController.OutputLogged -= NpmController_OutputLogged;
+                    _npmController.ErrorLogged -= NpmController_ErrorLogged;
+                    _npmController.ExceptionLogged -= NpmController_ExceptionLogged;
+                    _npmController.CommandCompleted -= NpmController_CommandCompleted;
+                }
+
                 _isDisposed = true;
             }
 
@@ -144,21 +146,19 @@ namespace Microsoft.NodejsTools.Project {
         }
 
         private INpmController CreateNpmController() {
-            lock (_lock) {
-                if (null == _npmController) {
-                    _npmController = NpmControllerFactory.Create(
-                        _projectNode.BuildProject.DirectoryPath,
-                        false,
-                        new NpmPathProvider(this));
-                    _npmController.CommandStarted += NpmController_CommandStarted;
-                    _npmController.OutputLogged += NpmController_OutputLogged;
-                    _npmController.ErrorLogged += NpmController_ErrorLogged;
-                    _npmController.ExceptionLogged += NpmController_ExceptionLogged;
-                    _npmController.CommandCompleted += NpmController_CommandCompleted;
-                    ReloadModules();
-                }
-                return _npmController;
+            if (null == _npmController) {
+                _npmController = NpmControllerFactory.Create(
+                    _projectNode.BuildProject.DirectoryPath,
+                    false,
+                    new NpmPathProvider(this));
+                _npmController.CommandStarted += NpmController_CommandStarted;
+                _npmController.OutputLogged += NpmController_OutputLogged;
+                _npmController.ErrorLogged += NpmController_ErrorLogged;
+                _npmController.ExceptionLogged += NpmController_ExceptionLogged;
+                _npmController.CommandCompleted += NpmController_CommandCompleted;
+                ReloadModules();
             }
+            return _npmController;
         }
 
         public INpmController NpmController {
@@ -282,7 +282,7 @@ namespace Microsoft.NodejsTools.Project {
         }
 
         private void UpdateStatusBarWithNpmActivity(string activity) {
-            lock (_lock) {
+            lock (_commandCountLock) {
                 if (_npmCommandsExecuting == 0) {
                     return;
                 }
@@ -309,7 +309,7 @@ namespace Microsoft.NodejsTools.Project {
         }
 
         private void NpmController_CommandStarted(object sender, EventArgs e) {
-            lock (_lock) {
+            lock (_commandCountLock) {
                 ++_npmCommandsExecuting;
             }
         }
@@ -327,7 +327,7 @@ namespace Microsoft.NodejsTools.Project {
         }
 
         private void NpmController_CommandCompleted(object sender, NpmCommandCompletedEventArgs e) {
-            lock (_lock) {
+            lock (_commandCountLock) {
                 --_npmCommandsExecuting;
                 if (_npmCommandsExecuting < 0) {
                     _npmCommandsExecuting = 0;
@@ -353,7 +353,7 @@ namespace Microsoft.NodejsTools.Project {
         #region Updating module hierarchy
 
         private void RestartFileSystemWatcherTimer() {
-            lock (_lock) {
+            lock (_fileBitsLock) {
                 if (null != _fileSystemWatcherTimer) {
                     _fileSystemWatcherTimer.Dispose();
                 }
@@ -380,56 +380,48 @@ namespace Microsoft.NodejsTools.Project {
         }
 
         private void UpdateModulesFromTimer() {
-            lock (_lock) {
+            lock (_fileBitsLock) {
                 if (null != _fileSystemWatcherTimer) {
                     _fileSystemWatcherTimer.Dispose();
                     _fileSystemWatcherTimer = null;
                 }
-
-                ReloadModules();
             }
 
+            ReloadModules();
             ReloadHierarchySafe();
         }
 
         private int _refreshRetryCount;
 
         private void ReloadModules() {
-            lock (_lock) {
-                var retry = false;
-                Exception ex = null;
-                try {
-                    NpmController.Refresh();
-                } catch (PackageJsonException pje) {
-                    retry = true;
-                    ex = pje;
-                } catch (AggregateException ae) {
-                    retry = true;
-                    ex = ae;
-                } catch (FileLoadException fle) {
-                    //  Fixes bug reported in work item 447 - just wait a bit and retry!
-                    retry = true;
-                    ex = fle;
-                }
+            var retry = false;
+            Exception ex = null;
+            try {
+                NpmController.Refresh();
+            } catch (PackageJsonException pje) {
+                retry = true;
+                ex = pje;
+            } catch (AggregateException ae) {
+                retry = true;
+                ex = ae;
+            } catch (FileLoadException fle) {
+                //  Fixes bug reported in work item 447 - just wait a bit and retry!
+                retry = true;
+                ex = fle;
+            }
 
-                if (retry) {
-                    if (_refreshRetryCount < 5) {
-                        ++_refreshRetryCount;
-                        RestartFileSystemWatcherTimer();
-                    } else {
-                        WriteNpmLogToOutputWindow(ErrorHelper.GetExceptionDetailsText(ex));
-                    }
+            if (retry) {
+                if (_refreshRetryCount < 5) {
+                    ++_refreshRetryCount;
+                    RestartFileSystemWatcherTimer();
+                } else {
+                    WriteNpmLogToOutputWindow(ErrorHelper.GetExceptionDetailsText(ex));
                 }
             }
         }
 
         private void ReloadHierarchy() {
-            INpmController controller;
-
-            lock (_lock) {
-                controller = _npmController;
-            }
-
+            var controller = _npmController;
             if (null != controller) {
                 var root = controller.RootPackage;
                 if (null != root) {

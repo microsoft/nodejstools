@@ -77,26 +77,26 @@ namespace Microsoft.NodejsTools.Npm.SPI {
 
         public void Refresh() {
             OnStartingRefresh();
-            lock (_lock) {
-                try {
-                    RootPackage = RootPackageFactory.Create(
-                        _fullPathToRootPackageDirectory,
-                        _showMissingDevOptionalSubPackages);
+            try {
+                RootPackage = RootPackageFactory.Create(
+                            _fullPathToRootPackageDirectory,
+                            _showMissingDevOptionalSubPackages);
+                
+                var command = new NpmLsCommand(_fullPathToRootPackageDirectory, true, PathToNpm,
+                    _useFallbackIfNpmNotFound);
 
-                    var command = new NpmLsCommand(_fullPathToRootPackageDirectory, true, PathToNpm,
-                        _useFallbackIfNpmNotFound);
-
-                    command.ExecuteAsync().ContinueWith(task => {
-                        try {
-                            GlobalPackages = task.Result
-                                ? RootPackageFactory.Create(command.ListBaseDirectory)
-                                : null;
-                        } catch (IOException) { } catch (AggregateException) { }    //  Latter for npm not installed.
-                        OnFinishedRefresh();
-                    });
-                } catch (IOException) {
-                    // Can sometimes happen when packages are still installing because the file may still be used by another process
-                }
+                command.ExecuteAsync().ContinueWith(task => {
+                    try {
+                        GlobalPackages = task.Result
+                            ? RootPackageFactory.Create(command.ListBaseDirectory)
+                            : null;
+                    } catch (IOException) { } catch (AggregateException) { }    //  Latter for npm not installed.
+                    OnFinishedRefresh();
+                });
+            } catch (IOException) {
+                // Can sometimes happen when packages are still installing because the file may still be used by another process
+            } catch (AggregateException) {
+                //  npm not installed
             }
         }
 
