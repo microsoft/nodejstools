@@ -22,7 +22,7 @@ namespace Microsoft.NodejsTools.Debugger.DebugEngine {
     class AD7Thread : IDebugThread2, IDebugThread100 {
         private readonly AD7Engine _engine;
         private readonly NodeThread _debuggedThread;
-        private const string ThreadNameString = "Python Thread";
+        private const string ThreadNameString = "Node.js Thread";
 
         public AD7Thread(AD7Engine engine, NodeThread debuggedThread) {
             _engine = engine;
@@ -30,10 +30,11 @@ namespace Microsoft.NodejsTools.Debugger.DebugEngine {
         }
 
         private string GetCurrentLocation(bool fIncludeModuleName) {
-            if (_debuggedThread.Frames != null) {
-                return _debuggedThread.Frames[0].FunctionName;
+            var topStackFrame = _debuggedThread.TopStackFrame;
+            if (topStackFrame != null) {
+                return topStackFrame.FunctionName;
             }
-            return "<unknown location, not in Python code>";
+            return "<unknown location, not in Node.js code>";
         }
 
         internal NodeThread GetDebuggedThread() {

@@ -64,6 +64,18 @@ namespace Microsoft.NodejsTools.Debugger {
             }
         }
 
+        public int CallstackDepth {
+            get {
+                return _frames != null ? _frames.Count : 0;
+            }
+        }
+
+        public NodeStackFrame TopStackFrame {
+            get {
+                return _frames != null && _frames.Count > 0 ? _frames[0] : null;
+            }
+        }
+
         public NodeDebugger Process {
             get {
                 return _process;
