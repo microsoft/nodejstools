@@ -125,38 +125,33 @@ namespace Microsoft.NodejsTools.Project{
 
         #endregion
 
-        //#region Dependency actions
-
-        //public async void Uninstall(){
-        //    var modulesNode = _projectNode.ModulesNode;
-        //    if (null != modulesNode){
-        //        using (var commander = modulesNode.NpmController.CreateNpmCommander()){
-        //            await commander.UninstallPackageAsync(Package.Name);
-        //        }
-        //    }
-        //}
-
-        //#endregion
-
         #region Command handling
 
-        internal override int QueryStatusOnNode(Guid cmdGroup, uint cmd, IntPtr pCmdText, ref QueryStatusResult result)
-        {
+        internal override int QueryStatusOnNode(Guid cmdGroup, uint cmd, IntPtr pCmdText, ref QueryStatusResult result){
             //  Latter condition is because it's only valid to carry out npm operations
             //  on top level dependencies of the user's project, not sub-dependencies.
             //  Performing operations on sub-dependencies would just break things.
-            if (cmdGroup == GuidList.guidNodeCmdSet && null == _parent)
-            {
-                switch (cmd)
-                {
+            if (cmdGroup == GuidList.guidNodeCmdSet && null == _parent){
+                switch (cmd){
                     case PkgCmdId.cmdidNpmInstallSingleMissingModule:
-                    case PkgCmdId.cmdidNpmUninstallModule:
-                        if (null != _projectNode.ModulesNode && !_projectNode.ModulesNode.IsCurrentStateASuppressCommandsMode())
-                        {
-                            result = QueryStatusResult.ENABLED | QueryStatusResult.SUPPORTED;
+                        if (null == _projectNode.ModulesNode
+                            || _projectNode.ModulesNode.IsCurrentStateASuppressCommandsMode()){
+                            result = QueryStatusResult.SUPPORTED;
+                        } else{
+                            if (null != Package && Package.IsMissing){
+                                result = QueryStatusResult.ENABLED | QueryStatusResult.SUPPORTED;
+                            } else{
+                                result = QueryStatusResult.SUPPORTED;
+                            }
                         }
-                        else
-                        {
+                        return VSConstants.S_OK;
+
+                    case PkgCmdId.cmdidNpmUpdateSingleModule:
+                    case PkgCmdId.cmdidNpmUninstallModule:
+                        if (null != _projectNode.ModulesNode &&
+                            !_projectNode.ModulesNode.IsCurrentStateASuppressCommandsMode()){
+                            result = QueryStatusResult.ENABLED | QueryStatusResult.SUPPORTED;
+                        } else{
                             result = QueryStatusResult.SUPPORTED;
                         }
                         return VSConstants.S_OK;
@@ -172,12 +167,9 @@ namespace Microsoft.NodejsTools.Project{
             return base.QueryStatusOnNode(cmdGroup, cmd, pCmdText, ref result);
         }
 
-        internal override int ExecCommandOnNode(Guid cmdGroup, uint cmd, uint nCmdexecopt, IntPtr pvaIn, IntPtr pvaOut)
-        {
-            if (cmdGroup == GuidList.guidNodeCmdSet && null == _parent)
-            {
-                switch (cmd)
-                {
+        internal override int ExecCommandOnNode(Guid cmdGroup, uint cmd, uint nCmdexecopt, IntPtr pvaIn, IntPtr pvaOut){
+            if (cmdGroup == GuidList.guidNodeCmdSet && null == _parent){
+                switch (cmd){
                     case PkgCmdId.cmdidNpmInstallSingleMissingModule:
                         if (null != _projectNode.ModulesNode){
                             _projectNode.ModulesNode.InstallMissingModule(Package);
@@ -190,6 +182,11 @@ namespace Microsoft.NodejsTools.Project{
                         }
                         return VSConstants.S_OK;
 
+                    case PkgCmdId.cmdidNpmUpdateSingleModule:
+                        if (null != _projectNode.ModulesNode){
+                            _projectNode.ModulesNode.UpdateModule(Package);
+                        }
+                        return VSConstants.S_OK;
                 }
             }
 

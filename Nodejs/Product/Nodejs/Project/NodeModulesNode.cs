@@ -164,6 +164,41 @@ namespace Microsoft.NodejsTools.Project {
             }
         }
 
+        private IRootPackage RootPackage
+        {
+            get{
+                var controller = NpmController;
+                return null == controller ? null : controller.RootPackage;
+            }
+        }
+
+        private INodeModules RootModules
+        {
+            get
+            {
+                var root = RootPackage;
+                return null == root ? null : root.Modules;
+            }
+        }
+
+        private bool HasMissingModules
+        {
+            get
+            {
+                var modules = RootModules;
+                return null != modules && modules.HasMissingModules;
+            }
+        }
+
+        private bool HasModules
+        {
+            get
+            {
+                var modules = RootModules;
+                return null != modules && modules.Count > 0;
+            }
+        }
+
         #endregion
 
         #region Logging and status bar updates
@@ -544,17 +579,38 @@ namespace Microsoft.NodejsTools.Project {
             if (cmdGroup == GuidList.guidNodeCmdSet){
                 switch (cmd){
                     case PkgCmdId.cmdidNpmManageModules:
+                        result = IsCurrentStateASuppressCommandsMode()
+                            ? QueryStatusResult.SUPPORTED
+                            : QueryStatusResult.ENABLED | QueryStatusResult.SUPPORTED;
+                        return VSConstants.S_OK;
+
                     case PkgCmdId.cmdidNpmInstallModules:
-                    case PkgCmdId.cmdidNpmUpdateModules:
-                        if (! IsCurrentStateASuppressCommandsMode()){
-                            result = QueryStatusResult.ENABLED | QueryStatusResult.SUPPORTED;
-                        } else {
+                        if (IsCurrentStateASuppressCommandsMode()){
                             result = QueryStatusResult.SUPPORTED;
+                        } else{
+                            if (HasMissingModules){
+                                result = QueryStatusResult.ENABLED | QueryStatusResult.SUPPORTED;
+                            } else{
+                                result = QueryStatusResult.SUPPORTED;
+                            }
+                        }
+                        return VSConstants.S_OK;
+
+                    case PkgCmdId.cmdidNpmUpdateModules:
+                        if (IsCurrentStateASuppressCommandsMode()){
+                            result = QueryStatusResult.SUPPORTED;
+                        } else{
+                            if (HasModules){
+                                result = QueryStatusResult.ENABLED | QueryStatusResult.SUPPORTED;
+                            } else{
+                                result = QueryStatusResult.SUPPORTED;
+                            }
                         }
                         return VSConstants.S_OK;
 
                     case PkgCmdId.cmdidNpmInstallSingleMissingModule:
                     case PkgCmdId.cmdidNpmUninstallModule:
+                    case PkgCmdId.cmdidNpmUpdateSingleModule:
                         result = QueryStatusResult.SUPPORTED | QueryStatusResult.INVISIBLE;
                         return VSConstants.S_OK;
                 }
@@ -577,11 +633,6 @@ namespace Microsoft.NodejsTools.Project {
                     case PkgCmdId.cmdidNpmUpdateModules:
                         UpdateModules();
                         return VSConstants.S_OK;
-
-                    //case PkgCmdId.cmdidNpmUninstallModule:
-                    //    UninstallModules();
-                    //    return VSConstants.S_OK;
-
                 }
             }
 
@@ -663,6 +714,19 @@ namespace Microsoft.NodejsTools.Project {
                     }
                 }
             } catch (NpmNotFoundException nnfe) {
+                ErrorHelper.ReportNpmNotInstalled(null, nnfe);
+            } finally{
+                AllowCommands();
+            }
+        }
+
+        public async void UpdateModule(IPackage package){
+            DoPreCommandActions();
+            try{
+                using (var commander = NpmController.CreateNpmCommander()){
+                    await commander.UpdatePackagesAsync(new[]{package});
+                }
+            } catch (NpmNotFoundException nnfe){
                 ErrorHelper.ReportNpmNotInstalled(null, nnfe);
             } finally{
                 AllowCommands();

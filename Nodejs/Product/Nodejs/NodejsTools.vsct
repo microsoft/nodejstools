@@ -194,6 +194,16 @@
         </Strings>
       </Button>
 
+      <Button guid="guidNodeToolsCmdSet" id="cmdidNpmUpdateSingleModule" priority="0x8270" type="Button">
+        <Parent guid="guidNodeToolsCmdSet" id="CodeFileGroup" />
+        <CommandFlag>DefaultInvisible</CommandFlag>
+        <CommandFlag>DynamicVisibility</CommandFlag>
+        <Strings>
+          <CommandName>cmdidNpmUpdateSingleModule</CommandName>
+          <ButtonText>&amp;Update Module</ButtonText>
+        </Strings>
+      </Button>
+
       <Button guid="guidNodeToolsCmdSet" id="cmdidImportWizard" priority="0x010" type="Button">
         <Parent guid="guidNodeToolsCmdSet" id="ToolsMenuItemsGroup"/>
         <CommandFlag>DefaultInvisible</CommandFlag>
@@ -262,6 +272,7 @@
       <IDSymbol name="cmdidNpmUpdateModules" value="0x0209" />
       <IDSymbol name="cmdidNpmUninstallModule" value="0x020A" />
       <IDSymbol name="cmdidNpmInstallSingleMissingModule" value="0x020B" />
+      <IDSymbol name="cmdidNpmUpdateSingleModule" value="0x020C" />
 
       <!-- Shared commands, defined in CommonConstants.cs -->
       <IDSymbol name="cmdidAddExistingFolder" value="0x10001" />
