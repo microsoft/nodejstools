@@ -422,8 +422,6 @@
     <Compile Include="NodejsProjectionBuffer.cs" />
     <Compile Include="NodejsProject.cs" />
     <Compile Include="NodejsProjectFactory.cs" />
-    <Compile Include="OAProject.cs" />
-    <Compile Include="OAProperty.cs" />
     <Compile Include="PkgCmdId.cs" />
     <Compile Include="Project\NodeFileLibraryNode.cs" />
     <Compile Include="Project\NodejsGeneralPropertyPage.cs" />

@@ -15,6 +15,7 @@
 using System;
 using System.IO;
 using System.Runtime.InteropServices;
+using Microsoft.VisualStudio;
 using Microsoft.VisualStudio.Shell.Interop;
 
 namespace Microsoft.NodejsTools.Profiling {
@@ -71,9 +72,11 @@ namespace Microsoft.NodejsTools.Profiling {
         void INodeProfiling.RemoveSession(INodeProfileSession session, bool deleteFromDisk) {
             for (int i = 0; i < _sessions.Sessions.Count; i++) {
                 if (session == _sessions.Sessions[i].GetAutomationObject()) {
-                    _sessions.DeleteItem(
-                        (uint)(deleteFromDisk ? __VSDELETEITEMOPERATION.DELITEMOP_DeleteFromStorage : __VSDELETEITEMOPERATION.DELITEMOP_RemoveFromProject),
-                        (uint)_sessions.Sessions[i].ItemId
+                    ErrorHandler.ThrowOnFailure(
+                        _sessions.DeleteItem(
+                            (uint)(deleteFromDisk ? __VSDELETEITEMOPERATION.DELITEMOP_DeleteFromStorage : __VSDELETEITEMOPERATION.DELITEMOP_RemoveFromProject),
+                            (uint)_sessions.Sessions[i].ItemId
+                        )
                     );
                     return;
                 }

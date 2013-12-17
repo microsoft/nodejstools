@@ -49,14 +49,14 @@ namespace Microsoft.Nodejs.Tests.UI {
                 var openFile = OpenProjectItem("server.js", out window);
 
                 openFile.MoveCaret(7, 1);
-                Keyboard.Type("function\t");
+                Keyboard.Type("functio\t");
                 openFile.WaitForText(@"var http = require('http');
 
 var port = process.env.port || 1337;
 var mymod = require('./mymod.js');
 var mutatemod = require('./mutatemod.js');
 
-function    
+function
 http.createServer(function (req, res) {
     res.writeHead(200, { 'Content-Type': 'text/plain' });
     res.end('Hello World\n');
@@ -223,7 +223,7 @@ http.createServer(function (req, res) {
                     if (testCase.File != curFile) {
                         openFile = OpenProjectItem(testCase.File, out window, @"TestData\RequireTestApp\RequireTestApp.sln");
                         app.OpenSolutionExplorer();
-                        app.SolutionExplorerTreeView.WaitForItem("Solution 'RequireTestApp' (1 project)", "RequireTestApp", "References");
+                        app.SolutionExplorerTreeView.WaitForItem("Solution 'RequireTestApp' (1 project)", "RequireTestApp", "dup.js");
                         text = openFile.Text;
                         curFile = testCase.File;
                     }
@@ -252,57 +252,55 @@ http.createServer(function (req, res) {
         [HostType("TC Dynamic"), DynamicHostType(typeof(VsIdeHostAdapter))]
         public void GlobalIntellisenseProjectReload() {
             Window window;
+            try {
+                using (var app = new VisualStudioApp(VsIdeTestHostContext.Dte)) {
+                    app.OpenProject(Path.GetFullPath(@"TestData\NodeAppWithModule\NodeAppWithModule.sln"));
 
-            //OpenProject();
-            //var file = OpenProjectItem("server.js", out window);
-            //var dispatcher = ((UIElement)file.TextView).Dispatcher;
-
-            using (var app = new VisualStudioApp(VsIdeTestHostContext.Dte)) {
-                app.OpenProject(Path.GetFullPath(@"TestData\NodeAppWithModule\NodeAppWithModule.sln"));
-
-                var projectName = "NodeAppWithModule";
-                var project = app.SolutionExplorerTreeView.WaitForItem(
-                    "Solution '" + projectName + "' (1 project)",
-                    projectName);
+                    var projectName = "NodeAppWithModule";
+                    var project = app.SolutionExplorerTreeView.WaitForItem(
+                        "Solution '" + projectName + "' (1 project)",
+                        projectName);
 
 
-                var projectNode = new TreeNode(project);
-                projectNode.SetFocus();
+                    var projectNode = new TreeNode(project);
+                    projectNode.SetFocus();
 
-                System.Threading.Thread.Sleep(2000);
-                Keyboard.Type(System.Windows.Input.Key.Apps);
-                Keyboard.Type(System.Windows.Input.Key.L);
-                //dispatcher.Invoke(() => VsIdeTestHostContext.Dte.ExecuteCommand("Project.UnloadProject"));
+                    System.Threading.Thread.Sleep(2000);
+                    VsIdeTestHostContext.Dte.ExecuteCommand("Project.UnloadProject");
 
-                project = app.SolutionExplorerTreeView.WaitForItem(
-                    "Solution '" + projectName + "' (0 projects)",
-                    projectName + " (unavailable)");
+                    project = app.SolutionExplorerTreeView.WaitForItem(
+                        "Solution '" + projectName + "' (0 projects)",
+                        projectName + " (unavailable)");
 
-                projectNode = new TreeNode(project);
-                projectNode.SetFocus();
+                    projectNode = new TreeNode(project);
+                    projectNode.SetFocus();
 
-                System.Threading.Thread.Sleep(2000);
+                    System.Threading.Thread.Sleep(2000);
 
-                Keyboard.Type(System.Windows.Input.Key.Apps);
-                Keyboard.Type(System.Windows.Input.Key.L);
-                //dispatcher.Invoke(() => VsIdeTestHostContext.Dte.ExecuteCommand("Project.ReloadProject"));
+                    VsIdeTestHostContext.Dte.ExecuteCommand("Project.ReloadProject");
 
-                app.SolutionExplorerTreeView.WaitForItem(
-                    "Solution '" + projectName + "' (1 project)",
-                    projectName,
-                    "server.js"
-                );
+                    app.SolutionExplorerTreeView.WaitForItem(
+                        "Solution '" + projectName + "' (1 project)",
+                        projectName,
+                        "server.js"
+                    );
 
-                var openFile = OpenItem("server.js", VsIdeTestHostContext.Dte.Solution.Projects.Item(1), out window);
+                    var openFile = OpenItem("server.js", VsIdeTestHostContext.Dte.Solution.Projects.Item(1), out window);
 
-                openFile.MoveCaret(6, 1);
-                Keyboard.Type("process.");
-                using (var session = openFile.WaitForSession<ICompletionSession>()) {
+                    openFile.MoveCaret(6, 1);
+                    Keyboard.Type("process.");
+                    using (var session = openFile.WaitForSession<ICompletionSession>()) {
 
-                    var completions = session.Session.CompletionSets.First().Completions.Select(x => x.InsertionText);
-                    Assert.IsTrue(completions.Contains("abort"));
-                    Assert.IsTrue(completions.Contains("chdir"));
+                        var completions = session.Session.CompletionSets.First().Completions.Select(x => x.InsertionText);
+                        Assert.IsTrue(completions.Contains("abort"));
+                        Assert.IsTrue(completions.Contains("chdir"));
+                    }
                 }
+            } finally {
+                // if the test fails while the project is unloaded then the .suo file will 
+                // indicate that the project shouldn't be loaded which will cause tests
+                // which are using the same project to fail later during the run.
+                File.Delete(Path.GetFullPath(@"TestData\NodeAppWithModule\NodeAppWithModule.v" + AssemblyVersionInfo.VSMajorVersion + ".suo"));
             }
         }
 
@@ -413,8 +411,8 @@ sd.StringDecoder
 
                 newProjDialog.FocusLanguageNode("JavaScript");
 
-                var djangoApp = newProjDialog.ProjectTypes.FindItem("Blank Node.js Application");
-                djangoApp.Select();
+                var nodejsApp = newProjDialog.ProjectTypes.FindItem("Blank Node.js Web Application");
+                nodejsApp.Select();
 
                 newProjDialog.ClickOK();
 
@@ -653,6 +651,8 @@ sd.StringDecoder
         [HostType("TC Dynamic"), DynamicHostType(typeof(VsIdeHostAdapter))]
         public void TestBrowserLaunch() {
             for (int mode = 0; mode < 2; mode++) {
+                var startingProcesses = System.Diagnostics.Process.GetProcessesByName("iexplore").Select(x => x.Id).ToSet();
+
                 using (var app = new VisualStudioApp(VsIdeTestHostContext.Dte)) {
                     var testFile = Path.Combine(Path.GetTempPath(), "nodejstest.txt");
                     if (File.Exists(testFile)) {
@@ -666,6 +666,22 @@ sd.StringDecoder
                     }
 
                     Assert.IsTrue(File.Exists(testFile), "test file not created");
+                }
+
+                System.Threading.Thread.Sleep(2000);
+                var endingProcesses = System.Diagnostics.Process.GetProcessesByName("iexplore").Select(x => x.Id);
+                var newProcesses = endingProcesses.Except(startingProcesses).ToArray();
+
+                if (mode == 0) {
+                    // new processes should have been shutdown when debugging stopped
+                    Assert.AreEqual(0, newProcesses.Length);
+                } else {
+                    // no debugging, process will hang around
+                    Assert.IsTrue(newProcesses.Length > 0);
+                    foreach (var proc in newProcesses) {
+                        Console.WriteLine("Killing process {0}", proc);
+                        System.Diagnostics.Process.GetProcessById(proc).Kill();
+                    }
                 }
             }
         }

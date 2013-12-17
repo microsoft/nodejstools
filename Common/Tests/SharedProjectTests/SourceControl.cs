@@ -360,6 +360,8 @@ namespace Microsoft.VisualStudioTools.SharedProjectTests {
 
                     app.SelectSourceControlProvider("Test Source Provider");
 
+                    TestSccProvider.DocumentEvents.Clear();
+
                     using (var solution = SourceControlProject(projectType).Generate()) {
                         try {
                             var project = app.OpenProject(solution.Filename);

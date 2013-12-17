@@ -56,14 +56,18 @@ namespace Microsoft.NodejsTools.Project {
         [SRDescriptionAttribute(SR.NodeExePathDescription)]
         public string NodeExePath {
             get {
-                var res = this.Node.ProjectMgr.GetProjectProperty(NodejsConstants.NodeExePath, true);
-                if (String.IsNullOrWhiteSpace(res)) {
-                    return Nodejs.NodeExePath ?? "";
-                }
-                return res;
+                return UIThread.Instance.RunSync(() => {
+                    var res = this.Node.ProjectMgr.GetProjectProperty(NodejsConstants.NodeExePath, true);
+                    if (String.IsNullOrWhiteSpace(res)) {
+                        return Nodejs.NodeExePath ?? "";
+                    }
+                    return res;
+                });
             }
             set {
-                Node.ProjectMgr.SetProjectProperty(NodejsConstants.NodeExePath, value);
+                UIThread.Instance.RunSync(() => {
+                    Node.ProjectMgr.SetProjectProperty(NodejsConstants.NodeExePath, value);
+                });
             }
         }
 
@@ -72,10 +76,14 @@ namespace Microsoft.NodejsTools.Project {
         [SRDescriptionAttribute(SR.NodeExeArgumentsDescription)]
         public string NodeExeArguments {
             get {
-                return this.Node.ProjectMgr.GetProjectProperty(NodejsConstants.NodeExeArguments, true);
+                return UIThread.Instance.RunSync(() => {
+                    return this.Node.ProjectMgr.GetProjectProperty(NodejsConstants.NodeExeArguments, true);
+                });
             }
             set {
-                Node.ProjectMgr.SetProjectProperty(NodejsConstants.NodeExeArguments, value);
+                UIThread.Instance.RunSync(() => {
+                    Node.ProjectMgr.SetProjectProperty(NodejsConstants.NodeExeArguments, value);
+                });
             }
         }
 
@@ -84,10 +92,14 @@ namespace Microsoft.NodejsTools.Project {
         [SRDescriptionAttribute(SR.ScriptArgumentsDescription)]
         public string ScriptArguments {
             get {
-                return this.Node.ProjectMgr.GetProjectProperty(NodejsConstants.ScriptArguments, true);
+                return UIThread.Instance.RunSync(() => {
+                    return this.Node.ProjectMgr.GetProjectProperty(NodejsConstants.ScriptArguments, true);
+                });
             }
             set {
-                Node.ProjectMgr.SetProjectProperty(NodejsConstants.ScriptArguments, value);
+                UIThread.Instance.RunSync(() => {
+                    Node.ProjectMgr.SetProjectProperty(NodejsConstants.ScriptArguments, value);
+                });
             }
         }
 
@@ -96,14 +108,18 @@ namespace Microsoft.NodejsTools.Project {
         [SRDescriptionAttribute(SR.NodejsPortDescription)]
         public int? NodejsPort {
             get {
-                int port;
-                if (Int32.TryParse(Node.ProjectMgr.GetProjectProperty(NodejsConstants.NodejsPort, true), out port)) {
-                    return port;
-                }
-                return null;
+                return UIThread.Instance.RunSync((Func<int?>)(() => {
+                    int port;
+                    if (Int32.TryParse(Node.ProjectMgr.GetProjectProperty(NodejsConstants.NodejsPort, true), out port)) {
+                        return port;
+                    }
+                    return null;
+                }));
             }
             set {
-                Node.ProjectMgr.SetProjectProperty(NodejsConstants.NodejsPort, value != null ? value.ToString() : "");
+                UIThread.Instance.RunSync(() => {
+                    Node.ProjectMgr.SetProjectProperty(NodejsConstants.NodejsPort, value != null ? value.ToString() : "");
+                });
             }
         }
 
@@ -112,10 +128,14 @@ namespace Microsoft.NodejsTools.Project {
         [SRDescriptionAttribute(SR.LaunchUrlDescription)]
         public string LaunchUrl {
             get {
-                return this.Node.ProjectMgr.GetProjectProperty(NodejsConstants.LaunchUrl, true);
+                return UIThread.Instance.RunSync(() => {
+                    return this.Node.ProjectMgr.GetProjectProperty(NodejsConstants.LaunchUrl, true);
+                });
             }
             set {
-                Node.ProjectMgr.SetProjectProperty(NodejsConstants.LaunchUrl, value);
+                UIThread.Instance.RunSync(() => {
+                    Node.ProjectMgr.SetProjectProperty(NodejsConstants.LaunchUrl, value);
+                });
             }
         }
 
@@ -124,14 +144,18 @@ namespace Microsoft.NodejsTools.Project {
         [SRDescriptionAttribute(SR.StartWebBrowserDescription)]
         public bool StartWebBrowser {
             get {
-                bool res;
-                if (Boolean.TryParse(Node.ProjectMgr.GetProjectProperty(NodejsConstants.StartWebBrowser, true), out res)) {
-                    return res;
-                }
-                return true;
+                return UIThread.Instance.RunSync(() => {
+                    bool res;
+                    if (Boolean.TryParse(Node.ProjectMgr.GetProjectProperty(NodejsConstants.StartWebBrowser, true), out res)) {
+                        return res;
+                    }
+                    return true;
+                });
             }
             set {
-                Node.ProjectMgr.SetProjectProperty(NodejsConstants.StartWebBrowser, value.ToString());
+                UIThread.Instance.RunSync(() => {
+                    Node.ProjectMgr.SetProjectProperty(NodejsConstants.StartWebBrowser, value.ToString());
+                });
             }
         }
 

@@ -1877,6 +1877,8 @@ namespace Microsoft.VisualStudioTools.Project
         /// <returns>null if property does not exist, otherwise value of the property</returns>
         public virtual string GetProjectProperty(string propertyName, bool resetCache)
         {
+            UIThread.Instance.MustBeCalledFromUIThread();
+
             MSBuildExecution.ProjectPropertyInstance property = GetMsBuildProperty(propertyName, resetCache);
             if (property == null)
                 return null;
@@ -1892,6 +1894,8 @@ namespace Microsoft.VisualStudioTools.Project
         /// <param name="propertyName">Name of the property to get</param>
         public virtual string GetUnevaluatedProperty(string propertyName)
         {
+            UIThread.Instance.MustBeCalledFromUIThread();
+
             var res = this.buildProject.GetProperty(propertyName);
 
             if (res != null)
@@ -1909,6 +1913,7 @@ namespace Microsoft.VisualStudioTools.Project
         public virtual void SetProjectProperty(string propertyName, string propertyValue)
         {
             Utilities.ArgumentNotNull("propertyName", propertyName);
+            UIThread.Instance.MustBeCalledFromUIThread();
 
             string oldValue = null;
             ProjectPropertyInstance oldProp = GetMsBuildProperty(propertyName, true);
