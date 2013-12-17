@@ -31,6 +31,7 @@ namespace Microsoft.NodejsTools {
         public const int cmdidNpmInstallModules             = 0x208;
         public const int cmdidNpmUpdateModules              = 0x209;
         public const int cmdidNpmUninstallModule            = 0x20A;
+        public const int cmdidNpmInstallSingleMissingModule = 0x20B;
 
         public const uint menuIdNPM = 0x1000;
     }

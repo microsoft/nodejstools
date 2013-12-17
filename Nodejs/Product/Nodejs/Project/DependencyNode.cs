@@ -84,7 +84,13 @@ namespace Microsoft.NodejsTools.Project{
             get { return VSConstants.GUID_ItemType_VirtualFolder; }
         }
 
-        public override object GetIconHandle(bool open){
+        public override int MenuCommandId
+        {
+            get { return VsMenus.IDM_VS_CTXT_ITEMNODE; }
+        }
+
+        public override object GetIconHandle(bool open)
+        {
             int imageIndex = _projectNode.ImageIndexDependency;
             if (Package.IsMissing){
                 if (Package.IsDevDependency){
@@ -119,15 +125,75 @@ namespace Microsoft.NodejsTools.Project{
 
         #endregion
 
-        #region Dependency actions
+        //#region Dependency actions
 
-        public async void Uninstall(){
-            var modulesNode = _projectNode.ModulesNode;
-            if (null != modulesNode){
-                using (var commander = modulesNode.NpmController.CreateNpmCommander()){
-                    await commander.UninstallPackageAsync(Package.Name);
+        //public async void Uninstall(){
+        //    var modulesNode = _projectNode.ModulesNode;
+        //    if (null != modulesNode){
+        //        using (var commander = modulesNode.NpmController.CreateNpmCommander()){
+        //            await commander.UninstallPackageAsync(Package.Name);
+        //        }
+        //    }
+        //}
+
+        //#endregion
+
+        #region Command handling
+
+        internal override int QueryStatusOnNode(Guid cmdGroup, uint cmd, IntPtr pCmdText, ref QueryStatusResult result)
+        {
+            //  Latter condition is because it's only valid to carry out npm operations
+            //  on top level dependencies of the user's project, not sub-dependencies.
+            //  Performing operations on sub-dependencies would just break things.
+            if (cmdGroup == GuidList.guidNodeCmdSet && null == _parent)
+            {
+                switch (cmd)
+                {
+                    case PkgCmdId.cmdidNpmInstallSingleMissingModule:
+                    case PkgCmdId.cmdidNpmUninstallModule:
+                        if (null != _projectNode.ModulesNode && !_projectNode.ModulesNode.IsCurrentStateASuppressCommandsMode())
+                        {
+                            result = QueryStatusResult.ENABLED | QueryStatusResult.SUPPORTED;
+                        }
+                        else
+                        {
+                            result = QueryStatusResult.SUPPORTED;
+                        }
+                        return VSConstants.S_OK;
+
+                    case PkgCmdId.cmdidNpmManageModules:
+                    case PkgCmdId.cmdidNpmInstallModules:
+                    case PkgCmdId.cmdidNpmUpdateModules:
+                        result = QueryStatusResult.SUPPORTED | QueryStatusResult.INVISIBLE;
+                        return VSConstants.S_OK;
                 }
             }
+
+            return base.QueryStatusOnNode(cmdGroup, cmd, pCmdText, ref result);
+        }
+
+        internal override int ExecCommandOnNode(Guid cmdGroup, uint cmd, uint nCmdexecopt, IntPtr pvaIn, IntPtr pvaOut)
+        {
+            if (cmdGroup == GuidList.guidNodeCmdSet && null == _parent)
+            {
+                switch (cmd)
+                {
+                    case PkgCmdId.cmdidNpmInstallSingleMissingModule:
+                        if (null != _projectNode.ModulesNode){
+                            _projectNode.ModulesNode.InstallMissingModule(Package);
+                        }
+                        return VSConstants.S_OK;
+
+                    case PkgCmdId.cmdidNpmUninstallModule:
+                        if (null != _projectNode.ModulesNode){
+                            _projectNode.ModulesNode.UninstallModule(Package);
+                        }
+                        return VSConstants.S_OK;
+
+                }
+            }
+
+            return base.ExecCommandOnNode(cmdGroup, cmd, nCmdexecopt, pvaIn, pvaOut);
         }
 
         #endregion

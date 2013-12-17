@@ -528,7 +528,7 @@ namespace Microsoft.NodejsTools.Project {
 
         #region Command handling
 
-        private bool IsCurrentStateASuppressCommandsMode(){
+        internal bool IsCurrentStateASuppressCommandsMode(){
             return _suppressCommands || ProjectMgr.IsCurrentStateASuppressCommandsMode();
         }
 
@@ -546,7 +546,6 @@ namespace Microsoft.NodejsTools.Project {
                     case PkgCmdId.cmdidNpmManageModules:
                     case PkgCmdId.cmdidNpmInstallModules:
                     case PkgCmdId.cmdidNpmUpdateModules:
-                    case PkgCmdId.cmdidNpmUninstallModule:
                         if (! IsCurrentStateASuppressCommandsMode()){
                             result = QueryStatusResult.ENABLED | QueryStatusResult.SUPPORTED;
                         } else {
@@ -554,6 +553,10 @@ namespace Microsoft.NodejsTools.Project {
                         }
                         return VSConstants.S_OK;
 
+                    case PkgCmdId.cmdidNpmInstallSingleMissingModule:
+                    case PkgCmdId.cmdidNpmUninstallModule:
+                        result = QueryStatusResult.SUPPORTED | QueryStatusResult.INVISIBLE;
+                        return VSConstants.S_OK;
                 }
             }
 
@@ -575,9 +578,9 @@ namespace Microsoft.NodejsTools.Project {
                         UpdateModules();
                         return VSConstants.S_OK;
 
-                    case PkgCmdId.cmdidNpmUninstallModule:
-                        UninstallModules();
-                        return VSConstants.S_OK;
+                    //case PkgCmdId.cmdidNpmUninstallModule:
+                    //    UninstallModules();
+                    //    return VSConstants.S_OK;
 
                 }
             }
@@ -606,6 +609,39 @@ namespace Microsoft.NodejsTools.Project {
             try{
                 using (var commander = NpmController.CreateNpmCommander()){
                     await commander.Install();
+                }
+            } catch (NpmNotFoundException nnfe){
+                ErrorHelper.ReportNpmNotInstalled(null, nnfe);
+            } finally{
+                AllowCommands();
+            }
+        }
+
+        public async void InstallMissingModule(IPackage package){
+            if (null == package){
+                return;
+            }
+
+            var root = _npmController.RootPackage;
+            if (null == root){
+                return;
+            }
+
+            var pkgJson = root.PackageJson;
+            if (null == pkgJson){
+                return;
+            }
+
+            var dep = root.PackageJson.AllDependencies[package.Name];
+
+            DoPreCommandActions();
+            try{
+                using (var commander = NpmController.CreateNpmCommander()){
+                    await commander.InstallPackageByVersionAsync(
+                        package.Name,
+                        null == dep ? "*" : dep.VersionRangeText,
+                        DependencyType.Standard,
+                        false);
                 }
             } catch (NpmNotFoundException nnfe){
                 ErrorHelper.ReportNpmNotInstalled(null, nnfe);
@@ -645,6 +681,29 @@ namespace Microsoft.NodejsTools.Project {
             } catch (NpmNotFoundException nnfe) {
                 ErrorHelper.ReportNpmNotInstalled(null, nnfe);
             } finally{
+                AllowCommands();
+            }
+        }
+
+        public async void UninstallModule(IPackage package)
+        {
+            if (null == package){
+                return;
+            }
+            DoPreCommandActions();
+            try
+            {
+                using (var commander = NpmController.CreateNpmCommander())
+                {
+                    await commander.UninstallPackageAsync(package.Name);
+                }
+            }
+            catch (NpmNotFoundException nnfe)
+            {
+                ErrorHelper.ReportNpmNotInstalled(null, nnfe);
+            }
+            finally
+            {
                 AllowCommands();
             }
         }
