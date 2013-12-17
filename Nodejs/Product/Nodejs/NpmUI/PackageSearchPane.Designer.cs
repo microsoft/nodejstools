@@ -52,7 +52,12 @@ namespace Microsoft.NodejsTools.NpmUI
             this._txtFind = new System.Windows.Forms.TextBox();
             this._labelFind = new System.Windows.Forms.Label();
             this._listResults = new System.Windows.Forms.ListView();
+            this._panelRefresh = new System.Windows.Forms.Panel();
+            this._buttonRefresh = new System.Windows.Forms.Button();
+            this._labelLastUpdateTime = new System.Windows.Forms.Label();
+            this._labelLastUpdated = new System.Windows.Forms.Label();
             this._panelFind.SuspendLayout();
+            this._panelRefresh.SuspendLayout();
             this.SuspendLayout();
             // 
             // _panelFind
@@ -94,7 +99,7 @@ namespace Microsoft.NodejsTools.NpmUI
             this._listResults.Name = "_listResults";
             this._listResults.OwnerDraw = true;
             this._listResults.ShowGroups = false;
-            this._listResults.Size = new System.Drawing.Size(636, 433);
+            this._listResults.Size = new System.Drawing.Size(636, 406);
             this._listResults.TabIndex = 1;
             this._listResults.UseCompatibleStateImageBehavior = false;
             this._listResults.View = System.Windows.Forms.View.Details;
@@ -103,16 +108,61 @@ namespace Microsoft.NodejsTools.NpmUI
             this._listResults.RetrieveVirtualItem += new System.Windows.Forms.RetrieveVirtualItemEventHandler(this._listResults_RetrieveVirtualItem);
             this._listResults.SelectedIndexChanged += new System.EventHandler(this._listResults_SelectedIndexChanged);
             // 
+            // _panelRefresh
+            // 
+            this._panelRefresh.Controls.Add(this._buttonRefresh);
+            this._panelRefresh.Controls.Add(this._labelLastUpdateTime);
+            this._panelRefresh.Controls.Add(this._labelLastUpdated);
+            this._panelRefresh.Dock = System.Windows.Forms.DockStyle.Bottom;
+            this._panelRefresh.Location = new System.Drawing.Point(0, 430);
+            this._panelRefresh.Name = "_panelRefresh";
+            this._panelRefresh.Size = new System.Drawing.Size(636, 27);
+            this._panelRefresh.TabIndex = 2;
+            // 
+            // _buttonRefresh
+            // 
+            this._buttonRefresh.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
+            this._buttonRefresh.Location = new System.Drawing.Point(512, 4);
+            this._buttonRefresh.Name = "_buttonRefresh";
+            this._buttonRefresh.Size = new System.Drawing.Size(121, 23);
+            this._buttonRefresh.TabIndex = 2;
+            this._buttonRefresh.Text = "&Refresh Catalog";
+            this._buttonRefresh.UseVisualStyleBackColor = true;
+            this._buttonRefresh.Click += new System.EventHandler(this._buttonRefresh_Click);
+            // 
+            // _labelLastUpdateTime
+            // 
+            this._labelLastUpdateTime.AutoSize = true;
+            this._labelLastUpdateTime.BackColor = System.Drawing.Color.Transparent;
+            this._labelLastUpdateTime.Location = new System.Drawing.Point(118, 9);
+            this._labelLastUpdateTime.Name = "_labelLastUpdateTime";
+            this._labelLastUpdateTime.Size = new System.Drawing.Size(95, 13);
+            this._labelLastUpdateTime.TabIndex = 1;
+            this._labelLastUpdateTime.Text = "Today at 10:00AM";
+            // 
+            // _labelLastUpdated
+            // 
+            this._labelLastUpdated.AutoSize = true;
+            this._labelLastUpdated.BackColor = System.Drawing.Color.Transparent;
+            this._labelLastUpdated.Location = new System.Drawing.Point(4, 9);
+            this._labelLastUpdated.Name = "_labelLastUpdated";
+            this._labelLastUpdated.Size = new System.Drawing.Size(107, 13);
+            this._labelLastUpdated.TabIndex = 0;
+            this._labelLastUpdated.Text = "Catalog last updated:";
+            // 
             // PackageSearchPane
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.Controls.Add(this._listResults);
+            this.Controls.Add(this._panelRefresh);
             this.Controls.Add(this._panelFind);
             this.Name = "PackageSearchPane";
             this.Size = new System.Drawing.Size(636, 457);
             this._panelFind.ResumeLayout(false);
             this._panelFind.PerformLayout();
+            this._panelRefresh.ResumeLayout(false);
+            this._panelRefresh.PerformLayout();
             this.ResumeLayout(false);
 
         }
@@ -123,5 +173,9 @@ namespace Microsoft.NodejsTools.NpmUI
         private System.Windows.Forms.TextBox _txtFind;
         private System.Windows.Forms.Label _labelFind;
         private System.Windows.Forms.ListView _listResults;
+        private System.Windows.Forms.Panel _panelRefresh;
+        private System.Windows.Forms.Button _buttonRefresh;
+        private System.Windows.Forms.Label _labelLastUpdateTime;
+        private System.Windows.Forms.Label _labelLastUpdated;
     }
 }

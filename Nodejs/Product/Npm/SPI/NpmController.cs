@@ -20,11 +20,11 @@ using System.Threading.Tasks;
 using Newtonsoft.Json;
 
 namespace Microsoft.NodejsTools.Npm.SPI {
-    internal class NpmController : INpmController {
+    internal class NpmController : AbstractNpmLogSource, INpmController {
 
         //  *Really* don't want to retrieve this more than once:
         //  47,000 packages takes a while.
-        private static IList<IPackage> _sRepoCatalogue;
+        private static IPackageCatalog _sRepoCatalogue;
 
         private string _fullPathToRootPackageDirectory;
         private bool _showMissingDevOptionalSubPackages;
@@ -77,28 +77,27 @@ namespace Microsoft.NodejsTools.Npm.SPI {
 
         public void Refresh() {
             OnStartingRefresh();
-            lock (_lock) {
-                try {
-                    RootPackage = RootPackageFactory.Create(
-                        _fullPathToRootPackageDirectory,
-                        _showMissingDevOptionalSubPackages);
+            try {
+                RootPackage = RootPackageFactory.Create(
+                            _fullPathToRootPackageDirectory,
+                            _showMissingDevOptionalSubPackages);
+                
+                var command = new NpmLsCommand(_fullPathToRootPackageDirectory, true, PathToNpm,
+                    _useFallbackIfNpmNotFound);
 
-                    var command = new NpmLsCommand(_fullPathToRootPackageDirectory, true, PathToNpm,
-                        _useFallbackIfNpmNotFound);
-
-                    command.ExecuteAsync().ContinueWith(task => {
-                        try {
-                            GlobalPackages = task.Result
-                                ? RootPackageFactory.Create(command.ListBaseDirectory)
-                                : null;
-                        } catch (IOException) { }
-                        OnFinishedRefresh();
-                    });
-                } catch (IOException) {
-                    // Can sometimes happen when packages are still installing because the file may still be used by another process
-                }
+                command.ExecuteAsync().ContinueWith(task => {
+                    try {
+                        GlobalPackages = task.Result
+                            ? RootPackageFactory.Create(command.ListBaseDirectory)
+                            : null;
+                    } catch (IOException) { } catch (AggregateException) { }    //  Latter for npm not installed.
+                    OnFinishedRefresh();
+                });
+            } catch (IOException) {
+                // Can sometimes happen when packages are still installing because the file may still be used by another process
+            } catch (AggregateException) {
+                //  npm not installed
             }
-            //OnFinishedRefresh();
         }
 
         public IRootPackage RootPackage {
@@ -132,41 +131,36 @@ namespace Microsoft.NodejsTools.Npm.SPI {
             return new NpmCommander(this);
         }
 
-        public event EventHandler<NpmLogEventArgs> OutputLogged;
-        public event EventHandler<NpmLogEventArgs> ErrorLogged;
-        public event EventHandler<NpmExceptionEventArgs> ExceptionLogged;
+        public void LogCommandStarted(object sender, EventArgs args) {
+            OnCommandStarted();
+        }
 
         public void LogOutput(object sender, NpmLogEventArgs e) {
-            var handlers = OutputLogged;
-            if (null != handlers) {
-                handlers(this, e);
-            }
+            OnOutputLogged(e.LogText);
         }
 
         public void LogError(object sender, NpmLogEventArgs e) {
-            var handlers = ErrorLogged;
-            if (null != handlers) {
-                handlers(this, e);
-            }
+            OnErrorLogged(e.LogText);
         }
 
         public void LogException(object sender, NpmExceptionEventArgs e) {
-            var handlers = ExceptionLogged;
-            if (null != handlers) {
-                handlers(this, e);
-            }
+            OnExceptionLogged(e.Exception);
         }
 
-        public async Task<IList<IPackage>> GetRepositoryCatalogueAsync(bool forceDownload) {
+        public void LogCommandCompleted(object sender, NpmCommandCompletedEventArgs e) {
+            OnCommandCompleted(e.Arguments, e.WithErrors, e.Cancelled);
+        }
+
+        public async Task<IPackageCatalog> GetRepositoryCatalogueAsync(bool forceDownload) {
             //  This should really be thread-safe but await can't be inside a lock so
             //  we'll just have to hope and pray this doesn't happen concurrently. Worst
             //  case is we'll end up with two retrievals, one of which will be binned,
             //  which isn't the end of the world.
-            if (null == _sRepoCatalogue || _sRepoCatalogue.Count == 0) {
+            if (null == _sRepoCatalogue || _sRepoCatalogue.Results.Count == 0 || forceDownload) {
                 Exception ex = null;
                 using (var commander = CreateNpmCommander()) {
                     commander.ExceptionLogged += (sender, args) => ex = args.Exception;
-                    _sRepoCatalogue = await commander.SearchAsync(null);
+                    _sRepoCatalogue = await commander.GetCatalogueAsync(forceDownload);
                 }
                 if (null != ex) {
                     throw ex;

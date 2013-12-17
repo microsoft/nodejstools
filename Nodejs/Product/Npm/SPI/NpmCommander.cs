@@ -19,60 +19,28 @@ using System.Text;
 using System.Threading.Tasks;
 
 namespace Microsoft.NodejsTools.Npm.SPI {
-    internal class NpmCommander : INpmCommander {
+    internal class NpmCommander : AbstractNpmLogSource, INpmCommander {
         private NpmController _npmController;
         private NpmCommand _command;
         private bool _disposed;
 
         public NpmCommander(NpmController controller) {
             _npmController = controller;
+            CommandStarted += _npmController.LogCommandStarted;
             OutputLogged += _npmController.LogOutput;
             ErrorLogged += _npmController.LogError;
             ExceptionLogged += _npmController.LogException;
+            CommandCompleted += _npmController.LogCommandCompleted;
         }
 
         public void Dispose() {
             if (!_disposed) {
                 _disposed = true;
+                CommandStarted -= _npmController.LogCommandStarted;
                 OutputLogged -= _npmController.LogOutput;
                 ErrorLogged -= _npmController.LogError;
                 ExceptionLogged -= _npmController.LogException;
-            }
-        }
-
-        private void FireNpmLogEvent(string logText, EventHandler<NpmLogEventArgs> handlers) {
-            if (null != handlers && !string.IsNullOrEmpty(logText)) {
-                handlers(this, new NpmLogEventArgs(logText));
-            }
-        }
-
-        public event EventHandler<NpmLogEventArgs> OutputLogged;
-
-        private void OnOutputLogged(string logText) {
-            FireNpmLogEvent(logText, OutputLogged);
-        }
-
-        public event EventHandler<NpmLogEventArgs> ErrorLogged;
-
-        private void OnErrorLogged(string logText) {
-            FireNpmLogEvent(logText, ErrorLogged);
-        }
-
-        public event EventHandler<NpmExceptionEventArgs> ExceptionLogged;
-
-        private void OnExceptionLogged(Exception e) {
-            var handlers = ExceptionLogged;
-            if (null != handlers) {
-                handlers(this, new NpmExceptionEventArgs(e));
-            }
-        }
-
-        public event EventHandler CommandCompleted;
-
-        private void OnCommandCompleted() {
-            var handlers = CommandCompleted;
-            if (null != handlers) {
-                handlers(this, new EventArgs());
+                CommandCompleted -= _npmController.LogCommandCompleted;
             }
         }
 
@@ -82,54 +50,94 @@ namespace Microsoft.NodejsTools.Npm.SPI {
             }
         }
 
-        //  TODO: events should be fired as data is logged, not in one massive barf at the end
-        private void FireLogEvents(NpmCommand command) {
-            //  Filter this out because we ony using search to return the entire module catalogue,
-            //  which will spew 47,000+ lines of total guff that the user probably isn't interested
-            //  in to the npm log in the output window.
-            if (command is NpmSearchCommand) {
+        private void command_CommandStarted(object sender, EventArgs e) {
+            OnCommandStarted();
+        }
+
+        private void command_ExceptionLogged(object sender, NpmExceptionEventArgs e) {
+            OnExceptionLogged(e.Exception);
+        }
+
+        private void command_ErrorLogged(object sender, NpmLogEventArgs e) {
+            OnErrorLogged(e.LogText);
+        }
+
+        private void command_OutputLogged(object sender, NpmLogEventArgs e) {
+            OnOutputLogged(e.LogText);
+        }
+
+        private void command_CommandCompleted(object sender, NpmCommandCompletedEventArgs e) {
+            OnCommandCompleted(e.Arguments, e.WithErrors, e.Cancelled);
+        }
+
+        private void RegisterLogEvents(NpmCommand command) {
+            if (command is NpmSearchCommand || command is NpmGetCatalogueCommand) {
                 return;
             }
-            OnOutputLogged(command.StandardOutput);
-            OnErrorLogged(command.StandardError);
+
+            command.CommandStarted += command_CommandStarted;
+            command.OutputLogged += command_OutputLogged;
+            command.ErrorLogged += command_ErrorLogged;
+            command.ExceptionLogged += command_ExceptionLogged;
+            command.CommandCompleted += command_CommandCompleted;
+        }
+
+        private void UnregisterLogEvents(NpmCommand command) {
+            if (command is NpmSearchCommand || command is NpmGetCatalogueCommand) {
+                return;
+            }
+
+            command.CommandStarted -= command_CommandStarted;
+            command.OutputLogged -= command_OutputLogged;
+            command.ErrorLogged -= command_ErrorLogged;
+            command.ExceptionLogged -= command_ExceptionLogged;
+            command.CommandCompleted -= command_CommandCompleted;
+        }
+
+        private async Task<bool> DoCommandExecute(bool refreshNpmController) {
+            RegisterLogEvents(_command);
+            bool success = await _command.ExecuteAsync();
+            UnregisterLogEvents(_command);
+            _npmController.Refresh();
+            return success;
+        }
+
+        public async Task<bool> Install() {
+            _command = new NpmInstallCommand(
+                _npmController.FullPathToRootPackageDirectory,
+                _npmController.PathToNpm,
+                _npmController.UseFallbackIfNpmNotFound);
+            return await DoCommandExecute(true);
         }
 
         private async Task<bool> InstallPackageByVersionAsync(
             string packageName,
             string versionRange,
             DependencyType type,
-            bool global) {
-            bool retVal = false;
-            try {
-                _command = new NpmInstallCommand(
-                    _npmController.FullPathToRootPackageDirectory,
-                    packageName,
-                    versionRange,
-                    type,
-                    global,
-                    _npmController.PathToNpm,
-                    _npmController.UseFallbackIfNpmNotFound);
-
-                retVal = await _command.ExecuteAsync();
-                FireLogEvents(_command);
-                _npmController.Refresh();
-            } catch (Exception e) {
-                OnExceptionLogged(e);
-            } finally {
-                OnCommandCompleted();
-            }
-            return retVal;
+            bool global,
+            bool saveToPackageJson) {
+            _command = new NpmInstallCommand(
+                _npmController.FullPathToRootPackageDirectory,
+                packageName,
+                versionRange,
+                type,
+                global,
+                saveToPackageJson,
+                _npmController.PathToNpm,
+                _npmController.UseFallbackIfNpmNotFound);
+            return await DoCommandExecute(true);
         }
 
         public async Task<bool> InstallPackageByVersionAsync(
             string packageName,
             string versionRange,
-            DependencyType type) {
-            return await InstallPackageByVersionAsync(packageName, versionRange, type, false);
+            DependencyType type,
+            bool saveToPackageJson) {
+            return await InstallPackageByVersionAsync(packageName, versionRange, type, false, saveToPackageJson);
         }
 
         public async Task<bool> InstallGlobalPackageByVersionAsync(string packageName, string versionRange) {
-            return await InstallPackageByVersionAsync(packageName, versionRange, DependencyType.Standard, true);
+            return await InstallPackageByVersionAsync(packageName, versionRange, DependencyType.Standard, true, false);
         }
 
         private DependencyType GetDependencyType(string packageName) {
@@ -149,25 +157,14 @@ namespace Microsoft.NodejsTools.Npm.SPI {
         }
 
         private async Task<bool> UninstallPackageAsync(string packageName, bool global) {
-            bool retVal = false;
-            try {
-                _command = new NpmUninstallCommand(
-                    _npmController.FullPathToRootPackageDirectory,
-                    packageName,
-                    GetDependencyType(packageName),
-                    global,
-                    _npmController.PathToNpm,
-                    _npmController.UseFallbackIfNpmNotFound);
-
-                retVal = await _command.ExecuteAsync();
-                FireLogEvents(_command);
-                _npmController.Refresh();
-            } catch (Exception e) {
-                OnExceptionLogged(e);
-            } finally {
-                OnCommandCompleted();
-            }
-            return retVal;
+            _command = new NpmUninstallCommand(
+                _npmController.FullPathToRootPackageDirectory,
+                packageName,
+                GetDependencyType(packageName),
+                global,
+                _npmController.PathToNpm,
+                _npmController.UseFallbackIfNpmNotFound);
+            return await DoCommandExecute(true);
         }
 
         public async Task<bool> UninstallPackageAsync(string packageName) {
@@ -179,45 +176,23 @@ namespace Microsoft.NodejsTools.Npm.SPI {
         }
 
         public async Task<IList<IPackage>> SearchAsync(string searchText) {
-            IList<IPackage> results = null;
-            try {
-                _command = new NpmSearchCommand(
-                    _npmController.FullPathToRootPackageDirectory,
-                    searchText,
-                    _npmController.PathToNpm,
-                    _npmController.UseFallbackIfNpmNotFound);
-                var success = await _command.ExecuteAsync();
-                FireLogEvents(_command);
-                if (success) {
-                    results = (_command as NpmSearchCommand).Results;
-                }
-            } catch (Exception e) {
-                OnExceptionLogged(e);
-            } finally {
-                OnCommandCompleted();
-            }
-            return results ?? new List<IPackage>();
+            _command = new NpmSearchCommand(
+                _npmController.FullPathToRootPackageDirectory,
+                searchText,
+                _npmController.PathToNpm,
+                _npmController.UseFallbackIfNpmNotFound);
+            var success = await DoCommandExecute(false);
+            return success ? (_command as NpmSearchCommand).Results : new List<IPackage>();
         }
 
-        public async Task<IList<IPackage>> GetCatalogueAsync(bool forceDownload) {
-            IList<IPackage> results = null;
-            try {
-                _command = new NpmGetCatalogueCommand(
-                    _npmController.FullPathToRootPackageDirectory,
-                    forceDownload,
-                    _npmController.PathToNpm,
-                    _npmController.UseFallbackIfNpmNotFound);
-                var success = await _command.ExecuteAsync();
-                FireLogEvents(_command);
-                if (success) {
-                    results = (_command as NpmSearchCommand).Results;
-                }
-            } catch (Exception e) {
-                OnExceptionLogged(e);
-            } finally {
-                OnCommandCompleted();
-            }
-            return results ?? new List<IPackage>();
+        public async Task<IPackageCatalog> GetCatalogueAsync(bool forceDownload) {
+            _command = new NpmGetCatalogueCommand(
+                _npmController.FullPathToRootPackageDirectory,
+                forceDownload,
+                _npmController.PathToNpm,
+                _npmController.UseFallbackIfNpmNotFound);
+            await DoCommandExecute(false);
+            return (_command as NpmGetCatalogueCommand).Catalog;
         }
 
         public async Task<bool> UpdatePackagesAsync() {
@@ -225,22 +200,12 @@ namespace Microsoft.NodejsTools.Npm.SPI {
         }
 
         public async Task<bool> UpdatePackagesAsync(IEnumerable<IPackage> packages) {
-            bool success = false;
-            try {
-                _command = new NpmUpdateCommand(
-                    _npmController.FullPathToRootPackageDirectory,
-                    packages,
-                    _npmController.PathToNpm,
-                    _npmController.UseFallbackIfNpmNotFound);
-                success = await _command.ExecuteAsync();
-                FireLogEvents(_command);
-                _npmController.Refresh();
-            } catch (Exception e) {
-                OnExceptionLogged(e);
-            } finally {
-                OnCommandCompleted();
-            }
-            return success;
+            _command = new NpmUpdateCommand(
+                _npmController.FullPathToRootPackageDirectory,
+                packages,
+                _npmController.PathToNpm,
+                _npmController.UseFallbackIfNpmNotFound);
+            return await DoCommandExecute(true);
         }
     }
 }

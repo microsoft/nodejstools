@@ -39,6 +39,12 @@ namespace Microsoft.NodejsTools.Options {
         }
 
         /// <summary>
+        /// Indicates whether or not the Output window should be shown when
+        /// npm commands are being executed.
+        /// </summary>
+        public bool ShowOutputWindowWhenExecutingNpm { get; set; }
+
+        /// <summary>
         /// The frequency at which to check for updated news. Default is once
         /// per week.
         /// </summary>
@@ -76,7 +82,8 @@ namespace Microsoft.NodejsTools.Options {
         /// a call to <see cref="SaveSettingsToStorage"/> to commit the new
         /// values.
         /// </summary>
-        public override void ResetSettings() {
+        public override void ResetSettings(){
+            ShowOutputWindowWhenExecutingNpm = true;
             _surveyNewsCheck = SurveyNewsPolicy.CheckOnceWeek;
             _surveyNewsLastCheck = DateTime.MinValue;
             _surveyNewsFeedUrl = DefaultSurveyNewsFeedUrl;
@@ -86,12 +93,14 @@ namespace Microsoft.NodejsTools.Options {
         private const string DefaultSurveyNewsFeedUrl = "http://go.microsoft.com/fwlink/?LinkId=328027";
         private const string DefaultSurveyNewsIndexUrl = "http://go.microsoft.com/fwlink/?LinkId=328029";
 
+        private const string ShowOutputWindowRunningNpm = "ShowOutputWindowRunningNpm";
         private const string SurveyNewsCheckSetting = "SurveyNewsCheck";
         private const string SurveyNewsLastCheckSetting = "SurveyNewsLastCheck";
         private const string SurveyNewsFeedUrlSetting = "SurveyNewsFeedUrl";
         private const string SurveyNewsIndexUrlSetting = "SurveyNewsIndexUrl";
 
-        public override void LoadSettingsFromStorage() {
+        public override void LoadSettingsFromStorage(){
+            ShowOutputWindowWhenExecutingNpm = LoadBool(ShowOutputWindowRunningNpm) ?? true;
             _surveyNewsCheck = LoadEnum<SurveyNewsPolicy>(SurveyNewsCheckSetting) ?? SurveyNewsPolicy.CheckOnceWeek;
             _surveyNewsLastCheck = LoadDateTime(SurveyNewsLastCheckSetting) ?? DateTime.MinValue;
             _surveyNewsFeedUrl = LoadString(SurveyNewsFeedUrlSetting) ?? DefaultSurveyNewsFeedUrl;
@@ -99,6 +108,7 @@ namespace Microsoft.NodejsTools.Options {
         }
 
         public override void SaveSettingsToStorage() {
+            SaveBool(ShowOutputWindowRunningNpm, ShowOutputWindowWhenExecutingNpm);
             SaveEnum(SurveyNewsCheckSetting, _surveyNewsCheck);
             SaveDateTime(SurveyNewsLastCheckSetting, _surveyNewsLastCheck);
         }

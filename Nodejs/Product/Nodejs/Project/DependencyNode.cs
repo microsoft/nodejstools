@@ -19,8 +19,8 @@ using Microsoft.VisualStudio;
 using Microsoft.VisualStudio.Shell;
 using Microsoft.VisualStudioTools.Project;
 
-namespace Microsoft.NodejsTools.Project{
-    internal class DependencyNode : HierarchyNode{
+namespace Microsoft.NodejsTools.Project {
+    internal class DependencyNode : HierarchyNode {
         private readonly NodejsProjectNode _projectNode;
         private readonly DependencyNode _parent;
         private readonly string _displayString;
@@ -28,28 +28,29 @@ namespace Microsoft.NodejsTools.Project{
         public DependencyNode(
             NodejsProjectNode root,
             DependencyNode parent,
-            IPackage package) : base(root){
+            IPackage package)
+            : base(root) {
             _projectNode = root;
             _parent = parent;
             Package = package;
 
             var buff = new StringBuilder(package.Name);
-            if (package.IsMissing){
+            if (package.IsMissing) {
                 buff.Append(" (missing)");
-            } else{
+            } else {
                 buff.Append('@');
                 buff.Append(package.Version);
 
-                if (! package.IsListedInParentPackageJson){
+                if (!package.IsListedInParentPackageJson) {
                     buff.Append(" (not listed in package.json)");
-                } else if (package.IsDevDependency){
+                } else if (package.IsDevDependency) {
                     buff.Append(" (dev)");
-                } else if (package.IsOptionalDependency){
+                } else if (package.IsOptionalDependency) {
                     buff.Append(" (optional)");
                 }
             }
 
-            if (package.IsBundledDependency){
+            if (package.IsBundledDependency) {
                 buff.Append("[bundled]");
             }
 
@@ -61,9 +62,9 @@ namespace Microsoft.NodejsTools.Project{
 
         #region HierarchyNode implementation
 
-        private string GetRelativeUrlFragment(){
+        private string GetRelativeUrlFragment() {
             var buff = new StringBuilder();
-            if (null != _parent){
+            if (null != _parent) {
                 buff.Append(_parent.GetRelativeUrlFragment());
                 buff.Append('/');
             }
@@ -72,40 +73,44 @@ namespace Microsoft.NodejsTools.Project{
             return buff.ToString();
         }
 
-        public override string Url{
+        public override string Url {
             get { return new Url(ProjectMgr.BaseURI, GetRelativeUrlFragment()).AbsoluteUrl; }
         }
 
-        public override string Caption{
+        public override string Caption {
             get { return _displayString; }
         }
 
-        public override Guid ItemTypeGuid{
+        public override Guid ItemTypeGuid {
             get { return VSConstants.GUID_ItemType_VirtualFolder; }
         }
 
-        public override object GetIconHandle(bool open){
+        public override int MenuCommandId {
+            get { return VsMenus.IDM_VS_CTXT_ITEMNODE; }
+        }
+
+        public override object GetIconHandle(bool open) {
             int imageIndex = _projectNode.ImageIndexDependency;
-            if (Package.IsMissing){
-                if (Package.IsDevDependency){
+            if (Package.IsMissing) {
+                if (Package.IsDevDependency) {
                     imageIndex = _projectNode.ImageIndexDependencyDevMissing;
-                } else if (Package.IsOptionalDependency){
+                } else if (Package.IsOptionalDependency) {
                     imageIndex = _projectNode.ImageIndexDependencyOptionalMissing;
-                } else if (Package.IsBundledDependency){
+                } else if (Package.IsBundledDependency) {
                     imageIndex = _projectNode.ImageIndexDependencyBundledMissing;
-                } else{
+                } else {
                     imageIndex = _projectNode.ImageIndexDependencyMissing;
                 }
-            } else{
-                if (! Package.IsListedInParentPackageJson){
+            } else {
+                if (!Package.IsListedInParentPackageJson) {
                     imageIndex = _projectNode.ImageIndexDependencyNotListed;
-                } else if (Package.IsDevDependency){
+                } else if (Package.IsDevDependency) {
                     imageIndex = _projectNode.ImageIndexDependencyDev;
-                } else if (Package.IsOptionalDependency){
+                } else if (Package.IsOptionalDependency) {
                     imageIndex = _projectNode.ImageIndexDependnecyOptional;
-                } else if (Package.IsBundledDependency){
+                } else if (Package.IsBundledDependency) {
                     imageIndex = _projectNode.ImageIndexDependencyBundled;
-                } else{
+                } else {
                     imageIndex = _projectNode.ImageIndexDependency;
                 }
             }
@@ -113,21 +118,78 @@ namespace Microsoft.NodejsTools.Project{
             return _projectNode.ImageHandler.GetIconHandle(imageIndex);
         }
 
-        public override string GetEditLabel(){
+        public override string GetEditLabel() {
             return null;
         }
 
         #endregion
 
-        #region Dependency actions
+        #region Command handling
 
-        public async void Uninstall(){
-            var modulesNode = _projectNode.ModulesNode;
-            if (null != modulesNode){
-                using (var commander = modulesNode.NpmController.CreateNpmCommander()){
-                    await commander.UninstallPackageAsync(Package.Name);
+        internal override int QueryStatusOnNode(Guid cmdGroup, uint cmd, IntPtr pCmdText, ref QueryStatusResult result) {
+            //  Latter condition is because it's only valid to carry out npm operations
+            //  on top level dependencies of the user's project, not sub-dependencies.
+            //  Performing operations on sub-dependencies would just break things.
+            if (cmdGroup == GuidList.guidNodeCmdSet && null == _parent) {
+                switch (cmd) {
+                    case PkgCmdId.cmdidNpmInstallSingleMissingModule:
+                        if (null == _projectNode.ModulesNode
+                            || _projectNode.ModulesNode.IsCurrentStateASuppressCommandsMode()) {
+                            result = QueryStatusResult.SUPPORTED;
+                        } else {
+                            if (null != Package && Package.IsMissing) {
+                                result = QueryStatusResult.ENABLED | QueryStatusResult.SUPPORTED;
+                            } else {
+                                result = QueryStatusResult.SUPPORTED;
+                            }
+                        }
+                        return VSConstants.S_OK;
+
+                    case PkgCmdId.cmdidNpmUpdateSingleModule:
+                    case PkgCmdId.cmdidNpmUninstallModule:
+                        if (null != _projectNode.ModulesNode &&
+                            !_projectNode.ModulesNode.IsCurrentStateASuppressCommandsMode()) {
+                            result = QueryStatusResult.ENABLED | QueryStatusResult.SUPPORTED;
+                        } else {
+                            result = QueryStatusResult.SUPPORTED;
+                        }
+                        return VSConstants.S_OK;
+
+                    case PkgCmdId.cmdidNpmManageModules:
+                    case PkgCmdId.cmdidNpmInstallModules:
+                    case PkgCmdId.cmdidNpmUpdateModules:
+                        result = QueryStatusResult.SUPPORTED | QueryStatusResult.INVISIBLE;
+                        return VSConstants.S_OK;
                 }
             }
+
+            return base.QueryStatusOnNode(cmdGroup, cmd, pCmdText, ref result);
+        }
+
+        internal override int ExecCommandOnNode(Guid cmdGroup, uint cmd, uint nCmdexecopt, IntPtr pvaIn, IntPtr pvaOut) {
+            if (cmdGroup == GuidList.guidNodeCmdSet && null == _parent) {
+                switch (cmd) {
+                    case PkgCmdId.cmdidNpmInstallSingleMissingModule:
+                        if (null != _projectNode.ModulesNode) {
+                            _projectNode.ModulesNode.InstallMissingModule(Package);
+                        }
+                        return VSConstants.S_OK;
+
+                    case PkgCmdId.cmdidNpmUninstallModule:
+                        if (null != _projectNode.ModulesNode) {
+                            _projectNode.ModulesNode.UninstallModule(Package);
+                        }
+                        return VSConstants.S_OK;
+
+                    case PkgCmdId.cmdidNpmUpdateSingleModule:
+                        if (null != _projectNode.ModulesNode) {
+                            _projectNode.ModulesNode.UpdateModule(Package);
+                        }
+                        return VSConstants.S_OK;
+                }
+            }
+
+            return base.ExecCommandOnNode(cmdGroup, cmd, nCmdexecopt, pvaIn, pvaOut);
         }
 
         #endregion

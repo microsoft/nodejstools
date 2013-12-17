@@ -16,23 +16,40 @@ namespace Microsoft.NodejsTools.Npm.SPI {
     internal class NpmInstallCommand : NpmCommand {
         public NpmInstallCommand(
             string fullPathToRootPackageDirectory,
+            string pathToNpm = null,
+            bool useFallbackIfNpmNotFound = true)
+            : base(fullPathToRootPackageDirectory, pathToNpm, useFallbackIfNpmNotFound) {
+            Arguments = "install";
+        }
+
+        public NpmInstallCommand(
+            string fullPathToRootPackageDirectory,
             string packageName,
             string versionRange,
             DependencyType type,
             bool global = false,
+            bool saveToPackageJson = true,
             string pathToNpm = null,
             bool useFallbackIfNpmNotFound = true)
             : base(fullPathToRootPackageDirectory, pathToNpm, useFallbackIfNpmNotFound) {
-            Arguments = string.Format(
-                "install {0} -{1}",
-                string.IsNullOrEmpty(versionRange)
-                    ? packageName
-                    : string.Format("{0}@\"{1}\"", packageName, versionRange),
-                global
-                    ? "g"
-                    : (type == DependencyType.Standard
-                           ? "-save"
-                           : (type == DependencyType.Development ? "-save-dev" : "-save-optional")));
+            if (global || saveToPackageJson) {
+                Arguments = string.Format(
+                    "install {0} -{1}",
+                    string.IsNullOrEmpty(versionRange)
+                        ? packageName
+                        : string.Format("{0}@\"{1}\"", packageName, versionRange),
+                    global
+                        ? "g"
+                        : (type == DependencyType.Standard
+                            ? "-save"
+                            : (type == DependencyType.Development ? "-save-dev" : "-save-optional")));
+            } else {
+                Arguments = string.Format(
+                    "install {0}",
+                    string.IsNullOrEmpty(versionRange)
+                        ? packageName
+                        : string.Format("{0}@\"{1}\"", packageName, versionRange));
+            }
         }
     }
 }

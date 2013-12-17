@@ -31,14 +31,32 @@ namespace NpmTests {
             return PackageJsonFactory.Create(new MockPackageJsonSource(json));
         }
 
+        protected string LoadStringFromResource(string manifestResourceName) {
+            using (
+                var reader =
+                    new StreamReader(
+                        typeof(AbstractPackageJsonTests).Assembly.GetManifestResourceStream(
+                            manifestResourceName))) {
+                return reader.ReadToEnd();
+            }
+        }
+
         protected IPackageJson LoadFromResource(string manifestResourceName) {
             using (
                 var reader =
                     new StreamReader(
                         typeof(AbstractPackageJsonTests).Assembly.GetManifestResourceStream(
                             manifestResourceName))) {
-                return LoadFrom(reader.ReadToEnd());
+                return LoadFrom(reader);
             }
+        }
+
+        protected IPackageJson LoadFromFile(string fullPathToFile) {
+            return PackageJsonFactory.Create(new FilePackageJsonSource(fullPathToFile));
+        }
+
+        protected IPackageJson LoadFrom(TextReader reader) {
+            return PackageJsonFactory.Create(new ReaderPackageJsonSource(reader));
         }
 
         private static void CheckContains(ISet<string> retrieved, IEnumerable<string> expected) {

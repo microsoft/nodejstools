@@ -12,6 +12,7 @@
  *
  * ***************************************************************************/
 
+using Microsoft.CSharp.RuntimeBinder;
 using Newtonsoft.Json.Linq;
 
 namespace Microsoft.NodejsTools.Npm.SPI {
@@ -23,15 +24,118 @@ namespace Microsoft.NodejsTools.Npm.SPI {
         public PackageJson(dynamic package) {
             _package = package;
 
-            Keywords = new Keywords(_package);
-            Licenses = new Licenses(_package);
-            Files = new PkgFiles(_package);
-            Man = new Man(_package);
-            Dependencies = new Dependencies(_package, "dependencies");
-            DevDependencies = new Dependencies(_package, "devDependencies");
-            BundledDependencies = new BundledDependencies(_package);
-            OptionalDependencies = new Dependencies(_package, "optionalDependencies");
-            AllDependencies = new Dependencies(_package, "dependencies", "devDependencies", "optionalDependencies");
+            InitKeywords();
+            InitLicenses();
+            InitFiles();
+            InitMan();
+            InitDependencies();
+            InitDevDependencies();
+            InitBundledDependencies();
+            InitOptionalDependencies();
+            InitAllDependencies();
+        }
+
+        private void WrapRuntimeBinderExceptionAndRethrow(
+            string errorProperty,
+            RuntimeBinderException rbe) {
+            throw new PackageJsonException(
+                    string.Format(@"Exception occurred retrieving {0} from package.json. The file may be invalid: you should edit it to correct an errors.
+
+The following error occurred:
+
+{1}",
+                        errorProperty,
+                        rbe));
+        }
+
+        private void InitKeywords() {
+            try {
+                Keywords = new Keywords(_package);
+            } catch (RuntimeBinderException rbe) {
+                WrapRuntimeBinderExceptionAndRethrow(
+                    "keywords",
+                    rbe);
+            }
+        }
+
+        private void InitFiles() {
+            try {
+                Files = new PkgFiles(_package);
+            } catch (RuntimeBinderException rbe) {
+                WrapRuntimeBinderExceptionAndRethrow(
+                    "files",
+                    rbe);
+            }
+        }
+
+        private void InitLicenses() {
+            try {
+                Licenses = new Licenses(_package);
+            } catch (RuntimeBinderException rbe) {
+                WrapRuntimeBinderExceptionAndRethrow(
+                    "licenses",
+                    rbe);
+            }
+        }
+
+        private void InitMan() {
+            try {
+                Man = new Man(_package);
+            } catch (RuntimeBinderException rbe) {
+                WrapRuntimeBinderExceptionAndRethrow(
+                    "man",
+                    rbe);
+            }
+        }
+
+        private void InitDependencies() {
+            try {
+                Dependencies = new Dependencies(_package, "dependencies");
+            } catch (RuntimeBinderException rbe) {
+                WrapRuntimeBinderExceptionAndRethrow(
+                    "dependencies",
+                    rbe);
+            }
+        }
+
+        private void InitDevDependencies() {
+            try {
+                DevDependencies = new Dependencies(_package, "devDependencies");
+            } catch (RuntimeBinderException rbe) {
+                WrapRuntimeBinderExceptionAndRethrow(
+                    "dev dependencies",
+                    rbe);
+            }
+        }
+
+        private void InitBundledDependencies() {
+            try {
+                BundledDependencies = new BundledDependencies(_package);
+            } catch (RuntimeBinderException rbe) {
+                WrapRuntimeBinderExceptionAndRethrow(
+                    "bundled dependencies",
+                    rbe);
+            }
+        }
+
+        private void InitOptionalDependencies() {
+            try {
+                OptionalDependencies = new Dependencies(_package, "optionalDependencies");
+            } catch (RuntimeBinderException rbe) {
+                WrapRuntimeBinderExceptionAndRethrow(
+                    "optional dependencies",
+                    rbe);
+            }
+        }
+
+        private void InitAllDependencies() {
+            try {
+                AllDependencies = new Dependencies(_package, "dependencies", "devDependencies", "optionalDependencies");
+            } catch (RuntimeBinderException rbe) {
+                WrapRuntimeBinderExceptionAndRethrow(
+                    "all dependencies",
+                    rbe);
+            }
         }
 
         public string Name {

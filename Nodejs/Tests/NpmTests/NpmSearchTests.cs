@@ -30,11 +30,11 @@ namespace NpmTests {
     public class NpmSearchTests {
 
         [ClassInitialize]
-        public static void Init(TestContext context){
+        public static void Init(TestContext context) {
             NodejsTestData.Deploy();
         }
 
-        private TextReader GetCatalogueReader(){
+        private TextReader GetCatalogueReader() {
             return new StreamReader(TestData.GetPath(@"TestData\NpmSearchData\npmsearchfullcatalog.txt"));
         }
 

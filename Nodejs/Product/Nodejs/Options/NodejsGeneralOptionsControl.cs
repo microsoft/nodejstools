@@ -25,6 +25,9 @@ namespace Microsoft.NodejsTools.Options {
         public NodejsGeneralOptionsControl() {
             InitializeComponent();
 
+            _showOutputWhenRunningNpm.Checked =
+                NodejsPackage.Instance.GeneralOptionsPage.ShowOutputWindowWhenExecutingNpm;
+
             switch (NodejsPackage.Instance.GeneralOptionsPage.SurveyNewsCheck) {
                 case SurveyNewsPolicy.Disabled: _surveyNewsCheckCombo.SelectedIndex = SurveyNewsNeverIndex; break;
                 case SurveyNewsPolicy.CheckOnceDay: _surveyNewsCheckCombo.SelectedIndex = SurveyNewsOnceDayIndex; break;
@@ -40,6 +43,11 @@ namespace Microsoft.NodejsTools.Options {
                 case SurveyNewsOnceWeekIndex: NodejsPackage.Instance.GeneralOptionsPage.SurveyNewsCheck = SurveyNewsPolicy.CheckOnceWeek; break;
                 case SurveyNewsOnceMonthIndex: NodejsPackage.Instance.GeneralOptionsPage.SurveyNewsCheck = SurveyNewsPolicy.CheckOnceMonth; break;
             }
+        }
+
+        private void _showOutputWhenRunningNpm_CheckedChanged(object sender, EventArgs e){
+            NodejsPackage.Instance.GeneralOptionsPage.ShowOutputWindowWhenExecutingNpm =
+                _showOutputWhenRunningNpm.Checked;
         }
     }
 }

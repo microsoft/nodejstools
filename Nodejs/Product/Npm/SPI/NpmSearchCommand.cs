@@ -29,6 +29,7 @@ namespace Microsoft.NodejsTools.Npm.SPI {
             Arguments = string.IsNullOrEmpty(searchText) || string.IsNullOrEmpty(searchText.Trim())
                             ? "search"
                             : string.Format("search {0}", searchText);
+            Results = new List<IPackage>();
         }
 
         protected void ParseResultsFromReader(TextReader source) {

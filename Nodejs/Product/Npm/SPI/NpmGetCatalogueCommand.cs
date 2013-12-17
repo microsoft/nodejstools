@@ -21,7 +21,7 @@ using System.Text;
 using System.Threading.Tasks;
 
 namespace Microsoft.NodejsTools.Npm.SPI {
-    internal class NpmGetCatalogueCommand : NpmSearchCommand {
+    internal class NpmGetCatalogueCommand : NpmSearchCommand, IPackageCatalog {
 
         private const string NpmCatalogueCacheGuid = "BDC4B648-84E1-4FA9-9AE8-20AF8795093F";
 
@@ -38,6 +38,7 @@ namespace Microsoft.NodejsTools.Npm.SPI {
                 pathToNpm,
                 useFallbackIfNpmNotFound) {
             _forceDownload = forceDownload;
+            LastRefreshed = DateTime.MinValue;
         }
 
         public override async Task<bool> ExecuteAsync() {
@@ -52,7 +53,7 @@ namespace Microsoft.NodejsTools.Npm.SPI {
                                 ParseResultsFromReader(reader);
                             }
                         }
-
+                        LastRefreshed = new FileInfo(filename).LastWriteTime;
                         return true;
                     }
                 } catch (Exception) { }
@@ -66,9 +67,14 @@ namespace Microsoft.NodejsTools.Npm.SPI {
                         writer.Write(StandardOutput);
                     }
                 }
+                LastRefreshed = new FileInfo(filename).LastWriteTime;
             } catch (Exception) { }
 
             return result;
         }
+
+        public DateTime LastRefreshed { get; private set; }
+
+        public IPackageCatalog Catalog { get { return this; } }
     }
 }

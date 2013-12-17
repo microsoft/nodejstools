@@ -172,4 +172,49 @@
   <data name="WorkingDirInvalidOrMissing" xml:space="preserve">
     <value>The specified working directory is invalid or missing.</value>
   </data>
+  <data name="PackageCatalogRefreshing" xml:space="preserve">
+    <value>Currently refreshing</value>
+  </data>
+  <data name="PackageCatalogRefreshNever" xml:space="preserve">
+    <value>Never</value>
+  </data>
+  <data name="PackageCatalogRefreshODays" xml:space="preserve">
+    <value>Today at {0}</value>
+  </data>
+  <data name="PackageCatalogRefresh1Day" xml:space="preserve">
+    <value>Yesterday at {0}</value>
+  </data>
+  <data name="PackageCatalogRefresh2To7Days" xml:space="preserve">
+    <value>{0} days ago</value>
+  </data>
+  <data name="PackageCatalogRefresh1Week" xml:space="preserve">
+    <value>More than 1 week ago</value>
+  </data>
+  <data name="PackageCatalogRefresh2Weeks" xml:space="preserve">
+    <value>More than 2 weeks ago</value>
+  </data>
+  <data name="PackageCatalogRefresh3Weeks" xml:space="preserve">
+    <value>More than 3 weeks ago</value>
+  </data>
+  <data name="PackageCatalogRefresh1Month" xml:space="preserve">
+    <value>More than 1 month ago</value>
+  </data>
+  <data name="PackageCatalogRefresh3Months" xml:space="preserve">
+    <value>More than 3 months ago</value>
+  </data>
+  <data name="PackageCatalogRefresh6Months" xml:space="preserve">
+    <value>Far too long ago</value>
+  </data>
+  <data name="NpmCancelledWithErrors" xml:space="preserve">
+    <value>{0} cancelled with errors - see Output window for details</value>
+  </data>
+  <data name="NpmCompletedWithErrors" xml:space="preserve">
+    <value>{0} completed with errors - see Output window for details</value>
+  </data>
+  <data name="NpmCancelled" xml:space="preserve">
+    <value>{0} cancelled</value>
+  </data>
+  <data name="NpmSuccessfullyCompleted" xml:space="preserve">
+    <value>{0} successfully completed</value>
+  </data>
 </root>

@@ -17,18 +17,18 @@ using System.Threading;
 using System.Windows.Forms;
 using Microsoft.NodejsTools.Npm;
 
-namespace Microsoft.NodejsTools.NpmUI{
-    public partial class PackageManagerDialog : Form{
+namespace Microsoft.NodejsTools.NpmUI {
+    public partial class PackageManagerDialog : Form {
         private readonly INpmController _npmController;
         private readonly object _lock = new object();
 
-        public PackageManagerDialog(INpmController controller){
+        public PackageManagerDialog(INpmController controller) {
             InitializeComponent();
 
             _npmController = controller;
         }
 
-        protected override void OnLoad(EventArgs e){
+        protected override void OnLoad(EventArgs e) {
             base.OnLoad(e);
 
             _npmController.FinishedRefresh += _npmController_FinishedRefresh;
@@ -37,7 +37,7 @@ namespace Microsoft.NodejsTools.NpmUI{
             _panePackageSources.NpmController = _npmController;
         }
 
-        private void _btnClose_Click(object sender, EventArgs e){
+        private void _btnClose_Click(object sender, EventArgs e) {
             DialogResult = DialogResult.OK;
             Close();
         }
@@ -46,7 +46,7 @@ namespace Microsoft.NodejsTools.NpmUI{
         /// This is a bit of a do everything method that updates the state of relevant controls based
         /// on which tabs, etc., are selected.
         /// </summary>
-        private void UpdateUIState(){
+        private void UpdateUIState() {
             _labelWarning.Visible =
                 _paneInstalledPackages.SelectedPackageView == PackageView.Global;
             _labelWarningText.Visible =
@@ -56,39 +56,39 @@ namespace Microsoft.NodejsTools.NpmUI{
                 _paneInstalledPackages.SelectedPackageView;
         }
 
-        private void LoadPackageInfo(){
-            lock (_lock){
+        private void LoadPackageInfo() {
+            lock (_lock) {
                 _paneInstalledPackages.LocalPackages =
                     _npmController.RootPackage.Modules;
                 var globals = _npmController.GlobalPackages;
-                if (null != globals){
+                if (null != globals) {
                     _paneInstalledPackages.GlobalPackages = globals.Modules;
                 }
             }
         }
 
-        private void _npmController_FinishedRefresh(object sender, EventArgs e){
-            if (InvokeRequired){
+        private void _npmController_FinishedRefresh(object sender, EventArgs e) {
+            if (InvokeRequired) {
                 BeginInvoke(
                     new EventHandler(_npmController_FinishedRefresh),
                     sender,
                     e);
-            } else{
+            } else {
                 LoadPackageInfo();
             }
         }
 
         private void _paneInstalledPackages_SelectedPackageViewChanged(
             object sender,
-            EventArgs e){
+            EventArgs e) {
             UpdateUIState();
         }
 
         private void DoWithPopup(
             string popupMessage,
             Action action,
-            INpmCommander commander){
-            using (var popup = new BusyPopup()){
+            INpmCommander commander) {
+            using (var popup = new BusyPopup()) {
                 popup.Message = popupMessage;
                 popup.ShowPopup(
                     this,
@@ -99,8 +99,8 @@ namespace Microsoft.NodejsTools.NpmUI{
 
         private void _paneInstalledPackages_UninstallGloballPackageRequested(
             object sender,
-            PackageEventArgs e){
-            using (var commander = _npmController.CreateNpmCommander()){
+            PackageEventArgs e) {
+            using (var commander = _npmController.CreateNpmCommander()) {
                 DoWithPopup(
                     string.Format(
                         "Uninstalling global package '{0}'...",
@@ -112,8 +112,8 @@ namespace Microsoft.NodejsTools.NpmUI{
 
         private void _paneInstalledPackages_UninstallLocalPackageRequested(
             object sender,
-            PackageEventArgs e){
-            using (var commander = _npmController.CreateNpmCommander()){
+            PackageEventArgs e) {
+            using (var commander = _npmController.CreateNpmCommander()) {
                 DoWithPopup(
                     string.Format(
                         "Uninstalling local package '{0}'...",
@@ -125,22 +125,23 @@ namespace Microsoft.NodejsTools.NpmUI{
 
         private void _panePackageSources_InstallPackageRequested(
             object sender,
-            PackageInstallEventArgs e){
-            using (var commander = _npmController.CreateNpmCommander()){
-                if (_paneInstalledPackages.SelectedPackageView == PackageView.Global){
+            PackageInstallEventArgs e) {
+            using (var commander = _npmController.CreateNpmCommander()) {
+                if (_paneInstalledPackages.SelectedPackageView == PackageView.Global) {
                     DoWithPopup(
                         string.Format("Installing global package '{0}'...", e.Name),
                         async () => await commander.InstallGlobalPackageByVersionAsync(
                                 e.Name,
                                 e.Version),
                         commander);
-                } else{
+                } else {
                     DoWithPopup(
                         string.Format("Installing local package '{0}'...", e.Name),
                         async () => await commander.InstallPackageByVersionAsync(
                                     e.Name,
                                     e.Version,
-                                    e.DependencyType),
+                                    e.DependencyType,
+                                    true),
                         commander);
                 }
             }

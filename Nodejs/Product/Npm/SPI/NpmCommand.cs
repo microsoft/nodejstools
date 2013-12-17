@@ -21,7 +21,7 @@ using System.Text;
 using System.Threading.Tasks;
 
 namespace Microsoft.NodejsTools.Npm.SPI {
-    internal abstract class NpmCommand {
+    internal abstract class NpmCommand : AbstractNpmLogSource {
         private readonly string _fullPathToRootPackageDirectory;
         private string _pathToNpm;
         private bool _useFallbackIfNpmNotFound;
@@ -130,48 +130,71 @@ namespace Microsoft.NodejsTools.Npm.SPI {
         }
 
         public virtual async Task<bool> ExecuteAsync() {
+            OnCommandStarted();
+            var success = false;
             using (_process = new Process()) {
-                _process.StartInfo = BuildStartInfo();
-
                 try {
+                    _process.StartInfo = BuildStartInfo();
+                    OnOutputLogged(string.Format("====Executing command 'npm {0} '====\r\n\r\n", _process.StartInfo.Arguments));
+
                     _process.Start();
-                } catch (Win32Exception we) {
-                    throw new NpmExecutionException(
-                        string.Format("Error executing npm - unable to start the npm process: {0}", we.Message),
-                        we);
+
+                    _process.ErrorDataReceived += _process_ErrorDataReceived;
+                    _process.OutputDataReceived += _process_OutputDataReceived;
+
+                    _process.BeginErrorReadLine();
+                    _process.BeginOutputReadLine();
+
+                    await Task.Run(() => WaitForExit());
+                    success = true;
+                } catch (Exception e) {
+                    OnExceptionLogged(new NpmExecutionException(
+                        string.Format("Error executing npm - unable to start the npm process: {0}", e.Message),
+                        e));
+                } finally {
+                    //  These invalid operation exceptions can occur if node isn't installed:
+                    //  if npm can't be found the process's start info will never be created,
+                    //  the process will never be started, and the calls to BeginXXXReadLine
+                    //  will never occur.
+                    try {
+                        _process.CancelErrorRead();
+                    } catch (InvalidOperationException) { }
+                    try {
+                        _process.CancelOutputRead();
+                    } catch (InvalidOperationException) { }
+
+                    try {
+                        OnOutputLogged(
+                            string.Format(
+                                "\r\n====npm command {0} with exit code {1}====\r\n\r\n",
+                                _cancelled ? "cancelled" : "completed",
+                                _process.ExitCode));
+                    } catch (InvalidOperationException) {    //  Again, if node not installed.
+                        OnOutputLogged("\r\n====Unable to execute npm====\r\n\r\n");
+                    }
                 }
-
-                _process.ErrorDataReceived += _process_ErrorDataReceived;
-                _process.OutputDataReceived += _process_OutputDataReceived;
-
-                _process.BeginErrorReadLine();
-                _process.BeginOutputReadLine();
-
-                await Task.Run(() => WaitForExit());
             }
-
-            return true;
+            OnCommandCompleted(Arguments, !success, _cancelled);
+            return success;
         }
 
-        private void AppendToBuffer(StringBuilder buffer, DataReceivedEventArgs e) {
+        private string AppendToBuffer(StringBuilder buffer, DataReceivedEventArgs e) {
             lock (_bufferLock) {
-                if (buffer.Length > 0) {
-                    buffer.Append(Environment.NewLine);
-                }
-
                 var data = e.Data;
-                if (!string.IsNullOrEmpty(data)) {
-                    buffer.Append(Encoding.UTF8.GetString(Console.OutputEncoding.GetBytes(e.Data)));
+                if (null != data) {
+                    data = Encoding.UTF8.GetString(Console.OutputEncoding.GetBytes(data)) + Environment.NewLine;
+                    buffer.Append(data);
                 }
+                return data;
             }
         }
 
         void _process_OutputDataReceived(object sender, DataReceivedEventArgs e) {
-            AppendToBuffer(_output, e);
+            OnOutputLogged(AppendToBuffer(_output, e));
         }
 
         void _process_ErrorDataReceived(object sender, DataReceivedEventArgs e) {
-            AppendToBuffer(_error, e);
+            OnErrorLogged(AppendToBuffer(_error, e));
         }
     }
 }

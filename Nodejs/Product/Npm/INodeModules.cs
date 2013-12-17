@@ -20,5 +20,6 @@ namespace Microsoft.NodejsTools.Npm {
         IPackage this[int index] { get; }
         IPackage this[string name] { get; }
         bool Contains(string name);
+        bool HasMissingModules { get; }
     }
 }

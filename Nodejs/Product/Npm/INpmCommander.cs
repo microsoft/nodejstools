@@ -22,14 +22,15 @@ namespace Microsoft.NodejsTools.Npm {
     public interface INpmCommander : INpmLogSource, IDisposable {
 
         /// <summary>
-        /// Fired whenever a command is completed, regardless of whether or not it was successful.
-        /// </summary>
-        event EventHandler CommandCompleted;
-
-        /// <summary>
         /// Cancels the currently running command
         /// </summary>
         void CancelCurrentCommand();
+
+        /// <summary>
+        /// Executes npm install to install all packages in package.json.
+        /// </summary>
+        /// <returns></returns>
+        Task<bool> Install();
 
         /// <summary>
         /// 
@@ -37,12 +38,14 @@ namespace Microsoft.NodejsTools.Npm {
         /// <param name="packageName"></param>
         /// <param name="versionRange"></param>
         /// <param name="type"></param>
+        /// <param name="saveToPackageJson"></param>
         /// <exception cref="PackageJsonException">If there is an error reading a package.json file when modules are refreshed.</exception>
         /// <returns></returns>
         Task<bool> InstallPackageByVersionAsync(
             string packageName,
             string versionRange,
-            DependencyType type);
+            DependencyType type,
+            bool saveToPackageJson);
 
         /// <summary>
         /// 
@@ -67,7 +70,7 @@ namespace Microsoft.NodejsTools.Npm {
 
         Task<IList<IPackage>> SearchAsync(string searchText);
 
-        Task<IList<IPackage>> GetCatalogueAsync(bool forceDownload);
+        Task<IPackageCatalog> GetCatalogueAsync(bool forceDownload);
 
         Task<bool> UpdatePackagesAsync();
 

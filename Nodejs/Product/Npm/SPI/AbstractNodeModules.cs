@@ -45,6 +45,17 @@ namespace Microsoft.NodejsTools.Npm.SPI {
             return this[name] != null;
         }
 
+        public bool HasMissingModules {
+            get {
+                foreach (IPackage pkg in this) {
+                    if (pkg.IsMissing) {
+                        return true;
+                    }
+                }
+                return false;
+            }
+        }
+
         public IEnumerator<IPackage> GetEnumerator() {
             return _packagesSorted.GetEnumerator();
         }

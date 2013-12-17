@@ -19,8 +19,8 @@ using System.Windows.Forms;
 using EnvDTE;
 using Microsoft.NodejsTools.Npm;
 
-namespace Microsoft.NodejsTools.NpmUI{
-    public partial class BusyPopup : Form{
+namespace Microsoft.NodejsTools.NpmUI {
+    public partial class BusyPopup : Form {
 
         private INpmCommander _commander;
         private Task _task;
@@ -28,36 +28,36 @@ namespace Microsoft.NodejsTools.NpmUI{
         private bool _cancelled;
         private StringBuilder _rtf = new StringBuilder();
 
-        public BusyPopup(){
+        public BusyPopup() {
             InitializeComponent();
             CreateHandle();
 
             _btnClose.Visible = false;
         }
 
-        public bool WithErrors{
+        public bool WithErrors {
             get { return _withErrors; }
         }
 
-        public string Message{
+        public string Message {
             get { return _busyControl.Message; }
             set { _busyControl.Message = value; }
         }
 
-        private void HandleCompletion(){
+        private void HandleCompletion() {
             _busyControl.Finished = true;
 
             var exception = _task.Exception;
-            if (null != exception){
+            if (null != exception) {
                 _withErrors = true;
                 WriteLines(ErrorHelper.GetExceptionDetailsText(exception), true);
             }
 
-            if (_cancelled || _withErrors){
+            if (_cancelled || _withErrors) {
                 _busyControl.Message = _cancelled
                     ? "npm Operation Cancelled..."
                     : "npm Operation Failed...";
-            } else{
+            } else {
                 _busyControl.Message = "npm Operation Completed Successfully...";
             }
 
@@ -66,7 +66,7 @@ namespace Microsoft.NodejsTools.NpmUI{
             _btnClose.Visible = true;
         }
 
-        private void Completed(){
+        private void Completed() {
             BeginInvoke(
                 new Action(HandleCompletion));
         }
@@ -81,7 +81,7 @@ namespace Microsoft.NodejsTools.NpmUI{
             commander.ExceptionLogged += commander_ExceptionLogged;
             commander.CommandCompleted += commander_CommandCompleted;
 
-            using (_task = new Task(action)){
+            using (_task = new Task(action)) {
                 //  N.B. This WON'T work because you're effectively passing in an async void that will "complete" immediately - grr
                 //_task.ContinueWith(t2 => Completed());
                 _task.Start();
@@ -95,13 +95,12 @@ namespace Microsoft.NodejsTools.NpmUI{
             }
         }
 
-        void commander_CommandCompleted(object sender, EventArgs e)
-        {
+        void commander_CommandCompleted(object sender, NpmCommandCompletedEventArgs e) {
             Completed();
         }
 
-        private void WriteOutput(string output){
-            if (_rtf.Length == 0){
+        private void WriteOutput(string output) {
+            if (_rtf.Length == 0) {
                 _rtf.Append(@"{\rtf1\ansicpg"
                     + Console.OutputEncoding.CodePage
                     + @"\deff0 {\fonttbl {\f0 Consolas;}}
@@ -109,13 +108,14 @@ namespace Microsoft.NodejsTools.NpmUI{
 ");
             }
 
-            if (output.Length > 0 && output[0] != '\\'){
+            if (output.Length > 0 && output[0] != '\\') {
                 //  Apply default text color
                 _rtf.Append(@"\cf1");
             }
 
-            _rtf.Append(output);
-            _rtf.Append("\\line\r\n");
+            _rtf.Append(output.EndsWith(Environment.NewLine) ? output.Substring(0, output.Length - Environment.NewLine.Length) : output);
+            _rtf.Append("\\line");
+            _rtf.Append(Environment.NewLine);
 
             //  There surely has to be a nicer way to do this but
             //  AppendText() just appends plaintext, hence the use
@@ -125,58 +125,59 @@ namespace Microsoft.NodejsTools.NpmUI{
             _textOutput.ScrollToCaret();
         }
 
-        private void WriteError(string error){
+        private void WriteError(string error) {
             _withErrors = true;
             WriteOutput(@"\cf2" + error);
         }
 
-        private void WriteWarning(string warning){
+        private void WriteWarning(string warning) {
             WriteOutput(@"\cf3" + warning);
         }
 
-        private void WriteLine(string line, bool forceError){
-            if (forceError || line.StartsWith("npm ERR!")){
+        private void WriteLine(string line, bool forceError) {
+            if (forceError || line.StartsWith("npm ERR!")) {
                 WriteError(line);
             }
-            else if (line.StartsWith("npm WARN")){
+            else if (line.StartsWith("npm WARN")) {
                 WriteWarning(line);
-            } else{
+            } else {
                 WriteOutput(line);
             }
         }
 
-        private string EscapeBackslashes(string source){
+        private string Preprocess(string source) {
             var buff = new StringBuilder();
-            foreach (var ch in source){
-                if (ch == '\\'){
+            foreach (var ch in source) {
+                if (ch == '\\') {
                     buff.Append("\\'5c");
-                } else{
+                } else {
                     buff.Append(ch);
                 }
             }
-            return buff.ToString();
+            var result = buff.ToString();
+            return result.EndsWith(Environment.NewLine) ? result.Substring(0, result.Length - Environment.NewLine.Length) : result;
         }
 
-        private void WriteLines(string text, bool forceError){
-            text = EscapeBackslashes(text);
-            foreach (var line in text.Split(new string[]{"\r\n", "\n"}, StringSplitOptions.None)){
+        private void WriteLines(string text, bool forceError) {
+            text = Preprocess(text);
+            foreach (var line in text.Split(new string[]{"\r\n", "\n"}, StringSplitOptions.None)) {
                 WriteLine(line, forceError);
             }
         }
 
-        private void commander_ErrorLogged(object sender, NpmLogEventArgs e){
+        private void commander_ErrorLogged(object sender, NpmLogEventArgs e) {
             BeginInvoke(new Action(() => WriteLines(e.LogText, false)));
         }
 
-        private void commander_OutputLogged(object sender, NpmLogEventArgs e){
+        private void commander_OutputLogged(object sender, NpmLogEventArgs e) {
             BeginInvoke(new Action(() => WriteLines(e.LogText, false)));
         }
 
-        void commander_ExceptionLogged(object sender, NpmExceptionEventArgs e){
+        void commander_ExceptionLogged(object sender, NpmExceptionEventArgs e) {
             BeginInvoke(new Action(() => WriteLines(ErrorHelper.GetExceptionDetailsText(e.Exception), true)));
         }
 
-        private void DoClose(){
+        private void DoClose() {
             DialogResult = DialogResult.OK;
             Close();
         }

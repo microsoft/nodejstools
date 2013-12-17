@@ -15,6 +15,14 @@
       <Link>SharedProject\HierarchyNodeFlags.cs</Link>
       <Visible>true</Visible>
     </Compile>
+	<Compile Include="$(_ProjectSystemFilesLocation)\OutputWindowRedirector.cs">
+      <Link>SharedProject\OutputWindowRedirector.cs</Link>
+      <Visible>true</Visible>
+    </Compile>
+	<Compile Include="$(_ProjectSystemFilesLocation)\ProcessOutput.cs">
+      <Link>SharedProject\ProcessOutput.cs</Link>
+      <Visible>true</Visible>
+    </Compile>
     <Compile Include="$(_ProjectSystemFilesLocation)\OverwriteFileDialog.xaml.cs">
       <DependentUpon>OverwriteFileDialog.xaml</DependentUpon>
       <Link>SharedProject\OverwriteFileDialog.xaml.cs</Link>

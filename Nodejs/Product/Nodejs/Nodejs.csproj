@@ -259,6 +259,7 @@
     </Compile>
     <Compile Include="NpmUI\ColorUtils.cs" />
     <Compile Include="NpmUI\ErrorHelper.cs" />
+    <Compile Include="NpmUI\IPackageListViewWrapper.cs" />
     <Compile Include="NpmUI\InstalledPackageListControl.cs">
       <SubType>UserControl</SubType>
     </Compile>
@@ -299,6 +300,7 @@
       <DependentUpon>PackageSourcesPane.cs</DependentUpon>
     </Compile>
     <Compile Include="NpmUI\PackageView.cs" />
+    <Compile Include="NpmUI\LastRefreshedMessageProvider.cs" />
     <Compile Include="Options\NodejsDialogPage.cs">
       <SubType>Component</SubType>
     </Compile>
@@ -702,6 +704,7 @@
       <Generator>ResXFileCodeGenerator</Generator>
       <Visible>true</Visible>
       <LastGenOutput>Resources.Designer.cs</LastGenOutput>
+      <SubType>Designer</SubType>
     </EmbeddedResource>
   </ItemGroup>
   <ItemGroup>

@@ -15,14 +15,14 @@
 using System;
 using System.Drawing;
 
-namespace Microsoft.NodejsTools.NpmUI{
+namespace Microsoft.NodejsTools.NpmUI {
     /// <summary>
     /// Useful functionality for handling and manipulating colors.
     /// </summary>
-    public sealed class ColorUtils{
+    public sealed class ColorUtils {
         private static readonly Random _sRandom = new Random();
 
-        private ColorUtils(){}
+        private ColorUtils() {}
 
         /// <summary>
         /// Creates a color that is a mixture of the two specified colors in the
@@ -38,14 +38,14 @@ namespace Microsoft.NodejsTools.NpmUI{
             Color color2,
             int parts1,
             int parts2){
-            if (parts1 < 0){
+            if (parts1 < 0) {
                 throw new ArgumentOutOfRangeException(
                     "parts1",
                     parts1,
                     string.Format(
                         "{0} is not a valid value for parts1.",
                         parts1));
-            } else if (parts2 < 0){
+            } else if (parts2 < 0) {
                 throw new ArgumentOutOfRangeException(
                     "parts2",
                     parts2,
@@ -54,12 +54,11 @@ namespace Microsoft.NodejsTools.NpmUI{
                         parts2));
             }
             int total = parts1 + parts2;
-            if (0 == total) //	Should never happen
-            {
+            if (0 == total) {   //  Should never happen
                 total = 2;
             }
             int alpha = (color1.A * parts1 + color2.A * parts2) / total;
-            if (alpha < 0){
+            if (alpha < 0) {
                 alpha = 0;
             }
             return Color.FromArgb(
@@ -69,7 +68,7 @@ namespace Microsoft.NodejsTools.NpmUI{
                 (color1.B * parts1 + color2.B * parts2) / total);
         }
 
-        public static Color GetRandomColor(){
+        public static Color GetRandomColor() {
             return Color.FromArgb(
                 255,
                 _sRandom.Next(256),
@@ -77,19 +76,19 @@ namespace Microsoft.NodejsTools.NpmUI{
                 _sRandom.Next(256));
         }
 
-        public static Color GetRandomNormalisedColor(){
+        public static Color GetRandomNormalisedColor() {
             return Normalise(GetRandomColor());
         }
 
-        public static Color GetBrightishRandomNormalizedColor(){
+        public static Color GetBrightishRandomNormalizedColor() {
             Color color = GetRandomNormalisedColor();
-            while (color.GetBrightness() < 0.90){
+            while (color.GetBrightness() < 0.90) {
                 color = Lighter(color);
             }
             return color;
         }
 
-        public static Color Normalise(Color source){
+        public static Color Normalise(Color source) {
             int max = Math.Max(Math.Max(source.R, source.G), source.B);
             float factor = 255F / max;
             return Color.FromArgb(
@@ -112,7 +111,7 @@ namespace Microsoft.NodejsTools.NpmUI{
             Color color1,
             Color color2,
             int parts1,
-            int parts2){
+            int parts2) {
             return Normalise(Mix(color1, color2, parts1, parts2));
         }
 
@@ -123,7 +122,7 @@ namespace Microsoft.NodejsTools.NpmUI{
         /// <param name="color1">First color.</param>
         /// <param name="color2">Second color.</param>
         /// <returns>Color halfway between the two supplied color.</returns>
-        public static Color MidPoint(Color color1, Color color2){
+        public static Color MidPoint(Color color1, Color color2) {
             return Color.FromArgb(
                 (color1.A + color2.A) / 2,
                 (color1.R + color2.R) / 2,
@@ -137,7 +136,7 @@ namespace Microsoft.NodejsTools.NpmUI{
         /// </summary>
         /// <param name="source">Source color.</param>
         /// <returns>Color halfway between supplied color and white.</returns>
-        public static Color Lighter(Color source){
+        public static Color Lighter(Color source) {
             return MidPoint(
                 source,
                 Color.FromArgb(
@@ -153,7 +152,7 @@ namespace Microsoft.NodejsTools.NpmUI{
         /// </summary>
         /// <param name="source">Source color.</param>
         /// <returns>Color halfway between supplied color and white.</returns>
-        public static Color Darker(Color source){
+        public static Color Darker(Color source) {
             return MidPoint(
                 source,
                 Color.FromArgb(

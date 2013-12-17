@@ -153,23 +153,56 @@
           <ButtonText>Mana&amp;ge npm Modules...</ButtonText>
         </Strings>
       </Button>
+      
+      <Button guid="guidNodeToolsCmdSet" id="cmdidNpmInstallModules" priority="0x8100" type="Button">
+        <Parent guid="guidNodeToolsCmdSet" id="CodeFileGroup" />
+        <CommandFlag>DefaultInvisible</CommandFlag>
+        <CommandFlag>DynamicVisibility</CommandFlag>
+        <Strings>
+          <CommandName>cmdidNpmInstallModules</CommandName>
+          <ButtonText>&amp;Install Missing npm Modules</ButtonText>
+        </Strings>
+      </Button>
 
-      <!-- Just taking these out for alpha -->
-      <!--<Button guid="guidNodeToolsCmdSet" id="cmdidNpmUpdateModules" priority="0x8100" type="Button">
-        <Parent guid="guidNodeToolsCmdSet" id="NpmInstallItemsGroup" />
+      <Button guid="guidNodeToolsCmdSet" id="cmdidNpmUpdateModules" priority="0x8200" type="Button">
+        <Parent guid="guidNodeToolsCmdSet" id="CodeFileGroup" />
+        <CommandFlag>DefaultInvisible</CommandFlag>
+        <CommandFlag>DynamicVisibility</CommandFlag>
         <Strings>
           <CommandName>cmdidNpmUpdateModules</CommandName>
           <ButtonText>Up&amp;date npm Modules</ButtonText>
         </Strings>
       </Button>
 
-      <Button guid="guidNodeToolsCmdSet" id="cmdidNpmUninstallModule" priority="0x8200" type="Button">
-        <Parent guid="guidNodeToolsCmdSet" id="NpmUninstallItemsGroup" />
+      <Button guid="guidNodeToolsCmdSet" id="cmdidNpmUninstallModule" priority="0x8300" type="Button">
+        <Parent guid="guidNodeToolsCmdSet" id="CodeFileGroup" />
+        <CommandFlag>DefaultInvisible</CommandFlag>
+        <CommandFlag>DynamicVisibility</CommandFlag>
         <Strings>
           <CommandName>cmdidNpmUninstallModules</CommandName>
           <ButtonText>Unins&amp;tall npm Module</ButtonText>
         </Strings>
-      </Button>-->
+      </Button>
+
+      <Button guid="guidNodeToolsCmdSet" id="cmdidNpmInstallSingleMissingModule" priority="0x8170" type="Button">
+        <Parent guid="guidNodeToolsCmdSet" id="CodeFileGroup" />
+        <CommandFlag>DefaultInvisible</CommandFlag>
+        <CommandFlag>DynamicVisibility</CommandFlag>
+        <Strings>
+          <CommandName>cmdidNpmInstallSingleMissingModule</CommandName>
+          <ButtonText>&amp;Install Missing npm Module</ButtonText>
+        </Strings>
+      </Button>
+
+      <Button guid="guidNodeToolsCmdSet" id="cmdidNpmUpdateSingleModule" priority="0x8270" type="Button">
+        <Parent guid="guidNodeToolsCmdSet" id="CodeFileGroup" />
+        <CommandFlag>DefaultInvisible</CommandFlag>
+        <CommandFlag>DynamicVisibility</CommandFlag>
+        <Strings>
+          <CommandName>cmdidNpmUpdateSingleModule</CommandName>
+          <ButtonText>&amp;Update Module</ButtonText>
+        </Strings>
+      </Button>
 
       <Button guid="guidNodeToolsCmdSet" id="cmdidImportWizard" priority="0x010" type="Button">
         <Parent guid="guidNodeToolsCmdSet" id="ToolsMenuItemsGroup"/>
@@ -235,8 +268,11 @@
       <IDSymbol name="cmdidImportWizard" value ="0x0205" />
       <IDSymbol name="cmdidOpenRemoteDebugDocumentation" value="0x0206" />
       <IDSymbol name="cmdidNpmManageModules" value="0x0207" />
-      <IDSymbol name="cmdidNpmUpdateModules" value="0x0208" />
-      <IDSymbol name="cmdidNpmUninstallModule" value="0x0209"/>
+      <IDSymbol name="cmdidNpmInstallModules" value="0x0208" />
+      <IDSymbol name="cmdidNpmUpdateModules" value="0x0209" />
+      <IDSymbol name="cmdidNpmUninstallModule" value="0x020A" />
+      <IDSymbol name="cmdidNpmInstallSingleMissingModule" value="0x020B" />
+      <IDSymbol name="cmdidNpmUpdateSingleModule" value="0x020C" />
 
       <!-- Shared commands, defined in CommonConstants.cs -->
       <IDSymbol name="cmdidAddExistingFolder" value="0x10001" />
