@@ -38,12 +38,14 @@ namespace Microsoft.NodejsTools.Npm {
         /// <param name="packageName"></param>
         /// <param name="versionRange"></param>
         /// <param name="type"></param>
+        /// <param name="saveToPackageJson"></param>
         /// <exception cref="PackageJsonException">If there is an error reading a package.json file when modules are refreshed.</exception>
         /// <returns></returns>
         Task<bool> InstallPackageByVersionAsync(
             string packageName,
             string versionRange,
-            DependencyType type);
+            DependencyType type,
+            bool saveToPackageJson);
 
         /// <summary>
         /// 

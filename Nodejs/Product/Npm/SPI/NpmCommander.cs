@@ -134,13 +134,15 @@ namespace Microsoft.NodejsTools.Npm.SPI {
             string packageName,
             string versionRange,
             DependencyType type,
-            bool global) {
+            bool global,
+            bool saveToPackageJson) {
             _command = new NpmInstallCommand(
                 _npmController.FullPathToRootPackageDirectory,
                 packageName,
                 versionRange,
                 type,
                 global,
+                saveToPackageJson,
                 _npmController.PathToNpm,
                 _npmController.UseFallbackIfNpmNotFound);
             return await DoCommandExecute(true);
@@ -149,12 +151,13 @@ namespace Microsoft.NodejsTools.Npm.SPI {
         public async Task<bool> InstallPackageByVersionAsync(
             string packageName,
             string versionRange,
-            DependencyType type) {
-            return await InstallPackageByVersionAsync(packageName, versionRange, type, false);
+            DependencyType type,
+            bool saveToPackageJson) {
+            return await InstallPackageByVersionAsync(packageName, versionRange, type, false, saveToPackageJson);
         }
 
         public async Task<bool> InstallGlobalPackageByVersionAsync(string packageName, string versionRange) {
-            return await InstallPackageByVersionAsync(packageName, versionRange, DependencyType.Standard, true);
+            return await InstallPackageByVersionAsync(packageName, versionRange, DependencyType.Standard, true, false);
         }
 
         private DependencyType GetDependencyType(string packageName) {

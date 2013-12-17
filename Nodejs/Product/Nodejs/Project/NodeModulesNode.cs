@@ -53,6 +53,8 @@ namespace Microsoft.NodejsTools.Project {
         private Timer _fileSystemWatcherTimer;
         private INpmController _npmController;
         private int _npmCommandsExecuting;
+        private bool _suppressCommands;
+
         private readonly object _lock = new object();
 
         private bool _isDisposed;
@@ -525,8 +527,6 @@ namespace Microsoft.NodejsTools.Project {
         #endregion
 
         #region Command handling
-
-        private bool _suppressCommands;
 
         private bool IsCurrentStateASuppressCommandsMode(){
             return _suppressCommands || ProjectMgr.IsCurrentStateASuppressCommandsMode();

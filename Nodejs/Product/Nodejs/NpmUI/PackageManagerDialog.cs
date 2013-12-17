@@ -140,7 +140,8 @@ namespace Microsoft.NodejsTools.NpmUI{
                         async () => await commander.InstallPackageByVersionAsync(
                                     e.Name,
                                     e.Version,
-                                    e.DependencyType),
+                                    e.DependencyType,
+                                    true),
                         commander);
                 }
             }
