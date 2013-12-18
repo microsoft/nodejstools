@@ -13,6 +13,7 @@
  * ***************************************************************************/
 
 using System;
+using System.Collections.Generic;
 using System.Collections.Specialized;
 using System.IO;
 using System.Linq;
@@ -1244,5 +1245,54 @@ namespace Microsoft.VisualStudioTools.SharedProjectTests {
                 }
             }
         }
+
+        /// <summary>
+        /// Checks various combinations of item visibility from within the users project
+        /// and from imported projects and how it's controlled by the Visible metadata.
+        /// </summary>
+        [TestMethod, Priority(0), TestCategory("Core")]
+        [HostType("TC Dynamic"), DynamicHostType(typeof(VsIdeHostAdapter))]
+        public void ItemVisibility() {
+            try {
+                foreach (var projectType in ProjectTypes) {
+                    var imported = new ProjectDefinition(
+                        "Imported",
+                        ItemGroup(
+                            CustomItem("MyItemType", "..\\Imported\\ImportedItem.txt", ""),
+                            CustomItem(
+                                "MyItemType", 
+                                "..\\Imported\\VisibleItem.txt", 
+                                "", 
+                                metadata: new Dictionary<string, string>() { { "Visible", "true" } }
+                            )
+                        )
+                    );
+                    var baseProj = new ProjectDefinition(
+                        "HelloWorld",
+                        projectType,
+                        CustomItem(
+                            "MyItemType", 
+                            "ProjectInvisible.txt", 
+                            "", 
+                            metadata: new Dictionary<string, string>() { { "Visible", "false" } }
+                        ),
+                        Import("..\\Imported\\Imported.proj"),
+                        Property("ProjectView", "ProjectFiles")
+                    );
+
+                    var solutionFile = SolutionFile.Generate("HelloWorld", baseProj, imported);
+                    using (var solution = solutionFile.ToVs()) {
+                        Assert.IsNotNull(solution.WaitForItem("HelloWorld", "VisibleItem.txt"), "VisibleItem.txt not found");
+                        Assert.IsNull(solution.FindItem("HelloWorld", "ProjectInvisible.txt"), "VisibleItem.txt not found");
+                        Assert.IsNull(solution.FindItem("HelloWorld", "ImportedItem.txt"), "VisibleItem.txt not found");
+                    }
+                }
+            } finally {
+                VsIdeTestHostContext.Dte.Solution.Close();
+                GC.Collect();
+                GC.WaitForPendingFinalizers();
+            }
+        }
+
     }
 }

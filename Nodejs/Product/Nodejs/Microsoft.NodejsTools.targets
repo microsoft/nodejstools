@@ -24,7 +24,9 @@
     <NodeModulesContent Include="$(ProjectHome)\node_modules\**\*.*"/>
   </ItemGroup>
 
-  <Target Name="Build">
+  <Target Name="CopyFilesToOutputDirectory"/>
+  
+  <Target Name="CoreCompile">
     <Message Text="Content=@(Content->'%(RelativeDir)%(Filename)%(Extension)')"/>
     <!-- Target used for generating a package which can be uploaded to web server -->
     <ItemGroup>
@@ -80,7 +82,7 @@
   </ItemGroup>
   <Target
     Name="GetTargetPath"
-    DependsOnTargets="Build"
+    DependsOnTargets="CoreCompile"
     Returns="@(ScriptAndWebDeployFiles)"
     >
     <ItemGroup>
@@ -117,7 +119,7 @@
 
   <Target
     Name="PipelineTransformPhase"
-    DependsOnTargets="Build"
+    DependsOnTargets="CoreCompile"
     Returns="@(TransformedFilenames)"
     >
 

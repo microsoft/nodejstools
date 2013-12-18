@@ -1724,7 +1724,7 @@ namespace Microsoft.VisualStudioTools.Project
                                 // MSBuilds tasks/targets can create items (such as object files),
                                 // such items are not part of the project per say, and should not be displayed.
                                 // so ignore those items.
-                                if (!this.IsItemTypeFileType(item.ItemType))
+                                if (!IsVisibleItem(item))
                                 {
                                     continue;
                                 }
@@ -2537,26 +2537,6 @@ namespace Microsoft.VisualStudioTools.Project
         }
 
         /// <summary>
-        /// Called by the project to know if the item is a file (that is part of the project)
-        /// or an intermediate file used by the MSBuild tasks/targets
-        /// Override this method if your project has more types or different ones
-        /// </summary>
-        /// <param name="type">Type name</param>
-        /// <returns>True = items of this type should be included in the project</returns>
-        protected virtual bool IsItemTypeFileType(string type)
-        {
-            // recognize the typical types as a file....
-            if (String.Compare(type, "Compile", StringComparison.OrdinalIgnoreCase) == 0
-                || String.Compare(type, "Content", StringComparison.OrdinalIgnoreCase) == 0
-                || String.Compare(type, "EmbeddedResource", StringComparison.OrdinalIgnoreCase) == 0
-                || String.Compare(type, "None", StringComparison.OrdinalIgnoreCase) == 0)
-                return true;
-
-            // we don't know about this type, so ignore it.
-            return false;
-        }
-
-        /// <summary>
         /// Filter items that should not be processed as file items. Example: Folders and References.
         /// </summary>
         protected virtual bool FilterItemTypeToBeAddedToHierarchy(string itemType)
@@ -3217,21 +3197,16 @@ namespace Microsoft.VisualStudioTools.Project
             // Process Files
             foreach (MSBuild.ProjectItem item in this.buildProject.Items.ToArray()) // copy the array, we could add folders while enumerating
             {
-                // Ignore items imported from .targets files. In particular, this will ignore the <Content>
-                // items that are generated from any <Compile> items in our .targets.
-                if (item.IsImported) {
-                    continue;
-                }
-
                 // Ignore the item if it is a reference or folder
                 if (this.FilterItemTypeToBeAddedToHierarchy(item.ItemType))
                     continue;
 
-                // MSBuilds tasks/targets can create items (such as object files),
-                // such items are not part of the project per say, and should not be displayed.
-                // so ignore those items.
-                if (!this.IsItemTypeFileType(item.ItemType))
+                // Check if the item is imported.  If it is we'll only show it in the
+                // project if it as a Visible item meta data.  Visible can also be used
+                // to hide non-imported items.
+                if (!IsVisibleItem(item)) {
                     continue;
+                }
 
                 // If the item is already contained do nothing.
                 // TODO: possibly report in the error list that the the item is already contained in the project file similar to Language projects.
@@ -3308,6 +3283,16 @@ namespace Microsoft.VisualStudioTools.Project
                 ProcessDependentFileNodes(subitemsKeys, subitems);
             }
 
+        }
+
+        private static bool IsVisibleItem(MSBuild.ProjectItem item) {
+            bool isVisibleItem = true;
+            string visible = item.GetMetadataValue(CommonConstants.Visible);
+            if ((item.IsImported && !String.Equals(visible, "true", StringComparison.OrdinalIgnoreCase)) ||
+                String.Equals(visible, "false", StringComparison.OrdinalIgnoreCase)) {
+                isVisibleItem = false;
+            }
+            return isVisibleItem;
         }
 
         /// <summary>
@@ -6184,6 +6169,10 @@ If the files in the existing folder have the same names as files in the folder y
 
             this.isClosed = true;
             isClosing = false;
+
+            if (taskProvider != null) {
+                taskProvider.Tasks.Clear();
+            }
 
             return hr;
         }

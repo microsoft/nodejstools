@@ -440,6 +440,7 @@
   <ItemGroup>
     <EmbeddedResource Include="NpmUI\BusyControl.resx">
       <DependentUpon>BusyControl.cs</DependentUpon>
+      <SubType>Designer</SubType>
     </EmbeddedResource>
     <EmbeddedResource Include="NpmUI\BusyPopup.resx">
       <DependentUpon>BusyPopup.cs</DependentUpon>
@@ -543,6 +544,26 @@
     <ZipProject Include="ProjectTemplates\AddWebSiteAzureExpressApp\index.js" />
     <ZipProject Include="ProjectTemplates\AddWebSiteAzureExpressApp\user.js" />
     <ZipProject Include="ProjectTemplates\AddWebSiteAzureNodejsApp\server.js" />
+    <ZipProject Include="ProjectTemplates\TypeScriptNodejsConsoleApp\package.json">
+      <Language>TypeScript</Language>
+    </ZipProject>
+    <ZipProject Include="ProjectTemplates\TypeScriptNodejsConsoleApp\README.md">
+      <Language>TypeScript</Language>
+    </ZipProject>
+    <ZipProject Include="ProjectTemplates\TypeScriptNodejsConsoleApp\app.ts">
+      <Language>TypeScript</Language>
+    </ZipProject>
+    <ZipProject Include="ProjectTemplates\TypeScriptNodejsConsoleApp\NodejsConsoleApp.njsproj">
+      <Language>TypeScript</Language>
+      <SubType>Designer</SubType>
+    </ZipProject>
+    <ZipProject Include="ProjectTemplates\TypeScriptNodejsConsoleApp\NodejsConsoleApp.vstemplate">
+      <Language>TypeScript</Language>
+    </ZipProject>
+    <ZipProject Include="ProjectTemplates\TypeScriptNodejsConsoleApp\Preview.png">
+      <Language>TypeScript</Language>
+    </ZipProject>
+    <Resource Include="ProjectTemplates\blankts.ico" />
     <Content Include="VSTemplateStore.pkgdef">
       <IncludeInVSIX>true</IncludeInVSIX>
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
