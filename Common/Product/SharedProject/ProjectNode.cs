@@ -3202,7 +3202,7 @@ namespace Microsoft.VisualStudioTools.Project
                     continue;
 
                 // Check if the item is imported.  If it is we'll only show it in the
-                // project if it as a Visible item meta data.  Visible can also be used
+                // project if it is a Visible item meta data.  Visible can also be used
                 // to hide non-imported items.
                 if (!IsVisibleItem(item)) {
                     continue;

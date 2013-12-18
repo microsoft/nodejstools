@@ -569,7 +569,7 @@ namespace Microsoft.VisualStudioTools.Project
     }
 
     /// <summary>
-    /// This type converter doesn't really do any conversions, but allowsu s to provide
+    /// This type converter doesn't really do any conversions, but allows us to provide
     /// a list of standard values for the build action.
     /// </summary>
     class BuildActionStringConverter : StringConverter {
