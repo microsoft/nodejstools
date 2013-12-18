@@ -378,7 +378,8 @@ try {
                     "Microsoft.NodejsTools.Profiling.dll",
                     "Microsoft.NodejsTools.ProjectWizard.dll",
                     "Microsoft.NodejsTools.WebRole.dll",
-                    "Microsoft.NodejsTools.Npm.dll"
+                    "Microsoft.NodejsTools.Npm.dll",
+                    "Microsoft.NodejsTools.TestAdapter.dll"
                     ) | ForEach {@{path="$destdir\Binaries\$_"; name=$projectName}})
                                 
                 $job1 = begin_sign_files $managed_files "$destdir\SignedBinaries" $approvers `
