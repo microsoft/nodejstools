@@ -63,9 +63,9 @@ namespace Microsoft.NodejsTools.NpmUI
             // _labelVersionTag
             // 
             this._labelVersionTag.AutoSize = true;
-            this._labelVersionTag.Location = new System.Drawing.Point(14, 59);
+            this._labelVersionTag.Location = new System.Drawing.Point(8, 59);
             this._labelVersionTag.Name = "_labelVersionTag";
-            this._labelVersionTag.Size = new System.Drawing.Size(79, 13);
+            this._labelVersionTag.Size = new System.Drawing.Size(84, 13);
             this._labelVersionTag.TabIndex = 1;
             this._labelVersionTag.Text = "&Version or Tag:";
             // 
@@ -73,7 +73,7 @@ namespace Microsoft.NodejsTools.NpmUI
             // 
             this._txtPackageName.Location = new System.Drawing.Point(94, 15);
             this._txtPackageName.Name = "_txtPackageName";
-            this._txtPackageName.Size = new System.Drawing.Size(351, 20);
+            this._txtPackageName.Size = new System.Drawing.Size(351, 22);
             this._txtPackageName.TabIndex = 2;
             this._tooltip.SetToolTip(this._txtPackageName, "Name of package. This must be an exact match.");
             this._txtPackageName.KeyUp += new System.Windows.Forms.KeyEventHandler(this._txtPackageName_KeyUp);
@@ -82,7 +82,7 @@ namespace Microsoft.NodejsTools.NpmUI
             // 
             this._txtVersionTag.Location = new System.Drawing.Point(94, 56);
             this._txtVersionTag.Name = "_txtVersionTag";
-            this._txtVersionTag.Size = new System.Drawing.Size(351, 20);
+            this._txtVersionTag.Size = new System.Drawing.Size(351, 22);
             this._txtVersionTag.TabIndex = 3;
             this._tooltip.SetToolTip(this._txtVersionTag, "Version, version range, or tag of required package.");
             this._txtVersionTag.KeyUp += new System.Windows.Forms.KeyEventHandler(this._txtVersionTag_KeyUp);
@@ -93,7 +93,7 @@ namespace Microsoft.NodejsTools.NpmUI
             this._labelNameRequired.ForeColor = System.Drawing.Color.Red;
             this._labelNameRequired.Location = new System.Drawing.Point(448, 18);
             this._labelNameRequired.Name = "_labelNameRequired";
-            this._labelNameRequired.Size = new System.Drawing.Size(11, 13);
+            this._labelNameRequired.Size = new System.Drawing.Size(12, 13);
             this._labelNameRequired.TabIndex = 4;
             this._labelNameRequired.Text = "*";
             // 
@@ -107,6 +107,7 @@ namespace Microsoft.NodejsTools.NpmUI
             this.Controls.Add(this._txtPackageName);
             this.Controls.Add(this._labelVersionTag);
             this.Controls.Add(this._labelPackageName);
+            this.Font = new System.Drawing.Font("Segoe UI", 8.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             this.Name = "PackageInstallPane";
             this.Size = new System.Drawing.Size(470, 112);
             this.ResumeLayout(false);
