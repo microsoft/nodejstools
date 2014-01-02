@@ -60,6 +60,11 @@ namespace Microsoft.NodejsTools.TestAdapter {
                         nodeExePath = NodejsTools.Nodejs.NodeExePath;
                     }
 
+                    if (!File.Exists(nodeExePath)) {
+                        logger.SendMessage(TestMessageLevel.Error, String.Format("Node.exe was not found.  Please install Node.js before running tests."));
+                        continue;
+                    }
+
                     // Provide all files to the test analyzer
                     foreach (var item in ((MSBuild.Project)proj).GetItems("Compile")) {
                         string fileAbsolutePath = CommonUtils.GetAbsoluteFilePath(projectHome, item.EvaluatedInclude);
