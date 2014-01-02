@@ -45,7 +45,7 @@ namespace Microsoft.NodejsTools.TestAdapter {
             : this(serviceProvider,
                    new SolutionEventsListener(serviceProvider),
                    new TestFilesUpdateWatcher(),
-                   new TestFileAddRemoveListener(serviceProvider,GuidList.NodejsBaseProjectFactory),
+                   new TestFileAddRemoveListener(serviceProvider,Guids.NodejsBaseProjectFactory),
                     operationState) { }
 
         public TestContainerDiscoverer(IServiceProvider serviceProvider,
@@ -83,7 +83,7 @@ namespace Microsoft.NodejsTools.TestAdapter {
         }
 
         private static IEnumerable<IVsProject> EnumerateLoadedProjects(IVsSolution solution) {
-            var guid = GuidList.NodejsBaseProjectFactory;
+            var guid = Guids.NodejsBaseProjectFactory;
             IEnumHierarchies hierarchies;
             ErrorHandler.ThrowOnFailure((solution.GetProjectEnum(
                 (uint)(__VSENUMPROJFLAGS.EPF_MATCHTYPE | __VSENUMPROJFLAGS.EPF_LOADEDINSOLUTION),
@@ -237,7 +237,7 @@ namespace Microsoft.NodejsTools.TestAdapter {
 
 
         public IEnumerable<ITestContainer> GetTestContainers(IVsProject project) {
-            if (!project.IsTestProject(GuidList.NodejsBaseProjectFactory)) {
+            if (!project.IsTestProject(Guids.NodejsBaseProjectFactory)) {
                 if (EqtTrace.IsVerboseEnabled) {
                     EqtTrace.Verbose("TestContainerDiscoverer: Ignoring project {0} as it is not a test project.", project.GetProjectName());
                 }
@@ -398,7 +398,7 @@ namespace Microsoft.NodejsTools.TestAdapter {
                 switch (e.ChangedReason) {
                     case TestFileChangedReason.Added:
                         Debug.Assert(e.Project != null);
-                        if (e.Project.IsTestProject(GuidList.NodejsBaseProjectFactory)) {
+                        if (e.Project.IsTestProject(Guids.NodejsBaseProjectFactory)) {
                             root = e.Project.GetProjectHome();
 
                             if (!string.IsNullOrEmpty(root) && CommonUtils.IsSubpathOf(root, e.File)) {
@@ -458,7 +458,7 @@ namespace Microsoft.NodejsTools.TestAdapter {
                 if (project.TryGetProjectPath(out projectPath) &&
                     CommonUtils.IsSamePath(projectPath, filename) ||
                     (hierarchy != null &&
-                    project.IsTestProject(GuidList.NodejsBaseProjectFactory) &&
+                    project.IsTestProject(Guids.NodejsBaseProjectFactory) &&
                     ErrorHandler.Succeeded(hierarchy.ParseCanonicalName(filename, out itemid)))) {
                     return project;
                 }

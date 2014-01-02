@@ -48,7 +48,7 @@ namespace Microsoft.NodejsTools.ProjectWizard {
             } else {
                 // https://nodejstools.codeplex.com/workitem/462
                 // we need to make sure our package is loaded before invoking our command
-                Guid packageGuid = new Guid(GuidList.guidNodePkgString);
+                Guid packageGuid = new Guid(Guids.NodejsPackageString);
                 IVsPackage package;
                 ((IVsShell)Package.GetGlobalService(typeof(SVsShell))).LoadPackage(
                     ref packageGuid,
@@ -57,7 +57,7 @@ namespace Microsoft.NodejsTools.ProjectWizard {
 
                 System.Threading.Tasks.Task.Factory.StartNew(() => {
                     object inObj = null, outObj = null;
-                    dte.Commands.Raise(GuidList.guidNodeCmdSet.ToString("B"), (int)PkgCmdId.cmdidImportWizard, ref inObj, ref outObj);
+                    dte.Commands.Raise(Guids.NodejsCmdSet.ToString("B"), (int)PkgCmdId.cmdidImportWizard, ref inObj, ref outObj);
                 });
             }
             throw new WizardCancelledException();

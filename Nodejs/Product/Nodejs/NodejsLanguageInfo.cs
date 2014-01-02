@@ -27,7 +27,7 @@ namespace Microsoft.NodejsTools {
     /// provide a code window manager so that we can have a navigation bar (actually we don't, this
     /// should be switched over to using our TextViewCreationListener instead).
     /// </summary>
-    [Guid(GuidList.guidNodejsLanguageInfo)]
+    [Guid(Guids.NodejsLanguageInfoString)]
     internal sealed class NodejsLanguageInfo : IVsLanguageInfo, IVsLanguageDebugInfo {
         private readonly IServiceProvider _serviceProvider;
         private readonly IComponentModel _componentModel;
@@ -71,7 +71,7 @@ namespace Microsoft.NodejsTools {
         }
 
         public int GetLanguageID(IVsTextBuffer pBuffer, int iLine, int iCol, out Guid pguidLanguageID) {
-            pguidLanguageID = GuidList.guidNodejsDebugLanguage;
+            pguidLanguageID = Guids.NodejsDebugLanguage;
             return VSConstants.S_OK;
         }
 

@@ -325,7 +325,7 @@ namespace Microsoft.NodejsTools.Debugger.DebugEngine {
             // Check whether breakpoint request for our language
             BP_REQUEST_INFO[] requestInfo = new BP_REQUEST_INFO[1];
             EngineUtils.CheckOk(pBPRequest.GetRequestInfo(enum_BPREQI_FIELDS.BPREQI_LANGUAGE | enum_BPREQI_FIELDS.BPREQI_BPLOCATION, requestInfo));
-            if (requestInfo[0].guidLanguage != GuidList.guidNodejsDebugLanguage && requestInfo[0].guidLanguage != GuidList.guidScriptDebugLanguage) {
+            if (requestInfo[0].guidLanguage != Guids.NodejsDebugLanguage && requestInfo[0].guidLanguage != Guids.ScriptDebugLanguage) {
                 // Check whether breakpoint request for our "downloaded" script
                 // "Downloaded" script will have our IDebugDocument2
                 IDebugDocument2 debugDocument;

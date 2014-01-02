@@ -48,7 +48,7 @@ namespace Microsoft.NodejsTools.Profiling {
     [InstalledProductRegistration("#110", "#112", AssemblyVersionInfo.Version, IconResourceID = 400)]
     // This attribute is needed to let the shell know that this package exposes some menus.
     [ProvideMenuResource("Menus.ctmenu", 1)]
-    [Guid(GuidList.guidNodeProfilingPkgString)]
+    [Guid(Guids.NodejsProfilingPkgString)]
     // set the window to dock where Toolbox/Performance Explorer dock by default
     [ProvideToolWindow(typeof(PerfToolWindow), Orientation = ToolWindowOrientation.Left, Style = VsDockStyle.Tabbed, Window = EnvDTE.Constants.vsWindowKindToolbox)]
     [ProvideFileFilterAttribute("{9C34161A-379E-4933-A0DC-871FE64D34F1}", "/1", "Node.js Performance Session (*" + PerfFileType + ");*" + PerfFileType, 100)]
@@ -99,34 +99,34 @@ namespace Microsoft.NodejsTools.Profiling {
             OleMenuCommandService mcs = GetService(typeof(IMenuCommandService)) as OleMenuCommandService;
             if (null != mcs) {
                 // Create the command for the menu item.
-                CommandID menuCommandID = new CommandID(GuidList.guidNodeProfilingCmdSet, (int)PkgCmdIDList.cmdidStartNodeProfiling);
+                CommandID menuCommandID = new CommandID(Guids.NodejsProfilingCmdSet, (int)PkgCmdIDList.cmdidStartNodeProfiling);
                 var oleMenuItem = new OleMenuCommand(StartProfilingWizard, menuCommandID);
                 oleMenuItem.BeforeQueryStatus += IsProfilingActive;
                 _startWizard = oleMenuItem;
                 mcs.AddCommand(oleMenuItem);
 
                 // Create the command for the menu item.
-                menuCommandID = new CommandID(GuidList.guidNodeProfilingCmdSet, (int)PkgCmdIDList.cmdidPerfExplorer);
+                menuCommandID = new CommandID(Guids.NodejsProfilingCmdSet, (int)PkgCmdIDList.cmdidPerfExplorer);
                 oleMenuItem = new OleMenuCommand(ShowPeformanceExplorer, menuCommandID);
                 mcs.AddCommand(oleMenuItem);
 
-                menuCommandID = new CommandID(GuidList.guidNodeProfilingCmdSet, (int)PkgCmdIDList.cmdidAddPerfSession);
+                menuCommandID = new CommandID(Guids.NodejsProfilingCmdSet, (int)PkgCmdIDList.cmdidAddPerfSession);
                 oleMenuItem = new OleMenuCommand(AddPerformanceSession, menuCommandID);
                 oleMenuItem.BeforeQueryStatus += IsProfilingActive;
                 mcs.AddCommand(oleMenuItem);
 
-                menuCommandID = new CommandID(GuidList.guidNodeProfilingCmdSet, (int)PkgCmdIDList.cmdidStartProfiling);
+                menuCommandID = new CommandID(Guids.NodejsProfilingCmdSet, (int)PkgCmdIDList.cmdidStartProfiling);
                 oleMenuItem = _startCommand = new OleMenuCommand(StartProfiling, menuCommandID);
                 oleMenuItem.BeforeQueryStatus += IsProfilingActiveAndSessionsExist;
                 mcs.AddCommand(oleMenuItem);
 
-                menuCommandID = new CommandID(GuidList.guidNodeProfilingCmdSet, (int)PkgCmdIDList.cmdidStopProfiling);
+                menuCommandID = new CommandID(Guids.NodejsProfilingCmdSet, (int)PkgCmdIDList.cmdidStopProfiling);
                 _stopCommand = oleMenuItem = new OleMenuCommand(StopProfiling, menuCommandID);
                 oleMenuItem.BeforeQueryStatus += IsProfilingInactive;
 
                 mcs.AddCommand(oleMenuItem);
 
-                menuCommandID = new CommandID(GuidList.guidNodeProfilingCmdSet, (int)PkgCmdIDList.cmdidStartPerformanceAnalysis);
+                menuCommandID = new CommandID(Guids.NodejsProfilingCmdSet, (int)PkgCmdIDList.cmdidStartPerformanceAnalysis);
                 _startProfiling = oleMenuItem = new OleMenuCommand(StartPerfAnalysis, menuCommandID);
                 oleMenuItem.BeforeQueryStatus += IsNodejsProjectStartup;
                 mcs.AddCommand(oleMenuItem);

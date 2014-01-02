@@ -204,7 +204,7 @@ namespace Microsoft.NodejsTools.Debugger.DebugEngine {
                 return _documentContext.GetLanguageInfo(ref pbstrLanguage, ref pguidLanguage);
             }
             pbstrLanguage = NodejsConstants.Nodejs;
-            pguidLanguage = GuidList.guidNodejsDebugLanguage;
+            pguidLanguage = Guids.NodejsDebugLanguage;
             return VSConstants.S_OK;
         }
 

@@ -249,7 +249,7 @@ namespace Microsoft.NodejsTools {
         }
 
         private bool TryShowContextMenu(IntPtr pvaIn, Guid itemType, out int res) {
-            if (itemType == new Guid(GuidList.NodejsProjectFactoryString)) {
+            if (itemType == new Guid(Guids.NodejsProjectFactoryString)) {
                 // multiple Node prjoect nodes selected
                 res = ShowContextMenu(pvaIn, VsMenus.IDM_VS_CTXT_PROJNODE/*IDM_VS_CTXT_WEBPROJECT*/);
                 return true;
@@ -326,7 +326,7 @@ namespace Microsoft.NodejsTools {
         }
 
         int IOleCommandTarget.Exec(ref Guid pguidCmdGroup, uint nCmdID, uint nCmdexecopt, IntPtr pvaIn, IntPtr pvaOut) {
-            if (pguidCmdGroup == GuidList.guidWebPackgeCmdId) {
+            if (pguidCmdGroup == Guids.WebPackageCommandId) {
                 if (nCmdID == 0x101 /*  EnablePublishToWindowsAzureMenuItem*/) {
 
                     // We need to forward the command to the web publish package and let it handle it, while
@@ -335,7 +335,7 @@ namespace Microsoft.NodejsTools {
                     // Python...
                     using (var listener = new AzureSolutionListener(this)) {
                         var shell = (IVsShell)((System.IServiceProvider)this).GetService(typeof(SVsShell));
-                        Guid webPublishPackageGuid = GuidList.guidWebPackageGuid;
+                        Guid webPublishPackageGuid = Guids.WebPackage;
                         IVsPackage package;
 
                         if (ErrorHandler.Succeeded(shell.LoadPackage(ref webPublishPackageGuid, out package))) {
@@ -379,7 +379,7 @@ namespace Microsoft.NodejsTools {
         }
 
         int IOleCommandTarget.QueryStatus(ref Guid pguidCmdGroup, uint cCmds, OLECMD[] prgCmds, IntPtr pCmdText) {
-            if (pguidCmdGroup == GuidList.guidEureka) {
+            if (pguidCmdGroup == Guids.Eureka) {
                 for (int i = 0; i < prgCmds.Length; i++) {
                     switch (prgCmds[i].cmdID) {
                         case 0x102: // View in Web Page Inspector from Eureka web tools
@@ -387,7 +387,7 @@ namespace Microsoft.NodejsTools {
                             return VSConstants.S_OK;
                     }
                 }
-            } else if (pguidCmdGroup == GuidList.guidVenusCmdId) {
+            } else if (pguidCmdGroup == Guids.VenusCommandId) {
                 for (int i = 0; i < prgCmds.Length; i++) {
                     switch (prgCmds[i].cmdID) {
                         case 0x034: /* add app assembly folder */
@@ -405,10 +405,10 @@ namespace Microsoft.NodejsTools {
                             return VSConstants.S_OK;
                     }
                 }
-            } else if (pguidCmdGroup == GuidList.guidWebPackgeCmdId) {
+            } else if (pguidCmdGroup == Guids.WebPackageCommandId) {
                 if (prgCmds[0].cmdID == 0x101 /*  EnablePublishToWindowsAzureMenuItem*/) {
                 }
-            } else if (pguidCmdGroup == GuidList.guidWebAppCmdId) {
+            } else if (pguidCmdGroup == Guids.WebAppCmdId) {
                 for (int i = 0; i < prgCmds.Length; i++) {
                     switch (prgCmds[i].cmdID) {
                         case 0x06A: /* check accessibility */
@@ -810,7 +810,7 @@ namespace Microsoft.NodejsTools {
             if (_innerProject3 != null) {
                 if (IsJavaScriptFile(GetItemName(_innerVsHierarchy, itemid))) {
                     // force HTML files opened w/o an editor type to be opened w/ our editor factory.
-                    Guid guid = GuidList.guidNodeEditorFactory;
+                    Guid guid = Guids.NodejsEditorFactory;
                     return _innerProject3.OpenItemWithSpecific(
                         itemid,
                         0,

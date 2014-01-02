@@ -254,7 +254,7 @@ namespace Microsoft.NodejsTools.Profiling {
                             if (uishell != null) {
                                 var pt = System.Windows.Forms.Cursor.Position;
                                 var pnts = new[] { new POINTS { x = (short)pt.X, y = (short)pt.Y } };
-                                var guid = GuidList.guidNodeProfilingCmdSet;
+                                var guid = Guids.NodejsProfilingCmdSet;
                                 int hr = uishell.ShowContextMenu(
                                     0,
                                     ref guid,
@@ -311,7 +311,7 @@ namespace Microsoft.NodejsTools.Profiling {
             #region IOleCommandTarget Members
 
             public int Exec(ref Guid pguidCmdGroup, uint nCmdID, uint nCmdexecopt, IntPtr pvaIn, IntPtr pvaOut) {
-                if (pguidCmdGroup == GuidList.guidNodeProfilingCmdSet) {
+                if (pguidCmdGroup == Guids.NodejsProfilingCmdSet) {
                     switch (nCmdID) {
                         case PkgCmdIDList.cmdidOpenReport:
                             _node.OpenProfile(_itemid);

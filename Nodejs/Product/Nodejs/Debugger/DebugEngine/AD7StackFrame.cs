@@ -294,7 +294,7 @@ namespace Microsoft.NodejsTools.Debugger.DebugEngine {
         // In this sample, all the supported stack frames are C++
         int IDebugStackFrame2.GetLanguageInfo(ref string pbstrLanguage, ref Guid pguidLanguage) {
             pbstrLanguage = NodejsConstants.Nodejs;
-            pguidLanguage = GuidList.guidNodejsDebugLanguage;
+            pguidLanguage = Guids.NodejsDebugLanguage;
             return VSConstants.S_OK;
         }
 

@@ -97,7 +97,7 @@ namespace Microsoft.NodejsTools.Project {
 
         public override Guid SharedCommandGuid {
             get {
-                return GuidList.guidNodeCmdSet;
+                return Guids.NodejsCmdSet;
             }
         }
 

@@ -19,7 +19,7 @@ using Microsoft.VisualStudioTools.Project;
 using IOleServiceProvider = Microsoft.VisualStudio.OLE.Interop.IServiceProvider;
 
 namespace Microsoft.NodejsTools {
-    [Guid(GuidList.NodejsBaseProjectFactoryString)]
+    [Guid(Guids.NodejsBaseProjectFactoryString)]
     class BaseNodeProjectFactory : ProjectFactory {
         public BaseNodeProjectFactory(NodejsProjectPackage package) : base(package) {
         }

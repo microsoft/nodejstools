@@ -130,7 +130,7 @@ namespace Microsoft.NodejsTools.Project {
             //  Latter condition is because it's only valid to carry out npm operations
             //  on top level dependencies of the user's project, not sub-dependencies.
             //  Performing operations on sub-dependencies would just break things.
-            if (cmdGroup == GuidList.guidNodeCmdSet && null == _parent) {
+            if (cmdGroup == Guids.NodejsCmdSet && null == _parent) {
                 switch (cmd) {
                     case PkgCmdId.cmdidNpmInstallSingleMissingModule:
                         if (null == _projectNode.ModulesNode
@@ -167,7 +167,7 @@ namespace Microsoft.NodejsTools.Project {
         }
 
         internal override int ExecCommandOnNode(Guid cmdGroup, uint cmd, uint nCmdexecopt, IntPtr pvaIn, IntPtr pvaOut) {
-            if (cmdGroup == GuidList.guidNodeCmdSet && null == _parent) {
+            if (cmdGroup == Guids.NodejsCmdSet && null == _parent) {
                 switch (cmd) {
                     case PkgCmdId.cmdidNpmInstallSingleMissingModule:
                         if (null != _projectNode.ModulesNode) {

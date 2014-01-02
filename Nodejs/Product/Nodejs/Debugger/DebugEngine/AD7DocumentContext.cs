@@ -106,7 +106,7 @@ namespace Microsoft.NodejsTools.Debugger.DebugEngine {
         // The language for this sample is always C++
         int IDebugDocumentContext2.GetLanguageInfo(ref string pbstrLanguage, ref Guid pguidLanguage) {
             pbstrLanguage = NodejsConstants.Nodejs;
-            pguidLanguage = GuidList.guidNodejsDebugLanguage;
+            pguidLanguage = Guids.NodejsDebugLanguage;
             return VSConstants.S_OK;
         }
 

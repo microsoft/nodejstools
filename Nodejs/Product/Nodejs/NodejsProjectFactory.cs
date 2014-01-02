@@ -17,7 +17,7 @@ using System.Runtime.InteropServices;
 using Microsoft.VisualStudio.Shell.Flavor;
 
 namespace Microsoft.NodejsTools {
-    [Guid(GuidList.NodejsProjectFactoryString)]
+    [Guid(Guids.NodejsProjectFactoryString)]
     class NodejsProjectFactory : FlavoredProjectFactoryBase {
         private NodejsPackage _package;
 
