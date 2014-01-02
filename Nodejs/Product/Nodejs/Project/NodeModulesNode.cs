@@ -31,7 +31,7 @@ using MessageBox = System.Windows.MessageBox;
 using Timer = System.Threading.Timer;
 
 namespace Microsoft.NodejsTools.Project {
-    internal class NodeModulesNode : HierarchyNode {
+    internal class NodeModulesNode : AbstractNpmNode {
         #region Constants
 
         /// <summary>
@@ -507,10 +507,6 @@ namespace Microsoft.NodejsTools.Project {
 
         public override string Caption {
             get { return _cCaption; }
-        }
-
-        public override Guid ItemTypeGuid {
-            get { return VSConstants.GUID_ItemType_VirtualFolder; }
         }
 
         public override int MenuCommandId {
