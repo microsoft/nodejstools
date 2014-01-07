@@ -92,6 +92,7 @@
       <DependentUpon>Resources.resx</DependentUpon>
     </Compile>
     <Compile Include="SerializationTestData.cs" />
+    <Compile Include="SourceMapTests.cs" />
     <Compile Include="TestNodejsReplSite.cs" />
   </ItemGroup>
   <ItemGroup>

@@ -366,6 +366,7 @@
     <Compile Include="Repl\VsNodejsReplSite.cs" />
     <Compile Include="SmartIndent.cs" />
     <Compile Include="SmartIndentProvider.cs" />
+    <Compile Include="SourceMap.cs" />
     <Compile Include="VsMenus.cs" />
     <Compile Include="AzureSolutionListener.cs" />
     <Compile Include="BaseNodeProjectFactory.cs" />

@@ -37,6 +37,7 @@ namespace ProfilingUITests {
     [TestClass]
     public class ProfilingTests {
         public const string NodejsProfileTest = "TestData\\NodejsProfileTest\\NodejsProfileTest.sln";
+        public const string NodejsTypeScriptProfileTest = "TestData\\NodejsTypeScriptProfileTest\\NodejsProfileTest.sln";
 
         [ClassInitialize]
         public static void DoDeployment(TestContext context) {
@@ -595,6 +596,39 @@ namespace ProfilingUITests {
                 }
             }
         }
+
+        [TestMethod, Priority(0), TestCategory("Core")]
+        [HostType("TC Dynamic"), DynamicHostType(typeof(VsIdeHostAdapter))]
+        public void LaunchMappedProject() {
+            var profiling = (INodeProfiling)VsIdeTestHostContext.Dte.GetObject("NodejsProfiling");
+
+            // no sessions yet
+            Assert.AreEqual(profiling.GetSession(1), null);
+
+            var project = OpenProject(NodejsTypeScriptProfileTest);
+
+            using (var app = new VisualStudioApp(VsIdeTestHostContext.Dte)) {
+                var session = LaunchProject(app, profiling, project, TestData.GetPath("TestData\\NodejsTypeScriptProfileTest"), false);
+                try {
+                    while (profiling.IsProfiling) {
+                        System.Threading.Thread.Sleep(500);
+                    }
+
+                    var report = session.GetReport(1);
+                    var filename = report.Filename;
+                    Assert.IsTrue(filename.Contains("NodejsProfileTest"));
+
+                    Assert.AreEqual(session.GetReport(2), null);
+
+                    Assert.AreNotEqual(session.GetReport(report.Filename), null);
+
+                    VerifyReport(report, "program.Greeter.f");
+                } finally {
+                    profiling.RemoveSession(session, true);
+                }
+            }
+        }
+
 
         [TestMethod, Priority(0), TestCategory("Core")]
         [HostType("TC Dynamic"), DynamicHostType(typeof(VsIdeHostAdapter))]

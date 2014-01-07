@@ -63,6 +63,7 @@ namespace Microsoft.NodejsTools.LogParsing {
         private readonly string _filename;
         private readonly string _outputFile;
         private readonly TimeSpan? _executionTime;
+        private Dictionary<string, SourceMap> _sourceMaps = new Dictionary<string, SourceMap>(StringComparer.OrdinalIgnoreCase);
         // Currently we maintain 2 layouts, one for code, one for shared libraries,
         // because V8 is dropping the high 32-bits of code loaded on 64-bit systems.
         // This will let us lookup against the JIT code layout, and then the lib layout, and
@@ -375,10 +376,10 @@ namespace Microsoft.NodejsTools.LogParsing {
         internal FunctionInformation ExtractNamespaceAndMethodName(string method, string type = "LazyCompile") {
             bool isRecompilation = !_allMethods.Add(method);
 
-            return ExtractNamespaceAndMethodName(method, isRecompilation, type);
+            return ExtractNamespaceAndMethodName(method, isRecompilation, type, _sourceMaps);
         }
 
-        internal static FunctionInformation ExtractNamespaceAndMethodName(string method, bool isRecompilation, string type = "LazyCompile") {
+        internal static FunctionInformation ExtractNamespaceAndMethodName(string method, bool isRecompilation, string type = "LazyCompile", Dictionary<string, SourceMap> sourceMaps = null) {
             string methodName = method;
             string ns = "";
             int? lineNo = null;
@@ -389,6 +390,7 @@ namespace Microsoft.NodejsTools.LogParsing {
                 method = method.Substring(1, method.Length - 2);
             }
 
+            int firstSpace;
             if (type == "Script" || type == "Function") {
                 // code-creation,Function,0xf1c38300,1928," assert.js:1",0xa6d4df58,~
                 // code-creation,Script,0xf1c38aa0,244,"assert.js",0xa6d4e050,~
@@ -396,13 +398,18 @@ namespace Microsoft.NodejsTools.LogParsing {
 
                 // this is a top level script or module, report it as such
                 methodName = "<node module>";
-                return new FunctionInformation("<node module>", GetModuleName(method), 1, GetFileName(method), isRecompilation);
+
+                string fileTemp = method;
+                if (type == "Function") {
+                    fileTemp = fileTemp.Substring(fileTemp.IndexOf(' ') + 1);
+                }
+                return MaybeMap(new FunctionInformation("<node module>", GetModuleName(method), 1, GetFileName(fileTemp), isRecompilation), sourceMaps);
             }
 
             // " net.js:931"
             // "f C:\Source\NodeApp2\NodeApp2\server.js:5"
             // " C:\Source\NodeApp2\NodeApp2\server.js:16"
-            int firstSpace = method.IndexOf(' ');
+            firstSpace = method.IndexOf(' ');
             if (firstSpace != -1) {
                 if (firstSpace == 0) {
                     methodName = "anonymous method";
@@ -429,7 +436,41 @@ namespace Microsoft.NodejsTools.LogParsing {
                 }
             }
 
-            return new FunctionInformation(ns, methodName, lineNo, filename, isRecompilation);
+            return MaybeMap(new FunctionInformation(ns, methodName, lineNo, filename, isRecompilation), sourceMaps);
+        }
+        
+        private static FunctionInformation MaybeMap(FunctionInformation funcInfo, Dictionary<string, SourceMap> sourceMaps) {
+            if (File.Exists(funcInfo.Filename) && File.Exists(funcInfo.Filename + ".map") && funcInfo.LineNumber != null) {
+                SourceMap map;
+                if (!sourceMaps.TryGetValue(funcInfo.Filename, out map)) {
+                    try {
+                        map = new SourceMap(new StreamReader(funcInfo.Filename + ".map"));
+                    } catch (InvalidOperationException) {
+                    } catch (FileNotFoundException) {
+                    } catch (DirectoryNotFoundException) {
+                    } catch (IOException) {
+                    }
+
+                    sourceMaps[funcInfo.Filename] = map;
+                }
+
+                SourceMapping mapping;
+                if (map != null && map.TryMapLine(funcInfo.LineNumber.Value, out mapping)) {
+                    string filename = mapping.Filename;
+                    if (filename != null && !Path.IsPathRooted(filename)) {
+                        filename = Path.Combine(Path.GetDirectoryName(funcInfo.Filename), filename);
+                    }
+
+                    return new FunctionInformation(
+                        funcInfo.Namespace,
+                        mapping.Name ?? funcInfo.Function,
+                        mapping.Line,
+                        filename ?? funcInfo.Filename,
+                        funcInfo.IsRecompilation
+                    );
+                }
+            }
+            return funcInfo;
         }
 
         private static char[] _invalidPathChars = Path.GetInvalidPathChars();
