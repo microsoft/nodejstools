@@ -158,6 +158,10 @@ namespace Microsoft.NodejsTools.NpmUI {
             if (null != pkg.Author &&
                 !string.IsNullOrEmpty(pkg.Author.Name)) {
                 author = string.Format("by {0}", pkg.Author.Name);
+                var max = owner is PackageSearchPane ? 25 : 18;
+                if (author.Length > max){
+                    author = author.Substring(0, max - 3) + "...";
+                }
             }
             size = TextRenderer.MeasureText(g, author, owner.Font);
             TextRenderer.DrawText(
