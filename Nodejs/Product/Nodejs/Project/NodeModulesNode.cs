@@ -48,7 +48,7 @@ namespace Microsoft.NodejsTools.Project {
 
         #region Member variables
 
-        private readonly NodejsProjectNode _projectNode;
+        private readonly GlobalModulesNode _globalModulesNode;
         private readonly FileSystemWatcher _watcher;
         private Timer _fileSystemWatcherTimer;
         private INpmController _npmController;
@@ -66,7 +66,6 @@ namespace Microsoft.NodejsTools.Project {
 
         public NodeModulesNode(NodejsProjectNode root)
             : base(root) {
-            _projectNode = root;
             ExcludeNodeFromScc = true;
 
             _watcher = new FileSystemWatcher(_projectNode.ProjectHome) {
@@ -79,6 +78,9 @@ namespace Microsoft.NodejsTools.Project {
             _watcher.EnableRaisingEvents = true;
 
             CreateNpmController();
+
+            _globalModulesNode = new GlobalModulesNode(root, this);
+            AddChild(_globalModulesNode);
         }
 
         private void CheckNotDisposed() {
@@ -427,58 +429,10 @@ namespace Microsoft.NodejsTools.Project {
                 if (null != root) {
                     ReloadHierarchy(this, root.Modules);
                 }
-            }
-        }
 
-        private void ReloadHierarchy(HierarchyNode parent, INodeModules modules) {
-            //  We're going to reuse nodes for which matching modules exist in the new set.
-            //  The reason for this is that we want to preserve the expansion state of the
-            //  hierarchy. If we just bin everything off and recreate it all from scratch
-            //  it'll all be in the collapsed state, which will be annoying for users who
-            //  have drilled down into the hierarchy
-            var recycle = new Dictionary<string, DependencyNode>();
-            var remove = new List<HierarchyNode>();
-            for (var current = parent.FirstChild; null != current; current = current.NextSibling) {
-                var dep = current as DependencyNode;
-                if (null == dep) {
-                    remove.Add(current);
-                    continue;
-                }
-
-                if (modules.Any(
-                    module =>
-                    module.Name == dep.Package.Name
-                    && module.Version == dep.Package.Version
-                    && module.IsBundledDependency == dep.Package.IsBundledDependency
-                    && module.IsDevDependency == dep.Package.IsDevDependency
-                    && module.IsListedInParentPackageJson == dep.Package.IsListedInParentPackageJson
-                    && module.IsMissing == dep.Package.IsMissing
-                    && module.IsOptionalDependency == dep.Package.IsOptionalDependency)) {
-                    recycle[dep.Package.Name] = dep;
-                } else {
-                    remove.Add(current);
-                }
-            }
-
-            foreach (var obsolete in remove) {
-                parent.RemoveChild(obsolete);
-                ProjectMgr.OnItemDeleted(obsolete);
-            }
-
-            foreach (var package in modules) {
-                DependencyNode child;
-
-                if (recycle.ContainsKey(package.Name)) {
-                    child = recycle[package.Name];
-                    child.Package = package;
-                } else {
-                    child = new DependencyNode(_projectNode, parent as DependencyNode, package);
-                    parent.AddChild(child);
-                }
-
-                ReloadHierarchy(child, package.Modules);
-                if (ProjectMgr.ParentHierarchy != null) {
-                    child.ExpandItem(EXPANDFLAGS.EXPF_CollapseFolder);
+                var global = controller.GlobalPackages;
+                if (null != global){
+                    ReloadHierarchy(_globalModulesNode, global.Modules);
                 }
             }
         }

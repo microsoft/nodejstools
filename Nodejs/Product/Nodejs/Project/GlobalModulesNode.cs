@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using Microsoft.VisualStudioTools.Project;
 
 namespace Microsoft.NodejsTools.Project {
     internal class GlobalModulesNode : AbstractNpmNode {
@@ -23,6 +24,11 @@ namespace Microsoft.NodejsTools.Project {
             _parent = parent;
         }
 
+        public override object GetIconHandle(bool open) {
+            return
+                ProjectMgr.ImageHandler.GetIconHandle(
+                    open ? (int)ProjectNode.ImageName.OpenReferenceFolder : (int)ProjectNode.ImageName.ReferenceFolder);
+        }
 
         public override string Url{
             get { return GlobalModulesVirtualName; }
