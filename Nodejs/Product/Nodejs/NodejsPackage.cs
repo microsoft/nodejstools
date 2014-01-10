@@ -157,7 +157,7 @@ namespace Microsoft.NodejsTools {
     [ProvideDebugException(AD7Engine.DebugEngineId, "Node.js Exceptions", "SyntaxError", State = enum_EXCEPTION_STATE.EXCEPTION_NONE)]
     [ProvideDebugException(AD7Engine.DebugEngineId, "Node.js Exceptions", "TypeError", State = enum_EXCEPTION_STATE.EXCEPTION_STOP_ALL)]
     [ProvideDebugException(AD7Engine.DebugEngineId, "Node.js Exceptions", "URIError", State = enum_EXCEPTION_STATE.EXCEPTION_STOP_ALL)]
-    [ProvideProjectFactory(typeof(NodejsProjectFactory), null, null, null, null, ".\\NullPath", LanguageVsTemplate = NodejsConstants.Nodejs)]   // outer flavor, no file extension
+    [ProvideProjectFactory(typeof(NodejsProjectFactory), null, null, null, null, "ProjectTemplates", LanguageVsTemplate = NodejsConstants.JavaScript, SortPriority=0x17)]   // outer flavor, no file extension
     [ProvideDebugPortSupplier("Node remote debugging", typeof(NodeRemoteDebugPortSupplier), NodeRemoteDebugPortSupplier.PortSupplierId)]
     [ProvideMenuResource(1000, 1)]                              // This attribute is needed to let the shell know that this package exposes some menus.
     [ProvideEditorExtension2(typeof(NodejsEditorFactory), NodeJsFileType, 50, "*:1", ProjectGuid = "{78D985FC-2CA0-4D08-9B6B-35ACD5E5294A}", NameResourceID = 102, DefaultName = "server", TemplateDir = "FileTemplates\\NewItem")]
@@ -254,6 +254,21 @@ namespace Microsoft.NodejsTools {
             ((IConnectionPointContainer)textMgr).FindConnectionPoint(ref guid, out connectionPoint);
             uint cookie;
             connectionPoint.Advise(_langPrefs, out cookie);
+
+            MakeDebuggerContextAvailable();
+        }
+
+        /// <summary>
+        /// Makes the debugger context available - this enables our debugger when we're installed into
+        /// a SKU which doesn't support every installed debugger.
+        /// </summary>
+        private void MakeDebuggerContextAvailable() {
+            var monitorSelection = (IVsMonitorSelection)GetService(typeof(SVsShellMonitorSelection));
+            Guid debugEngineGuid = AD7Engine.DebugEngineGuid;
+            uint contextCookie;
+            if (ErrorHandler.Succeeded(monitorSelection.GetCmdUIContextCookie(ref debugEngineGuid, out contextCookie))) {
+                ErrorHandler.ThrowOnFailure(monitorSelection.SetCmdUIContext(contextCookie, 1));
+            }
         }
 
         internal void OpenReplWindow() {

@@ -20,7 +20,7 @@ namespace Microsoft.NodejsTools
 {
     static class Guids
     {
-        public const string NodejsPackageString = "4219f2a8-fbf9-4659-a222-b7580a60eebb";
+        public const string NodejsPackageString = "FE8A8C3D-328A-476D-99F9-2A24B75F8C7F";
         public const string NodejsCmdSetString = "695e37e2-c6df-4e0a-8833-f688e4c65f1f";
         public const string NodejsEditorFactoryString = "88941496-93F4-4E37-83AF-AFE087415334";
         public const string NodejsEditorFactoryPromptEncodingString = "C8576E92-EFB6-4414-8F63-C84D474A539E";
@@ -32,7 +32,7 @@ namespace Microsoft.NodejsTools
         public const string ScriptDebugLanguageString = "{F7FA31DA-C32A-11D0-B442-00A0244A1DD2}";
 
         // Profiling guids
-        public const string NodejsProfilingPkgString = "9C34161A-379E-4933-A0DC-871FE64D34F1";
+        public const string NodejsProfilingPkgString = "B515653F-FB69-4B64-9D3F-F1FCF8421DD0";
         public const string NodejsProfilingCmdSetString = "3F2BC93C-CA2D-450B-9BFC-0C96288F1ED6";
         public const string ProfilingEditorFactoryString = "3585dc22-81a0-409e-85ae-cae5d02d99cd";
 

@@ -2,7 +2,7 @@
   <TemplateData>
     <Name>Blank Windows Azure Node.js Application</Name>
     <Description>An empty Node.js application for Windows Azure.</Description>
-    <Icon Package="{4219f2a8-fbf9-4659-a222-b7580a60eebb}" ID="401" />
+    <Icon Package="{FE8A8C3D-328A-476D-99F9-2A24B75F8C7F}" ID="401" />
     <ProjectType>Web</ProjectType>
     <ProjectSubType>JavaScript</ProjectSubType>
     <TemplateID>Microsoft.Web.JavaScript.AddWebSiteAzureNodejsApp</TemplateID>

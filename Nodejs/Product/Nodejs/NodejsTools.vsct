@@ -256,7 +256,7 @@
 
   <Symbols>
     <!-- This is the package guid. -->
-    <GuidSymbol name="guidNodeToolsPkg" value="{4219f2a8-fbf9-4659-a222-b7580a60eebb}" />
+    <GuidSymbol name="guidNodeToolsPkg" value="{FE8A8C3D-328A-476D-99F9-2A24B75F8C7F}" />
 
     <!-- This is our command set GUID and associated commands -->
     <GuidSymbol name="guidNodeToolsCmdSet" value="{695e37e2-c6df-4e0a-8833-f688e4c65f1f}">

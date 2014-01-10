@@ -36,6 +36,14 @@
       <Property Id="VisualStudioInstallRegistry" Value="SOFTWARE\Microsoft\VisualStudio\11.0\"/>
     <?endif?>
 -->
+    <Property Id="VWDEXPRESS_INSTALLED" Secure="yes">
+      <?if "$(var.VSTargetVersion)" = "11.0" ?>
+        <RegistrySearch Id="WebExpressInstallRegSearch" Root="HKLM" Key="SOFTWARE\Microsoft\VWDExpress\11.0\Setup\VS" Name="ProductDir" Type="raw" />
+      <?elseif "$(var.VSTargetVersion)" = "12.0" ?>
+        <RegistrySearch Id="WebExpressInstallRegSearch" Root="HKLM" Key="SOFTWARE\Microsoft\VWDExpress\12.0\Setup\VS" Name="ProductDir" Type="raw" />
+      <?endif ?>
+    </Property>
+
     <Property Id="VSPRO_INSTALLED" Secure="yes">
       <?if "$(var.VSTargetVersion)" = "11.0" ?>
         <RegistrySearch Id="ProInstallRegSearch" Root="HKLM" Key="SOFTWARE\Microsoft\VisualStudio\11.0\Setup\Microsoft Visual Studio Professional 2012" Name="InstallSuccess" Type="raw" />
@@ -63,13 +71,15 @@
     <Property Id="DEVENV_PATH" Secure="yes">
       <RegistrySearch Id="DevEnvPath" Root="HKLM" Key="Software\Microsoft\VisualStudio\$(var.VSTargetVersion)\Setup\VS" Name="EnvironmentPath" Type="raw" />
     </Property>
-    
+
+    <CustomAction Id="GetVwdPath" Property="VWD_PATH" Value="[VWDINSTALLPATH]\VWDExpress.exe" Execute="immediate" />     
+
     <!-- Conditions for install -->
     
     <?if "$(var.VSTargetVersion)" = "11.0" ?>
-    <Condition Message="Visual Studio 2012 (Professional, Premium, or Ultimate) must be installed."> VSPRO_INSTALLED OR VSPREMIUM_INSTALLED OR VSULTIMATE_INSTALLED OR Installed </Condition>
+    <Condition Message="Visual Studio 2012 (Professional, Premium, Ultimate, or Web Express) must be installed."> VSPRO_INSTALLED OR VSPREMIUM_INSTALLED OR VSULTIMATE_INSTALLED OR VWDEXPRESS_INSTALLED OR Installed </Condition>
     <?elseif "$(var.VSTargetVersion)" = "12.0" ?>
-    <Condition Message="Visual Studio 2013 (Professional, Premium, or Ultimate) must be installed."> VSPRO_INSTALLED OR VSPREMIUM_INSTALLED OR VSULTIMATE_INSTALLED OR Installed </Condition>
+    <Condition Message="Visual Studio 2013 (Professional, Premium, Ultimate, or Web Express) must be installed."> VSPRO_INSTALLED OR VSPREMIUM_INSTALLED OR VSULTIMATE_INSTALLED OR VWDEXPRESS_INSTALLED OR Installed </Condition>
     <?endif ?>
     
     <!-- Files/Components/MSMs to install -->
@@ -121,6 +131,7 @@
         <RemoveFolder Id='Comp_InstallDirItems' On='uninstall'/>
 
         <util:RestartResource Path="[DEVENV_PATH]" />
+        <util:RestartResource Path="[VWD_PATH]" />
       </Component>
     </DirectoryRef>
 
@@ -144,9 +155,15 @@
     <CustomAction Id="DevEnvSetup" Property="DEVENV_PATH" ExeCommand="/setup" Execute="deferred" Return="check" Impersonate="no" />
     <CustomAction Id="DevEnvSetup_Rollback" Property="DEVENV_PATH" ExeCommand="/setup" Execute="rollback" Return="check" Impersonate="no" />
 
+    <CustomAction Id="VWDSetup" Property="VWD_PATH" ExeCommand="/setup" Execute="deferred" Return="check" Impersonate="no" />
+    <CustomAction Id="VWDSetup_Rollback" Property="VWD_PATH" ExeCommand="/setup" Execute="rollback" Return="check" Impersonate="no" />
+
     <InstallExecuteSequence>
       <Custom Action="DevEnvSetup_Rollback" Before="DevEnvSetup" Overridable="yes">DEVENV_PATH</Custom>
       <Custom Action="DevEnvSetup" Before="InstallFinalize" Overridable="yes">DEVENV_PATH</Custom>
+      <Custom Action="GetVwdPath" Before="CostFinalize">VWDINSTALLPATH</Custom>
+      <Custom Action="VWDSetup_Rollback" Before="VWDSetup" Overridable="yes">VWD_PATH</Custom>
+      <Custom Action="VWDSetup" Before="InstallFinalize" Overridable="yes">VWD_PATH</Custom>
     </InstallExecuteSequence>
     <InstallUISequence>
       <Show Dialog="CustomAdvancedWelcomeEulaDlg" Before="FindRelatedProducts">NOT Installed</Show>
@@ -156,6 +173,8 @@
     <UI>
       <ProgressText Action="DevEnvSetup">Updating extension registration with Visual Studio...</ProgressText>
       <ProgressText Action="DevEnvSetup_Rollback">Removing extension registration with Visual Studio...</ProgressText>
+      <ProgressText Action="VWDSetup">Updating extension registration with Visual Studio Web Express...</ProgressText>
+      <ProgressText Action="VWDSetup_Rollback">Removing extension registration with Visual Studio Web Express...</ProgressText>
 
       <Dialog Id="CustomAdvancedWelcomeEulaDlg" Width="370" Height="270" Title="!(loc.AdvancedWelcomeEulaDlg_Title)">
         <Control Id="BannerBitmap" Type="Bitmap" X="0" Y="0" Width="370" Height="44" TabSkip="no" Text="!(loc.AdvancedWelcomeEulaDlgBannerBitmap)" />

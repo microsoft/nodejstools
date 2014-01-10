@@ -1,6 +1,6 @@
 ﻿<PackageManifest Version="2.0.0" xmlns="http://schemas.microsoft.com/developer/vsx-schema/2011" xmlns:d="http://schemas.microsoft.com/developer/vsx-schema-design/2011">
   <Metadata>
-    <Identity Id="4219f2a8-fbf9-4659-a222-b7580a60eebb" Version="1.0" Language="en-US" Publisher="Microsoft" />
+    <Identity Id="FE8A8C3D-328A-476D-99F9-2A24B75F8C7F" Version="1.0" Language="en-US" Publisher="Microsoft" />
     <DisplayName>Node.js Tools</DisplayName>
     <Description xml:space="preserve">Provides support for editing and debugging Node.js programs.</Description>
     <MoreInfo>http://nodejstools.codeplex.com</MoreInfo>
@@ -13,11 +13,12 @@
        them. -->
   <Installation InstalledByMsi="true">
     <InstallationTarget Id="Microsoft.VisualStudio.Pro" Version="11.0" />
+    <InstallationTarget Id="Microsoft.VisualStudio.VWDExpress" Version="11.0" />
   </Installation>
   <Dependencies>
     <Dependency Id="Microsoft.Framework.NDP" DisplayName="Microsoft .NET Framework" Version="4.5" />
     <Dependency Id="TestWindow.Microsoft.0771d463-d74d-4e95-aac2-39d3c7ec1f97" IsRequired="false" DisplayName="Test Explorer" Version="11.0" />
-    <Dependency Id="FF632CFA-E4C5-4D8E-B1E2-63BE3B8A8289" IsRequired="true" DisplayName="Node.js Tools - Interactive Window" Version="1.0"/>
+    <Dependency Id="29102E6C-34F2-4FF1-BA2F-C02ADE3846E8" IsRequired="true" DisplayName="Node.js Tools - Interactive Window" Version="1.0"/>
   </Dependencies>
   <Assets>
     <Asset Type="Microsoft.VisualStudio.Package" Path="|%CurrentProject%|" d:Source="Project" d:ProjectName="%CurrentProject%" />

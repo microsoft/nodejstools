@@ -19,6 +19,15 @@
           </Directory>
         </Directory>
       </Directory>
+
+      <Directory Id="VWD_EXTENSION_INSTALLPATH">
+        <Directory Id="_VWD_EXTENSIONS_MS" Name="Microsoft">
+          <Directory Id="_VWD_EXTENSIONS_MS_INTERACTIVE" Name="Node.js Tools - Interactive Window">
+            <Directory Id="VWDINSTALLLOCATION" Name="1.0">
+            </Directory>
+          </Directory>
+        </Directory>
+      </Directory>
     </Directory>
 
     <ComponentGroupRef Id="InteractiveWindowExt"/>

@@ -51,9 +51,9 @@ namespace Microsoft.NodejsTools.Profiling {
     [Guid(Guids.NodejsProfilingPkgString)]
     // set the window to dock where Toolbox/Performance Explorer dock by default
     [ProvideToolWindow(typeof(PerfToolWindow), Orientation = ToolWindowOrientation.Left, Style = VsDockStyle.Tabbed, Window = EnvDTE.Constants.vsWindowKindToolbox)]
-    [ProvideFileFilterAttribute("{9C34161A-379E-4933-A0DC-871FE64D34F1}", "/1", "Node.js Performance Session (*" + PerfFileType + ");*" + PerfFileType, 100)]
+    [ProvideFileFilterAttribute("{" + Guids.NodejsProfilingPkgString + "}", "/1", "Node.js Performance Session (*" + PerfFileType + ");*" + PerfFileType, 100)]
     [ProvideEditorExtension(typeof(ProfilingSessionEditorFactory), ".njsperf", 50,
-          ProjectGuid = "{9C34161A-379E-4933-A0DC-871FE64D34F1}",
+          ProjectGuid = Guids.NodejsProfilingPkgString,
           NameResourceID = 105,
           DefaultName = "NodejsPerfSession")]
     [ProvideAutomationObject("NodejsProfiling")]
@@ -91,7 +91,7 @@ namespace Microsoft.NodejsTools.Profiling {
             // TODO - Ideally this wouldn't be hardcoded in here but we don't have a good shared location
             //    move this guid to be from a shared file
             //   
-            Guid nodePackage = new Guid("4219f2a8-fbf9-4659-a222-b7580a60eebb");
+            Guid nodePackage = new Guid("FE8A8C3D-328A-476D-99F9-2A24B75F8C7F");
             IVsPackage package;
             shell.LoadPackage(ref nodePackage, out package);
 

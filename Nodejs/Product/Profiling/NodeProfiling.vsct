@@ -266,7 +266,7 @@
 
   <Symbols>
     <!-- This is the package guid. -->
-    <GuidSymbol name="guidNodeProfilingPkg" value="{9C34161A-379E-4933-A0DC-871FE64D34F1}" />
+    <GuidSymbol name="guidNodeProfilingPkg" value="{B515653F-FB69-4B64-9D3F-F1FCF8421DD0}" />
 
     <!-- This is the guid used to group the menu commands together -->
     <GuidSymbol name="guidNodeProfilingCmdSet" value="{3F2BC93C-CA2D-450B-9BFC-0C96288F1ED6}">
