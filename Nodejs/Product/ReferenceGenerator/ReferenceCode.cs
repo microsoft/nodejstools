@@ -87,7 +87,7 @@ namespace Microsoft.NodejsTools {
     for(var part = 0; part<parts.length; part++) {    
        var partText = parts[part];
 
-       if ((partText == '' && part != 0)|| partText == '.') {
+       if ((partText == '' && part != 0) || partText == '.') {
             continue;
        } else if(partText == '..' && res.length > 0) {
             res.splice(res.length - 1, 1);
