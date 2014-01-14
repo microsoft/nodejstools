@@ -12,6 +12,7 @@
  *
  * ***************************************************************************/
 
+#if DEV12_OR_LATER
 using System.ComponentModel.Composition;
 using Microsoft.VisualStudio.Text;
 using Microsoft.VisualStudio.Text.BraceCompletion;
@@ -19,7 +20,6 @@ using Microsoft.VisualStudio.Text.Editor;
 using Microsoft.VisualStudio.Utilities;
 
 namespace Microsoft.NodejsTools.Repl {
-#if DEV12_OR_LATER
     /// <summary>
     /// Brace matching session provider which takes precedence over the JavaScript
     /// brace matching implementation.  This is used for the REPL window to shut down
@@ -41,5 +41,5 @@ namespace Microsoft.NodejsTools.Repl {
             return false;
         }
     }
-#endif
 }
+#endif
