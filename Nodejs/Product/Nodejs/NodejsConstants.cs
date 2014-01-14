@@ -43,7 +43,7 @@ namespace Microsoft.NodejsTools {
         [Export, Name(Nodejs), BaseDefinition("text")]
         internal static ContentTypeDefinition ContentTypeDefinition = null;
 
-        [Export, Name(NodejsRepl), BaseDefinition("JavaScript")]
+        [Export, Name(NodejsRepl), BaseDefinition(Nodejs), BaseDefinition("JavaScript")]
         internal static ContentTypeDefinition ReplContentTypeDefinition = null;
     }
 }
