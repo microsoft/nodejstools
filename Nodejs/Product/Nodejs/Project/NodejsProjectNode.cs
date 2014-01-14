@@ -365,6 +365,21 @@ function starts_with(a, b) {
     return a.substr(0, b.length) == b;
 }
 ");
+
+            // If we get passed a fully qualified path turn it into a relative path
+            switchCode.Append("function relative(from, to) {");
+            switchCode.AppendLine(ReferenceCode.PathRelativeBody);
+            switchCode.Append("}");
+
+            switchCode.Append(@"if(module[1] == ':') { 
+    intellisense.logMessage('making relative ' + __dirname + ' -- ' + module); 
+    new_module = relative(__dirname, module); 
+    if (new_module != module) {
+        module = './' + new_module;
+    }
+    intellisense.logMessage('now ' + module); 
+}");
+
             foreach (NodejsFileNode nodeFile in _nodeFiles) {
                 if (nodeFile.Url.Length > NativeMethods.MAX_PATH) {
                     // .NET can't handle long filename paths, so ignore these modules...

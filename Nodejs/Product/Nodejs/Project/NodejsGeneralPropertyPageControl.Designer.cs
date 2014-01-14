@@ -81,7 +81,7 @@
             this._nodeExePath.AutoCompleteSource = System.Windows.Forms.AutoCompleteSource.FileSystem;
             this._nodeExePath.Location = new System.Drawing.Point(135, 19);
             this._nodeExePath.Name = "_nodeExePath";
-            this._nodeExePath.Size = new System.Drawing.Size(258, 20);
+            this._nodeExePath.Size = new System.Drawing.Size(308, 20);
             this._nodeExePath.TabIndex = 1;
             this._nodeExePath.TextChanged += new System.EventHandler(this.NodeExePathChanged);
             // 
@@ -91,7 +91,7 @@
             | System.Windows.Forms.AnchorStyles.Right)));
             this._nodeExeArguments.Location = new System.Drawing.Point(135, 45);
             this._nodeExeArguments.Name = "_nodeExeArguments";
-            this._nodeExeArguments.Size = new System.Drawing.Size(290, 20);
+            this._nodeExeArguments.Size = new System.Drawing.Size(340, 20);
             this._nodeExeArguments.TabIndex = 4;
             this._nodeExeArguments.TextChanged += new System.EventHandler(this.Changed);
             // 
@@ -127,7 +127,7 @@
             | System.Windows.Forms.AnchorStyles.Right)));
             this._scriptArguments.Location = new System.Drawing.Point(135, 71);
             this._scriptArguments.Name = "_scriptArguments";
-            this._scriptArguments.Size = new System.Drawing.Size(290, 20);
+            this._scriptArguments.Size = new System.Drawing.Size(340, 20);
             this._scriptArguments.TabIndex = 6;
             this._scriptArguments.TextChanged += new System.EventHandler(this.Changed);
             // 
@@ -146,7 +146,7 @@
             | System.Windows.Forms.AnchorStyles.Right)));
             this._workingDir.Location = new System.Drawing.Point(135, 97);
             this._workingDir.Name = "_workingDir";
-            this._workingDir.Size = new System.Drawing.Size(258, 20);
+            this._workingDir.Size = new System.Drawing.Size(308, 20);
             this._workingDir.TabIndex = 8;
             this._workingDir.TextChanged += new System.EventHandler(this.WorkingDirTextChanged);
             // 
@@ -156,7 +156,7 @@
             | System.Windows.Forms.AnchorStyles.Right)));
             this._launchUrl.Location = new System.Drawing.Point(135, 124);
             this._launchUrl.Name = "_launchUrl";
-            this._launchUrl.Size = new System.Drawing.Size(290, 20);
+            this._launchUrl.Size = new System.Drawing.Size(340, 20);
             this._launchUrl.TabIndex = 11;
             this._launchUrl.TextChanged += new System.EventHandler(this.Changed);
             // 
@@ -172,7 +172,7 @@
             // _browsePath
             // 
             this._browsePath.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
-            this._browsePath.Location = new System.Drawing.Point(399, 17);
+            this._browsePath.Location = new System.Drawing.Point(449, 17);
             this._browsePath.Name = "_browsePath";
             this._browsePath.Size = new System.Drawing.Size(26, 23);
             this._browsePath.TabIndex = 2;
@@ -183,7 +183,7 @@
             // _browseDirectory
             // 
             this._browseDirectory.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
-            this._browseDirectory.Location = new System.Drawing.Point(399, 95);
+            this._browseDirectory.Location = new System.Drawing.Point(449, 95);
             this._browseDirectory.Name = "_browseDirectory";
             this._browseDirectory.Size = new System.Drawing.Size(26, 23);
             this._browseDirectory.TabIndex = 9;

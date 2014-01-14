@@ -599,7 +599,14 @@ namespace Microsoft.NodejsTools.Project {
 
         public void ManageModules() {
             CheckNotDisposed();
-
+            
+            if (NpmController.RootPackage == null) {
+                NpmController.Refresh();
+                if (NpmController.RootPackage == null) {
+                    MessageBox.Show("Unable to parse package.json from your project.  Please fix any errors and try again.");
+                    return;
+                }
+            }
             using (var manager = new PackageManagerDialog(NpmController)) {
                 manager.ShowDialog();
             }

@@ -203,6 +203,9 @@
     </COMReference>
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="..\ReferenceGenerator\ReferenceCode.cs">
+      <Link>Project\ReferenceCode.cs</Link>
+    </Compile>
     <Compile Include="CodeWindowManager.cs" />
     <Compile Include="Commands\ImportWizardCommand.cs" />
     <Compile Include="Commands\OpenReplWindowCommand.cs" />
