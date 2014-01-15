@@ -160,13 +160,15 @@ namespace Microsoft.NodejsTools.Profiling {
             bool foundStartupProject = false;
             var dteService = (EnvDTE.DTE)(GetService(typeof(EnvDTE.DTE)));
 
-            var startupProjects = ((object[])dteService.Solution.SolutionBuild.StartupProjects).Select(x => x.ToString());
-            foreach (EnvDTE.Project project in dteService.Solution.Projects) {
-                var kind = project.Kind;
-                if (String.Equals(kind, NodejsProfilingPackage.NodeProjectGuid, StringComparison.OrdinalIgnoreCase)) {
-                    if (startupProjects.Contains(project.UniqueName, StringComparer.OrdinalIgnoreCase)) {
-                        foundStartupProject = true;
-                        break;
+            if (dteService.Solution.SolutionBuild.StartupProjects != null) {
+                var startupProjects = ((object[])dteService.Solution.SolutionBuild.StartupProjects).Select(x => x.ToString());
+                foreach (EnvDTE.Project project in dteService.Solution.Projects) {
+                    var kind = project.Kind;
+                    if (String.Equals(kind, NodejsProfilingPackage.NodeProjectGuid, StringComparison.OrdinalIgnoreCase)) {
+                        if (startupProjects.Contains(project.UniqueName, StringComparer.OrdinalIgnoreCase)) {
+                            foundStartupProject = true;
+                            break;
+                        }
                     }
                 }
             }
