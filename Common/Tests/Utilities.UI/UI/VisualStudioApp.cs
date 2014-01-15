@@ -356,19 +356,16 @@ namespace TestUtilities.UI {
         }
 
         public ExceptionHelperDialog WaitForException() {
-            for (int i = 0; i < 20; i++) {
-                var window = FindByName("Exception Helper Indicator Window");
-                if (window != null) {
-                    var innerPane = window.FindFirst(TreeScope.Descendants,
-                        new PropertyCondition(
-                            AutomationElement.ControlTypeProperty,
-                            ControlType.Pane
-                        )
-                    );
-                    Assert.IsNotNull(innerPane);
-                    return new ExceptionHelperDialog(innerPane);
-                }
-                System.Threading.Thread.Sleep(500);
+            var window = FindByName("Exception Helper Indicator Window");
+            if (window != null) {
+                var innerPane = window.FindFirst(TreeScope.Descendants,
+                    new PropertyCondition(
+                        AutomationElement.ControlTypeProperty,
+                        ControlType.Pane
+                    )
+                );
+                Assert.IsNotNull(innerPane);
+                return new ExceptionHelperDialog(innerPane);
             }
 
             Assert.Fail("Failed to find exception helper window");

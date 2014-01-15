@@ -56,7 +56,7 @@ namespace TestUtilities.UI {
         }
 
         public AutomationElement FindByName(string name) {
-            return Element.FindFirst(
+            return FindFirstWithRetry(
                 TreeScope.Descendants,
                 new PropertyCondition(
                     AutomationElement.NameProperty,
@@ -65,11 +65,26 @@ namespace TestUtilities.UI {
             );
         }
 
+        private AutomationElement FindFirstWithRetry(TreeScope scope, Condition condition) {
+            AutomationElement res = null;
+            for (int i = 0; i < 20 && res == null; i++) {
+                res = Element.FindFirst(scope, condition);
+                if (res == null) {
+                    Console.WriteLine("Failed to find element {0} on try {1}", condition, i);
+                    if (i == 0) {
+                        Console.WriteLine(new StackTrace(true).ToString());
+                    }
+                    System.Threading.Thread.Sleep(500);
+                }
+            }
+            return res;
+        }
+
         /// <summary>
         /// Finds the first descendent with the given automation ID.
         /// </summary>
         public AutomationElement FindByAutomationId(string automationId) {
-            return Element.FindFirst(
+            return FindFirstWithRetry(
                 TreeScope.Descendants,
                 new PropertyCondition(
                     AutomationElement.AutomationIdProperty,
@@ -84,7 +99,7 @@ namespace TestUtilities.UI {
         /// <param name="text"></param>
         /// <returns></returns>
         public AutomationElement FindButton(string text) {
-            return Element.FindFirst(
+            return FindFirstWithRetry(
                 TreeScope.Descendants,
                 new AndCondition(
                     new OrCondition(
@@ -111,7 +126,7 @@ namespace TestUtilities.UI {
         /// <param name="ctlType">The ControlType you wish to find</param>
         /// <returns></returns>
         public AutomationElement FindFirstByControlType(ControlType ctlType) {
-            return Element.FindFirst(
+            return FindFirstWithRetry(
                 TreeScope.Descendants,
                 new PropertyCondition(
                     AutomationElement.ControlTypeProperty,
@@ -126,7 +141,7 @@ namespace TestUtilities.UI {
         /// <param name="ctlType">The ControlType you wish to find</param>
         /// <returns></returns>
         public AutomationElement FindFirstByNameAndAutomationId(string name, string automationId) {
-            return Element.FindFirst(
+            return FindFirstWithRetry(
                 TreeScope.Descendants,
                 new AndCondition(
                     new PropertyCondition(
@@ -147,7 +162,7 @@ namespace TestUtilities.UI {
         /// <param name="ctlType">The ControlType you wish to find</param>
         /// <returns></returns>
         public AutomationElement FindFirstByControlType(string name, ControlType ctlType) {
-            return Element.FindFirst(
+            return FindFirstWithRetry(
                 TreeScope.Descendants,
                 new AndCondition(
                     new PropertyCondition(
