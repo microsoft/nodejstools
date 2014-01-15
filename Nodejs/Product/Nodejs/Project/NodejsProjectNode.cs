@@ -101,6 +101,21 @@ namespace Microsoft.NodejsTools.Project {
             }
         }
 
+        protected override bool DisableCmdInCurrentMode(Guid commandGroup, uint command) {
+            if (commandGroup == Guids.OfficeToolsBootstrapperCmdSet) {
+                // Convert to ... commands from Office Tools don't make sense and aren't supported 
+                // on our project type
+                const int AddOfficeAppProject = 0x0001;
+                const int AddSharePointAppProject = 0x0002;
+
+                if (command == AddOfficeAppProject || command == AddSharePointAppProject) {
+                    return true;
+                }
+            }
+
+            return base.DisableCmdInCurrentMode(commandGroup, command);
+        }
+
         public override void Close() {
             base.Close();
             if (File.Exists(_referenceFilename)) {

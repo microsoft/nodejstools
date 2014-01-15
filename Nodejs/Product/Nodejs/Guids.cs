@@ -53,5 +53,8 @@ namespace Microsoft.NodejsTools
         public static readonly Guid VsUIHierarchyWindow = new Guid("{7D960B07-7AF8-11D0-8E5E-00A0C911005A}");
         public static readonly Guid ProfilingEditorFactory = new Guid(ProfilingEditorFactoryString);
         public static readonly Guid PerfPkg = new Guid("{F4A63B2A-49AB-4b2d-AA59-A10F01026C89}");
+
+        public const string OfficeToolsBootstrapperCmdSetString = "{D26C976C-8EE8-4EC4-8746-F5F7702A17C5}";
+        public static readonly Guid OfficeToolsBootstrapperCmdSet = new Guid(OfficeToolsBootstrapperCmdSetString);
     };
 }
