@@ -247,7 +247,6 @@ namespace TestUtilities.UI {
             }
         }
 
-
         /// <summary>
         /// Gets the specified value from this element.  The element must support the value pattern.
         /// </summary>
@@ -274,6 +273,13 @@ namespace TestUtilities.UI {
             IntPtr hwnd;
             uiShell.GetDialogOwnerHwnd(out hwnd);
             AutomationWrapper.DumpElement(AutomationElement.FromHandle(hwnd));
+
+            // if we have a dialog open dump the main VS window too
+            var mainHwnd = new IntPtr(VsIdeTestHostContext.Dte.MainWindow.HWnd);
+            if (mainHwnd != hwnd) {
+                Console.WriteLine("VS: ");
+                AutomationWrapper.DumpElement(AutomationElement.FromHandle(mainHwnd));
+            }
         }
 
         public static void DumpElement(AutomationElement element) {
