@@ -179,10 +179,19 @@ namespace TestUtilities.UI {
 
         #region Pattern Helpers
 
+        private static void CheckNullElement(AutomationElement element) {
+            if (element == null) {
+                Console.WriteLine("Attempting to invoke pattern on null element");
+                AutomationWrapper.DumpVS();
+                throw new InvalidOperationException();
+            }
+        }
+
         /// <summary>
         /// Invokes the specified invokable item.  The item must support the invoke pattern.
         /// </summary>
         public static void Invoke(AutomationElement button) {
+            CheckNullElement(button);
             var invokePattern = (InvokePattern)button.GetCurrentPattern(InvokePattern.Pattern);
             invokePattern.Invoke();
         }
@@ -192,6 +201,7 @@ namespace TestUtilities.UI {
         /// </summary>
         /// <param name="selectionItem"></param>
         public static void Select(AutomationElement selectionItem) {
+            CheckNullElement(selectionItem);
             var selectPattern = (SelectionItemPattern)selectionItem.GetCurrentPattern(SelectionItemPattern.Pattern);
             selectPattern.Select();
         }
@@ -201,6 +211,7 @@ namespace TestUtilities.UI {
         /// </summary>
         /// <param name="selectionItem"></param>
         public static void AddToSelection(AutomationElement selectionItem) {
+            CheckNullElement(selectionItem);
             var selectPattern = (SelectionItemPattern)selectionItem.GetCurrentPattern(SelectionItemPattern.Pattern);
             selectPattern.AddToSelection();
         }
@@ -217,6 +228,7 @@ namespace TestUtilities.UI {
         /// </summary>
         /// <param name="node"></param>
         public static void EnsureExpanded(AutomationElement node) {
+            CheckNullElement(node);
             ExpandCollapsePattern pat = (ExpandCollapsePattern)node.GetCurrentPattern(ExpandCollapsePattern.Pattern);
             if (pat.Current.ExpandCollapseState == ExpandCollapseState.Collapsed) {
                 pat.Expand();
@@ -228,6 +240,7 @@ namespace TestUtilities.UI {
         /// </summary>
         /// <param name="node"></param>
         public static void Collapse(AutomationElement node) {
+            CheckNullElement(node);
             ExpandCollapsePattern pat = (ExpandCollapsePattern)node.GetCurrentPattern(ExpandCollapsePattern.Pattern);
             if (pat.Current.ExpandCollapseState != ExpandCollapseState.Collapsed) {
                 pat.Collapse();
