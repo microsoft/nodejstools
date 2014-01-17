@@ -1,0 +1,30 @@
+<VSTemplate Version="3.0.0" Type="Project" xmlns="http://schemas.microsoft.com/developer/vstemplate/2005">
+  <TemplateData>
+    <Name>Blank Windows Azure Node.js Web Application</Name>
+    <Description>An empty Node.js application for Windows Azure.</Description>
+    <Icon Package="{FE8A8C3D-328A-476D-99F9-2A24B75F8C7F}" ID="402" />
+    <ProjectType>TypeScript</ProjectType>
+    <TemplateID>Microsoft.TypeScript.NodejsWebApp</TemplateID>
+    <SortOrder>140</SortOrder>
+    <CreateNewFolder>true</CreateNewFolder>
+    <DefaultName>NodejsWebApp</DefaultName>
+    <ProvideDefaultName>true</ProvideDefaultName>
+    <NumberOfParentCategoriesToRollUp>1</NumberOfParentCategoriesToRollUp>
+    <PromptForSaveOnCreation>true</PromptForSaveOnCreation>
+    <PreviewImage>Preview.png</PreviewImage>
+    <TemplateGroupID>Node.jss</TemplateGroupID>
+  </TemplateData>
+  <TemplateContent>
+    <Project File="TypeScriptWebApp.njsproj" ReplaceParameters="true">
+      <ProjectItem OpenInEditor="true">server.ts</ProjectItem>
+      <ProjectItem ReplaceParameters="true">package.json</ProjectItem>
+      <ProjectItem ReplaceParameters="true">README.md</ProjectItem>
+      <ProjectItem>Web.config</ProjectItem>
+      <ProjectItem>Web.cloud.config</ProjectItem>
+      <ProjectItem TargetFileName="bin\ChangeConfig.ps1">ChangeConfig.ps1</ProjectItem>
+      <ProjectItem TargetFileName="bin\download.ps1">download.ps1</ProjectItem>
+      <ProjectItem TargetFileName="bin\setup_web.cmd">setup_web.cmd</ProjectItem>
+      <ProjectItem TargetFileName="bin\node.cmd">node.cmd</ProjectItem>
+    </Project>
+  </TemplateContent>
+</VSTemplate>

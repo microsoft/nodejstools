@@ -75,6 +75,8 @@
   <ItemDefinitionGroup>
     <ZipProject>
       <Language>JavaScript</Language>
+      <Culture>1033</Culture>
+      <OutputSubPath>Node.js</OutputSubPath>
     </ZipProject>
     <ZipItem>
       <Language>JavaScript</Language>
@@ -506,6 +508,10 @@
     <ZipProject Include="ProjectTemplates\AddWebSiteAzureExpressApp\Preview.png" />
     <ZipProject Include="ProjectTemplates\AzureNodejsApp\Preview.png" />
     <ZipProject Include="ProjectTemplates\NodejsConsoleApp\Preview.png" />
+    <Content Include="FileTemplates\NewItem\EmptyTs.ts">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+      <IncludeInVSIX>true</IncludeInVSIX>
+    </Content>
     <Content Include="FileTemplates\NewItem\UnitTest.js">
       <IncludeInVSIX>true</IncludeInVSIX>
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
@@ -549,26 +555,43 @@
     <ZipProject Include="ProjectTemplates\AddWebSiteAzureExpressApp\index.js" />
     <ZipProject Include="ProjectTemplates\AddWebSiteAzureExpressApp\user.js" />
     <ZipProject Include="ProjectTemplates\AddWebSiteAzureNodejsApp\server.js" />
-    <ZipProject Include="ProjectTemplates\TypeScriptNodejsConsoleApp\package.json">
-      <Language>TypeScript</Language>
-    </ZipProject>
-    <ZipProject Include="ProjectTemplates\TypeScriptNodejsConsoleApp\README.md">
-      <Language>TypeScript</Language>
-    </ZipProject>
-    <ZipProject Include="ProjectTemplates\TypeScriptNodejsConsoleApp\app.ts">
-      <Language>TypeScript</Language>
-    </ZipProject>
-    <ZipProject Include="ProjectTemplates\TypeScriptNodejsConsoleApp\NodejsConsoleApp.njsproj">
-      <Language>TypeScript</Language>
+    <TypeScriptProject Include="ProjectTemplates\TypeScriptConsoleApp\package.json" />
+    <TypeScriptProject Include="ProjectTemplates\TypeScriptConsoleApp\README.md" />
+    <TypeScriptProject Include="ProjectTemplates\TypeScriptConsoleApp\app.ts" />
+    <TypeScriptProject Include="ProjectTemplates\TypeScriptConsoleApp\NodejsConsoleApp.njsproj">
       <SubType>Designer</SubType>
-    </ZipProject>
-    <ZipProject Include="ProjectTemplates\TypeScriptNodejsConsoleApp\NodejsConsoleApp.vstemplate">
-      <Language>TypeScript</Language>
-    </ZipProject>
-    <ZipProject Include="ProjectTemplates\TypeScriptNodejsConsoleApp\Preview.png">
-      <Language>TypeScript</Language>
-    </ZipProject>
+    </TypeScriptProject>
+    <TypeScriptProject Include="ProjectTemplates\TypeScriptConsoleApp\NodejsConsoleApp.vstemplate" />
+    <TypeScriptProject Include="ProjectTemplates\TypeScriptConsoleApp\Preview.png" />
     <Resource Include="ProjectTemplates\blankts.ico" />
+    <TypeScriptProject Include="ProjectTemplates\TypeScriptWebApp\server.ts" />
+    <TypeScriptProject Include="ProjectTemplates\TypeScriptWebApp\NodejsWebApp.njsproj">
+      <SubType>Designer</SubType>
+    </TypeScriptProject>
+    <TypeScriptProject Include="ProjectTemplates\TypeScriptWebApp\NodejsWebApp.vstemplate" />
+    <TypeScriptProject Include="ProjectTemplates\TypeScriptWebApp\Preview.png" />
+    <TypeScriptProject Include="ProjectTemplates\TypeScriptWebApp\package.json" />
+    <TypeScriptProject Include="ProjectTemplates\TypeScriptWebApp\README.md" />
+    <Content Include="node.d.ts">
+      <IncludeInVSIX>true</IncludeInVSIX>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <TypeScriptProject Include="ProjectTemplates\TypeScriptExpressApp\express.d.ts" />
+    <TypeScriptProject Include="ProjectTemplates\TypeScriptExpressApp\user.ts" />
+    <TypeScriptProject Include="ProjectTemplates\TypeScriptExpressApp\app.ts" />
+    <TypeScriptProject Include="ProjectTemplates\TypeScriptExpressApp\ExpressApp.vstemplate">
+      <SubType>Designer</SubType>
+    </TypeScriptProject>
+    <TypeScriptProject Include="ProjectTemplates\TypeScriptExpressApp\index.ts" />
+    <TypeScriptProject Include="ProjectTemplates\TypeScriptExpressApp\Preview.png" />
+    <TypeScriptProject Include="ProjectTemplates\TypeScriptAzureWebApp\TypeScriptWebApp.vstemplate">
+      <SubType>Designer</SubType>
+    </TypeScriptProject>
+    <TypeScriptProject Include="ProjectTemplates\TypeScriptAzureWebApp\Preview.png" />
+    <TypeScriptProject Include="ProjectTemplates\TypeScriptAzureExpressApp\TypeScriptExpressApp.vstemplate">
+      <SubType>Designer</SubType>
+    </TypeScriptProject>
+    <TypeScriptProject Include="ProjectTemplates\TypeScriptAzureExpressApp\Preview.png" />
     <Content Include="VSTemplateStore.pkgdef">
       <IncludeInVSIX>true</IncludeInVSIX>
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
@@ -695,6 +718,63 @@
     <ZipProject Include="ProjectTemplates\AddWebSiteAzureExpressApp\index.jade" />
     <ZipProject Include="ProjectTemplates\AddWebSiteAzureExpressApp\layout.jade" />
     <ZipProject Include="ProjectTemplates\AddWebSiteAzureExpressApp\style.styl" />
+    <TypeScriptProject Include="ProjectTemplates\TypeScriptExpressApp\ExpressApp.njsproj">
+      <SubType>Designer</SubType>
+    </TypeScriptProject>
+    <TypeScriptProject Include="ProjectTemplates\TypeScriptExpressApp\index.jade" />
+    <TypeScriptProject Include="ProjectTemplates\TypeScriptExpressApp\layout.jade" />
+    <TypeScriptProject Include="ProjectTemplates\TypeScriptExpressApp\package.json" />
+    <TypeScriptProject Include="ProjectTemplates\TypeScriptExpressApp\README.md" />
+    <TypeScriptProject Include="ProjectTemplates\TypeScriptExpressApp\style.styl" />
+    <Content Include="FileTemplates\NewItem\EmptyJade.jade">
+      <IncludeInVSIX>true</IncludeInVSIX>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="FileTemplates\NewItem\EmptyJson.json">
+      <IncludeInVSIX>true</IncludeInVSIX>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="FileTemplates\NewItem\EmptyStyl.styl">
+      <IncludeInVSIX>true</IncludeInVSIX>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="FileTemplates\NewItem\EmptyXml.xml">
+      <IncludeInVSIX>true</IncludeInVSIX>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="FileTemplates\NewItem\EmptyCss.css">
+      <IncludeInVSIX>true</IncludeInVSIX>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="FileTemplates\NewItem\EmptyLess.less">
+      <IncludeInVSIX>true</IncludeInVSIX>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <TypeScriptProject Include="ProjectTemplates\TypeScriptAzureWebApp\TypeScriptWebApp.njsproj">
+      <SubType>Designer</SubType>
+    </TypeScriptProject>
+    <TypeScriptProject Include="ProjectTemplates\TypeScriptAzureWebApp\package.json" />
+    <TypeScriptProject Include="ProjectTemplates\TypeScriptAzureWebApp\README.md" />
+    <TypeScriptProject Include="ProjectTemplates\TypeScriptAzureWebApp\ChangeConfig.ps1" />
+    <TypeScriptProject Include="ProjectTemplates\TypeScriptAzureWebApp\download.ps1" />
+    <TypeScriptProject Include="ProjectTemplates\TypeScriptAzureWebApp\node.cmd" />
+    <TypeScriptProject Include="ProjectTemplates\TypeScriptAzureWebApp\Web.cloud.config" />
+    <TypeScriptProject Include="ProjectTemplates\TypeScriptAzureWebApp\Web.config" />
+    <TypeScriptProject Include="ProjectTemplates\TypeScriptAzureWebApp\setup_web.cmd" />
+    <TypeScriptProject Include="ProjectTemplates\TypeScriptAzureExpressApp\TypeScriptExpressApp.njsproj">
+      <SubType>Designer</SubType>
+    </TypeScriptProject>
+    <TypeScriptProject Include="ProjectTemplates\TypeScriptAzureExpressApp\index.jade" />
+    <TypeScriptProject Include="ProjectTemplates\TypeScriptAzureExpressApp\layout.jade" />
+    <TypeScriptProject Include="ProjectTemplates\TypeScriptAzureExpressApp\package.json" />
+    <TypeScriptProject Include="ProjectTemplates\TypeScriptAzureExpressApp\README.md" />
+    <TypeScriptProject Include="ProjectTemplates\TypeScriptAzureExpressApp\style.styl" />
+    <TypeScriptProject Include="ProjectTemplates\TypeScriptAzureExpressApp\ChangeConfig.ps1" />
+    <TypeScriptProject Include="ProjectTemplates\TypeScriptAzureExpressApp\download.ps1" />
+    <TypeScriptProject Include="ProjectTemplates\TypeScriptAzureExpressApp\node.cmd" />
+    <TypeScriptProject Include="ProjectTemplates\TypeScriptAzureExpressApp\setup_web.cmd" />
+    <TypeScriptProject Include="ProjectTemplates\TypeScriptAzureExpressApp\Web.cloud.config" />
+    <TypeScriptProject Include="ProjectTemplates\TypeScriptAzureExpressApp\Web.config" />
     <None Include="source.extension.vsixmanifest">
       <SubType>Designer</SubType>
     </None>
@@ -763,7 +843,21 @@
       <IncludeOutputGroupsInVSIXLocalOnly>DebugSymbolsProjectOutputGroup%3b</IncludeOutputGroupsInVSIXLocalOnly>
     </ProjectReference>
   </ItemGroup>
-  <ItemGroup />
+  <ItemGroup>
+    <TypeScriptProject Include="ProjectTemplates\TypeScriptAzureWebApp\server.ts" />
+  </ItemGroup>
+  <ItemGroup>
+    <TypeScriptProject Include="ProjectTemplates\TypeScriptAzureExpressApp\app.ts" />
+  </ItemGroup>
+  <ItemGroup>
+    <TypeScriptProject Include="ProjectTemplates\TypeScriptAzureExpressApp\express.d.ts" />
+  </ItemGroup>
+  <ItemGroup>
+    <TypeScriptProject Include="ProjectTemplates\TypeScriptAzureExpressApp\index.ts" />
+  </ItemGroup>
+  <ItemGroup>
+    <TypeScriptProject Include="ProjectTemplates\TypeScriptAzureExpressApp\user.ts" />
+  </ItemGroup>
   <PropertyGroup>
     <!--
     To specify a different registry root to register your package, uncomment the TargetRegistryRoot
@@ -783,4 +877,13 @@
   <Target Name="AfterBuild">
   </Target>
   -->
+  <Target Name="TransformTypeScriptProjects" BeforeTargets="MainResourcesGeneration">
+    <ItemGroup>
+      <ZipProject Include="@(TypeScriptProject)">
+        <Language>TypeScript</Language>
+        <Culture>1033</Culture>
+        <OutputSubPath>Node.js</OutputSubPath>
+      </ZipProject>
+    </ItemGroup>
+  </Target>
 </Project>

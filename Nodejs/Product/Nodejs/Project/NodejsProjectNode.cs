@@ -26,6 +26,7 @@ using Microsoft.VisualStudio;
 using Microsoft.VisualStudioTools;
 using Microsoft.VisualStudioTools.Project;
 using Microsoft.VisualStudioTools.Project.Automation;
+using MSBuild = Microsoft.Build.Evaluation;
 
 namespace Microsoft.NodejsTools.Project {
     class NodejsProjectNode : CommonProjectNode, VsWebSite.VSWebSite {
@@ -99,6 +100,34 @@ namespace Microsoft.NodejsTools.Project {
             get {
                 return Guids.NodejsCmdSet;
             }
+        }
+
+        protected override void FinishProjectCreation(string sourceFolder, string destFolder) {
+            foreach (MSBuild.ProjectItem item in this.BuildProject.Items) {
+                if (String.Equals(Path.GetExtension(item.EvaluatedInclude), NodejsConstants.TypeScriptExtension, StringComparison.OrdinalIgnoreCase)) {
+                    // If we have a TypeScript project deploy our node reference file.
+                    File.Copy(
+                        Path.Combine(
+                            Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location),
+                            "node.d.ts"
+                        ),
+                        Path.Combine(ProjectHome, "node.d.ts")
+                    );
+
+                    // copy any additional d.ts files
+                    foreach (var file in Directory.EnumerateFiles(sourceFolder, "*.d.ts", SearchOption.AllDirectories)) {
+                        var destPath = Path.Combine(
+                            destFolder,
+                            CommonUtils.GetRelativeFilePath(sourceFolder, file)
+                        );
+                        File.Copy(file, destPath);
+                        new FileInfo(destPath).Attributes = FileAttributes.Normal;
+                    }
+                    break;
+                }
+            }
+
+            base.FinishProjectCreation(sourceFolder, destFolder);
         }
 
         protected override bool DisableCmdInCurrentMode(Guid commandGroup, uint command) {

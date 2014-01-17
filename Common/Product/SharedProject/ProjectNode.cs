@@ -1740,6 +1740,8 @@ namespace Microsoft.VisualStudioTools.Project
                                 // now the copy file
                                 AddFileFromTemplate(strPathToFile, newFileName);
                             }
+
+                            FinishProjectCreation(basePath, baseLocation);
                         }
                     }
                     else
@@ -1761,6 +1763,13 @@ namespace Microsoft.VisualStudioTools.Project
                     }
                 }
             }
+        }
+
+        /// <summary>
+        /// Performs any new project initialization after the MSBuild project
+        /// has been constructed and template files copied to the project directory.
+        /// </summary>
+        protected virtual void FinishProjectCreation(string sourceFolder, string destFolder) {
         }
 
         /// <summary>

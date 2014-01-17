@@ -389,7 +389,11 @@ namespace Microsoft.VisualStudioTools.Project
         {
             get 
             {
-                return (prjBuildAction)BuildActionTypeConverter.Instance.ConvertFromString(HierarchyNode.ItemNode.ItemTypeName);
+                var res = BuildActionTypeConverter.Instance.ConvertFromString(HierarchyNode.ItemNode.ItemTypeName);
+                if (res is prjBuildAction) {
+                    return (prjBuildAction)res;
+                }
+                return prjBuildAction.prjBuildActionNone;
             }
             set 
             {
