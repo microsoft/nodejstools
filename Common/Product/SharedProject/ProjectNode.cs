@@ -1197,7 +1197,7 @@ namespace Microsoft.VisualStudioTools.Project
         /// <param name="disposing">Flag determining ehether it was deterministic or non deterministic clean up.</param>
         protected override void Dispose(bool disposing)
         {
-            if (this.isDisposed)
+            if (isDisposed)
             {
                 return;
             }
@@ -1206,36 +1206,39 @@ namespace Microsoft.VisualStudioTools.Project
             {
                 try
                 {
-                    this.UnRegisterProject();
+                    UnRegisterProject();
                 }
                 finally
                 {
                     try
                     {
-                        this.RegisterClipboardNotifications(false);
+                        RegisterClipboardNotifications(false);
                     }
                     finally
                     {
                         try
                         {
-                            if (this.site != null)
+                            if (site != null)
                             {
-                                this.site.Dispose();
+                                site.Dispose();
                             }
                         }
                         finally
                         {
-                            this.buildEngine = null;
+                            buildEngine = null;
                         }
                     }
                 }
 
-                if (this.buildProject != null)
+                if (buildProject != null)
                 {
-                    this.buildProject.ProjectCollection.UnloadProject(this.buildProject);
-                    this.buildProject.ProjectCollection.UnloadProject(this.buildProject.Xml);
-                    this.SetBuildProject(null);
+                    buildProject.ProjectCollection.UnloadProject(buildProject);
+                    buildProject.ProjectCollection.UnloadProject(buildProject.Xml);
+                    SetBuildProject(null);
                 }
+
+                isClosing = true;
+                isClosed = false;
 
                 if (null != imageHandler)
                 {
@@ -1246,7 +1249,11 @@ namespace Microsoft.VisualStudioTools.Project
             finally
             {
                 base.Dispose(disposing);
-                this.isDisposed = true;
+                // Note that this isDisposed flag is separate from the base's
+                isDisposed = true;
+                isClosed = true;
+                isClosing = false;
+                projectOpened = false;
             }
         }
 
@@ -1629,7 +1636,6 @@ namespace Microsoft.VisualStudioTools.Project
             using (new DebugTimer("ProjectLoad"))
             {
                 _diskNodes.Clear();
-
                 bool successful = false;
                 try
                 {
@@ -1762,6 +1768,26 @@ namespace Microsoft.VisualStudioTools.Project
                         this.Close();
                     }
                 }
+            }
+        }
+
+        public override void Close() {
+            projectOpened = false;
+            isClosing = true;
+
+            if (taskProvider != null) {
+                taskProvider.Tasks.Clear();
+            }
+
+            try {
+                // Walk the tree and close all nodes.
+                // This has to be done before the project closes, since we want
+                // state still available for the ProjectMgr on the nodes 
+                // when nodes are closing.
+                CloseAllNodes(this);
+            } finally {
+                // HierarchyNode.Close() will also call Dispose on us
+                base.Close();
             }
         }
 
@@ -1985,9 +2011,7 @@ namespace Microsoft.VisualStudioTools.Project
             }
 
             // Set some default values
-            options.OutputAssembly = outputPath + this.Caption + ".exe";
-
-            options.OutputAssembly = outputPath + this.GetAssemblyName(config);
+            options.OutputAssembly = outputPath + GetAssemblyName(config);
 
             string outputtype = GetProjectProperty(ProjectFileConstants.OutputType, false);
             if (!string.IsNullOrEmpty(outputtype))
@@ -2056,17 +2080,12 @@ namespace Microsoft.VisualStudioTools.Project
 
         private string GetOutputPath(MSBuildExecution.ProjectInstance properties)
         {
-            this.currentConfig = properties;
-            string outputPath = GetProjectProperty("OutputPath");
-
-            return outputPath;
+            return properties.GetPropertyValue("OutputPath");
         }
 
         private bool GetBoolAttr(MSBuildExecution.ProjectInstance properties, string name)
         {
-            this.currentConfig = properties;
-            string s = GetProjectProperty(name);
-
+            string s = properties.GetPropertyValue(name);
             return (s != null && s.ToUpperInvariant().Trim() == "TRUE");
         }
 
@@ -2074,19 +2093,45 @@ namespace Microsoft.VisualStudioTools.Project
         [SuppressMessage("Microsoft.Naming", "CA1720:IdentifiersShouldNotContainTypeNames", MessageId = "bool")]
         public virtual bool GetBoolAttr(string config, string name)
         {
-            this.SetConfiguration(config);
-            return this.GetBoolAttr(this.currentConfig, name);
+            SetConfiguration(config);
+            try
+            {
+                return GetBoolAttr(currentConfig, name);
+            }
+            finally
+            {
+                SetCurrentConfiguration();
+            }
         }
 
         /// <summary>
-        /// Get the assembly name for a give configuration
+        /// Get the assembly name for a given configuration
         /// </summary>
         /// <param name="config">the matching configuration in the msbuild file</param>
         /// <returns>assembly name</returns>
         public virtual string GetAssemblyName(string config)
         {
-            this.SetConfiguration(config);
-            return GetAssemblyName(this.currentConfig);
+            SetConfiguration(config);
+            try
+            {
+                var name = currentConfig.GetPropertyValue(ProjectFileConstants.AssemblyName) ?? Caption;
+                var outputType = currentConfig.GetPropertyValue(ProjectFileConstants.OutputType);
+
+                if ("library".Equals(outputType, StringComparison.OrdinalIgnoreCase))
+                {
+                    name += ".dll";
+                }
+                else
+                {
+                    name += ".exe";
+                }
+
+                return name;
+            }
+            finally
+            {
+                SetCurrentConfiguration();
+            }
         }
 
         /// <summary>
@@ -2570,23 +2615,10 @@ namespace Microsoft.VisualStudioTools.Project
             if (!this.useProvidedLogger || this.buildLogger == null)
             {
                 // Create the logger
-                this.BuildLogger = new IDEBuildLogger(output, this.TaskProvider, GetOuterInterface<IVsHierarchy>());
-
-                // To retrive the verbosity level, the build logger depends on the registry root 
-                // (otherwise it will used an hardcoded default)
-                ILocalRegistry2 registry = this.GetService(typeof(SLocalRegistry)) as ILocalRegistry2;
-                if (null != registry)
-                {
-                    string registryRoot;
-                    ErrorHandler.ThrowOnFailure(registry.GetLocalRegistryRoot(out registryRoot));
-                    IDEBuildLogger logger = this.BuildLogger as IDEBuildLogger;
-                    if (!String.IsNullOrEmpty(registryRoot) && (null != logger))
-                    {
-                        logger.BuildVerbosityRegistryRoot = registryRoot;
-                        logger.ErrorString = this.ErrorString;
-                        logger.WarningString = this.WarningString;
-                    }
-                }
+                var logger = new IDEBuildLogger(output, this.TaskProvider, GetOuterInterface<IVsHierarchy>());
+                logger.ErrorString = ErrorString;
+                logger.WarningString = WarningString;
+                this.BuildLogger = logger;
             }
             else
             {
@@ -3121,12 +3153,12 @@ namespace Microsoft.VisualStudioTools.Project
         protected internal virtual void SetCurrentConfiguration()
         {
             // Can't ask for the active config until the project is opened, so do nothing in that scenario
-            if (!this.projectOpened)
+            if (!IsProjectOpened)
                 return;
 
-            EnvDTE.Project automationObject = this.GetAutomationObject() as EnvDTE.Project;
+            EnvDTE.Project automationObject = GetAutomationObject() as EnvDTE.Project;
 
-            this.SetConfiguration(Utilities.GetActiveConfigurationName(automationObject));
+            SetConfiguration(Utilities.GetActiveConfigurationName(automationObject));
         }
 
         /// <summary>
@@ -3140,14 +3172,14 @@ namespace Microsoft.VisualStudioTools.Project
             Utilities.ArgumentNotNull("config", config);
 
             // Can't ask for the active config until the project is opened, so do nothing in that scenario
-            if (!projectOpened)
+            if (!IsProjectOpened)
                 return;
 
 
-            bool propertiesChanged = this.buildProject.SetGlobalProperty(ProjectFileConstants.Configuration, config);
+            bool propertiesChanged = this.BuildProject.SetGlobalProperty(ProjectFileConstants.Configuration, config);
             if (this.currentConfig == null || propertiesChanged)
             {
-                this.currentConfig = this.buildProject.CreateProjectInstance();
+                this.currentConfig = this.BuildProject.CreateProjectInstance();
             }
         }
 
@@ -3382,13 +3414,15 @@ namespace Microsoft.VisualStudioTools.Project
         public virtual void PrepareBuild(string config, bool cleanBuild) {
             UIThread.Instance.MustBeCalledFromUIThread();
 
-            string outputPath = Path.GetDirectoryName(GetProjectProperty("OutputPath"));
+            try {
+                SetConfiguration(config);
 
-            if (cleanBuild && this.currentConfig.Targets.ContainsKey(MsBuildTarget.Clean)) {
-                Build(config, MsBuildTarget.Clean);
+                string outputPath = Path.GetDirectoryName(GetProjectProperty("OutputPath"));
+
+                PackageUtilities.EnsureOutputPath(outputPath);
+            } finally {
+                SetCurrentConfiguration();
             }
-
-            PackageUtilities.EnsureOutputPath(outputPath);
         }
 
         /// <summary>
@@ -4774,10 +4808,10 @@ If the files in the existing folder have the same names as files in the folder y
                 }
 
                 if (parent.AllChildren.Any(n => candidate == n.GetEditLabel()))
-                    {
+                {
                     // Cannot create a node if one exists with the same name.
                     continue;
-                    }
+                }
 
                 itemName = candidate;
                 return VSConstants.S_OK;
@@ -5651,35 +5685,12 @@ If the files in the existing folder have the same names as files in the folder y
             }
 
             if (this.currentConfig == null)
+            {
                 throw new Exception(String.Format(CultureInfo.CurrentCulture, SR.GetString(SR.FailedToRetrieveProperties, CultureInfo.CurrentUICulture), propertyName));
+            }
 
             // return property asked for
             return this.currentConfig.GetProperty(propertyName);
-        }
-
-        [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Globalization", "CA1308:NormalizeStringsToUppercase")]
-        private string GetAssemblyName(MSBuildExecution.ProjectInstance properties)
-        {
-            this.currentConfig = properties;
-            string name = null;
-
-            name = GetProjectProperty(ProjectFileConstants.AssemblyName);
-            if (name == null)
-                name = this.Caption;
-
-            string outputtype = GetProjectProperty(ProjectFileConstants.OutputType, false);
-
-            if (outputtype == "library")
-            {
-                outputtype = outputtype.ToLowerInvariant();
-                name += ".dll";
-            }
-            else
-            {
-                name += ".exe";
-            }
-
-            return name;
         }
 
         /// <summary>
@@ -5721,7 +5732,7 @@ If the files in the existing folder have the same names as files in the folder y
             this.sccAuxPath = this.GetProjectProperty(ProjectFileConstants.SccAuxPath);
         }
 
-        private void OnAfterProjectOpen(object sender, AfterProjectFileOpenedEventArgs e)
+        internal void OnAfterProjectOpen()
         {
             this.projectOpened = true;
         }
@@ -5916,10 +5927,10 @@ If the files in the existing folder have the same names as files in the folder y
                 // If the SVsBuildManagerAccessor service is absent, we're not running within Visual Studio.
                 if (accessor != null)
                 {
-                    if (requiresUIThread) 
+                    if (requiresUIThread)
                     {
                         int result = accessor.ClaimUIThreadForBuild();
-                        if (result < 0) 
+                        if (result < 0)
                         {
                             // Not allowed to claim the UI thread right now. Try again later.
                             return false;
@@ -5971,7 +5982,7 @@ If the files in the existing folder have the same names as files in the folder y
         /// <remarks>
         /// This method must be called on the UI thread.
         /// </remarks>
-        private void EndBuild(BuildSubmission submission, bool designTime, bool requiresUIThread = false) 
+        private void EndBuild(BuildSubmission submission, bool designTime, bool requiresUIThread = false)
         {
             IVsBuildManagerAccessor accessor = null;
 
@@ -6020,7 +6031,7 @@ If the files in the existing folder have the same names as files in the folder y
 
                 try
                 {
-                    if (requiresUIThread) 
+                    if (requiresUIThread)
                     {
                         Marshal.ThrowExceptionForHR(accessor.ReleaseUIThreadForBuild());
                     }
@@ -6113,7 +6124,7 @@ If the files in the existing folder have the same names as files in the folder y
             
             HierarchyNode res;
             _diskNodes.TryGetValue(name, out res);
-            return res;            
+            return res;
         }
 
         /// <summary>
@@ -6162,27 +6173,11 @@ If the files in the existing folder have the same names as files in the folder y
         /// <returns>A success or failure value.</returns>
         int IVsHierarchy.Close() {
             int hr = VSConstants.S_OK;
-            isClosing = true;
             try {
-                // Walk the tree and close all nodes.
-                // This has to be done before the project closes, since we want still state available for the ProjectMgr on the nodes 
-                // when nodes are closing.
-                CloseAllNodes(this);
+                Close();
             } catch (COMException e) {
                 hr = e.ErrorCode;
-            } finally {
-                Close();
             }
-
-            SetBuildProject(null);
-
-            this.isClosed = true;
-            isClosing = false;
-
-            if (taskProvider != null) {
-                taskProvider.Tasks.Clear();
-            }
-
             return hr;
         }
 

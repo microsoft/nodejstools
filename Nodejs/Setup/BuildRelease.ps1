@@ -225,7 +225,7 @@ if ([int]::Parse([regex]::Match($buildnumber, '^[0-9]+').Value) -ge 65535) {
 }
 
 $releaseVersion = [regex]::Match((Get-Content $asmverfile), 'ReleaseVersion = "([0-9.]+)";').Groups[1].Value
-$stableBuildVersion = [regex]::Match((Get-Content $asmverfile), 'StableBuildVersion = "([0-9.]+)";').Groups[1].Value
+$minorVersion = [regex]::Match((Get-Content $asmverfile), 'MinorVersion = "([0-9.]+)";').Groups[1].Value
 $version = "$releaseVersion.$buildnumber"
 
 if ($release -or $mockrelease -or $internal) {
@@ -266,7 +266,7 @@ if ($skipclean) {
 
 Write-Output "Output Dir: $outdir"
 Write-Output ""
-Write-Output "Product version: $releaseversion.$stableBuildVersion.`$(VS version)"
+Write-Output "Product version: $releaseversion.$minorVersion.`$(VS version)"
 Write-Output "File version: $version"
 foreach ($targetVs in $targetversions) {
     Write-Output "Building for: $($targetVs.name)"

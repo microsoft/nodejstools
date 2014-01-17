@@ -184,7 +184,7 @@ namespace Microsoft.VisualStudioTools.Project
         internal T RunSync<T>(Func<T> a) {
             T retValue = default(T);
             if (this.isUnitTestingMode || IsUIThread) {
-                return a();                
+                return a();
             }
             Exception exn = null; ;
             Debug.Assert(this.synchronizationContext != null, "The SynchronizationContext must be captured before calling this method");
