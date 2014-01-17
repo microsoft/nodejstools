@@ -81,6 +81,7 @@
     <Compile Include="Debugger\Serialization\JsonWrapperTests.cs" />
     <Compile Include="Debugger\Serialization\BacktraceVariableTests.cs" />
     <Compile Include="ImportWizardTests.cs" />
+    <Compile Include="LauncherTests.cs" />
     <Compile Include="Mocks\MockNodeEvaluationResultFactory.cs" />
     <Compile Include="Mocks\MockNodeVariable.cs" />
     <Compile Include="Debugger\Serialization\NodeVariablesFactoryTests.cs" />

@@ -62,7 +62,6 @@ namespace Microsoft.NodejsTools.Debugger.DebugEngine {
         private static HashSet<WeakReference> _engines = new HashSet<WeakReference>();
 
         private string _webBrowserUrl = null;
-        private int? _webBrowserPort = null;
 
         // These constants are duplicated in HpcLauncher and cannot be changed
 
@@ -90,12 +89,7 @@ namespace Microsoft.NodejsTools.Debugger.DebugEngine {
         /// semi-colon.
         /// </summary>
         public const string InterpreterOptions = "INTERPRETER_OPTIONS";
-
-        /// <summary>
-        /// Specifies port to which to open web browser on node debug connect.
-        /// </summary>
-        public const string WebBrowserPort = "WEB_BROWSER_PORT";
-
+                
         /// <summary>
         /// Specifies URL to which to open web browser on node debug connect.
         /// </summary>
@@ -250,10 +244,10 @@ namespace Microsoft.NodejsTools.Debugger.DebugEngine {
 
             _loadComplete = true;
 
-            if (_webBrowserUrl != null) {
-                Debug.Assert(_webBrowserPort != null);
+            if (!String.IsNullOrWhiteSpace(_webBrowserUrl)) {
+                Uri uri = new Uri(_webBrowserUrl);
                 OnPortOpenedHandler.CreateHandler(
-                    _webBrowserPort.Value,
+                    uri.Port,
                     shortCircuitPredicate: () => !_processLoaded,
                     action: () => {
                         LaunchBrowserDebugger();
@@ -510,9 +504,6 @@ namespace Microsoft.NodejsTools.Debugger.DebugEngine {
                                 break;
                             case InterpreterOptions:
                                 interpreterOptions = setting[1];
-                                break;
-                            case WebBrowserPort:
-                                _webBrowserPort = int.Parse(setting[1]);
                                 break;
                             case WebBrowserUrl:
                                 _webBrowserUrl = HttpUtility.UrlDecode(setting[1]);
@@ -976,6 +967,17 @@ namespace Microsoft.NodejsTools.Debugger.DebugEngine {
 
         private void OnEntryPointHit(object sender, ThreadEventArgs e) {
             Send(new AD7EntryPointEvent(), AD7EntryPointEvent.IID, _threads[e.Thread]);
+        }
+
+        private void StartWebBrowser() {
+            Uri uri;
+            if (_webBrowserUrl != null && Uri.TryCreate(_webBrowserUrl, UriKind.RelativeOrAbsolute, out uri)) {
+                OnPortOpenedHandler.CreateHandler(
+                    uri.Port,
+                    shortCircuitPredicate: () => _process.HasExited,
+                    action: LaunchBrowserDebugger
+                );
+            }
         }
 
         private void LaunchBrowserDebugger() {

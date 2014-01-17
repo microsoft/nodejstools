@@ -17,6 +17,7 @@ using System.Collections;
 using System.Collections.Specialized;
 using System.Diagnostics;
 using System.IO;
+using System.Globalization;
 using System.Linq;
 using System.Net;
 using System.Net.NetworkInformation;
@@ -36,9 +37,16 @@ using System.Web;
 namespace Microsoft.NodejsTools.Project {
     class NodejsProjectLauncher : IProjectLauncher {
         private readonly NodejsProjectNode _project;
+        private int? _testServerPort;
 
         public NodejsProjectLauncher(NodejsProjectNode project) {
             _project = project;
+
+            var portNumber = _project.GetProjectProperty(NodejsConstants.NodejsPort);
+            int portNum;
+            if (Int32.TryParse(portNumber, out portNum)) {
+                _testServerPort = portNum;
+            }
         }
 
         #region IProjectLauncher Members
@@ -63,47 +71,33 @@ namespace Microsoft.NodejsTools.Project {
             if (!Boolean.TryParse(startBrowserStr, out startBrowser)) {
                 startBrowser = true;
             }
-            int? port = null;
-            string webBrowserUrl = null;
-            if (startBrowser) {
-                var portStr = _project.GetProjectProperty(NodejsConstants.NodejsPort);
-                int tmpPort;
-                if (String.IsNullOrWhiteSpace(portStr) || !Int32.TryParse(portStr, out tmpPort)) {
-                    // make sure we know the port for when we start the browser
-                    port = GetFreePort();
-                } else {
-                    port = tmpPort;
-                }
-                Debug.Assert(port != null);
-                webBrowserUrl = _project.GetProjectProperty(NodejsConstants.LaunchUrl);
-                if (String.IsNullOrWhiteSpace(webBrowserUrl)) {
-                    webBrowserUrl = "http://localhost:" + port;
-                }
-            }
-
+            
             if (debug) {
-                StartWithDebugger(file, port, (webBrowserUrl != null) ? HttpUtility.UrlEncode(webBrowserUrl) : webBrowserUrl);
+                StartWithDebugger(file);
             } else {
                 var psi = new ProcessStartInfo();
-                psi.UseShellExecute = false;
-                if (port != null) {
-                    psi.EnvironmentVariables["PORT"] = port.ToString();
-                }
-
+                psi.UseShellExecute = false;                
                 psi.FileName = nodePath;
                 psi.Arguments = GetFullArguments(file);
                 psi.WorkingDirectory = _project.GetWorkingDirectory();
+
+                string webBrowserUrl = GetFullUrl();
+                Uri uri = new Uri(webBrowserUrl);                        
+
+                psi.EnvironmentVariables["PORT"] = uri.Port.ToString();
+                
                 var process = Process.Start(psi);
 
-                if (webBrowserUrl != null) {
-                    Debug.Assert(port != null);
-                    OnPortOpenedHandler.CreateHandler(
-                        port.Value,
-                        shortCircuitPredicate: () => process.HasExited,
-                        action: () => {
-                            VsShellUtilities.OpenBrowser(webBrowserUrl, (uint)__VSOSPFLAGS.OSP_LaunchNewBrowser);
-                        }
-                    );
+                if (startBrowser) {
+                    if (webBrowserUrl != null) {
+                       OnPortOpenedHandler.CreateHandler(
+                            uri.Port,
+                            shortCircuitPredicate: () => process.HasExited,
+                            action: () => {
+                                VsShellUtilities.OpenBrowser(webBrowserUrl, (uint)__VSOSPFLAGS.OSP_LaunchNewBrowser);
+                            }
+                        );
+                    }
                 }
             }
             return VSConstants.S_OK;
@@ -135,14 +129,62 @@ namespace Microsoft.NodejsTools.Project {
 
         #endregion
 
+        private string GetFullUrl() {
+            var host = _project.GetProjectProperty(NodejsConstants.LaunchUrl);
+
+            try {
+                return GetFullUrl(host, TestServerPort);
+            } catch (UriFormatException) {
+                var output = OutputWindowRedirector.GetGeneral(NodejsPackage.Instance);
+                output.WriteErrorLine(SR.GetString(SR.ErrorInvalidLaunchUrl, host));
+                output.ShowAndActivate();
+                return string.Empty;
+            }
+        }
+
+        internal static string GetFullUrl(string host, int port) {
+            UriBuilder builder;
+            Uri uri;
+            if (Uri.TryCreate(host, UriKind.Absolute, out uri)) {
+                builder = new UriBuilder(uri);
+            } else {
+                builder = new UriBuilder();
+                builder.Scheme = Uri.UriSchemeHttp;
+                builder.Host = "localhost";
+                builder.Path = host;
+            }
+
+            builder.Port = port;
+
+            return builder.ToString();
+        }
+
+        private string TestServerPortString {
+            get {
+                if (!_testServerPort.HasValue) {
+                    _testServerPort = GetFreePort();
+                }
+                return _testServerPort.Value.ToString(CultureInfo.InvariantCulture);
+            }
+        }
+
+        private int TestServerPort {
+            get {
+                if (!_testServerPort.HasValue) {
+                    _testServerPort = GetFreePort();
+                }
+                return _testServerPort.Value;
+            }
+        }
+
         /// <summary>
         /// Default implementation of the "Start Debugging" command.
         /// </summary>
-        private void StartWithDebugger(string startupFile, int? port, string webBrowserUrl) {
+        private void StartWithDebugger(string startupFile) {
             VsDebugTargetInfo dbgInfo = new VsDebugTargetInfo();
             dbgInfo.cbSize = (uint)Marshal.SizeOf(dbgInfo);
 
-            SetupDebugInfo(ref dbgInfo, startupFile, port, webBrowserUrl);
+            SetupDebugInfo(ref dbgInfo, startupFile);
 
             LaunchDebugger(_project.Site, dbgInfo);
         }
@@ -168,7 +210,7 @@ namespace Microsoft.NodejsTools.Project {
         /// <summary>
         /// Sets up debugger information.
         /// </summary>
-        private void SetupDebugInfo(ref VsDebugTargetInfo dbgInfo, string startupFile, int? port, string webBrowserUrl) {
+        private void SetupDebugInfo(ref VsDebugTargetInfo dbgInfo, string startupFile) {
             dbgInfo.dlo = DEBUG_LAUNCH_OPERATION.DLO_CreateProcess;
 
             dbgInfo.bstrExe = GetNodePath();
@@ -179,25 +221,18 @@ namespace Microsoft.NodejsTools.Project {
             if(!String.IsNullOrWhiteSpace(nodeArgs)) {
                 dbgInfo.bstrOptions = AD7Engine.InterpreterOptions + "=" + nodeArgs;
             }
-            if (port.HasValue) {
-                if (!String.IsNullOrWhiteSpace(dbgInfo.bstrOptions)) {
-                    dbgInfo.bstrOptions += ";" + AD7Engine.WebBrowserPort + "=" + port.Value.ToString();
-                } else {
-                    dbgInfo.bstrOptions = AD7Engine.WebBrowserPort + "=" + port.Value.ToString();
-                }
-            }
-            if (!String.IsNullOrWhiteSpace(webBrowserUrl)) {
-                if (!String.IsNullOrWhiteSpace(dbgInfo.bstrOptions)) {
-                    dbgInfo.bstrOptions += ";" + AD7Engine.WebBrowserUrl + "=" + webBrowserUrl;
-                } else {
-                    dbgInfo.bstrOptions = AD7Engine.WebBrowserUrl + "=" + webBrowserUrl;
-                }
+
+            var url = GetFullUrl();
+            if (!String.IsNullOrWhiteSpace(url)) {
+                dbgInfo.bstrOptions = AD7Engine.WebBrowserUrl + "=" + HttpUtility.UrlEncode(url);
             }
 
             dbgInfo.fSendStdoutToOutputWindow = 0;
 
             StringDictionary env = new StringDictionary();
-            SetupEnvironment(env, port);
+            Uri webUrl = new Uri(url);
+            env["PORT"] = webUrl.Port.ToString();
+            
             if (env.Count > 0) {
                 // add any inherited env vars
                 var variables = Environment.GetEnvironmentVariables();
@@ -222,12 +257,6 @@ namespace Microsoft.NodejsTools.Project {
             // Set the Node  debugger
             dbgInfo.clsidCustom = AD7Engine.DebugEngineGuid;
             dbgInfo.grfLaunch = (uint)__VSDBGLAUNCHFLAGS.DBGLAUNCH_StopDebuggingOnEnd;
-        }
-
-        private void SetupEnvironment(StringDictionary env, int? port) {
-            if (port != null) {
-                env["PORT"] = port.ToString();
-            }
         }
 
         private static int GetFreePort() {
