@@ -25,6 +25,7 @@
       <ProjectItem TargetFileName="bin\download.ps1">download.ps1</ProjectItem>
       <ProjectItem TargetFileName="bin\setup_web.cmd">setup_web.cmd</ProjectItem>
       <ProjectItem TargetFileName="bin\node.cmd">node.cmd</ProjectItem>
+      <ProjectItem TargetFileName="iisnode.yml">iisnode.yml</ProjectItem>
     </Project>
   </TemplateContent>
 </VSTemplate>

@@ -705,6 +705,7 @@
     <ZipProject Include="ProjectTemplates\AddWebSiteAzureNodejsApp\Web.cloud.config" />
     <ZipProject Include="ProjectTemplates\AddWebSiteAzureNodejsApp\Web.config" />
     <ZipProject Include="ProjectTemplates\AddWebSiteAzureNodejsApp\node.cmd" />
+    <ZipProject Include="ProjectTemplates\AddWebSiteAzureNodejsApp\iisnode.yml" />
     <ZipProject Include="ProjectTemplates\AddWebSiteNodejsWebApp\AddWebSiteNodejsWebApp.njsproj">
       <SubType>Designer</SubType>
     </ZipProject>
@@ -733,6 +734,7 @@
     <ZipProject Include="ProjectTemplates\AzureNodejsApp\Web.cloud.config" />
     <ZipProject Include="ProjectTemplates\AzureNodejsApp\Web.config" />
     <ZipProject Include="ProjectTemplates\AzureNodejsApp\node.cmd" />
+    <ZipProject Include="ProjectTemplates\AzureNodejsApp\iisnode.yml" />
     <ZipProject Include="ProjectTemplates\AddWebSiteNodejsWebApp\package.json" />
     <ZipProject Include="ProjectTemplates\AddWebSiteNodejsWebApp\README.md" />
     <ZipProject Include="ProjectTemplates\NodejsWebApp\NodejsWebApp.njsproj">
@@ -760,6 +762,7 @@
     <ZipProject Include="ProjectTemplates\AzureExpressApp\download.ps1" />
     <ZipProject Include="ProjectTemplates\AzureExpressApp\ChangeConfig.ps1" />
     <ZipProject Include="ProjectTemplates\AzureExpressApp\node.cmd" />
+    <ZipProject Include="ProjectTemplates\AzureExpressApp\iisnode.yml" />
     <ZipProject Include="ProjectTemplates\AddWebSiteAzureExpressApp\ChangeConfig.ps1" />
     <ZipProject Include="ProjectTemplates\AddWebSiteAzureExpressApp\download.ps1" />
     <ZipProject Include="ProjectTemplates\AddWebSiteAzureExpressApp\package.json" />
@@ -768,6 +771,7 @@
     <ZipProject Include="ProjectTemplates\AddWebSiteAzureExpressApp\Web.cloud.config" />
     <ZipProject Include="ProjectTemplates\AddWebSiteAzureExpressApp\Web.config" />
     <ZipProject Include="ProjectTemplates\AddWebSiteAzureExpressApp\node.cmd" />
+    <ZipProject Include="ProjectTemplates\AddWebSiteAzureExpressApp\iisnode.yml" />
     <ZipProject Include="ProjectTemplates\NodejsConsoleApp\package.json" />
     <ZipProject Include="ProjectTemplates\NodejsConsoleApp\README.md" />
     <ZipProject Include="ProjectTemplates\NodejsConsoleApp\app.js" />
@@ -825,6 +829,7 @@
     <TypeScriptProject Include="ProjectTemplates\TypeScriptAzureWebApp\Web.cloud.config" />
     <TypeScriptProject Include="ProjectTemplates\TypeScriptAzureWebApp\Web.config" />
     <TypeScriptProject Include="ProjectTemplates\TypeScriptAzureWebApp\setup_web.cmd" />
+    <TypeScriptProject Include="ProjectTemplates\TypeScriptAzureWebApp\iisnode.yml" />
     <TypeScriptProject Include="ProjectTemplates\TypeScriptAzureExpressApp\TypeScriptExpressApp.njsproj">
       <SubType>Designer</SubType>
     </TypeScriptProject>
@@ -839,6 +844,7 @@
     <TypeScriptProject Include="ProjectTemplates\TypeScriptAzureExpressApp\setup_web.cmd" />
     <TypeScriptProject Include="ProjectTemplates\TypeScriptAzureExpressApp\Web.cloud.config" />
     <TypeScriptProject Include="ProjectTemplates\TypeScriptAzureExpressApp\Web.config" />
+    <TypeScriptProject Include="ProjectTemplates\TypeScriptAzureExpressApp\iisnode.yml" />
     <None Include="source.extension.vsixmanifest">
       <SubType>Designer</SubType>
     </None>

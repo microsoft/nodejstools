@@ -25,6 +25,7 @@
       <ProjectItem ReplaceParameters="true">package.json</ProjectItem>
       <ProjectItem ReplaceParameters="true">README.md</ProjectItem>
       <ProjectItem TargetFileName="bin\node.cmd">node.cmd</ProjectItem>
+      <ProjectItem TargetFileName="iisnode.yml">iisnode.yml</ProjectItem>
     </Project>
   </TemplateContent>
   <WizardExtension>
