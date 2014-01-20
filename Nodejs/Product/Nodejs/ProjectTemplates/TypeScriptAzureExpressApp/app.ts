@@ -6,7 +6,7 @@ import user = require('./routes/user');
 import http = require('http');
 import path = require('path');
 
-var app = express.createServer();
+var app = express();
 
 // all environments
 app.set('port', process.env.PORT || 3000);
