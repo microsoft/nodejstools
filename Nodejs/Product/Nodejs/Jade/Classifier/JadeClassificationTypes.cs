@@ -12,21 +12,11 @@
  *
  * ***************************************************************************/
 
-using System;
-using System.Collections.Generic;
-
-namespace Microsoft.NodejsTools {
-    /// <summary>
-    /// Just used for our MEF import to get the metadata in a strongly
-    /// typed way.
-    /// </summary>
-    sealed class ClassifierMetadata {
-        public readonly IEnumerable<string> ContentTypes;
-        public readonly IEnumerable<Type> TagTypes;
-
-        public ClassifierMetadata(IDictionary<string, object> values) {
-            ContentTypes = (IEnumerable<string>)values["ContentTypes"];
-            TagTypes = (IEnumerable<Type>)values["TagTypes"];
-        }
+namespace Microsoft.NodejsTools.Jade {
+    internal class JadeClassificationTypes {
+        public const string Filter = "JadeFilter";
+        public const string Keyword = "JadeKeyword"; // break case do ...
+        public const string Selector = "JadeSelector"; // class const extends imports
+        public const string Variable = "JadeVariable"; // #{foo}
     }
 }

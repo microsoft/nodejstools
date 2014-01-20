@@ -101,6 +101,7 @@
     </Reference>
     <Reference Include="Microsoft.VisualStudio.Editor, Version=$(VSTarget).0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a, processorArchitecture=MSIL" />
     <Reference Include="Microsoft.VisualStudio.Language.Intellisense, Version=$(VSTarget).0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a, processorArchitecture=MSIL" />
+    <Reference Include="Microsoft.VisualStudio.Language.StandardClassification, Version=$(VSTarget).0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a, processorArchitecture=MSIL" />
     <Reference Include="Microsoft.VisualStudio.OLE.Interop" />
     <Reference Include="Microsoft.VisualStudio.Shell.Interop" />
     <Reference Include="Microsoft.VisualStudio.Shell.Interop.8.0" />
@@ -214,13 +215,14 @@
     <Compile Include="..\ReferenceGenerator\ReferenceCode.cs">
       <Link>Project\ReferenceCode.cs</Link>
     </Compile>
+    <Compile Include="ClassifierProviderMetadata.cs" />
     <Compile Include="CodeWindowManager.cs" />
     <Compile Include="Commands\ImportWizardCommand.cs" />
     <Compile Include="Commands\OpenReplWindowCommand.cs" />
     <Compile Include="Commands\OpenRemoteDebugDocumentationCommand.cs" />
     <Compile Include="Commands\OpenRemoteDebugProxyFolderCommand.cs" />
     <Compile Include="Commands\SurveyNewsCommand.cs" />
-    <Compile Include="ClassifierMetadata.cs" />
+    <Compile Include="TaggerProviderMetadata.cs" />
     <Compile Include="CustomTrackingSpan.cs" />
     <Compile Include="Debugger\INodeConnection.cs" />
     <Compile Include="Debugger\NodeEventEventArgs.cs" />
@@ -251,6 +253,62 @@
     <Compile Include="Intellisense\ReferenceGroupDispenser.cs" />
     <Compile Include="Intellisense\RequireCompletionCache.cs" />
     <Compile Include="Intellisense\TextViewCreationListener.cs" />
+    <Compile Include="Jade\Classifier\IClassificationContextNameProvider.cs" />
+    <Compile Include="Jade\Classifier\ICompositeToken.cs" />
+    <Compile Include="Jade\Classifier\JadeClassificationDefinitions.cs" />
+    <Compile Include="Jade\Classifier\JadeClassificationNameProvider.cs" />
+    <Compile Include="Jade\Classifier\JadeClassificationTypes.cs" />
+    <Compile Include="Jade\Classifier\JadeClassifier.cs" />
+    <Compile Include="Jade\Classifier\JadeClassifierProvider.cs" />
+    <Compile Include="Jade\Classifier\TokenBasedClassifier.cs" />
+    <Compile Include="Jade\EntityTable.cs" />
+    <Compile Include="Jade\IdleTimeAsyncTask.cs" />
+    <Compile Include="Jade\ITextSnapshotProvider.cs" />
+    <Compile Include="Jade\JadeContentTypeDefinition.cs" />
+    <Compile Include="Jade\JadeLanguageInfo.cs" />
+    <Compile Include="Jade\Outlining\IndentBasedRegionBuilder.cs" />
+    <Compile Include="Jade\Outlining\JadeOutlineTaggerProvider.cs" />
+    <Compile Include="Jade\Outlining\JadeOutliningTagger.cs" />
+    <Compile Include="Jade\Outlining\OutlineRegion.cs" />
+    <Compile Include="Jade\Outlining\OutlineRegionBuilder.cs" />
+    <Compile Include="Jade\Outlining\OutlineRegionCollection.cs" />
+    <Compile Include="Jade\Outlining\OutlineRegionsChange.cs" />
+    <Compile Include="Jade\Outlining\OutlineRegionsChangedEventArgs.cs" />
+    <Compile Include="Jade\Outlining\OutliningTagger.cs" />
+    <Compile Include="Jade\ServiceManager.cs" />
+    <Compile Include="Jade\TextProvider.cs" />
+    <Compile Include="Jade\TextUtility.cs" />
+    <Compile Include="Jade\Text\CharacterStream.cs" />
+    <Compile Include="Jade\Text\Def\ICompositeTextRange.cs" />
+    <Compile Include="Jade\Text\Def\ITextProvider.cs" />
+    <Compile Include="Jade\Text\Def\ITextRange.cs" />
+    <Compile Include="Jade\Text\Def\ITextRangeCollection.cs" />
+    <Compile Include="Jade\Text\ReadonlyTextRangeCollection.cs" />
+    <Compile Include="Jade\Text\textchange.cs" />
+    <Compile Include="Jade\Text\TextChangeArgs.cs" />
+    <Compile Include="Jade\Text\TextHelper.cs" />
+    <Compile Include="Jade\Text\TextRange.cs" />
+    <Compile Include="Jade\Text\TextRangeCollection.cs" />
+    <Compile Include="Jade\Text\TextStream.cs" />
+    <Compile Include="Jade\TimeUtility.cs" />
+    <Compile Include="Jade\Tokenizer\JadeToken.cs" />
+    <Compile Include="Jade\Tokenizer\JadeTokenizer.cs" />
+    <Compile Include="Jade\Tokenizer\JadeTokenType.cs" />
+    <Compile Include="Jade\Tokenizer\Keywords\JadeCodeKeywords.cs" />
+    <Compile Include="Jade\Tokenizer\Keywords\JadeFilters.cs" />
+    <Compile Include="Jade\Tokenizer\Keywords\JadeTagKeywords.cs" />
+    <Compile Include="Jade\Tokenizer\States\AttributeState.cs" />
+    <Compile Include="Jade\Tokenizer\States\FilterState.cs" />
+    <Compile Include="Jade\Tokenizer\States\HtmlState.cs" />
+    <Compile Include="Jade\Tokenizer\States\InlineCodeState.cs" />
+    <Compile Include="Jade\Tokenizer\States\ScriptState.cs" />
+    <Compile Include="Jade\Tokenizer\States\StyleState.cs" />
+    <Compile Include="Jade\Tokenizer\States\TagState.cs" />
+    <Compile Include="Jade\Tokenizer\States\TextState.cs" />
+    <Compile Include="Jade\Tokens\IToken.cs" />
+    <Compile Include="Jade\Tokens\ITokenizer.cs" />
+    <Compile Include="Jade\Tokens\Token.cs" />
+    <Compile Include="Jade\Tokens\Tokenizer.cs" />
     <Compile Include="LanguagePreferences.cs" />
     <Compile Include="Nodejs.cs" />
     <Compile Include="NodejsLanguageInfo.cs" />
@@ -864,6 +922,7 @@
   <ItemGroup>
     <TypeScriptProject Include="ProjectTemplates\TypeScriptAzureExpressApp\user.ts" />
   </ItemGroup>
+  <ItemGroup />
   <PropertyGroup>
     <!--
     To specify a different registry root to register your package, uncomment the TargetRegistryRoot

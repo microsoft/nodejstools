@@ -20,6 +20,7 @@ namespace Microsoft.NodejsTools {
         public const string FileExtension = ".js";
         public const string TypeScriptExtension = ".ts";
         public const string JavaScript = "JavaScript";
+        public const string CSS = "CSS";
         public const string Nodejs = "Node.js";
         public const string NodejsRepl = "Node.jsRepl";
 

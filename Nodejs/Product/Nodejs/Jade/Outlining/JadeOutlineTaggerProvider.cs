@@ -1,0 +1,35 @@
+﻿/* ****************************************************************************
+ *
+ * Copyright (c) Microsoft Corporation. 
+ *
+ * This source code is subject to terms and conditions of the Apache License, Version 2.0. A 
+ * copy of the license can be found in the License.html file at the root of this distribution. If 
+ * you cannot locate the Apache License, Version 2.0, please send an email to 
+ * vspython@microsoft.com. By using this source code in any fashion, you are agreeing to be bound 
+ * by the terms of the Apache License, Version 2.0.
+ *
+ * You must not remove this notice, or any other, from this software.
+ *
+ * ***************************************************************************/
+
+using System.ComponentModel.Composition;
+using Microsoft.VisualStudio.Text;
+using Microsoft.VisualStudio.Text.Tagging;
+using Microsoft.VisualStudio.Utilities;
+
+namespace Microsoft.NodejsTools.Jade {
+    [Export(typeof(ITaggerProvider))]
+    [TagType(typeof(IOutliningRegionTag))]
+    [ContentType(JadeContentTypeDefinition.JadeContentType)]
+    internal sealed class JadeOutliningTaggerProvider : ITaggerProvider {
+        #region ITaggerProvider
+        public ITagger<T> CreateTagger<T>(ITextBuffer buffer) where T : ITag {
+            var tagger = ServiceManager.GetService<JadeOutliningTagger>(buffer);
+            if (tagger == null)
+                tagger = new JadeOutliningTagger(buffer);
+
+            return tagger as ITagger<T>;
+        }
+        #endregion
+    }
+}

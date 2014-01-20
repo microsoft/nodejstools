@@ -32,7 +32,7 @@ namespace Microsoft.NodejsTools {
         private readonly ITaggerProvider _taggerProvider;
         [ImportingConstructor]
         public SmartIndentProvider(IEditorOptionsFactoryService editorOptionsFactory,
-            [ImportMany(typeof(ITaggerProvider))]Lazy<ITaggerProvider, ClassifierMetadata>[] classifierProviders) {
+            [ImportMany(typeof(ITaggerProvider))]Lazy<ITaggerProvider, TaggerProviderMetadata>[] classifierProviders) {
             _editorOptionsFactory = editorOptionsFactory;
 
             // we use a tagger provider here instead of an IClassifierProvider because the 
@@ -69,7 +69,7 @@ namespace Microsoft.NodejsTools {
         [ImportingConstructor]
         public ReplSmartIndentProvider(
             IEditorOptionsFactoryService editorOptionsFactory,
-            [ImportMany(typeof(ITaggerProvider))]Lazy<ITaggerProvider, ClassifierMetadata>[] classifierProviders
+            [ImportMany(typeof(ITaggerProvider))]Lazy<ITaggerProvider, TaggerProviderMetadata>[] classifierProviders
             ) {
             _editorOptionsFactory = editorOptionsFactory;
 

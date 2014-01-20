@@ -26,6 +26,7 @@ using System.Windows.Forms;
 using Microsoft.NodejsTools.Commands;
 using Microsoft.NodejsTools.Debugger.DebugEngine;
 using Microsoft.NodejsTools.Debugger.Remote;
+using Microsoft.NodejsTools.Jade;
 using Microsoft.NodejsTools.Options;
 using Microsoft.NodejsTools.Project;
 using Microsoft.NodejsTools.Repl;
@@ -165,6 +166,7 @@ namespace Microsoft.NodejsTools {
     [ProvideProjectItem(typeof(BaseNodeProjectFactory), NodejsConstants.Nodejs, "FileTemplates\\NewItem", 0)]
     [ProvideLanguageTemplates("{349C5851-65DF-11DA-9384-00065B846F21}", NodejsConstants.Nodejs, Guids.NodejsPackageString, "Web", "Node.js Project Templates", "{" + Guids.NodejsBaseProjectFactoryString + "}", ".js", NodejsConstants.Nodejs, "{" + Guids.NodejsBaseProjectFactoryString + "}")]
     [ProvideTextEditorAutomation(NodejsConstants.Nodejs, 106, 102, ProfileMigrationType.PassThrough)]
+    [ProvideLanguageService(typeof(JadeLanguageInfo), "Jade", 3041, RequestStockColors = true, ShowSmartIndent = false, ShowCompletion = false, DefaultToInsertSpaces = true, HideAdvancedMembersByDefault = false, EnableAdvancedMembersOption = false, ShowDropDownOptions = false)]
     internal sealed class NodejsPackage : CommonPackage {
         internal const string NodeExpressionEvaluatorGuid = "{F16F2A71-1C45-4BAB-BECE-09D28CFDE3E6}";
         private IContentType _contentType;
