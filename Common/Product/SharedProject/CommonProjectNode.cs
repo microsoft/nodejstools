@@ -1453,7 +1453,7 @@ namespace Microsoft.VisualStudioTools.Project {
             return CreateFileNode(new MsBuildProjectElement(this, path, GetItemType(path)));
         }
 
-        internal string GetItemType(string filename) {
+        protected virtual string GetItemType(string filename) {
             if (IsCodeFile(filename)) {
                 return "Compile";
             } else {

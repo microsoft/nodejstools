@@ -393,7 +393,7 @@ namespace Microsoft.VisualStudioTools.Project
                 if (res is prjBuildAction) {
                     return (prjBuildAction)res;
                 }
-                return prjBuildAction.prjBuildActionNone;
+                return prjBuildAction.prjBuildActionContent;
             }
             set 
             {

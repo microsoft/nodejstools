@@ -47,5 +47,11 @@ namespace Microsoft.NodejsTools {
 
         [Export, Name(NodejsRepl), BaseDefinition(Nodejs), BaseDefinition("JavaScript")]
         internal static ContentTypeDefinition ReplContentTypeDefinition = null;
+        
+        public const string TypeScriptCompileItemType = "TypeScriptCompile";        
+        public const string EnableTypeScript = "EnableTypeScript";
+        public const string TypeScriptSourceMap = "TypeScriptSourceMap";
+        public const string TypeScriptModuleKind = "TypeScriptModuleKind";
+        public const string CommonJSModuleKind = "CommonJS";
     }
 }

@@ -130,6 +130,27 @@ namespace Microsoft.NodejsTools.Project {
             base.FinishProjectCreation(sourceFolder, destFolder);
         }
 
+        protected override void AddNewFileNodeToHierarchy(HierarchyNode parentNode, string fileName) {
+            base.AddNewFileNodeToHierarchy(parentNode, fileName);
+
+            if (String.Equals(Path.GetExtension(fileName), NodejsConstants.TypeScriptExtension, StringComparison.OrdinalIgnoreCase) &&
+                !String.Equals(GetProjectProperty(NodejsConstants.EnableTypeScript), "true", StringComparison.OrdinalIgnoreCase)) {
+                // enable type script on the project automatically...
+                SetProjectProperty(NodejsConstants.EnableTypeScript, "true");
+                SetProjectProperty(NodejsConstants.TypeScriptSourceMap, "true");
+                if (String.IsNullOrWhiteSpace(GetProjectProperty(NodejsConstants.TypeScriptModuleKind))) {
+                    SetProjectProperty(NodejsConstants.TypeScriptModuleKind, NodejsConstants.CommonJSModuleKind);
+                }
+            }
+        }
+
+        protected override string GetItemType(string filename) {
+            if (string.Equals(Path.GetExtension(filename), NodejsConstants.TypeScriptExtension, StringComparison.OrdinalIgnoreCase)) {
+                return NodejsConstants.TypeScriptCompileItemType;
+            }
+            return base.GetItemType(filename);
+        }
+
         protected override bool DisableCmdInCurrentMode(Guid commandGroup, uint command) {
             if (commandGroup == Guids.OfficeToolsBootstrapperCmdSet) {
                 // Convert to ... commands from Office Tools don't make sense and aren't supported 
