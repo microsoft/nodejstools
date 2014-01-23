@@ -53,5 +53,6 @@ namespace Microsoft.NodejsTools {
         public const string TypeScriptSourceMap = "TypeScriptSourceMap";
         public const string TypeScriptModuleKind = "TypeScriptModuleKind";
         public const string CommonJSModuleKind = "CommonJS";
+        public const string TypeScript = "TypeScript";
     }
 }

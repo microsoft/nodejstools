@@ -13,15 +13,20 @@
  * ***************************************************************************/
 
 using System;
+using System.Diagnostics;
 using System.IO;
 
 namespace Microsoft.NodejsTools.Debugger {
     class NodeModule {
         private readonly int _moduleId;
         private readonly string _fileName;
+        private readonly NodeDebugger _debugger;
         private object _document;
 
-        public NodeModule(int moduleId, string fileName) {
+        public NodeModule(NodeDebugger debugger, int moduleId, string fileName) {
+            Debug.Assert(fileName != null);
+
+            _debugger = debugger;
             _moduleId = moduleId;
             _fileName = fileName;
         }
@@ -42,8 +47,20 @@ namespace Microsoft.NodejsTools.Debugger {
             }
         }
 
+        public string JavaScriptFileName {
+            get {
+                return _fileName;
+            }
+        }
+
         public string FileName {
             get {
+                if (_debugger != null) {
+                    var mapping = _debugger.MapToOriginal(_fileName, 0);
+                    if (mapping != null) {
+                        return Path.Combine(Path.GetDirectoryName(_fileName), Path.GetFileName(mapping.FileName));
+                    }
+                }
                 return _fileName;
             }
         }

@@ -319,7 +319,9 @@ namespace Microsoft.NodejsTools.Debugger.DebugEngine {
             // Check whether breakpoint request for our language
             BP_REQUEST_INFO[] requestInfo = new BP_REQUEST_INFO[1];
             EngineUtils.CheckOk(pBPRequest.GetRequestInfo(enum_BPREQI_FIELDS.BPREQI_LANGUAGE | enum_BPREQI_FIELDS.BPREQI_BPLOCATION, requestInfo));
-            if (requestInfo[0].guidLanguage != Guids.NodejsDebugLanguage && requestInfo[0].guidLanguage != Guids.ScriptDebugLanguage) {
+            if (requestInfo[0].guidLanguage != Guids.NodejsDebugLanguage && 
+                requestInfo[0].guidLanguage != Guids.ScriptDebugLanguage &&
+                requestInfo[0].guidLanguage != Guids.TypeScriptDebugLanguage) {
                 // Check whether breakpoint request for our "downloaded" script
                 // "Downloaded" script will have our IDebugDocument2
                 IDebugDocument2 debugDocument;
@@ -1061,7 +1063,7 @@ namespace Microsoft.NodejsTools.Debugger.DebugEngine {
         private void OnBreakpointBound(object sender, BreakpointBindingEventArgs e) {
             var pendingBreakpoint = _breakpointManager.GetPendingBreakpoint(e.Breakpoint);
             var breakpointBinding = e.BreakpointBinding;
-            var codeContext = new AD7MemoryAddress(this, pendingBreakpoint.DocumentName, (uint)breakpointBinding.LineNo - 1);
+            var codeContext = new AD7MemoryAddress(this, pendingBreakpoint.DocumentName, (uint)breakpointBinding.RequestedLineNo - 1);
             var documentContext = new AD7DocumentContext(codeContext);
             var breakpointResolution = new AD7BreakpointResolution(this, breakpointBinding, documentContext);
             var boundBreakpoint = new AD7BoundBreakpoint(this, breakpointBinding, pendingBreakpoint, breakpointResolution, breakpointBinding.Enabled);
@@ -1171,6 +1173,16 @@ namespace Microsoft.NodejsTools.Debugger.DebugEngine {
             int matchCount = 0;
             for (matchCount = 0; matchCount < maxCount && array1[matchCount] == array2[matchCount]; ++matchCount);
             return matchCount;
+        }
+
+        internal static void MapLanguageInfo(string filename, out string pbstrLanguage, out Guid pguidLanguage) {
+            if (String.Equals(Path.GetExtension(filename), NodejsConstants.TypeScriptExtension, StringComparison.OrdinalIgnoreCase)) {
+                pbstrLanguage = NodejsConstants.TypeScript;
+                pguidLanguage = Guids.TypeScriptDebugLanguage;
+            } else {
+                pbstrLanguage = NodejsConstants.JavaScript;
+                pguidLanguage = Guids.NodejsDebugLanguage;
+            }
         }
     }
 }

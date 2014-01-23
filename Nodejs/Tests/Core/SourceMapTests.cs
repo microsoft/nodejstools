@@ -96,7 +96,7 @@ namespace NodejsTests {
             for (int i = 0; i < testCases.Length; i++) {
                 SourceMapping mapping;
                 if (map.TryMapLine(i, out mapping)) {
-                    Assert.AreEqual(testCases[i].Filename, mapping.Filename);
+                    Assert.AreEqual(testCases[i].Filename, mapping.FileName);
                     Assert.AreEqual(testCases[i].Name, mapping.Name);
                     Assert.AreEqual(testCases[i].Line, mapping.Line);
                 } else {
@@ -130,7 +130,7 @@ namespace NodejsTests {
                 Console.WriteLine("{0} {1}", testCases[i].InLine, testCases[i].InColumn);
                 SourceMapping mapping;
                 if (map.TryMapPoint(testCases[i].InLine, testCases[i].InColumn, out mapping)) {
-                    Assert.AreEqual(testCases[i].Filename, mapping.Filename);
+                    Assert.AreEqual(testCases[i].Filename, mapping.FileName);
                     Assert.AreEqual(testCases[i].Name, mapping.Name);
                     Assert.AreEqual(testCases[i].ExpectedLine, mapping.Line);
                     Assert.AreEqual(testCases[i].ExpectedColumn, mapping.Column);

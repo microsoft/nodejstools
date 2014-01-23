@@ -72,12 +72,34 @@ namespace Microsoft.NodejsTools.Debugger {
             }
         }
 
+        public string RequestedFileName {
+            get {
+                return _breakpoint.RequestedFileName;
+            }
+        }
+
+        /// <summary>
+        /// 1 based line number that corresponds with the actual JavaScript code
+        /// </summary>
         public int LineNo {
             get {
                 return _lineNo;
             }
             set {
                 _lineNo = value;
+            }
+        }
+
+        /// <summary>
+        /// 1 based line number that corresponds to the file the breakpoint was requested in
+        /// </summary>
+        public int RequestedLineNo {
+            get {
+                var mapping = _breakpoint.Process.MapToOriginal(FileName, LineNo - 1);
+                if (mapping != null) {
+                    return mapping.Line + 1;
+                }
+                return LineNo;
             }
         }
 

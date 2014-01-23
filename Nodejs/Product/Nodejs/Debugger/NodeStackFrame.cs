@@ -20,29 +20,49 @@ namespace Microsoft.NodejsTools.Debugger {
         private readonly string _frameName;
         private readonly NodeThread _thread;
         private readonly NodeModule _module;
+        private readonly int _startLine, _endLine, _lineNo;
 
         public NodeStackFrame(NodeThread thread, NodeModule module, string frameName, int startLine, int endLine, int lineNo, int frameId) {
             _thread = thread;
             _module = module;
             _frameName = frameName;
-            LineNo = lineNo;
+            _lineNo = lineNo;
             FrameId = frameId;
-            StartLine = startLine;
-            EndLine = endLine;
+            _startLine = startLine;
+            _endLine = endLine;
         }
 
         /// <summary>
         /// The line nubmer where the current function/class/module starts
         /// </summary>
         public int StartLine {
-            get; private set;
+            get {
+                return MapLineNo(_startLine);
+            }
         }
 
         /// <summary>
         /// The line number where the current function/class/module ends.
         /// </summary>
         public int EndLine {
-            get; private set;
+            get {
+                return MapLineNo(_endLine);
+            }
+        }
+
+        /// <summary>
+        /// Maps a line number from JavaScript to the original source code.
+        /// 
+        /// Line numbers are 1 based.
+        /// </summary>
+        /// <param name="lineNo"></param>
+        /// <returns></returns>
+        private int MapLineNo(int lineNo) {
+            var mapping = Thread.Process.MapToOriginal(Module.JavaScriptFileName, lineNo - 1);
+            if (mapping != null) {
+                return mapping.Line + 1;
+            }
+            return lineNo;
         }
 
         /// <summary>
@@ -55,13 +75,21 @@ namespace Microsoft.NodejsTools.Debugger {
         /// <summary>
         /// Gets a stack frame line number in the script.
         /// </summary>
-        public int LineNo { get; private set; }
+        public int LineNo {
+            get {
+                return MapLineNo(_lineNo);
+            }
+        }
 
         /// <summary>
         /// Gets a stack name.
         /// </summary>
         public string FunctionName {
             get {
+                var mapping = Thread.Process.MapToOriginal(Module.JavaScriptFileName, _lineNo - 1);
+                if (mapping != null) {
+                    return mapping.Name;
+                }
                 return _frameName;
             }
         }

@@ -240,13 +240,22 @@ namespace Microsoft.NodejsTools {
                         res = new SourceMapping(
                             line.Segments[i].OriginalLine,
                             line.Segments[i].OriginalColumn,
-                            Sources[line.Segments[i].SourceIndex],
-                            Names[line.Segments[i].OriginalName]
+                            line.Segments[i].SourceIndex < Sources.Count ? Sources[line.Segments[i].SourceIndex] : null,
+                            line.Segments[i].OriginalName < Names.Count ? Names[line.Segments[i].OriginalName] : null
                         );
                         return true;
                     }
                 }
-
+                if (line.Segments.Length > 0) {
+                    // we map to this column
+                    res = new SourceMapping(
+                        line.Segments[0].OriginalLine,
+                        line.Segments[0].OriginalColumn,
+                        line.Segments[0].SourceIndex < Sources.Count ? Sources[line.Segments[0].SourceIndex] : null,
+                        line.Segments[0].OriginalName < Names.Count ? Names[line.Segments[0].OriginalName] : null
+                    );
+                    return true;
+                }
             }
             res = default(SourceMapping);
             return false;
@@ -268,6 +277,54 @@ namespace Microsoft.NodejsTools {
                     return true;
                 }
             }
+            res = default(SourceMapping);
+            return false;
+        }
+
+        /// <summary>
+        /// Maps a location in the source code into the generated code.
+        /// </summary>
+        public bool TryMapPointBack(int lineNo, int columnNo, out SourceMapping res) {
+            int? firstBestLine = null, secondBestLine = null;
+            for (int i = 0; i < _lines.Length; i++) {
+                var line = _lines[i];
+                int? originalColumn = null;
+                foreach (var segment in line.Segments) {
+                    if (segment.OriginalLine == lineNo) {
+                        if (segment.OriginalColumn <= columnNo) {
+                            originalColumn = segment.OriginalColumn;
+                        } else if (originalColumn != null) {
+                            res = new SourceMapping(
+                                i,
+                                columnNo - originalColumn.Value,
+                                File,
+                                null
+                            );
+                            return true;
+                        } else {
+                            // code like:
+                            //      constructor(public greeting: string) { }
+                            // gets compiled into:
+                            //      function Greeter(greeting) {
+                            //          this.greeting = greeting;
+                            //      }
+                            // If we're going to pick a line out of here we'd rather pick the
+                            // 2nd line where we're going to hit a breakpoint.
+
+                            if (firstBestLine == null) {
+                                firstBestLine = i;
+                            } else if (secondBestLine == null && firstBestLine.Value != i) {
+                                secondBestLine = i;
+                            }
+                        }
+                    } else if (segment.OriginalLine > lineNo && firstBestLine != null) {
+                        // not a perfect matching on column (e.g. requested 0, mapping starts at 4)
+                        res = new SourceMapping(secondBestLine ?? firstBestLine.Value, 0, File, null);
+                        return true;
+                    }
+                }
+            }
+
             res = default(SourceMapping);
             return false;
         }
@@ -317,12 +374,12 @@ namespace Microsoft.NodejsTools {
 
     public class SourceMapping {
         public readonly int Line, Column;
-        public readonly string Filename, Name;
+        public readonly string FileName, Name;
 
         internal SourceMapping(int line, int column, string filename, string name) {
             Line = line;
             Column = column;
-            Filename = filename;
+            FileName = filename;
             Name = name;
         }
     }

@@ -105,7 +105,8 @@ namespace Microsoft.NodejsTools.Debugger.DebugEngine {
             }
 
             if ((dwFieldSpec & enum_FRAMEINFO_FLAGS.FIF_LANGUAGE) != 0) {
-                frameInfo.m_bstrLanguage = NodejsConstants.JavaScript;
+                Guid dummy;
+                AD7Engine.MapLanguageInfo(_stackFrame.FileName, out frameInfo.m_bstrLanguage, out dummy);
                 frameInfo.m_dwValidFields |= enum_FRAMEINFO_FLAGS.FIF_LANGUAGE;
             }
 
@@ -293,8 +294,7 @@ namespace Microsoft.NodejsTools.Debugger.DebugEngine {
         // Gets the language associated with this stack frame. 
         // In this sample, all the supported stack frames are C++
         int IDebugStackFrame2.GetLanguageInfo(ref string pbstrLanguage, ref Guid pguidLanguage) {
-            pbstrLanguage = NodejsConstants.Nodejs;
-            pguidLanguage = Guids.NodejsDebugLanguage;
+            AD7Engine.MapLanguageInfo(_stackFrame.FileName, out pbstrLanguage, out pguidLanguage);
             return VSConstants.S_OK;
         }
 

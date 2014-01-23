@@ -20,8 +20,8 @@ using System.Linq;
 namespace Microsoft.NodejsTools.Debugger {
     class NodeBreakpoint {
         private readonly NodeDebugger _process;
-        private readonly string _fileName;
-        private int _lineNo;
+        private readonly string _fileName, _requestedFileName;
+        private int _lineNo, _requestedLineNo;
         private Dictionary<int, NodeBreakpointBinding> _bindings = new Dictionary<int, NodeBreakpointBinding>();
         private bool _enabled;
         private BreakOn _breakOn;
@@ -30,14 +30,18 @@ namespace Microsoft.NodejsTools.Debugger {
         public NodeBreakpoint(
             NodeDebugger process,
             string fileName,
+            string requestedFileName,
             int lineNo,
+            int requestedLineNo,
             bool enabled,
             BreakOn breakOn,
             string condition
         ) {
             _process = process;
             _fileName = fileName;
+            _requestedFileName = requestedFileName;
             _lineNo = lineNo;
+            _requestedLineNo = requestedLineNo;
             _enabled = enabled;
             _breakOn = breakOn;
             _condition = condition;
@@ -57,9 +61,23 @@ namespace Microsoft.NodejsTools.Debugger {
             _process.BindBreakpoint(this, successHandler, failureHandler);
         }
 
+        /// <summary>
+        /// The filename where the breakpoint is set.  If source maps are in use then this
+        /// is the actual JavaScript file.
+        /// </summary>
         public string FileName {
             get {
                 return _fileName;
+            }
+        }
+
+        /// <summary>
+        /// The file name where the breakpoint was requested to be set.  If source maps are in use this can be
+        /// different than FileName.
+        /// </summary>
+        public string RequestedFileName {
+            get {
+                return _requestedFileName;
             }
         }
 
@@ -69,6 +87,12 @@ namespace Microsoft.NodejsTools.Debugger {
             }
             set {
                 _lineNo = value;
+            }
+        }
+
+        public int RequestedLineNo {
+            get {
+                return _requestedLineNo;
             }
         }
 
