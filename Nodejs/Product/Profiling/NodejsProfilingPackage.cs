@@ -238,7 +238,7 @@ namespace Microsoft.NodejsTools.Profiling {
 
         private void ProfileProjectTarget(SessionNode session, ProjectTarget projectTarget, bool openReport) {
             var targetGuid = projectTarget.TargetProject;
-
+            
             var dte = (EnvDTE.DTE)GetGlobalService(typeof(EnvDTE.DTE));
             EnvDTE.Project projectToProfile = null;
             foreach (EnvDTE.Project project in dte.Solution.Projects) {
@@ -327,7 +327,17 @@ namespace Microsoft.NodejsTools.Profiling {
             }
 
             var arch = NativeMethods.GetBinaryType(interpreter);
-            var process = new ProfiledProcess(interpreter, interpreterArgs, script, scriptArgs, workingDir, env, arch, launchUrl, port, startBrowser);
+
+            bool jmc = true;
+            using (var vsperfKey = VSRegistry.RegistryRoot(__VsLocalRegistryType.RegType_UserSettings).OpenSubKey("VSPerf")) {
+                var value = vsperfKey.GetValue("tools.options.justmycode");
+                int jmcSetting;
+                if (value != null && value is string && Int32.TryParse((string)value, out jmcSetting)) {
+                    jmc = jmcSetting != 0;
+                }
+            }
+
+            var process = new ProfiledProcess(interpreter, interpreterArgs, script, scriptArgs, workingDir, env, arch, launchUrl, port, startBrowser, jmc);
 
             string baseName = Path.GetFileNameWithoutExtension(session.Filename);
             string date = DateTime.Now.ToString("yyyyMMdd");

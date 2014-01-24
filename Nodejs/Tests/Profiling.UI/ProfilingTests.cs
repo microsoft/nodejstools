@@ -26,12 +26,15 @@ using EnvDTE90a;
 using Microsoft.NodejsTools;
 using Microsoft.NodejsTools.Profiling;
 using Microsoft.TC.TestHostAdapters;
+using Microsoft.VisualStudio.Shell;
+using Microsoft.VisualStudio.Shell.Interop;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using Microsoft.Win32;
 using TestUtilities;
 using TestUtilities.Nodejs;
 using TestUtilities.UI;
 using TestUtilities.UI.Nodejs;
+using Task = System.Threading.Tasks.Task;
 
 namespace ProfilingUITests {
     [TestClass]
@@ -123,56 +126,58 @@ namespace ProfilingUITests {
         [TestMethod, Priority(0), TestCategory("Core")]
         [HostType("TC Dynamic"), DynamicHostType(typeof(VsIdeHostAdapter))]
         public void NewProfilingSession() {
-            VsIdeTestHostContext.Dte.Solution.Close(false);
+            using (new JustMyCodeSetting(false)) {
+                VsIdeTestHostContext.Dte.Solution.Close(false);
 
-            using (var app = new NodejsVisualStudioApp(VsIdeTestHostContext.Dte)) {
+                using (var app = new NodejsVisualStudioApp(VsIdeTestHostContext.Dte)) {
 
-                app.OpenNodejsPerformance();
-                app.NodejsPerformanceExplorerToolBar.NewPerfSession();
+                    app.OpenNodejsPerformance();
+                    app.NodejsPerformanceExplorerToolBar.NewPerfSession();
 
-                var profiling = (INodeProfiling)VsIdeTestHostContext.Dte.GetObject("NodejsProfiling");
+                    var profiling = (INodeProfiling)VsIdeTestHostContext.Dte.GetObject("NodejsProfiling");
 
-                var perf = app.NodejsPerformanceExplorerTreeView.WaitForItem("Performance *");
-                Debug.Assert(perf != null);
-                var session = profiling.GetSession(1);
-                Assert.AreNotEqual(session, null);
+                    var perf = app.NodejsPerformanceExplorerTreeView.WaitForItem("Performance *");
+                    Debug.Assert(perf != null);
+                    var session = profiling.GetSession(1);
+                    Assert.AreNotEqual(session, null);
 
-                NodejsPerfTarget perfTarget = null;
-                try {
-                    Mouse.MoveTo(perf.GetClickablePoint());
-                    Mouse.DoubleClick(System.Windows.Input.MouseButton.Left);
-
-                    // wait for the dialog, set some settings, save them.
-                    perfTarget = new NodejsPerfTarget(app.WaitForDialog());
-
-                    perfTarget.SelectProfileScript();
-                    perfTarget.InterpreterPath = NodeExePath;
-                    perfTarget.ScriptName = TestData.GetPath(@"TestData\NodejsProfileTest\program.js");
-
+                    NodejsPerfTarget perfTarget = null;
                     try {
-                        perfTarget.Ok();
-                        perfTarget = null;
-                    } catch (ElementNotEnabledException) {
-                        Assert.Fail("Settings were invalid:\n  ScriptName = {0}\n",
-                            perfTarget.ScriptName);
-                    }
-                    app.WaitForDialogDismissed();
+                        Mouse.MoveTo(perf.GetClickablePoint());
+                        Mouse.DoubleClick(System.Windows.Input.MouseButton.Left);
 
-                    Mouse.MoveTo(perf.GetClickablePoint());
-                    Mouse.DoubleClick(System.Windows.Input.MouseButton.Left);
+                        // wait for the dialog, set some settings, save them.
+                        perfTarget = new NodejsPerfTarget(app.WaitForDialog());
 
-                    // re-open the dialog, verify the settings
-                    perfTarget = new NodejsPerfTarget(app.WaitForDialog());
+                        perfTarget.SelectProfileScript();
+                        perfTarget.InterpreterPath = NodeExePath;
+                        perfTarget.ScriptName = TestData.GetPath(@"TestData\NodejsProfileTest\program.js");
 
-                    //Assert.AreEqual("Python 2.6", perfTarget.SelectedInterpreter);
-                    Assert.AreEqual(TestData.GetPath(@"TestData\NodejsProfileTest\program.js"), perfTarget.ScriptName);
-
-                } finally {
-                    if (perfTarget != null) {
-                        perfTarget.Cancel();
+                        try {
+                            perfTarget.Ok();
+                            perfTarget = null;
+                        } catch (ElementNotEnabledException) {
+                            Assert.Fail("Settings were invalid:\n  ScriptName = {0}\n",
+                                perfTarget.ScriptName);
+                        }
                         app.WaitForDialogDismissed();
+
+                        Mouse.MoveTo(perf.GetClickablePoint());
+                        Mouse.DoubleClick(System.Windows.Input.MouseButton.Left);
+
+                        // re-open the dialog, verify the settings
+                        perfTarget = new NodejsPerfTarget(app.WaitForDialog());
+
+                        //Assert.AreEqual("Python 2.6", perfTarget.SelectedInterpreter);
+                        Assert.AreEqual(TestData.GetPath(@"TestData\NodejsProfileTest\program.js"), perfTarget.ScriptName);
+
+                    } finally {
+                        if (perfTarget != null) {
+                            perfTarget.Cancel();
+                            app.WaitForDialogDismissed();
+                        }
+                        profiling.RemoveSession(session, true);
                     }
-                    profiling.RemoveSession(session, true);
                 }
             }
         }
@@ -183,34 +188,36 @@ namespace ProfilingUITests {
         [TestMethod, Priority(0), TestCategory("Core")]
         [HostType("TC Dynamic"), DynamicHostType(typeof(VsIdeHostAdapter))]
         public void TestStartAnalysisDebugMenu() {
-            var profiling = (INodeProfiling)VsIdeTestHostContext.Dte.GetObject("NodejsProfiling");
+            using (new JustMyCodeSetting(false)) {
+                var profiling = (INodeProfiling)VsIdeTestHostContext.Dte.GetObject("NodejsProfiling");
 
-            // no sessions yet
-            Assert.AreEqual(profiling.GetSession(1), null);
+                // no sessions yet
+                Assert.AreEqual(profiling.GetSession(1), null);
 
-            var project = OpenProject(NodejsProfileTest);
-            using (var app = new NodejsVisualStudioApp(VsIdeTestHostContext.Dte)) {
-                app.Dte.ExecuteCommand("Debug.StartNode.jsPerformanceAnalysis");
-                while (profiling.GetSession(1) == null) {
-                    System.Threading.Thread.Sleep(100);
-                }
-                var session = profiling.GetSession(1);
-                try {
-                    while (profiling.IsProfiling) {
-                        System.Threading.Thread.Sleep(500);
+                var project = OpenProject(NodejsProfileTest);
+                using (var app = new NodejsVisualStudioApp(VsIdeTestHostContext.Dte)) {
+                    app.Dte.ExecuteCommand("Debug.StartNode.jsPerformanceAnalysis");
+                    while (profiling.GetSession(1) == null) {
+                        System.Threading.Thread.Sleep(100);
                     }
+                    var session = profiling.GetSession(1);
+                    try {
+                        while (profiling.IsProfiling) {
+                            System.Threading.Thread.Sleep(500);
+                        }
 
-                    var report = session.GetReport(1);
-                    var filename = report.Filename;
-                    Assert.IsTrue(filename.Contains("NodejsProfileTest"));
+                        var report = session.GetReport(1);
+                        var filename = report.Filename;
+                        Assert.IsTrue(filename.Contains("NodejsProfileTest"));
 
-                    Assert.AreEqual(session.GetReport(2), null);
+                        Assert.AreEqual(session.GetReport(2), null);
 
-                    Assert.AreNotEqual(session.GetReport(report.Filename), null);
+                        Assert.AreNotEqual(session.GetReport(report.Filename), null);
 
-                    VerifyReport(report, "program.f");
-                } finally {
-                    profiling.RemoveSession(session, true);
+                        VerifyReport(report, "program.f");
+                    } finally {
+                        profiling.RemoveSession(session, true);
+                    }
                 }
             }
         }
@@ -221,14 +228,16 @@ namespace ProfilingUITests {
         [TestMethod, Priority(0), TestCategory("Core")]
         [HostType("TC Dynamic"), DynamicHostType(typeof(VsIdeHostAdapter))]
         public void TestStartAnalysisDebugMenuNoProject() {
-            using (var app = new NodejsVisualStudioApp(VsIdeTestHostContext.Dte)) {
-                bool ok = true;
-                try {
-                    app.Dte.ExecuteCommand("Debug.StartNode.jsPerformanceAnalysis");
-                    ok = false;
-                } catch {
+            using (new JustMyCodeSetting(false)) {
+                using (var app = new NodejsVisualStudioApp(VsIdeTestHostContext.Dte)) {
+                    bool ok = true;
+                    try {
+                        app.Dte.ExecuteCommand("Debug.StartNode.jsPerformanceAnalysis");
+                        ok = false;
+                    } catch {
+                    }
+                    Assert.IsTrue(ok, "Could start perf analysis w/o a project open");
                 }
-                Assert.IsTrue(ok, "Could start perf analysis w/o a project open");
             }
         }
 
@@ -238,68 +247,70 @@ namespace ProfilingUITests {
         [TestMethod, Priority(0), TestCategory("Core")]
         [HostType("TC Dynamic"), DynamicHostType(typeof(VsIdeHostAdapter))]
         public void LaunchNewProfilingSession() {
-            VsIdeTestHostContext.Dte.Solution.Close(false);
+            using (new JustMyCodeSetting(false)) {
+                VsIdeTestHostContext.Dte.Solution.Close(false);
 
-            using (var app = new NodejsVisualStudioApp(VsIdeTestHostContext.Dte)) {
+                using (var app = new NodejsVisualStudioApp(VsIdeTestHostContext.Dte)) {
 
-                app.OpenNodejsPerformance();
-                app.NodejsPerformanceExplorerToolBar.NewPerfSession();
+                    app.OpenNodejsPerformance();
+                    app.NodejsPerformanceExplorerToolBar.NewPerfSession();
 
-                var profiling = (INodeProfiling)VsIdeTestHostContext.Dte.GetObject("NodejsProfiling");
+                    var profiling = (INodeProfiling)VsIdeTestHostContext.Dte.GetObject("NodejsProfiling");
 
-                var perf = app.NodejsPerformanceExplorerTreeView.WaitForItem("Performance *");
-                Debug.Assert(perf != null);
-                var session = profiling.GetSession(1);
-                Assert.AreNotEqual(session, null);
+                    var perf = app.NodejsPerformanceExplorerTreeView.WaitForItem("Performance *");
+                    Debug.Assert(perf != null);
+                    var session = profiling.GetSession(1);
+                    Assert.AreNotEqual(session, null);
 
-                NodejsPerfTarget perfTarget = null;
-                string savedFile = null;
-                try {
-                    Mouse.MoveTo(perf.GetClickablePoint());
-                    Mouse.DoubleClick(System.Windows.Input.MouseButton.Left);
-
-                    // wait for the dialog, set some settings, save them.
-                    perfTarget = new NodejsPerfTarget(app.WaitForDialog());
-
-                    perfTarget.SelectProfileScript();
-                    perfTarget.InterpreterPath = NodeExePath;
-                    perfTarget.ScriptName = TestData.GetPath(@"TestData\NodejsProfileTest\program.js");
-
+                    NodejsPerfTarget perfTarget = null;
+                    string savedFile = null;
                     try {
-                        perfTarget.Ok();
-                        perfTarget = null;
-                    } catch (ElementNotEnabledException) {
-                        Assert.Fail("Settings were invalid:\n  ScriptName = {0}\n",
-                            perfTarget.ScriptName);
-                    }
-                    app.WaitForDialogDismissed();
+                        Mouse.MoveTo(perf.GetClickablePoint());
+                        Mouse.DoubleClick(System.Windows.Input.MouseButton.Left);
 
-                    perf = app.NodejsPerformanceExplorerTreeView.WaitForItem("Performance *");
-                    Mouse.MoveTo(perf.GetClickablePoint());
-                    Mouse.Click(System.Windows.Input.MouseButton.Right);
-                    Keyboard.Type("S");
-                    savedFile = SavePerfFile(TestData.GetPath(@"TestData\NodejsProfileTest"), app.WaitForDialog());
+                        // wait for the dialog, set some settings, save them.
+                        perfTarget = new NodejsPerfTarget(app.WaitForDialog());
 
-                    var item = app.NodejsPerformanceExplorerTreeView.WaitForItem("Performance *", "Reports");
-                    AutomationElement child = null;
-                    for (int i = 0; i < 20; i++) {
-                        child = item.FindFirst(System.Windows.Automation.TreeScope.Descendants, Condition.TrueCondition);
-                        if (child != null) {
-                            break;
+                        perfTarget.SelectProfileScript();
+                        perfTarget.InterpreterPath = NodeExePath;
+                        perfTarget.ScriptName = TestData.GetPath(@"TestData\NodejsProfileTest\program.js");
+
+                        try {
+                            perfTarget.Ok();
+                            perfTarget = null;
+                        } catch (ElementNotEnabledException) {
+                            Assert.Fail("Settings were invalid:\n  ScriptName = {0}\n",
+                                perfTarget.ScriptName);
                         }
-                        System.Threading.Thread.Sleep(100);
-                    }
-                    Assert.IsNotNull(child, "node not added");
-                    System.Threading.Thread.Sleep(7500);    // give time for report to open
-                } finally {
-                    if (perfTarget != null) {
-                        perfTarget.Cancel();
                         app.WaitForDialogDismissed();
+
+                        perf = app.NodejsPerformanceExplorerTreeView.WaitForItem("Performance *");
+                        Mouse.MoveTo(perf.GetClickablePoint());
+                        Mouse.Click(System.Windows.Input.MouseButton.Right);
+                        Keyboard.Type("S");
+                        savedFile = SavePerfFile(TestData.GetPath(@"TestData\NodejsProfileTest"), app.WaitForDialog());
+
+                        var item = app.NodejsPerformanceExplorerTreeView.WaitForItem("Performance *", "Reports");
+                        AutomationElement child = null;
+                        for (int i = 0; i < 20; i++) {
+                            child = item.FindFirst(System.Windows.Automation.TreeScope.Descendants, Condition.TrueCondition);
+                            if (child != null) {
+                                break;
+                            }
+                            System.Threading.Thread.Sleep(100);
+                        }
+                        Assert.IsNotNull(child, "node not added");
+                        System.Threading.Thread.Sleep(7500);    // give time for report to open
+                    } finally {
+                        if (perfTarget != null) {
+                            perfTarget.Cancel();
+                            app.WaitForDialogDismissed();
+                        }
+                        if (!String.IsNullOrEmpty(savedFile)) {
+                            File.Delete(savedFile);
+                        }
+                        profiling.RemoveSession(session, true);
                     }
-                    if (!String.IsNullOrEmpty(savedFile)) {
-                        File.Delete(savedFile);
-                    }
-                    profiling.RemoveSession(session, true);
                 }
             }
         }
@@ -310,69 +321,71 @@ namespace ProfilingUITests {
         [TestMethod, Priority(0), TestCategory("Core")]
         [HostType("TC Dynamic"), DynamicHostType(typeof(VsIdeHostAdapter))]
         public void TestMultipleSessions() {
-            VsIdeTestHostContext.Dte.Solution.Close(false);
+            using (new JustMyCodeSetting(false)) {
+                VsIdeTestHostContext.Dte.Solution.Close(false);
 
-            using (var app = new NodejsVisualStudioApp(VsIdeTestHostContext.Dte)) {
+                using (var app = new NodejsVisualStudioApp(VsIdeTestHostContext.Dte)) {
 
-                app.OpenNodejsPerformance();
-                app.NodejsPerformanceExplorerToolBar.NewPerfSession();
+                    app.OpenNodejsPerformance();
+                    app.NodejsPerformanceExplorerToolBar.NewPerfSession();
 
-                var profiling = (INodeProfiling)VsIdeTestHostContext.Dte.GetObject("NodejsProfiling");
+                    var profiling = (INodeProfiling)VsIdeTestHostContext.Dte.GetObject("NodejsProfiling");
 
-                var perf = app.NodejsPerformanceExplorerTreeView.WaitForItem("Performance *");
-                Debug.Assert(perf != null);
+                    var perf = app.NodejsPerformanceExplorerTreeView.WaitForItem("Performance *");
+                    Debug.Assert(perf != null);
 
-                app.NodejsPerformanceExplorerToolBar.NewPerfSession();
-                perf = app.NodejsPerformanceExplorerTreeView.WaitForItem("Performance1 *");
-                Debug.Assert(perf != null);
-                var session = profiling.GetSession(1);
-                Assert.AreNotEqual(session, null);
-
-                NodejsPerfTarget perfTarget = null;
-                try {
-                    Mouse.MoveTo(perf.GetClickablePoint());
-                    Mouse.DoubleClick(System.Windows.Input.MouseButton.Left);
-
-                    // wait for the dialog, set some settings, save them.
-                    perfTarget = new NodejsPerfTarget(app.WaitForDialog());
-
-                    perfTarget.SelectProfileScript();
-                    perfTarget.InterpreterPath = NodeExePath;
-                    perfTarget.ScriptName = TestData.GetPath(@"TestData\NodejsProfileTest\program.js");
-
-                    try {
-                        perfTarget.Ok();
-                        perfTarget = null;
-                    } catch (ElementNotEnabledException) {
-                        Assert.Fail("Settings were invalid:\n  ScriptName = {0}\n",
-                            perfTarget.ScriptName);
-                    }
-                    app.WaitForDialogDismissed();
-                    
+                    app.NodejsPerformanceExplorerToolBar.NewPerfSession();
                     perf = app.NodejsPerformanceExplorerTreeView.WaitForItem("Performance1 *");
-                    Mouse.MoveTo(perf.GetClickablePoint());
-                    Mouse.Click(System.Windows.Input.MouseButton.Right);
-                    Keyboard.Type("S");
-                    SavePerfFile(TestData.GetPath(@"TestData\NodejsProfileTest"), app.WaitForDialog());
-                    SavePerfFile(TestData.GetPath(@"TestData\NodejsProfileTest"), app.WaitForDialog());
+                    Debug.Assert(perf != null);
+                    var session = profiling.GetSession(1);
+                    Assert.AreNotEqual(session, null);
 
-                    var item = app.NodejsPerformanceExplorerTreeView.WaitForItem("Performance1 *", "Reports");
-                    AutomationElement child = null;
-                    for (int i = 0; i < 20; i++) {
-                        child = item.FindFirst(System.Windows.Automation.TreeScope.Descendants, Condition.TrueCondition);
-                        if (child != null) {
-                            break;
+                    NodejsPerfTarget perfTarget = null;
+                    try {
+                        Mouse.MoveTo(perf.GetClickablePoint());
+                        Mouse.DoubleClick(System.Windows.Input.MouseButton.Left);
+
+                        // wait for the dialog, set some settings, save them.
+                        perfTarget = new NodejsPerfTarget(app.WaitForDialog());
+
+                        perfTarget.SelectProfileScript();
+                        perfTarget.InterpreterPath = NodeExePath;
+                        perfTarget.ScriptName = TestData.GetPath(@"TestData\NodejsProfileTest\program.js");
+
+                        try {
+                            perfTarget.Ok();
+                            perfTarget = null;
+                        } catch (ElementNotEnabledException) {
+                            Assert.Fail("Settings were invalid:\n  ScriptName = {0}\n",
+                                perfTarget.ScriptName);
                         }
-                        System.Threading.Thread.Sleep(100);
-                    }
-                    Assert.IsNotNull(child, "node not added");
-                } finally {
-                    if (perfTarget != null) {
-                        perfTarget.Cancel();
                         app.WaitForDialogDismissed();
+
+                        perf = app.NodejsPerformanceExplorerTreeView.WaitForItem("Performance1 *");
+                        Mouse.MoveTo(perf.GetClickablePoint());
+                        Mouse.Click(System.Windows.Input.MouseButton.Right);
+                        Keyboard.Type("S");
+                        SavePerfFile(TestData.GetPath(@"TestData\NodejsProfileTest"), app.WaitForDialog());
+                        SavePerfFile(TestData.GetPath(@"TestData\NodejsProfileTest"), app.WaitForDialog());
+
+                        var item = app.NodejsPerformanceExplorerTreeView.WaitForItem("Performance1 *", "Reports");
+                        AutomationElement child = null;
+                        for (int i = 0; i < 20; i++) {
+                            child = item.FindFirst(System.Windows.Automation.TreeScope.Descendants, Condition.TrueCondition);
+                            if (child != null) {
+                                break;
+                            }
+                            System.Threading.Thread.Sleep(100);
+                        }
+                        Assert.IsNotNull(child, "node not added");
+                    } finally {
+                        if (perfTarget != null) {
+                            perfTarget.Cancel();
+                            app.WaitForDialogDismissed();
+                        }
+                        profiling.RemoveSession(session, true);
+                        profiling.RemoveSession(profiling.GetSession(1), true);
                     }
-                    profiling.RemoveSession(session, true);
-                    profiling.RemoveSession(profiling.GetSession(1), true);
                 }
             }
         }
@@ -385,69 +398,71 @@ namespace ProfilingUITests {
         [TestMethod, Priority(0), TestCategory("Core")]
         [HostType("TC Dynamic"), DynamicHostType(typeof(VsIdeHostAdapter))]
         public void TestMultipleSessions2() {
-            VsIdeTestHostContext.Dte.Solution.Close(false);
+            using (new JustMyCodeSetting(false)) {
+                VsIdeTestHostContext.Dte.Solution.Close(false);
 
-            using (var app = new NodejsVisualStudioApp(VsIdeTestHostContext.Dte)) {
+                using (var app = new NodejsVisualStudioApp(VsIdeTestHostContext.Dte)) {
 
-                app.OpenNodejsPerformance();
-                app.NodejsPerformanceExplorerToolBar.NewPerfSession();
+                    app.OpenNodejsPerformance();
+                    app.NodejsPerformanceExplorerToolBar.NewPerfSession();
 
-                var profiling = (INodeProfiling)VsIdeTestHostContext.Dte.GetObject("NodejsProfiling");
+                    var profiling = (INodeProfiling)VsIdeTestHostContext.Dte.GetObject("NodejsProfiling");
 
-                var perf = app.NodejsPerformanceExplorerTreeView.WaitForItem("Performance *");
-                Debug.Assert(perf != null);
+                    var perf = app.NodejsPerformanceExplorerTreeView.WaitForItem("Performance *");
+                    Debug.Assert(perf != null);
 
-                app.NodejsPerformanceExplorerToolBar.NewPerfSession();
-                perf = app.NodejsPerformanceExplorerTreeView.WaitForItem("Performance *");
-                Debug.Assert(perf != null);
-                var session = profiling.GetSession(1);
-                Assert.AreNotEqual(session, null);
-
-                NodejsPerfTarget perfTarget = null;
-                try {
-                    Mouse.MoveTo(perf.GetClickablePoint());
-                    Mouse.DoubleClick(System.Windows.Input.MouseButton.Left);
-
-                    // wait for the dialog, set some settings, save them.
-                    perfTarget = new NodejsPerfTarget(app.WaitForDialog());
-
-                    perfTarget.SelectProfileScript();
-                    perfTarget.InterpreterPath = NodeExePath;
-                    perfTarget.ScriptName = TestData.GetPath(@"TestData\NodejsProfileTest\program.js");
-
-                    try {
-                        perfTarget.Ok();
-                        perfTarget = null;
-                    } catch (ElementNotEnabledException) {
-                        Assert.Fail("Settings were invalid:\n  ScriptName = {0}\n",
-                            perfTarget.ScriptName);
-                    }
-                    app.WaitForDialogDismissed();
-
+                    app.NodejsPerformanceExplorerToolBar.NewPerfSession();
                     perf = app.NodejsPerformanceExplorerTreeView.WaitForItem("Performance *");
-                    Mouse.MoveTo(perf.GetClickablePoint());
-                    Mouse.Click(System.Windows.Input.MouseButton.Right);
-                    Keyboard.Type("S");
-                    SavePerfFile(TestData.GetPath(@"TestData\NodejsProfileTest"), app.WaitForDialog());
-                    SavePerfFile(TestData.GetPath(@"TestData\NodejsProfileTest"), app.WaitForDialog());
+                    Debug.Assert(perf != null);
+                    var session = profiling.GetSession(1);
+                    Assert.AreNotEqual(session, null);
 
-                    var item = app.NodejsPerformanceExplorerTreeView.WaitForItem("Performance *", "Reports");
-                    AutomationElement child = null;
-                    for (int i = 0; i < 20; i++) {
-                        child = item.FindFirst(System.Windows.Automation.TreeScope.Descendants, Condition.TrueCondition);
-                        if (child != null) {
-                            break;
+                    NodejsPerfTarget perfTarget = null;
+                    try {
+                        Mouse.MoveTo(perf.GetClickablePoint());
+                        Mouse.DoubleClick(System.Windows.Input.MouseButton.Left);
+
+                        // wait for the dialog, set some settings, save them.
+                        perfTarget = new NodejsPerfTarget(app.WaitForDialog());
+
+                        perfTarget.SelectProfileScript();
+                        perfTarget.InterpreterPath = NodeExePath;
+                        perfTarget.ScriptName = TestData.GetPath(@"TestData\NodejsProfileTest\program.js");
+
+                        try {
+                            perfTarget.Ok();
+                            perfTarget = null;
+                        } catch (ElementNotEnabledException) {
+                            Assert.Fail("Settings were invalid:\n  ScriptName = {0}\n",
+                                perfTarget.ScriptName);
                         }
-                        System.Threading.Thread.Sleep(100);
-                    }
-                    Assert.IsNotNull(child, "node not added");
-                } finally {
-                    if (perfTarget != null) {
-                        perfTarget.Cancel();
                         app.WaitForDialogDismissed();
+
+                        perf = app.NodejsPerformanceExplorerTreeView.WaitForItem("Performance *");
+                        Mouse.MoveTo(perf.GetClickablePoint());
+                        Mouse.Click(System.Windows.Input.MouseButton.Right);
+                        Keyboard.Type("S");
+                        SavePerfFile(TestData.GetPath(@"TestData\NodejsProfileTest"), app.WaitForDialog());
+                        SavePerfFile(TestData.GetPath(@"TestData\NodejsProfileTest"), app.WaitForDialog());
+
+                        var item = app.NodejsPerformanceExplorerTreeView.WaitForItem("Performance *", "Reports");
+                        AutomationElement child = null;
+                        for (int i = 0; i < 20; i++) {
+                            child = item.FindFirst(System.Windows.Automation.TreeScope.Descendants, Condition.TrueCondition);
+                            if (child != null) {
+                                break;
+                            }
+                            System.Threading.Thread.Sleep(100);
+                        }
+                        Assert.IsNotNull(child, "node not added");
+                    } finally {
+                        if (perfTarget != null) {
+                            perfTarget.Cancel();
+                            app.WaitForDialogDismissed();
+                        }
+                        profiling.RemoveSession(session, true);
+                        profiling.RemoveSession(profiling.GetSession(1), true);
                     }
-                    profiling.RemoveSession(session, true);
-                    profiling.RemoveSession(profiling.GetSession(1), true);
                 }
             }
         }
@@ -455,65 +470,67 @@ namespace ProfilingUITests {
         [TestMethod, Priority(0), TestCategory("Core")]
         [HostType("TC Dynamic"), DynamicHostType(typeof(VsIdeHostAdapter))]
         public void NewProfilingSessionOpenSolution() {
-            VsIdeTestHostContext.Dte.Solution.Close(false);
-            using (var app = new NodejsVisualStudioApp(VsIdeTestHostContext.Dte)) {
+            using (new JustMyCodeSetting(false)) {
+                VsIdeTestHostContext.Dte.Solution.Close(false);
+                using (var app = new NodejsVisualStudioApp(VsIdeTestHostContext.Dte)) {
 
-                var profiling = (INodeProfiling)VsIdeTestHostContext.Dte.GetObject("NodejsProfiling");
+                    var profiling = (INodeProfiling)VsIdeTestHostContext.Dte.GetObject("NodejsProfiling");
 
-                // no sessions yet
-                Assert.AreEqual(profiling.GetSession(1), null);
+                    // no sessions yet
+                    Assert.AreEqual(profiling.GetSession(1), null);
 
-                var project = OpenProject(NodejsProfileTest);
+                    var project = OpenProject(NodejsProfileTest);
 
-                app.OpenNodejsPerformance();
-                app.NodejsPerformanceExplorerToolBar.NewPerfSession();
+                    app.OpenNodejsPerformance();
+                    app.NodejsPerformanceExplorerToolBar.NewPerfSession();
 
-                var perf = app.NodejsPerformanceExplorerTreeView.WaitForItem("Performance");
-                if (perf == null) {
-                    var tmpSession = profiling.GetSession(1);
-                    if (tmpSession != null) {
-                        profiling.RemoveSession(tmpSession, true);
+                    var perf = app.NodejsPerformanceExplorerTreeView.WaitForItem("Performance");
+                    if (perf == null) {
+                        var tmpSession = profiling.GetSession(1);
+                        if (tmpSession != null) {
+                            profiling.RemoveSession(tmpSession, true);
+                        }
+                        Debug.Fail("failed to find performance session, found " + tmpSession != null ? tmpSession.Name : "<nothing>");
                     }
-                    Debug.Fail("failed to find performance session, found " + tmpSession != null ? tmpSession.Name : "<nothing>");
-                }
 
-                var session = profiling.GetSession(1);
-                Assert.AreNotEqual(session, null);
+                    var session = profiling.GetSession(1);
+                    Assert.AreNotEqual(session, null);
 
-                NodejsPerfTarget perfTarget = null;
-                try {
-                    Mouse.MoveTo(perf.GetClickablePoint());
-                    Mouse.DoubleClick(System.Windows.Input.MouseButton.Left);
-
-                    // wait for the dialog, set some settings, save them.
-                    perfTarget = new NodejsPerfTarget(app.WaitForDialog());
-
-                    perfTarget.SelectProfileProject();
-
-                    perfTarget.SelectedProjectComboBox.SelectItem("NodejsProfileTest");
-
+                    NodejsPerfTarget perfTarget = null;
                     try {
-                        perfTarget.Ok();
-                        perfTarget = null;
-                    } catch (ElementNotEnabledException) {                        
-                        Assert.Fail("Settings were invalid:\n  SelectedProject = {0}",
-                            perfTarget.SelectedProjectComboBox.GetSelectedItemName());
-                    }
-                    app.WaitForDialogDismissed();
+                        Mouse.MoveTo(perf.GetClickablePoint());
+                        Mouse.DoubleClick(System.Windows.Input.MouseButton.Left);
 
-                    Mouse.MoveTo(perf.GetClickablePoint());
-                    Mouse.DoubleClick(System.Windows.Input.MouseButton.Left);
-                    
-                    // re-open the dialog, verify the settings
-                    perfTarget = new NodejsPerfTarget(app.WaitForDialog());
+                        // wait for the dialog, set some settings, save them.
+                        perfTarget = new NodejsPerfTarget(app.WaitForDialog());
 
-                    Assert.AreEqual("NodejsProfileTest", perfTarget.SelectedProject);
-                } finally {
-                    if (perfTarget != null) {
-                        perfTarget.Cancel();
+                        perfTarget.SelectProfileProject();
+
+                        perfTarget.SelectedProjectComboBox.SelectItem("NodejsProfileTest");
+
+                        try {
+                            perfTarget.Ok();
+                            perfTarget = null;
+                        } catch (ElementNotEnabledException) {
+                            Assert.Fail("Settings were invalid:\n  SelectedProject = {0}",
+                                perfTarget.SelectedProjectComboBox.GetSelectedItemName());
+                        }
                         app.WaitForDialogDismissed();
+
+                        Mouse.MoveTo(perf.GetClickablePoint());
+                        Mouse.DoubleClick(System.Windows.Input.MouseButton.Left);
+
+                        // re-open the dialog, verify the settings
+                        perfTarget = new NodejsPerfTarget(app.WaitForDialog());
+
+                        Assert.AreEqual("NodejsProfileTest", perfTarget.SelectedProject);
+                    } finally {
+                        if (perfTarget != null) {
+                            perfTarget.Cancel();
+                            app.WaitForDialogDismissed();
+                        }
+                        profiling.RemoveSession(session, true);
                     }
-                    profiling.RemoveSession(session, true);
                 }
             }
         }
@@ -521,46 +538,48 @@ namespace ProfilingUITests {
         [TestMethod, Priority(0), TestCategory("Core")]
         [HostType("TC Dynamic"), DynamicHostType(typeof(VsIdeHostAdapter))]
         public void LaunchNodejsProfilingWizard() {
-            using (var app = new NodejsVisualStudioApp(VsIdeTestHostContext.Dte)) {
-                var project = OpenProject(NodejsProfileTest);
+            using (new JustMyCodeSetting(false)) {
+                using (var app = new NodejsVisualStudioApp(VsIdeTestHostContext.Dte)) {
+                    var project = OpenProject(NodejsProfileTest);
 
-                app.LaunchNodejsProfiling();
+                    app.LaunchNodejsProfiling();
 
-                // wait for the dialog, set some settings, save them.
-                var perfTarget = new NodejsPerfTarget(app.WaitForDialog());
-                try {
-                    perfTarget.SelectProfileProject();
+                    // wait for the dialog, set some settings, save them.
+                    var perfTarget = new NodejsPerfTarget(app.WaitForDialog());
+                    try {
+                        perfTarget.SelectProfileProject();
 
-                    perfTarget.SelectedProjectComboBox.SelectItem("NodejsProfileTest");
+                        perfTarget.SelectedProjectComboBox.SelectItem("NodejsProfileTest");
+
+                        try {
+                            perfTarget.Ok();
+                            perfTarget = null;
+                        } catch (ElementNotEnabledException) {
+                            Assert.Fail("Settings were invalid:\n  SelectedProject = {0}",
+                                perfTarget.SelectedProjectComboBox.GetSelectedItemName());
+                        }
+                    } finally {
+                        if (perfTarget != null) {
+                            perfTarget.Cancel();
+                            app.WaitForDialogDismissed();
+                            perfTarget = null;
+                        }
+                    }
+                    app.WaitForDialogDismissed();
+
+                    var profiling = (INodeProfiling)VsIdeTestHostContext.Dte.GetObject("NodejsProfiling");
+                    var session = profiling.GetSession(1);
 
                     try {
-                        perfTarget.Ok();
-                        perfTarget = null;
-                    } catch (ElementNotEnabledException) {
-                        Assert.Fail("Settings were invalid:\n  SelectedProject = {0}",
-                            perfTarget.SelectedProjectComboBox.GetSelectedItemName());
-                    }
-                } finally {
-                    if (perfTarget != null) {
-                        perfTarget.Cancel();
-                        app.WaitForDialogDismissed();
-                        perfTarget = null;
-                    }
-                }
-                app.WaitForDialogDismissed();
+                        Assert.AreNotEqual(null, app.NodejsPerformanceExplorerTreeView.WaitForItem("NodejsProfileTest *"));
 
-                var profiling = (INodeProfiling)VsIdeTestHostContext.Dte.GetObject("NodejsProfiling");
-                var session = profiling.GetSession(1);
-
-                try {
-                    Assert.AreNotEqual(null, app.NodejsPerformanceExplorerTreeView.WaitForItem("NodejsProfileTest *"));
-
-                    while (profiling.IsProfiling) {
-                        // wait for profiling to finish...
-                        System.Threading.Thread.Sleep(500);
+                        while (profiling.IsProfiling) {
+                            // wait for profiling to finish...
+                            System.Threading.Thread.Sleep(500);
+                        }
+                    } finally {
+                        profiling.RemoveSession(session, true);
                     }
-                } finally {
-                    profiling.RemoveSession(session, true);
                 }
             }
         }
@@ -568,31 +587,33 @@ namespace ProfilingUITests {
         [TestMethod, Priority(0), TestCategory("Core")]
         [HostType("TC Dynamic"), DynamicHostType(typeof(VsIdeHostAdapter))]
         public void LaunchProject() {
-            var profiling = (INodeProfiling)VsIdeTestHostContext.Dte.GetObject("NodejsProfiling");
+            using (new JustMyCodeSetting(false)) {
+                var profiling = (INodeProfiling)VsIdeTestHostContext.Dte.GetObject("NodejsProfiling");
 
-            // no sessions yet
-            Assert.AreEqual(profiling.GetSession(1), null);
+                // no sessions yet
+                Assert.AreEqual(profiling.GetSession(1), null);
 
-            var project = OpenProject(NodejsProfileTest);
+                var project = OpenProject(NodejsProfileTest);
 
-            using (var app = new VisualStudioApp(VsIdeTestHostContext.Dte)) {
-                var session = LaunchProject(app, profiling, project, TestData.GetPath("TestData\\NodejsProfileTest"), false);
-                try {
-                    while (profiling.IsProfiling) {
-                        System.Threading.Thread.Sleep(500);
+                using (var app = new VisualStudioApp(VsIdeTestHostContext.Dte)) {
+                    var session = LaunchProject(app, profiling, project, TestData.GetPath("TestData\\NodejsProfileTest"), false);
+                    try {
+                        while (profiling.IsProfiling) {
+                            System.Threading.Thread.Sleep(500);
+                        }
+
+                        var report = session.GetReport(1);
+                        var filename = report.Filename;
+                        Assert.IsTrue(filename.Contains("NodejsProfileTest"));
+
+                        Assert.AreEqual(session.GetReport(2), null);
+
+                        Assert.AreNotEqual(session.GetReport(report.Filename), null);
+
+                        VerifyReport(report, "program.f");
+                    } finally {
+                        profiling.RemoveSession(session, true);
                     }
-
-                    var report = session.GetReport(1);
-                    var filename = report.Filename;
-                    Assert.IsTrue(filename.Contains("NodejsProfileTest"));
-
-                    Assert.AreEqual(session.GetReport(2), null);
-
-                    Assert.AreNotEqual(session.GetReport(report.Filename), null);
-
-                    VerifyReport(report, "program.f");
-                } finally {
-                    profiling.RemoveSession(session, true);
                 }
             }
         }
@@ -600,31 +621,33 @@ namespace ProfilingUITests {
         [TestMethod, Priority(0), TestCategory("Core")]
         [HostType("TC Dynamic"), DynamicHostType(typeof(VsIdeHostAdapter))]
         public void LaunchMappedProject() {
-            var profiling = (INodeProfiling)VsIdeTestHostContext.Dte.GetObject("NodejsProfiling");
+            using (new JustMyCodeSetting(false)) {
+                var profiling = (INodeProfiling)VsIdeTestHostContext.Dte.GetObject("NodejsProfiling");
 
-            // no sessions yet
-            Assert.AreEqual(profiling.GetSession(1), null);
+                // no sessions yet
+                Assert.AreEqual(profiling.GetSession(1), null);
 
-            var project = OpenProject(NodejsTypeScriptProfileTest);
+                var project = OpenProject(NodejsTypeScriptProfileTest);
 
-            using (var app = new VisualStudioApp(VsIdeTestHostContext.Dte)) {
-                var session = LaunchProject(app, profiling, project, TestData.GetPath("TestData\\NodejsTypeScriptProfileTest"), false);
-                try {
-                    while (profiling.IsProfiling) {
-                        System.Threading.Thread.Sleep(500);
+                using (var app = new VisualStudioApp(VsIdeTestHostContext.Dte)) {
+                    var session = LaunchProject(app, profiling, project, TestData.GetPath("TestData\\NodejsTypeScriptProfileTest"), false);
+                    try {
+                        while (profiling.IsProfiling) {
+                            System.Threading.Thread.Sleep(500);
+                        }
+
+                        var report = session.GetReport(1);
+                        var filename = report.Filename;
+                        Assert.IsTrue(filename.Contains("NodejsProfileTest"));
+
+                        Assert.AreEqual(session.GetReport(2), null);
+
+                        Assert.AreNotEqual(session.GetReport(report.Filename), null);
+
+                        VerifyReport(report, "program.Greeter.f");
+                    } finally {
+                        profiling.RemoveSession(session, true);
                     }
-
-                    var report = session.GetReport(1);
-                    var filename = report.Filename;
-                    Assert.IsTrue(filename.Contains("NodejsProfileTest"));
-
-                    Assert.AreEqual(session.GetReport(2), null);
-
-                    Assert.AreNotEqual(session.GetReport(report.Filename), null);
-
-                    VerifyReport(report, "program.Greeter.f");
-                } finally {
-                    profiling.RemoveSession(session, true);
                 }
             }
         }
@@ -633,43 +656,45 @@ namespace ProfilingUITests {
         [TestMethod, Priority(0), TestCategory("Core")]
         [HostType("TC Dynamic"), DynamicHostType(typeof(VsIdeHostAdapter))]
         public void TestSaveDirtySession() {
-            var profiling = (INodeProfiling)VsIdeTestHostContext.Dte.GetObject("NodejsProfiling");
+            using (new JustMyCodeSetting(false)) {
+                var profiling = (INodeProfiling)VsIdeTestHostContext.Dte.GetObject("NodejsProfiling");
 
-            // no sessions yet
-            Assert.AreEqual(profiling.GetSession(1), null);
+                // no sessions yet
+                Assert.AreEqual(profiling.GetSession(1), null);
 
-            var project = OpenProject(NodejsProfileTest);
+                var project = OpenProject(NodejsProfileTest);
 
-            using (var app = new NodejsVisualStudioApp(VsIdeTestHostContext.Dte)) {
-                var session = LaunchProject(app, profiling, project, TestData.GetPath("TestData\\NodejsProfileTest"), false);
-                try {
-                    while (profiling.IsProfiling) {
-                        System.Threading.Thread.Sleep(500);
+                using (var app = new NodejsVisualStudioApp(VsIdeTestHostContext.Dte)) {
+                    var session = LaunchProject(app, profiling, project, TestData.GetPath("TestData\\NodejsProfileTest"), false);
+                    try {
+                        while (profiling.IsProfiling) {
+                            System.Threading.Thread.Sleep(500);
+                        }
+
+                        var report = session.GetReport(1);
+                        var filename = report.Filename;
+                        Assert.IsTrue(filename.Contains("NodejsProfileTest"));
+
+                        app.OpenNodejsPerformance();
+                        var pyPerf = app.NodejsPerformanceExplorerTreeView;
+                        Assert.AreNotEqual(null, pyPerf);
+
+                        var item = pyPerf.FindItem("NodejsProfileTest *", "Reports");
+                        var child = item.FindFirst(System.Windows.Automation.TreeScope.Descendants, Condition.TrueCondition);
+                        var childName = child.GetCurrentPropertyValue(AutomationElement.NameProperty) as string;
+
+                        Assert.IsTrue(childName.StartsWith("NodejsProfileTest"));
+
+                        // select the dirty session node and save it
+                        var perfSessionItem = pyPerf.FindItem("NodejsProfileTest *");
+                        perfSessionItem.SetFocus();
+                        app.SaveSelection();
+
+                        // now it should no longer be dirty
+                        perfSessionItem = pyPerf.WaitForItem("NodejsProfileTest");
+                    } finally {
+                        profiling.RemoveSession(session, true);
                     }
-
-                    var report = session.GetReport(1);
-                    var filename = report.Filename;
-                    Assert.IsTrue(filename.Contains("NodejsProfileTest"));
-
-                    app.OpenNodejsPerformance();
-                    var pyPerf = app.NodejsPerformanceExplorerTreeView;
-                    Assert.AreNotEqual(null, pyPerf);
-
-                    var item = pyPerf.FindItem("NodejsProfileTest *", "Reports");
-                    var child = item.FindFirst(System.Windows.Automation.TreeScope.Descendants, Condition.TrueCondition);
-                    var childName = child.GetCurrentPropertyValue(AutomationElement.NameProperty) as string;
-
-                    Assert.IsTrue(childName.StartsWith("NodejsProfileTest"));
-
-                    // select the dirty session node and save it
-                    var perfSessionItem = pyPerf.FindItem("NodejsProfileTest *");
-                    perfSessionItem.SetFocus();
-                    app.SaveSelection();
-
-                    // now it should no longer be dirty
-                    perfSessionItem = pyPerf.WaitForItem("NodejsProfileTest");
-                } finally {
-                    profiling.RemoveSession(session, true);
                 }
             }
         }
@@ -677,26 +702,28 @@ namespace ProfilingUITests {
         [TestMethod, Priority(0), TestCategory("Core")]
         [HostType("TC Dynamic"), DynamicHostType(typeof(VsIdeHostAdapter))]
         public void TestDeleteReport() {
-            var profiling = (INodeProfiling)VsIdeTestHostContext.Dte.GetObject("NodejsProfiling");
+            using (new JustMyCodeSetting(false)) {
+                var profiling = (INodeProfiling)VsIdeTestHostContext.Dte.GetObject("NodejsProfiling");
 
-            // no sessions yet
-            Assert.AreEqual(profiling.GetSession(1), null);
+                // no sessions yet
+                Assert.AreEqual(profiling.GetSession(1), null);
 
-            var project = OpenProject(NodejsProfileTest);
+                var project = OpenProject(NodejsProfileTest);
 
-            using (var app = new NodejsVisualStudioApp(VsIdeTestHostContext.Dte)) {
-                var session = LaunchProject(app, profiling, project, TestData.GetPath("TestData\\NodejsProfileTest"), false);
-                try {
-                    string reportFilename;
-                    WaitForReport(profiling, session, app, out reportFilename);
+                using (var app = new NodejsVisualStudioApp(VsIdeTestHostContext.Dte)) {
+                    var session = LaunchProject(app, profiling, project, TestData.GetPath("TestData\\NodejsProfileTest"), false);
+                    try {
+                        string reportFilename;
+                        WaitForReport(profiling, session, app, out reportFilename);
 
-                    new RemoveItemDialog(app.WaitForDialog()).Delete();
+                        new RemoveItemDialog(app.WaitForDialog()).Delete();
 
-                    app.WaitForDialogDismissed();
+                        app.WaitForDialogDismissed();
 
-                    Assert.IsTrue(!File.Exists(reportFilename));
-                } finally {
-                    profiling.RemoveSession(session, true);
+                        Assert.IsTrue(!File.Exists(reportFilename));
+                    } finally {
+                        profiling.RemoveSession(session, true);
+                    }
                 }
             }
         }
@@ -704,75 +731,77 @@ namespace ProfilingUITests {
         [TestMethod, Priority(0), TestCategory("Core")]
         [HostType("TC Dynamic"), DynamicHostType(typeof(VsIdeHostAdapter))]
         public void TestCompareReports() {
-            var profiling = (INodeProfiling)VsIdeTestHostContext.Dte.GetObject("NodejsProfiling");
+            using (new JustMyCodeSetting(false)) {
+                var profiling = (INodeProfiling)VsIdeTestHostContext.Dte.GetObject("NodejsProfiling");
 
-            // no sessions yet
-            Assert.AreEqual(profiling.GetSession(1), null);
+                // no sessions yet
+                Assert.AreEqual(profiling.GetSession(1), null);
 
-            var project = OpenProject(NodejsProfileTest);
+                var project = OpenProject(NodejsProfileTest);
 
-            using (var app = new NodejsVisualStudioApp(VsIdeTestHostContext.Dte)) {
-                var session = LaunchProject(app, profiling, project, TestData.GetPath("TestData\\NodejsProfileTest"), false);
-                try {
-                    for (int i = 0; i < 20 && profiling.IsProfiling; i++) {
-                        System.Threading.Thread.Sleep(500);
-                    }
-
-                    session.Launch(false);
-                    for (int i = 0; i < 20 && profiling.IsProfiling; i++) {
-                        System.Threading.Thread.Sleep(500);
-                    }
-
-                    var pyPerf = app.NodejsPerformanceExplorerTreeView;
-
-                    var child = pyPerf.WaitForItem(
-                        "NodejsProfileTest *", 
-                        "Reports", 
-                        Path.GetFileNameWithoutExtension(profiling.GetSession(1).GetReport(1).Filename)
-                    );
-
-                    child.SetFocus();
-
-                    Keyboard.PressAndRelease(System.Windows.Input.Key.Apps);
-                    Keyboard.PressAndRelease(System.Windows.Input.Key.C);
-
-                    var cmpReports = new ComparePerfReports(app.WaitForDialog());
-                    cmpReports.ComparisonFile = session.GetReport(2).Filename;
+                using (var app = new NodejsVisualStudioApp(VsIdeTestHostContext.Dte)) {
+                    var session = LaunchProject(app, profiling, project, TestData.GetPath("TestData\\NodejsProfileTest"), false);
                     try {
-                        cmpReports.Ok();
-                        cmpReports = null;
-                    } catch (ElementNotEnabledException) {
-                        Assert.Fail("Settings were invalid:\n  BaselineFile = {0}\n  ComparisonFile = {1}",
-                            cmpReports.BaselineFile, cmpReports.ComparisonFile);
-                    } finally {
-                        if (cmpReports != null) {
-                            cmpReports.Cancel();
-                        }
-                    }
-
-                    app.WaitForDialogDismissed();
-
-                    // verify the difference file opens....
-                    bool foundDiff = false;
-                    for (int j = 0; j < 100 && !foundDiff; j++) {
-                        for (int i = 0; i < app.Dte.Documents.Count; i++) {
-                            var doc = app.Dte.Documents.Item(i + 1);
-                            string name = doc.FullName;
-
-                            if (name.StartsWith("vsp://diff/?baseline=")) {
-                                foundDiff = true;
-                                System.Threading.Thread.Sleep(5000);    // let the file get opened and processed
-                                ThreadPool.QueueUserWorkItem(x => doc.Close(EnvDTE.vsSaveChanges.vsSaveChangesNo));
-                                break;
-                            }
-                        }
-                        if (!foundDiff) {
+                        for (int i = 0; i < 20 && profiling.IsProfiling; i++) {
                             System.Threading.Thread.Sleep(500);
                         }
+
+                        session.Launch(false);
+                        for (int i = 0; i < 20 && profiling.IsProfiling; i++) {
+                            System.Threading.Thread.Sleep(500);
+                        }
+
+                        var pyPerf = app.NodejsPerformanceExplorerTreeView;
+
+                        var child = pyPerf.WaitForItem(
+                            "NodejsProfileTest *",
+                            "Reports",
+                            Path.GetFileNameWithoutExtension(profiling.GetSession(1).GetReport(1).Filename)
+                        );
+
+                        child.SetFocus();
+
+                        Keyboard.PressAndRelease(System.Windows.Input.Key.Apps);
+                        Keyboard.PressAndRelease(System.Windows.Input.Key.C);
+
+                        var cmpReports = new ComparePerfReports(app.WaitForDialog());
+                        cmpReports.ComparisonFile = session.GetReport(2).Filename;
+                        try {
+                            cmpReports.Ok();
+                            cmpReports = null;
+                        } catch (ElementNotEnabledException) {
+                            Assert.Fail("Settings were invalid:\n  BaselineFile = {0}\n  ComparisonFile = {1}",
+                                cmpReports.BaselineFile, cmpReports.ComparisonFile);
+                        } finally {
+                            if (cmpReports != null) {
+                                cmpReports.Cancel();
+                            }
+                        }
+
+                        app.WaitForDialogDismissed();
+
+                        // verify the difference file opens....
+                        bool foundDiff = false;
+                        for (int j = 0; j < 100 && !foundDiff; j++) {
+                            for (int i = 0; i < app.Dte.Documents.Count; i++) {
+                                var doc = app.Dte.Documents.Item(i + 1);
+                                string name = doc.FullName;
+
+                                if (name.StartsWith("vsp://diff/?baseline=")) {
+                                    foundDiff = true;
+                                    System.Threading.Thread.Sleep(5000);    // let the file get opened and processed
+                                    ThreadPool.QueueUserWorkItem(x => doc.Close(EnvDTE.vsSaveChanges.vsSaveChangesNo));
+                                    break;
+                                }
+                            }
+                            if (!foundDiff) {
+                                System.Threading.Thread.Sleep(500);
+                            }
+                        }
+                        Assert.IsTrue(foundDiff);
+                    } finally {
+                        profiling.RemoveSession(session, true);
                     }
-                    Assert.IsTrue(foundDiff);
-                } finally {
-                    profiling.RemoveSession(session, true);
                 }
             }
         }
@@ -780,26 +809,28 @@ namespace ProfilingUITests {
         [TestMethod, Priority(0), TestCategory("Core")]
         [HostType("TC Dynamic"), DynamicHostType(typeof(VsIdeHostAdapter))]
         public void TestRemoveReport() {
-            var profiling = (INodeProfiling)VsIdeTestHostContext.Dte.GetObject("NodejsProfiling");
+            using (new JustMyCodeSetting(false)) {
+                var profiling = (INodeProfiling)VsIdeTestHostContext.Dte.GetObject("NodejsProfiling");
 
-            // no sessions yet
-            Assert.AreEqual(profiling.GetSession(1), null);
+                // no sessions yet
+                Assert.AreEqual(profiling.GetSession(1), null);
 
-            var project = OpenProject(NodejsProfileTest);
+                var project = OpenProject(NodejsProfileTest);
 
-            using (var app = new NodejsVisualStudioApp(VsIdeTestHostContext.Dte)) {
-                var session = LaunchProject(app, profiling, project, TestData.GetPath("TestData\\NodejsProfileTest"), false);
-                try {
-                    string reportFilename;
-                    WaitForReport(profiling, session, app, out reportFilename);
+                using (var app = new NodejsVisualStudioApp(VsIdeTestHostContext.Dte)) {
+                    var session = LaunchProject(app, profiling, project, TestData.GetPath("TestData\\NodejsProfileTest"), false);
+                    try {
+                        string reportFilename;
+                        WaitForReport(profiling, session, app, out reportFilename);
 
-                    new RemoveItemDialog(app.WaitForDialog()).Remove();
+                        new RemoveItemDialog(app.WaitForDialog()).Remove();
 
-                    app.WaitForDialogDismissed();
+                        app.WaitForDialogDismissed();
 
-                    Assert.IsTrue(File.Exists(reportFilename));
-                } finally {
-                    profiling.RemoveSession(session, true);
+                        Assert.IsTrue(File.Exists(reportFilename));
+                    } finally {
+                        profiling.RemoveSession(session, true);
+                    }
                 }
             }
         }
@@ -807,29 +838,31 @@ namespace ProfilingUITests {
         [TestMethod, Priority(0), TestCategory("Core")]
         [HostType("TC Dynamic"), DynamicHostType(typeof(VsIdeHostAdapter))]
         public void TestOpenReport() {
-            var profiling = (INodeProfiling)VsIdeTestHostContext.Dte.GetObject("NodejsProfiling");
+            using (new JustMyCodeSetting(false)) {
+                var profiling = (INodeProfiling)VsIdeTestHostContext.Dte.GetObject("NodejsProfiling");
 
-            // no sessions yet
-            Assert.AreEqual(profiling.GetSession(1), null);
+                // no sessions yet
+                Assert.AreEqual(profiling.GetSession(1), null);
 
-            var project = OpenProject(NodejsProfileTest);
+                var project = OpenProject(NodejsProfileTest);
 
-            using (var app = new NodejsVisualStudioApp(VsIdeTestHostContext.Dte)) {
-                var session = LaunchProject(app, profiling, project, TestData.GetPath("TestData\\NodejsProfileTest"), false);
-                try {
-                    INodePerformanceReport report;
-                    AutomationElement child;
-                    WaitForReport(profiling, session, out report, app, out child);
+                using (var app = new NodejsVisualStudioApp(VsIdeTestHostContext.Dte)) {
+                    var session = LaunchProject(app, profiling, project, TestData.GetPath("TestData\\NodejsProfileTest"), false);
+                    try {
+                        INodePerformanceReport report;
+                        AutomationElement child;
+                        WaitForReport(profiling, session, out report, app, out child);
 
-                    var clickPoint = child.GetClickablePoint();
-                    Mouse.MoveTo(clickPoint);
-                    Mouse.DoubleClick(System.Windows.Input.MouseButton.Left);
+                        var clickPoint = child.GetClickablePoint();
+                        Mouse.MoveTo(clickPoint);
+                        Mouse.DoubleClick(System.Windows.Input.MouseButton.Left);
 
-                    Assert.AreNotEqual(null, app.WaitForDocument(report.Filename));
+                        Assert.AreNotEqual(null, app.WaitForDocument(report.Filename));
 
-                    app.Dte.Documents.CloseAll(EnvDTE.vsSaveChanges.vsSaveChangesNo);
-                } finally {
-                    profiling.RemoveSession(session, true);
+                        app.Dte.Documents.CloseAll(EnvDTE.vsSaveChanges.vsSaveChangesNo);
+                    } finally {
+                        profiling.RemoveSession(session, true);
+                    }
                 }
             }
         }
@@ -859,28 +892,30 @@ namespace ProfilingUITests {
         [TestMethod, Priority(0), TestCategory("Core")]
         [HostType("TC Dynamic"), DynamicHostType(typeof(VsIdeHostAdapter))]
         public void TestOpenReportCtxMenu() {
-            var profiling = (INodeProfiling)VsIdeTestHostContext.Dte.GetObject("NodejsProfiling");
+            using (new JustMyCodeSetting(false)) {
+                var profiling = (INodeProfiling)VsIdeTestHostContext.Dte.GetObject("NodejsProfiling");
 
-            // no sessions yet
-            Assert.AreEqual(profiling.GetSession(1), null);
+                // no sessions yet
+                Assert.AreEqual(profiling.GetSession(1), null);
 
-            var project = OpenProject(NodejsProfileTest);
+                var project = OpenProject(NodejsProfileTest);
 
-            using (var app = new NodejsVisualStudioApp(VsIdeTestHostContext.Dte)) {
-                var session = LaunchProject(app, profiling, project, TestData.GetPath("TestData\\NodejsProfileTest"), false);
-                try {
-                    INodePerformanceReport report;
-                    AutomationElement child;
-                    WaitForReport(profiling, session, out report, app, out child);
+                using (var app = new NodejsVisualStudioApp(VsIdeTestHostContext.Dte)) {
+                    var session = LaunchProject(app, profiling, project, TestData.GetPath("TestData\\NodejsProfileTest"), false);
+                    try {
+                        INodePerformanceReport report;
+                        AutomationElement child;
+                        WaitForReport(profiling, session, out report, app, out child);
 
-                    var clickPoint = child.GetClickablePoint();
-                    Mouse.MoveTo(clickPoint);
-                    Mouse.Click(System.Windows.Input.MouseButton.Right);
-                    Keyboard.Press(System.Windows.Input.Key.O);
+                        var clickPoint = child.GetClickablePoint();
+                        Mouse.MoveTo(clickPoint);
+                        Mouse.Click(System.Windows.Input.MouseButton.Right);
+                        Keyboard.Press(System.Windows.Input.Key.O);
 
-                    Assert.AreNotEqual(null, app.WaitForDocument(report.Filename));
-                } finally {
-                    profiling.RemoveSession(session, true);
+                        Assert.AreNotEqual(null, app.WaitForDocument(report.Filename));
+                    } finally {
+                        profiling.RemoveSession(session, true);
+                    }
                 }
             }
         }
@@ -888,36 +923,38 @@ namespace ProfilingUITests {
         [TestMethod, Priority(0), TestCategory("Core")]
         [HostType("TC Dynamic"), DynamicHostType(typeof(VsIdeHostAdapter))]
         public void TestTargetPropertiesForProject() {
-            var profiling = (INodeProfiling)VsIdeTestHostContext.Dte.GetObject("NodejsProfiling");
+            using (new JustMyCodeSetting(false)) {
+                var profiling = (INodeProfiling)VsIdeTestHostContext.Dte.GetObject("NodejsProfiling");
 
-            // no sessions yet
-            Assert.AreEqual(profiling.GetSession(1), null);
+                // no sessions yet
+                Assert.AreEqual(profiling.GetSession(1), null);
 
-            var project = OpenProject(NodejsProfileTest);
+                var project = OpenProject(NodejsProfileTest);
 
-            using (var app = new NodejsVisualStudioApp(VsIdeTestHostContext.Dte)) {
-                var session = LaunchProject(app, profiling, project, TestData.GetPath("TestData\\NodejsProfileTest"), false);
-                try {
-                    while (profiling.IsProfiling) {
-                        System.Threading.Thread.Sleep(500);
+                using (var app = new NodejsVisualStudioApp(VsIdeTestHostContext.Dte)) {
+                    var session = LaunchProject(app, profiling, project, TestData.GetPath("TestData\\NodejsProfileTest"), false);
+                    try {
+                        while (profiling.IsProfiling) {
+                            System.Threading.Thread.Sleep(500);
+                        }
+
+                        app.OpenNodejsPerformance();
+                        var pyPerf = app.NodejsPerformanceExplorerTreeView;
+
+                        var item = pyPerf.FindItem("NodejsProfileTest *");
+
+                        Mouse.MoveTo(item.GetClickablePoint());
+                        Mouse.DoubleClick(System.Windows.Input.MouseButton.Left);
+
+                        var perfTarget = new NodejsPerfTarget(app.WaitForDialog());
+                        Assert.AreEqual("NodejsProfileTest", perfTarget.SelectedProject);
+
+                        perfTarget.Cancel();
+
+                        app.WaitForDialogDismissed();
+                    } finally {
+                        profiling.RemoveSession(session, true);
                     }
-
-                    app.OpenNodejsPerformance();
-                    var pyPerf = app.NodejsPerformanceExplorerTreeView;
-
-                    var item = pyPerf.FindItem("NodejsProfileTest *");
-
-                    Mouse.MoveTo(item.GetClickablePoint());
-                    Mouse.DoubleClick(System.Windows.Input.MouseButton.Left);
-
-                    var perfTarget = new NodejsPerfTarget(app.WaitForDialog());
-                    Assert.AreEqual("NodejsProfileTest", perfTarget.SelectedProject);
-
-                    perfTarget.Cancel();
-
-                    app.WaitForDialogDismissed();
-                } finally {
-                    profiling.RemoveSession(session, true);
                 }
             }
         }
@@ -925,44 +962,46 @@ namespace ProfilingUITests {
         [TestMethod, Priority(0), TestCategory("Core")]
         [HostType("TC Dynamic"), DynamicHostType(typeof(VsIdeHostAdapter))]
         public void TestTargetPropertiesForExecutable() {
-            var profiling = (INodeProfiling)VsIdeTestHostContext.Dte.GetObject("NodejsProfiling");
+            using (new JustMyCodeSetting(false)) {
+                var profiling = (INodeProfiling)VsIdeTestHostContext.Dte.GetObject("NodejsProfiling");
 
-            // no sessions yet
-            Assert.AreEqual(profiling.GetSession(1), null);
-            using (var app = new NodejsVisualStudioApp(VsIdeTestHostContext.Dte)) {
-                var session = LaunchProcess(app,
-                    profiling,
-                    NodeExePath,
-                    TestData.GetPath(@"TestData\NodejsProfileTest\program.js"),
-                    TestData.GetPath(@"TestData\NodejsProfileTest"),
-                    "",
-                    false
-                );
+                // no sessions yet
+                Assert.AreEqual(profiling.GetSession(1), null);
+                using (var app = new NodejsVisualStudioApp(VsIdeTestHostContext.Dte)) {
+                    var session = LaunchProcess(app,
+                        profiling,
+                        NodeExePath,
+                        TestData.GetPath(@"TestData\NodejsProfileTest\program.js"),
+                        TestData.GetPath(@"TestData\NodejsProfileTest"),
+                        "",
+                        false
+                    );
 
-                while (profiling.IsProfiling) {
-                    System.Threading.Thread.Sleep(500);
-                }
-                NodejsPerfTarget perfTarget = null;
-                try {
-                    app.OpenNodejsPerformance();
-                    var pyPerf = app.NodejsPerformanceExplorerTreeView;
-
-                    var item = pyPerf.FindItem("program *");
-
-                    Mouse.MoveTo(item.GetClickablePoint());
-                    Mouse.DoubleClick(System.Windows.Input.MouseButton.Left);
-
-                    perfTarget = new NodejsPerfTarget(app.WaitForDialog());
-                    Assert.AreEqual(NodeExePath, perfTarget.InterpreterPath);
-                    Assert.AreEqual("", perfTarget.Arguments);
-                    Assert.IsTrue(perfTarget.ScriptName.EndsWith("program.js"));
-                    Assert.IsTrue(perfTarget.ScriptName.StartsWith(perfTarget.WorkingDir));
-                } finally {
-                    if (perfTarget != null) {
-                        perfTarget.Cancel();
-                        app.WaitForDialogDismissed();
+                    while (profiling.IsProfiling) {
+                        System.Threading.Thread.Sleep(500);
                     }
-                    profiling.RemoveSession(session, true);
+                    NodejsPerfTarget perfTarget = null;
+                    try {
+                        app.OpenNodejsPerformance();
+                        var pyPerf = app.NodejsPerformanceExplorerTreeView;
+
+                        var item = pyPerf.FindItem("program *");
+
+                        Mouse.MoveTo(item.GetClickablePoint());
+                        Mouse.DoubleClick(System.Windows.Input.MouseButton.Left);
+
+                        perfTarget = new NodejsPerfTarget(app.WaitForDialog());
+                        Assert.AreEqual(NodeExePath, perfTarget.InterpreterPath);
+                        Assert.AreEqual("", perfTarget.Arguments);
+                        Assert.IsTrue(perfTarget.ScriptName.EndsWith("program.js"));
+                        Assert.IsTrue(perfTarget.ScriptName.StartsWith(perfTarget.WorkingDir));
+                    } finally {
+                        if (perfTarget != null) {
+                            perfTarget.Cancel();
+                            app.WaitForDialogDismissed();
+                        }
+                        profiling.RemoveSession(session, true);
+                    }
                 }
             }
         }
@@ -970,35 +1009,37 @@ namespace ProfilingUITests {
         [TestMethod, Priority(0), TestCategory("Core")]
         [HostType("TC Dynamic"), DynamicHostType(typeof(VsIdeHostAdapter))]
         public void TestStopProfiling() {
-            var profiling = (INodeProfiling)VsIdeTestHostContext.Dte.GetObject("NodejsProfiling");
+            using (new JustMyCodeSetting(false)) {
+                var profiling = (INodeProfiling)VsIdeTestHostContext.Dte.GetObject("NodejsProfiling");
 
-            // no sessions yet
-            Assert.AreEqual(profiling.GetSession(1), null);
-            using (var app = new NodejsVisualStudioApp(VsIdeTestHostContext.Dte)) {
-                var session = LaunchProcess(app,
-                    profiling,
-                    NodeExePath,
-                    TestData.GetPath(@"TestData\NodejsProfileTest\infiniteProfile.js"),
-                    TestData.GetPath(@"TestData\NodejsProfileTest"),
-                    "",
-                    false
-                );
+                // no sessions yet
+                Assert.AreEqual(profiling.GetSession(1), null);
+                using (var app = new NodejsVisualStudioApp(VsIdeTestHostContext.Dte)) {
+                    var session = LaunchProcess(app,
+                        profiling,
+                        NodeExePath,
+                        TestData.GetPath(@"TestData\NodejsProfileTest\infiniteProfile.js"),
+                        TestData.GetPath(@"TestData\NodejsProfileTest"),
+                        "",
+                        false
+                    );
 
-                try {
-                    System.Threading.Thread.Sleep(1000);
-                    Assert.IsTrue(profiling.IsProfiling);
-                    app.OpenNodejsPerformance();
-                    app.NodejsPerformanceExplorerToolBar.StopProfiling();
+                    try {
+                        System.Threading.Thread.Sleep(1000);
+                        Assert.IsTrue(profiling.IsProfiling);
+                        app.OpenNodejsPerformance();
+                        app.NodejsPerformanceExplorerToolBar.StopProfiling();
 
-                    while (profiling.IsProfiling) {
-                        System.Threading.Thread.Sleep(100);
+                        while (profiling.IsProfiling) {
+                            System.Threading.Thread.Sleep(100);
+                        }
+
+                        var report = session.GetReport(1);
+
+                        Assert.AreNotEqual(null, report);
+                    } finally {
+                        profiling.RemoveSession(session, true);
                     }
-
-                    var report = session.GetReport(1);
-
-                    Assert.AreNotEqual(null, report);
-                } finally {
-                    profiling.RemoveSession(session, true);
                 }
             }
         }
@@ -1006,39 +1047,41 @@ namespace ProfilingUITests {
         [TestMethod, Priority(0), TestCategory("Core")]
         [HostType("TC Dynamic"), DynamicHostType(typeof(VsIdeHostAdapter))]
         public void TestTwoProfilesAtTheSameTime() {
-            var profiling = (INodeProfiling)VsIdeTestHostContext.Dte.GetObject("NodejsProfiling");
+            using (new JustMyCodeSetting(false)) {
+                var profiling = (INodeProfiling)VsIdeTestHostContext.Dte.GetObject("NodejsProfiling");
 
-            // no sessions yet
-            Assert.AreEqual(profiling.GetSession(1), null);
-            using (var app = new NodejsVisualStudioApp(VsIdeTestHostContext.Dte)) {
-                var session = LaunchProcess(app,
-                    profiling,
-                    NodeExePath,
-                    TestData.GetPath(@"TestData\NodejsProfileTest\infiniteProfile.js"),
-                    TestData.GetPath(@"TestData\NodejsProfileTest"),
-                    "",
-                    false
-                );
-
-                try {
-                    for (int i = 0; i < 100 && !profiling.IsProfiling; i++) {
-                        System.Threading.Thread.Sleep(100);
-                    }
-                    Assert.IsTrue(profiling.IsProfiling);
-                    app.OpenNodejsPerformance();
+                // no sessions yet
+                Assert.AreEqual(profiling.GetSession(1), null);
+                using (var app = new NodejsVisualStudioApp(VsIdeTestHostContext.Dte)) {
+                    var session = LaunchProcess(app,
+                        profiling,
+                        NodeExePath,
+                        TestData.GetPath(@"TestData\NodejsProfileTest\infiniteProfile.js"),
+                        TestData.GetPath(@"TestData\NodejsProfileTest"),
+                        "",
+                        false
+                    );
 
                     try {
-                        app.Dte.ExecuteCommand("Analyze.LaunchNode.jsProfiling");
-                        Assert.Fail();
-                    } catch (COMException) {
-                    }
-                    app.NodejsPerformanceExplorerToolBar.StopProfiling();
+                        for (int i = 0; i < 100 && !profiling.IsProfiling; i++) {
+                            System.Threading.Thread.Sleep(100);
+                        }
+                        Assert.IsTrue(profiling.IsProfiling);
+                        app.OpenNodejsPerformance();
 
-                    while (profiling.IsProfiling) {
-                        System.Threading.Thread.Sleep(100);
+                        try {
+                            app.Dte.ExecuteCommand("Analyze.LaunchNode.jsProfiling");
+                            Assert.Fail();
+                        } catch (COMException) {
+                        }
+                        app.NodejsPerformanceExplorerToolBar.StopProfiling();
+
+                        while (profiling.IsProfiling) {
+                            System.Threading.Thread.Sleep(100);
+                        }
+                    } finally {
+                        profiling.RemoveSession(session, true);
                     }
-                } finally {
-                    profiling.RemoveSession(session, true);
                 }
             }
         }
@@ -1071,61 +1114,63 @@ namespace ProfilingUITests {
         [TestMethod, Priority(0), TestCategory("Core")]
         [HostType("TC Dynamic"), DynamicHostType(typeof(VsIdeHostAdapter))]
         public void MultipleTargets() {
-            var profiling = (INodeProfiling)VsIdeTestHostContext.Dte.GetObject("NodejsProfiling");
+            using (new JustMyCodeSetting(false)) {
+                var profiling = (INodeProfiling)VsIdeTestHostContext.Dte.GetObject("NodejsProfiling");
 
-            // no sessions yet
-            Assert.AreEqual(profiling.GetSession(1), null);
+                // no sessions yet
+                Assert.AreEqual(profiling.GetSession(1), null);
 
-            var project = OpenProject(NodejsProfileTest);
+                var project = OpenProject(NodejsProfileTest);
 
-            using (var app = new NodejsVisualStudioApp(VsIdeTestHostContext.Dte)) {
-                var session = LaunchProject(app, profiling, project, TestData.GetPath("TestData\\NodejsProfileTest"), false);
-                INodeProfileSession session2 = null;
-                try {
-                    {
-                        while (profiling.IsProfiling) {
-                            System.Threading.Thread.Sleep(100);
+                using (var app = new NodejsVisualStudioApp(VsIdeTestHostContext.Dte)) {
+                    var session = LaunchProject(app, profiling, project, TestData.GetPath("TestData\\NodejsProfileTest"), false);
+                    INodeProfileSession session2 = null;
+                    try {
+                        {
+                            while (profiling.IsProfiling) {
+                                System.Threading.Thread.Sleep(100);
+                            }
+
+                            var report = session.GetReport(1);
+                            var filename = report.Filename;
+                            Assert.IsTrue(filename.Contains("NodejsProfileTest"));
+
+                            Assert.AreEqual(session.GetReport(2), null);
+
+                            Assert.AreNotEqual(session.GetReport(report.Filename), null);
+
+                            VerifyReport(report, "program.f");
                         }
 
-                        var report = session.GetReport(1);
-                        var filename = report.Filename;
-                        Assert.IsTrue(filename.Contains("NodejsProfileTest"));
+                        {
+                            session2 = LaunchProcess(app,
+                                profiling,
+                                NodeExePath,
+                                        TestData.GetPath(@"TestData\NodejsProfileTest\program.js"),
+                                        TestData.GetPath(@"TestData\NodejsProfileTest"),
+                                        "",
+                                        false
+                                    );
 
-                        Assert.AreEqual(session.GetReport(2), null);
+                            while (profiling.IsProfiling) {
+                                System.Threading.Thread.Sleep(100);
+                            }
 
-                        Assert.AreNotEqual(session.GetReport(report.Filename), null);
+                            var report = session2.GetReport(1);
+                            var filename = report.Filename;
+                            Assert.IsTrue(filename.Contains("program"));
 
-                        VerifyReport(report, "program.f");
-                    }
+                            Assert.AreEqual(session2.GetReport(2), null);
 
-                    {
-                        session2 = LaunchProcess(app,
-                            profiling,
-                            NodeExePath,
-                                    TestData.GetPath(@"TestData\NodejsProfileTest\program.js"),
-                                    TestData.GetPath(@"TestData\NodejsProfileTest"),
-                                    "",
-                                    false
-                                );
+                            Assert.AreNotEqual(session2.GetReport(report.Filename), null);
 
-                        while (profiling.IsProfiling) {
-                            System.Threading.Thread.Sleep(100);
+                            VerifyReport(report, "program.f");
                         }
-
-                        var report = session2.GetReport(1);
-                        var filename = report.Filename;
-                        Assert.IsTrue(filename.Contains("program"));
-
-                        Assert.AreEqual(session2.GetReport(2), null);
-
-                        Assert.AreNotEqual(session2.GetReport(report.Filename), null);
-
-                        VerifyReport(report, "program.f");
-                    }
-                } finally {
-                    profiling.RemoveSession(session, true);
-                    if (session2 != null) {
-                        profiling.RemoveSession(session2, true);
+                    } finally {
+                        profiling.RemoveSession(session, true);
+                        if (session2 != null) {
+                            profiling.RemoveSession(session2, true);
+                        }
                     }
                 }
             }
@@ -1134,18 +1179,84 @@ namespace ProfilingUITests {
         [TestMethod, Priority(0), TestCategory("Core")]
         [HostType("TC Dynamic"), DynamicHostType(typeof(VsIdeHostAdapter))]
         public void MultipleTargetsWithProjectHome() {
-            var profiling = (INodeProfiling)VsIdeTestHostContext.Dte.GetObject("NodejsProfiling");
+            using (new JustMyCodeSetting(false)) {
+                var profiling = (INodeProfiling)VsIdeTestHostContext.Dte.GetObject("NodejsProfiling");
 
-            // no sessions yet
-            Assert.AreEqual(profiling.GetSession(1), null);
+                // no sessions yet
+                Assert.AreEqual(profiling.GetSession(1), null);
 
-            var project = OpenProject(NodejsProfileTest);
+                var project = OpenProject(NodejsProfileTest);
 
-            using (var app = new NodejsVisualStudioApp(VsIdeTestHostContext.Dte)) {
-                var session = LaunchProject(app, profiling, project, TestData.GetPath("TestData\\NodejsProfileTest"), false);
-                INodeProfileSession session2 = null;
-                try {
-                    {
+                using (var app = new NodejsVisualStudioApp(VsIdeTestHostContext.Dte)) {
+                    var session = LaunchProject(app, profiling, project, TestData.GetPath("TestData\\NodejsProfileTest"), false);
+                    INodeProfileSession session2 = null;
+                    try {
+                        {
+                            while (profiling.IsProfiling) {
+                                System.Threading.Thread.Sleep(100);
+                            }
+
+                            var report = session.GetReport(1);
+                            var filename = report.Filename;
+                            Assert.IsTrue(filename.Contains("NodejsProfileTest"));
+
+                            Assert.AreEqual(session.GetReport(2), null);
+
+                            Assert.AreNotEqual(session.GetReport(report.Filename), null);
+
+                            VerifyReport(report, "program.f");
+                        }
+
+                        {
+                            session2 = LaunchProcess(app,
+                                profiling,
+                                NodeExePath,
+                                TestData.GetPath(@"TestData\NodejsProfileTest\program.js"),
+                                TestData.GetPath(@"TestData\NodejsProfileTest"),
+                                "",
+                                false
+                            );
+
+                            while (profiling.IsProfiling) {
+                                System.Threading.Thread.Sleep(100);
+                            }
+
+                            var report = session2.GetReport(1);
+                            var filename = report.Filename;
+                            Assert.IsTrue(filename.Contains("program"));
+
+                            Assert.AreEqual(session2.GetReport(2), null);
+
+                            Assert.AreNotEqual(session2.GetReport(report.Filename), null);
+
+                            VerifyReport(report, "program.f");
+                        }
+
+                    } finally {
+                        profiling.RemoveSession(session, true);
+                        if (session2 != null) {
+                            profiling.RemoveSession(session2, true);
+                        }
+                    }
+                }
+            }
+        }
+
+        [TestMethod, Priority(0), TestCategory("Core")]
+        [HostType("TC Dynamic"), DynamicHostType(typeof(VsIdeHostAdapter))]
+        public void MultipleReports() {
+            using (new JustMyCodeSetting(false)) {
+                var profiling = (INodeProfiling)VsIdeTestHostContext.Dte.GetObject("NodejsProfiling");
+
+                // no sessions yet
+                Assert.AreEqual(profiling.GetSession(1), null);
+
+                var project = OpenProject(NodejsProfileTest);
+
+                using (var app = new NodejsVisualStudioApp(VsIdeTestHostContext.Dte)) {
+                    var session = LaunchProject(app, profiling, project, TestData.GetPath("TestData\\NodejsProfileTest"), false);
+                    try {
+
                         while (profiling.IsProfiling) {
                             System.Threading.Thread.Sleep(100);
                         }
@@ -1159,80 +1270,18 @@ namespace ProfilingUITests {
                         Assert.AreNotEqual(session.GetReport(report.Filename), null);
 
                         VerifyReport(report, "program.f");
-                    }
 
-                    {
-                        session2 = LaunchProcess(app,
-                            profiling,
-                            NodeExePath,
-                            TestData.GetPath(@"TestData\NodejsProfileTest\program.js"),
-                            TestData.GetPath(@"TestData\NodejsProfileTest"),
-                            "",
-                            false
-                        );
+                        session.Launch();
 
                         while (profiling.IsProfiling) {
                             System.Threading.Thread.Sleep(100);
                         }
 
-                        var report = session2.GetReport(1);
-                        var filename = report.Filename;
-                        Assert.IsTrue(filename.Contains("program"));
-
-                        Assert.AreEqual(session2.GetReport(2), null);
-
-                        Assert.AreNotEqual(session2.GetReport(report.Filename), null);
-
+                        report = session.GetReport(2);
                         VerifyReport(report, "program.f");
+                    } finally {
+                        profiling.RemoveSession(session, true);
                     }
-
-                } finally {
-                    profiling.RemoveSession(session, true);
-                    if (session2 != null) {
-                        profiling.RemoveSession(session2, true);
-                    }
-                }
-            }
-        }
-
-        [TestMethod, Priority(0), TestCategory("Core")]
-        [HostType("TC Dynamic"), DynamicHostType(typeof(VsIdeHostAdapter))]
-        public void MultipleReports() {
-            var profiling = (INodeProfiling)VsIdeTestHostContext.Dte.GetObject("NodejsProfiling");
-
-            // no sessions yet
-            Assert.AreEqual(profiling.GetSession(1), null);
-
-            var project = OpenProject(NodejsProfileTest);
-
-            using (var app = new NodejsVisualStudioApp(VsIdeTestHostContext.Dte)) {
-                var session = LaunchProject(app, profiling, project, TestData.GetPath("TestData\\NodejsProfileTest"), false);
-                try {
-
-                    while (profiling.IsProfiling) {
-                        System.Threading.Thread.Sleep(100);
-                    }
-
-                    var report = session.GetReport(1);
-                    var filename = report.Filename;
-                    Assert.IsTrue(filename.Contains("NodejsProfileTest"));
-
-                    Assert.AreEqual(session.GetReport(2), null);
-
-                    Assert.AreNotEqual(session.GetReport(report.Filename), null);
-
-                    VerifyReport(report, "program.f");
-
-                    session.Launch();
-
-                    while (profiling.IsProfiling) {
-                        System.Threading.Thread.Sleep(100);
-                    }
-
-                    report = session.GetReport(2);
-                    VerifyReport(report, "program.f");
-                } finally {
-                    profiling.RemoveSession(session, true);
                 }
             }
         }
@@ -1241,35 +1290,107 @@ namespace ProfilingUITests {
         [TestMethod, Priority(0), TestCategory("Core")]
         [HostType("TC Dynamic"), DynamicHostType(typeof(VsIdeHostAdapter))]
         public void LaunchExecutable() {
-            var profiling = (INodeProfiling)VsIdeTestHostContext.Dte.GetObject("NodejsProfiling");
+            using (new JustMyCodeSetting(false)) {
+                var profiling = (INodeProfiling)VsIdeTestHostContext.Dte.GetObject("NodejsProfiling");
 
-            // no sessions yet
-            Assert.AreEqual(profiling.GetSession(1), null);
-            using (var app = new NodejsVisualStudioApp(VsIdeTestHostContext.Dte)) {
-                var session = LaunchProcess(app,
-                    profiling,
-                    NodeExePath,
-                    TestData.GetPath(@"TestData\NodejsProfileTest\program.js"),
-                    TestData.GetPath(@"TestData\NodejsProfileTest"),
-                    "",
-                    false
-                );
-                try {
-                    while (profiling.IsProfiling) {
-                        System.Threading.Thread.Sleep(100);
+                // no sessions yet
+                Assert.AreEqual(profiling.GetSession(1), null);
+                using (var app = new NodejsVisualStudioApp(VsIdeTestHostContext.Dte)) {
+                    var session = LaunchProcess(app,
+                        profiling,
+                        NodeExePath,
+                        TestData.GetPath(@"TestData\NodejsProfileTest\program.js"),
+                        TestData.GetPath(@"TestData\NodejsProfileTest"),
+                        "",
+                        false
+                    );
+                    try {
+                        while (profiling.IsProfiling) {
+                            System.Threading.Thread.Sleep(100);
+                        }
+
+                        var report = session.GetReport(1);
+                        var filename = report.Filename;
+                        Assert.IsTrue(filename.Contains("program"));
+
+                        Assert.AreEqual(session.GetReport(2), null);
+
+                        Assert.AreNotEqual(session.GetReport(report.Filename), null);
+
+                        VerifyReport(report, "program.f");
+                    } finally {
+                        profiling.RemoveSession(session, true);
                     }
+                }
+            }
+        }
 
-                    var report = session.GetReport(1);
-                    var filename = report.Filename;
-                    Assert.IsTrue(filename.Contains("program"));
+        [TestMethod, Priority(0), TestCategory("Core")]
+        [HostType("TC Dynamic"), DynamicHostType(typeof(VsIdeHostAdapter))]
+        public void TestJustMyCode() {
+            using (new JustMyCodeSetting(true)) {
+                var profiling = (INodeProfiling)VsIdeTestHostContext.Dte.GetObject("NodejsProfiling");
 
-                    Assert.AreEqual(session.GetReport(2), null);
+                // no sessions yet
+                Assert.AreEqual(profiling.GetSession(1), null);
+                using (var app = new NodejsVisualStudioApp(VsIdeTestHostContext.Dte)) {
+                    var session = LaunchProcess(app,
+                        profiling,
+                        NodeExePath,
+                        TestData.GetPath(@"TestData\NodejsProfileTest\JustMyCode.js"),
+                        TestData.GetPath(@"TestData\NodejsProfileTest"),
+                        "",
+                        false
+                    );
+                    try {
+                        while (profiling.IsProfiling) {
+                            System.Threading.Thread.Sleep(100);
+                        }
 
-                    Assert.AreNotEqual(session.GetReport(report.Filename), null);
+                        var report = session.GetReport(1);
+                        var filename = report.Filename;
 
-                    VerifyReport(report, "program.f");
-                } finally {
-                    profiling.RemoveSession(session, true);
+                        Assert.AreEqual(session.GetReport(2), null);
+
+                        VerifyReportMissing(report, "fs.fs.writeFileSync");
+                    } finally {
+                        profiling.RemoveSession(session, true);
+                    }
+                }
+            }
+        }
+
+        [TestMethod, Priority(0), TestCategory("Core")]
+        [HostType("TC Dynamic"), DynamicHostType(typeof(VsIdeHostAdapter))]
+        public void TestJustMyCodeOff() {
+            using (new JustMyCodeSetting(false)) {
+                var profiling = (INodeProfiling)VsIdeTestHostContext.Dte.GetObject("NodejsProfiling");
+
+                // no sessions yet
+                Assert.AreEqual(profiling.GetSession(1), null);
+                using (var app = new NodejsVisualStudioApp(VsIdeTestHostContext.Dte)) {
+                    var session = LaunchProcess(app,
+                        profiling,
+                        NodeExePath,
+                        TestData.GetPath(@"TestData\NodejsProfileTest\JustMyCode.js"),
+                        TestData.GetPath(@"TestData\NodejsProfileTest"),
+                        "",
+                        false
+                    );
+                    try {
+                        while (profiling.IsProfiling) {
+                            System.Threading.Thread.Sleep(100);
+                        }
+
+                        var report = session.GetReport(1);
+                        var filename = report.Filename;
+
+                        Assert.AreEqual(session.GetReport(2), null);
+
+                        VerifyReport(report, "fs.fs.writeFileSync");
+                    } finally {
+                        profiling.RemoveSession(session, true);
+                    }
                 }
             }
         }
@@ -1277,33 +1398,35 @@ namespace ProfilingUITests {
         [TestMethod, Priority(0), TestCategory("Core")]
         [HostType("TC Dynamic"), DynamicHostType(typeof(VsIdeHostAdapter))]
         public void TestProjectProperties() {
-            var profiling = (INodeProfiling)VsIdeTestHostContext.Dte.GetObject("NodejsProfiling");
+            using (new JustMyCodeSetting(false)) {
+                var profiling = (INodeProfiling)VsIdeTestHostContext.Dte.GetObject("NodejsProfiling");
 
-            var testFile = Path.Combine(Path.GetTempPath(), "nodejstest.txt");
-            if (File.Exists(testFile)) {
-                File.Delete(testFile);
-            }
+                var testFile = Path.Combine(Path.GetTempPath(), "nodejstest.txt");
+                if (File.Exists(testFile)) {
+                    File.Delete(testFile);
+                }
 
-            var project = OpenProject(@"TestData\NodejsProjectPropertiesTest\NodejsProjectPropertiesTest.sln", "server.js");
-            project.Properties.Item("WorkingDirectory").Value = Path.GetTempPath();
+                var project = OpenProject(@"TestData\NodejsProjectPropertiesTest\NodejsProjectPropertiesTest.sln", "server.js");
+                project.Properties.Item("WorkingDirectory").Value = Path.GetTempPath();
 
-            using (var app = new NodejsVisualStudioApp(VsIdeTestHostContext.Dte)) {
-                var session = LaunchProject(app, profiling, project, TestData.GetPath("TestData\\NodejsProfileTest"), false);
-                try {
-                    while (profiling.IsProfiling) {
-                        System.Threading.Thread.Sleep(100);
+                using (var app = new NodejsVisualStudioApp(VsIdeTestHostContext.Dte)) {
+                    var session = LaunchProject(app, profiling, project, TestData.GetPath("TestData\\NodejsProfileTest"), false);
+                    try {
+                        while (profiling.IsProfiling) {
+                            System.Threading.Thread.Sleep(100);
+                        }
+
+                        Assert.IsTrue(File.Exists(testFile), "test file not created");
+                        var lines = File.ReadAllLines(testFile);
+
+                        Assert.IsTrue(lines[0].Contains("scriptargs"), "no scriptargs");
+                        Assert.IsTrue(lines[0].Contains("server.js"), "missing filename");
+                        Assert.AreEqual(lines[1], "port: 1234");
+                        Assert.AreEqual(lines[2], "cwd: " + Path.GetTempPath().Substring(0, Path.GetTempPath().Length - 1));
+
+                    } finally {
+                        profiling.RemoveSession(session, true);
                     }
-
-                    Assert.IsTrue(File.Exists(testFile), "test file not created");
-                    var lines = File.ReadAllLines(testFile);
-
-                    Assert.IsTrue(lines[0].Contains("scriptargs"), "no scriptargs");
-                    Assert.IsTrue(lines[0].Contains("server.js"), "missing filename");
-                    Assert.AreEqual(lines[1], "port: 1234");
-                    Assert.AreEqual(lines[2], "cwd: " + Path.GetTempPath().Substring(0, Path.GetTempPath().Length - 1));
-
-                } finally {
-                    profiling.RemoveSession(session, true);
                 }
             }
         }
@@ -1311,31 +1434,49 @@ namespace ProfilingUITests {
         [TestMethod, Priority(0), TestCategory("Core")]
         [HostType("TC Dynamic"), DynamicHostType(typeof(VsIdeHostAdapter))]
         public void TestBrowserLaunch() {
-            var profiling = (INodeProfiling)VsIdeTestHostContext.Dte.GetObject("NodejsProfiling");
+            using (new JustMyCodeSetting(false)) {
+                var profiling = (INodeProfiling)VsIdeTestHostContext.Dte.GetObject("NodejsProfiling");
 
-            var testFile = Path.Combine(Path.GetTempPath(), "nodejstest.txt");
-            if (File.Exists(testFile)) {
-                File.Delete(testFile);
-            }
+                var testFile = Path.Combine(Path.GetTempPath(), "nodejstest.txt");
+                if (File.Exists(testFile)) {
+                    File.Delete(testFile);
+                }
 
-            var project = OpenProject(@"TestData\NodejsProjectPropertiesTest\NodejsProjectPropertiesTest.sln", "server2.js");
-            project.Properties.Item("WorkingDirectory").Value = Path.GetTempPath();
+                var project = OpenProject(@"TestData\NodejsProjectPropertiesTest\NodejsProjectPropertiesTest.sln", "server2.js");
+                project.Properties.Item("WorkingDirectory").Value = Path.GetTempPath();
 
-            using (var app = new NodejsVisualStudioApp(VsIdeTestHostContext.Dte)) {
-                var session = LaunchProject(app, profiling, project, TestData.GetPath("TestData\\NodejsProfileTest"), false);
-                try {
-                    while (profiling.IsProfiling) {
-                        System.Threading.Thread.Sleep(100);
+                using (var app = new NodejsVisualStudioApp(VsIdeTestHostContext.Dte)) {
+                    var session = LaunchProject(app, profiling, project, TestData.GetPath("TestData\\NodejsProfileTest"), false);
+                    try {
+                        while (profiling.IsProfiling) {
+                            System.Threading.Thread.Sleep(100);
+                        }
+
+                        Assert.IsTrue(File.Exists(testFile), "test file not created");
+                    } finally {
+                        profiling.RemoveSession(session, true);
                     }
-
-                    Assert.IsTrue(File.Exists(testFile), "test file not created");
-                } finally {
-                    profiling.RemoveSession(session, true);
                 }
             }
         }
 
         private static void VerifyReport(INodePerformanceReport report, params string[] expectedFunctions) {
+            bool[] expected = FindFunctions(report, expectedFunctions);
+
+            foreach (var found in expected) {
+                Assert.IsTrue(found);
+            }            
+        }
+
+        private static void VerifyReportMissing(INodePerformanceReport report, params string[] missingFunctions) {
+            bool[] expected = FindFunctions(report, missingFunctions);
+
+            foreach (var found in expected) {
+                Assert.IsFalse(found);
+            }
+        }
+
+        private static bool[] FindFunctions(INodePerformanceReport report, string[] expectedFunctions) {
             // run vsperf
             string[] lines = OpenPerformanceReportAsCsv(report);
             bool[] expected = new bool[expectedFunctions.Length];
@@ -1349,7 +1490,7 @@ namespace ProfilingUITests {
                 expectedFunctions[i] = "\"" + expectedFunctions[i] + "\"";
                 altExpected[i] = "\"" + altExpected[i] + "\"";
             }
-            
+
             foreach (var line in lines) {
                 for (int i = 0; i < expectedFunctions.Length; i++) {
                     if (line.StartsWith(expectedFunctions[i]) || line.StartsWith(altExpected[i])) {
@@ -1357,10 +1498,7 @@ namespace ProfilingUITests {
                     }
                 }
             }
-
-            foreach (var found in expected) {
-                Assert.IsTrue(found);
-            }            
+            return expected;
         }
 
         private static int _counter;
@@ -1489,6 +1627,28 @@ namespace ProfilingUITests {
             get {
                 Assert.IsNotNull(Nodejs.NodeExePath, "Node isn't installed");
                 return Nodejs.NodeExePath;
+            }
+        }
+
+        class JustMyCodeSetting : IDisposable {
+            private readonly bool _initialState;
+
+            public JustMyCodeSetting(bool enabled) {
+                using (var vsperfKey = VSRegistry.RegistryRoot(__VsLocalRegistryType.RegType_UserSettings, true).OpenSubKey("VSPerf", true)) {
+                    var value = vsperfKey.GetValue("tools.options.justmycode");
+                    int jmcSetting;
+                    if (value != null && value is string && Int32.TryParse((string)value, out jmcSetting)) {
+                        _initialState = jmcSetting != 0;
+                    }
+                    vsperfKey.SetValue("tools.options.justmycode", enabled ? "1" : "0");
+                }
+
+            }
+
+            public void Dispose() {
+                using (var vsperfKey = VSRegistry.RegistryRoot(__VsLocalRegistryType.RegType_UserSettings, true).OpenSubKey("VSPerf", true)) {
+                    vsperfKey.SetValue("tools.options.justmycode", _initialState ? "1" : "0");
+                }
             }
         }
     }
