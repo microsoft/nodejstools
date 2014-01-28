@@ -338,6 +338,14 @@
               <Condition>VWD_EXTENSION_INSTALLPATH</Condition>
             </Component>
 
+            <Component Directory="DIR_NewItem" Guid="{8F5B8D76-D07A-454F-9100-9BB892302DC9}">
+              <File Id="fil_FileTemplates_NewItem_EmptyHtml" KeyPath="yes" Source="$(var.BinariesDir)\FileTemplates\NewItem\EmptyHtml.html" />
+            </Component>
+            <Component Directory="DIR_VWD_NewItem" Guid="{3E035CA8-DE11-47C1-A1E9-0C6FEA215DC8}">
+              <File Id="filVWD_FileTemplates_NewItem_EmptyHtml" KeyPath="yes" Source="$(var.BinariesDir)\FileTemplates\NewItem\EmptyHtml.html" />
+              <Condition>VWD_EXTENSION_INSTALLPATH</Condition>
+            </Component>
+          
             <!-- MSBuild support files -->
             <Component Directory="Dir_NodejsToolsMsBuild" Guid="{6D84572F-D895-443F-BD25-712394273A4E}">
                 <File Id="filNodejsTools.targets" KeyPath="yes" Source="$(var.BinariesDir)\Microsoft.NodejsTools.targets" />
