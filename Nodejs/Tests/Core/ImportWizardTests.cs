@@ -184,7 +184,8 @@ namespace NodejsTests {
 
             AssertUtil.ContainsExactly(proj.Descendants(proj.GetName("Compile")).Select(x => x.Attribute("Include").Value),
                 "server.js",
-                "node_modules\\mymod.js");
+                "node_modules\\mymod.js",
+                "node_modules\\.bin\\myapp.js");
         }
 
         [TestMethod, Priority(0)]

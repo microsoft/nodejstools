@@ -287,6 +287,7 @@ namespace Microsoft.NodejsTools.Project.ImportWizard {
             );
             if (excludeNodeModules) {
                 folders.Remove("node_modules");
+                folders.RemoveWhere(folder => folder.StartsWith("node_modules\\", StringComparison.OrdinalIgnoreCase));
             }
             writer.WriteStartElement("ItemGroup");
             foreach (var file in EnumerateAllFiles(sourcePath, filters, excludeNodeModules)) {
@@ -375,9 +376,12 @@ namespace Microsoft.NodejsTools.Project.ImportWizard {
             }
 
             foreach (var dir in directories) {
+                if (excludeNodeModules && dir.Contains("\\node_modules\\")) {
+                    continue;
+                }
                 try {
                     foreach (var filter in patterns) {
-                        files.UnionWith(Directory.EnumerateFiles(dir, filter));
+                        files.UnionWith(Directory.EnumerateFiles(dir, filter, SearchOption.TopDirectoryOnly));
                     }
                 } catch (UnauthorizedAccessException) {
                 }
