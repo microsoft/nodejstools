@@ -1651,6 +1651,54 @@ namespace NodejsTests.Debugger {
 
         #endregion
 
+        #region Deep Callstack Tests
+
+        [TestMethod, Priority(0)]
+        public void Stepping_AccrossDeepThrow() {
+            TestDebuggerSteps(
+                "ThrowsWithDeepCallstack.js",
+                new[] {
+                    new TestStep(action: TestAction.ResumeThread, expectedEntryPointHit: 12),
+                    new TestStep(action: TestAction.StepOver, expectedStepComplete: 14),
+                    new TestStep(action: TestAction.ResumeProcess, expectedExitCode: 0),
+                },
+                defaultExceptionTreatment: ExceptionHitTreatment.BreakAlways,
+                exceptionTreatments: CollectExceptionTreatments("string", ExceptionHitTreatment.BreakNever)
+            );
+        }
+
+        [TestMethod, Priority(0)]
+        public void Stepping_AccrossDeepTracePoint() {
+            TestDebuggerSteps(
+                "DeepCallstack.js",
+                new[] {
+                    new TestStep(action: TestAction.AddBreakpoint, targetBreakpoint: 4),
+                    new TestStep(action: TestAction.ResumeThread, expectedEntryPointHit: 1),
+                    new TestStep(action: TestAction.StepOver, expectedStepComplete: 16),
+                    new TestStep(action: TestAction.StepOver, expectedBreakpointHit: 4),
+                    new TestStep(action: TestAction.ResumeThread, expectedStepComplete: 18),
+                    new TestStep(action: TestAction.ResumeProcess, expectedExitCode: 0),
+                }
+            );
+        }
+
+        [TestMethod, Priority(0)]
+        public void Stepping_AccrossDeepFixedUpTracePoint() {
+            TestDebuggerSteps(
+                "DeepCallstack.js",
+                new[] {
+                    new TestStep(action: TestAction.AddBreakpoint, targetBreakpoint: 3, expectFailure: true),
+                    new TestStep(action: TestAction.ResumeThread, expectedEntryPointHit: 1),
+                    new TestStep(action: TestAction.StepOver, expectedStepComplete: 16),
+                    new TestStep(action: TestAction.StepOver, expectedBreakpointHit: 4),
+                    new TestStep(action: TestAction.ResumeThread, expectedStepComplete: 18),
+                    new TestStep(action: TestAction.ResumeProcess, expectedExitCode: 0),
+                }
+            );
+        }
+
+        #endregion
+
         #region Module Load Tests
 
         [TestMethod, Priority(0)]
