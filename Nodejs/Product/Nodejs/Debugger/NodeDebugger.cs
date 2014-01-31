@@ -17,6 +17,7 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
 using System.Linq;
+using System.Net.NetworkInformation;
 using System.Text;
 using System.Text.RegularExpressions;
 using Microsoft.NodejsTools.Debugger.Serialization;
@@ -218,10 +219,6 @@ namespace Microsoft.NodejsTools.Debugger {
                 var evaluationResultFactory = new NodeEvaluationResultFactory();
                 ResponseHandler = new NodeResponseHandler(evaluationResultFactory);
             }
-
-            if (Connection == null) {
-                Connection = new NodeConnection();
-            }
         }
 
         public NodeDebugger(
@@ -234,7 +231,17 @@ namespace Microsoft.NodejsTools.Debugger {
             List<string[]> dirMapping,
             bool createNodeWindow = true) : this() {
 
-            string allArgs = "--debug-brk " + script;
+            var activeConnections =
+                from listener in IPGlobalProperties.GetIPGlobalProperties().GetActiveTcpListeners()
+                select listener.Port;
+            ushort debugPort = 5858;
+            if (activeConnections.Contains(debugPort)) {
+                debugPort = (ushort)Enumerable.Range(new Random().Next(5859, 6000), 60000).Except(activeConnections).First();
+            }
+
+            Connection = new NodeConnection(debugPort);
+
+            var allArgs = String.Format("--debug-brk={0} {1}", debugPort, script);
             if (!string.IsNullOrEmpty(interpreterOptions)) {
                 allArgs += " " + interpreterOptions;
             }

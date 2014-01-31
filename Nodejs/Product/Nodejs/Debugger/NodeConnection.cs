@@ -32,7 +32,7 @@ namespace Microsoft.NodejsTools.Debugger {
         private readonly JavaScriptSerializer _serializer = new JavaScriptSerializer();
         private int _currentRequestSequence = 1;
 
-        public NodeConnection() : this("localhost", 5858) {
+        public NodeConnection(ushort portNumber) : this("localhost", portNumber) {
         }
 
         public NodeConnection(string hostName, ushort portNumber) {
