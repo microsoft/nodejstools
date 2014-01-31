@@ -1,0 +1,23 @@
+<VSTemplate Version="3.0.0" Type="Project" xmlns="http://schemas.microsoft.com/developer/vstemplate/2005">
+  <TemplateData>
+    <Name>From Existing Node.js code</Name>
+    <Description>Creates a new Node.js project from existing code.</Description>
+    <Icon Package="{FE8A8C3D-328A-476D-99F9-2A24B75F8C7F}" ID="402" />
+    <ProjectType>TypeScript</ProjectType>
+    <TemplateID>Microsoft.TypeScript.NodejsFromExistingCode</TemplateID>
+    <SortOrder>120</SortOrder>
+    <CreateNewFolder>false</CreateNewFolder>
+    <DefaultName>NodejsApp</DefaultName>
+    <ProvideDefaultName>true</ProvideDefaultName>
+    <NumberOfParentCategoriesToRollUp>1</NumberOfParentCategoriesToRollUp>
+    <PromptForSaveOnCreation>true</PromptForSaveOnCreation>
+  </TemplateData>
+  <TemplateContent>
+    <Project File="FromExistingCode.njsproj" ReplaceParameters="true">
+    </Project>
+  </TemplateContent>
+  <WizardExtension>
+    <Assembly>Microsoft.NodejsTools.ProjectWizard, Version=1.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</Assembly>
+    <FullClassName>Microsoft.NodejsTools.ProjectWizard.NewProjectFromExistingWizard</FullClassName>
+  </WizardExtension>
+</VSTemplate>

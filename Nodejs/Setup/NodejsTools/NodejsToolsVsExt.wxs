@@ -218,6 +218,7 @@
             </Component>
             <Component Directory="VWD_PrjTempl_TS_Nodejs_1033" Guid="{91E9EB03-D5A1-4387-9F3A-2B566DA3B0AA}">
               <File Id="filVWDzipTypeScriptAzureExpressApp.zip" KeyPath="yes" Source="$(var.BinariesDir)\ProjectTemplates\TypeScript\Node.js\1033\TypeScriptAzureExpressApp.zip" />
+              <Condition>VWD_EXTENSION_INSTALLPATH</Condition>
             </Component>
 
             <Component Directory="PrjTempl_TS_Nodejs_1033" Guid="{4ACAC2EF-E905-4DEA-BC19-A07CE64C79FD}">
@@ -225,6 +226,7 @@
             </Component>
             <Component Directory="VWD_PrjTempl_TS_Nodejs_1033" Guid="{C0D7C24D-A1BA-4C7C-A884-E4B87C718EE9}">
               <File Id="filVWDzipTypeScriptAzureWebApp.zip" KeyPath="yes" Source="$(var.BinariesDir)\ProjectTemplates\TypeScript\Node.js\1033\TypeScriptAzureWebApp.zip" />
+              <Condition>VWD_EXTENSION_INSTALLPATH</Condition>
             </Component>
 
             <Component Directory="PrjTempl_TS_Nodejs_1033" Guid="{C02C8F2A-407B-4075-9611-A12F5988D9B1}">
@@ -232,6 +234,7 @@
             </Component>
             <Component Directory="VWD_PrjTempl_TS_Nodejs_1033" Guid="{78B3F26E-E7EC-434B-B62D-E6A53418B4DD}">
               <File Id="filVWDzipTypeScriptConsoleApp.zip" KeyPath="yes" Source="$(var.BinariesDir)\ProjectTemplates\TypeScript\Node.js\1033\TypeScriptConsoleApp.zip" />
+              <Condition>VWD_EXTENSION_INSTALLPATH</Condition>
             </Component>
 
             <Component Directory="PrjTempl_TS_Nodejs_1033" Guid="{C2D8AADA-13FD-4E4E-9D9C-EE54F6288CB2}">
@@ -239,6 +242,7 @@
             </Component>
             <Component Directory="VWD_PrjTempl_TS_Nodejs_1033" Guid="{569701D3-4964-441C-928D-CD9401B427B2}">
               <File Id="filVWDzipTypeScriptExpressApp.zip" KeyPath="yes" Source="$(var.BinariesDir)\ProjectTemplates\TypeScript\Node.js\1033\TypeScriptExpressApp.zip" />
+              <Condition>VWD_EXTENSION_INSTALLPATH</Condition>
             </Component>
 
             <Component Directory="PrjTempl_TS_Nodejs_1033" Guid="{44DADC4A-23D2-4769-96E4-4608DAE817D4}">
@@ -246,8 +250,17 @@
             </Component>
             <Component Directory="VWD_PrjTempl_TS_Nodejs_1033" Guid="{EEFFE4DA-5132-4B89-AD86-BCF10962B74A}">
               <File Id="filVWDzipTypeScriptWebApp.zip" KeyPath="yes" Source="$(var.BinariesDir)\ProjectTemplates\TypeScript\Node.js\1033\TypeScriptWebApp.zip" />
+              <Condition>VWD_EXTENSION_INSTALLPATH</Condition>
             </Component>
             
+            <Component Directory="PrjTempl_TS_Nodejs_1033" Guid="{26B061FD-69AE-4EDD-A346-089B7593FA1C}">
+              <File Id="filTypeScriptFromExistingCode.zip" KeyPath="yes" Source="$(var.BinariesDir)\ProjectTemplates\TypeScript\Node.js\1033\TypeScriptFromExistingCode.zip" />
+            </Component>
+            <Component Directory="VWD_PrjTempl_TS_Nodejs_1033" Guid="{1A46F16F-670E-48F3-AF0D-6F3657862F59}">
+              <File Id="filVWDTypeScriptFromExistingCode.zip" KeyPath="yes" Source="$(var.BinariesDir)\ProjectTemplates\TypeScript\Node.js\1033\TypeScriptFromExistingCode.zip" />
+              <Condition>VWD_EXTENSION_INSTALLPATH</Condition>
+            </Component>
+
             <!-- New item templates -->
             
             <Component Directory="DIR_NewItem" Guid="{007564C3-0035-45B6-8929-E793159D0C72}">

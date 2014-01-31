@@ -260,6 +260,27 @@ namespace NodejsTests {
             });
         }
 
+        [TestMethod, Priority(0)]
+        public void ImportWizardTypeScript() {
+            var settings = new ImportSettings();
+
+            settings.SourcePath = TestData.GetPath("TestData\\HelloWorldTypeScript\\");
+            settings.Filters = "*.ts;*.md;*.json";
+            settings.StartupFile = "server.ts";
+            settings.ExcludeNodeModules = false;
+            settings.ProjectPath = TestData.GetPath("TestData\\TestDestination\\TsSubdirectory\\ProjectName.njsproj");
+
+            var path = settings.CreateRequestedProject();
+
+            Assert.AreEqual(settings.ProjectPath, path);
+            var proj = XDocument.Load(path);
+
+            AssertUtil.ContainsExactly(proj.Descendants(proj.GetName("TypeScriptCompile")).Select(x => x.Attribute("Include").Value),
+                "server.ts");
+
+            Assert.AreEqual("server.js", proj.Descendant("StartupFile").Value);
+        }
+
         /// <summary>
         /// Creates a new window so that we have an active dispatcher for
         /// test cases which depend upon posting async events back and having

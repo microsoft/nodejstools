@@ -660,6 +660,12 @@
       <SubType>Designer</SubType>
     </TypeScriptProject>
     <TypeScriptProject Include="ProjectTemplates\TypeScriptAzureExpressApp\Preview.png" />
+    <TypeScriptProject Include="ProjectTemplates\TypeScriptFromExistingCode\FromExistingCode.njsproj">
+      <SubType>Designer</SubType>
+    </TypeScriptProject>
+    <TypeScriptProject Include="ProjectTemplates\TypeScriptFromExistingCode\FromExistingCode.vstemplate">
+      <SubType>Designer</SubType>
+    </TypeScriptProject>
     <Content Include="VSTemplateStore.pkgdef">
       <IncludeInVSIX>true</IncludeInVSIX>
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
