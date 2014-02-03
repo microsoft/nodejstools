@@ -82,8 +82,8 @@ namespace Microsoft.NodejsTools.Debugger.Remote {
                 string errText =
                     string.Format(
                         "Could not attach to Node.js process at '{0}:{1}'. " +
-                        "Make sure that the process is running behind the remote debug proxy (RemoteDebug.js), " +
-                        "and that the debuger port (default 5858) has been opened on the target host.",
+                        "Make sure the process is running behind the remote debug proxy (RemoteDebug.js), " +
+                        "and the debugger port (default 5858) is open on the target host.",
                         port.HostName,
                         port.PortNumber
                     );
