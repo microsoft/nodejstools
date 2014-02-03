@@ -17,6 +17,7 @@ using System.Collections.Generic;
 using System.Collections.Specialized;
 using System.IO;
 using System.Linq;
+using System.Threading.Tasks;
 using System.Windows;
 using EnvDTE;
 using Microsoft.TC.TestHostAdapters;
@@ -1201,6 +1202,53 @@ namespace Microsoft.VisualStudioTools.SharedProjectTests {
                     newProcs.First().Kill();
                 }
             }
+        }
+
+        [TestMethod, Priority(0), TestCategory("Core")]
+        [HostType("TC Dynamic"), DynamicHostType(typeof(VsIdeHostAdapter))]
+        public void CopyFullPath() {
+            var existing = System.Diagnostics.Process.GetProcesses().Select(x => x.Id).ToSet();
+
+            foreach (var projectType in ProjectTypes) {
+                var def = new ProjectDefinition(
+                    "HelloWorld",
+                    projectType,
+                    Compile("server"),
+                    Folder("IncFolder", isExcluded: false),
+                    Folder("ExcFolder", isExcluded: true),
+                    Compile("app", isExcluded: true),
+                    Compile("missing", isMissing: true)
+                );
+
+                using (var solution = def.Generate().ToVs()) {
+                    var projectDir = Path.GetDirectoryName(solution.Project.FullName);
+
+                    CheckCopyFullPath(solution.WaitForItem("HelloWorld", "IncFolder"),
+                                      projectDir + "\\IncFolder\\");
+                    CheckCopyFullPath(solution.WaitForItem("HelloWorld", "ExcFolder"),
+                                      projectDir + "\\ExcFolder\\");
+                    CheckCopyFullPath(solution.WaitForItem("HelloWorld", "server" + def.ProjectType.CodeExtension),
+                                      projectDir + "\\server" + def.ProjectType.CodeExtension);
+                    CheckCopyFullPath(solution.WaitForItem("HelloWorld", "app" + def.ProjectType.CodeExtension),
+                                      projectDir + "\\app" + def.ProjectType.CodeExtension);
+                    CheckCopyFullPath(solution.WaitForItem("HelloWorld", "missing" + def.ProjectType.CodeExtension),
+                                      projectDir + "\\missing" + def.ProjectType.CodeExtension);
+
+                }
+            }
+        }
+
+        private void CheckCopyFullPath(System.Windows.Automation.AutomationElement element, string expected) {
+            string clipboardText = "";
+            Console.WriteLine("Checking CopyFullPath on:{0}", expected);
+            AutomationWrapper.Select(element);
+            VsIdeTestHostContext.Dte.ExecuteCommand("Project.CopyFullPath");
+            
+            UIThreadInvoker.Invoke((Action)(() => {
+                clipboardText = System.Windows.Clipboard.GetText();
+            }));
+
+            Assert.AreEqual(expected, clipboardText);
         }
 
         [TestMethod, Priority(0), TestCategory("Core")]
