@@ -18,7 +18,6 @@ using System.Drawing;
 using System.IO;
 using System.Reflection;
 using System.Text;
-using System.Xaml;
 using System.Threading;
 using System.Web.Script.Serialization;
 using Microsoft.NodejsTools.Intellisense;
@@ -253,16 +252,18 @@ namespace Microsoft.NodejsTools.Project {
         }
 
         protected override void Reload() {
-            base.Reload();
+            using (new DebugTimer("Project Load")) {
+                base.Reload();
 
-            SyncFileSystem();
+                SyncFileSystem();
 
-            foreach (var group in _refGroupDispenser.Groups) {
-                group.GenerateReferenceFile();
+                foreach (var group in _refGroupDispenser.Groups) {
+                    group.GenerateReferenceFile();
+                }
+
+                NodejsPackage.Instance.CheckSurveyNews(false);
+                ModulesNode.ReloadHierarchySafe();
             }
-
-            NodejsPackage.Instance.CheckSurveyNews(false);
-            ModulesNode.ReloadHierarchySafe();
         }
 
         protected override void RaiseProjectPropertyChanged(string propertyName, string oldValue, string newValue) {

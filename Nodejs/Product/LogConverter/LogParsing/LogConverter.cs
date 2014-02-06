@@ -22,6 +22,7 @@ using System.IO.Compression;
 using System.Linq;
 using System.Runtime.InteropServices;
 using System.Text;
+using System.Windows.Forms;
 using Microsoft.NodejsTools.LogGeneration;
 using NodeLogConverter;
 using NodeLogConverter.LogParsing;
@@ -107,14 +108,19 @@ namespace Microsoft.NodejsTools.LogParsing {
                 }
             }
 
+#if DEBUG
             try {
+#endif
                 var log = new LogConverter(inputFile, outputFile, executionTime, jmc);
                 log.Process();
                 return 0;
+#if DEBUG
             } catch (Exception e) {
                 Console.WriteLine("Internal error while converting log: {0}", e.ToString());
-                return 2;
+                MessageBox.Show(e.ToString());
+                throw;
             }
+#endif
         }
 
         public void Process() {
@@ -351,10 +357,13 @@ namespace Microsoft.NodejsTools.LogParsing {
         }
 
         private static ulong ParseAddress(string address) {
+            ulong res;
             if (address.StartsWith("0x") || address.StartsWith("0X")) {
                 return UInt64.Parse(address.Substring(2), NumberStyles.AllowHexSpecifier);
+            } else if (UInt64.TryParse(address, out res)) {
+                return res;
             }
-            return UInt64.Parse(address);
+            return 0;
         }
 
         internal static string[] SplitRecord(string line) {
@@ -514,7 +523,7 @@ namespace Microsoft.NodejsTools.LogParsing {
                 }
 
                 SourceMapping mapping;
-                if (map != null && map.TryMapLine(funcInfo.LineNumber.Value, out mapping)) {
+                if (map != null && map.TryMapLine(funcInfo.LineNumber.Value - 1, out mapping)) {
                     string filename = mapping.FileName;
                     if (filename != null && !Path.IsPathRooted(filename)) {
                         filename = Path.Combine(Path.GetDirectoryName(funcInfo.Filename), filename);
@@ -523,7 +532,7 @@ namespace Microsoft.NodejsTools.LogParsing {
                     return new FunctionInformation(
                         funcInfo.Namespace,
                         mapping.Name ?? funcInfo.Function,
-                        mapping.Line,
+                        mapping.Line + 1,
                         filename ?? funcInfo.Filename,
                         funcInfo.IsRecompilation
                     );
@@ -669,10 +678,19 @@ public static void X{0:X}() {{
             parameters.GenerateExecutable = false;
             var res = compiler.CreateProvider().CompileAssemblyFromSource(parameters, pdbCode.ToString());
             if (res.Errors.Count > 0) {
-                Console.WriteLine("Error while generating symbols:");
+#if DEBUG
+                var tempPath = Path.GetTempFileName();
+                File.WriteAllText(tempPath, pdbCode.ToString());
+#endif
+                StringBuilder errors = new StringBuilder("Error while generating symbols:");
                 foreach (var error in res.Errors) {
-                    Console.WriteLine("    ", error);
+                    errors.AppendFormat("    {0}", error);
+                    errors.AppendLine();
                 }
+#if DEBUG
+                Console.WriteLine(errors.ToString());
+                MessageBox.Show("Code saved to: " + tempPath + Environment.NewLine + errors.ToString());
+#endif
             }
 
             ReadPdbSigAndAge(dllPath, out pdbSig, out pdbAge);
