@@ -15,7 +15,9 @@
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
+using System.IO;
 using System.Linq;
+using System.Net.NetworkInformation;
 using System.Threading;
 using System.Threading.Tasks;
 using Microsoft.NodejsTools.Debugger.Commands;
@@ -59,7 +61,8 @@ namespace Microsoft.NodejsTools.Debugger {
     /// <summary>
     /// Handles all interactions with a Node process which is being debugged.
     /// </summary>
-    class NodeDebugger : IDisposable {
+    class NodeDebugger : IDisposable, ISourceMapper
+    {
         private Process _process;
         private bool _attached;
         private readonly string _hostName;
@@ -74,6 +77,8 @@ namespace Microsoft.NodejsTools.Debugger {
         public readonly int MainThreadId = 1;
         private readonly Dictionary<string, NodeModule> _mapNameToScript = new Dictionary<string, NodeModule>(StringComparer.OrdinalIgnoreCase);
         private readonly Dictionary<int, NodeModule> _mapIdToScript = new Dictionary<int, NodeModule>();
+        private readonly Dictionary<string, JavaScriptSourceMapInfo> _originalFileToSourceMap = new Dictionary<string, JavaScriptSourceMapInfo>(StringComparer.OrdinalIgnoreCase);
+        private readonly Dictionary<string, SourceMap> _generatedFileToSourceMap = new Dictionary<string, SourceMap>(StringComparer.OrdinalIgnoreCase);
         private ExceptionHitTreatment _defaultExceptionTreatment = ExceptionHitTreatment.BreakAlways;
         private Dictionary<string, ExceptionHitTreatment> _exceptionTreatments = GetDefaultExceptionTreatments();
         private readonly Dictionary<int, string> _errorCodes = new Dictionary<int, string>();
@@ -238,7 +243,7 @@ namespace Microsoft.NodejsTools.Debugger {
         }
 
         private NodeDebugger() {
-            Connection = Connection ?? new DebuggerConnection();
+            Connection = Connection ?? new DebuggerConnection(_hostName, _portNumber);
             Client = Client ?? new DebuggerClient(Connection);
             CommandFactory = CommandFactory ?? new CommandFactory(
                 new SequentialNumberGenerator(),
@@ -259,7 +264,18 @@ namespace Microsoft.NodejsTools.Debugger {
             List<string[]> dirMapping,
             bool createNodeWindow = true) : this() {
 
-            string allArgs = "--debug-brk " + script;
+            var activeConnections =
+                from listener in IPGlobalProperties.GetIPGlobalProperties().GetActiveTcpListeners()
+                select listener.Port;
+            ushort debugPort = 5858;
+            if (activeConnections.Contains(debugPort)) {
+                debugPort = (ushort)Enumerable.Range(new Random().Next(5859, 6000), 60000).Except(activeConnections).First();
+            }
+
+            _hostName = "localhost";
+            _portNumber = debugPort;
+
+            var allArgs = String.Format("--debug-brk={0} {1}", debugPort, script);
             if (!string.IsNullOrEmpty(interpreterOptions)) {
                 allArgs += " " + interpreterOptions;
             }
@@ -491,18 +507,30 @@ namespace Microsoft.NodejsTools.Debugger {
             }
         }
 
+        /// <summary>
+        /// Adds a breakpoint in the specified file.  
+        /// 
+        /// Line number is 1 based
+        /// </summary>
         public NodeBreakpoint AddBreakPoint(
-            string fileName,
-            int lineNo,
+            string requestedFileName,
+            int requestedLineNo,
             bool enabled = true,
             BreakOn breakOn = new BreakOn(),
             string condition = null
             ) {
+            string fileName;
+            int lineNo;
+
+            MapToJavaScript(requestedFileName, requestedLineNo - 1, out fileName, out lineNo);
+            lineNo++;
             var res =
                 new NodeBreakpoint(
                     this,
                     fileName,
+                    requestedFileName,
                     lineNo,
+                    requestedLineNo,
                     enabled,
                     breakOn,
                     condition
@@ -596,7 +624,7 @@ namespace Microsoft.NodejsTools.Debugger {
         /// to give time to attach to debugger events.
         /// </summary>
         public void StartListening() {
-            Connection.ConnectTo(_hostName, _portNumber);
+            Connection.Connect(_hostName, _portNumber);
             ProcessConnect();
         }
 
@@ -671,7 +699,7 @@ namespace Microsoft.NodejsTools.Debugger {
                 NodeModule module;
                 if (!_mapNameToScript.TryGetValue(name, out module)) {
                     int id = newModule.ModuleId;
-                    module = new NodeModule(id, name);
+                    module = new NodeModule(this, id, name);
                     _mapNameToScript[name] = module;
                     _mapIdToScript[id] = module;
                     var modLoad = ModuleLoaded;
@@ -1409,5 +1437,113 @@ namespace Microsoft.NodejsTools.Debugger {
                    evaluateCommand.Result.Type == NodeExpressionType.Boolean &&
                    evaluateCommand.Result.StringValue == "true";
         }
+        #region Source Map Support
+
+        /// <summary>
+        /// Maps a line number from the original code to the generated JavaScript.
+        /// 
+        /// Line numbers are zero based.
+        /// </summary>
+        internal void MapToJavaScript(string requestedFileName, int requestedLineNo, out string fileName, out int lineNo) {
+            fileName = requestedFileName;
+            lineNo = requestedLineNo;
+            SourceMap sourceMap = GetSourceMap(requestedFileName);
+
+            if (sourceMap != null) {
+                SourceMapping result;
+                if (sourceMap.TryMapPointBack(requestedLineNo, 0, out result)) {
+                    lineNo = result.Line;
+                    fileName = Path.Combine(Path.GetDirectoryName(fileName), result.FileName);
+                    Debug.WriteLine("Mapped breakpoint from {0} {1} to {2} {3}", requestedFileName, requestedLineNo, fileName, lineNo);
+                }
+            }
+        }
+
+        class JavaScriptSourceMapInfo {
+            public readonly string[] Lines;
+            public readonly SourceMap Map;
+
+            public JavaScriptSourceMapInfo(SourceMap map, string[] lines) {
+                Map = map;
+                Lines = lines;
+            }
+        }
+
+        /// <summary>
+        /// Gets a source mapping for the given filename.  Line numbers are zero based.
+        /// </summary>
+        public SourceMapping MapToOriginal(string filename, int line) {
+            JavaScriptSourceMapInfo mapInfo;
+            if (!_originalFileToSourceMap.TryGetValue(filename, out mapInfo)) {
+                if (File.Exists(filename)) {
+                    var contents = File.ReadAllLines(filename);
+                    const string marker = "# sourceMappingURL=";
+                    int markerStart;
+                    var markerLine = contents.Reverse().FirstOrDefault(x => x.IndexOf(marker) != -1);
+                    if (markerLine != null && (markerStart = markerLine.IndexOf(marker)) != -1) {
+                        string sourceMapFilename = markerLine.Substring(markerStart + marker.Length).Trim();
+                        if (!File.Exists(sourceMapFilename)) {
+                            sourceMapFilename = Path.Combine(Path.GetDirectoryName(filename), Path.GetFileName(sourceMapFilename));
+                        }
+
+                        if (File.Exists(sourceMapFilename)) {
+                            try {
+                                _originalFileToSourceMap[filename] = mapInfo = new JavaScriptSourceMapInfo(new SourceMap(new StreamReader(sourceMapFilename)), contents);
+                            } catch (InvalidOperationException) {
+                                _originalFileToSourceMap[filename] = null;
+                            } catch (NotSupportedException) {
+                                _originalFileToSourceMap[filename] = null;
+                            }
+                        }
+                    }
+                }
+            }
+            if (mapInfo != null) {
+                SourceMapping mapping;
+                int column = 0;
+                if (line < mapInfo.Lines.Length) {
+                    var lineText = mapInfo.Lines[line];
+                    // map to the 1st non-whitespace character on the line
+                    // This ensures we get the correct line number, mapping to column 0
+                    // can give us the previous line.
+                    if (!String.IsNullOrWhiteSpace(lineText)) {
+                        for (; column < lineText.Length; column++) {
+                            if (!Char.IsWhiteSpace(lineText[column])) {
+                                break;
+                            }
+                        }
+                    }
+                }
+                if (mapInfo.Map.TryMapPoint(line, column, out mapping)) {
+                    return mapping;
+                }
+            }
+            return null;
+        }
+
+        private SourceMap GetSourceMap(string fileName) {
+            SourceMap sourceMap;
+            if (!_generatedFileToSourceMap.TryGetValue(fileName, out sourceMap)) {
+                // see if we are using source maps for this file.
+                if (!String.Equals(Path.GetExtension(fileName), NodejsConstants.FileExtension, StringComparison.OrdinalIgnoreCase)) {
+                    string baseFile = fileName.Substring(0, fileName.Length - Path.GetExtension(fileName).Length);
+                    if (File.Exists(baseFile + ".js") && File.Exists(baseFile + ".js.map")) {
+                        // we're using source maps...
+                        try {
+                            _generatedFileToSourceMap[fileName] = sourceMap = new SourceMap(new StreamReader(baseFile + ".js.map"));
+                        } catch (NotSupportedException) {
+                            _generatedFileToSourceMap[fileName] = null;
+                        } catch (InvalidOperationException) {
+                            _generatedFileToSourceMap[fileName] = null;
+                        }
+                    } else {
+                        _generatedFileToSourceMap[fileName] = null;
+                    }
+                }
+            }
+            return sourceMap;
+        }
+
+        #endregion
     }
 }

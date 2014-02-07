@@ -56,7 +56,7 @@ namespace TestUtilities.UI {
         }
 
         public AutomationElement FindByName(string name) {
-            return Element.FindFirst(
+            return FindFirstWithRetry(
                 TreeScope.Descendants,
                 new PropertyCondition(
                     AutomationElement.NameProperty,
@@ -65,11 +65,26 @@ namespace TestUtilities.UI {
             );
         }
 
+        private AutomationElement FindFirstWithRetry(TreeScope scope, Condition condition) {
+            AutomationElement res = null;
+            for (int i = 0; i < 20 && res == null; i++) {
+                res = Element.FindFirst(scope, condition);
+                if (res == null) {
+                    Console.WriteLine("Failed to find element {0} on try {1}", condition, i);
+                    if (i == 0) {
+                        Console.WriteLine(new StackTrace(true).ToString());
+                    }
+                    System.Threading.Thread.Sleep(500);
+                }
+            }
+            return res;
+        }
+
         /// <summary>
         /// Finds the first descendent with the given automation ID.
         /// </summary>
         public AutomationElement FindByAutomationId(string automationId) {
-            return Element.FindFirst(
+            return FindFirstWithRetry(
                 TreeScope.Descendants,
                 new PropertyCondition(
                     AutomationElement.AutomationIdProperty,
@@ -84,7 +99,7 @@ namespace TestUtilities.UI {
         /// <param name="text"></param>
         /// <returns></returns>
         public AutomationElement FindButton(string text) {
-            return Element.FindFirst(
+            return FindFirstWithRetry(
                 TreeScope.Descendants,
                 new AndCondition(
                     new OrCondition(
@@ -111,7 +126,7 @@ namespace TestUtilities.UI {
         /// <param name="ctlType">The ControlType you wish to find</param>
         /// <returns></returns>
         public AutomationElement FindFirstByControlType(ControlType ctlType) {
-            return Element.FindFirst(
+            return FindFirstWithRetry(
                 TreeScope.Descendants,
                 new PropertyCondition(
                     AutomationElement.ControlTypeProperty,
@@ -126,7 +141,7 @@ namespace TestUtilities.UI {
         /// <param name="ctlType">The ControlType you wish to find</param>
         /// <returns></returns>
         public AutomationElement FindFirstByNameAndAutomationId(string name, string automationId) {
-            return Element.FindFirst(
+            return FindFirstWithRetry(
                 TreeScope.Descendants,
                 new AndCondition(
                     new PropertyCondition(
@@ -147,7 +162,7 @@ namespace TestUtilities.UI {
         /// <param name="ctlType">The ControlType you wish to find</param>
         /// <returns></returns>
         public AutomationElement FindFirstByControlType(string name, ControlType ctlType) {
-            return Element.FindFirst(
+            return FindFirstWithRetry(
                 TreeScope.Descendants,
                 new AndCondition(
                     new PropertyCondition(
@@ -179,10 +194,19 @@ namespace TestUtilities.UI {
 
         #region Pattern Helpers
 
+        private static void CheckNullElement(AutomationElement element) {
+            if (element == null) {
+                Console.WriteLine("Attempting to invoke pattern on null element");
+                AutomationWrapper.DumpVS();
+                throw new InvalidOperationException();
+            }
+        }
+
         /// <summary>
         /// Invokes the specified invokable item.  The item must support the invoke pattern.
         /// </summary>
         public static void Invoke(AutomationElement button) {
+            CheckNullElement(button);
             var invokePattern = (InvokePattern)button.GetCurrentPattern(InvokePattern.Pattern);
             invokePattern.Invoke();
         }
@@ -192,6 +216,7 @@ namespace TestUtilities.UI {
         /// </summary>
         /// <param name="selectionItem"></param>
         public static void Select(AutomationElement selectionItem) {
+            CheckNullElement(selectionItem);
             var selectPattern = (SelectionItemPattern)selectionItem.GetCurrentPattern(SelectionItemPattern.Pattern);
             selectPattern.Select();
         }
@@ -201,6 +226,7 @@ namespace TestUtilities.UI {
         /// </summary>
         /// <param name="selectionItem"></param>
         public static void AddToSelection(AutomationElement selectionItem) {
+            CheckNullElement(selectionItem);
             var selectPattern = (SelectionItemPattern)selectionItem.GetCurrentPattern(SelectionItemPattern.Pattern);
             selectPattern.AddToSelection();
         }
@@ -217,6 +243,7 @@ namespace TestUtilities.UI {
         /// </summary>
         /// <param name="node"></param>
         public static void EnsureExpanded(AutomationElement node) {
+            CheckNullElement(node);
             ExpandCollapsePattern pat = (ExpandCollapsePattern)node.GetCurrentPattern(ExpandCollapsePattern.Pattern);
             if (pat.Current.ExpandCollapseState == ExpandCollapseState.Collapsed) {
                 pat.Expand();
@@ -228,12 +255,12 @@ namespace TestUtilities.UI {
         /// </summary>
         /// <param name="node"></param>
         public static void Collapse(AutomationElement node) {
+            CheckNullElement(node);
             ExpandCollapsePattern pat = (ExpandCollapsePattern)node.GetCurrentPattern(ExpandCollapsePattern.Pattern);
             if (pat.Current.ExpandCollapseState != ExpandCollapseState.Collapsed) {
                 pat.Collapse();
             }
         }
-
 
         /// <summary>
         /// Gets the specified value from this element.  The element must support the value pattern.
@@ -261,6 +288,13 @@ namespace TestUtilities.UI {
             IntPtr hwnd;
             uiShell.GetDialogOwnerHwnd(out hwnd);
             AutomationWrapper.DumpElement(AutomationElement.FromHandle(hwnd));
+
+            // if we have a dialog open dump the main VS window too
+            var mainHwnd = new IntPtr(VsIdeTestHostContext.Dte.MainWindow.HWnd);
+            if (mainHwnd != hwnd) {
+                Console.WriteLine("VS: ");
+                AutomationWrapper.DumpElement(AutomationElement.FromHandle(mainHwnd));
+            }
         }
 
         public static void DumpElement(AutomationElement element) {

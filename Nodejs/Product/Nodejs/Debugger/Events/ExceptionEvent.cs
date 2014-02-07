@@ -36,7 +36,7 @@ namespace Microsoft.NodejsTools.Debugger.Events {
             ExceptionName = GetExceptionName(message);
             ErrorNumber = GetExceptionCodeRef(message);
 
-            Module = new NodeModule(scriptId, filename);
+            Module = new NodeModule(null, scriptId, filename);
         }
 
         public string ExceptionName { get; private set; }

@@ -26,7 +26,7 @@ namespace Microsoft.NodejsTools.Debugger.Events {
             var scriptId = (int)message["body"]["script"]["id"];
             var filename = (string)message["body"]["script"]["name"];
 
-            Module = new NodeModule(scriptId, filename);
+            Module = new NodeModule(null, scriptId, filename);
             Breakpoints = message["body"]["breakpoints"].Values<int>().ToList();
         }
 

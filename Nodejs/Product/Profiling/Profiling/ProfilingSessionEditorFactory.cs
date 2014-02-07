@@ -27,7 +27,7 @@ namespace Microsoft.NodejsTools.Profiling {
     /// <summary>
     /// Factory for creating our editor object. Extends from the IVsEditoryFactory interface
     /// </summary>
-    [Guid(GuidList.guidProfilingEditorFactoryString)]
+    [Guid(Guids.ProfilingEditorFactoryString)]
     sealed class ProfilingSessionEditorFactory : IVsEditorFactory, IDisposable {
         private readonly NodejsProfilingPackage _editorPackage;
         private ServiceProvider _vsServiceProvider;
@@ -158,7 +158,7 @@ namespace Microsoft.NodejsTools.Profiling {
             // Initialize to null
             ppunkDocView = IntPtr.Zero;
             ppunkDocData = IntPtr.Zero;
-            pguidCmdUI = GuidList.guidProfilingEditorFactory;
+            pguidCmdUI = Guids.ProfilingEditorFactory;
             pgrfCDW = 0;
             pbstrEditorCaption = null;
 

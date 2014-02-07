@@ -55,3 +55,5 @@ var indexfolder = require('./indexfolder');
 var indexfolder2 = require('./indexfolder/');
 
 extravariable = 0;
+
+var resolve_path = require(require('path').resolve('./indexfolder'));

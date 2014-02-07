@@ -16,21 +16,26 @@ using System;
 using System.Threading.Tasks;
 
 namespace Microsoft.NodejsTools.Debugger.Communication {
-    interface IDebuggerConnection : IDisposable {
+    interface IDebuggerConnection {
         /// <summary>
         /// Gets a value indicating whether connection established.
         /// </summary>
         bool Connected { get; }
 
         /// <summary>
-        /// Connect to specified endpoint.
+        /// Connect to debugger.
+        /// </summary>
+        void Connect();
+
+        /// <summary>
+        /// Connect to specified debugger endpoint.
         /// </summary>
         /// <param name="host">Host address.</param>
         /// <param name="port">Port number.</param>
-        void ConnectTo(string host, int port);
+        void Connect(string host, ushort port);
 
         /// <summary>
-        /// Close connect.
+        /// Close connection.
         /// </summary>
         void Close();
 

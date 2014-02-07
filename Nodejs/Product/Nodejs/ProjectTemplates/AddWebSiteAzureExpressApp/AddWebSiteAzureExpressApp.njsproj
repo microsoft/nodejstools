@@ -37,6 +37,7 @@
     <Content Include="README.md" />
     <Content Include="views\index.jade" />
     <Content Include="views\layout.jade" />
+    <Content Include="iisnode.yml"/>
   </ItemGroup>
   <ItemGroup>
     <Folder Include="public\" />

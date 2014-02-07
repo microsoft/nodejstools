@@ -95,7 +95,7 @@ namespace Microsoft.VisualStudioTools.Project
         [Conditional("DEBUG")]
         internal void MustBeCalledFromUIThread()
         {
-            Debug.Assert(this.uithread == System.Threading.Thread.CurrentThread || this.isUnitTestingMode, "This must be called from the GUI thread");
+            Debug.Assert(IsUIThread || this.isUnitTestingMode, "This must be called from the GUI thread");
         }
 
         /// <summary>
@@ -184,7 +184,7 @@ namespace Microsoft.VisualStudioTools.Project
         internal T RunSync<T>(Func<T> a) {
             T retValue = default(T);
             if (this.isUnitTestingMode || IsUIThread) {
-                return a();                
+                return a();
             }
             Exception exn = null; ;
             Debug.Assert(this.synchronizationContext != null, "The SynchronizationContext must be captured before calling this method");

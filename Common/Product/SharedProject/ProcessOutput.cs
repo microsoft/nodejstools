@@ -59,6 +59,44 @@ namespace Microsoft.VisualStudioTools.Project{
         }
     }
 
+    sealed class TeeRedirector : Redirector, IDisposable {
+        private readonly Redirector[] _redirectors;
+
+        public TeeRedirector(params Redirector[] redirectors) {
+            _redirectors = redirectors;
+        }
+
+        public void Dispose() {
+            foreach (var redir in _redirectors.OfType<IDisposable>()) {
+                redir.Dispose();
+            }
+        }
+
+        public override void WriteLine(string line) {
+            foreach (var redir in _redirectors) {
+                redir.WriteLine(line);
+            }
+        }
+
+        public override void WriteErrorLine(string line) {
+            foreach (var redir in _redirectors) {
+                redir.WriteErrorLine(line);
+            }
+        }
+
+        public override void Show() {
+            foreach (var redir in _redirectors) {
+                redir.Show();
+            }
+        }
+
+        public override void ShowAndActivate() {
+            foreach (var redir in _redirectors) {
+                redir.ShowAndActivate();
+            }
+        }
+    }
+
     /// <summary>
     /// Represents a process and its captured output.
     /// </summary>
@@ -308,8 +346,7 @@ namespace Microsoft.VisualStudioTools.Project{
             _process.Exited += OnExited;
             _process.EnableRaisingEvents = true;
 
-            try
-            {
+            try {
                 _process.Start();
             } catch (Exception ex) {
                 _error.AddRange(SplitLines(ex.ToString()));

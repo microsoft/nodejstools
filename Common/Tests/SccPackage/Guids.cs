@@ -18,7 +18,7 @@ using System;
 
 namespace Microsoft.TestSccPackage
 {
-    static class GuidList
+    static class Guids
     {
         public const string guidSccPackagePkgString = "49e63f87-6b69-42ca-9496-1e20a919ef1f";
         public const string guidSccPackageCmdSetString = "045cf08e-e640-42c4-af80-0251d6f553a1";

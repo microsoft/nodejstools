@@ -24,8 +24,10 @@ using System.Windows.Threading;
 using Microsoft.Build.Framework;
 using Microsoft.Build.Utilities;
 using Microsoft.VisualStudio;
+using Microsoft.VisualStudio.Settings;
 using Microsoft.VisualStudio.Shell;
 using Microsoft.VisualStudio.Shell.Interop;
+using Microsoft.VisualStudio.Shell.Settings;
 using Microsoft.Win32;
 using IOleServiceProvider = Microsoft.VisualStudio.OLE.Interop.IServiceProvider;
 
@@ -39,10 +41,8 @@ namespace Microsoft.VisualStudioTools.Project
     {
         #region fields
 
-        // TODO: Remove these constants when we have a version that suppoerts getting the verbosity using automation.
-        private string buildVerbosityRegistryRoot = @"Software\Microsoft\VisualStudio\10.0";
-        private const string buildVerbosityRegistrySubKey = @"General";
-        private const string buildVerbosityRegistryKey = "MSBuildLoggerVerbosity";
+        private const string GeneralCollection = @"General";
+        private const string BuildVerbosityProperty = "MSBuildLoggerVerbosity";
 
         private int currentIndent;
         private IVsOutputWindowPane outputWindowPane;
@@ -91,20 +91,6 @@ namespace Microsoft.VisualStudioTools.Project
         }
 
         /// <summary>
-        /// When building from within VS, setting this will
-        /// enable the logger to retrive the verbosity from
-        /// the correct registry hive.
-        /// </summary>
-        internal string BuildVerbosityRegistryRoot
-        {
-            get { return this.buildVerbosityRegistryRoot; }
-            set
-            {
-                this.buildVerbosityRegistryRoot = value;
-            }
-        }
-
-        /// <summary>
         /// Set to null to avoid writing to the output window
         /// </summary>
         internal IVsOutputWindowPane OutputWindowPane
@@ -120,8 +106,7 @@ namespace Microsoft.VisualStudioTools.Project
         /// <summary>
         /// Constructor.  Inititialize member data.
         /// </summary>
-        public IDEBuildLogger(IVsOutputWindowPane output, TaskProvider taskProvider, IVsHierarchy hierarchy)
-        {
+        public IDEBuildLogger(IVsOutputWindowPane output, TaskProvider taskProvider, IVsHierarchy hierarchy) {
             UIThread.Instance.MustBeCalledFromUIThread();
 
             Utilities.ArgumentNotNull("taskProvider", taskProvider);
@@ -490,7 +475,7 @@ namespace Microsoft.VisualStudioTools.Project
                     logIt = true;
                     break;
                 default:
-                    Debug.Fail("Unknown Verbosity level. Ignoring will cause everything to be logged");
+                    Debug.Fail("Unknown Verbosity level. Ignoring will cause nothing to be logged");
                     break;
             }
 
@@ -526,20 +511,27 @@ namespace Microsoft.VisualStudioTools.Project
         /// </summary>
         private void SetVerbosity()
         {
-            // TODO: This should be replaced when we have a version that supports automation.
             if (!this.haveCachedVerbosity)
             {
-                string verbosityKey = String.Format(CultureInfo.InvariantCulture, @"{0}\{1}", BuildVerbosityRegistryRoot, buildVerbosityRegistrySubKey);
-                using (RegistryKey subKey = Registry.CurrentUser.OpenSubKey(verbosityKey))
+                this.Verbosity = LoggerVerbosity.Normal;
+
+                try
                 {
-                    if (subKey != null)
+                    var settings = new ShellSettingsManager(serviceProvider);
+                    var store = settings.GetReadOnlySettingsStore(SettingsScope.UserSettings);
+                    if (store.CollectionExists(GeneralCollection) && store.PropertyExists(GeneralCollection, BuildVerbosityProperty))
                     {
-                        object valueAsObject = subKey.GetValue(buildVerbosityRegistryKey);
-                        if (valueAsObject != null)
-                        {
-                            this.Verbosity = (LoggerVerbosity)((int)valueAsObject);
-                        }
+                        this.Verbosity = (LoggerVerbosity)store.GetInt32(GeneralCollection, BuildVerbosityProperty, (int)LoggerVerbosity.Normal);
                     }
+                }
+                catch (Exception ex)
+                {
+                    var message = string.Format(
+                        "Unable to read verbosity option from the registry.{0}{1}",
+                        Environment.NewLine,
+                        ex.ToString()
+                    );
+                    this.QueueOutputText(MessageImportance.High, message);
                 }
 
                 this.haveCachedVerbosity = true;

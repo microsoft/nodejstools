@@ -22,7 +22,7 @@ namespace Microsoft.NodejsTools.Debugger.Commands {
         private readonly Dictionary<int, NodeModule> _modules;
         private readonly IEvaluationResultFactory _resultFactory;
         private readonly NodeThread _thread;
-        private readonly NodeModule _unknownModule = new NodeModule(-1, "<unknown>");
+        private readonly NodeModule _unknownModule = new NodeModule(null, -1, "<unknown>");
 
         public BacktraceCommand(int id, IEvaluationResultFactory resultFactory,
             int fromFrame,
@@ -74,6 +74,7 @@ namespace Microsoft.NodejsTools.Debugger.Commands {
                 // Create stack frame
                 string name = GetFrameName(frame);
                 var moduleId = (int)frame["func"]["scriptId"];
+                
                 NodeModule module;
                 if (!modules.TryGetValue(moduleId, out module)) {
                     module = _unknownModule;
@@ -128,7 +129,7 @@ namespace Microsoft.NodejsTools.Debugger.Commands {
                 var scriptId = (int)reference["id"];
                 var filename = (string)reference["name"];
 
-                scripts.Add(scriptId, new NodeModule(scriptId, filename));
+                scripts.Add(scriptId, new NodeModule(null, scriptId, filename));
             }
             return scripts;
         }

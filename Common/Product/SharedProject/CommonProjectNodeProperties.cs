@@ -23,7 +23,7 @@ namespace Microsoft.VisualStudioTools.Project {
     [ComVisible(true)]
     [ClassInterface(ClassInterfaceType.AutoDual)]
     public class CommonProjectNodeProperties : ProjectNodeProperties, IVsCfgBrowseObject, VSLangProj.ProjectProperties {
-        private OAProjectConfigurationProperties _activeCfgSettings; 
+        private OAProjectConfigurationProperties _activeCfgSettings;
 
         internal CommonProjectNodeProperties(ProjectNode node)
             : base(node) {
@@ -51,7 +51,7 @@ namespace Microsoft.VisualStudioTools.Project {
                     this.Node.ProjectMgr.SetProjectProperty(
                         CommonConstants.StartupFile,
                         CommonUtils.GetRelativeFilePath(
-                            Node.ProjectMgr.ProjectHome,
+                            Node.ProjectMgr.ProjectHome, 
                             Path.Combine(Node.ProjectMgr.ProjectHome, value)
                         )
                     );
@@ -338,7 +338,7 @@ namespace Microsoft.VisualStudioTools.Project {
             }
             set {
                 throw new System.NotImplementedException();
-        }
+            }
         }
 
         [Browsable(false)]
@@ -350,11 +350,11 @@ namespace Microsoft.VisualStudioTools.Project {
         public string ReferencePath {
             get {
                 throw new System.NotImplementedException();
-                    }
+            }
             set {
                 throw new System.NotImplementedException();
-                }
             }
+        }
 
         [Browsable(false)]
         public string ServerExtensionsVersion {
@@ -380,7 +380,7 @@ namespace Microsoft.VisualStudioTools.Project {
 
         [Browsable(false)]
         public string URL {
-            get { return CommonUtils.MakeUri(Node.ProjectMgr.Url, false, UriKind.Absolute).AbsoluteUri;  }
+            get { return CommonUtils.MakeUri(Node.ProjectMgr.Url, false, UriKind.Absolute).AbsoluteUri; }
         }
 
         [Browsable(false)]
@@ -411,7 +411,7 @@ namespace Microsoft.VisualStudioTools.Project {
         [Browsable(false)]
         public object __project {
             get { throw new System.NotImplementedException(); }
-            }
+        }
 
         [Browsable(false)]
         public object get_Extender(string ExtenderName) {

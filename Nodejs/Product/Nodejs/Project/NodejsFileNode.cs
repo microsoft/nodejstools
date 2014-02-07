@@ -115,7 +115,7 @@ namespace Microsoft.NodejsTools.Project {
             Debug.Assert(this.ProjectMgr != null, "The Dynamic FileNode has no project manager");
 
             Utilities.CheckNotNull(this.ProjectMgr);
-            if (guidCmdGroup == GuidList.guidNodeCmdSet) {
+            if (guidCmdGroup == Guids.NodejsCmdSet) {
                 switch (cmd) {
                     case PkgCmdId.cmdidSetAsNodejsStartupFile:
                         // Set the StartupFile project property to the Url of this node
@@ -131,7 +131,7 @@ namespace Microsoft.NodejsTools.Project {
         }
 
         internal override int QueryStatusOnNode(Guid guidCmdGroup, uint cmd, IntPtr pCmdText, ref QueryStatusResult result) {
-            if (guidCmdGroup == GuidList.guidNodeCmdSet) {
+            if (guidCmdGroup == Guids.NodejsCmdSet) {
                 if (this.ProjectMgr.IsCodeFile(this.Url)) {
                     switch (cmd) {
                         case PkgCmdId.cmdidSetAsNodejsStartupFile:

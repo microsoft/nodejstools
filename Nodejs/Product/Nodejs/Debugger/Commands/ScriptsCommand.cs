@@ -41,7 +41,7 @@ namespace Microsoft.NodejsTools.Debugger.Commands {
                 var source = (string)module["source"];
                 var name = (string)module["name"];
 
-                Modules.Add(new NodeModule(id, name, source));
+                Modules.Add(new NodeModule(null, id, name, source));
             }
         }
     }

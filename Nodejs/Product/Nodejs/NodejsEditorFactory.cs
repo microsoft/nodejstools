@@ -35,7 +35,7 @@ namespace Microsoft.NodejsTools {
     /// <summary>
     /// Common factory for creating our editor
     /// </summary>    
-    [Guid(GuidList.guidNodeEditorFactoryString)]
+    [Guid(Guids.NodejsEditorFactoryString)]
     class NodejsEditorFactory : IVsEditorFactory {
         private NodejsPackage _package;
         private ServiceProvider _serviceProvider;
@@ -382,7 +382,7 @@ namespace Microsoft.NodejsTools {
         }
     }
 
-    [Guid(GuidList.guidNodeEditorFactoryStringPromptEncoding)]
+    [Guid(Guids.NodejsEditorFactoryPromptEncodingString)]
     class NodejsEditorFactoryPromptForEncoding : NodejsEditorFactory {
         public NodejsEditorFactoryPromptForEncoding(NodejsPackage package) : base(package, true) { }
         public override int CreateEditorInstance(uint createEditorFlags, string documentMoniker, string physicalView, VisualStudio.Shell.Interop.IVsHierarchy hierarchy, uint itemid, IntPtr docDataExisting, out IntPtr docView, out IntPtr docData, out string editorCaption, out Guid commandUIGuid, out int createDocumentWindowFlags) {

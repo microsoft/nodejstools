@@ -697,7 +697,7 @@ namespace Microsoft.VisualStudioTools.Project {
 
         private void MergeDiskNodes(HierarchyNode curParent, string dir) {
             var merger = new DiskMerger(this, curParent, dir);
-            while (merger.ContinueMerge()) {
+            while (merger.ContinueMerge(ParentHierarchy != null)) {
             }
         }
 
@@ -966,7 +966,7 @@ namespace Microsoft.VisualStudioTools.Project {
                     if (merger != null) {
                         // we have more file merges to process, do this
                         // before reflecting any other pending updates...
-                        if (!merger.ContinueMerge()) {
+                        if (!merger.ContinueMerge(ParentHierarchy != null)) {
                             _currentMerger = null;
                         }
                         continue;
@@ -1149,21 +1149,6 @@ namespace Microsoft.VisualStudioTools.Project {
                 return base.GetGuidProperty(propid, out guid);
             }
             return VSConstants.S_OK;
-        }
-
-        protected override bool IsItemTypeFileType(string type) {
-            if (!base.IsItemTypeFileType(type)) {
-                if (String.Compare(type, "Page", StringComparison.OrdinalIgnoreCase) == 0
-                || String.Compare(type, "ApplicationDefinition", StringComparison.OrdinalIgnoreCase) == 0
-                || String.Compare(type, "Resource", StringComparison.OrdinalIgnoreCase) == 0) {
-                    return true;
-                } else {
-                    return false;
-                }
-            } else {
-                //This is a well known item node type, so return true.
-                return true;
-            }
         }
 
         protected override NodeProperties CreatePropertiesObject() {
@@ -1468,7 +1453,7 @@ namespace Microsoft.VisualStudioTools.Project {
             return CreateFileNode(new MsBuildProjectElement(this, path, GetItemType(path)));
         }
 
-        internal string GetItemType(string filename) {
+        protected virtual string GetItemType(string filename) {
             if (IsCodeFile(filename)) {
                 return "Compile";
             } else {

@@ -184,7 +184,8 @@ namespace NodejsTests {
 
             AssertUtil.ContainsExactly(proj.Descendants(proj.GetName("Compile")).Select(x => x.Attribute("Include").Value),
                 "server.js",
-                "node_modules\\mymod.js");
+                "node_modules\\mymod.js",
+                "node_modules\\.bin\\myapp.js");
         }
 
         [TestMethod, Priority(0)]
@@ -257,6 +258,27 @@ namespace NodejsTests {
                 await Dispatcher.Yield();
                 Assert.AreEqual("HelloWorld31.njsproj", Path.GetFileName(settings.ProjectPath));
             });
+        }
+
+        [TestMethod, Priority(0)]
+        public void ImportWizardTypeScript() {
+            var settings = new ImportSettings();
+
+            settings.SourcePath = TestData.GetPath("TestData\\HelloWorldTypeScript\\");
+            settings.Filters = "*.ts;*.md;*.json";
+            settings.StartupFile = "server.ts";
+            settings.ExcludeNodeModules = false;
+            settings.ProjectPath = TestData.GetPath("TestData\\TestDestination\\TsSubdirectory\\ProjectName.njsproj");
+
+            var path = settings.CreateRequestedProject();
+
+            Assert.AreEqual(settings.ProjectPath, path);
+            var proj = XDocument.Load(path);
+
+            AssertUtil.ContainsExactly(proj.Descendants(proj.GetName("TypeScriptCompile")).Select(x => x.Attribute("Include").Value),
+                "server.ts");
+
+            Assert.AreEqual("server.js", proj.Descendant("StartupFile").Value);
         }
 
         /// <summary>

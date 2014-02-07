@@ -27,7 +27,7 @@ namespace Microsoft.NodejsTools.Profiling {
         internal static PerfToolWindow Instance;
 
         public PerfToolWindow() {
-            ToolClsid = GuidList.VsUIHierarchyWindow_guid;
+            ToolClsid = Guids.VsUIHierarchyWindow;
             Caption = Title;
             Instance = this;
         }
@@ -55,7 +55,7 @@ namespace Microsoft.NodejsTools.Profiling {
             object otbh;
             Microsoft.VisualStudio.ErrorHandler.ThrowOnFailure(frame.GetProperty((int)__VSFPROPID.VSFPROPID_ToolbarHost, out otbh));
             IVsToolWindowToolbarHost tbh = otbh as IVsToolWindowToolbarHost;
-            Guid guidPerfMenuGroup = GuidList.guidNodeProfilingCmdSet;
+            Guid guidPerfMenuGroup = Guids.NodejsProfilingCmdSet;
             Microsoft.VisualStudio.ErrorHandler.ThrowOnFailure(tbh.AddToolbar(VSTWT_LOCATION.VSTWT_TOP, ref guidPerfMenuGroup, PkgCmdIDList.menuIdPerfToolbar));
         }
 

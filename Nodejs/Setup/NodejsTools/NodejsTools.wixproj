@@ -40,6 +40,14 @@
       <RefTargetDir>INSTALLLOCATION</RefTargetDir>
       <DoNotHarvest>true</DoNotHarvest>
     </ProjectReference>
+    <ProjectReference Include="$(BuildRoot)\Nodejs\Product\TestAdapter\TestAdapter.csproj">
+      <Name>Microsoft.NodejsTools.TestAdapter</Name>
+      <Project>{3FC57837-519D-4980-A8E8-DC5879DDA002}</Project>
+      <Private>True</Private>
+      <RefProjectOutputGroups>Binaries</RefProjectOutputGroups>
+      <RefTargetDir>INSTALLLOCATION</RefTargetDir>
+      <DoNotHarvest>true</DoNotHarvest>
+    </ProjectReference>
   </ItemGroup>
   <Import Project="..\SetupProjectAfter.settings" />
 </Project>
