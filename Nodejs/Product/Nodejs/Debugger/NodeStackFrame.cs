@@ -132,7 +132,7 @@ namespace Microsoft.NodejsTools.Debugger {
         /// <param name="text">Text expression.</param>
         /// <param name="completion">Completion callback.</param>
         public virtual void ExecuteText(string text, Action<NodeEvaluationResult> completion) {
-            _thread.Process.ExecuteText(text, this, completion);
+            completion(_thread.Process.ExecuteTextAsync(text, this).Result);
         }
 
         /// <summary>

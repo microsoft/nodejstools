@@ -13,22 +13,23 @@
  * ***************************************************************************/
 
 using Microsoft.VisualStudioTools.Project;
+using Newtonsoft.Json.Linq;
 
 namespace Microsoft.NodejsTools.Debugger.Serialization {
     class NodeBacktraceVariable : INodeVariable {
-        public NodeBacktraceVariable(NodeStackFrame stackFrame, JsonValue parameter) {
+        public NodeBacktraceVariable(NodeStackFrame stackFrame, JToken parameter) {
             Utilities.ArgumentNotNull("stackFrame", stackFrame);
             Utilities.ArgumentNotNull("parameter", parameter);
 
-            JsonValue value = parameter["value"];
-            Id = value.GetValue<int>("ref");
+            JToken value = parameter["value"];
+            Id = (int)value["ref"];
             Parent = null;
             StackFrame = stackFrame;
-            Name = parameter.GetValue<string>("name") ?? NodeVariableType.AnonymousVariable;
-            TypeName = value.GetValue<string>("type");
-            Value = value.GetValue<string>("value");
-            Class = value.GetValue<string>("className");
-            Text = value.GetValue<string>("text");
+            Name = (string)parameter["name"] ?? NodeVariableType.AnonymousVariable;
+            TypeName = (string)value["type"];
+            Value = (string)value["value"];
+            Class = (string)value["className"];
+            Text = (string)value["text"];
             Attributes = NodePropertyAttributes.ReadOnly;
             Type = NodePropertyType.Normal;
         }

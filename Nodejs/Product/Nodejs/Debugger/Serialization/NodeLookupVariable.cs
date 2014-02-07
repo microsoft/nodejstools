@@ -14,25 +14,26 @@
 
 using System.Collections.Generic;
 using Microsoft.VisualStudioTools.Project;
+using Newtonsoft.Json.Linq;
 
 namespace Microsoft.NodejsTools.Debugger.Serialization {
     class NodeLookupVariable : INodeVariable {
-        public NodeLookupVariable(NodeEvaluationResult parent, JsonValue property, Dictionary<int, JsonValue> references) {
+        public NodeLookupVariable(NodeEvaluationResult parent, JToken property, Dictionary<int, JToken> references) {
             Utilities.ArgumentNotNull("parent", parent);
             Utilities.ArgumentNotNull("property", property);
             Utilities.ArgumentNotNull("references", references);
 
-            Id = property.GetValue<int>("ref");
-            JsonValue reference = references[Id];
+            Id = (int)property["ref"];
+            JToken reference = references[Id];
             Parent = parent;
             StackFrame = parent.Frame;
-            Name = property.GetValue<string>("name");
-            TypeName = reference.GetValue<string>("type");
-            Value = reference.GetValue<string>("value");
-            Class = reference.GetValue<string>("className");
-            Text = reference.GetValue<string>("text");
-            Attributes = (NodePropertyAttributes)property.GetValue<int>("attributes");
-            Type = (NodePropertyType)property.GetValue<int>("propertyType");
+            Name = (string)property["name"];
+            TypeName = (string)reference["type"];
+            Value = (string)reference["value"];
+            Class = (string)reference["className"];
+            Text = (string)reference["text"];
+            Attributes = (NodePropertyAttributes)(int)property["attributes"];
+            Type = (NodePropertyType)(int)property["propertyType"];
         }
 
         public int Id { get; private set; }

@@ -12,13 +12,15 @@
  *
  * ***************************************************************************/
 
-namespace Microsoft.NodejsTools.Debugger.Serialization {
-    interface INodeEvaluationResultFactory {
-        /// <summary>
-        /// Creates a new <see cref="NodeEvaluationResult" />.
-        /// </summary>
-        /// <param name="variable">Variable provider.</param>
-        /// <returns>Result.</returns>
-        NodeEvaluationResult Create(INodeVariable variable);
+using System;
+using Microsoft.NodejsTools.Debugger.Events;
+
+namespace Microsoft.NodejsTools.Debugger.Communication {
+    sealed class BreakpointEventArgs : EventArgs {
+        public BreakpointEventArgs(BreakpointEvent breakpointEvent) {
+            BreakpointEvent = breakpointEvent;
+        }
+
+        public BreakpointEvent BreakpointEvent { get; private set; }
     }
 }

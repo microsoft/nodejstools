@@ -17,10 +17,9 @@ using System.Diagnostics;
 
 namespace Microsoft.NodejsTools.Debugger {
     class NodeBreakpointBinding {
-        private NodeBreakpoint _breakpoint;
-        private int _lineNo;
-        private int _breakpointId;
-        private int? _scriptID;
+        private readonly NodeBreakpoint _breakpoint;
+        private readonly int _breakpointId;
+        private readonly int? _scriptID;
         private bool _enabled;
         private bool _engineEnabled;
         private BreakOn _breakOn;
@@ -28,8 +27,6 @@ namespace Microsoft.NodejsTools.Debugger {
         private uint _engineHitCount;
         private uint _hitCountDelta;
         private int _engineIgnoreCount;
-        private bool _fullyBound;
-        private bool _unbound;
 
         public NodeBreakpointBinding(
             NodeBreakpoint breakpoint,
@@ -39,7 +36,7 @@ namespace Microsoft.NodejsTools.Debugger {
             bool fullyBound
         ) {
             _breakpoint = breakpoint;
-            _lineNo = lineNo;
+            LineNo = lineNo;
             _breakpointId = breakpointId;
             _scriptID = scriptID;
             _enabled = breakpoint.Enabled;
@@ -47,7 +44,7 @@ namespace Microsoft.NodejsTools.Debugger {
             _condition = breakpoint.Condition;
             _engineEnabled = GetEngineEnabled();
             _engineIgnoreCount = GetEngineIgnoreCount();
-            _fullyBound = fullyBound;
+            FullyBound = fullyBound;
         }
 
         public NodeDebugger Process {
@@ -57,7 +54,7 @@ namespace Microsoft.NodejsTools.Debugger {
         }
 
         public void Remove() {
-            Process.RemoveBreakPoint(this);
+            Process.RemoveBreakPointAsync(this).Wait();
         }
 
         public NodeBreakpoint Breakpoint {
@@ -72,14 +69,7 @@ namespace Microsoft.NodejsTools.Debugger {
             }
         }
 
-        public int LineNo {
-            get {
-                return _lineNo;
-            }
-            set {
-                _lineNo = value;
-            }
-        }
+        public int LineNo { get; set; }
 
         public bool Enabled {
             get {
@@ -121,7 +111,7 @@ namespace Microsoft.NodejsTools.Debugger {
                 SyncCounts();
                 var engineEnabled = GetEngineEnabled(enabled, _breakOn, HitCount);
                 if (_engineEnabled != engineEnabled) {
-                    if (!Process.UpdateBreakpointBinding(_breakpointId, enabled: engineEnabled, validateSuccess: true)) {
+                    if (!Process.UpdateBreakpointBindingAsync(_breakpointId, engineEnabled, validateSuccess: true).Result) {
                         return false;
                     }
                     _engineEnabled = engineEnabled;
@@ -137,7 +127,7 @@ namespace Microsoft.NodejsTools.Debugger {
                 var engineEnabled = GetEngineEnabled(_enabled, breakOn, HitCount);
                 var enabled = (_engineEnabled != engineEnabled) ? (bool?)engineEnabled : null;
                 var engineIgnoreCount = GetEngineIgnoreCount(breakOn, HitCount);
-                if (!Process.UpdateBreakpointBinding(_breakpointId, ignoreCount: engineIgnoreCount, enabled: enabled, validateSuccess: true)) {
+                if (!Process.UpdateBreakpointBindingAsync(_breakpointId, ignoreCount: engineIgnoreCount, enabled: enabled, validateSuccess: true).Result) {
                     return false;
                 }
                 _engineEnabled = engineEnabled;
@@ -155,7 +145,7 @@ namespace Microsoft.NodejsTools.Debugger {
                     var engineEnabled = GetEngineEnabled(_enabled, _breakOn, hitCount);
                     var enabled = (_engineEnabled != engineEnabled) ? (bool?)engineEnabled : null;
                     var engineIgnoreCount = GetEngineIgnoreCount(_breakOn, hitCount);
-                    if (!Process.UpdateBreakpointBinding(_breakpointId, ignoreCount: engineIgnoreCount, enabled: enabled, validateSuccess: true)) {
+                    if (!Process.UpdateBreakpointBindingAsync(_breakpointId, ignoreCount: engineIgnoreCount, enabled: enabled, validateSuccess: true).Result) {
                         return false;
                     }
                     _engineEnabled = engineEnabled;
@@ -167,7 +157,7 @@ namespace Microsoft.NodejsTools.Debugger {
         }
 
         internal bool SetCondition(string condition) {
-            if (!Process.UpdateBreakpointBinding(_breakpointId, condition: condition, validateSuccess: true)) {
+            if (!Process.UpdateBreakpointBindingAsync(_breakpointId, condition: condition, validateSuccess: true).Result) {
                 return false;
             }
             _condition = condition;
@@ -199,12 +189,12 @@ namespace Microsoft.NodejsTools.Debugger {
                     break;
                 case BreakOnKind.Equal:
                     engineEnabled = false;
-                    Process.UpdateBreakpointBinding(_breakpointId, enabled: engineEnabled, followupHandler: followupHandlerWrapper);
+                    Process.UpdateBreakpointBindingAsync(_breakpointId, engineEnabled, followupHandler: followupHandlerWrapper).Wait();
                     break;
                 case BreakOnKind.Mod:
                     var hitCount = engineHitCount - _hitCountDelta;
                     engineIgnoreCount = GetEngineIgnoreCount(_breakOn, hitCount);
-                    Process.UpdateBreakpointBinding(_breakpointId, ignoreCount: engineIgnoreCount, followupHandler: followupHandlerWrapper);
+                    Process.UpdateBreakpointBindingAsync(_breakpointId, ignoreCount: engineIgnoreCount, followupHandler: followupHandlerWrapper).Wait();
                     break;
             }
         }
@@ -245,45 +235,38 @@ namespace Microsoft.NodejsTools.Debugger {
             return count;
         }
 
-        private void TestHit(Action trueHandler, Action falseHandler) {
+        private bool TestHit() {
             // Not hit if any ignore count
             if (GetEngineIgnoreCount() > 0) {
-                falseHandler();
-                return;
+                return false;
             }
 
             // Not hit if false condition
             if (!string.IsNullOrEmpty(_condition)) {
-                Process.TestPredicate(_condition, trueHandler, falseHandler);
-                return;
+                return Process.TestPredicateAsync(_condition).Result;
             }
 
             // Otherwise, hit
-            trueHandler();
+            return true;
         }
 
         internal void TestAndProcessHit(Action<NodeBreakpointBinding> processBinding) {
             // Process based on whether hit (based on hit count and/or condition predicates)
-            TestHit(
-                trueHandler:
-                    () => {
-                        // Fixup hit count
-                        _hitCountDelta = _engineHitCount - 1;
+            if (TestHit()) {
+                // Fixup hit count
+                _hitCountDelta = _engineHitCount - 1;
 
-                        // Process as hit
-                        processBinding(this);
-                    },
-                falseHandler:
-                    () => {
-                        // Process as not hit
-                        processBinding(null);
-                    }
-            );
+                // Process as hit
+                processBinding(this);
+            } else {
+                // Process as not hit
+                processBinding(null);
+            }
         }
 
         private void SyncCounts() {
             if (_engineIgnoreCount > 0) {
-                var hitCount = Process.GetBreakpointHitCount(_breakpointId);
+                var hitCount = Process.GetBreakpointHitCountAsync(_breakpointId).Result;
                 if (hitCount != null) {
                     _engineIgnoreCount -= hitCount.Value - (int)_engineHitCount;
                     _engineHitCount = (uint)hitCount;
@@ -297,22 +280,8 @@ namespace Microsoft.NodejsTools.Debugger {
             }
         }
 
-        internal bool FullyBound {
-            get {
-                return _fullyBound;
-            }
-            set {
-                _fullyBound = value;
-            }
-        }
+        internal bool FullyBound { get; set; }
 
-        public bool Unbound {
-            get {
-                return _unbound;
-            }
-            set {
-                _unbound = value;
-            }
-        }
+        public bool Unbound { get; set; }
     }
 }

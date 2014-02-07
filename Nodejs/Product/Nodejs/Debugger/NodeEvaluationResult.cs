@@ -12,9 +12,7 @@
  *
  * ***************************************************************************/
 
-using System;
 using System.Text.RegularExpressions;
-using System.Threading;
 
 namespace Microsoft.NodejsTools.Debugger {
     /// <summary>
@@ -118,23 +116,7 @@ namespace Microsoft.NodejsTools.Debugger {
                 return null;
             }
 
-            var childrenEnumed = new AutoResetEvent(false);
-            NodeEvaluationResult[] res = null;
-
-            _frame.Thread.Process.EnumChildren(this, children =>
-            {
-                res = children;
-                childrenEnumed.Set();
-            });
-
-            while (!_frame.Thread.Process.HasExited && !childrenEnumed.WaitOne(Math.Min(timeOut, 100))) {
-                if (timeOut <= 100) {
-                    break;
-                }
-                timeOut -= 100;
-            }
-
-            return res;
+            return _frame.Thread.Process.EnumChildrenAsync(this).Result;
         }
 
         private int GetStringLength(string stringValue) {

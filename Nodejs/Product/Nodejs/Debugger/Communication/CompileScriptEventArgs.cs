@@ -12,13 +12,15 @@
  *
  * ***************************************************************************/
 
-using Microsoft.NodejsTools.Debugger;
-using Microsoft.NodejsTools.Debugger.Serialization;
+using System;
+using Microsoft.NodejsTools.Debugger.Events;
 
-namespace NodejsTests.Mocks {
-    class MockNodeEvaluationResultFactory : INodeEvaluationResultFactory {
-        public NodeEvaluationResult Create(INodeVariable variable) {
-            return new NodeEvaluationResult(0, null, null, null, null, null, NodeExpressionType.None, null);
+namespace Microsoft.NodejsTools.Debugger.Communication {
+    sealed class CompileScriptEventArgs : EventArgs {
+        public CompileScriptEventArgs(CompileScriptEvent compileScriptEvent) {
+            CompileScriptEvent = compileScriptEvent;
         }
+
+        public CompileScriptEvent CompileScriptEvent { get; private set; }
     }
 }

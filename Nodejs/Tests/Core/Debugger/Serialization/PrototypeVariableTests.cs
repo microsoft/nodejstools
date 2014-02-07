@@ -17,6 +17,7 @@ using System.Collections.Generic;
 using Microsoft.NodejsTools.Debugger;
 using Microsoft.NodejsTools.Debugger.Serialization;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
+using Newtonsoft.Json.Linq;
 
 namespace NodejsTests.Debugger.Serialization {
     [TestClass]
@@ -25,8 +26,8 @@ namespace NodejsTests.Debugger.Serialization {
         public void CreatePrototypeVariable() {
             // Arrange
             var parent = new NodeEvaluationResult(0, null, null, null, null, null, NodeExpressionType.None, null);
-            JsonValue json = SerializationTestData.GetLookupJsonPrototype();
-            Dictionary<int, JsonValue> references = SerializationTestData.GetLookupJsonReferences();
+            JObject json = SerializationTestData.GetLookupJsonPrototype();
+            Dictionary<int, JToken> references = SerializationTestData.GetLookupJsonReferences();
 
             // Act
             var result = new NodePrototypeVariable(parent, json, references);
@@ -49,15 +50,14 @@ namespace NodejsTests.Debugger.Serialization {
         public void CreateLookupVariableWithNullParent() {
             // Arrange
             Exception exception = null;
-            JsonValue json = SerializationTestData.GetLookupJsonPrototype();
-            Dictionary<int, JsonValue> references = SerializationTestData.GetLookupJsonReferences();
+            JObject json = SerializationTestData.GetLookupJsonPrototype();
+            Dictionary<int, JToken> references = SerializationTestData.GetLookupJsonReferences();
             NodePrototypeVariable result = null;
 
             // Act
             try {
                 result = new NodePrototypeVariable(null, json, references);
-            }
-            catch (Exception e) {
+            } catch (Exception e) {
                 exception = e;
             }
 
@@ -72,14 +72,13 @@ namespace NodejsTests.Debugger.Serialization {
             // Arrange
             var parent = new NodeEvaluationResult(0, null, null, null, null, null, NodeExpressionType.None, null);
             Exception exception = null;
-            Dictionary<int, JsonValue> references = SerializationTestData.GetLookupJsonReferences();
+            Dictionary<int, JToken> references = SerializationTestData.GetLookupJsonReferences();
             NodePrototypeVariable result = null;
 
             // Act
             try {
                 result = new NodePrototypeVariable(parent, null, references);
-            }
-            catch (Exception e) {
+            } catch (Exception e) {
                 exception = e;
             }
 
@@ -93,15 +92,14 @@ namespace NodejsTests.Debugger.Serialization {
         public void CreateLookupVariableWithNullJsonReferences() {
             // Arrange
             var parent = new NodeEvaluationResult(0, null, null, null, null, null, NodeExpressionType.None, null);
-            JsonValue json = SerializationTestData.GetLookupJsonPrototype();
+            JObject json = SerializationTestData.GetLookupJsonPrototype();
             Exception exception = null;
             NodePrototypeVariable result = null;
 
             // Act
             try {
                 result = new NodePrototypeVariable(parent, json, null);
-            }
-            catch (Exception e) {
+            } catch (Exception e) {
                 exception = e;
             }
 

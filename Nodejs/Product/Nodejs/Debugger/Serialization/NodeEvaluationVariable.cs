@@ -13,22 +13,22 @@
  * ***************************************************************************/
 
 using Microsoft.VisualStudioTools.Project;
+using Newtonsoft.Json.Linq;
 
 namespace Microsoft.NodejsTools.Debugger.Serialization {
     class NodeEvaluationVariable : INodeVariable {
-        public NodeEvaluationVariable(NodeStackFrame stackFrame, string name, JsonValue message) {
-            Utilities.ArgumentNotNull("stackFrame", stackFrame);
+        public NodeEvaluationVariable(NodeStackFrame stackFrame, string name, JToken message) {
             Utilities.ArgumentNotNull("name", name);
             Utilities.ArgumentNotNull("message", message);
 
-            Id = message.GetValue<int>("handle");
+            Id = (int)message["handle"];
             Parent = null;
             StackFrame = stackFrame;
             Name = name;
-            TypeName = message.GetValue<string>("type");
-            Value = message.GetValue<string>("value");
-            Class = message.GetValue<string>("className");
-            Text = message.GetValue<string>("text");
+            TypeName = (string)message["type"];
+            Value = (string)message["value"];
+            Class = (string)message["className"];
+            Text = (string)message["text"];
             Attributes = NodePropertyAttributes.None;
             Type = NodePropertyType.Normal;
         }

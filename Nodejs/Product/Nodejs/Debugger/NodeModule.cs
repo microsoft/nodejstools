@@ -19,11 +19,13 @@ namespace Microsoft.NodejsTools.Debugger {
     class NodeModule {
         private readonly int _moduleId;
         private readonly string _fileName;
+        private readonly string _source;
         private object _document;
 
-        public NodeModule(int moduleId, string fileName) {
+        public NodeModule(int moduleId, string fileName, string source = null) {
             _moduleId = moduleId;
             _fileName = fileName;
+            _source = source;
         }
 
         public int ModuleId {
@@ -45,6 +47,14 @@ namespace Microsoft.NodejsTools.Debugger {
         public string FileName {
             get {
                 return _fileName;
+            }
+        }
+
+        public string Source
+        {
+            get
+            {
+                return _source;
             }
         }
 

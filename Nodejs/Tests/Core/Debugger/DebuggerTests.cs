@@ -760,7 +760,7 @@ namespace NodejsTests.Debugger {
                     new TestStep(action: TestAction.StepOut, expectedStepComplete: 1),
                     new TestStep(action: TestAction.AddBreakpoint, targetBreakpointFile: "console.js", targetBreakpoint: 53, builtin: true),
                     new TestStep(action: TestAction.ResumeProcess, expectedBreakpointHit: 53, expectedBreakFile: "console.js", builtin: true, validation:
-                        (process, thread) => {
+                        async (process, thread) => {
                             var module = thread.Frames[0].Module;
 
                             // User data
@@ -772,13 +772,13 @@ namespace NodejsTests.Debugger {
 
                             // Download builtin
                             Assert.IsTrue(module.BuiltIn);
-                            var scriptText = process.GetScriptText(module.ModuleId);
+                            var scriptText = await process.GetScriptTextAsync(module.ModuleId);
                             Assert.IsTrue(scriptText.Contains("function Console("));
 
                             // Download non-builtin
                             module = thread.Frames[2].Module;
                             Assert.IsFalse(module.BuiltIn);
-                            scriptText = process.GetScriptText(module.ModuleId);
+                            scriptText = await process.GetScriptTextAsync(module.ModuleId);
                             StreamReader streamReader = new StreamReader(module.FileName);
                             var fileText = streamReader.ReadToEnd();
                             streamReader.Close();
@@ -1832,7 +1832,7 @@ namespace NodejsTests.Debugger {
 //                    if (args.Breakpoint.LineNo == 9) {
 //                        // stop running the infinite loop
 //                        Debug.WriteLine(String.Format("First BP hit {0}", args.Thread.Id));
-//                        args.Thread.Frames[0].ExecuteText("x = False", (x) => {});
+//                        args.Thread.Frames[0].ExecuteTextAsync("x = False", (x) => {});
 //                        mainThread = args.Thread;
 //                    } else if (args.Breakpoint.LineNo == 5) {
 //                        // we hit the breakpoint on the new thread

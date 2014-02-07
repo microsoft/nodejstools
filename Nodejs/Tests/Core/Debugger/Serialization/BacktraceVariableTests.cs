@@ -16,6 +16,7 @@ using System;
 using Microsoft.NodejsTools.Debugger;
 using Microsoft.NodejsTools.Debugger.Serialization;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
+using Newtonsoft.Json.Linq;
 
 namespace NodejsTests.Debugger.Serialization {
     [TestClass]
@@ -23,7 +24,7 @@ namespace NodejsTests.Debugger.Serialization {
         [TestMethod, Priority(0)]
         public void CreateBacktraceVariable() {
             // Arrange
-            JsonValue json = SerializationTestData.GetBacktraceJsonObject();
+            JObject json = SerializationTestData.GetBacktraceJsonObject();
             var stackFrame = new NodeStackFrame(null, null, null, 0, 0, 0, 0);
 
             // Act
@@ -46,7 +47,7 @@ namespace NodejsTests.Debugger.Serialization {
         [TestMethod, Priority(0)]
         public void CreateBacktraceVariableWithNullName() {
             // Arrange
-            JsonValue json = SerializationTestData.GetBacktraceJsonObjectWithNullName();
+            JObject json = SerializationTestData.GetBacktraceJsonObjectWithNullName();
             var stackFrame = new NodeStackFrame(null, null, null, 0, 0, 0, 0);
 
             // Act
@@ -68,15 +69,14 @@ namespace NodejsTests.Debugger.Serialization {
         [TestMethod, Priority(0)]
         public void CreateBacktraceVariableWithNullStackFrame() {
             // Arrange
-            JsonValue json = SerializationTestData.GetBacktraceJsonObject();
+            JObject json = SerializationTestData.GetBacktraceJsonObject();
             Exception exception = null;
             NodeBacktraceVariable result = null;
 
             // Act
             try {
                 result = new NodeBacktraceVariable(null, json);
-            }
-            catch (Exception e) {
+            } catch (Exception e) {
                 exception = e;
             }
 
@@ -96,8 +96,7 @@ namespace NodejsTests.Debugger.Serialization {
             // Act
             try {
                 result = new NodeBacktraceVariable(stackFrame, null);
-            }
-            catch (Exception e) {
+            } catch (Exception e) {
                 exception = e;
             }
 

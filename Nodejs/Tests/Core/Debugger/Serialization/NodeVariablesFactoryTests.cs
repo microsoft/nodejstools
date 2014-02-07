@@ -34,7 +34,7 @@ namespace NodejsTests.Debugger.Serialization {
                 Class = null,
                 Text = null
             };
-            var factory = new NodeEvaluationResultFactory();
+            var factory = new EvaluationResultFactory();
 
             // Act
             NodeEvaluationResult result = factory.Create(variable);
@@ -66,7 +66,7 @@ namespace NodejsTests.Debugger.Serialization {
                 Class = null,
                 Text = null
             };
-            var factory = new NodeEvaluationResultFactory();
+            var factory = new EvaluationResultFactory();
 
             // Act
             NodeEvaluationResult result = factory.Create(variable);
@@ -98,7 +98,7 @@ namespace NodejsTests.Debugger.Serialization {
                 Class = null,
                 Text = null
             };
-            var factory = new NodeEvaluationResultFactory();
+            var factory = new EvaluationResultFactory();
 
             // Act
             NodeEvaluationResult result = factory.Create(variable);
@@ -130,7 +130,7 @@ namespace NodejsTests.Debugger.Serialization {
                 Class = null,
                 Text = null
             };
-            var factory = new NodeEvaluationResultFactory();
+            var factory = new EvaluationResultFactory();
 
             // Act
             NodeEvaluationResult result = factory.Create(variable);
@@ -162,7 +162,7 @@ namespace NodejsTests.Debugger.Serialization {
                 Class = null,
                 Text = null
             };
-            var factory = new NodeEvaluationResultFactory();
+            var factory = new EvaluationResultFactory();
 
             // Act
             NodeEvaluationResult result = factory.Create(variable);
@@ -193,7 +193,7 @@ namespace NodejsTests.Debugger.Serialization {
                 Class = null,
                 Text = "function(){...}"
             };
-            var factory = new NodeEvaluationResultFactory();
+            var factory = new EvaluationResultFactory();
 
             // Act
             NodeEvaluationResult result = factory.Create(variable);
@@ -224,7 +224,7 @@ namespace NodejsTests.Debugger.Serialization {
                 Class = null,
                 Text = null
             };
-            var factory = new NodeEvaluationResultFactory();
+            var factory = new EvaluationResultFactory();
 
             // Act
             NodeEvaluationResult result = factory.Create(variable);
@@ -256,7 +256,7 @@ namespace NodejsTests.Debugger.Serialization {
                 Class = "Object",
                 Text = null
             };
-            var factory = new NodeEvaluationResultFactory();
+            var factory = new EvaluationResultFactory();
 
             // Act
             NodeEvaluationResult result = factory.Create(variable);
@@ -287,7 +287,7 @@ namespace NodejsTests.Debugger.Serialization {
                 Class = "Date",
                 Text = null
             };
-            var factory = new NodeEvaluationResultFactory();
+            var factory = new EvaluationResultFactory();
 
             // Act
             NodeEvaluationResult result = factory.Create(variable);
@@ -318,7 +318,7 @@ namespace NodejsTests.Debugger.Serialization {
                 Class = "Array",
                 Text = null
             };
-            var factory = new NodeEvaluationResultFactory();
+            var factory = new EvaluationResultFactory();
 
             // Act
             NodeEvaluationResult result = factory.Create(variable);
@@ -349,7 +349,7 @@ namespace NodejsTests.Debugger.Serialization {
                 Class = null,
                 Text = null
             };
-            var factory = new NodeEvaluationResultFactory();
+            var factory = new EvaluationResultFactory();
 
             // Act
             NodeEvaluationResult result = factory.Create(variable);
@@ -380,7 +380,7 @@ namespace NodejsTests.Debugger.Serialization {
                 Class = null,
                 Text = null
             };
-            var factory = new NodeEvaluationResultFactory();
+            var factory = new EvaluationResultFactory();
 
             // Act
             NodeEvaluationResult result = factory.Create(variable);
@@ -411,7 +411,7 @@ namespace NodejsTests.Debugger.Serialization {
                 Class = null,
                 Text = "Unknown"
             };
-            var factory = new NodeEvaluationResultFactory();
+            var factory = new EvaluationResultFactory();
 
             // Act
             NodeEvaluationResult result = factory.Create(variable);
@@ -433,13 +433,12 @@ namespace NodejsTests.Debugger.Serialization {
         public void CreateEvaluationResultFromNullVariable() {
             // Arrange
             Exception exception = null;
-            var factory = new NodeEvaluationResultFactory();
+            var factory = new EvaluationResultFactory();
 
             // Act
             try {
                 factory.Create(null);
-            }
-            catch (Exception e) {
+            } catch (Exception e) {
                 exception = e;
             }
 
@@ -461,7 +460,7 @@ namespace NodejsTests.Debugger.Serialization {
                 Class = "Number",
                 Text = null
             };
-            var factory = new NodeEvaluationResultFactory();
+            var factory = new EvaluationResultFactory();
 
             // Act
             NodeEvaluationResult result = factory.Create(variable);
@@ -492,7 +491,7 @@ namespace NodejsTests.Debugger.Serialization {
                 Class = "Number",
                 Text = null
             };
-            var factory = new NodeEvaluationResultFactory();
+            var factory = new EvaluationResultFactory();
 
             // Act
             NodeEvaluationResult result = factory.Create(variable);
@@ -509,7 +508,7 @@ namespace NodejsTests.Debugger.Serialization {
             Assert.AreEqual(result.Type, NodeExpressionType.None);
             Assert.AreEqual(NodeVariableType.Number, result.TypeName);
         }
-        
+
         [TestMethod, Priority(0)]
         public void CreateObjectElementWithInvalidIdentifierEvaluationResult() {
             // Arrange
@@ -523,7 +522,7 @@ namespace NodejsTests.Debugger.Serialization {
                 Class = "Number",
                 Text = null
             };
-            var factory = new NodeEvaluationResultFactory();
+            var factory = new EvaluationResultFactory();
 
             // Act
             NodeEvaluationResult result = factory.Create(variable);

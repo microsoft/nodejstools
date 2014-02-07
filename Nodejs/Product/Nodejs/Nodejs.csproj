@@ -30,6 +30,8 @@
     <SccLocalPath>SAK</SccLocalPath>
     <SccAuxPath>SAK</SccAuxPath>
     <SccProvider>SAK</SccProvider>
+    <SolutionDir Condition="$(SolutionDir) == '' Or $(SolutionDir) == '*Undefined*'">..\..\</SolutionDir>
+    <RestorePackages>true</RestorePackages>
   </PropertyGroup>
   <PropertyGroup>
     <DelaySign>false</DelaySign>
@@ -124,6 +126,9 @@
       <SpecificVersion>False</SpecificVersion>
       <HintPath>$(DevEnvDir)PrivateAssemblies\Microsoft.Windows.Design.Host.dll</HintPath>
     </Reference>
+    <Reference Include="Newtonsoft.Json, Version=6.0.0.0, Culture=neutral, PublicKeyToken=30ad4fe6b2a6aeed, processorArchitecture=MSIL">
+      <HintPath>..\..\packages\Newtonsoft.Json.6.0.1\lib\net45\Newtonsoft.Json.dll</HintPath>
+    </Reference>
     <Reference Include="PresentationCore" />
     <Reference Include="PresentationFramework" />
     <Reference Include="System" />
@@ -211,22 +216,47 @@
     <Compile Include="Commands\SurveyNewsCommand.cs" />
     <Compile Include="ClassifierMetadata.cs" />
     <Compile Include="CustomTrackingSpan.cs" />
-    <Compile Include="Debugger\INodeConnection.cs" />
+    <Compile Include="Debugger\Communication\BreakpointEventArgs.cs" />
+    <Compile Include="Debugger\Communication\CompileScriptEventArgs.cs" />
+    <Compile Include="Debugger\Communication\ExceptionEventArgs.cs" />
+    <Compile Include="Debugger\Communication\IDebuggerClient.cs" />
+    <Compile Include="Debugger\Communication\IDebuggerConnection.cs" />
+    <Compile Include="Debugger\Communication\MessageEventArgs.cs" />
+    <Compile Include="Debugger\Communication\DebuggerClient.cs" />
+    <Compile Include="Debugger\Communication\DebuggerConnection.cs" />
+    <Compile Include="Debugger\Commands\BacktraceCommand.cs" />
+    <Compile Include="Debugger\Commands\ChangeBreakpointCommand.cs" />
+    <Compile Include="Debugger\Commands\ClearBreakpointsCommand.cs" />
+    <Compile Include="Debugger\Commands\CommandFactory.cs" />
+    <Compile Include="Debugger\Commands\ContinueCommand.cs" />
+    <Compile Include="Debugger\Commands\DisconnectCommand.cs" />
+    <Compile Include="Debugger\Commands\EvaluateCommand.cs" />
+    <Compile Include="Debugger\Commands\ICommandFactory.cs" />
+    <Compile Include="Debugger\Commands\IDebuggerCommand.cs" />
+    <Compile Include="Debugger\Events\BreakpointEvent.cs" />
+    <Compile Include="Debugger\Events\CompileScriptEvent.cs" />
+    <Compile Include="Debugger\Events\ExceptionEvent.cs" />
+    <Compile Include="Debugger\Events\IDebuggerEvent.cs" />
+    <Compile Include="Debugger\Serialization\INumberGenerator.cs" />
+    <Compile Include="Debugger\Commands\ListBreakpointsCommand.cs" />
+    <Compile Include="Debugger\Commands\LookupCommand.cs" />
+    <Compile Include="Debugger\Commands\DebuggerCommandBase.cs" />
+    <Compile Include="Debugger\Commands\NodeCommandException.cs" />
+    <Compile Include="Debugger\Commands\ScriptsCommand.cs" />
+    <Compile Include="Debugger\Serialization\SequentialNumberGenerator.cs" />
+    <Compile Include="Debugger\Commands\SetBreakpointCommand.cs" />
+    <Compile Include="Debugger\Commands\SetExceptionBreakCommand.cs" />
+    <Compile Include="Debugger\Commands\SuspendCommand.cs" />
     <Compile Include="Debugger\NodeEventEventArgs.cs" />
-    <Compile Include="Debugger\NodeConnection.cs" />
     <Compile Include="Debugger\NodeExpressionType.cs" />
     <Compile Include="Debugger\ResponseHandler.cs" />
-    <Compile Include="Debugger\Serialization\INodeEvaluationResultFactory.cs" />
-    <Compile Include="Debugger\Serialization\INodeResponseHandler.cs" />
-    <Compile Include="Debugger\Serialization\JsonArray.cs" />
-    <Compile Include="Debugger\Serialization\JsonValue.cs" />
+    <Compile Include="Debugger\Serialization\IEvaluationResultFactory.cs" />
     <Compile Include="Debugger\Serialization\NaturalSortComparer.cs" />
     <Compile Include="Debugger\Serialization\NodeBacktraceVariable.cs" />
     <Compile Include="Debugger\Serialization\NodeEvaluationVariable.cs" />
     <Compile Include="Debugger\Serialization\INodeVariable.cs" />
-    <Compile Include="Debugger\Serialization\NodeEvaluationResultFactory.cs" />
+    <Compile Include="Debugger\Serialization\EvaluationResultFactory.cs" />
     <Compile Include="Debugger\Serialization\NodeLookupVariable.cs" />
-    <Compile Include="Debugger\Serialization\NodeResponseHandler.cs" />
     <Compile Include="Debugger\Serialization\NodePropertyAttributes.cs" />
     <Compile Include="Debugger\Serialization\NodePropertyType.cs" />
     <Compile Include="Debugger\Serialization\NodePrototypeVariable.cs" />
@@ -665,6 +695,7 @@
     <ZipProject Include="ProjectTemplates\AddWebSiteAzureExpressApp\index.jade" />
     <ZipProject Include="ProjectTemplates\AddWebSiteAzureExpressApp\layout.jade" />
     <ZipProject Include="ProjectTemplates\AddWebSiteAzureExpressApp\style.styl" />
+    <None Include="packages.config" />
     <None Include="source.extension.vsixmanifest">
       <SubType>Designer</SubType>
     </None>
@@ -740,6 +771,13 @@
   </PropertyGroup>
   <Import Project="$(BuildRoot)\Common\Product\SharedProject\SharedProject.proj" />
   <Import Project="..\ProjectAfter.settings" />
+  <Import Project="$(SolutionDir)\.nuget\NuGet.targets" Condition="Exists('$(SolutionDir)\.nuget\NuGet.targets')" />
+  <Target Name="EnsureNuGetPackageBuildImports" BeforeTargets="PrepareForBuild">
+    <PropertyGroup>
+      <ErrorText>This project references NuGet package(s) that are missing on this computer. Enable NuGet Package Restore to download them.  For more information, see http://go.microsoft.com/fwlink/?LinkID=322105. The missing file is {0}.</ErrorText>
+    </PropertyGroup>
+    <Error Condition="!Exists('$(SolutionDir)\.nuget\NuGet.targets')" Text="$([System.String]::Format('$(ErrorText)', '$(SolutionDir)\.nuget\NuGet.targets'))" />
+  </Target>
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
        Other similar extension points exist, see Microsoft.Common.targets.
   <Target Name="BeforeBuild">
