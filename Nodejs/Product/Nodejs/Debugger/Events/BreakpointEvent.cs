@@ -19,7 +19,7 @@ using Newtonsoft.Json.Linq;
 namespace Microsoft.NodejsTools.Debugger.Events {
     sealed class BreakpointEvent : IDebuggerEvent {
         public BreakpointEvent(JObject message) {
-            Running = (bool)message["running"];
+            Running = false;
             Line = (int)message["body"]["sourceLine"];
             Column = (int)message["body"]["sourceColumn"];
 
@@ -27,11 +27,14 @@ namespace Microsoft.NodejsTools.Debugger.Events {
             var filename = (string)message["body"]["script"]["name"];
 
             Module = new NodeModule(null, scriptId, filename);
-            Breakpoints = message["body"]["breakpoints"].Values<int>().ToList();
+
+            JToken breakpoints = message["body"]["breakpoints"];
+            Breakpoints = breakpoints != null
+                ? breakpoints.Values<int>().ToList()
+                : new List<int>();
         }
 
         public List<int> Breakpoints { get; private set; }
-
         public NodeModule Module { get; private set; }
         public int Line { get; private set; }
         public int Column { get; set; }

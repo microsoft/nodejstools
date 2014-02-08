@@ -53,6 +53,14 @@ namespace Microsoft.NodejsTools.Debugger.Commands {
             return new ListBreakpointsCommand(_numberGenerator.GetNext());
         }
 
+        public LookupCommand CreateLookupCommand(List<NodeEvaluationResult> parents) {
+            return new LookupCommand(_numberGenerator.GetNext(), _resultFactory, parents);
+        }
+
+        public LookupCommand CreateLookupCommand(int[] handles) {
+            return new LookupCommand(_numberGenerator.GetNext(), _resultFactory, handles);
+        }
+
         public ScriptsCommand CreateScriptsCommand(int? moduleId = null) {
             return new ScriptsCommand(_numberGenerator.GetNext(), moduleId);
         }
@@ -67,10 +75,6 @@ namespace Microsoft.NodejsTools.Debugger.Commands {
 
         public SuspendCommand CreateSuspendCommand() {
             return new SuspendCommand(_numberGenerator.GetNext());
-        }
-
-        public LookupCommand CreateLookupCommand(int[] handles, NodeEvaluationResult parent = null) {
-            return new LookupCommand(_numberGenerator.GetNext(), _resultFactory, handles, parent);
         }
     }
 }

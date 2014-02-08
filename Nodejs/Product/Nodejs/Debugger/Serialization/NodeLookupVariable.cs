@@ -19,7 +19,6 @@ using Newtonsoft.Json.Linq;
 namespace Microsoft.NodejsTools.Debugger.Serialization {
     class NodeLookupVariable : INodeVariable {
         public NodeLookupVariable(NodeEvaluationResult parent, JToken property, Dictionary<int, JToken> references) {
-            Utilities.ArgumentNotNull("parent", parent);
             Utilities.ArgumentNotNull("property", property);
             Utilities.ArgumentNotNull("references", references);
 
@@ -32,8 +31,8 @@ namespace Microsoft.NodejsTools.Debugger.Serialization {
             Value = (string)reference["value"];
             Class = (string)reference["className"];
             Text = (string)reference["text"];
-            Attributes = (NodePropertyAttributes)(int)property["attributes"];
-            Type = (NodePropertyType)(int)property["propertyType"];
+            Attributes = (NodePropertyAttributes)property.Value<int>("attributes");
+            Type = (NodePropertyType)property.Value<int>("propertyType");
         }
 
         public int Id { get; private set; }

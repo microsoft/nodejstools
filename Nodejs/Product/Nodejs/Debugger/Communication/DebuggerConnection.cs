@@ -19,33 +19,23 @@ using System.Net.Sockets;
 using System.Text;
 using System.Text.RegularExpressions;
 using System.Threading.Tasks;
-using Utilities = Microsoft.VisualStudioTools.Project.Utilities;
+using Microsoft.VisualStudioTools.Project;
 
 namespace Microsoft.NodejsTools.Debugger.Communication {
     sealed class DebuggerConnection : IDebuggerConnection {
+        private readonly Regex _contentLength = new Regex(@"Content-Length: (\d+)", RegexOptions.Compiled);
         private string _hostName;
         private ushort _portNumber;
-        private readonly Regex _contentLength = new Regex(@"Content-Length: (\d+)", RegexOptions.Compiled);
         private StreamReader _streamReader;
         private StreamWriter _streamWriter;
         private TcpClient _tcpClient;
-
-        public DebuggerConnection(string hostName, ushort portNumber) {
-            Utilities.ArgumentNotNullOrEmpty("hostName", hostName);
-
-            _hostName = hostName;
-            _portNumber = portNumber;
-        }
-
-        public DebuggerConnection(ushort portNumber) : this("localhost", portNumber) {
-        }
 
         public void Close() {
             if (_tcpClient != null) {
                 _tcpClient.Close();
                 _tcpClient = null;
             }
-            
+
             if (_streamReader != null) {
                 _streamReader.Close();
                 _streamReader = null;
@@ -62,7 +52,7 @@ namespace Microsoft.NodejsTools.Debugger.Communication {
             Utilities.CheckNotNull(_streamWriter, "No connection with node.js debugger.");
 
             string request = string.Format("Content-Length: {0}{1}{1}{2}", Encoding.UTF8.GetByteCount(message), Environment.NewLine, message);
-            Debug.WriteLine(String.Format("Request: {0}", request));
+            DebugWriteLine("Request: " + message);
 
             await _streamWriter.WriteAsync(request).ConfigureAwait(false);
             await _streamWriter.FlushAsync().ConfigureAwait(false);
@@ -78,6 +68,15 @@ namespace Microsoft.NodejsTools.Debugger.Communication {
             get { return _tcpClient != null && _tcpClient.Connected; }
         }
 
+        public void Connect(string hostName, ushort portNumber) {
+            Utilities.ArgumentNotNullOrEmpty("hostName", hostName);
+
+            _hostName = hostName;
+            _portNumber = portNumber;
+
+            Connect();
+        }
+
         public void Connect() {
             Close();
 
@@ -88,19 +87,12 @@ namespace Microsoft.NodejsTools.Debugger.Communication {
             Task.Factory.StartNew(ReadStreamAsync);
         }
 
-        public void Connect(string hostName, ushort portNumber) {
-            Utilities.ArgumentNotNullOrEmpty("hostName", hostName);
-
-            _hostName = hostName;
-            _portNumber = portNumber;
-
-            Connect();
-        }
-
         /// <summary>
         /// Asynchronous read of the debugger output stream.
         /// </summary>
         private async void ReadStreamAsync() {
+            DebugWriteLine("DebuggerConnection: established connection.");
+
             try {
                 while (Connected) {
                     // Read message header
@@ -134,7 +126,7 @@ namespace Microsoft.NodejsTools.Debugger.Communication {
                     byte[] bytes = Encoding.UTF8.GetBytes(buffer, 0, count);
                     string message = Encoding.UTF8.GetString(bytes);
 
-                    Debug.Print(message);
+                    DebugWriteLine("Response: " + message);
 
                     EventHandler<MessageEventArgs> outputMessage = OutputMessage;
                     if (outputMessage != null) {
@@ -142,16 +134,24 @@ namespace Microsoft.NodejsTools.Debugger.Communication {
                     }
                 }
             } catch (SocketException) {
+            } catch (ObjectDisposedException) {
+            } catch (Exception e) {
+                Debug.Fail(e.ToString());
             } finally {
                 Close();
 
-                Debug.Print("Debugger connection was closed.");
+                DebugWriteLine("DebuggerConnection: connection was closed.");
 
                 EventHandler<EventArgs> connectionClosed = ConnectionClosed;
                 if (connectionClosed != null) {
                     connectionClosed(this, EventArgs.Empty);
                 }
             }
+        }
+
+        [Conditional("DEBUG")]
+        private void DebugWriteLine(string message) {
+            Debug.WriteLine("[{0}] {1}", DateTime.UtcNow.TimeOfDay, message);
         }
     }
 }

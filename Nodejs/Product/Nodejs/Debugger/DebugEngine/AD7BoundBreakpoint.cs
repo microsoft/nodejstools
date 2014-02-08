@@ -136,19 +136,19 @@ namespace Microsoft.NodejsTools.Debugger.DebugEngine {
             BreakOn breakOn = new BreakOn();
             switch (bpPassCount.stylePassCount) {
                 case enum_BP_PASSCOUNT_STYLE.BP_PASSCOUNT_NONE:
-                    breakOn.kind = BreakOnKind.Always;
+                    breakOn.Kind = BreakOnKind.Always;
                     break;
                 case enum_BP_PASSCOUNT_STYLE.BP_PASSCOUNT_EQUAL:
-                    breakOn.kind = BreakOnKind.Equal;
+                    breakOn.Kind = BreakOnKind.Equal;
                     break;
                 case enum_BP_PASSCOUNT_STYLE.BP_PASSCOUNT_EQUAL_OR_GREATER:
-                    breakOn.kind = BreakOnKind.GreaterThanOrEqual;
+                    breakOn.Kind = BreakOnKind.GreaterThanOrEqual;
                     break;
                 case enum_BP_PASSCOUNT_STYLE.BP_PASSCOUNT_MOD:
-                    breakOn.kind = BreakOnKind.Mod;
+                    breakOn.Kind = BreakOnKind.Mod;
                     break;
             }
-            breakOn.count = bpPassCount.dwPassCount;
+            breakOn.Count = bpPassCount.dwPassCount;
             return breakOn;
         }
 

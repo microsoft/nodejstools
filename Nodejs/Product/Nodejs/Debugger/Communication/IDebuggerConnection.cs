@@ -23,11 +23,6 @@ namespace Microsoft.NodejsTools.Debugger.Communication {
         bool Connected { get; }
 
         /// <summary>
-        /// Connect to debugger.
-        /// </summary>
-        void Connect();
-
-        /// <summary>
         /// Connect to specified debugger endpoint.
         /// </summary>
         /// <param name="host">Host address.</param>

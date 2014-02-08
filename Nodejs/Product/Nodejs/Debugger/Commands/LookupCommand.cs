@@ -14,26 +14,35 @@
 
 using System.Collections.Generic;
 using System.Globalization;
+using System.Linq;
 using Microsoft.NodejsTools.Debugger.Serialization;
 using Newtonsoft.Json.Linq;
 
 namespace Microsoft.NodejsTools.Debugger.Commands {
     sealed class LookupCommand : DebuggerCommandBase {
-        private readonly NodeEvaluationResult _parent;
+        private readonly int[] _handles;
+        private readonly Dictionary<int, NodeEvaluationResult> _parents;
         private readonly IEvaluationResultFactory _resultFactory;
 
-        public LookupCommand(int id, IEvaluationResultFactory resultFactory, int[] handles, NodeEvaluationResult parent = null) : base(id) {
+        public LookupCommand(int id, IEvaluationResultFactory resultFactory, List<NodeEvaluationResult> parents)
+            : this(id, resultFactory, parents.Select(p => p.Handle).ToArray()) {
+            _parents = parents.ToDictionary(p => p.Handle);
+        }
+
+        public LookupCommand(int id, IEvaluationResultFactory resultFactory, int[] handles) : base(id) {
             _resultFactory = resultFactory;
-            _parent = parent;
+            _handles = handles;
 
             CommandName = "lookup";
             Arguments = new Dictionary<string, object> {
                 { "handles", handles },
                 { "includeSource", false }
             };
+
+            Results = new Dictionary<int, List<NodeEvaluationResult>>();
         }
 
-        public List<NodeEvaluationResult> Results { get; private set; }
+        public Dictionary<int, List<NodeEvaluationResult>> Results { get; private set; }
 
         public override void ProcessResponse(JObject response) {
             base.ProcessResponse(response);
@@ -41,37 +50,44 @@ namespace Microsoft.NodejsTools.Debugger.Commands {
             // Retrieve references
             var refs = (JArray)response["refs"];
             var references = new Dictionary<int, JToken>(refs.Count);
-            for (int i = 0; i < refs.Count; i++) {
-                JToken reference = refs[i];
+            foreach (JToken reference in refs) {
                 var id = (int)reference["handle"];
                 references.Add(id, reference);
             }
 
             // Retrieve properties
             JToken body = response["body"];
-            string handle = _parent.Handle.ToString(CultureInfo.InvariantCulture);
-            JToken objectData = body[handle];
+
+            foreach (int handle in _handles) {
+                JToken data = body[handle.ToString(CultureInfo.InvariantCulture)];
+                NodeEvaluationResult parent;
+                _parents.TryGetValue(handle, out parent);
+                Results.Add(handle, GetProperties(data, parent, references));
+            }
+        }
+
+        private List<NodeEvaluationResult> GetProperties(JToken data, NodeEvaluationResult parent, Dictionary<int, JToken> references) {
             var properties = new List<NodeEvaluationResult>();
 
-            var props = (JArray)objectData["properties"];
+            var props = (JArray)data["properties"];
             if (props != null) {
                 for (int i = 0; i < props.Count; i++) {
                     JToken property = props[i];
-                    var variableProvider = new NodeLookupVariable(_parent, property, references);
+                    var variableProvider = new NodeLookupVariable(parent, property, references);
                     NodeEvaluationResult result = _resultFactory.Create(variableProvider);
                     properties.Add(result);
                 }
             }
 
             // Try to get prototype
-            JToken prototype = objectData["protoObject"];
+            JToken prototype = data["protoObject"];
             if (prototype != null) {
-                var variableProvider = new NodePrototypeVariable(_parent, prototype, references);
+                var variableProvider = new NodePrototypeVariable(parent, prototype, references);
                 NodeEvaluationResult result = _resultFactory.Create(variableProvider);
                 properties.Add(result);
             }
 
-            Results = properties;
+            return properties;
         }
     }
 }

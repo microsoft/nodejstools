@@ -53,8 +53,8 @@ namespace Microsoft.NodejsTools.Debugger {
             }
         }
 
-        public void Remove() {
-            Process.RemoveBreakPointAsync(this).Wait();
+        public async void Remove() {
+            await Process.RemoveBreakPointAsync(this).ConfigureAwait(false);
         }
 
         public NodeBreakpoint Breakpoint {
@@ -144,7 +144,7 @@ namespace Microsoft.NodejsTools.Debugger {
         }
 
         internal bool SetBreakOn(BreakOn breakOn, bool force = false) {
-            if (force || _breakOn.kind != breakOn.kind || _breakOn.count != breakOn.count) {
+            if (force || _breakOn.Kind != breakOn.Kind || _breakOn.Count != breakOn.Count) {
                 SyncCounts();
                 var engineEnabled = GetEngineEnabled(_enabled, breakOn, HitCount);
                 var enabled = (_engineEnabled != engineEnabled) ? (bool?)engineEnabled : null;
@@ -162,7 +162,7 @@ namespace Microsoft.NodejsTools.Debugger {
         internal bool SetHitCount(uint hitCount) {
             SyncCounts();
             if (HitCount != hitCount) {
-                if (_breakOn.kind != BreakOnKind.Always) {
+                if (_breakOn.Kind != BreakOnKind.Always) {
                     // When BreakOn (not BreakOnKind.Always), handle change to hit count by resetting ignore count 
                     var engineEnabled = GetEngineEnabled(_enabled, _breakOn, hitCount);
                     var enabled = (_engineEnabled != engineEnabled) ? (bool?)engineEnabled : null;
@@ -186,7 +186,7 @@ namespace Microsoft.NodejsTools.Debugger {
             return true;
         }
 
-        internal void ProcessBreakpointHit(Action followupHandler) {
+        internal async void ProcessBreakpointHit(Action followupHandler) {
             Debug.Assert(GetEngineEnabled(_enabled, _breakOn, HitCount));
 
             // Compose followup handler
@@ -204,19 +204,19 @@ namespace Microsoft.NodejsTools.Debugger {
             };
 
             // Handle pass count
-            switch (_breakOn.kind) {
+            switch (_breakOn.Kind) {
                 case BreakOnKind.Always:
                 case BreakOnKind.GreaterThanOrEqual:
                     followupHandlerWrapper();
                     break;
                 case BreakOnKind.Equal:
                     engineEnabled = false;
-                    Process.UpdateBreakpointBindingAsync(_breakpointId, engineEnabled, followupHandler: followupHandlerWrapper).Wait();
+                    await Process.UpdateBreakpointBindingAsync(_breakpointId, engineEnabled, followupHandler: followupHandlerWrapper).ConfigureAwait(false);
                     break;
                 case BreakOnKind.Mod:
                     var hitCount = engineHitCount - _hitCountDelta;
                     engineIgnoreCount = GetEngineIgnoreCount(_breakOn, hitCount);
-                    Process.UpdateBreakpointBindingAsync(_breakpointId, ignoreCount: engineIgnoreCount, followupHandler: followupHandlerWrapper).Wait();
+                    await Process.UpdateBreakpointBindingAsync(_breakpointId, ignoreCount: engineIgnoreCount, followupHandler: followupHandlerWrapper).ConfigureAwait(false);
                     break;
             }
         }
@@ -226,7 +226,7 @@ namespace Microsoft.NodejsTools.Debugger {
         }
 
         internal static bool GetEngineEnabled(bool enabled, BreakOn breakOn, uint hitCount) {
-            if (enabled && breakOn.kind == BreakOnKind.Equal && hitCount >= breakOn.count) {
+            if (enabled && breakOn.Kind == BreakOnKind.Equal && hitCount >= breakOn.Count) {
                 // Disable BreakOnKind.Equal breakpoints if hit count "exceeds" pass count 
                 return false;
             }
@@ -239,19 +239,19 @@ namespace Microsoft.NodejsTools.Debugger {
 
         internal static int GetEngineIgnoreCount(BreakOn breakOn, uint hitCount) {
             int count = 0;
-            switch (breakOn.kind) {
+            switch (breakOn.Kind) {
                 case BreakOnKind.Always:
                     count = 0;
                     break;
                 case BreakOnKind.Equal:
                 case BreakOnKind.GreaterThanOrEqual:
-                    count = (int)breakOn.count - (int)hitCount - 1;
+                    count = (int)breakOn.Count - (int)hitCount - 1;
                     if (count < 0) {
                         count = 0;
                     }
                     break;
                 case BreakOnKind.Mod:
-                    count = (int)(breakOn.count - hitCount % breakOn.count - 1);
+                    count = (int)(breakOn.Count - hitCount % breakOn.Count - 1);
                     break;
             }
             return count;

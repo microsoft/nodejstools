@@ -33,6 +33,11 @@ namespace Microsoft.NodejsTools.Debugger.Communication {
             _connection.OutputMessage += OnOutputMessage;
         }
 
+        /// <summary>
+        /// Send a command to debugger.
+        /// </summary>
+        /// <param name="command">Command.</param>
+        /// <param name="cancellationToken">Cancellation token.</param>
         public async Task SendRequestAsync(IDebuggerCommand command, CancellationToken cancellationToken = new CancellationToken()) {
             TaskCompletionSource<JObject> promise = _messages.GetOrAdd(command.Id, i => new TaskCompletionSource<JObject>());
             await _connection.SendMessageAsync(command.ToString()).ConfigureAwait(false);
@@ -43,17 +48,32 @@ namespace Microsoft.NodejsTools.Debugger.Communication {
             _messages.TryRemove(command.Id, out promise);
         }
 
+        /// <summary>
+        /// Break point event handler.
+        /// </summary>
         public event EventHandler<BreakpointEventArgs> BreakpointEvent;
+
+        /// <summary>
+        /// Compile script event handler.
+        /// </summary>
         public event EventHandler<CompileScriptEventArgs> CompileScriptEvent;
+
+        /// <summary>
+        /// Exception event handler.
+        /// </summary>
         public event EventHandler<ExceptionEventArgs> ExceptionEvent;
 
+        /// <summary>
+        /// Process message from debugger connection.
+        /// </summary>
+        /// <param name="sender">Sender.</param>
+        /// <param name="args">Event arguments.</param>
         private void OnOutputMessage(object sender, MessageEventArgs args) {
             JObject message;
 
             try {
                 message = JObject.Parse(args.Message);
-            }
-            catch (Exception e) {
+            } catch (Exception e) {
                 Debug.Fail(string.Format("Invalid event message: {0}", e));
                 return;
             }
@@ -124,14 +144,12 @@ namespace Microsoft.NodejsTools.Debugger.Communication {
         /// <param name="message">Message.</param>
         private void HandleResponseMessage(JObject message) {
             TaskCompletionSource<JObject> promise;
-
             var messageId = (int)message["request_seq"];
-            if (!_messages.TryGetValue(messageId, out promise)) {
+            if (_messages.TryGetValue(messageId, out promise)) {
+                promise.SetResult(message);
+            } else {
                 Debug.Print("Invalid response message identifier {0}: {1}", messageId, message);
-                return;
             }
-
-            promise.SetResult(message);
         }
     }
 }

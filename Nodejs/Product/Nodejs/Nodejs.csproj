@@ -227,7 +227,13 @@
     <Compile Include="Commands\OpenRemoteDebugDocumentationCommand.cs" />
     <Compile Include="Commands\OpenRemoteDebugProxyFolderCommand.cs" />
     <Compile Include="Commands\SurveyNewsCommand.cs" />
+    <Compile Include="Debugger\BreakOn.cs" />
+    <Compile Include="Debugger\BreakOnKind.cs" />
+    <Compile Include="Debugger\ExceptionHitTreatment.cs" />
+    <Compile Include="Debugger\ExceptionHandler.cs" />
+    <Compile Include="Debugger\IExceptionHandler.cs" />
     <Compile Include="Debugger\ISourceMapper.cs" />
+    <Compile Include="Debugger\SteppingKind.cs" />
     <Compile Include="TaggerProviderMetadata.cs" />
     <Compile Include="CustomTrackingSpan.cs" />
     <Compile Include="Debugger\Communication\BreakpointEventArgs.cs" />
