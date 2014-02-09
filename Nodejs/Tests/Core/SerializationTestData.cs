@@ -19,7 +19,7 @@ using Newtonsoft.Json.Linq;
 namespace NodejsTests {
     static class SerializationTestData {
         /// <summary>
-        /// Gets a json object produced by <see cref="JavaScriptSerializer" />.
+        /// Gets a json object.
         /// </summary>
         /// <returns>JSON object.</returns>
         public static object GetDeserializedJsonObject() {
@@ -29,7 +29,7 @@ namespace NodejsTests {
         }
 
         /// <summary>
-        /// Gets a json array produced by <see cref="JavaScriptSerializer" />.
+        /// Gets a json array.
         /// </summary>
         /// <returns>JSON array.</returns>
         public static object GetDeserializedPrimitiveJsonArray() {
@@ -39,7 +39,7 @@ namespace NodejsTests {
         }
 
         /// <summary>
-        /// Gets a json array produced by <see cref="JavaScriptSerializer" />.
+        /// Gets a json array.
         /// </summary>
         /// <returns>JSON array.</returns>
         public static object GetDeserializedComplexJsonArray() {
@@ -49,7 +49,7 @@ namespace NodejsTests {
         }
 
         /// <summary>
-        /// Gets a json backtrace response produced by <see cref="JavaScriptSerializer" />.
+        /// Gets a json backtrace response.
         /// </summary>
         /// <returns>JSON object.</returns>
         public static JObject GetBacktraceResponse() {
@@ -58,7 +58,7 @@ namespace NodejsTests {
         }
 
         /// <summary>
-        /// Gets a json backtrace object produced by <see cref="JavaScriptSerializer" />.
+        /// Gets a json backtrace object.
         /// </summary>
         /// <returns>JSON object.</returns>
         public static JObject GetBacktraceJsonObject() {
@@ -67,7 +67,7 @@ namespace NodejsTests {
         }
 
         /// <summary>
-        /// Gets a json backtrace object without name produced by <see cref="JavaScriptSerializer" />.
+        /// Gets a json backtrace object without name.
         /// </summary>
         /// <returns>JSON object.</returns>
         public static JObject GetBacktraceJsonObjectWithNullName() {
@@ -76,7 +76,7 @@ namespace NodejsTests {
         }
 
         /// <summary>
-        /// Gets a json evaluation response produced by <see cref="JavaScriptSerializer" />.
+        /// Gets a json evaluation response.
         /// </summary>
         /// <returns>JSON object.</returns>
         public static JObject GetEvaluateResponse() {
@@ -85,7 +85,7 @@ namespace NodejsTests {
         }
 
         /// <summary>
-        /// Gets a json evaluation object produced by <see cref="JavaScriptSerializer" />.
+        /// Gets a json evaluation object.
         /// </summary>
         /// <returns>JSON object.</returns>
         public static JObject GetEvaluationJsonObject() {
@@ -94,7 +94,7 @@ namespace NodejsTests {
         }
 
         /// <summary>
-        /// Gets a json lookup response produced by <see cref="JavaScriptSerializer" />.
+        /// Gets a json lookup response.
         /// </summary>
         /// <returns>JSON object.</returns>
         public static JObject GetLookupResponse() {
@@ -103,7 +103,7 @@ namespace NodejsTests {
         }
 
         /// <summary>
-        /// Gets a json lookup object produced by <see cref="JavaScriptSerializer" />.
+        /// Gets a json lookup object.
         /// </summary>
         /// <returns>JSON object.</returns>
         public static JObject GetLookupJsonProperty() {
@@ -112,7 +112,16 @@ namespace NodejsTests {
         }
 
         /// <summary>
-        /// Gets a json lookup references produced by <see cref="JavaScriptSerializer" />.
+        /// Gets a json scripts response.
+        /// </summary>
+        /// <returns>JSON object.</returns>
+        public static JObject GetScriptsResponse() {
+            string json = Resources.NodeScriptsResponse;
+            return DeserializeJsonValue(json);
+        }
+
+        /// <summary>
+        /// Gets a json lookup references.
         /// </summary>
         /// <returns>JSON object.</returns>
         public static Dictionary<int, JToken> GetLookupJsonReferences() {
@@ -129,7 +138,7 @@ namespace NodejsTests {
         }
 
         /// <summary>
-        /// Gets a json lookup object prototype produced by <see cref="JavaScriptSerializer" />.
+        /// Gets a json lookup object prototype.
         /// </summary>
         /// <returns>JSON object.</returns>
         public static JObject GetLookupJsonPrototype() {

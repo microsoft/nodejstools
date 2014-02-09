@@ -1,0 +1,136 @@
+﻿/* ****************************************************************************
+ *
+ * Copyright (c) Microsoft Corporation. 
+ *
+ * This source code is subject to terms and conditions of the Apache License, Version 2.0. A 
+ * copy of the license can be found in the License.html file at the root of this distribution. If 
+ * you cannot locate the Apache License, Version 2.0, please send an email to 
+ * vspython@microsoft.com. By using this source code in any fashion, you are agreeing to be bound 
+ * by the terms of the Apache License, Version 2.0.
+ *
+ * You must not remove this notice, or any other, from this software.
+ *
+ * ***************************************************************************/
+
+using System;
+using System.IO;
+using System.Text;
+using System.Threading.Tasks;
+using Microsoft.NodejsTools.Debugger.Communication;
+using Microsoft.VisualStudio.TestTools.UnitTesting;
+using Moq;
+
+namespace NodejsTests.Debugger.Communication {
+    [TestClass]
+    public class DebuggerConnectionTests {
+        [TestMethod]
+        public async Task RaiseConnectionClosedEvent() {
+            // Arrange
+            var memoryStream = new MemoryStream();
+
+            var tcpClientMock = new Mock<ITcpClient>();
+            tcpClientMock.Setup(p => p.GetStream()).Returns(() => memoryStream);
+            tcpClientMock.SetupGet(p => p.Connected).Returns(() => true);
+
+            var tcpClientFactoryMock = new Mock<ITcpClientFactory>();
+            tcpClientFactoryMock.Setup(p => p.CreateTcpClient(It.IsAny<string>(), It.IsAny<int>())).Returns(() => tcpClientMock.Object);
+
+            var debuggerConnection = new DebuggerConnection(tcpClientFactoryMock.Object);
+            object sender = null;
+            EventArgs args = null;
+
+            // Act
+            debuggerConnection.ConnectionClosed += (s, a) => {
+                sender = s;
+                args = a;
+            };
+            debuggerConnection.Connect("localhost", 5858);
+            debuggerConnection.Close();
+
+            await Task.Delay(TimeSpan.FromMilliseconds(100));
+            memoryStream.Close();
+
+            // Assert
+            Assert.IsNotNull(sender);
+            Assert.AreEqual(debuggerConnection, sender);
+            Assert.IsNotNull(args);
+        }
+
+        [TestMethod]
+        public async Task RaiseOutputMessageEvent() {
+            // Arrange
+            const string message = "Hello node.js!";
+            string formattedMessage = string.Format("Content-Length: {0}{1}{1}{2}", Encoding.UTF8.GetByteCount(message), Environment.NewLine, message);
+            byte[] rawMessage = Encoding.UTF8.GetBytes(formattedMessage);
+
+            var memoryStream = new MemoryStream();
+            await memoryStream.WriteAsync(rawMessage, 0, rawMessage.Length);
+            await memoryStream.FlushAsync();
+            memoryStream.Seek(0, SeekOrigin.Begin);
+
+            var tcpClientMock = new Mock<ITcpClient>();
+            tcpClientMock.Setup(p => p.GetStream()).Returns(() => memoryStream);
+            tcpClientMock.SetupGet(p => p.Connected).Returns(() => true);
+
+            var tcpClientFactoryMock = new Mock<ITcpClientFactory>();
+            tcpClientFactoryMock.Setup(p => p.CreateTcpClient(It.IsAny<string>(), It.IsAny<int>())).Returns(() => tcpClientMock.Object);
+
+            var debuggerConnection = new DebuggerConnection(tcpClientFactoryMock.Object);
+            object sender = null;
+            MessageEventArgs args = null;
+            bool inital = debuggerConnection.Connected;
+
+            // Act
+            debuggerConnection.OutputMessage += (s, a) => {
+                sender = s;
+                args = a;
+            };
+            debuggerConnection.Connect("localhost", 5858);
+            bool afterConnection = debuggerConnection.Connected;
+
+            await Task.Delay(TimeSpan.FromMilliseconds(100));
+            memoryStream.Close();
+
+            // Assert
+            Assert.IsNotNull(sender);
+            Assert.AreEqual(debuggerConnection, sender);
+            Assert.IsNotNull(args);
+            Assert.AreEqual(message, args.Message);
+            Assert.IsFalse(inital);
+            Assert.IsTrue(afterConnection);
+        }
+
+        [TestMethod]
+        public async Task SendMessageAsync() {
+            // Arrange
+            const string message = "Hello node.js!";
+            var sourceStream = new MemoryStream();
+            var tcs = new TaskCompletionSource<bool>();
+
+            var tcpClientMock = new Mock<ITcpClient>();
+            tcpClientMock.Setup(p => p.GetStream()).Returns(() => sourceStream);
+            tcpClientMock.SetupGet(p => p.Connected).Returns(() => tcs.Task.Result);
+
+            var tcpClientFactoryMock = new Mock<ITcpClientFactory>();
+            tcpClientFactoryMock.Setup(p => p.CreateTcpClient(It.IsAny<string>(), It.IsAny<int>())).Returns(() => tcpClientMock.Object);
+
+            var debuggerConnection = new DebuggerConnection(tcpClientFactoryMock.Object);
+            string result;
+
+            // Act
+            debuggerConnection.Connect("localhost", 5858);
+            await debuggerConnection.SendMessageAsync(message);
+
+            sourceStream.Seek(0, SeekOrigin.Begin);
+            using (var streamReader = new StreamReader(sourceStream)) {
+                result = await streamReader.ReadToEndAsync();
+            }
+
+            sourceStream.Close();
+            tcs.SetResult(false);
+
+            // Assert
+            Assert.AreEqual(string.Format("Content-Length: {0}{1}{1}{2}", Encoding.UTF8.GetByteCount(message), Environment.NewLine, message), result);
+        }
+    }
+}

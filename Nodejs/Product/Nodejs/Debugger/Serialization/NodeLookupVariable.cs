@@ -25,7 +25,7 @@ namespace Microsoft.NodejsTools.Debugger.Serialization {
             Id = (int)property["ref"];
             JToken reference = references[Id];
             Parent = parent;
-            StackFrame = parent.Frame;
+            StackFrame = parent != null ? parent.Frame : null;
             Name = (string)property["name"];
             TypeName = (string)reference["type"];
             Value = (string)reference["value"];

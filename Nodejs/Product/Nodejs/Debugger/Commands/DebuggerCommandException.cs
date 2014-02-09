@@ -12,18 +12,11 @@
  *
  * ***************************************************************************/
 
-using System.Threading;
+using System;
 
-namespace Microsoft.NodejsTools.Debugger.Serialization {
-    class SequentialNumberGenerator : INumberGenerator {
-        private int _number;
-
-        public int GetNext() {
-            return Interlocked.Increment(ref _number);
-        }
-
-        public void Reset() {
-            Interlocked.Exchange(ref _number, 0);
+namespace Microsoft.NodejsTools.Debugger.Commands {
+    sealed class DebuggerCommandException : Exception {
+        public DebuggerCommandException(string message) : base(message) {
         }
     }
 }

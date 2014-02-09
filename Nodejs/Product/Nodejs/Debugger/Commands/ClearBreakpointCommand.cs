@@ -15,8 +15,8 @@
 using System.Collections.Generic;
 
 namespace Microsoft.NodejsTools.Debugger.Commands {
-    sealed class ClearBreakpointsCommand : DebuggerCommandBase {
-        public ClearBreakpointsCommand(int id, int breakpointId) : base(id) {
+    sealed class ClearBreakpointCommand : DebuggerCommandBase {
+        public ClearBreakpointCommand(int id, int breakpointId) : base(id) {
             CommandName = "clearbreakpoint";
             Arguments = new Dictionary<string, object> {
                 { "breakpoint", breakpointId }

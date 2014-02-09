@@ -12,18 +12,10 @@
  *
  * ***************************************************************************/
 
-using System.Threading;
-
-namespace Microsoft.NodejsTools.Debugger.Serialization {
-    class SequentialNumberGenerator : INumberGenerator {
-        private int _number;
-
-        public int GetNext() {
-            return Interlocked.Increment(ref _number);
-        }
-
-        public void Reset() {
-            Interlocked.Exchange(ref _number, 0);
+namespace Microsoft.NodejsTools.Debugger.Communication {
+    class TcpClientFactory : ITcpClientFactory {
+        public ITcpClient CreateTcpClient(string hostName, int portNumber) {
+            return new TcpClientWrapper(hostName, portNumber);
         }
     }
 }

@@ -19,18 +19,18 @@ using Newtonsoft.Json.Linq;
 namespace Microsoft.NodejsTools.Debugger.Commands {
     sealed class EvaluateCommand : DebuggerCommandBase {
         private readonly string _expression;
-        private readonly NodeStackFrame _frame;
         private readonly IEvaluationResultFactory _resultFactory;
+        private readonly NodeStackFrame _stackFrame;
 
-        public EvaluateCommand(int id, IEvaluationResultFactory resultFactory, string expression, NodeStackFrame frame = null) : base(id) {
+        public EvaluateCommand(int id, IEvaluationResultFactory resultFactory, string expression, NodeStackFrame stackFrame = null) : base(id) {
             _resultFactory = resultFactory;
             _expression = expression;
-            _frame = frame;
+            _stackFrame = stackFrame;
 
             CommandName = "evaluate";
             Arguments = new Dictionary<string, object> {
                 { "expression", _expression },
-                { "frame", _frame != null ? _frame.FrameId : 0 },
+                { "frame", _stackFrame != null ? _stackFrame.FrameId : 0 },
                 { "global", false },
                 { "disable_break", true },
                 { "maxStringLength", -1 }
@@ -42,7 +42,7 @@ namespace Microsoft.NodejsTools.Debugger.Commands {
         public override void ProcessResponse(JObject response) {
             base.ProcessResponse(response);
 
-            var variableProvider = new NodeEvaluationVariable(_frame, _expression, response["body"]);
+            var variableProvider = new NodeEvaluationVariable(_stackFrame, _expression, response["body"]);
             Result = _resultFactory.Create(variableProvider);
         }
     }

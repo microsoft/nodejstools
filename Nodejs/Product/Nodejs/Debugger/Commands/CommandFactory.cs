@@ -33,8 +33,8 @@ namespace Microsoft.NodejsTools.Debugger.Commands {
             return new ChangeBreakpointCommand(_numberGenerator.GetNext(), breakpointId, enabled, condition, ignoreCount);
         }
 
-        public ClearBreakpointsCommand CreateClearBreakpointsCommand(int breakpointId) {
-            return new ClearBreakpointsCommand(_numberGenerator.GetNext(), breakpointId);
+        public ClearBreakpointCommand CreateClearBreakpointsCommand(int breakpointId) {
+            return new ClearBreakpointCommand(_numberGenerator.GetNext(), breakpointId);
         }
 
         public ContinueCommand CreateContinueCommand(SteppingKind stepping, int stepCount = 1) {
@@ -45,8 +45,8 @@ namespace Microsoft.NodejsTools.Debugger.Commands {
             return new DisconnectCommand(_numberGenerator.GetNext());
         }
 
-        public EvaluateCommand CreateEvaluateCommand(string expression, NodeStackFrame frame = null) {
-            return new EvaluateCommand(_numberGenerator.GetNext(), _resultFactory, expression, frame);
+        public EvaluateCommand CreateEvaluateCommand(string expression, NodeStackFrame stackFrame = null) {
+            return new EvaluateCommand(_numberGenerator.GetNext(), _resultFactory, expression, stackFrame);
         }
 
         public ListBreakpointsCommand CreateListBreakpointsCommand() {
@@ -61,12 +61,12 @@ namespace Microsoft.NodejsTools.Debugger.Commands {
             return new LookupCommand(_numberGenerator.GetNext(), _resultFactory, handles);
         }
 
-        public ScriptsCommand CreateScriptsCommand(int? moduleId = null) {
-            return new ScriptsCommand(_numberGenerator.GetNext(), moduleId);
+        public ScriptsCommand CreateScriptsCommand(bool includeSource = false, int? moduleId = null) {
+            return new ScriptsCommand(_numberGenerator.GetNext(), includeSource, moduleId);
         }
 
-        public SetBreakpointCommand CreateSetBreakpointCommand(int line, int column, NodeModule module, NodeBreakpoint breakpoint, bool withoutPredicate = false) {
-            return new SetBreakpointCommand(_numberGenerator.GetNext(), line, column, module, breakpoint, withoutPredicate);
+        public SetBreakpointCommand CreateSetBreakpointCommand(NodeModule module, NodeBreakpoint breakpoint, bool withoutPredicate = false) {
+            return new SetBreakpointCommand(_numberGenerator.GetNext(), module, breakpoint, withoutPredicate);
         }
 
         public SetExceptionBreakCommand CreateSetExceptionBreakCommand(bool uncaughtExceptions, bool enabled) {

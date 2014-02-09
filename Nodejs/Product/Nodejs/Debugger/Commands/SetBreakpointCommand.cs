@@ -24,9 +24,17 @@ namespace Microsoft.NodejsTools.Debugger.Commands {
         private readonly NodeBreakpoint _breakpoint;
         private readonly NodeModule _module;
 
-        public SetBreakpointCommand(int id, int line, int column, NodeModule module, NodeBreakpoint breakpoint, bool withoutPredicate = false) : base(id) {
+        public SetBreakpointCommand(int id, NodeModule module, NodeBreakpoint breakpoint, bool withoutPredicate = false) : base(id) {
             _module = module;
             _breakpoint = breakpoint;
+
+            // Zero based line numbers
+            int line = breakpoint.LineNo - 1;
+
+            // Zero based column numbers
+            // Special case column to avoid (line 0, column 0) which
+            // Node (V8) treats specially for script loaded via require
+            int column = line == 0 ? 1 : 0;
 
             CommandName = "setbreakpoint";
             Arguments = new Dictionary<string, object> {

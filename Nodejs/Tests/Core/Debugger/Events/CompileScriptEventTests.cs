@@ -12,11 +12,25 @@
  *
  * ***************************************************************************/
 
-using System;
+using Microsoft.NodejsTools.Debugger.Events;
+using Microsoft.VisualStudio.TestTools.UnitTesting;
+using Newtonsoft.Json.Linq;
 
-namespace Microsoft.NodejsTools.Debugger.Commands {
-    sealed class NodeCommandException : Exception {
-        public NodeCommandException(string message) : base(message) {
+namespace NodejsTests.Debugger.Events {
+    [TestClass]
+    public class CompileScriptEventTests {
+        [TestMethod]
+        public void CreateCompileScriptEvent() {
+            // Arrange
+            JObject message = JObject.Parse(Resources.NodeCompileScriptResponse);
+
+            // Act
+            var compileScriptEvent = new CompileScriptEvent(message);
+
+            // Assert
+            Assert.IsNotNull(compileScriptEvent.Module);
+            Assert.AreEqual("http.js", compileScriptEvent.Module.Name);
+            Assert.AreEqual(true, compileScriptEvent.Running);
         }
     }
 }

@@ -17,10 +17,10 @@ using Newtonsoft.Json.Linq;
 
 namespace Microsoft.NodejsTools.Debugger.Commands {
     sealed class ScriptsCommand : DebuggerCommandBase {
-        public ScriptsCommand(int id, int? moduleId = null) : base(id) {
+        public ScriptsCommand(int id, bool includeSource, int? moduleId = null) : base(id) {
             CommandName = "scripts";
             Arguments = new Dictionary<string, object> {
-                { "includeSource", true },
+                { "includeSource", includeSource },
             };
 
             if (moduleId != null) {

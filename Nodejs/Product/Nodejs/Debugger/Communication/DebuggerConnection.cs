@@ -24,12 +24,18 @@ using Microsoft.VisualStudioTools.Project;
 namespace Microsoft.NodejsTools.Debugger.Communication {
     sealed class DebuggerConnection : IDebuggerConnection {
         private readonly Regex _contentLength = new Regex(@"Content-Length: (\d+)", RegexOptions.Compiled);
-        private string _hostName;
-        private ushort _portNumber;
+        private readonly ITcpClientFactory _tcpClientFactory;
         private StreamReader _streamReader;
         private StreamWriter _streamWriter;
-        private TcpClient _tcpClient;
+        private ITcpClient _tcpClient;
 
+        public DebuggerConnection(ITcpClientFactory tcpClientFactory) {
+            _tcpClientFactory = tcpClientFactory;
+        }
+
+        /// <summary>
+        /// Close connection.
+        /// </summary>
         public void Close() {
             if (_tcpClient != null) {
                 _tcpClient.Close();
@@ -47,6 +53,10 @@ namespace Microsoft.NodejsTools.Debugger.Communication {
             }
         }
 
+        /// <summary>
+        /// Send a message.
+        /// </summary>
+        /// <param name="message">Message.</param>
         public async Task SendMessageAsync(string message) {
             Utilities.ArgumentNotNullOrEmpty("message", message);
             Utilities.CheckNotNull(_streamWriter, "No connection with node.js debugger.");
@@ -58,7 +68,14 @@ namespace Microsoft.NodejsTools.Debugger.Communication {
             await _streamWriter.FlushAsync().ConfigureAwait(false);
         }
 
+        /// <summary>
+        /// Fired when received inbound message.
+        /// </summary>
         public event EventHandler<MessageEventArgs> OutputMessage;
+
+        /// <summary>
+        /// Fired when connection was closed.
+        /// </summary>
         public event EventHandler<EventArgs> ConnectionClosed;
 
         /// <summary>
@@ -68,21 +85,21 @@ namespace Microsoft.NodejsTools.Debugger.Communication {
             get { return _tcpClient != null && _tcpClient.Connected; }
         }
 
-        public void Connect(string hostName, ushort portNumber) {
+        /// <summary>
+        /// Connect to specified debugger endpoint.
+        /// </summary>
+        /// <param name="hostName">Host address.</param>
+        /// <param name="portNumber">Port number.</param>
+        public void Connect(string hostName, int portNumber) {
             Utilities.ArgumentNotNullOrEmpty("hostName", hostName);
 
-            _hostName = hostName;
-            _portNumber = portNumber;
-
-            Connect();
-        }
-
-        public void Connect() {
             Close();
 
-            _tcpClient = new TcpClient(_hostName, _portNumber);
-            _streamReader = new StreamReader(_tcpClient.GetStream());
-            _streamWriter = new StreamWriter(_tcpClient.GetStream());
+            _tcpClient = _tcpClientFactory.CreateTcpClient(hostName, portNumber);
+
+            Stream stream = _tcpClient.GetStream();
+            _streamReader = new StreamReader(stream);
+            _streamWriter = new StreamWriter(stream);
 
             Task.Factory.StartNew(ReadStreamAsync);
         }
@@ -98,7 +115,7 @@ namespace Microsoft.NodejsTools.Debugger.Communication {
                     // Read message header
                     string result = await _streamReader.ReadLineAsync();
                     if (result == null) {
-                        break;
+                        continue;
                     }
 
                     // Check whether result is content length header
@@ -119,6 +136,7 @@ namespace Microsoft.NodejsTools.Debugger.Communication {
                     var buffer = new char[length];
                     int count = await _streamReader.ReadBlockAsync(buffer, 0, length);
                     if (count == 0) {
+                        DebugWriteLine(string.Format("DebuggerConnection: unable to read {0} chars.", length));
                         break;
                     }
 

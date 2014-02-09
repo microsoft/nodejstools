@@ -25,9 +25,9 @@ namespace Microsoft.NodejsTools.Debugger.Communication {
         /// <summary>
         /// Connect to specified debugger endpoint.
         /// </summary>
-        /// <param name="host">Host address.</param>
-        /// <param name="port">Port number.</param>
-        void Connect(string host, ushort port);
+        /// <param name="hostName">Host address.</param>
+        /// <param name="portNumber">Port number.</param>
+        void Connect(string hostName, int portNumber);
 
         /// <summary>
         /// Close connection.

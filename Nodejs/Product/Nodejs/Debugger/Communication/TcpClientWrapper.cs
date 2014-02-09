@@ -12,18 +12,27 @@
  *
  * ***************************************************************************/
 
-using System.Threading;
+using System.IO;
+using System.Net.Sockets;
 
-namespace Microsoft.NodejsTools.Debugger.Serialization {
-    class SequentialNumberGenerator : INumberGenerator {
-        private int _number;
+namespace Microsoft.NodejsTools.Debugger.Communication {
+    sealed class TcpClientWrapper : ITcpClient {
+        private readonly TcpClient _tcpClient;
 
-        public int GetNext() {
-            return Interlocked.Increment(ref _number);
+        public TcpClientWrapper(string hostName, int portNumber) {
+            _tcpClient = new TcpClient(hostName, portNumber);
         }
 
-        public void Reset() {
-            Interlocked.Exchange(ref _number, 0);
+        public bool Connected {
+            get { return _tcpClient.Connected; }
+        }
+
+        public void Close() {
+            _tcpClient.Close();
+        }
+
+        public Stream GetStream() {
+            return _tcpClient.GetStream();
         }
     }
 }

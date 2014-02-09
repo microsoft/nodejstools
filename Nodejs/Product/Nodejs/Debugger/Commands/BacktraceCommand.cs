@@ -40,13 +40,11 @@ namespace Microsoft.NodejsTools.Debugger.Commands {
                 { "inlineRefs", true }
             };
 
-            Frames = new List<NodeStackFrame>();
+            StackFrames = new List<NodeStackFrame>();
         }
 
         public int CallstackDepth { get; private set; }
-
-        public List<NodeStackFrame> Frames { get; private set; }
-
+        public List<NodeStackFrame> StackFrames { get; private set; }
 
         public override void ProcessResponse(JObject response) {
             base.ProcessResponse(response);
@@ -74,7 +72,7 @@ namespace Microsoft.NodejsTools.Debugger.Commands {
                 // Create stack frame
                 string name = GetFrameName(frame);
                 var moduleId = (int)frame["func"]["scriptId"];
-                
+
                 NodeModule module;
                 if (!modules.TryGetValue(moduleId, out module)) {
                     module = _unknownModule;
@@ -96,7 +94,7 @@ namespace Microsoft.NodejsTools.Debugger.Commands {
                 stackFrame.Locals = locals;
                 stackFrame.Parameters = parameters;
 
-                Frames.Add(stackFrame);
+                StackFrames.Add(stackFrame);
             }
         }
 

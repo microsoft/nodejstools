@@ -53,7 +53,7 @@ namespace Microsoft.NodejsTools.Debugger {
         private SteppingKind _steppingMode;
 
         private NodeDebugger() {
-            Connection = Connection ?? new DebuggerConnection();
+            Connection = Connection ?? new DebuggerConnection(new TcpClientFactory());
             Client = Client ?? new DebuggerClient(Connection);
             ExceptionHandler = ExceptionHandler ?? new ExceptionHandler();
             CommandFactory = CommandFactory ?? new CommandFactory(
@@ -776,7 +776,7 @@ namespace Microsoft.NodejsTools.Debugger {
                 return false;
             }
 
-            MainThread.Frames = backtraceCommand.Frames.ToArray();
+            MainThread.Frames = backtraceCommand.StackFrames.ToArray();
             return backtraceCommand.Running;
         }
 
@@ -936,18 +936,10 @@ namespace Microsoft.NodejsTools.Debugger {
         internal async Task<Tuple<int, int?, int>> SetBreakpointAsync(NodeBreakpoint breakpoint, bool withoutPredicate = false) {
             DebugWriteCommand(String.Format("Set Breakpoint"));
 
-            // Zero based line numbers
-            int line = breakpoint.LineNo - 1;
-
-            // Zero based column numbers
-            // Special case column to avoid (line 0, column 0) which
-            // Node (V8) treats specially for script loaded via require
-            int column = line == 0 ? 1 : 0;
-
             // Try to find module
             NodeModule module = GetModuleForFilePath(breakpoint.FileName);
 
-            SetBreakpointCommand setBreakpointCommand = CommandFactory.CreateSetBreakpointCommand(line, column, module, breakpoint, withoutPredicate);
+            SetBreakpointCommand setBreakpointCommand = CommandFactory.CreateSetBreakpointCommand(module, breakpoint, withoutPredicate);
             try {
                 await Client.SendRequestAsync(setBreakpointCommand).ConfigureAwait(false);
             } catch (Exception) {
@@ -1067,7 +1059,7 @@ namespace Microsoft.NodejsTools.Debugger {
             }
 
             int breakpointId = breakpointBinding.BreakpointID;
-            ClearBreakpointsCommand clearBreakpointsCommand = CommandFactory.CreateClearBreakpointsCommand(breakpointId);
+            ClearBreakpointCommand clearBreakpointsCommand = CommandFactory.CreateClearBreakpointsCommand(breakpointId);
 
             try {
                 await Client.SendRequestAsync(clearBreakpointsCommand).ConfigureAwait(false);
@@ -1096,7 +1088,7 @@ namespace Microsoft.NodejsTools.Debugger {
         internal async Task<string> GetScriptTextAsync(int moduleId) {
             DebugWriteCommand("GetScriptText: " + moduleId);
 
-            ScriptsCommand scriptsCommand = CommandFactory.CreateScriptsCommand(moduleId);
+            ScriptsCommand scriptsCommand = CommandFactory.CreateScriptsCommand(true, moduleId);
             var cts = new CancellationTokenSource(Timeout);
             try {
                 await Client.SendRequestAsync(scriptsCommand, cts.Token).ConfigureAwait(false);

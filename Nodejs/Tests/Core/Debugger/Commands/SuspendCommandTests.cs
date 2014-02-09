@@ -12,18 +12,25 @@
  *
  * ***************************************************************************/
 
-using System.Threading;
+using Microsoft.NodejsTools.Debugger.Commands;
+using Microsoft.VisualStudio.TestTools.UnitTesting;
 
-namespace Microsoft.NodejsTools.Debugger.Serialization {
-    class SequentialNumberGenerator : INumberGenerator {
-        private int _number;
+namespace NodejsTests.Debugger.Commands {
+    [TestClass]
+    public class SuspendCommandTests {
+        [TestMethod]
+        public void CreateSuspendCommand() {
+            // Arrange
+            const int commandId = 3;
 
-        public int GetNext() {
-            return Interlocked.Increment(ref _number);
-        }
+            // Act
+            var suspendCommand = new SuspendCommand(commandId);
 
-        public void Reset() {
-            Interlocked.Exchange(ref _number, 0);
+            // Assert
+            Assert.AreEqual(commandId, suspendCommand.Id);
+            Assert.AreEqual(
+                string.Format("{{\"command\":\"suspend\",\"seq\":{0},\"type\":\"request\",\"arguments\":null}}", commandId),
+                suspendCommand.ToString());
         }
     }
 }

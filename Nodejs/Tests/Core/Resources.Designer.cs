@@ -88,11 +88,38 @@ namespace NodejsTests {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to {&quot;seq&quot;:11,&quot;type&quot;:&quot;event&quot;,&quot;event&quot;:&quot;break&quot;,&quot;body&quot;:{&quot;invocationText&quot;:&quot;#&lt;Object&gt;.[anonymous](exports=#&lt;Object&gt;, require=function require(path) {\n    return self.require(path);\n  }, module=#&lt;Module&gt;, __filename=C:\\Users\\Tester\\documents\\visual studio 2012\\Projects\\NodejsApp2\\NodejsApp2\\serv... (length: 85), __dirname=C:\\Users\\Tester\\documents\\visual studio 2012\\Projects\\NodejsApp2\\NodejsApp2)&quot;,&quot;sourceLine&quot;:1,&quot;sourceColumn&quot;:0,&quot;sourceLineText&quot;:&quot;var port = process.env.port || 1337;&quot;,&quot;script&quot;:{&quot;id&quot;: [rest of string was truncated]&quot;;.
+        /// </summary>
+        internal static string NodeBreakpointResponse {
+            get {
+                return ResourceManager.GetString("NodeBreakpointResponse", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to {&quot;seq&quot;:5,&quot;type&quot;:&quot;event&quot;,&quot;event&quot;:&quot;afterCompile&quot;,&quot;success&quot;:true,&quot;body&quot;:{&quot;script&quot;:{&quot;handle&quot;:1,&quot;type&quot;:&quot;script&quot;,&quot;name&quot;:&quot;http.js&quot;,&quot;id&quot;:34,&quot;lineOffset&quot;:0,&quot;columnOffset&quot;:0,&quot;lineCount&quot;:2169,&quot;sourceStart&quot;:&quot;(function (exports, require, module, __filename, __dirname) { // Copyright Joyen&quot;,&quot;sourceLength&quot;:61850,&quot;scriptType&quot;:2,&quot;compilationType&quot;:0,&quot;context&quot;:{&quot;ref&quot;:0},&quot;text&quot;:&quot;http.js (lines: 2169)&quot;}},&quot;refs&quot;:[{&quot;handle&quot;:0,&quot;type&quot;:&quot;context&quot;,&quot;text&quot;:&quot;#&lt;ContextMirror&gt;&quot;}],&quot;running&quot;:true}.
+        /// </summary>
+        internal static string NodeCompileScriptResponse {
+            get {
+                return ResourceManager.GetString("NodeCompileScriptResponse", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to [{fullName: &quot;full name&quot;, age: 123}, {head:&quot;head&quot;, body:&quot;body&quot;}, [0, 1, 2]].
         /// </summary>
         internal static string NodeComplexArray {
             get {
                 return ResourceManager.GetString("NodeComplexArray", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to {&quot;seq&quot;:22,&quot;request_seq&quot;:10,&quot;type&quot;:&quot;response&quot;,&quot;command&quot;:&quot;disconnect&quot;,&quot;success&quot;:true,&quot;running&quot;:true}.
+        /// </summary>
+        internal static string NodeDisconnectResponse {
+            get {
+                return ResourceManager.GetString("NodeDisconnectResponse", resourceCulture);
             }
         }
         
@@ -111,6 +138,15 @@ namespace NodejsTests {
         internal static string NodeEvaluationVariableObject {
             get {
                 return ResourceManager.GetString("NodeEvaluationVariableObject", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to {&quot;seq&quot;:10,&quot;type&quot;:&quot;event&quot;,&quot;event&quot;:&quot;exception&quot;,&quot;success&quot;:true,&quot;body&quot;:{&quot;uncaught&quot;:false,&quot;exception&quot;:{&quot;handle&quot;:0,&quot;type&quot;:&quot;error&quot;,&quot;className&quot;:&quot;Error&quot;,&quot;constructorFunction&quot;:{&quot;ref&quot;:4},&quot;protoObject&quot;:{&quot;ref&quot;:5},&quot;prototypeObject&quot;:{&quot;ref&quot;:6},&quot;properties&quot;:[{&quot;name&quot;:&quot;stack&quot;,&quot;attributes&quot;:2,&quot;propertyType&quot;:3,&quot;ref&quot;:6},{&quot;name&quot;:&quot;arguments&quot;,&quot;attributes&quot;:2,&quot;propertyType&quot;:1,&quot;ref&quot;:6},{&quot;name&quot;:&quot;type&quot;,&quot;attributes&quot;:2,&quot;propertyType&quot;:1,&quot;ref&quot;:6},{&quot;name&quot;:&quot;message&quot;,&quot;attributes&quot;:2,&quot;propertyType&quot;:1,&quot;ref&quot;:7}],&quot;text&quot;:&quot;Error: Mission failed!&quot;},&quot;so [rest of string was truncated]&quot;;.
+        /// </summary>
+        internal static string NodeExceptionResponse {
+            get {
+                return ResourceManager.GetString("NodeExceptionResponse", resourceCulture);
             }
         }
         
@@ -147,6 +183,15 @@ namespace NodejsTests {
         internal static string NodeLookupVariableObject {
             get {
                 return ResourceManager.GetString("NodeLookupVariableObject", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to {&quot;seq&quot;:0,&quot;request_seq&quot;:1,&quot;type&quot;:&quot;response&quot;,&quot;command&quot;:&quot;scripts&quot;,&quot;success&quot;:true,&quot;body&quot;:[{&quot;handle&quot;:1,&quot;type&quot;:&quot;script&quot;,&quot;name&quot;:&quot;node.js&quot;,&quot;id&quot;:17,&quot;lineOffset&quot;:0,&quot;columnOffset&quot;:0,&quot;lineCount&quot;:903,&quot;sourceStart&quot;:&quot;// Copyright Joyent, Inc. and other Node contributors.\n//\n// Permission is hereb&quot;,&quot;sourceLength&quot;:28095,&quot;scriptType&quot;:2,&quot;compilationType&quot;:0,&quot;context&quot;:{&quot;ref&quot;:0},&quot;text&quot;:&quot;node.js (lines: 903)&quot;},{&quot;handle&quot;:3,&quot;type&quot;:&quot;script&quot;,&quot;name&quot;:&quot;path.js&quot;,&quot;id&quot;:22,&quot;lineOffset&quot;:0,&quot;columnOffset&quot;:0,&quot;lineCount&quot;:489,&quot;sourceStart&quot;:&quot;(fu [rest of string was truncated]&quot;;.
+        /// </summary>
+        internal static string NodeScriptsResponse {
+            get {
+                return ResourceManager.GetString("NodeScriptsResponse", resourceCulture);
             }
         }
         

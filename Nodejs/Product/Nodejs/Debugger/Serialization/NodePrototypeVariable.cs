@@ -19,14 +19,13 @@ using Newtonsoft.Json.Linq;
 namespace Microsoft.NodejsTools.Debugger.Serialization {
     class NodePrototypeVariable : INodeVariable {
         public NodePrototypeVariable(NodeEvaluationResult parent, JToken prototype, Dictionary<int, JToken> references) {
-            Utilities.ArgumentNotNull("parent", parent);
             Utilities.ArgumentNotNull("prototype", prototype);
             Utilities.ArgumentNotNull("references", references);
 
             Id = (int)prototype["ref"];
             JToken reference = references[Id];
             Parent = parent;
-            StackFrame = parent.Frame;
+            StackFrame = parent != null ? parent.Frame : null;
             Name = "__proto__";
             TypeName = (string)reference["type"];
             Value = (string)reference["value"];

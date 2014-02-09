@@ -50,6 +50,9 @@
     <PlatformTarget>x86</PlatformTarget>
   </PropertyGroup>
   <ItemGroup>
+    <Reference Include="Moq">
+      <HintPath>..\..\packages\Moq.4.2.1312.1622\lib\net40\Moq.dll</HintPath>
+    </Reference>
     <Reference Include="Newtonsoft.Json, Version=6.0.0.0, Culture=neutral, PublicKeyToken=30ad4fe6b2a6aeed, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
       <HintPath>..\..\packages\Newtonsoft.Json.6.0.1\lib\net45\Newtonsoft.Json.dll</HintPath>
@@ -80,13 +83,31 @@
   <ItemGroup>
     <Compile Include="BaselineCompare.cs" />
     <Compile Include="Debugger\BaseDebuggerTests.cs" />
+    <Compile Include="Debugger\Commands\BacktraceCommandTests.cs" />
+    <Compile Include="Debugger\Commands\ChangeBreakpointCommandTests.cs" />
+    <Compile Include="Debugger\Commands\ClearBreakpointCommandTests.cs" />
+    <Compile Include="Debugger\Commands\ContinueCommandTests.cs" />
+    <Compile Include="Debugger\Commands\SuspendCommandTests.cs" />
+    <Compile Include="Debugger\Commands\SetExceptionBreakCommandTests.cs" />
+    <Compile Include="Debugger\Commands\SetBreakpointCommandTests.cs" />
+    <Compile Include="Debugger\Commands\ScriptsCommandTests.cs" />
+    <Compile Include="Debugger\Commands\LookupCommandTests.cs" />
+    <Compile Include="Debugger\Commands\ListBreakpointsTests.cs" />
+    <Compile Include="Debugger\Commands\EvaluateCommandTests.cs" />
+    <Compile Include="Debugger\Commands\DisconnectCommandTests.cs" />
+    <Compile Include="Debugger\Communication\DebuggerClientTests.cs" />
+    <Compile Include="Debugger\Communication\DebuggerConnectionTests.cs" />
     <Compile Include="Debugger\DebuggerTests.cs" />
+    <Compile Include="Debugger\Events\CompileScriptEventTests.cs" />
+    <Compile Include="Debugger\Events\BreakpointEventTests.cs" />
+    <Compile Include="Debugger\Events\ExceptionEventTests.cs" />
+    <Compile Include="Debugger\ExceptionHandlerTests.cs" />
     <Compile Include="Debugger\InfrastructureTests.cs" />
-    <Compile Include="Debugger\Serialization\NodeResponseHandlerTests.cs" />
     <Compile Include="Debugger\Serialization\PrototypeVariableTests.cs" />
     <Compile Include="Debugger\Serialization\LookupVariableTests.cs" />
     <Compile Include="Debugger\Serialization\EvaluationVariableTests.cs" />
     <Compile Include="Debugger\Serialization\BacktraceVariableTests.cs" />
+    <Compile Include="Debugger\Serialization\SequentialNumberGeneratorTests.cs" />
     <Compile Include="ImportWizardTests.cs" />
     <Compile Include="Mocks\MockEvaluationResultFactory.cs" />
     <Compile Include="JadeTests.cs" />
@@ -139,6 +160,7 @@
   <ItemGroup>
     <None Include="packages.config" />
   </ItemGroup>
+  <ItemGroup />
   <Import Project="..\TestProjectAfter.settings" />
   <Import Project="$(SolutionDir)\.nuget\NuGet.targets" Condition="Exists('$(SolutionDir)\.nuget\NuGet.targets')" />
   <Target Name="EnsureNuGetPackageBuildImports" BeforeTargets="PrepareForBuild">

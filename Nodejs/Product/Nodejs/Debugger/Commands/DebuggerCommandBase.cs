@@ -35,7 +35,7 @@ namespace Microsoft.NodejsTools.Debugger.Commands {
 
             if (!(bool)response["success"]) {
                 var message = (string)response["message"];
-                throw new NodeCommandException(message);
+                throw new DebuggerCommandException(message);
             }
         }
 

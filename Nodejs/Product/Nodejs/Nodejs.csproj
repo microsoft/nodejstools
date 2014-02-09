@@ -229,6 +229,10 @@
     <Compile Include="Commands\SurveyNewsCommand.cs" />
     <Compile Include="Debugger\BreakOn.cs" />
     <Compile Include="Debugger\BreakOnKind.cs" />
+    <Compile Include="Debugger\Communication\ITcpClient.cs" />
+    <Compile Include="Debugger\Communication\ITcpClientFactory.cs" />
+    <Compile Include="Debugger\Communication\TcpClientFactory.cs" />
+    <Compile Include="Debugger\Communication\TcpClientWrapper.cs" />
     <Compile Include="Debugger\ExceptionHitTreatment.cs" />
     <Compile Include="Debugger\ExceptionHandler.cs" />
     <Compile Include="Debugger\IExceptionHandler.cs" />
@@ -246,7 +250,7 @@
     <Compile Include="Debugger\Communication\DebuggerConnection.cs" />
     <Compile Include="Debugger\Commands\BacktraceCommand.cs" />
     <Compile Include="Debugger\Commands\ChangeBreakpointCommand.cs" />
-    <Compile Include="Debugger\Commands\ClearBreakpointsCommand.cs" />
+    <Compile Include="Debugger\Commands\ClearBreakpointCommand.cs" />
     <Compile Include="Debugger\Commands\CommandFactory.cs" />
     <Compile Include="Debugger\Commands\ContinueCommand.cs" />
     <Compile Include="Debugger\Commands\DisconnectCommand.cs" />
@@ -261,7 +265,7 @@
     <Compile Include="Debugger\Commands\ListBreakpointsCommand.cs" />
     <Compile Include="Debugger\Commands\LookupCommand.cs" />
     <Compile Include="Debugger\Commands\DebuggerCommandBase.cs" />
-    <Compile Include="Debugger\Commands\NodeCommandException.cs" />
+    <Compile Include="Debugger\Commands\DebuggerCommandException.cs" />
     <Compile Include="Debugger\Commands\ScriptsCommand.cs" />
     <Compile Include="Debugger\Serialization\SequentialNumberGenerator.cs" />
     <Compile Include="Debugger\Commands\SetBreakpointCommand.cs" />

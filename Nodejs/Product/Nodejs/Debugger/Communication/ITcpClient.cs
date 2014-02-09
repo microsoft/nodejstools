@@ -12,18 +12,24 @@
  *
  * ***************************************************************************/
 
-using System.Threading;
+using System.IO;
 
-namespace Microsoft.NodejsTools.Debugger.Serialization {
-    class SequentialNumberGenerator : INumberGenerator {
-        private int _number;
+namespace Microsoft.NodejsTools.Debugger.Communication {
+    interface ITcpClient {
+        /// <summary>
+        /// Gets a value indicating whether client is connected to a remote host.
+        /// </summary>
+        bool Connected { get; }
 
-        public int GetNext() {
-            return Interlocked.Increment(ref _number);
-        }
+        /// <summary>
+        /// Disposes instance and requests that the underlying tcp connection be closed.
+        /// </summary>
+        void Close();
 
-        public void Reset() {
-            Interlocked.Exchange(ref _number, 0);
-        }
+        /// <summary>
+        /// Returns the <see cref="T:System.IO.Stream" /> used to send and receive data.
+        /// </summary>
+        /// <returns>The underlying <see cref="T:System.IO.Stream" /></returns>
+        Stream GetStream();
     }
 }

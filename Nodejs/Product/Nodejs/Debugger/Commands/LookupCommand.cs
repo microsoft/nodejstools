@@ -60,8 +60,15 @@ namespace Microsoft.NodejsTools.Debugger.Commands {
 
             foreach (int handle in _handles) {
                 JToken data = body[handle.ToString(CultureInfo.InvariantCulture)];
-                NodeEvaluationResult parent;
-                _parents.TryGetValue(handle, out parent);
+                if (data == null) {
+                    continue;
+                }
+
+                NodeEvaluationResult parent = null;
+                if (_parents != null) {
+                    _parents.TryGetValue(handle, out parent);
+                }
+
                 Results.Add(handle, GetProperties(data, parent, references));
             }
         }

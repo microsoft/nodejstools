@@ -19,16 +19,19 @@ using System.Threading;
 using System.Threading.Tasks;
 using Microsoft.NodejsTools.Debugger.Commands;
 using Microsoft.NodejsTools.Debugger.Events;
+using Microsoft.VisualStudioTools.Project;
 using Newtonsoft.Json.Linq;
 
 namespace Microsoft.NodejsTools.Debugger.Communication {
     sealed class DebuggerClient : IDebuggerClient {
         private readonly IDebuggerConnection _connection;
 
-        private ConcurrentDictionary<int, TaskCompletionSource<JObject>> _messages =
+        private readonly ConcurrentDictionary<int, TaskCompletionSource<JObject>> _messages =
             new ConcurrentDictionary<int, TaskCompletionSource<JObject>>();
 
         public DebuggerClient(IDebuggerConnection connection) {
+            Utilities.ArgumentNotNull("connection", connection);
+
             _connection = connection;
             _connection.OutputMessage += OnOutputMessage;
         }
@@ -74,11 +77,12 @@ namespace Microsoft.NodejsTools.Debugger.Communication {
             try {
                 message = JObject.Parse(args.Message);
             } catch (Exception e) {
-                Debug.Fail(string.Format("Invalid event message: {0}", e));
+                Debug.Fail(string.Format("Invalid debugger message: {0}{1}{2}", e, Environment.NewLine, args.Message));
                 return;
             }
 
-            switch ((string)message["type"]) {
+            var messageType = (string)message["type"];
+            switch (messageType) {
                 case "event":
                     HandleEventMessage(message);
                     break;
@@ -88,7 +92,7 @@ namespace Microsoft.NodejsTools.Debugger.Communication {
                     break;
 
                 default:
-                    Debug.Print("Unrecognized message type: {0}", message);
+                    Debug.Fail(string.Format("Unrecognized type '{0}' in message: {1}", messageType, message));
                     break;
             }
         }
@@ -98,7 +102,8 @@ namespace Microsoft.NodejsTools.Debugger.Communication {
         /// </summary>
         /// <param name="message">Message.</param>
         private void HandleEventMessage(JObject message) {
-            switch ((string)message["event"]) {
+            var eventType = (string)message["event"];
+            switch (eventType) {
                 case "afterCompile":
                     EventHandler<CompileScriptEventArgs> compileScriptHandler = CompileScriptEvent;
                     if (compileScriptHandler != null) {
@@ -124,16 +129,7 @@ namespace Microsoft.NodejsTools.Debugger.Communication {
                     break;
 
                 default:
-                    var errorMessage = (string)message["message"];
-                    ConcurrentDictionary<int, TaskCompletionSource<JObject>> messages =
-                        Interlocked.Exchange(ref _messages, new ConcurrentDictionary<int, TaskCompletionSource<JObject>>());
-
-                    foreach (var kv in messages) {
-                        kv.Value.SetException(new Exception(errorMessage));
-                    }
-
-                    messages.Clear();
-                    Debug.Print("Unrecognized event type: {0}", message);
+                    Debug.Fail(string.Format("Unrecognized type '{0}' in event message: {1}", eventType, message));
                     break;
             }
         }
@@ -148,7 +144,7 @@ namespace Microsoft.NodejsTools.Debugger.Communication {
             if (_messages.TryGetValue(messageId, out promise)) {
                 promise.SetResult(message);
             } else {
-                Debug.Print("Invalid response message identifier {0}: {1}", messageId, message);
+                Debug.Fail(string.Format("Invalid response identifier '{0}' in message: {1}", messageId, message));
             }
         }
     }

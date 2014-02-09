@@ -18,15 +18,15 @@ namespace Microsoft.NodejsTools.Debugger.Commands {
     interface ICommandFactory {
         BacktraceCommand CreateBacktraceCommand(int fromFrame, int toFrame, NodeThread thread = null, Dictionary<int, NodeModule> modules = null);
         ChangeBreakpointCommand CreateChangeBreakpointCommand(int breakpointId, bool? enabled = null, string condition = null, int? ignoreCount = null);
-        ClearBreakpointsCommand CreateClearBreakpointsCommand(int breakpointId);
+        ClearBreakpointCommand CreateClearBreakpointsCommand(int breakpointId);
         ContinueCommand CreateContinueCommand(SteppingKind stepping, int stepCount = 1);
         DisconnectCommand CreateDisconnectCommand();
-        EvaluateCommand CreateEvaluateCommand(string expression, NodeStackFrame frame = null);
+        EvaluateCommand CreateEvaluateCommand(string expression, NodeStackFrame stackFrame = null);
         ListBreakpointsCommand CreateListBreakpointsCommand();
         LookupCommand CreateLookupCommand(List<NodeEvaluationResult> parents);
         LookupCommand CreateLookupCommand(int[] handles);
-        ScriptsCommand CreateScriptsCommand(int? moduleId = null);
-        SetBreakpointCommand CreateSetBreakpointCommand(int line, int column, NodeModule module, NodeBreakpoint breakpoint, bool withoutPredicate = false);
+        ScriptsCommand CreateScriptsCommand(bool includeSource = false, int? moduleId = null);
+        SetBreakpointCommand CreateSetBreakpointCommand(NodeModule module, NodeBreakpoint breakpoint, bool withoutPredicate = false);
         SetExceptionBreakCommand CreateSetExceptionBreakCommand(bool uncaughtExceptions, bool enabled);
         SuspendCommand CreateSuspendCommand();
     }
