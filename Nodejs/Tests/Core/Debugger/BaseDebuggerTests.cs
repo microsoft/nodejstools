@@ -258,17 +258,8 @@ namespace NodejsTests.Debugger {
             string expectedException = null,
             string expectedFrame = null
         ) {
-            AutoResetEvent textExecuted = new AutoResetEvent(false);
             var frame = thread.Frames[frameIndex];
-            NodeEvaluationResult evaluationResult = null;
-            frame.ExecuteText(
-                expression,
-                (result) => {
-                    evaluationResult = result;
-                    textExecuted.Set();
-                }
-            );
-            AssertWaited(textExecuted);
+            NodeEvaluationResult evaluationResult = frame.ExecuteTextAsync(expression).Result;
             if (expectedType != null) {
                 Assert.AreEqual(expectedType, evaluationResult.TypeName);
             }

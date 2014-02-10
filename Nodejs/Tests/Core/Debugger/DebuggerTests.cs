@@ -105,16 +105,8 @@ namespace NodejsTests.Debugger {
 
             var frames = thread.Frames;
 
-            AutoResetEvent evalComplete = new AutoResetEvent(false);
-            NodeEvaluationResult evalRes = null;
-            frames[frame].ExecuteText(text, (completion) => {
-                evalRes = completion;
-                evalComplete.Set();
-            });
-
-            AssertWaited(evalComplete);
+            NodeEvaluationResult evalRes = frames[frame].ExecuteTextAsync(text).Result;
             Assert.IsTrue(evalRes != null, "didn't get evaluation result");
-
 
             if (children == null) {
                 Assert.IsTrue(!evalRes.Type.HasFlag(NodeExpressionType.Expandable));

@@ -749,10 +749,22 @@ namespace Microsoft.NodejsTools.Debugger {
 
             // Handle followup
             EventHandler<ExceptionRaisedEventArgs> exceptionRaised = ExceptionRaised;
-            if (exceptionRaised != null) {
-                var exception = new NodeException(exceptionName, exceptionEvent.Description);
-                exceptionRaised(this, new ExceptionRaisedEventArgs(MainThread, exception, exceptionEvent.Uncaught));
+            if (exceptionRaised == null) {
+                return;
             }
+
+            // Serialize exception object to get a proper description
+            string description;
+            var evaluateCommand = CommandFactory.CreateEvaluateCommand(exceptionEvent.ExceptionId);
+            try {
+                await Client.SendRequestAsync(evaluateCommand).ConfigureAwait(false);
+                description = evaluateCommand.Result.StringValue;
+            } catch (Exception) {
+                description = exceptionEvent.Description;
+            }
+
+            var exception = new NodeException(exceptionEvent.TypeName, description);
+            exceptionRaised(this, new ExceptionRaisedEventArgs(MainThread, exception, exceptionEvent.Uncaught));
         }
 
         private async Task<int> GetCallstackDepthAsync() {

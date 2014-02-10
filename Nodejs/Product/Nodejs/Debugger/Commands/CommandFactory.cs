@@ -49,6 +49,10 @@ namespace Microsoft.NodejsTools.Debugger.Commands {
             return new EvaluateCommand(_numberGenerator.GetNext(), _resultFactory, expression, stackFrame);
         }
 
+        public EvaluateCommand CreateEvaluateCommand(int variableId, NodeStackFrame stackFrame = null) {
+            return new EvaluateCommand(_numberGenerator.GetNext(), _resultFactory, variableId, stackFrame);
+        }
+
         public ListBreakpointsCommand CreateListBreakpointsCommand() {
             return new ListBreakpointsCommand(_numberGenerator.GetNext());
         }

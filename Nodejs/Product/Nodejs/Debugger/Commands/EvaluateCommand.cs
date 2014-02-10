@@ -12,6 +12,7 @@
  *
  * ***************************************************************************/
 
+using System;
 using System.Collections.Generic;
 using Microsoft.NodejsTools.Debugger.Serialization;
 using Newtonsoft.Json.Linq;
@@ -33,6 +34,22 @@ namespace Microsoft.NodejsTools.Debugger.Commands {
                 { "frame", _stackFrame != null ? _stackFrame.FrameId : 0 },
                 { "global", false },
                 { "disable_break", true },
+                { "maxStringLength", -1 }
+            };
+        }
+
+        public EvaluateCommand(int id, IEvaluationResultFactory resultFactory, int variableId, NodeStackFrame stackFrame = null) : base(id) {
+            _resultFactory = resultFactory;
+            _expression = "variable";
+            _stackFrame = stackFrame;
+
+            CommandName = "evaluate";
+            Arguments = new Dictionary<string, object> {
+                { "expression", _expression + ".toString()" },
+                { "frame", _stackFrame != null ? _stackFrame.FrameId : 0 },
+                { "global", false },
+                { "disable_break", true },
+                { "additional_context", new[] { new { name = _expression, handle = variableId } } },
                 { "maxStringLength", -1 }
             };
         }

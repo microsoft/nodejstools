@@ -22,6 +22,7 @@ namespace Microsoft.NodejsTools.Debugger.Commands {
         ContinueCommand CreateContinueCommand(SteppingKind stepping, int stepCount = 1);
         DisconnectCommand CreateDisconnectCommand();
         EvaluateCommand CreateEvaluateCommand(string expression, NodeStackFrame stackFrame = null);
+        EvaluateCommand CreateEvaluateCommand(int variableId, NodeStackFrame stackFrame = null);
         ListBreakpointsCommand CreateListBreakpointsCommand();
         LookupCommand CreateLookupCommand(List<NodeEvaluationResult> parents);
         LookupCommand CreateLookupCommand(int[] handles);

@@ -40,6 +40,25 @@ namespace NodejsTests.Debugger.Commands {
         }
 
         [TestMethod]
+        public void CreateEvaluateCommandWithVariableId() {
+            // Arrange
+            const int commandId = 3;
+            var resultFactory = new MockEvaluationResultFactory();
+            const int variableId = 2;
+
+            // Act
+            var evaluateCommand = new EvaluateCommand(commandId, resultFactory, variableId);
+
+            // Assert
+            Assert.AreEqual(commandId, evaluateCommand.Id);
+            Assert.AreEqual(
+                string.Format(
+                    "{{\"command\":\"evaluate\",\"seq\":{0},\"type\":\"request\",\"arguments\":{{\"expression\":\"variable.toString()\",\"frame\":0,\"global\":false,\"disable_break\":true,\"additional_context\":[{{\"name\":\"variable\",\"handle\":{1}}}],\"maxStringLength\":-1}}}}",
+                    commandId, variableId),
+                evaluateCommand.ToString());
+        }
+
+        [TestMethod]
         public void ProcessEvaluateResponse() {
             // Arrange
             const int commandId = 3;
