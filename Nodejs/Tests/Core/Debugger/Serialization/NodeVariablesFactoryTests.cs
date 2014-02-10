@@ -21,7 +21,7 @@ using NodejsTests.Mocks;
 namespace NodejsTests.Debugger.Serialization {
     [TestClass]
     public class NodeVariablesFactoryTests {
-        [TestMethod, Priority(0)]
+        [TestMethod]
         public void CreateNullEvaluationResult() {
             // Arrange
             var variable = new MockNodeVariable {
@@ -53,7 +53,7 @@ namespace NodejsTests.Debugger.Serialization {
             Assert.AreEqual(NodeVariableType.Null, result.TypeName);
         }
 
-        [TestMethod, Priority(0)]
+        [TestMethod]
         public void CreateNumberEvaluationResult() {
             // Arrange
             var variable = new MockNodeVariable {
@@ -85,7 +85,7 @@ namespace NodejsTests.Debugger.Serialization {
             Assert.AreEqual(NodeVariableType.Number, result.TypeName);
         }
 
-        [TestMethod, Priority(0)]
+        [TestMethod]
         public void CreateBooleanEvaluationResult() {
             // Arrange
             var variable = new MockNodeVariable {
@@ -117,7 +117,7 @@ namespace NodejsTests.Debugger.Serialization {
             Assert.AreEqual(NodeVariableType.Boolean, result.TypeName);
         }
 
-        [TestMethod, Priority(0)]
+        [TestMethod]
         public void CreateRegexpEvaluationResult() {
             // Arrange
             var variable = new MockNodeVariable {
@@ -149,7 +149,7 @@ namespace NodejsTests.Debugger.Serialization {
             Assert.AreEqual(NodeVariableType.Regexp, result.TypeName);
         }
 
-        [TestMethod, Priority(0)]
+        [TestMethod]
         public void CreateFunctionWithoutTextEvaluationResult() {
             // Arrange
             var variable = new MockNodeVariable {
@@ -180,7 +180,7 @@ namespace NodejsTests.Debugger.Serialization {
             Assert.AreEqual(NodeVariableType.Function, result.TypeName);
         }
 
-        [TestMethod, Priority(0)]
+        [TestMethod]
         public void CreateFunctionWithTextEvaluationResult() {
             // Arrange
             var variable = new MockNodeVariable {
@@ -211,7 +211,7 @@ namespace NodejsTests.Debugger.Serialization {
             Assert.AreEqual(NodeVariableType.Function, result.TypeName);
         }
 
-        [TestMethod, Priority(0)]
+        [TestMethod]
         public void CreateStringEvaluationResult() {
             // Arrange
             var variable = new MockNodeVariable {
@@ -243,7 +243,7 @@ namespace NodejsTests.Debugger.Serialization {
             Assert.AreEqual(NodeVariableType.String, result.TypeName);
         }
 
-        [TestMethod, Priority(0)]
+        [TestMethod]
         public void CreateObjectEvaluationResult() {
             // Arrange
             var variable = new MockNodeVariable {
@@ -274,7 +274,7 @@ namespace NodejsTests.Debugger.Serialization {
             Assert.AreEqual(NodeVariableType.Object, result.TypeName);
         }
 
-        [TestMethod, Priority(0)]
+        [TestMethod]
         public void CreateDateEvaluationResult() {
             // Arrange
             var variable = new MockNodeVariable {
@@ -305,7 +305,7 @@ namespace NodejsTests.Debugger.Serialization {
             Assert.AreEqual(NodeVariableType.Object, result.TypeName);
         }
 
-        [TestMethod, Priority(0)]
+        [TestMethod]
         public void CreateArrayEvaluationResult() {
             // Arrange
             var variable = new MockNodeVariable {
@@ -336,7 +336,7 @@ namespace NodejsTests.Debugger.Serialization {
             Assert.AreEqual(NodeVariableType.Object, result.TypeName);
         }
 
-        [TestMethod, Priority(0)]
+        [TestMethod]
         public void CreateErrorEvaluationResult() {
             // Arrange
             var variable = new MockNodeVariable {
@@ -367,7 +367,7 @@ namespace NodejsTests.Debugger.Serialization {
             Assert.AreEqual(NodeVariableType.Error, result.TypeName);
         }
 
-        [TestMethod, Priority(0)]
+        [TestMethod]
         public void CreateUnknownEvaluationResult() {
             // Arrange
             var variable = new MockNodeVariable {
@@ -398,7 +398,7 @@ namespace NodejsTests.Debugger.Serialization {
             Assert.AreEqual(NodeVariableType.Unknown, result.TypeName);
         }
 
-        [TestMethod, Priority(0)]
+        [TestMethod]
         public void CreateUnknownEvaluationResultWithEmptyValue() {
             // Arrange
             var variable = new MockNodeVariable {
@@ -429,7 +429,7 @@ namespace NodejsTests.Debugger.Serialization {
             Assert.AreEqual(NodeVariableType.Unknown, result.TypeName);
         }
 
-        [TestMethod, Priority(0)]
+        [TestMethod]
         public void CreateEvaluationResultFromNullVariable() {
             // Arrange
             Exception exception = null;
@@ -447,7 +447,7 @@ namespace NodejsTests.Debugger.Serialization {
             Assert.IsInstanceOfType(exception, typeof (ArgumentNullException));
         }
 
-        [TestMethod, Priority(0)]
+        [TestMethod]
         public void CreateArrayElementEvaluationResult() {
             // Arrange
             var variable = new MockNodeVariable {
@@ -478,7 +478,7 @@ namespace NodejsTests.Debugger.Serialization {
             Assert.AreEqual(NodeVariableType.Number, result.TypeName);
         }
 
-        [TestMethod, Priority(0)]
+        [TestMethod]
         public void CreateObjectElementEvaluationResult() {
             // Arrange
             var variable = new MockNodeVariable {
@@ -509,7 +509,7 @@ namespace NodejsTests.Debugger.Serialization {
             Assert.AreEqual(NodeVariableType.Number, result.TypeName);
         }
 
-        [TestMethod, Priority(0)]
+        [TestMethod]
         public void CreateObjectElementWithInvalidIdentifierEvaluationResult() {
             // Arrange
             var variable = new MockNodeVariable {

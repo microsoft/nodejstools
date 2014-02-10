@@ -21,7 +21,7 @@ using Newtonsoft.Json.Linq;
 namespace NodejsTests.Debugger.Serialization {
     [TestClass]
     public class EvaluationVariableTests {
-        [TestMethod, Priority(0)]
+        [TestMethod]
         public void CreateEvaluationVariable() {
             // Arrange
             JObject json = SerializationTestData.GetEvaluationJsonObject();
@@ -45,7 +45,7 @@ namespace NodejsTests.Debugger.Serialization {
             Assert.AreEqual("<tag>Value</tag>", result.Value);
         }
 
-        [TestMethod, Priority(0)]
+        [TestMethod]
         public void CreateBacktraceVariableWithNullStackFrame() {
             // Arrange
             JObject json = SerializationTestData.GetBacktraceJsonObject();
@@ -66,7 +66,7 @@ namespace NodejsTests.Debugger.Serialization {
             Assert.IsInstanceOfType(exception, typeof (ArgumentNullException));
         }
 
-        [TestMethod, Priority(0)]
+        [TestMethod]
         public void CreateBacktraceVariableWithNullName() {
             // Arrange
             JObject json = SerializationTestData.GetBacktraceJsonObject();
@@ -87,7 +87,7 @@ namespace NodejsTests.Debugger.Serialization {
             Assert.IsInstanceOfType(exception, typeof (ArgumentNullException));
         }
 
-        [TestMethod, Priority(0)]
+        [TestMethod]
         public void CreateBacktraceVariableWithNullJson() {
             // Arrange
             var stackFrame = new NodeStackFrame(null, null, null, 0, 0, 0, 0);

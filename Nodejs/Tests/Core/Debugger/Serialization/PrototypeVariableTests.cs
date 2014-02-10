@@ -22,7 +22,7 @@ using Newtonsoft.Json.Linq;
 namespace NodejsTests.Debugger.Serialization {
     [TestClass]
     public class PrototypeVariableTests {
-        [TestMethod, Priority(0)]
+        [TestMethod]
         public void CreatePrototypeVariable() {
             // Arrange
             var parent = new NodeEvaluationResult(0, null, null, null, null, null, NodeExpressionType.None, null);
@@ -46,28 +46,30 @@ namespace NodejsTests.Debugger.Serialization {
             Assert.IsNull(result.Value);
         }
 
-        [TestMethod, Priority(0)]
+        [TestMethod]
         public void CreateLookupVariableWithNullParent() {
             // Arrange
-            Exception exception = null;
             JObject json = SerializationTestData.GetLookupJsonPrototype();
             Dictionary<int, JToken> references = SerializationTestData.GetLookupJsonReferences();
-            NodePrototypeVariable result = null;
 
             // Act
-            try {
-                result = new NodePrototypeVariable(null, json, references);
-            } catch (Exception e) {
-                exception = e;
-            }
+            var result = new NodePrototypeVariable(null, json, references);
 
             // Assert
-            Assert.IsNull(result);
-            Assert.IsNotNull(exception);
-            Assert.IsInstanceOfType(exception, typeof (ArgumentNullException));
+            Assert.IsNotNull(result);
+            Assert.AreEqual(NodePropertyAttributes.DontEnum, result.Attributes);
+            Assert.AreEqual(NodeVariableType.Object, result.Class);
+            Assert.AreEqual(4, result.Id);
+            Assert.AreEqual("__proto__", result.Name);
+            Assert.IsNull(result.Parent);
+            Assert.IsNull(result.StackFrame);
+            Assert.AreEqual("#<Object>", result.Text);
+            Assert.AreEqual(NodePropertyType.Normal, result.Type);
+            Assert.AreEqual("object", result.TypeName);
+            Assert.IsNull(result.Value);
         }
 
-        [TestMethod, Priority(0)]
+        [TestMethod]
         public void CreateLookupVariableWithNullJsonValue() {
             // Arrange
             var parent = new NodeEvaluationResult(0, null, null, null, null, null, NodeExpressionType.None, null);
@@ -88,7 +90,7 @@ namespace NodejsTests.Debugger.Serialization {
             Assert.IsInstanceOfType(exception, typeof (ArgumentNullException));
         }
 
-        [TestMethod, Priority(0)]
+        [TestMethod]
         public void CreateLookupVariableWithNullJsonReferences() {
             // Arrange
             var parent = new NodeEvaluationResult(0, null, null, null, null, null, NodeExpressionType.None, null);
