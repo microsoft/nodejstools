@@ -14,6 +14,7 @@
 
 using System;
 using System.Diagnostics;
+using System.Threading.Tasks;
 
 namespace Microsoft.NodejsTools.Debugger {
     class NodeBreakpointBinding {
@@ -186,37 +187,36 @@ namespace Microsoft.NodejsTools.Debugger {
             return true;
         }
 
-        internal async void ProcessBreakpointHit(Action followupHandler) {
+        private void UpdatedEngineState(bool engineEnabled, uint engineHitCount, int engineIgnoreCount) {
+            _engineEnabled = engineEnabled;
+            _engineHitCount = engineHitCount;
+            _engineIgnoreCount = engineIgnoreCount;
+        }
+
+        internal async Task ProcessBreakpointHitAsync() {
             Debug.Assert(GetEngineEnabled(_enabled, _breakOn, HitCount));
 
             // Compose followup handler
-            var engineEnabled = true;
             var engineHitCount = _engineHitCount + (uint)_engineIgnoreCount + 1;
             var engineIgnoreCount = 0;
-            Action followupHandlerWrapper = () => {
-                // Update engine state
-                _engineEnabled = engineEnabled;
-                _engineHitCount = engineHitCount;
-                _engineIgnoreCount = engineIgnoreCount;
-
-                // Handle followup
-                followupHandler();
-            };
 
             // Handle pass count
             switch (_breakOn.Kind) {
                 case BreakOnKind.Always:
                 case BreakOnKind.GreaterThanOrEqual:
-                    followupHandlerWrapper();
+                    UpdatedEngineState(true, engineHitCount, engineIgnoreCount);
                     break;
                 case BreakOnKind.Equal:
-                    engineEnabled = false;
-                    await Process.UpdateBreakpointBindingAsync(_breakpointId, engineEnabled, followupHandler: followupHandlerWrapper).ConfigureAwait(false);
+                    if (await Process.UpdateBreakpointBindingAsync(_breakpointId, false).ConfigureAwait(false)) {
+                        UpdatedEngineState(false, engineHitCount, engineIgnoreCount);    
+                    }                    
                     break;
                 case BreakOnKind.Mod:
                     var hitCount = engineHitCount - _hitCountDelta;
                     engineIgnoreCount = GetEngineIgnoreCount(_breakOn, hitCount);
-                    await Process.UpdateBreakpointBindingAsync(_breakpointId, ignoreCount: engineIgnoreCount, followupHandler: followupHandlerWrapper).ConfigureAwait(false);
+                    if (await Process.UpdateBreakpointBindingAsync(_breakpointId, ignoreCount: engineIgnoreCount).ConfigureAwait(false)) {
+                        UpdatedEngineState(true, engineHitCount, engineIgnoreCount);    
+                    }
                     break;
             }
         }

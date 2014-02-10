@@ -598,21 +598,23 @@ namespace Microsoft.NodejsTools.Debugger {
             }
 
             // Process break for breakpoint bindings, if any
-            await ProcessBreakpointBreakAsync(breakpointBindings, () => AutoResumeAsync(false), false, false).ConfigureAwait(false);
+            if (!await ProcessBreakpointBreakAsync(breakpointBindings, false, false).ConfigureAwait(false)) {
+                await AutoResumeAsync(false).ConfigureAwait(false);
+            }
         }
 
-        private async Task ProcessBreakpointBreakAsync(List<NodeBreakpointBinding> breakpointBindings, Action noBreakpointsHitHandler, bool haveCallstack, bool testFullyBound) {
+        private async Task<bool> ProcessBreakpointBreakAsync(List<NodeBreakpointBinding> breakpointBindings, bool haveCallstack, bool testFullyBound) {
+            bool result = true;
             // Handle breakpoint(s) but no matching binding(s)
             // Indicated by non-null but empty breakpoint bindings collection
             int bindingsToProcess = breakpointBindings.Count;
             if (bindingsToProcess == 0) {
-                noBreakpointsHitHandler();
+                result = false;
             }
 
             // Process breakpoint binding
             var hitBindings = new List<NodeBreakpointBinding>();
-            Action<NodeBreakpointBinding> processBinding =
-                binding => {
+            Action<NodeBreakpointBinding> processBinding = async binding => {
                     // Collect hit breakpoint bindings
                     if (binding != null) {
                         hitBindings.Add(binding);
@@ -626,13 +628,13 @@ namespace Microsoft.NodejsTools.Debugger {
                             if (breakpointHit != null) {
                                 foreach (NodeBreakpointBinding hitBinding in hitBindings) {
                                     NodeBreakpointBinding breakpointBinding = hitBinding;
-                                    hitBinding.ProcessBreakpointHit(
-                                        () => breakpointHit(this, new BreakpointHitEventArgs(breakpointBinding, MainThread)));
+                                    await hitBinding.ProcessBreakpointHitAsync().ConfigureAwait(false);
+                                    breakpointHit(this, new BreakpointHitEventArgs(breakpointBinding, MainThread));
                                 }
                             }
                         } else {
                             // No breakpoints hit
-                            noBreakpointsHitHandler();
+                            result = false;
                         }
                     }
                 };
@@ -644,6 +646,8 @@ namespace Microsoft.NodejsTools.Debugger {
             }
 
             await ProcessBreakpointBindingsAsync(breakpointBindings, processBinding, testFullyBound).ConfigureAwait(false);
+
+            return result;
         }
 
         private async Task ProcessBreakpointBindingsAsync(IEnumerable<NodeBreakpointBinding> breakpointBindings, Action<NodeBreakpointBinding> processBinding, bool testFullyBound) {
@@ -815,14 +819,17 @@ namespace Microsoft.NodejsTools.Debugger {
                 NodeModule breakModule = GetModuleForFilePath(breakFileName);
                 var breakpointBindings = new List<NodeBreakpointBinding>();
                 foreach (NodeBreakpointBinding breakpointBinding in _breakpointBindings.Values) {
-                    if (breakpointBinding.Enabled && breakpointBinding.LineNo == breakLineNo && GetModuleForFilePath(breakpointBinding.FileName) == breakModule) {
+                    if (breakpointBinding.Enabled && breakpointBinding.LineNo == breakLineNo &&
+                        GetModuleForFilePath(breakpointBinding.FileName) == breakModule) {
                         breakpointBindings.Add(breakpointBinding);
                     }
                 }
                 if (breakpointBindings.Count > 0) {
                     // Delegate to ProcessBreak() which knows how to correctly
                     // fire breakpoint hit events for given breakpoint bindings and current backtrace
-                    await ProcessBreakpointBreakAsync(breakpointBindings, () => HandleEntryPointHit(), true, true).ConfigureAwait(false);
+                    if (!await ProcessBreakpointBreakAsync(breakpointBindings, true, true).ConfigureAwait(false)) {
+                        HandleEntryPointHit();
+                    }
                     return;
                 }
 
@@ -874,22 +881,13 @@ namespace Microsoft.NodejsTools.Debugger {
             Connection.Close();
         }
 
-        public async void BindBreakpoint(NodeBreakpoint breakpoint, Action<NodeBreakpointBinding> successHandler = null, Action failureHandler = null) {
-            // Wrap failure handler
-            Action wrappedFailureHandler = () => {
-                HandleBindBreakpointFailure(breakpoint);
-
-                if (failureHandler != null) {
-                    failureHandler();
-                }
-            };
-
+        public async Task<NodeBreakpointBinding> BindBreakpointAsync(NodeBreakpoint breakpoint) {
             Tuple<int, int?, int> result;
             try {
                 result = await SetBreakpointAsync(breakpoint).ConfigureAwait(false);
             } catch (Exception) {
-                wrappedFailureHandler();
-                return;
+                HandleBindBreakpointFailure(breakpoint);
+                return null;
             }
 
             bool fullyBound = (result.Item2.HasValue && result.Item3 == breakpoint.LineNo);
@@ -899,10 +897,7 @@ namespace Microsoft.NodejsTools.Debugger {
             // Treat as success
             if (fullyBound) {
                 HandleBindBreakpointSuccess(breakpointBinding, breakpoint);
-                if (successHandler != null) {
-                    successHandler(breakpointBinding);
-                }
-                return;
+                return breakpointBinding;
             }
 
             // Not fully bound, with predicate
@@ -911,26 +906,25 @@ namespace Microsoft.NodejsTools.Debugger {
                 try {
                     await RemoveBreakPointAsync(breakpointBinding).ConfigureAwait(false);
                 } catch (Exception) {
-                    wrappedFailureHandler();
+                    HandleBindBreakpointFailure(breakpoint);
+                    return null;
                 }
 
                 try {
                     result = await SetBreakpointAsync(breakpoint, true).ConfigureAwait(false);
                 } catch (Exception) {
-                    wrappedFailureHandler();
-                    return;
+                    HandleBindBreakpointFailure(breakpoint);
+                    return null;
                 }
 
                 Debug.Assert(!(result.Item2.HasValue && result.Item3 == breakpoint.LineNo));
                 CreateBreakpointBinding(breakpoint, result.Item1, result.Item2, result.Item3, false);
-
-                // Treat as failure (for now)
-                wrappedFailureHandler();
             }
 
             // Not fully bound, without predicate
             // Treat as failure (for now)
-            wrappedFailureHandler();
+            HandleBindBreakpointFailure(breakpoint);
+            return null;
         }
 
         internal async Task<Tuple<int, int?, int>> SetBreakpointAsync(NodeBreakpoint breakpoint, bool withoutPredicate = false) {
@@ -980,7 +974,6 @@ namespace Microsoft.NodejsTools.Debugger {
             bool? enabled = null,
             string condition = null,
             int? ignoreCount = null,
-            Action followupHandler = null,
             bool validateSuccess = false
             ) {
             // DEVNOTE: Calling UpdateBreakpointBinding() on the debug thread with validateSuccess == true will deadlock
@@ -992,15 +985,9 @@ namespace Microsoft.NodejsTools.Debugger {
             ChangeBreakpointCommand changeBreakPointCommand = CommandFactory.CreateChangeBreakpointCommand(breakpointId, enabled, condition, ignoreCount);
             try {
                 await Client.SendRequestAsync(changeBreakPointCommand).ConfigureAwait(false);
-                if (followupHandler != null) {
-                    followupHandler();
-                }
                 return true;
             } catch (Exception) {
                 // Handle failure
-                if (followupHandler != null) {
-                    followupHandler();
-                }
                 return !validateSuccess;
             }
         }

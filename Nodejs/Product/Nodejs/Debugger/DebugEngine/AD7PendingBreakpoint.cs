@@ -15,9 +15,7 @@
 using Microsoft.VisualStudio;
 using Microsoft.VisualStudio.Debugger.Interop;
 using System.Collections.Generic;
-using System.Diagnostics;
 using System.Runtime.InteropServices;
-using System.Threading;
 
 namespace Microsoft.NodejsTools.Debugger.DebugEngine {
     // This class represents a pending breakpoint which is an abstract representation of a breakpoint before it is bound.
@@ -25,21 +23,21 @@ namespace Microsoft.NodejsTools.Debugger.DebugEngine {
     // become children of the pending breakpoint.
     class AD7PendingBreakpoint : IDebugPendingBreakpoint2 {
         // The breakpoint request that resulted in this pending breakpoint being created.
-        private IDebugBreakpointRequest2 _bpRequest;
+        private readonly IDebugBreakpointRequest2 _bpRequest;
         private BP_REQUEST_INFO _bpRequestInfo;
-        private AD7Engine _engine;
-        private BreakpointManager _bpManager;
+        private readonly AD7Engine _engine;
+        private readonly BreakpointManager _bpManager;
 
-        private List<AD7BoundBreakpoint> _boundBreakpoints = new System.Collections.Generic.List<AD7BoundBreakpoint>();
-        private List<AD7BreakpointErrorEvent> _breakpointErrors = new System.Collections.Generic.List<AD7BreakpointErrorEvent>();
+        private readonly List<AD7BoundBreakpoint> _boundBreakpoints = new List<AD7BoundBreakpoint>();
+        private readonly List<AD7BreakpointErrorEvent> _breakpointErrors = new List<AD7BreakpointErrorEvent>();
 
         private bool _enabled;
-        private bool _deleted;
+        private readonly bool _deleted;
         private string _documentName;
 
-        public AD7PendingBreakpoint(IDebugBreakpointRequest2 pBPRequest, AD7Engine engine, BreakpointManager bpManager) {
-            _bpRequest = pBPRequest;
-            BP_REQUEST_INFO[] requestInfo = new BP_REQUEST_INFO[1];
+        public AD7PendingBreakpoint(IDebugBreakpointRequest2 pBpRequest, AD7Engine engine, BreakpointManager bpManager) {
+            _bpRequest = pBpRequest;
+            var requestInfo = new BP_REQUEST_INFO[1];
             EngineUtils.CheckOk(_bpRequest.GetRequestInfo(enum_BPREQI_FIELDS.BPREQI_BPLOCATION | enum_BPREQI_FIELDS.BPREQI_CONDITION | enum_BPREQI_FIELDS.BPREQI_ALLFIELDS, requestInfo));
             _bpRequestInfo = requestInfo[0];
             
@@ -95,14 +93,13 @@ namespace Microsoft.NodejsTools.Debugger.DebugEngine {
         int IDebugPendingBreakpoint2.Bind() {
             if (CanBind()) {
                 // Get the location in the document that the breakpoint is in.
-                TEXT_POSITION[] startPosition = new TEXT_POSITION[1];
-                TEXT_POSITION[] endPosition = new TEXT_POSITION[1];
+                var startPosition = new TEXT_POSITION[1];
+                var endPosition = new TEXT_POSITION[1];
                 string fileName;
-                IDebugDocumentPosition2 docPosition = (IDebugDocumentPosition2)(Marshal.GetObjectForIUnknown(_bpRequestInfo.bpLocation.unionmember2));
+                var docPosition = (IDebugDocumentPosition2)(Marshal.GetObjectForIUnknown(_bpRequestInfo.bpLocation.unionmember2));
                 EngineUtils.CheckOk(docPosition.GetRange(startPosition, endPosition));
                 EngineUtils.CheckOk(docPosition.GetFileName(out fileName));
 
-                AutoResetEvent breakpointBindComplete = new AutoResetEvent(false);
                 var breakpoint =
                     _engine.Process.AddBreakPoint(
                         fileName,
@@ -112,19 +109,7 @@ namespace Microsoft.NodejsTools.Debugger.DebugEngine {
                         _bpRequestInfo.bpCondition.bstrCondition
                     );
                 _bpManager.AddPendingBreakpoint(breakpoint, this);
-                breakpoint.Bind(
-                    (breakpointBinding) => {
-                        // Success handler
-                        breakpointBindComplete.Set();
-                    },
-                    () => {
-                        // Failure handler
-                        breakpointBindComplete.Set();
-                    });
-
-                // Give the breakpoint bind a chance to complete "synchronously"
-                // This attempts to ensure breakpoints are bound before the SDM resumes after launch
-                breakpointBindComplete.WaitOne(2000);
+                breakpoint.BindAsync().Wait(2000);
 
                 return VSConstants.S_OK;
             }
@@ -145,7 +130,6 @@ namespace Microsoft.NodejsTools.Debugger.DebugEngine {
                 // The breakpoint may not be bound for many reasons such as an invalid location, an invalid expression, etc...
                 // The sample engine does not support this, but a real world engine will want to return a valid enumeration of IDebugErrorBreakpoint2.
                 // The debugger will then display information about why the breakpoint did not bind to the user.
-                ppErrorEnum = null;
                 return VSConstants.S_FALSE;
             }
 
@@ -161,7 +145,7 @@ namespace Microsoft.NodejsTools.Debugger.DebugEngine {
         // Toggles the enabled state of this pending breakpoint.
         int IDebugPendingBreakpoint2.Enable(int fEnable) {
             lock (_boundBreakpoints) {
-                _enabled = fEnable == 0 ? false : true;
+                _enabled = fEnable != 0;
 
                 foreach (AD7BoundBreakpoint bp in _boundBreakpoints) {
                     ((IDebugBoundBreakpoint2)bp).Enable(fEnable);
@@ -193,8 +177,8 @@ namespace Microsoft.NodejsTools.Debugger.DebugEngine {
         }
 
         // Gets the breakpoint request that was used to create this pending breakpoint
-        int IDebugPendingBreakpoint2.GetBreakpointRequest(out IDebugBreakpointRequest2 ppBPRequest) {
-            ppBPRequest = _bpRequest;
+        int IDebugPendingBreakpoint2.GetBreakpointRequest(out IDebugBreakpointRequest2 ppBpRequest) {
+            ppBpRequest = _bpRequest;
             return VSConstants.S_OK;
         }
 
@@ -237,7 +221,7 @@ namespace Microsoft.NodejsTools.Debugger.DebugEngine {
         public string DocumentName {
             get {
                 if (_documentName == null) {
-                    IDebugDocumentPosition2 docPosition = (IDebugDocumentPosition2)(Marshal.GetObjectForIUnknown(_bpRequestInfo.bpLocation.unionmember2));
+                    var docPosition = (IDebugDocumentPosition2)(Marshal.GetObjectForIUnknown(_bpRequestInfo.bpLocation.unionmember2));
                     EngineUtils.CheckOk(docPosition.GetFileName(out _documentName));
                 }
                 return _documentName;

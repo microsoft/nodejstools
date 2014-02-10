@@ -12,20 +12,20 @@
  *
  * ***************************************************************************/
 
-using System;
 using System.Collections.Generic;
-using System.Diagnostics;
 using System.Linq;
+using System.Threading.Tasks;
 
 namespace Microsoft.NodejsTools.Debugger {
     class NodeBreakpoint {
         private readonly NodeDebugger _process;
         private readonly string _fileName, _requestedFileName;
-        private int _lineNo, _requestedLineNo;
-        private Dictionary<int, NodeBreakpointBinding> _bindings = new Dictionary<int, NodeBreakpointBinding>();
-        private bool _enabled;
-        private BreakOn _breakOn;
-        private string _condition;
+        private int _lineNo;
+        private readonly int _requestedLineNo;
+        private readonly Dictionary<int, NodeBreakpointBinding> _bindings = new Dictionary<int, NodeBreakpointBinding>();
+        private readonly bool _enabled;
+        private readonly BreakOn _breakOn;
+        private readonly string _condition;
 
         public NodeBreakpoint(
             NodeDebugger process,
@@ -57,8 +57,8 @@ namespace Microsoft.NodejsTools.Debugger {
         /// Requests the remote process enable the break point.  An event will be raised on the process
         /// when the break point is received.
         /// </summary>
-        public void Bind(Action<NodeBreakpointBinding> successHandler = null, Action failureHandler = null) {
-            _process.BindBreakpoint(this, successHandler, failureHandler);
+        public Task<NodeBreakpointBinding> BindAsync() {
+            return _process.BindBreakpointAsync(this);
         }
 
         /// <summary>

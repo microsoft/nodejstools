@@ -54,7 +54,16 @@ namespace NodejsTests.Debugger {
             Action failureHandler = null
         ) {
             NodeBreakpoint breakPoint = newproc.AddBreakPoint(fileName, line, enabled, breakOn, condition);
-            breakPoint.Bind(successHandler, failureHandler);
+            var breakpointBinding = breakPoint.BindAsync().Result;
+            if (breakpointBinding != null) {
+                if (successHandler != null) {
+                    successHandler(breakpointBinding);
+                }
+            } else {
+                if (failureHandler != null) {
+                    failureHandler();
+                }
+            }
             return breakPoint;
         }
 
@@ -207,12 +216,10 @@ namespace NodejsTests.Debugger {
                             foreach (var evaluationResult in frame.Parameters.Concat(frame.Locals)) {
                                 int i = 0;
                                 var match = -1;
-                                NodeEvaluationResult matchEvaluationResult = null;
                                 if (expectedParams != null) {
                                     foreach (var expectedParam in expectedParams) {
                                         if (evaluationResult.Expression == expectedParam) {
                                             match = i;
-                                            matchEvaluationResult = evaluationResult;
                                             break;
                                         }
                                         ++i;
@@ -221,7 +228,6 @@ namespace NodejsTests.Debugger {
                                 if (match == -1 && expectedLocals != null) {
                                     foreach (var expectedLocal in expectedLocals) {
                                         if (evaluationResult.Expression == expectedLocal) {
-                                            matchEvaluationResult = evaluationResult;
                                             match = i;
                                             break;
                                         }
@@ -484,24 +490,20 @@ namespace NodejsTests.Debugger {
             };
 
             AutoResetEvent breakpointBound = new AutoResetEvent(false);
-            BreakpointBindingEventArgs breakpointBind = null;
             process.BreakpointBound += (sender, e) => {
                 Console.WriteLine("BreakpointBound {0} {1}", e.BreakpointBinding.FileName, e.BreakpointBinding.LineNo);
-                breakpointBind = e;
                 breakpointBound.Set();
             };
 
             AutoResetEvent breakpointUnbound = new AutoResetEvent(false);
             process.BreakpointUnbound += (sender, e) => {
                 Console.WriteLine("BreakpointUnbound");
-                breakpointBind = e;
                 breakpointUnbound.Set();
             };
 
             AutoResetEvent breakpointBindFailure = new AutoResetEvent(false);
             process.BreakpointBindFailure += (sender, e) => {
                 Console.WriteLine("BreakpointBindFailure");
-                breakpointBind = e;
                 breakpointBindFailure.Set();
             };
 
