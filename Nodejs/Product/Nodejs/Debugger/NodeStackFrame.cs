@@ -12,8 +12,8 @@
  *
  * ***************************************************************************/
 
-using System;
 using System.Collections.Generic;
+using System.Threading.Tasks;
 
 namespace Microsoft.NodejsTools.Debugger {
     class NodeStackFrame {
@@ -158,9 +158,8 @@ namespace Microsoft.NodejsTools.Debugger {
         /// Executes the given text against this stack frame.
         /// </summary>
         /// <param name="text">Text expression.</param>
-        /// <param name="completion">Completion callback.</param>
-        public virtual void ExecuteText(string text, Action<NodeEvaluationResult> completion) {
-            completion(_thread.Process.ExecuteTextAsync(text, this).Result);
+        public virtual Task<NodeEvaluationResult> ExecuteTextAsync(string text) {
+            return _thread.Process.ExecuteTextAsync(text, this);
         }
 
         /// <summary>

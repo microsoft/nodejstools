@@ -13,7 +13,6 @@
  * ***************************************************************************/
 
 using System;
-using System.Threading;
 using Microsoft.VisualStudio;
 using Microsoft.VisualStudio.Debugger.Interop;
 
@@ -46,42 +45,32 @@ namespace Microsoft.NodejsTools.Debugger.DebugEngine {
         //
         // This is primarily used for the immediate window which this engine does not currently support.
         int IDebugExpression2.EvaluateAsync(enum_EVALFLAGS dwFlags, IDebugEventCallback2 pExprCallback) {
-            _frame.StackFrame.ExecuteText(_expression, obj => _frame.Engine.Send(
-                new AD7ExpressionEvaluationCompleteEvent(this, new AD7Property(_frame, obj)), 
-                AD7ExpressionEvaluationCompleteEvent.IID, 
-                _frame.Engine, 
-                _frame.Thread));
+            _frame.StackFrame.ExecuteTextAsync(_expression)
+                .ContinueWith(p => {
+                    var result = p.Result;
+                    if (result == null || !string.IsNullOrEmpty(result.ExceptionText)) {
+                        return;
+                    }
+
+                    _frame.Engine.Send(
+                        new AD7ExpressionEvaluationCompleteEvent(this, new AD7Property(_frame, result)),
+                        AD7ExpressionEvaluationCompleteEvent.IID,
+                        _frame.Engine,
+                        _frame.Thread);
+                });
+
             return VSConstants.S_OK;
         }
 
         // This method evaluates the expression synchronously.
         int IDebugExpression2.EvaluateSync(enum_EVALFLAGS dwFlags, uint dwTimeout, IDebugEventCallback2 pExprCallback, out IDebugProperty2 ppResult) {
-            AutoResetEvent completion = new AutoResetEvent(false);
-            NodeEvaluationResult result = null;
-            _frame.StackFrame.ExecuteText(_expression, obj => {
-                result = obj;
-                completion.Set();
-            });
-            
-            while (!_frame.StackFrame.Thread.Process.HasExited && !completion.WaitOne(Math.Min((int)dwTimeout, 100))) {
-                if (dwTimeout <= 100) {
-                    break;
-                }
-                dwTimeout -= 100;
+            NodeEvaluationResult result = _frame.StackFrame.ExecuteTextAsync(_expression).Result;
+
+            if (result == null || !string.IsNullOrEmpty(result.ExceptionText)) {
+                ppResult = null;
+                return VSConstants.E_FAIL;
             }
 
-            if (_frame.StackFrame.Thread.Process.HasExited || result == null) {
-                ppResult = null;
-                return VSConstants.E_FAIL;
-            }
-            if (result == null) {
-                ppResult = null;
-                return DebuggerConstants.E_EVALUATE_TIMEOUT;
-            }
-            if (!string.IsNullOrEmpty(result.ExceptionText)) {
-                ppResult = null;
-                return VSConstants.E_FAIL;
-            }
             if (!_writable) {
                 result.Type |= NodeExpressionType.ReadOnly;
             }

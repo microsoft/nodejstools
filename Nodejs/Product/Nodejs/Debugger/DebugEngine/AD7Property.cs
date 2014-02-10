@@ -15,7 +15,6 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Threading;
 using Microsoft.NodejsTools.Debugger.Serialization;
 using Microsoft.VisualStudio;
 using Microsoft.VisualStudio.Debugger.Interop;
@@ -152,18 +151,12 @@ namespace Microsoft.NodejsTools.Debugger.DebugEngine {
         public int GetStringChars(uint buflen, ushort[] rgString, out uint pceltFetched) {
             pceltFetched = buflen;
 
-            var completion = new AutoResetEvent(false);
-            _evaluationResult.Frame.ExecuteText(_evaluationResult.FullName, obj => {
-                obj.StringValue.ToCharArray().CopyTo(rgString, 0);
-                completion.Set();
-            });
-
-            while (!_frame.StackFrame.Thread.Process.HasExited && !completion.WaitOne(100)) {
-            }
-
-            if (_frame.StackFrame.Thread.Process.HasExited) {
+            var result = _evaluationResult.Frame.ExecuteTextAsync(_evaluationResult.FullName).Result;
+            if (result == null || !string.IsNullOrEmpty(result.ExceptionText)) {
                 return VSConstants.E_FAIL;
             }
+
+            result.StringValue.ToCharArray().CopyTo(rgString, 0);
 
             return VSConstants.S_OK;
         }
@@ -237,17 +230,9 @@ namespace Microsoft.NodejsTools.Debugger.DebugEngine {
 
         // The debugger will call this when the user tries to edit the property's values in one of the debugger windows.
         public int SetValueAsString(string pszValue, uint dwRadix, uint dwTimeout) {
-            var completion = new AutoResetEvent(false);
-            _evaluationResult.Frame.ExecuteText(_evaluationResult.FullName + " = " + pszValue, obj => completion.Set());
-
-            while (!_frame.StackFrame.Thread.Process.HasExited && !completion.WaitOne(Math.Min((int)dwTimeout, 100))) {
-                if (dwTimeout <= 100) {
-                    break;
-                }
-                dwTimeout -= 100;
-            }
-
-            if (_frame.StackFrame.Thread.Process.HasExited) {
+            var expression = string.Format("{0} = {1}", _evaluationResult.FullName, pszValue);
+            var result = _evaluationResult.Frame.ExecuteTextAsync(expression).Result;
+            if (result == null || !string.IsNullOrEmpty(result.ExceptionText)) {
                 return VSConstants.E_FAIL;
             }
 
