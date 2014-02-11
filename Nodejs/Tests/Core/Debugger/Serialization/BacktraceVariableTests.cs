@@ -32,7 +32,7 @@ namespace NodejsTests.Debugger.Serialization {
 
             // Assert
             Assert.IsNotNull(result);
-            Assert.AreEqual(NodePropertyAttributes.ReadOnly, result.Attributes);
+            Assert.AreEqual(NodePropertyAttributes.None, result.Attributes);
             Assert.IsNull(result.Class);
             Assert.AreEqual(21, result.Id);
             Assert.AreEqual("v_boolean", result.Name);
@@ -55,7 +55,7 @@ namespace NodejsTests.Debugger.Serialization {
 
             // Assert
             Assert.IsNotNull(result);
-            Assert.AreEqual(NodePropertyAttributes.ReadOnly, result.Attributes);
+            Assert.AreEqual(NodePropertyAttributes.None, result.Attributes);
             Assert.IsNull(result.Class);
             Assert.AreEqual(21, result.Id);
             Assert.AreEqual(NodeVariableType.AnonymousVariable, result.Name);

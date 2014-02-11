@@ -132,5 +132,37 @@ namespace NodejsTests.Debugger.Communication {
             // Assert
             Assert.AreEqual(string.Format("Content-Length: {0}{1}{1}{2}", Encoding.UTF8.GetByteCount(message), Environment.NewLine, message), result);
         }
+
+        [TestMethod]
+        public async Task RetrieveNodeVersion() {
+            // Arrange
+            const string version = "0.10.25";
+            const string message = "Embedding-Host: node v" + version;
+            byte[] rawMessage = Encoding.UTF8.GetBytes(message);
+
+            var memoryStream = new MemoryStream();
+            await memoryStream.WriteAsync(rawMessage, 0, rawMessage.Length);
+            await memoryStream.FlushAsync();
+            memoryStream.Seek(0, SeekOrigin.Begin);
+
+            var tcpClientMock = new Mock<ITcpClient>();
+            tcpClientMock.Setup(p => p.GetStream()).Returns(() => memoryStream);
+            tcpClientMock.SetupGet(p => p.Connected).Returns(() => true);
+
+            var tcpClientFactoryMock = new Mock<ITcpClientFactory>();
+            tcpClientFactoryMock.Setup(p => p.CreateTcpClient(It.IsAny<string>(), It.IsAny<int>())).Returns(() => tcpClientMock.Object);
+
+            var debuggerConnection = new DebuggerConnection(tcpClientFactoryMock.Object);
+
+            // Act
+            debuggerConnection.Connect("localhost", 5858);
+
+            await Task.Delay(TimeSpan.FromMilliseconds(100));
+            memoryStream.Close();
+
+            // Assert
+            Assert.IsNotNull(debuggerConnection.NodeVersion);
+            Assert.AreEqual(version, debuggerConnection.NodeVersion.ToString());
+        }
     }
 }

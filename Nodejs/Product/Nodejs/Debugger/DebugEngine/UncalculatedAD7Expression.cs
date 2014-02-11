@@ -13,6 +13,7 @@
  * ***************************************************************************/
 
 using System;
+using System.Threading.Tasks;
 using Microsoft.VisualStudio;
 using Microsoft.VisualStudio.Debugger.Interop;
 
@@ -23,12 +24,10 @@ namespace Microsoft.NodejsTools.Debugger.DebugEngine {
     class UncalculatedAD7Expression : IDebugExpression2 {
         private readonly AD7StackFrame _frame;
         private readonly string _expression;
-        private readonly bool _writable;
 
-        public UncalculatedAD7Expression(AD7StackFrame frame, string expression, bool writable = false) {
+        public UncalculatedAD7Expression(AD7StackFrame frame, string expression) {
             _frame = frame;
             _expression = expression;
-            _writable = writable;
         }
 
         #region IDebugExpression2 Members
@@ -47,13 +46,12 @@ namespace Microsoft.NodejsTools.Debugger.DebugEngine {
         int IDebugExpression2.EvaluateAsync(enum_EVALFLAGS dwFlags, IDebugEventCallback2 pExprCallback) {
             _frame.StackFrame.ExecuteTextAsync(_expression)
                 .ContinueWith(p => {
-                    var result = p.Result;
-                    if (result == null || !string.IsNullOrEmpty(result.ExceptionText)) {
+                    if (p.IsFaulted || p.IsCanceled) {
                         return;
                     }
 
                     _frame.Engine.Send(
-                        new AD7ExpressionEvaluationCompleteEvent(this, new AD7Property(_frame, result)),
+                        new AD7ExpressionEvaluationCompleteEvent(this, new AD7Property(_frame, p.Result)),
                         AD7ExpressionEvaluationCompleteEvent.IID,
                         _frame.Engine,
                         _frame.Thread);
@@ -64,19 +62,16 @@ namespace Microsoft.NodejsTools.Debugger.DebugEngine {
 
         // This method evaluates the expression synchronously.
         int IDebugExpression2.EvaluateSync(enum_EVALFLAGS dwFlags, uint dwTimeout, IDebugEventCallback2 pExprCallback, out IDebugProperty2 ppResult) {
-            NodeEvaluationResult result = _frame.StackFrame.ExecuteTextAsync(_expression).Result;
+            Task<NodeEvaluationResult> result = _frame.StackFrame.ExecuteTextAsync(_expression);
 
-            if (result == null || !string.IsNullOrEmpty(result.ExceptionText)) {
+            try {
+                result.Wait((int)dwTimeout);
+            } catch (Exception) {
                 ppResult = null;
                 return VSConstants.E_FAIL;
             }
 
-            if (!_writable) {
-                result.Type |= NodeExpressionType.ReadOnly;
-            }
-
-            ppResult = new AD7Property(_frame, result);
-
+            ppResult = new AD7Property(_frame, result.Result);
             return VSConstants.S_OK;
         }
 

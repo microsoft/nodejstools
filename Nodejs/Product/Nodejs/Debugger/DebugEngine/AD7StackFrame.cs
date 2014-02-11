@@ -367,7 +367,7 @@ namespace Microsoft.NodejsTools.Debugger.DebugEngine {
                 pichError = (uint)pbstrError.Length;
             }
 
-            ppExpr = new UncalculatedAD7Expression(this, pszCode, true);
+            ppExpr = new UncalculatedAD7Expression(this, pszCode);
             return VSConstants.S_OK;
         }
 

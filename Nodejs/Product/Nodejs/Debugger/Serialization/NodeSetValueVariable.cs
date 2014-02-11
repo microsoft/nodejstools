@@ -12,30 +12,26 @@
  *
  * ***************************************************************************/
 
-using Microsoft.VisualStudioTools.Project;
 using Newtonsoft.Json.Linq;
 
 namespace Microsoft.NodejsTools.Debugger.Serialization {
-    sealed class NodeBacktraceVariable : INodeVariable {
-        public NodeBacktraceVariable(NodeStackFrame stackFrame, JToken parameter) {
-            Utilities.ArgumentNotNull("stackFrame", stackFrame);
-            Utilities.ArgumentNotNull("parameter", parameter);
-
-            JToken value = parameter["value"];
-            Id = (int)value["ref"];
-            Parent = null;
+    sealed class NodeSetValueVariable : INodeVariable {
+        public NodeSetValueVariable(NodeStackFrame stackFrame, string name, JToken message) {
+            Id = (int)message["body"]["newValue"]["handle"];
             StackFrame = stackFrame;
-            Name = (string)parameter["name"] ?? NodeVariableType.AnonymousVariable;
-            TypeName = (string)value["type"];
-            Value = (string)value["value"];
-            Class = (string)value["className"];
-            Text = (string)value["text"];
+            Parent = null;
+            Name = name;
+            TypeName = (string)message["body"]["newValue"]["type"];
+            Value = (string)message["body"]["newValue"]["value"];
+            Class = (string)message["body"]["newValue"]["className"];
+            Text = (string)message["body"]["newValue"]["text"];
             Attributes = NodePropertyAttributes.None;
             Type = NodePropertyType.Normal;
         }
 
         public int Id { get; private set; }
         public NodeEvaluationResult Parent { get; private set; }
+        public NodeStackFrame StackFrame { get; private set; }
         public string Name { get; private set; }
         public string TypeName { get; private set; }
         public string Value { get; private set; }
@@ -43,6 +39,5 @@ namespace Microsoft.NodejsTools.Debugger.Serialization {
         public string Text { get; private set; }
         public NodePropertyAttributes Attributes { get; private set; }
         public NodePropertyType Type { get; private set; }
-        public NodeStackFrame StackFrame { get; private set; }
     }
 }

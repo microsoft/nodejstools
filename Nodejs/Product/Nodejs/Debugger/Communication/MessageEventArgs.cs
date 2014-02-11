@@ -15,7 +15,7 @@
 using System;
 
 namespace Microsoft.NodejsTools.Debugger.Communication {
-    public sealed class MessageEventArgs : EventArgs {
+    sealed class MessageEventArgs : EventArgs {
         public MessageEventArgs(string message) {
             Message = message;
         }

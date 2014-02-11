@@ -17,7 +17,7 @@ using Microsoft.VisualStudioTools.Project;
 using Newtonsoft.Json.Linq;
 
 namespace Microsoft.NodejsTools.Debugger.Serialization {
-    class NodePrototypeVariable : INodeVariable {
+    sealed class NodePrototypeVariable : INodeVariable {
         public NodePrototypeVariable(NodeEvaluationResult parent, JToken prototype, Dictionary<int, JToken> references) {
             Utilities.ArgumentNotNull("prototype", prototype);
             Utilities.ArgumentNotNull("references", references);

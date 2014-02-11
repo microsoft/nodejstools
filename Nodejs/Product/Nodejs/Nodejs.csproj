@@ -229,6 +229,7 @@
     <Compile Include="Commands\SurveyNewsCommand.cs" />
     <Compile Include="Debugger\BreakOn.cs" />
     <Compile Include="Debugger\BreakOnKind.cs" />
+    <Compile Include="Debugger\Commands\SetVariableValueCommand.cs" />
     <Compile Include="Debugger\Communication\ITcpClient.cs" />
     <Compile Include="Debugger\Communication\ITcpClientFactory.cs" />
     <Compile Include="Debugger\Communication\TcpClientFactory.cs" />
@@ -237,6 +238,7 @@
     <Compile Include="Debugger\ExceptionHandler.cs" />
     <Compile Include="Debugger\IExceptionHandler.cs" />
     <Compile Include="Debugger\ISourceMapper.cs" />
+    <Compile Include="Debugger\Serialization\NodeSetValueVariable.cs" />
     <Compile Include="Debugger\SteppingKind.cs" />
     <Compile Include="TaggerProviderMetadata.cs" />
     <Compile Include="CustomTrackingSpan.cs" />

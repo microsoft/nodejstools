@@ -29,6 +29,7 @@ namespace Microsoft.NodejsTools.Debugger.Commands {
         ScriptsCommand CreateScriptsCommand(bool includeSource = false, int? moduleId = null);
         SetBreakpointCommand CreateSetBreakpointCommand(NodeModule module, NodeBreakpoint breakpoint, bool withoutPredicate = false);
         SetExceptionBreakCommand CreateSetExceptionBreakCommand(bool uncaughtExceptions, bool enabled);
+        SetVariableValueCommand CreateSetVariableValueCommand(NodeStackFrame stackFrame, string name, int handle);
         SuspendCommand CreateSuspendCommand();
     }
 }

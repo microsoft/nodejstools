@@ -52,6 +52,12 @@ namespace Microsoft.NodejsTools.Debugger {
         private int _steppingCallstackDepth;
         private SteppingKind _steppingMode;
 
+        /// <summary>
+        /// Node version with setVariableValue command.
+        /// https://github.com/joyent/node/blob/master/ChangeLog
+        /// </summary>
+        private readonly Version _nodeSetVariableValueVersion = new Version(0, 10, 12);
+
         private NodeDebugger() {
             Connection = Connection ?? new DebuggerConnection(new TcpClientFactory());
             Client = Client ?? new DebuggerClient(Connection);
@@ -1027,12 +1033,27 @@ namespace Microsoft.NodejsTools.Debugger {
             DebugWriteCommand("ExecuteText to thread " + nodeStackFrame.Thread.Id + " " /*+ executeId*/);
 
             EvaluateCommand evaluateCommand = CommandFactory.CreateEvaluateCommand(text, nodeStackFrame);
-            try {
-                await Client.SendRequestAsync(evaluateCommand).ConfigureAwait(false);
-            } catch (Exception e) {
-                return new NodeEvaluationResult(e.Message, text, nodeStackFrame);
+            await Client.SendRequestAsync(evaluateCommand).ConfigureAwait(false);
+
+            return evaluateCommand.Result;
+        }
+
+        internal async Task<NodeEvaluationResult> SetVariableValueAsync(NodeStackFrame stackFrame, string name, string value) {
+            DebugWriteCommand("Set Variable Value");
+
+            if (Connection.NodeVersion >= _nodeSetVariableValueVersion) {
+                var evaluateValueCommand = CommandFactory.CreateEvaluateCommand(value, stackFrame);
+                await Client.SendRequestAsync(evaluateValueCommand).ConfigureAwait(false);
+                
+                var handle = evaluateValueCommand.Result.Handle;
+                var setVariableValuecommand = CommandFactory.CreateSetVariableValueCommand(stackFrame, name, handle);
+                await Client.SendRequestAsync(setVariableValuecommand).ConfigureAwait(false);
+                return setVariableValuecommand.Result;
             }
 
+            var expression = string.Format("{0} = {1}", name, value);
+            var evaluateCommand = CommandFactory.CreateEvaluateCommand(expression, stackFrame);
+            await Client.SendRequestAsync(evaluateCommand).ConfigureAwait(false);
             return evaluateCommand.Result;
         }
 

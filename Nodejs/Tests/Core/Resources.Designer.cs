@@ -196,6 +196,15 @@ namespace NodejsTests {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to {&quot;seq&quot;:15,&quot;request_seq&quot;:9,&quot;type&quot;:&quot;response&quot;,&quot;command&quot;:&quot;setVariableValue&quot;,&quot;success&quot;:true,&quot;body&quot;:{&quot;newValue&quot;:{&quot;handle&quot;:44,&quot;type&quot;:&quot;number&quot;,&quot;value&quot;:55,&quot;text&quot;:&quot;55&quot;}},&quot;refs&quot;:[],&quot;running&quot;:false}.
+        /// </summary>
+        internal static string NodeSetVariableValueResponse {
+            get {
+                return ResourceManager.GetString("NodeSetVariableValueResponse", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to [0, 1, 2].
         /// </summary>
         internal static string NodeSimpleArray {

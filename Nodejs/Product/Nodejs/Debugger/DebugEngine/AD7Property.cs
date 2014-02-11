@@ -27,11 +27,13 @@ namespace Microsoft.NodejsTools.Debugger.DebugEngine {
     // The sample engine only supports locals and parameters for functions that have symbols loaded.
     class AD7Property : IDebugProperty3 {
         private readonly NodeEvaluationResult _evaluationResult;
+        private readonly AD7Property _parent;
         private readonly AD7StackFrame _frame;
         private readonly IComparer<string> _comparer = new NaturalSortComparer();
 
-        public AD7Property(AD7StackFrame frame, NodeEvaluationResult evaluationResult) {
+        public AD7Property(AD7StackFrame frame, NodeEvaluationResult evaluationResult, AD7Property parent = null) {
             _evaluationResult = evaluationResult;
+            _parent = parent;
             _frame = frame;
         }
 
@@ -119,7 +121,7 @@ namespace Microsoft.NodejsTools.Debugger.DebugEngine {
             } else {
                 properties = new DEBUG_PROPERTY_INFO[children.Length];
                 for (int i = 0; i < children.Length; i++) {
-                    properties[i] = new AD7Property(_frame, children[i]).ConstructDebugPropertyInfo(dwRadix, dwFields);
+                    properties[i] = new AD7Property(_frame, children[i], this).ConstructDebugPropertyInfo(dwRadix, dwFields);
                 }
             }
 
@@ -151,13 +153,14 @@ namespace Microsoft.NodejsTools.Debugger.DebugEngine {
         public int GetStringChars(uint buflen, ushort[] rgString, out uint pceltFetched) {
             pceltFetched = buflen;
 
-            var result = _evaluationResult.Frame.ExecuteTextAsync(_evaluationResult.FullName).Result;
-            if (result == null || !string.IsNullOrEmpty(result.ExceptionText)) {
+            NodeEvaluationResult result;
+            try {
+                result = _evaluationResult.Frame.ExecuteTextAsync(_evaluationResult.FullName).Result;
+            } catch (Exception) {
                 return VSConstants.E_FAIL;
             }
 
             result.StringValue.ToCharArray().CopyTo(rgString, 0);
-
             return VSConstants.S_OK;
         }
 
@@ -180,8 +183,30 @@ namespace Microsoft.NodejsTools.Debugger.DebugEngine {
         }
 
         public int SetValueAsStringWithError(string pszValue, uint dwRadix, uint dwTimeout, out string errorString) {
-            errorString = null;
-            return SetValueAsString(pszValue, dwRadix, dwTimeout);
+            errorString = "Unable to set new value.";
+
+            try {
+                if (_parent == null) {
+                    _evaluationResult.Frame.SetVariableValueAsync(_evaluationResult.FullName, pszValue).Wait((int)dwTimeout);
+                } else {
+                    var expression = string.Format("{0} = {1}", _evaluationResult.FullName, pszValue);
+                    _evaluationResult.Frame.ExecuteTextAsync(expression).Wait((int)dwTimeout);
+                }
+            }
+            catch (AggregateException e) {
+                var baseException = e.GetBaseException();
+                if (!string.IsNullOrEmpty(baseException.Message)) {
+                    errorString = baseException.Message;
+                }
+                return VSConstants.E_FAIL;
+            } catch (Exception e) {
+                if (!string.IsNullOrEmpty(e.Message)) {
+                    errorString = e.Message;    
+                }
+                return VSConstants.E_FAIL;
+            }
+
+            return VSConstants.S_OK;
         }
 
         // Returns the memory bytes for a property value.
@@ -230,9 +255,14 @@ namespace Microsoft.NodejsTools.Debugger.DebugEngine {
 
         // The debugger will call this when the user tries to edit the property's values in one of the debugger windows.
         public int SetValueAsString(string pszValue, uint dwRadix, uint dwTimeout) {
-            var expression = string.Format("{0} = {1}", _evaluationResult.FullName, pszValue);
-            var result = _evaluationResult.Frame.ExecuteTextAsync(expression).Result;
-            if (result == null || !string.IsNullOrEmpty(result.ExceptionText)) {
+            try {
+                if (_parent == null) {
+                    _evaluationResult.Frame.SetVariableValueAsync(_evaluationResult.FullName, pszValue).Wait((int)dwTimeout);
+                } else {
+                    var expression = string.Format("{0} = {1}", _evaluationResult.FullName, pszValue);
+                    _evaluationResult.Frame.ExecuteTextAsync(expression).Wait((int)dwTimeout);
+                }
+            } catch (Exception) {
                 return VSConstants.E_FAIL;
             }
 

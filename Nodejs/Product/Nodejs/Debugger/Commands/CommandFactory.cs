@@ -76,6 +76,10 @@ namespace Microsoft.NodejsTools.Debugger.Commands {
         public SetExceptionBreakCommand CreateSetExceptionBreakCommand(bool uncaughtExceptions, bool enabled) {
             return new SetExceptionBreakCommand(_numberGenerator.GetNext(), uncaughtExceptions, enabled);
         }
+        
+        public SetVariableValueCommand CreateSetVariableValueCommand(NodeStackFrame stackFrame, string name, int handle) {
+            return new SetVariableValueCommand(_numberGenerator.GetNext(), _resultFactory, stackFrame, name, handle);
+        }
 
         public SuspendCommand CreateSuspendCommand() {
             return new SuspendCommand(_numberGenerator.GetNext());

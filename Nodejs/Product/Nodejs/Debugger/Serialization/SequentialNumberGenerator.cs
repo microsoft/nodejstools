@@ -15,7 +15,7 @@
 using System.Threading;
 
 namespace Microsoft.NodejsTools.Debugger.Serialization {
-    class SequentialNumberGenerator : INumberGenerator {
+    sealed class SequentialNumberGenerator : INumberGenerator {
         private int _number;
 
         public int GetNext() {

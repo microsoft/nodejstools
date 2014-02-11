@@ -17,7 +17,7 @@ using Microsoft.VisualStudioTools.Project;
 using Newtonsoft.Json.Linq;
 
 namespace Microsoft.NodejsTools.Debugger.Serialization {
-    class NodeLookupVariable : INodeVariable {
+    sealed class NodeLookupVariable : INodeVariable {
         public NodeLookupVariable(NodeEvaluationResult parent, JToken property, Dictionary<int, JToken> references) {
             Utilities.ArgumentNotNull("property", property);
             Utilities.ArgumentNotNull("references", references);

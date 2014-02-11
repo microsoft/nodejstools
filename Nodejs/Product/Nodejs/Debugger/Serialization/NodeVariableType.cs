@@ -16,7 +16,7 @@ namespace Microsoft.NodejsTools.Debugger.Serialization {
     /// <summary>
     /// Contains VS type aliases for v8 types.
     /// </summary>
-    class NodeVariableType {
+    sealed class NodeVariableType {
         public const string Unknown = "Unknown";
         public const string Undefined = "Undefined";
         public const string Null = "Null";

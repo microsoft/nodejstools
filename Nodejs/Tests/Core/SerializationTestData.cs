@@ -121,6 +121,15 @@ namespace NodejsTests {
         }
 
         /// <summary>
+        /// Gets a json set variable value response.
+        /// </summary>
+        /// <returns>JSON object.</returns>
+        public static JObject GetSetVariableValueResponse() {
+            string json = Resources.NodeSetVariableValueResponse;
+            return DeserializeJsonValue(json);
+        }
+
+        /// <summary>
         /// Gets a json lookup references.
         /// </summary>
         /// <returns>JSON object.</returns>

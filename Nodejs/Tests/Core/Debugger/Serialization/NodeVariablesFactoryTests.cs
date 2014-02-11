@@ -407,7 +407,7 @@ namespace NodejsTests.Debugger.Serialization {
                 StackFrame = null,
                 Name = "v_unknown",
                 TypeName = "unknown",
-                Value = string.Empty,
+                Value = null,
                 Class = null,
                 Text = "Unknown"
             };

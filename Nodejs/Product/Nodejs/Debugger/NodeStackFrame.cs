@@ -163,6 +163,33 @@ namespace Microsoft.NodejsTools.Debugger {
         }
 
         /// <summary>
+        /// Sets a new value for variable in this stack frame.
+        /// </summary>
+        /// <param name="name">Variable name.</param>
+        /// <param name="value">New value.</param>
+        public virtual async Task<NodeEvaluationResult> SetVariableValueAsync(string name, string value) {
+            var result = await _thread.Process.SetVariableValueAsync(this, name, value).ConfigureAwait(false);
+
+            // Update variable in locals
+            for (int i = 0; i < Locals.Count; i++) {
+                var evaluationResult = Locals[i];
+                if (evaluationResult.Expression == name) {
+                    Locals[i] = result;
+                }
+            }
+
+            // Update variable in parameters
+            for (int i = 0; i < Parameters.Count; i++) {
+                var evaluationResult = Parameters[i];
+                if (evaluationResult.Expression == name) {
+                    Locals[i] = result;
+                }
+            }
+
+            return result;
+        }
+
+        /// <summary>
         /// Sets the line number that this current frame is executing.  Returns true
         /// if the line was successfully set or false if the line number cannot be changed
         /// to this line.

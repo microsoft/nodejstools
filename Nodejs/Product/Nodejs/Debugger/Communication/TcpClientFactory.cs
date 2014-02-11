@@ -13,7 +13,7 @@
  * ***************************************************************************/
 
 namespace Microsoft.NodejsTools.Debugger.Communication {
-    class TcpClientFactory : ITcpClientFactory {
+    sealed class TcpClientFactory : ITcpClientFactory {
         public ITcpClient CreateTcpClient(string hostName, int portNumber) {
             return new TcpClientWrapper(hostName, portNumber);
         }

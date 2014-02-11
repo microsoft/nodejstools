@@ -24,13 +24,20 @@ using Microsoft.VisualStudioTools.Project;
 namespace Microsoft.NodejsTools.Debugger.Communication {
     sealed class DebuggerConnection : IDebuggerConnection {
         private readonly Regex _contentLength = new Regex(@"Content-Length: (\d+)", RegexOptions.Compiled);
+        private readonly Regex _nodeVersion = new Regex(@"Embedding-Host: node v([0-9.]+)", RegexOptions.Compiled);
         private readonly ITcpClientFactory _tcpClientFactory;
         private StreamReader _streamReader;
         private StreamWriter _streamWriter;
         private ITcpClient _tcpClient;
+        
+        /// <summary>
+        /// SBCS encoding.
+        /// </summary>
+        private readonly Encoding _encoding = Encoding.GetEncoding("latin1");
 
         public DebuggerConnection(ITcpClientFactory tcpClientFactory) {
             _tcpClientFactory = tcpClientFactory;
+            NodeVersion = new Version();
         }
 
         /// <summary>
@@ -61,10 +68,15 @@ namespace Microsoft.NodejsTools.Debugger.Communication {
             Utilities.ArgumentNotNullOrEmpty("message", message);
             Utilities.CheckNotNull(_streamWriter, "No connection with node.js debugger.");
 
-            string request = string.Format("Content-Length: {0}{1}{1}{2}", Encoding.UTF8.GetByteCount(message), Environment.NewLine, message);
+            // Convert UTF-8 string into SBCS
+            byte[] bytes = Encoding.UTF8.GetBytes(message);
+            char[] chars = _encoding.GetChars(bytes);
+            string header = string.Format("Content-Length: {0}{1}{1}", chars.Length, Environment.NewLine);
+            
             DebugWriteLine("Request: " + message);
 
-            await _streamWriter.WriteAsync(request).ConfigureAwait(false);
+            await _streamWriter.WriteAsync(header).ConfigureAwait(false);
+            await _streamWriter.WriteAsync(chars, 0, chars.Length).ConfigureAwait(false);
             await _streamWriter.FlushAsync().ConfigureAwait(false);
         }
 
@@ -86,6 +98,11 @@ namespace Microsoft.NodejsTools.Debugger.Communication {
         }
 
         /// <summary>
+        /// Gets a node.js version.
+        /// </summary>
+        public Version NodeVersion { get; private set; }
+
+        /// <summary>
         /// Connect to specified debugger endpoint.
         /// </summary>
         /// <param name="hostName">Host address.</param>
@@ -98,8 +115,8 @@ namespace Microsoft.NodejsTools.Debugger.Communication {
             _tcpClient = _tcpClientFactory.CreateTcpClient(hostName, portNumber);
 
             Stream stream = _tcpClient.GetStream();
-            _streamReader = new StreamReader(stream);
-            _streamWriter = new StreamWriter(stream);
+            _streamReader = new StreamReader(stream, _encoding);
+            _streamWriter = new StreamWriter(stream, _encoding);
 
             Task.Factory.StartNew(ReadStreamAsync);
         }
@@ -121,18 +138,26 @@ namespace Microsoft.NodejsTools.Debugger.Communication {
                     // Check whether result is content length header
                     Match match = _contentLength.Match(result);
                     if (!match.Success) {
+                        // Check whether result is node.js version string
+                        match = _nodeVersion.Match(result);
+                        if (match.Success) {
+                            NodeVersion = new Version(match.Groups[1].Value);
+                        } else {
+                            DebugWriteLine(string.Format("Debugger info: {0}", result));
+                        }
+
                         continue;
                     }
 
                     await _streamReader.ReadLineAsync();
 
-                    // Retrieve body length
+                    // Retrieve content length
                     int length = int.Parse(match.Groups[1].Value);
                     if (length == 0) {
                         continue;
                     }
 
-                    // Read message body
+                    // Read content
                     var buffer = new char[length];
                     int count = await _streamReader.ReadBlockAsync(buffer, 0, length);
                     if (count == 0) {
@@ -140,12 +165,13 @@ namespace Microsoft.NodejsTools.Debugger.Communication {
                         break;
                     }
 
-                    // Notify subscribers
-                    byte[] bytes = Encoding.UTF8.GetBytes(buffer, 0, count);
+                    // Get UTF-8 string from SBCS
+                    byte[] bytes = _encoding.GetBytes(buffer, 0, count);
                     string message = Encoding.UTF8.GetString(bytes);
 
                     DebugWriteLine("Response: " + message);
 
+                    // Notify subscribers
                     EventHandler<MessageEventArgs> outputMessage = OutputMessage;
                     if (outputMessage != null) {
                         outputMessage(this, new MessageEventArgs(message));
