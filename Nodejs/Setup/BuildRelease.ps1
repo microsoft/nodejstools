@@ -161,7 +161,7 @@ if ($internal) {
 }
 
 if ($release -or $mockrelease) {
-    $approvers = "smortaz", "dinov", "stevdo", "pminaev", "arturl", "zacha", "gilbertw", "huvalo"
+    $approvers = "smortaz", "dinov", "stevdo", "pminaev", "arturl", "gilbertw", "huvalo"
     $approvers = @($approvers | Where-Object {$_ -ne $env:USERNAME})
     $symbol_contacts = "$env:username;dinov;smortaz;stevdo;gilbertw"
     
