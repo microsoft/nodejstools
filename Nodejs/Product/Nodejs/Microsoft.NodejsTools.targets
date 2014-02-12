@@ -19,13 +19,15 @@
   <Target Name="CreateManifestResourceNames" Returns=""/>
 
   <Import Project="$(MSBuildToolsPath)\Microsoft.Common.targets"/>
-  
+  <Import Project="$(VSToolsPath)\TypeScript\Microsoft.TypeScript.targets" Condition="Exists('$(VSToolsPath)\TypeScript\Microsoft.TypeScript.targets') And '$(EnableTypeScript)' == 'true'" />
+
   <ItemGroup>
     <NodeModulesContent Include="$(ProjectHome)\node_modules\**\*.*"/>
   </ItemGroup>
 
-  <Target Name="Build">
-    <Message Text="Content=@(Content->'%(RelativeDir)%(Filename)%(Extension)')"/>
+  <Target Name="CopyFilesToOutputDirectory"/>
+  
+  <Target Name="CoreCompile">
     <!-- Target used for generating a package which can be uploaded to web server -->
     <ItemGroup>
       <_FoundWebConfig Include="@(Content)" Condition=" '%(Content.Filename)%(Content.Extension)' == 'web.config' " />
@@ -63,11 +65,11 @@
           SkipUnchangedFiles="true">    
     </Copy>
     <Copy SourceFiles="@(NodejsAzureDeploymentFile)"
-          DestinationFolder="bin"
+          DestinationFolder="$(IntermediateOutputPath)\bin"
           SkipUnchangedFiles="true">
       <Output TaskParameter="DestinationFiles" ItemName="FilesCopiedToIntermediate"/>
     </Copy>
-    <!-- If we have a web.cloud.config we want to deploy that as web.config instead, so we won't include
+   <!-- If we have a web.cloud.config we want to deploy that as web.config instead, so we won't include
          web.config or web.cloud.config.  Instead we will copy web.cloud.config to the intermediate directory 
          as web.config and include that.
       -->
@@ -80,19 +82,15 @@
   </ItemGroup>
   <Target
     Name="GetTargetPath"
-    DependsOnTargets="Build"
+    DependsOnTargets="CoreCompile"
     Returns="@(ScriptAndWebDeployFiles)"
     >
     <ItemGroup>
       <NodejsBinFiles Include="bin\**\*"  Exclude="bin\Microsoft.NodejsTools.WebRole.dll"/>
       <ScriptAndWebDeployFiles Include="@(NodejsBinFiles->'%(RootDir)%(Directory)%(Filename)%(Extension)')"/>
       <ScriptAndWebDeployFiles Include="@(FilesCopiedToIntermediate->'%(RootDir)%(Directory)%(Filename)%(Extension)')" />
-<!-- 
-      <NodejsAzureDeploymentFileLocal Include="@(NodejsAzureDeploymentFile->'bin\%(Filename)%(Extension)')" />
-      <ScriptAndWebDeployFiles Include="@(NodejsAzureDeploymentFileLocal->'%(RootDir)%(Directory)%(Filename)%(Extension)')"/>
-      -->
     </ItemGroup>
-    <Message Text="ScriptAndWebDeployFiles=@(ScriptAndWebDeployFiles)"  />
+    <Message Text="ScriptAndWebDeployFiles=@(ScriptAndWebDeployFiles)"  Importance="low"/>
   </Target>
   <Target Name="WatGetTargetFrameworkDirectories" Returns="" />
   <Target Name="BuiltProjectOutputGroupDependencies" Returns="" />
@@ -102,13 +100,16 @@
   <PropertyGroup>
     <CleanWPPAllFilesInSingleFolder Condition="'$(CleanWPPAllFilesInSingleFolder)' == ''">false</CleanWPPAllFilesInSingleFolder>
   </PropertyGroup>
-  
+
+  <PropertyGroup>
+    <PublishPipelineCollectFilesCore>$(PublishPipelineCollectFilesCore);CollectNodejsFiles</PublishPipelineCollectFilesCore>
+  </PropertyGroup>
+
   <Import Project="$(VSToolsPath)\WebApplications\Microsoft.WebApplication.targets" Condition="'$(VSToolsPath)' != ''" />
 
   <!--- Detects if we're deploying via web deploy, and sets _NodejsDeploymentMethod appropriately.
         Otherwise we'll assume we're deploying to cloud service. -->
   <Target Name="_HostDeployDetectTarget" BeforeTargets="GenerateGlobalPublishSetting">
-    <Message Text="Running _HostDeployDetectTarget"/>
     <PropertyGroup>
       <!-- We are deploying via web deploy to a shared host -->
       <_NodejsDeploymentMethod>WebDeploy</_NodejsDeploymentMethod>
@@ -116,11 +117,10 @@
   </Target>
 
   <Target
-    Name="PipelineTransformPhase"
-    DependsOnTargets="Build"
+    Name="CollectNodejsFiles"
+    DependsOnTargets="CoreCompile"
     Returns="@(TransformedFilenames)"
     >
-
     <Error 
       Text="web.config not found in project, to create a project to deploy to Windows Azure you must create a Windows Azure Node.js project." 
       Condition="'@(_FoundWebConfig)' == ''"/>
@@ -221,6 +221,11 @@
     <ItemGroup>
       <FilesForPackagingFromProject Include="@(Content->'$(IntermediateOutputPath)%(Identity)')" Condition="'%(Content.Link)'==''">
         <DestinationRelativePath>%(Content.Identity)</DestinationRelativePath>
+        <FromTarget>CollectFilesFromContent</FromTarget>
+        <Category>Run</Category>
+      </FilesForPackagingFromProject>
+      <FilesForPackagingFromProject Include="$(IntermediateOutputPath)\bin\Microsoft.NodejsTools.WebRole.dll">
+        <DestinationRelativePath>bin\Microsoft.NodejsTools.WebRole.dll</DestinationRelativePath>
         <FromTarget>CollectFilesFromContent</FromTarget>
         <Category>Run</Category>
       </FilesForPackagingFromProject>

@@ -48,7 +48,7 @@ namespace Microsoft.NodejsTools.Debugger.DebugEngine {
 
                 // The debugger will not QI the IDebugCodeContex2 interface returned here. We must pass the pointer
                 // to IDebugCodeContex2 and not IUnknown.
-                AD7MemoryAddress codeContext = new AD7MemoryAddress(m_engine, m_address.FileName, (uint)m_address.LineNo);
+                AD7MemoryAddress codeContext = new AD7MemoryAddress(m_engine, m_address.RequestedFileName, (uint)m_address.RequestedLineNo);
                 codeContext.SetDocumentContext(m_documentContext);
                 location.unionmember1 = Marshal.GetComInterfaceForObject(codeContext, typeof(IDebugCodeContext2));
                 pBPResolutionInfo[0].bpResLocation = location;

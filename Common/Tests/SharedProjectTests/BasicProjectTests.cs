@@ -13,9 +13,11 @@
  * ***************************************************************************/
 
 using System;
+using System.Collections.Generic;
 using System.Collections.Specialized;
 using System.IO;
 using System.Linq;
+using System.Threading.Tasks;
 using System.Windows;
 using EnvDTE;
 using Microsoft.TC.TestHostAdapters;
@@ -1204,6 +1206,53 @@ namespace Microsoft.VisualStudioTools.SharedProjectTests {
 
         [TestMethod, Priority(0), TestCategory("Core")]
         [HostType("TC Dynamic"), DynamicHostType(typeof(VsIdeHostAdapter))]
+        public void CopyFullPath() {
+            var existing = System.Diagnostics.Process.GetProcesses().Select(x => x.Id).ToSet();
+
+            foreach (var projectType in ProjectTypes) {
+                var def = new ProjectDefinition(
+                    "HelloWorld",
+                    projectType,
+                    Compile("server"),
+                    Folder("IncFolder", isExcluded: false),
+                    Folder("ExcFolder", isExcluded: true),
+                    Compile("app", isExcluded: true),
+                    Compile("missing", isMissing: true)
+                );
+
+                using (var solution = def.Generate().ToVs()) {
+                    var projectDir = Path.GetDirectoryName(solution.Project.FullName);
+
+                    CheckCopyFullPath(solution.WaitForItem("HelloWorld", "IncFolder"),
+                                      projectDir + "\\IncFolder\\");
+                    CheckCopyFullPath(solution.WaitForItem("HelloWorld", "ExcFolder"),
+                                      projectDir + "\\ExcFolder\\");
+                    CheckCopyFullPath(solution.WaitForItem("HelloWorld", "server" + def.ProjectType.CodeExtension),
+                                      projectDir + "\\server" + def.ProjectType.CodeExtension);
+                    CheckCopyFullPath(solution.WaitForItem("HelloWorld", "app" + def.ProjectType.CodeExtension),
+                                      projectDir + "\\app" + def.ProjectType.CodeExtension);
+                    CheckCopyFullPath(solution.WaitForItem("HelloWorld", "missing" + def.ProjectType.CodeExtension),
+                                      projectDir + "\\missing" + def.ProjectType.CodeExtension);
+
+                }
+            }
+        }
+
+        private void CheckCopyFullPath(System.Windows.Automation.AutomationElement element, string expected) {
+            string clipboardText = "";
+            Console.WriteLine("Checking CopyFullPath on:{0}", expected);
+            AutomationWrapper.Select(element);
+            VsIdeTestHostContext.Dte.ExecuteCommand("Project.CopyFullPath");
+            
+            UIThreadInvoker.Invoke((Action)(() => {
+                clipboardText = System.Windows.Clipboard.GetText();
+            }));
+
+            Assert.AreEqual(expected, clipboardText);
+        }
+
+        [TestMethod, Priority(0), TestCategory("Core")]
+        [HostType("TC Dynamic"), DynamicHostType(typeof(VsIdeHostAdapter))]
         public void PasteFileWhileOpenInEditor() {
             foreach (var projectType in ProjectTypes) {
                 var proj = new ProjectDefinition(
@@ -1244,5 +1293,54 @@ namespace Microsoft.VisualStudioTools.SharedProjectTests {
                 }
             }
         }
+
+        /// <summary>
+        /// Checks various combinations of item visibility from within the users project
+        /// and from imported projects and how it's controlled by the Visible metadata.
+        /// </summary>
+        [TestMethod, Priority(0), TestCategory("Core")]
+        [HostType("TC Dynamic"), DynamicHostType(typeof(VsIdeHostAdapter))]
+        public void ItemVisibility() {
+            try {
+                foreach (var projectType in ProjectTypes) {
+                    var imported = new ProjectDefinition(
+                        "Imported",
+                        ItemGroup(
+                            CustomItem("MyItemType", "..\\Imported\\ImportedItem.txt", ""),
+                            CustomItem(
+                                "MyItemType", 
+                                "..\\Imported\\VisibleItem.txt", 
+                                "", 
+                                metadata: new Dictionary<string, string>() { { "Visible", "true" } }
+                            )
+                        )
+                    );
+                    var baseProj = new ProjectDefinition(
+                        "HelloWorld",
+                        projectType,
+                        CustomItem(
+                            "MyItemType", 
+                            "ProjectInvisible.txt", 
+                            "", 
+                            metadata: new Dictionary<string, string>() { { "Visible", "false" } }
+                        ),
+                        Import("..\\Imported\\Imported.proj"),
+                        Property("ProjectView", "ProjectFiles")
+                    );
+
+                    var solutionFile = SolutionFile.Generate("HelloWorld", baseProj, imported);
+                    using (var solution = solutionFile.ToVs()) {
+                        Assert.IsNotNull(solution.WaitForItem("HelloWorld", "VisibleItem.txt"), "VisibleItem.txt not found");
+                        Assert.IsNull(solution.FindItem("HelloWorld", "ProjectInvisible.txt"), "VisibleItem.txt not found");
+                        Assert.IsNull(solution.FindItem("HelloWorld", "ImportedItem.txt"), "VisibleItem.txt not found");
+                    }
+                }
+            } finally {
+                VsIdeTestHostContext.Dte.Solution.Close();
+                GC.Collect();
+                GC.WaitForPendingFinalizers();
+            }
+        }
+
     }
 }

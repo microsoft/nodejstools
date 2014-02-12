@@ -280,7 +280,7 @@
 
     <Symbols>
         <!-- This is the package guid. -->
-        <GuidSymbol name="guidReplWindowPkg" value="{FF632CFA-E4C5-4D8E-B1E2-63BE3B8A8289}" />
+        <GuidSymbol name="guidReplWindowPkg" value="{29102E6C-34F2-4FF1-BA2F-C02ADE3846E8}" />
         <GuidSymbol name="guidReplWindow" value="{7EDC7332-5F41-4EF5-B8DD-A6CDC2FCDDF1}" />
 
         <!-- This is the guid used to group the menu commands together -->

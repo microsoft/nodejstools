@@ -48,12 +48,12 @@ namespace Microsoft.NodejsTools.Profiling {
     [InstalledProductRegistration("#110", "#112", AssemblyVersionInfo.Version, IconResourceID = 400)]
     // This attribute is needed to let the shell know that this package exposes some menus.
     [ProvideMenuResource("Menus.ctmenu", 1)]
-    [Guid(GuidList.guidNodeProfilingPkgString)]
+    [Guid(Guids.NodejsProfilingPkgString)]
     // set the window to dock where Toolbox/Performance Explorer dock by default
     [ProvideToolWindow(typeof(PerfToolWindow), Orientation = ToolWindowOrientation.Left, Style = VsDockStyle.Tabbed, Window = EnvDTE.Constants.vsWindowKindToolbox)]
-    [ProvideFileFilterAttribute("{9C34161A-379E-4933-A0DC-871FE64D34F1}", "/1", "Node.js Performance Session (*" + PerfFileType + ");*" + PerfFileType, 100)]
+    [ProvideFileFilterAttribute("{" + Guids.NodejsProfilingPkgString + "}", "/1", "Node.js Performance Session (*" + PerfFileType + ");*" + PerfFileType, 100)]
     [ProvideEditorExtension(typeof(ProfilingSessionEditorFactory), ".njsperf", 50,
-          ProjectGuid = "{9C34161A-379E-4933-A0DC-871FE64D34F1}",
+          ProjectGuid = Guids.NodejsProfilingPkgString,
           NameResourceID = 105,
           DefaultName = "NodejsPerfSession")]
     [ProvideAutomationObject("NodejsProfiling")]
@@ -91,7 +91,7 @@ namespace Microsoft.NodejsTools.Profiling {
             // TODO - Ideally this wouldn't be hardcoded in here but we don't have a good shared location
             //    move this guid to be from a shared file
             //   
-            Guid nodePackage = new Guid("4219f2a8-fbf9-4659-a222-b7580a60eebb");
+            Guid nodePackage = new Guid("FE8A8C3D-328A-476D-99F9-2A24B75F8C7F");
             IVsPackage package;
             shell.LoadPackage(ref nodePackage, out package);
 
@@ -99,34 +99,34 @@ namespace Microsoft.NodejsTools.Profiling {
             OleMenuCommandService mcs = GetService(typeof(IMenuCommandService)) as OleMenuCommandService;
             if (null != mcs) {
                 // Create the command for the menu item.
-                CommandID menuCommandID = new CommandID(GuidList.guidNodeProfilingCmdSet, (int)PkgCmdIDList.cmdidStartNodeProfiling);
+                CommandID menuCommandID = new CommandID(Guids.NodejsProfilingCmdSet, (int)PkgCmdIDList.cmdidStartNodeProfiling);
                 var oleMenuItem = new OleMenuCommand(StartProfilingWizard, menuCommandID);
                 oleMenuItem.BeforeQueryStatus += IsProfilingActive;
                 _startWizard = oleMenuItem;
                 mcs.AddCommand(oleMenuItem);
 
                 // Create the command for the menu item.
-                menuCommandID = new CommandID(GuidList.guidNodeProfilingCmdSet, (int)PkgCmdIDList.cmdidPerfExplorer);
+                menuCommandID = new CommandID(Guids.NodejsProfilingCmdSet, (int)PkgCmdIDList.cmdidPerfExplorer);
                 oleMenuItem = new OleMenuCommand(ShowPeformanceExplorer, menuCommandID);
                 mcs.AddCommand(oleMenuItem);
 
-                menuCommandID = new CommandID(GuidList.guidNodeProfilingCmdSet, (int)PkgCmdIDList.cmdidAddPerfSession);
+                menuCommandID = new CommandID(Guids.NodejsProfilingCmdSet, (int)PkgCmdIDList.cmdidAddPerfSession);
                 oleMenuItem = new OleMenuCommand(AddPerformanceSession, menuCommandID);
                 oleMenuItem.BeforeQueryStatus += IsProfilingActive;
                 mcs.AddCommand(oleMenuItem);
 
-                menuCommandID = new CommandID(GuidList.guidNodeProfilingCmdSet, (int)PkgCmdIDList.cmdidStartProfiling);
+                menuCommandID = new CommandID(Guids.NodejsProfilingCmdSet, (int)PkgCmdIDList.cmdidStartProfiling);
                 oleMenuItem = _startCommand = new OleMenuCommand(StartProfiling, menuCommandID);
                 oleMenuItem.BeforeQueryStatus += IsProfilingActiveAndSessionsExist;
                 mcs.AddCommand(oleMenuItem);
 
-                menuCommandID = new CommandID(GuidList.guidNodeProfilingCmdSet, (int)PkgCmdIDList.cmdidStopProfiling);
+                menuCommandID = new CommandID(Guids.NodejsProfilingCmdSet, (int)PkgCmdIDList.cmdidStopProfiling);
                 _stopCommand = oleMenuItem = new OleMenuCommand(StopProfiling, menuCommandID);
                 oleMenuItem.BeforeQueryStatus += IsProfilingInactive;
 
                 mcs.AddCommand(oleMenuItem);
 
-                menuCommandID = new CommandID(GuidList.guidNodeProfilingCmdSet, (int)PkgCmdIDList.cmdidStartPerformanceAnalysis);
+                menuCommandID = new CommandID(Guids.NodejsProfilingCmdSet, (int)PkgCmdIDList.cmdidStartPerformanceAnalysis);
                 _startProfiling = oleMenuItem = new OleMenuCommand(StartPerfAnalysis, menuCommandID);
                 oleMenuItem.BeforeQueryStatus += IsNodejsProjectStartup;
                 mcs.AddCommand(oleMenuItem);
@@ -160,13 +160,15 @@ namespace Microsoft.NodejsTools.Profiling {
             bool foundStartupProject = false;
             var dteService = (EnvDTE.DTE)(GetService(typeof(EnvDTE.DTE)));
 
-            var startupProjects = ((object[])dteService.Solution.SolutionBuild.StartupProjects).Select(x => x.ToString());
-            foreach (EnvDTE.Project project in dteService.Solution.Projects) {
-                var kind = project.Kind;
-                if (String.Equals(kind, NodejsProfilingPackage.NodeProjectGuid, StringComparison.OrdinalIgnoreCase)) {
-                    if (startupProjects.Contains(project.UniqueName, StringComparer.OrdinalIgnoreCase)) {
-                        foundStartupProject = true;
-                        break;
+            if (dteService.Solution.SolutionBuild.StartupProjects != null) {
+                var startupProjects = ((object[])dteService.Solution.SolutionBuild.StartupProjects).Select(x => x.ToString());
+                foreach (EnvDTE.Project project in dteService.Solution.Projects) {
+                    var kind = project.Kind;
+                    if (String.Equals(kind, NodejsProfilingPackage.NodeProjectGuid, StringComparison.OrdinalIgnoreCase)) {
+                        if (startupProjects.Contains(project.UniqueName, StringComparer.OrdinalIgnoreCase)) {
+                            foundStartupProject = true;
+                            break;
+                        }
                     }
                 }
             }
@@ -236,7 +238,7 @@ namespace Microsoft.NodejsTools.Profiling {
 
         private void ProfileProjectTarget(SessionNode session, ProjectTarget projectTarget, bool openReport) {
             var targetGuid = projectTarget.TargetProject;
-
+            
             var dte = (EnvDTE.DTE)GetGlobalService(typeof(EnvDTE.DTE));
             EnvDTE.Project projectToProfile = null;
             foreach (EnvDTE.Project project in dte.Solution.Projects) {
@@ -325,7 +327,17 @@ namespace Microsoft.NodejsTools.Profiling {
             }
 
             var arch = NativeMethods.GetBinaryType(interpreter);
-            var process = new ProfiledProcess(interpreter, interpreterArgs, script, scriptArgs, workingDir, env, arch, launchUrl, port, startBrowser);
+
+            bool jmc = true;
+            using (var vsperfKey = VSRegistry.RegistryRoot(__VsLocalRegistryType.RegType_UserSettings).OpenSubKey("VSPerf")) {
+                var value = vsperfKey.GetValue("tools.options.justmycode");
+                int jmcSetting;
+                if (value != null && value is string && Int32.TryParse((string)value, out jmcSetting)) {
+                    jmc = jmcSetting != 0;
+                }
+            }
+
+            var process = new ProfiledProcess(interpreter, interpreterArgs, script, scriptArgs, workingDir, env, arch, launchUrl, port, startBrowser, jmc);
 
             string baseName = Path.GetFileNameWithoutExtension(session.Filename);
             string date = DateTime.Now.ToString("yyyyMMdd");

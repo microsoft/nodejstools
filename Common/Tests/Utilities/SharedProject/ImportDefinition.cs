@@ -13,20 +13,19 @@
  * ***************************************************************************/
 
 using System;
-using System.Collections.Generic;
+using Microsoft.Build.Construction;
+using MSBuild = Microsoft.Build.Evaluation;
 
-namespace Microsoft.NodejsTools {
-    /// <summary>
-    /// Just used for our MEF import to get the metadata in a strongly
-    /// typed way.
-    /// </summary>
-    sealed class ClassifierMetadata {
-        public readonly IEnumerable<string> ContentTypes;
-        public readonly IEnumerable<Type> TagTypes;
+namespace TestUtilities.SharedProject {
+    public class ImportDefinition : ProjectContentGenerator {
+        public readonly string Project;
+        
+        public ImportDefinition(string project) {
+            Project = project;
+        }
 
-        public ClassifierMetadata(IDictionary<string, object> values) {
-            ContentTypes = (IEnumerable<string>)values["ContentTypes"];
-            TagTypes = (IEnumerable<Type>)values["TagTypes"];
+        public override void Generate(ProjectType projectType, MSBuild.Project project) {
+            var target = project.Xml.AddImport(Project);
         }
     }
 }

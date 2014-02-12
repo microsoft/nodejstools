@@ -75,6 +75,8 @@
   <ItemDefinitionGroup>
     <ZipProject>
       <Language>JavaScript</Language>
+      <Culture>1033</Culture>
+      <OutputSubPath>Node.js</OutputSubPath>
     </ZipProject>
     <ZipItem>
       <Language>JavaScript</Language>
@@ -99,6 +101,7 @@
     </Reference>
     <Reference Include="Microsoft.VisualStudio.Editor, Version=$(VSTarget).0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a, processorArchitecture=MSIL" />
     <Reference Include="Microsoft.VisualStudio.Language.Intellisense, Version=$(VSTarget).0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a, processorArchitecture=MSIL" />
+    <Reference Include="Microsoft.VisualStudio.Language.StandardClassification, Version=$(VSTarget).0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a, processorArchitecture=MSIL" />
     <Reference Include="Microsoft.VisualStudio.OLE.Interop" />
     <Reference Include="Microsoft.VisualStudio.Shell.Interop" />
     <Reference Include="Microsoft.VisualStudio.Shell.Interop.8.0" />
@@ -139,6 +142,12 @@
     <Reference Include="System.Xaml" />
     <Reference Include="System.Xml" />
     <Reference Include="VSLangProj, Version=7.0.3300.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a">
+      <EmbedInteropTypes>True</EmbedInteropTypes>
+    </Reference>
+    <Reference Include="VSLangProj2, Version=7.0.5000.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a">
+      <EmbedInteropTypes>True</EmbedInteropTypes>
+    </Reference>
+    <Reference Include="VSLangProj80, Version=8.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a">
       <EmbedInteropTypes>True</EmbedInteropTypes>
     </Reference>
     <Reference Include="VsWebSite.Interop, Version=8.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a">
@@ -203,13 +212,17 @@
     </COMReference>
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="..\ReferenceGenerator\ReferenceCode.cs">
+      <Link>Project\ReferenceCode.cs</Link>
+    </Compile>
+    <Compile Include="ClassifierProviderMetadata.cs" />
     <Compile Include="CodeWindowManager.cs" />
     <Compile Include="Commands\ImportWizardCommand.cs" />
     <Compile Include="Commands\OpenReplWindowCommand.cs" />
     <Compile Include="Commands\OpenRemoteDebugDocumentationCommand.cs" />
     <Compile Include="Commands\OpenRemoteDebugProxyFolderCommand.cs" />
     <Compile Include="Commands\SurveyNewsCommand.cs" />
-    <Compile Include="ClassifierMetadata.cs" />
+    <Compile Include="TaggerProviderMetadata.cs" />
     <Compile Include="CustomTrackingSpan.cs" />
     <Compile Include="Debugger\INodeConnection.cs" />
     <Compile Include="Debugger\NodeEventEventArgs.cs" />
@@ -240,6 +253,62 @@
     <Compile Include="Intellisense\ReferenceGroupDispenser.cs" />
     <Compile Include="Intellisense\RequireCompletionCache.cs" />
     <Compile Include="Intellisense\TextViewCreationListener.cs" />
+    <Compile Include="Jade\Classifier\IClassificationContextNameProvider.cs" />
+    <Compile Include="Jade\Classifier\ICompositeToken.cs" />
+    <Compile Include="Jade\Classifier\JadeClassificationDefinitions.cs" />
+    <Compile Include="Jade\Classifier\JadeClassificationNameProvider.cs" />
+    <Compile Include="Jade\Classifier\JadeClassificationTypes.cs" />
+    <Compile Include="Jade\Classifier\JadeClassifier.cs" />
+    <Compile Include="Jade\Classifier\JadeClassifierProvider.cs" />
+    <Compile Include="Jade\Classifier\TokenBasedClassifier.cs" />
+    <Compile Include="Jade\EntityTable.cs" />
+    <Compile Include="Jade\IdleTimeAsyncTask.cs" />
+    <Compile Include="Jade\ITextSnapshotProvider.cs" />
+    <Compile Include="Jade\JadeContentTypeDefinition.cs" />
+    <Compile Include="Jade\JadeLanguageInfo.cs" />
+    <Compile Include="Jade\Outlining\IndentBasedRegionBuilder.cs" />
+    <Compile Include="Jade\Outlining\JadeOutlineTaggerProvider.cs" />
+    <Compile Include="Jade\Outlining\JadeOutliningTagger.cs" />
+    <Compile Include="Jade\Outlining\OutlineRegion.cs" />
+    <Compile Include="Jade\Outlining\OutlineRegionBuilder.cs" />
+    <Compile Include="Jade\Outlining\OutlineRegionCollection.cs" />
+    <Compile Include="Jade\Outlining\OutlineRegionsChange.cs" />
+    <Compile Include="Jade\Outlining\OutlineRegionsChangedEventArgs.cs" />
+    <Compile Include="Jade\Outlining\OutliningTagger.cs" />
+    <Compile Include="Jade\ServiceManager.cs" />
+    <Compile Include="Jade\TextProvider.cs" />
+    <Compile Include="Jade\TextUtility.cs" />
+    <Compile Include="Jade\Text\CharacterStream.cs" />
+    <Compile Include="Jade\Text\Def\ICompositeTextRange.cs" />
+    <Compile Include="Jade\Text\Def\ITextProvider.cs" />
+    <Compile Include="Jade\Text\Def\ITextRange.cs" />
+    <Compile Include="Jade\Text\Def\ITextRangeCollection.cs" />
+    <Compile Include="Jade\Text\ReadonlyTextRangeCollection.cs" />
+    <Compile Include="Jade\Text\textchange.cs" />
+    <Compile Include="Jade\Text\TextChangeArgs.cs" />
+    <Compile Include="Jade\Text\TextHelper.cs" />
+    <Compile Include="Jade\Text\TextRange.cs" />
+    <Compile Include="Jade\Text\TextRangeCollection.cs" />
+    <Compile Include="Jade\Text\TextStream.cs" />
+    <Compile Include="Jade\TimeUtility.cs" />
+    <Compile Include="Jade\Tokenizer\JadeToken.cs" />
+    <Compile Include="Jade\Tokenizer\JadeTokenizer.cs" />
+    <Compile Include="Jade\Tokenizer\JadeTokenType.cs" />
+    <Compile Include="Jade\Tokenizer\Keywords\JadeCodeKeywords.cs" />
+    <Compile Include="Jade\Tokenizer\Keywords\JadeFilters.cs" />
+    <Compile Include="Jade\Tokenizer\Keywords\JadeTagKeywords.cs" />
+    <Compile Include="Jade\Tokenizer\States\AttributeState.cs" />
+    <Compile Include="Jade\Tokenizer\States\FilterState.cs" />
+    <Compile Include="Jade\Tokenizer\States\HtmlState.cs" />
+    <Compile Include="Jade\Tokenizer\States\InlineCodeState.cs" />
+    <Compile Include="Jade\Tokenizer\States\ScriptState.cs" />
+    <Compile Include="Jade\Tokenizer\States\StyleState.cs" />
+    <Compile Include="Jade\Tokenizer\States\TagState.cs" />
+    <Compile Include="Jade\Tokenizer\States\TextState.cs" />
+    <Compile Include="Jade\Tokens\IToken.cs" />
+    <Compile Include="Jade\Tokens\ITokenizer.cs" />
+    <Compile Include="Jade\Tokens\Token.cs" />
+    <Compile Include="Jade\Tokens\Tokenizer.cs" />
     <Compile Include="LanguagePreferences.cs" />
     <Compile Include="Nodejs.cs" />
     <Compile Include="NodejsLanguageInfo.cs" />
@@ -364,10 +433,12 @@
     <Compile Include="ProvideLanguageTemplates.cs" />
     <Compile Include="Repl\ClearReplCommand.cs" />
     <Compile Include="Repl\INodejsReplSite.cs" />
+    <Compile Include="Repl\ReplBraceCompletionSessionProvider.cs" />
     <Compile Include="Repl\SaveReplCommand.cs" />
     <Compile Include="Repl\VsNodejsReplSite.cs" />
     <Compile Include="SmartIndent.cs" />
     <Compile Include="SmartIndentProvider.cs" />
+    <Compile Include="SourceMap.cs" />
     <Compile Include="VsMenus.cs" />
     <Compile Include="AzureSolutionListener.cs" />
     <Compile Include="BaseNodeProjectFactory.cs" />
@@ -442,6 +513,7 @@
   <ItemGroup>
     <EmbeddedResource Include="NpmUI\BusyControl.resx">
       <DependentUpon>BusyControl.cs</DependentUpon>
+      <SubType>Designer</SubType>
     </EmbeddedResource>
     <EmbeddedResource Include="NpmUI\BusyPopup.resx">
       <DependentUpon>BusyPopup.cs</DependentUpon>
@@ -502,6 +574,18 @@
     <ZipProject Include="ProjectTemplates\AddWebSiteAzureExpressApp\Preview.png" />
     <ZipProject Include="ProjectTemplates\AzureNodejsApp\Preview.png" />
     <ZipProject Include="ProjectTemplates\NodejsConsoleApp\Preview.png" />
+    <Content Include="FileTemplates\NewItem\EmptyTs.ts">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+      <IncludeInVSIX>true</IncludeInVSIX>
+    </Content>
+    <Content Include="FileTemplates\NewItem\EmptyHtml.html">
+      <IncludeInVSIX>true</IncludeInVSIX>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="FileTemplates\NewItem\UnitTest.js">
+      <IncludeInVSIX>true</IncludeInVSIX>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
     <Content Include="NodejsProjectBig.ico">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
       <IncludeInVSIX>true</IncludeInVSIX>
@@ -541,6 +625,49 @@
     <ZipProject Include="ProjectTemplates\AddWebSiteAzureExpressApp\index.js" />
     <ZipProject Include="ProjectTemplates\AddWebSiteAzureExpressApp\user.js" />
     <ZipProject Include="ProjectTemplates\AddWebSiteAzureNodejsApp\server.js" />
+    <TypeScriptProject Include="ProjectTemplates\TypeScriptConsoleApp\package.json" />
+    <TypeScriptProject Include="ProjectTemplates\TypeScriptConsoleApp\README.md" />
+    <TypeScriptProject Include="ProjectTemplates\TypeScriptConsoleApp\app.ts" />
+    <TypeScriptProject Include="ProjectTemplates\TypeScriptConsoleApp\NodejsConsoleApp.njsproj">
+      <SubType>Designer</SubType>
+    </TypeScriptProject>
+    <TypeScriptProject Include="ProjectTemplates\TypeScriptConsoleApp\NodejsConsoleApp.vstemplate" />
+    <TypeScriptProject Include="ProjectTemplates\TypeScriptConsoleApp\Preview.png" />
+    <Resource Include="ProjectTemplates\blankts.ico" />
+    <TypeScriptProject Include="ProjectTemplates\TypeScriptWebApp\server.ts" />
+    <TypeScriptProject Include="ProjectTemplates\TypeScriptWebApp\NodejsWebApp.njsproj">
+      <SubType>Designer</SubType>
+    </TypeScriptProject>
+    <TypeScriptProject Include="ProjectTemplates\TypeScriptWebApp\NodejsWebApp.vstemplate" />
+    <TypeScriptProject Include="ProjectTemplates\TypeScriptWebApp\Preview.png" />
+    <TypeScriptProject Include="ProjectTemplates\TypeScriptWebApp\package.json" />
+    <TypeScriptProject Include="ProjectTemplates\TypeScriptWebApp\README.md" />
+    <Content Include="node.d.ts">
+      <IncludeInVSIX>true</IncludeInVSIX>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <TypeScriptProject Include="ProjectTemplates\TypeScriptExpressApp\express.d.ts" />
+    <TypeScriptProject Include="ProjectTemplates\TypeScriptExpressApp\user.ts" />
+    <TypeScriptProject Include="ProjectTemplates\TypeScriptExpressApp\app.ts" />
+    <TypeScriptProject Include="ProjectTemplates\TypeScriptExpressApp\ExpressApp.vstemplate">
+      <SubType>Designer</SubType>
+    </TypeScriptProject>
+    <TypeScriptProject Include="ProjectTemplates\TypeScriptExpressApp\index.ts" />
+    <TypeScriptProject Include="ProjectTemplates\TypeScriptExpressApp\Preview.png" />
+    <TypeScriptProject Include="ProjectTemplates\TypeScriptAzureWebApp\TypeScriptWebApp.vstemplate">
+      <SubType>Designer</SubType>
+    </TypeScriptProject>
+    <TypeScriptProject Include="ProjectTemplates\TypeScriptAzureWebApp\Preview.png" />
+    <TypeScriptProject Include="ProjectTemplates\TypeScriptAzureExpressApp\TypeScriptExpressApp.vstemplate">
+      <SubType>Designer</SubType>
+    </TypeScriptProject>
+    <TypeScriptProject Include="ProjectTemplates\TypeScriptAzureExpressApp\Preview.png" />
+    <TypeScriptProject Include="ProjectTemplates\TypeScriptFromExistingCode\FromExistingCode.njsproj">
+      <SubType>Designer</SubType>
+    </TypeScriptProject>
+    <TypeScriptProject Include="ProjectTemplates\TypeScriptFromExistingCode\FromExistingCode.vstemplate">
+      <SubType>Designer</SubType>
+    </TypeScriptProject>
     <Content Include="VSTemplateStore.pkgdef">
       <IncludeInVSIX>true</IncludeInVSIX>
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
@@ -590,6 +717,7 @@
     <ZipProject Include="ProjectTemplates\AddWebSiteAzureNodejsApp\Web.cloud.config" />
     <ZipProject Include="ProjectTemplates\AddWebSiteAzureNodejsApp\Web.config" />
     <ZipProject Include="ProjectTemplates\AddWebSiteAzureNodejsApp\node.cmd" />
+    <ZipProject Include="ProjectTemplates\AddWebSiteAzureNodejsApp\iisnode.yml" />
     <ZipProject Include="ProjectTemplates\AddWebSiteNodejsWebApp\AddWebSiteNodejsWebApp.njsproj">
       <SubType>Designer</SubType>
     </ZipProject>
@@ -618,6 +746,7 @@
     <ZipProject Include="ProjectTemplates\AzureNodejsApp\Web.cloud.config" />
     <ZipProject Include="ProjectTemplates\AzureNodejsApp\Web.config" />
     <ZipProject Include="ProjectTemplates\AzureNodejsApp\node.cmd" />
+    <ZipProject Include="ProjectTemplates\AzureNodejsApp\iisnode.yml" />
     <ZipProject Include="ProjectTemplates\AddWebSiteNodejsWebApp\package.json" />
     <ZipProject Include="ProjectTemplates\AddWebSiteNodejsWebApp\README.md" />
     <ZipProject Include="ProjectTemplates\NodejsWebApp\NodejsWebApp.njsproj">
@@ -645,6 +774,7 @@
     <ZipProject Include="ProjectTemplates\AzureExpressApp\download.ps1" />
     <ZipProject Include="ProjectTemplates\AzureExpressApp\ChangeConfig.ps1" />
     <ZipProject Include="ProjectTemplates\AzureExpressApp\node.cmd" />
+    <ZipProject Include="ProjectTemplates\AzureExpressApp\iisnode.yml" />
     <ZipProject Include="ProjectTemplates\AddWebSiteAzureExpressApp\ChangeConfig.ps1" />
     <ZipProject Include="ProjectTemplates\AddWebSiteAzureExpressApp\download.ps1" />
     <ZipProject Include="ProjectTemplates\AddWebSiteAzureExpressApp\package.json" />
@@ -653,6 +783,7 @@
     <ZipProject Include="ProjectTemplates\AddWebSiteAzureExpressApp\Web.cloud.config" />
     <ZipProject Include="ProjectTemplates\AddWebSiteAzureExpressApp\Web.config" />
     <ZipProject Include="ProjectTemplates\AddWebSiteAzureExpressApp\node.cmd" />
+    <ZipProject Include="ProjectTemplates\AddWebSiteAzureExpressApp\iisnode.yml" />
     <ZipProject Include="ProjectTemplates\NodejsConsoleApp\package.json" />
     <ZipProject Include="ProjectTemplates\NodejsConsoleApp\README.md" />
     <ZipProject Include="ProjectTemplates\NodejsConsoleApp\app.js" />
@@ -667,6 +798,65 @@
     <ZipProject Include="ProjectTemplates\AddWebSiteAzureExpressApp\index.jade" />
     <ZipProject Include="ProjectTemplates\AddWebSiteAzureExpressApp\layout.jade" />
     <ZipProject Include="ProjectTemplates\AddWebSiteAzureExpressApp\style.styl" />
+    <TypeScriptProject Include="ProjectTemplates\TypeScriptExpressApp\ExpressApp.njsproj">
+      <SubType>Designer</SubType>
+    </TypeScriptProject>
+    <TypeScriptProject Include="ProjectTemplates\TypeScriptExpressApp\index.jade" />
+    <TypeScriptProject Include="ProjectTemplates\TypeScriptExpressApp\layout.jade" />
+    <TypeScriptProject Include="ProjectTemplates\TypeScriptExpressApp\package.json" />
+    <TypeScriptProject Include="ProjectTemplates\TypeScriptExpressApp\README.md" />
+    <TypeScriptProject Include="ProjectTemplates\TypeScriptExpressApp\style.styl" />
+    <Content Include="FileTemplates\NewItem\EmptyJade.jade">
+      <IncludeInVSIX>true</IncludeInVSIX>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="FileTemplates\NewItem\EmptyJson.json">
+      <IncludeInVSIX>true</IncludeInVSIX>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="FileTemplates\NewItem\EmptyStyl.styl">
+      <IncludeInVSIX>true</IncludeInVSIX>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="FileTemplates\NewItem\EmptyXml.xml">
+      <IncludeInVSIX>true</IncludeInVSIX>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="FileTemplates\NewItem\EmptyCss.css">
+      <IncludeInVSIX>true</IncludeInVSIX>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="FileTemplates\NewItem\EmptyLess.less">
+      <IncludeInVSIX>true</IncludeInVSIX>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <TypeScriptProject Include="ProjectTemplates\TypeScriptAzureWebApp\TypeScriptWebApp.njsproj">
+      <SubType>Designer</SubType>
+    </TypeScriptProject>
+    <TypeScriptProject Include="ProjectTemplates\TypeScriptAzureWebApp\package.json" />
+    <TypeScriptProject Include="ProjectTemplates\TypeScriptAzureWebApp\README.md" />
+    <TypeScriptProject Include="ProjectTemplates\TypeScriptAzureWebApp\ChangeConfig.ps1" />
+    <TypeScriptProject Include="ProjectTemplates\TypeScriptAzureWebApp\download.ps1" />
+    <TypeScriptProject Include="ProjectTemplates\TypeScriptAzureWebApp\node.cmd" />
+    <TypeScriptProject Include="ProjectTemplates\TypeScriptAzureWebApp\Web.cloud.config" />
+    <TypeScriptProject Include="ProjectTemplates\TypeScriptAzureWebApp\Web.config" />
+    <TypeScriptProject Include="ProjectTemplates\TypeScriptAzureWebApp\setup_web.cmd" />
+    <TypeScriptProject Include="ProjectTemplates\TypeScriptAzureWebApp\iisnode.yml" />
+    <TypeScriptProject Include="ProjectTemplates\TypeScriptAzureExpressApp\TypeScriptExpressApp.njsproj">
+      <SubType>Designer</SubType>
+    </TypeScriptProject>
+    <TypeScriptProject Include="ProjectTemplates\TypeScriptAzureExpressApp\index.jade" />
+    <TypeScriptProject Include="ProjectTemplates\TypeScriptAzureExpressApp\layout.jade" />
+    <TypeScriptProject Include="ProjectTemplates\TypeScriptAzureExpressApp\package.json" />
+    <TypeScriptProject Include="ProjectTemplates\TypeScriptAzureExpressApp\README.md" />
+    <TypeScriptProject Include="ProjectTemplates\TypeScriptAzureExpressApp\style.styl" />
+    <TypeScriptProject Include="ProjectTemplates\TypeScriptAzureExpressApp\ChangeConfig.ps1" />
+    <TypeScriptProject Include="ProjectTemplates\TypeScriptAzureExpressApp\download.ps1" />
+    <TypeScriptProject Include="ProjectTemplates\TypeScriptAzureExpressApp\node.cmd" />
+    <TypeScriptProject Include="ProjectTemplates\TypeScriptAzureExpressApp\setup_web.cmd" />
+    <TypeScriptProject Include="ProjectTemplates\TypeScriptAzureExpressApp\Web.cloud.config" />
+    <TypeScriptProject Include="ProjectTemplates\TypeScriptAzureExpressApp\Web.config" />
+    <TypeScriptProject Include="ProjectTemplates\TypeScriptAzureExpressApp\iisnode.yml" />
     <None Include="source.extension.vsixmanifest">
       <SubType>Designer</SubType>
     </None>
@@ -728,6 +918,27 @@
       <IncludeOutputGroupsInVSIX>BuiltProjectOutputGroup%3bBuiltProjectOutputGroupDependencies%3bGetCopyToOutputDirectoryItems%3bSatelliteDllsProjectOutputGroup%3b</IncludeOutputGroupsInVSIX>
       <IncludeOutputGroupsInVSIXLocalOnly>DebugSymbolsProjectOutputGroup%3b</IncludeOutputGroupsInVSIXLocalOnly>
     </ProjectReference>
+    <ProjectReference Include="..\TestAdapter\TestAdapter.csproj">
+      <Project>{5085df35-3a32-4894-835e-e5a3956d4f57}</Project>
+      <Name>TestAdapter</Name>
+      <IncludeOutputGroupsInVSIX>BuiltProjectOutputGroup%3bBuiltProjectOutputGroupDependencies%3bGetCopyToOutputDirectoryItems%3bSatelliteDllsProjectOutputGroup%3b</IncludeOutputGroupsInVSIX>
+      <IncludeOutputGroupsInVSIXLocalOnly>DebugSymbolsProjectOutputGroup%3b</IncludeOutputGroupsInVSIXLocalOnly>
+    </ProjectReference>
+  </ItemGroup>
+  <ItemGroup>
+    <TypeScriptProject Include="ProjectTemplates\TypeScriptAzureWebApp\server.ts" />
+  </ItemGroup>
+  <ItemGroup>
+    <TypeScriptProject Include="ProjectTemplates\TypeScriptAzureExpressApp\app.ts" />
+  </ItemGroup>
+  <ItemGroup>
+    <TypeScriptProject Include="ProjectTemplates\TypeScriptAzureExpressApp\express.d.ts" />
+  </ItemGroup>
+  <ItemGroup>
+    <TypeScriptProject Include="ProjectTemplates\TypeScriptAzureExpressApp\index.ts" />
+  </ItemGroup>
+  <ItemGroup>
+    <TypeScriptProject Include="ProjectTemplates\TypeScriptAzureExpressApp\user.ts" />
   </ItemGroup>
   <ItemGroup />
   <PropertyGroup>
@@ -749,4 +960,13 @@
   <Target Name="AfterBuild">
   </Target>
   -->
+  <Target Name="TransformTypeScriptProjects" BeforeTargets="MainResourcesGeneration">
+    <ItemGroup>
+      <ZipProject Include="@(TypeScriptProject)">
+        <Language>TypeScript</Language>
+        <Culture>1033</Culture>
+        <OutputSubPath>Node.js</OutputSubPath>
+      </ZipProject>
+    </ItemGroup>
+  </Target>
 </Project>

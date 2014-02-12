@@ -62,7 +62,6 @@ namespace Microsoft.NodejsTools.Debugger.DebugEngine {
         private static HashSet<WeakReference> _engines = new HashSet<WeakReference>();
 
         private string _webBrowserUrl = null;
-        private int? _webBrowserPort = null;
 
         // These constants are duplicated in HpcLauncher and cannot be changed
 
@@ -90,12 +89,7 @@ namespace Microsoft.NodejsTools.Debugger.DebugEngine {
         /// semi-colon.
         /// </summary>
         public const string InterpreterOptions = "INTERPRETER_OPTIONS";
-
-        /// <summary>
-        /// Specifies port to which to open web browser on node debug connect.
-        /// </summary>
-        public const string WebBrowserPort = "WEB_BROWSER_PORT";
-
+                
         /// <summary>
         /// Specifies URL to which to open web browser on node debug connect.
         /// </summary>
@@ -250,10 +244,10 @@ namespace Microsoft.NodejsTools.Debugger.DebugEngine {
 
             _loadComplete = true;
 
-            if (_webBrowserUrl != null) {
-                Debug.Assert(_webBrowserPort != null);
+            if (!String.IsNullOrWhiteSpace(_webBrowserUrl)) {
+                Uri uri = new Uri(_webBrowserUrl);
                 OnPortOpenedHandler.CreateHandler(
-                    _webBrowserPort.Value,
+                    uri.Port,
                     shortCircuitPredicate: () => !_processLoaded,
                     action: () => {
                         LaunchBrowserDebugger();
@@ -325,7 +319,9 @@ namespace Microsoft.NodejsTools.Debugger.DebugEngine {
             // Check whether breakpoint request for our language
             BP_REQUEST_INFO[] requestInfo = new BP_REQUEST_INFO[1];
             EngineUtils.CheckOk(pBPRequest.GetRequestInfo(enum_BPREQI_FIELDS.BPREQI_LANGUAGE | enum_BPREQI_FIELDS.BPREQI_BPLOCATION, requestInfo));
-            if (requestInfo[0].guidLanguage != GuidList.guidNodejsDebugLanguage && requestInfo[0].guidLanguage != GuidList.guidScriptDebugLanguage) {
+            if (requestInfo[0].guidLanguage != Guids.NodejsDebugLanguage && 
+                requestInfo[0].guidLanguage != Guids.ScriptDebugLanguage &&
+                requestInfo[0].guidLanguage != Guids.TypeScriptDebugLanguage) {
                 // Check whether breakpoint request for our "downloaded" script
                 // "Downloaded" script will have our IDebugDocument2
                 IDebugDocument2 debugDocument;
@@ -510,9 +506,6 @@ namespace Microsoft.NodejsTools.Debugger.DebugEngine {
                                 break;
                             case InterpreterOptions:
                                 interpreterOptions = setting[1];
-                                break;
-                            case WebBrowserPort:
-                                _webBrowserPort = int.Parse(setting[1]);
                                 break;
                             case WebBrowserUrl:
                                 _webBrowserUrl = HttpUtility.UrlDecode(setting[1]);
@@ -978,6 +971,17 @@ namespace Microsoft.NodejsTools.Debugger.DebugEngine {
             Send(new AD7EntryPointEvent(), AD7EntryPointEvent.IID, _threads[e.Thread]);
         }
 
+        private void StartWebBrowser() {
+            Uri uri;
+            if (_webBrowserUrl != null && Uri.TryCreate(_webBrowserUrl, UriKind.RelativeOrAbsolute, out uri)) {
+                OnPortOpenedHandler.CreateHandler(
+                    uri.Port,
+                    shortCircuitPredicate: () => _process.HasExited,
+                    action: LaunchBrowserDebugger
+                );
+            }
+        }
+
         private void LaunchBrowserDebugger() {
             var vsDebugger = (IVsDebugger2)ServiceProvider.GlobalProvider.GetService(typeof(SVsShellDebugger));
 
@@ -1059,7 +1063,7 @@ namespace Microsoft.NodejsTools.Debugger.DebugEngine {
         private void OnBreakpointBound(object sender, BreakpointBindingEventArgs e) {
             var pendingBreakpoint = _breakpointManager.GetPendingBreakpoint(e.Breakpoint);
             var breakpointBinding = e.BreakpointBinding;
-            var codeContext = new AD7MemoryAddress(this, pendingBreakpoint.DocumentName, (uint)breakpointBinding.LineNo - 1);
+            var codeContext = new AD7MemoryAddress(this, pendingBreakpoint.DocumentName, (uint)breakpointBinding.RequestedLineNo - 1);
             var documentContext = new AD7DocumentContext(codeContext);
             var breakpointResolution = new AD7BreakpointResolution(this, breakpointBinding, documentContext);
             var boundBreakpoint = new AD7BoundBreakpoint(this, breakpointBinding, pendingBreakpoint, breakpointResolution, breakpointBinding.Enabled);
@@ -1169,6 +1173,16 @@ namespace Microsoft.NodejsTools.Debugger.DebugEngine {
             int matchCount = 0;
             for (matchCount = 0; matchCount < maxCount && array1[matchCount] == array2[matchCount]; ++matchCount);
             return matchCount;
+        }
+
+        internal static void MapLanguageInfo(string filename, out string pbstrLanguage, out Guid pguidLanguage) {
+            if (String.Equals(Path.GetExtension(filename), NodejsConstants.TypeScriptExtension, StringComparison.OrdinalIgnoreCase)) {
+                pbstrLanguage = NodejsConstants.TypeScript;
+                pguidLanguage = Guids.TypeScriptDebugLanguage;
+            } else {
+                pbstrLanguage = NodejsConstants.JavaScript;
+                pguidLanguage = Guids.NodejsDebugLanguage;
+            }
         }
     }
 }

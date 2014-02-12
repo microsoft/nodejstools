@@ -18,7 +18,9 @@ using Microsoft.VisualStudio.Utilities;
 namespace Microsoft.NodejsTools {
     class NodejsConstants {
         public const string FileExtension = ".js";
+        public const string TypeScriptExtension = ".ts";
         public const string JavaScript = "JavaScript";
+        public const string CSS = "CSS";
         public const string Nodejs = "Node.js";
         public const string NodejsRepl = "Node.jsRepl";
 
@@ -43,7 +45,14 @@ namespace Microsoft.NodejsTools {
         [Export, Name(Nodejs), BaseDefinition("text")]
         internal static ContentTypeDefinition ContentTypeDefinition = null;
 
-        [Export, Name(NodejsRepl), BaseDefinition("JavaScript")]
+        [Export, Name(NodejsRepl), BaseDefinition(Nodejs), BaseDefinition("JavaScript")]
         internal static ContentTypeDefinition ReplContentTypeDefinition = null;
+        
+        public const string TypeScriptCompileItemType = "TypeScriptCompile";        
+        public const string EnableTypeScript = "EnableTypeScript";
+        public const string TypeScriptSourceMap = "TypeScriptSourceMap";
+        public const string TypeScriptModuleKind = "TypeScriptModuleKind";
+        public const string CommonJSModuleKind = "CommonJS";
+        public const string TypeScript = "TypeScript";
     }
 }

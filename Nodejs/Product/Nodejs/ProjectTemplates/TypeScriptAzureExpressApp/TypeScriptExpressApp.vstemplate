@@ -1,0 +1,50 @@
+<VSTemplate Version="3.0.0" Type="Project" xmlns="http://schemas.microsoft.com/developer/vstemplate/2005">
+  <TemplateData>
+    <Name>Blank Windows Azure Express Application</Name>
+    <Description>An empty Express application for Windows Azure.</Description>
+    <Icon Package="{FE8A8C3D-328A-476D-99F9-2A24B75F8C7F}" ID="402" />
+    <ProjectType>TypeScript</ProjectType>
+    <TemplateID>Microsoft.TypeScript.ExpressApp</TemplateID>
+    <SortOrder>145</SortOrder>
+    <CreateNewFolder>true</CreateNewFolder>
+    <DefaultName>ExpressApp</DefaultName>
+    <ProvideDefaultName>true</ProvideDefaultName>
+    <NumberOfParentCategoriesToRollUp>1</NumberOfParentCategoriesToRollUp>
+    <PromptForSaveOnCreation>true</PromptForSaveOnCreation>
+    <PreviewImage>Preview.png</PreviewImage>
+  </TemplateData>
+  <TemplateContent>
+    <Project File="TypeScriptExpressApp.njsproj" ReplaceParameters="true">
+      <Folder Name="public">
+        <Folder Name="images"/>
+        <Folder Name="javascripts"/>
+        <Folder Name="stylesheets">
+          <ProjectItem>style.styl</ProjectItem>
+        </Folder>
+      </Folder>
+      <Folder Name="routes">
+        <ProjectItem>index.ts</ProjectItem>        
+        <ProjectItem>user.ts</ProjectItem>        
+      </Folder>
+      <Folder Name="views">
+        <ProjectItem>index.jade</ProjectItem>        
+        <ProjectItem>layout.jade</ProjectItem>        
+      </Folder>
+      <ProjectItem OpenInEditor="true">app.ts</ProjectItem>
+      <ProjectItem ReplaceParameters="true">package.json</ProjectItem>
+      <ProjectItem ReplaceParameters="true">README.md</ProjectItem>
+      <ProjectItem>express.d.ts</ProjectItem>
+      <ProjectItem>Web.config</ProjectItem>
+      <ProjectItem>Web.cloud.config</ProjectItem>
+      <ProjectItem TargetFileName="bin\ChangeConfig.ps1">ChangeConfig.ps1</ProjectItem>
+      <ProjectItem TargetFileName="bin\download.ps1">download.ps1</ProjectItem>
+      <ProjectItem TargetFileName="bin\setup_web.cmd">setup_web.cmd</ProjectItem>
+      <ProjectItem TargetFileName="bin\node.cmd">node.cmd</ProjectItem>
+      <ProjectItem TargetFileName="iisnode.yml">iisnode.yml</ProjectItem>
+    </Project>
+  </TemplateContent>
+  <WizardExtension>
+    <Assembly>Microsoft.NodejsTools.ProjectWizard, Version=1.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</Assembly>
+    <FullClassName>Microsoft.NodejsTools.ProjectWizard.NpmWizardExtension</FullClassName>
+  </WizardExtension>
+</VSTemplate>

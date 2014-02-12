@@ -484,7 +484,7 @@ namespace Microsoft.NodejsTools.Project {
         }
 
         internal override int QueryStatusOnNode(Guid cmdGroup, uint cmd, IntPtr pCmdText, ref QueryStatusResult result) {
-            if (cmdGroup == GuidList.guidNodeCmdSet) {
+            if (cmdGroup == Guids.NodejsCmdSet) {
                 switch (cmd) {
                     case PkgCmdId.cmdidNpmManageModules:
                         result = IsCurrentStateASuppressCommandsMode()
@@ -528,7 +528,7 @@ namespace Microsoft.NodejsTools.Project {
         }
 
         internal override int ExecCommandOnNode(Guid cmdGroup, uint cmd, uint nCmdexecopt, IntPtr pvaIn, IntPtr pvaOut) {
-            if (cmdGroup == GuidList.guidNodeCmdSet) {
+            if (cmdGroup == Guids.NodejsCmdSet) {
                 switch (cmd) {
                     case PkgCmdId.cmdidNpmManageModules:
                         ManageModules();
@@ -549,7 +549,14 @@ namespace Microsoft.NodejsTools.Project {
 
         public void ManageModules() {
             CheckNotDisposed();
-
+            
+            if (NpmController.RootPackage == null) {
+                NpmController.Refresh();
+                if (NpmController.RootPackage == null) {
+                    MessageBox.Show("Unable to parse package.json from your project.  Please fix any errors and try again.");
+                    return;
+                }
+            }
             using (var manager = new PackageManagerDialog(NpmController)) {
                 manager.ShowDialog();
             }

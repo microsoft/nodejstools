@@ -1651,6 +1651,54 @@ namespace NodejsTests.Debugger {
 
         #endregion
 
+        #region Deep Callstack Tests
+
+        [TestMethod, Priority(0)]
+        public void Stepping_AccrossDeepThrow() {
+            TestDebuggerSteps(
+                "ThrowsWithDeepCallstack.js",
+                new[] {
+                    new TestStep(action: TestAction.ResumeThread, expectedEntryPointHit: 12),
+                    new TestStep(action: TestAction.StepOver, expectedStepComplete: 14),
+                    new TestStep(action: TestAction.ResumeProcess, expectedExitCode: 0),
+                },
+                defaultExceptionTreatment: ExceptionHitTreatment.BreakAlways,
+                exceptionTreatments: CollectExceptionTreatments("string", ExceptionHitTreatment.BreakNever)
+            );
+        }
+
+        [TestMethod, Priority(0)]
+        public void Stepping_AccrossDeepTracePoint() {
+            TestDebuggerSteps(
+                "DeepCallstack.js",
+                new[] {
+                    new TestStep(action: TestAction.AddBreakpoint, targetBreakpoint: 4),
+                    new TestStep(action: TestAction.ResumeThread, expectedEntryPointHit: 1),
+                    new TestStep(action: TestAction.StepOver, expectedStepComplete: 16),
+                    new TestStep(action: TestAction.StepOver, expectedBreakpointHit: 4),
+                    new TestStep(action: TestAction.ResumeThread, expectedStepComplete: 18),
+                    new TestStep(action: TestAction.ResumeProcess, expectedExitCode: 0),
+                }
+            );
+        }
+
+        [TestMethod, Priority(0)]
+        public void Stepping_AccrossDeepFixedUpTracePoint() {
+            TestDebuggerSteps(
+                "DeepCallstack.js",
+                new[] {
+                    new TestStep(action: TestAction.AddBreakpoint, targetBreakpoint: 3, expectFailure: true),
+                    new TestStep(action: TestAction.ResumeThread, expectedEntryPointHit: 1),
+                    new TestStep(action: TestAction.StepOver, expectedStepComplete: 16),
+                    new TestStep(action: TestAction.StepOver, expectedBreakpointHit: 4),
+                    new TestStep(action: TestAction.ResumeThread, expectedStepComplete: 18),
+                    new TestStep(action: TestAction.ResumeProcess, expectedExitCode: 0),
+                }
+            );
+        }
+
+        #endregion
+
         #region Module Load Tests
 
         [TestMethod, Priority(0)]
@@ -2540,6 +2588,107 @@ namespace NodejsTests.Debugger {
             Assert.AreEqual(expectedOutput, actualOutput);
         }
 
+        #endregion
+
+        #region TypeScript Tests
+
+        [TestMethod, Priority(0)]
+        public void TypeScript_Stepping_Basic() {
+            TestDebuggerSteps(
+                "TypeScriptTest.js",
+                new[] {
+                    new TestStep(action: TestAction.AddBreakpoint, 
+                        targetBreakpoint: 2, 
+                        targetBreakpointFile: "TypeScriptTest.ts"),
+                    new TestStep(action: TestAction.ResumeThread, expectedEntryPointHit: 1),
+                    new TestStep(action: TestAction.ResumeThread, 
+                        expectedHitCount: 1, 
+                        targetBreakpoint: 2, 
+                        targetBreakpointFile: "TypeScriptTest.ts", 
+                        expectedBreakFunction: "Greeter.constructor",
+                        expectedBreakpointHit: 2),
+                    new TestStep(action: TestAction.StepOut, expectedStepComplete: 9),
+                }
+            );
+
+            TestDebuggerSteps(
+                "TypeScriptTest.js",
+                new[] {
+                    new TestStep(action: TestAction.AddBreakpoint, 
+                        targetBreakpoint: 8, 
+                        targetBreakpointFile: "TypeScriptTest.ts"),
+                    new TestStep(action: TestAction.ResumeThread, expectedEntryPointHit: 1),
+                    new TestStep(action: TestAction.ResumeThread, 
+                        expectedHitCount: 1, 
+                        targetBreakpoint: 8, 
+                        targetBreakpointFile: "TypeScriptTest.ts", 
+                        expectedBreakFunction: "Greeter",
+                        expectedBreakpointHit: 8),
+                    new TestStep(action: TestAction.StepInto, expectedStepComplete: 2),
+                }
+            );
+
+            TestDebuggerSteps(
+                "TypeScriptTest.js",
+                new[] {
+                    new TestStep(action: TestAction.AddBreakpoint, 
+                        targetBreakpoint: 8, 
+                        targetBreakpointFile: "TypeScriptTest.ts"),
+                    new TestStep(action: TestAction.ResumeThread, expectedEntryPointHit: 1),
+                    new TestStep(action: TestAction.ResumeThread, 
+                        expectedHitCount: 1, 
+                        targetBreakpoint: 8, 
+                        targetBreakpointFile: "TypeScriptTest.ts", 
+                        expectedBreakFunction: "Greeter",
+                        expectedBreakpointHit: 8),
+                    new TestStep(action: TestAction.StepOver, expectedStepComplete: 9),
+                }
+            );
+
+            TestDebuggerSteps(
+                "TypeScriptTest.js",
+                new[] {
+                    new TestStep(action: TestAction.AddBreakpoint, targetBreakpoint: 4, targetBreakpointFile: "TypeScriptTest.ts"),
+                    new TestStep(action: TestAction.ResumeThread, expectedEntryPointHit: 1),
+                    new TestStep(action: TestAction.ResumeThread, expectedHitCount: 1, targetBreakpoint: 4, targetBreakpointFile: "TypeScriptTest.ts", expectedBreakFunction: "Greeter.greet", expectedBreakpointHit: 4),
+                    new TestStep(action: TestAction.ResumeProcess, expectedExitCode: 0),
+                }
+            );
+
+            TestDebuggerSteps(
+                "TypeScriptTest.js",
+                new[] {
+                    new TestStep(action: TestAction.AddBreakpoint, 
+                        targetBreakpoint: 2, 
+                        targetBreakpointFile: "TypeScriptTest.ts"),
+                    new TestStep(action: TestAction.ResumeThread, expectedEntryPointHit: 1),
+                    new TestStep(action: TestAction.ResumeThread, 
+                        expectedHitCount: 1, 
+                        targetBreakpoint: 2, 
+                        targetBreakpointFile: "TypeScriptTest.ts", 
+                        expectedBreakFunction: "Greeter.constructor",
+                        expectedBreakpointHit: 2),
+                    new TestStep(action: TestAction.ResumeProcess, expectedExitCode: 0),
+                }
+            );
+
+            TestDebuggerSteps(
+                "TypeScriptTest2.js",
+                new[] {
+                    new TestStep(action: TestAction.AddBreakpoint, 
+                        targetBreakpoint: 3, 
+                        targetBreakpointFile: "TypeScriptTest2.ts"),
+                    new TestStep(action: TestAction.ResumeThread, expectedEntryPointHit: 1),
+                    new TestStep(action: TestAction.ResumeThread, 
+                        expectedHitCount: 1, 
+                        targetBreakpoint: 3, 
+                        targetBreakpointFile: "TypeScriptTest2.ts", 
+                        expectedBreakFunction: "Greeter.constructor",
+                        expectedBreakpointHit: 3),
+                    new TestStep(action: TestAction.ResumeProcess, expectedExitCode: 0),
+                }
+            );
+        }
         #endregion
     }
 }

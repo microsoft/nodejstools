@@ -53,9 +53,10 @@ namespace Microsoft.Nodejs.Tests.UI {
                 var doc = solution.OpenItem("AutoIndent", "Bug384.js");
                 doc.Invoke(() => doc.TextView.Caret.MoveTo(doc.TextView.TextViewLines[9]));
                 Keyboard.Type(System.Windows.Input.Key.End);
+                Keyboard.Type(" ");
                 Assert.AreEqual(
-                    4,
-                    doc.TextView.Caret.Position.VirtualBufferPosition.VirtualSpaces
+                    5,
+                    doc.TextView.Caret.Position.BufferPosition.GetContainingLine().Length
                 );
             }
         }
@@ -220,6 +221,9 @@ bar*/
 
         private static void AutoIndentTest(VisualStudioSolution solution, string typedText, string expectedText) {
             var doc = solution.OpenItem("AutoIndent", "server.js");
+            doc.MoveCaret(1, 1);
+            doc.Invoke(() => doc.TextView.Caret.EnsureVisible());
+            doc.SetFocus();
 
             Keyboard.Type(typedText);
 

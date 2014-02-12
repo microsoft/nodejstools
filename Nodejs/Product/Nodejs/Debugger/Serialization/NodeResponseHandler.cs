@@ -21,7 +21,7 @@ using Microsoft.VisualStudioTools.Project;
 namespace Microsoft.NodejsTools.Debugger.Serialization {
     class NodeResponseHandler : INodeResponseHandler {
         private readonly INodeEvaluationResultFactory _evaluationResultFactory;
-        private readonly NodeModule _unknownModule = new NodeModule(-1, "<unknown>");
+        private readonly NodeModule _unknownModule = new NodeModule(null, -1, "<unknown>");
 
         /// <summary>
         /// Instantiates response message parser..
@@ -46,7 +46,7 @@ namespace Microsoft.NodejsTools.Debugger.Serialization {
             // Extract scripts (if not provided)
             if (modules == null) {
                 JsonArray refs = message.GetArray("refs");
-                modules = GetScripts(refs);
+                modules = GetScripts(thread.Process, refs);
             }
 
             // Extract frames
@@ -171,14 +171,14 @@ namespace Microsoft.NodejsTools.Debugger.Serialization {
             return framename;
         }
 
-        private static Dictionary<int, NodeModule> GetScripts(JsonArray references) {
+        private static Dictionary<int, NodeModule> GetScripts(NodeDebugger debugger, JsonArray references) {
             var scripts = new Dictionary<int, NodeModule>(references.Count);
             for (int i = 0; i < references.Count; i++) {
                 JsonValue reference = references[i];
                 var scriptId = reference.GetValue<int>("id");
                 var filename = reference.GetValue<string>("name");
 
-                scripts.Add(scriptId, new NodeModule(scriptId, filename));
+                scripts.Add(scriptId, new NodeModule(debugger, scriptId, filename));
             }
             return scripts;
         }

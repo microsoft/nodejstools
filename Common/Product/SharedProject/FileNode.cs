@@ -82,7 +82,7 @@ namespace Microsoft.VisualStudioTools.Project
                 return ItemNode is AllFilesProjectElement;
             }
         }
-
+        
         /// <summary>
         /// overwrites of the generic hierarchyitem.
         /// </summary>
@@ -548,9 +548,7 @@ namespace Microsoft.VisualStudioTools.Project
                     result |= QueryStatusResult.SUPPORTED | QueryStatusResult.ENABLED;
                     return VSConstants.S_OK;
                 }
-            }
-            else
-            {
+            } else if (cmdGroup != ProjectMgr.SharedCommandGuid) {
                 return (int)OleConstants.OLECMDERR_E_UNKNOWNGROUP;
             }
             return base.QueryStatusOnNode(cmdGroup, cmd, pCmdText, ref result);

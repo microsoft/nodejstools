@@ -26,6 +26,7 @@ using Microsoft.VisualStudio;
 using Microsoft.VisualStudioTools;
 using Microsoft.VisualStudioTools.Project;
 using Microsoft.VisualStudioTools.Project.Automation;
+using MSBuild = Microsoft.Build.Evaluation;
 
 namespace Microsoft.NodejsTools.Project {
     class NodejsProjectNode : CommonProjectNode, VsWebSite.VSWebSite {
@@ -97,8 +98,72 @@ namespace Microsoft.NodejsTools.Project {
 
         public override Guid SharedCommandGuid {
             get {
-                return GuidList.guidNodeCmdSet;
+                return Guids.NodejsCmdSet;
             }
+        }
+
+        protected override void FinishProjectCreation(string sourceFolder, string destFolder) {
+            foreach (MSBuild.ProjectItem item in this.BuildProject.Items) {
+                if (String.Equals(Path.GetExtension(item.EvaluatedInclude), NodejsConstants.TypeScriptExtension, StringComparison.OrdinalIgnoreCase)) {
+                    // If we have a TypeScript project deploy our node reference file.
+                    File.Copy(
+                        Path.Combine(
+                            Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location),
+                            "node.d.ts"
+                        ),
+                        Path.Combine(ProjectHome, "node.d.ts")
+                    );
+
+                    // copy any additional d.ts files
+                    foreach (var file in Directory.EnumerateFiles(sourceFolder, "*.d.ts", SearchOption.AllDirectories)) {
+                        var destPath = Path.Combine(
+                            destFolder,
+                            CommonUtils.GetRelativeFilePath(sourceFolder, file)
+                        );
+                        File.Copy(file, destPath);
+                        new FileInfo(destPath).Attributes = FileAttributes.Normal;
+                    }
+                    break;
+                }
+            }
+
+            base.FinishProjectCreation(sourceFolder, destFolder);
+        }
+
+        protected override void AddNewFileNodeToHierarchy(HierarchyNode parentNode, string fileName) {
+            base.AddNewFileNodeToHierarchy(parentNode, fileName);
+
+            if (String.Equals(Path.GetExtension(fileName), NodejsConstants.TypeScriptExtension, StringComparison.OrdinalIgnoreCase) &&
+                !String.Equals(GetProjectProperty(NodejsConstants.EnableTypeScript), "true", StringComparison.OrdinalIgnoreCase)) {
+                // enable type script on the project automatically...
+                SetProjectProperty(NodejsConstants.EnableTypeScript, "true");
+                SetProjectProperty(NodejsConstants.TypeScriptSourceMap, "true");
+                if (String.IsNullOrWhiteSpace(GetProjectProperty(NodejsConstants.TypeScriptModuleKind))) {
+                    SetProjectProperty(NodejsConstants.TypeScriptModuleKind, NodejsConstants.CommonJSModuleKind);
+                }
+            }
+        }
+
+        protected override string GetItemType(string filename) {
+            if (string.Equals(Path.GetExtension(filename), NodejsConstants.TypeScriptExtension, StringComparison.OrdinalIgnoreCase)) {
+                return NodejsConstants.TypeScriptCompileItemType;
+            }
+            return base.GetItemType(filename);
+        }
+
+        protected override bool DisableCmdInCurrentMode(Guid commandGroup, uint command) {
+            if (commandGroup == Guids.OfficeToolsBootstrapperCmdSet) {
+                // Convert to ... commands from Office Tools don't make sense and aren't supported 
+                // on our project type
+                const int AddOfficeAppProject = 0x0001;
+                const int AddSharePointAppProject = 0x0002;
+
+                if (command == AddOfficeAppProject || command == AddSharePointAppProject) {
+                    return true;
+                }
+            }
+
+            return base.DisableCmdInCurrentMode(commandGroup, command);
         }
 
         public override void Close() {
@@ -365,6 +430,21 @@ function starts_with(a, b) {
     return a.substr(0, b.length) == b;
 }
 ");
+
+            // If we get passed a fully qualified path turn it into a relative path
+            switchCode.Append("function relative(from, to) {");
+            switchCode.AppendLine(ReferenceCode.PathRelativeBody);
+            switchCode.Append("}");
+
+            switchCode.Append(@"if(module[1] == ':') { 
+    intellisense.logMessage('making relative ' + __dirname + ' -- ' + module); 
+    new_module = relative(__dirname, module); 
+    if (new_module != module) {
+        module = './' + new_module;
+    }
+    intellisense.logMessage('now ' + module); 
+}");
+
             foreach (NodejsFileNode nodeFile in _nodeFiles) {
                 if (nodeFile.Url.Length > NativeMethods.MAX_PATH) {
                     // .NET can't handle long filename paths, so ignore these modules...

@@ -28,10 +28,10 @@ namespace Microsoft.NodejsTools.Project {
     //Set the projectsTemplatesDirectory to a non-existant path to prevent VS from including the working directory as a valid template path
     [PackageRegistration(UseManagedResourcesOnly = true)]
     [Description("Node.js Project Package")]
-    [Guid("D861969D-CEC8-4411-AB85-C08EFE4100A2")]
+    [Guid("2C52FA27-791E-4D04-9F82-234BBB58DE78")]
     [DeveloperActivity(NodejsConstants.JavaScript, typeof(NodejsProjectPackage))]
     [ProvideObject(typeof(NodejsGeneralPropertyPage))]
-    [ProvideProjectFactory(typeof(BaseNodeProjectFactory), NodejsConstants.Nodejs, NodeFileFilter, "njsproj", "njsproj", ".\\NullPath", LanguageVsTemplate = NodejsConstants.Nodejs)]
+    [ProvideProjectFactory(typeof(BaseNodeProjectFactory), NodejsConstants.JavaScript, NodeFileFilter, "njsproj", "njsproj", "ProjectTemplates", LanguageVsTemplate = NodejsConstants.Nodejs, SortPriority=0x17)]
     public class NodejsProjectPackage : CommonProjectPackage {
         internal const string NodeFileFilter = "Node.js Project Files (*.njsproj);*.njsproj";
 

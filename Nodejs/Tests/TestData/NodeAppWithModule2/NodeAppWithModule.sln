@@ -1,0 +1,18 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio 2012
+Project("{9092AA53-FB77-4645-B42D-1CCCA6BD08BD}") = "NodeAppWithModule", "NodeAppWithModule\NodeAppWithModule.njsproj", "{05CD8450-890D-4E5E-B672-8AE2C17432DE}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{05CD8450-890D-4E5E-B672-8AE2C17432DE}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{05CD8450-890D-4E5E-B672-8AE2C17432DE}.Release|Any CPU.ActiveCfg = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+EndGlobal

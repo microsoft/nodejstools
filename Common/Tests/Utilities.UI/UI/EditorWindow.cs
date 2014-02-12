@@ -220,6 +220,8 @@ namespace TestUtilities.UI {
             }
 
             if (!(sessionStack.TopSession is T)) {
+                Console.WriteLine("Buffer text:\r\n{0}", Text);
+                Console.WriteLine("-----");
                 AutomationWrapper.DumpVS();
                 Assert.Fail("failed to find session " + typeof(T).FullName);
             }

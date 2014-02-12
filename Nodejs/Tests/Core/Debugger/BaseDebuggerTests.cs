@@ -352,7 +352,7 @@ namespace NodejsTests.Debugger {
             public int? _expectedEntryPointHit;
             public int? _expectedBreakpointHit;
             public int? _expectedStepComplete;
-            public string _expectedBreakFile;
+            public string _expectedBreakFile, _expectedBreakFunction;
             public ExceptionInfo _expectedExceptionRaised;
             public string _targetBreakpointFile;
             public int? _targetBreakpoint;
@@ -383,7 +383,8 @@ namespace NodejsTests.Debugger {
                 bool builtin = false,
                 bool expectFailure = false,
                 Action<NodeDebugger, NodeThread> validation = null,
-                int? expectedExitCode = null
+                int? expectedExitCode = null,
+                string expectedBreakFunction = null
             ) {
                 _action = action;
                 _expectedEntryPointHit = expectedEntryPointHit;
@@ -402,6 +403,7 @@ namespace NodejsTests.Debugger {
                 _expectFailure = expectFailure;
                 _validation = validation;
                 _expectedExitCode = expectedExitCode;
+                _expectedBreakFunction = expectedBreakFunction;
             }
         }
 
@@ -476,6 +478,7 @@ namespace NodejsTests.Debugger {
 
             AutoResetEvent entryPointHit = new AutoResetEvent(false);
             process.EntryPointHit += (sender, e) => {
+                Console.WriteLine("EntryPointHit");
                 Assert.AreEqual(thread, e.Thread);
                 entryPointHit.Set();
             };
@@ -483,31 +486,36 @@ namespace NodejsTests.Debugger {
             AutoResetEvent breakpointBound = new AutoResetEvent(false);
             BreakpointBindingEventArgs breakpointBind = null;
             process.BreakpointBound += (sender, e) => {
+                Console.WriteLine("BreakpointBound {0} {1}", e.BreakpointBinding.FileName, e.BreakpointBinding.LineNo);
                 breakpointBind = e;
                 breakpointBound.Set();
             };
 
             AutoResetEvent breakpointUnbound = new AutoResetEvent(false);
             process.BreakpointUnbound += (sender, e) => {
+                Console.WriteLine("BreakpointUnbound");
                 breakpointBind = e;
                 breakpointUnbound.Set();
             };
 
             AutoResetEvent breakpointBindFailure = new AutoResetEvent(false);
             process.BreakpointBindFailure += (sender, e) => {
+                Console.WriteLine("BreakpointBindFailure");
                 breakpointBind = e;
                 breakpointBindFailure.Set();
             };
 
             AutoResetEvent breakpointHit = new AutoResetEvent(false);
             process.BreakpointHit += (sender, e) => {
+                Console.WriteLine("BreakpointHit {0}", e.BreakpointBinding.RequestedLineNo);
                 Assert.AreEqual(thread, e.Thread);
-                Assert.AreEqual(thread.Frames.First().LineNo, e.BreakpointBinding.LineNo);
+                Assert.AreEqual(thread.Frames.First().LineNo, e.BreakpointBinding.RequestedLineNo);
                 breakpointHit.Set();
             };
 
             AutoResetEvent stepComplete = new AutoResetEvent(false);
             process.StepComplete += (sender, e) => {
+                Console.WriteLine("StepComplete");
                 Assert.AreEqual(thread, e.Thread);
                 stepComplete.Set();
             };
@@ -515,6 +523,7 @@ namespace NodejsTests.Debugger {
             AutoResetEvent exceptionRaised = new AutoResetEvent(false);
             NodeException exception = null;
             process.ExceptionRaised += (sender, e) => {
+                Console.WriteLine("ExceptionRaised");
                 Assert.AreEqual(thread, e.Thread);
                 exception = e.Exception;
                 exceptionRaised.Set();
@@ -523,11 +532,15 @@ namespace NodejsTests.Debugger {
             AutoResetEvent processExited = new AutoResetEvent(false);
             int exitCode = 0;
             process.ProcessExited += (sender, e) => {
+                Console.WriteLine("ProcessExited {0}", e.ExitCode);
                 exitCode = e.ExitCode;
                 processExited.Set();
             };
 
+            Console.WriteLine("-----------------------------------------");
+            Console.WriteLine("Begin debugger step test");
             foreach (var step in steps) {
+                Console.WriteLine("Step: {0}", step._action);
                 Assert.IsFalse(
                     ((step._expectedEntryPointHit != null ? 1 : 0) +
                      (step._expectedBreakpointHit != null ? 1 : 0) +
@@ -702,9 +715,16 @@ namespace NodejsTests.Debugger {
                     }
                     Assert.AreEqual(expectedBreakFile, thread.Frames.First().FileName);
                 }
+                var expectedBreakFunction = step._expectedBreakFunction;
+                if (expectedBreakFunction != null) {
+                    Assert.AreEqual(expectedBreakFunction, thread.Frames.First().FunctionName);
+                }
 
                 if (step._expectedHitCount != null) {
                     string breakpointFileName = step._targetBreakpointFile ?? filename;
+                    if (!step._builtin && !Path.IsPathRooted(breakpointFileName)) {
+                        breakpointFileName = DebuggerTestPath + breakpointFileName;
+                    }
                     int breakpointLine = step._targetBreakpoint.Value;
                     Breakpoint breakpoint = new Breakpoint(breakpointFileName, breakpointLine);
                     nodeBreakpoint = breakpoints[breakpoint];

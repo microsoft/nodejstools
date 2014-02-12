@@ -1,6 +1,6 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <Vsix xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xsd="http://www.w3.org/2001/XMLSchema" Version="1.0.0" xmlns="http://schemas.microsoft.com/developer/vsx-schema/2010">
-  <Identifier Id="FF632CFA-E4C5-4D8E-B1E2-63BE3B8A8289">
+  <Identifier Id="29102E6C-34F2-4FF1-BA2F-C02ADE3846E8">
     <Name>Node.js Tools - Interactive Window</Name>
     <Author>Microsoft</Author>
     <Version>1.0</Version>
@@ -15,6 +15,7 @@
         <Edition>Pro</Edition>
         <Edition>VSTS</Edition>
         <Edition>VSTD</Edition>
+        <Edition>VWDExpress</Edition>
       </VisualStudio>
     </SupportedProducts>
     <SupportedFrameworkRuntimeEdition MinVersion="4.0" />

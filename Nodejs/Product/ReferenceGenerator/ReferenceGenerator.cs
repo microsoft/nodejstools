@@ -7,6 +7,7 @@ using System.Text;
 using System.Threading.Tasks;
 using System.Web.Script.Serialization;
 using System.Xml;
+using Microsoft.NodejsTools;
 
 namespace NodeReferenceGenerator {
 
@@ -149,6 +150,7 @@ namespace Microsoft.NodejsTools.Intellisense {
             GenerateModuleWorker(module, indentation, modName);
         }
 
+
         private void GenerateModuleWorker(dynamic module, int indentation, string name) {
             _output.Append(' ', indentation * 4);
             _output.AppendFormat("function {0}() {{", name);
@@ -162,7 +164,16 @@ namespace Microsoft.NodejsTools.Intellisense {
 
             if (module.ContainsKey("methods")) {
                 foreach (var method in module["methods"]) {
-                    GenerateMethod(name, method, indentation + 1);
+                    string body = null;
+                    if (name == "path" && method["name"] is string) {
+                        switch ((string)method["name"]) {
+                            case "relative": body = ReferenceCode.PathRelativeBody; break;
+                            case "normalize": body = ReferenceCode.PathNormalizeBody; break;
+                            case "resolve": body = ReferenceCode.PathResolveBody; break;
+                            case "join": body = ReferenceCode.PathJoinBody; break;
+                        }
+                    }
+                    GenerateMethod(name, method, indentation + 1, body);
                 }
             }
 
@@ -366,7 +377,7 @@ namespace Microsoft.NodejsTools.Intellisense {
             _output.AppendLine("}");
         }
 
-        private void GenerateMethod(string fullName, dynamic method, int indentation = 1) {
+        private void GenerateMethod(string fullName, dynamic method, int indentation, string body = null) {
             _output.Append(' ', indentation * 4);
             _output.AppendFormat("this.{0} = function(", method["name"]);
             var signature = method["signatures"][0];
@@ -443,7 +454,9 @@ namespace Microsoft.NodejsTools.Intellisense {
                 }
             }
 
-            if (method["name"].StartsWith("create") && method["name"].Length > 6) {
+            if (body != null) {
+                _output.AppendLine(body);
+            } else if (method["name"].StartsWith("create") && method["name"].Length > 6) {
                 _output.Append(' ', indentation * 4);
                 _output.AppendFormat("return new this.{1}();", fullName, method["name"].Substring(6));
                 _output.AppendLine();
@@ -476,6 +489,7 @@ namespace Microsoft.NodejsTools.Intellisense {
             res.AppendLine("    }");
 
             res.Append(@"    var f = function(module) { 
+        module = module.replace(/\\/g, '/');
         if(require_count++ >= 50) {
             require_count = 0;
             intellisense.progress();
@@ -508,7 +522,7 @@ namespace Microsoft.NodejsTools.Intellisense {
     o.__proto__ = f.__proto__;
     f.__proto__ = o;
     return f;
-}()");
+}();");
         }
 
 

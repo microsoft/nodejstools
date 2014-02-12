@@ -31,7 +31,7 @@ namespace Microsoft.NodejsTools.Project.ImportWizard {
         public ImportSettings() {
             TopLevelJavaScriptFiles = new BulkObservableCollection<string>();
 
-            Filters = "*.txt;*.htm;*.html;*.css;*.png;*.jpg;*.gif;*.bmp;*.ico;*.svg;*.json;*.md;*.ejs;*.styl;*.jade;*.xml";
+            Filters = "*.txt;*.htm;*.html;*.css;*.png;*.jpg;*.gif;*.bmp;*.ico;*.svg;*.json;*.md;*.ejs;*.styl;*.jade;*.xml;*.ts";
         }
 
         public string ProjectPath {
@@ -131,6 +131,15 @@ namespace Microsoft.NodejsTools.Project.ImportWizard {
                 // so using Dispatcher directly.
                 Task.Factory.StartNew(() => {
                     var files = Directory.EnumerateFiles(sourcePath, "*.js", SearchOption.TopDirectoryOnly);
+
+                    if (filters.Split(';').Any(x => x.EndsWith(".ts", StringComparison.OrdinalIgnoreCase))) {
+                        files = Directory.EnumerateFiles(
+                            sourcePath, 
+                            "*.ts", 
+                            SearchOption.TopDirectoryOnly
+                        ).Concat(files);
+                    }
+
                     var fileList = files.Select(f => Path.GetFileName(f)).ToList();
                     dispatcher.BeginInvoke((Action)(() => {
                         var tlpf = s.TopLevelJavaScriptFiles as BulkObservableCollection<string>;
@@ -143,9 +152,9 @@ namespace Microsoft.NodejsTools.Project.ImportWizard {
                                 s.TopLevelJavaScriptFiles.Add(file);
                             }
                         }
-                        if (fileList.Contains("server.js")) {
+                        if (fileList.Contains("server.js") || fileList.Contains("server.ts")) {
                             s.StartupFile = "server.js";
-                        } else if (fileList.Contains("app.js")) {
+                        } else if (fileList.Contains("app.js") || fileList.Contains("app.ts")) {
                             s.StartupFile = "app.js";
                         } else if (fileList.Count > 0) {
                             s.StartupFile = fileList.First();
@@ -247,13 +256,21 @@ namespace Microsoft.NodejsTools.Project.ImportWizard {
             writer.WriteElementString("ProjectView", "ShowAllFiles");
 
             if (CommonUtils.IsValidPath(startupFile)) {
-                writer.WriteElementString("StartupFile", startupFile);
+                writer.WriteElementString("StartupFile", Path.GetFileNameWithoutExtension(startupFile) + ".js");
             } else {
                 writer.WriteElementString("StartupFile", "");
             }
             writer.WriteElementString("WorkingDirectory", ".");
             writer.WriteElementString("OutputPath", ".");
             writer.WriteElementString("ProjectTypeGuids", "{3AF33F2E-1136-4D97-BBB7-1795711AC8B8};{349c5851-65df-11da-9384-00065b846f21};{9092AA53-FB77-4645-B42D-1CCCA6BD08BD}");
+            bool typeScriptSupport = EnumerateAllFiles(sourcePath, filters, excludeNodeModules)
+                .Any(filename => NodejsConstants.TypeScriptExtension.Equals(Path.GetExtension(filename), StringComparison.OrdinalIgnoreCase));
+
+            if (typeScriptSupport) {
+                writer.WriteElementString("TypeScriptSourceMap", "true");
+                writer.WriteElementString("TypeScriptModuleKind", "CommonJS");
+                writer.WriteElementString("EnableTypeScript", "true");
+            }
 
             writer.WriteStartElement("VisualStudioVersion");
             writer.WriteAttributeString("Condition", "'$(VisualStudioVersion)' == ''");
@@ -287,12 +304,15 @@ namespace Microsoft.NodejsTools.Project.ImportWizard {
             );
             if (excludeNodeModules) {
                 folders.Remove("node_modules");
+                folders.RemoveWhere(folder => folder.StartsWith("node_modules\\", StringComparison.OrdinalIgnoreCase));
             }
             writer.WriteStartElement("ItemGroup");
             foreach (var file in EnumerateAllFiles(sourcePath, filters, excludeNodeModules)) {
                 var ext = Path.GetExtension(file);
                 if (NodejsConstants.FileExtension.Equals(ext, StringComparison.OrdinalIgnoreCase)) {
                     writer.WriteStartElement("Compile");
+                } else if (NodejsConstants.TypeScriptExtension.Equals(ext, StringComparison.OrdinalIgnoreCase)) {
+                    writer.WriteStartElement("TypeScriptCompile");
                 } else {
                     writer.WriteStartElement("Content");
                 }
@@ -375,9 +395,12 @@ namespace Microsoft.NodejsTools.Project.ImportWizard {
             }
 
             foreach (var dir in directories) {
+                if (excludeNodeModules && dir.Contains("\\node_modules\\")) {
+                    continue;
+                }
                 try {
                     foreach (var filter in patterns) {
-                        files.UnionWith(Directory.EnumerateFiles(dir, filter));
+                        files.UnionWith(Directory.EnumerateFiles(dir, filter, SearchOption.TopDirectoryOnly));
                     }
                 } catch (UnauthorizedAccessException) {
                 }

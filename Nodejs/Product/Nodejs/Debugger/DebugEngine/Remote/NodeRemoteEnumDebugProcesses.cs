@@ -14,9 +14,11 @@
 
 using Microsoft.VisualStudio;
 using Microsoft.VisualStudio.Debugger.Interop;
+using System;
 using System.IO;
 using System.Net;
 using System.Net.Sockets;
+using System.Text;
 using System.Windows.Forms;
 
 namespace Microsoft.NodejsTools.Debugger.Remote {
@@ -43,13 +45,34 @@ namespace Microsoft.NodejsTools.Debugger.Remote {
                     try {
                         socket.NoDelay = true;
                         socket.Connect(new DnsEndPoint(port.HostName, port.PortNumber));
-                        socket.Disconnect(false);
-                        int pid = 1;
-                        string exe = "node.exe";
-                        string username = string.Empty;
-                        string version = string.Empty;
-                        process = new NodeRemoteDebugProcess(port, pid, exe, username, version);
-                        break;
+                        // https://nodejstools.codeplex.com/workitem/578
+                        // Read "welcome" headers from node debug socket before disconnecting to workaround issue
+                        // where connect and immediate disconnect leaves node.js (V8) in a bad state which blocks attach.
+                        try {
+                            byte[] socketBuffer = new byte[1024];
+                            IAsyncResult asyncResult =
+                                socket.BeginReceive(
+                                    socketBuffer,
+                                    0,
+                                    1024,
+                                    SocketFlags.None,
+                                    null,
+                                    null
+                            );
+                            if (asyncResult.AsyncWaitHandle.WaitOne(1000)) {
+                                var bytesReceived = socket.EndReceive(asyncResult);
+                                var str = Encoding.UTF8.GetString(socketBuffer.Substring(0, bytesReceived)).Trim();
+                                int pid = 1;
+                                string exe = "node.exe";
+                                string username = string.Empty;
+                                string version = string.Empty;
+                                process = new NodeRemoteDebugProcess(port, pid, exe, username, version);
+                                break;
+                            }
+
+                        } finally {
+                            socket.Disconnect(false);
+                        }
                     }
                     catch (IOException) {
                     }
@@ -59,8 +82,8 @@ namespace Microsoft.NodejsTools.Debugger.Remote {
                 string errText =
                     string.Format(
                         "Could not attach to Node.js process at '{0}:{1}'. " +
-                        "Make sure that the process is running behind the remote debug proxy (RemoteDebug.js), " +
-                        "and that the debuger port (default 5858) has been opened on the target host.",
+                        "Make sure the process is running behind the remote debug proxy (RemoteDebug.js), " +
+                        "and the debugger port (default 5858) is open on the target host.",
                         port.HostName,
                         port.PortNumber
                     );

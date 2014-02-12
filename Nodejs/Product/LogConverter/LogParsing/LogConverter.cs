@@ -19,6 +19,7 @@ using System.Diagnostics;
 using System.Globalization;
 using System.IO;
 using System.IO.Compression;
+using System.Linq;
 using System.Runtime.InteropServices;
 using System.Text;
 using Microsoft.NodejsTools.LogGeneration;
@@ -63,6 +64,9 @@ namespace Microsoft.NodejsTools.LogParsing {
         private readonly string _filename;
         private readonly string _outputFile;
         private readonly TimeSpan? _executionTime;
+        private readonly bool _justMyCode;
+        private readonly SortedDictionary<AddressRange, bool> _codeAddresses = new SortedDictionary<AddressRange,bool>();
+        private Dictionary<string, SourceMap> _sourceMaps = new Dictionary<string, SourceMap>(StringComparer.OrdinalIgnoreCase);
         // Currently we maintain 2 layouts, one for code, one for shared libraries,
         // because V8 is dropping the high 32-bits of code loaded on 64-bit systems.
         // This will let us lookup against the JIT code layout, and then the lib layout, and
@@ -72,17 +76,24 @@ namespace Microsoft.NodejsTools.LogParsing {
         static uint ProcessId = (uint)System.Diagnostics.Process.GetCurrentProcess().Id;
         const int JitModuleId = 1;
 
-        public LogConverter(string filename, string outputFile, TimeSpan? executionTime) {
+        public LogConverter(string filename, string outputFile, TimeSpan? executionTime, bool justMyCode) {
             _filename = filename;
             _outputFile = outputFile;
             _executionTime = executionTime;
+            _justMyCode = justMyCode;
         }
 
         public static int Main(string[] args) {
             if (args.Length < 2) {
-                Console.WriteLine("Usage: <v8.log path> <output.vspx path> [<start time> <execution time>]");
+                Console.WriteLine("Usage: [/jmc] <v8.log path> <output.vspx path> [<start time> <execution time>]");
                 return 1;
             }
+            bool jmc = false;
+            if (args[0] == "/jmc") {
+                args = args.Skip(1).ToArray();
+                jmc = true;
+            }
+
             string inputFile = args[0];
             string outputFile = args[1];
             TimeSpan? executionTime = null;
@@ -97,7 +108,7 @@ namespace Microsoft.NodejsTools.LogParsing {
             }
 
             try {
-                var log = new LogConverter(inputFile, outputFile, executionTime);
+                var log = new LogConverter(inputFile, outputFile, executionTime, jmc);
                 log.Process();
                 return 0;
             } catch (Exception e) {
@@ -226,6 +237,8 @@ namespace Microsoft.NodejsTools.LogParsing {
                                 if (funcInfo.IsRecompilation) {
                                     functionName += " (recompiled)";
                                 }
+
+                                _codeAddresses[new AddressRange(startAddr, methodLoad.MethodSize)] = IsMyCode(funcInfo);
                                 log.Trace(header, methodLoad, funcInfo.Namespace, functionName, "" /* signature*/);
 
                                 methodToken++;
@@ -259,19 +272,25 @@ namespace Microsoft.NodejsTools.LogParsing {
                                     // tick, ip, esp, ? [always zero], ?, always zero[?], stack IPs...
                                     const int nonStackFrames = 6;   // count of records, including IP, which aren't stack addresses.
 
-                                    object[] args = new object[2 + records.Length - nonStackFrames];
-                                    args[0] = sw;
-                                    args[1] = ParseAddress(records[1]); // ip
+                                    List<object> args = new List<object>();
+                                    args.Add(sw);
+                                    var ipAddr = ParseAddress(records[1]);
+                                    if (ipAddr != 0 && ShouldIncludeCode(ipAddr)) {
+                                        args.Add(ipAddr);
+                                    }
+                                    for (int i = nonStackFrames; i < records.Length; i++) {
+                                        var callerAddr = ParseAddress(records[i]);
+                                        if (callerAddr != 0 && ShouldIncludeCode(callerAddr)) {
+                                            args.Add(callerAddr);
+                                        }
+                                    }
 
                                     if ((records.Length - nonStackFrames) == 0) {
                                         // idle CPU time
                                         sw.Process = 0;
                                     }
                                     tickCount++;
-                                    for (int i = nonStackFrames; i < records.Length; i++) {
-                                        args[i - nonStackFrames + 2] = ParseAddress(records[i]);
-                                    }
-                                    log.Trace(header, args);
+                                    log.Trace(header, args.ToArray());
                                 }
                                 break;
                             default:
@@ -311,6 +330,24 @@ namespace Microsoft.NodejsTools.LogParsing {
                     }
                 }
             }
+        }
+
+        private bool ShouldIncludeCode(ulong callerAddr) {
+            if (_justMyCode) {
+                bool isMyCode;
+                if (_codeAddresses.TryGetValue(new AddressRange(callerAddr), out isMyCode)) {
+                    return isMyCode;
+                }
+            }
+
+            return true;
+        }
+
+        private static bool IsMyCode(FunctionInformation funcInfo) {
+            return !String.IsNullOrWhiteSpace(funcInfo.Filename) &&
+                funcInfo.Filename.IndexOfAny(InvalidPathChars) == -1 &&
+                funcInfo.Filename.IndexOf("\\node_modules\\") == -1 &&
+                Path.IsPathRooted(funcInfo.Filename);
         }
 
         private static ulong ParseAddress(string address) {
@@ -375,10 +412,10 @@ namespace Microsoft.NodejsTools.LogParsing {
         internal FunctionInformation ExtractNamespaceAndMethodName(string method, string type = "LazyCompile") {
             bool isRecompilation = !_allMethods.Add(method);
 
-            return ExtractNamespaceAndMethodName(method, isRecompilation, type);
+            return ExtractNamespaceAndMethodName(method, isRecompilation, type, _sourceMaps);
         }
 
-        internal static FunctionInformation ExtractNamespaceAndMethodName(string method, bool isRecompilation, string type = "LazyCompile") {
+        internal static FunctionInformation ExtractNamespaceAndMethodName(string method, bool isRecompilation, string type = "LazyCompile", Dictionary<string, SourceMap> sourceMaps = null) {
             string methodName = method;
             string ns = "";
             int? lineNo = null;
@@ -389,6 +426,7 @@ namespace Microsoft.NodejsTools.LogParsing {
                 method = method.Substring(1, method.Length - 2);
             }
 
+            int firstSpace;
             if (type == "Script" || type == "Function") {
                 // code-creation,Function,0xf1c38300,1928," assert.js:1",0xa6d4df58,~
                 // code-creation,Script,0xf1c38aa0,244,"assert.js",0xa6d4e050,~
@@ -396,13 +434,19 @@ namespace Microsoft.NodejsTools.LogParsing {
 
                 // this is a top level script or module, report it as such
                 methodName = "<node module>";
-                return new FunctionInformation("<node module>", GetModuleName(method), 1, GetFileName(method), isRecompilation);
+
+                string fileTemp = method;
+                if (type == "Function") {
+                    fileTemp = fileTemp.Substring(fileTemp.IndexOf(' ') + 1);
+                }
+                return MaybeMap(new FunctionInformation("<node module>", GetModuleName(method), 1, GetFileName(fileTemp), isRecompilation), sourceMaps);
             }
 
             // " net.js:931"
             // "f C:\Source\NodeApp2\NodeApp2\server.js:5"
             // " C:\Source\NodeApp2\NodeApp2\server.js:16"
-            int firstSpace = method.IndexOf(' ');
+
+            firstSpace = FirstSpace(method);
             if (firstSpace != -1) {
                 if (firstSpace == 0) {
                     methodName = "anonymous method";
@@ -429,7 +473,63 @@ namespace Microsoft.NodejsTools.LogParsing {
                 }
             }
 
-            return new FunctionInformation(ns, methodName, lineNo, filename, isRecompilation);
+            return MaybeMap(new FunctionInformation(ns, methodName, lineNo, filename, isRecompilation), sourceMaps);
+        }
+
+        private static int FirstSpace(string method) {
+            int parenCount = 0;
+            for (int i = 0; i < method.Length; i++) {
+                switch (method[i]) {
+                    case '(': parenCount++; break;
+                    case ')': parenCount--; break;
+                    case ' ':
+                        if (parenCount == 0) {
+                            return i;
+                        }
+                        break;
+                }
+            }
+            return -1;
+        }
+
+        private static char[] InvalidPathChars = Path.GetInvalidPathChars();
+
+        private static FunctionInformation MaybeMap(FunctionInformation funcInfo, Dictionary<string, SourceMap> sourceMaps) {
+            if (funcInfo.Filename != null &&
+                funcInfo.Filename.IndexOfAny(InvalidPathChars) == -1 &&
+                File.Exists(funcInfo.Filename) &&
+                File.Exists(funcInfo.Filename + ".map") && 
+                funcInfo.LineNumber != null) {
+                SourceMap map;
+                if (!sourceMaps.TryGetValue(funcInfo.Filename, out map)) {
+                    try {
+                        map = new SourceMap(new StreamReader(funcInfo.Filename + ".map"));
+                    } catch (InvalidOperationException) {
+                    } catch (FileNotFoundException) {
+                    } catch (DirectoryNotFoundException) {
+                    } catch (IOException) {
+                    }
+
+                    sourceMaps[funcInfo.Filename] = map;
+                }
+
+                SourceMapping mapping;
+                if (map != null && map.TryMapLine(funcInfo.LineNumber.Value, out mapping)) {
+                    string filename = mapping.FileName;
+                    if (filename != null && !Path.IsPathRooted(filename)) {
+                        filename = Path.Combine(Path.GetDirectoryName(funcInfo.Filename), filename);
+                    }
+
+                    return new FunctionInformation(
+                        funcInfo.Namespace,
+                        mapping.Name ?? funcInfo.Function,
+                        mapping.Line,
+                        filename ?? funcInfo.Filename,
+                        funcInfo.IsRecompilation
+                    );
+                }
+            }
+            return funcInfo;
         }
 
         private static char[] _invalidPathChars = Path.GetInvalidPathChars();
@@ -734,5 +834,59 @@ public static void X{0:X}() {{
         }
 
         #endregion
+
+        struct AddressRange : IComparable<AddressRange>, IEquatable<AddressRange> {
+            public readonly ulong Start;
+            public readonly uint Length;
+            public readonly bool Lookup;
+
+            public AddressRange(ulong start, uint length) {
+                Start = start;
+                Length = length;
+                Lookup = false;
+            }
+
+            /// <summary>
+            /// Creates a new AddressRange to perform a lookup
+            /// </summary>
+            /// <param name="start"></param>
+            public AddressRange(ulong start) {
+                Start = start;
+                Length = 0;
+                Lookup = true;
+            }
+
+            public int CompareTo(AddressRange other) {
+                if (Lookup) {
+                    // fuzzy lookup
+                    if (Start >= other.Start && Start < other.Start + other.Length) {
+                        return 0;
+                    }
+                } else if (other.Lookup) {
+                    if (other.Start >= Start && other.Start < Start + Length) {
+                        return 0;
+                    }
+                }
+
+                if (Start > other.Start) {
+                    return 1;
+                } else if (other.Start == Start) {
+                    return 0;
+                } else {
+                    return -1;
+                }
+            }
+
+            public override string ToString() {
+                return String.Format("AddressRange: {0} {1}", Start, Length);
+            }
+            public override int GetHashCode() {
+                return (int)Start;
+            }
+
+            public bool Equals(AddressRange other) {
+                return CompareTo(other) == 0;
+            }
+        }
     }
 }

@@ -203,8 +203,7 @@ namespace Microsoft.NodejsTools.Debugger.DebugEngine {
             if (_documentContext != null) {
                 return _documentContext.GetLanguageInfo(ref pbstrLanguage, ref pguidLanguage);
             }
-            pbstrLanguage = NodejsConstants.Nodejs;
-            pguidLanguage = GuidList.guidNodejsDebugLanguage;
+            AD7Engine.MapLanguageInfo(FileName, out pbstrLanguage, out pguidLanguage);
             return VSConstants.S_OK;
         }
 

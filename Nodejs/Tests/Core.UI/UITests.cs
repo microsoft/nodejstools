@@ -57,7 +57,7 @@ namespace Microsoft.Nodejs.Tests.UI {
 
                 var consoleApp = newProjDialog.ProjectTypes.FindItem("Blank Node.js Application");
                 consoleApp.Select();
-                newProjDialog.ProjectName = "Foo.Bar";
+                newProjDialog.ProjectName = "Fob.Baz";
                 newProjDialog.ClickOK();
 
                 // wait for new solution to load...

@@ -32,9 +32,9 @@ namespace Microsoft.NodejsTools.Profiling {
         private readonly ProcessorArchitecture _arch;
         private readonly Process _process;
         private readonly int? _port;
-        private readonly bool _startBrowser;
+        private readonly bool _startBrowser, _justMyCode;
 
-        public ProfiledProcess(string exe, string interpreterArgs, string script, string scriptArgs, string dir, Dictionary<string, string> envVars, ProcessorArchitecture arch, string launchUrl, int? port, bool startBrowser) {
+        public ProfiledProcess(string exe, string interpreterArgs, string script, string scriptArgs, string dir, Dictionary<string, string> envVars, ProcessorArchitecture arch, string launchUrl, int? port, bool startBrowser, bool justMyCode) {
             if (arch != ProcessorArchitecture.X86 && arch != ProcessorArchitecture.Amd64) {
                 throw new InvalidOperationException(String.Format("Unsupported architecture: {0}", arch));
             }
@@ -53,6 +53,7 @@ namespace Microsoft.NodejsTools.Profiling {
             _launchUrl = launchUrl;
             _port = port;
             _startBrowser = startBrowser;
+            _justMyCode = justMyCode;
 
             var processInfo = new ProcessStartInfo(_exe);
             processInfo.WorkingDirectory = dir;
@@ -137,12 +138,12 @@ namespace Microsoft.NodejsTools.Profiling {
                                 Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location),
                                 "Microsoft.NodejsTools.NodeLogConverter.exe"
                             ),
+                            (_justMyCode ? "/jmc " : "") + 
                             "\"" + v8log + "\" " +
                             "\"" + filename + "\" " +
                             "\"" + _process.StartTime.ToString() + "\" " +
                             "\"" + executionTime.ToString() + "\""
                         );
-
 
                     psi.UseShellExecute = false;
                     psi.CreateNoWindow = true;

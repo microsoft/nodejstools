@@ -19,7 +19,7 @@ using System.Reflection;
 using Microsoft.Win32;
 
 namespace Microsoft.NodejsTools {
-    static class NodejsToolsInstallPath {
+    public static class NodejsToolsInstallPath {
         private static string GetFromAssembly(Assembly assembly, string filename) {
             string path = Path.Combine(
                 Path.GetDirectoryName(assembly.Location),

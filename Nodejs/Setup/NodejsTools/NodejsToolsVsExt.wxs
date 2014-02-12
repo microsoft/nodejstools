@@ -2,13 +2,14 @@
 <Wix xmlns="http://schemas.microsoft.com/wix/2006/wi">
     <Fragment>
         <DirectoryRef Id="INSTALLLOCATION">
-            <Directory Id="DIR_ProjectTemplates_4DCCAA275A2C4923918F2CBC07199083" Name="ProjectTemplates" />
-            <Directory Id="DIR_FileTemplates_867246A15C254AAAA0099E75615C893A" Name="FileTemplates">
-              <Directory Id="DIR_NewItem_8C4602C9B0A2476697A95E2BF5B94B53" Name="NewItem"/>
+            <Directory Id="DIR_FileTemplates" Name="FileTemplates">
+              <Directory Id="DIR_NewItem" Name="NewItem"/>
             </Directory>
         </DirectoryRef>
-        <DirectoryRef Id="INSTALLLOCATION">
-            <Directory Id="GAC" Name="GAC" />
+        <DirectoryRef Id="VWD_INSTALLLOCATION">
+            <Directory Id="DIR_VWD_FileTemplates" Name="FileTemplates">
+              <Directory Id="DIR_VWD_NewItem" Name="NewItem"/>
+            </Directory>
         </DirectoryRef>
     </Fragment>
     <Fragment>
@@ -17,117 +18,355 @@
             <Component Id="PerUserInstallRegistry" Directory="INSTALLLOCATION" Guid="{07CBA996-E490-4F22-87C0-069BAF855D68}">
                 <Condition>NOT ALLUSERS = 1</Condition>
                 <RegistryKey Root='HKCU' Key='Software\Microsoft\VisualStudio\$(var.VSTargetVersion)\ExtensionManager\EnabledExtensions'>
-                    <RegistryValue Type='string' Name='4219f2a8-fbf9-4659-a222-b7580a60eebb,1.0' Value='[EXTENSION_INSTALLPATH]Extensions\Microsoft\Node.js Tools\1.0\'/>
+                    <RegistryValue Type='string' Name='FE8A8C3D-328A-476D-99F9-2A24B75F8C7F,1.0' Value='[EXTENSION_INSTALLPATH]Extensions\Microsoft\Node.js Tools\1.0\'/>
                 </RegistryKey>
                 <RegistryKey Root='HKCU' Key='Software\Microsoft\VisualStudio\$(var.VSTargetVersion)\ExtensionManager\ExtensionTypes'>
-                    <RegistryValue Type='string' Name='4219f2a8-fbf9-4659-a222-b7580a60eebb,1.0' Value='Tool'/>
+                    <RegistryValue Type='string' Name='FE8A8C3D-328A-476D-99F9-2A24B75F8C7F,1.0' Value='Tool'/>
                 </RegistryKey>
                 <File Id='filVSTemplateStore.pkgdef' Source='$(var.TargetDir)\VSTemplateStore.pkgdef' />
             </Component>
             
-            <!-- All user components -->
-
-            <!-- Both per user and all user components -->
-            <Component Id="cmpE3F5BF4C28BA41A9A478DAC397C64098" Directory="INSTALLLOCATION" Guid="{DDBCEC41-C59C-4C5D-B7A2-77AB2F7684DB}">
-              <File Id="fil47E7513578964CFA86B587D50FC280CB" KeyPath="yes" Source="$(var.BinariesDir)\Microsoft.NodejsTools.dll" />
+            <Component Directory="INSTALLLOCATION" Guid="{DDBCEC41-C59C-4C5D-B7A2-77AB2F7684DB}">
+              <File Id="filMicrosoft.Nodejstools.dll" KeyPath="yes" Source="$(var.BinariesDir)\Microsoft.NodejsTools.dll"/>
             </Component>
-            <Component Id="cmpMicrosoft.NodejsTools.Npm.dll" Directory="INSTALLLOCATION" Guid="{6BEB23FF-398F-4E40-8775-E6DF3E2E76AB}">
+            <Component Directory="VWD_INSTALLLOCATION" Guid="{ACA59645-2FBE-42FF-90F4-A124D37C9173}">
+              <File Id="filVWDMicrosoft.Nodejstools.dll" KeyPath="yes" Source="$(var.BinariesDir)\Microsoft.NodejsTools.dll"/>
+              <Condition>VWD_EXTENSION_INSTALLPATH</Condition>
+            </Component>
+
+            <Component Directory="INSTALLLOCATION" Guid="{6BEB23FF-398F-4E40-8775-E6DF3E2E76AB}">
               <File Id="filMicrosoft.NodejsTools.Npm.dll" KeyPath="yes" Source="$(var.BinariesDir)\Microsoft.NodejsTools.Npm.dll" />
             </Component>
-            <Component Id="cmpMicrosoft.NodejsTools.ProjectWizard.dll" Directory="INSTALLLOCATION" Guid="{5B0F69FB-EBB6-42CF-8422-57C2A492E664}">
+            <Component Directory="VWD_INSTALLLOCATION" Guid="{EF8782C7-FA7C-47E0-AE3E-1E71D9C88E47}">
+              <File Id="filVWDMicrosoft.NodejsTools.Npm.dll" KeyPath="yes" Source="$(var.BinariesDir)\Microsoft.NodejsTools.Npm.dll" />
+              <Condition>VWD_EXTENSION_INSTALLPATH</Condition>
+            </Component>
+
+            <Component Directory="INSTALLLOCATION" Guid="{5B0F69FB-EBB6-42CF-8422-57C2A492E664}">
               <File Id="filMicrosoft.NodejsTools.ProjectWizard.dll" KeyPath="yes" Source="$(var.BinariesDir)\Microsoft.NodejsTools.ProjectWizard.dll" />
             </Component>
-            <Component Id="cmp9FEF8767393C493A8B68D8BF6D4961B5" Directory="INSTALLLOCATION" Guid="{B43D5044-D8D5-42A8-BAEF-1A7DBC21AAE6}">
-              <File Id="filE8D2A28B9CB64184A05AEAAF2A2EF4C8" KeyPath="yes" Source="$(var.BinariesDir)\Microsoft.NodejsTools.AjaxMin.dll" />
+            <Component Directory="VWD_INSTALLLOCATION" Guid="{1C8C1ACA-B9A1-4038-B014-2E1ED6604BA0}">
+              <File Id="filVWDMicrosoft.NodejsTools.ProjectWizard.dll" KeyPath="yes" Source="$(var.BinariesDir)\Microsoft.NodejsTools.ProjectWizard.dll" />
+              <Condition>VWD_EXTENSION_INSTALLPATH</Condition>
             </Component>
-            <Component Id="cmp8D98477436DB42B0ACE9B536469F60E1" Directory="INSTALLLOCATION" Guid="{0AE160E1-51FF-4153-9882-E89DDFAE07B5}">
-              <File Id="filEEA4A429F6A1428CAC96158BA6ADD3F1" KeyPath="yes" Source="$(var.BinariesDir)\NodejsProject.ico" />
+
+            <Component Directory="INSTALLLOCATION" Guid="{7566BE04-67D4-4E6B-948F-0DD6F74F114F}">
+              <File Id="filMicrosoft.NodejsTools.TestAdapter.dll" KeyPath="yes" Source="$(var.BinariesDir)\Microsoft.NodejsTools.TestAdapter.dll" />
             </Component>
-            <Component Id="cmpA1538F6E77EE4170BEEC113CBCA174BB" Directory="INSTALLLOCATION" Guid="{60D3CA23-457C-4AA9-AD84-A8992687A234}">
-              <File Id="fil0A762C1A17F3488488BB00DB54D656A5" KeyPath="yes" Source="$(var.BinariesDir)\NodejsProjectBig.ico" />
+            <Component Directory="VWD_INSTALLLOCATION" Guid="{451240D1-98FC-4D41-86DF-61A4DC18AAF7}">
+              <File Id="filVWDMicrosoft.NodejsTools.TestAdapter.dll" KeyPath="yes" Source="$(var.BinariesDir)\Microsoft.NodejsTools.TestAdapter.dll" />
+              <Condition>VWD_EXTENSION_INSTALLPATH</Condition>
             </Component>
-            <Component Id="cmpC4E8CE1ED04F4740A1B017ECE4DA9CD1" Directory="INSTALLLOCATION" Guid="{1CF7A1CB-228A-4FA1-97EC-A9CD4417FF63}">
-              <File Id="fil617BFEB8AC8E419B80409E0DD6D4641B" KeyPath="yes" Source="$(var.ObjDir)\extension.vsixmanifest" />
+
+            <Component Directory="INSTALLLOCATION" Guid="{B43D5044-D8D5-42A8-BAEF-1A7DBC21AAE6}">
+              <File Id="filMicrosoft.NodejsTools.AjaxMin.dll" KeyPath="yes" Source="$(var.BinariesDir)\Microsoft.NodejsTools.AjaxMin.dll" />
             </Component>
-            <Component Id="cmp2F4D073922FD4DB199AC2AC8470BA750" Directory="INSTALLLOCATION" Guid="{99782EAC-E8DD-4FC7-8EBA-58F107CCEB9E}">
-              <File Id="fil530034032FEF4DFDBFD9E74C8411CB8C" KeyPath="yes" Source="$(var.BinariesDir)\Microsoft.NodejsTools.pkgdef" />
+            <Component Directory="VWD_INSTALLLOCATION" Guid="{A8DD116C-36C3-48B8-B1F4-88A145AC5066}">
+              <File Id="filVWDMicrosoft.NodejsTools.AjaxMin.dll" KeyPath="yes" Source="$(var.BinariesDir)\Microsoft.NodejsTools.AjaxMin.dll" />
+              <Condition>VWD_EXTENSION_INSTALLPATH</Condition>
             </Component>
-            <Component Id="cmp31BE00F937684CD0925BD24FB16D6D6D" Directory="INSTALLLOCATION" Guid="{8101FEA9-BE4C-4361-89A7-F438C0B5EB80}">
-              <File Id="fil226B6994EA9247808FCA9C6485906CB2" KeyPath="yes" Source="$(var.BinariesDir)\visualstudio_nodejs_repl.js" />
+
+            <Component Directory="INSTALLLOCATION" Guid="{0AE160E1-51FF-4153-9882-E89DDFAE07B5}">
+              <File Id="filNodejsProject.ico" KeyPath="yes" Source="$(var.BinariesDir)\NodejsProject.ico" />
             </Component>
-            <Component Id="cmp05C8461645AC4E30883B5F6FC70C2F9B" Directory="INSTALLLOCATION" Guid="{B87AE937-DA4A-4599-B2E9-B9EE139293D1}">
-              <File Id="filB3AE8C142D5449D0A2CB178BD4C5EF1F" KeyPath="yes" Source="$(var.BinariesDir)\nodejsref.js" />
+            <Component Directory="VWD_INSTALLLOCATION" Guid="{54912CB4-BCB0-49AA-9ABA-872BA50DC9E7}">
+              <File Id="filVWDNodejsProject.ico" KeyPath="yes" Source="$(var.BinariesDir)\NodejsProject.ico" />
+              <Condition>VWD_EXTENSION_INSTALLPATH</Condition>
             </Component>
-            <Component Id="cmp3939064E04124AF7B8F790B3D2EAEFE7" Directory="INSTALLLOCATION" Guid="{8C7344A9-E311-4AF7-9E7F-B6232FD2FA29}">
-              <File Id="fil3B2605EA0CF2447BB2857277D59C650F" KeyPath="yes" Source="$(var.BinariesDir)\NoSurveyNewsFeed.html" />
+
+            <Component Directory="INSTALLLOCATION" Guid="{60D3CA23-457C-4AA9-AD84-A8992687A234}">
+              <File Id="filNodejsProjectBig.ico" KeyPath="yes" Source="$(var.BinariesDir)\NodejsProjectBig.ico" />
             </Component>
-            <Component Id="cmpAzureExpressApp.zip" Directory="DIR_ProjectTemplates_4DCCAA275A2C4923918F2CBC07199083" Guid="{D4213A93-048A-4A0C-BFE2-6ABC6D42644A}">
-              <File Id="filAzureExpressApp.zip" KeyPath="yes" Source="$(var.BinariesDir)\ProjectTemplates\JavaScript\AzureExpressApp.zip" />
+            <Component Directory="VWD_INSTALLLOCATION" Guid="{EE0E3254-9FCD-4D10-93CF-2776536755C9}">
+              <File Id="filVWDNodejsProjectBig.ico" KeyPath="yes" Source="$(var.BinariesDir)\NodejsProjectBig.ico" />
+              <Condition>VWD_EXTENSION_INSTALLPATH</Condition>
             </Component>
-            <Component Id="cmpAzureNodejsApp.zip" Directory="DIR_ProjectTemplates_4DCCAA275A2C4923918F2CBC07199083" Guid="{94061A1E-94EF-4246-B10F-8E2FD990AC27}">
-              <File Id="filAzureNodejsApp.zip" KeyPath="yes" Source="$(var.BinariesDir)\ProjectTemplates\JavaScript\AzureNodejsApp.zip" />
+
+            <Component Directory="INSTALLLOCATION" Guid="{1CF7A1CB-228A-4FA1-97EC-A9CD4417FF63}">
+              <File Id="filextension.vsixmanifest" KeyPath="yes" Source="$(var.ObjDir)\extension.vsixmanifest" />
             </Component>
-            <Component Id="cmpExpressApp.zip" Directory="DIR_ProjectTemplates_4DCCAA275A2C4923918F2CBC07199083" Guid="{D7612D7F-2AAA-4925-9818-3F638FA04C5C}">
-              <File Id="filExpressApp.zip" KeyPath="yes" Source="$(var.BinariesDir)\ProjectTemplates\JavaScript\ExpressApp.zip" />
+            <Component Directory="VWD_INSTALLLOCATION" Guid="{EAF98364-3CCA-493B-8C26-151CB8EFA7B8}">
+              <File Id="filVWDextension.vsixmanifest" KeyPath="yes" Source="$(var.ObjDir)\extension.vsixmanifest" />
+              <Condition>VWD_EXTENSION_INSTALLPATH</Condition>
             </Component>
-            <Component Id="cmpFromExistingCode.zip" Directory="DIR_ProjectTemplates_4DCCAA275A2C4923918F2CBC07199083" Guid="{552FDAC5-C143-40EB-980E-678DF4DA714C}">
-              <File Id="filFromExistingCode.zip" KeyPath="yes" Source="$(var.BinariesDir)\ProjectTemplates\JavaScript\FromExistingCode.zip" />
+
+            <Component Directory="INSTALLLOCATION" Guid="{99782EAC-E8DD-4FC7-8EBA-58F107CCEB9E}">
+              <File Id="filMicrosoft.NodejsTools.pkgdef" KeyPath="yes" Source="$(var.BinariesDir)\Microsoft.NodejsTools.pkgdef" />
             </Component>
-            <Component Id="cmpNodejsWebApp.zip" Directory="DIR_ProjectTemplates_4DCCAA275A2C4923918F2CBC07199083" Guid="{2A83D4D0-2334-4FFF-AB7B-8D1D96F0D3FC}">
-              <File Id="filNodejsWebApp.zip" KeyPath="yes" Source="$(var.BinariesDir)\ProjectTemplates\JavaScript\NodejsWebApp.zip" />
+            <Component Directory="VWD_INSTALLLOCATION" Guid="{1421DFC4-E953-4BE5-802E-B7ED13401D35}">
+              <File Id="filVWDMicrosoft.NodejsTools.pkgdef" KeyPath="yes" Source="$(var.BinariesDir)\Microsoft.NodejsTools.pkgdef" />
+              <Condition>VWD_EXTENSION_INSTALLPATH</Condition>
             </Component>
-            <Component Id="cmpNodejsConsoleApp.zip" Directory="DIR_ProjectTemplates_4DCCAA275A2C4923918F2CBC07199083" Guid="{8EA6B5E7-ACBD-4177-94F4-10C7C8458BCD}">
-              <File Id="filNodejsConsoleApp.zip" KeyPath="yes" Source="$(var.BinariesDir)\ProjectTemplates\JavaScript\NodejsConsoleApp.zip" />
+
+            <Component Directory="INSTALLLOCATION" Guid="{8101FEA9-BE4C-4361-89A7-F438C0B5EB80}">
+              <File Id="filvisualstudio_nodejs_repl.js" KeyPath="yes" Source="$(var.BinariesDir)\visualstudio_nodejs_repl.js" />
             </Component>
-            <Component Id="cmpAddWebSiteAzureExpressApp.zip" Directory="DIR_ProjectTemplates_4DCCAA275A2C4923918F2CBC07199083" Guid="{86749494-2D16-4AD4-9E86-B3A3ED72DB80}">
-              <File Id="filAddWebSiteAzureExpressApp.zip" KeyPath="yes" Source="$(var.BinariesDir)\ProjectTemplates\JavaScript\AddWebSiteAzureExpressApp.zip" />
+            <Component Directory="VWD_INSTALLLOCATION" Guid="{3F09FEAE-6F0F-4E56-9F0A-6D8920B79C05}">
+              <File Id="filVWDvisualstudio_nodejs_repl.js" KeyPath="yes" Source="$(var.BinariesDir)\visualstudio_nodejs_repl.js" />
+              <Condition>VWD_EXTENSION_INSTALLPATH</Condition>
             </Component>
-            <Component Id="cmpAddWebSiteAzureNodejsApp.zip" Directory="DIR_ProjectTemplates_4DCCAA275A2C4923918F2CBC07199083" Guid="{A1770285-15AE-446E-B843-7A3FA82AD3F7}">
-              <File Id="filAddWebSiteAzureNodejsApp.zip" KeyPath="yes" Source="$(var.BinariesDir)\ProjectTemplates\JavaScript\AddWebSiteAzureNodejsApp.zip" />
+
+            <Component Directory="INSTALLLOCATION" Guid="{B87AE937-DA4A-4599-B2E9-B9EE139293D1}">
+              <File Id="filnodejsref.js" KeyPath="yes" Source="$(var.BinariesDir)\nodejsref.js" />
             </Component>
-            <Component Id="cmpAddWebSiteExpressApp.zip" Directory="DIR_ProjectTemplates_4DCCAA275A2C4923918F2CBC07199083" Guid="{99D43BE0-92B6-47F2-8512-29189F4117F1}">
-              <File Id="filAddWebSiteExpressApp.zip" KeyPath="yes" Source="$(var.BinariesDir)\ProjectTemplates\JavaScript\AddWebSiteExpressApp.zip" />
+            <Component Directory="VWD_INSTALLLOCATION" Guid="{031EF09A-427C-472A-9339-9A08DCA4B1E5}">
+              <File Id="filVWDnodejsref.js" KeyPath="yes" Source="$(var.BinariesDir)\nodejsref.js" />
+              <Condition>VWD_EXTENSION_INSTALLPATH</Condition>
             </Component>
-            <Component Id="cmpAddWebSiteNodejsWebApp.zip" Directory="DIR_ProjectTemplates_4DCCAA275A2C4923918F2CBC07199083" Guid="{559C2DB8-DBAE-419A-95FE-9F7AE5623875}">
-              <File Id="filAddWebSiteNodejsWebApp.zip" KeyPath="yes" Source="$(var.BinariesDir)\ProjectTemplates\JavaScript\AddWebSiteNodejsWebApp.zip" />
+
+            <Component Directory="INSTALLLOCATION" Guid="{7FE66D60-4017-4941-9333-D174AC070796}">
+              <File Id="filnode.d.ts" KeyPath="yes" Source="$(var.BinariesDir)\node.d.ts" />
             </Component>
-            <Component Id="cmpNodejsTools.targets" Directory="Dir_NodejsToolsMsBuild" Guid="{6D84572F-D895-443F-BD25-712394273A4E}">
+            <Component Directory="VWD_INSTALLLOCATION" Guid="{DF26AC4A-DF20-467B-831D-10C0704DD22C}">
+              <File Id="filVWDnode.d.ts" KeyPath="yes" Source="$(var.BinariesDir)\node.d.ts" />
+              <Condition>VWD_EXTENSION_INSTALLPATH</Condition>
+            </Component>
+
+            <Component Directory="INSTALLLOCATION" Guid="{8C7344A9-E311-4AF7-9E7F-B6232FD2FA29}">
+              <File Id="filNoSurveyNewsFeed.html" KeyPath="yes" Source="$(var.BinariesDir)\NoSurveyNewsFeed.html" />
+            </Component>
+            <Component Directory="VWD_INSTALLLOCATION" Guid="{32EC1284-EDCC-4F88-8F12-1AB99404BF5C}">
+              <File Id="filVWDNoSurveyNewsFeed.html" KeyPath="yes" Source="$(var.BinariesDir)\NoSurveyNewsFeed.html" />
+              <Condition>VWD_EXTENSION_INSTALLPATH</Condition>
+            </Component>
+
+            <!-- Project Templates -->
+            
+            <Component Directory="PrjTempl_JS_Nodejs_1033" Guid="{D4213A93-048A-4A0C-BFE2-6ABC6D42644A}">
+              <File Id="filAzureExpressApp.zip" KeyPath="yes" Source="$(var.BinariesDir)\ProjectTemplates\JavaScript\Node.js\1033\AzureExpressApp.zip" />
+            </Component>
+            <Component Directory="VWD_PrjTempl_JS_Nodejs_1033" Guid="{D0EB64E5-F5F6-44B7-B667-D52CF89D6874}">
+              <File Id="filVWDAzureExpressApp.zip" KeyPath="yes" Source="$(var.BinariesDir)\ProjectTemplates\JavaScript\Node.js\1033\AzureExpressApp.zip" />
+              <Condition>VWD_EXTENSION_INSTALLPATH</Condition>
+            </Component>
+
+            <Component Directory="PrjTempl_JS_Nodejs_1033" Guid="{94061A1E-94EF-4246-B10F-8E2FD990AC27}">
+              <File Id="filAzureNodejsApp.zip" KeyPath="yes" Source="$(var.BinariesDir)\ProjectTemplates\JavaScript\Node.js\1033\AzureNodejsApp.zip" />
+            </Component>
+            <Component Directory="VWD_PrjTempl_JS_Nodejs_1033" Guid="{61063019-4D6D-464A-826E-D2B1BBAA000E}">
+              <File Id="filVWDAzureNodejsApp.zip" KeyPath="yes" Source="$(var.BinariesDir)\ProjectTemplates\JavaScript\Node.js\1033\AzureNodejsApp.zip" />
+              <Condition>VWD_EXTENSION_INSTALLPATH</Condition>
+            </Component>
+
+            <Component Directory="PrjTempl_JS_Nodejs_1033" Guid="{D7612D7F-2AAA-4925-9818-3F638FA04C5C}">
+              <File Id="filExpressApp.zip" KeyPath="yes" Source="$(var.BinariesDir)\ProjectTemplates\JavaScript\Node.js\1033\ExpressApp.zip" />
+            </Component>
+            <Component Directory="VWD_PrjTempl_JS_Nodejs_1033" Guid="{DEA62297-903B-4978-8393-B06C1B9F51CB}">
+              <File Id="filVWDExpressApp.zip" KeyPath="yes" Source="$(var.BinariesDir)\ProjectTemplates\JavaScript\Node.js\1033\ExpressApp.zip" />
+              <Condition>VWD_EXTENSION_INSTALLPATH</Condition>
+            </Component>
+
+            <Component Directory="PrjTempl_JS_Nodejs_1033" Guid="{552FDAC5-C143-40EB-980E-678DF4DA714C}">
+              <File Id="filFromExistingCode.zip" KeyPath="yes" Source="$(var.BinariesDir)\ProjectTemplates\JavaScript\Node.js\1033\FromExistingCode.zip" />
+            </Component>
+            <Component Directory="VWD_PrjTempl_JS_Nodejs_1033" Guid="{1F39E651-2B38-44B6-BF99-6D26724D802B}">
+              <File Id="filVWDFromExistingCode.zip" KeyPath="yes" Source="$(var.BinariesDir)\ProjectTemplates\JavaScript\Node.js\1033\FromExistingCode.zip" />
+              <Condition>VWD_EXTENSION_INSTALLPATH</Condition>
+            </Component>
+
+            <Component Directory="PrjTempl_JS_Nodejs_1033" Guid="{2A83D4D0-2334-4FFF-AB7B-8D1D96F0D3FC}">
+              <File Id="filNodejsWebApp.zip" KeyPath="yes" Source="$(var.BinariesDir)\ProjectTemplates\JavaScript\Node.js\1033\NodejsWebApp.zip" />
+            </Component>
+            <Component Directory="VWD_PrjTempl_JS_Nodejs_1033" Guid="{7D6A29FC-F8BA-4DB1-97BB-4B2F71D1ED58}">
+              <File Id="filVWDNodejsWebApp.zip" KeyPath="yes" Source="$(var.BinariesDir)\ProjectTemplates\JavaScript\Node.js\1033\NodejsWebApp.zip" />
+              <Condition>VWD_EXTENSION_INSTALLPATH</Condition>
+            </Component>
+
+            <Component Directory="PrjTempl_JS_Nodejs_1033" Guid="{8EA6B5E7-ACBD-4177-94F4-10C7C8458BCD}">
+              <File Id="filNodejsConsoleApp.zip" KeyPath="yes" Source="$(var.BinariesDir)\ProjectTemplates\JavaScript\Node.js\1033\NodejsConsoleApp.zip" />
+            </Component>
+            <Component Directory="VWD_PrjTempl_JS_Nodejs_1033" Guid="{4017F342-991F-4645-89F4-EEE704A84F60}">
+              <File Id="filVWDNodejsConsoleApp.zip" KeyPath="yes" Source="$(var.BinariesDir)\ProjectTemplates\JavaScript\Node.js\1033\NodejsConsoleApp.zip" />
+              <Condition>VWD_EXTENSION_INSTALLPATH</Condition>
+            </Component>
+
+            <Component Directory="PrjTempl_JS_Nodejs_1033" Guid="{86749494-2D16-4AD4-9E86-B3A3ED72DB80}">
+              <File Id="filAddWebSiteAzureExpressApp.zip" KeyPath="yes" Source="$(var.BinariesDir)\ProjectTemplates\JavaScript\Node.js\1033\AddWebSiteAzureExpressApp.zip" />
+            </Component>
+            <Component Directory="VWD_PrjTempl_JS_Nodejs_1033" Guid="{C0C136D0-424A-454A-93CF-E6D65230C018}">
+              <File Id="filVWDAddWebSiteAzureExpressApp.zip" KeyPath="yes" Source="$(var.BinariesDir)\ProjectTemplates\JavaScript\Node.js\1033\AddWebSiteAzureExpressApp.zip" />
+              <Condition>VWD_EXTENSION_INSTALLPATH</Condition>
+            </Component>
+
+            <Component Directory="PrjTempl_JS_Nodejs_1033" Guid="{A1770285-15AE-446E-B843-7A3FA82AD3F7}">
+              <File Id="filAddWebSiteAzureNodejsApp.zip" KeyPath="yes" Source="$(var.BinariesDir)\ProjectTemplates\JavaScript\Node.js\1033\AddWebSiteAzureNodejsApp.zip" />
+            </Component>
+            <Component Directory="VWD_PrjTempl_JS_Nodejs_1033" Guid="{C8A3314C-4283-4C89-A982-F3E1B13A3420}">
+              <File Id="filVWDAddWebSiteAzureNodejsApp.zip" KeyPath="yes" Source="$(var.BinariesDir)\ProjectTemplates\JavaScript\Node.js\1033\AddWebSiteAzureNodejsApp.zip" />
+              <Condition>VWD_EXTENSION_INSTALLPATH</Condition>
+            </Component>
+
+            <Component Directory="PrjTempl_JS_Nodejs_1033" Guid="{99D43BE0-92B6-47F2-8512-29189F4117F1}">
+              <File Id="filAddWebSiteExpressApp.zip" KeyPath="yes" Source="$(var.BinariesDir)\ProjectTemplates\JavaScript\Node.js\1033\AddWebSiteExpressApp.zip" />
+            </Component>
+            <Component Directory="VWD_PrjTempl_JS_Nodejs_1033" Guid="{B0868078-E58D-4100-850F-75472FF640EF}">
+              <File Id="filVWDAddWebSiteExpressApp.zip" KeyPath="yes" Source="$(var.BinariesDir)\ProjectTemplates\JavaScript\Node.js\1033\AddWebSiteExpressApp.zip" />
+              <Condition>VWD_EXTENSION_INSTALLPATH</Condition>
+            </Component>
+
+            <Component Directory="PrjTempl_JS_Nodejs_1033" Guid="{559C2DB8-DBAE-419A-95FE-9F7AE5623875}">
+              <File Id="filAddWebSiteNodejsWebApp.zip" KeyPath="yes" Source="$(var.BinariesDir)\ProjectTemplates\JavaScript\Node.js\1033\AddWebSiteNodejsWebApp.zip" />
+            </Component>
+            <Component Directory="VWD_PrjTempl_JS_Nodejs_1033" Guid="{6F0B56B5-6CCF-429D-9E7A-99919E5EC8D5}">
+              <File Id="filVWDAddWebSiteNodejsWebApp.zip" KeyPath="yes" Source="$(var.BinariesDir)\ProjectTemplates\JavaScript\Node.js\1033\AddWebSiteNodejsWebApp.zip" />
+              <Condition>VWD_EXTENSION_INSTALLPATH</Condition>
+            </Component>
+
+            <!-- TypeScript project templates -->
+            <Component Directory="PrjTempl_TS_Nodejs_1033" Guid="{1FCEE0F3-412C-49DB-806E-2CA9986010E4}">
+              <File Id="filzipTypeScriptAzureExpressApp.zip" KeyPath="yes" Source="$(var.BinariesDir)\ProjectTemplates\TypeScript\Node.js\1033\TypeScriptAzureExpressApp.zip" />
+            </Component>
+            <Component Directory="VWD_PrjTempl_TS_Nodejs_1033" Guid="{91E9EB03-D5A1-4387-9F3A-2B566DA3B0AA}">
+              <File Id="filVWDzipTypeScriptAzureExpressApp.zip" KeyPath="yes" Source="$(var.BinariesDir)\ProjectTemplates\TypeScript\Node.js\1033\TypeScriptAzureExpressApp.zip" />
+              <Condition>VWD_EXTENSION_INSTALLPATH</Condition>
+            </Component>
+
+            <Component Directory="PrjTempl_TS_Nodejs_1033" Guid="{4ACAC2EF-E905-4DEA-BC19-A07CE64C79FD}">
+              <File Id="filzipTypeScriptAzureWebApp.zip" KeyPath="yes" Source="$(var.BinariesDir)\ProjectTemplates\TypeScript\Node.js\1033\TypeScriptAzureWebApp.zip" />
+            </Component>
+            <Component Directory="VWD_PrjTempl_TS_Nodejs_1033" Guid="{C0D7C24D-A1BA-4C7C-A884-E4B87C718EE9}">
+              <File Id="filVWDzipTypeScriptAzureWebApp.zip" KeyPath="yes" Source="$(var.BinariesDir)\ProjectTemplates\TypeScript\Node.js\1033\TypeScriptAzureWebApp.zip" />
+              <Condition>VWD_EXTENSION_INSTALLPATH</Condition>
+            </Component>
+
+            <Component Directory="PrjTempl_TS_Nodejs_1033" Guid="{C02C8F2A-407B-4075-9611-A12F5988D9B1}">
+              <File Id="filzipTypeScriptConsoleApp.zip" KeyPath="yes" Source="$(var.BinariesDir)\ProjectTemplates\TypeScript\Node.js\1033\TypeScriptConsoleApp.zip" />
+            </Component>
+            <Component Directory="VWD_PrjTempl_TS_Nodejs_1033" Guid="{78B3F26E-E7EC-434B-B62D-E6A53418B4DD}">
+              <File Id="filVWDzipTypeScriptConsoleApp.zip" KeyPath="yes" Source="$(var.BinariesDir)\ProjectTemplates\TypeScript\Node.js\1033\TypeScriptConsoleApp.zip" />
+              <Condition>VWD_EXTENSION_INSTALLPATH</Condition>
+            </Component>
+
+            <Component Directory="PrjTempl_TS_Nodejs_1033" Guid="{C2D8AADA-13FD-4E4E-9D9C-EE54F6288CB2}">
+              <File Id="filzipTypeScriptExpressApp.zip" KeyPath="yes" Source="$(var.BinariesDir)\ProjectTemplates\TypeScript\Node.js\1033\TypeScriptExpressApp.zip" />
+            </Component>
+            <Component Directory="VWD_PrjTempl_TS_Nodejs_1033" Guid="{569701D3-4964-441C-928D-CD9401B427B2}">
+              <File Id="filVWDzipTypeScriptExpressApp.zip" KeyPath="yes" Source="$(var.BinariesDir)\ProjectTemplates\TypeScript\Node.js\1033\TypeScriptExpressApp.zip" />
+              <Condition>VWD_EXTENSION_INSTALLPATH</Condition>
+            </Component>
+
+            <Component Directory="PrjTempl_TS_Nodejs_1033" Guid="{44DADC4A-23D2-4769-96E4-4608DAE817D4}">
+              <File Id="filzipTypeScriptWebApp.zip" KeyPath="yes" Source="$(var.BinariesDir)\ProjectTemplates\TypeScript\Node.js\1033\TypeScriptWebApp.zip" />
+            </Component>
+            <Component Directory="VWD_PrjTempl_TS_Nodejs_1033" Guid="{EEFFE4DA-5132-4B89-AD86-BCF10962B74A}">
+              <File Id="filVWDzipTypeScriptWebApp.zip" KeyPath="yes" Source="$(var.BinariesDir)\ProjectTemplates\TypeScript\Node.js\1033\TypeScriptWebApp.zip" />
+              <Condition>VWD_EXTENSION_INSTALLPATH</Condition>
+            </Component>
+            
+            <Component Directory="PrjTempl_TS_Nodejs_1033" Guid="{26B061FD-69AE-4EDD-A346-089B7593FA1C}">
+              <File Id="filTypeScriptFromExistingCode.zip" KeyPath="yes" Source="$(var.BinariesDir)\ProjectTemplates\TypeScript\Node.js\1033\TypeScriptFromExistingCode.zip" />
+            </Component>
+            <Component Directory="VWD_PrjTempl_TS_Nodejs_1033" Guid="{1A46F16F-670E-48F3-AF0D-6F3657862F59}">
+              <File Id="filVWDTypeScriptFromExistingCode.zip" KeyPath="yes" Source="$(var.BinariesDir)\ProjectTemplates\TypeScript\Node.js\1033\TypeScriptFromExistingCode.zip" />
+              <Condition>VWD_EXTENSION_INSTALLPATH</Condition>
+            </Component>
+
+            <!-- New item templates -->
+            
+            <Component Directory="DIR_NewItem" Guid="{007564C3-0035-45B6-8929-E793159D0C72}">
+              <File Id="filTextFile.txt" KeyPath="yes" Source="$(var.BinariesDir)\FileTemplates\NewItem\TextFile.txt" />
+            </Component>
+            <Component Directory="DIR_VWD_NewItem" Guid="{03B54DF8-8FFF-4A79-BEA4-7142D10DAAF1}">
+              <File Id="filVWDTextFile.txt" KeyPath="yes" Source="$(var.BinariesDir)\FileTemplates\NewItem\TextFile.txt" />
+              <Condition>VWD_EXTENSION_INSTALLPATH</Condition>
+            </Component>
+
+            <Component Directory="DIR_NewItem" Guid="{580F274E-4467-48FE-9EDC-80D1E75C1F1D}">
+              <File Id="filNewItems.vsdir" KeyPath="yes" Source="$(var.BinariesDir)\FileTemplates\NewItem\NewItems.vsdir" />
+            </Component>
+            <Component Directory="DIR_VWD_NewItem" Guid="{3D2472E8-9131-4A6A-802D-37CA83240B56}">
+              <File Id="filVWDNewItems.vsdir" KeyPath="yes" Source="$(var.BinariesDir)\FileTemplates\NewItem\NewItems.vsdir" />
+              <Condition>VWD_EXTENSION_INSTALLPATH</Condition>
+            </Component>
+
+            <Component Directory="DIR_NewItem" Guid="{E4B83B18-E5EF-4D95-93A2-557FD1619A25}">
+              <File Id="filEmptyJs.js" KeyPath="yes" Source="$(var.BinariesDir)\FileTemplates\NewItem\EmptyJs.js" />
+            </Component>
+            <Component Directory="DIR_VWD_NewItem" Guid="{DFBC4713-F04B-4C2A-9851-C9446BE9C686}">
+              <File Id="filVWDEmptyJs.js" KeyPath="yes" Source="$(var.BinariesDir)\FileTemplates\NewItem\EmptyJs.js" />
+              <Condition>VWD_EXTENSION_INSTALLPATH</Condition>
+            </Component>
+
+            <Component Directory="DIR_NewItem" Guid="{0CAB0566-88D4-4955-A10B-F1C41F40FA5E}">
+              <File Id="fil_FileTemplates_NewItem_UnitTestJS" KeyPath="yes" Source="$(var.BinariesDir)\FileTemplates\NewItem\UnitTest.js" />
+            </Component>
+            <Component Directory="DIR_VWD_NewItem" Guid="{DFBC4713-F04B-4C2A-9851-C9446BE9C686}">
+              <File Id="filVWD_FileTemplates_NewItem_UnitTestJS" KeyPath="yes" Source="$(var.BinariesDir)\FileTemplates\NewItem\UnitTest.js" />
+              <Condition>VWD_EXTENSION_INSTALLPATH</Condition>
+            </Component>
+
+            <Component Directory="DIR_NewItem" Guid="{09AD25DB-6446-456D-AB91-08ECA025B7D8}">
+              <File Id="fil_FileTemplates_NewItem_EmptyXml" KeyPath="yes" Source="$(var.BinariesDir)\FileTemplates\NewItem\EmptyXml.xml" />
+            </Component>
+            <Component Directory="DIR_VWD_NewItem" Guid="{9F1482A2-D9B0-444A-9FC9-079FEB478570}">
+              <File Id="filVWD_FileTemplates_NewItem_EmptyXml" KeyPath="yes" Source="$(var.BinariesDir)\FileTemplates\NewItem\EmptyXml.xml" />
+              <Condition>VWD_EXTENSION_INSTALLPATH</Condition>
+            </Component>
+
+            <Component Directory="DIR_NewItem" Guid="{7232F039-0E83-40D0-BFCD-243271A591AE}">
+              <File Id="fil_FileTemplates_NewItem_EmptyTs" KeyPath="yes" Source="$(var.BinariesDir)\FileTemplates\NewItem\EmptyTs.ts" />
+            </Component>
+            <Component Directory="DIR_VWD_NewItem" Guid="{03CC9C4C-81E5-40C2-8608-51A7C9F924CC}">
+              <File Id="filVWD_FileTemplates_NewItem_EmptyTs" KeyPath="yes" Source="$(var.BinariesDir)\FileTemplates\NewItem\EmptyTs.ts" />
+              <Condition>VWD_EXTENSION_INSTALLPATH</Condition>
+            </Component>
+
+            <Component Directory="DIR_NewItem" Guid="{BF4D87AF-935E-466C-A461-5991871D7A0A}">
+              <File Id="fil_FileTemplates_NewItem_EmptyStyl" KeyPath="yes" Source="$(var.BinariesDir)\FileTemplates\NewItem\EmptyStyl.styl" />
+            </Component>
+            <Component Directory="DIR_VWD_NewItem" Guid="{EE4E8525-D73D-492D-B592-7396A0075A5E}">
+              <File Id="filVWD_FileTemplates_NewItem_EmptyStyl" KeyPath="yes" Source="$(var.BinariesDir)\FileTemplates\NewItem\EmptyStyl.styl" />
+              <Condition>VWD_EXTENSION_INSTALLPATH</Condition>
+            </Component>
+
+            <Component Directory="DIR_NewItem" Guid="{922969A4-EC20-457F-B96F-662BB0449180}">
+              <File Id="fil_FileTemplates_NewItem_EmptyLess" KeyPath="yes" Source="$(var.BinariesDir)\FileTemplates\NewItem\EmptyLess.less" />
+            </Component>
+            <Component Directory="DIR_VWD_NewItem" Guid="{993A42E3-A00B-4485-8CE9-031322FDF511}">
+              <File Id="filVWD_FileTemplates_NewItem_EmptyLess" KeyPath="yes" Source="$(var.BinariesDir)\FileTemplates\NewItem\EmptyLess.less" />
+              <Condition>VWD_EXTENSION_INSTALLPATH</Condition>
+            </Component>
+
+            <Component Directory="DIR_NewItem" Guid="{44C83C28-DF25-4FBE-85D1-4277EEF837BC}">
+              <File Id="fil_FileTemplates_NewItem_EmptyJson" KeyPath="yes" Source="$(var.BinariesDir)\FileTemplates\NewItem\EmptyJson.json" />
+            </Component>
+            <Component Directory="DIR_VWD_NewItem" Guid="{E226A090-09A2-4003-884D-03B73F6EFA01}">
+              <File Id="filVWD_FileTemplates_NewItem_EmptyJson" KeyPath="yes" Source="$(var.BinariesDir)\FileTemplates\NewItem\EmptyJson.json" />
+              <Condition>VWD_EXTENSION_INSTALLPATH</Condition>
+            </Component>
+
+            <Component Directory="DIR_NewItem" Guid="{008F7188-A3F5-43F7-97AE-390014F4B914}">
+              <File Id="fil_FileTemplates_NewItem_EmptyJade" KeyPath="yes" Source="$(var.BinariesDir)\FileTemplates\NewItem\EmptyJade.jade" />
+            </Component>
+            <Component Directory="DIR_VWD_NewItem" Guid="{7FA3080A-D45A-4663-A359-9E8C9BE5934F}">
+              <File Id="filVWD_FileTemplates_NewItem_EmptyJade" KeyPath="yes" Source="$(var.BinariesDir)\FileTemplates\NewItem\EmptyJade.jade" />
+              <Condition>VWD_EXTENSION_INSTALLPATH</Condition>
+            </Component>
+
+            <Component Directory="DIR_NewItem" Guid="{250138E4-E9F8-406B-AE23-C0BA5BC8742B}">
+              <File Id="fil_FileTemplates_NewItem_EmptyCss" KeyPath="yes" Source="$(var.BinariesDir)\FileTemplates\NewItem\EmptyCss.css" />
+            </Component>
+            <Component Directory="DIR_VWD_NewItem" Guid="{59CF4388-D6F3-49C9-B48A-3C14B525B4D0}">
+              <File Id="filVWD_FileTemplates_NewItem_EmptyCss" KeyPath="yes" Source="$(var.BinariesDir)\FileTemplates\NewItem\EmptyCss.css" />
+              <Condition>VWD_EXTENSION_INSTALLPATH</Condition>
+            </Component>
+
+            <Component Directory="DIR_NewItem" Guid="{8F5B8D76-D07A-454F-9100-9BB892302DC9}">
+              <File Id="fil_FileTemplates_NewItem_EmptyHtml" KeyPath="yes" Source="$(var.BinariesDir)\FileTemplates\NewItem\EmptyHtml.html" />
+            </Component>
+            <Component Directory="DIR_VWD_NewItem" Guid="{3E035CA8-DE11-47C1-A1E9-0C6FEA215DC8}">
+              <File Id="filVWD_FileTemplates_NewItem_EmptyHtml" KeyPath="yes" Source="$(var.BinariesDir)\FileTemplates\NewItem\EmptyHtml.html" />
+              <Condition>VWD_EXTENSION_INSTALLPATH</Condition>
+            </Component>
+          
+            <!-- MSBuild support files -->
+            <Component Directory="Dir_NodejsToolsMsBuild" Guid="{6D84572F-D895-443F-BD25-712394273A4E}">
                 <File Id="filNodejsTools.targets" KeyPath="yes" Source="$(var.BinariesDir)\Microsoft.NodejsTools.targets" />
             </Component>
-            <Component Id="cmpWebRole.dll" Directory="Dir_NodejsToolsMsBuild" Guid="{8E1C6566-4E0C-4F70-8735-081B9521660A}">
+            <Component Directory="Dir_NodejsToolsMsBuild" Guid="{8E1C6566-4E0C-4F70-8735-081B9521660A}">
                 <File Id="filWebRole.dll" KeyPath="yes" Source="$(var.BinariesDir)\Microsoft.NodejsTools.WebRole.dll" />
             </Component>
 
-            <Component Id="cmpDB983944C41346E38BA0413248958C3A" Directory="DIR_NewItem_8C4602C9B0A2476697A95E2BF5B94B53" Guid="{007564C3-0035-45B6-8929-E793159D0C72}">
-              <File Id="fil227A010D0980483B91EC09B5E42613E5" KeyPath="yes" Source="$(var.BinariesDir)\FileTemplates\NewItem\TextFile.txt" />
-            </Component>
-            <Component Id="cmpDF185097F0E246D8B0A178F91D9DBFD9" Directory="DIR_NewItem_8C4602C9B0A2476697A95E2BF5B94B53" Guid="{580F274E-4467-48FE-9EDC-80D1E75C1F1D}">
-              <File Id="filF10B1C2B44E844F9B012351640ADBC65" KeyPath="yes" Source="$(var.BinariesDir)\FileTemplates\NewItem\NewItems.vsdir" />
-            </Component>
-            <Component Id="cmp9608E5E0EB994452A7D3A8856F529C38" Directory="DIR_NewItem_8C4602C9B0A2476697A95E2BF5B94B53" Guid="{E4B83B18-E5EF-4D95-93A2-557FD1619A25}">
-              <File Id="fil0FF05115771C408E8CD4FFA986AF0459" KeyPath="yes" Source="$(var.BinariesDir)\FileTemplates\NewItem\EmptyJs.js" />
-            </Component>
-
-          <!-- WebPI Components -->
-
         </ComponentGroup>
     </Fragment>
-  <!--
-    <Fragment>
-      <DirectoryRef Id="DIR_Templates_ProjectTemplates_EBEE0B4C969248EA90D7CF43A9566C06" />
-    </Fragment>
-    <Fragment>
-      <DirectoryRef Id="DIR_Templates_ProjectTemplates_NodeAppProject_27837B82E64C4599AFADE3E577B2D5B3" />
-    </Fragment>
-    <Fragment>
-      <DirectoryRef Id="DIR_Templates_4DCCAA275A2C4923918F2CBC07199083">
-        <Directory Id="DIR_Templates_ProjectTemplates_EBEE0B4C969248EA90D7CF43A9566C06" Name="ProjectTemplates" />
-      </DirectoryRef>
-    </Fragment>
-    <Fragment>
-      <DirectoryRef Id="DIR_Templates_Projects_EBEE0B4C969248EA90D7CF43A9566C06">
-        <Directory Id="DIR_Templates_Projects_NodeAppProject_27837B82E64C4599AFADE3E577B2D5B3" Name="NodeAppProject" />
-      </DirectoryRef>
-    </Fragment>
-    -->
 </Wix>

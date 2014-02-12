@@ -1,3 +1,5 @@
+.hg
+.hgignore
 Binaries
 Python\TestResults
 VSPackage.xform.resx

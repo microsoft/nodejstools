@@ -17,6 +17,7 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
 using System.Linq;
+using System.Net.NetworkInformation;
 using System.Text;
 using System.Text.RegularExpressions;
 using Microsoft.NodejsTools.Debugger.Serialization;
@@ -66,11 +67,12 @@ namespace Microsoft.NodejsTools.Debugger {
         private bool _handleEntryPointHit;
         private SteppingKind _steppingMode;
         private int _steppingCallstackDepth;
-        private bool _resumingStepping;
         private readonly Dictionary<int, NodeThread> _threads = new Dictionary<int, NodeThread>();
         public readonly int MainThreadId = 1;
         private readonly Dictionary<string, NodeModule> _mapNameToScript = new Dictionary<string, NodeModule>(StringComparer.OrdinalIgnoreCase);
         private readonly Dictionary<int, NodeModule> _mapIdToScript = new Dictionary<int, NodeModule>();
+        private Dictionary<string, JavaScriptSourceMapInfo> _originalFileToSourceMap = new Dictionary<string, JavaScriptSourceMapInfo>(StringComparer.OrdinalIgnoreCase);
+        private Dictionary<string, SourceMap> _generatedFileToSourceMap = new Dictionary<string, SourceMap>(StringComparer.OrdinalIgnoreCase);
         private ExceptionHitTreatment _defaultExceptionTreatment = ExceptionHitTreatment.BreakAlways;
         private Dictionary<string, ExceptionHitTreatment> _exceptionTreatments = GetDefaultExceptionTreatments();
         private Dictionary<int, string> _errorCodes = new Dictionary<int, string>();
@@ -217,10 +219,6 @@ namespace Microsoft.NodejsTools.Debugger {
                 var evaluationResultFactory = new NodeEvaluationResultFactory();
                 ResponseHandler = new NodeResponseHandler(evaluationResultFactory);
             }
-
-            if (Connection == null) {
-                Connection = new NodeConnection();
-            }
         }
 
         public NodeDebugger(
@@ -233,7 +231,17 @@ namespace Microsoft.NodejsTools.Debugger {
             List<string[]> dirMapping,
             bool createNodeWindow = true) : this() {
 
-            string allArgs = "--debug-brk " + script;
+            var activeConnections =
+                from listener in IPGlobalProperties.GetIPGlobalProperties().GetActiveTcpListeners()
+                select listener.Port;
+            ushort debugPort = 5858;
+            if (activeConnections.Contains(debugPort)) {
+                debugPort = (ushort)Enumerable.Range(new Random().Next(5859, 6000), 60000).Except(activeConnections).First();
+            }
+
+            Connection = new NodeConnection(debugPort);
+
+            var allArgs = String.Format("--debug-brk={0} {1}", debugPort, script);
             if (!string.IsNullOrEmpty(interpreterOptions)) {
                 allArgs += " " + interpreterOptions;
             }
@@ -380,22 +388,23 @@ namespace Microsoft.NodejsTools.Debugger {
             Continue(SteppingKind.None);
         }
 
-        private void Continue(SteppingKind steppingKind, bool resetSteppingMode = true) {
+        private void Continue(SteppingKind steppingKind, bool resetSteppingMode = true, int stepCount = 1) {
             if (resetSteppingMode) {
                 _steppingMode = steppingKind;
-                _steppingCallstackDepth = MainThread.Frames.Count();
-                _resumingStepping = false;
+                _steppingCallstackDepth = MainThread.CallstackDepth;
             }
             Dictionary<string, object> args = null;
             switch (steppingKind) {
                 case SteppingKind.Over:
-                    args = new Dictionary<string, object> { { "stepaction", "next" } };
+                    Debug.Assert(stepCount == 1);
+                    args = new Dictionary<string, object> { { "stepaction", "next" }, {"stepcount", stepCount } };
                     break;
                 case SteppingKind.Into:
-                    args = new Dictionary<string, object> { { "stepaction", "in" } };
+                    Debug.Assert(stepCount == 1);
+                    args = new Dictionary<string, object> { { "stepaction", "in" }, { "stepcount", stepCount } };
                     break;
                 case SteppingKind.Out:
-                    args = new Dictionary<string, object> { { "stepaction", "out" } };
+                    args = new Dictionary<string, object> { { "stepaction", "out" }, { "stepcount", stepCount } };
                     break;
                 default:
                     break;
@@ -418,83 +427,104 @@ namespace Microsoft.NodejsTools.Debugger {
                 });
         }
 
-        private void AutoResume(bool needBacktrace = false) {
-            // Continue stepping, if stepping
-            if (_steppingMode != SteppingKind.None) {
-                if (needBacktrace) {
-                    // Get backtrace
-                    // Doing this here avoids doing a backtrace for all auto resumes
-                    PerformBacktrace((running) => {
-                        // Handle followup
-                        _resumingStepping = true;
-                        CompleteStepping();
-                    });
-                    return;
-                }
-
-                // Have backtrace
-                _resumingStepping = true;
-                CompleteStepping();
+        private void AutoResume(bool haveCallstack) {
+            // Simply continue, if not stepping
+            if (_steppingMode == SteppingKind.None) {
+                Continue();
                 return;
             }
 
-            // Fall back to continue, without stepping
-            Continue();
+            AutoResumeStepping(haveCallstack);
+        }
+        private void AutoResumeStepping(bool haveCallstack) {
+            if (!haveCallstack) {
+                // Don't have callstack, so get callstack depth from server
+                // Doing this avoids doing a full backtrace for all auto resumes
+                GetCallstackDepth((callstackDepth) => {
+                    // Handle followup
+                    AutoResumeStepping(callstackDepth, haveCallstack);
+                });
+                return;
+            }
+
+            // Have callstack, so get callstack depth from it
+            AutoResumeStepping(MainThread.CallstackDepth, haveCallstack);
+        }
+
+        private void AutoResumeStepping(int callstackDepth, bool haveCallstack) {
+            switch (_steppingMode) {
+                case SteppingKind.Over:
+                    var stepCount = callstackDepth - _steppingCallstackDepth;
+                    if (stepCount > 0) {
+                        // Stepping over autoresumed break (in nested frame)
+                        Continue(SteppingKind.Out, resetSteppingMode: false, stepCount: stepCount);
+                        return;
+                    }
+                    break;
+                case SteppingKind.Out:
+                    stepCount = callstackDepth - _steppingCallstackDepth + 1;
+                    if (stepCount > 0) {
+                        // Stepping out across autoresumed break (in nested frame)
+                        Continue(SteppingKind.Out, resetSteppingMode: false, stepCount: stepCount);
+                        return;
+                    }
+                    break;
+                case SteppingKind.Into:
+                    // Stepping into or to autoresumed break
+                    break;
+                default:
+                    Debug.WriteLine(String.Format("Unexpected SteppingMode: {0}", _steppingMode));
+                    break;
+            }
+
+            CompleteStepping(haveCallstack);
+        }
+
+        private void CompleteStepping(bool haveCallstack) {
+            // Ensure we have callstack
+            if (!haveCallstack) {
+                PerformBacktrace(
+                    (running) => {
+                        Debug.Assert(!running);
+                        CompleteStepping();
+                    }
+                );
+            } else {
+                CompleteStepping();
+            }
         }
 
         private void CompleteStepping() {
-            if (_resumingStepping) {
-                switch (_steppingMode) {
-                    // Stepping over or to tracepoint
-                    case SteppingKind.Over:
-                        if (MainThread.Frames.Count() > _steppingCallstackDepth) {
-                            // Stepping over traceport (in nested frame)
-                            Continue(SteppingKind.Out, resetSteppingMode: false);
-                            return;
-                        }
-                        break;
-                    // Stepping into or to tracepoint
-                    case SteppingKind.Into:
-                        break;
-                    // Stepping out accross or to tracepoint
-                    case SteppingKind.Out:
-                        if ((MainThread.Frames.Count() + 1) > _steppingCallstackDepth) {
-                            // Stepping out accross tracepoint (in nested frame)
-                            Continue(SteppingKind.Out, resetSteppingMode: false);
-                            return;
-                        }
-                        break;
-                    default:
-                        Debug.WriteLine(String.Format("Unexpected SteppingMode: {0}", _steppingMode));
-                        break;
-                }
-            }
-
             var stepComplete = StepComplete;
             if (stepComplete != null) {
                 stepComplete(this, new ThreadEventArgs(MainThread));
             }
         }
 
-        public bool StoppedForException {
-            get {
-                // TODO: Implement me
-                return false;
-            }
-        }
-
+        /// <summary>
+        /// Adds a breakpoint in the specified file.  
+        /// 
+        /// Line number is 1 based
+        /// </summary>
         public NodeBreakpoint AddBreakPoint(
-            string fileName,
-            int lineNo,
+            string requestedFileName,
+            int requestedLineNo,
             bool enabled = true,
             BreakOn breakOn = new BreakOn(),
             string condition = null
             ) {
+            string fileName;
+            int lineNo;
+
+            MapToJavaScript(requestedFileName, requestedLineNo - 1, out fileName, out lineNo);
+            lineNo++;
             var res =
                 new NodeBreakpoint(
                     this,
                     fileName,
+                    requestedFileName,
                     lineNo,
+                    requestedLineNo,
                     enabled,
                     breakOn,
                     condition
@@ -638,7 +668,7 @@ namespace Microsoft.NodejsTools.Debugger {
                 NodeModule module;
                 if (!_mapNameToScript.TryGetValue(name, out module)) {
                     int id = (int)script["id"];
-                    module = new NodeModule(id, name);
+                    module = new NodeModule(this, id, name);
                     _mapNameToScript[name] = module;
                     _mapIdToScript[id] = module;
                     var modLoad = ModuleLoaded;
@@ -745,33 +775,26 @@ namespace Microsoft.NodejsTools.Debugger {
                 }
             }
 
-            // We need to get the backtrace to derive whether to break,
-            // and/or to fire the appropriate events for the break
-            PerformBacktrace(
-                (running) => {
-                    Debug.Assert(!running);
-
-                    // Process break for breakpoint bindings, if any
-                    ProcessBreak(
-                        breakpointBindings,
-                        noBreakpointsHitHandler:
-                            () => {
-                                // Fall back to auto resume, when no breakpoints hit
-                                AutoResume();
-                            }
-                    );
-                }
-            );
-
-        }
-
-        private void ProcessBreak(List<NodeBreakpointBinding> breakpointBindings, Action noBreakpointsHitHandler, bool testFullyBound = false) {
-            // Handle step complete break
+            // Complete stepping, if no breakpoint bindings
             if (breakpointBindings == null) {
-                CompleteStepping();
+                CompleteStepping(haveCallstack: false);
                 return;
             }
 
+            // Process break for breakpoint bindings, if any
+            ProcessBreakpointBreak(
+                breakpointBindings,
+                noBreakpointsHitHandler:
+                    () => {
+                        // Fall back to auto resume, when no breakpoints hit
+                        AutoResume(haveCallstack: false);
+                    },
+                    haveCallstack: false,
+                    testFullyBound: false
+            );
+        }
+
+        private void ProcessBreakpointBreak(List<NodeBreakpointBinding> breakpointBindings, Action noBreakpointsHitHandler, bool haveCallstack, bool testFullyBound) {
             // Handle breakpoint(s) but no matching binding(s)
             // Indicated by non-null but empty breakpoint bindings collection
             var bindingsToProcess = breakpointBindings.Count;
@@ -793,14 +816,14 @@ namespace Microsoft.NodejsTools.Debugger {
                         if (hitBindings.Count > 0) {
                             // Fire breakpoint hit event(s)
                             var breakpointHit = BreakpointHit;
-                            foreach (var hitBinding in hitBindings) {
-                                hitBinding.ProcessBreakpointHit(
-                                    () => {
-                                        if (breakpointHit != null) {
+                            if (breakpointHit != null) {
+                                foreach (var hitBinding in hitBindings) {
+                                    hitBinding.ProcessBreakpointHit(
+                                        () => {
                                             breakpointHit(this, new BreakpointHitEventArgs(hitBinding, MainThread));
                                         }
-                                    }
-                                );
+                                    );
+                                }
                             }
                         } else {
                             // No breakpoints hit
@@ -809,8 +832,22 @@ namespace Microsoft.NodejsTools.Debugger {
                     }
                 };
 
+            // Process breakpoint bindings, ensuring we have callstack
+            if (!haveCallstack) {
+                PerformBacktrace(
+                    (running) => {
+                        Debug.Assert(!running);
+                        ProcessBreakpointBindings(breakpointBindings, processBinding, testFullyBound);
+                    }
+                );
+            } else {
+                ProcessBreakpointBindings(breakpointBindings, processBinding, testFullyBound);
+            }
+        }
+
+        private void ProcessBreakpointBindings(List<NodeBreakpointBinding> breakpointBindings, Action<NodeBreakpointBinding> processBinding, bool testFullyBound) {
             // Iterate over breakpoint bindings, processing them as fully bound or not
-            var currentLineNo = MainThread.Frames[0].LineNo;
+            var currentLineNo = MainThread.TopStackFrame.LineNo;
             foreach (var breakpointBinding in breakpointBindings) {
                 // Handle normal (fully bound) breakpoint binding
                 if (breakpointBinding.FullyBound) {
@@ -911,7 +948,7 @@ namespace Microsoft.NodejsTools.Debugger {
                 exceptionTreatment = _defaultExceptionTreatment;
             }
             if (exceptionTreatment == ExceptionHitTreatment.BreakNever) {
-                AutoResume(needBacktrace: true);
+                AutoResume(haveCallstack: false);
                 return;
             }
 
@@ -961,10 +998,38 @@ namespace Microsoft.NodejsTools.Debugger {
             return name;
         }
 
-        private void PerformBacktrace(Action<bool> followupHandler) {
+        private void GetCallstackDepth(Action<int> followupHandler) {
             Connection.SendRequest(
                 "backtrace",
-                new Dictionary<string, object> { { "inlineRefs", true } },
+                new Dictionary<string, object> {
+                    { "fromFrame", 0 },
+                    { "toFrame", 1 },
+                    { "inlineRefs", true }
+                },
+                successHandler:
+                    json => {
+                        var body = (Dictionary<string, object>)json["body"];
+                        var callstackDepth = (int)body["totalFrames"];
+                        followupHandler(callstackDepth);
+                    }
+                );
+        }
+
+        private void PerformBacktrace(Action<bool> followupHandler) {
+            // CONSIDER:  Lazy population of callstacks
+            // Given the VS Debugger UI always asks for full callstacks, we always ask Node.js for full backtraces.
+            // Given the nature or Node.js code, deep callstacks are expected to be rare.
+            // Although according to the V8 docs (http://code.google.com/p/v8/wiki/DebuggerProtocol) the 'backtrace'
+            // request takes a 'bottom' parameter, empirically, Node.js fails requests with it set.  Here we
+            // approximate 'bottom' for 'toFrame' using int.MaxValue.  Node.js silently handles toFrame depths
+            // greater than the current callstack.
+            Connection.SendRequest(
+                "backtrace",
+                new Dictionary<string, object> {
+                    { "fromFrame", 0 },
+                    { "toFrame", int.MaxValue },
+                    { "inlineRefs", true }
+                },
                 successHandler:
                     json => {
                         var running = (bool)json["running"];
@@ -1099,7 +1164,7 @@ namespace Microsoft.NodejsTools.Debugger {
 
                 // Handle breakpoint binding at entrypoint
                 // Attempt to fire breakpoint hit event without actually resuming
-                var topFrame = MainThread.Frames.First();
+                var topFrame = MainThread.TopStackFrame;
                 var breakLineNo = topFrame.LineNo;
                 var breakFileName = topFrame.FileName.ToLower();
                 var breakModule = GetModuleForFilePath(breakFileName);
@@ -1112,7 +1177,7 @@ namespace Microsoft.NodejsTools.Debugger {
                 if (breakpointBindings.Count > 0) {
                     // Delegate to ProcessBreak() which knows how to correctly
                     // fire breakpoint hit events for given breakpoint bindings and current backtrace
-                    ProcessBreak(
+                    ProcessBreakpointBreak(
                         breakpointBindings,
                         noBreakpointsHitHandler:
                             () => {
@@ -1121,6 +1186,7 @@ namespace Microsoft.NodejsTools.Debugger {
                                 // SDM will auto-resume on entrypoint hit for F5 launch, but not for F10/F11 launch
                                 HandleEntryPointHit();
                             },
+                        haveCallstack: true,
                         testFullyBound: true
                     );
                     return;
@@ -1144,7 +1210,7 @@ namespace Microsoft.NodejsTools.Debugger {
             }
 
             // Handle tracepoint (auto-resumed "when hit" breakpoint) resume during stepping
-            AutoResume();
+            AutoResume(haveCallstack: true);
         }
 
         private bool HandleEntryPointHit() {
@@ -1642,5 +1708,113 @@ namespace Microsoft.NodejsTools.Debugger {
             );
         }
 
+        #region Source Map Support
+
+        /// <summary>
+        /// Maps a line number from the original code to the generated JavaScript.
+        /// 
+        /// Line numbers are zero based.
+        /// </summary>
+        internal void MapToJavaScript(string requestedFileName, int requestedLineNo, out string fileName, out int lineNo) {
+            fileName = requestedFileName;
+            lineNo = requestedLineNo;
+            SourceMap sourceMap = GetSourceMap(requestedFileName);
+
+            if (sourceMap != null) {
+                SourceMapping result;
+                if (sourceMap.TryMapPointBack(requestedLineNo, 0, out result)) {
+                    lineNo = result.Line;
+                    fileName = Path.Combine(Path.GetDirectoryName(fileName), result.FileName);
+                    Debug.WriteLine("Mapped breakpoint from {0} {1} to {2} {3}", requestedFileName, requestedLineNo, fileName, lineNo);
+                }
+            }
+        }
+
+        class JavaScriptSourceMapInfo {
+            public readonly string[] Lines;
+            public readonly SourceMap Map;
+
+            public JavaScriptSourceMapInfo(SourceMap map, string[] lines) {
+                Map = map;
+                Lines = lines;
+            }
+        }
+
+        /// <summary>
+        /// Gets a source mapping for the given filename.  Line numbers are zero based.
+        /// </summary>
+        internal SourceMapping MapToOriginal(string filename, int line) {
+            JavaScriptSourceMapInfo mapInfo;
+            if (!_originalFileToSourceMap.TryGetValue(filename, out mapInfo)) {
+                if (File.Exists(filename)) {
+                    var contents = File.ReadAllLines(filename);
+                    const string marker = "# sourceMappingURL=";
+                    int markerStart;
+                    var markerLine = contents.Reverse().FirstOrDefault(x => x.IndexOf(marker) != -1);
+                    if (markerLine != null && (markerStart = markerLine.IndexOf(marker)) != -1) {
+                        string sourceMapFilename = markerLine.Substring(markerStart + marker.Length).Trim();
+                        if (!File.Exists(sourceMapFilename)) {
+                            sourceMapFilename = Path.Combine(Path.GetDirectoryName(filename), Path.GetFileName(sourceMapFilename));
+                        }
+
+                        if (File.Exists(sourceMapFilename)) {
+                            try {
+                                _originalFileToSourceMap[filename] = mapInfo = new JavaScriptSourceMapInfo(new SourceMap(new StreamReader(sourceMapFilename)), contents);
+                            } catch (InvalidOperationException) {
+                                _originalFileToSourceMap[filename] = null;
+                            } catch (NotSupportedException) {
+                                _originalFileToSourceMap[filename] = null;
+                            }
+                        }
+                    }
+                }
+            }
+            if (mapInfo != null) {
+                SourceMapping mapping;
+                int column = 0;
+                if (line < mapInfo.Lines.Length) {
+                    var lineText = mapInfo.Lines[line];
+                    // map to the 1st non-whitespace character on the line
+                    // This ensures we get the correct line number, mapping to column 0
+                    // can give us the previous line.
+                    if (!String.IsNullOrWhiteSpace(lineText)) {
+                        for (; column < lineText.Length; column++) {
+                            if (!Char.IsWhiteSpace(lineText[column])) {
+                                break;
+                            }
+                        }
+                    }
+                }
+                if (mapInfo.Map.TryMapPoint(line, column, out mapping)) {
+                    return mapping;
+                }
+            }
+            return null;
+        }
+
+        private SourceMap GetSourceMap(string fileName) {
+            SourceMap sourceMap;
+            if (!_generatedFileToSourceMap.TryGetValue(fileName, out sourceMap)) {
+                // see if we are using source maps for this file.
+                if (!String.Equals(Path.GetExtension(fileName), NodejsConstants.FileExtension, StringComparison.OrdinalIgnoreCase)) {
+                    string baseFile = fileName.Substring(0, fileName.Length - Path.GetExtension(fileName).Length);
+                    if (File.Exists(baseFile + ".js") && File.Exists(baseFile + ".js.map")) {
+                        // we're using source maps...
+                        try {
+                            _generatedFileToSourceMap[fileName] = sourceMap = new SourceMap(new StreamReader(baseFile + ".js.map"));
+                        } catch (NotSupportedException) {
+                            _generatedFileToSourceMap[fileName] = null;
+                        } catch (InvalidOperationException) {
+                            _generatedFileToSourceMap[fileName] = null;
+                        }
+                    } else {
+                        _generatedFileToSourceMap[fileName] = null;
+                    }
+                }
+            }
+            return sourceMap;
+        }
+
+        #endregion
     }
 }

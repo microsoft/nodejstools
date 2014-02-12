@@ -49,7 +49,15 @@ namespace Microsoft.Nodejs.Tests.UI {
                 var openFile = OpenProjectItem("server.js", out window);
 
                 openFile.MoveCaret(7, 1);
-                Keyboard.Type("functio\t");
+                
+                // we need to ensure the snippets are initialized by starting
+                // and dismissing an intellisense session.
+                Keyboard.Type(Keyboard.CtrlSpace.ToString());
+                Keyboard.PressAndRelease(System.Windows.Input.Key.Escape);
+
+                Keyboard.Type("functio");
+                System.Threading.Thread.Sleep(2000);
+                Keyboard.Type("\t");
                 openFile.WaitForText(@"var http = require('http');
 
 var port = process.env.port || 1337;
@@ -159,16 +167,19 @@ http.createServer(function (req, res) {
         [TestMethod, Priority(0), TestCategory("Core")]
         [HostType("TC Dynamic"), DynamicHostType(typeof(VsIdeHostAdapter))]
         public void GlobalIntellisense() {
-            Window window;
-            var openFile = OpenProjectItem("server.js", out window);
+            using (var app = new VisualStudioApp(VsIdeTestHostContext.Dte)) {
+                Window window;
+                var openFile = OpenProjectItem("server.js", out window);
 
-            openFile.MoveCaret(6, 1);
-            Keyboard.Type("process.");
-            using (var session = openFile.WaitForSession<ICompletionSession>()) {
+                openFile.MoveCaret(6, 1);
 
-                var completions = session.Session.CompletionSets.First().Completions.Select(x => x.InsertionText);
-                Assert.IsTrue(completions.Contains("abort"));
-                Assert.IsTrue(completions.Contains("chdir"));
+                Keyboard.Type("process.");
+                using (var session = openFile.WaitForSession<ICompletionSession>()) {
+
+                    var completions = session.Session.CompletionSets.First().Completions.Select(x => x.InsertionText);
+                    Assert.IsTrue(completions.Contains("abort"));
+                    Assert.IsTrue(completions.Contains("chdir"));
+                }
             }
         }
 
@@ -193,6 +204,7 @@ http.createServer(function (req, res) {
                 new { File="server.js", Line = 48, Type = "nested.", Expected = "__filename" },
                 new { File="server.js", Line = 54, Type = "indexfolder.", Expected = "indexfolder" },
                 new { File="server.js", Line = 56, Type = "indexfolder2.", Expected = "indexfolder" },
+                new { File="server.js", Line = 60, Type = "resolve_path.", Expected = "indexfolder" },
 
                 new { File="node_modules\\mymod.js", Line = 5, Type = "dup.", Expected = "node_modules_dup" },
                 new { File="node_modules\\mymod.js", Line = 8, Type = "dup0.", Expected = "node_modules_dup" },
@@ -252,55 +264,51 @@ http.createServer(function (req, res) {
         [HostType("TC Dynamic"), DynamicHostType(typeof(VsIdeHostAdapter))]
         public void GlobalIntellisenseProjectReload() {
             Window window;
-            try {
-                using (var app = new VisualStudioApp(VsIdeTestHostContext.Dte)) {
-                    app.OpenProject(Path.GetFullPath(@"TestData\NodeAppWithModule\NodeAppWithModule.sln"));
+            using (var app = new VisualStudioApp(VsIdeTestHostContext.Dte)) {
+                app.OpenProject(Path.GetFullPath(@"TestData\NodeAppWithModule2\NodeAppWithModule.sln"));
 
-                    var projectName = "NodeAppWithModule";
-                    var project = app.SolutionExplorerTreeView.WaitForItem(
-                        "Solution '" + projectName + "' (1 project)",
-                        projectName);
+                var projectName = "NodeAppWithModule";
+                var project = app.SolutionExplorerTreeView.WaitForItem(
+                    "Solution '" + projectName + "' (1 project)",
+                    projectName);
 
+                var projectNode = new TreeNode(project);
+                projectNode.SetFocus();
 
-                    var projectNode = new TreeNode(project);
-                    projectNode.SetFocus();
+                System.Threading.Thread.Sleep(2000);
 
-                    System.Threading.Thread.Sleep(2000);
-                    VsIdeTestHostContext.Dte.ExecuteCommand("Project.UnloadProject");
+                VsIdeTestHostContext.Dte.ExecuteCommand("Project.UnloadProject");
 
-                    project = app.SolutionExplorerTreeView.WaitForItem(
-                        "Solution '" + projectName + "' (0 projects)",
-                        projectName + " (unavailable)");
+                project = app.SolutionExplorerTreeView.WaitForItem(
+                    "Solution '" + projectName + "' (0 projects)",
+                    projectName + " (unavailable)");
 
-                    projectNode = new TreeNode(project);
-                    projectNode.SetFocus();
+                projectNode = new TreeNode(project);
+                projectNode.Select();
 
-                    System.Threading.Thread.Sleep(2000);
+                System.Threading.Thread.Sleep(2000);
 
-                    VsIdeTestHostContext.Dte.ExecuteCommand("Project.ReloadProject");
+                VsIdeTestHostContext.Dte.ExecuteCommand("Project.ReloadProject");
 
+                Assert.IsNotNull(
                     app.SolutionExplorerTreeView.WaitForItem(
                         "Solution '" + projectName + "' (1 project)",
                         projectName,
                         "server.js"
-                    );
+                    ),
+                    "project not reloaded"
+                );
 
-                    var openFile = OpenItem("server.js", VsIdeTestHostContext.Dte.Solution.Projects.Item(1), out window);
+                var openFile = OpenItem("server.js", VsIdeTestHostContext.Dte.Solution.Projects.Item(1), out window);
 
-                    openFile.MoveCaret(6, 1);
-                    Keyboard.Type("process.");
-                    using (var session = openFile.WaitForSession<ICompletionSession>()) {
+                openFile.MoveCaret(6, 1);
+                Keyboard.Type("process.");
+                using (var session = openFile.WaitForSession<ICompletionSession>()) {
 
-                        var completions = session.Session.CompletionSets.First().Completions.Select(x => x.InsertionText);
-                        Assert.IsTrue(completions.Contains("abort"));
-                        Assert.IsTrue(completions.Contains("chdir"));
-                    }
+                    var completions = session.Session.CompletionSets.First().Completions.Select(x => x.InsertionText);
+                    Assert.IsTrue(completions.Contains("abort"));
+                    Assert.IsTrue(completions.Contains("chdir"));
                 }
-            } finally {
-                // if the test fails while the project is unloaded then the .suo file will 
-                // indicate that the project shouldn't be loaded which will cause tests
-                // which are using the same project to fail later during the run.
-                File.Delete(Path.GetFullPath(@"TestData\NodeAppWithModule\NodeAppWithModule.v" + AssemblyVersionInfo.VSMajorVersion + ".suo"));
             }
         }
 

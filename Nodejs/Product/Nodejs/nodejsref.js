@@ -2875,6 +2875,25 @@ require = function () {
                     /// <signature>
                     /// <param name="p"></param>
                     /// </signature>
+
+                    var parts = p.replace(/\\/g, '/').split('/');
+                    var res = [];
+                    for(var part = 0; part<parts.length; part++) {    
+                        var partText = parts[part];
+
+                        if ((partText == '' && part != 0)|| partText == '.') {
+                            continue;
+                        } else if(partText == '..' && res.length > 0) {
+                            res.splice(res.length - 1, 1);
+                        } else {
+                            res[res.length] = partText;
+                        }
+                    }
+                    var normalized = res.join('\\');
+                    if(p[p.length - 1] == '/' || p[p.length - 1] == '\\') {
+                        normalized += '\\';
+                    }
+                    return normalized;
                 }
                 this.join = function(path1, path2) {
                     /// <summary><p>Join all arguments together and normalize the resulting path.&#10;&#10;</p>&#10;<p>Arguments must be strings.  In v0.8, non-string arguments were&#10;silently ignored.  In v0.10 and up, an exception is thrown.&#10;&#10;</p>&#10;<p>Example:&#10;&#10;</p>&#10;<pre><code>path.join(&#39;/foo&#39;, &#39;bar&#39;, &#39;baz/asdf&#39;, &#39;quux&#39;, &#39;..&#39;)&#10;// returns&#10;&#39;/foo/bar/baz/asdf&#39;&#10;&#10;path.join(&#39;foo&#39;, {}, &#39;bar&#39;)&#10;// throws exception&#10;TypeError: Arguments to path.join must be strings</code></pre>&#10;</summary>
@@ -2883,6 +2902,15 @@ require = function () {
                     /// <param name="path2"></param>
                     /// <param name="..."></param>
                     /// </signature>
+    
+                    var args = Array.prototype.slice.call(arguments);
+                    for (var i = 0; i<args.length; i++) {
+                        if (args[i] == '') {
+                            args.splice(i, 1);
+                        }
+                    }
+                    return this.normalize(args.join('//'));
+
                 }
                 this.resolve = function(from, to) {
                     /// <summary><p>Resolves <code>to</code> to an absolute path.&#10;&#10;</p>&#10;<p>If <code>to</code> isn&#39;t already absolute <code>from</code> arguments are prepended in right to left&#10;order, until an absolute path is found. If after using all <code>from</code> paths still&#10;no absolute path is found, the current working directory is used as well. The&#10;resulting path is normalized, and trailing slashes are removed unless the path&#10;gets resolved to the root directory. Non-string arguments are ignored.&#10;&#10;</p>&#10;<p>Another way to think of it is as a sequence of <code>cd</code> commands in a shell.&#10;&#10;</p>&#10;<pre><code>path.resolve(&#39;foo/bar&#39;, &#39;/tmp/file/&#39;, &#39;..&#39;, &#39;a/../subfile&#39;)</code></pre>&#10;<p>Is similar to:&#10;&#10;</p>&#10;<pre><code>cd foo/bar&#10;cd /tmp/file/&#10;cd ..&#10;cd a/../subfile&#10;pwd</code></pre>&#10;<p>The difference is that the different paths don&#39;t need to exist and may also be&#10;files.&#10;&#10;</p>&#10;<p>Examples:&#10;&#10;</p>&#10;<pre><code>path.resolve(&#39;/foo/bar&#39;, &#39;./baz&#39;)&#10;// returns&#10;&#39;/foo/bar/baz&#39;&#10;&#10;path.resolve(&#39;/foo/bar&#39;, &#39;/tmp/file/&#39;)&#10;// returns&#10;&#39;/tmp/file&#39;&#10;&#10;path.resolve(&#39;wwwroot&#39;, &#39;static_files/png/&#39;, &#39;../gif/image.gif&#39;)&#10;// if currently in /home/myself/node, it returns&#10;&#39;/home/myself/node/wwwroot/static_files/gif/image.gif&#39;</code></pre>&#10;</summary>
@@ -2890,6 +2918,22 @@ require = function () {
                     /// <param name="from ..."></param>
                     /// <param name="to"></param>
                     /// </signature>
+
+                    var realTo = '';
+                    for(var i = arguments.length - 1; i>= 0; i--) {
+                        realTo = this.join(arguments[i], realTo);
+                        if(realTo[0] == '/' || realTo[0] == '\\') {
+                            // relative to drive which is available via __dirname
+                            return __dirname.substr(0, 2) + realTo;
+                        } else if((realTo[0].toUpperCase() >= 'A' && realTo[0].toUpperCase() <= 'Z')  && 
+                                  realTo[1] == ':' &&
+                                  (realTo[2] == '\\' || realTo[2] == '/')) {
+                            // absolute path
+                            return realTo;
+                        }
+                    }
+                    var res = this.join(__dirname, realTo);
+                    return res;
                 }
                 this.relative = function(from, to) {
                     /// <summary><p>Solve the relative path from <code>from</code> to <code>to</code>.&#10;&#10;</p>&#10;<p>At times we have two absolute paths, and we need to derive the relative&#10;path from one to the other.  This is actually the reverse transform of&#10;<code>path.resolve</code>, which means we see that:&#10;&#10;</p>&#10;<pre><code>path.resolve(from, path.relative(from, to)) == path.resolve(to)</code></pre>&#10;<p>Examples:&#10;&#10;</p>&#10;<pre><code>path.relative(&#39;C:\\orandea\\test\\aaa&#39;, &#39;C:\\orandea\\impl\\bbb&#39;)&#10;// returns&#10;&#39;..\\..\\impl\\bbb&#39;&#10;&#10;path.relative(&#39;/data/orandea/test/aaa&#39;, &#39;/data/orandea/impl/bbb&#39;)&#10;// returns&#10;&#39;../../impl/bbb&#39;</code></pre>&#10;</summary>
@@ -2897,6 +2941,80 @@ require = function () {
                     /// <param name="from"></param>
                     /// <param name="to"></param>
                     /// </signature>
+    
+                    // switch to forward slashes
+                    from = from.replace(/\\/g, '/');
+                    to = to.replace(/\\/g, '/');
+                    function fix_return(inp) {
+                        if(inp[inp.length - 1] == '/') {
+                            inp = inp.substr(0, inp.length - 1);
+                        }
+                        return inp.replace(/\//g, '\\');;
+                    }
+
+                    // fixup drive letters like Node
+                    if(from[1] == ':') {
+                        if(to[1] == ':') {
+                            if(from[0].toLowerCase() != to[0].toLowerCase()) {
+                                if(to[2] != '/') {
+                                    to = __dirname.replace(/\\/g, '/') + '/' + to.substr(2);
+                                }
+                                // fully qualified on different drives
+                                return fix_return(to);
+                            }
+                            if(to[2] != '/') {
+                                to = __dirname.replace(/\\/g, '/') + '/' + to.substr(2);
+                            }
+                        } else {
+                            if(to[0] != '/') {
+                                to = '/' + to;
+                            }
+                            to = __dirname.substr(0, 2) + to;
+                        }
+
+                        if(from[2] != '/' && from[0] == __dirname[0]) {
+                            from = __dirname.replace(/\\/g, '/') + '/' + from.substr(2);
+                        }
+                    } else if(to[1] == ':') {
+                        from = __dirname.substr(0, 2) + from;
+                        if(to[2] != '/') {
+                            to = __dirname.replace(/\\/g, '/') + '/' + to.substr(2);
+                        }
+                    }
+
+                    // normalize path endings
+                    if(from[from.length - 1] != '/') {
+                        from += '/';
+                    }
+                    if(to[to.length - 1] != '/') {
+                        to += '/';
+                    }    
+
+                    // compare the paths
+                    var i, si = -1;
+                    for(i = 0; i<from.length && i < to.length; i++) {
+                        if(from[i].toLowerCase() != to[i].toLowerCase()) {
+                            break;
+                        } else if(from[i] == '/') {
+                            si = i;
+                        }
+                    }
+                    if(si == -1 && to[1] == ':') {
+                        return fix_return(to);
+                    } else if(i == from.length && i == to.length) {
+                        return '';
+                    }
+                    var res = '';
+                    for(; i<from.length; i++) {
+                        if(from[i] == '/') {
+                            res += '../';
+                        }
+                    }
+                    if(res.length == 0 && to.length - 1 == si) {
+                        return './';
+                    }
+                    return fix_return(res + to.substr(si + 1));
+
                 }
                 this.dirname = function(p) {
                     /// <summary><p>Return the directory name of a path.  Similar to the Unix <code>dirname</code> command.&#10;&#10;</p>&#10;<p>Example:&#10;&#10;</p>&#10;<pre><code>path.dirname(&#39;/foo/bar/baz/asdf/quux&#39;)&#10;// returns&#10;&#39;/foo/bar/baz/asdf&#39;</code></pre>&#10;</summary>
@@ -4894,6 +5012,7 @@ require = function () {
         }
     }
     var f = function(module) { 
+        module = module.replace(/\\/g, '/');
         if(require_count++ >= 50) {
             require_count = 0;
             intellisense.progress();
@@ -4926,7 +5045,7 @@ require = function () {
     o.__proto__ = f.__proto__;
     f.__proto__ = o;
     return f;
-}()var console = new function __console() {
+}();var console = new function __console() {
     /// <summary><p>For printing to stdout and stderr.  Similar to the console object functions&#10;provided by most web browsers, here the output is sent to stdout or stderr.&#10;&#10;</p>&#10;<p>The console functions are synchronous when the destination is a terminal or&#10;a file (to avoid lost messages in case of premature exit) and asynchronous&#10;when it&#39;s a pipe (to avoid blocking for long periods of time).&#10;&#10;</p>&#10;<p>That is, in the following example, stdout is non-blocking while stderr&#10;is blocking:&#10;&#10;</p>&#10;<pre><code>$ node script.js 2&gt; error.log | tee info.log</code></pre>&#10;<p>In daily use, the blocking/non-blocking dichotomy is not something you&#10;should worry about unless you log huge amounts of data.&#10;&#10;&#10;</p>&#10;</summary>
     this.log = function(data) {
         /// <summary><p>Prints to stdout with newline. This function can take multiple arguments in a&#10;<code>printf()</code>-like way. Example:&#10;&#10;</p>&#10;<pre><code>console.log(&#39;count: %d&#39;, count);</code></pre>&#10;<p>If formatting elements are not found in the first string then <code>util.inspect</code>&#10;is used on each argument.  See [util.format()][] for more information.&#10;&#10;</p>&#10;</summary>
