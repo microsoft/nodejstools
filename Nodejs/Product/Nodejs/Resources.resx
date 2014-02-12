@@ -217,4 +217,7 @@
   <data name="NpmSuccessfullyCompleted" xml:space="preserve">
     <value>{0} successfully completed</value>
   </data>
+  <data name="NpmCatalogEmpty" xml:space="preserve">
+    <value>Refresh failed - check connectivity</value>
+  </data>
 </root>

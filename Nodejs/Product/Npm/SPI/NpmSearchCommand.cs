@@ -56,6 +56,6 @@ namespace Microsoft.NodejsTools.Npm.SPI {
             return success;
         }
 
-        public IList<IPackage> Results { get; private set; }
+        public IList<IPackage> Results { get; protected set; }
     }
 }

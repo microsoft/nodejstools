@@ -27,6 +27,7 @@ namespace Microsoft.NodejsTools.NpmUI {
         private INpmController _npmController;
         private IPackageCatalog _allPackages;
         private IList<IPackage> _filteredPackages;
+        private bool _catalogEmpty;
 
         public PackageSearchPane() {
             InitializeComponent();
@@ -89,14 +90,25 @@ namespace Microsoft.NodejsTools.NpmUI {
                 _busy.Show();
             }
 
+            bool showList = false;
+
             try {
                 _allPackages = await _npmController.GetRepositoryCatalogueAsync(forceRefresh);
-                _busy.Hide();
-                _listResults.Show();
-                StartFilter();
+                _catalogEmpty = false;
+                showList = true;
             } catch (NpmNotFoundException) {
                 _busy.Finished = true;
                 _busy.Message = "Catalog retrieval aborted - npm.cmd not found";
+            } catch (NpmCatalogEmptyException){
+                _busy.Finished = true;
+                _catalogEmpty = true;
+                showList = true;
+            }
+
+            if (showList) {
+                _busy.Hide();
+                _listResults.Show();
+                StartFilter();
             }
         }
 
@@ -137,9 +149,11 @@ namespace Microsoft.NodejsTools.NpmUI {
             _listResults.VirtualListSize = _filteredPackages.Count;
             _listResults.Invalidate();
 
-            var days = LastRefreshedMessageProvider.GetNumberOfDaysSinceLastRefresh(_allPackages.LastRefreshed);
+            var days = _catalogEmpty
+                ? int.MaxValue
+                : LastRefreshedMessageProvider.GetNumberOfDaysSinceLastRefresh(_allPackages.LastRefreshed);
             SetLastUpdateTimeMessage(
-                LastRefreshedMessageProvider.GetMessageFor(_allPackages.LastRefreshed),
+                _catalogEmpty ? Resources.NpmCatalogEmpty : LastRefreshedMessageProvider.GetMessageFor(_allPackages.LastRefreshed),
                 days > 14 ? Color.Red : SystemColors.WindowText,
                 days > 7);
             SetRefreshControlsVisible(true);

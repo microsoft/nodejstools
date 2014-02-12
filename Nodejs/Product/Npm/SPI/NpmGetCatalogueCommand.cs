@@ -59,16 +59,23 @@ namespace Microsoft.NodejsTools.Npm.SPI {
                 } catch (Exception) { }
             }
 
+            var oldResults = Results;
             var result = await base.ExecuteAsync();
+            var newResults = Results;
 
-            try {
-                using (var stream = new FileStream(filename, FileMode.Create, FileAccess.Write, FileShare.None)) {
-                    using (var writer = new StreamWriter(stream)) {
-                        writer.Write(StandardOutput);
+            if (newResults.Count > 0) {
+                try {
+                    using (var stream = new FileStream(filename, FileMode.Create, FileAccess.Write, FileShare.None)) {
+                        using (var writer = new StreamWriter(stream)) {
+                            writer.Write(StandardOutput);
+                        }
                     }
-                }
-                LastRefreshed = new FileInfo(filename).LastWriteTime;
-            } catch (Exception) { }
+                    LastRefreshed = new FileInfo(filename).LastWriteTime;
+                } catch (Exception) { }
+            } else {
+                Results = oldResults;
+                throw new NpmCatalogEmptyException(Resources.ErrNpmCatalogEmpty);
+            }
 
             return result;
         }
