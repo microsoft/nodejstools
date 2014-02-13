@@ -196,6 +196,19 @@ namespace TestUtilities.UI {
             Debug.Assert(Path.IsPathRooted(filename));
 
             string windowName = Path.GetFileName(filename);
+            var elem = GetDocumentTab(windowName);
+
+            elem = elem.FindFirst(TreeScope.Descendants,
+                new PropertyCondition(
+                    AutomationElement.ClassNameProperty,
+                    "WpfTextView"
+                )
+            );
+
+            return new EditorWindow(filename, elem);
+        }
+
+        public AutomationElement GetDocumentTab(string windowName) {
             var elem = Element.FindFirst(TreeScope.Descendants,
                 new AndCondition(
                     new PropertyCondition(
@@ -223,15 +236,7 @@ namespace TestUtilities.UI {
                     )
                 );
             }
-
-            elem = elem.FindFirst(TreeScope.Descendants,
-                new PropertyCondition(
-                    AutomationElement.ClassNameProperty,
-                    "WpfTextView"
-                )
-            );
-
-            return new EditorWindow(filename, elem);
+            return elem;
         }
 
         /// <summary>

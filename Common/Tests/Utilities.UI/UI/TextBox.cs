@@ -28,6 +28,9 @@ namespace TestUtilities.UI
             {
                 return (((TextPattern)Element.GetCurrentPattern(TextPattern.Pattern)).DocumentRange.GetText(-1).ToString());
             }
+            set {
+                ((ValuePattern)Element.GetCurrentPattern(ValuePattern.Pattern)).SetValue(value);
+            }
         }
     }
 }
