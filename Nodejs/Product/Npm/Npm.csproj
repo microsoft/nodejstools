@@ -92,6 +92,7 @@
     <Compile Include="SPI\AbstractNpmLogSource.cs" />
     <Compile Include="SPI\NpmCommander.cs" />
     <Compile Include="SPI\NpmGetCatalogueCommand.cs" />
+    <Compile Include="SPI\PackageCatalogFilter.cs" />
     <Compile Include="TokenEventArgs.cs" />
     <Compile Include="SemverVersion.cs" />
     <Compile Include="SemverVersionFormatException.cs" />

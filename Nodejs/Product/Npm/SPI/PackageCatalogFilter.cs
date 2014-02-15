@@ -13,12 +13,25 @@
  * ***************************************************************************/
 
 using System;
-using Microsoft.NodejsTools.Npm.SPI;
+using System.Collections.Generic;
 
-namespace Microsoft.NodejsTools.Npm {
-    public static class PackageCatalogFilterFactory {
-        public static IPackageCatalogFilter Create(IPackageCatalog catalog) {
-            return new PackageCatalogFilter(catalog);
+namespace Microsoft.NodejsTools.Npm.SPI {
+    internal class PackageCatalogFilter : IPackageCatalogFilter {
+
+        private readonly IPackageCatalog _source;
+
+        public PackageCatalogFilter(IPackageCatalog source) {
+            _source = source;
+        }
+
+        public IComparer<IPackage> Comparer { get; set; }
+
+        public IList<IPackage> Filter(string filterString) {
+            if (null == _source) {
+                return new List<IPackage>();
+            }
+
+            throw new NotImplementedException();
         }
     }
 }
