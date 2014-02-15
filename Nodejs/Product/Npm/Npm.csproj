@@ -56,6 +56,7 @@
     <Compile Include="INpmSearchParser.cs" />
     <Compile Include="IPackage.cs" />
     <Compile Include="IPackageCatalog.cs" />
+    <Compile Include="IPackageCatalogFilter.cs" />
     <Compile Include="IPackageJson.cs" />
     <Compile Include="IPackageJsonSource.cs" />
     <Compile Include="IPerson.cs" />
@@ -71,7 +72,9 @@
     <Compile Include="NpmExecutionException.cs" />
     <Compile Include="NpmLogEventArgs.cs" />
     <Compile Include="NpmNotFoundException.cs" />
+    <Compile Include="NpmSearchComparer.cs" />
     <Compile Include="NpmSearchParserFactory.cs" />
+    <Compile Include="PackageCatalogFilterFactory.cs" />
     <Compile Include="PackageComparer.cs" />
     <Compile Include="PackageEventArgs.cs" />
     <Compile Include="PackageFlags.cs" />
