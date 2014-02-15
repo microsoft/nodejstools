@@ -13,10 +13,9 @@
  * ***************************************************************************/
 
 using System.Collections.Generic;
-using Microsoft.NodejsTools.Npm;
 
-namespace Microsoft.NodejsTools.NpmUI {
-    internal class NpmSearchComparer : IComparer<IPackage> {
+namespace Microsoft.NodejsTools.Npm {
+    public class NpmSearchComparer : IComparer<IPackage> {
         private string _filterString;
 
         public NpmSearchComparer(string filterString) {
