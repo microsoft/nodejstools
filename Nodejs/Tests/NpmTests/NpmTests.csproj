@@ -40,6 +40,7 @@
     <Compile Include="InstallUninstallPackageTests.cs" />
     <Compile Include="FileSystemPackageJsonTests.cs" />
     <Compile Include="MaxPathTests.cs" />
+    <Compile Include="MockPackageCatalog.cs" />
     <Compile Include="MockPackageJsonSource.cs" />
     <Compile Include="ModuleHierarchyTests.cs" />
     <Compile Include="NpmSearchTests.cs" />
