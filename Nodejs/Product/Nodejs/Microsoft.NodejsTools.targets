@@ -10,6 +10,7 @@
   <PropertyGroup>
     <TargetFrameworkVersion>v4.0</TargetFrameworkVersion>
     <NodejsSupportPath>$(MSBuildThisFileDirectory)</NodejsSupportPath>
+    <ProjectHome Condition="'$(ProjectHome)' == ''">.</ProjectHome>
   </PropertyGroup>
 
   <Target Name="GetTargetFrameworkVersion" Returns="$(TargetFrameworkVersion)" />

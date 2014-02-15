@@ -26,6 +26,18 @@ namespace TestUtilities.UI.Nodejs {
             : base(dte) {
         }
 
+        protected override void Dispose(bool disposing) {
+            if (!IsDisposed) {
+                try {
+                    InteractiveWindow.CloseAll(this);
+                } catch (Exception ex) {
+                    Console.WriteLine("Error while closing all interactive windows");
+                    Console.WriteLine(ex);
+                }
+            }
+            base.Dispose(disposing);
+        }
+
         /// <summary>
         /// Opens and activates the solution explorer window.
         /// </summary>
@@ -128,7 +140,8 @@ namespace TestUtilities.UI.Nodejs {
                         AutomationElement.AutomationIdProperty,
                         "WpfTextView"
                     )
-                )
+                ),
+                this
             );
 
         }
