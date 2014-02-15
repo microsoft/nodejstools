@@ -12,24 +12,24 @@
  *
  * ***************************************************************************/
 
-using System;
 using System.Collections.Generic;
 using Microsoft.NodejsTools.Debugger.Serialization;
 using Newtonsoft.Json.Linq;
 
 namespace Microsoft.NodejsTools.Debugger.Commands {
-    sealed class EvaluateCommand : DebuggerCommandBase {
+    sealed class EvaluateCommand : DebuggerCommand {
+        private readonly Dictionary<string, object> _arguments;
         private readonly string _expression;
         private readonly IEvaluationResultFactory _resultFactory;
         private readonly NodeStackFrame _stackFrame;
 
-        public EvaluateCommand(int id, IEvaluationResultFactory resultFactory, string expression, NodeStackFrame stackFrame = null) : base(id) {
+        public EvaluateCommand(int id, IEvaluationResultFactory resultFactory, string expression, NodeStackFrame stackFrame = null)
+            : base(id, "evaluate") {
             _resultFactory = resultFactory;
             _expression = expression;
             _stackFrame = stackFrame;
 
-            CommandName = "evaluate";
-            Arguments = new Dictionary<string, object> {
+            _arguments = new Dictionary<string, object> {
                 { "expression", _expression },
                 { "frame", _stackFrame != null ? _stackFrame.FrameId : 0 },
                 { "global", false },
@@ -38,13 +38,13 @@ namespace Microsoft.NodejsTools.Debugger.Commands {
             };
         }
 
-        public EvaluateCommand(int id, IEvaluationResultFactory resultFactory, int variableId, NodeStackFrame stackFrame = null) : base(id) {
+        public EvaluateCommand(int id, IEvaluationResultFactory resultFactory, int variableId, NodeStackFrame stackFrame = null)
+            : base(id, "evaluate") {
             _resultFactory = resultFactory;
             _expression = "variable";
             _stackFrame = stackFrame;
 
-            CommandName = "evaluate";
-            Arguments = new Dictionary<string, object> {
+            _arguments = new Dictionary<string, object> {
                 { "expression", _expression + ".toString()" },
                 { "frame", _stackFrame != null ? _stackFrame.FrameId : 0 },
                 { "global", false },
@@ -52,6 +52,10 @@ namespace Microsoft.NodejsTools.Debugger.Commands {
                 { "additional_context", new[] { new { name = _expression, handle = variableId } } },
                 { "maxStringLength", -1 }
             };
+        }
+
+        protected override IDictionary<string, object> Arguments {
+            get { return _arguments; }
         }
 
         public NodeEvaluationResult Result { get; private set; }

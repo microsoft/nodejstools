@@ -16,7 +16,7 @@ using System.Collections.Generic;
 using System.Linq;
 
 namespace Microsoft.NodejsTools.Debugger {
-    sealed class ExceptionHandler : IExceptionHandler {
+    sealed class ExceptionHandler {
         private ExceptionHitTreatment _defaultExceptionTreatment = ExceptionHitTreatment.BreakAlways;
         private Dictionary<string, ExceptionHitTreatment> _exceptionTreatments;
 
@@ -44,7 +44,7 @@ namespace Microsoft.NodejsTools.Debugger {
             return updated;
         }
 
-        public bool ClearExceptionThreatments(ICollection<KeyValuePair<string, ExceptionHitTreatment>> exceptionTreatments) {
+        public bool ClearExceptionTreatments(ICollection<KeyValuePair<string, ExceptionHitTreatment>> exceptionTreatments) {
             bool updated = false;
             foreach (var exceptionTreatment in exceptionTreatments) {
                 ExceptionHitTreatment treatmentValue;
@@ -176,18 +176,22 @@ namespace Microsoft.NodejsTools.Debugger {
                 "TypeError",
                 "URIError"
             };
+
             string[] breakNeverTypes = {
                 // should probably be break on unhandled when we have just my code support
                 "Error(ENOENT)",
                 "SyntaxError"
             };
+
             var defaultExceptionTreatments = new Dictionary<string, ExceptionHitTreatment>();
             foreach (string exceptionType in exceptionTypes) {
                 defaultExceptionTreatments[exceptionType] = ExceptionHitTreatment.BreakAlways;
             }
+
             foreach (string exceptionType in breakNeverTypes) {
                 defaultExceptionTreatments[exceptionType] = ExceptionHitTreatment.BreakNever;
             }
+
             return defaultExceptionTreatments;
         }
     }

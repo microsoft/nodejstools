@@ -12,31 +12,26 @@
  *
  * ***************************************************************************/
 
+using System.Diagnostics;
 using Microsoft.VisualStudio;
 using Microsoft.VisualStudio.Debugger.Interop;
-using System.Diagnostics;
 
 namespace Microsoft.NodejsTools.Debugger.DebugEngine {
     // This class represents a breakpoint that has been bound to a location in the debuggee. It is a child of the pending breakpoint
     // that creates it. Unless the pending breakpoint only has one bound breakpoint, each bound breakpoint is displayed as a child of the
     // pending breakpoint in the breakpoints window. Otherwise, only one is displayed.
     class AD7BoundBreakpoint : IDebugBoundBreakpoint2 {
-        private readonly AD7PendingBreakpoint _pendingBreakpoint;
-        private readonly AD7BreakpointResolution _breakpointResolution;
-        private readonly AD7Engine _engine;
         private readonly NodeBreakpointBinding _breakpointBinding;
-
-        private bool _enabled;
+        private readonly AD7BreakpointResolution _breakpointResolution;
+        private readonly bool _enabled;
+        private readonly AD7PendingBreakpoint _pendingBreakpoint;
         private bool _deleted;
 
         public AD7BoundBreakpoint(
-            AD7Engine engine,
             NodeBreakpointBinding breakpointBinding,
             AD7PendingBreakpoint pendingBreakpoint,
             AD7BreakpointResolution breakpointResolution,
-            bool enabled
-        ) {
-            _engine = engine;
+            bool enabled) {
             _breakpointBinding = breakpointBinding;
             _pendingBreakpoint = pendingBreakpoint;
             _breakpointResolution = breakpointResolution;
@@ -59,24 +54,20 @@ namespace Microsoft.NodejsTools.Debugger.DebugEngine {
             return VSConstants.S_OK;
         }
 
-        [Conditional("DEBUG")]
-        private static void AssertMainThread() {
-            //Debug.Assert(Worker.MainThreadId == Worker.CurrentThreadId);
-        }
-
         // Called by the debugger UI when the user is enabling or disabling a breakpoint.
         int IDebugBoundBreakpoint2.Enable(int fEnable) {
             AssertMainThread();
 
-            if (!_breakpointBinding.SetEnabled(fEnable != 0)) {
+            if (!_breakpointBinding.SetEnabledAsync(fEnable != 0).Result) {
                 return VSConstants.E_FAIL;
             }
+
             return VSConstants.S_OK;
         }
 
         // Return the breakpoint resolution which describes how the breakpoint bound in the debuggee.
-        int IDebugBoundBreakpoint2.GetBreakpointResolution(out IDebugBreakpointResolution2 ppBPResolution) {
-            ppBPResolution = _breakpointResolution;
+        int IDebugBoundBreakpoint2.GetBreakpointResolution(out IDebugBreakpointResolution2 ppBpResolution) {
+            ppBpResolution = _breakpointResolution;
             return VSConstants.S_OK;
         }
 
@@ -87,7 +78,7 @@ namespace Microsoft.NodejsTools.Debugger.DebugEngine {
         }
 
         // 
-        int IDebugBoundBreakpoint2.GetState(enum_BP_STATE[] pState) {
+        int IDebugBoundBreakpoint2.GetState(enum_BP_STATE [] pState) {
             pState[0] = 0;
 
             if (_deleted) {
@@ -111,44 +102,59 @@ namespace Microsoft.NodejsTools.Debugger.DebugEngine {
                 return VSConstants.E_NOTIMPL;
             }
 
-            return _breakpointBinding.SetCondition(bpCondition.bstrCondition) ? VSConstants.S_OK : VSConstants.E_FAIL;
+            if (!_breakpointBinding.SetConditionAsync(bpCondition.bstrCondition).Result) {
+                return VSConstants.E_FAIL;
+            }
+
+            return VSConstants.S_OK;
         }
 
         int IDebugBoundBreakpoint2.SetHitCount(uint dwHitCount) {
             AssertMainThread();
 
-            if (!_breakpointBinding.SetHitCount(dwHitCount)) {
+            if (!_breakpointBinding.SetHitCountAsync(dwHitCount).Result) {
                 return VSConstants.E_FAIL;
             }
+
             return VSConstants.S_OK;
         }
 
         int IDebugBoundBreakpoint2.SetPassCount(BP_PASSCOUNT bpPassCount) {
             AssertMainThread();
 
-            if (!_breakpointBinding.SetBreakOn(GetBreakOnForPassCount(bpPassCount))) {
+            BreakOn breakOn = GetBreakOnForPassCount(bpPassCount);
+            if (!_breakpointBinding.SetBreakOnAsync(breakOn).Result) {
                 return VSConstants.E_FAIL;
             }
+
             return VSConstants.S_OK;
         }
 
+        [ Conditional("DEBUG") ]
+        private static void AssertMainThread() {
+            //Debug.Assert(Worker.MainThreadId == Worker.CurrentThreadId);
+        }
+
         internal static BreakOn GetBreakOnForPassCount(BP_PASSCOUNT bpPassCount) {
-            BreakOn breakOn = new BreakOn();
+            BreakOn breakOn;
+            uint count = bpPassCount.dwPassCount;
             switch (bpPassCount.stylePassCount) {
                 case enum_BP_PASSCOUNT_STYLE.BP_PASSCOUNT_NONE:
-                    breakOn.Kind = BreakOnKind.Always;
+                    breakOn = new BreakOn(BreakOnKind.Always, count);
                     break;
                 case enum_BP_PASSCOUNT_STYLE.BP_PASSCOUNT_EQUAL:
-                    breakOn.Kind = BreakOnKind.Equal;
+                    breakOn = new BreakOn(BreakOnKind.Equal, count);
                     break;
                 case enum_BP_PASSCOUNT_STYLE.BP_PASSCOUNT_EQUAL_OR_GREATER:
-                    breakOn.Kind = BreakOnKind.GreaterThanOrEqual;
+                    breakOn = new BreakOn(BreakOnKind.GreaterThanOrEqual, count);
                     break;
                 case enum_BP_PASSCOUNT_STYLE.BP_PASSCOUNT_MOD:
-                    breakOn.Kind = BreakOnKind.Mod;
+                    breakOn = new BreakOn(BreakOnKind.Mod, count);
+                    break;
+                default:
+                    breakOn = new BreakOn(BreakOnKind.Always, count);
                     break;
             }
-            breakOn.Count = bpPassCount.dwPassCount;
             return breakOn;
         }
 

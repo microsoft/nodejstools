@@ -17,13 +17,12 @@ using System.IO;
 
 namespace Microsoft.NodejsTools.Debugger {
     class NodeModule {
-        private readonly ISourceMapper _mapper;
-        private readonly int _moduleId;
         private readonly string _fileName;
+        private readonly SourceMapper _mapper;
+        private readonly int _moduleId;
         private readonly string _source;
-        private object _document;
 
-        public NodeModule(ISourceMapper mapper, int moduleId, string fileName, string source = null) {
+        public NodeModule(SourceMapper mapper, int moduleId, string fileName, string source = null) {
             Debug.Assert(fileName != null);
 
             _mapper = mapper;
@@ -33,14 +32,11 @@ namespace Microsoft.NodejsTools.Debugger {
         }
 
         public int ModuleId {
-            get {
-                return _moduleId;
-            }
+            get { return _moduleId; }
         }
 
         public string Name {
             get {
-                
                 if (_fileName.IndexOfAny(Path.GetInvalidPathChars()) == -1) {
                     return Path.GetFileName(_fileName);
                 }
@@ -49,17 +45,17 @@ namespace Microsoft.NodejsTools.Debugger {
         }
 
         public string JavaScriptFileName {
-            get {
-                return _fileName;
-            }
+            get { return _fileName; }
         }
 
         public string FileName {
             get {
                 if (_mapper != null) {
-                    var mapping = _mapper.MapToOriginal(_fileName, 0);
+                    SourceMapping mapping = _mapper.MapToOriginal(_fileName, 0);
                     if (mapping != null) {
-                        return Path.Combine(Path.GetDirectoryName(_fileName), Path.GetFileName(mapping.FileName));
+                        string directoryName = Path.GetDirectoryName(_fileName) ?? string.Empty;
+                        string fileName = Path.GetFileName(mapping.FileName) ?? string.Empty;
+                        return Path.Combine(directoryName, fileName);
                     }
                 }
                 return _fileName;
@@ -67,25 +63,16 @@ namespace Microsoft.NodejsTools.Debugger {
         }
 
         public string Source {
-            get {
-                return _source;
-            }
+            get { return _source; }
         }
 
         public bool BuiltIn {
             get {
                 // No directory separator characters implies builtin
-                return (_fileName.IndexOfAny(new [] { Path.DirectorySeparatorChar, Path.AltDirectorySeparatorChar }) == -1);
+                return (_fileName.IndexOfAny(new[] { Path.DirectorySeparatorChar, Path.AltDirectorySeparatorChar }) == -1);
             }
         }
 
-        public object Document {
-            get {
-                return _document;
-            }
-            set {
-                _document = value;
-            }
-        }
+        public object Document { get; set; }
     }
 }

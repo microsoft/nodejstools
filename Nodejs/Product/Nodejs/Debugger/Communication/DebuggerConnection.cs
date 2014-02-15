@@ -44,11 +44,6 @@ namespace Microsoft.NodejsTools.Debugger.Communication {
         /// Close connection.
         /// </summary>
         public void Close() {
-            if (_tcpClient != null) {
-                _tcpClient.Close();
-                _tcpClient = null;
-            }
-
             if (_streamReader != null) {
                 _streamReader.Close();
                 _streamReader = null;
@@ -57,6 +52,11 @@ namespace Microsoft.NodejsTools.Debugger.Communication {
             if (_streamWriter != null) {
                 _streamWriter.Close();
                 _streamWriter = null;
+            }
+
+            if (_tcpClient != null) {
+                _tcpClient.Close();
+                _tcpClient = null;
             }
         }
 
@@ -180,7 +180,8 @@ namespace Microsoft.NodejsTools.Debugger.Communication {
             } catch (SocketException) {
             } catch (ObjectDisposedException) {
             } catch (Exception e) {
-                Debug.Fail(e.ToString());
+                DebugWriteLine(string.Format("DebuggerConnection: message processing failed {0}.", e));
+                throw;
             } finally {
                 Close();
 

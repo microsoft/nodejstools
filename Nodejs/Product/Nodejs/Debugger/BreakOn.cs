@@ -16,13 +16,14 @@ using System;
 
 namespace Microsoft.NodejsTools.Debugger {
     struct BreakOn {
-        public uint Count;
-        public BreakOnKind Kind;
+        public readonly uint Count;
+        public readonly BreakOnKind Kind;
 
         public BreakOn(BreakOnKind kind, uint count) {
             if (kind != BreakOnKind.Always && count < 1) {
                 throw new ArgumentException("Invalid BreakOn count");
             }
+
             Kind = kind;
             Count = count;
         }

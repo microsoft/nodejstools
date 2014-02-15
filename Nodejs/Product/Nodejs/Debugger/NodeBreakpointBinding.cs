@@ -12,34 +12,34 @@
  *
  * ***************************************************************************/
 
-using System;
 using System.Diagnostics;
+using System.Threading;
 using System.Threading.Tasks;
 
 namespace Microsoft.NodejsTools.Debugger {
     class NodeBreakpointBinding {
         private readonly NodeBreakpoint _breakpoint;
         private readonly int _breakpointId;
-        private readonly int? _scriptID;
-        private bool _enabled;
-        private bool _engineEnabled;
+        private readonly int? _scriptId;
         private BreakOn _breakOn;
         private string _condition;
+        private bool _enabled;
+        private bool _engineEnabled;
         private uint _engineHitCount;
-        private uint _hitCountDelta;
         private int _engineIgnoreCount;
+        private uint _hitCountDelta;
 
         public NodeBreakpointBinding(
             NodeBreakpoint breakpoint,
             int lineNo,
             int breakpointId,
-            int? scriptID,
+            int? scriptId,
             bool fullyBound
         ) {
             _breakpoint = breakpoint;
             LineNo = lineNo;
             _breakpointId = breakpointId;
-            _scriptID = scriptID;
+            _scriptId = scriptId;
             _enabled = breakpoint.Enabled;
             _breakOn = breakpoint.BreakOn;
             _condition = breakpoint.Condition;
@@ -49,31 +49,19 @@ namespace Microsoft.NodejsTools.Debugger {
         }
 
         public NodeDebugger Process {
-            get {
-                return _breakpoint.Process;
-            }
-        }
-
-        public async void Remove() {
-            await Process.RemoveBreakPointAsync(this).ConfigureAwait(false);
+            get { return _breakpoint.Process; }
         }
 
         public NodeBreakpoint Breakpoint {
-            get {
-                return _breakpoint;
-            }
+            get { return _breakpoint; }
         }
 
         public string FileName {
-            get {
-                return _breakpoint.FileName;
-            }
+            get { return _breakpoint.FileName; }
         }
 
         public string RequestedFileName {
-            get {
-                return _breakpoint.RequestedFileName;
-            }
+            get { return _breakpoint.RequestedFileName; }
         }
 
         /// <summary>
@@ -86,7 +74,7 @@ namespace Microsoft.NodejsTools.Debugger {
         /// </summary>
         public int RequestedLineNo {
             get {
-                var mapping = _breakpoint.Process.MapToOriginal(FileName, LineNo - 1);
+                SourceMapping mapping = _breakpoint.Process.SourceMapper.MapToOriginal(FileName, LineNo - 1);
                 if (mapping != null) {
                     return mapping.Line + 1;
                 }
@@ -95,33 +83,35 @@ namespace Microsoft.NodejsTools.Debugger {
         }
 
         public bool Enabled {
-            get {
-                return _enabled;
-            }
+            get { return _enabled; }
         }
 
         public BreakOn BreakOn {
-            get {
-                return _breakOn;
-            }
+            get { return _breakOn; }
         }
 
         public string Condition {
-            get {
-                return _condition;
-            }
+            get { return _condition; }
         }
 
-        public int BreakpointID {
-            get {
-                return _breakpointId;
-            }
+        public int BreakpointId {
+            get { return _breakpointId; }
         }
 
-        internal int? ScriptID {
-            get {
-                return _scriptID;
-            }
+        internal int? ScriptId {
+            get { return _scriptId; }
+        }
+
+        private uint HitCount {
+            get { return _engineHitCount - _hitCountDelta; }
+        }
+
+        internal bool FullyBound { get; set; }
+
+        public bool Unbound { get; set; }
+
+        public async void Remove() {
+            await Process.RemoveBreakPointAsync(this).ConfigureAwait(false);
         }
 
         public uint GetHitCount() {
@@ -129,60 +119,69 @@ namespace Microsoft.NodejsTools.Debugger {
             return HitCount;
         }
 
-        internal bool SetEnabled(bool enabled) {
-            if (_enabled != enabled) {
-                SyncCounts();
-                var engineEnabled = GetEngineEnabled(enabled, _breakOn, HitCount);
-                if (_engineEnabled != engineEnabled) {
-                    if (!Process.UpdateBreakpointBindingAsync(_breakpointId, engineEnabled, validateSuccess: true).Result) {
-                        return false;
-                    }
-                    _engineEnabled = engineEnabled;
-                }
-                _enabled = enabled;
+        internal async Task<bool> SetEnabledAsync(bool enabled) {
+            if (_enabled == enabled) {
+                return true;
             }
-            return true;            
+
+            SyncCounts();
+
+            bool engineEnabled = GetEngineEnabled(enabled, _breakOn, HitCount);
+            if (_engineEnabled != engineEnabled) {
+                await Process.UpdateBreakpointBindingAsync(_breakpointId, engineEnabled, validateSuccess: true);
+                _engineEnabled = engineEnabled;
+            }
+
+            _enabled = enabled;
+            return true;
         }
 
-        internal bool SetBreakOn(BreakOn breakOn, bool force = false) {
-            if (force || _breakOn.Kind != breakOn.Kind || _breakOn.Count != breakOn.Count) {
-                SyncCounts();
-                var engineEnabled = GetEngineEnabled(_enabled, breakOn, HitCount);
-                var enabled = (_engineEnabled != engineEnabled) ? (bool?)engineEnabled : null;
-                var engineIgnoreCount = GetEngineIgnoreCount(breakOn, HitCount);
-                if (!Process.UpdateBreakpointBindingAsync(_breakpointId, ignoreCount: engineIgnoreCount, enabled: enabled, validateSuccess: true).Result) {
-                    return false;
-                }
+        internal async Task<bool> SetBreakOnAsync(BreakOn breakOn, bool force = false) {
+            if (!force && _breakOn.Kind == breakOn.Kind && _breakOn.Count == breakOn.Count) {
+                return true;
+            }
+
+            SyncCounts();
+
+            bool engineEnabled = GetEngineEnabled(_enabled, breakOn, HitCount);
+            bool? enabled = (_engineEnabled != engineEnabled) ? (bool?)engineEnabled : null;
+
+            int engineIgnoreCount = GetEngineIgnoreCount(breakOn, HitCount);
+            await Process.UpdateBreakpointBindingAsync(_breakpointId, ignoreCount: engineIgnoreCount, enabled: enabled, validateSuccess: true);
+
+            _engineEnabled = engineEnabled;
+            _engineIgnoreCount = engineIgnoreCount;
+            _breakOn = breakOn;
+
+            return true;
+        }
+
+        internal async Task<bool> SetHitCountAsync(uint hitCount) {
+            SyncCounts();
+
+            if (HitCount == hitCount) {
+                return true;
+            }
+
+            if (_breakOn.Kind != BreakOnKind.Always) {
+                // When BreakOn (not BreakOnKind.Always), handle change to hit count by resetting ignore count 
+                bool engineEnabled = GetEngineEnabled(_enabled, _breakOn, hitCount);
+                bool? enabled = (_engineEnabled != engineEnabled) ? (bool?)engineEnabled : null;
+
+                int engineIgnoreCount = GetEngineIgnoreCount(_breakOn, hitCount);
+                await Process.UpdateBreakpointBindingAsync(_breakpointId, ignoreCount: engineIgnoreCount, enabled: enabled, validateSuccess: true);
+
                 _engineEnabled = engineEnabled;
                 _engineIgnoreCount = engineIgnoreCount;
-                _breakOn = breakOn;
             }
+
+            _hitCountDelta = _engineHitCount - hitCount;
+
             return true;
         }
 
-        internal bool SetHitCount(uint hitCount) {
-            SyncCounts();
-            if (HitCount != hitCount) {
-                if (_breakOn.Kind != BreakOnKind.Always) {
-                    // When BreakOn (not BreakOnKind.Always), handle change to hit count by resetting ignore count 
-                    var engineEnabled = GetEngineEnabled(_enabled, _breakOn, hitCount);
-                    var enabled = (_engineEnabled != engineEnabled) ? (bool?)engineEnabled : null;
-                    var engineIgnoreCount = GetEngineIgnoreCount(_breakOn, hitCount);
-                    if (!Process.UpdateBreakpointBindingAsync(_breakpointId, ignoreCount: engineIgnoreCount, enabled: enabled, validateSuccess: true).Result) {
-                        return false;
-                    }
-                    _engineEnabled = engineEnabled;
-                    _engineIgnoreCount = engineIgnoreCount;
-                }
-                _hitCountDelta = _engineHitCount - hitCount;
-            }
-            return true;
-        }
-
-        internal bool SetCondition(string condition) {
-            if (!Process.UpdateBreakpointBindingAsync(_breakpointId, condition: condition, validateSuccess: true).Result) {
-                return false;
-            }
+        internal async Task<bool> SetConditionAsync(string condition) {
+            await Process.UpdateBreakpointBindingAsync(_breakpointId, condition: condition, validateSuccess: true);
             _condition = condition;
             return true;
         }
@@ -193,12 +192,12 @@ namespace Microsoft.NodejsTools.Debugger {
             _engineIgnoreCount = engineIgnoreCount;
         }
 
-        internal async Task ProcessBreakpointHitAsync() {
+        internal async Task ProcessBreakpointHitAsync(CancellationToken cancellationToken = new CancellationToken()) {
             Debug.Assert(GetEngineEnabled(_enabled, _breakOn, HitCount));
 
             // Compose followup handler
-            var engineHitCount = _engineHitCount + (uint)_engineIgnoreCount + 1;
-            var engineIgnoreCount = 0;
+            uint engineHitCount = _engineHitCount + (uint)_engineIgnoreCount + 1;
+            int engineIgnoreCount = 0;
 
             // Handle pass count
             switch (_breakOn.Kind) {
@@ -207,16 +206,14 @@ namespace Microsoft.NodejsTools.Debugger {
                     UpdatedEngineState(true, engineHitCount, engineIgnoreCount);
                     break;
                 case BreakOnKind.Equal:
-                    if (await Process.UpdateBreakpointBindingAsync(_breakpointId, false).ConfigureAwait(false)) {
-                        UpdatedEngineState(false, engineHitCount, engineIgnoreCount);    
-                    }                    
+                    await Process.UpdateBreakpointBindingAsync(_breakpointId, false, cancellationToken: cancellationToken).ConfigureAwait(false);
+                    UpdatedEngineState(false, engineHitCount, engineIgnoreCount);
                     break;
                 case BreakOnKind.Mod:
-                    var hitCount = engineHitCount - _hitCountDelta;
+                    uint hitCount = engineHitCount - _hitCountDelta;
                     engineIgnoreCount = GetEngineIgnoreCount(_breakOn, hitCount);
-                    if (await Process.UpdateBreakpointBindingAsync(_breakpointId, ignoreCount: engineIgnoreCount).ConfigureAwait(false)) {
-                        UpdatedEngineState(true, engineHitCount, engineIgnoreCount);    
-                    }
+                    await Process.UpdateBreakpointBindingAsync(_breakpointId, ignoreCount: engineIgnoreCount, cancellationToken: cancellationToken).ConfigureAwait(false);
+                    UpdatedEngineState(true, engineHitCount, engineIgnoreCount);
                     break;
             }
         }
@@ -257,7 +254,7 @@ namespace Microsoft.NodejsTools.Debugger {
             return count;
         }
 
-        private bool TestHit() {
+        private async Task<bool> TestHitAsync() {
             // Not hit if any ignore count
             if (GetEngineIgnoreCount() > 0) {
                 return false;
@@ -265,45 +262,37 @@ namespace Microsoft.NodejsTools.Debugger {
 
             // Not hit if false condition
             if (!string.IsNullOrEmpty(_condition)) {
-                return Process.TestPredicateAsync(_condition).Result;
+                return await Process.TestPredicateAsync(_condition);
             }
 
             // Otherwise, hit
             return true;
         }
 
-        internal void TestAndProcessHit(Action<NodeBreakpointBinding> processBinding) {
+        internal async Task<bool> TestAndProcessHitAsync() {
             // Process based on whether hit (based on hit count and/or condition predicates)
-            if (TestHit()) {
+            if (await TestHitAsync()) {
                 // Fixup hit count
                 _hitCountDelta = _engineHitCount - 1;
-
-                // Process as hit
-                processBinding(this);
-            } else {
-                // Process as not hit
-                processBinding(null);
+                return true;
             }
+
+            // Process as not hit
+            return false;
         }
 
         private void SyncCounts() {
-            if (_engineIgnoreCount > 0) {
-                var hitCount = Process.GetBreakpointHitCountAsync(_breakpointId).Result;
-                if (hitCount != null) {
-                    _engineIgnoreCount -= hitCount.Value - (int)_engineHitCount;
-                    _engineHitCount = (uint)hitCount;
-                }
+            if (_engineIgnoreCount <= 0) {
+                return;
             }
-        }
 
-        private uint HitCount {
-            get {
-                return _engineHitCount - _hitCountDelta;
+            int? hitCount = Process.GetBreakpointHitCountAsync(_breakpointId).Result;
+            if (hitCount == null) {
+                return;
             }
+
+            _engineIgnoreCount -= hitCount.Value - (int)_engineHitCount;
+            _engineHitCount = (uint)hitCount;
         }
-
-        internal bool FullyBound { get; set; }
-
-        public bool Unbound { get; set; }
     }
 }

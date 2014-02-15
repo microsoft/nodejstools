@@ -106,25 +106,22 @@ namespace Microsoft.NodejsTools.Debugger.DebugEngine {
         public const string DirMappingSetting = "DIR_MAPPING";
 
         public AD7Engine() {
-            DebugWriteLine("NodeEngine Created ({0})", GetHashCode());
+            DebugWriteLine("AD7Engine Created ({0})", GetHashCode());
             _breakpointManager = new BreakpointManager(this);
             Engines.Add(new WeakReference(this));
         }
 
         ~AD7Engine() {
-            DebugWriteLine("NodeEngine Finalized ({0})", GetHashCode());
+            DebugWriteLine("AD7Engine Finalized ({0})", GetHashCode());
             if (!_attached && _process != null) {
                 // detach the process exited event, we don't need to send the exited event
                 // which could happen when we terminate the process and check if it's still
                 // running.
-                try {
-                    _process.ProcessExited -= OnProcessExited;
+                _process.ProcessExited -= OnProcessExited;
 
-                    // we launched the process, go ahead and kill it now that
-                    // VS has released us
-                    _process.Terminate();
-                } catch (InvalidOperationException) {
-                }
+                // we launched the process, go ahead and kill it now that
+                // VS has released us
+                _process.Terminate();
             }
 
             foreach (var engine in Engines) {
@@ -168,7 +165,7 @@ namespace Microsoft.NodejsTools.Debugger.DebugEngine {
 
         // Attach the debug engine to a program. 
         int IDebugEngine2.Attach(IDebugProgram2[] rgpPrograms, IDebugProgramNode2[] rgpProgramNodes, uint celtPrograms, IDebugEventCallback2 ad7Callback, enum_ATTACH_REASON dwReason) {
-            DebugWriteLine("NodeEngine Attach Called ({0})", GetHashCode());
+            DebugWriteCommand("Attach");
 
             AssertMainThread();
             Debug.Assert(_ad7ProgramId == Guid.Empty);
@@ -181,7 +178,7 @@ namespace Microsoft.NodejsTools.Debugger.DebugEngine {
             int processId = EngineUtils.GetProcessId(rgpPrograms[0]);
             if (processId == 0) {
                 // engine only supports system processes
-                DebugWriteLine("NodeEngine failed to get process id during attach");
+                DebugWriteLine("AD7Engine failed to get process id during attach");
                 return VSConstants.E_NOTIMPL;
             }
 
@@ -211,7 +208,7 @@ namespace Microsoft.NodejsTools.Debugger.DebugEngine {
                 HandleLoadComplete();
             }
 
-            DebugWriteLine("NodeEngine Attach returning S_OK");
+            DebugWriteLine("AD7Engine Attach returning S_OK");
             return VSConstants.S_OK;
         }
 
@@ -245,7 +242,7 @@ namespace Microsoft.NodejsTools.Debugger.DebugEngine {
             _loadComplete = true;
 
             if (!String.IsNullOrWhiteSpace(_webBrowserUrl)) {
-                Uri uri = new Uri(_webBrowserUrl);
+                var uri = new Uri(_webBrowserUrl);
                 OnPortOpenedHandler.CreateHandler(
                     uri.Port,
                     shortCircuitPredicate: () => !_processLoaded,
@@ -266,15 +263,11 @@ namespace Microsoft.NodejsTools.Debugger.DebugEngine {
             Send(eventObject, AD7ModuleLoadEvent.IID, null);
         }
 
-        private void SendEntryPointHit(AD7Thread ad7Thread) {
-            Send(new AD7EntryPointEvent(), AD7EntryPointEvent.IID, ad7Thread);
-        }
-
         // Requests that all programs being debugged by this DE stop execution the next time one of their threads attempts to run.
         // This is normally called in response to the user clicking on the pause button in the debugger.
         // When the break is complete, an AsyncBreakComplete event will be sent back to the debugger.
         int IDebugEngine2.CauseBreak() {
-            DebugWriteLine("NodeEngine CauseBreak Called ({0})" + GetHashCode());
+            DebugWriteCommand("CauseBreak");
             AssertMainThread();
             return CauseBreak();
         }
@@ -288,7 +281,7 @@ namespace Microsoft.NodejsTools.Debugger.DebugEngine {
         // was received and processed. The only event we send in this fashion is Program Destroy.
         // It responds to that event by shutting down the engine.
         int IDebugEngine2.ContinueFromSynchronousEvent(IDebugEvent2 eventObject) {
-            DebugWriteLine("NodeEngine ContinueFromSynchronousEvent Called ({0})", GetHashCode());
+            DebugWriteCommand("ContinueFromSynchronousEvent");
             AssertMainThread();
 
             if (eventObject is AD7ProgramDestroyEvent) {
@@ -302,7 +295,7 @@ namespace Microsoft.NodejsTools.Debugger.DebugEngine {
 
                 debuggedProcess.Close();
             } else {
-                Debug.Fail("Unknown syncronious event");
+                Debug.Fail("Unknown synchronous event");
             }
 
             return VSConstants.S_OK;
@@ -310,14 +303,14 @@ namespace Microsoft.NodejsTools.Debugger.DebugEngine {
 
         // Creates a pending breakpoint in the engine. A pending breakpoint is contains all the information needed to bind a breakpoint to 
         // a location in the debuggee.
-        int IDebugEngine2.CreatePendingBreakpoint(IDebugBreakpointRequest2 pBPRequest, out IDebugPendingBreakpoint2 ppPendingBP) {
-            DebugWriteLine("NodeEngine CreatePendingBreakpoint Called ({0})", GetHashCode());
+        int IDebugEngine2.CreatePendingBreakpoint(IDebugBreakpointRequest2 pBpRequest, out IDebugPendingBreakpoint2 ppPendingBp) {
+            DebugWriteCommand("CreatePendingBreakpoint");
             Debug.Assert(_breakpointManager != null);
-            ppPendingBP = null;
+            ppPendingBp = null;
 
             // Check whether breakpoint request for our language
-            BP_REQUEST_INFO[] requestInfo = new BP_REQUEST_INFO[1];
-            EngineUtils.CheckOk(pBPRequest.GetRequestInfo(enum_BPREQI_FIELDS.BPREQI_LANGUAGE | enum_BPREQI_FIELDS.BPREQI_BPLOCATION, requestInfo));
+            var requestInfo = new BP_REQUEST_INFO[1];
+            EngineUtils.CheckOk(pBpRequest.GetRequestInfo(enum_BPREQI_FIELDS.BPREQI_LANGUAGE | enum_BPREQI_FIELDS.BPREQI_BPLOCATION, requestInfo));
             if (requestInfo[0].guidLanguage != Guids.NodejsDebugLanguage && 
                 requestInfo[0].guidLanguage != Guids.ScriptDebugLanguage &&
                 requestInfo[0].guidLanguage != Guids.TypeScriptDebugLanguage) {
@@ -331,14 +324,14 @@ namespace Microsoft.NodejsTools.Debugger.DebugEngine {
                 }
             }
 
-            _breakpointManager.CreatePendingBreakpoint(pBPRequest, out ppPendingBP);
+            _breakpointManager.CreatePendingBreakpoint(pBpRequest, out ppPendingBp);
             return VSConstants.S_OK;
         }
 
         // Informs a DE that the program specified has been atypically terminated and that the DE should 
         // clean up all references to the program and send a program destroy event.
         int IDebugEngine2.DestroyProgram(IDebugProgram2 pProgram) {
-            DebugWriteLine("NodeEngine DestroyProgram Called ({0})", GetHashCode());
+            DebugWriteCommand("DestroyProgram");
 
             // Tell the SDM that the engine knows that the program is exiting, and that the
             // engine will send a program destroy. We do this because the Win32 debug api will always
@@ -348,7 +341,7 @@ namespace Microsoft.NodejsTools.Debugger.DebugEngine {
 
         // Gets the GUID of the DE.
         int IDebugEngine2.GetEngineId(out Guid guidEngine) {
-            DebugWriteLine("NodeEngine GetEngineId Called ({0})", GetHashCode());
+            DebugWriteCommand("GetEngineId");
             guidEngine = DebugEngineGuid;
             return VSConstants.S_OK;
         }
@@ -370,7 +363,7 @@ namespace Microsoft.NodejsTools.Debugger.DebugEngine {
         }
 
         private static void UpdateExceptionTreatment(
-            EXCEPTION_INFO[] exceptionInfos,
+            IEnumerable<EXCEPTION_INFO> exceptionInfos,
             Action<ExceptionHitTreatment?, ICollection<KeyValuePair<string, ExceptionHitTreatment>>> updateExceptionTreatment
         ) {
             ExceptionHitTreatment? defaultExceptionTreatment = null;
@@ -393,7 +386,7 @@ namespace Microsoft.NodejsTools.Debugger.DebugEngine {
         }
 
         int IDebugEngine2.RemoveAllSetExceptions(ref Guid guidType) {
-            DebugWriteLine("NodeEngine RemoveAllSetExceptions Called ({0})", GetHashCode());
+            DebugWriteCommand("RemoveAllSetExceptions");
             if (guidType == DebugEngineGuid || guidType == Guid.Empty) {
                 _process.ClearExceptionTreatment();
             }
@@ -401,13 +394,13 @@ namespace Microsoft.NodejsTools.Debugger.DebugEngine {
         }
 
         int IDebugEngine2.RemoveSetException(EXCEPTION_INFO[] pException) {
-            DebugWriteLine("NodeEngine RemoveSetException Called ({0})", GetHashCode());
+            DebugWriteCommand("RemoveSetException");
             UpdateExceptionTreatment(pException, _process.ClearExceptionTreatment);
             return VSConstants.S_OK;
         }
 
         int IDebugEngine2.SetException(EXCEPTION_INFO[] pException) {
-            DebugWriteLine("NodeEngine SetException Called ({0})", GetHashCode());
+            DebugWriteCommand("SetException");
             UpdateExceptionTreatment(pException, _process.SetExceptionTreatment);
             return VSConstants.S_OK;
         }
@@ -415,22 +408,22 @@ namespace Microsoft.NodejsTools.Debugger.DebugEngine {
         // Sets the locale of the DE.
         // This method is called by the session debug manager (SDM) to propagate the locale settings of the IDE so that
         // strings returned by the DE are properly localized. The engine is not localized so this is not implemented.
-        int IDebugEngine2.SetLocale(ushort wLangID) {
-            DebugWriteLine("NodeEngine SetLocale Called ({0})", GetHashCode());
+        int IDebugEngine2.SetLocale(ushort wLangId) {
+            DebugWriteCommand("SetLocale");
             return VSConstants.S_OK;
         }
 
         // A metric is a registry value used to change a debug engine's behavior or to advertise supported functionality. 
         // This method can forward the call to the appropriate form of the Debugging SDK Helpers function, SetMetric.
         int IDebugEngine2.SetMetric(string pszMetric, object varValue) {
-            DebugWriteLine("NodeEngine SetMetric Called ({0})", GetHashCode());
+            DebugWriteCommand("SetMetric");
             return VSConstants.S_OK;
         }
 
         // Sets the registry root currently in use by the DE. Different installations of Visual Studio can change where their registry information is stored
         // This allows the debugger to tell the engine where that location is.
         int IDebugEngine2.SetRegistryRoot(string pszRegistryRoot) {
-            DebugWriteLine("NodeEngine SetRegistryRoot Called ({0})", GetHashCode());
+            DebugWriteCommand("SetRegistryRoot");
             return VSConstants.S_OK;
         }
 
@@ -440,7 +433,7 @@ namespace Microsoft.NodejsTools.Debugger.DebugEngine {
 
         // Determines if a process can be terminated.
         int IDebugEngineLaunch2.CanTerminateProcess(IDebugProcess2 process) {
-            DebugWriteLine("NodeEngine CanTerminateProcess Called ({0})", GetHashCode());
+            DebugWriteCommand("CanTerminateProcess");
             AssertMainThread();
 
             Debug.Assert(_events != null);
@@ -462,7 +455,7 @@ namespace Microsoft.NodejsTools.Debugger.DebugEngine {
         // The IDebugEngineLaunch2::ResumeProcess method is called to start the process after the process has been successfully launched in a suspended state.
         int IDebugEngineLaunch2.LaunchSuspended(string pszServer, IDebugPort2 port, string exe, string args, string dir, string env, string options, enum_LAUNCH_FLAGS launchFlags, uint hStdInput, uint hStdOutput, uint hStdError, IDebugEventCallback2 ad7Callback, out IDebugProcess2 process) {
             DebugWriteLine("--------------------------------------------------------------------------------");
-            DebugWriteLine("NodeEngine LaunchSuspended Called with flags '{0}' ({1})", launchFlags, GetHashCode());
+            DebugWriteLine("AD7Engine LaunchSuspended Called with flags '{0}' ({1})", launchFlags, GetHashCode());
             AssertMainThread();
 
             Debug.Assert(_events == null);
@@ -534,19 +527,19 @@ namespace Microsoft.NodejsTools.Debugger.DebugEngine {
 
             AttachEvents(_process);
 
-            AD_PROCESS_ID adProcessId = new AD_PROCESS_ID();
+            var adProcessId = new AD_PROCESS_ID();
             adProcessId.ProcessIdType = (uint)enum_AD_PROCESS_ID.AD_PROCESS_ID_SYSTEM;
             adProcessId.dwProcessId = (uint)_process.Id;
 
             EngineUtils.RequireOk(port.GetProcess(adProcessId, out process));
-            DebugWriteLine("NodeEngine LaunchSuspended returning S_OK");
+            DebugWriteLine("AD7Engine LaunchSuspended returning S_OK");
             Debug.Assert(process != null);
             Debug.Assert(!_process.HasExited);
 
             return VSConstants.S_OK;
         }
 
-        private static string[] SplitOptions(string options) {
+        private static IEnumerable<string> SplitOptions(string options) {
             var res = new List<string>();
             int lastStart = 0;
             for (int i = 0; i < options.Length; i++) {
@@ -563,12 +556,12 @@ namespace Microsoft.NodejsTools.Debugger.DebugEngine {
             if (options.Length  - lastStart > 0) {
                 res.Add(options.Substring(lastStart, options.Length - lastStart));
             }
-            return res.ToArray();
+            return res;
         }
 
         // Resume a process launched by IDebugEngineLaunch2.LaunchSuspended
         int IDebugEngineLaunch2.ResumeProcess(IDebugProcess2 process) {
-            DebugWriteLine("NodeEngine ResumeProcess Called ({0})", GetHashCode());
+            DebugWriteCommand("ResumeProcess");
             AssertMainThread();
 
             if (_events == null) {
@@ -614,7 +607,7 @@ namespace Microsoft.NodejsTools.Debugger.DebugEngine {
         // This function is used to terminate a process that the engine launched
         // The debugger will call IDebugEngineLaunch2::CanTerminateProcess before calling this method.
         int IDebugEngineLaunch2.TerminateProcess(IDebugProcess2 process) {
-            DebugWriteLine("NodeEngine TerminateProcess Called ({0})", GetHashCode());
+            DebugWriteCommand("TerminateProcess");
             AssertMainThread();
 
             Debug.Assert(_events != null);
@@ -636,17 +629,17 @@ namespace Microsoft.NodejsTools.Debugger.DebugEngine {
 
         // Determines if a debug engine (DE) can detach from the program.
         public int CanDetach() {
-            DebugWriteLine("NodeEngine CanDetach Called ({0})", GetHashCode());
+            DebugWriteCommand("CanDetach");
             return VSConstants.S_OK;
         }
 
         // The debugger calls CauseBreak when the user clicks on the pause button in VS. The debugger should respond by entering
         // breakmode. 
         public int CauseBreak() {
-            DebugWriteLine("NodeEngine CauseBreak ({0})", GetHashCode());
+            DebugWriteCommand("CauseBreak");
             AssertMainThread();
 
-            _process.BreakAll();
+            _process.BreakAllAsync().Wait();
 
             return VSConstants.S_OK;
         }
@@ -658,7 +651,7 @@ namespace Microsoft.NodejsTools.Debugger.DebugEngine {
             AssertMainThread();
 
             var thread = (AD7Thread)pThread;
-            DebugWriteLine("NodeEngine Continue Called on thread #{0} ({1})", thread.GetDebuggedThread().Id, GetHashCode());
+            DebugWriteCommand("Continue");
 
             // TODO: How does this differ from ExecuteOnThread?
             thread.GetDebuggedThread().Resume();
@@ -669,7 +662,7 @@ namespace Microsoft.NodejsTools.Debugger.DebugEngine {
         // Detach is called when debugging is stopped and the process was attached to (as opposed to launched)
         // or when one of the Detach commands are executed in the UI.
         public int Detach() {
-            DebugWriteLine("NodeEngine Detach Called ({0})", GetHashCode());
+            DebugWriteCommand("Detach");
             AssertMainThread();
 
             _breakpointManager.ClearBreakpointBindingResults();
@@ -682,7 +675,7 @@ namespace Microsoft.NodejsTools.Debugger.DebugEngine {
 
         // Enumerates the code contexts for a given position in a source file.
         public int EnumCodeContexts(IDebugDocumentPosition2 pDocPos, out IEnumDebugCodeContexts2 ppEnum) {
-            DebugWriteLine("NodeEngine EnumCodeContexts Called ({0})", GetHashCode());
+            DebugWriteCommand("EnumCodeContexts");
 
             string filename;
             pDocPos.GetFileName(out filename);
@@ -690,14 +683,14 @@ namespace Microsoft.NodejsTools.Debugger.DebugEngine {
 
             pDocPos.GetRange(beginning, end);
 
-            ppEnum = new AD7CodeContextEnum(new[] { new AD7MemoryAddress(this, filename, (uint)beginning[0].dwLine) });
+            ppEnum = new AD7CodeContextEnum(new[] { new AD7MemoryAddress(this, filename, beginning[0].dwLine) });
             return VSConstants.S_OK;
         }
 
         // EnumCodePaths is used for the step-into specific feature -- right click on the current statment and decide which
         // function to step into. This is not something that we support.
         public int EnumCodePaths(string hint, IDebugCodeContext2 start, IDebugStackFrame2 frame, int fSource, out IEnumCodePaths2 pathEnum, out IDebugCodeContext2 safetyContext) {
-            DebugWriteLine("NodeEngine EnumCodePaths Called ({0})", GetHashCode());
+            DebugWriteCommand("EnumCodePaths");
 
             pathEnum = null;
             safetyContext = null;
@@ -706,7 +699,7 @@ namespace Microsoft.NodejsTools.Debugger.DebugEngine {
 
         // EnumModules is called by the debugger when it needs to enumerate the modules in the program.
         public int EnumModules(out IEnumDebugModules2 ppEnum) {
-            DebugWriteLine("NodeEngine EnumModules Called ({0})", GetHashCode());
+            DebugWriteCommand("EnumModules");
             AssertMainThread();
 
             var moduleObjects = new AD7Module[_modules.Count];
@@ -723,7 +716,7 @@ namespace Microsoft.NodejsTools.Debugger.DebugEngine {
 
         // EnumThreads is called by the debugger when it needs to enumerate the threads in the program.
         public int EnumThreads(out IEnumDebugThreads2 ppEnum) {
-            DebugWriteLine("NodeEngine EnumThreads Called ({0})", GetHashCode());
+            DebugWriteCommand("EnumThreads");
             AssertMainThread();
 
             var threadObjects = new AD7Thread[_threads.Count];
@@ -746,30 +739,27 @@ namespace Microsoft.NodejsTools.Debugger.DebugEngine {
         // A program may expose any number and type of additional properties that can be described through the IDebugProperty2 interface. 
         // An IDE might display the additional program properties through a generic property browser user interface.
         public int GetDebugProperty(out IDebugProperty2 ppProperty) {
-            DebugWriteLine("NodeEngine GetDebugProperty Called ({0})", GetHashCode());
+            DebugWriteCommand("GetDebugProperty");
             throw new Exception("The method or operation is not implemented.");
         }
 
         // The debugger calls this when it needs to obtain the IDebugDisassemblyStream2 for a particular code-context.
         public int GetDisassemblyStream(enum_DISASSEMBLY_STREAM_SCOPE dwScope, IDebugCodeContext2 codeContext, out IDebugDisassemblyStream2 disassemblyStream) {
-            DebugWriteLine("NodeEngine GetDisassemblyStream Called ({0})", GetHashCode());
-
+            DebugWriteCommand("GetDisassemblyStream");
             disassemblyStream = null;
             return VSConstants.E_NOTIMPL;
         }
 
         // This method gets the Edit and Continue (ENC) update for this program. A custom debug engine always returns E_NOTIMPL
         public int GetENCUpdate(out object update) {
-            DebugWriteLine("NodeEngine GetENCUpdate Called ({0})", GetHashCode());
-
+            DebugWriteCommand("GetENCUpdate");
             update = null;
             return VSConstants.S_OK;
         }
 
         // Gets the name and identifier of the debug engine (DE) running this program.
         public int GetEngineInfo(out string engineName, out Guid engineGuid) {
-            DebugWriteLine("NodeEngine GetEngineInfo Called ({0})", GetHashCode());
-
+            DebugWriteCommand("GetEngineInfo");
             engineName = "Node Engine";
             engineGuid = DebugEngineGuid;
             return VSConstants.S_OK;
@@ -778,14 +768,14 @@ namespace Microsoft.NodejsTools.Debugger.DebugEngine {
         // The memory bytes as represented by the IDebugMemoryBytes2 object is for the program's image in memory and not any memory 
         // that was allocated when the program was executed.
         public int GetMemoryBytes(out IDebugMemoryBytes2 ppMemoryBytes) {
-            DebugWriteLine("NodeEngine GetMemoryBytes Called ({0})", GetHashCode());
+            DebugWriteCommand("GetMemoryBytes");
             throw new Exception("The method or operation is not implemented.");
         }
 
         // Gets the name of the program.
         // The name returned by this method is always a friendly, user-displayable name that describes the program.
         public int GetName(out string programName) {
-            DebugWriteLine("NodeEngine GetName Called ({0})", GetHashCode());
+            DebugWriteCommand("GetName");
 
             // The engine uses default transport and doesn't need to customize the name of the program,
             // so return NULL.
@@ -796,8 +786,7 @@ namespace Microsoft.NodejsTools.Debugger.DebugEngine {
         // Gets a GUID for this program. A debug engine (DE) must return the program identifier originally passed to the IDebugProgramNodeAttach2::OnAttach
         // or IDebugEngine2::Attach methods. This allows identification of the program across debugger components.
         public int GetProgramId(out Guid guidProgramId) {
-            DebugWriteLine("NodeEngine GetProgramId Called ({0})", GetHashCode());
-
+            DebugWriteCommand("GetProgramId");
             guidProgramId = _ad7ProgramId;
             return guidProgramId == Guid.Empty ? VSConstants.E_FAIL : VSConstants.S_OK;
         }
@@ -810,8 +799,7 @@ namespace Microsoft.NodejsTools.Debugger.DebugEngine {
         /// In case there is any thread synchronization or communication between threads, other threads in the program should run when a particular thread is stepping.
         /// </summary>
         public int Step(IDebugThread2 pThread, enum_STEPKIND sk, enum_STEPUNIT step) {
-            DebugWriteLine("NodeEngine Step Called ({0})", GetHashCode());
-
+            DebugWriteCommand("Step");
             var thread = ((AD7Thread)pThread).GetDebuggedThread();
             switch (sk) {
                 case enum_STEPKIND.STEP_INTO: thread.StepInto(); break;
@@ -823,7 +811,7 @@ namespace Microsoft.NodejsTools.Debugger.DebugEngine {
 
         // Terminates the program.
         public int Terminate() {
-            DebugWriteLine("NodeEngine Terminate Called ({0})", GetHashCode());
+            DebugWriteCommand("Terminate");
 
             // Because we implement IDebugEngineLaunch2 we will terminate
             // the process in IDebugEngineLaunch2.TerminateProcess
@@ -832,7 +820,7 @@ namespace Microsoft.NodejsTools.Debugger.DebugEngine {
 
         // Writes a dump to a file.
         public int WriteDump(enum_DUMPTYPE dumptype, string pszDumpUrl) {
-            DebugWriteLine("NodeEngine WriteDump Called ({0})", GetHashCode());
+            DebugWriteCommand("WriteDump");
             return VSConstants.E_NOTIMPL;
         }
 
@@ -844,7 +832,7 @@ namespace Microsoft.NodejsTools.Debugger.DebugEngine {
         // stepping state cleared.  See http://msdn.microsoft.com/en-us/library/bb145596.aspx for a
         // description of different ways we can resume.
         public int ExecuteOnThread(IDebugThread2 pThread) {
-            DebugWriteLine("NodeEngine ExecuteOnThread Called ({0})", GetHashCode());
+            DebugWriteCommand("ExecuteOnThread");
             AssertMainThread();
 
             // clear stepping state on the thread the user was currently on
@@ -861,7 +849,7 @@ namespace Microsoft.NodejsTools.Debugger.DebugEngine {
         #region IDebugSymbolSettings100 members
 
         public int SetSymbolLoadState(int bIsManual, int bLoadAdjacent, string strIncludeList, string strExcludeList) {
-            DebugWriteLine("NodeEngine SetSymbolLoadState Called ({0})", GetHashCode());
+            DebugWriteCommand("SetSymbolLoadState");
 
             // The SDM will call this method on the debug engine when it is created, to notify it of the user's
             // symbol settings in Tools->Options->Debugging->Symbols.
@@ -915,7 +903,7 @@ namespace Microsoft.NodejsTools.Debugger.DebugEngine {
 
             EngineUtils.RequireOk(eventObject.GetAttributes(out attributes));
 
-            DebugWriteLine("NodeEngine Event: {0} ({1})", eventObject.GetType(), iidEvent);
+            DebugWriteLine("AD7Engine Event: {0} ({1})", eventObject.GetType(), iidEvent);
             try {
                 EngineUtils.RequireOk(_events.Event(this, null, program, thread, eventObject, ref riidEvent, attributes));
             } catch (InvalidCastException) {                
@@ -996,23 +984,12 @@ namespace Microsoft.NodejsTools.Debugger.DebugEngine {
             Send(new AD7EntryPointEvent(), AD7EntryPointEvent.IID, _threads[e.Thread]);
         }
 
-        private void StartWebBrowser() {
-            Uri uri;
-            if (_webBrowserUrl != null && Uri.TryCreate(_webBrowserUrl, UriKind.RelativeOrAbsolute, out uri)) {
-                OnPortOpenedHandler.CreateHandler(
-                    uri.Port,
-                    shortCircuitPredicate: () => _process.HasExited,
-                    action: LaunchBrowserDebugger
-                );
-            }
-        }
-
         private void LaunchBrowserDebugger() {
             DebugWriteLine("LaunchBrowserDebugger Started");
 
             var vsDebugger = (IVsDebugger2)ServiceProvider.GlobalProvider.GetService(typeof(SVsShellDebugger));
 
-            VsDebugTargetInfo2 info = new VsDebugTargetInfo2();
+            var info = new VsDebugTargetInfo2();
             var infoSize = Marshal.SizeOf(info);
             info.cbSize = (uint)infoSize;
             info.bstrExe = _webBrowserUrl;
@@ -1095,7 +1072,7 @@ namespace Microsoft.NodejsTools.Debugger.DebugEngine {
             var codeContext = new AD7MemoryAddress(this, pendingBreakpoint.DocumentName, (uint)breakpointBinding.RequestedLineNo - 1);
             var documentContext = new AD7DocumentContext(codeContext);
             var breakpointResolution = new AD7BreakpointResolution(this, breakpointBinding, documentContext);
-            var boundBreakpoint = new AD7BoundBreakpoint(this, breakpointBinding, pendingBreakpoint, breakpointResolution, breakpointBinding.Enabled);
+            var boundBreakpoint = new AD7BoundBreakpoint(breakpointBinding, pendingBreakpoint, breakpointResolution, breakpointBinding.Enabled);
             _breakpointManager.AddBoundBreakpoint(breakpointBinding, boundBreakpoint);
             Send(
                 new AD7BreakpointBoundEvent(pendingBreakpoint, boundBreakpoint),
@@ -1151,7 +1128,6 @@ namespace Microsoft.NodejsTools.Debugger.DebugEngine {
             }
 
             string fuzzyFileName = null;
-            var enumHierarchyItemsFactory = Package.GetGlobalService(typeof(SVsEnumHierarchyItemsFactory)) as IVsEnumHierarchyItemsFactory;
             var solution = Package.GetGlobalService(typeof(SVsSolution)) as IVsSolution;
             if (solution != null) {
                 int bestMatchCount = 0;
@@ -1159,7 +1135,7 @@ namespace Microsoft.NodejsTools.Debugger.DebugEngine {
                 var reverseFileName = NormalizedReversedPath(fileName);
                 foreach (var project in solution.EnumerateLoadedProjects(onlyNodeProjects: false)) {
                     int pfFound;
-                    VSDOCUMENTPRIORITY[] pdwPriority = new VSDOCUMENTPRIORITY[1];
+                    var pdwPriority = new VSDOCUMENTPRIORITY[1];
                     uint pitemid;
                     if (ErrorHandler.Succeeded(project.IsDocumentInProject(fileName, out pfFound, pdwPriority, out pitemid)) && pfFound != 0) {
                         // Handle remote attach where given fully-qualified path found in project, by matching given filename
@@ -1200,7 +1176,7 @@ namespace Microsoft.NodejsTools.Debugger.DebugEngine {
         private int CountCharMatch(char[] array1, char[] array2) {
             var maxCount = Math.Min(array1.Length, array2.Length);
             int matchCount;
-            for (matchCount = 0; matchCount < maxCount && array1[matchCount] == array2[matchCount]; ++matchCount);
+            for (matchCount = 0; matchCount < maxCount && array1[matchCount] == array2[matchCount]; ++matchCount) { }
             return matchCount;
         }
 
@@ -1212,6 +1188,11 @@ namespace Microsoft.NodejsTools.Debugger.DebugEngine {
                 pbstrLanguage = NodejsConstants.JavaScript;
                 pguidLanguage = Guids.NodejsDebugLanguage;
             }
+        }
+
+        [Conditional("DEBUG")]
+        private void DebugWriteCommand(string commandName) {
+            DebugWriteLine("AD7Engine Called " + commandName);
         }
 
         [Conditional("DEBUG")]

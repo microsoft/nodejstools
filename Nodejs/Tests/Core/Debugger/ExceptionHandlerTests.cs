@@ -130,7 +130,7 @@ namespace NodejsTests.Debugger {
             ExceptionHitTreatment initial = exceptionHandler.GetExceptionHitTreatment(exceptionName);
 
             // Act
-            bool updated = exceptionHandler.ClearExceptionThreatments(new Dictionary<string, ExceptionHitTreatment> {
+            bool updated = exceptionHandler.ClearExceptionTreatments(new Dictionary<string, ExceptionHitTreatment> {
                 { exceptionName, ExceptionHitTreatment.BreakOnUnhandled }
             });
             ExceptionHitTreatment changed = exceptionHandler.GetExceptionHitTreatment(exceptionName);

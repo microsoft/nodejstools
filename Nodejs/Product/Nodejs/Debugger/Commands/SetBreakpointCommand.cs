@@ -20,11 +20,13 @@ using System.Text.RegularExpressions;
 using Newtonsoft.Json.Linq;
 
 namespace Microsoft.NodejsTools.Debugger.Commands {
-    sealed class SetBreakpointCommand : DebuggerCommandBase {
+    sealed class SetBreakpointCommand : DebuggerCommand {
+        private readonly Dictionary<string, object> _arguments;
         private readonly NodeBreakpoint _breakpoint;
         private readonly NodeModule _module;
 
-        public SetBreakpointCommand(int id, NodeModule module, NodeBreakpoint breakpoint, bool withoutPredicate = false) : base(id) {
+        public SetBreakpointCommand(int id, NodeModule module, NodeBreakpoint breakpoint, bool withoutPredicate = false)
+            : base(id, "setbreakpoint") {
             _module = module;
             _breakpoint = breakpoint;
 
@@ -36,34 +38,39 @@ namespace Microsoft.NodejsTools.Debugger.Commands {
             // Node (V8) treats specially for script loaded via require
             int column = line == 0 ? 1 : 0;
 
-            CommandName = "setbreakpoint";
-            Arguments = new Dictionary<string, object> {
+            _arguments = new Dictionary<string, object> {
                 { "line", line },
                 { "column", column }
             };
 
             if (_module != null) {
-                Arguments["type"] = "scriptId";
-                Arguments["target"] = _module.ModuleId;
+                _arguments["type"] = "scriptId";
+                _arguments["target"] = _module.ModuleId;
             } else {
-                Arguments["type"] = "scriptRegExp";
-                Arguments["target"] = GetCaseInsensitiveRegex(_breakpoint.FileName);
+                _arguments["type"] = "scriptRegExp";
+                _arguments["target"] = GetCaseInsensitiveRegex(_breakpoint.FileName);
             }
 
             if (!NodeBreakpointBinding.GetEngineEnabled(_breakpoint.Enabled, _breakpoint.BreakOn, 0)) {
-                Arguments["enabled"] = false;
+                _arguments["enabled"] = false;
             }
 
-            if (!withoutPredicate) {
-                int ignoreCount = NodeBreakpointBinding.GetEngineIgnoreCount(_breakpoint.BreakOn, 0);
-                if (ignoreCount > 0) {
-                    Arguments["ignoreCount"] = ignoreCount;
-                }
-
-                if (!string.IsNullOrEmpty(_breakpoint.Condition)) {
-                    Arguments["condition"] = _breakpoint.Condition;
-                }
+            if (withoutPredicate) {
+                return;
             }
+
+            int ignoreCount = NodeBreakpointBinding.GetEngineIgnoreCount(_breakpoint.BreakOn, 0);
+            if (ignoreCount > 0) {
+                _arguments["ignoreCount"] = ignoreCount;
+            }
+
+            if (!string.IsNullOrEmpty(_breakpoint.Condition)) {
+                _arguments["condition"] = _breakpoint.Condition;
+            }
+        }
+
+        protected override IDictionary<string, object> Arguments {
+            get { return _arguments; }
         }
 
         public int BreakpointId { get; private set; }
@@ -75,21 +82,25 @@ namespace Microsoft.NodejsTools.Debugger.Commands {
         public override void ProcessResponse(JObject response) {
             base.ProcessResponse(response);
 
-            JToken body = response["body"];
-            BreakpointId = (int)body["breakpoint"];
             if (_module != null) {
                 ScriptId = _module.ModuleId;
             }
 
+            JToken body = response["body"];
+            BreakpointId = (int)body["breakpoint"];
+
             // Handle breakpoint actual location fixup
             LineNo = _breakpoint.LineNo;
+
             var actualLocations = (JArray)body["actual_locations"];
-            if (actualLocations != null) {
-                if (actualLocations.Count > 0) {
-                    int actualLocation = (int)actualLocations[0]["line"] + 1;
-                    if (actualLocation != _breakpoint.LineNo) {
-                        LineNo = actualLocation;
-                    }
+            if (actualLocations == null) {
+                return;
+            }
+
+            if (actualLocations.Count > 0) {
+                int actualLocation = (int)actualLocations[0]["line"] + 1;
+                if (actualLocation != _breakpoint.LineNo) {
+                    LineNo = actualLocation;
                 }
             }
         }

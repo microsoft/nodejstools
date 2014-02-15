@@ -19,7 +19,8 @@ using Microsoft.NodejsTools.Debugger.Serialization;
 using Newtonsoft.Json.Linq;
 
 namespace Microsoft.NodejsTools.Debugger.Commands {
-    sealed class LookupCommand : DebuggerCommandBase {
+    sealed class LookupCommand : DebuggerCommand {
+        private readonly Dictionary<string, object> _arguments;
         private readonly int[] _handles;
         private readonly Dictionary<int, NodeEvaluationResult> _parents;
         private readonly IEvaluationResultFactory _resultFactory;
@@ -29,17 +30,18 @@ namespace Microsoft.NodejsTools.Debugger.Commands {
             _parents = parents.ToDictionary(p => p.Handle);
         }
 
-        public LookupCommand(int id, IEvaluationResultFactory resultFactory, int[] handles) : base(id) {
+        public LookupCommand(int id, IEvaluationResultFactory resultFactory, int[] handles) : base(id, "lookup") {
             _resultFactory = resultFactory;
             _handles = handles;
 
-            CommandName = "lookup";
-            Arguments = new Dictionary<string, object> {
+            _arguments = new Dictionary<string, object> {
                 { "handles", handles },
                 { "includeSource", false }
             };
+        }
 
-            Results = new Dictionary<int, List<NodeEvaluationResult>>();
+        protected override IDictionary<string, object> Arguments {
+            get { return _arguments; }
         }
 
         public Dictionary<int, List<NodeEvaluationResult>> Results { get; private set; }
@@ -49,6 +51,7 @@ namespace Microsoft.NodejsTools.Debugger.Commands {
 
             // Retrieve references
             var refs = (JArray)response["refs"];
+
             var references = new Dictionary<int, JToken>(refs.Count);
             foreach (JToken reference in refs) {
                 var id = (int)reference["handle"];
@@ -58,6 +61,7 @@ namespace Microsoft.NodejsTools.Debugger.Commands {
             // Retrieve properties
             JToken body = response["body"];
 
+            var results = new Dictionary<int, List<NodeEvaluationResult>>();
             foreach (int handle in _handles) {
                 JToken data = body[handle.ToString(CultureInfo.InvariantCulture)];
                 if (data == null) {
@@ -69,8 +73,10 @@ namespace Microsoft.NodejsTools.Debugger.Commands {
                     _parents.TryGetValue(handle, out parent);
                 }
 
-                Results.Add(handle, GetProperties(data, parent, references));
+                results.Add(handle, GetProperties(data, parent, references));
             }
+
+            Results = results;
         }
 
         private List<NodeEvaluationResult> GetProperties(JToken data, NodeEvaluationResult parent, Dictionary<int, JToken> references) {
@@ -78,12 +84,8 @@ namespace Microsoft.NodejsTools.Debugger.Commands {
 
             var props = (JArray)data["properties"];
             if (props != null) {
-                for (int i = 0; i < props.Count; i++) {
-                    JToken property = props[i];
-                    var variableProvider = new NodeLookupVariable(parent, property, references);
-                    NodeEvaluationResult result = _resultFactory.Create(variableProvider);
-                    properties.Add(result);
-                }
+                properties.AddRange(props.Select(property => new NodeLookupVariable(parent, property, references))
+                    .Select(variableProvider => _resultFactory.Create(variableProvider)));
             }
 
             // Try to get prototype

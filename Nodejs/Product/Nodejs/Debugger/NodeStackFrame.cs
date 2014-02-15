@@ -13,17 +13,20 @@
  * ***************************************************************************/
 
 using System.Collections.Generic;
+using System.Threading;
 using System.Threading.Tasks;
 
 namespace Microsoft.NodejsTools.Debugger {
     class NodeStackFrame {
+        private readonly NodeDebugger _debugger;
+        private readonly int _endLine;
         private readonly string _frameName;
-        private readonly NodeThread _thread;
+        private readonly int _lineNo;
         private readonly NodeModule _module;
-        private readonly int _startLine, _endLine, _lineNo;
+        private readonly int _startLine;
 
-        public NodeStackFrame(NodeThread thread, NodeModule module, string frameName, int startLine, int endLine, int lineNo, int frameId) {
-            _thread = thread;
+        public NodeStackFrame(NodeDebugger debugger, NodeModule module, string frameName, int startLine, int endLine, int lineNo, int frameId) {
+            _debugger = debugger;
             _module = module;
             _frameName = frameName;
             _lineNo = lineNo;
@@ -36,49 +39,28 @@ namespace Microsoft.NodejsTools.Debugger {
         /// The line nubmer where the current function/class/module starts
         /// </summary>
         public int StartLine {
-            get {
-                return MapLineNo(_startLine);
-            }
+            get { return MapLineNo(_startLine); }
         }
 
         /// <summary>
         /// The line number where the current function/class/module ends.
         /// </summary>
         public int EndLine {
-            get {
-                return MapLineNo(_endLine);
-            }
-        }
-
-        /// <summary>
-        /// Maps a line number from JavaScript to the original source code.
-        /// 
-        /// Line numbers are 1 based.
-        /// </summary>
-        /// <param name="lineNo"></param>
-        /// <returns></returns>
-        private int MapLineNo(int lineNo) {
-            var mapping = Thread.Process.MapToOriginal(Module.JavaScriptFileName, lineNo - 1);
-            if (mapping != null) {
-                return mapping.Line + 1;
-            }
-            return lineNo;
+            get { return MapLineNo(_endLine); }
         }
 
         /// <summary>
         /// Gets a thread which executes stack frame.
         /// </summary>
-        public NodeThread Thread {
-            get { return _thread; }
+        public NodeDebugger Process {
+            get { return _debugger; }
         }
 
         /// <summary>
         /// Gets a stack frame line number in the script.
         /// </summary>
         public int LineNo {
-            get {
-                return MapLineNo(_lineNo);
-            }
+            get { return MapLineNo(_lineNo); }
         }
 
         /// <summary>
@@ -86,7 +68,7 @@ namespace Microsoft.NodejsTools.Debugger {
         /// </summary>
         public string FunctionName {
             get {
-                var mapping = Thread.Process.MapToOriginal(Module.JavaScriptFileName, _lineNo - 1);
+                SourceMapping mapping = _debugger.SourceMapper.MapToOriginal(Module.JavaScriptFileName, _lineNo - 1);
                 if (mapping != null) {
                     return mapping.Name;
                 }
@@ -98,26 +80,21 @@ namespace Microsoft.NodejsTools.Debugger {
         /// Gets a script file name which holds a code segment of the frame.
         /// </summary>
         public string FileName {
-            get {
-                return _module.FileName;
-            }
+            get { return _module.FileName; }
         }
 
         /// <summary>
         /// Gets a script which holds a code segment of the frame.
         /// </summary>
         public NodeModule Module {
-            get {
-                return _module;
-            }
+            get { return _module; }
         }
 
         /// <summary>
-        /// Gets the ID of the frame.  Frame 0 is the currently executing frame, 1 is the caller of the currently executing frame, etc...
+        /// Gets the ID of the frame.  Frame 0 is the currently executing frame, 1 is the caller of the currently executing frame,
+        /// etc...
         /// </summary>
-        public int FrameId {
-            get; private set;
-        }
+        public int FrameId { get; private set; }
 
         /// <summary>
         /// Gets or sets a local variables of the frame.
@@ -130,13 +107,27 @@ namespace Microsoft.NodejsTools.Debugger {
         public IList<NodeEvaluationResult> Parameters { get; set; }
 
         /// <summary>
+        /// Maps a line number from JavaScript to the original source code.
+        /// Line numbers are 1 based.
+        /// </summary>
+        /// <param name="lineNo"></param>
+        /// <returns></returns>
+        private int MapLineNo(int lineNo) {
+            SourceMapping mapping = _debugger.SourceMapper.MapToOriginal(Module.JavaScriptFileName, lineNo - 1);
+            if (mapping != null) {
+                return mapping.Line + 1;
+            }
+            return lineNo;
+        }
+
+        /// <summary>
         /// Attempts to parse the given text.  Returns true if the text is a valid expression.  Returns false if the text is not
         /// a valid expression and assigns the error messages produced to errorMsg.
         /// </summary>
         public virtual bool TryParseText(string text, out string errorMsg) {
 #if NEEDS_UPDATING
             CollectingErrorSink errorSink = new CollectingErrorSink();
-            Parser parser = Parser.CreateParser(new StringReader(text), _thread.Process.LanguageVersion, new ParserOptions() { ErrorSink = errorSink });
+            Parser parser = Parser.CreateParser(new StringReader(text), _debugger.LanguageVersion, new ParserOptions() { ErrorSink = errorSink });
             var ast = parser.ParseSingleStatement();
             if (errorSink.Errors.Count > 0) {
                 StringBuilder msg = new StringBuilder();
@@ -158,8 +149,9 @@ namespace Microsoft.NodejsTools.Debugger {
         /// Executes the given text against this stack frame.
         /// </summary>
         /// <param name="text">Text expression.</param>
-        public virtual Task<NodeEvaluationResult> ExecuteTextAsync(string text) {
-            return _thread.Process.ExecuteTextAsync(text, this);
+        /// <param name="cancellationToken">Cancellation token.</param>
+        public virtual Task<NodeEvaluationResult> ExecuteTextAsync(string text, CancellationToken cancellationToken = new CancellationToken()) {
+            return _debugger.ExecuteTextAsync(text, this, cancellationToken);
         }
 
         /// <summary>
@@ -167,12 +159,13 @@ namespace Microsoft.NodejsTools.Debugger {
         /// </summary>
         /// <param name="name">Variable name.</param>
         /// <param name="value">New value.</param>
-        public virtual async Task<NodeEvaluationResult> SetVariableValueAsync(string name, string value) {
-            var result = await _thread.Process.SetVariableValueAsync(this, name, value).ConfigureAwait(false);
+        /// <param name="cancellationToken">Cancellation token.</param>
+        public virtual async Task<NodeEvaluationResult> SetVariableValueAsync(string name, string value, CancellationToken cancellationToken = new CancellationToken()) {
+            NodeEvaluationResult result = await _debugger.SetVariableValueAsync(this, name, value, cancellationToken).ConfigureAwait(false);
 
             // Update variable in locals
             for (int i = 0; i < Locals.Count; i++) {
-                var evaluationResult = Locals[i];
+                NodeEvaluationResult evaluationResult = Locals[i];
                 if (evaluationResult.Expression == name) {
                     Locals[i] = result;
                 }
@@ -180,7 +173,7 @@ namespace Microsoft.NodejsTools.Debugger {
 
             // Update variable in parameters
             for (int i = 0; i < Parameters.Count; i++) {
-                var evaluationResult = Parameters[i];
+                NodeEvaluationResult evaluationResult = Parameters[i];
                 if (evaluationResult.Expression == name) {
                     Locals[i] = result;
                 }
@@ -195,7 +188,7 @@ namespace Microsoft.NodejsTools.Debugger {
         /// to this line.
         /// </summary>
         public bool SetLineNumber(int lineNo) {
-            return _thread.Process.SetLineNumber(this, lineNo);
+            return _debugger.SetLineNumber(this, lineNo);
         }
     }
 }

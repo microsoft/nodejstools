@@ -18,29 +18,33 @@ using Microsoft.NodejsTools.Debugger.Serialization;
 using Newtonsoft.Json.Linq;
 
 namespace Microsoft.NodejsTools.Debugger.Commands {
-    sealed class BacktraceCommand : DebuggerCommandBase {
+    sealed class BacktraceCommand : DebuggerCommand {
+        private readonly Dictionary<string, object> _arguments;
+        private readonly NodeDebugger _debugger;
         private readonly Dictionary<int, NodeModule> _modules;
         private readonly IEvaluationResultFactory _resultFactory;
-        private readonly NodeThread _thread;
         private readonly NodeModule _unknownModule = new NodeModule(null, -1, "<unknown>");
 
-        public BacktraceCommand(int id, IEvaluationResultFactory resultFactory,
+        public BacktraceCommand(
+            int id,
+            IEvaluationResultFactory resultFactory,
             int fromFrame,
             int toFrame,
-            NodeThread thread = null,
-            Dictionary<int, NodeModule> modules = null) : base(id) {
+            NodeDebugger debugger = null,
+            Dictionary<int, NodeModule> modules = null) : base(id, "backtrace") {
             _resultFactory = resultFactory;
-            _thread = thread;
+            _debugger = debugger;
             _modules = modules;
 
-            CommandName = "backtrace";
-            Arguments = new Dictionary<string, object> {
+            _arguments = new Dictionary<string, object> {
                 { "fromFrame", fromFrame },
                 { "toFrame", toFrame },
                 { "inlineRefs", true }
             };
+        }
 
-            StackFrames = new List<NodeStackFrame>();
+        protected override IDictionary<string, object> Arguments {
+            get { return _arguments; }
         }
 
         public int CallstackDepth { get; private set; }
@@ -52,8 +56,8 @@ namespace Microsoft.NodejsTools.Debugger.Commands {
             JToken body = response["body"];
             CallstackDepth = (int)body["totalFrames"];
 
-            // Should not collect stack frames without thread
-            if (_thread == null) {
+            // Should not collect stack frames without debugger
+            if (_debugger == null) {
                 return;
             }
 
@@ -66,9 +70,8 @@ namespace Microsoft.NodejsTools.Debugger.Commands {
                 return;
             }
 
-            for (int i = 0; i < frames.Count; i++) {
-                JToken frame = frames[i];
-
+            var results = new List<NodeStackFrame>(frames.Count);
+            foreach (JToken frame in frames) {
                 // Create stack frame
                 string name = GetFrameName(frame);
                 var moduleId = (int)frame["func"]["scriptId"];
@@ -80,8 +83,7 @@ namespace Microsoft.NodejsTools.Debugger.Commands {
 
                 int line = (int)frame["line"] + 1;
                 var stackFrameId = (int)frame["index"];
-
-                var stackFrame = new NodeStackFrame(_thread, module, name, line, line, line, stackFrameId);
+                var stackFrame = new NodeStackFrame(_debugger, module, name, line, line, line, stackFrameId);
 
                 // Locals
                 var variables = (JArray)frame["locals"];
@@ -94,18 +96,15 @@ namespace Microsoft.NodejsTools.Debugger.Commands {
                 stackFrame.Locals = locals;
                 stackFrame.Parameters = parameters;
 
-                StackFrames.Add(stackFrame);
+                results.Add(stackFrame);
             }
+
+            StackFrames = results;
         }
 
-        private List<NodeEvaluationResult> GetVariables(NodeStackFrame stackFrame, JArray variables) {
-            var results = new List<NodeEvaluationResult>(variables.Count);
-            for (int i = 0; i < variables.Count; i++) {
-                var variableProvider = new NodeBacktraceVariable(stackFrame, variables[i]);
-                NodeEvaluationResult result = _resultFactory.Create(variableProvider);
-                results.Add(result);
-            }
-            return results.ToList();
+        private List<NodeEvaluationResult> GetVariables(NodeStackFrame stackFrame, IEnumerable<JToken> variables) {
+            return variables.Select(t => new NodeBacktraceVariable(stackFrame, t))
+                .Select(variableProvider => _resultFactory.Create(variableProvider)).ToList();
         }
 
         private static string GetFrameName(JToken frame) {
@@ -122,8 +121,7 @@ namespace Microsoft.NodejsTools.Debugger.Commands {
 
         private static Dictionary<int, NodeModule> GetScripts(JArray references) {
             var scripts = new Dictionary<int, NodeModule>(references.Count);
-            for (int i = 0; i < references.Count; i++) {
-                JToken reference = references[i];
+            foreach (JToken reference in references) {
                 var scriptId = (int)reference["id"];
                 var filename = (string)reference["name"];
 

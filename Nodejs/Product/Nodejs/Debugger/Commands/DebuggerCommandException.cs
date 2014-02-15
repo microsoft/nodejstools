@@ -13,10 +13,14 @@
  * ***************************************************************************/
 
 using System;
+using System.Runtime.Serialization;
 
 namespace Microsoft.NodejsTools.Debugger.Commands {
-    sealed class DebuggerCommandException : Exception {
-        public DebuggerCommandException(string message) : base(message) {
-        }
+    [Serializable]
+    class DebuggerCommandException : Exception {
+        public DebuggerCommandException() { }
+        public DebuggerCommandException(string message) : base(message) { }
+        public DebuggerCommandException(string message, Exception innerException) : base(message, innerException) { }
+        protected DebuggerCommandException(SerializationInfo info, StreamingContext context) : base(info, context) { }
     }
 }

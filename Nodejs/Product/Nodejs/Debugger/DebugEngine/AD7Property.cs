@@ -15,6 +15,9 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Threading;
+using System.Threading.Tasks;
+using Microsoft.NodejsTools.Debugger.Commands;
 using Microsoft.NodejsTools.Debugger.Serialization;
 using Microsoft.VisualStudio;
 using Microsoft.VisualStudio.Debugger.Interop;
@@ -26,10 +29,10 @@ namespace Microsoft.NodejsTools.Debugger.DebugEngine {
     //
     // The sample engine only supports locals and parameters for functions that have symbols loaded.
     class AD7Property : IDebugProperty3 {
-        private readonly NodeEvaluationResult _evaluationResult;
-        private readonly AD7Property _parent;
-        private readonly AD7StackFrame _frame;
         private readonly IComparer<string> _comparer = new NaturalSortComparer();
+        private readonly NodeEvaluationResult _evaluationResult;
+        private readonly AD7StackFrame _frame;
+        private readonly AD7Property _parent;
 
         public AD7Property(AD7StackFrame frame, NodeEvaluationResult evaluationResult, AD7Property parent = null) {
             _evaluationResult = evaluationResult;
@@ -109,18 +112,18 @@ namespace Microsoft.NodejsTools.Debugger.DebugEngine {
         // Enumerates the children of a property. This provides support for dereferencing pointers, displaying members of an array, or fields of a class or struct.
         // The sample debugger only supports pointer dereferencing as children. This means there is only ever one child.
         public int EnumChildren(enum_DEBUGPROP_INFO_FLAGS dwFields, uint dwRadix, ref Guid guidFilter, enum_DBG_ATTRIB_FLAGS dwAttribFilter, string pszNameFilter, uint dwTimeout, out IEnumDebugPropertyInfo2 ppEnum) {
-            ppEnum = null;
-            NodeEvaluationResult[] children = _evaluationResult.GetChildren((int)dwTimeout);
-            if (children == null) {
-                return VSConstants.S_FALSE;
-            }
+            TimeSpan timeout = TimeSpan.FromMilliseconds(dwTimeout);
+            var tokenSource = new CancellationTokenSource(timeout);
+
+            List<NodeEvaluationResult> children = _evaluationResult.GetChildrenAsync(tokenSource.Token)
+                .WaitAsync(timeout, tokenSource.Token).Result;
 
             DEBUG_PROPERTY_INFO[] properties;
-            if (children.Length == 0) {
+            if (children.Count == 0) {
                 properties = new[] { new DEBUG_PROPERTY_INFO { dwFields = enum_DEBUGPROP_INFO_FLAGS.DEBUGPROP_INFO_NAME, bstrValue = "No children" } };
             } else {
-                properties = new DEBUG_PROPERTY_INFO[children.Length];
-                for (int i = 0; i < children.Length; i++) {
+                properties = new DEBUG_PROPERTY_INFO[children.Count];
+                for (int i = 0; i < children.Count; i++) {
                     properties[i] = new AD7Property(_frame, children[i], this).ConstructDebugPropertyInfo(dwRadix, dwFields);
                 }
             }
@@ -153,14 +156,9 @@ namespace Microsoft.NodejsTools.Debugger.DebugEngine {
         public int GetStringChars(uint buflen, ushort[] rgString, out uint pceltFetched) {
             pceltFetched = buflen;
 
-            NodeEvaluationResult result;
-            try {
-                result = _evaluationResult.Frame.ExecuteTextAsync(_evaluationResult.FullName).Result;
-            } catch (Exception) {
-                return VSConstants.E_FAIL;
-            }
-
+            NodeEvaluationResult result = _evaluationResult.Frame.ExecuteTextAsync(_evaluationResult.FullName).Result;
             result.StringValue.ToCharArray().CopyTo(rgString, 0);
+
             return VSConstants.S_OK;
         }
 
@@ -184,26 +182,16 @@ namespace Microsoft.NodejsTools.Debugger.DebugEngine {
 
         public int SetValueAsStringWithError(string pszValue, uint dwRadix, uint dwTimeout, out string errorString) {
             errorString = "Unable to set new value.";
-
             try {
-                if (_parent == null) {
-                    _evaluationResult.Frame.SetVariableValueAsync(_evaluationResult.FullName, pszValue).Wait((int)dwTimeout);
-                } else {
-                    var expression = string.Format("{0} = {1}", _evaluationResult.FullName, pszValue);
-                    _evaluationResult.Frame.ExecuteTextAsync(expression).Wait((int)dwTimeout);
-                }
-            }
-            catch (AggregateException e) {
-                var baseException = e.GetBaseException();
-                if (!string.IsNullOrEmpty(baseException.Message)) {
+                SetValueAsStringAsync(pszValue, TimeSpan.FromMilliseconds(dwTimeout)).Wait();
+            } catch (AggregateException ae) {
+                Exception baseException = ae.GetBaseException();
+                if (baseException is DebuggerCommandException) {
                     errorString = baseException.Message;
+                    return VSConstants.E_FAIL;
                 }
-                return VSConstants.E_FAIL;
-            } catch (Exception e) {
-                if (!string.IsNullOrEmpty(e.Message)) {
-                    errorString = e.Message;    
-                }
-                return VSConstants.E_FAIL;
+
+                throw;
             }
 
             return VSConstants.S_OK;
@@ -255,18 +243,19 @@ namespace Microsoft.NodejsTools.Debugger.DebugEngine {
 
         // The debugger will call this when the user tries to edit the property's values in one of the debugger windows.
         public int SetValueAsString(string pszValue, uint dwRadix, uint dwTimeout) {
-            try {
-                if (_parent == null) {
-                    _evaluationResult.Frame.SetVariableValueAsync(_evaluationResult.FullName, pszValue).Wait((int)dwTimeout);
-                } else {
-                    var expression = string.Format("{0} = {1}", _evaluationResult.FullName, pszValue);
-                    _evaluationResult.Frame.ExecuteTextAsync(expression).Wait((int)dwTimeout);
-                }
-            } catch (Exception) {
-                return VSConstants.E_FAIL;
+            SetValueAsStringAsync(pszValue, TimeSpan.FromMilliseconds(dwTimeout)).Wait();
+            return VSConstants.S_OK;
+        }
+
+        private Task<NodeEvaluationResult> SetValueAsStringAsync(string value, TimeSpan timeout) {
+            var tokenSource = new CancellationTokenSource(timeout);
+            if (_parent == null) {
+                return _evaluationResult.Frame.SetVariableValueAsync(_evaluationResult.FullName, value, tokenSource.Token)
+                    .WaitAsync(timeout, tokenSource.Token);
             }
 
-            return VSConstants.S_OK;
+            string expression = string.Format("{0} = {1}", _evaluationResult.FullName, value);
+            return _evaluationResult.Frame.ExecuteTextAsync(expression, tokenSource.Token).WaitAsync(timeout, tokenSource.Token);
         }
 
         #endregion

@@ -13,9 +13,7 @@
  * ***************************************************************************/
 
 namespace Microsoft.NodejsTools.Debugger.Commands {
-    sealed class SuspendCommand : DebuggerCommandBase {
-        public SuspendCommand(int id) : base(id) {
-            CommandName = "suspend";
-        }
+    sealed class SuspendCommand : DebuggerCommand {
+        public SuspendCommand(int id) : base(id, "suspend") { }
     }
 }

@@ -16,6 +16,8 @@ using System;
 using System.Diagnostics;
 using System.Net.Sockets;
 using System.Text;
+using System.Threading;
+using System.Threading.Tasks;
 
 namespace Microsoft.NodejsTools.Debugger {
     static class Extensions {
@@ -173,6 +175,24 @@ namespace Microsoft.NodejsTools.Debugger {
                     break;
             }
             return true;
+        }
+
+        internal static async Task<T> WaitAsync<T>(this Task<T> task, TimeSpan timeout, CancellationToken token = default (CancellationToken)) {
+            var cancellationTokenSource = new CancellationTokenSource();
+            var linkedTokenSource = CancellationTokenSource.CreateLinkedTokenSource(token, cancellationTokenSource.Token);
+            
+            await Task.WhenAny(new[] {
+                task,
+                Task.Delay(timeout, linkedTokenSource.Token)
+            }).ConfigureAwait(false);
+            
+            linkedTokenSource.Cancel();
+
+            if (task.IsCompleted) {
+                return task.Result;
+            }
+
+            throw new TimeoutException();
         }
     }
 }

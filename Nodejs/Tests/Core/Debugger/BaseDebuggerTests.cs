@@ -626,16 +626,16 @@ namespace NodejsTests.Debugger {
                         nodeBreakpoint = breakpoints[breakpoint];
                         foreach (var breakpointBinding in nodeBreakpoint.GetBindings()) {
                             if (step._hitCount != null) {
-                                Assert.IsTrue(breakpointBinding.SetHitCount(step._hitCount.Value));
+                                Assert.IsTrue(breakpointBinding.SetHitCountAsync(step._hitCount.Value).Result);
                             }
                             if (step._enabled != null) {
-                                Assert.IsTrue(breakpointBinding.SetEnabled(step._enabled.Value));
+                                Assert.IsTrue(breakpointBinding.SetEnabledAsync(step._enabled.Value).Result);
                             }
                             if (step._breakOn != null) {
-                                Assert.IsTrue(breakpointBinding.SetBreakOn(step._breakOn.Value));
+                                Assert.IsTrue(breakpointBinding.SetBreakOnAsync(step._breakOn.Value).Result);
                             }
                             if (step._condition != null) {
-                                Assert.IsTrue(breakpointBinding.SetCondition(step._condition));
+                                Assert.IsTrue(breakpointBinding.SetConditionAsync(step._condition).Result);
                             }
                         }
                         break;

@@ -17,19 +17,36 @@ using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 
 namespace Microsoft.NodejsTools.Debugger.Commands {
-    abstract class DebuggerCommandBase : IDebuggerCommand {
-        protected Dictionary<string, object> Arguments;
+    abstract class DebuggerCommand {
+        private readonly string _commandName;
 
-        protected string CommandName;
-
-        protected DebuggerCommandBase(int id) {
+        protected DebuggerCommand(int id, string commandName) {
             Id = id;
+            _commandName = commandName;
         }
 
+        /// <summary>
+        /// Gets a command arguments.
+        /// </summary>
+        protected virtual IDictionary<string, object> Arguments {
+            get { return null; }
+        }
+
+        /// <summary>
+        /// Gets a command identifier.
+        /// </summary>
         public int Id { get; private set; }
 
+        /// <summary>
+        /// Gets a value indicating whether command execution in progress.
+        /// </summary>
         public bool Running { get; private set; }
 
+        /// <summary>
+        /// Parses response message.
+        /// </summary>
+        /// <param name="response">Message.</param>
+        /// <returns>Indicates whether command execution succeeded.</returns>
         public virtual void ProcessResponse(JObject response) {
             Running = (bool)response["running"];
 
@@ -39,10 +56,14 @@ namespace Microsoft.NodejsTools.Debugger.Commands {
             }
         }
 
+        /// <summary>
+        /// Serializes a command.
+        /// </summary>
+        /// <returns></returns>
         public override string ToString() {
             return JsonConvert.SerializeObject(
                 new {
-                    command = CommandName,
+                    command = _commandName,
                     seq = Id,
                     type = "request",
                     arguments = Arguments

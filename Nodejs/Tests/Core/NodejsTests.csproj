@@ -109,7 +109,6 @@
     <Compile Include="Debugger\Serialization\LookupVariableTests.cs" />
     <Compile Include="Debugger\Serialization\EvaluationVariableTests.cs" />
     <Compile Include="Debugger\Serialization\BacktraceVariableTests.cs" />
-    <Compile Include="Debugger\Serialization\SequentialNumberGeneratorTests.cs" />
     <Compile Include="ImportWizardTests.cs" />
     <Compile Include="Mocks\MockEvaluationResultFactory.cs" />
     <Compile Include="JadeTests.cs" />

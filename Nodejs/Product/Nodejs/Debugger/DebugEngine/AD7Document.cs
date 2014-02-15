@@ -47,12 +47,13 @@ namespace Microsoft.NodejsTools.Debugger.DebugEngine {
         private char[] ScriptText {
             get {
                 if (_scriptText == null) {
-                    var scriptText = _documentContext.Engine.Process.GetScriptTextAsync(_documentContext.Module.ModuleId).Result;
+                    var moduleId = _documentContext.Module.ModuleId;
+                    var scriptText = _documentContext.Engine.Process.GetScriptTextAsync(moduleId).Result;
                     if (scriptText != null){
                         _scriptText = scriptText.ToCharArray();
                     }
-
                 }
+
                 return _scriptText;
             }
         }
@@ -60,8 +61,7 @@ namespace Microsoft.NodejsTools.Debugger.DebugEngine {
         private int[] ScriptLines {
             get {
                 if (_scriptLines == null) {
-                    var scriptLines = new List<int>();
-                    scriptLines.Add(0);
+                    var scriptLines = new List<int> { 0 };
                     if (ScriptText != null) {
                         for (var i = 0; i < ScriptText.Length; ++i) {
                             // Treat combinations of carriage return and line feed as line endings

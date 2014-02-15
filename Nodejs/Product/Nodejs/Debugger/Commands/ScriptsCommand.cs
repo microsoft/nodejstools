@@ -16,18 +16,21 @@ using System.Collections.Generic;
 using Newtonsoft.Json.Linq;
 
 namespace Microsoft.NodejsTools.Debugger.Commands {
-    sealed class ScriptsCommand : DebuggerCommandBase {
-        public ScriptsCommand(int id, bool includeSource, int? moduleId = null) : base(id) {
-            CommandName = "scripts";
-            Arguments = new Dictionary<string, object> {
-                { "includeSource", includeSource },
+    sealed class ScriptsCommand : DebuggerCommand {
+        private readonly Dictionary<string, object> _arguments;
+
+        public ScriptsCommand(int id, bool includeSource = false, int? moduleId = null) : base(id, "scripts") {
+            _arguments = new Dictionary<string, object> {
+                { "includeSource", includeSource }
             };
 
             if (moduleId != null) {
-                Arguments["ids"] = new object[] { moduleId };
+                _arguments["ids"] = new object[] { moduleId };
             }
+        }
 
-            Modules = new List<NodeModule>();
+        protected override IDictionary<string, object> Arguments {
+            get { return _arguments; }
         }
 
         public List<NodeModule> Modules { get; private set; }
@@ -36,13 +39,17 @@ namespace Microsoft.NodejsTools.Debugger.Commands {
             base.ProcessResponse(response);
 
             var body = (JArray)response["body"];
+
+            var result = new List<NodeModule>(body.Count);
             foreach (JToken module in body) {
                 var id = (int)module["id"];
                 var source = (string)module["source"];
                 var name = (string)module["name"];
 
-                Modules.Add(new NodeModule(null, id, name, source));
+                result.Add(new NodeModule(null, id, name, source));
             }
+
+            Modules = result;
         }
     }
 }

@@ -24,7 +24,7 @@ namespace Microsoft.NodejsTools.Debugger.Communication {
         /// </summary>
         /// <param name="command">Command.</param>
         /// <param name="cancellationToken">Cancellation token.</param>
-        Task SendRequestAsync(IDebuggerCommand command, CancellationToken cancellationToken = new CancellationToken());
+        Task SendRequestAsync(DebuggerCommand command, CancellationToken cancellationToken = new CancellationToken());
 
         /// <summary>
         /// Break point event handler.

@@ -15,12 +15,17 @@
 using System.Collections.Generic;
 
 namespace Microsoft.NodejsTools.Debugger.Commands {
-    sealed class ClearBreakpointCommand : DebuggerCommandBase {
-        public ClearBreakpointCommand(int id, int breakpointId) : base(id) {
-            CommandName = "clearbreakpoint";
-            Arguments = new Dictionary<string, object> {
+    sealed class ClearBreakpointCommand : DebuggerCommand {
+        private readonly Dictionary<string, object> _arguments;
+
+        public ClearBreakpointCommand(int id, int breakpointId) : base(id, "clearbreakpoint") {
+            _arguments = new Dictionary<string, object> {
                 { "breakpoint", breakpointId }
             };
+        }
+
+        protected override IDictionary<string, object> Arguments {
+            get { return _arguments; }
         }
     }
 }

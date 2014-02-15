@@ -12,7 +12,10 @@
  *
  * ***************************************************************************/
 
+using System.Collections.Generic;
 using System.Text.RegularExpressions;
+using System.Threading;
+using System.Threading.Tasks;
 
 namespace Microsoft.NodejsTools.Debugger {
     /// <summary>
@@ -111,12 +114,12 @@ namespace Microsoft.NodejsTools.Debugger {
         /// "foo" or "0" so they need additional work to append onto this expression.
         /// Returns null if the object is not expandable.
         /// </summary>
-        public NodeEvaluationResult[] GetChildren(int timeOut) {
+        public async Task<List<NodeEvaluationResult>> GetChildrenAsync(CancellationToken cancellationToken = new CancellationToken()) {
             if (!Type.HasFlag(NodeExpressionType.Expandable)) {
                 return null;
             }
 
-            return _frame.Thread.Process.EnumChildrenAsync(this).Result;
+            return await _frame.Process.EnumChildrenAsync(this, cancellationToken).ConfigureAwait(false);
         }
 
         private int GetStringLength(string stringValue) {

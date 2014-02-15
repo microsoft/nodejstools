@@ -41,14 +41,22 @@ namespace Microsoft.NodejsTools.Debugger.Communication {
         /// </summary>
         /// <param name="command">Command.</param>
         /// <param name="cancellationToken">Cancellation token.</param>
-        public async Task SendRequestAsync(IDebuggerCommand command, CancellationToken cancellationToken = new CancellationToken()) {
-            TaskCompletionSource<JObject> promise = _messages.GetOrAdd(command.Id, i => new TaskCompletionSource<JObject>());
-            await _connection.SendMessageAsync(command.ToString()).ConfigureAwait(false);
+        public async Task SendRequestAsync(DebuggerCommand command, CancellationToken cancellationToken = new CancellationToken()) {
+            cancellationToken.ThrowIfCancellationRequested();
 
-            JObject response = await promise.Task.ConfigureAwait(false);
-            command.ProcessResponse(response);
+            try {
+                TaskCompletionSource<JObject> promise = _messages.GetOrAdd(command.Id, i => new TaskCompletionSource<JObject>());
+                await _connection.SendMessageAsync(command.ToString()).ConfigureAwait(false);
+                cancellationToken.ThrowIfCancellationRequested();
 
-            _messages.TryRemove(command.Id, out promise);
+                JObject response = await promise.Task.ConfigureAwait(false);
+                cancellationToken.ThrowIfCancellationRequested();
+
+                command.ProcessResponse(response);
+            } finally {
+                TaskCompletionSource<JObject> promise;
+                _messages.TryRemove(command.Id, out promise);
+            }
         }
 
         /// <summary>
@@ -72,16 +80,9 @@ namespace Microsoft.NodejsTools.Debugger.Communication {
         /// <param name="sender">Sender.</param>
         /// <param name="args">Event arguments.</param>
         private void OnOutputMessage(object sender, MessageEventArgs args) {
-            JObject message;
-
-            try {
-                message = JObject.Parse(args.Message);
-            } catch (Exception e) {
-                Debug.Fail(string.Format("Invalid debugger message: {0}{1}{2}", e, Environment.NewLine, args.Message));
-                return;
-            }
-
+            JObject message = JObject.Parse(args.Message);
             var messageType = (string)message["type"];
+
             switch (messageType) {
                 case "event":
                     HandleEventMessage(message);
@@ -141,10 +142,11 @@ namespace Microsoft.NodejsTools.Debugger.Communication {
         private void HandleResponseMessage(JObject message) {
             TaskCompletionSource<JObject> promise;
             var messageId = (int)message["request_seq"];
+            
             if (_messages.TryGetValue(messageId, out promise)) {
                 promise.SetResult(message);
             } else {
-                Debug.Fail(string.Format("Invalid response identifier '{0}' in message: {1}", messageId, message));
+                Debug.Fail(string.Format("Invalid response identifier '{0}'", messageId));
             }
         }
     }

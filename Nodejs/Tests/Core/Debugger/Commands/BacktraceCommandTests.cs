@@ -14,6 +14,7 @@
 
 using Microsoft.NodejsTools.Debugger;
 using Microsoft.NodejsTools.Debugger.Commands;
+using Microsoft.NodejsTools.Debugger.Serialization;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using Newtonsoft.Json.Linq;
 using NodejsTests.Mocks;
@@ -54,7 +55,7 @@ namespace NodejsTests.Debugger.Commands {
 
             // Assert
             Assert.AreEqual(7, backtraceCommand.CallstackDepth);
-            Assert.AreEqual(0, backtraceCommand.StackFrames.Count);
+            Assert.IsNull(backtraceCommand.StackFrames);
         }
 
         [TestMethod]
@@ -63,9 +64,9 @@ namespace NodejsTests.Debugger.Commands {
             const int commandId = 3;
             const int fromFrame = 0;
             const int toFrame = 7;
-            var thread = new NodeThread(new NodeDebugger("localhost", 5858, 1), 0, false);
+            var debugger = new NodeDebugger("localhost", 5858, 1);
             var resultFactory = new MockEvaluationResultFactory();
-            var backtraceCommand = new BacktraceCommand(commandId, resultFactory, fromFrame, toFrame, thread);
+            var backtraceCommand = new BacktraceCommand(commandId, resultFactory, fromFrame, toFrame, debugger);
             JObject backtraceMessage = SerializationTestData.GetBacktraceResponse();
 
             // Act
@@ -74,7 +75,7 @@ namespace NodejsTests.Debugger.Commands {
             // Assert
             Assert.AreEqual(7, backtraceCommand.StackFrames.Count);
             NodeStackFrame firstFrame = backtraceCommand.StackFrames[0];
-            Assert.AreEqual("Anonymous function", firstFrame.FunctionName);
+            Assert.AreEqual(NodeVariableType.AnonymousFunction, firstFrame.FunctionName);
             Assert.AreEqual(@"C:\Users\Tester\documents\visual studio 2012\Projects\NodejsApp1\NodejsApp1\server.js", firstFrame.FileName);
             Assert.AreEqual(23, firstFrame.LineNo);
             Assert.AreEqual(15, firstFrame.Locals.Count);

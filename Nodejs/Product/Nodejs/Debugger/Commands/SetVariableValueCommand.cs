@@ -18,12 +18,14 @@ using Microsoft.VisualStudioTools.Project;
 using Newtonsoft.Json.Linq;
 
 namespace Microsoft.NodejsTools.Debugger.Commands {
-    sealed class SetVariableValueCommand : DebuggerCommandBase {
+    sealed class SetVariableValueCommand : DebuggerCommand {
+        private readonly Dictionary<string, object> _arguments;
         private readonly string _name;
         private readonly IEvaluationResultFactory _resultFactory;
         private readonly NodeStackFrame _stackFrame;
 
-        public SetVariableValueCommand(int id, IEvaluationResultFactory resultFactory, NodeStackFrame stackFrame, string name, int handle) : base(id) {
+        public SetVariableValueCommand(int id, IEvaluationResultFactory resultFactory, NodeStackFrame stackFrame, string name, int handle)
+            : base(id, "setVariableValue") {
             Utilities.ArgumentNotNull("resultFactory", resultFactory);
             Utilities.ArgumentNotNull("stackFrame", stackFrame);
             Utilities.ArgumentNotNullOrEmpty("name", name);
@@ -32,12 +34,15 @@ namespace Microsoft.NodejsTools.Debugger.Commands {
             _stackFrame = stackFrame;
             _name = name;
 
-            CommandName = "setVariableValue";
-            Arguments = new Dictionary<string, object> {
+            _arguments = new Dictionary<string, object> {
                 { "name", name },
                 { "newValue", new { handle } },
                 { "scope", new { frameNumber = stackFrame.FrameId, number = 0 } }
             };
+        }
+
+        protected override IDictionary<string, object> Arguments {
+            get { return _arguments; }
         }
 
         public NodeEvaluationResult Result { get; private set; }

@@ -25,8 +25,6 @@ namespace Microsoft.NodejsTools.Debugger.DebugEngine {
     // Also implements the IDebugExpressionContext interface, which allows expression evaluation and watch windows.
     class AD7StackFrame : IDebugStackFrame2, IDebugExpressionContext2 {
         private readonly AD7Engine _engine;
-        private readonly IList<NodeEvaluationResult> _locals;
-        private readonly IList<NodeEvaluationResult> _parameters;
         private readonly NodeStackFrame _stackFrame;
         private readonly AD7Thread _thread;
         private AD7MemoryAddress _codeContext;
@@ -35,13 +33,10 @@ namespace Microsoft.NodejsTools.Debugger.DebugEngine {
 
         // An array of this frame's parameters
 
-        public AD7StackFrame(AD7Engine engine, AD7Thread thread, NodeStackFrame threadContext) {
+        public AD7StackFrame(AD7Engine engine, AD7Thread thread, NodeStackFrame stackFrame) {
             _engine = engine;
             _thread = thread;
-            _stackFrame = threadContext;
-
-            _parameters = threadContext.Parameters;
-            _locals = threadContext.Locals;
+            _stackFrame = stackFrame;
         }
 
         public NodeStackFrame StackFrame {
@@ -156,44 +151,16 @@ namespace Microsoft.NodejsTools.Debugger.DebugEngine {
 
         // Construct an instance of IEnumDebugPropertyInfo2 for the combined locals and parameters.
         private List<DEBUG_PROPERTY_INFO> CreateLocalsPlusArgsProperties(uint radix) {
-            var properties = new List<DEBUG_PROPERTY_INFO>();
-
-            if (_locals != null) {
-                for (int i = 0; i < _locals.Count; i++) {
-                    var property = new AD7Property(this, _locals[i]);
-                    properties.Add(
-                        property.ConstructDebugPropertyInfo(
-                            radix,
-                            enum_DEBUGPROP_INFO_FLAGS.DEBUGPROP_INFO_STANDARD | enum_DEBUGPROP_INFO_FLAGS.DEBUGPROP_INFO_FULLNAME
-                        )
-                    );
-                }
-            }
-
-            if (_parameters != null) {
-                for (int i = 0; i < _parameters.Count; i++) {
-                    var property = new AD7Property(this, _parameters[i]);
-                    properties.Add(
-                        property.ConstructDebugPropertyInfo(
-                            radix,
-                            enum_DEBUGPROP_INFO_FLAGS.DEBUGPROP_INFO_STANDARD | enum_DEBUGPROP_INFO_FLAGS.DEBUGPROP_INFO_FULLNAME
-                        )
-                    );
-                }
-            }
-
-            return properties;
+            return CreateLocalProperties(radix).Union(CreateParameterProperties(radix)).ToList();
         }
 
         // Construct an instance of IEnumDebugPropertyInfo2 for the locals collection only.
         private List<DEBUG_PROPERTY_INFO> CreateLocalProperties(uint radix) {
             var properties = new List<DEBUG_PROPERTY_INFO>();
-            if (_locals == null) {
-                return properties;
-            }
+            var locals = _stackFrame.Locals;
 
-            for (int i = 0; i < _locals.Count; i++) {
-                var property = new AD7Property(this, _locals[i]);
+            for (int i = 0; i < locals.Count; i++) {
+                var property = new AD7Property(this, locals[i]);
                 properties.Add(
                         property.ConstructDebugPropertyInfo(
                             radix,
@@ -208,12 +175,10 @@ namespace Microsoft.NodejsTools.Debugger.DebugEngine {
         // Construct an instance of IEnumDebugPropertyInfo2 for the parameters collection only.
         private List<DEBUG_PROPERTY_INFO> CreateParameterProperties(uint radix) {
             var properties = new List<DEBUG_PROPERTY_INFO>();
-            if (_parameters == null) {
-                return properties;
-            }
+            var parameters = _stackFrame.Parameters;
 
-            for (int i = 0; i < _parameters.Count; i++) {
-                var property = new AD7Property(this, _parameters[i]);
+            for (int i = 0; i < parameters.Count; i++) {
+                var property = new AD7Property(this, parameters[i]);
                 properties.Add(
                         property.ConstructDebugPropertyInfo(
                             radix,
@@ -249,7 +214,10 @@ namespace Microsoft.NodejsTools.Debugger.DebugEngine {
                 return VSConstants.E_NOTIMPL;
             }
 
+            // Select distinct values from arguments and local variables
+            properties = properties.GroupBy(p => p.bstrName).Select(p => p.First()).ToList();
             elementsReturned = (uint) properties.Count;
+
             enumObject = new AD7PropertyInfoEnum(properties.OrderBy(p => p.bstrName, _comparer).ToArray());
 
             return VSConstants.S_OK;
@@ -343,21 +311,11 @@ namespace Microsoft.NodejsTools.Debugger.DebugEngine {
             pbstrError = "";
             pichError = 0;
 
-            if (_parameters != null) {
-                foreach (NodeEvaluationResult currVariable in _parameters) {
-                    if (String.CompareOrdinal(currVariable.Expression, pszCode) == 0) {
-                        ppExpr = new UncalculatedAD7Expression(this, currVariable.Expression);
-                        return VSConstants.S_OK;
-                    }
-                }
-            }
-
-            if (_locals != null) {
-                foreach (NodeEvaluationResult currVariable in _locals) {
-                    if (String.CompareOrdinal(currVariable.Expression, pszCode) == 0) {
-                        ppExpr = new UncalculatedAD7Expression(this, currVariable.Expression);
-                        return VSConstants.S_OK;
-                    }
+            var evaluationResults = _stackFrame.Locals.Union(_stackFrame.Parameters);
+            foreach (NodeEvaluationResult currVariable in evaluationResults) {
+                if (String.CompareOrdinal(currVariable.Expression, pszCode) == 0) {
+                    ppExpr = new UncalculatedAD7Expression(this, currVariable.Expression);
+                    return VSConstants.S_OK;
                 }
             }
 

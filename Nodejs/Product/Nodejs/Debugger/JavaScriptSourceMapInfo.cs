@@ -12,15 +12,14 @@
  *
  * ***************************************************************************/
 
-using System.Collections.Generic;
-
 namespace Microsoft.NodejsTools.Debugger {
-    interface IExceptionHandler {
-        bool BreakOnAllExceptions { get; }
-        bool SetExceptionTreatments(ICollection<KeyValuePair<string, ExceptionHitTreatment>> exceptionTreatments);
-        bool ClearExceptionThreatments(ICollection<KeyValuePair<string, ExceptionHitTreatment>> exceptionTreatments);
-        bool ResetExceptionTreatments();
-        bool SetDefaultExceptionHitTreatment(ExceptionHitTreatment exceptionTreatment);
-        ExceptionHitTreatment GetExceptionHitTreatment(string exceptionName);
+    class JavaScriptSourceMapInfo {
+        public readonly string[] Lines;
+        public readonly SourceMap Map;
+
+        public JavaScriptSourceMapInfo(SourceMap map, string[] lines) {
+            Map = map;
+            Lines = lines;
+        }
     }
 }

@@ -15,13 +15,18 @@
 using System.Collections.Generic;
 
 namespace Microsoft.NodejsTools.Debugger.Commands {
-    sealed class SetExceptionBreakCommand : DebuggerCommandBase {
-        public SetExceptionBreakCommand(int id, bool uncaughtExceptions, bool enabled) : base(id) {
-            CommandName = "setexceptionbreak";
-            Arguments = new Dictionary<string, object> {
+    sealed class SetExceptionBreakCommand : DebuggerCommand {
+        private readonly Dictionary<string, object> _arguments;
+
+        public SetExceptionBreakCommand(int id, bool uncaughtExceptions, bool enabled) : base(id, "setexceptionbreak") {
+            _arguments = new Dictionary<string, object> {
                 { "type", uncaughtExceptions ? "uncaught" : "all" },
                 { "enabled", enabled }
             };
+        }
+
+        protected override IDictionary<string, object> Arguments {
+            get { return _arguments; }
         }
     }
 }

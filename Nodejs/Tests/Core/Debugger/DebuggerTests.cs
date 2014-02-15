@@ -110,10 +110,10 @@ namespace NodejsTests.Debugger {
 
             if (children == null) {
                 Assert.IsTrue(!evalRes.Type.HasFlag(NodeExpressionType.Expandable));
-                Assert.IsTrue(evalRes.GetChildren(Int32.MaxValue) == null);
+                Assert.IsTrue(evalRes.GetChildrenAsync().Result == null);
             } else {
                 Assert.IsTrue(evalRes.Type.HasFlag(NodeExpressionType.Expandable));
-                var childrenReceived = new List<NodeEvaluationResult>(evalRes.GetChildren(Int32.MaxValue));
+                var childrenReceived = new List<NodeEvaluationResult>(evalRes.GetChildrenAsync().Result);
 
                 Assert.AreEqual(children.Length, childrenReceived.Count, String.Format("received incorrect number of children: {0} expected, received {1}", children.Length, childrenReceived.Count));
                 for (int i = 0; i < children.Length; i++) {
@@ -183,7 +183,7 @@ namespace NodejsTests.Debugger {
                     Assert.AreEqual(thread, args.Thread);
                     breakComplete.Set();
                 };
-                process.BreakAll();
+                process.BreakAllAsync().Wait();
                 AssertWaited(breakComplete);
                 breakComplete.Reset();
 
