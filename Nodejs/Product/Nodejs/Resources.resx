@@ -186,12 +186,6 @@
   <data name="NpmPackageAuthorDescription" xml:space="preserve">
     <value>Primary or original author of package; there may also be additional contributors.</value>
   </data>
-  <data name="NpmPackagePublishDateTime" xml:space="preserve">
-    <value>Published</value>
-  </data>
-  <data name="NpmPackagePublishDateTimeDescription" xml:space="preserve">
-    <value>When the package was published.</value>
-  </data>
   <data name="NpmPackagePath" xml:space="preserve">
     <value>Path</value>
   </data>

@@ -109,15 +109,6 @@ namespace Microsoft.NodejsTools.Project {
             }
         }
 
-        [SRCategoryAttribute(SR.CategoryVersion)]
-        [LocDisplayName(SR.NpmPackagePublishDateTime)]
-        [SRDescriptionAttribute(SR.NpmPackagePublishDateTimeDescription)]
-        public string PublishDateTime {
-            get {
-                return null == Package ? null : Package.PublishDateTimeString;
-            }
-        }
-
         [SRCategoryAttribute(SR.General)]
         [LocDisplayName(SR.NpmPackagePath)]
         [SRDescriptionAttribute(SR.NpmPackagePathDescription)]

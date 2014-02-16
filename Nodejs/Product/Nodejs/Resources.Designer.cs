@@ -502,24 +502,6 @@ namespace Microsoft.NodejsTools {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Published.
-        /// </summary>
-        internal static string NpmPackagePublishDateTime {
-            get {
-                return ResourceManager.GetString("NpmPackagePublishDateTime", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   Looks up a localized string similar to When the package was published..
-        /// </summary>
-        internal static string NpmPackagePublishDateTimeDescription {
-            get {
-                return ResourceManager.GetString("NpmPackagePublishDateTimeDescription", resourceCulture);
-            }
-        }
-        
-        /// <summary>
         ///   Looks up a localized string similar to Requested Version.
         /// </summary>
         internal static string NpmPackageRequestedVersionRange {
