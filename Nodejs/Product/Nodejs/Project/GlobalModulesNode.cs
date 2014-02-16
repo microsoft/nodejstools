@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using Microsoft.NodejsTools.Npm;
 using Microsoft.VisualStudioTools.Project;
 
 namespace Microsoft.NodejsTools.Project {
@@ -37,6 +38,8 @@ namespace Microsoft.NodejsTools.Project {
         public override string Caption{ //  TODO: stick this string in a resource, along with the NodeModulesNode caption
             get { return _cCaption; }
         }
+
+        internal IGlobalPackages GlobalPackages { get; set; }
 
         //  TODO: is there a way to support tooltips on hierarchy nodes?
 

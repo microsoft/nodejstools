@@ -169,7 +169,7 @@ namespace Microsoft.NodejsTools.Project {
             }
         }
 
-        private IRootPackage RootPackage {
+        internal IRootPackage RootPackage {
             get {
                 var controller = NpmController;
                 return null == controller ? null : controller.RootPackage;
@@ -432,6 +432,7 @@ namespace Microsoft.NodejsTools.Project {
 
                 var global = controller.GlobalPackages;
                 if (null != global){
+                    _globalModulesNode.GlobalPackages = global;
                     ReloadHierarchy(_globalModulesNode, global.Modules);
                 }
             }

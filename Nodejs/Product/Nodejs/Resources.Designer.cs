@@ -268,6 +268,42 @@ namespace Microsoft.NodejsTools {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Package Installations.
+        /// </summary>
+        internal static string NpmNodePackageInstallation {
+            get {
+                return ResourceManager.GetString("NpmNodePackageInstallation", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Indicates whether the node manages local or global npm package installations..
+        /// </summary>
+        internal static string NpmNodePackageInstallationDescription {
+            get {
+                return ResourceManager.GetString("NpmNodePackageInstallationDescription", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Path.
+        /// </summary>
+        internal static string NpmNodePath {
+            get {
+                return ResourceManager.GetString("NpmNodePath", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Base path in which npm packages are installed..
+        /// </summary>
+        internal static string NpmNodePathDescription {
+            get {
+                return ResourceManager.GetString("NpmNodePathDescription", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Author.
         /// </summary>
         internal static string NpmPackageAuthor {
@@ -642,6 +678,24 @@ namespace Microsoft.NodejsTools {
         internal static string PackageCatalogRefreshODays {
             get {
                 return ResourceManager.GetString("PackageCatalogRefreshODays", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Global.
+        /// </summary>
+        internal static string PackageInstallationGlobal {
+            get {
+                return ResourceManager.GetString("PackageInstallationGlobal", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Local.
+        /// </summary>
+        internal static string PackageInstallationLocal {
+            get {
+                return ResourceManager.GetString("PackageInstallationLocal", resourceCulture);
             }
         }
         

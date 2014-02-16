@@ -61,6 +61,11 @@ namespace Microsoft.NodejsTools.Project {
         internal const string CategoryVersion = "CategoryVersion";
         internal const string CategoryStatus = "CategoryStatus";
 
+        internal const string NpmNodePackageInstallation = "NpmNodePackageInstallation";
+        internal const string NpmNodePackageInstallationDescription = "NpmNodePackageInstallationDescription";
+        internal const string NpmNodePath = "NpmNodePath";
+        internal const string NpmNodePathDescription = "NpmNodePathDescription";
+
         internal static new string GetString(string value) {
             string result = Microsoft.NodejsTools.Resources.ResourceManager.GetString(value, CultureInfo.CurrentUICulture) ?? CommonSR.GetString(value);
             if (result == null) {

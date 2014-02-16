@@ -264,6 +264,24 @@
   <data name="RequestedVersionRangeNone" xml:space="preserve">
     <value>None</value>
   </data>
+  <data name="NpmNodePackageInstallation" xml:space="preserve">
+    <value>Package Installations</value>
+  </data>
+  <data name="NpmNodePackageInstallationDescription" xml:space="preserve">
+    <value>Indicates whether the node manages local or global npm package installations.</value>
+  </data>
+  <data name="NpmNodePath" xml:space="preserve">
+    <value>Path</value>
+  </data>
+  <data name="NpmNodePathDescription" xml:space="preserve">
+    <value>Base path in which npm packages are installed.</value>
+  </data>
+  <data name="PackageInstallationGlobal" xml:space="preserve">
+    <value>Global</value>
+  </data>
+  <data name="PackageInstallationLocal" xml:space="preserve">
+    <value>Local</value>
+  </data>
   <data name="ScriptArgumentsToolTip" xml:space="preserve">
     <value>Specifies the arguments passed to the script on launch.</value>
   </data>

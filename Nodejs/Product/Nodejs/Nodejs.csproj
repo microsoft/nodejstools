@@ -223,6 +223,7 @@
     <Compile Include="Commands\OpenRemoteDebugProxyFolderCommand.cs" />
     <Compile Include="Commands\SurveyNewsCommand.cs" />
     <Compile Include="Project\DependencyNodeProperties.cs" />
+    <Compile Include="Project\NpmNodeProperties.cs" />
     <Compile Include="Resources.Designer.cs">
       <AutoGen>True</AutoGen>
       <DesignTime>True</DesignTime>

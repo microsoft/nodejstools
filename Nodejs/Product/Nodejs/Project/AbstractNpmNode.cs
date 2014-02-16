@@ -21,6 +21,10 @@ namespace Microsoft.NodejsTools.Project {
             get { return VSConstants.GUID_ItemType_VirtualFolder; }
         }
 
+        protected override NodeProperties CreatePropertiesObject() {
+            return new NpmNodeProperties(this);
+        }
+
         protected void ReloadHierarchy(HierarchyNode parent, INodeModules modules) {
             //  We're going to reuse nodes for which matching modules exist in the new set.
             //  The reason for this is that we want to preserve the expansion state of the
