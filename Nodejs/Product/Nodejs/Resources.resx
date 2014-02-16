@@ -198,11 +198,11 @@
   <data name="NpmPackagePathDescription" xml:space="preserve">
     <value>Location of package on disk.</value>
   </data>
-  <data name="NpmPackageIsGlobalInstall" xml:space="preserve">
-    <value>Global Install</value>
+  <data name="NpmPackageType" xml:space="preserve">
+    <value>Package Type</value>
   </data>
-  <data name="NpmPackageIsGlobalInstallDescription" xml:space="preserve">
-    <value>Whether the package is installed globally (true) or locally (false).</value>
+  <data name="NpmPackageTypeDescription" xml:space="preserve">
+    <value>Indicates whether package is global, or locally installed in your project, and whether or not it is a sub-package.</value>
   </data>
   <data name="NpmPackageIsListedInParentPackageJson" xml:space="preserve">
     <value>Listed As Dependency</value>
@@ -239,6 +239,30 @@
   </data>
   <data name="CategoryStatus" xml:space="preserve">
     <value>Status</value>
+  </data>
+  <data name="PackageTypeLocal" xml:space="preserve">
+    <value>Local</value>
+  </data>
+  <data name="PackageTypeLocalSubpackage" xml:space="preserve">
+    <value>Local sub-package</value>
+  </data>
+  <data name="PackageTypeGlobal" xml:space="preserve">
+    <value>Global</value>
+  </data>
+  <data name="PackageTypeGlobalSubpackage" xml:space="preserve">
+    <value>Global sub-package</value>
+  </data>
+  <data name="NewVersionNotApplicableSubpackage" xml:space="preserve">
+    <value>Not applicable for sub-packages</value>
+  </data>
+  <data name="NewVersionUnknown" xml:space="preserve">
+    <value>Unknown</value>
+  </data>
+  <data name="NewVersionPackageCatalogNotRetrieved" xml:space="preserve">
+    <value>Package catalog not yet retrieved</value>
+  </data>
+  <data name="RequestedVersionRangeNone" xml:space="preserve">
+    <value>None</value>
   </data>
   <data name="ScriptArgumentsToolTip" xml:space="preserve">
     <value>Specifies the arguments passed to the script on launch.</value>

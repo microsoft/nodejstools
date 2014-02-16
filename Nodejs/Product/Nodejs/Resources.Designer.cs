@@ -97,6 +97,33 @@ namespace Microsoft.NodejsTools {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Not applicable for sub-packages.
+        /// </summary>
+        internal static string NewVersionNotApplicableSubpackage {
+            get {
+                return ResourceManager.GetString("NewVersionNotApplicableSubpackage", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Package catalog not yet retrieved.
+        /// </summary>
+        internal static string NewVersionPackageCatalogNotRetrieved {
+            get {
+                return ResourceManager.GetString("NewVersionPackageCatalogNotRetrieved", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Unknown.
+        /// </summary>
+        internal static string NewVersionUnknown {
+            get {
+                return ResourceManager.GetString("NewVersionUnknown", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Arguments to Node.exe.
         /// </summary>
         internal static string NodeExeArguments {
@@ -313,24 +340,6 @@ namespace Microsoft.NodejsTools {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Global Install.
-        /// </summary>
-        internal static string NpmPackageIsGlobalInstall {
-            get {
-                return ResourceManager.GetString("NpmPackageIsGlobalInstall", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   Looks up a localized string similar to Whether the package is installed globally (true) or locally (false)..
-        /// </summary>
-        internal static string NpmPackageIsGlobalInstallDescription {
-            get {
-                return ResourceManager.GetString("NpmPackageIsGlobalInstallDescription", resourceCulture);
-            }
-        }
-        
-        /// <summary>
         ///   Looks up a localized string similar to Listed As Dependency.
         /// </summary>
         internal static string NpmPackageIsListedInParentPackageJson {
@@ -493,6 +502,24 @@ namespace Microsoft.NodejsTools {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Package Type.
+        /// </summary>
+        internal static string NpmPackageType {
+            get {
+                return ResourceManager.GetString("NpmPackageType", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Indicates whether package is global, or locally installed in your project, and whether or not it is a sub-package..
+        /// </summary>
+        internal static string NpmPackageTypeDescription {
+            get {
+                return ResourceManager.GetString("NpmPackageTypeDescription", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Version.
         /// </summary>
         internal static string NpmPackageVersion {
@@ -615,6 +642,51 @@ namespace Microsoft.NodejsTools {
         internal static string PackageCatalogRefreshODays {
             get {
                 return ResourceManager.GetString("PackageCatalogRefreshODays", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Global.
+        /// </summary>
+        internal static string PackageTypeGlobal {
+            get {
+                return ResourceManager.GetString("PackageTypeGlobal", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Global sub-package.
+        /// </summary>
+        internal static string PackageTypeGlobalSubpackage {
+            get {
+                return ResourceManager.GetString("PackageTypeGlobalSubpackage", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Local.
+        /// </summary>
+        internal static string PackageTypeLocal {
+            get {
+                return ResourceManager.GetString("PackageTypeLocal", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Local sub-package.
+        /// </summary>
+        internal static string PackageTypeLocalSubpackage {
+            get {
+                return ResourceManager.GetString("PackageTypeLocalSubpackage", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to None.
+        /// </summary>
+        internal static string RequestedVersionRangeNone {
+            get {
+                return ResourceManager.GetString("RequestedVersionRangeNone", resourceCulture);
             }
         }
         

@@ -45,8 +45,8 @@ namespace Microsoft.NodejsTools.Project {
         internal const string NpmPackagePublishDateTimeDescription = "NpmPackagePublishDateTimeDescription";
         internal const string NpmPackagePath = "NpmPackagePath";
         internal const string NpmPackagePathDescription = "NpmPackagePathDescription";
-        internal const string NpmPackageIsGlobalInstall = "NpmPackageIsGlobalInstall";
-        internal const string NpmPackageIsGlobalInstallDescription = "NpmPackageIsGlobalInstallDescription";
+        internal const string NpmPackageType = "NpmPackageType";
+        internal const string NpmPackageTypeDescription = "NpmPackageTypeDescription";
         internal const string NpmPackageIsListedInParentPackageJson = "NpmPackageIsListedInParentPackageJson";
         internal const string NpmPackageIsListedInParentPackageJsonDescription = "NpmPackageIsListedInParentPackageJsonDescription";
         internal const string NpmPackageIsMissing = "NpmPackageIsMissing";

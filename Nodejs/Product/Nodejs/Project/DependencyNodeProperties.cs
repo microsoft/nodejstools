@@ -15,9 +15,7 @@ namespace Microsoft.NodejsTools.Project {
     [ClassInterface(ClassInterfaceType.AutoDual)]
     [Guid("CA6C9721-2F64-4A1F-99C9-C087F698CB34")]
     public class DependencyNodeProperties : NodeProperties {
-        internal DependencyNodeProperties(DependencyNode node) : base(node) {
-            
-        }
+        internal DependencyNodeProperties(DependencyNode node) : base(node) {}
 
         private DependencyNode DependencyNode { get { return Node as DependencyNode; } }
 
@@ -46,7 +44,8 @@ namespace Microsoft.NodejsTools.Project {
         [SRDescriptionAttribute(SR.NpmPackageRequestedVersionRangeDescription)]
         public string RequestedVersionRange {
             get {
-                return null == Package ? null : Package.RequestedVersionRange;
+                var range = null == Package ? null : Package.RequestedVersionRange;
+                return range ?? Resources.RequestedVersionRangeNone;
             }
         }
 
@@ -55,7 +54,11 @@ namespace Microsoft.NodejsTools.Project {
         [SRDescriptionAttribute(SR.NpmPackageNewVersionAvailableDescription)]
         public string NewVersionAvailable {
             get {
-                return "Unknown";   //  TODO!!!
+                if (IsSubPackage) {
+                    return Resources.NewVersionNotApplicableSubpackage;
+                }
+
+                return Resources.NewVersionUnknown;   //  TODO!!!
             }
         }
 
@@ -116,10 +119,7 @@ namespace Microsoft.NodejsTools.Project {
             }
         }
 
-        [SRCategoryAttribute(SR.General)]
-        [LocDisplayName(SR.NpmPackageIsGlobalInstall)]
-        [SRDescriptionAttribute(SR.NpmPackageIsGlobalInstallDescription)]
-        public bool IsGlobalInstall {
+        private bool IsGlobalInstall {
             get {
                 var node = DependencyNode as HierarchyNode;
                 while (null != node) {
@@ -130,6 +130,33 @@ namespace Microsoft.NodejsTools.Project {
                     node = node.Parent;
                 }
                 return false;
+            }
+        }
+
+        private bool IsSubPackage {
+            get {
+                var node = DependencyNode as HierarchyNode;
+                if (null != node && node.Parent is DependencyNode) {
+                    return true;
+                }
+                return false;
+            }
+        }
+
+        [SRCategoryAttribute(SR.General)]
+        [LocDisplayName(SR.NpmPackageType)]
+        [SRDescriptionAttribute(SR.NpmPackageTypeDescription)]
+        public string PackageType {
+            get {
+                if (IsGlobalInstall) {
+                    return IsSubPackage
+                        ? Resources.PackageTypeGlobalSubpackage
+                        : Resources.PackageTypeGlobal;
+                }
+
+                return IsSubPackage
+                    ? Resources.PackageTypeLocalSubpackage
+                    : Resources.PackageTypeLocal;
             }
         }
 

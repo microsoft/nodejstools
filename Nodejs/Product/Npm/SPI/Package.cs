@@ -30,9 +30,7 @@ namespace Microsoft.NodejsTools.Npm.SPI {
 
         public string PublishDateTimeString { get { return null; } }
 
-        public string RequestedVersionRange {
-            get { return Version.ToString(); }
-        }
+        public string RequestedVersionRange { get; internal set; }
 
         public IEnumerable<string> Keywords { get { return new List<string>(); } }
 
