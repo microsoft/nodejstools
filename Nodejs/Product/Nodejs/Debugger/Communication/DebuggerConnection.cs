@@ -29,7 +29,7 @@ namespace Microsoft.NodejsTools.Debugger.Communication {
         private StreamReader _streamReader;
         private StreamWriter _streamWriter;
         private ITcpClient _tcpClient;
-        
+
         /// <summary>
         /// SBCS encoding.
         /// </summary>
@@ -72,7 +72,7 @@ namespace Microsoft.NodejsTools.Debugger.Communication {
             byte[] bytes = Encoding.UTF8.GetBytes(message);
             char[] chars = _encoding.GetChars(bytes);
             string header = string.Format("Content-Length: {0}{1}{1}", chars.Length, Environment.NewLine);
-            
+
             DebugWriteLine("Request: " + message);
 
             await _streamWriter.WriteAsync(header).ConfigureAwait(false);
@@ -179,6 +179,7 @@ namespace Microsoft.NodejsTools.Debugger.Communication {
                 }
             } catch (SocketException) {
             } catch (ObjectDisposedException) {
+            } catch (IOException) {
             } catch (Exception e) {
                 DebugWriteLine(string.Format("DebuggerConnection: message processing failed {0}.", e));
                 throw;

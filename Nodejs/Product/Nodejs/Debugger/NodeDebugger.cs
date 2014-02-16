@@ -980,8 +980,10 @@ namespace Microsoft.NodejsTools.Debugger {
             }
 
             int breakpointId = breakpointBinding.BreakpointId;
-            var clearBreakpointsCommand = new ClearBreakpointCommand(CommandId, breakpointId);
-            await _client.SendRequestAsync(clearBreakpointsCommand, cancellationToken).ConfigureAwait(false);
+            if (_connection.Connected) {
+                var clearBreakpointsCommand = new ClearBreakpointCommand(CommandId, breakpointId);
+                await _client.SendRequestAsync(clearBreakpointsCommand, cancellationToken).ConfigureAwait(false);    
+            }
 
             NodeBreakpoint breakpoint = breakpointBinding.Breakpoint;
             _breakpointBindings.Remove(breakpointId);
