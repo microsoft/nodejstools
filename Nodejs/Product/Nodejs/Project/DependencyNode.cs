@@ -122,6 +122,10 @@ namespace Microsoft.NodejsTools.Project {
             return null;
         }
 
+        protected override NodeProperties CreatePropertiesObject() {
+            return new DependencyNodeProperties(this);
+        }
+
         #endregion
 
         #region Command handling

@@ -27,6 +27,40 @@ namespace Microsoft.NodejsTools.Project {
         internal const string NodejsPort = "NodejsPort";
         internal const string NodejsPortDescription = "NodejsPortDescription";
 
+        internal const string NpmPackageName = "NpmPackageName";
+        internal const string NpmPackageNameDescription = "NpmPackageNameDescription";
+        internal const string NpmPackageVersion = "NpmPackageVersion";
+        internal const string NpmPackageVersionDescription = "NpmPackageVersionDescription";
+        internal const string NpmPackageRequestedVersionRange = "NpmPackageRequestedVersionRange";
+        internal const string NpmPackageRequestedVersionRangeDescription = "NpmPackageRequestedVersionRangeDescription";
+        internal const string NpmPackageNewVersionAvailable = "NpmPackageNewVersionAvailable";
+        internal const string NpmPackageNewVersionAvailableDescription = "NpmPackageNewVersionAvailableDescription";
+        internal const string NpmPackageDescription = "NpmPackageDescription";
+        internal const string NpmPackageDescriptionDescription = "NpmPackageDescriptionDescription";
+        internal const string NpmPackageKeywords = "NpmPackageKeywords";
+        internal const string NpmPackageKeywordsDescription = "NpmPackageKeywordsDescription";
+        internal const string NpmPackageAuthor = "NpmPackageAuthor";
+        internal const string NpmPackageAuthorDescription = "NpmPackageAuthorDescription";
+        internal const string NpmPackagePublishDateTime = "NpmPackagePublishDateTime";
+        internal const string NpmPackagePublishDateTimeDescription = "NpmPackagePublishDateTimeDescription";
+        internal const string NpmPackagePath = "NpmPackagePath";
+        internal const string NpmPackagePathDescription = "NpmPackagePathDescription";
+        internal const string NpmPackageIsGlobalInstall = "NpmPackageIsGlobalInstall";
+        internal const string NpmPackageIsGlobalInstallDescription = "NpmPackageIsGlobalInstallDescription";
+        internal const string NpmPackageIsListedInParentPackageJson = "NpmPackageIsListedInParentPackageJson";
+        internal const string NpmPackageIsListedInParentPackageJsonDescription = "NpmPackageIsListedInParentPackageJsonDescription";
+        internal const string NpmPackageIsMissing = "NpmPackageIsMissing";
+        internal const string NpmPackageIsMissingDescription = "NpmPackageIsMissingDescription";
+        internal const string NpmPackageIsDevDependency = "NpmPackageIsDevDependency";
+        internal const string NpmPackageIsDevDependencyDescription = "NpmPackageIsDevDependencyDescription";
+        internal const string NpmPackageIsOptionalDependency = "NpmPackageIsOptionalDependency";
+        internal const string NpmPackageIsOptionalDependencyDescription = "NpmPackageIsOptionalDependencyDescription";
+        internal const string NpmPackageIsBundledDependency = "NpmPackageIsBundledDependency";
+        internal const string NpmPackageIsBundledDependencyDescription = "NpmPackageIsBundledDependencyDescription";
+
+        internal const string CategoryVersion = "CategoryVersion";
+        internal const string CategoryStatus = "CategoryStatus";
+
         internal static new string GetString(string value) {
             string result = Microsoft.NodejsTools.Resources.ResourceManager.GetString(value, CultureInfo.CurrentUICulture) ?? CommonSR.GetString(value);
             if (result == null) {

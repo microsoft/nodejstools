@@ -61,6 +61,24 @@ namespace Microsoft.NodejsTools {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Status.
+        /// </summary>
+        internal static string CategoryStatus {
+            get {
+                return ResourceManager.GetString("CategoryStatus", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Version.
+        /// </summary>
+        internal static string CategoryVersion {
+            get {
+                return ResourceManager.GetString("CategoryVersion", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Invalid port number - the port should contain only digits..
         /// </summary>
         internal static string InvalidPortNumber {
@@ -219,6 +237,276 @@ namespace Microsoft.NodejsTools {
         internal static string NpmCompletedWithErrors {
             get {
                 return ResourceManager.GetString("NpmCompletedWithErrors", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Author.
+        /// </summary>
+        internal static string NpmPackageAuthor {
+            get {
+                return ResourceManager.GetString("NpmPackageAuthor", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Primary or original author of package; there may also be additional contributors..
+        /// </summary>
+        internal static string NpmPackageAuthorDescription {
+            get {
+                return ResourceManager.GetString("NpmPackageAuthorDescription", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Description.
+        /// </summary>
+        internal static string NpmPackageDescription {
+            get {
+                return ResourceManager.GetString("NpmPackageDescription", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Package description..
+        /// </summary>
+        internal static string NpmPackageDescriptionDescription {
+            get {
+                return ResourceManager.GetString("NpmPackageDescriptionDescription", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Bundled Dependency.
+        /// </summary>
+        internal static string NpmPackageIsBundledDependency {
+            get {
+                return ResourceManager.GetString("NpmPackageIsBundledDependency", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Indicates whether or not the package is a bundled dependency..
+        /// </summary>
+        internal static string NpmPackageIsBundledDependencyDescription {
+            get {
+                return ResourceManager.GetString("NpmPackageIsBundledDependencyDescription", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Dev Dependency.
+        /// </summary>
+        internal static string NpmPackageIsDevDependency {
+            get {
+                return ResourceManager.GetString("NpmPackageIsDevDependency", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Indicates whether or not the package is a development dependency..
+        /// </summary>
+        internal static string NpmPackageIsDevDependencyDescription {
+            get {
+                return ResourceManager.GetString("NpmPackageIsDevDependencyDescription", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Global Install.
+        /// </summary>
+        internal static string NpmPackageIsGlobalInstall {
+            get {
+                return ResourceManager.GetString("NpmPackageIsGlobalInstall", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Whether the package is installed globally (true) or locally (false)..
+        /// </summary>
+        internal static string NpmPackageIsGlobalInstallDescription {
+            get {
+                return ResourceManager.GetString("NpmPackageIsGlobalInstallDescription", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Listed As Dependency.
+        /// </summary>
+        internal static string NpmPackageIsListedInParentPackageJson {
+            get {
+                return ResourceManager.GetString("NpmPackageIsListedInParentPackageJson", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Indicates whether or not the package is listed as a package.json dependency..
+        /// </summary>
+        internal static string NpmPackageIsListedInParentPackageJsonDescription {
+            get {
+                return ResourceManager.GetString("NpmPackageIsListedInParentPackageJsonDescription", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Missing.
+        /// </summary>
+        internal static string NpmPackageIsMissing {
+            get {
+                return ResourceManager.GetString("NpmPackageIsMissing", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Indicates whether or not the package is a missing dependency..
+        /// </summary>
+        internal static string NpmPackageIsMissingDescription {
+            get {
+                return ResourceManager.GetString("NpmPackageIsMissingDescription", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Optional Dependency.
+        /// </summary>
+        internal static string NpmPackageIsOptionalDependency {
+            get {
+                return ResourceManager.GetString("NpmPackageIsOptionalDependency", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Indicates whether or not the package is an optional dependency..
+        /// </summary>
+        internal static string NpmPackageIsOptionalDependencyDescription {
+            get {
+                return ResourceManager.GetString("NpmPackageIsOptionalDependencyDescription", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Keywords.
+        /// </summary>
+        internal static string NpmPackageKeywords {
+            get {
+                return ResourceManager.GetString("NpmPackageKeywords", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Package keywords..
+        /// </summary>
+        internal static string NpmPackageKeywordsDescription {
+            get {
+                return ResourceManager.GetString("NpmPackageKeywordsDescription", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Package Name.
+        /// </summary>
+        internal static string NpmPackageName {
+            get {
+                return ResourceManager.GetString("NpmPackageName", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Name of package, as specified in its package.json..
+        /// </summary>
+        internal static string NpmPackageNameDescription {
+            get {
+                return ResourceManager.GetString("NpmPackageNameDescription", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Newer Version Available.
+        /// </summary>
+        internal static string NpmPackageNewVersionAvailable {
+            get {
+                return ResourceManager.GetString("NpmPackageNewVersionAvailable", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Indicates whether or not a newer version of the package is available..
+        /// </summary>
+        internal static string NpmPackageNewVersionAvailableDescription {
+            get {
+                return ResourceManager.GetString("NpmPackageNewVersionAvailableDescription", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Path.
+        /// </summary>
+        internal static string NpmPackagePath {
+            get {
+                return ResourceManager.GetString("NpmPackagePath", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Location of package on disk..
+        /// </summary>
+        internal static string NpmPackagePathDescription {
+            get {
+                return ResourceManager.GetString("NpmPackagePathDescription", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Published.
+        /// </summary>
+        internal static string NpmPackagePublishDateTime {
+            get {
+                return ResourceManager.GetString("NpmPackagePublishDateTime", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to When the package was published..
+        /// </summary>
+        internal static string NpmPackagePublishDateTimeDescription {
+            get {
+                return ResourceManager.GetString("NpmPackagePublishDateTimeDescription", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Requested Version.
+        /// </summary>
+        internal static string NpmPackageRequestedVersionRange {
+            get {
+                return ResourceManager.GetString("NpmPackageRequestedVersionRange", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Version of package requested in package.json belonging to parent package or project..
+        /// </summary>
+        internal static string NpmPackageRequestedVersionRangeDescription {
+            get {
+                return ResourceManager.GetString("NpmPackageRequestedVersionRangeDescription", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Version.
+        /// </summary>
+        internal static string NpmPackageVersion {
+            get {
+                return ResourceManager.GetString("NpmPackageVersion", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Installed version of package..
+        /// </summary>
+        internal static string NpmPackageVersionDescription {
+            get {
+                return ResourceManager.GetString("NpmPackageVersionDescription", resourceCulture);
             }
         }
         
