@@ -121,24 +121,8 @@ namespace Microsoft.NodejsTools.NpmUI {
                 return;
             }
 
-            filterString = filterString.ToLower();
+            var target = PackageCatalogFilterFactory.Create(_allPackages).Filter(filterString);
 
-            var target = new List<IPackage>();
-            foreach (var package in _allPackages.Results) {
-                if (string.IsNullOrEmpty(filterString) || package.Name.ToLower().Contains(filterString)) {
-                    target.Add(package);
-                    continue;
-                }
-
-                string description = package.Description;
-                if (null != description && description.ToLower().Contains(filterString)) {
-                    target.Add(package);
-                }
-
-                //  TODO: match on keywords also!
-            }
-
-            target.Sort(new NpmSearchFilterStringComparer(filterString));
             if (!IsDisposed) {
                 BeginInvoke(new Action(() => SetListData(target)));
             }
