@@ -28,11 +28,6 @@ namespace Microsoft.NodejsTools.Npm {
     public interface IPackageCatalogFilter {
 
         /// <summary>
-        /// Comparer used to sort filtered results.
-        /// </summary>
-        IComparer<IPackage> Comparer { get; set; }
-            
-        /// <summary>
         /// Filters the entire package list based on the supplied filter string and returns
         /// any packages that match. If filterString starts with a '/' it will be treated as
         /// a regular expression. In this case, if that last character in the string is also a

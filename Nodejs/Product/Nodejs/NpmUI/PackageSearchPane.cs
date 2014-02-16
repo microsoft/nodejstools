@@ -138,7 +138,7 @@ namespace Microsoft.NodejsTools.NpmUI {
                 //  TODO: match on keywords also!
             }
 
-            target.Sort(new NpmSearchComparer(filterString));
+            target.Sort(new NpmSearchFilterStringComparer(filterString));
             if (!IsDisposed) {
                 BeginInvoke(new Action(() => SetListData(target)));
             }

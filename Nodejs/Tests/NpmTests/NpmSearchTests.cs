@@ -226,7 +226,7 @@ namespace NpmTests {
                 bool match = false;
                 if (package.Name.ToLower().Contains(filterString)) {
                     match = true;
-                } else if (package.Description.ToLower().Contains(filterString)) {
+                } else if (null != package.Description && package.Description.ToLower().Contains(filterString)) {
                     match = true;
                 } else {
                     if (package.Keywords.Any(keyword => keyword.ToLower().Contains(filterString))) {
@@ -245,7 +245,7 @@ namespace NpmTests {
                 bool match = false;
                 if (package.Name.ToLower() == expectedMatch) {
                     match = true;
-                } else if (package.Description.ToLower() == expectedMatch) {
+                } else if (null != package.Description && package.Description.ToLower() == expectedMatch) {
                     match = true;
                 } else {
                     if (package.Keywords.Any(keyword => keyword.ToLower() == expectedMatch)) {

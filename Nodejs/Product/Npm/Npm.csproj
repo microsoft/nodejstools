@@ -32,6 +32,7 @@
     <Reference Include="Microsoft.CSharp" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="SPI\AbstractNpmSearchComparer.cs" />
     <Compile Include="DependencyType.cs" />
     <Compile Include="DependencyUrlType.cs" />
     <Compile Include="DirectoryPackageJsonSource.cs" />
@@ -72,7 +73,8 @@
     <Compile Include="NpmExecutionException.cs" />
     <Compile Include="NpmLogEventArgs.cs" />
     <Compile Include="NpmNotFoundException.cs" />
-    <Compile Include="NpmSearchComparer.cs" />
+    <Compile Include="SPI\NpmSearchBasicComparer.cs" />
+    <Compile Include="SPI\NpmSearchFilterStringComparer.cs" />
     <Compile Include="NpmSearchParserFactory.cs" />
     <Compile Include="PackageCatalogFilterFactory.cs" />
     <Compile Include="PackageComparer.cs" />
