@@ -12,6 +12,7 @@
  *
  * ***************************************************************************/
 
+using System.Text;
 using System.Text.RegularExpressions;
 using Newtonsoft.Json.Linq;
 
@@ -70,5 +71,31 @@ namespace Microsoft.NodejsTools.Npm.SPI {
         public string Name { get; private set; }
         public string Email { get; private set; }
         public string Url { get; private set; }
+
+        public override string ToString() {
+            var buff = new StringBuilder();
+            if (!string.IsNullOrEmpty(Name)) {
+                buff.Append(Name);
+            }
+
+            if (!string.IsNullOrEmpty(Email)) {
+                if (buff.Length > 0) {
+                    buff.Append(' ');
+                }
+                buff.Append('<');
+                buff.Append(Email);
+                buff.Append('>');
+            }
+
+            if (!string.IsNullOrEmpty(Url)) {
+                if (buff.Length > 0) {
+                    buff.Append(' ');
+                }
+                buff.Append('(');
+                buff.Append(Url);
+                buff.Append(')');
+            }
+            return buff.ToString();
+        }
     }
 }
