@@ -73,7 +73,7 @@
     <Compile Include="NpmExecutionException.cs" />
     <Compile Include="NpmLogEventArgs.cs" />
     <Compile Include="NpmNotFoundException.cs" />
-    <Compile Include="SPI\NpmSearchBasicComparer.cs" />
+    <Compile Include="SPI\NpmSearchRegexComparer.cs" />
     <Compile Include="SPI\NpmSearchFilterStringComparer.cs" />
     <Compile Include="NpmSearchParserFactory.cs" />
     <Compile Include="PackageCatalogFilterFactory.cs" />

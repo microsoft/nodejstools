@@ -74,7 +74,7 @@ namespace Microsoft.NodejsTools.Npm.SPI {
                 }
             }
 
-            target.Sort(new NpmSearchBasicComparer());
+            target.Sort(new NpmSearchRegexComparer(regex));
             return target;
         }
 
