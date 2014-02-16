@@ -21,6 +21,10 @@ namespace Microsoft.NodejsTools.Project {
             get { return VSConstants.GUID_ItemType_VirtualFolder; }
         }
 
+        public override int MenuCommandId {
+            get { return VsMenus.IDM_VS_CTXT_ITEMNODE; }
+        }
+
         protected override NodeProperties CreatePropertiesObject() {
             return new NpmNodeProperties(this);
         }

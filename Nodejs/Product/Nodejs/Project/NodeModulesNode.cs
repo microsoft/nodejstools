@@ -464,10 +464,6 @@ namespace Microsoft.NodejsTools.Project {
             get { return _cCaption; }
         }
 
-        public override int MenuCommandId {
-            get { return VsMenus.IDM_VS_CTXT_ITEMNODE; }
-        }
-
         #endregion
 
         #region Command handling
@@ -640,15 +636,14 @@ namespace Microsoft.NodejsTools.Project {
             }
         }
 
-        public async void UpdateModules() {
+        internal async void UpdateModules(IList<HierarchyNode> nodes) {
             DoPreCommandActions();
             try {
-                var selected = _projectNode.GetSelectedNodes();
                 using (var commander = NpmController.CreateNpmCommander()) {
-                    if (selected.Count == 1 && selected[0] == this) {
+                    if (nodes.Count == 1 && nodes[0] == this) {
                         await commander.UpdatePackagesAsync();
                     } else {
-                        var valid = selected.OfType<DependencyNode>().Where(CheckValidCommandTarget).ToList();
+                        var valid = nodes.OfType<DependencyNode>().Where(CheckValidCommandTarget).ToList();
 
                         var list = valid.Where(node => node.GetPropertiesObject().IsGlobalInstall).Select(node => node.Package).ToList();
                         if (list.Count > 0) {
@@ -666,6 +661,10 @@ namespace Microsoft.NodejsTools.Project {
             } finally {
                 AllowCommands();
             }
+        }
+
+        public void UpdateModules() {
+            UpdateModules(_projectNode.GetSelectedNodes());
         }
 
         public async void UpdateModule(DependencyNode node) {

@@ -4,6 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using Microsoft.NodejsTools.Npm;
+using Microsoft.VisualStudio;
 using Microsoft.VisualStudioTools.Project;
 
 namespace Microsoft.NodejsTools.Project {
@@ -41,10 +42,53 @@ namespace Microsoft.NodejsTools.Project {
 
         internal IGlobalPackages GlobalPackages { get; set; }
 
-        //  TODO: is there a way to support tooltips on hierarchy nodes?
+        internal override int QueryStatusOnNode(Guid cmdGroup, uint cmd, IntPtr pCmdText, ref QueryStatusResult result) {
+            if (cmdGroup == Guids.NodejsCmdSet) {
+                switch (cmd) {
+                    case PkgCmdId.cmdidNpmManageModules:
+                        result = _parent.IsCurrentStateASuppressCommandsMode()
+                            ? QueryStatusResult.SUPPORTED
+                            : QueryStatusResult.ENABLED | QueryStatusResult.SUPPORTED;
+                        return VSConstants.S_OK;
 
-        //  TODO: properties for this node should include location of global modules on disk
+                    case PkgCmdId.cmdidNpmUpdateModules:
+                        if (_parent.IsCurrentStateASuppressCommandsMode()) {
+                            result = QueryStatusResult.SUPPORTED;
+                        } else {
+                            if (AllChildren.Any()) {
+                                result = QueryStatusResult.ENABLED | QueryStatusResult.SUPPORTED;
+                            } else {
+                                result = QueryStatusResult.SUPPORTED;
+                            }
+                        }
+                        return VSConstants.S_OK;
 
-        //  TODO: ability to open explorer window in global modules folder? "Show in Windows Explorer"?
+                    case PkgCmdId.cmdidNpmInstallModules:
+                    case PkgCmdId.cmdidNpmInstallSingleMissingModule:
+                    case PkgCmdId.cmdidNpmUninstallModule:
+                    case PkgCmdId.cmdidNpmUpdateSingleModule:
+                        result = QueryStatusResult.SUPPORTED | QueryStatusResult.INVISIBLE;
+                        return VSConstants.S_OK;
+                }
+            }
+
+            return base.QueryStatusOnNode(cmdGroup, cmd, pCmdText, ref result);
+        }
+
+        internal override int ExecCommandOnNode(Guid cmdGroup, uint cmd, uint nCmdexecopt, IntPtr pvaIn, IntPtr pvaOut) {
+            if (cmdGroup == Guids.NodejsCmdSet) {
+                switch (cmd) {
+                    case PkgCmdId.cmdidNpmManageModules:
+                        _parent.ManageModules();
+                        return VSConstants.S_OK;
+
+                    case PkgCmdId.cmdidNpmUpdateModules:
+                        _parent.UpdateModules(AllChildren.ToList());
+                        return VSConstants.S_OK;
+                }
+            }
+
+            return base.ExecCommandOnNode(cmdGroup, cmd, nCmdexecopt, pvaIn, pvaOut);
+        }
     }
 }

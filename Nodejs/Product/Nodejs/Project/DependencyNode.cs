@@ -141,7 +141,9 @@ namespace Microsoft.NodejsTools.Project {
             if (cmdGroup == Guids.NodejsCmdSet && null == _parent) {
                 switch (cmd) {
                     case PkgCmdId.cmdidNpmInstallSingleMissingModule:
-                        if (null == _projectNode.ModulesNode
+                        if (GetPropertiesObject().IsGlobalInstall){
+                            result = QueryStatusResult.SUPPORTED | QueryStatusResult.INVISIBLE;
+                        } else if (null == _projectNode.ModulesNode
                             || _projectNode.ModulesNode.IsCurrentStateASuppressCommandsMode()) {
                             result = QueryStatusResult.SUPPORTED;
                         } else {
