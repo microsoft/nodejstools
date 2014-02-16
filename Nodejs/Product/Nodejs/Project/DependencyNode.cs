@@ -126,6 +126,10 @@ namespace Microsoft.NodejsTools.Project {
             return new DependencyNodeProperties(this);
         }
 
+        internal DependencyNodeProperties GetPropertiesObject() {
+            return CreatePropertiesObject() as DependencyNodeProperties;
+        }
+
         #endregion
 
         #region Command handling
@@ -175,19 +179,19 @@ namespace Microsoft.NodejsTools.Project {
                 switch (cmd) {
                     case PkgCmdId.cmdidNpmInstallSingleMissingModule:
                         if (null != _projectNode.ModulesNode) {
-                            _projectNode.ModulesNode.InstallMissingModule(Package);
+                            _projectNode.ModulesNode.InstallMissingModule(this);
                         }
                         return VSConstants.S_OK;
 
                     case PkgCmdId.cmdidNpmUninstallModule:
                         if (null != _projectNode.ModulesNode) {
-                            _projectNode.ModulesNode.UninstallModule(Package);
+                            _projectNode.ModulesNode.UninstallModule(this);
                         }
                         return VSConstants.S_OK;
 
                     case PkgCmdId.cmdidNpmUpdateSingleModule:
                         if (null != _projectNode.ModulesNode) {
-                            _projectNode.ModulesNode.UpdateModule(Package);
+                            _projectNode.ModulesNode.UpdateModule(this);
                         }
                         return VSConstants.S_OK;
                 }

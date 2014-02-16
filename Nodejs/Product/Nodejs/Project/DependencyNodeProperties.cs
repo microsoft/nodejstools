@@ -118,7 +118,7 @@ namespace Microsoft.NodejsTools.Project {
             }
         }
 
-        private bool IsGlobalInstall {
+        internal bool IsGlobalInstall {
             get {
                 var node = DependencyNode as HierarchyNode;
                 while (null != node) {
@@ -132,7 +132,7 @@ namespace Microsoft.NodejsTools.Project {
             }
         }
 
-        private bool IsSubPackage {
+        internal bool IsSubPackage {
             get {
                 var node = DependencyNode as HierarchyNode;
                 if (null != node && node.Parent is DependencyNode) {
