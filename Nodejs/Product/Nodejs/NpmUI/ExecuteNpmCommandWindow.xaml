@@ -14,9 +14,9 @@
                 <Label>npm install etc</Label>
             </StackPanel>
             <StackPanel Height="40" HorizontalAlignment="Right" Orientation="Horizontal" DockPanel.Dock="Bottom">
-                <Button Content="Cancel" MinWidth="64">
+                <Button Content="_Cancel" MinWidth="64">
                 </Button>
-                <Button Content="Close" MinWidth="64">
+                <Button Content="C_lose" MinWidth="64">
                 </Button>
             </StackPanel>
             <npmUi:NpmOutputControl Height="Auto"></npmUi:NpmOutputControl>
