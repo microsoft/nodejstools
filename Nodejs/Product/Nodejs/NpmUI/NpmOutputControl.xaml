@@ -1,0 +1,19 @@
+﻿<UserControl x:Class="Microsoft.NodejsTools.NpmUI.NpmOutputControl"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
+             mc:Ignorable="d" 
+             d:DesignHeight="200" d:DesignWidth="640">
+    <!-- Theming -->
+    <UserControl.Resources>
+        <ResourceDictionary Source="pack://application:,,,/Microsoft.NodejsTools;component/SharedProject/Wpf/Controls.xaml" />
+    </UserControl.Resources>
+    <Grid>
+        <DockPanel VerticalAlignment="Stretch" Height="Auto">
+            <ProgressBar Name="_progress" Height="4" DockPanel.Dock="Top" IsIndeterminate="true"></ProgressBar>
+            <RichTextBox Name="_textBox" Background="Black" Foreground="White">
+            </RichTextBox>
+        </DockPanel>            
+    </Grid>
+</UserControl>

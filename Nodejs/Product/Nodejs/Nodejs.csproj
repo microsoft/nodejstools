@@ -222,6 +222,9 @@
     <Compile Include="Commands\OpenRemoteDebugDocumentationCommand.cs" />
     <Compile Include="Commands\OpenRemoteDebugProxyFolderCommand.cs" />
     <Compile Include="Commands\SurveyNewsCommand.cs" />
+    <Compile Include="NpmUI\NpmOutputControl.xaml.cs">
+      <DependentUpon>NpmOutputControl.xaml</DependentUpon>
+    </Compile>
     <Compile Include="Project\DependencyNodeProperties.cs" />
     <Compile Include="Project\NpmNodeProperties.cs" />
     <Compile Include="Resources.Designer.cs">
@@ -404,6 +407,10 @@
     <Compile Include="Project\ImportWizard\ImportWizard.xaml.cs">
       <DependentUpon>ImportWizard.xaml</DependentUpon>
     </Compile>
+    <Page Include="NpmUI\NpmOutputControl.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
     <Page Include="Project\ImportWizard\StartupPage.xaml">
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
