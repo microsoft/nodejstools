@@ -17,9 +17,11 @@ using Newtonsoft.Json.Linq;
 
 namespace Microsoft.NodejsTools.Debugger.Commands {
     sealed class ScriptsCommand : DebuggerCommand {
+        private readonly NodeDebugger _debugger;
         private readonly Dictionary<string, object> _arguments;
 
-        public ScriptsCommand(int id, bool includeSource = false, int? moduleId = null) : base(id, "scripts") {
+        public ScriptsCommand(int id, NodeDebugger debugger, bool includeSource = false, int? moduleId = null) : base(id, "scripts") {
+            _debugger = debugger;
             _arguments = new Dictionary<string, object> {
                 { "includeSource", includeSource }
             };
@@ -44,9 +46,10 @@ namespace Microsoft.NodejsTools.Debugger.Commands {
             foreach (JToken module in body) {
                 var id = (int)module["id"];
                 var source = (string)module["source"];
-                var name = (string)module["name"];
+                var javaScriptFileName = (string)module["name"];
+                var fileName = _debugger.GetModuleFileName(javaScriptFileName);
 
-                result.Add(new NodeModule(null, id, name, source));
+                result.Add(new NodeModule(id, fileName, javaScriptFileName, source));
             }
 
             Modules = result;

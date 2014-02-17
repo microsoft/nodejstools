@@ -132,6 +132,69 @@
   <data name="NodeCompileScriptResponse" xml:space="preserve">
     <value>{"seq":5,"type":"event","event":"afterCompile","success":true,"body":{"script":{"handle":1,"type":"script","name":"http.js","id":34,"lineOffset":0,"columnOffset":0,"lineCount":2169,"sourceStart":"(function (exports, require, module, __filename, __dirname) { // Copyright Joyen","sourceLength":61850,"scriptType":2,"compilationType":0,"context":{"ref":0},"text":"http.js (lines: 2169)"}},"refs":[{"handle":0,"type":"context","text":"#&lt;ContextMirror&gt;"}],"running":true}</value>
   </data>
+  <data name="NodeCompileScriptResponseWithNullScriptName" xml:space="preserve">
+    <value>{
+  "seq": 1229,
+  "type": "event",
+  "event": "afterCompile",
+  "success": true,
+  "body": {
+    "script": {
+      "handle": 1,
+      "type": "script",
+      "id": 172,
+      "lineOffset": 0,
+      "columnOffset": 0,
+      "lineCount": 3,
+      "sourceStart": "(function() {\nvar ret = Buffer.prototype.writeUInt8.apply(this, arguments);this.",
+      "sourceLength": 110,
+      "scriptType": 2,
+      "compilationType": 1,
+      "evalFromScript": {
+        "ref": 3
+      },
+      "evalFromLocation": {
+        "line": 158,
+        "column": 37
+      },
+      "evalFromFunctionName": {
+        "type_": "string",
+        "value_": "",
+        "handle_": 4
+      },
+      "context": {
+        "ref": 0
+      },
+      "text": "undefined (lines: 3)"
+    }
+  },
+  "refs": [
+    {
+      "handle": 3,
+      "type": "script",
+      "name": "C:\\Projects\\App\\node_modules\\mongoose\\lib\\types\\buffer.js",
+      "id": 170,
+      "lineOffset": 0,
+      "columnOffset": 0,
+      "lineCount": 257,
+      "sourceStart": "(function (exports, require, module, __filename, __dirname) { \n/*!\n * Access dri",
+      "sourceLength": 5269,
+      "scriptType": 2,
+      "compilationType": 0,
+      "context": {
+        "ref": 2
+      },
+      "text": "C:\\Projects\\App\\node_modules\\mongoose\\lib\\types\\buffer.js (lines: 257)"
+    },
+    {
+      "handle": 0,
+      "type": "context",
+      "text": "#&lt;ContextMirror&gt;"
+    }
+  ],
+  "running": true
+}</value>
+  </data>
   <data name="NodeComplexArray" xml:space="preserve">
     <value>[{fullName: "full name", age: 123}, {head:"head", body:"body"}, [0, 1, 2]]</value>
   </data>
@@ -155,6 +218,9 @@
   </data>
   <data name="NodeLookupResponse" xml:space="preserve">
     <value>{"seq":15,"request_seq":9,"type":"response","command":"lookup","success":true,"body":{"25":{"handle":25,"type":"object","className":"Object","constructorFunction":{"ref":2},"protoObject":{"ref":4},"prototypeObject":{"ref":3},"properties":[{"name":"first","propertyType":1,"ref":54},{"name":"second","propertyType":1,"ref":55}],"text":"#&lt;Object&gt;"}},"refs":[{"handle":2,"type":"function","className":"Function","constructorFunction":{"ref":56},"protoObject":{"ref":39},"prototypeObject":{"ref":4},"name":"Object","inferredName":"","resolved":true,"source":"function Object() { [native code] }","scopes":[],"properties":[{"name":"length","attributes":7,"propertyType":3,"ref":54},{"name":"name","attributes":7,"propertyType":3,"ref":57},{"name":"arguments","attributes":7,"propertyType":3,"ref":5},{"name":"caller","attributes":7,"propertyType":3,"ref":5},{"name":"prototype","attributes":7,"propertyType":3,"ref":4},{"name":"keys","attributes":2,"propertyType":2,"ref":58},{"name":"create","attributes":2,"propertyType":2,"ref":59},{"name":"defineProperty","attributes":2,"propertyType":2,"ref":60},{"name":"defineProperties","attributes":2,"propertyType":2,"ref":61},{"name":"freeze","attributes":2,"propertyType":2,"ref":62},{"name":"getPrototypeOf","attributes":2,"propertyType":2,"ref":63},{"name":"getOwnPropertyDescriptor","attributes":2,"propertyType":2,"ref":64},{"name":"getOwnPropertyNames","attributes":2,"propertyType":2,"ref":65},{"name":"is","attributes":2,"propertyType":2,"ref":66},{"name":"isExtensible","attributes":2,"propertyType":2,"ref":67},{"name":"isFrozen","attributes":2,"propertyType":2,"ref":68},{"name":"isSealed","attributes":2,"propertyType":2,"ref":69},{"name":"preventExtensions","attributes":2,"propertyType":2,"ref":70},{"name":"seal","attributes":2,"propertyType":2,"ref":71}],"text":"function Object() { [native code] }"},{"handle":4,"type":"object","className":"Object","constructorFunction":{"ref":2},"protoObject":{"ref":5},"prototypeObject":{"ref":3},"properties":[{"name":"constructor","attributes":2,"propertyType":2,"ref":2},{"name":"toString","attributes":2,"propertyType":2,"ref":72},{"name":"toLocaleString","attributes":2,"propertyType":2,"ref":73},{"name":"valueOf","attributes":2,"propertyType":2,"ref":74},{"name":"hasOwnProperty","attributes":2,"propertyType":2,"ref":75},{"name":"isPrototypeOf","attributes":2,"propertyType":2,"ref":76},{"name":"propertyIsEnumerable","attributes":2,"propertyType":2,"ref":77},{"name":"__defineGetter__","attributes":2,"propertyType":2,"ref":78},{"name":"__lookupGetter__","attributes":2,"propertyType":2,"ref":79},{"name":"__defineSetter__","attributes":2,"propertyType":2,"ref":80},{"name":"__lookupSetter__","attributes":2,"propertyType":2,"ref":81}],"text":"#&lt;Object&gt;"},{"handle":3,"type":"undefined","text":"undefined"},{"handle":54,"type":"number","value":1,"text":"1"},{"handle":55,"type":"number","value":2,"text":"2"}],"running":false}</value>
+  </data>
+  <data name="NodeLookupResponseWithPrimitiveObject" xml:space="preserve">
+    <value>{"seq":7,"request_seq":7,"type":"response","command":"lookup","success":true,"body":{"9":{"handle":9,"type":"string","value":"ENOENT","length":6,"text":"ENOENT"}},"refs":[],"running":false}</value>
   </data>
   <data name="NodeLookupVariableObject" xml:space="preserve">
     <value>{"name":"first","propertyType":1,"ref":54}</value>

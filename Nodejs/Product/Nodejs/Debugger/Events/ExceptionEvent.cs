@@ -31,12 +31,12 @@ namespace Microsoft.NodejsTools.Debugger.Events {
             TypeName = string.Format("{0} exception", typeName);
 
             var scriptId = (int)message["body"]["script"]["id"];
-            var filename = (string)message["body"]["script"]["name"];
+            var fileName = (string)message["body"]["script"]["name"];
 
             ExceptionName = GetExceptionName(message);
             ErrorNumber = GetExceptionCodeRef(message);
 
-            Module = new NodeModule(null, scriptId, filename);
+            Module = new NodeModule(scriptId, fileName, fileName);
         }
 
         public string ExceptionName { get; private set; }

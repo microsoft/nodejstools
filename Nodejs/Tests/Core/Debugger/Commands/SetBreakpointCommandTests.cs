@@ -25,7 +25,8 @@ namespace NodejsTests.Debugger.Commands {
             const int commandId = 3;
             const int moduleId = 5;
             const int line = 2;
-            var module = new NodeModule(null, moduleId, "module.js");
+            const string fileName = "module.js";
+            var module = new NodeModule(moduleId, fileName, fileName);
             var breakOn = new BreakOn(BreakOnKind.Equal, 2);
             var breakpoint = new NodeBreakpoint(null, null, null, line, 0, true, breakOn, null);
 
@@ -47,7 +48,8 @@ namespace NodejsTests.Debugger.Commands {
             const int commandId = 3;
             const int moduleId = 5;
             const int line = 1;
-            var module = new NodeModule(null, moduleId, "module.js");
+            const string fileName = "module.js";
+            var module = new NodeModule(moduleId, fileName, fileName);
             var breakOn = new BreakOn(BreakOnKind.Equal, 2);
             var breakpoint = new NodeBreakpoint(null, null, null, line, 0, true, breakOn, null);
 
@@ -90,7 +92,8 @@ namespace NodejsTests.Debugger.Commands {
             const int commandId = 3;
             const int moduleId = 5;
             const int line = 2;
-            var module = new NodeModule(null, moduleId, "module.js");
+            const string fileName = "module.js";
+            var module = new NodeModule(moduleId, fileName, fileName);
             var breakOn = new BreakOn(BreakOnKind.Equal, 2);
             var breakpoint = new NodeBreakpoint(null, null, null, line, 0, true, breakOn, null);
 

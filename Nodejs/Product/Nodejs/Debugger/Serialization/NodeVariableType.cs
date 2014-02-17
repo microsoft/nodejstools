@@ -29,5 +29,7 @@ namespace Microsoft.NodejsTools.Debugger.Serialization {
         public const string Error = "Error";
         public const string AnonymousFunction = "(anonymous function)";
         public const string AnonymousVariable = "(anonymous variable)";
+        public const string UnknownModule = "<unknown>";
+        public const string Prototype = "__proto__";
     }
 }

@@ -101,6 +101,15 @@ namespace NodejsTests {
             string json = Resources.NodeLookupResponse;
             return DeserializeJsonValue(json);
         }
+        
+        /// <summary>
+        /// Gets a json lookup response with primitive object.
+        /// </summary>
+        /// <returns>JSON object.</returns>
+        public static JObject GetLookupResponseWithPrimitiveObject() {
+            string json = Resources.NodeLookupResponseWithPrimitiveObject;
+            return DeserializeJsonValue(json);
+        }
 
         /// <summary>
         /// Gets a json lookup object.

@@ -16,6 +16,7 @@ using System;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Diagnostics;
+using System.IO;
 using System.Linq;
 using System.Net.NetworkInformation;
 using System.Threading;
@@ -394,6 +395,17 @@ namespace Microsoft.NodejsTools.Debugger {
             }
         }
 
+        public string GetModuleFileName(string javaScriptFileName) {
+            SourceMapping mapping = SourceMapper.MapToOriginal(javaScriptFileName, 0);
+            if (mapping == null) {
+                return javaScriptFileName;
+            }
+
+            string directoryName = Path.GetDirectoryName(javaScriptFileName) ?? string.Empty;
+            string fileName = Path.GetFileName(mapping.FileName) ?? string.Empty;
+            return Path.Combine(directoryName, fileName);
+        }
+
         #endregion
 
         #region Debuggee Communcation
@@ -448,7 +460,7 @@ namespace Microsoft.NodejsTools.Debugger {
         }
 
         private async Task GetScriptsAsync(CancellationToken cancellationToken = new CancellationToken()) {
-            var scriptsCommand = new ScriptsCommand(CommandId);
+            var scriptsCommand = new ScriptsCommand(CommandId, this);
             await _client.SendRequestAsync(scriptsCommand, cancellationToken).ConfigureAwait(false);
 
             foreach (NodeModule module in scriptsCommand.Modules) {
@@ -457,17 +469,16 @@ namespace Microsoft.NodejsTools.Debugger {
         }
 
         private void AddScript(NodeModule newModule) {
-            string name = newModule.FileName;
+            string name = newModule.JavaScriptFileName;
             if (!string.IsNullOrEmpty(name)) {
                 NodeModule module;
                 if (!_mapNameToScript.TryGetValue(name, out module)) {
-                    int id = newModule.ModuleId;
-                    module = new NodeModule(SourceMapper, id, name);
-                    _mapNameToScript[name] = module;
-                    _mapIdToScript[id] = module;
+                    _mapNameToScript[name] = newModule;
+                    _mapIdToScript[newModule.ModuleId] = newModule;
+
                     EventHandler<ModuleLoadedEventArgs> modLoad = ModuleLoaded;
                     if (modLoad != null) {
-                        modLoad(this, new ModuleLoadedEventArgs(module));
+                        modLoad(this, new ModuleLoadedEventArgs(newModule));
                     }
                 }
             }
@@ -714,9 +725,13 @@ namespace Microsoft.NodejsTools.Debugger {
             // request takes a 'bottom' parameter, empirically, Node.js fails requests with it set.  Here we
             // approximate 'bottom' for 'toFrame' using int.MaxValue.  Node.js silently handles toFrame depths
             // greater than the current callstack.
-            var backtraceCommand = new BacktraceCommand(CommandId, _resultFactory, 0, int.MaxValue, this, _mapIdToScript);
+            var backtraceCommand = new BacktraceCommand(CommandId, _resultFactory, 0, int.MaxValue, this);
             await _client.SendRequestAsync(backtraceCommand, cancellationToken).ConfigureAwait(false);
+
             MainThread.Frames = backtraceCommand.StackFrames.ToArray();
+            foreach (NodeModule module in backtraceCommand.Modules.Values) {
+                AddScript(module);
+            }
 
             return backtraceCommand.Running;
         }
@@ -982,7 +997,7 @@ namespace Microsoft.NodejsTools.Debugger {
             int breakpointId = breakpointBinding.BreakpointId;
             if (_connection.Connected) {
                 var clearBreakpointsCommand = new ClearBreakpointCommand(CommandId, breakpointId);
-                await _client.SendRequestAsync(clearBreakpointsCommand, cancellationToken).ConfigureAwait(false);    
+                await _client.SendRequestAsync(clearBreakpointsCommand, cancellationToken).ConfigureAwait(false);
             }
 
             NodeBreakpoint breakpoint = breakpointBinding.Breakpoint;
@@ -1004,7 +1019,7 @@ namespace Microsoft.NodejsTools.Debugger {
         internal async Task<string> GetScriptTextAsync(int moduleId, CancellationToken cancellationToken = new CancellationToken()) {
             DebugWriteCommand("GetScriptText: " + moduleId);
 
-            var scriptsCommand = new ScriptsCommand(CommandId, true, moduleId);
+            var scriptsCommand = new ScriptsCommand(CommandId, this, true, moduleId);
             await _client.SendRequestAsync(scriptsCommand, cancellationToken).ConfigureAwait(false);
 
             if (scriptsCommand.Modules.Count == 0) {

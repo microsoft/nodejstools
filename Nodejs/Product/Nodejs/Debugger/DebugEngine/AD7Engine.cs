@@ -775,8 +775,6 @@ namespace Microsoft.NodejsTools.Debugger.DebugEngine {
         // Gets the name of the program.
         // The name returned by this method is always a friendly, user-displayable name that describes the program.
         public int GetName(out string programName) {
-            DebugWriteCommand("GetName");
-
             // The engine uses default transport and doesn't need to customize the name of the program,
             // so return NULL.
             programName = null;

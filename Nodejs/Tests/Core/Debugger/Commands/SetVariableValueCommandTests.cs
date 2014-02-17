@@ -16,7 +16,7 @@ using Microsoft.NodejsTools.Debugger;
 using Microsoft.NodejsTools.Debugger.Commands;
 using Microsoft.NodejsTools.Debugger.Serialization;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
-using NodejsTests.Mocks;
+using Moq;
 
 namespace NodejsTests.Debugger.Commands {
     [TestClass]
@@ -26,13 +26,13 @@ namespace NodejsTests.Debugger.Commands {
             // Arrange
             const int commandId = 3;
             const int frameId = 1;
-            var resultFactory = new MockEvaluationResultFactory();
+            var resultFactoryMock = new Mock<IEvaluationResultFactory>();
             var stackframe = new NodeStackFrame(null, null, null, 0, 0, 0, frameId);
             const string variableName = "port";
             const int handle = 40;
 
             // Act
-            var setVariableValueCommand = new SetVariableValueCommand(commandId, resultFactory, stackframe, variableName, handle);
+            var setVariableValueCommand = new SetVariableValueCommand(commandId, resultFactoryMock.Object, stackframe, variableName, handle);
 
             // Assert
             Assert.AreEqual(commandId, setVariableValueCommand.Id);
@@ -46,11 +46,13 @@ namespace NodejsTests.Debugger.Commands {
         public void ProcessSetVariableValueResponse() {
             // Arrange
             const int commandId = 3;
-            var resultFactory = new MockEvaluationResultFactory();
+            var resultFactoryMock = new Mock<IEvaluationResultFactory>();
+            resultFactoryMock.Setup(factory => factory.Create(It.IsAny<INodeVariable>()))
+                .Returns(() => new NodeEvaluationResult(0, null, null, null, null, null, NodeExpressionType.None, null));
             var stackframe = new NodeStackFrame(null, null, null, 0, 0, 0, 0);
             const string variableName = "port";
             const int handle = 40;
-            var setVariableValueCommand = new SetVariableValueCommand(commandId, resultFactory, stackframe, variableName, handle);
+            var setVariableValueCommand = new SetVariableValueCommand(commandId, resultFactoryMock.Object, stackframe, variableName, handle);
 
             // Act
             setVariableValueCommand.ProcessResponse(SerializationTestData.GetSetVariableValueResponse());
@@ -58,6 +60,7 @@ namespace NodejsTests.Debugger.Commands {
             // Assert
             Assert.AreEqual(commandId, setVariableValueCommand.Id);
             Assert.IsNotNull(setVariableValueCommand.Result);
+            resultFactoryMock.Verify(factory => factory.Create(It.IsAny<INodeVariable>()), Times.Once);
         }
     }
 }

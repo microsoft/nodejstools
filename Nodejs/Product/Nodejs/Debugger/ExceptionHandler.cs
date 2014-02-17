@@ -159,6 +159,7 @@ namespace Microsoft.NodejsTools.Debugger {
                 "Error(ETIMEDOUT)",
                 "Error(ETXTBSY)",
                 "Error(EXDEV)",
+                "Error(MODULE_NOT_FOUND)",
                 "Error(SIGHUP)",
                 "Error(SIGINT)",
                 "Error(SIGILL)",
@@ -180,6 +181,7 @@ namespace Microsoft.NodejsTools.Debugger {
             string[] breakNeverTypes = {
                 // should probably be break on unhandled when we have just my code support
                 "Error(ENOENT)",
+                "Error(MODULE_NOT_FOUND)",
                 "SyntaxError"
             };
 

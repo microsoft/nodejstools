@@ -24,9 +24,10 @@ namespace NodejsTests.Debugger.Commands {
             // Arrange
             const int commandId = 3;
             const bool includeSource = true;
+            var debugger = new NodeDebugger("localhost", 5858, 1);
 
             // Act
-            var scriptsCommand = new ScriptsCommand(commandId, includeSource);
+            var scriptsCommand = new ScriptsCommand(commandId, debugger, includeSource);
 
             // Assert
             Assert.AreEqual(commandId, scriptsCommand.Id);
@@ -43,9 +44,10 @@ namespace NodejsTests.Debugger.Commands {
             const int commandId = 3;
             const int moduleId = 5;
             const bool includeSource = false;
+            var debugger = new NodeDebugger("localhost", 5858, 1);
 
             // Act
-            var scriptsCommand = new ScriptsCommand(commandId, includeSource, moduleId);
+            var scriptsCommand = new ScriptsCommand(commandId, debugger, includeSource, moduleId);
 
             // Assert
             Assert.AreEqual(commandId, scriptsCommand.Id);
@@ -61,7 +63,8 @@ namespace NodejsTests.Debugger.Commands {
             // Arrange
             const int commandId = 3;
             const bool includeSource = true;
-            var scriptsCommand = new ScriptsCommand(commandId, includeSource);
+            var debugger = new NodeDebugger("localhost", 5858, 1);
+            var scriptsCommand = new ScriptsCommand(commandId, debugger, includeSource);
 
             // Act
             scriptsCommand.ProcessResponse(SerializationTestData.GetScriptsResponse());

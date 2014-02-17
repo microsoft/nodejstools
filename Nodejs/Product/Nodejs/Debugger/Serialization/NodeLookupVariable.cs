@@ -23,7 +23,10 @@ namespace Microsoft.NodejsTools.Debugger.Serialization {
             Utilities.ArgumentNotNull("references", references);
 
             Id = (int)property["ref"];
-            JToken reference = references[Id];
+            JToken reference;
+            if (!references.TryGetValue(Id, out reference)) {
+                reference = property;
+            }
             Parent = parent;
             StackFrame = parent != null ? parent.Frame : null;
             Name = (string)property["name"];

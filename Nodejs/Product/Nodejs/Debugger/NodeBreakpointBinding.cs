@@ -106,7 +106,7 @@ namespace Microsoft.NodejsTools.Debugger {
             get { return _engineHitCount - _hitCountDelta; }
         }
 
-        internal bool FullyBound { get; set; }
+        internal bool FullyBound { get; private set; }
 
         public bool Unbound { get; set; }
 

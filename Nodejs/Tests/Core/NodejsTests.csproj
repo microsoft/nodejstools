@@ -110,7 +110,6 @@
     <Compile Include="Debugger\Serialization\EvaluationVariableTests.cs" />
     <Compile Include="Debugger\Serialization\BacktraceVariableTests.cs" />
     <Compile Include="ImportWizardTests.cs" />
-    <Compile Include="Mocks\MockEvaluationResultFactory.cs" />
     <Compile Include="JadeTests.cs" />
     <Compile Include="LauncherTests.cs" />
     <Compile Include="Mocks\MockNodeVariable.cs" />
@@ -156,6 +155,7 @@
     <EmbeddedResource Include="Resources.resx">
       <Generator>ResXFileCodeGenerator</Generator>
       <LastGenOutput>Resources.Designer.cs</LastGenOutput>
+      <SubType>Designer</SubType>
     </EmbeddedResource>
   </ItemGroup>
   <ItemGroup>

@@ -16,8 +16,8 @@ using Microsoft.NodejsTools.Debugger;
 using Microsoft.NodejsTools.Debugger.Commands;
 using Microsoft.NodejsTools.Debugger.Serialization;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
+using Moq;
 using Newtonsoft.Json.Linq;
-using NodejsTests.Mocks;
 
 namespace NodejsTests.Debugger.Commands {
     [TestClass]
@@ -28,9 +28,10 @@ namespace NodejsTests.Debugger.Commands {
             const int commandId = 3;
             const int fromFrame = 0;
             const int toFrame = 7;
+            var resultFactoryMock = new Mock<IEvaluationResultFactory>();
 
             // Act
-            var backtraceCommand = new BacktraceCommand(commandId, new MockEvaluationResultFactory(), fromFrame, toFrame);
+            var backtraceCommand = new BacktraceCommand(commandId, resultFactoryMock.Object, fromFrame, toFrame);
 
             // Assert
             Assert.AreEqual(commandId, backtraceCommand.Id);
@@ -47,7 +48,10 @@ namespace NodejsTests.Debugger.Commands {
             const int commandId = 3;
             const int fromFrame = 0;
             const int toFrame = 7;
-            var backtraceCommand = new BacktraceCommand(commandId, new MockEvaluationResultFactory(), fromFrame, toFrame);
+            var resultFactoryMock = new Mock<IEvaluationResultFactory>();
+            resultFactoryMock.Setup(factory => factory.Create(It.IsAny<INodeVariable>()))
+                .Returns(() => new NodeEvaluationResult(0, null, null, null, null, null, NodeExpressionType.None, null));
+            var backtraceCommand = new BacktraceCommand(commandId, resultFactoryMock.Object, fromFrame, toFrame);
             JObject backtraceMessage = SerializationTestData.GetBacktraceResponse();
 
             // Act
@@ -56,6 +60,7 @@ namespace NodejsTests.Debugger.Commands {
             // Assert
             Assert.AreEqual(7, backtraceCommand.CallstackDepth);
             Assert.IsNull(backtraceCommand.StackFrames);
+            resultFactoryMock.Verify(factory => factory.Create(It.IsAny<INodeVariable>()), Times.Never);
         }
 
         [TestMethod]
@@ -64,9 +69,11 @@ namespace NodejsTests.Debugger.Commands {
             const int commandId = 3;
             const int fromFrame = 0;
             const int toFrame = 7;
+            var resultFactoryMock = new Mock<IEvaluationResultFactory>();
+            resultFactoryMock.Setup(factory => factory.Create(It.IsAny<INodeVariable>()))
+                .Returns(() => new NodeEvaluationResult(0, null, null, null, null, null, NodeExpressionType.None, null));
             var debugger = new NodeDebugger("localhost", 5858, 1);
-            var resultFactory = new MockEvaluationResultFactory();
-            var backtraceCommand = new BacktraceCommand(commandId, resultFactory, fromFrame, toFrame, debugger);
+            var backtraceCommand = new BacktraceCommand(commandId, resultFactoryMock.Object, fromFrame, toFrame, debugger);
             JObject backtraceMessage = SerializationTestData.GetBacktraceResponse();
 
             // Act
@@ -80,6 +87,7 @@ namespace NodejsTests.Debugger.Commands {
             Assert.AreEqual(23, firstFrame.LineNo);
             Assert.AreEqual(15, firstFrame.Locals.Count);
             Assert.AreEqual(5, firstFrame.Parameters.Count);
+            resultFactoryMock.Verify(factory => factory.Create(It.IsAny<INodeVariable>()), Times.Exactly(51));
         }
     }
 }

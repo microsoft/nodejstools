@@ -21,20 +21,17 @@ namespace Microsoft.NodejsTools.Debugger.Commands {
     sealed class BacktraceCommand : DebuggerCommand {
         private readonly Dictionary<string, object> _arguments;
         private readonly NodeDebugger _debugger;
-        private readonly Dictionary<int, NodeModule> _modules;
         private readonly IEvaluationResultFactory _resultFactory;
-        private readonly NodeModule _unknownModule = new NodeModule(null, -1, "<unknown>");
+        private readonly NodeModule _unknownModule = new NodeModule(-1, NodeVariableType.UnknownModule, NodeVariableType.UnknownModule);
 
         public BacktraceCommand(
             int id,
             IEvaluationResultFactory resultFactory,
             int fromFrame,
             int toFrame,
-            NodeDebugger debugger = null,
-            Dictionary<int, NodeModule> modules = null) : base(id, "backtrace") {
+            NodeDebugger debugger = null) : base(id, "backtrace") {
             _resultFactory = resultFactory;
             _debugger = debugger;
-            _modules = modules;
 
             _arguments = new Dictionary<string, object> {
                 { "fromFrame", fromFrame },
@@ -49,6 +46,7 @@ namespace Microsoft.NodejsTools.Debugger.Commands {
 
         public int CallstackDepth { get; private set; }
         public List<NodeStackFrame> StackFrames { get; private set; }
+        public Dictionary<int, NodeModule> Modules { get; private set; }
 
         public override void ProcessResponse(JObject response) {
             base.ProcessResponse(response);
@@ -62,7 +60,7 @@ namespace Microsoft.NodejsTools.Debugger.Commands {
             }
 
             // Extract scripts (if not provided)
-            Dictionary<int, NodeModule> modules = _modules ?? GetScripts((JArray)response["refs"]);
+            Dictionary<int, NodeModule> modules = GetScripts((JArray)response["refs"], _debugger);
 
             // Extract frames
             var frames = (JArray)body["frames"];
@@ -99,6 +97,7 @@ namespace Microsoft.NodejsTools.Debugger.Commands {
                 results.Add(stackFrame);
             }
 
+            Modules = modules;
             StackFrames = results;
         }
 
@@ -119,13 +118,14 @@ namespace Microsoft.NodejsTools.Debugger.Commands {
             return framename;
         }
 
-        private static Dictionary<int, NodeModule> GetScripts(JArray references) {
+        private static Dictionary<int, NodeModule> GetScripts(JArray references, NodeDebugger debugger) {
             var scripts = new Dictionary<int, NodeModule>(references.Count);
             foreach (JToken reference in references) {
                 var scriptId = (int)reference["id"];
-                var filename = (string)reference["name"];
+                var javaScriptFilename = (string)reference["name"];
+                string fileName = debugger.GetModuleFileName(javaScriptFilename);
 
-                scripts.Add(scriptId, new NodeModule(null, scriptId, filename));
+                scripts.Add(scriptId, new NodeModule(scriptId, fileName, javaScriptFilename));
             }
             return scripts;
         }

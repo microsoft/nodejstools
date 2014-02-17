@@ -23,10 +23,13 @@ namespace Microsoft.NodejsTools.Debugger.Serialization {
             Utilities.ArgumentNotNull("references", references);
 
             Id = (int)prototype["ref"];
-            JToken reference = references[Id];
+            JToken reference;
+            if (!references.TryGetValue(Id, out reference)) {
+                reference = prototype;
+            }
             Parent = parent;
             StackFrame = parent != null ? parent.Frame : null;
-            Name = "__proto__";
+            Name = NodeVariableType.Prototype;
             TypeName = (string)reference["type"];
             Value = (string)reference["value"];
             Class = (string)reference["className"];

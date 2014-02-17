@@ -129,6 +129,12 @@ namespace Microsoft.NodejsTools.Debugger.Communication {
                     }
                     break;
 
+                case "beforeCompile":
+                case "breakForCommand":
+                case "newFunction":
+                case "scriptCollected":
+                    break;
+
                 default:
                     Debug.Fail(string.Format("Unrecognized type '{0}' in event message: {1}", eventType, message));
                     break;

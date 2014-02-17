@@ -14,6 +14,7 @@
 
 using System;
 using System.Threading;
+using Microsoft.NodejsTools.Debugger.Commands;
 using Microsoft.VisualStudio;
 using Microsoft.VisualStudio.Debugger.Interop;
 
@@ -80,9 +81,22 @@ namespace Microsoft.NodejsTools.Debugger.DebugEngine {
         int IDebugExpression2.EvaluateSync(enum_EVALFLAGS dwFlags, uint dwTimeout, IDebugEventCallback2 pExprCallback, out IDebugProperty2 ppResult) {
             TimeSpan timeout = TimeSpan.FromMilliseconds(dwTimeout);
             var tokenSource = new CancellationTokenSource(timeout);
+            ppResult = null;
 
-            NodeEvaluationResult result = _frame.StackFrame.ExecuteTextAsync(_expression, tokenSource.Token)
-                .WaitAsync(timeout, tokenSource.Token).Result;
+            NodeEvaluationResult result;
+            try {
+                result = _frame.StackFrame.ExecuteTextAsync(_expression, tokenSource.Token)
+                    .WaitAsync(timeout, tokenSource.Token).Result;
+                ppResult = new AD7Property(_frame, result);
+            } catch (AggregateException ae) {
+                Exception baseException = ae.GetBaseException();
+                if (baseException is DebuggerCommandException) {
+                    return VSConstants.E_FAIL;
+                }
+
+                throw;
+            }
+
             ppResult = new AD7Property(_frame, result);
 
             return VSConstants.S_OK;

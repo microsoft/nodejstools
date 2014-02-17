@@ -12,10 +12,12 @@
  *
  * ***************************************************************************/
 
+using Microsoft.NodejsTools.Debugger;
 using Microsoft.NodejsTools.Debugger.Commands;
+using Microsoft.NodejsTools.Debugger.Serialization;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
+using Moq;
 using Newtonsoft.Json;
-using NodejsTests.Mocks;
 
 namespace NodejsTests.Debugger.Commands {
     [TestClass]
@@ -24,11 +26,11 @@ namespace NodejsTests.Debugger.Commands {
         public void CreateLookupCommand() {
             // Arrange
             const int commandId = 3;
-            var resultFactory = new MockEvaluationResultFactory();
+            var resultFactoryMock = new Mock<IEvaluationResultFactory>();
             var handles = new[] { 25 };
 
             // Act
-            var lookupCommand = new LookupCommand(commandId, resultFactory, handles);
+            var lookupCommand = new LookupCommand(commandId, resultFactoryMock.Object, handles);
 
             // Assert
             Assert.AreEqual(commandId, lookupCommand.Id);
@@ -43,10 +45,12 @@ namespace NodejsTests.Debugger.Commands {
         public void ProcessLookupResponse() {
             // Arrange
             const int commandId = 3;
-            var resultFactory = new MockEvaluationResultFactory();
+            var resultFactoryMock = new Mock<IEvaluationResultFactory>();
+            resultFactoryMock.Setup(factory => factory.Create(It.IsAny<INodeVariable>()))
+                .Returns(() => new NodeEvaluationResult(0, null, null, null, null, null, NodeExpressionType.None, null));
             const int handle = 25;
             var handles = new[] { handle };
-            var lookupCommand = new LookupCommand(commandId, resultFactory, handles);
+            var lookupCommand = new LookupCommand(commandId, resultFactoryMock.Object, handles);
 
             // Act
             lookupCommand.ProcessResponse(SerializationTestData.GetLookupResponse());
@@ -56,6 +60,29 @@ namespace NodejsTests.Debugger.Commands {
             Assert.IsNotNull(lookupCommand.Results);
             Assert.IsTrue(lookupCommand.Results.ContainsKey(handle));
             Assert.IsNotNull(lookupCommand.Results[handle]);
+            resultFactoryMock.Verify(factory => factory.Create(It.IsAny<INodeVariable>()), Times.AtLeastOnce);
+        }
+        
+        [TestMethod]
+        public void ProcessLookupResponseWithPrimitiveObject() {
+            // Arrange
+            const int commandId = 3;
+            var resultFactoryMock = new Mock<IEvaluationResultFactory>();
+            resultFactoryMock.Setup(factory => factory.Create(It.IsAny<INodeVariable>()))
+                .Returns(() => new NodeEvaluationResult(0, null, null, null, null, null, NodeExpressionType.None, null));
+            const int handle = 9;
+            var handles = new[] { handle };
+            var lookupCommand = new LookupCommand(commandId, resultFactoryMock.Object, handles);
+
+            // Act
+            lookupCommand.ProcessResponse(SerializationTestData.GetLookupResponseWithPrimitiveObject());
+
+            // Assert
+            Assert.AreEqual(commandId, lookupCommand.Id);
+            Assert.IsNotNull(lookupCommand.Results);
+            Assert.IsTrue(lookupCommand.Results.ContainsKey(handle));
+            Assert.IsNotNull(lookupCommand.Results[handle]);
+            resultFactoryMock.Verify(factory => factory.Create(It.IsAny<INodeVariable>()), Times.Once);
         }
     }
 }

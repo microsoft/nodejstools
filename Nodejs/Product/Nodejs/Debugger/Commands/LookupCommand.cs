@@ -63,7 +63,8 @@ namespace Microsoft.NodejsTools.Debugger.Commands {
 
             var results = new Dictionary<int, List<NodeEvaluationResult>>();
             foreach (int handle in _handles) {
-                JToken data = body[handle.ToString(CultureInfo.InvariantCulture)];
+                var id = handle.ToString(CultureInfo.InvariantCulture);
+                JToken data = body[id];
                 if (data == null) {
                     continue;
                 }
@@ -73,7 +74,15 @@ namespace Microsoft.NodejsTools.Debugger.Commands {
                     _parents.TryGetValue(handle, out parent);
                 }
 
-                results.Add(handle, GetProperties(data, parent, references));
+                var properties = GetProperties(data, parent, references);
+                if (properties.Count == 0) {
+                    // Primitive javascript type
+                    var variable = new NodeEvaluationVariable(null, id, data);
+                    var property = _resultFactory.Create(variable);
+                    properties.Add(property);
+                }
+
+                results.Add(handle, properties);
             }
 
             Results = results;

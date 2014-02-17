@@ -12,6 +12,7 @@
  *
  * ***************************************************************************/
 
+using Microsoft.NodejsTools.Debugger.Serialization;
 using Newtonsoft.Json.Linq;
 
 namespace Microsoft.NodejsTools.Debugger.Events {
@@ -20,9 +21,9 @@ namespace Microsoft.NodejsTools.Debugger.Events {
             Running = (bool)message["running"];
 
             var scriptId = (int)message["body"]["script"]["id"];
-            var filename = (string)message["body"]["script"]["name"];
+            var fileName = (string)message["body"]["script"]["name"] ?? NodeVariableType.UnknownModule;
 
-            Module = new NodeModule(null, scriptId, filename);
+            Module = new NodeModule(scriptId, fileName, fileName);
         }
 
         public NodeModule Module { get; private set; }

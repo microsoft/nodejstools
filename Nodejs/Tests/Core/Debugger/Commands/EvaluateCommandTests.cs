@@ -14,8 +14,9 @@
 
 using Microsoft.NodejsTools.Debugger;
 using Microsoft.NodejsTools.Debugger.Commands;
+using Microsoft.NodejsTools.Debugger.Serialization;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
-using NodejsTests.Mocks;
+using Moq;
 
 namespace NodejsTests.Debugger.Commands {
     [TestClass]
@@ -24,11 +25,11 @@ namespace NodejsTests.Debugger.Commands {
         public void CreateEvaluateCommand() {
             // Arrange
             const int commandId = 3;
-            var resultFactory = new MockEvaluationResultFactory();
+            var resultFactoryMock = new Mock<IEvaluationResultFactory>();
             const string expression = "expression";
 
             // Act
-            var evaluateCommand = new EvaluateCommand(commandId, resultFactory, expression);
+            var evaluateCommand = new EvaluateCommand(commandId, resultFactoryMock.Object, expression);
 
             // Assert
             Assert.AreEqual(commandId, evaluateCommand.Id);
@@ -43,11 +44,11 @@ namespace NodejsTests.Debugger.Commands {
         public void CreateEvaluateCommandWithVariableId() {
             // Arrange
             const int commandId = 3;
-            var resultFactory = new MockEvaluationResultFactory();
+            var resultFactoryMock = new Mock<IEvaluationResultFactory>();
             const int variableId = 2;
 
             // Act
-            var evaluateCommand = new EvaluateCommand(commandId, resultFactory, variableId);
+            var evaluateCommand = new EvaluateCommand(commandId, resultFactoryMock.Object, variableId);
 
             // Assert
             Assert.AreEqual(commandId, evaluateCommand.Id);
@@ -62,10 +63,12 @@ namespace NodejsTests.Debugger.Commands {
         public void ProcessEvaluateResponse() {
             // Arrange
             const int commandId = 3;
-            var resultFactory = new MockEvaluationResultFactory();
+            var resultFactoryMock = new Mock<IEvaluationResultFactory>();
+            resultFactoryMock.Setup(factory => factory.Create(It.IsAny<INodeVariable>()))
+                .Returns(() => new NodeEvaluationResult(0, null, null, null, null, null, NodeExpressionType.None, null));
             const string expression = "expression";
             var stackFrame = new NodeStackFrame(null, null, null, 0, 0, 0, 0);
-            var evaluateCommand = new EvaluateCommand(commandId, resultFactory, expression, stackFrame);
+            var evaluateCommand = new EvaluateCommand(commandId, resultFactoryMock.Object, expression, stackFrame);
 
             // Act
             evaluateCommand.ProcessResponse(SerializationTestData.GetEvaluateResponse());
@@ -73,6 +76,7 @@ namespace NodejsTests.Debugger.Commands {
             // Assert
             Assert.AreEqual(commandId, evaluateCommand.Id);
             Assert.IsNotNull(evaluateCommand.Result);
+            resultFactoryMock.Verify(factory => factory.Create(It.IsAny<INodeVariable>()), Times.Once);
         }
     }
 }
