@@ -228,6 +228,9 @@
     <Compile Include="NpmUI\NpmOutputControl.xaml.cs">
       <DependentUpon>NpmOutputControl.xaml</DependentUpon>
     </Compile>
+    <Compile Include="NpmUI\NpmPackageInstallWindow.xaml.cs">
+      <DependentUpon>NpmPackageInstallWindow.xaml</DependentUpon>
+    </Compile>
     <Compile Include="Project\DependencyNodeProperties.cs" />
     <Compile Include="Project\NpmNodeProperties.cs" />
     <Compile Include="Resources.Designer.cs">
@@ -415,6 +418,10 @@
       <Generator>MSBuild:Compile</Generator>
     </Page>
     <Page Include="NpmUI\NpmOutputControl.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="NpmUI\NpmPackageInstallWindow.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
