@@ -68,7 +68,7 @@ namespace Microsoft.NodejsTools.Debugger {
         /// </summary>
         public string FunctionName {
             get {
-                SourceMapping mapping = _debugger.SourceMapper.MapToOriginal(Module.JavaScriptFileName, _lineNo - 1);
+                SourceMapping mapping = _debugger.SourceMapper.MapToOriginal(Module.JavaScriptFileName, _lineNo);
                 if (mapping != null) {
                     return mapping.Name;
                 }
@@ -113,9 +113,9 @@ namespace Microsoft.NodejsTools.Debugger {
         /// <param name="lineNo"></param>
         /// <returns></returns>
         private int MapLineNo(int lineNo) {
-            SourceMapping mapping = _debugger.SourceMapper.MapToOriginal(Module.JavaScriptFileName, lineNo - 1);
+            SourceMapping mapping = _debugger.SourceMapper.MapToOriginal(Module.JavaScriptFileName, lineNo);
             if (mapping != null) {
-                return mapping.Line + 1;
+                return mapping.Line;
             }
             return lineNo;
         }

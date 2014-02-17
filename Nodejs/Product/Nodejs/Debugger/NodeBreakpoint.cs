@@ -23,6 +23,7 @@ namespace Microsoft.NodejsTools.Debugger {
         private readonly string _condition;
         private readonly bool _enabled;
         private readonly string _fileName;
+        private readonly int _lineNo;
         private readonly NodeDebugger _process;
         private readonly string _requestedFileName;
         private readonly int _requestedLineNo;
@@ -40,7 +41,7 @@ namespace Microsoft.NodejsTools.Debugger {
             _process = process;
             _fileName = fileName;
             _requestedFileName = requestedFileName;
-            LineNo = lineNo;
+            _lineNo = lineNo;
             _requestedLineNo = requestedLineNo;
             _enabled = enabled;
             _breakOn = breakOn;
@@ -67,7 +68,9 @@ namespace Microsoft.NodejsTools.Debugger {
             get { return _requestedFileName; }
         }
 
-        public int LineNo { get; set; }
+        public int LineNo {
+            get { return _lineNo; }
+        }
 
         public int RequestedLineNo {
             get { return _requestedLineNo; }

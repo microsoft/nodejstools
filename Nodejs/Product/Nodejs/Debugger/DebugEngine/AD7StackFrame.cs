@@ -93,7 +93,8 @@ namespace Microsoft.NodejsTools.Debugger.DebugEngine {
                         funcName = funcName + " in <unknown>";
                     }
                 }
-                frameInfo.m_bstrFuncName = funcName + " Line " + _stackFrame.LineNo;
+
+                frameInfo.m_bstrFuncName = string.Format("{0} Line {1}", funcName, _stackFrame.LineNo + 1);
                 frameInfo.m_dwValidFields |= enum_FRAMEINFO_FLAGS.FIF_FUNCNAME;
             }
 

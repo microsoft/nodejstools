@@ -74,9 +74,9 @@ namespace Microsoft.NodejsTools.Debugger {
         /// </summary>
         public int RequestedLineNo {
             get {
-                SourceMapping mapping = _breakpoint.Process.SourceMapper.MapToOriginal(FileName, LineNo - 1);
+                SourceMapping mapping = _breakpoint.Process.SourceMapper.MapToOriginal(FileName, LineNo);
                 if (mapping != null) {
-                    return mapping.Line + 1;
+                    return mapping.Line;
                 }
                 return LineNo;
             }

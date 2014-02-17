@@ -13,6 +13,7 @@
  * ***************************************************************************/
 
 using System;
+using System.Globalization;
 using Microsoft.VisualStudio;
 using Microsoft.VisualStudio.Debugger.Interop;
 
@@ -41,7 +42,7 @@ namespace Microsoft.NodejsTools.Debugger.DebugEngine {
         }
 
         public AD7MemoryAddress(AD7Engine engine, NodeStackFrame frame)
-            : this(engine, frame, null, (uint)frame.LineNo - 1) {
+            : this(engine, frame, null, (uint)frame.LineNo) {
         }
 
         public AD7Engine Engine {
@@ -79,15 +80,15 @@ namespace Microsoft.NodejsTools.Debugger.DebugEngine {
         public int Compare(enum_CONTEXT_COMPARE uContextCompare, IDebugMemoryContext2[] compareToItems, uint compareToLength, out uint foundIndex) {
             foundIndex = uint.MaxValue;
 
-            enum_CONTEXT_COMPARE contextCompare = (enum_CONTEXT_COMPARE)uContextCompare;
+            enum_CONTEXT_COMPARE contextCompare = uContextCompare;
 
             for (uint c = 0; c < compareToLength; c++) {
-                AD7MemoryAddress compareTo = compareToItems[c] as AD7MemoryAddress;
+                var compareTo = compareToItems[c] as AD7MemoryAddress;
                 if (compareTo == null) {
                     continue;
                 }
 
-                if (!AD7Engine.ReferenceEquals(this._engine, compareTo._engine)) {
+                if (!ReferenceEquals(_engine, compareTo._engine)) {
                     continue;
                 }
 
@@ -95,33 +96,33 @@ namespace Microsoft.NodejsTools.Debugger.DebugEngine {
 
                 switch (contextCompare) {
                     case enum_CONTEXT_COMPARE.CONTEXT_EQUAL:
-                        result = (this._lineNo == compareTo._lineNo);
+                        result = (_lineNo == compareTo._lineNo);
                         break;
 
                     case enum_CONTEXT_COMPARE.CONTEXT_LESS_THAN:
-                        result = (this._lineNo < compareTo._lineNo);
+                        result = (_lineNo < compareTo._lineNo);
                         break;
 
                     case enum_CONTEXT_COMPARE.CONTEXT_GREATER_THAN:
-                        result = (this._lineNo > compareTo._lineNo);
+                        result = (_lineNo > compareTo._lineNo);
                         break;
 
                     case enum_CONTEXT_COMPARE.CONTEXT_LESS_THAN_OR_EQUAL:
-                        result = (this._lineNo <= compareTo._lineNo);
+                        result = (_lineNo <= compareTo._lineNo);
                         break;
 
                     case enum_CONTEXT_COMPARE.CONTEXT_GREATER_THAN_OR_EQUAL:
-                        result = (this._lineNo >= compareTo._lineNo);
+                        result = (_lineNo >= compareTo._lineNo);
                         break;
 
                     case enum_CONTEXT_COMPARE.CONTEXT_SAME_SCOPE:
                     case enum_CONTEXT_COMPARE.CONTEXT_SAME_FUNCTION:
                         if (_frame != null) {
-                            result = compareTo.FileName == FileName && (compareTo._lineNo + 1) >= _frame.StartLine && (compareTo._lineNo + 1) <= _frame.EndLine;
+                            result = compareTo.FileName == FileName && (compareTo._lineNo) >= _frame.StartLine && (compareTo._lineNo) <= _frame.EndLine;
                         } else if (compareTo._frame != null) {
-                            result = compareTo.FileName == FileName && (_lineNo + 1) >= compareTo._frame.StartLine && (compareTo._lineNo + 1) <= compareTo._frame.EndLine;
+                            result = compareTo.FileName == FileName && (_lineNo) >= compareTo._frame.StartLine && (compareTo._lineNo) <= compareTo._frame.EndLine;
                         } else {
-                            result = this._lineNo == compareTo._lineNo && this.FileName == compareTo.FileName;
+                            result = _lineNo == compareTo._lineNo && FileName == compareTo.FileName;
                         }
                         break;
 
@@ -158,7 +159,7 @@ namespace Microsoft.NodejsTools.Debugger.DebugEngine {
             pinfo[0].dwFields = 0;
 
             if ((dwFields & enum_CONTEXT_INFO_FIELDS.CIF_ADDRESS) != 0) {
-                pinfo[0].bstrAddress = _lineNo.ToString();
+                pinfo[0].bstrAddress = _lineNo.ToString(CultureInfo.InvariantCulture);
                 pinfo[0].dwFields |= enum_CONTEXT_INFO_FIELDS.CIF_ADDRESS;
             }
 

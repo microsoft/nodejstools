@@ -79,7 +79,7 @@ namespace Microsoft.NodejsTools.Debugger.Commands {
                     module = _unknownModule;
                 }
 
-                int line = (int)frame["line"] + 1;
+                int line = (int)frame["line"];
                 var stackFrameId = (int)frame["index"];
                 var stackFrame = new NodeStackFrame(_debugger, module, name, line, line, line, stackFrameId);
 
