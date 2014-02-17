@@ -128,7 +128,11 @@ namespace Microsoft.NodejsTools.Debugger.DebugEngine {
                 }
             }
 
-            ppEnum = new AD7PropertyEnum(properties.OrderBy(p => p.bstrName, _comparer).ToArray());
+            if (dwFields.HasFlag(enum_DEBUGPROP_INFO_FLAGS.DEBUGPROP_INFO_NAME)) {
+                properties = properties.OrderBy(p => p.bstrName, _comparer).ToArray();
+            }
+
+            ppEnum = new AD7PropertyEnum(properties);
             return VSConstants.S_OK;
         }
 

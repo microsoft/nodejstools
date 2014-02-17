@@ -539,5 +539,45 @@ namespace NodejsTests.Debugger.Serialization {
             Assert.AreEqual(result.Type, NodeExpressionType.None);
             Assert.AreEqual(NodeVariableType.Number, result.TypeName);
         }
+        
+        [TestMethod]
+        public void CreateEvaluationResultForPrototypeChild() {
+            // Arrange
+            const string parentName = "parent";
+            var variable = new MockNodeVariable {
+                Id = 19,
+                Parent = new NodeEvaluationResult(
+                    0, 
+                    null,
+                    null, 
+                    "Object",
+                    NodeVariableType.Prototype,
+                    parentName + "." + NodeVariableType.Prototype,
+                    NodeExpressionType.Expandable,
+                    null),
+                StackFrame = null,
+                Name = "name",
+                TypeName = "number",
+                Value = "0",
+                Class = "Number",
+                Text = null
+            };
+            var factory = new EvaluationResultFactory();
+
+            // Act
+            NodeEvaluationResult result = factory.Create(variable);
+
+            // Assert
+            Assert.IsNotNull(result);
+            Assert.IsNull(result.ExceptionText);
+            Assert.AreEqual(variable.Name, result.Expression);
+            Assert.IsNull(result.Frame);
+            Assert.AreEqual(string.Format(@"{0}.{1}", parentName, variable.Name), result.FullName);
+            Assert.AreEqual(variable.Id, result.Handle);
+            Assert.AreEqual(string.Format("0x{0:x}", int.Parse(variable.Value)), result.HexValue);
+            Assert.AreEqual(variable.Value, result.StringValue);
+            Assert.AreEqual(result.Type, NodeExpressionType.None);
+            Assert.AreEqual(NodeVariableType.Number, result.TypeName);
+        }
     }
 }

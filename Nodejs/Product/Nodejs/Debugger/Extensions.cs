@@ -14,6 +14,7 @@
 
 using System;
 using System.Diagnostics;
+using System.IO;
 using System.Net.Sockets;
 using System.Text;
 using System.Threading;
@@ -193,6 +194,20 @@ namespace Microsoft.NodejsTools.Debugger {
             }
 
             throw new TimeoutException();
+        }
+
+        internal static async Task<string> ReadLineBlockAsync(this StreamReader streamReader, int length) {
+            var buffer = new char[length];
+
+            int count = await streamReader.ReadBlockAsync(buffer, 0, length);
+            if (count == 0) {
+                var errorMessage = string.Format("Unable to read {0} bytes from stream.", length);
+                throw new InvalidDataException(errorMessage);
+            }
+
+            // Get UTF-8 string
+            byte[] bytes = streamReader.CurrentEncoding.GetBytes(buffer, 0, count);
+            return Encoding.UTF8.GetString(bytes);
         }
     }
 }

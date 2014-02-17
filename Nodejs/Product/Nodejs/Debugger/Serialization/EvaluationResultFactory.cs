@@ -121,7 +121,15 @@ namespace Microsoft.NodejsTools.Debugger.Serialization {
                 return fullName;
             }
 
-            fullName = string.Format(VariableNameValidator.IsMatch(name) ? @"{0}.{1}" : @"{0}[""{1}""]", parent.FullName, name);
+            // Generates a parent name
+            const string prototypeSuffix = "." + NodeVariableType.Prototype;
+            var parentName = parent.FullName;
+            if (parentName.EndsWith(prototypeSuffix)) {
+                parentName = parentName.Remove(parentName.Length - prototypeSuffix.Length);
+            }
+
+            // Generates a full name
+            fullName = string.Format(VariableNameValidator.IsMatch(name) ? @"{0}.{1}" : @"{0}[""{1}""]", parentName, name);
 
             if (parent.TypeName != NodeVariableType.Object) {
                 return fullName;
