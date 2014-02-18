@@ -97,8 +97,6 @@ namespace Microsoft.NodejsTools.Debugger {
             _hostName = "localhost";
             _portNumber = debuggerPortOrDefault;
 
-            Connection = new NodeConnection(debuggerPortOrDefault);
-
             var allArgs = String.Format("--debug-brk={0} {1}", debuggerPortOrDefault, script);
             if (!string.IsNullOrEmpty(interpreterOptions)) {
                 allArgs += " " + interpreterOptions;
