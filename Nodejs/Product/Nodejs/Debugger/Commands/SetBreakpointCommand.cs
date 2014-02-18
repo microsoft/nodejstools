@@ -31,7 +31,7 @@ namespace Microsoft.NodejsTools.Debugger.Commands {
             _breakpoint = breakpoint;
 
             // Zero based line numbers
-            int line = breakpoint.LineNo - 1;
+            int line = breakpoint.LineNo;
 
             // Zero based column numbers
             // Special case column to avoid (line 0, column 0) which
@@ -98,7 +98,7 @@ namespace Microsoft.NodejsTools.Debugger.Commands {
             }
 
             if (actualLocations.Count > 0) {
-                int actualLocation = (int)actualLocations[0]["line"] + 1;
+                int actualLocation = (int)actualLocations[0]["line"];
                 if (actualLocation != _breakpoint.LineNo) {
                     LineNo = actualLocation;
                 }

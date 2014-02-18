@@ -343,8 +343,7 @@ namespace Microsoft.NodejsTools.Debugger {
             string fileName;
             int lineNo;
 
-            SourceMapper.MapToJavaScript(requestedFileName, requestedLineNo - 1, out fileName, out lineNo);
-            lineNo++;
+            SourceMapper.MapToJavaScript(requestedFileName, requestedLineNo, out fileName, out lineNo);
 
             return new NodeBreakpoint(this, fileName, requestedFileName, lineNo, requestedLineNo, enabled, breakOn, condition);
         }
