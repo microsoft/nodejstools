@@ -41,6 +41,10 @@
             this._browsePath = new System.Windows.Forms.Button();
             this._browseDirectory = new System.Windows.Forms.Button();
             this._nodeExeErrorProvider = new System.Windows.Forms.ErrorProvider(this.components);
+            this._debuggerPortLabel = new System.Windows.Forms.Label();
+            this._debuggerPort = new System.Windows.Forms.TextBox();
+            this._envVars = new System.Windows.Forms.TextBox();
+            this._envVarsLabel = new System.Windows.Forms.Label();
             ((System.ComponentModel.ISupportInitialize)(this._nodeExeErrorProvider)).BeginInit();
             this.SuspendLayout();
             // 
@@ -65,10 +69,10 @@
             // _startBrowser
             // 
             this._startBrowser.AutoSize = true;
-            this._startBrowser.Location = new System.Drawing.Point(17, 176);
+            this._startBrowser.Location = new System.Drawing.Point(17, 228);
             this._startBrowser.Name = "_startBrowser";
             this._startBrowser.Size = new System.Drawing.Size(161, 17);
-            this._startBrowser.TabIndex = 14;
+            this._startBrowser.TabIndex = 18;
             this._startBrowser.Text = "St&art web browser on launch";
             this._startBrowser.UseVisualStyleBackColor = true;
             this._startBrowser.CheckedChanged += new System.EventHandler(this.Changed);
@@ -97,19 +101,19 @@
             // 
             // _nodejsPort
             // 
-            this._nodejsPort.Location = new System.Drawing.Point(135, 150);
+            this._nodejsPort.Location = new System.Drawing.Point(135, 176);
             this._nodejsPort.Name = "_nodejsPort";
             this._nodejsPort.Size = new System.Drawing.Size(105, 20);
-            this._nodejsPort.TabIndex = 13;
-            this._nodejsPort.TextChanged += new System.EventHandler(this.NodejsPortChanged);
+            this._nodejsPort.TabIndex = 15;
+            this._nodejsPort.TextChanged += new System.EventHandler(this.PortChanged);
             // 
             // _nodePortLabel
             // 
             this._nodePortLabel.AutoSize = true;
-            this._nodePortLabel.Location = new System.Drawing.Point(14, 153);
+            this._nodePortLabel.Location = new System.Drawing.Point(14, 179);
             this._nodePortLabel.Name = "_nodePortLabel";
             this._nodePortLabel.Size = new System.Drawing.Size(67, 13);
-            this._nodePortLabel.TabIndex = 12;
+            this._nodePortLabel.TabIndex = 14;
             this._nodePortLabel.Text = "Node.&js port:";
             // 
             // _scriptArgsLabel
@@ -195,10 +199,50 @@
             // 
             this._nodeExeErrorProvider.ContainerControl = this;
             // 
+            // _debuggerPortLabel
+            // 
+            this._debuggerPortLabel.AutoSize = true;
+            this._debuggerPortLabel.Location = new System.Drawing.Point(14, 205);
+            this._debuggerPortLabel.Name = "_debuggerPortLabel";
+            this._debuggerPortLabel.Size = new System.Drawing.Size(78, 13);
+            this._debuggerPortLabel.TabIndex = 16;
+            this._debuggerPortLabel.Text = "&Debugger port:";
+            // 
+            // _debuggerPort
+            // 
+            this._debuggerPort.Location = new System.Drawing.Point(135, 202);
+            this._debuggerPort.Name = "_debuggerPort";
+            this._debuggerPort.Size = new System.Drawing.Size(105, 20);
+            this._debuggerPort.TabIndex = 17;
+            this._debuggerPort.TextChanged += new System.EventHandler(this.PortChanged);
+            // 
+            // _envVars
+            // 
+            this._envVars.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
+            | System.Windows.Forms.AnchorStyles.Right)));
+            this._envVars.Location = new System.Drawing.Point(135, 150);
+            this._envVars.Name = "_envVars";
+            this._envVars.Size = new System.Drawing.Size(340, 20);
+            this._envVars.TabIndex = 13;
+            this._envVars.TextChanged += new System.EventHandler(this.Changed);
+            // 
+            // _envVarsLabel
+            // 
+            this._envVarsLabel.AutoSize = true;
+            this._envVarsLabel.Location = new System.Drawing.Point(14, 153);
+            this._envVarsLabel.Name = "_envVarsLabel";
+            this._envVarsLabel.Size = new System.Drawing.Size(115, 13);
+            this._envVarsLabel.TabIndex = 12;
+            this._envVarsLabel.Text = "Environment &Variables:";
+            // 
             // NodejsGeneralPropertyPageControl
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
+            this.Controls.Add(this._envVarsLabel);
+            this.Controls.Add(this._envVars);
+            this.Controls.Add(this._debuggerPort);
+            this.Controls.Add(this._debuggerPortLabel);
             this.Controls.Add(this._browseDirectory);
             this.Controls.Add(this._browsePath);
             this.Controls.Add(this._nodePortLabel);
@@ -216,7 +260,7 @@
             this.Controls.Add(this._nodeExePath);
             this.MinimumSize = new System.Drawing.Size(303, 0);
             this.Name = "NodejsGeneralPropertyPageControl";
-            this.Size = new System.Drawing.Size(488, 302);
+            this.Size = new System.Drawing.Size(488, 305);
             ((System.ComponentModel.ISupportInitialize)(this._nodeExeErrorProvider)).EndInit();
             this.ResumeLayout(false);
             this.PerformLayout();
@@ -242,5 +286,9 @@
         private System.Windows.Forms.Button _browsePath;
         private System.Windows.Forms.Button _browseDirectory;
         private System.Windows.Forms.ErrorProvider _nodeExeErrorProvider;
+        private System.Windows.Forms.Label _envVarsLabel;
+        private System.Windows.Forms.TextBox _envVars;
+        private System.Windows.Forms.TextBox _debuggerPort;
+        private System.Windows.Forms.Label _debuggerPortLabel;
     }
 }

@@ -272,6 +272,12 @@ namespace Microsoft.NodejsTools.Project {
             var propPage = GeneralPropertyPageControl;
             if (propPage != null) {
                 switch (propertyName) {
+                    case NodejsConstants.EnvironmentVariables:
+                        propPage.EnvironmentVariables = newValue;
+                        break;
+                    case NodejsConstants.DebuggerPort:
+                        propPage.DebuggerPort = newValue;
+                        break;
                     case NodejsConstants.NodejsPort:
                         propPage.NodejsPort = newValue;
                         break;

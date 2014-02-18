@@ -25,7 +25,7 @@ namespace Microsoft.NodejsTools.Debugger.Remote {
         public const string PortSupplierId = "{9E16F805-5EFC-4CE5-8B67-9AE9B643EF80}";
         private static readonly Guid _guid = new Guid(PortSupplierId);
         private static readonly string _defaultHost = "localhost";
-        private static readonly ushort _defaultPort = 5858;
+        private static readonly ushort _defaultPort = NodejsConstants.DefaultDebuggerPort;
         private static readonly Regex _portNameRegex = new Regex(@"^(?<hostName>[^:\n]+?)?(:(?<portNum>\d+))?$", RegexOptions.ExplicitCapture);
 
         public NodeRemoteDebugPortSupplier() {
@@ -90,7 +90,7 @@ namespace Microsoft.NodejsTools.Debugger.Remote {
             pbstrText =
                 "Allows attaching to Node.js processes running behind a remote debug proxy (RemoteDebug.js). " +
                 "Related documentation can be found under the 'Tools\\Node.js Tool\\Remote Debug Proxy' menu. " +
-                "Specify the target hostname and debugger port in the 'Qualifier' textbox, e.g. 'targethost:5858'. " +
+                "Specify the target hostname and debugger port in the 'Qualifier' textbox, e.g. 'targethost:" + NodejsConstants.DefaultDebuggerPort + "'. " +
                 "This transport is not secure, and should not be used on a network that might have hostile traffic.";
             return VSConstants.S_OK;
         }
