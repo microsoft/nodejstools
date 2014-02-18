@@ -30,21 +30,24 @@ namespace Microsoft.NodejsTools.Intellisense {
         private readonly IVsEditorAdaptersFactoryService _adaptersFactory;
         private readonly IEditorOperationsFactoryService _editorOperationsFactory;
         private readonly IComponentModel _compModel;
+        private readonly IEditorOptionsFactoryService _editorOptionsFactory;
 
         [ImportingConstructor]
-        public TextViewCreationListener(IVsEditorAdaptersFactoryService adaptersFactory, IEditorOperationsFactoryService editorOperationsFactory, [Import(typeof(SVsServiceProvider))]IServiceProvider serviceProvider) {
+        public TextViewCreationListener(IVsEditorAdaptersFactoryService adaptersFactory, IEditorOperationsFactoryService editorOperationsFactory, [Import(typeof(SVsServiceProvider))]IServiceProvider serviceProvider, IEditorOptionsFactoryService editorOptionsFactory) {
             _adaptersFactory = adaptersFactory;
             _editorOperationsFactory = editorOperationsFactory;
             _compModel = (IComponentModel)serviceProvider.GetService(typeof(SComponentModel));
+            _editorOptionsFactory = editorOptionsFactory;
         }
 
         #region IVsTextViewCreationListener Members
 
         public void VsTextViewCreated(VisualStudio.TextManager.Interop.IVsTextView textViewAdapter) {
-            var textView = _adaptersFactory.GetWpfTextView(textViewAdapter);
+            var textView = _adaptersFactory.GetWpfTextView(textViewAdapter);            
             var editFilter = new EditFilter(
                 textView,
                 _editorOperationsFactory.GetEditorOperations(textView),
+                _editorOptionsFactory.GetOptions(textView),
                 _compModel.GetService<IIntellisenseSessionStackMapService>().GetStackForTextView(textView),
                 _compModel
             );

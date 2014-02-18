@@ -51,11 +51,6 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TestAdapter", "Product\Test
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TestAdapterTests", "Tests\TestAdapterTests\TestAdapterTests.csproj", "{3FC57837-519D-4980-A8E8-DC5879DDA002}"
 EndProject
-Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution Items", "{296394AD-BB10-4801-B3D5-31D28F0CC1A6}"
-	ProjectSection(SolutionItems) = preProject
-		Performance1.psess = Performance1.psess
-	EndProjectSection
-EndProject
 Global
 	GlobalSection(TeamFoundationVersionControl) = preSolution
 		SccNumberOfProjects = 23
@@ -268,8 +263,5 @@ Global
 		{E75E5DB1-0EA0-4247-A830-FE467C016816} = {850AC94A-310F-4F88-A553-2806D7732BD1}
 		{95494195-DCA4-4633-B78B-2087836C11D0} = {850AC94A-310F-4F88-A553-2806D7732BD1}
 		{3FC57837-519D-4980-A8E8-DC5879DDA002} = {850AC94A-310F-4F88-A553-2806D7732BD1}
-	EndGlobalSection
-	GlobalSection(Performance) = preSolution
-		HasPerformanceSessions = true
 	EndGlobalSection
 EndGlobal

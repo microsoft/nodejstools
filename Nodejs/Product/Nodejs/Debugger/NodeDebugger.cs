@@ -78,18 +78,26 @@ namespace Microsoft.NodejsTools.Debugger {
             string interpreterOptions,
             NodeDebugOptions debugOptions,
             List<string[]> dirMapping,
+            ushort? debuggerPort = null,
             bool createNodeWindow = true) : this() {
+
             // Select debugger port for a local connection
-            List<int> activeConnections = IPGlobalProperties.GetIPGlobalProperties().GetActiveTcpListeners().Select(p => p.Port).ToList();
-            ushort debugPort = 5858;
-            if (activeConnections.Contains(debugPort)) {
-                debugPort = (ushort)Enumerable.Range(new Random().Next(5859, 6000), 60000).Except(activeConnections).First();
+            ushort debuggerPortOrDefault = NodejsConstants.DefaultDebuggerPort;
+            if (debuggerPort != null) {
+                debuggerPortOrDefault = debuggerPort.Value;
+            } else {
+                var activeConnections =
+                    from listener in IPGlobalProperties.GetIPGlobalProperties().GetActiveTcpListeners()
+                    select listener.Port;
+                if (activeConnections.Contains(debuggerPortOrDefault)) {
+                    debuggerPortOrDefault = (ushort)Enumerable.Range(new Random().Next(5859, 6000), 60000).Except(activeConnections).First();
+                }
             }
 
             _hostName = "localhost";
-            _portNumber = debugPort;
+            _portNumber = debuggerPortOrDefault;
 
-            string allArgs = "--debug-brk " + script;
+            var allArgs = String.Format("--debug-brk={0} {1}", debuggerPortOrDefault, script);
             if (!string.IsNullOrEmpty(interpreterOptions)) {
                 allArgs += " " + interpreterOptions;
             }

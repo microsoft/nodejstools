@@ -96,6 +96,11 @@ namespace Microsoft.NodejsTools.Debugger.DebugEngine {
         public const string WebBrowserUrl = "WEB_BROWSER_URL";
 
         /// <summary>
+        /// Specifies the port to be used for the debugger.
+        /// </summary>
+        public const string DebuggerPort = "DEBUGGER_PORT";
+
+        /// <summary>
         /// Specifies a directory mapping in the form of:
         /// 
         /// OldDir|NewDir
@@ -467,6 +472,7 @@ namespace Microsoft.NodejsTools.Debugger.DebugEngine {
             var debugOptions = NodeDebugOptions.None;
             List<string[]> dirMapping = null;
             string interpreterOptions = null;
+            ushort? debugPort = null;
             if (options != null) {
                 var splitOptions = SplitOptions(options);
                 
@@ -474,6 +480,8 @@ namespace Microsoft.NodejsTools.Debugger.DebugEngine {
                     var setting = optionSetting.Split(new[] { '=' }, 2);
 
                     if (setting.Length == 2) {
+                        setting[1] = HttpUtility.UrlDecode(setting[1]);
+
                         switch (setting[0]) {
                             case WaitOnAbnormalExitSetting:
                                 bool value;
@@ -505,7 +513,13 @@ namespace Microsoft.NodejsTools.Debugger.DebugEngine {
                                 interpreterOptions = setting[1];
                                 break;
                             case WebBrowserUrl:
-                                _webBrowserUrl = HttpUtility.UrlDecode(setting[1]);
+                                _webBrowserUrl = setting[1];
+                                break;
+                            case DebuggerPort:
+                                ushort dbgPortTmp;
+                                if (ushort.TryParse(setting[1], out dbgPortTmp)) {
+                                    debugPort = dbgPortTmp;
+                                }
                                 break;
                         }
                     }
@@ -520,7 +534,8 @@ namespace Microsoft.NodejsTools.Debugger.DebugEngine {
                     env,
                     interpreterOptions,
                     debugOptions,
-                    dirMapping
+                    dirMapping,
+                    debugPort
                 );
 
             _process.Start(false);

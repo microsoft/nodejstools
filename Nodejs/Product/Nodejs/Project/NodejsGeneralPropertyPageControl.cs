@@ -54,6 +54,8 @@ namespace Microsoft.NodejsTools.Project {
             _tooltip.SetToolTip(_startBrowser, Resources.StartBrowserToolTip);
             _tooltip.SetToolTip(_workingDir, Resources.WorkingDirToolTip);
             _tooltip.SetToolTip(_launchUrl, Resources.LaunchUrlToolTip);
+            _tooltip.SetToolTip(_debuggerPort, Resources.DebuggerPort);
+            _tooltip.SetToolTip(_envVars, Resources.EnvironmentVariables);
         }
 
         public string NodeExePath {
@@ -120,6 +122,24 @@ namespace Microsoft.NodejsTools.Project {
             }
         }
 
+        public string EnvironmentVariables {
+            get {
+                return _envVars.Text;
+            }
+            set {
+                _envVars.Text = value;
+            }
+        }
+
+        public string DebuggerPort {
+            get {
+                return _debuggerPort.Text;
+            }
+            set {
+                _debuggerPort.Text = value;
+            }
+        }
+
         private void Changed(object sender, EventArgs e) {
             _propPage.IsDirty = true;
         }
@@ -168,11 +188,13 @@ namespace Microsoft.NodejsTools.Project {
             }
         }
 
-        private void NodejsPortChanged(object sender, EventArgs e) {
-            if (_nodejsPort.Text.Any(ch => !Char.IsDigit(ch))) {
-                _nodeExeErrorProvider.SetError(_nodejsPort, Resources.InvalidPortNumber);
+        private void PortChanged(object sender, EventArgs e) {
+            var textSender = (TextBox)sender;
+
+            if (textSender.Text.Any(ch => !Char.IsDigit(ch))) {
+                _nodeExeErrorProvider.SetError(textSender, Resources.InvalidPortNumber);
             } else {
-                _nodeExeErrorProvider.SetError(_nodejsPort, String.Empty);
+                _nodeExeErrorProvider.SetError(textSender, String.Empty);
             }
             Changed(sender, e);
         }
