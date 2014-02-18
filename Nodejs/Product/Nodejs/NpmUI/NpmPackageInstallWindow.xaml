@@ -25,6 +25,46 @@
                 </Grid.ColumnDefinitions>
             </Grid>
             
+            <Grid DockPanel.Dock="Top" HorizontalAlignment="Stretch" VerticalAlignment="Center">
+                <Grid.ColumnDefinitions>
+                    <!-- Find/npm install label -->
+                    <ColumnDefinition Width="Auto"></ColumnDefinition>
+                    <!-- Text field -->
+                    <ColumnDefinition Width="*"></ColumnDefinition>
+                    <!-- Dependency type: standard, dev, optional, global -->
+                    <ColumnDefinition Width="Auto"></ColumnDefinition>
+                    <!-- Install button -->
+                    <ColumnDefinition Width="Auto"></ColumnDefinition>
+                </Grid.ColumnDefinitions>
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="Auto"></RowDefinition>
+                </Grid.RowDefinitions>
+                
+                <Label Grid.Column="0"
+                       Grid.Row="0"
+                       Content="npm install"></Label>
+                
+                <TextBox Name="_TxtArguments"
+                           Grid.Column="1"
+                           Grid.Row="0"></TextBox>
+                
+                <ComboBox Name="_ComboDependencyType"
+                          Grid.Column="2"
+                          Grid.Row="0"
+                          Width="100">
+                    <ComboBoxItem Tag="St" IsSelected="True">Standard</ComboBoxItem>
+                    <ComboBoxItem Tag="Dev">Development</ComboBoxItem>
+                    <ComboBoxItem Tag="Opt">Optional</ComboBoxItem>
+                    <ComboBoxItem Tag="Global">Global</ComboBoxItem>
+                </ComboBox>
+                <Button Name="_BtnInstall"
+                        Grid.Column="3"
+                        Grid.Row="0"
+                        Content="Install"></Button>
+            </Grid>
+            
+            <!-- Dialog control -->
+            
             <StackPanel DockPanel.Dock="Bottom"
                         Orientation="Horizontal"
                         HorizontalAlignment="Right"
@@ -36,15 +76,42 @@
                 <Grid.RowDefinitions>
                     <RowDefinition Height="9*"></RowDefinition>
                     <RowDefinition Height="Auto"></RowDefinition>
+                    <RowDefinition Height="Auto"></RowDefinition>
                     <RowDefinition Height="*"></RowDefinition>
                 </Grid.RowDefinitions>
-                <ListBox Grid.Row="0"></ListBox>
-                <GridSplitter Grid.Row="1"
+                
+                <!-- Package List -->
+                
+                <ListBox Name="_PackageList" Grid.Row="0"></ListBox>
+                
+                <!-- Package cache control -->
+                
+                <DockPanel Grid.Row="1" Height="Auto" HorizontalAlignment="Stretch">
+                    <StackPanel DockPanel.Dock="Left"
+                                Orientation="Horizontal"
+                                VerticalAlignment="Center">
+                        <Label Content="Catalog last updated:"></Label>
+                        <Label Name="_LblLastRefreshed" Content="Today at 10:00 AM"></Label>
+                    </StackPanel>
+                    <StackPanel DockPanel.Dock="Right"
+                                Orientation="Horizontal"
+                                HorizontalAlignment="Right"
+                                VerticalAlignment="Center">
+                        <Button Name="_BtnRefresh" Content="Refresh Catalog"></Button>
+                    </StackPanel>
+                </DockPanel>
+                
+                <!-- Split -->
+                
+                <GridSplitter Grid.Row="2"
                               HorizontalAlignment="Stretch"
                               VerticalAlignment="Center"
                               ShowsPreview="True"
                               Height="5"></GridSplitter>
-                <npmUi:NpmOutputControl Grid.Row="2"></npmUi:NpmOutputControl>
+                
+                <!-- Npm Output -->
+                
+                <npmUi:NpmOutputControl Grid.Row="3"></npmUi:NpmOutputControl>
             </Grid>
 
             
