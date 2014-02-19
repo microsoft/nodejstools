@@ -77,6 +77,31 @@
     <Copy SourceFiles="@(_FoundWebCloudConfig)" DestinationFiles="$(IntermediateOutputPath)\web.config" Condition="$(DeployingCloudConfig)" SkipUnchangedFiles="true"/>
   </Target>
 
+  <Target Name="BuiltProjectOutputGroup" Returns="@(BuiltProjectOutputGroupOutput)">
+    <Message Text="BuildProjectOutputGroup @(TypeScriptCompile)"/>
+    <ItemGroup>
+      <!-- We can't depend upon GeneratedJavascript defined by TypeScript because it 
+           doesn't occur when we're publishing, just when building.  So we calculate
+           the paths for the generated code here.  We also don't get to rely upon 
+           TypeScriptCollectPublishFiles to include the files for publishing because 
+           Worker Roles won't invoke PublishPipeline, they invoke some targets directly -->
+      <_GeneratedJavascript Include="@(TypeScriptCompile->'%(RelativeDir)%(Filename).js')"/>
+      <!-- Building scripts results in the scripts -->
+      <_TempBuiltProjectOutputGroup Include="@(Compile->'%(FullPath)');@(Content->'%(FullPath)');@(_GeneratedJavascript->'%(FullPath)')"/>
+
+      <!-- Include the project file -->
+      <_TempBuiltProjectOutputGroup Include="$(MSBuildProjectFullPath)">
+        <OriginalItemSpec>$(MSBuildProjectFullPath)</OriginalItemSpec>
+        <TargetPath>$(ProjectFileName)</TargetPath>
+      </_TempBuiltProjectOutputGroup>
+    </ItemGroup>
+
+    <AssignTargetPath Files="@(_TempBuiltProjectOutputGroup)" RootFolder="$(MSBuildProjectDirectory)">
+      <Output TaskParameter="AssignedFiles" ItemName="BuiltProjectOutputGroupOutput" />
+    </AssignTargetPath>
+  </Target>
+
+  <Target Name="DebugSymbolsProjectOutputGroup" />
 
   <ItemGroup>
     <NodejsAzureDeploymentFile Include="$(NodejsSupportPath)Microsoft.NodejsTools.WebRole.dll"></NodejsAzureDeploymentFile>

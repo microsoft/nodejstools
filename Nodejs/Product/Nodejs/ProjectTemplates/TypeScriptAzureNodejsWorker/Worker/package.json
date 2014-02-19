@@ -1,0 +1,10 @@
+{
+  "name": "$safeprojectname$",
+  "version": "0.0.0",
+  "description": "$projectname$",
+  "main": "server.js",
+  "author": {
+    "name": "$username$",
+    "email": ""
+  }
+}
