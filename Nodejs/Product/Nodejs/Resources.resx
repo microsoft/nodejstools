@@ -304,6 +304,18 @@
   <data name="WorkingDirInvalidOrMissing" xml:space="preserve">
     <value>The specified working directory is invalid or missing.</value>
   </data>
+  <data name="CatalogFilterLabelFilter">
+    <value>Filter:</value>
+  </data>
+  <data name="CatalogFilterLabelNpmInstall">
+    <value>npm install</value>
+  </data>
+  <data name="CatalogLoadingDefault">
+    <value>Loading published package list...</value>
+  </data>
+  <data name="CatalogLoadingNoNpm">
+    <value>Catalog retrieval aborted - npm.cmd not found</value>
+  </data>
   <data name="PackageCatalogRefreshing" xml:space="preserve">
     <value>Currently refreshing</value>
   </data>

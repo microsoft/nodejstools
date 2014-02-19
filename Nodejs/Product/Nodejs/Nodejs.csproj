@@ -228,9 +228,11 @@
     <Compile Include="NpmUI\NpmOutputControl.xaml.cs">
       <DependentUpon>NpmOutputControl.xaml</DependentUpon>
     </Compile>
+    <Compile Include="NpmUI\NpmPackageInstallViewModel.cs" />
     <Compile Include="NpmUI\NpmPackageInstallWindow.xaml.cs">
       <DependentUpon>NpmPackageInstallWindow.xaml</DependentUpon>
     </Compile>
+    <Compile Include="NpmUI\PackageCatalogEntryViewModel.cs" />
     <Compile Include="Project\DependencyNodeProperties.cs" />
     <Compile Include="Project\NpmNodeProperties.cs" />
     <Compile Include="Resources.Designer.cs">
