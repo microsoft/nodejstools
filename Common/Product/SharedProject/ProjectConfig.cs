@@ -678,6 +678,12 @@ namespace Microsoft.VisualStudioTools.Project
             var earliestOutput = DateTime.MaxValue;
             bool mustRebuild = false;
 
+            var allInputs = new HashSet<string>(OutputGroups
+                .Where(g => IsInputGroup(g.Name))
+                .SelectMany(x => x.EnumerateOutputs())
+                .Select(input => input.CanonicalName),
+                StringComparer.OrdinalIgnoreCase
+            );
             foreach (var group in OutputGroups.Where(g => !IsInputGroup(g.Name)))
             {
                 foreach (var output in group.EnumerateOutputs())
@@ -699,6 +705,11 @@ namespace Microsoft.VisualStudioTools.Project
                     {
                         mustRebuild = true;
                         break;
+                    }
+                    
+                    // output is an input, ignore it...
+                    if (allInputs.Contains(path)) {
+                        continue;
                     }
 
                     string inputPath;

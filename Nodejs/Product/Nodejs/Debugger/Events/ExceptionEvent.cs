@@ -20,8 +20,8 @@ namespace Microsoft.NodejsTools.Debugger.Events {
         public ExceptionEvent(JObject message) {
             Running = false;
 
-            Line = (int)message["body"]["sourceLine"];
-            Column = (int)message["body"]["sourceColumn"];
+            Line = (int?)message["body"]["sourceLine"];
+            Column = (int?)message["body"]["sourceColumn"];
             Uncaught = (bool)message["body"]["uncaught"];
             ExceptionId = (int)message["body"]["exception"]["handle"];
             Description = (string)message["body"]["exception"]["text"];
@@ -30,19 +30,21 @@ namespace Microsoft.NodejsTools.Debugger.Events {
             typeName = CultureInfo.CurrentCulture.TextInfo.ToTitleCase(typeName);
             TypeName = string.Format("{0} exception", typeName);
 
-            var scriptId = (int)message["body"]["script"]["id"];
-            var fileName = (string)message["body"]["script"]["name"];
+            var script = message["body"]["script"];
+            if (script != null) {
+                var scriptId = (int)message["body"]["script"]["id"];
+                var fileName = (string)message["body"]["script"]["name"];
+                Module = new NodeModule(scriptId, fileName, fileName);
+            }
 
             ExceptionName = GetExceptionName(message);
             ErrorNumber = GetExceptionCodeRef(message);
-
-            Module = new NodeModule(scriptId, fileName, fileName);
         }
 
         public string ExceptionName { get; private set; }
         public int? ErrorNumber { get; private set; }
-        public int Line { get; private set; }
-        public int Column { get; private set; }
+        public int? Line { get; private set; }
+        public int? Column { get; private set; }
         public string Description { get; private set; }
         public int ExceptionId { get; private set; }
         public string TypeName { get; private set; }

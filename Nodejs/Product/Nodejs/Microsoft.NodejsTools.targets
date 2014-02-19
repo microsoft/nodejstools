@@ -11,6 +11,7 @@
     <TargetFrameworkVersion>v4.0</TargetFrameworkVersion>
     <NodejsSupportPath>$(MSBuildThisFileDirectory)</NodejsSupportPath>
     <ProjectHome Condition="'$(ProjectHome)' == ''">.</ProjectHome>
+    <DebugSymbols>false</DebugSymbols>
   </PropertyGroup>
 
   <Target Name="GetTargetFrameworkVersion" Returns="$(TargetFrameworkVersion)" />
@@ -101,6 +102,29 @@
     </AssignTargetPath>
   </Target>
 
+  <Target
+      Name="SourceFilesProjectOutputGroup"
+      Returns="@(SourceFilesProjectOutputGroupOutput)"
+      DependsOnTargets="$(SourceFilesProjectOutputGroupDependsOn)">
+
+    <AssignTargetPath Files="@(Compile);@(Content)" RootFolder="$(MSBuildProjectDirectory)">
+      <Output TaskParameter="AssignedFiles" ItemName="_CompileWithTargetPath" />
+    </AssignTargetPath>
+    <Message Text="Running SourceFilesProjectOutputGroup" Importance="high"/>
+    <ItemGroup>
+      <!-- First we deal with Compile, EmbeddedResource and AppConfig -->
+      <SourceFilesProjectOutputGroupOutput Include="@(_CompileWithTargetPath->'%(FullPath)')"/>
+
+      <!-- Include the project file -->
+      <SourceFilesProjectOutputGroupOutput Include="$(MSBuildProjectFullPath)">
+        <!-- For compatibility with 2.0 -->
+        <OriginalItemSpec>$(MSBuildProjectFullPath)</OriginalItemSpec>
+        <TargetPath>$(ProjectFileName)</TargetPath>
+      </SourceFilesProjectOutputGroupOutput>
+    </ItemGroup>
+
+  </Target>
+  
   <Target Name="DebugSymbolsProjectOutputGroup" />
 
   <ItemGroup>
