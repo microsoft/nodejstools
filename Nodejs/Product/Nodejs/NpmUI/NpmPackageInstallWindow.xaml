@@ -12,20 +12,13 @@
         <DockPanel VerticalAlignment="Stretch"
                    Height="Auto"
                    HorizontalAlignment="Stretch"
-                   Width="Auto">
-            <Grid DockPanel.Dock="Top">
-                <Grid.RowDefinitions>
-                    <RowDefinition Height="*"></RowDefinition>
-                    <RowDefinition Height="*"></RowDefinition>
-                </Grid.RowDefinitions>
-                <Grid.ColumnDefinitions>
-                    <ColumnDefinition Width="Auto"></ColumnDefinition>
-                    <ColumnDefinition Width="*"></ColumnDefinition>
-                    <ColumnDefinition Width="Auto"></ColumnDefinition>
-                </Grid.ColumnDefinitions>
-            </Grid>
+                   Width="Auto"
+                   Margin="4, 4, 4, 4">
             
-            <Grid DockPanel.Dock="Top" HorizontalAlignment="Stretch" VerticalAlignment="Center">
+            <Grid DockPanel.Dock="Top"
+                  HorizontalAlignment="Stretch"
+                  VerticalAlignment="Center"
+                  Margin="0, 0, 0, 4">
                 <Grid.ColumnDefinitions>
                     <!-- Find/npm install label -->
                     <ColumnDefinition Width="Auto"></ColumnDefinition>
@@ -42,16 +35,20 @@
                 
                 <Label Grid.Column="0"
                        Grid.Row="0"
-                       Content="npm install"></Label>
+                       Content="npm install"
+                       VerticalAlignment="Center"></Label>
                 
                 <TextBox Name="_TxtArguments"
                            Grid.Column="1"
-                           Grid.Row="0"></TextBox>
+                           Grid.Row="0"
+                         Height="20"></TextBox>
                 
                 <ComboBox Name="_ComboDependencyType"
                           Grid.Column="2"
                           Grid.Row="0"
-                          Width="100">
+                          Width="100"
+                          MaxHeight="22"
+                          Padding="2">
                     <ComboBoxItem Tag="St" IsSelected="True">Standard</ComboBoxItem>
                     <ComboBoxItem Tag="Dev">Development</ComboBoxItem>
                     <ComboBoxItem Tag="Opt">Optional</ComboBoxItem>
