@@ -25,6 +25,7 @@ using Microsoft.NodejsTools.Debugger.Commands;
 using Microsoft.NodejsTools.Debugger.Communication;
 using Microsoft.NodejsTools.Debugger.Events;
 using Microsoft.NodejsTools.Debugger.Serialization;
+using Microsoft.VisualStudioTools.Project;
 
 namespace Microsoft.NodejsTools.Debugger {
     /// <summary>
@@ -118,6 +119,12 @@ namespace Microsoft.NodejsTools.Debugger {
                 }
             }
 
+            FixupForRunAndWait(
+                debugOptions.HasFlag(NodeDebugOptions.WaitOnAbnormalExit),
+                debugOptions.HasFlag(NodeDebugOptions.WaitOnNormalExit),
+                psi
+            );
+
             _process = new Process {
                 StartInfo = psi,
                 EnableRaisingEvents = true
@@ -169,7 +176,7 @@ namespace Microsoft.NodejsTools.Debugger {
         /// <summary>
         /// Terminates node.js process.
         /// </summary>
-        public void Terminate() {
+        public void Terminate(bool killProcess = true) {
             lock (this) {
                 // Disconnect
                 _connection.Close();
@@ -182,7 +189,7 @@ namespace Microsoft.NodejsTools.Debugger {
                     // Cleanup process
                     Debug.Assert(!_attached);
                     try {
-                        if (!_process.HasExited) {
+                        if (killProcess && !_process.HasExited) {
                             _process.Kill();
                         } else {
                             exitCode = _process.ExitCode;
@@ -458,7 +465,7 @@ namespace Microsoft.NodejsTools.Debugger {
         }
 
         private void OnConnectionClosed(object sender, EventArgs args) {
-            Terminate();
+            Terminate(killProcess: false);
 
             EventHandler<ThreadEventArgs> threadExited = ThreadExited;
             if (threadExited != null) {
@@ -1095,5 +1102,22 @@ namespace Microsoft.NodejsTools.Debugger {
         }
 
         #endregion
+
+        internal static void FixupForRunAndWait(bool waitOnAbnormal, bool waitOnNormal, ProcessStartInfo psi) {
+            if (waitOnAbnormal || waitOnNormal) {
+                string args = "/c \"\"" + psi.FileName + "\" " + psi.Arguments;
+
+                if (waitOnAbnormal && waitOnNormal) {
+                    args += " & pause";
+                } else if (waitOnAbnormal) {
+                    args += " & if errorlevel 1 pause";
+                } else if (waitOnNormal) {
+                    args += " & if not errorlevel 1 pause";
+                }
+                args += "\"";
+                psi.FileName = Path.Combine(Environment.SystemDirectory, "cmd.exe");
+                psi.Arguments = args;
+            }
+        }
     }
 }

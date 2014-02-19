@@ -2,7 +2,7 @@
     "AdvancedDebugging.html": "10b8aa92b0bb444c961fbd28b9e08bfef4d7a49ddfa9ca2e205a0ac6aa96c3f6", 
     "AzureDeployment.html": "c72d260435b64a58e1e4e7ac29735f57ca9a4f6e99c40688716b4b61cf473cd2", 
     "Debugging.html": "2a7db2c48ce4ff4a66933e6b8d98288eb5ddc9c707c52e86cb4e67483b233e89", 
-    "Documentation.html": "73d18c02cdfc76170f0d0b6a700340d4af6725ccd30274bf454ab22d64a0cea1", 
+    "Documentation.html": "2aa9a4e677082ff3229bbf705956ff455886c1cb117c53d5e55fdd9be50ccdff", 
     "Editor.html": "1ec0f64ffb8da42690f6315ee7df7a4234353f6ad3cdddfa833e13a03d0110c1", 
     "Images\\AzureCloudServiceActivityLog.png": "http://www.codeplex.com/Download?ProjectName=nodejstools&DownloadId=760435", 
     "Images\\AzureCloudServiceBrowser.png": "http://www.codeplex.com/Download?ProjectName=nodejstools&DownloadId=760501", 
@@ -99,6 +99,7 @@
     "Images\\InstallationMSI.png": "http://www.codeplex.com/Download?ProjectName=nodejstools&DownloadId=760478", 
     "Images\\InstallationREPL.png": "http://www.codeplex.com/Download?ProjectName=nodejstools&DownloadId=760451", 
     "Images\\InstallationREPLCommand.png": "http://www.codeplex.com/Download?ProjectName=nodejstools&DownloadId=760495", 
+    "Images\\LinkedFileIcon.png": "http://www.codeplex.com/Download?ProjectName=nodejstools&DownloadId=801236", 
     "Images\\ProjectFromExisting1.png": "http://www.codeplex.com/Download?ProjectName=nodejstools&DownloadId=760463", 
     "Images\\ProjectFromExisting2.png": "http://www.codeplex.com/Download?ProjectName=nodejstools&DownloadId=760464", 
     "Images\\ProjectFromExisting3.png": "http://www.codeplex.com/Download?ProjectName=nodejstools&DownloadId=760447", 
@@ -137,8 +138,8 @@
     "Images\\prof-overview.png": "http://www.codeplex.com/Download?ProjectName=nodejstools&DownloadId=760452", 
     "Images\\prof-source.png": "http://www.codeplex.com/Download?ProjectName=nodejstools&DownloadId=760438", 
     "Installation.html": "6b1bcbc6b39e1e5cc17380f057f5d5e4291daa4420b657b6c96a4d01bb44d0d0", 
-    "NodeJSOnLinuxOnAzure.html": "71ac76301393dd2f1f0d18336c64ba15907ee1f1c30603a489089c2f036f0f05", 
-    "Npm.html": "7039f70b516b556046ceb87100d9d01b876920fc22d9cde6206aa694c0000c56", 
+    "NodeJSOnLinuxOnAzure.html": "9fb56ba72117f78879cbc1eea1688ab098705892d6dd04e03f52d20387e9e1b9", 
+    "Npm.html": "dce92ea55706c5c4599524056778d8cfbf9f55918d6cde92a2889641c7b0a9a6", 
     "Profiling.html": "db5a3e880b93e08f9ba34caa7411c66b6cbc38f0f0420acbeae9a717664bc95f", 
-    "Projects.html": "4b328548dba3000ca0d806539ed74c39fbb5b1a4f0d335b2a466c1e01ebee4bc"
+    "Projects.html": "af7635da710996270a89a5c8423e9939e52974cb917e63fc2d41aa615d057dd3"
 }

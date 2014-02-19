@@ -66,6 +66,14 @@
               <Condition>VWD_EXTENSION_INSTALLPATH</Condition>
             </Component>
 
+            <Component Directory="INSTALLLOCATION" Guid="{C494CFC4-B146-4350-BA60-63EEFF273441}">
+              <File Id="filtypescriptServices.js" KeyPath="yes" Source="$(var.BinariesDir)\Formatting\typescriptServices.js"/>
+            </Component>
+            <Component Directory="VWD_INSTALLLOCATION" Guid="{F73909C5-C308-444B-928A-0E5ACFD857FC}">
+              <File Id="filVWDtypescriptServices.js" KeyPath="yes" Source="$(var.BinariesDir)\Formatting\typescriptServices.js"/>
+              <Condition>VWD_EXTENSION_INSTALLPATH</Condition>
+            </Component>
+
             <Component Directory="INSTALLLOCATION" Guid="{0AE160E1-51FF-4153-9882-E89DDFAE07B5}">
               <File Id="filNodejsProject.ico" KeyPath="yes" Source="$(var.BinariesDir)\NodejsProject.ico" />
             </Component>

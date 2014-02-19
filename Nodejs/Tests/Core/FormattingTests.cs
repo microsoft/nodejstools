@@ -145,33 +145,41 @@ namespace NodejsTests {
 
         private static void FormatDocumentTest(string input, string expected, FormatCodeOptions options = null) {
             var inst = JavaScriptFormattingService.Instance;
-            var buffer = new MockTextBuffer(input, "fob.py", "Node.js");
-            inst.AddDocument("fob.py", buffer);
+            string pathToFile = "fob.py";
+            var buffer = new MockTextBuffer(input, pathToFile, "Node.js");
+            inst.AddDocument(pathToFile, buffer);
+            try {
+                var edits = inst.GetFormattingEditsForDocument(
+                    pathToFile,
+                    0,
+                    buffer.CurrentSnapshot.Length,
+                    options ?? new FormatCodeOptions()
+                );
 
-            var edits = inst.GetFormattingEditsForDocument(
-                "fob.py",
-                0,
-                buffer.CurrentSnapshot.Length,
-                options ?? new FormatCodeOptions()
-            );
-
-            EditFilter.ApplyEdits(buffer, edits);
-            Assert.AreEqual(expected, buffer.CurrentSnapshot.GetText());
+                EditFilter.ApplyEdits(buffer, edits);
+                Assert.AreEqual(expected, buffer.CurrentSnapshot.GetText());
+            } finally {
+                inst.RemoveDocument(pathToFile);
+            }
         }
 
         private static void FormatSelectionTest(string input, string expected, int start, int end, FormatCodeOptions options = null) {
             var inst = JavaScriptFormattingService.Instance;
-            var buffer = new MockTextBuffer(input, "fob.py", "Node.js");
+            string pathToFile = "fob.py";
+            var buffer = new MockTextBuffer(input, pathToFile, "Node.js");
             inst.AddDocument("fob.py", buffer);
-
-            var edits = inst.GetFormattingEditsForRange(
-                "fob.py",
-                start,
-                end,
-                options ?? new FormatCodeOptions()
-            );
-            EditFilter.ApplyEdits(buffer, edits);
-            Assert.AreEqual(expected, buffer.CurrentSnapshot.GetText());
+            try {
+                var edits = inst.GetFormattingEditsForRange(
+                    pathToFile,
+                    start,
+                    end,
+                    options ?? new FormatCodeOptions()
+                );
+                EditFilter.ApplyEdits(buffer, edits);
+                Assert.AreEqual(expected, buffer.CurrentSnapshot.GetText());
+            } finally {
+                inst.RemoveDocument(pathToFile);
+            }
         }
     }
 }

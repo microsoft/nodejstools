@@ -206,7 +206,12 @@ namespace Microsoft.VisualStudioTools.SharedProjectTests {
                         Target(
                             "Clean", 
                             Tasks.Message("Hello Clean World!", importance: "high")
+                        ),
+                        Target(
+                            "CoreCompile",
+                            Tasks.Message("CoreCompile", importance: "high")
                         )
+
                     );
                     using (var solution = proj.Generate().ToVs()) {
                         VsIdeTestHostContext.Dte.ExecuteCommand("Build.CleanSolution");
@@ -232,6 +237,10 @@ namespace Microsoft.VisualStudioTools.SharedProjectTests {
                         Target(
                             "Build",
                             Tasks.Message("Hello Build World!", importance: "high")
+                        ),
+                        Target(
+                            "CoreCompile",
+                            Tasks.Message("CoreCompile", importance: "high")
                         )
                     );
                     using (var solution = proj.Generate().ToVs()) {

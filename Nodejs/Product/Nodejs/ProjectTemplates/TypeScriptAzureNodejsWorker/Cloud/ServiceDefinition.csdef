@@ -1,0 +1,36 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<ServiceDefinition xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xsd="http://www.w3.org/2001/XMLSchema" name="$safeprojectname$" xmlns="http://schemas.microsoft.com/ServiceHosting/2008/10/ServiceDefinition">
+  <WorkerRole name="$lastprojectname$">
+    <Startup>
+      <Task commandLine="setup_worker.cmd &gt; log.txt" executionContext="elevated">
+        <Environment>
+          <Variable name="EMULATED">
+            <RoleInstanceValue xpath="/RoleEnvironment/Deployment/@emulated" />
+          </Variable>
+          <Variable name="RUNTIMEID" value="node" />
+          <Variable name="RUNTIMEURL" value="http://az413943.vo.msecnd.net/node/0.10.21.exe;http://nodertncu.blob.core.windows.net/iisnode/0.1.21.exe" />
+        </Environment>
+      </Task>
+      <Task commandLine="node.cmd .\startup.js" executionContext="elevated" />
+    </Startup>
+    <Endpoints>
+      <InputEndpoint name="HttpIn" protocol="tcp" port="80" />
+    </Endpoints>
+    <Runtime>
+      <Environment>
+        <Variable name="PORT">
+          <RoleInstanceValue xpath="/RoleEnvironment/CurrentInstance/Endpoints/Endpoint[@name='HttpIn']/@port" />
+        </Variable>
+        <Variable name="EMULATED">
+          <RoleInstanceValue xpath="/RoleEnvironment/Deployment/@emulated" />
+        </Variable>
+      </Environment>
+      <EntryPoint>
+        <ProgramEntryPoint commandLine="node.cmd .\server.js" setReadyOnProcessStart="true" />
+      </EntryPoint>
+    </Runtime>
+    <ConfigurationSettings>
+      <Setting name="Microsoft.WindowsAzure.Plugins.Diagnostics.ConnectionString"/>
+    </ConfigurationSettings>
+  </WorkerRole>
+</ServiceDefinition>

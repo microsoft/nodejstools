@@ -24,10 +24,14 @@ namespace Microsoft.NodejsTools.Formatting {
     class JavaScriptFormattingService : IActiveScriptSite {
         private readonly TypeScriptServiceHost _host;
         private readonly TypeScriptLanguageService _langSvc;
-        public static JavaScriptFormattingService Instance = new JavaScriptFormattingService();
+        private static readonly Lazy<JavaScriptFormattingService> _instance = new Lazy<JavaScriptFormattingService>(() => new JavaScriptFormattingService());
         private static readonly Guid JScriptEngine = new Guid("F414C260-6AC0-11CF-B6D1-00AA00BBBB58");
 
-        public JavaScriptFormattingService() {
+        public static JavaScriptFormattingService Instance {
+            get { return _instance.Value; }
+        }
+
+        private JavaScriptFormattingService() {
             var t = Type.GetTypeFromCLSID(JScriptEngine);
             var scriptParse = Activator.CreateInstance(t) as IActiveScript;            
             scriptParse.SetScriptSite(this);

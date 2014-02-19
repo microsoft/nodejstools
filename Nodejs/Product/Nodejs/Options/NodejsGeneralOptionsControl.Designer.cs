@@ -28,6 +28,8 @@
             this._surveyNewsCheckCombo = new System.Windows.Forms.ComboBox();
             this._topOptionsPanel = new System.Windows.Forms.Panel();
             this._showOutputWhenRunningNpm = new System.Windows.Forms.CheckBox();
+            this._waitOnAbnormalExit = new System.Windows.Forms.CheckBox();
+            this._waitOnNormalExit = new System.Windows.Forms.CheckBox();
             this.tableLayoutPanel3.SuspendLayout();
             this._topOptionsPanel.SuspendLayout();
             this.SuspendLayout();
@@ -42,7 +44,7 @@
             this.tableLayoutPanel3.Controls.Add(this._surveyNewsCheckLabel, 0, 7);
             this.tableLayoutPanel3.Controls.Add(this._surveyNewsCheckCombo, 1, 7);
             this.tableLayoutPanel3.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.tableLayoutPanel3.Location = new System.Drawing.Point(0, 25);
+            this.tableLayoutPanel3.Location = new System.Drawing.Point(0, 66);
             this.tableLayoutPanel3.Margin = new System.Windows.Forms.Padding(3, 4, 3, 4);
             this.tableLayoutPanel3.Name = "tableLayoutPanel3";
             this.tableLayoutPanel3.RowCount = 9;
@@ -55,7 +57,7 @@
             this.tableLayoutPanel3.RowStyles.Add(new System.Windows.Forms.RowStyle());
             this.tableLayoutPanel3.RowStyles.Add(new System.Windows.Forms.RowStyle());
             this.tableLayoutPanel3.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Absolute, 20F));
-            this.tableLayoutPanel3.Size = new System.Drawing.Size(381, 265);
+            this.tableLayoutPanel3.Size = new System.Drawing.Size(381, 224);
             this.tableLayoutPanel3.TabIndex = 0;
             // 
             // _surveyNewsCheckLabel
@@ -90,11 +92,13 @@
             // 
             // _topOptionsPanel
             // 
+            this._topOptionsPanel.Controls.Add(this._waitOnNormalExit);
+            this._topOptionsPanel.Controls.Add(this._waitOnAbnormalExit);
             this._topOptionsPanel.Controls.Add(this._showOutputWhenRunningNpm);
             this._topOptionsPanel.Dock = System.Windows.Forms.DockStyle.Top;
             this._topOptionsPanel.Location = new System.Drawing.Point(0, 0);
             this._topOptionsPanel.Name = "_topOptionsPanel";
-            this._topOptionsPanel.Size = new System.Drawing.Size(381, 25);
+            this._topOptionsPanel.Size = new System.Drawing.Size(381, 66);
             this._topOptionsPanel.TabIndex = 1;
             // 
             // _showOutputWhenRunningNpm
@@ -107,6 +111,28 @@
             this._showOutputWhenRunningNpm.Text = "Show Output window when executing &npm";
             this._showOutputWhenRunningNpm.UseVisualStyleBackColor = true;
             this._showOutputWhenRunningNpm.CheckedChanged += new System.EventHandler(this._showOutputWhenRunningNpm_CheckedChanged);
+            // 
+            // _waitOnAbnormalExit
+            // 
+            this._waitOnAbnormalExit.AutoSize = true;
+            this._waitOnAbnormalExit.Location = new System.Drawing.Point(4, 24);
+            this._waitOnAbnormalExit.Name = "_waitOnAbnormalExit";
+            this._waitOnAbnormalExit.Size = new System.Drawing.Size(235, 17);
+            this._waitOnAbnormalExit.TabIndex = 1;
+            this._waitOnAbnormalExit.Text = "&Wait for input when process exits abnormally";
+            this._waitOnAbnormalExit.UseVisualStyleBackColor = true;
+            this._waitOnAbnormalExit.CheckedChanged += new System.EventHandler(this._waitOnAbnormalExit_CheckedChanged);
+            // 
+            // _waitOnNormalExit
+            // 
+            this._waitOnNormalExit.AutoSize = true;
+            this._waitOnNormalExit.Location = new System.Drawing.Point(4, 44);
+            this._waitOnNormalExit.Name = "_waitOnNormalExit";
+            this._waitOnNormalExit.Size = new System.Drawing.Size(223, 17);
+            this._waitOnNormalExit.TabIndex = 2;
+            this._waitOnNormalExit.Text = "Wai&t for input when process exits normally";
+            this._waitOnNormalExit.UseVisualStyleBackColor = true;
+            this._waitOnNormalExit.CheckedChanged += new System.EventHandler(this._waitOnNormalExit_CheckedChanged);
             // 
             // NodejsGeneralOptionsControl
             // 
@@ -133,5 +159,7 @@
         private System.Windows.Forms.ComboBox _surveyNewsCheckCombo;
         private System.Windows.Forms.Panel _topOptionsPanel;
         private System.Windows.Forms.CheckBox _showOutputWhenRunningNpm;
+        private System.Windows.Forms.CheckBox _waitOnNormalExit;
+        private System.Windows.Forms.CheckBox _waitOnAbnormalExit;
     }
 }
