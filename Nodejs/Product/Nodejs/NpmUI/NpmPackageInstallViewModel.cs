@@ -47,7 +47,10 @@ namespace Microsoft.NodejsTools.NpmUI {
         private string _argumentOnlyText;
         private bool _isExecuteNpmWithArgumentsMode;
 
+        private InstallPackageCommand _installCommand;
+
         public NpmPackageInstallViewModel() {
+            _installCommand = new InstallPackageCommand(this);
         }
         
         public event PropertyChangedEventHandler PropertyChanged;
@@ -269,8 +272,43 @@ namespace Microsoft.NodejsTools.NpmUI {
             //  TODO: implement this
         }
 
+        private class InstallPackageCommand : ICommand {
+            private NpmPackageInstallViewModel _owner;
+
+            public InstallPackageCommand(NpmPackageInstallViewModel owner) {
+                _owner = owner;
+                _owner.PropertyChanged += Owner_PropertyChanged;
+            }
+
+            void Owner_PropertyChanged(object sender, PropertyChangedEventArgs e) {
+                switch (e.PropertyName) {
+                    case "IsExecuteNpmWithArgumentsMode":
+                    case "SelectedPackage":
+                        OnCanExecuteChanged();
+                }
+            }
+
+            public bool CanExecute(object parameter) {
+                return _owner.IsExecuteNpmWithArgumentsMode && !string.IsNullOrEmpty(_owner.RawFilterText)
+                    || _owner.SelectedPackage != null;
+            }
+
+            public void Execute(object parameter) {
+                _owner.Install();
+            }
+
+            public event EventHandler CanExecuteChanged;
+
+            private void OnCanExecuteChanged() {
+                var handlers = CanExecuteChanged;
+                if (null != handlers) {
+                    handlers();
+                }
+            }
+        }
+
         public ICommand InstallCommand {
-            
+            get { return _installCommand; }
         }
 
         #endregion
