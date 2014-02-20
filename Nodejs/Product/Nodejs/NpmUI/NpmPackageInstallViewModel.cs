@@ -54,6 +54,7 @@ namespace Microsoft.NodejsTools.NpmUI {
         private bool _isExecuteNpmWithArgumentsMode;
         private int _selectedDependencyTypeIndex;
 
+        private PackageCatalogEntryViewModel _selectedPackage;
         private InstallPackageCommand _installCommand;
 
         public NpmPackageInstallViewModel() {
@@ -116,7 +117,12 @@ namespace Microsoft.NodejsTools.NpmUI {
             private set {
                 _isLoadingCatalog = value;
                 OnPropertyChanged();
+                OnPropertyChanged("RefreshCatalogEnabled");
             }
+        }
+
+        public bool RefreshCatalogEnabled {
+            get { return !IsLoadingCatalog; }
         }
 
         public bool NpmNotFound {
@@ -316,44 +322,70 @@ namespace Microsoft.NodejsTools.NpmUI {
             //  TODO: install code goes here
         }
 
-        private class InstallPackageCommand : ICommand {
-            private NpmPackageInstallViewModel _owner;
 
-            public InstallPackageCommand(NpmPackageInstallViewModel owner) {
+        public PackageCatalogEntryViewModel SelectedPackage {
+            get { return _selectedPackage; }
+            set {
+                _selectedPackage = value;
+                OnPropertyChanged();
+            }
+        }
+
+        private abstract class ViewModelCommand : ICommand {
+            protected NpmPackageInstallViewModel _owner;
+
+            protected ViewModelCommand(NpmPackageInstallViewModel owner) {
                 _owner = owner;
                 _owner.PropertyChanged += Owner_PropertyChanged;
             }
 
-            void Owner_PropertyChanged(object sender, PropertyChangedEventArgs e) {
+            protected abstract void Owner_PropertyChanged(
+                object sender,
+                PropertyChangedEventArgs e);
+
+            public abstract bool CanExecute(object parameter);
+            public abstract void Execute(object parameter);
+            public event EventHandler CanExecuteChanged;
+
+            protected void OnCanExecuteChanged() {
+                var handlers = CanExecuteChanged;
+                if (null != handlers) {
+                    handlers(this, EventArgs.Empty);
+                }
+            }
+        }
+
+        private class InstallPackageCommand : ViewModelCommand {
+            public InstallPackageCommand(NpmPackageInstallViewModel owner) : base(owner) {}
+
+            protected override void Owner_PropertyChanged(
+                object sender,
+                PropertyChangedEventArgs e) {
                 switch (e.PropertyName) {
                     case "IsExecuteNpmWithArgumentsMode":
                     case "SelectedPackage":
                         OnCanExecuteChanged();
+                        break;
                 }
             }
 
-            public bool CanExecute(object parameter) {
+            public override bool CanExecute(object parameter) {
                 return _owner.IsExecuteNpmWithArgumentsMode && !string.IsNullOrEmpty(_owner.RawFilterText)
                     || _owner.SelectedPackage != null;
             }
 
-            public void Execute(object parameter) {
+            public override void Execute(object parameter) {
                 _owner.Install();
-            }
-
-            public event EventHandler CanExecuteChanged;
-
-            private void OnCanExecuteChanged() {
-                var handlers = CanExecuteChanged;
-                if (null != handlers) {
-                    handlers();
-                }
             }
         }
 
         public ICommand InstallCommand {
             get { return _installCommand; }
         }
+
+        #endregion
+
+        #region Dialog control
 
         #endregion
     }

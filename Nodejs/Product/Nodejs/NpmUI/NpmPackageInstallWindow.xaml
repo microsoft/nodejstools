@@ -91,7 +91,8 @@
                         Height="40">
                     <Button Name="_Close"
                             IsDefault="True"
-                            Content="_Close"></Button>
+                            Content="_Close"
+                            Command="Close"></Button>
                 </StackPanel>
             </DockPanel>
             
@@ -108,7 +109,9 @@
                 
                 <ListBox Name="_PackageList"
                          Grid.Row="0"
-                         ItemsSource="{Binding Path=FilteredPackages}">
+                         ItemsSource="{Binding Path=FilteredPackages}"
+                         SelectedItem="{Binding Path=SelectedPackage}"
+                         Visibility="{Binding Path=FilteredCatalogListVisibility}">
                     <ListBox.ItemTemplate>
                         <DataTemplate>
                             <DockPanel>
@@ -151,18 +154,26 @@
                 
                 <!-- Package cache control -->
                 
-                <DockPanel Grid.Row="1" Height="Auto" HorizontalAlignment="Stretch">
+                <DockPanel Grid.Row="1"
+                           Height="Auto"
+                           HorizontalAlignment="Stretch"
+                           Visibility="{Binding Path=LoadingCatalogControlVisibility}">
                     <StackPanel DockPanel.Dock="Left"
                                 Orientation="Horizontal"
                                 VerticalAlignment="Center">
                         <Label Content="Catalog last updated:"></Label>
-                        <Label Name="_LblLastRefreshed" Content="Today at 10:00 AM"></Label>
+                        <Label Name="_LblLastRefreshed"
+                               Content="{Binding Path=LastCatalogUpdateTimeMessage}"
+                               Foreground="{Binding Path=LastCatalogUpdateTimeColor}"
+                               FontWeight="{Binding Path=LastCatalogUpdateTimeFontWeight}"></Label>
                     </StackPanel>
                     <StackPanel DockPanel.Dock="Right"
                                 Orientation="Horizontal"
                                 HorizontalAlignment="Right"
                                 VerticalAlignment="Center">
-                        <Button Name="_BtnRefresh" Content="Refresh Catalog"></Button>
+                        <Button Name="_BtnRefresh"
+                                Content="Refresh Catalog"
+                                IsEnabled="{Binding Path=RefreshCatalogEnabled}"></Button>
                     </StackPanel>
                 </DockPanel>
                 
