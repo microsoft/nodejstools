@@ -523,7 +523,14 @@ namespace Microsoft.NodejsTools.LogParsing {
                 }
 
                 SourceMapping mapping;
-                if (map != null && map.TryMapLine(funcInfo.LineNumber.Value - 1, out mapping)) {
+                // We explicitly don't convert our 1 based line numbers into 0 based
+                // line numbers here.  V8 is giving us the starting line of the function,
+                // and TypeScript doesn't give the right name for the declaring name.
+                // But TypeScript also happens to always emit a newline after the {
+                // for a function definition, and we're always mapping line numbers from
+                // function definitions, so mapping line + 1 happens to work out for
+                // the time being.
+                if (map != null && map.TryMapLine(funcInfo.LineNumber.Value, out mapping)) {
                     string filename = mapping.FileName;
                     if (filename != null && !Path.IsPathRooted(filename)) {
                         filename = Path.Combine(Path.GetDirectoryName(funcInfo.Filename), filename);

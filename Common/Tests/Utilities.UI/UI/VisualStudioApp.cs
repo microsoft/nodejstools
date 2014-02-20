@@ -155,6 +155,21 @@ namespace TestUtilities.UI {
             return dialog;
         }
 
+        public void ExecuteCommand(string commandName, string commandArgs = "", int timeout = 25000) {
+            Task task = Task.Factory.StartNew(() => {
+                Console.WriteLine("Executing command {0} {1}", commandName, commandArgs);
+                Dte.ExecuteCommand(commandName, commandArgs);
+                Console.WriteLine("Successfully executed command {0} {1}", commandName, commandArgs);
+            });
+
+            if (!task.Wait(timeout)) {
+                string msg = String.Format("Command {0} failed to execute in specified timeout", commandName);
+                Console.WriteLine(msg);
+                DumpVS();
+                Assert.Fail(msg);
+            }
+        }
+
         /// <summary>
         /// Opens and activates the Navigate To window.
         /// </summary>

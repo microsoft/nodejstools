@@ -304,7 +304,7 @@ namespace Microsoft.Nodejs.Tests.UI {
                 var docWindow = app.GetDocument(window.Document.FullName);
 
                 var solutionExplorer = app.SolutionExplorerTreeView;
-                app.Dte.ExecuteCommand("Debug.Start");
+                app.ExecuteCommand("Debug.Start");
                 app.WaitForMode(dbgDebugMode.dbgRunMode);
 
                 app.OpenSolutionExplorer();
@@ -323,7 +323,7 @@ namespace Microsoft.Nodejs.Tests.UI {
                     }
                 } catch (COMException) {
                 }
-                app.Dte.ExecuteCommand("Debug.StopDebugging");
+                app.ExecuteCommand("Debug.StopDebugging");
                 app.WaitForMode(dbgDebugMode.dbgDesignMode);
 
                 projectNode = solutionExplorer.WaitForItem("Solution 'AddExistingFolder' (1 project)", "AddExistingFolder");
