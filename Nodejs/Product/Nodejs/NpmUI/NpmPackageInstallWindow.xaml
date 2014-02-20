@@ -35,7 +35,7 @@
                 
                 <Label Grid.Column="0"
                        Grid.Row="0"
-                       MinWidth="80"
+                       MinWidth="60"
                        HorizontalContentAlignment="Right"
                        HorizontalAlignment="Right"
                        Content="{Binding Path=FilterLabelText}"
@@ -111,11 +111,14 @@
                          Grid.Row="0"
                          ItemsSource="{Binding Path=FilteredPackages}"
                          SelectedItem="{Binding Path=SelectedPackage}"
-                         Visibility="{Binding Path=FilteredCatalogListVisibility}">
+                         Visibility="{Binding Path=FilteredCatalogListVisibility}"
+                         HorizontalContentAlignment="Stretch">
                     <ListBox.ItemTemplate>
                         <DataTemplate>
-                            <DockPanel>
-                                <Grid DockPanel.Dock="Top">
+                            <DockPanel Margin="4, 4, 4, 4" HorizontalAlignment="Stretch">
+                                <Grid DockPanel.Dock="Top"
+                                      Margin="0, 0, 0, 0"
+                                      HorizontalAlignment="Stretch">
                                     <Grid.ColumnDefinitions>
                                         <ColumnDefinition Width="Auto"></ColumnDefinition>
                                         <ColumnDefinition Width="Auto"></ColumnDefinition>
@@ -123,30 +126,69 @@
                                     </Grid.ColumnDefinitions>
                                     <Label Grid.Column="0"
                                            Content="{Binding Path=Name}"
-                                           FontWeight="Bold"></Label>
+                                           FontWeight="Bold"
+                                           Margin="0, 0, 0, 0"
+                                           Padding="0, 0, 0, 0"
+                                           MaxHeight="24"></Label>
                                     <Label Grid.Column="1"
                                            Content="{Binding Path=VersionString}"
-                                           Foreground="{Binding Path=VersionColor}"></Label>
+                                           Margin="0, 0, 4, 0"
+                                           Padding="0, 0, 0, 0"
+                                           MaxHeight="24">
+                                        <Label.Foreground>
+                                            <SolidColorBrush Color="{Binding Path=VersionColor}"></SolidColorBrush>
+                                        </Label.Foreground>
+                                    </Label>
                                     <Label Grid.Column="2"
                                            Content="{Binding Path=Author}"
-                                           Foreground="{Binding Path=AuthorColor}"></Label>
+                                           Margin="4, 0, 0, 0"
+                                           Padding="0, 0, 0, 0"
+                                           HorizontalAlignment="Stretch"
+                                           HorizontalContentAlignment="Right"
+                                           MaxHeight="24">
+                                        <Label.Foreground>
+                                            <SolidColorBrush Color="{Binding Path=AuthorColor}"></SolidColorBrush>
+                                        </Label.Foreground>
+                                    </Label>
                                 </Grid>
                                 
-                                <Grid DockPanel.Dock="Bottom">
+                                <Grid DockPanel.Dock="Bottom" Margin="0, 0, 0, 0">
                                     <Grid.ColumnDefinitions>
                                         <ColumnDefinition Width="*"></ColumnDefinition>
                                         <ColumnDefinition Width="Auto"></ColumnDefinition>
                                     </Grid.ColumnDefinitions>
+                                    <Grid.RowDefinitions>
+                                        <RowDefinition Height="Auto"></RowDefinition>
+                                        <RowDefinition Height="Auto"></RowDefinition>
+                                    </Grid.RowDefinitions>
                                     <Label Grid.Column="0"
+                                           Grid.Row="0"
                                            Content="{Binding Path=Keywords}"
-                                           Foreground="{Binding Path=KeywordsColor}"></Label>
+                                           Margin="0, 0, 4, 0"
+                                           Padding="0, 0, 0, 0"
+                                           MaxHeight="24">
+                                        <Label.Foreground>
+                                            <SolidColorBrush Color="{Binding Path=KeywordsColor}"></SolidColorBrush>
+                                        </Label.Foreground>
+                                    </Label>
                                     <Label Grid.Column="1"
+                                           Grid.Row="0"
                                            Content="{Binding Path=InstallMessage}"
                                            Visibility="{Binding Path=InstallMessageVisibility}"
-                                           Foreground="{Binding Path=InstallMessageColor}"></Label>
+                                           Margin="4, 0, 0, 0"
+                                           Padding="0, 0, 0, 0"
+                                           MaxHeight="24">
+                                        <Label.Foreground>
+                                            <SolidColorBrush Color="{Binding Path=InstallMessageColor}"></SolidColorBrush>
+                                        </Label.Foreground>
+                                    </Label>
+                                    <Separator Grid.Column="0" Grid.ColumnSpan="2" Grid.Row="1"></Separator>
                                 </Grid>
                                 
-                                <Label Content="{Binding Path=Description}"></Label>
+                                <Label Content="{Binding Path=Description}"
+                                       Margin="0, 4, 0, 4"
+                                       Padding="0, 0, 0, 0"
+                                       MaxHeight="22"></Label>
                             </DockPanel>
                         </DataTemplate>
                     </ListBox.ItemTemplate>
@@ -164,8 +206,11 @@
                         <Label Content="Catalog last updated:"></Label>
                         <Label Name="_LblLastRefreshed"
                                Content="{Binding Path=LastCatalogUpdateTimeMessage}"
-                               Foreground="{Binding Path=LastCatalogUpdateTimeColor}"
-                               FontWeight="{Binding Path=LastCatalogUpdateTimeFontWeight}"></Label>
+                               FontWeight="{Binding Path=LastCatalogUpdateTimeFontWeight}">
+                            <Label.Foreground>
+                                <SolidColorBrush Color="{Binding Path=LastCatalogUpdateTimeColor}"></SolidColorBrush>
+                            </Label.Foreground>
+                        </Label>
                     </StackPanel>
                     <StackPanel DockPanel.Dock="Right"
                                 Orientation="Horizontal"

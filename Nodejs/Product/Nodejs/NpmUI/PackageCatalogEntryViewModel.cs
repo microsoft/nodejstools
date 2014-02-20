@@ -62,7 +62,12 @@ namespace Microsoft.NodejsTools.NpmUI {
         }
 
         public string Keywords {
-            get { return KeywordStringBuilder.BuildKeywordString(_package); }
+            get {
+                var keywords = KeywordStringBuilder.BuildKeywordString(_package);
+                return string.IsNullOrEmpty(keywords)
+                    ? Resources.NoKeywordsInPackage
+                    : keywords;
+            }
         }
 
         public Color KeywordsColor {

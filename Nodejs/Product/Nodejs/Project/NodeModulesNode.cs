@@ -554,9 +554,14 @@ namespace Microsoft.NodejsTools.Project {
                     return;
                 }
             }
-            using (var manager = new PackageManagerDialog(NpmController)) {
-                manager.ShowDialog();
-            }
+            //using (var manager = new PackageManagerDialog(NpmController)) {
+            //    manager.ShowDialog();
+            //}
+
+            var viewModel = new NpmPackageInstallViewModel();
+            viewModel.NpmController = NpmController;
+            var manager = new NpmPackageInstallWindow(viewModel);
+            manager.ShowDialog();
 
             ReloadHierarchy();
         }

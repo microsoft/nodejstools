@@ -268,6 +268,15 @@ namespace Microsoft.NodejsTools {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to (This package has no keywords.).
+        /// </summary>
+        internal static string NoKeywordsInPackage {
+            get {
+                return ResourceManager.GetString("NoKeywordsInPackage", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to {0} cancelled.
         /// </summary>
         internal static string NpmCancelled {

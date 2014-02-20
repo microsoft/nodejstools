@@ -18,8 +18,10 @@ using System.ComponentModel;
 using System.Linq;
 using System.Runtime.CompilerServices;
 using System.Text;
+using System.Threading;
 using System.Threading.Tasks;
 using System.Windows;
+using System.Windows.Documents;
 using System.Windows.Input;
 using System.Windows.Media;
 using Microsoft.NodejsTools.Npm;
@@ -40,23 +42,23 @@ namespace Microsoft.NodejsTools.NpmUI {
 
         private bool _isLoadingCatalog;
         private IPackageCatalog _allPackages;
-        private IList<IPackage> _filteredPackages;
+        private IList<PackageCatalogEntryViewModel> _filteredPackages = new List<PackageCatalogEntryViewModel>();
+        private PackageCatalogEntryViewModel _selectedPackage;
+        private InstallPackageCommand _installCommand;
         private bool _npmNotFound;
         private bool _isCatalogEmpty;
         private Visibility _catalogControlVisibility = Visibility.Visible;
         private string _catalogLoadingMessage = string.Empty;
         private Visibility _loadingCatalogControlVisibility = Visibility.Hidden;
         private Visibility _filteredCatalogListVisibility = Visibility.Visible;
-        private string _filterLabelText;
+        private string _filterLabelText = Resources.CatalogFilterLabelFilter;
         private string _rawFilterText;
         private string _catalogFilterText;
         private string _argumentOnlyText;
         private bool _isExecuteNpmWithArgumentsMode;
         private int _selectedDependencyTypeIndex;
 
-        private PackageCatalogEntryViewModel _selectedPackage;
-        private InstallPackageCommand _installCommand;
-
+        
         public NpmPackageInstallViewModel() {
             _installCommand = new InstallPackageCommand(this);
         }
@@ -219,6 +221,14 @@ namespace Microsoft.NodejsTools.NpmUI {
 
         #region Filtering
 
+        public IList<PackageCatalogEntryViewModel> FilteredPackages {
+            get { return _filteredPackages; }
+            set {
+                _filteredPackages = value;
+                OnPropertyChanged();
+            }
+        } 
+
         public string FilterLabelText {
             get { return _filterLabelText; }
             private set {
@@ -238,8 +248,37 @@ namespace Microsoft.NodejsTools.NpmUI {
             }
         }
 
-        private void Filter() {
-            //  TODO: implement this
+        private void StartFilter() {
+            ThreadPool.QueueUserWorkItem(o => Filter(CatalogFilterText));
+        }
+
+        private void Filter(string filterString) {
+            if (null == _allPackages) {
+                return;
+            }
+
+            var filtered = PackageCatalogFilterFactory.Create(_allPackages).Filter(filterString);
+            var controller = _npmController;
+            var target = filtered.Select(package => new PackageCatalogEntryViewModel(
+                package,
+                null == controller ? null : controller.RootPackage,
+                null == controller ? null : controller.GlobalPackages)).ToList();
+            
+            Application.Current.Dispatcher.BeginInvoke(
+                new Action(() => SetListData(target)));
+        }
+
+        private void SetListData(IList<PackageCatalogEntryViewModel> filtered) {
+            FilteredPackages = filtered;
+            
+            var days = IsCatalogEmpty
+                ? int.MaxValue
+                : LastRefreshedMessageProvider.GetNumberOfDaysSinceLastRefresh(_allPackages.LastRefreshed);
+            SetLastCatalogUpdateTimeMessage(
+                IsCatalogEmpty ? Resources.NpmCatalogEmpty : LastRefreshedMessageProvider.GetMessageFor(_allPackages.LastRefreshed),
+                days > 14 ? Colors.Red : SystemColors.WindowTextColor,
+                days > 7 ? FontWeights.Bold : FontWeights.Normal);
+            CatalogControlVisibility = Visibility.Visible;
         }
 
         public string CatalogFilterText {
@@ -303,21 +342,21 @@ namespace Microsoft.NodejsTools.NpmUI {
         }
 
         private void Install() {
-            var type = DependencyType.Standard;
-            var global = false;
-            switch (SelectedDependencyTypeIndex) {
-                case IndexDev:
-                    type = DependencyType.Development;
-                    break;
+            //var type = DependencyType.Standard;
+            //var global = false;
+            //switch (SelectedDependencyTypeIndex) {
+            //    case IndexDev:
+            //        type = DependencyType.Development;
+            //        break;
 
-                case IndexOptional:
-                    type = DependencyType.Optional;
-                    break;
+            //    case IndexOptional:
+            //        type = DependencyType.Optional;
+            //        break;
 
-                case IndexGlobal:
-                    global = true;
-                    break;
-            }
+            //    case IndexGlobal:
+            //        global = true;
+            //        break;
+            //}
 
             //  TODO: install code goes here
         }
