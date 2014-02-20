@@ -17,8 +17,10 @@ namespace Microsoft.NodejsTools.NpmUI {
     /// Interaction logic for NpmPackageInstallWindow.xaml
     /// </summary>
     public partial class NpmPackageInstallWindow : Window {
-        public NpmPackageInstallWindow() {
+        internal NpmPackageInstallWindow(NpmPackageInstallViewModel vm) {
             InitializeComponent();
+
+            DataContext = vm;
         }
     }
 }

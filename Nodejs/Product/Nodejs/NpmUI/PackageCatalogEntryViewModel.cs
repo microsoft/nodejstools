@@ -42,11 +42,19 @@ namespace Microsoft.NodejsTools.NpmUI {
         }
 
         public string VersionString {
-            get { return _package.Version.ToString(); }
+            get { return string.Format( "@ {0}", _package.Version); }
+        }
+
+        public Color VersionColor {
+            get { return KeywordsColor; }
         }
 
         public string Author {
-            get { return _package.Author.ToString(); }
+            get { return string.Format("by {0}", _package.Author); }
+        }
+
+        public Color AuthorColor {
+            get { return KeywordsColor; }
         }
 
         public string Description {
@@ -55,6 +63,10 @@ namespace Microsoft.NodejsTools.NpmUI {
 
         public string Keywords {
             get { return KeywordStringBuilder.BuildKeywordString(_package); }
+        }
+
+        public Color KeywordsColor {
+            get { return WpfColorUtils.MidPoint(SystemColors.WindowColor, SystemColors.WindowTextColor); }
         }
 
         private IPackage GetFromRoot(IRootPackage root) {

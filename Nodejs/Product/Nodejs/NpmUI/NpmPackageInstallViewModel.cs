@@ -26,6 +26,12 @@ using Microsoft.NodejsTools.Npm;
 
 namespace Microsoft.NodejsTools.NpmUI {
     internal class NpmPackageInstallViewModel : INotifyPropertyChanged {
+
+        private const int IndexStandard = 0;
+        private const int IndexDev = 1;
+        private const int IndexOptional = 2;
+        private const int IndexGlobal = 3;
+
         private INpmController _npmController;
 
         private string _lastCatalogUpdateTimeMessage = string.Empty;
@@ -46,6 +52,7 @@ namespace Microsoft.NodejsTools.NpmUI {
         private string _catalogFilterText;
         private string _argumentOnlyText;
         private bool _isExecuteNpmWithArgumentsMode;
+        private int _selectedDependencyTypeIndex;
 
         private InstallPackageCommand _installCommand;
 
@@ -268,8 +275,45 @@ namespace Microsoft.NodejsTools.NpmUI {
             get { return IsExecuteNpmWithArgumentsMode ? Visibility.Hidden : Visibility.Visible; }
         }
 
+        #endregion
+
+        #region Installation
+
+        public int SelectedDependencyTypeIndex {
+            get { return _selectedDependencyTypeIndex; }
+            set {
+                _selectedDependencyTypeIndex = value;
+                OnPropertyChanged();
+                OnPropertyChanged("GlobalWarningVisibility");
+            }
+        }
+
+        public Visibility GlobalWarningVisibility {
+            get {
+                return IndexGlobal == SelectedDependencyTypeIndex
+                    ? Visibility.Visible
+                    : Visibility.Hidden;
+            }
+        }
+
         private void Install() {
-            //  TODO: implement this
+            var type = DependencyType.Standard;
+            var global = false;
+            switch (SelectedDependencyTypeIndex) {
+                case IndexDev:
+                    type = DependencyType.Development;
+                    break;
+
+                case IndexOptional:
+                    type = DependencyType.Optional;
+                    break;
+
+                case IndexGlobal:
+                    global = true;
+                    break;
+            }
+
+            //  TODO: install code goes here
         }
 
         private class InstallPackageCommand : ICommand {

@@ -35,20 +35,27 @@
                 
                 <Label Grid.Column="0"
                        Grid.Row="0"
-                       Content="npm install"
+                       MinWidth="80"
+                       HorizontalContentAlignment="Right"
+                       HorizontalAlignment="Right"
+                       Content="{Binding Path=FilterLabelText}"
                        VerticalAlignment="Center"></Label>
                 
                 <TextBox Name="_TxtArguments"
                            Grid.Column="1"
                            Grid.Row="0"
-                         Height="20"></TextBox>
+                         Height="24"
+                         Text="{Binding Path=RawFilterText}"></TextBox>
                 
                 <ComboBox Name="_ComboDependencyType"
                           Grid.Column="2"
                           Grid.Row="0"
                           Width="100"
-                          MaxHeight="22"
-                          Padding="2">
+                          MaxHeight="24"
+                          Padding="3"
+                          Margin="4, 0, 0, 0"
+                          SelectedIndex="{Binding Path=SelectedDependencyTypeIndex}"
+                          Visibility="{Binding Path=NonArgumentControlsVisibility}">
                     <ComboBoxItem Tag="St" IsSelected="True">Standard</ComboBoxItem>
                     <ComboBoxItem Tag="Dev">Development</ComboBoxItem>
                     <ComboBoxItem Tag="Opt">Optional</ComboBoxItem>
@@ -57,17 +64,37 @@
                 <Button Name="_BtnInstall"
                         Grid.Column="3"
                         Grid.Row="0"
-                        Content="Install"></Button>
+                        Content="Install"
+                        Command="{Binding Path=InstallCommand}"></Button>
             </Grid>
             
             <!-- Dialog control -->
             
-            <StackPanel DockPanel.Dock="Bottom"
+            <DockPanel DockPanel.Dock="Bottom">
+                <StackPanel DockPanel.Dock="Left"
+                            Orientation="Horizontal"
+                            HorizontalAlignment="Left"
+                            VerticalAlignment="Center">
+                    <Label Content="Warning:"
+                           FontWeight="Bold"
+                           Background="LightYellow"
+                           Foreground="Black"
+                           Visibility="{Binding Path=GlobalWarningVisibility}"></Label>
+                    <Label Content="Global installs will affect other apps using packages via 'npm link'"
+                           Background="LightYellow"
+                           Foreground="Black"
+                           Visibility="{Binding Path=GlobalWarningVisibility}"></Label>
+                </StackPanel>
+                <StackPanel DockPanel.Dock="Right"
                         Orientation="Horizontal"
                         HorizontalAlignment="Right"
                         Height="40">
-                <Button Name="_Close" IsDefault="True" Content="_Close"></Button>
-            </StackPanel>
+                    <Button Name="_Close"
+                            IsDefault="True"
+                            Content="_Close"></Button>
+                </StackPanel>
+            </DockPanel>
+            
             
             <Grid>
                 <Grid.RowDefinitions>
@@ -79,7 +106,48 @@
                 
                 <!-- Package List -->
                 
-                <ListBox Name="_PackageList" Grid.Row="0"></ListBox>
+                <ListBox Name="_PackageList"
+                         Grid.Row="0"
+                         ItemsSource="{Binding Path=FilteredPackages}">
+                    <ListBox.ItemTemplate>
+                        <DataTemplate>
+                            <DockPanel>
+                                <Grid DockPanel.Dock="Top">
+                                    <Grid.ColumnDefinitions>
+                                        <ColumnDefinition Width="Auto"></ColumnDefinition>
+                                        <ColumnDefinition Width="Auto"></ColumnDefinition>
+                                        <ColumnDefinition Width="*"></ColumnDefinition>
+                                    </Grid.ColumnDefinitions>
+                                    <Label Grid.Column="0"
+                                           Content="{Binding Path=Name}"
+                                           FontWeight="Bold"></Label>
+                                    <Label Grid.Column="1"
+                                           Content="{Binding Path=VersionString}"
+                                           Foreground="{Binding Path=VersionColor}"></Label>
+                                    <Label Grid.Column="2"
+                                           Content="{Binding Path=Author}"
+                                           Foreground="{Binding Path=AuthorColor}"></Label>
+                                </Grid>
+                                
+                                <Grid DockPanel.Dock="Bottom">
+                                    <Grid.ColumnDefinitions>
+                                        <ColumnDefinition Width="*"></ColumnDefinition>
+                                        <ColumnDefinition Width="Auto"></ColumnDefinition>
+                                    </Grid.ColumnDefinitions>
+                                    <Label Grid.Column="0"
+                                           Content="{Binding Path=Keywords}"
+                                           Foreground="{Binding Path=KeywordsColor}"></Label>
+                                    <Label Grid.Column="1"
+                                           Content="{Binding Path=InstallMessage}"
+                                           Visibility="{Binding Path=InstallMessageVisibility}"
+                                           Foreground="{Binding Path=InstallMessageColor}"></Label>
+                                </Grid>
+                                
+                                <Label Content="{Binding Path=Description}"></Label>
+                            </DockPanel>
+                        </DataTemplate>
+                    </ListBox.ItemTemplate>
+                </ListBox>
                 
                 <!-- Package cache control -->
                 
