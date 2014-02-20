@@ -709,6 +709,15 @@ namespace Microsoft.NodejsTools {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to  - info for {0} packages retrieved.
+        /// </summary>
+        internal static string PackageCount {
+            get {
+                return ResourceManager.GetString("PackageCount", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Global.
         /// </summary>
         internal static string PackageInstallationGlobal {
@@ -759,6 +768,15 @@ namespace Microsoft.NodejsTools {
         internal static string PackageInstalledLocallyOldVersion {
             get {
                 return ResourceManager.GetString("PackageInstalledLocallyOldVersion", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to  - {0} matching packages.
+        /// </summary>
+        internal static string PackageMatchCount {
+            get {
+                return ResourceManager.GetString("PackageMatchCount", resourceCulture);
             }
         }
         

@@ -207,11 +207,25 @@
                                 <Label Content="{Binding Path=Description}"
                                        Margin="0, 4, 0, 4"
                                        Padding="0, 0, 0, 0"
-                                       MaxHeight="22"></Label>
+                                       MaxHeight="22"
+                                       HorizontalAlignment="Stretch"></Label>
                             </DockPanel>
                         </DataTemplate>
                     </ListBox.ItemTemplate>
                 </ListBox>
+                
+                <StackPanel Grid.Row="0"
+                            HorizontalAlignment="Stretch"
+                            VerticalAlignment="Center"
+                            Visibility="{Binding Path=LoadingCatalogControlVisibility}">
+                    <Label Content="{Binding Path=LoadingCatalogMessage}"
+                           HorizontalAlignment="Center"
+                           HorizontalContentAlignment="Center"></Label>
+                    <ProgressBar Height="16"
+                                 Margin="50, 4, 50, 4"
+                                 IsIndeterminate="True"
+                                 IsEnabled="{Binding Path=IsLoadingCatalog}"></ProgressBar>
+                </StackPanel>
                 
                 <!-- Package cache control -->
                 
@@ -225,7 +239,7 @@
                         <Label Content="Catalog last updated:"></Label>
                         <Label Name="_LblLastRefreshed"
                                Content="{Binding Path=LastCatalogUpdateTimeMessage}"
-                               FontWeight="{Binding Path=LastCatalogUpdateTimeFontWeight}">
+                               FontWeight="{Binding Path=LastCatalogUpdateFontWeight}">
                             <Label.Foreground>
                                 <SolidColorBrush Color="{Binding Path=LastCatalogUpdateTimeColor}"></SolidColorBrush>
                             </Label.Foreground>

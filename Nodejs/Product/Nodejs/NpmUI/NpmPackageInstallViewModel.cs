@@ -197,8 +197,9 @@ namespace Microsoft.NodejsTools.NpmUI {
             IsLoadingCatalog = true;
 
             FilteredCatalogListVisibility = Visibility.Hidden;
-            LoadingCatalogControlVisibility = Visibility.Hidden;
-            LoadingCatalogMessage = Resources.CatalogLoadingNoNpm;
+            CatalogControlVisibility = Visibility.Hidden;
+            LoadingCatalogControlVisibility = Visibility.Visible;
+            LoadingCatalogMessage = Resources.CatalogLoadingDefault;
             
             SetLastCatalogUpdateTimeMessage(
                 Resources.PackageCatalogRefreshing,
@@ -325,8 +326,22 @@ namespace Microsoft.NodejsTools.NpmUI {
             var days = IsCatalogEmpty
                 ? int.MaxValue
                 : LastRefreshedMessageProvider.GetNumberOfDaysSinceLastRefresh(_allPackages.LastRefreshed);
+
+            string message;
+            if (IsCatalogEmpty) {
+                message = Resources.NpmCatalogEmpty;
+            }
+            else {
+                message = string.Format(
+                    "{0}{1}",
+                    LastRefreshedMessageProvider.GetMessageFor(_allPackages.LastRefreshed),
+                    string.Format(_allPackages.Results.Count > filtered.Count
+                        ? Resources.PackageMatchCount
+                        : Resources.PackageCount, filtered.Count));
+            }
+
             SetLastCatalogUpdateTimeMessage(
-                IsCatalogEmpty ? Resources.NpmCatalogEmpty : LastRefreshedMessageProvider.GetMessageFor(_allPackages.LastRefreshed),
+                message,
                 days > 14 ? Colors.Red : SystemColors.WindowTextColor,
                 days > 7 ? FontWeights.Bold : FontWeights.Normal);
             CatalogControlVisibility = Visibility.Visible;
