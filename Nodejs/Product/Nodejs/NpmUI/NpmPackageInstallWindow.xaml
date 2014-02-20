@@ -50,8 +50,12 @@
                 <TextBox Name="_TxtArguments"
                            Grid.Column="1"
                            Grid.Row="0"
-                         Height="24"
-                         Text="{Binding Path=RawFilterText}"></TextBox>
+                         Height="24">
+                    <TextBox.Text>
+                        <Binding Path="RawFilterText"
+                                 UpdateSourceTrigger="PropertyChanged" />
+                    </TextBox.Text>
+                </TextBox>
                 
                 <ComboBox Name="_ComboDependencyType"
                           Grid.Column="2"
@@ -86,7 +90,7 @@
                            Background="LightYellow"
                            Foreground="Black"
                            Visibility="{Binding Path=GlobalWarningVisibility}"></Label>
-                    <Label Content="Global installs will affect other apps using packages via 'npm link'"
+                    <Label Content="Global installs will affect other apps that use packages via 'npm link'"
                            Background="LightYellow"
                            Foreground="Black"
                            Visibility="{Binding Path=GlobalWarningVisibility}"></Label>
@@ -146,7 +150,7 @@
                                     </Label>
                                     <Label Grid.Column="1"
                                            Content="{Binding Path=VersionString}"
-                                           Margin="0, 0, 4, 0"
+                                           Margin="4, 0, 4, 0"
                                            Padding="0, 0, 0, 0"
                                            MaxHeight="24">
                                         <Label.Foreground>

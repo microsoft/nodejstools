@@ -17,13 +17,11 @@ using System.Collections.Generic;
 using System.ComponentModel;
 using System.Linq;
 using System.Runtime.CompilerServices;
-using System.Text;
 using System.Threading;
-using System.Threading.Tasks;
 using System.Windows;
-using System.Windows.Documents;
 using System.Windows.Input;
 using System.Windows.Media;
+using System.Windows.Threading;
 using Microsoft.NodejsTools.Npm;
 
 namespace Microsoft.NodejsTools.NpmUI {
@@ -78,6 +76,7 @@ namespace Microsoft.NodejsTools.NpmUI {
         private Visibility _filteredCatalogListVisibility = Visibility.Visible;
         private string _filterLabelText = Resources.CatalogFilterLabelFilter;
         private string _rawFilterText;
+        private DispatcherTimer _keypressFilterDelayTimer;
         private string _catalogFilterText;
         private string _argumentOnlyText;
         private bool _isExecuteNpmWithArgumentsMode;
@@ -294,10 +293,28 @@ namespace Microsoft.NodejsTools.NpmUI {
             set {
                 _rawFilterText = value;
                 OnPropertyChanged();
-
-                //  TODO: start timer and update filter
-                //  TODO: switch state if npm to be executed with arguments, and split text
+                CatalogFilterText = value;
+                StartFilterTimer();
             }
+        }
+
+        private void StartFilterTimer() {
+            if (null == _keypressFilterDelayTimer) {
+                _keypressFilterDelayTimer = new DispatcherTimer();
+                _keypressFilterDelayTimer.Interval = new TimeSpan(0, 0, 0, 0, 500);
+                _keypressFilterDelayTimer.Tick += _keypressFilterDelayTimer_Tick;
+            } else {
+                _keypressFilterDelayTimer.Stop();
+            }
+            _keypressFilterDelayTimer.Start();
+        }
+
+        private void _keypressFilterDelayTimer_Tick(object sender, EventArgs e) {
+            _keypressFilterDelayTimer.Stop();
+            _keypressFilterDelayTimer.Tick -= _keypressFilterDelayTimer_Tick;
+            _keypressFilterDelayTimer = null;
+
+            StartFilter();
         }
 
         private void StartFilter() {
