@@ -718,6 +718,42 @@ namespace Microsoft.NodejsTools {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Installed globally.
+        /// </summary>
+        internal static string PackageInstalledGlobally {
+            get {
+                return ResourceManager.GetString("PackageInstalledGlobally", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Old version {0} installed globally.
+        /// </summary>
+        internal static string PackageInstalledGloballyOldVersion {
+            get {
+                return ResourceManager.GetString("PackageInstalledGloballyOldVersion", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Installed locally.
+        /// </summary>
+        internal static string PackageInstalledLocally {
+            get {
+                return ResourceManager.GetString("PackageInstalledLocally", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Old version {0} installed locally.
+        /// </summary>
+        internal static string PackageInstalledLocallyOldVersion {
+            get {
+                return ResourceManager.GetString("PackageInstalledLocallyOldVersion", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Global.
         /// </summary>
         internal static string PackageTypeGlobal {

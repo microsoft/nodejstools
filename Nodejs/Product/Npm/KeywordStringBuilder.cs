@@ -12,16 +12,19 @@
  *
  * ***************************************************************************/
 
-using System;
-using System.Collections.Generic;
+using System.Text;
 
-namespace Microsoft.NodejsTools.Npm.SPI {
-    internal abstract class AbstractNpmSearchComparer : IComparer<IPackage> {
-
-        protected int CompareBasedOnKeywords(IPackage x, IPackage y) {
-            return string.Compare(KeywordStringBuilder.BuildKeywordString(x), KeywordStringBuilder.BuildKeywordString(y), StringComparison.CurrentCulture);
+namespace Microsoft.NodejsTools.Npm {
+    public static class KeywordStringBuilder {
+        public static string BuildKeywordString(IPackage source) {
+            var buffer = new StringBuilder();
+            foreach (var keyword in source.Keywords) {
+                if ( buffer.Length > 0) {
+                    buffer.Append(", ");
+                }
+                buffer.Append(keyword);
+            }
+            return buffer.ToString();
         }
-
-        public abstract int Compare(IPackage x, IPackage y);
     }
 }
