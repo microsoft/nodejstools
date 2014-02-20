@@ -22,5 +22,13 @@ namespace Microsoft.NodejsTools.NpmUI {
 
             DataContext = vm;
         }
+
+        private void ExecuteClose(object sender, ExecutedRoutedEventArgs e) {
+            Close();
+        }
+
+        private void CanExecuteClose(object sender, CanExecuteRoutedEventArgs e) {
+            e.CanExecute = true;
+        }
     }
 }

@@ -114,6 +114,17 @@ namespace Microsoft.NodejsTools.NpmUI {
             }
         }
 
+        //  This doesn't work as I'd like
+        //public Color BackgroundColor {
+        //    get {
+        //        return IsInstalledGlobally || IsInstalledLocally
+        //            ? (IsGlobalInstallOutOfDate || IsLocalInstallOutOfDate
+        //                ? WpfColorUtils.MidPoint(Colors.Transparent, Colors.Yellow)
+        //                : WpfColorUtils.MidPoint(Colors.Transparent, Colors.LightGreen))
+        //            : Colors.Transparent;
+        //    }
+        //}
+
         public Visibility InstallMessageVisibility {
             get {
                 return IsInstalledLocally || IsInstalledGlobally

@@ -29,6 +29,30 @@ using Microsoft.NodejsTools.Npm;
 namespace Microsoft.NodejsTools.NpmUI {
     internal class NpmPackageInstallViewModel : INotifyPropertyChanged {
 
+        private abstract class ViewModelCommand : ICommand {
+            protected NpmPackageInstallViewModel _owner;
+
+            protected ViewModelCommand(NpmPackageInstallViewModel owner) {
+                _owner = owner;
+                _owner.PropertyChanged += Owner_PropertyChanged;
+            }
+
+            protected abstract void Owner_PropertyChanged(
+                object sender,
+                PropertyChangedEventArgs e);
+
+            public abstract bool CanExecute(object parameter);
+            public abstract void Execute(object parameter);
+            public event EventHandler CanExecuteChanged;
+
+            protected void OnCanExecuteChanged() {
+                var handlers = CanExecuteChanged;
+                if (null != handlers) {
+                    handlers(this, EventArgs.Empty);
+                }
+            }
+        }
+
         private const int IndexStandard = 0;
         private const int IndexDev = 1;
         private const int IndexOptional = 2;
@@ -42,6 +66,7 @@ namespace Microsoft.NodejsTools.NpmUI {
 
         private bool _isLoadingCatalog;
         private IPackageCatalog _allPackages;
+        private RefreshCatalogCommand _refreshCommand;
         private IList<PackageCatalogEntryViewModel> _filteredPackages = new List<PackageCatalogEntryViewModel>();
         private PackageCatalogEntryViewModel _selectedPackage;
         private InstallPackageCommand _installCommand;
@@ -61,6 +86,7 @@ namespace Microsoft.NodejsTools.NpmUI {
         
         public NpmPackageInstallViewModel() {
             _installCommand = new InstallPackageCommand(this);
+            _refreshCommand = new RefreshCatalogCommand(this);
         }
         
         public event PropertyChangedEventHandler PropertyChanged;
@@ -186,13 +212,13 @@ namespace Microsoft.NodejsTools.NpmUI {
                 IsCatalogEmpty = false;
                 showList = true;
             } catch (NpmNotFoundException) {
-                IsLoadingCatalog = false;
                 LoadingCatalogMessage = Resources.CatalogLoadingNoNpm;
             } catch (NpmCatalogEmptyException) {
-                IsLoadingCatalog = false;
                 IsCatalogEmpty = true;
                 showList = true;
             }
+
+            IsLoadingCatalog = false;
 
             if (showList) {
                 LoadingCatalogControlVisibility = Visibility.Hidden;
@@ -214,6 +240,31 @@ namespace Microsoft.NodejsTools.NpmUI {
             set {
                 _catalogControlVisibility = value;
                 OnPropertyChanged();
+            }
+        }
+
+        private class RefreshCatalogCommand : ViewModelCommand {
+            public RefreshCatalogCommand(NpmPackageInstallViewModel owner) : base(owner) {}
+            protected override void Owner_PropertyChanged(object sender, PropertyChangedEventArgs e) {
+                switch (e.PropertyName) {
+                    case "IsLoadingCatalog":
+                        OnCanExecuteChanged();
+                        break;
+                }
+            }
+
+            public override bool CanExecute(object parameter) {
+                return _owner.RefreshCatalogEnabled;
+            }
+
+            public override void Execute(object parameter) {
+                _owner.RefreshCatalogue();
+            }
+        }
+
+        public ICommand RefreshCommand {
+            get {
+                return _refreshCommand;
             }
         }
 
@@ -367,30 +418,6 @@ namespace Microsoft.NodejsTools.NpmUI {
             set {
                 _selectedPackage = value;
                 OnPropertyChanged();
-            }
-        }
-
-        private abstract class ViewModelCommand : ICommand {
-            protected NpmPackageInstallViewModel _owner;
-
-            protected ViewModelCommand(NpmPackageInstallViewModel owner) {
-                _owner = owner;
-                _owner.PropertyChanged += Owner_PropertyChanged;
-            }
-
-            protected abstract void Owner_PropertyChanged(
-                object sender,
-                PropertyChangedEventArgs e);
-
-            public abstract bool CanExecute(object parameter);
-            public abstract void Execute(object parameter);
-            public event EventHandler CanExecuteChanged;
-
-            protected void OnCanExecuteChanged() {
-                var handlers = CanExecuteChanged;
-                if (null != handlers) {
-                    handlers(this, EventArgs.Empty);
-                }
             }
         }
 
