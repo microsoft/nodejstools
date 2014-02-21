@@ -79,6 +79,24 @@ namespace Microsoft.NodejsTools {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to HasTests.
+        /// </summary>
+        internal static string HasTests {
+            get {
+                return ResourceManager.GetString("HasTests", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Specifies if file exports are tests..
+        /// </summary>
+        internal static string HasTestsDescription {
+            get {
+                return ResourceManager.GetString("HasTestsDescription", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Invalid port number - the port should contain only digits..
         /// </summary>
         internal static string InvalidPortNumber {

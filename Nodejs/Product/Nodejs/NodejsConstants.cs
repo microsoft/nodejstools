@@ -24,15 +24,16 @@ namespace Microsoft.NodejsTools {
         public const string Nodejs = "Node.js";
         public const string NodejsRepl = "Node.jsRepl";
 
-        public const string NodeExePath = "NodeExePath";
-        public const string NodeExeArguments = "NodeExeArguments";
-        public const string ScriptArguments = "ScriptArguments";
-        public const string NodejsPort = "NodejsPort";
         public const string DebuggerPort = "DebuggerPort";
         public const string EnvironmentVariables = "EnvironmentVariables";
-        public const string StartWebBrowser = "StartWebBrowser";
         public const string LaunchUrl = "LaunchUrl";
+        public const string NodeExePath = "NodeExePath";
+        public const string NodeExeArguments = "NodeExeArguments";
+        public const string NodejsPort = "NodejsPort";
         public const string ProjectFileFilter = "Node.js Project File (*.njsproj)\n*.njsproj\nAll Files (*.*)\n*.*\n";
+        public const string ScriptArguments = "ScriptArguments";
+        public const string StartWebBrowser = "StartWebBrowser";
+        
 
         public const string NodeModulesFolder = "node_modules";
         public const string PackageJsonFile = "package.json";

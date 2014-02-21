@@ -86,7 +86,7 @@ namespace Microsoft.NodejsTools.Project {
         private void RefreshReferenceFile(object state) {
             UpdateReferenceFile();
         }
-
+        
         public override int InitializeForOuter(string filename, string location, string name, uint flags, ref Guid iid, out IntPtr projectPointer, out int canceled) {
             int res = base.InitializeForOuter(filename, location, name, flags, ref iid, out projectPointer, out canceled);
             if (ErrorHandler.Succeeded(res)) {
