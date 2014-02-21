@@ -11,8 +11,21 @@
     </UserControl.Resources>
     <Grid>
         <DockPanel VerticalAlignment="Stretch" Height="Auto">
-            <ProgressBar Name="_progress" Height="4" DockPanel.Dock="Top" IsIndeterminate="true"></ProgressBar>
-            <RichTextBox Name="_textBox" Background="Black" Foreground="White">
+            <StackPanel DockPanel.Dock="Top"
+                        Orientation="Vertical"
+                        HorizontalAlignment="Stretch">
+                <TextBox HorizontalAlignment="Stretch"
+                         IsEnabled="True"
+                         IsReadOnly="True"
+                         Text="{Binding Path=StatusText}"></TextBox>
+                <ProgressBar Name="_progress"
+                             Height="4"
+                             IsIndeterminate="true"
+                             Visibility="{Binding Path=ExecutionProgressVisibility}"></ProgressBar>
+            </StackPanel>
+            <RichTextBox Name="_textBox"
+                         Background="Black"
+                         Foreground="GreenYellow">
             </RichTextBox>
         </DockPanel>            
     </Grid>

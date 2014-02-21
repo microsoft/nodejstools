@@ -558,9 +558,12 @@ namespace Microsoft.NodejsTools.Project {
             //    manager.ShowDialog();
             //}
 
-            var viewModel = new NpmPackageInstallViewModel();
+            var executeVm = new NpmOutputControlViewModel();
+            executeVm.NpmController = NpmController;
+            var viewModel = new NpmPackageInstallViewModel(executeVm);
             viewModel.NpmController = NpmController;
             var manager = new NpmPackageInstallWindow(viewModel);
+            manager.NpmExecuteControl.DataContext = executeVm;
             manager.ShowDialog();
 
             ReloadHierarchy();

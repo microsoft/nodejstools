@@ -316,6 +316,9 @@
   <data name="CatalogLoadingNoNpm">
     <value>Catalog retrieval aborted - npm.cmd not found</value>
   </data>
+  <data name="NoKeywordsInPackage">
+    <value>(This package has no keywords.)</value>
+  </data>
   <data name="PackageCatalogRefreshing" xml:space="preserve">
     <value>Currently refreshing</value>
   </data>
@@ -349,6 +352,12 @@
   <data name="PackageCatalogRefresh6Months" xml:space="preserve">
     <value>Far too long ago</value>
   </data>
+  <data name="PackageCount" xml:space="preserve">
+    <value> - info for {0} packages retrieved</value>
+  </data>
+  <data name="PackageMatchCount" xml:space="preserve">
+    <value> - {0} matching packages</value>
+  </data>
   <data name="PackageInstalledLocally" xml:space="preserve">
     <value>Installed locally</value>
   </data>
@@ -375,5 +384,17 @@
   </data>
   <data name="NpmCatalogEmpty" xml:space="preserve">
     <value>Refresh failed - check connectivity</value>
+  </data>
+  <data name="NpmStatusReady" xml:space="preserve">
+    <value>READY</value>
+  </data>
+  <data name="NpmStatusReadyWithErrors" xml:space="preserve">
+    <value>READY - Last command completed with errors</value>
+  </data>
+  <data name="NpmStatusExecuting" xml:space="preserve">
+    <value>Executing: {0}</value>
+  </data>
+  <data name="NpmStatusExecutingQueued" xml:space="preserve">
+    <value>Executing: {0} ({1} command(s) queued)</value>
   </data>
 </root>

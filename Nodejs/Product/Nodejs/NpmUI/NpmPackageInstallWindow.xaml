@@ -2,7 +2,10 @@
         xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         xmlns:npmUi="clr-namespace:Microsoft.NodejsTools.NpmUI"
-        Title="npm Package Manager" Height="500" Width="600">
+        Title="npm Package Manager"
+        Height="500"
+        Width="600"
+        WindowStartupLocation="CenterOwner">
     <!-- Theming -->
     <Window.Resources>
         <ResourceDictionary Source="pack://application:,,,/Microsoft.NodejsTools;component/SharedProject/Wpf/Controls.xaml" />
@@ -47,9 +50,8 @@
                        Content="{Binding Path=FilterLabelText}"
                        VerticalAlignment="Center"></Label>
                 
-                <TextBox Name="_TxtArguments"
-                           Grid.Column="1"
-                           Grid.Row="0"
+                <TextBox Grid.Column="1"
+                         Grid.Row="0"
                          Height="24">
                     <TextBox.Text>
                         <Binding Path="RawFilterText"
@@ -57,8 +59,7 @@
                     </TextBox.Text>
                 </TextBox>
                 
-                <ComboBox Name="_ComboDependencyType"
-                          Grid.Column="2"
+                <ComboBox Grid.Column="2"
                           Grid.Row="0"
                           Width="100"
                           MaxHeight="24"
@@ -71,8 +72,7 @@
                     <ComboBoxItem Tag="Opt">Optional</ComboBoxItem>
                     <ComboBoxItem Tag="Global">Global</ComboBoxItem>
                 </ComboBox>
-                <Button Name="_BtnInstall"
-                        Grid.Column="3"
+                <Button Grid.Column="3"
                         Grid.Row="0"
                         Content="Install"
                         Command="{Binding Path=InstallCommand}"></Button>
@@ -99,8 +99,7 @@
                         Orientation="Horizontal"
                         HorizontalAlignment="Right"
                         Height="40">
-                    <Button Name="_Close"
-                            IsDefault="True"
+                    <Button IsDefault="True"
                             Content="_Close"
                             Command="ApplicationCommands.Close"></Button>
                 </StackPanel>
@@ -109,7 +108,7 @@
             
             <Grid>
                 <Grid.RowDefinitions>
-                    <RowDefinition Height="9*"></RowDefinition>
+                    <RowDefinition Height="5*"></RowDefinition>
                     <RowDefinition Height="Auto"></RowDefinition>
                     <RowDefinition Height="Auto"></RowDefinition>
                     <RowDefinition Height="*"></RowDefinition>
@@ -117,8 +116,7 @@
                 
                 <!-- Package List -->
                 
-                <ListBox Name="_PackageList"
-                         Grid.Row="0"
+                <ListBox Grid.Row="0"
                          ItemsSource="{Binding Path=FilteredPackages}"
                          SelectedItem="{Binding Path=SelectedPackage}"
                          Visibility="{Binding Path=FilteredCatalogListVisibility}"
@@ -269,7 +267,8 @@
                 
                 <!-- Npm Output -->
                 
-                <npmUi:NpmOutputControl Grid.Row="3"></npmUi:NpmOutputControl>
+                <npmUi:NpmOutputControl Grid.Row="3"
+                                        x:Name="ExecuteControl"></npmUi:NpmOutputControl>
             </Grid>
 
             

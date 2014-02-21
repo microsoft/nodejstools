@@ -82,10 +82,13 @@ namespace Microsoft.NodejsTools.NpmUI {
         private bool _isExecuteNpmWithArgumentsMode;
         private int _selectedDependencyTypeIndex;
 
+        private NpmOutputControlViewModel _executeViewModel;
         
-        public NpmPackageInstallViewModel() {
+        public NpmPackageInstallViewModel(NpmOutputControlViewModel executeViewModel) {
             _installCommand = new InstallPackageCommand(this);
             _refreshCommand = new RefreshCatalogCommand(this);
+
+            _executeViewModel = executeViewModel;
         }
         
         public event PropertyChangedEventHandler PropertyChanged;
@@ -293,6 +296,9 @@ namespace Microsoft.NodejsTools.NpmUI {
             set {
                 _rawFilterText = value;
                 OnPropertyChanged();
+
+                //  TODO: set catalog filter text properly
+
                 CatalogFilterText = value;
                 StartFilterTimer();
             }

@@ -228,6 +228,7 @@
     <Compile Include="NpmUI\NpmOutputControl.xaml.cs">
       <DependentUpon>NpmOutputControl.xaml</DependentUpon>
     </Compile>
+    <Compile Include="NpmUI\NpmOutputControlViewModel.cs" />
     <Compile Include="NpmUI\NpmPackageInstallViewModel.cs" />
     <Compile Include="NpmUI\NpmPackageInstallWindow.xaml.cs">
       <DependentUpon>NpmPackageInstallWindow.xaml</DependentUpon>

@@ -601,6 +601,42 @@ namespace Microsoft.NodejsTools {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Executing: {0}.
+        /// </summary>
+        internal static string NpmStatusExecuting {
+            get {
+                return ResourceManager.GetString("NpmStatusExecuting", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Executing: {0} ({1} command(s) queued).
+        /// </summary>
+        internal static string NpmStatusExecutingQueued {
+            get {
+                return ResourceManager.GetString("NpmStatusExecutingQueued", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to READY.
+        /// </summary>
+        internal static string NpmStatusReady {
+            get {
+                return ResourceManager.GetString("NpmStatusReady", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to READY - Last command completed with errors.
+        /// </summary>
+        internal static string NpmStatusReadyWithErrors {
+            get {
+                return ResourceManager.GetString("NpmStatusReadyWithErrors", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to {0} successfully completed.
         /// </summary>
         internal static string NpmSuccessfullyCompleted {

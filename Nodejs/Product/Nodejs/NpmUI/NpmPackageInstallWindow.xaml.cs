@@ -30,5 +30,9 @@ namespace Microsoft.NodejsTools.NpmUI {
         private void CanExecuteClose(object sender, CanExecuteRoutedEventArgs e) {
             e.CanExecute = true;
         }
+
+        public NpmOutputControl NpmExecuteControl {
+            get { return this.ExecuteControl; }
+        }
     }
 }
