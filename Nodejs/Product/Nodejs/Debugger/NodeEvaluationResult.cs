@@ -22,31 +22,20 @@ namespace Microsoft.NodejsTools.Debugger {
     /// Represents the result of an evaluation of an expression against a given stack frame.
     /// </summary>
     class NodeEvaluationResult {
-        private readonly NodeStackFrame _frame;
-        private readonly int _handle;
         private readonly Regex _stringLengthExpression = new Regex(@"\.\.\. \(length: ([0-9]+)\)$", RegexOptions.Compiled);
 
         /// <summary>
         /// Creates an evaluation result for an expression which successfully returned a value.
         /// </summary>
         public NodeEvaluationResult(int handle, string stringValue, string hexValue, string typeName, string expression, string fullName, NodeExpressionType type, NodeStackFrame frame) {
-            _handle = handle;
-            _frame = frame;
+            Handle = handle;
+            Frame = frame;
             Expression = expression;
             StringValue = stringValue;
             HexValue = hexValue;
             TypeName = typeName;
             FullName = fullName;
             Type = type;
-        }
-
-        /// <summary>
-        /// Creates an evaluation result for an expression which raised an exception instead of returning a value.
-        /// </summary>
-        public NodeEvaluationResult(string exceptionText, string expression, NodeStackFrame frame) {
-            _frame = frame;
-            Expression = expression;
-            ExceptionText = exceptionText;
         }
 
         /// <summary>
@@ -72,12 +61,6 @@ namespace Microsoft.NodejsTools.Debugger {
         public string TypeName { get; private set; }
 
         /// <summary>
-        /// Gets the text of the exception which was thrown when evaluating this expression, or null
-        /// if no exception was thrown.
-        /// </summary>
-        public string ExceptionText { get; private set; }
-
-        /// <summary>
         /// Gets the expression text representation.
         /// </summary>
         public string Expression { get; private set; }
@@ -90,21 +73,17 @@ namespace Microsoft.NodejsTools.Debugger {
         /// <summary>
         /// Gets a type metadata for the expression.
         /// </summary>
-        public NodeExpressionType Type { get; set; }
+        public NodeExpressionType Type { get; private set; }
 
         /// <summary>
         /// Returns the stack frame in which this expression was evaluated.
         /// </summary>
-        public NodeStackFrame Frame {
-            get { return _frame; }
-        }
+        public NodeStackFrame Frame { get; private set; }
 
         /// <summary>
         /// Returns the handle for this evaluation result.
         /// </summary>
-        public int Handle {
-            get { return _handle; }
-        }
+        public int Handle { get; private set; }
 
         /// <summary>
         /// Gets the list of children which this object contains.  The children can be either
@@ -119,7 +98,7 @@ namespace Microsoft.NodejsTools.Debugger {
                 return null;
             }
 
-            return await _frame.Process.EnumChildrenAsync(this, cancellationToken).ConfigureAwait(false);
+            return await Frame.Process.EnumChildrenAsync(this, cancellationToken).ConfigureAwait(false);
         }
 
         private int GetStringLength(string stringValue) {

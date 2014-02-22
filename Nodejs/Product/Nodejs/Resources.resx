@@ -223,4 +223,7 @@
   <data name="EnvironmentVariables" xml:space="preserve">
     <value>Specifies environment variables to be set in the spawned process in the form NAME=value;NAME1=value</value>
   </data>
+  <data name="DebuggerConnectionClosed" xml:space="preserve">
+    <value>Debugger connection was closed.</value>
+  </data>
 </root>

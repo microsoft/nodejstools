@@ -25,7 +25,6 @@ using Microsoft.NodejsTools.Debugger.Commands;
 using Microsoft.NodejsTools.Debugger.Communication;
 using Microsoft.NodejsTools.Debugger.Events;
 using Microsoft.NodejsTools.Debugger.Serialization;
-using Microsoft.VisualStudioTools.Project;
 
 namespace Microsoft.NodejsTools.Debugger {
     /// <summary>
@@ -81,15 +80,14 @@ namespace Microsoft.NodejsTools.Debugger {
             List<string[]> dirMapping,
             ushort? debuggerPort = null,
             bool createNodeWindow = true) : this() {
-
             // Select debugger port for a local connection
             ushort debuggerPortOrDefault = NodejsConstants.DefaultDebuggerPort;
             if (debuggerPort != null) {
                 debuggerPortOrDefault = debuggerPort.Value;
             } else {
-                var activeConnections =
-                    from listener in IPGlobalProperties.GetIPGlobalProperties().GetActiveTcpListeners()
-                    select listener.Port;
+                List<int> activeConnections =
+                    (from listener in IPGlobalProperties.GetIPGlobalProperties().GetActiveTcpListeners()
+                        select listener.Port).ToList();
                 if (activeConnections.Contains(debuggerPortOrDefault)) {
                     debuggerPortOrDefault = (ushort)Enumerable.Range(new Random().Next(5859, 6000), 60000).Except(activeConnections).First();
                 }
@@ -256,10 +254,10 @@ namespace Microsoft.NodejsTools.Debugger {
         public async void Resume() {
             DebugWriteCommand("Resume");
             var tokenSource = new CancellationTokenSource(_timeout);
-            await ContinueAsync(cancellationToken: tokenSource.Token).ConfigureAwait(false);
+            await ContinueAndSaveSteppingAsync(SteppingKind.None, cancellationToken: tokenSource.Token).ConfigureAwait(false);
         }
 
-        private Task ContinueAsync(SteppingKind steppingKind, bool resetSteppingMode = true, int stepCount = 1, CancellationToken cancellationToken = new CancellationToken()) {
+        private Task ContinueAndSaveSteppingAsync(SteppingKind steppingKind, bool resetSteppingMode = true, int stepCount = 1, CancellationToken cancellationToken = new CancellationToken()) {
             if (resetSteppingMode) {
                 _steppingMode = steppingKind;
                 _steppingCallstackDepth = MainThread.CallstackDepth;
@@ -306,7 +304,7 @@ namespace Microsoft.NodejsTools.Debugger {
                     int stepCount = callstackDepth - _steppingCallstackDepth;
                     if (stepCount > 0) {
                         // Stepping over autoresumed break (in nested frame)
-                        await ContinueAsync(SteppingKind.Out, false, stepCount, cancellationToken).ConfigureAwait(false);
+                        await ContinueAndSaveSteppingAsync(SteppingKind.Out, false, stepCount, cancellationToken).ConfigureAwait(false);
                         return;
                     }
                     break;
@@ -314,7 +312,7 @@ namespace Microsoft.NodejsTools.Debugger {
                     stepCount = callstackDepth - _steppingCallstackDepth + 1;
                     if (stepCount > 0) {
                         // Stepping out across autoresumed break (in nested frame)
-                        await ContinueAsync(SteppingKind.Out, false, stepCount, cancellationToken).ConfigureAwait(false);
+                        await ContinueAndSaveSteppingAsync(SteppingKind.Out, false, stepCount, cancellationToken).ConfigureAwait(false);
                         return;
                     }
                     break;
@@ -465,7 +463,7 @@ namespace Microsoft.NodejsTools.Debugger {
         }
 
         private void OnConnectionClosed(object sender, EventArgs args) {
-            Terminate(killProcess: false);
+            Terminate(false);
 
             EventHandler<ThreadEventArgs> threadExited = ThreadExited;
             if (threadExited != null) {
@@ -687,6 +685,7 @@ namespace Microsoft.NodejsTools.Debugger {
             if (!string.IsNullOrEmpty(errorCode)) {
                 exceptionName = string.Format("{0}({1})", exceptionName, errorCode);
             }
+
             // UNDONE Handle break on unhandled, once just my code is supported
             // Node has a catch all, so there are no uncaught exceptions
             // For now just break always or never
@@ -709,14 +708,17 @@ namespace Microsoft.NodejsTools.Debugger {
                 return;
             }
 
-            // Serialize exception object to get a proper description
-            var tokenSource = new CancellationTokenSource(_timeout);
-            var evaluateCommand = new EvaluateCommand(CommandId, _resultFactory, exceptionEvent.ExceptionId);
-            await _client.SendRequestAsync(evaluateCommand, tokenSource.Token).ConfigureAwait(false);
+            string description = exceptionEvent.Description;
+            if (description.StartsWith("#<") && description.EndsWith(">")) {
+                // Serialize exception object to get a proper description
+                var tokenSource = new CancellationTokenSource(_timeout);
+                var evaluateCommand = new EvaluateCommand(CommandId, _resultFactory, exceptionEvent.ExceptionId);
+                await _client.SendRequestAsync(evaluateCommand, tokenSource.Token).ConfigureAwait(false);
 
-            string description = evaluateCommand.Result.StringValue ?? exceptionEvent.Description;
-            var exception = new NodeException(exceptionEvent.TypeName, description);
+                description = evaluateCommand.Result.StringValue;
+            }
 
+            var exception = new NodeException(exceptionName, description);
             exceptionRaised(this, new ExceptionRaisedEventArgs(MainThread, exception, exceptionEvent.Uncaught));
         }
 
@@ -742,7 +744,26 @@ namespace Microsoft.NodejsTools.Debugger {
             var backtraceCommand = new BacktraceCommand(CommandId, _resultFactory, 0, int.MaxValue, this);
             await _client.SendRequestAsync(backtraceCommand, cancellationToken).ConfigureAwait(false);
 
-            MainThread.Frames = backtraceCommand.StackFrames.ToArray();
+            List<NodeStackFrame> stackFrames = backtraceCommand.StackFrames;
+
+            // Collects results of number type which have null values and perform a lookup for actual values
+            var numbersWithNullValue = new List<NodeEvaluationResult>();
+            foreach (NodeStackFrame stackFrame in stackFrames) {
+                numbersWithNullValue.AddRange(stackFrame.Locals.Concat(stackFrame.Parameters)
+                    .Where(p => p.TypeName == NodeVariableType.Number && p.StringValue == null));
+            }
+
+            if (numbersWithNullValue.Count > 0) {
+                var lookupCommand = new LookupCommand(CommandId, _resultFactory, numbersWithNullValue);
+                await _client.SendRequestAsync(lookupCommand, cancellationToken).ConfigureAwait(false);
+
+                foreach (NodeEvaluationResult targetResult in numbersWithNullValue) {
+                    NodeEvaluationResult lookupResult = lookupCommand.Results[targetResult.Handle][0];
+                    targetResult.StringValue = targetResult.HexValue = lookupResult.StringValue;
+                }
+            }
+
+            MainThread.Frames = stackFrames;
             foreach (NodeModule module in backtraceCommand.Modules.Values) {
                 AddScript(module);
             }
@@ -757,19 +778,19 @@ namespace Microsoft.NodejsTools.Debugger {
         internal async void SendStepOver(int identity) {
             DebugWriteCommand("StepOver");
             var tokenSource = new CancellationTokenSource(_timeout);
-            await ContinueAsync(SteppingKind.Over, 1, tokenSource.Token).ConfigureAwait(false);
+            await ContinueAndSaveSteppingAsync(SteppingKind.Over, cancellationToken: tokenSource.Token).ConfigureAwait(false);
         }
 
         internal async void SendStepInto(int identity) {
             DebugWriteCommand("StepInto");
             var tokenSource = new CancellationTokenSource(_timeout);
-            await ContinueAsync(SteppingKind.Into, 1, tokenSource.Token).ConfigureAwait(false);
+            await ContinueAndSaveSteppingAsync(SteppingKind.Into, cancellationToken: tokenSource.Token).ConfigureAwait(false);
         }
 
         internal async void SendStepOut(int identity) {
             DebugWriteCommand("StepOut");
             var tokenSource = new CancellationTokenSource(_timeout);
-            await ContinueAsync(SteppingKind.Out, 1, tokenSource.Token).ConfigureAwait(false);
+            await ContinueAndSaveSteppingAsync(SteppingKind.Out, cancellationToken: tokenSource.Token).ConfigureAwait(false);
         }
 
         internal async void SendResumeThread(int threadId) {
@@ -1087,6 +1108,23 @@ namespace Microsoft.NodejsTools.Debugger {
         internal void Close() {
         }
 
+        internal static void FixupForRunAndWait(bool waitOnAbnormal, bool waitOnNormal, ProcessStartInfo psi) {
+            if (waitOnAbnormal || waitOnNormal) {
+                string args = "/c \"\"" + psi.FileName + "\" " + psi.Arguments;
+
+                if (waitOnAbnormal && waitOnNormal) {
+                    args += " & pause";
+                } else if (waitOnAbnormal) {
+                    args += " & if errorlevel 1 pause";
+                } else {
+                    args += " & if not errorlevel 1 pause";
+                }
+                args += "\"";
+                psi.FileName = Path.Combine(Environment.SystemDirectory, "cmd.exe");
+                psi.Arguments = args;
+            }
+        }
+
         #region IDisposable
 
         public void Dispose() {
@@ -1102,22 +1140,5 @@ namespace Microsoft.NodejsTools.Debugger {
         }
 
         #endregion
-
-        internal static void FixupForRunAndWait(bool waitOnAbnormal, bool waitOnNormal, ProcessStartInfo psi) {
-            if (waitOnAbnormal || waitOnNormal) {
-                string args = "/c \"\"" + psi.FileName + "\" " + psi.Arguments;
-
-                if (waitOnAbnormal && waitOnNormal) {
-                    args += " & pause";
-                } else if (waitOnAbnormal) {
-                    args += " & if errorlevel 1 pause";
-                } else if (waitOnNormal) {
-                    args += " & if not errorlevel 1 pause";
-                }
-                args += "\"";
-                psi.FileName = Path.Combine(Environment.SystemDirectory, "cmd.exe");
-                psi.Arguments = args;
-            }
-        }
     }
 }

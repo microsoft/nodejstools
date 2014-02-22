@@ -12,33 +12,46 @@
  *
  * ***************************************************************************/
 
-using System.Globalization;
+using System.Collections.Generic;
+using Microsoft.NodejsTools.Debugger.Serialization;
 using Newtonsoft.Json.Linq;
 
 namespace Microsoft.NodejsTools.Debugger.Events {
     sealed class ExceptionEvent : IDebuggerEvent {
+        /// <summary>
+        /// V8 type transformations.
+        /// </summary>
+        private readonly Dictionary<string, string> _typeNameMappings = new Dictionary<string, string> {
+            { "undefined", NodeVariableType.Undefined },
+            { "null", NodeVariableType.Null },
+            { "number", NodeVariableType.Number },
+            { "boolean", NodeVariableType.Boolean },
+            { "regexp", NodeVariableType.Regexp },
+            { "function", NodeVariableType.Function },
+            { "string", NodeVariableType.String },
+            { "object", NodeVariableType.Object },
+            { "error", NodeVariableType.Error },
+        };
+
         public ExceptionEvent(JObject message) {
             Running = false;
 
-            Line = (int?)message["body"]["sourceLine"];
-            Column = (int?)message["body"]["sourceColumn"];
-            Uncaught = (bool)message["body"]["uncaught"];
-            ExceptionId = (int)message["body"]["exception"]["handle"];
-            Description = (string)message["body"]["exception"]["text"];
-            string typeName = (string)message["body"]["exception"]["className"]
-                              ?? (string)message["body"]["exception"]["type"];
-            typeName = CultureInfo.CurrentCulture.TextInfo.ToTitleCase(typeName);
-            TypeName = string.Format("{0} exception", typeName);
+            JToken body = message["body"];
+            Line = (int?)body["sourceLine"];
+            Column = (int?)body["sourceColumn"];
+            Uncaught = (bool)body["uncaught"];
+            ExceptionId = (int)body["exception"]["handle"];
+            Description = (string)body["exception"]["text"];
+            TypeName = GetExceptionType(body);
+            ExceptionName = GetExceptionName(message);
+            ErrorNumber = GetExceptionCodeRef(body);
 
-            var script = message["body"]["script"];
+            JToken script = body["script"];
             if (script != null) {
-                var scriptId = (int)message["body"]["script"]["id"];
-                var fileName = (string)message["body"]["script"]["name"];
+                var scriptId = (int)script["id"];
+                var fileName = (string)script["name"];
                 Module = new NodeModule(scriptId, fileName, fileName);
             }
-
-            ExceptionName = GetExceptionName(message);
-            ErrorNumber = GetExceptionCodeRef(message);
         }
 
         public string ExceptionName { get; private set; }
@@ -52,8 +65,7 @@ namespace Microsoft.NodejsTools.Debugger.Events {
         public NodeModule Module { get; private set; }
         public bool Running { get; private set; }
 
-        private int? GetExceptionCodeRef(JObject json) {
-            JToken body = json["body"];
+        private int? GetExceptionCodeRef(JToken body) {
             JToken exception = body["exception"];
             var properties = (JArray)exception["properties"];
             if (properties != null) {
@@ -79,7 +91,7 @@ namespace Microsoft.NodejsTools.Debugger.Events {
                     name = (string)refRecord["name"];
                 }
             }
-            return name;
+            return _typeNameMappings.ContainsKey(name) ? _typeNameMappings[name] : name;
         }
 
         private JToken GetRefRecord(JArray refs, int handle) {
@@ -91,6 +103,12 @@ namespace Microsoft.NodejsTools.Debugger.Events {
                 }
             }
             return null;
+        }
+
+        private string GetExceptionType(JToken body) {
+            string name = (string)body["exception"]["className"]
+                          ?? (string)body["exception"]["type"];
+            return _typeNameMappings.ContainsKey(name) ? _typeNameMappings[name] : name;
         }
     }
 }
