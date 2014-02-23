@@ -216,5 +216,14 @@ namespace Microsoft.NodejsTools.Npm.SPI {
         public async Task<bool> UpdateGlobalPackagesAsync(IEnumerable<IPackage> packages) {
             return await UpdatePackagesAsync(packages, true);
         }
+
+        public async Task<bool> ExecuteNpmCommandAsync(string arguments) {
+            _command = new GenericNpmCommand(
+                _npmController.FullPathToRootPackageDirectory,
+                arguments,
+                _npmController.PathToNpm,
+                _npmController.UseFallbackIfNpmNotFound);
+            return await DoCommandExecute(true);
+        }
     }
 }

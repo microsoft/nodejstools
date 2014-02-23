@@ -23,7 +23,7 @@
                              IsIndeterminate="true"
                              Visibility="{Binding Path=ExecutionProgressVisibility}"></ProgressBar>
             </StackPanel>
-            <RichTextBox Name="_textBox"
+            <RichTextBox x:Name="_textBox"
                          Background="Black"
                          Foreground="GreenYellow">
             </RichTextBox>

@@ -610,11 +610,29 @@ namespace Microsoft.NodejsTools {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to ERRORS ENCOUNTERED - Executing: {0}.
+        /// </summary>
+        internal static string NpmStatusExecutingErrors {
+            get {
+                return ResourceManager.GetString("NpmStatusExecutingErrors", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Executing: {0} ({1} command(s) queued).
         /// </summary>
         internal static string NpmStatusExecutingQueued {
             get {
                 return ResourceManager.GetString("NpmStatusExecutingQueued", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to ERRORS ENCOUNTERED - Executing: {0} ({1} command(s) queued).
+        /// </summary>
+        internal static string NpmStatusExecutingQueuedErrors {
+            get {
+                return ResourceManager.GetString("NpmStatusExecutingQueuedErrors", resourceCulture);
             }
         }
         
@@ -628,7 +646,7 @@ namespace Microsoft.NodejsTools {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to READY - Last command completed with errors.
+        ///   Looks up a localized string similar to READY - Last command(s) completed with errors.
         /// </summary>
         internal static string NpmStatusReadyWithErrors {
             get {

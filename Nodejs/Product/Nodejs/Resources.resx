@@ -389,12 +389,18 @@
     <value>READY</value>
   </data>
   <data name="NpmStatusReadyWithErrors" xml:space="preserve">
-    <value>READY - Last command completed with errors</value>
+    <value>READY - Last command(s) completed with errors</value>
   </data>
   <data name="NpmStatusExecuting" xml:space="preserve">
     <value>Executing: {0}</value>
   </data>
   <data name="NpmStatusExecutingQueued" xml:space="preserve">
     <value>Executing: {0} ({1} command(s) queued)</value>
+  </data>
+  <data name="NpmStatusExecutingErrors" xml:space="preserve">
+    <value>ERRORS ENCOUNTERED - Executing: {0}</value>
+  </data>
+  <data name="NpmStatusExecutingQueuedErrors" xml:space="preserve">
+    <value>ERRORS ENCOUNTERED - Executing: {0} ({1} command(s) queued)</value>
   </data>
 </root>

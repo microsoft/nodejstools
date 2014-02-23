@@ -33,6 +33,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="KeywordStringBuilder.cs" />
+    <Compile Include="NpmArgumentBuilder.cs" />
     <Compile Include="SemverVersionComparer.cs" />
     <Compile Include="SPI\AbstractNpmSearchComparer.cs" />
     <Compile Include="DependencyType.cs" />
@@ -75,6 +76,7 @@
     <Compile Include="NpmExecutionException.cs" />
     <Compile Include="NpmLogEventArgs.cs" />
     <Compile Include="NpmNotFoundException.cs" />
+    <Compile Include="SPI\GenericNpmCommand.cs" />
     <Compile Include="SPI\NpmSearchRegexComparer.cs" />
     <Compile Include="SPI\NpmSearchFilterStringComparer.cs" />
     <Compile Include="NpmSearchParserFactory.cs" />

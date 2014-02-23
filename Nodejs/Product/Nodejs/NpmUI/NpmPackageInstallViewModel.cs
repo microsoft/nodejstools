@@ -107,6 +107,10 @@ namespace Microsoft.NodejsTools.NpmUI {
             }
         }
 
+        public NpmOutputControlViewModel ExecuteViewModel {
+            get { return _executeViewModel; }
+        }
+
         #region Catalog control and refresh
 
         public string LastCatalogUpdateTimeMessage {

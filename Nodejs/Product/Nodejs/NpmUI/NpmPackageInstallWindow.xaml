@@ -268,7 +268,8 @@
                 <!-- Npm Output -->
                 
                 <npmUi:NpmOutputControl Grid.Row="3"
-                                        x:Name="ExecuteControl"></npmUi:NpmOutputControl>
+                                        x:Name="ExecuteControl"
+                                        DataContext="{Binding Path=ExecuteViewModel}"></npmUi:NpmOutputControl>
             </Grid>
 
             
