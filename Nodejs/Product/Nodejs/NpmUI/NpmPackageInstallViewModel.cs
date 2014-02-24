@@ -23,6 +23,7 @@ using System.Windows.Input;
 using System.Windows.Media;
 using System.Windows.Threading;
 using Microsoft.NodejsTools.Npm;
+using Microsoft.Windows.Design.Host;
 
 namespace Microsoft.NodejsTools.NpmUI {
     internal class NpmPackageInstallViewModel : INotifyPropertyChanged {
@@ -101,10 +102,20 @@ namespace Microsoft.NodejsTools.NpmUI {
         public INpmController NpmController {
             get { return _npmController; }
             set {
+                if (null != _npmController) {
+                    _npmController.FinishedRefresh -= NpmController_FinishedRefresh;
+                }
                 _npmController = value;
                 OnPropertyChanged();
-                LoadCatalogue();
+                if (null != _npmController) {
+                    LoadCatalogue();
+                    _npmController.FinishedRefresh += NpmController_FinishedRefresh;
+                }
             }
+        }
+
+        void NpmController_FinishedRefresh(object sender, EventArgs e) {
+            StartFilter();
         }
 
         public NpmOutputControlViewModel ExecuteViewModel {
@@ -188,6 +199,7 @@ namespace Microsoft.NodejsTools.NpmUI {
             set {
                 _loadingCatalogControlVisibility = value;
                 OnPropertyChanged();
+                OnPropertyChanged("FilterControlsVisibility");
             }
         }
 
@@ -296,15 +308,45 @@ namespace Microsoft.NodejsTools.NpmUI {
             }
         }
 
+        private static bool TreatAsArguments(string source) {
+            return !string.IsNullOrEmpty(source) && source.Any(char.IsWhiteSpace);
+        }
+
+        private static string GetFilterStringPortion(string source) {
+            if (string.IsNullOrEmpty(source)) {
+                return source;
+            }
+
+            for (int index = 0, size = source.Length; index < size; ++index) {
+                if (char.IsWhiteSpace(source[index])) {
+                    return index == 0 ? string.Empty : source.Substring(0, index);
+                }
+            }
+
+            return source;
+        }
+
+        private static string GetArgumentPortion(string source) {
+            string filter = GetFilterStringPortion(source);
+            return string.IsNullOrEmpty(filter)
+                ? source
+                : (source.Length > filter.Length ? source.Substring(filter.Length) : string.Empty);
+        }
+
         public string RawFilterText {
             get { return _rawFilterText; }
             set {
                 _rawFilterText = value;
                 OnPropertyChanged();
 
-                //  TODO: set catalog filter text properly
-
-                CatalogFilterText = value;
+                if (TreatAsArguments(_rawFilterText)) {
+                    IsExecuteNpmWithArgumentsMode = true;
+                    CatalogFilterText = GetFilterStringPortion(_rawFilterText);
+                    ArgumentOnlyText = GetArgumentPortion(_rawFilterText);
+                } else {
+                    IsExecuteNpmWithArgumentsMode = false;
+                    CatalogFilterText = value;
+                }
                 StartFilterTimer();
             }
         }
@@ -380,8 +422,6 @@ namespace Microsoft.NodejsTools.NpmUI {
             private set {
                 _catalogFilterText = value;
                 OnPropertyChanged();
-
-                //  TODO: call filter method
             }
         }
 
@@ -411,7 +451,11 @@ namespace Microsoft.NodejsTools.NpmUI {
         }
 
         public Visibility NonArgumentControlsVisibility {
-            get { return IsExecuteNpmWithArgumentsMode ? Visibility.Hidden : Visibility.Visible; }
+            get { return IsExecuteNpmWithArgumentsMode ? Visibility.Collapsed : Visibility.Visible; }
+        }
+
+        public Visibility FilterControlsVisibility {
+            get { return LoadingCatalogControlVisibility == Visibility.Visible ? Visibility.Collapsed : Visibility.Visible; }
         }
 
         #endregion

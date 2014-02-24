@@ -132,9 +132,12 @@ namespace Microsoft.NodejsTools.NpmUI {
         public string InstalledLocallyMessage {
             get {
                 if (IsInstalledLocally) {
-                    return IsLocalInstallOutOfDate
-                        ? string.Format(Resources.PackageInstalledLocallyOldVersion, _package.Version)
-                        : Resources.PackageInstalledLocally;
+                    var installed = LocallyInstalledPackage;
+                    if (null != installed) {
+                        return IsLocalInstallOutOfDate
+                            ? string.Format(Resources.PackageInstalledLocallyOldVersion, installed.Version)
+                            : Resources.PackageInstalledLocally;
+                    }
                 }
 
                 return string.Empty;
@@ -144,9 +147,12 @@ namespace Microsoft.NodejsTools.NpmUI {
         public string InstalledGloballyMessage {
             get {
                 if (IsInstalledGlobally) {
-                    return IsGlobalInstallOutOfDate
-                        ? string.Format(Resources.PackageInstalledGloballyOldVersion, _package.Version)
-                        : Resources.PackageInstalledGlobally;
+                    var installed = GloballyInstalledPackage;
+                    if (null != installed) {
+                        return IsGlobalInstallOutOfDate
+                            ? string.Format(Resources.PackageInstalledGloballyOldVersion, installed.Version)
+                            : Resources.PackageInstalledGlobally;
+                    }
                 }
 
                 return string.Empty;

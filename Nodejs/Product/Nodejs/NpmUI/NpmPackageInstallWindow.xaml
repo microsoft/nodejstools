@@ -32,7 +32,8 @@
             <Grid DockPanel.Dock="Top"
                   HorizontalAlignment="Stretch"
                   VerticalAlignment="Center"
-                  Margin="0, 0, 0, 4">
+                  Margin="0, 0, 0, 4"
+                  Visibility="{Binding Path=FilterControlsVisibility}">
                 <Grid.ColumnDefinitions>
                     <!-- Find/npm install label -->
                     <ColumnDefinition Width="Auto"></ColumnDefinition>
@@ -49,7 +50,7 @@
                 
                 <Label Grid.Column="0"
                        Grid.Row="0"
-                       MinWidth="60"
+                       MinWidth="72"
                        HorizontalContentAlignment="Right"
                        HorizontalAlignment="Right"
                        Content="{Binding Path=FilterLabelText}"

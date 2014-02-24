@@ -65,13 +65,15 @@ namespace Microsoft.NodejsTools.NpmUI {
 
         private INpmController _npmController;
         private Queue<QueuedNpmCommandInfo> _commandQueue = new Queue<QueuedNpmCommandInfo>();
-        private readonly object _queueLock = new object();
+        private readonly object _lock = new object();
         private bool _isDisposed;
         private string _statusText = Resources.NpmStatusReady;
         private bool _isExecutingCommand;
         private bool _withErrors;
         private FlowDocument _output = new FlowDocument();
         private Thread _worker;
+        private QueuedNpmCommandInfo _currentCommand;
+        private INpmCommander _commander;
         
         public NpmOutputControlViewModel() {
             var style = new Style(typeof(Paragraph));
@@ -92,8 +94,8 @@ namespace Microsoft.NodejsTools.NpmUI {
         }
 
         private void Pulse() {
-            lock (_queueLock) {
-                Monitor.PulseAll(_queueLock);
+            lock (_lock) {
+                Monitor.PulseAll(_lock);
             }
         }
 
@@ -116,17 +118,18 @@ namespace Microsoft.NodejsTools.NpmUI {
 
         public bool IsExecutingCommand {
             get {
-                lock (_queueLock) {
+                lock (_lock) {
                     return _isExecutingCommand;
                 }
             }
             set {
-                lock (_queueLock) {
+                lock (_lock) {
                     _isExecutingCommand = value;
                     Pulse();
                 }
                 OnPropertyChanged();
                 OnPropertyChanged("ExecutionProgressVisibility");
+                OnPropertyChanged("IsCancellable");
             }
         }
 
@@ -134,11 +137,34 @@ namespace Microsoft.NodejsTools.NpmUI {
             get { return IsExecutingCommand ? Visibility.Visible : Visibility.Hidden; }
         }
 
-        private void QueueCommand(QueuedNpmCommandInfo info) {
-            lock (_queueLock) {
-                _commandQueue.Enqueue(info);
-                Monitor.PulseAll(_queueLock);
+        public bool IsCancellable {
+            get {
+                lock (_lock) {
+                    return _commandQueue.Count > 0 || IsExecutingCommand;
+                }
             }
+        }
+
+        public void Cancel() {
+            lock (_lock) {
+                _commandQueue.Clear();
+                if (null != _commander) {
+                    _commander.CancelCurrentCommand();
+                }
+            }
+
+            UpdateStatusMessage();
+            OnPropertyChanged("IsCancellable");
+        }
+
+        private void QueueCommand(QueuedNpmCommandInfo info) {
+            lock (_lock) {
+                _commandQueue.Enqueue(info);
+                Monitor.PulseAll(_lock);
+            }
+
+            UpdateStatusMessageSafe();
+            OnPropertyChanged("IsCancellable");
         }
 
         public void QueueCommand(string arguments) {
@@ -164,112 +190,53 @@ namespace Microsoft.NodejsTools.NpmUI {
 
         private async void Execute(QueuedNpmCommandInfo info) {
             IsExecutingCommand = true;
-            using (var commander = _npmController.CreateNpmCommander()) {
-                commander.OutputLogged += commander_OutputLogged;
-                commander.ErrorLogged += commander_ErrorLogged;
-                commander.ExceptionLogged += commander_ExceptionLogged;
-                commander.CommandCompleted += commander_CommandCompleted;
+            try {
+                lock (_lock) {
+                    _commander = _npmController.CreateNpmCommander();
+                    _commander.OutputLogged += commander_OutputLogged;
+                    _commander.ErrorLogged += commander_ErrorLogged;
+                    _commander.ExceptionLogged += commander_ExceptionLogged;
+                    _commander.CommandCompleted += commander_CommandCompleted;
+                }
 
-                try {
-                    if (info.IsFreeformArgumentCommand) {
-                        await commander.ExecuteNpmCommandAsync(info.Arguments);
-                    } else if (info.IsGlobalInstall) {
-                        await commander.InstallGlobalPackageByVersionAsync(
+                if (info.IsFreeformArgumentCommand) {
+                    await _commander.ExecuteNpmCommandAsync(info.Arguments);
+                } else if (info.IsGlobalInstall) {
+                    await _commander.InstallGlobalPackageByVersionAsync(
+                            info.Name,
+                            info.Version);
+                } else {
+                    await _commander.InstallPackageByVersionAsync(
                                 info.Name,
-                                info.Version);
-                    } else {
-                        await commander.InstallPackageByVersionAsync(
-                                    info.Name,
-                                    info.Version,
-                                    info.DependencyType,
-                                    true);
-                    }
-                } finally {
-                    commander.OutputLogged -= commander_OutputLogged;
-                    commander.ErrorLogged -= commander_ErrorLogged;
-                    commander.ExceptionLogged -= commander_ExceptionLogged;
-                    commander.CommandCompleted -= commander_CommandCompleted;
+                                info.Version,
+                                info.DependencyType,
+                                true);
+                }
+            } finally {
+                _commander.OutputLogged -= commander_OutputLogged;
+                _commander.ErrorLogged -= commander_ErrorLogged;
+                _commander.ExceptionLogged -= commander_ExceptionLogged;
+                _commander.CommandCompleted -= commander_CommandCompleted;
+                lock (_lock) {
+                    _commander = null;
                 }
             }
         }
 
-        private void HandleCompletion() {
-            //  Don't think we need to do any of this.
-            //_busyControl.Finished = true;
-
-            //var exception = _task.Exception;
-            //if (null != exception) {
-            //    _withErrors = true;
-            //    WriteLines(ErrorHelper.GetExceptionDetailsText(exception), true);
-            //}
-
-            //if (_cancelled || _withErrors) {
-            //    _busyControl.Message = _cancelled
-            //        ? "npm Operation Cancelled..."
-            //        : "npm Operation Failed...";
-            //} else {
-            //    _busyControl.Message = "npm Operation Completed Successfully...";
-            //}
-
-            //_btnClose.Location = _btnCancel.Location;
-            //_btnCancel.Visible = false;
-            //_btnClose.Visible = true;
+        private void HandleCompletionSafe() {
+            UpdateStatusMessage();
+            OnPropertyChanged("IsCancellable");
         }
 
         private void commander_CommandCompleted(object sender, NpmCommandCompletedEventArgs e) {
             IsExecutingCommand = false;
             Application.Current.Dispatcher.BeginInvoke(
-                new Action(HandleCompletion));
+                new Action(HandleCompletionSafe));
         }
 
         public FlowDocument Output {
             get { return _output; }
         }
-
-//        private void WriteOutput(string output) {
-//            if (_rtf.Length == 0) {
-//                _rtf.Append(@"{\rtf1\ansicpg"
-//                    + Console.OutputEncoding.CodePage
-//                    + @"\deff0 {\fonttbl {\f0 Consolas;}}
-//{\colortbl;\red255\green255\blue255;\red255\green0\blue0;\red255\green255\blue0;}\fs16
-//");
-//            }
-
-//            if (output.Length > 0 && output[0] != '\\') {
-//                //  Apply default text color
-//                _rtf.Append(@"\cf1");
-//            }
-
-//            _rtf.Append(output.EndsWith(Environment.NewLine) ? output.Substring(0, output.Length - Environment.NewLine.Length) : output);
-//            _rtf.Append("\\line");
-//            _rtf.Append(Environment.NewLine);
-
-//            //  There surely has to be a nicer way to do this but
-//            //  AppendText() just appends plaintext, hence the use
-//            //  of the buffer, and the following...
-//            _textOutput.Rtf = _rtf.ToString();
-//            _textOutput.SelectionStart = _rtf.Length;
-//            _textOutput.ScrollToCaret();
-//        }
-
-//        private void WriteError(string error) {
-//            _withErrors = true;
-//            WriteOutput(@"\cf2" + error);
-//        }
-
-//        private void WriteWarning(string warning) {
-//            WriteOutput(@"\cf3" + warning);
-//        }
-
-//        private void WriteLine(string line, bool forceError) {
-//            if (forceError || line.StartsWith("npm ERR!")) {
-//                WriteError(line);
-//            } else if (line.StartsWith("npm WARN")) {
-//                WriteWarning(line);
-//            } else {
-//                WriteOutput(line);
-//            }
-//        }
 
         public event EventHandler OutputWritten;
 
@@ -281,15 +248,6 @@ namespace Microsoft.NodejsTools.NpmUI {
         }
 
         private string Preprocess(string source) {
-            //var buff = new StringBuilder();
-            //foreach (var ch in source) {
-            //    if (ch == '\\') {
-            //        buff.Append("\\'5c");
-            //    } else {
-            //        buff.Append(ch);
-            //    }
-            //}
-            //var result = buff.ToString();
             return source.EndsWith(Environment.NewLine) ? source.Substring(0, source.Length - Environment.NewLine.Length) : source;
         }
 
@@ -351,45 +309,63 @@ namespace Microsoft.NodejsTools.NpmUI {
             return buff.ToString();
         }
 
+        private void UpdateStatusMessage() {
+            bool                    executingCommand;
+            QueuedNpmCommandInfo    command;
+            int count;
+            lock (_lock) {
+                executingCommand = IsExecutingCommand;
+                command = _currentCommand;
+                count = _commandQueue.Count;
+            }
+
+            string status;
+
+            if (executingCommand && null != command) {
+                var commandText = GetCommandText(command);
+                if (count > 0) {
+                    status = string.Format(
+                        _withErrors ? Resources.NpmStatusExecutingQueuedErrors : Resources.NpmStatusExecutingQueued,
+                        commandText,
+                        count);
+                } else {
+                    status = string.Format(
+                        _withErrors ? Resources.NpmStatusExecutingErrors : Resources.NpmStatusExecuting,
+                        commandText);
+                }
+            } else {
+                status = _withErrors ? Resources.NpmStatusReadyWithErrors : Resources.NpmStatusReady;
+            }
+
+            StatusText = status;
+        }
+
+        private void UpdateStatusMessageSafe() {
+            Application.Current.Dispatcher.BeginInvoke(new Action(UpdateStatusMessage));
+        }
+
         private void Run() {
             int count = 0;
             // We want the thread to continue running queued commands before
             // exiting so the user can close the install window without having to wait
             // for commands to complete.
             while (!_isDisposed || count > 0) {
-                QueuedNpmCommandInfo info = null;
-                lock (_queueLock) {
+                lock (_lock) {
                     while ((_commandQueue.Count == 0 && !_isDisposed)
                         || null == _npmController
                         || IsExecutingCommand) {
-                        Monitor.Wait(_queueLock);
+                        Monitor.Wait(_lock);
                     }
 
                     if (_commandQueue.Count > 0) {
-                        info = _commandQueue.Dequeue();
+                        _currentCommand = _commandQueue.Dequeue();
                     }
                     count = _commandQueue.Count;
                 }
 
-                if (null != info) {
-                    string  status,
-                            commandText = GetCommandText(info);
-
-                    if (count > 0) {
-                        status = string.Format(
-                            _withErrors ? Resources.NpmStatusExecutingQueuedErrors : Resources.NpmStatusExecutingQueued,
-                            commandText,
-                            count);
-                    } else {
-                        status = string.Format(
-                            _withErrors ? Resources.NpmStatusExecutingErrors : Resources.NpmStatusExecuting,
-                            commandText);
-                    }
-
-                    Application.Current.Dispatcher.BeginInvoke(
-                        new Action(() => StatusText = status));
-
-                    Execute(info);
+                if (null != _currentCommand) {
+                    Execute(_currentCommand);
+                    UpdateStatusMessageSafe();
                 }
             }
         }

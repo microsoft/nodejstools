@@ -42,5 +42,12 @@ namespace Microsoft.NodejsTools.NpmUI {
         void vm_OutputWritten(object sender, EventArgs e) {
             _textBox.ScrollToEnd();
         }
+
+        private void OnClickCancel(object sender, RoutedEventArgs e) {
+            var vm = DataContext as NpmOutputControlViewModel;
+            if (null != vm) {
+                vm.Cancel();
+            }
+        }
     }
 }

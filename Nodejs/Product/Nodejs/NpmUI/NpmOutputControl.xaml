@@ -14,10 +14,19 @@
             <StackPanel DockPanel.Dock="Top"
                         Orientation="Vertical"
                         HorizontalAlignment="Stretch">
-                <TextBox HorizontalAlignment="Stretch"
-                         IsEnabled="True"
-                         IsReadOnly="True"
-                         Text="{Binding Path=StatusText}"></TextBox>
+                <DockPanel HorizontalAlignment="Stretch">
+                    <Button DockPanel.Dock="Right"
+                            Content="Cancel"
+                            HorizontalAlignment="Right"
+                            Margin="4, 0, 4, 0"
+                            IsEnabled="{Binding Path=IsCancellable}"
+                            Click="OnClickCancel"></Button>
+                    <TextBox HorizontalAlignment="Stretch"
+                             IsEnabled="True"
+                             IsReadOnly="True"
+                             Height="24"
+                             Text="{Binding Path=StatusText}"></TextBox>
+                </DockPanel>
                 <ProgressBar Name="_progress"
                              Height="4"
                              IsIndeterminate="true"

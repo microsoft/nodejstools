@@ -567,6 +567,10 @@ namespace Microsoft.NodejsTools.Project {
             manager.Owner = System.Windows.Application.Current.MainWindow;
             manager.ShowDialog();
 
+            //  This will unregister event handlers on the controller and prevent
+            //  us from leaking view models.
+            viewModel.NpmController = null;
+
             ReloadHierarchy();
         }
 
