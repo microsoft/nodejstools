@@ -435,23 +435,37 @@ namespace Microsoft.NodejsTools.NpmUI {
         }
 
         private void Install() {
-            //var type = DependencyType.Standard;
-            //var global = false;
-            //switch (SelectedDependencyTypeIndex) {
-            //    case IndexDev:
-            //        type = DependencyType.Development;
-            //        break;
+            if (IsExecuteNpmWithArgumentsMode) {
+                _executeViewModel.QueueCommand("install", RawFilterText);
+            } else if (null != _selectedPackage) {
+                var type = DependencyType.Standard;
+                var global = false;
+                switch (SelectedDependencyTypeIndex) {
+                    case IndexDev:
+                        type = DependencyType.Development;
+                        break;
 
-            //    case IndexOptional:
-            //        type = DependencyType.Optional;
-            //        break;
+                    case IndexOptional:
+                        type = DependencyType.Optional;
+                        break;
 
-            //    case IndexGlobal:
-            //        global = true;
-            //        break;
-            //}
+                    case IndexGlobal:
+                        global = true;
+                        break;
+                }
 
-            //  TODO: install code goes here
+                if (global) {
+                    _executeViewModel.QueueInstallGlobalPackage(
+                        _selectedPackage.Name,
+                        "*");
+                } else {
+                    _executeViewModel.QueueInstallPackage(
+                        _selectedPackage.Name,
+                        "*",
+                        type);
+                }
+            }
+            
         }
 
 
