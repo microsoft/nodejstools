@@ -54,7 +54,16 @@ namespace NodejsTests.Debugger {
             Action failureHandler = null
         ) {
             NodeBreakpoint breakPoint = newproc.AddBreakPoint(fileName, line, enabled, breakOn, condition);
-            breakPoint.Bind(successHandler, failureHandler);
+            var breakpointBinding = breakPoint.BindAsync().Result;
+            if (breakpointBinding != null) {
+                if (successHandler != null) {
+                    successHandler(breakpointBinding);
+                }
+            } else {
+                if (failureHandler != null) {
+                    failureHandler();
+                }
+            }
             return breakPoint;
         }
 
@@ -207,12 +216,10 @@ namespace NodejsTests.Debugger {
                             foreach (var evaluationResult in frame.Parameters.Concat(frame.Locals)) {
                                 int i = 0;
                                 var match = -1;
-                                NodeEvaluationResult matchEvaluationResult = null;
                                 if (expectedParams != null) {
                                     foreach (var expectedParam in expectedParams) {
                                         if (evaluationResult.Expression == expectedParam) {
                                             match = i;
-                                            matchEvaluationResult = evaluationResult;
                                             break;
                                         }
                                         ++i;
@@ -221,7 +228,6 @@ namespace NodejsTests.Debugger {
                                 if (match == -1 && expectedLocals != null) {
                                     foreach (var expectedLocal in expectedLocals) {
                                         if (evaluationResult.Expression == expectedLocal) {
-                                            matchEvaluationResult = evaluationResult;
                                             match = i;
                                             break;
                                         }
@@ -252,17 +258,8 @@ namespace NodejsTests.Debugger {
             string expectedException = null,
             string expectedFrame = null
         ) {
-            AutoResetEvent textExecuted = new AutoResetEvent(false);
             var frame = thread.Frames[frameIndex];
-            NodeEvaluationResult evaluationResult = null;
-            frame.ExecuteText(
-                expression,
-                (result) => {
-                    evaluationResult = result;
-                    textExecuted.Set();
-                }
-            );
-            AssertWaited(textExecuted);
+            NodeEvaluationResult evaluationResult = frame.ExecuteTextAsync(expression).Result;
             if (expectedType != null) {
                 Assert.AreEqual(expectedType, evaluationResult.TypeName);
             }
@@ -484,24 +481,20 @@ namespace NodejsTests.Debugger {
             };
 
             AutoResetEvent breakpointBound = new AutoResetEvent(false);
-            BreakpointBindingEventArgs breakpointBind = null;
             process.BreakpointBound += (sender, e) => {
                 Console.WriteLine("BreakpointBound {0} {1}", e.BreakpointBinding.FileName, e.BreakpointBinding.LineNo);
-                breakpointBind = e;
                 breakpointBound.Set();
             };
 
             AutoResetEvent breakpointUnbound = new AutoResetEvent(false);
             process.BreakpointUnbound += (sender, e) => {
                 Console.WriteLine("BreakpointUnbound");
-                breakpointBind = e;
                 breakpointUnbound.Set();
             };
 
             AutoResetEvent breakpointBindFailure = new AutoResetEvent(false);
             process.BreakpointBindFailure += (sender, e) => {
                 Console.WriteLine("BreakpointBindFailure");
-                breakpointBind = e;
                 breakpointBindFailure.Set();
             };
 
@@ -633,16 +626,16 @@ namespace NodejsTests.Debugger {
                         nodeBreakpoint = breakpoints[breakpoint];
                         foreach (var breakpointBinding in nodeBreakpoint.GetBindings()) {
                             if (step._hitCount != null) {
-                                Assert.IsTrue(breakpointBinding.SetHitCount(step._hitCount.Value));
+                                Assert.IsTrue(breakpointBinding.SetHitCountAsync(step._hitCount.Value).Result);
                             }
                             if (step._enabled != null) {
-                                Assert.IsTrue(breakpointBinding.SetEnabled(step._enabled.Value));
+                                Assert.IsTrue(breakpointBinding.SetEnabledAsync(step._enabled.Value).Result);
                             }
                             if (step._breakOn != null) {
-                                Assert.IsTrue(breakpointBinding.SetBreakOn(step._breakOn.Value));
+                                Assert.IsTrue(breakpointBinding.SetBreakOnAsync(step._breakOn.Value).Result);
                             }
                             if (step._condition != null) {
-                                Assert.IsTrue(breakpointBinding.SetCondition(step._condition));
+                                Assert.IsTrue(breakpointBinding.SetConditionAsync(step._condition).Result);
                             }
                         }
                         break;

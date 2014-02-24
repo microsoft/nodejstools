@@ -17,6 +17,7 @@ using System.Diagnostics;
 using System.IO;
 using System.Text;
 using System.Text.RegularExpressions;
+using System.Threading;
 using Microsoft.NodejsTools.Intellisense;
 using Microsoft.VisualStudio;
 using Microsoft.VisualStudioTools;
@@ -41,14 +42,26 @@ namespace Microsoft.NodejsTools.Project {
             _currentText = "";
             _refGroup = root._refGroupDispenser.AddFile(this);
             _fileId = root._currentFileCounter++;
-            if (File.Exists(Url)) { // avoid the exception if we can
-                try {
-                    GenerateReferenceFile(File.ReadAllText(Url));
-                } catch {
-                }
-            }
+            ThreadPool.QueueUserWorkItem(GenerateReferenceFileStarter);
 
             root._nodeFiles.Add(this);
+        }
+
+        private void GenerateReferenceFileStarter(object dummy) {
+            if (File.Exists(Url)) { // avoid the exception if we can
+                string text = null;
+                try {
+                    text = File.ReadAllText(Url);
+                } catch (PathTooLongException) {
+                } catch (DirectoryNotFoundException) {
+                } catch (IOException) {
+                } catch (UnauthorizedAccessException) {
+                }
+
+                if (text != null) {
+                    GenerateReferenceFile(text);
+                }
+            }
         }
 
         internal string MangledModuleFunctionName {
@@ -138,8 +151,7 @@ namespace Microsoft.NodejsTools.Project {
                             //We enable "Set as StartUp File" command only on current language code files, 
                             //the file is in project home dir and if the file is not the startup file already.
                             string startupFile = ((CommonProjectNode)ProjectMgr).GetStartupFile();
-                            if (!CommonUtils.IsSamePath(startupFile, this.Url) &&
-                                !IsNonMemberItem) {
+                            if (!CommonUtils.IsSamePath(startupFile, this.Url)) {
                                 result |= QueryStatusResult.SUPPORTED | QueryStatusResult.ENABLED;
                             }
                             return VSConstants.S_OK;

@@ -14,10 +14,11 @@
 
 using System;
 using System.Collections;
+using System.Collections.Generic;
 using System.Collections.Specialized;
 using System.Diagnostics;
-using System.IO;
 using System.Globalization;
+using System.IO;
 using System.Linq;
 using System.Net;
 using System.Net.NetworkInformation;
@@ -25,14 +26,14 @@ using System.Net.Sockets;
 using System.Runtime.InteropServices;
 using System.Text;
 using System.Threading;
+using System.Web;
 using System.Windows.Forms;
+using Microsoft.NodejsTools.Debugger;
 using Microsoft.NodejsTools.Debugger.DebugEngine;
 using Microsoft.VisualStudio;
 using Microsoft.VisualStudio.Shell;
 using Microsoft.VisualStudio.Shell.Interop;
 using Microsoft.VisualStudioTools.Project;
-using Microsoft.Win32;
-using System.Web;
 
 namespace Microsoft.NodejsTools.Project {
     class NodejsProjectLauncher : IProjectLauncher {
@@ -76,16 +77,26 @@ namespace Microsoft.NodejsTools.Project {
                 StartWithDebugger(file);
             } else {
                 var psi = new ProcessStartInfo();
-                psi.UseShellExecute = false;                
+                psi.UseShellExecute = false;
+
                 psi.FileName = nodePath;
                 psi.Arguments = GetFullArguments(file);
                 psi.WorkingDirectory = _project.GetWorkingDirectory();
+
+                NodeDebugger.FixupForRunAndWait(
+                    NodejsPackage.Instance.GeneralOptionsPage.WaitOnAbnormalExit,
+                    NodejsPackage.Instance.GeneralOptionsPage.WaitOnNormalExit,
+                    psi
+                );
 
                 string webBrowserUrl = GetFullUrl();
                 Uri uri = new Uri(webBrowserUrl);                        
 
                 psi.EnvironmentVariables["PORT"] = uri.Port.ToString();
-                
+                foreach (var nameValue in GetEnvironmentVariables()) {
+                    psi.EnvironmentVariables[nameValue.Key] = nameValue.Value;
+                }
+
                 var process = Process.Start(psi);
 
                 if (startBrowser) {
@@ -130,6 +141,12 @@ namespace Microsoft.NodejsTools.Project {
         #endregion
 
         private string GetFullUrl() {
+            bool launchBrowser;
+            if (Boolean.TryParse(_project.GetProjectProperty(NodejsConstants.StartWebBrowser), out launchBrowser)
+                && !launchBrowser) {
+                return String.Empty;
+            }
+
             var host = _project.GetProjectProperty(NodejsConstants.LaunchUrl);
 
             try {
@@ -207,6 +224,14 @@ namespace Microsoft.NodejsTools.Project {
             return p;
         }
 
+        private void AppendOption(ref VsDebugTargetInfo dbgInfo, string option, string value) {
+            if (!String.IsNullOrWhiteSpace(dbgInfo.bstrOptions)) {
+                dbgInfo.bstrOptions += ";";
+            }
+
+            dbgInfo.bstrOptions += option + "=" + HttpUtility.UrlEncode(value);
+        }
+
         /// <summary>
         /// Sets up debugger information.
         /// </summary>
@@ -219,20 +244,39 @@ namespace Microsoft.NodejsTools.Project {
             dbgInfo.bstrRemoteMachine = null;
             var nodeArgs = _project.GetProjectProperty(NodejsConstants.NodeExeArguments);
             if(!String.IsNullOrWhiteSpace(nodeArgs)) {
-                dbgInfo.bstrOptions = AD7Engine.InterpreterOptions + "=" + nodeArgs;
+                AppendOption(ref dbgInfo, AD7Engine.InterpreterOptions, nodeArgs);
             }
 
             var url = GetFullUrl();
             if (!String.IsNullOrWhiteSpace(url)) {
-                dbgInfo.bstrOptions = AD7Engine.WebBrowserUrl + "=" + HttpUtility.UrlEncode(url);
+                AppendOption(ref dbgInfo, AD7Engine.WebBrowserUrl, url);
+            }
+
+            var debuggerPort = _project.GetProjectProperty(NodejsConstants.DebuggerPort);
+            if (!String.IsNullOrWhiteSpace(debuggerPort)) {
+                AppendOption(ref dbgInfo, AD7Engine.DebuggerPort, debuggerPort);
+            }
+
+            if (NodejsPackage.Instance.GeneralOptionsPage.WaitOnAbnormalExit) {
+                AppendOption(ref dbgInfo, AD7Engine.WaitOnAbnormalExitSetting, "true");
+            }
+
+            if (NodejsPackage.Instance.GeneralOptionsPage.WaitOnNormalExit) {
+                AppendOption(ref dbgInfo, AD7Engine.WaitOnNormalExitSetting, "true");
             }
 
             dbgInfo.fSendStdoutToOutputWindow = 0;
 
             StringDictionary env = new StringDictionary();
-            Uri webUrl = new Uri(url);
-            env["PORT"] = webUrl.Port.ToString();
-            
+            if (!String.IsNullOrWhiteSpace(url)) {
+                Uri webUrl = new Uri(url);
+                env["PORT"] = webUrl.Port.ToString();
+            }
+
+            foreach (var nameValue in GetEnvironmentVariables()) {
+                env[nameValue.Key] = nameValue.Value;
+            }
+
             if (env.Count > 0) {
                 // add any inherited env vars
                 var variables = Environment.GetEnvironmentVariables();
@@ -257,6 +301,18 @@ namespace Microsoft.NodejsTools.Project {
             // Set the Node  debugger
             dbgInfo.clsidCustom = AD7Engine.DebugEngineGuid;
             dbgInfo.grfLaunch = (uint)__VSDBGLAUNCHFLAGS.DBGLAUNCH_StopDebuggingOnEnd;
+        }
+
+        private IEnumerable<KeyValuePair<string, string>> GetEnvironmentVariables() {
+            var envVars = _project.GetProjectProperty(NodejsConstants.EnvironmentVariables);
+            if (envVars != null) {
+                foreach (var envVar in envVars.Split(';')) {
+                    var nameValue = envVar.Split(new[] { '=' }, 2);
+                    if (nameValue.Length == 2) {
+                        yield return new KeyValuePair<string, string>(nameValue[0], nameValue[1]);
+                    }
+                }
+            }
         }
 
         private static int GetFreePort() {

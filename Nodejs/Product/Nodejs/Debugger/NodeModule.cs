@@ -12,34 +12,31 @@
  *
  * ***************************************************************************/
 
-using System;
 using System.Diagnostics;
 using System.IO;
 
 namespace Microsoft.NodejsTools.Debugger {
     class NodeModule {
-        private readonly int _moduleId;
         private readonly string _fileName;
-        private readonly NodeDebugger _debugger;
-        private object _document;
+        private readonly string _javaScriptFileName;
+        private readonly int _moduleId;
+        private readonly string _source;
 
-        public NodeModule(NodeDebugger debugger, int moduleId, string fileName) {
+        public NodeModule(int moduleId, string fileName, string javaScriptFileName, string source = null) {
             Debug.Assert(fileName != null);
 
-            _debugger = debugger;
             _moduleId = moduleId;
             _fileName = fileName;
+            _javaScriptFileName = javaScriptFileName;
+            _source = source;
         }
 
         public int ModuleId {
-            get {
-                return _moduleId;
-            }
+            get { return _moduleId; }
         }
 
         public string Name {
             get {
-                
                 if (_fileName.IndexOfAny(Path.GetInvalidPathChars()) == -1) {
                     return Path.GetFileName(_fileName);
                 }
@@ -48,37 +45,24 @@ namespace Microsoft.NodejsTools.Debugger {
         }
 
         public string JavaScriptFileName {
-            get {
-                return _fileName;
-            }
+            get { return _javaScriptFileName; }
         }
 
         public string FileName {
-            get {
-                if (_debugger != null) {
-                    var mapping = _debugger.MapToOriginal(_fileName, 0);
-                    if (mapping != null) {
-                        return Path.Combine(Path.GetDirectoryName(_fileName), Path.GetFileName(mapping.FileName));
-                    }
-                }
-                return _fileName;
-            }
+            get { return _fileName; }
+        }
+
+        public string Source {
+            get { return _source; }
         }
 
         public bool BuiltIn {
             get {
                 // No directory separator characters implies builtin
-                return (_fileName.IndexOfAny(new [] { Path.DirectorySeparatorChar, Path.AltDirectorySeparatorChar }) == -1);
+                return (_fileName.IndexOfAny(new[] { Path.DirectorySeparatorChar, Path.AltDirectorySeparatorChar }) == -1);
             }
         }
 
-        public object Document {
-            get {
-                return _document;
-            }
-            set {
-                _document = value;
-            }
-        }
+        public object Document { get; set; }
     }
 }

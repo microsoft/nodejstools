@@ -14,12 +14,12 @@
 
 using System.Collections.Generic;
 using System.Web.Script.Serialization;
-using Microsoft.NodejsTools.Debugger.Serialization;
+using Newtonsoft.Json.Linq;
 
 namespace NodejsTests {
     static class SerializationTestData {
         /// <summary>
-        /// Gets a json object produced by <see cref="JavaScriptSerializer" />.
+        /// Gets a json object.
         /// </summary>
         /// <returns>JSON object.</returns>
         public static object GetDeserializedJsonObject() {
@@ -29,7 +29,7 @@ namespace NodejsTests {
         }
 
         /// <summary>
-        /// Gets a json array produced by <see cref="JavaScriptSerializer" />.
+        /// Gets a json array.
         /// </summary>
         /// <returns>JSON array.</returns>
         public static object GetDeserializedPrimitiveJsonArray() {
@@ -39,7 +39,7 @@ namespace NodejsTests {
         }
 
         /// <summary>
-        /// Gets a json array produced by <see cref="JavaScriptSerializer" />.
+        /// Gets a json array.
         /// </summary>
         /// <returns>JSON array.</returns>
         public static object GetDeserializedComplexJsonArray() {
@@ -49,79 +49,106 @@ namespace NodejsTests {
         }
 
         /// <summary>
-        /// Gets a json backtrace response produced by <see cref="JavaScriptSerializer" />.
+        /// Gets a json backtrace response.
         /// </summary>
         /// <returns>JSON object.</returns>
-        public static JsonValue GetBacktraceResponse() {
+        public static JObject GetBacktraceResponse() {
             string json = Resources.NodeBacktraceResponse;
             return DeserializeJsonValue(json);
         }
 
         /// <summary>
-        /// Gets a json backtrace object produced by <see cref="JavaScriptSerializer" />.
+        /// Gets a json backtrace object.
         /// </summary>
         /// <returns>JSON object.</returns>
-        public static JsonValue GetBacktraceJsonObject() {
+        public static JObject GetBacktraceJsonObject() {
             string json = Resources.NodeBacktraceVariableObject;
             return DeserializeJsonValue(json);
         }
 
         /// <summary>
-        /// Gets a json backtrace object without name produced by <see cref="JavaScriptSerializer" />.
+        /// Gets a json backtrace object without name.
         /// </summary>
         /// <returns>JSON object.</returns>
-        public static JsonValue GetBacktraceJsonObjectWithNullName() {
+        public static JObject GetBacktraceJsonObjectWithNullName() {
             string json = Resources.NodeBacktraceVariableObjectWithoutName;
             return DeserializeJsonValue(json);
         }
 
         /// <summary>
-        /// Gets a json evaluation response produced by <see cref="JavaScriptSerializer" />.
+        /// Gets a json evaluation response.
         /// </summary>
         /// <returns>JSON object.</returns>
-        public static JsonValue GetEvaluateResponse() {
+        public static JObject GetEvaluateResponse() {
             string json = Resources.NodeEvaluationResponse;
             return DeserializeJsonValue(json);
         }
 
         /// <summary>
-        /// Gets a json evaluation object produced by <see cref="JavaScriptSerializer" />.
+        /// Gets a json evaluation object.
         /// </summary>
         /// <returns>JSON object.</returns>
-        public static JsonValue GetEvaluationJsonObject() {
+        public static JObject GetEvaluationJsonObject() {
             string json = Resources.NodeEvaluationVariableObject;
             return DeserializeJsonValue(json);
         }
 
         /// <summary>
-        /// Gets a json lookup response produced by <see cref="JavaScriptSerializer" />.
+        /// Gets a json lookup response.
         /// </summary>
         /// <returns>JSON object.</returns>
-        public static JsonValue GetLookupResponse() {
+        public static JObject GetLookupResponse() {
             string json = Resources.NodeLookupResponse;
+            return DeserializeJsonValue(json);
+        }
+        
+        /// <summary>
+        /// Gets a json lookup response with primitive object.
+        /// </summary>
+        /// <returns>JSON object.</returns>
+        public static JObject GetLookupResponseWithPrimitiveObject() {
+            string json = Resources.NodeLookupResponseWithPrimitiveObject;
             return DeserializeJsonValue(json);
         }
 
         /// <summary>
-        /// Gets a json lookup object produced by <see cref="JavaScriptSerializer" />.
+        /// Gets a json lookup object.
         /// </summary>
         /// <returns>JSON object.</returns>
-        public static JsonValue GetLookupJsonProperty() {
+        public static JObject GetLookupJsonProperty() {
             string json = Resources.NodeLookupVariableObject;
             return DeserializeJsonValue(json);
         }
 
         /// <summary>
-        /// Gets a json lookup references produced by <see cref="JavaScriptSerializer" />.
+        /// Gets a json scripts response.
         /// </summary>
         /// <returns>JSON object.</returns>
-        public static Dictionary<int, JsonValue> GetLookupJsonReferences() {
+        public static JObject GetScriptsResponse() {
+            string json = Resources.NodeScriptsResponse;
+            return DeserializeJsonValue(json);
+        }
+
+        /// <summary>
+        /// Gets a json set variable value response.
+        /// </summary>
+        /// <returns>JSON object.</returns>
+        public static JObject GetSetVariableValueResponse() {
+            string json = Resources.NodeSetVariableValueResponse;
+            return DeserializeJsonValue(json);
+        }
+
+        /// <summary>
+        /// Gets a json lookup references.
+        /// </summary>
+        /// <returns>JSON object.</returns>
+        public static Dictionary<int, JToken> GetLookupJsonReferences() {
             string json = Resources.NodeLookupReferencesArray;
-            JsonArray refs = DeserializeJsonArray(json);
-            var references = new Dictionary<int, JsonValue>(refs.Count);
+            JArray refs = DeserializeJsonArray(json);
+            var references = new Dictionary<int, JToken>(refs.Count);
             for (int i = 0; i < refs.Count; i++) {
-                JsonValue reference = refs[i];
-                var id = reference.GetValue<int>("handle");
+                JToken reference = refs[i];
+                var id = (int)reference["handle"];
                 references.Add(id, reference);
             }
 
@@ -129,24 +156,20 @@ namespace NodejsTests {
         }
 
         /// <summary>
-        /// Gets a json lookup object prototype produced by <see cref="JavaScriptSerializer" />.
+        /// Gets a json lookup object prototype.
         /// </summary>
         /// <returns>JSON object.</returns>
-        public static JsonValue GetLookupJsonPrototype() {
+        public static JObject GetLookupJsonPrototype() {
             string json = Resources.NodeLookupPrototypeObject;
             return DeserializeJsonValue(json);
         }
 
-        private static JsonValue DeserializeJsonValue(string json) {
-            var serializer = new JavaScriptSerializer();
-            var value = (Dictionary<string, object>)serializer.DeserializeObject(json);
-            return new JsonValue(value);
+        private static JObject DeserializeJsonValue(string json) {
+            return JObject.Parse(json);
         }
 
-        private static JsonArray DeserializeJsonArray(string json) {
-            var serializer = new JavaScriptSerializer();
-            var array = (object[])serializer.DeserializeObject(json);
-            return new JsonArray(array);
+        private static JArray DeserializeJsonArray(string json) {
+            return JArray.Parse(json);
         }
     }
 }

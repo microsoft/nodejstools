@@ -67,7 +67,6 @@ namespace Microsoft.NodejsTools {
     // Keep declared exceptions in sync with those given default values in NodeDebugger.GetDefaultExceptionTreatments()
     [ProvideDebugException(AD7Engine.DebugEngineId, "Node.js Exceptions", State = enum_EXCEPTION_STATE.EXCEPTION_STOP_ALL)]
     [ProvideDebugException(AD7Engine.DebugEngineId, "Node.js Exceptions", "Error", State = enum_EXCEPTION_STATE.EXCEPTION_STOP_ALL)]
-    [ProvideDebugException(AD7Engine.DebugEngineId, "Node.js Exceptions", "Error", "Error(ENOENT)", State = enum_EXCEPTION_STATE.EXCEPTION_NONE)]
     [ProvideDebugException(AD7Engine.DebugEngineId, "Node.js Exceptions", "Error", "Error(EACCES)", State = enum_EXCEPTION_STATE.EXCEPTION_STOP_ALL)]
     [ProvideDebugException(AD7Engine.DebugEngineId, "Node.js Exceptions", "Error", "Error(EADDRINUSE)", State = enum_EXCEPTION_STATE.EXCEPTION_STOP_ALL)]
     [ProvideDebugException(AD7Engine.DebugEngineId, "Node.js Exceptions", "Error", "Error(EADDRNOTAVAIL)", State = enum_EXCEPTION_STATE.EXCEPTION_STOP_ALL)]
@@ -110,7 +109,7 @@ namespace Microsoft.NodejsTools {
     [ProvideDebugException(AD7Engine.DebugEngineId, "Node.js Exceptions", "Error", "Error(ENOBUFS)", State = enum_EXCEPTION_STATE.EXCEPTION_STOP_ALL)]
     [ProvideDebugException(AD7Engine.DebugEngineId, "Node.js Exceptions", "Error", "Error(ENODATA)", State = enum_EXCEPTION_STATE.EXCEPTION_STOP_ALL)]
     [ProvideDebugException(AD7Engine.DebugEngineId, "Node.js Exceptions", "Error", "Error(ENODEV)", State = enum_EXCEPTION_STATE.EXCEPTION_STOP_ALL)]
-    [ProvideDebugException(AD7Engine.DebugEngineId, "Node.js Exceptions", "Error", "Error(ENOENT)", State = enum_EXCEPTION_STATE.EXCEPTION_STOP_ALL)]
+    [ProvideDebugException(AD7Engine.DebugEngineId, "Node.js Exceptions", "Error", "Error(ENOENT)", State = enum_EXCEPTION_STATE.EXCEPTION_NONE)]
     [ProvideDebugException(AD7Engine.DebugEngineId, "Node.js Exceptions", "Error", "Error(ENOEXEC)", State = enum_EXCEPTION_STATE.EXCEPTION_STOP_ALL)]
     [ProvideDebugException(AD7Engine.DebugEngineId, "Node.js Exceptions", "Error", "Error(ENOLINK)", State = enum_EXCEPTION_STATE.EXCEPTION_STOP_ALL)]
     [ProvideDebugException(AD7Engine.DebugEngineId, "Node.js Exceptions", "Error", "Error(ENOLCK)", State = enum_EXCEPTION_STATE.EXCEPTION_STOP_ALL)]
@@ -142,6 +141,7 @@ namespace Microsoft.NodejsTools {
     [ProvideDebugException(AD7Engine.DebugEngineId, "Node.js Exceptions", "Error", "Error(ETIMEDOUT)", State = enum_EXCEPTION_STATE.EXCEPTION_STOP_ALL)]
     [ProvideDebugException(AD7Engine.DebugEngineId, "Node.js Exceptions", "Error", "Error(ETXTBSY)", State = enum_EXCEPTION_STATE.EXCEPTION_STOP_ALL)]
     [ProvideDebugException(AD7Engine.DebugEngineId, "Node.js Exceptions", "Error", "Error(EXDEV)", State = enum_EXCEPTION_STATE.EXCEPTION_STOP_ALL)]
+    [ProvideDebugException(AD7Engine.DebugEngineId, "Node.js Exceptions", "Error", "Error(MODULE_NOT_FOUND)", State = enum_EXCEPTION_STATE.EXCEPTION_NONE)]
     [ProvideDebugException(AD7Engine.DebugEngineId, "Node.js Exceptions", "Error", "Error(SIGHUP)", State = enum_EXCEPTION_STATE.EXCEPTION_STOP_ALL)]
     [ProvideDebugException(AD7Engine.DebugEngineId, "Node.js Exceptions", "Error", "Error(SIGINT)", State = enum_EXCEPTION_STATE.EXCEPTION_STOP_ALL)]
     [ProvideDebugException(AD7Engine.DebugEngineId, "Node.js Exceptions", "Error", "Error(SIGILL)", State = enum_EXCEPTION_STATE.EXCEPTION_STOP_ALL)]
@@ -167,6 +167,9 @@ namespace Microsoft.NodejsTools {
     [ProvideLanguageTemplates("{349C5851-65DF-11DA-9384-00065B846F21}", NodejsConstants.Nodejs, Guids.NodejsPackageString, "Web", "Node.js Project Templates", "{" + Guids.NodejsBaseProjectFactoryString + "}", ".js", NodejsConstants.Nodejs, "{" + Guids.NodejsBaseProjectFactoryString + "}")]
     [ProvideTextEditorAutomation(NodejsConstants.Nodejs, 106, 102, ProfileMigrationType.PassThrough)]
     [ProvideLanguageService(typeof(JadeLanguageInfo), "Jade", 3041, RequestStockColors = true, ShowSmartIndent = false, ShowCompletion = false, DefaultToInsertSpaces = true, HideAdvancedMembersByDefault = false, EnableAdvancedMembersOption = false, ShowDropDownOptions = false)]
+    [ProvideLanguageEditorOptionPage(typeof(NodejsFormattingSpacingOptionsPage), NodejsConstants.Nodejs, "Formatting", "Spacing", "3042")]
+    [ProvideLanguageEditorOptionPage(typeof(NodejsFormattingBracesOptionsPage), NodejsConstants.Nodejs, "Formatting", "Braces", "3043")]
+    [ProvideLanguageEditorOptionPage(typeof(NodejsFormattingGeneralOptionsPage), NodejsConstants.Nodejs, "Formatting", "General", "3044")]
     internal sealed class NodejsPackage : CommonPackage {
         internal const string NodeExpressionEvaluatorGuid = "{F16F2A71-1C45-4BAB-BECE-09D28CFDE3E6}";
         private IContentType _contentType;
@@ -211,6 +214,24 @@ namespace Microsoft.NodejsTools {
             }
         }
 
+        public NodejsFormattingSpacingOptionsPage FormattingSpacingOptionsPage {
+            get {
+                return (NodejsFormattingSpacingOptionsPage)GetDialogPage(typeof(NodejsFormattingSpacingOptionsPage));
+            }
+        }
+
+        public NodejsFormattingBracesOptionsPage FormattingBracesOptionsPage {
+            get {
+                return (NodejsFormattingBracesOptionsPage)GetDialogPage(typeof(NodejsFormattingBracesOptionsPage));
+            }
+        }
+
+        public NodejsFormattingGeneralOptionsPage FormattingGeneralOptionsPage {
+            get {
+                return (NodejsFormattingGeneralOptionsPage)GetDialogPage(typeof(NodejsFormattingGeneralOptionsPage));
+            }
+        }
+        
         public EnvDTE.DTE DTE {
             get {
                 return (EnvDTE.DTE)GetService(typeof(EnvDTE.DTE));

@@ -30,6 +30,8 @@
     <SccLocalPath>SAK</SccLocalPath>
     <SccAuxPath>SAK</SccAuxPath>
     <SccProvider>SAK</SccProvider>
+    <SolutionDir Condition="$(SolutionDir) == '' Or $(SolutionDir) == '*Undefined*'">..\..\</SolutionDir>
+    <RestorePackages>true</RestorePackages>
   </PropertyGroup>
   <PropertyGroup>
     <DelaySign>false</DelaySign>
@@ -78,9 +80,19 @@
       <Culture>1033</Culture>
       <OutputSubPath>Node.js</OutputSubPath>
     </ZipProject>
+    <MultiProjectZipProject>
+      <Language>JavaScript</Language>
+      <Culture>1033</Culture>
+      <OutputSubPath>Node.js</OutputSubPath>
+    </MultiProjectZipProject>
     <ZipItem>
       <Language>JavaScript</Language>
     </ZipItem>
+    <VSTemplate>
+      <Language>JavaScript</Language>
+      <Culture>1033</Culture>
+      <OutputSubPath>Node.js</OutputSubPath>
+    </VSTemplate>
   </ItemDefinitionGroup>
   <ItemGroup>
     <Reference Include="Microsoft.Build, Version=$(MicrosoftBuildAssemblyVersion), Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a" />
@@ -127,6 +139,9 @@
       <SpecificVersion>False</SpecificVersion>
       <HintPath>$(DevEnvDir)PrivateAssemblies\Microsoft.Windows.Design.Host.dll</HintPath>
     </Reference>
+    <Reference Include="Newtonsoft.Json, Version=6.0.0.0, Culture=neutral, PublicKeyToken=30ad4fe6b2a6aeed, processorArchitecture=MSIL">
+      <HintPath>..\..\packages\Newtonsoft.Json.6.0.1\lib\net45\Newtonsoft.Json.dll</HintPath>
+    </Reference>
     <Reference Include="PresentationCore" />
     <Reference Include="PresentationFramework" />
     <Reference Include="System" />
@@ -142,7 +157,7 @@
     <Reference Include="System.Xaml" />
     <Reference Include="System.Xml" />
     <Reference Include="VSLangProj, Version=7.0.3300.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a">
-      <EmbedInteropTypes>True</EmbedInteropTypes>
+      <EmbedInteropTypes>False</EmbedInteropTypes>
     </Reference>
     <Reference Include="VSLangProj2, Version=7.0.5000.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a">
       <EmbedInteropTypes>True</EmbedInteropTypes>
@@ -241,25 +256,101 @@
       <AutoGen>True</AutoGen>
       <DesignTime>True</DesignTime>
       <DependentUpon>Resources.resx</DependentUpon>
+	</Compile>
+    <Compile Include="Debugger\BreakOn.cs" />
+    <Compile Include="Debugger\BreakOnKind.cs" />
+    <Compile Include="Debugger\Commands\SetVariableValueCommand.cs" />
+    <Compile Include="Debugger\Communication\ITcpClient.cs" />
+    <Compile Include="Debugger\Communication\ITcpClientFactory.cs" />
+    <Compile Include="Debugger\Communication\TcpClientFactory.cs" />
+    <Compile Include="Debugger\Communication\TcpClientWrapper.cs" />
+    <Compile Include="Debugger\ExceptionHitTreatment.cs" />
+    <Compile Include="Debugger\ExceptionHandler.cs" />
+    <Compile Include="Debugger\JavaScriptSourceMapInfo.cs" />
+    <Compile Include="Debugger\Serialization\NodeSetValueVariable.cs" />
+    <Compile Include="Debugger\SourceMapper.cs" />
+    <Compile Include="Debugger\SteppingKind.cs" />
+    <Compile Include="Formatting\AddNamedItemFlags.cs" />
+    <Compile Include="Formatting\ArrayHelper.cs" />
+    <Compile Include="Formatting\ByteOrderMark.cs" />
+    <Compile Include="Formatting\FormatCodeOptions.cs" />
+    <Compile Include="Formatting\JavaScriptFormattingService.cs" />
+    <Compile Include="Formatting\GetItemInfoFlags.cs" />
+    <Compile Include="Formatting\IActiveScript.cs" />
+    <Compile Include="Formatting\IActiveScriptError.cs" />
+    <Compile Include="Formatting\IActiveScriptParse.cs" />
+    <Compile Include="Formatting\IActiveScriptSite.cs" />
+    <Compile Include="Formatting\ParseScriptTextFlags.cs" />
+    <Compile Include="Formatting\ScriptState.cs" />
+    <Compile Include="Formatting\ScriptThreadState.cs" />
+    <Compile Include="Formatting\TextEdit.cs" />
+    <Compile Include="Formatting\TypeScriptLanguageService.cs" />
+    <Compile Include="Formatting\TypeScriptServiceHost.cs" />
+    <Compile Include="Formatting\TypeScriptSnapshot.cs" />
+    <Compile Include="Options\NodejsFormattingBracesOptionsPage.cs">
+      <SubType>Component</SubType>
+    </Compile>
+    <Compile Include="Options\NodejsFormattingSpacingOptionsPage.cs">
+      <SubType>Component</SubType>
+    </Compile>
+    <Compile Include="Options\NodejsFormattingGeneralOptionsPage.cs">
+      <SubType>Component</SubType>
+    </Compile>
+    <Compile Include="Options\NodejsFormattingBracesOptionsControl.cs">
+      <SubType>UserControl</SubType>
+    </Compile>
+    <Compile Include="Options\NodejsFormattingBracesOptionsControl.Designer.cs">
+      <DependentUpon>NodejsFormattingBracesOptionsControl.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Options\NodejsFormattingGeneralOptionsControl.cs">
+      <SubType>UserControl</SubType>
+    </Compile>
+    <Compile Include="Options\NodejsFormattingGeneralOptionsControl.Designer.cs">
+      <DependentUpon>NodejsFormattingGeneralOptionsControl.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Options\NodejsFormattingSpacingOptionsControl.cs">
+      <SubType>UserControl</SubType>
+    </Compile>
+    <Compile Include="Options\NodejsFormattingSpacingOptionsControl.Designer.cs">
+      <DependentUpon>NodejsFormattingSpacingOptionsControl.cs</DependentUpon>
     </Compile>
     <Compile Include="TaggerProviderMetadata.cs" />
     <Compile Include="CustomTrackingSpan.cs" />
-    <Compile Include="Debugger\INodeConnection.cs" />
+    <Compile Include="Debugger\Communication\BreakpointEventArgs.cs" />
+    <Compile Include="Debugger\Communication\CompileScriptEventArgs.cs" />
+    <Compile Include="Debugger\Communication\ExceptionEventArgs.cs" />
+    <Compile Include="Debugger\Communication\IDebuggerClient.cs" />
+    <Compile Include="Debugger\Communication\IDebuggerConnection.cs" />
+    <Compile Include="Debugger\Communication\MessageEventArgs.cs" />
+    <Compile Include="Debugger\Communication\DebuggerClient.cs" />
+    <Compile Include="Debugger\Communication\DebuggerConnection.cs" />
+    <Compile Include="Debugger\Commands\BacktraceCommand.cs" />
+    <Compile Include="Debugger\Commands\ChangeBreakpointCommand.cs" />
+    <Compile Include="Debugger\Commands\ClearBreakpointCommand.cs" />
+    <Compile Include="Debugger\Commands\ContinueCommand.cs" />
+    <Compile Include="Debugger\Commands\DisconnectCommand.cs" />
+    <Compile Include="Debugger\Commands\EvaluateCommand.cs" />
+    <Compile Include="Debugger\Events\BreakpointEvent.cs" />
+    <Compile Include="Debugger\Events\CompileScriptEvent.cs" />
+    <Compile Include="Debugger\Events\ExceptionEvent.cs" />
+    <Compile Include="Debugger\Events\IDebuggerEvent.cs" />
+    <Compile Include="Debugger\Commands\ListBreakpointsCommand.cs" />
+    <Compile Include="Debugger\Commands\LookupCommand.cs" />
+    <Compile Include="Debugger\Commands\DebuggerCommand.cs" />
+    <Compile Include="Debugger\Commands\DebuggerCommandException.cs" />
+    <Compile Include="Debugger\Commands\ScriptsCommand.cs" />
+    <Compile Include="Debugger\Commands\SetBreakpointCommand.cs" />
+    <Compile Include="Debugger\Commands\SetExceptionBreakCommand.cs" />
+    <Compile Include="Debugger\Commands\SuspendCommand.cs" />
     <Compile Include="Debugger\NodeEventEventArgs.cs" />
-    <Compile Include="Debugger\NodeConnection.cs" />
     <Compile Include="Debugger\NodeExpressionType.cs" />
-    <Compile Include="Debugger\ResponseHandler.cs" />
-    <Compile Include="Debugger\Serialization\INodeEvaluationResultFactory.cs" />
-    <Compile Include="Debugger\Serialization\INodeResponseHandler.cs" />
-    <Compile Include="Debugger\Serialization\JsonArray.cs" />
-    <Compile Include="Debugger\Serialization\JsonValue.cs" />
+    <Compile Include="Debugger\Serialization\IEvaluationResultFactory.cs" />
     <Compile Include="Debugger\Serialization\NaturalSortComparer.cs" />
     <Compile Include="Debugger\Serialization\NodeBacktraceVariable.cs" />
     <Compile Include="Debugger\Serialization\NodeEvaluationVariable.cs" />
     <Compile Include="Debugger\Serialization\INodeVariable.cs" />
-    <Compile Include="Debugger\Serialization\NodeEvaluationResultFactory.cs" />
+    <Compile Include="Debugger\Serialization\EvaluationResultFactory.cs" />
     <Compile Include="Debugger\Serialization\NodeLookupVariable.cs" />
-    <Compile Include="Debugger\Serialization\NodeResponseHandler.cs" />
     <Compile Include="Debugger\Serialization\NodePropertyAttributes.cs" />
     <Compile Include="Debugger\Serialization\NodePropertyType.cs" />
     <Compile Include="Debugger\Serialization\NodePrototypeVariable.cs" />
@@ -567,6 +658,15 @@
     <EmbeddedResource Include="NpmUI\PackageSourcesPane.resx">
       <DependentUpon>PackageSourcesPane.cs</DependentUpon>
     </EmbeddedResource>
+    <EmbeddedResource Include="Options\NodejsFormattingBracesOptionsControl.resx">
+      <DependentUpon>NodejsFormattingBracesOptionsControl.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Options\NodejsFormattingGeneralOptionsControl.resx">
+      <DependentUpon>NodejsFormattingGeneralOptionsControl.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Options\NodejsFormattingSpacingOptionsControl.resx">
+      <DependentUpon>NodejsFormattingSpacingOptionsControl.cs</DependentUpon>
+    </EmbeddedResource>
     <EmbeddedResource Include="Options\NodejsGeneralOptionsControl.resx">
       <DependentUpon>NodejsGeneralOptionsControl.cs</DependentUpon>
     </EmbeddedResource>
@@ -615,6 +715,11 @@
     </Content>
     <Content Include="FileTemplates\NewItem\UnitTest.js">
       <IncludeInVSIX>true</IncludeInVSIX>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Formatting\typescriptServices.js">
+      <IncludeInVSIX>true</IncludeInVSIX>
+      <VSIXSubpath>.</VSIXSubpath>
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
     <Content Include="NodejsProjectBig.ico">
@@ -699,6 +804,34 @@
     <TypeScriptProject Include="ProjectTemplates\TypeScriptFromExistingCode\FromExistingCode.vstemplate">
       <SubType>Designer</SubType>
     </TypeScriptProject>
+    <None Include="ProjectTemplates\AzureNodejsWorker\project.root" />
+    <MultiProjectZipProject Include="ProjectTemplates\AzureNodejsWorker\Worker\Worker.njsproj">
+      <SubType>Designer</SubType>
+    </MultiProjectZipProject>
+    <MultiProjectZipProject Include="ProjectTemplates\AzureNodejsWorker\AzureNodejsWorker.vstemplate">
+      <SubType>Designer</SubType>
+    </MultiProjectZipProject>
+    <MultiProjectZipProject Include="ProjectTemplates\AzureNodejsWorker\Preview.png" />
+    <MultiProjectZipProject Include="ProjectTemplates\AzureNodejsWorker\Worker\server.js" />
+    <MultiProjectZipProject Include="ProjectTemplates\AzureNodejsWorker\Worker\startup.js" />
+    <MultiProjectZipProject Include="ProjectTemplates\AzureNodejsWorker\Cloud\Cloud.vstemplate">
+      <SubType>Designer</SubType>
+    </MultiProjectZipProject>
+    <MultiProjectZipProject Include="ProjectTemplates\AzureNodejsWorker\Worker\Worker.vstemplate">
+      <SubType>Designer</SubType>
+    </MultiProjectZipProject>
+    <MultiProjectZipProject Include="ProjectTemplates\AzureNodejsWorker\Worker\download.ps1" />
+    <MultiProjectZipProject Include="ProjectTemplates\AzureNodejsWorker\Worker\node.cmd" />
+    <MultiProjectZipProject Include="ProjectTemplates\AzureNodejsWorker\Worker\package.json" />
+    <MultiProjectZipProject Include="ProjectTemplates\AzureNodejsWorker\Worker\README.md" />
+    <MultiProjectZipProject Include="ProjectTemplates\AzureNodejsWorker\Worker\setup_worker.cmd" />
+    <MultiProjectZipProject Include="ProjectTemplates\AzureNodejsWorker\Cloud\diagnostics.wadcfg" />
+    <MultiProjectZipProject Include="ProjectTemplates\AzureNodejsWorker\Cloud\ServiceConfiguration.Cloud.cscfg" />
+    <MultiProjectZipProject Include="ProjectTemplates\AzureNodejsWorker\Cloud\ServiceConfiguration.Local.cscfg" />
+    <MultiProjectZipProject Include="ProjectTemplates\AzureNodejsWorker\Cloud\ServiceDefinition.csdef" />
+    <MultiProjectZipProject Include="ProjectTemplates\AzureNodejsWorker\Cloud\Cloud.ccproj">
+      <SubType>Designer</SubType>
+    </MultiProjectZipProject>
     <Content Include="VSTemplateStore.pkgdef">
       <IncludeInVSIX>true</IncludeInVSIX>
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
@@ -829,6 +962,7 @@
     <ZipProject Include="ProjectTemplates\AddWebSiteAzureExpressApp\index.jade" />
     <ZipProject Include="ProjectTemplates\AddWebSiteAzureExpressApp\layout.jade" />
     <ZipProject Include="ProjectTemplates\AddWebSiteAzureExpressApp\style.styl" />
+    <None Include="packages.config" />
     <TypeScriptProject Include="ProjectTemplates\TypeScriptExpressApp\ExpressApp.njsproj">
       <SubType>Designer</SubType>
     </TypeScriptProject>
@@ -888,6 +1022,34 @@
     <TypeScriptProject Include="ProjectTemplates\TypeScriptAzureExpressApp\Web.cloud.config" />
     <TypeScriptProject Include="ProjectTemplates\TypeScriptAzureExpressApp\Web.config" />
     <TypeScriptProject Include="ProjectTemplates\TypeScriptAzureExpressApp\iisnode.yml" />
+    <TypeScriptMultiProjectZipProject Include="ProjectTemplates\TypeScriptAzureNodejsWorker\AzureNodejsWorker.vstemplate">
+      <SubType>Designer</SubType>
+    </TypeScriptMultiProjectZipProject>
+    <TypeScriptMultiProjectZipProject Include="ProjectTemplates\TypeScriptAzureNodejsWorker\Cloud\Cloud.vstemplate">
+      <SubType>Designer</SubType>
+    </TypeScriptMultiProjectZipProject>
+    <TypeScriptMultiProjectZipProject Include="ProjectTemplates\TypeScriptAzureNodejsWorker\Preview.png" />
+    <TypeScriptMultiProjectZipProject Include="ProjectTemplates\TypeScriptAzureNodejsWorker\Worker\server.ts" />
+    <TypeScriptMultiProjectZipProject Include="ProjectTemplates\TypeScriptAzureNodejsWorker\Worker\startup.ts" />
+    <TypeScriptMultiProjectZipProject Include="ProjectTemplates\TypeScriptAzureNodejsWorker\Worker\Worker.njsproj">
+      <SubType>Designer</SubType>
+    </TypeScriptMultiProjectZipProject>
+    <TypeScriptMultiProjectZipProject Include="ProjectTemplates\TypeScriptAzureNodejsWorker\Worker\Worker.vstemplate">
+      <SubType>Designer</SubType>
+    </TypeScriptMultiProjectZipProject>
+    <TypeScriptMultiProjectZipProject Include="ProjectTemplates\TypeScriptAzureNodejsWorker\Cloud\Cloud.ccproj">
+      <SubType>Designer</SubType>
+    </TypeScriptMultiProjectZipProject>
+    <TypeScriptMultiProjectZipProject Include="ProjectTemplates\TypeScriptAzureNodejsWorker\Cloud\diagnostics.wadcfg" />
+    <TypeScriptMultiProjectZipProject Include="ProjectTemplates\TypeScriptAzureNodejsWorker\Cloud\ServiceConfiguration.Cloud.cscfg" />
+    <TypeScriptMultiProjectZipProject Include="ProjectTemplates\TypeScriptAzureNodejsWorker\Cloud\ServiceConfiguration.Local.cscfg" />
+    <TypeScriptMultiProjectZipProject Include="ProjectTemplates\TypeScriptAzureNodejsWorker\Cloud\ServiceDefinition.csdef" />
+    <None Include="ProjectTemplates\TypeScriptAzureNodejsWorker\project.root" />
+    <TypeScriptMultiProjectZipProject Include="ProjectTemplates\TypeScriptAzureNodejsWorker\Worker\download.ps1" />
+    <TypeScriptMultiProjectZipProject Include="ProjectTemplates\TypeScriptAzureNodejsWorker\Worker\node.cmd" />
+    <TypeScriptMultiProjectZipProject Include="ProjectTemplates\TypeScriptAzureNodejsWorker\Worker\package.json" />
+    <TypeScriptMultiProjectZipProject Include="ProjectTemplates\TypeScriptAzureNodejsWorker\Worker\README.md" />
+    <TypeScriptMultiProjectZipProject Include="ProjectTemplates\TypeScriptAzureNodejsWorker\Worker\setup_worker.cmd" />
     <None Include="source.extension.vsixmanifest">
       <SubType>Designer</SubType>
     </None>
@@ -978,6 +1140,13 @@
   </PropertyGroup>
   <Import Project="$(BuildRoot)\Common\Product\SharedProject\SharedProject.proj" />
   <Import Project="..\ProjectAfter.settings" />
+  <Import Project="$(SolutionDir)\.nuget\NuGet.targets" Condition="Exists('$(SolutionDir)\.nuget\NuGet.targets')" />
+  <Target Name="EnsureNuGetPackageBuildImports" BeforeTargets="PrepareForBuild">
+    <PropertyGroup>
+      <ErrorText>This project references NuGet package(s) that are missing on this computer. Enable NuGet Package Restore to download them.  For more information, see http://go.microsoft.com/fwlink/?LinkID=322105. The missing file is {0}.</ErrorText>
+    </PropertyGroup>
+    <Error Condition="!Exists('$(SolutionDir)\.nuget\NuGet.targets')" Text="$([System.String]::Format('$(ErrorText)', '$(SolutionDir)\.nuget\NuGet.targets'))" />
+  </Target>
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
        Other similar extension points exist, see Microsoft.Common.targets.
   <Target Name="BeforeBuild">
@@ -985,13 +1154,18 @@
   <Target Name="AfterBuild">
   </Target>
   -->
-  <Target Name="TransformTypeScriptProjects" BeforeTargets="MainResourcesGeneration">
+  <Target Name="TransformTypeScriptProjects" BeforeTargets="MainResourcesGeneration;TransformMultiProjectZipProject">
     <ItemGroup>
       <ZipProject Include="@(TypeScriptProject)">
         <Language>TypeScript</Language>
         <Culture>1033</Culture>
         <OutputSubPath>Node.js</OutputSubPath>
       </ZipProject>
+      <MultiProjectZipProject Include="@(TypeScriptMultiProjectZipProject)">
+        <Language>TypeScript</Language>
+        <Culture>1033</Culture>
+        <OutputSubPath>Node.js</OutputSubPath>
+      </MultiProjectZipProject>
     </ItemGroup>
   </Target>
 </Project>

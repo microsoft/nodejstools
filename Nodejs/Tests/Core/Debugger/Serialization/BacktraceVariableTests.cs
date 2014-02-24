@@ -16,14 +16,15 @@ using System;
 using Microsoft.NodejsTools.Debugger;
 using Microsoft.NodejsTools.Debugger.Serialization;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
+using Newtonsoft.Json.Linq;
 
 namespace NodejsTests.Debugger.Serialization {
     [TestClass]
     public class BacktraceVariableTests {
-        [TestMethod, Priority(0)]
+        [TestMethod]
         public void CreateBacktraceVariable() {
             // Arrange
-            JsonValue json = SerializationTestData.GetBacktraceJsonObject();
+            JObject json = SerializationTestData.GetBacktraceJsonObject();
             var stackFrame = new NodeStackFrame(null, null, null, 0, 0, 0, 0);
 
             // Act
@@ -31,7 +32,7 @@ namespace NodejsTests.Debugger.Serialization {
 
             // Assert
             Assert.IsNotNull(result);
-            Assert.AreEqual(NodePropertyAttributes.ReadOnly, result.Attributes);
+            Assert.AreEqual(NodePropertyAttributes.None, result.Attributes);
             Assert.IsNull(result.Class);
             Assert.AreEqual(21, result.Id);
             Assert.AreEqual("v_boolean", result.Name);
@@ -43,10 +44,10 @@ namespace NodejsTests.Debugger.Serialization {
             Assert.AreEqual("False", result.Value);
         }
 
-        [TestMethod, Priority(0)]
+        [TestMethod]
         public void CreateBacktraceVariableWithNullName() {
             // Arrange
-            JsonValue json = SerializationTestData.GetBacktraceJsonObjectWithNullName();
+            JObject json = SerializationTestData.GetBacktraceJsonObjectWithNullName();
             var stackFrame = new NodeStackFrame(null, null, null, 0, 0, 0, 0);
 
             // Act
@@ -54,7 +55,7 @@ namespace NodejsTests.Debugger.Serialization {
 
             // Assert
             Assert.IsNotNull(result);
-            Assert.AreEqual(NodePropertyAttributes.ReadOnly, result.Attributes);
+            Assert.AreEqual(NodePropertyAttributes.None, result.Attributes);
             Assert.IsNull(result.Class);
             Assert.AreEqual(21, result.Id);
             Assert.AreEqual(NodeVariableType.AnonymousVariable, result.Name);
@@ -65,18 +66,17 @@ namespace NodejsTests.Debugger.Serialization {
             Assert.AreEqual("boolean", result.TypeName);
         }
 
-        [TestMethod, Priority(0)]
+        [TestMethod]
         public void CreateBacktraceVariableWithNullStackFrame() {
             // Arrange
-            JsonValue json = SerializationTestData.GetBacktraceJsonObject();
+            JObject json = SerializationTestData.GetBacktraceJsonObject();
             Exception exception = null;
             NodeBacktraceVariable result = null;
 
             // Act
             try {
                 result = new NodeBacktraceVariable(null, json);
-            }
-            catch (Exception e) {
+            } catch (Exception e) {
                 exception = e;
             }
 
@@ -86,7 +86,7 @@ namespace NodejsTests.Debugger.Serialization {
             Assert.IsInstanceOfType(exception, typeof (ArgumentNullException));
         }
 
-        [TestMethod, Priority(0)]
+        [TestMethod]
         public void CreateBacktraceVariableWithNullJson() {
             // Arrange
             var stackFrame = new NodeStackFrame(null, null, null, 0, 0, 0, 0);
@@ -96,8 +96,7 @@ namespace NodejsTests.Debugger.Serialization {
             // Act
             try {
                 result = new NodeBacktraceVariable(stackFrame, null);
-            }
-            catch (Exception e) {
+            } catch (Exception e) {
                 exception = e;
             }
 

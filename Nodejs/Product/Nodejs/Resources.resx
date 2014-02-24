@@ -433,4 +433,10 @@
   <data name="NpmStatusExecutingQueuedErrors" xml:space="preserve">
     <value>ERRORS ENCOUNTERED - Executing: {0} ({1} command(s) queued)</value>
   </data>
+  <data name="DebuggerPort" xml:space="preserve">
+    <value>Specifies the port used to communicate with the debugger</value>
+  </data>
+  <data name="EnvironmentVariables" xml:space="preserve">
+    <value>Specifies environment variables to be set in the spawned process in the form NAME=value;NAME1=value</value>
+  </data>
 </root>

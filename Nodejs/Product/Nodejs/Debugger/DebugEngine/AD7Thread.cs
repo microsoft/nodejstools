@@ -22,7 +22,6 @@ namespace Microsoft.NodejsTools.Debugger.DebugEngine {
     class AD7Thread : IDebugThread2, IDebugThread100 {
         private readonly AD7Engine _engine;
         private readonly NodeThread _debuggedThread;
-        private const string ThreadNameString = "Node.js Thread";
 
         public AD7Thread(AD7Engine engine, NodeThread debuggedThread) {
             _engine = engine;
@@ -59,12 +58,10 @@ namespace Microsoft.NodejsTools.Debugger.DebugEngine {
             }
 
             int numStackFrames = stackFrames.Count;
-            FRAMEINFO[] frameInfoArray;
-
-            frameInfoArray = new FRAMEINFO[numStackFrames];
+            var frameInfoArray = new FRAMEINFO[numStackFrames];
 
             for (int i = 0; i < numStackFrames; i++) {
-                AD7StackFrame frame = new AD7StackFrame(_engine, this, stackFrames[i]);
+                var frame = new AD7StackFrame(_engine, this, stackFrames[i]);
                 frame.SetFrameInfo(dwFieldSpec, out frameInfoArray[i]);
             }
 

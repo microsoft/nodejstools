@@ -272,7 +272,9 @@ namespace Microsoft.NodejsTools {
                         line.Segments[0].OriginalLine,
                         0,
                         Sources[line.Segments[0].SourceIndex],
-                        Names[line.Segments[0].OriginalName]
+                        line.Segments[0].OriginalName < Names.Count ? 
+                            Names[line.Segments[0].OriginalName] : 
+                            null
                     );
                     return true;
                 }

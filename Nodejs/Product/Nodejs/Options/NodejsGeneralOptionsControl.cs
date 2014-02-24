@@ -34,6 +34,8 @@ namespace Microsoft.NodejsTools.Options {
                 case SurveyNewsPolicy.CheckOnceWeek: _surveyNewsCheckCombo.SelectedIndex = SurveyNewsOnceWeekIndex; break;
                 case SurveyNewsPolicy.CheckOnceMonth: _surveyNewsCheckCombo.SelectedIndex = SurveyNewsOnceMonthIndex; break;
             }
+            _waitOnAbnormalExit.Checked = NodejsPackage.Instance.GeneralOptionsPage.WaitOnAbnormalExit;
+            _waitOnNormalExit.Checked = NodejsPackage.Instance.GeneralOptionsPage.WaitOnNormalExit;
         }
 
         private void _surveyNewsCheckCombo_SelectedIndexChanged(object sender, EventArgs e) {
@@ -48,6 +50,15 @@ namespace Microsoft.NodejsTools.Options {
         private void _showOutputWhenRunningNpm_CheckedChanged(object sender, EventArgs e){
             NodejsPackage.Instance.GeneralOptionsPage.ShowOutputWindowWhenExecutingNpm =
                 _showOutputWhenRunningNpm.Checked;
+        }
+
+        private void _waitOnAbnormalExit_CheckedChanged(object sender, EventArgs e) {
+            NodejsPackage.Instance.GeneralOptionsPage.WaitOnAbnormalExit = _waitOnAbnormalExit.Checked;
+        }
+
+        private void _waitOnNormalExit_CheckedChanged(object sender, EventArgs e) {
+            NodejsPackage.Instance.GeneralOptionsPage.WaitOnNormalExit = _waitOnNormalExit.Checked;
+
         }
     }
 }

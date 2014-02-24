@@ -14,211 +14,61 @@
 
 using System;
 using System.Collections.Generic;
+using System.ComponentModel;
 using System.Diagnostics;
 using System.IO;
 using System.Linq;
 using System.Net.NetworkInformation;
-using System.Text;
-using System.Text.RegularExpressions;
+using System.Threading;
+using System.Threading.Tasks;
+using Microsoft.NodejsTools.Debugger.Commands;
+using Microsoft.NodejsTools.Debugger.Communication;
+using Microsoft.NodejsTools.Debugger.Events;
 using Microsoft.NodejsTools.Debugger.Serialization;
+using Microsoft.VisualStudioTools.Project;
 
 namespace Microsoft.NodejsTools.Debugger {
-    enum SteppingKind {
-        None = 0,
-        Over,
-        Into,
-        Out
-    }
-
-    enum ExceptionHitTreatment {
-        BreakNever = 0,
-        BreakAlways,
-        BreakOnUnhandled
-    }
-
-    enum BreakOnKind {
-        Always = 0,
-        Equal,
-        GreaterThanOrEqual,
-        Mod
-    }
-
-    struct BreakOn {
-        public BreakOnKind kind;
-        public uint count;
-        public BreakOn(BreakOnKind kind, uint count) {
-            if (kind != BreakOnKind.Always && count < 1) {
-                throw new ArgumentException("Invalid BreakOn count");
-            }
-            this.kind = kind;
-            this.count = count;
-        }
-    }
-
     /// <summary>
     /// Handles all interactions with a Node process which is being debugged.
     /// </summary>
     class NodeDebugger : IDisposable {
-        private Process _process;
-        private bool _attached;
-        private int? _id;
-        private readonly Dictionary<int, NodeBreakpointBinding> _breakpointBindings = new Dictionary<int, NodeBreakpointBinding>();
-        private bool _loadCompleteHandled;
-        private bool _handleEntryPointHit;
-        private SteppingKind _steppingMode;
-        private int _steppingCallstackDepth;
-        private readonly Dictionary<int, NodeThread> _threads = new Dictionary<int, NodeThread>();
         public readonly int MainThreadId = 1;
-        private readonly Dictionary<string, NodeModule> _mapNameToScript = new Dictionary<string, NodeModule>(StringComparer.OrdinalIgnoreCase);
+        private readonly Dictionary<int, NodeBreakpointBinding> _breakpointBindings = new Dictionary<int, NodeBreakpointBinding>();
+        private readonly IDebuggerClient _client;
+        private readonly IDebuggerConnection _connection;
+        private readonly Dictionary<int, string> _errorCodes = new Dictionary<int, string>();
+        private readonly ExceptionHandler _exceptionHandler;
+        private readonly string _hostName;
         private readonly Dictionary<int, NodeModule> _mapIdToScript = new Dictionary<int, NodeModule>();
-        private Dictionary<string, JavaScriptSourceMapInfo> _originalFileToSourceMap = new Dictionary<string, JavaScriptSourceMapInfo>(StringComparer.OrdinalIgnoreCase);
-        private Dictionary<string, SourceMap> _generatedFileToSourceMap = new Dictionary<string, SourceMap>(StringComparer.OrdinalIgnoreCase);
-        private ExceptionHitTreatment _defaultExceptionTreatment = ExceptionHitTreatment.BreakAlways;
-        private Dictionary<string, ExceptionHitTreatment> _exceptionTreatments = GetDefaultExceptionTreatments();
-        private Dictionary<int, string> _errorCodes = new Dictionary<int, string>();
+        private readonly Dictionary<string, NodeModule> _mapNameToScript = new Dictionary<string, NodeModule>(StringComparer.OrdinalIgnoreCase);
+        private readonly Version _nodeSetVariableValueVersion = new Version(0, 10, 12);
+        private readonly ushort _portNumber;
+        private readonly EvaluationResultFactory _resultFactory;
+        private readonly Dictionary<int, NodeThread> _threads = new Dictionary<int, NodeThread>();
+        private readonly TimeSpan _timeout = TimeSpan.FromSeconds(2);
+        private bool _attached;
         private bool _breakOnAllExceptions;
         private bool _breakOnUncaughtExceptions;
-        private INodeConnection _connection;
-
-        public INodeConnection Connection {
-            get {
-                return _connection;
-            }
-            set {
-                if (_connection == value) {
-                    return;
-                }
-
-                if (_connection != null) {
-                    _connection.SocketDisconnected -= OnSocketDisconnected;
-                    _connection.NodeEvent -= OnNodeEvent;
-                }
-
-                _connection = value;
-
-                if (_connection != null) {
-                    _connection.SocketDisconnected += OnSocketDisconnected;
-                    _connection.NodeEvent += OnNodeEvent;
-                }
-            }
-        }
-
-        public INodeResponseHandler ResponseHandler { get; set; }
-
-        private static Dictionary<string, ExceptionHitTreatment> GetDefaultExceptionTreatments() {
-            // Keep exception types in sync with those declared in ProvideDebugExceptionAttribute's in NodePackage.cs
-            string[] exceptionTypes = {
-                "Error",
-                "Error(EACCES)",
-                "Error(EADDRINUSE)",
-                "Error(EADDRNOTAVAIL)",
-                "Error(EAFNOSUPPORT)",
-                "Error(EAGAIN)",
-                "Error(EWOULDBLOCK)",
-                "Error(EALREADY)",
-                "Error(EBADF)",
-                "Error(EBADMSG)",
-                "Error(EBUSY)",
-                "Error(ECANCELED)",
-                "Error(ECHILD)",
-                "Error(ECONNABORTED)",
-                "Error(ECONNREFUSED)",
-                "Error(ECONNRESET)",
-                "Error(EDEADLK)",
-                "Error(EDESTADDRREQ)",
-                "Error(EDOM)",
-                "Error(EEXIST)",
-                "Error(EFAULT)",
-                "Error(EFBIG)",
-                "Error(EHOSTUNREACH)",
-                "Error(EIDRM)",
-                "Error(EILSEQ)",
-                "Error(EINPROGRESS)",
-                "Error(EINTR)",
-                "Error(EINVAL)",
-                "Error(EIO)",
-                "Error(EISCONN)",
-                "Error(EISDIR)",
-                "Error(ELOOP)",
-                "Error(EMFILE)",
-                "Error(EMLINK)",
-                "Error(EMSGSIZE)",
-                "Error(ENAMETOOLONG)",
-                "Error(ENETDOWN)",
-                "Error(ENETRESET)",
-                "Error(ENETUNREACH)",
-                "Error(ENFILE)",
-                "Error(ENOBUFS)",
-                "Error(ENODATA)",
-                "Error(ENODEV)",
-                "Error(ENOENT)",
-                "Error(ENOEXEC)",
-                "Error(ENOLINK)",
-                "Error(ENOLCK)",
-                "Error(ENOMEM)",
-                "Error(ENOMSG)",
-                "Error(ENOPROTOOPT)",
-                "Error(ENOSPC)",
-                "Error(ENOSR)",
-                "Error(ENOSTR)",
-                "Error(ENOSYS)",
-                "Error(ENOTCONN)",
-                "Error(ENOTDIR)",
-                "Error(ENOTEMPTY)",
-                "Error(ENOTSOCK)",
-                "Error(ENOTSUP)",
-                "Error(ENOTTY)",
-                "Error(ENXIO)",
-                "Error(EOVERFLOW)",
-                "Error(EPERM)",
-                "Error(EPIPE)",
-                "Error(EPROTO)",
-                "Error(EPROTONOSUPPORT)",
-                "Error(EPROTOTYPE)",
-                "Error(ERANGE)",
-                "Error(EROFS)",
-                "Error(ESPIPE)",
-                "Error(ESRCH)",
-                "Error(ETIME)",
-                "Error(ETIMEDOUT)",
-                "Error(ETXTBSY)",
-                "Error(EXDEV)",
-                "Error(SIGHUP)",
-                "Error(SIGINT)",
-                "Error(SIGILL)",
-                "Error(SIGABRT)",
-                "Error(SIGFPE)",
-                "Error(SIGKILL)",
-                "Error(SIGSEGV)",
-                "Error(SIGTERM)",
-                "Error(SIGBREAK)",
-                "Error(SIGWINCH)",
-                "EvalError",
-                "RangeError",
-                "ReferenceError",
-                "SyntaxError",
-                "TypeError",
-                "URIError"
-            };
-            string[] breakNeverTypes = { // should probably be break on unhandled when we have just my code support
-                "Error(ENOENT)",
-                "SyntaxError",
-            };
-            var defaultExceptionTreatments = new Dictionary<string, ExceptionHitTreatment>();
-            foreach (var exceptionType in exceptionTypes) {
-                defaultExceptionTreatments[exceptionType] = ExceptionHitTreatment.BreakAlways;
-            }
-            foreach (var exceptionType in breakNeverTypes) {
-                defaultExceptionTreatments[exceptionType] = ExceptionHitTreatment.BreakNever;
-            }
-            return defaultExceptionTreatments;
-        }
+        private bool _handleEntryPointHit;
+        private int? _id;
+        private bool _loadCompleteHandled;
+        private int _number;
+        private Process _process;
+        private int _steppingCallstackDepth;
+        private SteppingKind _steppingMode;
 
         private NodeDebugger() {
-            if (ResponseHandler == null) {
-                var evaluationResultFactory = new NodeEvaluationResultFactory();
-                ResponseHandler = new NodeResponseHandler(evaluationResultFactory);
-            }
+            _connection = new DebuggerConnection(new TcpClientFactory());
+            _connection.ConnectionClosed += OnConnectionClosed;
+
+            _client = new DebuggerClient(_connection);
+            _client.BreakpointEvent += OnBreakpointEvent;
+            _client.CompileScriptEvent += OnCompileScriptEvent;
+            _client.ExceptionEvent += OnExceptionEvent;
+
+            _resultFactory = new EvaluationResultFactory();
+            _exceptionHandler = new ExceptionHandler();
+            SourceMapper = new SourceMapper();
         }
 
         public NodeDebugger(
@@ -229,30 +79,39 @@ namespace Microsoft.NodejsTools.Debugger {
             string interpreterOptions,
             NodeDebugOptions debugOptions,
             List<string[]> dirMapping,
+            ushort? debuggerPort = null,
             bool createNodeWindow = true) : this() {
 
-            var activeConnections =
-                from listener in IPGlobalProperties.GetIPGlobalProperties().GetActiveTcpListeners()
-                select listener.Port;
-            ushort debugPort = 5858;
-            if (activeConnections.Contains(debugPort)) {
-                debugPort = (ushort)Enumerable.Range(new Random().Next(5859, 6000), 60000).Except(activeConnections).First();
+            // Select debugger port for a local connection
+            ushort debuggerPortOrDefault = NodejsConstants.DefaultDebuggerPort;
+            if (debuggerPort != null) {
+                debuggerPortOrDefault = debuggerPort.Value;
+            } else {
+                var activeConnections =
+                    from listener in IPGlobalProperties.GetIPGlobalProperties().GetActiveTcpListeners()
+                    select listener.Port;
+                if (activeConnections.Contains(debuggerPortOrDefault)) {
+                    debuggerPortOrDefault = (ushort)Enumerable.Range(new Random().Next(5859, 6000), 60000).Except(activeConnections).First();
+                }
             }
 
-            Connection = new NodeConnection(debugPort);
+            _hostName = "localhost";
+            _portNumber = debuggerPortOrDefault;
 
-            var allArgs = String.Format("--debug-brk={0} {1}", debugPort, script);
+            var allArgs = String.Format("--debug-brk={0} {1}", debuggerPortOrDefault, script);
             if (!string.IsNullOrEmpty(interpreterOptions)) {
                 allArgs += " " + interpreterOptions;
             }
 
-            var psi = new ProcessStartInfo(exe, allArgs);
-            psi.CreateNoWindow = !createNodeWindow;
-            psi.WorkingDirectory = dir;
-            psi.UseShellExecute = false;
+            var psi = new ProcessStartInfo(exe, allArgs) {
+                CreateNoWindow = !createNodeWindow,
+                WorkingDirectory = dir,
+                UseShellExecute = false
+            };
+
             if (env != null) {
                 string[] envValues = env.Split('\0');
-                foreach (var curValue in envValues) {
+                foreach (string curValue in envValues) {
                     string[] nameValue = curValue.Split(new[] { '=' }, 2);
                     if (nameValue.Length == 2 && !String.IsNullOrWhiteSpace(nameValue[0])) {
                         psi.EnvironmentVariables[nameValue[0]] = nameValue[1];
@@ -260,36 +119,43 @@ namespace Microsoft.NodejsTools.Debugger {
                 }
             }
 
-            _process = new Process();
-            _process.StartInfo = psi;
-            _process.EnableRaisingEvents = true;
+            FixupForRunAndWait(
+                debugOptions.HasFlag(NodeDebugOptions.WaitOnAbnormalExit),
+                debugOptions.HasFlag(NodeDebugOptions.WaitOnNormalExit),
+                psi
+            );
+
+            _process = new Process {
+                StartInfo = psi,
+                EnableRaisingEvents = true
+            };
         }
 
         public NodeDebugger(string hostName, ushort portNumber, int id) : this() {
+            _hostName = hostName;
+            _portNumber = portNumber;
             _id = id;
             _attached = true;
-
-            Connection = new NodeConnection(hostName, portNumber);
         }
 
         #region Public Process API
 
         public int Id {
-            get {
-                return _id != null ? _id.Value : _process.Id;
-            }
+            get { return _id != null ? _id.Value : _process.Id; }
+        }
+
+        private NodeThread MainThread {
+            get { return _threads[MainThreadId]; }
+        }
+
+        public bool HasExited {
+            get { return !_connection.Connected; }
         }
 
         public void Start(bool startListening = true) {
             _process.Start();
             if (startListening) {
                 StartListening();
-            }
-        }
-
-        private NodeThread MainThread {
-            get {
-                return _threads[MainThreadId];
             }
         }
 
@@ -307,26 +173,31 @@ namespace Microsoft.NodejsTools.Debugger {
             return _process.WaitForExit(milliseconds);
         }
 
-        public void Terminate() {
+        /// <summary>
+        /// Terminates node.js process.
+        /// </summary>
+        public void Terminate(bool killProcess = true) {
             lock (this) {
                 // Disconnect
-                Connection.Disconnect();
+                _connection.Close();
 
                 // Fall back to using -1 for exit code if we cannot obtain one from the process
                 // This is the normal case for attach where there is no process to interrogate
-                int exitCode =  -1;
+                int exitCode = -1;
 
                 if (_process != null) {
                     // Cleanup process
                     Debug.Assert(!_attached);
                     try {
-                        if (!_process.HasExited) {
+                        if (killProcess && !_process.HasExited) {
                             _process.Kill();
                         } else {
                             exitCode = _process.ExitCode;
                         }
-                    } catch {
+                    } catch (InvalidOperationException) {
+                    } catch (Win32Exception) {
                     }
+
                     _process.Dispose();
                     _process = null;
                 } else {
@@ -338,126 +209,104 @@ namespace Microsoft.NodejsTools.Debugger {
                 }
 
                 // Fire event
-                var exited = ProcessExited;
+                EventHandler<ProcessExitedEventArgs> exited = ProcessExited;
                 if (exited != null) {
                     exited(this, new ProcessExitedEventArgs(exitCode));
                 }
             }
         }
 
-        public bool HasExited {
-            get { return !Connection.Connected; }
-        }
-
         /// <summary>
         /// Breaks into the process.
         /// </summary>
-        public void BreakAll() {
+        public async Task BreakAllAsync() {
             DebugWriteCommand("BreakAll");
 
-            Connection.SendRequest(
-                "suspend",
-                null,   // args
-                json => {
-                    // Handle success
-                    // We need to get the backtrace before we break, so we request the backtrace
-                    // and follow up with firing the appropriate event for the break
-                    PerformBacktrace((running) => {
-                        // Handle followup
-                        // Fallback to firing step complete event
-                        Debug.Assert(!running);
-                        var asyncBreakComplete = AsyncBreakComplete;
-                        if (asyncBreakComplete != null) {
-                            asyncBreakComplete(this, new ThreadEventArgs(MainThread));
-                        }
-                    });
-                });
+            var tokenSource = new CancellationTokenSource(_timeout);
+            var suspendCommand = new SuspendCommand(CommandId);
+            await _client.SendRequestAsync(suspendCommand, tokenSource.Token).ConfigureAwait(false);
+
+            // Handle success
+            // We need to get the backtrace before we break, so we request the backtrace
+            // and follow up with firing the appropriate event for the break
+            tokenSource = new CancellationTokenSource(_timeout);
+            bool running = await PerformBacktraceAsync(tokenSource.Token).ConfigureAwait(false);
+            Debug.Assert(!running);
+
+            // Fallback to firing step complete event
+            EventHandler<ThreadEventArgs> asyncBreakComplete = AsyncBreakComplete;
+            if (asyncBreakComplete != null) {
+                asyncBreakComplete(this, new ThreadEventArgs(MainThread));
+            }
         }
 
         [Conditional("DEBUG")]
         private void DebugWriteCommand(string commandName) {
-            Debug.WriteLine("Node Debugger Sending Command " + commandName);
+            DebugWriteLine("NodeDebugger Called " + commandName);
+        }
+
+        [Conditional("DEBUG")]
+        private void DebugWriteLine(string message) {
+            Debug.WriteLine("[{0}] {1}", DateTime.UtcNow.TimeOfDay, message);
         }
 
         /// <summary>
         /// Resumes the process.
         /// </summary>
-        public void Resume() {
+        public async void Resume() {
             DebugWriteCommand("Resume");
-
-            Continue(SteppingKind.None);
+            var tokenSource = new CancellationTokenSource(_timeout);
+            await ContinueAsync(cancellationToken: tokenSource.Token).ConfigureAwait(false);
         }
 
-        private void Continue(SteppingKind steppingKind, bool resetSteppingMode = true, int stepCount = 1) {
+        private Task ContinueAsync(SteppingKind steppingKind, bool resetSteppingMode = true, int stepCount = 1, CancellationToken cancellationToken = new CancellationToken()) {
             if (resetSteppingMode) {
                 _steppingMode = steppingKind;
                 _steppingCallstackDepth = MainThread.CallstackDepth;
             }
-            Dictionary<string, object> args = null;
-            switch (steppingKind) {
-                case SteppingKind.Over:
-                    Debug.Assert(stepCount == 1);
-                    args = new Dictionary<string, object> { { "stepaction", "next" }, {"stepcount", stepCount } };
-                    break;
-                case SteppingKind.Into:
-                    Debug.Assert(stepCount == 1);
-                    args = new Dictionary<string, object> { { "stepaction", "in" }, { "stepcount", stepCount } };
-                    break;
-                case SteppingKind.Out:
-                    args = new Dictionary<string, object> { { "stepaction", "out" }, { "stepcount", stepCount } };
-                    break;
-                default:
-                    break;
-            }
 
-            Continue(args);
+            return ContinueAsync(steppingKind, stepCount, cancellationToken);
         }
 
-        private void Continue(Dictionary<string, object> args = null) {
+        private async Task ContinueAsync(SteppingKind stepping = SteppingKind.None, int stepCount = 1, CancellationToken cancellationToken = new CancellationToken()) {
             // Ensure load complete and entrypoint breakpoint/tracepoint handling disabled after first real continue
             _loadCompleteHandled = true;
             _handleEntryPointHit = false;
 
-            Connection.SendRequest(
-                "continue",
-                args,
-                json => {
-                    // Handle success
-                    // Nothing to do
-                });
+            var continueCommand = new ContinueCommand(CommandId, stepping, stepCount);
+            await _client.SendRequestAsync(continueCommand, cancellationToken).ConfigureAwait(false);
         }
 
-        private void AutoResume(bool haveCallstack) {
+        private Task AutoResumeAsync(bool haveCallstack, CancellationToken cancellationToken = new CancellationToken()) {
             // Simply continue, if not stepping
-            if (_steppingMode == SteppingKind.None) {
-                Continue();
-                return;
+            if (_steppingMode != SteppingKind.None) {
+                return AutoResumeSteppingAsync(haveCallstack, cancellationToken);
             }
 
-            AutoResumeStepping(haveCallstack);
+            return ContinueAsync(cancellationToken: cancellationToken);
         }
-        private void AutoResumeStepping(bool haveCallstack) {
-            if (!haveCallstack) {
+
+        private async Task AutoResumeSteppingAsync(bool haveCallstack, CancellationToken cancellationToken = new CancellationToken()) {
+            int callstackDepth;
+            if (haveCallstack) {
+                // Have callstack, so get callstack depth from it
+                callstackDepth = MainThread.CallstackDepth;
+            } else {
                 // Don't have callstack, so get callstack depth from server
                 // Doing this avoids doing a full backtrace for all auto resumes
-                GetCallstackDepth((callstackDepth) => {
-                    // Handle followup
-                    AutoResumeStepping(callstackDepth, haveCallstack);
-                });
-                return;
+                callstackDepth = await GetCallstackDepthAsync(cancellationToken).ConfigureAwait(false);
             }
 
-            // Have callstack, so get callstack depth from it
-            AutoResumeStepping(MainThread.CallstackDepth, haveCallstack);
+            await AutoResumeSteppingAsync(callstackDepth, haveCallstack, cancellationToken).ConfigureAwait(false);
         }
 
-        private void AutoResumeStepping(int callstackDepth, bool haveCallstack) {
+        private async Task AutoResumeSteppingAsync(int callstackDepth, bool haveCallstack, CancellationToken cancellationToken = new CancellationToken()) {
             switch (_steppingMode) {
                 case SteppingKind.Over:
-                    var stepCount = callstackDepth - _steppingCallstackDepth;
+                    int stepCount = callstackDepth - _steppingCallstackDepth;
                     if (stepCount > 0) {
                         // Stepping over autoresumed break (in nested frame)
-                        Continue(SteppingKind.Out, resetSteppingMode: false, stepCount: stepCount);
+                        await ContinueAsync(SteppingKind.Out, false, stepCount, cancellationToken).ConfigureAwait(false);
                         return;
                     }
                     break;
@@ -465,7 +314,7 @@ namespace Microsoft.NodejsTools.Debugger {
                     stepCount = callstackDepth - _steppingCallstackDepth + 1;
                     if (stepCount > 0) {
                         // Stepping out across autoresumed break (in nested frame)
-                        Continue(SteppingKind.Out, resetSteppingMode: false, stepCount: stepCount);
+                        await ContinueAsync(SteppingKind.Out, false, stepCount, cancellationToken).ConfigureAwait(false);
                         return;
                     }
                     break;
@@ -473,37 +322,31 @@ namespace Microsoft.NodejsTools.Debugger {
                     // Stepping into or to autoresumed break
                     break;
                 default:
-                    Debug.WriteLine(String.Format("Unexpected SteppingMode: {0}", _steppingMode));
+                    Debug.WriteLine("Unexpected SteppingMode: {0}", _steppingMode);
                     break;
             }
 
-            CompleteStepping(haveCallstack);
+            await CompleteSteppingAsync(haveCallstack, cancellationToken).ConfigureAwait(false);
         }
 
-        private void CompleteStepping(bool haveCallstack) {
+        private async Task CompleteSteppingAsync(bool haveCallstack, CancellationToken cancellationToken = new CancellationToken()) {
             // Ensure we have callstack
             if (!haveCallstack) {
-                PerformBacktrace(
-                    (running) => {
-                        Debug.Assert(!running);
-                        CompleteStepping();
-                    }
-                );
-            } else {
-                CompleteStepping();
+                bool running = await PerformBacktraceAsync(cancellationToken).ConfigureAwait(false);
+                Debug.Assert(!running);
             }
+            CompleteStepping();
         }
 
         private void CompleteStepping() {
-            var stepComplete = StepComplete;
+            EventHandler<ThreadEventArgs> stepComplete = StepComplete;
             if (stepComplete != null) {
                 stepComplete(this, new ThreadEventArgs(MainThread));
             }
         }
 
         /// <summary>
-        /// Adds a breakpoint in the specified file.  
-        /// 
+        /// Adds a breakpoint in the specified file.
         /// Line number is 1 based
         /// </summary>
         public NodeBreakpoint AddBreakPoint(
@@ -511,100 +354,85 @@ namespace Microsoft.NodejsTools.Debugger {
             int requestedLineNo,
             bool enabled = true,
             BreakOn breakOn = new BreakOn(),
-            string condition = null
-            ) {
+            string condition = null) {
             string fileName;
             int lineNo;
 
-            MapToJavaScript(requestedFileName, requestedLineNo - 1, out fileName, out lineNo);
-            lineNo++;
-            var res =
-                new NodeBreakpoint(
-                    this,
-                    fileName,
-                    requestedFileName,
-                    lineNo,
-                    requestedLineNo,
-                    enabled,
-                    breakOn,
-                    condition
-                );
-            return res;
+            SourceMapper.MapToJavaScript(requestedFileName, requestedLineNo, out fileName, out lineNo);
+
+            return new NodeBreakpoint(this, fileName, requestedFileName, lineNo, requestedLineNo, enabled, breakOn, condition);
         }
 
-        public void SetExceptionTreatment(
+        public async void SetExceptionTreatment(
             ExceptionHitTreatment? defaultExceptionTreatment,
-            ICollection<KeyValuePair<string, ExceptionHitTreatment>> exceptionTreatments
-        ) {
+            ICollection<KeyValuePair<string, ExceptionHitTreatment>> exceptionTreatments) {
             bool updated = false;
 
-            if (defaultExceptionTreatment.HasValue && (_defaultExceptionTreatment != defaultExceptionTreatment.Value)) {
-                _defaultExceptionTreatment = defaultExceptionTreatment.Value;
-                updated = true;
+            if (defaultExceptionTreatment.HasValue) {
+                updated |= _exceptionHandler.SetDefaultExceptionHitTreatment(defaultExceptionTreatment.Value);
             }
 
             if (exceptionTreatments != null) {
-                foreach (var exceptionTreatment in exceptionTreatments) {
-                    ExceptionHitTreatment treatmentValue;
-                    if (!_exceptionTreatments.TryGetValue(exceptionTreatment.Key, out treatmentValue) ||
-                        (exceptionTreatment.Value != treatmentValue)
-                    ) {
-                        _exceptionTreatments[exceptionTreatment.Key] = exceptionTreatment.Value;
-                        updated = true;
-                    }
-                }
+                updated |= _exceptionHandler.SetExceptionTreatments(exceptionTreatments);
             }
 
             if (updated) {
-                SetExceptionBreak(synchronous: true);
+                var tokenSource = new CancellationTokenSource(_timeout);
+                await SetExceptionBreakAsync(tokenSource.Token).ConfigureAwait(false);
             }
         }
 
-        public void ClearExceptionTreatment(
+        public async void ClearExceptionTreatment(
             ExceptionHitTreatment? defaultExceptionTreatment,
-            ICollection<KeyValuePair<string, ExceptionHitTreatment>> exceptionTreatments
-        ) {
+            ICollection<KeyValuePair<string, ExceptionHitTreatment>> exceptionTreatments) {
             bool updated = false;
 
-            if (defaultExceptionTreatment.HasValue && (_defaultExceptionTreatment != ExceptionHitTreatment.BreakNever)) {
-                _defaultExceptionTreatment = ExceptionHitTreatment.BreakNever;
-                updated = true;
+            if (defaultExceptionTreatment.HasValue) {
+                updated |= _exceptionHandler.SetDefaultExceptionHitTreatment(ExceptionHitTreatment.BreakNever);
             }
 
-            foreach (var exceptionTreatment in exceptionTreatments) {
-                ExceptionHitTreatment treatmentValue;
-                if (_exceptionTreatments.TryGetValue(exceptionTreatment.Key, out treatmentValue)) {
-                    _exceptionTreatments.Remove(exceptionTreatment.Key);
-                    updated = true;
-                }
-            }
+            updated |= _exceptionHandler.ClearExceptionTreatments(exceptionTreatments);
 
             if (updated) {
-                SetExceptionBreak(synchronous: true);
+                var tokenSource = new CancellationTokenSource(_timeout);
+                await SetExceptionBreakAsync(tokenSource.Token).ConfigureAwait(false);
             }
         }
 
-        public void ClearExceptionTreatment() {
-            bool updated = false;
-
-            if (_defaultExceptionTreatment != ExceptionHitTreatment.BreakAlways) {
-                _defaultExceptionTreatment = ExceptionHitTreatment.BreakAlways;
-                updated = true;
-            }
-
-            if (_exceptionTreatments.Values.Any(value => value != ExceptionHitTreatment.BreakAlways)) {
-                _exceptionTreatments = GetDefaultExceptionTreatments();
-                updated = true;
-            }
+        public async void ClearExceptionTreatment() {
+            bool updated = _exceptionHandler.SetDefaultExceptionHitTreatment(ExceptionHitTreatment.BreakAlways);
+            updated |= _exceptionHandler.ResetExceptionTreatments();
 
             if (updated) {
-                SetExceptionBreak(synchronous: true);
+                var tokenSource = new CancellationTokenSource(_timeout);
+                await SetExceptionBreakAsync(tokenSource.Token).ConfigureAwait(false);
             }
+        }
+
+        public string GetModuleFileName(string javaScriptFileName) {
+            SourceMapping mapping = SourceMapper.MapToOriginal(javaScriptFileName, 0);
+            if (mapping == null) {
+                return javaScriptFileName;
+            }
+
+            string directoryName = Path.GetDirectoryName(javaScriptFileName) ?? string.Empty;
+            string fileName = Path.GetFileName(mapping.FileName) ?? string.Empty;
+            return Path.Combine(directoryName, fileName);
         }
 
         #endregion
 
         #region Debuggee Communcation
+
+        // Gets a next command identifier
+        private int CommandId {
+            get { return Interlocked.Increment(ref _number); }
+        }
+
+        /// <summary>
+        /// Gets or sets a source mapper.
+        /// </summary>
+        public SourceMapper SourceMapper { get; private set; }
 
         internal void Unregister() {
             GC.SuppressFinalize(this);
@@ -614,246 +442,186 @@ namespace Microsoft.NodejsTools.Debugger {
         /// Starts listening for debugger communication.  Can be called after Start
         /// to give time to attach to debugger events.
         /// </summary>
-        public void StartListening() {
-            Connection.Connect();
-            ProcessConnect();
-        }
+        public async void StartListening() {
+            _connection.Connect(_hostName, _portNumber);
 
-        private void OnSocketDisconnected(object sender, EventArgs args) {
-            Terminate();
-        }
-
-        private void OnNodeEvent(object sender, NodeEventEventArgs e) {
-            ProcessEvent(e.Data);
-        }
-
-        private void ProcessConnect() {
             var mainThread = new NodeThread(this, MainThreadId, false);
             _threads[mainThread.Id] = mainThread;
 
-            GetScripts();
+            await GetScriptsAsync().ConfigureAwait(false);
+            await SetExceptionBreakAsync().ConfigureAwait(false);
+            bool running = await PerformBacktraceAsync().ConfigureAwait(false);
 
-            SetExceptionBreak();
+            // At this point we can fire events
+            EventHandler<ThreadEventArgs> newThread = ThreadCreated;
+            if (newThread != null) {
+                newThread(this, new ThreadEventArgs(mainThread));
+            }
 
-            PerformBacktrace((running) => {
-                // At this point we can fire events
-                var newThread = ThreadCreated;
-                if (newThread != null) {
-                    newThread(this, new ThreadEventArgs(mainThread));
-                }
-                var procLoaded = ProcessLoaded;
-                if (procLoaded != null) {
-                    procLoaded(this, new ProcessLoadedEventArgs(mainThread, running));
-                }
-            });
+            EventHandler<ProcessLoadedEventArgs> procLoaded = ProcessLoaded;
+            if (procLoaded != null) {
+                procLoaded(this, new ProcessLoadedEventArgs(mainThread, running));
+            }
         }
 
-        private void GetScripts() {
-            Connection.SendRequest(
-                "scripts",
-                null,   // args
-                json => {
-                    // Handle success
-                    foreach (Dictionary<string, object> script in (object[])json["body"]) {
-                        AddScript(script);
-                    }
-                }
-            );
+        private void OnConnectionClosed(object sender, EventArgs args) {
+            Terminate(killProcess: false);
+
+            EventHandler<ThreadEventArgs> threadExited = ThreadExited;
+            if (threadExited != null) {
+                threadExited(this, new ThreadEventArgs(MainThread));
+            }
         }
 
-        private void AddScript(Dictionary<string, object> script) {
-            object nameObj;
-            if (script.TryGetValue("name", out nameObj) && !string.IsNullOrEmpty((string)nameObj)) {
-                var name = (string)nameObj;
+        private async Task GetScriptsAsync(CancellationToken cancellationToken = new CancellationToken()) {
+            var scriptsCommand = new ScriptsCommand(CommandId, this);
+            await _client.SendRequestAsync(scriptsCommand, cancellationToken).ConfigureAwait(false);
+
+            foreach (NodeModule module in scriptsCommand.Modules) {
+                AddScript(module);
+            }
+        }
+
+        private void AddScript(NodeModule newModule) {
+            string name = newModule.JavaScriptFileName;
+            if (!string.IsNullOrEmpty(name)) {
                 NodeModule module;
                 if (!_mapNameToScript.TryGetValue(name, out module)) {
-                    int id = (int)script["id"];
-                    module = new NodeModule(this, id, name);
-                    _mapNameToScript[name] = module;
-                    _mapIdToScript[id] = module;
-                    var modLoad = ModuleLoaded;
+                    _mapNameToScript[name] = newModule;
+                    _mapIdToScript[newModule.ModuleId] = newModule;
+
+                    EventHandler<ModuleLoadedEventArgs> modLoad = ModuleLoaded;
                     if (modLoad != null) {
-                        modLoad(this, new ModuleLoadedEventArgs(module));
+                        modLoad(this, new ModuleLoadedEventArgs(newModule));
                     }
                 }
             }
         }
 
-        private bool SetExceptionBreak(bool synchronous = false) {
+        private async Task SetExceptionBreakAsync(CancellationToken cancellationToken = new CancellationToken()) {
             // UNDONE Handle break on unhandled, once just my code is supported
             // Node has a catch all, so there are no uncaught exceptions
             // For now just break on all
             //var breakOnAllExceptions = _defaultExceptionTreatment == ExceptionHitTreatment.BreakAlways || _exceptionTreatments.Values.Any(value => value == ExceptionHitTreatment.BreakAlways);
             //var breakOnUncaughtExceptions = !all && (_defaultExceptionTreatment != ExceptionHitTreatment.BreakNever || _exceptionTreatments.Values.Any(value => value != ExceptionHitTreatment.BreakNever));
-            var breakOnAllExceptions = _defaultExceptionTreatment != ExceptionHitTreatment.BreakNever || _exceptionTreatments.Values.Any(value => value != ExceptionHitTreatment.BreakNever);
-            var breakOnUncaughtExceptions = false;
+            bool breakOnAllExceptions = _exceptionHandler.BreakOnAllExceptions;
+            const bool breakOnUncaughtExceptions = false;
 
-            int? timeout = null;
-            Func<bool> shortCircuitPredicate = null;
-            if (synchronous) {
-                timeout = 2000;
-                shortCircuitPredicate = () => HasExited;
-            }
-
-            if (_breakOnAllExceptions != breakOnAllExceptions) {
-                if (!Connection.SendRequest(
-                        "setexceptionbreak",
-                        new Dictionary<string, object> {
-                            { "type", "all" },
-                            { "enabled", breakOnAllExceptions }
-                        },
-                        successHandler: JsonListener => {
-                            _breakOnAllExceptions = breakOnAllExceptions;
-                        },
-                        timeout: timeout,
-                        shortCircuitPredicate: shortCircuitPredicate) &&
-                    synchronous
-                ) {
-                    return false;
-                };
-            }
-            if (_breakOnUncaughtExceptions != breakOnUncaughtExceptions) {
-                if (!Connection.SendRequest(
-                        "setexceptionbreak",
-                        new Dictionary<string, object> {
-                            { "type", "uncaught" },
-                            { "enabled", breakOnUncaughtExceptions }
-                        },
-                        successHandler: JsonListener => {
-                            _breakOnUncaughtExceptions = breakOnUncaughtExceptions;
-                        },
-                        timeout: timeout,
-                        shortCircuitPredicate: shortCircuitPredicate) &&
-                    synchronous
-                ) {
-                    return false;
-                };
-            }
-
-            return true;
-        }
-
-        private void ProcessEvent(Dictionary<string, object> json) {
-            switch ((string)json["event"]) {
-                case "afterCompile":
-                    ProcessCompile(json);
-                    break;
-                case "break":
-                    ProcessBreak(json);
-                    break;
-                case "exception":
-                    ProcessException(json);
-                    break;
-                //case "scriptCollected":
-                //    GetScripts();
-                //    break;
-                default:
-                    Debug.WriteLine(String.Format("Unknown event: {0}", (string)json["event"]));
-                    break;
-            }
-        }
-
-        private void ProcessCompile(Dictionary<string, object> json) {
-            // Add script
-            var script = (Dictionary<string, object>)(((Dictionary<string, object>)json["body"])["script"]);
-            AddScript(script);
-        }
-
-        private void ProcessBreak(Dictionary<string, object> json) {
-            //  Derive breakpoint bindings, if any
-            List<NodeBreakpointBinding> breakpointBindings = null;
-            object breakpointsObj;
-            ((Dictionary<string, object>)json["body"]).TryGetValue("breakpoints", out breakpointsObj);
-            object[] breakpoints = breakpointsObj as object[];
-            if (breakpoints != null) {
-                breakpointBindings = new List<NodeBreakpointBinding>();
-                foreach (int breakpoint in breakpoints) {
-                    NodeBreakpointBinding nodeBreakpointBinding;
-                    if (_breakpointBindings.TryGetValue(breakpoint, out nodeBreakpointBinding)) {
-                        breakpointBindings.Add(nodeBreakpointBinding);
-                    }
-                }
-            }
-
-            // Complete stepping, if no breakpoint bindings
-            if (breakpointBindings == null) {
-                CompleteStepping(haveCallstack: false);
+            if (HasExited) {
                 return;
             }
 
-            // Process break for breakpoint bindings, if any
-            ProcessBreakpointBreak(
-                breakpointBindings,
-                noBreakpointsHitHandler:
-                    () => {
-                        // Fall back to auto resume, when no breakpoints hit
-                        AutoResume(haveCallstack: false);
-                    },
-                    haveCallstack: false,
-                    testFullyBound: false
-            );
+            if (_breakOnAllExceptions != breakOnAllExceptions) {
+                var setExceptionBreakCommand = new SetExceptionBreakCommand(CommandId, false, breakOnAllExceptions);
+                await _client.SendRequestAsync(setExceptionBreakCommand, cancellationToken).ConfigureAwait(false);
+
+                _breakOnAllExceptions = breakOnAllExceptions;
+            }
+
+            if (_breakOnUncaughtExceptions != breakOnUncaughtExceptions) {
+                var setExceptionBreakCommand = new SetExceptionBreakCommand(CommandId, true, breakOnUncaughtExceptions);
+                await _client.SendRequestAsync(setExceptionBreakCommand, cancellationToken).ConfigureAwait(false);
+
+                _breakOnUncaughtExceptions = breakOnUncaughtExceptions;
+            }
         }
 
-        private void ProcessBreakpointBreak(List<NodeBreakpointBinding> breakpointBindings, Action noBreakpointsHitHandler, bool haveCallstack, bool testFullyBound) {
+        private void OnCompileScriptEvent(object sender, CompileScriptEventArgs args) {
+            AddScript(args.CompileScriptEvent.Module);
+        }
+
+        private async void OnBreakpointEvent(object sender, BreakpointEventArgs args) {
+            BreakpointEvent breakpointEvent = args.BreakpointEvent;
+
+            // Complete stepping, if no breakpoint bindings
+            if (breakpointEvent.Breakpoints.Count == 0) {
+                await CompleteSteppingAsync(false).ConfigureAwait(false);
+                return;
+            }
+
+            //  Derive breakpoint bindings, if any
+            var breakpointBindings = new List<NodeBreakpointBinding>();
+            foreach (int breakpoint in args.BreakpointEvent.Breakpoints) {
+                NodeBreakpointBinding nodeBreakpointBinding;
+                if (_breakpointBindings.TryGetValue(breakpoint, out nodeBreakpointBinding)) {
+                    breakpointBindings.Add(nodeBreakpointBinding);
+                }
+            }
+
+            // Process break for breakpoint bindings, if any
+            if (!await ProcessBreakpointBreakAsync(breakpointBindings, false, false).ConfigureAwait(false)) {
+                await AutoResumeAsync(false).ConfigureAwait(false);
+            }
+        }
+
+        private async Task<bool> ProcessBreakpointBreakAsync(
+            List<NodeBreakpointBinding> breakpointBindings,
+            bool haveCallstack,
+            bool testFullyBound,
+            CancellationToken cancellationToken = new CancellationToken()) {
+            bool result = true;
             // Handle breakpoint(s) but no matching binding(s)
             // Indicated by non-null but empty breakpoint bindings collection
-            var bindingsToProcess = breakpointBindings.Count;
+            int bindingsToProcess = breakpointBindings.Count;
             if (bindingsToProcess == 0) {
-                noBreakpointsHitHandler();
+                result = false;
             }
 
             // Process breakpoint binding
-            List<NodeBreakpointBinding> hitBindings = new List<NodeBreakpointBinding>();
-            Action<NodeBreakpointBinding> processBinding =
-                (binding) => {
-                    // Collect hit breakpoint bindings
-                    if (binding != null) {
-                        hitBindings.Add(binding);
-                    }
+            var hitBindings = new List<NodeBreakpointBinding>();
+            Action<NodeBreakpointBinding> processBinding = async binding => {
+                // Collect hit breakpoint bindings
+                if (binding != null) {
+                    hitBindings.Add(binding);
+                }
 
-                    // Handle last processed breakpoint binding by either breaking with breakpoint hit events or calling noBreakpointsHitHandler
-                    if (--bindingsToProcess == 0) {
-                        if (hitBindings.Count > 0) {
-                            // Fire breakpoint hit event(s)
-                            var breakpointHit = BreakpointHit;
-                            if (breakpointHit != null) {
-                                foreach (var hitBinding in hitBindings) {
-                                    hitBinding.ProcessBreakpointHit(
-                                        () => {
-                                            breakpointHit(this, new BreakpointHitEventArgs(hitBinding, MainThread));
-                                        }
-                                    );
-                                }
+                // Handle last processed breakpoint binding by either breaking with breakpoint hit events or calling noBreakpointsHitHandler
+                if (--bindingsToProcess == 0) {
+                    if (hitBindings.Count > 0) {
+                        // Fire breakpoint hit event(s)
+                        EventHandler<BreakpointHitEventArgs> breakpointHit = BreakpointHit;
+                        if (breakpointHit != null) {
+                            foreach (NodeBreakpointBinding hitBinding in hitBindings) {
+                                NodeBreakpointBinding breakpointBinding = hitBinding;
+                                await hitBinding.ProcessBreakpointHitAsync(cancellationToken).ConfigureAwait(false);
+                                breakpointHit(this, new BreakpointHitEventArgs(breakpointBinding, MainThread));
                             }
-                        } else {
-                            // No breakpoints hit
-                            noBreakpointsHitHandler();
                         }
+                    } else {
+                        // No breakpoints hit
+                        result = false;
                     }
-                };
+                }
+            };
 
             // Process breakpoint bindings, ensuring we have callstack
             if (!haveCallstack) {
-                PerformBacktrace(
-                    (running) => {
-                        Debug.Assert(!running);
-                        ProcessBreakpointBindings(breakpointBindings, processBinding, testFullyBound);
-                    }
-                );
-            } else {
-                ProcessBreakpointBindings(breakpointBindings, processBinding, testFullyBound);
+                bool running = await PerformBacktraceAsync(cancellationToken).ConfigureAwait(false);
+                Debug.Assert(!running);
             }
+
+            await ProcessBreakpointBindingsAsync(breakpointBindings, processBinding, testFullyBound, cancellationToken).ConfigureAwait(false);
+
+            return result;
         }
 
-        private void ProcessBreakpointBindings(List<NodeBreakpointBinding> breakpointBindings, Action<NodeBreakpointBinding> processBinding, bool testFullyBound) {
+        private async Task ProcessBreakpointBindingsAsync(
+            IEnumerable<NodeBreakpointBinding> breakpointBindings,
+            Action<NodeBreakpointBinding> processBinding,
+            bool testFullyBound,
+            CancellationToken cancellationToken = new CancellationToken()) {
             // Iterate over breakpoint bindings, processing them as fully bound or not
-            var currentLineNo = MainThread.TopStackFrame.LineNo;
-            foreach (var breakpointBinding in breakpointBindings) {
+            int currentLineNo = MainThread.TopStackFrame.LineNo;
+            foreach (NodeBreakpointBinding breakpointBinding in breakpointBindings) {
                 // Handle normal (fully bound) breakpoint binding
                 if (breakpointBinding.FullyBound) {
                     if (testFullyBound) {
                         // Process based on whether hit (based on hit count and/or condition predicates)
-                        breakpointBinding.TestAndProcessHit(processBinding);
+                        if (await breakpointBinding.TestAndProcessHitAsync()) {
+                            processBinding(breakpointBinding);
+                        } else {
+                            processBinding(null);
+                        }
                         continue;
                     }
 
@@ -863,159 +631,107 @@ namespace Microsoft.NodejsTools.Debugger {
 
                 // Handle fixed-up breakpoint binding
                 // Rebind breakpoint
-                RemoveBreakPoint(
-                    breakpointBinding,
-                    successHandler:
-                        () => {
-                            var breakpoint = breakpointBinding.Breakpoint;
-                            SetBreakpoint(
-                                breakpoint,
-                                successHandler:
-                                    (breakpointID, scriptID, lineNo) => {
-                                        // Treat rebound breakpoint binding as fully bound
-                                        var reboundbreakpointBinding = CreateBreakpointBinding(breakpoint, breakpointID, scriptID, lineNo, fullyBound: true);
-                                        HandleBindBreakpointSuccess(reboundbreakpointBinding, breakpoint);
+                await RemoveBreakPointAsync(breakpointBinding, cancellationToken).ConfigureAwait(false);
 
-                                        // Handle invalid-line fixup (second bind matches current line)
-                                        if (reboundbreakpointBinding.LineNo == currentLineNo) {
-                                            // Process based on whether hit (based on hit count and/or condition predicates)
-                                            reboundbreakpointBinding.TestAndProcessHit(processBinding);
-                                            return;
-                                        }
+                NodeBreakpoint breakpoint = breakpointBinding.Breakpoint;
+                Tuple<int, int?, int> result = await SetBreakpointAsync(breakpoint, cancellationToken: cancellationToken).ConfigureAwait(false);
 
-                                        // Handle lambda-eval fixup (second bind does not match current line)
-                                        // Process as not hit
-                                        processBinding(null);
-                                    },
-                                failureHandler:
-                                    () => {
-                                        processBinding(null);
-                                    }
-                            );
-                        },
-                    failureHandler:
-                        () => {
-                            processBinding(breakpointBinding);
-                        }
-                );
-            }
-        }
+                // Treat rebound breakpoint binding as fully bound
+                NodeBreakpointBinding reboundbreakpointBinding = CreateBreakpointBinding(breakpoint, result.Item1, result.Item2, result.Item3, true);
+                HandleBindBreakpointSuccess(reboundbreakpointBinding, breakpoint);
 
-        private void ProcessException(Dictionary<string, object> json) {
-            var body = (Dictionary<string, object>)json["body"];
-            var uncaught = (bool)body["uncaught"];
-
-            var exceptionName = GetExceptionName(json);
-            var errNo = GetExceptionCodeRef(json);
-            if (errNo != null) {
-                string errorCodeFromMap;
-                if (_errorCodes.TryGetValue(errNo.Value, out errorCodeFromMap)) {
-                    ReportException(body, uncaught, exceptionName, errorCodeFromMap);
-                } else {
-                    Connection.SendRequest(
-                        "lookup",
-                        new Dictionary<string, object> {
-                            { "handles", new object[] {errNo.Value} },
-                            { "includeSource", false }
-                        },
-                        lookupSuccessJson => {
-                            var errorCodeFromLookup = ((Dictionary<string, object>)((Dictionary<string, object>)lookupSuccessJson["body"])[errNo.ToString()])["value"].ToString();
-                            _errorCodes[errNo.Value] = errorCodeFromLookup;
-                            ReportException(body, uncaught, exceptionName, errorCodeFromLookup);
-                        },
-                        lookupFailureJson => {
-                            ReportException(body, uncaught, exceptionName);
-                        }
-                    );
+                // Handle invalid-line fixup (second bind matches current line)
+                if (reboundbreakpointBinding.LineNo == currentLineNo) {
+                    // Process based on whether hit (based on hit count and/or condition predicates)
+                    if (await reboundbreakpointBinding.TestAndProcessHitAsync()) {
+                        processBinding(reboundbreakpointBinding);
+                    } else {
+                        processBinding(null);
+                    }
+                    return;
                 }
-            } else {
-                ReportException(body, uncaught, exceptionName);
+
+                // Handle lambda-eval fixup (second bind does not match current line)
+                // Process as not hit
+                processBinding(null);
             }
         }
 
-        private void ReportException(Dictionary<string, object> body, bool uncaught, string exceptionName, string errorCode) {
-            ReportException(body, uncaught, exceptionName + "(" + errorCode + ")");
+        private async void OnExceptionEvent(object sender, ExceptionEventArgs args) {
+            ExceptionEvent exception = args.ExceptionEvent;
+
+            if (exception.ErrorNumber == null) {
+                ReportException(exception);
+                return;
+            }
+
+            int errorNumber = exception.ErrorNumber.Value;
+            string errorCodeFromMap;
+            if (_errorCodes.TryGetValue(errorNumber, out errorCodeFromMap)) {
+                ReportException(exception, errorCodeFromMap);
+                return;
+            }
+
+            var tokenSource = new CancellationTokenSource(_timeout);
+            var lookupCommand = new LookupCommand(CommandId, _resultFactory, new[] { exception.ErrorNumber.Value });
+            await _client.SendRequestAsync(lookupCommand, tokenSource.Token).ConfigureAwait(false);
+
+            string errorCodeFromLookup = lookupCommand.Results[errorNumber][0].StringValue;
+            _errorCodes[errorNumber] = errorCodeFromLookup;
+
+            ReportException(exception, errorCodeFromLookup);
         }
-        
-        private void ReportException(Dictionary<string, object> body, bool uncaught, string exceptionName) {
+
+        private async void ReportException(ExceptionEvent exceptionEvent, string errorCode = null) {
+            string exceptionName = exceptionEvent.ExceptionName;
+            if (!string.IsNullOrEmpty(errorCode)) {
+                exceptionName = string.Format("{0}({1})", exceptionName, errorCode);
+            }
             // UNDONE Handle break on unhandled, once just my code is supported
             // Node has a catch all, so there are no uncaught exceptions
             // For now just break always or never
             //if (exceptionTreatment == ExceptionHitTreatment.BreakNever ||
             //    (exceptionTreatment == ExceptionHitTreatment.BreakOnUnhandled && !uncaught)) {
-            ExceptionHitTreatment exceptionTreatment;
-            if (!_exceptionTreatments.TryGetValue(exceptionName, out exceptionTreatment)) {
-                exceptionTreatment = _defaultExceptionTreatment;
-            }
+            ExceptionHitTreatment exceptionTreatment = _exceptionHandler.GetExceptionHitTreatment(exceptionName);
             if (exceptionTreatment == ExceptionHitTreatment.BreakNever) {
-                AutoResume(haveCallstack: false);
+                await AutoResumeAsync(false).ConfigureAwait(false);
                 return;
             }
 
             // We need to get the backtrace before we break, so we request the backtrace
             // and follow up with firing the appropriate event for the break
-            PerformBacktrace((running) => {
-                // Handle followup
-                Debug.Assert(!running);
-                var exceptionRaised = ExceptionRaised;
-                if (exceptionRaised != null) {
-                    var exception = (Dictionary<string, object>)body["exception"];
-                    var text = (string)exception["text"];
-                    exceptionRaised(this, new ExceptionRaisedEventArgs(MainThread, new NodeException(exceptionName, text), uncaught));
-                }
-            });
-        }
+            bool running = await PerformBacktraceAsync().ConfigureAwait(false);
+            Debug.Assert(!running);
 
-        private int? GetExceptionCodeRef(Dictionary<string, object> json) {
-            var body = (Dictionary<string, object>)json["body"];
-            var exception = (Dictionary<string, object>)body["exception"];
-            object propertiesObj = null;
-            if (exception.TryGetValue("properties", out propertiesObj) && propertiesObj != null) {
-                var properties = (object[])propertiesObj;
-                foreach (Dictionary<string, object> property in properties) {
-                    if (((string)property["name"]) == "code") {
-                        return (int)property["ref"];
-                    }
-                }
+            // Handle followup
+            EventHandler<ExceptionRaisedEventArgs> exceptionRaised = ExceptionRaised;
+            if (exceptionRaised == null) {
+                return;
             }
 
-            return null;
+            // Serialize exception object to get a proper description
+            var tokenSource = new CancellationTokenSource(_timeout);
+            var evaluateCommand = new EvaluateCommand(CommandId, _resultFactory, exceptionEvent.ExceptionId);
+            await _client.SendRequestAsync(evaluateCommand, tokenSource.Token).ConfigureAwait(false);
+
+            string description = evaluateCommand.Result.StringValue ?? exceptionEvent.Description;
+            var exception = new NodeException(exceptionEvent.TypeName, description);
+
+            exceptionRaised(this, new ExceptionRaisedEventArgs(MainThread, exception, exceptionEvent.Uncaught));
         }
 
-        private string GetExceptionName(Dictionary<string, object> json) {
-            var body = (Dictionary<string, object>)json["body"];
-            var exception = (Dictionary<string, object>)body["exception"];
-            var name = (string)exception["type"];
-            if (name == "error" || name == "object") {
-                var constructorFunction = (Dictionary<string, object>)exception["constructorFunction"];
-                var constructorFunctionHandle = (int)constructorFunction["ref"];
-                var refs = (object[])json["refs"];
-                var refRecord = GetRefRecord(refs, constructorFunctionHandle);
-                if (refRecord != null) {
-                    name = (string)refRecord["name"];
-                }
-            }
-            return name;
+        private async Task<int> GetCallstackDepthAsync(CancellationToken cancellationToken = new CancellationToken()) {
+            var backtraceCommand = new BacktraceCommand(CommandId, _resultFactory, 0, 1);
+            await _client.SendRequestAsync(backtraceCommand, cancellationToken).ConfigureAwait(false);
+
+            return backtraceCommand.CallstackDepth;
         }
 
-        private void GetCallstackDepth(Action<int> followupHandler) {
-            Connection.SendRequest(
-                "backtrace",
-                new Dictionary<string, object> {
-                    { "fromFrame", 0 },
-                    { "toFrame", 1 },
-                    { "inlineRefs", true }
-                },
-                successHandler:
-                    json => {
-                        var body = (Dictionary<string, object>)json["body"];
-                        var callstackDepth = (int)body["totalFrames"];
-                        followupHandler(callstackDepth);
-                    }
-                );
-        }
-
-        private void PerformBacktrace(Action<bool> followupHandler) {
+        /// <summary>
+        /// Retrieves a backtrace for current execution point.
+        /// </summary>
+        /// <returns>Whether program execution in progress.</returns>
+        private async Task<bool> PerformBacktraceAsync(CancellationToken cancellationToken = new CancellationToken()) {
             // CONSIDER:  Lazy population of callstacks
             // Given the VS Debugger UI always asks for full callstacks, we always ask Node.js for full backtraces.
             // Given the nature or Node.js code, deep callstacks are expected to be rare.
@@ -1023,138 +739,40 @@ namespace Microsoft.NodejsTools.Debugger {
             // request takes a 'bottom' parameter, empirically, Node.js fails requests with it set.  Here we
             // approximate 'bottom' for 'toFrame' using int.MaxValue.  Node.js silently handles toFrame depths
             // greater than the current callstack.
-            Connection.SendRequest(
-                "backtrace",
-                new Dictionary<string, object> {
-                    { "fromFrame", 0 },
-                    { "toFrame", int.MaxValue },
-                    { "inlineRefs", true }
-                },
-                successHandler:
-                    json => {
-                        var running = (bool)json["running"];
-                        if (running) {
-                            if (followupHandler != null) {
-                                followupHandler(running);
-                            }
-                            return;
-                        }
+            var backtraceCommand = new BacktraceCommand(CommandId, _resultFactory, 0, int.MaxValue, this);
+            await _client.SendRequestAsync(backtraceCommand, cancellationToken).ConfigureAwait(false);
 
-                        var mainThread = MainThread;
-                        var jsonValue = new JsonValue(json);
-                        ResponseHandler.ProcessBacktrace(
-                            mainThread,
-                            _mapIdToScript,
-                            jsonValue,
-                            successHandler:
-                                frames => {
-                                    FixupBacktrace(frames, followupHandler);
-                                }
-                        );
-                    }
-                );
-        }
-
-        private static void AddFixupHandler(
-            Dictionary<NodeEvaluationResult, List<Action<NodeEvaluationResult, Dictionary<string, object>>>> evaluationResultHandlers,
-            NodeEvaluationResult evaluationResult,
-            Action<NodeEvaluationResult, Dictionary<string, object>> handler
-        ) {
-            List<Action<NodeEvaluationResult, Dictionary<string, object>>> handlers;
-            if (!evaluationResultHandlers.TryGetValue(evaluationResult, out handlers)) {
-                handlers = new List<Action<NodeEvaluationResult, Dictionary<string, object>>>();
-                evaluationResultHandlers[evaluationResult] = handlers;
-            }
-            handlers.Add(handler);
-        }
-
-        private void FixupBacktrace(NodeStackFrame[] nodeFrames, Action<bool> followupHandler) {
-            // Wrap followup handler
-            Action followup = () => {
-                MainThread.Frames = nodeFrames;
-                if (followupHandler != null) {
-                    followupHandler(false);
-                }
-            };
-
-            // Collect evaluation results requiring fixup and map to fixup handlers
-            // Allow for multiple fixup handlers per evaluation result
-            Dictionary<NodeEvaluationResult, List<Action<NodeEvaluationResult, Dictionary<string, object>>>> evaluationResultHandlers = new Dictionary<NodeEvaluationResult, List<Action<NodeEvaluationResult, Dictionary<string, object>>>>();
-            foreach (var nodeFrame in nodeFrames) {
-                foreach (var evaluationResult in nodeFrame.Parameters.Concat(nodeFrame.Locals)) {
-                    if (evaluationResult.Handle > 0) {
-                        if (evaluationResult.TypeName == "Number" && evaluationResult.StringValue == null) {
-                            AddFixupHandler(
-                                evaluationResultHandlers,
-                                evaluationResult,
-                                (fixupEvaluationResult, record) => {
-                                    fixupEvaluationResult.StringValue = fixupEvaluationResult.HexValue = (string)record["text"];
-                                }
-                            );
-                        }
-                    }
-                }
-            }
-            if (evaluationResultHandlers.Count == 0) {
-                // No fixup
-                followup();
-                return;
+            MainThread.Frames = backtraceCommand.StackFrames.ToArray();
+            foreach (NodeModule module in backtraceCommand.Modules.Values) {
+                AddScript(module);
             }
 
-            // Perform lookup on evaluation result handles
-            var handles = evaluationResultHandlers.Keys.Select(r => r.Handle).Cast<object>().ToArray();
-            Connection.SendRequest(
-                "lookup",
-                new Dictionary<string, object> {
-                    { "handles", handles },
-                    { "includeSource", false }
-                },
-                successHandler:
-                    json => {
-                        // Invoke fixup handlers, passing associated evaluation result and "lookup" response record
-                        // For multiple fixup handlers per evaluation result, process in order of handler adds
-                        var body = (Dictionary<string, object>)json["body"];
-                        foreach (var evaluationResult in evaluationResultHandlers.Keys) {
-                            var record = (Dictionary<string, object>)body[evaluationResult.Handle.ToString()];
-                            foreach (var handler in evaluationResultHandlers[evaluationResult]) {
-                                handler(evaluationResult, record);
-                            }
-                        }
-                        followup();
-                    },
-                failureHandler:
-                    json => {
-                        // No fixup
-                        followup();
-                    }
-            );
+            return backtraceCommand.Running;
         }
 
         internal IList<NodeThread> GetThreads() {
-            List<NodeThread> threads = new List<NodeThread>();
-            foreach (var thread in _threads.Values) {
-                threads.Add(thread);
-            }
-            return threads;
+            return _threads.Values.ToList();
         }
 
-
-        internal void SendStepOver(int identity) {
+        internal async void SendStepOver(int identity) {
             DebugWriteCommand("StepOver");
-            Continue(SteppingKind.Over);
+            var tokenSource = new CancellationTokenSource(_timeout);
+            await ContinueAsync(SteppingKind.Over, 1, tokenSource.Token).ConfigureAwait(false);
         }
 
-        internal void SendStepInto(int identity) {
+        internal async void SendStepInto(int identity) {
             DebugWriteCommand("StepInto");
-            Continue(SteppingKind.Into);
+            var tokenSource = new CancellationTokenSource(_timeout);
+            await ContinueAsync(SteppingKind.Into, 1, tokenSource.Token).ConfigureAwait(false);
         }
 
-        internal void SendStepOut(int identity) {
+        internal async void SendStepOut(int identity) {
             DebugWriteCommand("StepOut");
-            Continue(SteppingKind.Out);
+            var tokenSource = new CancellationTokenSource(_timeout);
+            await ContinueAsync(SteppingKind.Out, 1, tokenSource.Token).ConfigureAwait(false);
         }
 
-        internal void SendResumeThread(int threadId) {
+        internal async void SendResumeThread(int threadId) {
             DebugWriteCommand("ResumeThread");
 
             // Handle load complete resume
@@ -1164,31 +782,25 @@ namespace Microsoft.NodejsTools.Debugger {
 
                 // Handle breakpoint binding at entrypoint
                 // Attempt to fire breakpoint hit event without actually resuming
-                var topFrame = MainThread.TopStackFrame;
-                var breakLineNo = topFrame.LineNo;
-                var breakFileName = topFrame.FileName.ToLower();
-                var breakModule = GetModuleForFilePath(breakFileName);
-                List<NodeBreakpointBinding> breakpointBindings = new List<NodeBreakpointBinding>();
-                foreach (var breakpointBinding in _breakpointBindings.Values) {
-                    if (breakpointBinding.Enabled && breakpointBinding.LineNo == breakLineNo && GetModuleForFilePath(breakpointBinding.FileName) == breakModule) {
+                NodeStackFrame topFrame = MainThread.TopStackFrame;
+                int breakLineNo = topFrame.LineNo;
+                string breakFileName = topFrame.FileName.ToLower();
+                NodeModule breakModule = GetModuleForFilePath(breakFileName);
+
+                var breakpointBindings = new List<NodeBreakpointBinding>();
+                foreach (NodeBreakpointBinding breakpointBinding in _breakpointBindings.Values) {
+                    if (breakpointBinding.Enabled && breakpointBinding.LineNo == breakLineNo &&
+                        GetModuleForFilePath(breakpointBinding.FileName) == breakModule) {
                         breakpointBindings.Add(breakpointBinding);
                     }
                 }
+
                 if (breakpointBindings.Count > 0) {
                     // Delegate to ProcessBreak() which knows how to correctly
                     // fire breakpoint hit events for given breakpoint bindings and current backtrace
-                    ProcessBreakpointBreak(
-                        breakpointBindings,
-                        noBreakpointsHitHandler:
-                            () => {
-                                // Handle no breakpoints hit for current backtrace
-                                // Fire entrypoint hit event without actually resuming
-                                // SDM will auto-resume on entrypoint hit for F5 launch, but not for F10/F11 launch
-                                HandleEntryPointHit();
-                            },
-                        haveCallstack: true,
-                        testFullyBound: true
-                    );
+                    if (!await ProcessBreakpointBreakAsync(breakpointBindings, true, true).ConfigureAwait(false)) {
+                        HandleEntryPointHit();
+                    }
                     return;
                 }
 
@@ -1210,13 +822,13 @@ namespace Microsoft.NodejsTools.Debugger {
             }
 
             // Handle tracepoint (auto-resumed "when hit" breakpoint) resume during stepping
-            AutoResume(haveCallstack: true);
+            await AutoResumeAsync(true).ConfigureAwait(false);
         }
 
         private bool HandleEntryPointHit() {
             if (_handleEntryPointHit) {
                 _handleEntryPointHit = false;
-                var entryPointHit = EntryPointHit;
+                EventHandler<ThreadEventArgs> entryPointHit = EntryPointHit;
                 if (entryPointHit != null) {
                     entryPointHit(this, new ThreadEventArgs(MainThread));
                     return true;
@@ -1230,395 +842,217 @@ namespace Microsoft.NodejsTools.Debugger {
             //throw new NotImplementedException();
         }
 
-        public void Detach() {
+        public async void Detach() {
             DebugWriteCommand("Detach");
 
             // Disconnect request has no response
-            Connection.SendRequest("disconnect");
-            Connection.Disconnect();
+            var tokenSource = new CancellationTokenSource(_timeout);
+            var disconnectCommand = new DisconnectCommand(CommandId);
+            await _client.SendRequestAsync(disconnectCommand, tokenSource.Token).ConfigureAwait(false);
+
+            _connection.Close();
         }
 
-        private string GetCaseInsensitiveRegex(string filePath, bool leafNameOnly) {
-            // NOTE: There is no way to pass a regex case insensitive modifier to the Node (V8) engine
-            var fileName = filePath;
-            var trailing = false;
-            if (leafNameOnly) {
-                fileName = Path.GetFileName(filePath);
-                trailing = fileName != filePath;
+        public async Task<NodeBreakpointBinding> BindBreakpointAsync(NodeBreakpoint breakpoint, CancellationToken cancellationToken = new CancellationToken()) {
+            Tuple<int, int?, int> result = await SetBreakpointAsync(breakpoint, cancellationToken: cancellationToken).ConfigureAwait(false);
+
+            bool fullyBound = (result.Item2.HasValue && result.Item3 == breakpoint.LineNo);
+            NodeBreakpointBinding breakpointBinding = CreateBreakpointBinding(breakpoint, result.Item1, result.Item2, result.Item3, fullyBound);
+
+            // Fully bound (normal case)
+            // Treat as success
+            if (fullyBound) {
+                HandleBindBreakpointSuccess(breakpointBinding, breakpoint);
+                return breakpointBinding;
             }
 
-            fileName = Regex.Escape(fileName);
+            // Not fully bound, with predicate
+            // Rebind without predicate
+            if (breakpoint.HasPredicate) {
+                await RemoveBreakPointAsync(breakpointBinding, cancellationToken).ConfigureAwait(false);
+                result = await SetBreakpointAsync(breakpoint, true, cancellationToken).ConfigureAwait(false);
 
-            var builder = new StringBuilder();
-            if (trailing) {
-                builder.Append("[" + Regex.Escape(Path.DirectorySeparatorChar.ToString() + Path.AltDirectorySeparatorChar.ToString()) + "]");
-            } else {
-                builder.Append('^');
+                Debug.Assert(!(result.Item2.HasValue && result.Item3 == breakpoint.LineNo));
+                CreateBreakpointBinding(breakpoint, result.Item1, result.Item2, result.Item3, false);
             }
 
-            foreach (var ch in fileName) {
-                var upper = ch.ToString().ToUpper();
-                var lower =  ch.ToString().ToLower();
-                if (upper != lower) {
-                    builder.Append('[');
-                    builder.Append(upper);
-                    builder.Append(lower);
-                    builder.Append(']');
-                } else {
-                    builder.Append(upper);
-                }
-            }
-
-            builder.Append("$");
-            return builder.ToString();
+            // Not fully bound, without predicate
+            // Treat as failure (for now)
+            HandleBindBreakpointFailure(breakpoint);
+            return null;
         }
 
-        public void BindBreakpoint(NodeBreakpoint breakpoint, Action<NodeBreakpointBinding> successHandler = null, Action failureHandler = null) {
-            // Wrap failure handler
-            Action wrappedFailureHandler = () => {
-                HandleBindBreakpointFailure(breakpoint);
-
-                if (failureHandler != null) {
-                    failureHandler();
-                }
-            };
-
-            SetBreakpoint(
-                breakpoint,
-                successHandler:
-                    (breakpointID, scriptID, lineNo) => {
-                        var fullyBound = (scriptID.HasValue && lineNo == breakpoint.LineNo);
-                        var breakpointBinding = CreateBreakpointBinding(breakpoint, breakpointID, scriptID, lineNo, fullyBound);
-
-                        // Fully bound (normal case)
-                        // Treat as success
-                        if (fullyBound) {
-                            HandleBindBreakpointSuccess(breakpointBinding, breakpoint);
-                            if (successHandler != null) {
-                                successHandler(breakpointBinding);
-                            }
-                            return;
-                        }
-
-                        // Not fully bound, with predicate
-                        // Rebind without predicate
-                        if (breakpoint.HasPredicate) {
-                            RemoveBreakPoint(
-                                breakpointBinding,
-                                successHandler:
-                                    () => {
-                                        SetBreakpoint(
-                                            breakpoint,
-                                            withoutPredicate: true,
-                                            successHandler:
-                                                (breakpointID2, scriptID2, lineNo2) => {
-                                                    Debug.Assert(!(scriptID2.HasValue && lineNo2 == breakpoint.LineNo));
-                                                    CreateBreakpointBinding(breakpoint, breakpointID2, scriptID2, lineNo2, fullyBound: false);
-
-                                                    // Treat as failure (for now)
-                                                    wrappedFailureHandler();
-                                                },
-                                            failureHandler: wrappedFailureHandler
-                                        );
-                                    },
-                                failureHandler: wrappedFailureHandler
-                            );
-                            return;
-                        }
-
-                        // Not fully bound, without predicate
-                        // Treat as failure (for now)
-                        wrappedFailureHandler();
-                        return;
-
-                    },
-                failureHandler: wrappedFailureHandler
-            );
-        }
-
-        internal void SetBreakpoint(NodeBreakpoint breakpoint, Action<int, int?, int> successHandler = null, Action failureHandler = null, bool withoutPredicate = false) {
+        internal async Task<Tuple<int, int?, int>> SetBreakpointAsync(
+            NodeBreakpoint breakpoint,
+            bool withoutPredicate = false,
+            CancellationToken cancellationToken = new CancellationToken()) {
             DebugWriteCommand(String.Format("Set Breakpoint"));
 
-            // Zero based line numbers
-            var line = breakpoint.LineNo - 1;
+            // Try to find module
+            NodeModule module = GetModuleForFilePath(breakpoint.FileName);
 
-            // Zero based column numbers
-            // Special case column to avoid (line 0, column 0) which
-            // Node (V8) treats specially for script loaded via require
-            var column = line == 0 ? 1 : 0;
+            var setBreakpointCommand = new SetBreakpointCommand(CommandId, module, breakpoint, withoutPredicate);
+            await _client.SendRequestAsync(setBreakpointCommand, cancellationToken).ConfigureAwait(false);
 
-            // Compose request arguments
-            var args =
-                new Dictionary<string, object> { 
-                    { "line", line },
-                    { "column", column }
-                };
-            var module = GetModuleForFilePath(breakpoint.FileName);
-            if (module != null) {
-                args["type"] = "scriptId";
-                args["target"]= module.ModuleId;
-            } else {
-                args["type"] = "scriptRegExp";
-                args["target"] = GetCaseInsensitiveRegex(breakpoint.FileName, _attached);
-            }
-
-            if (!NodeBreakpointBinding.GetEngineEnabled(breakpoint.Enabled, breakpoint.BreakOn, 0)) {
-                args["enabled"] = false;
-            }
-
-            if (!withoutPredicate) {
-                var ignoreCount = NodeBreakpointBinding.GetEngineIgnoreCount(breakpoint.BreakOn, 0);
-                if (ignoreCount > 0) {
-                    args["ignoreCount"] = ignoreCount;
-                }
-
-                if (!string.IsNullOrEmpty(breakpoint.Condition)) {
-                    args["condition"] = breakpoint.Condition;
-                }
-            }
-
-            Connection.SendRequest(
-                "setbreakpoint",
-                args,
-                successHandler:
-                    (json) => {
-                        var body = (Dictionary<string, object>)json["body"];
-                        var breakpointID = (int)body["breakpoint"];
-                        int? scriptID = null;
-                        if (module != null) {
-                            scriptID = module.ModuleId;
-                        }
-
-                        // Handle breakpoint actual location fixup
-                        var lineNo = breakpoint.LineNo;
-                        object actualLocationsObject;
-                        if (body.TryGetValue("actual_locations", out actualLocationsObject) && actualLocationsObject != null) {
-                            var actualLocations = (object[])actualLocationsObject;
-                            if (actualLocations.Length > 0) {
-                                Debug.Assert(actualLocations.Length == 1);
-                                var actualLocation = (int)((Dictionary<string, object>)actualLocations[0])["line"] + 1;
-                                if (actualLocation != breakpoint.LineNo) {
-                                    lineNo = actualLocation;
-                                }
-                            }
-                        }
-
-                        successHandler(breakpointID, scriptID, lineNo);
-                    },
-                failureHandler:
-                    (json) => {
-                        failureHandler();
-                    }
-            );
+            return new Tuple<int, int?, int>(setBreakpointCommand.BreakpointId, setBreakpointCommand.ScriptId, setBreakpointCommand.LineNo);
         }
 
-        private NodeBreakpointBinding CreateBreakpointBinding(NodeBreakpoint breakpoint, int breakpointID, int? scriptID, int lineNo, bool fullyBound) {
-            var breakpointBinding = breakpoint.CreateBinding(lineNo, breakpointID, scriptID, fullyBound);
-            _breakpointBindings[breakpointID] = breakpointBinding;
+        private NodeBreakpointBinding CreateBreakpointBinding(NodeBreakpoint breakpoint, int breakpointId, int? scriptId, int lineNo, bool fullyBound) {
+            NodeBreakpointBinding breakpointBinding = breakpoint.CreateBinding(lineNo, breakpointId, scriptId, fullyBound);
+            _breakpointBindings[breakpointId] = breakpointBinding;
             return breakpointBinding;
         }
 
         private void HandleBindBreakpointSuccess(NodeBreakpointBinding breakpointBinding, NodeBreakpoint breakpoint) {
-            var breakpointBound = BreakpointBound;
+            EventHandler<BreakpointBindingEventArgs> breakpointBound = BreakpointBound;
             if (breakpointBound != null) {
                 breakpointBound(this, new BreakpointBindingEventArgs(breakpoint, breakpointBinding));
             }
         }
 
         private void HandleBindBreakpointFailure(NodeBreakpoint breakpoint) {
-            var breakpointBindFailure = BreakpointBindFailure;
+            EventHandler<BreakpointBindingEventArgs> breakpointBindFailure = BreakpointBindFailure;
             if (breakpointBindFailure != null) {
                 breakpointBindFailure(this, new BreakpointBindingEventArgs(breakpoint, null));
             }
         }
 
         internal NodeModule GetModuleForFilePath(string filePath) {
-            NodeModule module = null;
+            NodeModule module;
             _mapNameToScript.TryGetValue(filePath, out module);
             return module;
         }
 
-        internal bool UpdateBreakpointBinding(
+        internal async Task UpdateBreakpointBindingAsync(
             int breakpointId,
             bool? enabled = null,
             string condition = null,
             int? ignoreCount = null,
-            Action followupHandler = null,
-            bool validateSuccess = false
-        ) {
+            bool validateSuccess = false,
+            CancellationToken cancellationToken = new CancellationToken()) {
             // DEVNOTE: Calling UpdateBreakpointBinding() on the debug thread with validateSuccess == true will deadlock
             // and timout, causing both the followup handler to be called before confirmation of success (or failure), and
             // a return of false (failure).
-
             DebugWriteCommand(String.Format("Update Breakpoint binding"));
 
-            // Compose request arguments
-            if (enabled == null && condition == null && ignoreCount == null) {
-                Debug.Fail("enabled and/or condition and/ or ignoreCount expected");
-                return false;
-            }
-            var args = new Dictionary<string, object> { { "breakpoint", breakpointId }};
-            if (enabled != null) {
-                args["enabled"] = enabled.Value;
-            }
-            if (condition != null) {
-                args["condition"] = condition;
-            }
-            if (ignoreCount != null) {
-                args["ignoreCount"] = ignoreCount.Value;
-            }
-
-            // Process request
-            bool success = false;
-            Connection.SendRequest(
-                "changebreakpoint",
-                args,
-                json => {
-                    // Handle success
-                    if (followupHandler != null) {
-                        followupHandler();
-                    }
-                    success = true;
-                },
-                json => {
-                    // Handle failure
-                    if (followupHandler != null) {
-                        followupHandler();
-                    }
-                },
-                validateSuccess ? (int?)2000 : null,
-                validateSuccess ? (Func<bool>)(() => HasExited) : null
-            );
-
-            return validateSuccess ? success : true;
+            var changeBreakPointCommand = new ChangeBreakpointCommand(CommandId, breakpointId, enabled, condition, ignoreCount);
+            await _client.SendRequestAsync(changeBreakPointCommand, cancellationToken).ConfigureAwait(false);
         }
 
-        internal int? GetBreakpointHitCount(
-            int breakpointId
-        ) {
+        internal async Task<int?> GetBreakpointHitCountAsync(int breakpointId, CancellationToken cancellationToken = new CancellationToken()) {
             int? hitCount = null;
-            Connection.SendRequest(
-                "listbreakpoints",
-                null,   // args
-                json => {
-                    // Handle success
-                    var body = (Dictionary<string, object>)json["body"];
-                    var breakpoints = (object[])body["breakpoints"];
-                    foreach (var breakpointObj in breakpoints) {
-                        var breakpoint = (Dictionary<string, object>)breakpointObj;
-                        if ((int)breakpoint["number"] == breakpointId) {
-                            hitCount = (int)breakpoint["hit_count"];
-                            break;
-                        }
-                    }
-                },
-                timeout: 2000,
-                shortCircuitPredicate: () => HasExited
-            );
+
+            var listBreakpointsCommand = new ListBreakpointsCommand(CommandId);
+            await _client.SendRequestAsync(listBreakpointsCommand, cancellationToken).ConfigureAwait(false);
+
+            foreach (var breakpoint in listBreakpointsCommand.Breakpoints) {
+                if (breakpoint.Key == breakpointId) {
+                    hitCount = breakpoint.Value;
+                    break;
+                }
+            }
 
             return hitCount;
         }
 
-        internal void ExecuteText(string text, NodeStackFrame nodeStackFrame, Action<NodeEvaluationResult> completion) {
-            DebugWriteCommand("ExecuteText to thread " + nodeStackFrame.Thread.Id + " " /*+ executeId*/);
+        internal async Task<NodeEvaluationResult> ExecuteTextAsync(
+            string text,
+            NodeStackFrame nodeStackFrame,
+            CancellationToken cancellationToken = new CancellationToken()) {
+            DebugWriteCommand("Execute Text Async");
 
-            Connection.SendRequest(
-                "evaluate",
-                new Dictionary<string, object> {
-                            { "expression", text },
-                            { "frame",  nodeStackFrame.FrameId },
-                            { "global", false },
-                            { "disable_break", true },
-                            { "maxStringLength", -1 }
-                },
-                json => {
-                    // Handle success
-                    var jsonValue = new JsonValue(json);
-                    var evaluationResult = ResponseHandler.ProcessEvaluate(nodeStackFrame, text, jsonValue);
-                    completion(evaluationResult);
-                },
-                json => {
-                    // Handle failure
-                    completion(new NodeEvaluationResult((string)json["message"],text,nodeStackFrame));
-                }
-            );
+            var evaluateCommand = new EvaluateCommand(CommandId, _resultFactory, text, nodeStackFrame);
+            await _client.SendRequestAsync(evaluateCommand, cancellationToken).ConfigureAwait(false);
+
+            return evaluateCommand.Result;
         }
 
-        internal void EnumChildren(NodeEvaluationResult nodeEvaluationResult, Action<NodeEvaluationResult[]> completion) {
-            DebugWriteCommand("Enum Children");
+        internal async Task<NodeEvaluationResult> SetVariableValueAsync(
+            NodeStackFrame stackFrame,
+            string name,
+            string value,
+            CancellationToken cancellationToken = new CancellationToken()) {
+            DebugWriteCommand("Set Variable Value");
 
-            Connection.SendRequest(
-                "lookup",
-                new Dictionary<string, object> {
-                            { "handles", new object[] {nodeEvaluationResult.Handle} },
-                            { "includeSource", false }
-                },
-                json => {
-                    // Handle success
-                    var jsonValue = new JsonValue(json);
-                    var evaluationResults = ResponseHandler.ProcessLookup(nodeEvaluationResult, jsonValue);
-                    completion(evaluationResults.ToArray());
-                }
-            );
-        }
+            if (_connection.NodeVersion >= _nodeSetVariableValueVersion) {
+                var evaluateValueCommand = new EvaluateCommand(CommandId, _resultFactory, value, stackFrame);
+                await _client.SendRequestAsync(evaluateValueCommand, cancellationToken).ConfigureAwait(false);
 
-        private Dictionary<string, object> GetRefRecord(object[] refs, int handle) {
-            foreach (var refRecordObj in refs) {
-                var refRecord = (Dictionary<string, object>)refRecordObj;
-                var refRecordHandle = (int)refRecord["handle"];
-                if (refRecordHandle == handle) {
-                    return refRecord;
-                }
+                int handle = evaluateValueCommand.Result.Handle;
+                var setVariableValuecommand = new SetVariableValueCommand(CommandId, _resultFactory, stackFrame, name, handle);
+                await _client.SendRequestAsync(setVariableValuecommand, cancellationToken).ConfigureAwait(false);
+                return setVariableValuecommand.Result;
             }
 
-            return null;
+            string expression = string.Format("{0} = {1}", name, value);
+            var evaluateCommand = new EvaluateCommand(CommandId, _resultFactory, expression, stackFrame);
+            await _client.SendRequestAsync(evaluateCommand, cancellationToken).ConfigureAwait(false);
+
+            return evaluateCommand.Result;
         }
 
-        internal void RemoveBreakPoint(NodeBreakpointBinding breakpointBinding, Action successHandler = null, Action failureHandler = null) {
+        internal async Task<List<NodeEvaluationResult>> EnumChildrenAsync(NodeEvaluationResult nodeEvaluationResult, CancellationToken cancellationToken = new CancellationToken()) {
+            DebugWriteCommand("Enum Children");
+
+            var lookupCommand = new LookupCommand(CommandId, _resultFactory, new List<NodeEvaluationResult> { nodeEvaluationResult });
+            await _client.SendRequestAsync(lookupCommand, cancellationToken).ConfigureAwait(false);
+
+            return lookupCommand.Results[nodeEvaluationResult.Handle];
+        }
+
+        internal async Task RemoveBreakPointAsync(NodeBreakpointBinding breakpointBinding, CancellationToken cancellationToken = new CancellationToken()) {
             DebugWriteCommand("Remove Breakpoint");
 
             // Perform remove idempotently, as remove may be called in response to BreakpointUnound event
             if (breakpointBinding.Unbound) {
-                if (successHandler != null) {
-                    successHandler();
-                }
                 return;
             }
 
-            Connection.SendRequest(
-                "clearbreakpoint",
-                new Dictionary<string, object> {
-                    { "breakpoint", breakpointBinding.BreakpointID }
-                },
-                successHandler:
-                    json => {
-                        var breakpoint = breakpointBinding.Breakpoint;
-                        _breakpointBindings.Remove(breakpointBinding.BreakpointID);
-                        breakpoint.RemoveBinding(breakpointBinding);
-                        breakpointBinding.Unbound = true;
+            int breakpointId = breakpointBinding.BreakpointId;
+            if (_connection.Connected) {
+                var clearBreakpointsCommand = new ClearBreakpointCommand(CommandId, breakpointId);
+                await _client.SendRequestAsync(clearBreakpointsCommand, cancellationToken).ConfigureAwait(false);
+            }
 
-                        var breakpointUnbound = BreakpointUnbound;
-                        if (breakpointUnbound != null) {
-                            breakpointUnbound(this, new BreakpointBindingEventArgs(breakpoint, breakpointBinding));
-                        }
+            NodeBreakpoint breakpoint = breakpointBinding.Breakpoint;
+            _breakpointBindings.Remove(breakpointId);
+            breakpoint.RemoveBinding(breakpointBinding);
+            breakpointBinding.Unbound = true;
 
-                        if (successHandler != null) {
-                            successHandler();
-                        }
-                    },
-                failureHandler:
-                    json => {
-                        if (failureHandler != null) {
-                            failureHandler();
-                        }
-                    }
-            );
+            EventHandler<BreakpointBindingEventArgs> breakpointUnbound = BreakpointUnbound;
+            if (breakpointUnbound != null) {
+                breakpointUnbound(this, new BreakpointBindingEventArgs(breakpoint, breakpointBinding));
+            }
         }
 
         internal bool SetLineNumber(NodeStackFrame nodeStackFrame, int lineNo) {
             DebugWriteCommand("Set Line Number");
-
             throw new NotImplementedException();
+        }
+
+        internal async Task<string> GetScriptTextAsync(int moduleId, CancellationToken cancellationToken = new CancellationToken()) {
+            DebugWriteCommand("GetScriptText: " + moduleId);
+
+            var scriptsCommand = new ScriptsCommand(CommandId, this, true, moduleId);
+            await _client.SendRequestAsync(scriptsCommand, cancellationToken).ConfigureAwait(false);
+
+            if (scriptsCommand.Modules.Count == 0) {
+                return null;
+            }
+
+            return scriptsCommand.Modules[0].Source;
+        }
+
+        internal async Task<bool> TestPredicateAsync(string expression, CancellationToken cancellationToken = new CancellationToken()) {
+            DebugWriteCommand("TestPredicate: " + expression);
+
+            string predicateExpression = string.Format("Boolean({0})", expression);
+            var evaluateCommand = new EvaluateCommand(CommandId, _resultFactory, predicateExpression);
+            await _client.SendRequestAsync(evaluateCommand, cancellationToken).ConfigureAwait(false);
+
+            return evaluateCommand.Result != null &&
+                   evaluateCommand.Result.Type == NodeExpressionType.Boolean &&
+                   evaluateCommand.Result.StringValue == "true";
         }
 
         #endregion
@@ -1629,8 +1063,9 @@ namespace Microsoft.NodejsTools.Debugger {
         /// Fired when the process has started and is broken into the debugger, but before any user code is run.
         /// </summary>
         public event EventHandler<ProcessLoadedEventArgs> ProcessLoaded;
+
         public event EventHandler<ThreadEventArgs> ThreadCreated;
-        public event EventHandler<ThreadEventArgs> ThreadExited { add { } remove { } }
+        public event EventHandler<ThreadEventArgs> ThreadExited;
         public event EventHandler<ThreadEventArgs> EntryPointHit;
         public event EventHandler<ThreadEventArgs> StepComplete;
         public event EventHandler<ThreadEventArgs> AsyncBreakComplete;
@@ -1641,7 +1076,11 @@ namespace Microsoft.NodejsTools.Debugger {
         public event EventHandler<BreakpointBindingEventArgs> BreakpointUnbound;
         public event EventHandler<BreakpointBindingEventArgs> BreakpointBindFailure;
         public event EventHandler<BreakpointHitEventArgs> BreakpointHit;
-        public event EventHandler<OutputEventArgs> DebuggerOutput { add { } remove { } }
+
+        public event EventHandler<OutputEventArgs> DebuggerOutput {
+            add { }
+            remove { }
+        }
 
         #endregion
 
@@ -1649,6 +1088,7 @@ namespace Microsoft.NodejsTools.Debugger {
         }
 
         #region IDisposable
+
         public void Dispose() {
             Dispose(true);
             GC.SuppressFinalize(this);
@@ -1660,161 +1100,24 @@ namespace Microsoft.NodejsTools.Debugger {
                 Terminate();
             }
         }
-        #endregion
-
-        internal string GetScriptText(int moduleId) {
-            DebugWriteCommand("GetScriptText: " + moduleId);
-
-            string scriptText = null;
-            Connection.SendRequest(
-                "scripts",
-                new Dictionary<string, object> {
-                        { "ids", new object[] {moduleId} },
-                        { "includeSource",  true },
-                },
-                successHandler: json => {
-                    var script = (Dictionary<string, object>)((object[])json["body"]).First();
-                    scriptText = (string)script["source"];
-                },
-                timeout: 3000
-            );
-            return scriptText;
-        }
-
-        internal void TestPredicate(string expression, Action trueHandler, Action falseHandler) {
-            DebugWriteCommand("TestPredicate: " + expression);
-            
-            Connection.SendRequest(
-                "evaluate",
-                new Dictionary<string, object> {
-                        { "expression", "Boolean(" + expression + ")" },
-                        { "frame",  0 },
-                        { "global", false },
-                        { "disable_break", true },
-                },
-                successHandler:
-                    json => {
-                        var record = (Dictionary<string, object>)json["body"];
-                        if ((string)record["type"] == "boolean" && (bool)record["value"] == true) {
-                            trueHandler();
-                        } else {
-                            falseHandler();
-                        }
-                    },
-                failureHandler:
-                    json => {
-                        falseHandler();
-                    }
-            );
-        }
-
-        #region Source Map Support
-
-        /// <summary>
-        /// Maps a line number from the original code to the generated JavaScript.
-        /// 
-        /// Line numbers are zero based.
-        /// </summary>
-        internal void MapToJavaScript(string requestedFileName, int requestedLineNo, out string fileName, out int lineNo) {
-            fileName = requestedFileName;
-            lineNo = requestedLineNo;
-            SourceMap sourceMap = GetSourceMap(requestedFileName);
-
-            if (sourceMap != null) {
-                SourceMapping result;
-                if (sourceMap.TryMapPointBack(requestedLineNo, 0, out result)) {
-                    lineNo = result.Line;
-                    fileName = Path.Combine(Path.GetDirectoryName(fileName), result.FileName);
-                    Debug.WriteLine("Mapped breakpoint from {0} {1} to {2} {3}", requestedFileName, requestedLineNo, fileName, lineNo);
-                }
-            }
-        }
-
-        class JavaScriptSourceMapInfo {
-            public readonly string[] Lines;
-            public readonly SourceMap Map;
-
-            public JavaScriptSourceMapInfo(SourceMap map, string[] lines) {
-                Map = map;
-                Lines = lines;
-            }
-        }
-
-        /// <summary>
-        /// Gets a source mapping for the given filename.  Line numbers are zero based.
-        /// </summary>
-        internal SourceMapping MapToOriginal(string filename, int line) {
-            JavaScriptSourceMapInfo mapInfo;
-            if (!_originalFileToSourceMap.TryGetValue(filename, out mapInfo)) {
-                if (File.Exists(filename)) {
-                    var contents = File.ReadAllLines(filename);
-                    const string marker = "# sourceMappingURL=";
-                    int markerStart;
-                    var markerLine = contents.Reverse().FirstOrDefault(x => x.IndexOf(marker) != -1);
-                    if (markerLine != null && (markerStart = markerLine.IndexOf(marker)) != -1) {
-                        string sourceMapFilename = markerLine.Substring(markerStart + marker.Length).Trim();
-                        if (!File.Exists(sourceMapFilename)) {
-                            sourceMapFilename = Path.Combine(Path.GetDirectoryName(filename), Path.GetFileName(sourceMapFilename));
-                        }
-
-                        if (File.Exists(sourceMapFilename)) {
-                            try {
-                                _originalFileToSourceMap[filename] = mapInfo = new JavaScriptSourceMapInfo(new SourceMap(new StreamReader(sourceMapFilename)), contents);
-                            } catch (InvalidOperationException) {
-                                _originalFileToSourceMap[filename] = null;
-                            } catch (NotSupportedException) {
-                                _originalFileToSourceMap[filename] = null;
-                            }
-                        }
-                    }
-                }
-            }
-            if (mapInfo != null) {
-                SourceMapping mapping;
-                int column = 0;
-                if (line < mapInfo.Lines.Length) {
-                    var lineText = mapInfo.Lines[line];
-                    // map to the 1st non-whitespace character on the line
-                    // This ensures we get the correct line number, mapping to column 0
-                    // can give us the previous line.
-                    if (!String.IsNullOrWhiteSpace(lineText)) {
-                        for (; column < lineText.Length; column++) {
-                            if (!Char.IsWhiteSpace(lineText[column])) {
-                                break;
-                            }
-                        }
-                    }
-                }
-                if (mapInfo.Map.TryMapPoint(line, column, out mapping)) {
-                    return mapping;
-                }
-            }
-            return null;
-        }
-
-        private SourceMap GetSourceMap(string fileName) {
-            SourceMap sourceMap;
-            if (!_generatedFileToSourceMap.TryGetValue(fileName, out sourceMap)) {
-                // see if we are using source maps for this file.
-                if (!String.Equals(Path.GetExtension(fileName), NodejsConstants.FileExtension, StringComparison.OrdinalIgnoreCase)) {
-                    string baseFile = fileName.Substring(0, fileName.Length - Path.GetExtension(fileName).Length);
-                    if (File.Exists(baseFile + ".js") && File.Exists(baseFile + ".js.map")) {
-                        // we're using source maps...
-                        try {
-                            _generatedFileToSourceMap[fileName] = sourceMap = new SourceMap(new StreamReader(baseFile + ".js.map"));
-                        } catch (NotSupportedException) {
-                            _generatedFileToSourceMap[fileName] = null;
-                        } catch (InvalidOperationException) {
-                            _generatedFileToSourceMap[fileName] = null;
-                        }
-                    } else {
-                        _generatedFileToSourceMap[fileName] = null;
-                    }
-                }
-            }
-            return sourceMap;
-        }
 
         #endregion
+
+        internal static void FixupForRunAndWait(bool waitOnAbnormal, bool waitOnNormal, ProcessStartInfo psi) {
+            if (waitOnAbnormal || waitOnNormal) {
+                string args = "/c \"\"" + psi.FileName + "\" " + psi.Arguments;
+
+                if (waitOnAbnormal && waitOnNormal) {
+                    args += " & pause";
+                } else if (waitOnAbnormal) {
+                    args += " & if errorlevel 1 pause";
+                } else if (waitOnNormal) {
+                    args += " & if not errorlevel 1 pause";
+                }
+                args += "\"";
+                psi.FileName = Path.Combine(Environment.SystemDirectory, "cmd.exe");
+                psi.Arguments = args;
+            }
+        }
     }
 }

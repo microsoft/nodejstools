@@ -38,7 +38,6 @@
     <Content Include="bin\node.cmd" />
     <Content Include="package.json" />
     <Content Include="README.md" />
-    <Content Include="iisnode.yml"/>
   </ItemGroup>
 
   <Import Project="$(VSToolsPath)\Node.js Tools\Microsoft.NodejsTools.targets" />

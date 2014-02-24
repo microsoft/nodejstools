@@ -45,6 +45,18 @@ namespace Microsoft.NodejsTools.Options {
         public bool ShowOutputWindowWhenExecutingNpm { get; set; }
 
         /// <summary>
+        /// True if Node processes should pause for input before exiting
+        /// if they exit abnormally.
+        /// </summary>
+        public bool WaitOnAbnormalExit { get; set; }
+
+        /// <summary>
+        /// True if Node processes should pause for input before exiting
+        /// if they exit normally.
+        /// </summary>
+        public bool WaitOnNormalExit { get; set; }
+
+        /// <summary>
         /// The frequency at which to check for updated news. Default is once
         /// per week.
         /// </summary>
@@ -88,6 +100,8 @@ namespace Microsoft.NodejsTools.Options {
             _surveyNewsLastCheck = DateTime.MinValue;
             _surveyNewsFeedUrl = DefaultSurveyNewsFeedUrl;
             _surveyNewsIndexUrl = DefaultSurveyNewsIndexUrl;
+            WaitOnAbnormalExit = true;
+            WaitOnNormalExit = false;
         }
 
         private const string DefaultSurveyNewsFeedUrl = "http://go.microsoft.com/fwlink/?LinkId=328027";
@@ -98,6 +112,8 @@ namespace Microsoft.NodejsTools.Options {
         private const string SurveyNewsLastCheckSetting = "SurveyNewsLastCheck";
         private const string SurveyNewsFeedUrlSetting = "SurveyNewsFeedUrl";
         private const string SurveyNewsIndexUrlSetting = "SurveyNewsIndexUrl";
+        private const string WaitOnAbnormalExitSetting = "WaitOnAbnormalExit";
+        private const string WaitOnNormalExitSetting = "WaitOnNormalExit";
 
         public override void LoadSettingsFromStorage(){
             ShowOutputWindowWhenExecutingNpm = LoadBool(ShowOutputWindowRunningNpm) ?? true;
@@ -105,12 +121,16 @@ namespace Microsoft.NodejsTools.Options {
             _surveyNewsLastCheck = LoadDateTime(SurveyNewsLastCheckSetting) ?? DateTime.MinValue;
             _surveyNewsFeedUrl = LoadString(SurveyNewsFeedUrlSetting) ?? DefaultSurveyNewsFeedUrl;
             _surveyNewsIndexUrl = LoadString(SurveyNewsIndexUrlSetting) ?? DefaultSurveyNewsIndexUrl;
+            WaitOnAbnormalExit = LoadBool(WaitOnAbnormalExitSetting) ?? true;
+            WaitOnNormalExit = LoadBool(WaitOnNormalExitSetting) ?? false;
         }
 
         public override void SaveSettingsToStorage() {
             SaveBool(ShowOutputWindowRunningNpm, ShowOutputWindowWhenExecutingNpm);
             SaveEnum(SurveyNewsCheckSetting, _surveyNewsCheck);
             SaveDateTime(SurveyNewsLastCheckSetting, _surveyNewsLastCheck);
+            SaveBool(WaitOnNormalExitSetting, WaitOnNormalExit);
+            SaveBool(WaitOnAbnormalExitSetting, WaitOnAbnormalExit);
         }
     }
 }

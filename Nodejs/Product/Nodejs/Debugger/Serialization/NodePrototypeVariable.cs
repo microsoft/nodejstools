@@ -14,23 +14,26 @@
 
 using System.Collections.Generic;
 using Microsoft.VisualStudioTools.Project;
+using Newtonsoft.Json.Linq;
 
 namespace Microsoft.NodejsTools.Debugger.Serialization {
-    class NodePrototypeVariable : INodeVariable {
-        public NodePrototypeVariable(NodeEvaluationResult parent, JsonValue prototype, Dictionary<int, JsonValue> references) {
-            Utilities.ArgumentNotNull("parent", parent);
+    sealed class NodePrototypeVariable : INodeVariable {
+        public NodePrototypeVariable(NodeEvaluationResult parent, JToken prototype, Dictionary<int, JToken> references) {
             Utilities.ArgumentNotNull("prototype", prototype);
             Utilities.ArgumentNotNull("references", references);
 
-            Id = prototype.GetValue<int>("ref");
-            JsonValue reference = references[Id];
+            Id = (int)prototype["ref"];
+            JToken reference;
+            if (!references.TryGetValue(Id, out reference)) {
+                reference = prototype;
+            }
             Parent = parent;
-            StackFrame = parent.Frame;
-            Name = "__proto__";
-            TypeName = reference.GetValue<string>("type");
-            Value = reference.GetValue<string>("value");
-            Class = reference.GetValue<string>("className");
-            Text = reference.GetValue<string>("text");
+            StackFrame = parent != null ? parent.Frame : null;
+            Name = NodeVariableType.Prototype;
+            TypeName = (string)reference["type"];
+            Value = (string)reference["value"];
+            Class = (string)reference["className"];
+            Text = (string)reference["text"];
             Attributes = NodePropertyAttributes.DontEnum;
             Type = NodePropertyType.Normal;
         }

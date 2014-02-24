@@ -460,9 +460,9 @@ namespace Microsoft.NodejsTools.Project {
         }
 
         public override object GetIconHandle(bool open) {
-            return
-                ProjectMgr.ImageHandler.GetIconHandle(
-                    open ? (int)ProjectNode.ImageName.OpenReferenceFolder : (int)ProjectNode.ImageName.ReferenceFolder);
+            //We don't want the icon to become an expanded folder 'OpenReferenceFolder'
+            //  Thus we always return 'ReferenceFolder'
+            return ProjectMgr.GetIconHandleByName(ProjectNode.ImageName.ReferenceFolder);              
         }
 
         public override string Url {

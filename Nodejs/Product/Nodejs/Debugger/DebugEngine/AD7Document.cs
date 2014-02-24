@@ -14,9 +14,7 @@
 
 using System;
 using System.Collections.Generic;
-using System.Runtime.CompilerServices;
 using System.Runtime.InteropServices;
-using System.Text;
 using Microsoft.VisualStudio;
 using Microsoft.VisualStudio.Debugger.Interop;
 
@@ -49,12 +47,13 @@ namespace Microsoft.NodejsTools.Debugger.DebugEngine {
         private char[] ScriptText {
             get {
                 if (_scriptText == null) {
-                    var scriptText = _documentContext.Engine.Process.GetScriptText(_documentContext.Module.ModuleId);
+                    var moduleId = _documentContext.Module.ModuleId;
+                    var scriptText = _documentContext.Engine.Process.GetScriptTextAsync(moduleId).Result;
                     if (scriptText != null){
                         _scriptText = scriptText.ToCharArray();
                     }
-
                 }
+
                 return _scriptText;
             }
         }
@@ -62,15 +61,13 @@ namespace Microsoft.NodejsTools.Debugger.DebugEngine {
         private int[] ScriptLines {
             get {
                 if (_scriptLines == null) {
-                    var scriptLines = new List<int>();
-                    scriptLines.Add(0);
+                    var scriptLines = new List<int> { 0 };
                     if (ScriptText != null) {
                         for (var i = 0; i < ScriptText.Length; ++i) {
                             // Treat combinations of carriage return and line feed as line endings
                             var curChar = ScriptText[i];
                             if (curChar == '\r' || curChar == '\n') {
                                 if (curChar == '\r' && i + 1 < ScriptText.Length) {
-                                    var nextChar = ScriptText[i + 1];
                                     if (ScriptText[i + 1] == '\n') {
                                         ++i;
                                     }
@@ -99,7 +96,7 @@ namespace Microsoft.NodejsTools.Debugger.DebugEngine {
         private static void SetOutParameterValue(IntPtr outParameter, Func<Int32> valueFunc) {
             // Avoid evaluating and setting out parameter value if null
             if (outParameter != IntPtr.Zero) {
-                Marshal.Copy(new[] { valueFunc(), }, 0, outParameter, 1);
+                Marshal.Copy(new[] { valueFunc() }, 0, outParameter, 1);
             }
         }
 

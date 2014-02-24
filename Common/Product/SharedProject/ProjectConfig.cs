@@ -17,6 +17,8 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using System.Diagnostics.CodeAnalysis;
 using System.Globalization;
+using System.IO;
+using System.Linq;
 using System.Runtime.InteropServices;
 using Microsoft.VisualStudio;
 using Microsoft.VisualStudio.OLE.Interop;
@@ -548,25 +550,31 @@ namespace Microsoft.VisualStudioTools.Project
 
         #region helper methods
 
-        private MSBuildExecution.ProjectPropertyInstance GetMsBuildProperty(string propertyName, bool resetCache)
+        private MSBuildExecution.ProjectInstance GetCurrentConfig(bool resetCache = false)
         {
-            if (resetCache || this.currentConfig == null)
+            if (resetCache || currentConfig == null)
             {
                 // Get properties for current configuration from project file and cache it
-                this.project.SetConfiguration(this.ConfigName);
-                this.project.BuildProject.ReevaluateIfNecessary();
+                project.SetConfiguration(ConfigName);
+                project.BuildProject.ReevaluateIfNecessary();
                 // Create a snapshot of the evaluated project in its current state
-                this.currentConfig = this.project.BuildProject.CreateProjectInstance();
+                currentConfig = project.BuildProject.CreateProjectInstance();
 
                 // Restore configuration
                 project.SetCurrentConfiguration();
             }
+            return currentConfig;
+        }
 
-            if (this.currentConfig == null)
+        private MSBuildExecution.ProjectPropertyInstance GetMsBuildProperty(string propertyName, bool resetCache)
+        {
+            var current = GetCurrentConfig(resetCache);
+
+            if (current == null)
                 throw new Exception("Failed to retrieve properties");
 
             // return property asked for
-            return this.currentConfig.GetProperty(propertyName);
+            return current.GetProperty(propertyName);
         }
 
         /// <summary>
@@ -604,6 +612,208 @@ namespace Microsoft.VisualStudioTools.Project
                 pages[0] = PackageUtilities.CreateCAUUIDFromGuidArray(guids);
             }
         }
+
+        internal virtual bool IsInputGroup(string groupName)
+        {
+            return groupName == "SourceFiles";
+        }
+
+        private static DateTime? TryGetLastWriteTimeUtc(string path, Redirector output = null)
+        {
+            try
+            {
+                return File.GetLastWriteTimeUtc(path);
+            }
+            catch (UnauthorizedAccessException ex)
+            {
+                if (output != null)
+                {
+                    output.WriteErrorLine(string.Format("Failed to access {0}: {1}", path, ex.Message));
+#if DEBUG
+                    output.WriteErrorLine(ex.ToString());
+#endif
+                }
+            }
+            catch (ArgumentException ex)
+            {
+                if (output != null)
+                {
+                    output.WriteErrorLine(string.Format("Failed to access {0}: {1}", path, ex.Message));
+#if DEBUG
+                    output.WriteErrorLine(ex.ToString());
+#endif
+                }
+            }
+            catch (PathTooLongException ex)
+            {
+                if (output != null)
+                {
+                    output.WriteErrorLine(string.Format("Failed to access {0}: {1}", path, ex.Message));
+#if DEBUG
+                    output.WriteErrorLine(ex.ToString());
+#endif
+                }
+            }
+            catch (NotSupportedException ex)
+            {
+                if (output != null)
+                {
+                    output.WriteErrorLine(string.Format("Failed to access {0}: {1}", path, ex.Message));
+#if DEBUG
+                    output.WriteErrorLine(ex.ToString());
+#endif
+                }
+            }
+            return null;
+        }
+
+        internal virtual bool IsUpToDate()
+        {
+            var outputWindow = OutputWindowRedirector.GetGeneral(ProjectMgr.Site);
+#if DEBUG
+            outputWindow.WriteLine(string.Format("Checking whether {0} needs to be rebuilt:", ProjectMgr.Caption));
+#endif
+
+            var latestInput = DateTime.MinValue;
+            var earliestOutput = DateTime.MaxValue;
+            bool mustRebuild = false;
+
+            var allInputs = new HashSet<string>(OutputGroups
+                .Where(g => IsInputGroup(g.Name))
+                .SelectMany(x => x.EnumerateOutputs())
+                .Select(input => input.CanonicalName),
+                StringComparer.OrdinalIgnoreCase
+            );
+            foreach (var group in OutputGroups.Where(g => !IsInputGroup(g.Name)))
+            {
+                foreach (var output in group.EnumerateOutputs())
+                {
+                    var path = output.CanonicalName;
+#if DEBUG
+                    var dt = TryGetLastWriteTimeUtc(path);
+                    outputWindow.WriteLine(string.Format(
+                        "  Out: {0}: {1} [{2}]",
+                        group.Name,
+                        path,
+                        dt.HasValue ? dt.Value.ToString("s") : "err"
+                    ));
+#endif
+                    DateTime? modifiedTime;
+
+                    if (!File.Exists(path) ||
+                        !(modifiedTime = TryGetLastWriteTimeUtc(path, outputWindow)).HasValue)
+                    {
+                        mustRebuild = true;
+                        break;
+                    }
+                    
+                    // output is an input, ignore it...
+                    if (allInputs.Contains(path)) {
+                        continue;
+                    }
+
+                    string inputPath;
+                    if (File.Exists(inputPath = output.GetMetadata("SourceFile")))
+                    {
+                        var inputModifiedTime = TryGetLastWriteTimeUtc(inputPath, outputWindow);
+                        if (inputModifiedTime.HasValue && inputModifiedTime.Value > modifiedTime.Value)
+                        {
+                            mustRebuild = true;
+                            break;
+                        }
+                        else
+                        {
+                            continue;
+                        }
+                    }
+
+                    if (modifiedTime.Value < earliestOutput)
+                    {
+                        earliestOutput = modifiedTime.Value;
+                    }
+                }
+
+                if (mustRebuild)
+                {
+                    // Early exit if we know we're going to have to rebuild
+                    break;
+                }
+            }
+
+            if (mustRebuild)
+            {
+#if DEBUG
+                outputWindow.WriteLine(string.Format(
+                    "Rebuilding {0} because mustRebuild is true",
+                    ProjectMgr.Caption
+                ));
+#endif
+                return false;
+            }
+
+            foreach (var group in OutputGroups.Where(g => IsInputGroup(g.Name)))
+            {
+                foreach (var input in group.EnumerateOutputs())
+                {
+                    var path = input.CanonicalName;
+#if DEBUG
+                    var dt = TryGetLastWriteTimeUtc(path);
+                    outputWindow.WriteLine(string.Format(
+                        "  In:  {0}: {1} [{2}]",
+                        group.Name,
+                        path,
+                        dt.HasValue ? dt.Value.ToString("s") : "err"
+                    ));
+#endif
+                    if (!File.Exists(path))
+                    {
+                        continue;
+                    }
+
+                    var modifiedTime = TryGetLastWriteTimeUtc(path, outputWindow);
+                    if (modifiedTime.HasValue && modifiedTime.Value > latestInput)
+                    {
+                        latestInput = modifiedTime.Value;
+                        if (earliestOutput < latestInput)
+                        {
+                            break;
+                        }
+                    }
+                }
+
+                if (earliestOutput < latestInput)
+                {
+                    // Early exit if we know we're going to have to rebuild
+                    break;
+                }
+            }
+
+            if (earliestOutput < latestInput)
+            {
+#if DEBUG
+                outputWindow.WriteLine(string.Format(
+                    "Rebuilding {0} because {1:s} < {2:s}",
+                    ProjectMgr.Caption,
+                    earliestOutput,
+                    latestInput
+                ));
+#endif
+                return false;
+            }
+            else
+            {
+#if DEBUG
+                outputWindow.WriteLine(string.Format(
+                    "Not rebuilding {0} because {1:s} >= {2:s}",
+                    ProjectMgr.Caption,
+                    earliestOutput,
+                    latestInput
+                ));
+#endif
+                return true;
+            }
+        }
+
         #endregion
 
         #region IVsProjectFlavorCfg Members
@@ -639,7 +849,14 @@ namespace Microsoft.VisualStudioTools.Project
             } else if (iidCfg == typeof(IVsBuildableProjectCfg).GUID) {
                 IVsBuildableProjectCfg buildableConfig;
                 this.get_BuildableProjectCfg(out buildableConfig);
-                ppCfg = Marshal.GetComInterfaceForObject(buildableConfig, typeof(IVsBuildableProjectCfg));
+                //
+                //In some cases we've intentionally shutdown the build options
+                //  If buildableConfig is null then don't try to get the BuildableProjectCfg interface
+                //  
+                if (null != buildableConfig) 
+                {                    
+                    ppCfg = Marshal.GetComInterfaceForObject(buildableConfig, typeof(IVsBuildableProjectCfg));
+                }
             }
 
             // If not supported
@@ -727,9 +944,9 @@ namespace Microsoft.VisualStudioTools.Project
         }
 
         public virtual int StartUpToDateCheck(IVsOutputWindowPane pane, uint options) {
-            // Report that the build is not up to date to ensure that we always
-            // build.
-            return VSConstants.E_NOTIMPL;
+            return config.IsUpToDate() ?
+                VSConstants.S_OK :
+                VSConstants.E_FAIL;            
         }
 
         public virtual int Stop(int fsync) {

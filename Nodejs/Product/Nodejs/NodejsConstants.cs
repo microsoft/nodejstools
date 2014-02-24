@@ -28,6 +28,8 @@ namespace Microsoft.NodejsTools {
         public const string NodeExeArguments = "NodeExeArguments";
         public const string ScriptArguments = "ScriptArguments";
         public const string NodejsPort = "NodejsPort";
+        public const string DebuggerPort = "DebuggerPort";
+        public const string EnvironmentVariables = "EnvironmentVariables";
         public const string StartWebBrowser = "StartWebBrowser";
         public const string LaunchUrl = "LaunchUrl";
         public const string ProjectFileFilter = "Node.js Project File (*.njsproj)\n*.njsproj\nAll Files (*.*)\n*.*\n";
@@ -41,6 +43,8 @@ namespace Microsoft.NodejsTools {
 
         public const string NodejsHiddenUserModule = "nodejs_tools_for_visual_studio_hidden_usermodule_";
         public const string NodejsHiddenUserModuleInstance = "nodejs_tools_for_visual_studio_hidden_module_instance_";
+
+        public const ushort DefaultDebuggerPort = 5858;
 
         [Export, Name(Nodejs), BaseDefinition("text")]
         internal static ContentTypeDefinition ContentTypeDefinition = null;

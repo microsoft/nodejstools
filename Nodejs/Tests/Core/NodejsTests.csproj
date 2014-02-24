@@ -43,11 +43,23 @@
     <SccLocalPath>SAK</SccLocalPath>
     <SccAuxPath>SAK</SccAuxPath>
     <SccProvider>SAK</SccProvider>
+    <SolutionDir Condition="$(SolutionDir) == '' Or $(SolutionDir) == '*Undefined*'">..\..\</SolutionDir>
+    <RestorePackages>true</RestorePackages>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Platform)' == 'x86' ">
     <PlatformTarget>x86</PlatformTarget>
   </PropertyGroup>
   <ItemGroup>
+    <Reference Include="Moq">
+      <HintPath>..\..\packages\Moq.4.2.1312.1622\lib\net40\Moq.dll</HintPath>
+    </Reference>
+    <Reference Include="Newtonsoft.Json, Version=6.0.0.0, Culture=neutral, PublicKeyToken=30ad4fe6b2a6aeed, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\..\packages\Newtonsoft.Json.6.0.1\lib\net45\Newtonsoft.Json.dll</HintPath>
+    </Reference>
+    <Reference Include="Microsoft.CSharp" />
+    <Reference Include="Microsoft.VisualStudio.CoreUtility, Version=$(VSTarget).0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a, processorArchitecture=MSIL" />
+    <Reference Include="Microsoft.VisualStudio.Text.Data, Version=$(VSTarget).0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a, processorArchitecture=MSIL" />
     <Reference Include="Microsoft.VisualStudio.Text.Logic, Version=$(VSTarget).0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a, processorArchitecture=MSIL" />
     <Reference Include="PresentationCore" />
     <Reference Include="PresentationFramework" />
@@ -74,18 +86,36 @@
   <ItemGroup>
     <Compile Include="BaselineCompare.cs" />
     <Compile Include="Debugger\BaseDebuggerTests.cs" />
+    <Compile Include="Debugger\Commands\BacktraceCommandTests.cs" />
+    <Compile Include="Debugger\Commands\ChangeBreakpointCommandTests.cs" />
+    <Compile Include="Debugger\Commands\ClearBreakpointCommandTests.cs" />
+    <Compile Include="Debugger\Commands\ContinueCommandTests.cs" />
+    <Compile Include="Debugger\Commands\SetVariableValueCommandTests.cs" />
+    <Compile Include="Debugger\Commands\SuspendCommandTests.cs" />
+    <Compile Include="Debugger\Commands\SetExceptionBreakCommandTests.cs" />
+    <Compile Include="Debugger\Commands\SetBreakpointCommandTests.cs" />
+    <Compile Include="Debugger\Commands\ScriptsCommandTests.cs" />
+    <Compile Include="Debugger\Commands\LookupCommandTests.cs" />
+    <Compile Include="Debugger\Commands\ListBreakpointsTests.cs" />
+    <Compile Include="Debugger\Commands\EvaluateCommandTests.cs" />
+    <Compile Include="Debugger\Commands\DisconnectCommandTests.cs" />
+    <Compile Include="Debugger\Communication\DebuggerClientTests.cs" />
+    <Compile Include="Debugger\Communication\DebuggerConnectionTests.cs" />
     <Compile Include="Debugger\DebuggerTests.cs" />
+    <Compile Include="Debugger\Events\CompileScriptEventTests.cs" />
+    <Compile Include="Debugger\Events\BreakpointEventTests.cs" />
+    <Compile Include="Debugger\Events\ExceptionEventTests.cs" />
+    <Compile Include="Debugger\ExceptionHandlerTests.cs" />
     <Compile Include="Debugger\InfrastructureTests.cs" />
-    <Compile Include="Debugger\Serialization\NodeResponseHandlerTests.cs" />
+    <Compile Include="Debugger\Serialization\SetValueVariableTests.cs" />
     <Compile Include="Debugger\Serialization\PrototypeVariableTests.cs" />
     <Compile Include="Debugger\Serialization\LookupVariableTests.cs" />
     <Compile Include="Debugger\Serialization\EvaluationVariableTests.cs" />
-    <Compile Include="Debugger\Serialization\JsonWrapperTests.cs" />
     <Compile Include="Debugger\Serialization\BacktraceVariableTests.cs" />
+    <Compile Include="FormattingTests.cs" />
     <Compile Include="ImportWizardTests.cs" />
     <Compile Include="JadeTests.cs" />
     <Compile Include="LauncherTests.cs" />
-    <Compile Include="Mocks\MockNodeEvaluationResultFactory.cs" />
     <Compile Include="Mocks\MockNodeVariable.cs" />
     <Compile Include="Debugger\Serialization\NodeVariablesFactoryTests.cs" />
     <Compile Include="ReferenceCodeTests.cs" />
@@ -129,7 +159,26 @@
     <EmbeddedResource Include="Resources.resx">
       <Generator>ResXFileCodeGenerator</Generator>
       <LastGenOutput>Resources.Designer.cs</LastGenOutput>
+      <SubType>Designer</SubType>
     </EmbeddedResource>
   </ItemGroup>
+  <ItemGroup>
+    <None Include="packages.config" />
+  </ItemGroup>
+  <ItemGroup>
+    <EmbeddedResource Include="..\..\Product\Nodejs\Formatting\typescriptServices.js">
+      <Link>typescriptServices.js</Link>
+    </EmbeddedResource>
+  </ItemGroup>
+  <ItemGroup>
+    <EmbeddedResource Include="ruleFormattingTests.json" />
+  </ItemGroup>
   <Import Project="..\TestProjectAfter.settings" />
+  <Import Project="$(SolutionDir)\.nuget\NuGet.targets" Condition="Exists('$(SolutionDir)\.nuget\NuGet.targets')" />
+  <Target Name="EnsureNuGetPackageBuildImports" BeforeTargets="PrepareForBuild">
+    <PropertyGroup>
+      <ErrorText>This project references NuGet package(s) that are missing on this computer. Enable NuGet Package Restore to download them.  For more information, see http://go.microsoft.com/fwlink/?LinkID=322105. The missing file is {0}.</ErrorText>
+    </PropertyGroup>
+    <Error Condition="!Exists('$(SolutionDir)\.nuget\NuGet.targets')" Text="$([System.String]::Format('$(ErrorText)', '$(SolutionDir)\.nuget\NuGet.targets'))" />
+  </Target>
 </Project>

@@ -12,20 +12,21 @@
  *
  * ***************************************************************************/
 
-using System;
 using System.Collections.Generic;
-using System.Diagnostics;
 using System.Linq;
+using System.Threading.Tasks;
 
 namespace Microsoft.NodejsTools.Debugger {
     class NodeBreakpoint {
+        private readonly Dictionary<int, NodeBreakpointBinding> _bindings = new Dictionary<int, NodeBreakpointBinding>();
+        private readonly BreakOn _breakOn;
+        private readonly string _condition;
+        private readonly bool _enabled;
+        private readonly string _fileName;
+        private readonly int _lineNo;
         private readonly NodeDebugger _process;
-        private readonly string _fileName, _requestedFileName;
-        private int _lineNo, _requestedLineNo;
-        private Dictionary<int, NodeBreakpointBinding> _bindings = new Dictionary<int, NodeBreakpointBinding>();
-        private bool _enabled;
-        private BreakOn _breakOn;
-        private string _condition;
+        private readonly string _requestedFileName;
+        private readonly int _requestedLineNo;
 
         public NodeBreakpoint(
             NodeDebugger process,
@@ -48,17 +49,7 @@ namespace Microsoft.NodejsTools.Debugger {
         }
 
         public NodeDebugger Process {
-            get {
-                return _process;
-            }
-        }
-
-        /// <summary>
-        /// Requests the remote process enable the break point.  An event will be raised on the process
-        /// when the break point is received.
-        /// </summary>
-        public void Bind(Action<NodeBreakpointBinding> successHandler = null, Action failureHandler = null) {
-            _process.BindBreakpoint(this, successHandler, failureHandler);
+            get { return _process; }
         }
 
         /// <summary>
@@ -66,9 +57,7 @@ namespace Microsoft.NodejsTools.Debugger {
         /// is the actual JavaScript file.
         /// </summary>
         public string FileName {
-            get {
-                return _fileName;
-            }
+            get { return _fileName; }
         }
 
         /// <summary>
@@ -76,59 +65,49 @@ namespace Microsoft.NodejsTools.Debugger {
         /// different than FileName.
         /// </summary>
         public string RequestedFileName {
-            get {
-                return _requestedFileName;
-            }
+            get { return _requestedFileName; }
         }
 
         public int LineNo {
-            get {
-                return _lineNo;
-            }
-            set {
-                _lineNo = value;
-            }
+            get { return _lineNo; }
         }
 
         public int RequestedLineNo {
-            get {
-                return _requestedLineNo;
-            }
+            get { return _requestedLineNo; }
         }
 
         public bool Enabled {
-            get {
-                return _enabled;
-            }
+            get { return _enabled; }
         }
 
         public BreakOn BreakOn {
-            get {
-                return _breakOn;
-            }
+            get { return _breakOn; }
         }
 
         public string Condition {
-            get {
-                return _condition;
-            }
+            get { return _condition; }
         }
 
         public bool HasPredicate {
-            get {
-                return (!string.IsNullOrEmpty(_condition) || NodeBreakpointBinding.GetEngineIgnoreCount(_breakOn, 0) > 0);
-
-            }
+            get { return (!string.IsNullOrEmpty(_condition) || NodeBreakpointBinding.GetEngineIgnoreCount(_breakOn, 0) > 0); }
         }
 
-        internal NodeBreakpointBinding CreateBinding(int lineNo, int breakpointID, int? scriptID, bool fullyBound) {
-            var binding = new NodeBreakpointBinding(this, lineNo, breakpointID, scriptID, fullyBound);
-            _bindings[breakpointID] = binding;
+        /// <summary>
+        /// Requests the remote process enable the break point.  An event will be raised on the process
+        /// when the break point is received.
+        /// </summary>
+        public Task<NodeBreakpointBinding> BindAsync() {
+            return _process.BindBreakpointAsync(this);
+        }
+
+        internal NodeBreakpointBinding CreateBinding(int lineNo, int breakpointId, int? scriptId, bool fullyBound) {
+            var binding = new NodeBreakpointBinding(this, lineNo, breakpointId, scriptId, fullyBound);
+            _bindings[breakpointId] = binding;
             return binding;
         }
 
         internal void RemoveBinding(NodeBreakpointBinding binding) {
-            _bindings.Remove(binding.BreakpointID);
+            _bindings.Remove(binding.BreakpointId);
         }
 
         internal IEnumerable<NodeBreakpointBinding> GetBindings() {

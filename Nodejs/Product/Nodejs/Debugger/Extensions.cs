@@ -14,8 +14,11 @@
 
 using System;
 using System.Diagnostics;
+using System.IO;
 using System.Net.Sockets;
 using System.Text;
+using System.Threading;
+using System.Threading.Tasks;
 
 namespace Microsoft.NodejsTools.Debugger {
     static class Extensions {
@@ -173,6 +176,38 @@ namespace Microsoft.NodejsTools.Debugger {
                     break;
             }
             return true;
+        }
+
+        internal static async Task<T> WaitAsync<T>(this Task<T> task, TimeSpan timeout, CancellationToken token = default (CancellationToken)) {
+            var cancellationTokenSource = new CancellationTokenSource();
+            var linkedTokenSource = CancellationTokenSource.CreateLinkedTokenSource(token, cancellationTokenSource.Token);
+            
+            await Task.WhenAny(new[] {
+                task,
+                Task.Delay(timeout, linkedTokenSource.Token)
+            }).ConfigureAwait(false);
+            
+            linkedTokenSource.Cancel();
+
+            if (task.IsCompleted) {
+                return task.Result;
+            }
+
+            throw new TimeoutException();
+        }
+
+        internal static async Task<string> ReadLineBlockAsync(this StreamReader streamReader, int length) {
+            var buffer = new char[length];
+
+            int count = await streamReader.ReadBlockAsync(buffer, 0, length);
+            if (count == 0) {
+                var errorMessage = string.Format("Unable to read {0} bytes from stream.", length);
+                throw new InvalidDataException(errorMessage);
+            }
+
+            // Get UTF-8 string
+            byte[] bytes = streamReader.CurrentEncoding.GetBytes(buffer, 0, count);
+            return Encoding.UTF8.GetString(bytes);
         }
     }
 }

@@ -71,6 +71,8 @@ namespace Microsoft.NodejsTools {
         private string _leadingText;
 
         public NodejsProjectionBuffer(IContentTypeRegistryService contentRegistry, IProjectionBufferFactoryService bufferFactory, ITextBuffer diskBuffer, IBufferGraphFactoryService bufferGraphFactory, IContentType contentType, string referenceFileName) {
+            Debug.Assert(diskBuffer != null);
+
             _diskBuffer = diskBuffer;
             _referenceFilename = referenceFileName;
             UpdateLeadingText(_diskBuffer.CurrentSnapshot);

@@ -82,6 +82,9 @@
     <Reference Include="Microsoft.CSharp" />
     <Reference Include="System.Data" />
     <Reference Include="System.Xml" />
+    <Reference Include="VSLangProj, Version=7.0.3300.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a">
+      <EmbedInteropTypes>False</EmbedInteropTypes>
+    </Reference>
   </ItemGroup>
   <ItemGroup>
     <Compile Include="..\Nodejs\Guids.cs">
@@ -95,7 +98,9 @@
     </Compile>
     <Compile Include="ImportWizard.cs" />
     <Compile Include="NpmWizardExtension.cs" />
+    <Compile Include="InnerWorkerRoleWizard.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="OuterWorkerRoleWizard.cs" />
   </ItemGroup>
   <ItemGroup>
     <EmbeddedResource Include="..\Nodejs\Resources.resx">

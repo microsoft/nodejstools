@@ -21,7 +21,7 @@ using NodejsTests.Mocks;
 namespace NodejsTests.Debugger.Serialization {
     [TestClass]
     public class NodeVariablesFactoryTests {
-        [TestMethod, Priority(0)]
+        [TestMethod]
         public void CreateNullEvaluationResult() {
             // Arrange
             var variable = new MockNodeVariable {
@@ -34,7 +34,7 @@ namespace NodejsTests.Debugger.Serialization {
                 Class = null,
                 Text = null
             };
-            var factory = new NodeEvaluationResultFactory();
+            var factory = new EvaluationResultFactory();
 
             // Act
             NodeEvaluationResult result = factory.Create(variable);
@@ -53,7 +53,7 @@ namespace NodejsTests.Debugger.Serialization {
             Assert.AreEqual(NodeVariableType.Null, result.TypeName);
         }
 
-        [TestMethod, Priority(0)]
+        [TestMethod]
         public void CreateNumberEvaluationResult() {
             // Arrange
             var variable = new MockNodeVariable {
@@ -66,7 +66,7 @@ namespace NodejsTests.Debugger.Serialization {
                 Class = null,
                 Text = null
             };
-            var factory = new NodeEvaluationResultFactory();
+            var factory = new EvaluationResultFactory();
 
             // Act
             NodeEvaluationResult result = factory.Create(variable);
@@ -85,7 +85,7 @@ namespace NodejsTests.Debugger.Serialization {
             Assert.AreEqual(NodeVariableType.Number, result.TypeName);
         }
 
-        [TestMethod, Priority(0)]
+        [TestMethod]
         public void CreateBooleanEvaluationResult() {
             // Arrange
             var variable = new MockNodeVariable {
@@ -98,7 +98,7 @@ namespace NodejsTests.Debugger.Serialization {
                 Class = null,
                 Text = null
             };
-            var factory = new NodeEvaluationResultFactory();
+            var factory = new EvaluationResultFactory();
 
             // Act
             NodeEvaluationResult result = factory.Create(variable);
@@ -117,7 +117,7 @@ namespace NodejsTests.Debugger.Serialization {
             Assert.AreEqual(NodeVariableType.Boolean, result.TypeName);
         }
 
-        [TestMethod, Priority(0)]
+        [TestMethod]
         public void CreateRegexpEvaluationResult() {
             // Arrange
             var variable = new MockNodeVariable {
@@ -130,7 +130,7 @@ namespace NodejsTests.Debugger.Serialization {
                 Class = null,
                 Text = null
             };
-            var factory = new NodeEvaluationResultFactory();
+            var factory = new EvaluationResultFactory();
 
             // Act
             NodeEvaluationResult result = factory.Create(variable);
@@ -149,7 +149,7 @@ namespace NodejsTests.Debugger.Serialization {
             Assert.AreEqual(NodeVariableType.Regexp, result.TypeName);
         }
 
-        [TestMethod, Priority(0)]
+        [TestMethod]
         public void CreateFunctionWithoutTextEvaluationResult() {
             // Arrange
             var variable = new MockNodeVariable {
@@ -162,7 +162,7 @@ namespace NodejsTests.Debugger.Serialization {
                 Class = null,
                 Text = null
             };
-            var factory = new NodeEvaluationResultFactory();
+            var factory = new EvaluationResultFactory();
 
             // Act
             NodeEvaluationResult result = factory.Create(variable);
@@ -180,7 +180,7 @@ namespace NodejsTests.Debugger.Serialization {
             Assert.AreEqual(NodeVariableType.Function, result.TypeName);
         }
 
-        [TestMethod, Priority(0)]
+        [TestMethod]
         public void CreateFunctionWithTextEvaluationResult() {
             // Arrange
             var variable = new MockNodeVariable {
@@ -193,7 +193,7 @@ namespace NodejsTests.Debugger.Serialization {
                 Class = null,
                 Text = "function(){...}"
             };
-            var factory = new NodeEvaluationResultFactory();
+            var factory = new EvaluationResultFactory();
 
             // Act
             NodeEvaluationResult result = factory.Create(variable);
@@ -211,7 +211,7 @@ namespace NodejsTests.Debugger.Serialization {
             Assert.AreEqual(NodeVariableType.Function, result.TypeName);
         }
 
-        [TestMethod, Priority(0)]
+        [TestMethod]
         public void CreateStringEvaluationResult() {
             // Arrange
             var variable = new MockNodeVariable {
@@ -224,7 +224,7 @@ namespace NodejsTests.Debugger.Serialization {
                 Class = null,
                 Text = null
             };
-            var factory = new NodeEvaluationResultFactory();
+            var factory = new EvaluationResultFactory();
 
             // Act
             NodeEvaluationResult result = factory.Create(variable);
@@ -243,7 +243,7 @@ namespace NodejsTests.Debugger.Serialization {
             Assert.AreEqual(NodeVariableType.String, result.TypeName);
         }
 
-        [TestMethod, Priority(0)]
+        [TestMethod]
         public void CreateObjectEvaluationResult() {
             // Arrange
             var variable = new MockNodeVariable {
@@ -256,7 +256,7 @@ namespace NodejsTests.Debugger.Serialization {
                 Class = "Object",
                 Text = null
             };
-            var factory = new NodeEvaluationResultFactory();
+            var factory = new EvaluationResultFactory();
 
             // Act
             NodeEvaluationResult result = factory.Create(variable);
@@ -274,7 +274,7 @@ namespace NodejsTests.Debugger.Serialization {
             Assert.AreEqual(NodeVariableType.Object, result.TypeName);
         }
 
-        [TestMethod, Priority(0)]
+        [TestMethod]
         public void CreateDateEvaluationResult() {
             // Arrange
             var variable = new MockNodeVariable {
@@ -287,7 +287,7 @@ namespace NodejsTests.Debugger.Serialization {
                 Class = "Date",
                 Text = null
             };
-            var factory = new NodeEvaluationResultFactory();
+            var factory = new EvaluationResultFactory();
 
             // Act
             NodeEvaluationResult result = factory.Create(variable);
@@ -305,7 +305,7 @@ namespace NodejsTests.Debugger.Serialization {
             Assert.AreEqual(NodeVariableType.Object, result.TypeName);
         }
 
-        [TestMethod, Priority(0)]
+        [TestMethod]
         public void CreateArrayEvaluationResult() {
             // Arrange
             var variable = new MockNodeVariable {
@@ -318,7 +318,7 @@ namespace NodejsTests.Debugger.Serialization {
                 Class = "Array",
                 Text = null
             };
-            var factory = new NodeEvaluationResultFactory();
+            var factory = new EvaluationResultFactory();
 
             // Act
             NodeEvaluationResult result = factory.Create(variable);
@@ -336,7 +336,7 @@ namespace NodejsTests.Debugger.Serialization {
             Assert.AreEqual(NodeVariableType.Object, result.TypeName);
         }
 
-        [TestMethod, Priority(0)]
+        [TestMethod]
         public void CreateErrorEvaluationResult() {
             // Arrange
             var variable = new MockNodeVariable {
@@ -349,7 +349,7 @@ namespace NodejsTests.Debugger.Serialization {
                 Class = null,
                 Text = null
             };
-            var factory = new NodeEvaluationResultFactory();
+            var factory = new EvaluationResultFactory();
 
             // Act
             NodeEvaluationResult result = factory.Create(variable);
@@ -367,7 +367,7 @@ namespace NodejsTests.Debugger.Serialization {
             Assert.AreEqual(NodeVariableType.Error, result.TypeName);
         }
 
-        [TestMethod, Priority(0)]
+        [TestMethod]
         public void CreateUnknownEvaluationResult() {
             // Arrange
             var variable = new MockNodeVariable {
@@ -380,7 +380,7 @@ namespace NodejsTests.Debugger.Serialization {
                 Class = null,
                 Text = null
             };
-            var factory = new NodeEvaluationResultFactory();
+            var factory = new EvaluationResultFactory();
 
             // Act
             NodeEvaluationResult result = factory.Create(variable);
@@ -398,7 +398,7 @@ namespace NodejsTests.Debugger.Serialization {
             Assert.AreEqual(NodeVariableType.Unknown, result.TypeName);
         }
 
-        [TestMethod, Priority(0)]
+        [TestMethod]
         public void CreateUnknownEvaluationResultWithEmptyValue() {
             // Arrange
             var variable = new MockNodeVariable {
@@ -407,11 +407,11 @@ namespace NodejsTests.Debugger.Serialization {
                 StackFrame = null,
                 Name = "v_unknown",
                 TypeName = "unknown",
-                Value = string.Empty,
+                Value = null,
                 Class = null,
                 Text = "Unknown"
             };
-            var factory = new NodeEvaluationResultFactory();
+            var factory = new EvaluationResultFactory();
 
             // Act
             NodeEvaluationResult result = factory.Create(variable);
@@ -429,17 +429,16 @@ namespace NodejsTests.Debugger.Serialization {
             Assert.AreEqual(NodeVariableType.Unknown, result.TypeName);
         }
 
-        [TestMethod, Priority(0)]
+        [TestMethod]
         public void CreateEvaluationResultFromNullVariable() {
             // Arrange
             Exception exception = null;
-            var factory = new NodeEvaluationResultFactory();
+            var factory = new EvaluationResultFactory();
 
             // Act
             try {
                 factory.Create(null);
-            }
-            catch (Exception e) {
+            } catch (Exception e) {
                 exception = e;
             }
 
@@ -448,7 +447,7 @@ namespace NodejsTests.Debugger.Serialization {
             Assert.IsInstanceOfType(exception, typeof (ArgumentNullException));
         }
 
-        [TestMethod, Priority(0)]
+        [TestMethod]
         public void CreateArrayElementEvaluationResult() {
             // Arrange
             var variable = new MockNodeVariable {
@@ -461,7 +460,7 @@ namespace NodejsTests.Debugger.Serialization {
                 Class = "Number",
                 Text = null
             };
-            var factory = new NodeEvaluationResultFactory();
+            var factory = new EvaluationResultFactory();
 
             // Act
             NodeEvaluationResult result = factory.Create(variable);
@@ -479,7 +478,7 @@ namespace NodejsTests.Debugger.Serialization {
             Assert.AreEqual(NodeVariableType.Number, result.TypeName);
         }
 
-        [TestMethod, Priority(0)]
+        [TestMethod]
         public void CreateObjectElementEvaluationResult() {
             // Arrange
             var variable = new MockNodeVariable {
@@ -492,7 +491,7 @@ namespace NodejsTests.Debugger.Serialization {
                 Class = "Number",
                 Text = null
             };
-            var factory = new NodeEvaluationResultFactory();
+            var factory = new EvaluationResultFactory();
 
             // Act
             NodeEvaluationResult result = factory.Create(variable);
@@ -509,8 +508,8 @@ namespace NodejsTests.Debugger.Serialization {
             Assert.AreEqual(result.Type, NodeExpressionType.None);
             Assert.AreEqual(NodeVariableType.Number, result.TypeName);
         }
-        
-        [TestMethod, Priority(0)]
+
+        [TestMethod]
         public void CreateObjectElementWithInvalidIdentifierEvaluationResult() {
             // Arrange
             var variable = new MockNodeVariable {
@@ -523,7 +522,7 @@ namespace NodejsTests.Debugger.Serialization {
                 Class = "Number",
                 Text = null
             };
-            var factory = new NodeEvaluationResultFactory();
+            var factory = new EvaluationResultFactory();
 
             // Act
             NodeEvaluationResult result = factory.Create(variable);
@@ -534,6 +533,46 @@ namespace NodejsTests.Debugger.Serialization {
             Assert.AreEqual(variable.Name, result.Expression);
             Assert.IsNull(result.Frame);
             Assert.AreEqual(string.Format(@"{0}[""{1}""]", variable.Parent.Expression, variable.Name), result.FullName);
+            Assert.AreEqual(variable.Id, result.Handle);
+            Assert.AreEqual(string.Format("0x{0:x}", int.Parse(variable.Value)), result.HexValue);
+            Assert.AreEqual(variable.Value, result.StringValue);
+            Assert.AreEqual(result.Type, NodeExpressionType.None);
+            Assert.AreEqual(NodeVariableType.Number, result.TypeName);
+        }
+        
+        [TestMethod]
+        public void CreateEvaluationResultForPrototypeChild() {
+            // Arrange
+            const string parentName = "parent";
+            var variable = new MockNodeVariable {
+                Id = 19,
+                Parent = new NodeEvaluationResult(
+                    0, 
+                    null,
+                    null, 
+                    "Object",
+                    NodeVariableType.Prototype,
+                    parentName + "." + NodeVariableType.Prototype,
+                    NodeExpressionType.Expandable,
+                    null),
+                StackFrame = null,
+                Name = "name",
+                TypeName = "number",
+                Value = "0",
+                Class = "Number",
+                Text = null
+            };
+            var factory = new EvaluationResultFactory();
+
+            // Act
+            NodeEvaluationResult result = factory.Create(variable);
+
+            // Assert
+            Assert.IsNotNull(result);
+            Assert.IsNull(result.ExceptionText);
+            Assert.AreEqual(variable.Name, result.Expression);
+            Assert.IsNull(result.Frame);
+            Assert.AreEqual(string.Format(@"{0}.{1}", parentName, variable.Name), result.FullName);
             Assert.AreEqual(variable.Id, result.Handle);
             Assert.AreEqual(string.Format("0x{0:x}", int.Parse(variable.Value)), result.HexValue);
             Assert.AreEqual(variable.Value, result.StringValue);

@@ -14,25 +14,28 @@
 
 using System.Collections.Generic;
 using Microsoft.VisualStudioTools.Project;
+using Newtonsoft.Json.Linq;
 
 namespace Microsoft.NodejsTools.Debugger.Serialization {
-    class NodeLookupVariable : INodeVariable {
-        public NodeLookupVariable(NodeEvaluationResult parent, JsonValue property, Dictionary<int, JsonValue> references) {
-            Utilities.ArgumentNotNull("parent", parent);
+    sealed class NodeLookupVariable : INodeVariable {
+        public NodeLookupVariable(NodeEvaluationResult parent, JToken property, Dictionary<int, JToken> references) {
             Utilities.ArgumentNotNull("property", property);
             Utilities.ArgumentNotNull("references", references);
 
-            Id = property.GetValue<int>("ref");
-            JsonValue reference = references[Id];
+            Id = (int)property["ref"];
+            JToken reference;
+            if (!references.TryGetValue(Id, out reference)) {
+                reference = property;
+            }
             Parent = parent;
-            StackFrame = parent.Frame;
-            Name = property.GetValue<string>("name");
-            TypeName = reference.GetValue<string>("type");
-            Value = reference.GetValue<string>("value");
-            Class = reference.GetValue<string>("className");
-            Text = reference.GetValue<string>("text");
-            Attributes = (NodePropertyAttributes)property.GetValue<int>("attributes");
-            Type = (NodePropertyType)property.GetValue<int>("propertyType");
+            StackFrame = parent != null ? parent.Frame : null;
+            Name = (string)property["name"];
+            TypeName = (string)reference["type"];
+            Value = (string)reference["value"];
+            Class = (string)reference["className"];
+            Text = (string)reference["text"];
+            Attributes = (NodePropertyAttributes)property.Value<int>("attributes");
+            Type = (NodePropertyType)property.Value<int>("propertyType");
         }
 
         public int Id { get; private set; }

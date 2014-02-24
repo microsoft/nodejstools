@@ -196,6 +196,19 @@ namespace TestUtilities.UI {
             Debug.Assert(Path.IsPathRooted(filename));
 
             string windowName = Path.GetFileName(filename);
+            var elem = GetDocumentTab(windowName);
+
+            elem = elem.FindFirst(TreeScope.Descendants,
+                new PropertyCondition(
+                    AutomationElement.ClassNameProperty,
+                    "WpfTextView"
+                )
+            );
+
+            return new EditorWindow(filename, elem);
+        }
+
+        public AutomationElement GetDocumentTab(string windowName) {
             var elem = Element.FindFirst(TreeScope.Descendants,
                 new AndCondition(
                     new PropertyCondition(
@@ -223,15 +236,7 @@ namespace TestUtilities.UI {
                     )
                 );
             }
-
-            elem = elem.FindFirst(TreeScope.Descendants,
-                new PropertyCondition(
-                    AutomationElement.ClassNameProperty,
-                    "WpfTextView"
-                )
-            );
-
-            return new EditorWindow(filename, elem);
+            return elem;
         }
 
         /// <summary>
@@ -636,6 +641,29 @@ namespace TestUtilities.UI {
             }
 
             Assert.AreEqual(mode, VsIdeTestHostContext.Dte.Debugger.CurrentMode);
+        }
+
+        public virtual Project CreateProject(
+            string languageName,
+            string templateName,
+            string createLocation,
+            string projectName,
+            bool newSolution = true
+        ) {
+            var sln = (Solution2)Dte.Solution;
+            var templatePath = sln.GetProjectTemplate(templateName, languageName);
+            Assert.IsTrue(File.Exists(templatePath) || Directory.Exists(templatePath), string.Format("Cannot find template '{0}' for language '{1}'", templateName, languageName));
+
+            var origName = projectName;
+            var projectDir = Path.Combine(createLocation, projectName);
+            for (int i = 1; Directory.Exists(projectDir); ++i) {
+                projectName = string.Format("{0}{1}", origName, i);
+                projectDir = Path.Combine(createLocation, projectName);
+            }
+
+            sln.AddFromTemplate(templatePath, projectDir, projectName, newSolution);
+
+            return sln.Projects.Cast<Project>().FirstOrDefault(p => p.Name == projectName);
         }
 
         public Project OpenProject(string projName, string startItem = null, int? expectedProjects = null, string projectName = null, bool setStartupItem = true) {
