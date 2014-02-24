@@ -25,7 +25,9 @@
             </StackPanel>
             <RichTextBox x:Name="_textBox"
                          Background="Black"
-                         Foreground="GreenYellow">
+                         Foreground="GreenYellow"
+                         IsReadOnly="True"
+                         FontFamily="Consolas">
             </RichTextBox>
         </DockPanel>            
     </Grid>

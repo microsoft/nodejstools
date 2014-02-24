@@ -13,19 +13,8 @@
  * ***************************************************************************/
 
 using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
-using System.Windows.Data;
-using System.Windows.Documents;
-using System.Windows.Input;
-using System.Windows.Media;
-using System.Windows.Media.Imaging;
-using System.Windows.Navigation;
-using System.Windows.Shapes;
 
 namespace Microsoft.NodejsTools.NpmUI {
     /// <summary>
@@ -42,11 +31,16 @@ namespace Microsoft.NodejsTools.NpmUI {
                     var vm = DataContext as NpmOutputControlViewModel;
                     if (null != vm) {
                         _textBox.Document = vm.Output;
+                        vm.OutputWritten += vm_OutputWritten;
                     }
                     break;
             }
 
             base.OnPropertyChanged(e);
+        }
+
+        void vm_OutputWritten(object sender, EventArgs e) {
+            _textBox.ScrollToEnd();
         }
     }
 }

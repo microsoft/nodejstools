@@ -284,6 +284,7 @@ namespace Microsoft.NodejsTools.NpmUI {
             set {
                 _filteredPackages = value;
                 OnPropertyChanged();
+                SelectedPackage = null != _filteredPackages && _filteredPackages.Count > 0 ? _filteredPackages[0] : null;
             }
         } 
 

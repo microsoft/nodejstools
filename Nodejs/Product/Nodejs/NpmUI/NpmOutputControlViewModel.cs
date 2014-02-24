@@ -22,6 +22,7 @@ using System.Threading;
 using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Documents;
+using System.Windows.Media;
 using Microsoft.NodejsTools.Npm;
 
 namespace Microsoft.NodejsTools.NpmUI {
@@ -73,8 +74,13 @@ namespace Microsoft.NodejsTools.NpmUI {
         private Thread _worker;
         
         public NpmOutputControlViewModel() {
+            var style = new Style(typeof(Paragraph));
+            style.Setters.Add(new Setter(Block.MarginProperty, new Thickness(0)));
+            _output.Resources.Add(typeof(Paragraph), style);
+
             _worker = new Thread(Run);
             _worker.Name = "npm UI Execution";
+            _worker.IsBackground = true;
             _worker.Start();
         }
 
@@ -265,38 +271,56 @@ namespace Microsoft.NodejsTools.NpmUI {
 //            }
 //        }
 
-//        private string Preprocess(string source) {
-//            var buff = new StringBuilder();
-//            foreach (var ch in source) {
-//                if (ch == '\\') {
-//                    buff.Append("\\'5c");
-//                } else {
-//                    buff.Append(ch);
-//                }
-//            }
-//            var result = buff.ToString();
-//            return result.EndsWith(Environment.NewLine) ? result.Substring(0, result.Length - Environment.NewLine.Length) : result;
-//        }
+        public event EventHandler OutputWritten;
+
+        private void OnOutputWritten() {
+            var handlers = OutputWritten;
+            if (null != handlers) {
+                handlers(this, EventArgs.Empty);
+            }
+        }
+
+        private string Preprocess(string source) {
+            //var buff = new StringBuilder();
+            //foreach (var ch in source) {
+            //    if (ch == '\\') {
+            //        buff.Append("\\'5c");
+            //    } else {
+            //        buff.Append(ch);
+            //    }
+            //}
+            //var result = buff.ToString();
+            return source.EndsWith(Environment.NewLine) ? source.Substring(0, source.Length - Environment.NewLine.Length) : source;
+        }
 
         private void WriteLines(string text, bool forceError) {
-            //text = Preprocess(text);
+            text = Preprocess(text);
             if (forceError) {
                 _withErrors = true;
             }
             foreach (var line in text.Split(new string[] { "\r\n", "\n" }, StringSplitOptions.None)) {
-                //WriteLine(line, forceError);
+                var sub = line;
+                var paragraph = new Paragraph();
 
-                if (line.StartsWith("npm ERR!")) {
-                    _withErrors = true;
-                    
-                    //  TODO: special formatting
-                } else if (line.StartsWith("npm WARN")) {
-                    //  TODO: special formatting
+                if (sub.StartsWith("npm ")) {
+                    paragraph.Inlines.Add(new Run(sub.Substring(0,4)));
+                    sub = sub.Length > 4 ? sub.Substring(4) : string.Empty;
+                    if (sub.StartsWith("ERR!")) {
+                        _withErrors = true;
+                        paragraph.Inlines.Add(new Run(sub.Substring(0, 4)) { Foreground = Brushes.Red });
+                        sub = sub.Length > 4 ? sub.Substring(4) : string.Empty;
+                    } else if (sub.StartsWith("WARN")) {
+                        paragraph.Inlines.Add(new Run(sub.Substring(0, 4)) { Foreground = Brushes.Yellow });
+                        sub = sub.Length > 4 ? sub.Substring(4) : string.Empty;
+                    }
                 }
 
-                var paragraph = new Paragraph(new Run(line));
+                paragraph.Inlines.Add(new Run(sub));
+
                 _output.Blocks.Add(paragraph);
             }
+
+            OnOutputWritten();
         }
 
         private void commander_ExceptionLogged(object sender, NpmExceptionEventArgs e) {
@@ -328,22 +352,26 @@ namespace Microsoft.NodejsTools.NpmUI {
         }
 
         private void Run() {
-            while (!_isDisposed) {
+            int count = 0;
+            // We want the thread to continue running queued commands before
+            // exiting so the user can close the install window without having to wait
+            // for commands to complete.
+            while (!_isDisposed || count > 0) {
                 QueuedNpmCommandInfo info = null;
-                int count = 0;
                 lock (_queueLock) {
-                    while (!_isDisposed
-                        && (_commandQueue.Count == 0 || null == _npmController || IsExecutingCommand)) {
+                    while ((_commandQueue.Count == 0 && !_isDisposed)
+                        || null == _npmController
+                        || IsExecutingCommand) {
                         Monitor.Wait(_queueLock);
                     }
 
-                    if (!_isDisposed) {
+                    if (_commandQueue.Count > 0) {
                         info = _commandQueue.Dequeue();
-                        count = _commandQueue.Count;
                     }
+                    count = _commandQueue.Count;
                 }
 
-                if (!_isDisposed && null != info) {
+                if (null != info) {
                     string  status,
                             commandText = GetCommandText(info);
 
@@ -368,6 +396,7 @@ namespace Microsoft.NodejsTools.NpmUI {
 
         public void Dispose() {
             _isDisposed = true;
+            OutputWritten = null;
             Pulse();
         }
     }

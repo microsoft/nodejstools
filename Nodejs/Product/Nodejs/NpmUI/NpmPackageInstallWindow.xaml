@@ -16,7 +16,12 @@
                         Executed="ExecuteClose"
                         CanExecute="CanExecuteClose"></CommandBinding>
     </Window.CommandBindings>
-    
+
+    <Window.InputBindings>
+        <KeyBinding Command="{Binding Path=InstallCommand}"
+              Gesture="ENTER" />
+    </Window.InputBindings>
+
     <Grid>
         <DockPanel VerticalAlignment="Stretch"
                    Height="Auto"
@@ -101,14 +106,15 @@
                         Height="40">
                     <Button IsDefault="True"
                             Content="_Close"
-                            Command="ApplicationCommands.Close"></Button>
+                            Command="ApplicationCommands.Close"
+                            IsCancel="True"></Button>
                 </StackPanel>
             </DockPanel>
             
             
             <Grid>
                 <Grid.RowDefinitions>
-                    <RowDefinition Height="5*"></RowDefinition>
+                    <RowDefinition Height="260"></RowDefinition>
                     <RowDefinition Height="Auto"></RowDefinition>
                     <RowDefinition Height="Auto"></RowDefinition>
                     <RowDefinition Height="*"></RowDefinition>
@@ -116,11 +122,14 @@
                 
                 <!-- Package List -->
                 
-                <ListBox Grid.Row="0"
+                <ListBox x:Name="_packageList"
+                         Grid.Row="0"
                          ItemsSource="{Binding Path=FilteredPackages}"
                          SelectedItem="{Binding Path=SelectedPackage}"
                          Visibility="{Binding Path=FilteredCatalogListVisibility}"
-                         HorizontalContentAlignment="Stretch">
+                         HorizontalContentAlignment="Stretch"
+                         MinHeight="0"
+                         MouseDoubleClick="_packageList_OnMouseDoubleClick">
                     <ListBox.ItemTemplate>
                         <DataTemplate>
                             <DockPanel Margin="4, 4, 4, 0"

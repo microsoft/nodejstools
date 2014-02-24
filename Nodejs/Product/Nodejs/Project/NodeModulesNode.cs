@@ -564,6 +564,7 @@ namespace Microsoft.NodejsTools.Project {
             viewModel.NpmController = NpmController;
             var manager = new NpmPackageInstallWindow(viewModel);
             manager.NpmExecuteControl.DataContext = executeVm;
+            manager.Owner = System.Windows.Application.Current.MainWindow;
             manager.ShowDialog();
 
             ReloadHierarchy();
