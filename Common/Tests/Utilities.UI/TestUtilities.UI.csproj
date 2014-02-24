@@ -27,6 +27,7 @@
     <DefineConstants>$(DefineConstants);TRACE</DefineConstants>
   </PropertyGroup>
   <ItemGroup>
+    <Reference Include="Accessibility" />
     <Reference Include="envdte, Version=8.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a">
       <EmbedInteropTypes>False</EmbedInteropTypes>
       <HintPath>..\..\..\..\..\..\..\..\Program Files (x86)\Common Files\Microsoft Shared\MSEnv\PublicAssemblies\envdte.dll</HintPath>
@@ -92,14 +93,22 @@
     </Compile>
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="UI\AddExistingItemDialog.cs" />
+    <Compile Include="UI\AutomationDialog.cs" />
     <Compile Include="UI\AddReferenceDialog.cs" />
     <Compile Include="UI\AttachToProcessDialog.cs" />
     <Compile Include="UI\AutomationWrapper.cs" />
+    <Compile Include="UI\ListBox.cs" />
     <Compile Include="UI\Button.cs" />
     <Compile Include="UI\CheckBox.cs" />
     <Compile Include="UI\CheckListView.cs" />
     <Compile Include="UI\ChooseLocationDialog.cs" />
     <Compile Include="UI\ComboBox.cs" />
+    <Compile Include="UI\ListBoxItem.cs" />
+    <Compile Include="UI\AzureWebSiteImportPublishSettingsDialog.cs" />
+    <Compile Include="UI\AzureWebSiteCreateDialog.cs" />
+    <Compile Include="UI\AzureWebSiteImportSubscriptionDialog.cs" />
+    <Compile Include="UI\AzureWebSiteManageSubscriptionsDialog.cs" />
+    <Compile Include="UI\AzureWebSitePublishDialog.cs" />
     <Compile Include="UI\OpenProjectDialog.cs" />
     <Compile Include="UI\CredentialsDialog.cs" />
     <Compile Include="UI\DetailPane.cs" />
@@ -129,6 +138,7 @@
     <Compile Include="UI\Table.cs" />
     <Compile Include="UI\TestExtensions.cs" />
     <Compile Include="UI\TextBox.cs" />
+    <Compile Include="UI\ToolsOptionsDialog.cs" />
     <Compile Include="UI\TreeNode.cs" />
     <Compile Include="UI\TreeView.cs" />
     <Compile Include="UI\TypeBrowserPane.cs" />

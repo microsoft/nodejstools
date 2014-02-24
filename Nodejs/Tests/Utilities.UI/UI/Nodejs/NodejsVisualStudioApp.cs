@@ -22,6 +22,14 @@ namespace TestUtilities.UI.Nodejs {
     public class NodejsVisualStudioApp : VisualStudioApp {
         private NodejsPerfExplorer _perfTreeView;
         private NodejsPerfToolBar _perfToolBar;
+
+        public const string JavaScriptTemplateLanguageName = "JavaScript";
+        public const string TypeScriptTemplateLanguageName = "TypeScript";
+
+        public const string JavaScriptAzureWebAppTemplate = "Blank Windows Azure Node.js Application";
+        public const string TypeScriptAzureWebAppTemplate = "Blank Windows Azure Node.js Web Application";
+
+
         public NodejsVisualStudioApp(DTE dte)
             : base(dte) {
         }

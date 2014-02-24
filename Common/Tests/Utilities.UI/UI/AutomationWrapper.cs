@@ -14,7 +14,10 @@
 
 using System;
 using System.Diagnostics;
+using System.Runtime.InteropServices;
+using System.Threading;
 using System.Windows.Automation;
+using Accessibility;
 using Microsoft.TC.TestHostAdapters;
 using Microsoft.VisualStudio.Shell.Interop;
 
@@ -207,8 +210,7 @@ namespace TestUtilities.UI {
         /// </summary>
         public static void Invoke(AutomationElement button) {
             CheckNullElement(button);
-            var invokePattern = (InvokePattern)button.GetCurrentPattern(InvokePattern.Pattern);
-            invokePattern.Invoke();
+            button.GetInvokePattern().Invoke();
         }
 
         /// <summary>
@@ -217,8 +219,13 @@ namespace TestUtilities.UI {
         /// <param name="selectionItem"></param>
         public static void Select(AutomationElement selectionItem) {
             CheckNullElement(selectionItem);
-            var selectPattern = (SelectionItemPattern)selectionItem.GetCurrentPattern(SelectionItemPattern.Pattern);
-            selectPattern.Select();
+            selectionItem.GetSelectionItemPattern().Select();
+        }
+
+        public static void DoDefaultAction(AutomationElement element) {
+            CheckNullElement(element);
+            var accessible = NativeMethods.GetAccessibleObject(element);
+            accessible.accDoDefaultAction();
         }
 
         /// <summary>
@@ -325,6 +332,52 @@ namespace TestUtilities.UI {
         public void Invoke() {
             Invoke(Element);
         }
+
+        public static void WaitFor<T>(T obj, Predicate<T> condition, int timeout = 100000) where T : AutomationWrapper {
+            for (int i = 0; i < timeout; i += 100) {
+                if (condition(obj))
+                    return;
+
+                Thread.Sleep(100);
+            }
+
+            throw new TimeoutException(string.Format("Timeout waiting for element '{0}'", obj.Element.Current.Name));
+        }
+
+        public void WaitForInputIdle() {
+            object pattern;
+            if (Element.TryGetCurrentPattern(WindowPattern.Pattern, out pattern)) {
+                if (!((WindowPattern)pattern).WaitForInputIdle(5000)) {
+                    throw new TimeoutException();
+                }
+            }
+        }
+
+        public void WaitForClosed(TimeSpan timeout, Action closeCommand = null) {
+            using (var closed = new AutoResetEvent(false)) {
+                AutomationEventHandler handler = (s, e) => {
+                    closed.Set();
+                };
+                Automation.AddAutomationEventHandler(
+                    WindowPattern.WindowClosedEvent,
+                    Element,
+                    TreeScope.Element,
+                    handler
+                );
+
+                if (closeCommand != null) {
+                    closeCommand();
+                }
+
+                closed.WaitOne(timeout);
+
+                Automation.RemoveAutomationEventHandler(
+                    WindowPattern.WindowClosedEvent,
+                    Element,
+                    handler
+                );
+            }
+        }
     }
 
     public static class AutomationElementExtensions {
@@ -345,6 +398,57 @@ namespace TestUtilities.UI {
 
         public static void Collapse(this AutomationElement node) {
             AutomationWrapper.Collapse(node);
+        }
+
+        [DebuggerStepThrough]
+        private static T Pattern<T>(this AutomationElement node, AutomationPattern pattern) where T : BasePattern {
+            try {
+                return (T)node.GetCurrentPattern(pattern);
+            } catch (InvalidOperationException) {
+                Console.WriteLine("{0} pattern is not supported by {1}.", pattern.ProgrammaticName, node.Current.Name);
+                AutomationWrapper.DumpElement(node);
+                throw;
+            }
+        }
+
+        [DebuggerStepThrough]
+        public static InvokePattern GetInvokePattern(this AutomationElement node) {
+            return node.Pattern<InvokePattern>(InvokePattern.Pattern);
+        }
+
+        [DebuggerStepThrough]
+        public static ValuePattern GetValuePattern(this AutomationElement node) {
+            return node.Pattern<ValuePattern>(ValuePattern.Pattern);
+        }
+
+        [DebuggerStepThrough]
+        public static TextPattern GetTextPattern(this AutomationElement node) {
+            return node.Pattern<TextPattern>(TextPattern.Pattern);
+        }
+
+        [DebuggerStepThrough]
+        public static ScrollPattern GetScrollPattern(this AutomationElement node) {
+            return node.Pattern<ScrollPattern>(ScrollPattern.Pattern);
+        }
+
+        [DebuggerStepThrough]
+        public static SelectionPattern GetSelectionPattern(this AutomationElement node) {
+            return node.Pattern<SelectionPattern>(SelectionPattern.Pattern);
+        }
+
+        [DebuggerStepThrough]
+        public static SelectionItemPattern GetSelectionItemPattern(this AutomationElement node) {
+            return node.Pattern<SelectionItemPattern>(SelectionItemPattern.Pattern);
+        }
+
+        [DebuggerStepThrough]
+        public static ExpandCollapsePattern GetExpandCollapsePattern(this AutomationElement node) {
+            return node.Pattern<ExpandCollapsePattern>(ExpandCollapsePattern.Pattern);
+        }
+
+        [DebuggerStepThrough]
+        public static WindowPattern GetWindowPattern(this AutomationElement node) {
+            return node.Pattern<WindowPattern>(WindowPattern.Pattern);
         }
     }
 } 

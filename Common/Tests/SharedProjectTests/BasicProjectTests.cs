@@ -159,7 +159,9 @@ namespace Microsoft.VisualStudioTools.SharedProjectTests {
                     using (var solution = BasicProject(projectType).Generate().ToVs()) {
                         var project = solution.Project;
 
-                        Assert.AreEqual(2, project.ProjectItems.Count);
+                        // Counts may differ between project types, so we take
+                        // the initial count and check against the delta.
+                        int previousCount = project.ProjectItems.Count;
                         
                         var item = project.ProjectItems.AddFromFileCopy(Path.Combine(solution.Directory, "Extra" + projectType.CodeExtension));
 
@@ -179,12 +181,13 @@ namespace Microsoft.VisualStudioTools.SharedProjectTests {
                         Assert.AreEqual(false, vsProjItem.ProjectItem.IsOpen);
                         Assert.AreEqual(VsIdeTestHostContext.Dte, vsProjItem.ProjectItem.DTE);
 
-                        Assert.AreEqual(3, project.ProjectItems.Count);
+                        Assert.AreEqual(1, project.ProjectItems.Count - previousCount, "Expected one new item");
+                        previousCount = project.ProjectItems.Count;
 
                         // add an existing item
                         project.ProjectItems.AddFromFile(Path.Combine(solution.Directory, "HelloWorld", "server" + projectType.CodeExtension));
 
-                        Assert.AreEqual(3, project.ProjectItems.Count);
+                        Assert.AreEqual(0, project.ProjectItems.Count - previousCount, "Expected no new items");
                     }
                 }
             } finally {
@@ -197,11 +200,17 @@ namespace Microsoft.VisualStudioTools.SharedProjectTests {
         [TestMethod, Priority(0), TestCategory("Core")]
         [HostType("TC Dynamic"), DynamicHostType(typeof(VsIdeHostAdapter))]
         public void CleanSolution() {
+            var msbuildLogProperty = VsIdeTestHostContext.Dte
+                .get_Properties("Environment", "ProjectsAndSolution")
+                .Item("MSBuildOutputVerbosity");
+            var originalValue = msbuildLogProperty.Value;
+            msbuildLogProperty.Value = 2;
             try {
                 foreach (var projectType in ProjectTypes) {
                     var proj = new ProjectDefinition(
                         "HelloWorld",
                         projectType,
+                        Property("OutputPath", "."),
                         Compile("server"),
                         Target(
                             "Clean", 
@@ -219,6 +228,7 @@ namespace Microsoft.VisualStudioTools.SharedProjectTests {
                     }
                 }
             } finally {
+                msbuildLogProperty.Value = originalValue;
                 VsIdeTestHostContext.Dte.Solution.Close();
                 GC.Collect();
                 GC.WaitForPendingFinalizers();
@@ -228,11 +238,17 @@ namespace Microsoft.VisualStudioTools.SharedProjectTests {
         [TestMethod, Priority(0), TestCategory("Core")]
         [HostType("TC Dynamic"), DynamicHostType(typeof(VsIdeHostAdapter))]
         public void BuildSolution() {
+            var msbuildLogProperty = VsIdeTestHostContext.Dte
+                .get_Properties("Environment", "ProjectsAndSolution")
+                .Item("MSBuildOutputVerbosity");
+            var originalValue = msbuildLogProperty.Value;
+            msbuildLogProperty.Value = 2;
             try {
                 foreach (var projectType in ProjectTypes) {
                     var proj = new ProjectDefinition(
                         "HelloWorld",
                         projectType,
+                        Property("OutputPath", "."),
                         Compile("server"),
                         Target(
                             "Build",
@@ -241,7 +257,8 @@ namespace Microsoft.VisualStudioTools.SharedProjectTests {
                         Target(
                             "CoreCompile",
                             Tasks.Message("CoreCompile", importance: "high")
-                        )
+                        ),
+                        Target("CreateManifestResourceNames")
                     );
                     using (var solution = proj.Generate().ToVs()) {
                         VsIdeTestHostContext.Dte.ExecuteCommand("Build.BuildSolution");
@@ -249,6 +266,7 @@ namespace Microsoft.VisualStudioTools.SharedProjectTests {
                     }
                 }
             } finally {
+                msbuildLogProperty.Value = originalValue;
                 VsIdeTestHostContext.Dte.Solution.Close();
                 GC.Collect();
                 GC.WaitForPendingFinalizers();
@@ -1182,6 +1200,11 @@ namespace Microsoft.VisualStudioTools.SharedProjectTests {
         [HostType("TC Dynamic"), DynamicHostType(typeof(VsIdeHostAdapter))]
         public void OpenCommandHere() {
             var existing = System.Diagnostics.Process.GetProcesses().Select(x => x.Id).ToSet();
+            try {
+                VsIdeTestHostContext.Dte.Commands.Item("ProjectandSolutionContextMenus.Project.OpenCommandPromptHere");
+            } catch (ArgumentException) {
+                Assert.Inconclusive("Open Command Prompt Here command is not implemented");
+            }
 
             foreach (var projectType in ProjectTypes) {
                 var def = new ProjectDefinition(
@@ -1295,7 +1318,7 @@ namespace Microsoft.VisualStudioTools.SharedProjectTests {
                     );
 
                     System.Threading.Thread.Sleep(1000);
-                    solution.AssertFileExistsWithContent("// new server", "HelloWorld", "server.js");
+                    solution.AssertFileExistsWithContent("// new server", "HelloWorld", "server" + projectType.CodeExtension);
 
                     var dlg = solution.App.WaitForDialog(); // not a simple dialog we can check
                     NativeMethods.EndDialog(dlg, new IntPtr((int)TestUtilities.UI.MessageBoxButton.Yes));

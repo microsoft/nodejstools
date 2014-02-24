@@ -12,26 +12,20 @@
  *
  * ***************************************************************************/
 
-using System.Windows.Automation;
+using System;
+using System.IO;
+using System.Net;
 
-namespace TestUtilities.UI
+namespace TestUtilities
 {
-    public class TextBox : AutomationWrapper
-    {
-        public TextBox(AutomationElement element)
-            : base(element) { 
-        }
-
-        public string Value
-        {
-            get
-            {
-                return Element.GetTextPattern().DocumentRange.GetText(-1);
+    public static class WebDownloadUtility {
+        public static string GetString(Uri siteUri) {
+            string text;
+            var req = HttpWebRequest.CreateHttp(siteUri);
+            using (var resp = req.GetResponse()) {
+                text = new StreamReader(resp.GetResponseStream()).ReadToEnd();
             }
-            set
-            {
-                Element.GetValuePattern().SetValue(value);
-            }
+            return text;
         }
     }
 }

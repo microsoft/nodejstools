@@ -14,24 +14,12 @@
 
 using System.Windows.Automation;
 
-namespace TestUtilities.UI
-{
-    public class TextBox : AutomationWrapper
-    {
-        public TextBox(AutomationElement element)
-            : base(element) { 
-        }
+namespace TestUtilities.UI {
+    public class ListBoxItem : AutomationWrapper {
+        private ListBox _parent;
 
-        public string Value
-        {
-            get
-            {
-                return Element.GetTextPattern().DocumentRange.GetText(-1);
-            }
-            set
-            {
-                Element.GetValuePattern().SetValue(value);
-            }
+        public ListBoxItem(AutomationElement element, ListBox parent) : base(element) { 
+            _parent = parent;
         }
     }
 }
