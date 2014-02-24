@@ -43,8 +43,12 @@ namespace Microsoft.NodejsTools.Jade {
 
         private static string GetClassificationName(JadeToken token) {
             switch (token.TokenType) {
-                case JadeTokenType.JadeSelector:
-                    return JadeClassificationTypes.Selector;
+                case JadeTokenType.TagName:
+                    return HtmlElementName;
+                case JadeTokenType.ClassLiteral:
+                    return JadeClassificationTypes.ClassLiteral;
+                case JadeTokenType.IdLiteral:
+                    return JadeClassificationTypes.IdLiteral;
                 case JadeTokenType.Filter:
                     return JadeClassificationTypes.Filter;
                 case JadeTokenType.TagKeyword:

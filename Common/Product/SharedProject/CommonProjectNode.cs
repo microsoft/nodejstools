@@ -612,6 +612,7 @@ namespace Microsoft.VisualStudioTools.Project {
                     if (_watcher != null) {
                         _watcher.EnableRaisingEvents = true;
                     }
+                    _project.BoldStartupItem();
                     return false;
                 }
 
@@ -662,7 +663,7 @@ namespace Microsoft.VisualStudioTools.Project {
                     }
                     return true;
                 }
-
+                
                 foreach (var file in files) {
                     if (_project.IsFileHidden(file)) {
                         continue;
@@ -1134,6 +1135,9 @@ namespace Microsoft.VisualStudioTools.Project {
 
                     } else if (File.Exists(_path)) { // rapid changes can arrive out of order, make sure the file still exists
                         _project.AddAllFilesFile(parent, _path);
+                        if (String.Equals(_project.GetStartupFile(), _path, StringComparison.OrdinalIgnoreCase)) {
+                            _project.BoldStartupItem();
+                        }
                     }
 
                     parent.ExpandItem(wasExpanded ? EXPANDFLAGS.EXPF_ExpandFolder : EXPANDFLAGS.EXPF_CollapseFolder);

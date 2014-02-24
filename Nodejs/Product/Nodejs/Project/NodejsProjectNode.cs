@@ -256,7 +256,7 @@ namespace Microsoft.NodejsTools.Project {
                 base.Reload();
 
                 SyncFileSystem();
-
+                
                 foreach (var group in _refGroupDispenser.Groups) {
                     group.GenerateReferenceFile();
                 }

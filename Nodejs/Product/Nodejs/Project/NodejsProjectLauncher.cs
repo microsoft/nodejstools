@@ -72,7 +72,7 @@ namespace Microsoft.NodejsTools.Project {
             if (!Boolean.TryParse(startBrowserStr, out startBrowser)) {
                 startBrowser = true;
             }
-            
+
             if (debug) {
                 StartWithDebugger(file);
             } else {
@@ -90,7 +90,7 @@ namespace Microsoft.NodejsTools.Project {
                 );
 
                 string webBrowserUrl = GetFullUrl();
-                Uri uri = new Uri(webBrowserUrl);                        
+                Uri uri = new Uri(webBrowserUrl);
 
                 psi.EnvironmentVariables["PORT"] = uri.Port.ToString();
                 foreach (var nameValue in GetEnvironmentVariables()) {
@@ -101,13 +101,13 @@ namespace Microsoft.NodejsTools.Project {
 
                 if (startBrowser) {
                     if (webBrowserUrl != null) {
-                       OnPortOpenedHandler.CreateHandler(
-                            uri.Port,
-                            shortCircuitPredicate: () => process.HasExited,
-                            action: () => {
-                                VsShellUtilities.OpenBrowser(webBrowserUrl, (uint)__VSOSPFLAGS.OSP_LaunchNewBrowser);
-                            }
-                        );
+                        OnPortOpenedHandler.CreateHandler(
+                             uri.Port,
+                             shortCircuitPredicate: () => process.HasExited,
+                             action: () => {
+                                 VsShellUtilities.OpenBrowser(webBrowserUrl, (uint)__VSOSPFLAGS.OSP_LaunchNewBrowser);
+                             }
+                         );
                     }
                 }
             }
@@ -243,7 +243,7 @@ namespace Microsoft.NodejsTools.Project {
             dbgInfo.bstrArg = GetFullArguments(startupFile, includeNodeArgs: false);    // we need to supply node args via options
             dbgInfo.bstrRemoteMachine = null;
             var nodeArgs = _project.GetProjectProperty(NodejsConstants.NodeExeArguments);
-            if(!String.IsNullOrWhiteSpace(nodeArgs)) {
+            if (!String.IsNullOrWhiteSpace(nodeArgs)) {
                 AppendOption(ref dbgInfo, AD7Engine.InterpreterOptions, nodeArgs);
             }
 
@@ -354,7 +354,7 @@ namespace Microsoft.NodejsTools.Project {
                 }
                 Sleep = sleep ?? 500;                                   // 1/2 second sleep
                 ShortCircuitPredicate = shortCircuitPredicate ?? (() => false);
-                Action = action ?? (() => {});
+                Action = action ?? (() => { });
                 StartTime = System.DateTime.Now;
             }
         }
@@ -414,7 +414,7 @@ namespace Microsoft.NodejsTools.Project {
 
             // Launch browser (if not short-circuited)
             if (!info.ShortCircuitPredicate()) {
-                info.Action();                
+                info.Action();
             }
         }
     }

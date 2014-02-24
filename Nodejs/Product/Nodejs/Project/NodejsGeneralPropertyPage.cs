@@ -24,7 +24,7 @@ namespace Microsoft.NodejsTools.Project {
         private readonly NodejsGeneralPropertyPageControl _control;
 
         public NodejsGeneralPropertyPage() {
-            _control = new NodejsGeneralPropertyPageControl(this);            
+            _control = new NodejsGeneralPropertyPageControl(this);
         }
 
         public override System.Windows.Forms.Control Control {
@@ -65,7 +65,7 @@ namespace Microsoft.NodejsTools.Project {
         public override void LoadSettings() {
             Loading = true;
             try {
-                _control.NodeExeArguments = Project.GetProjectProperty(NodejsConstants.NodeExeArguments);                
+                _control.NodeExeArguments = Project.GetProjectProperty(NodejsConstants.NodeExeArguments);
                 _control.NodeExePath = Project.GetProjectProperty(NodejsConstants.NodeExePath);
                 _control.ScriptArguments = Project.GetProjectProperty(NodejsConstants.ScriptArguments);
                 _control.WorkingDirectory = Project.GetProjectProperty(CommonConstants.WorkingDirectory);

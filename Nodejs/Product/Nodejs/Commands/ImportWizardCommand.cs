@@ -30,6 +30,23 @@ namespace Microsoft.NodejsTools.Commands {
             statusBar.SetText("Importing project...");
 
             var dlg = new Microsoft.NodejsTools.Project.ImportWizard.ImportWizard();
+            
+            Microsoft.VisualStudio.Shell.OleMenuCmdEventArgs oleArgs = args as Microsoft.VisualStudio.Shell.OleMenuCmdEventArgs;
+            if (oleArgs != null) {
+                string projectArgs = oleArgs.InValue as string;
+                if (projectArgs != null) {
+                    var argItems = projectArgs.Split('|');
+                    if (argItems.Length == 2) {
+                        dlg.ImportSettings.ProjectPath = CommonUtils.GetAvailableFilename(
+                            argItems[1], 
+                            argItems[0], 
+                            ".njsproj"
+                        );
+                        dlg.ImportSettings.SourcePath = argItems[1];
+                    }
+                }
+            }
+            
             if (dlg.ShowModal() ?? false) {
                 var settings = dlg.ImportSettings;
 

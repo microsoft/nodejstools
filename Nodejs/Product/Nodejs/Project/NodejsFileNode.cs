@@ -63,7 +63,7 @@ namespace Microsoft.NodejsTools.Project {
                 }
             }
         }
-        
+
         protected override NodeProperties CreatePropertiesObject() {
             if (IsLinkFile) {
                 return new NodejsLinkFileNodeProperties(this);
