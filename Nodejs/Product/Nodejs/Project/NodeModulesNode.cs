@@ -54,6 +54,7 @@ namespace Microsoft.NodejsTools.Project {
         private INpmController _npmController;
         private int _npmCommandsExecuting;
         private bool _suppressCommands;
+        private bool _firstHierarchyLoad = true;
 
         private readonly object _fileBitsLock = new object();
         private readonly object _commandCountLock = new object();
@@ -161,6 +162,10 @@ namespace Microsoft.NodejsTools.Project {
                 ReloadModules();
             }
             return _npmController;
+        }
+
+        void NpmController_FinishedRefresh(object sender, EventArgs e) {
+            ReloadHierarchySafe();
         }
 
         public INpmController NpmController {
@@ -390,7 +395,6 @@ namespace Microsoft.NodejsTools.Project {
             }
 
             ReloadModules();
-            ReloadHierarchySafe();
         }
 
         private int _refreshRetryCount;
@@ -434,6 +438,11 @@ namespace Microsoft.NodejsTools.Project {
                 if (null != global){
                     _globalModulesNode.GlobalPackages = global;
                     ReloadHierarchy(_globalModulesNode, global.Modules);
+                }
+
+                if (_firstHierarchyLoad) {
+                    controller.FinishedRefresh += NpmController_FinishedRefresh;
+                    _firstHierarchyLoad = false;
                 }
             }
         }

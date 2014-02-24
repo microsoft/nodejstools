@@ -40,6 +40,10 @@ namespace Microsoft.NodejsTools.Project {
             get { return _cCaption; }
         }
 
+        public override int SortPriority {
+            get { return -1; /* DefaultSortOrderNode.FolderNode; */ }
+        }
+
         internal IGlobalPackages GlobalPackages { get; set; }
 
         internal override int QueryStatusOnNode(Guid cmdGroup, uint cmd, IntPtr pCmdText, ref QueryStatusResult result) {
