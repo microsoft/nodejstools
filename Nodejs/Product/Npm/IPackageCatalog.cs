@@ -22,5 +22,6 @@ namespace Microsoft.NodejsTools.Npm {
     public interface IPackageCatalog {
         IList<IPackage> Results { get; }
         DateTime LastRefreshed { get; }
+        IPackage this[string name] { get; }
     }
 }

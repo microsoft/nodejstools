@@ -168,5 +168,11 @@ namespace Microsoft.NodejsTools.Npm.SPI {
             }
             return _sRepoCatalogue;
         }
+
+        public IPackageCatalog MostRecentlyLoadedCatalog {
+            get {
+                return _sRepoCatalogue;
+            }
+        }
     }
 }

@@ -18,11 +18,25 @@ using Microsoft.NodejsTools.Npm;
 
 namespace NpmTests {
     internal class MockPackageCatalog : IPackageCatalog {
+        private IDictionary<string, IPackage> _byName = new Dictionary<string, IPackage>();
+ 
         public MockPackageCatalog(IList<IPackage> results) {
             Results = results;
             LastRefreshed = DateTime.Now;
+
+            foreach (var package in results) {
+                _byName[package.Name] = package;
+            }
         }
         public IList<IPackage> Results { get; private set; }
         public DateTime LastRefreshed { get; private set; }
+
+        public IPackage this[string name] {
+            get {
+                IPackage match;
+                _byName.TryGetValue(name, out match);
+                return match;
+            }
+        }
     }
 }

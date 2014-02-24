@@ -60,6 +60,18 @@ namespace Microsoft.NodejsTools.Project {
 
         public IPackage Package { get; internal set; }
 
+        internal INpmController NpmController {
+            get {
+                if (null != _projectNode) {
+                    var modulesNode = _projectNode.ModulesNode;
+                    if (null != modulesNode) {
+                        return modulesNode.NpmController;
+                    }
+                }
+                return null;
+            }
+        }
+
         #region HierarchyNode implementation
 
         private string GetRelativeUrlFragment() {

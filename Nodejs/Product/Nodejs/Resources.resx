@@ -198,6 +198,12 @@
   <data name="NpmPackageTypeDescription" xml:space="preserve">
     <value>Indicates whether package is global, or locally installed in your project, and whether or not it is a sub-package.</value>
   </data>
+  <data name="NpmPackageLinkStatus" xml:space="preserve">
+    <value>Link Status</value>
+  </data>
+  <data name="NpmPackageLinkStatusDescription" xml:space="preserve">
+    <value>Indicates whether a package has been linked from globally installed packages.</value>
+  </data>
   <data name="NpmPackageIsListedInParentPackageJson" xml:space="preserve">
     <value>Listed As Dependency</value>
   </data>
@@ -246,6 +252,24 @@
   <data name="PackageTypeGlobalSubpackage" xml:space="preserve">
     <value>Global sub-package</value>
   </data>
+  <data name="LinkStatusLocallyInstalled" xml:space="preserve">
+    <value>Installed locally</value>
+  </data>
+  <data name="LinkStatusLinkedFromGlobal" xml:space="preserve">
+    <value>Installed locally or linked from global packages</value>
+  </data>
+  <data name="LinkStatusNotLinkedToProject" xml:space="preserve">
+    <value>Not linked to project</value>
+  </data>
+  <data name="LinkStatusLinkedToProject" xml:space="preserve">
+    <value>Linked or installed into project</value>
+  </data>
+  <data name="LinkStatusNotApplicableSubPackages" xml:space="preserve">
+    <value>Not applicable for sub-packages.</value>
+  </data>
+  <data name="LinkStatusUnknown" xml:space="preserve">
+    <value>Unknown</value>
+  </data>
   <data name="NewVersionNotApplicableSubpackage" xml:space="preserve">
     <value>Not applicable for sub-packages</value>
   </data>
@@ -254,6 +278,12 @@
   </data>
   <data name="NewVersionPackageCatalogNotRetrieved" xml:space="preserve">
     <value>Package catalog not yet retrieved</value>
+  </data>
+  <data name="NewVersionYes" xml:space="preserve">
+    <value>Yes: {0}</value>
+  </data>
+  <data name="NewVersionNo" xml:space="preserve">
+    <value>No</value>
   </data>
   <data name="RequestedVersionRangeNone" xml:space="preserve">
     <value>None</value>

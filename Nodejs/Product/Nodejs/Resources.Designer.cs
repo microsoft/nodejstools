@@ -133,6 +133,69 @@ namespace Microsoft.NodejsTools {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Installed locally or linked from global packages.
+        /// </summary>
+        internal static string LinkStatusLinkedFromGlobal {
+            get {
+                return ResourceManager.GetString("LinkStatusLinkedFromGlobal", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Linked or installed into project.
+        /// </summary>
+        internal static string LinkStatusLinkedToProject {
+            get {
+                return ResourceManager.GetString("LinkStatusLinkedToProject", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Installed locally.
+        /// </summary>
+        internal static string LinkStatusLocallyInstalled {
+            get {
+                return ResourceManager.GetString("LinkStatusLocallyInstalled", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Not applicable for sub-packages..
+        /// </summary>
+        internal static string LinkStatusNotApplicableSubPackages {
+            get {
+                return ResourceManager.GetString("LinkStatusNotApplicableSubPackages", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Not linked to project.
+        /// </summary>
+        internal static string LinkStatusNotLinkedToProject {
+            get {
+                return ResourceManager.GetString("LinkStatusNotLinkedToProject", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Unknown.
+        /// </summary>
+        internal static string LinkStatusUnknown {
+            get {
+                return ResourceManager.GetString("LinkStatusUnknown", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to No.
+        /// </summary>
+        internal static string NewVersionNo {
+            get {
+                return ResourceManager.GetString("NewVersionNo", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Not applicable for sub-packages.
         /// </summary>
         internal static string NewVersionNotApplicableSubpackage {
@@ -156,6 +219,15 @@ namespace Microsoft.NodejsTools {
         internal static string NewVersionUnknown {
             get {
                 return ResourceManager.GetString("NewVersionUnknown", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Yes: {0}.
+        /// </summary>
+        internal static string NewVersionYes {
+            get {
+                return ResourceManager.GetString("NewVersionYes", resourceCulture);
             }
         }
         
@@ -489,6 +561,24 @@ namespace Microsoft.NodejsTools {
         internal static string NpmPackageKeywordsDescription {
             get {
                 return ResourceManager.GetString("NpmPackageKeywordsDescription", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Link Status.
+        /// </summary>
+        internal static string NpmPackageLinkStatus {
+            get {
+                return ResourceManager.GetString("NpmPackageLinkStatus", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Indicates whether a package has been linked from globally installed packages..
+        /// </summary>
+        internal static string NpmPackageLinkStatusDescription {
+            get {
+                return ResourceManager.GetString("NpmPackageLinkStatusDescription", resourceCulture);
             }
         }
         

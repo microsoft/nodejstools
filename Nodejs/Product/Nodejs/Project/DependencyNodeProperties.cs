@@ -57,6 +57,13 @@ namespace Microsoft.NodejsTools.Project {
             }
         }
 
+        private IPackageCatalog MostRecentlyLoadedCatalog {
+            get {
+                var controller = DependencyNode.NpmController;
+                return null == controller ? null : controller.MostRecentlyLoadedCatalog;
+            }
+        }
+
         [SRCategoryAttribute(SR.CategoryVersion)]
         [LocDisplayName(SR.NpmPackageNewVersionAvailable)]
         [SRDescriptionAttribute(SR.NpmPackageNewVersionAvailableDescription)]
@@ -66,7 +73,20 @@ namespace Microsoft.NodejsTools.Project {
                     return Resources.NewVersionNotApplicableSubpackage;
                 }
 
-                return Resources.NewVersionUnknown;   //  TODO!!!
+                var package = Package;
+                var catalog = MostRecentlyLoadedCatalog;
+                if (null == catalog || null == package) {
+                    return Resources.NewVersionUnknown;
+                }
+
+                var listed = catalog[package.Name];
+                if (null == listed) {
+                    return Resources.NewVersionUnknown;
+                }
+
+                return listed.Version > package.Version
+                    ? string.Format(Resources.NewVersionYes, listed.Version)
+                    : string.Format(Resources.NewVersionNo);
             }
         }
 
@@ -156,6 +176,42 @@ namespace Microsoft.NodejsTools.Project {
                 return IsSubPackage
                     ? Resources.PackageTypeLocalSubpackage
                     : Resources.PackageTypeLocal;
+            }
+        }
+
+
+        [SRCategoryAttribute(SR.General)]
+        [LocDisplayName(SR.NpmPackageLinkStatus)]
+        [SRDescriptionAttribute(SR.NpmPackageLinkStatusDescription)]
+        public string LinkStatus {
+            get {
+                if (IsSubPackage) {
+                    return Resources.LinkStatusNotApplicableSubPackages;
+                }
+
+                var package = Package;
+                var controller = DependencyNode.NpmController;
+                if (null != controller && null != package) {
+                    if (IsGlobalInstall) {
+                        var root = controller.RootPackage;
+                        if (null != root) {
+                            var local = root.Modules[package.Name];
+                            return null == local || local.Version != package.Version
+                                ? Resources.LinkStatusNotLinkedToProject
+                                : Resources.LinkStatusLinkedToProject;
+                        }
+                    } else {
+                        var global = controller.GlobalPackages;
+                        if (null != global) {
+                            var installed = global.Modules[package.Name];
+                            return null == installed || installed.Version != package.Version
+                                ? Resources.LinkStatusLocallyInstalled
+                                : Resources.LinkStatusLinkedFromGlobal;
+                        }
+                    }
+                }
+
+                return Resources.LinkStatusUnknown;
             }
         }
 

@@ -47,6 +47,8 @@ namespace Microsoft.NodejsTools.Project {
         internal const string NpmPackagePathDescription = "NpmPackagePathDescription";
         internal const string NpmPackageType = "NpmPackageType";
         internal const string NpmPackageTypeDescription = "NpmPackageTypeDescription";
+        internal const string NpmPackageLinkStatus = "NpmPackageLinkStatus";
+        internal const string NpmPackageLinkStatusDescription = "NpmPackageLinkStatusDescription";
         internal const string NpmPackageIsListedInParentPackageJson = "NpmPackageIsListedInParentPackageJson";
         internal const string NpmPackageIsListedInParentPackageJsonDescription = "NpmPackageIsListedInParentPackageJsonDescription";
         internal const string NpmPackageIsMissing = "NpmPackageIsMissing";
