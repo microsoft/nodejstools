@@ -19,6 +19,7 @@ using System.Linq;
 using System.Net;
 using System.Threading;
 using Microsoft.NodejsTools.Debugger;
+using Microsoft.NodejsTools.Debugger.Serialization;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using TestUtilities;
 using TestUtilities.Nodejs;
@@ -89,7 +90,7 @@ namespace NodejsTests.Debugger {
                 DebugProcess(
                     filename,
                     onLoadComplete: (newproc, newthread) => {
-                        var breakPoint = AddBreakPoint(newproc, filename, lineNo);
+                        AddBreakPoint(newproc, filename, lineNo);
                         thread = newthread;
                     }
                 );
@@ -201,9 +202,9 @@ namespace NodejsTests.Debugger {
             TestDebuggerSteps(
                 "LocalsTest4.js",
                 new[] {
-                    new TestStep(action: TestAction.AddBreakpoint, targetBreakpoint: 2),
-                    new TestStep(action: TestAction.ResumeThread, expectedEntryPointHit: 9),
-                    new TestStep(action: TestAction.ResumeProcess, expectedBreakpointHit: 2),
+                    new TestStep(action: TestAction.AddBreakpoint, targetBreakpoint: 1),
+                    new TestStep(action: TestAction.ResumeThread, expectedEntryPointHit: 8),
+                    new TestStep(action: TestAction.ResumeProcess, expectedBreakpointHit: 1),
                     new TestStep(validation: (process, thread) => {
                             ExecTest(thread, expression: "x + 1", expectedType: "Number", expectedValue: "43", expectedFrame: "f");
                         }
@@ -233,19 +234,19 @@ namespace NodejsTests.Debugger {
         public void LocalsTest() {
             LocalsTest(
                 "LocalsTest.js",
-                3,
+                2,
                 expectedLocals: new string[] { "x" }
             );
 
             LocalsTest(
                 "LocalsTest2.js",
-                2,
+                1,
                 expectedParams: new string[] { "x" }
             );
 
             LocalsTest(
                 "LocalsTest3.js",
-                3,
+                2,
                 expectedParams: new string[] { "x" },
                 expectedLocals: new string[] { "y" }
             );
@@ -258,7 +259,7 @@ namespace NodejsTests.Debugger {
         public void SpecialNumberLocalsTest() {
             LocalsTest(
                 "SpecialNumberLocalsTest.js",
-                7,
+                6,
                 expectedLocals: new string[] { "nan", "negInf", "nul", "posInf" },
                 expectedValues: new string[] { "NaN", "-Infinity", "null", "Infinity" },
                 expectedHexValues: new string[] { "NaN", "-Infinity", null, "Infinity" }
@@ -269,7 +270,7 @@ namespace NodejsTests.Debugger {
         public void GlobalsTest() {
             LocalsTest(
                 "GlobalsTest.js",
-                4,
+                3,
                 expectedParams: new string[] { "exports", "require", "module", "__filename", "__dirname" },
                 expectedLocals: new[] { "y", "x" });
         }
@@ -284,11 +285,11 @@ namespace NodejsTests.Debugger {
             TestDebuggerSteps(
                 "SteppingTestBug509.js",
                 new[] {
-                    new TestStep(action: TestAction.ResumeThread, expectedEntryPointHit: 3),
-                    new TestStep(action: TestAction.StepInto, expectedStepComplete: 1), // step into triangular_number
-                    new TestStep(action: TestAction.StepInto, expectedStepComplete: 1), // step over triangular_number
-                    new TestStep(action: TestAction.StepInto, expectedStepComplete: 1), // step into triangular_number
-                    new TestStep(action: TestAction.StepInto, expectedStepComplete: 1), // step into triangular_number
+                    new TestStep(action: TestAction.ResumeThread, expectedEntryPointHit: 2),
+                    new TestStep(action: TestAction.StepInto, expectedStepComplete: 0), // step into triangular_number
+                    new TestStep(action: TestAction.StepInto, expectedStepComplete: 0), // step over triangular_number
+                    new TestStep(action: TestAction.StepInto, expectedStepComplete: 0), // step into triangular_number
+                    new TestStep(action: TestAction.StepInto, expectedStepComplete: 0), // step into triangular_number
                     new TestStep(action: TestAction.ResumeProcess, expectedExitCode: 0),
                 }
             );
@@ -309,12 +310,12 @@ namespace NodejsTests.Debugger {
             TestDebuggerSteps(
                 "SteppingTestBug507",
                 new[] {
-                    new TestStep(action: TestAction.ResumeThread, expectedEntryPointHit: 8),
-                    new TestStep(action: TestAction.StepOver, expectedStepComplete: 12),    // step over Z.prototype.foo = function () { ... }
-                    new TestStep(action: TestAction.StepOver, expectedStepComplete: 13),    // step over p = Z()
-                    new TestStep(action: TestAction.StepInto, expectedStepComplete: 9),     // step into print add_two_numbers(p.foo, 3)
-                    new TestStep(action: TestAction.StepOut, expectedStepComplete: 13),     // step out return 7
-                    new TestStep(action: TestAction.StepInto, expectedStepComplete: 2),     // step into add_two_numbers(p.foo, 3)
+                    new TestStep(action: TestAction.ResumeThread, expectedEntryPointHit: 7),
+                    new TestStep(action: TestAction.StepOver, expectedStepComplete: 11),    // step over Z.prototype.foo = function () { ... }
+                    new TestStep(action: TestAction.StepOver, expectedStepComplete: 12),    // step over p = Z()
+                    new TestStep(action: TestAction.StepInto, expectedStepComplete: 8),     // step into print add_two_numbers(p.foo, 3)
+                    new TestStep(action: TestAction.StepOut, expectedStepComplete: 12),     // step out return 7
+                    new TestStep(action: TestAction.StepInto, expectedStepComplete: 1),     // step into add_two_numbers(p.foo, 3)
                     new TestStep(action: TestAction.ResumeProcess, expectedExitCode: 0),
                 }
             );
@@ -323,24 +324,24 @@ namespace NodejsTests.Debugger {
             TestDebuggerSteps(
                 "SteppingTestBug503.js",
                 new[] {
-                    new TestStep(action: TestAction.AddBreakpoint, targetBreakpoint: 7),
-                    new TestStep(action: TestAction.AddBreakpoint, targetBreakpoint: 15),
-                    new TestStep(action: TestAction.ResumeThread, expectedEntryPointHit: 18),
-                    new TestStep(action: TestAction.ResumeProcess, expectedBreakpointHit: 7),   // continue from def x1(y):
-                    new TestStep(action: TestAction.StepOut, expectedStepComplete: 3),          // step out after hitting breakpoint at return y
-                    new TestStep(action: TestAction.StepOut, expectedStepComplete: 3),          // step out z += 1
-                    new TestStep(action: TestAction.StepOut, expectedStepComplete: 3),          // step out z += 1
-                    new TestStep(action: TestAction.StepOut, expectedStepComplete: 3),          // step out z += 1
-                    new TestStep(action: TestAction.StepOut, expectedStepComplete: 3),          // step out z += 1
-                    new TestStep(action: TestAction.StepOut, expectedStepComplete: 19),         // step out z += 1
+                    new TestStep(action: TestAction.AddBreakpoint, targetBreakpoint: 6),
+                    new TestStep(action: TestAction.AddBreakpoint, targetBreakpoint: 14),
+                    new TestStep(action: TestAction.ResumeThread, expectedEntryPointHit: 17),
+                    new TestStep(action: TestAction.ResumeProcess, expectedBreakpointHit: 6),   // continue from def x1(y):
+                    new TestStep(action: TestAction.StepOut, expectedStepComplete: 2),          // step out after hitting breakpoint at return y
+                    new TestStep(action: TestAction.StepOut, expectedStepComplete: 2),          // step out z += 1
+                    new TestStep(action: TestAction.StepOut, expectedStepComplete: 2),          // step out z += 1
+                    new TestStep(action: TestAction.StepOut, expectedStepComplete: 2),          // step out z += 1
+                    new TestStep(action: TestAction.StepOut, expectedStepComplete: 2),          // step out z += 1
+                    new TestStep(action: TestAction.StepOut, expectedStepComplete: 18),         // step out z += 1
 
-                    new TestStep(action: TestAction.StepOut, expectedBreakpointHit: 15),         // step out after stepping out to x2(5)
-                    new TestStep(action: TestAction.StepOut, expectedStepComplete: 12),         // step out after hitting breakpoint at return y
-                    new TestStep(action: TestAction.StepOut, expectedStepComplete: 12),         // step out return z + 3
-                    new TestStep(action: TestAction.StepOut, expectedStepComplete: 12),         // step out return z + 3
-                    new TestStep(action: TestAction.StepOut, expectedStepComplete: 12),         // step out return z + 3
-                    new TestStep(action: TestAction.StepOut, expectedStepComplete: 12),         // step out return z + 3
-                    new TestStep(action: TestAction.StepOut, expectedStepComplete: 20),         // step out return z + 3
+                    new TestStep(action: TestAction.StepOut, expectedBreakpointHit: 14),         // step out after stepping out to x2(5)
+                    new TestStep(action: TestAction.StepOut, expectedStepComplete: 11),         // step out after hitting breakpoint at return y
+                    new TestStep(action: TestAction.StepOut, expectedStepComplete: 11),         // step out return z + 3
+                    new TestStep(action: TestAction.StepOut, expectedStepComplete: 11),         // step out return z + 3
+                    new TestStep(action: TestAction.StepOut, expectedStepComplete: 11),         // step out return z + 3
+                    new TestStep(action: TestAction.StepOut, expectedStepComplete: 11),         // step out return z + 3
+                    new TestStep(action: TestAction.StepOut, expectedStepComplete: 19),         // step out return z + 3
                     new TestStep(action: TestAction.ResumeProcess, expectedExitCode: 0),
                 }
             );
@@ -369,10 +370,10 @@ namespace NodejsTests.Debugger {
             TestDebuggerSteps(
                 "SteppingTest6.js",
                 new[] {
-                    new TestStep(action: TestAction.ResumeThread, expectedEntryPointHit: 1),
-                    new TestStep(action: TestAction.StepOver, expectedStepComplete: 2), // step over print 'hello world'
-                    new TestStep(action: TestAction.StepOver, expectedStepComplete: 3), // step over a = [1, 2, 3]
-                    new TestStep(action: TestAction.StepOver, expectedStepComplete: 4),  // step over print a
+                    new TestStep(action: TestAction.ResumeThread, expectedEntryPointHit: 0),
+                    new TestStep(action: TestAction.StepOver, expectedStepComplete: 1), // step over print 'hello world'
+                    new TestStep(action: TestAction.StepOver, expectedStepComplete: 2), // step over a = [1, 2, 3]
+                    new TestStep(action: TestAction.StepOver, expectedStepComplete: 3),  // step over print a
                     new TestStep(action: TestAction.ResumeProcess, expectedExitCode: 0),
                 }
             );
@@ -380,9 +381,9 @@ namespace NodejsTests.Debugger {
             TestDebuggerSteps(
                 "SteppingTest5.js",
                 new[] {
-                    new TestStep(action: TestAction.ResumeThread, expectedEntryPointHit: 9),
-                    new TestStep(action: TestAction.StepInto, expectedStepComplete: 5), // step into f()
-                    new TestStep(action: TestAction.StepOut, expectedStepComplete: 10), // step out of f() on line "g()"
+                    new TestStep(action: TestAction.ResumeThread, expectedEntryPointHit: 8),
+                    new TestStep(action: TestAction.StepInto, expectedStepComplete: 4), // step into f()
+                    new TestStep(action: TestAction.StepOut, expectedStepComplete: 9), // step out of f() on line "g()"
                     new TestStep(action: TestAction.ResumeProcess, expectedExitCode: 0),
                 }
             );
@@ -390,15 +391,15 @@ namespace NodejsTests.Debugger {
             TestDebuggerSteps(
                 "SteppingTest4.js",
                 new[] {
-                    new TestStep(action: TestAction.ResumeThread, expectedEntryPointHit: 7),
-                    new TestStep(action: TestAction.StepInto, expectedStepComplete: 2), // step into f()
-                    new TestStep(action: TestAction.StepOver, expectedStepComplete: 3), // step over for i in (1,3):
-                    new TestStep(action: TestAction.StepOver, expectedStepComplete: 2), // step over for print i
-                    new TestStep(action: TestAction.StepOver, expectedStepComplete: 3), // step over for i in (1,3):
-                    new TestStep(action: TestAction.StepOver, expectedStepComplete: 2), // step over for print i
-                    new TestStep(action: TestAction.StepOver, expectedStepComplete: 3), // step over for i in (1,3):
-                    new TestStep(action: TestAction.StepOver, expectedStepComplete: 2), // step over for print i
-                    new TestStep(action: TestAction.StepOver, expectedStepComplete: 5), // step over for i in (1,3):
+                    new TestStep(action: TestAction.ResumeThread, expectedEntryPointHit: 6),
+                    new TestStep(action: TestAction.StepInto, expectedStepComplete: 1), // step into f()
+                    new TestStep(action: TestAction.StepOver, expectedStepComplete: 2), // step over for i in (1,3):
+                    new TestStep(action: TestAction.StepOver, expectedStepComplete: 1), // step over for print i
+                    new TestStep(action: TestAction.StepOver, expectedStepComplete: 2), // step over for i in (1,3):
+                    new TestStep(action: TestAction.StepOver, expectedStepComplete: 1), // step over for print i
+                    new TestStep(action: TestAction.StepOver, expectedStepComplete: 2), // step over for i in (1,3):
+                    new TestStep(action: TestAction.StepOver, expectedStepComplete: 1), // step over for print i
+                    new TestStep(action: TestAction.StepOver, expectedStepComplete: 4), // step over for i in (1,3):
                     new TestStep(action: TestAction.ResumeProcess, expectedExitCode: 0),
                 }
             );
@@ -406,8 +407,8 @@ namespace NodejsTests.Debugger {
             TestDebuggerSteps(
                 "SteppingTest3.js",
                 new[] {
-                    new TestStep(action: TestAction.ResumeThread, expectedEntryPointHit: 6),
-                    new TestStep(action: TestAction.StepOver, expectedStepComplete: 7), // step over f()
+                    new TestStep(action: TestAction.ResumeThread, expectedEntryPointHit: 5),
+                    new TestStep(action: TestAction.StepOver, expectedStepComplete: 6), // step over f()
                     new TestStep(action: TestAction.ResumeProcess, expectedExitCode: 0),
                 }
             );
@@ -415,9 +416,9 @@ namespace NodejsTests.Debugger {
             TestDebuggerSteps(
                 "SteppingTest3.js",
                 new[] {
-                    new TestStep(action: TestAction.ResumeThread, expectedEntryPointHit: 6),
-                    new TestStep(action: TestAction.StepInto, expectedStepComplete: 2), // step into f()
-                    new TestStep(action: TestAction.StepOut, expectedStepComplete: 7),  // step out of f()
+                    new TestStep(action: TestAction.ResumeThread, expectedEntryPointHit: 5),
+                    new TestStep(action: TestAction.StepInto, expectedStepComplete: 1), // step into f()
+                    new TestStep(action: TestAction.StepOut, expectedStepComplete: 6),  // step out of f()
                     new TestStep(action: TestAction.ResumeProcess, expectedExitCode: 0),
                 }
             );
@@ -425,9 +426,9 @@ namespace NodejsTests.Debugger {
             TestDebuggerSteps(
                 "SteppingTest2.js",
                 new[] {
-                    new TestStep(action: TestAction.ResumeThread, expectedEntryPointHit: 5),
-                    new TestStep(action: TestAction.StepInto, expectedStepComplete: 2), // step into f()
-                    new TestStep(action: TestAction.StepOver, expectedStepComplete: 3), // step over print 'hi'
+                    new TestStep(action: TestAction.ResumeThread, expectedEntryPointHit: 4),
+                    new TestStep(action: TestAction.StepInto, expectedStepComplete: 1), // step into f()
+                    new TestStep(action: TestAction.StepOver, expectedStepComplete: 2), // step over print 'hi'
                     new TestStep(action: TestAction.ResumeProcess, expectedExitCode: 0),
                 }
             );
@@ -435,10 +436,10 @@ namespace NodejsTests.Debugger {
             TestDebuggerSteps(
                 "SteppingTest2.js",
                 new[] {
-                    new TestStep(action: TestAction.ResumeThread, expectedEntryPointHit: 5),
-                    new TestStep(action: TestAction.StepInto, expectedStepComplete: 2), // step into f()
-                    new TestStep(action: TestAction.StepOver, expectedStepComplete: 3), // step over print 'hi'
-                    new TestStep(action: TestAction.StepOver, expectedStepComplete: 6), // step over end }
+                    new TestStep(action: TestAction.ResumeThread, expectedEntryPointHit: 4),
+                    new TestStep(action: TestAction.StepInto, expectedStepComplete: 1), // step into f()
+                    new TestStep(action: TestAction.StepOver, expectedStepComplete: 2), // step over print 'hi'
+                    new TestStep(action: TestAction.StepOver, expectedStepComplete: 5), // step over end }
                     new TestStep(action: TestAction.ResumeProcess, expectedExitCode: 0),
                 }
             );
@@ -446,9 +447,9 @@ namespace NodejsTests.Debugger {
             TestDebuggerSteps(
                 "SteppingTest.js",
                 new[] {
-                    new TestStep(action: TestAction.ResumeThread, expectedEntryPointHit: 1),
-                    new TestStep(action: TestAction.StepOver, expectedStepComplete: 2), // step over print "hello"
-                    new TestStep(action: TestAction.StepOver, expectedStepComplete: 3), // step over print "goodbye"
+                    new TestStep(action: TestAction.ResumeThread, expectedEntryPointHit: 0),
+                    new TestStep(action: TestAction.StepOver, expectedStepComplete: 1), // step over print "hello"
+                    new TestStep(action: TestAction.StepOver, expectedStepComplete: 2), // step over print "goodbye"
                     new TestStep(action: TestAction.ResumeProcess, expectedExitCode: 0),
                 }
             );
@@ -464,7 +465,7 @@ namespace NodejsTests.Debugger {
             TestDebuggerSteps(
                 "BreakpointTest.js",
                 new[] {
-                    new TestStep(action: TestAction.ResumeThread, expectedEntryPointHit: 1),
+                    new TestStep(action: TestAction.ResumeThread, expectedEntryPointHit: 0),
                     new TestStep(action: TestAction.ResumeThread),
                 }
             );
@@ -476,7 +477,7 @@ namespace NodejsTests.Debugger {
             TestDebuggerSteps(
                 "BreakpointTest.js",
                 new[] {
-                    new TestStep(action: TestAction.ResumeThread, expectedEntryPointHit: 1),
+                    new TestStep(action: TestAction.ResumeThread, expectedEntryPointHit: 0),
                     new TestStep(action: TestAction.ResumeProcess, expectedExitCode: 0),
                 }
             );
@@ -488,8 +489,8 @@ namespace NodejsTests.Debugger {
             TestDebuggerSteps(
                 "BreakpointTest.js",
                 new[] {
-                    new TestStep(action: TestAction.AddBreakpoint, targetBreakpoint: 1),
-                    new TestStep(action: TestAction.ResumeThread, expectedBreakpointHit: 1),
+                    new TestStep(action: TestAction.AddBreakpoint, targetBreakpoint: 0),
+                    new TestStep(action: TestAction.ResumeThread, expectedBreakpointHit: 0),
                     new TestStep(action: TestAction.ResumeProcess, expectedExitCode: 0),
                 }
             );
@@ -501,9 +502,9 @@ namespace NodejsTests.Debugger {
             TestDebuggerSteps(
                 "BreakpointTest.js",
                 new[] {
-                    new TestStep(action: TestAction.AddBreakpoint, targetBreakpoint: 1),
-                    new TestStep(action: TestAction.ResumeThread, expectedBreakpointHit: 1),
-                    new TestStep(action: TestAction.ResumeThread, expectedEntryPointHit: 1),
+                    new TestStep(action: TestAction.AddBreakpoint, targetBreakpoint: 0),
+                    new TestStep(action: TestAction.ResumeThread, expectedBreakpointHit: 0),
+                    new TestStep(action: TestAction.ResumeThread, expectedEntryPointHit: 0),
                     new TestStep(action: TestAction.ResumeThread),
                 }
             );
@@ -515,9 +516,9 @@ namespace NodejsTests.Debugger {
             TestDebuggerSteps(
                 "BreakpointTest.js",
                 new[] {
-                    new TestStep(action: TestAction.AddBreakpoint, targetBreakpoint: 1),
-                    new TestStep(action: TestAction.ResumeThread, expectedBreakpointHit: 1),
-                    new TestStep(action: TestAction.ResumeThread, expectedEntryPointHit: 1),
+                    new TestStep(action: TestAction.AddBreakpoint, targetBreakpoint: 0),
+                    new TestStep(action: TestAction.ResumeThread, expectedBreakpointHit: 0),
+                    new TestStep(action: TestAction.ResumeThread, expectedEntryPointHit: 0),
                     new TestStep(action: TestAction.ResumeProcess, expectedExitCode: 0),
                 }
             );
@@ -529,8 +530,8 @@ namespace NodejsTests.Debugger {
             TestDebuggerSteps(
                 "BreakpointTest.js",
                 new[] {
-                    new TestStep(action: TestAction.AddBreakpoint, targetBreakpoint: 1, breakOn: new BreakOn(BreakOnKind.Equal, 2)),
-                    new TestStep(action: TestAction.ResumeThread, expectedEntryPointHit: 1),
+                    new TestStep(action: TestAction.AddBreakpoint, targetBreakpoint: 0, breakOn: new BreakOn(BreakOnKind.Equal, 2)),
+                    new TestStep(action: TestAction.ResumeThread, expectedEntryPointHit: 0),
                     new TestStep(action: TestAction.ResumeThread),
                 }
             );
@@ -542,8 +543,8 @@ namespace NodejsTests.Debugger {
             TestDebuggerSteps(
                 "BreakpointTest.js",
                 new[] {
-                    new TestStep(action: TestAction.AddBreakpoint, targetBreakpoint: 1, breakOn: new BreakOn(BreakOnKind.Equal, 2)),
-                    new TestStep(action: TestAction.ResumeThread, expectedEntryPointHit: 1),
+                    new TestStep(action: TestAction.AddBreakpoint, targetBreakpoint: 0, breakOn: new BreakOn(BreakOnKind.Equal, 2)),
+                    new TestStep(action: TestAction.ResumeThread, expectedEntryPointHit: 0),
                     new TestStep(action: TestAction.ResumeProcess, expectedExitCode: 0),
                 }
             );
@@ -562,9 +563,9 @@ namespace NodejsTests.Debugger {
             TestDebuggerSteps(
                 "BreakpointTest3.js",
                 new[] {
-                    new TestStep(action: TestAction.AddBreakpoint, targetBreakpoint: 2),
-                    new TestStep(action: TestAction.ResumeThread, expectedEntryPointHit: 5),
-                    new TestStep(action: TestAction.ResumeThread, expectedBreakpointHit: 2),
+                    new TestStep(action: TestAction.AddBreakpoint, targetBreakpoint: 1),
+                    new TestStep(action: TestAction.ResumeThread, expectedEntryPointHit: 4),
+                    new TestStep(action: TestAction.ResumeThread, expectedBreakpointHit: 1),
                     new TestStep(action: TestAction.ResumeProcess, expectedExitCode: 0),
                 }
             );
@@ -575,9 +576,9 @@ namespace NodejsTests.Debugger {
             TestDebuggerSteps(
                 "BreakpointTest3.js",
                 new[] {
-                    new TestStep(action: TestAction.AddBreakpoint, targetBreakpoint: 2),
-                    new TestStep(action: TestAction.ResumeThread, expectedEntryPointHit: 5),
-                    new TestStep(action: TestAction.ResumeThread, expectedBreakpointHit: 2),
+                    new TestStep(action: TestAction.AddBreakpoint, targetBreakpoint: 1),
+                    new TestStep(action: TestAction.ResumeThread, expectedEntryPointHit: 4),
+                    new TestStep(action: TestAction.ResumeThread, expectedBreakpointHit: 1),
                     new TestStep(action: TestAction.ResumeThread),
                 }
             );
@@ -592,27 +593,27 @@ namespace NodejsTests.Debugger {
             TestDebuggerSteps(
                 "SteppingBasic.js",
                 new[] {
-                    new TestStep(action: TestAction.ResumeThread, expectedEntryPointHit: 10),
+                    new TestStep(action: TestAction.ResumeThread, expectedEntryPointHit: 9),
 
+                    new TestStep(action: TestAction.StepOver, expectedStepComplete: 10),    // Step over
                     new TestStep(action: TestAction.StepOver, expectedStepComplete: 11),    // Step over
-                    new TestStep(action: TestAction.StepOver, expectedStepComplete: 12),    // Step over
-                    new TestStep(action: TestAction.StepInto, expectedStepComplete: 2),     // Step into
-                    new TestStep(action: TestAction.StepOver, expectedStepComplete: 3),     // Step over
-                    new TestStep(action: TestAction.StepOver, expectedStepComplete: 14),    // Step over (out)
+                    new TestStep(action: TestAction.StepInto, expectedStepComplete: 1),     // Step into
+                    new TestStep(action: TestAction.StepOver, expectedStepComplete: 2),     // Step over
+                    new TestStep(action: TestAction.StepOver, expectedStepComplete: 13),    // Step over (out)
 
-                    new TestStep(action: TestAction.StepInto, expectedStepComplete: 15),    // Step into (over)
-                    new TestStep(action: TestAction.StepInto, expectedStepComplete: 6),     // Step into
-                    new TestStep(action: TestAction.StepInto, expectedStepComplete: 7),     // Step into (over)
-                    new TestStep(action: TestAction.StepInto, expectedStepComplete: 2),     // Step into
-                    new TestStep(action: TestAction.StepInto, expectedStepComplete: 3),     // Step into (over)
-                    new TestStep(action: TestAction.StepInto, expectedStepComplete: 8),     // Step into (out)
-                    new TestStep(action: TestAction.StepInto, expectedStepComplete: 17),    // Step into (out)
+                    new TestStep(action: TestAction.StepInto, expectedStepComplete: 14),    // Step into (over)
+                    new TestStep(action: TestAction.StepInto, expectedStepComplete: 5),     // Step into
+                    new TestStep(action: TestAction.StepInto, expectedStepComplete: 6),     // Step into (over)
+                    new TestStep(action: TestAction.StepInto, expectedStepComplete: 1),     // Step into
+                    new TestStep(action: TestAction.StepInto, expectedStepComplete: 2),     // Step into (over)
+                    new TestStep(action: TestAction.StepInto, expectedStepComplete: 7),     // Step into (out)
+                    new TestStep(action: TestAction.StepInto, expectedStepComplete: 16),    // Step into (out)
 
-                    new TestStep(action: TestAction.StepInto, expectedStepComplete: 6),     // Step into
-                    new TestStep(action: TestAction.StepInto, expectedStepComplete: 7),     // Step into (over)
-                    new TestStep(action: TestAction.StepInto, expectedStepComplete: 2),     // Step into
-                    new TestStep(action: TestAction.StepOut, expectedStepComplete: 8),      // Step out
-                    new TestStep(action: TestAction.StepOut, expectedStepComplete: 19),     // Step out
+                    new TestStep(action: TestAction.StepInto, expectedStepComplete: 5),     // Step into
+                    new TestStep(action: TestAction.StepInto, expectedStepComplete: 6),     // Step into (over)
+                    new TestStep(action: TestAction.StepInto, expectedStepComplete: 1),     // Step into
+                    new TestStep(action: TestAction.StepOut, expectedStepComplete: 7),      // Step out
+                    new TestStep(action: TestAction.StepOut, expectedStepComplete: 18),     // Step out
 
                     new TestStep(action: TestAction.ResumeProcess, expectedExitCode: 0),
                 }
@@ -624,43 +625,43 @@ namespace NodejsTests.Debugger {
             TestDebuggerSteps(
                 "SteppingAccrossBreakPoints.js",
                 new[] {
+                    new TestStep(action: TestAction.AddBreakpoint, targetBreakpoint: 1),
                     new TestStep(action: TestAction.AddBreakpoint, targetBreakpoint: 2),
-                    new TestStep(action: TestAction.AddBreakpoint, targetBreakpoint: 3),
+                    new TestStep(action: TestAction.AddBreakpoint, targetBreakpoint: 5),
                     new TestStep(action: TestAction.AddBreakpoint, targetBreakpoint: 6),
                     new TestStep(action: TestAction.AddBreakpoint, targetBreakpoint: 7),
-                    new TestStep(action: TestAction.AddBreakpoint, targetBreakpoint: 8),
-                    new TestStep(action: TestAction.AddBreakpoint, targetBreakpoint: 11),
+                    new TestStep(action: TestAction.AddBreakpoint, targetBreakpoint: 10),
+                    new TestStep(action: TestAction.AddBreakpoint, targetBreakpoint: 12),
                     new TestStep(action: TestAction.AddBreakpoint, targetBreakpoint: 13),
-                    new TestStep(action: TestAction.AddBreakpoint, targetBreakpoint: 14),
+                    new TestStep(action: TestAction.AddBreakpoint, targetBreakpoint: 15),
                     new TestStep(action: TestAction.AddBreakpoint, targetBreakpoint: 16),
-                    new TestStep(action: TestAction.AddBreakpoint, targetBreakpoint: 17),
-                    new TestStep(action: TestAction.AddBreakpoint, targetBreakpoint: 19),
+                    new TestStep(action: TestAction.AddBreakpoint, targetBreakpoint: 18),
 
-                    new TestStep(action: TestAction.ResumeThread, expectedEntryPointHit: 10),
+                    new TestStep(action: TestAction.ResumeThread, expectedEntryPointHit: 9),
 
-                    new TestStep(action: TestAction.StepOver, expectedBreakpointHit: 11),   // Step over to breakpoint
-                    new TestStep(action: TestAction.StepOver, expectedBreakpointHit: 6),    // Step over (into) breakpoint
-                    new TestStep(action: TestAction.StepOver, expectedBreakpointHit: 7),    // Step over to breakpoint
-                    new TestStep(action: TestAction.StepOver, expectedBreakpointHit: 2),    // Step over to (into) nested breakpoint
-                    new TestStep(action: TestAction.StepOver, expectedBreakpointHit: 3),    // Step over to breakpoint
-                    new TestStep(action: TestAction.StepOver, expectedBreakpointHit: 8),    // Step over (out) to breakpoint
-                    new TestStep(action: TestAction.StepOver, expectedBreakpointHit: 13),   // Step over (out) to breakpoint
+                    new TestStep(action: TestAction.StepOver, expectedBreakpointHit: 10),   // Step over to breakpoint
+                    new TestStep(action: TestAction.StepOver, expectedBreakpointHit: 5),    // Step over (into) breakpoint
+                    new TestStep(action: TestAction.StepOver, expectedBreakpointHit: 6),    // Step over to breakpoint
+                    new TestStep(action: TestAction.StepOver, expectedBreakpointHit: 1),    // Step over to (into) nested breakpoint
+                    new TestStep(action: TestAction.StepOver, expectedBreakpointHit: 2),    // Step over to breakpoint
+                    new TestStep(action: TestAction.StepOver, expectedBreakpointHit: 7),    // Step over (out) to breakpoint
+                    new TestStep(action: TestAction.StepOver, expectedBreakpointHit: 12),   // Step over (out) to breakpoint
 
-                    new TestStep(action: TestAction.StepInto, expectedBreakpointHit: 14),   // Step into (over to) breakpoint
-                    new TestStep(action: TestAction.StepInto, expectedBreakpointHit: 6),    // Step into breakpoint
-                    new TestStep(action: TestAction.StepInto, expectedBreakpointHit: 7),    // Step into (over to) breakpoint
-                    new TestStep(action: TestAction.StepInto, expectedBreakpointHit: 2),    // Step into breakpoint
-                    new TestStep(action: TestAction.StepInto, expectedBreakpointHit: 3),    // Step into (over to) breakpoint
-                    new TestStep(action: TestAction.StepInto, expectedBreakpointHit: 8),    // Step into (out to) breakpoint
-                    new TestStep(action: TestAction.StepInto, expectedBreakpointHit: 16),   // Step into (out to) breakpoint
+                    new TestStep(action: TestAction.StepInto, expectedBreakpointHit: 13),   // Step into (over to) breakpoint
+                    new TestStep(action: TestAction.StepInto, expectedBreakpointHit: 5),    // Step into breakpoint
+                    new TestStep(action: TestAction.StepInto, expectedBreakpointHit: 6),    // Step into (over to) breakpoint
+                    new TestStep(action: TestAction.StepInto, expectedBreakpointHit: 1),    // Step into breakpoint
+                    new TestStep(action: TestAction.StepInto, expectedBreakpointHit: 2),    // Step into (over to) breakpoint
+                    new TestStep(action: TestAction.StepInto, expectedBreakpointHit: 7),    // Step into (out to) breakpoint
+                    new TestStep(action: TestAction.StepInto, expectedBreakpointHit: 15),   // Step into (out to) breakpoint
 
-                    new TestStep(action: TestAction.StepOut, expectedBreakpointHit: 17),    // Step out (over) to breakpoint
-                    new TestStep(action: TestAction.StepOut, expectedBreakpointHit: 6),     // Step out to (into) breakpoint
-                    new TestStep(action: TestAction.StepOut, expectedBreakpointHit: 7),     // Step out (over) to breakpoint
-                    new TestStep(action: TestAction.StepOut, expectedBreakpointHit: 2),     // Step out to (into) breakpoint
-                    new TestStep(action: TestAction.StepOut, expectedBreakpointHit: 3),     // Step out (over) to breakpoint
-                    new TestStep(action: TestAction.StepOut, expectedBreakpointHit: 8),     // Step out to breakpoint
-                    new TestStep(action: TestAction.StepOut, expectedBreakpointHit: 19),    // Step out to breakpoint
+                    new TestStep(action: TestAction.StepOut, expectedBreakpointHit: 16),    // Step out (over) to breakpoint
+                    new TestStep(action: TestAction.StepOut, expectedBreakpointHit: 5),     // Step out to (into) breakpoint
+                    new TestStep(action: TestAction.StepOut, expectedBreakpointHit: 6),     // Step out (over) to breakpoint
+                    new TestStep(action: TestAction.StepOut, expectedBreakpointHit: 1),     // Step out to (into) breakpoint
+                    new TestStep(action: TestAction.StepOut, expectedBreakpointHit: 2),     // Step out (over) to breakpoint
+                    new TestStep(action: TestAction.StepOut, expectedBreakpointHit: 7),     // Step out to breakpoint
+                    new TestStep(action: TestAction.StepOut, expectedBreakpointHit: 18),    // Step out to breakpoint
 
                     new TestStep(action: TestAction.ResumeProcess, expectedExitCode: 0),
                 }
@@ -672,49 +673,49 @@ namespace NodejsTests.Debugger {
             TestDebuggerSteps(
                 "SteppingAccrossTracePoints.js",
                 new[] {
+                    new TestStep(action: TestAction.AddBreakpoint, targetBreakpoint: 1),
                     new TestStep(action: TestAction.AddBreakpoint, targetBreakpoint: 2),
-                    new TestStep(action: TestAction.AddBreakpoint, targetBreakpoint: 3),
+                    new TestStep(action: TestAction.AddBreakpoint, targetBreakpoint: 5),
                     new TestStep(action: TestAction.AddBreakpoint, targetBreakpoint: 6),
                     new TestStep(action: TestAction.AddBreakpoint, targetBreakpoint: 7),
-                    new TestStep(action: TestAction.AddBreakpoint, targetBreakpoint: 8),
-                    new TestStep(action: TestAction.AddBreakpoint, targetBreakpoint: 11),
+                    new TestStep(action: TestAction.AddBreakpoint, targetBreakpoint: 10),
+                    new TestStep(action: TestAction.AddBreakpoint, targetBreakpoint: 12),
                     new TestStep(action: TestAction.AddBreakpoint, targetBreakpoint: 13),
-                    new TestStep(action: TestAction.AddBreakpoint, targetBreakpoint: 14),
-                    new TestStep(action: TestAction.AddBreakpoint, targetBreakpoint: 16),
-                    new TestStep(action: TestAction.AddBreakpoint, targetBreakpoint: 18),
+                    new TestStep(action: TestAction.AddBreakpoint, targetBreakpoint: 15),
+                    new TestStep(action: TestAction.AddBreakpoint, targetBreakpoint: 17),
 
-                    new TestStep(action: TestAction.ResumeThread, expectedEntryPointHit: 10),
+                    new TestStep(action: TestAction.ResumeThread, expectedEntryPointHit: 9),
 
-                    new TestStep(action: TestAction.StepOver, expectedBreakpointHit: 11),       // Step over to tracepoint
-                    new TestStep(action: TestAction.ResumeThread, expectedStepComplete: 11),    // Step over complete
-                    new TestStep(action: TestAction.StepOver, expectedBreakpointHit: 2),        // Step over (accross) tracepoint
-                    new TestStep(action: TestAction.ResumeThread, expectedBreakpointHit: 3),    // Step over (accross) tracepoint
-                    new TestStep(action: TestAction.ResumeThread, expectedBreakpointHit: 13),   // Step over to tracepoint
-                    new TestStep(action: TestAction.ResumeThread, expectedStepComplete: 13),    // Step over complete
+                    new TestStep(action: TestAction.StepOver, expectedBreakpointHit: 10),       // Step over to tracepoint
+                    new TestStep(action: TestAction.ResumeThread, expectedStepComplete: 10),    // Step over complete
+                    new TestStep(action: TestAction.StepOver, expectedBreakpointHit: 1),        // Step over (accross) tracepoint
+                    new TestStep(action: TestAction.ResumeThread, expectedBreakpointHit: 2),    // Step over (accross) tracepoint
+                    new TestStep(action: TestAction.ResumeThread, expectedBreakpointHit: 12),   // Step over to tracepoint
+                    new TestStep(action: TestAction.ResumeThread, expectedStepComplete: 12),    // Step over complete
 
-                    new TestStep(action: TestAction.StepInto, expectedBreakpointHit: 14),       // Step into (over to) tracepoint
-                    new TestStep(action: TestAction.ResumeThread, expectedStepComplete: 14),    // Step into complete
-                    new TestStep(action: TestAction.StepInto, expectedBreakpointHit: 6),        // Step into tracepoint
-                    new TestStep(action: TestAction.ResumeThread, expectedStepComplete: 6),     // Step into complete
-                    new TestStep(action: TestAction.StepInto, expectedBreakpointHit: 7),        // Step into (over to) tracepoint
-                    new TestStep(action: TestAction.ResumeThread, expectedStepComplete: 7),     // Step into (over) complete
-                    new TestStep(action: TestAction.StepInto, expectedBreakpointHit: 2),        // Step into tracepoint
-                    new TestStep(action: TestAction.ResumeThread, expectedStepComplete: 2),     // Step into complete
-                    new TestStep(action: TestAction.StepInto, expectedBreakpointHit: 3),        // Step into (over to) tracepoint
-                    new TestStep(action: TestAction.ResumeThread, expectedStepComplete: 3),     // Step into (over) complete
-                    new TestStep(action: TestAction.StepInto, expectedBreakpointHit: 8),        // Step into (out to) tracepoint
-                    new TestStep(action: TestAction.ResumeThread, expectedStepComplete: 8),     // Step into (out) complete
-                    new TestStep(action: TestAction.StepInto, expectedBreakpointHit: 16),       // Step into (out to) tracepoint
-                    new TestStep(action: TestAction.ResumeThread, expectedStepComplete: 16),    // Step into (out) complete
+                    new TestStep(action: TestAction.StepInto, expectedBreakpointHit: 13),       // Step into (over to) tracepoint
+                    new TestStep(action: TestAction.ResumeThread, expectedStepComplete: 13),    // Step into complete
+                    new TestStep(action: TestAction.StepInto, expectedBreakpointHit: 5),        // Step into tracepoint
+                    new TestStep(action: TestAction.ResumeThread, expectedStepComplete: 5),     // Step into complete
+                    new TestStep(action: TestAction.StepInto, expectedBreakpointHit: 6),        // Step into (over to) tracepoint
+                    new TestStep(action: TestAction.ResumeThread, expectedStepComplete: 6),     // Step into (over) complete
+                    new TestStep(action: TestAction.StepInto, expectedBreakpointHit: 1),        // Step into tracepoint
+                    new TestStep(action: TestAction.ResumeThread, expectedStepComplete: 1),     // Step into complete
+                    new TestStep(action: TestAction.StepInto, expectedBreakpointHit: 2),        // Step into (over to) tracepoint
+                    new TestStep(action: TestAction.ResumeThread, expectedStepComplete: 2),     // Step into (over) complete
+                    new TestStep(action: TestAction.StepInto, expectedBreakpointHit: 7),        // Step into (out to) tracepoint
+                    new TestStep(action: TestAction.ResumeThread, expectedStepComplete: 7),     // Step into (out) complete
+                    new TestStep(action: TestAction.StepInto, expectedBreakpointHit: 15),       // Step into (out to) tracepoint
+                    new TestStep(action: TestAction.ResumeThread, expectedStepComplete: 15),    // Step into (out) complete
 
-                    new TestStep(action: TestAction.StepInto, expectedBreakpointHit: 6),        // Step into tracepoint
-                    new TestStep(action: TestAction.ResumeThread, expectedStepComplete: 6),     // Step into complete
-                    new TestStep(action: TestAction.StepOut, expectedBreakpointHit: 7),         // Step out (accross) tracepoint
+                    new TestStep(action: TestAction.StepInto, expectedBreakpointHit: 5),        // Step into tracepoint
+                    new TestStep(action: TestAction.ResumeThread, expectedStepComplete: 5),     // Step into complete
+                    new TestStep(action: TestAction.StepOut, expectedBreakpointHit: 6),         // Step out (accross) tracepoint
+                    new TestStep(action: TestAction.ResumeThread, expectedBreakpointHit: 1),    // Step out (accross) tracepoint
                     new TestStep(action: TestAction.ResumeThread, expectedBreakpointHit: 2),    // Step out (accross) tracepoint
-                    new TestStep(action: TestAction.ResumeThread, expectedBreakpointHit: 3),    // Step out (accross) tracepoint
-                    new TestStep(action: TestAction.ResumeThread, expectedBreakpointHit: 8),    // Step out (accross) tracepoint
-                    new TestStep(action: TestAction.ResumeThread, expectedBreakpointHit: 18),   // Step out (accross) tracepoint
-                    new TestStep(action: TestAction.ResumeThread, expectedStepComplete: 18),    // Step out complete
+                    new TestStep(action: TestAction.ResumeThread, expectedBreakpointHit: 7),    // Step out (accross) tracepoint
+                    new TestStep(action: TestAction.ResumeThread, expectedBreakpointHit: 17),   // Step out (accross) tracepoint
+                    new TestStep(action: TestAction.ResumeThread, expectedStepComplete: 17),    // Step out complete
 
                     new TestStep(action: TestAction.ResumeProcess, expectedExitCode: 0),
                 }
@@ -726,15 +727,15 @@ namespace NodejsTests.Debugger {
             TestDebuggerSteps(
                 "SteppingAcrossCaughtExceptions.js",
                 new[] {
-                    new TestStep(action: TestAction.AddBreakpoint, targetBreakpoint: 12),
+                    new TestStep(action: TestAction.AddBreakpoint, targetBreakpoint: 11),
 
-                    new TestStep(action: TestAction.ResumeThread, expectedEntryPointHit: 18),
+                    new TestStep(action: TestAction.ResumeThread, expectedEntryPointHit: 17),
 
-                    new TestStep(action: TestAction.ResumeProcess, expectedBreakpointHit: 12),
-                    new TestStep(action: TestAction.StepInto, expectedStepComplete: 3),
-                    new TestStep(action: TestAction.StepOut, expectedStepComplete: 13),
-                    new TestStep(action: TestAction.StepOver, expectedStepComplete: 14),
-                    new TestStep(action: TestAction.StepOut, expectedStepComplete: 19),
+                    new TestStep(action: TestAction.ResumeProcess, expectedBreakpointHit: 11),
+                    new TestStep(action: TestAction.StepInto, expectedStepComplete: 2),
+                    new TestStep(action: TestAction.StepOut, expectedStepComplete: 12),
+                    new TestStep(action: TestAction.StepOver, expectedStepComplete: 13),
+                    new TestStep(action: TestAction.StepOut, expectedStepComplete: 18),
 
                     new TestStep(action: TestAction.ResumeProcess, expectedExitCode: 0),
                 },
@@ -747,11 +748,11 @@ namespace NodejsTests.Debugger {
             TestDebuggerSteps(
                 "DebuggingDownloaded.js",
                 new[] {
-                    new TestStep(action: TestAction.StepInto, expectedStepComplete: 205, expectedBreakFile: "node.js", builtin: true),
-                    new TestStep(action: TestAction.StepOver, expectedStepComplete: 206, expectedBreakFile: "node.js", builtin: true),
-                    new TestStep(action: TestAction.StepOut, expectedStepComplete: 1),
-                    new TestStep(action: TestAction.AddBreakpoint, targetBreakpointFile: "console.js", targetBreakpoint: 53, builtin: true),
-                    new TestStep(action: TestAction.ResumeProcess, expectedBreakpointHit: 53, expectedBreakFile: "console.js", builtin: true, validation:
+                    new TestStep(action: TestAction.StepInto, expectedStepComplete: 204, expectedBreakFile: "node.js", builtin: true),
+                    new TestStep(action: TestAction.StepOver, expectedStepComplete: 205, expectedBreakFile: "node.js", builtin: true),
+                    new TestStep(action: TestAction.StepOut, expectedStepComplete: 0),
+                    new TestStep(action: TestAction.AddBreakpoint, targetBreakpointFile: "console.js", targetBreakpoint: 52, builtin: true),
+                    new TestStep(action: TestAction.ResumeProcess, expectedBreakpointHit: 52, expectedBreakFile: "console.js", builtin: true, validation:
                         async (process, thread) => {
                             var module = thread.Frames[0].Module;
 
@@ -788,10 +789,10 @@ namespace NodejsTests.Debugger {
             TestDebuggerSteps(
                 "FunctionPassedFewerThanTakenParms.js",
                 new[] {
-                    new TestStep(action: TestAction.AddBreakpoint, targetBreakpoint: 2),
+                    new TestStep(action: TestAction.AddBreakpoint, targetBreakpoint: 1),
 
-                    new TestStep(action: TestAction.ResumeThread, expectedEntryPointHit: 5),
-                    new TestStep(action: TestAction.ResumeProcess, expectedBreakpointHit: 2),
+                    new TestStep(action: TestAction.ResumeThread, expectedEntryPointHit: 4),
+                    new TestStep(action: TestAction.ResumeProcess, expectedBreakpointHit: 1),
 
                     new TestStep(action: TestAction.ResumeProcess, expectedExitCode: 0),
                 }
@@ -803,9 +804,9 @@ namespace NodejsTests.Debugger {
             TestDebuggerSteps(
                 "FunctionPassedFewerThanTakenParms.js",
                 new[] {
-                    new TestStep(action: TestAction.ResumeThread, expectedEntryPointHit: 5),
+                    new TestStep(action: TestAction.ResumeThread, expectedEntryPointHit: 4),
 
-                    new TestStep(action: TestAction.StepInto, expectedStepComplete: 2),
+                    new TestStep(action: TestAction.StepInto, expectedStepComplete: 1),
 
                     new TestStep(action: TestAction.ResumeProcess, expectedExitCode: 0),
                 }
@@ -822,7 +823,7 @@ namespace NodejsTests.Debugger {
             TestDebuggerSteps(
                 "HelloWorld.js",
                 new[] {
-                    new TestStep(action: TestAction.AddBreakpoint, targetBreakpoint: 4),
+                    new TestStep(action: TestAction.AddBreakpoint, targetBreakpoint: 3),
                     new TestStep(action: TestAction.ResumeProcess),
                     new TestStep(validation: (process, thread) => {
                         ThreadPool.QueueUserWorkItem(new WaitCallback(stateinfo => {
@@ -835,8 +836,8 @@ namespace NodejsTests.Debugger {
                             textRead.Set();
                         }));
                     }),
-                    new TestStep(action: TestAction.Wait, expectedBreakpointHit: 4),
-                    new TestStep(action: TestAction.StepOver, expectedStepComplete: 5),
+                    new TestStep(action: TestAction.Wait, expectedBreakpointHit: 3),
+                    new TestStep(action: TestAction.StepOver, expectedStepComplete: 4),
                     new TestStep(action: TestAction.ResumeProcess),
                     new TestStep(validation: (process, thread) => {
                         AssertWaited(textRead);
@@ -852,7 +853,7 @@ namespace NodejsTests.Debugger {
             TestDebuggerSteps(
                 "HelloWorldWithClosure.js",
                 new[] {
-                    new TestStep(action: TestAction.AddBreakpoint, targetBreakpoint: 7, expectFailure: true),
+                    new TestStep(action: TestAction.AddBreakpoint, targetBreakpoint: 6, expectFailure: true),
                     new TestStep(action: TestAction.ResumeProcess),
                     new TestStep(validation: (process, thread) => {
                         ThreadPool.QueueUserWorkItem(new WaitCallback(stateinfo => {
@@ -865,8 +866,8 @@ namespace NodejsTests.Debugger {
                             textRead.Set();
                         }));
                     }),
-                    new TestStep(action: TestAction.Wait, expectedBreakpointHit: 7),
-                    new TestStep(action: TestAction.StepOver, expectedStepComplete: 8),
+                    new TestStep(action: TestAction.Wait, expectedBreakpointHit: 6),
+                    new TestStep(action: TestAction.StepOver, expectedStepComplete: 7),
                     new TestStep(action: TestAction.ResumeProcess),
                     new TestStep(validation: (process, thread) => {
                         AssertWaited(textRead);
@@ -882,9 +883,9 @@ namespace NodejsTests.Debugger {
                 "RunForever.js",
                 new[] {
                     new TestStep(action: TestAction.ResumeProcess),
-                    new TestStep(action: TestAction.AddBreakpoint, targetBreakpoint: 2),
-                    new TestStep(action: TestAction.Wait, expectedBreakpointHit: 2),
-                    new TestStep(action: TestAction.ResumeProcess, expectedBreakpointHit: 2),
+                    new TestStep(action: TestAction.AddBreakpoint, targetBreakpoint: 1),
+                    new TestStep(action: TestAction.Wait, expectedBreakpointHit: 1),
+                    new TestStep(action: TestAction.ResumeProcess, expectedBreakpointHit: 1),
                     new TestStep(action: TestAction.KillProcess),
                 }
             );
@@ -895,8 +896,8 @@ namespace NodejsTests.Debugger {
             TestDebuggerSteps(
                 "BreakpointTest.js",
                 new[] {
-                    new TestStep(action: TestAction.AddBreakpoint, targetBreakpoint: 1),
-                    new TestStep(action: TestAction.ResumeThread, expectedBreakpointHit: 1),
+                    new TestStep(action: TestAction.AddBreakpoint, targetBreakpoint: 0),
+                    new TestStep(action: TestAction.ResumeThread, expectedBreakpointHit: 0),
                     new TestStep(action: TestAction.ResumeProcess, expectedExitCode: 0),
                 }
             );
@@ -907,11 +908,11 @@ namespace NodejsTests.Debugger {
             TestDebuggerSteps(
                 "BreakpointTest2.js",
                 new[] {
-                    new TestStep(action: TestAction.AddBreakpoint, targetBreakpoint: 3),
-                    new TestStep(action: TestAction.ResumeThread, expectedEntryPointHit: 7),
-                    new TestStep(action: TestAction.ResumeProcess, expectedBreakpointHit: 3),
-                    new TestStep(action: TestAction.ResumeProcess, expectedBreakpointHit: 3),
-                    new TestStep(action: TestAction.ResumeProcess, expectedBreakpointHit: 3),
+                    new TestStep(action: TestAction.AddBreakpoint, targetBreakpoint: 2),
+                    new TestStep(action: TestAction.ResumeThread, expectedEntryPointHit: 6),
+                    new TestStep(action: TestAction.ResumeProcess, expectedBreakpointHit: 2),
+                    new TestStep(action: TestAction.ResumeProcess, expectedBreakpointHit: 2),
+                    new TestStep(action: TestAction.ResumeProcess, expectedBreakpointHit: 2),
                     new TestStep(action: TestAction.ResumeProcess, expectedExitCode: 0),
                 }
             );
@@ -922,9 +923,9 @@ namespace NodejsTests.Debugger {
             TestDebuggerSteps(
                 "BreakpointTest3.js",
                 new[] {
-                    new TestStep(action: TestAction.AddBreakpoint, targetBreakpoint: 2),
-                    new TestStep(action: TestAction.ResumeThread, expectedEntryPointHit: 5),
-                    new TestStep(action: TestAction.ResumeProcess, expectedBreakpointHit: 2),
+                    new TestStep(action: TestAction.AddBreakpoint, targetBreakpoint: 1),
+                    new TestStep(action: TestAction.ResumeThread, expectedEntryPointHit: 4),
+                    new TestStep(action: TestAction.ResumeProcess, expectedBreakpointHit: 1),
                     new TestStep(action: TestAction.ResumeProcess, expectedExitCode: 0),
                 }
             );
@@ -935,27 +936,27 @@ namespace NodejsTests.Debugger {
             TestDebuggerSteps(
                 "BreakpointTest2.js",
                 new[] {
-                    new TestStep(action: TestAction.AddBreakpoint, targetBreakpoint: 3, condition: "i == 1"),
-                    new TestStep(action: TestAction.ResumeThread, expectedEntryPointHit: 7),
-                    new TestStep(action: TestAction.ResumeProcess, expectedBreakpointHit: 3),
+                    new TestStep(action: TestAction.AddBreakpoint, targetBreakpoint: 2, condition: "i == 1"),
+                    new TestStep(action: TestAction.ResumeThread, expectedEntryPointHit: 6),
+                    new TestStep(action: TestAction.ResumeProcess, expectedBreakpointHit: 2),
                     new TestStep(action: TestAction.ResumeProcess, expectedExitCode: 0),
                 }
             );
             TestDebuggerSteps(
                 "BreakpointTest2.js",
                 new[] {
-                    new TestStep(action: TestAction.AddBreakpoint, targetBreakpoint: 3, condition: "i < 3"),
-                    new TestStep(action: TestAction.ResumeThread, expectedEntryPointHit: 7),
-                    new TestStep(action: TestAction.ResumeProcess, expectedBreakpointHit: 3),
-                    new TestStep(action: TestAction.ResumeProcess, expectedBreakpointHit: 3),
+                    new TestStep(action: TestAction.AddBreakpoint, targetBreakpoint: 2, condition: "i < 3"),
+                    new TestStep(action: TestAction.ResumeThread, expectedEntryPointHit: 6),
+                    new TestStep(action: TestAction.ResumeProcess, expectedBreakpointHit: 2),
+                    new TestStep(action: TestAction.ResumeProcess, expectedBreakpointHit: 2),
                     new TestStep(action: TestAction.ResumeProcess, expectedExitCode: 0),
                 }
             );
             TestDebuggerSteps(
                 "BreakpointTest2.js",
                 new[] {
-                    new TestStep(action: TestAction.AddBreakpoint, targetBreakpoint: 3, condition: "i > 3"),
-                    new TestStep(action: TestAction.ResumeThread, expectedEntryPointHit: 7),
+                    new TestStep(action: TestAction.AddBreakpoint, targetBreakpoint: 2, condition: "i > 3"),
+                    new TestStep(action: TestAction.ResumeThread, expectedEntryPointHit: 6),
                     new TestStep(action: TestAction.ResumeProcess, expectedExitCode: 0),
                 }
             );
@@ -966,12 +967,12 @@ namespace NodejsTests.Debugger {
             TestDebuggerSteps(
                 "BreakpointTest2.js",
                 new[] {
-                    new TestStep(action: TestAction.AddBreakpoint, targetBreakpoint: 3, enabled: false),
-                    new TestStep(action: TestAction.AddBreakpoint, targetBreakpoint: 7, enabled: false),    // Should never hit
-                    new TestStep(action: TestAction.ResumeThread, expectedEntryPointHit: 7),
-                    new TestStep(action: TestAction.UpdateBreakpoint, targetBreakpoint: 3, enabled: true),
-                    new TestStep(action: TestAction.ResumeProcess, expectedBreakpointHit: 3),
-                    new TestStep(action: TestAction.UpdateBreakpoint, targetBreakpoint: 3, enabled: false),
+                    new TestStep(action: TestAction.AddBreakpoint, targetBreakpoint: 2, enabled: false),
+                    new TestStep(action: TestAction.AddBreakpoint, targetBreakpoint: 6, enabled: false),    // Should never hit
+                    new TestStep(action: TestAction.ResumeThread, expectedEntryPointHit: 6),
+                    new TestStep(action: TestAction.UpdateBreakpoint, targetBreakpoint: 2, enabled: true),
+                    new TestStep(action: TestAction.ResumeProcess, expectedBreakpointHit: 2),
+                    new TestStep(action: TestAction.UpdateBreakpoint, targetBreakpoint: 2, enabled: false),
                     new TestStep(action: TestAction.ResumeProcess, expectedExitCode: 0),
                 }
             );
@@ -982,10 +983,10 @@ namespace NodejsTests.Debugger {
             TestDebuggerSteps(
                 "BreakpointTest2.js",
                 new[] {
-                    new TestStep(action: TestAction.AddBreakpoint, targetBreakpoint: 3),
-                    new TestStep(action: TestAction.ResumeThread, expectedEntryPointHit: 7),
-                    new TestStep(action: TestAction.ResumeProcess, expectedBreakpointHit: 3),
-                    new TestStep(action: TestAction.RemoveBreakpoint, targetBreakpoint: 3),
+                    new TestStep(action: TestAction.AddBreakpoint, targetBreakpoint: 2),
+                    new TestStep(action: TestAction.ResumeThread, expectedEntryPointHit: 6),
+                    new TestStep(action: TestAction.ResumeProcess, expectedBreakpointHit: 2),
+                    new TestStep(action: TestAction.RemoveBreakpoint, targetBreakpoint: 2),
                     new TestStep(action: TestAction.ResumeProcess, expectedExitCode: 0),
                 }
             );
@@ -1025,18 +1026,18 @@ namespace NodejsTests.Debugger {
             TestDebuggerSteps(
                 "BreakpointBreakOn.js",
                 new[] {
-                    new TestStep(action: TestAction.AddBreakpoint, targetBreakpoint: 3),
-                    new TestStep(action: TestAction.ResumeThread, expectedEntryPointHit: 7),
-                    new TestStep(action: TestAction.ResumeProcess, expectedBreakpointHit: 3, targetBreakpoint: 3, expectedHitCount: 1),
-                    new TestStep(action: TestAction.ResumeProcess, expectedBreakpointHit: 3, targetBreakpoint: 3, expectedHitCount: 2),
-                    new TestStep(action: TestAction.ResumeProcess, expectedBreakpointHit: 3, targetBreakpoint: 3, expectedHitCount: 3),
-                    new TestStep(action: TestAction.ResumeProcess, expectedBreakpointHit: 3, targetBreakpoint: 3, expectedHitCount: 4),
-                    new TestStep(action: TestAction.ResumeProcess, expectedBreakpointHit: 3, targetBreakpoint: 3, expectedHitCount: 5),
-                    new TestStep(action: TestAction.ResumeProcess, expectedBreakpointHit: 3, targetBreakpoint: 3, expectedHitCount: 6),
-                    new TestStep(action: TestAction.ResumeProcess, expectedBreakpointHit: 3, targetBreakpoint: 3, expectedHitCount: 7),
-                    new TestStep(action: TestAction.ResumeProcess, expectedBreakpointHit: 3, targetBreakpoint: 3, expectedHitCount: 8),
-                    new TestStep(action: TestAction.ResumeProcess, expectedBreakpointHit: 3, targetBreakpoint: 3, expectedHitCount: 9),
-                    new TestStep(action: TestAction.ResumeProcess, expectedBreakpointHit: 3, targetBreakpoint: 3, expectedHitCount: 10),
+                    new TestStep(action: TestAction.AddBreakpoint, targetBreakpoint: 2),
+                    new TestStep(action: TestAction.ResumeThread, expectedEntryPointHit: 6),
+                    new TestStep(action: TestAction.ResumeProcess, expectedBreakpointHit: 2, targetBreakpoint: 2, expectedHitCount: 1),
+                    new TestStep(action: TestAction.ResumeProcess, expectedBreakpointHit: 2, targetBreakpoint: 2, expectedHitCount: 2),
+                    new TestStep(action: TestAction.ResumeProcess, expectedBreakpointHit: 2, targetBreakpoint: 2, expectedHitCount: 3),
+                    new TestStep(action: TestAction.ResumeProcess, expectedBreakpointHit: 2, targetBreakpoint: 2, expectedHitCount: 4),
+                    new TestStep(action: TestAction.ResumeProcess, expectedBreakpointHit: 2, targetBreakpoint: 2, expectedHitCount: 5),
+                    new TestStep(action: TestAction.ResumeProcess, expectedBreakpointHit: 2, targetBreakpoint: 2, expectedHitCount: 6),
+                    new TestStep(action: TestAction.ResumeProcess, expectedBreakpointHit: 2, targetBreakpoint: 2, expectedHitCount: 7),
+                    new TestStep(action: TestAction.ResumeProcess, expectedBreakpointHit: 2, targetBreakpoint: 2, expectedHitCount: 8),
+                    new TestStep(action: TestAction.ResumeProcess, expectedBreakpointHit: 2, targetBreakpoint: 2, expectedHitCount: 9),
+                    new TestStep(action: TestAction.ResumeProcess, expectedBreakpointHit: 2, targetBreakpoint: 2, expectedHitCount: 10),
                     new TestStep(action: TestAction.ResumeProcess, expectedExitCode: 0),
                 }
             );
@@ -1045,26 +1046,26 @@ namespace NodejsTests.Debugger {
             TestDebuggerSteps(
                 "BreakpointBreakOn.js",
                 new[] {
-                    new TestStep(action: TestAction.AddBreakpoint, targetBreakpoint: 3, breakOn: new BreakOn(BreakOnKind.Equal, 1)),
-                    new TestStep(action: TestAction.ResumeThread, expectedEntryPointHit: 7),
-                    new TestStep(action: TestAction.ResumeProcess, expectedBreakpointHit: 3, targetBreakpoint: 3, expectedHitCount: 1),
+                    new TestStep(action: TestAction.AddBreakpoint, targetBreakpoint: 2, breakOn: new BreakOn(BreakOnKind.Equal, 1)),
+                    new TestStep(action: TestAction.ResumeThread, expectedEntryPointHit: 6),
+                    new TestStep(action: TestAction.ResumeProcess, expectedBreakpointHit: 2, targetBreakpoint: 2, expectedHitCount: 1),
                     new TestStep(action: TestAction.ResumeProcess, expectedExitCode: 0),
                 }
             );
             TestDebuggerSteps(
                 "BreakpointBreakOn.js",
                 new[] {
-                    new TestStep(action: TestAction.AddBreakpoint, targetBreakpoint: 3, breakOn: new BreakOn(BreakOnKind.Equal, 10)),
-                    new TestStep(action: TestAction.ResumeThread, expectedEntryPointHit: 7),
-                    new TestStep(action: TestAction.ResumeProcess, expectedBreakpointHit: 3, targetBreakpoint: 3, expectedHitCount: 10),
+                    new TestStep(action: TestAction.AddBreakpoint, targetBreakpoint: 2, breakOn: new BreakOn(BreakOnKind.Equal, 10)),
+                    new TestStep(action: TestAction.ResumeThread, expectedEntryPointHit: 6),
+                    new TestStep(action: TestAction.ResumeProcess, expectedBreakpointHit: 2, targetBreakpoint: 2, expectedHitCount: 10),
                     new TestStep(action: TestAction.ResumeProcess, expectedExitCode: 0),
                 }
             );
             TestDebuggerSteps(
                 "BreakpointBreakOn.js",
                 new[] {
-                    new TestStep(action: TestAction.AddBreakpoint, targetBreakpoint: 3, breakOn: new BreakOn(BreakOnKind.Equal, 11)),
-                    new TestStep(action: TestAction.ResumeThread, expectedEntryPointHit: 7),
+                    new TestStep(action: TestAction.AddBreakpoint, targetBreakpoint: 2, breakOn: new BreakOn(BreakOnKind.Equal, 11)),
+                    new TestStep(action: TestAction.ResumeThread, expectedEntryPointHit: 6),
                     new TestStep(action: TestAction.ResumeProcess, expectedExitCode: 0),
                 }
             );
@@ -1073,35 +1074,35 @@ namespace NodejsTests.Debugger {
             TestDebuggerSteps(
                 "BreakpointBreakOn.js",
                 new[] {
-                    new TestStep(action: TestAction.AddBreakpoint, targetBreakpoint: 3, breakOn: new BreakOn(BreakOnKind.GreaterThanOrEqual, 1)),
-                    new TestStep(action: TestAction.ResumeThread, expectedEntryPointHit: 7),
-                    new TestStep(action: TestAction.ResumeProcess, expectedBreakpointHit: 3, targetBreakpoint: 3, expectedHitCount: 1),
-                    new TestStep(action: TestAction.ResumeProcess, expectedBreakpointHit: 3, targetBreakpoint: 3, expectedHitCount: 2),
-                    new TestStep(action: TestAction.ResumeProcess, expectedBreakpointHit: 3, targetBreakpoint: 3, expectedHitCount: 3),
-                    new TestStep(action: TestAction.ResumeProcess, expectedBreakpointHit: 3, targetBreakpoint: 3, expectedHitCount: 4),
-                    new TestStep(action: TestAction.ResumeProcess, expectedBreakpointHit: 3, targetBreakpoint: 3, expectedHitCount: 5),
-                    new TestStep(action: TestAction.ResumeProcess, expectedBreakpointHit: 3, targetBreakpoint: 3, expectedHitCount: 6),
-                    new TestStep(action: TestAction.ResumeProcess, expectedBreakpointHit: 3, targetBreakpoint: 3, expectedHitCount: 7),
-                    new TestStep(action: TestAction.ResumeProcess, expectedBreakpointHit: 3, targetBreakpoint: 3, expectedHitCount: 8),
-                    new TestStep(action: TestAction.ResumeProcess, expectedBreakpointHit: 3, targetBreakpoint: 3, expectedHitCount: 9),
-                    new TestStep(action: TestAction.ResumeProcess, expectedBreakpointHit: 3, targetBreakpoint: 3, expectedHitCount: 10),
+                    new TestStep(action: TestAction.AddBreakpoint, targetBreakpoint: 2, breakOn: new BreakOn(BreakOnKind.GreaterThanOrEqual, 1)),
+                    new TestStep(action: TestAction.ResumeThread, expectedEntryPointHit: 6),
+                    new TestStep(action: TestAction.ResumeProcess, expectedBreakpointHit: 2, targetBreakpoint: 2, expectedHitCount: 1),
+                    new TestStep(action: TestAction.ResumeProcess, expectedBreakpointHit: 2, targetBreakpoint: 2, expectedHitCount: 2),
+                    new TestStep(action: TestAction.ResumeProcess, expectedBreakpointHit: 2, targetBreakpoint: 2, expectedHitCount: 3),
+                    new TestStep(action: TestAction.ResumeProcess, expectedBreakpointHit: 2, targetBreakpoint: 2, expectedHitCount: 4),
+                    new TestStep(action: TestAction.ResumeProcess, expectedBreakpointHit: 2, targetBreakpoint: 2, expectedHitCount: 5),
+                    new TestStep(action: TestAction.ResumeProcess, expectedBreakpointHit: 2, targetBreakpoint: 2, expectedHitCount: 6),
+                    new TestStep(action: TestAction.ResumeProcess, expectedBreakpointHit: 2, targetBreakpoint: 2, expectedHitCount: 7),
+                    new TestStep(action: TestAction.ResumeProcess, expectedBreakpointHit: 2, targetBreakpoint: 2, expectedHitCount: 8),
+                    new TestStep(action: TestAction.ResumeProcess, expectedBreakpointHit: 2, targetBreakpoint: 2, expectedHitCount: 9),
+                    new TestStep(action: TestAction.ResumeProcess, expectedBreakpointHit: 2, targetBreakpoint: 2, expectedHitCount: 10),
                     new TestStep(action: TestAction.ResumeProcess, expectedExitCode: 0),
                 }
             );
             TestDebuggerSteps(
                 "BreakpointBreakOn.js",
                 new[] {
-                    new TestStep(action: TestAction.AddBreakpoint, targetBreakpoint: 3, breakOn: new BreakOn(BreakOnKind.GreaterThanOrEqual, 10)),
-                    new TestStep(action: TestAction.ResumeThread, expectedEntryPointHit: 7),
-                    new TestStep(action: TestAction.ResumeProcess, expectedBreakpointHit: 3, targetBreakpoint: 3, expectedHitCount: 10),
+                    new TestStep(action: TestAction.AddBreakpoint, targetBreakpoint: 2, breakOn: new BreakOn(BreakOnKind.GreaterThanOrEqual, 10)),
+                    new TestStep(action: TestAction.ResumeThread, expectedEntryPointHit: 6),
+                    new TestStep(action: TestAction.ResumeProcess, expectedBreakpointHit: 2, targetBreakpoint: 2, expectedHitCount: 10),
                     new TestStep(action: TestAction.ResumeProcess, expectedExitCode: 0),
                 }
             );
             TestDebuggerSteps(
                 "BreakpointBreakOn.js",
                 new[] {
-                    new TestStep(action: TestAction.AddBreakpoint, targetBreakpoint: 3, breakOn: new BreakOn(BreakOnKind.GreaterThanOrEqual, 11)),
-                    new TestStep(action: TestAction.ResumeThread, expectedEntryPointHit: 7),
+                    new TestStep(action: TestAction.AddBreakpoint, targetBreakpoint: 2, breakOn: new BreakOn(BreakOnKind.GreaterThanOrEqual, 11)),
+                    new TestStep(action: TestAction.ResumeThread, expectedEntryPointHit: 6),
                     new TestStep(action: TestAction.ResumeProcess, expectedExitCode: 0),
                 }
             );
@@ -1110,45 +1111,45 @@ namespace NodejsTests.Debugger {
             TestDebuggerSteps(
                 "BreakpointBreakOn.js",
                 new[] {
-                    new TestStep(action: TestAction.AddBreakpoint, targetBreakpoint: 3, breakOn: new BreakOn(BreakOnKind.Mod, 1)),
-                    new TestStep(action: TestAction.ResumeThread, expectedEntryPointHit: 7),
-                    new TestStep(action: TestAction.ResumeProcess, expectedBreakpointHit: 3, targetBreakpoint: 3, expectedHitCount: 1),
-                    new TestStep(action: TestAction.ResumeProcess, expectedBreakpointHit: 3, targetBreakpoint: 3, expectedHitCount: 2),
-                    new TestStep(action: TestAction.ResumeProcess, expectedBreakpointHit: 3, targetBreakpoint: 3, expectedHitCount: 3),
-                    new TestStep(action: TestAction.ResumeProcess, expectedBreakpointHit: 3, targetBreakpoint: 3, expectedHitCount: 4),
-                    new TestStep(action: TestAction.ResumeProcess, expectedBreakpointHit: 3, targetBreakpoint: 3, expectedHitCount: 5),
-                    new TestStep(action: TestAction.ResumeProcess, expectedBreakpointHit: 3, targetBreakpoint: 3, expectedHitCount: 6),
-                    new TestStep(action: TestAction.ResumeProcess, expectedBreakpointHit: 3, targetBreakpoint: 3, expectedHitCount: 7),
-                    new TestStep(action: TestAction.ResumeProcess, expectedBreakpointHit: 3, targetBreakpoint: 3, expectedHitCount: 8),
-                    new TestStep(action: TestAction.ResumeProcess, expectedBreakpointHit: 3, targetBreakpoint: 3, expectedHitCount: 9),
-                    new TestStep(action: TestAction.ResumeProcess, expectedBreakpointHit: 3, targetBreakpoint: 3, expectedHitCount: 10),
+                    new TestStep(action: TestAction.AddBreakpoint, targetBreakpoint: 2, breakOn: new BreakOn(BreakOnKind.Mod, 1)),
+                    new TestStep(action: TestAction.ResumeThread, expectedEntryPointHit: 6),
+                    new TestStep(action: TestAction.ResumeProcess, expectedBreakpointHit: 2, targetBreakpoint: 2, expectedHitCount: 1),
+                    new TestStep(action: TestAction.ResumeProcess, expectedBreakpointHit: 2, targetBreakpoint: 2, expectedHitCount: 2),
+                    new TestStep(action: TestAction.ResumeProcess, expectedBreakpointHit: 2, targetBreakpoint: 2, expectedHitCount: 3),
+                    new TestStep(action: TestAction.ResumeProcess, expectedBreakpointHit: 2, targetBreakpoint: 2, expectedHitCount: 4),
+                    new TestStep(action: TestAction.ResumeProcess, expectedBreakpointHit: 2, targetBreakpoint: 2, expectedHitCount: 5),
+                    new TestStep(action: TestAction.ResumeProcess, expectedBreakpointHit: 2, targetBreakpoint: 2, expectedHitCount: 6),
+                    new TestStep(action: TestAction.ResumeProcess, expectedBreakpointHit: 2, targetBreakpoint: 2, expectedHitCount: 7),
+                    new TestStep(action: TestAction.ResumeProcess, expectedBreakpointHit: 2, targetBreakpoint: 2, expectedHitCount: 8),
+                    new TestStep(action: TestAction.ResumeProcess, expectedBreakpointHit: 2, targetBreakpoint: 2, expectedHitCount: 9),
+                    new TestStep(action: TestAction.ResumeProcess, expectedBreakpointHit: 2, targetBreakpoint: 2, expectedHitCount: 10),
                     new TestStep(action: TestAction.ResumeProcess, expectedExitCode: 0),
                 }
             );
             TestDebuggerSteps(
                 "BreakpointBreakOn.js",
                 new[] {
-                    new TestStep(action: TestAction.AddBreakpoint, targetBreakpoint: 3, breakOn: new BreakOn(BreakOnKind.Mod, 5)),
-                    new TestStep(action: TestAction.ResumeThread, expectedEntryPointHit: 7),
-                    new TestStep(action: TestAction.ResumeProcess, expectedBreakpointHit: 3, targetBreakpoint: 3, expectedHitCount: 5),
-                    new TestStep(action: TestAction.ResumeProcess, expectedBreakpointHit: 3, targetBreakpoint: 3, expectedHitCount: 10),
+                    new TestStep(action: TestAction.AddBreakpoint, targetBreakpoint: 2, breakOn: new BreakOn(BreakOnKind.Mod, 5)),
+                    new TestStep(action: TestAction.ResumeThread, expectedEntryPointHit: 6),
+                    new TestStep(action: TestAction.ResumeProcess, expectedBreakpointHit: 2, targetBreakpoint: 2, expectedHitCount: 5),
+                    new TestStep(action: TestAction.ResumeProcess, expectedBreakpointHit: 2, targetBreakpoint: 2, expectedHitCount: 10),
                     new TestStep(action: TestAction.ResumeProcess, expectedExitCode: 0),
                 }
             );
             TestDebuggerSteps(
                 "BreakpointBreakOn.js",
                 new[] {
-                    new TestStep(action: TestAction.AddBreakpoint, targetBreakpoint: 3, breakOn: new BreakOn(BreakOnKind.Mod, 10)),
-                    new TestStep(action: TestAction.ResumeThread, expectedEntryPointHit: 7),
-                    new TestStep(action: TestAction.ResumeProcess, expectedBreakpointHit: 3, targetBreakpoint: 3, expectedHitCount: 10),
+                    new TestStep(action: TestAction.AddBreakpoint, targetBreakpoint: 2, breakOn: new BreakOn(BreakOnKind.Mod, 10)),
+                    new TestStep(action: TestAction.ResumeThread, expectedEntryPointHit: 6),
+                    new TestStep(action: TestAction.ResumeProcess, expectedBreakpointHit: 2, targetBreakpoint: 2, expectedHitCount: 10),
                     new TestStep(action: TestAction.ResumeProcess, expectedExitCode: 0),
                 }
             );
             TestDebuggerSteps(
                 "BreakpointBreakOn.js",
                 new[] {
-                    new TestStep(action: TestAction.AddBreakpoint, targetBreakpoint: 3, breakOn: new BreakOn(BreakOnKind.Mod, 11)),
-                    new TestStep(action: TestAction.ResumeThread, expectedEntryPointHit: 7),
+                    new TestStep(action: TestAction.AddBreakpoint, targetBreakpoint: 2, breakOn: new BreakOn(BreakOnKind.Mod, 11)),
+                    new TestStep(action: TestAction.ResumeThread, expectedEntryPointHit: 6),
                     new TestStep(action: TestAction.ResumeProcess, expectedExitCode: 0),
                 }
             );
@@ -1157,16 +1158,16 @@ namespace NodejsTests.Debugger {
             TestDebuggerSteps(
                 "BreakpointBreakOn.js",
                 new[] {
-                    new TestStep(action: TestAction.AddBreakpoint, targetBreakpoint: 3, breakOn: new BreakOn(BreakOnKind.Always, 0)),
-                    new TestStep(action: TestAction.ResumeThread, expectedEntryPointHit: 7),
-                    new TestStep(action: TestAction.ResumeProcess, expectedBreakpointHit: 3, targetBreakpoint: 3, expectedHitCount: 1),
-                    new TestStep(action: TestAction.UpdateBreakpoint, targetBreakpoint: 3, breakOn: new BreakOn(BreakOnKind.Equal, 3)),
-                    new TestStep(action: TestAction.ResumeProcess, expectedBreakpointHit: 3, targetBreakpoint: 3, expectedHitCount: 3),
-                    new TestStep(action: TestAction.UpdateBreakpoint, targetBreakpoint: 3, breakOn: new BreakOn(BreakOnKind.GreaterThanOrEqual, 5)),
-                    new TestStep(action: TestAction.ResumeProcess, expectedBreakpointHit: 3, targetBreakpoint: 3, expectedHitCount: 5),
-                    new TestStep(action: TestAction.ResumeProcess, expectedBreakpointHit: 3, targetBreakpoint: 3, expectedHitCount: 6),
-                    new TestStep(action: TestAction.UpdateBreakpoint, targetBreakpoint: 3, breakOn: new BreakOn(BreakOnKind.Mod, 3)),
-                    new TestStep(action: TestAction.ResumeProcess, expectedBreakpointHit: 3, targetBreakpoint: 3, expectedHitCount: 9),
+                    new TestStep(action: TestAction.AddBreakpoint, targetBreakpoint: 2, breakOn: new BreakOn(BreakOnKind.Always, 0)),
+                    new TestStep(action: TestAction.ResumeThread, expectedEntryPointHit: 6),
+                    new TestStep(action: TestAction.ResumeProcess, expectedBreakpointHit: 2, targetBreakpoint: 2, expectedHitCount: 1),
+                    new TestStep(action: TestAction.UpdateBreakpoint, targetBreakpoint: 2, breakOn: new BreakOn(BreakOnKind.Equal, 3)),
+                    new TestStep(action: TestAction.ResumeProcess, expectedBreakpointHit: 2, targetBreakpoint: 2, expectedHitCount: 3),
+                    new TestStep(action: TestAction.UpdateBreakpoint, targetBreakpoint: 2, breakOn: new BreakOn(BreakOnKind.GreaterThanOrEqual, 5)),
+                    new TestStep(action: TestAction.ResumeProcess, expectedBreakpointHit: 2, targetBreakpoint: 2, expectedHitCount: 5),
+                    new TestStep(action: TestAction.ResumeProcess, expectedBreakpointHit: 2, targetBreakpoint: 2, expectedHitCount: 6),
+                    new TestStep(action: TestAction.UpdateBreakpoint, targetBreakpoint: 2, breakOn: new BreakOn(BreakOnKind.Mod, 3)),
+                    new TestStep(action: TestAction.ResumeProcess, expectedBreakpointHit: 2, targetBreakpoint: 2, expectedHitCount: 9),
                     new TestStep(action: TestAction.ResumeProcess, expectedExitCode: 0),
                 }
             );
@@ -1206,15 +1207,15 @@ namespace NodejsTests.Debugger {
             TestDebuggerSteps(
                 "BreakpointBreakOn.js",
                 new[] {
-                    new TestStep(action: TestAction.AddBreakpoint, targetBreakpoint: 3, breakOn: new BreakOn(BreakOnKind.Mod, 3)),
-                    new TestStep(action: TestAction.ResumeThread, expectedEntryPointHit: 7),
-                    new TestStep(action: TestAction.ResumeProcess, expectedBreakpointHit: 3, targetBreakpoint: 3, expectedHitCount: 3),
-                    new TestStep(action: TestAction.StepOver, expectedStepComplete: 2, targetBreakpoint: 3, expectedHitCount: 3),
-                    new TestStep(action: TestAction.StepOver, expectedStepComplete: 3, targetBreakpoint: 3, expectedHitCount: 4),
-                    new TestStep(action: TestAction.UpdateBreakpoint, targetBreakpoint: 3, hitCount: 0),
-                    new TestStep(action: TestAction.None, targetBreakpoint: 3, expectedHitCount: 0),
-                    new TestStep(action: TestAction.ResumeProcess, expectedBreakpointHit: 3, targetBreakpoint: 3, expectedHitCount: 3),
-                    new TestStep(action: TestAction.ResumeProcess, expectedBreakpointHit: 3, targetBreakpoint: 3, expectedHitCount: 6),
+                    new TestStep(action: TestAction.AddBreakpoint, targetBreakpoint: 2, breakOn: new BreakOn(BreakOnKind.Mod, 3)),
+                    new TestStep(action: TestAction.ResumeThread, expectedEntryPointHit: 6),
+                    new TestStep(action: TestAction.ResumeProcess, expectedBreakpointHit: 2, targetBreakpoint: 2, expectedHitCount: 3),
+                    new TestStep(action: TestAction.StepOver, expectedStepComplete: 1, targetBreakpoint: 2, expectedHitCount: 3),
+                    new TestStep(action: TestAction.StepOver, expectedStepComplete: 2, targetBreakpoint: 2, expectedHitCount: 4),
+                    new TestStep(action: TestAction.UpdateBreakpoint, targetBreakpoint: 2, hitCount: 0),
+                    new TestStep(action: TestAction.None, targetBreakpoint: 2, expectedHitCount: 0),
+                    new TestStep(action: TestAction.ResumeProcess, expectedBreakpointHit: 2, targetBreakpoint: 2, expectedHitCount: 3),
+                    new TestStep(action: TestAction.ResumeProcess, expectedBreakpointHit: 2, targetBreakpoint: 2, expectedHitCount: 6),
                     new TestStep(action: TestAction.ResumeProcess, expectedExitCode: 0),
                 }
             );
@@ -1225,9 +1226,22 @@ namespace NodejsTests.Debugger {
             TestDebuggerSteps(
                 "FixupBreakpointOnComment.js",
                 new[] {
-                    new TestStep(action: TestAction.AddBreakpoint, targetBreakpoint: 1, expectFailure: true),
-                    new TestStep(action: TestAction.AddBreakpoint, targetBreakpoint: 4, expectFailure: true),
-                    new TestStep(action: TestAction.AddBreakpoint, targetBreakpoint: 7, expectFailure: true),
+                    new TestStep(action: TestAction.AddBreakpoint, targetBreakpoint: 0, expectFailure: true),
+                    new TestStep(action: TestAction.AddBreakpoint, targetBreakpoint: 3, expectFailure: true),
+                    new TestStep(action: TestAction.AddBreakpoint, targetBreakpoint: 6, expectFailure: true),
+                    new TestStep(action: TestAction.ResumeThread, expectedBreakpointHit: 1),
+                    new TestStep(action: TestAction.ResumeThread, expectedEntryPointHit: 1),
+                    new TestStep(action: TestAction.ResumeProcess, expectedBreakpointHit: 4),
+                    new TestStep(action: TestAction.ResumeProcess, expectedBreakpointHit: 9),
+                    new TestStep(action: TestAction.ResumeProcess, expectedExitCode: 0),
+                }
+            );
+            TestDebuggerSteps(
+                "FixupBreakpointOnBlankLine.js",
+                new[] {
+                    new TestStep(action: TestAction.AddBreakpoint, targetBreakpoint: 0, expectFailure: true),
+                    new TestStep(action: TestAction.AddBreakpoint, targetBreakpoint: 3, expectFailure: true),
+                    new TestStep(action: TestAction.AddBreakpoint, targetBreakpoint: 6, expectFailure: true),
                     new TestStep(action: TestAction.ResumeThread, expectedBreakpointHit: 2),
                     new TestStep(action: TestAction.ResumeThread, expectedEntryPointHit: 2),
                     new TestStep(action: TestAction.ResumeProcess, expectedBreakpointHit: 5),
@@ -1236,65 +1250,52 @@ namespace NodejsTests.Debugger {
                 }
             );
             TestDebuggerSteps(
-                "FixupBreakpointOnBlankLine.js",
-                new[] {
-                    new TestStep(action: TestAction.AddBreakpoint, targetBreakpoint: 1, expectFailure: true),
-                    new TestStep(action: TestAction.AddBreakpoint, targetBreakpoint: 4, expectFailure: true),
-                    new TestStep(action: TestAction.AddBreakpoint, targetBreakpoint: 7, expectFailure: true),
-                    new TestStep(action: TestAction.ResumeThread, expectedBreakpointHit: 3),
-                    new TestStep(action: TestAction.ResumeThread, expectedEntryPointHit: 3),
-                    new TestStep(action: TestAction.ResumeProcess, expectedBreakpointHit: 6),
-                    new TestStep(action: TestAction.ResumeProcess, expectedBreakpointHit: 11),
-                    new TestStep(action: TestAction.ResumeProcess, expectedExitCode: 0),
-                }
-            );
-            TestDebuggerSteps(
                 "FixupBreakpointOnFunction.js",
                 new[] {
-                    new TestStep(action: TestAction.AddBreakpoint, targetBreakpoint: 2),
-                    new TestStep(action: TestAction.AddBreakpoint, targetBreakpoint: 6, expectFailure: true),
-                    new TestStep(action: TestAction.AddBreakpoint, targetBreakpoint: 11, expectFailure: true),
-                    new TestStep(action: TestAction.AddBreakpoint, targetBreakpoint: 16),
-                    new TestStep(action: TestAction.AddBreakpoint, targetBreakpoint: 20, expectFailure: true),
-                    new TestStep(action: TestAction.ResumeThread, expectedEntryPointHit: 25),
-                    new TestStep(action: TestAction.ResumeProcess, expectedBreakpointHit: 2),
-                    new TestStep(action: TestAction.ResumeProcess, expectedBreakpointHit: 7),
-                    new TestStep(action: TestAction.ResumeProcess, expectedBreakpointHit: 13),
-                    new TestStep(action: TestAction.ResumeProcess, expectedBreakpointHit: 16),
-                    new TestStep(action: TestAction.ResumeProcess, expectedBreakpointHit: 22),
+                    new TestStep(action: TestAction.AddBreakpoint, targetBreakpoint: 1),
+                    new TestStep(action: TestAction.AddBreakpoint, targetBreakpoint: 5, expectFailure: true),
+                    new TestStep(action: TestAction.AddBreakpoint, targetBreakpoint: 10, expectFailure: true),
+                    new TestStep(action: TestAction.AddBreakpoint, targetBreakpoint: 15),
+                    new TestStep(action: TestAction.AddBreakpoint, targetBreakpoint: 19, expectFailure: true),
+                    new TestStep(action: TestAction.ResumeThread, expectedEntryPointHit: 24),
+                    new TestStep(action: TestAction.ResumeProcess, expectedBreakpointHit: 1),
+                    new TestStep(action: TestAction.ResumeProcess, expectedBreakpointHit: 6),
+                    new TestStep(action: TestAction.ResumeProcess, expectedBreakpointHit: 12),
+                    new TestStep(action: TestAction.ResumeProcess, expectedBreakpointHit: 15),
+                    new TestStep(action: TestAction.ResumeProcess, expectedBreakpointHit: 21),
                     new TestStep(action: TestAction.ResumeProcess, expectedExitCode: 0),
                 }
             );
             TestDebuggerSteps(
                 "RequiresScriptsWithBreakpointFixup.js",
                 new[] {
-                    new TestStep(action: TestAction.AddBreakpoint, targetBreakpointFile: "FixupBreakpointOnComment.js", targetBreakpoint: 1, expectFailure: true),
-                    new TestStep(action: TestAction.AddBreakpoint, targetBreakpointFile: "FixupBreakpointOnComment.js", targetBreakpoint: 4, expectFailure: true),
-                    new TestStep(action: TestAction.AddBreakpoint, targetBreakpointFile: "FixupBreakpointOnComment.js", targetBreakpoint: 7, expectFailure: true),
+                    new TestStep(action: TestAction.AddBreakpoint, targetBreakpointFile: "FixupBreakpointOnComment.js", targetBreakpoint: 0, expectFailure: true),
+                    new TestStep(action: TestAction.AddBreakpoint, targetBreakpointFile: "FixupBreakpointOnComment.js", targetBreakpoint: 3, expectFailure: true),
+                    new TestStep(action: TestAction.AddBreakpoint, targetBreakpointFile: "FixupBreakpointOnComment.js", targetBreakpoint: 6, expectFailure: true),
 
-                    new TestStep(action: TestAction.AddBreakpoint, targetBreakpointFile: "FixupBreakpointOnBlankLine.js", targetBreakpoint: 1, expectFailure: true),
-                    new TestStep(action: TestAction.AddBreakpoint, targetBreakpointFile: "FixupBreakpointOnBlankLine.js", targetBreakpoint: 4, expectFailure: true),
-                    new TestStep(action: TestAction.AddBreakpoint, targetBreakpointFile: "FixupBreakpointOnBlankLine.js", targetBreakpoint: 7, expectFailure: true),
+                    new TestStep(action: TestAction.AddBreakpoint, targetBreakpointFile: "FixupBreakpointOnBlankLine.js", targetBreakpoint: 0, expectFailure: true),
+                    new TestStep(action: TestAction.AddBreakpoint, targetBreakpointFile: "FixupBreakpointOnBlankLine.js", targetBreakpoint: 3, expectFailure: true),
+                    new TestStep(action: TestAction.AddBreakpoint, targetBreakpointFile: "FixupBreakpointOnBlankLine.js", targetBreakpoint: 6, expectFailure: true),
 
-                    new TestStep(action: TestAction.AddBreakpoint, targetBreakpointFile: "FixupBreakpointOnFunction.js", targetBreakpoint: 2, expectFailure: true),
-                    new TestStep(action: TestAction.AddBreakpoint, targetBreakpointFile: "FixupBreakpointOnFunction.js", targetBreakpoint: 6, expectFailure: true),
-                    new TestStep(action: TestAction.AddBreakpoint, targetBreakpointFile: "FixupBreakpointOnFunction.js", targetBreakpoint: 11, expectFailure: true),
-                    new TestStep(action: TestAction.AddBreakpoint, targetBreakpointFile: "FixupBreakpointOnFunction.js", targetBreakpoint: 16, expectFailure: true),
-                    new TestStep(action: TestAction.AddBreakpoint, targetBreakpointFile: "FixupBreakpointOnFunction.js", targetBreakpoint: 20, expectFailure: true),
+                    new TestStep(action: TestAction.AddBreakpoint, targetBreakpointFile: "FixupBreakpointOnFunction.js", targetBreakpoint: 1, expectFailure: true),
+                    new TestStep(action: TestAction.AddBreakpoint, targetBreakpointFile: "FixupBreakpointOnFunction.js", targetBreakpoint: 5, expectFailure: true),
+                    new TestStep(action: TestAction.AddBreakpoint, targetBreakpointFile: "FixupBreakpointOnFunction.js", targetBreakpoint: 10, expectFailure: true),
+                    new TestStep(action: TestAction.AddBreakpoint, targetBreakpointFile: "FixupBreakpointOnFunction.js", targetBreakpoint: 15, expectFailure: true),
+                    new TestStep(action: TestAction.AddBreakpoint, targetBreakpointFile: "FixupBreakpointOnFunction.js", targetBreakpoint: 19, expectFailure: true),
 
-                    new TestStep(action: TestAction.ResumeProcess, expectedBreakFile: "FixupBreakpointOnComment.js", expectedBreakpointHit: 2),
-                    new TestStep(action: TestAction.ResumeProcess, expectedBreakFile: "FixupBreakpointOnComment.js", expectedBreakpointHit: 5),
-                    new TestStep(action: TestAction.ResumeProcess, expectedBreakFile: "FixupBreakpointOnComment.js", expectedBreakpointHit: 10),
+                    new TestStep(action: TestAction.ResumeProcess, expectedBreakFile: "FixupBreakpointOnComment.js", expectedBreakpointHit: 1),
+                    new TestStep(action: TestAction.ResumeProcess, expectedBreakFile: "FixupBreakpointOnComment.js", expectedBreakpointHit: 4),
+                    new TestStep(action: TestAction.ResumeProcess, expectedBreakFile: "FixupBreakpointOnComment.js", expectedBreakpointHit: 9),
 
-                    new TestStep(action: TestAction.ResumeProcess, expectedBreakFile: "FixupBreakpointOnBlankLine.js", expectedBreakpointHit: 3),
-                    new TestStep(action: TestAction.ResumeProcess, expectedBreakFile: "FixupBreakpointOnBlankLine.js", expectedBreakpointHit: 6),
-                    new TestStep(action: TestAction.ResumeProcess, expectedBreakFile: "FixupBreakpointOnBlankLine.js", expectedBreakpointHit: 11),
+                    new TestStep(action: TestAction.ResumeProcess, expectedBreakFile: "FixupBreakpointOnBlankLine.js", expectedBreakpointHit: 2),
+                    new TestStep(action: TestAction.ResumeProcess, expectedBreakFile: "FixupBreakpointOnBlankLine.js", expectedBreakpointHit: 5),
+                    new TestStep(action: TestAction.ResumeProcess, expectedBreakFile: "FixupBreakpointOnBlankLine.js", expectedBreakpointHit: 10),
 
-                    new TestStep(action: TestAction.ResumeProcess, expectedBreakFile: "FixupBreakpointOnFunction.js", expectedBreakpointHit: 2),
-                    new TestStep(action: TestAction.ResumeProcess, expectedBreakFile: "FixupBreakpointOnFunction.js", expectedBreakpointHit: 7),
-                    new TestStep(action: TestAction.ResumeProcess, expectedBreakFile: "FixupBreakpointOnFunction.js", expectedBreakpointHit: 13),
-                    new TestStep(action: TestAction.ResumeProcess, expectedBreakFile: "FixupBreakpointOnFunction.js", expectedBreakpointHit: 16),
-                    new TestStep(action: TestAction.ResumeProcess, expectedBreakFile: "FixupBreakpointOnFunction.js", expectedBreakpointHit: 22),
+                    new TestStep(action: TestAction.ResumeProcess, expectedBreakFile: "FixupBreakpointOnFunction.js", expectedBreakpointHit: 1),
+                    new TestStep(action: TestAction.ResumeProcess, expectedBreakFile: "FixupBreakpointOnFunction.js", expectedBreakpointHit: 6),
+                    new TestStep(action: TestAction.ResumeProcess, expectedBreakFile: "FixupBreakpointOnFunction.js", expectedBreakpointHit: 12),
+                    new TestStep(action: TestAction.ResumeProcess, expectedBreakFile: "FixupBreakpointOnFunction.js", expectedBreakpointHit: 15),
+                    new TestStep(action: TestAction.ResumeProcess, expectedBreakFile: "FixupBreakpointOnFunction.js", expectedBreakpointHit: 21),
 
                     new TestStep(action: TestAction.ResumeProcess, expectedExitCode: 0),
                 }
@@ -1438,17 +1439,17 @@ namespace NodejsTests.Debugger {
 
         [TestMethod, Priority(0)]
         public void TestBreakpointPredicatedEntrypointNoFixup() {
-            TestBreakpointPredicatedEntrypoint("BreakpointTest.js", targetBreakpoint: 1, expectedHit: 1);
+            TestBreakpointPredicatedEntrypoint("BreakpointTest.js", targetBreakpoint: 0, expectedHit: 0);
         }
 
         [TestMethod, Priority(0)]
         public void TestBreakpointPredicatedEntrypointBlankLineFixup() {
-            TestBreakpointPredicatedEntrypoint("FixupBreakpointOnBlankLine.js", targetBreakpoint: 1, expectedHit: 3);
+            TestBreakpointPredicatedEntrypoint("FixupBreakpointOnBlankLine.js", targetBreakpoint: 0, expectedHit: 2);
         }
 
         [TestMethod, Priority(0)]
         public void TestBreakpointPredicatedEntrypointCommentFixup() {
-            TestBreakpointPredicatedEntrypoint("FixupBreakpointOnComment.js", targetBreakpoint: 1, expectedHit: 2);
+            TestBreakpointPredicatedEntrypoint("FixupBreakpointOnComment.js", targetBreakpoint: 0, expectedHit: 1);
         }
        
         #endregion
@@ -1464,7 +1465,7 @@ namespace NodejsTests.Debugger {
                 ExceptionHitTreatment.BreakAlways,
                 null,
                 0,
-                new ExceptionInfo("Error", "Error: Error description", 4)
+                new ExceptionInfo("Error", "Error: Error description", 3)
             );
 
             // Explicit break always
@@ -1473,7 +1474,7 @@ namespace NodejsTests.Debugger {
                 ExceptionHitTreatment.BreakNever,
                 CollectExceptionTreatments("Error", ExceptionHitTreatment.BreakAlways),
                 0,
-                new ExceptionInfo("Error", "Error: Error description", 4)
+                new ExceptionInfo("Error", "Error: Error description", 3)
             );
 
             // Explicit break always (both)
@@ -1482,7 +1483,7 @@ namespace NodejsTests.Debugger {
                 ExceptionHitTreatment.BreakAlways,
                 CollectExceptionTreatments("Error", ExceptionHitTreatment.BreakAlways),
                 0,
-                new ExceptionInfo("Error", "Error: Error description", 4)
+                new ExceptionInfo("Error", "Error: Error description", 3)
             );
 
             // UNDONE test break on unhandled once supported
@@ -1517,7 +1518,7 @@ namespace NodejsTests.Debugger {
                 ExceptionHitTreatment.BreakAlways,
                 null,
                 8,
-                new ExceptionInfo("Error", "Error: Error description", 3)
+                new ExceptionInfo("Error", "Error: Error description", 2)
             );
 
             // Explicit break always
@@ -1526,7 +1527,7 @@ namespace NodejsTests.Debugger {
                 ExceptionHitTreatment.BreakNever,
                 CollectExceptionTreatments("Error", ExceptionHitTreatment.BreakAlways),
                 8,
-                new ExceptionInfo("Error", "Error: Error description", 3)
+                new ExceptionInfo("Error", "Error: Error description", 2)
             );
 
             // Explicit break always (both)
@@ -1535,7 +1536,7 @@ namespace NodejsTests.Debugger {
                 ExceptionHitTreatment.BreakAlways,
                 CollectExceptionTreatments("Error", ExceptionHitTreatment.BreakAlways),
                 8,
-                new ExceptionInfo("Error", "Error: Error description", 3)
+                new ExceptionInfo("Error", "Error: Error description", 2)
             );
 
             // Implicit break on unhandled
@@ -1544,7 +1545,7 @@ namespace NodejsTests.Debugger {
                 ExceptionHitTreatment.BreakOnUnhandled,
                 null,
                 8,
-                new ExceptionInfo("Error", "Error: Error description", 3)
+                new ExceptionInfo("Error", "Error: Error description", 2)
             );
 
             // Explicit break on unhandled
@@ -1553,7 +1554,7 @@ namespace NodejsTests.Debugger {
                 ExceptionHitTreatment.BreakNever,
                 CollectExceptionTreatments("Error", ExceptionHitTreatment.BreakOnUnhandled),
                 8,
-                new ExceptionInfo("Error", "Error: Error description", 3)
+                new ExceptionInfo("Error", "Error: Error description", 2)
             );
 
             // Explicit break on unhandled (both)
@@ -1562,7 +1563,7 @@ namespace NodejsTests.Debugger {
                 ExceptionHitTreatment.BreakOnUnhandled,
                 CollectExceptionTreatments("Error", ExceptionHitTreatment.BreakOnUnhandled),
                 8,
-                new ExceptionInfo("Error", "Error: Error description", 3)
+                new ExceptionInfo("Error", "Error: Error description", 2)
             );
         }
 
@@ -1573,19 +1574,19 @@ namespace NodejsTests.Debugger {
                 ExceptionHitTreatment.BreakAlways,
                 null,
                 0,
-                new ExceptionInfo("Error", "Error: msg", 4),
-                new ExceptionInfo("ReferenceError", "ReferenceError: UndefinedVariable is not defined", 10),
-                new ExceptionInfo("RangeError", "RangeError: Invalid array length", 16),
-                new ExceptionInfo("TypeError", "TypeError: Object UserStringValue has no method 'UndefinedFunction'", 22),
+                new ExceptionInfo("Error", "Error: msg", 3),
+                new ExceptionInfo("ReferenceError", "ReferenceError: UndefinedVariable is not defined", 9),
+                new ExceptionInfo("RangeError", "RangeError: Invalid array length", 15),
+                new ExceptionInfo("TypeError", "TypeError: Object UserStringValue has no method 'UndefinedFunction'", 21),
                 new ExceptionInfo("URIError", "URIError: URI malformed"),
                 new ExceptionInfo("SyntaxError", "SyntaxError: Invalid regular expression: missing /"),
-                new ExceptionInfo("EvalError", "EvalError: msg", 40),
-                new ExceptionInfo("UserDefinedError", "#<UserDefinedError>", 54),
-                new ExceptionInfo("UserDefinedRangeError", "#<UserDefinedRangeError>", 66),
-                new ExceptionInfo("UserDefinedType", "#<UserDefinedType>", 74),
-                new ExceptionInfo("number", "1", 83),
-                new ExceptionInfo("string", "exception_string", 89),
-                new ExceptionInfo("boolean", "false", 95)
+                new ExceptionInfo("EvalError", "EvalError: msg", 39),
+                new ExceptionInfo("UserDefinedError", "UserDefinedError: msg", 53),
+                new ExceptionInfo("UserDefinedRangeError", "UserDefinedRangeError: msg", 65),
+                new ExceptionInfo("UserDefinedType", "[object Object]", 73),
+                new ExceptionInfo(NodeVariableType.Number, "1", 82),
+                new ExceptionInfo(NodeVariableType.String, "exception_string", 88),
+                new ExceptionInfo(NodeVariableType.Boolean, "false", 94)
             );
         }
 
@@ -1596,12 +1597,12 @@ namespace NodejsTests.Debugger {
                 ExceptionHitTreatment.BreakAlways,
                 null,
                 0,
-                new ExceptionInfo("UserDefinedClass", "#<UserDefinedClass>", 6),
-                new ExceptionInfo("TypeError", "TypeError: TypeError description", 14),
-                new ExceptionInfo("ReferenceError", "ReferenceError: ReferenceError description", 17),
-                new ExceptionInfo("TypeError", "TypeError: TypeError description", 25),
-                new ExceptionInfo("ReferenceError", "ReferenceError: ReferenceError description", 28),
-                new ExceptionInfo("Error", "Error: Error description", 35)
+                new ExceptionInfo("UserDefinedClass", "[object Object]", 5),
+                new ExceptionInfo("TypeError", "TypeError: TypeError description", 13),
+                new ExceptionInfo("ReferenceError", "ReferenceError: ReferenceError description", 16),
+                new ExceptionInfo("TypeError", "TypeError: TypeError description", 24),
+                new ExceptionInfo("ReferenceError", "ReferenceError: ReferenceError description", 27),
+                new ExceptionInfo("Error", "Error: Error description", 34)
             );
         }
 
@@ -1631,11 +1632,11 @@ namespace NodejsTests.Debugger {
             TestDebuggerSteps(
                 "ExceptionInEvaluatedCode.js",
                 new[] {
-                    new TestStep(action: TestAction.ResumeThread, expectedEntryPointHit: 2),
-                    new TestStep(action: TestAction.StepOver, expectedStepComplete: 3),
-                    new TestStep(action: TestAction.StepOver, expectedExceptionRaised: new ExceptionInfo("SyntaxError", "SyntaxError: Unexpected token )", 1)),
-                    new TestStep(action: TestAction.StepOver, expectedStepComplete: 5),
-                    new TestStep(action: TestAction.StepOver, expectedStepComplete: 7),
+                    new TestStep(action: TestAction.ResumeThread, expectedEntryPointHit: 1),
+                    new TestStep(action: TestAction.StepOver, expectedStepComplete: 2),
+                    new TestStep(action: TestAction.StepOver, expectedExceptionRaised: new ExceptionInfo("SyntaxError", "SyntaxError: Unexpected token )", 0)),
+                    new TestStep(action: TestAction.StepOver, expectedStepComplete: 4),
+                    new TestStep(action: TestAction.StepOver, expectedStepComplete: 6),
                     new TestStep(action: TestAction.ResumeProcess, expectedExitCode: 0),
                 }
             );
@@ -1650,12 +1651,12 @@ namespace NodejsTests.Debugger {
             TestDebuggerSteps(
                 "ThrowsWithDeepCallstack.js",
                 new[] {
-                    new TestStep(action: TestAction.ResumeThread, expectedEntryPointHit: 12),
-                    new TestStep(action: TestAction.StepOver, expectedStepComplete: 14),
+                    new TestStep(action: TestAction.ResumeThread, expectedEntryPointHit: 11),
+                    new TestStep(action: TestAction.StepOver, expectedStepComplete: 13),
                     new TestStep(action: TestAction.ResumeProcess, expectedExitCode: 0),
                 },
                 defaultExceptionTreatment: ExceptionHitTreatment.BreakAlways,
-                exceptionTreatments: CollectExceptionTreatments("string", ExceptionHitTreatment.BreakNever)
+                exceptionTreatments: CollectExceptionTreatments(NodeVariableType.String, ExceptionHitTreatment.BreakNever)
             );
         }
 
@@ -1664,11 +1665,11 @@ namespace NodejsTests.Debugger {
             TestDebuggerSteps(
                 "DeepCallstack.js",
                 new[] {
-                    new TestStep(action: TestAction.AddBreakpoint, targetBreakpoint: 4),
-                    new TestStep(action: TestAction.ResumeThread, expectedEntryPointHit: 1),
-                    new TestStep(action: TestAction.StepOver, expectedStepComplete: 16),
-                    new TestStep(action: TestAction.StepOver, expectedBreakpointHit: 4),
-                    new TestStep(action: TestAction.ResumeThread, expectedStepComplete: 18),
+                    new TestStep(action: TestAction.AddBreakpoint, targetBreakpoint: 3),
+                    new TestStep(action: TestAction.ResumeThread, expectedEntryPointHit: 0),
+                    new TestStep(action: TestAction.StepOver, expectedStepComplete: 15),
+                    new TestStep(action: TestAction.StepOver, expectedBreakpointHit: 3),
+                    new TestStep(action: TestAction.ResumeThread, expectedStepComplete: 17),
                     new TestStep(action: TestAction.ResumeProcess, expectedExitCode: 0),
                 }
             );
@@ -1679,11 +1680,11 @@ namespace NodejsTests.Debugger {
             TestDebuggerSteps(
                 "DeepCallstack.js",
                 new[] {
-                    new TestStep(action: TestAction.AddBreakpoint, targetBreakpoint: 3, expectFailure: true),
-                    new TestStep(action: TestAction.ResumeThread, expectedEntryPointHit: 1),
-                    new TestStep(action: TestAction.StepOver, expectedStepComplete: 16),
-                    new TestStep(action: TestAction.StepOver, expectedBreakpointHit: 4),
-                    new TestStep(action: TestAction.ResumeThread, expectedStepComplete: 18),
+                    new TestStep(action: TestAction.AddBreakpoint, targetBreakpoint: 2, expectFailure: true),
+                    new TestStep(action: TestAction.ResumeThread, expectedEntryPointHit: 0),
+                    new TestStep(action: TestAction.StepOver, expectedStepComplete: 15),
+                    new TestStep(action: TestAction.StepOver, expectedBreakpointHit: 3),
+                    new TestStep(action: TestAction.ResumeThread, expectedStepComplete: 17),
                     new TestStep(action: TestAction.ResumeProcess, expectedExitCode: 0),
                 }
             );
@@ -1745,7 +1746,7 @@ namespace NodejsTests.Debugger {
             TestDebuggerSteps(
                 "ExitNormal.js",
                 new[] {
-                    new TestStep(action: TestAction.ResumeThread, expectedEntryPointHit: 1),
+                    new TestStep(action: TestAction.ResumeThread, expectedEntryPointHit: 0),
                     new TestStep(action: TestAction.ResumeProcess, expectedExitCode: 0),
                 }
             );
@@ -1756,8 +1757,8 @@ namespace NodejsTests.Debugger {
             TestDebuggerSteps(
                 "ExitException.js",
                 new[] {
-                    new TestStep(action: TestAction.ResumeThread, expectedEntryPointHit: 1),
-                    new TestStep(action: TestAction.ResumeProcess, expectedExceptionRaised: new ExceptionInfo("Error", "Error: msg", 2)),
+                    new TestStep(action: TestAction.ResumeThread, expectedEntryPointHit: 0),
+                    new TestStep(action: TestAction.ResumeProcess, expectedExceptionRaised: new ExceptionInfo("Error", "Error: msg", 1)),
                     new TestStep(action: TestAction.ResumeProcess, expectedExitCode: 8),
                 }
             );
@@ -1769,7 +1770,7 @@ namespace NodejsTests.Debugger {
             TestDebuggerSteps(
                 "ExitExplicit.js",
                 new[] {
-                    new TestStep(action: TestAction.ResumeThread, expectedEntryPointHit: 1),
+                    new TestStep(action: TestAction.ResumeThread, expectedEntryPointHit: 0),
                     new TestStep(action: TestAction.ResumeProcess, expectedExitCode: 42),
                 }
             );
@@ -1784,15 +1785,15 @@ namespace NodejsTests.Debugger {
             TestDebuggerSteps(
                 "PassedArgs.js",
                 new[] {
-                    new TestStep(action: TestAction.ResumeThread, expectedEntryPointHit: 1),
-                    new TestStep(action: TestAction.ResumeProcess, expectedExceptionRaised: new ExceptionInfo("Error", "Error: Invalid args", 4)),
+                    new TestStep(action: TestAction.ResumeThread, expectedEntryPointHit: 0),
+                    new TestStep(action: TestAction.ResumeProcess, expectedExceptionRaised: new ExceptionInfo("Error", "Error: Invalid args", 3)),
                     new TestStep(action: TestAction.ResumeProcess, expectedExitCode: 8),
                 }
             );
             TestDebuggerSteps(
                 "PassedArgs.js",
                 new[] {
-                    new TestStep(action: TestAction.ResumeThread, expectedEntryPointHit: 1),
+                    new TestStep(action: TestAction.ResumeThread, expectedEntryPointHit: 0),
                     new TestStep(action: TestAction.ResumeProcess, expectedExitCode: 0),
                 },
                 interpreterOptions: "42"
@@ -1817,11 +1818,11 @@ namespace NodejsTests.Debugger {
                         thread,
                         filename,
                         new[] {
-                        new TestStep(action: TestAction.AddBreakpoint, targetBreakpoint: 2),
-                        new TestStep(action: TestAction.Wait, expectedBreakpointHit: 2),
-                        new TestStep(action: TestAction.ResumeProcess, expectedBreakpointHit: 2),
-                        new TestStep(action: TestAction.Detach),
-                    }
+                            new TestStep(action: TestAction.AddBreakpoint, targetBreakpoint: 1),
+                            new TestStep(action: TestAction.Wait, expectedBreakpointHit: 1),
+                            new TestStep(action: TestAction.ResumeProcess, expectedBreakpointHit: 1),
+                            new TestStep(action: TestAction.Detach),
+                        }
                     );
                 }
 
@@ -2590,16 +2591,16 @@ namespace NodejsTests.Debugger {
                 "TypeScriptTest.js",
                 new[] {
                     new TestStep(action: TestAction.AddBreakpoint, 
-                        targetBreakpoint: 2, 
+                        targetBreakpoint: 1, 
                         targetBreakpointFile: "TypeScriptTest.ts"),
-                    new TestStep(action: TestAction.ResumeThread, expectedEntryPointHit: 1),
+                    new TestStep(action: TestAction.ResumeThread, expectedEntryPointHit: 0),
                     new TestStep(action: TestAction.ResumeThread, 
                         expectedHitCount: 1, 
-                        targetBreakpoint: 2, 
+                        targetBreakpoint: 1, 
                         targetBreakpointFile: "TypeScriptTest.ts", 
                         expectedBreakFunction: "Greeter.constructor",
-                        expectedBreakpointHit: 2),
-                    new TestStep(action: TestAction.StepOut, expectedStepComplete: 9),
+                        expectedBreakpointHit: 1),
+                    new TestStep(action: TestAction.StepOut, expectedStepComplete: 8),
                 }
             );
 
@@ -2607,16 +2608,16 @@ namespace NodejsTests.Debugger {
                 "TypeScriptTest.js",
                 new[] {
                     new TestStep(action: TestAction.AddBreakpoint, 
-                        targetBreakpoint: 8, 
+                        targetBreakpoint: 7, 
                         targetBreakpointFile: "TypeScriptTest.ts"),
-                    new TestStep(action: TestAction.ResumeThread, expectedEntryPointHit: 1),
+                    new TestStep(action: TestAction.ResumeThread, expectedEntryPointHit: 0),
                     new TestStep(action: TestAction.ResumeThread, 
                         expectedHitCount: 1, 
-                        targetBreakpoint: 8, 
+                        targetBreakpoint: 7, 
                         targetBreakpointFile: "TypeScriptTest.ts", 
                         expectedBreakFunction: "Greeter",
-                        expectedBreakpointHit: 8),
-                    new TestStep(action: TestAction.StepInto, expectedStepComplete: 2),
+                        expectedBreakpointHit: 7),
+                    new TestStep(action: TestAction.StepInto, expectedStepComplete: 1),
                 }
             );
 
@@ -2624,25 +2625,25 @@ namespace NodejsTests.Debugger {
                 "TypeScriptTest.js",
                 new[] {
                     new TestStep(action: TestAction.AddBreakpoint, 
-                        targetBreakpoint: 8, 
+                        targetBreakpoint: 7, 
                         targetBreakpointFile: "TypeScriptTest.ts"),
-                    new TestStep(action: TestAction.ResumeThread, expectedEntryPointHit: 1),
+                    new TestStep(action: TestAction.ResumeThread, expectedEntryPointHit: 0),
                     new TestStep(action: TestAction.ResumeThread, 
                         expectedHitCount: 1, 
-                        targetBreakpoint: 8, 
+                        targetBreakpoint: 7, 
                         targetBreakpointFile: "TypeScriptTest.ts", 
                         expectedBreakFunction: "Greeter",
-                        expectedBreakpointHit: 8),
-                    new TestStep(action: TestAction.StepOver, expectedStepComplete: 9),
+                        expectedBreakpointHit: 7),
+                    new TestStep(action: TestAction.StepOver, expectedStepComplete: 8),
                 }
             );
 
             TestDebuggerSteps(
                 "TypeScriptTest.js",
                 new[] {
-                    new TestStep(action: TestAction.AddBreakpoint, targetBreakpoint: 4, targetBreakpointFile: "TypeScriptTest.ts"),
-                    new TestStep(action: TestAction.ResumeThread, expectedEntryPointHit: 1),
-                    new TestStep(action: TestAction.ResumeThread, expectedHitCount: 1, targetBreakpoint: 4, targetBreakpointFile: "TypeScriptTest.ts", expectedBreakFunction: "Greeter.greet", expectedBreakpointHit: 4),
+                    new TestStep(action: TestAction.AddBreakpoint, targetBreakpoint: 3, targetBreakpointFile: "TypeScriptTest.ts"),
+                    new TestStep(action: TestAction.ResumeThread, expectedEntryPointHit: 0),
+                    new TestStep(action: TestAction.ResumeThread, expectedHitCount: 1, targetBreakpoint: 3, targetBreakpointFile: "TypeScriptTest.ts", expectedBreakFunction: "Greeter.greet", expectedBreakpointHit: 3),
                     new TestStep(action: TestAction.ResumeProcess, expectedExitCode: 0),
                 }
             );
@@ -2651,15 +2652,15 @@ namespace NodejsTests.Debugger {
                 "TypeScriptTest.js",
                 new[] {
                     new TestStep(action: TestAction.AddBreakpoint, 
-                        targetBreakpoint: 2, 
+                        targetBreakpoint: 1, 
                         targetBreakpointFile: "TypeScriptTest.ts"),
-                    new TestStep(action: TestAction.ResumeThread, expectedEntryPointHit: 1),
+                    new TestStep(action: TestAction.ResumeThread, expectedEntryPointHit: 0),
                     new TestStep(action: TestAction.ResumeThread, 
                         expectedHitCount: 1, 
-                        targetBreakpoint: 2, 
+                        targetBreakpoint: 1, 
                         targetBreakpointFile: "TypeScriptTest.ts", 
                         expectedBreakFunction: "Greeter.constructor",
-                        expectedBreakpointHit: 2),
+                        expectedBreakpointHit: 1),
                     new TestStep(action: TestAction.ResumeProcess, expectedExitCode: 0),
                 }
             );
@@ -2668,15 +2669,15 @@ namespace NodejsTests.Debugger {
                 "TypeScriptTest2.js",
                 new[] {
                     new TestStep(action: TestAction.AddBreakpoint, 
-                        targetBreakpoint: 3, 
+                        targetBreakpoint: 2, 
                         targetBreakpointFile: "TypeScriptTest2.ts"),
-                    new TestStep(action: TestAction.ResumeThread, expectedEntryPointHit: 1),
+                    new TestStep(action: TestAction.ResumeThread, expectedEntryPointHit: 0),
                     new TestStep(action: TestAction.ResumeThread, 
                         expectedHitCount: 1, 
-                        targetBreakpoint: 3, 
+                        targetBreakpoint: 2, 
                         targetBreakpointFile: "TypeScriptTest2.ts", 
                         expectedBreakFunction: "Greeter.constructor",
-                        expectedBreakpointHit: 3),
+                        expectedBreakpointHit: 2),
                     new TestStep(action: TestAction.ResumeProcess, expectedExitCode: 0),
                 }
             );

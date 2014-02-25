@@ -61,6 +61,15 @@ namespace Microsoft.NodejsTools {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Debugger connection was closed..
+        /// </summary>
+        internal static string DebuggerConnectionClosed {
+            get {
+                return ResourceManager.GetString("DebuggerConnectionClosed", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Specifies the port used to communicate with the debugger.
         /// </summary>
         internal static string DebuggerPort {
