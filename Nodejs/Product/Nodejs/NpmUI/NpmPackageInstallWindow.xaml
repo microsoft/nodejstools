@@ -4,7 +4,9 @@
         xmlns:npmUi="clr-namespace:Microsoft.NodejsTools.NpmUI"
         Title="npm Package Manager"
         Height="500"
+        MinHeight="300"
         Width="600"
+        MinWidth="400"
         WindowStartupLocation="CenterOwner">
     <!-- Theming -->
     <Window.Resources>

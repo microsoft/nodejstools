@@ -15,11 +15,9 @@
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
-using System.Linq;
 using System.Runtime.CompilerServices;
 using System.Text;
 using System.Threading;
-using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Documents;
 using System.Windows.Media;
@@ -27,51 +25,15 @@ using Microsoft.NodejsTools.Npm;
 
 namespace Microsoft.NodejsTools.NpmUI {
     class NpmOutputControlViewModel : INotifyPropertyChanged, IDisposable {
-
-        private class QueuedNpmCommandInfo : EventArgs {
-
-            public QueuedNpmCommandInfo(
-                string arguments) {
-                Name = arguments;
-                IsFreeformArgumentCommand = true;
-            }
-
-            public QueuedNpmCommandInfo(
-                string name,
-                string version) {
-                Name = name;
-                Version = version;
-                IsGlobalInstall = true;
-                IsFreeformArgumentCommand = false;
-            }
-
-            public QueuedNpmCommandInfo(
-                string name,
-                string version,
-                DependencyType depType) : this(name, version) {
-                DependencyType = depType;
-                IsGlobalInstall = false;
-            }
-
-            public bool IsFreeformArgumentCommand { get; private set; }
-            public string Arguments {
-                get { return Name; }
-            }
-            public string Name { get; private set; }
-            public string Version { get; private set; }
-            public DependencyType DependencyType { get; private set; }
-            public bool IsGlobalInstall { get; private set; }
-        }
-
         private INpmController _npmController;
-        private Queue<QueuedNpmCommandInfo> _commandQueue = new Queue<QueuedNpmCommandInfo>();
+        private readonly Queue<QueuedNpmCommandInfo> _commandQueue = new Queue<QueuedNpmCommandInfo>();
         private readonly object _lock = new object();
         private bool _isDisposed;
         private string _statusText = Resources.NpmStatusReady;
         private bool _isExecutingCommand;
         private bool _withErrors;
-        private FlowDocument _output = new FlowDocument();
-        private Thread _worker;
+        private readonly FlowDocument _output = new FlowDocument();
+        private readonly Thread _worker;
         private QueuedNpmCommandInfo _currentCommand;
         private INpmCommander _commander;
         
@@ -374,6 +336,42 @@ namespace Microsoft.NodejsTools.NpmUI {
             _isDisposed = true;
             OutputWritten = null;
             Pulse();
+        }
+
+        private class QueuedNpmCommandInfo : EventArgs {
+
+            public QueuedNpmCommandInfo(
+                string arguments) {
+                Name = arguments;
+                IsFreeformArgumentCommand = true;
+            }
+
+            public QueuedNpmCommandInfo(
+                string name,
+                string version) {
+                Name = name;
+                Version = version;
+                IsGlobalInstall = true;
+                IsFreeformArgumentCommand = false;
+            }
+
+            public QueuedNpmCommandInfo(
+                string name,
+                string version,
+                DependencyType depType)
+                : this(name, version) {
+                DependencyType = depType;
+                IsGlobalInstall = false;
+            }
+
+            public bool IsFreeformArgumentCommand { get; private set; }
+            public string Arguments {
+                get { return Name; }
+            }
+            public string Name { get; private set; }
+            public string Version { get; private set; }
+            public DependencyType DependencyType { get; private set; }
+            public bool IsGlobalInstall { get; private set; }
         }
     }
 }

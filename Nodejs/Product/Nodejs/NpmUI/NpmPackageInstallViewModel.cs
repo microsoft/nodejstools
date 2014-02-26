@@ -52,11 +52,13 @@ namespace Microsoft.NodejsTools.NpmUI {
             }
         }
 
-        private const int IndexStandard = 0;
-        private const int IndexDev = 1;
-        private const int IndexOptional = 2;
-        private const int IndexGlobal = 3;
-
+        private enum Indices {
+            IndexStandard = 0,
+            IndexDev = 1,
+            IndexOptional = 2,
+            IndexGlobal = 3
+        }
+        
         private INpmController _npmController;
 
         private string _lastCatalogUpdateTimeMessage = string.Empty;
@@ -433,11 +435,6 @@ namespace Microsoft.NodejsTools.NpmUI {
             }
         }
 
-        //  Think this is redundant
-        //public string FullNpmArgumentText {
-            
-        //}
-
         public bool IsExecuteNpmWithArgumentsMode {
             get { return _isExecuteNpmWithArgumentsMode; }
             private set {
@@ -473,7 +470,7 @@ namespace Microsoft.NodejsTools.NpmUI {
 
         public Visibility GlobalWarningVisibility {
             get {
-                return IndexGlobal == SelectedDependencyTypeIndex
+                return Indices.IndexGlobal == (Indices) SelectedDependencyTypeIndex
                     ? Visibility.Visible
                     : Visibility.Hidden;
             }
@@ -485,16 +482,16 @@ namespace Microsoft.NodejsTools.NpmUI {
             } else if (null != _selectedPackage) {
                 var type = DependencyType.Standard;
                 var global = false;
-                switch (SelectedDependencyTypeIndex) {
-                    case IndexDev:
+                switch ((Indices) SelectedDependencyTypeIndex) {
+                    case Indices.IndexDev:
                         type = DependencyType.Development;
                         break;
 
-                    case IndexOptional:
+                    case Indices.IndexOptional:
                         type = DependencyType.Optional;
                         break;
 
-                    case IndexGlobal:
+                    case Indices.IndexGlobal:
                         global = true;
                         break;
                 }
