@@ -25,6 +25,7 @@ using Microsoft.NodejsTools.Debugger.Commands;
 using Microsoft.NodejsTools.Debugger.Communication;
 using Microsoft.NodejsTools.Debugger.Events;
 using Microsoft.NodejsTools.Debugger.Serialization;
+using Microsoft.VisualStudioTools.Project;
 
 namespace Microsoft.NodejsTools.Debugger {
     /// <summary>
@@ -1120,7 +1121,14 @@ namespace Microsoft.NodejsTools.Debugger {
                     args += " & if not errorlevel 1 pause";
                 }
                 args += "\"";
-                psi.FileName = Path.Combine(Environment.SystemDirectory, "cmd.exe");
+                var binaryType = NativeMethods.GetBinaryType(psi.FileName);
+                if (binaryType == System.Reflection.ProcessorArchitecture.Amd64) {
+                    // VS wants the binary we launch to match in bitness to the Node.exe
+                    // we're requesting it to launch.
+                    psi.FileName = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.Windows), "Sysnative", "cmd.exe");
+                } else {
+                    psi.FileName = Path.Combine(Environment.SystemDirectory, "cmd.exe");
+                }
                 psi.Arguments = args;
             }
         }
