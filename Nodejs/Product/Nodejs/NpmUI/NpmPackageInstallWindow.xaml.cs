@@ -38,6 +38,8 @@ namespace Microsoft.NodejsTools.NpmUI {
         }
 
         private void _packageList_OnMouseDoubleClick(object sender, MouseButtonEventArgs e) {
+            //var source = e.OriginalSource;
+
             var vm = DataContext as NpmPackageInstallViewModel;
             if (null != vm) {
                 var cmd = vm.InstallCommand;
