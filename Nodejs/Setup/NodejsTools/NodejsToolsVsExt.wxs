@@ -295,11 +295,11 @@
               <Condition>VWD_EXTENSION_INSTALLPATH</Condition>
             </Component>
 
-            <Component Directory="DIR_NewItem" Guid="{0CAB0566-88D4-4955-A10B-F1C41F40FA5E}">
-              <File Id="fil_FileTemplates_NewItem_UnitTestJS" KeyPath="yes" Source="$(var.BinariesDir)\FileTemplates\NewItem\UnitTest.js" />
+            <Component Directory="DIR_NewItem" Guid="{21AFA4F2-E0B2-46D5-92DB-8B988A8ECAD7}">
+              <File Id="fil_ItemTemplates_JavaScript_UnitTest" KeyPath="yes" Source="$(var.BinariesDir)\ItemTemplates\JavaScript\UnitTest.zip" />
             </Component>
-            <Component Directory="DIR_VWD_NewItem" Guid="{DFBC4713-F04B-4C2A-9851-C9446BE9C686}">
-              <File Id="filVWD_FileTemplates_NewItem_UnitTestJS" KeyPath="yes" Source="$(var.BinariesDir)\FileTemplates\NewItem\UnitTest.js" />
+            <Component Directory="DIR_VWD_NewItem" Guid="{DFC03E6F-D42F-4216-933B-00410A38A486}">
+              <File Id="filVWD_ItemTemplates_JavaScript_UnitTest" KeyPath="yes" Source="$(var.BinariesDir)\ItemTemplates\JavaScript\UnitTest.zip" />
               <Condition>VWD_EXTENSION_INSTALLPATH</Condition>
             </Component>
 

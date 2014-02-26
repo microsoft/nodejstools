@@ -60,13 +60,8 @@ namespace Microsoft.NodejsTools.Debugger.DebugEngine {
             }
 
             if (dwFields.HasFlag(enum_DEBUGPROP_INFO_FLAGS.DEBUGPROP_INFO_VALUE)) {
-                if (!string.IsNullOrEmpty(_evaluationResult.ExceptionText)) {
-                    propertyInfo.bstrValue = _evaluationResult.ExceptionText;
-                } else {
-                    string value = radix == 16 ? _evaluationResult.HexValue ?? _evaluationResult.StringValue : _evaluationResult.StringValue;
-                    propertyInfo.bstrValue = _evaluationResult.Type.HasFlag(NodeExpressionType.String) ? string.Format("\"{0}\"", value) : value;
-                }
-
+                string value = radix == 16 ? _evaluationResult.HexValue ?? _evaluationResult.StringValue : _evaluationResult.StringValue;
+                propertyInfo.bstrValue = _evaluationResult.Type.HasFlag(NodeExpressionType.String) ? string.Format("\"{0}\"", value) : value;
                 propertyInfo.dwFields |= enum_DEBUGPROP_INFO_FLAGS.DEBUGPROP_INFO_VALUE;
             }
 

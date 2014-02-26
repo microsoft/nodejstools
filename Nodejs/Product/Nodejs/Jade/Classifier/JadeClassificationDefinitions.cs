@@ -65,25 +65,50 @@ namespace Microsoft.NodejsTools.Jade {
         }
         #endregion
 
-        #region JadeSelector
+        #region JadeClassLiteral
+
         [Export(typeof(ClassificationTypeDefinition))]
-        [Name(JadeClassificationTypes.Selector), Export]
-        internal ClassificationTypeDefinition SelectorClassificationType {
+        [Name(JadeClassificationTypes.ClassLiteral), Export]
+        internal ClassificationTypeDefinition ClassLiteralClassificationType {
             get;
             set;
         }
 
         [Export(typeof(EditorFormatDefinition))]
         [UserVisible(true)]
-        [ClassificationType(ClassificationTypeNames = JadeClassificationTypes.Selector)]
-        [Name("JadeSelectorFormatDefinition")]
+        [ClassificationType(ClassificationTypeNames = JadeClassificationTypes.ClassLiteral)]
+        [Name("JadeClassLiteralFormatDefinition")]
         [Order]
-        internal sealed class SelectorClassificationFormat : ClassificationFormatDefinition {
-            internal SelectorClassificationFormat() {
-                ForegroundColor = Colors.OliveDrab;
-                this.DisplayName = "Jade Selector";
+        internal sealed class ClassLiteralClassificationFormat : ClassificationFormatDefinition {
+            internal ClassLiteralClassificationFormat() {
+                ForegroundColor = new Color() { R = 255, G = 128, B = 0 };
+                this.DisplayName = "Jade Class Literal";
             }
         }
+
+        #endregion
+
+        #region JadeIdLiteral
+
+        [Export(typeof(ClassificationTypeDefinition))]
+        [Name(JadeClassificationTypes.IdLiteral), Export]
+        internal ClassificationTypeDefinition IdLiteralClassificationType {
+            get;
+            set;
+        }
+
+        [Export(typeof(EditorFormatDefinition))]
+        [UserVisible(true)]
+        [ClassificationType(ClassificationTypeNames = JadeClassificationTypes.IdLiteral)]
+        [Name("JadeIdLiteralFormatDefinition")]
+        [Order]
+        internal sealed class IdLiteralClassificationFormat : ClassificationFormatDefinition {
+            internal IdLiteralClassificationFormat() {
+                ForegroundColor = Colors.Maroon;
+                this.DisplayName = "Jade Id Literal";
+            }
+        }
+
         #endregion
 
         #region JadeVariable

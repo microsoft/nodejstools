@@ -15,6 +15,7 @@
 using System;
 using System.Collections.Concurrent;
 using System.Diagnostics;
+using System.IO;
 using System.Threading;
 using System.Threading.Tasks;
 using Microsoft.NodejsTools.Debugger.Commands;
@@ -26,7 +27,7 @@ namespace Microsoft.NodejsTools.Debugger.Communication {
     sealed class DebuggerClient : IDebuggerClient {
         private readonly IDebuggerConnection _connection;
 
-        private readonly ConcurrentDictionary<int, TaskCompletionSource<JObject>> _messages =
+        private ConcurrentDictionary<int, TaskCompletionSource<JObject>> _messages =
             new ConcurrentDictionary<int, TaskCompletionSource<JObject>>();
 
         public DebuggerClient(IDebuggerConnection connection) {
@@ -34,6 +35,7 @@ namespace Microsoft.NodejsTools.Debugger.Communication {
 
             _connection = connection;
             _connection.OutputMessage += OnOutputMessage;
+            _connection.ConnectionClosed += OnConnectionClosed;
         }
 
         /// <summary>
@@ -73,6 +75,21 @@ namespace Microsoft.NodejsTools.Debugger.Communication {
         /// Exception event handler.
         /// </summary>
         public event EventHandler<ExceptionEventArgs> ExceptionEvent;
+
+        /// <summary>
+        /// Handles disconnect from debugger.
+        /// </summary>
+        /// <param name="sender">Sender.</param>
+        /// <param name="e">Event arguments.</param>
+        private void OnConnectionClosed(object sender, EventArgs e) {
+            ConcurrentDictionary<int, TaskCompletionSource<JObject>> messages = Interlocked.Exchange(ref _messages, new ConcurrentDictionary<int, TaskCompletionSource<JObject>>());
+            foreach (var kv in messages) {
+                var exception = new IOException(Resources.DebuggerConnectionClosed);
+                kv.Value.SetException(exception);
+            }
+
+            messages.Clear();
+        }
 
         /// <summary>
         /// Process message from debugger connection.
@@ -148,7 +165,7 @@ namespace Microsoft.NodejsTools.Debugger.Communication {
         private void HandleResponseMessage(JObject message) {
             TaskCompletionSource<JObject> promise;
             var messageId = (int)message["request_seq"];
-            
+
             if (_messages.TryGetValue(messageId, out promise)) {
                 promise.SetResult(message);
             } else {

@@ -26,10 +26,11 @@ namespace TestUtilities.UI
         {
             get
             {
-                return (((TextPattern)Element.GetCurrentPattern(TextPattern.Pattern)).DocumentRange.GetText(-1).ToString());
+                return Element.GetTextPattern().DocumentRange.GetText(-1);
             }
-            set {
-                ((ValuePattern)Element.GetCurrentPattern(ValuePattern.Pattern)).SetValue(value);
+            set
+            {
+                Element.GetValuePattern().SetValue(value);
             }
         }
     }

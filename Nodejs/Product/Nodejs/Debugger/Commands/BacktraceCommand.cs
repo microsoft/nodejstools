@@ -53,6 +53,7 @@ namespace Microsoft.NodejsTools.Debugger.Commands {
 
             JToken body = response["body"];
             CallstackDepth = (int)body["totalFrames"];
+            StackFrames = new List<NodeStackFrame>();
 
             // Should not collect stack frames without debugger
             if (_debugger == null) {
@@ -60,27 +61,23 @@ namespace Microsoft.NodejsTools.Debugger.Commands {
             }
 
             // Extract scripts (if not provided)
-            Dictionary<int, NodeModule> modules = GetScripts((JArray)response["refs"], _debugger);
+            Modules = GetScripts((JArray)response["refs"], _debugger);
 
             // Extract frames
-            var frames = (JArray)body["frames"];
-            if (frames == null) {
-                return;
-            }
-
+            var frames = (JArray)body["frames"] ?? new JArray();
             var results = new List<NodeStackFrame>(frames.Count);
             foreach (JToken frame in frames) {
                 // Create stack frame
                 string name = GetFrameName(frame);
-                var moduleId = (int)frame["func"]["scriptId"];
+                var moduleId = (int?)frame["func"]["scriptId"];
 
                 NodeModule module;
-                if (!modules.TryGetValue(moduleId, out module)) {
+                if (!moduleId.HasValue || !Modules.TryGetValue(moduleId.Value, out module)) {
                     module = _unknownModule;
                 }
 
-                int line = (int)frame["line"];
-                var stackFrameId = (int)frame["index"];
+                int line = (int?)frame["line"] ?? 0;
+                int stackFrameId = (int?)frame["index"] ?? 0;
                 var stackFrame = new NodeStackFrame(_debugger, module, name, line, line, line, stackFrameId);
 
                 // Locals
@@ -94,11 +91,8 @@ namespace Microsoft.NodejsTools.Debugger.Commands {
                 stackFrame.Locals = locals;
                 stackFrame.Parameters = parameters;
 
-                results.Add(stackFrame);
+                StackFrames.Add(stackFrame);
             }
-
-            Modules = modules;
-            StackFrames = results;
         }
 
         private List<NodeEvaluationResult> GetVariables(NodeStackFrame stackFrame, IEnumerable<JToken> variables) {

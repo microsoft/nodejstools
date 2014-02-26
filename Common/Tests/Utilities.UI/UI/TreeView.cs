@@ -24,10 +24,7 @@ namespace TestUtilities.UI {
             : base(element) {
         }
 
-        /// <summary>
-        /// Waits for the item in the solution tree to be available for up to 10 seconds.
-        /// </summary>
-        public AutomationElement WaitForItem(params string[] path) {
+        protected AutomationElement WaitForItemHelper(Func<string[], AutomationElement> getItem, string[] path) {
             AutomationElement item = null;
             for (int i = 0; i < 40; i++) {
                 item = FindItem(path);
@@ -46,10 +43,14 @@ namespace TestUtilities.UI {
         /// <summary>
         /// Waits for the item in the solution tree to be available for up to 10 seconds.
         /// </summary>
-        public AutomationElement WaitForItemRemoved(params string[] path) {
+        public AutomationElement WaitForItem(params string[] path) {
+            return WaitForItemHelper(FindItem, path);
+        }
+
+        protected AutomationElement WaitForItemRemovedHelper(Func<string[], AutomationElement> getItem, string[] path) {
             AutomationElement item = null;
             for (int i = 0; i < 40; i++) {
-                item = FindItem(path);
+                item = getItem(path);
                 if (item == null) {
                     break;
                 }
@@ -57,6 +58,14 @@ namespace TestUtilities.UI {
             }
             return item;
         }
+
+        /// <summary>
+        /// Waits for the item in the solution tree to be removed within 10 seconds.
+        /// </summary>
+        public AutomationElement WaitForItemRemoved(params string[] path) {
+            return WaitForItemRemovedHelper(FindItem, path);
+        }
+
 
         /// <summary>
         /// Finds the specified item in the solution tree and returns it.
@@ -67,7 +76,7 @@ namespace TestUtilities.UI {
             return FindNode(Element.FindAll(TreeScope.Children, Condition.TrueCondition), path, 0);
         }
 
-        private static AutomationElement FindNode(AutomationElementCollection nodes, string[] splitPath, int depth) {
+        protected static AutomationElement FindNode(AutomationElementCollection nodes, string[] splitPath, int depth) {
             for (int i = 0; i < nodes.Count; i++) {
                 var node = nodes[i];
                 var name = node.GetCurrentPropertyValue(AutomationElement.NameProperty) as string;
@@ -92,10 +101,8 @@ namespace TestUtilities.UI {
         /// <summary>
         /// return all visible nodes
         /// </summary>
-        public List<TreeNode> Nodes
-        {
-            get
-            {
+        public List<TreeNode> Nodes {
+            get {
                 return Element.FindAll(
                     TreeScope.Children,
                     new PropertyCondition(AutomationElement.ControlTypeProperty, ControlType.TreeItem)
@@ -103,6 +110,43 @@ namespace TestUtilities.UI {
                     .OfType<AutomationElement>()
                     .Select(e => new TreeNode(e))
                     .ToList();
+            }
+        }
+
+        /// <summary>
+        /// Gets or sets a single selected item or null if no item is selected.
+        /// </summary>
+        /// <exception cref="InvalidOperationException">
+        /// Multiple items are selected.
+        /// </exception>
+        public TreeNode SelectedItem {
+            get {
+                var selected = Element.GetSelectionPattern().Current.GetSelection().SingleOrDefault();
+                return selected == null ? null : new TreeNode(selected);
+            }
+            set {
+                foreach (var selected in Element.GetSelectionPattern().Current.GetSelection()) {
+                    selected.GetSelectionItemPattern().RemoveFromSelection();
+                }
+                if (value != null) {
+                    value.Select();
+                }
+            }
+        }
+
+        public IList<TreeNode> SelectedItems {
+            get {
+                return Element.GetSelectionPattern().Current.GetSelection().Select(e => new TreeNode(e)).ToArray();
+            }
+            set {
+                foreach (var selected in Element.GetSelectionPattern().Current.GetSelection()) {
+                    selected.GetSelectionItemPattern().RemoveFromSelection();
+                }
+                if (value != null) {
+                    foreach (var item in value) {
+                        item.Select();
+                    }
+                }
             }
         }
 
@@ -129,7 +173,7 @@ namespace TestUtilities.UI {
             var lowHeight = treeBounds.Height / 2 - 10;
             var highHeight = treeBounds.Height / 2 + 10;
 
-            var scroll = (ScrollPattern)Element.GetCurrentPattern(ScrollPattern.Pattern);
+            var scroll = Element.GetScrollPattern();
             if (!scroll.Current.VerticallyScrollable) {
                 return;
             }

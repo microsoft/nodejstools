@@ -56,7 +56,22 @@ namespace Microsoft.NodejsTools.ProjectWizard {
                 );
 
                 System.Threading.Tasks.Task.Factory.StartNew(() => {
-                    object inObj = null, outObj = null;
+                    string projName = replacementsDictionary["$projectname$"];
+                    string solnName = replacementsDictionary["$specifiedsolutionname$"];
+                    string directory;
+                    if (String.IsNullOrWhiteSpace(solnName)) {
+                        // Create directory is unchecked, destinationdirectory is the
+                        // directory name the user entered plus the project name, we want
+                        // to remove the project name.
+                        directory = Path.GetDirectoryName(replacementsDictionary["$destinationdirectory$"]);
+                    } else {
+                        // Create directory is checked, the destinationdirectory is the
+                        // directory the user entered plus the project name plus the
+                        // solution name - we want to remove both extra folders
+                        directory = Path.GetDirectoryName(Path.GetDirectoryName(replacementsDictionary["$destinationdirectory$"]));
+                    }
+
+                    object inObj = projName + "|" + directory, outObj = null;
                     dte.Commands.Raise(Guids.NodejsCmdSet.ToString("B"), (int)PkgCmdId.cmdidImportWizard, ref inObj, ref outObj);
                 });
             }

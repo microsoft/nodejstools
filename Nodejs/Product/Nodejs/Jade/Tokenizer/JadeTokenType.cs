@@ -26,7 +26,8 @@ namespace Microsoft.NodejsTools.Jade {
         Filter,
         CodeKeyword,     // if, each, else, ...
         TagKeyword,      // stylesheets:, javascripts:, as:
-        JadeSelector,    // '#fob.baz in div#fob.baz
+        IdLiteral,      // a#foo    <a id="foo"></a> or #foo <div id="foo"></div>
+        ClassLiteral,   // a.button <a class="button"></a>
         CssSelector,        // CSS selector
         CssPropertyName,    // CSS property name
         CssPropertyValue,   // CSS property value

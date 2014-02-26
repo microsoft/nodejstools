@@ -99,21 +99,20 @@ namespace Microsoft.NodejsTools.TestAdapter {
             }
         }
 
-        private static IEnumerable<string> GetProjectItems(IVsProject project) {
+        private static IEnumerable<uint> GetProjectItemIds(IVsProject project) {
             var hierarchy = (IVsHierarchy)project;
-            return GetProjectItems(hierarchy, VSConstants.VSITEMID_ROOT);
+            return GetProjectItemIds(hierarchy, VSConstants.VSITEMID_ROOT);
         }
 
-        private static IEnumerable<string> GetProjectItems(IVsHierarchy project, uint itemId) {
+        private static IEnumerable<uint> GetProjectItemIds(IVsHierarchy project, uint itemId) {
             object pVar = GetPropertyValue((int)__VSHPROPID.VSHPROPID_FirstChild, itemId, project);
 
             uint childId = GetItemId(pVar);
             while (childId != VSConstants.VSITEMID_NIL) {
-                string childPath = GetCanonicalName(childId, project);
-                yield return childPath;
+                yield return childId;
 
-                foreach (var childNodePath in GetProjectItems(project, childId))
-                    yield return childNodePath;
+                foreach (var childNodePathId in GetProjectItemIds(project, childId))
+                    yield return childNodePathId;
 
                 pVar = GetPropertyValue((int)__VSHPROPID.VSHPROPID_NextSibling, childId, project);
                 childId = GetItemId(pVar);
@@ -147,23 +146,50 @@ namespace Microsoft.NodejsTools.TestAdapter {
             }
             return null;            
         }
+        
+        internal bool IsTestFile(string pathToFile) {
+            if (!".js".Equals(Path.GetExtension(pathToFile), StringComparison.OrdinalIgnoreCase)) {
+                return false;
+            }
+            IVsProject project = GetTestProjectFromFile(pathToFile);
+            Debug.Assert(project != null);
 
-        public static string GetCanonicalName(uint itemId, IVsHierarchy hierarchy) {
-            string strRet = string.Empty;
-            int hr = hierarchy.GetCanonicalName(itemId, out strRet);
+            uint itemId; 
+            ErrorHandler.Succeeded(((IVsHierarchy)project).ParseCanonicalName(pathToFile, out itemId));
 
-            Debug.Assert(hr == VSConstants.S_OK);
-            return strRet;            
+            return IsTestFile(itemId, project);
         }
 
-        private IEnumerable<string> FindJavaScriptTestItems(IVsProject project) {
-            return from item in GetProjectItems(project)
-                   where IsTestFile(item)
-                   select item;
-        }
+        private static bool IsTestFile(uint itemId, IVsProject project) {
+            IVsHierarchy hierarchy = project as IVsHierarchy;
 
-        static internal bool IsTestFile(string path) {
-            return ".js".Equals(Path.GetExtension(path), StringComparison.OrdinalIgnoreCase);
+            if (hierarchy == null) {
+                return false;
+            }
+            object extObject;
+            hierarchy.GetProperty(itemId, (int)__VSHPROPID.VSHPROPID_ExtObject, out extObject);
+
+            var projectItem = extObject as EnvDTE.ProjectItem;
+            if (projectItem == null) {
+                return false;
+            }
+
+            var props = projectItem.Properties;
+            if (props == null) {
+                return false;
+            }
+            try {
+                var testFile = props.Item("HasTests");
+                if (testFile == null) {
+                    return false;
+                }
+
+                return (bool)testFile.Value;
+            } catch (ArgumentException) {
+                //If we can't retrieve the property then consider this not to be a Test file
+            }
+            return false;           
+            
         }
 
         private void OperationStateChanged(object sender, OperationStateChangedEventArgs e) {

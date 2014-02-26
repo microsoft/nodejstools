@@ -16,7 +16,8 @@ namespace Microsoft.NodejsTools.Jade {
     internal class JadeClassificationTypes {
         public const string Filter = "JadeFilter";
         public const string Keyword = "JadeKeyword"; // break case do ...
-        public const string Selector = "JadeSelector"; // class const extends imports
         public const string Variable = "JadeVariable"; // #{foo}
+        public const string ClassLiteral = "JadeClassLiteral"; // a.foo
+        public const string IdLiteral = "JadeIdLiteral"; // a#foo
     }
 }

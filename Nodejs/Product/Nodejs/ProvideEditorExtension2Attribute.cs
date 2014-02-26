@@ -14,7 +14,10 @@
 
 using System;
 using System.Globalization;
+using System.IO;
 using Microsoft.VisualStudio.Shell;
+using Microsoft.VisualStudioTools;
+using Microsoft.VisualStudio.Shell.Interop;
 
 namespace Microsoft.NodejsTools {
 
@@ -35,10 +38,12 @@ namespace Microsoft.NodejsTools {
         private Guid _project;
         private string _templateDir;
         private int _resId;
+        private int _editorNameResId;
         private bool _editorFactoryNotify;
         private string _editorName;
         private Guid _linkedEditorGuid;
         private readonly string[] _extensions;
+        private __VSPHYSICALVIEWATTRIBUTES _commonViewAttrs;
 
         /// <include file='doc\ProvideEditorExtensionAttribute.uex' path='docs/doc[@for="ProvideEditorExtensionAttribute.ProvideEditorExtensionAttribute"]' />
         /// <devdoc>
@@ -63,6 +68,13 @@ namespace Microsoft.NodejsTools {
             _editorFactoryNotify = false;
             _extensions = extensions;
         }
+
+#if DEV11_OR_LATER
+        public ProvideEditorExtension2Attribute(object factoryType, string extension, int priority, __VSPHYSICALVIEWATTRIBUTES commonViewAttributes, params string[] extensions) :
+            this(factoryType, extension, priority, extensions) {
+            _commonViewAttrs = commonViewAttributes;
+        }
+#endif
 
         /// <include file='doc\ProvideEditorExtensionAttribute.uex' path='docs/doc[@for="ProvideEditorExtensionAttribute.Extension"]' />
         /// <devdoc>
@@ -105,6 +117,12 @@ namespace Microsoft.NodejsTools {
             set { _linkedEditorGuid = new System.Guid(value); }
         }
 
+        public __VSPHYSICALVIEWATTRIBUTES CommonPhysicalViewAttributes {
+            get {
+                return _commonViewAttrs;
+            }
+        }
+
         /// <include file='doc\ProvideEditorExtensionAttribute.uex' path='docs/doc[@for="ProvideEditorExtensionAttribute.EditorFactoryNotify"]/*' />
         public bool EditorFactoryNotify {
             get { return this._editorFactoryNotify; }
@@ -121,6 +139,11 @@ namespace Microsoft.NodejsTools {
         public int NameResourceID {
             get { return _resId; }
             set { _resId = value; }
+        }
+
+        public int EditorNameResourceId {
+            get { return _editorNameResId; }
+            set { _editorNameResId = value; }
         }
 
         /// <include file='doc\ProvideEditorExtensionAttribute.uex' path='docs/doc[@for="ProvideEditorExtensionAttribute.DefaultName"]/*' />
@@ -170,10 +193,15 @@ namespace Microsoft.NodejsTools {
                 if (!string.IsNullOrEmpty(DefaultName)) {
                     editorKey.SetValue(null, DefaultName);
                 }
-                if (0 != _resId)
+                if (0 != _editorNameResId)
+                    editorKey.SetValue("DisplayName", "#" + _editorNameResId.ToString(CultureInfo.InvariantCulture));
+                else if (0 != _resId)
                     editorKey.SetValue("DisplayName", "#" + _resId.ToString(CultureInfo.InvariantCulture));
                 if (_linkedEditorGuid != Guid.Empty) {
                     editorKey.SetValue("LinkedEditorGuid", _linkedEditorGuid.ToString("B"));
+                }
+                if (_commonViewAttrs != 0) {
+                    editorKey.SetValue("CommonPhysicalViewAttributes", (int)_commonViewAttrs);
                 }
                 editorKey.SetValue("Package", context.ComponentType.GUID.ToString("B"));
             }
@@ -203,8 +231,8 @@ namespace Microsoft.NodejsTools {
                     if (_templateDir.Length != 0) {
                         Uri url = new Uri(context.ComponentType.Assembly.CodeBase);
                         string templates = url.LocalPath;
-                        templates = System.IO.Path.Combine(System.IO.Path.GetDirectoryName(templates), _templateDir);
-                        templates = context.EscapePath(System.IO.Path.GetFullPath(templates));
+                        templates = CommonUtils.GetAbsoluteDirectoryPath(Path.GetDirectoryName(templates), _templateDir);
+                        templates = context.EscapePath(templates);
                         projectKey.SetValue("TemplatesDir", templates);
                     }
                     projectKey.SetValue("SortPriority", Priority);

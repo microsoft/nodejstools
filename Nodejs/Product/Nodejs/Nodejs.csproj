@@ -270,6 +270,7 @@
     <Compile Include="Debugger\Serialization\NodeSetValueVariable.cs" />
     <Compile Include="Debugger\SourceMapper.cs" />
     <Compile Include="Debugger\SteppingKind.cs" />
+    <Compile Include="Project\NodejsFileNodeProperties.cs" />
     <Compile Include="Formatting\AddNamedItemFlags.cs" />
     <Compile Include="Formatting\ArrayHelper.cs" />
     <Compile Include="Formatting\ByteOrderMark.cs" />
@@ -287,6 +288,7 @@
     <Compile Include="Formatting\TypeScriptLanguageService.cs" />
     <Compile Include="Formatting\TypeScriptServiceHost.cs" />
     <Compile Include="Formatting\TypeScriptSnapshot.cs" />
+    <Compile Include="Jade\JadeEditorFactory.cs" />
     <Compile Include="Options\NodejsFormattingBracesOptionsPage.cs">
       <SubType>Component</SubType>
     </Compile>
@@ -713,10 +715,6 @@
       <IncludeInVSIX>true</IncludeInVSIX>
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
-    <Content Include="FileTemplates\NewItem\UnitTest.js">
-      <IncludeInVSIX>true</IncludeInVSIX>
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </Content>
     <Content Include="Formatting\typescriptServices.js">
       <IncludeInVSIX>true</IncludeInVSIX>
       <VSIXSubpath>.</VSIXSubpath>
@@ -832,6 +830,8 @@
     <MultiProjectZipProject Include="ProjectTemplates\AzureNodejsWorker\Cloud\Cloud.ccproj">
       <SubType>Designer</SubType>
     </MultiProjectZipProject>
+    <ZipItem Include="Templates\Files\UnitTest\UnitTest.js" />
+    <ZipItem Include="Templates\Files\UnitTest\UnitTest.vstemplate" />
     <Content Include="VSTemplateStore.pkgdef">
       <IncludeInVSIX>true</IncludeInVSIX>
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>

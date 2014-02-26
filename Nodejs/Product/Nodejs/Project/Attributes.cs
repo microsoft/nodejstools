@@ -20,6 +20,9 @@ using CommonSR = Microsoft.VisualStudioTools.Project.SR;
 
 namespace Microsoft.NodejsTools.Project {
     internal class SR : CommonSR {
+
+        internal const string HasTests = "HasTests";
+        internal const string HasTestsDescription = "HasTestsDescription";
         internal const string NodeExeArguments = "NodeExeArguments";
         internal const string NodeExeArgumentsDescription = "NodeExeArgumentsDescription";
         internal const string NodeExePath = "NodeExePath";

@@ -38,7 +38,7 @@ namespace Microsoft.Nodejs.Tests.UI {
                 newItem.FileName = "NewTSFile.ts";
                 newItem.ClickOK();
 
-                VsIdeTestHostContext.Dte.ExecuteCommand("Build.BuildSolution");
+                solution.App.ExecuteCommand("Build.BuildSolution");
                 solution.App.WaitForOutputWindowText("Build", "tsc.exe");
             }
         }

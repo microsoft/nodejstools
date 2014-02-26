@@ -462,7 +462,7 @@ namespace Microsoft.NodejsTools.Project {
         public override object GetIconHandle(bool open) {
             //We don't want the icon to become an expanded folder 'OpenReferenceFolder'
             //  Thus we always return 'ReferenceFolder'
-            return ProjectMgr.GetIconHandleByName(ProjectNode.ImageName.ReferenceFolder);              
+            return ProjectMgr.GetIconHandleByName(ProjectNode.ImageName.ReferenceFolder);
         }
 
         public override string Url {
@@ -555,7 +555,7 @@ namespace Microsoft.NodejsTools.Project {
 
         public void ManageModules() {
             CheckNotDisposed();
-            
+
             if (NpmController.RootPackage == null) {
                 NpmController.Refresh();
                 if (NpmController.RootPackage == null) {

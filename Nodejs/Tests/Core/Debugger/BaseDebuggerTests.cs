@@ -49,21 +49,10 @@ namespace NodejsTests.Debugger {
             int line,
             bool enabled = true,
             BreakOn breakOn = new BreakOn(),
-            string condition = "",
-            Action<NodeBreakpointBinding> successHandler = null,
-            Action failureHandler = null
+            string condition = ""
         ) {
             NodeBreakpoint breakPoint = newproc.AddBreakPoint(fileName, line, enabled, breakOn, condition);
-            var breakpointBinding = breakPoint.BindAsync().Result;
-            if (breakpointBinding != null) {
-                if (successHandler != null) {
-                    successHandler(breakpointBinding);
-                }
-            } else {
-                if (failureHandler != null) {
-                    failureHandler();
-                }
-            }
+            breakPoint.BindAsync().Wait();
             return breakPoint;
         }
 
@@ -259,15 +248,26 @@ namespace NodejsTests.Debugger {
             string expectedFrame = null
         ) {
             var frame = thread.Frames[frameIndex];
-            NodeEvaluationResult evaluationResult = frame.ExecuteTextAsync(expression).Result;
+            NodeEvaluationResult evaluationResult = null;
+            AggregateException exception = null;
+            
+            try {
+                evaluationResult = frame.ExecuteTextAsync(expression).Result;
+            } catch (AggregateException ae) {
+                exception = ae;
+            }
+            
             if (expectedType != null) {
+                Assert.IsNotNull(evaluationResult);
                 Assert.AreEqual(expectedType, evaluationResult.TypeName);
             }
             if (expectedValue != null) {
+                Assert.IsNotNull(evaluationResult);
                 Assert.AreEqual(expectedValue, evaluationResult.StringValue);
             }
             if (expectedException != null) {
-                Assert.AreEqual(expectedException, evaluationResult.ExceptionText);
+                Assert.IsNotNull(exception);
+                Assert.AreEqual(expectedException, exception.GetBaseException().Message);
             }
             if (expectedFrame != null) {
                 Assert.AreEqual(expectedFrame, frame.FunctionName);
@@ -470,8 +470,6 @@ namespace NodejsTests.Debugger {
             }
 
             Dictionary<Breakpoint, NodeBreakpoint> breakpoints = new Dictionary<Breakpoint, NodeBreakpoint>();
-            AutoResetEvent breakpointBindSuccessHandled = new AutoResetEvent(false);
-            AutoResetEvent breakpointBindFailureHandled = new AutoResetEvent(false);
 
             AutoResetEvent entryPointHit = new AutoResetEvent(false);
             process.EntryPointHit += (sender, e) => {
@@ -586,28 +584,16 @@ namespace NodejsTests.Debugger {
                                 breakpointLine,
                                 step._enabled ?? true,
                                 step._breakOn ?? new BreakOn(),
-                                step._condition,
-                                successHandler: (breakpointBinding) => {
-                                    breakpointBindSuccessHandled.Set();
-                                },
-                                failureHandler: () => {
-                                    breakpointBindFailureHandled.Set();
-                                }
+                                step._condition
                             );
                         if (step._expectFailure) {
                             AssertWaited(breakpointBindFailure);
-                            AssertWaited(breakpointBindFailureHandled);
                             AssertNotSet(breakpointBound);
-                            AssertNotSet(breakpointBindSuccessHandled);
                             breakpointBindFailure.Reset();
-                            breakpointBindFailureHandled.Reset();
                         } else {
                             AssertWaited(breakpointBound);
-                            AssertWaited(breakpointBindSuccessHandled);
                             AssertNotSet(breakpointBindFailure);
-                            AssertNotSet(breakpointBindFailureHandled);
                             breakpointBound.Reset();
-                            breakpointBindSuccessHandled.Reset();
                         }
                         break;
                     case TestAction.RemoveBreakpoint:

@@ -107,7 +107,7 @@
       Returns="@(SourceFilesProjectOutputGroupOutput)"
       DependsOnTargets="$(SourceFilesProjectOutputGroupDependsOn)">
 
-    <AssignTargetPath Files="@(Compile);@(Content)" RootFolder="$(MSBuildProjectDirectory)">
+    <AssignTargetPath Files="@(Compile);@(Content);@(TypeScriptCompile)" RootFolder="$(MSBuildProjectDirectory)">
       <Output TaskParameter="AssignedFiles" ItemName="_CompileWithTargetPath" />
     </AssignTargetPath>
     <Message Text="Running SourceFilesProjectOutputGroup" Importance="high"/>

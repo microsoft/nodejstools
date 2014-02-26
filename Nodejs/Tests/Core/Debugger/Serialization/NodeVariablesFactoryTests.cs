@@ -41,7 +41,6 @@ namespace NodejsTests.Debugger.Serialization {
 
             // Assert
             Assert.IsNotNull(result);
-            Assert.IsNull(result.ExceptionText);
             Assert.AreEqual(variable.Name, result.Expression);
             Assert.IsNull(result.Frame);
             Assert.AreEqual(variable.Name, result.FullName);
@@ -73,7 +72,6 @@ namespace NodejsTests.Debugger.Serialization {
 
             // Assert
             Assert.IsNotNull(result);
-            Assert.IsNull(result.ExceptionText);
             Assert.AreEqual(variable.Name, result.Expression);
             Assert.IsNull(result.Frame);
             Assert.AreEqual(variable.Name, result.FullName);
@@ -105,7 +103,6 @@ namespace NodejsTests.Debugger.Serialization {
 
             // Assert
             Assert.IsNotNull(result);
-            Assert.IsNull(result.ExceptionText);
             Assert.AreEqual(variable.Name, result.Expression);
             Assert.IsNull(result.Frame);
             Assert.AreEqual(variable.Name, result.FullName);
@@ -137,7 +134,6 @@ namespace NodejsTests.Debugger.Serialization {
 
             // Assert
             Assert.IsNotNull(result);
-            Assert.IsNull(result.ExceptionText);
             Assert.AreEqual(variable.Name, result.Expression);
             Assert.IsNull(result.Frame);
             Assert.AreEqual(variable.Name, result.FullName);
@@ -169,7 +165,6 @@ namespace NodejsTests.Debugger.Serialization {
 
             // Assert
             Assert.IsNotNull(result);
-            Assert.IsNull(result.ExceptionText);
             Assert.AreEqual(variable.Name, result.Expression);
             Assert.IsNull(result.Frame);
             Assert.AreEqual(variable.Name, result.FullName);
@@ -200,7 +195,6 @@ namespace NodejsTests.Debugger.Serialization {
 
             // Assert
             Assert.IsNotNull(result);
-            Assert.IsNull(result.ExceptionText);
             Assert.AreEqual(variable.Name, result.Expression);
             Assert.IsNull(result.Frame);
             Assert.AreEqual(variable.Name, result.FullName);
@@ -231,7 +225,6 @@ namespace NodejsTests.Debugger.Serialization {
 
             // Assert
             Assert.IsNotNull(result);
-            Assert.IsNull(result.ExceptionText);
             Assert.AreEqual(variable.Name, result.Expression);
             Assert.IsNull(result.Frame);
             Assert.AreEqual(variable.Name, result.FullName);
@@ -263,7 +256,6 @@ namespace NodejsTests.Debugger.Serialization {
 
             // Assert
             Assert.IsNotNull(result);
-            Assert.IsNull(result.ExceptionText);
             Assert.AreEqual(variable.Name, result.Expression);
             Assert.IsNull(result.Frame);
             Assert.AreEqual(variable.Name, result.FullName);
@@ -294,7 +286,6 @@ namespace NodejsTests.Debugger.Serialization {
 
             // Assert
             Assert.IsNotNull(result);
-            Assert.IsNull(result.ExceptionText);
             Assert.AreEqual(variable.Name, result.Expression);
             Assert.IsNull(result.Frame);
             Assert.AreEqual(variable.Name, result.FullName);
@@ -325,7 +316,6 @@ namespace NodejsTests.Debugger.Serialization {
 
             // Assert
             Assert.IsNotNull(result);
-            Assert.IsNull(result.ExceptionText);
             Assert.AreEqual(variable.Name, result.Expression);
             Assert.IsNull(result.Frame);
             Assert.AreEqual(variable.Name, result.FullName);
@@ -356,7 +346,6 @@ namespace NodejsTests.Debugger.Serialization {
 
             // Assert
             Assert.IsNotNull(result);
-            Assert.IsNull(result.ExceptionText);
             Assert.AreEqual(variable.Name, result.Expression);
             Assert.IsNull(result.Frame);
             Assert.AreEqual(variable.Name, result.FullName);
@@ -387,7 +376,6 @@ namespace NodejsTests.Debugger.Serialization {
 
             // Assert
             Assert.IsNotNull(result);
-            Assert.IsNull(result.ExceptionText);
             Assert.AreEqual(variable.Name, result.Expression);
             Assert.IsNull(result.Frame);
             Assert.AreEqual(variable.Name, result.FullName);
@@ -418,7 +406,6 @@ namespace NodejsTests.Debugger.Serialization {
 
             // Assert
             Assert.IsNotNull(result);
-            Assert.IsNull(result.ExceptionText);
             Assert.AreEqual(variable.Name, result.Expression);
             Assert.IsNull(result.Frame);
             Assert.AreEqual(variable.Name, result.FullName);
@@ -467,7 +454,6 @@ namespace NodejsTests.Debugger.Serialization {
 
             // Assert
             Assert.IsNotNull(result);
-            Assert.IsNull(result.ExceptionText);
             Assert.AreEqual(string.Format("[{0}]", variable.Name), result.Expression);
             Assert.IsNull(result.Frame);
             Assert.AreEqual(string.Format(@"{0}[{1}]", variable.Parent.Expression, variable.Name), result.FullName);
@@ -498,7 +484,6 @@ namespace NodejsTests.Debugger.Serialization {
 
             // Assert
             Assert.IsNotNull(result);
-            Assert.IsNull(result.ExceptionText);
             Assert.AreEqual(variable.Name, result.Expression);
             Assert.IsNull(result.Frame);
             Assert.AreEqual(string.Format(@"{0}.{1}", variable.Parent.Expression, variable.Name), result.FullName);
@@ -529,7 +514,6 @@ namespace NodejsTests.Debugger.Serialization {
 
             // Assert
             Assert.IsNotNull(result);
-            Assert.IsNull(result.ExceptionText);
             Assert.AreEqual(variable.Name, result.Expression);
             Assert.IsNull(result.Frame);
             Assert.AreEqual(string.Format(@"{0}[""{1}""]", variable.Parent.Expression, variable.Name), result.FullName);
@@ -539,7 +523,7 @@ namespace NodejsTests.Debugger.Serialization {
             Assert.AreEqual(result.Type, NodeExpressionType.None);
             Assert.AreEqual(NodeVariableType.Number, result.TypeName);
         }
-        
+
         [TestMethod]
         public void CreateEvaluationResultForPrototypeChild() {
             // Arrange
@@ -547,9 +531,9 @@ namespace NodejsTests.Debugger.Serialization {
             var variable = new MockNodeVariable {
                 Id = 19,
                 Parent = new NodeEvaluationResult(
-                    0, 
+                    0,
                     null,
-                    null, 
+                    null,
                     "Object",
                     NodeVariableType.Prototype,
                     parentName + "." + NodeVariableType.Prototype,
@@ -569,7 +553,6 @@ namespace NodejsTests.Debugger.Serialization {
 
             // Assert
             Assert.IsNotNull(result);
-            Assert.IsNull(result.ExceptionText);
             Assert.AreEqual(variable.Name, result.Expression);
             Assert.IsNull(result.Frame);
             Assert.AreEqual(string.Format(@"{0}.{1}", parentName, variable.Name), result.FullName);

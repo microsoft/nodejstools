@@ -29,6 +29,10 @@ namespace Microsoft.NodejsTools
         public const string NodejsProjectFactoryString = "3AF33F2E-1136-4D97-BBB7-1795711AC8B8";
         public const string NodejsBaseProjectFactoryString = "9092AA53-FB77-4645-B42D-1CCCA6BD08BD";
         public const string TypeScriptLanguageInfoString = "87bdf188-e6e8-4fcf-a82a-9b8506e01847";
+        public const string JadeEditorFactoryString = "6CB69EF8-1329-4DC0-84B4-FA134EA59BE3";
+
+        //Guid for our formatting service
+        internal const string JavaScriptFormattingServiceString = "F414C260-6AC0-11CF-B6D1-00AA00BBBB58";
 
         public const string ScriptDebugLanguageString = "{F7FA31DA-C32A-11D0-B442-00A0244A1DD2}";
 

@@ -64,6 +64,16 @@ namespace Microsoft.NodejsTools.Project {
             }
         }
 
+        protected override NodeProperties CreatePropertiesObject() {
+            if (IsLinkFile) {
+                return new NodejsLinkFileNodeProperties(this);
+            } else if (IsNonMemberItem) {
+                return new ExcludedFileNodeProperties(this);
+            }
+
+            return new NodejsIncludedFileNodeProperties(this);
+        }
+
         internal string MangledModuleFunctionName {
             get {
                 return NodejsConstants.NodejsHiddenUserModule + _fileId;
