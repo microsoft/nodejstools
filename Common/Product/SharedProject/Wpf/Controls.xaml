@@ -1,7 +1,6 @@
 ﻿<ResourceDictionary xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
                     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-                    xmlns:wpf="clr-namespace:Microsoft.VisualStudioTools.Wpf;assembly=Microsoft.NodejsTools"
-                    xmlns:vsshell="http://schemas.microsoft.com/vstools/2013/vsshell">
+                    xmlns:wpf="http://schemas.microsoft.com/vstools/2013/wpf">
 
     <Style x:Key="FocusVisualStyle" TargetType="{x:Type Control}">
         <Setter Property="Control.Template">
@@ -9,7 +8,7 @@
                 <ControlTemplate>
                     <Rectangle Margin="2"
                                RenderOptions.EdgeMode="Aliased"
-                               Stroke="{DynamicResource {x:Static vsshell:VsBrushes.WindowTextKey}}"
+                               Stroke="{DynamicResource {x:Static wpf:Controls.ForegroundKey}}"
                                StrokeThickness="1"
                                StrokeDashArray="1 1" />
                 </ControlTemplate>
@@ -23,7 +22,7 @@
                 <ControlTemplate>
                     <Ellipse Margin="2"
                              RenderOptions.EdgeMode="Aliased"
-                             Stroke="{DynamicResource {x:Static vsshell:VsBrushes.WindowTextKey}}"
+                             Stroke="{DynamicResource {x:Static wpf:Controls.ForegroundKey}}"
                              StrokeThickness="1"
                              StrokeDashArray="1 2" />
                 </ControlTemplate>
@@ -32,7 +31,7 @@
     </Style>
 
     <Style x:Key="IconPath" TargetType="{x:Type Path}">
-        <Setter Property="Fill" Value="{DynamicResource {x:Static vsshell:VsBrushes.WindowTextKey}}" />
+        <Setter Property="Fill" Value="{DynamicResource {x:Static wpf:Controls.ForegroundKey}}" />
         <Setter Property="MaxWidth" Value="10" />
         <Setter Property="MaxHeight" Value="10" />
         <Setter Property="Margin" Value="3" />
@@ -40,21 +39,21 @@
     </Style>
 
     <Style TargetType="{x:Type ProgressBar}">
-        <Setter Property="Background" Value="{DynamicResource {x:Static vsshell:VsBrushes.ComboBoxBackgroundKey}}" />
-        <Setter Property="BorderBrush" Value="{DynamicResource {x:Static vsshell:VsBrushes.ComboBoxBorderKey}}" />
+        <Setter Property="Background" Value="{DynamicResource {x:Static wpf:Controls.ControlBackgroundKey}}" />
+        <Setter Property="BorderBrush" Value="{DynamicResource {x:Static wpf:Controls.ControlBorderKey}}" />
         <Setter Property="Margin" Value="2" />
         <Setter Property="Padding" Value="2" />
     </Style>
 
     <Style TargetType="{x:Type TextBlock}">
-        <Setter Property="Foreground" Value="{DynamicResource {x:Static vsshell:VsBrushes.WindowTextKey}}" />
+        <Setter Property="Foreground" Value="{DynamicResource {x:Static wpf:Controls.ForegroundKey}}" />
         <Setter Property="FontFamily" Value="Segoe UI" />
         <Setter Property="Margin" Value="3 0" />
         <Setter Property="TextWrapping" Value="Wrap" />
     </Style>
     
     <Style TargetType="{x:Type Label}">
-        <Setter Property="Foreground" Value="{DynamicResource {x:Static vsshell:VsBrushes.WindowTextKey}}" />
+        <Setter Property="Foreground" Value="{DynamicResource {x:Static wpf:Controls.ForegroundKey}}" />
         <Setter Property="FontFamily" Value="Segoe UI" />
         <Setter Property="Margin" Value="0" />
     </Style>
@@ -89,39 +88,39 @@
 
     <Style TargetType="{x:Type Control}">
         <Setter Property="FontFamily" Value="Segoe UI" />
-        <Setter Property="Background" Value="{DynamicResource {x:Static vsshell:VsBrushes.ComboBoxBackgroundKey}}" />
-        <Setter Property="Foreground" Value="{DynamicResource {x:Static vsshell:VsBrushes.WindowTextKey}}" />
-        <Setter Property="BorderBrush" Value="{DynamicResource {x:Static vsshell:VsBrushes.ComboBoxBorderKey}}" />
+        <Setter Property="Background" Value="{DynamicResource {x:Static wpf:Controls.ControlBackgroundKey}}" />
+        <Setter Property="Foreground" Value="{DynamicResource {x:Static wpf:Controls.ControlForegroundKey}}" />
+        <Setter Property="BorderBrush" Value="{DynamicResource {x:Static wpf:Controls.ControlBorderKey}}" />
         <Setter Property="BorderThickness" Value="1" />
         <Setter Property="FocusVisualStyle" Value="{StaticResource FocusVisualStyle}" />
         <Style.Triggers>
             <Trigger Property="IsFocused" Value="True">
-                <Setter Property="BorderBrush" Value="{DynamicResource {x:Static vsshell:VsBrushes.ComboBoxMouseOverBorderKey}}" />
+                <Setter Property="BorderBrush" Value="{DynamicResource {x:Static wpf:Controls.ControlBorderSelectedKey}}" />
             </Trigger>
             <Trigger Property="IsMouseOver" Value="True">
-                <Setter Property="Background" Value="{DynamicResource {x:Static vsshell:VsBrushes.ComboBoxMouseOverBackgroundGradientKey}}" />
-                <Setter Property="BorderBrush" Value="{DynamicResource {x:Static vsshell:VsBrushes.ComboBoxMouseOverGlyphKey}}" />
+                <Setter Property="Background" Value="{DynamicResource {x:Static wpf:Controls.ControlBackgroundHoverKey}}" />
+                <Setter Property="BorderBrush" Value="{DynamicResource {x:Static wpf:Controls.ControlBorderHoverKey}}" />
             </Trigger>
             <Trigger Property="IsEnabled" Value="False">
-                <Setter Property="Background" Value="{DynamicResource {x:Static vsshell:VsBrushes.ComboBoxDisabledBackgroundKey}}" />
-                <Setter Property="Foreground" Value="{DynamicResource {x:Static vsshell:VsBrushes.ComboBoxDisabledGlyphKey}}" />
-                <Setter Property="BorderBrush" Value="{DynamicResource {x:Static vsshell:VsBrushes.ComboBoxDisabledBorderKey}}" />
+                <Setter Property="Background" Value="{DynamicResource {x:Static wpf:Controls.ControlBackgroundDisabledKey}}" />
+                <Setter Property="Foreground" Value="{DynamicResource {x:Static wpf:Controls.ControlForegroundDisabledKey}}" />
+                <Setter Property="BorderBrush" Value="{DynamicResource {x:Static wpf:Controls.ControlBorderDisabledKey}}" />
             </Trigger>
         </Style.Triggers>
     </Style>
     
     <Style x:Key="TooltipBorder" TargetType="{x:Type Border}">
-        <Setter Property="Background" Value="{DynamicResource {x:Static vsshell:VsBrushes.InfoBackgroundKey}}" />
-        <Setter Property="BorderBrush" Value="{DynamicResource {x:Static vsshell:VsBrushes.InfoBackgroundKey}}" />
+        <Setter Property="Background" Value="{DynamicResource {x:Static wpf:Controls.TooltipBackgroundKey}}" />
+        <Setter Property="BorderBrush" Value="{DynamicResource {x:Static wpf:Controls.TooltipBackgroundKey}}" />
         <Setter Property="BorderThickness" Value="4" />
-        <Setter Property="TextElement.Foreground" Value="{DynamicResource {x:Static vsshell:VsBrushes.InfoTextKey}}" />
+        <Setter Property="TextElement.Foreground" Value="{DynamicResource {x:Static wpf:Controls.TooltipTextKey}}" />
     </Style>
     
     <Style TargetType="{x:Type GroupBox}">
         <Setter Property="Margin" Value="6" />
         <Setter Property="Padding" Value="6 3" />
-        <Setter Property="BorderBrush" Value="{DynamicResource {x:Static vsshell:VsBrushes.ComboBoxBorderKey}}" />
-        <Setter Property="Background" Value="{DynamicResource {x:Static vsshell:VsBrushes.WindowKey}}" />
+        <Setter Property="BorderBrush" Value="{DynamicResource {x:Static wpf:Controls.ControlBorderKey}}" />
+        <Setter Property="Background" Value="{DynamicResource {x:Static wpf:Controls.BackgroundKey}}" />
         <Setter Property="Template">
             <Setter.Value>
                 <ControlTemplate TargetType="{x:Type GroupBox}">
@@ -155,8 +154,8 @@
         </Setter>
         <Style.Triggers>
             <Trigger Property="IsEnabled" Value="False">
-                <Setter Property="Foreground" Value="{DynamicResource {x:Static vsshell:VsBrushes.ComboBoxDisabledGlyphKey}}" />
-                <Setter Property="BorderBrush" Value="{DynamicResource {x:Static vsshell:VsBrushes.ComboBoxDisabledBorderKey}}" />
+                <Setter Property="Foreground" Value="{DynamicResource {x:Static wpf:Controls.ControlForegroundDisabledKey}}" />
+                <Setter Property="BorderBrush" Value="{DynamicResource {x:Static wpf:Controls.ControlBorderDisabledKey}}" />
             </Trigger>
         </Style.Triggers>
     </Style>
@@ -187,7 +186,7 @@
                 <Setter Property="IsCancel" Value="True" />
             </Trigger>
             <Trigger Property="IsPressed" Value="True">
-                <Setter Property="BorderBrush" Value="{DynamicResource {x:Static vsshell:VsBrushes.ComboBoxMouseOverBorderKey}}" />
+                <Setter Property="BorderBrush" Value="{DynamicResource {x:Static wpf:Controls.ControlBorderSelectedKey}}" />
             </Trigger>
             <MultiTrigger>
                 <MultiTrigger.Conditions>
@@ -195,7 +194,7 @@
                     <Condition Property="IsEnabled" Value="True" />
                     <Condition Property="IsMouseOver" Value="False" />
                 </MultiTrigger.Conditions>
-                <Setter Property="BorderBrush" Value="{DynamicResource {x:Static vsshell:VsBrushes.ComboBoxMouseOverBorderKey}}" />
+                <Setter Property="BorderBrush" Value="{DynamicResource {x:Static wpf:Controls.ControlBorderSelectedKey}}" />
                 <Setter Property="BorderThickness" Value="2" />
             </MultiTrigger>
             <MultiTrigger>
@@ -204,14 +203,14 @@
                     <Condition Property="IsEnabled" Value="True" />
                     <Condition Property="IsMouseOver" Value="True" />
                 </MultiTrigger.Conditions>
-                <Setter Property="BorderBrush" Value="{DynamicResource {x:Static vsshell:VsBrushes.ComboBoxMouseOverGlyphKey}}" />
+                <Setter Property="BorderBrush" Value="{DynamicResource {x:Static wpf:Controls.ControlBorderHoverKey}}" />
                 <Setter Property="BorderThickness" Value="2" />
             </MultiTrigger>
         </Style.Triggers>
     </Style>
 
     <Style x:Key="NavigationButton" TargetType="{x:Type Button}">
-        <Setter Property="Foreground" Value="{DynamicResource {x:Static vsshell:VsBrushes.ControlLinkTextKey}}" />
+        <Setter Property="Foreground" Value="{DynamicResource {x:Static wpf:Controls.HyperlinkKey}}" />
         <Setter Property="HorizontalContentAlignment" Value="Center" />
         <Setter Property="VerticalContentAlignment" Value="Center" />
         <Setter Property="Cursor" Value="Hand" />
@@ -246,7 +245,7 @@
                             <ControlTemplate>
                                 <Rectangle Margin="0"
                                            RenderOptions.EdgeMode="Aliased"
-                                           Stroke="{DynamicResource {x:Static vsshell:VsBrushes.WindowTextKey}}"
+                                           Stroke="{DynamicResource {x:Static wpf:Controls.ForegroundKey}}"
                                            StrokeThickness="1"
                                            StrokeDashArray="1 1" />
                             </ControlTemplate>
@@ -257,10 +256,10 @@
         </Setter>
         <Style.Triggers>
             <Trigger Property="IsMouseOver" Value="True">
-                <Setter Property="Foreground" Value="{DynamicResource {x:Static vsshell:VsBrushes.ControlLinkTextHoverKey}}" />
+                <Setter Property="Foreground" Value="{DynamicResource {x:Static wpf:Controls.HyperlinkHoverKey}}" />
             </Trigger>
             <Trigger Property="IsEnabled" Value="False">
-                <Setter Property="Foreground" Value="{DynamicResource {x:Static vsshell:VsBrushes.GrayTextKey}}" />
+                <Setter Property="Foreground" Value="{DynamicResource {x:Static wpf:Controls.GrayTextKey}}" />
             </Trigger>
         </Style.Triggers>
     </Style>
@@ -268,10 +267,10 @@
     <Style x:Key="NavigationButtonInList" BasedOn="{StaticResource NavigationButton}" TargetType="{x:Type Button}">
         <Style.Triggers>
             <DataTrigger Binding="{Binding IsSelected,RelativeSource={RelativeSource AncestorType=ListBoxItem}}" Value="True">
-                <Setter Property="Foreground" Value="{DynamicResource {x:Static vsshell:VsBrushes.HighlightTextKey}}" />
+                <Setter Property="Foreground" Value="{DynamicResource {x:Static wpf:Controls.HighlightTextKey}}" />
             </DataTrigger>
             <Trigger Property="IsEnabled" Value="False">
-                <Setter Property="Foreground" Value="{DynamicResource {x:Static vsshell:VsBrushes.GrayTextKey}}" />
+                <Setter Property="Foreground" Value="{DynamicResource {x:Static wpf:Controls.GrayTextKey}}" />
             </Trigger>
         </Style.Triggers>
     </Style>
@@ -342,13 +341,13 @@
         </Setter>
         <Style.Triggers>
             <Trigger Property="IsExpanded" Value="True">
-                <Setter Property="BorderBrush" Value="{DynamicResource {x:Static vsshell:VsBrushes.ComboBoxMouseOverBorderKey}}" />
+                <Setter Property="BorderBrush" Value="{DynamicResource {x:Static wpf:Controls.ControlBorderSelectedKey}}" />
             </Trigger>
         </Style.Triggers>
     </Style>
 
     <Style TargetType="{x:Type TextBox}" BasedOn="{StaticResource {x:Type Control}}">
-        <Setter Property="CaretBrush" Value="{DynamicResource {x:Static vsshell:VsBrushes.WindowTextKey}}" />
+        <Setter Property="CaretBrush" Value="{DynamicResource {x:Static wpf:Controls.ForegroundKey}}" />
         <Setter Property="FocusVisualStyle" Value="{x:Null}" />
         <Setter Property="Template">
             <Setter.Value>
@@ -416,7 +415,7 @@
                             <Rectangle x:Name="focusRect"
                                        Grid.Column="0"
                                        RenderOptions.EdgeMode="Aliased"
-                                       Stroke="{DynamicResource {x:Static vsshell:VsBrushes.WindowTextKey}}"
+                                       Stroke="{DynamicResource {x:Static wpf:Controls.ForegroundKey}}"
                                        StrokeThickness="1"
                                        StrokeDashArray="1 1"
                                        Visibility="Hidden" />
@@ -449,14 +448,14 @@
         </Setter>
         <Style.Triggers>
             <Trigger Property="IsEnabled" Value="False">
-                <Setter Property="Background" Value="{DynamicResource {x:Static vsshell:VsBrushes.ComboBoxDisabledBackgroundKey}}" />
-                <Setter Property="BorderBrush" Value="{DynamicResource {x:Static vsshell:VsBrushes.ComboBoxDisabledBorderKey}}" />
-                <Setter Property="Foreground" Value="{DynamicResource {x:Static vsshell:VsBrushes.ComboBoxDisabledGlyphKey}}" />
+                <Setter Property="Background" Value="{DynamicResource {x:Static wpf:Controls.ControlBackgroundDisabledKey}}" />
+                <Setter Property="BorderBrush" Value="{DynamicResource {x:Static wpf:Controls.ControlBorderDisabledKey}}" />
+                <Setter Property="Foreground" Value="{DynamicResource {x:Static wpf:Controls.ControlForegroundDisabledKey}}" />
             </Trigger>
             <Trigger Property="IsPressed" Value="True">
-                <Setter Property="Background" Value="{DynamicResource {x:Static vsshell:VsBrushes.ComboBoxMouseDownBackgroundKey}}" />
-                <Setter Property="BorderBrush" Value="{DynamicResource {x:Static vsshell:VsBrushes.ComboBoxMouseDownBorderKey}}" />
-                <Setter Property="Foreground" Value="{DynamicResource {x:Static vsshell:VsBrushes.ComboBoxGlyphKey}}" />
+                <Setter Property="Background" Value="{DynamicResource {x:Static wpf:Controls.ControlBackgroundPressedKey}}" />
+                <Setter Property="BorderBrush" Value="{DynamicResource {x:Static wpf:Controls.ControlBorderPressedKey}}" />
+                <Setter Property="Foreground" Value="{DynamicResource {x:Static wpf:Controls.ControlForegroundPressedKey}}" />
             </Trigger>
         </Style.Triggers>
 
@@ -490,7 +489,7 @@
                             <Rectangle x:Name="focusRect"
                                        Grid.Column="0"
                                        RenderOptions.EdgeMode="Aliased"
-                                       Stroke="{DynamicResource {x:Static vsshell:VsBrushes.WindowTextKey}}"
+                                       Stroke="{DynamicResource {x:Static wpf:Controls.ForegroundKey}}"
                                        StrokeThickness="1"
                                        StrokeDashArray="1 1"
                                        Visibility="Hidden" />
@@ -518,21 +517,21 @@
         </Setter>
         <Style.Triggers>
             <Trigger Property="IsEnabled" Value="False">
-                <Setter Property="Background" Value="{DynamicResource {x:Static vsshell:VsBrushes.ComboBoxDisabledBackgroundKey}}" />
-                <Setter Property="BorderBrush" Value="{DynamicResource {x:Static vsshell:VsBrushes.ComboBoxDisabledBorderKey}}" />
-                <Setter Property="Foreground" Value="{DynamicResource {x:Static vsshell:VsBrushes.ComboBoxDisabledGlyphKey}}" />
+                <Setter Property="Background" Value="{DynamicResource {x:Static wpf:Controls.ControlBackgroundDisabledKey}}" />
+                <Setter Property="BorderBrush" Value="{DynamicResource {x:Static wpf:Controls.ControlBorderDisabledKey}}" />
+                <Setter Property="Foreground" Value="{DynamicResource {x:Static wpf:Controls.ControlForegroundDisabledKey}}" />
             </Trigger>
             <Trigger Property="IsPressed" Value="True">
-                <Setter Property="Background" Value="{DynamicResource {x:Static vsshell:VsBrushes.ComboBoxMouseDownBackgroundKey}}" />
-                <Setter Property="BorderBrush" Value="{DynamicResource {x:Static vsshell:VsBrushes.ComboBoxMouseDownBorderKey}}" />
-                <Setter Property="Foreground" Value="{DynamicResource {x:Static vsshell:VsBrushes.ComboBoxGlyphKey}}" />
+                <Setter Property="Background" Value="{DynamicResource {x:Static wpf:Controls.ControlBackgroundPressedKey}}" />
+                <Setter Property="BorderBrush" Value="{DynamicResource {x:Static wpf:Controls.ControlBorderPressedKey}}" />
+                <Setter Property="Foreground" Value="{DynamicResource {x:Static wpf:Controls.ControlForegroundPressedKey}}" />
             </Trigger>
         </Style.Triggers>
 
     </Style>
     <Style TargetType="{x:Type RepeatButton}">
-        <Setter Property="Background" Value="{DynamicResource {x:Static vsshell:VsBrushes.ScrollBarArrowBackgroundKey}}" />
-        <Setter Property="Foreground" Value="{DynamicResource {x:Static vsshell:VsBrushes.ScrollBarThumbGlyphKey}}" />
+        <Setter Property="Background" Value="{DynamicResource {x:Static wpf:Controls.ScrollBarArrowBackgroundKey}}" />
+        <Setter Property="Foreground" Value="{DynamicResource {x:Static wpf:Controls.ScrollBarArrowKey}}" />
         <Setter Property="HorizontalContentAlignment" Value="Center" />
         <Setter Property="VerticalContentAlignment" Value="Center" />
         <Setter Property="Padding" Value="1" />
@@ -556,23 +555,23 @@
         </Setter>
         <Style.Triggers>
             <Trigger Property="IsMouseOver" Value="True">
-                <Setter Property="Background" Value="{DynamicResource {x:Static vsshell:VsBrushes.ScrollBarArrowMouseOverBackgroundKey}}" />
-                <Setter Property="Foreground" Value="{DynamicResource {x:Static vsshell:VsBrushes.GrayTextKey}}" />
+                <Setter Property="Background" Value="{DynamicResource {x:Static wpf:Controls.ScrollBarArrowBackgroundHoverKey}}" />
+                <Setter Property="Foreground" Value="{DynamicResource {x:Static wpf:Controls.ScrollBarArrowHoverKey}}" />
             </Trigger>
             <Trigger Property="IsPressed" Value="True">
-                <Setter Property="Background" Value="{DynamicResource {x:Static vsshell:VsBrushes.ScrollBarArrowPressedBackgroundKey}}" />
-                <Setter Property="Foreground" Value="{DynamicResource {x:Static vsshell:VsBrushes.WindowTextKey}}" />
+                <Setter Property="Background" Value="{DynamicResource {x:Static wpf:Controls.ScrollBarArrowBackgroundPressedKey}}" />
+                <Setter Property="Foreground" Value="{DynamicResource {x:Static wpf:Controls.ScrollBarArrowPressedKey}}" />
             </Trigger>
             <Trigger Property="IsEnabled" Value="False">
                 <Setter Property="Opacity" Value="0.56" />
-                <Setter Property="Background" Value="{DynamicResource {x:Static vsshell:VsBrushes.ComboBoxMouseDownBorderKey}}" />
-                <Setter Property="Foreground" Value="{DynamicResource {x:Static vsshell:VsBrushes.ScrollBarThumbGlyphKey}}" />
+                <Setter Property="Background" Value="{DynamicResource {x:Static wpf:Controls.ScrollBarArrowBackgroundDisabledKey}}" />
+                <Setter Property="Foreground" Value="{DynamicResource {x:Static wpf:Controls.ScrollBarArrowDisabledKey}}" />
             </Trigger>
         </Style.Triggers>
     </Style>
 
     <Style TargetType="{x:Type Thumb}">
-        <Setter Property="Background" Value="{DynamicResource {x:Static vsshell:VsBrushes.ScrollBarThumbBackgroundKey}}" />
+        <Setter Property="Background" Value="{DynamicResource {x:Static wpf:Controls.ScrollBarThumbBackgroundKey}}" />
         <Setter Property="OverridesDefaultStyle" Value="True" />
         <Setter Property="IsTabStop" Value="False" />
         <Setter Property="Template">
@@ -584,10 +583,10 @@
         </Setter>
         <Style.Triggers>
             <Trigger Property="IsMouseOver" Value="True">
-                <Setter Property="Background" Value="{DynamicResource {x:Static vsshell:VsBrushes.ScrollBarThumbMouseOverBackgroundKey}}" />
+                <Setter Property="Background" Value="{DynamicResource {x:Static wpf:Controls.ScrollBarThumbBackgroundHoverKey}}" />
             </Trigger>
             <Trigger Property="IsDragging" Value="True">
-                <Setter Property="Background" Value="{DynamicResource {x:Static vsshell:VsBrushes.ScrollBarThumbPressedBackgroundKey}}" />
+                <Setter Property="Background" Value="{DynamicResource {x:Static wpf:Controls.ScrollBarThumbBackgroundPressedKey}}" />
             </Trigger>
         </Style.Triggers>
     </Style>
@@ -595,7 +594,7 @@
     <Style TargetType="{x:Type ScrollBar}">
         <Setter Property="Stylus.IsPressAndHoldEnabled" Value="False" />
         <Setter Property="Stylus.IsFlicksEnabled" Value="False" />
-        <Setter Property="Background" Value="{DynamicResource {x:Static vsshell:VsBrushes.ScrollBarBackgroundKey}}" />
+        <Setter Property="Background" Value="{DynamicResource {x:Static wpf:Controls.ScrollBarBackgroundKey}}" />
         <Setter Property="Width" Value="{DynamicResource {x:Static SystemParameters.VerticalScrollBarWidthKey}}" />
         <Setter Property="MinWidth" Value="{DynamicResource {x:Static SystemParameters.VerticalScrollBarWidthKey}}" />
         <Setter Property="Template">
@@ -788,8 +787,39 @@
     </Style>
 
     <Style x:Key="HelpText" TargetType="{x:Type TextBlock}" BasedOn="{StaticResource {x:Type TextBlock}}">
-        <Setter Property="Foreground" Value="{DynamicResource {x:Static vsshell:VsBrushes.GrayTextKey}}" />
+        <Setter Property="Foreground" Value="{DynamicResource {x:Static wpf:Controls.GrayTextKey}}" />
         <Setter Property="Padding" Value="8 0 0 5" />
+    </Style>
+    
+    <Style TargetType="{x:Type wpf:LabelledControl}">
+        <Setter Property="Focusable" Value="False" />
+        <Setter Property="Margin" Value="0 0 0 8" />
+        <Setter Property="IsTabStop" Value="False" />
+        <Setter Property="Template">
+            <Setter.Value>
+                <ControlTemplate>
+                    <Grid DataContext="{Binding RelativeSource={RelativeSource AncestorType={x:Type wpf:LabelledControl}}}">
+                        <Grid.RowDefinitions>
+                            <RowDefinition Height="auto" />
+                            <RowDefinition Height="auto" />
+                            <RowDefinition Height="*" />
+                        </Grid.RowDefinitions>
+
+                        <Label Grid.Row="0" Content="{Binding Title}" Target="{Binding ElementName=Content}" />
+                        <TextBlock Grid.Row="1" Text="{Binding HelpText}" Style="{StaticResource HelpText}" Name="HelpText" />
+                        <ContentPresenter Grid.Row="2" Content="{Binding Content}" Margin="3" Name="Content" />
+                    </Grid>
+                    <ControlTemplate.Triggers>
+                        <Trigger Property="wpf:LabelledControl.HasHelpText" Value="False">
+                            <Setter TargetName="HelpText" Property="Visibility" Value="Collapsed" />
+                        </Trigger>
+                        <Trigger Property="IsEnabled" Value="False">
+                            <Setter Property="Opacity" Value="0.5" />
+                        </Trigger>
+                    </ControlTemplate.Triggers>
+                </ControlTemplate>
+            </Setter.Value>
+        </Setter>
     </Style>
 
     <Style TargetType="{x:Type wpf:LabelledButton}">
@@ -801,7 +831,7 @@
                 <ControlTemplate>
                     <ControlTemplate.Resources>
                         <Style x:Key="HelpText" TargetType="{x:Type TextBlock}" BasedOn="{StaticResource {x:Type TextBlock}}">
-                            <Setter Property="Foreground" Value="{DynamicResource {x:Static vsshell:VsBrushes.GrayTextKey}}" />
+                            <Setter Property="Foreground" Value="{DynamicResource {x:Static wpf:Controls.GrayTextKey}}" />
                             <Setter Property="Padding" Value="8 0 0 5" />
                         </Style>
                     </ControlTemplate.Resources>

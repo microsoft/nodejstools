@@ -589,20 +589,10 @@
       <Link>SharedProject\Wpf\LabelledButton.cs</Link>
       <Visible>true</Visible>
     </Compile>
-    <EmbeddedResource Include="$(_ProjectSystemFilesLocation)\Wpf\LabelledButton.xaml">
-      <Link>SharedProject\LabelledButton.xaml</Link>
-      <ManifestResourceName>Microsoft.VisualStudio.Project</ManifestResourceName>
-      <Visible>true</Visible>
-    </EmbeddedResource>
     <Compile Include="$(_ProjectSystemFilesLocation)\Wpf\LabelledControl.cs">
       <Link>SharedProject\Wpf\LabelledControl.cs</Link>
       <Visible>true</Visible>
     </Compile>
-    <EmbeddedResource Include="$(_ProjectSystemFilesLocation)\Wpf\LabelledControl.xaml">
-      <Link>SharedProject\LabelledControl.xaml</Link>
-      <ManifestResourceName>Microsoft.VisualStudio.Project</ManifestResourceName>
-      <Visible>true</Visible>
-    </EmbeddedResource>
     <Compile Include="$(_ProjectSystemFilesLocation)\Wpf\Controls.cs">
       <Link>SharedProject\Wpf\Controls.cs</Link>
       <Visible>true</Visible>
