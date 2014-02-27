@@ -12,13 +12,15 @@
  *
  * ***************************************************************************/
 
-using Microsoft.VisualStudio;
-using Microsoft.VisualStudio.Debugger.Interop;
 using System;
 using System.IO;
+using Microsoft.VisualStudio;
+using Microsoft.VisualStudio.Debugger.Interop;
 
 namespace Microsoft.NodejsTools.Debugger.Remote {
     internal class NodeRemoteDebugProcess : IDebugProcess2, IDebugProcessSecurity2 {
+        // Remote processes always have this ID.
+        public const int RemoteId = 1;
 
         private readonly NodeRemoteDebugPort _port;
         private readonly int _id;
@@ -28,9 +30,9 @@ namespace Microsoft.NodejsTools.Debugger.Remote {
         private readonly Guid _guid = Guid.NewGuid();
         private NodeRemoteEnumDebugPrograms _programs;
 
-        public NodeRemoteDebugProcess(NodeRemoteDebugPort port, int pid, string exe, string username, string version) {
+        public NodeRemoteDebugProcess(NodeRemoteDebugPort port, string exe, string username, string version) {
             _port = port;
-            _id = (pid == 0) ? 1 : pid; // attach dialog won't show processes with pid==0
+            _id = RemoteId;
             _username = username;
             _exe = string.IsNullOrEmpty(exe) ? "<node>" : exe;
             _version = version;
@@ -144,7 +146,11 @@ namespace Microsoft.NodejsTools.Debugger.Remote {
         }
 
         private string BaseName {
-            get { return Path.GetFileName(_exe) + " @ " + _port.HostName + ":" + _port.PortNumber; }
+            get {
+                string portName;
+                _port.GetPortName(out portName);
+                return Path.GetFileName(_exe) + " @ " + portName;
+            }
         }
 
         private string Title {

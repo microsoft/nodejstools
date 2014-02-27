@@ -12,19 +12,18 @@
  *
  * ***************************************************************************/
 
+using System.IO;
+using System.Net.Sockets;
+using System.Net.WebSockets;
+using System.Windows.Forms;
+using Microsoft.NodejsTools.Debugger.Communication;
 using Microsoft.VisualStudio;
 using Microsoft.VisualStudio.Debugger.Interop;
-using System;
-using System.IO;
-using System.Net;
-using System.Net.Sockets;
-using System.Text;
-using System.Windows.Forms;
 
 namespace Microsoft.NodejsTools.Debugger.Remote {
     internal class NodeRemoteEnumDebugProcesses : NodeRemoteEnumDebug<IDebugProcess2>, IEnumDebugProcesses2 {
-        public NodeRemoteEnumDebugProcesses(NodeRemoteDebugPort port)
-            : base(Connect(port)) {
+        public NodeRemoteEnumDebugProcesses(NodeRemoteDebugPort port, INetworkClientFactory networkClientFactory)
+            : base(Connect(port, networkClientFactory)) {
         }
 
         public NodeRemoteEnumDebugProcesses(NodeRemoteEnumDebugProcesses processes)
@@ -38,55 +37,32 @@ namespace Microsoft.NodejsTools.Debugger.Remote {
 
         // Connect to the remote debugging server. If any errors occur, display an error dialog, and keep
         // trying for as long as user clicks "Retry".
-        private static NodeRemoteDebugProcess Connect(NodeRemoteDebugPort port) {
+        private static NodeRemoteDebugProcess Connect(NodeRemoteDebugPort port, INetworkClientFactory networkClientFactory) {
             NodeRemoteDebugProcess process = null;
             while (true) {
-                using (var socket = new Socket(AddressFamily.InterNetwork, SocketType.Stream, ProtocolType.Tcp)) {
-                    try {
-                        socket.NoDelay = true;
-                        socket.Connect(new DnsEndPoint(port.HostName, port.PortNumber));
+                try {
+                    using (var client = networkClientFactory.CreateNetworkClient(port.Uri))
+                    using (var stream = client.GetStream()) {
                         // https://nodejstools.codeplex.com/workitem/578
                         // Read "welcome" headers from node debug socket before disconnecting to workaround issue
                         // where connect and immediate disconnect leaves node.js (V8) in a bad state which blocks attach.
-                        try {
-                            byte[] socketBuffer = new byte[1024];
-                            IAsyncResult asyncResult =
-                                socket.BeginReceive(
-                                    socketBuffer,
-                                    0,
-                                    1024,
-                                    SocketFlags.None,
-                                    null,
-                                    null
-                            );
-                            if (asyncResult.AsyncWaitHandle.WaitOne(1000)) {
-                                var bytesReceived = socket.EndReceive(asyncResult);
-                                var str = Encoding.UTF8.GetString(socketBuffer.Substring(0, bytesReceived)).Trim();
-                                int pid = 1;
-                                string exe = "node.exe";
-                                string username = string.Empty;
-                                string version = string.Empty;
-                                process = new NodeRemoteDebugProcess(port, pid, exe, username, version);
-                                break;
-                            }
-
-                        } finally {
-                            socket.Disconnect(false);
+                        var buffer = new byte[1024];
+                        if (stream.ReadAsync(buffer, 0, buffer.Length).Wait(5000)) {
+                            process = new NodeRemoteDebugProcess(port, "node.exe", "", "");
+                            break;
                         }
                     }
-                    catch (IOException) {
-                    }
-                    catch (SocketException) {
-                    }
+                } catch (IOException) {
+                } catch (SocketException) {
+                } catch (WebSocketException) {
                 }
+
                 string errText =
                     string.Format(
-                        "Could not attach to Node.js process at '{0}:{1}'. " +
+                        "Could not attach to Node.js process at {0}. " +
                         "Make sure the process is running behind the remote debug proxy (RemoteDebug.js), " +
-                        "and the debugger port (default " + NodejsConstants.DefaultDebuggerPort + ") is open on the target host.",
-                        port.HostName,
-                        port.PortNumber
-                    );
+                        "and the debugger port (default {1}) is open on the target host.",
+                        port.Uri, NodejsConstants.DefaultDebuggerPort);
                 DialogResult dlgRes = MessageBox.Show(errText, null, MessageBoxButtons.RetryCancel, MessageBoxIcon.Error);
                 if (dlgRes != DialogResult.Retry) {
                     break;

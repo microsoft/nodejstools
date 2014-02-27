@@ -12,18 +12,18 @@
  *
  * ***************************************************************************/
 
-using Microsoft.NodejsTools.Debugger.Remote;
-using Microsoft.NodejsTools.Project;
-using Microsoft.VisualStudio;
-using Microsoft.VisualStudio.Debugger.Interop;
-using Microsoft.VisualStudio.Shell;
-using Microsoft.VisualStudio.Shell.Interop;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
 using System.Runtime.InteropServices;
 using System.Web;
+using Microsoft.NodejsTools.Debugger.Remote;
+using Microsoft.NodejsTools.Project;
+using Microsoft.VisualStudio;
+using Microsoft.VisualStudio.Debugger.Interop;
+using Microsoft.VisualStudio.Shell;
+using Microsoft.VisualStudio.Shell.Interop;
 
 namespace Microsoft.NodejsTools.Debugger.DebugEngine {
     // AD7Engine is the primary entrypoint object for the debugging engine. 
@@ -196,8 +196,7 @@ namespace Microsoft.NodejsTools.Debugger.DebugEngine {
 
                 var program = (NodeRemoteDebugProgram)rgpPrograms[0];
                 var process = program.DebugProcess;
-                var port = process.DebugPort;
-                _process = new NodeDebugger(port.HostName, port.PortNumber, process.Id);
+                _process = new NodeDebugger(process.DebugPort.Uri, process.Id);
 
                 AttachEvents(_process);
                 _attached = true;
@@ -951,10 +950,13 @@ namespace Microsoft.NodejsTools.Debugger.DebugEngine {
 
         private void OnThreadExited(object sender, ThreadEventArgs e) {
             // TODO: Thread exit code
-            var oldThread = _threads[e.Thread];
+            AD7Thread oldThread;
+            _threads.TryGetValue(e.Thread, out oldThread);
             _threads.Remove(e.Thread);
 
-            Send(new AD7ThreadDestroyEvent(0), AD7ThreadDestroyEvent.IID, oldThread);
+            if (oldThread != null) {
+                Send(new AD7ThreadDestroyEvent(0), AD7ThreadDestroyEvent.IID, oldThread);
+            }
         }
 
         private void OnThreadCreated(object sender, ThreadEventArgs e) {

@@ -34,6 +34,8 @@ namespace Microsoft.NodejsTools {
         public const int cmdidNpmInstallSingleMissingModule = 0x20B;
         public const int cmdidNpmUpdateSingleModule         = 0x20C;
 
+        public const uint cmdidAzureExplorerAttachNodejsDebugger = 0x20D;
+
         public const uint menuIdNPM = 0x1000;
     }
 }

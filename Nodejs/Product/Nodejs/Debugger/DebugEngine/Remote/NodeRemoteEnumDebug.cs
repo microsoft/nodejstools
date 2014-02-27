@@ -38,7 +38,7 @@ namespace Microsoft.NodejsTools.Debugger.Remote {
         public int Next(uint celt, T[] rgelt, ref uint pceltFetched) {
             if (_done) {
                 pceltFetched = 0;
-                return 1;
+                return VSConstants.S_FALSE;
             } else {
                 pceltFetched = 1;
                 rgelt[0] = _elem;
@@ -54,12 +54,12 @@ namespace Microsoft.NodejsTools.Debugger.Remote {
 
         public int Skip(uint celt) {
             if (celt == 0) {
-                return 0;
+                return VSConstants.S_OK;
             } else if (_done) {
-                return 1;
+                return VSConstants.S_FALSE;
             } else {
                 _done = true;
-                return celt > 1 ? 1 : 0;
+                return celt > 1 ? VSConstants.S_FALSE : VSConstants.S_OK;
             }
         }
     }

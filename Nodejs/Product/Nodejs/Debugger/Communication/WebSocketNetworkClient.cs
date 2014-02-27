@@ -12,27 +12,34 @@
  *
  * ***************************************************************************/
 
+using System;
 using System.IO;
 using System.Net.Sockets;
+using System.Net.WebSockets;
+using System.Threading;
 
 namespace Microsoft.NodejsTools.Debugger.Communication {
-    sealed class TcpClientWrapper : ITcpClient {
-        private readonly TcpClient _tcpClient;
+    sealed class WebSocketNetworkClient : INetworkClient {
+        private readonly ClientWebSocket _webSocket;
+        private readonly WebSocketStream _stream;
 
-        public TcpClientWrapper(string hostName, int portNumber) {
-            _tcpClient = new TcpClient(hostName, portNumber);
+        public WebSocketNetworkClient(Uri uri) {
+            _webSocket = new ClientWebSocket();
+            _webSocket.ConnectAsync(uri, CancellationToken.None).Wait();
+            _stream = new WebSocketStream(_webSocket);
         }
 
         public bool Connected {
-            get { return _tcpClient.Connected; }
+            get { return _webSocket.State == WebSocketState.Open; }
         }
 
-        public void Close() {
-            _tcpClient.Close();
+        public void Dispose() {
+            _webSocket.CloseOutputAsync(WebSocketCloseStatus.NormalClosure, null, CancellationToken.None).Wait();
+            _webSocket.Dispose();
         }
 
         public Stream GetStream() {
-            return _tcpClient.GetStream();
+            return _stream;
         }
     }
 }

@@ -34,15 +34,14 @@ namespace Microsoft.NodejsTools.Debugger {
     class NodeDebugger : IDisposable {
         public readonly int MainThreadId = 1;
         private readonly Dictionary<int, NodeBreakpointBinding> _breakpointBindings = new Dictionary<int, NodeBreakpointBinding>();
+        private readonly Uri _debuggerEndpointUri;
         private readonly IDebuggerClient _client;
         private readonly IDebuggerConnection _connection;
         private readonly Dictionary<int, string> _errorCodes = new Dictionary<int, string>();
         private readonly ExceptionHandler _exceptionHandler;
-        private readonly string _hostName;
         private readonly Dictionary<int, NodeModule> _mapIdToScript = new Dictionary<int, NodeModule>();
         private readonly Dictionary<string, NodeModule> _mapNameToScript = new Dictionary<string, NodeModule>(StringComparer.OrdinalIgnoreCase);
         private readonly Version _nodeSetVariableValueVersion = new Version(0, 10, 12);
-        private readonly ushort _portNumber;
         private readonly EvaluationResultFactory _resultFactory;
         private readonly Dictionary<int, NodeThread> _threads = new Dictionary<int, NodeThread>();
         private readonly TimeSpan _timeout = TimeSpan.FromSeconds(2);
@@ -58,7 +57,7 @@ namespace Microsoft.NodejsTools.Debugger {
         private SteppingKind _steppingMode;
 
         private NodeDebugger() {
-            _connection = new DebuggerConnection(new TcpClientFactory());
+            _connection = new DebuggerConnection(new NetworkClientFactory());
             _connection.ConnectionClosed += OnConnectionClosed;
 
             _client = new DebuggerClient(_connection);
@@ -94,8 +93,7 @@ namespace Microsoft.NodejsTools.Debugger {
                 }
             }
 
-            _hostName = "localhost";
-            _portNumber = debuggerPortOrDefault;
+            _debuggerEndpointUri = new UriBuilder { Scheme = "tcp", Host = "localhost", Port = debuggerPortOrDefault }.Uri;
 
             var allArgs = String.Format("--debug-brk={0} {1}", debuggerPortOrDefault, script);
             if (!string.IsNullOrEmpty(interpreterOptions)) {
@@ -130,9 +128,8 @@ namespace Microsoft.NodejsTools.Debugger {
             };
         }
 
-        public NodeDebugger(string hostName, ushort portNumber, int id) : this() {
-            _hostName = hostName;
-            _portNumber = portNumber;
+        public NodeDebugger(Uri debuggerEndpointUri, int id) : this() {
+            _debuggerEndpointUri = debuggerEndpointUri;
             _id = id;
             _attached = true;
         }
@@ -442,7 +439,7 @@ namespace Microsoft.NodejsTools.Debugger {
         /// to give time to attach to debugger events.
         /// </summary>
         public async void StartListening() {
-            _connection.Connect(_hostName, _portNumber);
+            _connection.Connect(_debuggerEndpointUri);
 
             var mainThread = new NodeThread(this, MainThreadId, false);
             _threads[mainThread.Id] = mainThread;

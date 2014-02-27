@@ -11,3 +11,28 @@
  * You must not remove this notice, or any other, from this software.
  *
  * ***************************************************************************/
+
+using System.IO;
+using System.Net.Sockets;
+
+namespace Microsoft.NodejsTools.Debugger.Communication {
+    sealed class TcpNetworkClient : INetworkClient {
+        private readonly TcpClient _tcpClient;
+
+        public TcpNetworkClient(string hostName, int portNumber) {
+            _tcpClient = new TcpClient(hostName, portNumber);
+        }
+
+        public bool Connected {
+            get { return _tcpClient.Connected; }
+        }
+
+        public void Dispose() {
+            _tcpClient.Close();
+        }
+
+        public Stream GetStream() {
+            return _tcpClient.GetStream();
+        }
+    }
+}

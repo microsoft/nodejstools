@@ -12,19 +12,15 @@
  *
  * ***************************************************************************/
 
+using System;
 using System.IO;
 
 namespace Microsoft.NodejsTools.Debugger.Communication {
-    interface ITcpClient {
+    interface INetworkClient : IDisposable {
         /// <summary>
         /// Gets a value indicating whether client is connected to a remote host.
         /// </summary>
         bool Connected { get; }
-
-        /// <summary>
-        /// Disposes instance and requests that the underlying tcp connection be closed.
-        /// </summary>
-        void Close();
 
         /// <summary>
         /// Returns the <see cref="T:System.IO.Stream" /> used to send and receive data.

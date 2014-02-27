@@ -12,6 +12,7 @@
  *
  * ***************************************************************************/
 
+using System;
 using Microsoft.NodejsTools.Debugger;
 using Microsoft.NodejsTools.Debugger.Commands;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
@@ -24,7 +25,7 @@ namespace NodejsTests.Debugger.Commands {
             // Arrange
             const int commandId = 3;
             const bool includeSource = true;
-            var debugger = new NodeDebugger("localhost", 5858, 1);
+            var debugger = new NodeDebugger(new Uri("tcp://localhost:5858"), 1);
 
             // Act
             var scriptsCommand = new ScriptsCommand(commandId, debugger, includeSource);
@@ -44,7 +45,7 @@ namespace NodejsTests.Debugger.Commands {
             const int commandId = 3;
             const int moduleId = 5;
             const bool includeSource = false;
-            var debugger = new NodeDebugger("localhost", 5858, 1);
+            var debugger = new NodeDebugger(new Uri("tcp://localhost:5858"), 1);
 
             // Act
             var scriptsCommand = new ScriptsCommand(commandId, debugger, includeSource, moduleId);
@@ -63,7 +64,7 @@ namespace NodejsTests.Debugger.Commands {
             // Arrange
             const int commandId = 3;
             const bool includeSource = true;
-            var debugger = new NodeDebugger("localhost", 5858, 1);
+            var debugger = new NodeDebugger(new Uri("tcp://localhost:5858"), 1);
             var scriptsCommand = new ScriptsCommand(commandId, debugger, includeSource);
 
             // Act
