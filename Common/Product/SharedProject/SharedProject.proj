@@ -605,12 +605,12 @@
       <Link>SharedProject\Wpf\Dialogs.cs</Link>
       <Visible>true</Visible>
     </Compile>
-    <Resource Include="$(_ProjectSystemFilesLocation)\Wpf\Controls.xaml">
+    <Page Include="$(_ProjectSystemFilesLocation)\Wpf\Controls.xaml">
       <Link>SharedProject\Wpf\Controls.xaml</Link>
       <Visible>true</Visible>
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
-    </Resource>
+    </Page>
   </ItemGroup>
   <ItemGroup>
     <EmbeddedResource Include="$(_ProjectSystemFilesLocation)\ProjectResources.resx">
