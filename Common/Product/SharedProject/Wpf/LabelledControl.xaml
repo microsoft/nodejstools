@@ -1,0 +1,36 @@
+<Style xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+                    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+                    xmlns:vsshell="http://schemas.microsoft.com/vstools/2013/vsshell"
+                    TargetType="{x:Type wpf:LabelledControl}">
+    <Style.Resources>
+        <ResourceDictionary Source="Controls.xaml"/>
+    </Style.Resources>
+    <Setter Property="Focusable" Value="False"  />
+    <Setter Property="Margin" Value="0 0 0 8" />
+    <Setter Property="IsTabStop" Value="False" />
+    <Setter Property="Template">
+        <Setter.Value>
+            <ControlTemplate>
+                <Grid DataContext="{Binding RelativeSource={RelativeSource AncestorType={x:Type wpf:LabelledControl}}}">
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="auto" />
+                        <RowDefinition Height="auto" />
+                        <RowDefinition Height="*" />
+                    </Grid.RowDefinitions>
+
+                    <Label Grid.Row="0" Content="{Binding Title}" Target="{Binding ElementName=Content}" />
+                    <TextBlock Grid.Row="1" Text="{Binding HelpText}" Style="{StaticResource HelpText}" Name="HelpText" />
+                    <ContentPresenter Grid.Row="2" Content="{Binding Content}" Margin="3" Name="Content" />
+                </Grid>
+                <ControlTemplate.Triggers>
+                    <Trigger Property="wpf:LabelledControl.HasHelpText" Value="False">
+                        <Setter TargetName="HelpText" Property="Visibility" Value="Collapsed" />
+                    </Trigger>
+                    <Trigger Property="IsEnabled" Value="False">
+                        <Setter Property="Opacity" Value="0.5" />
+                    </Trigger>
+                </ControlTemplate.Triggers>
+            </ControlTemplate>
+        </Setter.Value>
+    </Setter>
+</Style>

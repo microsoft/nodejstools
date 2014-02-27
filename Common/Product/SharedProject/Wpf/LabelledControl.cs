@@ -17,6 +17,15 @@ using System.Windows.Controls;
 
 namespace Microsoft.VisualStudioTools.Wpf {
     sealed class LabelledControl : ContentControl {
+        private static Style _controlStyle;
+
+        public LabelledControl() {
+            if (_controlStyle == null) {
+                _controlStyle = Controls.LoadStyle(typeof(LabelledControl());
+            }
+            Style = _controlStyle;
+        }
+
         public string Title {
             get { return (string)GetValue(TitleProperty); }
             set { SetValue(TitleProperty, value); }
