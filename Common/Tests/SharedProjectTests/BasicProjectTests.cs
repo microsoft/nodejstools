@@ -261,7 +261,7 @@ namespace Microsoft.VisualStudioTools.SharedProjectTests {
                         Target("CreateManifestResourceNames")
                     );
                     using (var solution = proj.Generate().ToVs()) {
-                        VsIdeTestHostContext.Dte.ExecuteCommand("Build.BuildSolution");
+                        VsIdeTestHostContext.Dte.ExecuteCommand("Build.RebuildSolution");
                         solution.App.WaitForOutputWindowText("Build", "Hello Build World!");
                     }
                 }

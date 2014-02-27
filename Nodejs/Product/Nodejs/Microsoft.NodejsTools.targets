@@ -79,7 +79,6 @@
   </Target>
 
   <Target Name="BuiltProjectOutputGroup" Returns="@(BuiltProjectOutputGroupOutput)">
-    <Message Text="BuildProjectOutputGroup @(TypeScriptCompile)"/>
     <ItemGroup>
       <!-- We can't depend upon GeneratedJavascript defined by TypeScript because it 
            doesn't occur when we're publishing, just when building.  So we calculate
@@ -110,7 +109,6 @@
     <AssignTargetPath Files="@(Compile);@(Content);@(TypeScriptCompile)" RootFolder="$(MSBuildProjectDirectory)">
       <Output TaskParameter="AssignedFiles" ItemName="_CompileWithTargetPath" />
     </AssignTargetPath>
-    <Message Text="Running SourceFilesProjectOutputGroup" Importance="high"/>
     <ItemGroup>
       <!-- First we deal with Compile, EmbeddedResource and AppConfig -->
       <SourceFilesProjectOutputGroupOutput Include="@(_CompileWithTargetPath->'%(FullPath)')"/>
