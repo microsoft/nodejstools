@@ -13,7 +13,9 @@
  * ***************************************************************************/
 
 using System.Windows;
+using System.Windows.Controls;
 using System.Windows.Input;
+using System.Windows.Media;
 
 namespace Microsoft.NodejsTools.NpmUI {
     /// <summary>
@@ -37,11 +39,23 @@ namespace Microsoft.NodejsTools.NpmUI {
             get { return this.ExecuteControl; }
         }
 
-        private void _packageList_OnMouseDoubleClick(object sender, MouseButtonEventArgs e) {
-            //var source = e.OriginalSource;
+        private static object GetItemObjectAtPoint(ItemsControl control, Point p) {
+            var obj = GetListItemAtPoint(control, p);
+            return null == obj ? null : control.ItemContainerGenerator.ItemFromContainer(obj);
+        }
 
+        private static ListBoxItem GetListItemAtPoint(ItemsControl control, Point p) {
+            var result = VisualTreeHelper.HitTest(control, p);
+            var obj = result.VisualHit;
+            while (VisualTreeHelper.GetParent(obj) != null && !(obj is ListBoxItem)) {
+                obj = VisualTreeHelper.GetParent(obj);
+            }
+            return obj as ListBoxItem;
+        }
+
+        private void _packageList_OnMouseDoubleClick(object sender, MouseButtonEventArgs e) {
             var vm = DataContext as NpmPackageInstallViewModel;
-            if (null != vm) {
+            if (null != vm && GetItemObjectAtPoint(_packageList, e.GetPosition(_packageList)) == vm.SelectedPackage) {
                 var cmd = vm.InstallCommand;
                 if (null != cmd && cmd.CanExecute(null)) {
                     cmd.Execute(null);
