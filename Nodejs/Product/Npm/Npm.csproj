@@ -32,7 +32,6 @@
     <Reference Include="Microsoft.CSharp" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="KeywordStringBuilder.cs" />
     <Compile Include="NpmArgumentBuilder.cs" />
     <Compile Include="SemverVersionComparer.cs" />
     <Compile Include="SPI\AbstractNpmSearchComparer.cs" />

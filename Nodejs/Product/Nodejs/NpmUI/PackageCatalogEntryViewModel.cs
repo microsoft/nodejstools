@@ -59,7 +59,7 @@ namespace Microsoft.NodejsTools.NpmUI {
 
         public string Keywords {
             get {
-                var keywords = KeywordStringBuilder.BuildKeywordString(_package);
+                var keywords = string.Join(", ", _package.Keywords);
                 return string.IsNullOrEmpty(keywords)
                     ? Resources.NoKeywordsInPackage
                     : keywords;
