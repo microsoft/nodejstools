@@ -113,6 +113,7 @@ namespace Microsoft.NodejsTools.NpmUI {
                 if (null != _commander) {
                     _commander.CancelCurrentCommand();
                 }
+                IsExecutingCommand = false;
             }
 
             UpdateStatusMessage();

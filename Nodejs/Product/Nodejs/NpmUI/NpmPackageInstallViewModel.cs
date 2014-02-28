@@ -310,8 +310,10 @@ namespace Microsoft.NodejsTools.NpmUI {
             }
         }
 
-        private static bool TreatAsArguments(string source) {
-            return !string.IsNullOrEmpty(source) && source.Any(char.IsWhiteSpace);
+        private bool TreatAsArguments(string source) {
+            return IsCatalogEmpty
+                || (!string.IsNullOrEmpty(source)
+                && (source.Any(char.IsWhiteSpace) || source.Any(ch => ch == '@')));
         }
 
         private static string GetFilterStringPortion(string source) {
