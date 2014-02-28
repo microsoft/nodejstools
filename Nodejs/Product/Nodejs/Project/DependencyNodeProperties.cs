@@ -29,6 +29,12 @@ namespace Microsoft.NodejsTools.Project {
 
         private IPackage Package { get { return DependencyNode.Package; } }
 
+        public override string GetClassName() {
+            return IsSubPackage
+                ? (IsGlobalInstall ? Resources.PropertiesClassGlobalSubPackage : Resources.PropertiesClassLocalSubPackage)
+                : (IsGlobalInstall ? Resources.PropertiesClassGlobalPackage : Resources.PropertiesClassLocalPackage);
+        }
+
         [SRCategoryAttribute(SR.General)]
         [LocDisplayName(SR.NpmPackageName)]
         [SRDescriptionAttribute(SR.NpmPackageNameDescription)]

@@ -35,6 +35,10 @@ namespace Microsoft.NodejsTools.Project {
             get { return NpmNode is GlobalModulesNode; }
         }
 
+        public override string GetClassName() {
+            return IsGlobalNode ? Resources.PropertiesClassGlobal : Resources.PropertiesClassNpm;
+        }
+
         [SRCategoryAttribute(SR.General)]
         [LocDisplayName(SR.NpmNodePackageInstallation)]
         [SRDescriptionAttribute(SR.NpmNodePackageInstallationDescription)]

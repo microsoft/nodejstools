@@ -306,6 +306,24 @@
   <data name="PackageInstallationLocal" xml:space="preserve">
     <value>Local</value>
   </data>
+  <data name="PropertiesClassLocalPackage" xml:space="preserve">
+    <value>Local Package Properties</value>
+  </data>
+  <data name="PropertiesClassGlobalPackage" xml:space="preserve">
+    <value>Global Package Properties</value>
+  </data>
+  <data name="PropertiesClassLocalSubPackage" xml:space="preserve">
+    <value>Local Sub-Package Properties</value>
+  </data>
+  <data name="PropertiesClassGlobalSubPackage" xml:space="preserve">
+    <value>Global Sub-Package Properties</value>
+  </data>
+  <data name="PropertiesClassNpm" xml:space="preserve">
+    <value>npm Packages Properties</value>
+  </data>
+  <data name="PropertiesClassGlobal" xml:space="preserve">
+    <value>Globally npm Packages Properties</value>
+  </data>
   <data name="ScriptArgumentsToolTip" xml:space="preserve">
     <value>Specifies the arguments passed to the script on launch.</value>
   </data>
