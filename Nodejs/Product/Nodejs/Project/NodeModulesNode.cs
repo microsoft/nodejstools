@@ -563,10 +563,7 @@ namespace Microsoft.NodejsTools.Project {
                     return;
                 }
             }
-            //using (var manager = new PackageManagerDialog(NpmController)) {
-            //    manager.ShowDialog();
-            //}
-
+            
             var executeVm = new NpmOutputControlViewModel();
             executeVm.NpmController = NpmController;
             var viewModel = new NpmPackageInstallViewModel(executeVm);
