@@ -55,7 +55,7 @@ namespace Microsoft.NodejsTools.Debugger.Communication {
         }
 
         public override int Read(byte[] buffer, int offset, int count) {
-            return ReadAsync(buffer, offset, count).Result;
+            return ReadAsync(buffer, offset, count).GetAwaiter().GetResult();
         }
 
         public override async Task<int> ReadAsync(byte[] buffer, int offset, int count, CancellationToken cancellationToken) {
@@ -67,7 +67,7 @@ namespace Microsoft.NodejsTools.Debugger.Communication {
         }
 
         public override void Write(byte[] buffer, int offset, int count) {
-            WriteAsync(buffer, offset, count).Wait();
+            WriteAsync(buffer, offset, count).GetAwaiter().GetResult();
         }
 
         public override Task WriteAsync(byte[] buffer, int offset, int count, CancellationToken cancellationToken) {

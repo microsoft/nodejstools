@@ -74,7 +74,7 @@ namespace Microsoft.NodejsTools.Commands {
                 if (!attachTask.Result) {
                     string msg = string.Format(
                         "Could not attach to node.exe process on Azure web site at {0}\r\n\r\n" +
-                        "Make sure that the web site is running and servicing requests, and that the websocket debugging proxy is correctly registerd in web.config",
+                        "Make sure that the web site is running and servicing requests, and that the websocket debugging proxy is correctly registered in web.config",
                         webSite.Uri);
                     if (MessageBox.Show(msg, null, MessageBoxButtons.RetryCancel, MessageBoxIcon.Error) == DialogResult.Retry) {
                         AttachWorker(webSite).ContinueWith(onAttach);
