@@ -188,6 +188,14 @@
               <Condition>VWD_EXTENSION_INSTALLPATH</Condition>
             </Component>
 
+            <Component Directory="PrjTempl_JS_Nodejs_1033" Guid="{E6AE0B10-4EE2-4399-ABD8-4CBCA87307D9}">
+              <File Id="filAzureNodejsWorker.zip" KeyPath="yes" Source="$(var.BinariesDir)\ProjectTemplates\JavaScript\Node.js\1033\AzureNodejsWorker.zip" />
+            </Component>
+            <Component Directory="VWD_PrjTempl_JS_Nodejs_1033" Guid="{995637F7-34B8-4DA8-AE46-8EF233C89290}">
+              <File Id="filVWDAzureNodejsWorker.zip" KeyPath="yes" Source="$(var.BinariesDir)\ProjectTemplates\JavaScript\Node.js\1033\AzureNodejsWorker.zip" />
+              <Condition>VWD_EXTENSION_INSTALLPATH</Condition>
+            </Component>
+
             <Component Directory="PrjTempl_JS_Nodejs_1033" Guid="{86749494-2D16-4AD4-9E86-B3A3ED72DB80}">
               <File Id="filAddWebSiteAzureExpressApp.zip" KeyPath="yes" Source="$(var.BinariesDir)\ProjectTemplates\JavaScript\Node.js\1033\AddWebSiteAzureExpressApp.zip" />
             </Component>
@@ -266,6 +274,14 @@
             </Component>
             <Component Directory="VWD_PrjTempl_TS_Nodejs_1033" Guid="{1A46F16F-670E-48F3-AF0D-6F3657862F59}">
               <File Id="filVWDTypeScriptFromExistingCode.zip" KeyPath="yes" Source="$(var.BinariesDir)\ProjectTemplates\TypeScript\Node.js\1033\TypeScriptFromExistingCode.zip" />
+              <Condition>VWD_EXTENSION_INSTALLPATH</Condition>
+            </Component>
+
+            <Component Directory="PrjTempl_TS_Nodejs_1033" Guid="{FADE680A-2A4C-444C-9B89-D7BDF814471E}">
+              <File Id="filTypeScriptAzureNodejsWorker.zip" KeyPath="yes" Source="$(var.BinariesDir)\ProjectTemplates\TypeScript\Node.js\1033\TypeScriptAzureNodejsWorker.zip" />
+            </Component>
+            <Component Directory="VWD_PrjTempl_TS_Nodejs_1033" Guid="{B52E3CEB-F92A-4CF1-B0E1-9B99EFF37C83}">
+              <File Id="filVWDTypeScriptAzureNodejsWorker.zip" KeyPath="yes" Source="$(var.BinariesDir)\ProjectTemplates\TypeScript\Node.js\1033\TypeScriptAzureNodejsWorker.zip" />
               <Condition>VWD_EXTENSION_INSTALLPATH</Condition>
             </Component>
 
