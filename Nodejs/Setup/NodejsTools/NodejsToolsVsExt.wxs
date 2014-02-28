@@ -122,11 +122,19 @@
               <Condition>VWD_EXTENSION_INSTALLPATH</Condition>
             </Component>
 
+            <Component Directory="INSTALLLOCATION" Guid="{E683DD3E-1F7E-4248-BFE4-C8F9C4004CF8}">
+              <File Id="filCredits.txt" KeyPath="yes" Source="$(var.BinariesDir)\Credits.txt" />
+            </Component>
+            <Component Directory="VWD_INSTALLLOCATION" Guid="{ECA7994E-D4DB-4D39-A1BE-4E6022F61F6B}">
+              <File Id="filVWCredits.txt" KeyPath="yes" Source="$(var.BinariesDir)\Credits.txt" />
+              <Condition>VWD_EXTENSION_INSTALLPATH</Condition>
+            </Component>
+
             <Component Directory="INSTALLLOCATION" Guid="{7FE66D60-4017-4941-9333-D174AC070796}">
-              <File Id="filnode.d.ts" KeyPath="yes" Source="$(var.BinariesDir)\node.d.ts" />
+              <File Id="filnode.d.ts" KeyPath="yes" Source="$(var.BinariesDir)\Scripts\Typings\node\node.d.ts" />
             </Component>
             <Component Directory="VWD_INSTALLLOCATION" Guid="{DF26AC4A-DF20-467B-831D-10C0704DD22C}">
-              <File Id="filVWDnode.d.ts" KeyPath="yes" Source="$(var.BinariesDir)\node.d.ts" />
+              <File Id="filVWDnode.d.ts" KeyPath="yes" Source="$(var.BinariesDir)\Scripts\Typings\node\node.d.ts" />
               <Condition>VWD_EXTENSION_INSTALLPATH</Condition>
             </Component>
 
@@ -185,6 +193,14 @@
             </Component>
             <Component Directory="VWD_PrjTempl_JS_Nodejs_1033" Guid="{4017F342-991F-4645-89F4-EEE704A84F60}">
               <File Id="filVWDNodejsConsoleApp.zip" KeyPath="yes" Source="$(var.BinariesDir)\ProjectTemplates\JavaScript\Node.js\1033\NodejsConsoleApp.zip" />
+              <Condition>VWD_EXTENSION_INSTALLPATH</Condition>
+            </Component>
+
+            <Component Directory="PrjTempl_JS_Nodejs_1033" Guid="{E6AE0B10-4EE2-4399-ABD8-4CBCA87307D9}">
+              <File Id="filAzureNodejsWorker.zip" KeyPath="yes" Source="$(var.BinariesDir)\ProjectTemplates\JavaScript\Node.js\1033\AzureNodejsWorker.zip" />
+            </Component>
+            <Component Directory="VWD_PrjTempl_JS_Nodejs_1033" Guid="{995637F7-34B8-4DA8-AE46-8EF233C89290}">
+              <File Id="filVWDAzureNodejsWorker.zip" KeyPath="yes" Source="$(var.BinariesDir)\ProjectTemplates\JavaScript\Node.js\1033\AzureNodejsWorker.zip" />
               <Condition>VWD_EXTENSION_INSTALLPATH</Condition>
             </Component>
 
@@ -269,6 +285,14 @@
               <Condition>VWD_EXTENSION_INSTALLPATH</Condition>
             </Component>
 
+            <Component Directory="PrjTempl_TS_Nodejs_1033" Guid="{FADE680A-2A4C-444C-9B89-D7BDF814471E}">
+              <File Id="filTypeScriptAzureNodejsWorker.zip" KeyPath="yes" Source="$(var.BinariesDir)\ProjectTemplates\TypeScript\Node.js\1033\TypeScriptAzureNodejsWorker.zip" />
+            </Component>
+            <Component Directory="VWD_PrjTempl_TS_Nodejs_1033" Guid="{B52E3CEB-F92A-4CF1-B0E1-9B99EFF37C83}">
+              <File Id="filVWDTypeScriptAzureNodejsWorker.zip" KeyPath="yes" Source="$(var.BinariesDir)\ProjectTemplates\TypeScript\Node.js\1033\TypeScriptAzureNodejsWorker.zip" />
+              <Condition>VWD_EXTENSION_INSTALLPATH</Condition>
+            </Component>
+
             <!-- New item templates -->
             
             <Component Directory="DIR_NewItem" Guid="{007564C3-0035-45B6-8929-E793159D0C72}">
@@ -295,11 +319,11 @@
               <Condition>VWD_EXTENSION_INSTALLPATH</Condition>
             </Component>
 
-            <Component Directory="DIR_NewItem" Guid="{0CAB0566-88D4-4955-A10B-F1C41F40FA5E}">
-              <File Id="fil_FileTemplates_NewItem_UnitTestJS" KeyPath="yes" Source="$(var.BinariesDir)\FileTemplates\NewItem\UnitTest.js" />
+            <Component Directory="DIR_NewItem" Guid="{21AFA4F2-E0B2-46D5-92DB-8B988A8ECAD7}">
+              <File Id="fil_ItemTemplates_JavaScript_UnitTest" KeyPath="yes" Source="$(var.BinariesDir)\ItemTemplates\JavaScript\UnitTest.zip" />
             </Component>
-            <Component Directory="DIR_VWD_NewItem" Guid="{DFBC4713-F04B-4C2A-9851-C9446BE9C686}">
-              <File Id="filVWD_FileTemplates_NewItem_UnitTestJS" KeyPath="yes" Source="$(var.BinariesDir)\FileTemplates\NewItem\UnitTest.js" />
+            <Component Directory="DIR_VWD_NewItem" Guid="{DFC03E6F-D42F-4216-933B-00410A38A486}">
+              <File Id="filVWD_ItemTemplates_JavaScript_UnitTest" KeyPath="yes" Source="$(var.BinariesDir)\ItemTemplates\JavaScript\UnitTest.zip" />
               <Condition>VWD_EXTENSION_INSTALLPATH</Condition>
             </Component>
 

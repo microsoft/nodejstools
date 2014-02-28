@@ -12,7 +12,13 @@
     <NodejsSupportPath>$(MSBuildThisFileDirectory)</NodejsSupportPath>
     <ProjectHome Condition="'$(ProjectHome)' == ''">.</ProjectHome>
     <DebugSymbols>false</DebugSymbols>
+    <TargetFrameworkIdentifier>Node.js</TargetFrameworkIdentifier>  <!-- disables xaml imports -->
+    <FakesImported>true</FakesImported> <!-- disables quality tools fakes imports -->
   </PropertyGroup>
+  
+  <ItemGroup Condition="'$(BuildingInsideVisualStudio)'=='true'">
+    <AvailableItemName Include="TypeScriptCompile" Condition="'$(EnableTypeScript)' == 'true'"/>
+  </ItemGroup>
 
   <Target Name="GetTargetFrameworkVersion" Returns="$(TargetFrameworkVersion)" />
   <Target Name="GetTargetFrameworkDirectories" Returns="" />
@@ -22,6 +28,12 @@
 
   <Import Project="$(MSBuildToolsPath)\Microsoft.Common.targets"/>
   <Import Project="$(VSToolsPath)\TypeScript\Microsoft.TypeScript.targets" Condition="Exists('$(VSToolsPath)\TypeScript\Microsoft.TypeScript.targets') And '$(EnableTypeScript)' == 'true'" />
+
+  <Target
+    Name="GetReferenceAssemblyPaths"
+    DependsOnTargets="$(GetReferenceAssemblyPathsDependsOn)">
+    <!-- We have no reference assembly paths -->
+  </Target>
 
   <ItemGroup>
     <NodeModulesContent Include="$(ProjectHome)\node_modules\**\*.*"/>
@@ -79,7 +91,6 @@
   </Target>
 
   <Target Name="BuiltProjectOutputGroup" Returns="@(BuiltProjectOutputGroupOutput)">
-    <Message Text="BuildProjectOutputGroup @(TypeScriptCompile)"/>
     <ItemGroup>
       <!-- We can't depend upon GeneratedJavascript defined by TypeScript because it 
            doesn't occur when we're publishing, just when building.  So we calculate
@@ -88,13 +99,14 @@
            Worker Roles won't invoke PublishPipeline, they invoke some targets directly -->
       <_GeneratedJavascript Include="@(TypeScriptCompile->'%(RelativeDir)%(Filename).js')"/>
       <!-- Building scripts results in the scripts -->
-      <_TempBuiltProjectOutputGroup Include="@(Compile->'%(FullPath)');@(Content->'%(FullPath)');@(_GeneratedJavascript->'%(FullPath)')"/>
+      <_TempBuiltProjectOutputGroup Include="@(Compile->'%(FullPath)');@(Content->'%(FullPath)');@(_GeneratedJavascript->'%(FullPath)');@(NodeModulesContent->'%(FullPath)')"/>
 
       <!-- Include the project file -->
       <_TempBuiltProjectOutputGroup Include="$(MSBuildProjectFullPath)">
         <OriginalItemSpec>$(MSBuildProjectFullPath)</OriginalItemSpec>
         <TargetPath>$(ProjectFileName)</TargetPath>
       </_TempBuiltProjectOutputGroup>
+      
     </ItemGroup>
 
     <AssignTargetPath Files="@(_TempBuiltProjectOutputGroup)" RootFolder="$(MSBuildProjectDirectory)">
@@ -107,10 +119,9 @@
       Returns="@(SourceFilesProjectOutputGroupOutput)"
       DependsOnTargets="$(SourceFilesProjectOutputGroupDependsOn)">
 
-    <AssignTargetPath Files="@(Compile);@(Content)" RootFolder="$(MSBuildProjectDirectory)">
+    <AssignTargetPath Files="@(Compile);@(Content);@(TypeScriptCompile)" RootFolder="$(MSBuildProjectDirectory)">
       <Output TaskParameter="AssignedFiles" ItemName="_CompileWithTargetPath" />
     </AssignTargetPath>
-    <Message Text="Running SourceFilesProjectOutputGroup" Importance="high"/>
     <ItemGroup>
       <!-- First we deal with Compile, EmbeddedResource and AppConfig -->
       <SourceFilesProjectOutputGroupOutput Include="@(_CompileWithTargetPath->'%(FullPath)')"/>

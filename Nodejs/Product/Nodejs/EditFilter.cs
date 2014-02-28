@@ -54,6 +54,7 @@ namespace Microsoft.NodejsTools {
             textView.Closed += TextViewClosed;
             string path = GetFilePath();
             if (path != null) {
+                System.Diagnostics.Debug.Assert(JavaScriptFormattingService.Instance != null);
                 JavaScriptFormattingService.Instance.AddDocument(path, textView.TextBuffer);
             }
         }

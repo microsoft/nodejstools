@@ -1,9 +1,7 @@
-/// <reference path="../node.d.ts" />
-
 /*
  * GET home page.
  */
 
-export function index(req, res) {
+export function index(req: ServerRequest, res: ExpressResponse) {
     res.render('index', { title: 'Express' });
 };

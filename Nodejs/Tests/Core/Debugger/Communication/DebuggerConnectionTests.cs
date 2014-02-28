@@ -28,12 +28,12 @@ namespace NodejsTests.Debugger.Communication {
             // Arrange
             var memoryStream = new MemoryStream();
 
-            var tcpClientMock = new Mock<ITcpClient>();
+            var tcpClientMock = new Mock<INetworkClient>();
             tcpClientMock.Setup(p => p.GetStream()).Returns(() => memoryStream);
             tcpClientMock.SetupGet(p => p.Connected).Returns(() => true);
 
-            var tcpClientFactoryMock = new Mock<ITcpClientFactory>();
-            tcpClientFactoryMock.Setup(p => p.CreateTcpClient(It.IsAny<string>(), It.IsAny<int>())).Returns(() => tcpClientMock.Object);
+            var tcpClientFactoryMock = new Mock<INetworkClientFactory>();
+            tcpClientFactoryMock.Setup(p => p.CreateNetworkClient(It.IsAny<Uri>())).Returns(() => tcpClientMock.Object);
 
             var debuggerConnection = new DebuggerConnection(tcpClientFactoryMock.Object);
             object sender = null;
@@ -44,7 +44,7 @@ namespace NodejsTests.Debugger.Communication {
                 sender = s;
                 args = a;
             };
-            debuggerConnection.Connect("localhost", 5858);
+            debuggerConnection.Connect(new Uri("tcp://localhost:5858"));
             debuggerConnection.Close();
 
             await Task.Delay(TimeSpan.FromMilliseconds(100));
@@ -68,12 +68,12 @@ namespace NodejsTests.Debugger.Communication {
             await memoryStream.FlushAsync();
             memoryStream.Seek(0, SeekOrigin.Begin);
 
-            var tcpClientMock = new Mock<ITcpClient>();
+            var tcpClientMock = new Mock<INetworkClient>();
             tcpClientMock.Setup(p => p.GetStream()).Returns(() => memoryStream);
             tcpClientMock.SetupGet(p => p.Connected).Returns(() => true);
 
-            var tcpClientFactoryMock = new Mock<ITcpClientFactory>();
-            tcpClientFactoryMock.Setup(p => p.CreateTcpClient(It.IsAny<string>(), It.IsAny<int>())).Returns(() => tcpClientMock.Object);
+            var tcpClientFactoryMock = new Mock<INetworkClientFactory>();
+            tcpClientFactoryMock.Setup(p => p.CreateNetworkClient(It.IsAny<Uri>())).Returns(() => tcpClientMock.Object);
 
             var debuggerConnection = new DebuggerConnection(tcpClientFactoryMock.Object);
             object sender = null;
@@ -85,7 +85,7 @@ namespace NodejsTests.Debugger.Communication {
                 sender = s;
                 args = a;
             };
-            debuggerConnection.Connect("localhost", 5858);
+            debuggerConnection.Connect(new Uri("tcp://localhost:5858"));
             bool afterConnection = debuggerConnection.Connected;
 
             await Task.Delay(TimeSpan.FromMilliseconds(100));
@@ -107,18 +107,18 @@ namespace NodejsTests.Debugger.Communication {
             var sourceStream = new MemoryStream();
             var tcs = new TaskCompletionSource<bool>();
 
-            var tcpClientMock = new Mock<ITcpClient>();
+            var tcpClientMock = new Mock<INetworkClient>();
             tcpClientMock.Setup(p => p.GetStream()).Returns(() => sourceStream);
             tcpClientMock.SetupGet(p => p.Connected).Returns(() => tcs.Task.Result);
 
-            var tcpClientFactoryMock = new Mock<ITcpClientFactory>();
-            tcpClientFactoryMock.Setup(p => p.CreateTcpClient(It.IsAny<string>(), It.IsAny<int>())).Returns(() => tcpClientMock.Object);
+            var tcpClientFactoryMock = new Mock<INetworkClientFactory>();
+            tcpClientFactoryMock.Setup(p => p.CreateNetworkClient(It.IsAny<Uri>())).Returns(() => tcpClientMock.Object);
 
             var debuggerConnection = new DebuggerConnection(tcpClientFactoryMock.Object);
             string result;
 
             // Act
-            debuggerConnection.Connect("localhost", 5858);
+            debuggerConnection.Connect(new Uri("tcp://localhost:5858"));
             await debuggerConnection.SendMessageAsync(message);
 
             sourceStream.Seek(0, SeekOrigin.Begin);
@@ -145,17 +145,17 @@ namespace NodejsTests.Debugger.Communication {
             await memoryStream.FlushAsync();
             memoryStream.Seek(0, SeekOrigin.Begin);
 
-            var tcpClientMock = new Mock<ITcpClient>();
+            var tcpClientMock = new Mock<INetworkClient>();
             tcpClientMock.Setup(p => p.GetStream()).Returns(() => memoryStream);
             tcpClientMock.SetupGet(p => p.Connected).Returns(() => true);
 
-            var tcpClientFactoryMock = new Mock<ITcpClientFactory>();
-            tcpClientFactoryMock.Setup(p => p.CreateTcpClient(It.IsAny<string>(), It.IsAny<int>())).Returns(() => tcpClientMock.Object);
+            var tcpClientFactoryMock = new Mock<INetworkClientFactory>();
+            tcpClientFactoryMock.Setup(p => p.CreateNetworkClient(It.IsAny<Uri>())).Returns(() => tcpClientMock.Object);
 
             var debuggerConnection = new DebuggerConnection(tcpClientFactoryMock.Object);
 
             // Act
-            debuggerConnection.Connect("localhost", 5858);
+            debuggerConnection.Connect(new Uri("tcp://localhost:5858"));
 
             await Task.Delay(TimeSpan.FromMilliseconds(100));
             memoryStream.Close();

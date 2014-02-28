@@ -16,6 +16,7 @@ using System;
 using System.Diagnostics;
 using System.Threading;
 using System.Threading.Tasks;
+using Microsoft.VisualStudio.Shell.Interop;
 using Microsoft.VisualStudioTools.Project;
 
 namespace Microsoft.NodejsTools.Jade {
@@ -202,6 +203,13 @@ namespace Microsoft.NodejsTools.Jade {
             if (!_connectedToIdle) {
                 _connectedToIdle = true;
                 _idleConnectTime = DateTime.Now;
+
+                // make sure our package is loaded so we can use its
+                // OnIdle event
+                Guid nodePackage = new Guid(Guids.NodejsPackageString);
+                IVsPackage package;
+                var shell = (IVsShell)NodejsPackage.GetGlobalService(typeof(SVsShell));
+                shell.LoadPackage(ref nodePackage, out package);
 
                 NodejsPackage.Instance.OnIdle += OnIdle;
             }

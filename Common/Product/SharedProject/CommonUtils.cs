@@ -393,5 +393,23 @@ namespace Microsoft.VisualStudioTools {
             return !string.IsNullOrEmpty(path) &&
                 path.IndexOfAny(InvalidPathChars) < 0;
         }
+
+        /// <summary>
+        /// Gets a filename in the specified location with the specified name and extension.
+        /// If the file already exist it will calculate a name with a number in it.
+        /// </summary>
+        public static string GetAvailableFilename(string location, string basename, string extension) {
+            var newPath = Path.Combine(location, basename);
+            int index = 0;
+            if (File.Exists(newPath + extension)) {
+                string candidateNewPath;
+                do {
+                    candidateNewPath = string.Format("{0}{1}", newPath, ++index);
+                } while (File.Exists(candidateNewPath + extension));
+                newPath = candidateNewPath;
+            }
+            string final = newPath + extension;
+            return final;
+        }
     }
 }

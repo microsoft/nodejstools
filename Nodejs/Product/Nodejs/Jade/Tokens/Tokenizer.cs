@@ -312,15 +312,18 @@ namespace Microsoft.NodejsTools.Jade {
         }
 
         /// <summary>
-        /// Collects all characters up to the next whitespace
+        /// Collects all characters up to the next whitespace always
+        /// including the current character
         /// </summary>
         /// <returns>Sequence range</returns>
-        protected virtual ITextRange GetNonWSSequence(string terminators) {
+        protected ITextRange GetNonWSSequence(string terminators) {
             int start = _cs.Position;
+
+            _cs.MoveToNextChar();
 
             while (!_cs.IsEndOfStream() && !_cs.IsWhiteSpace()) {
                 for (int i = 0; i < terminators.Length; i++) {
-                    if (_cs.CurrentChar == terminators[i])
+                    if (terminators.IndexOf(_cs.CurrentChar) != -1)
                         return TextRange.FromBounds(start, _cs.Position);
                 }
 

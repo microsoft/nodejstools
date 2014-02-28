@@ -21,11 +21,12 @@ using System.Globalization;
 using System.IO;
 using System.Linq;
 using System.Runtime.InteropServices;
+using System.Threading.Tasks;
 using System.Windows;
-using Microsoft.VisualStudioTools;
 using Microsoft.VisualStudio;
 using Microsoft.VisualStudio.Shell;
 using Microsoft.VisualStudio.Shell.Interop;
+using Microsoft.VisualStudioTools;
 using Microsoft.VisualStudioTools.Project;
 
 namespace Microsoft.NodejsTools.Profiling {
@@ -84,6 +85,8 @@ namespace Microsoft.NodejsTools.Profiling {
         protected override void Initialize() {
             Trace.WriteLine(string.Format(CultureInfo.CurrentCulture, "Entering Initialize() of: {0}", this.ToString()));
             base.Initialize();
+
+            UIThread.Instance.Run(() => { });
 
             var shell = (IVsShell)GetService(typeof(SVsShell));
 
@@ -262,7 +265,18 @@ namespace Microsoft.NodejsTools.Profiling {
             }
         }
 
-        internal static void ProfileProject(SessionNode session, EnvDTE.Project projectToProfile, bool openReport) {
+        internal async void ProfileProject(SessionNode session, EnvDTE.Project projectToProfile, bool openReport) {
+            if (!await UIThread.Instance.RunSync(async () => {
+                if (!await EnsureProjectUpToDate(projectToProfile)) {
+                    if (MessageBox.Show(Resources.FailedToBuild, Resources.NodejsToolsForVS, MessageBoxButton.YesNo) == MessageBoxResult.No) {
+                        return false;
+                    }
+                }
+                return true;
+            })) {
+                return;
+            }
+
             var interpreterArgs = (string)projectToProfile.Properties.Item("NodeExeArguments").Value;
             var scriptArgs = (string)projectToProfile.Properties.Item("ScriptArguments").Value;
             var startBrowser = (bool)projectToProfile.Properties.Item("StartWebBrowser").Value;
@@ -299,6 +313,83 @@ namespace Microsoft.NodejsTools.Profiling {
                 port,
                 startBrowser
             );
+        }
+
+        class UpdateSolutionEvents : IVsUpdateSolutionEvents {
+            private readonly TaskCompletionSource<bool> SuccessSource = new TaskCompletionSource<bool>();
+            
+            public Task<bool> Task {
+                get{
+                    return SuccessSource.Task;
+                }
+            }
+
+            public int OnActiveProjectCfgChange(IVsHierarchy pIVsHierarchy) {
+                return VSConstants.S_OK;
+            }
+
+            public int UpdateSolution_Begin(ref int pfCancelUpdate) {
+                pfCancelUpdate = 0;
+                return VSConstants.S_OK;
+            }
+
+            public int UpdateSolution_Cancel() {
+                return VSConstants.S_OK;
+            }
+
+            public int UpdateSolution_Done(int fSucceeded, int fModified, int fCancelCommand) {
+                SuccessSource.SetResult(fSucceeded != 0);                
+                return VSConstants.S_OK;
+            }
+
+            public int UpdateSolution_StartUpdate(ref int pfCancelUpdate) {
+                pfCancelUpdate = 0;
+                return VSConstants.S_OK;
+            }
+        }
+
+        /// <summary>
+        /// Ensures the project is up to date.  Returns true if the project is up to date
+        /// or is successfully built, false if it's not up to date.
+        /// </summary>
+        private async Task<bool> EnsureProjectUpToDate(EnvDTE.Project projectToProfile) {
+            var guid = Guid.Parse((string)projectToProfile.Properties.Item("Guid").Value);
+            var solution = (IVsSolution)GetService(typeof(SVsSolution));
+            IVsHierarchy hierarchy;
+            if (ErrorHandler.Succeeded(solution.GetProjectOfGuid(ref guid, out hierarchy))) {
+                var buildMan = (IVsSolutionBuildManager)GetService(typeof(SVsSolutionBuildManager));
+                if (buildMan != null) {
+                    if (((IVsSolutionBuildManager3)buildMan).AreProjectsUpToDate(0) == VSConstants.S_OK) {
+                        // projects are up to date, no need to build.
+                        return true;
+                    }
+
+                    uint updateCookie = VSConstants.VSCOOKIE_NIL;
+                    var updateEvents = new UpdateSolutionEvents();
+                    try {
+                        if (ErrorHandler.Succeeded(buildMan.AdviseUpdateSolutionEvents(updateEvents, out updateCookie))) {
+                            int hr;
+                            if (ErrorHandler.Succeeded(
+                                hr = buildMan.StartSimpleUpdateProjectConfiguration(
+                                hierarchy,
+                                null,
+                                null,
+                                (uint)(VSSOLNBUILDUPDATEFLAGS.SBF_OPERATION_BUILD),
+                                0,
+                                0
+                            ))) {
+                                return await updateEvents.Task;
+                            }
+                        }
+                    } finally {
+                        if (updateCookie != VSConstants.VSCOOKIE_NIL) {
+                            buildMan.UnadviseUpdateSolutionEvents(updateCookie);
+                        }
+                    }
+                }
+            }
+
+            return true;
         }
 
         private static void ProfileStandaloneTarget(SessionNode session, StandaloneTarget runTarget, bool openReport) {

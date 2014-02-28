@@ -26,6 +26,7 @@ using Microsoft.NodejsTools.Debugger.Commands;
 using Microsoft.NodejsTools.Debugger.Communication;
 using Microsoft.NodejsTools.Debugger.Events;
 using Microsoft.NodejsTools.Debugger.Serialization;
+using Microsoft.VisualStudioTools.Project;
 
 namespace Microsoft.NodejsTools.Debugger {
     /// <summary>
@@ -34,15 +35,14 @@ namespace Microsoft.NodejsTools.Debugger {
     class NodeDebugger : IDisposable {
         public readonly int MainThreadId = 1;
         private readonly Dictionary<int, NodeBreakpointBinding> _breakpointBindings = new Dictionary<int, NodeBreakpointBinding>();
+        private readonly Uri _debuggerEndpointUri;
         private readonly IDebuggerClient _client;
         private readonly IDebuggerConnection _connection;
         private readonly Dictionary<int, string> _errorCodes = new Dictionary<int, string>();
         private readonly ExceptionHandler _exceptionHandler;
-        private readonly string _hostName;
         private readonly Dictionary<int, NodeModule> _mapIdToScript = new Dictionary<int, NodeModule>();
         private readonly Dictionary<string, NodeModule> _mapNameToScript = new Dictionary<string, NodeModule>(StringComparer.OrdinalIgnoreCase);
         private readonly Version _nodeSetVariableValueVersion = new Version(0, 10, 12);
-        private readonly ushort _portNumber;
         private readonly EvaluationResultFactory _resultFactory;
         private readonly SourceMapper _sourceMapper;
         private readonly Dictionary<int, NodeThread> _threads = new Dictionary<int, NodeThread>();
@@ -62,7 +62,7 @@ namespace Microsoft.NodejsTools.Debugger {
         private SteppingKind _steppingMode;
 
         private NodeDebugger() {
-            _connection = new DebuggerConnection(new TcpClientFactory());
+            _connection = new DebuggerConnection(new NetworkClientFactory());
             _connection.ConnectionClosed += OnConnectionClosed;
 
             _client = new DebuggerClient(_connection);
@@ -106,8 +106,7 @@ namespace Microsoft.NodejsTools.Debugger {
                 }
             }
 
-            _hostName = "localhost";
-            _portNumber = debuggerPortOrDefault;
+            _debuggerEndpointUri = new UriBuilder { Scheme = "tcp", Host = "localhost", Port = debuggerPortOrDefault }.Uri;
 
             var allArgs = String.Format("--debug-brk={0} {1}", debuggerPortOrDefault, script);
             if (!string.IsNullOrEmpty(interpreterOptions)) {
@@ -142,9 +141,8 @@ namespace Microsoft.NodejsTools.Debugger {
             };
         }
 
-        public NodeDebugger(string hostName, ushort portNumber, int id) : this() {
-            _hostName = hostName;
-            _portNumber = portNumber;
+        public NodeDebugger(Uri debuggerEndpointUri, int id) : this() {
+            _debuggerEndpointUri = debuggerEndpointUri;
             _id = id;
             _attached = true;
         }
@@ -483,7 +481,7 @@ namespace Microsoft.NodejsTools.Debugger {
         /// to give time to attach to debugger events.
         /// </summary>
         public async void StartListening() {
-            _connection.Connect(_hostName, _portNumber);
+            _connection.Connect(_debuggerEndpointUri);
 
             var mainThread = new NodeThread(this, MainThreadId, false);
             _threads[mainThread.Id] = mainThread;
@@ -1167,7 +1165,14 @@ namespace Microsoft.NodejsTools.Debugger {
                     args += " & if not errorlevel 1 pause";
                 }
                 args += "\"";
-                psi.FileName = Path.Combine(Environment.SystemDirectory, "cmd.exe");
+                var binaryType = NativeMethods.GetBinaryType(psi.FileName);
+                if (binaryType == System.Reflection.ProcessorArchitecture.Amd64) {
+                    // VS wants the binary we launch to match in bitness to the Node.exe
+                    // we're requesting it to launch.
+                    psi.FileName = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.Windows), "Sysnative", "cmd.exe");
+                } else {
+                    psi.FileName = Path.Combine(Environment.SystemDirectory, "cmd.exe");
+                }
                 psi.Arguments = args;
             }
         }

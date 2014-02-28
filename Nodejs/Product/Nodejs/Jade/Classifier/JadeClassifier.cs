@@ -78,7 +78,8 @@ namespace Microsoft.NodejsTools.Jade {
                 case JadeTokenType.TagKeyword:
                 case JadeTokenType.TagName:
                 case JadeTokenType.Filter:
-                case JadeTokenType.JadeSelector:
+                case JadeTokenType.IdLiteral:
+                case JadeTokenType.ClassLiteral:
                 case JadeTokenType.Comment:
                     return true;
             }

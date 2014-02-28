@@ -14,8 +14,8 @@
 
 using System;
 using System.Collections.Generic;
-using System.Linq;
 using System.Text;
+using System.Linq;
 using Microsoft.VisualStudio.Text;
 
 namespace TestUtilities.Mocks {
@@ -83,21 +83,21 @@ namespace TestUtilities.Mocks {
             var deletes = new NormalizedSnapshotSpanCollection(
                 _snapshot,
                 _edits.Where(edit => edit is DeletionEdit)
-                .Select(edit => 
+                .Select(edit =>
                     new Span(
-                        ((DeletionEdit)edit).Position, 
+                        ((DeletionEdit)edit).Position,
                         ((DeletionEdit)edit).Length
                     )
                 )
             );
-            
+
             // apply the deletes
             for (int i = deletes.Count - 1; i >= 0; i--) {
                 text.Remove(deletes[i].Start, deletes[i].Length);
             }
 
             // now apply the inserts
-            int curDelete = 0, adjust = 0;            
+            int curDelete = 0, adjust = 0;
             foreach (InsertionEdit insert in _edits.Where(edit => edit is InsertionEdit)) {
                 while (curDelete < deletes.Count && deletes[curDelete].Start < insert.Position) {
                     adjust -= deletes[curDelete++].Length;
@@ -140,8 +140,8 @@ namespace TestUtilities.Mocks {
             }
 
             var res = ((MockTextBuffer)_snapshot.TextBuffer)._snapshot = new MockTextSnapshot(
-                (MockTextBuffer)_snapshot.TextBuffer, 
-                text.ToString(), 
+                (MockTextBuffer)_snapshot.TextBuffer,
+                text.ToString(),
                 _snapshot,
                 changes.ToArray()
             );

@@ -69,7 +69,8 @@ namespace Microsoft.NodejsTools.TestAdapter {
                     foreach (var item in ((MSBuild.Project)proj).GetItems("Compile")) {
                         string fileAbsolutePath = CommonUtils.GetAbsoluteFilePath(projectHome, item.EvaluatedInclude);
 
-                        if (!TestContainerDiscoverer.IsTestFile(fileAbsolutePath)) {
+                        string value = item.GetMetadataValue("HasTests");
+                        if (String.IsNullOrEmpty(value) || !value.Equals("true", StringComparison.OrdinalIgnoreCase)) {
                             continue;
                         }
 
@@ -90,8 +91,8 @@ namespace Microsoft.NodejsTools.TestAdapter {
                                 }
                             }
                         } finally {
-                            try { 
-                                File.Delete(tempFile); 
+                            try {
+                                File.Delete(tempFile);
                             } catch (Exception) { //
                                 //Unable to delete for some reason
                                 //  We leave the file behind in this case, its in TEMP so eventually OS will clean up                                

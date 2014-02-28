@@ -16,6 +16,7 @@ using System;
 using System.Collections.Generic;
 using System.Drawing;
 using System.IO;
+using System.Linq;
 using System.Reflection;
 using System.Text;
 using System.Threading;
@@ -49,8 +50,13 @@ namespace Microsoft.NodejsTools.Project {
             _timer = new Timer(RefreshReferenceFile);
         }
 
-        private void InitDependencyImages()
-        {
+        public override IEnumerable<string> GetAvailableItemNames() {
+            // Remove a couple of available item names which show up from imports we
+            // can't control out of Microsoft.Common.targets.
+            return base.GetAvailableItemNames().Except(new[] { "CodeAnalysisDictionary", "XamlAppDef" });
+        }
+
+        private void InitDependencyImages() {
             var images = ImageHandler.ImageList.Images;
             ImageIndexDependency = images.Count;
             images.Add(Image.FromStream(typeof(NodejsProjectNode).Assembly.GetManifestResourceStream("Microsoft.NodejsTools.Resources.Dependency_16.png")));
@@ -86,7 +92,7 @@ namespace Microsoft.NodejsTools.Project {
         private void RefreshReferenceFile(object state) {
             UpdateReferenceFile();
         }
-
+        
         public override int InitializeForOuter(string filename, string location, string name, uint flags, ref Guid iid, out IntPtr projectPointer, out int canceled) {
             int res = base.InitializeForOuter(filename, location, name, flags, ref iid, out projectPointer, out canceled);
             if (ErrorHandler.Succeeded(res)) {
@@ -104,24 +110,31 @@ namespace Microsoft.NodejsTools.Project {
         protected override void FinishProjectCreation(string sourceFolder, string destFolder) {
             foreach (MSBuild.ProjectItem item in this.BuildProject.Items) {
                 if (String.Equals(Path.GetExtension(item.EvaluatedInclude), NodejsConstants.TypeScriptExtension, StringComparison.OrdinalIgnoreCase)) {
-                    // If we have a TypeScript project deploy our node reference file.
+
+                    // Create the 'typings' folder
+                    var typingsFolder = Path.Combine(ProjectHome, "Scripts", "typings");
+                    if (!Directory.Exists(typingsFolder)) {
+                        Directory.CreateDirectory(typingsFolder);
+                    }
+
+                    // Deploy node.d.ts into If we have a TypeScript project deploy our node reference file.
+                    var nodeTypingsFolder = Path.Combine(typingsFolder, "node");
+                    if (!Directory.Exists(Path.Combine(nodeTypingsFolder))) {
+                        Directory.CreateDirectory(nodeTypingsFolder);
+                    }
+
                     File.Copy(
                         Path.Combine(
                             Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location),
+                            "Scripts",
+                            "typings",
+                            "node",
                             "node.d.ts"
                         ),
-                        Path.Combine(ProjectHome, "node.d.ts")
-                    );
-
-                    // copy any additional d.ts files
-                    foreach (var file in Directory.EnumerateFiles(sourceFolder, "*.d.ts", SearchOption.AllDirectories)) {
-                        var destPath = Path.Combine(
-                            destFolder,
-                            CommonUtils.GetRelativeFilePath(sourceFolder, file)
+                        Path.Combine(
+                            nodeTypingsFolder,
+                            "node.d.ts")
                         );
-                        File.Copy(file, destPath);
-                        new FileInfo(destPath).Attributes = FileAttributes.Normal;
-                    }
                     break;
                 }
             }
@@ -256,7 +269,7 @@ namespace Microsoft.NodejsTools.Project {
                 base.Reload();
 
                 SyncFileSystem();
-
+                
                 foreach (var group in _refGroupDispenser.Groups) {
                     group.GenerateReferenceFile();
                 }
@@ -687,13 +700,11 @@ function require(module) {
 
 
 
-        protected internal override void ProcessReferences()
-        {
+        protected internal override void ProcessReferences() {
             base.ProcessReferences();
 
-            if ( null == ModulesNode )
-            {
-                ModulesNode = new NodeModulesNode( this );
+            if (null == ModulesNode) {
+                ModulesNode = new NodeModulesNode(this);
                 AddChild(ModulesNode);
             }
         }
@@ -728,7 +739,7 @@ function require(module) {
         }
 
         public EnvDTE.Project Project {
-            get { return (OAProject)GetAutomationObject();  }
+            get { return (OAProject)GetAutomationObject(); }
         }
 
         public VsWebSite.AssemblyReferences References {

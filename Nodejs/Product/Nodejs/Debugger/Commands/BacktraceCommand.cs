@@ -64,11 +64,8 @@ namespace Microsoft.NodejsTools.Debugger.Commands {
             Modules = GetScripts((JArray)response["refs"], _debugger);
 
             // Extract frames
-            var frames = (JArray)body["frames"];
-            if (frames == null) {
-                return;
-            }
-
+            var frames = (JArray)body["frames"] ?? new JArray();
+            var results = new List<NodeStackFrame>(frames.Count);
             foreach (JToken frame in frames) {
                 // Create stack frame
                 string name = GetFrameName(frame);

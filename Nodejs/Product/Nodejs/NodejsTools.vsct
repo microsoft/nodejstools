@@ -44,6 +44,13 @@
 
         <Group guid="guidNodeToolsCmdSet" id="NpmUninstallItemsGroup" priority="0x0800"></Group>
 
+        <!-- On newer versions of Web Tools, this is provided by their package, but on the older ones they rely 
+             on Server Explorer to dynamically generate the items for them. Defining it here and parenting our
+             command to it makes it show in the right spot (next to "Attach Debugger") on newer versions, and
+             show in a separate group all by itself on older versions, which is the best we can get. -->
+        <Group guid="guidAzureExplorerCmdId" id="groupAzureDiagnostics" priority="0x0150">
+          <Parent guid="guid_SE_MenuGroup" id="IDM_SE_CONTEXT_STANDARD"/>
+        </Group>
     </Groups>
 
     <Menus>
@@ -224,6 +231,18 @@
           <CommandName>Import Existing Project...</CommandName>
         </Strings>
       </Button>
+
+      <Button guid="guidNodeToolsCmdSet" id="cmdidAzureExplorerAttachNodejsDebugger" priority="0x0110" type="Button">
+        <Parent guid="guidAzureExplorerCmdId" id="groupAzureDiagnostics"/>
+        <CommandFlag>DefaultInvisible</CommandFlag>
+        <CommandFlag>DynamicVisibility</CommandFlag>
+        <Strings>
+          <ButtonText>Attach Debugger (&amp;node.js)</ButtonText>
+          <MenuText>Attach Debugger (&amp;node.js)</MenuText>
+          <ToolTipText>Attach the node.js debugger to the remote Windows Azure site</ToolTipText>
+          <CommandName>Attach node.js Debugger</CommandName>
+        </Strings>
+      </Button>
     </Buttons>
 
 
@@ -288,6 +307,7 @@
       <IDSymbol name="cmdidNpmUninstallModule" value="0x020A" />
       <IDSymbol name="cmdidNpmInstallSingleMissingModule" value="0x020B" />
       <IDSymbol name="cmdidNpmUpdateSingleModule" value="0x020C" />
+      <IDSymbol name="cmdidAzureExplorerAttachNodejsDebugger" value="0x020D" />
 
       <!-- Shared commands, defined in CommonConstants.cs -->
       <IDSymbol name="cmdidAddExistingFolder" value="0x10001" />
@@ -300,6 +320,7 @@
       <IDSymbol name="CodeFileGroup" value="0x1012" />
       <IDSymbol name="NpmInstallItemsGroup" value="0x1013" />
       <IDSymbol name="NpmUninstallItemsGroup" value="0x1014" />
+      <IDSymbol name="AzureExplorerCommandsGroup" value="0x1015" />
 
       <!-- Menus -->
       <IDSymbol name="ToolsMenu" value ="0x2001" />
@@ -313,7 +334,11 @@
       <IDSymbol name="bmpPicX" value="4" />
       <IDSymbol name="bmpPicArrows" value="5" />
       <IDSymbol name="nodeDebugRepl" value="6" />
-    </GuidSymbol>    
+    </GuidSymbol>
+
+    <GuidSymbol name="guidAzureExplorerCmdId" value="{2F32C14E-B908-42E6-AE7E-B8B3E2DED633}">
+      <IDSymbol name="groupAzureDiagnostics" value="400" />
+    </GuidSymbol>
   </Symbols>
 
 </CommandTable>
