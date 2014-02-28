@@ -688,6 +688,10 @@
     <ZipProject Include="ProjectTemplates\AddWebSiteAzureExpressApp\Preview.png" />
     <ZipProject Include="ProjectTemplates\AzureNodejsApp\Preview.png" />
     <ZipProject Include="ProjectTemplates\NodejsConsoleApp\Preview.png" />
+    <Content Include="Credits.txt">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+      <IncludeInVSIX>true</IncludeInVSIX>
+    </Content>
     <Content Include="FileTemplates\NewItem\EmptyTs.ts">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
       <IncludeInVSIX>true</IncludeInVSIX>
@@ -757,7 +761,7 @@
     <TypeScriptProject Include="ProjectTemplates\TypeScriptWebApp\Preview.png" />
     <TypeScriptProject Include="ProjectTemplates\TypeScriptWebApp\package.json" />
     <TypeScriptProject Include="ProjectTemplates\TypeScriptWebApp\README.md" />
-    <Content Include="node.d.ts">
+    <Content Include="Scripts\Typings\node\node.d.ts">
       <IncludeInVSIX>true</IncludeInVSIX>
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>

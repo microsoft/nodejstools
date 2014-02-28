@@ -1,5 +1,3 @@
-/// <reference path="../node.d.ts" />
-
 /*
  * GET home page.
  */

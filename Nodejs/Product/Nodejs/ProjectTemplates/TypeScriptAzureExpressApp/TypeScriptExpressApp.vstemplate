@@ -30,10 +30,16 @@
         <ProjectItem>index.jade</ProjectItem>        
         <ProjectItem>layout.jade</ProjectItem>        
       </Folder>
+      <Folder Name="Scripts">
+        <Folder Name="typings">
+          <Folder Name="express">
+            <ProjectItem>express.d.ts</ProjectItem>
+          </Folder>
+        </Folder>
+      </Folder>
       <ProjectItem OpenInEditor="true">app.ts</ProjectItem>
       <ProjectItem ReplaceParameters="true">package.json</ProjectItem>
-      <ProjectItem ReplaceParameters="true">README.md</ProjectItem>
-      <ProjectItem>express.d.ts</ProjectItem>
+      <ProjectItem ReplaceParameters="true">README.md</ProjectItem>      
       <ProjectItem>Web.config</ProjectItem>
       <ProjectItem>Web.cloud.config</ProjectItem>
       <ProjectItem ReplaceParameters="true">Web.Debug.config</ProjectItem>

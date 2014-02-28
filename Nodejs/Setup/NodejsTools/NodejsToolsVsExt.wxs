@@ -122,11 +122,19 @@
               <Condition>VWD_EXTENSION_INSTALLPATH</Condition>
             </Component>
 
+            <Component Directory="INSTALLLOCATION" Guid="{E683DD3E-1F7E-4248-BFE4-C8F9C4004CF8}">
+              <File Id="filCredits.txt" KeyPath="yes" Source="$(var.BinariesDir)\Credits.txt" />
+            </Component>
+            <Component Directory="VWD_INSTALLLOCATION" Guid="{ECA7994E-D4DB-4D39-A1BE-4E6022F61F6B}">
+              <File Id="filVWCredits.txt" KeyPath="yes" Source="$(var.BinariesDir)\Credits.txt" />
+              <Condition>VWD_EXTENSION_INSTALLPATH</Condition>
+            </Component>
+
             <Component Directory="INSTALLLOCATION" Guid="{7FE66D60-4017-4941-9333-D174AC070796}">
-              <File Id="filnode.d.ts" KeyPath="yes" Source="$(var.BinariesDir)\node.d.ts" />
+              <File Id="filnode.d.ts" KeyPath="yes" Source="$(var.BinariesDir)\Scripts\Typings\node\node.d.ts" />
             </Component>
             <Component Directory="VWD_INSTALLLOCATION" Guid="{DF26AC4A-DF20-467B-831D-10C0704DD22C}">
-              <File Id="filVWDnode.d.ts" KeyPath="yes" Source="$(var.BinariesDir)\node.d.ts" />
+              <File Id="filVWDnode.d.ts" KeyPath="yes" Source="$(var.BinariesDir)\Scripts\Typings\node\node.d.ts" />
               <Condition>VWD_EXTENSION_INSTALLPATH</Condition>
             </Component>
 

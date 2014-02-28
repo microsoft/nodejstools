@@ -33,7 +33,7 @@ namespace Microsoft.NodejsTools.Project {
         internal readonly string _referenceFilename = GetReferenceFilePath();
         const string _userSwitchMarker = "// **NTVS** INSERT USER MODULE SWITCH HERE **NTVS**";
         internal readonly List<NodejsFileNode> _nodeFiles = new List<NodejsFileNode>();
-        private readonly JavaScriptSerializer _serializer = new JavaScriptSerializer();        
+        private readonly JavaScriptSerializer _serializer = new JavaScriptSerializer();
         private readonly Timer _timer;
         internal readonly ReferenceGroupDispenser _refGroupDispenser = new ReferenceGroupDispenser();
         private readonly HashSet<ReferenceGroup> _pendingRefGroupGenerations = new HashSet<ReferenceGroup>();
@@ -49,8 +49,7 @@ namespace Microsoft.NodejsTools.Project {
             _timer = new Timer(RefreshReferenceFile);
         }
 
-        private void InitDependencyImages()
-        {
+        private void InitDependencyImages() {
             var images = ImageHandler.ImageList.Images;
             ImageIndexDependency = images.Count;
             images.Add(Image.FromStream(typeof(NodejsProjectNode).Assembly.GetManifestResourceStream("Microsoft.NodejsTools.Resources.Dependency_16.png")));
@@ -86,7 +85,7 @@ namespace Microsoft.NodejsTools.Project {
         private void RefreshReferenceFile(object state) {
             UpdateReferenceFile();
         }
-        
+
         public override int InitializeForOuter(string filename, string location, string name, uint flags, ref Guid iid, out IntPtr projectPointer, out int canceled) {
             int res = base.InitializeForOuter(filename, location, name, flags, ref iid, out projectPointer, out canceled);
             if (ErrorHandler.Succeeded(res)) {
@@ -104,24 +103,31 @@ namespace Microsoft.NodejsTools.Project {
         protected override void FinishProjectCreation(string sourceFolder, string destFolder) {
             foreach (MSBuild.ProjectItem item in this.BuildProject.Items) {
                 if (String.Equals(Path.GetExtension(item.EvaluatedInclude), NodejsConstants.TypeScriptExtension, StringComparison.OrdinalIgnoreCase)) {
-                    // If we have a TypeScript project deploy our node reference file.
+
+                    // Create the 'typings' folder
+                    var typingsFolder = Path.Combine(ProjectHome, "Scripts", "typings");
+                    if (!Directory.Exists(typingsFolder)) {
+                        Directory.CreateDirectory(typingsFolder);
+                    }
+
+                    // Deploy node.d.ts into If we have a TypeScript project deploy our node reference file.
+                    var nodeTypingsFolder = Path.Combine(typingsFolder, "node");
+                    if (!Directory.Exists(Path.Combine(nodeTypingsFolder))) {
+                        Directory.CreateDirectory(nodeTypingsFolder);
+                    }
+
                     File.Copy(
                         Path.Combine(
                             Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location),
+                            "Scripts",
+                            "typings",
+                            "node",
                             "node.d.ts"
                         ),
-                        Path.Combine(ProjectHome, "node.d.ts")
+                        Path.Combine(
+                            nodeTypingsFolder,
+                            "node.d.ts")
                     );
-
-                    // copy any additional d.ts files
-                    foreach (var file in Directory.EnumerateFiles(sourceFolder, "*.d.ts", SearchOption.AllDirectories)) {
-                        var destPath = Path.Combine(
-                            destFolder,
-                            CommonUtils.GetRelativeFilePath(sourceFolder, file)
-                        );
-                        File.Copy(file, destPath);
-                        new FileInfo(destPath).Attributes = FileAttributes.Normal;
-                    }
                     break;
                 }
             }
@@ -256,7 +262,7 @@ namespace Microsoft.NodejsTools.Project {
                 base.Reload();
 
                 SyncFileSystem();
-                
+
                 foreach (var group in _refGroupDispenser.Groups) {
                     group.GenerateReferenceFile();
                 }
@@ -333,7 +339,7 @@ namespace Microsoft.NodejsTools.Project {
             }
         }
 
-        private void UpdateReferenceFileUIThread(NodejsFileNode changedFile) {            
+        private void UpdateReferenceFileUIThread(NodejsFileNode changedFile) {
             lock (_pendingRefGroupGenerations) {
                 foreach (var refGroup in _pendingRefGroupGenerations) {
                     refGroup.GenerateReferenceFile();
@@ -350,9 +356,9 @@ namespace Microsoft.NodejsTools.Project {
             UpdateReferenceFile(this, switchCode);
 
             _requireCompletionCache.Clear();
-            
+
             WriteReferenceFile(
-                _referenceFilename, 
+                _referenceFilename,
                 header + _nodeRefCode.Replace(_userSwitchMarker, switchCode.ToString())
             );
         }
@@ -509,7 +515,7 @@ function starts_with(a, b) {
                     List<CommonFolderNode> folderPackageList;
                     if (directoryPackages.TryGetValue(nodeFile, out folderPackageList)) {
                         foreach (var folderPackage in folderPackageList) {
-                                // this file is also exposed as the folder
+                            // this file is also exposed as the folder
                             if (Path.GetFileName(CommonUtils.TrimEndSeparator(folderPackage.Parent.Url)) == NodejsConstants.NodeModulesFolder) {
                                 switchCode.AppendFormat(
                                     "    || (starts_with(__dirname, '{0}') && (module == '{1}'))\r\n",
@@ -687,13 +693,11 @@ function require(module) {
 
 
 
-        protected internal override void ProcessReferences()
-        {
+        protected internal override void ProcessReferences() {
             base.ProcessReferences();
 
-            if ( null == ModulesNode )
-            {
-                ModulesNode = new NodeModulesNode( this );
+            if (null == ModulesNode) {
+                ModulesNode = new NodeModulesNode(this);
                 AddChild(ModulesNode);
             }
         }
@@ -728,7 +732,7 @@ function require(module) {
         }
 
         public EnvDTE.Project Project {
-            get { return (OAProject)GetAutomationObject();  }
+            get { return (OAProject)GetAutomationObject(); }
         }
 
         public VsWebSite.AssemblyReferences References {
