@@ -175,12 +175,15 @@ namespace Microsoft.NodejsTools.NpmUI {
                                 true);
                 }
             } finally {
-                _commander.OutputLogged -= commander_OutputLogged;
-                _commander.ErrorLogged -= commander_ErrorLogged;
-                _commander.ExceptionLogged -= commander_ExceptionLogged;
-                _commander.CommandCompleted -= commander_CommandCompleted;
-                lock (_lock) {
-                    _commander = null;
+                var cmdr = _commander;
+                if (null != cmdr) {
+                    cmdr.OutputLogged -= commander_OutputLogged;
+                    cmdr.ErrorLogged -= commander_ErrorLogged;
+                    cmdr.ExceptionLogged -= commander_ExceptionLogged;
+                    cmdr.CommandCompleted -= commander_CommandCompleted;
+                    lock (_lock) {
+                        _commander = null;
+                    }
                 }
             }
         }
