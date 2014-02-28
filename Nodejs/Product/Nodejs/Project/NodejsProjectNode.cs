@@ -16,6 +16,7 @@ using System;
 using System.Collections.Generic;
 using System.Drawing;
 using System.IO;
+using System.Linq;
 using System.Reflection;
 using System.Text;
 using System.Threading;
@@ -33,7 +34,7 @@ namespace Microsoft.NodejsTools.Project {
         internal readonly string _referenceFilename = GetReferenceFilePath();
         const string _userSwitchMarker = "// **NTVS** INSERT USER MODULE SWITCH HERE **NTVS**";
         internal readonly List<NodejsFileNode> _nodeFiles = new List<NodejsFileNode>();
-        private readonly JavaScriptSerializer _serializer = new JavaScriptSerializer();
+        private readonly JavaScriptSerializer _serializer = new JavaScriptSerializer();        
         private readonly Timer _timer;
         internal readonly ReferenceGroupDispenser _refGroupDispenser = new ReferenceGroupDispenser();
         private readonly HashSet<ReferenceGroup> _pendingRefGroupGenerations = new HashSet<ReferenceGroup>();
@@ -47,6 +48,12 @@ namespace Microsoft.NodejsTools.Project {
             AddCATIDMapping(projectNodePropsType, projectNodePropsType.GUID);
             InitDependencyImages();
             _timer = new Timer(RefreshReferenceFile);
+        }
+
+        public override IEnumerable<string> GetAvailableItemNames() {
+            // Remove a couple of available item names which show up from imports we
+            // can't control out of Microsoft.Common.targets.
+            return base.GetAvailableItemNames().Except(new[] { "CodeAnalysisDictionary", "XamlAppDef" });
         }
 
         private void InitDependencyImages() {
@@ -85,7 +92,7 @@ namespace Microsoft.NodejsTools.Project {
         private void RefreshReferenceFile(object state) {
             UpdateReferenceFile();
         }
-
+        
         public override int InitializeForOuter(string filename, string location, string name, uint flags, ref Guid iid, out IntPtr projectPointer, out int canceled) {
             int res = base.InitializeForOuter(filename, location, name, flags, ref iid, out projectPointer, out canceled);
             if (ErrorHandler.Succeeded(res)) {
@@ -127,7 +134,7 @@ namespace Microsoft.NodejsTools.Project {
                         Path.Combine(
                             nodeTypingsFolder,
                             "node.d.ts")
-                    );
+                        );
                     break;
                 }
             }
@@ -262,7 +269,7 @@ namespace Microsoft.NodejsTools.Project {
                 base.Reload();
 
                 SyncFileSystem();
-
+                
                 foreach (var group in _refGroupDispenser.Groups) {
                     group.GenerateReferenceFile();
                 }
@@ -339,7 +346,7 @@ namespace Microsoft.NodejsTools.Project {
             }
         }
 
-        private void UpdateReferenceFileUIThread(NodejsFileNode changedFile) {
+        private void UpdateReferenceFileUIThread(NodejsFileNode changedFile) {            
             lock (_pendingRefGroupGenerations) {
                 foreach (var refGroup in _pendingRefGroupGenerations) {
                     refGroup.GenerateReferenceFile();
@@ -356,9 +363,9 @@ namespace Microsoft.NodejsTools.Project {
             UpdateReferenceFile(this, switchCode);
 
             _requireCompletionCache.Clear();
-
+            
             WriteReferenceFile(
-                _referenceFilename,
+                _referenceFilename, 
                 header + _nodeRefCode.Replace(_userSwitchMarker, switchCode.ToString())
             );
         }
@@ -515,7 +522,7 @@ function starts_with(a, b) {
                     List<CommonFolderNode> folderPackageList;
                     if (directoryPackages.TryGetValue(nodeFile, out folderPackageList)) {
                         foreach (var folderPackage in folderPackageList) {
-                            // this file is also exposed as the folder
+                                // this file is also exposed as the folder
                             if (Path.GetFileName(CommonUtils.TrimEndSeparator(folderPackage.Parent.Url)) == NodejsConstants.NodeModulesFolder) {
                                 switchCode.AppendFormat(
                                     "    || (starts_with(__dirname, '{0}') && (module == '{1}'))\r\n",

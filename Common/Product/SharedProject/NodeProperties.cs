@@ -19,6 +19,7 @@ using System.Diagnostics;
 using System.Diagnostics.CodeAnalysis;
 using System.Globalization;
 using System.IO;
+using System.Linq;
 using System.Runtime.InteropServices;
 using Microsoft.VisualStudio;
 using Microsoft.VisualStudio.OLE.Interop;
@@ -522,7 +523,14 @@ namespace Microsoft.VisualStudioTools.Project {
         }
 
         public override StandardValuesCollection GetStandardValues(ITypeDescriptorContext context) {
-            return new StandardValuesCollection(new[] { "None", "Compile", "Content" });
+            FileNodeProperties nodeProps = context.Instance as FileNodeProperties;
+            IEnumerable<string> itemNames;
+            if (nodeProps != null) {
+                itemNames = nodeProps.HierarchyNode.ProjectMgr.GetAvailableItemNames();
+            } else {
+                itemNames = new[] { "None", "Compile", "Content" };
+            }
+            return new StandardValuesCollection(itemNames.ToArray());
         }
     }
 
