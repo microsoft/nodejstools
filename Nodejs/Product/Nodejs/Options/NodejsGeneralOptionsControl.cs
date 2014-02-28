@@ -25,29 +25,45 @@ namespace Microsoft.NodejsTools.Options {
         public NodejsGeneralOptionsControl() {
             InitializeComponent();
 
-            _showOutputWhenRunningNpm.Checked =
-                NodejsPackage.Instance.GeneralOptionsPage.ShowOutputWindowWhenExecutingNpm;
+            _showOutputWhenRunningNpm.Checked = NodejsPackage.Instance.GeneralOptionsPage.ShowOutputWindowWhenExecutingNpm;
 
             switch (NodejsPackage.Instance.GeneralOptionsPage.SurveyNewsCheck) {
-                case SurveyNewsPolicy.Disabled: _surveyNewsCheckCombo.SelectedIndex = SurveyNewsNeverIndex; break;
-                case SurveyNewsPolicy.CheckOnceDay: _surveyNewsCheckCombo.SelectedIndex = SurveyNewsOnceDayIndex; break;
-                case SurveyNewsPolicy.CheckOnceWeek: _surveyNewsCheckCombo.SelectedIndex = SurveyNewsOnceWeekIndex; break;
-                case SurveyNewsPolicy.CheckOnceMonth: _surveyNewsCheckCombo.SelectedIndex = SurveyNewsOnceMonthIndex; break;
+                case SurveyNewsPolicy.Disabled:
+                    _surveyNewsCheckCombo.SelectedIndex = SurveyNewsNeverIndex;
+                    break;
+                case SurveyNewsPolicy.CheckOnceDay:
+                    _surveyNewsCheckCombo.SelectedIndex = SurveyNewsOnceDayIndex;
+                    break;
+                case SurveyNewsPolicy.CheckOnceWeek:
+                    _surveyNewsCheckCombo.SelectedIndex = SurveyNewsOnceWeekIndex;
+                    break;
+                case SurveyNewsPolicy.CheckOnceMonth:
+                    _surveyNewsCheckCombo.SelectedIndex = SurveyNewsOnceMonthIndex;
+                    break;
             }
             _waitOnAbnormalExit.Checked = NodejsPackage.Instance.GeneralOptionsPage.WaitOnAbnormalExit;
             _waitOnNormalExit.Checked = NodejsPackage.Instance.GeneralOptionsPage.WaitOnNormalExit;
+            _editAndContinue.Checked = NodejsPackage.Instance.GeneralOptionsPage.EditAndContinue;
         }
 
         private void _surveyNewsCheckCombo_SelectedIndexChanged(object sender, EventArgs e) {
             switch (_surveyNewsCheckCombo.SelectedIndex) {
-                case SurveyNewsNeverIndex: NodejsPackage.Instance.GeneralOptionsPage.SurveyNewsCheck = SurveyNewsPolicy.Disabled; break;
-                case SurveyNewsOnceDayIndex: NodejsPackage.Instance.GeneralOptionsPage.SurveyNewsCheck = SurveyNewsPolicy.CheckOnceDay; break;
-                case SurveyNewsOnceWeekIndex: NodejsPackage.Instance.GeneralOptionsPage.SurveyNewsCheck = SurveyNewsPolicy.CheckOnceWeek; break;
-                case SurveyNewsOnceMonthIndex: NodejsPackage.Instance.GeneralOptionsPage.SurveyNewsCheck = SurveyNewsPolicy.CheckOnceMonth; break;
+                case SurveyNewsNeverIndex:
+                    NodejsPackage.Instance.GeneralOptionsPage.SurveyNewsCheck = SurveyNewsPolicy.Disabled;
+                    break;
+                case SurveyNewsOnceDayIndex:
+                    NodejsPackage.Instance.GeneralOptionsPage.SurveyNewsCheck = SurveyNewsPolicy.CheckOnceDay;
+                    break;
+                case SurveyNewsOnceWeekIndex:
+                    NodejsPackage.Instance.GeneralOptionsPage.SurveyNewsCheck = SurveyNewsPolicy.CheckOnceWeek;
+                    break;
+                case SurveyNewsOnceMonthIndex:
+                    NodejsPackage.Instance.GeneralOptionsPage.SurveyNewsCheck = SurveyNewsPolicy.CheckOnceMonth;
+                    break;
             }
         }
 
-        private void _showOutputWhenRunningNpm_CheckedChanged(object sender, EventArgs e){
+        private void _showOutputWhenRunningNpm_CheckedChanged(object sender, EventArgs e) {
             NodejsPackage.Instance.GeneralOptionsPage.ShowOutputWindowWhenExecutingNpm =
                 _showOutputWhenRunningNpm.Checked;
         }
@@ -58,7 +74,10 @@ namespace Microsoft.NodejsTools.Options {
 
         private void _waitOnNormalExit_CheckedChanged(object sender, EventArgs e) {
             NodejsPackage.Instance.GeneralOptionsPage.WaitOnNormalExit = _waitOnNormalExit.Checked;
+        }
 
+        private void _editAndContinue_CheckedChanged(object sender, EventArgs e) {
+            NodejsPackage.Instance.GeneralOptionsPage.EditAndContinue = _editAndContinue.Checked;
         }
     }
 }

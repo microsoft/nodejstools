@@ -20,7 +20,6 @@ namespace Microsoft.NodejsTools.Debugger {
         private readonly string _fileName;
         private readonly string _javaScriptFileName;
         private readonly int _moduleId;
-        private readonly string _source;
 
         public NodeModule(int moduleId, string fileName, string javaScriptFileName, string source = null) {
             Debug.Assert(fileName != null);
@@ -28,7 +27,7 @@ namespace Microsoft.NodejsTools.Debugger {
             _moduleId = moduleId;
             _fileName = fileName;
             _javaScriptFileName = javaScriptFileName;
-            _source = source;
+            Source = source;
         }
 
         public int ModuleId {
@@ -52,9 +51,7 @@ namespace Microsoft.NodejsTools.Debugger {
             get { return _fileName; }
         }
 
-        public string Source {
-            get { return _source; }
-        }
+        public string Source { get; set; }
 
         public bool BuiltIn {
             get {

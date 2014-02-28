@@ -19,6 +19,7 @@ using System.Diagnostics;
 using System.IO;
 using System.Linq;
 using System.Net.NetworkInformation;
+using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
 using Microsoft.NodejsTools.Debugger.Commands;
@@ -43,11 +44,15 @@ namespace Microsoft.NodejsTools.Debugger {
         private readonly Version _nodeSetVariableValueVersion = new Version(0, 10, 12);
         private readonly ushort _portNumber;
         private readonly EvaluationResultFactory _resultFactory;
+        private readonly SourceMapper _sourceMapper;
         private readonly Dictionary<int, NodeThread> _threads = new Dictionary<int, NodeThread>();
         private readonly TimeSpan _timeout = TimeSpan.FromSeconds(2);
+        private readonly bool _trackFileChanges;
         private bool _attached;
         private bool _breakOnAllExceptions;
         private bool _breakOnUncaughtExceptions;
+        private EnvDTE.DocumentEvents _documentEvents;
+        private EnvDTE.Events _events;
         private bool _handleEntryPointHit;
         private int? _id;
         private bool _loadCompleteHandled;
@@ -67,7 +72,15 @@ namespace Microsoft.NodejsTools.Debugger {
 
             _resultFactory = new EvaluationResultFactory();
             _exceptionHandler = new ExceptionHandler();
-            SourceMapper = new SourceMapper();
+            _sourceMapper = new SourceMapper();
+
+            NodejsPackage package = NodejsPackage.Instance;
+            _trackFileChanges = package.GeneralOptionsPage.EditAndContinue;
+            if (_trackFileChanges) {
+                _events = package.DTE.Events;
+                _documentEvents = _events.DocumentEvents;
+                _documentEvents.DocumentSaved += OnDocumentSaved;
+            }
         }
 
         public NodeDebugger(
@@ -428,12 +441,41 @@ namespace Microsoft.NodejsTools.Debugger {
         }
 
         /// <summary>
-        /// Gets or sets a source mapper.
+        /// Gets a source mapper.
         /// </summary>
-        public SourceMapper SourceMapper { get; private set; }
+        public SourceMapper SourceMapper {
+            get { return _sourceMapper; }
+        }
 
         internal void Unregister() {
             GC.SuppressFinalize(this);
+        }
+
+        private async void OnDocumentSaved(EnvDTE.Document document)
+        {
+            NodeModule module;
+            if (!_mapNameToScript.TryGetValue(document.FullName, out module)) {
+                return;
+            }
+
+            // Wrap module contents as following https://github.com/joyent/node/blob/v0.10.26-release/src/node.js#L880
+            var newSource = new StringBuilder("(function (exports, require, module, __filename, __dirname) { ");
+            newSource.Append(File.ReadAllText(module.JavaScriptFileName));
+            newSource.Append("\n});");
+
+            module.Source = newSource.ToString();
+
+            var changeLiveCommand = new ChangeLiveCommand(CommandId, module);
+            await _client.SendRequestAsync(changeLiveCommand).ConfigureAwait(false);
+
+            if (changeLiveCommand.StackModified) {
+                await PerformBacktraceAsync().ConfigureAwait(false);
+            }
+
+            if (changeLiveCommand.NeedStepIn) {
+                var continueCommand = new ContinueCommand(CommandId, SteppingKind.Into);
+                await _client.SendRequestAsync(continueCommand).ConfigureAwait(false);
+            }
         }
 
         /// <summary>
@@ -1106,6 +1148,11 @@ namespace Microsoft.NodejsTools.Debugger {
         #endregion
 
         internal void Close() {
+            if (_trackFileChanges) {
+                _documentEvents.DocumentSaved -= OnDocumentSaved;
+                _documentEvents = null;
+                _events = null;
+            }
         }
 
         internal static void FixupForRunAndWait(bool waitOnAbnormal, bool waitOnNormal, ProcessStartInfo psi) {

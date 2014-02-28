@@ -239,6 +239,7 @@
     <Compile Include="Commands\SurveyNewsCommand.cs" />
     <Compile Include="Debugger\BreakOn.cs" />
     <Compile Include="Debugger\BreakOnKind.cs" />
+    <Compile Include="Debugger\Commands\ChangeLiveCommand.cs" />
     <Compile Include="Debugger\Commands\SetVariableValueCommand.cs" />
     <Compile Include="Debugger\Communication\ITcpClient.cs" />
     <Compile Include="Debugger\Communication\ITcpClientFactory.cs" />
