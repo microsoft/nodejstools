@@ -54,8 +54,13 @@ namespace Microsoft.NodejsTools.NpmUI {
         }
 
         private void _packageList_OnMouseDoubleClick(object sender, MouseButtonEventArgs e) {
+            if (e.ChangedButton != MouseButton.Left) {
+                return;
+            }
             var vm = DataContext as NpmPackageInstallViewModel;
-            if (null != vm && GetItemObjectAtPoint(_packageList, e.GetPosition(_packageList)) == vm.SelectedPackage) {
+            if (null != vm
+                && GetItemObjectAtPoint(_packageList, e.GetPosition(_packageList)) == vm.SelectedPackage
+                && ! vm.IsCatalogEmpty) {
                 var cmd = vm.InstallCommand;
                 if (null != cmd && cmd.CanExecute(null)) {
                     cmd.Execute(null);
