@@ -412,7 +412,7 @@ namespace Microsoft.NodejsTools {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Refresh failed - check connectivity.
+        ///   Looks up a localized string similar to Refresh failed - see output below for details.
         /// </summary>
         internal static string NpmCatalogEmpty {
             get {

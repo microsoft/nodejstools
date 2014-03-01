@@ -247,12 +247,12 @@ namespace Microsoft.NodejsTools.NpmUI {
             OnOutputWritten();
         }
 
-        private void commander_ExceptionLogged(object sender, NpmExceptionEventArgs e) {
+        internal void commander_ExceptionLogged(object sender, NpmExceptionEventArgs e) {
             Application.Current.Dispatcher.BeginInvoke(
                 new Action(() => WriteLines(ErrorHelper.GetExceptionDetailsText(e.Exception), true)));
         }
 
-        private void commander_ErrorLogged(object sender, NpmLogEventArgs e) {
+        internal void commander_ErrorLogged(object sender, NpmLogEventArgs e) {
             Application.Current.Dispatcher.BeginInvoke(new Action(() => WriteLines(e.LogText, false)));
         }
 

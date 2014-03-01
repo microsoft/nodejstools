@@ -159,8 +159,12 @@ namespace Microsoft.NodejsTools.Npm.SPI {
             if (null == _sRepoCatalogue || _sRepoCatalogue.Results.Count == 0 || forceDownload) {
                 Exception ex = null;
                 using (var commander = CreateNpmCommander()) {
-                    commander.ExceptionLogged += (sender, args) => ex = args.Exception;
+                    EventHandler<NpmExceptionEventArgs> exHandler = (sender, args) => { LogException(sender, args); ex = args.Exception; };
+                    commander.ErrorLogged += LogError;
+                    commander.ExceptionLogged += exHandler;
                     _sRepoCatalogue = await commander.GetCatalogueAsync(forceDownload);
+                    commander.ErrorLogged -= LogError;
+                    commander.ExceptionLogged -= exHandler;
                 }
                 if (null != ex) {
                     throw ex;

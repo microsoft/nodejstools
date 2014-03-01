@@ -71,27 +71,25 @@ namespace Microsoft.NodejsTools.Npm.SPI {
         }
 
         private void RegisterLogEvents(NpmCommand command) {
-            if (command is NpmSearchCommand || command is NpmGetCatalogueCommand) {
-                return;
+            if (!(command is NpmSearchCommand)) {
+                command.CommandStarted += command_CommandStarted;
+                command.OutputLogged += command_OutputLogged;
+                command.CommandCompleted += command_CommandCompleted;
             }
 
-            command.CommandStarted += command_CommandStarted;
-            command.OutputLogged += command_OutputLogged;
             command.ErrorLogged += command_ErrorLogged;
             command.ExceptionLogged += command_ExceptionLogged;
-            command.CommandCompleted += command_CommandCompleted;
         }
 
         private void UnregisterLogEvents(NpmCommand command) {
-            if (command is NpmSearchCommand || command is NpmGetCatalogueCommand) {
-                return;
+            if (!(command is NpmSearchCommand)) {
+                command.CommandStarted -= command_CommandStarted;
+                command.OutputLogged -= command_OutputLogged;
+                command.CommandCompleted -= command_CommandCompleted;
             }
 
-            command.CommandStarted -= command_CommandStarted;
-            command.OutputLogged -= command_OutputLogged;
             command.ErrorLogged -= command_ErrorLogged;
             command.ExceptionLogged -= command_ExceptionLogged;
-            command.CommandCompleted -= command_CommandCompleted;
         }
 
         private async Task<bool> DoCommandExecute(bool refreshNpmController) {

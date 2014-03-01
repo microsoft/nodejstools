@@ -228,6 +228,9 @@ namespace Microsoft.NodejsTools.NpmUI {
 
             bool showList = false;
 
+            _npmController.ErrorLogged += _executeViewModel.commander_ErrorLogged;
+            _npmController.ExceptionLogged += _executeViewModel.commander_ExceptionLogged;
+
             try {
                 _allPackages = await _npmController.GetRepositoryCatalogueAsync(forceRefresh);
                 IsCatalogEmpty = false;
@@ -237,6 +240,9 @@ namespace Microsoft.NodejsTools.NpmUI {
             } catch (NpmCatalogEmptyException) {
                 IsCatalogEmpty = true;
                 showList = true;
+            } finally {
+                _npmController.ErrorLogged -= _executeViewModel.commander_ErrorLogged;
+                _npmController.ExceptionLogged -= _executeViewModel.commander_ExceptionLogged;
             }
 
             IsLoadingCatalog = false;
