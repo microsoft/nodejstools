@@ -14,7 +14,8 @@
             <StackPanel DockPanel.Dock="Top"
                         Orientation="Vertical"
                         HorizontalAlignment="Stretch">
-                <DockPanel HorizontalAlignment="Stretch">
+                <DockPanel HorizontalAlignment="Stretch"
+                           Visibility="{Binding Path=CommandCancelVisibility}">
                     <Button DockPanel.Dock="Right"
                             Content="Cancel"
                             HorizontalAlignment="Right"

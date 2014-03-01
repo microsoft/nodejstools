@@ -31,6 +31,7 @@ namespace Microsoft.NodejsTools.NpmUI {
         private bool _isDisposed;
         private string _statusText = Resources.NpmStatusReady;
         private bool _isExecutingCommand;
+        private Visibility _commandCancelVisibility = Visibility.Visible;
         private bool _withErrors;
         private readonly FlowDocument _output = new FlowDocument();
         private readonly Thread _worker;
@@ -97,6 +98,23 @@ namespace Microsoft.NodejsTools.NpmUI {
 
         public Visibility ExecutionProgressVisibility {
             get { return IsExecutingCommand ? Visibility.Visible : Visibility.Hidden; }
+        }
+
+        public Visibility CommandCancelVisibility {
+            get { return _commandCancelVisibility; }
+            set {
+                _commandCancelVisibility = value;
+                OnPropertyChanged();
+            }
+        }
+
+        private void SetCancellable(bool cancellable) {
+            CommandCancelVisibility = cancellable ? Visibility.Visible : Visibility.Collapsed;
+        }
+
+        public void SetCancellableSafe(bool cancellable) {
+            Application.Current.Dispatcher.BeginInvoke(new Action(
+                () => SetCancellable(cancellable)));
         }
 
         public bool IsCancellable {
