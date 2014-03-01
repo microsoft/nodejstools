@@ -321,7 +321,7 @@ namespace Microsoft.VisualStudioTools.Project {
         [LocDisplayName(SR.BuildAction)]
         [SRDescriptionAttribute(SR.BuildActionDescription)]
         [TypeConverter(typeof(BuildActionStringConverter))]
-        public string BuildActionString {
+        public string ItemType {
             get {
                 return HierarchyNode.ItemNode.ItemTypeName;
             }
@@ -329,7 +329,7 @@ namespace Microsoft.VisualStudioTools.Project {
                 HierarchyNode.ItemNode.ItemTypeName = value;
             }
         }
-
+        
         /// <summary>
         /// Specifies the build action as a projBuildAction so that automation can get the
         /// expected enum value.
