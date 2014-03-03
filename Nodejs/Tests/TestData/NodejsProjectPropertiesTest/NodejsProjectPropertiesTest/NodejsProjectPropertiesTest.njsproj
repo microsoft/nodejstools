@@ -6,7 +6,7 @@
     <Name>NodejsProjectPropertiesTest</Name>
     <RootNamespace>NodejsProjectPropertiesTest</RootNamespace>
     <NodeExeLocation />
-    <NodeExeArguments />
+    <NodeExeArguments>--harmony</NodeExeArguments>
     <ScriptArguments>scriptargs</ScriptArguments>
     <NodejsPort>1234</NodejsPort>
     <StartWebBrowser>True</StartWebBrowser>

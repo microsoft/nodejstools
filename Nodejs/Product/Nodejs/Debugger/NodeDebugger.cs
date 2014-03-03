@@ -97,7 +97,7 @@ namespace Microsoft.NodejsTools.Debugger {
 
             var allArgs = String.Format("--debug-brk={0} {1}", debuggerPortOrDefault, script);
             if (!string.IsNullOrEmpty(interpreterOptions)) {
-                allArgs += " " + interpreterOptions;
+                allArgs = interpreterOptions + " " + allArgs;
             }
 
             var psi = new ProcessStartInfo(exe, allArgs) {
