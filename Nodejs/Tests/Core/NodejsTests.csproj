@@ -89,6 +89,7 @@
     <Compile Include="Debugger\Commands\ChangeBreakpointCommandTests.cs" />
     <Compile Include="Debugger\Commands\ClearBreakpointCommandTests.cs" />
     <Compile Include="Debugger\Commands\ContinueCommandTests.cs" />
+    <Compile Include="Debugger\Commands\ChangeLiveCommandTests.cs" />
     <Compile Include="Debugger\Commands\SetVariableValueCommandTests.cs" />
     <Compile Include="Debugger\Commands\SuspendCommandTests.cs" />
     <Compile Include="Debugger\Commands\SetExceptionBreakCommandTests.cs" />

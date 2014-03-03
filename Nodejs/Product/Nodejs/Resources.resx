@@ -232,4 +232,7 @@
   <data name="DebuggerConnectionClosed" xml:space="preserve">
     <value>Debugger connection was closed.</value>
   </data>
+  <data name="DebuggerModuleUpdateFailed" xml:space="preserve">
+    <value>Failed to update file contents.</value>
+  </data>
 </root>

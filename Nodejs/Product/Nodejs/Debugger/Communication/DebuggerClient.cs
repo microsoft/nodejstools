@@ -48,7 +48,7 @@ namespace Microsoft.NodejsTools.Debugger.Communication {
 
             try {
                 TaskCompletionSource<JObject> promise = _messages.GetOrAdd(command.Id, i => new TaskCompletionSource<JObject>());
-                await _connection.SendMessageAsync(command.ToString()).ConfigureAwait(false);
+                _connection.SendMessage(command.ToString());
                 cancellationToken.ThrowIfCancellationRequested();
 
                 JObject response = await promise.Task.ConfigureAwait(false);

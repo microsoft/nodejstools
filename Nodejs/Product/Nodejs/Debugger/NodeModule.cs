@@ -21,13 +21,12 @@ namespace Microsoft.NodejsTools.Debugger {
         private readonly string _javaScriptFileName;
         private readonly int _moduleId;
 
-        public NodeModule(int moduleId, string fileName, string javaScriptFileName, string source = null) {
+        public NodeModule(int moduleId, string fileName, string javaScriptFileName) {
             Debug.Assert(fileName != null);
 
             _moduleId = moduleId;
             _fileName = fileName;
             _javaScriptFileName = javaScriptFileName;
-            Source = source;
         }
 
         public int ModuleId {
