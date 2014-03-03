@@ -24,14 +24,14 @@ using Microsoft.VisualStudioTools.Project;
 namespace Microsoft.NodejsTools.Debugger.Communication {
     sealed class DebuggerConnection : IDebuggerConnection {
         private readonly Regex _contentLength = new Regex(@"Content-Length: (\d+)", RegexOptions.Compiled);
+        private readonly AsyncProducerConsumerCollection<string> _messages;
+        private readonly INetworkClientFactory _networkClientFactory;
         private readonly Regex _nodeVersion = new Regex(@"Embedding-Host: node v([0-9.]+)", RegexOptions.Compiled);
-        private readonly INetworkClientFactory _tcpClientFactory;
-        private StreamReader _streamReader;
-        private StreamWriter _streamWriter;
-        private INetworkClient _tcpClient;
+        private INetworkClient _networkClient;
 
-        public DebuggerConnection(INetworkClientFactory tcpClientFactory) {
-            _tcpClientFactory = tcpClientFactory;
+        public DebuggerConnection(INetworkClientFactory networkClientFactory) {
+            _networkClientFactory = networkClientFactory;
+            _messages = new AsyncProducerConsumerCollection<string>();
             NodeVersion = new Version();
         }
 
@@ -39,19 +39,9 @@ namespace Microsoft.NodejsTools.Debugger.Communication {
         /// Close connection.
         /// </summary>
         public void Close() {
-            if (_streamReader != null) {
-                _streamReader.Close();
-                _streamReader = null;
-            }
-
-            if (_streamWriter != null) {
-                _streamWriter.Close();
-                _streamWriter = null;
-            }
-
-            if (_tcpClient != null) {
-                _tcpClient.Dispose();
-                _tcpClient = null;
+            if (_networkClient != null) {
+                _networkClient.Dispose();
+                _networkClient = null;
             }
         }
 
@@ -59,17 +49,19 @@ namespace Microsoft.NodejsTools.Debugger.Communication {
         /// Send a message.
         /// </summary>
         /// <param name="message">Message.</param>
-        public async Task SendMessageAsync(string message) {
+        public void SendMessage(string message) {
             Utilities.ArgumentNotNullOrEmpty("message", message);
-            Utilities.CheckNotNull(_streamWriter, "No connection with node.js debugger.");
+
+            if (!Connected) {
+                return;
+            }
+
+            DebugWriteLine("Request: " + message);
 
             int byteCount = Encoding.UTF8.GetByteCount(message);
             string request = string.Format("Content-Length: {0}{1}{1}{2}", byteCount, Environment.NewLine, message);
 
-            DebugWriteLine("Request: " + message);
-
-            await _streamWriter.WriteAsync(request).ConfigureAwait(false);
-            await _streamWriter.FlushAsync().ConfigureAwait(false);
+            _messages.Add(request);
         }
 
         /// <summary>
@@ -86,7 +78,7 @@ namespace Microsoft.NodejsTools.Debugger.Communication {
         /// Gets a value indicating whether connection established.
         /// </summary>
         public bool Connected {
-            get { return _tcpClient != null && _tcpClient.Connected; }
+            get { return _networkClient != null && _networkClient.Connected; }
         }
 
         /// <summary>
@@ -103,76 +95,94 @@ namespace Microsoft.NodejsTools.Debugger.Communication {
 
             Close();
 
-            _tcpClient = _tcpClientFactory.CreateNetworkClient(uri);
-
-            Stream stream = _tcpClient.GetStream();
-            _streamReader = new StreamReader(stream, Encoding.Default);
-            _streamWriter = new StreamWriter(stream);
+            _networkClient = _networkClientFactory.CreateNetworkClient(uri);
 
             Task.Factory.StartNew(ReadStreamAsync);
+            Task.Factory.StartNew(WriteStreamAsync);
         }
 
         /// <summary>
-        /// Asynchronous read of the debugger output stream.
+        /// Writes messages to debugger input stream.
+        /// </summary>
+        private async void WriteStreamAsync() {
+            using (var streamWriter = new StreamWriter(_networkClient.GetStream())) {
+                try {
+                    while (Connected) {
+                        string message = await _messages.Take();
+                        await streamWriter.WriteAsync(message);
+                        await streamWriter.FlushAsync();
+                    }
+                } catch (SocketException) {
+                } catch (ObjectDisposedException) {
+                } catch (IOException) {
+                } catch (Exception e) {
+                    DebugWriteLine(string.Format("DebuggerConnection: failed to write message {0}.", e));
+                    throw;
+                }
+            }
+        }
+
+        /// <summary>
+        /// Reads data from debugger output stream.
         /// </summary>
         private async void ReadStreamAsync() {
             DebugWriteLine("DebuggerConnection: established connection.");
 
-            try {
-                while (Connected) {
-                    // Read message header
-                    string result = await _streamReader.ReadLineAsync();
-                    if (result == null) {
-                        continue;
-                    }
-
-                    // Check whether result is content length header
-                    Match match = _contentLength.Match(result);
-                    if (!match.Success) {
-                        // Check whether result is node.js version string
-                        match = _nodeVersion.Match(result);
-                        if (match.Success) {
-                            NodeVersion = new Version(match.Groups[1].Value);
-                        } else {
-                            DebugWriteLine(string.Format("Debugger info: {0}", result));
+            using (var streamReader = new StreamReader(_networkClient.GetStream(), Encoding.Default)) {
+                try {
+                    while (Connected) {
+                        // Read message header
+                        string result = await streamReader.ReadLineAsync();
+                        if (result == null) {
+                            continue;
                         }
 
-                        continue;
+                        // Check whether result is content length header
+                        Match match = _contentLength.Match(result);
+                        if (!match.Success) {
+                            // Check whether result is node.js version string
+                            match = _nodeVersion.Match(result);
+                            if (match.Success) {
+                                NodeVersion = new Version(match.Groups[1].Value);
+                            } else {
+                                DebugWriteLine(string.Format("Debugger info: {0}", result));
+                            }
+
+                            continue;
+                        }
+
+                        await streamReader.ReadLineAsync();
+
+                        // Retrieve content length
+                        int length = int.Parse(match.Groups[1].Value);
+                        if (length == 0) {
+                            continue;
+                        }
+
+                        // Read content
+                        string message = await streamReader.ReadLineBlockAsync(length);
+
+                        DebugWriteLine("Response: " + message);
+
+                        // Notify subscribers
+                        EventHandler<MessageEventArgs> outputMessage = OutputMessage;
+                        if (outputMessage != null) {
+                            outputMessage(this, new MessageEventArgs(message));
+                        }
                     }
+                } catch (SocketException) {
+                } catch (ObjectDisposedException) {
+                } catch (IOException) {
+                } catch (Exception e) {
+                    DebugWriteLine(string.Format("DebuggerConnection: message processing failed {0}.", e));
+                    throw;
+                } finally {
+                    DebugWriteLine("DebuggerConnection: connection was closed.");
 
-                    await _streamReader.ReadLineAsync();
-
-                    // Retrieve content length
-                    int length = int.Parse(match.Groups[1].Value);
-                    if (length == 0) {
-                        continue;
+                    EventHandler<EventArgs> connectionClosed = ConnectionClosed;
+                    if (connectionClosed != null) {
+                        connectionClosed(this, EventArgs.Empty);
                     }
-
-                    // Read content
-                    string message = await _streamReader.ReadLineBlockAsync(length);
-
-                    DebugWriteLine("Response: " + message);
-
-                    // Notify subscribers
-                    EventHandler<MessageEventArgs> outputMessage = OutputMessage;
-                    if (outputMessage != null) {
-                        outputMessage(this, new MessageEventArgs(message));
-                    }
-                }
-            } catch (SocketException) {
-            } catch (ObjectDisposedException) {
-            } catch (IOException) {
-            } catch (Exception e) {
-                DebugWriteLine(string.Format("DebuggerConnection: message processing failed {0}.", e));
-                throw;
-            } finally {
-                Close();
-
-                DebugWriteLine("DebuggerConnection: connection was closed.");
-
-                EventHandler<EventArgs> connectionClosed = ConnectionClosed;
-                if (connectionClosed != null) {
-                    connectionClosed(this, EventArgs.Empty);
                 }
             }
         }

@@ -53,10 +53,11 @@ namespace Microsoft.NodejsTools.Debugger.Commands {
 
             JToken body = response["body"];
             CallstackDepth = (int)body["totalFrames"];
-            StackFrames = new List<NodeStackFrame>();
 
             // Should not collect stack frames without debugger
             if (_debugger == null) {
+                Modules = new Dictionary<int, NodeModule>();
+                StackFrames = new List<NodeStackFrame>();
                 return;
             }
 
@@ -64,8 +65,9 @@ namespace Microsoft.NodejsTools.Debugger.Commands {
             Modules = GetScripts((JArray)response["refs"], _debugger);
 
             // Extract frames
-            var frames = (JArray)body["frames"] ?? new JArray();
-            var results = new List<NodeStackFrame>(frames.Count);
+            JArray frames = (JArray)body["frames"] ?? new JArray();
+            StackFrames = new List<NodeStackFrame>(frames.Count);
+
             foreach (JToken frame in frames) {
                 // Create stack frame
                 string name = GetFrameName(frame);

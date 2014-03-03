@@ -249,6 +249,7 @@
     <Compile Include="Commands\OpenRemoteDebugDocumentationCommand.cs" />
     <Compile Include="Commands\OpenRemoteDebugProxyFolderCommand.cs" />
     <Compile Include="Commands\SurveyNewsCommand.cs" />
+    <Compile Include="Debugger\Communication\AsyncProducerConsumerCollection.cs" />
     <Compile Include="Debugger\BreakOn.cs" />
     <Compile Include="Debugger\BreakOnKind.cs" />
     <Compile Include="Debugger\Commands\ChangeLiveCommand.cs" />

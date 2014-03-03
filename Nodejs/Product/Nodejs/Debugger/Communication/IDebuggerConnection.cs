@@ -13,7 +13,6 @@
  * ***************************************************************************/
 
 using System;
-using System.Threading.Tasks;
 
 namespace Microsoft.NodejsTools.Debugger.Communication {
     interface IDebuggerConnection {
@@ -42,7 +41,7 @@ namespace Microsoft.NodejsTools.Debugger.Communication {
         /// Send a message.
         /// </summary>
         /// <param name="message">Message.</param>
-        Task SendMessageAsync(string message);
+        void SendMessage(string message);
 
         /// <summary>
         /// Fired when received inbound message.

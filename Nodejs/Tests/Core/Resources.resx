@@ -129,6 +129,9 @@
   <data name="NodeBreakpointResponse" xml:space="preserve">
     <value>{"seq":11,"type":"event","event":"break","body":{"invocationText":"#&lt;Object&gt;.[anonymous](exports=#&lt;Object&gt;, require=function require(path) {\n    return self.require(path);\n  }, module=#&lt;Module&gt;, __filename=C:\\Users\\Tester\\documents\\visual studio 2012\\Projects\\NodejsApp2\\NodejsApp2\\serv... (length: 85), __dirname=C:\\Users\\Tester\\documents\\visual studio 2012\\Projects\\NodejsApp2\\NodejsApp2)","sourceLine":1,"sourceColumn":0,"sourceLineText":"var port = process.env.port || 1337;","script":{"id":33,"name":"C:\\Users\\Tester\\documents\\visual studio 2012\\Projects\\NodejsApp2\\NodejsApp2\\server.js","lineOffset":0,"columnOffset":0,"lineCount":8},"breakpoints":[2]}}</value>
   </data>
+  <data name="NodeChangeLiveResponse" xml:space="preserve">
+    <value>{"seq":9,"request_seq":9,"type":"response","command":"changelive","success":true,"body":{"change_log":[{"dropped_from_stack":[{"name":""}]},{"break_points_update":[{"type":"position_changed","id":1,"old_positions":{"position":10,"line":0,"column":10},"new_positions":{"position":10,"line":0,"column":10}},{"type":"position_changed","id":2,"old_positions":{"position":92,"line":1,"column":0},"new_positions":{"position":93,"line":1,"column":0}}]},{"function_patched":""},{"position_patched":[{"name":"","info_not_found":true}]}],"result":{"change_tree":{"name":"","positions":{"start_position":0,"end_position":117},"status":"source changed","children":[{"name":"","positions":{"start_position":10,"end_position":115},"status":"changed","children":[],"new_children":[],"new_positions":{"start_position":10,"end_position":116}}],"new_children":[],"new_positions":{"start_position":0,"end_position":118}},"textual_diff":{"old_len":117,"new_len":118,"chunks":[88,88,89]},"updated":true,"stack_modified":true,"stack_update_needs_step_in":true},"stepin_recommended":true},"refs":[],"running":false}</value>
+  </data>
   <data name="NodeCompileScriptResponse" xml:space="preserve">
     <value>{"seq":5,"type":"event","event":"afterCompile","success":true,"body":{"script":{"handle":1,"type":"script","name":"http.js","id":34,"lineOffset":0,"columnOffset":0,"lineCount":2169,"sourceStart":"(function (exports, require, module, __filename, __dirname) { // Copyright Joyen","sourceLength":61850,"scriptType":2,"compilationType":0,"context":{"ref":0},"text":"http.js (lines: 2169)"}},"refs":[{"handle":0,"type":"context","text":"#&lt;ContextMirror&gt;"}],"running":true}</value>
   </data>
@@ -203,6 +206,9 @@
   </data>
   <data name="NodeEvaluationResponse" xml:space="preserve">
     <value>{"seq":21,"request_seq":15,"type":"response","command":"evaluate","success":true,"body":{"handle":16,"type":"string","value":"&lt;tag&gt;Value&lt;/tag&gt;","length":16,"text":"&lt;tag&gt;Value&lt;/tag&gt;"},"refs":[],"running":false}</value>
+  </data>
+  <data name="NodeEvaluationResponseWithReferenceError" xml:space="preserve">
+    <value>{"seq":19,"request_seq":18,"type":"response","command":"evaluate","success":false,"message":"ReferenceError: hello is not defined"}</value>
   </data>
   <data name="NodeEvaluationVariableObject" xml:space="preserve">
     <value>{"handle":16,"type":"string","value":"&lt;tag&gt;Value&lt;/tag&gt;","length":16,"text":"&lt;tag&gt;Value&lt;/tag&gt;"}</value>

@@ -48,7 +48,7 @@ namespace Microsoft.NodejsTools.Debugger.Commands {
         /// <param name="response">Message.</param>
         /// <returns>Indicates whether command execution succeeded.</returns>
         public virtual void ProcessResponse(JObject response) {
-            Running = (bool)response["running"];
+            Running = (bool?)response["running"] ?? false;
 
             if (!(bool)response["success"]) {
                 var message = (string)response["message"];

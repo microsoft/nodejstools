@@ -19,6 +19,7 @@ using System.Diagnostics;
 using System.IO;
 using System.Linq;
 using System.Net.NetworkInformation;
+using System.Reflection;
 using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
@@ -35,28 +36,24 @@ namespace Microsoft.NodejsTools.Debugger {
     class NodeDebugger : IDisposable {
         public readonly int MainThreadId = 1;
         private readonly Dictionary<int, NodeBreakpointBinding> _breakpointBindings = new Dictionary<int, NodeBreakpointBinding>();
-        private readonly Uri _debuggerEndpointUri;
         private readonly IDebuggerClient _client;
         private readonly IDebuggerConnection _connection;
+        private readonly Uri _debuggerEndpointUri;
         private readonly Dictionary<int, string> _errorCodes = new Dictionary<int, string>();
         private readonly ExceptionHandler _exceptionHandler;
-        private readonly Dictionary<int, NodeModule> _mapIdToScript = new Dictionary<int, NodeModule>();
         private readonly Dictionary<string, NodeModule> _mapNameToScript = new Dictionary<string, NodeModule>(StringComparer.OrdinalIgnoreCase);
         private readonly Version _nodeSetVariableValueVersion = new Version(0, 10, 12);
         private readonly EvaluationResultFactory _resultFactory;
         private readonly SourceMapper _sourceMapper;
         private readonly Dictionary<int, NodeThread> _threads = new Dictionary<int, NodeThread>();
         private readonly TimeSpan _timeout = TimeSpan.FromSeconds(2);
-        private readonly bool _trackFileChanges;
         private bool _attached;
         private bool _breakOnAllExceptions;
         private bool _breakOnUncaughtExceptions;
-        private EnvDTE.DocumentEvents _documentEvents;
-        private EnvDTE.Events _events;
+        private int _commandId;
         private bool _handleEntryPointHit;
         private int? _id;
         private bool _loadCompleteHandled;
-        private int _number;
         private Process _process;
         private int _steppingCallstackDepth;
         private SteppingKind _steppingMode;
@@ -73,14 +70,6 @@ namespace Microsoft.NodejsTools.Debugger {
             _resultFactory = new EvaluationResultFactory();
             _exceptionHandler = new ExceptionHandler();
             _sourceMapper = new SourceMapper();
-
-            NodejsPackage package = NodejsPackage.Instance;
-            _trackFileChanges = package.GeneralOptionsPage.EditAndContinue;
-            if (_trackFileChanges) {
-                _events = package.DTE.Events;
-                _documentEvents = _events.DocumentEvents;
-                _documentEvents.DocumentSaved += OnDocumentSaved;
-            }
         }
 
         public NodeDebugger(
@@ -108,7 +97,7 @@ namespace Microsoft.NodejsTools.Debugger {
 
             _debuggerEndpointUri = new UriBuilder { Scheme = "tcp", Host = "localhost", Port = debuggerPortOrDefault }.Uri;
 
-            var allArgs = String.Format("--debug-brk={0} {1}", debuggerPortOrDefault, script);
+            string allArgs = String.Format("--debug-brk={0} {1}", debuggerPortOrDefault, script);
             if (!string.IsNullOrEmpty(interpreterOptions)) {
                 allArgs += " " + interpreterOptions;
             }
@@ -435,7 +424,7 @@ namespace Microsoft.NodejsTools.Debugger {
 
         // Gets a next command identifier
         private int CommandId {
-            get { return Interlocked.Increment(ref _number); }
+            get { return Interlocked.Increment(ref _commandId); }
         }
 
         /// <summary>
@@ -449,13 +438,12 @@ namespace Microsoft.NodejsTools.Debugger {
             GC.SuppressFinalize(this);
         }
 
-        private async void OnDocumentSaved(EnvDTE.Document document)
-        {
-            NodeModule module;
-            if (!_mapNameToScript.TryGetValue(document.FullName, out module)) {
-                return;
-            }
-
+        /// <summary>
+        /// Updates a module content while debugging.
+        /// </summary>
+        /// <param name="module">Node module.</param>
+        /// <returns>Operation result.</returns>
+        internal async Task<bool> UpdatedModuleSourceAsync(NodeModule module) {
             // Wrap module contents as following https://github.com/joyent/node/blob/v0.10.26-release/src/node.js#L880
             var newSource = new StringBuilder("(function (exports, require, module, __filename, __dirname) { ");
             newSource.Append(File.ReadAllText(module.JavaScriptFileName));
@@ -466,14 +454,23 @@ namespace Microsoft.NodejsTools.Debugger {
             var changeLiveCommand = new ChangeLiveCommand(CommandId, module);
             await _client.SendRequestAsync(changeLiveCommand).ConfigureAwait(false);
 
-            if (changeLiveCommand.StackModified) {
-                await PerformBacktraceAsync().ConfigureAwait(false);
+            // Check whether update was successfull
+            if (!changeLiveCommand.Updated) {
+                return false;
             }
 
+            // Make step into if required
             if (changeLiveCommand.NeedStepIn) {
                 var continueCommand = new ContinueCommand(CommandId, SteppingKind.Into);
                 await _client.SendRequestAsync(continueCommand).ConfigureAwait(false);
             }
+
+            // Update stacktrace if required
+            if (changeLiveCommand.StackModified || changeLiveCommand.NeedStepIn) {
+                await CompleteSteppingAsync(false).ConfigureAwait(false);
+            }
+
+            return true;
         }
 
         /// <summary>
@@ -521,12 +518,11 @@ namespace Microsoft.NodejsTools.Debugger {
         }
 
         private void AddScript(NodeModule newModule) {
-            string name = newModule.JavaScriptFileName;
+            string name = newModule.FileName;
             if (!string.IsNullOrEmpty(name)) {
                 NodeModule module;
                 if (!_mapNameToScript.TryGetValue(name, out module)) {
                     _mapNameToScript[name] = newModule;
-                    _mapIdToScript[newModule.ModuleId] = newModule;
 
                     EventHandler<ModuleLoadedEventArgs> modLoad = ModuleLoaded;
                     if (modLoad != null) {
@@ -845,13 +841,13 @@ namespace Microsoft.NodejsTools.Debugger {
                 // Attempt to fire breakpoint hit event without actually resuming
                 NodeStackFrame topFrame = MainThread.TopStackFrame;
                 int breakLineNo = topFrame.LineNo;
-                string breakFileName = topFrame.FileName.ToLower();
+                string breakFileName = topFrame.Module.FileName.ToLower();
                 NodeModule breakModule = GetModuleForFilePath(breakFileName);
 
                 var breakpointBindings = new List<NodeBreakpointBinding>();
                 foreach (NodeBreakpointBinding breakpointBinding in _breakpointBindings.Values) {
                     if (breakpointBinding.Enabled && breakpointBinding.LineNo == breakLineNo &&
-                        GetModuleForFilePath(breakpointBinding.FileName) == breakModule) {
+                        GetModuleForFilePath(breakpointBinding.RequestedFileName) == breakModule) {
                         breakpointBindings.Add(breakpointBinding);
                     }
                 }
@@ -950,7 +946,7 @@ namespace Microsoft.NodejsTools.Debugger {
             DebugWriteCommand(String.Format("Set Breakpoint"));
 
             // Try to find module
-            NodeModule module = GetModuleForFilePath(breakpoint.FileName);
+            NodeModule module = GetModuleForFilePath(breakpoint.RequestedFileName);
 
             var setBreakpointCommand = new SetBreakpointCommand(CommandId, module, breakpoint, withoutPredicate);
             await _client.SendRequestAsync(setBreakpointCommand, cancellationToken).ConfigureAwait(false);
@@ -1146,11 +1142,6 @@ namespace Microsoft.NodejsTools.Debugger {
         #endregion
 
         internal void Close() {
-            if (_trackFileChanges) {
-                _documentEvents.DocumentSaved -= OnDocumentSaved;
-                _documentEvents = null;
-                _events = null;
-            }
         }
 
         internal static void FixupForRunAndWait(bool waitOnAbnormal, bool waitOnNormal, ProcessStartInfo psi) {
@@ -1165,8 +1156,8 @@ namespace Microsoft.NodejsTools.Debugger {
                     args += " & if not errorlevel 1 pause";
                 }
                 args += "\"";
-                var binaryType = NativeMethods.GetBinaryType(psi.FileName);
-                if (binaryType == System.Reflection.ProcessorArchitecture.Amd64) {
+                ProcessorArchitecture binaryType = NativeMethods.GetBinaryType(psi.FileName);
+                if (binaryType == ProcessorArchitecture.Amd64) {
                     // VS wants the binary we launch to match in bitness to the Node.exe
                     // we're requesting it to launch.
                     psi.FileName = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.Windows), "Sysnative", "cmd.exe");

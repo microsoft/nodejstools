@@ -97,6 +97,15 @@ namespace NodejsTests {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to {&quot;seq&quot;:9,&quot;request_seq&quot;:9,&quot;type&quot;:&quot;response&quot;,&quot;command&quot;:&quot;changelive&quot;,&quot;success&quot;:true,&quot;body&quot;:{&quot;change_log&quot;:[{&quot;dropped_from_stack&quot;:[{&quot;name&quot;:&quot;&quot;}]},{&quot;break_points_update&quot;:[{&quot;type&quot;:&quot;position_changed&quot;,&quot;id&quot;:1,&quot;old_positions&quot;:{&quot;position&quot;:10,&quot;line&quot;:0,&quot;column&quot;:10},&quot;new_positions&quot;:{&quot;position&quot;:10,&quot;line&quot;:0,&quot;column&quot;:10}},{&quot;type&quot;:&quot;position_changed&quot;,&quot;id&quot;:2,&quot;old_positions&quot;:{&quot;position&quot;:92,&quot;line&quot;:1,&quot;column&quot;:0},&quot;new_positions&quot;:{&quot;position&quot;:93,&quot;line&quot;:1,&quot;column&quot;:0}}]},{&quot;function_patched&quot;:&quot;&quot;},{&quot;position_patched&quot;:[{&quot;name&quot;:&quot;&quot;,&quot;info_not_ [rest of string was truncated]&quot;;.
+        /// </summary>
+        internal static string NodeChangeLiveResponse {
+            get {
+                return ResourceManager.GetString("NodeChangeLiveResponse", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to {&quot;seq&quot;:5,&quot;type&quot;:&quot;event&quot;,&quot;event&quot;:&quot;afterCompile&quot;,&quot;success&quot;:true,&quot;body&quot;:{&quot;script&quot;:{&quot;handle&quot;:1,&quot;type&quot;:&quot;script&quot;,&quot;name&quot;:&quot;http.js&quot;,&quot;id&quot;:34,&quot;lineOffset&quot;:0,&quot;columnOffset&quot;:0,&quot;lineCount&quot;:2169,&quot;sourceStart&quot;:&quot;(function (exports, require, module, __filename, __dirname) { // Copyright Joyen&quot;,&quot;sourceLength&quot;:61850,&quot;scriptType&quot;:2,&quot;compilationType&quot;:0,&quot;context&quot;:{&quot;ref&quot;:0},&quot;text&quot;:&quot;http.js (lines: 2169)&quot;}},&quot;refs&quot;:[{&quot;handle&quot;:0,&quot;type&quot;:&quot;context&quot;,&quot;text&quot;:&quot;#&lt;ContextMirror&gt;&quot;}],&quot;running&quot;:true}.
         /// </summary>
         internal static string NodeCompileScriptResponse {
@@ -158,6 +167,15 @@ namespace NodejsTests {
         internal static string NodeEvaluationResponse {
             get {
                 return ResourceManager.GetString("NodeEvaluationResponse", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to {&quot;seq&quot;:19,&quot;request_seq&quot;:18,&quot;type&quot;:&quot;response&quot;,&quot;command&quot;:&quot;evaluate&quot;,&quot;success&quot;:false,&quot;message&quot;:&quot;ReferenceError: hello is not defined&quot;}.
+        /// </summary>
+        internal static string NodeEvaluationResponseWithReferenceError {
+            get {
+                return ResourceManager.GetString("NodeEvaluationResponseWithReferenceError", resourceCulture);
             }
         }
         

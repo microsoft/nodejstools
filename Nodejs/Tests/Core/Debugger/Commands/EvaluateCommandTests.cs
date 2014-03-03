@@ -12,6 +12,7 @@
  *
  * ***************************************************************************/
 
+using System;
 using Microsoft.NodejsTools.Debugger;
 using Microsoft.NodejsTools.Debugger.Commands;
 using Microsoft.NodejsTools.Debugger.Serialization;
@@ -77,6 +78,32 @@ namespace NodejsTests.Debugger.Commands {
             Assert.AreEqual(commandId, evaluateCommand.Id);
             Assert.IsNotNull(evaluateCommand.Result);
             resultFactoryMock.Verify(factory => factory.Create(It.IsAny<INodeVariable>()), Times.Once);
+        }
+
+        [TestMethod]
+        public void ProcessEvaluateResponseWithReferenceError() {
+            // Arrange
+            const int commandId = 3;
+            var resultFactoryMock = new Mock<IEvaluationResultFactory>();
+            resultFactoryMock.Setup(factory => factory.Create(It.IsAny<INodeVariable>()));
+            const string expression = "hello";
+            var stackFrame = new NodeStackFrame(null, null, null, 0, 0, 0, 0);
+            var evaluateCommand = new EvaluateCommand(commandId, resultFactoryMock.Object, expression, stackFrame);
+            Exception exception = null;
+
+            // Act
+            try {
+                evaluateCommand.ProcessResponse(SerializationTestData.GetEvaluateResponseWithReferenceError());
+            } catch (Exception e) {
+                exception = e;
+            }
+
+            // Assert
+            Assert.IsNotNull(exception);
+            Assert.IsInstanceOfType(exception, typeof (DebuggerCommandException));
+            Assert.AreEqual("ReferenceError: hello is not defined", exception.Message);
+            Assert.IsNull(evaluateCommand.Result);
+            resultFactoryMock.Verify(factory => factory.Create(It.IsAny<INodeVariable>()), Times.Never);
         }
     }
 }
