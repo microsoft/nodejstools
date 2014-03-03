@@ -140,6 +140,10 @@ namespace Microsoft.NodejsTools.NpmUI {
 
         private void QueueCommand(QueuedNpmCommandInfo info) {
             lock (_lock) {
+                if (_commandQueue.Contains(info)
+                    || info.Equals(_currentCommand)) {
+                    return;
+                }
                 _commandQueue.Enqueue(info);
                 Monitor.PulseAll(_lock);
             }
@@ -171,37 +175,38 @@ namespace Microsoft.NodejsTools.NpmUI {
 
         private async void Execute(QueuedNpmCommandInfo info) {
             IsExecutingCommand = true;
+            INpmCommander cmdr = null;
             try {
                 lock (_lock) {
-                    _commander = _npmController.CreateNpmCommander();
-                    _commander.OutputLogged += commander_OutputLogged;
-                    _commander.ErrorLogged += commander_ErrorLogged;
-                    _commander.ExceptionLogged += commander_ExceptionLogged;
-                    _commander.CommandCompleted += commander_CommandCompleted;
+                    cmdr = _npmController.CreateNpmCommander();
+                    cmdr.OutputLogged += commander_OutputLogged;
+                    cmdr.ErrorLogged += commander_ErrorLogged;
+                    cmdr.ExceptionLogged += commander_ExceptionLogged;
+                    cmdr.CommandCompleted += commander_CommandCompleted;
+                    _commander = cmdr;
                 }
 
                 if (info.IsFreeformArgumentCommand) {
-                    await _commander.ExecuteNpmCommandAsync(info.Arguments);
+                    await cmdr.ExecuteNpmCommandAsync(info.Arguments);
                 } else if (info.IsGlobalInstall) {
-                    await _commander.InstallGlobalPackageByVersionAsync(
+                    await cmdr.InstallGlobalPackageByVersionAsync(
                             info.Name,
                             info.Version);
                 } else {
-                    await _commander.InstallPackageByVersionAsync(
+                    await cmdr.InstallPackageByVersionAsync(
                                 info.Name,
                                 info.Version,
                                 info.DependencyType,
                                 true);
                 }
             } finally {
-                var cmdr = _commander;
-                if (null != cmdr) {
-                    cmdr.OutputLogged -= commander_OutputLogged;
-                    cmdr.ErrorLogged -= commander_ErrorLogged;
-                    cmdr.ExceptionLogged -= commander_ExceptionLogged;
-                    cmdr.CommandCompleted -= commander_CommandCompleted;
-                    lock (_lock) {
-                        _commander = null;
+                lock (_lock) {
+                    _commander = null;
+                    if (null != cmdr) {
+                        cmdr.OutputLogged -= commander_OutputLogged;
+                        cmdr.ErrorLogged -= commander_ErrorLogged;
+                        cmdr.ExceptionLogged -= commander_ExceptionLogged;
+                        cmdr.CommandCompleted -= commander_CommandCompleted;
                     }
                 }
             }
@@ -278,21 +283,6 @@ namespace Microsoft.NodejsTools.NpmUI {
             Application.Current.Dispatcher.BeginInvoke(new Action(() => WriteLines(e.LogText, false)));
         }
 
-        private string GetCommandText(QueuedNpmCommandInfo info) {
-            var buff = new StringBuilder("npm ");
-            if (info.IsFreeformArgumentCommand) {
-                buff.Append(info.Arguments);
-            } else {
-                buff.Append(NpmArgumentBuilder.GetNpmInstallArguments(
-                    info.Name,
-                    info.Version,
-                    info.DependencyType,
-                    info.IsGlobalInstall,
-                    true));
-            }
-            return buff.ToString();
-        }
-
         private void UpdateStatusMessage() {
             bool                    executingCommand;
             QueuedNpmCommandInfo    command;
@@ -306,7 +296,7 @@ namespace Microsoft.NodejsTools.NpmUI {
             string status;
 
             if (executingCommand && null != command) {
-                var commandText = GetCommandText(command);
+                var commandText = command.ToString();
                 if (count > 0) {
                     status = string.Format(
                         _withErrors ? Resources.NpmStatusExecutingQueuedErrors : Resources.NpmStatusExecutingQueued,
@@ -394,6 +384,33 @@ namespace Microsoft.NodejsTools.NpmUI {
             public string Version { get; private set; }
             public DependencyType DependencyType { get; private set; }
             public bool IsGlobalInstall { get; private set; }
+
+            public bool Equals(QueuedNpmCommandInfo other) {
+                return null != other && StringComparer.CurrentCulture.Compare(ToString(), other.ToString()) == 0;
+            }
+
+            public override bool Equals(object obj) {
+                return Equals(obj as QueuedNpmCommandInfo);
+            }
+
+            public override int GetHashCode() {
+                return ToString().GetHashCode();
+            }
+
+            public override string ToString() {
+                var buff = new StringBuilder("npm ");
+                if (IsFreeformArgumentCommand) {
+                    buff.Append(Arguments);
+                } else {
+                    buff.Append(NpmArgumentBuilder.GetNpmInstallArguments(
+                        Name,
+                        Version,
+                        DependencyType,
+                        IsGlobalInstall,
+                        true));
+                }
+                return buff.ToString();
+            }
         }
     }
 }
