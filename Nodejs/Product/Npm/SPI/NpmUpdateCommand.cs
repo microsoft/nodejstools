@@ -17,21 +17,29 @@ using System.Text;
 
 namespace Microsoft.NodejsTools.Npm.SPI {
     internal class NpmUpdateCommand : NpmCommand {
-        public NpmUpdateCommand(string fullPathToRootPackageDirectory, string pathToNpm = null)
-            : this(fullPathToRootPackageDirectory, new List<IPackage>(), pathToNpm) { }
+        public NpmUpdateCommand(string fullPathToRootPackageDirectory, bool global, string pathToNpm = null)
+            : this(fullPathToRootPackageDirectory, new List<IPackage>(), global, pathToNpm) { }
 
         public NpmUpdateCommand(
             string fullPathToRootPackageDirectory,
             IEnumerable<IPackage> packages,
+            bool global,
             string pathToNpm = null,
             bool useFallbackIfNpmNotFound = true)
             : base(fullPathToRootPackageDirectory, pathToNpm, useFallbackIfNpmNotFound) {
             var buff = new StringBuilder("update");
+            if (global) {
+                buff.Append(" -g");
+            }
+
             foreach (var package in packages) {
                 buff.Append(' ');
                 buff.Append(package.Name);
             }
-            buff.Append(" --save");
+
+            if (!global) {
+                buff.Append(" --save");
+            }
             Arguments = buff.ToString();
         }
     }

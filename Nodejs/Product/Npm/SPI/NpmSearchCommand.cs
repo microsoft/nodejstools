@@ -33,12 +33,17 @@ namespace Microsoft.NodejsTools.Npm.SPI {
         }
 
         protected void ParseResultsFromReader(TextReader source) {
-            IList<IPackage> results = new List<IPackage>();
+            IList<IPackage> results     = new List<IPackage>();
+            ISet<string>    deduplicate = new HashSet<string>();
 
             var lexer = NpmSearchParserFactory.CreateLexer();
             var parser = NpmSearchParserFactory.CreateParser(lexer);
             parser.Package += (sender, args) => {
-                results.Add(args.Package);
+                var pkg = args.Package;
+                if (!deduplicate.Contains(pkg.Name)) {
+                    results.Add(pkg);
+                    deduplicate.Add(pkg.Name);
+                }
             };
             lexer.Lex(source);
             Results = results;
@@ -56,6 +61,6 @@ namespace Microsoft.NodejsTools.Npm.SPI {
             return success;
         }
 
-        public IList<IPackage> Results { get; private set; }
+        public IList<IPackage> Results { get; protected set; }
     }
 }

@@ -106,20 +106,33 @@ namespace NpmTests {
                     expectedKeywords);
         }
 
-        [TestMethod, Priority(0)]
-        public void TestParseModuleCatalogue() {
+        private IList<IPackage> GetTestPackageList(out IDictionary<string, IPackage> byName) {
             IList<IPackage> target = new List<IPackage>();
-            IDictionary<string, IPackage> byName = new Dictionary<string, IPackage>();
+            IDictionary<string, IPackage> temp = new Dictionary<string, IPackage>();
             INpmSearchLexer lexer = NpmSearchParserFactory.CreateLexer();
             INpmSearchParser parser = NpmSearchParserFactory.CreateParser(lexer);
             parser.Package += (source, args) => {
                 target.Add(args.Package);
-                byName[args.Package.Name] = args.Package;
+                temp[args.Package.Name] = args.Package;
             };
 
             using (var reader = GetCatalogueReader()) {
                 lexer.Lex(reader);
             }
+
+            byName = temp;
+            return target;
+        }
+
+        private IPackageCatalog GetTestPackageCatalog() {
+            IDictionary<string, IPackage> byName;
+            return new MockPackageCatalog(GetTestPackageList(out byName));
+        }
+        
+        [TestMethod, Priority(0)]
+        public void TestParseModuleCatalogue() {
+            IDictionary<string, IPackage> byName;
+            var target = GetTestPackageList(out byName);
 
             Assert.AreEqual(47365, target.Count, "Unexpected package count in catalogue list.");
             Assert.AreEqual(target.Count, byName.Count, "Number of packages should be same in list and dictionary.");
@@ -196,6 +209,66 @@ namespace NpmTests {
                 "2012-04-14 12:47",
                 SemverVersion.Parse("0.0.2"),
                 new[] { "pdf", "writer", "generator", "graphics", "document", "vector" });
+        }
+
+        private IList<IPackage> GetFilteredPackageList(string filterString) {
+            var catalog = GetTestPackageCatalog();
+            var filter = PackageCatalogFilterFactory.Create(catalog);
+            return filter.Filter(filterString);
+        }
+            
+        [TestMethod, Priority(0)]
+        public void TestFilterString() {
+            const string filterString = "express";
+            var results = GetFilteredPackageList(filterString);
+            Assert.IsTrue(results.Count > 0, string.Format("Should be some filter results for '{0}'.", filterString));
+            foreach (var package in results) {
+                bool match = false;
+                if (package.Name.ToLower().Contains(filterString)) {
+                    match = true;
+                } else if (null != package.Description && package.Description.ToLower().Contains(filterString)) {
+                    match = true;
+                } else {
+                    if (package.Keywords.Any(keyword => keyword.ToLower().Contains(filterString))) {
+                        match = true;
+                    }
+                }
+
+                Assert.IsTrue(match, string.Format("Found no match for filter string '{0}' in package '{1}'.", filterString, package.Name));
+            }
+        }
+
+        private void CheckRegexFilterResults(string filterString, IList<IPackage> results) {
+            const string expectedMatch = "express";
+            Assert.IsTrue(results.Count > 0, string.Format("Should be some filter results for '{0}'.", filterString));
+            foreach (var package in results) {
+                bool match = false;
+                if (package.Name.ToLower() == expectedMatch) {
+                    match = true;
+                } else if (null != package.Description && package.Description.ToLower() == expectedMatch) {
+                    match = true;
+                } else {
+                    if (package.Keywords.Any(keyword => keyword.ToLower() == expectedMatch)) {
+                        match = true;
+                    }
+                }
+
+                Assert.IsTrue(match, string.Format("Found no match for filter regex '{0}' in package '{1}'.", filterString, package.Name));
+            }
+        }
+
+        private void TestFilterRegex(string filterString) {
+            CheckRegexFilterResults(filterString, GetFilteredPackageList(filterString));
+        }
+
+        [TestMethod, Priority(0)]
+        public void TestFilterRegex() {
+            TestFilterRegex("/^express$");
+        }
+
+        [TestMethod, Priority(0)]
+        public void TestFilterRegexTrailingSlash() {
+            TestFilterRegex("/^express$/");
         }
     }
 }

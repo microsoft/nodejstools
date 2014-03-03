@@ -12,10 +12,17 @@
  *
  * ***************************************************************************/
 
-using System.Windows.Forms;
-
-namespace Microsoft.NodejsTools.NpmUI {
-    internal interface IPackageListViewWrapper {
-        ListView ListView { get; }
+namespace Microsoft.NodejsTools.Npm.SPI {
+    internal class GenericNpmCommand : NpmCommand {
+        public GenericNpmCommand(
+            string fullPathToRootPackageDirectory,
+            string arguments,
+            string pathToNpm = null,
+            bool useFallbackIfNpmNotFound = true) : base(
+            fullPathToRootPackageDirectory,
+            pathToNpm,
+            useFallbackIfNpmNotFound) {
+            Arguments = arguments;
+        }
     }
 }

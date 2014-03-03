@@ -81,5 +81,20 @@ namespace Microsoft.NodejsTools.Npm {
         /// <exception cref="PackageJsonException">If there is an error reading a package.json file when modules are refreshed.</exception>
         /// <returns></returns>
         Task<bool> UpdatePackagesAsync(IEnumerable<IPackage> packages);
+
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="packages"></param>
+        /// <exception cref="PackageJsonException">If there is an error reading a package.json file when modules are refreshed.</exception>
+        /// <returns></returns>
+        Task<bool> UpdateGlobalPackagesAsync(IEnumerable<IPackage> packages);
+
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="arguments"></param>
+        /// <returns></returns>
+        Task<bool> ExecuteNpmCommandAsync(string arguments);
     }
 }

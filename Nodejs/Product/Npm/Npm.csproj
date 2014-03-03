@@ -31,6 +31,9 @@
     <Reference Include="Microsoft.CSharp" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="NpmArgumentBuilder.cs" />
+    <Compile Include="SemverVersionComparer.cs" />
+    <Compile Include="SPI\AbstractNpmSearchComparer.cs" />
     <Compile Include="DependencyType.cs" />
     <Compile Include="DependencyUrlType.cs" />
     <Compile Include="DirectoryPackageJsonSource.cs" />
@@ -55,6 +58,7 @@
     <Compile Include="INpmSearchParser.cs" />
     <Compile Include="IPackage.cs" />
     <Compile Include="IPackageCatalog.cs" />
+    <Compile Include="IPackageCatalogFilter.cs" />
     <Compile Include="IPackageJson.cs" />
     <Compile Include="IPackageJsonSource.cs" />
     <Compile Include="IPerson.cs" />
@@ -63,13 +67,18 @@
     <Compile Include="IScript.cs" />
     <Compile Include="IScripts.cs" />
     <Compile Include="NodeModuleBuilder.cs" />
+    <Compile Include="NpmCatalogEmptyException.cs" />
     <Compile Include="NpmCommandCompletedEventArgs.cs" />
     <Compile Include="NpmControllerFactory.cs" />
     <Compile Include="NpmExceptionEventArgs.cs" />
     <Compile Include="NpmExecutionException.cs" />
     <Compile Include="NpmLogEventArgs.cs" />
     <Compile Include="NpmNotFoundException.cs" />
+    <Compile Include="SPI\GenericNpmCommand.cs" />
+    <Compile Include="SPI\NpmSearchRegexComparer.cs" />
+    <Compile Include="SPI\NpmSearchFilterStringComparer.cs" />
     <Compile Include="NpmSearchParserFactory.cs" />
+    <Compile Include="PackageCatalogFilterFactory.cs" />
     <Compile Include="PackageComparer.cs" />
     <Compile Include="PackageEventArgs.cs" />
     <Compile Include="PackageFlags.cs" />
@@ -77,11 +86,17 @@
     <Compile Include="PackageJsonFactory.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="ReaderPackageJsonSource.cs" />
+    <Compile Include="Resources.Designer.cs">
+      <AutoGen>True</AutoGen>
+      <DesignTime>True</DesignTime>
+      <DependentUpon>Resources.resx</DependentUpon>
+    </Compile>
     <Compile Include="RootPackageFactory.cs" />
     <Compile Include="ScriptName.cs" />
     <Compile Include="SPI\AbstractNpmLogSource.cs" />
     <Compile Include="SPI\NpmCommander.cs" />
     <Compile Include="SPI\NpmGetCatalogueCommand.cs" />
+    <Compile Include="SPI\PackageCatalogFilter.cs" />
     <Compile Include="TokenEventArgs.cs" />
     <Compile Include="SemverVersion.cs" />
     <Compile Include="SemverVersionFormatException.cs" />
@@ -120,6 +135,12 @@
   </ItemGroup>
   <ItemGroup>
     <None Include="packages.config" />
+  </ItemGroup>
+  <ItemGroup>
+    <EmbeddedResource Include="Resources.resx">
+      <Generator>ResXFileCodeGenerator</Generator>
+      <LastGenOutput>Resources.Designer.cs</LastGenOutput>
+    </EmbeddedResource>
   </ItemGroup>
   <Import Project="..\ProjectAfter.settings" />
   <Import Project="$(SolutionDir)\.nuget\nuget.targets" />

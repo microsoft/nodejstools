@@ -166,11 +166,14 @@ namespace Microsoft.NodejsTools.Npm {
             }
 
             var other = (SemverVersion)obj;
+
+            //  Note that we do NOT include build metadata in the comparison,
+            //  since semver specifies that this is ignored when determining whether or
+            //  not versions are equal. See point 11 at http://semver.org/.
             return Major == other.Major
                    && Minor == other.Minor
                    && Patch == other.Patch
-                   && PreReleaseVersion == PreReleaseVersion
-                   && BuildMetadata == BuildMetadata;
+                   && PreReleaseVersion == other.PreReleaseVersion;
         }
 
         public static bool operator ==(SemverVersion v1, SemverVersion v2) {
@@ -179,6 +182,22 @@ namespace Microsoft.NodejsTools.Npm {
 
         public static bool operator !=(SemverVersion v1, SemverVersion v2) {
             return !(v1 == v2);
+        }
+
+        public static bool operator >(SemverVersion v1, SemverVersion v2) {
+            return new SemverVersionComparer().Compare(v1, v2) == 1;
+        }
+
+        public static bool operator <(SemverVersion v1, SemverVersion v2) {
+            return new SemverVersionComparer().Compare(v1, v2) == -1;
+        }
+
+        public static bool operator >=(SemverVersion v1, SemverVersion v2) {
+            return v1 == v2 || v1 > v2;
+        }
+
+        public static bool operator <=(SemverVersion v1, SemverVersion v2) {
+            return v1 == v2 || v1 < v2;
         }
     }
 }

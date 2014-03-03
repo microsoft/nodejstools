@@ -13,19 +13,12 @@
  * ***************************************************************************/
 
 using System;
-using System.Collections.Generic;
-using System.Threading.Tasks;
+using Microsoft.NodejsTools.Npm.SPI;
 
 namespace Microsoft.NodejsTools.Npm {
-    public interface INpmController : INpmLogSource {
-        event EventHandler StartingRefresh;
-        void Refresh();
-        event EventHandler FinishedRefresh;
-        IRootPackage RootPackage { get; }
-        IGlobalPackages GlobalPackages { get; }
-        INpmCommander CreateNpmCommander();
-
-        Task<IPackageCatalog> GetRepositoryCatalogueAsync(bool forceDownload);
-        IPackageCatalog MostRecentlyLoadedCatalog { get; }
+    public static class PackageCatalogFilterFactory {
+        public static IPackageCatalogFilter Create(IPackageCatalog catalog) {
+            return new PackageCatalogFilter(catalog);
+        }
     }
 }

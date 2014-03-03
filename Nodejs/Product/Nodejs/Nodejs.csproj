@@ -249,6 +249,26 @@
     <Compile Include="Commands\OpenRemoteDebugDocumentationCommand.cs" />
     <Compile Include="Commands\OpenRemoteDebugProxyFolderCommand.cs" />
     <Compile Include="Commands\SurveyNewsCommand.cs" />
+    <Compile Include="NpmUI\ExecuteNpmCommandWindow.xaml.cs">
+      <DependentUpon>ExecuteNpmCommandWindow.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="NpmUI\NpmOutputControl.xaml.cs">
+      <DependentUpon>NpmOutputControl.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="NpmUI\NpmOutputControlViewModel.cs" />
+    <Compile Include="NpmUI\NpmPackageInstallViewModel.cs" />
+    <Compile Include="NpmUI\NpmPackageInstallWindow.xaml.cs">
+      <DependentUpon>NpmPackageInstallWindow.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="NpmUI\PackageCatalogEntryViewModel.cs" />
+    <Compile Include="NpmUI\WpfColorUtils.cs" />
+    <Compile Include="Project\DependencyNodeProperties.cs" />
+    <Compile Include="Project\NpmNodeProperties.cs" />
+    <Compile Include="Resources.Designer.cs">
+      <AutoGen>True</AutoGen>
+      <DesignTime>True</DesignTime>
+      <DependentUpon>Resources.resx</DependentUpon>
+    </Compile>
     <Compile Include="Debugger\BreakOn.cs" />
     <Compile Include="Debugger\BreakOnKind.cs" />
     <Compile Include="Debugger\Commands\SetVariableValueCommand.cs" />
@@ -421,61 +441,7 @@
     <Compile Include="NodejsLanguageInfo.cs" />
     <Compile Include="NodejsProjectConfig.cs" />
     <Compile Include="NodejsToolsInstallPath.cs" />
-    <Compile Include="NpmUI\BusyControl.cs">
-      <SubType>UserControl</SubType>
-    </Compile>
-    <Compile Include="NpmUI\BusyControl.Designer.cs">
-      <DependentUpon>BusyControl.cs</DependentUpon>
-    </Compile>
-    <Compile Include="NpmUI\BusyPopup.cs">
-      <SubType>Form</SubType>
-    </Compile>
-    <Compile Include="NpmUI\BusyPopup.Designer.cs">
-      <DependentUpon>BusyPopup.cs</DependentUpon>
-    </Compile>
-    <Compile Include="NpmUI\ColorUtils.cs" />
     <Compile Include="NpmUI\ErrorHelper.cs" />
-    <Compile Include="NpmUI\IPackageListViewWrapper.cs" />
-    <Compile Include="NpmUI\InstalledPackageListControl.cs">
-      <SubType>UserControl</SubType>
-    </Compile>
-    <Compile Include="NpmUI\InstalledPackageListControl.Designer.cs">
-      <DependentUpon>InstalledPackageListControl.cs</DependentUpon>
-    </Compile>
-    <Compile Include="NpmUI\InstalledPackagesPane.cs">
-      <SubType>UserControl</SubType>
-    </Compile>
-    <Compile Include="NpmUI\InstalledPackagesPane.Designer.cs">
-      <DependentUpon>InstalledPackagesPane.cs</DependentUpon>
-    </Compile>
-    <Compile Include="NpmUI\PackageListItemPainter.cs" />
-    <Compile Include="NpmUI\NpmSearchComparer.cs" />
-    <Compile Include="NpmUI\PackageInstallEventArgs.cs" />
-    <Compile Include="NpmUI\PackageInstallPane.cs">
-      <SubType>UserControl</SubType>
-    </Compile>
-    <Compile Include="NpmUI\PackageInstallPane.Designer.cs">
-      <DependentUpon>PackageInstallPane.cs</DependentUpon>
-    </Compile>
-    <Compile Include="NpmUI\PackageManagerDialog.cs">
-      <SubType>Form</SubType>
-    </Compile>
-    <Compile Include="NpmUI\PackageManagerDialog.Designer.cs">
-      <DependentUpon>PackageManagerDialog.cs</DependentUpon>
-    </Compile>
-    <Compile Include="NpmUI\PackageSearchPane.cs">
-      <SubType>UserControl</SubType>
-    </Compile>
-    <Compile Include="NpmUI\PackageSearchPane.Designer.cs">
-      <DependentUpon>PackageSearchPane.cs</DependentUpon>
-    </Compile>
-    <Compile Include="NpmUI\PackageSourcesPane.cs">
-      <SubType>UserControl</SubType>
-    </Compile>
-    <Compile Include="NpmUI\PackageSourcesPane.Designer.cs">
-      <DependentUpon>PackageSourcesPane.cs</DependentUpon>
-    </Compile>
-    <Compile Include="NpmUI\PackageView.cs" />
     <Compile Include="NpmUI\LastRefreshedMessageProvider.cs" />
     <Compile Include="Options\NodejsDialogPage.cs">
       <SubType>Component</SubType>
@@ -490,6 +456,8 @@
       <DependentUpon>NodejsGeneralOptionsControl.cs</DependentUpon>
     </Compile>
     <Compile Include="Options\SurveyNewsPolicy.cs" />
+    <Compile Include="Project\AbstractNpmNode.cs" />
+    <Compile Include="Project\GlobalModulesNode.cs" />
     <Compile Include="Project\ImportWizard\StartupPage.xaml.cs">
       <DependentUpon>StartupPage.xaml</DependentUpon>
     </Compile>
@@ -503,6 +471,18 @@
     <Compile Include="Project\ImportWizard\ImportWizard.xaml.cs">
       <DependentUpon>ImportWizard.xaml</DependentUpon>
     </Compile>
+    <Page Include="NpmUI\ExecuteNpmCommandWindow.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="NpmUI\NpmOutputControl.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="NpmUI\NpmPackageInstallWindow.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
     <Page Include="Project\ImportWizard\StartupPage.xaml">
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
@@ -616,31 +596,6 @@
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>
-    <EmbeddedResource Include="NpmUI\BusyControl.resx">
-      <DependentUpon>BusyControl.cs</DependentUpon>
-      <SubType>Designer</SubType>
-    </EmbeddedResource>
-    <EmbeddedResource Include="NpmUI\BusyPopup.resx">
-      <DependentUpon>BusyPopup.cs</DependentUpon>
-    </EmbeddedResource>
-    <EmbeddedResource Include="NpmUI\InstalledPackageListControl.resx">
-      <DependentUpon>InstalledPackageListControl.cs</DependentUpon>
-    </EmbeddedResource>
-    <EmbeddedResource Include="NpmUI\InstalledPackagesPane.resx">
-      <DependentUpon>InstalledPackagesPane.cs</DependentUpon>
-    </EmbeddedResource>
-    <EmbeddedResource Include="NpmUI\PackageInstallPane.resx">
-      <DependentUpon>PackageInstallPane.cs</DependentUpon>
-    </EmbeddedResource>
-    <EmbeddedResource Include="NpmUI\PackageManagerDialog.resx">
-      <DependentUpon>PackageManagerDialog.cs</DependentUpon>
-    </EmbeddedResource>
-    <EmbeddedResource Include="NpmUI\PackageSearchPane.resx">
-      <DependentUpon>PackageSearchPane.cs</DependentUpon>
-    </EmbeddedResource>
-    <EmbeddedResource Include="NpmUI\PackageSourcesPane.resx">
-      <DependentUpon>PackageSourcesPane.cs</DependentUpon>
-    </EmbeddedResource>
     <EmbeddedResource Include="Options\NodejsFormattingBracesOptionsControl.resx">
       <DependentUpon>NodejsFormattingBracesOptionsControl.cs</DependentUpon>
     </EmbeddedResource>
@@ -1070,18 +1025,12 @@
     <ZipProject Include="ProjectTemplates\NodejsWebApp\NodejsWebApp.vstemplate">
       <SubType>Designer</SubType>
     </ZipProject>
-    <Compile Include="Resources.Designer.cs">
-      <AutoGen>True</AutoGen>
-      <DesignTime>True</DesignTime>
-      <DependentUpon>Resources.resx</DependentUpon>
-      <Visible>true</Visible>
-    </Compile>
     <EmbeddedResource Include="Resources.resx">
       <ManifestResourceName>Microsoft.NodejsTools.Resources</ManifestResourceName>
       <Generator>ResXFileCodeGenerator</Generator>
       <Visible>true</Visible>
-      <LastGenOutput>Resources.Designer.cs</LastGenOutput>
       <SubType>Designer</SubType>
+      <LastGenOutput>Resources.Designer.cs</LastGenOutput>
     </EmbeddedResource>
   </ItemGroup>
   <ItemGroup>

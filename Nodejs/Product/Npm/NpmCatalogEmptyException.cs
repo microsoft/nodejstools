@@ -13,19 +13,15 @@
  * ***************************************************************************/
 
 using System;
-using System.Collections.Generic;
-using System.Threading.Tasks;
+using System.Runtime.Serialization;
 
 namespace Microsoft.NodejsTools.Npm {
-    public interface INpmController : INpmLogSource {
-        event EventHandler StartingRefresh;
-        void Refresh();
-        event EventHandler FinishedRefresh;
-        IRootPackage RootPackage { get; }
-        IGlobalPackages GlobalPackages { get; }
-        INpmCommander CreateNpmCommander();
 
-        Task<IPackageCatalog> GetRepositoryCatalogueAsync(bool forceDownload);
-        IPackageCatalog MostRecentlyLoadedCatalog { get; }
+    [Serializable]
+    public class NpmCatalogEmptyException : NpmExecutionException, ISerializable {
+        public NpmCatalogEmptyException(){}
+        public NpmCatalogEmptyException(string message) : base(message){}
+        public NpmCatalogEmptyException(string message, Exception innerException) : base(message, innerException){}
+        protected NpmCatalogEmptyException(SerializationInfo info, StreamingContext context) : base(info, context){}
     }
 }

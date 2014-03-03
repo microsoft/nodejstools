@@ -30,14 +30,21 @@ namespace Microsoft.NodejsTools.Npm.SPI {
             var parentPackageJson = parent.PackageJson;
             if (null != parentPackageJson) {
                 foreach (var dependency in parentPackageJson.AllDependencies) {
+                    Package module = null;
                     if (!Contains(dependency.Name)) {
-                        var module = new Package(
+                        module = new Package(
                             parent,
                             Path.Combine(modulesBase, dependency.Name),
                             showMissingDevOptionalSubPackages);
                         if (parent as IPackage == null || !module.IsMissing || showMissingDevOptionalSubPackages) {
                             AddModule(module);
                         }
+                    } else {
+                        module = this[dependency.Name] as Package;
+                    }
+
+                    if (null != module) {
+                        module.RequestedVersionRange = dependency.VersionRangeText;
                     }
                 }
             }
