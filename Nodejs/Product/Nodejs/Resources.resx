@@ -434,10 +434,10 @@
     <value>Refresh failed - see output below for details</value>
   </data>
   <data name="NpmStatusReady" xml:space="preserve">
-    <value>READY</value>
+    <value>Select package(s) for install</value>
   </data>
   <data name="NpmStatusReadyWithErrors" xml:space="preserve">
-    <value>READY - Last command(s) completed with errors</value>
+    <value>Select package(s) for install - errors occurred for previous install(s) - see output below</value>
   </data>
   <data name="NpmStatusExecuting" xml:space="preserve">
     <value>Executing: {0}</value>
@@ -446,10 +446,10 @@
     <value>Executing: {0} ({1} command(s) queued)</value>
   </data>
   <data name="NpmStatusExecutingErrors" xml:space="preserve">
-    <value>ERRORS ENCOUNTERED - Executing: {0}</value>
+    <value>Errors encountered for previous command(s) - Executing: {0}</value>
   </data>
   <data name="NpmStatusExecutingQueuedErrors" xml:space="preserve">
-    <value>ERRORS ENCOUNTERED - Executing: {0} ({1} command(s) queued)</value>
+    <value>Errors encountered for previous command(s) - Executing: {0} ({1} command(s) queued)</value>
   </data>
   <data name="HasTests" xml:space="preserve">
     <value>HasTests</value>
