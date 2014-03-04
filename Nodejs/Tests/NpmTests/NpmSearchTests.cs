@@ -144,16 +144,25 @@ namespace NpmTests {
             IDictionary<string, IPackage> byName;
             return new MockPackageCatalog(GetTestPackageList(filename, out byName));
         }
-        
+
         [TestMethod, Priority(0)]
-        public void TestParseModuleCatalogue() {
+        public void NpmPre143_CheckPackageCount() {
             IDictionary<string, IPackage> byName;
             var target = GetTestPackageList(Filename_Original, out byName);
-
             Assert.AreEqual(47365, target.Count, "Unexpected package count in catalogue list.");
-            Assert.AreEqual(target.Count, byName.Count, "Number of packages should be same in list and dictionary.");
+        }
 
-            //  First package in catelogue
+        [TestMethod, Priority(0)]
+        public void NpmPre143_CheckListAndDictByNameSameSize() {
+            IDictionary<string, IPackage> byName;
+            var target = GetTestPackageList(Filename_Original, out byName);
+            Assert.AreEqual(target.Count, byName.Count, "Number of packages should be same in list and dictionary.");
+        }
+
+        [TestMethod, Priority(0)]
+        public void NpmPre143_CheckFirstPackageInCatalog_0() {
+            IDictionary<string, IPackage> byName;
+            var target = GetTestPackageList(Filename_Original, out byName);
             CheckPackage(
                 target,
                 byName,
@@ -164,8 +173,12 @@ namespace NpmTests {
                 "2013-02-03 06:26",
                 new SemverVersion(),
                 null);
+        }
 
-            //  Last package in catalogue
+        [TestMethod, Priority(0)]
+        public void NpmPre143_CheckLastPackageInCatalog_zzz() {
+            IDictionary<string, IPackage> byName;
+            var target = GetTestPackageList(Filename_Original, out byName);
             CheckPackage(
                 target,
                 byName,
@@ -176,8 +189,12 @@ namespace NpmTests {
                 "2013-03-26 06:15",
                 new SemverVersion(0, 2, 0),
                 null);
+        }
 
-            //  Version number with build and/or pre-release info
+        [TestMethod, Priority(0)]
+        public void NpmPre143_CheckPackageWithBuildPreReleaseInfo() {
+            IDictionary<string, IPackage> byName;
+            var target = GetTestPackageList(Filename_Original, out byName);
             CheckPackage(
                 target,
                 byName,
@@ -188,8 +205,12 @@ namespace NpmTests {
                 "2013-09-30 21:53",
                 SemverVersion.Parse("1.3.0-95847e2"),
                 new[] { "cms", "framework" });
+        }
 
-            //  Multiple authors listed
+        [TestMethod, Priority(0)]
+        public void NpmPre143_CheckPackageMultipleAuthors() {
+            IDictionary<string, IPackage> byName;
+            var target = GetTestPackageList(Filename_Original, out byName);
             CheckPackage(
                 target,
                 byName,
@@ -200,8 +221,12 @@ namespace NpmTests {
                 "2013-09-06 19:09",
                 SemverVersion.Parse("0.8.1"),
                 new[] { "saml", "wsfed", "passport", "auth0", "azure", "auth", "authn", "authentication", "identity", "adfs" });
+        }
 
-            //  Equals in description field
+        [TestMethod, Priority(0)]
+        public void NpmPre143_CheckPackageDescriptionContainsEquals() {
+            IDictionary<string, IPackage> byName;
+            var target = GetTestPackageList(Filename_Original, out byName);
             CheckPackage(
                 target,
                 byName,
@@ -212,9 +237,14 @@ namespace NpmTests {
                 "2013-06-11 22:48",
                 SemverVersion.Parse("1.0.0"),
                 null);
+        }
+        
+        [TestMethod, Priority(0)]
+        public void NpmPre143_CheckPackageAuthorAsEmailAddress() {
+            IDictionary<string, IPackage> byName;
+            var target = GetTestPackageList(Filename_Original, out byName);
 
             //  Author is email address
-            //  =            
             CheckPackage(
                 target,
                 byName,
