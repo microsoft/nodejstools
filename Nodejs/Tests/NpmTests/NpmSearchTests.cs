@@ -223,20 +223,47 @@ namespace NpmTests {
 
             Assert.AreEqual(62084, target.Count, "Unexpected package count in catalogue list.");
 
-            var packageCounts = new Dictionary<string, int>();
+            var packageCounts = new Dictionary<string, IList<IPackage>>();
             foreach (IPackage package in target) {
-                packageCounts[package.Name] = packageCounts.ContainsKey(package.Name) ? packageCounts[package.Name] + 1: 1;
+                if (!packageCounts.ContainsKey(package.Name)) {
+                    packageCounts[package.Name] = new List<IPackage>();
+                }
+                packageCounts[package.Name].Add(package);
             }
 
-            var moreThanOne = new List<string>();
+            var moreThanOne = new List<IList<IPackage>>();
             foreach(string name in packageCounts.Keys) {
-                if(packageCounts[name] > 1) {
-                    moreThanOne.Add(name);
+                if(packageCounts[name].Count > 1) {
+                    moreThanOne.Add(packageCounts[name]);
                 }
             }
 
             if (moreThanOne.Count > 0) {
-                Assert.Fail(string.Format("Multiple package instances found: {0}", string.Join(", ", moreThanOne)));
+                var buff = new StringBuilder();
+                foreach (var list in moreThanOne) {
+                    if (buff.Length > 0) {
+                        buff.Append(", ");
+                    }
+                    buff.Append("[");
+                    foreach (var package in list) {
+                        if (buff[buff.Length - 1] != '[') {
+                            buff.Append(", ");
+                        }
+                        buff.Append("{\"");
+                        buff.Append(package.Name);
+                        buff.Append("\", \"");
+                        buff.Append(package.Version);
+                        buff.Append("\", \"");
+                        buff.Append(package.Description);
+                        buff.Append("\", \"");
+                        buff.Append(package.Author);
+                        buff.Append("\", \"");
+                        buff.Append(string.Join(" ", package.Keywords));
+                        buff.Append("\"}");
+                    }
+                    buff.Append("]");
+                }
+                Assert.Fail(string.Format("Multiple package instances found: {0}", buff.ToString()));
             }
 
             Assert.AreEqual(target.Count, byName.Count, "Number of packages should be same in list and dictionary.");
