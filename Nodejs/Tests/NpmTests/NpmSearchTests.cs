@@ -52,7 +52,8 @@ namespace NpmTests {
 
             Assert.AreEqual(expectedName, package.Name, "Invalid name.");
             Assert.AreEqual(expectedDescription, package.Description, "Invalid description.");
-            Assert.AreEqual(expectedAuthor, package.Author.Name, "Invalid author.");
+            string actualAuthorString = null == package.Author ? null : package.Author.Name;
+            Assert.AreEqual(expectedAuthor, actualAuthorString, "Invalid author.");
             Assert.AreEqual(expectedPublishDateTime, package.PublishDateTimeString, "Invalid publish date/time.");
             Assert.AreEqual(expectedVersion, package.Version, "Invalid version.");
 
@@ -89,7 +90,25 @@ namespace NpmTests {
             string expectedPublishDateTime,
             SemverVersion expectedVersion,
             IEnumerable<string> expectedKeywords) {
+            CheckPackage(
+                packagesByName[expectedName],
+                expectedName,
+                expectedDescription,
+                expectedAuthor,
+                expectedPublishDateTime,
+                expectedVersion,
+                expectedKeywords);
+
             if (expectedIndex >= 0) {
+                for (int index = 0, size = packages.Count; index < size; ++index ) {
+                    if (packages[index].Name == expectedName) {
+                        Assert.AreEqual(
+                            expectedIndex,
+                            index,
+                            string.Format("Package '{0}' not at expected index in list.", expectedName));
+                    }
+                }
+
                 CheckPackage(
                     packages[expectedIndex],
                     expectedName,
@@ -99,14 +118,6 @@ namespace NpmTests {
                     expectedVersion,
                     expectedKeywords);
             }
-            CheckPackage(
-                    packagesByName[expectedName],
-                    expectedName,
-                    expectedDescription,
-                    expectedAuthor,
-                    expectedPublishDateTime,
-                    expectedVersion,
-                    expectedKeywords);
         }
 
         private IList<IPackage> GetTestPackageList(
@@ -216,13 +227,22 @@ namespace NpmTests {
                 new[] { "pdf", "writer", "generator", "graphics", "document", "vector" });
         }
 
-        [TestMethod, Priority(0)]
-        public void TestParseModuleCatalogue_Mar14() {
-            IDictionary<string, IPackage> byName;
-            var target = GetTestPackageList(Filename_Mar14, out byName);
+        private void CheckSensibleNumberOfNonZeroVersions(ICollection<IPackage> target) {
+            int sensibleVersionCount = 0;
+            var zero = SemverVersion.Parse("0.0.0");
+            foreach (var package in target) {
+                if (package.Version != zero) {
+                    ++sensibleVersionCount;
+                }
+            }
 
-            Assert.AreEqual(62084, target.Count, "Unexpected package count in catalogue list.");
+            //  Let's say (it'll be much higher) but at least 25% of packages must have a sensible version number
+            Assert.IsTrue(
+                sensibleVersionCount > target.Count / 4,
+                string.Format("There are only {0} packages with version numbers other than {1}", sensibleVersionCount, zero));
+        }
 
+        private void CheckOnlyOneOfEachPackage(IEnumerable<IPackage> target) {
             var packageCounts = new Dictionary<string, IList<IPackage>>();
             foreach (IPackage package in target) {
                 if (!packageCounts.ContainsKey(package.Name)) {
@@ -232,8 +252,8 @@ namespace NpmTests {
             }
 
             var moreThanOne = new List<IList<IPackage>>();
-            foreach(string name in packageCounts.Keys) {
-                if(packageCounts[name].Count > 1) {
+            foreach (string name in packageCounts.Keys) {
+                if (packageCounts[name].Count > 1) {
                     moreThanOne.Add(packageCounts[name]);
                 }
             }
@@ -265,21 +285,20 @@ namespace NpmTests {
                 }
                 Assert.Fail(string.Format("Multiple package instances found: {0}", buff.ToString()));
             }
+        }
+
+        [TestMethod, Priority(0)]
+        public void TestParseModuleCatalogue_Mar14() {
+            IDictionary<string, IPackage> byName;
+            var target = GetTestPackageList(Filename_Mar14, out byName);
+
+            CheckSensibleNumberOfNonZeroVersions(target);
+
+            Assert.AreEqual( 62068 /*was 62084*/, target.Count, "Unexpected package count in catalogue list.");
+
+            CheckOnlyOneOfEachPackage(target);
 
             Assert.AreEqual(target.Count, byName.Count, "Number of packages should be same in list and dictionary.");
-
-            int sensibleVersionCount = 0;
-            var zero = SemverVersion.Parse("0.0.0");
-            foreach (var package in target) {
-                if (package.Version != zero) {
-                    ++sensibleVersionCount;
-                }
-            }
-
-            //  Let's say (it'll be much higher) but at least 25% of packages must have a sensible version number
-            Assert.IsTrue(
-                sensibleVersionCount > target.Count / 4,
-                string.Format("There are only {0} packages with version numbers other than {1}", sensibleVersionCount, zero));
 
             //  First package in catelogue
             CheckPackage(
@@ -297,7 +316,7 @@ namespace NpmTests {
             CheckPackage(
                 target,
                 byName,
-                47364,
+                62067,
                 "zzz",
                 "Lightweight REST service container",
                 "avayanis",
@@ -309,7 +328,7 @@ namespace NpmTests {
             CheckPackage(
                 target,
                 byName,
-                34413,
+                45322,
                 "psc-cms-js",
                 "js library for Psc CMS (pscheit/psc-cms). shim reposistory…",
                 "pscheit",
@@ -321,7 +340,7 @@ namespace NpmTests {
             CheckPackage(
                 target,
                 byName,
-                32499,
+                42864,
                 "passport-wsfed-saml2",
                 "SAML2 Protocol and WS-Fed library",
                 "woloski…",
@@ -333,7 +352,7 @@ namespace NpmTests {
             CheckPackage(
                 target,
                 byName,
-                32254,
+                42580,
                 "particularizable",
                 "particularizable ================ `enumerable` was taken.",
                 "elliottcable",
@@ -345,13 +364,129 @@ namespace NpmTests {
             CheckPackage(
                 target,
                 byName,
-                32705,
+                43119,
                 "pdfkit-memory",
                 "A PDF generation library for Node.js",
                 "trevor@kimenye.com",
                 "2012-04-14",
                 SemverVersion.Parse("0.0.2"),
                 new[] { "pdf", "writer", "generator", "graphics", "document", "vector" });
+
+            // Packages around and including package with no description, author, or version - I can't believe the npm registry even allows this!
+            CheckPackage(
+                target,
+                byName,
+                14,
+                "11zwheat",
+                "Git powered javascript blog.",
+                "sun11",
+                "2012-11-17",
+                SemverVersion.Parse("0.2.6"),
+                null);
+            CheckPackage(
+                target,
+                byName,
+                15,
+                "122",
+                null,
+                null,
+                "2014-03-03",
+                SemverVersion.Parse("0.0.0"),
+                null);
+            CheckPackage(
+                target,
+                byName,
+                16,
+                "123",
+                "123",
+                "feitian",
+                "2013-12-20",
+                SemverVersion.Parse("0.0.1"),
+                new [] {"123"});
+            CheckPackage(
+                target,
+                byName,
+                17,
+                "127-ssh",
+                "Capture your command not found and tries to ssh",
+                "romainberger",
+                "2013-12-28",
+                SemverVersion.Parse("0.1.2"),
+                null);
+
+            // No version, but everything else
+            CheckPackage(
+                target,
+                byName,
+                30,
+                "2co",
+                "Module that will provide nodejs adapters for 2checkout API…",
+                "biggora",
+                "2012-04-02",
+                SemverVersion.Parse("0.0.0"),
+                new[] { "payments", "2checkout", "adapter", "gateway" });
+            CheckPackage(
+                target,
+                byName,
+                31,
+                "2co-client",
+                "A low-level HTTP client for the 2checkout API",
+                "rakeshpai",
+                "2013-11-06",
+                SemverVersion.Parse("0.0.12"),
+                new [] {"2checkout", "2co", "payment", "payment", "gateway"});
+
+            // Check packages with and around results with blank description field
+            CheckPackage(
+                target,
+                byName,
+                250,
+                "activator",
+                "simple user activation and password reset for nodejs",
+                "deitch",
+                "2013-11-10",
+                SemverVersion.Parse("0.2.8"),
+                new[] { "express", "email", "sms", "activation", "nodejs", "node", "confirmation", "two-step" });
+            CheckPackage(
+                target,
+                byName,
+                251,
+                "active-client",
+                null,
+                "s3u",
+                "2011-01-03",
+                SemverVersion.Parse("0.1.1"),
+                null);
+            CheckPackage(
+                target,
+                byName,
+                252,
+                "active-golf",
+                null,
+                "sberryman",
+                "2014-02-12",
+                SemverVersion.Parse("0.0.11"),
+                null);
+            CheckPackage(
+                target,
+                byName,
+                253,
+                "active-markdown",
+                "A tool for generating reactive documents from markdown…",
+                "alecperkins",
+                "2013-05-04",
+                SemverVersion.Parse("0.3.2"),
+                null);
+            CheckPackage(
+                target,
+                byName,
+                254,
+                "active-menu",
+                "Facilitates the creation of menus in Node applications.",
+                "persata",
+                "2013-09-22",
+                SemverVersion.Parse("0.1.2"),
+                new[] { "menu", "ui", "express" });
         }
 
         private IList<IPackage> GetFilteredPackageList(string filterString) {

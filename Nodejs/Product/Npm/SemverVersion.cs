@@ -27,13 +27,13 @@ namespace Microsoft.NodejsTools.Npm {
         private static readonly Regex RegexSemver = new Regex(
             "^(?<major>[0-9]+)"
             + "\\.(?<minor>[0-9]+)"
-            + "\\.(?<patch>[0-9]+)"
-            + "(?:-(?<prerelease>[0-9A-Za-z-]+(\\.[0-9A-Za-z-]+)*))?"
-            + "(?:\\+(?<buildmetadata>[0-9A-Za-z-]+(\\.[0-9A-Za-z-]+)*))?$",
+            + "\\.(?<patch>[…0-9]+)" // The '…' is there to handle the 'classy' library, which has a very long version number - see slightly snarky comment about that unadulterated bag of hilarity below.
+            + "(?:-(?<prerelease>[…0-9A-Za-z-]+(\\.[…0-9A-Za-z-]+)*))?"
+            + "(?:\\+(?<buildmetadata>[…0-9A-Za-z-]+(\\.[…0-9A-Za-z-]+)*))?$",
             RegexOptions.IgnoreCase | RegexOptions.Singleline);
 
         private static readonly Regex RegexOptionalFragment = new Regex(
-            "^[0-9A-Za-z-]+(\\.[0-9A-Za-z-]+)*$",
+            "^[…0-9A-Za-z-]+(\\.[…0-9A-Za-z-]+)*$",
             RegexOptions.IgnoreCase | RegexOptions.Singleline);
 
         public static SemverVersion Parse(string versionString) {
@@ -50,10 +50,17 @@ namespace Microsoft.NodejsTools.Npm {
             var buildMetadata = match.Groups["buildmetadata"];
 
             try {
+                // NASTY: To deal with patch truncation - e.g., seen with 'classy' package in npm v1.4.3 onwards
+                var patch = match.Groups["patch"].Value;
+                while (!string.IsNullOrEmpty(patch) && patch.EndsWith("…")) {
+                    patch = patch.Length == 1 ? "0" : patch.Substring(0, patch.Length - 1);
+                }
+                // /NASTY
+
                 return new SemverVersion(
                     ulong.Parse(match.Groups["major"].Value),
                     ulong.Parse(match.Groups["minor"].Value),
-                    ulong.Parse(match.Groups["patch"].Value),
+                    ulong.Parse(patch),
                     preRelease.Success ? preRelease.Value : null,
                     buildMetadata.Success ? buildMetadata.Value : null);
             } catch (OverflowException oe) {

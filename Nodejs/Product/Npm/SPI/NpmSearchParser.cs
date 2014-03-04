@@ -13,10 +13,6 @@
  * ***************************************************************************/
 
 using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace Microsoft.NodejsTools.Npm.SPI {
     class NpmSearchParser : INpmSearchParser {
@@ -32,6 +28,7 @@ namespace Microsoft.NodejsTools.Npm.SPI {
 
         private INpmSearchLexer _lexer;
         private NodeModuleBuilder _builder;
+        private PackageProxy _lastPackage;
         private NextToken _nextToken = NextToken.Name;
 
         public NpmSearchParser(INpmSearchLexer lexer) {
@@ -47,7 +44,13 @@ namespace Microsoft.NodejsTools.Npm.SPI {
             if ((e.Flags & TokenFlags.Newline) == TokenFlags.Newline
                 || (e.Flags & TokenFlags.ThatsAllFolks) == TokenFlags.ThatsAllFolks) {
                 if (!string.IsNullOrEmpty(_builder.Name)) {
-                    OnPackage(_builder.Build());
+                    if (_nextToken == NextToken.Description) {
+                        //  Handle names that are wrapped across lines in npm output from npm v1.4.3 onwards
+                        _lastPackage.Name = _lastPackage.Name + _builder.Name;
+                    } else {
+                        _lastPackage = _builder.Build() as PackageProxy;
+                        OnPackage(_lastPackage);
+                    }
                 }
 
                 _builder.Reset();
@@ -62,7 +65,15 @@ namespace Microsoft.NodejsTools.Npm.SPI {
                         break;
                     case NextToken.Description:
                         if (e.LeadingEqualsCount != 1 || e.Value.Length == 1) {
-                            _builder.AppendToDescription(e.Value);
+                            if (e.LeadingEqualsCount == 0
+                                && ((e.Flags & TokenFlags.Digits) == TokenFlags.Digits)
+                                && ((e.Flags & TokenFlags.Dashes) == TokenFlags.Dashes)
+                                && ((e.Flags & TokenFlags.Letters) != TokenFlags.Letters)) {
+                                _nextToken = NextToken.Author;
+                                goto case NextToken.Author; //  Will handle as a date
+                            } else {
+                                _builder.AppendToDescription(e.Value);
+                            }
                         } else {
                             _builder.AddAuthor(e.Value.Substring(1));
                             _nextToken = NextToken.Author;
@@ -80,10 +91,20 @@ namespace Microsoft.NodejsTools.Npm.SPI {
                         }
                         break;
                     case NextToken.DateTime:
-                        if ((e.Flags & TokenFlags.Digits) == TokenFlags.Digits
-                            && (e.Flags & TokenFlags.Colons) == TokenFlags.Colons) {
-                            _builder.AppendToDate(e.Value);
-                            _nextToken = NextToken.Version;
+                        if ((e.Flags & TokenFlags.Digits) == TokenFlags.Digits) {
+                            if ((e.Flags & TokenFlags.Colons) == TokenFlags.Colons){
+                                _builder.AppendToDate(e.Value);
+                                _nextToken = NextToken.Version;
+                            } else if ((e.Flags & TokenFlags.Dots) == TokenFlags.Dots) {
+                                _nextToken = NextToken.Version;
+                                goto case NextToken.Version;
+                            } else {
+                                _nextToken = NextToken.Keywords;
+                                goto case NextToken.Keywords;
+                            }
+                        } else if ((e.Flags & TokenFlags.Whitespace) == TokenFlags.None) {
+                            _nextToken = NextToken.Keywords;
+                            goto case NextToken.Keywords;
                         }
                         break;
                     case NextToken.Version:
