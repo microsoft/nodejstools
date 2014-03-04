@@ -288,19 +288,37 @@ namespace NpmTests {
         }
 
         [TestMethod, Priority(0)]
-        public void TestParseModuleCatalogue_Mar14() {
+        public void Npm143AndLater_CheckNonZeroPackageVersionsExist() {
             IDictionary<string, IPackage> byName;
             var target = GetTestPackageList(Filename_Mar14, out byName);
-
             CheckSensibleNumberOfNonZeroVersions(target);
+        }
 
-            Assert.AreEqual( 62068 /*was 62084*/, target.Count, "Unexpected package count in catalogue list.");
+        [TestMethod, Priority(0)]
+        public void Npm143AndLater_CheckCorrectPackageCount() {
+            IDictionary<string, IPackage> byName;
+            var target = GetTestPackageList(Filename_Mar14, out byName);
+            Assert.AreEqual(62068 /*was 62084*/, target.Count, "Unexpected package count in catalogue list.");
+        }
 
+        [TestMethod, Priority(0)]
+        public void Npm143AndLater_CheckNoDuplicatePackages() {
+            IDictionary<string, IPackage> byName;
+            var target = GetTestPackageList(Filename_Mar14, out byName);
             CheckOnlyOneOfEachPackage(target);
+        }
 
+        [TestMethod, Priority(0)]
+        public void Npm143AndLater_CheckListAndDictByNameSameSize() {
+            IDictionary<string, IPackage> byName;
+            var target = GetTestPackageList(Filename_Mar14, out byName);
             Assert.AreEqual(target.Count, byName.Count, "Number of packages should be same in list and dictionary.");
+        }
 
-            //  First package in catelogue
+        [TestMethod, Priority(0)]
+        public void Npm143AndLater_CheckFirstPackageInCatalog_007() {
+            IDictionary<string, IPackage> byName;
+            var target = GetTestPackageList(Filename_Mar14, out byName);
             CheckPackage(
                 target,
                 byName,
@@ -310,9 +328,13 @@ namespace NpmTests {
                 "btford",
                 "2013-07-29",
                 new SemverVersion(0, 0, 2),
-                new [] { "testing", "test", "mock", "spy" });
+                new[] { "testing", "test", "mock", "spy" });
+        }
 
-            //  Last package in catalogue
+        [TestMethod, Priority(0)]
+        public void Npm143AndLater_CheckLastPackageInCatalog_zzz() {
+            IDictionary<string, IPackage> byName;
+            var target = GetTestPackageList(Filename_Mar14, out byName);
             CheckPackage(
                 target,
                 byName,
@@ -323,6 +345,12 @@ namespace NpmTests {
                 "2013-11-24",
                 new SemverVersion(0, 3, 0),
                 null);
+        }
+
+        [TestMethod, Priority(0)]
+        public void Npm143AndLater_CheckPackageTruncatedBuildPreReleaseInfo() {
+            IDictionary<string, IPackage> byName;
+            var target = GetTestPackageList(Filename_Mar14, out byName);
 
             //  Version number with truncated build and/or pre-release info
             CheckPackage(
@@ -335,6 +363,12 @@ namespace NpmTests {
                 "2014-01-07",
                 SemverVersion.Parse("1.3.0-9584…"),
                 new[] { "cms", "framework" });
+        }
+
+        [TestMethod, Priority(0)]
+        public void Npm143AndLater_CheckPackageMultipleAuthorsTruncated() {
+            IDictionary<string, IPackage> byName;
+            var target = GetTestPackageList(Filename_Mar14, out byName);
 
             //  Multiple authors listed
             CheckPackage(
@@ -347,8 +381,12 @@ namespace NpmTests {
                 "2014-02-25",
                 SemverVersion.Parse("0.8.7"),
                 new[] { "saml", "wsfed", "passport", "auth0", "azure", "auth", "authn", "authentication", "identity", "adfs" });
+        }
 
-            //  Equals in description field
+        [TestMethod, Priority(0)]
+        public void Npm143AndLater_CheckPackageEqualsInDescription() {
+            IDictionary<string, IPackage> byName;
+            var target = GetTestPackageList(Filename_Mar14, out byName);
             CheckPackage(
                 target,
                 byName,
@@ -359,8 +397,12 @@ namespace NpmTests {
                 "2013-06-11",
                 SemverVersion.Parse("1.0.0"),
                 null);
+        }
 
-            //  Author is email address
+        [TestMethod, Priority(0)]
+        public void Npm143AndLater_CheckPackageAuthorAsEmailAddress() {
+            IDictionary<string, IPackage> byName;
+            var target = GetTestPackageList(Filename_Mar14, out byName);
             CheckPackage(
                 target,
                 byName,
@@ -371,6 +413,12 @@ namespace NpmTests {
                 "2012-04-14",
                 SemverVersion.Parse("0.0.2"),
                 new[] { "pdf", "writer", "generator", "graphics", "document", "vector" });
+        }
+
+        [TestMethod, Priority(0)]
+        public void Npm143AndLater_CheckPackageNoDescriptionAuthorVersion() {
+            IDictionary<string, IPackage> byName;
+            var target = GetTestPackageList(Filename_Mar14, out byName);
 
             // Packages around and including package with no description, author, or version - I can't believe the npm registry even allows this!
             CheckPackage(
@@ -402,7 +450,7 @@ namespace NpmTests {
                 "feitian",
                 "2013-12-20",
                 SemverVersion.Parse("0.0.1"),
-                new [] {"123"});
+                new[] { "123" });
             CheckPackage(
                 target,
                 byName,
@@ -413,8 +461,14 @@ namespace NpmTests {
                 "2013-12-28",
                 SemverVersion.Parse("0.1.2"),
                 null);
+        }
 
-            // No version, but everything else
+        [TestMethod, Priority(0)]
+        public void Npm143AndLater_CheckPackageNoVersion() {
+            IDictionary<string, IPackage> byName;
+            var target = GetTestPackageList(Filename_Mar14, out byName);
+
+            // No version, but everything else, plus package after
             CheckPackage(
                 target,
                 byName,
@@ -434,7 +488,13 @@ namespace NpmTests {
                 "rakeshpai",
                 "2013-11-06",
                 SemverVersion.Parse("0.0.12"),
-                new [] {"2checkout", "2co", "payment", "payment", "gateway"});
+                new[] { "2checkout", "2co", "payment", "payment", "gateway" });
+        }
+
+        [TestMethod, Priority(0)]
+        public void Npm143AndLater_CheckPackageNoDescription() {
+            IDictionary<string, IPackage> byName;
+            var target = GetTestPackageList(Filename_Mar14, out byName);
 
             // Check packages with and around results with blank description field
             CheckPackage(
