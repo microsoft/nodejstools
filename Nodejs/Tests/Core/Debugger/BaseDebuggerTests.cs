@@ -474,7 +474,7 @@ namespace NodejsTests.Debugger {
             AutoResetEvent entryPointHit = new AutoResetEvent(false);
             process.EntryPointHit += (sender, e) => {
                 Console.WriteLine("EntryPointHit");
-                Assert.AreEqual(thread, e.Thread);
+                Assert.AreEqual(e.Thread, thread);
                 entryPointHit.Set();
             };
 
@@ -499,15 +499,15 @@ namespace NodejsTests.Debugger {
             AutoResetEvent breakpointHit = new AutoResetEvent(false);
             process.BreakpointHit += (sender, e) => {
                 Console.WriteLine("BreakpointHit {0}", e.BreakpointBinding.RequestedLineNo);
-                Assert.AreEqual(thread, e.Thread);
-                Assert.AreEqual(thread.Frames.First().LineNo, e.BreakpointBinding.RequestedLineNo);
+                Assert.AreEqual(e.Thread, thread);
+                Assert.AreEqual(e.BreakpointBinding.RequestedLineNo, thread.Frames.First().LineNo);
                 breakpointHit.Set();
             };
 
             AutoResetEvent stepComplete = new AutoResetEvent(false);
             process.StepComplete += (sender, e) => {
                 Console.WriteLine("StepComplete");
-                Assert.AreEqual(thread, e.Thread);
+                Assert.AreEqual(e.Thread, thread);
                 stepComplete.Set();
             };
 
@@ -515,7 +515,7 @@ namespace NodejsTests.Debugger {
             NodeException exception = null;
             process.ExceptionRaised += (sender, e) => {
                 Console.WriteLine("ExceptionRaised");
-                Assert.AreEqual(thread, e.Thread);
+                Assert.AreEqual(e.Thread, thread);
                 exception = e.Exception;
                 exceptionRaised.Set();
             };

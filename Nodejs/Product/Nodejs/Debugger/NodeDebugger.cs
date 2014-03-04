@@ -121,8 +121,7 @@ namespace Microsoft.NodejsTools.Debugger {
             FixupForRunAndWait(
                 debugOptions.HasFlag(NodeDebugOptions.WaitOnAbnormalExit),
                 debugOptions.HasFlag(NodeDebugOptions.WaitOnNormalExit),
-                psi
-            );
+                psi);
 
             _process = new Process {
                 StartInfo = psi,
@@ -588,6 +587,37 @@ namespace Microsoft.NodejsTools.Debugger {
             }
         }
 
+        private async Task<bool> ProcessBindingAsync(
+            NodeBreakpointBinding binding,
+            List<NodeBreakpointBinding> hitBindings,
+            int bindingsToProcess,
+            CancellationToken cancellationToken = new CancellationToken()) {
+            // Collect hit breakpoint bindings
+            if (binding != null) {
+                hitBindings.Add(binding);
+            }
+
+            // Handle last processed breakpoint binding by either breaking with breakpoint hit events or calling noBreakpointsHitHandler
+            if (--bindingsToProcess == 0) {
+                if (hitBindings.Count > 0) {
+                    // Fire breakpoint hit event(s)
+                    EventHandler<BreakpointHitEventArgs> breakpointHit = BreakpointHit;
+                    if (breakpointHit != null) {
+                        foreach (NodeBreakpointBinding hitBinding in hitBindings) {
+                            NodeBreakpointBinding breakpointBinding = hitBinding;
+                            await hitBinding.ProcessBreakpointHitAsync(cancellationToken).ConfigureAwait(false);
+                            breakpointHit(this, new BreakpointHitEventArgs(breakpointBinding, MainThread));
+                        }
+                    }
+                } else {
+                    // No breakpoints hit
+                    return false;
+                }
+            }
+
+            return true;
+        }
+
         private async Task<bool> ProcessBreakpointBreakAsync(
             List<NodeBreakpointBinding> breakpointBindings,
             bool haveCallstack,
@@ -603,30 +633,6 @@ namespace Microsoft.NodejsTools.Debugger {
 
             // Process breakpoint binding
             var hitBindings = new List<NodeBreakpointBinding>();
-            Action<NodeBreakpointBinding> processBinding = async binding => {
-                // Collect hit breakpoint bindings
-                if (binding != null) {
-                    hitBindings.Add(binding);
-                }
-
-                // Handle last processed breakpoint binding by either breaking with breakpoint hit events or calling noBreakpointsHitHandler
-                if (--bindingsToProcess == 0) {
-                    if (hitBindings.Count > 0) {
-                        // Fire breakpoint hit event(s)
-                        EventHandler<BreakpointHitEventArgs> breakpointHit = BreakpointHit;
-                        if (breakpointHit != null) {
-                            foreach (NodeBreakpointBinding hitBinding in hitBindings) {
-                                NodeBreakpointBinding breakpointBinding = hitBinding;
-                                await hitBinding.ProcessBreakpointHitAsync(cancellationToken).ConfigureAwait(false);
-                                breakpointHit(this, new BreakpointHitEventArgs(breakpointBinding, MainThread));
-                            }
-                        }
-                    } else {
-                        // No breakpoints hit
-                        result = false;
-                    }
-                }
-            };
 
             // Process breakpoint bindings, ensuring we have callstack
             if (!haveCallstack) {
@@ -634,16 +640,6 @@ namespace Microsoft.NodejsTools.Debugger {
                 Debug.Assert(!running);
             }
 
-            await ProcessBreakpointBindingsAsync(breakpointBindings, processBinding, testFullyBound, cancellationToken).ConfigureAwait(false);
-
-            return result;
-        }
-
-        private async Task ProcessBreakpointBindingsAsync(
-            IEnumerable<NodeBreakpointBinding> breakpointBindings,
-            Action<NodeBreakpointBinding> processBinding,
-            bool testFullyBound,
-            CancellationToken cancellationToken = new CancellationToken()) {
             // Iterate over breakpoint bindings, processing them as fully bound or not
             int currentLineNo = MainThread.TopStackFrame.LineNo;
             foreach (NodeBreakpointBinding breakpointBinding in breakpointBindings) {
@@ -652,14 +648,14 @@ namespace Microsoft.NodejsTools.Debugger {
                     if (testFullyBound) {
                         // Process based on whether hit (based on hit count and/or condition predicates)
                         if (await breakpointBinding.TestAndProcessHitAsync()) {
-                            processBinding(breakpointBinding);
+                            result &= await ProcessBindingAsync(breakpointBinding, hitBindings, bindingsToProcess, cancellationToken).ConfigureAwait(false) && result;
                         } else {
-                            processBinding(null);
+                            result &= await ProcessBindingAsync(null, hitBindings, bindingsToProcess, cancellationToken).ConfigureAwait(false);
                         }
                         continue;
                     }
 
-                    processBinding(breakpointBinding);
+                    result &= await ProcessBindingAsync(breakpointBinding, hitBindings, bindingsToProcess, cancellationToken).ConfigureAwait(false);
                     continue;
                 }
 
@@ -668,27 +664,30 @@ namespace Microsoft.NodejsTools.Debugger {
                 await RemoveBreakPointAsync(breakpointBinding, cancellationToken).ConfigureAwait(false);
 
                 NodeBreakpoint breakpoint = breakpointBinding.Breakpoint;
-                Tuple<int, int?, int> result = await SetBreakpointAsync(breakpoint, cancellationToken: cancellationToken).ConfigureAwait(false);
+                SetBreakpointCommand breakpointResult = await SetBreakpointAsync(breakpoint, cancellationToken: cancellationToken).ConfigureAwait(false);
 
                 // Treat rebound breakpoint binding as fully bound
-                NodeBreakpointBinding reboundbreakpointBinding = CreateBreakpointBinding(breakpoint, result.Item1, result.Item2, result.Item3, true);
+                NodeBreakpointBinding reboundbreakpointBinding = CreateBreakpointBinding(breakpoint, breakpointResult.BreakpointId, breakpointResult.ScriptId, breakpointResult.LineNo, true);
                 HandleBindBreakpointSuccess(reboundbreakpointBinding, breakpoint);
 
                 // Handle invalid-line fixup (second bind matches current line)
                 if (reboundbreakpointBinding.LineNo == currentLineNo) {
                     // Process based on whether hit (based on hit count and/or condition predicates)
                     if (await reboundbreakpointBinding.TestAndProcessHitAsync()) {
-                        processBinding(reboundbreakpointBinding);
+                        result &= await ProcessBindingAsync(reboundbreakpointBinding, hitBindings, bindingsToProcess, cancellationToken).ConfigureAwait(false);
                     } else {
-                        processBinding(null);
+                        result &= await ProcessBindingAsync(null, hitBindings, bindingsToProcess, cancellationToken).ConfigureAwait(false);
                     }
-                    return;
+
+                    return result;
                 }
 
                 // Handle lambda-eval fixup (second bind does not match current line)
                 // Process as not hit
-                processBinding(null);
+                result &= await ProcessBindingAsync(null, hitBindings, bindingsToProcess, cancellationToken).ConfigureAwait(false);
             }
+
+            return result;
         }
 
         private async void OnExceptionEvent(object sender, ExceptionEventArgs args) {
@@ -911,10 +910,10 @@ namespace Microsoft.NodejsTools.Debugger {
         }
 
         public async Task<NodeBreakpointBinding> BindBreakpointAsync(NodeBreakpoint breakpoint, CancellationToken cancellationToken = new CancellationToken()) {
-            Tuple<int, int?, int> result = await SetBreakpointAsync(breakpoint, cancellationToken: cancellationToken).ConfigureAwait(false);
+            SetBreakpointCommand result = await SetBreakpointAsync(breakpoint, cancellationToken: cancellationToken).ConfigureAwait(false);
 
-            bool fullyBound = (result.Item2.HasValue && result.Item3 == breakpoint.LineNo);
-            NodeBreakpointBinding breakpointBinding = CreateBreakpointBinding(breakpoint, result.Item1, result.Item2, result.Item3, fullyBound);
+            bool fullyBound = (result.ScriptId.HasValue && result.LineNo == breakpoint.LineNo);
+            NodeBreakpointBinding breakpointBinding = CreateBreakpointBinding(breakpoint, result.BreakpointId, result.ScriptId, result.LineNo, fullyBound);
 
             // Fully bound (normal case)
             // Treat as success
@@ -929,8 +928,8 @@ namespace Microsoft.NodejsTools.Debugger {
                 await RemoveBreakPointAsync(breakpointBinding, cancellationToken).ConfigureAwait(false);
                 result = await SetBreakpointAsync(breakpoint, true, cancellationToken).ConfigureAwait(false);
 
-                Debug.Assert(!(result.Item2.HasValue && result.Item3 == breakpoint.LineNo));
-                CreateBreakpointBinding(breakpoint, result.Item1, result.Item2, result.Item3, false);
+                Debug.Assert(!(result.ScriptId.HasValue && result.LineNo == breakpoint.LineNo));
+                CreateBreakpointBinding(breakpoint, result.BreakpointId, result.ScriptId, result.LineNo, false);
             }
 
             // Not fully bound, without predicate
@@ -939,11 +938,11 @@ namespace Microsoft.NodejsTools.Debugger {
             return null;
         }
 
-        internal async Task<Tuple<int, int?, int>> SetBreakpointAsync(
+        private async Task<SetBreakpointCommand> SetBreakpointAsync(
             NodeBreakpoint breakpoint,
             bool withoutPredicate = false,
             CancellationToken cancellationToken = new CancellationToken()) {
-            DebugWriteCommand(String.Format("Set Breakpoint"));
+            DebugWriteCommand("Set Breakpoint");
 
             // Try to find module
             NodeModule module = GetModuleForFilePath(breakpoint.RequestedFileName);
@@ -951,7 +950,7 @@ namespace Microsoft.NodejsTools.Debugger {
             var setBreakpointCommand = new SetBreakpointCommand(CommandId, module, breakpoint, withoutPredicate);
             await _client.SendRequestAsync(setBreakpointCommand, cancellationToken).ConfigureAwait(false);
 
-            return new Tuple<int, int?, int>(setBreakpointCommand.BreakpointId, setBreakpointCommand.ScriptId, setBreakpointCommand.LineNo);
+            return setBreakpointCommand;
         }
 
         private NodeBreakpointBinding CreateBreakpointBinding(NodeBreakpoint breakpoint, int breakpointId, int? scriptId, int lineNo, bool fullyBound) {
@@ -990,7 +989,7 @@ namespace Microsoft.NodejsTools.Debugger {
             // DEVNOTE: Calling UpdateBreakpointBinding() on the debug thread with validateSuccess == true will deadlock
             // and timout, causing both the followup handler to be called before confirmation of success (or failure), and
             // a return of false (failure).
-            DebugWriteCommand(String.Format("Update Breakpoint binding"));
+            DebugWriteCommand("Update Breakpoint binding");
 
             var changeBreakPointCommand = new ChangeBreakpointCommand(CommandId, breakpointId, enabled, condition, ignoreCount);
             await _client.SendRequestAsync(changeBreakPointCommand, cancellationToken).ConfigureAwait(false);
