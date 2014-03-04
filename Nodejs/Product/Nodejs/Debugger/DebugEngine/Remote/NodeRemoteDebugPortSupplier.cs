@@ -12,50 +12,62 @@
  *
  * ***************************************************************************/
 
-using Microsoft.VisualStudio;
-using Microsoft.VisualStudio.Debugger.Interop;
 using System;
 using System.Runtime.InteropServices;
-using System.Text.RegularExpressions;
+using Microsoft.VisualStudio;
+using Microsoft.VisualStudio.Debugger.Interop;
 
 namespace Microsoft.NodejsTools.Debugger.Remote {
     [ComVisible(true)]
     [Guid("A241707C-7DB3-464F-8D3E-F3D33E86AE99")]
     public class NodeRemoteDebugPortSupplier : IDebugPortSupplier2, IDebugPortSupplierDescription2 {
         public const string PortSupplierId = "{9E16F805-5EFC-4CE5-8B67-9AE9B643EF80}";
+        public static readonly Guid PortSupplierGuid = new Guid(PortSupplierId);
+
         private static readonly Guid _guid = new Guid(PortSupplierId);
-        private static readonly string _defaultHost = "localhost";
-        private static readonly ushort _defaultPort = NodejsConstants.DefaultDebuggerPort;
-        private static readonly Regex _portNameRegex = new Regex(@"^(?<hostName>[^:\n]+?)?(:(?<portNum>\d+))?$", RegexOptions.ExplicitCapture);
 
         public NodeRemoteDebugPortSupplier() {
         }
 
-        // Qualifier for our transport is parsed as 'hostname:port', where ':port' is optional.
+        // Qualifier for our transport is parsed either as a tcp://, ws:// or ws:// URI,
+        // or as 'hostname:port', where ':port' is optional.
         public int AddPort(IDebugPortRequest2 pRequest, out IDebugPort2 ppPort) {
             ppPort = null;
 
             string name;
             pRequest.GetPortName(out name);
 
-            Match m = _portNameRegex.Match(name);
-            if (!m.Success) {
-                return new FormatException().HResult;
+            Uri uri;
+            if (!Uri.TryCreate(name, UriKind.Absolute, out uri)) {
+                // If it's not a valid absolute URI, then it might be 'hostname:port' without the scheme -
+                // add tcp:// and try again, and let it throw this time if it still can't parse.
+                name = "tcp://" + name;
+                uri = new Uri(name, UriKind.Absolute);
             }
 
-            string hostName = _defaultHost;
-            if (m.Groups["hostName"].Success) {
-                hostName = m.Groups["hostName"].Value;
-            }
+            switch (uri.Scheme) {
+                case "tcp":
+                    // tcp:// URI should only specify host and optionally port, path has no meaning and is invalid.
+                    if (uri.PathAndQuery != "/") {
+                        return new FormatException().HResult;
+                    }
+                    // Set default port if not specified.
+                    if (uri.Port < 0) {
+                        uri = new UriBuilder(uri) { Port = NodejsConstants.DefaultDebuggerPort }.Uri;
+                    }
+                    break;
 
-            ushort portNum = _defaultPort;
-            if (m.Groups["portNum"].Success) {
-                if (!ushort.TryParse(m.Groups["portNum"].Value, out portNum)) {
+                case "ws":
+                case "wss":
+                    // WebSocket URIs are used as is
+                    break;
+
+                default:
+                    // Anything else is not a valid debugger endpoint
                     return new FormatException().HResult;
-                }
             }
 
-            ppPort = new NodeRemoteDebugPort(this, pRequest, hostName, portNum);
+            ppPort = new NodeRemoteDebugPort(this, pRequest, uri);
             return VSConstants.S_OK;
         }
 
@@ -78,7 +90,7 @@ namespace Microsoft.NodejsTools.Debugger.Remote {
         }
 
         public int GetPortSupplierName(out string pbstrName) {
-            pbstrName = "Node remote debugging (unsecured)";
+            pbstrName = "Node.js remote debugging";
             return VSConstants.S_OK;
         }
 

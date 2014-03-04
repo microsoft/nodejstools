@@ -148,7 +148,7 @@ namespace NodejsTests.Debugger {
             bool resumeOnProcessLoad = false){
             // Load process
             AutoResetEvent processLoaded = new AutoResetEvent(false);
-            var process = new NodeDebugger(hostName, portNumber, id);
+            var process = new NodeDebugger(new UriBuilder { Scheme = "tcp", Host = hostName, Port = portNumber }.Uri, id);
             if (onProcessCreated != null) {
                 onProcessCreated(process);
             }

@@ -34,10 +34,12 @@
 
   <ItemGroup>
     <TypeScriptCompile Include="server.ts" />
+    <TypeScriptCompile Include="Scripts\typings\node\node.d.ts" />
     <Content Include="package.json" />
     <Content Include="README.md" />
     <Content Include="Web.config" />
     <Content Include="Web.cloud.config" />
+    <Content Include="Web.Debug.config" />
     <Content Include="bin\ChangeConfig.ps1" />
     <Content Include="bin\download.ps1" />
     <Content Include="bin\setup_web.cmd" />

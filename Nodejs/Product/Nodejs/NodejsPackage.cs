@@ -265,13 +265,19 @@ namespace Microsoft.NodejsTools {
             RegisterEditorFactory(new JadeEditorFactory(this));
 
             // Add our command handlers for menu (commands must exist in the .vsct file)
-            RegisterCommands(new Command[] { 
+            var commands = new List<Command> {
                 new OpenReplWindowCommand(),
                 new OpenRemoteDebugProxyFolderCommand(),
                 new OpenRemoteDebugDocumentationCommand(),
                 new SurveyNewsCommand(),
                 new ImportWizardCommand()
-            }, Guids.NodejsCmdSet);
+            };
+            try {
+                commands.Add(new AzureExplorerAttachDebuggerCommand());
+            } catch (NotSupportedException) {
+            }
+            RegisterCommands(commands, Guids.NodejsCmdSet);
+
 
             IVsTextManager textMgr = (IVsTextManager)Instance.GetService(typeof(SVsTextManager));
             var langPrefs = new LANGPREFERENCES[1];

@@ -35,6 +35,8 @@
     <TypeScriptCompile Include="app.ts" />
     <TypeScriptCompile Include="routes\index.ts" />
     <TypeScriptCompile Include="routes\user.ts" />
+    <TypeScriptCompile Include="Scripts\typings\node\node.d.ts" />
+    <TypeScriptCompile Include="Scripts\typings\express\express.d.ts" />
     <Content Include="package.json" />
     <Content Include="public\stylesheets\style.styl" />
     <Content Include="README.md" />
@@ -42,6 +44,7 @@
     <Content Include="views\layout.jade" />
     <Content Include="Web.config" />
     <Content Include="Web.cloud.config" />
+    <Content Include="Web.Debug.config" />
     <Content Include="bin\ChangeConfig.ps1" />
     <Content Include="bin\download.ps1" />
     <Content Include="bin\setup_web.cmd" />

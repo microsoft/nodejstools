@@ -1,5 +1,3 @@
-/// <reference path="express.d.ts" />
-
 import express = require('express');
 import routes = require('./routes/index');
 import user = require('./routes/user');

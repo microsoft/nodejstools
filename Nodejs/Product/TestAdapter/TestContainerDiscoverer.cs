@@ -152,8 +152,11 @@ namespace Microsoft.NodejsTools.TestAdapter {
                 return false;
             }
             IVsProject project = GetTestProjectFromFile(pathToFile);
-            Debug.Assert(project != null);
-
+            if (null == project) {
+                //The file is not included in the project.  
+                //Don't look for tests in it.
+                return false;
+            }
             uint itemId; 
             ErrorHandler.Succeeded(((IVsHierarchy)project).ParseCanonicalName(pathToFile, out itemId));
 

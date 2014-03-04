@@ -25,12 +25,12 @@ namespace Microsoft.NodejsTools.Debugger.Communication {
     sealed class DebuggerConnection : IDebuggerConnection {
         private readonly Regex _contentLength = new Regex(@"Content-Length: (\d+)", RegexOptions.Compiled);
         private readonly Regex _nodeVersion = new Regex(@"Embedding-Host: node v([0-9.]+)", RegexOptions.Compiled);
-        private readonly ITcpClientFactory _tcpClientFactory;
+        private readonly INetworkClientFactory _tcpClientFactory;
         private StreamReader _streamReader;
         private StreamWriter _streamWriter;
-        private ITcpClient _tcpClient;
+        private INetworkClient _tcpClient;
 
-        public DebuggerConnection(ITcpClientFactory tcpClientFactory) {
+        public DebuggerConnection(INetworkClientFactory tcpClientFactory) {
             _tcpClientFactory = tcpClientFactory;
             NodeVersion = new Version();
         }
@@ -50,7 +50,7 @@ namespace Microsoft.NodejsTools.Debugger.Communication {
             }
 
             if (_tcpClient != null) {
-                _tcpClient.Close();
+                _tcpClient.Dispose();
                 _tcpClient = null;
             }
         }
@@ -97,14 +97,13 @@ namespace Microsoft.NodejsTools.Debugger.Communication {
         /// <summary>
         /// Connect to specified debugger endpoint.
         /// </summary>
-        /// <param name="hostName">Host address.</param>
-        /// <param name="portNumber">Port number.</param>
-        public void Connect(string hostName, int portNumber) {
-            Utilities.ArgumentNotNullOrEmpty("hostName", hostName);
+        /// <param name="uri">URI identifying the endpoint to connect to.</param>
+        public void Connect(Uri uri) {
+            Utilities.ArgumentNotNull("uri", uri);
 
             Close();
 
-            _tcpClient = _tcpClientFactory.CreateTcpClient(hostName, portNumber);
+            _tcpClient = _tcpClientFactory.CreateNetworkClient(uri);
 
             Stream stream = _tcpClient.GetStream();
             _streamReader = new StreamReader(stream, Encoding.Default);

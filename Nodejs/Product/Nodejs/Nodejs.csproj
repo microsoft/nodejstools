@@ -61,6 +61,7 @@
     <DefineConstants>$(DefineConstants);TRACE;DEBUG</DefineConstants>
     <TreatWarningsAsErrors>true</TreatWarningsAsErrors>
     <ErrorReport>prompt</ErrorReport>
+    <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'Release|x86'">
     <PlatformTarget>x86</PlatformTarget>
@@ -70,6 +71,7 @@
     <DefineConstants>$(DefineConstants);TRACE</DefineConstants>
     <TreatWarningsAsErrors>true</TreatWarningsAsErrors>
     <ErrorReport>prompt</ErrorReport>
+    <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
   </PropertyGroup>
   <PropertyGroup>
     <DefineConstants>$(DefineConstants);NODEJS_TOOLS;NTVS_FEATURE_INTERACTIVEWINDOW</DefineConstants>
@@ -139,8 +141,16 @@
       <SpecificVersion>False</SpecificVersion>
       <HintPath>$(DevEnvDir)PrivateAssemblies\Microsoft.Windows.Design.Host.dll</HintPath>
     </Reference>
-    <Reference Include="Newtonsoft.Json, Version=6.0.0.0, Culture=neutral, PublicKeyToken=30ad4fe6b2a6aeed, processorArchitecture=MSIL">
-      <HintPath>..\..\packages\Newtonsoft.Json.6.0.1\lib\net45\Newtonsoft.Json.dll</HintPath>
+    <Reference Include="Microsoft.VisualStudio.Web.WindowsAzure.Contracts">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>$(DevEnvDir)PrivateAssemblies\Microsoft.VisualStudio.Web.WindowsAzure.Contracts.dll</HintPath>
+    </Reference>
+    <Reference Include="Microsoft.VisualStudio.WindowsAzure.CommonAzureTools.Contracts">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>$(DevEnvDir)Extensions\Microsoft\Windows Azure Tools\Common\Microsoft.VisualStudio.WindowsAzure.CommonAzureTools.Contracts.dll</HintPath>
+    </Reference>
+    <Reference Include="Newtonsoft.Json, Version=4.5.0.0, Culture=neutral, PublicKeyToken=30ad4fe6b2a6aeed, processorArchitecture=MSIL">
+      <HintPath>..\..\packages\Newtonsoft.Json.4.5.11\lib\net40\Newtonsoft.Json.dll</HintPath>
     </Reference>
     <Reference Include="PresentationCore" />
     <Reference Include="PresentationFramework" />
@@ -156,6 +166,7 @@
     <Reference Include="System.Windows.Forms" />
     <Reference Include="System.Xaml" />
     <Reference Include="System.Xml" />
+    <Reference Include="System.Xml.Linq" />
     <Reference Include="VSLangProj, Version=7.0.3300.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a">
       <EmbedInteropTypes>False</EmbedInteropTypes>
     </Reference>
@@ -232,6 +243,7 @@
     </Compile>
     <Compile Include="ClassifierProviderMetadata.cs" />
     <Compile Include="CodeWindowManager.cs" />
+    <Compile Include="Commands\AzureExplorerAttachDebuggerCommand.cs" />
     <Compile Include="Commands\ImportWizardCommand.cs" />
     <Compile Include="Commands\OpenReplWindowCommand.cs" />
     <Compile Include="Commands\OpenRemoteDebugDocumentationCommand.cs" />
@@ -260,10 +272,12 @@
     <Compile Include="Debugger\BreakOn.cs" />
     <Compile Include="Debugger\BreakOnKind.cs" />
     <Compile Include="Debugger\Commands\SetVariableValueCommand.cs" />
-    <Compile Include="Debugger\Communication\ITcpClient.cs" />
-    <Compile Include="Debugger\Communication\ITcpClientFactory.cs" />
-    <Compile Include="Debugger\Communication\TcpClientFactory.cs" />
-    <Compile Include="Debugger\Communication\TcpClientWrapper.cs" />
+    <Compile Include="Debugger\Communication\INetworkClient.cs" />
+    <Compile Include="Debugger\Communication\INetworkClientFactory.cs" />
+    <Compile Include="Debugger\Communication\NetworkClientFactory.cs" />
+    <Compile Include="Debugger\Communication\WebSocketNetworkClient.cs" />
+    <Compile Include="Debugger\Communication\TcpNetworkClient.cs" />
+    <Compile Include="Debugger\Communication\WebSocketStream.cs" />
     <Compile Include="Debugger\ExceptionHitTreatment.cs" />
     <Compile Include="Debugger\ExceptionHandler.cs" />
     <Compile Include="Debugger\JavaScriptSourceMapInfo.cs" />
@@ -629,6 +643,10 @@
     <ZipProject Include="ProjectTemplates\AddWebSiteAzureExpressApp\Preview.png" />
     <ZipProject Include="ProjectTemplates\AzureNodejsApp\Preview.png" />
     <ZipProject Include="ProjectTemplates\NodejsConsoleApp\Preview.png" />
+    <Content Include="Credits.txt">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+      <IncludeInVSIX>true</IncludeInVSIX>
+    </Content>
     <Content Include="FileTemplates\NewItem\EmptyTs.ts">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
       <IncludeInVSIX>true</IncludeInVSIX>
@@ -698,7 +716,7 @@
     <TypeScriptProject Include="ProjectTemplates\TypeScriptWebApp\Preview.png" />
     <TypeScriptProject Include="ProjectTemplates\TypeScriptWebApp\package.json" />
     <TypeScriptProject Include="ProjectTemplates\TypeScriptWebApp\README.md" />
-    <Content Include="node.d.ts">
+    <Content Include="Scripts\Typings\node\node.d.ts">
       <IncludeInVSIX>true</IncludeInVSIX>
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
@@ -830,6 +848,9 @@
     <ZipProject Include="ProjectTemplates\AzureNodejsApp\README.md" />
     <ZipProject Include="ProjectTemplates\AzureNodejsApp\setup_web.cmd" />
     <ZipProject Include="ProjectTemplates\AzureNodejsApp\Web.cloud.config" />
+    <ZipProject Include="ProjectTemplates\AzureNodejsApp\Web.Debug.config">
+      <SubType>Designer</SubType>
+    </ZipProject>
     <ZipProject Include="ProjectTemplates\AzureNodejsApp\Web.config" />
     <ZipProject Include="ProjectTemplates\AzureNodejsApp\node.cmd" />
     <ZipProject Include="ProjectTemplates\AzureNodejsApp\iisnode.yml" />
@@ -856,6 +877,7 @@
     <ZipProject Include="ProjectTemplates\AzureExpressApp\README.md" />
     <ZipProject Include="ProjectTemplates\AzureExpressApp\Web.config" />
     <ZipProject Include="ProjectTemplates\AzureExpressApp\Web.cloud.config" />
+    <ZipProject Include="ProjectTemplates\AzureExpressApp\Web.Debug.config" />
     <ZipProject Include="ProjectTemplates\AzureExpressApp\setup_web.cmd" />
     <ZipProject Include="ProjectTemplates\AzureExpressApp\download.ps1" />
     <ZipProject Include="ProjectTemplates\AzureExpressApp\ChangeConfig.ps1" />
@@ -867,6 +889,7 @@
     <ZipProject Include="ProjectTemplates\AddWebSiteAzureExpressApp\README.md" />
     <ZipProject Include="ProjectTemplates\AddWebSiteAzureExpressApp\setup_web.cmd" />
     <ZipProject Include="ProjectTemplates\AddWebSiteAzureExpressApp\Web.cloud.config" />
+    <ZipProject Include="ProjectTemplates\AddWebSiteAzureExpressApp\Web.Debug.config" />
     <ZipProject Include="ProjectTemplates\AddWebSiteAzureExpressApp\Web.config" />
     <ZipProject Include="ProjectTemplates\AddWebSiteAzureExpressApp\node.cmd" />
     <ZipProject Include="ProjectTemplates\AddWebSiteAzureExpressApp\iisnode.yml" />
@@ -926,6 +949,7 @@
     <TypeScriptProject Include="ProjectTemplates\TypeScriptAzureWebApp\download.ps1" />
     <TypeScriptProject Include="ProjectTemplates\TypeScriptAzureWebApp\node.cmd" />
     <TypeScriptProject Include="ProjectTemplates\TypeScriptAzureWebApp\Web.cloud.config" />
+    <TypeScriptProject Include="ProjectTemplates\TypeScriptAzureWebApp\Web.Debug.config" />
     <TypeScriptProject Include="ProjectTemplates\TypeScriptAzureWebApp\Web.config" />
     <TypeScriptProject Include="ProjectTemplates\TypeScriptAzureWebApp\setup_web.cmd" />
     <TypeScriptProject Include="ProjectTemplates\TypeScriptAzureWebApp\iisnode.yml" />
@@ -942,6 +966,7 @@
     <TypeScriptProject Include="ProjectTemplates\TypeScriptAzureExpressApp\node.cmd" />
     <TypeScriptProject Include="ProjectTemplates\TypeScriptAzureExpressApp\setup_web.cmd" />
     <TypeScriptProject Include="ProjectTemplates\TypeScriptAzureExpressApp\Web.cloud.config" />
+    <TypeScriptProject Include="ProjectTemplates\TypeScriptAzureExpressApp\Web.Debug.config" />
     <TypeScriptProject Include="ProjectTemplates\TypeScriptAzureExpressApp\Web.config" />
     <TypeScriptProject Include="ProjectTemplates\TypeScriptAzureExpressApp\iisnode.yml" />
     <TypeScriptMultiProjectZipProject Include="ProjectTemplates\TypeScriptAzureNodejsWorker\AzureNodejsWorker.vstemplate">

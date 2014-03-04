@@ -1215,6 +1215,19 @@ namespace Microsoft.VisualStudioTools.Project {
 
         #region virtual methods
 
+        public virtual IEnumerable<string> GetAvailableItemNames() {
+            IEnumerable<string> itemTypes = new[] { 
+                ProjectFileConstants.None,
+                ProjectFileConstants.Compile,
+                ProjectFileConstants.Content
+            };
+
+            var items = this.buildProject.GetItems("AvailableItemName");
+            itemTypes = itemTypes.Union(items.Select(x => x.EvaluatedInclude));            
+
+            return itemTypes;
+        }
+
         /// <summary>
         /// Creates a reference node for the given file returning the node, or returns null
         /// if the file doesn't represent a valid file which can be referenced.

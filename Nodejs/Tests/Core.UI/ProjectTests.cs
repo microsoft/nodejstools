@@ -649,8 +649,10 @@ sd.StringDecoder
 
                     Assert.IsTrue(lines[0].Contains("scriptargs"), "no scriptargs");
                     Assert.IsTrue(lines[0].Contains("server.js"), "missing filename");
-                    Assert.AreEqual(lines[1], "port: 1234");
-                    Assert.AreEqual(lines[2], "cwd: C:\\");
+                    Assert.IsFalse(lines[0].Contains("--harmony"), "interpreter argument leaked to script");
+                    Assert.IsTrue(lines[1].Contains("--harmony"), "missing interpreter argument");
+                    Assert.AreEqual(lines[2], "port: 1234");
+                    Assert.AreEqual(lines[3], "cwd: C:\\");
                 }
             }
         }

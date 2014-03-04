@@ -12,10 +12,10 @@
  *
  * ***************************************************************************/
 
+using System;
+
 namespace Microsoft.NodejsTools.Debugger.Communication {
-    sealed class TcpClientFactory : ITcpClientFactory {
-        public ITcpClient CreateTcpClient(string hostName, int portNumber) {
-            return new TcpClientWrapper(hostName, portNumber);
-        }
+    interface INetworkClientFactory {
+        INetworkClient CreateNetworkClient(Uri uri);
     }
 }

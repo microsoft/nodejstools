@@ -19,6 +19,7 @@ var assemblies = [
     'TestUtilities.Nodejs',
     'TestUtilities.UI.Nodejs',
     'NodeTests',
+    'Nodejs.AzurePublishing.Tests.UI',
     'Nodejs.Tests.UI',
     'NodejsProfilingUITests',
     'ProfilerTests',
