@@ -240,15 +240,7 @@ namespace Microsoft.VisualStudioTools.Project {
         }
 
         internal override int QueryStatusOnNode(Guid cmdGroup, uint cmd, IntPtr pCmdText, ref QueryStatusResult result) {
-            if (cmdGroup == CommonConstants.Std97CmdGroupGuid) {
-                switch ((VSConstants.VSStd97CmdID)cmd) {
-                    case VSConstants.VSStd97CmdID.BuildCtx:
-                    case VSConstants.VSStd97CmdID.RebuildCtx:
-                    case VSConstants.VSStd97CmdID.CleanCtx:
-                        result = QueryStatusResult.SUPPORTED | QueryStatusResult.INVISIBLE;
-                        return VSConstants.S_OK;
-                }
-            } else if (cmdGroup == Microsoft.VisualStudioTools.Project.VsMenus.guidStandardCommandSet2K) {
+            if (cmdGroup == Microsoft.VisualStudioTools.Project.VsMenus.guidStandardCommandSet2K) {
                 switch ((VsCommands2K)cmd) {
                     case VsCommands2K.ECMD_PUBLISHSELECTION:
                         if (pCmdText != IntPtr.Zero && NativeMethods.OLECMDTEXT.GetFlags(pCmdText) == NativeMethods.OLECMDTEXT.OLECMDTEXTF.OLECMDTEXTF_NAME) {

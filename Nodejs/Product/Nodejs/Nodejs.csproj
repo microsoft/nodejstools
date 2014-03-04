@@ -1074,7 +1074,10 @@
   <ItemGroup>
     <TypeScriptProject Include="ProjectTemplates\TypeScriptAzureExpressApp\user.ts" />
   </ItemGroup>
-  <ItemGroup />
+  <ItemGroup>
+    <TypeScriptProject Include="ProjectTemplates\TypeScriptAzureExpressApp\stylus.d.ts" />
+    <TypeScriptProject Include="ProjectTemplates\TypeScriptExpressApp\stylus.d.ts" />
+  </ItemGroup>
   <PropertyGroup>
     <!--
     To specify a different registry root to register your package, uncomment the TargetRegistryRoot

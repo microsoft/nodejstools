@@ -745,7 +745,7 @@ namespace Microsoft.NodejsTools {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Errors encountered for previous command(s) - Executing: {0}.
+        ///   Looks up a localized string similar to ERRORS ENCOUNTERED - Executing: {0}.
         /// </summary>
         internal static string NpmStatusExecutingErrors {
             get {
@@ -763,7 +763,7 @@ namespace Microsoft.NodejsTools {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Errors encountered for previous command(s) - Executing: {0} ({1} command(s) queued).
+        ///   Looks up a localized string similar to ERRORS ENCOUNTERED - Executing: {0} ({1} command(s) queued).
         /// </summary>
         internal static string NpmStatusExecutingQueuedErrors {
             get {
@@ -772,7 +772,7 @@ namespace Microsoft.NodejsTools {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Select package(s) for install.
+        ///   Looks up a localized string similar to READY.
         /// </summary>
         internal static string NpmStatusReady {
             get {
@@ -781,7 +781,7 @@ namespace Microsoft.NodejsTools {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Select package(s) for install - errors occurred for previous install(s) - see output below.
+        ///   Looks up a localized string similar to READY - Last command(s) completed with errors.
         /// </summary>
         internal static string NpmStatusReadyWithErrors {
             get {

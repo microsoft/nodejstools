@@ -105,6 +105,8 @@ declare module "express" {
 
             all(path: string, ...callbacks: Function[]): void;
 
+            get(name: string): string;
+
             get(name: string, ...handlers: RequestFunction[]): T;
 
             get(name: RegExp, ...handlers: RequestFunction[]): T;
@@ -138,6 +140,8 @@ declare module "express" {
             all(path: string, fn?: (req: Request, res: Response, next: Function) => any): Router;
 
             all(path: string, ...callbacks: Function[]): void;
+
+            get(name: string): string;
 
             get(name: string, ...handlers: RequestFunction[]): Router;
 

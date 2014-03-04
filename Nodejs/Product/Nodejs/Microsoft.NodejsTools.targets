@@ -41,6 +41,8 @@
   <Target Name="CopyFilesToOutputDirectory"/>
   
   <Target Name="CoreCompile">
+    <Error Condition="!Exists('$(VSToolsPath)\TypeScript\Microsoft.TypeScript.targets') And '$(EnableTypeScript)' == 'true'" Text="TypeScript is not installed but TypeScript support is enabled in this project.  Please download and install TypeScript http://go.microsoft.com/fwlink/?LinkID=393159&clcid=0x409."></Error>
+    
     <!-- Target used for generating a package which can be uploaded to web server -->
     <ItemGroup>
       <_FoundWebConfig Include="@(Content)" Condition=" '%(Content.Filename)%(Content.Extension)' == 'web.config' " />
@@ -98,8 +100,10 @@
            the paths for the generated code here.  We also don't get to rely upon 
            TypeScriptCollectPublishFiles to include the files for publishing because 
            Worker Roles won't invoke PublishPipeline, they invoke some targets directly -->
-      <_GeneratedJavascript Include="@(TypeScriptCompile->'%(RelativeDir)%(Filename).js')" Exclude="*.d.ts"/>
-      <!-- Building scripts results in the scripts -->
+      <_GeneratedJavascript Include="@(TypeScriptCompile->'%(RelativeDir)%(Filename).js')"
+                            Condition="'$([System.IO.Path]::GetExtension(%(Filename)))' != '.d'"/>
+      
+      <!-- Building scripts results in the scripts -->      
       <_TempBuiltProjectOutputGroup Include="@(Compile->'%(FullPath)');@(Content->'%(FullPath)');@(_GeneratedJavascript->'%(FullPath)');@(NodeModulesContent->'%(FullPath)')"/>
 
       <!-- Include the project file -->
@@ -120,7 +124,7 @@
       Returns="@(SourceFilesProjectOutputGroupOutput)"
       DependsOnTargets="$(SourceFilesProjectOutputGroupDependsOn)">
 
-    <AssignTargetPath Files="@(Compile);@(Content);@(TypeScriptCompile)" RootFolder="$(MSBuildProjectDirectory)">
+    <AssignTargetPath Files="@(Compile);@(Content);@(TypeScriptCompile);@(NodeModulesContent)" RootFolder="$(MSBuildProjectDirectory)">
       <Output TaskParameter="AssignedFiles" ItemName="_CompileWithTargetPath" />
     </AssignTargetPath>
     <ItemGroup>

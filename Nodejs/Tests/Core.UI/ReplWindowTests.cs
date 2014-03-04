@@ -33,6 +33,16 @@ namespace Microsoft.Nodejs.Tests.UI {
 
         [TestMethod, Priority(0), TestCategory("Core")]
         [HostType("TC Dynamic"), DynamicHostType(typeof(VsIdeHostAdapter))]
+        public void TestErrorNewLine() {
+            var window = Prepare();
+            Keyboard.Type("abc\r");
+            window.WaitForText("> abc", "ReferenceError: abc is not defined", "> ");
+            Keyboard.Type("42\r");
+            window.WaitForText("> abc", "ReferenceError: abc is not defined", "> 42", "42", "> ");
+        }
+
+        [TestMethod, Priority(0), TestCategory("Core")]
+        [HostType("TC Dynamic"), DynamicHostType(typeof(VsIdeHostAdapter))]
         public void TestColorOutput() {
             var window = Prepare();
             Keyboard.Type("[1,2,3]\r");
