@@ -41,7 +41,7 @@
   <Target Name="CopyFilesToOutputDirectory"/>
   
   <Target Name="CoreCompile">
-    <Error Condition="!Exists('$(VSToolsPath)\TypeScript\Microsoft.TypeScript.targets') And '$(EnableTypeScript)' == 'true'" Text="TypeScript is not installed but TypeScript support is enabled in this project.  Please download and install TypeScript http://go.microsoft.com/fwlink/?LinkID=393159&clcid=0x409."></Error>
+    <Error Condition="!Exists('$(VSToolsPath)\TypeScript\Microsoft.TypeScript.targets') And '$(EnableTypeScript)' == 'true'" Text="TypeScript is not installed but TypeScript support is enabled in this project.  Please download and install TypeScript http://go.microsoft.com/fwlink/?LinkID=393159&amp;clcid=0x409."></Error>
     
     <!-- Target used for generating a package which can be uploaded to web server -->
     <ItemGroup>
