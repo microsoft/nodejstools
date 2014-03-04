@@ -29,13 +29,16 @@ namespace NpmTests {
     [TestClass]
     public class NpmSearchTests {
 
+        private const string Filename_Original = "npmsearchfullcatalog.txt";
+        private const string Filename_Mar14 = "npmsearchfullcat_mar14.txt";
+
         [ClassInitialize]
         public static void Init(TestContext context) {
             NodejsTestData.Deploy();
         }
 
-        private TextReader GetCatalogueReader() {
-            return new StreamReader(TestData.GetPath(@"TestData\NpmSearchData\npmsearchfullcatalog.txt"));
+        private TextReader GetCatalogueReader(string filename) {
+            return new StreamReader(TestData.GetPath(@"TestData\NpmSearchData\" + filename));
         }
 
         private void CheckPackage(
@@ -106,7 +109,9 @@ namespace NpmTests {
                     expectedKeywords);
         }
 
-        private IList<IPackage> GetTestPackageList(out IDictionary<string, IPackage> byName) {
+        private IList<IPackage> GetTestPackageList(
+            string filename,
+            out IDictionary<string, IPackage> byName) {
             IList<IPackage> target = new List<IPackage>();
             IDictionary<string, IPackage> temp = new Dictionary<string, IPackage>();
             INpmSearchLexer lexer = NpmSearchParserFactory.CreateLexer();
@@ -116,7 +121,7 @@ namespace NpmTests {
                 temp[args.Package.Name] = args.Package;
             };
 
-            using (var reader = GetCatalogueReader()) {
+            using (var reader = GetCatalogueReader(filename)) {
                 lexer.Lex(reader);
             }
 
@@ -124,15 +129,15 @@ namespace NpmTests {
             return target;
         }
 
-        private IPackageCatalog GetTestPackageCatalog() {
+        private IPackageCatalog GetTestPackageCatalog(string filename) {
             IDictionary<string, IPackage> byName;
-            return new MockPackageCatalog(GetTestPackageList(out byName));
+            return new MockPackageCatalog(GetTestPackageList(filename, out byName));
         }
         
         [TestMethod, Priority(0)]
         public void TestParseModuleCatalogue() {
             IDictionary<string, IPackage> byName;
-            var target = GetTestPackageList(out byName);
+            var target = GetTestPackageList(Filename_Original, out byName);
 
             Assert.AreEqual(47365, target.Count, "Unexpected package count in catalogue list.");
             Assert.AreEqual(target.Count, byName.Count, "Number of packages should be same in list and dictionary.");
@@ -211,8 +216,119 @@ namespace NpmTests {
                 new[] { "pdf", "writer", "generator", "graphics", "document", "vector" });
         }
 
+        [TestMethod, Priority(0)]
+        public void TestParseModuleCatalogue_Mar14() {
+            IDictionary<string, IPackage> byName;
+            var target = GetTestPackageList(Filename_Mar14, out byName);
+
+            Assert.AreEqual(62084, target.Count, "Unexpected package count in catalogue list.");
+
+            var packageCounts = new Dictionary<string, int>();
+            foreach (IPackage package in target) {
+                packageCounts[package.Name] = packageCounts.ContainsKey(package.Name) ? packageCounts[package.Name] + 1: 1;
+            }
+
+            var moreThanOne = new List<string>();
+            foreach(string name in packageCounts.Keys) {
+                if(packageCounts[name] > 1) {
+                    moreThanOne.Add(name);
+                }
+            }
+
+            if (moreThanOne.Count > 0) {
+                Assert.Fail(string.Format("Multiple package instances found: {0}", string.Join(", ", moreThanOne)));
+            }
+
+            Assert.AreEqual(target.Count, byName.Count, "Number of packages should be same in list and dictionary.");
+
+            int sensibleVersionCount = 0;
+            var zero = SemverVersion.Parse("0.0.0");
+            foreach (var package in target) {
+                if (package.Version != zero) {
+                    ++sensibleVersionCount;
+                }
+            }
+
+            //  Let's say (it'll be much higher) but at least 25% of packages must have a sensible version number
+            Assert.IsTrue(
+                sensibleVersionCount > target.Count / 4,
+                string.Format("There are only {0} packages with version numbers other than {1}", sensibleVersionCount, zero));
+
+            //  First package in catelogue
+            CheckPackage(
+                target,
+                byName,
+                0,
+                "007",
+                "Returns a deep copy of an object with all functions…",
+                "btford",
+                "2013-07-29",
+                new SemverVersion(0, 0, 2),
+                new [] { "testing", "test", "mock", "spy" });
+
+            //  Last package in catalogue
+            CheckPackage(
+                target,
+                byName,
+                47364,
+                "zzz",
+                "Lightweight REST service container",
+                "avayanis",
+                "2013-11-24",
+                new SemverVersion(0, 3, 0),
+                null);
+
+            //  Version number with truncated build and/or pre-release info
+            CheckPackage(
+                target,
+                byName,
+                34413,
+                "psc-cms-js",
+                "js library for Psc CMS (pscheit/psc-cms). shim reposistory…",
+                "pscheit",
+                "2014-01-07",
+                SemverVersion.Parse("1.3.0-9584…"),
+                new[] { "cms", "framework" });
+
+            //  Multiple authors listed
+            CheckPackage(
+                target,
+                byName,
+                32499,
+                "passport-wsfed-saml2",
+                "SAML2 Protocol and WS-Fed library",
+                "woloski…",
+                "2014-02-25",
+                SemverVersion.Parse("0.8.7"),
+                new[] { "saml", "wsfed", "passport", "auth0", "azure", "auth", "authn", "authentication", "identity", "adfs" });
+
+            //  Equals in description field
+            CheckPackage(
+                target,
+                byName,
+                32254,
+                "particularizable",
+                "particularizable ================ `enumerable` was taken.",
+                "elliottcable",
+                "2013-06-11",
+                SemverVersion.Parse("1.0.0"),
+                null);
+
+            //  Author is email address
+            CheckPackage(
+                target,
+                byName,
+                32705,
+                "pdfkit-memory",
+                "A PDF generation library for Node.js",
+                "trevor@kimenye.com",
+                "2012-04-14",
+                SemverVersion.Parse("0.0.2"),
+                new[] { "pdf", "writer", "generator", "graphics", "document", "vector" });
+        }
+
         private IList<IPackage> GetFilteredPackageList(string filterString) {
-            var catalog = GetTestPackageCatalog();
+            var catalog = GetTestPackageCatalog(Filename_Original);
             var filter = PackageCatalogFilterFactory.Create(catalog);
             return filter.Filter(filterString);
         }
