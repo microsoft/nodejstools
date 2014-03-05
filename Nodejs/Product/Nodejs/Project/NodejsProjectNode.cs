@@ -135,18 +135,20 @@ namespace Microsoft.NodejsTools.Project {
                         Directory.CreateDirectory(nodeTypingsFolder);
                     }
 
-                    File.Copy(
+                    var nodeFolder = ((OAProject)this.GetAutomationObject()).ProjectItems
+                        .AddFolder("Scripts").ProjectItems
+                        .AddFolder("typings").ProjectItems
+                        .AddFolder("node");
+
+                    nodeFolder.ProjectItems.AddFromFileCopy(
                         Path.Combine(
                             Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location),
                             "Scripts",
                             "typings",
                             "node",
                             "node.d.ts"
-                        ),
-                        Path.Combine(
-                            nodeTypingsFolder,
-                            "node.d.ts")
-                        );
+                        )
+                    );
                     break;
                 }
             }

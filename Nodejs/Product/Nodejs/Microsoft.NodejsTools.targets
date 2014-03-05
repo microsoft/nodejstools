@@ -13,6 +13,7 @@
     <ProjectHome Condition="'$(ProjectHome)' == ''">.</ProjectHome>
     <DebugSymbols>false</DebugSymbols>
     <FakesImported>true</FakesImported> <!-- disables quality tools fakes imports -->
+    <TypeScriptTarget Condition="'$(TypeScriptTarget) == ''">ES5</TypeScriptTarget>
   </PropertyGroup>
   
   <ItemGroup Condition="'$(BuildingInsideVisualStudio)'=='true'">

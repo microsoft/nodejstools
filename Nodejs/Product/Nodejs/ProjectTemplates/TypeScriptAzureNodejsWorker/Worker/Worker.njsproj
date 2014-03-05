@@ -34,7 +34,6 @@
   <ItemGroup>
     <TypeScriptCompile Include="server.ts" />
     <TypeScriptCompile Include="startup.ts" />
-    <TypeScriptCompile Include="Scripts\typings\node\node.d.ts" />
     <Content Include="download.ps1" />
     <Content Include="setup_worker.cmd" />
     <Content Include="node.cmd" />

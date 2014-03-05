@@ -34,7 +34,6 @@
 
   <ItemGroup>
     <TypeScriptCompile Include="server.ts" />
-    <TypeScriptCompile Include="Scripts\typings\node\node.d.ts" />
     <Content Include="package.json" />
     <Content Include="README.md" />
     <Content Include="Web.config" />
