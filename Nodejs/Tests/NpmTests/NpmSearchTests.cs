@@ -124,16 +124,19 @@ namespace NpmTests {
             string filename,
             out IDictionary<string, IPackage> byName) {
             IList<IPackage> target = new List<IPackage>();
-            IDictionary<string, IPackage> temp = new Dictionary<string, IPackage>();
             INpmSearchLexer lexer = NpmSearchParserFactory.CreateLexer();
             INpmSearchParser parser = NpmSearchParserFactory.CreateParser(lexer);
-            parser.Package += (source, args) => {
-                target.Add(args.Package);
-                temp[args.Package.Name] = args.Package;
-            };
+            parser.Package += (source, args) => target.Add(args.Package);
 
             using (var reader = GetCatalogueReader(filename)) {
                 lexer.Lex(reader);
+            }
+
+            //  Do this after because package names can be split across multiple
+            //  lines and therefore may change after the IPackage is initially created.
+            IDictionary<string, IPackage> temp = new Dictionary<string, IPackage>();
+            foreach (var package in target ) {
+                temp[package.Name] = package;
             }
 
             byName = temp;
@@ -577,6 +580,24 @@ namespace NpmTests {
                 "2013-09-22",
                 SemverVersion.Parse("0.1.2"),
                 new[] { "menu", "ui", "express" });
+        }
+
+        [TestMethod, Priority(0)]
+        public void Npm143AndLater_CheckPackageWithLongName() {
+            IDictionary<string, IPackage> byName;
+            var target = GetTestPackageList(Filename_Mar14, out byName);
+
+            //  This package's name wraps across two lines
+            CheckPackage(
+                target,
+                byName,
+                2425,
+                "atropa-jasmine-spec-runner-generator-html",
+                "A node module to generate Jasmine Spec Runner html pages.",
+                "kastor",
+                "2013-03-19",
+                SemverVersion.Parse("0.1.0-2"),
+                new[] { "atropa-jasmine-spec-runner-generator-html", "atropa", "utilities", "jasmine", "test" });
         }
 
         private IList<IPackage> GetFilteredPackageList(string filterString) {
