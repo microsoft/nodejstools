@@ -30,7 +30,7 @@ namespace NpmTests {
     public class NpmSearchTests {
 
         private const string Filename_Original = "npmsearchfullcatalog.txt";
-        private const string Filename_Mar14 = "npmsearchfullcat_mar14.txt";
+        private const string Filename_Npm143 = "npmsearchfullcat_npm143.txt";
 
         [ClassInitialize]
         public static void Init(TestContext context) {
@@ -323,35 +323,35 @@ namespace NpmTests {
         [TestMethod, Priority(0)]
         public void Npm143AndLater_CheckNonZeroPackageVersionsExist() {
             IDictionary<string, IPackage> byName;
-            var target = GetTestPackageList(Filename_Mar14, out byName);
+            var target = GetTestPackageList(Filename_Npm143, out byName);
             CheckSensibleNumberOfNonZeroVersions(target);
         }
 
         [TestMethod, Priority(0)]
         public void Npm143AndLater_CheckCorrectPackageCount() {
             IDictionary<string, IPackage> byName;
-            var target = GetTestPackageList(Filename_Mar14, out byName);
+            var target = GetTestPackageList(Filename_Npm143, out byName);
             Assert.AreEqual(62068 /*was 62084*/, target.Count, "Unexpected package count in catalogue list.");
         }
 
         [TestMethod, Priority(0)]
         public void Npm143AndLater_CheckNoDuplicatePackages() {
             IDictionary<string, IPackage> byName;
-            var target = GetTestPackageList(Filename_Mar14, out byName);
+            var target = GetTestPackageList(Filename_Npm143, out byName);
             CheckOnlyOneOfEachPackage(target);
         }
 
         [TestMethod, Priority(0)]
         public void Npm143AndLater_CheckListAndDictByNameSameSize() {
             IDictionary<string, IPackage> byName;
-            var target = GetTestPackageList(Filename_Mar14, out byName);
+            var target = GetTestPackageList(Filename_Npm143, out byName);
             Assert.AreEqual(target.Count, byName.Count, "Number of packages should be same in list and dictionary.");
         }
 
         [TestMethod, Priority(0)]
         public void Npm143AndLater_CheckFirstPackageInCatalog_007() {
             IDictionary<string, IPackage> byName;
-            var target = GetTestPackageList(Filename_Mar14, out byName);
+            var target = GetTestPackageList(Filename_Npm143, out byName);
             CheckPackage(
                 target,
                 byName,
@@ -367,7 +367,7 @@ namespace NpmTests {
         [TestMethod, Priority(0)]
         public void Npm143AndLater_CheckLastPackageInCatalog_zzz() {
             IDictionary<string, IPackage> byName;
-            var target = GetTestPackageList(Filename_Mar14, out byName);
+            var target = GetTestPackageList(Filename_Npm143, out byName);
             CheckPackage(
                 target,
                 byName,
@@ -383,7 +383,7 @@ namespace NpmTests {
         [TestMethod, Priority(0)]
         public void Npm143AndLater_CheckPackageTruncatedBuildPreReleaseInfo() {
             IDictionary<string, IPackage> byName;
-            var target = GetTestPackageList(Filename_Mar14, out byName);
+            var target = GetTestPackageList(Filename_Npm143, out byName);
 
             //  Version number with truncated build and/or pre-release info
             CheckPackage(
@@ -401,7 +401,7 @@ namespace NpmTests {
         [TestMethod, Priority(0)]
         public void Npm143AndLater_CheckPackageMultipleAuthorsTruncated() {
             IDictionary<string, IPackage> byName;
-            var target = GetTestPackageList(Filename_Mar14, out byName);
+            var target = GetTestPackageList(Filename_Npm143, out byName);
 
             //  Multiple authors listed
             CheckPackage(
@@ -419,7 +419,7 @@ namespace NpmTests {
         [TestMethod, Priority(0)]
         public void Npm143AndLater_CheckPackageEqualsInDescription() {
             IDictionary<string, IPackage> byName;
-            var target = GetTestPackageList(Filename_Mar14, out byName);
+            var target = GetTestPackageList(Filename_Npm143, out byName);
             CheckPackage(
                 target,
                 byName,
@@ -435,7 +435,7 @@ namespace NpmTests {
         [TestMethod, Priority(0)]
         public void Npm143AndLater_CheckPackageAuthorAsEmailAddress() {
             IDictionary<string, IPackage> byName;
-            var target = GetTestPackageList(Filename_Mar14, out byName);
+            var target = GetTestPackageList(Filename_Npm143, out byName);
             CheckPackage(
                 target,
                 byName,
@@ -451,7 +451,7 @@ namespace NpmTests {
         [TestMethod, Priority(0)]
         public void Npm143AndLater_CheckPackageNoDescriptionAuthorVersion() {
             IDictionary<string, IPackage> byName;
-            var target = GetTestPackageList(Filename_Mar14, out byName);
+            var target = GetTestPackageList(Filename_Npm143, out byName);
 
             // Packages around and including package with no description, author, or version - I can't believe the npm registry even allows this!
             CheckPackage(
@@ -499,7 +499,7 @@ namespace NpmTests {
         [TestMethod, Priority(0)]
         public void Npm143AndLater_CheckPackageNoVersion() {
             IDictionary<string, IPackage> byName;
-            var target = GetTestPackageList(Filename_Mar14, out byName);
+            var target = GetTestPackageList(Filename_Npm143, out byName);
 
             // No version, but everything else, plus package after
             CheckPackage(
@@ -527,7 +527,7 @@ namespace NpmTests {
         [TestMethod, Priority(0)]
         public void Npm143AndLater_CheckPackageNoDescription() {
             IDictionary<string, IPackage> byName;
-            var target = GetTestPackageList(Filename_Mar14, out byName);
+            var target = GetTestPackageList(Filename_Npm143, out byName);
 
             // Check packages with and around results with blank description field
             CheckPackage(
@@ -585,7 +585,7 @@ namespace NpmTests {
         [TestMethod, Priority(0)]
         public void Npm143AndLater_CheckPackageWithLongName() {
             IDictionary<string, IPackage> byName;
-            var target = GetTestPackageList(Filename_Mar14, out byName);
+            var target = GetTestPackageList(Filename_Npm143, out byName);
 
             //  This package's name wraps across two lines
             CheckPackage(
