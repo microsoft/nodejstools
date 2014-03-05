@@ -12,22 +12,15 @@
  *
  * ***************************************************************************/
 
-using System;
-using Microsoft.NodejsTools.Npm;
+using System.Windows;
 
 namespace Microsoft.NodejsTools.NpmUI {
-    internal class PackageInstallEventArgs : EventArgs {
-        public PackageInstallEventArgs(
-            string name,
-            string version,
-            DependencyType depType) {
-            Name = name;
-            Version = version;
-            DependencyType = depType;
+    /// <summary>
+    /// Interaction logic for ExecuteNpmCommandWindow.xaml
+    /// </summary>
+    public partial class ExecuteNpmCommandWindow : Window {
+        public ExecuteNpmCommandWindow() {
+            InitializeComponent();
         }
-
-        public string Name { get; private set; }
-        public string Version { get; private set; }
-        public DependencyType DependencyType { get; private set; }
     }
 }

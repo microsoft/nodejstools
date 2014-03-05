@@ -25,7 +25,7 @@ namespace Microsoft.NodejsTools.Debugger.Communication {
 
         public WebSocketNetworkClient(Uri uri) {
             _webSocket = new ClientWebSocket();
-            _webSocket.ConnectAsync(uri, CancellationToken.None).Wait();
+            _webSocket.ConnectAsync(uri, CancellationToken.None).GetAwaiter().GetResult();
             _stream = new WebSocketStream(_webSocket);
         }
 
@@ -34,7 +34,7 @@ namespace Microsoft.NodejsTools.Debugger.Communication {
         }
 
         public void Dispose() {
-            _webSocket.CloseOutputAsync(WebSocketCloseStatus.NormalClosure, null, CancellationToken.None).Wait();
+            _webSocket.CloseOutputAsync(WebSocketCloseStatus.NormalClosure, null, CancellationToken.None).GetAwaiter().GetResult();
             _webSocket.Dispose();
         }
 

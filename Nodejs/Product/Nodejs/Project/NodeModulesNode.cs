@@ -31,7 +31,7 @@ using MessageBox = System.Windows.MessageBox;
 using Timer = System.Threading.Timer;
 
 namespace Microsoft.NodejsTools.Project {
-    internal class NodeModulesNode : HierarchyNode {
+    internal class NodeModulesNode : AbstractNpmNode {
         #region Constants
 
         /// <summary>
@@ -48,12 +48,13 @@ namespace Microsoft.NodejsTools.Project {
 
         #region Member variables
 
-        private readonly NodejsProjectNode _projectNode;
+        private readonly GlobalModulesNode _globalModulesNode;
         private readonly FileSystemWatcher _watcher;
         private Timer _fileSystemWatcherTimer;
         private INpmController _npmController;
         private int _npmCommandsExecuting;
         private bool _suppressCommands;
+        private bool _firstHierarchyLoad = true;
 
         private readonly object _fileBitsLock = new object();
         private readonly object _commandCountLock = new object();
@@ -66,7 +67,6 @@ namespace Microsoft.NodejsTools.Project {
 
         public NodeModulesNode(NodejsProjectNode root)
             : base(root) {
-            _projectNode = root;
             ExcludeNodeFromScc = true;
 
             _watcher = new FileSystemWatcher(_projectNode.ProjectHome) {
@@ -79,6 +79,9 @@ namespace Microsoft.NodejsTools.Project {
             _watcher.EnableRaisingEvents = true;
 
             CreateNpmController();
+
+            _globalModulesNode = new GlobalModulesNode(root, this);
+            AddChild(_globalModulesNode);
         }
 
         private void CheckNotDisposed() {
@@ -161,13 +164,17 @@ namespace Microsoft.NodejsTools.Project {
             return _npmController;
         }
 
+        void NpmController_FinishedRefresh(object sender, EventArgs e) {
+            ReloadHierarchySafe();
+        }
+
         public INpmController NpmController {
             get {
                 return _npmController;
             }
         }
 
-        private IRootPackage RootPackage {
+        internal IRootPackage RootPackage {
             get {
                 var controller = NpmController;
                 return null == controller ? null : controller.RootPackage;
@@ -388,7 +395,6 @@ namespace Microsoft.NodejsTools.Project {
             }
 
             ReloadModules();
-            ReloadHierarchySafe();
         }
 
         private int _refreshRetryCount;
@@ -427,58 +433,16 @@ namespace Microsoft.NodejsTools.Project {
                 if (null != root) {
                     ReloadHierarchy(this, root.Modules);
                 }
-            }
-        }
 
-        private void ReloadHierarchy(HierarchyNode parent, INodeModules modules) {
-            //  We're going to reuse nodes for which matching modules exist in the new set.
-            //  The reason for this is that we want to preserve the expansion state of the
-            //  hierarchy. If we just bin everything off and recreate it all from scratch
-            //  it'll all be in the collapsed state, which will be annoying for users who
-            //  have drilled down into the hierarchy
-            var recycle = new Dictionary<string, DependencyNode>();
-            var remove = new List<HierarchyNode>();
-            for (var current = parent.FirstChild; null != current; current = current.NextSibling) {
-                var dep = current as DependencyNode;
-                if (null == dep) {
-                    remove.Add(current);
-                    continue;
+                var global = controller.GlobalPackages;
+                if (null != global){
+                    _globalModulesNode.GlobalPackages = global;
+                    ReloadHierarchy(_globalModulesNode, global.Modules);
                 }
 
-                if (modules.Any(
-                    module =>
-                    module.Name == dep.Package.Name
-                    && module.Version == dep.Package.Version
-                    && module.IsBundledDependency == dep.Package.IsBundledDependency
-                    && module.IsDevDependency == dep.Package.IsDevDependency
-                    && module.IsListedInParentPackageJson == dep.Package.IsListedInParentPackageJson
-                    && module.IsMissing == dep.Package.IsMissing
-                    && module.IsOptionalDependency == dep.Package.IsOptionalDependency)) {
-                    recycle[dep.Package.Name] = dep;
-                } else {
-                    remove.Add(current);
-                }
-            }
-
-            foreach (var obsolete in remove) {
-                parent.RemoveChild(obsolete);
-                ProjectMgr.OnItemDeleted(obsolete);
-            }
-
-            foreach (var package in modules) {
-                DependencyNode child;
-
-                if (recycle.ContainsKey(package.Name)) {
-                    child = recycle[package.Name];
-                    child.Package = package;
-                } else {
-                    child = new DependencyNode(_projectNode, parent as DependencyNode, package);
-                    parent.AddChild(child);
-                }
-
-                ReloadHierarchy(child, package.Modules);
-                if (ProjectMgr.ParentHierarchy != null) {
-                    child.ExpandItem(EXPANDFLAGS.EXPF_CollapseFolder);
+                if (_firstHierarchyLoad) {
+                    controller.FinishedRefresh += NpmController_FinishedRefresh;
+                    _firstHierarchyLoad = false;
                 }
             }
         }
@@ -507,14 +471,6 @@ namespace Microsoft.NodejsTools.Project {
 
         public override string Caption {
             get { return _cCaption; }
-        }
-
-        public override Guid ItemTypeGuid {
-            get { return VSConstants.GUID_ItemType_VirtualFolder; }
-        }
-
-        public override int MenuCommandId {
-            get { return VsMenus.IDM_VS_CTXT_ITEMNODE; }
         }
 
         #endregion
@@ -607,9 +563,19 @@ namespace Microsoft.NodejsTools.Project {
                     return;
                 }
             }
-            using (var manager = new PackageManagerDialog(NpmController)) {
-                manager.ShowDialog();
-            }
+            
+            var executeVm = new NpmOutputControlViewModel();
+            executeVm.NpmController = NpmController;
+            var viewModel = new NpmPackageInstallViewModel(executeVm);
+            viewModel.NpmController = NpmController;
+            var manager = new NpmPackageInstallWindow(viewModel);
+            manager.NpmExecuteControl.DataContext = executeVm;
+            manager.Owner = System.Windows.Application.Current.MainWindow;
+            manager.ShowDialog();
+
+            //  This will unregister event handlers on the controller and prevent
+            //  us from leaking view models.
+            viewModel.NpmController = null;
 
             ReloadHierarchy();
         }
@@ -618,6 +584,21 @@ namespace Microsoft.NodejsTools.Project {
             CheckNotDisposed();
             SuppressCommands();
             ConditionallyShowNpmOutputPane();
+        }
+
+        private bool CheckValidCommandTarget(DependencyNode node) {
+            if (null == node) {
+                return false;
+            }
+            var props = node.GetPropertiesObject();
+            if (null == props || props.IsSubPackage) {
+                return false;
+            }
+            var package = node.Package;
+            if (null == package) {
+                return false;
+            }
+            return true;
         }
 
         public async void InstallMissingModules() {
@@ -633,8 +614,8 @@ namespace Microsoft.NodejsTools.Project {
             }
         }
 
-        public async void InstallMissingModule(IPackage package) {
-            if (null == package) {
+        public async void InstallMissingModule(DependencyNode node) {
+            if (!CheckValidCommandTarget(node)) {
                 return;
             }
 
@@ -648,34 +629,23 @@ namespace Microsoft.NodejsTools.Project {
                 return;
             }
 
+            var package = node.Package;
             var dep = root.PackageJson.AllDependencies[package.Name];
 
             DoPreCommandActions();
             try {
                 using (var commander = NpmController.CreateNpmCommander()) {
-                    await commander.InstallPackageByVersionAsync(
-                        package.Name,
-                        null == dep ? "*" : dep.VersionRangeText,
-                        DependencyType.Standard,
-                        false);
-                }
-            } catch (NpmNotFoundException nnfe) {
-                ErrorHelper.ReportNpmNotInstalled(null, nnfe);
-            } finally {
-                AllowCommands();
-            }
-        }
-
-        public async void UpdateModules() {
-            DoPreCommandActions();
-            try {
-                var selected = _projectNode.GetSelectedNodes();
-                using (var commander = NpmController.CreateNpmCommander()) {
-                    if (selected.Count == 1 && selected[0] == this) {
-                        await commander.UpdatePackagesAsync();
+                    if (node.GetPropertiesObject().IsGlobalInstall) {
+                        //  I genuinely can't see a way this would ever happen but, just to be on the safe side...
+                        await commander.InstallGlobalPackageByVersionAsync(
+                            package.Name,
+                            null == dep ? "*" : dep.VersionRangeText);
                     } else {
-                        await commander.UpdatePackagesAsync(
-                            selected.OfType<DependencyNode>().Select(dep => dep.Package).ToList());
+                        await commander.InstallPackageByVersionAsync(
+                            package.Name,
+                            null == dep ? "*" : dep.VersionRangeText,
+                            DependencyType.Standard,
+                            false);
                     }
                 }
             } catch (NpmNotFoundException nnfe) {
@@ -685,11 +655,49 @@ namespace Microsoft.NodejsTools.Project {
             }
         }
 
-        public async void UpdateModule(IPackage package) {
+        internal async void UpdateModules(IList<HierarchyNode> nodes) {
             DoPreCommandActions();
             try {
                 using (var commander = NpmController.CreateNpmCommander()) {
-                    await commander.UpdatePackagesAsync(new[] { package });
+                    if (nodes.Count == 1 && nodes[0] == this) {
+                        await commander.UpdatePackagesAsync();
+                    } else {
+                        var valid = nodes.OfType<DependencyNode>().Where(CheckValidCommandTarget).ToList();
+
+                        var list = valid.Where(node => node.GetPropertiesObject().IsGlobalInstall).Select(node => node.Package).ToList();
+                        if (list.Count > 0) {
+                            await commander.UpdateGlobalPackagesAsync(list);
+                        }
+
+                        list = valid.Where(node => !node.GetPropertiesObject().IsGlobalInstall).Select(node => node.Package).ToList();
+                        if (list.Count > 0) {
+                            await commander.UpdatePackagesAsync(list);
+                        }
+                    }
+                }
+            } catch (NpmNotFoundException nnfe) {
+                ErrorHelper.ReportNpmNotInstalled(null, nnfe);
+            } finally {
+                AllowCommands();
+            }
+        }
+
+        public void UpdateModules() {
+            UpdateModules(_projectNode.GetSelectedNodes());
+        }
+
+        public async void UpdateModule(DependencyNode node) {
+            if (!CheckValidCommandTarget(node)) {
+                return;
+            }
+            DoPreCommandActions();
+            try {
+                using (var commander = NpmController.CreateNpmCommander()) {
+                    if (node.GetPropertiesObject().IsGlobalInstall) {
+                        await commander.UpdateGlobalPackagesAsync(new[] { node.Package });
+                    } else {
+                        await commander.UpdatePackagesAsync(new[] { node.Package });
+                    }
                 }
             } catch (NpmNotFoundException nnfe) {
                 ErrorHelper.ReportNpmNotInstalled(null, nnfe);
@@ -703,8 +711,12 @@ namespace Microsoft.NodejsTools.Project {
             try {
                 var selected = _projectNode.GetSelectedNodes();
                 using (var commander = NpmController.CreateNpmCommander()) {
-                    foreach (var name in selected.OfType<DependencyNode>().Select(dep => dep.Package.Name).ToList()) {
-                        await commander.UninstallPackageAsync(name);
+                    foreach (var node in selected.OfType<DependencyNode>().Where(CheckValidCommandTarget)) {
+                        if (node.GetPropertiesObject().IsGlobalInstall) {
+                            await commander.UninstallGlobalPackageAsync(node.Package.Name);
+                        } else {
+                            await commander.UninstallPackageAsync(node.Package.Name);
+                        }
                     }
                 }
             } catch (NpmNotFoundException nnfe) {
@@ -714,14 +726,18 @@ namespace Microsoft.NodejsTools.Project {
             }
         }
 
-        public async void UninstallModule(IPackage package) {
-            if (null == package) {
+        public async void UninstallModule(DependencyNode node) {
+            if (!CheckValidCommandTarget(node)) {
                 return;
             }
             DoPreCommandActions();
             try {
                 using (var commander = NpmController.CreateNpmCommander()) {
-                    await commander.UninstallPackageAsync(package.Name);
+                    if (node.GetPropertiesObject().IsGlobalInstall) {
+                        await commander.UninstallGlobalPackageAsync(node.Package.Name);
+                    } else {
+                        await commander.UninstallPackageAsync(node.Package.Name);
+                    }
                 }
             } catch (NpmNotFoundException nnfe) {
                 ErrorHelper.ReportNpmNotInstalled(null, nnfe);

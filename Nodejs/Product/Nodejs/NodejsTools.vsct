@@ -197,7 +197,7 @@
         <CommandFlag>DynamicVisibility</CommandFlag>
         <Strings>
           <CommandName>cmdidNpmUninstallModules</CommandName>
-          <ButtonText>Unins&amp;tall npm Module</ButtonText>
+          <ButtonText>Unins&amp;tall npm Module(s)</ButtonText>
         </Strings>
       </Button>
 
@@ -207,7 +207,7 @@
         <CommandFlag>DynamicVisibility</CommandFlag>
         <Strings>
           <CommandName>cmdidNpmInstallSingleMissingModule</CommandName>
-          <ButtonText>&amp;Install Missing npm Module</ButtonText>
+          <ButtonText>&amp;Install Missing npm Module(s)</ButtonText>
         </Strings>
       </Button>
 
@@ -217,7 +217,7 @@
         <CommandFlag>DynamicVisibility</CommandFlag>
         <Strings>
           <CommandName>cmdidNpmUpdateSingleModule</CommandName>
-          <ButtonText>&amp;Update Module</ButtonText>
+          <ButtonText>&amp;Update npm Module(s)</ButtonText>
         </Strings>
       </Button>
 

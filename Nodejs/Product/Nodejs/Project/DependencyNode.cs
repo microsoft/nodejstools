@@ -60,6 +60,18 @@ namespace Microsoft.NodejsTools.Project {
 
         public IPackage Package { get; internal set; }
 
+        internal INpmController NpmController {
+            get {
+                if (null != _projectNode) {
+                    var modulesNode = _projectNode.ModulesNode;
+                    if (null != modulesNode) {
+                        return modulesNode.NpmController;
+                    }
+                }
+                return null;
+            }
+        }
+
         #region HierarchyNode implementation
 
         private string GetRelativeUrlFragment() {
@@ -122,6 +134,14 @@ namespace Microsoft.NodejsTools.Project {
             return null;
         }
 
+        protected override NodeProperties CreatePropertiesObject() {
+            return new DependencyNodeProperties(this);
+        }
+
+        internal DependencyNodeProperties GetPropertiesObject() {
+            return CreatePropertiesObject() as DependencyNodeProperties;
+        }
+
         #endregion
 
         #region Command handling
@@ -133,7 +153,9 @@ namespace Microsoft.NodejsTools.Project {
             if (cmdGroup == Guids.NodejsCmdSet && null == _parent) {
                 switch (cmd) {
                     case PkgCmdId.cmdidNpmInstallSingleMissingModule:
-                        if (null == _projectNode.ModulesNode
+                        if (GetPropertiesObject().IsGlobalInstall) {
+                            result = QueryStatusResult.SUPPORTED | QueryStatusResult.INVISIBLE;
+                        } else if (null == _projectNode.ModulesNode
                             || _projectNode.ModulesNode.IsCurrentStateASuppressCommandsMode()) {
                             result = QueryStatusResult.SUPPORTED;
                         } else {
@@ -171,19 +193,19 @@ namespace Microsoft.NodejsTools.Project {
                 switch (cmd) {
                     case PkgCmdId.cmdidNpmInstallSingleMissingModule:
                         if (null != _projectNode.ModulesNode) {
-                            _projectNode.ModulesNode.InstallMissingModule(Package);
+                            _projectNode.ModulesNode.InstallMissingModule(this);
                         }
                         return VSConstants.S_OK;
 
                     case PkgCmdId.cmdidNpmUninstallModule:
                         if (null != _projectNode.ModulesNode) {
-                            _projectNode.ModulesNode.UninstallModule(Package);
+                            _projectNode.ModulesNode.UninstallModule(this);
                         }
                         return VSConstants.S_OK;
 
                     case PkgCmdId.cmdidNpmUpdateSingleModule:
                         if (null != _projectNode.ModulesNode) {
-                            _projectNode.ModulesNode.UpdateModule(Package);
+                            _projectNode.ModulesNode.UpdateModule(this);
                         }
                         return VSConstants.S_OK;
                 }

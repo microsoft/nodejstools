@@ -13,6 +13,22 @@
         </DirectoryRef>
     </Fragment>
     <Fragment>
+        <DirectoryRef Id="INSTALLLOCATION">
+            <Directory Id="DIR_INSTALLOCATION_Scripts" Name="Scripts">
+              <Directory Id="DIR_INSTALLOCATION_Scripts_typings" Name="typings">
+                <Directory Id="DIR_INSTALLOCATION_Scripts_typings_node" Name="node"/>
+              </Directory>
+            </Directory>
+        </DirectoryRef>
+        <DirectoryRef Id="VWD_INSTALLLOCATION">
+            <Directory Id="DIR_VWDINSTALLOCATION_Scripts" Name="Scripts">
+              <Directory Id="DIR_VWDINSTALLOCATION_Scripts_typings" Name="typings">
+                <Directory Id="DIR_VWDINSTALLOCATION_Scripts_typings_node" Name="node"/>
+              </Directory>
+            </Directory>
+        </DirectoryRef>
+    </Fragment>
+    <Fragment>
         <ComponentGroup Id="NodejsToolsExt">
             <!-- Per user components -->
             <Component Id="PerUserInstallRegistry" Directory="INSTALLLOCATION" Guid="{07CBA996-E490-4F22-87C0-069BAF855D68}">
@@ -130,10 +146,10 @@
               <Condition>VWD_EXTENSION_INSTALLPATH</Condition>
             </Component>
 
-            <Component Directory="INSTALLLOCATION" Guid="{7FE66D60-4017-4941-9333-D174AC070796}">
+            <Component Directory="DIR_INSTALLOCATION_Scripts_typings_node" Guid="{7FE66D60-4017-4941-9333-D174AC070796}">
               <File Id="filnode.d.ts" KeyPath="yes" Source="$(var.BinariesDir)\Scripts\Typings\node\node.d.ts" />
             </Component>
-            <Component Directory="VWD_INSTALLLOCATION" Guid="{DF26AC4A-DF20-467B-831D-10C0704DD22C}">
+            <Component Directory="DIR_VWDINSTALLOCATION_Scripts_typings_node" Guid="{DF26AC4A-DF20-467B-831D-10C0704DD22C}">
               <File Id="filVWDnode.d.ts" KeyPath="yes" Source="$(var.BinariesDir)\Scripts\Typings\node\node.d.ts" />
               <Condition>VWD_EXTENSION_INSTALLPATH</Condition>
             </Component>

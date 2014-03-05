@@ -36,15 +36,16 @@ namespace Microsoft.NodejsTools.Project {
 
         public NodejsFileNode(NodejsProjectNode root, ProjectElement e)
             : base(root, e) {
-            CreateWatcher(Url);
             _tempFilePath = NodejsProjectNode.GetReferenceFilePath();
             _asyncFilePath = NodejsProjectNode.GetReferenceFilePath();
             _currentText = "";
             _refGroup = root._refGroupDispenser.AddFile(this);
             _fileId = root._currentFileCounter++;
-            ThreadPool.QueueUserWorkItem(GenerateReferenceFileStarter);
 
             root._nodeFiles.Add(this);
+
+            CreateWatcher(Url);
+            ThreadPool.QueueUserWorkItem(GenerateReferenceFileStarter);
         }
 
         private void GenerateReferenceFileStarter(object dummy) {

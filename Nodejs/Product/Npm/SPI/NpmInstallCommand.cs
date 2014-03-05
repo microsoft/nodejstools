@@ -32,24 +32,12 @@ namespace Microsoft.NodejsTools.Npm.SPI {
             string pathToNpm = null,
             bool useFallbackIfNpmNotFound = true)
             : base(fullPathToRootPackageDirectory, pathToNpm, useFallbackIfNpmNotFound) {
-            if (global || saveToPackageJson) {
-                Arguments = string.Format(
-                    "install {0} -{1}",
-                    string.IsNullOrEmpty(versionRange)
-                        ? packageName
-                        : string.Format("{0}@\"{1}\"", packageName, versionRange),
-                    global
-                        ? "g"
-                        : (type == DependencyType.Standard
-                            ? "-save"
-                            : (type == DependencyType.Development ? "-save-dev" : "-save-optional")));
-            } else {
-                Arguments = string.Format(
-                    "install {0}",
-                    string.IsNullOrEmpty(versionRange)
-                        ? packageName
-                        : string.Format("{0}@\"{1}\"", packageName, versionRange));
-            }
+            Arguments = NpmArgumentBuilder.GetNpmInstallArguments(
+                packageName,
+                versionRange,
+                type,
+                global,
+                saveToPackageJson);
         }
     }
 }

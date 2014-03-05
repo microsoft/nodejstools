@@ -50,10 +50,22 @@ namespace Microsoft.NodejsTools.Project {
             _timer = new Timer(RefreshReferenceFile);
         }
 
+        private static string[] _excludedAvailableItems = new[] { 
+            "ApplicationDefinition", 
+            "Page",
+            "Resource",
+            "SplashScreen",
+            "DesignData",
+            "DesignDataWithDesignTimeCreatableTypes",
+            "EntityDeploy",
+            "CodeAnalysisDictionary", 
+            "XamlAppDef"
+        };
+
         public override IEnumerable<string> GetAvailableItemNames() {
             // Remove a couple of available item names which show up from imports we
             // can't control out of Microsoft.Common.targets.
-            return base.GetAvailableItemNames().Except(new[] { "CodeAnalysisDictionary", "XamlAppDef" });
+            return base.GetAvailableItemNames().Except(_excludedAvailableItems);
         }
 
         private void InitDependencyImages() {

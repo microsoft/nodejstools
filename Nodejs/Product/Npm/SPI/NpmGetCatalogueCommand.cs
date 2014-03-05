@@ -25,6 +25,7 @@ namespace Microsoft.NodejsTools.Npm.SPI {
 
         private const string NpmCatalogueCacheGuid = "BDC4B648-84E1-4FA9-9AE8-20AF8795093F";
 
+        private IDictionary<string, IPackage> _byName = new Dictionary<string, IPackage>(); 
         private readonly bool _forceDownload;
 
         public NpmGetCatalogueCommand(
@@ -54,27 +55,62 @@ namespace Microsoft.NodejsTools.Npm.SPI {
                             }
                         }
                         LastRefreshed = new FileInfo(filename).LastWriteTime;
+                        PopulateByName();
                         return true;
                     }
                 } catch (Exception) { }
             }
 
+            var oldResults = Results;
             var result = await base.ExecuteAsync();
+            var newResults = Results;
 
-            try {
-                using (var stream = new FileStream(filename, FileMode.Create, FileAccess.Write, FileShare.None)) {
-                    using (var writer = new StreamWriter(stream)) {
-                        writer.Write(StandardOutput);
+            if (newResults.Count > 0) {
+                try {
+                    using (var stream = new FileStream(filename, FileMode.Create, FileAccess.Write, FileShare.None)) {
+                        using (var writer = new StreamWriter(stream)) {
+                            writer.Write(StandardOutput);
+                        }
                     }
-                }
-                LastRefreshed = new FileInfo(filename).LastWriteTime;
-            } catch (Exception) { }
+                    LastRefreshed = new FileInfo(filename).LastWriteTime;
+                    PopulateByName();
+                } catch (Exception) { }
+
+            } else {
+                Results = oldResults;
+                throw new NpmCatalogEmptyException(Resources.ErrNpmCatalogEmpty);
+            }
 
             return result;
+        }
+
+        private void PopulateByName() {
+            var source = Results;
+            if (null == source) {
+                return;
+            }
+            var target = new Dictionary<string, IPackage>();
+            foreach (var package in source) {
+                target[package.Name] = package;
+            }
+            _byName = target;
         }
 
         public DateTime LastRefreshed { get; private set; }
 
         public IPackageCatalog Catalog { get { return this; } }
+
+        public IPackage this[string name] {
+            get {
+                var temp = _byName;
+                if (null == temp) {
+                    return null;
+                }
+
+                IPackage match;
+                temp.TryGetValue(name, out match);
+                return match;
+            }
+        }
     }
 }

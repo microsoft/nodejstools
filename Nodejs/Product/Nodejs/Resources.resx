@@ -144,6 +144,186 @@
   <data name="NodejsPortToolTip" xml:space="preserve">
     <value>Specifies the port number used for process.env.port, if unspecified a random port is generated.</value>
   </data>
+  <data name="NpmPackageName" xml:space="preserve">
+    <value>Package Name</value>
+  </data>
+  <data name="NpmPackageNameDescription" xml:space="preserve">
+    <value>Name of package, as specified in its package.json.</value>
+  </data>
+  <data name="NpmPackageVersion" xml:space="preserve">
+    <value>Version</value>
+  </data>
+  <data name="NpmPackageVersionDescription" xml:space="preserve">
+    <value>Installed version of package.</value>
+  </data>
+  <data name="NpmPackageRequestedVersionRange" xml:space="preserve">
+    <value>Requested Version</value>
+  </data>
+  <data name="NpmPackageRequestedVersionRangeDescription" xml:space="preserve">
+    <value>Version of package requested in package.json belonging to parent package or project.</value>
+  </data>
+  <data name="NpmPackageNewVersionAvailable" xml:space="preserve">
+    <value>Newer Version Available</value>
+  </data>
+  <data name="NpmPackageNewVersionAvailableDescription" xml:space="preserve">
+    <value>Indicates whether or not a newer version of the package is available.</value>
+  </data>
+  <data name="NpmPackageDescription" xml:space="preserve">
+    <value>Description</value>
+  </data>
+  <data name="NpmPackageDescriptionDescription" xml:space="preserve">
+    <value>Package description.</value>
+  </data>
+  <data name="NpmPackageKeywords" xml:space="preserve">
+    <value>Keywords</value>
+  </data>
+  <data name="NpmPackageKeywordsDescription" xml:space="preserve">
+    <value>Package keywords.</value>
+  </data>
+  <data name="NpmPackageAuthor" xml:space="preserve">
+    <value>Author</value>
+  </data>
+  <data name="NpmPackageAuthorDescription" xml:space="preserve">
+    <value>Primary or original author of package; there may also be additional contributors.</value>
+  </data>
+  <data name="NpmPackagePath" xml:space="preserve">
+    <value>Path</value>
+  </data>
+  <data name="NpmPackagePathDescription" xml:space="preserve">
+    <value>Location of package on disk.</value>
+  </data>
+  <data name="NpmPackageType" xml:space="preserve">
+    <value>Package Type</value>
+  </data>
+  <data name="NpmPackageTypeDescription" xml:space="preserve">
+    <value>Indicates whether package is global, or locally installed in your project, and whether or not it is a sub-package.</value>
+  </data>
+  <data name="NpmPackageLinkStatus" xml:space="preserve">
+    <value>Link Status</value>
+  </data>
+  <data name="NpmPackageLinkStatusDescription" xml:space="preserve">
+    <value>Indicates whether a package has been linked from globally installed packages.</value>
+  </data>
+  <data name="NpmPackageIsListedInParentPackageJson" xml:space="preserve">
+    <value>Listed As Dependency</value>
+  </data>
+  <data name="NpmPackageIsListedInParentPackageJsonDescription" xml:space="preserve">
+    <value>Indicates whether or not the package is listed as a package.json dependency.</value>
+  </data>
+  <data name="NpmPackageIsMissing" xml:space="preserve">
+    <value>Missing</value>
+  </data>
+  <data name="NpmPackageIsMissingDescription" xml:space="preserve">
+    <value>Indicates whether or not the package is a missing dependency.</value>
+  </data>
+  <data name="NpmPackageIsDevDependency" xml:space="preserve">
+    <value>Dev Dependency</value>
+  </data>
+  <data name="NpmPackageIsDevDependencyDescription" xml:space="preserve">
+    <value>Indicates whether or not the package is a development dependency.</value>
+  </data>
+  <data name="NpmPackageIsOptionalDependency" xml:space="preserve">
+    <value>Optional Dependency</value>
+  </data>
+  <data name="NpmPackageIsOptionalDependencyDescription" xml:space="preserve">
+    <value>Indicates whether or not the package is an optional dependency.</value>
+  </data>
+  <data name="NpmPackageIsBundledDependency" xml:space="preserve">
+    <value>Bundled Dependency</value>
+  </data>
+  <data name="NpmPackageIsBundledDependencyDescription" xml:space="preserve">
+    <value>Indicates whether or not the package is a bundled dependency.</value>
+  </data>
+  <data name="CategoryVersion" xml:space="preserve">
+    <value>Version</value>
+  </data>
+  <data name="CategoryStatus" xml:space="preserve">
+    <value>Status</value>
+  </data>
+  <data name="PackageTypeLocal" xml:space="preserve">
+    <value>Local</value>
+  </data>
+  <data name="PackageTypeLocalSubpackage" xml:space="preserve">
+    <value>Local sub-package</value>
+  </data>
+  <data name="PackageTypeGlobal" xml:space="preserve">
+    <value>Global</value>
+  </data>
+  <data name="PackageTypeGlobalSubpackage" xml:space="preserve">
+    <value>Global sub-package</value>
+  </data>
+  <data name="LinkStatusLocallyInstalled" xml:space="preserve">
+    <value>Installed locally</value>
+  </data>
+  <data name="LinkStatusLinkedFromGlobal" xml:space="preserve">
+    <value>Installed locally or linked from global packages</value>
+  </data>
+  <data name="LinkStatusNotLinkedToProject" xml:space="preserve">
+    <value>Not linked to project</value>
+  </data>
+  <data name="LinkStatusLinkedToProject" xml:space="preserve">
+    <value>Linked or installed into project</value>
+  </data>
+  <data name="LinkStatusNotApplicableSubPackages" xml:space="preserve">
+    <value>Not applicable for sub-packages.</value>
+  </data>
+  <data name="LinkStatusUnknown" xml:space="preserve">
+    <value>Unknown</value>
+  </data>
+  <data name="NewVersionNotApplicableSubpackage" xml:space="preserve">
+    <value>Not applicable for sub-packages</value>
+  </data>
+  <data name="NewVersionUnknown" xml:space="preserve">
+    <value>Unknown</value>
+  </data>
+  <data name="NewVersionPackageCatalogNotRetrieved" xml:space="preserve">
+    <value>Package catalog not yet retrieved</value>
+  </data>
+  <data name="NewVersionYes" xml:space="preserve">
+    <value>Yes: {0}</value>
+  </data>
+  <data name="NewVersionNo" xml:space="preserve">
+    <value>No</value>
+  </data>
+  <data name="RequestedVersionRangeNone" xml:space="preserve">
+    <value>None</value>
+  </data>
+  <data name="NpmNodePackageInstallation" xml:space="preserve">
+    <value>Package Installations</value>
+  </data>
+  <data name="NpmNodePackageInstallationDescription" xml:space="preserve">
+    <value>Indicates whether the node manages local or global npm package installations.</value>
+  </data>
+  <data name="NpmNodePath" xml:space="preserve">
+    <value>Path</value>
+  </data>
+  <data name="NpmNodePathDescription" xml:space="preserve">
+    <value>Base path in which npm packages are installed.</value>
+  </data>
+  <data name="PackageInstallationGlobal" xml:space="preserve">
+    <value>Global</value>
+  </data>
+  <data name="PackageInstallationLocal" xml:space="preserve">
+    <value>Local</value>
+  </data>
+  <data name="PropertiesClassLocalPackage" xml:space="preserve">
+    <value>Local Package Properties</value>
+  </data>
+  <data name="PropertiesClassGlobalPackage" xml:space="preserve">
+    <value>Global Package Properties</value>
+  </data>
+  <data name="PropertiesClassLocalSubPackage" xml:space="preserve">
+    <value>Local Sub-Package Properties</value>
+  </data>
+  <data name="PropertiesClassGlobalSubPackage" xml:space="preserve">
+    <value>Global Sub-Package Properties</value>
+  </data>
+  <data name="PropertiesClassNpm" xml:space="preserve">
+    <value>npm Packages Properties</value>
+  </data>
+  <data name="PropertiesClassGlobal" xml:space="preserve">
+    <value>Globally npm Packages Properties</value>
+  </data>
   <data name="ScriptArgumentsToolTip" xml:space="preserve">
     <value>Specifies the arguments passed to the script on launch.</value>
   </data>
@@ -171,6 +351,21 @@
   </data>
   <data name="WorkingDirInvalidOrMissing" xml:space="preserve">
     <value>The specified working directory is invalid or missing.</value>
+  </data>
+  <data name="CatalogFilterLabelFilter">
+    <value>Filter:</value>
+  </data>
+  <data name="CatalogFilterLabelNpmInstall">
+    <value>npm install</value>
+  </data>
+  <data name="CatalogLoadingDefault">
+    <value>Loading published package list...</value>
+  </data>
+  <data name="CatalogLoadingNoNpm">
+    <value>Catalog retrieval aborted - npm.cmd not found</value>
+  </data>
+  <data name="NoKeywordsInPackage">
+    <value>(This package has no keywords.)</value>
   </data>
   <data name="PackageCatalogRefreshing" xml:space="preserve">
     <value>Currently refreshing</value>
@@ -205,6 +400,24 @@
   <data name="PackageCatalogRefresh6Months" xml:space="preserve">
     <value>Far too long ago</value>
   </data>
+  <data name="PackageCount" xml:space="preserve">
+    <value> - info for {0} packages retrieved</value>
+  </data>
+  <data name="PackageMatchCount" xml:space="preserve">
+    <value> - {0} matching packages</value>
+  </data>
+  <data name="PackageInstalledLocally" xml:space="preserve">
+    <value>Installed locally</value>
+  </data>
+  <data name="PackageInstalledLocallyOldVersion" xml:space="preserve">
+    <value>Old version {0} installed locally</value>
+  </data>
+  <data name="PackageInstalledGlobally" xml:space="preserve">
+    <value>Installed globally</value>
+  </data>
+  <data name="PackageInstalledGloballyOldVersion" xml:space="preserve">
+    <value>Old version {0} installed globally</value>
+  </data>
   <data name="NpmCancelledWithErrors" xml:space="preserve">
     <value>{0} cancelled with errors - see Output window for details</value>
   </data>
@@ -216,6 +429,27 @@
   </data>
   <data name="NpmSuccessfullyCompleted" xml:space="preserve">
     <value>{0} successfully completed</value>
+  </data>
+  <data name="NpmCatalogEmpty" xml:space="preserve">
+    <value>Refresh failed - see output below for details</value>
+  </data>
+  <data name="NpmStatusReady" xml:space="preserve">
+    <value>Select package(s) for install</value>
+  </data>
+  <data name="NpmStatusReadyWithErrors" xml:space="preserve">
+    <value>Select package(s) for install - errors occurred for previous install(s) - see output below</value>
+  </data>
+  <data name="NpmStatusExecuting" xml:space="preserve">
+    <value>Executing: {0}</value>
+  </data>
+  <data name="NpmStatusExecutingQueued" xml:space="preserve">
+    <value>Executing: {0} ({1} command(s) queued)</value>
+  </data>
+  <data name="NpmStatusExecutingErrors" xml:space="preserve">
+    <value>Errors encountered for previous command(s) - Executing: {0}</value>
+  </data>
+  <data name="NpmStatusExecutingQueuedErrors" xml:space="preserve">
+    <value>Errors encountered for previous command(s) - Executing: {0} ({1} command(s) queued)</value>
   </data>
   <data name="HasTests" xml:space="preserve">
     <value>HasTests</value>

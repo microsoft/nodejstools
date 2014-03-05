@@ -26,5 +26,6 @@ namespace Microsoft.NodejsTools.Npm {
         INpmCommander CreateNpmCommander();
 
         Task<IPackageCatalog> GetRepositoryCatalogueAsync(bool forceDownload);
+        IPackageCatalog MostRecentlyLoadedCatalog { get; }
     }
 }

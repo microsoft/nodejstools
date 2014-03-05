@@ -12,7 +12,6 @@
     <NodejsSupportPath>$(MSBuildThisFileDirectory)</NodejsSupportPath>
     <ProjectHome Condition="'$(ProjectHome)' == ''">.</ProjectHome>
     <DebugSymbols>false</DebugSymbols>
-    <TargetFrameworkIdentifier>Node.js</TargetFrameworkIdentifier>  <!-- disables xaml imports -->
     <FakesImported>true</FakesImported> <!-- disables quality tools fakes imports -->
   </PropertyGroup>
   
@@ -90,14 +89,16 @@
     <Copy SourceFiles="@(_FoundWebCloudConfig)" DestinationFiles="$(IntermediateOutputPath)\web.config" Condition="$(DeployingCloudConfig)" SkipUnchangedFiles="true"/>
   </Target>
 
-  <Target Name="BuiltProjectOutputGroup" Returns="@(BuiltProjectOutputGroupOutput)">
+  <Target Name="BuiltProjectOutputGroup" 
+          Returns="@(BuiltProjectOutputGroupOutput)" 
+          DependsOnTargets="$(BuiltProjectOutputGroupDependsOn)">
     <ItemGroup>
       <!-- We can't depend upon GeneratedJavascript defined by TypeScript because it 
            doesn't occur when we're publishing, just when building.  So we calculate
            the paths for the generated code here.  We also don't get to rely upon 
            TypeScriptCollectPublishFiles to include the files for publishing because 
            Worker Roles won't invoke PublishPipeline, they invoke some targets directly -->
-      <_GeneratedJavascript Include="@(TypeScriptCompile->'%(RelativeDir)%(Filename).js')"/>
+      <_GeneratedJavascript Include="@(TypeScriptCompile->'%(RelativeDir)%(Filename).js')" Exclude="*.d.ts"/>
       <!-- Building scripts results in the scripts -->
       <_TempBuiltProjectOutputGroup Include="@(Compile->'%(FullPath)');@(Content->'%(FullPath)');@(_GeneratedJavascript->'%(FullPath)');@(NodeModulesContent->'%(FullPath)')"/>
 
