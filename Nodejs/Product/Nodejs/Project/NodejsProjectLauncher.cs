@@ -298,9 +298,12 @@ namespace Microsoft.NodejsTools.Project {
         private bool ShouldStartBrowser() {
             var startBrowser = _project.GetProjectProperty(NodejsConstants.StartWebBrowser);
             bool fStartBrowser;
-            return !String.IsNullOrEmpty(startBrowser) &&
-                Boolean.TryParse(startBrowser, out fStartBrowser) &&
-                fStartBrowser;
+            if (!String.IsNullOrEmpty(startBrowser) &&
+                Boolean.TryParse(startBrowser, out fStartBrowser)) {
+                return fStartBrowser;
+            }
+
+            return true;
         }
 
         private IEnumerable<KeyValuePair<string, string>> GetEnvironmentVariables() {
