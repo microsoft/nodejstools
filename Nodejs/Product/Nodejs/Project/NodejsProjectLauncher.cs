@@ -67,11 +67,7 @@ namespace Microsoft.NodejsTools.Project {
                 return VSConstants.S_OK;
             }
 
-            var startBrowserStr = _project.GetProjectProperty(NodejsConstants.StartWebBrowser);
-            bool startBrowser;
-            if (!Boolean.TryParse(startBrowserStr, out startBrowser)) {
-                startBrowser = true;
-            }
+            bool startBrowser = ShouldStartBrowser();
 
             if (debug) {
                 StartWithDebugger(file);
@@ -90,25 +86,27 @@ namespace Microsoft.NodejsTools.Project {
                 );
 
                 string webBrowserUrl = GetFullUrl();
-                Uri uri = new Uri(webBrowserUrl);
+                Uri uri = null;
+                if (!String.IsNullOrWhiteSpace(webBrowserUrl)) {
+                    uri = new Uri(webBrowserUrl);
 
-                psi.EnvironmentVariables["PORT"] = uri.Port.ToString();
+                    psi.EnvironmentVariables["PORT"] = uri.Port.ToString();
+                }
+
                 foreach (var nameValue in GetEnvironmentVariables()) {
                     psi.EnvironmentVariables[nameValue.Key] = nameValue.Value;
                 }
 
                 var process = Process.Start(psi);
 
-                if (startBrowser) {
-                    if (webBrowserUrl != null) {
-                        OnPortOpenedHandler.CreateHandler(
-                             uri.Port,
-                             shortCircuitPredicate: () => process.HasExited,
-                             action: () => {
-                                 VsShellUtilities.OpenBrowser(webBrowserUrl, (uint)__VSOSPFLAGS.OSP_LaunchNewBrowser);
-                             }
-                         );
-                    }
+                if (startBrowser && uri != null) {
+                    OnPortOpenedHandler.CreateHandler(
+                        uri.Port,
+                        shortCircuitPredicate: () => process.HasExited,
+                        action: () => {
+                            VsShellUtilities.OpenBrowser(webBrowserUrl, (uint)__VSOSPFLAGS.OSP_LaunchNewBrowser);
+                        }
+                    );
                 }
             }
             return VSConstants.S_OK;
@@ -141,12 +139,6 @@ namespace Microsoft.NodejsTools.Project {
         #endregion
 
         private string GetFullUrl() {
-            bool launchBrowser;
-            if (Boolean.TryParse(_project.GetProjectProperty(NodejsConstants.StartWebBrowser), out launchBrowser)
-                && !launchBrowser) {
-                return String.Empty;
-            }
-
             var host = _project.GetProjectProperty(NodejsConstants.LaunchUrl);
 
             try {
@@ -248,7 +240,7 @@ namespace Microsoft.NodejsTools.Project {
             }
 
             var url = GetFullUrl();
-            if (!String.IsNullOrWhiteSpace(url)) {
+            if (ShouldStartBrowser() && !String.IsNullOrWhiteSpace(url)) {
                 AppendOption(ref dbgInfo, AD7Engine.WebBrowserUrl, url);
             }
 
@@ -301,6 +293,14 @@ namespace Microsoft.NodejsTools.Project {
             // Set the Node  debugger
             dbgInfo.clsidCustom = AD7Engine.DebugEngineGuid;
             dbgInfo.grfLaunch = (uint)__VSDBGLAUNCHFLAGS.DBGLAUNCH_StopDebuggingOnEnd;
+        }
+
+        private bool ShouldStartBrowser() {
+            var startBrowser = _project.GetProjectProperty(NodejsConstants.StartWebBrowser);
+            bool fStartBrowser;
+            return !String.IsNullOrEmpty(startBrowser) &&
+                Boolean.TryParse(startBrowser, out fStartBrowser) &&
+                fStartBrowser;
         }
 
         private IEnumerable<KeyValuePair<string, string>> GetEnvironmentVariables() {
