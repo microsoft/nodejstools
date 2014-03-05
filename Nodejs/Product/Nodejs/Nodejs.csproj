@@ -818,7 +818,6 @@
     <ZipProject Include="ProjectTemplates\AddWebSiteAzureNodejsApp\package.json" />
     <ZipProject Include="ProjectTemplates\AddWebSiteAzureNodejsApp\README.md" />
     <ZipProject Include="ProjectTemplates\AddWebSiteAzureNodejsApp\setup_web.cmd" />
-    <ZipProject Include="ProjectTemplates\AddWebSiteAzureNodejsApp\Web.cloud.config" />
     <ZipProject Include="ProjectTemplates\AddWebSiteAzureNodejsApp\Web.config" />
     <ZipProject Include="ProjectTemplates\AddWebSiteAzureNodejsApp\node.cmd" />
     <ZipProject Include="ProjectTemplates\AddWebSiteAzureNodejsApp\iisnode.yml" />
@@ -847,7 +846,6 @@
     <ZipProject Include="ProjectTemplates\AzureNodejsApp\package.json" />
     <ZipProject Include="ProjectTemplates\AzureNodejsApp\README.md" />
     <ZipProject Include="ProjectTemplates\AzureNodejsApp\setup_web.cmd" />
-    <ZipProject Include="ProjectTemplates\AzureNodejsApp\Web.cloud.config" />
     <ZipProject Include="ProjectTemplates\AzureNodejsApp\Web.Debug.config">
       <SubType>Designer</SubType>
     </ZipProject>
@@ -876,7 +874,6 @@
     <ZipProject Include="ProjectTemplates\AzureExpressApp\package.json" />
     <ZipProject Include="ProjectTemplates\AzureExpressApp\README.md" />
     <ZipProject Include="ProjectTemplates\AzureExpressApp\Web.config" />
-    <ZipProject Include="ProjectTemplates\AzureExpressApp\Web.cloud.config" />
     <ZipProject Include="ProjectTemplates\AzureExpressApp\Web.Debug.config" />
     <ZipProject Include="ProjectTemplates\AzureExpressApp\setup_web.cmd" />
     <ZipProject Include="ProjectTemplates\AzureExpressApp\download.ps1" />
@@ -888,7 +885,6 @@
     <ZipProject Include="ProjectTemplates\AddWebSiteAzureExpressApp\package.json" />
     <ZipProject Include="ProjectTemplates\AddWebSiteAzureExpressApp\README.md" />
     <ZipProject Include="ProjectTemplates\AddWebSiteAzureExpressApp\setup_web.cmd" />
-    <ZipProject Include="ProjectTemplates\AddWebSiteAzureExpressApp\Web.cloud.config" />
     <ZipProject Include="ProjectTemplates\AddWebSiteAzureExpressApp\Web.Debug.config" />
     <ZipProject Include="ProjectTemplates\AddWebSiteAzureExpressApp\Web.config" />
     <ZipProject Include="ProjectTemplates\AddWebSiteAzureExpressApp\node.cmd" />
@@ -948,7 +944,6 @@
     <TypeScriptProject Include="ProjectTemplates\TypeScriptAzureWebApp\ChangeConfig.ps1" />
     <TypeScriptProject Include="ProjectTemplates\TypeScriptAzureWebApp\download.ps1" />
     <TypeScriptProject Include="ProjectTemplates\TypeScriptAzureWebApp\node.cmd" />
-    <TypeScriptProject Include="ProjectTemplates\TypeScriptAzureWebApp\Web.cloud.config" />
     <TypeScriptProject Include="ProjectTemplates\TypeScriptAzureWebApp\Web.Debug.config" />
     <TypeScriptProject Include="ProjectTemplates\TypeScriptAzureWebApp\Web.config" />
     <TypeScriptProject Include="ProjectTemplates\TypeScriptAzureWebApp\setup_web.cmd" />
@@ -965,7 +960,6 @@
     <TypeScriptProject Include="ProjectTemplates\TypeScriptAzureExpressApp\download.ps1" />
     <TypeScriptProject Include="ProjectTemplates\TypeScriptAzureExpressApp\node.cmd" />
     <TypeScriptProject Include="ProjectTemplates\TypeScriptAzureExpressApp\setup_web.cmd" />
-    <TypeScriptProject Include="ProjectTemplates\TypeScriptAzureExpressApp\Web.cloud.config" />
     <TypeScriptProject Include="ProjectTemplates\TypeScriptAzureExpressApp\Web.Debug.config" />
     <TypeScriptProject Include="ProjectTemplates\TypeScriptAzureExpressApp\Web.config" />
     <TypeScriptProject Include="ProjectTemplates\TypeScriptAzureExpressApp\iisnode.yml" />

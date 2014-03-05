@@ -47,17 +47,7 @@
     <ItemGroup>
       <_FoundWebConfig Include="@(Content)" Condition=" '%(Content.Filename)%(Content.Extension)' == 'web.config' " />
       <_FoundWebConfig Include="@(Include)" Condition=" '%(Include.Filename)%(Include.Extension)' == 'web.config' " />
-      <_FoundWebCloudConfig Include="@(Content)" Condition=" '%(Content.Filename)%(Content.Extension)' == 'web.cloud.config' " />
-      <_FoundWebCloudConfig Include="@(Include)" Condition=" '%(Include.Filename)%(Include.Extension)' == 'web.cloud.config' " />
     </ItemGroup>
-    <PropertyGroup>
-      <!-- Turn the item into a property -->
-      <HasWebCloudConfig Condition="'@(_FoundWebCloudConfig)' != ''">true</HasWebCloudConfig>
-
-      <!-- Property which specifies whether or not we're deploying Web.cloud.config instead of web.config -->
-      <DeployingCloudConfig Condition="'$(HasWebCloudConfig)' == 'true' and '$(_NodejsDeploymentMethod)' == 'WebDeploy'">true</DeployingCloudConfig>
-      <DeployingCloudConfig Condition="'$(DeployingCloudConfig)' == ''">false</DeployingCloudConfig>
-    </PropertyGroup>
 
     <Copy
         SourceFiles="@(Compile)"
@@ -84,11 +74,6 @@
           SkipUnchangedFiles="true">
       <Output TaskParameter="DestinationFiles" ItemName="FilesCopiedToIntermediate"/>
     </Copy>
-   <!-- If we have a web.cloud.config we want to deploy that as web.config instead, so we won't include
-         web.config or web.cloud.config.  Instead we will copy web.cloud.config to the intermediate directory 
-         as web.config and include that.
-      -->
-    <Copy SourceFiles="@(_FoundWebCloudConfig)" DestinationFiles="$(IntermediateOutputPath)\web.config" Condition="$(DeployingCloudConfig)" SkipUnchangedFiles="true"/>
   </Target>
 
   <Target Name="BuiltProjectOutputGroup" 
@@ -101,7 +86,7 @@
            TypeScriptCollectPublishFiles to include the files for publishing because 
            Worker Roles won't invoke PublishPipeline, they invoke some targets directly -->
       <_GeneratedJavascript Include="@(TypeScriptCompile->'%(RelativeDir)%(Filename).js')"
-                            Condition="'$([System.IO.Path]::GetExtension(%(Filename)))' != '.d'"/>
+                            Condition="'%(Filename)' != '' and '$([System.IO.Path]::GetExtension(%(Filename)))' != '.d'"/>
       
       <!-- Building scripts results in the scripts -->      
       <_TempBuiltProjectOutputGroup Include="@(Compile->'%(FullPath)');@(Content->'%(FullPath)');@(_GeneratedJavascript->'%(FullPath)');@(NodeModulesContent->'%(FullPath)')"/>
@@ -196,19 +181,10 @@
       <ContentFiles Include="@(Include)" />
       <ContentFiles Include="@(Compile)" />
       <ContentFiles Include="@(NodeModulesContent)" />
-      <ContentFiles Remove="web.config;web.cloud.config" Condition="$(DeployingCloudConfig)"/>
       <Content Include="@(NodeModulesContent)"/>
       <GeneratedFiles Include="@(NodejsAzureDeploymentFile)" />
       <TransformedFilenames Include="@(ContentFiles->'%(FullPath)')">
         <DestinationRelativePath>%(RelativeDir)%(Filename)%(Extension)</DestinationRelativePath>
-        <Exclude>false</Exclude>
-        <FromTarget>Unknown</FromTarget>
-        <Category>Run</Category>
-        <ProjectFileType>Default</ProjectFileType>
-      </TransformedFilenames>
-
-      <TransformedFilenames Include="$(IntermediateOutputPath)web.config" Condition="$(DeployingCloudConfig)">
-        <DestinationRelativePath>web.config</DestinationRelativePath>
         <Exclude>false</Exclude>
         <FromTarget>Unknown</FromTarget>
         <Category>Run</Category>
