@@ -1802,6 +1802,27 @@ namespace NodejsTests.Debugger {
 
         #endregion
 
+        [TestMethod, Priority(0)]
+        public void TestDuplicateFileName() {
+            TestDebuggerSteps(
+                "DuppedFilename.js",
+                new[] {
+                    new TestStep(action: TestAction.AddBreakpoint, 
+                        targetBreakpoint: 2, 
+                        targetBreakpointFile: "Directory\\DuppedFilename.js",
+                        expectFailure:true),
+                    new TestStep(action: TestAction.ResumeThread, expectedEntryPointHit: 0),
+                    new TestStep(action: TestAction.ResumeThread, 
+                        expectedHitCount: 1, 
+                        targetBreakpoint: 2, 
+                        targetBreakpointFile: "Directory\\DuppedFilename.js", 
+                        expectedBreakFunction: "f",
+                        expectedBreakpointHit: 2),
+                    new TestStep(action: TestAction.StepOut, expectedStepComplete: 4),               
+                }
+            );
+        }
+
         #region Attach Tests
 
         [TestMethod, Priority(0)]

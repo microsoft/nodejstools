@@ -45,6 +45,7 @@ namespace Microsoft.NodejsTools.Debugger {
         private readonly EvaluationResultFactory _resultFactory;
         private readonly Dictionary<int, NodeThread> _threads = new Dictionary<int, NodeThread>();
         private readonly TimeSpan _timeout = TimeSpan.FromSeconds(2);
+        private readonly ScriptTree _scriptTree = new ScriptTree(null);
         private bool _attached;
         private bool _breakOnAllExceptions;
         private bool _breakOnUncaughtExceptions;
@@ -478,6 +479,23 @@ namespace Microsoft.NodejsTools.Debugger {
             }
         }
 
+        /// <summary>
+        /// Stores all of the scripts which are loaded in the debuggee in reverse order based
+        /// upon their file components.  The first entry is the filename, then the parent directory,
+        /// then parent of that directory, etc...
+        /// 
+        /// This is used to do fuzzy filename matching when a breakpoint is hit.
+        /// </summary>
+        class ScriptTree {
+            public readonly string Filename;
+            public readonly Dictionary<string, ScriptTree> Parents = new Dictionary<string, ScriptTree>(StringComparer.OrdinalIgnoreCase);
+            public readonly List<NodeModule> Children = new List<NodeModule>();
+
+            public ScriptTree(string filename) {
+                Filename = filename;
+            }
+        }
+
         private void AddScript(NodeModule newModule) {
             string name = newModule.JavaScriptFileName;
             if (!string.IsNullOrEmpty(name)) {
@@ -491,7 +509,24 @@ namespace Microsoft.NodejsTools.Debugger {
                         modLoad(this, new ModuleLoadedEventArgs(newModule));
                     }
                 }
+
+                // we only need to do fuzzy comparisons when debugging remotely
+                ScriptTree curTree = _scriptTree;
+                string[] pathComponents = GetPathComponents(name);
+                foreach (var component in pathComponents.Reverse()) {
+                    ScriptTree nextTree;
+                    if (!curTree.Parents.TryGetValue(component, out nextTree)) {
+                        curTree.Parents[component] = nextTree = new ScriptTree(component);
+                    }
+
+                    curTree.Children.Add(newModule);
+                    curTree = nextTree;
+                }
             }
+        }
+
+        private static string[] GetPathComponents(string path) {
+            return path.Split('\\', '/', ':');
         }
 
         private async Task SetExceptionBreakAsync(CancellationToken cancellationToken = new CancellationToken()) {
@@ -545,12 +580,13 @@ namespace Microsoft.NodejsTools.Debugger {
             }
 
             // Process break for breakpoint bindings, if any
-            if (!await ProcessBreakpointBreakAsync(breakpointBindings, false, false).ConfigureAwait(false)) {
+            if (!await ProcessBreakpointBreakAsync(breakpointEvent.Module, breakpointBindings, false, false).ConfigureAwait(false)) {
                 await AutoResumeAsync(false).ConfigureAwait(false);
             }
         }
 
         private async Task<bool> ProcessBreakpointBreakAsync(
+            NodeModule brokeIn,
             List<NodeBreakpointBinding> breakpointBindings,
             bool haveCallstack,
             bool testFullyBound,
@@ -576,12 +612,22 @@ namespace Microsoft.NodejsTools.Debugger {
                     if (hitBindings.Count > 0) {
                         // Fire breakpoint hit event(s)
                         EventHandler<BreakpointHitEventArgs> breakpointHit = BreakpointHit;
-                        if (breakpointHit != null) {
-                            foreach (NodeBreakpointBinding hitBinding in hitBindings) {
+                        bool match = false;
+                        foreach (NodeBreakpointBinding hitBinding in hitBindings) {
+                            if (FileNameMatchesForBreak(brokeIn, hitBinding)) {
+                                match = true;
                                 NodeBreakpointBinding breakpointBinding = hitBinding;
                                 await hitBinding.ProcessBreakpointHitAsync(cancellationToken).ConfigureAwait(false);
-                                breakpointHit(this, new BreakpointHitEventArgs(breakpointBinding, MainThread));
+
+                                if (breakpointHit != null) {
+                                    breakpointHit(this, new BreakpointHitEventArgs(breakpointBinding, MainThread));
+                                }
+                            } else {
+                                hitBinding.FixupHitCount();
                             }
+                        }
+                        if (!match) {
+                            result = false;
                         }
                     } else {
                         // No breakpoints hit
@@ -599,6 +645,37 @@ namespace Microsoft.NodejsTools.Debugger {
             await ProcessBreakpointBindingsAsync(breakpointBindings, processBinding, testFullyBound, cancellationToken).ConfigureAwait(false);
 
             return result;
+        }
+
+        private bool FileNameMatchesForBreak(NodeModule brokeIn, NodeBreakpointBinding hitBinding) {
+            // when we bind breakpoints we can end up setting breakpoints on index.js
+            // and then hit the breakpoint and we need to make sure the paths are
+            // actually the same.  We do this based upon all of the scripts which are
+            // loaded into the process, walking up the path until we have a trailing
+            // path that matches a single script.  If we can't get to just a single
+            // match we'll break in all of the files.
+            string[] pathComponents = GetPathComponents(hitBinding.FileName);
+            ScriptTree curTree = _scriptTree;
+            foreach (var component in pathComponents.Reverse()) {
+                ScriptTree nextTree;
+                if (!curTree.Parents.TryGetValue(component, out nextTree)) {
+                    // we know nothing about this script, it must not be loaded yet
+                    return false;
+                }
+
+                if (curTree.Children.Count == 1) {
+                    // we map to a single script, see if it's where we broke.
+                    return String.Equals(
+                        curTree.Children[0].FileName,
+                        brokeIn.FileName,
+                        StringComparison.OrdinalIgnoreCase
+                    );
+                }
+
+                curTree = nextTree;
+            }
+
+            return true;
         }
 
         private async Task ProcessBreakpointBindingsAsync(
@@ -817,7 +894,7 @@ namespace Microsoft.NodejsTools.Debugger {
                 if (breakpointBindings.Count > 0) {
                     // Delegate to ProcessBreak() which knows how to correctly
                     // fire breakpoint hit events for given breakpoint bindings and current backtrace
-                    if (!await ProcessBreakpointBreakAsync(breakpointBindings, true, true).ConfigureAwait(false)) {
+                    if (!await ProcessBreakpointBreakAsync(breakModule, breakpointBindings, true, true).ConfigureAwait(false)) {
                         HandleEntryPointHit();
                     }
                     return;

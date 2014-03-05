@@ -281,6 +281,13 @@ namespace Microsoft.NodejsTools.Debugger {
             return false;
         }
 
+        /// <summary>
+        /// Called after we auto resume a breakpoint because it wasn't really hit.
+        /// </summary>
+        internal void FixupHitCount() {
+            _hitCountDelta++;
+        }
+
         private void SyncCounts() {
             if (_engineIgnoreCount <= 0) {
                 return;
