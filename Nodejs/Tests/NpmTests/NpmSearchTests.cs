@@ -31,6 +31,7 @@ namespace NpmTests {
 
         private const string Filename_Original = "npmsearchfullcatalog.txt";
         private const string Filename_Npm143 = "npmsearchfullcat_npm143.txt";
+        private const string Filename_Npm144 = "npmsearchfullcat_npm144.txt";
 
         [ClassInitialize]
         public static void Init(TestContext context) {
@@ -320,36 +321,72 @@ namespace NpmTests {
             }
         }
 
-        [TestMethod, Priority(0)]
-        public void Npm143AndLater_CheckNonZeroPackageVersionsExist() {
+        private void CheckNonZeroPackageVersionsExist(string testDataFilename) {
             IDictionary<string, IPackage> byName;
-            var target = GetTestPackageList(Filename_Npm143, out byName);
+            var target = GetTestPackageList(testDataFilename, out byName);
             CheckSensibleNumberOfNonZeroVersions(target);
         }
 
         [TestMethod, Priority(0)]
-        public void Npm143AndLater_CheckCorrectPackageCount() {
-            IDictionary<string, IPackage> byName;
-            var target = GetTestPackageList(Filename_Npm143, out byName);
-            Assert.AreEqual(62068 /*was 62084*/, target.Count, "Unexpected package count in catalogue list.");
+        public void Npm143_CheckNonZeroPackageVersionsExist() {
+            CheckNonZeroPackageVersionsExist(Filename_Npm143);
         }
 
         [TestMethod, Priority(0)]
-        public void Npm143AndLater_CheckNoDuplicatePackages() {
+        public void Npm144_CheckNonZeroPackageVersionsExist() {
+            CheckNonZeroPackageVersionsExist(Filename_Npm144);
+        }
+
+        private void CheckCorrectPackageCount(string testDataFilename, int expectedCount) {
             IDictionary<string, IPackage> byName;
-            var target = GetTestPackageList(Filename_Npm143, out byName);
+            var target = GetTestPackageList(testDataFilename, out byName);
+            Assert.AreEqual(expectedCount, target.Count, "Unexpected package count in catalogue list.");
+        }
+
+        [TestMethod, Priority(0)]
+        public void Npm143_CheckCorrectPackageCount() {
+            CheckCorrectPackageCount(Filename_Npm143, 62068);
+        }
+
+        [TestMethod, Priority(0)]
+        public void Npm144_CheckCorrectPackageCount() {
+            CheckCorrectPackageCount(Filename_Npm144, 62208);
+        }
+
+        private void CheckNoDuplicatePackages(string testDataFilename) {
+            IDictionary<string, IPackage> byName;
+            var target = GetTestPackageList(testDataFilename, out byName);
             CheckOnlyOneOfEachPackage(target);
         }
 
         [TestMethod, Priority(0)]
-        public void Npm143AndLater_CheckListAndDictByNameSameSize() {
+        public void Npm143_CheckNoDuplicatePackages() {
+            CheckNoDuplicatePackages(Filename_Npm143);
+        }
+
+        [TestMethod, Priority(0)]
+        public void Npm144_CheckNoDuplicatePackages() {
+            CheckNoDuplicatePackages(Filename_Npm144);
+        }
+
+        private void CheckListAndDictByNameSameSize(string testDataFilename) {
             IDictionary<string, IPackage> byName;
-            var target = GetTestPackageList(Filename_Npm143, out byName);
+            var target = GetTestPackageList(testDataFilename, out byName);
             Assert.AreEqual(target.Count, byName.Count, "Number of packages should be same in list and dictionary.");
         }
 
         [TestMethod, Priority(0)]
-        public void Npm143AndLater_CheckFirstPackageInCatalog_007() {
+        public void Npm143_CheckListAndDictByNameSameSize() {
+            CheckListAndDictByNameSameSize(Filename_Npm143);
+        }
+
+        [TestMethod, Priority(0)]
+        public void Npm144_CheckListAndDictByNameSameSize() {
+            CheckListAndDictByNameSameSize(Filename_Npm144);
+        }
+
+        [TestMethod, Priority(0)]
+        public void Npm143_CheckFirstPackageInCatalog_007() {
             IDictionary<string, IPackage> byName;
             var target = GetTestPackageList(Filename_Npm143, out byName);
             CheckPackage(
@@ -365,7 +402,7 @@ namespace NpmTests {
         }
 
         [TestMethod, Priority(0)]
-        public void Npm143AndLater_CheckLastPackageInCatalog_zzz() {
+        public void Npm143_CheckLastPackageInCatalog_zzz() {
             IDictionary<string, IPackage> byName;
             var target = GetTestPackageList(Filename_Npm143, out byName);
             CheckPackage(
@@ -381,7 +418,7 @@ namespace NpmTests {
         }
 
         [TestMethod, Priority(0)]
-        public void Npm143AndLater_CheckPackageTruncatedBuildPreReleaseInfo() {
+        public void Npm143_CheckPackageTruncatedBuildPreReleaseInfo() {
             IDictionary<string, IPackage> byName;
             var target = GetTestPackageList(Filename_Npm143, out byName);
 
@@ -399,7 +436,7 @@ namespace NpmTests {
         }
 
         [TestMethod, Priority(0)]
-        public void Npm143AndLater_CheckPackageMultipleAuthorsTruncated() {
+        public void Npm143_CheckPackageMultipleAuthorsTruncated() {
             IDictionary<string, IPackage> byName;
             var target = GetTestPackageList(Filename_Npm143, out byName);
 
@@ -417,7 +454,7 @@ namespace NpmTests {
         }
 
         [TestMethod, Priority(0)]
-        public void Npm143AndLater_CheckPackageEqualsInDescription() {
+        public void Npm143_CheckPackageEqualsInDescription() {
             IDictionary<string, IPackage> byName;
             var target = GetTestPackageList(Filename_Npm143, out byName);
             CheckPackage(
@@ -433,7 +470,7 @@ namespace NpmTests {
         }
 
         [TestMethod, Priority(0)]
-        public void Npm143AndLater_CheckPackageAuthorAsEmailAddress() {
+        public void Npm143_CheckPackageAuthorAsEmailAddress() {
             IDictionary<string, IPackage> byName;
             var target = GetTestPackageList(Filename_Npm143, out byName);
             CheckPackage(
@@ -449,7 +486,7 @@ namespace NpmTests {
         }
 
         [TestMethod, Priority(0)]
-        public void Npm143AndLater_CheckPackageNoDescriptionAuthorVersion() {
+        public void Npm143_CheckPackageNoDescriptionAuthorVersion() {
             IDictionary<string, IPackage> byName;
             var target = GetTestPackageList(Filename_Npm143, out byName);
 
@@ -497,7 +534,7 @@ namespace NpmTests {
         }
 
         [TestMethod, Priority(0)]
-        public void Npm143AndLater_CheckPackageNoVersion() {
+        public void Npm143_CheckPackageNoVersion() {
             IDictionary<string, IPackage> byName;
             var target = GetTestPackageList(Filename_Npm143, out byName);
 
@@ -525,7 +562,7 @@ namespace NpmTests {
         }
 
         [TestMethod, Priority(0)]
-        public void Npm143AndLater_CheckPackageNoDescription() {
+        public void Npm143_CheckPackageNoDescription() {
             IDictionary<string, IPackage> byName;
             var target = GetTestPackageList(Filename_Npm143, out byName);
 
@@ -583,7 +620,7 @@ namespace NpmTests {
         }
 
         [TestMethod, Priority(0)]
-        public void Npm143AndLater_CheckPackageWithLongName() {
+        public void Npm143_CheckPackageWithLongName() {
             IDictionary<string, IPackage> byName;
             var target = GetTestPackageList(Filename_Npm143, out byName);
 
