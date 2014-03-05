@@ -243,11 +243,20 @@ namespace NodejsTests {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to {&quot;seq&quot;:0,&quot;request_seq&quot;:1,&quot;type&quot;:&quot;response&quot;,&quot;command&quot;:&quot;scripts&quot;,&quot;success&quot;:true,&quot;body&quot;:[{&quot;handle&quot;:1,&quot;type&quot;:&quot;script&quot;,&quot;name&quot;:&quot;node.js&quot;,&quot;id&quot;:17,&quot;lineOffset&quot;:0,&quot;columnOffset&quot;:0,&quot;lineCount&quot;:903,&quot;sourceStart&quot;:&quot;// Copyright Joyent, Inc. and other Node contributors.\n//\n// Permission is hereb&quot;,&quot;sourceLength&quot;:28095,&quot;scriptType&quot;:2,&quot;compilationType&quot;:0,&quot;context&quot;:{&quot;ref&quot;:0},&quot;text&quot;:&quot;node.js (lines: 903)&quot;},{&quot;handle&quot;:3,&quot;type&quot;:&quot;script&quot;,&quot;name&quot;:&quot;path.js&quot;,&quot;id&quot;:22,&quot;lineOffset&quot;:0,&quot;columnOffset&quot;:0,&quot;lineCount&quot;:489,&quot;sourceStart&quot;:&quot;(fu [rest of string was truncated]&quot;;.
+        ///   Looks up a localized string similar to {&quot;seq&quot;:0,&quot;request_seq&quot;:1,&quot;type&quot;:&quot;response&quot;,&quot;command&quot;:&quot;scripts&quot;,&quot;success&quot;:true,&quot;body&quot;:[{&quot;handle&quot;:1,&quot;type&quot;:&quot;script&quot;,&quot;name&quot;:&quot;node.js&quot;,&quot;id&quot;:17,&quot;lineOffset&quot;:0,&quot;columnOffset&quot;:0,&quot;lineCount&quot;:903,&quot;source&quot;:&quot;(function (exports, require, module, __filename, __dirname) { node.js\n});&quot;,&quot;sourceStart&quot;:&quot;// Copyright Joyent, Inc. and other Node contributors.\n//\n// Permission is hereb&quot;,&quot;sourceLength&quot;:28095,&quot;scriptType&quot;:2,&quot;compilationType&quot;:0,&quot;context&quot;:{&quot;ref&quot;:0},&quot;text&quot;:&quot;node.js (lines: 903)&quot;},{&quot;handle&quot;:3,&quot;type&quot;:&quot;script&quot;,&quot;name [rest of string was truncated]&quot;;.
         /// </summary>
         internal static string NodeScriptsResponse {
             get {
                 return ResourceManager.GetString("NodeScriptsResponse", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to {&quot;seq&quot;:3,&quot;request_seq&quot;:4,&quot;type&quot;:&quot;response&quot;,&quot;command&quot;:&quot;setbreakpoint&quot;,&quot;success&quot;:true,&quot;body&quot;:{&quot;type&quot;:&quot;scriptId&quot;,&quot;breakpoint&quot;:2,&quot;script_id&quot;:33,&quot;line&quot;:0,&quot;column&quot;:62,&quot;actual_locations&quot;:[{&quot;line&quot;:0,&quot;column&quot;:62,&quot;script_id&quot;:33}]},&quot;refs&quot;:[],&quot;running&quot;:false}.
+        /// </summary>
+        internal static string NodeSetBreakpointResponse {
+            get {
+                return ResourceManager.GetString("NodeSetBreakpointResponse", resourceCulture);
             }
         }
         

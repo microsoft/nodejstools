@@ -103,8 +103,8 @@ namespace Microsoft.NodejsTools.Debugger.DebugEngine {
                 var breakpoint =
                     _engine.Process.AddBreakPoint(
                         fileName,
-                        (int)(startPosition[0].dwLine),
-                        (int)(startPosition[0].dwColumn),
+                        (int)startPosition[0].dwLine,
+                        (int)startPosition[0].dwColumn,
                         _enabled,
                         AD7BoundBreakpoint.GetBreakOnForPassCount(_bpRequestInfo.bpPassCount),
                         _bpRequestInfo.bpCondition.bstrCondition

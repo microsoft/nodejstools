@@ -14,7 +14,6 @@
 
 using System;
 using System.IO;
-using System.Security.Cryptography;
 using System.Text;
 using System.Threading.Tasks;
 using Microsoft.NodejsTools.Debugger.Communication;
@@ -24,6 +23,25 @@ using Moq;
 namespace NodejsTests.Debugger.Communication {
     [TestClass]
     public class DebuggerConnectionTests {
+        [TestMethod]
+        public void CreateDebuggerConnectionWithNullNetworkClientFactory() {
+            // Arrange
+            Exception exception = null;
+            DebuggerConnection connection = null;
+
+            // Act
+            try {
+                connection = new DebuggerConnection(null);
+            } catch (Exception e) {
+                exception = e;
+            }
+
+            // Assert
+            Assert.IsNull(connection);
+            Assert.IsNotNull(exception);
+            Assert.IsInstanceOfType(exception, typeof (ArgumentNullException));
+        }
+
         [TestMethod]
         public async Task RaiseConnectionClosedEvent() {
             // Arrange
@@ -125,7 +143,7 @@ namespace NodejsTests.Debugger.Communication {
             await Task.Delay(TimeSpan.FromMilliseconds(100));
             connected[0] = false;
 
-            var buffer = sourceStream.GetBuffer();
+            byte[] buffer = sourceStream.GetBuffer();
             string result = Encoding.UTF8.GetString(buffer, 0, (int)sourceStream.Length);
 
             sourceStream.Close();

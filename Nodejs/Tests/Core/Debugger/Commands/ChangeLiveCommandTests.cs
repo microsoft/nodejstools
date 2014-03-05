@@ -12,6 +12,7 @@
  *
  * ***************************************************************************/
 
+using System;
 using Microsoft.NodejsTools.Debugger;
 using Microsoft.NodejsTools.Debugger.Commands;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
@@ -26,9 +27,8 @@ namespace NodejsTests.Debugger.Commands {
             const int moduleId = 5;
             const string fileName = "fileName.js";
             const string source = "source";
-            var module = new NodeModule(moduleId, fileName, fileName) {
-                Source = source
-            };
+            string wrappedSource = string.Format("{0}{1}{2}", NodeConstants.ScriptWrapBegin, source, NodeConstants.ScriptWrapEnd.Replace("\n",@"\n"));
+            var module = new NodeModule(moduleId, fileName, fileName) { Source = source };
 
             // Act
             var changeLiveCommand = new ChangeLiveCommand(commandId, module);
@@ -38,7 +38,7 @@ namespace NodejsTests.Debugger.Commands {
             Assert.AreEqual(
                 string.Format(
                     "{{\"command\":\"changelive\",\"seq\":{0},\"type\":\"request\",\"arguments\":{{\"script_id\":{1},\"new_source\":\"{2}\",\"preview_only\":false}}}}",
-                    commandId, moduleId, source),
+                    commandId, moduleId, wrappedSource),
                 changeLiveCommand.ToString());
         }
 

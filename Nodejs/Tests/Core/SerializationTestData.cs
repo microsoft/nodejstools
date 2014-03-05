@@ -182,6 +182,15 @@ namespace NodejsTests {
             return DeserializeJsonValue(json);
         }
 
+        /// <summary>
+        /// Gets a json for set breakpoint response.
+        /// </summary>
+        /// <returns>JSON object.</returns>
+        public static JObject GetSetBreakpointResponse() {
+            string json = Resources.NodeSetBreakpointResponse;
+            return DeserializeJsonValue(json);
+        }
+
         private static JObject DeserializeJsonValue(string json) {
             return JObject.Parse(json);
         }

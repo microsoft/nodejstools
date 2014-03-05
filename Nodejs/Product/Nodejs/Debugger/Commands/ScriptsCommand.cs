@@ -46,6 +46,14 @@ namespace Microsoft.NodejsTools.Debugger.Commands {
             foreach (JToken module in body) {
                 var id = (int)module["id"];
                 var source = (string)module["source"];
+                if (!string.IsNullOrEmpty(source) &&
+                    source.StartsWith(NodeConstants.ScriptWrapBegin) && 
+                    source.EndsWith(NodeConstants.ScriptWrapEnd)) {
+                    source = source.Substring(
+                        NodeConstants.ScriptWrapBegin.Length, 
+                        source.Length - NodeConstants.ScriptWrapBegin.Length - NodeConstants.ScriptWrapEnd.Length);
+                }
+
                 var javaScriptFileName = (string)module["name"];
                 string fileName = _debugger.GetModuleFileName(javaScriptFileName);
 

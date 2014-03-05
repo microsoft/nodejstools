@@ -90,7 +90,7 @@ namespace NodejsTests.Debugger {
                 DebugProcess(
                     filename,
                     onLoadComplete: (newproc, newthread) => {
-                        AddBreakPoint(newproc, filename, lineNo);
+                        AddBreakPoint(newproc, filename, lineNo, 0);
                         thread = newthread;
                     }
                 );

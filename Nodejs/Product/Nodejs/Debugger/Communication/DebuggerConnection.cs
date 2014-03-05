@@ -30,6 +30,8 @@ namespace Microsoft.NodejsTools.Debugger.Communication {
         private INetworkClient _networkClient;
 
         public DebuggerConnection(INetworkClientFactory networkClientFactory) {
+            Utilities.ArgumentNotNull("networkClientFactory", networkClientFactory);
+
             _networkClientFactory = networkClientFactory;
             _messages = new AsyncProducerConsumerCollection<string>();
             NodeVersion = new Version();
@@ -108,7 +110,7 @@ namespace Microsoft.NodejsTools.Debugger.Communication {
             using (var streamWriter = new StreamWriter(_networkClient.GetStream())) {
                 try {
                     while (Connected) {
-                        string message = await _messages.Take();
+                        string message = await _messages.TakeAsync();
                         await streamWriter.WriteAsync(message);
                         await streamWriter.FlushAsync();
                     }

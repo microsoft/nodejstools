@@ -17,6 +17,7 @@ using System.Globalization;
 using System.IO;
 using System.Text;
 using System.Text.RegularExpressions;
+using Microsoft.VisualStudioTools.Project;
 using Newtonsoft.Json.Linq;
 
 namespace Microsoft.NodejsTools.Debugger.Commands {
@@ -27,6 +28,8 @@ namespace Microsoft.NodejsTools.Debugger.Commands {
 
         public SetBreakpointCommand(int id, NodeModule module, NodeBreakpoint breakpoint, bool withoutPredicate = false)
             : base(id, "setbreakpoint") {
+            Utilities.ArgumentNotNull("breakpoint", breakpoint);
+
             _module = module;
             _breakpoint = breakpoint;
 
@@ -88,12 +91,11 @@ namespace Microsoft.NodejsTools.Debugger.Commands {
         public override void ProcessResponse(JObject response) {
             base.ProcessResponse(response);
 
-            if (_module != null) {
-                ScriptId = _module.ModuleId;
-            }
-
             JToken body = response["body"];
             BreakpointId = (int)body["breakpoint"];
+
+            int? moduleId = _module != null ? _module.ModuleId : (int?)null;
+            ScriptId = (int?)body["script_id"] ?? moduleId;
 
             // Handle breakpoint actual location fixup
             JArray actualLocations = (JArray)body["actual_locations"] ?? new JArray();
