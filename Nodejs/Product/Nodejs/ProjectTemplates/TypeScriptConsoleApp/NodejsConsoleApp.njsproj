@@ -22,6 +22,7 @@
     <TypeScriptSourceMap>true</TypeScriptSourceMap>
     <TypeScriptModuleKind>CommonJS</TypeScriptModuleKind>
     <EnableTypeScript>true</EnableTypeScript>
+    <StartWebBrowser>false</StartWebBrowser>
   </PropertyGroup>
 
   <PropertyGroup Condition=" '$(Configuration)' == 'Debug' ">
