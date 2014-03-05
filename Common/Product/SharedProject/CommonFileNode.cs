@@ -296,7 +296,7 @@ namespace Microsoft.VisualStudioTools.Project {
             if (CommonUtils.IsSamePath(ProjectMgr.GetStartupFile(), Url)) {
                 ProjectMgr.BoldItem(this, true);
             }
-
+            
             return VSConstants.S_OK;
         }
 

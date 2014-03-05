@@ -217,7 +217,7 @@ namespace Microsoft.NodejsTools {
                             ErrorHandler.ThrowOnFailure(multiItemSelect.GetSelectedItems(flags, numberOfSelectedItems, vsItemSelections));
 
                             foreach (VSITEMSELECTION vsItemSelection in vsItemSelections) {
-                                yield return new VSITEMSELECTION() { itemid = vsItemSelection .itemid, pHier = hierarchy};
+                                yield return new VSITEMSELECTION() { itemid = vsItemSelection.itemid, pHier = hierarchy };
                             }
                         }
                     }
@@ -747,8 +747,8 @@ namespace Microsoft.NodejsTools {
                     cFilesToOpen,
                     rgpszFilesToOpen,
                     hwndDlgOwner,
-                    dwAddItemOperation == VSADDITEMOPERATION.VSADDITEMOP_CLONEFILE ? 
-                        (uint)__VSSPECIFICEDITORFLAGS.VSSPECIFICEDITOR_DoOpen : 
+                    dwAddItemOperation == VSADDITEMOPERATION.VSADDITEMOP_CLONEFILE ?
+                        (uint)__VSSPECIFICEDITORFLAGS.VSSPECIFICEDITOR_DoOpen :
                         0,
                     ref ourEditor,
                     "",
@@ -829,5 +829,6 @@ namespace Microsoft.NodejsTools {
         }
 
         #endregion
+
     }
 }

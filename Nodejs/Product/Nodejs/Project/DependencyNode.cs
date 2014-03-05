@@ -193,19 +193,19 @@ namespace Microsoft.NodejsTools.Project {
                 switch (cmd) {
                     case PkgCmdId.cmdidNpmInstallSingleMissingModule:
                         if (null != _projectNode.ModulesNode) {
-                            _projectNode.ModulesNode.InstallMissingModule(this);
+                            var t = _projectNode.ModulesNode.InstallMissingModule(this);
                         }
                         return VSConstants.S_OK;
 
                     case PkgCmdId.cmdidNpmUninstallModule:
                         if (null != _projectNode.ModulesNode) {
-                            _projectNode.ModulesNode.UninstallModule(this);
+                            var t = _projectNode.ModulesNode.UninstallModule(this);
                         }
                         return VSConstants.S_OK;
 
                     case PkgCmdId.cmdidNpmUpdateSingleModule:
                         if (null != _projectNode.ModulesNode) {
-                            _projectNode.ModulesNode.UpdateModule(this);
+                            var t = _projectNode.ModulesNode.UpdateModule(this);
                         }
                         return VSConstants.S_OK;
                 }

@@ -541,7 +541,7 @@ namespace Microsoft.NodejsTools.Project {
                         return VSConstants.S_OK;
 
                     case PkgCmdId.cmdidNpmInstallModules:
-                        InstallMissingModules();
+                        var t = InstallMissingModules();
                         return VSConstants.S_OK;
 
                     case PkgCmdId.cmdidNpmUpdateModules:
@@ -601,7 +601,7 @@ namespace Microsoft.NodejsTools.Project {
             return true;
         }
 
-        public async void InstallMissingModules() {
+        public async System.Threading.Tasks.Task InstallMissingModules() {
             DoPreCommandActions();
             try {
                 using (var commander = NpmController.CreateNpmCommander()) {
@@ -614,7 +614,7 @@ namespace Microsoft.NodejsTools.Project {
             }
         }
 
-        public async void InstallMissingModule(DependencyNode node) {
+        public async System.Threading.Tasks.Task InstallMissingModule(DependencyNode node) {
             if (!CheckValidCommandTarget(node)) {
                 return;
             }
@@ -655,7 +655,7 @@ namespace Microsoft.NodejsTools.Project {
             }
         }
 
-        internal async void UpdateModules(IList<HierarchyNode> nodes) {
+        internal async System.Threading.Tasks.Task UpdateModules(IList<HierarchyNode> nodes) {
             DoPreCommandActions();
             try {
                 using (var commander = NpmController.CreateNpmCommander()) {
@@ -683,10 +683,10 @@ namespace Microsoft.NodejsTools.Project {
         }
 
         public void UpdateModules() {
-            UpdateModules(_projectNode.GetSelectedNodes());
+            var t = UpdateModules(_projectNode.GetSelectedNodes());
         }
 
-        public async void UpdateModule(DependencyNode node) {
+        public async System.Threading.Tasks.Task UpdateModule(DependencyNode node) {
             if (!CheckValidCommandTarget(node)) {
                 return;
             }
@@ -706,7 +706,7 @@ namespace Microsoft.NodejsTools.Project {
             }
         }
 
-        public async void UninstallModules() {
+        public async System.Threading.Tasks.Task UninstallModules() {
             DoPreCommandActions();
             try {
                 var selected = _projectNode.GetSelectedNodes();
@@ -726,7 +726,7 @@ namespace Microsoft.NodejsTools.Project {
             }
         }
 
-        public async void UninstallModule(DependencyNode node) {
+        public async System.Threading.Tasks.Task UninstallModule(DependencyNode node) {
             if (!CheckValidCommandTarget(node)) {
                 return;
             }

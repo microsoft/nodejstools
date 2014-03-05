@@ -33,14 +33,15 @@ namespace Microsoft.NodejsTools.Project {
 
         private NodeModulesNode _parent;
 
-        public GlobalModulesNode(NodejsProjectNode root, NodeModulesNode parent) : base(root) {
+        public GlobalModulesNode(NodejsProjectNode root, NodeModulesNode parent)
+            : base(root) {
             _parent = parent;
         }
 
         public override object GetIconHandle(bool open) {
             return ProjectMgr.ImageHandler.GetIconHandle(open
-                ? (int) ProjectNode.ImageName.OpenReferenceFolder
-                : (int) ProjectNode.ImageName.ReferenceFolder);
+                ? (int)ProjectNode.ImageName.OpenReferenceFolder
+                : (int)ProjectNode.ImageName.ReferenceFolder);
         }
 
         public override string Url {
@@ -98,7 +99,7 @@ namespace Microsoft.NodejsTools.Project {
                         return VSConstants.S_OK;
 
                     case PkgCmdId.cmdidNpmUpdateModules:
-                        _parent.UpdateModules(AllChildren.ToList());
+                        var t = _parent.UpdateModules(AllChildren.ToList());
                         return VSConstants.S_OK;
                 }
             }

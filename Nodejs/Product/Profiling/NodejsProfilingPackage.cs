@@ -259,13 +259,13 @@ namespace Microsoft.NodejsTools.Profiling {
             }
 
             if (projectToProfile != null) {
-                ProfileProject(session, projectToProfile, openReport);
+                var t = ProfileProject(session, projectToProfile, openReport);
             } else {
                 MessageBox.Show("Project could not be found in current solution.", Resources.NodejsToolsForVS);
             }
         }
 
-        internal async void ProfileProject(SessionNode session, EnvDTE.Project projectToProfile, bool openReport) {
+        internal async System.Threading.Tasks.Task ProfileProject(SessionNode session, EnvDTE.Project projectToProfile, bool openReport) {
             if (!await UIThread.Instance.RunSync(async () => {
                 if (!await EnsureProjectUpToDate(projectToProfile)) {
                     if (MessageBox.Show(Resources.FailedToBuild, Resources.NodejsToolsForVS, MessageBoxButton.YesNo) == MessageBoxResult.No) {

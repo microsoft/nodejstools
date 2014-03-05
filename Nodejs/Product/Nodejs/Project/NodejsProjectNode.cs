@@ -20,6 +20,7 @@ using System.Linq;
 using System.Reflection;
 using System.Text;
 using System.Threading;
+using System.Threading.Tasks;
 using System.Web.Script.Serialization;
 using Microsoft.NodejsTools.Intellisense;
 using Microsoft.VisualStudio;
@@ -28,8 +29,9 @@ using Microsoft.VisualStudioTools.Project;
 using Microsoft.VisualStudioTools.Project.Automation;
 using MSBuild = Microsoft.Build.Evaluation;
 
+
 namespace Microsoft.NodejsTools.Project {
-    class NodejsProjectNode : CommonProjectNode, VsWebSite.VSWebSite {
+    class NodejsProjectNode : CommonProjectNode, VsWebSite.VSWebSite, Microsoft.NodejsTools.ProjectWizard.INodePackageModulesCommands {
         private static string _nodeRefCode = ReadNodeRefCode();
         internal readonly string _referenceFilename = GetReferenceFilePath();
         const string _userSwitchMarker = "// **NTVS** INSERT USER MODULE SWITCH HERE **NTVS**";
@@ -129,7 +131,7 @@ namespace Microsoft.NodejsTools.Project {
                         Directory.CreateDirectory(typingsFolder);
                     }
 
-                    // Deploy node.d.ts into If we have a TypeScript project deploy our node reference file.
+                    // Deploy node.d.ts
                     var nodeTypingsFolder = Path.Combine(typingsFolder, "node");
                     if (!Directory.Exists(Path.Combine(nodeTypingsFolder))) {
                         Directory.CreateDirectory(nodeTypingsFolder);
@@ -283,7 +285,7 @@ namespace Microsoft.NodejsTools.Project {
                 base.Reload();
 
                 SyncFileSystem();
-                
+
                 foreach (var group in _refGroupDispenser.Groups) {
                     group.GenerateReferenceFile();
                 }
@@ -791,5 +793,11 @@ function require(module) {
         }
 
         #endregion
+
+        public Task InstallMissingModules() {
+            //Fire off the command to update the missing modules
+            //  through NPM
+            return ModulesNode.InstallMissingModules();
+        }
     }
 }

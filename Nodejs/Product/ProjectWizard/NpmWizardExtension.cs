@@ -32,62 +32,23 @@ namespace Microsoft.NodejsTools.ProjectWizard {
         }
 
         public void ProjectFinishedGenerating(EnvDTE.Project project) {
-            // Prompt the user if we should run npm install
-            EnvDTE.ProjectItem packageJson;
-            try {
-                packageJson = project.ProjectItems.Item("package.json");
-            } catch (ArgumentException) {
-                return;
+            Debug.Assert(project.Object != null);
+            Debug.Assert(project.Object is INodePackageModulesCommands);
+            // prompt the user to install dependencies
+            var shouldDoInstall = MessageBox.Show(@"The newly created project has dependencies defined in package.json.
+
+Do you want to run npm install to get the dependencies now?
+
+This operation will run in the background.  
+Results of this operation are available in the Output window.",
+                "Node.js Tools for Visual Studio",
+                MessageBoxButtons.YesNo
+            );
+
+            if (shouldDoInstall == DialogResult.Yes) {
+                ((INodePackageModulesCommands)project.Object).InstallMissingModules();
             }
 
-            var serializer = new JavaScriptSerializer();
-            Dictionary<string, object> jsonDict;
-            try {
-                jsonDict = (Dictionary<string, object>)serializer.DeserializeObject(File.ReadAllText(packageJson.get_FileNames(1)));
-            } catch {
-                // can't read, failed to deserialize json
-                return;
-            }
-
-            if (File.Exists(Nodejs.NodeExePath)) {
-                var npmPath = Path.Combine(Path.GetDirectoryName(Nodejs.NodeExePath), "npm.cmd");
-                if (File.Exists(npmPath)) {
-
-                    object dependenciesObject;
-                    Dictionary<string, object> dependencies;
-                    if (jsonDict.TryGetValue("dependencies", out dependenciesObject) &&
-                        (dependencies = dependenciesObject as Dictionary<string, object>) != null &&
-                        dependencies.Count > 0) {
-
-                        // prompt the user to install dependencies
-                        var shouldDoInstall = MessageBox.Show(@"The newly created project has dependencies defined in package.json.
-
-Do you want to run npm install to get the dependencies now?",
-                            "Node.js Tools for Visual Studio",
-                            MessageBoxButtons.YesNo
-                        );
-
-                        if (shouldDoInstall == DialogResult.Yes) {
-                            var cmd = Path.Combine(
-                                Environment.GetFolderPath(Environment.SpecialFolder.System),
-                                "cmd.exe"
-                            );
-
-                            var psi = new ProcessStartInfo(
-                                cmd,
-                                String.Format("/C \"{0}\" install && pause", npmPath)
-                            ) { WorkingDirectory = (string)project.Properties.Item("ProjectHome").Value };
-                            psi.UseShellExecute = false;
-                            try {
-                                using (var proc = Process.Start(psi)) {
-                                    proc.WaitForExit();
-                                }
-                            } catch {
-                            }
-                        }
-                    }
-                }
-            }
         }
 
         public void ProjectItemFinishedGenerating(EnvDTE.ProjectItem projectItem) {
