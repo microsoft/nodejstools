@@ -18,6 +18,7 @@ using System.Threading.Tasks;
 
 namespace Microsoft.NodejsTools.Debugger {
     class NodeStackFrame {
+        private readonly int _columnNo;
         private readonly NodeDebugger _debugger;
         private readonly int _endLine;
         private readonly string _frameName;
@@ -25,18 +26,19 @@ namespace Microsoft.NodejsTools.Debugger {
         private readonly NodeModule _module;
         private readonly int _startLine;
 
-        public NodeStackFrame(NodeDebugger debugger, NodeModule module, string frameName, int startLine, int endLine, int lineNo, int frameId) {
+        public NodeStackFrame(NodeDebugger debugger, NodeModule module, string frameName, int startLine, int endLine, int lineNo, int columnNo, int frameId) {
             _debugger = debugger;
             _module = module;
             _frameName = frameName;
             _lineNo = lineNo;
+            _columnNo = columnNo;
             FrameId = frameId;
             _startLine = startLine;
             _endLine = endLine;
         }
 
         /// <summary>
-        /// The line nubmer where the current function/class/module starts
+        /// The line number where the current function/class/module starts
         /// </summary>
         public int StartLine {
             get { return MapLineNo(_startLine); }
@@ -61,6 +63,13 @@ namespace Microsoft.NodejsTools.Debugger {
         /// </summary>
         public int LineNo {
             get { return MapLineNo(_lineNo); }
+        }
+
+        /// <summary>
+        /// Gets a stack frame column number in the script.
+        /// </summary>
+        public int ColumnNo {
+            get { return MapColumnNo(_lineNo, _columnNo); }
         }
 
         /// <summary>
@@ -118,6 +127,21 @@ namespace Microsoft.NodejsTools.Debugger {
                 return mapping.Line;
             }
             return lineNo;
+        }
+
+        /// <summary>
+        /// Maps a column number from JavaScript to the original source code.
+        /// Column numbers are 1 based.
+        /// </summary>
+        /// <param name="line"></param>
+        /// <param name="column"></param>
+        /// <returns></returns>
+        private int MapColumnNo(int line, int column) {
+            SourceMapping mapping = _debugger.SourceMapper.MapToOriginal(Module.JavaScriptFileName, line, column);
+            if (mapping != null) {
+                return mapping.Column;
+            }
+            return column;
         }
 
         /// <summary>

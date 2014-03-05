@@ -23,44 +23,40 @@ namespace Microsoft.NodejsTools.Debugger.DebugEngine {
     // IDebugCodeContext2 represents the starting position of a code instruction. 
     // For most run-time architectures today, a code context can be thought of as an address in a program's execution stream.
     class AD7MemoryAddress : IDebugCodeContext2, IDebugCodeContext100 {
+        private readonly int _columnNo;
         private readonly AD7Engine _engine;
-        private readonly uint _lineNo;
         private readonly string _filename;
         private readonly NodeStackFrame _frame;
+        private readonly int _lineNo;
         private IDebugDocumentContext2 _documentContext;
 
-        private AD7MemoryAddress(AD7Engine engine, NodeStackFrame frame, string filename, uint lineNo) {
+        private AD7MemoryAddress(AD7Engine engine, NodeStackFrame frame, string filename, int lineNo, int columnNo) {
             _engine = engine;
             _frame = frame;
             _filename = filename;
             _lineNo = lineNo;
+            _columnNo = columnNo;
         }
 
 
-        public AD7MemoryAddress(AD7Engine engine, string filename, uint lineNo)
-            : this(engine, null, filename, lineNo) {
+        public AD7MemoryAddress(AD7Engine engine, string filename, int lineNo, int columnNo)
+            : this(engine, null, filename, lineNo, columnNo) {
         }
 
         public AD7MemoryAddress(AD7Engine engine, NodeStackFrame frame)
-            : this(engine, frame, null, (uint)frame.LineNo) {
+            : this(engine, frame, null, frame.LineNo, frame.ColumnNo) {
         }
 
         public AD7Engine Engine {
-            get {
-                return _engine;
-            }
+            get { return _engine; }
         }
 
         public NodeModule Module {
-            get {
-                return _frame != null ? _frame.Module : null;
-            }
+            get { return _frame != null ? _frame.Module : null; }
         }
 
         public string FileName {
-            get {
-                return _frame != null ? _frame.FileName : _filename;
-            }
+            get { return _frame != null ? _frame.FileName : _filename; }
         }
 
         public void SetDocumentContext(IDebugDocumentContext2 docContext) {
@@ -70,8 +66,17 @@ namespace Microsoft.NodejsTools.Debugger.DebugEngine {
         #region IDebugMemoryContext2 Members
 
         // Adds a specified value to the current context's address to create a new context.
+
+        public int LineNumber {
+            get { return _lineNo; }
+        }
+
+        public int ColumnNumber {
+            get { return _columnNo; }
+        }
+
         public int Add(ulong dwCount, out IDebugMemoryContext2 newAddress) {
-            newAddress = new AD7MemoryAddress(_engine, _frame, _filename, _lineNo + (uint)dwCount);
+            newAddress = new AD7MemoryAddress(_engine, _frame, _filename, _lineNo + (int)dwCount, _columnNo);
             return VSConstants.S_OK;
         }
 
@@ -148,12 +153,6 @@ namespace Microsoft.NodejsTools.Debugger.DebugEngine {
             return VSConstants.S_FALSE;
         }
 
-        public uint LineNumber {
-            get {
-                return _lineNo;
-            }
-        }
-
         // Gets information that describes this context.
         public int GetInfo(enum_CONTEXT_INFO_FIELDS dwFields, CONTEXT_INFO[] pinfo) {
             pinfo[0].dwFields = 0;
@@ -169,10 +168,14 @@ namespace Microsoft.NodejsTools.Debugger.DebugEngine {
             }
 
             // Fields not supported by the sample
-            if ((dwFields & enum_CONTEXT_INFO_FIELDS.CIF_ADDRESSOFFSET) != 0) { }
-            if ((dwFields & enum_CONTEXT_INFO_FIELDS.CIF_ADDRESSABSOLUTE) != 0) { }
-            if ((dwFields & enum_CONTEXT_INFO_FIELDS.CIF_MODULEURL) != 0) { }
-            if ((dwFields & enum_CONTEXT_INFO_FIELDS.CIF_FUNCTIONOFFSET) != 0) { }
+            if ((dwFields & enum_CONTEXT_INFO_FIELDS.CIF_ADDRESSOFFSET) != 0) {
+            }
+            if ((dwFields & enum_CONTEXT_INFO_FIELDS.CIF_ADDRESSABSOLUTE) != 0) {
+            }
+            if ((dwFields & enum_CONTEXT_INFO_FIELDS.CIF_MODULEURL) != 0) {
+            }
+            if ((dwFields & enum_CONTEXT_INFO_FIELDS.CIF_FUNCTIONOFFSET) != 0) {
+            }
 
             return VSConstants.S_OK;
         }
@@ -185,7 +188,7 @@ namespace Microsoft.NodejsTools.Debugger.DebugEngine {
 
         // Subtracts a specified value from the current context's address to create a new context.
         public int Subtract(ulong dwCount, out IDebugMemoryContext2 ppMemCxt) {
-            ppMemCxt = new AD7MemoryAddress(_engine, _frame, _filename, _lineNo - (uint)dwCount);
+            ppMemCxt = new AD7MemoryAddress(_engine, _frame, _filename, _lineNo - (int)dwCount, _columnNo);
             return VSConstants.S_OK;
         }
 

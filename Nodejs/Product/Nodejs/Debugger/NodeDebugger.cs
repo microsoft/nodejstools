@@ -20,7 +20,6 @@ using System.IO;
 using System.Linq;
 using System.Net.NetworkInformation;
 using System.Reflection;
-using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
 using Microsoft.NodejsTools.Debugger.Commands;
@@ -332,10 +331,7 @@ namespace Microsoft.NodejsTools.Debugger {
                 bool running = await PerformBacktraceAsync(cancellationToken).ConfigureAwait(false);
                 Debug.Assert(!running);
             }
-            CompleteStepping();
-        }
 
-        private void CompleteStepping() {
             EventHandler<ThreadEventArgs> stepComplete = StepComplete;
             if (stepComplete != null) {
                 stepComplete(this, new ThreadEventArgs(MainThread));
@@ -349,15 +345,16 @@ namespace Microsoft.NodejsTools.Debugger {
         public NodeBreakpoint AddBreakPoint(
             string requestedFileName,
             int requestedLineNo,
+            int requestedColumnNo,
             bool enabled = true,
             BreakOn breakOn = new BreakOn(),
             string condition = null) {
             string fileName;
             int lineNo;
+            int columnNo;
 
-            SourceMapper.MapToJavaScript(requestedFileName, requestedLineNo, out fileName, out lineNo);
-
-            return new NodeBreakpoint(this, fileName, requestedFileName, lineNo, requestedLineNo, enabled, breakOn, condition);
+            SourceMapper.MapToJavaScript(requestedFileName, requestedLineNo, requestedColumnNo, out fileName, out lineNo, out columnNo);
+            return new NodeBreakpoint(this, fileName, requestedFileName, lineNo, columnNo, enabled, breakOn, condition);
         }
 
         public async void SetExceptionTreatment(
@@ -443,12 +440,7 @@ namespace Microsoft.NodejsTools.Debugger {
         /// <param name="module">Node module.</param>
         /// <returns>Operation result.</returns>
         internal async Task<bool> UpdatedModuleSourceAsync(NodeModule module) {
-            // Wrap module contents as following https://github.com/joyent/node/blob/v0.10.26-release/src/node.js#L880
-            var newSource = new StringBuilder("(function (exports, require, module, __filename, __dirname) { ");
-            newSource.Append(File.ReadAllText(module.JavaScriptFileName));
-            newSource.Append("\n});");
-
-            module.Source = newSource.ToString();
+            module.Source = File.ReadAllText(module.JavaScriptFileName);
 
             var changeLiveCommand = new ChangeLiveCommand(CommandId, module);
             await _client.SendRequestAsync(changeLiveCommand).ConfigureAwait(false);
@@ -566,9 +558,13 @@ namespace Microsoft.NodejsTools.Debugger {
         private async void OnBreakpointEvent(object sender, BreakpointEventArgs args) {
             BreakpointEvent breakpointEvent = args.BreakpointEvent;
 
+            // Process breakpoint bindings, ensuring we have callstack
+            bool running = await PerformBacktraceAsync().ConfigureAwait(false);
+            Debug.Assert(!running);
+
             // Complete stepping, if no breakpoint bindings
             if (breakpointEvent.Breakpoints.Count == 0) {
-                await CompleteSteppingAsync(false).ConfigureAwait(false);
+                await CompleteSteppingAsync(true).ConfigureAwait(false);
                 return;
             }
 
@@ -582,7 +578,7 @@ namespace Microsoft.NodejsTools.Debugger {
             }
 
             // Process break for breakpoint bindings, if any
-            if (!await ProcessBreakpointBreakAsync(breakpointBindings, false, false).ConfigureAwait(false)) {
+            if (!await ProcessBreakpointBreakAsync(breakpointBindings, false).ConfigureAwait(false)) {
                 await AutoResumeAsync(false).ConfigureAwait(false);
             }
         }
@@ -620,7 +616,6 @@ namespace Microsoft.NodejsTools.Debugger {
 
         private async Task<bool> ProcessBreakpointBreakAsync(
             List<NodeBreakpointBinding> breakpointBindings,
-            bool haveCallstack,
             bool testFullyBound,
             CancellationToken cancellationToken = new CancellationToken()) {
             bool result = true;
@@ -633,12 +628,6 @@ namespace Microsoft.NodejsTools.Debugger {
 
             // Process breakpoint binding
             var hitBindings = new List<NodeBreakpointBinding>();
-
-            // Process breakpoint bindings, ensuring we have callstack
-            if (!haveCallstack) {
-                bool running = await PerformBacktraceAsync(cancellationToken).ConfigureAwait(false);
-                Debug.Assert(!running);
-            }
 
             // Iterate over breakpoint bindings, processing them as fully bound or not
             int currentLineNo = MainThread.TopStackFrame.LineNo;
@@ -664,10 +653,10 @@ namespace Microsoft.NodejsTools.Debugger {
                 await RemoveBreakPointAsync(breakpointBinding, cancellationToken).ConfigureAwait(false);
 
                 NodeBreakpoint breakpoint = breakpointBinding.Breakpoint;
-                SetBreakpointCommand breakpointResult = await SetBreakpointAsync(breakpoint, cancellationToken: cancellationToken).ConfigureAwait(false);
+                SetBreakpointCommand setResult = await SetBreakpointAsync(breakpoint, cancellationToken: cancellationToken).ConfigureAwait(false);
 
                 // Treat rebound breakpoint binding as fully bound
-                NodeBreakpointBinding reboundbreakpointBinding = CreateBreakpointBinding(breakpoint, breakpointResult.BreakpointId, breakpointResult.ScriptId, breakpointResult.LineNo, true);
+                NodeBreakpointBinding reboundbreakpointBinding = CreateBreakpointBinding(breakpoint, setResult.BreakpointId, setResult.ScriptId, setResult.LineNo, setResult.ColumnNo, true);
                 HandleBindBreakpointSuccess(reboundbreakpointBinding, breakpoint);
 
                 // Handle invalid-line fixup (second bind matches current line)
@@ -854,7 +843,7 @@ namespace Microsoft.NodejsTools.Debugger {
                 if (breakpointBindings.Count > 0) {
                     // Delegate to ProcessBreak() which knows how to correctly
                     // fire breakpoint hit events for given breakpoint bindings and current backtrace
-                    if (!await ProcessBreakpointBreakAsync(breakpointBindings, true, true).ConfigureAwait(false)) {
+                    if (!await ProcessBreakpointBreakAsync(breakpointBindings, true).ConfigureAwait(false)) {
                         HandleEntryPointHit();
                     }
                     return;
@@ -913,7 +902,7 @@ namespace Microsoft.NodejsTools.Debugger {
             SetBreakpointCommand result = await SetBreakpointAsync(breakpoint, cancellationToken: cancellationToken).ConfigureAwait(false);
 
             bool fullyBound = (result.ScriptId.HasValue && result.LineNo == breakpoint.LineNo);
-            NodeBreakpointBinding breakpointBinding = CreateBreakpointBinding(breakpoint, result.BreakpointId, result.ScriptId, result.LineNo, fullyBound);
+            NodeBreakpointBinding breakpointBinding = CreateBreakpointBinding(breakpoint, result.BreakpointId, result.ScriptId, result.LineNo, result.ColumnNo, fullyBound);
 
             // Fully bound (normal case)
             // Treat as success
@@ -929,7 +918,7 @@ namespace Microsoft.NodejsTools.Debugger {
                 result = await SetBreakpointAsync(breakpoint, true, cancellationToken).ConfigureAwait(false);
 
                 Debug.Assert(!(result.ScriptId.HasValue && result.LineNo == breakpoint.LineNo));
-                CreateBreakpointBinding(breakpoint, result.BreakpointId, result.ScriptId, result.LineNo, false);
+                CreateBreakpointBinding(breakpoint, result.BreakpointId, result.ScriptId, result.LineNo, result.ColumnNo, false);
             }
 
             // Not fully bound, without predicate
@@ -953,8 +942,8 @@ namespace Microsoft.NodejsTools.Debugger {
             return setBreakpointCommand;
         }
 
-        private NodeBreakpointBinding CreateBreakpointBinding(NodeBreakpoint breakpoint, int breakpointId, int? scriptId, int lineNo, bool fullyBound) {
-            NodeBreakpointBinding breakpointBinding = breakpoint.CreateBinding(lineNo, breakpointId, scriptId, fullyBound);
+        private NodeBreakpointBinding CreateBreakpointBinding(NodeBreakpoint breakpoint, int breakpointId, int? scriptId, int lineNo, int columnNo, bool fullyBound) {
+            NodeBreakpointBinding breakpointBinding = breakpoint.CreateBinding(lineNo, columnNo, breakpointId, scriptId, fullyBound);
             _breakpointBindings[breakpointId] = breakpointBinding;
             return breakpointBinding;
         }

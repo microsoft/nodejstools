@@ -47,11 +47,12 @@ namespace NodejsTests.Debugger {
             NodeDebugger newproc,
             string fileName,
             int line,
+            int column,
             bool enabled = true,
             BreakOn breakOn = new BreakOn(),
             string condition = ""
         ) {
-            NodeBreakpoint breakPoint = newproc.AddBreakPoint(fileName, line, enabled, breakOn, condition);
+            NodeBreakpoint breakPoint = newproc.AddBreakPoint(fileName, line, column, enabled, breakOn, condition);
             breakPoint.BindAsync().Wait();
             return breakPoint;
         }
@@ -353,6 +354,7 @@ namespace NodejsTests.Debugger {
             public ExceptionInfo _expectedExceptionRaised;
             public string _targetBreakpointFile;
             public int? _targetBreakpoint;
+            public int? _targetBreakpointColumn;
             public uint? _expectedHitCount;
             public uint? _hitCount;
             public bool? _enabled;
@@ -371,6 +373,7 @@ namespace NodejsTests.Debugger {
                 string expectedBreakFile = null,
                 ExceptionInfo expectedExceptionRaised = null,
                 int? targetBreakpoint = null,
+                int? targetBreakpointColumn = null,
                 string targetBreakpointFile = null,
                 uint? expectedHitCount = null,
                 uint? hitCount = null,
@@ -391,6 +394,7 @@ namespace NodejsTests.Debugger {
                 _expectedExceptionRaised = expectedExceptionRaised;
                 _targetBreakpointFile = targetBreakpointFile;
                 _targetBreakpoint = targetBreakpoint;
+                _targetBreakpointColumn = targetBreakpointColumn;
                 _expectedHitCount = expectedHitCount;
                 _hitCount = hitCount;
                 _enabled = enabled;
@@ -438,12 +442,14 @@ namespace NodejsTests.Debugger {
         }
 
         internal struct Breakpoint {
-            internal Breakpoint(string fileName, int line) {
+            internal Breakpoint(string fileName, int line, int column) {
                 _fileName = fileName;
                 _line = line;
+                _column = column;
             }
             public string _fileName;
             public int _line;
+            public int _column;
         }
 
         internal void TestDebuggerSteps(
@@ -575,13 +581,15 @@ namespace NodejsTests.Debugger {
                             breakpointFileName = filename;
                         }
                         int breakpointLine = step._targetBreakpoint.Value;
-                        Breakpoint breakpoint = new Breakpoint(breakpointFileName, breakpointLine);
+                        int breakpointColumn = step._targetBreakpointColumn.HasValue ? step._targetBreakpointColumn.Value : 0;
+                        Breakpoint breakpoint = new Breakpoint(breakpointFileName, breakpointLine, breakpointColumn);
                         Assert.IsFalse(breakpoints.TryGetValue(breakpoint, out nodeBreakpoint));
                         breakpoints[breakpoint] =
                             AddBreakPoint(
                                 process,
                                 breakpointFileName,
                                 breakpointLine,
+                                breakpointColumn,
                                 step._enabled ?? true,
                                 step._breakOn ?? new BreakOn(),
                                 step._condition
@@ -599,7 +607,8 @@ namespace NodejsTests.Debugger {
                     case TestAction.RemoveBreakpoint:
                         breakpointFileName = step._targetBreakpointFile ?? filename;
                         breakpointLine = step._targetBreakpoint.Value;
-                        breakpoint = new Breakpoint(breakpointFileName, breakpointLine);
+                        breakpointColumn = step._targetBreakpointColumn.HasValue ? step._targetBreakpointColumn.Value : 0;
+                        breakpoint = new Breakpoint(breakpointFileName, breakpointLine, breakpointColumn);
                         breakpoints[breakpoint].Remove();
                         breakpoints.Remove(breakpoint);
                         AssertWaited(breakpointUnbound);
@@ -608,7 +617,8 @@ namespace NodejsTests.Debugger {
                     case TestAction.UpdateBreakpoint:
                         breakpointFileName = step._targetBreakpointFile ?? filename;
                         breakpointLine = step._targetBreakpoint.Value;
-                        breakpoint = new Breakpoint(breakpointFileName, breakpointLine);
+                        breakpointColumn = step._targetBreakpointColumn.HasValue ? step._targetBreakpointColumn.Value : 0;
+                        breakpoint = new Breakpoint(breakpointFileName, breakpointLine, breakpointColumn);
                         nodeBreakpoint = breakpoints[breakpoint];
                         foreach (var breakpointBinding in nodeBreakpoint.GetBindings()) {
                             if (step._hitCount != null) {
@@ -705,7 +715,8 @@ namespace NodejsTests.Debugger {
                         breakpointFileName = DebuggerTestPath + breakpointFileName;
                     }
                     int breakpointLine = step._targetBreakpoint.Value;
-                    Breakpoint breakpoint = new Breakpoint(breakpointFileName, breakpointLine);
+                    int breakpointColumn = step._targetBreakpointColumn.HasValue ? step._targetBreakpointColumn.Value : 0;
+                    var breakpoint = new Breakpoint(breakpointFileName, breakpointLine, breakpointColumn);
                     nodeBreakpoint = breakpoints[breakpoint];
                     foreach (var breakpointBinding in nodeBreakpoint.GetBindings()) {
                         Assert.AreEqual(step._expectedHitCount.Value, breakpointBinding.GetHitCount());

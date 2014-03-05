@@ -79,8 +79,9 @@ namespace Microsoft.NodejsTools.Debugger.Commands {
                 }
 
                 int line = (int?)frame["line"] ?? 0;
+                int column = (int?)frame["column"] ?? 0;
                 int stackFrameId = (int?)frame["index"] ?? 0;
-                var stackFrame = new NodeStackFrame(_debugger, module, name, line, line, line, stackFrameId);
+                var stackFrame = new NodeStackFrame(_debugger, module, name, line, line, line, column, stackFrameId);
 
                 // Locals
                 var variables = (JArray)frame["locals"];

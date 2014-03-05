@@ -36,7 +36,11 @@ namespace Microsoft.NodejsTools.Debugger.Commands {
             // Zero based column numbers
             // Special case column to avoid (line 0, column 0) which
             // Node (V8) treats specially for script loaded via require
-            int column = line == 0 ? 1 : 0;
+            // Script wrapping process: https://github.com/joyent/node/blob/v0.10.26-release/src/node.js#L880
+            int column = breakpoint.ColumnNo;
+            if (line == 0) {
+                column += NodeConstants.ScriptWrapBegin.Length;
+            }
 
             _arguments = new Dictionary<string, object> {
                 { "line", line },
@@ -79,6 +83,8 @@ namespace Microsoft.NodejsTools.Debugger.Commands {
 
         public int LineNo { get; private set; }
 
+        public int ColumnNo { get; private set; }
+
         public override void ProcessResponse(JObject response) {
             base.ProcessResponse(response);
 
@@ -90,18 +96,14 @@ namespace Microsoft.NodejsTools.Debugger.Commands {
             BreakpointId = (int)body["breakpoint"];
 
             // Handle breakpoint actual location fixup
-            LineNo = _breakpoint.LineNo;
-
-            var actualLocations = (JArray)body["actual_locations"];
-            if (actualLocations == null) {
-                return;
-            }
-
-            if (actualLocations.Count > 0) {
-                int actualLocation = (int)actualLocations[0]["line"];
-                if (actualLocation != _breakpoint.LineNo) {
-                    LineNo = actualLocation;
-                }
+            JArray actualLocations = (JArray)body["actual_locations"] ?? new JArray();
+            if (actualLocations != null && actualLocations.Count > 0) {
+                LineNo = (int)actualLocations[0]["line"];
+                var columnNo = (int)actualLocations[0]["column"];
+                ColumnNo = LineNo == 0 ? columnNo - NodeConstants.ScriptWrapBegin.Length : columnNo;
+            } else {
+                LineNo = _breakpoint.LineNo;
+                ColumnNo = _breakpoint.ColumnNo;
             }
         }
 

@@ -20,6 +20,8 @@ namespace Microsoft.NodejsTools.Debugger {
     class NodeBreakpointBinding {
         private readonly NodeBreakpoint _breakpoint;
         private readonly int _breakpointId;
+        private readonly int _columnNo;
+        private readonly int _lineNo;
         private readonly int? _scriptId;
         private BreakOn _breakOn;
         private string _condition;
@@ -32,12 +34,14 @@ namespace Microsoft.NodejsTools.Debugger {
         public NodeBreakpointBinding(
             NodeBreakpoint breakpoint,
             int lineNo,
+            int columnNo,
             int breakpointId,
             int? scriptId,
             bool fullyBound
-        ) {
+            ) {
             _breakpoint = breakpoint;
-            LineNo = lineNo;
+            _lineNo = lineNo;
+            _columnNo = columnNo;
             _breakpointId = breakpointId;
             _scriptId = scriptId;
             _enabled = breakpoint.Enabled;
@@ -67,7 +71,16 @@ namespace Microsoft.NodejsTools.Debugger {
         /// <summary>
         /// 1 based line number that corresponds with the actual JavaScript code
         /// </summary>
-        public int LineNo { get; set; }
+        public int LineNo {
+            get { return _lineNo; }
+        }
+
+        /// <summary>
+        /// 1 based column number that corresponds with the actual JavaScript code
+        /// </summary>
+        public int ColumnNo {
+            get { return _columnNo; }
+        }
 
         /// <summary>
         /// 1 based line number that corresponds to the file the breakpoint was requested in
@@ -79,6 +92,19 @@ namespace Microsoft.NodejsTools.Debugger {
                     return mapping.Line;
                 }
                 return LineNo;
+            }
+        }
+
+        /// <summary>
+        /// 1 based column number that corresponds to the file the breakpoint was requested in
+        /// </summary>
+        public int RequestedColumnNo {
+            get {
+                SourceMapping mapping = _breakpoint.Process.SourceMapper.MapToOriginal(FileName, LineNo, ColumnNo);
+                if (mapping != null) {
+                    return mapping.Column;
+                }
+                return ColumnNo;
             }
         }
 

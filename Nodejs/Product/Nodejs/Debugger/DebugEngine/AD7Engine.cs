@@ -705,7 +705,7 @@ namespace Microsoft.NodejsTools.Debugger.DebugEngine {
 
             pDocPos.GetRange(beginning, end);
 
-            ppEnum = new AD7CodeContextEnum(new[] { new AD7MemoryAddress(this, filename, beginning[0].dwLine) });
+            ppEnum = new AD7CodeContextEnum(new[] { new AD7MemoryAddress(this, filename, (int)beginning[0].dwLine, (int)beginning[0].dwColumn) });
             return VSConstants.S_OK;
         }
 
@@ -1101,7 +1101,7 @@ namespace Microsoft.NodejsTools.Debugger.DebugEngine {
         private void OnBreakpointBound(object sender, BreakpointBindingEventArgs e) {
             var pendingBreakpoint = _breakpointManager.GetPendingBreakpoint(e.Breakpoint);
             var breakpointBinding = e.BreakpointBinding;
-            var codeContext = new AD7MemoryAddress(this, pendingBreakpoint.DocumentName, (uint)breakpointBinding.RequestedLineNo);
+            var codeContext = new AD7MemoryAddress(this, pendingBreakpoint.DocumentName, breakpointBinding.RequestedLineNo, breakpointBinding.RequestedColumnNo);
             var documentContext = new AD7DocumentContext(codeContext);
             var breakpointResolution = new AD7BreakpointResolution(this, breakpointBinding, documentContext);
             var boundBreakpoint = new AD7BoundBreakpoint(breakpointBinding, pendingBreakpoint, breakpointResolution, breakpointBinding.Enabled);

@@ -63,8 +63,7 @@ namespace Microsoft.NodejsTools.Debugger.DebugEngine {
         #region IDebugDocumentContext2 Members
 
         // Compares this document context to a given array of document contexts.
-        int IDebugDocumentContext2.Compare(enum_DOCCONTEXT_COMPARE Compare, IDebugDocumentContext2[] rgpDocContextSet, uint dwDocContextSetLen, out uint pdwDocContext) {
-            dwDocContextSetLen = 0;
+        int IDebugDocumentContext2.Compare(enum_DOCCONTEXT_COMPARE compare, IDebugDocumentContext2[] rgpDocContextSet, uint dwDocContextSetLen, out uint pdwDocContext) {
             pdwDocContext = 0;
 
             return VSConstants.E_NOTIMPL;
@@ -74,9 +73,7 @@ namespace Microsoft.NodejsTools.Debugger.DebugEngine {
         // The engine sample only supports one code context per document context and 
         // the code contexts are always memory addresses.
         int IDebugDocumentContext2.EnumCodeContexts(out IEnumDebugCodeContexts2 ppEnumCodeCxts) {
-            ppEnumCodeCxts = null;
-
-            AD7MemoryAddress[] codeContexts = new AD7MemoryAddress[1];
+            var codeContexts = new AD7MemoryAddress[1];
             codeContexts[0] = _codeContext;
             ppEnumCodeCxts = new AD7CodeContextEnum(codeContexts);
             return VSConstants.S_OK;
@@ -127,11 +124,11 @@ namespace Microsoft.NodejsTools.Debugger.DebugEngine {
         // Gets the file statement range of the document context.
         // A statement range is the range of the lines that contributed the code to which this document context refers.
         int IDebugDocumentContext2.GetStatementRange(TEXT_POSITION[] pBegPosition, TEXT_POSITION[] pEndPosition) {
-            pBegPosition[0].dwColumn = 0;
-            pBegPosition[0].dwLine = _codeContext.LineNumber;
+            pBegPosition[0].dwColumn = (uint)_codeContext.ColumnNumber;
+            pBegPosition[0].dwLine = (uint)_codeContext.LineNumber;
 
-            pEndPosition[0].dwColumn = 0;
-            pEndPosition[0].dwLine = _codeContext.LineNumber;
+            pEndPosition[0].dwColumn = (uint)_codeContext.ColumnNumber;
+            pEndPosition[0].dwLine = (uint)_codeContext.LineNumber;
 
             return VSConstants.S_OK;
         }

@@ -263,6 +263,7 @@
     <Compile Include="Debugger\ExceptionHitTreatment.cs" />
     <Compile Include="Debugger\ExceptionHandler.cs" />
     <Compile Include="Debugger\JavaScriptSourceMapInfo.cs" />
+    <Compile Include="Debugger\NodeConstants.cs" />
     <Compile Include="Debugger\Serialization\NodeSetValueVariable.cs" />
     <Compile Include="Debugger\SourceMapper.cs" />
     <Compile Include="Debugger\SteppingKind.cs" />

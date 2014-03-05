@@ -20,9 +20,15 @@ namespace Microsoft.NodejsTools.Debugger.Commands {
         private readonly Dictionary<string, object> _arguments;
 
         public ChangeLiveCommand(int id, NodeModule module) : base(id, "changelive") {
+            // Wrap script contents as following https://github.com/joyent/node/blob/v0.10.26-release/src/node.js#L880
+            string source = string.Format("{0}{1}{2}",
+                NodeConstants.ScriptWrapBegin,
+                module.Source,
+                NodeConstants.ScriptWrapEnd);
+
             _arguments = new Dictionary<string, object> {
                 { "script_id", module.ModuleId },
-                { "new_source", module.Source },
+                { "new_source", source },
                 { "preview_only", false },
             };
         }
@@ -38,7 +44,7 @@ namespace Microsoft.NodejsTools.Debugger.Commands {
         public override void ProcessResponse(JObject response) {
             base.ProcessResponse(response);
 
-            var result = response["body"]["result"];
+            JToken result = response["body"]["result"];
             Updated = (bool)result["updated"];
             StackModified = (bool)result["stack_modified"];
             NeedStepIn = (bool)result["stack_update_needs_step_in"];

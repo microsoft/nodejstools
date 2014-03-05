@@ -26,7 +26,7 @@ namespace Microsoft.NodejsTools.Debugger {
         /// <summary>
         /// Gets a source mapping for the given filename.  Line numbers are zero based.
         /// </summary>
-        public SourceMapping MapToOriginal(string filename, int line) {
+        public SourceMapping MapToOriginal(string filename, int line, int column = 0) {
             JavaScriptSourceMapInfo mapInfo;
             if (!_originalFileToSourceMap.TryGetValue(filename, out mapInfo)) {
                 if (File.Exists(filename)) {
@@ -55,7 +55,6 @@ namespace Microsoft.NodejsTools.Debugger {
             }
             if (mapInfo != null) {
                 SourceMapping mapping;
-                int column = 0;
                 if (line < mapInfo.Lines.Length) {
                     string lineText = mapInfo.Lines[line];
                     // map to the 1st non-whitespace character on the line
@@ -80,15 +79,17 @@ namespace Microsoft.NodejsTools.Debugger {
         /// Maps a line number from the original code to the generated JavaScript.
         /// Line numbers are zero based.
         /// </summary>
-        public void MapToJavaScript(string requestedFileName, int requestedLineNo, out string fileName, out int lineNo) {
+        public void MapToJavaScript(string requestedFileName, int requestedLineNo, int requestedColumnNo, out string fileName, out int lineNo, out int columnNo) {
             fileName = requestedFileName;
             lineNo = requestedLineNo;
+            columnNo = requestedColumnNo;
             SourceMap sourceMap = GetSourceMap(requestedFileName);
 
             if (sourceMap != null) {
                 SourceMapping result;
-                if (sourceMap.TryMapPointBack(requestedLineNo, 0, out result)) {
+                if (sourceMap.TryMapPointBack(requestedLineNo, requestedColumnNo, out result)) {
                     lineNo = result.Line;
+                    columnNo = result.Column;
                     fileName = Path.Combine(Path.GetDirectoryName(fileName) ?? string.Empty, result.FileName);
                     Debug.WriteLine("Mapped breakpoint from {0} {1} to {2} {3}", requestedFileName, requestedLineNo, fileName, lineNo);
                 }

@@ -20,20 +20,20 @@ namespace Microsoft.NodejsTools.Debugger {
     class NodeBreakpoint {
         private readonly Dictionary<int, NodeBreakpointBinding> _bindings = new Dictionary<int, NodeBreakpointBinding>();
         private readonly BreakOn _breakOn;
+        private readonly int _columnNo;
         private readonly string _condition;
         private readonly bool _enabled;
         private readonly string _fileName;
         private readonly int _lineNo;
         private readonly NodeDebugger _process;
         private readonly string _requestedFileName;
-        private readonly int _requestedLineNo;
 
         public NodeBreakpoint(
             NodeDebugger process,
             string fileName,
             string requestedFileName,
             int lineNo,
-            int requestedLineNo,
+            int columnNo,
             bool enabled,
             BreakOn breakOn,
             string condition
@@ -42,7 +42,7 @@ namespace Microsoft.NodejsTools.Debugger {
             _fileName = fileName;
             _requestedFileName = requestedFileName;
             _lineNo = lineNo;
-            _requestedLineNo = requestedLineNo;
+            _columnNo = columnNo;
             _enabled = enabled;
             _breakOn = breakOn;
             _condition = condition;
@@ -72,8 +72,8 @@ namespace Microsoft.NodejsTools.Debugger {
             get { return _lineNo; }
         }
 
-        public int RequestedLineNo {
-            get { return _requestedLineNo; }
+        public int ColumnNo {
+            get { return _columnNo; }
         }
 
         public bool Enabled {
@@ -100,8 +100,8 @@ namespace Microsoft.NodejsTools.Debugger {
             return _process.BindBreakpointAsync(this);
         }
 
-        internal NodeBreakpointBinding CreateBinding(int lineNo, int breakpointId, int? scriptId, bool fullyBound) {
-            var binding = new NodeBreakpointBinding(this, lineNo, breakpointId, scriptId, fullyBound);
+        internal NodeBreakpointBinding CreateBinding(int lineNo, int columnNo, int breakpointId, int? scriptId, bool fullyBound) {
+            var binding = new NodeBreakpointBinding(this, lineNo, columnNo, breakpointId, scriptId, fullyBound);
             _bindings[breakpointId] = binding;
             return binding;
         }
