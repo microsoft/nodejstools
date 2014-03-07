@@ -32,21 +32,30 @@ namespace Microsoft.NodejsTools.Npm.SPI {
             Results = new List<IPackage>();
         }
 
-        protected void ParseResultsFromReader(TextReader source) {
-            IList<IPackage> results     = new List<IPackage>();
-            ISet<string>    deduplicate = new HashSet<string>();
-
-            var lexer = NpmSearchParserFactory.CreateLexer();
-            var parser = NpmSearchParserFactory.CreateParser(lexer);
-            parser.Package += (sender, args) => {
-                var pkg = args.Package;
+        private IList<IPackage> DeduplicateResults(IList<IPackage> preliminary) {
+            var results = new List<IPackage>();
+            var deduplicate = new HashSet<string>();
+            foreach (var pkg in preliminary) {
                 if (!deduplicate.Contains(pkg.Name)) {
                     results.Add(pkg);
                     deduplicate.Add(pkg.Name);
                 }
-            };
+            }
+            return results;
+        } 
+
+        protected void ParseResultsFromReader(TextReader source) {
+            var temp     = new List<IPackage>();
+            var lexer = NpmSearchParserFactory.CreateLexer();
+            var parser = NpmSearchParserFactory.CreateParser(lexer);
+            parser.Package += (sender, args) => temp.Add(args.Package);
             lexer.Lex(source);
-            Results = results;
+
+            //  We do the deduplication afterwards because package names
+            //  can change after the packages are created where the names
+            //  are split across more than one line in the npm search
+            //  output.
+            Results = DeduplicateResults(temp);
         }
 
         public override async Task<bool> ExecuteAsync() {
