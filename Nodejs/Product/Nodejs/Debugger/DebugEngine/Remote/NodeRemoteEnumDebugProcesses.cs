@@ -12,6 +12,7 @@
  *
  * ***************************************************************************/
 
+using System;
 using System.IO;
 using System.Net.Sockets;
 using System.Net.WebSockets;
@@ -55,14 +56,18 @@ namespace Microsoft.NodejsTools.Debugger.Remote {
                 } catch (IOException) {
                 } catch (SocketException) {
                 } catch (WebSocketException) {
+                } catch (PlatformNotSupportedException) {
+                    MessageBox.Show(
+                        "Remote debugging of node.js Windows Azure applications is only supported on Windows 8 and above.",
+                        null, MessageBoxButtons.OK, MessageBoxIcon.Error);
+                    return null;
                 }
 
-                string errText =
-                    string.Format(
-                        "Could not attach to Node.js process at {0}. " +
-                        "Make sure the process is running behind the remote debug proxy (RemoteDebug.js), " +
-                        "and the debugger port (default {1}) is open on the target host.",
-                        port.Uri, NodejsConstants.DefaultDebuggerPort);
+                string errText = string.Format(
+                    "Could not attach to Node.js process at {0}. " +
+                    "Make sure the process is running behind the remote debug proxy (RemoteDebug.js), " +
+                    "and the debugger port (default {1}) is open on the target host.",
+                    port.Uri, NodejsConstants.DefaultDebuggerPort);
                 DialogResult dlgRes = MessageBox.Show(errText, null, MessageBoxButtons.RetryCancel, MessageBoxIcon.Error);
                 if (dlgRes != DialogResult.Retry) {
                     break;
