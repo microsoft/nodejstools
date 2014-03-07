@@ -352,19 +352,19 @@
   <data name="WorkingDirInvalidOrMissing" xml:space="preserve">
     <value>The specified working directory is invalid or missing.</value>
   </data>
-  <data name="CatalogFilterLabelFilter">
+  <data name="CatalogFilterLabelFilter" xml:space="preserve">
     <value>Filter:</value>
   </data>
-  <data name="CatalogFilterLabelNpmInstall">
+  <data name="CatalogFilterLabelNpmInstall" xml:space="preserve">
     <value>npm install</value>
   </data>
-  <data name="CatalogLoadingDefault">
+  <data name="CatalogLoadingDefault" xml:space="preserve">
     <value>Loading published package list...</value>
   </data>
-  <data name="CatalogLoadingNoNpm">
+  <data name="CatalogLoadingNoNpm" xml:space="preserve">
     <value>Catalog retrieval aborted - npm.cmd not found</value>
   </data>
-  <data name="NoKeywordsInPackage">
+  <data name="NoKeywordsInPackage" xml:space="preserve">
     <value>(This package has no keywords.)</value>
   </data>
   <data name="PackageCatalogRefreshing" xml:space="preserve">
@@ -468,5 +468,8 @@
   </data>
   <data name="DebuggerModuleUpdateFailed" xml:space="preserve">
     <value>Failed to update file contents.</value>
+  </data>
+  <data name="NodejsNotSupported" xml:space="preserve">
+    <value>This version of Node.js ({0}) is not supported. Please upgrade to Node.js v0.10.20 or later.</value>
   </data>
 </root>

@@ -43,6 +43,11 @@
   
   <Target Name="CoreCompile">
     <Error Condition="!Exists('$(VSToolsPath)\TypeScript\Microsoft.TypeScript.targets') And '$(EnableTypeScript)' == 'true'" Text="TypeScript is not installed but TypeScript support is enabled in this project.  Please download and install TypeScript http://go.microsoft.com/fwlink/?LinkID=393159&amp;clcid=0x409."></Error>
+    <PropertyGroup>
+      <_NodeModulesContentProperty>@(NodeModulesContent)</_NodeModulesContentProperty>
+    </PropertyGroup>
+    <Error Condition="$(_NodeModulesContentProperty.IndexOf('*')) != -1"
+           Text="Files in your project exceed MAX_PATH, please move your project to a location with a shorter path."></Error>
     
     <!-- Target used for generating a package which can be uploaded to web server -->
     <ItemGroup>
@@ -54,26 +59,27 @@
         SourceFiles="@(Compile)"
         DestinationFiles="@(Compile->'$(IntermediateOutputPath)%(RelativeDir)%(Filename)%(Extension)')"
         SkipUnchangedFiles="true">
-      <!-- <Output TaskParameter="DestinationFiles" ItemName="FilesCopiedToIntermediate"/> -->
+      <Output TaskParameter="DestinationFiles" ItemName="FileWrites"/>
     </Copy>
     <Copy SourceFiles="@(Include)"
           DestinationFiles="@(Include->'$(IntermediateOutputPath)%(RelativeDir)%(Filename)%(Extension)')"          
           SkipUnchangedFiles="true">
-      <!-- <Output TaskParameter="DestinationFiles" ItemName="FilesCopiedToIntermediate"/> -->
+      <Output TaskParameter="DestinationFiles" ItemName="FileWrites"/>
     </Copy>
     <Copy SourceFiles="@(Content)"
           DestinationFiles="@(Content->'$(IntermediateOutputPath)%(RelativeDir)%(Filename)%(Extension)')"
           SkipUnchangedFiles="true">
-      <!-- <Output TaskParameter="DestinationFiles" ItemName="FilesCopiedToIntermediate"/> -->
+      <Output TaskParameter="DestinationFiles" ItemName="FileWrites"/>
     </Copy>
     <Copy SourceFiles="@(NodeModulesContent)"
           DestinationFiles="@(NodeModulesContent->'$(IntermediateOutputPath)%(RelativeDir)%(Filename)%(Extension)')"
-          SkipUnchangedFiles="true">    
+          SkipUnchangedFiles="true">
+      <Output TaskParameter="DestinationFiles" ItemName="FileWrites"/>
     </Copy>
     <Copy SourceFiles="@(NodejsAzureDeploymentFile)"
           DestinationFolder="$(IntermediateOutputPath)\bin"
           SkipUnchangedFiles="true">
-      <Output TaskParameter="DestinationFiles" ItemName="FilesCopiedToIntermediate"/>
+      <Output TaskParameter="DestinationFiles" ItemName="FileWrites"/>
     </Copy>
   </Target>
 

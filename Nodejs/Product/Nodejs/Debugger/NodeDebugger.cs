@@ -54,7 +54,7 @@ namespace Microsoft.NodejsTools.Debugger {
         private bool _handleEntryPointHit;
         private int? _id;
         private bool _loadCompleteHandled;
-        private Process _process;
+        private NodeProcess _process;
         private int _steppingCallstackDepth;
         private SteppingKind _steppingMode;
 
@@ -90,7 +90,7 @@ namespace Microsoft.NodejsTools.Debugger {
             } else {
                 List<int> activeConnections =
                     (from listener in IPGlobalProperties.GetIPGlobalProperties().GetActiveTcpListeners()
-                     select listener.Port).ToList();
+                        select listener.Port).ToList();
                 if (activeConnections.Contains(debuggerPortOrDefault)) {
                     debuggerPortOrDefault = (ushort)Enumerable.Range(new Random().Next(5859, 6000), 60000).Except(activeConnections).First();
                 }
@@ -119,15 +119,12 @@ namespace Microsoft.NodejsTools.Debugger {
                 }
             }
 
-            FixupForRunAndWait(
+            _process = new NodeProcess(
+                psi, 
                 debugOptions.HasFlag(NodeDebugOptions.WaitOnAbnormalExit),
                 debugOptions.HasFlag(NodeDebugOptions.WaitOnNormalExit),
-                psi);
-
-            _process = new Process {
-                StartInfo = psi,
-                EnableRaisingEvents = true
-            };
+                enableRaisingEvents: true
+            );
         }
 
         public NodeDebugger(Uri debuggerEndpointUri, int id)
@@ -626,35 +623,35 @@ namespace Microsoft.NodejsTools.Debugger {
             List<NodeBreakpointBinding> hitBindings,
             int bindingsToProcess,
             CancellationToken cancellationToken = new CancellationToken()) {
-            // Collect hit breakpoint bindings
-            if (binding != null) {
-                hitBindings.Add(binding);
-            }
+                // Collect hit breakpoint bindings
+                if (binding != null) {
+                    hitBindings.Add(binding);
+                }
 
-            // Handle last processed breakpoint binding by either breaking with breakpoint hit events or calling noBreakpointsHitHandler
-            if (--bindingsToProcess == 0) {
-                if (hitBindings.Count > 0) {
-                    // Fire breakpoint hit event(s)
-                    EventHandler<BreakpointHitEventArgs> breakpointHit = BreakpointHit;
-                    bool match = false;
-                    foreach (NodeBreakpointBinding hitBinding in hitBindings) {
-                        if (FileNameMatchesForBreak(brokeIn, hitBinding)) {
-                            match = true;
-                            NodeBreakpointBinding breakpointBinding = hitBinding;
-                            await hitBinding.ProcessBreakpointHitAsync(cancellationToken).ConfigureAwait(false);
+                // Handle last processed breakpoint binding by either breaking with breakpoint hit events or calling noBreakpointsHitHandler
+                if (--bindingsToProcess == 0) {
+                    if (hitBindings.Count > 0) {
+                        // Fire breakpoint hit event(s)
+                        EventHandler<BreakpointHitEventArgs> breakpointHit = BreakpointHit;
+                        bool match = false;
+                        foreach (NodeBreakpointBinding hitBinding in hitBindings) {
+                            if (FileNameMatchesForBreak(brokeIn, hitBinding)) {
+                                match = true;
+                                NodeBreakpointBinding breakpointBinding = hitBinding;
+                                await hitBinding.ProcessBreakpointHitAsync(cancellationToken).ConfigureAwait(false);
 
-                            if (breakpointHit != null) {
-                                breakpointHit(this, new BreakpointHitEventArgs(breakpointBinding, MainThread));
+                                if (breakpointHit != null) {
+                                    breakpointHit(this, new BreakpointHitEventArgs(breakpointBinding, MainThread));
+                                }
+                            } else {
+                                hitBinding.FixupHitCount();
                             }
-                        } else {
-                            hitBinding.FixupHitCount();
                         }
-                    }
-                    if (!match) {
+                        if (!match) {
                         return false;
-                    }
-                } else {
-                    // No breakpoints hit
+                        }
+                    } else {
+                        // No breakpoints hit
                     return false;
                 }
             }
@@ -1210,30 +1207,6 @@ namespace Microsoft.NodejsTools.Debugger {
         #endregion
 
         internal void Close() {
-        }
-
-        internal static void FixupForRunAndWait(bool waitOnAbnormal, bool waitOnNormal, ProcessStartInfo psi) {
-            if (waitOnAbnormal || waitOnNormal) {
-                string args = "/c \"\"" + psi.FileName + "\" " + psi.Arguments;
-
-                if (waitOnAbnormal && waitOnNormal) {
-                    args += " & pause";
-                } else if (waitOnAbnormal) {
-                    args += " & if errorlevel 1 pause";
-                } else {
-                    args += " & if not errorlevel 1 pause";
-                }
-                args += "\"";
-                ProcessorArchitecture binaryType = NativeMethods.GetBinaryType(psi.FileName);
-                if (binaryType == ProcessorArchitecture.Amd64) {
-                    // VS wants the binary we launch to match in bitness to the Node.exe
-                    // we're requesting it to launch.
-                    psi.FileName = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.Windows), "Sysnative", "cmd.exe");
-                } else {
-                    psi.FileName = Path.Combine(Environment.SystemDirectory, "cmd.exe");
-                }
-                psi.Arguments = args;
-            }
         }
 
         #region IDisposable

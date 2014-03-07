@@ -303,11 +303,10 @@ namespace NodejsTests.Debugger {
             }
         }
 
-        internal ICollection<KeyValuePair<string, ExceptionHitTreatment>> CollectExceptionTreatments(string exceptionName = null, ExceptionHitTreatment exceptionTreatment = ExceptionHitTreatment.BreakAlways) {
-            return
-                string.IsNullOrEmpty(exceptionName) ?
-                new KeyValuePair<string, ExceptionHitTreatment>[0] :
-                new KeyValuePair<string, ExceptionHitTreatment>[] { new KeyValuePair<string, ExceptionHitTreatment>(exceptionName, exceptionTreatment) };
+        internal ICollection<KeyValuePair<string, ExceptionHitTreatment>> CollectExceptionTreatments(ExceptionHitTreatment exceptionTreatment = ExceptionHitTreatment.BreakAlways, params string[] exceptionNames) {
+            return exceptionNames.Select(
+                name => new KeyValuePair<string, ExceptionHitTreatment>(name, exceptionTreatment)
+            ).ToArray();
         }
 
         internal void TestExceptions(
@@ -469,7 +468,7 @@ namespace NodejsTests.Debugger {
             // for alpha we have SyntaxErrors set to BreakNever by default.  Here we set it to BreakAlways so unit tests can run
             // assuming BreakAlways is the default.            
             // TODO: Remove once exception treatment is updated for just my code support when it is added after Alpha
-            process.SetExceptionTreatment(null, CollectExceptionTreatments("SyntaxError", ExceptionHitTreatment.BreakAlways));
+            process.SetExceptionTreatment(null, CollectExceptionTreatments(ExceptionHitTreatment.BreakAlways, "SyntaxError"));
 
             if (defaultExceptionTreatment != null || exceptionTreatments != null) {
                 process.SetExceptionTreatment(defaultExceptionTreatment, exceptionTreatments);

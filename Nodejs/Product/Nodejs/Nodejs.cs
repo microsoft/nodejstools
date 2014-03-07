@@ -13,6 +13,7 @@
  * ***************************************************************************/
 
 using System;
+using System.Diagnostics;
 using System.IO;
 #if !NO_WINDOWS
 using System.Windows.Forms;
@@ -85,6 +86,32 @@ namespace Microsoft.NodejsTools {
                 MessageBoxButtons.OK,
                 MessageBoxIcon.Error
             );
+        }
+
+        /// <summary>
+        /// Checks if the given version of Node.js is supported and displays a
+        /// message if it isn't.  Returns true if the version is supported.
+        /// </summary>
+        /// <param name="path"></param>
+        /// <returns></returns>
+        public static bool CheckNodejsSupported(string path) {
+            bool supported = true;
+            if (path != null && File.Exists(path)) {
+                FileVersionInfo info = FileVersionInfo.GetVersionInfo(path);
+                if (info.FileMajorPart == 0) {
+                    if (info.FileMinorPart < 10 ||
+                        (info.FileMinorPart == 10 && info.FileBuildPart < 20)) {
+                        MessageBox.Show(
+                            String.Format(Resources.NodejsNotSupported, info.FileVersion),
+                            Resources.NodejsToolsForVisualStudio,
+                            MessageBoxButtons.OK,
+                            MessageBoxIcon.Error
+                        );
+                        supported = false;
+                    } 
+                }
+            }
+            return supported;
         }
 
         public static void ShowNodejsPathNotFound(string path) {

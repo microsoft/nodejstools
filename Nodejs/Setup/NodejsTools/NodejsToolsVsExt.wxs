@@ -50,6 +50,14 @@
               <Condition>VWD_EXTENSION_INSTALLPATH</Condition>
             </Component>
 
+            <Component Directory="INSTALLLOCATION" Guid="{17F638C2-A7CD-4661-B85E-8B165DB47BCE}">
+              <File Id="filMicrosoft.Nodejstools.PressAnyKey.exe" KeyPath="yes" Source="$(var.BinariesDir)\Microsoft.NodejsTools.PressAnyKey.exe"/>
+            </Component>
+            <Component Directory="VWD_INSTALLLOCATION" Guid="{A73B980B-5B18-42B2-8090-8BD691802872}">
+              <File Id="filVWDMicrosoft.Nodejstools.PressAnyKey.exe" KeyPath="yes" Source="$(var.BinariesDir)\Microsoft.NodejsTools.PressAnyKey.exe"/>
+              <Condition>VWD_EXTENSION_INSTALLPATH</Condition>
+            </Component>
+
             <Component Directory="INSTALLLOCATION" Guid="{6BEB23FF-398F-4E40-8775-E6DF3E2E76AB}">
               <File Id="filMicrosoft.NodejsTools.Npm.dll" KeyPath="yes" Source="$(var.BinariesDir)\Microsoft.NodejsTools.Npm.dll" />
             </Component>

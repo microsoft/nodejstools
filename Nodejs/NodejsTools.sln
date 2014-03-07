@@ -1,6 +1,8 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
-# Visual Studio 2012
+# Visual Studio 2013
+VisualStudioVersion = 12.0.21005.1
+MinimumVisualStudioVersion = 10.0.40219.1
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Nodejs", "Product\Nodejs\Nodejs.csproj", "{32EC5259-98DA-40CA-9E2D-1B1B2E966F88}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ReferenceGenerator", "Product\ReferenceGenerator\ReferenceGenerator.csproj", "{81FBB417-19B2-4E70-857E-D4564B77AD8F}"
@@ -51,11 +53,13 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TestAdapterTests", "Tests\T
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "AzurePublishing.Tests.UI", "Tests\AzurePublishing.UI\AzurePublishing.Tests.UI.csproj", "{F2DCA606-EA73-47B6-940C-0793AC9D07BE}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "PressAnyKey", "Product\PressAnyKey\PressAnyKey.csproj", "{CB61D8BD-48DC-40F4-A4BA-5B68A10A7481}"
+EndProject
 Global
 	GlobalSection(TeamFoundationVersionControl) = preSolution
-		SccNumberOfProjects = 24
+		SccNumberOfProjects = 25
 		SccEnterpriseProvider = {4CA58AB2-18FA-4F8D-95D4-32DDF27D184C}
-		SccTeamFoundationServer = http://tcvstf:8080/tfs/tc
+		SccTeamFoundationServer = http://vstfdevdiv:8080/devdiv2
 		SccLocalPath0 = .
 		SccProjectUniqueName1 = Product\\AjaxMinDll\\AjaxMinDll.csproj
 		SccProjectTopLevelParentUniqueName1 = NodejsTools.sln
@@ -149,6 +153,10 @@ Global
 		SccProjectTopLevelParentUniqueName23 = NodejsTools.sln
 		SccProjectName23 = Tests/AzurePublishing.UI
 		SccLocalPath23 = Tests\\AzurePublishing.UI
+		SccProjectUniqueName24 = Product\\PressAnyKey\\PressAnyKey.csproj
+		SccProjectTopLevelParentUniqueName24 = NodejsTools.sln
+		SccProjectName24 = Product/PressAnyKey
+		SccLocalPath24 = Product\\PressAnyKey
 	EndGlobalSection
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|x86 = Debug|x86
@@ -247,6 +255,10 @@ Global
 		{F2DCA606-EA73-47B6-940C-0793AC9D07BE}.Debug|x86.Build.0 = Debug|x86
 		{F2DCA606-EA73-47B6-940C-0793AC9D07BE}.Release|x86.ActiveCfg = Release|x86
 		{F2DCA606-EA73-47B6-940C-0793AC9D07BE}.Release|x86.Build.0 = Release|x86
+		{CB61D8BD-48DC-40F4-A4BA-5B68A10A7481}.Debug|x86.ActiveCfg = Debug|x86
+		{CB61D8BD-48DC-40F4-A4BA-5B68A10A7481}.Debug|x86.Build.0 = Debug|x86
+		{CB61D8BD-48DC-40F4-A4BA-5B68A10A7481}.Release|x86.ActiveCfg = Release|x86
+		{CB61D8BD-48DC-40F4-A4BA-5B68A10A7481}.Release|x86.Build.0 = Release|x86
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -262,6 +274,7 @@ Global
 		{712D84EC-B2A6-46D1-B030-BA697AE5E554} = {F9719B35-F359-47A7-A2F8-34F42E53C809}
 		{E5EF4B0A-AB41-4B98-8FA8-98D6348003A8} = {F9719B35-F359-47A7-A2F8-34F42E53C809}
 		{5085DF35-3A32-4894-835E-E5A3956D4F57} = {F9719B35-F359-47A7-A2F8-34F42E53C809}
+		{CB61D8BD-48DC-40F4-A4BA-5B68A10A7481} = {F9719B35-F359-47A7-A2F8-34F42E53C809}
 		{D092D54E-FF29-4D32-9AEE-4EF704C92F67} = {850AC94A-310F-4F88-A553-2806D7732BD1}
 		{E8150EBC-6B62-40BF-BF91-1DC60149B530} = {850AC94A-310F-4F88-A553-2806D7732BD1}
 		{F18AF6F7-F534-44BE-B5DE-44D6EFFF947D} = {850AC94A-310F-4F88-A553-2806D7732BD1}

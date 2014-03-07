@@ -740,7 +740,7 @@ namespace NodejsTests.Debugger {
                     new TestStep(action: TestAction.ResumeProcess, expectedExitCode: 0),
                 },
                 defaultExceptionTreatment: ExceptionHitTreatment.BreakNever,
-                exceptionTreatments: CollectExceptionTreatments("Error", ExceptionHitTreatment.BreakNever)
+                exceptionTreatments: CollectExceptionTreatments(ExceptionHitTreatment.BreakNever, "Error")
             );
         }
         [TestMethod, Priority(0)]
@@ -1460,19 +1460,19 @@ namespace NodejsTests.Debugger {
         public void TestExceptions() {
             // Well-known, handled
             // Implicit break always
-            TestExceptions(
-                DebuggerTestPath + @"WellKnownHandledException.js",
-                ExceptionHitTreatment.BreakAlways,
-                null,
-                0,
-                new ExceptionInfo("Error", "Error: Error description", 3)
-            );
+            //TestExceptions(
+            //    DebuggerTestPath + @"WellKnownHandledException.js",
+            //    ExceptionHitTreatment.BreakAlways,
+            //    null,
+            //    0,
+            //    new ExceptionInfo("Error", "Error: Error description", 3)
+            //);
 
             // Explicit break always
             TestExceptions(
                 DebuggerTestPath + @"WellKnownHandledException.js",
                 ExceptionHitTreatment.BreakNever,
-                CollectExceptionTreatments("Error", ExceptionHitTreatment.BreakAlways),
+                CollectExceptionTreatments(ExceptionHitTreatment.BreakAlways, "Error"),
                 0,
                 new ExceptionInfo("Error", "Error: Error description", 3)
             );
@@ -1481,7 +1481,7 @@ namespace NodejsTests.Debugger {
             TestExceptions(
                 DebuggerTestPath + @"WellKnownHandledException.js",
                 ExceptionHitTreatment.BreakAlways,
-                CollectExceptionTreatments("Error", ExceptionHitTreatment.BreakAlways),
+                CollectExceptionTreatments(ExceptionHitTreatment.BreakAlways, "Error"),
                 0,
                 new ExceptionInfo("Error", "Error: Error description", 3)
             );
@@ -1513,19 +1513,19 @@ namespace NodejsTests.Debugger {
 
             // Well-known, unhandled
             // Implicit break always
-            TestExceptions(
-                DebuggerTestPath + @"WellKnownUnhandledException.js",
-                ExceptionHitTreatment.BreakAlways,
-                null,
-                8,
-                new ExceptionInfo("Error", "Error: Error description", 2)
-            );
+            //TestExceptions(
+            //    DebuggerTestPath + @"WellKnownUnhandledException.js",
+            //    ExceptionHitTreatment.BreakAlways,
+            //    null,
+            //    8,
+            //    new ExceptionInfo("Error", "Error: Error description", 2)
+            //);
 
             // Explicit break always
             TestExceptions(
                 DebuggerTestPath + @"WellKnownUnhandledException.js",
                 ExceptionHitTreatment.BreakNever,
-                CollectExceptionTreatments("Error", ExceptionHitTreatment.BreakAlways),
+                CollectExceptionTreatments(ExceptionHitTreatment.BreakAlways, "Error"),
                 8,
                 new ExceptionInfo("Error", "Error: Error description", 2)
             );
@@ -1534,25 +1534,25 @@ namespace NodejsTests.Debugger {
             TestExceptions(
                 DebuggerTestPath + @"WellKnownUnhandledException.js",
                 ExceptionHitTreatment.BreakAlways,
-                CollectExceptionTreatments("Error", ExceptionHitTreatment.BreakAlways),
+                CollectExceptionTreatments(ExceptionHitTreatment.BreakAlways, "Error"),
                 8,
                 new ExceptionInfo("Error", "Error: Error description", 2)
             );
 
             // Implicit break on unhandled
-            TestExceptions(
-                DebuggerTestPath + @"WellKnownUnhandledException.js",
-                ExceptionHitTreatment.BreakOnUnhandled,
-                null,
-                8,
-                new ExceptionInfo("Error", "Error: Error description", 2)
-            );
+            //TestExceptions(
+            //    DebuggerTestPath + @"WellKnownUnhandledException.js",
+            //    ExceptionHitTreatment.BreakOnUnhandled,
+            //    null,
+            //    8,
+            //    new ExceptionInfo("Error", "Error: Error description", 2)
+            //);
 
             // Explicit break on unhandled
             TestExceptions(
                 DebuggerTestPath + @"WellKnownUnhandledException.js",
                 ExceptionHitTreatment.BreakNever,
-                CollectExceptionTreatments("Error", ExceptionHitTreatment.BreakOnUnhandled),
+                CollectExceptionTreatments(ExceptionHitTreatment.BreakOnUnhandled, "Error"),
                 8,
                 new ExceptionInfo("Error", "Error: Error description", 2)
             );
@@ -1561,7 +1561,7 @@ namespace NodejsTests.Debugger {
             TestExceptions(
                 DebuggerTestPath + @"WellKnownUnhandledException.js",
                 ExceptionHitTreatment.BreakOnUnhandled,
-                CollectExceptionTreatments("Error", ExceptionHitTreatment.BreakOnUnhandled),
+                CollectExceptionTreatments(ExceptionHitTreatment.BreakOnUnhandled, "Error"),
                 8,
                 new ExceptionInfo("Error", "Error: Error description", 2)
             );
@@ -1572,7 +1572,7 @@ namespace NodejsTests.Debugger {
             TestExceptions(
                 DebuggerTestPath + @"ExceptionTypes.js",
                 ExceptionHitTreatment.BreakAlways,
-                null,
+                CollectExceptionTreatments(ExceptionHitTreatment.BreakAlways, "Error", "RangeError", "TypeError", "ReferenceError", "URIError", "SyntaxError", "EvalError", "UserDefinedError", "UserDefinedRangeError", "UserDefinedType"),
                 0,
                 new ExceptionInfo("Error", "Error: msg", 3),
                 new ExceptionInfo("ReferenceError", "ReferenceError: UndefinedVariable is not defined", 9),
@@ -1595,7 +1595,7 @@ namespace NodejsTests.Debugger {
             TestExceptions(
                 DebuggerTestPath + @"ComplexExceptions.js",
                 ExceptionHitTreatment.BreakAlways,
-                null,
+                CollectExceptionTreatments(ExceptionHitTreatment.BreakAlways, "Error", "UserDefinedClass", "TypeError", "ReferenceError"),
                 0,
                 new ExceptionInfo("UserDefinedClass", "[object Object]", 5),
                 new ExceptionInfo("TypeError", "TypeError: TypeError description", 13),
@@ -1656,7 +1656,7 @@ namespace NodejsTests.Debugger {
                     new TestStep(action: TestAction.ResumeProcess, expectedExitCode: 0),
                 },
                 defaultExceptionTreatment: ExceptionHitTreatment.BreakAlways,
-                exceptionTreatments: CollectExceptionTreatments(NodeVariableType.String, ExceptionHitTreatment.BreakNever)
+                exceptionTreatments: CollectExceptionTreatments(ExceptionHitTreatment.BreakNever, NodeVariableType.String)
             );
         }
 
@@ -1760,7 +1760,8 @@ namespace NodejsTests.Debugger {
                     new TestStep(action: TestAction.ResumeThread, expectedEntryPointHit: 0),
                     new TestStep(action: TestAction.ResumeProcess, expectedExceptionRaised: new ExceptionInfo("Error", "Error: msg", 1)),
                     new TestStep(action: TestAction.ResumeProcess, expectedExitCode: 8),
-                }
+                },
+                exceptionTreatments: CollectExceptionTreatments(ExceptionHitTreatment.BreakAlways, "Error")
             );
 
         }

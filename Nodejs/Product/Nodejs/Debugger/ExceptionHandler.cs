@@ -82,8 +82,14 @@ namespace Microsoft.NodejsTools.Debugger {
         }
 
         private Dictionary<string, ExceptionHitTreatment> GetDefaultExceptionTreatments() {
-            // Keep exception types in sync with those declared in ProvideDebugExceptionAttribute's in NodePackage.cs
+            // Keep exception types in sync with those declared in ProvideDebugExceptionAttribute's in NodePackage.Debugger.cs
+#if FALSE
             string[] exceptionTypes = {
+            };
+#endif
+
+            string[] breakNeverTypes = {
+                // should probably be break on unhandled when we have just my code support
                 "Error",
                 "Error(EACCES)",
                 "Error(EADDRINUSE)",
@@ -175,20 +181,18 @@ namespace Microsoft.NodejsTools.Debugger {
                 "ReferenceError",
                 "SyntaxError",
                 "TypeError",
-                "URIError"
-            };
-
-            string[] breakNeverTypes = {
-                // should probably be break on unhandled when we have just my code support
+                "URIError",
                 "Error(ENOENT)",
                 "Error(MODULE_NOT_FOUND)",
                 "SyntaxError"
             };
 
             var defaultExceptionTreatments = new Dictionary<string, ExceptionHitTreatment>();
+#if FALSE
             foreach (string exceptionType in exceptionTypes) {
                 defaultExceptionTreatments[exceptionType] = ExceptionHitTreatment.BreakAlways;
             }
+#endif
 
             foreach (string exceptionType in breakNeverTypes) {
                 defaultExceptionTreatments[exceptionType] = ExceptionHitTreatment.BreakNever;

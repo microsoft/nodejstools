@@ -65,6 +65,8 @@ namespace Microsoft.NodejsTools.Project {
             if (nodePath == null) {
                 Nodejs.ShowNodejsNotInstalled();
                 return VSConstants.S_OK;
+            } else if (!Nodejs.CheckNodejsSupported(nodePath)) {
+                return VSConstants.S_OK;
             }
 
             bool startBrowser = ShouldStartBrowser();
@@ -79,12 +81,6 @@ namespace Microsoft.NodejsTools.Project {
                 psi.Arguments = GetFullArguments(file);
                 psi.WorkingDirectory = _project.GetWorkingDirectory();
 
-                NodeDebugger.FixupForRunAndWait(
-                    NodejsPackage.Instance.GeneralOptionsPage.WaitOnAbnormalExit,
-                    NodejsPackage.Instance.GeneralOptionsPage.WaitOnNormalExit,
-                    psi
-                );
-
                 string webBrowserUrl = GetFullUrl();
                 Uri uri = null;
                 if (!String.IsNullOrWhiteSpace(webBrowserUrl)) {
@@ -97,7 +93,11 @@ namespace Microsoft.NodejsTools.Project {
                     psi.EnvironmentVariables[nameValue.Key] = nameValue.Value;
                 }
 
-                var process = Process.Start(psi);
+                var process = NodeProcess.Start(
+                    psi,
+                    NodejsPackage.Instance.GeneralOptionsPage.WaitOnAbnormalExit,
+                    NodejsPackage.Instance.GeneralOptionsPage.WaitOnNormalExit
+                );
 
                 if (startBrowser && uri != null) {
                     OnPortOpenedHandler.CreateHandler(
@@ -193,9 +193,9 @@ namespace Microsoft.NodejsTools.Project {
             VsDebugTargetInfo dbgInfo = new VsDebugTargetInfo();
             dbgInfo.cbSize = (uint)Marshal.SizeOf(dbgInfo);
 
-            SetupDebugInfo(ref dbgInfo, startupFile);
-
-            LaunchDebugger(_project.Site, dbgInfo);
+            if (SetupDebugInfo(ref dbgInfo, startupFile)) {
+                LaunchDebugger(_project.Site, dbgInfo);
+            }
         }
 
 
@@ -227,10 +227,13 @@ namespace Microsoft.NodejsTools.Project {
         /// <summary>
         /// Sets up debugger information.
         /// </summary>
-        private void SetupDebugInfo(ref VsDebugTargetInfo dbgInfo, string startupFile) {
+        private bool SetupDebugInfo(ref VsDebugTargetInfo dbgInfo, string startupFile) {
             dbgInfo.dlo = DEBUG_LAUNCH_OPERATION.DLO_CreateProcess;
 
             dbgInfo.bstrExe = GetNodePath();
+            if (!Nodejs.CheckNodejsSupported(dbgInfo.bstrExe)) {
+                return false;
+            }
             dbgInfo.bstrCurDir = _project.GetWorkingDirectory();
             dbgInfo.bstrArg = GetFullArguments(startupFile, includeNodeArgs: false);    // we need to supply node args via options
             dbgInfo.bstrRemoteMachine = null;
@@ -293,6 +296,7 @@ namespace Microsoft.NodejsTools.Project {
             // Set the Node  debugger
             dbgInfo.clsidCustom = AD7Engine.DebugEngineGuid;
             dbgInfo.grfLaunch = (uint)__VSDBGLAUNCHFLAGS.DBGLAUNCH_StopDebuggingOnEnd;
+            return true;
         }
 
         private bool ShouldStartBrowser() {

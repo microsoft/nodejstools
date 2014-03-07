@@ -65,11 +65,9 @@ namespace Microsoft.NodejsTools {
             var newProject = string.Format(CultureInfo.InvariantCulture, "Projects\\{0}", _webProjectGuid);
             using (Key projectKey = context.CreateKey(newProject)) {
                 projectKey.SetValue(null, _description);
-                projectKey.SetValue(_package, _languageGuid);
                 projectKey.SetValue("Language(VsTemplate)", _languageName);
-                //projectKey.SetValue("Package", _package);
+                projectKey.SetValue("Package", _package);
                 projectKey.SetValue("ShowOnlySpecifiedTemplates(VsTemplate)", 0);
-                projectKey.SetValue("TemplateGroupIDs(VsTemplate)", _templateGroup);
 
                 using (Key propKey = projectKey.CreateSubkey("WebApplicationProperties")) {
                     propKey.SetValue("CodeFileExtension", _codeFileExtension);

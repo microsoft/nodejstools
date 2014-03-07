@@ -12,6 +12,7 @@
  *
  * ***************************************************************************/
 
+using System;
 using System.IO;
 using System.Linq;
 using EnvDTE;
@@ -32,6 +33,7 @@ namespace Microsoft.Nodejs.Tests.UI {
                 foreach (var exitCode in new[] { 0, 1 }) {
                     foreach (var waitOnAbnormal in new[] { true, false }) {
                         foreach (var waitOnNormal in new[] { true, false }) {
+                            Console.WriteLine("Testing {0} {1} {2} {3}", debug, exitCode, waitOnAbnormal, waitOnNormal);
                             var filename = Path.Combine(TestData.GetTempPath(), Path.GetRandomFileName());
 
                             var project = Project("WaitOnExit",
@@ -43,7 +45,7 @@ process.exit(" + exitCode + ");"),
                             );
 
                             using (var solution = project.Generate().ToVs()) {
-                                var waitingOnProcess = (waitOnAbnormal || waitOnNormal) ? "cmd" : "node";
+                                var waitingOnProcess = (waitOnAbnormal || waitOnNormal) ? "Microsoft.NodejsTools.PressAnyKey" : "node";
                                 var beginningProcesses = System.Diagnostics.Process.GetProcessesByName(
                                     waitingOnProcess
                                 ).Select(x => x.Id);

@@ -249,6 +249,8 @@
     <Compile Include="Commands\OpenRemoteDebugDocumentationCommand.cs" />
     <Compile Include="Commands\OpenRemoteDebugProxyFolderCommand.cs" />
     <Compile Include="Commands\SurveyNewsCommand.cs" />
+    <Compile Include="Debugger\NodeProcess.cs" />
+    <Compile Include="NodejsPackage.Debugger.cs" />
     <Compile Include="NpmUI\ExecuteNpmCommandWindow.xaml.cs">
       <DependentUpon>ExecuteNpmCommandWindow.xaml</DependentUpon>
     </Compile>
@@ -1042,6 +1044,12 @@
     <ProjectReference Include="..\Npm\Npm.csproj">
       <Project>{e5ef4b0a-ab41-4b98-8fa8-98d6348003a8}</Project>
       <Name>Npm</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\PressAnyKey\PressAnyKey.csproj">
+      <Project>{cb61d8bd-48dc-40f4-a4ba-5b68a10a7481}</Project>
+      <Name>PressAnyKey</Name>
+      <IncludeOutputGroupsInVSIX>BuiltProjectOutputGroup%3bBuiltProjectOutputGroupDependencies%3bGetCopyToOutputDirectoryItems%3bSatelliteDllsProjectOutputGroup%3b</IncludeOutputGroupsInVSIX>
+      <IncludeOutputGroupsInVSIXLocalOnly>DebugSymbolsProjectOutputGroup%3b</IncludeOutputGroupsInVSIXLocalOnly>
     </ProjectReference>
     <ProjectReference Include="..\ProjectWizard\ProjectWizard.csproj">
       <Project>{dbc73df7-1b4c-48be-8b48-715297487e7a}</Project>
