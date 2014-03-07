@@ -64,6 +64,7 @@ namespace NodejsTests.Debugger.Commands {
             // Arrange
             const int commandId = 3;
             const bool includeSource = true;
+            const string nodejs = "node.js";
             var debugger = new NodeDebugger(new Uri("tcp://localhost:5858"), 1);
             var scriptsCommand = new ScriptsCommand(commandId, debugger, includeSource);
 
@@ -75,7 +76,10 @@ namespace NodejsTests.Debugger.Commands {
             Assert.IsNotNull(scriptsCommand.Modules);
             Assert.AreEqual(17, scriptsCommand.Modules.Count);
             NodeModule module = scriptsCommand.Modules[0];
-            Assert.AreEqual("node.js", module.Name);
+            Assert.AreEqual(nodejs, module.Name);
+            Assert.AreEqual(nodejs, module.Source);
+            Assert.AreEqual(nodejs, module.FileName);
+            Assert.AreEqual(nodejs, module.JavaScriptFileName);
             Assert.AreEqual(17, module.ModuleId);
         }
     }

@@ -25,7 +25,7 @@ namespace NodejsTests.Debugger.Serialization {
         public void CreateBacktraceVariable() {
             // Arrange
             JObject json = SerializationTestData.GetBacktraceJsonObject();
-            var stackFrame = new NodeStackFrame(null, null, null, 0, 0, 0, 0);
+            var stackFrame = new NodeStackFrame(null, null, null, 0, 0, 0, 0, 0);
 
             // Act
             var result = new NodeBacktraceVariable(stackFrame, json);
@@ -48,7 +48,7 @@ namespace NodejsTests.Debugger.Serialization {
         public void CreateBacktraceVariableWithNullName() {
             // Arrange
             JObject json = SerializationTestData.GetBacktraceJsonObjectWithNullName();
-            var stackFrame = new NodeStackFrame(null, null, null, 0, 0, 0, 0);
+            var stackFrame = new NodeStackFrame(null, null, null, 0, 0, 0, 0, 0);
 
             // Act
             var result = new NodeBacktraceVariable(stackFrame, json);
@@ -89,7 +89,7 @@ namespace NodejsTests.Debugger.Serialization {
         [TestMethod]
         public void CreateBacktraceVariableWithNullJson() {
             // Arrange
-            var stackFrame = new NodeStackFrame(null, null, null, 0, 0, 0, 0);
+            var stackFrame = new NodeStackFrame(null, null, null, 0, 0, 0, 0, 0);
             Exception exception = null;
             NodeBacktraceVariable result = null;
 

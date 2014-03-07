@@ -18,6 +18,7 @@ using System.Diagnostics;
 using System.IO;
 using System.Runtime.InteropServices;
 using System.Web;
+using EnvDTE;
 using Microsoft.NodejsTools.Debugger.Remote;
 using Microsoft.NodejsTools.Project;
 using Microsoft.VisualStudio;
@@ -67,6 +68,8 @@ namespace Microsoft.NodejsTools.Debugger.DebugEngine {
 
         public const string DebugEngineId = "{0A638DAC-429B-4973-ADA0-E8DCDFB29B61}";
         public static Guid DebugEngineGuid = new Guid(DebugEngineId);
+        private bool _trackFileChanges;
+        private DocumentEvents _documentEvents;
 
         /// <summary>
         /// Specifies whether the process should prompt for input before exiting on an abnormal exit.
@@ -296,6 +299,11 @@ namespace Microsoft.NodejsTools.Debugger.DebugEngine {
                 _ad7ProgramId = Guid.Empty;
                 _threads.Clear();
                 _modules.Clear();
+
+                if (_trackFileChanges) {
+                    _documentEvents.DocumentSaved -= OnDocumentSaved;
+                    _documentEvents = null;
+                }
 
                 debuggedProcess.Close();
             } else {
@@ -697,7 +705,7 @@ namespace Microsoft.NodejsTools.Debugger.DebugEngine {
 
             pDocPos.GetRange(beginning, end);
 
-            ppEnum = new AD7CodeContextEnum(new[] { new AD7MemoryAddress(this, filename, beginning[0].dwLine) });
+            ppEnum = new AD7CodeContextEnum(new[] { new AD7MemoryAddress(this, filename, (int)beginning[0].dwLine, (int)beginning[0].dwColumn) });
             return VSConstants.S_OK;
         }
 
@@ -944,7 +952,16 @@ namespace Microsoft.NodejsTools.Debugger.DebugEngine {
             process.StepComplete += OnStepComplete;
             process.ThreadExited += OnThreadExited;
             process.DebuggerOutput += OnDebuggerOutput;
-            
+
+            // Subscribe to document changes when enabled Edit and Continue
+            NodejsPackage package = NodejsPackage.Instance;
+            _trackFileChanges = package.GeneralOptionsPage.EditAndContinue;
+
+            if (_trackFileChanges) {
+                _documentEvents = package.DTE.Events.DocumentEvents;
+                _documentEvents.DocumentSaved += OnDocumentSaved;
+            }
+
             process.StartListening();
         }
 
@@ -1084,7 +1101,7 @@ namespace Microsoft.NodejsTools.Debugger.DebugEngine {
         private void OnBreakpointBound(object sender, BreakpointBindingEventArgs e) {
             var pendingBreakpoint = _breakpointManager.GetPendingBreakpoint(e.Breakpoint);
             var breakpointBinding = e.BreakpointBinding;
-            var codeContext = new AD7MemoryAddress(this, pendingBreakpoint.DocumentName, (uint)breakpointBinding.RequestedLineNo);
+            var codeContext = new AD7MemoryAddress(this, pendingBreakpoint.DocumentName, breakpointBinding.RequestedLineNo, breakpointBinding.RequestedColumnNo);
             var documentContext = new AD7DocumentContext(codeContext);
             var breakpointResolution = new AD7BreakpointResolution(this, breakpointBinding, documentContext);
             var boundBreakpoint = new AD7BoundBreakpoint(breakpointBinding, pendingBreakpoint, breakpointResolution, breakpointBinding.Enabled);
@@ -1131,6 +1148,24 @@ namespace Microsoft.NodejsTools.Debugger.DebugEngine {
             }
 
             Send(new AD7DebugOutputStringEvent2(e.Output), AD7DebugOutputStringEvent2.IID, thread);
+        }
+
+        private async void OnDocumentSaved(Document document) {
+            var module = Process.GetModuleForFilePath(document.FullName);
+            if (module == null) {
+                return;
+            }
+
+            // Rebuild current project if required
+            if (String.Equals(Path.GetExtension(module.FileName), NodejsConstants.TypeScriptExtension, StringComparison.OrdinalIgnoreCase)) {
+                document.ProjectItem.ContainingProject.GetNodeProject().Build(null, null);
+            }
+
+            // Update module source
+            if (!await Process.UpdatedModuleSourceAsync(module).ConfigureAwait(false)) {
+                var statusBar = (IVsStatusbar)ServiceProvider.GlobalProvider.GetService(typeof(SVsStatusbar));
+                statusBar.SetText(Resources.DebuggerModuleUpdateFailed);
+            }
         }
 
         #endregion

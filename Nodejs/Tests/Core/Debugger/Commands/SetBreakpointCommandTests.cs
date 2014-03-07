@@ -12,9 +12,11 @@
  *
  * ***************************************************************************/
 
+using System;
 using Microsoft.NodejsTools.Debugger;
 using Microsoft.NodejsTools.Debugger.Commands;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
+using Newtonsoft.Json.Linq;
 
 namespace NodejsTests.Debugger.Commands {
     [TestClass]
@@ -25,10 +27,11 @@ namespace NodejsTests.Debugger.Commands {
             const int commandId = 3;
             const int moduleId = 5;
             const int line = 2;
+            const int column = 0;
             const string fileName = "module.js";
             var module = new NodeModule(moduleId, fileName, fileName);
             var breakOn = new BreakOn(BreakOnKind.Equal, 2);
-            var breakpoint = new NodeBreakpoint(null, null, null, line, 0, true, breakOn, null);
+            var breakpoint = new NodeBreakpoint(null, null, null, line, column, true, breakOn, null);
 
             // Act
             var setBreakpointCommand = new SetBreakpointCommand(commandId, module, breakpoint);
@@ -38,7 +41,7 @@ namespace NodejsTests.Debugger.Commands {
             Assert.AreEqual(
                 string.Format(
                     "{{\"command\":\"setbreakpoint\",\"seq\":{0},\"type\":\"request\",\"arguments\":{{\"line\":{1},\"column\":{2},\"type\":\"scriptId\",\"target\":{3},\"ignoreCount\":1}}}}",
-                    commandId, line, 0, module.ModuleId),
+                    commandId, line, column, module.ModuleId),
                 setBreakpointCommand.ToString());
         }
 
@@ -48,10 +51,11 @@ namespace NodejsTests.Debugger.Commands {
             const int commandId = 3;
             const int moduleId = 5;
             const int line = 0;
+            const int column = 0;
             const string fileName = "module.js";
             var module = new NodeModule(moduleId, fileName, fileName);
             var breakOn = new BreakOn(BreakOnKind.Equal, 2);
-            var breakpoint = new NodeBreakpoint(null, null, null, line, 0, true, breakOn, null);
+            var breakpoint = new NodeBreakpoint(null, null, null, line, column, true, breakOn, null);
 
             // Act
             var setBreakpointCommand = new SetBreakpointCommand(commandId, module, breakpoint);
@@ -61,7 +65,7 @@ namespace NodejsTests.Debugger.Commands {
             Assert.AreEqual(
                 string.Format(
                     "{{\"command\":\"setbreakpoint\",\"seq\":{0},\"type\":\"request\",\"arguments\":{{\"line\":{1},\"column\":{2},\"type\":\"scriptId\",\"target\":{3},\"ignoreCount\":1}}}}",
-                    commandId, line, 1, module.ModuleId),
+                    commandId, line, column + NodeConstants.ScriptWrapBegin.Length, module.ModuleId),
                 setBreakpointCommand.ToString());
         }
 
@@ -70,9 +74,10 @@ namespace NodejsTests.Debugger.Commands {
             // Arrange
             const int commandId = 3;
             const int line = 2;
+            const int column = 0;
             const string fileName = "module.js";
             var breakOn = new BreakOn(BreakOnKind.Equal, 2);
-            var breakpoint = new NodeBreakpoint(null, fileName, null, line, 0, true, breakOn, null);
+            var breakpoint = new NodeBreakpoint(null, fileName, null, line, column, true, breakOn, null);
 
             // Act
             var setBreakpointCommand = new SetBreakpointCommand(commandId, null, breakpoint);
@@ -82,7 +87,7 @@ namespace NodejsTests.Debugger.Commands {
             Assert.AreEqual(
                 string.Format(
                     "{{\"command\":\"setbreakpoint\",\"seq\":{0},\"type\":\"request\",\"arguments\":{{\"line\":{1},\"column\":{2},\"type\":\"scriptRegExp\",\"target\":\"^[Mm][Oo][Dd][Uu][Ll][Ee]\\\\.[Jj][Ss]$\",\"ignoreCount\":1}}}}",
-                    commandId, line, 0),
+                    commandId, line, column),
                 setBreakpointCommand.ToString());
         }
 
@@ -92,10 +97,11 @@ namespace NodejsTests.Debugger.Commands {
             const int commandId = 3;
             const int moduleId = 5;
             const int line = 2;
+            const int column = 0;
             const string fileName = "module.js";
             var module = new NodeModule(moduleId, fileName, fileName);
             var breakOn = new BreakOn(BreakOnKind.Equal, 2);
-            var breakpoint = new NodeBreakpoint(null, null, null, line, 0, true, breakOn, null);
+            var breakpoint = new NodeBreakpoint(null, null, null, line, column, true, breakOn, null);
 
             // Act
             var setBreakpointCommand = new SetBreakpointCommand(commandId, module, breakpoint, true);
@@ -105,8 +111,56 @@ namespace NodejsTests.Debugger.Commands {
             Assert.AreEqual(
                 string.Format(
                     "{{\"command\":\"setbreakpoint\",\"seq\":{0},\"type\":\"request\",\"arguments\":{{\"line\":{1},\"column\":{2},\"type\":\"scriptId\",\"target\":{3}}}}}",
-                    commandId, line, 0, moduleId),
+                    commandId, line, column, moduleId),
                 setBreakpointCommand.ToString());
+        }
+
+        [TestMethod]
+        public void ProcessSetBreakpointResponse() {
+            // Arrange
+            const int commandId = 3;
+            const int moduleId = 33;
+            const int line = 2;
+            const int column = 0;
+            const string fileName = "module.js";
+            var module = new NodeModule(moduleId, fileName, fileName);
+            var breakOn = new BreakOn(BreakOnKind.Equal, 2);
+            var breakpoint = new NodeBreakpoint(null, null, null, line, column, true, breakOn, null);
+            var setBreakpointCommand = new SetBreakpointCommand(commandId, module, breakpoint);
+            JObject breakpointResponse = SerializationTestData.GetSetBreakpointResponse();
+
+            // Act
+            setBreakpointCommand.ProcessResponse(breakpointResponse);
+
+            // Assert
+            Assert.AreEqual(2, setBreakpointCommand.BreakpointId);
+            Assert.AreEqual(0, setBreakpointCommand.ColumnNo);
+            Assert.AreEqual(0, setBreakpointCommand.LineNo);
+            Assert.AreEqual(false, setBreakpointCommand.Running);
+            Assert.AreEqual(33, setBreakpointCommand.ScriptId);
+        }
+
+        [TestMethod]
+        public void CreateSetBreakpointCommandWithNullBreakpoint() {
+            // Arrange
+            const int commandId = 3;
+            const int moduleId = 5;
+            const string fileName = "module.js";
+            var module = new NodeModule(moduleId, fileName, fileName);
+            SetBreakpointCommand setBreakpointCommand = null;
+            Exception exception = null;
+
+            // Act
+            try {
+                setBreakpointCommand = new SetBreakpointCommand(commandId, module, null);
+            } catch (Exception e) {
+                exception = e;
+            }
+
+            // Assert
+            Assert.IsNull(setBreakpointCommand);
+            Assert.IsNotNull(exception);
+            Assert.IsInstanceOfType(exception, typeof (ArgumentNullException));
         }
     }
 }

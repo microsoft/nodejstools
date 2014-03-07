@@ -124,6 +124,15 @@ namespace Microsoft.NodejsTools {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Failed to update file contents..
+        /// </summary>
+        internal static string DebuggerModuleUpdateFailed {
+            get {
+                return ResourceManager.GetString("DebuggerModuleUpdateFailed", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Specifies the port used to communicate with the debugger.
         /// </summary>
         internal static string DebuggerPort {

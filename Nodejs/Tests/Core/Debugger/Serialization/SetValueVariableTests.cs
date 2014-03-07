@@ -12,7 +12,6 @@
  *
  * ***************************************************************************/
 
-using System;
 using Microsoft.NodejsTools.Debugger;
 using Microsoft.NodejsTools.Debugger.Serialization;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
@@ -26,7 +25,7 @@ namespace NodejsTests.Debugger.Serialization {
             // Arrange
             JObject json = SerializationTestData.GetSetVariableValueResponse();
             const int frameId = 3;
-            var stackFrame = new NodeStackFrame(null, null, null, 0, 0, 0, frameId);
+            var stackFrame = new NodeStackFrame(null, null, null, 0, 0, 0, 0, frameId);
             const string name = "name";
 
             // Act

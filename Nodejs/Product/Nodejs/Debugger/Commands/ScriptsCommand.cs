@@ -17,8 +17,8 @@ using Newtonsoft.Json.Linq;
 
 namespace Microsoft.NodejsTools.Debugger.Commands {
     sealed class ScriptsCommand : DebuggerCommand {
-        private readonly NodeDebugger _debugger;
         private readonly Dictionary<string, object> _arguments;
+        private readonly NodeDebugger _debugger;
 
         public ScriptsCommand(int id, NodeDebugger debugger, bool includeSource = false, int? moduleId = null) : base(id, "scripts") {
             _debugger = debugger;
@@ -40,19 +40,25 @@ namespace Microsoft.NodejsTools.Debugger.Commands {
         public override void ProcessResponse(JObject response) {
             base.ProcessResponse(response);
 
-            var body = (JArray)response["body"];
+            JArray body = (JArray)response["body"] ?? new JArray();
+            Modules = new List<NodeModule>(body.Count);
 
-            var result = new List<NodeModule>(body.Count);
             foreach (JToken module in body) {
                 var id = (int)module["id"];
                 var source = (string)module["source"];
+                if (!string.IsNullOrEmpty(source) &&
+                    source.StartsWith(NodeConstants.ScriptWrapBegin) && 
+                    source.EndsWith(NodeConstants.ScriptWrapEnd)) {
+                    source = source.Substring(
+                        NodeConstants.ScriptWrapBegin.Length, 
+                        source.Length - NodeConstants.ScriptWrapBegin.Length - NodeConstants.ScriptWrapEnd.Length);
+                }
+
                 var javaScriptFileName = (string)module["name"];
-                var fileName = _debugger.GetModuleFileName(javaScriptFileName);
+                string fileName = _debugger.GetModuleFileName(javaScriptFileName);
 
-                result.Add(new NodeModule(id, fileName, javaScriptFileName, source));
+                Modules.Add(new NodeModule(id, fileName, javaScriptFileName) { Source = source });
             }
-
-            Modules = result;
         }
     }
 }

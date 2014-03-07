@@ -44,7 +44,7 @@ namespace NodejsTests.Debugger.Commands {
         }
 
         [TestMethod]
-        public void ProcessBacktraceForКCallstackDepth() {
+        public void ProcessBacktraceForCallstackDepth() {
             // Arrange
             const int commandId = 3;
             const int fromFrame = 0;
@@ -60,7 +60,10 @@ namespace NodejsTests.Debugger.Commands {
 
             // Assert
             Assert.AreEqual(7, backtraceCommand.CallstackDepth);
-            Assert.IsNull(backtraceCommand.StackFrames);
+            Assert.IsNotNull(backtraceCommand.Modules);
+            Assert.AreEqual(0, backtraceCommand.Modules.Count);
+            Assert.IsNotNull(backtraceCommand.StackFrames);
+            Assert.AreEqual(0, backtraceCommand.StackFrames.Count);
             resultFactoryMock.Verify(factory => factory.Create(It.IsAny<INodeVariable>()), Times.Never);
         }
 
@@ -86,8 +89,11 @@ namespace NodejsTests.Debugger.Commands {
             Assert.AreEqual(NodeVariableType.AnonymousFunction, firstFrame.FunctionName);
             Assert.AreEqual(@"C:\Users\Tester\documents\visual studio 2012\Projects\NodejsApp1\NodejsApp1\server.js", firstFrame.FileName);
             Assert.AreEqual(22, firstFrame.LineNo);
+            Assert.AreEqual(0, firstFrame.ColumnNo);
             Assert.AreEqual(15, firstFrame.Locals.Count);
             Assert.AreEqual(5, firstFrame.Parameters.Count);
+            Assert.IsNotNull(backtraceCommand.Modules);
+            Assert.AreEqual(3, backtraceCommand.Modules.Count);
             resultFactoryMock.Verify(factory => factory.Create(It.IsAny<INodeVariable>()), Times.Exactly(51));
         }
     }

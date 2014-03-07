@@ -269,8 +269,10 @@
       <DesignTime>True</DesignTime>
       <DependentUpon>Resources.resx</DependentUpon>
     </Compile>
+    <Compile Include="Debugger\Communication\AsyncProducerConsumerCollection.cs" />
     <Compile Include="Debugger\BreakOn.cs" />
     <Compile Include="Debugger\BreakOnKind.cs" />
+    <Compile Include="Debugger\Commands\ChangeLiveCommand.cs" />
     <Compile Include="Debugger\Commands\SetVariableValueCommand.cs" />
     <Compile Include="Debugger\Communication\INetworkClient.cs" />
     <Compile Include="Debugger\Communication\INetworkClientFactory.cs" />
@@ -281,6 +283,7 @@
     <Compile Include="Debugger\ExceptionHitTreatment.cs" />
     <Compile Include="Debugger\ExceptionHandler.cs" />
     <Compile Include="Debugger\JavaScriptSourceMapInfo.cs" />
+    <Compile Include="Debugger\NodeConstants.cs" />
     <Compile Include="Debugger\Serialization\NodeSetValueVariable.cs" />
     <Compile Include="Debugger\SourceMapper.cs" />
     <Compile Include="Debugger\SteppingKind.cs" />

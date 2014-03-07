@@ -90,7 +90,7 @@ namespace NodejsTests.Debugger {
                 DebugProcess(
                     filename,
                     onLoadComplete: (newproc, newthread) => {
-                        AddBreakPoint(newproc, filename, lineNo);
+                        AddBreakPoint(newproc, filename, lineNo, 0);
                         thread = newthread;
                     }
                 );
@@ -2612,12 +2612,14 @@ namespace NodejsTests.Debugger {
                 "TypeScriptTest.js",
                 new[] {
                     new TestStep(action: TestAction.AddBreakpoint, 
-                        targetBreakpoint: 1, 
+                        targetBreakpoint: 1,
+                        targetBreakpointColumn: 43,
                         targetBreakpointFile: "TypeScriptTest.ts"),
                     new TestStep(action: TestAction.ResumeThread, expectedEntryPointHit: 0),
                     new TestStep(action: TestAction.ResumeThread, 
                         expectedHitCount: 1, 
-                        targetBreakpoint: 1, 
+                        targetBreakpoint: 1,
+                        targetBreakpointColumn: 43,
                         targetBreakpointFile: "TypeScriptTest.ts", 
                         expectedBreakFunction: "Greeter.constructor",
                         expectedBreakpointHit: 1),

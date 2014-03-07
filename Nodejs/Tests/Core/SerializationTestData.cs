@@ -85,6 +85,15 @@ namespace NodejsTests {
         }
 
         /// <summary>
+        /// Gets a json evaluation response with reference error.
+        /// </summary>
+        /// <returns>JSON object.</returns>
+        public static JObject GetEvaluateResponseWithReferenceError() {
+            string json = Resources.NodeEvaluationResponseWithReferenceError;
+            return DeserializeJsonValue(json);
+        }
+
+        /// <summary>
         /// Gets a json evaluation object.
         /// </summary>
         /// <returns>JSON object.</returns>
@@ -101,7 +110,7 @@ namespace NodejsTests {
             string json = Resources.NodeLookupResponse;
             return DeserializeJsonValue(json);
         }
-        
+
         /// <summary>
         /// Gets a json lookup response with primitive object.
         /// </summary>
@@ -161,6 +170,24 @@ namespace NodejsTests {
         /// <returns>JSON object.</returns>
         public static JObject GetLookupJsonPrototype() {
             string json = Resources.NodeLookupPrototypeObject;
+            return DeserializeJsonValue(json);
+        }
+
+        /// <summary>
+        /// Gets a json change live response.
+        /// </summary>
+        /// <returns>JSON object.</returns>
+        public static JObject GetChangeLiveResponse() {
+            string json = Resources.NodeChangeLiveResponse;
+            return DeserializeJsonValue(json);
+        }
+
+        /// <summary>
+        /// Gets a json for set breakpoint response.
+        /// </summary>
+        /// <returns>JSON object.</returns>
+        public static JObject GetSetBreakpointResponse() {
+            string json = Resources.NodeSetBreakpointResponse;
             return DeserializeJsonValue(json);
         }
 

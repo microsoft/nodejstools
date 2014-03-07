@@ -19,6 +19,7 @@ using System.Diagnostics;
 using System.IO;
 using System.Linq;
 using System.Net.NetworkInformation;
+using System.Reflection;
 using System.Threading;
 using System.Threading.Tasks;
 using Microsoft.NodejsTools.Debugger.Commands;
@@ -34,25 +35,25 @@ namespace Microsoft.NodejsTools.Debugger {
     class NodeDebugger : IDisposable {
         public readonly int MainThreadId = 1;
         private readonly Dictionary<int, NodeBreakpointBinding> _breakpointBindings = new Dictionary<int, NodeBreakpointBinding>();
-        private readonly Uri _debuggerEndpointUri;
         private readonly IDebuggerClient _client;
         private readonly IDebuggerConnection _connection;
+        private readonly Uri _debuggerEndpointUri;
         private readonly Dictionary<int, string> _errorCodes = new Dictionary<int, string>();
         private readonly ExceptionHandler _exceptionHandler;
-        private readonly Dictionary<int, NodeModule> _mapIdToScript = new Dictionary<int, NodeModule>();
         private readonly Dictionary<string, NodeModule> _mapNameToScript = new Dictionary<string, NodeModule>(StringComparer.OrdinalIgnoreCase);
         private readonly Version _nodeSetVariableValueVersion = new Version(0, 10, 12);
         private readonly EvaluationResultFactory _resultFactory;
+        private readonly SourceMapper _sourceMapper;
         private readonly Dictionary<int, NodeThread> _threads = new Dictionary<int, NodeThread>();
         private readonly TimeSpan _timeout = TimeSpan.FromSeconds(2);
         private readonly ScriptTree _scriptTree = new ScriptTree(null);
         private bool _attached;
         private bool _breakOnAllExceptions;
         private bool _breakOnUncaughtExceptions;
+        private int _commandId;
         private bool _handleEntryPointHit;
         private int? _id;
         private bool _loadCompleteHandled;
-        private int _number;
         private Process _process;
         private int _steppingCallstackDepth;
         private SteppingKind _steppingMode;
@@ -68,7 +69,7 @@ namespace Microsoft.NodejsTools.Debugger {
 
             _resultFactory = new EvaluationResultFactory();
             _exceptionHandler = new ExceptionHandler();
-            SourceMapper = new SourceMapper();
+            _sourceMapper = new SourceMapper();
         }
 
         public NodeDebugger(
@@ -80,7 +81,8 @@ namespace Microsoft.NodejsTools.Debugger {
             NodeDebugOptions debugOptions,
             List<string[]> dirMapping,
             ushort? debuggerPort = null,
-            bool createNodeWindow = true) : this() {
+            bool createNodeWindow = true)
+            : this() {
             // Select debugger port for a local connection
             ushort debuggerPortOrDefault = NodejsConstants.DefaultDebuggerPort;
             if (debuggerPort != null) {
@@ -88,7 +90,7 @@ namespace Microsoft.NodejsTools.Debugger {
             } else {
                 List<int> activeConnections =
                     (from listener in IPGlobalProperties.GetIPGlobalProperties().GetActiveTcpListeners()
-                        select listener.Port).ToList();
+                     select listener.Port).ToList();
                 if (activeConnections.Contains(debuggerPortOrDefault)) {
                     debuggerPortOrDefault = (ushort)Enumerable.Range(new Random().Next(5859, 6000), 60000).Except(activeConnections).First();
                 }
@@ -96,7 +98,7 @@ namespace Microsoft.NodejsTools.Debugger {
 
             _debuggerEndpointUri = new UriBuilder { Scheme = "tcp", Host = "localhost", Port = debuggerPortOrDefault }.Uri;
 
-            var allArgs = String.Format("--debug-brk={0} {1}", debuggerPortOrDefault, script);
+            string allArgs = String.Format("--debug-brk={0} {1}", debuggerPortOrDefault, script);
             if (!string.IsNullOrEmpty(interpreterOptions)) {
                 allArgs = interpreterOptions + " " + allArgs;
             }
@@ -120,8 +122,7 @@ namespace Microsoft.NodejsTools.Debugger {
             FixupForRunAndWait(
                 debugOptions.HasFlag(NodeDebugOptions.WaitOnAbnormalExit),
                 debugOptions.HasFlag(NodeDebugOptions.WaitOnNormalExit),
-                psi
-            );
+                psi);
 
             _process = new Process {
                 StartInfo = psi,
@@ -129,7 +130,8 @@ namespace Microsoft.NodejsTools.Debugger {
             };
         }
 
-        public NodeDebugger(Uri debuggerEndpointUri, int id) : this() {
+        public NodeDebugger(Uri debuggerEndpointUri, int id)
+            : this() {
             _debuggerEndpointUri = debuggerEndpointUri;
             _id = id;
             _attached = true;
@@ -332,10 +334,7 @@ namespace Microsoft.NodejsTools.Debugger {
                 bool running = await PerformBacktraceAsync(cancellationToken).ConfigureAwait(false);
                 Debug.Assert(!running);
             }
-            CompleteStepping();
-        }
 
-        private void CompleteStepping() {
             EventHandler<ThreadEventArgs> stepComplete = StepComplete;
             if (stepComplete != null) {
                 stepComplete(this, new ThreadEventArgs(MainThread));
@@ -349,15 +348,16 @@ namespace Microsoft.NodejsTools.Debugger {
         public NodeBreakpoint AddBreakPoint(
             string requestedFileName,
             int requestedLineNo,
+            int requestedColumnNo,
             bool enabled = true,
             BreakOn breakOn = new BreakOn(),
             string condition = null) {
             string fileName;
             int lineNo;
+            int columnNo;
 
-            SourceMapper.MapToJavaScript(requestedFileName, requestedLineNo, out fileName, out lineNo);
-
-            return new NodeBreakpoint(this, fileName, requestedFileName, lineNo, requestedLineNo, enabled, breakOn, condition);
+            SourceMapper.MapToJavaScript(requestedFileName, requestedLineNo, requestedColumnNo, out fileName, out lineNo, out columnNo);
+            return new NodeBreakpoint(this, fileName, requestedFileName, lineNo, columnNo, enabled, breakOn, condition);
         }
 
         public async void SetExceptionTreatment(
@@ -423,16 +423,48 @@ namespace Microsoft.NodejsTools.Debugger {
 
         // Gets a next command identifier
         private int CommandId {
-            get { return Interlocked.Increment(ref _number); }
+            get { return Interlocked.Increment(ref _commandId); }
         }
 
         /// <summary>
-        /// Gets or sets a source mapper.
+        /// Gets a source mapper.
         /// </summary>
-        public SourceMapper SourceMapper { get; private set; }
+        public SourceMapper SourceMapper {
+            get { return _sourceMapper; }
+        }
 
         internal void Unregister() {
             GC.SuppressFinalize(this);
+        }
+
+        /// <summary>
+        /// Updates a module content while debugging.
+        /// </summary>
+        /// <param name="module">Node module.</param>
+        /// <returns>Operation result.</returns>
+        internal async Task<bool> UpdatedModuleSourceAsync(NodeModule module) {
+            module.Source = File.ReadAllText(module.JavaScriptFileName);
+
+            var changeLiveCommand = new ChangeLiveCommand(CommandId, module);
+            await _client.SendRequestAsync(changeLiveCommand).ConfigureAwait(false);
+
+            // Check whether update was successfull
+            if (!changeLiveCommand.Updated) {
+                return false;
+            }
+
+            // Make step into if required
+            if (changeLiveCommand.NeedStepIn) {
+                var continueCommand = new ContinueCommand(CommandId, SteppingKind.Into);
+                await _client.SendRequestAsync(continueCommand).ConfigureAwait(false);
+            }
+
+            // Update stacktrace if required
+            if (changeLiveCommand.StackModified || changeLiveCommand.NeedStepIn) {
+                await CompleteSteppingAsync(false).ConfigureAwait(false);
+            }
+
+            return true;
         }
 
         /// <summary>
@@ -497,12 +529,11 @@ namespace Microsoft.NodejsTools.Debugger {
         }
 
         private void AddScript(NodeModule newModule) {
-            string name = newModule.JavaScriptFileName;
+            string name = newModule.FileName;
             if (!string.IsNullOrEmpty(name)) {
                 NodeModule module;
                 if (!_mapNameToScript.TryGetValue(name, out module)) {
                     _mapNameToScript[name] = newModule;
-                    _mapIdToScript[newModule.ModuleId] = newModule;
 
                     EventHandler<ModuleLoadedEventArgs> modLoad = ModuleLoaded;
                     if (modLoad != null) {
@@ -512,7 +543,7 @@ namespace Microsoft.NodejsTools.Debugger {
 
                 // we only need to do fuzzy comparisons when debugging remotely
                 ScriptTree curTree = _scriptTree;
-                string[] pathComponents = GetPathComponents(name);
+                string[] pathComponents = GetPathComponents(newModule.JavaScriptFileName);
                 foreach (var component in pathComponents.Reverse()) {
                     ScriptTree nextTree;
                     if (!curTree.Parents.TryGetValue(component, out nextTree)) {
@@ -564,9 +595,13 @@ namespace Microsoft.NodejsTools.Debugger {
         private async void OnBreakpointEvent(object sender, BreakpointEventArgs args) {
             BreakpointEvent breakpointEvent = args.BreakpointEvent;
 
+            // Process breakpoint bindings, ensuring we have callstack
+            bool running = await PerformBacktraceAsync().ConfigureAwait(false);
+            Debug.Assert(!running);
+
             // Complete stepping, if no breakpoint bindings
             if (breakpointEvent.Breakpoints.Count == 0) {
-                await CompleteSteppingAsync(false).ConfigureAwait(false);
+                await CompleteSteppingAsync(true).ConfigureAwait(false);
                 return;
             }
 
@@ -580,71 +615,51 @@ namespace Microsoft.NodejsTools.Debugger {
             }
 
             // Process break for breakpoint bindings, if any
-            if (!await ProcessBreakpointBreakAsync(breakpointEvent.Module, breakpointBindings, false, false).ConfigureAwait(false)) {
+            if (!await ProcessBreakpointBreakAsync(breakpointEvent.Module, breakpointBindings, false).ConfigureAwait(false)) {
                 await AutoResumeAsync(false).ConfigureAwait(false);
             }
         }
 
-        private async Task<bool> ProcessBreakpointBreakAsync(
+        private async Task<bool> ProcessBindingAsync(
             NodeModule brokeIn,
-            List<NodeBreakpointBinding> breakpointBindings,
-            bool haveCallstack,
-            bool testFullyBound,
+            NodeBreakpointBinding binding,
+            List<NodeBreakpointBinding> hitBindings,
+            int bindingsToProcess,
             CancellationToken cancellationToken = new CancellationToken()) {
-            bool result = true;
-            // Handle breakpoint(s) but no matching binding(s)
-            // Indicated by non-null but empty breakpoint bindings collection
-            int bindingsToProcess = breakpointBindings.Count;
-            if (bindingsToProcess == 0) {
-                result = false;
+            // Collect hit breakpoint bindings
+            if (binding != null) {
+                hitBindings.Add(binding);
             }
 
-            // Process breakpoint binding
-            var hitBindings = new List<NodeBreakpointBinding>();
-            Action<NodeBreakpointBinding> processBinding = async binding => {
-                // Collect hit breakpoint bindings
-                if (binding != null) {
-                    hitBindings.Add(binding);
-                }
+            // Handle last processed breakpoint binding by either breaking with breakpoint hit events or calling noBreakpointsHitHandler
+            if (--bindingsToProcess == 0) {
+                if (hitBindings.Count > 0) {
+                    // Fire breakpoint hit event(s)
+                    EventHandler<BreakpointHitEventArgs> breakpointHit = BreakpointHit;
+                    bool match = false;
+                    foreach (NodeBreakpointBinding hitBinding in hitBindings) {
+                        if (FileNameMatchesForBreak(brokeIn, hitBinding)) {
+                            match = true;
+                            NodeBreakpointBinding breakpointBinding = hitBinding;
+                            await hitBinding.ProcessBreakpointHitAsync(cancellationToken).ConfigureAwait(false);
 
-                // Handle last processed breakpoint binding by either breaking with breakpoint hit events or calling noBreakpointsHitHandler
-                if (--bindingsToProcess == 0) {
-                    if (hitBindings.Count > 0) {
-                        // Fire breakpoint hit event(s)
-                        EventHandler<BreakpointHitEventArgs> breakpointHit = BreakpointHit;
-                        bool match = false;
-                        foreach (NodeBreakpointBinding hitBinding in hitBindings) {
-                            if (FileNameMatchesForBreak(brokeIn, hitBinding)) {
-                                match = true;
-                                NodeBreakpointBinding breakpointBinding = hitBinding;
-                                await hitBinding.ProcessBreakpointHitAsync(cancellationToken).ConfigureAwait(false);
-
-                                if (breakpointHit != null) {
-                                    breakpointHit(this, new BreakpointHitEventArgs(breakpointBinding, MainThread));
-                                }
-                            } else {
-                                hitBinding.FixupHitCount();
+                            if (breakpointHit != null) {
+                                breakpointHit(this, new BreakpointHitEventArgs(breakpointBinding, MainThread));
                             }
+                        } else {
+                            hitBinding.FixupHitCount();
                         }
-                        if (!match) {
-                            result = false;
-                        }
-                    } else {
-                        // No breakpoints hit
-                        result = false;
                     }
+                    if (!match) {
+                        return false;
+                    }
+                } else {
+                    // No breakpoints hit
+                    return false;
                 }
-            };
-
-            // Process breakpoint bindings, ensuring we have callstack
-            if (!haveCallstack) {
-                bool running = await PerformBacktraceAsync(cancellationToken).ConfigureAwait(false);
-                Debug.Assert(!running);
             }
 
-            await ProcessBreakpointBindingsAsync(breakpointBindings, processBinding, testFullyBound, cancellationToken).ConfigureAwait(false);
-
-            return result;
+            return true;
         }
 
         private bool FileNameMatchesForBreak(NodeModule brokeIn, NodeBreakpointBinding hitBinding) {
@@ -678,11 +693,22 @@ namespace Microsoft.NodejsTools.Debugger {
             return true;
         }
 
-        private async Task ProcessBreakpointBindingsAsync(
-            IEnumerable<NodeBreakpointBinding> breakpointBindings,
-            Action<NodeBreakpointBinding> processBinding,
+        private async Task<bool> ProcessBreakpointBreakAsync(
+            NodeModule brokeIn,
+            List<NodeBreakpointBinding> breakpointBindings,
             bool testFullyBound,
             CancellationToken cancellationToken = new CancellationToken()) {
+            bool result = true;
+            // Handle breakpoint(s) but no matching binding(s)
+            // Indicated by non-null but empty breakpoint bindings collection
+            int bindingsToProcess = breakpointBindings.Count;
+            if (bindingsToProcess == 0) {
+                result = false;
+            }
+
+            // Process breakpoint binding
+            var hitBindings = new List<NodeBreakpointBinding>();
+
             // Iterate over breakpoint bindings, processing them as fully bound or not
             int currentLineNo = MainThread.TopStackFrame.LineNo;
             foreach (NodeBreakpointBinding breakpointBinding in breakpointBindings) {
@@ -691,14 +717,14 @@ namespace Microsoft.NodejsTools.Debugger {
                     if (testFullyBound) {
                         // Process based on whether hit (based on hit count and/or condition predicates)
                         if (await breakpointBinding.TestAndProcessHitAsync()) {
-                            processBinding(breakpointBinding);
+                            result &= await ProcessBindingAsync(brokeIn, breakpointBinding, hitBindings, bindingsToProcess, cancellationToken).ConfigureAwait(false);
                         } else {
-                            processBinding(null);
+                            result &= await ProcessBindingAsync(brokeIn, null, hitBindings, bindingsToProcess, cancellationToken).ConfigureAwait(false);
                         }
                         continue;
                     }
 
-                    processBinding(breakpointBinding);
+                    result &= await ProcessBindingAsync(brokeIn, breakpointBinding, hitBindings, bindingsToProcess, cancellationToken).ConfigureAwait(false);
                     continue;
                 }
 
@@ -707,27 +733,30 @@ namespace Microsoft.NodejsTools.Debugger {
                 await RemoveBreakPointAsync(breakpointBinding, cancellationToken).ConfigureAwait(false);
 
                 NodeBreakpoint breakpoint = breakpointBinding.Breakpoint;
-                Tuple<int, int?, int> result = await SetBreakpointAsync(breakpoint, cancellationToken: cancellationToken).ConfigureAwait(false);
+                SetBreakpointCommand setResult = await SetBreakpointAsync(breakpoint, cancellationToken: cancellationToken).ConfigureAwait(false);
 
                 // Treat rebound breakpoint binding as fully bound
-                NodeBreakpointBinding reboundbreakpointBinding = CreateBreakpointBinding(breakpoint, result.Item1, result.Item2, result.Item3, true);
+                NodeBreakpointBinding reboundbreakpointBinding = CreateBreakpointBinding(breakpoint, setResult.BreakpointId, setResult.ScriptId, setResult.LineNo, setResult.ColumnNo, true);
                 HandleBindBreakpointSuccess(reboundbreakpointBinding, breakpoint);
 
                 // Handle invalid-line fixup (second bind matches current line)
                 if (reboundbreakpointBinding.LineNo == currentLineNo) {
                     // Process based on whether hit (based on hit count and/or condition predicates)
                     if (await reboundbreakpointBinding.TestAndProcessHitAsync()) {
-                        processBinding(reboundbreakpointBinding);
+                        result &= await ProcessBindingAsync(brokeIn, reboundbreakpointBinding, hitBindings, bindingsToProcess, cancellationToken).ConfigureAwait(false);
                     } else {
-                        processBinding(null);
+                        result &= await ProcessBindingAsync(brokeIn, null, hitBindings, bindingsToProcess, cancellationToken).ConfigureAwait(false);
                     }
-                    return;
+
+                    return result;
                 }
 
                 // Handle lambda-eval fixup (second bind does not match current line)
                 // Process as not hit
-                processBinding(null);
+                result &= await ProcessBindingAsync(brokeIn, null, hitBindings, bindingsToProcess, cancellationToken).ConfigureAwait(false);
             }
+
+            return result;
         }
 
         private async void OnExceptionEvent(object sender, ExceptionEventArgs args) {
@@ -880,13 +909,13 @@ namespace Microsoft.NodejsTools.Debugger {
                 // Attempt to fire breakpoint hit event without actually resuming
                 NodeStackFrame topFrame = MainThread.TopStackFrame;
                 int breakLineNo = topFrame.LineNo;
-                string breakFileName = topFrame.FileName.ToLower();
+                string breakFileName = topFrame.Module.FileName.ToLower();
                 NodeModule breakModule = GetModuleForFilePath(breakFileName);
 
                 var breakpointBindings = new List<NodeBreakpointBinding>();
                 foreach (NodeBreakpointBinding breakpointBinding in _breakpointBindings.Values) {
                     if (breakpointBinding.Enabled && breakpointBinding.LineNo == breakLineNo &&
-                        GetModuleForFilePath(breakpointBinding.FileName) == breakModule) {
+                        GetModuleForFilePath(breakpointBinding.RequestedFileName) == breakModule) {
                         breakpointBindings.Add(breakpointBinding);
                     }
                 }
@@ -894,7 +923,7 @@ namespace Microsoft.NodejsTools.Debugger {
                 if (breakpointBindings.Count > 0) {
                     // Delegate to ProcessBreak() which knows how to correctly
                     // fire breakpoint hit events for given breakpoint bindings and current backtrace
-                    if (!await ProcessBreakpointBreakAsync(breakModule, breakpointBindings, true, true).ConfigureAwait(false)) {
+                    if (!await ProcessBreakpointBreakAsync(breakModule, breakpointBindings, true).ConfigureAwait(false)) {
                         HandleEntryPointHit();
                     }
                     return;
@@ -950,10 +979,10 @@ namespace Microsoft.NodejsTools.Debugger {
         }
 
         public async Task<NodeBreakpointBinding> BindBreakpointAsync(NodeBreakpoint breakpoint, CancellationToken cancellationToken = new CancellationToken()) {
-            Tuple<int, int?, int> result = await SetBreakpointAsync(breakpoint, cancellationToken: cancellationToken).ConfigureAwait(false);
+            SetBreakpointCommand result = await SetBreakpointAsync(breakpoint, cancellationToken: cancellationToken).ConfigureAwait(false);
 
-            bool fullyBound = (result.Item2.HasValue && result.Item3 == breakpoint.LineNo);
-            NodeBreakpointBinding breakpointBinding = CreateBreakpointBinding(breakpoint, result.Item1, result.Item2, result.Item3, fullyBound);
+            bool fullyBound = (result.ScriptId.HasValue && result.LineNo == breakpoint.LineNo);
+            NodeBreakpointBinding breakpointBinding = CreateBreakpointBinding(breakpoint, result.BreakpointId, result.ScriptId, result.LineNo, result.ColumnNo, fullyBound);
 
             // Fully bound (normal case)
             // Treat as success
@@ -968,8 +997,8 @@ namespace Microsoft.NodejsTools.Debugger {
                 await RemoveBreakPointAsync(breakpointBinding, cancellationToken).ConfigureAwait(false);
                 result = await SetBreakpointAsync(breakpoint, true, cancellationToken).ConfigureAwait(false);
 
-                Debug.Assert(!(result.Item2.HasValue && result.Item3 == breakpoint.LineNo));
-                CreateBreakpointBinding(breakpoint, result.Item1, result.Item2, result.Item3, false);
+                Debug.Assert(!(result.ScriptId.HasValue && result.LineNo == breakpoint.LineNo));
+                CreateBreakpointBinding(breakpoint, result.BreakpointId, result.ScriptId, result.LineNo, result.ColumnNo, false);
             }
 
             // Not fully bound, without predicate
@@ -978,23 +1007,23 @@ namespace Microsoft.NodejsTools.Debugger {
             return null;
         }
 
-        internal async Task<Tuple<int, int?, int>> SetBreakpointAsync(
+        private async Task<SetBreakpointCommand> SetBreakpointAsync(
             NodeBreakpoint breakpoint,
             bool withoutPredicate = false,
             CancellationToken cancellationToken = new CancellationToken()) {
-            DebugWriteCommand(String.Format("Set Breakpoint"));
+            DebugWriteCommand("Set Breakpoint");
 
             // Try to find module
-            NodeModule module = GetModuleForFilePath(breakpoint.FileName);
+            NodeModule module = GetModuleForFilePath(breakpoint.RequestedFileName);
 
             var setBreakpointCommand = new SetBreakpointCommand(CommandId, module, breakpoint, withoutPredicate);
             await _client.SendRequestAsync(setBreakpointCommand, cancellationToken).ConfigureAwait(false);
 
-            return new Tuple<int, int?, int>(setBreakpointCommand.BreakpointId, setBreakpointCommand.ScriptId, setBreakpointCommand.LineNo);
+            return setBreakpointCommand;
         }
 
-        private NodeBreakpointBinding CreateBreakpointBinding(NodeBreakpoint breakpoint, int breakpointId, int? scriptId, int lineNo, bool fullyBound) {
-            NodeBreakpointBinding breakpointBinding = breakpoint.CreateBinding(lineNo, breakpointId, scriptId, fullyBound);
+        private NodeBreakpointBinding CreateBreakpointBinding(NodeBreakpoint breakpoint, int breakpointId, int? scriptId, int lineNo, int columnNo, bool fullyBound) {
+            NodeBreakpointBinding breakpointBinding = breakpoint.CreateBinding(lineNo, columnNo, breakpointId, scriptId, fullyBound);
             _breakpointBindings[breakpointId] = breakpointBinding;
             return breakpointBinding;
         }
@@ -1029,7 +1058,7 @@ namespace Microsoft.NodejsTools.Debugger {
             // DEVNOTE: Calling UpdateBreakpointBinding() on the debug thread with validateSuccess == true will deadlock
             // and timout, causing both the followup handler to be called before confirmation of success (or failure), and
             // a return of false (failure).
-            DebugWriteCommand(String.Format("Update Breakpoint binding"));
+            DebugWriteCommand("Update Breakpoint binding");
 
             var changeBreakPointCommand = new ChangeBreakpointCommand(CommandId, breakpointId, enabled, condition, ignoreCount);
             await _client.SendRequestAsync(changeBreakPointCommand, cancellationToken).ConfigureAwait(false);
@@ -1195,8 +1224,8 @@ namespace Microsoft.NodejsTools.Debugger {
                     args += " & if not errorlevel 1 pause";
                 }
                 args += "\"";
-                var binaryType = NativeMethods.GetBinaryType(psi.FileName);
-                if (binaryType == System.Reflection.ProcessorArchitecture.Amd64) {
+                ProcessorArchitecture binaryType = NativeMethods.GetBinaryType(psi.FileName);
+                if (binaryType == ProcessorArchitecture.Amd64) {
                     // VS wants the binary we launch to match in bitness to the Node.exe
                     // we're requesting it to launch.
                     psi.FileName = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.Windows), "Sysnative", "cmd.exe");

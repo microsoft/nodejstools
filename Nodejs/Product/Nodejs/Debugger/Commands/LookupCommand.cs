@@ -50,9 +50,9 @@ namespace Microsoft.NodejsTools.Debugger.Commands {
             base.ProcessResponse(response);
 
             // Retrieve references
-            var refs = (JArray)response["refs"];
-
+            JArray refs = (JArray)response["refs"] ?? new JArray();
             var references = new Dictionary<int, JToken>(refs.Count);
+
             foreach (JToken reference in refs) {
                 var id = (int)reference["handle"];
                 references.Add(id, reference);
@@ -60,10 +60,10 @@ namespace Microsoft.NodejsTools.Debugger.Commands {
 
             // Retrieve properties
             JToken body = response["body"];
+            Results = new Dictionary<int, List<NodeEvaluationResult>>(_handles.Length);
 
-            var results = new Dictionary<int, List<NodeEvaluationResult>>();
             foreach (int handle in _handles) {
-                var id = handle.ToString(CultureInfo.InvariantCulture);
+                string id = handle.ToString(CultureInfo.InvariantCulture);
                 JToken data = body[id];
                 if (data == null) {
                     continue;
@@ -74,18 +74,16 @@ namespace Microsoft.NodejsTools.Debugger.Commands {
                     _parents.TryGetValue(handle, out parent);
                 }
 
-                var properties = GetProperties(data, parent, references);
+                List<NodeEvaluationResult> properties = GetProperties(data, parent, references);
                 if (properties.Count == 0) {
                     // Primitive javascript type
                     var variable = new NodeEvaluationVariable(null, id, data);
-                    var property = _resultFactory.Create(variable);
+                    NodeEvaluationResult property = _resultFactory.Create(variable);
                     properties.Add(property);
                 }
 
-                results.Add(handle, properties);
+                Results.Add(handle, properties);
             }
-
-            Results = results;
         }
 
         private List<NodeEvaluationResult> GetProperties(JToken data, NodeEvaluationResult parent, Dictionary<int, JToken> references) {

@@ -27,7 +27,7 @@ namespace NodejsTests.Debugger.Commands {
             const int commandId = 3;
             const int frameId = 1;
             var resultFactoryMock = new Mock<IEvaluationResultFactory>();
-            var stackframe = new NodeStackFrame(null, null, null, 0, 0, 0, frameId);
+            var stackframe = new NodeStackFrame(null, null, null, 0, 0, 0, 0, frameId);
             const string variableName = "port";
             const int handle = 40;
 
@@ -38,7 +38,7 @@ namespace NodejsTests.Debugger.Commands {
             Assert.AreEqual(commandId, setVariableValueCommand.Id);
             Assert.AreEqual(
                 string.Format("{{\"command\":\"setVariableValue\",\"seq\":{0},\"type\":\"request\",\"arguments\":{{\"name\":\"{1}\",\"newValue\":{{\"handle\":{2}}},\"scope\":{{\"frameNumber\":{3},\"number\":0}}}}}}",
-                commandId, variableName,handle, frameId),
+                    commandId, variableName, handle, frameId),
                 setVariableValueCommand.ToString());
         }
 
@@ -49,7 +49,7 @@ namespace NodejsTests.Debugger.Commands {
             var resultFactoryMock = new Mock<IEvaluationResultFactory>();
             resultFactoryMock.Setup(factory => factory.Create(It.IsAny<INodeVariable>()))
                 .Returns(() => new NodeEvaluationResult(0, null, null, null, null, null, NodeExpressionType.None, null));
-            var stackframe = new NodeStackFrame(null, null, null, 0, 0, 0, 0);
+            var stackframe = new NodeStackFrame(null, null, null, 0, 0, 0, 0, 0);
             const string variableName = "port";
             const int handle = 40;
             var setVariableValueCommand = new SetVariableValueCommand(commandId, resultFactoryMock.Object, stackframe, variableName, handle);

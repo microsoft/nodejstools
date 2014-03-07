@@ -46,11 +46,8 @@ namespace NodejsTests.Debugger.Communication {
             // Arrange
             var connectionMock = new Mock<IDebuggerConnection>();
             var messageEventArgs = new MessageEventArgs(Resources.NodeDisconnectResponse);
-            connectionMock.Setup(p => p.SendMessageAsync(It.IsAny<string>())).Returns((string s) => {
-                var tcs = new TaskCompletionSource<int>();
-                tcs.SetResult(0);
-                return tcs.Task;
-            }).Raises(f => f.OutputMessage += null, messageEventArgs);
+            connectionMock.Setup(p => p.SendMessage(It.IsAny<string>()))
+                .Raises(f => f.OutputMessage += null, messageEventArgs);
             var client = new DebuggerClient(connectionMock.Object);
             var disconnectCommand = new DisconnectCommand(10);
 

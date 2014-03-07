@@ -24,6 +24,25 @@ namespace NodejsTests.Debugger.Communication {
     [TestClass]
     public class DebuggerConnectionTests {
         [TestMethod]
+        public void CreateDebuggerConnectionWithNullNetworkClientFactory() {
+            // Arrange
+            Exception exception = null;
+            DebuggerConnection connection = null;
+
+            // Act
+            try {
+                connection = new DebuggerConnection(null);
+            } catch (Exception e) {
+                exception = e;
+            }
+
+            // Assert
+            Assert.IsNull(connection);
+            Assert.IsNotNull(exception);
+            Assert.IsInstanceOfType(exception, typeof (ArgumentNullException));
+        }
+
+        [TestMethod]
         public async Task RaiseConnectionClosedEvent() {
             // Arrange
             var memoryStream = new MemoryStream();
@@ -44,11 +63,12 @@ namespace NodejsTests.Debugger.Communication {
                 sender = s;
                 args = a;
             };
-            debuggerConnection.Connect(new Uri("tcp://localhost:5858"));
-            debuggerConnection.Close();
 
+            debuggerConnection.Connect(new Uri("tcp://localhost:5858"));
             await Task.Delay(TimeSpan.FromMilliseconds(100));
+
             memoryStream.Close();
+            await Task.Delay(TimeSpan.FromMilliseconds(100));
 
             // Assert
             Assert.IsNotNull(sender);
@@ -105,29 +125,28 @@ namespace NodejsTests.Debugger.Communication {
             // Arrange
             const string message = "Hello node.js!";
             var sourceStream = new MemoryStream();
-            var tcs = new TaskCompletionSource<bool>();
+            bool[] connected = { true };
 
             var tcpClientMock = new Mock<INetworkClient>();
             tcpClientMock.Setup(p => p.GetStream()).Returns(() => sourceStream);
-            tcpClientMock.SetupGet(p => p.Connected).Returns(() => tcs.Task.Result);
+            tcpClientMock.SetupGet(p => p.Connected).Returns(() => connected[0]);
 
             var tcpClientFactoryMock = new Mock<INetworkClientFactory>();
             tcpClientFactoryMock.Setup(p => p.CreateNetworkClient(It.IsAny<Uri>())).Returns(() => tcpClientMock.Object);
 
             var debuggerConnection = new DebuggerConnection(tcpClientFactoryMock.Object);
-            string result;
 
             // Act
             debuggerConnection.Connect(new Uri("tcp://localhost:5858"));
-            await debuggerConnection.SendMessageAsync(message);
+            debuggerConnection.SendMessage(message);
 
-            sourceStream.Seek(0, SeekOrigin.Begin);
-            using (var streamReader = new StreamReader(sourceStream)) {
-                result = await streamReader.ReadToEndAsync();
-            }
+            await Task.Delay(TimeSpan.FromMilliseconds(100));
+            connected[0] = false;
+
+            byte[] buffer = sourceStream.GetBuffer();
+            string result = Encoding.UTF8.GetString(buffer, 0, (int)sourceStream.Length);
 
             sourceStream.Close();
-            tcs.SetResult(false);
 
             // Assert
             Assert.AreEqual(string.Format("Content-Length: {0}{1}{1}{2}", Encoding.UTF8.GetByteCount(message), Environment.NewLine, message), result);
