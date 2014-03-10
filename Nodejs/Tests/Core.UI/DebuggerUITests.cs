@@ -99,5 +99,64 @@ process.exit(" + exitCode + ");"),
                 }
             }
         }
+
+        /// <summary>
+        /// Verfiies that we can launch node.exe in a way where debugging doesn't
+        /// start (in this case -v is passed to display the version).  VS shouldn't crash.
+        /// </summary>
+        [TestMethod, Priority(0), TestCategory("Core")]
+        [HostType("TC Dynamic"), DynamicHostType(typeof(VsIdeHostAdapter))]
+        public void TestNoDebugging() {
+            var project = Project("NoDebugging",
+                Compile("server"),
+                Property(CommonConstants.StartupFile, "server.js"),
+                Property(NodejsConstants.NodeExeArguments, "-v")
+            );
+
+            using (var solution = project.Generate().ToVs()) {
+                bool waitOnAbnormal, waitOnNormal;
+                waitOnAbnormal = NodejsPackage.Instance.GeneralOptionsPage.WaitOnAbnormalExit;
+                waitOnNormal = NodejsPackage.Instance.GeneralOptionsPage.WaitOnNormalExit;
+                try {
+                    NodejsPackage.Instance.GeneralOptionsPage.WaitOnAbnormalExit = true;
+                    NodejsPackage.Instance.GeneralOptionsPage.WaitOnNormalExit = true;
+
+                    var beginningProcesses = System.Diagnostics.Process.GetProcessesByName(
+                        "Microsoft.NodejsTools.PressAnyKey"
+                    ).Select(x => x.Id);
+
+                    solution.App.Dte.ExecuteCommand("Debug.Start");
+
+                    bool foundNewProcesses = false;
+                    for (int i = 0; i < 10; i++) {
+                        var currentProcesses = System.Diagnostics.Process.GetProcessesByName(
+                            "Microsoft.NodejsTools.PressAnyKey"
+                        ).Select(x => x.Id);
+                        var newProcesses = currentProcesses.Except(beginningProcesses).ToArray();
+                        if (newProcesses.Length > 0) {
+                            // we shouldn't have gotten into debug mode
+                            Assert.AreEqual(
+                                VsIdeTestHostContext.Dte.Debugger.CurrentMode,
+                                dbgDebugMode.dbgDesignMode
+                            );
+
+                            Assert.AreEqual(1, newProcesses.Length);
+                            foreach (var proc in newProcesses) {
+                                System.Diagnostics.Process.GetProcessById(proc).Kill();
+                            }
+
+                            foundNewProcesses = true;
+                            break;
+                        }
+                        System.Threading.Thread.Sleep(2000);
+                    }
+
+                    Assert.IsTrue(foundNewProcesses, "failed to find new processes");
+                } finally {
+                    NodejsPackage.Instance.GeneralOptionsPage.WaitOnAbnormalExit = waitOnAbnormal;
+                    NodejsPackage.Instance.GeneralOptionsPage.WaitOnNormalExit = waitOnNormal;
+                }
+            }
+        }
     }
 }

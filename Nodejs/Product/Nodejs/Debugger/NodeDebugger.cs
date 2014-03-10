@@ -468,15 +468,15 @@ namespace Microsoft.NodejsTools.Debugger {
         /// Starts listening for debugger communication.  Can be called after Start
         /// to give time to attach to debugger events.
         /// </summary>
-        public async void StartListening() {
+        public void StartListening() {
             _connection.Connect(_debuggerEndpointUri);
 
             var mainThread = new NodeThread(this, MainThreadId, false);
             _threads[mainThread.Id] = mainThread;
 
-            await GetScriptsAsync().ConfigureAwait(false);
-            await SetExceptionBreakAsync().ConfigureAwait(false);
-            bool running = await PerformBacktraceAsync().ConfigureAwait(false);
+            GetScriptsAsync().Wait();
+            SetExceptionBreakAsync().Wait();
+            bool running = PerformBacktraceAsync().Result;
 
             // At this point we can fire events
             EventHandler<ThreadEventArgs> newThread = ThreadCreated;
