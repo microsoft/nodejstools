@@ -80,7 +80,7 @@ namespace NodejsTests.Debugger.Commands {
             Assert.AreEqual(nodejs, module.Source);
             Assert.AreEqual(nodejs, module.FileName);
             Assert.AreEqual(nodejs, module.JavaScriptFileName);
-            Assert.AreEqual(17, module.ModuleId);
+            Assert.AreEqual(17, module.Id);
         }
     }
 }

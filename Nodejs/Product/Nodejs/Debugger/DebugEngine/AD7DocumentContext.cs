@@ -124,11 +124,11 @@ namespace Microsoft.NodejsTools.Debugger.DebugEngine {
         // Gets the file statement range of the document context.
         // A statement range is the range of the lines that contributed the code to which this document context refers.
         int IDebugDocumentContext2.GetStatementRange(TEXT_POSITION[] pBegPosition, TEXT_POSITION[] pEndPosition) {
-            pBegPosition[0].dwColumn = (uint)_codeContext.ColumnNumber;
-            pBegPosition[0].dwLine = (uint)_codeContext.LineNumber;
+            pBegPosition[0].dwColumn = (uint)_codeContext.Column;
+            pBegPosition[0].dwLine = (uint)_codeContext.Line;
 
-            pEndPosition[0].dwColumn = (uint)_codeContext.ColumnNumber;
-            pEndPosition[0].dwLine = (uint)_codeContext.LineNumber;
+            pEndPosition[0].dwColumn = (uint)_codeContext.Column;
+            pEndPosition[0].dwLine = (uint)_codeContext.Line;
 
             return VSConstants.S_OK;
         }

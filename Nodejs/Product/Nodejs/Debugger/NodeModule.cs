@@ -19,18 +19,18 @@ namespace Microsoft.NodejsTools.Debugger {
     class NodeModule {
         private readonly string _fileName;
         private readonly string _javaScriptFileName;
-        private readonly int _moduleId;
+        private readonly int _id;
 
-        public NodeModule(int moduleId, string fileName, string javaScriptFileName) {
+        public NodeModule(int id, string fileName, string javaScriptFileName) {
             Debug.Assert(fileName != null);
 
-            _moduleId = moduleId;
+            _id = id;
             _fileName = fileName;
             _javaScriptFileName = javaScriptFileName;
         }
 
-        public int ModuleId {
-            get { return _moduleId; }
+        public int Id {
+            get { return _id; }
         }
 
         public string Name {

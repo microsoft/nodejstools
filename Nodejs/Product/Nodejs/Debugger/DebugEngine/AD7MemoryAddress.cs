@@ -22,29 +22,29 @@ namespace Microsoft.NodejsTools.Debugger.DebugEngine {
     // IDebugMemoryContext2 represents a position in the address space of the machine running the program being debugged.
     // IDebugCodeContext2 represents the starting position of a code instruction. 
     // For most run-time architectures today, a code context can be thought of as an address in a program's execution stream.
-    class AD7MemoryAddress : IDebugCodeContext2, IDebugCodeContext100 {
-        private readonly int _columnNo;
+    sealed class AD7MemoryAddress : IDebugCodeContext2, IDebugCodeContext100 {
+        private readonly int _column;
         private readonly AD7Engine _engine;
-        private readonly string _filename;
+        private readonly string _fileName;
         private readonly NodeStackFrame _frame;
-        private readonly int _lineNo;
+        private readonly int _line;
         private IDebugDocumentContext2 _documentContext;
 
-        private AD7MemoryAddress(AD7Engine engine, NodeStackFrame frame, string filename, int lineNo, int columnNo) {
+        private AD7MemoryAddress(AD7Engine engine, NodeStackFrame frame, string fileName, int line, int column) {
             _engine = engine;
             _frame = frame;
-            _filename = filename;
-            _lineNo = lineNo;
-            _columnNo = columnNo;
+            _fileName = fileName;
+            _line = line;
+            _column = column;
         }
 
 
-        public AD7MemoryAddress(AD7Engine engine, string filename, int lineNo, int columnNo)
-            : this(engine, null, filename, lineNo, columnNo) {
+        public AD7MemoryAddress(AD7Engine engine, string fileName, int line, int column)
+            : this(engine, null, fileName, line, column) {
         }
 
         public AD7MemoryAddress(AD7Engine engine, NodeStackFrame frame)
-            : this(engine, frame, null, frame.LineNo, frame.ColumnNo) {
+            : this(engine, frame, null, frame.Line, frame.Column) {
         }
 
         public AD7Engine Engine {
@@ -56,7 +56,15 @@ namespace Microsoft.NodejsTools.Debugger.DebugEngine {
         }
 
         public string FileName {
-            get { return _frame != null ? _frame.FileName : _filename; }
+            get { return _frame != null ? _frame.FileName : _fileName; }
+        }
+
+        public int Line {
+            get { return _line; }
+        }
+
+        public int Column {
+            get { return _column; }
         }
 
         public void SetDocumentContext(IDebugDocumentContext2 docContext) {
@@ -66,17 +74,8 @@ namespace Microsoft.NodejsTools.Debugger.DebugEngine {
         #region IDebugMemoryContext2 Members
 
         // Adds a specified value to the current context's address to create a new context.
-
-        public int LineNumber {
-            get { return _lineNo; }
-        }
-
-        public int ColumnNumber {
-            get { return _columnNo; }
-        }
-
         public int Add(ulong dwCount, out IDebugMemoryContext2 newAddress) {
-            newAddress = new AD7MemoryAddress(_engine, _frame, _filename, _lineNo + (int)dwCount, _columnNo);
+            newAddress = new AD7MemoryAddress(_engine, _frame, _fileName, _line + (int)dwCount, _column);
             return VSConstants.S_OK;
         }
 
@@ -101,33 +100,33 @@ namespace Microsoft.NodejsTools.Debugger.DebugEngine {
 
                 switch (contextCompare) {
                     case enum_CONTEXT_COMPARE.CONTEXT_EQUAL:
-                        result = (_lineNo == compareTo._lineNo);
+                        result = _line == compareTo._line;
                         break;
 
                     case enum_CONTEXT_COMPARE.CONTEXT_LESS_THAN:
-                        result = (_lineNo < compareTo._lineNo);
+                        result = _line < compareTo._line;
                         break;
 
                     case enum_CONTEXT_COMPARE.CONTEXT_GREATER_THAN:
-                        result = (_lineNo > compareTo._lineNo);
+                        result = _line > compareTo._line;
                         break;
 
                     case enum_CONTEXT_COMPARE.CONTEXT_LESS_THAN_OR_EQUAL:
-                        result = (_lineNo <= compareTo._lineNo);
+                        result = _line <= compareTo._line;
                         break;
 
                     case enum_CONTEXT_COMPARE.CONTEXT_GREATER_THAN_OR_EQUAL:
-                        result = (_lineNo >= compareTo._lineNo);
+                        result = _line >= compareTo._line;
                         break;
 
                     case enum_CONTEXT_COMPARE.CONTEXT_SAME_SCOPE:
                     case enum_CONTEXT_COMPARE.CONTEXT_SAME_FUNCTION:
                         if (_frame != null) {
-                            result = compareTo.FileName == FileName && (compareTo._lineNo) >= _frame.StartLine && (compareTo._lineNo) <= _frame.EndLine;
+                            result = compareTo.FileName == FileName && compareTo._line >= _frame.StartLine && compareTo._line <= _frame.EndLine;
                         } else if (compareTo._frame != null) {
-                            result = compareTo.FileName == FileName && (_lineNo) >= compareTo._frame.StartLine && (compareTo._lineNo) <= compareTo._frame.EndLine;
+                            result = compareTo.FileName == FileName && _line >= compareTo._frame.StartLine && compareTo._line <= compareTo._frame.EndLine;
                         } else {
-                            result = _lineNo == compareTo._lineNo && FileName == compareTo.FileName;
+                            result = _line == compareTo._line && FileName == compareTo.FileName;
                         }
                         break;
 
@@ -158,7 +157,7 @@ namespace Microsoft.NodejsTools.Debugger.DebugEngine {
             pinfo[0].dwFields = 0;
 
             if ((dwFields & enum_CONTEXT_INFO_FIELDS.CIF_ADDRESS) != 0) {
-                pinfo[0].bstrAddress = _lineNo.ToString(CultureInfo.InvariantCulture);
+                pinfo[0].bstrAddress = _line.ToString(CultureInfo.InvariantCulture);
                 pinfo[0].dwFields |= enum_CONTEXT_INFO_FIELDS.CIF_ADDRESS;
             }
 
@@ -188,7 +187,7 @@ namespace Microsoft.NodejsTools.Debugger.DebugEngine {
 
         // Subtracts a specified value from the current context's address to create a new context.
         public int Subtract(ulong dwCount, out IDebugMemoryContext2 ppMemCxt) {
-            ppMemCxt = new AD7MemoryAddress(_engine, _frame, _filename, _lineNo - (int)dwCount, _columnNo);
+            ppMemCxt = new AD7MemoryAddress(_engine, _frame, _fileName, _line - (int)dwCount, _column);
             return VSConstants.S_OK;
         }
 

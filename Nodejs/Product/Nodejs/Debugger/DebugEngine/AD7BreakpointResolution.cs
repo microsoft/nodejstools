@@ -18,7 +18,7 @@ using System.Runtime.InteropServices;
 
 namespace Microsoft.NodejsTools.Debugger.DebugEngine {
     // This class represents the information that describes a bound breakpoint.
-    class AD7BreakpointResolution : IDebugBreakpointResolution2 {
+    sealed class AD7BreakpointResolution : IDebugBreakpointResolution2 {
         private readonly AD7Engine _engine;
         private readonly NodeBreakpointBinding _binding;
         private readonly AD7DocumentContext _documentContext;
@@ -46,7 +46,7 @@ namespace Microsoft.NodejsTools.Debugger.DebugEngine {
 
                 // The debugger will not QI the IDebugCodeContex2 interface returned here. We must pass the pointer
                 // to IDebugCodeContex2 and not IUnknown.
-                var codeContext = new AD7MemoryAddress(_engine, _binding.RequestedFileName, _binding.RequestedLineNo, _binding.RequestedColumnNo);
+                var codeContext = new AD7MemoryAddress(_engine, _binding.Target.FileName, _binding.Target.Line, _binding.Target.Column);
                 codeContext.SetDocumentContext(_documentContext);
                 location.unionmember1 = Marshal.GetComInterfaceForObject(codeContext, typeof(IDebugCodeContext2));
                 pBpResolutionInfo[0].bpResLocation = location;

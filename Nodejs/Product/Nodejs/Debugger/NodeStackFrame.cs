@@ -17,38 +17,35 @@ using System.Threading;
 using System.Threading.Tasks;
 
 namespace Microsoft.NodejsTools.Debugger {
-    class NodeStackFrame {
-        private readonly int _columnNo;
+    sealed class NodeStackFrame {
+        private readonly int _column;
         private readonly NodeDebugger _debugger;
-        private readonly int _endLine;
+        private readonly int _frameId;
         private readonly string _frameName;
-        private readonly int _lineNo;
+        private readonly int _line;
         private readonly NodeModule _module;
-        private readonly int _startLine;
 
-        public NodeStackFrame(NodeDebugger debugger, NodeModule module, string frameName, int startLine, int endLine, int lineNo, int columnNo, int frameId) {
+        public NodeStackFrame(NodeDebugger debugger, NodeModule module, int frameId, string frameName, int line, int column) {
             _debugger = debugger;
             _module = module;
+            _frameId = frameId;
             _frameName = frameName;
-            _lineNo = lineNo;
-            _columnNo = columnNo;
-            FrameId = frameId;
-            _startLine = startLine;
-            _endLine = endLine;
+            _line = line;
+            _column = column;
         }
 
         /// <summary>
         /// The line number where the current function/class/module starts
         /// </summary>
         public int StartLine {
-            get { return MapLineNo(_startLine); }
+            get { return _line; }
         }
 
         /// <summary>
         /// The line number where the current function/class/module ends.
         /// </summary>
         public int EndLine {
-            get { return MapLineNo(_endLine); }
+            get { return _line; }
         }
 
         /// <summary>
@@ -61,28 +58,22 @@ namespace Microsoft.NodejsTools.Debugger {
         /// <summary>
         /// Gets a stack frame line number in the script.
         /// </summary>
-        public int LineNo {
-            get { return MapLineNo(_lineNo); }
+        public int Line {
+            get { return _line; }
         }
 
         /// <summary>
         /// Gets a stack frame column number in the script.
         /// </summary>
-        public int ColumnNo {
-            get { return MapColumnNo(_lineNo, _columnNo); }
+        public int Column {
+            get { return _column; }
         }
 
         /// <summary>
         /// Gets a stack name.
         /// </summary>
         public string FunctionName {
-            get {
-                SourceMapping mapping = _debugger.SourceMapper.MapToOriginal(Module.JavaScriptFileName, _lineNo);
-                if (mapping != null) {
-                    return mapping.Name;
-                }
-                return _frameName;
-            }
+            get { return _frameName; }
         }
 
         /// <summary>
@@ -103,7 +94,9 @@ namespace Microsoft.NodejsTools.Debugger {
         /// Gets the ID of the frame.  Frame 0 is the currently executing frame, 1 is the caller of the currently executing frame,
         /// etc...
         /// </summary>
-        public int FrameId { get; private set; }
+        public int FrameId {
+            get { return _frameId; }
+        }
 
         /// <summary>
         /// Gets or sets a local variables of the frame.
@@ -116,39 +109,10 @@ namespace Microsoft.NodejsTools.Debugger {
         public IList<NodeEvaluationResult> Parameters { get; set; }
 
         /// <summary>
-        /// Maps a line number from JavaScript to the original source code.
-        /// Line numbers are 1 based.
-        /// </summary>
-        /// <param name="lineNo"></param>
-        /// <returns></returns>
-        private int MapLineNo(int lineNo) {
-            SourceMapping mapping = _debugger.SourceMapper.MapToOriginal(Module.JavaScriptFileName, lineNo);
-            if (mapping != null) {
-                return mapping.Line;
-            }
-            return lineNo;
-        }
-
-        /// <summary>
-        /// Maps a column number from JavaScript to the original source code.
-        /// Column numbers are 1 based.
-        /// </summary>
-        /// <param name="line"></param>
-        /// <param name="column"></param>
-        /// <returns></returns>
-        private int MapColumnNo(int line, int column) {
-            SourceMapping mapping = _debugger.SourceMapper.MapToOriginal(Module.JavaScriptFileName, line, column);
-            if (mapping != null) {
-                return mapping.Column;
-            }
-            return column;
-        }
-
-        /// <summary>
         /// Attempts to parse the given text.  Returns true if the text is a valid expression.  Returns false if the text is not
         /// a valid expression and assigns the error messages produced to errorMsg.
         /// </summary>
-        public virtual bool TryParseText(string text, out string errorMsg) {
+        public bool TryParseText(string text, out string errorMsg) {
 #if NEEDS_UPDATING
             CollectingErrorSink errorSink = new CollectingErrorSink();
             Parser parser = Parser.CreateParser(new StringReader(text), _debugger.LanguageVersion, new ParserOptions() { ErrorSink = errorSink });
@@ -174,8 +138,8 @@ namespace Microsoft.NodejsTools.Debugger {
         /// </summary>
         /// <param name="text">Text expression.</param>
         /// <param name="cancellationToken">Cancellation token.</param>
-        public virtual Task<NodeEvaluationResult> ExecuteTextAsync(string text, CancellationToken cancellationToken = new CancellationToken()) {
-            return _debugger.ExecuteTextAsync(text, this, cancellationToken);
+        public Task<NodeEvaluationResult> ExecuteTextAsync(string text, CancellationToken cancellationToken = new CancellationToken()) {
+            return _debugger.ExecuteTextAsync(this, text, cancellationToken);
         }
 
         /// <summary>
@@ -184,7 +148,7 @@ namespace Microsoft.NodejsTools.Debugger {
         /// <param name="name">Variable name.</param>
         /// <param name="value">New value.</param>
         /// <param name="cancellationToken">Cancellation token.</param>
-        public virtual async Task<NodeEvaluationResult> SetVariableValueAsync(string name, string value, CancellationToken cancellationToken = new CancellationToken()) {
+        public async Task<NodeEvaluationResult> SetVariableValueAsync(string name, string value, CancellationToken cancellationToken = new CancellationToken()) {
             NodeEvaluationResult result = await _debugger.SetVariableValueAsync(this, name, value, cancellationToken).ConfigureAwait(false);
 
             // Update variable in locals
@@ -199,20 +163,11 @@ namespace Microsoft.NodejsTools.Debugger {
             for (int i = 0; i < Parameters.Count; i++) {
                 NodeEvaluationResult evaluationResult = Parameters[i];
                 if (evaluationResult.Expression == name) {
-                    Locals[i] = result;
+                    Parameters[i] = result;
                 }
             }
 
             return result;
-        }
-
-        /// <summary>
-        /// Sets the line number that this current frame is executing.  Returns true
-        /// if the line was successfully set or false if the line number cannot be changed
-        /// to this line.
-        /// </summary>
-        public bool SetLineNumber(int lineNo) {
-            return _debugger.SetLineNumber(this, lineNo);
         }
     }
 }

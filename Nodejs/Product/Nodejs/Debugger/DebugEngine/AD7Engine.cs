@@ -61,7 +61,6 @@ namespace Microsoft.NodejsTools.Debugger.DebugEngine {
         private readonly BreakpointManager _breakpointManager;
         private Guid _ad7ProgramId;             // A unique identifier for the program being debugged.
         private static readonly HashSet<WeakReference> Engines = new HashSet<WeakReference>();
-
         private string _webBrowserUrl;
 
         // These constants are duplicated in HpcLauncher and cannot be changed
@@ -199,7 +198,15 @@ namespace Microsoft.NodejsTools.Debugger.DebugEngine {
 
                 var program = (NodeRemoteDebugProgram)rgpPrograms[0];
                 var process = program.DebugProcess;
-                _process = new NodeDebugger(process.DebugPort.Uri, process.Id);
+                var uri = process.DebugPort.Uri;
+
+                _process = new NodeDebugger(uri, process.Id);
+
+                // We only need to do fuzzy comparisons when debugging remotely
+                if (!uri.IsLoopback) {
+                    _process.IsRemote = true;
+                    _process.BreakpointHandler = new FuzzyLogicBreakpointHandler();
+                }
 
                 AttachEvents(_process);
                 _attached = true;
@@ -541,7 +548,6 @@ namespace Microsoft.NodejsTools.Debugger.DebugEngine {
                     env,
                     interpreterOptions,
                     debugOptions,
-                    dirMapping,
                     debugPort
                 );
 
@@ -1101,7 +1107,7 @@ namespace Microsoft.NodejsTools.Debugger.DebugEngine {
         private void OnBreakpointBound(object sender, BreakpointBindingEventArgs e) {
             var pendingBreakpoint = _breakpointManager.GetPendingBreakpoint(e.Breakpoint);
             var breakpointBinding = e.BreakpointBinding;
-            var codeContext = new AD7MemoryAddress(this, pendingBreakpoint.DocumentName, breakpointBinding.RequestedLineNo, breakpointBinding.RequestedColumnNo);
+            var codeContext = new AD7MemoryAddress(this, pendingBreakpoint.DocumentName, breakpointBinding.Target.Line, breakpointBinding.Target.Column);
             var documentContext = new AD7DocumentContext(codeContext);
             var breakpointResolution = new AD7BreakpointResolution(this, breakpointBinding, documentContext);
             var boundBreakpoint = new AD7BoundBreakpoint(breakpointBinding, pendingBreakpoint, breakpointResolution, breakpointBinding.Enabled);
@@ -1162,7 +1168,7 @@ namespace Microsoft.NodejsTools.Debugger.DebugEngine {
             }
 
             // Update module source
-            if (!await Process.UpdatedModuleSourceAsync(module).ConfigureAwait(false)) {
+            if (!await Process.UpdateModuleSourceAsync(module).ConfigureAwait(false)) {
                 var statusBar = (IVsStatusbar)ServiceProvider.GlobalProvider.GetService(typeof(SVsStatusbar));
                 statusBar.SetText(Resources.DebuggerModuleUpdateFailed);
             }

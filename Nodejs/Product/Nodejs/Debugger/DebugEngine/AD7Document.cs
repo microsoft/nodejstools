@@ -47,7 +47,7 @@ namespace Microsoft.NodejsTools.Debugger.DebugEngine {
         private char[] ScriptText {
             get {
                 if (_scriptText == null) {
-                    var moduleId = _documentContext.Module.ModuleId;
+                    var moduleId = _documentContext.Module.Id;
                     var scriptText = _documentContext.Engine.Process.GetScriptTextAsync(moduleId).Result;
                     if (scriptText != null){
                         _scriptText = scriptText.ToCharArray();

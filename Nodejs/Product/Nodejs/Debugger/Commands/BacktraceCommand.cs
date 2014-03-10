@@ -70,7 +70,7 @@ namespace Microsoft.NodejsTools.Debugger.Commands {
 
             foreach (JToken frame in frames) {
                 // Create stack frame
-                string name = GetFrameName(frame);
+                string frameName = GetFrameName(frame);
                 var moduleId = (int?)frame["func"]["scriptId"];
 
                 NodeModule module;
@@ -80,8 +80,8 @@ namespace Microsoft.NodejsTools.Debugger.Commands {
 
                 int line = (int?)frame["line"] ?? 0;
                 int column = (int?)frame["column"] ?? 0;
-                int stackFrameId = (int?)frame["index"] ?? 0;
-                var stackFrame = new NodeStackFrame(_debugger, module, name, line, line, line, column, stackFrameId);
+                int frameId = (int?)frame["index"] ?? 0;
+                NodeStackFrame stackFrame = CreateStackFrame(module, frameName, line, column, frameId);
 
                 // Locals
                 var variables = (JArray)frame["locals"];
@@ -96,6 +96,19 @@ namespace Microsoft.NodejsTools.Debugger.Commands {
 
                 StackFrames.Add(stackFrame);
             }
+        }
+
+        private NodeStackFrame CreateStackFrame(NodeModule module, string frameName, int line, int column, int stackFrameId) {
+            // Map file position to original, if required
+            if (module.JavaScriptFileName != module.FileName) {
+                SourceMapping mapping = _debugger.SourceMapper.MapToOriginal(module.JavaScriptFileName, line, column);
+                if (mapping != null) {
+                    line = mapping.Line;
+                    column = mapping.Column;
+                    frameName = string.IsNullOrEmpty(mapping.Name) ? frameName : mapping.Name;
+                }
+            }
+            return new NodeStackFrame(_debugger, module, stackFrameId, frameName, line, column);
         }
 
         private List<NodeEvaluationResult> GetVariables(NodeStackFrame stackFrame, IEnumerable<JToken> variables) {

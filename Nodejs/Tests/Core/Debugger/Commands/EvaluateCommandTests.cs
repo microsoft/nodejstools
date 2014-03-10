@@ -68,7 +68,7 @@ namespace NodejsTests.Debugger.Commands {
             resultFactoryMock.Setup(factory => factory.Create(It.IsAny<INodeVariable>()))
                 .Returns(() => new NodeEvaluationResult(0, null, null, null, null, null, NodeExpressionType.None, null));
             const string expression = "expression";
-            var stackFrame = new NodeStackFrame(null, null, null, 0, 0, 0, 0, 0);
+            var stackFrame = new NodeStackFrame(null, null, 0, null, 0, 0);
             var evaluateCommand = new EvaluateCommand(commandId, resultFactoryMock.Object, expression, stackFrame);
 
             // Act
@@ -87,7 +87,7 @@ namespace NodejsTests.Debugger.Commands {
             var resultFactoryMock = new Mock<IEvaluationResultFactory>();
             resultFactoryMock.Setup(factory => factory.Create(It.IsAny<INodeVariable>()));
             const string expression = "hello";
-            var stackFrame = new NodeStackFrame(null, null, null, 0, 0, 0, 0, 0);
+            var stackFrame = new NodeStackFrame(null, null, 0, null, 0, 0);
             var evaluateCommand = new EvaluateCommand(commandId, resultFactoryMock.Object, expression, stackFrame);
             Exception exception = null;
 

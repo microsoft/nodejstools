@@ -27,7 +27,7 @@ namespace Microsoft.NodejsTools.Debugger.Commands {
                 NodeConstants.ScriptWrapEnd);
 
             _arguments = new Dictionary<string, object> {
-                { "script_id", module.ModuleId },
+                { "script_id", module.Id },
                 { "new_source", source },
                 { "preview_only", false },
             };

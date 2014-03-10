@@ -52,7 +52,7 @@ namespace NodejsTests.Debugger {
             BreakOn breakOn = new BreakOn(),
             string condition = ""
         ) {
-            NodeBreakpoint breakPoint = newproc.AddBreakPoint(fileName, line, column, enabled, breakOn, condition);
+            NodeBreakpoint breakPoint = newproc.AddBreakpoint(fileName, line, column, enabled, breakOn, condition);
             breakPoint.BindAsync().Wait();
             return breakPoint;
         }
@@ -485,7 +485,7 @@ namespace NodejsTests.Debugger {
 
             AutoResetEvent breakpointBound = new AutoResetEvent(false);
             process.BreakpointBound += (sender, e) => {
-                Console.WriteLine("BreakpointBound {0} {1}", e.BreakpointBinding.FileName, e.BreakpointBinding.LineNo);
+                Console.WriteLine("BreakpointBound {0} {1}", e.BreakpointBinding.Position.FileName, e.BreakpointBinding.Position.Line);
                 breakpointBound.Set();
             };
 
@@ -503,9 +503,9 @@ namespace NodejsTests.Debugger {
 
             AutoResetEvent breakpointHit = new AutoResetEvent(false);
             process.BreakpointHit += (sender, e) => {
-                Console.WriteLine("BreakpointHit {0}", e.BreakpointBinding.RequestedLineNo);
+                Console.WriteLine("BreakpointHit {0}", e.BreakpointBinding.Target.Line);
                 Assert.AreEqual(e.Thread, thread);
-                Assert.AreEqual(e.BreakpointBinding.RequestedLineNo, thread.Frames.First().LineNo);
+                Assert.AreEqual(e.BreakpointBinding.Target.Line, thread.Frames.First().Line);
                 breakpointHit.Set();
             };
 
@@ -680,19 +680,19 @@ namespace NodejsTests.Debugger {
                 }
 
                 if (step._expectedEntryPointHit != null) {
-                    Assert.AreEqual(step._expectedEntryPointHit.Value, thread.Frames.First().LineNo);
+                    Assert.AreEqual(step._expectedEntryPointHit.Value, thread.Frames.First().Line);
                 }
                 else if (step._expectedBreakpointHit != null) {
-                    Assert.AreEqual(step._expectedBreakpointHit.Value, thread.Frames.First().LineNo);
+                    Assert.AreEqual(step._expectedBreakpointHit.Value, thread.Frames.First().Line);
                 }
                 else if (step._expectedStepComplete != null) {
-                    Assert.AreEqual(step._expectedStepComplete.Value, thread.Frames.First().LineNo);
+                    Assert.AreEqual(step._expectedStepComplete.Value, thread.Frames.First().Line);
                 }
                 else if (step._expectedExceptionRaised != null) {
                     Assert.AreEqual(step._expectedExceptionRaised.TypeName, exception.TypeName);
                     Assert.AreEqual(step._expectedExceptionRaised.Description, exception.Description);
                     if (step._expectedExceptionRaised.LineNo != null) {
-                        Assert.AreEqual(step._expectedExceptionRaised.LineNo.Value, thread.Frames[0].LineNo);
+                        Assert.AreEqual(step._expectedExceptionRaised.LineNo.Value, thread.Frames[0].Line);
                     }
                     exception = null;
                 }

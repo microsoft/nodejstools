@@ -101,7 +101,7 @@ namespace Microsoft.NodejsTools.Debugger.DebugEngine {
                 EngineUtils.CheckOk(docPosition.GetFileName(out fileName));
 
                 var breakpoint =
-                    _engine.Process.AddBreakPoint(
+                    _engine.Process.AddBreakpoint(
                         fileName,
                         (int)startPosition[0].dwLine,
                         (int)startPosition[0].dwColumn,

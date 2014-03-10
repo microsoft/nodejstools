@@ -88,8 +88,8 @@ namespace NodejsTests.Debugger.Commands {
             NodeStackFrame firstFrame = backtraceCommand.StackFrames[0];
             Assert.AreEqual(NodeVariableType.AnonymousFunction, firstFrame.FunctionName);
             Assert.AreEqual(@"C:\Users\Tester\documents\visual studio 2012\Projects\NodejsApp1\NodejsApp1\server.js", firstFrame.FileName);
-            Assert.AreEqual(22, firstFrame.LineNo);
-            Assert.AreEqual(0, firstFrame.ColumnNo);
+            Assert.AreEqual(22, firstFrame.Line);
+            Assert.AreEqual(0, firstFrame.Column);
             Assert.AreEqual(15, firstFrame.Locals.Count);
             Assert.AreEqual(5, firstFrame.Parameters.Count);
             Assert.IsNotNull(backtraceCommand.Modules);

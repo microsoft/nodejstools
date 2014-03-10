@@ -17,32 +17,23 @@ using System.Linq;
 using System.Threading.Tasks;
 
 namespace Microsoft.NodejsTools.Debugger {
-    class NodeBreakpoint {
+    sealed class NodeBreakpoint {
         private readonly Dictionary<int, NodeBreakpointBinding> _bindings = new Dictionary<int, NodeBreakpointBinding>();
         private readonly BreakOn _breakOn;
-        private readonly int _columnNo;
         private readonly string _condition;
         private readonly bool _enabled;
-        private readonly string _fileName;
-        private readonly int _lineNo;
+        private readonly FilePosition _position;
         private readonly NodeDebugger _process;
-        private readonly string _requestedFileName;
+        private readonly FilePosition _target;
 
-        public NodeBreakpoint(
-            NodeDebugger process,
-            string fileName,
-            string requestedFileName,
-            int lineNo,
-            int columnNo,
-            bool enabled,
-            BreakOn breakOn,
-            string condition
-        ) {
+        public NodeBreakpoint(NodeDebugger process, FilePosition position, bool enabled, BreakOn breakOn, string condition)
+            : this(process, position, position, enabled, breakOn, condition) {
+        }
+
+        public NodeBreakpoint(NodeDebugger process, FilePosition target, FilePosition position, bool enabled, BreakOn breakOn, string condition) {
             _process = process;
-            _fileName = fileName;
-            _requestedFileName = requestedFileName;
-            _lineNo = lineNo;
-            _columnNo = columnNo;
+            _target = target;
+            _position = position;
             _enabled = enabled;
             _breakOn = breakOn;
             _condition = condition;
@@ -53,27 +44,19 @@ namespace Microsoft.NodejsTools.Debugger {
         }
 
         /// <summary>
-        /// The filename where the breakpoint is set.  If source maps are in use then this
-        /// is the actual JavaScript file.
+        /// The file name, line and column where the breakpoint was requested to be set.
+        /// If source maps are in use this can be different than Position.
         /// </summary>
-        public string FileName {
-            get { return _fileName; }
+        public FilePosition Target {
+            get { return _target; }
         }
 
         /// <summary>
-        /// The file name where the breakpoint was requested to be set.  If source maps are in use this can be
-        /// different than FileName.
+        /// The filename, line and column where the breakpoint is set. If source maps are in use
+        /// then this is position in the actual JavaScript file.
         /// </summary>
-        public string RequestedFileName {
-            get { return _requestedFileName; }
-        }
-
-        public int LineNo {
-            get { return _lineNo; }
-        }
-
-        public int ColumnNo {
-            get { return _columnNo; }
+        public FilePosition Position {
+            get { return _position; }
         }
 
         public bool Enabled {
@@ -100,8 +83,8 @@ namespace Microsoft.NodejsTools.Debugger {
             return _process.BindBreakpointAsync(this);
         }
 
-        internal NodeBreakpointBinding CreateBinding(int lineNo, int columnNo, int breakpointId, int? scriptId, bool fullyBound) {
-            var binding = new NodeBreakpointBinding(this, lineNo, columnNo, breakpointId, scriptId, fullyBound);
+        internal NodeBreakpointBinding CreateBinding(FilePosition target, FilePosition position, int breakpointId, int? scriptId, bool fullyBound) {
+            var binding = new NodeBreakpointBinding(this, target, position, breakpointId, scriptId, fullyBound);
             _bindings[breakpointId] = binding;
             return binding;
         }
