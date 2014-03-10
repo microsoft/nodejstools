@@ -18,8 +18,11 @@ using System.IO;
 namespace Microsoft.NodejsTools.Debugger {
     class NodeModule {
         private readonly string _fileName;
-        private readonly string _javaScriptFileName;
         private readonly int _id;
+        private readonly string _javaScriptFileName;
+
+        public NodeModule(int id, string fileName) : this(id, fileName, fileName) {
+        }
 
         public NodeModule(int id, string fileName, string javaScriptFileName) {
             Debug.Assert(fileName != null);

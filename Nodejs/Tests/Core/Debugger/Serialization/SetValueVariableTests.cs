@@ -25,7 +25,7 @@ namespace NodejsTests.Debugger.Serialization {
             // Arrange
             JObject json = SerializationTestData.GetSetVariableValueResponse();
             const int frameId = 3;
-            var stackFrame = new NodeStackFrame(null, null, frameId, null, 0, 0);
+            var stackFrame = new NodeStackFrame(frameId);
             const string name = "name";
 
             // Act

@@ -21,9 +21,9 @@ namespace Microsoft.NodejsTools.Debugger.Events {
             Running = (bool)message["running"];
 
             var scriptId = (int)message["body"]["script"]["id"];
-            var fileName = (string)message["body"]["script"]["name"] ?? NodeVariableType.UnknownModule;
+            string fileName = (string)message["body"]["script"]["name"] ?? NodeVariableType.UnknownModule;
 
-            Module = new NodeModule(scriptId, fileName, fileName);
+            Module = new NodeModule(scriptId, fileName);
         }
 
         public NodeModule Module { get; private set; }

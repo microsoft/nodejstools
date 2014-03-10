@@ -50,7 +50,7 @@ namespace Microsoft.NodejsTools.Debugger.Events {
             if (script != null) {
                 var scriptId = (int)script["id"];
                 var fileName = (string)script["name"];
-                Module = new NodeModule(scriptId, fileName, fileName);
+                Module = new NodeModule(scriptId, fileName);
             }
         }
 

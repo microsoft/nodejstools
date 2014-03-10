@@ -38,7 +38,8 @@ namespace Microsoft.NodejsTools.Debugger {
         private readonly Uri _debuggerEndpointUri;
         private readonly Dictionary<int, string> _errorCodes = new Dictionary<int, string>();
         private readonly ExceptionHandler _exceptionHandler;
-        private readonly Dictionary<string, NodeModule> _mapNameToScript = new Dictionary<string, NodeModule>(StringComparer.OrdinalIgnoreCase);
+        private readonly Dictionary<int, NodeModule> _mapIdToModule = new Dictionary<int, NodeModule>();
+        private readonly Dictionary<string, NodeModule> _mapNameToModule = new Dictionary<string, NodeModule>(StringComparer.OrdinalIgnoreCase);
         private readonly EvaluationResultFactory _resultFactory;
         private readonly SourceMapper _sourceMapper;
         private readonly Dictionary<int, NodeThread> _threads = new Dictionary<int, NodeThread>();
@@ -46,8 +47,8 @@ namespace Microsoft.NodejsTools.Debugger {
         private bool _attached;
         private bool _breakOnAllExceptions;
         private bool _breakOnUncaughtExceptions;
-        private BreakpointHandler _breakpointHandler;
         private int _commandId;
+        private IFileNameMapper _fileNameMapper;
         private bool _handleEntryPointHit;
         private int? _id;
         private bool _loadCompleteHandled;
@@ -67,7 +68,7 @@ namespace Microsoft.NodejsTools.Debugger {
             _resultFactory = new EvaluationResultFactory();
             _exceptionHandler = new ExceptionHandler();
             _sourceMapper = new SourceMapper();
-            _breakpointHandler = new BreakpointHandler();
+            _fileNameMapper = new LocalFileNameMapper();
         }
 
         public NodeDebugger(
@@ -404,17 +405,6 @@ namespace Microsoft.NodejsTools.Debugger {
             }
         }
 
-        public string GetModuleFileName(string javaScriptFileName) {
-            SourceMapping mapping = SourceMapper.MapToOriginal(javaScriptFileName, 0);
-            if (mapping == null) {
-                return javaScriptFileName;
-            }
-
-            string directoryName = Path.GetDirectoryName(javaScriptFileName) ?? string.Empty;
-            string fileName = Path.GetFileName(mapping.FileName) ?? string.Empty;
-            return Path.Combine(directoryName, fileName);
-        }
-
         #endregion
 
         #region Debuggee Communcation
@@ -434,13 +424,13 @@ namespace Microsoft.NodejsTools.Debugger {
         }
 
         /// <summary>
-        /// Gets or sets a breakpoint handler.
+        /// Gets or sets a file name mapper.
         /// </summary>
-        public BreakpointHandler BreakpointHandler {
-            get { return _breakpointHandler; }
+        public IFileNameMapper FileNameMapper {
+            get { return _fileNameMapper; }
             set {
                 if (value != null) {
-                    _breakpointHandler = value;
+                    _fileNameMapper = value;
                 }
             }
         }
@@ -515,27 +505,23 @@ namespace Microsoft.NodejsTools.Debugger {
         }
 
         private async Task GetScriptsAsync(CancellationToken cancellationToken = new CancellationToken()) {
-            var scriptsCommand = new ScriptsCommand(CommandId, this);
+            var scriptsCommand = new ScriptsCommand(CommandId);
             await _client.SendRequestAsync(scriptsCommand, cancellationToken).ConfigureAwait(false);
 
-            foreach (NodeModule module in scriptsCommand.Modules) {
-                AddModule(module);
-            }
+            AddModules(scriptsCommand.Modules);
         }
 
-        private void AddModule(NodeModule newModule) {
-            string name = newModule.FileName;
-            if (!string.IsNullOrEmpty(name)) {
-                NodeModule module;
-                if (!_mapNameToScript.TryGetValue(name, out module)) {
-                    _mapNameToScript[name] = newModule;
+        private void AddModules(IEnumerable<NodeModule> modules) {
+            EventHandler<ModuleLoadedEventArgs> moduleLoaded = ModuleLoaded;
+            if (moduleLoaded == null) {
+                return;
+            }
 
-                    EventHandler<ModuleLoadedEventArgs> modLoad = ModuleLoaded;
-                    if (modLoad != null) {
-                        modLoad(this, new ModuleLoadedEventArgs(newModule));
-                    }
-
-                    _breakpointHandler.AddModuleName(newModule.JavaScriptFileName);
+            foreach (NodeModule module in modules) {
+                NodeModule newModule;
+                if (GetOrAddModule(module, out newModule)) {
+                    moduleLoaded(this, new ModuleLoadedEventArgs(newModule));
+                    _fileNameMapper.AddModuleName(newModule.JavaScriptFileName);
                 }
             }
         }
@@ -569,7 +555,7 @@ namespace Microsoft.NodejsTools.Debugger {
         }
 
         private void OnCompileScriptEvent(object sender, CompileScriptEventArgs args) {
-            AddModule(args.CompileScriptEvent.Module);
+            AddModules(new[] { args.CompileScriptEvent.Module });
         }
 
         private async void OnBreakpointEvent(object sender, BreakpointEventArgs args) {
@@ -594,8 +580,13 @@ namespace Microsoft.NodejsTools.Debugger {
                 }
             }
 
+            // Retrieve a local module
+            NodeModule module;
+            GetOrAddModule(breakpointEvent.Module, out module);
+            module = module ?? breakpointEvent.Module;
+
             // Process break for breakpoint bindings, if any
-            if (!await ProcessBreakpointBreakAsync(breakpointEvent.Module, breakpointBindings, false).ConfigureAwait(false)) {
+            if (!await ProcessBreakpointBreakAsync(module, breakpointBindings, false).ConfigureAwait(false)) {
                 await AutoResumeAsync(false).ConfigureAwait(false);
             }
         }
@@ -636,7 +627,7 @@ namespace Microsoft.NodejsTools.Debugger {
             }
 
             // Handle last processed breakpoint binding by breaking with breakpoint hit events
-            List<NodeBreakpointBinding> matchedBindings = _breakpointHandler.ProcessBindings(brokeIn, hitBindings).ToList();
+            List<NodeBreakpointBinding> matchedBindings = ProcessBindings(brokeIn, hitBindings).ToList();
 
             // Fire breakpoint hit event(s)
             EventHandler<BreakpointHitEventArgs> breakpointHit = BreakpointHit;
@@ -648,6 +639,16 @@ namespace Microsoft.NodejsTools.Debugger {
             }
 
             return matchedBindings.Count != 0;
+        }
+
+        public IEnumerable<NodeBreakpointBinding> ProcessBindings(NodeModule brokeIn, IEnumerable<NodeBreakpointBinding> hitBindings) {
+            foreach (NodeBreakpointBinding hitBinding in hitBindings) {
+                if (_fileNameMapper.MatchFileName(brokeIn.JavaScriptFileName, hitBinding.Position.FileName)) {
+                    yield return hitBinding;
+                } else {
+                    hitBinding.FixupHitCount();
+                }
+            }
         }
 
         private async void OnExceptionEvent(object sender, ExceptionEventArgs args) {
@@ -665,9 +666,8 @@ namespace Microsoft.NodejsTools.Debugger {
                 return;
             }
 
-            var tokenSource = new CancellationTokenSource(_timeout);
             var lookupCommand = new LookupCommand(CommandId, _resultFactory, new[] { exception.ErrorNumber.Value });
-            await _client.SendRequestAsync(lookupCommand, tokenSource.Token).ConfigureAwait(false);
+            await _client.SendRequestAsync(lookupCommand).ConfigureAwait(false);
 
             string errorCodeFromLookup = lookupCommand.Results[errorNumber][0].StringValue;
             _errorCodes[errorNumber] = errorCodeFromLookup;
@@ -718,10 +718,41 @@ namespace Microsoft.NodejsTools.Debugger {
         }
 
         private async Task<int> GetCallstackDepthAsync(CancellationToken cancellationToken = new CancellationToken()) {
-            var backtraceCommand = new BacktraceCommand(CommandId, _resultFactory, 0, 1);
+            var backtraceCommand = new BacktraceCommand(CommandId, _resultFactory, 0, 1, true);
             await _client.SendRequestAsync(backtraceCommand, cancellationToken).ConfigureAwait(false);
 
             return backtraceCommand.CallstackDepth;
+        }
+
+        private IEnumerable<NodeStackFrame> GetLocalFrames(IEnumerable<NodeStackFrame> stackFrames) {
+            foreach (NodeStackFrame stackFrame in stackFrames) {
+                // Retrieve a local module
+                NodeModule module;
+                GetOrAddModule(stackFrame.Module, out module);
+                module = module ?? stackFrame.Module;
+
+                int line = stackFrame.Line;
+                int column = stackFrame.Column;
+                string functionName = stackFrame.FunctionName;
+
+                // Map file position to original, if required
+                if (module.JavaScriptFileName != module.FileName) {
+                    SourceMapping mapping = SourceMapper.MapToOriginal(module.JavaScriptFileName, line, column);
+                    if (mapping != null) {
+                        line = mapping.Line;
+                        column = mapping.Column;
+                        functionName = string.IsNullOrEmpty(mapping.Name) ? functionName : mapping.Name;
+                    }
+                }
+
+                stackFrame.Process = this;
+                stackFrame.Module = module;
+                stackFrame.Line = line;
+                stackFrame.Column = column;
+                stackFrame.FunctionName = functionName;
+
+                yield return stackFrame;
+            }
         }
 
         /// <summary>
@@ -736,10 +767,14 @@ namespace Microsoft.NodejsTools.Debugger {
             // request takes a 'bottom' parameter, empirically, Node.js fails requests with it set.  Here we
             // approximate 'bottom' for 'toFrame' using int.MaxValue.  Node.js silently handles toFrame depths
             // greater than the current callstack.
-            var backtraceCommand = new BacktraceCommand(CommandId, _resultFactory, 0, int.MaxValue, this);
+            var backtraceCommand = new BacktraceCommand(CommandId, _resultFactory, 0, int.MaxValue);
             await _client.SendRequestAsync(backtraceCommand, cancellationToken).ConfigureAwait(false);
 
-            List<NodeStackFrame> stackFrames = backtraceCommand.StackFrames;
+            // Add extracted modules
+            AddModules(backtraceCommand.Modules.Values);
+
+            // Add stack frames
+            List<NodeStackFrame> stackFrames = GetLocalFrames(backtraceCommand.StackFrames).ToList();
 
             // Collects results of number type which have null values and perform a lookup for actual values
             var numbersWithNullValue = new List<NodeEvaluationResult>();
@@ -759,9 +794,6 @@ namespace Microsoft.NodejsTools.Debugger {
             }
 
             MainThread.Frames = stackFrames;
-            foreach (NodeModule module in backtraceCommand.Modules.Values) {
-                AddModule(module);
-            }
 
             return backtraceCommand.Running;
         }
@@ -801,12 +833,12 @@ namespace Microsoft.NodejsTools.Debugger {
                 NodeStackFrame topFrame = MainThread.TopStackFrame;
                 int currentLine = topFrame.Line;
                 string breakFileName = topFrame.Module.FileName;
-                NodeModule breakModule = GetModuleForFilePath(breakFileName);
+                NodeModule breakModule = GetModuleByFilePath(breakFileName);
 
                 var breakpointBindings = new List<NodeBreakpointBinding>();
                 foreach (NodeBreakpointBinding breakpointBinding in _breakpointBindings.Values) {
                     if (breakpointBinding.Enabled && breakpointBinding.Position.Line == currentLine &&
-                        GetModuleForFilePath(breakpointBinding.Target.FileName) == breakModule) {
+                        GetModuleByFilePath(breakpointBinding.Target.FileName) == breakModule) {
                         breakpointBindings.Add(breakpointBinding);
                     }
                 }
@@ -905,7 +937,7 @@ namespace Microsoft.NodejsTools.Debugger {
             DebugWriteCommand("Set Breakpoint");
 
             // Try to find module
-            NodeModule module = GetModuleForFilePath(breakpoint.Target.FileName);
+            NodeModule module = GetModuleByFilePath(breakpoint.Target.FileName);
 
             var setBreakpointCommand = new SetBreakpointCommand(CommandId, module, breakpoint, withoutPredicate, IsRemote);
             await _client.SendRequestAsync(setBreakpointCommand, cancellationToken).ConfigureAwait(false);
@@ -939,12 +971,6 @@ namespace Microsoft.NodejsTools.Debugger {
             if (breakpointBindFailure != null) {
                 breakpointBindFailure(this, new BreakpointBindingEventArgs(breakpoint, null));
             }
-        }
-
-        internal NodeModule GetModuleForFilePath(string filePath) {
-            NodeModule module;
-            _mapNameToScript.TryGetValue(filePath, out module);
-            return module;
         }
 
         internal async Task UpdateBreakpointBindingAsync(
@@ -1042,7 +1068,7 @@ namespace Microsoft.NodejsTools.Debugger {
         internal async Task<string> GetScriptTextAsync(int moduleId, CancellationToken cancellationToken = new CancellationToken()) {
             DebugWriteCommand("GetScriptText: " + moduleId);
 
-            var scriptsCommand = new ScriptsCommand(CommandId, this, true, moduleId);
+            var scriptsCommand = new ScriptsCommand(CommandId, true, moduleId);
             await _client.SendRequestAsync(scriptsCommand, cancellationToken).ConfigureAwait(false);
 
             if (scriptsCommand.Modules.Count == 0) {
@@ -1089,6 +1115,76 @@ namespace Microsoft.NodejsTools.Debugger {
         public event EventHandler<OutputEventArgs> DebuggerOutput {
             add { }
             remove { }
+        }
+
+        #endregion
+
+        #region Modules Management
+
+        /// <summary>
+        /// Gets or adds a new module.
+        /// </summary>
+        /// <param name="module">New module.</param>
+        /// <param name="value">Existing module.</param>
+        /// <returns>True if module was added otherwise false.</returns>
+        private bool GetOrAddModule(NodeModule module, out NodeModule value) {
+            value = null;
+
+            string javaScriptFileName = module.JavaScriptFileName;
+            if (string.IsNullOrEmpty(javaScriptFileName) ||
+                javaScriptFileName == NodeVariableType.UnknownModule ||
+                javaScriptFileName.StartsWith("binding:")) {
+                return false;
+            }
+
+            // Get local JS file name
+            javaScriptFileName = FileNameMapper.GetLocalFileName(javaScriptFileName);
+
+            // Try to get mapping for JS file
+            SourceMapping mapping = SourceMapper.MapToOriginal(javaScriptFileName, 0);
+            if (mapping == null) {
+                module = new NodeModule(module.Id, javaScriptFileName);
+            } else {
+                string directoryName = Path.GetDirectoryName(javaScriptFileName) ?? string.Empty;
+                string fileName = Path.Combine(directoryName, Path.GetFileName(mapping.FileName) ?? string.Empty);
+
+                module = new NodeModule(module.Id, fileName, javaScriptFileName);
+            }
+
+            // Check whether module already exits
+            if (_mapNameToModule.TryGetValue(module.FileName, out value)) {
+                return false;
+            }
+
+            // Add module
+            _mapNameToModule[module.FileName] = module;
+            _mapIdToModule[module.Id] = module;
+
+            value = module;
+
+            return true;
+        }
+
+        /// <summary>
+        /// Gets a module by file path.
+        /// </summary>
+        /// <param name="filePath">File path.</param>
+        /// <returns>Module.</returns>
+        public NodeModule GetModuleByFilePath(string filePath) {
+            NodeModule module;
+            _mapNameToModule.TryGetValue(filePath, out module);
+            return module;
+        }
+
+        /// <summary>
+        /// Gets a module by id.
+        /// </summary>
+        /// <param name="id">Module identifier.</param>
+        /// <returns>Module.</returns>
+        public NodeModule GetModuleById(int id) {
+            NodeModule module;
+            _mapIdToModule.TryGetValue(id, out module);
+            return module;
         }
 
         #endregion

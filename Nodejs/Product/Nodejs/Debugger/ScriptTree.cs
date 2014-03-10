@@ -23,7 +23,7 @@ namespace Microsoft.NodejsTools.Debugger {
     /// This is used to do fuzzy filename matching when a breakpoint is hit.
     /// </summary>
     sealed class ScriptTree {
-        public readonly List<string> Children = new List<string>();
+        public readonly HashSet<string> Children = new HashSet<string>(StringComparer.OrdinalIgnoreCase);
         public readonly string Filename;
         public readonly Dictionary<string, ScriptTree> Parents = new Dictionary<string, ScriptTree>(StringComparer.OrdinalIgnoreCase);
 

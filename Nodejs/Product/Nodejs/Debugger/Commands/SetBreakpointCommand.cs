@@ -102,9 +102,11 @@ namespace Microsoft.NodejsTools.Debugger.Commands {
 
             // Handle breakpoint actual location fixup
             JArray actualLocations = (JArray)body["actual_locations"] ?? new JArray();
-            if (actualLocations != null && actualLocations.Count > 0) {
-                Line = (int)actualLocations[0]["line"];
-                var column = (int)actualLocations[0]["column"];
+            if (actualLocations.Count > 0) {
+                var location = actualLocations[0];
+                ScriptId = ScriptId ?? (int?)location["script_id"];
+                Line = (int)location["line"];
+                var column = (int)location["column"];
                 Column = Line == 0 ? column - NodeConstants.ScriptWrapBegin.Length : column;
             } else {
                 Line = _breakpoint.Position.Line;

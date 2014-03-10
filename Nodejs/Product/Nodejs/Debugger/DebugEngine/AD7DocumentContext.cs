@@ -18,39 +18,27 @@ using Microsoft.VisualStudio;
 using Microsoft.VisualStudio.Debugger.Interop;
 
 namespace Microsoft.NodejsTools.Debugger.DebugEngine {
-    // This class represents a document context to the debugger. A document context represents a location within a source file. 
+    /// <summary>
+    /// This class represents a document context to the debugger. A document context
+    /// represents a location within a source file.
+    /// </summary>
     class AD7DocumentContext : IDebugDocumentContext2 {
         private readonly AD7MemoryAddress _codeContext;
-        private string _fileName;
 
         public AD7DocumentContext(AD7MemoryAddress codeContext) {
             _codeContext = codeContext;
         }
 
         public AD7Engine Engine {
-            get {
-                return _codeContext.Engine;
-            }
+            get { return _codeContext.Engine; }
         }
 
         public NodeModule Module {
-            get {
-                return _codeContext.Module;
-            }
+            get { return _codeContext.Module; }
         }
 
         public string FileName {
-            get {
-                if (_fileName == null) {
-                    // Perform "fuzzy" filename matching for non-builtin sources
-                    var module = Module;
-                    _fileName =
-                        (module == null) || module.BuiltIn ?
-                        _codeContext.FileName :
-                        Engine.GetFuzzyMatchFilename(_codeContext.FileName);
-                }
-                return _fileName;
-            }
+            get { return _codeContext.FileName; }
         }
 
         public bool Downloaded {
@@ -86,7 +74,7 @@ namespace Microsoft.NodejsTools.Debugger.DebugEngine {
             // Expose document for downloaded modules
             ppDocument = null;
             if (Downloaded) {
-                var module = Module;
+                NodeModule module = Module;
                 if (module != null) {
                     // Lazily create document per module
                     ppDocument = (AD7Document)module.Document;

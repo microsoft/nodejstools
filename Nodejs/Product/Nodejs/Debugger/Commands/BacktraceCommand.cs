@@ -20,18 +20,14 @@ using Newtonsoft.Json.Linq;
 namespace Microsoft.NodejsTools.Debugger.Commands {
     sealed class BacktraceCommand : DebuggerCommand {
         private readonly Dictionary<string, object> _arguments;
-        private readonly NodeDebugger _debugger;
         private readonly IEvaluationResultFactory _resultFactory;
-        private readonly NodeModule _unknownModule = new NodeModule(-1, NodeVariableType.UnknownModule, NodeVariableType.UnknownModule);
+        private readonly bool _depthOnly;
+        private readonly NodeModule _unknownModule = new NodeModule(-1, NodeVariableType.UnknownModule);
 
-        public BacktraceCommand(
-            int id,
-            IEvaluationResultFactory resultFactory,
-            int fromFrame,
-            int toFrame,
-            NodeDebugger debugger = null) : base(id, "backtrace") {
+        public BacktraceCommand(int id, IEvaluationResultFactory resultFactory, int fromFrame, int toFrame, bool depthOnly = false)
+            : base(id, "backtrace") {
             _resultFactory = resultFactory;
-            _debugger = debugger;
+            _depthOnly = depthOnly;
 
             _arguments = new Dictionary<string, object> {
                 { "fromFrame", fromFrame },
@@ -54,15 +50,15 @@ namespace Microsoft.NodejsTools.Debugger.Commands {
             JToken body = response["body"];
             CallstackDepth = (int)body["totalFrames"];
 
-            // Should not collect stack frames without debugger
-            if (_debugger == null) {
+            // Collect frames only if required
+            if (_depthOnly) {
                 Modules = new Dictionary<int, NodeModule>();
                 StackFrames = new List<NodeStackFrame>();
                 return;
             }
 
             // Extract scripts (if not provided)
-            Modules = GetScripts((JArray)response["refs"], _debugger);
+            Modules = GetModules((JArray)response["refs"]);
 
             // Extract frames
             JArray frames = (JArray)body["frames"] ?? new JArray();
@@ -70,7 +66,7 @@ namespace Microsoft.NodejsTools.Debugger.Commands {
 
             foreach (JToken frame in frames) {
                 // Create stack frame
-                string frameName = GetFrameName(frame);
+                string functionName = GetFunctionName(frame);
                 var moduleId = (int?)frame["func"]["scriptId"];
 
                 NodeModule module;
@@ -81,34 +77,24 @@ namespace Microsoft.NodejsTools.Debugger.Commands {
                 int line = (int?)frame["line"] ?? 0;
                 int column = (int?)frame["column"] ?? 0;
                 int frameId = (int?)frame["index"] ?? 0;
-                NodeStackFrame stackFrame = CreateStackFrame(module, frameName, line, column, frameId);
+
+                var stackFrame = new NodeStackFrame(frameId) {
+                    Column = column,
+                    FunctionName = functionName,
+                    Line = line,
+                    Module = module
+                };
 
                 // Locals
-                var variables = (JArray)frame["locals"];
-                List<NodeEvaluationResult> locals = GetVariables(stackFrame, variables);
+                JArray variables = (JArray)frame["locals"] ?? new JArray();
+                stackFrame.Locals = GetVariables(stackFrame, variables);
 
                 // Arguments
-                variables = (JArray)frame["arguments"];
-                List<NodeEvaluationResult> parameters = GetVariables(stackFrame, variables);
-
-                stackFrame.Locals = locals;
-                stackFrame.Parameters = parameters;
+                variables = (JArray)frame["arguments"] ?? new JArray();
+                stackFrame.Parameters = GetVariables(stackFrame, variables);
 
                 StackFrames.Add(stackFrame);
             }
-        }
-
-        private NodeStackFrame CreateStackFrame(NodeModule module, string frameName, int line, int column, int stackFrameId) {
-            // Map file position to original, if required
-            if (module.JavaScriptFileName != module.FileName) {
-                SourceMapping mapping = _debugger.SourceMapper.MapToOriginal(module.JavaScriptFileName, line, column);
-                if (mapping != null) {
-                    line = mapping.Line;
-                    column = mapping.Column;
-                    frameName = string.IsNullOrEmpty(mapping.Name) ? frameName : mapping.Name;
-                }
-            }
-            return new NodeStackFrame(_debugger, module, stackFrameId, frameName, line, column);
         }
 
         private List<NodeEvaluationResult> GetVariables(NodeStackFrame stackFrame, IEnumerable<JToken> variables) {
@@ -116,7 +102,7 @@ namespace Microsoft.NodejsTools.Debugger.Commands {
                 .Select(variableProvider => _resultFactory.Create(variableProvider)).ToList();
         }
 
-        private static string GetFrameName(JToken frame) {
+        private static string GetFunctionName(JToken frame) {
             JToken func = frame["func"];
             var framename = (string)func["name"];
             if (string.IsNullOrEmpty(framename)) {
@@ -128,14 +114,13 @@ namespace Microsoft.NodejsTools.Debugger.Commands {
             return framename;
         }
 
-        private static Dictionary<int, NodeModule> GetScripts(JArray references, NodeDebugger debugger) {
+        private static Dictionary<int, NodeModule> GetModules(JArray references) {
             var scripts = new Dictionary<int, NodeModule>(references.Count);
             foreach (JToken reference in references) {
                 var scriptId = (int)reference["id"];
-                var javaScriptFilename = (string)reference["name"];
-                string fileName = debugger.GetModuleFileName(javaScriptFilename);
+                var fileName = (string)reference["name"];
 
-                scripts.Add(scriptId, new NodeModule(scriptId, fileName, javaScriptFilename));
+                scripts.Add(scriptId, new NodeModule(scriptId, fileName));
             }
             return scripts;
         }

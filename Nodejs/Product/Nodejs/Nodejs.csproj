@@ -249,9 +249,10 @@
     <Compile Include="Commands\OpenRemoteDebugDocumentationCommand.cs" />
     <Compile Include="Commands\OpenRemoteDebugProxyFolderCommand.cs" />
     <Compile Include="Commands\SurveyNewsCommand.cs" />
-    <Compile Include="Debugger\BreakpointHandler.cs" />
     <Compile Include="Debugger\FilePosition.cs" />
-    <Compile Include="Debugger\FuzzyLogicBreakpointHandler.cs" />
+    <Compile Include="Debugger\FuzzyLogicFileNameMapper.cs" />
+    <Compile Include="Debugger\IFileNameMapper.cs" />
+    <Compile Include="Debugger\LocalFileNameMapper.cs" />
     <Compile Include="Debugger\NodeProcess.cs" />
     <Compile Include="Debugger\ScriptTree.cs" />
     <Compile Include="NodejsPackage.Debugger.cs" />

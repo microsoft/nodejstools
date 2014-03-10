@@ -29,7 +29,7 @@ namespace NodejsTests.Debugger.Commands {
             const int line = 2;
             const int column = 0;
             const string fileName = "module.js";
-            var module = new NodeModule(moduleId, fileName, fileName);
+            var module = new NodeModule(moduleId, fileName);
             var breakOn = new BreakOn(BreakOnKind.Equal, 2);
             var position = new FilePosition(fileName, line, column);
             var breakpoint = new NodeBreakpoint(null, null, position, true, breakOn, null);
@@ -54,7 +54,7 @@ namespace NodejsTests.Debugger.Commands {
             const int line = 0;
             const int column = 0;
             const string fileName = "c:\\module.js";
-            var module = new NodeModule(moduleId, fileName, fileName);
+            var module = new NodeModule(moduleId, fileName);
             var breakOn = new BreakOn(BreakOnKind.Equal, 2);
             var position = new FilePosition(fileName, line, column);
             var breakpoint = new NodeBreakpoint(null, null, position, true, breakOn, null);
@@ -125,7 +125,7 @@ namespace NodejsTests.Debugger.Commands {
             const int line = 2;
             const int column = 0;
             const string fileName = "module.js";
-            var module = new NodeModule(moduleId, fileName, fileName);
+            var module = new NodeModule(moduleId, fileName);
             var breakOn = new BreakOn(BreakOnKind.Equal, 2);
             var position = new FilePosition(fileName, line, column);
             var breakpoint = new NodeBreakpoint(null, null, position, true, breakOn, null);
@@ -150,7 +150,7 @@ namespace NodejsTests.Debugger.Commands {
             const int line = 2;
             const int column = 0;
             const string fileName = "module.js";
-            var module = new NodeModule(moduleId, fileName, fileName);
+            var module = new NodeModule(moduleId, fileName);
             var breakOn = new BreakOn(BreakOnKind.Equal, 2);
             var position = new FilePosition(fileName, line, column);
             var breakpoint = new NodeBreakpoint(null, null, position, true, breakOn, null);
@@ -174,7 +174,7 @@ namespace NodejsTests.Debugger.Commands {
             const int commandId = 3;
             const int moduleId = 5;
             const string fileName = "module.js";
-            var module = new NodeModule(moduleId, fileName, fileName);
+            var module = new NodeModule(moduleId, fileName);
             SetBreakpointCommand setBreakpointCommand = null;
             Exception exception = null;
 

@@ -15,80 +15,61 @@
 using System.Collections.Generic;
 using System.Threading;
 using System.Threading.Tasks;
+using Microsoft.VisualStudioTools.Project;
 
 namespace Microsoft.NodejsTools.Debugger {
     sealed class NodeStackFrame {
-        private readonly int _column;
-        private readonly NodeDebugger _debugger;
         private readonly int _frameId;
-        private readonly string _frameName;
-        private readonly int _line;
-        private readonly NodeModule _module;
 
-        public NodeStackFrame(NodeDebugger debugger, NodeModule module, int frameId, string frameName, int line, int column) {
-            _debugger = debugger;
-            _module = module;
+        public NodeStackFrame(int frameId) {
             _frameId = frameId;
-            _frameName = frameName;
-            _line = line;
-            _column = column;
         }
 
         /// <summary>
         /// The line number where the current function/class/module starts
         /// </summary>
         public int StartLine {
-            get { return _line; }
+            get { return Line; }
         }
 
         /// <summary>
         /// The line number where the current function/class/module ends.
         /// </summary>
         public int EndLine {
-            get { return _line; }
+            get { return Line; }
         }
 
         /// <summary>
         /// Gets a thread which executes stack frame.
         /// </summary>
-        public NodeDebugger Process {
-            get { return _debugger; }
-        }
+        public NodeDebugger Process { get; set; }
 
         /// <summary>
         /// Gets a stack frame line number in the script.
         /// </summary>
-        public int Line {
-            get { return _line; }
-        }
+        public int Line { get; set; }
 
         /// <summary>
         /// Gets a stack frame column number in the script.
         /// </summary>
-        public int Column {
-            get { return _column; }
-        }
+        public int Column { get; set; }
 
         /// <summary>
         /// Gets a stack name.
         /// </summary>
-        public string FunctionName {
-            get { return _frameName; }
-        }
+        public string FunctionName { get; set; }
 
         /// <summary>
         /// Gets a script file name which holds a code segment of the frame.
         /// </summary>
         public string FileName {
-            get { return _module.FileName; }
+            get { return Module != null ? Module.FileName : null; }
         }
 
         /// <summary>
         /// Gets a script which holds a code segment of the frame.
         /// </summary>
-        public NodeModule Module {
-            get { return _module; }
-        }
+        public NodeModule Module { get; set; }
 
         /// <summary>
         /// Gets the ID of the frame.  Frame 0 is the currently executing frame, 1 is the caller of the currently executing frame,
@@ -139,7 +120,9 @@ namespace Microsoft.NodejsTools.Debugger {
         /// <param name="text">Text expression.</param>
         /// <param name="cancellationToken">Cancellation token.</param>
         public Task<NodeEvaluationResult> ExecuteTextAsync(string text, CancellationToken cancellationToken = new CancellationToken()) {
-            return _debugger.ExecuteTextAsync(this, text, cancellationToken);
+            Utilities.CheckNotNull(Process);
+
+            return Process.ExecuteTextAsync(this, text, cancellationToken);
         }
 
         /// <summary>
@@ -149,7 +132,9 @@ namespace Microsoft.NodejsTools.Debugger {
         /// <param name="value">New value.</param>
         /// <param name="cancellationToken">Cancellation token.</param>
         public async Task<NodeEvaluationResult> SetVariableValueAsync(string name, string value, CancellationToken cancellationToken = new CancellationToken()) {
-            NodeEvaluationResult result = await _debugger.SetVariableValueAsync(this, name, value, cancellationToken).ConfigureAwait(false);
+            Utilities.CheckNotNull(Process);
+
+            NodeEvaluationResult result = await Process.SetVariableValueAsync(this, name, value, cancellationToken).ConfigureAwait(false);
 
             // Update variable in locals
             for (int i = 0; i < Locals.Count; i++) {

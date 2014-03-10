@@ -27,7 +27,7 @@ namespace NodejsTests.Debugger.Commands {
             const int commandId = 3;
             const int frameId = 1;
             var resultFactoryMock = new Mock<IEvaluationResultFactory>();
-            var stackFrame = new NodeStackFrame(null, null, frameId, null, 0, 0);
+            var stackFrame = new NodeStackFrame(frameId);
             const string variableName = "port";
             const int handle = 40;
 
@@ -49,7 +49,7 @@ namespace NodejsTests.Debugger.Commands {
             var resultFactoryMock = new Mock<IEvaluationResultFactory>();
             resultFactoryMock.Setup(factory => factory.Create(It.IsAny<INodeVariable>()))
                 .Returns(() => new NodeEvaluationResult(0, null, null, null, null, null, NodeExpressionType.None, null));
-            var stackFrame = new NodeStackFrame(null, null, 0, null, 0, 0);
+            var stackFrame = new NodeStackFrame(0);
             const string variableName = "port";
             const int handle = 40;
             var setVariableValueCommand = new SetVariableValueCommand(commandId, resultFactoryMock.Object, stackFrame, variableName, handle);

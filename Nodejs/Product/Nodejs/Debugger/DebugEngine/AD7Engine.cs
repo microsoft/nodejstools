@@ -205,7 +205,7 @@ namespace Microsoft.NodejsTools.Debugger.DebugEngine {
                 // We only need to do fuzzy comparisons when debugging remotely
                 if (!uri.IsLoopback) {
                     _process.IsRemote = true;
-                    _process.BreakpointHandler = new FuzzyLogicBreakpointHandler();
+                    _process.FileNameMapper = new FuzzyLogicFileNameMapper();
                 }
 
                 AttachEvents(_process);
@@ -1157,7 +1157,7 @@ namespace Microsoft.NodejsTools.Debugger.DebugEngine {
         }
 
         private async void OnDocumentSaved(Document document) {
-            var module = Process.GetModuleForFilePath(document.FullName);
+            var module = Process.GetModuleByFilePath(document.FullName);
             if (module == null) {
                 return;
             }
@@ -1175,66 +1175,6 @@ namespace Microsoft.NodejsTools.Debugger.DebugEngine {
         }
 
         #endregion
-
-        internal string GetFuzzyMatchFilename(string fileName) {
-            // Hande local launch or attach, by matching given filename
-            // UNDONE Detect local attach
-            if (!_attached) {
-                return fileName;
-            }
-
-            string fuzzyFileName = null;
-            var solution = Package.GetGlobalService(typeof(SVsSolution)) as IVsSolution;
-            if (solution != null) {
-                int bestMatchCount = 0;
-                var leafName = Path.GetFileName(fileName);
-                var reverseFileName = NormalizedReversedPath(fileName);
-                foreach (var project in solution.EnumerateLoadedProjects(onlyNodeProjects: false)) {
-                    int pfFound;
-                    var pdwPriority = new VSDOCUMENTPRIORITY[1];
-                    uint pitemid;
-                    if (ErrorHandler.Succeeded(project.IsDocumentInProject(fileName, out pfFound, pdwPriority, out pitemid)) && pfFound != 0) {
-                        // Handle remote attach where given fully-qualified path found in project, by matching given filename
-                        return fileName;
-                    }
-
-                    if (fuzzyFileName == null) {
-                        foreach (var itemid in project.EnumerateProjectItems()) {
-                            string moniker;
-                            if (ErrorHandler.Succeeded(project.GetMkDocument(itemid, out moniker)) && moniker != null) {
-                                if (string.Compare(leafName, Path.GetFileName(moniker), StringComparison.OrdinalIgnoreCase) == 0) {
-                                    var matchCount = CountCharMatch(reverseFileName, NormalizedReversedPath(moniker));
-                                    if (matchCount > bestMatchCount) {
-                                        bestMatchCount = matchCount;
-                                        // Handle remote attach where leaf name in project, by matching project item filename
-                                        fuzzyFileName = moniker;
-                                    }
-                                }
-                            }
-                        }
-                    }
-                }
-            }
-            if (fuzzyFileName != null) {
-                return fuzzyFileName;
-            }
-
-            // Fallback to matching leaf name, which causes source to be downloaded
-            return Path.GetFileName(fileName);
-        }
-
-        private char[] NormalizedReversedPath(string path) {
-            var array = path.Replace('/', '\\').ToLower().ToCharArray();
-            Array.Reverse(array);
-            return array;
-        }
-
-        private int CountCharMatch(char[] array1, char[] array2) {
-            var maxCount = Math.Min(array1.Length, array2.Length);
-            int matchCount;
-            for (matchCount = 0; matchCount < maxCount && array1[matchCount] == array2[matchCount]; ++matchCount) { }
-            return matchCount;
-        }
 
         internal static void MapLanguageInfo(string filename, out string pbstrLanguage, out Guid pguidLanguage) {
             if (String.Equals(Path.GetExtension(filename), NodejsConstants.TypeScriptExtension, StringComparison.OrdinalIgnoreCase)) {

@@ -12,25 +12,20 @@
  *
  * ***************************************************************************/
 
-using System.Collections.Generic;
-
 namespace Microsoft.NodejsTools.Debugger {
-    class BreakpointHandler {
-        public virtual void AddModuleName(string fileName) {
+    /// <summary>
+    /// Handles file name mapping while local debigging.
+    /// </summary>
+    sealed class LocalFileNameMapper : IFileNameMapper {
+        public void AddModuleName(string fileName) {
         }
 
-        public IEnumerable<NodeBreakpointBinding> ProcessBindings(NodeModule brokeIn, IEnumerable<NodeBreakpointBinding> hitBindings) {
-            foreach (NodeBreakpointBinding hitBinding in hitBindings) {
-                if (MatchFileName(brokeIn.JavaScriptFileName, hitBinding.Position.FileName)) {
-                    yield return hitBinding;
-                } else {
-                    hitBinding.FixupHitCount();
-                }
-            }
-        }
-
-        protected virtual bool MatchFileName(string remoteFileName, string localFileName) {
+        public bool MatchFileName(string remoteFileName, string localFileName) {
             return remoteFileName == localFileName;
+        }
+
+        public string GetLocalFileName(string remoteFileName) {
+            return remoteFileName;
         }
     }
 }
