@@ -14,6 +14,7 @@
 
 using System;
 using System.IO;
+using System.Threading;
 using System.Windows.Automation;
 using EnvDTE;
 using Microsoft.NodejsTools;
@@ -38,8 +39,15 @@ namespace Microsoft.Nodejs.Tests.UI {
                 newItem.FileName = "NewTSFile.ts";
                 newItem.ClickOK();
 
-                solution.App.ExecuteCommand("Build.BuildSolution");
-                solution.App.WaitForOutputWindowText("Build", "tsc.exe");
+                using (AutoResetEvent buildDone = new AutoResetEvent(false)) {
+                    solution.App.Dte.Events.BuildEvents.OnBuildDone += (sender, args) => {
+                        buildDone.Set();
+                    };
+
+                    solution.App.ExecuteCommand("Build.BuildSolution");
+                    solution.App.WaitForOutputWindowText("Build", "tsc.exe");
+                    Assert.IsTrue(buildDone.WaitOne(10000), "failed to wait for build)");
+                }
             }
         }
 
