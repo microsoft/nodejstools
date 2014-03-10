@@ -1157,7 +1157,7 @@ namespace Microsoft.NodejsTools.Debugger.DebugEngine {
         }
 
         private async void OnDocumentSaved(Document document) {
-            var module = Process.GetModuleByFilePath(document.FullName);
+            var module = Process.GetModuleForFilePath(document.FullName);
             if (module == null) {
                 return;
             }

@@ -38,8 +38,7 @@ namespace Microsoft.NodejsTools.Debugger {
         private readonly Uri _debuggerEndpointUri;
         private readonly Dictionary<int, string> _errorCodes = new Dictionary<int, string>();
         private readonly ExceptionHandler _exceptionHandler;
-        private readonly Dictionary<int, NodeModule> _mapIdToModule = new Dictionary<int, NodeModule>();
-        private readonly Dictionary<string, NodeModule> _mapNameToModule = new Dictionary<string, NodeModule>(StringComparer.OrdinalIgnoreCase);
+        private readonly Dictionary<string, NodeModule> _modules = new Dictionary<string, NodeModule>(StringComparer.OrdinalIgnoreCase);
         private readonly EvaluationResultFactory _resultFactory;
         private readonly SourceMapper _sourceMapper;
         private readonly Dictionary<int, NodeThread> _threads = new Dictionary<int, NodeThread>();
@@ -833,12 +832,12 @@ namespace Microsoft.NodejsTools.Debugger {
                 NodeStackFrame topFrame = MainThread.TopStackFrame;
                 int currentLine = topFrame.Line;
                 string breakFileName = topFrame.Module.FileName;
-                NodeModule breakModule = GetModuleByFilePath(breakFileName);
+                NodeModule breakModule = GetModuleForFilePath(breakFileName);
 
                 var breakpointBindings = new List<NodeBreakpointBinding>();
                 foreach (NodeBreakpointBinding breakpointBinding in _breakpointBindings.Values) {
                     if (breakpointBinding.Enabled && breakpointBinding.Position.Line == currentLine &&
-                        GetModuleByFilePath(breakpointBinding.Target.FileName) == breakModule) {
+                        GetModuleForFilePath(breakpointBinding.Target.FileName) == breakModule) {
                         breakpointBindings.Add(breakpointBinding);
                     }
                 }
@@ -937,7 +936,7 @@ namespace Microsoft.NodejsTools.Debugger {
             DebugWriteCommand("Set Breakpoint");
 
             // Try to find module
-            NodeModule module = GetModuleByFilePath(breakpoint.Target.FileName);
+            NodeModule module = GetModuleForFilePath(breakpoint.Target.FileName);
 
             var setBreakpointCommand = new SetBreakpointCommand(CommandId, module, breakpoint, withoutPredicate, IsRemote);
             await _client.SendRequestAsync(setBreakpointCommand, cancellationToken).ConfigureAwait(false);
@@ -1152,38 +1151,26 @@ namespace Microsoft.NodejsTools.Debugger {
             }
 
             // Check whether module already exits
-            if (_mapNameToModule.TryGetValue(module.FileName, out value)) {
+            if (_modules.TryGetValue(module.FileName, out value)) {
                 return false;
             }
 
-            // Add module
-            _mapNameToModule[module.FileName] = module;
-            _mapIdToModule[module.Id] = module;
-
             value = module;
+
+            // Add module
+            _modules[module.FileName] = module;
 
             return true;
         }
 
         /// <summary>
-        /// Gets a module by file path.
+        /// Gets a module for file path.
         /// </summary>
         /// <param name="filePath">File path.</param>
         /// <returns>Module.</returns>
-        public NodeModule GetModuleByFilePath(string filePath) {
+        public NodeModule GetModuleForFilePath(string filePath) {
             NodeModule module;
-            _mapNameToModule.TryGetValue(filePath, out module);
-            return module;
-        }
-
-        /// <summary>
-        /// Gets a module by id.
-        /// </summary>
-        /// <param name="id">Module identifier.</param>
-        /// <returns>Module.</returns>
-        public NodeModule GetModuleById(int id) {
-            NodeModule module;
-            _mapIdToModule.TryGetValue(id, out module);
+            _modules.TryGetValue(filePath, out module);
             return module;
         }
 
