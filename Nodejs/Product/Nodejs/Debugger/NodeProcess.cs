@@ -26,7 +26,7 @@ namespace Microsoft.NodejsTools.Debugger {
     sealed class NodeProcess : IDisposable {
         private readonly ProcessStartInfo _psi;
         private readonly bool _waitOnAbnormal, _waitOnNormal, _enableRaisingEvents;
-        private Process _process;
+        private Process _process, _pressAnyKeyProcess;
 
         public NodeProcess(ProcessStartInfo psi, bool waitOnAbnormal, bool waitOnNormal, bool enableRaisingEvents) {
             _psi = psi;
@@ -65,7 +65,7 @@ namespace Microsoft.NodejsTools.Debugger {
                     Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location),
                     "Microsoft.NodejsTools.PressAnyKey.exe"
                 );
-                var process = Process.Start(_psi);
+                var process = _pressAnyKeyProcess = Process.Start(_psi);
                 int? pid = null;
                 while (!process.HasExited) {
                     if (new FileInfo(pidFile).Length == 0) {
@@ -128,10 +128,13 @@ namespace Microsoft.NodejsTools.Debugger {
         }
 
         internal void Kill() {
-            if (_process == null) {
-                return;
+            if (_pressAnyKeyProcess != null) {
+                _pressAnyKeyProcess.Kill();
             }
-            _process.Kill();
+
+            if (_process != null) {
+                _process.Kill();
+            }
         }
 
         public int ExitCode {
@@ -144,6 +147,9 @@ namespace Microsoft.NodejsTools.Debugger {
         }
 
         public void Dispose() {
+            if (_pressAnyKeyProcess != null) {
+                _pressAnyKeyProcess.Dispose();
+            }
             if (_process != null) {
                 _process.Dispose();
             }

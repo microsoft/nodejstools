@@ -90,6 +90,13 @@
               <Condition>VWD_EXTENSION_INSTALLPATH</Condition>
             </Component>
 
+            <Component Directory="INSTALLLOCATION" Guid="{E78AE0F0-8705-4E33-9178-F85A3AC74032}">
+              <File Id="filNewtonsoft.Json.dll" KeyPath="yes" Source="$(var.BinariesDir)\Newtonsoft.Json.dll" />
+            </Component>
+            <Component Directory="VWD_INSTALLLOCATION" Guid="{D44CA655-5F18-4054-BDA0-1024EA83A5A6}">
+              <File Id="filVWDNewtonsoft.Json.dll" KeyPath="yes" Source="$(var.BinariesDir)\Newtonsoft.Json.dll" />
+            </Component>
+
             <Component Directory="INSTALLLOCATION" Guid="{C494CFC4-B146-4350-BA60-63EEFF273441}">
               <File Id="filtypescriptServices.js" KeyPath="yes" Source="$(var.BinariesDir)\Formatting\typescriptServices.js"/>
             </Component>
