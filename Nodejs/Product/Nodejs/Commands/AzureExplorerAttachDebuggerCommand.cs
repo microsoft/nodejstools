@@ -81,8 +81,8 @@ namespace Microsoft.NodejsTools.Commands {
             onAttach = (attachTask) => {
                 if (!attachTask.Result) {
                     string msg = string.Format(
-                        "Could not attach to node.exe process on Azure web site at {0}\r\n\r\n" +
-                        "Make sure that the web site is running and servicing requests, and that the websocket debugging proxy is correctly registered in web.config",
+                        "Could not attach to node.exe process on Azure web site at {0}.\r\n\r\n" +
+                        "Error retrieving websocket debug proxy information from web.config.",
                         webSite.Uri);
                     if (MessageBox.Show(msg, null, MessageBoxButtons.RetryCancel, MessageBoxIcon.Error) == DialogResult.Retry) {
                         AttachWorker(webSite).ContinueWith(onAttach);
@@ -215,10 +215,12 @@ namespace Microsoft.NodejsTools.Commands {
 
             try {
                 AttachDebugger(new UriBuilder(webSite.Uri) { Scheme = (webSite.Uri.Scheme == "https") ? "wss" : "ws", Path = path }.Uri);
-                return true;
             } catch (Exception) {
-                return false;
+                // If we got to this point, the attach logic in debug engine will catch exceptions, display proper error message and
+                // ask the user to retry, so the only case where we actually get here is if user canceled on error. If this is the case,
+                // we don't want to pop any additional error messages, so always return true.
             }
+            return true;
         }
 
         /// <summary>
