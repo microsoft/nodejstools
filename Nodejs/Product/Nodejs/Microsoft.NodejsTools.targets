@@ -269,17 +269,17 @@
         DependsOnTargets="$(CollectFilesFromContentDependsOn)"
         Condition="'@(Content)'!=''">
     <ItemGroup>
-      <FilesForPackagingFromProject Include="@(Content->'$(IntermediateOutputPath)%(Identity)')" Condition="'%(Content.Link)'==''">
+      <FilesForPackagingFromProject Include="@(Content)" Condition="'%(Content.Link)'==''">
         <DestinationRelativePath>%(Content.Identity)</DestinationRelativePath>
         <FromTarget>CollectFilesFromContent</FromTarget>
         <Category>Run</Category>
       </FilesForPackagingFromProject>
-      <FilesForPackagingFromProject Include="$(IntermediateOutputPath)\bin\Microsoft.NodejsTools.WebRole.dll">
-        <DestinationRelativePath>bin\Microsoft.NodejsTools.WebRole.dll</DestinationRelativePath>
+      <FilesForPackagingFromProject Include="@(NodejsAzureDeploymentFile)">
+        <DestinationRelativePath>bin\%(Filename)%(Extension)</DestinationRelativePath>
         <FromTarget>CollectFilesFromContent</FromTarget>
         <Category>Run</Category>
       </FilesForPackagingFromProject>
-      <FilesForPackagingFromProject Include="@(Content->'$(IntermediateOutputPath)%(Identity)')" Condition="'%(Content.Link)'!='' And $(EnableCollectLinkFilesInProject)">
+      <FilesForPackagingFromProject Include="@(Content)" Condition="'%(Content.Link)'!='' And $(EnableCollectLinkFilesInProject)">
         <DestinationRelativePath>%(Content.Link)</DestinationRelativePath>
         <FromTarget>CollectFilesFromContent</FromTarget>
         <Category>Run</Category>
