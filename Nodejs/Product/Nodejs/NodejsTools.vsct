@@ -43,14 +43,6 @@
         <Group guid="guidNodeToolsCmdSet" id="NpmInstallItemsGroup" priority="0x0700"></Group>
 
         <Group guid="guidNodeToolsCmdSet" id="NpmUninstallItemsGroup" priority="0x0800"></Group>
-
-        <!-- On newer versions of Web Tools, this is provided by their package, but on the older ones they rely 
-             on Server Explorer to dynamically generate the items for them. Defining it here and parenting our
-             command to it makes it show in the right spot (next to "Attach Debugger") on newer versions, and
-             show in a separate group all by itself on older versions, which is the best we can get. -->
-        <Group guid="guidAzureExplorerCmdId" id="groupAzureDiagnostics" priority="0x0150">
-          <Parent guid="guid_SE_MenuGroup" id="IDM_SE_CONTEXT_STANDARD"/>
-        </Group>
     </Groups>
 
     <Menus>
