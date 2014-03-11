@@ -205,7 +205,7 @@ namespace Microsoft.NodejsTools.Debugger.DebugEngine {
                 // We only need to do fuzzy comparisons when debugging remotely
                 if (!uri.IsLoopback) {
                     _process.IsRemote = true;
-                    _process.FileNameMapper = new FuzzyLogicFileNameMapper();
+                    _process.FileNameMapper = new FuzzyLogicFileNameMapper(EnumerateSolutionFiles());
                 }
 
                 AttachEvents(_process);
@@ -1183,6 +1183,24 @@ namespace Microsoft.NodejsTools.Debugger.DebugEngine {
             } else {
                 pbstrLanguage = NodejsConstants.JavaScript;
                 pguidLanguage = Guids.NodejsDebugLanguage;
+            }
+        }
+
+        /// <summary>
+        /// Enumerates files in the solution projects.
+        /// </summary>
+        /// <returns>File names collection.</returns>
+        private IEnumerable<string> EnumerateSolutionFiles() {
+            var solution = Package.GetGlobalService(typeof (SVsSolution)) as IVsSolution;
+            if (solution != null) {
+                foreach (IVsProject project in solution.EnumerateLoadedProjects(false)) {
+                    foreach (uint itemid in project.EnumerateProjectItems()) {
+                        string moniker;
+                        if (ErrorHandler.Succeeded(project.GetMkDocument(itemid, out moniker)) && moniker != null) {
+                            yield return moniker;
+                        }
+                    }
+                }
             }
         }
 

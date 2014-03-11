@@ -15,20 +15,6 @@
 namespace Microsoft.NodejsTools.Debugger {
     interface IFileNameMapper {
         /// <summary>
-        /// Add module to collection.
-        /// </summary>
-        /// <param name="fileName">File name.</param>
-        void AddModuleName(string fileName);
-
-        /// <summary>
-        /// Perform match between local and remote module.
-        /// </summary>
-        /// <param name="remoteFileName">Remote file name.</param>
-        /// <param name="localFileName">Local file name.</param>
-        /// <returns>True if remote file is matched to local otherwise false.</returns>
-        bool MatchFileName(string remoteFileName, string localFileName);
-
-        /// <summary>
         /// Returns a local file name for a remote.
         /// </summary>
         /// <param name="remoteFileName">Remote file name.</param>

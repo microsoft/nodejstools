@@ -14,80 +14,33 @@
 
 using System.Collections.Generic;
 using System.Linq;
-using Microsoft.VisualStudio;
-using Microsoft.VisualStudio.Shell;
-using Microsoft.VisualStudio.Shell.Interop;
 
 namespace Microsoft.NodejsTools.Debugger {
     /// <summary>
     /// Handles file name mapping while remote debugging.
     /// </summary>
     sealed class FuzzyLogicFileNameMapper : IFileNameMapper {
-        private readonly ScriptTree _loadedScripts = new ScriptTree(null);
-        private readonly ScriptTree _projectFiles = new ScriptTree(null);
+        private readonly ScriptTree _scripts = new ScriptTree(null);
 
-        public FuzzyLogicFileNameMapper() {
-            foreach (string fileName in EnumerateSolutionFiles()) {
-                AddModuleToTree(_projectFiles, fileName);
+        /// <summary>
+        /// Constructs mapping based on list project files.
+        /// </summary>
+        /// <param name="files">List of project files.</param>
+        public FuzzyLogicFileNameMapper(IEnumerable<string> files) {
+            foreach (string fileName in files) {
+                AddModuleToTree(fileName);
             }
         }
 
-        public void AddModuleName(string fileName) {
-            AddModuleToTree(_loadedScripts, fileName);
-        }
-
-        public bool MatchFileName(string remoteFileName, string localFileName) {
-            return FindModuleInTree(_loadedScripts, remoteFileName, localFileName);
-        }
-
+        /// <summary>
+        /// Returns a local file name for a remote.
+        /// </summary>
+        /// <param name="remoteFileName">Remote file name.</param>
+        /// <returns>Local file name.</returns>
         public string GetLocalFileName(string remoteFileName) {
-            return FindModuleMatchInTree(_projectFiles, remoteFileName);
-        }
-
-        private void AddModuleToTree(ScriptTree scriptTree, string fileName) {
-            ScriptTree curTree = scriptTree;
-            IEnumerable<string> pathComponents = GetPathComponents(fileName);
-            foreach (string component in pathComponents.Reverse()) {
-                ScriptTree nextTree;
-                if (!curTree.Parents.TryGetValue(component, out nextTree)) {
-                    curTree.Parents[component] = nextTree = new ScriptTree(component);
-                }
-
-                curTree.Children.Add(fileName);
-                curTree = nextTree;
-            }
-        }
-
-        private bool FindModuleInTree(ScriptTree scriptTree, string remoteFileName, string localFileName) {
-            // when we bind breakpoints we can end up setting breakpoints on index.js
-            // and then hit the breakpoint and we need to make sure the paths are
-            // actually the same.  We do this based upon all of the scripts which are
-            // loaded into the process, walking up the path until we have a trailing
-            // path that matches a single script.  If we can't get to just a single
-            // match we'll break in all of the files.
+            // Try to find best file name match
             IEnumerable<string> pathComponents = GetPathComponents(remoteFileName);
-            ScriptTree curTree = scriptTree;
-            foreach (string component in pathComponents.Reverse()) {
-                ScriptTree nextTree;
-                if (!curTree.Parents.TryGetValue(component, out nextTree)) {
-                    // we know nothing about this script, it must not be loaded yet
-                    return false;
-                }
-
-                if (nextTree.Children.Count == 1) {
-                    // we map to a single script, see if it's where we broke.
-                    return nextTree.Children.Contains(localFileName);
-                }
-
-                curTree = nextTree;
-            }
-
-            return true;
-        }
-
-        private string FindModuleMatchInTree(ScriptTree scriptTree, string remoteFileName) {
-            IEnumerable<string> pathComponents = GetPathComponents(remoteFileName);
-            ScriptTree curTree = scriptTree;
+            ScriptTree curTree = _scripts;
             foreach (string component in pathComponents.Reverse()) {
                 ScriptTree nextTree;
                 if (!curTree.Parents.TryGetValue(component, out nextTree)) {
@@ -104,17 +57,17 @@ namespace Microsoft.NodejsTools.Debugger {
             return remoteFileName;
         }
 
-        private IEnumerable<string> EnumerateSolutionFiles() {
-            var solution = Package.GetGlobalService(typeof (SVsSolution)) as IVsSolution;
-            if (solution != null) {
-                foreach (IVsProject project in solution.EnumerateLoadedProjects(false)) {
-                    foreach (uint itemid in project.EnumerateProjectItems()) {
-                        string moniker;
-                        if (ErrorHandler.Succeeded(project.GetMkDocument(itemid, out moniker)) && moniker != null) {
-                            yield return moniker;
-                        }
-                    }
+        private void AddModuleToTree(string fileName) {
+            ScriptTree curTree = _scripts;
+            IEnumerable<string> pathComponents = GetPathComponents(fileName);
+            foreach (string component in pathComponents.Reverse()) {
+                ScriptTree nextTree;
+                if (!curTree.Parents.TryGetValue(component, out nextTree)) {
+                    curTree.Parents[component] = nextTree = new ScriptTree(component);
                 }
+
+                curTree.Children.Add(fileName);
+                curTree = nextTree;
             }
         }
 

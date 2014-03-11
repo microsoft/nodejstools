@@ -520,7 +520,6 @@ namespace Microsoft.NodejsTools.Debugger {
                 NodeModule newModule;
                 if (GetOrAddModule(module, out newModule)) {
                     moduleLoaded(this, new ModuleLoadedEventArgs(newModule));
-                    _fileNameMapper.AddModuleName(newModule.JavaScriptFileName);
                 }
             }
         }
@@ -626,7 +625,7 @@ namespace Microsoft.NodejsTools.Debugger {
             }
 
             // Handle last processed breakpoint binding by breaking with breakpoint hit events
-            List<NodeBreakpointBinding> matchedBindings = ProcessBindings(brokeIn, hitBindings).ToList();
+            List<NodeBreakpointBinding> matchedBindings = ProcessBindings(brokeIn.JavaScriptFileName, hitBindings).ToList();
 
             // Fire breakpoint hit event(s)
             EventHandler<BreakpointHitEventArgs> breakpointHit = BreakpointHit;
@@ -640,9 +639,16 @@ namespace Microsoft.NodejsTools.Debugger {
             return matchedBindings.Count != 0;
         }
 
-        public IEnumerable<NodeBreakpointBinding> ProcessBindings(NodeModule brokeIn, IEnumerable<NodeBreakpointBinding> hitBindings) {
+        /// <summary>
+        /// Checks list of selected bindings.
+        /// </summary>
+        /// <param name="fileName">Module file name.</param>
+        /// <param name="hitBindings">Collection of selected bindings.</param>
+        /// <returns>Matched bindings.</returns>
+        private IEnumerable<NodeBreakpointBinding> ProcessBindings(string fileName, IEnumerable<NodeBreakpointBinding> hitBindings) {
             foreach (NodeBreakpointBinding hitBinding in hitBindings) {
-                if (_fileNameMapper.MatchFileName(brokeIn.JavaScriptFileName, hitBinding.Position.FileName)) {
+                string localFileName = _fileNameMapper.GetLocalFileName(fileName);
+                if (string.Equals(localFileName, hitBinding.Position.FileName, StringComparison.OrdinalIgnoreCase)) {
                     yield return hitBinding;
                 } else {
                     hitBinding.FixupHitCount();

@@ -12,13 +12,23 @@
  *
  * ***************************************************************************/
 
-namespace Microsoft.NodejsTools.Debugger {
-    /// <summary>
-    /// Handles file name mapping while local debigging.
-    /// </summary>
-    sealed class LocalFileNameMapper : IFileNameMapper {
-        public string GetLocalFileName(string remoteFileName) {
-            return remoteFileName;
+using Microsoft.NodejsTools.Debugger;
+using Microsoft.VisualStudio.TestTools.UnitTesting;
+
+namespace NodejsTests.Debugger.FileNameMapping {
+    [TestClass]
+    public class LocalFileNameMapperTests {
+        [TestMethod]
+        public void GetLocalFileNameTests() {
+            // Arrange
+            const string remoteFileName = "remoteFileName";
+            var fileNameMapper = new LocalFileNameMapper();
+
+            // Act
+            string fileName = fileNameMapper.GetLocalFileName(remoteFileName);
+
+            // Assert
+            Assert.AreEqual(remoteFileName, fileName);
         }
     }
 }

@@ -106,6 +106,8 @@
     <Compile Include="Debugger\Events\BreakpointEventTests.cs" />
     <Compile Include="Debugger\Events\ExceptionEventTests.cs" />
     <Compile Include="Debugger\ExceptionHandlerTests.cs" />
+    <Compile Include="Debugger\FileNameMapping\FuzzyLogicFileNameMapperTests.cs" />
+    <Compile Include="Debugger\FileNameMapping\LocalFileNameMapperTests.cs" />
     <Compile Include="Debugger\InfrastructureTests.cs" />
     <Compile Include="Debugger\Serialization\SetValueVariableTests.cs" />
     <Compile Include="Debugger\Serialization\PrototypeVariableTests.cs" />
