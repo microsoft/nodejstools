@@ -30,7 +30,7 @@ namespace NodejsTests.Debugger.Events {
 
             // Assert
             Assert.IsNotNull(compileScriptEvent.Module);
-            Assert.AreEqual(34, compileScriptEvent.Module.ModuleId);
+            Assert.AreEqual(34, compileScriptEvent.Module.Id);
             Assert.AreEqual("http.js", compileScriptEvent.Module.Name);
             Assert.AreEqual(true, compileScriptEvent.Running);
         }
@@ -46,7 +46,7 @@ namespace NodejsTests.Debugger.Events {
 
             // Assert
             Assert.IsNotNull(compileScriptEvent.Module);
-            Assert.AreEqual(172, compileScriptEvent.Module.ModuleId);
+            Assert.AreEqual(172, compileScriptEvent.Module.Id);
             Assert.AreEqual(NodeVariableType.UnknownModule, compileScriptEvent.Module.Name);
             Assert.AreEqual(true, compileScriptEvent.Running);
         }

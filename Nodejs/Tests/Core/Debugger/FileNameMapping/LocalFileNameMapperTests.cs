@@ -12,21 +12,23 @@
  *
  * ***************************************************************************/
 
-using Microsoft.NodejsTools.Debugger.Serialization;
-using Newtonsoft.Json.Linq;
+using Microsoft.NodejsTools.Debugger;
+using Microsoft.VisualStudio.TestTools.UnitTesting;
 
-namespace Microsoft.NodejsTools.Debugger.Events {
-    sealed class CompileScriptEvent : IDebuggerEvent {
-        public CompileScriptEvent(JObject message) {
-            Running = (bool)message["running"];
+namespace NodejsTests.Debugger.FileNameMapping {
+    [TestClass]
+    public class LocalFileNameMapperTests {
+        [TestMethod]
+        public void GetLocalFileNameTests() {
+            // Arrange
+            const string remoteFileName = "remoteFileName";
+            var fileNameMapper = new LocalFileNameMapper();
 
-            var scriptId = (int)message["body"]["script"]["id"];
-            string fileName = (string)message["body"]["script"]["name"] ?? NodeVariableType.UnknownModule;
+            // Act
+            string fileName = fileNameMapper.GetLocalFileName(remoteFileName);
 
-            Module = new NodeModule(scriptId, fileName);
+            // Assert
+            Assert.AreEqual(remoteFileName, fileName);
         }
-
-        public NodeModule Module { get; private set; }
-        public bool Running { get; private set; }
     }
 }

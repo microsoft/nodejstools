@@ -765,13 +765,13 @@ namespace NodejsTests.Debugger {
 
                             // Download builtin
                             Assert.IsTrue(module.BuiltIn);
-                            var scriptText = await process.GetScriptTextAsync(module.ModuleId);
+                            var scriptText = await process.GetScriptTextAsync(module.Id);
                             Assert.IsTrue(scriptText.Contains("function Console("));
 
                             // Download non-builtin
                             module = thread.Frames[2].Module;
                             Assert.IsFalse(module.BuiltIn);
-                            scriptText = await process.GetScriptTextAsync(module.ModuleId);
+                            scriptText = await process.GetScriptTextAsync(module.Id);
                             StreamReader streamReader = new StreamReader(module.FileName);
                             var fileText = streamReader.ReadToEnd();
                             streamReader.Close();
@@ -1451,7 +1451,27 @@ namespace NodejsTests.Debugger {
         public void TestBreakpointPredicatedEntrypointCommentFixup() {
             TestBreakpointPredicatedEntrypoint("FixupBreakpointOnComment.js", targetBreakpoint: 0, expectedHit: 1);
         }
-       
+
+        [TestMethod, Priority(0)]
+        public void TestDuplicateFileName() {
+            TestDebuggerSteps(
+                "DuppedFilename.js",
+                new[] {
+                    new TestStep(action: TestAction.AddBreakpoint,
+                        targetBreakpoint: 1,
+                        targetBreakpointFile: "Directory\\DuppedFilename.js",
+                        expectFailure: true),
+                    new TestStep(action: TestAction.ResumeThread, expectedEntryPointHit: 0),
+                    new TestStep(action: TestAction.ResumeThread,
+                        expectedHitCount: 1,
+                        targetBreakpoint: 1,
+                        targetBreakpointFile: "Directory\\DuppedFilename.js",
+                        expectedBreakFunction: "f",
+                        expectedBreakpointHit: 1),
+                    new TestStep(action: TestAction.StepOut, expectedStepComplete: 4),
+                });
+        }
+
         #endregion
 
         #region Exception Tests
@@ -1802,27 +1822,6 @@ namespace NodejsTests.Debugger {
         }
 
         #endregion
-
-        [TestMethod, Priority(0)]
-        public void TestDuplicateFileName() {
-            TestDebuggerSteps(
-                "DuppedFilename.js",
-                new[] {
-                    new TestStep(action: TestAction.AddBreakpoint, 
-                        targetBreakpoint: 2, 
-                        targetBreakpointFile: "Directory\\DuppedFilename.js",
-                        expectFailure:true),
-                    new TestStep(action: TestAction.ResumeThread, expectedEntryPointHit: 0),
-                    new TestStep(action: TestAction.ResumeThread, 
-                        expectedHitCount: 1, 
-                        targetBreakpoint: 2, 
-                        targetBreakpointFile: "Directory\\DuppedFilename.js", 
-                        expectedBreakFunction: "f",
-                        expectedBreakpointHit: 2),
-                    new TestStep(action: TestAction.StepOut, expectedStepComplete: 4),               
-                }
-            );
-        }
 
         #region Attach Tests
 
@@ -2702,6 +2701,27 @@ namespace NodejsTests.Debugger {
                         targetBreakpointFile: "TypeScriptTest2.ts", 
                         expectedBreakFunction: "Greeter.constructor",
                         expectedBreakpointHit: 2),
+                    new TestStep(action: TestAction.ResumeProcess, expectedExitCode: 0),
+                }
+            );
+        }
+
+        [TestMethod, Priority(0)]
+        public void TypeScript_Break_On_First_Line()
+        {
+            TestDebuggerSteps(
+                "TypeScriptTest3.js",
+                new[] {
+                    new TestStep(action: TestAction.AddBreakpoint, 
+                        targetBreakpoint: 0,
+                        targetBreakpointFile: "TypeScriptTest3.ts"),
+                    new TestStep(action: TestAction.ResumeThread, 
+                        expectedHitCount: 1, 
+                        targetBreakpoint: 0,
+                        targetBreakpointColumn: 0,
+                        targetBreakpointFile: "TypeScriptTest3.ts", 
+                        expectedBreakFunction: NodeVariableType.AnonymousFunction,
+                        expectedBreakpointHit: 0),
                     new TestStep(action: TestAction.ResumeProcess, expectedExitCode: 0),
                 }
             );

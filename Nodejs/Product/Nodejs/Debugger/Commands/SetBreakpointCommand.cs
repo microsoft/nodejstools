@@ -26,7 +26,7 @@ namespace Microsoft.NodejsTools.Debugger.Commands {
         private readonly NodeBreakpoint _breakpoint;
         private readonly NodeModule _module;
 
-        public SetBreakpointCommand(int id, NodeModule module, NodeBreakpoint breakpoint, bool withoutPredicate = false)
+        public SetBreakpointCommand(int id, NodeModule module, NodeBreakpoint breakpoint, bool withoutPredicate, bool remote)
             : base(id, "setbreakpoint") {
             Utilities.ArgumentNotNull("breakpoint", breakpoint);
 
@@ -34,13 +34,13 @@ namespace Microsoft.NodejsTools.Debugger.Commands {
             _breakpoint = breakpoint;
 
             // Zero based line numbers
-            int line = breakpoint.LineNo;
+            int line = breakpoint.Position.Line;
 
             // Zero based column numbers
             // Special case column to avoid (line 0, column 0) which
             // Node (V8) treats specially for script loaded via require
             // Script wrapping process: https://github.com/joyent/node/blob/v0.10.26-release/src/node.js#L880
-            int column = breakpoint.ColumnNo;
+            int column = _breakpoint.Position.Column;
             if (line == 0) {
                 column += NodeConstants.ScriptWrapBegin.Length;
             }
@@ -52,10 +52,13 @@ namespace Microsoft.NodejsTools.Debugger.Commands {
 
             if (_module != null) {
                 _arguments["type"] = "scriptId";
-                _arguments["target"] = _module.ModuleId;
-            } else {
+                _arguments["target"] = _module.Id;
+            } else if (remote) {
                 _arguments["type"] = "scriptRegExp";
-                _arguments["target"] = GetCaseInsensitiveRegex(_breakpoint.FileName);
+                _arguments["target"] = GetCaseInsensitiveRegex(_breakpoint.Position.FileName);
+            } else {
+                _arguments["type"] = "script";
+                _arguments["target"] = _breakpoint.Position.FileName;
             }
 
             if (!NodeBreakpointBinding.GetEngineEnabled(_breakpoint.Enabled, _breakpoint.BreakOn, 0)) {
@@ -84,9 +87,9 @@ namespace Microsoft.NodejsTools.Debugger.Commands {
 
         public int? ScriptId { get; private set; }
 
-        public int LineNo { get; private set; }
+        public int Line { get; private set; }
 
-        public int ColumnNo { get; private set; }
+        public int Column { get; private set; }
 
         public override void ProcessResponse(JObject response) {
             base.ProcessResponse(response);
@@ -94,18 +97,20 @@ namespace Microsoft.NodejsTools.Debugger.Commands {
             JToken body = response["body"];
             BreakpointId = (int)body["breakpoint"];
 
-            int? moduleId = _module != null ? _module.ModuleId : (int?)null;
+            int? moduleId = _module != null ? _module.Id : (int?)null;
             ScriptId = (int?)body["script_id"] ?? moduleId;
 
             // Handle breakpoint actual location fixup
             JArray actualLocations = (JArray)body["actual_locations"] ?? new JArray();
-            if (actualLocations != null && actualLocations.Count > 0) {
-                LineNo = (int)actualLocations[0]["line"];
-                var columnNo = (int)actualLocations[0]["column"];
-                ColumnNo = LineNo == 0 ? columnNo - NodeConstants.ScriptWrapBegin.Length : columnNo;
+            if (actualLocations.Count > 0) {
+                var location = actualLocations[0];
+                ScriptId = ScriptId ?? (int?)location["script_id"];
+                Line = (int)location["line"];
+                var column = (int)location["column"];
+                Column = Line == 0 ? column - NodeConstants.ScriptWrapBegin.Length : column;
             } else {
-                LineNo = _breakpoint.LineNo;
-                ColumnNo = _breakpoint.ColumnNo;
+                Line = _breakpoint.Position.Line;
+                Column = _breakpoint.Position.Column;
             }
         }
 

@@ -199,7 +199,7 @@ namespace Microsoft.NodejsTools.Debugger {
         internal static async Task<string> ReadLineBlockAsync(this StreamReader streamReader, int length) {
             var buffer = new char[length];
 
-            int count = await streamReader.ReadBlockAsync(buffer, 0, length);
+            int count = await streamReader.ReadBlockAsync(buffer, 0, length).ConfigureAwait(false);
             if (count == 0) {
                 var errorMessage = string.Format("Unable to read {0} bytes from stream.", length);
                 throw new InvalidDataException(errorMessage);

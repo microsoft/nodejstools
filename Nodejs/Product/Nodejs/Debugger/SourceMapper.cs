@@ -79,7 +79,7 @@ namespace Microsoft.NodejsTools.Debugger {
         /// Maps a line number from the original code to the generated JavaScript.
         /// Line numbers are zero based.
         /// </summary>
-        public void MapToJavaScript(string requestedFileName, int requestedLineNo, int requestedColumnNo, out string fileName, out int lineNo, out int columnNo) {
+        public bool MapToJavaScript(string requestedFileName, int requestedLineNo, int requestedColumnNo, out string fileName, out int lineNo, out int columnNo) {
             fileName = requestedFileName;
             lineNo = requestedLineNo;
             columnNo = requestedColumnNo;
@@ -93,7 +93,11 @@ namespace Microsoft.NodejsTools.Debugger {
                     fileName = Path.Combine(Path.GetDirectoryName(fileName) ?? string.Empty, result.FileName);
                     Debug.WriteLine("Mapped breakpoint from {0} {1} to {2} {3}", requestedFileName, requestedLineNo, fileName, lineNo);
                 }
+
+                return true;
             }
+
+            return false;
         }
 
         private SourceMap GetSourceMap(string fileName) {

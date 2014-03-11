@@ -44,7 +44,7 @@ namespace Microsoft.NodejsTools.Debugger.DebugEngine {
                 info.dwValidFields |= enum_MODULE_INFO_FIELDS.MIF_URL;
             }
             if ((dwFields & enum_MODULE_INFO_FIELDS.MIF_LOADORDER) != 0) {
-                info.m_dwLoadOrder = (uint)this.DebuggedModule.ModuleId;
+                info.m_dwLoadOrder = (uint)this.DebuggedModule.Id;
                 info.dwValidFields |= enum_MODULE_INFO_FIELDS.MIF_LOADORDER;
             }
 

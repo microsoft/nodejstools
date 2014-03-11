@@ -26,7 +26,7 @@ namespace Microsoft.NodejsTools.Debugger.Events {
             var scriptId = (int)message["body"]["script"]["id"];
             var fileName = (string)message["body"]["script"]["name"];
 
-            Module = new NodeModule(scriptId, fileName, fileName);
+            Module = new NodeModule(scriptId, fileName);
 
             JToken breakpoints = message["body"]["breakpoints"];
             Breakpoints = breakpoints != null

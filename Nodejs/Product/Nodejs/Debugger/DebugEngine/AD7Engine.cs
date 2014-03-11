@@ -61,7 +61,6 @@ namespace Microsoft.NodejsTools.Debugger.DebugEngine {
         private readonly BreakpointManager _breakpointManager;
         private Guid _ad7ProgramId;             // A unique identifier for the program being debugged.
         private static readonly HashSet<WeakReference> Engines = new HashSet<WeakReference>();
-
         private string _webBrowserUrl;
 
         // These constants are duplicated in HpcLauncher and cannot be changed
@@ -199,7 +198,15 @@ namespace Microsoft.NodejsTools.Debugger.DebugEngine {
 
                 var program = (NodeRemoteDebugProgram)rgpPrograms[0];
                 var process = program.DebugProcess;
-                _process = new NodeDebugger(process.DebugPort.Uri, process.Id);
+                var uri = process.DebugPort.Uri;
+
+                _process = new NodeDebugger(uri, process.Id);
+
+                // We only need to do fuzzy comparisons when debugging remotely
+                if (!uri.IsLoopback) {
+                    _process.IsRemote = true;
+                    _process.FileNameMapper = new FuzzyLogicFileNameMapper(EnumerateSolutionFiles());
+                }
 
                 AttachEvents(_process);
                 _attached = true;
@@ -541,7 +548,6 @@ namespace Microsoft.NodejsTools.Debugger.DebugEngine {
                     env,
                     interpreterOptions,
                     debugOptions,
-                    dirMapping,
                     debugPort
                 );
 
@@ -918,14 +924,21 @@ namespace Microsoft.NodejsTools.Debugger.DebugEngine {
         #region Events
 
         internal void Send(IDebugEvent2 eventObject, string iidEvent, IDebugProgram2 program, IDebugThread2 thread) {
+            DebugWriteLine("AD7Engine Event: {0} ({1})", eventObject.GetType(), iidEvent);
+
+            // Check that events was not disposed
+            var events = _events;
+            if (events == null) {
+                return;
+            }
+
             uint attributes;
             var riidEvent = new Guid(iidEvent);
 
             EngineUtils.RequireOk(eventObject.GetAttributes(out attributes));
-
-            DebugWriteLine("AD7Engine Event: {0} ({1})", eventObject.GetType(), iidEvent);
+            
             try {
-                EngineUtils.RequireOk(_events.Event(this, null, program, thread, eventObject, ref riidEvent, attributes));
+                EngineUtils.RequireOk(events.Event(this, null, program, thread, eventObject, ref riidEvent, attributes));
             } catch (InvalidCastException) {                
                 // COM object has gone away
             }
@@ -1101,7 +1114,7 @@ namespace Microsoft.NodejsTools.Debugger.DebugEngine {
         private void OnBreakpointBound(object sender, BreakpointBindingEventArgs e) {
             var pendingBreakpoint = _breakpointManager.GetPendingBreakpoint(e.Breakpoint);
             var breakpointBinding = e.BreakpointBinding;
-            var codeContext = new AD7MemoryAddress(this, pendingBreakpoint.DocumentName, breakpointBinding.RequestedLineNo, breakpointBinding.RequestedColumnNo);
+            var codeContext = new AD7MemoryAddress(this, pendingBreakpoint.DocumentName, breakpointBinding.Target.Line, breakpointBinding.Target.Column);
             var documentContext = new AD7DocumentContext(codeContext);
             var breakpointResolution = new AD7BreakpointResolution(this, breakpointBinding, documentContext);
             var boundBreakpoint = new AD7BoundBreakpoint(breakpointBinding, pendingBreakpoint, breakpointResolution, breakpointBinding.Enabled);
@@ -1162,73 +1175,13 @@ namespace Microsoft.NodejsTools.Debugger.DebugEngine {
             }
 
             // Update module source
-            if (!await Process.UpdatedModuleSourceAsync(module).ConfigureAwait(false)) {
+            if (!await Process.UpdateModuleSourceAsync(module).ConfigureAwait(false)) {
                 var statusBar = (IVsStatusbar)ServiceProvider.GlobalProvider.GetService(typeof(SVsStatusbar));
                 statusBar.SetText(Resources.DebuggerModuleUpdateFailed);
             }
         }
 
         #endregion
-
-        internal string GetFuzzyMatchFilename(string fileName) {
-            // Hande local launch or attach, by matching given filename
-            // UNDONE Detect local attach
-            if (!_attached) {
-                return fileName;
-            }
-
-            string fuzzyFileName = null;
-            var solution = Package.GetGlobalService(typeof(SVsSolution)) as IVsSolution;
-            if (solution != null) {
-                int bestMatchCount = 0;
-                var leafName = Path.GetFileName(fileName);
-                var reverseFileName = NormalizedReversedPath(fileName);
-                foreach (var project in solution.EnumerateLoadedProjects(onlyNodeProjects: false)) {
-                    int pfFound;
-                    var pdwPriority = new VSDOCUMENTPRIORITY[1];
-                    uint pitemid;
-                    if (ErrorHandler.Succeeded(project.IsDocumentInProject(fileName, out pfFound, pdwPriority, out pitemid)) && pfFound != 0) {
-                        // Handle remote attach where given fully-qualified path found in project, by matching given filename
-                        return fileName;
-                    }
-
-                    if (fuzzyFileName == null) {
-                        foreach (var itemid in project.EnumerateProjectItems()) {
-                            string moniker;
-                            if (ErrorHandler.Succeeded(project.GetMkDocument(itemid, out moniker)) && moniker != null) {
-                                if (string.Compare(leafName, Path.GetFileName(moniker), StringComparison.OrdinalIgnoreCase) == 0) {
-                                    var matchCount = CountCharMatch(reverseFileName, NormalizedReversedPath(moniker));
-                                    if (matchCount > bestMatchCount) {
-                                        bestMatchCount = matchCount;
-                                        // Handle remote attach where leaf name in project, by matching project item filename
-                                        fuzzyFileName = moniker;
-                                    }
-                                }
-                            }
-                        }
-                    }
-                }
-            }
-            if (fuzzyFileName != null) {
-                return fuzzyFileName;
-            }
-
-            // Fallback to matching leaf name, which causes source to be downloaded
-            return Path.GetFileName(fileName);
-        }
-
-        private char[] NormalizedReversedPath(string path) {
-            var array = path.Replace('/', '\\').ToLower().ToCharArray();
-            Array.Reverse(array);
-            return array;
-        }
-
-        private int CountCharMatch(char[] array1, char[] array2) {
-            var maxCount = Math.Min(array1.Length, array2.Length);
-            int matchCount;
-            for (matchCount = 0; matchCount < maxCount && array1[matchCount] == array2[matchCount]; ++matchCount) { }
-            return matchCount;
-        }
 
         internal static void MapLanguageInfo(string filename, out string pbstrLanguage, out Guid pguidLanguage) {
             if (String.Equals(Path.GetExtension(filename), NodejsConstants.TypeScriptExtension, StringComparison.OrdinalIgnoreCase)) {
@@ -1237,6 +1190,24 @@ namespace Microsoft.NodejsTools.Debugger.DebugEngine {
             } else {
                 pbstrLanguage = NodejsConstants.JavaScript;
                 pguidLanguage = Guids.NodejsDebugLanguage;
+            }
+        }
+
+        /// <summary>
+        /// Enumerates files in the solution projects.
+        /// </summary>
+        /// <returns>File names collection.</returns>
+        private IEnumerable<string> EnumerateSolutionFiles() {
+            var solution = Package.GetGlobalService(typeof (SVsSolution)) as IVsSolution;
+            if (solution != null) {
+                foreach (IVsProject project in solution.EnumerateLoadedProjects(false)) {
+                    foreach (uint itemid in project.EnumerateProjectItems()) {
+                        string moniker;
+                        if (ErrorHandler.Succeeded(project.GetMkDocument(itemid, out moniker)) && moniker != null) {
+                            yield return moniker;
+                        }
+                    }
+                }
             }
         }
 

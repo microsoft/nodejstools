@@ -12,7 +12,6 @@
  *
  * ***************************************************************************/
 
-using System;
 using Microsoft.NodejsTools.Debugger;
 using Microsoft.NodejsTools.Debugger.Commands;
 using Microsoft.NodejsTools.Debugger.Serialization;
@@ -52,7 +51,7 @@ namespace NodejsTests.Debugger.Commands {
             var resultFactoryMock = new Mock<IEvaluationResultFactory>();
             resultFactoryMock.Setup(factory => factory.Create(It.IsAny<INodeVariable>()))
                 .Returns(() => new NodeEvaluationResult(0, null, null, null, null, null, NodeExpressionType.None, null));
-            var backtraceCommand = new BacktraceCommand(commandId, resultFactoryMock.Object, fromFrame, toFrame);
+            var backtraceCommand = new BacktraceCommand(commandId, resultFactoryMock.Object, fromFrame, toFrame, true);
             JObject backtraceMessage = SerializationTestData.GetBacktraceResponse();
 
             // Act
@@ -76,8 +75,7 @@ namespace NodejsTests.Debugger.Commands {
             var resultFactoryMock = new Mock<IEvaluationResultFactory>();
             resultFactoryMock.Setup(factory => factory.Create(It.IsAny<INodeVariable>()))
                 .Returns(() => new NodeEvaluationResult(0, null, null, null, null, null, NodeExpressionType.None, null));
-            var debugger = new NodeDebugger(new Uri("tcp://localhost:5858"), 1);
-            var backtraceCommand = new BacktraceCommand(commandId, resultFactoryMock.Object, fromFrame, toFrame, debugger);
+            var backtraceCommand = new BacktraceCommand(commandId, resultFactoryMock.Object, fromFrame, toFrame);
             JObject backtraceMessage = SerializationTestData.GetBacktraceResponse();
 
             // Act
@@ -88,8 +86,8 @@ namespace NodejsTests.Debugger.Commands {
             NodeStackFrame firstFrame = backtraceCommand.StackFrames[0];
             Assert.AreEqual(NodeVariableType.AnonymousFunction, firstFrame.FunctionName);
             Assert.AreEqual(@"C:\Users\Tester\documents\visual studio 2012\Projects\NodejsApp1\NodejsApp1\server.js", firstFrame.FileName);
-            Assert.AreEqual(22, firstFrame.LineNo);
-            Assert.AreEqual(0, firstFrame.ColumnNo);
+            Assert.AreEqual(22, firstFrame.Line);
+            Assert.AreEqual(0, firstFrame.Column);
             Assert.AreEqual(15, firstFrame.Locals.Count);
             Assert.AreEqual(5, firstFrame.Parameters.Count);
             Assert.IsNotNull(backtraceCommand.Modules);

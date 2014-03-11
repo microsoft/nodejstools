@@ -18,10 +18,8 @@ using Newtonsoft.Json.Linq;
 namespace Microsoft.NodejsTools.Debugger.Commands {
     sealed class ScriptsCommand : DebuggerCommand {
         private readonly Dictionary<string, object> _arguments;
-        private readonly NodeDebugger _debugger;
 
-        public ScriptsCommand(int id, NodeDebugger debugger, bool includeSource = false, int? moduleId = null) : base(id, "scripts") {
-            _debugger = debugger;
+        public ScriptsCommand(int id, bool includeSource = false, int? moduleId = null) : base(id, "scripts") {
             _arguments = new Dictionary<string, object> {
                 { "includeSource", includeSource }
             };
@@ -47,17 +45,16 @@ namespace Microsoft.NodejsTools.Debugger.Commands {
                 var id = (int)module["id"];
                 var source = (string)module["source"];
                 if (!string.IsNullOrEmpty(source) &&
-                    source.StartsWith(NodeConstants.ScriptWrapBegin) && 
+                    source.StartsWith(NodeConstants.ScriptWrapBegin) &&
                     source.EndsWith(NodeConstants.ScriptWrapEnd)) {
                     source = source.Substring(
-                        NodeConstants.ScriptWrapBegin.Length, 
+                        NodeConstants.ScriptWrapBegin.Length,
                         source.Length - NodeConstants.ScriptWrapBegin.Length - NodeConstants.ScriptWrapEnd.Length);
                 }
 
-                var javaScriptFileName = (string)module["name"];
-                string fileName = _debugger.GetModuleFileName(javaScriptFileName);
+                var fileName = (string)module["name"];
 
-                Modules.Add(new NodeModule(id, fileName, javaScriptFileName) { Source = source });
+                Modules.Add(new NodeModule(id, fileName) { Source = source });
             }
         }
     }

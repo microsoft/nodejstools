@@ -47,7 +47,6 @@ namespace Microsoft.NodejsTools.Debugger.DebugEngine {
 
             if (!_deleted) {
                 _deleted = true;
-                _pendingBreakpoint.OnBoundBreakpointDeleted(this);
                 _breakpointBinding.Remove();
             }
 

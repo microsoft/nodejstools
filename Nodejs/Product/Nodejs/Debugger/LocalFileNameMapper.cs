@@ -12,21 +12,13 @@
  *
  * ***************************************************************************/
 
-using Microsoft.NodejsTools.Debugger.Serialization;
-using Newtonsoft.Json.Linq;
-
-namespace Microsoft.NodejsTools.Debugger.Events {
-    sealed class CompileScriptEvent : IDebuggerEvent {
-        public CompileScriptEvent(JObject message) {
-            Running = (bool)message["running"];
-
-            var scriptId = (int)message["body"]["script"]["id"];
-            string fileName = (string)message["body"]["script"]["name"] ?? NodeVariableType.UnknownModule;
-
-            Module = new NodeModule(scriptId, fileName);
+namespace Microsoft.NodejsTools.Debugger {
+    /// <summary>
+    /// Handles file name mapping while local debigging.
+    /// </summary>
+    sealed class LocalFileNameMapper : IFileNameMapper {
+        public string GetLocalFileName(string remoteFileName) {
+            return remoteFileName;
         }
-
-        public NodeModule Module { get; private set; }
-        public bool Running { get; private set; }
     }
 }

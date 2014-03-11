@@ -18,19 +18,22 @@ using System.IO;
 namespace Microsoft.NodejsTools.Debugger {
     class NodeModule {
         private readonly string _fileName;
+        private readonly int _id;
         private readonly string _javaScriptFileName;
-        private readonly int _moduleId;
 
-        public NodeModule(int moduleId, string fileName, string javaScriptFileName) {
+        public NodeModule(int id, string fileName) : this(id, fileName, fileName) {
+        }
+
+        public NodeModule(int id, string fileName, string javaScriptFileName) {
             Debug.Assert(fileName != null);
 
-            _moduleId = moduleId;
+            _id = id;
             _fileName = fileName;
             _javaScriptFileName = javaScriptFileName;
         }
 
-        public int ModuleId {
-            get { return _moduleId; }
+        public int Id {
+            get { return _id; }
         }
 
         public string Name {
