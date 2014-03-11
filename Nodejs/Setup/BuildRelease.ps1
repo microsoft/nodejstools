@@ -160,7 +160,9 @@ if ($internal) {
     $outdir = "$outdir\Internal\$name"
 }
 
-if ($release -or $mockrelease) {
+$signedbuild = $release -or $mockrelease
+if ($signedbuild) {
+    $signedbuildText = "true"
     $approvers = "smortaz", "dinov", "stevdo", "pminaev", "arturl", "gilbertw", "huvalo"
     $approvers = @($approvers | Where-Object {$_ -ne $env:USERNAME})
     $symbol_contacts = "$env:username;dinov;smortaz;stevdo;gilbertw"
@@ -177,6 +179,8 @@ if ($release -or $mockrelease) {
         Import-Module -force $buildroot\Common\Setup\ReleaseHelpers.psm1
     }
     Pop-Location
+} else {
+    $signedbuildText = "false"
 }
 
 # Add new products here
@@ -310,9 +314,8 @@ try {
     (Get-Content $asmverfile) | %{ $_ -replace ' = "4100.00"', (' = "' + $buildnumber + '"') } | Set-Content $asmverfile
 
 
-    foreach ($targetVs in $targetVersions) {
-        foreach ($config in $targetConfigs)
-        {
+    foreach ($config in $targetConfigs) {
+        foreach ($targetVs in $targetVersions) {
             $bindir = "Binaries\$config$($targetVs.number)"
             $destdir = "$outdir\$($targetVs.name)\$config"
             mkdir $destdir -EA 0 | Out-Null
@@ -326,6 +329,7 @@ try {
                     /p:VSTarget=$($targetVs.number) `
                     /p:VisualStudioVersion=$($targetVs.number) `
                     /p:"CustomBuildIdentifier=$name" `
+                    /p:ReleaseBuild=$signedbuildText `
                     Nodejs\Tests\dirs.proj
                 if ($LASTEXITCODE -gt 0) {
                     Write-Error -EA:Continue "Test build failed: $config"
@@ -341,6 +345,7 @@ try {
                 /p:VSTarget=$($targetVs.number) `
                 /p:VisualStudioVersion=$($targetVs.number) `
                 /p:"CustomBuildIdentifier=$name" `
+                /p:ReleaseBuild=$signedbuildText `
                 Nodejs\Setup\dirs.proj
             if ($LASTEXITCODE -gt 0) {
                 Write-Error -EA:Continue "Build failed: $config"
@@ -361,14 +366,19 @@ try {
             
             mkdir $destdir\Binaries\ReplWindow -EA 0 | Out-Null
             Copy-Item -force -recurse Nodejs\Product\InteractiveWindow\obj\Dev$($targetVs.number)\$config\extension.vsixmanifest $destdir\Binaries\InteractiveWindow
+        }
+        
+        ######################################################################
+        ##  BEGIN SIGNING CODE
+        ######################################################################
+        if ($signedbuild) {
+            $jobs = @()
             
-            ######################################################################
-            ##  BEGIN SIGNING CODE
-            ######################################################################
-            if ($release -or $mockrelease) {                
-                submit_symbols "NTVS$spacename" "$buildnumber $($targetvs.name)" "symbols" "$destdir\Symbols" $symbol_contacts
+            Write-Output "Signing binaries..."
 
-                Write-Output "Signing binaries..."
+            foreach ($targetVs in $targetVersions) {
+                $destdir = "$outdir\$($targetVs.name)\$config"
+
 
                 $managed_files = @((
                     "Microsoft.NodejsTools.NodeLogConverter.exe", 
@@ -382,16 +392,25 @@ try {
                     "Microsoft.NodejsTools.TestAdapter.dll",
                     "Microsoft.NodejsTools.PressAnyKey.exe"
                     ) | ForEach {@{path="$destdir\Binaries\$_"; name=$projectName}})
-                                
-                $job1 = begin_sign_files $managed_files "$destdir\SignedBinaries" $approvers `
-                    $projectName $projectUrl "$projectName - managed code" $projectKeywords `
-                    "authenticode;strongname"
 
-                end_sign_files @(,$job1)
-                Write-Output "Signing binaries Completed"
-                
+                Write-Output "Submitting signing job for $($targetVs.name)"
+
+                $jobs += begin_sign_files $managed_files "$destdir\SignedBinaries" $approvers `
+                    $projectName $projectUrl "$projectName $($targetVs.name) - managed code" $projectKeywords `
+                    "authenticode;strongname" `
+                    -delaysigned
+            }
+            
+            end_sign_files $jobs
+            Write-Output "Signing binaries Completed"
+            
+            foreach ($targetVs in $targetVersions) {
+                $bindir = "Binaries\$config$($targetVs.number)"
+                $destdir = "$outdir\$($targetVs.name)\$config"
+
+                submit_symbols "NTVS$spacename" "$buildnumber $($targetvs.name)" "symbols" "$destdir\Symbols" $symbol_contacts
                 submit_symbols "NTVS$spacename" "$buildnumber $($targetvs.name)" "binaries" "$destdir\SignedBinaries" $symbol_contacts
-                
+
                 #Copy the signed binaries back into the binaries directory
                 #  so that msi's are built with the signed binaries
                 Copy-Item "$destdir\SignedBinaries\*" $bindir -Recurse -Force
@@ -422,20 +441,31 @@ try {
                 
                 Move-Item $destdir\*.msi $destdir\UnsignedMsi -Force
                 Move-Item $bindir\*.msi $destdir\SignedBinariesUnsignedMsi -Force
-                
+            }
+            
+            $jobs = @()
+
+            Write-Output "Signing MSIs..."
+
+            foreach ($targetVs in $targetVersions) {
+                $destdir = "$outdir\$($targetVs.name)\$config"
+
                 $msi_files = @($products | 
                     ForEach {@{
                         path="$destdir\SignedBinariesUnsignedMsi\$($_.msi)";
                         name="Node.js Tools for Visual Studio$($_.signtag)"
                     }}
                 )
-                Write-Output "Signing MSIs..."
-                $job = begin_sign_files $msi_files $destdir $approvers `
-                    $projectName $projectUrl "$projectName - installer" $projectKeywords `
+
+                Write-Output "Submitting MSI signing job for $($targetVs.name)"
+
+                $jobs += begin_sign_files $msi_files $destdir $approvers `
+                    $projectName $projectUrl "$projectName $($targetVs.name) - installer" $projectKeywords `
                     "authenticode"
-                end_sign_files @(,$job)
-                Write-Output "Signing MSIs Completed"
             }
+            
+            end_sign_files $jobs
+            Write-Output "Signing MSIs Completed"
             ######################################################################
             ##  END SIGNING CODE
             ######################################################################
