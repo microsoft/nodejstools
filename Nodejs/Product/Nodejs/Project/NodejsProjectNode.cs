@@ -44,7 +44,7 @@ namespace Microsoft.NodejsTools.Project {
         internal int _currentFileCounter;
 
         public NodejsProjectNode(NodejsProjectPackage package)
-            : base(package, Utilities.GetImageList(typeof(NodejsProjectNode).Assembly.GetManifestResourceStream("Microsoft.NodejsTools.NodeImageList.bmp"))) {
+            : base(package, Utilities.GetImageList(typeof(NodejsProjectNode).Assembly.GetManifestResourceStream("Microsoft.NodejsTools.Resources.Icons.NodejsImageList.bmp"))) {
 
             Type projectNodePropsType = typeof(NodejsProjectNodeProperties);
             AddCATIDMapping(projectNodePropsType, projectNodePropsType.GUID);
@@ -272,7 +272,7 @@ namespace Microsoft.NodejsTools.Project {
 
         protected override Stream ProjectIconsImageStripStream {
             get {
-                return typeof(ProjectNode).Assembly.GetManifestResourceStream("imagelis.bmp");
+                return typeof(ProjectNode).Assembly.GetManifestResourceStream("Microsoft.VisualStudioTools.Resources.Icons.SharedProjectImageList.bmp");
             }
         }
 

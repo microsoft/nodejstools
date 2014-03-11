@@ -262,7 +262,7 @@
     </ProjectReference>
   </ItemGroup>
   <ItemGroup>
-    <Content Include="..\Icons\NodejsPackage.ico">
+    <Content Include="..\Icons\NodejsProject.ico">
       <IncludeInVSIX>true</IncludeInVSIX>
       <VSIXSubpath>.</VSIXSubpath>
     </Content>

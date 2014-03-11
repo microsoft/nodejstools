@@ -20,7 +20,7 @@
 
     <?include ..\InstallPath.wxi ?>
 
-    <Icon Id="AddRemoveProgramsIcon" SourceFile="$(var.TargetDir)\NodejsToolsforVisualStudio.ico"/>
+    <Icon Id="AddRemoveProgramsIcon" SourceFile="$(var.TargetDir)Resources\Icons\NodejsToolsforVisualStudio.ico"/>
     <Property Id="ARPPRODUCTION">AddRemoveProgramsIcon</Property>
 
     <Property Id="VSLAUNCHER" >

@@ -667,35 +667,12 @@
       <VSIXSubpath>.</VSIXSubpath>
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
-    <Content Include="NodejsProjectBig.ico">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-      <IncludeInVSIX>true</IncludeInVSIX>
-    </Content>
-    <Resource Include="NodejsProjectBigResource.ico" />
-    <Content Include="NoSurveyNewsFeed.html">
-      <IncludeInVSIX>true</IncludeInVSIX>
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </Content>
     <ZipProject Include="ProjectTemplates\FromExistingCode\FromExistingCode.njsproj">
       <SubType>Designer</SubType>
     </ZipProject>
     <ZipProject Include="ProjectTemplates\FromExistingCode\FromExistingCode.vstemplate">
       <SubType>Designer</SubType>
     </ZipProject>
-    <EmbeddedResource Include="Resources\DependencyBundledMissing_16.png" />
-    <EmbeddedResource Include="Resources\DependencyBundled_16.png" />
-    <EmbeddedResource Include="Resources\DependencyDevMissing_16.png" />
-    <EmbeddedResource Include="Resources\DependencyDev_16.png" />
-    <EmbeddedResource Include="Resources\DependencyExtraneousBundled_16.png" />
-    <EmbeddedResource Include="Resources\DependencyExtraneous_16.png" />
-    <EmbeddedResource Include="Resources\DependencyMissing_16.png" />
-    <EmbeddedResource Include="Resources\DependencyOptionalMissing_16.png" />
-    <EmbeddedResource Include="Resources\DependencyOptional_16.png" />
-    <EmbeddedResource Include="Resources\Dependency_16.png" />
-    <EmbeddedResource Include="Resources\Warning_16.png" />
-    <EmbeddedResource Include="Resources\DependencyDev_32.png" />
-    <EmbeddedResource Include="Resources\DependencyOptional_32.png" />
-    <EmbeddedResource Include="Resources\Dependency_32.png" />
     <ZipProject Include="ProjectTemplates\AzureExpressApp\app.js" />
     <ZipProject Include="ProjectTemplates\AzureExpressApp\index.js" />
     <ZipProject Include="ProjectTemplates\AzureExpressApp\user.js" />
@@ -714,7 +691,6 @@
     </TypeScriptProject>
     <TypeScriptProject Include="ProjectTemplates\TypeScriptConsoleApp\NodejsConsoleApp.vstemplate" />
     <TypeScriptProject Include="ProjectTemplates\TypeScriptConsoleApp\Preview.png" />
-    <Resource Include="ProjectTemplates\blankts.ico" />
     <TypeScriptProject Include="ProjectTemplates\TypeScriptWebApp\server.ts" />
     <TypeScriptProject Include="ProjectTemplates\TypeScriptWebApp\NodejsWebApp.njsproj">
       <SubType>Designer</SubType>
@@ -794,15 +770,6 @@
     <Content Include="FileTemplates\NewItem\TextFile.txt">
       <IncludeInVSIX>true</IncludeInVSIX>
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </Content>
-    <ZipProject Include="ProjectTemplates\blankwj.ico" />
-    <Content Include="..\Icons\NodejsProject.ico">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-      <IncludeInVSIX>true</IncludeInVSIX>
-    </Content>
-    <Content Include="..\Icons\NodejsToolsforVisualStudio.ico">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-      <IncludeInVSIX>true</IncludeInVSIX>
     </Content>
     <ZipProject Include="ProjectTemplates\AzureNodejsApp\AzureNodejsApp.vstemplate">
       <SubType>Designer</SubType>
@@ -1003,26 +970,75 @@
     </None>
   </ItemGroup>
   <ItemGroup>
-    <EmbeddedResource Include="..\Icons\NodeImageList.bmp" />
-    <EmbeddedResource Include="..\Icons\imagelis.bmp">
-      <Link>imagelis.bmp</Link>
-      <ManifestResourceName>Microsoft.ProjectIcons.bmp</ManifestResourceName>
+    <Resource Include="..\Icons\blankts.ico">
+      <Link>Resources\Icons\blankts.ico</Link>
+    </Resource>
+    <Resource Include="..\Icons\blankjs.ico">
+      <Link>Resources\Icons\blankjs.ico</Link>
+    </Resource>
+    <EmbeddedResource Include="..\Icons\NodejsImageList.bmp">
+      <Link>Resources\Icons\NodejsImageList.bmp</Link>
+      <LogicalName>Microsoft.NodejsTools.Resources.Icons.NodejsImageList.bmp</LogicalName>
     </EmbeddedResource>
+    <EmbeddedResource Include="..\Icons\SharedProjectImageList.bmp">
+      <Link>Resources\Icons\SharedProjectImageList.bmp</Link>
+      <LogicalName>Microsoft.VisualStudioTools.Resources.Icons.SharedProjectImageList.bmp</LogicalName>
+    </EmbeddedResource>
+    <None Include="..\Icons\Images_32bit.png">
+      <Link>Resources\Icons\Images_32bit.png</Link>
+    </None>
+  </ItemGroup>
+  <ItemGroup>
+    <Content Include="..\Icons\NodejsProject.ico">
+      <Link>Resources\Icons\NodejsProject.ico</Link>
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+      <IncludeInVSIX>true</IncludeInVSIX>
+      <VSIXSubpath>.</VSIXSubpath>
+    </Content>
+    <Content Include="..\Icons\NodejsToolsforVisualStudio.ico">
+      <Link>Resources\Icons\NodejsToolsforVisualStudio.ico</Link>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+      <IncludeInVSIX>true</IncludeInVSIX>
+    </Content>
+    <Content Include="..\Icons\NodejsProjectBig.ico">
+      <Link>Resources\Icons\NodejsProjectBig.ico</Link>
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+      <IncludeInVSIX>true</IncludeInVSIX>
+    </Content>
+    <Resource Include="..\Icons\NodejsProjectBigResource.ico">
+      <Link>Resources\Icons\NodejsProjectBigResource.ico</Link>
+    </Resource>
+    <Content Include="NoSurveyNewsFeed.html">
+      <IncludeInVSIX>true</IncludeInVSIX>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Resources\Package.ico" />
+    <EmbeddedResource Include="Resources\DependencyBundledMissing_16.png" />
+    <EmbeddedResource Include="Resources\DependencyBundled_16.png" />
+    <EmbeddedResource Include="Resources\DependencyDevMissing_16.png" />
+    <EmbeddedResource Include="Resources\DependencyDev_16.png" />
+    <EmbeddedResource Include="Resources\DependencyExtraneousBundled_16.png" />
+    <EmbeddedResource Include="Resources\DependencyExtraneous_16.png" />
+    <EmbeddedResource Include="Resources\DependencyMissing_16.png" />
+    <EmbeddedResource Include="Resources\DependencyOptionalMissing_16.png" />
+    <EmbeddedResource Include="Resources\DependencyOptional_16.png" />
+    <EmbeddedResource Include="Resources\Dependency_16.png" />
+    <EmbeddedResource Include="Resources\Warning_16.png" />
+    <EmbeddedResource Include="Resources\DependencyDev_32.png" />
+    <EmbeddedResource Include="Resources\DependencyOptional_32.png" />
+    <EmbeddedResource Include="Resources\Dependency_32.png" />
+  </ItemGroup>
+  <ItemGroup>
     <Content Include="nodejsref.js">
       <IncludeInVSIX>true</IncludeInVSIX>
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
     <ZipProject Include="ProjectTemplates\NodejsWebApp\server.js" />
-    <Content Include="..\Icons\NodejsPackage.ico">
-      <IncludeInVSIX>true</IncludeInVSIX>
-      <VSIXSubpath>.</VSIXSubpath>
-    </Content>
     <Content Include="visualstudio_nodejs_repl.js">
       <IncludeInVSIX>true</IncludeInVSIX>
       <VSIXSubpath>.</VSIXSubpath>
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
-    <Content Include="Resources\Package.ico" />
     <ZipProject Include="ProjectTemplates\NodejsWebApp\NodejsWebApp.vstemplate">
       <SubType>Designer</SubType>
     </ZipProject>

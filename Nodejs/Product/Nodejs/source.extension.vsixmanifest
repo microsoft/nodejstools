@@ -5,8 +5,8 @@
     <Description xml:space="preserve">Provides support for editing and debugging Node.js programs.</Description>
     <MoreInfo>http://nodejstools.codeplex.com</MoreInfo>
     <GettingStartedGuide>http://nodejstools.codeplex.com</GettingStartedGuide>
-    <Icon>NodejsPackage.ico</Icon>
-    <PreviewImage>NodejsPackageBig.ico</PreviewImage>
+    <Icon>Resources\Icons\NodejsProject.ico</Icon>
+    <PreviewImage>Resources\Icons\NodejsProjectBig.ico</PreviewImage>
   </Metadata>
   <!-- Version="11.0" specifies the minimum (not the maximum) version, and the
        Id specifications are minimums; any SKU equal or 'higher' will accept
@@ -27,7 +27,6 @@
     <Asset Type="Microsoft.VisualStudio.MefComponent" d:Source="Project" d:ProjectName="TestAdapter" Path="|TestAdapter|" AssemblyName="|TestAdapter;AssemblyName|" />
     <Asset Type="UnitTestExtension" d:Source="Project" d:ProjectName="TestAdapter" Path="|TestAdapter|" AssemblyName="|TestAdapter;AssemblyName|"/>
     <Asset Type="Microsoft.VisualStudio.Assembly" d:Source="Project" d:ProjectName="ProjectWizard" Path="|ProjectWizard|" AssemblyName="|ProjectWizard;AssemblyName|" />
-    <Asset Type="Microsoft.VisualStudio.MefComponent" d:Source="Project" d:ProjectName="ProjectWizard" Path="|ProjectWizard|" />
     <Asset Type="Microsoft.VisualStudio.ProjectTemplate" d:Source="Project" d:ProjectName="%CurrentProject%" d:TargetPath="|%CurrentProject%;TemplateProjectOutputGroup|" Path="ProjectTemplates" d:VsixSubPath="ProjectTemplates" />
     <Asset Type="Microsoft.VisualStudio.ItemTemplate" d:Source="Project" d:ProjectName="%CurrentProject%" d:TargetPath="|%CurrentProject%;TemplateProjectOutputGroup|" Path="ItemTemplates" d:VsixSubPath="ItemTemplates" />
   </Assets>

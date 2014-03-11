@@ -13,6 +13,13 @@
         </DirectoryRef>
     </Fragment>
     <Fragment>
+        <DirectoryRef Id="EXTENSION_INSTALLPATH">
+            <Directory Id="DIR_ItemTemplates" Name="ItemTemplates">
+              <Directory Id="DIR_ItemTemplates_JavaScript" Name="JavaScript"/>
+            </Directory>
+        </DirectoryRef>
+    </Fragment>
+    <Fragment>
         <DirectoryRef Id="INSTALLLOCATION">
             <Directory Id="DIR_INSTALLOCATION_Scripts" Name="Scripts">
               <Directory Id="DIR_INSTALLOCATION_Scripts_typings" Name="typings">
@@ -106,18 +113,18 @@
             </Component>
 
             <Component Directory="INSTALLLOCATION" Guid="{0AE160E1-51FF-4153-9882-E89DDFAE07B5}">
-              <File Id="filNodejsProject.ico" KeyPath="yes" Source="$(var.BinariesDir)\NodejsProject.ico" />
+              <File Id="filNodejsProject.ico" KeyPath="yes" Source="$(var.BinariesDir)\Resources\Icons\NodejsProject.ico" />
             </Component>
             <Component Directory="VWD_INSTALLLOCATION" Guid="{54912CB4-BCB0-49AA-9ABA-872BA50DC9E7}">
-              <File Id="filVWDNodejsProject.ico" KeyPath="yes" Source="$(var.BinariesDir)\NodejsProject.ico" />
+              <File Id="filVWDNodejsProject.ico" KeyPath="yes" Source="$(var.BinariesDir)\Resources\Icons\NodejsProject.ico" />
               <Condition>VWD_EXTENSION_INSTALLPATH</Condition>
             </Component>
 
             <Component Directory="INSTALLLOCATION" Guid="{60D3CA23-457C-4AA9-AD84-A8992687A234}">
-              <File Id="filNodejsProjectBig.ico" KeyPath="yes" Source="$(var.BinariesDir)\NodejsProjectBig.ico" />
+              <File Id="filNodejsProjectBig.ico" KeyPath="yes" Source="$(var.BinariesDir)\Resources\Icons\NodejsProjectBig.ico" />
             </Component>
             <Component Directory="VWD_INSTALLLOCATION" Guid="{EE0E3254-9FCD-4D10-93CF-2776536755C9}">
-              <File Id="filVWDNodejsProjectBig.ico" KeyPath="yes" Source="$(var.BinariesDir)\NodejsProjectBig.ico" />
+              <File Id="filVWDNodejsProjectBig.ico" KeyPath="yes" Source="$(var.BinariesDir)\Resources\Icons\NodejsProjectBig.ico" />
               <Condition>VWD_EXTENSION_INSTALLPATH</Condition>
             </Component>
 
@@ -350,12 +357,8 @@
               <Condition>VWD_EXTENSION_INSTALLPATH</Condition>
             </Component>
 
-            <Component Directory="DIR_NewItem" Guid="{21AFA4F2-E0B2-46D5-92DB-8B988A8ECAD7}">
+            <Component Directory="DIR_ItemTemplates_JavaScript" Guid="{21AFA4F2-E0B2-46D5-92DB-8B988A8ECAD7}">
               <File Id="fil_ItemTemplates_JavaScript_UnitTest" KeyPath="yes" Source="$(var.BinariesDir)\ItemTemplates\JavaScript\UnitTest.zip" />
-            </Component>
-            <Component Directory="DIR_VWD_NewItem" Guid="{DFC03E6F-D42F-4216-933B-00410A38A486}">
-              <File Id="filVWD_ItemTemplates_JavaScript_UnitTest" KeyPath="yes" Source="$(var.BinariesDir)\ItemTemplates\JavaScript\UnitTest.zip" />
-              <Condition>VWD_EXTENSION_INSTALLPATH</Condition>
             </Component>
 
             <Component Directory="DIR_NewItem" Guid="{09AD25DB-6446-456D-AB91-08ECA025B7D8}">
