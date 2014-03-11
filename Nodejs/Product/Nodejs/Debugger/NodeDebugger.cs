@@ -602,7 +602,7 @@ namespace Microsoft.NodejsTools.Debugger {
             foreach (NodeBreakpointBinding breakpointBinding in breakpointBindings) {
                 // Handle normal (fully bound) breakpoint binding
                 if (breakpointBinding.FullyBound) {
-                    if (!testFullyBound || await breakpointBinding.TestAndProcessHitAsync()) {
+                    if (!testFullyBound || await breakpointBinding.TestAndProcessHitAsync().ConfigureAwait(false)) {
                         hitBindings.Add(breakpointBinding);
                     }
                 } else {
@@ -618,7 +618,7 @@ namespace Microsoft.NodejsTools.Debugger {
                     HandleBindBreakpointSuccess(reboundbreakpointBinding, breakpoint);
 
                     // Handle invalid-line fixup (second bind matches current line)
-                    if (reboundbreakpointBinding.Target.Line == currentLine && await reboundbreakpointBinding.TestAndProcessHitAsync()) {
+                    if (reboundbreakpointBinding.Target.Line == currentLine && await reboundbreakpointBinding.TestAndProcessHitAsync().ConfigureAwait(false)) {
                         hitBindings.Add(reboundbreakpointBinding);
                     }
                 }

@@ -116,7 +116,7 @@ namespace Microsoft.NodejsTools.Debugger {
 
             bool engineEnabled = GetEngineEnabled(enabled, _breakOn, HitCount);
             if (_engineEnabled != engineEnabled) {
-                await Process.UpdateBreakpointBindingAsync(_breakpointId, engineEnabled, validateSuccess: true);
+                await Process.UpdateBreakpointBindingAsync(_breakpointId, engineEnabled, validateSuccess: true).ConfigureAwait(false);
                 _engineEnabled = engineEnabled;
             }
 
@@ -135,7 +135,7 @@ namespace Microsoft.NodejsTools.Debugger {
             bool? enabled = (_engineEnabled != engineEnabled) ? (bool?)engineEnabled : null;
 
             int engineIgnoreCount = GetEngineIgnoreCount(breakOn, HitCount);
-            await Process.UpdateBreakpointBindingAsync(_breakpointId, ignoreCount: engineIgnoreCount, enabled: enabled, validateSuccess: true);
+            await Process.UpdateBreakpointBindingAsync(_breakpointId, ignoreCount: engineIgnoreCount, enabled: enabled, validateSuccess: true).ConfigureAwait(false);
 
             _engineEnabled = engineEnabled;
             _engineIgnoreCount = engineIgnoreCount;
@@ -157,7 +157,7 @@ namespace Microsoft.NodejsTools.Debugger {
                 bool? enabled = (_engineEnabled != engineEnabled) ? (bool?)engineEnabled : null;
 
                 int engineIgnoreCount = GetEngineIgnoreCount(_breakOn, hitCount);
-                await Process.UpdateBreakpointBindingAsync(_breakpointId, ignoreCount: engineIgnoreCount, enabled: enabled, validateSuccess: true);
+                await Process.UpdateBreakpointBindingAsync(_breakpointId, ignoreCount: engineIgnoreCount, enabled: enabled, validateSuccess: true).ConfigureAwait(false);
 
                 _engineEnabled = engineEnabled;
                 _engineIgnoreCount = engineIgnoreCount;
@@ -169,7 +169,7 @@ namespace Microsoft.NodejsTools.Debugger {
         }
 
         internal async Task<bool> SetConditionAsync(string condition) {
-            await Process.UpdateBreakpointBindingAsync(_breakpointId, condition: condition, validateSuccess: true);
+            await Process.UpdateBreakpointBindingAsync(_breakpointId, condition: condition, validateSuccess: true).ConfigureAwait(false);
             _condition = condition;
             return true;
         }
@@ -250,7 +250,7 @@ namespace Microsoft.NodejsTools.Debugger {
 
             // Not hit if false condition
             if (!string.IsNullOrEmpty(_condition)) {
-                return await Process.TestPredicateAsync(_condition);
+                return await Process.TestPredicateAsync(_condition).ConfigureAwait(false);
             }
 
             // Otherwise, hit
@@ -262,7 +262,7 @@ namespace Microsoft.NodejsTools.Debugger {
         /// </summary>
         /// <returns>Whether break should be handled.</returns>
         internal async Task<bool> TestAndProcessHitAsync() {
-            if (await TestHitAsync()) {
+            if (await TestHitAsync().ConfigureAwait(false)) {
                 // Fixup hit count
                 _hitCountDelta = _engineHitCount > 0 ? _engineHitCount - 1 : 0;
                 return true;

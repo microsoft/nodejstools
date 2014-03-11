@@ -72,7 +72,7 @@ namespace Microsoft.NodejsTools.Debugger.Communication {
 
         public override async Task WriteAsync(byte[] buffer, int offset, int count, CancellationToken cancellationToken) {
             try {
-                await _webSocket.SendAsync(new ArraySegment<byte>(buffer, offset, count), WebSocketMessageType.Binary, true, cancellationToken);
+                await _webSocket.SendAsync(new ArraySegment<byte>(buffer, offset, count), WebSocketMessageType.Binary, true, cancellationToken).ConfigureAwait(false);
             } catch (WebSocketException ex) {
                 throw new IOException(ex.Message, ex);
             }
