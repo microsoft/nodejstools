@@ -924,14 +924,21 @@ namespace Microsoft.NodejsTools.Debugger.DebugEngine {
         #region Events
 
         internal void Send(IDebugEvent2 eventObject, string iidEvent, IDebugProgram2 program, IDebugThread2 thread) {
+            DebugWriteLine("AD7Engine Event: {0} ({1})", eventObject.GetType(), iidEvent);
+
+            // Check that events was not disposed
+            var events = _events;
+            if (events == null) {
+                return;
+            }
+
             uint attributes;
             var riidEvent = new Guid(iidEvent);
 
             EngineUtils.RequireOk(eventObject.GetAttributes(out attributes));
-
-            DebugWriteLine("AD7Engine Event: {0} ({1})", eventObject.GetType(), iidEvent);
+            
             try {
-                EngineUtils.RequireOk(_events.Event(this, null, program, thread, eventObject, ref riidEvent, attributes));
+                EngineUtils.RequireOk(events.Event(this, null, program, thread, eventObject, ref riidEvent, attributes));
             } catch (InvalidCastException) {                
                 // COM object has gone away
             }
