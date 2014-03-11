@@ -427,6 +427,10 @@ namespace Microsoft.NodejsTools.Project {
         }
 
         private void ReloadHierarchy() {
+            if (ProjectMgr.IsClosed) {
+                return;
+            }
+
             var controller = _npmController;
             if (null != controller) {
                 var root = controller.RootPackage;
