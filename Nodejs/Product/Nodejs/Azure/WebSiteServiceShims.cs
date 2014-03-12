@@ -27,6 +27,7 @@ using System.Diagnostics;
 using System.Linq;
 using System.Reflection;
 using System.Runtime.CompilerServices;
+using System.Runtime.ExceptionServices;
 using System.Runtime.InteropServices;
 using System.Threading.Tasks;
 using Microsoft.VisualStudio.WindowsAzure.Authentication;
@@ -62,7 +63,12 @@ namespace Microsoft.VisualStudio.Web.WindowsAzure.Contracts.Shims {
             if (method == null) {
                 throw new MissingMethodException(_interface.FullName, name);
             }
-            return method.Invoke(_impl, args);
+            try {
+                return method.Invoke(_impl, args);
+            } catch (TargetInvocationException tex) {
+                ExceptionDispatchInfo.Capture(tex.InnerException ?? tex).Throw();
+                return null;
+            }
         }
 
         protected object Invoke([CallerMemberName] string name = null) {
@@ -87,7 +93,12 @@ namespace Microsoft.VisualStudio.Web.WindowsAzure.Contracts.Shims {
             if (prop == null) {
                 throw new MissingMemberException(_interface.FullName, name);
             }
-            return prop.GetValue(_impl);
+            try {
+                return prop.GetValue(_impl);
+            } catch (TargetInvocationException tex) {
+                ExceptionDispatchInfo.Capture(tex.InnerException ?? tex).Throw();
+                return null;
+            }
         }
     }
 

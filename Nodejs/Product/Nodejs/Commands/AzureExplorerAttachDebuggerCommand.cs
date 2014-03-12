@@ -13,6 +13,7 @@
  * ***************************************************************************/
 
 using System;
+using System.Diagnostics;
 using System.IO;
 using System.Linq;
 using System.Net;
@@ -30,6 +31,7 @@ using Microsoft.VisualStudio.Shell.Interop;
 using Microsoft.VisualStudio.Web.WindowsAzure.Contracts.Shims;
 using Microsoft.VisualStudio.WindowsAzure.Authentication;
 using Microsoft.VisualStudioTools;
+using Microsoft.VisualStudioTools.Project;
 
 namespace Microsoft.NodejsTools.Commands {
     /// <summary>
@@ -211,10 +213,13 @@ namespace Microsoft.NodejsTools.Commands {
 
             try {
                 AttachDebugger(new UriBuilder(webSite.Uri) { Scheme = (webSite.Uri.Scheme == "https") ? "wss" : "ws", Path = path }.Uri);
-            } catch (Exception) {
+            } catch (Exception ex) {
                 // If we got to this point, the attach logic in debug engine will catch exceptions, display proper error message and
                 // ask the user to retry, so the only case where we actually get here is if user canceled on error. If this is the case,
-                // we don't want to pop any additional error messages, so always return true.
+                // we don't want to pop any additional error messages, so always return true, but log the error in the Output window.
+                var output = OutputWindowRedirector.GetGeneral(NodejsPackage.Instance);
+                output.WriteErrorLine("Failed to attach to Azure web site: " + ex.Message);
+                output.ShowAndActivate();
             }
             return true;
         }
