@@ -52,17 +52,20 @@ namespace NodejsTests.Debugger.FileNameMapping {
         [TestMethod, Priority(0)]
         public void GetLocalFileNameIfProjectContainsDuplicatesTests() {
             // Arrange
-            const string remoteFileName = "/root/other/project/path/app.js";
+            const string remoteFileName1 = "/root/other/project/path/app.js";
+            const string remoteFileName2 = "/root/other/project/path/sub/app.js";
             const string localFileName1 = @"c:\path\To\project\app.js";
-            const string localFileName2 = @"c:\Path\to\project\app.js";
+            const string localFileName2 = @"c:\Path\to\project\sub\app.js";
             var localFiles = new List<string> { localFileName1, localFileName2 };
             var fileNameMapper = new FuzzyLogicFileNameMapper(localFiles);
 
             // Act
-            string fileName = fileNameMapper.GetLocalFileName(remoteFileName);
+            string fileName1 = fileNameMapper.GetLocalFileName(remoteFileName1);
+            string fileName2 = fileNameMapper.GetLocalFileName(remoteFileName2);
 
             // Assert
-            Assert.IsTrue(string.Equals(localFileName1, fileName, StringComparison.OrdinalIgnoreCase));
+            Assert.IsTrue(string.Equals(localFileName1, fileName1, StringComparison.OrdinalIgnoreCase));
+            Assert.IsTrue(string.Equals(localFileName2, fileName2, StringComparison.OrdinalIgnoreCase));
         }
     }
 }

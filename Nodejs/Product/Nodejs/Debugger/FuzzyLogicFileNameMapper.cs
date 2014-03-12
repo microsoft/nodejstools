@@ -41,12 +41,26 @@ namespace Microsoft.NodejsTools.Debugger {
             // Try to find best file name match
             IEnumerable<string> pathComponents = GetPathComponents(remoteFileName);
             ScriptTree curTree = _scripts;
+
+            // Walk up the remote path, matching it against known local files.
             foreach (string component in pathComponents.Reverse()) {
                 ScriptTree nextTree;
                 if (!curTree.Parents.TryGetValue(component, out nextTree)) {
-                    return remoteFileName;
+                    // Can't walk up the local tree any further - this means that we're at the point at which local and remote
+                    // filesystems begin to differ, yet we have more than one candidate. The right one is the one that's closest
+                    // to that point (i.e. shortest path).
+                    //
+                    // For example, if remote path is:
+                    //      /wwwroot/bbb/ccc.js"
+                    // and local files are:
+                    //      C:\MyProject\bbb\ccc.js
+                    //      C:\MyProject\aaa\bbb\ccc.js
+                    // then we stop at wwwroot, as it doesn't map to anything locally, but both files are still candidates -
+                    // and we want the first one rather than the second one.
+                    return curTree.Children.OrderBy(s => s.Length).FirstOrDefault() ?? remoteFileName;
                 }
 
+                // Short-circuit the walk if we end up with only a single candidate at any point.
                 if (nextTree.Children.Count == 1) {
                     return nextTree.Children.First();
                 }
