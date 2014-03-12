@@ -19,7 +19,7 @@ using Microsoft.VisualStudio.TestTools.UnitTesting;
 namespace NodejsTests.Debugger {
     [TestClass]
     public class ExceptionHandlerTests {
-        [TestMethod]
+        [TestMethod, Priority(0)]
         public void SetNewDefaultExceptionHitTreatment() {
             // Arrange
             var exceptionHandler = new ExceptionHandler();
@@ -31,7 +31,7 @@ namespace NodejsTests.Debugger {
             Assert.IsTrue(updated);
         }
 
-        [TestMethod]
+        [TestMethod, Priority(0)]
         public void SetSameDefaultExceptionHitTreatment() {
             // Arrange
             var exceptionHandler = new ExceptionHandler();
@@ -43,7 +43,7 @@ namespace NodejsTests.Debugger {
             Assert.IsFalse(updated);
         }
 
-        [TestMethod]
+        [TestMethod, Priority(0)]
         public void GetExceptionHitTreatmentForKnownError() {
             // Arrange
             var exceptionHandler = new ExceptionHandler();
@@ -52,10 +52,10 @@ namespace NodejsTests.Debugger {
             ExceptionHitTreatment result = exceptionHandler.GetExceptionHitTreatment("Error");
 
             // Assert
-            Assert.AreEqual(ExceptionHitTreatment.BreakAlways, result);
+            Assert.AreEqual(ExceptionHitTreatment.BreakNever, result);
         }
 
-        [TestMethod]
+        [TestMethod, Priority(0)]
         public void GetExceptionHitTreatmentForUnknownError() {
             // Arrange
             var exceptionHandler = new ExceptionHandler();
@@ -67,7 +67,7 @@ namespace NodejsTests.Debugger {
             Assert.AreEqual(ExceptionHitTreatment.BreakAlways, result);
         }
 
-        [TestMethod]
+        [TestMethod, Priority(0)]
         public void GetExceptionHitTreatmentForUnknownErrorAfterChangingDefaults() {
             // Arrange
             var exceptionHandler = new ExceptionHandler();
@@ -81,12 +81,12 @@ namespace NodejsTests.Debugger {
             Assert.AreEqual(newDefault, result);
         }
 
-        [TestMethod]
+        [TestMethod, Priority(0)]
         public void SetSameExceptionTreatments() {
             // Arrange
             var exceptionHandler = new ExceptionHandler();
             const string exceptionName = "Error";
-            const ExceptionHitTreatment newValue = ExceptionHitTreatment.BreakAlways;
+            const ExceptionHitTreatment newValue = ExceptionHitTreatment.BreakNever;
             ExceptionHitTreatment initial = exceptionHandler.GetExceptionHitTreatment(exceptionName);
 
             // Act
@@ -96,13 +96,13 @@ namespace NodejsTests.Debugger {
             ExceptionHitTreatment changed = exceptionHandler.GetExceptionHitTreatment(exceptionName);
 
             // Assert
-            Assert.AreEqual(ExceptionHitTreatment.BreakAlways, initial);
+            Assert.AreEqual(ExceptionHitTreatment.BreakNever, initial);
             Assert.IsFalse(updated);
             Assert.AreEqual(initial, changed);
             Assert.AreEqual(newValue, changed);
         }
 
-        [TestMethod]
+        [TestMethod, Priority(0)]
         public void SetNewExceptionTreatments() {
             // Arrange
             var exceptionHandler = new ExceptionHandler();
@@ -117,12 +117,12 @@ namespace NodejsTests.Debugger {
             ExceptionHitTreatment changed = exceptionHandler.GetExceptionHitTreatment(exceptionName);
 
             // Assert
-            Assert.AreEqual(ExceptionHitTreatment.BreakAlways, initial);
+            Assert.AreEqual(ExceptionHitTreatment.BreakNever, initial);
             Assert.IsTrue(updated);
             Assert.AreEqual(newValue, changed);
         }
 
-        [TestMethod]
+        [TestMethod, Priority(0)]
         public void ClearExceptionTreatments() {
             // Arrange
             var exceptionHandler = new ExceptionHandler();
@@ -141,7 +141,7 @@ namespace NodejsTests.Debugger {
             Assert.AreEqual(ExceptionHitTreatment.BreakAlways, changed);
         }
 
-        [TestMethod]
+        [TestMethod, Priority(0)]
         public void ResetExceptionTreatments() {
             // Arrange
             var exceptionHandler = new ExceptionHandler();

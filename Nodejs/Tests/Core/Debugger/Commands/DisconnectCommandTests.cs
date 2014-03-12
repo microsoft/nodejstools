@@ -18,7 +18,7 @@ using Microsoft.VisualStudio.TestTools.UnitTesting;
 namespace NodejsTests.Debugger.Commands {
     [TestClass]
     public class DisconnectCommandTests {
-        [TestMethod]
+        [TestMethod, Priority(0)]
         public void CreateDisconnectCommand() {
             // Arrange
             const int commandId = 3;

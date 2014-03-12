@@ -20,7 +20,7 @@ using Newtonsoft.Json.Linq;
 namespace NodejsTests.Debugger.Events {
     [TestClass]
     public class CompileScriptEventTests {
-        [TestMethod]
+        [TestMethod, Priority(0)]
         public void CreateCompileScriptEvent() {
             // Arrange
             JObject message = JObject.Parse(Resources.NodeCompileScriptResponse);
@@ -35,7 +35,7 @@ namespace NodejsTests.Debugger.Events {
             Assert.AreEqual(true, compileScriptEvent.Running);
         }
 
-        [TestMethod]
+        [TestMethod, Priority(0)]
         public void CreateCompileScriptEventWithNullScriptName()
         {
             // Arrange

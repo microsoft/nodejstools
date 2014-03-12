@@ -20,7 +20,7 @@ using Newtonsoft.Json.Linq;
 namespace NodejsTests.Debugger.Serialization {
     [TestClass]
     public class SetValueVariableTests {
-        [TestMethod]
+        [TestMethod, Priority(0)]
         public void CreateSetVariableValue() {
             // Arrange
             JObject json = SerializationTestData.GetSetVariableValueResponse();

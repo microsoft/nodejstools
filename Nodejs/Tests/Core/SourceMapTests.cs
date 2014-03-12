@@ -110,21 +110,21 @@ namespace NodejsTests {
             var map = new SourceMap(new StringReader(_sample));
             var testCases = new[] { 
                 new { InLine = 0, InColumn = 0, ExpectedLine = 0, ExpectedColumn = 0, Name = "Greeter", Filename = "test.ts" },
-                new { InLine = 1, InColumn = 0, ExpectedLine = -1, ExpectedColumn = 0, Name = "Greeter", Filename = "test.ts" },
+                new { InLine = 1, InColumn = 0, ExpectedLine = 1, ExpectedColumn = 4, Name = "Greeter", Filename = "test.ts" },
                 new { InLine = 1, InColumn = 4, ExpectedLine = 1, ExpectedColumn = 4, Name = "Greeter", Filename = "test.ts" },
-                new { InLine = 2, InColumn = 0, ExpectedLine = -1, ExpectedColumn = 0, Name = "Greeter.constructor", Filename = "test.ts" },
-                new { InLine = 2, InColumn = 4, ExpectedLine = -1, ExpectedColumn = 0, Name = "Greeter.constructor", Filename = "test.ts" },
+                new { InLine = 2, InColumn = 0, ExpectedLine = 1, ExpectedColumn = 16, Name = "Greeter.constructor", Filename = "test.ts" },
+                new { InLine = 2, InColumn = 4, ExpectedLine = 1, ExpectedColumn = 16, Name = "Greeter.constructor", Filename = "test.ts" },
                 new { InLine = 2, InColumn = 8, ExpectedLine = 1, ExpectedColumn = 16, Name = "Greeter.constructor", Filename = "test.ts" },
                 new { InLine = 3, InColumn = 0, ExpectedLine = 1, ExpectedColumn = 39, Name = "Greeter.constructor", Filename = "test.ts" },
-                new { InLine = 4, InColumn = 0, ExpectedLine = -1, ExpectedColumn = 0, Name = "Greeter", Filename = "test.ts" },
-                new { InLine = 5, InColumn = 0, ExpectedLine = -1, ExpectedColumn = 0, Name = "Greeter.greet", Filename = "test.ts" },
-                new { InLine = 5, InColumn = 4, ExpectedLine = -1, ExpectedColumn = 4, Name = "Greeter.greet", Filename = "test.ts" },
+                new { InLine = 4, InColumn = 0, ExpectedLine = 2, ExpectedColumn = 4, Name = "Greeter", Filename = "test.ts" },
+                new { InLine = 5, InColumn = 0, ExpectedLine = 3, ExpectedColumn = 8, Name = "Greeter.greet", Filename = "test.ts" },
+                new { InLine = 5, InColumn = 4, ExpectedLine = 3, ExpectedColumn = 8, Name = "Greeter.greet", Filename = "test.ts" },
                 new { InLine = 5, InColumn = 32, ExpectedLine = 3, ExpectedColumn = 29, Name = "Greeter.greet", Filename = "test.ts" },
-                new { InLine = 6, InColumn = 0, ExpectedLine = -1, ExpectedColumn = 0, Name = "Greeter.greet", Filename = "test.ts" },
-                new { InLine = 7, InColumn = 0, ExpectedLine = -1, ExpectedColumn = 0, Name = "Greeter", Filename = "test.ts" },
+                new { InLine = 6, InColumn = 0, ExpectedLine = 4, ExpectedColumn = 4, Name = "Greeter.greet", Filename = "test.ts" },
+                new { InLine = 7, InColumn = 0, ExpectedLine = 5, ExpectedColumn = 0, Name = "Greeter", Filename = "test.ts" },
                 new { InLine = 8, InColumn = 0, ExpectedLine = 5, ExpectedColumn = 0, Name = "Greeter", Filename = "test.ts" },
                 new { InLine = 9, InColumn = 0, ExpectedLine = 5, ExpectedColumn = 1, Name = "Greeter", Filename = "test.ts" },
-                new { InLine = 10, InColumn = 0, ExpectedLine = -1, ExpectedColumn = 0, Name = "", Filename = "" },
+                new { InLine = 10, InColumn = 0, ExpectedLine = 5, ExpectedColumn = 0, Name = "", Filename = "" },
             };
             for (int i = 0; i < testCases.Length; i++) {
                 Console.WriteLine("{0} {1}", testCases[i].InLine, testCases[i].InColumn);
@@ -134,8 +134,6 @@ namespace NodejsTests {
                     Assert.AreEqual(testCases[i].Name, mapping.Name);
                     Assert.AreEqual(testCases[i].ExpectedLine, mapping.Line);
                     Assert.AreEqual(testCases[i].ExpectedColumn, mapping.Column);
-                } else {
-                    Assert.AreEqual(-1, testCases[i].ExpectedLine);
                 }
             }
         }

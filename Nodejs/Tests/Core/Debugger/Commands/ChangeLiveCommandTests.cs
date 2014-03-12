@@ -19,7 +19,7 @@ using Microsoft.VisualStudio.TestTools.UnitTesting;
 namespace NodejsTests.Debugger.Commands {
     [TestClass]
     public class ChangeLiveCommandTests {
-        [TestMethod]
+        [TestMethod, Priority(0)]
         public void CreateChangeLiveCommand() {
             // Arrange
             const int commandId = 3;
@@ -41,7 +41,7 @@ namespace NodejsTests.Debugger.Commands {
                 changeLiveCommand.ToString());
         }
 
-        [TestMethod]
+        [TestMethod, Priority(0)]
         public void ProcessChangeLiveResponse() {
             // Arrange
             const int commandId = 3;

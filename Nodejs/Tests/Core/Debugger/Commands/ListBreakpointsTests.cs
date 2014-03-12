@@ -18,7 +18,7 @@ using Microsoft.VisualStudio.TestTools.UnitTesting;
 namespace NodejsTests.Debugger.Commands {
     [TestClass]
     public class ListBreakpointsTests {
-        [TestMethod]
+        [TestMethod, Priority(0)]
         public void CreateListBreakpointsCommand() {
             // Arrange
             const int commandId = 3;

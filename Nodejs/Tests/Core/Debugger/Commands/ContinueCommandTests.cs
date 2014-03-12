@@ -19,7 +19,7 @@ using Microsoft.VisualStudio.TestTools.UnitTesting;
 namespace NodejsTests.Debugger.Commands {
     [TestClass]
     public class ContinueCommandTests {
-        [TestMethod]
+        [TestMethod, Priority(0)]
         public void CreateContinueCommand() {
             // Arrange
             const int commandId = 3;
@@ -37,7 +37,7 @@ namespace NodejsTests.Debugger.Commands {
                 continueCommand.ToString());
         }
 
-        [TestMethod]
+        [TestMethod, Priority(0)]
         public void CreateContinueCommandWithOptionalParameters() {
             // Arrange
             const int commandId = 3;

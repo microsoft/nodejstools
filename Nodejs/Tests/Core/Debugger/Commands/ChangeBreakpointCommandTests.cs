@@ -18,7 +18,7 @@ using Microsoft.VisualStudio.TestTools.UnitTesting;
 namespace NodejsTests.Debugger.Commands {
     [TestClass]
     public class ChangeBreakpointCommandTests {
-        [TestMethod]
+        [TestMethod, Priority(0)]
         public void CreateChangeBreakpointCommand() {
             // Arrange
             const int commandId = 3;
@@ -36,7 +36,7 @@ namespace NodejsTests.Debugger.Commands {
                 changeBreakpointCommand.ToString());
         }
 
-        [TestMethod]
+        [TestMethod, Priority(0)]
         public void CreateChangeBreakpointCommandWithOptionalParameters() {
             // Arrange
             const int commandId = 3;

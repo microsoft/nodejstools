@@ -22,7 +22,7 @@ using Newtonsoft.Json.Linq;
 namespace NodejsTests.Debugger.Commands {
     [TestClass]
     public class BacktraceCommandTests {
-        [TestMethod]
+        [TestMethod, Priority(0)]
         public void CreateBacktraceCommand() {
             // Arrange
             const int commandId = 3;
@@ -42,7 +42,7 @@ namespace NodejsTests.Debugger.Commands {
                 backtraceCommand.ToString());
         }
 
-        [TestMethod]
+        [TestMethod, Priority(0)]
         public void ProcessBacktraceForCallstackDepth() {
             // Arrange
             const int commandId = 3;
@@ -66,7 +66,7 @@ namespace NodejsTests.Debugger.Commands {
             resultFactoryMock.Verify(factory => factory.Create(It.IsAny<INodeVariable>()), Times.Never);
         }
 
-        [TestMethod]
+        [TestMethod, Priority(0)]
         public void ProcessBacktraceForStackFrames() {
             // Arrange
             const int commandId = 3;

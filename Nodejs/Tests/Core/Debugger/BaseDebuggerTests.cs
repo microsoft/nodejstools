@@ -413,7 +413,8 @@ namespace NodejsTests.Debugger {
             string interpreterOptions = null,
             Action<NodeDebugger> onProcessCreated = null,
             ExceptionHitTreatment? defaultExceptionTreatment = null,
-            ICollection<KeyValuePair<string, ExceptionHitTreatment>> exceptionTreatments = null
+            ICollection<KeyValuePair<string, ExceptionHitTreatment>> exceptionTreatments = null,
+            string scriptArguments = null
         ) {
             if (!Path.IsPathRooted(filename)) {
                 filename = DebuggerTestPath + filename;
@@ -427,6 +428,7 @@ namespace NodejsTests.Debugger {
                     thread = newthread;
                 },
                 interpreterOptions: interpreterOptions,
+                arguments: scriptArguments,
                 resumeOnProcessLoad: false
             )) {
                 TestDebuggerSteps(

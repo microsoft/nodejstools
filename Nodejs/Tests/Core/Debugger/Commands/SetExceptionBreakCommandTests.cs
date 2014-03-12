@@ -18,7 +18,7 @@ using Microsoft.VisualStudio.TestTools.UnitTesting;
 namespace NodejsTests.Debugger.Commands {
     [TestClass]
     public class SetExceptionBreakCommandTests {
-        [TestMethod]
+        [TestMethod, Priority(0)]
         public void CreateSetExceptionBreakCommand() {
             // Arrange
             const int commandId = 3;
@@ -37,7 +37,7 @@ namespace NodejsTests.Debugger.Commands {
                 setExceptionBreakCommand.ToString());
         }
 
-        [TestMethod]
+        [TestMethod, Priority(0)]
         public void CreateSetExceptionBreakCommandForAll() {
             // Arrange
             const int commandId = 3;

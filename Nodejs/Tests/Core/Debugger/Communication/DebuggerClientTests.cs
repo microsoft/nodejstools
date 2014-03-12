@@ -22,7 +22,7 @@ using Moq;
 namespace NodejsTests.Debugger.Communication {
     [TestClass]
     public class DebuggerClientTests {
-        [TestMethod]
+        [TestMethod, Priority(0)]
         public void CreateDebuggerClientWithNullConnection() {
             // Arrange
             Exception exception = null;
@@ -41,7 +41,7 @@ namespace NodejsTests.Debugger.Communication {
             Assert.IsInstanceOfType(exception, typeof (ArgumentNullException));
         }
 
-        [TestMethod]
+        [TestMethod, Priority(0)]
         public async Task SendMessageViaDebuggerClient() {
             // Arrange
             var connectionMock = new Mock<IDebuggerConnection>();
@@ -58,7 +58,7 @@ namespace NodejsTests.Debugger.Communication {
             Assert.IsTrue(disconnectCommand.Running);
         }
 
-        [TestMethod]
+        [TestMethod, Priority(0)]
         public void RaiseCompileScriptEventViaDebuggerClient() {
             // Arrange
             var connectionMock = new Mock<IDebuggerConnection>();
@@ -80,7 +80,7 @@ namespace NodejsTests.Debugger.Communication {
             Assert.IsNotNull(args.CompileScriptEvent);
         }
 
-        [TestMethod]
+        [TestMethod, Priority(0)]
         public void RaiseBreakpointEventViaDebuggerClient() {
             // Arrange
             var connectionMock = new Mock<IDebuggerConnection>();
@@ -102,7 +102,7 @@ namespace NodejsTests.Debugger.Communication {
             Assert.IsNotNull(args.BreakpointEvent);
         }
 
-        [TestMethod]
+        [TestMethod, Priority(0)]
         public void RaiseExceptionEventViaDebuggerClient() {
             // Arrange
             var connectionMock = new Mock<IDebuggerConnection>();

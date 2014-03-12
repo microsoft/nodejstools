@@ -22,7 +22,7 @@ using Newtonsoft.Json;
 namespace NodejsTests.Debugger.Commands {
     [TestClass]
     public class LookupCommandTests {
-        [TestMethod]
+        [TestMethod, Priority(0)]
         public void CreateLookupCommand() {
             // Arrange
             const int commandId = 3;
@@ -41,7 +41,7 @@ namespace NodejsTests.Debugger.Commands {
                 lookupCommand.ToString());
         }
 
-        [TestMethod]
+        [TestMethod, Priority(0)]
         public void ProcessLookupResponse() {
             // Arrange
             const int commandId = 3;
@@ -62,8 +62,8 @@ namespace NodejsTests.Debugger.Commands {
             Assert.IsNotNull(lookupCommand.Results[handle]);
             resultFactoryMock.Verify(factory => factory.Create(It.IsAny<INodeVariable>()), Times.AtLeastOnce);
         }
-        
-        [TestMethod]
+
+        [TestMethod, Priority(0)]
         public void ProcessLookupResponseWithPrimitiveObject() {
             // Arrange
             const int commandId = 3;

@@ -18,7 +18,7 @@ using Microsoft.VisualStudio.TestTools.UnitTesting;
 namespace NodejsTests.Debugger.Commands {
     [TestClass]
     public class SuspendCommandTests {
-        [TestMethod]
+        [TestMethod, Priority(0)]
         public void CreateSuspendCommand() {
             // Arrange
             const int commandId = 3;

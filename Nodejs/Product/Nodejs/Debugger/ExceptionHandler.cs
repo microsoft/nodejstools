@@ -182,9 +182,6 @@ namespace Microsoft.NodejsTools.Debugger {
                 "SyntaxError",
                 "TypeError",
                 "URIError",
-                "Error(ENOENT)",
-                "Error(MODULE_NOT_FOUND)",
-                "SyntaxError"
             };
 
             var defaultExceptionTreatments = new Dictionary<string, ExceptionHitTreatment>();

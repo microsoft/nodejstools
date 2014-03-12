@@ -18,7 +18,7 @@ using Microsoft.VisualStudio.TestTools.UnitTesting;
 namespace NodejsTests.Debugger.Commands {
     [TestClass]
     public class ClearBreakpointCommandTests {
-        [TestMethod]
+        [TestMethod, Priority(0)]
         public void CreateClearBreakpointCommand() {
             // Arrange
             const int commandId = 3;

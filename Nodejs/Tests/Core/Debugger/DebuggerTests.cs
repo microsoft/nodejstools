@@ -1802,14 +1802,15 @@ namespace NodejsTests.Debugger {
         #region Argument Tests
 
         [TestMethod, Priority(0)]
-        public void TestInterpreterArguments() {
+        public void TestScriptArguments() {
             TestDebuggerSteps(
                 "PassedArgs.js",
                 new[] {
                     new TestStep(action: TestAction.ResumeThread, expectedEntryPointHit: 0),
                     new TestStep(action: TestAction.ResumeProcess, expectedExceptionRaised: new ExceptionInfo("Error", "Error: Invalid args", 3)),
                     new TestStep(action: TestAction.ResumeProcess, expectedExitCode: 8),
-                }
+                },
+                exceptionTreatments: CollectExceptionTreatments(ExceptionHitTreatment.BreakAlways, "Error")
             );
             TestDebuggerSteps(
                 "PassedArgs.js",
@@ -1817,7 +1818,7 @@ namespace NodejsTests.Debugger {
                     new TestStep(action: TestAction.ResumeThread, expectedEntryPointHit: 0),
                     new TestStep(action: TestAction.ResumeProcess, expectedExitCode: 0),
                 },
-                interpreterOptions: "42"
+                scriptArguments: "42"
             );
         }
 
