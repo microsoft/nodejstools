@@ -471,13 +471,29 @@ try {
             ######################################################################
         }
         
-        foreach ($product in $products) {
-            Copy-Item "$destdir\$($product.msi)" "$outdir\$($product.outname1)$spacename $($targetvs.name)$($product.outname2)" -Force -EA:0
-            if (-not $?) {
-                Write-Output "Failed to copy $destdir\$($product.msi)"
+        foreach ($targetVs in $targetVersions) {
+            $destdir = "$outdir\$($targetVs.name)\$config"
+            if ($config -match "debug") {
+                $config_mark = " Debug"
+            } else {
+                $config_mark = ""
+            }
+            
+            foreach ($product in $products) {
+                Copy-Item "$destdir\$($product.msi)" "$outdir\$($product.outname1)$spacename $($targetvs.name)$config_mark$($product.outname2)" -Force -EA:0
+                if (-not $?) {
+                    Write-Output "Failed to copy $destdir\$($product.msi)"
+                }
             }
         }
     }
+
+    # If this is unsigned then copy the skipverification files to toplevel folder
+    if(-not $signedbuild) {
+        $bindir = "$outdir\$($targetVersions[0].name)\$($targetConfigs[0])"
+        Copy-Item "$bindir\*.reg" "$outdir\" -Force -EA:0
+    }
+
     
     if ($scorch) {
         tfpt scorch /noprompt
