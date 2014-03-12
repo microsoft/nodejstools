@@ -489,7 +489,7 @@ try {
     }
 
     # If this is unsigned then copy the skipverification files to toplevel folder
-    if(-not $signedbuild) {
+    if(-not $release) {
         $bindir = "$outdir\$($targetVersions[0].name)\$($targetConfigs[0])"
         Copy-Item "$bindir\*.reg" "$outdir\" -Force -EA:0
     }
