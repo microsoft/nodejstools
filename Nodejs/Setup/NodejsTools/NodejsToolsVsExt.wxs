@@ -18,6 +18,11 @@
               <Directory Id="DIR_ItemTemplates_JavaScript" Name="JavaScript"/>
             </Directory>
         </DirectoryRef>
+        <DirectoryRef Id="VWD_INSTALLLOCATION">
+            <Directory Id="DIR_VWD_ItemTemplates" Name="ItemTemplates">
+              <Directory Id="DIR_VWD_ItemTemplates_JavaScript" Name="JavaScript"/>
+            </Directory>
+        </DirectoryRef>
     </Fragment>
     <Fragment>
         <DirectoryRef Id="INSTALLLOCATION">
@@ -359,6 +364,10 @@
 
             <Component Directory="DIR_ItemTemplates_JavaScript" Guid="{21AFA4F2-E0B2-46D5-92DB-8B988A8ECAD7}">
               <File Id="fil_ItemTemplates_JavaScript_UnitTest" KeyPath="yes" Source="$(var.BinariesDir)\ItemTemplates\JavaScript\UnitTest.zip" />
+            </Component>
+            <Component Directory="DIR_VWD_ItemTemplates_JavaScript" Guid="{DAB80542-5649-49DE-ACD1-04CEB7AFFF5D}">
+              <File Id="fil_VWD_ItemTemplates_JavaScript_UnitTest" KeyPath="yes" Source="$(var.BinariesDir)\ItemTemplates\JavaScript\UnitTest.zip" />
+              <Condition>VWD_EXTENSION_INSTALLPATH</Condition>
             </Component>
 
             <Component Directory="DIR_NewItem" Guid="{09AD25DB-6446-456D-AB91-08ECA025B7D8}">

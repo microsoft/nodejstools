@@ -47,7 +47,7 @@
         
         <Grid Grid.Column="0" Grid.RowSpan="3"
               Background="{DynamicResource {x:Static wpf:Controls.BackgroundAccentKey}}">
-            <Image Source="/Microsoft.NodejsTools;component/NodejsProjectBigResource.ico"
+            <Image Source="/Microsoft.NodejsTools;component/Resources/Icons/NodejsProjectBigResource.ico"
                    Stretch="Uniform"
                    MaxWidth="64px"
                    Margin="24px"

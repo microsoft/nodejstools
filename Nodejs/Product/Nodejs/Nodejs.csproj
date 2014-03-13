@@ -979,6 +979,9 @@
     <Resource Include="..\Icons\blankjs.ico">
       <Link>Resources\Icons\blankjs.ico</Link>
     </Resource>
+    <Resource Include="..\Icons\JScript.ico">
+      <Link>Resources\Icons\JScript.ico</Link>
+    </Resource>
     <EmbeddedResource Include="..\Icons\NodejsImageList.bmp">
       <Link>Resources\Icons\NodejsImageList.bmp</Link>
       <LogicalName>Microsoft.NodejsTools.Resources.Icons.NodejsImageList.bmp</LogicalName>
