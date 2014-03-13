@@ -51,6 +51,9 @@
     <SignAssembly>True</SignAssembly>
     <TargetFrameworkVersion>v4.5</TargetFrameworkVersion>
     <CreateVsixContainer>true</CreateVsixContainer>
+    <StartAction>Program</StartAction>
+    <StartProgram>$(DevEnvDir)devenv.exe</StartProgram>
+    <StartArguments>/rootSuffix Exp /Log</StartArguments>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'Debug|x86'">
     <PlatformTarget>x86</PlatformTarget>
@@ -991,7 +994,7 @@
   <ItemGroup>
     <Content Include="..\Icons\NodejsProject.ico">
       <Link>Resources\Icons\NodejsProject.ico</Link>
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
       <IncludeInVSIX>true</IncludeInVSIX>
       <VSIXSubpath>.</VSIXSubpath>
     </Content>
@@ -1002,7 +1005,7 @@
     </Content>
     <Content Include="..\Icons\NodejsProjectBig.ico">
       <Link>Resources\Icons\NodejsProjectBig.ico</Link>
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
       <IncludeInVSIX>true</IncludeInVSIX>
     </Content>
     <Resource Include="..\Icons\NodejsProjectBigResource.ico">

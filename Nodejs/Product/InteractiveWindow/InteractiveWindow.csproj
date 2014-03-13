@@ -211,17 +211,6 @@
   <PropertyGroup>
     <DelaySign>true</DelaySign>
   </PropertyGroup>
-  <Target Name="ConditionalResx" BeforeTargets="MainResourcesGeneration" Condition="'@(ConditionalEmbeddedResource)' != ''">
-    <WriteLinesToFile File="@(ConditionalEmbeddedResource->'%(RootDir)%(Directory)%(Filename).xform.resx')" Lines="$([System.IO.File]::ReadAllText('%(fullpath)').Replace(&quot;_VSVERSION_&quot;,&quot;$(VSTarget)&quot;))" Overwrite="true" />
-    <ItemGroup>
-      <EmbeddedResource Include="@(ConditionalEmbeddedResource->'%(RootDir)%(Directory)%(Filename).xform.resx')">
-        <ManifestResourceName>%(ConditionalEmbeddedResource.ManifestResourceName)</ManifestResourceName>
-        <MergeWithCTO Condition="'%(ConditionalEmbeddedResource.MergeWithCTO)' != ''">%(ConditionalEmbeddedResource.MergeWithCTO)</MergeWithCTO>
-        <LastGenOutput Condition="'%(ConditionalEmbeddedResource.LastGenOutput)' != ''">%(ConditionalEmbeddedResource.LastGenOutput)</LastGenOutput>
-        <Generator Condition="'%(ConditionalEmbeddedResource.Generator)' != ''">%(ConditionalEmbeddedResource.Generator)</Generator>
-      </EmbeddedResource>
-    </ItemGroup>
-  </Target>
   <Import Project="$(BuildRoot)\Common\Product\ReplWindow\ReplWindow.proj" />
   <Import Project="..\ProjectAfter.settings" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 

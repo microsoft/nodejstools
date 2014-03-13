@@ -30,9 +30,8 @@
   <Target Name="ConditionalResx"
           BeforeTargets="MainResourcesGeneration"
           Condition="'@(ConditionalEmbeddedResource)' != ''"
-          >
-    
-          
+          Inputs="@(ConditionalEmbeddedResource)"
+          Outputs="@(ConditionalEmbeddedResource->'%(RootDir)%(Directory)%(Filename).xform.resx')">
     <WriteLinesToFile 
       File="@(ConditionalEmbeddedResource->'%(RootDir)%(Directory)%(Filename).xform.resx')" 
       Lines="$([System.IO.File]::ReadAllText('%(fullpath)').Replace(&quot;_VSVERSION_&quot;,&quot;$(VSTarget)&quot;))" 
@@ -51,7 +50,8 @@
   <Target Name="TransformZipProject"
           BeforeTargets="MainResourcesGeneration"
           Condition="'@(TransformedZipProject)' != ''"
-          >
+          Inputs="@(TransformedZipProject)"
+          Outputs="@(TransformedZipProject->'%(RootDir)%(Directory)%(Filename)')">
     <WriteLinesToFile 
       File="@(TransformedZipProject->'%(RootDir)%(Directory)%(Filename)')" 
       Lines="$([System.IO.File]::ReadAllText('%(fullpath)').Replace(&quot;_VSVERSION_&quot;,&quot;$(VSTarget)&quot;))" 
@@ -61,7 +61,9 @@
       <ZipProject Include="@(TransformedZipProject->'%(RootDir)%(Directory)%(Filename)')" />
     </ItemGroup>
   </Target>
-  <Target Name="TransformMultiProjectZipProject" BeforeTargets="MainResourcesGeneration" Inputs="@(MultiProjectZipProject)" Outputs="@(_ZipProject.ZipFile)">
+  <Target Name="TransformMultiProjectZipProject" BeforeTargets="MainResourcesGeneration"
+          Inputs="@(MultiProjectZipProject)"
+          Outputs="@(MultiProjectZipProject->'$(ZipIntermediatePath)$([System.IO.Path]::GetFileName($([MSBuild]::GetDirectoryNameOfFileAbove(`%(FullPath)`, project.root)))).zip')">
     <!-- Supports ziping up a new project template which contains multiple projects.  The project template needs to contain
          a project.root file which indicates the root of the project file.  It can then have a directory hierarchy (needed for
          multiple vstemplate files) below the project which ZipProject doesn't support -->

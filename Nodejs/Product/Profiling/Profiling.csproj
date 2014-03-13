@@ -263,6 +263,7 @@
   </ItemGroup>
   <ItemGroup>
     <Content Include="..\Icons\NodejsProject.ico">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
       <IncludeInVSIX>true</IncludeInVSIX>
       <VSIXSubpath>.</VSIXSubpath>
     </Content>
