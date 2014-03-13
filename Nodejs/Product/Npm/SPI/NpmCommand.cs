@@ -91,6 +91,7 @@ namespace Microsoft.NodejsTools.Npm.SPI {
             info.UseShellExecute = false;
             info.RedirectStandardOutput = true;
             info.RedirectStandardError = true;
+            info.RedirectStandardInput = true;
             info.CreateNoWindow = true;
 
             CopyEnvironmentVariables(info);
