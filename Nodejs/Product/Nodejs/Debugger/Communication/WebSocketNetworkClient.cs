@@ -14,7 +14,6 @@
 
 using System;
 using System.IO;
-using System.Net.Sockets;
 using System.Net.WebSockets;
 using System.Threading;
 
@@ -34,8 +33,12 @@ namespace Microsoft.NodejsTools.Debugger.Communication {
         }
 
         public void Dispose() {
-            _webSocket.CloseOutputAsync(WebSocketCloseStatus.NormalClosure, null, CancellationToken.None).GetAwaiter().GetResult();
-            _webSocket.Dispose();
+            try {
+                _webSocket.CloseOutputAsync(WebSocketCloseStatus.NormalClosure, null, CancellationToken.None).GetAwaiter().GetResult();
+                _webSocket.Dispose();
+            } catch (WebSocketException) {
+                // We don't care about any errors when cleaning up and closing connection.
+            }
         }
 
         public Stream GetStream() {

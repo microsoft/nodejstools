@@ -13,9 +13,11 @@
  * ***************************************************************************/
 
 using System;
+using System.Diagnostics;
 using System.IO;
 using System.Net.Sockets;
 using System.Net.WebSockets;
+using System.Text;
 using System.Windows.Forms;
 using Microsoft.NodejsTools.Debugger.Communication;
 using Microsoft.VisualStudio;
@@ -43,15 +45,21 @@ namespace Microsoft.NodejsTools.Debugger.Remote {
             while (true) {
                 Exception exception = null;
                 try {
+                    Debug.WriteLine("NodeRemoteEnumDebugProcesses pinging remote host ...");
                     using (var client = networkClientFactory.CreateNetworkClient(port.Uri))
                     using (var stream = client.GetStream()) {
                         // https://nodejstools.codeplex.com/workitem/578
                         // Read "welcome" headers from node debug socket before disconnecting to workaround issue
                         // where connect and immediate disconnect leaves node.js (V8) in a bad state which blocks attach.
                         var buffer = new byte[1024];
-                        if (stream.ReadAsync(buffer, 0, buffer.Length).Wait(5000)) {
+                        var readTask = stream.ReadAsync(buffer, 0, buffer.Length);
+                        if (readTask.Wait(5000)) {
+                            Debug.WriteLine("NodeRemoteEnumDebugProcesses debugger response: " + Encoding.UTF8.GetString(buffer, 0, readTask.Result));
                             process = new NodeRemoteDebugProcess(port, "node.exe", "", "");
+                            Debug.WriteLine("NodeRemoteEnumDebugProcesses ping successful.");
                             break;
+                        } else {
+                            Debug.WriteLine("NodeRemoteEnumDebugProcesses ping timed out.");
                         }
                     }
                 } catch (AggregateException ex) {

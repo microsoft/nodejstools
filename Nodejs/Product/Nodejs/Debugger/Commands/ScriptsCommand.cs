@@ -42,6 +42,11 @@ namespace Microsoft.NodejsTools.Debugger.Commands {
             Modules = new List<NodeModule>(body.Count);
 
             foreach (JToken module in body) {
+                var fileName = (string)module["name"];
+                if (fileName == null) {
+                    continue;
+                }
+
                 var id = (int)module["id"];
                 var source = (string)module["source"];
                 if (!string.IsNullOrEmpty(source) &&
@@ -51,8 +56,6 @@ namespace Microsoft.NodejsTools.Debugger.Commands {
                         NodeConstants.ScriptWrapBegin.Length,
                         source.Length - NodeConstants.ScriptWrapBegin.Length - NodeConstants.ScriptWrapEnd.Length);
                 }
-
-                var fileName = (string)module["name"];
 
                 Modules.Add(new NodeModule(id, fileName) { Source = source });
             }

@@ -28,6 +28,7 @@ namespace Microsoft.NodejsTools.Debugger.Communication {
         private readonly INetworkClientFactory _networkClientFactory;
         private readonly Regex _nodeVersion = new Regex(@"Embedding-Host: node v([0-9.]+)", RegexOptions.Compiled);
         private INetworkClient _networkClient;
+        private readonly object _networkClientLock = new object();
 
         public DebuggerConnection(INetworkClientFactory networkClientFactory) {
             Utilities.ArgumentNotNull("networkClientFactory", networkClientFactory);
@@ -37,13 +38,19 @@ namespace Microsoft.NodejsTools.Debugger.Communication {
             NodeVersion = new Version();
         }
 
+        public void Dispose() {
+            Close();
+        }
+
         /// <summary>
         /// Close connection.
         /// </summary>
         public void Close() {
-            if (_networkClient != null) {
-                _networkClient.Dispose();
-                _networkClient = null;
+            lock (_networkClientLock) {
+                if (_networkClient != null) {
+                    _networkClient.Dispose();
+                    _networkClient = null;
+                }
             }
         }
 
@@ -80,7 +87,11 @@ namespace Microsoft.NodejsTools.Debugger.Communication {
         /// Gets a value indicating whether connection established.
         /// </summary>
         public bool Connected {
-            get { return _networkClient != null && _networkClient.Connected; }
+            get {
+                lock (_networkClientLock) {
+                    return _networkClient != null && _networkClient.Connected;
+                }
+            }
         }
 
         /// <summary>
@@ -96,9 +107,9 @@ namespace Microsoft.NodejsTools.Debugger.Communication {
             Utilities.ArgumentNotNull("uri", uri);
 
             Close();
-
-            _networkClient = _networkClientFactory.CreateNetworkClient(uri);
-
+            lock (_networkClientLock) {
+                _networkClient = _networkClientFactory.CreateNetworkClient(uri);
+            }
             Task.Factory.StartNew(ReadStreamAsync);
             Task.Factory.StartNew(WriteStreamAsync);
         }
@@ -107,20 +118,28 @@ namespace Microsoft.NodejsTools.Debugger.Communication {
         /// Writes messages to debugger input stream.
         /// </summary>
         private async void WriteStreamAsync() {
-            using (var streamWriter = new StreamWriter(_networkClient.GetStream())) {
-                try {
+            INetworkClient networkClient;
+            lock (_networkClientLock) {
+                networkClient = _networkClient;
+            }
+            if (networkClient == null) {
+                return;
+            }
+
+            try {
+                using (var streamWriter = new StreamWriter(networkClient.GetStream())) {
                     while (Connected) {
-                        string message = await _messages.TakeAsync();
-                        await streamWriter.WriteAsync(message);
-                        await streamWriter.FlushAsync();
+                        string message = await _messages.TakeAsync().ConfigureAwait(false);
+                        await streamWriter.WriteAsync(message).ConfigureAwait(false);
+                        await streamWriter.FlushAsync().ConfigureAwait(false);
                     }
-                } catch (SocketException) {
-                } catch (ObjectDisposedException) {
-                } catch (IOException) {
-                } catch (Exception e) {
-                    DebugWriteLine(string.Format("DebuggerConnection: failed to write message {0}.", e));
-                    throw;
                 }
+            } catch (SocketException) {
+            } catch (ObjectDisposedException) {
+            } catch (IOException) {
+            } catch (Exception e) {
+                DebugWriteLine(string.Format("DebuggerConnection: failed to write message {0}.", e));
+                throw;
             }
         }
 
@@ -130,11 +149,19 @@ namespace Microsoft.NodejsTools.Debugger.Communication {
         private async void ReadStreamAsync() {
             DebugWriteLine("DebuggerConnection: established connection.");
 
-            using (var streamReader = new StreamReader(_networkClient.GetStream(), Encoding.Default)) {
-                try {
+            INetworkClient networkClient;
+            lock (_networkClientLock) {
+                networkClient = _networkClient;
+            }
+            if (networkClient == null) {
+                return;
+            }
+
+            try {
+                using (var streamReader = new StreamReader(networkClient.GetStream(), Encoding.Default)) {
                     while (Connected) {
                         // Read message header
-                        string result = await streamReader.ReadLineAsync();
+                        string result = await streamReader.ReadLineAsync().ConfigureAwait(false);
                         if (result == null) {
                             continue;
                         }
@@ -153,7 +180,7 @@ namespace Microsoft.NodejsTools.Debugger.Communication {
                             continue;
                         }
 
-                        await streamReader.ReadLineAsync();
+                        await streamReader.ReadLineAsync().ConfigureAwait(false);
 
                         // Retrieve content length
                         int length = int.Parse(match.Groups[1].Value);
@@ -162,7 +189,7 @@ namespace Microsoft.NodejsTools.Debugger.Communication {
                         }
 
                         // Read content
-                        string message = await streamReader.ReadLineBlockAsync(length);
+                        string message = await streamReader.ReadLineBlockAsync(length).ConfigureAwait(false);
 
                         DebugWriteLine("Response: " + message);
 
@@ -172,19 +199,19 @@ namespace Microsoft.NodejsTools.Debugger.Communication {
                             outputMessage(this, new MessageEventArgs(message));
                         }
                     }
-                } catch (SocketException) {
-                } catch (ObjectDisposedException) {
-                } catch (IOException) {
-                } catch (Exception e) {
-                    DebugWriteLine(string.Format("DebuggerConnection: message processing failed {0}.", e));
-                    throw;
-                } finally {
-                    DebugWriteLine("DebuggerConnection: connection was closed.");
+                }
+            } catch (SocketException) {
+            } catch (ObjectDisposedException) {
+            } catch (IOException) {
+            } catch (Exception e) {
+                DebugWriteLine(string.Format("DebuggerConnection: message processing failed {0}.", e));
+                throw;
+            } finally {
+                DebugWriteLine("DebuggerConnection: connection was closed.");
 
-                    EventHandler<EventArgs> connectionClosed = ConnectionClosed;
-                    if (connectionClosed != null) {
-                        connectionClosed(this, EventArgs.Empty);
-                    }
+                EventHandler<EventArgs> connectionClosed = ConnectionClosed;
+                if (connectionClosed != null) {
+                    connectionClosed(this, EventArgs.Empty);
                 }
             }
         }

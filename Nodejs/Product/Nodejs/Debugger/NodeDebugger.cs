@@ -42,7 +42,7 @@ namespace Microsoft.NodejsTools.Debugger {
         private readonly EvaluationResultFactory _resultFactory;
         private readonly SourceMapper _sourceMapper;
         private readonly Dictionary<int, NodeThread> _threads = new Dictionary<int, NodeThread>();
-        private readonly TimeSpan _timeout = TimeSpan.FromSeconds(2);
+        private readonly TimeSpan _timeout = TimeSpan.FromSeconds(5);
         private bool _attached;
         private bool _breakOnAllExceptions;
         private bool _breakOnUncaughtExceptions;
@@ -478,9 +478,19 @@ namespace Microsoft.NodejsTools.Debugger {
             var mainThread = new NodeThread(this, MainThreadId, false);
             _threads[mainThread.Id] = mainThread;
 
-            GetScriptsAsync().Wait();
-            SetExceptionBreakAsync().Wait();
-            bool running = PerformBacktraceAsync().Result;
+            if (!GetScriptsAsync().Wait((int)_timeout.TotalMilliseconds)) {
+                throw new TimeoutException("Timed out while retrieving scripts from debuggee.");
+            }
+
+            if (!SetExceptionBreakAsync().Wait((int)_timeout.TotalMilliseconds)) {
+                throw new TimeoutException("Timed out while setting up exception handling in debuggee.");
+            }
+
+            var backTraceTask = PerformBacktraceAsync();
+            if (!backTraceTask.Wait((int)_timeout.TotalMilliseconds)) {
+                throw new TimeoutException("Timed out while performing initial backtrace.");
+            }
+            bool running = backTraceTask.GetAwaiter().GetResult();
 
             // At this point we can fire events
             EventHandler<ThreadEventArgs> newThread = ThreadCreated;

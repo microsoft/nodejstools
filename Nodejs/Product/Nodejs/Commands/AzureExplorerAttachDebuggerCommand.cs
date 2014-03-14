@@ -13,7 +13,6 @@
  * ***************************************************************************/
 
 using System;
-using System.Diagnostics;
 using System.IO;
 using System.Linq;
 using System.Net;
@@ -212,7 +211,7 @@ namespace Microsoft.NodejsTools.Commands {
             }
 
             try {
-                AttachDebugger(new UriBuilder(webSite.Uri) { Scheme = (webSite.Uri.Scheme == "https") ? "wss" : "ws", Path = path }.Uri);
+                AttachDebugger(new UriBuilder(webSite.Uri) { Scheme = "wss", Port = -1, Path = path }.Uri);
             } catch (Exception ex) {
                 // If we got to this point, the attach logic in debug engine will catch exceptions, display proper error message and
                 // ask the user to retry, so the only case where we actually get here is if user canceled on error. If this is the case,

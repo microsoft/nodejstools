@@ -226,7 +226,9 @@ namespace Microsoft.NodejsTools.Debugger.DebugEngine {
                 lock (_breakpoint) {
                     foreach (NodeBreakpointBinding binding in _breakpoint.GetBindings()) {
                         var boundBreakpoint = (IDebugBoundBreakpoint2)_bpManager.GetBoundBreakpoint(binding);
-                        boundBreakpoint.Delete();
+                        if (boundBreakpoint != null) {
+                            boundBreakpoint.Delete();
+                        }
                     }
                 }
 
