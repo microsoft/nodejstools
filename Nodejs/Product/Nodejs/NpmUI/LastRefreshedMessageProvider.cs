@@ -33,7 +33,7 @@ namespace Microsoft.NodejsTools.NpmUI {
                 Days = -1;
                 Description = Resources.PackageCatalogRefreshNever;
             } else {
-                Days = (int)(DateTime.Now - lastRefreshTime).TotalDays;
+                Days = (int)(DateTime.Now.Date - lastRefreshTime.Date).TotalDays;
                 if (Days == 0) {
                     Description = string.Format(Resources.PackageCatalogRefresh0Days, lastRefreshTime);
                 } else if (Days == 1) {

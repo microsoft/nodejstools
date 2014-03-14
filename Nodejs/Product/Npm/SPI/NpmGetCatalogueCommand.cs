@@ -27,9 +27,6 @@ using Newtonsoft.Json.Linq;
 
 namespace Microsoft.NodejsTools.Npm.SPI {
     internal class NpmGetCatalogueCommand : NpmCommand, IPackageCatalog {
-
-        private const string NpmCatalogueCacheGuid = "BDC4B648-84E1-4FA9-9AE8-20AF8795093F";
-
         private IDictionary<string, IPackage> _byName = new Dictionary<string, IPackage>(); 
         private readonly bool _forceDownload;
         private string _cachePath;
