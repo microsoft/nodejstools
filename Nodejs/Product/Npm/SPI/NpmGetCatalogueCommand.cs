@@ -14,81 +14,211 @@
 
 using System;
 using System.Collections.Generic;
+using System.Collections.ObjectModel;
 using System.IO;
 using System.Linq;
+using System.Net;
 using System.Runtime.Remoting.Messaging;
 using System.Text;
+using System.Threading;
 using System.Threading.Tasks;
+using Microsoft.VisualStudioTools.Project;
+using Newtonsoft.Json.Linq;
 
 namespace Microsoft.NodejsTools.Npm.SPI {
-    internal class NpmGetCatalogueCommand : NpmSearchCommand, IPackageCatalog {
+    internal class NpmGetCatalogueCommand : NpmCommand, IPackageCatalog {
 
         private const string NpmCatalogueCacheGuid = "BDC4B648-84E1-4FA9-9AE8-20AF8795093F";
 
         private IDictionary<string, IPackage> _byName = new Dictionary<string, IPackage>(); 
         private readonly bool _forceDownload;
+        private string _cachePath;
 
         public NpmGetCatalogueCommand(
             string fullPathToRootPackageDirectory,
             bool forceDownload,
             string pathToNpm = null,
-            bool useFallbackIfNpmNotFound = true)
+            bool useFallbackIfNpmNotFound = true
+        )
             : base(
                 fullPathToRootPackageDirectory,
-                null,
                 pathToNpm,
-                useFallbackIfNpmNotFound) {
+                useFallbackIfNpmNotFound
+        ) {
+            Arguments = "search";
             _forceDownload = forceDownload;
             LastRefreshed = DateTime.MinValue;
         }
 
-        public override async Task<bool> ExecuteAsync() {
-            var filename = Path.Combine(
-                Path.GetTempPath(),
-                string.Format("npmcatalog{0}.txt", NpmCatalogueCacheGuid));
-            if (!_forceDownload) {
-                try {
-                    if (File.Exists(filename)) {
-                        using (var stream = new FileStream(filename, FileMode.Open, FileAccess.Read, FileShare.Read)) {
-                            using (var reader = new StreamReader(stream)) {
-                                ParseResultsFromReader(reader);
+        private static List<IPackage> ParseResultsFromReader(TextReader reader) {
+            var builder = new NodeModuleBuilder();
+            var results = new List<IPackage>();
+            using (var jsonReader = new Newtonsoft.Json.JsonTextReader(reader)) {
+                var token = JObject.ReadFrom(jsonReader);
+                foreach (var module in token.Values()) {
+                    try {
+                        builder.Name = (string)module["name"];
+                        if (string.IsNullOrEmpty(builder.Name)) {
+                            continue;
+                        }
+
+                        builder.AppendToDescription((string)module["description"] ?? string.Empty);
+
+                        var versions = module["versions"];
+                        if (versions != null) {
+                            var latestVersion = versions
+                                .OfType<JProperty>()
+                                .Where(v => (string)v == "latest")
+                                .Select(v => v.Name)
+                                .FirstOrDefault();
+
+                            if (!string.IsNullOrEmpty(latestVersion)) {
+                                builder.Version = SemverVersion.Parse(latestVersion);
                             }
                         }
-                        LastRefreshed = new FileInfo(filename).LastWriteTime;
-                        PopulateByName();
-                        return true;
+
+                        var keywords = module["keywords"];
+                        if (keywords != null) {
+                            foreach (var keyword in keywords.Select(v => (string)v)) {
+                                builder.AddKeyword(keyword);
+                            }
+                        }
+
+                        AddAuthor(builder, module["author"]);
+                        
+
+                        results.Add(builder.Build());
+                    } catch (InvalidOperationException) {
+                        // Occurs if a JValue appears where we expect JProperty
+                    } finally {
+                        builder.Reset();
                     }
-                } catch (Exception) { }
+                }
             }
 
-            var oldResults = Results;
-            var result = await base.ExecuteAsync();
-            var newResults = Results;
+            return results;
+        }
 
-            if (newResults.Count > 0) {
+        private static void AddAuthor(NodeModuleBuilder builder, JToken author) {
+            JArray authorArray;
+            JObject authorObject;
+            string name;
+            if ((authorArray = author as JArray) != null) {
+                foreach (var subAuthor in authorArray) {
+                    AddAuthor(builder, subAuthor);
+                }
+            } else if ((authorObject = author as JObject) != null) {
+                AddAuthor(builder, authorObject["name"]);
+            } else if (!string.IsNullOrEmpty(name = (string)author)) {
+                builder.AddAuthor(name);
+            }
+        }
+
+        private string CachePath {
+            get {
+                if (_cachePath == null) {
+                    _cachePath = Path.Combine(
+                        Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData),
+                        "Microsoft",
+                        "Node.js Tools",
+                        "packagecache.json"
+                    );
+                }
+                return _cachePath;
+            }
+        }
+
+        private async Task UpdateCache(Uri registry, string filename) {
+            registry = registry ?? new Uri("https://registry.npmjs.org/");
+
+            Uri packageUri;
+            if (!Uri.TryCreate(registry, "/-/all", out packageUri)) {
+                return;
+            }
+
+            Directory.CreateDirectory(Path.GetDirectoryName(filename));
+
+            var request = WebRequest.Create(packageUri);
+            using (var response = await request.GetResponseAsync())
+            using (var cache = new FileStream(filename, FileMode.Create, FileAccess.Write, FileShare.Read)) {
+                const long ONE_MB = 1024L * 1024L;
+                int nextNotification = 1;
+
+                long totalDownloaded = 0, totalLength;
                 try {
-                    using (var stream = new FileStream(filename, FileMode.Create, FileAccess.Write, FileShare.None)) {
-                        using (var writer = new StreamWriter(stream)) {
-                            writer.Write(StandardOutput);
-                        }
-                    }
-                    LastRefreshed = new FileInfo(filename).LastWriteTime;
-                    PopulateByName();
-                } catch (Exception) { }
+                    totalLength = response.ContentLength;
+                } catch (NotSupportedException) {
+                    totalLength = -1;
+                }
 
-            } else {
-                Results = oldResults;
+                OnOutputLogged(string.Format(Resources.PackagesDownloadStarting, packageUri.AbsoluteUri));
+
+                int bytesRead;
+                var buffer = new byte[4096];
+                while ((bytesRead = await response.GetResponseStream().ReadAsync(buffer, 0, buffer.Length)) > 0) {
+                    totalDownloaded += bytesRead;
+                    if (totalDownloaded > nextNotification * ONE_MB) {
+                        if (totalLength > 0) {
+                            OnOutputLogged(string.Format(
+                                Resources.PackagesDownloadedXOfYMB,
+                                nextNotification,
+                                totalLength / ONE_MB + 1
+                            ));
+                        } else {
+                            OnOutputLogged(string.Format(
+                                Resources.PackagesDownloadedXMB,
+                                nextNotification
+                            ));
+                        }
+                        nextNotification += 1;
+                    }
+
+                    await cache.WriteAsync(buffer, 0, bytesRead);
+                }
+                OnOutputLogged(Resources.PackagesDownloadComplete);
+            }
+        }
+
+        public override async Task<bool> ExecuteAsync() {
+            var filename = CachePath;
+            if (_forceDownload || !File.Exists(filename)) {
+                Uri registry = null;
+                using (var proc = ProcessOutput.RunHiddenAndCapture(GetPathToNpm(), "config", "get", "registry")) {
+                    if (await proc == 0) {
+                        registry = proc.StandardOutputLines
+                            .Select(s => {
+                                Uri u;
+                                return Uri.TryCreate(s, UriKind.Absolute, out u) ? u : null;
+                            })
+                            .FirstOrDefault(u => u != null);
+                    }
+                }
+
+                await UpdateCache(registry, filename);
+            }
+
+            List<IPackage> newResults = null;
+
+            try {
+                if (File.Exists(filename)) {
+                    using (var reader = new StreamReader(filename)) {
+                        newResults = await Task.Run(() => ParseResultsFromReader(reader));
+                    }
+                }
+            } catch (Exception) { }
+
+            if (newResults == null || !newResults.Any()) {
                 throw new NpmCatalogEmptyException(Resources.ErrNpmCatalogEmpty);
             }
 
-            return result;
+            LastRefreshed = File.GetLastWriteTime(filename);
+            Results = new ReadOnlyCollection<IPackage>(newResults);
+            PopulateByName(newResults);
+
+            return true;
         }
 
-        private void PopulateByName() {
-            var source = Results;
-            if (null == source) {
-                return;
-            }
+        private void PopulateByName(IEnumerable<IPackage> source) {
             var target = new Dictionary<string, IPackage>();
             foreach (var package in source) {
                 target[package.Name] = package;
@@ -112,5 +242,7 @@ namespace Microsoft.NodejsTools.Npm.SPI {
                 return match;
             }
         }
+
+        public IList<IPackage> Results { get; private set; }
     }
 }

@@ -16,12 +16,13 @@ using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Input;
 using System.Windows.Media;
+using Microsoft.VisualStudioTools;
 
 namespace Microsoft.NodejsTools.NpmUI {
     /// <summary>
     /// Interaction logic for NpmPackageInstallWindow.xaml
     /// </summary>
-    public partial class NpmPackageInstallWindow : Window {
+    partial class NpmPackageInstallWindow : DialogWindowVersioningWorkaround {
         internal NpmPackageInstallWindow(NpmPackageInstallViewModel vm) {
             InitializeComponent();
             DataContext = vm;

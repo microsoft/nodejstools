@@ -42,7 +42,7 @@ namespace Microsoft.NodejsTools.Npm.SPI {
 
         protected string Arguments { get; set; }
 
-        private string GetPathToNpm() {
+        protected string GetPathToNpm() {
             if (null == _pathToNpm || !File.Exists(_pathToNpm)) {
                 if (_useFallbackIfNpmNotFound) {
                     string match = null;

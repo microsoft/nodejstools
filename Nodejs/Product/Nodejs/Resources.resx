@@ -373,11 +373,11 @@
   <data name="PackageCatalogRefreshNever" xml:space="preserve">
     <value>Never</value>
   </data>
-  <data name="PackageCatalogRefreshODays" xml:space="preserve">
-    <value>Today at {0}</value>
+  <data name="PackageCatalogRefresh0Days" xml:space="preserve">
+    <value>Today at {0:t}</value>
   </data>
   <data name="PackageCatalogRefresh1Day" xml:space="preserve">
-    <value>Yesterday at {0}</value>
+    <value>Yesterday at {0:t}</value>
   </data>
   <data name="PackageCatalogRefresh2To7Days" xml:space="preserve">
     <value>{0} days ago</value>
@@ -430,9 +430,6 @@
   <data name="NpmSuccessfullyCompleted" xml:space="preserve">
     <value>{0} successfully completed</value>
   </data>
-  <data name="NpmCatalogEmpty" xml:space="preserve">
-    <value>Refresh failed - see output below for details</value>
-  </data>
   <data name="NpmStatusReady" xml:space="preserve">
     <value>READY</value>
   </data>
@@ -471,5 +468,8 @@
   </data>
   <data name="NodejsNotSupported" xml:space="preserve">
     <value>This version of Node.js ({0}) is not supported. Please upgrade to Node.js v0.10.20 or later.</value>
+  </data>
+  <data name="PackageCatalogRefreshFailed" xml:space="preserve">
+    <value>Refresh failed - see output below for details</value>
   </data>
 </root>

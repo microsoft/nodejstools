@@ -17,6 +17,7 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
+using Microsoft.VisualStudioTools.Project;
 
 namespace Microsoft.NodejsTools.Npm.SPI {
     internal class NpmSearchCommand : NpmCommand {
@@ -26,9 +27,7 @@ namespace Microsoft.NodejsTools.Npm.SPI {
             string pathToNpm = null,
             bool useFallbackIfNpmNotFound = true)
             : base(fullPathToRootPackageDirectory, pathToNpm, useFallbackIfNpmNotFound) {
-            Arguments = string.IsNullOrEmpty(searchText) || string.IsNullOrEmpty(searchText.Trim())
-                            ? "search"
-                            : string.Format("search {0}", searchText);
+            Arguments = string.IsNullOrWhiteSpace(searchText) ? "search" : string.Format("search {0}", searchText);
             Results = new List<IPackage>();
         }
 

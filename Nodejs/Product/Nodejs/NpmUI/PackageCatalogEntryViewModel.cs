@@ -41,16 +41,11 @@ namespace Microsoft.NodejsTools.NpmUI {
             get { return string.Format( "@ {0}", _package.Version); }
         }
 
-        public Color VersionColor {
-            get { return KeywordsColor; }
-        }
-
         public string Author {
-            get { return string.Format("by {0}", _package.Author); }
-        }
-
-        public Color AuthorColor {
-            get { return KeywordsColor; }
+            get {
+                var text = string.Format("by {0}", _package.Author);
+                return text == "by " ? "" : text;
+            }
         }
 
         public string Description {
@@ -64,10 +59,6 @@ namespace Microsoft.NodejsTools.NpmUI {
                     ? Resources.NoKeywordsInPackage
                     : keywords;
             }
-        }
-
-        public Color KeywordsColor {
-            get { return WpfColorUtils.MidPoint(SystemColors.WindowColor, SystemColors.WindowTextColor); }
         }
 
         private IPackage GetFromRoot(IRootPackage root) {
@@ -86,11 +77,11 @@ namespace Microsoft.NodejsTools.NpmUI {
             get { return GetFromRoot(_global); }
         }
 
-        private bool IsInstalledLocally {
+        public bool IsInstalledLocally {
             get { return LocallyInstalledPackage != null; }
         }
 
-        private bool IsInstalledGlobally {
+        public bool IsInstalledGlobally {
             get { return GloballyInstalledPackage != null; }
         }
 
@@ -98,34 +89,15 @@ namespace Microsoft.NodejsTools.NpmUI {
             return null != installed && installed.Version < _package.Version;
         }
 
-        private bool IsLocalInstallOutOfDate {
+        public bool IsLocalInstallOutOfDate {
             get {
                 return IsInstalledPackageOutOfDate(LocallyInstalledPackage);
             }
         }
 
-        private bool IsGlobalInstallOutOfDate {
+        public bool IsGlobalInstallOutOfDate {
             get {
                 return IsInstalledPackageOutOfDate(GloballyInstalledPackage);
-            }
-        }
-
-        //  This doesn't work as I'd like
-        //public Color BackgroundColor {
-        //    get {
-        //        return IsInstalledGlobally || IsInstalledLocally
-        //            ? (IsGlobalInstallOutOfDate || IsLocalInstallOutOfDate
-        //                ? WpfColorUtils.MidPoint(Colors.Transparent, Colors.Yellow)
-        //                : WpfColorUtils.MidPoint(Colors.Transparent, Colors.LightGreen))
-        //            : Colors.Transparent;
-        //    }
-        //}
-
-        public Visibility InstallMessageVisibility {
-            get {
-                return IsInstalledLocally || IsInstalledGlobally
-                    ? Visibility.Visible
-                    : Visibility.Hidden;
             }
         }
 

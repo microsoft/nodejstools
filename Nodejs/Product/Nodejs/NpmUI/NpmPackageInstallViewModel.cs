@@ -69,6 +69,7 @@ namespace Microsoft.NodejsTools.NpmUI {
         private IPackageCatalog _allPackages;
         private RefreshCatalogCommand _refreshCommand;
         private IList<PackageCatalogEntryViewModel> _filteredPackages = new List<PackageCatalogEntryViewModel>();
+        private LastRefreshedMessageProvider _lastRefreshedMessage;
         private PackageCatalogEntryViewModel _selectedPackage;
         private InstallPackageCommand _installCommand;
         private bool _npmNotFound;
@@ -134,30 +135,6 @@ namespace Microsoft.NodejsTools.NpmUI {
             }
         }
 
-        public Color LastCatalogUpdateTimeColor {
-            get { return _lastCatalogUpdateTimeColor; }
-            private set {
-                _lastCatalogUpdateTimeColor = value;
-                OnPropertyChanged();
-            }
-        }
-
-        public FontWeight LastCatalogUpdateFontWeight {
-            get { return _lastCatalogUpdateFontWeight; }
-            private set {
-                _lastCatalogUpdateFontWeight = value;
-                OnPropertyChanged();
-            }
-        }
-
-        private void SetLastCatalogUpdateTimeMessage(
-            string message,
-            Color color,
-            FontWeight weight) {
-            LastCatalogUpdateTimeMessage = message;
-            LastCatalogUpdateTimeColor = color;
-            LastCatalogUpdateFontWeight = weight;
-        }
 
         public bool IsLoadingCatalog {
             get { return _isLoadingCatalog; }
@@ -220,19 +197,17 @@ namespace Microsoft.NodejsTools.NpmUI {
             CatalogControlVisibility = Visibility.Hidden;
             LoadingCatalogControlVisibility = Visibility.Visible;
             LoadingCatalogMessage = Resources.CatalogLoadingDefault;
-            
-            SetLastCatalogUpdateTimeMessage(
-                Resources.PackageCatalogRefreshing,
-                SystemColors.WindowTextColor,
-                FontWeights.Normal);
+
+            LastRefreshedMessage = LastRefreshedMessageProvider.RefreshInProgress;
 
             bool showList = false;
 
-            _npmController.ErrorLogged += _executeViewModel.commander_ErrorLogged;
-            _npmController.ExceptionLogged += _executeViewModel.commander_ExceptionLogged;
+            var controller = _npmController;
+            controller.ErrorLogged += _executeViewModel.commander_ErrorLogged;
+            controller.ExceptionLogged += _executeViewModel.commander_ExceptionLogged;
             _executeViewModel.SetCancellableSafe(false);
             try {
-                _allPackages = await _npmController.GetRepositoryCatalogueAsync(forceRefresh);
+                _allPackages = await controller.GetRepositoryCatalogueAsync(forceRefresh);
                 IsCatalogEmpty = false;
                 showList = true;
             } catch (NpmNotFoundException) {
@@ -241,8 +216,8 @@ namespace Microsoft.NodejsTools.NpmUI {
                 IsCatalogEmpty = true;
                 showList = true;
             } finally {
-                _npmController.ErrorLogged -= _executeViewModel.commander_ErrorLogged;
-                _npmController.ExceptionLogged -= _executeViewModel.commander_ExceptionLogged;
+                controller.ErrorLogged -= _executeViewModel.commander_ErrorLogged;
+                controller.ExceptionLogged -= _executeViewModel.commander_ExceptionLogged;
                 _executeViewModel.SetCancellableSafe(true);
             }
 
@@ -307,7 +282,15 @@ namespace Microsoft.NodejsTools.NpmUI {
                 OnPropertyChanged();
                 SelectedPackage = null != _filteredPackages && _filteredPackages.Count > 0 ? _filteredPackages[0] : null;
             }
-        } 
+        }
+
+        public LastRefreshedMessageProvider LastRefreshedMessage {
+            get { return _lastRefreshedMessage; }
+            set {
+                _lastRefreshedMessage = value;
+                OnPropertyChanged();
+            }
+        }
 
         public string FilterLabelText {
             get { return _filterLabelText; }
@@ -403,28 +386,9 @@ namespace Microsoft.NodejsTools.NpmUI {
 
         private void SetListData(IList<PackageCatalogEntryViewModel> filtered) {
             FilteredPackages = filtered;
-            
-            var days = IsCatalogEmpty
-                ? int.MaxValue
-                : LastRefreshedMessageProvider.GetNumberOfDaysSinceLastRefresh(_allPackages.LastRefreshed);
-
-            string message;
-            if (IsCatalogEmpty) {
-                message = Resources.NpmCatalogEmpty;
-            }
-            else {
-                message = string.Format(
-                    "{0}{1}",
-                    LastRefreshedMessageProvider.GetMessageFor(_allPackages.LastRefreshed),
-                    string.Format(_allPackages.Results.Count > filtered.Count
-                        ? Resources.PackageMatchCount
-                        : Resources.PackageCount, filtered.Count));
-            }
-
-            SetLastCatalogUpdateTimeMessage(
-                message,
-                days > 14 ? Colors.Red : SystemColors.WindowTextColor,
-                days > 7 ? FontWeights.Bold : FontWeights.Normal);
+            LastRefreshedMessage = IsCatalogEmpty
+                ? LastRefreshedMessageProvider.RefreshFailed
+                : new LastRefreshedMessageProvider(_allPackages.LastRefreshed);
             CatalogControlVisibility = Visibility.Visible;
         }
 

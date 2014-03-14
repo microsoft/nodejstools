@@ -15,62 +15,50 @@
 using System;
 
 namespace Microsoft.NodejsTools.NpmUI {
-    internal static class LastRefreshedMessageProvider {
-        public static int GetNumberOfDaysSinceLastRefresh(DateTime lastRefreshTime) {
-            return DateTime.MinValue == lastRefreshTime
-                ? -1
-                : (DateTime.Now - lastRefreshTime.Date).Days;
-        }
+    internal class LastRefreshedMessageProvider {
+        public static readonly LastRefreshedMessageProvider RefreshFailed = new LastRefreshedMessageProvider {
+            Days = int.MaxValue,
+            Description = Resources.PackageCatalogRefreshFailed
+        };
 
-        public static string GetMessageFor(DateTime lastRefreshTime) {
-            var days = GetNumberOfDaysSinceLastRefresh(lastRefreshTime);
-            switch (days) {
-                case -1:
-                    return Resources.PackageCatalogRefreshNever;
+        public static readonly LastRefreshedMessageProvider RefreshInProgress = new LastRefreshedMessageProvider {
+            Days = 0,
+            Description = Resources.PackageCatalogRefreshing
+        };
 
-                case 0:
-                    return string.Format(
-                        Resources.PackageCatalogRefreshODays,
-                        lastRefreshTime.ToShortTimeString());
+        private LastRefreshedMessageProvider() { }
 
-                case 1:
-                    return string.Format(
-                        Resources.PackageCatalogRefresh1Day,
-                        lastRefreshTime.ToShortTimeString());
-
-                case 2:
-                case 3:
-                case 4:
-                case 5:
-                case 6:
-                case 7:
-                    return string.Format(
-                        Resources.PackageCatalogRefresh2To7Days,
-                        days);
-
-                default:
-                    if (days > 183) {
-                        return Resources.PackageCatalogRefresh6Months;
-                    }
-
-                    if (days > 92) {
-                        return Resources.PackageCatalogRefresh3Months;
-                    }
-
-                    if (days > 31) {
-                        return Resources.PackageCatalogRefresh1Month;
-                    }
-
-                    if (days > 21) {
-                        return Resources.PackageCatalogRefresh3Weeks;
-                    }
-
-                    if (days > 14) {
-                        return Resources.PackageCatalogRefresh2Weeks;
-                    }
-
-                    return Resources.PackageCatalogRefresh1Week;
+        public LastRefreshedMessageProvider(DateTime lastRefreshTime) {
+            if (lastRefreshTime == DateTime.MinValue) {
+                Days = -1;
+                Description = Resources.PackageCatalogRefreshNever;
+            } else {
+                Days = (int)(DateTime.Now - lastRefreshTime).TotalDays;
+                if (Days == 0) {
+                    Description = string.Format(Resources.PackageCatalogRefresh0Days, lastRefreshTime);
+                } else if (Days == 1) {
+                    Description = string.Format(Resources.PackageCatalogRefresh1Day, lastRefreshTime);
+                } else if (Days <= 7) {
+                    Description = string.Format(Resources.PackageCatalogRefresh2To7Days, Days);
+                } else if (Days <= 14) {
+                    Description = Resources.PackageCatalogRefresh1Week;
+                } else if (Days <= 21) {
+                    Description = Resources.PackageCatalogRefresh2Weeks;
+                } else if (Days <= 31) {
+                    Description = Resources.PackageCatalogRefresh3Weeks;
+                } else if (Days <= 92) {
+                    Description = Resources.PackageCatalogRefresh1Month;
+                } else {
+                    Description = Resources.PackageCatalogRefresh3Months;
+                }
             }
         }
+
+        public int Days { get; private set; }
+
+        public string Description { get; private set; }
+
+        public bool IsOld { get { return Days > 7; } }
+        public bool IsAncient { get { return Days > 14; } }
     }
 }
