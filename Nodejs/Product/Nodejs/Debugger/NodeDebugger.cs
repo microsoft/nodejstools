@@ -87,7 +87,7 @@ namespace Microsoft.NodejsTools.Debugger {
             } else {
                 List<int> activeConnections =
                     (from listener in IPGlobalProperties.GetIPGlobalProperties().GetActiveTcpListeners()
-                        select listener.Port).ToList();
+                     select listener.Port).ToList();
                 if (activeConnections.Contains(debuggerPortOrDefault)) {
                     debuggerPortOrDefault = (ushort)Enumerable.Range(new Random().Next(5859, 6000), 60000).Except(activeConnections).First();
                 }
@@ -252,8 +252,12 @@ namespace Microsoft.NodejsTools.Debugger {
         /// </summary>
         public async void Resume() {
             DebugWriteCommand("Resume");
-            var tokenSource = new CancellationTokenSource(_timeout);
-            await ContinueAndSaveSteppingAsync(SteppingKind.None, cancellationToken: tokenSource.Token).ConfigureAwait(false);
+            try {
+                var tokenSource = new CancellationTokenSource(_timeout);
+                await ContinueAndSaveSteppingAsync(SteppingKind.None, cancellationToken: tokenSource.Token).ConfigureAwait(false);
+            } catch (IOException) {
+                // Debugger connection went down - this is normal when debuggee dies.
+            }
         }
 
         private Task ContinueAndSaveSteppingAsync(SteppingKind steppingKind, bool resetSteppingMode = true, int stepCount = 1, CancellationToken cancellationToken = new CancellationToken()) {
@@ -360,47 +364,61 @@ namespace Microsoft.NodejsTools.Debugger {
 
         public async void SetExceptionTreatment(
             ExceptionHitTreatment? defaultExceptionTreatment,
-            ICollection<KeyValuePair<string, ExceptionHitTreatment>> exceptionTreatments) {
-            bool updated = false;
+            ICollection<KeyValuePair<string, ExceptionHitTreatment>> exceptionTreatments
+        ) {
+            try {
+                bool updated = false;
 
-            if (defaultExceptionTreatment.HasValue) {
-                updated |= _exceptionHandler.SetDefaultExceptionHitTreatment(defaultExceptionTreatment.Value);
-            }
+                if (defaultExceptionTreatment.HasValue) {
+                    updated |= _exceptionHandler.SetDefaultExceptionHitTreatment(defaultExceptionTreatment.Value);
+                }
 
-            if (exceptionTreatments != null) {
-                updated |= _exceptionHandler.SetExceptionTreatments(exceptionTreatments);
-            }
+                if (exceptionTreatments != null) {
+                    updated |= _exceptionHandler.SetExceptionTreatments(exceptionTreatments);
+                }
 
-            if (updated) {
-                var tokenSource = new CancellationTokenSource(_timeout);
-                await SetExceptionBreakAsync(tokenSource.Token).ConfigureAwait(false);
+                if (updated) {
+                    var tokenSource = new CancellationTokenSource(_timeout);
+                    await SetExceptionBreakAsync(tokenSource.Token).ConfigureAwait(false);
+                }
+            } catch (IOException) {
+                // Debugger connection went down - this is normal when debuggee dies.
             }
         }
 
         public async void ClearExceptionTreatment(
             ExceptionHitTreatment? defaultExceptionTreatment,
-            ICollection<KeyValuePair<string, ExceptionHitTreatment>> exceptionTreatments) {
-            bool updated = false;
+            ICollection<KeyValuePair<string, ExceptionHitTreatment>> exceptionTreatments
+        ) {
+            try {
+                bool updated = false;
 
-            if (defaultExceptionTreatment.HasValue) {
-                updated |= _exceptionHandler.SetDefaultExceptionHitTreatment(ExceptionHitTreatment.BreakNever);
-            }
+                if (defaultExceptionTreatment.HasValue) {
+                    updated |= _exceptionHandler.SetDefaultExceptionHitTreatment(ExceptionHitTreatment.BreakNever);
+                }
 
-            updated |= _exceptionHandler.ClearExceptionTreatments(exceptionTreatments);
+                updated |= _exceptionHandler.ClearExceptionTreatments(exceptionTreatments);
 
-            if (updated) {
-                var tokenSource = new CancellationTokenSource(_timeout);
-                await SetExceptionBreakAsync(tokenSource.Token).ConfigureAwait(false);
+                if (updated) {
+                    var tokenSource = new CancellationTokenSource(_timeout);
+                    await SetExceptionBreakAsync(tokenSource.Token).ConfigureAwait(false);
+                }
+            } catch (IOException) {
+                // Debugger connection went down - this is normal when debuggee dies.
             }
         }
 
         public async void ClearExceptionTreatment() {
-            bool updated = _exceptionHandler.SetDefaultExceptionHitTreatment(ExceptionHitTreatment.BreakAlways);
-            updated |= _exceptionHandler.ResetExceptionTreatments();
+            try {
+                bool updated = _exceptionHandler.SetDefaultExceptionHitTreatment(ExceptionHitTreatment.BreakAlways);
+                updated |= _exceptionHandler.ResetExceptionTreatments();
 
-            if (updated) {
-                var tokenSource = new CancellationTokenSource(_timeout);
-                await SetExceptionBreakAsync(tokenSource.Token).ConfigureAwait(false);
+                if (updated) {
+                    var tokenSource = new CancellationTokenSource(_timeout);
+                    await SetExceptionBreakAsync(tokenSource.Token).ConfigureAwait(false);
+                }
+            } catch (IOException) {
+                // Debugger connection went down - this is normal when debuggee dies.
             }
         }
 
@@ -505,12 +523,12 @@ namespace Microsoft.NodejsTools.Debugger {
         }
 
         private void OnConnectionClosed(object sender, EventArgs args) {
-            Terminate(false);
-
             EventHandler<ThreadEventArgs> threadExited = ThreadExited;
             if (threadExited != null) {
                 threadExited(this, new ThreadEventArgs(MainThread));
             }
+
+            Terminate(false);
         }
 
         private async Task GetScriptsAsync(CancellationToken cancellationToken = new CancellationToken()) {
@@ -567,35 +585,39 @@ namespace Microsoft.NodejsTools.Debugger {
         }
 
         private async void OnBreakpointEvent(object sender, BreakpointEventArgs args) {
-            BreakpointEvent breakpointEvent = args.BreakpointEvent;
+            try {
+                BreakpointEvent breakpointEvent = args.BreakpointEvent;
 
-            // Process breakpoint bindings, ensuring we have callstack
-            bool running = await PerformBacktraceAsync().ConfigureAwait(false);
-            Debug.Assert(!running);
+                // Process breakpoint bindings, ensuring we have callstack
+                bool running = await PerformBacktraceAsync().ConfigureAwait(false);
+                Debug.Assert(!running);
 
-            // Complete stepping, if no breakpoint bindings
-            if (breakpointEvent.Breakpoints.Count == 0) {
-                await CompleteSteppingAsync(true).ConfigureAwait(false);
-                return;
-            }
-
-            //  Derive breakpoint bindings, if any
-            var breakpointBindings = new List<NodeBreakpointBinding>();
-            foreach (int breakpoint in args.BreakpointEvent.Breakpoints) {
-                NodeBreakpointBinding nodeBreakpointBinding;
-                if (_breakpointBindings.TryGetValue(breakpoint, out nodeBreakpointBinding)) {
-                    breakpointBindings.Add(nodeBreakpointBinding);
+                // Complete stepping, if no breakpoint bindings
+                if (breakpointEvent.Breakpoints.Count == 0) {
+                    await CompleteSteppingAsync(true).ConfigureAwait(false);
+                    return;
                 }
-            }
 
-            // Retrieve a local module
-            NodeModule module;
-            GetOrAddModule(breakpointEvent.Module, out module);
-            module = module ?? breakpointEvent.Module;
+                //  Derive breakpoint bindings, if any
+                var breakpointBindings = new List<NodeBreakpointBinding>();
+                foreach (int breakpoint in args.BreakpointEvent.Breakpoints) {
+                    NodeBreakpointBinding nodeBreakpointBinding;
+                    if (_breakpointBindings.TryGetValue(breakpoint, out nodeBreakpointBinding)) {
+                        breakpointBindings.Add(nodeBreakpointBinding);
+                    }
+                }
 
-            // Process break for breakpoint bindings, if any
-            if (!await ProcessBreakpointBreakAsync(module, breakpointBindings, false).ConfigureAwait(false)) {
-                await AutoResumeAsync(false).ConfigureAwait(false);
+                // Retrieve a local module
+                NodeModule module;
+                GetOrAddModule(breakpointEvent.Module, out module);
+                module = module ?? breakpointEvent.Module;
+
+                // Process break for breakpoint bindings, if any
+                if (!await ProcessBreakpointBreakAsync(module, breakpointBindings, false).ConfigureAwait(false)) {
+                    await AutoResumeAsync(false).ConfigureAwait(false);
+                }
+            } catch (IOException) {
+                // Debugger connection went down - this is normal when debuggee dies.
             }
         }
 
@@ -667,75 +689,82 @@ namespace Microsoft.NodejsTools.Debugger {
         }
 
         private async void OnExceptionEvent(object sender, ExceptionEventArgs args) {
-            ExceptionEvent exception = args.ExceptionEvent;
+            try {
+                ExceptionEvent exception = args.ExceptionEvent;
 
-            if (exception.ErrorNumber == null) {
-                ReportException(exception);
-                return;
+                if (exception.ErrorNumber == null) {
+                    ReportException(exception);
+                    return;
+                }
+
+                int errorNumber = exception.ErrorNumber.Value;
+                string errorCodeFromMap;
+                if (_errorCodes.TryGetValue(errorNumber, out errorCodeFromMap)) {
+                    ReportException(exception, errorCodeFromMap);
+                    return;
+                }
+
+                var lookupCommand = new LookupCommand(CommandId, _resultFactory, new[] { exception.ErrorNumber.Value });
+                await _client.SendRequestAsync(lookupCommand).ConfigureAwait(false);
+
+                string errorCodeFromLookup = lookupCommand.Results[errorNumber][0].StringValue;
+                _errorCodes[errorNumber] = errorCodeFromLookup;
+
+                ReportException(exception, errorCodeFromLookup);
+            } catch (IOException) {
+                // Debugger connection went down - this is normal when debuggee dies.
             }
-
-            int errorNumber = exception.ErrorNumber.Value;
-            string errorCodeFromMap;
-            if (_errorCodes.TryGetValue(errorNumber, out errorCodeFromMap)) {
-                ReportException(exception, errorCodeFromMap);
-                return;
-            }
-
-            var lookupCommand = new LookupCommand(CommandId, _resultFactory, new[] { exception.ErrorNumber.Value });
-            await _client.SendRequestAsync(lookupCommand).ConfigureAwait(false);
-
-            string errorCodeFromLookup = lookupCommand.Results[errorNumber][0].StringValue;
-            _errorCodes[errorNumber] = errorCodeFromLookup;
-
-            ReportException(exception, errorCodeFromLookup);
         }
 
         private async void ReportException(ExceptionEvent exceptionEvent, string errorCode = null) {
-            string exceptionName = exceptionEvent.ExceptionName;
-            if (!string.IsNullOrEmpty(errorCode)) {
-                exceptionName = string.Format("{0}({1})", exceptionName, errorCode);
+            try {
+                string exceptionName = exceptionEvent.ExceptionName;
+                if (!string.IsNullOrEmpty(errorCode)) {
+                    exceptionName = string.Format("{0}({1})", exceptionName, errorCode);
+                }
+
+                // UNDONE Handle break on unhandled, once just my code is supported
+                // Node has a catch all, so there are no uncaught exceptions
+                // For now just break always or never
+                //if (exceptionTreatment == ExceptionHitTreatment.BreakNever ||
+                //    (exceptionTreatment == ExceptionHitTreatment.BreakOnUnhandled && !uncaught)) {
+                ExceptionHitTreatment exceptionTreatment = _exceptionHandler.GetExceptionHitTreatment(exceptionName);
+                if (exceptionTreatment == ExceptionHitTreatment.BreakNever) {
+                    await AutoResumeAsync(false).ConfigureAwait(false);
+                    return;
+                }
+
+                // We need to get the backtrace before we break, so we request the backtrace
+                // and follow up with firing the appropriate event for the break
+                bool running = await PerformBacktraceAsync().ConfigureAwait(false);
+                Debug.Assert(!running);
+
+                // Handle followup
+                EventHandler<ExceptionRaisedEventArgs> exceptionRaised = ExceptionRaised;
+                if (exceptionRaised == null) {
+                    return;
+                }
+
+                string description = exceptionEvent.Description;
+                if (description.StartsWith("#<") && description.EndsWith(">")) {
+                    // Serialize exception object to get a proper description
+                    var tokenSource = new CancellationTokenSource(_timeout);
+                    var evaluateCommand = new EvaluateCommand(CommandId, _resultFactory, exceptionEvent.ExceptionId);
+                    await _client.SendRequestAsync(evaluateCommand, tokenSource.Token).ConfigureAwait(false);
+
+                    description = evaluateCommand.Result.StringValue;
+                }
+
+                var exception = new NodeException(exceptionName, description);
+                exceptionRaised(this, new ExceptionRaisedEventArgs(MainThread, exception, exceptionEvent.Uncaught));
+            } catch (IOException) {
+                // Debugger connection went down - this is normal when debuggee dies.
             }
-
-            // UNDONE Handle break on unhandled, once just my code is supported
-            // Node has a catch all, so there are no uncaught exceptions
-            // For now just break always or never
-            //if (exceptionTreatment == ExceptionHitTreatment.BreakNever ||
-            //    (exceptionTreatment == ExceptionHitTreatment.BreakOnUnhandled && !uncaught)) {
-            ExceptionHitTreatment exceptionTreatment = _exceptionHandler.GetExceptionHitTreatment(exceptionName);
-            if (exceptionTreatment == ExceptionHitTreatment.BreakNever) {
-                await AutoResumeAsync(false).ConfigureAwait(false);
-                return;
-            }
-
-            // We need to get the backtrace before we break, so we request the backtrace
-            // and follow up with firing the appropriate event for the break
-            bool running = await PerformBacktraceAsync().ConfigureAwait(false);
-            Debug.Assert(!running);
-
-            // Handle followup
-            EventHandler<ExceptionRaisedEventArgs> exceptionRaised = ExceptionRaised;
-            if (exceptionRaised == null) {
-                return;
-            }
-
-            string description = exceptionEvent.Description;
-            if (description.StartsWith("#<") && description.EndsWith(">")) {
-                // Serialize exception object to get a proper description
-                var tokenSource = new CancellationTokenSource(_timeout);
-                var evaluateCommand = new EvaluateCommand(CommandId, _resultFactory, exceptionEvent.ExceptionId);
-                await _client.SendRequestAsync(evaluateCommand, tokenSource.Token).ConfigureAwait(false);
-
-                description = evaluateCommand.Result.StringValue;
-            }
-
-            var exception = new NodeException(exceptionName, description);
-            exceptionRaised(this, new ExceptionRaisedEventArgs(MainThread, exception, exceptionEvent.Uncaught));
         }
 
         private async Task<int> GetCallstackDepthAsync(CancellationToken cancellationToken = new CancellationToken()) {
             var backtraceCommand = new BacktraceCommand(CommandId, _resultFactory, 0, 1, true);
             await _client.SendRequestAsync(backtraceCommand, cancellationToken).ConfigureAwait(false);
-
             return backtraceCommand.CallstackDepth;
         }
 
@@ -819,73 +848,88 @@ namespace Microsoft.NodejsTools.Debugger {
 
         internal async void SendStepOver(int identity) {
             DebugWriteCommand("StepOver");
-            var tokenSource = new CancellationTokenSource(_timeout);
-            await ContinueAndSaveSteppingAsync(SteppingKind.Over, cancellationToken: tokenSource.Token).ConfigureAwait(false);
+            try {
+                var tokenSource = new CancellationTokenSource(_timeout);
+                await ContinueAndSaveSteppingAsync(SteppingKind.Over, cancellationToken: tokenSource.Token).ConfigureAwait(false);
+            } catch (IOException) {
+                // Debugger connection went down - this is normal when debuggee dies.
+            }
         }
 
         internal async void SendStepInto(int identity) {
             DebugWriteCommand("StepInto");
-            var tokenSource = new CancellationTokenSource(_timeout);
-            await ContinueAndSaveSteppingAsync(SteppingKind.Into, cancellationToken: tokenSource.Token).ConfigureAwait(false);
+            try {
+                var tokenSource = new CancellationTokenSource(_timeout);
+                await ContinueAndSaveSteppingAsync(SteppingKind.Into, cancellationToken: tokenSource.Token).ConfigureAwait(false);
+            } catch (IOException) {
+                // Debugger connection went down - this is normal when debuggee dies.
+            }
         }
 
         internal async void SendStepOut(int identity) {
             DebugWriteCommand("StepOut");
-            var tokenSource = new CancellationTokenSource(_timeout);
-            await ContinueAndSaveSteppingAsync(SteppingKind.Out, cancellationToken: tokenSource.Token).ConfigureAwait(false);
+            try {
+                var tokenSource = new CancellationTokenSource(_timeout);
+                await ContinueAndSaveSteppingAsync(SteppingKind.Out, cancellationToken: tokenSource.Token).ConfigureAwait(false);
+            } catch (IOException) {
+                // Debugger connection went down - this is normal when debuggee dies.
+            }
         }
 
         internal async void SendResumeThread(int threadId) {
             DebugWriteCommand("ResumeThread");
+            try {
+                // Handle load complete resume
+                if (!_loadCompleteHandled) {
+                    _loadCompleteHandled = true;
+                    _handleEntryPointHit = true;
 
-            // Handle load complete resume
-            if (!_loadCompleteHandled) {
-                _loadCompleteHandled = true;
-                _handleEntryPointHit = true;
+                    // Handle breakpoint binding at entrypoint
+                    // Attempt to fire breakpoint hit event without actually resuming
+                    NodeStackFrame topFrame = MainThread.TopStackFrame;
+                    int currentLine = topFrame.Line;
+                    string breakFileName = topFrame.Module.FileName;
+                    NodeModule breakModule = GetModuleForFilePath(breakFileName);
 
-                // Handle breakpoint binding at entrypoint
-                // Attempt to fire breakpoint hit event without actually resuming
-                NodeStackFrame topFrame = MainThread.TopStackFrame;
-                int currentLine = topFrame.Line;
-                string breakFileName = topFrame.Module.FileName;
-                NodeModule breakModule = GetModuleForFilePath(breakFileName);
-
-                var breakpointBindings = new List<NodeBreakpointBinding>();
-                foreach (NodeBreakpointBinding breakpointBinding in _breakpointBindings.Values) {
-                    if (breakpointBinding.Enabled && breakpointBinding.Position.Line == currentLine &&
-                        GetModuleForFilePath(breakpointBinding.Target.FileName) == breakModule) {
-                        breakpointBindings.Add(breakpointBinding);
+                    var breakpointBindings = new List<NodeBreakpointBinding>();
+                    foreach (NodeBreakpointBinding breakpointBinding in _breakpointBindings.Values) {
+                        if (breakpointBinding.Enabled && breakpointBinding.Position.Line == currentLine &&
+                            GetModuleForFilePath(breakpointBinding.Target.FileName) == breakModule) {
+                            breakpointBindings.Add(breakpointBinding);
+                        }
                     }
-                }
 
-                if (breakpointBindings.Count > 0) {
-                    // Delegate to ProcessBreak() which knows how to correctly
-                    // fire breakpoint hit events for given breakpoint bindings and current backtrace
-                    if (!await ProcessBreakpointBreakAsync(breakModule, breakpointBindings, true).ConfigureAwait(false)) {
-                        HandleEntryPointHit();
+                    if (breakpointBindings.Count > 0) {
+                        // Delegate to ProcessBreak() which knows how to correctly
+                        // fire breakpoint hit events for given breakpoint bindings and current backtrace
+                        if (!await ProcessBreakpointBreakAsync(breakModule, breakpointBindings, true).ConfigureAwait(false)) {
+                            HandleEntryPointHit();
+                        }
+                        return;
                     }
+
+                    // Handle no breakpoint at entrypoint
+                    // Fire entrypoint hit event without actually resuming
+                    // SDM will auto-resume on entrypoint hit for F5 launch, but not for F10/F11 launch
+                    HandleEntryPointHit();
                     return;
                 }
 
-                // Handle no breakpoint at entrypoint
-                // Fire entrypoint hit event without actually resuming
+                // Handle tracepoint (auto-resumed "when hit" breakpoint) at entrypoint resume, by firing entrypoint hit event without actually resuming
+                // If the SDM auto-resumes a tracepoint hit at the entrypoint, we need to give the SDM a chance to handle the entrypoint.
+                // By first firing breakpoint hit for a breakpoint/tracepoint at the entrypoint, and then falling back to firing entrypoint hit
+                // when the breakpoint is a tracepoint (auto-resumed), the breakpoint's/tracepoint's side effects will be seen, including when effectively
+                // breaking at the entrypoint for F10/F11 launch.            
                 // SDM will auto-resume on entrypoint hit for F5 launch, but not for F10/F11 launch
-                HandleEntryPointHit();
-                return;
-            }
+                if (HandleEntryPointHit()) {
+                    return;
+                }
 
-            // Handle tracepoint (auto-resumed "when hit" breakpoint) at entrypoint resume, by firing entrypoint hit event without actually resuming
-            // If the SDM auto-resumes a tracepoint hit at the entrypoint, we need to give the SDM a chance to handle the entrypoint.
-            // By first firing breakpoint hit for a breakpoint/tracepoint at the entrypoint, and then falling back to firing entrypoint hit
-            // when the breakpoint is a tracepoint (auto-resumed), the breakpoint's/tracepoint's side effects will be seen, including when effectively
-            // breaking at the entrypoint for F10/F11 launch.            
-            // SDM will auto-resume on entrypoint hit for F5 launch, but not for F10/F11 launch
-            if (HandleEntryPointHit()) {
-                return;
+                // Handle tracepoint (auto-resumed "when hit" breakpoint) resume during stepping
+                await AutoResumeAsync(true).ConfigureAwait(false);
+            } catch (IOException) {
+                // Debugger connection went down - this is normal when debuggee dies.
             }
-
-            // Handle tracepoint (auto-resumed "when hit" breakpoint) resume during stepping
-            await AutoResumeAsync(true).ConfigureAwait(false);
         }
 
         private bool HandleEntryPointHit() {
@@ -907,13 +951,15 @@ namespace Microsoft.NodejsTools.Debugger {
 
         public async void Detach() {
             DebugWriteCommand("Detach");
-
-            // Disconnect request has no response
-            var tokenSource = new CancellationTokenSource(_timeout);
-            var disconnectCommand = new DisconnectCommand(CommandId);
-            await _client.SendRequestAsync(disconnectCommand, tokenSource.Token).ConfigureAwait(false);
-
-            _connection.Close();
+            try {
+                // Disconnect request has no response
+                var tokenSource = new CancellationTokenSource(_timeout);
+                var disconnectCommand = new DisconnectCommand(CommandId);
+                await _client.SendRequestAsync(disconnectCommand, tokenSource.Token).ConfigureAwait(false);
+                _connection.Close();
+            } catch (IOException) {
+                // Debugger connection went down - this is normal when debuggee dies.
+            }
         }
 
         public async Task<NodeBreakpointBinding> BindBreakpointAsync(NodeBreakpoint breakpoint, CancellationToken cancellationToken = new CancellationToken()) {
