@@ -795,6 +795,7 @@
     <ZipProject Include="ProjectTemplates\AddWebSiteAzureNodejsApp\README.md" />
     <ZipProject Include="ProjectTemplates\AddWebSiteAzureNodejsApp\setup_web.cmd" />
     <ZipProject Include="ProjectTemplates\AddWebSiteAzureNodejsApp\Web.config" />
+    <ZipProject Include="ProjectTemplates\AddWebSiteAzureNodejsApp\Web.Debug.config" />
     <ZipProject Include="ProjectTemplates\AddWebSiteAzureNodejsApp\node.cmd" />
     <ZipProject Include="ProjectTemplates\AddWebSiteAzureNodejsApp\iisnode.yml" />
     <ZipProject Include="ProjectTemplates\AddWebSiteNodejsWebApp\AddWebSiteNodejsWebApp.njsproj">
