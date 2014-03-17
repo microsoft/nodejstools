@@ -1485,9 +1485,10 @@ namespace ProfilingUITests {
 
                         Assert.IsTrue(lines[0].Contains("scriptargs"), "no scriptargs");
                         Assert.IsTrue(lines[0].Contains("server.js"), "missing filename");
-                        Assert.AreEqual(lines[1], "port: 1234");
-                        Assert.AreEqual(lines[2], "cwd: " + Path.GetTempPath().Substring(0, Path.GetTempPath().Length - 1));
-
+                        Assert.IsFalse(lines[0].Contains("--harmony"), "interpreter argument leaked to script");
+                        Assert.IsTrue(lines[1].Contains("--harmony"), "missing interpreter argument");
+                        Assert.AreEqual("port: 1234", lines[2]);
+                        Assert.AreEqual("cwd: " + Path.GetTempPath().Substring(0, Path.GetTempPath().Length - 1), lines[3]);
                     } finally {
                         profiling.RemoveSession(session, true);
                     }
