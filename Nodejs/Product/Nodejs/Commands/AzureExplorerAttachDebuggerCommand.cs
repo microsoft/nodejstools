@@ -183,44 +183,46 @@ namespace Microsoft.NodejsTools.Commands {
         }
 
         private async Task<bool> AttachWorker(AzureWebSiteInfo webSite) {
-            // Get path (relative to site URL) for the debugger endpoint.
-            XDocument webConfig;
-            try {
-                webConfig = await GetWebConfig(webSite);
-            } catch (WebException) {
-                return false;
-            } catch (IOException) {
-                return false;
-            } catch (XmlException) {
-                return false;
-            }
-            if (webConfig == null) {
-                return false;
-            }
+            using (new WaitDialog("Azure remote debugging", "Attaching to Azure web site at " + webSite.Uri, NodejsPackage.Instance, showProgress: true)) {
+                // Get path (relative to site URL) for the debugger endpoint.
+                XDocument webConfig;
+                try {
+                    webConfig = await GetWebConfig(webSite);
+                } catch (WebException) {
+                    return false;
+                } catch (IOException) {
+                    return false;
+                } catch (XmlException) {
+                    return false;
+                }
+                if (webConfig == null) {
+                    return false;
+                }
 
-            var path =
-                (from add in webConfig.Elements("configuration").Elements("system.webServer").Elements("handlers").Elements("add")
-                 let type = (string)add.Attribute("type")
-                 where type != null
-                 let components = type.Split(',')
-                 where components[0].Trim() == "Microsoft.NodejsTools.Debugger.WebSocketProxy"
-                 select (string)add.Attribute("path")
-                ).FirstOrDefault();
-            if (path == null) {
-                return false;
-            }
+                var path =
+                    (from add in webConfig.Elements("configuration").Elements("system.webServer").Elements("handlers").Elements("add")
+                     let type = (string)add.Attribute("type")
+                     where type != null
+                     let components = type.Split(',')
+                     where components[0].Trim() == "Microsoft.NodejsTools.Debugger.WebSocketProxy"
+                     select (string)add.Attribute("path")
+                    ).FirstOrDefault();
+                if (path == null) {
+                    return false;
+                }
 
-            try {
-                AttachDebugger(new UriBuilder(webSite.Uri) { Scheme = "wss", Port = -1, Path = path }.Uri);
-            } catch (Exception ex) {
-                // If we got to this point, the attach logic in debug engine will catch exceptions, display proper error message and
-                // ask the user to retry, so the only case where we actually get here is if user canceled on error. If this is the case,
-                // we don't want to pop any additional error messages, so always return true, but log the error in the Output window.
-                var output = OutputWindowRedirector.GetGeneral(NodejsPackage.Instance);
-                output.WriteErrorLine("Failed to attach to Azure web site: " + ex.Message);
-                output.ShowAndActivate();
+                try {
+                    AttachDebugger(new UriBuilder(webSite.Uri) { Scheme = "wss", Port = -1, Path = path }.Uri);
+                } catch (Exception ex) {
+                    // If we got to this point, the attach logic in debug engine will catch exceptions, display proper error message and
+                    // ask the user to retry, so the only case where we actually get here is if user canceled on error. If this is the case,
+                    // we don't want to pop any additional error messages, so always return true, but log the error in the Output window.
+                    var output = OutputWindowRedirector.GetGeneral(NodejsPackage.Instance);
+                    output.WriteErrorLine("Failed to attach to Azure web site: " + ex.Message);
+                    output.ShowAndActivate();
+                }
+                return true;
             }
-            return true;
         }
 
         /// <summary>
