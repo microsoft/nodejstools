@@ -333,6 +333,8 @@ namespace Microsoft.NodejsTools.NpmUI {
 
                     if (_commandQueue.Count > 0) {
                         _currentCommand = _commandQueue.Dequeue();
+                    } else {
+                        _currentCommand = null;
                     }
                     count = _commandQueue.Count;
                 }

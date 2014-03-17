@@ -12,7 +12,8 @@
     Width="600"
     MinWidth="600"
     WindowStartupLocation="CenterOwner"
-    Background="{DynamicResource {x:Static wpf:Controls.BackgroundKey}}">
+    Background="{DynamicResource {x:Static wpf:Controls.BackgroundKey}}"
+    ResizeMode="CanResizeWithGrip">
     <!-- Theming -->
     <Window.Resources>
         <ResourceDictionary>
@@ -137,12 +138,11 @@
     <Window.CommandBindings>
         <CommandBinding Command="ApplicationCommands.Close"
                         Executed="ExecuteClose"
-                        CanExecute="CanExecuteClose"></CommandBinding>
+                        CanExecute="CanExecuteClose" />
     </Window.CommandBindings>
 
     <Window.InputBindings>
-        <KeyBinding Command="{Binding Path=InstallCommand}"
-              Gesture="ENTER" />
+        <KeyBinding Command="{Binding Path=InstallCommand}" Gesture="ENTER" />
     </Window.InputBindings>
 
     <Grid>
@@ -170,15 +170,24 @@
                 <Grid.RowDefinitions>
                     <RowDefinition Height="Auto"></RowDefinition>
                 </Grid.RowDefinitions>
-                
+
+                <!-- These labels should be Hidden but not Collapsed, to ensure
+                     the spacing is correct. -->
                 <Label Grid.Column="0"
                        Grid.Row="0"
-                       MinWidth="72"
-                       HorizontalContentAlignment="Right"
                        HorizontalAlignment="Right"
-                       Content="{Binding FilterLabelText,FallbackValue='Filter: '}"
-                       VerticalAlignment="Center"></Label>
-                
+                       VerticalAlignment="Center"
+                       Visibility="{Binding FilterLabelVisibility}">
+                    Filter:
+                </Label>
+                <Label Grid.Column="0"
+                       Grid.Row="0"
+                       HorizontalAlignment="Right"
+                       VerticalAlignment="Center"
+                       Visibility="{Binding NpmInstallLabelVisibility}">
+                    npm install
+                </Label>
+
                 <TextBox Grid.Column="1"
                          Grid.Row="0"
                          Height="24"
@@ -223,16 +232,16 @@
                 <Button Grid.Column="1"
                         Command="ApplicationCommands.Close"
                         IsCancel="True">
-                    _Cancel
+                    _Close
                 </Button>
             </Grid>
             
             
             <Grid>
                 <Grid.RowDefinitions>
-                    <RowDefinition Height="3*"></RowDefinition>
-                    <RowDefinition Height="Auto"></RowDefinition>
-                    <RowDefinition Height="*"></RowDefinition>
+                    <RowDefinition Height="3*" MinHeight="30" />
+                    <RowDefinition Height="Auto" />
+                    <RowDefinition Height="*" />
                 </Grid.RowDefinitions>
                 
                 <!-- Package List -->
@@ -264,7 +273,11 @@
                 <!-- Splitter -->
 
                 <Separator Grid.Row="1"
-                           Margin="0 2"
+                           Margin="0 3 0 5"
+                           Height="2"
+                           IsHitTestVisible="False"/>
+                <Separator Grid.Row="1"
+                           Margin="0 5 0 3"
                            Height="2"
                            IsHitTestVisible="False"/>
                 <GridSplitter Grid.Row="1"

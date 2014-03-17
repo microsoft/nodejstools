@@ -78,7 +78,8 @@ namespace Microsoft.NodejsTools.NpmUI {
         private string _catalogLoadingMessage = string.Empty;
         private Visibility _loadingCatalogControlVisibility = Visibility.Hidden;
         private Visibility _filteredCatalogListVisibility = Visibility.Visible;
-        private string _filterLabelText = Resources.CatalogFilterLabelFilter;
+        private Visibility _filterLabelVisibility = Visibility.Visible;
+        private Visibility _npmInstallLabelVisibility = Visibility.Hidden;
         private string _rawFilterText;
         private DispatcherTimer _keypressFilterDelayTimer;
         private string _catalogFilterText;
@@ -292,10 +293,18 @@ namespace Microsoft.NodejsTools.NpmUI {
             }
         }
 
-        public string FilterLabelText {
-            get { return _filterLabelText; }
+        public Visibility FilterLabelVisibility {
+            get { return _filterLabelVisibility; }
             private set {
-                _filterLabelText = value;
+                _filterLabelVisibility = value;
+                OnPropertyChanged();
+            }
+        }
+
+        public Visibility NpmInstallLabelVisibility {
+            get { return _npmInstallLabelVisibility; }
+            private set {
+                _npmInstallLabelVisibility = value;
                 OnPropertyChanged();
             }
         }
@@ -385,7 +394,12 @@ namespace Microsoft.NodejsTools.NpmUI {
         }
 
         private void SetListData(IList<PackageCatalogEntryViewModel> filtered) {
+            var newSelection = filtered.FirstOrDefault();
+            
             FilteredPackages = filtered;
+            if (newSelection != null) {
+                SelectedPackage = newSelection;
+            }
             LastRefreshedMessage = IsCatalogEmpty
                 ? LastRefreshedMessageProvider.RefreshFailed
                 : new LastRefreshedMessageProvider(_allPackages.LastRefreshed);
@@ -414,9 +428,8 @@ namespace Microsoft.NodejsTools.NpmUI {
                 _isExecuteNpmWithArgumentsMode = value;
                 OnPropertyChanged();
                 OnPropertyChanged("NonArgumentControlsVisibility");
-                FilterLabelText = value
-                    ? Resources.CatalogFilterLabelNpmInstall
-                    : Resources.CatalogFilterLabelFilter;
+                FilterLabelVisibility = value ? Visibility.Hidden : Visibility.Visible;
+                NpmInstallLabelVisibility = value ? Visibility.Visible : Visibility.Hidden;
             }
         }
 

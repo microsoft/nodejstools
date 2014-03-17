@@ -568,19 +568,19 @@ namespace Microsoft.NodejsTools.Project {
                 }
             }
             
-            var executeVm = new NpmOutputControlViewModel();
-            executeVm.NpmController = NpmController;
-            var viewModel = new NpmPackageInstallViewModel(executeVm);
-            viewModel.NpmController = NpmController;
-            var manager = new NpmPackageInstallWindow(viewModel);
-            manager.NpmExecuteControl.DataContext = executeVm;
-            manager.Owner = System.Windows.Application.Current.MainWindow;
-            manager.ShowDialog();
+            using (var executeVm = new NpmOutputControlViewModel()) {
+                executeVm.NpmController = NpmController;
+                var viewModel = new NpmPackageInstallViewModel(executeVm);
+                viewModel.NpmController = NpmController;
+                var manager = new NpmPackageInstallWindow(viewModel);
+                manager.NpmExecuteControl.DataContext = executeVm;
+                manager.Owner = System.Windows.Application.Current.MainWindow;
+                manager.ShowDialog();
 
-            //  This will unregister event handlers on the controller and prevent
-            //  us from leaking view models.
-            viewModel.NpmController = null;
-
+                //  This will unregister event handlers on the controller and prevent
+                //  us from leaking view models.
+                viewModel.NpmController = null;
+            }
             ReloadHierarchy();
         }
 

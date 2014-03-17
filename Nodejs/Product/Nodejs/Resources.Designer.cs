@@ -61,24 +61,6 @@ namespace Microsoft.NodejsTools {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Filter:.
-        /// </summary>
-        internal static string CatalogFilterLabelFilter {
-            get {
-                return ResourceManager.GetString("CatalogFilterLabelFilter", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   Looks up a localized string similar to npm install.
-        /// </summary>
-        internal static string CatalogFilterLabelNpmInstall {
-            get {
-                return ResourceManager.GetString("CatalogFilterLabelNpmInstall", resourceCulture);
-            }
-        }
-        
-        /// <summary>
         ///   Looks up a localized string similar to Loading published package list....
         /// </summary>
         internal static string CatalogLoadingDefault {

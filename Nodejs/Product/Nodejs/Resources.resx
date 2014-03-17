@@ -352,12 +352,6 @@
   <data name="WorkingDirInvalidOrMissing" xml:space="preserve">
     <value>The specified working directory is invalid or missing.</value>
   </data>
-  <data name="CatalogFilterLabelFilter" xml:space="preserve">
-    <value>Filter:</value>
-  </data>
-  <data name="CatalogFilterLabelNpmInstall" xml:space="preserve">
-    <value>npm install</value>
-  </data>
   <data name="CatalogLoadingDefault" xml:space="preserve">
     <value>Loading published package list...</value>
   </data>
