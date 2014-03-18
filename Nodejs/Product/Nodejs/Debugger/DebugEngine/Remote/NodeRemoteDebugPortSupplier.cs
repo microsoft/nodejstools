@@ -37,14 +37,12 @@ namespace Microsoft.NodejsTools.Debugger.Remote {
             string name;
             pRequest.GetPortName(out name);
 
-            Uri uri;
-            if (!Uri.TryCreate(name, UriKind.Absolute, out uri)) {
-                // If it's not a valid absolute URI, then it might be 'hostname:port' without the scheme -
-                // add tcp:// and try again, and let it throw this time if it still can't parse.
+            // Support old-style 'hostname:port' format, as well.
+            if (!name.Contains("://")) {
                 name = "tcp://" + name;
-                uri = new Uri(name, UriKind.Absolute);
             }
 
+            var uri = new Uri(name, UriKind.Absolute);
             switch (uri.Scheme) {
                 case "tcp":
                     // tcp:// URI should only specify host and optionally port, path has no meaning and is invalid.
