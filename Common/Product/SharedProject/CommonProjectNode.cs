@@ -1065,6 +1065,13 @@ namespace Microsoft.VisualStudioTools.Project {
                     // actually exists ignore the event.
                     if ((!File.Exists(child.Url) && !Directory.Exists(child.Url)) ||
                         _project.IsFileHidden(child.Url)) {
+
+                        if (child.ItemNode == null) {
+                            // nodes should all have ItemNodes, the project is special.
+                            Debug.Assert(child is ProjectNode);
+                            return;
+                        }
+
                         if (child.ItemNode.IsExcluded) {
                             RemoveAllFilesChildren(child);
                             // deleting a show all files item, remove the node.
