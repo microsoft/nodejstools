@@ -152,66 +152,53 @@
                    Width="Auto"
                    Margin="4, 4, 4, 4">
             
-            <Grid DockPanel.Dock="Top"
-                  HorizontalAlignment="Stretch"
-                  VerticalAlignment="Center"
-                  Margin="0, 0, 0, 4"
-                  Visibility="{Binding Path=FilterControlsVisibility}">
-                <Grid.ColumnDefinitions>
-                    <!-- Find/npm install label -->
-                    <ColumnDefinition Width="Auto"></ColumnDefinition>
-                    <!-- Text field -->
-                    <ColumnDefinition Width="*"></ColumnDefinition>
-                    <!-- Dependency type: standard, dev, optional, global -->
-                    <ColumnDefinition Width="Auto"></ColumnDefinition>
-                    <!-- Install button -->
-                    <ColumnDefinition Width="Auto"></ColumnDefinition>
-                </Grid.ColumnDefinitions>
-                <Grid.RowDefinitions>
-                    <RowDefinition Height="Auto"></RowDefinition>
-                </Grid.RowDefinitions>
 
                 <!-- These labels should be Hidden but not Collapsed, to ensure
                      the spacing is correct. -->
-                <Label Grid.Column="0"
-                       Grid.Row="0"
-                       HorizontalAlignment="Right"
-                       VerticalAlignment="Center"
-                       Visibility="{Binding FilterLabelVisibility}">
-                    Filter:
-                </Label>
-                <Label Grid.Column="0"
-                       Grid.Row="0"
-                       HorizontalAlignment="Right"
-                       VerticalAlignment="Center"
-                       Visibility="{Binding NpmInstallLabelVisibility}">
-                    npm install
-                </Label>
-
-                <TextBox Grid.Column="1"
+                <wpf:LabelledControl Title="Enter a search term or arguments for npm install:"
+                                     DockPanel.Dock="Top"
+                  HorizontalAlignment="Stretch"
+                  VerticalAlignment="Center"
+                  Visibility="{Binding Path=FilterControlsVisibility}">
+                <Grid>
+                    <Grid.ColumnDefinitions>
+                        <!-- Text field -->
+                        <ColumnDefinition Width="*"></ColumnDefinition>
+                        <!-- Dependency type: standard, dev, optional, global -->
+                        <ColumnDefinition Width="Auto"></ColumnDefinition>
+                        <!-- Install button -->
+                        <ColumnDefinition Width="Auto"></ColumnDefinition>
+                    </Grid.ColumnDefinitions>
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="Auto"></RowDefinition>
+                    </Grid.RowDefinitions>
+                    <TextBox 
+                         Grid.Column="0"
                          Grid.Row="0"
                          Height="24"
+                         Foreground="{Binding FilterTextBrush}"
                          Text="{Binding RawFilterText,UpdateSourceTrigger=PropertyChanged}" />
-                
-                <ComboBox Grid.Column="2"
-                          Grid.Row="0"
-                          Width="100"
-                          MaxHeight="24"
-                          Padding="3"
-                          Margin="4, 0, 0, 0"
-                          SelectedIndex="{Binding Path=SelectedDependencyTypeIndex}"
-                          Visibility="{Binding Path=NonArgumentControlsVisibility}">
-                    <ComboBoxItem Tag="St" IsSelected="True">Standard</ComboBoxItem>
-                    <ComboBoxItem Tag="Dev">Development</ComboBoxItem>
-                    <ComboBoxItem Tag="Opt">Optional</ComboBoxItem>
-                    <ComboBoxItem Tag="Global">Global</ComboBoxItem>
-                </ComboBox>
-                <Button Grid.Column="3"
+
+                    <ComboBox 
+                            Grid.Column="1"
+                            Width="100"
+                            MaxHeight="24"
+                            Padding="3"
+                            Margin="4, 0, 0, 0"
+                            SelectedIndex="{Binding Path=SelectedDependencyTypeIndex}"
+                            Visibility="{Binding Path=NonArgumentControlsVisibility}">
+                        <ComboBoxItem Tag="St" IsSelected="True">Standard</ComboBoxItem>
+                        <ComboBoxItem Tag="Dev">Development</ComboBoxItem>
+                        <ComboBoxItem Tag="Opt">Optional</ComboBoxItem>
+                        <ComboBoxItem Tag="Global">Global</ComboBoxItem>
+                    </ComboBox>
+                    <Button Grid.Column="2"
                         Grid.Row="0"
                         Content="Install"
-                        Command="{Binding Path=InstallCommand}"></Button>
-            </Grid>
-            
+                        Command="{Binding Path=InstallCommand}"/>
+                </Grid>
+            </wpf:LabelledControl>
+
             <!-- Dialog control -->
             
             <Grid DockPanel.Dock="Bottom">

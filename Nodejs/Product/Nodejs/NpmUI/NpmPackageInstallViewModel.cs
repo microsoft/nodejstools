@@ -23,6 +23,7 @@ using System.Windows.Input;
 using System.Windows.Media;
 using System.Windows.Threading;
 using Microsoft.NodejsTools.Npm;
+using Microsoft.VisualStudioTools.Wpf;
 using Microsoft.Windows.Design.Host;
 
 namespace Microsoft.NodejsTools.NpmUI {
@@ -78,13 +79,9 @@ namespace Microsoft.NodejsTools.NpmUI {
         private string _catalogLoadingMessage = string.Empty;
         private Visibility _loadingCatalogControlVisibility = Visibility.Hidden;
         private Visibility _filteredCatalogListVisibility = Visibility.Visible;
-        private Visibility _filterLabelVisibility = Visibility.Visible;
-        private Visibility _npmInstallLabelVisibility = Visibility.Hidden;
         private string _rawFilterText;
         private DispatcherTimer _keypressFilterDelayTimer;
-        private string _catalogFilterText;
-        private string _argumentOnlyText;
-        private bool _isExecuteNpmWithArgumentsMode;
+        private bool _isExecuteNpmWithArgumentsMode, _userSelectedPackage;
         private int _selectedDependencyTypeIndex;
 
         private NpmOutputControlViewModel _executeViewModel;
@@ -281,7 +278,6 @@ namespace Microsoft.NodejsTools.NpmUI {
             set {
                 _filteredPackages = value;
                 OnPropertyChanged();
-                SelectedPackage = null != _filteredPackages && _filteredPackages.Count > 0 ? _filteredPackages[0] : null;
             }
         }
 
@@ -293,19 +289,16 @@ namespace Microsoft.NodejsTools.NpmUI {
             }
         }
 
-        public Visibility FilterLabelVisibility {
-            get { return _filterLabelVisibility; }
-            private set {
-                _filterLabelVisibility = value;
-                OnPropertyChanged();
-            }
-        }
+        public Brush FilterTextBrush {
+            get {
+                object key;
+                if (_userSelectedPackage) {
+                    key = Controls.GrayTextKey;
+                } else {
+                    key = Controls.ForegroundKey;
+                }
 
-        public Visibility NpmInstallLabelVisibility {
-            get { return _npmInstallLabelVisibility; }
-            private set {
-                _npmInstallLabelVisibility = value;
-                OnPropertyChanged();
+                return (Brush)Application.Current.TryFindResource(key);
             }
         }
 
@@ -344,11 +337,8 @@ namespace Microsoft.NodejsTools.NpmUI {
 
                 if (TreatAsArguments(_rawFilterText)) {
                     IsExecuteNpmWithArgumentsMode = true;
-                    CatalogFilterText = GetFilterStringPortion(_rawFilterText);
-                    ArgumentOnlyText = GetArgumentPortion(_rawFilterText);
                 } else {
                     IsExecuteNpmWithArgumentsMode = false;
-                    CatalogFilterText = value;
                 }
                 StartFilterTimer();
             }
@@ -374,7 +364,7 @@ namespace Microsoft.NodejsTools.NpmUI {
         }
 
         private void StartFilter() {
-            ThreadPool.QueueUserWorkItem(o => Filter(CatalogFilterText));
+            ThreadPool.QueueUserWorkItem(o => Filter(GetFilterStringPortion(RawFilterText)));
         }
 
         private void Filter(string filterString) {
@@ -390,15 +380,19 @@ namespace Microsoft.NodejsTools.NpmUI {
                 null == controller ? null : controller.GlobalPackages)).ToList();
             
             Application.Current.Dispatcher.BeginInvoke(
-                new Action(() => SetListData(target)));
+                new Action(() => SetFilteredList(target)));
         }
 
-        private void SetListData(IList<PackageCatalogEntryViewModel> filtered) {
+        private void SetFilteredList(IList<PackageCatalogEntryViewModel> filtered) {
             var newSelection = filtered.FirstOrDefault();
             
             FilteredPackages = filtered;
             if (newSelection != null) {
-                SelectedPackage = newSelection;
+                // by pass the property, we don't want to alter the filter text
+                _selectedPackage = newSelection;
+                _userSelectedPackage = false;
+                OnPropertyChanged("SelectedPackage");
+                OnPropertyChanged("FilterTextBrush");
             }
             LastRefreshedMessage = IsCatalogEmpty
                 ? LastRefreshedMessageProvider.RefreshFailed
@@ -406,30 +400,11 @@ namespace Microsoft.NodejsTools.NpmUI {
             CatalogControlVisibility = Visibility.Visible;
         }
 
-        public string CatalogFilterText {
-            get { return _catalogFilterText; }
-            private set {
-                _catalogFilterText = value;
-                OnPropertyChanged();
-            }
-        }
-
-        public string ArgumentOnlyText {
-            get { return _argumentOnlyText; }
-            private set {
-                _argumentOnlyText = value;
-                OnPropertyChanged();
-            }
-        }
-
         public bool IsExecuteNpmWithArgumentsMode {
             get { return _isExecuteNpmWithArgumentsMode; }
             private set {
                 _isExecuteNpmWithArgumentsMode = value;
-                OnPropertyChanged();
                 OnPropertyChanged("NonArgumentControlsVisibility");
-                FilterLabelVisibility = value ? Visibility.Hidden : Visibility.Visible;
-                NpmInstallLabelVisibility = value ? Visibility.Visible : Visibility.Hidden;
             }
         }
 
@@ -484,11 +459,11 @@ namespace Microsoft.NodejsTools.NpmUI {
 
                 if (global) {
                     _executeViewModel.QueueInstallGlobalPackage(
-                        _selectedPackage.Name,
+                        RawFilterText,
                         "*");
                 } else {
                     _executeViewModel.QueueInstallPackage(
-                        _selectedPackage.Name,
+                        RawFilterText,
                         "*",
                         type);
                 }
@@ -502,6 +477,14 @@ namespace Microsoft.NodejsTools.NpmUI {
             set {
                 _selectedPackage = value;
                 OnPropertyChanged();
+                if (_selectedPackage != null) {
+                    _rawFilterText = _selectedPackage.Name;
+                    _userSelectedPackage = true;
+                    OnPropertyChanged("RawFilterText");
+                } else {
+                    _userSelectedPackage = false;
+                }
+                OnPropertyChanged("FilterTextBrush");
             }
         }
 
@@ -520,8 +503,7 @@ namespace Microsoft.NodejsTools.NpmUI {
             }
 
             public override bool CanExecute(object parameter) {
-                return _owner.IsExecuteNpmWithArgumentsMode && !string.IsNullOrEmpty(_owner.RawFilterText)
-                    || _owner.SelectedPackage != null;
+                return !string.IsNullOrEmpty(_owner.RawFilterText);
             }
 
             public override void Execute(object parameter) {
