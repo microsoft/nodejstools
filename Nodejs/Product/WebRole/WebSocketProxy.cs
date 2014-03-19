@@ -85,7 +85,7 @@ namespace Microsoft.NodejsTools.Debugger {
                 using (var stream = GetType().Assembly.GetManifestResourceStream("Microsoft.NodejsTools.WebRole.WebSocketProxy.html"))
                 using (var reader = new StreamReader(stream)) {
                     string html = reader.ReadToEnd();
-                    var wsUri = new UriBuilder(context.Request.Url) { Scheme = "wss" };
+                    var wsUri = new UriBuilder(context.Request.Url) { Scheme = "wss", Port = -1 };
                     context.Response.Write(html.Replace("{{WS_URI}}", wsUri.ToString()));
                 }
 
