@@ -34,7 +34,6 @@ namespace Microsoft.NodejsTools {
         public const string ProjectFileFilter = "Node.js Project File (*.njsproj)\n*.njsproj\nAll Files (*.*)\n*.*\n";
         public const string ScriptArguments = "ScriptArguments";
         public const string StartWebBrowser = "StartWebBrowser";
-        
 
         public const string NodeModulesFolder = "node_modules";
         public const string PackageJsonFile = "package.json";
@@ -53,8 +52,8 @@ namespace Microsoft.NodejsTools {
 
         [Export, Name(NodejsRepl), BaseDefinition(Nodejs), BaseDefinition("JavaScript")]
         internal static ContentTypeDefinition ReplContentTypeDefinition = null;
-        
-        public const string TypeScriptCompileItemType = "TypeScriptCompile";        
+
+        public const string TypeScriptCompileItemType = "TypeScriptCompile";
         public const string EnableTypeScript = "EnableTypeScript";
         public const string TypeScriptSourceMap = "TypeScriptSourceMap";
         public const string TypeScriptModuleKind = "TypeScriptModuleKind";

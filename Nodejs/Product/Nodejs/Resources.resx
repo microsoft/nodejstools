@@ -442,11 +442,11 @@
   <data name="NpmStatusExecutingQueuedErrors" xml:space="preserve">
     <value>ERRORS ENCOUNTERED - Executing: {0} ({1} command(s) queued)</value>
   </data>
-  <data name="HasTests" xml:space="preserve">
-    <value>HasTests</value>
+  <data name="TestFramework" xml:space="preserve">
+    <value>Test Framework</value>
   </data>
-  <data name="HasTestsDescription" xml:space="preserve">
-    <value>Specifies if file exports are tests.</value>
+  <data name="TestFrameworkDescription" xml:space="preserve">
+    <value>Specifies the test framework this file applies to.</value>
   </data>
   <data name="DebuggerPort" xml:space="preserve">
     <value>Specifies the port used to communicate with the debugger</value>

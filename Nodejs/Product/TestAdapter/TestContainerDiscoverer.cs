@@ -146,11 +146,32 @@ namespace Microsoft.NodejsTools.TestAdapter {
             }
             return null;            
         }
-        
+
+        internal static bool IsValidTestFramework(string testFramework) {
+            //TODO - Add support for testFrameworks
+            return !String.IsNullOrWhiteSpace(testFramework);
+        }
+
         internal bool IsTestFile(string pathToFile) {
-            if (!".js".Equals(Path.GetExtension(pathToFile), StringComparison.OrdinalIgnoreCase)) {
+
+            string testCaseFile = pathToFile;
+            string testCaseFileExtension = Path.GetExtension(pathToFile);
+
+            //
+            //Check to see if we are dealing with a TypeScript file
+            //  If we are then switch the test container to the underlying js file
+            //
+            if (".ts".Equals(testCaseFileExtension, StringComparison.OrdinalIgnoreCase)) {
+                testCaseFile = testCaseFile.Substring(0,testCaseFile.Length -3) + ".js";
+                if (!File.Exists(testCaseFile)) {
+                    //Ignore the file for now.  On the next build event the typescript compiler will generate the file
+                    //  at that point this function gets invoked again on the .ts file and we'll see the newly created .js file
+                    return false;
+                }
+            }else if(!".js".Equals(testCaseFileExtension, StringComparison.OrdinalIgnoreCase)) {
                 return false;
             }
+
             IVsProject project = GetTestProjectFromFile(pathToFile);
             if (null == project) {
                 //The file is not included in the project.  
@@ -181,17 +202,18 @@ namespace Microsoft.NodejsTools.TestAdapter {
             if (props == null) {
                 return false;
             }
+
             try {
-                var testFile = props.Item("HasTests");
-                if (testFile == null) {
+                var testFile = props.Item("TestFramework");
+                if (testFile == null || !(testFile.Value is string)) {
                     return false;
                 }
 
-                return (bool)testFile.Value;
+                return IsValidTestFramework((string)testFile.Value);
             } catch (ArgumentException) {
                 //If we can't retrieve the property then consider this not to be a Test file
             }
-            return false;           
+            return false;
             
         }
 
@@ -326,6 +348,10 @@ namespace Microsoft.NodejsTools.TestAdapter {
 
         private bool ShouldDiscover(string pathToItem) {
             if (string.IsNullOrEmpty(pathToItem)) {
+                return false;
+            }
+
+            if (pathToItem.IndexOf("\\node_modules\\",StringComparison.OrdinalIgnoreCase) >= 0) {
                 return false;
             }
 

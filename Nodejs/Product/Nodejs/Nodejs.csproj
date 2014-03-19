@@ -269,6 +269,8 @@
     </Compile>
     <Compile Include="NpmUI\PackageCatalogEntryViewModel.cs" />
     <Compile Include="Project\DependencyNodeProperties.cs" />
+    <Compile Include="Project\NodejsTypeScriptFileNode.cs" />
+    <Compile Include="Project\NodejsTypeScriptFileNodeProperties.cs" />
     <Compile Include="Project\NpmNodeProperties.cs" />
     <Compile Include="Resources.Designer.cs">
       <AutoGen>True</AutoGen>

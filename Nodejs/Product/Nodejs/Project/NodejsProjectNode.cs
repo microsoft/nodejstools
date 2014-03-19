@@ -35,6 +35,10 @@ namespace Microsoft.NodejsTools.Project {
         private static string _nodeRefCode = ReadNodeRefCode();
         internal readonly string _referenceFilename = GetReferenceFilePath();
         const string _userSwitchMarker = "// **NTVS** INSERT USER MODULE SWITCH HERE **NTVS**";
+        
+        /// <summary>
+        /// List of files to scan for require()
+        /// </summary>
         internal readonly List<NodejsFileNode> _nodeFiles = new List<NodejsFileNode>();
         private readonly JavaScriptSerializer _serializer = new JavaScriptSerializer();        
         private readonly Timer _timer;
@@ -235,6 +239,17 @@ namespace Microsoft.NodejsTools.Project {
 
             _timer.Change(250, Timeout.Infinite);
             return res;
+        }
+
+        public override CommonFileNode CreateNonCodeFileNode(ProjectElement item) {
+            string fileName = item.GetFullPathForElement();
+            if (!String.IsNullOrWhiteSpace(fileName)
+                && Path.GetExtension(fileName).Equals(".ts", StringComparison.OrdinalIgnoreCase)
+                && !fileName.EndsWith(".d.ts",StringComparison.OrdinalIgnoreCase)) {
+                return new NodejsTypeScriptFileNode(this, item);
+            }
+
+            return base.CreateNonCodeFileNode(item);
         }
 
         public override string GetProjectName() {

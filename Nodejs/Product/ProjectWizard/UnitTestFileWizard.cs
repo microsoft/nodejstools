@@ -30,8 +30,8 @@ namespace Microsoft.NodejsTools.ProjectWizard {
         public void ProjectFinishedGenerating(Project project) { }
 
         public void ProjectItemFinishedGenerating(ProjectItem projectItem) {            
-            EnvDTE.Property property = projectItem.Properties.Item("HasTests");
-            property.Value = true;
+            EnvDTE.Property property = projectItem.Properties.Item("TestFramework");
+            property.Value = "Default";
         }
 
         public void RunFinished() { }

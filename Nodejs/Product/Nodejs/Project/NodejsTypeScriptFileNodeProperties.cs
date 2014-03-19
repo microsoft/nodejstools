@@ -31,8 +31,8 @@ using IOleServiceProvider = Microsoft.VisualStudio.OLE.Interop.IServiceProvider;
 namespace Microsoft.NodejsTools.Project {
 
     [ComVisible(true)]
-    public class NodejsIncludedFileNodeProperties : IncludedFileNodeProperties {
-        internal NodejsIncludedFileNodeProperties(HierarchyNode node)
+    public class NodejsTypeScriptFileNodeProperties : IncludedFileNodeProperties {
+        internal NodejsTypeScriptFileNodeProperties(HierarchyNode node)
             : base(node) {
         }
 
@@ -54,8 +54,8 @@ namespace Microsoft.NodejsTools.Project {
     }
 
     [ComVisible(true)]
-    public class NodejsLinkFileNodeProperties : LinkFileNodeProperties {
-        internal NodejsLinkFileNodeProperties(HierarchyNode node)
+    public class NodejsTypeScriptLinkFileNodeProperties : LinkFileNodeProperties {
+        internal NodejsTypeScriptLinkFileNodeProperties(HierarchyNode node)
             : base(node) {
         }
 

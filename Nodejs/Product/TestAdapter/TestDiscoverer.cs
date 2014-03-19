@@ -43,89 +43,99 @@ namespace Microsoft.NodejsTools.TestAdapter {
             ValidateArg.NotNull(discoverySink, "discoverySink");
             ValidateArg.NotNull(logger, "logger");
 
-            var buildEngine = new MSBuild.ProjectCollection();
-            try {
-                // Load all the test containers passed in (.pyproj msbuild files)
-                foreach (string source in sources) {
-                    buildEngine.LoadProject(source);
-                }
-
-                foreach (var proj in buildEngine.LoadedProjects) {
-
-                    var projectHome = Path.GetFullPath(Path.Combine(proj.DirectoryPath, "."));
-                    var projSource = ((MSBuild.Project)proj).FullPath;
-
-                    var nodeExePath = proj.GetPropertyValue(NodejsConstants.NodeExePath);
-                    if (string.IsNullOrEmpty(nodeExePath)) {
-                        nodeExePath = NodejsTools.Nodejs.NodeExePath;
+            using (var buildEngine = new MSBuild.ProjectCollection()) {
+                try {
+                    // Load all the test containers passed in (.pyproj msbuild files)
+                    foreach (string source in sources) {
+                        buildEngine.LoadProject(source);
                     }
 
-                    if (!File.Exists(nodeExePath)) {
-                        logger.SendMessage(TestMessageLevel.Error, String.Format("Node.exe was not found.  Please install Node.js before running tests."));
-                        continue;
-                    }
+                    foreach (var proj in buildEngine.LoadedProjects) {
 
-                    // Provide all files to the test analyzer
-                    foreach (var item in ((MSBuild.Project)proj).GetItems("Compile")) {
-                        string fileAbsolutePath = CommonUtils.GetAbsoluteFilePath(projectHome, item.EvaluatedInclude);
+                        var projectHome = Path.GetFullPath(Path.Combine(proj.DirectoryPath, "."));
+                        var projSource = ((MSBuild.Project)proj).FullPath;
 
-                        string value = item.GetMetadataValue("HasTests");
-                        if (String.IsNullOrEmpty(value) || !value.Equals("true", StringComparison.OrdinalIgnoreCase)) {
+                        var nodeExePath = proj.GetPropertyValue(NodejsConstants.NodeExePath);
+                        if (string.IsNullOrEmpty(nodeExePath)) {
+                            nodeExePath = NodejsTools.Nodejs.NodeExePath;
+                        }
+
+                        if (!File.Exists(nodeExePath)) {
+                            logger.SendMessage(TestMessageLevel.Error, String.Format("Node.exe was not found.  Please install Node.js before running tests."));
                             continue;
                         }
 
-                        logger.SendMessage(TestMessageLevel.Informational, String.Format("Processing {0}", fileAbsolutePath));
+                        // Provide all files to the test analyzer
+                        foreach (var item in proj.Items.Where(item => item.ItemType == "Compile" || item.ItemType == "TypeScriptCompile")) {
 
-                        string testCases = String.Empty;
-                        string tempFile = Path.GetTempFileName();
+                            //Check to see if this is a TestCase
+                            string value = item.GetMetadataValue("TestFramework");
+                            if (!TestContainerDiscoverer.IsValidTestFramework(value)) {
+                                continue;
+                            }
 
-                        try {
-                            EvaluateJavaScript(nodeExePath, String.Format("var fs = require('fs'); var stream = fs.createWriteStream('{0}'); var testCase = require('{1}'); for(var x in testCase) {{ stream.write(x + '\\r\\n'); }} stream.end();", tempFile.Replace("\\", "\\\\"), fileAbsolutePath.Replace("\\", "\\\\")), logger);
-                            for (int i = 0; i < 4; i++) {
+                            string fileAbsolutePath = CommonUtils.GetAbsoluteFilePath(projectHome, item.EvaluatedInclude);
+
+                            if (Path.GetExtension(fileAbsolutePath).Equals(".ts", StringComparison.OrdinalIgnoreCase)) {
+                                //We're dealing with TypeScript
+                                //Switch to the underlying js file
+                                fileAbsolutePath = fileAbsolutePath.Substring(0, fileAbsolutePath.Length - 3) + ".js";
+                            } else if (!Path.GetExtension(fileAbsolutePath).Equals(".js", StringComparison.OrdinalIgnoreCase)) {
+                                continue;
+                            }
+
+                            logger.SendMessage(TestMessageLevel.Informational, String.Format("Processing {0}", fileAbsolutePath));
+
+                            string testCases = String.Empty;
+                            string tempFile = Path.GetTempFileName();
+
+                            try {
+                                EvaluateJavaScript(nodeExePath, String.Format("var fs = require('fs'); var stream = fs.createWriteStream('{0}'); var testCase = require('{1}'); for(var x in testCase) {{ stream.write(x + '\\r\\n'); }} stream.end();", tempFile.Replace("\\", "\\\\"), fileAbsolutePath.Replace("\\", "\\\\")), logger);
+                                for (int i = 0; i < 4; i++) {
+                                    try {
+                                        testCases = File.ReadAllText(tempFile);
+                                        break;
+                                    } catch (IOException) {
+                                        //We took an error processing the file.  Wait a few and try again
+                                        Thread.Sleep(500);
+                                    }
+                                }
+                            } finally {
                                 try {
-                                    testCases = File.ReadAllText(tempFile);
-                                    break;
-                                } catch (IOException) {
-                                    //We took an error processing the file.  Wait a few and try again
-                                    Thread.Sleep(500);
+                                    File.Delete(tempFile);
+                                } catch (Exception) { //
+                                    //Unable to delete for some reason
+                                    //  We leave the file behind in this case, its in TEMP so eventually OS will clean up
                                 }
                             }
-                        } finally {
-                            try {
-                                File.Delete(tempFile);
-                            } catch (Exception) { //
-                                //Unable to delete for some reason
-                                //  We leave the file behind in this case, its in TEMP so eventually OS will clean up                                
+
+
+                            if (String.IsNullOrEmpty(testCases)) {
+                                logger.SendMessage(TestMessageLevel.Warning, String.Format("Discovered 0 testcases in: {0}", fileAbsolutePath));
+                            } else {
+                                foreach (var testFunction in testCases.Split(new[] { "\r\n", "\r", "\n" }, StringSplitOptions.RemoveEmptyEntries)) {
+                                    //TestCase Qualified name format
+                                    //Path::ModuleName::TestName
+                                    string testName = MakeFullyQualifiedTestName(fileAbsolutePath, Path.GetFileNameWithoutExtension(fileAbsolutePath), testFunction);
+
+                                    logger.SendMessage(TestMessageLevel.Informational, String.Format("Creating TestCase:{0}", testName));
+                                    var testCase = new TestCase(testName, TestExecutor.ExecutorUri, projSource) {
+                                        CodeFilePath = fileAbsolutePath,
+                                        LineNumber = 0,
+                                        DisplayName = testFunction
+                                    };
+
+                                    discoverySink.SendTestCase(testCase);
+                                }
                             }
+                            logger.SendMessage(TestMessageLevel.Informational, String.Format("Processing Finished {0}", fileAbsolutePath));
                         }
-
-
-                        if (String.IsNullOrEmpty(testCases)) {
-                            logger.SendMessage(TestMessageLevel.Warning, String.Format("Discovered 0 testcases in: {0}", fileAbsolutePath));
-                        } else {
-                            foreach (var testFunction in testCases.Split(new[] { "\r\n", "\r", "\n" }, StringSplitOptions.RemoveEmptyEntries)) {
-                                //TestCase Qualified name format
-                                //Path::ModuleName::TestName
-                                string testName = MakeFullyQualifiedTestName(fileAbsolutePath, Path.GetFileNameWithoutExtension(fileAbsolutePath), testFunction);
-
-                                logger.SendMessage(TestMessageLevel.Informational, String.Format("Creating TestCase:{0}", testName));
-                                var testCase = new TestCase(testName, TestExecutor.ExecutorUri, projSource) {
-                                    CodeFilePath = fileAbsolutePath,
-                                    LineNumber = 0,
-                                    DisplayName = testFunction
-                                };
-
-                                discoverySink.SendTestCase(testCase);
-                            }
-                        }
-                        logger.SendMessage(TestMessageLevel.Informational, String.Format("Processing Finished {0}", fileAbsolutePath));
                     }
+                } finally {
+                    // Disposing buildEngine does not clear the document cache in
+                    // VS 2013, so manually unload all projects before disposing.
+                    buildEngine.UnloadAllProjects();
                 }
-            } finally {
-                // Disposing buildEngine does not clear the document cache in
-                // VS 2013, so manually unload all projects before disposing.
-                buildEngine.UnloadAllProjects();
-                buildEngine.Dispose();
             }
         }
 
