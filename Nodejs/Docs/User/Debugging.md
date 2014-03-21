@@ -95,6 +95,32 @@ It is worth noting that hovering over a valid identifier or selected expression 
 
 ![Hover Tips](Images/DebuggingHover.png)
 
+Edit and Continue
+-----------------
+
+Edit and Continue feature allows you to make changes to your source code and continue program execution without having to stop and restart the debugging session. For that in break mode, modify your source code and save changes. When you resume your program it will continue execution from the beginning of most deepest modified stack frame.
+
+For example, in the following application:
+
+```javascript
+var hello = 'Hello';
+
+function appendExclamation(text){
+    return text + '!';
+}
+
+function appendWorld(text){
+    var world = appendExclamation(' world');
+    return text + world;
+}
+
+console.log(appendWorld(hello));
+```
+
+Put a breakpoint on the `return text + '!'` line, start debugging (typically F5) and wait when program execution will stopped on the target statement. Then modify the statement `return text + world`, save changes and perform a Step Over (typically F10), so after that stepping will be continued from the beginning of `appendWorld` function.
+
+To enable/disable Edit and Continue function go to **Tools** menu and click on **Options**. In the **Options** dialog box, expand the **Node.js Tools** node and select or clear the **Enable Edit and Continue** check box.
+
 Debugging Options
 -----------------
 
