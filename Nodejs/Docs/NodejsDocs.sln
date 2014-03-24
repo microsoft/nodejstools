@@ -1,7 +1,7 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio 2013
-VisualStudioVersion = 12.0.30110.0
+VisualStudioVersion = 12.0.30307.0
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{888888A0-9F3D-457C-B088-3A5042F75D52}") = "NodejsDocs", "NodejsDocs.pyproj", "{908F7EE4-4DCE-4A13-9E9C-219595AB56E8}"
 EndProject
@@ -9,7 +9,7 @@ Global
 	GlobalSection(TeamFoundationVersionControl) = preSolution
 		SccNumberOfProjects = 2
 		SccEnterpriseProvider = {4CA58AB2-18FA-4F8D-95D4-32DDF27D184C}
-		SccTeamFoundationServer = http://tcvstf:8080/tfs/tc
+		SccTeamFoundationServer = http://vstfdevdiv:8080/devdiv2
 		SccLocalPath0 = .
 		SccProjectUniqueName1 = NodejsDocs.pyproj
 		SccLocalPath1 = .

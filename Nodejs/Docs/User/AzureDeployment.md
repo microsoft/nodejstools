@@ -18,13 +18,21 @@ Right-click on the project node in Solution Explorer, and select **Publish...**.
 
 ![Publish](Images/AzureWebSitePublishCommand.png)
 
-This will bring up the publish profile which will allow you to import your Windows Azure publish settings file for the web site.
+This will bring up the publish profile which will allow you to specify the web site to which the project will be published.
 
-![Profile](Images/AzureWebSitePublishProfile.png)
+![Selecting a publish target](Images/AzureWebSitePublishTarget.png)
 
-You can also sign-in to your Windows Azure account and create a new Web Site directly from the publish dialog.
+The easiest way to do so is to select the web site from the picker by choosing the first option on the dialog above, and logging in using your Windows Azure credentials. This will open a new dialog that will provide a list of all web sites associated with your Windows Azure subscription, as well as the ability to create a new site.
 
-![Create Site](Images/AzureWebSiteCreate.png)
+![Selecting a web site](Images/AzureWebSitePublishSelectSite.png)
+
+Alternatively, if you have a downloaded publish profile for your web site, you can use "Import" to use the corresponding publish settings without logging in.
+
+If you plan on debugging your published project directly on Windows Azure servers by using node.js remote debugging, you need to publish the site in "Debug" configuration. This setting is separate from the current active solution configuration, and always defaults to "Release". To change it, open the "Settings" tab, and use the "Configuration" combo box:
+
+![Changing the publish configuration](Images/AzureWebSitePublishConfig.png)
+
+Note that publishing in "Debug" configuration will enable the debugging server on your web site, as well as a number of advanced logging options - you can see the detailed changes in Web.Debug.config file that is a part of your project. This configuration negatively affects the performance of your site and increases its attack surface, and so it should only be used for testing, and never for production websites.
 
 Once you have the publish settings you're ready to deploy. You can click Preview to see the files that will be uploaded.
 

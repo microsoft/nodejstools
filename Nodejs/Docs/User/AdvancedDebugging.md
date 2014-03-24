@@ -1,7 +1,7 @@
-Advanced Debugging
+﻿Advanced Debugging
 ==================
 
-Node.js Tools for Visual Studio (NTVS) include advanced debugging features for debugging Node.js applications, like advanced breakpoints, and remote debugging of Node.js processes running on any OS (Windows, Linux, MacOS).
+Node.js Tools for Visual Studio (NTVS) include advanced debugging features for debugging Node.js applications, like advanced breakpoints, and remote debugging of Node.js processes running on any OS (Windows, Linux, MacOS), or hosted on Windows Azure.
 
 ![Overview](Images/DebuggingAdvancedOverview.png)
 
@@ -149,3 +149,55 @@ Note: It is possible to run Node.exe with a non-default local debugger port. Thi
 ```
 node.exe --debug:5860 server.js
 ```
+
+
+Remote Debugging on Windows Azure
+---------------------------------
+
+NTVS has special support for remote debugging of code running on Windows Azure Web Sites. Unlike simple remote debugging, the target machine is not directly accessible over TCP in this scenario, but NTVS comes with a WebSocket proxy for the debugging protocol that exposes the debugger protocol via HTTP. When you create a new Windows Azure project, the proxy is fully configured for you in Web.Debug.config, and will be enabled on the web site if you publish your project in the "Debug" configuration by following [wiki:"these steps" AzureDeployment#publish-to-azure-web-site-using-web-deploy].
+
+Since the Azure remote debugging uses web sockets, it must be enabled for your web site in the management portal. This setting can be found on the web site management page, on the "Configure" tab - don't forget to click "Save" after changing it:
+
+![Enabling web sockets in Azure portal](Images/DebuggingAdvancedEnableWebSockets.png)
+
+Once your project is properly deployed and web sockets are enabled, you can attach to the web site from Server Explorer. If you do not have the Server Explorer window open, you can open it via <span class="menu">View</span> → <span class="menu">Server Explorer</span>. Then, locate your web site under Windows Azure → Web Sites, and right-click on it. If it is running, and your project has been deployed to it using the Debug configuration, you should see the "Attach Debugger (node.js)" command in the context menu:
+
+![Attaching to Azure Web Site](Images/DebuggingAdvancedAzureWebSiteAttach.png)
+
+Note that on Visual Studio Professional and above, you will see two "Attach Debugger" commands - the default one with no qualifiers is used to debug .NET applications running under IIS, and is only useful if you co-host .NET code alongside your node.js app. To attach to your node.js app, you need to use the "Attach Debugger (node.js)" command. If you do not see that command in the context menu for your site (i.e. you only see "Attach Debugger", or you see neither), then one of the following applies:
+
+* You do not have Visual Studio 2013:
+ * Server Explorer functionality is not available on your version of Visual Studio. You will have to use attach via Attach to Process dialog as described [below](#attaching-without-server-explorer).
+* You do not have Visual Studio 2013 Update 2 RC or later installed:
+ * Download and install [Update 2](http://www.microsoft.com/en-us/download/details.aspx?id=42023). 
+* The project is not opened in Solution Explorer:
+ * Open the project that you're trying to debug via File → Open → Project/Solution.
+* The web site is not running (i.e. stopped - this can be seen from its icon):
+ * Start the web site by right-clicking on it in Server Explorer and selecting "Start Web Site" in the context menu.
+* The project was not deployed in the "Debug" configuration:
+ * Re-deploy the project in "Debug" configuration as described [wiki:"here" AzureDeployment#publish-to-azure-web-site-using-web-deploy].
+* Web.Debug.config was deleted from the project, or modified to disable the debug proxy.
+ * Restore the original Web.debug.config. The easiest way to do so is to create a new Blank Windows Azure Node.js Application project, and then copy Web.debug.config from it to your existing project.
+
+If the attach has completed successfully, Visual Studio should switch to debug window profile, and the title bar should say "(Running)" after the opened project name. You should also be seeing the debugger toolbar, which indicates the process being debugged - for a Windows Azure web site, it should include a corresponding wss:// URI:
+
+![Debugging Azure Web Site](Images/DebuggingAdvancedAttachedToWebSite.png)
+
+Once attached, the debugging experience is the same as for regular remote debugging. 
+
+
+## Attaching without Server Explorer
+
+It is also possible to attach to a Windows Azure web site directly from the Attach to Process dialog, similar to regular remote debugging. To do so, you will first need to find out the debugger endpoint URL for your web site - it is defined in Web.Debug.config in your project, and is different for every project (it is automatically generated when the project is created). Look for an HTTP handler named "NtvsDebugProxy", and note its path:
+
+![Determining the debugger endpoint in an Azure Web project](Images/DebuggingAdvancedAzureProxyPath.png)
+
+That path is relative to your web site root. For example, given a web site at **http://ntvsdemo.azurewebsites.net**, and the path as specified on the screenshot above, the proxy is at http://ntvsdemo.azurewebsites.net/**ntvs-debug-proxy/8452c2af-4460-4d28-a35d-f2f516d98d62**. You can open that URL in the browser to verify that the debugging proxy is up and running, which will also provide further instructions on attaching:
+
+![Azure remote debugging proxy information page](Images/DebuggingAdvancedAzureProxyInfoPage.png)
+
+Note the URL provided at the bottom. It is, in fact, identical to the URL that you used to open the page, except that scheme is **wss://** rather than **http://**. 
+
+Now, to attach to the debugger using that URL, open Debug → Attach to Process, select "Node.js remote debugging" in Transport dropdown, enter the **wss://** URL into the Qualifier textbox, and press Enter. If NTVS can successfully connect to the web site, it will show a single node.exe process in the process list below the qualifier. Press Enter or click "Attach" to attach to that process.
+
+![Using Attach to Process dialog to attach to an Azure web site](Images/DebuggingAdvancedAzureManualAttach.png)
