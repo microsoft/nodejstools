@@ -341,20 +341,13 @@ namespace Microsoft.VisualStudioTools.Project {
         }
         #endregion
 
-        #region methods
-
-        internal OleServiceProvider.ServiceCreatorCallback ServiceCreator {
-            get { return new OleServiceProvider.ServiceCreatorCallback(this.CreateServices); }
-        }
-
-        protected virtual object CreateServices(Type serviceType) {
-            object service = null;
-            if (typeof(EnvDTE.ProjectItem) == serviceType) {
-                service = GetAutomationObject();
+        public override int QueryService(ref Guid guidService, out object result) {
+            if (guidService == typeof(VSLangProj.VSProject).GUID) {
+                result = ProjectMgr.VSProject;
+                return VSConstants.S_OK;
             }
-            return service;
-        }
 
-        #endregion
+            return base.QueryService(ref guidService, out result);
+        }
     }
 }

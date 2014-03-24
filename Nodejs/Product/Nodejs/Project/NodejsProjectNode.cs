@@ -33,7 +33,7 @@ using MSBuild = Microsoft.Build.Evaluation;
 namespace Microsoft.NodejsTools.Project {
     class NodejsProjectNode : CommonProjectNode, VsWebSite.VSWebSite, Microsoft.NodejsTools.ProjectWizard.INodePackageModulesCommands {
         private static string _nodeRefCode = ReadNodeRefCode();
-        internal readonly string _referenceFilename = GetReferenceFilePath();
+        internal readonly string _referenceFilename = GetReferenceFilePath("NodejsProjectReference");
         const string _userSwitchMarker = "// **NTVS** INSERT USER MODULE SWITCH HERE **NTVS**";
         
         /// <summary>
@@ -46,6 +46,7 @@ namespace Microsoft.NodejsTools.Project {
         private readonly HashSet<ReferenceGroup> _pendingRefGroupGenerations = new HashSet<ReferenceGroup>();
         internal readonly RequireCompletionCache _requireCompletionCache = new RequireCompletionCache();
         internal int _currentFileCounter;
+        private static Random _random = new Random();
 
         public NodejsProjectNode(NodejsProjectPackage package)
             : base(package, Utilities.GetImageList(typeof(NodejsProjectNode).Assembly.GetManifestResourceStream("Microsoft.NodejsTools.Resources.Icons.NodejsImageList.bmp"))) {
@@ -211,14 +212,12 @@ namespace Microsoft.NodejsTools.Project {
             }
         }
 
-        internal static string GetReferenceFilePath() {
+        internal static string GetReferenceFilePath(string baseName) {
             string res;
             do {
-                // .js files instead of just using Path.GetTempPath because the JS
-                // language service analyzes .js files.                
                 res = Path.Combine(
                     Path.GetTempPath(),
-                    Path.GetFileNameWithoutExtension(Path.GetRandomFileName()) + ".js"
+                    baseName + _random.Next() + ".js"
                 );
             } while (File.Exists(res));
             return res;
@@ -242,7 +241,7 @@ namespace Microsoft.NodejsTools.Project {
         }
 
         public override CommonFileNode CreateNonCodeFileNode(ProjectElement item) {
-            string fileName = item.GetFullPathForElement();
+            string fileName = item.Url;
             if (!String.IsNullOrWhiteSpace(fileName)
                 && Path.GetExtension(fileName).Equals(".ts", StringComparison.OrdinalIgnoreCase)
                 && !fileName.EndsWith(".d.ts",StringComparison.OrdinalIgnoreCase)) {
@@ -267,6 +266,26 @@ namespace Microsoft.NodejsTools.Project {
 
         public override string GetFormatList() {
             return NodejsConstants.ProjectFileFilter;
+        }
+
+        protected override Guid[] GetConfigurationDependentPropertyPages() {
+            var res = base.GetConfigurationDependentPropertyPages();
+
+            var enableTs = GetProjectProperty(NodejsConstants.EnableTypeScript, false);
+            bool fEnableTs;
+            if (enableTs != null && Boolean.TryParse(enableTs, out fEnableTs) && fEnableTs) {
+                var typeScriptPages = GetProjectProperty(NodejsConstants.TypeScriptCfgProperty);
+                if (typeScriptPages != null) {
+                    foreach (var strGuid in typeScriptPages.Split(';')) {
+                        Guid guid;
+                        if (Guid.TryParse(strGuid, out guid)) {
+                            res = res.Append(guid);
+                        }
+                    }
+                }
+            }
+
+            return res;
         }
 
         public override Type GetGeneralPropertyPageType() {
@@ -520,10 +539,7 @@ function starts_with(a, b) {
 
                     var baseDir = curParent.FullPathToChildren;
                     var trimmedBaseDir = CommonUtils.TrimEndSeparator(baseDir);
-                    string name = CommonUtils.CreateFriendlyFilePath(
-                            baseDir,
-                            nodeFile.Url
-                        ).Replace("\\", "/");
+                    string name = GetRelativeModuleName(nodeFile, baseDir);
 
                     // For each parent above the file, the file can be accessed with a relative
                     // path, e.g ./my/parent and with or without a .js extension
@@ -606,6 +622,16 @@ function starts_with(a, b) {
             }
 
             switchCode.AppendLine("intellisense.logMessage('Intellisense failed to resolve module: ' + module + ' in ' + __filename);");
+        }
+
+        private static string GetRelativeModuleName(NodejsFileNode nodeFile, string baseDir) {
+            string res;
+            if (nodeFile.Url.StartsWith(baseDir)) {
+                res = nodeFile.Url.Substring(baseDir.Length);
+            } else {
+                res = CommonUtils.CreateFriendlyFilePath(baseDir, nodeFile.Url);
+            }
+            return res.Replace("\\", "/");
         }
 
         /// <summary>

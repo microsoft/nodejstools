@@ -83,7 +83,6 @@ namespace Microsoft.VisualStudioTools.Project {
 
             _package = package;
             CanFileNodesHaveChilds = true;
-            OleServiceProvider.AddService(typeof(VSLangProj.VSProject), new OleServiceProvider.ServiceCreatorCallback(CreateServices), false);
             SupportsProjectDesigner = true;
             _imageList = imageList;
 
@@ -97,6 +96,15 @@ namespace Microsoft.VisualStudioTools.Project {
 
             _uiSync = new UIThreadSynchronizer();
             package.OnIdle += OnIdle;
+        }
+
+        public override int QueryService(ref Guid guidService, out object result) {
+            if (guidService == typeof(VSLangProj.VSProject).GUID) {
+                result = VSProject;
+                return VSConstants.S_OK;
+            }
+
+            return base.QueryService(ref guidService, out result);
         }
 
         #region abstract methods
@@ -975,7 +983,7 @@ namespace Microsoft.VisualStudioTools.Project {
                         }
 #if DEBUG
                     } catch (Exception ex) {
-                        Debug.Fail("Unexpected exception while processing change: {0}", ex.ToString());
+                        Debug.Fail("Unexpected exception while processing change", ex.ToString());
                         throw;
                     }
 #endif
@@ -1423,8 +1431,9 @@ namespace Microsoft.VisualStudioTools.Project {
         public override FileNode CreateFileNode(ProjectElement item) {
             Utilities.ArgumentNotNull("item", item);
 
+            string url = item.Url;
             CommonFileNode newNode;
-            if (IsCodeFile(item.GetFullPathForElement())) {
+            if (IsCodeFile(url)) {
                 newNode = CreateCodeFileNode(item);
             } else {
                 newNode = CreateNonCodeFileNode(item);
@@ -1432,18 +1441,13 @@ namespace Microsoft.VisualStudioTools.Project {
 
             string link = item.GetMetadata(ProjectFileConstants.Link);
             if (!String.IsNullOrWhiteSpace(link) ||
-                !CommonUtils.IsSubpathOf(ProjectHome, item.GetFullPathForElement())) {
+                !CommonUtils.IsSubpathOf(ProjectHome, url)) {
                 newNode.SetIsLinkFile(true);
             }
 
-            newNode.OleServiceProvider.AddService(typeof(EnvDTE.Project),
-                new OleServiceProvider.ServiceCreatorCallback(CreateServices), false);
-            newNode.OleServiceProvider.AddService(typeof(EnvDTE.ProjectItem), newNode.ServiceCreator, false);
-
-            newNode.OleServiceProvider.AddService(typeof(VSLangProj.VSProject),
-                new OleServiceProvider.ServiceCreatorCallback(CreateServices), false);
             return newNode;
         }
+
 
         /// <summary>
         /// Create a file node based on absolute file name.
@@ -1481,19 +1485,6 @@ namespace Microsoft.VisualStudioTools.Project {
             }
 
             return VSConstants.S_OK;
-        }
-
-        public override DependentFileNode CreateDependentFileNode(MsBuildProjectElement item) {
-            DependentFileNode node = base.CreateDependentFileNode(item);
-            if (null != node) {
-                string include = item.GetMetadata(ProjectFileConstants.Include);
-                if (IsCodeFile(include)) {
-                    node.OleServiceProvider.AddService(
-                        typeof(SVSMDCodeDomProvider), new OleServiceProvider.ServiceCreatorCallback(CreateServices), false);
-                }
-            }
-
-            return node;
         }
 
         /// <summary>
@@ -1697,20 +1688,6 @@ namespace Microsoft.VisualStudioTools.Project {
             if (searchPath.Count != newSearchPath.Count) {
                 SaveSearchPath(newSearchPath);
             }
-        }
-
-        /// <summary>
-        /// Creates the services exposed by this project.
-        /// </summary>
-        protected virtual object CreateServices(Type serviceType) {
-            object service = null;
-            if (typeof(VSLangProj.VSProject) == serviceType) {
-                service = VSProject;
-            } else if (typeof(EnvDTE.Project) == serviceType) {
-                service = GetAutomationObject();
-            }
-
-            return service;
         }
 
         /// <summary>

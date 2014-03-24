@@ -178,31 +178,39 @@ namespace Microsoft.NodejsTools.Npm.SPI {
 
         public override async Task<bool> ExecuteAsync() {
             var filename = CachePath;
-            if (_forceDownload || !File.Exists(filename)) {
-                Uri registry = null;
-                using (var proc = ProcessOutput.RunHiddenAndCapture(GetPathToNpm(), "config", "get", "registry")) {
-                    if (await proc == 0) {
-                        registry = proc.StandardOutputLines
-                            .Select(s => {
-                                Uri u;
-                                return Uri.TryCreate(s, UriKind.Absolute, out u) ? u : null;
-                            })
-                            .FirstOrDefault(u => u != null);
-                    }
-                }
-
-                await UpdateCache(registry, filename);
-            }
-
             List<IPackage> newResults = null;
 
-            try {
-                if (File.Exists(filename)) {
-                    using (var reader = new StreamReader(filename)) {
-                        newResults = await Task.Run(() => ParseResultsFromReader(reader));
+            for (int attempt = 0; attempt < 2; attempt++) {
+                if (_forceDownload || !File.Exists(filename)) {
+                    Uri registry = null;
+                    using (var proc = ProcessOutput.RunHiddenAndCapture(GetPathToNpm(), "config", "get", "registry")) {
+                        if (await proc == 0) {
+                            registry = proc.StandardOutputLines
+                                .Select(s => {
+                                    Uri u;
+                                    return Uri.TryCreate(s, UriKind.Absolute, out u) ? u : null;
+                                })
+                                .FirstOrDefault(u => u != null);
+                        }
                     }
+
+                    await UpdateCache(registry, filename);
                 }
-            } catch (Exception) { }
+
+
+                try {
+                    if (File.Exists(filename)) {
+                        using (var reader = new StreamReader(filename)) {
+                            newResults = await Task.Run(() => ParseResultsFromReader(reader));
+                        }
+                    }
+                    break;
+                } catch (Exception) {
+                    // assume the results are corrupted and try again...
+                    File.Delete(filename);
+                    continue;
+                }
+            }
 
             if (newResults == null || !newResults.Any()) {
                 throw new NpmCatalogEmptyException(Resources.ErrNpmCatalogEmpty);

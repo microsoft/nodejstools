@@ -466,4 +466,7 @@
   <data name="PackageCatalogRefreshFailed" xml:space="preserve">
     <value>Refresh failed - see output below for details</value>
   </data>
+  <data name="ReplInitializationMessage" xml:space="preserve">
+    <value>Node.js interactive window. Type .help for a list of commands.</value>
+  </data>
 </root>

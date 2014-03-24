@@ -20,7 +20,7 @@ using Microsoft.VisualStudioTools.Project;
 
 namespace Microsoft.NodejsTools.Intellisense {
     class ReferenceGroup {
-        public readonly string Filename = NodejsProjectNode.GetReferenceFilePath();
+        public readonly string Filename = NodejsProjectNode.GetReferenceFilePath("NodejsReferenceGroup");
         public readonly HashSet<NodejsFileNode> Included = new HashSet<NodejsFileNode>();
 
         public void GenerateReferenceFile() {

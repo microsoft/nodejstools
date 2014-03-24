@@ -471,7 +471,12 @@ namespace Microsoft.NodejsTools.NpmUI {
             
         }
 
-
+        /// <summary>
+        /// Sets the selected package when it changes via the UI.  When we change the
+        /// filtered list and initialize the first selected package we don't go through
+        /// here as it will alter the search text which we just used to filter and
+        /// we don't want to set it to the now selected package.
+        /// </summary>
         public PackageCatalogEntryViewModel SelectedPackage {
             get { return _selectedPackage; }
             set {

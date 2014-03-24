@@ -1042,6 +1042,15 @@ namespace Microsoft.NodejsTools {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Node.js interactive window. Type .help for a list of commands..
+        /// </summary>
+        internal static string ReplInitializationMessage {
+            get {
+                return ResourceManager.GetString("ReplInitializationMessage", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to None.
         /// </summary>
         internal static string RequestedVersionRangeNone {

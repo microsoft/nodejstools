@@ -306,6 +306,10 @@
       <Link>SharedProject\HierarchyNode.cs</Link>
       <Visible>true</Visible>
     </Compile>
+    <Compile Include="$(_ProjectSystemFilesLocation)\HierarchyIdMap.cs">
+      <Link>SharedProject\HierarchyIdMap.cs</Link>
+      <Visible>true</Visible>
+    </Compile>
     <Compile Include="$(_ProjectSystemFilesLocation)\IDEBuildLogger.cs">
       <Link>SharedProject\IDEBuildLogger.cs</Link>
       <Visible>true</Visible>

@@ -53,6 +53,9 @@ namespace Microsoft.NodejsTools.Repl {
             _window.SetOptionValue(ReplOptions.DisplayPromptInMargin, false);
             _window.SetOptionValue(ReplOptions.SupportAnsiColors, true);
             _window.SetOptionValue(ReplOptions.UseSmartUpDown, true);
+
+            _window.WriteLine(Resources.ReplInitializationMessage);
+
             return ExecutionResult.Succeeded;
         }
 

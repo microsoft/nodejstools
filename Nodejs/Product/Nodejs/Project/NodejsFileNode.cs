@@ -36,8 +36,9 @@ namespace Microsoft.NodejsTools.Project {
 
         public NodejsFileNode(NodejsProjectNode root, ProjectElement e)
             : base(root, e) {
-            _tempFilePath = NodejsProjectNode.GetReferenceFilePath();
-            _asyncFilePath = NodejsProjectNode.GetReferenceFilePath();
+            string referenceBaseName = Path.GetFileNameWithoutExtension(Caption);
+            _tempFilePath = NodejsProjectNode.GetReferenceFilePath(referenceBaseName);
+            _asyncFilePath = NodejsProjectNode.GetReferenceFilePath("async_" + referenceBaseName);
             _currentText = "";
             _refGroup = root._refGroupDispenser.AddFile(this);
             _fileId = root._currentFileCounter++;
@@ -201,10 +202,16 @@ namespace Microsoft.NodejsTools.Project {
 
         internal override void RenameInStorage(string oldName, string newName) {
             CloseWatcher();
-
-            base.RenameInStorage(oldName, newName);
-
-            CreateWatcher(newName);
+            bool renamed = false;
+            try {
+                base.RenameInStorage(oldName, newName);
+                renamed = true;
+                CreateWatcher(newName);
+            } finally {
+                if (!renamed) {
+                    CreateWatcher(oldName);
+                }
+            }
         }
 
         public override int SetEditLabel(string label) {
