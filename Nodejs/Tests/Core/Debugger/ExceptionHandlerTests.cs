@@ -19,7 +19,7 @@ using Microsoft.VisualStudio.TestTools.UnitTesting;
 namespace NodejsTests.Debugger {
     [TestClass]
     public class ExceptionHandlerTests {
-        [TestMethod, Priority(0)]
+        [TestMethod, Priority(0), TestCategory("Debugging")]
         public void SetNewDefaultExceptionHitTreatment() {
             // Arrange
             var exceptionHandler = new ExceptionHandler();
@@ -31,7 +31,7 @@ namespace NodejsTests.Debugger {
             Assert.IsTrue(updated);
         }
 
-        [TestMethod, Priority(0)]
+        [TestMethod, Priority(0), TestCategory("Debugging")]
         public void SetSameDefaultExceptionHitTreatment() {
             // Arrange
             var exceptionHandler = new ExceptionHandler();
@@ -43,7 +43,7 @@ namespace NodejsTests.Debugger {
             Assert.IsFalse(updated);
         }
 
-        [TestMethod, Priority(0)]
+        [TestMethod, Priority(0), TestCategory("Debugging")]
         public void GetExceptionHitTreatmentForKnownError() {
             // Arrange
             var exceptionHandler = new ExceptionHandler();
@@ -55,7 +55,7 @@ namespace NodejsTests.Debugger {
             Assert.AreEqual(ExceptionHitTreatment.BreakNever, result);
         }
 
-        [TestMethod, Priority(0)]
+        [TestMethod, Priority(0), TestCategory("Debugging")]
         public void GetExceptionHitTreatmentForUnknownError() {
             // Arrange
             var exceptionHandler = new ExceptionHandler();
@@ -67,7 +67,7 @@ namespace NodejsTests.Debugger {
             Assert.AreEqual(ExceptionHitTreatment.BreakAlways, result);
         }
 
-        [TestMethod, Priority(0)]
+        [TestMethod, Priority(0), TestCategory("Debugging")]
         public void GetExceptionHitTreatmentForUnknownErrorAfterChangingDefaults() {
             // Arrange
             var exceptionHandler = new ExceptionHandler();
@@ -81,7 +81,7 @@ namespace NodejsTests.Debugger {
             Assert.AreEqual(newDefault, result);
         }
 
-        [TestMethod, Priority(0)]
+        [TestMethod, Priority(0), TestCategory("Debugging")]
         public void SetSameExceptionTreatments() {
             // Arrange
             var exceptionHandler = new ExceptionHandler();
@@ -102,7 +102,7 @@ namespace NodejsTests.Debugger {
             Assert.AreEqual(newValue, changed);
         }
 
-        [TestMethod, Priority(0)]
+        [TestMethod, Priority(0), TestCategory("Debugging")]
         public void SetNewExceptionTreatments() {
             // Arrange
             var exceptionHandler = new ExceptionHandler();
@@ -122,7 +122,7 @@ namespace NodejsTests.Debugger {
             Assert.AreEqual(newValue, changed);
         }
 
-        [TestMethod, Priority(0)]
+        [TestMethod, Priority(0), TestCategory("Debugging")]
         public void ClearExceptionTreatments() {
             // Arrange
             var exceptionHandler = new ExceptionHandler();
@@ -141,7 +141,7 @@ namespace NodejsTests.Debugger {
             Assert.AreEqual(ExceptionHitTreatment.BreakAlways, changed);
         }
 
-        [TestMethod, Priority(0)]
+        [TestMethod, Priority(0), TestCategory("Debugging")]
         public void ResetExceptionTreatments() {
             // Arrange
             var exceptionHandler = new ExceptionHandler();

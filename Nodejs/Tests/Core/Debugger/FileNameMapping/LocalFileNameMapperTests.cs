@@ -18,7 +18,7 @@ using Microsoft.VisualStudio.TestTools.UnitTesting;
 namespace NodejsTests.Debugger.FileNameMapping {
     [TestClass]
     public class LocalFileNameMapperTests {
-        [TestMethod, Priority(0)]
+        [TestMethod, Priority(0), TestCategory("Debugging")]
         public void GetLocalFileNameTests() {
             // Arrange
             const string remoteFileName = "remoteFileName";

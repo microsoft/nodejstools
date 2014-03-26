@@ -22,7 +22,7 @@ using Newtonsoft.Json.Linq;
 namespace NodejsTests.Debugger.Serialization {
     [TestClass]
     public class PrototypeVariableTests {
-        [TestMethod, Priority(0)]
+        [TestMethod, Priority(0), TestCategory("Debugging")]
         public void CreatePrototypeVariable() {
             // Arrange
             var parent = new NodeEvaluationResult(0, null, null, null, null, null, NodeExpressionType.None, null);
@@ -46,7 +46,7 @@ namespace NodejsTests.Debugger.Serialization {
             Assert.IsNull(result.Value);
         }
 
-        [TestMethod, Priority(0)]
+        [TestMethod, Priority(0), TestCategory("Debugging")]
         public void CreateLookupVariableWithNullParent() {
             // Arrange
             JObject json = SerializationTestData.GetLookupJsonPrototype();
@@ -69,7 +69,7 @@ namespace NodejsTests.Debugger.Serialization {
             Assert.IsNull(result.Value);
         }
 
-        [TestMethod, Priority(0)]
+        [TestMethod, Priority(0), TestCategory("Debugging")]
         public void CreateLookupVariableWithNullJsonValue() {
             // Arrange
             var parent = new NodeEvaluationResult(0, null, null, null, null, null, NodeExpressionType.None, null);
@@ -90,7 +90,7 @@ namespace NodejsTests.Debugger.Serialization {
             Assert.IsInstanceOfType(exception, typeof (ArgumentNullException));
         }
 
-        [TestMethod, Priority(0)]
+        [TestMethod, Priority(0), TestCategory("Debugging")]
         public void CreateLookupVariableWithNullJsonReferences() {
             // Arrange
             var parent = new NodeEvaluationResult(0, null, null, null, null, null, NodeExpressionType.None, null);

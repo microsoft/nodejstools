@@ -53,7 +53,7 @@ namespace NodejsTests {
         /// </summary>
         private const string _sample = @"{'version':3,'file':'test.js','sourceRoot':'','sources':['test.ts'],'names':['Greeter','Greeter.constructor','Greeter.greet'],'mappings':'AAAA;IACIA,iBAAYA,QAAuBA;QAAvBC,aAAeA,GAARA,QAAQA;AAAQA,IAAIA,CAACA;IACxCD,0BAAAA;QACIE,OAAOA,MAAMA,GAAGA,IAAIA,CAACA,QAAQA,GAAGA,OAAOA;IAC3CA,CAACA;IACLF,eAACA;AAADA,CAACA,IAAA;AAAA,CAAC'}";
 
-        [TestMethod, Priority(0)]
+        [TestMethod, Priority(0), TestCategory("Debugging")]
         public void TestBadMappings() {
             // empty segment
             AssertUtil.Throws<InvalidOperationException>(
@@ -77,7 +77,7 @@ namespace NodejsTests {
         }
 
 
-        [TestMethod, Priority(0)]
+        [TestMethod, Priority(0), TestCategory("Debugging")]
         public void TestMappingLine() {
             var map = new SourceMap(new StringReader(_sample));
             var testCases = new[] { 
@@ -105,7 +105,7 @@ namespace NodejsTests {
             }
         }
 
-        [TestMethod, Priority(0)]
+        [TestMethod, Priority(0), TestCategory("Debugging")]
         public void TestMappingLineAndColumn() {
             var map = new SourceMap(new StringReader(_sample));
             var testCases = new[] { 
@@ -138,7 +138,7 @@ namespace NodejsTests {
             }
         }
 
-        [TestMethod, Priority(0)]
+        [TestMethod, Priority(0), TestCategory("Debugging")]
         public void TestVersion() {
             try {
                 new SourceMap(new StringReader("{}"));
@@ -160,14 +160,14 @@ namespace NodejsTests {
             }
         }
 
-        [TestMethod, Priority(0)]
+        [TestMethod, Priority(0), TestCategory("Debugging")]
         public void TestNames() {
             var map = new SourceMap(new StringReader("{version:3, names:['foo']}"));
             Assert.AreEqual(map.Names[0], "foo");
         }
 
 
-        [TestMethod, Priority(0)]
+        [TestMethod, Priority(0), TestCategory("Debugging")]
         public void TestSources() {
             var map = new SourceMap(new StringReader("{version:3, sources:['test.ts']}"));
             Assert.AreEqual(map.Sources[0], "test.ts");
@@ -176,13 +176,13 @@ namespace NodejsTests {
             Assert.AreEqual(map.Sources[0], "root_path\\test.ts");
         }
 
-        [TestMethod, Priority(0)]
+        [TestMethod, Priority(0), TestCategory("Debugging")]
         public void TestFile() {
             var map = new SourceMap(new StringReader("{version:3, file:'test.js'}"));
             Assert.AreEqual(map.File, "test.js");
         }
 
-        [TestMethod, Priority(0)]
+        [TestMethod, Priority(0), TestCategory("Debugging")]
         public void TestInvalidJson() {
             try {
                 var map = new SourceMap(new StringReader("{'test.js\\'}"));

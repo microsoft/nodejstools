@@ -19,7 +19,7 @@ using Newtonsoft.Json.Linq;
 namespace NodejsTests.Debugger.Events {
     [TestClass]
     public class ExceptionEventTests {
-        [TestMethod, Priority(0)]
+        [TestMethod, Priority(0), TestCategory("Debugging")]
         public void CreateExceptionEvent() {
             // Arrange
             JObject message = JObject.Parse(Resources.NodeExceptionResponse);

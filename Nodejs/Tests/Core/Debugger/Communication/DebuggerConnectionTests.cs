@@ -23,7 +23,7 @@ using Moq;
 namespace NodejsTests.Debugger.Communication {
     [TestClass]
     public class DebuggerConnectionTests {
-        [TestMethod, Priority(0)]
+        [TestMethod, Priority(0), TestCategory("Debugging")]
         public void CreateDebuggerConnectionWithNullNetworkClientFactory() {
             // Arrange
             Exception exception = null;
@@ -42,7 +42,7 @@ namespace NodejsTests.Debugger.Communication {
             Assert.IsInstanceOfType(exception, typeof (ArgumentNullException));
         }
 
-        [TestMethod, Priority(0)]
+        [TestMethod, Priority(0), TestCategory("Debugging")]
         public async Task RaiseConnectionClosedEvent() {
             // Arrange
             var memoryStream = new MemoryStream();
@@ -76,7 +76,7 @@ namespace NodejsTests.Debugger.Communication {
             Assert.IsNotNull(args);
         }
 
-        [TestMethod, Priority(0)]
+        [TestMethod, Priority(0), TestCategory("Debugging")]
         public async Task RaiseOutputMessageEvent() {
             // Arrange
             const string message = "Hello node.js!";
@@ -120,7 +120,7 @@ namespace NodejsTests.Debugger.Communication {
             Assert.IsTrue(afterConnection);
         }
 
-        [TestMethod, Priority(0)]
+        [TestMethod, Priority(0), TestCategory("Debugging")]
         public async Task SendMessageAsync() {
             // Arrange
             const string message = "Hello node.js!";
@@ -152,7 +152,7 @@ namespace NodejsTests.Debugger.Communication {
             Assert.AreEqual(string.Format("Content-Length: {0}{1}{1}{2}", Encoding.UTF8.GetByteCount(message), Environment.NewLine, message), result);
         }
 
-        [TestMethod, Priority(0)]
+        [TestMethod, Priority(0), TestCategory("Debugging")]
         public async Task RetrieveNodeVersion() {
             // Arrange
             const string version = "0.10.25";

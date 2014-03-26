@@ -21,7 +21,7 @@ using Newtonsoft.Json.Linq;
 namespace NodejsTests.Debugger.Commands {
     [TestClass]
     public class SetBreakpointCommandTests {
-        [TestMethod, Priority(0)]
+        [TestMethod, Priority(0), TestCategory("Debugging")]
         public void CreateSetBreakpointCommand() {
             // Arrange
             const int commandId = 3;
@@ -46,7 +46,7 @@ namespace NodejsTests.Debugger.Commands {
                 setBreakpointCommand.ToString());
         }
 
-        [TestMethod, Priority(0)]
+        [TestMethod, Priority(0), TestCategory("Debugging")]
         public void CreateSetBreakpointCommandOnFirstLine() {
             // Arrange
             const int commandId = 3;
@@ -71,7 +71,7 @@ namespace NodejsTests.Debugger.Commands {
                 setBreakpointCommand.ToString());
         }
 
-        [TestMethod, Priority(0)]
+        [TestMethod, Priority(0), TestCategory("Debugging")]
         public void CreateSetBreakpointCommandOnRemoteFile() {
             // Arrange
             const int commandId = 3;
@@ -94,7 +94,7 @@ namespace NodejsTests.Debugger.Commands {
                 setBreakpointCommand.ToString());
         }
 
-        [TestMethod, Priority(0)]
+        [TestMethod, Priority(0), TestCategory("Debugging")]
         public void CreateSetBreakpointCommandOnLocalFile() {
             // Arrange
             const int commandId = 3;
@@ -117,7 +117,7 @@ namespace NodejsTests.Debugger.Commands {
                 setBreakpointCommand.ToString());
         }
 
-        [TestMethod, Priority(0)]
+        [TestMethod, Priority(0), TestCategory("Debugging")]
         public void CreateSetBreakpointCommandWithoutPredicate() {
             // Arrange
             const int commandId = 3;
@@ -142,7 +142,7 @@ namespace NodejsTests.Debugger.Commands {
                 setBreakpointCommand.ToString());
         }
 
-        [TestMethod, Priority(0)]
+        [TestMethod, Priority(0), TestCategory("Debugging")]
         public void ProcessSetBreakpointResponse() {
             // Arrange
             const int commandId = 3;
@@ -168,7 +168,7 @@ namespace NodejsTests.Debugger.Commands {
             Assert.AreEqual(33, setBreakpointCommand.ScriptId);
         }
 
-        [TestMethod, Priority(0)]
+        [TestMethod, Priority(0), TestCategory("Debugging")]
         public void CreateSetBreakpointCommandWithNullBreakpoint() {
             // Arrange
             const int commandId = 3;
