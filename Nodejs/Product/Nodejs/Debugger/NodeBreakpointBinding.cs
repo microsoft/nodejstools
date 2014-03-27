@@ -98,7 +98,7 @@ namespace Microsoft.NodejsTools.Debugger {
 
         public bool Unbound { get; set; }
 
-        public async void Remove() {
+        public async Task Remove() {
             await Process.RemoveBreakpointAsync(this).ConfigureAwait(false);
         }
 

@@ -250,14 +250,12 @@ namespace Microsoft.NodejsTools.Debugger {
         /// <summary>
         /// Resumes the process.
         /// </summary>
-        public async void Resume() {
+        public void Resume() {
             DebugWriteCommand("Resume");
-            try {
+            DebuggerClient.RunWithRequestExceptionsHandled(async () => {
                 var tokenSource = new CancellationTokenSource(_timeout);
                 await ContinueAndSaveSteppingAsync(SteppingKind.None, cancellationToken: tokenSource.Token).ConfigureAwait(false);
-            } catch (IOException) {
-                // Debugger connection went down - this is normal when debuggee dies.
-            }
+            });
         }
 
         private Task ContinueAndSaveSteppingAsync(SteppingKind steppingKind, bool resetSteppingMode = true, int stepCount = 1, CancellationToken cancellationToken = new CancellationToken()) {
@@ -362,11 +360,11 @@ namespace Microsoft.NodejsTools.Debugger {
             return new NodeBreakpoint(this, target, enabled, breakOn, condition);
         }
 
-        public async void SetExceptionTreatment(
+        public void SetExceptionTreatment(
             ExceptionHitTreatment? defaultExceptionTreatment,
             ICollection<KeyValuePair<string, ExceptionHitTreatment>> exceptionTreatments
         ) {
-            try {
+            DebuggerClient.RunWithRequestExceptionsHandled(async () => {
                 bool updated = false;
 
                 if (defaultExceptionTreatment.HasValue) {
@@ -381,16 +379,14 @@ namespace Microsoft.NodejsTools.Debugger {
                     var tokenSource = new CancellationTokenSource(_timeout);
                     await SetExceptionBreakAsync(tokenSource.Token).ConfigureAwait(false);
                 }
-            } catch (IOException) {
-                // Debugger connection went down - this is normal when debuggee dies.
-            }
+            });
         }
 
-        public async void ClearExceptionTreatment(
+        public void ClearExceptionTreatment(
             ExceptionHitTreatment? defaultExceptionTreatment,
             ICollection<KeyValuePair<string, ExceptionHitTreatment>> exceptionTreatments
         ) {
-            try {
+            DebuggerClient.RunWithRequestExceptionsHandled(async () => {
                 bool updated = false;
 
                 if (defaultExceptionTreatment.HasValue) {
@@ -403,13 +399,11 @@ namespace Microsoft.NodejsTools.Debugger {
                     var tokenSource = new CancellationTokenSource(_timeout);
                     await SetExceptionBreakAsync(tokenSource.Token).ConfigureAwait(false);
                 }
-            } catch (IOException) {
-                // Debugger connection went down - this is normal when debuggee dies.
-            }
+            });
         }
 
-        public async void ClearExceptionTreatment() {
-            try {
+        public void ClearExceptionTreatment() {
+            DebuggerClient.RunWithRequestExceptionsHandled(async () => {
                 bool updated = _exceptionHandler.SetDefaultExceptionHitTreatment(ExceptionHitTreatment.BreakAlways);
                 updated |= _exceptionHandler.ResetExceptionTreatments();
 
@@ -417,9 +411,7 @@ namespace Microsoft.NodejsTools.Debugger {
                     var tokenSource = new CancellationTokenSource(_timeout);
                     await SetExceptionBreakAsync(tokenSource.Token).ConfigureAwait(false);
                 }
-            } catch (IOException) {
-                // Debugger connection went down - this is normal when debuggee dies.
-            }
+            });
         }
 
         #endregion
@@ -584,8 +576,8 @@ namespace Microsoft.NodejsTools.Debugger {
             AddModules(new[] { args.CompileScriptEvent.Module });
         }
 
-        private async void OnBreakpointEvent(object sender, BreakpointEventArgs args) {
-            try {
+        private void OnBreakpointEvent(object sender, BreakpointEventArgs args) {
+            DebuggerClient.RunWithRequestExceptionsHandled(async () => {
                 BreakpointEvent breakpointEvent = args.BreakpointEvent;
 
                 // Process breakpoint bindings, ensuring we have callstack
@@ -616,9 +608,7 @@ namespace Microsoft.NodejsTools.Debugger {
                 if (!await ProcessBreakpointBreakAsync(module, breakpointBindings, false).ConfigureAwait(false)) {
                     await AutoResumeAsync(false).ConfigureAwait(false);
                 }
-            } catch (IOException) {
-                // Debugger connection went down - this is normal when debuggee dies.
-            }
+            });
         }
 
         private async Task<bool> ProcessBreakpointBreakAsync(
@@ -688,8 +678,8 @@ namespace Microsoft.NodejsTools.Debugger {
             }
         }
 
-        private async void OnExceptionEvent(object sender, ExceptionEventArgs args) {
-            try {
+        private void OnExceptionEvent(object sender, ExceptionEventArgs args) {
+            DebuggerClient.RunWithRequestExceptionsHandled(async () => {
                 ExceptionEvent exception = args.ExceptionEvent;
 
                 if (exception.ErrorNumber == null) {
@@ -711,13 +701,11 @@ namespace Microsoft.NodejsTools.Debugger {
                 _errorCodes[errorNumber] = errorCodeFromLookup;
 
                 ReportException(exception, errorCodeFromLookup);
-            } catch (IOException) {
-                // Debugger connection went down - this is normal when debuggee dies.
-            }
+            });
         }
 
-        private async void ReportException(ExceptionEvent exceptionEvent, string errorCode = null) {
-            try {
+        private void ReportException(ExceptionEvent exceptionEvent, string errorCode = null) {
+            DebuggerClient.RunWithRequestExceptionsHandled(async () => {
                 string exceptionName = exceptionEvent.ExceptionName;
                 if (!string.IsNullOrEmpty(errorCode)) {
                     exceptionName = string.Format("{0}({1})", exceptionName, errorCode);
@@ -757,9 +745,7 @@ namespace Microsoft.NodejsTools.Debugger {
 
                 var exception = new NodeException(exceptionName, description);
                 exceptionRaised(this, new ExceptionRaisedEventArgs(MainThread, exception, exceptionEvent.Uncaught));
-            } catch (IOException) {
-                // Debugger connection went down - this is normal when debuggee dies.
-            }
+            });
         }
 
         private async Task<int> GetCallstackDepthAsync(CancellationToken cancellationToken = new CancellationToken()) {
@@ -846,39 +832,33 @@ namespace Microsoft.NodejsTools.Debugger {
             return _threads.Values.ToList();
         }
 
-        internal async void SendStepOver(int identity) {
+        internal void SendStepOver(int identity) {
             DebugWriteCommand("StepOver");
-            try {
+            DebuggerClient.RunWithRequestExceptionsHandled(async () => {
                 var tokenSource = new CancellationTokenSource(_timeout);
                 await ContinueAndSaveSteppingAsync(SteppingKind.Over, cancellationToken: tokenSource.Token).ConfigureAwait(false);
-            } catch (IOException) {
-                // Debugger connection went down - this is normal when debuggee dies.
-            }
+            });
         }
 
-        internal async void SendStepInto(int identity) {
+        internal void SendStepInto(int identity) {
             DebugWriteCommand("StepInto");
-            try {
+            DebuggerClient.RunWithRequestExceptionsHandled(async () => {
                 var tokenSource = new CancellationTokenSource(_timeout);
                 await ContinueAndSaveSteppingAsync(SteppingKind.Into, cancellationToken: tokenSource.Token).ConfigureAwait(false);
-            } catch (IOException) {
-                // Debugger connection went down - this is normal when debuggee dies.
-            }
+            });
         }
 
-        internal async void SendStepOut(int identity) {
+        internal void SendStepOut(int identity) {
             DebugWriteCommand("StepOut");
-            try {
+            DebuggerClient.RunWithRequestExceptionsHandled(async () => {
                 var tokenSource = new CancellationTokenSource(_timeout);
                 await ContinueAndSaveSteppingAsync(SteppingKind.Out, cancellationToken: tokenSource.Token).ConfigureAwait(false);
-            } catch (IOException) {
-                // Debugger connection went down - this is normal when debuggee dies.
-            }
+            });
         }
 
-        internal async void SendResumeThread(int threadId) {
+        internal void SendResumeThread(int threadId) {
             DebugWriteCommand("ResumeThread");
-            try {
+            DebuggerClient.RunWithRequestExceptionsHandled(async () => {
                 // Handle load complete resume
                 if (!_loadCompleteHandled) {
                     _loadCompleteHandled = true;
@@ -927,9 +907,7 @@ namespace Microsoft.NodejsTools.Debugger {
 
                 // Handle tracepoint (auto-resumed "when hit" breakpoint) resume during stepping
                 await AutoResumeAsync(true).ConfigureAwait(false);
-            } catch (IOException) {
-                // Debugger connection went down - this is normal when debuggee dies.
-            }
+            });
         }
 
         private bool HandleEntryPointHit() {
@@ -949,17 +927,15 @@ namespace Microsoft.NodejsTools.Debugger {
             //throw new NotImplementedException();
         }
 
-        public async void Detach() {
+        public void Detach() {
             DebugWriteCommand("Detach");
-            try {
+            DebuggerClient.RunWithRequestExceptionsHandled(async () => {
                 // Disconnect request has no response
                 var tokenSource = new CancellationTokenSource(_timeout);
                 var disconnectCommand = new DisconnectCommand(CommandId);
                 await _client.SendRequestAsync(disconnectCommand, tokenSource.Token).ConfigureAwait(false);
                 _connection.Close();
-            } catch (IOException) {
-                // Debugger connection went down - this is normal when debuggee dies.
-            }
+            });
         }
 
         public async Task<NodeBreakpointBinding> BindBreakpointAsync(NodeBreakpoint breakpoint, CancellationToken cancellationToken = new CancellationToken()) {

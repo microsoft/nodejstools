@@ -47,7 +47,7 @@ namespace Microsoft.NodejsTools.Debugger.DebugEngine {
 
             if (!_deleted) {
                 _deleted = true;
-                _breakpointBinding.Remove();
+                _breakpointBinding.Remove().GetAwaiter().GetResult();
             }
 
             return VSConstants.S_OK;
@@ -57,7 +57,7 @@ namespace Microsoft.NodejsTools.Debugger.DebugEngine {
         int IDebugBoundBreakpoint2.Enable(int fEnable) {
             AssertMainThread();
 
-            if (!_breakpointBinding.SetEnabledAsync(fEnable != 0).Result) {
+            if (!_breakpointBinding.SetEnabledAsync(fEnable != 0).GetAwaiter().GetResult()) {
                 return VSConstants.E_FAIL;
             }
 
@@ -101,7 +101,7 @@ namespace Microsoft.NodejsTools.Debugger.DebugEngine {
                 return VSConstants.E_NOTIMPL;
             }
 
-            if (!_breakpointBinding.SetConditionAsync(bpCondition.bstrCondition).Result) {
+            if (!_breakpointBinding.SetConditionAsync(bpCondition.bstrCondition).GetAwaiter().GetResult()) {
                 return VSConstants.E_FAIL;
             }
 
@@ -111,7 +111,7 @@ namespace Microsoft.NodejsTools.Debugger.DebugEngine {
         int IDebugBoundBreakpoint2.SetHitCount(uint dwHitCount) {
             AssertMainThread();
 
-            if (!_breakpointBinding.SetHitCountAsync(dwHitCount).Result) {
+            if (!_breakpointBinding.SetHitCountAsync(dwHitCount).GetAwaiter().GetResult()) {
                 return VSConstants.E_FAIL;
             }
 
@@ -122,7 +122,7 @@ namespace Microsoft.NodejsTools.Debugger.DebugEngine {
             AssertMainThread();
 
             BreakOn breakOn = GetBreakOnForPassCount(bpPassCount);
-            if (!_breakpointBinding.SetBreakOnAsync(breakOn).Result) {
+            if (!_breakpointBinding.SetBreakOnAsync(breakOn).GetAwaiter().GetResult()) {
                 return VSConstants.E_FAIL;
             }
 
