@@ -37,7 +37,7 @@ namespace NodejsTests.Debugger {
             var exceptionHandler = new ExceptionHandler();
 
             // Act
-            bool updated = exceptionHandler.SetDefaultExceptionHitTreatment(ExceptionHitTreatment.BreakAlways);
+            bool updated = exceptionHandler.SetDefaultExceptionHitTreatment(ExceptionHitTreatment.BreakNever);
 
             // Assert
             Assert.IsFalse(updated);
@@ -64,14 +64,14 @@ namespace NodejsTests.Debugger {
             ExceptionHitTreatment result = exceptionHandler.GetExceptionHitTreatment("Error(MY)");
 
             // Assert
-            Assert.AreEqual(ExceptionHitTreatment.BreakAlways, result);
+            Assert.AreEqual(ExceptionHitTreatment.BreakNever, result);
         }
 
         [TestMethod, Priority(0), TestCategory("Debugging")]
         public void GetExceptionHitTreatmentForUnknownErrorAfterChangingDefaults() {
             // Arrange
             var exceptionHandler = new ExceptionHandler();
-            const ExceptionHitTreatment newDefault = ExceptionHitTreatment.BreakOnUnhandled;
+            const ExceptionHitTreatment newDefault = ExceptionHitTreatment.BreakAlways;
 
             // Act
             exceptionHandler.SetDefaultExceptionHitTreatment(newDefault);
@@ -127,6 +127,9 @@ namespace NodejsTests.Debugger {
             // Arrange
             var exceptionHandler = new ExceptionHandler();
             const string exceptionName = "SyntaxError";
+            exceptionHandler.SetExceptionTreatments(new Dictionary<string, ExceptionHitTreatment> {
+                { exceptionName, ExceptionHitTreatment.BreakAlways }
+            });
             ExceptionHitTreatment initial = exceptionHandler.GetExceptionHitTreatment(exceptionName);
 
             // Act
@@ -136,15 +139,18 @@ namespace NodejsTests.Debugger {
             ExceptionHitTreatment changed = exceptionHandler.GetExceptionHitTreatment(exceptionName);
 
             // Assert
-            Assert.AreEqual(ExceptionHitTreatment.BreakNever, initial);
+            Assert.AreEqual(ExceptionHitTreatment.BreakAlways, initial);
             Assert.IsTrue(updated);
-            Assert.AreEqual(ExceptionHitTreatment.BreakAlways, changed);
+            Assert.AreEqual(ExceptionHitTreatment.BreakNever, changed);
         }
 
         [TestMethod, Priority(0), TestCategory("Debugging")]
         public void ResetExceptionTreatments() {
             // Arrange
             var exceptionHandler = new ExceptionHandler();
+            exceptionHandler.SetExceptionTreatments(new Dictionary<string, ExceptionHitTreatment> {
+                { "Node.js Exceptions", ExceptionHitTreatment.BreakAlways }
+            });
 
             // Act
             bool updated = exceptionHandler.ResetExceptionTreatments();

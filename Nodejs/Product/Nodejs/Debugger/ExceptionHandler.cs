@@ -17,7 +17,7 @@ using System.Linq;
 
 namespace Microsoft.NodejsTools.Debugger {
     sealed class ExceptionHandler {
-        private ExceptionHitTreatment _defaultExceptionTreatment = ExceptionHitTreatment.BreakAlways;
+        private ExceptionHitTreatment _defaultExceptionTreatment = ExceptionHitTreatment.BreakNever;
         private Dictionary<string, ExceptionHitTreatment> _exceptionTreatments;
 
         public ExceptionHandler() {
