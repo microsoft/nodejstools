@@ -41,15 +41,13 @@
 
   <Target Name="CopyFilesToOutputDirectory"/>
   
-  <Target Name="CheckMaxPath">
-    <Error Condition="$(CheckMaxPathFilenames.IndexOf('*')) != -1"
-           Text="Files in your project exceed MAX_PATH, please move your project to a location with a shorter path."></Error>
-  </Target>
-
   <Target Name="CoreCompile">
     <Error Condition="!Exists('$(VSToolsPath)\TypeScript\Microsoft.TypeScript.targets') And '$(EnableTypeScript)' == 'true'" Text="TypeScript is not installed but TypeScript support is enabled in this project.  Please download and install TypeScript http://go.microsoft.com/fwlink/?LinkID=393159&amp;clcid=0x409."></Error>
-
-    <MSBuild Projects="$(MSBuildProjectFile)" Targets="CheckMaxPath" Properties="CheckMaxPathFilenames=%(NodeModulesContent.Identity)" />
+    <PropertyGroup>
+      <_NodeModulesContentProperty>@(NodeModulesContent)</_NodeModulesContentProperty>
+    </PropertyGroup>
+    <Error Condition="$(_NodeModulesContentProperty.IndexOf('*')) != -1"
+           Text="Files in your project exceed MAX_PATH, please move your project to a location with a shorter path."></Error>
     
     <!-- Target used for generating a package which can be uploaded to web server -->
     <ItemGroup>
@@ -109,8 +107,6 @@
       
     </ItemGroup>
 
-    <MSBuild Projects="$(MSBuildProjectFile)" Targets="CheckMaxPath" Properties="CheckMaxPathFilenames=%(_TempBuiltProjectOutputGroup.Identity)" />
-    
     <AssignTargetPath Files="@(_TempBuiltProjectOutputGroup)" RootFolder="$(MSBuildProjectDirectory)">
       <Output TaskParameter="AssignedFiles" ItemName="BuiltProjectOutputGroupOutput" />
     </AssignTargetPath>
