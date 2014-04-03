@@ -19,6 +19,7 @@ Features in Depth
 * [wiki:"npm" Npm]
 * [wiki:"Profiling" Profiling]
 * [wiki:"Azure Deployment" AzureDeployment]
+* [wiki:"Unit Tests" UnitTests]
 
 Release Notes
 -------------
