@@ -42,6 +42,11 @@
     <SccAuxPath>SAK</SccAuxPath>
     <SccProvider>SAK</SccProvider>
   </PropertyGroup>
+  <PropertyGroup>
+    <!-- This typically defaults to True, but unless we're going to completely
+         sign this assembly, we'd prefer it wasn't delay signed. -->
+    <SignAssembly Condition="'$(ReleaseBuild)' != ''">$(ReleaseBuild)</SignAssembly>
+  </PropertyGroup>
   <PropertyGroup Condition=" '$(Platform)' == 'AnyCPU' ">
     <PlatformTarget>AnyCPU</PlatformTarget>
   </PropertyGroup>

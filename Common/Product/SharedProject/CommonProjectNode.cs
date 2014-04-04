@@ -311,7 +311,11 @@ namespace Microsoft.VisualStudioTools.Project {
         }
 
         internal int AddExistingFolderToNode(HierarchyNode parent) {
-            var dir = BrowseForFolder(String.Format("Add Existing Folder - {0}", Caption), parent.FullPathToChildren);
+            var dir = Dialogs.BrowseForDirectory(
+                IntPtr.Zero,
+                parent.FullPathToChildren,
+                String.Format("Add Existing Folder - {0}", Caption)
+            );
             if (dir != null) {
                 DropFilesOrFolders(new[] { dir }, parent);
             }
@@ -515,7 +519,7 @@ namespace Microsoft.VisualStudioTools.Project {
         }
 
         protected internal override int ShowAllFiles() {
-            UIThread.Instance.MustBeCalledFromUIThread();
+            UIThread.MustBeCalledFromUIThread();
 
             if (!QueryEditProjectFile(false)) {
                 return VSConstants.E_FAIL;
@@ -663,7 +667,7 @@ namespace Microsoft.VisualStudioTools.Project {
                     }
                     return true;
                 }
-                
+
                 foreach (var file in files) {
                     if (_project.IsFileHidden(file)) {
                         continue;
@@ -703,7 +707,7 @@ namespace Microsoft.VisualStudioTools.Project {
         }
 
         private void RemoveSubTree(HierarchyNode node) {
-            UIThread.Instance.MustBeCalledFromUIThread();
+            UIThread.MustBeCalledFromUIThread();
             foreach (var child in node.AllChildren) {
                 RemoveSubTree(child);
             }
@@ -1067,7 +1071,7 @@ namespace Microsoft.VisualStudioTools.Project {
             private void ChildDeleted(HierarchyNode child) {
                 if (child != null) {
                     _project.TryDeactivateSymLinkWatcher(child);
-                    UIThread.Instance.MustBeCalledFromUIThread();
+                    UIThread.MustBeCalledFromUIThread();
 
                     // rapid changes can arrive out of order, if the file or directory 
                     // actually exists ignore the event.
@@ -1144,7 +1148,7 @@ namespace Microsoft.VisualStudioTools.Project {
                         _project.AddAllFilesFile(parent, _path);
                         if (String.Equals(_project.GetStartupFile(), _path, StringComparison.OrdinalIgnoreCase)) {
                             _project.BoldStartupItem();
-                        }
+                    }
                     }
 
                     parent.ExpandItem(wasExpanded ? EXPANDFLAGS.EXPF_ExpandFolder : EXPANDFLAGS.EXPF_CollapseFolder);
@@ -1608,145 +1612,17 @@ namespace Microsoft.VisualStudioTools.Project {
         }
 
         /// <summary>
-        /// Parses SearchPath property into a list of distinct absolute paths, preserving the order.
+        /// Creates the services exposed by this project.
         /// </summary>
-        protected IList<string> ParseSearchPath() {
-            var searchPath = GetProjectProperty(CommonConstants.SearchPath, true);
-            return ParseSearchPath(searchPath);
-        }
-
-        /// <summary>
-        /// Parses SearchPath string into a list of distinct absolute paths, preserving the order.
-        /// </summary>
-        protected IList<string> ParseSearchPath(string searchPath) {
-            var result = new List<string>();
-
-            if (!string.IsNullOrEmpty(searchPath)) {
-                var seen = new HashSet<string>();
-                foreach (var path in searchPath.Split(';')) {
-                    if (string.IsNullOrEmpty(path)) {
-                        continue;
-                    }
-
-                    var absPath = CommonUtils.GetAbsoluteFilePath(ProjectHome, path);
-                    if (seen.Add(absPath)) {
-                        result.Add(absPath);
-                    }
-                }
+        protected virtual object CreateServices(Type serviceType) {
+            object service = null;
+            if (typeof(VSLangProj.VSProject) == serviceType) {
+                service = VSProject;
+            } else if (typeof(EnvDTE.Project) == serviceType) {
+                service = GetAutomationObject();
             }
 
-            return result;
-        }
-
-        /// <summary>
-        /// Saves list of paths back as SearchPath project property.
-        /// </summary>
-        private void SaveSearchPath(IList<string> value) {
-            var valueStr = string.Join(";", value.Select(path => {
-                var relPath = CommonUtils.GetRelativeFilePath(ProjectHome, path);
-                if (string.IsNullOrEmpty(relPath)) {
-                    relPath = ".";
-                }
-                return relPath;
-            }));
-            SetProjectProperty(CommonConstants.SearchPath, valueStr);
-        }
-
-        /// <summary>
-        /// Adds new search path to the SearchPath project property.
-        /// </summary>
-        internal void AddSearchPathEntry(string newpath) {
-            Utilities.ArgumentNotNull("newpath", newpath);
-
-            var searchPath = ParseSearchPath();
-            var absPath = CommonUtils.GetAbsoluteFilePath(ProjectHome, newpath);
-            // Ignore the end separator when determining whether the path has
-            // already been added. Having both "C:\Fob" and "C:\Fob\" is not
-            // legal.
-            if (searchPath.Contains(CommonUtils.EnsureEndSeparator(absPath), StringComparer.OrdinalIgnoreCase) ||
-                searchPath.Contains(CommonUtils.TrimEndSeparator(absPath), StringComparer.OrdinalIgnoreCase)) {
-                return;
-            }
-            searchPath.Add(absPath);
-            SaveSearchPath(searchPath);
-        }
-
-        /// <summary>
-        /// Removes a given path from the SearchPath property.
-        /// </summary>
-        internal void RemoveSearchPathEntry(string path) {
-            var absPath = CommonUtils.TrimEndSeparator(CommonUtils.GetAbsoluteFilePath(ProjectHome, path));
-            var absPathWithEndSeparator = CommonUtils.EnsureEndSeparator(absPath);
-            var searchPath = ParseSearchPath();
-
-            var newSearchPath = searchPath
-                // Ignore the end separator when determining paths to remove.
-                .Where(p => !absPath.Equals(p, StringComparison.OrdinalIgnoreCase) &&
-                            !absPathWithEndSeparator.Equals(p, StringComparison.OrdinalIgnoreCase))
-                .ToList();
-
-            if (searchPath.Count != newSearchPath.Count) {
-                SaveSearchPath(newSearchPath);
-            }
-        }
-
-        /// <summary>
-        /// Executes Add Search Path menu command.
-        /// </summary>        
-        internal int AddSearchPath() {
-            string dirName = BrowseForFolder(
-                DynamicProjectSR.GetString(DynamicProjectSR.SelectFolderForSearchPath),
-                ProjectHome);
-
-            if (dirName != null) {
-                AddSearchPathEntry(CommonUtils.EnsureEndSeparator(dirName));
-            }
-
-            return VSConstants.S_OK;
-        }
-
-        internal string BrowseForFolder(string title, string initialDir) {
-            // Get a reference to the UIShell.
-            IVsUIShell uiShell = GetService(typeof(SVsUIShell)) as IVsUIShell;
-            if (null == uiShell) {
-                return null;
-            }
-
-            //Create a fill in a structure that defines Browse for folder dialog
-            VSBROWSEINFOW[] browseInfo = new VSBROWSEINFOW[1];
-            //Dialog title
-            browseInfo[0].pwzDlgTitle = title;
-            //Initial directory - project directory
-            browseInfo[0].pwzInitialDir = initialDir;
-            //Parent window
-            uiShell.GetDialogOwnerHwnd(out browseInfo[0].hwndOwner);
-            //Max path length
-            //This is WCHARS not bytes
-            browseInfo[0].nMaxDirName = (uint)NativeMethods.MAX_PATH;
-            //This struct size
-            browseInfo[0].lStructSize = (uint)Marshal.SizeOf(typeof(VSBROWSEINFOW));
-            //Memory to write selected directory to.
-            //Note: this one allocates unmanaged memory, which must be freed later
-            //  Add 1 for the null terminator and double since we are WCHARs not bytes
-            IntPtr pDirName = Marshal.AllocCoTaskMem((NativeMethods.MAX_PATH + 1) * 2);
-            browseInfo[0].pwzDirName = pDirName;
-            try {
-                //Show the dialog
-                int hr = uiShell.GetDirectoryViaBrowseDlg(browseInfo);
-                if (hr == VSConstants.OLE_E_PROMPTSAVECANCELLED) {
-                    //User cancelled the dialog
-                    return null;
-                }
-                //Check for any failures
-                ErrorHandler.ThrowOnFailure(hr);
-                //Get selected directory
-                return Marshal.PtrToStringAuto(browseInfo[0].pwzDirName);
-            } finally {
-                //Free allocated unmanaged memory
-                if (pDirName != IntPtr.Zero) {
-                    Marshal.FreeCoTaskMem(pDirName);
-                }
-            }
+            return service;
         }
 
         /// <summary>
@@ -1759,7 +1635,10 @@ namespace Microsoft.VisualStudioTools.Project {
 
             if (_userBuildProject == null) {
                 // user project file doesn't exist yet, create it.
-                _userBuildProject = new MSBuild.Project(BuildProject.ProjectCollection);
+                // We set the content of user file explictly so VS2013 won't add ToolsVersion="12" which would result in incompatibility with VS2010,2012   
+                var root = Microsoft.Build.Construction.ProjectRootElement.Create(BuildProject.ProjectCollection);
+                root.ToolsVersion = "4.0";
+                _userBuildProject = new MSBuild.Project(root, null, null, BuildProject.ProjectCollection);
                 _userBuildProject.FullPath = FileName + PerUserFileExtension;
             }
             _userBuildProject.SetProperty(propertyName, propertyValue ?? String.Empty);

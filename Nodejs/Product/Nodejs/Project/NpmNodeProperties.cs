@@ -36,22 +36,20 @@ namespace Microsoft.NodejsTools.Project {
         }
 
         public override string GetClassName() {
-            return IsGlobalNode ? Resources.PropertiesClassGlobal : Resources.PropertiesClassNpm;
+            return SR.GetString(IsGlobalNode ? SR.PropertiesClassGlobal : SR.PropertiesClassNpm);
         }
 
         [SRCategoryAttribute(SR.General)]
-        [LocDisplayName(SR.NpmNodePackageInstallation)]
+        [SRDisplayName(SR.NpmNodePackageInstallation)]
         [SRDescriptionAttribute(SR.NpmNodePackageInstallationDescription)]
         public string PackageInstallation {
             get {
-                return IsGlobalNode
-                    ? Resources.PackageInstallationGlobal
-                    : Resources.PackageInstallationLocal;
+                return SR.GetString(IsGlobalNode ? SR.PackageInstallationGlobal : SR.PackageInstallationLocal);
             }
         }
 
         [SRCategoryAttribute(SR.General)]
-        [LocDisplayName(SR.NpmNodePath)]
+        [SRDisplayName(SR.NpmNodePath)]
         [SRDescriptionAttribute(SR.NpmNodePathDescription)]
         public string Path {
             get {

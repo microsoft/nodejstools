@@ -274,7 +274,7 @@ namespace Microsoft.VisualStudioTools.Project {
             }
 
             // Prompt to save if there are dirty docs
-            string message = SR.GetString(SR.SaveModifiedDocuments, CultureInfo.CurrentUICulture);
+            string message = SR.GetString(SR.SaveModifiedDocuments);
             string title = string.Empty;
             OLEMSGICON icon = OLEMSGICON.OLEMSGICON_WARNING;
             OLEMSGBUTTON buttons = OLEMSGBUTTON.OLEMSGBUTTON_YESNOCANCEL;
@@ -1212,6 +1212,15 @@ folder you are copying, do you want to replace the existing files?", Path.GetFil
                     } else {
                         // we are copying and adding a new file node
                         File.Copy(SourceMoniker, newPath, true);
+                        
+                        // best effort to reset the ReadOnly attribute
+                        try {
+                            File.SetAttributes(newPath, File.GetAttributes(newPath) &~ FileAttributes.ReadOnly);
+                        } catch (ArgumentException) {
+                        } catch (UnauthorizedAccessException) {
+                        } catch (IOException) {
+                        }
+
                         var existing = Project.FindNodeByFullPath(newPath);
                         if (existing == null) {
                             var fileNode = Project.CreateFileNode(newPath);

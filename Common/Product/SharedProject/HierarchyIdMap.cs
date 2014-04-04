@@ -26,7 +26,7 @@ namespace Microsoft.VisualStudioTools.Project {
         private List<uint> _freedIds = new List<uint>();
 
         public uint Add(HierarchyNode node) {
-            UIThread.Instance.MustBeCalledFromUIThread();
+            UIThread.MustBeCalledFromUIThread();
 
             uint res;
 
@@ -43,7 +43,7 @@ namespace Microsoft.VisualStudioTools.Project {
         }
 
         public void Remove(HierarchyNode node) {
-            UIThread.Instance.MustBeCalledFromUIThread();
+            UIThread.MustBeCalledFromUIThread();
 
             foreach (var keyValue in _ids) {
                 if (keyValue.Value == node) {
@@ -56,7 +56,7 @@ namespace Microsoft.VisualStudioTools.Project {
 
         public HierarchyNode this[uint itemId] {
             get {
-                UIThread.Instance.MustBeCalledFromUIThread();
+                UIThread.MustBeCalledFromUIThread();
 
                 HierarchyNode res;
                 _ids.TryGetValue(itemId, out res);

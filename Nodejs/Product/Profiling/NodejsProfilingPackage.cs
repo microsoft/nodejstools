@@ -86,8 +86,6 @@ namespace Microsoft.NodejsTools.Profiling {
             Trace.WriteLine(string.Format(CultureInfo.CurrentCulture, "Entering Initialize() of: {0}", this.ToString()));
             base.Initialize();
 
-            UIThread.Instance.Run(() => { });
-
             var shell = (IVsShell)GetService(typeof(SVsShell));
 
             // we call into the Node.js package, so we need it loaded.
@@ -266,14 +264,8 @@ namespace Microsoft.NodejsTools.Profiling {
         }
 
         internal async System.Threading.Tasks.Task ProfileProject(SessionNode session, EnvDTE.Project projectToProfile, bool openReport) {
-            if (!await UIThread.Instance.RunSync(async () => {
-                if (!await EnsureProjectUpToDate(projectToProfile)) {
-                    if (MessageBox.Show(Resources.FailedToBuild, Resources.NodejsToolsForVS, MessageBoxButton.YesNo) == MessageBoxResult.No) {
-                        return false;
-                    }
-                }
-                return true;
-            })) {
+            if (!await UIThread.InvokeTask(() => EnsureProjectUpToDate(projectToProfile)) &&
+                await UIThread.InvokeAsync(() => MessageBox.Show(Resources.FailedToBuild, Resources.NodejsToolsForVS, MessageBoxButton.YesNo)) == MessageBoxResult.No) {
                 return;
             }
 

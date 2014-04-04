@@ -415,14 +415,14 @@ sd.StringDecoder
         [HostType("TC Dynamic"), DynamicHostType(typeof(VsIdeHostAdapter))]
         public void TestNewProject() {
             using (var app = new VisualStudioApp(VsIdeTestHostContext.Dte)) {
-                var newProjDialog = app.FileNewProject();
-
+                using (var newProjDialog = app.FileNewProject()) {
                 newProjDialog.FocusLanguageNode("JavaScript");
 
                 var nodejsApp = newProjDialog.ProjectTypes.FindItem("Blank Node.js Web Application");
                 nodejsApp.Select();
 
-                newProjDialog.ClickOK();
+                    newProjDialog.OK();
+                }
 
                 // wait for new solution to load...            
                 for (int i = 0; i < 40 && app.Dte.Solution.Projects.Count == 0; i++) {
@@ -446,13 +446,13 @@ sd.StringDecoder
         [HostType("TC Dynamic"), DynamicHostType(typeof(VsIdeHostAdapter))]
         public void TestNewAzureProject() {
             using (var app = new VisualStudioApp(VsIdeTestHostContext.Dte)) {
-                var newProjDialog = app.FileNewProject();
-
+                using (var newProjDialog = app.FileNewProject()) {
                 newProjDialog.FocusLanguageNode("JavaScript");
 
                 var djangoApp = newProjDialog.ProjectTypes.FindItem("Blank Windows Azure Node.js Application");
                 djangoApp.Select();
-                newProjDialog.ClickOK();
+                    newProjDialog.OK();
+                }
 
                 // wait for new solution to load...
                 for (int i = 0; i < 40 && app.Dte.Solution.Projects.Count == 0; i++) {

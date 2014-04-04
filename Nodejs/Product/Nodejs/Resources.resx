@@ -469,4 +469,10 @@
   <data name="ReplInitializationMessage" xml:space="preserve">
     <value>Node.js interactive window. Type .help for a list of commands.</value>
   </data>
+  <data name="NodeExePathDescription" xml:space="preserve">
+    <value>Specifies the path to the node.exe executable.</value>
+  </data>
+  <data name="NodejsPortDescription" xml:space="preserve">
+    <value>Specifies the port number used for process.env.port, if unspecified a random port is generated.</value>
+  </data>
 </root>

@@ -1,0 +1,28 @@
+<Project DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <PropertyGroup>
+      <_ProjectSystemFilesLocation Condition="$(_ProjectSystemFilesLocation) == ''">$(BuildRoot)\Common\Product\SharedProject</_ProjectSystemFilesLocation>
+      <_NodejsFilesLocation Condition="$(_NodejsFilesLocation) == ''">$(BuildRoot)\Nodejs\Product\Nodejs</_NodejsFilesLocation>
+  </PropertyGroup>
+  <ItemGroup>
+    <Compile Include="$(_ProjectSystemFilesLocation)\ProjectResources.cs">
+      <Link>SharedProject\ProjectResources.cs</Link>
+      <Visible>true</Visible>
+    </Compile>
+    <Compile Include="$(_NodejsFilesLocation)\Project\ProjectResources.cs">
+      <Link>NodejsProject\ProjectResources.cs</Link>
+      <Visible>true</Visible>
+    </Compile>
+  </ItemGroup>
+  <ItemGroup>
+    <EmbeddedResource Include="$(_ProjectSystemFilesLocation)\ProjectResources.resx">
+      <Link>SharedProject\ProjectResources.resx</Link>
+      <ManifestResourceName>Microsoft.VisualStudio.Project</ManifestResourceName>
+      <Visible>true</Visible>
+    </EmbeddedResource>
+    <EmbeddedResource Include="$(_NodejsFilesLocation)\Resources.resx">
+      <Link>NodejsProject\Resources.resx</Link>
+      <ManifestResourceName>Microsoft.NodejsTools.Project</ManifestResourceName>
+      <Visible>true</Visible>
+    </EmbeddedResource>
+  </ItemGroup>
+</Project>

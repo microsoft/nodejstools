@@ -16,6 +16,7 @@ using System.Text;
 using System.Windows;
 using System.Windows.Media;
 using Microsoft.NodejsTools.Npm;
+using Microsoft.NodejsTools.Project;
 
 namespace Microsoft.NodejsTools.NpmUI {
     internal class PackageCatalogEntryViewModel {
@@ -56,7 +57,7 @@ namespace Microsoft.NodejsTools.NpmUI {
             get {
                 var keywords = string.Join(", ", _package.Keywords);
                 return string.IsNullOrEmpty(keywords)
-                    ? Resources.NoKeywordsInPackage
+                    ? SR.GetString(SR.NoKeywordsInPackage)
                     : keywords;
             }
         }
@@ -107,8 +108,8 @@ namespace Microsoft.NodejsTools.NpmUI {
                     var installed = LocallyInstalledPackage;
                     if (null != installed) {
                         return IsLocalInstallOutOfDate
-                            ? string.Format(Resources.PackageInstalledLocallyOldVersion, installed.Version)
-                            : Resources.PackageInstalledLocally;
+                            ? SR.GetString(SR.PackageInstalledLocallyOldVersion, installed.Version)
+                            : SR.GetString(SR.PackageInstalledLocally);
                     }
                 }
 
@@ -122,8 +123,8 @@ namespace Microsoft.NodejsTools.NpmUI {
                     var installed = GloballyInstalledPackage;
                     if (null != installed) {
                         return IsGlobalInstallOutOfDate
-                            ? string.Format(Resources.PackageInstalledGloballyOldVersion, installed.Version)
-                            : Resources.PackageInstalledGlobally;
+                            ? SR.GetString(SR.PackageInstalledGloballyOldVersion, installed.Version)
+                            : SR.GetString(SR.PackageInstalledGlobally);
                     }
                 }
 

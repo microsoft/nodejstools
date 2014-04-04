@@ -27,6 +27,7 @@ using Microsoft.VisualStudio.Debugger.Interop;
 using Microsoft.VisualStudio.Shell;
 using Microsoft.VisualStudio.Shell.Interop;
 using Microsoft.VisualStudioTools.Project;
+using SR = Microsoft.NodejsTools.Project.SR;
 
 namespace Microsoft.NodejsTools.Debugger.DebugEngine {
     // AD7Engine is the primary entrypoint object for the debugging engine. 
@@ -1175,7 +1176,7 @@ namespace Microsoft.NodejsTools.Debugger.DebugEngine {
             if (String.Equals(Path.GetExtension(module.FileName), NodejsConstants.TypeScriptExtension, StringComparison.OrdinalIgnoreCase)) {
                 if (document.ProjectItem.ContainingProject.GetNodeProject().Build(null, null) != MSBuildResult.Successful) {
                     var statusBar = (IVsStatusbar)ServiceProvider.GlobalProvider.GetService(typeof(SVsStatusbar));
-                    statusBar.SetText(Resources.DebuggerModuleUpdateFailed);
+                    statusBar.SetText(SR.GetString(SR.DebuggerModuleUpdateFailed));
                     return;
                 } 
             }
@@ -1183,7 +1184,7 @@ namespace Microsoft.NodejsTools.Debugger.DebugEngine {
             DebuggerClient.RunWithRequestExceptionsHandled(async () => {
                 if (!await Process.UpdateModuleSourceAsync(module).ConfigureAwait(false)) {
                     var statusBar = (IVsStatusbar)ServiceProvider.GlobalProvider.GetService(typeof(SVsStatusbar));
-                    statusBar.SetText(Resources.DebuggerModuleUpdateFailed);
+                    statusBar.SetText(SR.GetString(SR.DebuggerModuleUpdateFailed));
                 }
             });
         }

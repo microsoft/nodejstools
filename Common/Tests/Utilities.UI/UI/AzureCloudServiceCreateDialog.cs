@@ -16,56 +16,56 @@ using System;
 using System.Windows.Automation;
 
 namespace TestUtilities.UI {
-    public class AzureWebSiteCreateDialog : AutomationDialog {
-        public AzureWebSiteCreateDialog(VisualStudioApp app, AutomationElement element)
+    public class AzureCloudServiceCreateDialog : AutomationDialog {
+        public AzureCloudServiceCreateDialog(VisualStudioApp app, AutomationElement element)
             : base(app, element) {
         }
 
         public void ClickCreate() {
             // Wait for the create button to be enabled
-            WaitFor(CreateButton, btn => btn.Element.Current.IsEnabled);
-
-            // Wait for Locations and Databases to have a selection
-            // (the create button may be enabled before they are populated)
-            WaitFor(LocationComboBox, combobox => combobox.GetSelectedItemName() != null);
-            WaitFor(DatabaseComboBox, combobox => combobox.GetSelectedItemName() != null);
+            WaitFor(OkButton, btn => btn.Element.Current.IsEnabled);
 
             WaitForInputIdle();
-            WaitForClosed(TimeSpan.FromSeconds(180.0), () => CreateButton.Click());
+            WaitForClosed(TimeSpan.FromSeconds(30.0), () => OkButton.Click());
         }
 
-        public string SiteName {
+        public string ServiceName {
             get {
-                return GetSiteNameBox().GetValuePattern().Current.Value;
+                return GetServiceNameBox().GetValuePattern().Current.Value;
             }
             set {
                 WaitForInputIdle();
-                GetSiteNameBox().GetValuePattern().SetValue(value);
+                GetServiceNameBox().GetValuePattern().SetValue(value);
             }
         }
 
-        private Button CreateButton {
+        public string Location {
             get {
-                return new Button(FindByName("Create"));
+                return LocationComboBox.GetSelectedItemName();
+            }
+            set {
+                WaitForInputIdle();
+                WaitFor(LocationComboBox, combobox => combobox.GetSelectedItemName() != "<Loading...>");
+                LocationComboBox.SelectItem(value);
+            }
+        }
+
+        private Button OkButton {
+            get {
+                return new Button(FindByAutomationId("OkButton"));
             }
         }
 
         private ComboBox LocationComboBox {
             get {
-                return new ComboBox(FindByAutomationId("_azureSiteLocation"));
+                return new ComboBox(FindByAutomationId("LocationComboBox"));
             }
         }
 
-        private ComboBox DatabaseComboBox {
-            get {
-                return new ComboBox(FindByAutomationId("_azureDatabaseServer"));
-            }
-        }
-
-        private AutomationElement GetSiteNameBox() {
+        private AutomationElement GetServiceNameBox() {
             return Element.FindFirst(TreeScope.Descendants,
                 new AndCondition(
-                    new PropertyCondition(AutomationElement.AutomationIdProperty, "_azureSiteName"),
+                    new PropertyCondition(AutomationElement.AutomationIdProperty, "ServiceNameTextBox"),
                     new PropertyCondition(AutomationElement.ControlTypeProperty, ControlType.Edit)
                 )
             );

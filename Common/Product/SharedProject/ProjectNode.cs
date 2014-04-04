@@ -47,6 +47,7 @@ namespace Microsoft.VisualStudioTools.Project {
         IVsUIHierarchy,
         IVsPersistHierarchyItem2,
         IVsHierarchyDeleteHandler,
+        IVsHierarchyDeleteHandler2,
         IVsHierarchyDropDataTarget,
         IVsHierarchyDropDataSource,
         IVsHierarchyDropDataSource2,
@@ -496,7 +497,7 @@ namespace Microsoft.VisualStudioTools.Project {
         public virtual string ErrorString {
             get {
                 if (this.errorString == null) {
-                    this.errorString = SR.GetString(SR.Error, CultureInfo.CurrentUICulture);
+                    this.errorString = SR.GetString(SR.Error);
                 }
 
                 return this.errorString;
@@ -506,7 +507,7 @@ namespace Microsoft.VisualStudioTools.Project {
         public virtual string WarningString {
             get {
                 if (this.warningString == null) {
-                    this.warningString = SR.GetString(SR.Warning, CultureInfo.CurrentUICulture);
+                    this.warningString = SR.GetString(SR.Warning);
                 }
 
                 return this.warningString;
@@ -883,9 +884,9 @@ namespace Microsoft.VisualStudioTools.Project {
         public override int SetEditLabel(string label) {
             // Validate the filename. 
             if (Utilities.IsFileNameInvalid(label)) {
-                throw new InvalidOperationException(String.Format(SR.GetString(SR.ErrorInvalidFileName, CultureInfo.CurrentUICulture), label));
+                throw new InvalidOperationException(SR.GetString(SR.ErrorInvalidFileName, label));
             } else if (this.ProjectFolder.Length + label.Length + 1 > NativeMethods.MAX_PATH) {
-                throw new InvalidOperationException(String.Format(CultureInfo.CurrentCulture, SR.GetString(SR.PathTooLong, CultureInfo.CurrentUICulture), label));
+                throw new InvalidOperationException(SR.GetString(SR.PathTooLong, label));
             }
 
 
@@ -900,7 +901,7 @@ namespace Microsoft.VisualStudioTools.Project {
 
             // Now check whether the original file is still there. It could have been renamed.
             if (!File.Exists(this.Url)) {
-                throw new InvalidOperationException(String.Format(CultureInfo.CurrentCulture, SR.GetString(SR.FileOrFolderCannotBeFound, CultureInfo.CurrentUICulture), this.ProjectFile));
+                throw new InvalidOperationException(SR.GetString(SR.FileOrFolderCannotBeFound, ProjectFile));
             }
 
             // Get the full file name and then rename the project file.
@@ -1257,7 +1258,7 @@ namespace Microsoft.VisualStudioTools.Project {
 
             // We just validate for length, since we assume other validation has been performed by the dlgOwner.
             if (CommonUtils.GetAbsoluteFilePath(this.ProjectHome, itemName).Length >= NativeMethods.MAX_PATH) {
-                string errorMessage = String.Format(CultureInfo.CurrentCulture, SR.GetString(SR.PathTooLong, CultureInfo.CurrentUICulture), itemName);
+                string errorMessage = SR.GetString(SR.PathTooLong, itemName);
                 if (!Utilities.IsInAutomationFunction(this.Site)) {
                     string title = null;
                     OLEMSGICON icon = OLEMSGICON.OLEMSGICON_CRITICAL;
@@ -1394,14 +1395,14 @@ namespace Microsoft.VisualStudioTools.Project {
                         (IVsComponentUser)this,
                         0,
                         null,
-                DynamicProjectSR.GetString(Microsoft.VisualStudioTools.Project.SR.AddReferenceDialogTitle),   // Title
-                        "VS.AddReference",						  // Help topic
+                        SR.GetString(SR.AddReferenceDialogTitle), // Title
+                        "VS.AddReference", // Help topic
                         ref pX,
                         ref pY,
                         (uint)tabInit.Length,
                         tabInit,
                         ref guidEmpty,
-                        AddReferenceExtensions,
+                        AddReferenceExtensions.Replace('|', '\0') + "\0",
                         ref strBrowseLocations));
                 }
             } catch (COMException e) {
@@ -1416,7 +1417,7 @@ namespace Microsoft.VisualStudioTools.Project {
 
         protected virtual string AddReferenceExtensions {
             get {
-                return "Dynamic Link Libraries (*.dll)\0*.dll\0All Files (*.*)\0*.*\0";
+                return SR.GetString(SR.AddReferenceExtensions);
             }
         }
 
@@ -1610,10 +1611,10 @@ namespace Microsoft.VisualStudioTools.Project {
                     Directory.CreateDirectory(directory);
                 }
 
-                FileInfo fiOrg = new FileInfo(source);
-                FileInfo fiNew = fiOrg.CopyTo(target, true);
+                File.Copy(source, target, true);
 
-                fiNew.Attributes = FileAttributes.Normal; // remove any read only attributes.
+                // best effort to reset the ReadOnly attribute
+                File.SetAttributes(target, File.GetAttributes(target) & ~FileAttributes.ReadOnly);
             } catch (IOException e) {
                 Trace.WriteLine("Exception : " + e.Message);
             } catch (UnauthorizedAccessException e) {
@@ -1690,7 +1691,7 @@ namespace Microsoft.VisualStudioTools.Project {
         /// <param name="resetCache">True to avoid using the cache</param>
         /// <returns>null if property does not exist, otherwise value of the property</returns>
         public virtual string GetProjectProperty(string propertyName, bool resetCache) {
-            UIThread.Instance.MustBeCalledFromUIThread();
+            UIThread.MustBeCalledFromUIThread();
 
             MSBuildExecution.ProjectPropertyInstance property = GetMsBuildProperty(propertyName, resetCache);
             if (property == null)
@@ -1706,7 +1707,7 @@ namespace Microsoft.VisualStudioTools.Project {
         /// </summary>
         /// <param name="propertyName">Name of the property to get</param>
         public virtual string GetUnevaluatedProperty(string propertyName) {
-            UIThread.Instance.MustBeCalledFromUIThread();
+            UIThread.MustBeCalledFromUIThread();
 
             var res = this.buildProject.GetProperty(propertyName);
 
@@ -1723,7 +1724,7 @@ namespace Microsoft.VisualStudioTools.Project {
         /// <param name="propertyValue">Value of property</param>
         public virtual void SetProjectProperty(string propertyName, string propertyValue) {
             Utilities.ArgumentNotNull("propertyName", propertyName);
-            UIThread.Instance.MustBeCalledFromUIThread();
+            UIThread.MustBeCalledFromUIThread();
 
             var oldValue = GetUnevaluatedProperty(propertyName) ?? string.Empty;
             propertyValue = propertyValue ?? string.Empty;
@@ -1930,12 +1931,13 @@ namespace Microsoft.VisualStudioTools.Project {
         /// </summary>
         /// <param name="strPath">Path of the folder, can be relative to project or absolute</param>
         public virtual HierarchyNode CreateFolderNodes(string path, bool createOnDisk = true) {
-            Utilities.ArgumentNotNullOrEmpty("path", path);
+            Utilities.ArgumentNotNull("path", path);
 
             if (Path.IsPathRooted(path)) {
                 // Ensure we are using a path deeper than ProjectHome
-                if (!CommonUtils.IsSubpathOf(ProjectHome, path))
+                if (!CommonUtils.IsSubpathOf(ProjectHome, path)) {
                     throw new ArgumentException("The path is not within the project", "path");
+                }
 
                 path = CommonUtils.GetRelativeDirectoryPath(ProjectHome, path);
             }
@@ -2327,7 +2329,7 @@ namespace Microsoft.VisualStudioTools.Project {
         /// </remarks>
         [SuppressMessage("Microsoft.Naming", "CA1709:IdentifiersShouldBeCasedCorrectly", MessageId = "Ms")]
         protected virtual MSBuildResult InvokeMsBuild(string target) {
-            UIThread.Instance.MustBeCalledFromUIThread();
+            UIThread.MustBeCalledFromUIThread();
 
             MSBuildResult result = MSBuildResult.Failed;
             const bool designTime = true;
@@ -2407,7 +2409,7 @@ namespace Microsoft.VisualStudioTools.Project {
                 }
 
                 submission.ExecuteAsync(sub => {
-                    UIThread.Instance.Run(() => {
+                    UIThread.Invoke(() => {
                         IDEBuildLogger ideLogger = this.buildLogger as IDEBuildLogger;
                         if (ideLogger != null) {
                             ideLogger.FlushBuildOutput();
@@ -2481,7 +2483,7 @@ namespace Microsoft.VisualStudioTools.Project {
             string errorMessage = String.Empty;
 
             if (newFileName.Length > NativeMethods.MAX_PATH) {
-                errorMessage = String.Format(CultureInfo.CurrentCulture, SR.GetString(SR.PathTooLong, CultureInfo.CurrentUICulture), newFileName);
+                errorMessage = SR.GetString(SR.PathTooLong, newFileName);
             } else {
                 string fileName = String.Empty;
 
@@ -2490,16 +2492,16 @@ namespace Microsoft.VisualStudioTools.Project {
                 }
                     // We want to be consistent in the error message and exception we throw. fileName could be for example #¤&%"¤&"%  and that would trigger an ArgumentException on Path.IsRooted.
                 catch (ArgumentException) {
-                    errorMessage = String.Format(SR.GetString(SR.ErrorInvalidFileName, CultureInfo.CurrentUICulture), newFileName);
+                    errorMessage = SR.GetString(SR.ErrorInvalidFileName, newFileName);
                 }
 
                 if (errorMessage.Length == 0) {
                     // If there is no filename or it starts with a leading dot issue an error message and quit.
                     // For some reason the save as dialog box allows to save files like "......ext"
                     if (String.IsNullOrEmpty(fileName) || fileName[0] == '.') {
-                        errorMessage = SR.GetString(SR.FileNameCannotContainALeadingPeriod, CultureInfo.CurrentUICulture);
+                        errorMessage = SR.GetString(SR.FileNameCannotContainALeadingPeriod);
                     } else if (Utilities.ContainsInvalidFileNameChars(newFileName)) {
-                        errorMessage = String.Format(SR.GetString(SR.ErrorInvalidFileName, CultureInfo.CurrentUICulture), newFileName);
+                        errorMessage = SR.GetString(SR.ErrorInvalidFileName, newFileName);
                     }
                 }
             }
@@ -2654,7 +2656,7 @@ namespace Microsoft.VisualStudioTools.Project {
             OLEMSGDEFBUTTON defaultButton = OLEMSGDEFBUTTON.OLEMSGDEFBUTTON_FIRST;
 
             // File already exists in project... message box
-            message = String.Format(SR.GetString(inProject ? SR.FileAlreadyInProject : SR.FileAlreadyExists, CultureInfo.CurrentUICulture), Path.GetFileName(originalFileName));
+            message = SR.GetString(inProject ? SR.FileAlreadyInProject : SR.FileAlreadyExists, Path.GetFileName(originalFileName));
             icon = OLEMSGICON.OLEMSGICON_QUERY;
             buttons = OLEMSGBUTTON.OLEMSGBUTTON_YESNO;
             int msgboxResult = VsShellUtilities.ShowMessageBox(this.Site, title, message, icon, buttons, defaultButton);
@@ -2740,7 +2742,7 @@ namespace Microsoft.VisualStudioTools.Project {
         /// <param name="canonicalName">Canonical name of the output group</param>
         /// <returns>Display name</returns>
         protected internal virtual string GetOutputGroupDisplayName(string canonicalName) {
-            string result = SR.GetString(String.Format(CultureInfo.InvariantCulture, "Output{0}", canonicalName), CultureInfo.CurrentUICulture);
+            string result = SR.GetString("Output" + canonicalName);
             if (String.IsNullOrEmpty(result))
                 result = canonicalName;
             return result;
@@ -2752,7 +2754,7 @@ namespace Microsoft.VisualStudioTools.Project {
         /// <param name="canonicalName">Canonical name of the output group</param>
         /// <returns>Description</returns>
         protected internal virtual string GetOutputGroupDescription(string canonicalName) {
-            string result = SR.GetString(String.Format(CultureInfo.InvariantCulture, "Output{0}Description", canonicalName), CultureInfo.CurrentUICulture);
+            string result = SR.GetString("Output" + canonicalName + "Description");
             if (String.IsNullOrEmpty(result))
                 result = canonicalName;
             return result;
@@ -2982,7 +2984,7 @@ namespace Microsoft.VisualStudioTools.Project {
         /// Overloaded method. Invokes MSBuild using the default configuration and does without logging on the output window pane.
         /// </summary>
         public MSBuildResult Build(string target) {
-            UIThread.Instance.MustBeCalledFromUIThread();
+            UIThread.MustBeCalledFromUIThread();
 
             return this.Build(String.Empty, target);
         }
@@ -2993,7 +2995,7 @@ namespace Microsoft.VisualStudioTools.Project {
         ///  PrepareBuild mainly creates directories and cleans house if cleanBuild is true
         /// </summary>
         public virtual void PrepareBuild(string config, bool cleanBuild) {
-            UIThread.Instance.MustBeCalledFromUIThread();
+            UIThread.MustBeCalledFromUIThread();
 
             try {
                 SetConfiguration(config);
@@ -3011,7 +3013,7 @@ namespace Microsoft.VisualStudioTools.Project {
         /// </summary>
         [SuppressMessage("Microsoft.Naming", "CA1704:IdentifiersShouldBeSpelledCorrectly", MessageId = "vsopts")]
         public virtual MSBuildResult Build(string config, string target) {
-            UIThread.Instance.MustBeCalledFromUIThread();
+            UIThread.MustBeCalledFromUIThread();
 
             lock (ProjectNode.BuildLock) {
                 IVsOutputWindowPane output = null;
@@ -3610,7 +3612,7 @@ namespace Microsoft.VisualStudioTools.Project {
             }
 
             if (String.IsNullOrEmpty(tempFileToBeSaved)) {
-                throw new ArgumentException(SR.GetString(SR.InvalidParameter, CultureInfo.CurrentUICulture), "fileToBeSaved");
+                throw new ArgumentException(SR.GetString(SR.InvalidParameter), "fileToBeSaved");
             }
 
             int setProjectFileDirtyAfterSave = 0;
@@ -3778,27 +3780,33 @@ namespace Microsoft.VisualStudioTools.Project {
 
             // Pre-calculates some paths that we can use when calling CanAddItems
             List<string> filesToAdd = new List<string>();
-            for (int index = 0; index < files.Length; index++) {
+            foreach (var file in files) {
+                string fileName;
                 string newFileName = String.Empty;
 
-                string file = files[index];
-
                 switch (op) {
-                    case VSADDITEMOPERATION.VSADDITEMOP_CLONEFILE: {
-                            string fileName = Path.GetFileName(itemName ?? file);
-                            newFileName = CommonUtils.GetAbsoluteFilePath(baseDir, fileName);
-                        }
+                    case VSADDITEMOPERATION.VSADDITEMOP_CLONEFILE:
+                        fileName = Path.GetFileName(itemName ?? file);
+                        newFileName = CommonUtils.GetAbsoluteFilePath(baseDir, fileName);
                         break;
                     case VSADDITEMOPERATION.VSADDITEMOP_LINKTOFILE:
-                    case VSADDITEMOPERATION.VSADDITEMOP_OPENFILE: {
-                            string fileName = Path.GetFileName(file);
-                            newFileName = CommonUtils.GetAbsoluteFilePath(baseDir, fileName);
+                    case VSADDITEMOPERATION.VSADDITEMOP_OPENFILE:
+                        fileName = Path.GetFileName(file);
+                        newFileName = CommonUtils.GetAbsoluteFilePath(baseDir, fileName);
 
-                            var friendlyPath = CommonUtils.CreateFriendlyFilePath(ProjectHome, file);
+                        if (isLink && CommonUtils.IsSubpathOf(ProjectHome, file)) {
+                            // creating a link to a file that's actually in the project, it's not really a link.
+                            isLink = false;
 
-                            if (isLink && CommonUtils.IsSubpathOf(ProjectHome, file)) {
-                                // creating a link to a file that's actually in the project, it's not really a link.
-                                isLink = false;
+                            // If the file is not going to be added in its
+                            // current path (GetDirectoryName(file) != baseDir),
+                            // we need to update the filename and also update
+                            // the destination node (n). Otherwise, we don't
+                            // want to change the destination node (previous
+                            // behavior) - just trust that our caller knows
+                            // what they are doing. (Web Essentials relies on
+                            // this.)
+                            if (!CommonUtils.IsSameDirectory(baseDir, Path.GetDirectoryName(file))) {
                                 newFileName = file;
                                 n = this.CreateFolderNodes(Path.GetDirectoryName(file));
                             }
@@ -3926,7 +3934,7 @@ namespace Microsoft.VisualStudioTools.Project {
                     if (!overwrite && File.Exists(newFileName)) {
                         var existingChild = this.FindNodeByFullPath(file);
                         if (existingChild == null || !existingChild.IsLinkFile) {
-                            string message = String.Format(CultureInfo.CurrentCulture, SR.GetString(SR.FileAlreadyExists, CultureInfo.CurrentUICulture), newFileName);
+                            string message = SR.GetString(SR.FileAlreadyExists, newFileName);
                             string title = string.Empty;
                             OLEMSGICON icon = OLEMSGICON.OLEMSGICON_QUERY;
                             OLEMSGBUTTON buttons = OLEMSGBUTTON.OLEMSGBUTTON_YESNO;
@@ -3977,8 +3985,11 @@ namespace Microsoft.VisualStudioTools.Project {
                                     if (fileInfo.Attributes.HasFlag(FileAttributes.ReadOnly)) {
                                         fileInfo.Attributes &= ~FileAttributes.ReadOnly;
                                     }
-                                } catch (Exception) {
+                                } catch (Exception ex) {
                                     // Best-effort, but no big deal if this fails.
+                                    if (ex.IsCriticalException()) {
+                                        throw;
+                                    }
                                 }
                             }
                         } finally {
@@ -4256,7 +4267,7 @@ If the files in the existing folder have the same names as files in the folder y
 
             HierarchyNode n = this.NodeFromItemId(itemId);
             if (n == null) {
-                throw new ArgumentException(SR.GetString(SR.ParameterMustBeAValidItemId, CultureInfo.CurrentUICulture), "itemId");
+                throw new ArgumentException(SR.GetString(SR.ParameterMustBeAValidItemId), "itemId");
             }
 
             // Delegate to the document manager object that knows how to open the item
@@ -4276,7 +4287,7 @@ If the files in the existing folder have the same names as files in the folder y
 
             HierarchyNode n = this.NodeFromItemId(itemId);
             if (n == null) {
-                throw new ArgumentException(SR.GetString(SR.ParameterMustBeAValidItemId, CultureInfo.CurrentUICulture), "itemId");
+                throw new ArgumentException(SR.GetString(SR.ParameterMustBeAValidItemId), "itemId");
             }
 
             // Delegate to the document manager object that knows how to open the item
@@ -4293,7 +4304,7 @@ If the files in the existing folder have the same names as files in the folder y
         public virtual int RemoveItem(uint reserved, uint itemId, out int result) {
             HierarchyNode n = this.NodeFromItemId(itemId);
             if (n == null) {
-                throw new ArgumentException(SR.GetString(SR.ParameterMustBeAValidItemId, CultureInfo.CurrentUICulture), "itemId");
+                throw new ArgumentException(SR.GetString(SR.ParameterMustBeAValidItemId), "itemId");
             }
             n.Remove(true);
             result = 1;
@@ -4307,7 +4318,7 @@ If the files in the existing folder have the same names as files in the folder y
 
             HierarchyNode n = this.NodeFromItemId(itemId);
             if (n == null) {
-                throw new ArgumentException(SR.GetString(SR.ParameterMustBeAValidItemId, CultureInfo.CurrentUICulture), "itemId");
+                throw new ArgumentException(SR.GetString(SR.ParameterMustBeAValidItemId), "itemId");
             }
 
             // Delegate to the document manager object that knows how to open the item
@@ -4426,7 +4437,7 @@ If the files in the existing folder have the same names as files in the folder y
         /// <param name="hwndDialog">Handle to the component picker dialog</param>
         /// <param name="pResult">Result to be returned to the caller</param>
         public virtual int AddComponent(VSADDCOMPOPERATION dwAddCompOperation, uint cComponents, System.IntPtr[] rgpcsdComponents, System.IntPtr hwndDialog, VSADDCOMPRESULT[] pResult) {
-            UIThread.Instance.MustBeCalledFromUIThread();
+            UIThread.MustBeCalledFromUIThread();
 
             if (rgpcsdComponents == null || pResult == null) {
                 return VSConstants.E_FAIL;
@@ -4466,7 +4477,7 @@ If the files in the existing folder have the same names as files in the folder y
         /// <returns>If the method succeeds, it returns S_OK. If it fails, it returns an error code. </returns>
         public virtual int GetSccFiles(uint itemid, CALPOLESTR[] stringsOut, CADWORD[] flagsOut) {
             if (itemid == VSConstants.VSITEMID_SELECTION) {
-                throw new ArgumentException(SR.GetString(SR.InvalidParameter, CultureInfo.CurrentUICulture), "itemid");
+                throw new ArgumentException(SR.GetString(SR.InvalidParameter), "itemid");
             } else if (itemid == VSConstants.VSITEMID_ROOT) {
                 // Root node.  Return our project file path.
                 if (stringsOut != null && stringsOut.Length > 0) {
@@ -4482,7 +4493,7 @@ If the files in the existing folder have the same names as files in the folder y
             // otherwise delegate to either a file or a folder to get the SCC files
             HierarchyNode n = this.NodeFromItemId(itemid);
             if (n == null) {
-                throw new ArgumentException(SR.GetString(SR.InvalidParameter, CultureInfo.CurrentUICulture), "itemid");
+                throw new ArgumentException(SR.GetString(SR.InvalidParameter), "itemid");
             }
 
             List<string> files = new List<string>();
@@ -4524,12 +4535,12 @@ If the files in the existing folder have the same names as files in the folder y
         /// <remarks>This method is called to discover any special or hidden files associated with an item in the project hierarchy. It is called when GetSccFiles returns with the SFF_HasSpecialFiles flag set for any of the files associated with the node.</remarks>
         public virtual int GetSccSpecialFiles(uint itemid, string sccFile, CALPOLESTR[] stringsOut, CADWORD[] flagsOut) {
             if (itemid == VSConstants.VSITEMID_SELECTION) {
-                throw new ArgumentException(SR.GetString(SR.InvalidParameter, CultureInfo.CurrentUICulture), "itemid");
+                throw new ArgumentException(SR.GetString(SR.InvalidParameter), "itemid");
             }
 
             HierarchyNode n = this.NodeFromItemId(itemid);
             if (n == null) {
-                throw new ArgumentException(SR.GetString(SR.InvalidParameter, CultureInfo.CurrentUICulture), "itemid");
+                throw new ArgumentException(SR.GetString(SR.InvalidParameter), "itemid");
             }
 
             List<string> files = new List<string>();
@@ -4567,7 +4578,7 @@ If the files in the existing folder have the same names as files in the folder y
                 for (int i = 0; i < affectedNodes; i++) {
                     HierarchyNode n = this.NodeFromItemId(itemidAffectedNodes[i]);
                     if (n == null) {
-                        throw new ArgumentException(SR.GetString(SR.InvalidParameter, CultureInfo.CurrentUICulture), "itemidAffectedNodes");
+                        throw new ArgumentException(SR.GetString(SR.InvalidParameter), "itemidAffectedNodes");
                     }
 
                     ReDrawNode(n, UIHierarchyElement.SccState);
@@ -4918,7 +4929,7 @@ If the files in the existing folder have the same names as files in the folder y
         /// <param name="item">msbuild item</param>
         /// <returns>parent node</returns>
         internal HierarchyNode GetItemParentNode(MSBuild.ProjectItem item) {
-            UIThread.Instance.MustBeCalledFromUIThread();
+            UIThread.MustBeCalledFromUIThread();
 
             var link = item.GetMetadataValue(ProjectFileConstants.Link);
             HierarchyNode currentParent = this;
@@ -4961,7 +4972,7 @@ If the files in the existing folder have the same names as files in the folder y
             }
 
             if (this.currentConfig == null) {
-                throw new Exception(String.Format(CultureInfo.CurrentCulture, SR.GetString(SR.FailedToRetrieveProperties, CultureInfo.CurrentUICulture), propertyName));
+                throw new Exception(SR.GetString(SR.FailedToRetrieveProperties, propertyName));
             }
 
             // return property asked for
@@ -5234,7 +5245,7 @@ If the files in the existing folder have the same names as files in the folder y
                         Marshal.ThrowExceptionForHR(accessor.UnregisterLoggers(submission.SubmissionId));
                     }
                 } catch (Exception ex) {
-                    if (ErrorHandler.IsCriticalException(ex)) {
+                    if (ex.IsCriticalException()) {
                         throw;
                     }
 
@@ -5246,7 +5257,7 @@ If the files in the existing folder have the same names as files in the folder y
                         Marshal.ThrowExceptionForHR(accessor.EndDesignTimeBuild());
                     }
                 } catch (Exception ex) {
-                    if (ErrorHandler.IsCriticalException(ex)) {
+                    if (ex.IsCriticalException()) {
                         throw;
                     }
 
@@ -5259,7 +5270,7 @@ If the files in the existing folder have the same names as files in the folder y
                         Marshal.ThrowExceptionForHR(accessor.ReleaseUIThreadForBuild());
                     }
                 } catch (Exception ex) {
-                    if (ErrorHandler.IsCriticalException(ex)) {
+                    if (ex.IsCriticalException()) {
                         throw;
                     }
 
@@ -5335,7 +5346,7 @@ If the files in the existing folder have the same names as files in the folder y
         /// Finds a node by it's full path on disk.
         /// </summary>
         internal HierarchyNode FindNodeByFullPath(string name) {
-            UIThread.Instance.MustBeCalledFromUIThread();
+            UIThread.MustBeCalledFromUIThread();
 
             Debug.Assert(Path.IsPathRooted(name));
 
@@ -5553,7 +5564,7 @@ If the files in the existing folder have the same names as files in the folder y
             Utilities.ArgumentNotNull("parent", parent);
             Utilities.ArgumentNotNull("child", child);
 
-            UIThread.Instance.MustBeCalledFromUIThread();
+            UIThread.MustBeCalledFromUIThread();
 
             IDiskBasedNode diskNode = child as IDiskBasedNode;
             if (diskNode != null) {
@@ -5577,7 +5588,7 @@ If the files in the existing folder have the same names as files in the folder y
         }
 
         internal void OnItemDeleted(HierarchyNode deletedItem) {
-            UIThread.Instance.MustBeCalledFromUIThread();
+            UIThread.MustBeCalledFromUIThread();
 
             IDiskBasedNode diskNode = deletedItem as IDiskBasedNode;
             if (diskNode != null) {
@@ -5734,6 +5745,36 @@ If the files in the existing folder have the same names as files in the folder y
 
         #endregion
 
+        #region IVsHierarchyDeleteHandler2 methods
+
+        public int ShowMultiSelDeleteOrRemoveMessage(uint dwDelItemOp, uint cDelItems, uint[] rgDelItems, out int pfCancelOperation) {
+            pfCancelOperation = 0;
+            return VSConstants.S_OK;
+        }
+
+        public int ShowSpecificDeleteRemoveMessage(uint dwDelItemOps, uint cDelItems, uint[] rgDelItems, out int pfShowStandardMessage, out uint pdwDelItemOp) {
+            pfShowStandardMessage = 1;
+            pdwDelItemOp = dwDelItemOps;
+
+            var items = rgDelItems.Select(id => NodeFromItemId(id)).Where(n => n != null).ToArray();
+            if (items.Length == 0) {
+                return VSConstants.S_OK;
+            } else {
+                bool cancel, showStandardDialog;
+                items[0].ShowDeleteMessage(items, (__VSDELETEITEMOPERATION)dwDelItemOps, out cancel, out showStandardDialog);
+
+                if (showStandardDialog || cancel) {
+                    pdwDelItemOp = 0;
+                }
+                if (!showStandardDialog) {
+                    pfShowStandardMessage = 0;
+                }
+            }
+            return VSConstants.S_OK;
+        }
+
+        #endregion
+
         #region IVsPersistHierarchyItem2 methods
 
         /// <summary>
@@ -5763,8 +5804,7 @@ If the files in the existing folder have the same names as files in the folder y
 
             // We can only perform save if the document is open
             if (docData == IntPtr.Zero) {
-                string errorMessage = string.Format(CultureInfo.CurrentCulture, SR.GetString(SR.CanNotSaveFileNotOpeneInEditor, CultureInfo.CurrentUICulture), node.Url);
-                throw new InvalidOperationException(errorMessage);
+                throw new InvalidOperationException(SR.GetString(SR.CanNotSaveFileNotOpeneInEditor, node.Url));
             }
 
             string docNew = String.Empty;
@@ -5910,7 +5950,7 @@ If the files in the existing folder have the same names as files in the folder y
         #endregion
 
         public void UpdatePathForDeferredSave(string oldPath, string newPath) {
-            UIThread.Instance.MustBeCalledFromUIThread();
+            UIThread.MustBeCalledFromUIThread();
 
             var existing = _diskNodes[oldPath];
             _diskNodes.Remove(oldPath);

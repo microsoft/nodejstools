@@ -26,6 +26,7 @@ using Microsoft.NodejsTools.NpmUI;
 using Microsoft.VisualStudio;
 using Microsoft.VisualStudio.Shell;
 using Microsoft.VisualStudio.Shell.Interop;
+using Microsoft.VisualStudioTools;
 using Microsoft.VisualStudioTools.Project;
 using MessageBox = System.Windows.MessageBox;
 using Timer = System.Threading.Timer;
@@ -281,12 +282,10 @@ namespace Microsoft.NodejsTools.Project {
         }
 
         private void ForceUpdateStatusBarWithNpmActivitySafe(string activity) {
-            if (UIThread.Instance.IsUIThread) {
-                ForceUpdateStatusBarWithNpmActivity(activity);
-            } else {
-                UIThread.Instance.Run(() => ForceUpdateStatusBarWithNpmActivity(activity));
+            UIThread.InvokeAsync(() => ForceUpdateStatusBarWithNpmActivity(activity))
+                .HandleAllExceptions(SR.ProductName)
+                .DoNotWait();
             }
-        }
 
         private void UpdateStatusBarWithNpmActivity(string activity) {
             lock (_commandCountLock) {
@@ -343,13 +342,14 @@ namespace Microsoft.NodejsTools.Project {
 
             string message;
             if (e.WithErrors) {
-                message = e.Cancelled
-                    ? string.Format(Resources.NpmCancelledWithErrors, e.CommandText)
-                    : string.Format(Resources.NpmCompletedWithErrors, e.CommandText);
+                message = SR.GetString(
+                    e.Cancelled ? SR.NpmCancelledWithErrors : SR.NpmCompletedWithErrors,
+                    e.CommandText
+                );
             } else if (e.Cancelled) {
-                message = string.Format(Resources.NpmCancelled, e.CommandText);
+                message = SR.GetString(SR.NpmCancelled, e.CommandText);
             } else {
-                message = string.Format(Resources.NpmSuccessfullyCompleted, e.CommandText);
+                message = SR.GetString(SR.NpmSuccessfullyCompleted, e.CommandText);
             }
 
             ForceUpdateStatusBarWithNpmActivitySafe(message);
@@ -379,11 +379,9 @@ namespace Microsoft.NodejsTools.Project {
         }
 
         internal void ReloadHierarchySafe() {
-            if (UIThread.Instance.IsUIThread) {
-                ReloadHierarchy();
-            } else {
-                UIThread.Instance.Run(ReloadHierarchy);
-            }
+            UIThread.InvokeAsync(ReloadHierarchy)
+                .HandleAllExceptions(SR.ProductName)
+                .DoNotWait();
         }
 
         private void UpdateModulesFromTimer() {
@@ -645,12 +643,12 @@ namespace Microsoft.NodejsTools.Project {
                             package.Name,
                             null == dep ? "*" : dep.VersionRangeText);
                     } else {
-                        await commander.InstallPackageByVersionAsync(
-                            package.Name,
-                            null == dep ? "*" : dep.VersionRangeText,
-                            DependencyType.Standard,
-                            false);
-                    }
+                    await commander.InstallPackageByVersionAsync(
+                        package.Name,
+                        null == dep ? "*" : dep.VersionRangeText,
+                        DependencyType.Standard,
+                        false);
+                }
                 }
             } catch (NpmNotFoundException nnfe) {
                 ErrorHelper.ReportNpmNotInstalled(null, nnfe);

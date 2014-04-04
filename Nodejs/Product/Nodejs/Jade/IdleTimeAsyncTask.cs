@@ -17,7 +17,9 @@ using System.Diagnostics;
 using System.Threading;
 using System.Threading.Tasks;
 using Microsoft.VisualStudio.Shell.Interop;
+using Microsoft.VisualStudioTools;
 using Microsoft.VisualStudioTools.Project;
+using SR = Microsoft.NodejsTools.Project.SR;
 
 namespace Microsoft.NodejsTools.Jade {
     /// <summary>
@@ -161,10 +163,14 @@ namespace Microsoft.NodejsTools.Jade {
                             );
                             result = ex;
                         } finally {
-                            UIThread.Instance.Run(() => UIThreadCompletedCallback(result));
+                            UIThread.InvokeAsync(() => UIThreadCompletedCallback(result))
+                                .HandleAllExceptions(SR.ProductName)
+                                .DoNotWait();
                         }
                     } else if (Interlocked.Read(ref _closed) > 0) {
-                        UIThread.Instance.Run((() => UIThreadCanceledCallback(null)));
+                        UIThread.InvokeAsync((() => UIThreadCanceledCallback(null)))
+                            .HandleAllExceptions(SR.ProductName)
+                            .DoNotWait();
                     }
                 });
             }

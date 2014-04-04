@@ -19,6 +19,9 @@ using System.IO;
 using System.Windows.Forms;
 #endif
 using Microsoft.Win32;
+#if !NO_WINDOWS
+using Microsoft.NodejsTools.Project;
+#endif
 
 namespace Microsoft.NodejsTools {
     public sealed class Nodejs {
@@ -81,8 +84,8 @@ namespace Microsoft.NodejsTools {
 #if !NO_WINDOWS
         public static void ShowNodejsNotInstalled() {
             MessageBox.Show(
-                Resources.NodejsNotInstalled,
-                Resources.NodejsToolsForVisualStudio,
+                SR.GetString(SR.NodejsNotInstalled),
+                SR.ProductName,
                 MessageBoxButtons.OK,
                 MessageBoxIcon.Error
             );
@@ -102,8 +105,8 @@ namespace Microsoft.NodejsTools {
                     if (info.FileMinorPart < 10 ||
                         (info.FileMinorPart == 10 && info.FileBuildPart < 20)) {
                         MessageBox.Show(
-                            String.Format(Resources.NodejsNotSupported, info.FileVersion),
-                            Resources.NodejsToolsForVisualStudio,
+                            SR.GetString(SR.NodejsNotSupported, info.FileVersion),
+                            SR.ProductName,
                             MessageBoxButtons.OK,
                             MessageBoxIcon.Error
                         );
@@ -116,11 +119,8 @@ namespace Microsoft.NodejsTools {
 
         public static void ShowNodejsPathNotFound(string path) {
             MessageBox.Show(
-                String.Format(
-                    Resources.NodeExeDoesntExist,
-                    path
-                ),
-                Resources.NodejsToolsForVisualStudio,
+                SR.GetString(SR.NodeExeDoesntExist, path),
+                SR.ProductName,
                 MessageBoxButtons.OK,
                 MessageBoxIcon.Error
             );

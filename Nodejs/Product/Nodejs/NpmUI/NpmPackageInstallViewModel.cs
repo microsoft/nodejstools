@@ -23,6 +23,7 @@ using System.Windows.Input;
 using System.Windows.Media;
 using System.Windows.Threading;
 using Microsoft.NodejsTools.Npm;
+using Microsoft.NodejsTools.Project;
 using Microsoft.VisualStudioTools.Wpf;
 using Microsoft.Windows.Design.Host;
 
@@ -194,7 +195,7 @@ namespace Microsoft.NodejsTools.NpmUI {
             FilteredCatalogListVisibility = Visibility.Hidden;
             CatalogControlVisibility = Visibility.Hidden;
             LoadingCatalogControlVisibility = Visibility.Visible;
-            LoadingCatalogMessage = Resources.CatalogLoadingDefault;
+            LoadingCatalogMessage = SR.GetString(SR.CatalogLoadingDefault);
 
             LastRefreshedMessage = LastRefreshedMessageProvider.RefreshInProgress;
 
@@ -209,7 +210,7 @@ namespace Microsoft.NodejsTools.NpmUI {
                 IsCatalogEmpty = false;
                 showList = true;
             } catch (NpmNotFoundException) {
-                LoadingCatalogMessage = Resources.CatalogLoadingNoNpm;
+                LoadingCatalogMessage = SR.GetString(SR.CatalogLoadingNoNpm);
             } catch (NpmCatalogEmptyException) {
                 IsCatalogEmpty = true;
                 showList = true;

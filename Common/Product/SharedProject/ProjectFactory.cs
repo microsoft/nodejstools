@@ -441,6 +441,10 @@ namespace Microsoft.VisualStudioTools.Project {
                 // Load the project file and user file into MSBuild as plain
                 // XML to make it easier for subclasses.
                 var projectXml = ProjectRootElement.Open(bstrFileName);
+                if (projectXml == null) {
+                    throw new Exception(SR.GetString(SR.UpgradeCannotLoadProject));
+                }
+
                 var userXml = userFileName != null ? ProjectRootElement.Open(userFileName) : null;
 
                 // Invoke our virtual UpgradeProject function. If it fails, it
@@ -487,13 +491,17 @@ namespace Microsoft.VisualStudioTools.Project {
                 logger.Log(__VSUL_ERRORLEVEL.VSUL_STATUSMSG, "Converted");
                 return VSConstants.S_OK;
             } catch (Exception ex) {
+                if (ex.IsCriticalException()) {
+                    throw;
+                }
+
                 logger.Log(__VSUL_ERRORLEVEL.VSUL_ERROR, SR.GetString(SR.UnexpectedUpgradeError, ex.Message));
                 try {
                     ActivityLog.LogError(GetType().FullName, ex.ToString());
                 } catch (InvalidOperationException) {
                     // Cannot log to ActivityLog. This may occur if we are
                     // outside of VS right now (for example, unit tests).
-                    Console.WriteLine(ex);
+                    System.Diagnostics.Trace.TraceError(ex.ToString());
                 }
                 return VSConstants.E_FAIL;
             }
@@ -536,6 +544,9 @@ namespace Microsoft.VisualStudioTools.Project {
                     pUpgradeRequired = 1;
                 }
             } catch (Exception ex) {
+                if (ex.IsCriticalException()) {
+                    throw;
+                }
                 // Log the error and don't attempt to upgrade the project.
                 logger.Log(__VSUL_ERRORLEVEL.VSUL_ERROR, SR.GetString(SR.UnexpectedUpgradeError, ex.Message));
                 try {
@@ -543,7 +554,7 @@ namespace Microsoft.VisualStudioTools.Project {
                 } catch (InvalidOperationException) {
                     // Cannot log to ActivityLog. This may occur if we are
                     // outside of VS right now (for example, unit tests).
-                    Console.WriteLine(ex);
+                    System.Diagnostics.Trace.TraceError(ex.ToString());
                 }
                 pUpgradeRequired = 0;
             }
@@ -607,6 +618,9 @@ namespace Microsoft.VisualStudioTools.Project {
                 }
 
             } catch (Exception ex) {
+                if (ex.IsCriticalException()) {
+                    throw;
+                }
                 // Log the error and don't attempt to upgrade the project.
                 logger.Log(__VSUL_ERRORLEVEL.VSUL_ERROR, SR.GetString(SR.UnexpectedUpgradeError, ex.Message));
                 try {
@@ -614,7 +628,7 @@ namespace Microsoft.VisualStudioTools.Project {
                 } catch (InvalidOperationException) {
                     // Cannot log to ActivityLog. This may occur if we are
                     // outside of VS right now (for example, unit tests).
-                    Console.WriteLine(ex);
+                    System.Diagnostics.Trace.TraceError(ex.ToString());
                 }
                 pUpgradeRequired = (uint)__VSPPROJECTUPGRADEVIAFACTORYREPAIRFLAGS.VSPUVF_PROJECT_NOREPAIR;
             }

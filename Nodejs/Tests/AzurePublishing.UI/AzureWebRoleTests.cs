@@ -24,8 +24,8 @@ using TestUtilities.UI.Nodejs;
 
 namespace AzurePublishingUITests {
     [TestClass]
-    public class AzureWebSiteTests {
-        private string _webSiteToDelete;
+    public class AzureWebRoleTests {
+        private string _cloudServiceToDelete;
         private static string publishSettingsFilePath;
 
         [ClassInitialize]
@@ -47,37 +47,14 @@ namespace AzurePublishingUITests {
 
         [TestCleanup]
         public void Cleanup() {
-            if (!string.IsNullOrEmpty(_webSiteToDelete)) {
-                Assert.IsTrue(AzureUtility.DeleteWebSiteWithRetry(publishSettingsFilePath, _webSiteToDelete));
+            if (!string.IsNullOrEmpty(_cloudServiceToDelete)) {
+                Assert.IsTrue(AzureUtility.DeleteCloudServiceWithRetry(publishSettingsFilePath, _cloudServiceToDelete), "Failed to delete cloud service.");
             }
         }
 
         public TestContext TestContext { get; set; }
 
-        internal static void CreateProject(VisualStudioApp app, string languageName, string templateName, string location, string projectName, string expectedProjectItem) {
-            using (var newProjDialog = app.FileNewProject()) {
-                newProjDialog.FocusLanguageNode(languageName);
-                newProjDialog.Location = location;
-                newProjDialog.ProjectName = projectName;
-
-                var djangoApp = newProjDialog.ProjectTypes.FindItem(templateName);
-                djangoApp.Select();
-                newProjDialog.OK();
-            }
-
-            // wait for new solution to load...
-            for (int i = 0; i < 40 && app.Dte.Solution.Projects.Count == 0; i++) {
-                System.Threading.Thread.Sleep(250);
-            }
-
-            app.SolutionExplorerTreeView.WaitForItem(
-                "Solution '" + app.Dte.Solution.Projects.Item(1).Name + "' (1 project)",
-                app.Dte.Solution.Projects.Item(1).Name,
-                expectedProjectItem
-            );
-        }
-
-        private void TestPublishToWebSite(
+        private void TestPublishToWebRole(
             string languageName,
             string templateName,
             string projectName,
@@ -86,7 +63,7 @@ namespace AzurePublishingUITests {
             int publishTimeout
         ) {
             using (var app = new VisualStudioApp(VsIdeTestHostContext.Dte)) {
-                CreateProject(
+                AzureWebSiteTests.CreateProject(
                     app,
                     languageName,
                     templateName,
@@ -95,9 +72,13 @@ namespace AzurePublishingUITests {
                     expectedProjectItem
                 );
 
-                _webSiteToDelete = Guid.NewGuid().ToString("N");
-                var siteUri = app.PublishToAzureWebSite(_webSiteToDelete, publishSettingsFilePath);
+                app.Dte.ExecuteCommand("Project.ConverttoWindowsAzureCloudServiceProject");
+
+                _cloudServiceToDelete = Guid.NewGuid().ToString("N");
+                var siteUri = app.PublishToAzureCloudService(_cloudServiceToDelete, publishSettingsFilePath);
                 app.WaitForBuildComplete(publishTimeout);
+
+                app.AzureActivityLog.WaitForPublishComplete(_cloudServiceToDelete, publishTimeout);
 
                 string text = WebDownloadUtility.GetString(siteUri);
                 Console.WriteLine("Response from {0}", siteUri);
@@ -106,12 +87,12 @@ namespace AzurePublishingUITests {
             }
         }
 
-        const int JavaScriptWebAppPublishTimeout = 2 * 60 * 1000;
+        const int JavaScriptWebAppPublishTimeout = 20 * 60 * 1000;
 
         [TestMethod, Priority(0), TestCategory("Core"), Timeout(JavaScriptWebAppPublishTimeout)]
         [HostType("TC Dynamic"), DynamicHostType(typeof(VsIdeHostAdapter))]
         public void JavaScriptWebAppPublish() {
-            TestPublishToWebSite(
+            TestPublishToWebRole(
                 NodejsVisualStudioApp.JavaScriptTemplateLanguageName,
                 NodejsVisualStudioApp.JavaScriptAzureWebAppTemplate,
                 "webproj",
@@ -121,12 +102,12 @@ namespace AzurePublishingUITests {
             );
         }
 
-        const int TypeScriptWebAppPublishTimeout = 2 * 60 * 1000;
+        const int TypeScriptWebAppPublishTimeout = 20 * 60 * 1000;
 
         [TestMethod, Priority(0), TestCategory("Core"), Timeout(TypeScriptWebAppPublishTimeout)]
         [HostType("TC Dynamic"), DynamicHostType(typeof(VsIdeHostAdapter))]
         public void TypeScriptWebAppPublish() {
-            TestPublishToWebSite(
+            TestPublishToWebRole(
                 NodejsVisualStudioApp.TypeScriptTemplateLanguageName,
                 NodejsVisualStudioApp.TypeScriptAzureWebAppTemplate,
                 "typeproj",

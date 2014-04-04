@@ -272,11 +272,6 @@
     <Compile Include="Project\NodejsTypeScriptFileNode.cs" />
     <Compile Include="Project\NodejsTypeScriptFileNodeProperties.cs" />
     <Compile Include="Project\NpmNodeProperties.cs" />
-    <Compile Include="Resources.Designer.cs">
-      <AutoGen>True</AutoGen>
-      <DesignTime>True</DesignTime>
-      <DependentUpon>Resources.resx</DependentUpon>
-    </Compile>
     <Compile Include="Debugger\Communication\AsyncProducerConsumerCollection.cs" />
     <Compile Include="Debugger\BreakOn.cs" />
     <Compile Include="Debugger\BreakOnKind.cs" />
@@ -341,6 +336,7 @@
     <Compile Include="Options\NodejsFormattingSpacingOptionsControl.Designer.cs">
       <DependentUpon>NodejsFormattingSpacingOptionsControl.cs</DependentUpon>
     </Compile>
+    <Compile Include="Project\ProjectResources.cs" />
     <Compile Include="TaggerProviderMetadata.cs" />
     <Compile Include="CustomTrackingSpan.cs" />
     <Compile Include="Debugger\Communication\BreakpointEventArgs.cs" />
@@ -1052,10 +1048,8 @@
     </ZipProject>
     <EmbeddedResource Include="Resources.resx">
       <ManifestResourceName>Microsoft.NodejsTools.Resources</ManifestResourceName>
-      <Generator>ResXFileCodeGenerator</Generator>
       <Visible>true</Visible>
       <SubType>Designer</SubType>
-      <LastGenOutput>Resources.Designer.cs</LastGenOutput>
     </EmbeddedResource>
   </ItemGroup>
   <ItemGroup>

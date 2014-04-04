@@ -44,8 +44,8 @@ namespace Microsoft.VisualStudioTools.Project {
 
         private int currentIndent;
         private IVsOutputWindowPane outputWindowPane;
-        private string errorString = SR.GetString(SR.Error, CultureInfo.CurrentUICulture);
-        private string warningString = SR.GetString(SR.Warning, CultureInfo.CurrentUICulture);
+        private string errorString = SR.GetString(SR.Error);
+        private string warningString = SR.GetString(SR.Warning);
         private TaskProvider taskProvider;
         private IVsHierarchy hierarchy;
         private IServiceProvider serviceProvider;
@@ -100,7 +100,7 @@ namespace Microsoft.VisualStudioTools.Project {
         /// Constructor.  Inititialize member data.
         /// </summary>
         public IDEBuildLogger(IVsOutputWindowPane output, TaskProvider taskProvider, IVsHierarchy hierarchy) {
-            UIThread.Instance.MustBeCalledFromUIThread();
+            UIThread.MustBeCalledFromUIThread();
 
             Utilities.ArgumentNotNull("taskProvider", taskProvider);
             Utilities.ArgumentNotNull("hierarchy", hierarchy);
@@ -534,7 +534,7 @@ namespace Microsoft.VisualStudioTools.Project {
             try {
                 action();
             } catch (Exception ex) {
-                if (Microsoft.VisualStudio.ErrorHandler.IsCriticalException(ex)) {
+                if (ex.IsCriticalException()) {
                     throw;
                 }
 

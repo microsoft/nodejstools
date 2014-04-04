@@ -1,4 +1,4 @@
-﻿/* ****************************************************************************
+/* ****************************************************************************
  *
  * Copyright (c) Microsoft Corporation. 
  *
@@ -13,12 +13,18 @@
  * ***************************************************************************/
 
 using System;
+using System.Threading;
 
-namespace Microsoft.NodejsTools.Project
-{
-    public enum NodejsItemType
-    {
-        NodejsItemTypeJavascript = 0,
-        NodejsItemTypeJavascriptTest = 1,
+namespace Microsoft.VisualStudioTools {
+    static class ExceptionExtensions {
+        /// <summary>
+        /// Returns true if an exception should not be handled by logging code.
+        /// </summary>
+        public static bool IsCriticalException(this Exception ex) {
+            return ex is StackOverflowException ||
+                ex is OutOfMemoryException ||
+                ex is ThreadAbortException ||
+                ex is AccessViolationException;
+        }
     }
 }

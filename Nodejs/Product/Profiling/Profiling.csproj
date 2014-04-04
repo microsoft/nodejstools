@@ -170,6 +170,9 @@
     </COMReference>
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="..\..\..\Common\Product\SharedProject\ExceptionExtensions.cs">
+      <Link>ExceptionExtensions.cs</Link>
+    </Compile>
     <Compile Include="..\..\..\Common\Product\SharedProject\UIThread.cs">
       <Link>UIThread.cs</Link>
     </Compile>
