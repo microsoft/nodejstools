@@ -109,6 +109,11 @@ namespace Microsoft.NodejsTools.TestAdapter {
                                 }
                             }
 
+                            if (String.IsNullOrEmpty(testCases)){
+                                MochaDiscover mocha = new MochaDiscover(fileAbsolutePath, 
+                                    (s) => {EvaluateJavaScript(nodeExePath, s, logger);});
+                                testCases = mocha.Discover();
+                            }
 
                             if (String.IsNullOrEmpty(testCases)) {
                                 logger.SendMessage(TestMessageLevel.Warning, String.Format("Discovered 0 testcases in: {0}", fileAbsolutePath));
