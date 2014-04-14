@@ -112,23 +112,38 @@ namespace Microsoft.NodejsTools.TestAdapter {
             string testFile;
             string testClass;
             string testMethod;
-            TestDiscoverer.ParseFullyQualifiedTestName(test.FullyQualifiedName, out testFile, out testClass, out testMethod);
+            string testFramework;
+            TestDiscoverer.ParseFullyQualifiedTestName(test.FullyQualifiedName, out testFile, out testClass, out testMethod, out testFramework);
 
-            return Path.GetDirectoryName(CommonUtils.GetAbsoluteFilePath(settings.WorkingDir, testFile));
+            if (testFramework != "mocha") {
+                return Path.GetDirectoryName(CommonUtils.GetAbsoluteFilePath(settings.WorkingDir, testFile));
+            } else {
+                return settings.WorkingDir;
+            }
         }
 
         private static IEnumerable<string> GetInterpreterArgs(TestCase test) {
             string testFile;
             string testClass;
             string testMethod;
-            TestDiscoverer.ParseFullyQualifiedTestName(test.FullyQualifiedName, out testFile, out testClass, out testMethod);
+            string testFramework;
+            TestDiscoverer.ParseFullyQualifiedTestName(test.FullyQualifiedName, out testFile, out testClass, out testMethod, out testFramework);
 
-            var moduleName = Path.GetFileNameWithoutExtension(testFile);
+            if (testFramework != "mocha") {
+                var moduleName = Path.GetFileNameWithoutExtension(testFile);
 
-            return new[] { 
-                "-e",                
-                String.Format("var testCase = require('{0}'); testCase['{1}']();", testFile.Replace("\\","\\\\"), testMethod)
-            };
+                return new[] { 
+                    "-e",                
+                    String.Format("var testCase = require('{0}'); testCase['{1}']();", testFile.Replace("\\","\\\\"), testMethod)
+                };
+            } else {
+                return new string[] {
+                    @"node_modules\mocha\bin\mocha",
+                    "-g",
+                    testMethod,
+                    testFile.StartsWith("\"")? testFile : "\"" + testFile + "\""
+                };
+            }
         }
 
         private static IEnumerable<string> GetDebugArgs(NodejsProjectSettings settings, out string secret, out int port) {
@@ -196,7 +211,9 @@ namespace Microsoft.NodejsTools.TestAdapter {
                                     workingDir,
                                     null,
                                     false,
-                                    null)) {
+                                    null,
+                                    //TODO: HACK, skip wrapping for mocha; otherwise test failure message will be messed.
+                                    !test.FullyQualifiedName.EndsWith("mocha"))) {
                 bool killed = false;
 
 #if DEBUG

@@ -90,7 +90,7 @@ namespace Microsoft.NodejsTools.TestAdapter {
                             string tempFile = Path.GetTempFileName();
 
                             try {
-                                EvaluateJavaScript(nodeExePath, String.Format("var fs = require('fs'); var stream = fs.createWriteStream('{0}'); var testCase = require('{1}'); for(var x in testCase) {{ stream.write(x + '\\r\\n'); }} stream.end();", tempFile.Replace("\\", "\\\\"), fileAbsolutePath.Replace("\\", "\\\\")), logger);
+                                EvaluateJavaScript(nodeExePath, String.Format("var fs = require('fs'); var stream = fs.createWriteStream('{0}'); var testCase = require('{1}'); for(var x in testCase) {{ stream.write(x + '\\r\\n'); }} stream.end();", tempFile.Replace("\\", "\\\\"), fileAbsolutePath.Replace("\\", "\\\\")), logger, projectHome);
                                 for (int i = 0; i < 4; i++) {
                                     try {
                                         testCases = File.ReadAllText(tempFile);
@@ -109,10 +109,12 @@ namespace Microsoft.NodejsTools.TestAdapter {
                                 }
                             }
 
+                            string testFramework = "vs";
                             if (String.IsNullOrEmpty(testCases)){
                                 MochaDiscover mocha = new MochaDiscover(fileAbsolutePath, 
-                                    (s) => {EvaluateJavaScript(nodeExePath, s, logger);});
+                                    (s) => {EvaluateJavaScript(nodeExePath, s, logger, projectHome);});
                                 testCases = mocha.Discover();
+                                testFramework = "mocha";
                             }
 
                             if (String.IsNullOrEmpty(testCases)) {
@@ -121,7 +123,7 @@ namespace Microsoft.NodejsTools.TestAdapter {
                                 foreach (var testFunction in testCases.Split(new[] { "\r\n", "\r", "\n" }, StringSplitOptions.RemoveEmptyEntries)) {
                                     //TestCase Qualified name format
                                     //Path::ModuleName::TestName
-                                    string testName = MakeFullyQualifiedTestName(fileAbsolutePath, Path.GetFileNameWithoutExtension(fileAbsolutePath), testFunction);
+                                    string testName = MakeFullyQualifiedTestName(fileAbsolutePath, Path.GetFileNameWithoutExtension(fileAbsolutePath), testFunction, testFramework);
 
                                     logger.SendMessage(TestMessageLevel.Informational, String.Format("Creating TestCase:{0}", testName));
                                     var testCase = new TestCase(testName, TestExecutor.ExecutorUri, projSource) {
@@ -145,15 +147,27 @@ namespace Microsoft.NodejsTools.TestAdapter {
         }
 
         internal static string MakeFullyQualifiedTestName(string modulePath, string className, string methodName) {
-            return modulePath + "::" + className + "::" + methodName;
+            return MakeFullyQualifiedTestName(modulePath, className, methodName, "vs");
+        }
+        internal static string MakeFullyQualifiedTestName(string modulePath, string className, string methodName, string testFramework) {
+            return modulePath + "::" + className + "::" + methodName + "::" + testFramework;
         }
 
         internal static void ParseFullyQualifiedTestName(string fullyQualifiedName, out string modulePath, out string className, out string methodName) {
+            string testFramework;
+            ParseFullyQualifiedTestName(fullyQualifiedName, out modulePath, out className, out methodName, out testFramework);
+        }
+
+        internal static void ParseFullyQualifiedTestName(string fullyQualifiedName, out string modulePath, out string className, out string methodName, out string testFramework) {
             string[] parts = fullyQualifiedName.Split(new string[] { "::" }, StringSplitOptions.None);
-            Debug.Assert(parts.Length == 3);
+            Debug.Assert(parts.Length == 3 || parts.Length == 4);
             modulePath = parts[0];
             className = parts[1];
             methodName = parts[2];
+            testFramework = null;
+            if (parts.Length > 3) {
+                testFramework = parts[3];
+            }
         }
 
         internal static MSBuild.Project LoadProject(MSBuild.ProjectCollection buildEngine, string fullProjectPath) {
@@ -165,7 +179,7 @@ namespace Microsoft.NodejsTools.TestAdapter {
             return buildEngine.LoadProject(fullProjectPath);
         }
 
-        private string EvaluateJavaScript(string nodeExePath, string code, IMessageLogger logger) {
+        private string EvaluateJavaScript(string nodeExePath, string code, IMessageLogger logger, string workingDirectory) {
 #if DEBUG
             logger.SendMessage(TestMessageLevel.Informational, String.Format("  Code {0}", code));
 #endif
@@ -176,6 +190,7 @@ namespace Microsoft.NodejsTools.TestAdapter {
             processStartInfo.UseShellExecute = false;
             processStartInfo.RedirectStandardError = true;
             processStartInfo.RedirectStandardOutput = true;
+            processStartInfo.WorkingDirectory = workingDirectory;
 
             string stdout = "";
             try {
