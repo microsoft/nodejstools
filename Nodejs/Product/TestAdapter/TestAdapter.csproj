@@ -125,7 +125,6 @@
     <Compile Include="..\Nodejs\Nodejs.cs">
       <Link>Nodejs.cs</Link>
     </Compile>
-    <Compile Include="MochaDiscover.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="RunFromContextFileExtensions.cs" />
     <Compile Include="..\..\..\Common\Product\TestAdapter\ServiceProviderExtension.cs">
@@ -143,6 +142,9 @@
     <Compile Include="..\..\..\Common\Product\TestAdapter\TestFilesUpdateWatcher.cs">
       <Link>TestFilesUpdateWatcher.cs</Link>
     </Compile>
+    <Compile Include="TestFrameworks\Default.cs" />
+    <Compile Include="TestFrameworks\ITestFramework.cs" />
+    <Compile Include="TestFrameworks\Mocha.cs" />
     <Compile Include="TestMethodResolver.cs" />
     <Compile Include="..\..\..\Common\Product\TestAdapter\VisualStudioApp.cs">
       <Link>VisualStudioApp.cs</Link>
@@ -151,6 +153,7 @@
       <Link>VsProjectExtensions.cs</Link>
     </Compile>
   </ItemGroup>
+  <ItemGroup />
   <Target Name="DeployPTVSD" BeforeTargets="GetVsixSourceItems">
     <ItemGroup>
       <PTVSDFiles Include="$(OutputPath)visualstudio_py_*.py" />

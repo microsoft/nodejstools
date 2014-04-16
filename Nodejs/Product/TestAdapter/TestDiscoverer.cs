@@ -73,6 +73,8 @@ namespace Microsoft.NodejsTools.TestAdapter {
                             if (!TestContainerDiscoverer.IsValidTestFramework(value)) {
                                 continue;
                             }
+                            Debug.Fail("Before discover");
+                            TestFrameworks.ITestFramework testFramework = GetTestFrameworkObject(value);
 
                             string fileAbsolutePath = CommonUtils.GetAbsoluteFilePath(projectHome, item.EvaluatedInclude);
 
@@ -90,7 +92,7 @@ namespace Microsoft.NodejsTools.TestAdapter {
                             string tempFile = Path.GetTempFileName();
 
                             try {
-                                EvaluateJavaScript(nodeExePath, String.Format("var fs = require('fs'); var stream = fs.createWriteStream('{0}'); var testCase = require('{1}'); for(var x in testCase) {{ stream.write(x + '\\r\\n'); }} stream.end();", tempFile.Replace("\\", "\\\\"), fileAbsolutePath.Replace("\\", "\\\\")), logger, projectHome);
+                                EvaluateJavaScript(nodeExePath, testFramework.DiscoverScript(fileAbsolutePath, tempFile), logger, projectHome);
                                 for (int i = 0; i < 4; i++) {
                                     try {
                                         testCases = File.ReadAllText(tempFile);
@@ -109,21 +111,13 @@ namespace Microsoft.NodejsTools.TestAdapter {
                                 }
                             }
 
-                            string testFramework = "vs";
-                            if (String.IsNullOrEmpty(testCases)){
-                                MochaDiscover mocha = new MochaDiscover(fileAbsolutePath, 
-                                    (s) => {EvaluateJavaScript(nodeExePath, s, logger, projectHome);});
-                                testCases = mocha.Discover();
-                                testFramework = "mocha";
-                            }
-
                             if (String.IsNullOrEmpty(testCases)) {
                                 logger.SendMessage(TestMessageLevel.Warning, String.Format("Discovered 0 testcases in: {0}", fileAbsolutePath));
                             } else {
                                 foreach (var testFunction in testCases.Split(new[] { "\r\n", "\r", "\n" }, StringSplitOptions.RemoveEmptyEntries)) {
                                     //TestCase Qualified name format
-                                    //Path::ModuleName::TestName
-                                    string testName = MakeFullyQualifiedTestName(fileAbsolutePath, Path.GetFileNameWithoutExtension(fileAbsolutePath), testFunction, testFramework);
+                                    //Path::ModuleName::TestName:TestFramework
+                                    string testName = MakeFullyQualifiedTestName(fileAbsolutePath, Path.GetFileNameWithoutExtension(fileAbsolutePath), testFunction, testFramework.Name);
 
                                     logger.SendMessage(TestMessageLevel.Informational, String.Format("Creating TestCase:{0}", testName));
                                     var testCase = new TestCase(testName, TestExecutor.ExecutorUri, projSource) {
@@ -146,28 +140,25 @@ namespace Microsoft.NodejsTools.TestAdapter {
             }
         }
 
-        internal static string MakeFullyQualifiedTestName(string modulePath, string className, string methodName) {
-            return MakeFullyQualifiedTestName(modulePath, className, methodName, "vs");
+        private TestFrameworks.ITestFramework GetTestFrameworkObject(string testFramework) {
+            if (testFramework == "mocha") {
+                return new TestFrameworks.Mocha();
+            } else {
+                return new TestFrameworks.Default();
+            }
         }
+
         internal static string MakeFullyQualifiedTestName(string modulePath, string className, string methodName, string testFramework) {
             return modulePath + "::" + className + "::" + methodName + "::" + testFramework;
         }
 
-        internal static void ParseFullyQualifiedTestName(string fullyQualifiedName, out string modulePath, out string className, out string methodName) {
-            string testFramework;
-            ParseFullyQualifiedTestName(fullyQualifiedName, out modulePath, out className, out methodName, out testFramework);
-        }
-
         internal static void ParseFullyQualifiedTestName(string fullyQualifiedName, out string modulePath, out string className, out string methodName, out string testFramework) {
             string[] parts = fullyQualifiedName.Split(new string[] { "::" }, StringSplitOptions.None);
-            Debug.Assert(parts.Length == 3 || parts.Length == 4);
+            Debug.Assert(parts.Length == 4);
             modulePath = parts[0];
             className = parts[1];
             methodName = parts[2];
-            testFramework = null;
-            if (parts.Length > 3) {
-                testFramework = parts[3];
-            }
+            testFramework = parts[3];
         }
 
         internal static MSBuild.Project LoadProject(MSBuild.ProjectCollection buildEngine, string fullProjectPath) {
