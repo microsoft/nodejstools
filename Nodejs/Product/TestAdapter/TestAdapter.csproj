@@ -142,9 +142,8 @@
     <Compile Include="..\..\..\Common\Product\TestAdapter\TestFilesUpdateWatcher.cs">
       <Link>TestFilesUpdateWatcher.cs</Link>
     </Compile>
-    <Compile Include="TestFrameworks\Default.cs" />
-    <Compile Include="TestFrameworks\ITestFramework.cs" />
-    <Compile Include="TestFrameworks\Mocha.cs" />
+    <Compile Include="TestFrameworks\TestFramework.cs" />
+    <Compile Include="TestFrameworks\FrameworkDiscover.cs" />
     <Compile Include="TestMethodResolver.cs" />
     <Compile Include="..\..\..\Common\Product\TestAdapter\VisualStudioApp.cs">
       <Link>VisualStudioApp.cs</Link>

@@ -759,6 +759,18 @@
     </MultiProjectZipProject>
     <ZipItem Include="Templates\Files\UnitTest\UnitTest.js" />
     <ZipItem Include="Templates\Files\UnitTest\UnitTest.vstemplate" />
+    <Content Include="TestFrameworks\discover.js">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+      <IncludeInVSIX>true</IncludeInVSIX>
+    </Content>
+    <Content Include="TestFrameworks\generic\generic.js">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+      <IncludeInVSIX>true</IncludeInVSIX>
+    </Content>
+    <Content Include="TestFrameworks\mocha\mocha.js">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+      <IncludeInVSIX>true</IncludeInVSIX>
+    </Content>
     <Content Include="VSTemplateStore.pkgdef">
       <IncludeInVSIX>true</IncludeInVSIX>
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
@@ -1109,6 +1121,7 @@
     <TypeScriptProject Include="ProjectTemplates\TypeScriptAzureExpressApp\stylus.d.ts" />
     <TypeScriptProject Include="ProjectTemplates\TypeScriptExpressApp\stylus.d.ts" />
   </ItemGroup>
+  <ItemGroup />
   <PropertyGroup>
     <!--
     To specify a different registry root to register your package, uncomment the TargetRegistryRoot
