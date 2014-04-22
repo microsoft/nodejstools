@@ -35,8 +35,9 @@ var run_tests = function (testName, testFile, projectFolder) {
     mocha.grep(testName);
   }
   mocha.addFile(testFile);
-  mocha.run(function () {
-    console.log('Done');
+  mocha.run(function (code) {
+    console.log('Done with Code:' + code);
+    process.exit(code);
   });
 }
 module.exports.run_tests = run_tests;
