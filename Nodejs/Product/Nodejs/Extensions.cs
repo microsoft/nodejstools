@@ -14,12 +14,18 @@
 
 using System;
 using System.Collections.Generic;
+using System.IO;
+using System.Text;
 using Microsoft.NodejsTools;
+using Microsoft.NodejsTools.Analysis;
+using Microsoft.NodejsTools.Intellisense;
 using Microsoft.NodejsTools.Project;
 using Microsoft.VisualStudio;
+using Microsoft.VisualStudio.Language.StandardClassification;
 using Microsoft.VisualStudio.Shell;
 using Microsoft.VisualStudio.Shell.Interop;
 using Microsoft.VisualStudio.Text;
+using Microsoft.VisualStudio.Text.Classification;
 using Microsoft.VisualStudioTools;
 
 namespace Microsoft.NodejsTools {
@@ -99,6 +105,106 @@ namespace Microsoft.NodejsTools {
             list.CopyTo(res, 0);
             res[res.Length - 1] = item;
             return res;
+        }
+
+        internal static EnvDTE.Project GetProject(this ITextBuffer buffer) {
+            var path = buffer.GetFilePath();
+            if (path != null && NodejsPackage.Instance != null) {
+                var item = NodejsPackage.Instance.DTE.Solution.FindProjectItem(path);
+                if (item != null) {
+                    return item.ContainingProject;
+                }
+            }
+            return null;
+        }
+
+        internal static NodejsProjectNode GetPythonProject(this EnvDTE.Project project) {
+            return project.GetCommonProject() as NodejsProjectNode;
+        }        
+
+        internal static VsProjectAnalyzer GetAnalyzer(this ITextBuffer buffer) {
+            NodejsProjectNode pyProj;
+            VsProjectAnalyzer analyzer;
+            if (!buffer.Properties.TryGetProperty<NodejsProjectNode>(typeof(NodejsProjectNode), out pyProj)) {
+                var project = buffer.GetProject();
+                if (project != null) {
+                    pyProj = project.GetPythonProject();
+                    if (pyProj != null) {
+                        buffer.Properties.AddProperty(typeof(NodejsProjectNode), pyProj);
+                    }
+                }
+            }
+
+            if (pyProj != null) {
+                analyzer = pyProj.GetAnalyzer();
+                return analyzer;
+            }
+
+            // exists for tests where we don't run in VS and for the existing changes preview
+            if (buffer.Properties.TryGetProperty<VsProjectAnalyzer>(typeof(VsProjectAnalyzer), out analyzer)) {
+                return analyzer;
+            }
+
+            return NodejsPackage.Instance.DefaultAnalyzer;
+        }
+
+        internal static bool TryGetPythonProjectEntry(this ITextBuffer buffer, out IPythonProjectEntry entry) {
+            IProjectEntry e;
+            if (buffer.TryGetProjectEntry(out e) && (entry = e as IPythonProjectEntry) != null) {
+                return true;
+            }
+            entry = null;
+            return false;
+        }
+
+        internal static bool TryGetProjectEntry(this ITextBuffer buffer, out IProjectEntry entry) {
+            return buffer.Properties.TryGetProperty<IProjectEntry>(typeof(IProjectEntry), out entry);
+        }
+
+        internal static string LimitLines(
+            this string str,
+            int maxLines = 30,
+            int charsPerLine = 200,
+            bool ellipsisAtEnd = true,
+            bool stopAtFirstBlankLine = false
+        ) {
+            if (string.IsNullOrEmpty(str)) {
+                return str;
+            }
+
+            int lineCount = 0;
+            var prettyPrinted = new StringBuilder();
+            bool wasEmpty = true;
+
+            using (var reader = new StringReader(str)) {
+                for (var line = reader.ReadLine(); line != null && lineCount < maxLines; line = reader.ReadLine()) {
+                    if (string.IsNullOrWhiteSpace(line)) {
+                        if (wasEmpty) {
+                            continue;
+                        }
+                        wasEmpty = true;
+                        if (stopAtFirstBlankLine) {
+                            lineCount = maxLines;
+                            break;
+                        }
+                        lineCount += 1;
+                        prettyPrinted.AppendLine();
+                    } else {
+                        wasEmpty = false;
+                        lineCount += (line.Length / charsPerLine) + 1;
+                        prettyPrinted.AppendLine(line);
+                    }
+                }
+            }
+            if (ellipsisAtEnd && lineCount >= maxLines) {
+                prettyPrinted.AppendLine("...");
+            }
+            return prettyPrinted.ToString().Trim();
+        }
+
+        internal static bool CanComplete(this ClassificationSpan token) {
+            return token.ClassificationType.IsOfType(PredefinedClassificationTypeNames.Keyword) |
+                token.ClassificationType.IsOfType(PredefinedClassificationTypeNames.Identifier);
         }
 
     }

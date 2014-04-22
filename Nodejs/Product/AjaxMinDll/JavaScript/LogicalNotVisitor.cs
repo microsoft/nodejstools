@@ -2,16 +2,17 @@
 using System.Collections.Generic;
 using System.Text;
 
-namespace Microsoft.Ajax.Utilities
+namespace Microsoft.NodejsTools.Parsing
 {
+#if FALSE
     public class LogicalNot : TreeVisitor
     {
-        private AstNode m_expression;
+        private Node m_expression;
         private bool m_measure;
         private JSParser m_parser;
         private int m_delta;
 
-        public LogicalNot(AstNode node, JSParser parser)
+        public LogicalNot(Node node, JSParser parser)
         {
             m_expression = node;
             m_parser = parser;
@@ -35,13 +36,13 @@ namespace Microsoft.Ajax.Utilities
             m_expression.Accept(this);
         }
 
-        public static void Apply(AstNode node, JSParser parser)
+        public static void Apply(Node node, JSParser parser)
         {
             var logicalNot = new LogicalNot(node, parser);
             logicalNot.Apply();
         }
 
-        private void WrapWithLogicalNot(AstNode operand)
+        private void WrapWithLogicalNot(Node operand)
         {
             operand.Parent.ReplaceChild(
                 operand,
@@ -52,7 +53,7 @@ namespace Microsoft.Ajax.Utilities
                     });
         }
 
-        private void TypicalHandler(AstNode node)
+        private void TypicalHandler(Node node)
         {
             if (node != null)
             {
@@ -506,4 +507,5 @@ namespace Microsoft.Ajax.Utilities
             }
         }
     }
+#endif
 }

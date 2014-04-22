@@ -55,9 +55,11 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "AzurePublishing.Tests.UI", 
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "PressAnyKey", "Product\PressAnyKey\PressAnyKey.csproj", "{CB61D8BD-48DC-40F4-A4BA-5B68A10A7481}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "JSAnalysisTests", "Tests\AnalysisTests\JSAnalysisTests.csproj", "{C2FA3ADC-95A6-47ED-9010-A86EDE081A73}"
+EndProject
 Global
 	GlobalSection(TeamFoundationVersionControl) = preSolution
-		SccNumberOfProjects = 25
+		SccNumberOfProjects = 26
 		SccEnterpriseProvider = {4CA58AB2-18FA-4F8D-95D4-32DDF27D184C}
 		SccTeamFoundationServer = http://vstfdevdiv:8080/devdiv2
 		SccLocalPath0 = .
@@ -157,6 +159,10 @@ Global
 		SccProjectTopLevelParentUniqueName24 = NodejsTools.sln
 		SccProjectName24 = Product/PressAnyKey
 		SccLocalPath24 = Product\\PressAnyKey
+		SccProjectUniqueName25 = Tests\\AnalysisTests\\JSAnalysisTests.csproj
+		SccProjectTopLevelParentUniqueName25 = NodejsTools.sln
+		SccProjectName25 = Tests/AnalysisTests
+		SccLocalPath25 = Tests\\AnalysisTests
 	EndGlobalSection
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|x86 = Debug|x86
@@ -259,6 +265,9 @@ Global
 		{CB61D8BD-48DC-40F4-A4BA-5B68A10A7481}.Debug|x86.Build.0 = Debug|x86
 		{CB61D8BD-48DC-40F4-A4BA-5B68A10A7481}.Release|x86.ActiveCfg = Release|x86
 		{CB61D8BD-48DC-40F4-A4BA-5B68A10A7481}.Release|x86.Build.0 = Release|x86
+		{C2FA3ADC-95A6-47ED-9010-A86EDE081A73}.Debug|x86.ActiveCfg = Debug|Any CPU
+		{C2FA3ADC-95A6-47ED-9010-A86EDE081A73}.Debug|x86.Build.0 = Debug|Any CPU
+		{C2FA3ADC-95A6-47ED-9010-A86EDE081A73}.Release|x86.ActiveCfg = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -288,5 +297,6 @@ Global
 		{95494195-DCA4-4633-B78B-2087836C11D0} = {850AC94A-310F-4F88-A553-2806D7732BD1}
 		{3FC57837-519D-4980-A8E8-DC5879DDA002} = {850AC94A-310F-4F88-A553-2806D7732BD1}
 		{F2DCA606-EA73-47B6-940C-0793AC9D07BE} = {850AC94A-310F-4F88-A553-2806D7732BD1}
+		{C2FA3ADC-95A6-47ED-9010-A86EDE081A73} = {850AC94A-310F-4F88-A553-2806D7732BD1}
 	EndGlobalSection
 EndGlobal

@@ -14,8 +14,9 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-namespace Microsoft.Ajax.Utilities
+namespace Microsoft.NodejsTools.Parsing
 {
+#if FALSE
     public class ConditionalCompilationOn : ConditionalCompilationStatement
     {
         public ConditionalCompilationOn(Context context, JSParser parser)
@@ -23,7 +24,7 @@ namespace Microsoft.Ajax.Utilities
         {
         }
 
-        public override void Accept(IVisitor visitor)
+        public override void Accept(AstVisitor visitor)
         {
             if (visitor != null)
             {
@@ -31,4 +32,5 @@ namespace Microsoft.Ajax.Utilities
             }
         }
     }
+#endif
 }

@@ -18,13 +18,13 @@ using System.Collections.Generic;
 using System.Reflection;
 using System.Text;
 
-namespace Microsoft.Ajax.Utilities
+namespace Microsoft.NodejsTools.Parsing
 {
-    public sealed class VariableDeclaration : AstNode, INameDeclaration, INameReference
+    public sealed class VariableDeclaration : Node, INameDeclaration, INameReference
     {
-        private AstNode m_initializer;
+        private Expression m_initializer;
 
-        public AstNode Initializer
+        public Expression Initializer
         {
             get { return m_initializer; }
             set
@@ -36,15 +36,13 @@ namespace Microsoft.Ajax.Utilities
         }
 
         public string Identifier { get; set; }
-        public Context NameContext { get; set; }
+        public TokenWithSpan NameContext { get; set; }
 
-        public Context AssignContext { get; set; }
+        public TokenWithSpan AssignContext { get; set; }
 
         public bool HasInitializer { get { return Initializer != null; } }
 
         public JSVariableField VariableField { get; set; }
-        public bool IsCCSpecialCase { get; set; }
-        public bool UseCCOn { get; set; }
 
         public string Name
         {
@@ -82,7 +80,7 @@ namespace Microsoft.Ajax.Utilities
             }
         }
 
-        public AstNode AssignmentValue
+        public Node AssignmentValue
         {
             get
             {
@@ -90,17 +88,18 @@ namespace Microsoft.Ajax.Utilities
             }
         }
 
-        public VariableDeclaration(Context context, JSParser parser)
+        public VariableDeclaration(TokenWithSpan context, JSParser parser)
             : base(context, parser)
         {
         }
 
-        public override void Accept(IVisitor visitor)
-        {
-            if (visitor != null)
-            {
-                visitor.Visit(this);
+        public override void Walk(AstVisitor visitor) {
+            if (visitor.Walk(this)) {
+                if (m_initializer != null) {
+                    m_initializer.Walk(visitor);
+                }
             }
+            visitor.PostWalk(this);
         }
 
         public override bool IsExpression
@@ -114,12 +113,12 @@ namespace Microsoft.Ajax.Utilities
             }
         }
 
-        internal override string GetFunctionGuess(AstNode target)
+        internal override string GetFunctionGuess(Node target)
         {
             return Identifier;
         }
 
-        public override IEnumerable<AstNode> Children
+        public override IEnumerable<Node> Children
         {
             get
             {
@@ -127,32 +126,14 @@ namespace Microsoft.Ajax.Utilities
             }
         }
 
-        public override bool ReplaceChild(AstNode oldNode, AstNode newNode)
+        public override bool ReplaceChild(Node oldNode, Node newNode)
         {
             if (Initializer == oldNode)
             {
-                Initializer = newNode;
+                Initializer = (Expression)newNode;
                 return true;
             }
             return false;
-        }
-
-        public override bool IsEquivalentTo(AstNode otherNode)
-        {
-            JSVariableField otherField = null;
-            Lookup otherLookup;
-            var otherVarDecl = otherNode as VariableDeclaration;
-            if (otherVarDecl != null)
-            {
-                otherField = otherVarDecl.VariableField;
-            }
-            else if ((otherLookup = otherNode as Lookup) != null)
-            {
-                otherField = otherLookup.VariableField;
-            }
-
-            // if we get here, we're not equivalent
-            return this.VariableField != null && this.VariableField.IsSameField(otherField);
         }
 
         #region INameReference Members

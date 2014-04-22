@@ -17,7 +17,7 @@
 using System;
 using System.Text;
 
-namespace Microsoft.Ajax.Utilities
+namespace Microsoft.NodejsTools.Parsing
 {
     public class ContextError
     {
@@ -35,7 +35,7 @@ namespace Microsoft.Ajax.Utilities
         public string Message { get; protected set; }
 
         // constructor
-        public ContextError(bool isError, int severity, string subcategory, string errorCode, string helpKeyword, string file, int startLine, int startColumn, int endLine, int endColumn, string message)
+        public ContextError(bool isError, int severity, string subcategory, string errorCode, string helpKeyword, int startLine, int startColumn, int endLine, int endColumn, string message)
         {
             // transfer the values as-is
             IsError = isError;
@@ -43,7 +43,6 @@ namespace Microsoft.Ajax.Utilities
             Subcategory = subcategory;
             ErrorCode = errorCode;
             HelpKeyword = helpKeyword;
-            File = file;
             StartLine = startLine;
             StartColumn = startColumn;
             EndLine = endLine;
@@ -59,11 +58,6 @@ namespace Microsoft.Ajax.Utilities
         public override string ToString()
         {
             var sb = new StringBuilder();
-
-            if (!string.IsNullOrEmpty(File))
-            {
-                sb.Append(File);
-            }
 
             // if there is a startline, then there must be a location.
             // no start line, then no location

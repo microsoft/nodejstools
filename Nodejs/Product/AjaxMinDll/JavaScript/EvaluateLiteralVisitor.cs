@@ -18,8 +18,9 @@ using System;
 using System.Collections.Generic;
 using System.Text;
 
-namespace Microsoft.Ajax.Utilities
+namespace Microsoft.NodejsTools.Parsing
 {
+#if FALSE
     internal class EvaluateLiteralVisitor : TreeVisitor
     {
         private JSParser m_parser;
@@ -118,7 +119,7 @@ namespace Microsoft.Ajax.Utilities
         /// </summary>
         /// <param name="node">node to replace</param>
         /// <param name="newLiteral">literal to replace the node with</param>
-        private static void ReplaceNodeWithLiteral(AstNode node, ConstantWrapper newLiteral)
+        private static void ReplaceNodeWithLiteral(Node node, ConstantWrapper newLiteral)
         {
             var grouping = node.Parent as GroupingOperator;
             if (grouping != null)
@@ -134,7 +135,7 @@ namespace Microsoft.Ajax.Utilities
             }
         }
 
-        private static void ReplaceNodeCheckParens(AstNode oldNode, AstNode newNode)
+        private static void ReplaceNodeCheckParens(Node oldNode, Node newNode)
         {
             var grouping = oldNode.Parent as GroupingOperator;
             if (grouping != null)
@@ -2423,7 +2424,7 @@ namespace Microsoft.Ajax.Utilities
                                 // less bytes than while(1)
 
                                 // check to see if we want to combine a preceding var with a for-statement
-                                AstNode initializer = null;
+                                Node initializer = null;
                                 if (m_parser.Settings.IsModificationAllowed(TreeModifications.MoveVarIntoFor))
                                 {
                                     // if the previous statement is a var, we can move it to the initializer
@@ -2475,4 +2476,5 @@ namespace Microsoft.Ajax.Utilities
             }
         }
     }
+#endif
 }

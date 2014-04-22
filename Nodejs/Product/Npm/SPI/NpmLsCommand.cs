@@ -39,17 +39,6 @@ namespace Microsoft.NodejsTools.Npm.SPI {
                     if (null != temp) {
                         temp.Trim();
                         if (temp.Length > 0) {
-                            // The standard output contains an informational 
-                            // message added by the base command class through 
-                            // the redirector.  We must trim it to get the output 
-                            // of the ls command.
-                            if (temp.StartsWith("====")) {
-                                int index = temp.IndexOf("\n");
-                                if (index >= 0) {
-                                    temp = temp.Substring(index).Trim();
-                                }
-                            }
-
                             var splits = temp.Split(new[] { '\n' }, StringSplitOptions.RemoveEmptyEntries);
                             if (splits.Length > 0) {
                                 _listBaseDirectory = splits[0].Trim();

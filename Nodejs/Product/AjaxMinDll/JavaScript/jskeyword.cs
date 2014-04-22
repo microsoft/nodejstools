@@ -14,7 +14,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-namespace Microsoft.Ajax.Utilities
+namespace Microsoft.NodejsTools.Parsing
 {
 
     internal sealed class JSKeyword
@@ -70,18 +70,9 @@ namespace Microsoft.Ajax.Utilities
                 case JSToken.Static: return "static";
                 case JSToken.Yield: return "yield";
 
-                // apparently never allowed for Chrome, so we want to treat it
-                // differently, too
-                case JSToken.Native: return "native";
-
                 // no other tokens can be identifiers
                 default: return null;
             }
-        }
-
-        internal JSToken GetKeyword(Context context, int wordLength)
-        {
-            return GetKeyword(context.Document.Source, context.StartPosition, wordLength);
         }
 
         internal JSToken GetKeyword(string source, int startPosition, int wordLength)
@@ -176,8 +167,7 @@ namespace Microsoft.Ajax.Utilities
             keywords['l' - 'a'] = new JSKeyword(JSToken.Let, "let");
             // n
             keywords['n' - 'a'] = new JSKeyword(JSToken.New, "new",
-                new JSKeyword(JSToken.Null, "null",
-                    new JSKeyword(JSToken.Native, "native")));
+                new JSKeyword(JSToken.Null, "null"));
             // p
             keywords['p' - 'a'] = new JSKeyword(JSToken.Public, "public",
                 new JSKeyword(JSToken.Package, "package",

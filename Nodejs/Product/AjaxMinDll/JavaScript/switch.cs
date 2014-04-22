@@ -17,14 +17,14 @@
 using System.Collections.Generic;
 using System.Text;
 
-namespace Microsoft.Ajax.Utilities
+namespace Microsoft.NodejsTools.Parsing
 {
-    public sealed class Switch : AstNode
+    public sealed class Switch : Statement
     {
-        private AstNode m_expression;
-        private AstNodeList m_cases;
+        private Expression m_expression;
+        private AstNodeList<SwitchCase> m_cases;
 
-        public AstNode Expression
+        public Expression Expression
         {
             get { return m_expression; }
             set
@@ -35,7 +35,7 @@ namespace Microsoft.Ajax.Utilities
             }
         }
 
-        public AstNodeList Cases
+        public AstNodeList<SwitchCase> Cases
         {
             get { return m_cases; }
             set
@@ -47,21 +47,23 @@ namespace Microsoft.Ajax.Utilities
         }
 
         public bool BraceOnNewLine { get; set; }
-        public Context BraceContext { get; set; }
+        public TokenWithSpan BraceContext { get; set; }
 
         public ActivationObject BlockScope { get; set; }
 
-        public Switch(Context context, JSParser parser)
+        public Switch(TokenWithSpan context, JSParser parser)
             : base(context, parser)
         {
         }
 
-        public override void Accept(IVisitor visitor)
-        {
-            if (visitor != null)
-            {
-                visitor.Visit(this);
+        public override void Walk(AstVisitor visitor) {
+            if (visitor.Walk(this)) {
+                Expression.Walk(visitor);
+                foreach (var switchCase in m_cases) {
+                    switchCase.Walk(visitor);
+                }
             }
+            visitor.PostWalk(this);
         }
 
         internal override bool RequiresSeparator
@@ -74,7 +76,7 @@ namespace Microsoft.Ajax.Utilities
             }
         }
 
-        public override IEnumerable<AstNode> Children
+        public override IEnumerable<Node> Children
         {
             get
             {
@@ -82,16 +84,16 @@ namespace Microsoft.Ajax.Utilities
             }
         }
 
-        public override bool ReplaceChild(AstNode oldNode, AstNode newNode)
+        public override bool ReplaceChild(Node oldNode, Node newNode)
         {
             if (Expression == oldNode)
             {
-                Expression = newNode;
+                Expression = (Expression)newNode;
                 return true;
             }
             if (Cases == oldNode)
             {
-                AstNodeList newList = newNode as AstNodeList;
+                AstNodeList<SwitchCase> newList = newNode as AstNodeList<SwitchCase>;
                 if (newNode == null || newList != null)
                 {
                     // remove it

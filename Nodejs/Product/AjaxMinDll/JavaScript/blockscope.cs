@@ -17,18 +17,18 @@
 using System;
 using System.Reflection;
 
-namespace Microsoft.Ajax.Utilities
+namespace Microsoft.NodejsTools.Parsing
 {
     public class BlockScope : ActivationObject
     {
-        private Context m_context;// = null;
-        public Context Context
+        private TokenWithSpan m_context;// = null;
+        public TokenWithSpan Context
         {
             get { return m_context; }
         }
 
-        public BlockScope(ActivationObject parent, Context context, CodeSettings settings)
-            : base(parent, settings)
+        public BlockScope(ActivationObject parent, TokenWithSpan context, ErrorSink errorSink)
+            : base(parent, errorSink)
         {
             if (context == null)
             {

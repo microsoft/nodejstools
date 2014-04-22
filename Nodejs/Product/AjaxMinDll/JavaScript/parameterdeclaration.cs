@@ -14,9 +14,9 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-namespace Microsoft.Ajax.Utilities
+namespace Microsoft.NodejsTools.Parsing
 {
-    public sealed class ParameterDeclaration : AstNode, INameDeclaration
+    public sealed class ParameterDeclaration : Statement, INameDeclaration
     {
         public string Name
         {
@@ -30,21 +30,22 @@ namespace Microsoft.Ajax.Utilities
 
         public JSVariableField VariableField { get; set; }
 
-        public AstNode Initializer { get { return null; } }
+        public Expression Initializer { get { return null; } }
 
-        public Context NameContext { get { return Context; } }
+        public TokenWithSpan NameContext { get { return Context; } }
 
-        public ParameterDeclaration(Context context, JSParser parser)
+        public ParameterDeclaration(TokenWithSpan context, JSParser parser)
             : base(context, parser)
         {
         }
 
-        public override void Accept(IVisitor visitor)
-        {
-            if (visitor != null)
-            {
-                visitor.Visit(this);
+        public override void Walk(AstVisitor visitor) {
+            if (visitor.Walk(this)) {
+                if (Initializer != null) {
+                    Initializer.Walk(visitor);
+                }
             }
+            visitor.PostWalk(this);
         }
     }
 }

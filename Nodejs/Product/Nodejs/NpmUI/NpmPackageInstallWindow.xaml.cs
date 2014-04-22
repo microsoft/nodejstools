@@ -12,64 +12,60 @@
  *
  * ***************************************************************************/
 
-using System;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Input;
 using System.Windows.Media;
-using Microsoft.NodejsTools.Npm;
 using Microsoft.VisualStudioTools;
 
 namespace Microsoft.NodejsTools.NpmUI {
     /// <summary>
     /// Interaction logic for NpmPackageInstallWindow.xaml
     /// </summary>
-    sealed partial class NpmPackageInstallWindow : DialogWindowVersioningWorkaround, IDisposable {
-        private readonly NpmPackageInstallViewModel _vm;
-        
-        internal NpmPackageInstallWindow(INpmController controller, NpmOutputControlViewModel executeVm) {
-            DataContext = _vm = new NpmPackageInstallViewModel(executeVm, Dispatcher);
-            _vm.NpmController = controller;
+    partial class NpmPackageInstallWindow : DialogWindowVersioningWorkaround {
+        internal NpmPackageInstallWindow(NpmPackageInstallViewModel vm) {
             InitializeComponent();
-            ExecuteControl.DataContext = executeVm;
+            DataContext = vm;
         }
 
-        public void Dispose() {
-            //  This will unregister event handlers on the controller and prevent
-            //  us from leaking view models.
-            _vm.NpmController = null;
-        }
-
-        private void Close_Executed(object sender, ExecutedRoutedEventArgs e) {
+        private void ExecuteClose(object sender, ExecutedRoutedEventArgs e) {
             Close();
         }
 
-        private void Close_CanExecute(object sender, CanExecuteRoutedEventArgs e) {
+        private void CanExecuteClose(object sender, CanExecuteRoutedEventArgs e) {
             e.CanExecute = true;
-            e.Handled = true;
         }
 
-        private void InstallCommand_Executed(object sender, ExecutedRoutedEventArgs e) {
-            _vm.Install(e.Parameter as PackageCatalogEntryViewModel);
+        public NpmOutputControl NpmExecuteControl {
+            get { return this.ExecuteControl; }
         }
 
-        private void InstallCommand_CanExecute(object sender, CanExecuteRoutedEventArgs e) {
-            e.CanExecute = _vm.CanInstall(e.Parameter as PackageCatalogEntryViewModel);
-            e.Handled = true;
+        private static object GetItemObjectAtPoint(ItemsControl control, Point p) {
+            var obj = GetListItemAtPoint(control, p);
+            return null == obj ? null : control.ItemContainerGenerator.ItemFromContainer(obj);
         }
 
-        private void RefreshCatalogCommand_Executed(object sender, ExecutedRoutedEventArgs e) {
-            _vm.RefreshCatalog();
+        private static ListBoxItem GetListItemAtPoint(ItemsControl control, Point p) {
+            var result = VisualTreeHelper.HitTest(control, p);
+            var obj = result.VisualHit;
+            while (VisualTreeHelper.GetParent(obj) != null && !(obj is ListBoxItem)) {
+                obj = VisualTreeHelper.GetParent(obj);
+            }
+            return obj as ListBoxItem;
         }
 
-        private void RefreshCatalogCommand_CanExecute(object sender, CanExecuteRoutedEventArgs e) {
-            e.CanExecute = _vm.CanRefreshCatalog;
-            e.Handled = true;
-        }
-
-        private void FilterTextBox_IsVisibleChanged(object sender, DependencyPropertyChangedEventArgs e) {
-            if ((e.NewValue as bool?) ?? false) {
-                ((UIElement)sender).Focus();
+        private void _packageList_OnMouseDoubleClick(object sender, MouseButtonEventArgs e) {
+            if (e.ChangedButton != MouseButton.Left) {
+                return;
+            }
+            var vm = DataContext as NpmPackageInstallViewModel;
+            if (null != vm
+                && GetItemObjectAtPoint(_packageList, e.GetPosition(_packageList)) == vm.SelectedPackage
+                && ! vm.IsCatalogEmpty) {
+                var cmd = vm.InstallCommand;
+                if (null != cmd && cmd.CanExecute(null)) {
+                    cmd.Execute(null);
+                }
             }
         }
     }

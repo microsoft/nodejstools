@@ -17,14 +17,14 @@
 using System.Collections.Generic;
 using System.Text;
 
-namespace Microsoft.Ajax.Utilities
+namespace Microsoft.NodejsTools.Parsing
 {
 
     public sealed class Member : Expression
     {
-        private AstNode m_root;
+        private Expression m_root;
 
-        public AstNode Root
+        public Expression Root
         {
             get { return m_root; }
             set
@@ -36,9 +36,9 @@ namespace Microsoft.Ajax.Utilities
         }
 
         public string Name { get; set; }
-        public Context NameContext { get; set; }
+        public TokenWithSpan NameContext { get; set; }
 
-        public Member(Context context, JSParser parser)
+        public Member(TokenWithSpan context, JSParser parser)
             : base(context, parser)
         {
         }
@@ -51,37 +51,19 @@ namespace Microsoft.Ajax.Utilities
             }
         }
 
-        public override void Accept(IVisitor visitor)
-        {
-            if (visitor != null)
-            {
-                visitor.Visit(this);
+        public override void Walk(AstVisitor visitor) {
+            if (visitor.Walk(this)) {
+                m_root.Walk(visitor);
             }
+            visitor.PostWalk(this);
         }
 
-        public override bool IsEquivalentTo(AstNode otherNode)
-        {
-            var otherMember = otherNode as Member;
-            return otherMember != null
-                && string.CompareOrdinal(this.Name, otherMember.Name) == 0
-                && this.Root.IsEquivalentTo(otherMember.Root);
-        }
-
-        internal override string GetFunctionGuess(AstNode target)
+        internal override string GetFunctionGuess(Node target)
         {
             return Root.GetFunctionGuess(this) + '.' + Name;
         }
 
-        internal override bool IsDebuggerStatement
-        {
-            get
-            {
-                // depends on whether the root is
-                return Root.IsDebuggerStatement;
-            }
-        }
-
-        public override IEnumerable<AstNode> Children
+        public override IEnumerable<Node> Children
         {
             get
             {
@@ -89,17 +71,17 @@ namespace Microsoft.Ajax.Utilities
             }
         }
 
-        public override bool ReplaceChild(AstNode oldNode, AstNode newNode)
+        public override bool ReplaceChild(Node oldNode, Node newNode)
         {
             if (Root == oldNode)
             {
-                Root = newNode;
+                Root = (Expression)newNode;
                 return true;
             }
             return false;
         }
 
-        public override AstNode LeftHandSide
+        public override Node LeftHandSide
         {
             get
             {

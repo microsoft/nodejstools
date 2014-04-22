@@ -16,11 +16,11 @@
 
 using System;
 
-namespace Microsoft.Ajax.Utilities
+namespace Microsoft.NodejsTools.Parsing
 {
-    public abstract class Expression : AstNode
+    public abstract class Expression : Node
     {
-        protected Expression(Context context, JSParser parser)
+        protected Expression(TokenWithSpan context, JSParser parser)
             : base(context, parser)
         {
         }
@@ -42,5 +42,10 @@ namespace Microsoft.Ajax.Utilities
                 return OperatorPrecedence.Primary;
             }
         }
+
+        public virtual bool ReplaceChild(Expression oldNode, Expression newNode) {
+            return false;
+        }
+
     }
 }

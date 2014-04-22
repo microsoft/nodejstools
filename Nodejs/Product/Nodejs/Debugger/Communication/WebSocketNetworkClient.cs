@@ -17,7 +17,6 @@ using System.IO;
 using System.Net;
 using System.Net.WebSockets;
 using System.Threading;
-using Microsoft.VisualStudioTools;
 
 namespace Microsoft.NodejsTools.Debugger.Communication {
     sealed class WebSocketNetworkClient : INetworkClient {

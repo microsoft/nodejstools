@@ -16,27 +16,25 @@
 
 using System.Text;
 
-namespace Microsoft.Ajax.Utilities
+namespace Microsoft.NodejsTools.Parsing
 {
 
-    public sealed class ContinueNode : AstNode
+    public sealed class ContinueNode : Statement
     {
         public int NestLevel { get; set; }
 
         public string Label { get; set; }
-        public Context LabelContext { get; set; }
+        public TokenWithSpan LabelContext { get; set; }
 
-        public ContinueNode(Context context, JSParser parser)
+        public ContinueNode(TokenWithSpan context, JSParser parser)
             : base(context, parser)
         {
         }
 
-        public override void Accept(IVisitor visitor)
-        {
-            if (visitor != null)
-            {
-                visitor.Visit(this);
+        public override void Walk(AstVisitor visitor) {
+            if (visitor.Walk(this)) {
             }
+            visitor.PostWalk(this);
         }
     }
 }

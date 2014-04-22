@@ -18,9 +18,10 @@ using System;
 using System.Collections.Generic;
 using System.Text;
 
-namespace Microsoft.Ajax.Utilities
+namespace Microsoft.NodejsTools.Parsing
 {
-    internal class FinalPassVisitor : TreeVisitor
+#if FALSE
+    internal class FinalPassVisitor : AstVisitor
     {
         private JSParser m_parser;
 
@@ -46,4 +47,5 @@ namespace Microsoft.Ajax.Utilities
             }
         }
     }
+#endif
 }

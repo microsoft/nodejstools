@@ -19,7 +19,7 @@ using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Text;
 
-namespace Microsoft.Ajax.Utilities
+namespace Microsoft.NodejsTools.Parsing
 {
     /// <summary>
     /// Settings for how local variables and functions can be renamed
@@ -118,10 +118,7 @@ namespace Microsoft.Ajax.Utilities
             this.EvalTreatment = EvalTreatment.Ignore;
             this.InlineSafeStrings = true;
             this.MacSafariQuirks = true;
-            this.PreserveImportantComments = true;
-            this.QuoteObjectLiteralProperties = false;
             this.StrictMode = false;
-            this.StripDebugStatements = true;
             this.ManualRenamesProperties = true;
             this.OutputMode = OutputMode.SingleLine;
 
@@ -154,16 +151,10 @@ namespace Microsoft.Ajax.Utilities
                 m_minify = this.m_minify,
 
                 AllowEmbeddedAspNetBlocks = this.AllowEmbeddedAspNetBlocks,
-                CollapseToLiteral = this.CollapseToLiteral,
                 ConstStatementsMozilla = this.ConstStatementsMozilla,
                 DebugLookupList = this.DebugLookupList,
-                EvalLiteralExpressions = this.EvalLiteralExpressions,
                 EvalTreatment = this.EvalTreatment,
                 Format = this.Format,
-                IgnoreConditionalCompilation = this.IgnoreConditionalCompilation,
-                IgnoreAllErrors = this.IgnoreAllErrors,
-                IgnoreErrorList = this.IgnoreErrorList,
-                IgnorePreprocessorDefines = this.IgnorePreprocessorDefines,
                 IndentSize = this.IndentSize,
                 InlineSafeStrings = this.InlineSafeStrings,
                 KillSwitch = this.KillSwitch,
@@ -176,16 +167,9 @@ namespace Microsoft.Ajax.Utilities
                 OutputMode = this.OutputMode,
                 PreprocessOnly = this.PreprocessOnly,
                 PreprocessorDefineList = this.PreprocessorDefineList,
-                PreserveFunctionNames = this.PreserveFunctionNames,
-                PreserveImportantComments = this.PreserveImportantComments,
-                QuoteObjectLiteralProperties = this.QuoteObjectLiteralProperties,
-                RemoveFunctionExpressionNames = this.RemoveFunctionExpressionNames,
-                RemoveUnneededCode = this.RemoveUnneededCode,
                 RenamePairs = this.RenamePairs,
-                ReorderScopeDeclarations = this.ReorderScopeDeclarations,
                 SourceMode = this.SourceMode,
                 StrictMode = this.StrictMode,
-                StripDebugStatements = this.StripDebugStatements,
                 TermSemicolons = this.TermSemicolons,
                 BlocksStartOnSameLine = this.BlocksStartOnSameLine,
                 ErrorIfNotInlineSafe = this.ErrorIfNotInlineSafe,
@@ -528,18 +512,6 @@ namespace Microsoft.Ajax.Utilities
 
         private HashSet<string> m_debugLookups;
 
-        /// <summary>
-        /// Collection of "debug" lookup identifiers
-        /// </summary>
-        [Obsolete("This property is deprecated; use DebugLookupCollection instead")]
-        [System.ComponentModel.EditorBrowsable(System.ComponentModel.EditorBrowsableState.Never)]
-        public ReadOnlyCollection<string> DebugLookups
-        {
-            get
-            {
-                return new ReadOnlyCollection<string>(new List<string>(DebugLookupCollection));
-            }
-        }
 
         /// <summary>
         /// Gets the set of debug lookups
@@ -651,15 +623,6 @@ namespace Microsoft.Ajax.Utilities
         #region properties
 
         /// <summary>
-        /// collapse new Array() to [] and new Object() to {} [true]
-        /// or leave ais [false]. Default is true.
-        /// </summary>
-        public bool CollapseToLiteral
-        {
-            get; set;
-        }
-
-        /// <summary>
         /// Gets or sets a boolean value indicating whether to use old-style const statements (just var-statements that
         /// define unchangeable fields) or new EcmaScript 6 lexical declarations.
         /// </summary>
@@ -701,17 +664,6 @@ namespace Microsoft.Ajax.Utilities
         }
 
         /// <summary>
-        /// Evaluate expressions containing only literal bool, string, numeric, or null values [true]
-        /// Leave literal expressions alone and do not evaluate them [false]. Default is true.
-        /// </summary>
-        [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Naming", "CA1704:IdentifiersShouldBeSpelledCorrectly", MessageId = "Eval")]
-        public bool EvalLiteralExpressions
-        {
-            get;
-            set;
-        }
-
-        /// <summary>
         /// Gets or sets a settings value indicating how "safe" eval-statements are to be assumed.
         /// Ignore (default) means we can assume eval-statements will not reference any local variables and functions.
         /// MakeImmediateSafe assumes eval-statements will reference local variables and function within the same scope.
@@ -731,18 +683,6 @@ namespace Microsoft.Ajax.Utilities
         {
             get; set;
         }
-
-        /// <summary>
-        /// Gets or sets a boolean value indicating whether or not to ignore conditional-compilation comment syntax (true) or
-        /// to try to retain the comments in the output (false; default)
-        /// </summary>
-        public bool IgnoreConditionalCompilation { get; set; }
-
-        /// <summary>
-        /// Gets or sets a boolean value indicating whether or not to ignore preprocessor defines comment syntax (true) or
-        /// to evaluate them (false; default)
-        /// </summary>
-        public bool IgnorePreprocessorDefines { get; set; }
 
         /// <summary>
         /// Gets or sets a boolean value indicating whether to break up string literals containing &lt;/script&gt; so inline code won't break [true, default]
@@ -789,17 +729,6 @@ namespace Microsoft.Ajax.Utilities
                 // when we set this flag, we want to turn other things on and off at the same time
                 m_minify = value;
 
-                // aligned properties
-                this.CollapseToLiteral = m_minify;
-                this.EvalLiteralExpressions = m_minify;
-                this.RemoveFunctionExpressionNames = m_minify;
-                this.RemoveUnneededCode = m_minify;
-                this.ReorderScopeDeclarations = m_minify;
-
-                // opposite properties
-                this.PreserveFunctionNames = !m_minify;
-                this.PreserveImportantComments = !m_minify;
-
                 // dependent switches
                 this.LocalRenaming = m_minify ? LocalRenaming.CrunchAll : LocalRenaming.KeepAll;
                 this.KillSwitch = m_minify ? 0 : ~((long)TreeModifications.PreserveImportantComments);
@@ -825,62 +754,6 @@ namespace Microsoft.Ajax.Utilities
         }
 
         /// <summary>
-        /// Gets or sets a value indicating whether all function names must be preserved and remain as-named (true),
-        /// or can be automatically renamed (false, default).
-        /// </summary>
-        public bool PreserveFunctionNames
-        {
-            get; set;
-        }
-
-        /// <summary>
-        /// Gets or sets a value indicating whether to preserve important comments in the output.
-        /// Default is true, preserving important comments. Important comments have an exclamation
-        /// mark as the very first in-comment character (//! or /*!).
-        /// </summary>
-        public bool PreserveImportantComments
-        {
-            get; set;
-        }
-
-        /// <summary>
-        /// Gets or sets a value indicating whether to always quote object literal property names.
-        /// Default is false.
-        /// </summary>
-        public bool QuoteObjectLiteralProperties
-        {
-            get; set;
-        }
-
-        /// <summary>
-        /// Gets or sets a value indicating whether or not to reorder function and variable
-        /// declarations within scopes (true, default), or to leave the order as specified in 
-        /// the original source.
-        /// </summary>
-        public bool ReorderScopeDeclarations
-        {
-            get; set;
-        }
-
-        /// <summary>
-        /// Gets or sets a value indicating whether or not to remove unreferenced function expression names (true, default)
-        /// or to leave the names of function expressions, even if they are unreferenced (false).
-        /// </summary>
-        public bool RemoveFunctionExpressionNames
-        {
-            get; set;
-        }
-
-        /// <summary>
-        /// Gets or sets a boolean value indicating whether to remove unneeded code, such as uncalled local functions or unreachable code [true, default], 
-        /// or to keep such code in the output [false].
-        /// </summary>
-        public bool RemoveUnneededCode
-        {
-            get; set;
-        }
-
-        /// <summary>
         /// Gets or sets the source mode
         /// </summary>
         public JavaScriptSourceMode SourceMode
@@ -896,15 +769,6 @@ namespace Microsoft.Ajax.Utilities
         {
             get;
             set;
-        }
-
-        /// <summary>
-        /// Gets or sets a boolean value indicating whether to strip debug statements [true, default],
-        /// or leave debug statements in the output [false]
-        /// </summary>
-        public bool StripDebugStatements
-        {
-            get; set;
         }
 
         /// <summary>
@@ -1092,29 +956,16 @@ namespace Microsoft.Ajax.Utilities
         RemoveUnusedParameters                      = 0x0000000000400000,
 
         /// <summary>
-        /// remove "debug" statements
-        /// </summary>
-        StripDebugStatements                        = 0x0000000000800000,
-
-        /// <summary>
         /// Rename local variables and functions
         /// </summary>
         LocalRenaming                               = 0x0000000001000000,
 
-        /// <summary>
-        /// Remove unused function expression names
-        /// </summary>
-        RemoveFunctionExpressionNames               = 0x0000000002000000,
 
         /// <summary>
         /// Remove unnecessary labels from break or continue statements
         /// </summary>
         RemoveUnnecessaryLabels                     = 0x0000000004000000,
 
-        /// <summary>
-        /// Remove unnecessary @cc_on statements
-        /// </summary>
-        RemoveUnnecessaryCCOnStatements             = 0x0000000008000000,
 
         /// <summary>
         /// Convert (new Date()).getTime() to +new Date

@@ -18,19 +18,19 @@ using System;
 using System.Collections.Generic;
 using System.Text;
 
-namespace Microsoft.Ajax.Utilities
+namespace Microsoft.NodejsTools.Parsing
 {
 
-    public sealed class Block : AstNode
+    public sealed class Block : Statement
     {
-        private List<AstNode> m_list;
+        private List<Statement> m_list;
 
         /// <summary>
         /// Gets a particular statement in the list of statements making up this block
         /// </summary>
         /// <param name="index">zero-based index of the desired statement</param>
         /// <returns>abstract syntax tree node</returns>
-        public AstNode this[int index]
+        public Statement this[int index]
         {
             get { return m_list[index]; }
             set
@@ -72,7 +72,7 @@ namespace Microsoft.Ajax.Utilities
         /// </summary>
         public bool BraceOnNewLine { get; set; }
 
-        public override Context TerminatingContext
+        public override TokenWithSpan TerminatingContext
         {
             get
             {
@@ -82,18 +82,19 @@ namespace Microsoft.Ajax.Utilities
             }
         }
 
-        public Block(Context context, JSParser parser)
+        public Block(TokenWithSpan context, JSParser parser)
             : base(context, parser)
         {
-            m_list = new List<AstNode>();
+            m_list = new List<Statement>();
         }
 
-        public override void Accept(IVisitor visitor)
-        {
-            if (visitor != null)
-            {
-                visitor.Visit(this);
+        public override void Walk(AstVisitor walker) {
+            if (walker.Walk(this)) {
+                foreach (var node in m_list) {
+                    node.Walk(walker);
+                }
             }
+            walker.PostWalk(this);
         }
 
         internal override bool RequiresSeparator
@@ -109,7 +110,7 @@ namespace Microsoft.Ajax.Utilities
                 return (
                   m_list.Count == 0
                   ? true
-                  : (m_list.Count == 1  && !m_list[0].HideFromOutput ? m_list[0].RequiresSeparator : false)
+                  : (m_list.Count == 1 ? m_list[0].RequiresSeparator : false)
                   );
             }
         }
@@ -119,31 +120,6 @@ namespace Microsoft.Ajax.Utilities
             // if there's more than one item, then return false.
             // otherwise recurse the call
             return (m_list.Count == 1 && m_list[0].EncloseBlock(type));
-        }
-
-        internal override bool IsDebuggerStatement
-        {
-            get
-            {
-                // a block will pop-positive for being a debugger statement
-                // if all the statements within it are debugger statements. 
-                // So loop through our list, and if any isn't, return false.
-                // otherwise return true.
-                // empty blocks do not pop positive for "debugger" statements
-                if (m_list.Count == 0)
-                {
-                    return false;
-                }
-
-                foreach (AstNode statement in m_list)
-                {
-                    if (!statement.IsDebuggerStatement)
-                    {
-                        return false;
-                    }
-                }
-                return true;
-            }
         }
 
         /// <summary>
@@ -173,7 +149,7 @@ namespace Microsoft.Ajax.Utilities
         /// <summary>
         /// Gets an enumerator for the syntax tree nodes making up this block
         /// </summary>
-        public override IEnumerable<AstNode> Children
+        public override IEnumerable<Node> Children
         {
             get
             {
@@ -187,7 +163,7 @@ namespace Microsoft.Ajax.Utilities
         /// <param name="oldNode">existing statement node to replace.</param>
         /// <param name="newNode">node with which to replace the existing node.</param>
         /// <returns>true if the replacement was a succeess; false otherwise</returns>
-        public override bool ReplaceChild(AstNode oldNode, AstNode newNode)
+        public override bool ReplaceChild(Node oldNode, Node newNode)
         {
             for (int ndx = m_list.Count - 1; ndx >= 0; --ndx)
             {
@@ -212,7 +188,7 @@ namespace Microsoft.Ajax.Utilities
                         else
                         {
                             // not a block -- slap it in there
-                            m_list[ndx] = newNode;
+                            m_list[ndx] = (Statement)newNode;
                             newNode.Parent = this;
                         }
                     }
@@ -228,7 +204,7 @@ namespace Microsoft.Ajax.Utilities
         /// Append the given statement node to the end of the block
         /// </summary>
         /// <param name="element">node to add to the block</param>
-        public void Append(AstNode element)
+        public void Append(Statement element)
         {
             if (element != null)
             {
@@ -242,7 +218,7 @@ namespace Microsoft.Ajax.Utilities
         /// </summary>
         /// <param name="child">node to find</param>
         /// <returns>zero-based index of the node in the block, or -1 if the node is not a direct child of the block</returns>
-        public int IndexOf(AstNode child)
+        public int IndexOf(Statement child)
         {
             return m_list.IndexOf(child);
         }
@@ -252,7 +228,7 @@ namespace Microsoft.Ajax.Utilities
         /// </summary>
         /// <param name="after">exisitng child node of the block</param>
         /// <param name="item">node to insert after the existing node</param>
-        public void InsertAfter(AstNode after, AstNode item)
+        public void InsertAfter(Statement after, Statement item)
         {
             if (item != null)
             {
@@ -264,7 +240,7 @@ namespace Microsoft.Ajax.Utilities
                     {
                         // don't insert a block into a block -- insert the new block's
                         // children instead (don't want nested blocks)
-                        InsertRange(index + 1, block.Children);
+                        InsertRange(index + 1, block.m_list);
                     }
                     else
                     {
@@ -280,14 +256,14 @@ namespace Microsoft.Ajax.Utilities
         /// </summary>
         /// <param name="position">zero-based index into which the new node will be inserted</param>
         /// <param name="item">new node to insert into the block</param>
-        public void Insert(int position, AstNode item)
+        public void Insert(int position, Statement item)
         {
             if (item != null)
             {
                 var block = item as Block;
                 if (block != null)
                 {
-                    InsertRange(position, block.Children);
+                    InsertRange(position, block.m_list);
                 }
                 else
                 {
@@ -323,12 +299,12 @@ namespace Microsoft.Ajax.Utilities
         /// </summary>
         /// <param name="index">Zero-based position into which the new nodes will be inserted.</param>
         /// <param name="newItems">Collection of statements to insert</param>
-        public void InsertRange(int index, IEnumerable<AstNode> newItems)
+        public void InsertRange(int index, IEnumerable<Statement> newItems)
         {
             if (newItems != null)
             {
                 m_list.InsertRange(index, newItems);
-                foreach (AstNode newItem in newItems)
+                foreach (Node newItem in newItems)
                 {
                     newItem.Parent = this;
                 }

@@ -25,7 +25,7 @@ using System.Threading;
 using System.Threading.Tasks;
 using System.Web.Script.Serialization;
 using System.Windows.Forms;
-using Microsoft.Ajax.Utilities;
+using Microsoft.NodejsTools.Parsing;
 using Microsoft.NodejsTools.Project;
 using Microsoft.VisualStudio.Text;
 
@@ -69,25 +69,23 @@ namespace Microsoft.NodejsTools.Repl {
         }
 
         public bool CanExecuteText(string text) {
-            var parser = new JSParser(text);
-            var errorSink = new ErrorSink(text);
-            parser.CompilerError += errorSink.CompilerError;
+            var errorSink = new ReplErrorSink(text);
+            var parser = new JSParser(text, errorSink);
             parser.Parse(new CodeSettings());
 
             return !errorSink.Unterminated;
         }
 
-        class ErrorSink {
+        class ReplErrorSink : ErrorSink {
             public bool Unterminated;
             public readonly string Text;
 
-            public ErrorSink(string text) {
+            public ReplErrorSink(string text) {
                 Text = text;
             }
 
-            public void CompilerError(object sender, JScriptExceptionEventArgs e) {
-                
-                switch(e.Exception.ErrorCode) {
+            public override void OnError(JScriptExceptionEventArgs e) {
+                switch (e.Exception.ErrorCode) {
                     case JSError.NoCatch:
                     case JSError.UnclosedFunction:
                     case JSError.NoCommentEnd:

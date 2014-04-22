@@ -19,7 +19,7 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using System.Reflection;
 
-namespace Microsoft.Ajax.Utilities
+namespace Microsoft.NodejsTools.Parsing
 {
     /// <summary>
     /// Field type enumeration
@@ -49,7 +49,7 @@ namespace Microsoft.Ajax.Utilities
         private bool m_isGenerated;
         private string m_crunchedName;// = null;
 
-        public Context OriginalContext { get; set; }
+        public TokenWithSpan OriginalContext { get; set; }
         public string Name { get; private set; }
         public FieldType FieldType { get; set; }
         public FieldAttributes Attributes { get; set; }

@@ -44,6 +44,7 @@ namespace Microsoft.NodejsTools.Project {
         private readonly Timer _timer;
         internal readonly ReferenceGroupDispenser _refGroupDispenser = new ReferenceGroupDispenser();
         private readonly HashSet<ReferenceGroup> _pendingRefGroupGenerations = new HashSet<ReferenceGroup>();
+        private readonly VsProjectAnalyzer _analyzer;
         internal readonly RequireCompletionCache _requireCompletionCache = new RequireCompletionCache();
         internal int _currentFileCounter;
         private static Random _random = new Random();
@@ -55,6 +56,11 @@ namespace Microsoft.NodejsTools.Project {
             AddCATIDMapping(projectNodePropsType, projectNodePropsType.GUID);
             InitDependencyImages();
             _timer = new Timer(RefreshReferenceFile);
+            _analyzer = new VsProjectAnalyzer();
+        }
+
+        public VsProjectAnalyzer GetAnalyzer() {
+            return _analyzer;
         }
 
         private static string[] _excludedAvailableItems = new[] { 
@@ -175,6 +181,12 @@ namespace Microsoft.NodejsTools.Project {
                     SetProjectProperty(NodejsConstants.TypeScriptModuleKind, NodejsConstants.CommonJSModuleKind);
                 }
             }
+        }
+
+        internal static bool IsNodejsFile(string strFileName) {
+            var ext = Path.GetExtension(strFileName);
+
+            return String.Equals(ext, NodejsConstants.FileExtension, StringComparison.OrdinalIgnoreCase);
         }
 
         protected override string GetItemType(string filename) {
@@ -319,7 +331,7 @@ namespace Microsoft.NodejsTools.Project {
                 base.Reload();
 
                 SyncFileSystem();
-
+                
                 foreach (var group in _refGroupDispenser.Groups) {
                     group.GenerateReferenceFile();
                 }

@@ -15,37 +15,41 @@
 using System.Collections.Generic;
 
 namespace Microsoft.VisualStudioTools.Project {
+    /// <summary>
+    /// Alternative to EventSinkCollection.  EventSinkCollection typically has O(n)
+    /// performance for additions.  This trades off a little extra memory usage for
+    /// removed nodes in favor of O(1) addition time.  Both implementations have take
+    /// O(n) for removal.
+    /// </summary>
     sealed class HierarchyIdMap {
-        private readonly List<HierarchyNode> _ids = new List<HierarchyNode>();
-        private readonly Stack<int> _freedIds = new Stack<int>();
+        private readonly Dictionary<uint, HierarchyNode> _ids = new Dictionary<uint,HierarchyNode>();
+        private List<uint> _freedIds = new List<uint>();
 
         public uint Add(HierarchyNode node) {
             UIThread.MustBeCalledFromUIThread();
 
+            uint res;
+
             if (_freedIds.Count > 0) {
-                var i = _freedIds.Pop();
-                _ids[i] = node;
-                return (uint)i;
+                res = _freedIds[_freedIds.Count - 1];
+                _freedIds.RemoveAt(_freedIds.Count - 1);
             } else {
-                _ids.Add(node);
                 // ids are 1 based
-                return (uint)_ids.Count;
+                res = (uint)_ids.Count + 1;
             }
+
+            _ids[res] = node;
+            return res;
         }
 
         public void Remove(HierarchyNode node) {
             UIThread.MustBeCalledFromUIThread();
 
-            int i = (int)node.ID - 1;
-            if (0 <= i && i < _ids.Count && object.ReferenceEquals(node, _ids[i])) {
-                _ids[i] = null;
-            } else {
-                for (i = 0; i < _ids.Count; ++i) {
-                    if (object.ReferenceEquals(node, _ids[i])) {
-                        _ids[i] = null;
-                        _freedIds.Push(i);
-                        break;
-                    }
+            foreach (var keyValue in _ids) {
+                if (keyValue.Value == node) {
+                    _ids.Remove(keyValue.Key);
+                    _freedIds.Add(keyValue.Key);
+                    break;
                 }
             }
         }
@@ -54,11 +58,9 @@ namespace Microsoft.VisualStudioTools.Project {
             get {
                 UIThread.MustBeCalledFromUIThread();
 
-                int i = (int)itemId - 1;
-                if (0 <= i && i < _ids.Count) {
-                    return _ids[i];
-                }
-                return null;
+                HierarchyNode res;
+                _ids.TryGetValue(itemId, out res);
+                return res;
             }
         }
 

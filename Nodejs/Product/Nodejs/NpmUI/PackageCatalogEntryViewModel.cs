@@ -12,11 +12,6 @@
  *
  * ***************************************************************************/
 
-using System;
-using System.ComponentModel;
-using System.Globalization;
-using System.Linq;
-using System.Runtime.CompilerServices;
 using System.Text;
 using System.Windows;
 using System.Windows.Media;
@@ -24,106 +19,140 @@ using Microsoft.NodejsTools.Npm;
 using Microsoft.NodejsTools.Project;
 
 namespace Microsoft.NodejsTools.NpmUI {
-    abstract class PackageCatalogEntryViewModel {
-        private readonly string _name;
-        private readonly SemverVersion? _version;
-        private readonly string _author;
-        private readonly string _description;
-        private readonly string _keywords;
+    internal class PackageCatalogEntryViewModel {
 
-        private readonly SemverVersion? _localVersion, _globalVersion;
+        private IPackage _package;
+        private IRootPackage _local;
+        private IGlobalPackages _global;
 
-        protected PackageCatalogEntryViewModel(
-            string name,
-            SemverVersion? version,
-            string author,
-            string description,
-            string keywords,
-            SemverVersion? localVersion,
-            SemverVersion? globalVersion
-        ) {
-            _name = name;
-            _version = version;
-            _author = author;
-            _description = description;
-            _keywords = keywords;
-            _localVersion = localVersion;
-            _globalVersion = globalVersion;
+        public PackageCatalogEntryViewModel(
+            IPackage package,
+            IRootPackage local,
+            IGlobalPackages global) {
+            _package = package;
+            _local = local;
+            _global = global;
         }
 
-        public virtual string Name { get { return _name; } }
-        public string Version { get { return ToString(_version); } }
-        public string Author { get { return _author; } }
-        public string Description { get { return _description; } }
-        public string Keywords { get { return _keywords; } }
-        public bool IsInstalledLocally { get { return _localVersion.HasValue; } }
-        public bool IsInstalledGlobally { get { return _globalVersion.HasValue; } }
-        public bool IsLocalInstallOutOfDate { get { return _localVersion.HasValue && _localVersion < _version; } }
-        public bool IsGlobalInstallOutOfDate { get { return _globalVersion.HasValue && _globalVersion < _version; } }
-        public string LocalVersion { get { return ToString(_localVersion); } }
-        public string GlobalVersion { get { return ToString(_globalVersion); } }
-
-        private static string ToString(SemverVersion? version) {
-            return version.HasValue ? version.ToString() : string.Empty;
+        public string Name {
+            get { return _package.Name; }
         }
-    }
 
-    internal class InstallCommandPackageCatalogEntryViewModel : PackageCatalogEntryViewModel, INotifyPropertyChanged {
-        private string _name;
+        public string VersionString {
+            get { return string.Format( "@ {0}", _package.Version); }
+        }
 
-        public InstallCommandPackageCatalogEntryViewModel()
-        : base(
-            string.Empty,
-            null,
-            string.Empty,
-            string.Empty,
-            string.Empty,
-            null,
-            null
-        ) { }
-
-        public override string Name {
+        public string Author {
             get {
-                return string.IsNullOrEmpty(_name)
-                    ? SR.GetString(SR.NpmPackageInstallHelpMessage)
-                    : _name;
+                var text = string.Format("by {0}", _package.Author);
+                return text == "by " ? "" : text;
             }
         }
 
-        public string Command {
-            get { return _name; }
-            set {
-                _name = value;
-                OnPropertyChanged();
-                OnPropertyChanged("Name");
+        public string Description {
+            get { return _package.Description; }
+        }
+
+        public string Keywords {
+            get {
+                var keywords = string.Join(", ", _package.Keywords);
+                return string.IsNullOrEmpty(keywords)
+                    ? SR.GetString(SR.NoKeywordsInPackage)
+                    : keywords;
             }
         }
 
-        public event PropertyChangedEventHandler PropertyChanged;
+        private IPackage GetFromRoot(IRootPackage root) {
+            if (null == root) {
+                return null;
+            }
 
-        protected virtual void OnPropertyChanged([CallerMemberName] string propertyName = null) {
-            var handler = PropertyChanged;
-            if (handler != null) {
-                handler(this, new PropertyChangedEventArgs(propertyName));
+            return root.Modules[_package.Name];
+        }
+
+        private IPackage LocallyInstalledPackage {
+            get { return GetFromRoot(_local); }
+        }
+
+        private IPackage GloballyInstalledPackage {
+            get { return GetFromRoot(_global); }
+        }
+
+        public bool IsInstalledLocally {
+            get { return LocallyInstalledPackage != null; }
+        }
+
+        public bool IsInstalledGlobally {
+            get { return GloballyInstalledPackage != null; }
+        }
+
+        private bool IsInstalledPackageOutOfDate(IPackage installed) {
+            return null != installed && installed.Version < _package.Version;
+        }
+
+        public bool IsLocalInstallOutOfDate {
+            get {
+                return IsInstalledPackageOutOfDate(LocallyInstalledPackage);
             }
         }
-    }
 
-    internal class ReadOnlyPackageCatalogEntryViewModel : PackageCatalogEntryViewModel {
-        public ReadOnlyPackageCatalogEntryViewModel(IPackage package, IPackage localInstall, IPackage globalInstall)
-        : base(
-            package.Name ?? "",
-            package.Version,
-            package.Author == null ? "" : package.Author.ToString(),
-            package.Description ?? "",
-            (package.Keywords != null && package.Keywords.Any())
-                ? string.Join(", ", package.Keywords)
-                : SR.GetString(SR.NoKeywordsInPackage),
-            localInstall != null ? (SemverVersion?)localInstall.Version : null,
-            globalInstall != null ? (SemverVersion?)globalInstall.Version : null
-        ) {
-            if (string.IsNullOrEmpty(Name)) {
-                throw new ArgumentNullException("package.Name");
+        public bool IsGlobalInstallOutOfDate {
+            get {
+                return IsInstalledPackageOutOfDate(GloballyInstalledPackage);
+            }
+        }
+
+        public string InstalledLocallyMessage {
+            get {
+                if (IsInstalledLocally) {
+                    var installed = LocallyInstalledPackage;
+                    if (null != installed) {
+                        return IsLocalInstallOutOfDate
+                            ? SR.GetString(SR.PackageInstalledLocallyOldVersion, installed.Version)
+                            : SR.GetString(SR.PackageInstalledLocally);
+                    }
+                }
+
+                return string.Empty;
+            }
+        }
+
+        public string InstalledGloballyMessage {
+            get {
+                if (IsInstalledGlobally) {
+                    var installed = GloballyInstalledPackage;
+                    if (null != installed) {
+                        return IsGlobalInstallOutOfDate
+                            ? SR.GetString(SR.PackageInstalledGloballyOldVersion, installed.Version)
+                            : SR.GetString(SR.PackageInstalledGlobally);
+                    }
+                }
+
+                return string.Empty;
+            }
+        }
+
+        public string InstallMessage {
+            get {
+                var buff = new StringBuilder();
+                buff.Append(InstalledLocallyMessage);
+                var msg = InstalledGloballyMessage;
+                if (!string.IsNullOrEmpty(msg)) {
+                    if (buff.Length > 0) {
+                        buff.Append("; ");
+                    }
+                    buff.Append(msg);
+                }
+                return buff.ToString();
+            }
+        }
+
+        public Color InstallMessageColor {
+            get {
+                return IsInstalledLocally && IsLocalInstallOutOfDate
+                    || IsInstalledGlobally && IsGlobalInstallOutOfDate
+                    ? Colors.Red
+                    : Colors.MediumSeaGreen;
             }
         }
     }

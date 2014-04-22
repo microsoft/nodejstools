@@ -17,13 +17,14 @@
 using System.Collections.Generic;
 using System.Text;
 
-namespace Microsoft.Ajax.Utilities
+namespace Microsoft.NodejsTools.Parsing
 {
+#if FALSE
     public class ConditionalCompilationSet : ConditionalCompilationStatement
     {
-        private AstNode m_value;
+        private Node m_value;
 
-        public AstNode Value
+        public Node Value
         {
             get { return m_value; }
             set
@@ -41,7 +42,7 @@ namespace Microsoft.Ajax.Utilities
         {
         }
 
-        public override IEnumerable<AstNode> Children
+        public override IEnumerable<Node> Children
         {
             get
             {
@@ -49,7 +50,7 @@ namespace Microsoft.Ajax.Utilities
             }
         }
 
-        public override void Accept(IVisitor visitor)
+        public override void Accept(AstVisitor visitor)
         {
             if (visitor != null)
             {
@@ -57,7 +58,7 @@ namespace Microsoft.Ajax.Utilities
             }
         }
 
-        public override bool ReplaceChild(AstNode oldNode, AstNode newNode)
+        public override bool ReplaceChild(Node oldNode, Node newNode)
         {
             if (Value == oldNode)
             {
@@ -67,4 +68,5 @@ namespace Microsoft.Ajax.Utilities
             return false;
         }
     }
+#endif
 }

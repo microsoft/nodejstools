@@ -18,7 +18,7 @@ using System;
 using System.Globalization;
 using System.Text.RegularExpressions;
 
-namespace Microsoft.Ajax.Utilities
+namespace Microsoft.NodejsTools.Parsing
 {
     public sealed class RegExpLiteral : Expression
     {
@@ -33,25 +33,15 @@ namespace Microsoft.Ajax.Utilities
             }
         }
 
-        public RegExpLiteral(Context context, JSParser parser)
+        public RegExpLiteral(TokenWithSpan context, JSParser parser)
             : base(context, parser)
         {
         }
 
-        public override void Accept(IVisitor visitor)
-        {
-            if (visitor != null)
-            {
-                visitor.Visit(this);
+        public override void Walk(AstVisitor visitor) {
+            if (visitor.Walk(this)) {
             }
-        }
-
-        public override bool IsEquivalentTo(AstNode otherNode)
-        {
-            var otherRegExp = otherNode as RegExpLiteral;
-            return otherRegExp != null
-                && string.CompareOrdinal(Pattern, otherRegExp.Pattern) == 0
-                && string.CompareOrdinal(PatternSwitches, otherRegExp.PatternSwitches) == 0;
+            visitor.PostWalk(this);
         }
     }
 }

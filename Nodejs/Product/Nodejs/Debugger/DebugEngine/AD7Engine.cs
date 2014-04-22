@@ -66,6 +66,8 @@ namespace Microsoft.NodejsTools.Debugger.DebugEngine {
         private static readonly HashSet<WeakReference> Engines = new HashSet<WeakReference>();
         private string _webBrowserUrl;
 
+        // These constants are duplicated in HpcLauncher and cannot be changed
+
         public const string DebugEngineId = "{0A638DAC-429B-4973-ADA0-E8DCDFB29B61}";
         public static Guid DebugEngineGuid = new Guid(DebugEngineId);
         private bool _trackFileChanges;
@@ -697,7 +699,6 @@ namespace Microsoft.NodejsTools.Debugger.DebugEngine {
             _breakpointManager.ClearBreakpointBindingResults();
 
             _process.Detach();
-            DetachEvents(_process);
             _ad7ProgramId = Guid.Empty;
 
             return VSConstants.S_OK;
@@ -938,11 +939,6 @@ namespace Microsoft.NodejsTools.Debugger.DebugEngine {
             var riidEvent = new Guid(iidEvent);
 
             EngineUtils.RequireOk(eventObject.GetAttributes(out attributes));
-            
-            if ((attributes & (uint)enum_EVENTATTRIBUTES.EVENT_STOPPING) != 0 && thread == null) {
-                Debug.Fail("A thread must be provided for a stopping event");
-                return;
-            }
 
             try {
                 EngineUtils.RequireOk(events.Event(this, null, program, thread, eventObject, ref riidEvent, attributes));
@@ -983,29 +979,6 @@ namespace Microsoft.NodejsTools.Debugger.DebugEngine {
             }
 
             process.StartListening();
-        }
-
-        private void DetachEvents(NodeDebugger process) {
-            process.ProcessLoaded -= OnProcessLoaded;
-            process.ModuleLoaded -= OnModuleLoaded;
-            process.ThreadCreated -= OnThreadCreated;
-
-            process.BreakpointBound -= OnBreakpointBound;
-            process.BreakpointUnbound -= OnBreakpointUnbound;
-            process.BreakpointBindFailure -= OnBreakpointBindFailure;
-
-            process.BreakpointHit -= OnBreakpointHit;
-            process.AsyncBreakComplete -= OnAsyncBreakComplete;
-            process.ExceptionRaised -= OnExceptionRaised;
-            process.ProcessExited -= OnProcessExited;
-            process.EntryPointHit -= OnEntryPointHit;
-            process.StepComplete -= OnStepComplete;
-            process.ThreadExited -= OnThreadExited;
-            process.DebuggerOutput -= OnDebuggerOutput;
-
-            if (_documentEvents != null) {
-                _documentEvents.DocumentSaved -= OnDocumentSaved;
-            }
         }
 
         private void OnThreadExited(object sender, ThreadEventArgs e) {
@@ -1185,13 +1158,11 @@ namespace Microsoft.NodejsTools.Debugger.DebugEngine {
         }
 
         private void OnDebuggerOutput(object sender, OutputEventArgs e) {
-            AD7Thread thread = null;
-            if (e.Thread != null && !_threads.TryGetValue(e.Thread, out thread)) {
+            AD7Thread thread;
+            if (!_threads.TryGetValue(e.Thread, out thread)) {
                 _threads[e.Thread] = thread = new AD7Thread(this, e.Thread);
             }
 
-            // thread can be null for an output string event because it is not
-            // a stopping event.
             Send(new AD7DebugOutputStringEvent2(e.Output), AD7DebugOutputStringEvent2.IID, thread);
         }
 

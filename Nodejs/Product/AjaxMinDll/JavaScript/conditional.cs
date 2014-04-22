@@ -18,16 +18,16 @@ using System;
 using System.Collections.Generic;
 using System.Text;
 
-namespace Microsoft.Ajax.Utilities
+namespace Microsoft.NodejsTools.Parsing
 {
 
     public sealed class Conditional : Expression
     {
-        private AstNode m_condition;
-        private AstNode m_trueExpression;
-        private AstNode m_falseExpression;
+        private Expression m_condition;
+        private Expression m_trueExpression;
+        private Expression m_falseExpression;
 
-        public AstNode Condition
+        public Expression Condition
         {
             get { return m_condition; }
             set
@@ -38,7 +38,7 @@ namespace Microsoft.Ajax.Utilities
             }
         }
 
-        public AstNode TrueExpression
+        public Expression TrueExpression
         {
             get { return m_trueExpression; }
             set
@@ -49,7 +49,7 @@ namespace Microsoft.Ajax.Utilities
             }
         }
 
-        public AstNode FalseExpression
+        public Expression FalseExpression
         {
             get { return m_falseExpression; }
             set
@@ -60,10 +60,10 @@ namespace Microsoft.Ajax.Utilities
             }
         }
 
-        public Context QuestionContext { get; set; }
-        public Context ColonContext { get; set; }
+        public TokenWithSpan QuestionContext { get; set; }
+        public TokenWithSpan ColonContext { get; set; }
 
-        public Conditional(Context context, JSParser parser)
+        public Conditional(TokenWithSpan context, JSParser parser)
             : base(context, parser)
         {
         }
@@ -100,16 +100,7 @@ namespace Microsoft.Ajax.Utilities
             return PrimitiveType.Other;
         }
 
-        public override bool IsEquivalentTo(AstNode otherNode)
-        {
-            var otherConditional = otherNode as Conditional;
-            return otherConditional != null
-                && Condition.IsEquivalentTo(otherConditional.Condition)
-                && TrueExpression.IsEquivalentTo(otherConditional.TrueExpression)
-                && FalseExpression.IsEquivalentTo(otherConditional.FalseExpression);
-        }
-
-        public override IEnumerable<AstNode> Children
+        public override IEnumerable<Node> Children
         {
             get
             {
@@ -117,35 +108,36 @@ namespace Microsoft.Ajax.Utilities
             }
         }
 
-        public override void Accept(IVisitor visitor)
-        {
-            if (visitor != null)
-            {
-                visitor.Visit(this);
+        public override void Walk(AstVisitor visitor) {
+            if (visitor.Walk(this)) {
+                m_condition.Walk(visitor);
+                m_trueExpression.Walk(visitor);
+                m_falseExpression.Walk(visitor);
             }
+            visitor.PostWalk(this);
         }
 
-        public override bool ReplaceChild(AstNode oldNode, AstNode newNode)
+        public override bool ReplaceChild(Node oldNode, Node newNode)
         {
             if (Condition == oldNode)
             {
-                Condition = newNode;
+                Condition = (Expression)newNode;
                 return true;
             }
             if (TrueExpression == oldNode)
             {
-                TrueExpression = newNode;
+                TrueExpression = (Expression)newNode;
                 return true;
             }
             if (FalseExpression == oldNode)
             {
-                FalseExpression = newNode;
+                FalseExpression = (Expression)newNode;
                 return true;
             }
             return false;
         }
 
-        public override AstNode LeftHandSide
+        public override Node LeftHandSide
         {
             get
             {

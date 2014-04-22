@@ -17,8 +17,9 @@
 using System;
 using System.Globalization;
 using System.Text;
+using Microsoft.Ajax.Utilities;
 
-namespace Microsoft.Ajax.Utilities
+namespace Microsoft.NodejsTools.Parsing
 {
     /// <summary>
     /// JSEncoderFallback encodes invalid encoder characters as Unicode escapes:

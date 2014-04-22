@@ -16,7 +16,7 @@
 
 using System;
 
-namespace Microsoft.Ajax.Utilities
+namespace Microsoft.NodejsTools.Parsing
 {
     public enum ReferenceType
     {
@@ -61,7 +61,7 @@ namespace Microsoft.Ajax.Utilities
                         // (if the forIn variable is a var, then it wouldn't be a lookup, so we don't have to worry about
                         // going up past a var-decl intermediate node)
                         var forIn = Parent as ForIn;
-                        isAssign = forIn != null && this == forIn.Variable;
+                        isAssign = forIn != null && this == Statement.GetExpression(forIn.Variable);
                     }
                 }
 
@@ -69,11 +69,11 @@ namespace Microsoft.Ajax.Utilities
             }
         }
 
-        public AstNode AssignmentValue
+        public Node AssignmentValue
         {
             get
             {
-                AstNode value = null;
+                Node value = null;
 
                 // see if our parent is a binary operator.
                 var binaryOp = Parent as BinaryOperator;
@@ -89,50 +89,25 @@ namespace Microsoft.Ajax.Utilities
             }
         }
 
-        public Lookup(Context context, JSParser parser)
+        public Lookup(TokenWithSpan context, JSParser parser)
             : base(context, parser)
         {
             RefType = ReferenceType.Variable;
         }
 
-        public override void Accept(IVisitor visitor)
-        {
-            if (visitor != null)
-            {
-                visitor.Visit(this);
+        public override void Walk(AstVisitor visitor) {
+            if (visitor.Walk(this)) {
             }
+            visitor.PostWalk(this);
         }
 
-        public override bool IsEquivalentTo(AstNode otherNode)
-        {
-            // this one is tricky. If we have a field assigned, then we are equivalent if the
-            // field is the same as the other one. If there is no field, then just check the name
-            var otherLookup = otherNode as Lookup;
-            if (otherLookup != null)
-            {
-                if (VariableField != null)
-                {
-                    // the variable fields should be the same
-                    return VariableField.IsSameField(otherLookup.VariableField);
-                }
-                else
-                {
-                    // otherwise the names should be identical
-                    return string.CompareOrdinal(Name, otherLookup.Name) == 0;
-                }
-            }
-
-            // if we get here, we're not equivalent
-            return false;
-        }
-
-        internal override string GetFunctionGuess(AstNode target)
+        internal override string GetFunctionGuess(Node target)
         {
             // return the source name
             return Name;
         }
 
-        private static bool MatchMemberName(AstNode node, string lookup, int startIndex, int endIndex)
+        private static bool MatchMemberName(Node node, string lookup, int startIndex, int endIndex)
         {
             // the node needs to be a Member node, and if it is, the appropriate portion of the lookup
             // string should match the name of the member.
@@ -140,7 +115,7 @@ namespace Microsoft.Ajax.Utilities
             return member != null && string.CompareOrdinal(member.Name, 0, lookup, startIndex, endIndex - startIndex) == 0;
         }
 
-        private static bool MatchesMemberChain(AstNode parent, string lookup, int startIndex)
+        private static bool MatchesMemberChain(Node parent, string lookup, int startIndex)
         {
             // get the NEXT period
             var period = lookup.IndexOf('.', startIndex);
@@ -163,49 +138,6 @@ namespace Microsoft.Ajax.Utilities
 
             // now check the last segment, from start to the end of the string
             return MatchMemberName(parent, lookup, startIndex, lookup.Length);
-        }
-
-        internal override bool IsDebuggerStatement
-        {
-            get
-            {
-                // if we don't want to strip debug statements, then nothing is a debug statement
-                if (Parser.Settings.StripDebugStatements)
-                {
-                    // we want to look through the parser's debug lookup list (if there is one)
-                    // and see if we match any of the debug lookups specified therein.
-                    foreach (var lookup in Parser.DebugLookups)
-                    {
-                        // see if there's a period in this lookup
-                        var firstPeriod = lookup.IndexOf('.');
-                        if (firstPeriod > 0)
-                        {
-                            // this lookup is a member chain, so check our name against that
-                            // first part before the period; if it matches, we need to walk up the parent tree
-                            if (string.CompareOrdinal(Name, 0, lookup, 0, firstPeriod) == 0)
-                            {
-                                // we matched the first one; test the rest of the chain
-                                if (MatchesMemberChain(Parent, lookup, firstPeriod + 1))
-                                {
-                                    return true;
-                                }
-                            }
-                        }
-                        else
-                        {
-                            // just a straight comparison
-                            if (string.CompareOrdinal(Name, lookup) == 0)
-                            {
-                                // we found a match
-                                return true;
-                            }
-                        }
-                    }
-                }
-
-                // if we get here, we didn't find a match
-                return false;
-            }
         }
 
         //code in parser relies on this.name being returned from here

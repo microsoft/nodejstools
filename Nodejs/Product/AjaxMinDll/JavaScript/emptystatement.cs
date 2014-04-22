@@ -19,21 +19,19 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 
-namespace Microsoft.Ajax.Utilities
+namespace Microsoft.NodejsTools.Parsing
 {
-    public class EmptyStatement : AstNode
+    public class EmptyStatement : Statement
     {
-        public EmptyStatement(Context context, JSParser parser)
+        public EmptyStatement(TokenWithSpan context, JSParser parser)
             : base(context, parser)
         {
         }
 
-        public override void Accept(IVisitor visitor)
-        {
-            if (visitor != null)
-            {
-                visitor.Visit(this);
+        public override void Walk(AstVisitor visitor) {
+            if (visitor.Walk(this)) {
             }
+            visitor.PostWalk(this);
         }
 
         internal override bool RequiresSeparator

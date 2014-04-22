@@ -17,14 +17,14 @@
 using System.Collections.Generic;
 using System.Text;
 
-namespace Microsoft.Ajax.Utilities
+namespace Microsoft.NodejsTools.Parsing
 {
     public sealed class ForIn : IterationStatement
     {
-        private AstNode m_variable;
-        private AstNode m_collection;
+        private Statement m_variable;
+        private Expression m_collection;
 
-        public AstNode Variable
+        public Statement Variable
         {
             get { return m_variable; }
             set
@@ -35,7 +35,7 @@ namespace Microsoft.Ajax.Utilities
             }
         }
 
-        public AstNode Collection
+        public Expression Collection
         {
             get { return m_collection; }
             set
@@ -46,11 +46,11 @@ namespace Microsoft.Ajax.Utilities
             }
         }
 
-        public Context OperatorContext { get; set; }
+        public TokenWithSpan OperatorContext { get; set; }
 
         public BlockScope BlockScope { get; set; }
 
-        public override Context TerminatingContext
+        public override TokenWithSpan TerminatingContext
         {
             get
             {
@@ -59,20 +59,21 @@ namespace Microsoft.Ajax.Utilities
             }
         }
 
-        public ForIn(Context context, JSParser parser)
+        public ForIn(TokenWithSpan context, JSParser parser)
             : base(context, parser)
         {
         }
 
-        public override void Accept(IVisitor visitor)
-        {
-            if (visitor != null)
-            {
-                visitor.Visit(this);
+        public override void Walk(AstVisitor visitor) {
+            if (visitor.Walk(this)) {
+                m_collection.Walk(visitor);
+                m_variable.Walk(visitor);
+                Body.Walk(visitor);
             }
+            visitor.PostWalk(this);
         }
 
-        public override IEnumerable<AstNode> Children
+        public override IEnumerable<Node> Children
         {
             get
             {
@@ -80,21 +81,21 @@ namespace Microsoft.Ajax.Utilities
             }
         }
 
-        public override bool ReplaceChild(AstNode oldNode, AstNode newNode)
+        public override bool ReplaceChild(Node oldNode, Node newNode)
         {
             if (Variable == oldNode)
             {
-                Variable = newNode;
+                Variable = (Statement)newNode;
                 return true;
             }
             if (Collection == oldNode)
             {
-                Collection = newNode;
+                Collection = (Expression)newNode;
                 return true;
             }
             if (Body == oldNode)
             {
-                Body = ForceToBlock(newNode);
+                Body = ForceToBlock((Statement)newNode);
                 return true;
             }
             return false;

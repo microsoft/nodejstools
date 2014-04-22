@@ -20,7 +20,7 @@ using System.Collections.ObjectModel;
 using System.Diagnostics;
 using System.Text;
 
-namespace Microsoft.Ajax.Utilities
+namespace Microsoft.NodejsTools.Parsing
 {
     /// <summary>
     /// Output mode setting
@@ -91,7 +91,6 @@ namespace Microsoft.Ajax.Utilities
             LineBreakThreshold = int.MaxValue - 1000;
             AllowEmbeddedAspNetBlocks = false;
 
-            IgnoreErrorCollection = new HashSet<string>(StringComparer.OrdinalIgnoreCase);
             PreprocessorValues = new Dictionary<string, string>(StringComparer.OrdinalIgnoreCase);
             ResourceStrings = new List<ResourceStrings>();
         }
@@ -117,16 +116,6 @@ namespace Microsoft.Ajax.Utilities
         {
             get;
             set;
-        }
-
-        /// <summary>
-        /// Gets or sets a flag for whether to ignore ALL errors found in the input code.
-        /// Default is false.
-        /// </summary>
-        public bool IgnoreAllErrors 
-        { 
-            get; 
-            set; 
         }
 
         /// <summary>
@@ -205,98 +194,6 @@ namespace Microsoft.Ajax.Utilities
             get
             {
                 return new string(' ', m_indentLevel * IndentSize);
-            }
-        }
-
-        #endregion
-
-        #region IgnoreErrors list
-
-        /// <summary>
-        /// Collection of errors to ignore
-        /// </summary>
-        [Obsolete("Use IgnoreErrorCollection instead")]
-        [System.ComponentModel.EditorBrowsable(System.ComponentModel.EditorBrowsableState.Never)]
-        public ReadOnlyCollection<string> IgnoreErrors 
-        {
-            get
-            {
-                var newList = new List<string>();
-                newList.AddRange(IgnoreErrorCollection);
-                return new ReadOnlyCollection<string>(newList);
-            }
-        }
-
-        /// <summary>
-        /// Set the list of errors to ignore
-        /// </summary>
-        /// <param name="definedNames">array of error code strings</param>
-        /// <returns>number of error codes successfully added to the collection</returns>
-        [Obsolete("Use SetIgnoreErrors passing in an IEnumerable<string> instead instead")]
-        [System.ComponentModel.EditorBrowsable(System.ComponentModel.EditorBrowsableState.Never)]
-        public int SetIgnoreErrors(params string[] ignoreErrors)
-        {
-            return SetIgnoreErrors((ICollection<string>)ignoreErrors);
-        }
-
-        /// <summary>
-        /// Gets a collection of errors to ignore
-        /// </summary>
-        public ICollection<string> IgnoreErrorCollection { get; private set; }
-
-        /// <summary>
-        /// Set the collection of errors to ignore
-        /// </summary>
-        /// <param name="definedNames">collection of error code strings</param>
-        /// <returns>number of error codes successfully added to the collection</returns>
-        public int SetIgnoreErrors(IEnumerable<string> ignoreErrors)
-        {
-            IgnoreErrorCollection.Clear();
-            if (ignoreErrors != null)
-            {
-                foreach (var ignoreError in ignoreErrors)
-                {
-                    IgnoreErrorCollection.Add(ignoreError.Trim());
-                }
-            }
-
-            return IgnoreErrorCollection.Count;
-        }
-
-        /// <summary>
-        /// string representation of the list of debug lookups, comma-separated
-        /// </summary>
-        public string IgnoreErrorList
-        {
-            get
-            {
-                // createa string builder and add each of the debug lookups to it
-                // one-by-one, separating them with a comma
-                var sb = new StringBuilder();
-                foreach (var errorCode in IgnoreErrorCollection)
-                {
-                    if (sb.Length > 0)
-                    {
-                        sb.Append(',');
-                    }
-                    sb.Append(errorCode);
-                }
-
-                return sb.ToString();
-            }
-            set
-            {
-                if (!string.IsNullOrEmpty(value))
-                {
-                    foreach (var error in value.Split(','))
-                    {
-                        IgnoreErrorCollection.Add(error);
-                    }
-                }
-                else
-                {
-                    IgnoreErrorCollection.Clear();
-                }
             }
         }
 

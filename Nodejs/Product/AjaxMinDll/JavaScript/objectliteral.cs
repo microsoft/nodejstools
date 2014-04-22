@@ -17,13 +17,13 @@
 using System.Collections.Generic;
 using System.Text;
 
-namespace Microsoft.Ajax.Utilities
+namespace Microsoft.NodejsTools.Parsing
 {
     public sealed class ObjectLiteral : Expression
     {
-        private AstNodeList m_properties;
+        private AstNodeList<ObjectLiteralProperty> m_properties;
 
-        public AstNodeList Properties
+        public AstNodeList<ObjectLiteralProperty> Properties
         {
             get { return m_properties; }
             set
@@ -56,20 +56,21 @@ namespace Microsoft.Ajax.Utilities
             }
         }
 
-        public ObjectLiteral(Context context, JSParser parser)
+        public ObjectLiteral(TokenWithSpan context, JSParser parser)
             : base(context, parser)
         {
         }
 
-        public override void Accept(IVisitor visitor)
-        {
-            if (visitor != null)
-            {
-                visitor.Visit(this);
+        public override void Walk(AstVisitor visitor) {
+            if (visitor.Walk(this)) {
+                foreach (var prop in m_properties) {
+                    prop.Walk(visitor);
+                }
             }
+            visitor.PostWalk(this);
         }
 
-        public override IEnumerable<AstNode> Children
+        public override IEnumerable<Node> Children
         {
             get
             {
@@ -77,11 +78,11 @@ namespace Microsoft.Ajax.Utilities
             }
         }
 
-        public override bool ReplaceChild(AstNode oldNode, AstNode newNode)
+        public override bool ReplaceChild(Node oldNode, Node newNode)
         {
             if (oldNode == m_properties)
             {
-                var properties = newNode as AstNodeList;
+                var properties = newNode as AstNodeList<ObjectLiteralProperty>;
                 if (newNode == null || properties != null)
                 {
                     Properties = properties;

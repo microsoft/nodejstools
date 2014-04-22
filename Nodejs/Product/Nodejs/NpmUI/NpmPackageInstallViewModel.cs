@@ -17,7 +17,6 @@ using System.Collections.Generic;
 using System.ComponentModel;
 using System.Linq;
 using System.Runtime.CompilerServices;
-using System.Text.RegularExpressions;
 using System.Threading;
 using System.Windows;
 using System.Windows.Input;
@@ -30,15 +29,37 @@ using Microsoft.Windows.Design.Host;
 
 namespace Microsoft.NodejsTools.NpmUI {
     internal class NpmPackageInstallViewModel : INotifyPropertyChanged {
+
+        private abstract class ViewModelCommand : ICommand {
+            protected NpmPackageInstallViewModel _owner;
+
+            protected ViewModelCommand(NpmPackageInstallViewModel owner) {
+                _owner = owner;
+                _owner.PropertyChanged += Owner_PropertyChanged;
+            }
+
+            protected abstract void Owner_PropertyChanged(
+                object sender,
+                PropertyChangedEventArgs e);
+
+            public abstract bool CanExecute(object parameter);
+            public abstract void Execute(object parameter);
+            public event EventHandler CanExecuteChanged;
+
+            protected void OnCanExecuteChanged() {
+                var handlers = CanExecuteChanged;
+                if (null != handlers) {
+                    handlers(this, EventArgs.Empty);
+                }
+            }
+        }
+
         private enum Indices {
             IndexStandard = 0,
             IndexDev = 1,
             IndexOptional = 2,
             IndexGlobal = 3
         }
-
-        public static readonly ICommand InstallCommand = new RoutedCommand();
-        public static readonly ICommand RefreshCatalogCommand = new RoutedCommand();
         
         private INpmController _npmController;
 
@@ -48,39 +69,31 @@ namespace Microsoft.NodejsTools.NpmUI {
 
         private bool _isLoadingCatalog;
         private IPackageCatalog _allPackages;
-        private readonly object _filteredPackagesLock = new object();
+        private RefreshCatalogCommand _refreshCommand;
         private IList<PackageCatalogEntryViewModel> _filteredPackages = new List<PackageCatalogEntryViewModel>();
         private LastRefreshedMessageProvider _lastRefreshedMessage;
         private PackageCatalogEntryViewModel _selectedPackage;
+        private InstallPackageCommand _installCommand;
         private bool _npmNotFound;
         private bool _isCatalogEmpty;
         private Visibility _catalogControlVisibility = Visibility.Visible;
         private string _catalogLoadingMessage = string.Empty;
         private Visibility _loadingCatalogControlVisibility = Visibility.Hidden;
         private Visibility _filteredCatalogListVisibility = Visibility.Visible;
+        private string _rawFilterText;
+        private DispatcherTimer _keypressFilterDelayTimer;
+        private bool _isExecuteNpmWithArgumentsMode, _userSelectedPackage;
         private int _selectedDependencyTypeIndex;
 
-        private string _currentFilter;
-        private string _filterText;
-        private readonly Timer _filterTimer;
-
-        private readonly Dispatcher _dispatcher;
-
         private NpmOutputControlViewModel _executeViewModel;
-
-        private readonly InstallCommandPackageCatalogEntryViewModel _installCommand =
-            new InstallCommandPackageCatalogEntryViewModel();
         
-        public NpmPackageInstallViewModel(
-            NpmOutputControlViewModel executeViewModel,
-            Dispatcher dispatcher
-        ) {
-            _dispatcher = dispatcher;
+        public NpmPackageInstallViewModel(NpmOutputControlViewModel executeViewModel) {
+            _installCommand = new InstallPackageCommand(this);
+            _refreshCommand = new RefreshCatalogCommand(this);
 
             _executeViewModel = executeViewModel;
-            _filterTimer = new Timer(FilterTimer_Elapsed, null, Timeout.Infinite, Timeout.Infinite);
         }
-
+        
         public event PropertyChangedEventHandler PropertyChanged;
 
         protected virtual void OnPropertyChanged([CallerMemberName] string propertyName = null) {
@@ -97,7 +110,7 @@ namespace Microsoft.NodejsTools.NpmUI {
                 _npmController = value;
                 OnPropertyChanged();
                 if (null != _npmController) {
-                    LoadCatalog();
+                    LoadCatalogue();
                     _npmController.FinishedRefresh += NpmController_FinishedRefresh;
                 }
             }
@@ -127,11 +140,11 @@ namespace Microsoft.NodejsTools.NpmUI {
             private set {
                 _isLoadingCatalog = value;
                 OnPropertyChanged();
-                OnPropertyChanged("CanRefreshCatalog");
+                OnPropertyChanged("RefreshCatalogEnabled");
             }
         }
 
-        public bool CanRefreshCatalog {
+        public bool RefreshCatalogEnabled {
             get { return !IsLoadingCatalog; }
         }
 
@@ -176,7 +189,7 @@ namespace Microsoft.NodejsTools.NpmUI {
             }
         }
 
-        private async void LoadCatalog(bool forceRefresh) {
+        private async void LoadCatalogue(bool forceRefresh) {
             IsLoadingCatalog = true;
 
             FilteredCatalogListVisibility = Visibility.Hidden;
@@ -216,12 +229,12 @@ namespace Microsoft.NodejsTools.NpmUI {
             }
         }
 
-        public void LoadCatalog() {
-            LoadCatalog(false);
+        public void LoadCatalogue() {
+            LoadCatalogue(false);
         }
 
-        public void RefreshCatalog() {
-            LoadCatalog(true);
+        public void RefreshCatalogue() {
+            LoadCatalogue(true);
         }
 
         public Visibility CatalogControlVisibility {
@@ -232,79 +245,41 @@ namespace Microsoft.NodejsTools.NpmUI {
             }
         }
 
+        private class RefreshCatalogCommand : ViewModelCommand {
+            public RefreshCatalogCommand(NpmPackageInstallViewModel owner) : base(owner) {}
+            protected override void Owner_PropertyChanged(object sender, PropertyChangedEventArgs e) {
+                switch (e.PropertyName) {
+                    case "IsLoadingCatalog":
+                        OnCanExecuteChanged();
+                        break;
+                }
+            }
+
+            public override bool CanExecute(object parameter) {
+                return _owner.RefreshCatalogEnabled;
+            }
+
+            public override void Execute(object parameter) {
+                _owner.RefreshCatalogue();
+            }
+        }
+
+        public ICommand RefreshCommand {
+            get {
+                return _refreshCommand;
+            }
+        }
+
         #endregion
 
         #region Filtering
 
         public IList<PackageCatalogEntryViewModel> FilteredPackages {
-            get {
-                lock (_filteredPackagesLock) {
-                    return _filteredPackages;
-                }
-            }
+            get { return _filteredPackages; }
             set {
-                lock (_filteredPackagesLock) {
-                    _filteredPackages = value;
-                }
+                _filteredPackages = value;
                 OnPropertyChanged();
             }
-        }
-
-        public string FilterText {
-            get { return _filterText; }
-            set {
-                _filterText = value;
-                _installCommand.Command = value;
-                if (_currentFilter != _filterText) {
-                    StartFilter();
-                }
-                OnPropertyChanged();
-            }
-        }
-
-        private void StartFilter() {
-            _filterTimer.Change(500, Timeout.Infinite);
-        }
-
-        private void FilterTimer_Elapsed(object state) {
-            List<PackageCatalogEntryViewModel> newItems = null;
-
-            var filterText = _filterText;
-            var filtered = PackageCatalogFilterFactory.Create(_allPackages).Filter(filterText);
-
-            if (filtered.Any()) {
-                IRootPackage rootPackage = null;
-                IGlobalPackages globalPackages = null;
-                var controller = _npmController;
-                if (controller != null) {
-                    rootPackage = controller.RootPackage;
-                    globalPackages = controller.GlobalPackages;
-                }
-
-                newItems = new List<PackageCatalogEntryViewModel> {
-                    _installCommand
-                };
-                newItems.AddRange(filtered.Select(package => new ReadOnlyPackageCatalogEntryViewModel(
-                    package,
-                    rootPackage.Modules[package.Name],
-                    globalPackages.Modules[package.Name]
-                )));
-            }
-
-            _dispatcher.BeginInvoke((Action)(() => {
-                if (newItems != null) {
-                    lock (_filteredPackagesLock) {
-                        FilteredPackages = newItems;
-                        _currentFilter = filterText;
-                    }
-                }
-                SelectedPackage = _installCommand;
-
-                LastRefreshedMessage = IsCatalogEmpty
-                    ? LastRefreshedMessageProvider.RefreshFailed
-                    : new LastRefreshedMessageProvider(_allPackages.LastRefreshed);
-                CatalogControlVisibility = Visibility.Visible;
-            }));
         }
 
         public LastRefreshedMessageProvider LastRefreshedMessage {
@@ -313,6 +288,25 @@ namespace Microsoft.NodejsTools.NpmUI {
                 _lastRefreshedMessage = value;
                 OnPropertyChanged();
             }
+        }
+
+        public Brush FilterTextBrush {
+            get {
+                object key;
+                if (_userSelectedPackage) {
+                    key = Controls.GrayTextKey;
+                } else {
+                    key = Controls.ForegroundKey;
+                }
+
+                return (Brush)Application.Current.TryFindResource(key);
+            }
+        }
+
+        private bool TreatAsArguments(string source) {
+            return IsCatalogEmpty
+                || (!string.IsNullOrEmpty(source)
+                && (source.Any(char.IsWhiteSpace) || source.Any(ch => ch == '@')));
         }
 
         private static string GetFilterStringPortion(string source) {
@@ -329,6 +323,95 @@ namespace Microsoft.NodejsTools.NpmUI {
             return source;
         }
 
+        private static string GetArgumentPortion(string source) {
+            string filter = GetFilterStringPortion(source);
+            return string.IsNullOrEmpty(filter)
+                ? source
+                : (source.Length > filter.Length ? source.Substring(filter.Length) : string.Empty);
+        }
+
+        public string RawFilterText {
+            get { return _rawFilterText; }
+            set {
+                _rawFilterText = value;
+                OnPropertyChanged();
+
+                if (TreatAsArguments(_rawFilterText)) {
+                    IsExecuteNpmWithArgumentsMode = true;
+                } else {
+                    IsExecuteNpmWithArgumentsMode = false;
+                }
+                StartFilterTimer();
+            }
+        }
+
+        private void StartFilterTimer() {
+            if (null == _keypressFilterDelayTimer) {
+                _keypressFilterDelayTimer = new DispatcherTimer();
+                _keypressFilterDelayTimer.Interval = new TimeSpan(0, 0, 0, 0, 500);
+                _keypressFilterDelayTimer.Tick += _keypressFilterDelayTimer_Tick;
+            } else {
+                _keypressFilterDelayTimer.Stop();
+            }
+            _keypressFilterDelayTimer.Start();
+        }
+
+        private void _keypressFilterDelayTimer_Tick(object sender, EventArgs e) {
+            _keypressFilterDelayTimer.Stop();
+            _keypressFilterDelayTimer.Tick -= _keypressFilterDelayTimer_Tick;
+            _keypressFilterDelayTimer = null;
+
+            StartFilter();
+        }
+
+        private void StartFilter() {
+            ThreadPool.QueueUserWorkItem(o => Filter(GetFilterStringPortion(RawFilterText)));
+        }
+
+        private void Filter(string filterString) {
+            if (null == _allPackages) {
+                return;
+            }
+
+            var filtered = PackageCatalogFilterFactory.Create(_allPackages).Filter(filterString);
+            var controller = _npmController;
+            var target = filtered.Select(package => new PackageCatalogEntryViewModel(
+                package,
+                null == controller ? null : controller.RootPackage,
+                null == controller ? null : controller.GlobalPackages)).ToList();
+            
+            Application.Current.Dispatcher.BeginInvoke(
+                new Action(() => SetFilteredList(target)));
+        }
+
+        private void SetFilteredList(IList<PackageCatalogEntryViewModel> filtered) {
+            var newSelection = filtered.FirstOrDefault();
+            
+            FilteredPackages = filtered;
+            if (newSelection != null) {
+                // by pass the property, we don't want to alter the filter text
+                _selectedPackage = newSelection;
+                _userSelectedPackage = false;
+                OnPropertyChanged("SelectedPackage");
+                OnPropertyChanged("FilterTextBrush");
+            }
+            LastRefreshedMessage = IsCatalogEmpty
+                ? LastRefreshedMessageProvider.RefreshFailed
+                : new LastRefreshedMessageProvider(_allPackages.LastRefreshed);
+            CatalogControlVisibility = Visibility.Visible;
+        }
+
+        public bool IsExecuteNpmWithArgumentsMode {
+            get { return _isExecuteNpmWithArgumentsMode; }
+            private set {
+                _isExecuteNpmWithArgumentsMode = value;
+                OnPropertyChanged("NonArgumentControlsVisibility");
+            }
+        }
+
+        public Visibility NonArgumentControlsVisibility {
+            get { return IsExecuteNpmWithArgumentsMode ? Visibility.Collapsed : Visibility.Visible; }
+        }
 
         public Visibility FilterControlsVisibility {
             get { return LoadingCatalogControlVisibility == Visibility.Visible ? Visibility.Collapsed : Visibility.Visible; }
@@ -355,52 +438,87 @@ namespace Microsoft.NodejsTools.NpmUI {
             }
         }
 
-        internal bool CanInstall(PackageCatalogEntryViewModel package) {
-            var install = package as InstallCommandPackageCatalogEntryViewModel;
-            if (install != null) {
-                return !string.IsNullOrEmpty(install.Command);
-            }
+        private void Install() {
+            if (IsExecuteNpmWithArgumentsMode) {
+                _executeViewModel.QueueCommand("install", RawFilterText);
+            } else if (null != _selectedPackage) {
+                var type = DependencyType.Standard;
+                var global = false;
+                switch ((Indices) SelectedDependencyTypeIndex) {
+                    case Indices.IndexDev:
+                        type = DependencyType.Development;
+                        break;
 
-            return package != null;
-        }
+                    case Indices.IndexOptional:
+                        type = DependencyType.Optional;
+                        break;
 
-        internal void Install(PackageCatalogEntryViewModel package) {
-            var type = DependencyType.Standard;
-            var global = false;
-            switch ((Indices)SelectedDependencyTypeIndex) {
-                case Indices.IndexDev:
-                    type = DependencyType.Development;
-                    break;
-
-                case Indices.IndexOptional:
-                    type = DependencyType.Optional;
-                    break;
-
-                case Indices.IndexGlobal:
-                    global = true;
-                    break;
-            }
-
-            var install = package as InstallCommandPackageCatalogEntryViewModel;
-            if (install != null) {
-                if (!string.IsNullOrEmpty(install.Command)) {
-                    _executeViewModel.QueueCommand("install " + install.Command);
+                    case Indices.IndexGlobal:
+                        global = true;
+                        break;
                 }
-            } else if (package != null) {
+
                 if (global) {
-                    _executeViewModel.QueueInstallGlobalPackage(package.Name, "*");
+                    _executeViewModel.QueueInstallGlobalPackage(
+                        RawFilterText,
+                        "*");
                 } else {
-                    _executeViewModel.QueueInstallPackage(package.Name, "*", type);
+                    _executeViewModel.QueueInstallPackage(
+                        RawFilterText,
+                        "*",
+                        type);
                 }
             }
+            
         }
 
+        /// <summary>
+        /// Sets the selected package when it changes via the UI.  When we change the
+        /// filtered list and initialize the first selected package we don't go through
+        /// here as it will alter the search text which we just used to filter and
+        /// we don't want to set it to the now selected package.
+        /// </summary>
         public PackageCatalogEntryViewModel SelectedPackage {
             get { return _selectedPackage; }
             set {
                 _selectedPackage = value;
                 OnPropertyChanged();
+                if (_selectedPackage != null) {
+                    _rawFilterText = _selectedPackage.Name;
+                    _userSelectedPackage = true;
+                    OnPropertyChanged("RawFilterText");
+                } else {
+                    _userSelectedPackage = false;
+                }
+                OnPropertyChanged("FilterTextBrush");
             }
+        }
+
+        private class InstallPackageCommand : ViewModelCommand {
+            public InstallPackageCommand(NpmPackageInstallViewModel owner) : base(owner) {}
+
+            protected override void Owner_PropertyChanged(
+                object sender,
+                PropertyChangedEventArgs e) {
+                switch (e.PropertyName) {
+                    case "IsExecuteNpmWithArgumentsMode":
+                    case "SelectedPackage":
+                        OnCanExecuteChanged();
+                        break;
+                }
+            }
+
+            public override bool CanExecute(object parameter) {
+                return !string.IsNullOrEmpty(_owner.RawFilterText);
+            }
+
+            public override void Execute(object parameter) {
+                _owner.Install();
+            }
+        }
+
+        public ICommand InstallCommand {
+            get { return _installCommand; }
         }
 
         #endregion

@@ -18,8 +18,9 @@ using System;
 using System.Globalization;
 using System.Text;
 
-namespace Microsoft.Ajax.Utilities
+namespace Microsoft.NodejsTools.Parsing
 {
+#if FALSE
     /// <summary>
     /// CssFallback encodes invalid encoder characters as Unicode escapes:
     ///       \123456
@@ -226,4 +227,5 @@ namespace Microsoft.Ajax.Utilities
             return m_fallbackString;
         }
     }
+#endif
 }

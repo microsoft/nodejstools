@@ -17,9 +17,9 @@
 using System.Collections.Generic;
 using System.Text;
 
-namespace Microsoft.Ajax.Utilities
+namespace Microsoft.NodejsTools.Parsing
 {
-    public sealed class TryNode : AstNode
+    public sealed class TryNode : Statement
     {
         private Block m_tryBlock;
         private Block m_catchBlock;
@@ -78,9 +78,9 @@ namespace Microsoft.Ajax.Utilities
             }
         }
 
-        public Context CatchContext { get; set; }
+        public TokenWithSpan CatchContext { get; set; }
 
-        public Context CatchVarContext
+        public TokenWithSpan CatchVarContext
         {
             get
             {
@@ -88,9 +88,9 @@ namespace Microsoft.Ajax.Utilities
             }
         }
 
-        public Context FinallyContext { get; set; }
+        public TokenWithSpan FinallyContext { get; set; }
 
-        public TryNode(Context context, JSParser parser)
+        public TryNode(TokenWithSpan context, JSParser parser)
             : base(context, parser)
         {
         }
@@ -100,15 +100,23 @@ namespace Microsoft.Ajax.Utilities
             CatchParameter.VariableField = field;
         }
 
-        public override void Accept(IVisitor visitor)
-        {
-            if (visitor != null)
-            {
-                visitor.Visit(this);
+        public override void Walk(AstVisitor visitor) {
+            if (visitor.Walk(this)) {
+                m_tryBlock.Walk(visitor);
+                if (m_catchParameter != null) {
+                    m_catchParameter.Walk(visitor);
+                }
+                if (m_catchBlock != null) {
+                    m_catchBlock.Walk(visitor);
+                }
+                if (m_finallyBlock != null) {
+                    m_finallyBlock.Walk(visitor);
+                }
             }
+            visitor.PostWalk(this);
         }
 
-        public override IEnumerable<AstNode> Children
+        public override IEnumerable<Node> Children
         {
             get
             {
@@ -116,11 +124,11 @@ namespace Microsoft.Ajax.Utilities
             }
         }
 
-        public override bool ReplaceChild(AstNode oldNode, AstNode newNode)
+        public override bool ReplaceChild(Node oldNode, Node newNode)
         {
             if (TryBlock == oldNode)
             {
-                TryBlock = ForceToBlock(newNode);
+                TryBlock = ForceToBlock((Statement)newNode);
                 return true;
             }
             if (CatchParameter == oldNode)
@@ -130,12 +138,12 @@ namespace Microsoft.Ajax.Utilities
             }
             if (CatchBlock == oldNode)
             {
-                CatchBlock = ForceToBlock(newNode);
+                CatchBlock = ForceToBlock((Statement)newNode);
                 return true;
             }
             if (FinallyBlock == oldNode)
             {
-                FinallyBlock = ForceToBlock(newNode);
+                FinallyBlock = ForceToBlock((Statement)newNode);
                 return true;
             }
             return false;

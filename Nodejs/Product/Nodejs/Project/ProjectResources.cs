@@ -64,12 +64,10 @@ namespace Microsoft.NodejsTools.Project {
         internal const string NpmNodePackageInstallationDescription = "NpmNodePackageInstallationDescription";
         internal const string NpmNodePath = "NpmNodePath";
         internal const string NpmNodePathDescription = "NpmNodePathDescription";
-        internal const string NpmOutputPaneTitle = "NpmOutputPaneTitle";
         internal const string NpmPackageAuthor = "NpmPackageAuthor";
         internal const string NpmPackageAuthorDescription = "NpmPackageAuthorDescription";
         internal const string NpmPackageDescription = "NpmPackageDescription";
         internal const string NpmPackageDescriptionDescription = "NpmPackageDescriptionDescription";
-        internal const string NpmPackageInstallHelpMessage = "NpmPackageInstallHelpMessage";
         internal const string NpmPackageIsBundledDependency = "NpmPackageIsBundledDependency";
         internal const string NpmPackageIsBundledDependencyDescription = "NpmPackageIsBundledDependencyDescription";
         internal const string NpmPackageIsDevDependency = "NpmPackageIsDevDependency";

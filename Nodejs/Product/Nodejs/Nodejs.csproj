@@ -242,6 +242,13 @@
     </Compile>
     <Compile Include="Azure\WebSiteServiceShims.cs" />
     <Compile Include="ClassifierProviderMetadata.cs" />
+    <Compile Include="Classifier\NodejsClassifier.cs" />
+    <Compile Include="Classifier\NodejsClassifierProvider.cs" />
+    <Compile Include="Classifier\NodejsPredefinedClassificationTypeNames.cs" />
+    <Compile Include="Classifier\SnapshotSpanSourceCodeReader.cs" />
+    <Compile Include="Classifier\TokenCache.cs" />
+    <Compile Include="Classifier\TokenCategory.cs" />
+    <Compile Include="Classifier\TokenInfo.cs" />
     <Compile Include="CodeWindowManager.cs" />
     <Compile Include="Commands\AzureExplorerAttachDebuggerCommand.cs" />
     <Compile Include="Commands\ImportWizardCommand.cs" />
@@ -255,6 +262,21 @@
     <Compile Include="Debugger\LocalFileNameMapper.cs" />
     <Compile Include="Debugger\NodeProcess.cs" />
     <Compile Include="Debugger\ScriptTree.cs" />
+    <Compile Include="Intellisense\AnalysisPriority.cs" />
+    <Compile Include="Intellisense\AnalysisQueue.cs" />
+    <Compile Include="Intellisense\AnalysisSynchronizationContext.cs" />
+    <Compile Include="Intellisense\CollectingErrorSink.cs" />
+    <Compile Include="Intellisense\CompletionAnalysis.cs" />
+    <Compile Include="Intellisense\EntryEventArgs.cs" />
+    <Compile Include="Intellisense\FuzzyCompletionSet.cs" />
+    <Compile Include="Intellisense\FuzzyStringMatcher.cs" />
+    <Compile Include="Intellisense\MonitoredBufferResult.cs" />
+    <Compile Include="Intellisense\NormalCompletionAnalysis.cs" />
+    <Compile Include="Intellisense\ParseQueue.cs" />
+    <Compile Include="Intellisense\VsProjectAnalyzer.cs" />
+    <Compile Include="Intellisense\SnapshotCookie.cs" />
+    <Compile Include="Intellisense\TaskProvider.cs" />
+    <Compile Include="Navigation\DropDownBarClient.cs" />
     <Compile Include="NodejsPackage.Debugger.cs" />
     <Compile Include="NpmUI\ExecuteNpmCommandWindow.xaml.cs">
       <DependentUpon>ExecuteNpmCommandWindow.xaml</DependentUpon>
@@ -282,6 +304,7 @@
     <Compile Include="Debugger\Communication\NetworkClientFactory.cs" />
     <Compile Include="Debugger\Communication\WebSocketNetworkClient.cs" />
     <Compile Include="Debugger\Communication\TcpNetworkClient.cs" />
+    <Compile Include="Debugger\Communication\WebSocketStream.cs" />
     <Compile Include="Debugger\ExceptionHitTreatment.cs" />
     <Compile Include="Debugger\ExceptionHandler.cs" />
     <Compile Include="Debugger\JavaScriptSourceMapInfo.cs" />
@@ -753,13 +776,7 @@
       <SubType>Designer</SubType>
     </MultiProjectZipProject>
     <ZipItem Include="Templates\Files\UnitTest\UnitTest.js" />
-    <ZipItem Include="Templates\Files\UnitTest\UnitTest.vstemplate">
-      <SubType>Designer</SubType>
-    </ZipItem>
-    <ZipItem Include="Templates\Files\TypeScriptUnitTest\UnitTest.ts" />
-    <ZipItem Include="Templates\Files\TypeScriptUnitTest\UnitTest.vstemplate">
-      <SubType>Designer</SubType>
-    </ZipItem>
+    <ZipItem Include="Templates\Files\UnitTest\UnitTest.vstemplate" />
     <Content Include="VSTemplateStore.pkgdef">
       <IncludeInVSIX>true</IncludeInVSIX>
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
@@ -999,16 +1016,20 @@
   </ItemGroup>
   <ItemGroup>
     <Content Include="..\Icons\NodejsProject.ico">
-      <Link>NodejsProject.ico</Link>
+      <Link>Resources\Icons\NodejsProject.ico</Link>
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
       <IncludeInVSIX>true</IncludeInVSIX>
       <VSIXSubpath>.</VSIXSubpath>
     </Content>
-    <Content Include="..\Icons\NodejsProjectBig.ico">
-      <Link>NodejsProjectBig.ico</Link>
+    <Content Include="..\Icons\NodejsToolsforVisualStudio.ico">
+      <Link>Resources\Icons\NodejsToolsforVisualStudio.ico</Link>
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
       <IncludeInVSIX>true</IncludeInVSIX>
-      <VSIXSubpath>.</VSIXSubpath>
+    </Content>
+    <Content Include="..\Icons\NodejsProjectBig.ico">
+      <Link>Resources\Icons\NodejsProjectBig.ico</Link>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+      <IncludeInVSIX>true</IncludeInVSIX>
     </Content>
     <Resource Include="..\Icons\NodejsProjectBigResource.ico">
       <Link>Resources\Icons\NodejsProjectBigResource.ico</Link>

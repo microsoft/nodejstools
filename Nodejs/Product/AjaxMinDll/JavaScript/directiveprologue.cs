@@ -18,16 +18,16 @@ using System;
 using System.Collections.Generic;
 using System.Text;
 
-namespace Microsoft.Ajax.Utilities
+namespace Microsoft.NodejsTools.Parsing
 {
     public class DirectivePrologue : ConstantWrapper
     {
-        public DirectivePrologue(string value, Context context, JSParser parser)
+        public DirectivePrologue(string value, TokenWithSpan context, JSParser parser)
             : base(value, PrimitiveType.String, context, parser)
         {
             // this is a "use strict" directive if the source context is EXACTLY "use strict"
             // don't consider the quotes so it can be " or ' delimiters
-            UseStrict = string.CompareOrdinal(Context.Code, 1, "use strict", 0, 10) == 0;
+            UseStrict = string.Equals(value, "use strict", StringComparison.Ordinal);
         }
 
         public bool UseStrict { get; private set; }
@@ -63,12 +63,10 @@ namespace Microsoft.Ajax.Utilities
             }
         }
 
-        public override void Accept(IVisitor visitor)
-        {
-            if (visitor != null)
-            {
-                visitor.Visit(this);
+        public override void Walk(AstVisitor visitor) {
+            if (visitor.Walk(this)) {
             }
+            visitor.PostWalk(this);
         }
     }
 }

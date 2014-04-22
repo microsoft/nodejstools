@@ -19,90 +19,76 @@ using System.Collections.Generic;
 using System.Globalization;
 using System.Text;
 
-namespace Microsoft.Ajax.Utilities
+namespace Microsoft.NodejsTools.Parsing
 {
-    public class CommaOperator : BinaryOperator
+    public class CommaOperator : Expression
     {
-        public CommaOperator(Context context, JSParser parser)
+        private Expression[] _expressions;
+
+        public CommaOperator(TokenWithSpan context, JSParser parser)
             : base(context, parser)
         {
         }
 
-        public static AstNode CombineWithComma(Context context, JSParser parser, AstNode operand1, AstNode operand2)
+        public override PrimitiveType FindPrimitiveType() {
+            return _expressions[_expressions.Length - 1].FindPrimitiveType();
+        }
+
+        public override IEnumerable<Node> Children
         {
-            var comma = new CommaOperator(context, parser)
-                {
-                    OperatorToken = JSToken.Comma
-                };
-
-            // if the left is a comma-operator already....
-            var leftBinary = operand1 as BinaryOperator;
-            var rightBinary = operand2 as BinaryOperator;
-            if (leftBinary != null && leftBinary.OperatorToken == JSToken.Comma)
+            get
             {
-                // the left-hand side is already a comma operator. Instead of nesting these, we're
-                // going to combine them
-                // move the old list's left-hand side to our left-hand side
-                comma.Operand1 = leftBinary.Operand1;
-
-                AstNodeList list;
-                if (rightBinary != null && rightBinary.OperatorToken == JSToken.Comma)
-                {
-                    // the right is ALSO a comma operator. Create a new list, append all the rest of the operands
-                    // and set our right-hand side to be the list
-                    list = new AstNodeList(null, parser);
-                    list.Append(leftBinary.Operand2).Append(rightBinary.Operand1).Append(rightBinary.Operand2);
-                }
-                else
-                {
-                    // the right is not a comma operator.
-                    // see if the left-hand side already has a list we can use
-                    list = leftBinary.Operand2 as AstNodeList;
-                    if (list == null)
-                    {
-                        // it's not a list already
-                        // create a new list with the left's right and our right and set it to our right
-                        list = new AstNodeList(null, parser);
-                        list.Append(leftBinary.Operand2);
-                    }
-
-                    // and add our right-hand operand to the end of the list
-                    list.Append(operand2);
-                }
-
-                // set the list on the right
-                comma.Operand2 = list;
+                return _expressions;
             }
-            else if (rightBinary != null && rightBinary.OperatorToken == JSToken.Comma)
+        }
+
+        public Expression[] Expressions
+        {
+            get
             {
-                // the left hand side is NOT a comma operator.
-                comma.Operand1 = operand1;
+                return _expressions;
+            }
+            set
+            {
+                _expressions = value;
+            }
+        }
 
-                // the right-hand side is already a comma-operator, but the left is not.
-                // see if it already has a list we can reuse
-                var rightList = rightBinary.Operand2 as AstNodeList;
-                if (rightList != null)
-                {
-                    // it does. Prepend its right-hand operand and use the list
-                    rightList.Insert(0, rightBinary.Operand1);
-                }
-                else
-                {
-                    // it's not -- create a new list containing the operands
-                    rightList = new AstNodeList(rightBinary.Context, parser);
-                    rightList.Append(rightBinary.Operand1);
-                    rightList.Append(rightBinary.Operand2);
-                }
+        public static Expression CombineWithComma(TokenWithSpan context, JSParser parser, Expression operand1, Expression operand2)
+        {
+            var comma = new CommaOperator(context, parser);
 
-                comma.Operand2 = rightList;
+            List<Expression> res = new List<Expression>();
+            CommaOperator left = operand1 as CommaOperator;
+            CommaOperator right = operand2 as CommaOperator;
+            if (left != null)
+            {
+                res.AddRange(left.Expressions);
             }
             else
             {
-                comma.Operand1 = operand1;
-                comma.Operand2 = operand2;
+                res.Add(operand1);
             }
 
+            if (right != null)
+            {
+                res.AddRange(right.Expressions);
+            }
+            else
+            {
+                res.Add(operand2);
+            }
+            comma.Expressions = res.ToArray();
             return comma;
+        }
+
+        public override void Walk(AstVisitor visitor) {
+            if (visitor.Walk(this)) {
+                foreach (var expr in _expressions) {
+                    expr.Walk(visitor);
+                }
+            }
+            visitor.PostWalk(this);
         }
     }
 }

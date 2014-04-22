@@ -18,14 +18,14 @@ using System;
 using System.Collections.Generic;
 using System.Text;
 
-namespace Microsoft.Ajax.Utilities
+namespace Microsoft.NodejsTools.Parsing
 {
     public sealed class CallNode : Expression
     {
-        private AstNode m_function;
-        private AstNodeList m_arguments;
+        private Expression m_function;
+        private AstNodeList<Expression> m_arguments;
 
-        public AstNode Function
+        public Expression Function
         {
             get { return m_function; }
             set
@@ -36,7 +36,7 @@ namespace Microsoft.Ajax.Utilities
             }
         }
 
-        public AstNodeList Arguments
+        public AstNodeList<Expression> Arguments
         {
             get { return m_arguments; }
             set
@@ -59,7 +59,7 @@ namespace Microsoft.Ajax.Utilities
             set;
         }
 
-        public CallNode(Context context, JSParser parser)
+        public CallNode(TokenWithSpan context, JSParser parser)
             : base(context, parser)
         {
         }
@@ -100,15 +100,17 @@ namespace Microsoft.Ajax.Utilities
             }
         }
 
-        public override void Accept(IVisitor visitor)
-        {
-            if (visitor != null)
-            {
-                visitor.Visit(this);
+        public override void Walk(AstVisitor visitor) {
+            if (visitor.Walk(this)) {
+                m_function.Walk(visitor);
+                foreach (var param in m_arguments) {
+                    param.Walk(visitor);
+                }
             }
+            visitor.PostWalk(this);
         }
 
-        public override IEnumerable<AstNode> Children
+        public override IEnumerable<Node> Children
         {
             get
             {
@@ -116,11 +118,11 @@ namespace Microsoft.Ajax.Utilities
             }
         }
 
-        public override bool ReplaceChild(AstNode oldNode, AstNode newNode)
+        public override bool ReplaceChild(Node oldNode, Node newNode)
         {
             if (Function == oldNode)
             {
-                Function = newNode;
+                Function = (Expression)newNode;
                 return true;
             }
             if (Arguments == oldNode)
@@ -134,7 +136,7 @@ namespace Microsoft.Ajax.Utilities
                 else
                 {
                     // if the new node isn't an AstNodeList, ignore it
-                    var newList = newNode as AstNodeList;
+                    var newList = newNode as AstNodeList<Expression>;
                     if (newList != null)
                     {
                         Arguments = newList;
@@ -145,34 +147,12 @@ namespace Microsoft.Ajax.Utilities
             return false;
         }
 
-        public override AstNode LeftHandSide
+        public override Node LeftHandSide
         {
             get
             {
                 // the function is on the left
                 return Function.LeftHandSide;
-            }
-        }
-
-        public override bool IsEquivalentTo(AstNode otherNode)
-        {
-            // a call node is equivalent to another call node if the function and the arguments
-            // are all equivalent (and be sure to check for brackets and constructor)
-            var otherCall = otherNode as CallNode;
-            return otherCall != null
-                && this.InBrackets == otherCall.InBrackets
-                && this.IsConstructor == otherCall.IsConstructor
-                && this.Function.IsEquivalentTo(otherCall.Function)
-                && this.Arguments.IsEquivalentTo(otherCall.Arguments);
-        }
-
-        internal override bool IsDebuggerStatement
-        {
-            get
-            {
-                // see if this is a member, lookup, or call node
-                // if it is, then we will pop positive if the recursive call does
-                return ((Function is Member || Function is CallNode || Function is Lookup) && Function.IsDebuggerStatement);
             }
         }
     }

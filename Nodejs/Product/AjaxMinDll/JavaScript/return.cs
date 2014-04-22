@@ -17,12 +17,12 @@
 using System.Collections.Generic;
 using System.Text;
 
-namespace Microsoft.Ajax.Utilities
+namespace Microsoft.NodejsTools.Parsing
 {
-    public sealed class ReturnNode : AstNode
+    public sealed class ReturnNode : Statement
     {
-        private AstNode m_operand;
-        public AstNode Operand
+        private Expression m_operand;
+        public Expression Operand
         {
             get { return m_operand; }
             set
@@ -33,20 +33,19 @@ namespace Microsoft.Ajax.Utilities
             }
         }
 
-        public ReturnNode(Context context, JSParser parser)
+        public ReturnNode(TokenWithSpan context, JSParser parser)
             : base(context, parser)
         {
         }
 
-        public override void Accept(IVisitor visitor)
-        {
-            if (visitor != null)
-            {
-                visitor.Visit(this);
+        public override void Walk(AstVisitor visitor) {
+            if (visitor.Walk(this)) {
+                m_operand.Walk(visitor);
             }
+            visitor.PostWalk(this);
         }
 
-        public override IEnumerable<AstNode> Children
+        public override IEnumerable<Node> Children
         {
             get
             {
@@ -54,11 +53,11 @@ namespace Microsoft.Ajax.Utilities
             }
         }
 
-        public override bool ReplaceChild(AstNode oldNode, AstNode newNode)
+        public override bool ReplaceChild(Node oldNode, Node newNode)
         {
             if (Operand == oldNode)
             {
-                Operand = newNode;
+                Operand = (Expression)newNode;
                 return true;
             }
             return false;

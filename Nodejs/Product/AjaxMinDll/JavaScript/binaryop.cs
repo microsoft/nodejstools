@@ -19,15 +19,15 @@ using System.Collections.Generic;
 using System.Globalization;
 using System.Text;
 
-namespace Microsoft.Ajax.Utilities
+namespace Microsoft.NodejsTools.Parsing
 {
 
     public class BinaryOperator : Expression
     {
-        private AstNode m_operand1;
-        private AstNode m_operand2;
+        private Expression m_operand1;
+        private Expression m_operand2;
 
-        public AstNode Operand1 
+        public Expression Operand1 
         {
             get { return m_operand1; }
             set
@@ -37,8 +37,8 @@ namespace Microsoft.Ajax.Utilities
                 m_operand1.IfNotNull(n => n.Parent = this);
             }
         }
-        
-        public AstNode Operand2 
+
+        public Expression Operand2 
         {
             get { return m_operand2; }
             set
@@ -50,9 +50,9 @@ namespace Microsoft.Ajax.Utilities
         }
 
         public JSToken OperatorToken { get; set; }
-        public Context OperatorContext { get; set; }
+        public TokenWithSpan OperatorContext { get; set; }
 
-        public override Context TerminatingContext
+        public override TokenWithSpan TerminatingContext
         {
             get
             {
@@ -61,7 +61,7 @@ namespace Microsoft.Ajax.Utilities
             }
         }
 
-        public BinaryOperator(Context context, JSParser parser)
+        public BinaryOperator(TokenWithSpan context, JSParser parser)
             : base(context, parser)
         {
         }
@@ -146,9 +146,6 @@ namespace Microsoft.Ajax.Utilities
             switch (OperatorToken)
             {
                 case JSToken.Assign:
-                case JSToken.Comma:
-                    // returns whatever type the right operand is
-                    return Operand2.FindPrimitiveType();
 
                 case JSToken.BitwiseAnd:
                 case JSToken.BitwiseAndAssign:
@@ -223,7 +220,7 @@ namespace Microsoft.Ajax.Utilities
             }
         }
 
-        public override IEnumerable<AstNode> Children
+        public override IEnumerable<Node> Children
         {
             get
             {
@@ -231,30 +228,30 @@ namespace Microsoft.Ajax.Utilities
             }
         }
 
-        public override void Accept(IVisitor visitor)
-        {
-            if (visitor != null)
-            {
-                visitor.Visit(this);
+        public override void Walk(AstVisitor walker) {
+            if (walker.Walk(this)) {
+                m_operand1.Walk(walker);
+                m_operand2.Walk(walker);
             }
+            walker.PostWalk(this);
         }
-
-        public override bool ReplaceChild(AstNode oldNode, AstNode newNode)
+        
+        public override bool ReplaceChild(Node oldNode, Node newNode)
         {
             if (Operand1 == oldNode)
             {
-                Operand1 = newNode;
+                Operand1 = (Expression)newNode;
                 return true;
             }
             if (Operand2 == oldNode)
             {
-                Operand2 = newNode;
+                Operand2 = (Expression)newNode;
                 return true;
             }
             return false;
         }
 
-        public override AstNode LeftHandSide
+        public override Node LeftHandSide
         {
             get
             {
@@ -268,20 +265,9 @@ namespace Microsoft.Ajax.Utilities
             // swap the operands -- we don't need to go through ReplaceChild or the
             // property setters because we don't need to change the Parent pointers 
             // or anything like that.
-            AstNode temp = m_operand1;
+            Expression temp = m_operand1;
             m_operand1 = m_operand2;
             m_operand2 = temp;
-        }
-
-        public override bool IsEquivalentTo(AstNode otherNode)
-        {
-            // a binary operator is equivalent to another binary operator if the operator is the same and
-            // both operands are also equivalent
-            var otherBinary = otherNode as BinaryOperator;
-            return otherBinary != null
-                && OperatorToken == otherBinary.OperatorToken
-                && Operand1.IsEquivalentTo(otherBinary.Operand1)
-                && Operand2.IsEquivalentTo(otherBinary.Operand2);
         }
 
         public bool IsAssign
@@ -310,7 +296,7 @@ namespace Microsoft.Ajax.Utilities
             }
         }
 
-        internal override string GetFunctionGuess(AstNode target)
+        internal override string GetFunctionGuess(Node target)
         {
             return Operand2 == target
                 ? IsAssign ? Operand1.GetFunctionGuess(this) : Parent.GetFunctionGuess(this)
@@ -340,11 +326,13 @@ namespace Microsoft.Ajax.Utilities
             }
         }
 
+#if FALSE
         public override string ToString()
         {
             return (Operand1 == null ? "<null>" : Operand1.ToString())
                 + ' ' + OutputVisitor.OperatorString(OperatorToken) + ' '
                 + (Operand2 == null ? "<null>" : Operand2.ToString());
         }
+#endif
     }
 }

@@ -13,13 +13,10 @@
  * ***************************************************************************/
 
 using System;
-using System.Collections.Generic;
 using System.Diagnostics;
 using System.Globalization;
 using System.IO;
-using System.Linq;
 using System.Runtime.InteropServices;
-using Microsoft.CSharp.RuntimeBinder;
 using Microsoft.VisualStudio.Shell;
 using Microsoft.VisualStudio.Shell.Interop;
 
@@ -118,15 +115,53 @@ namespace Microsoft.VisualStudioTools.Project {
 
                     // Search for the project in the collection of the projects in the
                     // current solution.
-                    var dte = (EnvDTE.DTE)ProjectMgr.GetService(typeof(EnvDTE.DTE));
-                    if (null == dte || null == dte.Solution) {
+                    EnvDTE.DTE dte = (EnvDTE.DTE)this.ProjectMgr.GetService(typeof(EnvDTE.DTE));
+                    if ((null == dte) || (null == dte.Solution)) {
                         return null;
                     }
-                    var unmodeled = new Guid(EnvDTE.Constants.vsProjectKindUnmodeled);
-                    referencedProject = dte.Solution.Projects
-                        .Cast<EnvDTE.Project>()
-                        .Where(prj => !Utilities.GuidEquals(unmodeled, prj.Kind))
-                        .FirstOrDefault(prj => CommonUtils.IsSamePath(referencedProjectFullPath, prj.FullName));
+                    foreach (EnvDTE.Project prj in dte.Solution.Projects) {
+                        //Skip this project if it is an umodeled project (unloaded)
+                        if (string.Compare(EnvDTE.Constants.vsProjectKindUnmodeled, prj.Kind, StringComparison.OrdinalIgnoreCase) == 0) {
+                            continue;
+                        }
+
+                        // Get the full path of the current project.
+                        EnvDTE.Property pathProperty = null;
+                        try {
+                            if (prj.Properties == null) {
+                                continue;
+                            }
+
+                            pathProperty = prj.Properties.Item("FullPath");
+                            if (null == pathProperty) {
+                                // The full path should alway be availabe, but if this is not the
+                                // case then we have to skip it.
+                                continue;
+                            }
+                        } catch (ArgumentException) {
+                            continue;
+                        }
+                        string prjPath = pathProperty.Value.ToString();
+                        EnvDTE.Property fileNameProperty = null;
+                        // Get the name of the project file.
+                        try {
+                            fileNameProperty = prj.Properties.Item("FileName");
+                            if (null == fileNameProperty) {
+                                // Again, this should never be the case, but we handle it anyway.
+                                continue;
+                            }
+                        } catch (ArgumentException) {
+                            continue;
+                        }
+                        prjPath = Path.Combine(prjPath, fileNameProperty.Value.ToString());
+
+                        // If the full path of this project is the same as the one of this
+                        // reference, then we have found the right project.
+                        if (CommonUtils.IsSamePath(prjPath, referencedProjectFullPath)) {
+                            this.referencedProject = prj;
+                            break;
+                        }
+                    }
                 }
 
                 return this.referencedProject;
@@ -151,13 +186,13 @@ namespace Microsoft.VisualStudioTools.Project {
                 if (null == confManager) {
                     return null;
                 }
-                
+
                 // Get the active configuration.
                 EnvDTE.Configuration config = confManager.ActiveConfiguration;
-                
                 if (null == config) {
                     return null;
                 }
+
 
                 if (null == config.Properties) {
                     return null;
@@ -177,28 +212,19 @@ namespace Microsoft.VisualStudioTools.Project {
 
                 // Now get the name of the assembly from the project.
                 // Some project system throw if the property does not exist. We expect an ArgumentException.
-                string outputName = null;
+                EnvDTE.Property assemblyNameProperty = null;
                 try {
-                    outputName = this.ReferencedProjectObject.Properties.Item("OutputFileName").Value.ToString();
+                    assemblyNameProperty = this.ReferencedProjectObject.Properties.Item("OutputFileName");
                 } catch (ArgumentException) {
-                } catch (NullReferenceException) {
                 }
 
-                if (outputName == null) {
-                    try {
-                        outputName = ((object[])config.OutputGroups.Item("Built").FileNames)
-                            .OfType<string>()
-                            .FirstOrDefault();
-                    } catch (ArgumentException) {
-                    } catch (NullReferenceException) {
-                    } catch (InvalidCastException) {
-                    }
+                if (null == assemblyNameProperty) {
+                    return null;
                 }
-
                 // build the full path adding the name of the assembly to the output path.
-                return string.IsNullOrEmpty(outputName) ?
-                    null :
-                    CommonUtils.GetAbsoluteFilePath(outputPath, outputName);
+                outputPath = Path.Combine(outputPath, assemblyNameProperty.Value.ToString());
+
+                return outputPath;
             }
         }
 

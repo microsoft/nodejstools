@@ -37,11 +37,7 @@ namespace Microsoft.NodejsTools.Debugger {
                     if (markerLine != null && (markerStart = markerLine.IndexOf(marker, StringComparison.Ordinal)) != -1) {
                         string sourceMapFilename = markerLine.Substring(markerStart + marker.Length).Trim();
                         if (!File.Exists(sourceMapFilename)) {
-                            try {
-                                sourceMapFilename = Path.Combine(Path.GetDirectoryName(filename) ?? string.Empty, Path.GetFileName(sourceMapFilename));
-                            } catch (ArgumentException) {
-                            } catch (PathTooLongException) {
-                            }
+                            sourceMapFilename = Path.Combine(Path.GetDirectoryName(filename) ?? string.Empty, Path.GetFileName(sourceMapFilename));
                         }
 
                         if (File.Exists(sourceMapFilename)) {
@@ -94,11 +90,7 @@ namespace Microsoft.NodejsTools.Debugger {
                 if (sourceMap.TryMapPointBack(requestedLineNo, requestedColumnNo, out result)) {
                     lineNo = result.Line;
                     columnNo = result.Column;
-                    try {
-                        fileName = Path.Combine(Path.GetDirectoryName(fileName) ?? string.Empty, result.FileName);
-                    } catch (ArgumentException) {
-                    } catch (PathTooLongException) {
-                    }
+                    fileName = Path.Combine(Path.GetDirectoryName(fileName) ?? string.Empty, result.FileName);
                     Debug.WriteLine("Mapped breakpoint from {0} {1} to {2} {3}", requestedFileName, requestedLineNo, fileName, lineNo);
                 }
 
@@ -111,17 +103,9 @@ namespace Microsoft.NodejsTools.Debugger {
         private SourceMap GetSourceMap(string fileName) {
             SourceMap sourceMap;
             if (!_generatedFileToSourceMap.TryGetValue(fileName, out sourceMap)) {
-                // See if we are using source maps for this file.
-
-                string extension;
-                try {
-                    extension = Path.GetExtension(fileName);
-                } catch (ArgumentException) {
-                    extension = "";
-                }
-
-                if (!string.Equals(extension, NodejsConstants.FileExtension, StringComparison.OrdinalIgnoreCase)) {
-                    string baseFile = fileName.Substring(0, fileName.Length - extension.Length);
+                // see if we are using source maps for this file.
+                if (!String.Equals(Path.GetExtension(fileName), NodejsConstants.FileExtension, StringComparison.OrdinalIgnoreCase)) {
+                    string baseFile = fileName.Substring(0, fileName.Length - Path.GetExtension(fileName).Length);
                     if (File.Exists(baseFile + ".js") && File.Exists(baseFile + ".js.map")) {
                         // we're using source maps...
                         try {

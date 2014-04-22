@@ -18,16 +18,16 @@ using System;
 using System.Collections.Generic;
 using System.Text;
 
-namespace Microsoft.Ajax.Utilities
+namespace Microsoft.NodejsTools.Parsing
 {
 
     public sealed class ForNode : IterationStatement
     {
-        private AstNode m_initializer;
-        private AstNode m_condition;
-        private AstNode m_incrementer;
+        private Statement m_initializer;
+        private Expression m_condition;
+        private Expression m_incrementer;
 
-        public AstNode Initializer
+        public Statement Initializer
         {
             get { return m_initializer; }
             set
@@ -38,7 +38,7 @@ namespace Microsoft.Ajax.Utilities
             }
         }
 
-        public AstNode Condition
+        public Expression Condition
         {
             get { return m_condition; }
             set
@@ -50,7 +50,7 @@ namespace Microsoft.Ajax.Utilities
         }
 
         [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Naming", "CA1704:IdentifiersShouldBeSpelledCorrectly", MessageId = "Incrementer")]
-        public AstNode Incrementer
+        public Expression Incrementer
         {
             get { return m_incrementer; }
             set
@@ -62,14 +62,14 @@ namespace Microsoft.Ajax.Utilities
         }
 
         /// <summary>Context for the first semicolon, separating the initializer and the condition</summary>
-        public Context Separator1Context { get; set; }
+        public TokenWithSpan Separator1Context { get; set; }
 
         /// <summary>Context for the second semicolon, separating the condition and the incrementor</summary>
-        public Context Separator2Context { get; set; }
+        public TokenWithSpan Separator2Context { get; set; }
 
         public BlockScope BlockScope { get; set; }
 
-        public override Context TerminatingContext
+        public override TokenWithSpan TerminatingContext
         {
             get
             {
@@ -78,19 +78,21 @@ namespace Microsoft.Ajax.Utilities
             }
         }
 
-        public ForNode(Context context, JSParser parser)
+        public ForNode(TokenWithSpan context, JSParser parser)
             : base(context, parser)
         {
         }
 
-        public override void Accept(IVisitor visitor)
-        {
-            if (visitor != null)
-            {
-                visitor.Visit(this);
+        public override void Walk(AstVisitor visitor) {
+            if (visitor.Walk(this)) {
+                m_initializer.Walk(visitor);
+                m_condition.Walk(visitor);
+                Body.Walk(visitor);
+                m_incrementer.Walk(visitor);
             }
+            visitor.PostWalk(this);
         }
-		
+
 		internal override bool RequiresSeparator
         {
             get
@@ -106,7 +108,7 @@ namespace Microsoft.Ajax.Utilities
             return Body == null || Body.Count == 0 ? false : Body.EncloseBlock(type);
         }
 
-        public override IEnumerable<AstNode> Children
+        public override IEnumerable<Node> Children
         {
             get
             {
@@ -114,26 +116,26 @@ namespace Microsoft.Ajax.Utilities
             }
         }
 
-        public override bool ReplaceChild(AstNode oldNode, AstNode newNode)
+        public override bool ReplaceChild(Node oldNode, Node newNode)
         {
             if (Initializer == oldNode)
             {
-                Initializer = newNode;
+                Initializer = (Statement)newNode;
                 return true;
             }
             if (Condition == oldNode)
             {
-                Condition = newNode;
+                Condition = (Expression)newNode;
                 return true;
             }
             if (Incrementer == oldNode)
             {
-                Incrementer = newNode;
+                Incrementer = (Expression)newNode;
                 return true;
             }
             if (Body == oldNode)
             {
-                Body = ForceToBlock(newNode);
+                Body = ForceToBlock((Statement)newNode);
                 return true;
             }
             return false;

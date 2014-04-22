@@ -57,7 +57,7 @@ namespace Microsoft.NodejsTools.Debugger.DebugEngine {
             _frame.StackFrame.ExecuteTextAsync(_expression, _tokenSource.Token)
                 .ContinueWith(p => {
                     try {
-                        if (p.IsFaulted || p.IsCanceled || p.Result == null) {
+                        if (p.IsFaulted || p.IsCanceled) {
                             return;
                         }
 
@@ -87,6 +87,7 @@ namespace Microsoft.NodejsTools.Debugger.DebugEngine {
             try {
                 result = _frame.StackFrame.ExecuteTextAsync(_expression, tokenSource.Token)
                     .WaitAsync(timeout, tokenSource.Token).Result;
+                ppResult = new AD7Property(_frame, result);
             } catch (AggregateException ae) {
                 Exception baseException = ae.GetBaseException();
                 if (baseException is DebuggerCommandException) {
@@ -94,10 +95,6 @@ namespace Microsoft.NodejsTools.Debugger.DebugEngine {
                 }
 
                 throw;
-            }
-
-            if (result == null) {
-                return VSConstants.E_FAIL;
             }
 
             ppResult = new AD7Property(_frame, result);

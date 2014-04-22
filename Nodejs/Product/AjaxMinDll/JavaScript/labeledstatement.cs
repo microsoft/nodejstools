@@ -17,13 +17,13 @@
 using System.Collections.Generic;
 using System.Text;
 
-namespace Microsoft.Ajax.Utilities
+namespace Microsoft.NodejsTools.Parsing
 {
-    public sealed class LabeledStatement : AstNode
+    public sealed class LabeledStatement : Statement
     {
-        private AstNode m_statement;
+        private Statement m_statement;
 
-        public AstNode Statement
+        public Statement Statement
         {
             get { return m_statement; }
             set
@@ -37,19 +37,18 @@ namespace Microsoft.Ajax.Utilities
         public int NestCount { get; set; }
         public string Label { get; set; }
 
-        public Context ColonContext { get; set; }
+        public TokenWithSpan ColonContext { get; set; }
 
-        public LabeledStatement(Context context, JSParser parser)
+        public LabeledStatement(TokenWithSpan context, JSParser parser)
             : base(context, parser)
         {
         }
 
-        public override void Accept(IVisitor visitor)
-        {
-            if (visitor != null)
-            {
-                visitor.Visit(this);
+        public override void Walk(AstVisitor visitor) {
+            if (visitor.Walk(this)) {
+                m_statement.Walk(visitor);
             }
+            visitor.PostWalk(this);
         }
 
         internal override bool RequiresSeparator
@@ -61,7 +60,7 @@ namespace Microsoft.Ajax.Utilities
             }
         }
 
-        public override AstNode LeftHandSide
+        public override Node LeftHandSide
         {
             get
             {
@@ -76,7 +75,7 @@ namespace Microsoft.Ajax.Utilities
             return (Statement != null ? Statement.EncloseBlock(type) : false);
         }
 
-        public override IEnumerable<AstNode> Children
+        public override IEnumerable<Node> Children
         {
             get
             {
@@ -84,11 +83,11 @@ namespace Microsoft.Ajax.Utilities
             }
         }
 
-        public override bool ReplaceChild(AstNode oldNode, AstNode newNode)
+        public override bool ReplaceChild(Node oldNode, Node newNode)
         {
             if (Statement == oldNode)
             {
-                Statement = newNode;
+                Statement = (Statement)newNode;
                 return true;
             }
             return false;

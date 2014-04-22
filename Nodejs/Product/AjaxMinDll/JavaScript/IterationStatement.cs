@@ -14,14 +14,14 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-namespace Microsoft.Ajax.Utilities
+namespace Microsoft.NodejsTools.Parsing
 {
     using System.Collections.Generic;
     using System.Globalization;
     using System.IO;
     using System.Text;
 
-    public abstract class IterationStatement : AstNode
+    public abstract class IterationStatement : Statement
     {
         private Block m_body;
 
@@ -36,7 +36,7 @@ namespace Microsoft.Ajax.Utilities
             }
         }
 
-        protected IterationStatement(Context context, JSParser parser)
+        protected IterationStatement(TokenWithSpan context, JSParser parser)
             : base(context, parser)
         {
         }

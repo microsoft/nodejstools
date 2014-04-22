@@ -20,13 +20,13 @@ using System.Globalization;
 using System.Reflection;
 using System.Text;
 
-namespace Microsoft.Ajax.Utilities
+namespace Microsoft.NodejsTools.Parsing
 {
     public interface INameReference
     {
         ActivationObject VariableScope { get; }
         bool IsAssignment { get; }
-        AstNode AssignmentValue { get; }
+        Node AssignmentValue { get; }
         JSVariableField VariableField { get; }
         string Name { get; }
         long Index { get; }

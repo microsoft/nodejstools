@@ -16,12 +16,12 @@
 
 using System.Reflection;
 
-namespace Microsoft.Ajax.Utilities
+namespace Microsoft.NodejsTools.Parsing
 {
     public sealed class WithScope : BlockScope
     {
-        public WithScope(ActivationObject parent, Context context, CodeSettings settings)
-            : base(parent, context, settings)
+        public WithScope(ActivationObject parent, TokenWithSpan context, ErrorSink errorSink)
+            : base(parent, context, errorSink)
         {
             IsInWithScope = true;
         }

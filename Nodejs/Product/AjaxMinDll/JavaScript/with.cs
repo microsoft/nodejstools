@@ -18,14 +18,14 @@ using System;
 using System.Collections.Generic;
 using System.Text;
 
-namespace Microsoft.Ajax.Utilities
+namespace Microsoft.NodejsTools.Parsing
 {
-    public sealed class WithNode : AstNode
+    public sealed class WithNode : Statement
     {
-        private AstNode m_withObject;
+        private Expression m_withObject;
         private Block m_body;
 
-        public AstNode WithObject
+        public Expression WithObject
         {
             get { return m_withObject; }
             set
@@ -47,7 +47,7 @@ namespace Microsoft.Ajax.Utilities
             }
         }
 
-        public override Context TerminatingContext
+        public override TokenWithSpan TerminatingContext
         {
             get
             {
@@ -56,20 +56,20 @@ namespace Microsoft.Ajax.Utilities
             }
         }
 
-        public WithNode(Context context, JSParser parser)
+        public WithNode(TokenWithSpan context, JSParser parser)
             : base(context, parser)
         {
         }
 
-        public override void Accept(IVisitor visitor)
-        {
-            if (visitor != null)
-            {
-                visitor.Visit(this);
+        public override void Walk(AstVisitor visitor) {
+            if (visitor.Walk(this)) {
+                m_withObject.Walk(visitor);
+                m_body.Walk(visitor);
             }
+            visitor.PostWalk(this);
         }
 
-        public override IEnumerable<AstNode> Children
+        public override IEnumerable<Node> Children
         {
             get
             {
@@ -77,16 +77,16 @@ namespace Microsoft.Ajax.Utilities
             }
         }
 
-        public override bool ReplaceChild(AstNode oldNode, AstNode newNode)
+        public override bool ReplaceChild(Node oldNode, Node newNode)
         {
             if (WithObject == oldNode)
             {
-                WithObject = newNode;
+                WithObject = (Expression)newNode;
                 return true;
             }
             if (Body == oldNode)
             {
-                Body = ForceToBlock(newNode);
+                Body = ForceToBlock((Statement)newNode);
                 return true;
             }
             return false;

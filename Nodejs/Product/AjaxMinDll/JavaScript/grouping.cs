@@ -14,7 +14,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-namespace Microsoft.Ajax.Utilities
+namespace Microsoft.NodejsTools.Parsing
 {
     using System.Collections.Generic;
 
@@ -23,9 +23,9 @@ namespace Microsoft.Ajax.Utilities
     /// </summary>
     public class GroupingOperator : Expression
     {
-        private AstNode m_operand;
+        private Expression m_operand;
 
-        public AstNode Operand
+        public Expression Operand
         {
             get { return m_operand; }
             set
@@ -36,17 +36,16 @@ namespace Microsoft.Ajax.Utilities
             }
         }
 
-        public GroupingOperator(Context context, JSParser parser)
+        public GroupingOperator(TokenWithSpan context, JSParser parser)
             : base(context, parser)
         {
         }
 
-        public override void Accept(IVisitor visitor)
-        {
-            if (visitor != null)
-            {
-                visitor.Visit(this);
+        public override void Walk(AstVisitor visitor) {
+            if (visitor.Walk(this)) {
+                m_operand.Walk(visitor);
             }
+            visitor.PostWalk(this);
         }
 
         public override PrimitiveType FindPrimitiveType()
@@ -64,7 +63,7 @@ namespace Microsoft.Ajax.Utilities
             }
         }
 
-        public override IEnumerable<AstNode> Children
+        public override IEnumerable<Node> Children
         {
             get
             {
@@ -72,25 +71,15 @@ namespace Microsoft.Ajax.Utilities
             }
         }
 
-        public override bool ReplaceChild(AstNode oldNode, AstNode newNode)
+        public override bool ReplaceChild(Node oldNode, Node newNode)
         {
             if (Operand == oldNode)
             {
-                Operand = newNode;
+                Operand = (Expression)newNode;
                 return true;
             }
 
             return false;
-        }
-
-        public override bool IsEquivalentTo(AstNode otherNode)
-        {
-            // we be equivalent if the other node is the
-            // equivalent of the operand, right? The only difference would be the
-            // parentheses, so maybe it'd still be the equivalent, no?
-            var otherGroup = otherNode as GroupingOperator;
-            return (otherGroup != null && Operand.IsEquivalentTo(otherGroup.Operand))
-                || Operand.IsEquivalentTo(otherNode);
         }
 
         public override bool IsConstant

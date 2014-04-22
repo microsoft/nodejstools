@@ -21,13 +21,13 @@ using System.Globalization;
 using System.Text;
 using System.Text.RegularExpressions;
 
-namespace Microsoft.Ajax.Utilities
+namespace Microsoft.NodejsTools.Parsing
 {
     /// <summary>
     /// Traverse the tree to build up scope lexically-declared names, var-declared names,
     /// and lookups, then resolve everything.
     /// </summary>
-    public class ResolutionVisitor : IVisitor
+    public class ResolutionVisitor : AstVisitor
     {
         #region private fields
 
@@ -46,8 +46,7 @@ namespace Microsoft.Ajax.Utilities
         /// <summary>stack to maintain the current variable scope as we traverse the tree</summary>
         private Stack<ActivationObject> m_variableStack;
 
-        /// <summary>code setings</summary>
-        private CodeSettings m_settings;
+        private ErrorSink _errorSink;
 
         #endregion
 
@@ -84,7 +83,7 @@ namespace Microsoft.Ajax.Utilities
 
         #region private constructor
 
-        private ResolutionVisitor(ActivationObject rootScope, CodeSettings settings)
+        private ResolutionVisitor(ActivationObject rootScope, ErrorSink errorSink)
         {
             // create the lexical and variable scope stacks and push the root scope onto them
             m_lexicalStack = new Stack<ActivationObject>();
@@ -93,20 +92,20 @@ namespace Microsoft.Ajax.Utilities
             m_variableStack = new Stack<ActivationObject>();
             m_variableStack.Push(rootScope);
 
-            m_settings = settings;
+            _errorSink = errorSink;
         }
 
         #endregion
 
-        public static void Apply(AstNode node, ActivationObject scope, CodeSettings settings)
+        public static void Apply(Node node, ActivationObject scope, ErrorSink errorSink)
         {
             if (node != null && scope != null)
             {
                 // create the visitor and run it. This will create all the child
                 // scopes and populate all the scopes with the var-decl, lex-decl,
                 // and lookup references within them.
-                var visitor = new ResolutionVisitor(scope, settings);
-                node.Accept(visitor);
+                var visitor = new ResolutionVisitor(scope, errorSink);
+                node.Walk(visitor);
 
                 // now that all the scopes are created and they all know what decls
                 // they contains, create all the fields
@@ -114,12 +113,12 @@ namespace Microsoft.Ajax.Utilities
 
                 // now that all the fields have been created in all the scopes,
                 // let's go through and resolve all the references
-                ResolveLookups(scope, settings);
+                visitor.ResolveLookups(scope);
 
                 // now that everything is declared and resolved as per the language specs,
                 // we need to go back and add ghosted fields for older versions of IE that
                 // incorrectly implement catch-variables and named function expressions.
-                AddGhostedFields(scope);
+                visitor.AddGhostedFields(scope);
             }
         }
 
@@ -150,18 +149,18 @@ namespace Microsoft.Ajax.Utilities
             }
         }
 
-        private static void ResolveLookups(ActivationObject scope, CodeSettings settings)
+        private void ResolveLookups(ActivationObject scope)
         {
             // resolve each lookup this scope contains
             foreach (var lookup in scope.ScopeLookups)
             {
-                ResolveLookup(scope, lookup, settings);
+                ResolveLookup(scope, lookup);
             }
 
             // and recurse
             foreach (var childScope in scope.ChildScopes)
             {
-                ResolveLookups(childScope, settings);
+                ResolveLookups(childScope);
             }
         }
 
@@ -177,7 +176,7 @@ namespace Microsoft.Ajax.Utilities
             while (varField != null);
         }
 
-        private static void ResolveLookup(ActivationObject scope, Lookup lookup, CodeSettings settings)
+        private void ResolveLookup(ActivationObject scope, Lookup lookup)
         {
             // resolve lookup via the lexical scope
             lookup.VariableField = scope.FindReference(lookup.Name);
@@ -199,59 +198,24 @@ namespace Microsoft.Ajax.Utilities
                     else
                     {
                         // report this undefined reference
-                        lookup.Context.ReportUndefined(lookup);
+                        _errorSink.ReportUndefined(lookup);
 
                         // possibly undefined global (but definitely not local).
                         // see if this is a function or a variable.
                         var callNode = lookup.Parent as CallNode;
                         var isFunction = callNode != null && callNode.Function == lookup;
-                        lookup.Context.HandleError((isFunction ? JSError.UndeclaredFunction : JSError.UndeclaredVariable), false);
-                    }
-                }
-            }
-            else if (lookup.VariableField.FieldType == FieldType.Predefined)
-            {
-                if (string.CompareOrdinal(lookup.Name, "window") == 0)
-                {
-                    // it's the global window object
-                    // see if it's the child of a member or call-brackets node
-                    var member = lookup.Parent as Member;
-                    if (member != null)
-                    {
-                        // we have window.XXXX. Add XXXX to the known globals if it
-                        // isn't already a known item.
-                        scope.AddGlobal(member.Name);
-                    }
-                    else
-                    {
-                        var callNode = lookup.Parent as CallNode;
-                        if (callNode != null && callNode.InBrackets
-                            && callNode.Arguments.Count == 1
-                            && callNode.Arguments[0] is ConstantWrapper
-                            && callNode.Arguments[0].FindPrimitiveType() == PrimitiveType.String)
-                        {
-                            // we have window["XXXX"]. See if XXXX is a valid identifier.
-                            // TODO: we could get rid of the ConstantWrapper restriction and use an Evaluate visitor
-                            // to evaluate the argument, since we know for sure that it's a string.
-                            var identifier = callNode.Arguments[0].ToString();
-                            if (JSScanner.IsValidIdentifier(identifier))
-                            {
-                                // Add XXXX to the known globals if it isn't already a known item.
-                                scope.AddGlobal(identifier);
-                            }
+
+                        if (isFunction) {
+                            _errorSink.HandleUndeclaredFunction(
+                                lookup.Name,
+                                lookup.Context
+                            );
+                        } else {
+                            _errorSink.HandleUndeclaredVariable(
+                                lookup.Name,
+                                lookup.Context
+                            );
                         }
-                    }
-                }
-                else if (settings.EvalTreatment != EvalTreatment.Ignore
-                    && string.CompareOrdinal(lookup.Name, "eval") == 0)
-                {
-                    // it's an eval -- but are we calling it?
-                    // TODO: what if we are assigning it to a variable? Should we track that variable and see if we call it?
-                    // What about passing it as a parameter to a function? track that as well in case the function calls it?
-                    var parentCall = lookup.Parent as CallNode;
-                    if (parentCall != null && parentCall.Function == lookup)
-                    {
-                        scope.IsKnownAtCompileTime = false;
                     }
                 }
             }
@@ -264,7 +228,7 @@ namespace Microsoft.Ajax.Utilities
             lookup.VariableField.IsPlaceholder = false;
         }
 
-        private static void AddGhostedFields(ActivationObject scope)
+        private void AddGhostedFields(ActivationObject scope)
         {
             foreach (var catchParameter in scope.GhostedCatchParameters)
             {
@@ -283,7 +247,7 @@ namespace Microsoft.Ajax.Utilities
             }
         }
 
-        private static void ResolveGhostedCatchParameter(ActivationObject scope, ParameterDeclaration catchParameter)
+        private void ResolveGhostedCatchParameter(ActivationObject scope, ParameterDeclaration catchParameter)
         {
             // check to see if the name exists in the outer variable scope.
             var ghostField = scope[catchParameter.Name];
@@ -318,7 +282,7 @@ namespace Microsoft.Ajax.Utilities
                     // in modern browsers, but will bind to this catch variable in older
                     // versions of IE! Definitely a cross-browser difference!
                     // throw a cross-browser issue error.
-                    catchParameter.Context.HandleError(JSError.AmbiguousCatchVar);
+                    _errorSink.HandleError(JSError.AmbiguousCatchVar, catchParameter.Context);
                 }
             }
 
@@ -339,7 +303,7 @@ namespace Microsoft.Ajax.Utilities
             }
         }
 
-        private static void ResolveGhostedFunctions(ActivationObject scope, FunctionObject funcObject)
+        private void ResolveGhostedFunctions(ActivationObject scope, FunctionObject funcObject)
         {
             var functionField = funcObject.VariableField;
 
@@ -380,7 +344,7 @@ namespace Microsoft.Ajax.Utilities
                     // IE browsers will link to this function expression!
                     // fire a cross-browser error warning
                     ghostField.IsAmbiguous = true;
-                    funcObject.IdContext.HandleError(JSError.AmbiguousNamedFunctionExpression);
+                    _errorSink.HandleError(JSError.AmbiguousNamedFunctionExpression, funcObject.IdContext);
                 }
                 else if (ghostField.IsReferenced)
                 {
@@ -397,8 +361,10 @@ namespace Microsoft.Ajax.Utilities
                         // would also be cool, although less-common than the vardecl version.
                         Lookup lookup;
                         var parentAssignment = funcObject.Parent as BinaryOperator;
-                        if (parentAssignment == null || parentAssignment.OperatorToken != JSToken.Assign
-                            || parentAssignment.Operand2 != funcObject
+                        if (parentAssignment == null || 
+                            parentAssignment.OperatorToken != JSToken.Assign
+                            || !(parentAssignment.Operand2 is FunctionExpression)
+                            || ((FunctionExpression)parentAssignment.Operand2).Function != funcObject
                             || (lookup = parentAssignment.Operand1 as Lookup) == null
                             || lookup.Name != funcObject.Name)
                         {
@@ -430,59 +396,40 @@ namespace Microsoft.Ajax.Utilities
 
         #region IVisitor Members
 
-        public void Visit(ArrayLiteral node)
+        public override bool Walk(ArrayLiteral node)
         {
             if (node != null)
             {
                 if (node.Elements != null)
                 {
-                    node.Elements.Accept(this);
+                    node.Elements.Walk(this);
                 }
 
                 node.Index = NextOrderIndex;
             }
+            return false;
         }
 
-        public void Visit(AspNetBlockNode node)
-        {
-            // nothing to do
-        }
-
-        public void Visit(AstNodeList node)
-        {
-            if (node != null)
-            {
-                // don't bother setting the order of the list itself, just the items
-                for (var ndx = 0; ndx < node.Count; ++ndx)
-                {
-                    var item = node[ndx];
-                    if (item != null)
-                    {
-                        item.Accept(this);
-                    }
-                }
-            }
-        }
-
-        public void Visit(BinaryOperator node)
+        public override bool Walk(BinaryOperator node)
         {
             if (node != null)
             {
                 if (node.Operand1 != null)
                 {
-                    node.Operand1.Accept(this);
+                    node.Operand1.Walk(this);
                 }
 
                 if (node.Operand2 != null)
                 {
-                    node.Operand2.Accept(this);
+                    node.Operand2.Walk(this);
                 }
 
                 node.Index = NextOrderIndex;
             }
+            return false;
         }
 
-        public void Visit(Block node)
+        public override bool Walk(Block node)
         {
             if (node != null)
             {
@@ -491,9 +438,9 @@ namespace Microsoft.Ajax.Utilities
                     && node.Parent != null
                     && !(node.Parent is SwitchCase)
                     && !(node.Parent is FunctionObject)
-                    && !(node.Parent is ConditionalCompilationComment))
+                    /*&& !(node.Parent is ConditionalCompilationComment)*/)
                 {
-                    node.BlockScope = new BlockScope(CurrentLexicalScope, node.Context, m_settings)
+                    node.BlockScope = new BlockScope(CurrentLexicalScope, node.Context, _errorSink)
                     {
                         IsInWithScope = m_withDepth > 0
                     };
@@ -512,7 +459,7 @@ namespace Microsoft.Ajax.Utilities
                         var statement = node[ndx];
                         if (statement != null)
                         {
-                            statement.Accept(this);
+                            statement.Walk(this);
                         }
                     }
                 }
@@ -538,9 +485,10 @@ namespace Microsoft.Ajax.Utilities
                     node.BlockScope = null;
                 }
             }
+            return false;
         }
 
-        public void Visit(Break node)
+        public override bool Walk(Break node)
         {
             if (node != null)
             {
@@ -550,80 +498,41 @@ namespace Microsoft.Ajax.Utilities
                 // since this stops execution
                 m_isUnreachable = true;
             }
+            return false;
         }
 
-        public void Visit(CallNode node)
+        public override bool Walk(CallNode node)
         {
             if (node != null)
             {
                 if (node.Function != null)
                 {
-                    node.Function.Accept(this);
+                    node.Function.Walk(this);
                 }
 
                 if (node.Arguments != null)
                 {
-                    node.Arguments.Accept(this);
+                    node.Arguments.Walk(this);
                 }
 
                 node.Index = NextOrderIndex;
             }
+            return false;
         }
 
-        public void Visit(ConditionalCompilationComment node)
-        {
-            if (node != null)
-            {
-                if (node.Statements != null)
-                {
-                    node.Statements.Accept(this);
-                }
-            }
-        }
-
-        public void Visit(ConditionalCompilationElse node)
-        {
-            // nothing to do
-        }
-
-        public void Visit(ConditionalCompilationElseIf node)
-        {
-            // nothing to do
-        }
-
-        public void Visit(ConditionalCompilationEnd node)
-        {
-            // nothing to do
-        }
-
-        public void Visit(ConditionalCompilationIf node)
-        {
-            // nothing to do
-        }
-
-        public void Visit(ConditionalCompilationOn node)
-        {
-            // nothing to do
-        }
-
-        public void Visit(ConditionalCompilationSet node)
-        {
-            // nothing to do
-        }
-
-        public void Visit(Conditional node)
+        public override bool Walk(Conditional node)
         {
             if (node != null)
             {
                 if (node.Condition != null)
                 {
-                    node.Condition.Accept(this);
+                    node.Condition.Walk(this);
                 }
 
                 var startingIndex = m_orderIndex;
                 if (node.TrueExpression != null)
                 {
-                    node.TrueExpression.Accept(this);
+                    node.TrueExpression.Walk(this);
                 }
 
                 var trueEndIndex = m_orderIndex;
@@ -631,28 +540,31 @@ namespace Microsoft.Ajax.Utilities
 
                 if (node.FalseExpression != null)
                 {
-                    node.FalseExpression.Accept(this);
+                    node.FalseExpression.Walk(this);
                 }
 
                 m_orderIndex = Math.Max(trueEndIndex, m_orderIndex);
                 node.Index = NextOrderIndex;
             }
+            return false;
         }
 
-        public void Visit(ConstantWrapper node)
+        public override bool Walk(ConstantWrapper node)
         {
             if (node != null)
             {
                 node.Index = NextOrderIndex;
             }
+            return false;
         }
 
-        public void Visit(ConstantWrapperPP node)
+        public override bool Walk(ConstantWrapperPP node)
         {
             // nothing to do
+            return false;
         }
 
-        public void Visit(ConstStatement node)
+        public override bool Walk(ConstStatement node)
         {
             if (node != null)
             {
@@ -665,13 +577,14 @@ namespace Microsoft.Ajax.Utilities
                     var item = node[ndx];
                     if (item != null)
                     {
-                        item.Accept(this);
+                        item.Walk(this);
                     }
                 }
             }
+            return false;
         }
 
-        public void Visit(ContinueNode node)
+        public override bool Walk(ContinueNode node)
         {
             if (node != null)
             {
@@ -681,25 +594,19 @@ namespace Microsoft.Ajax.Utilities
                 // since this stops execution
                 m_isUnreachable = true;
             }
+            return false;
         }
 
-        public void Visit(CustomNode node)
+        public override bool Walk(DebuggerNode node)
         {
             if (node != null)
             {
                 node.Index = NextOrderIndex;
             }
+            return false;
         }
 
-        public void Visit(DebuggerNode node)
-        {
-            if (node != null)
-            {
-                node.Index = NextOrderIndex;
-            }
-        }
-
-        public void Visit(DirectivePrologue node)
+        public override bool Walk(DirectivePrologue node)
         {
             if (node != null)
             {
@@ -709,31 +616,34 @@ namespace Microsoft.Ajax.Utilities
                     CurrentVariableScope.UseStrict = true;
                 }
             }
+            return false;
         }
 
-        public void Visit(DoWhile node)
+        public override bool Walk(DoWhile node)
         {
             if (node != null)
             {
                 node.Index = NextOrderIndex;
                 if (node.Body != null)
                 {
-                    node.Body.Accept(this);
+                    node.Body.Walk(this);
                 }
 
                 if (node.Condition != null)
                 {
-                    node.Condition.Accept(this);
+                    node.Condition.Walk(this);
                 }
             }
+            return false;
         }
 
-        public void Visit(EmptyStatement node)
+        public override bool Walk(EmptyStatement node)
         {
             // nothing to do
+            return false;
         }
 
-        public void Visit(ForIn node)
+        public override bool Walk(ForIn node)
         {
             if (node != null)
             {
@@ -741,7 +651,7 @@ namespace Microsoft.Ajax.Utilities
 
                 if (node.Collection != null)
                 {
-                    node.Collection.Accept(this);
+                    node.Collection.Walk(this);
                 }
 
                 if (node.Variable != null)
@@ -754,7 +664,7 @@ namespace Microsoft.Ajax.Utilities
                     if (lexDeclaration != null)
                     {
                         // create the scope on the block
-                        node.BlockScope = new BlockScope(CurrentLexicalScope, node.Context, m_settings)
+                        node.BlockScope = new BlockScope(CurrentLexicalScope, node.Context, _errorSink)
                         {
                             IsInWithScope = m_withDepth > 0
                         };
@@ -766,12 +676,12 @@ namespace Microsoft.Ajax.Utilities
                 {
                     if (node.Variable != null)
                     {
-                        node.Variable.Accept(this);
+                        node.Variable.Walk(this);
                     }
 
                     if (node.Body != null)
                     {
-                        node.Body.Accept(this);
+                        node.Body.Walk(this);
                     }
                 }
                 finally
@@ -783,9 +693,10 @@ namespace Microsoft.Ajax.Utilities
                     }
                 }
             }
+            return false;
         }
 
-        public void Visit(ForNode node)
+        public override bool Walk(ForNode node)
         {
             if (node != null)
             {
@@ -801,7 +712,7 @@ namespace Microsoft.Ajax.Utilities
                     if (lexDeclaration != null)
                     {
                         // create the scope on the block
-                        node.BlockScope = new BlockScope(CurrentLexicalScope, node.Context, m_settings)
+                        node.BlockScope = new BlockScope(CurrentLexicalScope, node.Context, _errorSink)
                         {
                             IsInWithScope = m_withDepth > 0
                         };
@@ -813,22 +724,22 @@ namespace Microsoft.Ajax.Utilities
                 {
                     if (node.Initializer != null)
                     {
-                        node.Initializer.Accept(this);
+                        node.Initializer.Walk(this);
                     }
 
                     if (node.Condition != null)
                     {
-                        node.Condition.Accept(this);
+                        node.Condition.Walk(this);
                     }
 
                     if (node.Body != null)
                     {
-                        node.Body.Accept(this);
+                        node.Body.Walk(this);
                     }
 
                     if (node.Incrementer != null)
                     {
-                        node.Incrementer.Accept(this);
+                        node.Incrementer.Walk(this);
                     }
                 }
                 finally
@@ -840,9 +751,10 @@ namespace Microsoft.Ajax.Utilities
                     }
                 }
             }
+            return false;
         }
 
-        public void Visit(FunctionObject node)
+        public override bool Walk(FunctionObject node)
         {
             if (node != null)
             {
@@ -859,7 +771,7 @@ namespace Microsoft.Ajax.Utilities
                     // function's scope that contains just the function name so the function can
                     // be self-referencing without the function expression polluting the parent scope.
                     // don't add the function name field yet, because it's not a decl per se.
-                    parentScope = new FunctionScope(parentScope, true, m_settings, node)
+                    parentScope = new FunctionScope(parentScope, true, node, _errorSink)
                     {
                         IsInWithScope = m_withDepth > 0
                     };
@@ -869,7 +781,7 @@ namespace Microsoft.Ajax.Utilities
                     CurrentVariableScope.GhostedFunctions.Add(node);
                 }
 
-                node.FunctionScope = new FunctionScope(parentScope, node.FunctionType != FunctionType.Declaration, m_settings, node)
+                node.FunctionScope = new FunctionScope(parentScope, node.FunctionType != FunctionType.Declaration, node, _errorSink)
                 {
                     IsInWithScope = m_withDepth > 0
                 };
@@ -883,7 +795,7 @@ namespace Microsoft.Ajax.Utilities
                     if (node.Body != null)
                     {
                         m_orderIndex = 0;
-                        node.Body.Accept(this);
+                        node.Body.Walk(this);
                     }
                 }
                 finally
@@ -910,46 +822,49 @@ namespace Microsoft.Ajax.Utilities
                         // this is ES6 syntax: a function declaration inside a block scope. Not allowed
                         // in ES5 code, so throw a warning and ghost this function in the outer variable scope 
                         // to make sure that we don't generate any naming collisions.
-                        node.NameContext.HandleError(JSError.MisplacedFunctionDeclaration, false);
+                        _errorSink.HandleError(JSError.MisplacedFunctionDeclaration, node.NameContext);
                         CurrentVariableScope.GhostedFunctions.Add(node);
                     }
                 }
             }
+            return false;
         }
 
-        public void Visit(GetterSetter node)
+        public override bool Walk(GetterSetter node)
         {
             // nothing to do
+            return true;
         }
 
-        public void Visit(GroupingOperator node)
+        public override bool Walk(GroupingOperator node)
         {
             if (node != null)
             {
                 if (node.Operand != null)
                 {
-                    node.Operand.Accept(this);
+                    node.Operand.Walk(this);
                 }
 
                 node.Index = NextOrderIndex;
             }
+            return false;
         }
 
-        public void Visit(IfNode node)
+        public override bool Walk(IfNode node)
         {
             if (node != null)
             {
                 node.Index = NextOrderIndex;
                 if (node.Condition != null)
                 {
-                    node.Condition.Accept(this);
+                    node.Condition.Walk(this);
                 }
 
                 // make true and false block numbered from the same starting point?
                 var startingPoint = m_orderIndex;
                 if (node.TrueBlock != null)
                 {
-                    node.TrueBlock.Accept(this);
+                    node.TrueBlock.Walk(this);
                 }
 
                 var trueStop = m_orderIndex;
@@ -957,32 +872,29 @@ namespace Microsoft.Ajax.Utilities
 
                 if (node.FalseBlock != null)
                 {
-                    node.FalseBlock.Accept(this);
+                    node.FalseBlock.Walk(this);
                 }
 
                 // and keep counting from the farthest point
                 m_orderIndex = Math.Max(trueStop, m_orderIndex);
             }
+            return false;
         }
 
-        public void Visit(ImportantComment node)
-        {
-            // nothing to do
-        }
-
-        public void Visit(LabeledStatement node)
+        public override bool Walk(LabeledStatement node)
         {
             if (node != null)
             {
                 node.Index = NextOrderIndex;
                 if (node.Statement != null)
                 {
-                    node.Statement.Accept(this);
+                    node.Statement.Walk(this);
                 }
             }
+            return false;
         }
 
-        public void Visit(LexicalDeclaration node)
+        public override bool Walk(LexicalDeclaration node)
         {
             if (node != null)
             {
@@ -993,13 +905,14 @@ namespace Microsoft.Ajax.Utilities
                     var decl = node[ndx];
                     if (decl != null)
                     {
-                        decl.Accept(this);
+                        decl.Walk(this);
                     }
                 }
             }
+            return false;
         }
 
-        public void Visit(Lookup node)
+        public override bool Walk(Lookup node)
         {
             if (node != null)
             {
@@ -1009,69 +922,76 @@ namespace Microsoft.Ajax.Utilities
                 // that's the starting point for this node's lookup resolution.
                 CurrentLexicalScope.ScopeLookups.Add(node);
             }
+            return false;
         }
 
-        public void Visit(Member node)
+        public override bool Walk(Member node)
         {
             if (node != null)
             {
                 if (node.Root != null)
                 {
-                    node.Root.Accept(this);
+                    node.Root.Walk(this);
                 }
 
                 node.Index = NextOrderIndex;
             }
+            return false;
         }
 
-        public void Visit(ObjectLiteral node)
+        public override bool Walk(ObjectLiteral node)
         {
             if (node != null)
             {
-                node.Properties.Accept(this);
+                node.Properties.Walk(this);
                 node.Index = NextOrderIndex;
             }
+            return false;
         }
 
-        public void Visit(ObjectLiteralField node)
+        public override bool Walk(ObjectLiteralField node)
         {
             // nothing to do
+            return true;
         }
 
-        public void Visit(ObjectLiteralProperty node)
+        public override bool Walk(ObjectLiteralProperty node)
         {
             if (node != null)
             {
                 // don't care about the property names; just recurse the values
                 if (node.Value != null)
                 {
-                    node.Value.Accept(this);
+                    node.Value.Walk(this);
                 }
 
                 node.Index = NextOrderIndex;
             }
+            return false;
         }
 
-        public void Visit(ParameterDeclaration node)
+        public override bool Walk(ParameterDeclaration node)
         {
             // nothing to do
+            return true;
         }
 
-        public void Visit(RegExpLiteral node)
+        public override bool Walk(RegExpLiteral node)
         {
             if (node != null)
             {
                 node.Index = NextOrderIndex;
             }
+            return true;
         }
 
-        public void Visit(ReturnNode node)
+        public override bool Walk(ReturnNode node)
         {
             if (node != null)
             {
                 if (node.Operand != null)
                 {
-                    node.Operand.Accept(this);
+                    node.Operand.Walk(this);
                 }
 
                 node.Index = NextOrderIndex;
@@ -1080,21 +1000,22 @@ namespace Microsoft.Ajax.Utilities
                 // since this stops execution
                 m_isUnreachable = true;
             }
+            return false;
         }
 
-        public void Visit(Switch node)
+        public override bool Walk(Switch node)
         {
             if (node != null)
             {
                 node.Index = NextOrderIndex;
                 if (node.Expression != null)
                 {
-                    node.Expression.Accept(this);
+                    node.Expression.Walk(this);
                 }
 
                 // the switch has its own block scope to use for all the blocks that are under
                 // its child switch-case nodes
-                node.BlockScope = new BlockScope(CurrentLexicalScope, node.Context, m_settings)
+                node.BlockScope = new BlockScope(CurrentLexicalScope, node.Context, _errorSink)
                 {
                     IsInWithScope = m_withDepth > 0
                 };
@@ -1104,7 +1025,7 @@ namespace Microsoft.Ajax.Utilities
                 {
                     if (node.Cases != null)
                     {
-                        node.Cases.Accept(this);
+                        node.Cases.Walk(this);
                     }
                 }
                 finally
@@ -1120,39 +1041,30 @@ namespace Microsoft.Ajax.Utilities
                     node.BlockScope = null;
                 }
             }
+            return false;
         }
 
-        public void Visit(SwitchCase node)
+        public override bool Walk(SwitchCase node)
         {
-            if (node != null)
-            {
-                if (node.CaseValue != null)
-                {
-                    node.CaseValue.Accept(this);
-                }
-
-                if (node.Statements != null)
-                {
-                    node.Statements.Accept(this);
-                }
-            }
+            return true;
         }
 
-        public void Visit(ThisLiteral node)
+        public override bool Walk(ThisLiteral node)
         {
             if (node != null)
             {
                 node.Index = NextOrderIndex;
             }
+            return true;
         }
 
-        public void Visit(ThrowNode node)
+        public override bool Walk(ThrowNode node)
         {
             if (node != null)
             {
                 if (node.Operand != null)
                 {
-                    node.Operand.Accept(this);
+                    node.Operand.Walk(this);
                 }
 
                 node.Index = NextOrderIndex;
@@ -1161,9 +1073,10 @@ namespace Microsoft.Ajax.Utilities
                 // since this stops execution
                 m_isUnreachable = true;
             }
+            return false;
         }
 
-        public void Visit(TryNode node)
+        public override bool Walk(TryNode node)
         {
             if (node != null)
             {
@@ -1171,7 +1084,7 @@ namespace Microsoft.Ajax.Utilities
 
                 if (node.TryBlock != null)
                 {
-                    node.TryBlock.Accept(this);
+                    node.TryBlock.Walk(this);
                 }
 
                 // add this catch parameter to the list of catch parameters the variable
@@ -1185,35 +1098,37 @@ namespace Microsoft.Ajax.Utilities
                 {
                     // create the catch-scope, add the catch parameter to it, and recurse the catch block.
                     // the block itself will push the scope onto the stack and pop it off, so we don't have to.
-                    node.CatchBlock.BlockScope = new CatchScope(CurrentLexicalScope, node.CatchBlock.Context, m_settings, node.CatchParameter)
+                    node.CatchBlock.BlockScope = new CatchScope(CurrentLexicalScope, node.CatchBlock.Context, node.CatchParameter, _errorSink)
                     {
                         IsInWithScope = m_withDepth > 0
                     };
                     node.CatchBlock.BlockScope.LexicallyDeclaredNames.Add(node.CatchParameter);
-                    node.CatchBlock.Accept(this);
+                    node.CatchBlock.Walk(this);
                 }
 
                 if (node.FinallyBlock != null)
                 {
-                    node.FinallyBlock.Accept(this);
+                    node.FinallyBlock.Walk(this);
                 }
             }
+            return false;
         }
 
-        public void Visit(UnaryOperator node)
+        public override bool Walk(UnaryOperator node)
         {
             if (node != null)
             {
                 if (node.Operand != null)
                 {
-                    node.Operand.Accept(this);
+                    node.Operand.Walk(this);
                 }
 
                 node.Index = NextOrderIndex;
             }
+            return false;
         }
 
-        public void Visit(Var node)
+        public override bool Walk(Var node)
         {
             if (node != null)
             {
@@ -1225,13 +1140,14 @@ namespace Microsoft.Ajax.Utilities
                     var decl = node[ndx];
                     if (decl != null)
                     {
-                        decl.Accept(this);
+                        decl.Walk(this);
                     }
                 }
             }
+            return false;
         }
 
-        public void Visit(VariableDeclaration node)
+        public override bool Walk(VariableDeclaration node)
         {
             if (node != null)
             {
@@ -1253,7 +1169,7 @@ namespace Microsoft.Ajax.Utilities
                 if (node.Initializer != null)
                 {
                     // recurse the initializer
-                    node.Initializer.Accept(this);
+                    node.Initializer.Walk(this);
                     node.Index = NextOrderIndex;
                 }
                 else
@@ -1263,45 +1179,38 @@ namespace Microsoft.Ajax.Utilities
                     node.Index = -1;
                 }
             }
+            return false;
         }
 
-        public void Visit(WhileNode node)
+        public override bool Walk(WhileNode node)
         {
             if (node != null)
             {
                 node.Index = NextOrderIndex;
-                if (node.Condition != null)
-                {
-                    node.Condition.Accept(this);
-                }
-
-                if (node.Body != null)
-                {
-                    node.Body.Accept(this);
-                }
             }
+            return true;
         }
 
-        public void Visit(WithNode node)
+        public override bool Walk(WithNode node)
         {
             if (node != null)
             {
                 node.Index = NextOrderIndex;
                 if (node.WithObject != null)
                 {
-                    node.WithObject.Accept(this);
+                    node.WithObject.Walk(this);
                 }
 
                 if (node.Body != null)
                 {
                     // create the with-scope and recurse the block.
                     // the block itself will push the scope onto the stack and pop it off, so we don't have to.
-                    node.Body.BlockScope = new WithScope(CurrentLexicalScope, node.Body.Context, m_settings);
+                    node.Body.BlockScope = new WithScope(CurrentLexicalScope, node.Body.Context, _errorSink);
 
                     try
                     {
                         ++m_withDepth;
-                        node.Body.Accept(this);
+                        node.Body.Walk(this);
                     }
                     finally
                     {
@@ -1309,8 +1218,29 @@ namespace Microsoft.Ajax.Utilities
                     }
                 }
             }
+            return false;
         }
 
         #endregion
+
+        public override bool Walk(CommaOperator node)
+        {
+            return true;
+        }
+
+        public override bool Walk(JsAst jsAst)
+        {
+            return true;
+        }
+
+        public override bool Walk<T>(AstNodeList<T> node)
+        {
+            return true;
+        }
+
+        public override bool Walk(FunctionExpression functionExpression)
+        {
+            return true;
+        }
     }
 }

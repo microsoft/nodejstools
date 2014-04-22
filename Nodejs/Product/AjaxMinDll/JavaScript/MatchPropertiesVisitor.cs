@@ -18,12 +18,13 @@ using System;
 using System.Collections.Generic;
 using System.Text;
 
-namespace Microsoft.Ajax.Utilities
+namespace Microsoft.NodejsTools.Parsing
 {
+#if FALSE
     /// <summary>
     /// This visitor has a Match method that takes a node and an string representing an identifier list separated by periods: IDENT(.IDENT)*
     /// </summary>
-    public class MatchPropertiesVisitor : IVisitor
+    public class MatchPropertiesVisitor : AstVisitor
     {
         private string[] m_parts;
         private bool m_isMatch;
@@ -33,7 +34,7 @@ namespace Microsoft.Ajax.Utilities
         {
         }
 
-        public bool Match(AstNode node, string identifiers)
+        public bool Match(Node node, string identifiers)
         {
             // set the match to false
             m_isMatch = false;
@@ -139,11 +140,6 @@ namespace Microsoft.Ajax.Utilities
         #region IVisitor Members
 
         public void Visit(ArrayLiteral node)
-        {
-            // not applicable; terminate
-        }
-
-        public void Visit(AspNetBlockNode node)
         {
             // not applicable; terminate
         }
@@ -375,4 +371,5 @@ namespace Microsoft.Ajax.Utilities
 
         #endregion
     }
+#endif
 }

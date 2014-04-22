@@ -44,13 +44,13 @@
     </ApplicationIcon>
     <AssemblyKeyContainerName>
     </AssemblyKeyContainerName>
-    <AssemblyName>Microsoft.NodejsTools.AjaxMin</AssemblyName>
+    <AssemblyName>Microsoft.NodejsTools.Analysis</AssemblyName>
     <DefaultClientScript>JScript</DefaultClientScript>
     <DefaultHTMLPageLayout>Grid</DefaultHTMLPageLayout>
     <DefaultTargetSchema>IE50</DefaultTargetSchema>
     <DelaySign>true</DelaySign>
     <OutputType>Library</OutputType>
-    <RootNamespace>Microsoft.Ajax.Utilities</RootNamespace>
+    <RootNamespace>Microsoft.NodejsTools</RootNamespace>
     <RunPostBuildEvent>OnBuildSuccess</RunPostBuildEvent>
     <StartupObject>
     </StartupObject>
@@ -132,38 +132,149 @@
     <CodeAnalysisRuleSet>AllRules.ruleset</CodeAnalysisRuleSet>
   </PropertyGroup>
   <ItemGroup>
+    <Reference Include="Microsoft.CSharp" />
     <Reference Include="System">
       <Name>System</Name>
     </Reference>
     <Reference Include="System.Data">
       <Name>System.Data</Name>
     </Reference>
+    <Reference Include="System.Web.Extensions" />
     <Reference Include="System.Xml">
       <Name>System.XML</Name>
     </Reference>
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Analysis\AnalysisExtensions.cs" />
+    <Compile Include="Analysis\AnalysisLimits.cs" />
+    <Compile Include="Analysis\AnalysisLog.cs" />
+    <Compile Include="Analysis\AnalysisSet.cs" />
+    <Compile Include="Analysis\AnalysisSetExtensions.cs" />
+    <Compile Include="Analysis\AnalysisValue.cs" />
+    <Compile Include="Analysis\AnalysisVariable.cs" />
+    <Compile Include="Analysis\Analyzer\AnalysisUnit.cs" />
+    <Compile Include="Analysis\Analyzer\AnalyzerStatusUpdater.cs" />
+    <Compile Include="Analysis\Analyzer\ClassScope.cs" />
+    <Compile Include="Analysis\Analyzer\ComprehensionScope.cs" />
+    <Compile Include="Analysis\Analyzer\DDG.cs" />
+    <Compile Include="Analysis\Analyzer\DependencyInfo.cs" />
+    <Compile Include="Analysis\Analyzer\DependentKeyValue.cs" />
+    <Compile Include="Analysis\Analyzer\EmptySet.cs" />
+    <Compile Include="Analysis\Analyzer\ExpressionEvaluator.cs" />
+    <Compile Include="Analysis\Analyzer\FunctionAnalysisUnit.cs" />
+    <Compile Include="Analysis\Analyzer\FunctionScope.cs" />
+    <Compile Include="Analysis\Analyzer\EnvironmentRecord.cs" />
+    <Compile Include="Analysis\Analyzer\IReferenceable.cs" />
+    <Compile Include="Analysis\Analyzer\IsInstanceScope.cs" />
+    <Compile Include="Analysis\Analyzer\ModuleScope.cs" />
+    <Compile Include="Analysis\Analyzer\OverviewWalker.cs" />
+    <Compile Include="Analysis\Analyzer\StatementScope.cs" />
+    <Compile Include="Analysis\AssemblyInfo.cs" />
+    <Compile Include="Analysis\BooleanInfo.cs" />
+    <Compile Include="Analysis\Deque.cs" />
+    <Compile Include="Analysis\EmptyBuiltinModule.cs" />
+    <Compile Include="Analysis\EncodedLocation.cs" />
+    <Compile Include="Analysis\ExportedMemberInfo.cs" />
+    <Compile Include="Analysis\FileCookie.cs" />
+    <Compile Include="Analysis\GetMemberOptions.cs" />
+    <Compile Include="Analysis\GlobalBuilder.cs" />
+    <Compile Include="Analysis\HashSetExtensions.cs" />
+    <Compile Include="Analysis\IAnalysisCookie.cs" />
+    <Compile Include="Analysis\IAnalysisValue.cs" />
+    <Compile Include="Analysis\IAnalysisVariable.cs" />
+    <Compile Include="Analysis\IdDispenser.cs" />
+    <Compile Include="Analysis\IEnumerableExtensions.cs" />
+    <Compile Include="Analysis\ILocationResolver.cs" />
+    <Compile Include="Analysis\IndexSpan.cs" />
+    <Compile Include="Analysis\NodejsModuleBuilder.cs" />
+    <Compile Include="Analysis\Values\BuiltinTypeId.cs" />
+    <Compile Include="Analysis\Values\ExpandoValue.cs" />
+    <Compile Include="Analysis\Values\PythonMemberType.cs" />
+    <Compile Include="Analysis\IOverloadResult.cs" />
+    <Compile Include="Analysis\KnownTypes.cs" />
+    <Compile Include="Analysis\LocationInfo.cs" />
+    <Compile Include="Analysis\MemberResult.cs" />
+    <Compile Include="Analysis\ModuleAnalysis.cs" />
+    <Compile Include="Analysis\ModulePath.cs" />
+    <Compile Include="Analysis\ModuleReference.cs" />
+    <Compile Include="Analysis\ModuleTable.cs" />
+    <Compile Include="Analysis\NativeMethods.cs" />
+    <Compile Include="Analysis\NoneType.cs" />
+    <Compile Include="Analysis\NullInfo.cs" />
+    <Compile Include="Analysis\NumberInfo.cs" />
+    <Compile Include="Analysis\OverloadResult.cs" />
+    <Compile Include="Analysis\ParameterResult.cs" />
+    <Compile Include="Analysis\ProjectEntry.cs" />
+    <Compile Include="Analysis\ProjectEntryExtensions.cs" />
+    <Compile Include="Analysis\JsAnalyzer.cs" />
+    <Compile Include="Analysis\JsAnalyzer.Specializations.cs" />
+    <Compile Include="Analysis\PythonKeywords.cs" />
+    <Compile Include="Analysis\ReadOnlyWrapper.cs" />
+    <Compile Include="Analysis\Resources.Designer.cs" />
+    <Compile Include="Analysis\SaveAnalysis.cs" />
+    <Compile Include="Analysis\SetOfOne.cs" />
+    <Compile Include="Analysis\SetOfOneEnumerator.cs" />
+    <Compile Include="Analysis\SetOfTwo.cs" />
+    <Compile Include="Analysis\SingleDict.cs" />
+    <Compile Include="Analysis\SourceLocationResolver.cs" />
+    <Compile Include="Analysis\StringInfo.cs" />
+    <Compile Include="Analysis\UndefinedInfo.cs" />
+    <Compile Include="Analysis\Validation.cs" />
+    <Compile Include="Analysis\Values\ArgumentSet.cs" />
+    <Compile Include="Analysis\Values\ArrayInfo.cs" />
+    <Compile Include="Analysis\Values\BoundBuiltinMethodInfo.cs" />
+    <Compile Include="Analysis\Values\BoundMethodInfo.cs" />
+    <Compile Include="Analysis\Values\BuiltinClassInfo.cs" />
+    <Compile Include="Analysis\Values\BuiltinEventInfo.cs" />
+    <Compile Include="Analysis\Values\BuiltinFunctionInfo.cs" />
+    <Compile Include="Analysis\Values\BuiltinInstanceInfo.cs" />
+    <Compile Include="Analysis\Values\BuiltinMethodInfo.cs" />
+    <Compile Include="Analysis\Values\BuiltinModule.cs" />
+    <Compile Include="Analysis\Values\BuiltinNamespace.cs" />
+    <Compile Include="Analysis\Values\BuiltinPropertyInfo.cs" />
+    <Compile Include="Analysis\Values\CallChain.cs" />
+    <Compile Include="Analysis\Values\ClassInfo.cs" />
+    <Compile Include="Analysis\Values\ConstantInfo.cs" />
+    <Compile Include="Analysis\Values\DictionaryInfo.cs" />
+    <Compile Include="Analysis\Values\EnumInstanceInfo.cs" />
+    <Compile Include="Analysis\Values\FunctionInfo.cs" />
+    <Compile Include="Analysis\Values\GeneratorFunctionInfo.cs" />
+    <Compile Include="Analysis\Values\GeneratorInfo.cs" />
+    <Compile Include="Analysis\Values\IModule.cs" />
+    <Compile Include="Analysis\Values\ObjectInfo.cs" />
+    <Compile Include="Analysis\Values\IterableInfo.cs" />
+    <Compile Include="Analysis\Values\IteratorInfo.cs" />
+    <Compile Include="Analysis\Values\ListBuiltinClassInfo.cs" />
+    <Compile Include="Analysis\Values\ListInfo.cs" />
+    <Compile Include="Analysis\Values\MemberReferences.cs" />
+    <Compile Include="Analysis\Values\MergeStrengths.cs" />
+    <Compile Include="Analysis\Values\ModuleInfo.cs" />
+    <Compile Include="Analysis\Values\MultipleMemberInfo.cs" />
+    <Compile Include="Analysis\Values\NumericInstanceInfo.cs" />
+    <Compile Include="Analysis\Values\ObjectBuiltinClassInfo.cs" />
+    <Compile Include="Analysis\Values\RangeInfo.cs" />
+    <Compile Include="Analysis\Values\ReflectedNamespace.cs" />
+    <Compile Include="Analysis\Values\SequenceBuiltinClassInfo.cs" />
+    <Compile Include="Analysis\Values\SequenceBuiltinInstanceInfo.cs" />
+    <Compile Include="Analysis\Values\SequenceInfo.cs" />
+    <Compile Include="Analysis\Values\SetInfo.cs" />
+    <Compile Include="Analysis\Values\SliceInfo.cs" />
+    <Compile Include="Analysis\Values\SpecializedCallable.cs" />
+    <Compile Include="Analysis\Values\SpecializedNamespace.cs" />
+    <Compile Include="Analysis\Values\SuperInfo.cs" />
+    <Compile Include="Analysis\Values\TupleBuiltinClassInfo.cs" />
+    <Compile Include="Analysis\Values\UserFunctionInfo.cs" />
+    <Compile Include="Analysis\Values\Utils.cs" />
+    <Compile Include="Analysis\VariableDef.cs" />
+    <Compile Include="Analysis\VariableType.cs" />
     <Compile Include="CommonSettings.cs" />
-    <Compile Include="Configuration.cs" />
     <Compile Include="ContextError.cs" />
     <Compile Include="CssEncoderFallback.cs" />
-    <Compile Include="Css\CssColorName.cs" />
-    <Compile Include="Css\CssParser.cs" />
-    <Compile Include="Css\CssScanner.cs" />
-    <Compile Include="Css\CssSettings.cs" />
-    <Compile Include="Css\CssErrorCode.cs" />
-    <Compile Include="Css\CssToken.cs" />
-    <Compile Include="Css\CssStrings.Designer.cs">
-      <AutoGen>True</AutoGen>
-      <DesignTime>True</DesignTime>
-      <DependentUpon>CssStrings.resx</DependentUpon>
-    </Compile>
     <Compile Include="Extensions.cs" />
     <Compile Include="Helpers.cs" />
     <Compile Include="JavaScript\activationobject.cs" />
     <Compile Include="JavaScript\AnalyzeNodeVisitor.cs" />
     <Compile Include="JavaScript\arrayliteral.cs" />
-    <Compile Include="JavaScript\aspnetblocknode.cs" />
     <Compile Include="JavaScript\ast.cs" />
     <Compile Include="JavaScript\astlist.cs" />
     <Compile Include="JavaScript\binaryop.cs" />
@@ -186,10 +297,8 @@
     <Compile Include="JavaScript\const.cs" />
     <Compile Include="JavaScript\constantwrapper.cs" />
     <Compile Include="JavaScript\constantwrapperpp.cs" />
-    <Compile Include="JavaScript\context.cs" />
+    <Compile Include="JavaScript\TokenWithSpan.cs" />
     <Compile Include="JavaScript\continue.cs" />
-    <Compile Include="JavaScript\crunchenumerator.cs" />
-    <Compile Include="JavaScript\CustomNode.cs" />
     <Compile Include="JavaScript\debugger.cs" />
     <Compile Include="JavaScript\declaration.cs" />
     <Compile Include="JavaScript\DetachReferences.cs" />
@@ -197,22 +306,27 @@
     <Compile Include="JavaScript\documentcontext.cs" />
     <Compile Include="JavaScript\dowhile.cs" />
     <Compile Include="JavaScript\emptystatement.cs" />
+    <Compile Include="JavaScript\ErrorResult.cs" />
+    <Compile Include="JavaScript\ErrorSink.cs" />
     <Compile Include="JavaScript\EvaluateLiteralVisitor.cs" />
     <Compile Include="JavaScript\expr.cs" />
+    <Compile Include="JavaScript\ExpressionStatement.cs" />
     <Compile Include="JavaScript\FinalPassVisitor.cs" />
     <Compile Include="JavaScript\for.cs" />
     <Compile Include="JavaScript\forin.cs" />
+    <Compile Include="JavaScript\FunctionExpression.cs" />
     <Compile Include="JavaScript\functionobject.cs" />
     <Compile Include="JavaScript\functionscope.cs" />
     <Compile Include="JavaScript\gettersetter.cs" />
     <Compile Include="JavaScript\globalscope.cs" />
     <Compile Include="JavaScript\grouping.cs" />
     <Compile Include="JavaScript\if.cs" />
-    <Compile Include="JavaScript\importantcomment.cs" />
     <Compile Include="JavaScript\INameReference.cs" />
+    <Compile Include="JavaScript\IndexResolver.cs" />
     <Compile Include="JavaScript\ISourceMap.cs" />
     <Compile Include="JavaScript\IterationStatement.cs" />
     <Compile Include="JavaScript\IVisitor.cs" />
+    <Compile Include="JavaScript\JsAst.cs" />
     <Compile Include="JavaScript\JScript.Designer.cs">
       <AutoGen>True</AutoGen>
       <DesignTime>True</DesignTime>
@@ -246,16 +360,16 @@
     <Compile Include="JavaScript\ResolutionVisitor.cs" />
     <Compile Include="JavaScript\return.cs" />
     <Compile Include="JavaScript\scannerexception.cs" />
-    <Compile Include="JavaScript\ScriptSharpSourceMap.cs" />
+    <Compile Include="JavaScript\SourceLocation.cs" />
+    <Compile Include="JavaScript\SourceSpan.cs" />
+    <Compile Include="JavaScript\Statement.cs" />
     <Compile Include="JavaScript\switch.cs" />
     <Compile Include="JavaScript\switchcase.cs" />
-    <Compile Include="JavaScript\SourceMapFactory.cs" />
     <Compile Include="JavaScript\thisliteral.cs" />
     <Compile Include="JavaScript\throw.cs" />
     <Compile Include="JavaScript\TreeVisitor.cs" />
     <Compile Include="JavaScript\try.cs" />
     <Compile Include="JavaScript\unaryop.cs" />
-    <Compile Include="JavaScript\V3SourceMap.cs" />
     <Compile Include="JavaScript\var.cs" />
     <Compile Include="JavaScript\variabledeclaration.cs" />
     <Compile Include="JavaScript\while.cs" />
@@ -265,22 +379,16 @@
     <Compile Include="Properties\AssemblyInfo.cs">
       <SubType>Code</SubType>
     </Compile>
-    <Compile Include="Minifier.cs">
-      <SubType>Code</SubType>
-    </Compile>
     <Compile Include="ResourceStrings.cs" />
-    <Compile Include="SwitchParser.cs" />
   </ItemGroup>
   <ItemGroup>
+    <Content Include="all.json">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
     <None Include="FinalPublicKey.snk" />
   </ItemGroup>
   <ItemGroup>
-    <EmbeddedResource Include="Css\CssStrings.resx">
-      <SubType>Designer</SubType>
-      <Generator>ResXFileCodeGenerator</Generator>
-      <CustomToolNamespace>Microsoft.Ajax.Utilities</CustomToolNamespace>
-      <LastGenOutput>CssStrings.Designer.cs</LastGenOutput>
-    </EmbeddedResource>
+    <EmbeddedResource Include="Analysis\Resources.resx" />
     <EmbeddedResource Include="JavaScript\JScript.resx">
       <SubType>Designer</SubType>
       <Generator>ResXFileCodeGenerator</Generator>

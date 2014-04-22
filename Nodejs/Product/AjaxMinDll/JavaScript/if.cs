@@ -18,16 +18,16 @@ using System;
 using System.Collections.Generic;
 using System.Text;
 
-namespace Microsoft.Ajax.Utilities
+namespace Microsoft.NodejsTools.Parsing
 {
 
-    public sealed class IfNode : AstNode
+    public sealed class IfNode : Statement
     {
-        private AstNode m_condition;
+        private Expression m_condition;
         private Block m_trueBlock;
         private Block m_falseBlock;
 
-        public AstNode Condition
+        public Expression Condition
         {
             get { return m_condition; }
             set
@@ -60,9 +60,9 @@ namespace Microsoft.Ajax.Utilities
             }
         }
 
-        public Context ElseContext { get; set; }
+        public TokenWithSpan ElseContext { get; set; }
 
-        public override Context TerminatingContext
+        public override TokenWithSpan TerminatingContext
         {
             get
             {
@@ -87,17 +87,22 @@ namespace Microsoft.Ajax.Utilities
             }
         }
 
-        public IfNode(Context context, JSParser parser)
+        public IfNode(TokenWithSpan context, JSParser parser)
             : base(context, parser)
         {
         }
 
-        public override void Accept(IVisitor visitor)
-        {
-            if (visitor != null)
-            {
-                visitor.Visit(this);
+        public override void Walk(AstVisitor visitor) {
+            if (visitor.Walk(this)) {
+                m_condition.Walk(visitor);
+                if (TrueBlock != null) {
+                    TrueBlock.Walk(visitor);
+                }
+                if (FalseBlock != null) {
+                    FalseBlock.Walk(visitor);
+                }
             }
+            visitor.PostWalk(this);
         }
 
         public void SwapBranches()
@@ -107,7 +112,7 @@ namespace Microsoft.Ajax.Utilities
             m_falseBlock = temp;
         }
 
-        public override IEnumerable<AstNode> Children
+        public override IEnumerable<Node> Children
         {
             get
             {
@@ -115,21 +120,21 @@ namespace Microsoft.Ajax.Utilities
             }
         }
 
-        public override bool ReplaceChild(AstNode oldNode, AstNode newNode)
+        public override bool ReplaceChild(Node oldNode, Node newNode)
         {
             if (Condition == oldNode)
             {
-                Condition = newNode;
+                Condition = (Expression)newNode;
                 return true;
             }
             if (TrueBlock == oldNode)
             {
-                TrueBlock = ForceToBlock(newNode);
+                TrueBlock = ForceToBlock((Statement)newNode);
                 return true;
             }
             if (FalseBlock == oldNode)
             {
-                FalseBlock = ForceToBlock(newNode);
+                FalseBlock = ForceToBlock((Statement)newNode);
                 return true;
             }
             return false;

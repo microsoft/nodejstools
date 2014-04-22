@@ -17,15 +17,15 @@
 using System.Collections;
 using System.Reflection;
 
-namespace Microsoft.Ajax.Utilities
+namespace Microsoft.NodejsTools.Parsing
 {
 
     public sealed class CatchScope : BlockScope
     {
         public ParameterDeclaration CatchParameter { get; private set; }
 
-        internal CatchScope(ActivationObject parent, Context catchContext, CodeSettings settings, ParameterDeclaration catchParameter)
-            : base(parent, catchContext, settings)
+        internal CatchScope(ActivationObject parent, TokenWithSpan catchContext, ParameterDeclaration catchParameter, ErrorSink errorSink)
+            : base(parent, catchContext, errorSink)
         {
             CatchParameter = catchParameter;
         }

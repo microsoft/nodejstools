@@ -17,10 +17,11 @@
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
+using System.Diagnostics;
 using System.Globalization;
 using System.Text;
 
-namespace Microsoft.Ajax.Utilities
+namespace Microsoft.NodejsTools.Parsing
 {
     public sealed class JSScanner
     {
@@ -35,138 +36,108 @@ namespace Microsoft.Ajax.Utilities
 
         #region private fields
 
-        private string m_strSourceCode;
+        private string _source;
+        private StringBuilder _identifier; // the identifier we're building up for the current token
+        private int _lastPosOnBuilder; // the position of the last identifier character appended into m_identifier
+        private string _decodedString; // the string literal we're building up for the current token
+        private int _currentPosition;
+        private List<int> _newLineLocations;
+        private SourceLocation _initialLocation;
+        private State _state;
+        internal IndexResolver _indexResolver;
+        private int _tokenStartIndex, _tokenEndIndex;
 
-        private int m_endPos;
-
-        private StringBuilder m_identifier;
-        private bool m_literalIssues;
-
-        // a list of strings that we can add new ones to or clear
-        // depending on comments we may find in the source
-        internal ICollection<string> DebugLookupCollection { get; set; }
-
-        // for pre-processor
-        private Dictionary<string, string> m_defines;
-
-        private int m_startLinePosition;
-        private int m_currentPosition;
-        private int m_currentLine;
-        private int m_lastPosOnBuilder;
-        private int m_ifDirectiveLevel;
-        private int m_conditionalCompilationIfLevel;
-        private bool m_conditionalCompilationOn;
-        private bool m_inConditionalComment;
-        private bool m_inSingleLineComment;
-        private bool m_inMultipleLineComment;
-        private string m_decodedString;
-        private Context m_currentToken;
+        private readonly ErrorSink _errorSink;
 
         #endregion
 
         #region public properties
 
-        public bool UsePreprocessorDefines { get; set; }
+        /// <summary>
+        /// Gets/sets the current parser state for restarting
+        /// the scanner.
+        /// </summary>
+        public object CurrentState {
+            get {
+                return _state;
+            }
+        }
 
-        public bool IgnoreConditionalCompilation { get; set; }
+        public string StringLiteralValue { get { return _decodedString; } }
 
-        public bool AllowEmbeddedAspNetBlocks { get; set; }
-
-        public bool LiteralHasIssues { get { return m_literalIssues; } }
-
-        public string StringLiteralValue { get { return m_decodedString; } }
-
-        public int CurrentLine { get { return m_currentLine; } }
-
-        public int StartLinePosition { get { return m_startLinePosition; } }
-
-        public bool IsEndOfFile { get { return m_currentPosition >= m_endPos; } }
-
-        public bool StripDebugCommentBlocks { get; set; }
+        public bool IsEndOfFile { get { return _currentPosition >= _source.Length; } }
 
         internal string Identifier
         {
             get
             {
-                return m_identifier.Length > 0
-                    ? m_identifier.ToString()
-                    : m_currentToken.Code;
+                return _identifier.Length > 0
+                    ? _identifier.ToString() :
+                    CurrentTokenString();
             }
         }
 
-        #endregion
-
-        #region public events
-
-        public event EventHandler<GlobalDefineEventArgs> GlobalDefine;
-
-        public event EventHandler<NewModuleEventArgs> NewModule;
+        private string CurrentTokenString() {
+            return _source.Substring(_tokenStartIndex, _tokenEndIndex - _tokenStartIndex);
+        }
 
         #endregion
 
         #region constructors
 
-        public JSScanner(Context sourceContext)
-        {
-            if (sourceContext == null)
-            {
-                throw new ArgumentNullException("sourceContext");
-            }
+        
+        public JSScanner(string source, ErrorSink errorSink) {
+            _errorSink = errorSink ?? new ErrorSink();
+            _currentPosition = 0;
 
-            m_startLinePosition = sourceContext.StartLinePosition;
-            m_currentPosition = sourceContext.StartLinePosition;
-            m_currentLine = sourceContext.StartLineNumber;
-            m_currentToken = sourceContext.Clone();
-
-            // just hold on to these values
-            m_strSourceCode = sourceContext.Document.Source;
-            m_endPos = sourceContext.EndPosition;
-
-            // by default we want to use preprocessor defines
-            // and strip debug comment blocks
-            UsePreprocessorDefines = true;
-            StripDebugCommentBlocks = true;
-
+            Initialize(source, null, new SourceLocation(0, 1, 1));
+            
             // create a string builder that we'll keep reusing as we
             // scan identifiers. We'll build the unescaped name into it
-            m_identifier = new StringBuilder(128);
+            _identifier = new StringBuilder(128);
         }
 
-        private JSScanner(IDictionary<string, string> defines)
-        {
-            // copy the collection, but don't share it. We don't want
-            // defines we find here to populate the collection of the original.
-            SetPreprocessorDefines(defines);
-
+        public JSScanner() {
             // stuff we don't want to copy
-            m_decodedString = null;
-            m_identifier = new StringBuilder(128);
+            _decodedString = null;
+            _identifier = new StringBuilder(128);
+            _errorSink = new ErrorSink();
+        }
 
-            // create a new set so anything we find doesn't affect the original.
-            DebugLookupCollection = new HashSet<string>();
+        /// <summary>
+        /// Initializes the scanner for parsing from a previous location
+        /// where it left off.  DocumentContext provides the source code,
+        /// state provides the previous state.
+        /// </summary>
+        public void Initialize(string source, object state, SourceLocation initialLocation) {
+            if (state != null && !(state is State)) {
+                throw new InvalidOperationException("state object must have come from JSScanner.CurrentState");
+            }
+
+            _source = source;
+            _initialLocation = initialLocation;
+            _newLineLocations = new List<int>();
+            _indexResolver = new IndexResolver(_newLineLocations, initialLocation);
+
+            _currentPosition = 0;
+            if (state == null) {
+                _state = new State();
+            } else {
+                _state = (State)state;
+            }
+        }
+
+        public void Uninitialize() {
+            _source = null;
         }
 
         public JSScanner Clone()
         {
-            return new JSScanner(this.m_defines)
+            return new JSScanner(_source, _errorSink)
             {
-                AllowEmbeddedAspNetBlocks = this.AllowEmbeddedAspNetBlocks,
-                IgnoreConditionalCompilation = this.IgnoreConditionalCompilation,
-                m_conditionalCompilationIfLevel = this.m_conditionalCompilationIfLevel,
-                m_conditionalCompilationOn = this.m_conditionalCompilationOn,
-                m_currentLine = this.m_currentLine,
-                m_currentPosition = this.m_currentPosition,
-                m_currentToken = this.m_currentToken.Clone(),
-                m_endPos = this.m_endPos,
-                m_ifDirectiveLevel = this.m_ifDirectiveLevel,
-                m_inConditionalComment = this.m_inConditionalComment,
-                m_inMultipleLineComment = this.m_inMultipleLineComment,
-                m_inSingleLineComment = this.m_inSingleLineComment,
-                m_lastPosOnBuilder = this.m_lastPosOnBuilder,
-                m_startLinePosition = this.m_startLinePosition,
-                m_strSourceCode = this.m_strSourceCode,
-                UsePreprocessorDefines = this.UsePreprocessorDefines,
-                StripDebugCommentBlocks = this.StripDebugCommentBlocks,
+                _currentPosition = this._currentPosition,
+                _lastPosOnBuilder = this._lastPosOnBuilder,
+                _source = this._source,
             };
         }
 
@@ -178,19 +149,24 @@ namespace Microsoft.Ajax.Utilities
         /// <param name="scanForRegularExpressionLiterals">whether to try scanning a regexp when encountering a /</param>
         /// <returns>next token from the input</returns>
         [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Maintainability", "CA1502:AvoidExcessiveComplexity"), System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Maintainability", "CA1505:AvoidUnmaintainableCode", Justification = "big case statement")]
-        public Context ScanNextToken(bool scanForRegularExpressionLiterals)
+        public TokenWithSpan ScanNextToken(bool scanForRegularExpressionLiterals)
         {
             var token = JSToken.None;
 
-            m_currentToken.StartPosition = m_currentPosition;
-            m_currentToken.StartLineNumber = m_currentLine;
-            m_currentToken.StartLinePosition = m_startLinePosition;
+            _tokenStartIndex = _currentPosition;
 
-            m_identifier.Length = 0;
+            _identifier.Length = 0;
+
+            if (_state.UnterminatedComment) {
+                SkipMultilineComment();
+                token = JSToken.MultipleLineComment;
+                _tokenEndIndex = _currentPosition;
+                return MakeContext(token);
+            }
 
             // our case switch should be pretty efficient -- it's 9-13 and 32-126. Thsose are the most common characters 
             // we will find in the code for the start of tokens.
-            char c = GetChar(m_currentPosition++);
+            char c = GetChar(_currentPosition++);
             switch (c)
             {
                 case '\n':
@@ -205,22 +181,22 @@ namespace Microsoft.Ajax.Utilities
                     // we are asking for raw tokens, and this is the start of a stretch of whitespace.
                     // advance to the end of the whitespace, and return that as the token
                     token = JSToken.WhiteSpace;
-                    while (JSScanner.IsBlankSpace(GetChar(m_currentPosition)))
+                    while (JSScanner.IsBlankSpace(GetChar(_currentPosition)))
                     {
-                        ++m_currentPosition;
+                        ++_currentPosition;
                     }
 
                     break;
 
                 case '!':
                     token = JSToken.LogicalNot;
-                    if ('=' == GetChar(m_currentPosition))
+                    if ('=' == GetChar(_currentPosition))
                     {
-                        m_currentPosition++;
+                        _currentPosition++;
                         token = JSToken.NotEqual;
-                        if ('=' == GetChar(m_currentPosition))
+                        if ('=' == GetChar(_currentPosition))
                         {
-                            m_currentPosition++;
+                            _currentPosition++;
                             token = JSToken.StrictNotEqual;
                         }
                     }
@@ -241,9 +217,9 @@ namespace Microsoft.Ajax.Utilities
 
                 case '%':
                     token = JSToken.Modulo;
-                    if ('=' == GetChar(m_currentPosition))
+                    if ('=' == GetChar(_currentPosition))
                     {
-                        m_currentPosition++;
+                        _currentPosition++;
                         token = JSToken.ModuloAssign;
                     }
 
@@ -251,15 +227,15 @@ namespace Microsoft.Ajax.Utilities
 
                 case '&':
                     token = JSToken.BitwiseAnd;
-                    c = GetChar(m_currentPosition);
+                    c = GetChar(_currentPosition);
                     if ('&' == c)
                     {
-                        m_currentPosition++;
+                        _currentPosition++;
                         token = JSToken.LogicalAnd;
                     }
                     else if ('=' == c)
                     {
-                        m_currentPosition++;
+                        _currentPosition++;
                         token = JSToken.BitwiseAndAssign;
                     }
 
@@ -275,9 +251,9 @@ namespace Microsoft.Ajax.Utilities
 
                 case '*':
                     token = JSToken.Multiply;
-                    if ('=' == GetChar(m_currentPosition))
+                    if ('=' == GetChar(_currentPosition))
                     {
-                        m_currentPosition++;
+                        _currentPosition++;
                         token = JSToken.MultiplyAssign;
                     }
 
@@ -285,15 +261,15 @@ namespace Microsoft.Ajax.Utilities
 
                 case '+':
                     token = JSToken.Plus;
-                    c = GetChar(m_currentPosition);
+                    c = GetChar(_currentPosition);
                     if ('+' == c)
                     {
-                        m_currentPosition++;
+                        _currentPosition++;
                         token = JSToken.Increment;
                     }
                     else if ('=' == c)
                     {
-                        m_currentPosition++;
+                        _currentPosition++;
                         token = JSToken.PlusAssign;
                     }
 
@@ -305,15 +281,15 @@ namespace Microsoft.Ajax.Utilities
 
                 case '-':
                     token = JSToken.Minus;
-                    c = GetChar(m_currentPosition);
+                    c = GetChar(_currentPosition);
                     if ('-' == c)
                     {
-                        m_currentPosition++;
+                        _currentPosition++;
                         token = JSToken.Decrement;
                     }
                     else if ('=' == c)
                     {
-                        m_currentPosition++;
+                        _currentPosition++;
                         token = JSToken.MinusAssign;
                     }
 
@@ -321,7 +297,7 @@ namespace Microsoft.Ajax.Utilities
 
                 case '.':
                     token = JSToken.AccessField;
-                    c = GetChar(m_currentPosition);
+                    c = GetChar(_currentPosition);
                     if (JSScanner.IsDigit(c))
                     {
                         token = ScanNumber('.');
@@ -331,101 +307,19 @@ namespace Microsoft.Ajax.Utilities
 
                 case '/':
                     token = JSToken.Divide;
-                    c = GetChar(m_currentPosition);
+                    c = GetChar(_currentPosition);
                     switch (c)
                     {
                         case '/':
                             token = JSToken.SingleLineComment;
-                            m_inSingleLineComment = true;
-                            c = GetChar(++m_currentPosition);
+                            c = GetChar(++_currentPosition);
 
-                            // see if there is a THIRD slash character
-                            if (c == '/')
-                            {
-                                // advance past the slash and see if we have one of our special preprocessing directives
-                                ++m_currentPosition;
-                                if (GetChar(m_currentPosition) == '#')
-                                {
-                                    // scan preprocessing directives
-                                    token = JSToken.PreprocessorDirective;
-
-                                    if (!ScanPreprocessingDirective())
-                                    {
-                                        // if it returns false, we don't want to skip the rest of
-                                        // the comment line; just exit
-                                        break;
-                                    }
-                                }
-                            }
-                            else if (c == '@' && !IgnoreConditionalCompilation)
-                            {
-                                // we got //@
-                                // if we have not turned on conditional-compilation yet, then check to see if that's
-                                // what we're trying to do now.
-                                // we are currently on the @ -- start peeking from there
-                                if (m_conditionalCompilationOn
-                                    || CheckSubstring(m_currentPosition + 1, "cc_on"))
-                                {
-                                    // if the NEXT character is not an identifier character, then we need to skip
-                                    // the @ character -- otherwise leave it there
-                                    if (!IsValidIdentifierStart(GetChar(m_currentPosition + 1)))
-                                    {
-                                        ++m_currentPosition;
-                                    }
-
-                                    // we are now in a conditional comment
-                                    m_inConditionalComment = true;
-                                    token = JSToken.ConditionalCommentStart;
-                                    break;
-                                }
-                            }
 
                             SkipSingleLineComment();
-
-                            // if we're still in a multiple-line comment, then we must've been in
-                            // a multi-line CONDITIONAL comment, in which case this normal one-line comment
-                            // won't turn off conditional comments just because we hit the end of line.
-                            if (!m_inMultipleLineComment && m_inConditionalComment)
-                            {
-                                m_inConditionalComment = false;
-                                token = JSToken.ConditionalCommentEnd;
-                            }
 
                             break;
 
                         case '*':
-                            m_inMultipleLineComment = true;
-                            if (GetChar(++m_currentPosition) == '@' && !IgnoreConditionalCompilation)
-                            {
-                                // we have /*@
-                                // if we have not turned on conditional-compilation yet, then let's peek to see if the next
-                                // few characters are cc_on -- if so, turn it on.
-                                if (!m_conditionalCompilationOn)
-                                {
-                                    // we are currently on the @ -- start peeking from there
-                                    if (!CheckSubstring(m_currentPosition + 1, "cc_on"))
-                                    {
-                                        // we aren't turning on conditional comments. We need to ignore this comment
-                                        // as just another multi-line comment
-                                        SkipMultilineComment();
-                                        token = JSToken.MultipleLineComment;
-                                        break;
-                                    }
-                                }
-
-                                // if the NEXT character is not an identifier character, then we need to skip
-                                // the @ character -- otherwise leave it there
-                                if (!IsValidIdentifierStart(GetChar(m_currentPosition + 1)))
-                                {
-                                    ++m_currentPosition;
-                                }
-
-                                // we are now in a conditional comment
-                                m_inConditionalComment = true;
-                                token = JSToken.ConditionalCommentStart;
-                                break;
-                            }
-
                             SkipMultilineComment();
                             token = JSToken.MultipleLineComment;
                             break;
@@ -445,13 +339,13 @@ namespace Microsoft.Ajax.Utilities
                                 }
                                 else if (c == '=')
                                 {
-                                    m_currentPosition++;
+                                    _currentPosition++;
                                     token = JSToken.DivideAssign;
                                 }
                             }
                             else if (c == '=')
                             {
-                                m_currentPosition++;
+                                _currentPosition++;
                                 token = JSToken.DivideAssign;
                             }
                             break;
@@ -481,31 +375,23 @@ namespace Microsoft.Ajax.Utilities
                     break;
 
                 case '<':
-                    if (AllowEmbeddedAspNetBlocks &&
-                        '%' == GetChar(m_currentPosition))
+                    token = JSToken.LessThan;
+                    if ('<' == GetChar(_currentPosition))
                     {
-                        token = ScanAspNetBlock();
+                        _currentPosition++;
+                        token = JSToken.LeftShift;
                     }
-                    else
-                    {
-                        token = JSToken.LessThan;
-                        if ('<' == GetChar(m_currentPosition))
-                        {
-                            m_currentPosition++;
-                            token = JSToken.LeftShift;
-                        }
 
-                        if ('=' == GetChar(m_currentPosition))
+                    if ('=' == GetChar(_currentPosition))
+                    {
+                        _currentPosition++;
+                        if (token == JSToken.LessThan)
                         {
-                            m_currentPosition++;
-                            if (token == JSToken.LessThan)
-                            {
-                                token = JSToken.LessThanEqual;
-                            }
-                            else
-                            {
-                                token = JSToken.LeftShiftAssign;
-                            }
+                            token = JSToken.LessThanEqual;
+                        }
+                        else
+                        {
+                            token = JSToken.LeftShiftAssign;
                         }
                     }
 
@@ -513,13 +399,13 @@ namespace Microsoft.Ajax.Utilities
 
                 case '=':
                     token = JSToken.Assign;
-                    if ('=' == GetChar(m_currentPosition))
+                    if ('=' == GetChar(_currentPosition))
                     {
-                        m_currentPosition++;
+                        _currentPosition++;
                         token = JSToken.Equal;
-                        if ('=' == GetChar(m_currentPosition))
+                        if ('=' == GetChar(_currentPosition))
                         {
-                            m_currentPosition++;
+                            _currentPosition++;
                             token = JSToken.StrictEqual;
                         }
                     }
@@ -528,20 +414,20 @@ namespace Microsoft.Ajax.Utilities
 
                 case '>':
                     token = JSToken.GreaterThan;
-                    if ('>' == GetChar(m_currentPosition))
+                    if ('>' == GetChar(_currentPosition))
                     {
-                        m_currentPosition++;
+                        _currentPosition++;
                         token = JSToken.RightShift;
-                        if ('>' == GetChar(m_currentPosition))
+                        if ('>' == GetChar(_currentPosition))
                         {
-                            m_currentPosition++;
+                            _currentPosition++;
                             token = JSToken.UnsignedRightShift;
                         }
                     }
 
-                    if ('=' == GetChar(m_currentPosition))
+                    if ('=' == GetChar(_currentPosition))
                     {
-                        m_currentPosition++;
+                        _currentPosition++;
                         token = token == JSToken.GreaterThan ? JSToken.GreaterThanEqual
                             : token == JSToken.RightShift ? JSToken.RightShiftAssign
                             : token == JSToken.UnsignedRightShift ? JSToken.UnsignedRightShiftAssign
@@ -552,164 +438,6 @@ namespace Microsoft.Ajax.Utilities
 
                 case '?':
                     token = JSToken.ConditionalIf;
-                    break;
-
-                case '@':
-                    if (IgnoreConditionalCompilation)
-                    {
-                        // if the switch to ignore conditional compilation is on, then we don't know
-                        // anything about conditional-compilation statements, and the @-sign character
-                        // is illegal at this spot.
-                        token = IllegalCharacter();
-                        break;
-                    }
-
-                    // see if the @-sign is immediately followed by an identifier. If it is,
-                    // we'll see which one so we can tell if it's a conditional-compilation statement
-                    // need to make sure the context INCLUDES the @ sign
-                    int startPosition = m_currentPosition;
-                    m_currentToken.StartPosition = startPosition - 1;
-                    m_currentToken.StartLineNumber = m_currentLine;
-                    m_currentToken.StartLinePosition = m_startLinePosition;
-                    ScanIdentifier();
-                    switch (m_currentPosition - startPosition)
-                    {
-                        case 0:
-                            // look for '@*/'.
-                            if ('*' == GetChar(m_currentPosition) && '/' == GetChar(++m_currentPosition))
-                            {
-                                m_currentPosition++;
-                                m_inMultipleLineComment = false;
-                                m_inConditionalComment = false;
-                                token = JSToken.ConditionalCommentEnd;
-                                break;
-                            }
-
-                            // otherwise we just have a @ sitting by itself!
-                            // throw an error and loop back to the next token.
-                            token = IllegalCharacter();
-                            break;
-
-                        case 2:
-                            if (CheckSubstring(startPosition, "if"))
-                            {
-                                token = JSToken.ConditionalCompilationIf;
-
-                                // increment the if-level
-                                ++m_conditionalCompilationIfLevel;
-
-                                // if we're not in a conditional comment and we haven't explicitly
-                                // turned on conditional compilation when we encounter
-                                // a @if statement, then we can implicitly turn it on.
-                                if (!m_inConditionalComment && !m_conditionalCompilationOn)
-                                {
-                                    m_conditionalCompilationOn = true;
-                                }
-
-                                break;
-                            }
-
-                            // the string isn't a known preprocessor command, so 
-                            // fall into the default processing to handle it as a variable name
-                            goto default;
-
-                        case 3:
-                            if (CheckSubstring(startPosition, "set"))
-                            {
-                                token = JSToken.ConditionalCompilationSet;
-
-                                // if we're not in a conditional comment and we haven't explicitly
-                                // turned on conditional compilation when we encounter
-                                // a @set statement, then we can implicitly turn it on.
-                                if (!m_inConditionalComment && !m_conditionalCompilationOn)
-                                {
-                                    m_conditionalCompilationOn = true;
-                                }
-
-                                break;
-                            }
-
-                            if (CheckSubstring(startPosition, "end"))
-                            {
-                                token = JSToken.ConditionalCompilationEnd;
-                                if (m_conditionalCompilationIfLevel > 0)
-                                {
-                                    // down one more @if level
-                                    m_conditionalCompilationIfLevel--;
-                                }
-                                else
-                                {
-                                    // not corresponding @if -- invalid @end statement
-                                    HandleError(JSError.CCInvalidEnd);
-                                }
-
-                                break;
-                            }
-
-                            // the string isn't a known preprocessor command, so 
-                            // fall into the default processing to handle it as a variable name
-                            goto default;
-
-                        case 4:
-                            if (CheckSubstring(startPosition, "else"))
-                            {
-                                token = JSToken.ConditionalCompilationElse;
-
-                                // if we don't have a corresponding @if statement, then throw and error
-                                // (but keep processing)
-                                if (m_conditionalCompilationIfLevel <= 0)
-                                {
-                                    HandleError(JSError.CCInvalidElse);
-                                }
-
-                                break;
-                            }
-
-                            if (CheckSubstring(startPosition, "elif"))
-                            {
-                                token = JSToken.ConditionalCompilationElseIf;
-
-                                // if we don't have a corresponding @if statement, then throw and error
-                                // (but keep processing)
-                                if (m_conditionalCompilationIfLevel <= 0)
-                                {
-                                    HandleError(JSError.CCInvalidElseIf);
-                                }
-
-                                break;
-                            }
-
-                            // the string isn't a known preprocessor command, so 
-                            // fall into the default processing to handle it as a variable name
-                            goto default;
-
-                        case 5:
-                            if (CheckSubstring(startPosition, "cc_on"))
-                            {
-                                // turn it on and return the @cc_on token
-                                m_conditionalCompilationOn = true;
-                                token = JSToken.ConditionalCompilationOn;
-                                break;
-                            }
-
-                            // the string isn't a known preprocessor command, so 
-                            // fall into the default processing to handle it as a variable name
-                            goto default;
-
-                        default:
-                            // we have @[id], where [id] is a valid identifier.
-                            // if we haven't explicitly turned on conditional compilation,
-                            // we'll keep processing, but we need to fire an error to indicate
-                            // that the code should turn it on first.
-                            if (!m_conditionalCompilationOn)
-                            {
-                                HandleError(JSError.CCOff);
-                            }
-
-                            token = JSToken.ConditionalCompilationVariable;
-                            break;
-                    }
-
                     break;
 
                 case 'A':
@@ -749,10 +477,10 @@ namespace Microsoft.Ajax.Utilities
                 case '\\':
                     // try decoding a unicode escape sequence. We read the backslash and
                     // now the "current" character is the "u"
-                    if (PeekUnicodeEscape(m_currentPosition, ref c))
+                    if (PeekUnicodeEscape(_currentPosition, ref c))
                     {
                         // advance past the escape characters
-                        m_currentPosition += 5;
+                        _currentPosition += 5;
 
                         // valid unicode escape sequence
                         if (IsValidIdentifierStart(c))
@@ -760,8 +488,8 @@ namespace Microsoft.Ajax.Utilities
                             // use the unescaped character as the first character of the
                             // decoded identifier, and current character is now the last position
                             // on the builder
-                            m_identifier.Append(c);
-                            m_lastPosOnBuilder = m_currentPosition;
+                            _identifier.Append(c);
+                            _lastPosOnBuilder = _currentPosition;
 
                             // scan the rest of the identifier
                             ScanIdentifier();
@@ -775,7 +503,7 @@ namespace Microsoft.Ajax.Utilities
                     {
                         // not a valid unicode escape sequence
                         // see if the next character is a valid identifier character
-                        if (IsValidIdentifierStart(GetChar(m_currentPosition)))
+                        if (IsValidIdentifierStart(GetChar(_currentPosition)))
                         {
                             // we're going to just assume this is an escaped identifier character
                             // because some older browsers allow things like \foo ("foo") and 
@@ -795,17 +523,12 @@ namespace Microsoft.Ajax.Utilities
 
                 case '^':
                     token = JSToken.BitwiseXor;
-                    if ('=' == GetChar(m_currentPosition))
+                    if ('=' == GetChar(_currentPosition))
                     {
-                        m_currentPosition++;
+                        _currentPosition++;
                         token = JSToken.BitwiseXorAssign;
                     }
 
-                    break;
-
-                case '#':
-                case '`':
-                    token = IllegalCharacter();
                     break;
 
                 case 'a':
@@ -852,15 +575,15 @@ namespace Microsoft.Ajax.Utilities
 
                 case '|':
                     token = JSToken.BitwiseOr;
-                    c = GetChar(m_currentPosition);
+                    c = GetChar(_currentPosition);
                     if ('|' == c)
                     {
-                        m_currentPosition++;
+                        _currentPosition++;
                         token = JSToken.LogicalOr;
                     }
                     else if ('=' == c)
                     {
-                        m_currentPosition++;
+                        _currentPosition++;
                         token = JSToken.BitwiseOrAssign;
                     }
 
@@ -874,32 +597,24 @@ namespace Microsoft.Ajax.Utilities
                     token = JSToken.BitwiseNot;
                     break;
 
+                case '\0':
+                    if (IsEndOfFile)
+                    {
+                        token = JSToken.EndOfFile;
+                        _currentPosition--;
+                    }
+                    else
+                    {
+                        token = IllegalCharacter();
+                    }
+                    break;
+                case '\u2028':
+                case '\u2029':
+                    // more line terminator
+                    token = ScanLineTerminator(c);
+                    break;
                 default:
-                    if (c == '\0')
-                    {
-                        if (IsEndOfFile)
-                        {
-                            token = JSToken.EndOfFile;
-                            m_currentPosition--;
-                            if (m_conditionalCompilationIfLevel > 0)
-                            {
-                                m_currentToken.EndLineNumber = m_currentLine;
-                                m_currentToken.EndLinePosition = m_startLinePosition;
-                                m_currentToken.EndPosition = m_currentPosition;
-                                HandleError(JSError.NoCCEnd);
-                            }
-                        }
-                        else
-                        {
-                            token = IllegalCharacter();
-                        }
-                    }
-                    else if (c == '\u2028' || c == '\u2029')
-                    {
-                        // more line terminator
-                        token = ScanLineTerminator(c);
-                    }
-                    else if (IsValidIdentifierStart(c))
+                    if (IsValidIdentifierStart(c))
                     {
                         token = JSToken.Identifier;
                         ScanIdentifier();
@@ -908,9 +623,9 @@ namespace Microsoft.Ajax.Utilities
                     {
                         // we are asking for raw tokens, and this is the start of a stretch of whitespace.
                         // advance to the end of the whitespace, and return that as the token
-                        while (JSScanner.IsBlankSpace(GetChar(m_currentPosition)))
+                        while (JSScanner.IsBlankSpace(GetChar(_currentPosition)))
                         {
-                            ++m_currentPosition;
+                            ++_currentPosition;
                         }
                         token = JSToken.WhiteSpace;
                     }
@@ -923,124 +638,102 @@ namespace Microsoft.Ajax.Utilities
             }
 
             // fix up the end of the token
-            m_currentToken.EndLineNumber = m_currentLine;
-            m_currentToken.EndLinePosition = m_startLinePosition;
-            m_currentToken.EndPosition = m_currentPosition;
+            _tokenEndIndex = _currentPosition;            
+            return MakeContext(token);
+        }
 
-            // this is now the current token
-            m_currentToken.Token = token;
-            return m_currentToken;
+        public List<TokenWithSpan> ReadTokens(int characterCount) {
+            List<TokenWithSpan> tokens = new List<TokenWithSpan>();
+
+            int start = _currentPosition;
+
+            while (_currentPosition- start < characterCount) {
+                var token = ScanNextToken(true);
+                tokens.Add(token);
+                if (IsEndOfFile) {
+                    break;
+                }
+            }
+
+            return tokens;
+        }
+
+        
+        private TokenWithSpan MakeContext(JSToken token) {
+#if FALSE
+            var startLoc = IndexToLocation(_tokenStartIndex);
+            var endLoc = IndexToLocation(_tokenEndIndex);
+
+            Debug.Assert(startLoc.Line == _state.TokenStartLineNumber);
+            Debug.Assert(endLoc.Line == _state.TokenEndLineNumber);
+            Debug.Assert(startLoc.Column == _state.TokenStartLinePosition);
+            Debug.Assert(endLoc.Column == _state.TokenEndLinePosition);
+#endif
+
+            return new TokenWithSpan(
+                _indexResolver,
+                _tokenStartIndex + _initialLocation.Index,
+                _tokenEndIndex + _initialLocation.Index,
+                token                
+            );
+
+#if FALSE
+            return new Context(
+                _state.TokenStartLineNumber,
+                _state.TokenStartLinePosition,
+                _tokenStartIndex,
+                _state.TokenEndLineNumber,
+                _state.TokenEndLinePosition,
+                _tokenEndIndex,
+                token
+            );
+#endif
         }
 
         private JSToken ScanLineTerminator(char ch)
         {
             // line terminator
             var token = JSToken.EndOfLine;
-            if (m_inConditionalComment && m_inSingleLineComment)
+            if (ch == '\r')
             {
-                // if we are in a single-line conditional comment, then we want
-                // to return the end of comment token WITHOUT moving past the end of line 
-                // characters
-                token = JSToken.ConditionalCommentEnd;
-                m_inConditionalComment = m_inSingleLineComment = false;
+                // \r\n is a valid SINGLE line-terminator. So if the \r is
+                // followed by a \n, we only want to process a single line terminator.
+                if (GetChar(_currentPosition) == '\n')
+                {
+                    _currentPosition++;
+                }
             }
-            else
+
+            // keep multiple line terminators together in a single token.
+            // so get the current character after this last line terminator
+            // and then keep looping until we hit something that isn't one.
+            while ((ch = GetChar(_currentPosition)) == '\r' || ch == '\n' || ch == '\u2028' || ch == '\u2029')
             {
                 if (ch == '\r')
                 {
-                    // \r\n is a valid SINGLE line-terminator. So if the \r is
-                    // followed by a \n, we only want to process a single line terminator.
-                    if (GetChar(m_currentPosition) == '\n')
+                    // skip over the \r and if the next one is an \n skip over it, too
+                    if (GetChar(++_currentPosition) == '\n')
                     {
-                        m_currentPosition++;
+                        ++_currentPosition;
                     }
+                    _newLineLocations.Add(_currentPosition);
                 }
-
-                m_currentLine++;
-                m_startLinePosition = m_currentPosition;
-
-                // keep multiple line terminators together in a single token.
-                // so get the current character after this last line terminator
-                // and then keep looping until we hit something that isn't one.
-                while ((ch = GetChar(m_currentPosition)) == '\r' || ch == '\n' || ch == '\u2028' || ch == '\u2029')
+                else
                 {
-                    if (ch == '\r')
-                    {
-                        // skip over the \r and if the next one is an \n skip over it, too
-                        if (GetChar(++m_currentPosition) == '\n')
-                        {
-                            ++m_currentPosition;
-                        }
-                    }
-                    else
-                    {
-                        // skip over any other non-\r character
-                        ++m_currentPosition;
-                    }
-
-                    // increment the line number and reset the start position
-                    m_currentLine++;
-                    m_startLinePosition = m_currentPosition;
+                    // skip over any other non-\r character
+                    ++_currentPosition;
                 }
             }
 
-            // if we WERE in a single-line comment, we aren't anymore!
-            m_inSingleLineComment = false;
             return token;
         }
 
         private JSToken IllegalCharacter()
         {
-            m_currentToken.EndLineNumber = m_currentLine;
-            m_currentToken.EndLinePosition = m_startLinePosition;
-            m_currentToken.EndPosition = m_currentPosition;
+            _tokenEndIndex = _currentPosition;
 
             HandleError(JSError.IllegalChar);
             return JSToken.Error;
-        }
-
-        /// <summary>
-        /// Set the list of preprocessor defined names and values
-        /// </summary>
-        /// <param name="defines">dictionary of name/value pairs</param>
-        public void SetPreprocessorDefines(IDictionary<string, string> defines)
-        {
-            // this is a destructive set, blowing away any previous list
-            if (defines != null && defines.Count > 0)
-            {
-                // create a new dictionary, case-INsensitive
-                m_defines = new Dictionary<string, string>(StringComparer.OrdinalIgnoreCase);
-
-                // add an entry for each unique, valid name passed to us.
-                foreach (var nameValuePair in defines)
-                {
-                    if (JSScanner.IsValidIdentifier(nameValuePair.Key) && !m_defines.ContainsKey(nameValuePair.Key))
-                    {
-                        m_defines.Add(nameValuePair.Key, nameValuePair.Value);
-                    }
-                }
-            }
-            else
-            {
-                // we have no defined names
-                m_defines = null;
-            }
-        }
-
-        private void OnGlobalDefine(string name)
-        {
-            if (GlobalDefine != null)
-            {
-                GlobalDefine(this, new GlobalDefineEventArgs() { Name = name });
-            }
-        }
-
-        private void OnNewModule(string newModule)
-        {
-            if (NewModule != null)
-            {
-                NewModule(this, new NewModuleEventArgs { Module = newModule });
-            }
         }
 
         public static bool IsKeyword(string name, bool strictMode)
@@ -1085,7 +778,6 @@ namespace Microsoft.Ajax.Utilities
                                 isKeyword = strictMode;
                                 break;
 
-                            case JSToken.Native:
                             default:
                                 // no other tokens can be identifiers.
                                 // apparently never allowed for Chrome, so we want to treat it
@@ -1117,7 +809,7 @@ namespace Microsoft.Ajax.Utilities
 
         private bool CheckCaseInsensitiveSubstring(string target)
         {
-            var startIndex = m_currentPosition;
+            var startIndex = _currentPosition;
             for (int ndx = 0; ndx < target.Length; ++ndx)
             {
                 if (target[ndx] != char.ToUpperInvariant(GetChar(startIndex + ndx)))
@@ -1128,15 +820,15 @@ namespace Microsoft.Ajax.Utilities
             }
 
             // if we got here, the strings match. Advance the current position over it
-            m_currentPosition += target.Length;
+            _currentPosition += target.Length;
             return true;
         }
 
         private char GetChar(int index)
         {
-            if (index < m_endPos)
+            if (index < _source.Length)
             {
-                return m_strSourceCode[index];
+                return _source[index];
             }
 
             return '\0';
@@ -1146,29 +838,21 @@ namespace Microsoft.Ajax.Utilities
         {
             for (;;)
             {
-                char c = GetChar(m_currentPosition);
+                char c = GetChar(_currentPosition);
                 if (!IsIdentifierPartChar(c))
                 {
                     break;
                 }
 
-                ++m_currentPosition;
+                ++_currentPosition;
             }
 
-            if (AllowEmbeddedAspNetBlocks
-                && CheckSubstring(m_currentPosition, "<%="))
-            {
-                // the identifier has an ASP.NET <%= ... %> block as part of it.
-                // move the current position to the opening % character and call 
-                // the method that will parse it from there.
-                ++m_currentPosition;
-                ScanAspNetBlock();
-            }
+            
 
-            if (m_lastPosOnBuilder > 0)
+            if (_lastPosOnBuilder > 0)
             {
-                m_identifier.Append(m_strSourceCode.Substring(m_lastPosOnBuilder, m_currentPosition - m_lastPosOnBuilder));
-                m_lastPosOnBuilder = 0;
+                _identifier.Append(_source.Substring(_lastPosOnBuilder, _currentPosition - _lastPosOnBuilder));
+                _lastPosOnBuilder = 0;
             }
         }
 
@@ -1176,15 +860,14 @@ namespace Microsoft.Ajax.Utilities
         {
             for (;;)
             {
-                char c = GetChar(m_currentPosition);
+                char c = GetChar(_currentPosition);
                 if ('a' <= c && c <= 'z')
                 {
-                    m_currentPosition++;
+                    _currentPosition++;
                     continue;
                 }
 
-                if (IsIdentifierPartChar(c) 
-                    || (AllowEmbeddedAspNetBlocks && CheckSubstring(m_currentPosition, "<%=")))
+                if (IsIdentifierPartChar(c))
                 {
                     ScanIdentifier();
                     return JSToken.Identifier;
@@ -1193,7 +876,11 @@ namespace Microsoft.Ajax.Utilities
                 break;
             }
 
-            return keyword.GetKeyword(m_currentToken, m_currentPosition - m_currentToken.StartPosition);
+            return keyword.GetKeyword(
+                _source,
+                _tokenStartIndex,
+                _currentPosition - _tokenStartIndex
+            );
         }
 
         [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Maintainability", "CA1502:AvoidExcessiveComplexity")]
@@ -1203,17 +890,16 @@ namespace Microsoft.Ajax.Utilities
             JSToken token = noMoreDot ? JSToken.NumericLiteral : JSToken.IntegerLiteral;
             bool exponent = false;
             char c;
-            m_literalIssues = false;
 
             if ('0' == leadChar)
             {
                 // c is now the character AFTER the leading zero
-                c = GetChar(m_currentPosition);
+                c = GetChar(_currentPosition);
                 if ('x' == c || 'X' == c)
                 {
-                    if (JSScanner.IsHexDigit(GetChar(m_currentPosition + 1)))
+                    if (JSScanner.IsHexDigit(GetChar(_currentPosition + 1)))
                     {
-                        while (JSScanner.IsHexDigit(GetChar(++m_currentPosition)))
+                        while (JSScanner.IsHexDigit(GetChar(++_currentPosition)))
                         {
                             // empty
                         }
@@ -1221,6 +907,7 @@ namespace Microsoft.Ajax.Utilities
 
                     return CheckForNumericBadEnding(token);
                 }
+#if FALSE
                 else if ('b' == c || 'B' == c)
                 {
                     // ES6 binary literal?
@@ -1249,18 +936,18 @@ namespace Microsoft.Ajax.Utilities
 
                     return CheckForNumericBadEnding(token);
                 }
+#endif
                 else if ('0' <= c && c <= '7')
                 {
                     // this is a zero followed by a digit between 0 and 7.
                     // This could be interpreted as an octal literal, which isn't strictly supported.
                     while ('0' <= c && c <= '7')
                     {
-                        c = GetChar(++m_currentPosition);
+                        c = GetChar(++_currentPosition);
                     }
 
                     // return the integer token with issues, which should cause it to be output
                     // as-is and not combined with other literals or anything.
-                    m_literalIssues = true;
                     HandleError(JSError.OctalLiteralsDeprecated);
                     return token;
                 }
@@ -1277,7 +964,7 @@ namespace Microsoft.Ajax.Utilities
 
             for (;;)
             {
-                c = GetChar(m_currentPosition);
+                c = GetChar(_currentPosition);
                 if (!JSScanner.IsDigit(c))
                 {
                     if ('.' == c)
@@ -1302,7 +989,7 @@ namespace Microsoft.Ajax.Utilities
                     }
                     else if ('+' == c || '-' == c)
                     {
-                        char e = GetChar(m_currentPosition - 1);
+                        char e = GetChar(_currentPosition - 1);
                         if ('e' != e && 'E' != e)
                         {
                             break;
@@ -1314,19 +1001,19 @@ namespace Microsoft.Ajax.Utilities
                     }
                 }
 
-                m_currentPosition++;
+                _currentPosition++;
             }
 
-            c = GetChar(m_currentPosition - 1);
+            c = GetChar(_currentPosition - 1);
             if ('+' == c || '-' == c)
             {
-                m_currentPosition--;
-                c = GetChar(m_currentPosition - 1);
+                _currentPosition--;
+                c = GetChar(_currentPosition - 1);
             }
 
             if ('e' == c || 'E' == c)
             {
-                m_currentPosition--;
+                _currentPosition--;
             }
 
             // it is invalid for a numeric literal to be immediately followed by another
@@ -1340,18 +1027,17 @@ namespace Microsoft.Ajax.Utilities
             // it is invalid for a numeric literal to be immediately followed by another
             // digit or an identifier start character. So check for those cases and return an
             // invalid numeric literal if true.
-            char ch = GetChar(m_currentPosition);
+            char ch = GetChar(_currentPosition);
             if (('0' <= ch && ch <= '9') || IsValidIdentifierStart(ch))
             {
                 // we know that next character is invalid, so skip it and 
                 // anything else after it that's identifier-like, and throw an error.
-                ++m_currentPosition;
-                while (IsValidIdentifierPart(GetChar(m_currentPosition)))
+                ++_currentPosition;
+                while (IsValidIdentifierPart(GetChar(_currentPosition)))
                 {
-                    ++m_currentPosition;
+                    ++_currentPosition;
                 }
 
-                m_literalIssues = true;
                 HandleError(JSError.BadNumericLiteral);
                 token = JSToken.NumericLiteral;
             }
@@ -1361,11 +1047,11 @@ namespace Microsoft.Ajax.Utilities
 
         internal String ScanRegExp()
         {
-            int pos = m_currentPosition;
+            int pos = _currentPosition;
             bool isEscape = false;
             bool isInSet = false;
             char c;
-            while (!IsEndLineOrEOF(c = GetChar(m_currentPosition++), 0))
+            while (!IsEndLineOrEOF(c = GetChar(_currentPosition++), 0))
             {
                 if (isEscape)
                 {
@@ -1384,17 +1070,16 @@ namespace Microsoft.Ajax.Utilities
                 }
                 else if (c == '/')
                 {
-                    if (pos == m_currentPosition)
+                    if (pos == _currentPosition)
                     {
                         return null;
                     }
 
-                    m_currentToken.EndPosition = m_currentPosition;
-                    m_currentToken.EndLinePosition = m_startLinePosition;
-                    m_currentToken.EndLineNumber = m_currentLine;
-                    return m_strSourceCode.Substring(
-                        m_currentToken.StartPosition + 1,
-                        m_currentToken.EndPosition - m_currentToken.StartPosition - 2);
+                    _tokenEndIndex = _currentPosition;
+                    return _source.Substring(
+                        _tokenStartIndex + 1,
+                        _tokenEndIndex - _tokenStartIndex - 2
+                    );
                 }
                 else if (c == '\\')
                 {
@@ -1403,142 +1088,25 @@ namespace Microsoft.Ajax.Utilities
             }
 
             // reset and return null. Assume it is not a reg exp
-            m_currentPosition = pos;
+            _currentPosition = pos;
             return null;
         }
 
         internal String ScanRegExpFlags()
         {
-            int pos = m_currentPosition;
-            while (JSScanner.IsAsciiLetter(GetChar(m_currentPosition)))
+            int pos = _currentPosition;
+            while (JSScanner.IsAsciiLetter(GetChar(_currentPosition)))
             {
-                m_currentPosition++;
+                _currentPosition++;
             }
 
-            if (pos != m_currentPosition)
+            if (pos != _currentPosition)
             {
-                m_currentToken.EndPosition = m_currentPosition;
-                m_currentToken.EndLineNumber = m_currentLine;
-                m_currentToken.EndLinePosition = m_startLinePosition;
-                return m_strSourceCode.Substring(pos, m_currentToken.EndPosition - pos);
+                _tokenEndIndex = _currentPosition;
+                return _source.Substring(pos, _tokenEndIndex - pos);
             }
 
             return null;
-        }
-
-        /// <summary>
-        /// Scans for the end of an Asp.Net block.
-        ///  On exit this.currentPos will be at the next char to scan after the asp.net block.
-        /// </summary>
-        private JSToken ScanAspNetBlock()
-        {
-            // assume we find an asp.net block
-            var tokenType = JSToken.AspNetBlock;
-
-            // the current position is the % that opens the <%.
-            // advance to the next character and save it because we will want 
-            // to know whether it's an equals-sign later
-            var thirdChar = GetChar(++m_currentPosition);
-
-            // advance to the next character
-            ++m_currentPosition;
-
-            // loop until we find a > with a % before it (%>)
-            while (!(this.GetChar(this.m_currentPosition - 1) == '%' &&
-                     this.GetChar(this.m_currentPosition) == '>') ||
-                     IsEndOfFile)
-            {
-                this.m_currentPosition++;
-            }
-
-            // we should be at the > of the %> right now.
-            // set the end point of this token
-            m_currentToken.EndPosition = m_currentPosition + 1;
-            m_currentToken.EndLineNumber = m_currentLine;
-            m_currentToken.EndLinePosition = m_startLinePosition;
-
-            // see if we found an unterminated asp.net block
-            if (IsEndOfFile)
-            {
-                HandleError(JSError.UnterminatedAspNetBlock);
-            }
-            else
-            {
-                // Eat the last >.
-                this.m_currentPosition++;
-
-                if (thirdChar == '=')
-                {
-                    // this is a <%= ... %> token.
-                    // we're going to treat this like an identifier
-                    tokenType = JSToken.Identifier;
-
-                    // now, if the next character is an identifier part
-                    // then skip to the end of the identifier. And if this is
-                    // another <%= then skip to the end (%>)
-                    if (IsValidIdentifierPart(GetChar(m_currentPosition))
-                        || CheckSubstring(m_currentPosition, "<%="))
-                    {
-                        // and do it however many times we need
-                        while (true)
-                        {
-                            if (IsValidIdentifierPart(GetChar(m_currentPosition)))
-                            {
-                                // skip to the end of the identifier part
-                                while (IsValidIdentifierPart(GetChar(++m_currentPosition)))
-                                {
-                                    // loop
-                                }
-
-                                // when we get here, the current position is the first
-                                // character that ISN"T an identifier-part. That means everything 
-                                // UP TO this point must have been on the 
-                                // same line, so we only need to update the position
-                                m_currentToken.EndPosition = m_currentPosition;
-                            }
-                            else if (CheckSubstring(m_currentPosition, "<%="))
-                            {
-                                // skip forward four characters -- the minimum position
-                                // for the closing %>
-                                m_currentPosition += 4;
-
-                                // and keep looping until we find it
-                                while (!(this.GetChar(this.m_currentPosition - 1) == '%' &&
-                                         this.GetChar(this.m_currentPosition) == '>') ||
-                                         IsEndOfFile)
-                                {
-                                    this.m_currentPosition++;
-                                }
-
-                                // update the end of the token
-                                m_currentToken.EndPosition = m_currentPosition + 1;
-                                m_currentToken.EndLineNumber = m_currentLine;
-                                m_currentToken.EndLinePosition = m_startLinePosition;
-
-                                // we should be at the > of the %> right now.
-                                // see if we found an unterminated asp.net block
-                                if (IsEndOfFile)
-                                {
-                                    HandleError(JSError.UnterminatedAspNetBlock);
-                                }
-                                else
-                                {
-                                    // skip the > and go around another time
-                                    ++m_currentPosition;
-                                }
-                            }
-                            else
-                            {
-                                // neither an identifer part nor another <%= sequence,
-                                // so we're done here
-                                break;
-                            }
-                        }
-                    }
-                }
-            }
-
-            return tokenType;
         }
 
         //--------------------------------------------------------------------------------------------------
@@ -1552,13 +1120,12 @@ namespace Microsoft.Ajax.Utilities
         [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Maintainability", "CA1502:AvoidExcessiveComplexity")]
         private void ScanString(char delimiter)
         {
-            int start = m_currentPosition;
-            m_decodedString = null;
-            m_literalIssues = false;
+            int start = _currentPosition;
+            _decodedString = null;
             StringBuilder result = null;
 
             char ch;
-            while((ch = GetChar(m_currentPosition++)) != delimiter)
+            while((ch = GetChar(_currentPosition++)) != delimiter)
             {
                 if (ch != '\\')
                 {
@@ -1573,14 +1140,13 @@ namespace Microsoft.Ajax.Utilities
                         //      var y = 42;
                         // should NOT get combined to: var x="unterminated,y=42;
                         // (same for moving it inside for-statements, combining expression statements, etc.)
-                        //m_literalIssues = true;
                         HandleError(JSError.UnterminatedString);
 
                         // back up to the start of the line terminator
-                        --m_currentPosition;
-                        if (GetChar(m_currentPosition - 1) == '\r')
+                        --_currentPosition;
+                        if (GetChar(_currentPosition - 1) == '\r')
                         {
-                            --m_currentPosition;
+                            --_currentPosition;
                         }
 
                         break;
@@ -1590,29 +1156,12 @@ namespace Microsoft.Ajax.Utilities
                     {
                         // whether it's a null literal character within the string or an
                         // actual end of file, this string literal has issues....
-                        m_literalIssues = true;
-
                         if (IsEndOfFile)
                         {
-                            m_currentPosition--;
+                            _currentPosition--;
                             HandleError(JSError.UnterminatedString);
                             break;
                         }
-
-                    }
-
-                    if (AllowEmbeddedAspNetBlocks
-                        && ch == '<'
-                        && GetChar(m_currentPosition) == '%')
-                    {
-                        // start of an ASP.NET block INSIDE a string literal.
-                        // just skip the entire ASP.NET block -- move forward until
-                        // we find the closing %> delimiter, then we'll continue on
-                        // with the next character.
-                        SkipAspNetReplacement();
-
-                        // asp.net blocks insides strings can cause issues
-                        m_literalIssues = true;
                     }
                 }
                 else
@@ -1628,10 +1177,10 @@ namespace Microsoft.Ajax.Utilities
                     // start points to the first position that has not been written to the StringBuilder.
                     // The first time we get in here that position is the beginning of the string, after that
                     // is the character immediately following the escape sequence
-                    if (m_currentPosition - start - 1 > 0)
+                    if (_currentPosition - start - 1 > 0)
                     {
                         // append all the non escape chars to the string builder
-                        result.Append(m_strSourceCode, start, m_currentPosition - start - 1);
+                        result.Append(_source, start, _currentPosition - start - 1);
                     }
 
                     // state variable to be reset
@@ -1640,14 +1189,14 @@ namespace Microsoft.Ajax.Utilities
                     int escapeStart;
                     int esc = 0;
 
-                    ch = GetChar(m_currentPosition++);
+                    ch = GetChar(_currentPosition++);
                     switch (ch)
                     {
                         // line terminator crap
                         case '\r':
-                            if ('\n' == GetChar(m_currentPosition))
+                            if ('\n' == GetChar(_currentPosition))
                             {
-                                m_currentPosition++;
+                                _currentPosition++;
                             }
 
                             goto case '\n';
@@ -1655,8 +1204,7 @@ namespace Microsoft.Ajax.Utilities
                         case '\n':
                         case '\u2028':
                         case '\u2029':
-                            m_currentLine++;
-                            m_startLinePosition = m_currentPosition;
+                            _newLineLocations.Add(_currentPosition);
                             break;
 
                         // classic single char escape sequences
@@ -1674,7 +1222,6 @@ namespace Microsoft.Ajax.Utilities
 
                         case 'v':
                             // \v inside strings can cause issues
-                            m_literalIssues = true;
                             result.Append((char)11);
                             break;
 
@@ -1701,7 +1248,7 @@ namespace Microsoft.Ajax.Utilities
                         // hexadecimal escape sequence /xHH
                         case 'x':
                             // save the start of the escape in case we fail
-                            escapeStart = m_currentPosition - 2;
+                            escapeStart = _currentPosition - 2;
                             isValidHex = true;
                             if (!ScanHexDigit(ref esc))
                             {
@@ -1709,9 +1256,9 @@ namespace Microsoft.Ajax.Utilities
                                 
                                 // if that invalid character (which the scan function skipped over)
                                 // was a delimiter, back up!
-                                if (GetChar(m_currentPosition - 1) == delimiter)
+                                if (GetChar(_currentPosition - 1) == delimiter)
                                 {
-                                    --m_currentPosition;
+                                    --_currentPosition;
                                 }
                             }
 
@@ -1721,9 +1268,9 @@ namespace Microsoft.Ajax.Utilities
 
                                 // if that invalid character (which the scan function skipped over)
                                 // was a delimiter, back up!
-                                if (GetChar(m_currentPosition - 1) == delimiter)
+                                if (GetChar(_currentPosition - 1) == delimiter)
                                 {
-                                    --m_currentPosition;
+                                    --_currentPosition;
                                 }
                             }
 
@@ -1736,8 +1283,7 @@ namespace Microsoft.Ajax.Utilities
                             {
                                 // wasn't valid -- keep the original and flag this 
                                 // as having issues
-                                result.Append(m_strSourceCode.Substring(escapeStart, m_currentPosition - escapeStart));
-                                m_literalIssues = true;
+                                result.Append(_source.Substring(escapeStart, _currentPosition - escapeStart));
                                 HandleError(JSError.BadHexEscapeSequence);
                             }
                             break;
@@ -1745,7 +1291,7 @@ namespace Microsoft.Ajax.Utilities
                         // unicode escape sequence /uHHHH
                         case 'u':
                             // save the start of the escape in case we fail
-                            escapeStart = m_currentPosition - 2;
+                            escapeStart = _currentPosition - 2;
                             isValidHex = true;
                             if (!ScanHexDigit(ref esc))
                             {
@@ -1753,9 +1299,9 @@ namespace Microsoft.Ajax.Utilities
                                 
                                 // if that invalid character (which the scan function skipped over)
                                 // was a delimiter, back up!
-                                if (GetChar(m_currentPosition - 1) == delimiter)
+                                if (GetChar(_currentPosition - 1) == delimiter)
                                 {
-                                    --m_currentPosition;
+                                    --_currentPosition;
                                 }
                             }
 
@@ -1765,9 +1311,9 @@ namespace Microsoft.Ajax.Utilities
                                 
                                 // if that invalid character (which the scan function skipped over)
                                 // was a delimiter, back up!
-                                if (GetChar(m_currentPosition - 1) == delimiter)
+                                if (GetChar(_currentPosition - 1) == delimiter)
                                 {
-                                    --m_currentPosition;
+                                    --_currentPosition;
                                 }
                             }
 
@@ -1777,9 +1323,9 @@ namespace Microsoft.Ajax.Utilities
                                 
                                 // if that invalid character (which the scan function skipped over)
                                 // was a delimiter, back up!
-                                if (GetChar(m_currentPosition - 1) == delimiter)
+                                if (GetChar(_currentPosition - 1) == delimiter)
                                 {
-                                    --m_currentPosition;
+                                    --_currentPosition;
                                 }
                             }
 
@@ -1789,9 +1335,9 @@ namespace Microsoft.Ajax.Utilities
                                 
                                 // if that invalid character (which the scan function skipped over)
                                 // was a delimiter, back up!
-                                if (GetChar(m_currentPosition - 1) == delimiter)
+                                if (GetChar(_currentPosition - 1) == delimiter)
                                 {
-                                    --m_currentPosition;
+                                    --_currentPosition;
                                 }
                             }
 
@@ -1803,8 +1349,7 @@ namespace Microsoft.Ajax.Utilities
                             else
                             {
                                 // wasn't valid -- keep the original
-                                result.Append(m_strSourceCode.Substring(escapeStart, m_currentPosition - escapeStart));
-                                m_literalIssues = true;
+                                result.Append(_source.Substring(escapeStart, _currentPosition - escapeStart));
                                 HandleError(JSError.BadHexEscapeSequence);
                             }
                             break;
@@ -1822,7 +1367,6 @@ namespace Microsoft.Ajax.Utilities
                         case '6':
                         case '7':
                             // octal literals inside strings can cause issues
-                            m_literalIssues = true;
 
                             // esc is reset at the beginning of the loop and it is used to check that we did not go through the cases 1, 2 or 3
                             if (!seqOfThree)
@@ -1830,13 +1374,13 @@ namespace Microsoft.Ajax.Utilities
                                 esc = (ch - '0') << 3;
                             }
 
-                            ch = GetChar(m_currentPosition++);
+                            ch = GetChar(_currentPosition++);
                             if ('0' <= ch && ch <= '7')
                             {
                                 if (seqOfThree)
                                 {
                                     esc |= (ch - '0') << 3;
-                                    ch = GetChar(m_currentPosition++);
+                                    ch = GetChar(_currentPosition++);
                                     if ('0' <= ch && ch <= '7')
                                     {
                                         esc |= ch - '0';
@@ -1847,7 +1391,7 @@ namespace Microsoft.Ajax.Utilities
                                         result.Append((char)(esc >> 3));
 
                                         // do not skip over this char we have to read it back
-                                        --m_currentPosition;
+                                        --_currentPosition;
                                     }
                                 }
                                 else
@@ -1868,7 +1412,7 @@ namespace Microsoft.Ajax.Utilities
                                 }
 
                                 // do not skip over this char we have to read it back
-                                --m_currentPosition;
+                                --_currentPosition;
                             }
 
                             HandleError(JSError.OctalLiteralsDeprecated);
@@ -1880,37 +1424,37 @@ namespace Microsoft.Ajax.Utilities
                             break;
                     }
 
-                    start = m_currentPosition;
+                    start = _currentPosition;
                 }
             }
 
             // update the unescaped string
             if (null != result)
             {
-                if (m_currentPosition - start - 1 > 0)
+                if (_currentPosition - start - 1 > 0)
                 {
                     // append all the non escape chars to the string builder
-                    result.Append(m_strSourceCode, start, m_currentPosition - start - 1);
+                    result.Append(_source, start, _currentPosition - start - 1);
                 }
-                m_decodedString = result.ToString();
+                _decodedString = result.ToString();
             }
-            else if (m_currentPosition == m_currentToken.StartPosition + 1)
+            else if (_currentPosition == _tokenStartIndex + 1)
             {
                 // empty unterminated string!
-                m_decodedString = string.Empty;
+                _decodedString = string.Empty;
             }
             else
             {
                 // might be an unterminated string, so make sure that last character is the terminator
-                int numDelimiters = (GetChar(m_currentPosition - 1) == delimiter ? 2 : 1);
-                m_decodedString = m_strSourceCode.Substring(m_currentToken.StartPosition + 1, m_currentPosition - m_currentToken.StartPosition - numDelimiters);
+                int numDelimiters = (GetChar(_currentPosition - 1) == delimiter ? 2 : 1);
+                _decodedString = _source.Substring(_tokenStartIndex + 1, _currentPosition - _tokenStartIndex - numDelimiters);
             }
         }
 
         private bool ScanHexDigit(ref int esc)
         {
             // get the current character and advance the pointer assuming it's good
-            var ch = GetChar(m_currentPosition++);
+            var ch = GetChar(_currentPosition++);
 
             // merge the hex digit's value into the unescaped value
             var isGoodValue = true;
@@ -1943,17 +1487,17 @@ namespace Microsoft.Ajax.Utilities
             // delimiter, then keep skipping
             // forward until we find the closing %>. Be sure to set the current pointer
             // to the NEXT character AFTER the > when we find it.
-            ++m_currentPosition;
+            ++_currentPosition;
 
             char ch;
-            while ((ch = GetChar(m_currentPosition++)) != '\0' || !IsEndOfFile)
+            while ((ch = GetChar(_currentPosition++)) != '\0' || !IsEndOfFile)
             {
                 if (ch == '%'
-                    && GetChar(m_currentPosition) == '>')
+                    && GetChar(_currentPosition) == '>')
                 {
                     // found the closing delimiter -- the current position in on the >
                     // so we need to advance to the next character and break out of the loop
-                    ++m_currentPosition;
+                    ++_currentPosition;
                     break;
                 }
             }
@@ -1965,51 +1509,42 @@ namespace Microsoft.Ajax.Utilities
             // the single-line comment does NOT include the line terminator!
             SkipToEndOfLine();
 
-            // no longer in a single-line comment
-            m_inSingleLineComment = false;
-
             // fix up the end of the token
-            m_currentToken.EndPosition = m_currentPosition;
-            m_currentToken.EndLinePosition = m_startLinePosition;
-            m_currentToken.EndLineNumber = m_currentLine;
+            _tokenEndIndex = _currentPosition;
         }
 
         private void SkipToEndOfLine()
         {
-            var c = GetChar(m_currentPosition);
+            var c = GetChar(_currentPosition);
             while (c != 0
                 && c != '\n'
                 && c != '\r'
                 && c != '\x2028'
                 && c != '\x2029')
             {
-                c = GetChar(++m_currentPosition);
+                c = GetChar(++_currentPosition);
             }
         }
 
         private void SkipOneLineTerminator()
         {
-            var c = GetChar(m_currentPosition);
+            var c = GetChar(_currentPosition);
             if (c == '\r')
             {
                 // skip over the \r; and if it's followed by a \n, skip it, too
-                if (GetChar(++m_currentPosition) == '\n')
+                if (GetChar(++_currentPosition) == '\n')
                 {
-                    ++m_currentPosition;
+                    ++_currentPosition;
                 }
-
-                m_currentLine++;
-                m_startLinePosition = m_currentPosition;
+                _newLineLocations.Add(_currentPosition);
             }
             else if (c == '\n'
                 || c == '\x2028'
                 || c == '\x2029')
             {
                 // skip over the single line-feed character
-                ++m_currentPosition;
-
-                m_currentLine++;
-                m_startLinePosition = m_currentPosition;
+                ++_currentPosition;
+                _newLineLocations.Add(_currentPosition);
             }
         }
 
@@ -2018,20 +1553,18 @@ namespace Microsoft.Ajax.Utilities
         {
             for (; ; )
             {
-                char c = GetChar(m_currentPosition);
+                char c = GetChar(_currentPosition);
                 while ('*' == c)
                 {
-                    c = GetChar(++m_currentPosition);
+                    c = GetChar(++_currentPosition);
                     if ('/' == c)
                     {
                         // get past the trailing slash
-                        m_currentPosition++;
+                        _currentPosition++;
 
                         // no longer in a multiline comment; fix up the end of the current token.
-                        m_inMultipleLineComment = false;
-                        m_currentToken.EndPosition = m_currentPosition;
-                        m_currentToken.EndLinePosition = m_startLinePosition;
-                        m_currentToken.EndLineNumber = m_currentLine;
+                        _tokenEndIndex = _currentPosition;
+                        _state.UnterminatedComment = false;
                         return;
                     }
 
@@ -2042,9 +1575,8 @@ namespace Microsoft.Ajax.Utilities
                     
                     if (IsLineTerminator(c, 1))
                     {
-                        c = GetChar(++m_currentPosition);
-                        m_currentLine++;
-                        m_startLinePosition = m_currentPosition + 1;
+                        c = GetChar(++_currentPosition);
+                        _newLineLocations.Add(_currentPosition);
                     }
                 }
 
@@ -2055,26 +1587,24 @@ namespace Microsoft.Ajax.Utilities
 
                 if (IsLineTerminator(c, 1))
                 {
-                    m_currentLine++;
-                    m_startLinePosition = m_currentPosition + 1;
+                    _newLineLocations.Add(_currentPosition + 1);
                 }
 
-                ++m_currentPosition;
+                ++_currentPosition;
             }
 
             // if we are here we got EOF
-            m_currentToken.EndPosition = m_currentPosition;
-            m_currentToken.EndLinePosition = m_startLinePosition;
-            m_currentToken.EndLineNumber = m_currentLine;
-            throw new ScannerException(JSError.NoCommentEnd);
+            _tokenEndIndex = _currentPosition;
+            _state.UnterminatedComment = true;
+            //throw new ScannerException(JSError.NoCommentEnd);
         }
 
         private void SkipBlanks()
         {
-            char c = GetChar(m_currentPosition);
+            char c = GetChar(_currentPosition);
             while (JSScanner.IsBlankSpace(c))
             {
-                c = GetChar(++m_currentPosition);
+                c = GetChar(++_currentPosition);
             }
         }
 
@@ -2101,9 +1631,9 @@ namespace Microsoft.Ajax.Utilities
             {
                 case '\u000d':
                     // treat 0x0D0x0A as a single character
-                    if (0x0A == GetChar(m_currentPosition + increment))
+                    if (0x0A == GetChar(_currentPosition + increment))
                     {
-                        m_currentPosition++;
+                        _currentPosition++;
                     }
 
                     return true;
@@ -2131,7 +1661,7 @@ namespace Microsoft.Ajax.Utilities
         {
             get
             {
-                return IsEndLineOrEOF(GetChar(m_currentPosition), 0);
+                return IsEndLineOrEOF(GetChar(_currentPosition), 0);
             }
         }
 
@@ -2389,18 +1919,18 @@ namespace Microsoft.Ajax.Utilities
             bool isEscapeChar = false;
             if ('\\' == c)
             {
-                if ('u' == GetChar(m_currentPosition + 1))
+                if ('u' == GetChar(_currentPosition + 1))
                 {
-                    char h1 = GetChar(m_currentPosition + 2);
+                    char h1 = GetChar(_currentPosition + 2);
                     if (IsHexDigit(h1))
                     {
-                        char h2 = GetChar(m_currentPosition + 3);
+                        char h2 = GetChar(_currentPosition + 3);
                         if (IsHexDigit(h2))
                         {
-                            char h3 = GetChar(m_currentPosition + 4);
+                            char h3 = GetChar(_currentPosition + 4);
                             if (IsHexDigit(h3))
                             {
-                                char h4 = GetChar(m_currentPosition + 5);
+                                char h4 = GetChar(_currentPosition + 5);
                                 if (IsHexDigit(h4))
                                 {
                                     isEscapeChar = true;
@@ -2420,15 +1950,15 @@ namespace Microsoft.Ajax.Utilities
             // if we get here, we're a good character!
             if (isEscapeChar)
             {
-                int startPosition = (m_lastPosOnBuilder > 0) ? m_lastPosOnBuilder : m_currentToken.StartPosition;
-                if (m_currentPosition - startPosition > 0)
+                int startPosition = (_lastPosOnBuilder > 0) ? _lastPosOnBuilder : _tokenStartIndex;
+                if (_currentPosition - startPosition > 0)
                 {
-                    m_identifier.Append(m_strSourceCode.Substring(startPosition, m_currentPosition - startPosition));
+                    _identifier.Append(_source.Substring(startPosition, _currentPosition - startPosition));
                 }
 
-                m_identifier.Append(c);
-                m_currentPosition += 5;
-                m_lastPosOnBuilder = m_currentPosition + 1;
+                _identifier.Append(c);
+                _currentPosition += 5;
+                _lastPosOnBuilder = _currentPosition + 1;
             }
 
             return true;
@@ -2449,395 +1979,6 @@ namespace Microsoft.Ajax.Utilities
             return ('A' <= c && c <= 'Z') || ('a' <= c && c <= 'z');
         }
 
-        private string PPScanIdentifier(bool forceUpper)
-        {
-            string identifier = null;
-
-            // start at the current position
-            var startPos = m_currentPosition;
-
-            // see if the first character is a valid identifier start
-            if (JSScanner.IsValidIdentifierStart(GetChar(startPos)))
-            {
-                // it is -- skip to the next character
-                ++m_currentPosition;
-
-                // and keep going as long as we have valid part characters
-                while (JSScanner.IsValidIdentifierPart(GetChar(m_currentPosition)))
-                {
-                    ++m_currentPosition;
-                }
-            }
-
-            // if we advanced at all, return the code we scanned. Otherwise return null
-            if (m_currentPosition > startPos)
-            {
-                identifier = m_strSourceCode.Substring(startPos, m_currentPosition - startPos);
-                if (forceUpper)
-                {
-                    identifier = identifier.ToUpperInvariant();
-                }
-            }
-
-            return identifier;
-        }
-
-        private bool PPScanInteger(out int intValue)
-        {
-            var startPos = m_currentPosition;
-            while (IsDigit(GetChar(m_currentPosition)))
-            {
-                ++m_currentPosition;
-            }
-
-            var success = false;
-            if (m_currentPosition > startPos)
-            {
-                success = int.TryParse(m_strSourceCode.Substring(startPos, m_currentPosition - startPos), out intValue);
-            }
-            else
-            {
-                intValue = 0;
-            }
-
-            return success;
-        }
-
-        private int PPSkipToDirective(params string[] endStrings)
-        {
-            // save the current position - if we hit an EOF before we find a directive
-            // we're looking for, we'll use this as the end of the error context so we
-            // don't have the whole rest of the file printed out with the error.
-            var endPosition = m_currentPosition;
-            var endLineNum = m_currentLine;
-            var endLinePos = m_startLinePosition;
-
-            while (true)
-            {
-                char c = GetChar(m_currentPosition++);
-                switch (c)
-                {
-                    // EOF
-                    case '\0':
-                        if (IsEndOfFile)
-                        {
-                            // adjust the scanner state
-                            m_currentPosition--;
-                            m_currentToken.EndPosition = m_currentPosition;
-                            m_currentToken.EndLineNumber = m_currentLine;
-                            m_currentToken.EndLinePosition = m_startLinePosition;
-
-                            // create a clone of the current token and set the ending to be the end of the
-                            // directive for which we're trying to find an end. Use THAT context for the 
-                            // error context. Then throw an exception so we can bail.
-                            var contextError = m_currentToken.Clone();
-                            contextError.EndPosition = endPosition;
-                            contextError.EndLineNumber = endLineNum;
-                            contextError.EndLinePosition = endLinePos;
-                            contextError.HandleError(string.CompareOrdinal(endStrings[0], "#ENDDEBUG") == 0 
-                                ? JSError.NoEndDebugDirective 
-                                : JSError.NoEndIfDirective);
-                            throw new ScannerException(JSError.ErrorEndOfFile);
-                        }
-
-                        break;
-
-                    // line terminator crap
-                    case '\r':
-                        if (GetChar(m_currentPosition) == '\n')
-                        {
-                            m_currentPosition++;
-                        }
-
-                        m_currentLine++;
-                        m_startLinePosition = m_currentPosition;
-                        break;
-                    case '\n':
-                        m_currentLine++;
-                        m_startLinePosition = m_currentPosition;
-                        break;
-                    case '\u2028':
-                        m_currentLine++;
-                        m_startLinePosition = m_currentPosition;
-                        break;
-                    case '\u2029':
-                        m_currentLine++;
-                        m_startLinePosition = m_currentPosition;
-                        break;
-
-                    // check for /// (and then followed by any one of the substrings passed to us)
-                    case '/':
-                        if (CheckSubstring(m_currentPosition, "//"))
-                        {
-                            // skip it
-                            m_currentPosition += 2;
-
-                            // check to see if this is the start of ANOTHER preprocessor construct. If it
-                            // is, then it's a NESTED statement and we'll need to recursively skip the 
-                            // whole thing so everything stays on track
-                            if (CheckCaseInsensitiveSubstring("#IFDEF")
-                                || CheckCaseInsensitiveSubstring("#IFNDEF")
-                                || CheckCaseInsensitiveSubstring("#IF"))
-                            {
-                                PPSkipToDirective("#ENDIF");
-                            }
-                            else
-                            {
-                                // now check each of the ending strings that were passed to us to see if one of
-                                // them is a match
-                                for (var ndx = 0; ndx < endStrings.Length; ++ndx)
-                                {
-                                    if (CheckCaseInsensitiveSubstring(endStrings[ndx]))
-                                    {
-                                        // found the ending string
-                                        return ndx;
-                                    }
-                                }
-
-                                // not something we're looking for -- but is it a simple ///#END?
-                                if (CheckCaseInsensitiveSubstring("#END"))
-                                {
-                                    // if the current character is not whitespace, then it's not a simple "#END"
-                                    c = GetChar(m_currentPosition);
-                                    if (IsBlankSpace(c) || IsAtEndOfLine)
-                                    {
-                                        // it is! Well, we were expecting either #ENDIF or #ENDDEBUG, but we found just an #END.
-                                        // that's not how the syntax is SUPPOSED to go. But let's let it fly.
-                                        // the ending token is always the first one.
-                                        return 0;
-                                    }
-                                }
-                            }
-                        }
-
-                        break;
-                }
-            }
-        }
-
-        // returns true we should skip the rest of this line,
-        // or false if we are already processed the whole thing.
-        private bool ScanPreprocessingDirective()
-        {
-            // check for some AjaxMin preprocessor comments
-            if (CheckCaseInsensitiveSubstring("#GLOBALS"))
-            {
-                return ScanGlobalsDirective();
-            }
-            else if (CheckCaseInsensitiveSubstring("#SOURCE"))
-            {
-                return ScanSourceDirective();
-            }
-            else if (UsePreprocessorDefines)
-            {
-                if (CheckCaseInsensitiveSubstring("#DEBUG"))
-                {
-                    return ScanDebugDirective();
-                }
-                else if (CheckCaseInsensitiveSubstring("#IF"))
-                {
-                    return ScanIfDirective();
-                }
-                else if (CheckCaseInsensitiveSubstring("#ELSE") && m_ifDirectiveLevel > 0)
-                {
-                    return ScanElseDirective();
-                }
-                else if (CheckCaseInsensitiveSubstring("#ENDIF") && m_ifDirectiveLevel > 0)
-                {
-                    return ScanEndIfDirective();
-                }
-                else if (CheckCaseInsensitiveSubstring("#DEFINE"))
-                {
-                    return ScanDefineDirective();
-                }
-                else if (CheckCaseInsensitiveSubstring("#UNDEF"))
-                {
-                    return ScanUndefineDirective();
-                }
-            }
-
-            return true;
-        }
-
-        private bool ScanGlobalsDirective()
-        {
-            // found ///#GLOBALS comment
-            SkipBlanks();
-
-            // should be one or more space-separated identifiers
-            while (!IsAtEndOfLine)
-            {
-                var identifier = PPScanIdentifier(false);
-                if (identifier != null)
-                {
-                    OnGlobalDefine(identifier);
-                }
-
-                SkipBlanks();
-            }
-
-            return true;
-        }
-
-        private bool ScanSourceDirective()
-        {
-            // found ///#SOURCE comment
-            SkipBlanks();
-
-            // pull the line, the column, and the source path off the line
-            var linePos = 0;
-            var colPos = 0;
-
-            // line number is first
-            if (PPScanInteger(out linePos))
-            {
-                SkipBlanks();
-
-                // column number is second
-                if (PPScanInteger(out colPos))
-                {
-                    SkipBlanks();
-
-                    // the path should be the last part of the line.
-                    // skip to the end and then use the part between.
-                    var ndxStart = m_currentPosition;
-                    SkipToEndOfLine();
-                    if (m_currentPosition > ndxStart)
-                    {
-                        // there is a non-blank source token.
-                        // so we have the line and the column and the source.
-                        // use them. Remember, though: we stopped BEFORE the line terminator,
-                        // so read ONE line terminator for the end of this line.
-                        SkipOneLineTerminator();
-
-                        // change the file context
-                        var newModule = m_strSourceCode.Substring(ndxStart, m_currentPosition - ndxStart).TrimEnd();
-                        m_currentToken.ChangeFileContext(newModule);
-
-                        // adjust the line number
-                        this.m_currentLine = linePos;
-
-                        // the start line position is the current position less the column position.
-                        // and because the column position in the comment is one-based, add one to get 
-                        // back to zero-based: current - (col - 1)
-                        this.m_startLinePosition = m_currentPosition - colPos + 1;
-
-                        // the source offset for both start and end is now the current position.
-                        // this is assuming that a single token doesn't span across source files, which isn't
-                        // entirely true, since a string literal or multi-line comment (for example) may do just that.
-                        this.m_currentToken.SourceOffsetStart = this.m_currentToken.SourceOffsetEnd = m_currentPosition;
-
-                        // alert anyone (the parser) that we encountered the start of a new module
-                        OnNewModule(newModule);
-
-                        // return false because we are all set on the next line and DON'T want the
-                        // line skipped.
-                        return false;
-                    }
-                }
-            }
-
-            // something isn't right; skip the rest of this line
-            return true;
-        }
-
-        private bool ScanIfDirective()
-        {
-            // we know we start with #IF -- see if it's #IFDEF or #IFNDEF
-            var isIfDef = CheckCaseInsensitiveSubstring("DEF");
-            var isIfNotDef = !isIfDef && CheckCaseInsensitiveSubstring("NDEF");
-
-            // skip past the token and any blanks
-            SkipBlanks();
-
-            // if we encountered a line-break here, then ignore this directive
-            if (!IsAtEndOfLine)
-            {
-                // get an identifier from the input
-                var identifier = PPScanIdentifier(true);
-                if (!string.IsNullOrEmpty(identifier))
-                {
-                    // set a state so that if we hit an #ELSE directive, we skip to #ENDIF
-                    ++m_ifDirectiveLevel;
-
-                    // if there is a dictionary AND the identifier is in it, then the identifier IS defined.
-                    // if there is not dictionary OR the identifier is NOT in it, then it is NOT defined.
-                    var isDefined = (m_defines != null && m_defines.ContainsKey(identifier));
-
-                    // skip any blanks
-                    SkipBlanks();
-
-                    // if we are at the end of the line, or if this was an #IFDEF or #IFNDEF, then
-                    // we have enough information to act
-                    if (isIfDef || isIfNotDef || IsAtEndOfLine)
-                    {
-                        // either #IFDEF identifier, #IFNDEF identifier, or #IF identifier.
-                        // this will simply test for whether or not it's defined
-                        var conditionIsTrue = (!isIfNotDef && isDefined) || (isIfNotDef && !isDefined);
-
-                        // if the condition is true, we just keep processing and when we hit the #END we're done,
-                        // or if we hit an #ELSE we skip to the #END. But if we are not true, we need to skip to
-                        // the #ELSE or #END directly.
-                        if (!conditionIsTrue)
-                        {
-                            // the condition is FALSE!
-                            // skip to #ELSE or #ENDIF and continue processing normally.
-                            // (make sure the end if always the first one)
-                            if (PPSkipToDirective("#ENDIF", "#ELSE") == 0)
-                            {
-                                // encountered the #ENDIF directive, so we know to reset the flag
-                                --m_ifDirectiveLevel;
-                            }
-                        }
-                    }
-                    else
-                    {
-                        // this is an #IF and we have something after the identifier.
-                        // it better be an operator or we'll ignore this comment.
-                        var operation = CheckForOperator(PPOperators.Instance);
-                        if (operation != null)
-                        {
-                            // skip any whitespace
-                            SkipBlanks();
-
-                            // save the current index -- this is either a non-whitespace character or the EOL.
-                            // if it wasn't the EOL, skip to it now
-                            var ndxStart = m_currentPosition;
-                            if (!IsAtEndOfLine)
-                            {
-                                SkipToEndOfLine();
-                            }
-
-                            // the value to compare against is the substring between the start and the current.
-                            // (and could be empty)
-                            var compareTo = m_strSourceCode.Substring(ndxStart, m_currentPosition - ndxStart);
-
-                            // now do the comparison and see if it's true. If the identifier isn't even defined, then
-                            // the condition is false.
-                            var conditionIsTrue = isDefined && operation(m_defines[identifier], compareTo.TrimEnd());
-
-                            // if the condition is true, we just keep processing and when we hit the #END we're done,
-                            // or if we hit an #ELSE we skip to the #END. But if we are not true, we need to skip to
-                            // the #ELSE or #END directly.
-                            if (!conditionIsTrue)
-                            {
-                                // the condition is FALSE!
-                                // skip to #ELSE or #ENDIF and continue processing normally.
-                                // (make sure the end if always the first one)
-                                if (PPSkipToDirective("#ENDIF", "#ELSE") == 0)
-                                {
-                                    // encountered the #ENDIF directive, so we know to reset the flag
-                                    --m_ifDirectiveLevel;
-                                }
-                            }
-                        }
-                    }
-                }
-            }
-
-            return true;
-        }
-
         private Func<string,string,bool> CheckForOperator(SortedDictionary<string, Func<string,string,bool>> operators)
         {
             // we need to make SURE we are checking the longer strings before we check the
@@ -2856,157 +1997,17 @@ namespace Microsoft.Ajax.Utilities
             return null;
         }
 
-        private bool ScanElseDirective()
-        {
-            // reset the state that says we were in an #IFDEF construct
-            --m_ifDirectiveLevel;
-
-            // ...then we now want to skip until the #ENDIF directive
-            PPSkipToDirective("#ENDIF");
-            return true;
-        }
-
-        private bool ScanEndIfDirective()
-        {
-            // reset the state that says we were in an #IFDEF construct
-            --m_ifDirectiveLevel;
-            return true;
-        }
-
-        private bool ScanDefineDirective()
-        {
-            // skip past the token and any blanks
-            SkipBlanks();
-
-            // if we encountered a line-break here, then ignore this directive
-            if (!IsAtEndOfLine)
-            {
-                // get an identifier from the input
-                var identifier = PPScanIdentifier(true);
-                if (!string.IsNullOrEmpty(identifier))
-                {
-                    // see if we're assigning a value
-                    string value = string.Empty;
-                    SkipBlanks();
-                    if (GetChar(m_currentPosition) == '=')
-                    {
-                        // we are! get the rest of the line as the trimmed string
-                        var ndxStart = ++m_currentPosition;
-                        SkipToEndOfLine();
-                        value = m_strSourceCode.Substring(ndxStart, m_currentPosition - ndxStart).Trim();
-                    }
-
-                    // if there is no dictionary of defines yet, create one now
-                    if (m_defines == null)
-                    {
-                        m_defines = new Dictionary<string, string>(StringComparer.OrdinalIgnoreCase);
-                    }
-
-                    // if the identifier is not already in the dictionary, add it now
-                    if (!m_defines.ContainsKey(identifier))
-                    {
-                        m_defines.Add(identifier, value);
-                    }
-                    else
-                    {
-                        // it already exists -- just set the value
-                        m_defines[identifier] = value;
-                    }
-                }
-            }
-
-            return true;
-        }
-
-        private bool ScanUndefineDirective()
-        {
-            // skip past the token and any blanks
-            SkipBlanks();
-
-            // if we encountered a line-break here, then ignore this directive
-            if (!IsAtEndOfLine)
-            {
-                // get an identifier from the input
-                var identifier = PPScanIdentifier(true);
-
-                // if there was an identifier and we have a dictionary of "defines" and the
-                // identifier is in that dictionary...
-                if (!string.IsNullOrEmpty(identifier))
-                {
-                    if (m_defines != null && m_defines.ContainsKey(identifier))
-                    {
-                        // remove the identifier from the "defines" dictionary
-                        m_defines.Remove(identifier);
-                    }
-                }
-            }
-
-            return true;
-        }
-
-        private bool ScanDebugDirective()
-        {
-            // advance to the next character. If it's an equal sign, then this
-            // debug comment is setting a debug namespace, not marking debug code.
-            if (GetChar(m_currentPosition) == '=')
-            {
-                // we have ///#DEBUG=
-                // get the namespace after the equal sign
-                ++m_currentPosition;
-                var identifier = PPScanIdentifier(false);
-                if (identifier == null)
-                {
-                    // nothing. clear the debug namespaces
-                    DebugLookupCollection.Clear();
-                }
-                else
-                {
-                    // this first identifier is the root namespace for the debug object.
-                    // let's also treat it as a known global.
-                    OnGlobalDefine(identifier);
-
-                    // see if we have a period and keep looping to get IDENT(.IDENT)*
-                    while (GetChar(m_currentPosition) == '.')
-                    {
-                        ++m_currentPosition;
-                        var nextIdentifier = PPScanIdentifier(false);
-                        if (nextIdentifier != null)
-                        {
-                            identifier += '.' + nextIdentifier;
-                        }
-                        else
-                        {
-                            // problem with the formatting -- ignore this comment
-                            identifier = null;
-                            break;
-                        }
-                    }
-
-                    if (identifier != null)
-                    {
-                        // add the identifier to the debug list
-                        DebugLookupCollection.Add(identifier);
-                    }
-                }
-            }
-            else if (StripDebugCommentBlocks && (m_defines == null || !m_defines.ContainsKey("DEBUG")))
-            {
-                // NOT a debug namespace assignment comment, so this is the start
-                // of a debug block. If we are skipping debug blocks (the DEBUG name
-                // is not defined AND StripDebugCommentBlocks is TRUE), then start skipping now.
-                // skip until we hit ///#ENDDEBUG
-                PPSkipToDirective("#ENDDEBUG");
-            }
-
-            return true;
-        }
-
         private void HandleError(JSError error)
         {
-            m_currentToken.EndPosition = m_currentPosition;
-            m_currentToken.EndLinePosition = m_startLinePosition;
-            m_currentToken.EndLineNumber = m_currentLine;
-            m_currentToken.HandleError(error);
+            _tokenEndIndex = _currentPosition;
+            var errorEx = new JScriptException(
+                error, 
+                MakeContext(JSToken.None)
+            );
+
+            _errorSink.OnCompilerError(
+                errorEx
+            );
         }
 
         /// <summary>
@@ -3055,7 +2056,7 @@ namespace Microsoft.Ajax.Utilities
             return JSToken.FirstBinaryOperator <= token && token <= JSToken.ConditionalIf;
         }
 
-        internal static OperatorPrecedence GetOperatorPrecedence(Context op)
+        internal static OperatorPrecedence GetOperatorPrecedence(TokenWithSpan op)
         {
             return op == null || op.Token == JSToken.None ? OperatorPrecedence.None : JSScanner.s_OperatorsPrec[op.Token - JSToken.FirstBinaryOperator];
         }
@@ -3120,201 +2121,38 @@ namespace Microsoft.Ajax.Utilities
         }
 
         /// <summary>
-        /// Class for associating an operator with a function for ///#IF directives
-        /// in a lazy-loaded manner. Doesn't create and initialize the dictionary
-        /// until the scanner actually encounters syntax that needs it.
-        /// The keys are sorted by length, decreasing (longest operators first).
+        /// Mutable parser state.  This is the state which changes
+        /// as we parse.  The current state can be captured to enable
+        /// re-starting of tokenization if the previous lines have
+        /// not changed.
         /// </summary>
-        private sealed class PPOperators : SortedDictionary<string, Func<string, string, bool>>
-        {
-            private PPOperators()
-                : base(new LengthComparer())
-            {
-                // add the operator information
-                this.Add("==", PPIsEqual);
-                this.Add("!=", PPIsNotEqual);
-                this.Add("===", PPIsStrictEqual);
-                this.Add("!==", PPIsNotStrictEqual);
-                this.Add("<", PPIsLessThan);
-                this.Add(">", PPIsGreaterThan);
-                this.Add("<=", PPIsLessThanOrEqual);
-                this.Add(">=", PPIsGreaterThanOrEqual);
+        struct State : IEquatable<State> {
+            // TODO: If this stays as a single bool we should just
+            // re-use pre-boxed versions so the state's super cheap.
+            public bool UnterminatedComment;
+
+            public override int GetHashCode() {
+                return UnterminatedComment ? 1 : 0;
             }
 
-            #region thread-safe lazy-loading property and nested class
-
-            public static PPOperators Instance
-            {
-                get
-                {
-                    return Nested.Instance;
+            public override bool Equals(object obj) {
+                if (obj is State) {
+                    return Equals((State)obj);
                 }
+                return false;
             }
 
-            private static class Nested
-            {
-                internal static readonly PPOperators Instance = new PPOperators();
+            public bool Equals(State other) {
+                return other.UnterminatedComment == UnterminatedComment;
             }
-
-            #endregion
-
-            #region sorting class
-
-            /// <summary>
-            /// Sorting class for the sorted dictionary base to make sure the operators are
-            /// enumerated with the LONGEST strings first, before the shorter strings.
-            /// </summary>
-            private class LengthComparer : Comparer<string>
-            {
-                public override int Compare(string x, string y)
-                {
-                    var delta = x != null && y != null ? y.Length - x.Length : 0;
-                    return delta != 0 ? delta : string.CompareOrdinal(x, y);
-                }
-            }
-
-            #endregion
-
-            #region condition execution methods
-
-            private static bool PPIsStrictEqual(string left, string right)
-            {
-                // strict comparison is only a string compare -- no conversion to float if
-                // the string comparison fails.
-                return string.Compare(left, right, StringComparison.OrdinalIgnoreCase) == 0;
-            }
-
-            private static bool PPIsNotStrictEqual(string left, string right)
-            {
-                // strict comparison is only a string compare -- no conversion to float if
-                // the string comparison fails.
-                return string.Compare(left, right, StringComparison.OrdinalIgnoreCase) != 0;
-            }
-
-            private static bool PPIsEqual(string left, string right)
-            {
-                // first see if a string compare works
-                var isTrue = string.Compare(left, right, StringComparison.OrdinalIgnoreCase) == 0;
-
-                // if not, then try converting both sides to double and doing the comparison
-                if (!isTrue)
-                {
-                    double leftNumeric, rightNumeric;
-                    if (ConvertToNumeric(left, right, out leftNumeric, out rightNumeric))
-                    {
-                        // they both converted successfully
-                        isTrue = leftNumeric == rightNumeric;
-                    }
-                }
-
-                return isTrue;
-            }
-
-            private static bool PPIsNotEqual(string left, string right)
-            {
-                // first see if a string compare works
-                var isTrue = string.Compare(left, right, StringComparison.OrdinalIgnoreCase) != 0;
-
-                // if they AREN'T equal, then try converting both sides to double and doing the comparison
-                if (isTrue)
-                {
-                    double leftNumeric, rightNumeric;
-                    if (ConvertToNumeric(left, right, out leftNumeric, out rightNumeric))
-                    {
-                        // they both converted successfully
-                        isTrue = leftNumeric != rightNumeric;
-                    }
-                }
-
-                return isTrue;
-            }
-
-            private static bool PPIsLessThan(string left, string right)
-            {
-                // only numeric comparisons
-                bool isTrue = false;
-                double leftNumeric, rightNumeric;
-                if (ConvertToNumeric(left, right, out leftNumeric, out rightNumeric))
-                {
-                    // they both converted successfully
-                    isTrue = leftNumeric < rightNumeric;
-                }
-
-                return isTrue;
-            }
-
-            private static bool PPIsGreaterThan(string left, string right)
-            {
-                // only numeric comparisons
-                bool isTrue = false;
-                double leftNumeric, rightNumeric;
-                if (ConvertToNumeric(left, right, out leftNumeric, out rightNumeric))
-                {
-                    // they both converted successfully
-                    isTrue = leftNumeric > rightNumeric;
-                }
-
-                return isTrue;
-            }
-
-            private static bool PPIsLessThanOrEqual(string left, string right)
-            {
-                // only numeric comparisons
-                bool isTrue = false;
-                double leftNumeric, rightNumeric;
-                if (ConvertToNumeric(left, right, out leftNumeric, out rightNumeric))
-                {
-                    // they both converted successfully
-                    isTrue = leftNumeric <= rightNumeric;
-                }
-
-                return isTrue;
-            }
-
-            private static bool PPIsGreaterThanOrEqual(string left, string right)
-            {
-                // only numeric comparisons
-                bool isTrue = false;
-                double leftNumeric, rightNumeric;
-                if (ConvertToNumeric(left, right, out leftNumeric, out rightNumeric))
-                {
-                    // they both converted successfully
-                    isTrue = leftNumeric >= rightNumeric;
-                }
-
-                return isTrue;
-            }
-
-            #endregion
-
-            #region static helper methods
-
-            /// <summary>
-            /// Try converting the two strings to doubles
-            /// </summary>
-            /// <param name="left">first string</param>
-            /// <param name="right">second string</param>
-            /// <param name="leftNumeric">first string converted to double</param>
-            /// <param name="rightNumeric">second string converted to double</param>
-            /// <returns>true if the conversion was successful; false otherwise</returns>
-            private static bool ConvertToNumeric(string left, string right, out double leftNumeric, out double rightNumeric)
-            {
-                rightNumeric = default(double);
-                return double.TryParse(left, NumberStyles.Any, CultureInfo.InvariantCulture, out leftNumeric)
-                    && double.TryParse(right, NumberStyles.Any, CultureInfo.InvariantCulture, out rightNumeric);
-            }
-
-            #endregion
         }
     }
 
-    public class GlobalDefineEventArgs : EventArgs
-    {
-        public string Name { get; set; }
-    }
+    public class ErrorEventArgs : EventArgs {
+        public readonly JScriptException Error;
 
-    public class NewModuleEventArgs : EventArgs
-    {
-        public string Module { get; set; }
+        public ErrorEventArgs(JScriptException errorEx) {
+            Error = errorEx;
+        }
     }
 }

@@ -18,7 +18,7 @@ using System;
 using System.Collections.Generic;
 using System.Reflection;
 
-namespace Microsoft.Ajax.Utilities
+namespace Microsoft.NodejsTools.Parsing
 {
     public sealed class FunctionScope : ActivationObject
     {
@@ -26,8 +26,8 @@ namespace Microsoft.Ajax.Utilities
 
         private HashSet<ActivationObject> m_refScopes;
 
-        internal FunctionScope(ActivationObject parent, bool isExpression, CodeSettings settings, FunctionObject funcObj)
-            : base(parent, settings)
+        internal FunctionScope(ActivationObject parent, bool isExpression, FunctionObject funcObj, ErrorSink errorSink)
+            : base(parent, errorSink)
         {
             m_refScopes = new HashSet<ActivationObject>();
             if (isExpression)

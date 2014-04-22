@@ -14,32 +14,20 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-namespace Microsoft.Ajax.Utilities
+namespace Microsoft.NodejsTools.Parsing
 {
     public sealed class ThisLiteral : Expression
     {
 
-        public ThisLiteral(Context context, JSParser parser)
+        public ThisLiteral(TokenWithSpan context, JSParser parser)
             : base(context, parser)
         {
         }
 
-        public override void Accept(IVisitor visitor)
-        {
-            if (visitor != null)
-            {
-                visitor.Visit(this);
+        public override void Walk(AstVisitor visitor) {
+            if (visitor.Walk(this)) {
             }
-        }
-
-        public override bool IsEquivalentTo(AstNode otherNode)
-        {
-            var otherThis = otherNode as ThisLiteral;
-            
-            // this really assume we are comparing this operators from the same object scope.
-            // if you compare a this-literal from one function to a this-literal from another,
-            // it will pop positive -- but it won't actually be equivalent!
-            return otherThis != null;
+            visitor.PostWalk(this);
         }
     }
 }

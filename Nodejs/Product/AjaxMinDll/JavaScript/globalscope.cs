@@ -19,7 +19,7 @@ using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Reflection;
 
-namespace Microsoft.Ajax.Utilities
+namespace Microsoft.NodejsTools.Parsing
 {
     public sealed class GlobalScope : ActivationObject
     {
@@ -30,8 +30,8 @@ namespace Microsoft.Ajax.Utilities
 
         public ICollection<UndefinedReferenceException> UndefinedReferences { get { return m_undefined; } }
 
-        internal GlobalScope(CodeSettings settings)
-            : base(null, settings)
+        internal GlobalScope(ErrorSink errorSink)
+            : base(null, errorSink)
         {
             // define the Global object's properties, and methods
             m_globalProperties = new HashSet<string>(new[] { 
@@ -72,12 +72,6 @@ namespace Microsoft.Ajax.Utilities
                 // start off with any known globals
                 m_assumedGlobals = settings.KnownGlobalCollection == null ? new HashSet<string>() : new HashSet<string>(settings.KnownGlobalCollection);
 
-                // chek to see if there are any debug lookups
-                foreach (var debugLookup in settings.DebugLookupCollection)
-                {
-                    m_assumedGlobals.Add(debugLookup.SubstringUpToFirst('.'));
-                }
-
                 // and the root name of any resource strings is also an assumed global
                 foreach (var resourceStrings in settings.ResourceStrings)
                 {
@@ -91,18 +85,6 @@ namespace Microsoft.Ajax.Utilities
             {
                 // empty set
                 m_assumedGlobals = new HashSet<string>();
-            }
-        }
-
-        internal override void AutoRenameFields()
-        {
-            // don't crunch global values -- they might be referenced in other scripts
-            // within the page but outside this module.
-
-            // traverse through our children scopes
-            foreach (ActivationObject scope in ChildScopes)
-            {
-                scope.AutoRenameFields();
             }
         }
 

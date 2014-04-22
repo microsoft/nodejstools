@@ -1,0 +1,593 @@
+﻿/* ****************************************************************************
+ *
+ * Copyright (c) Microsoft Corporation. 
+ *
+ * This source code is subject to terms and conditions of the Apache License, Version 2.0. A 
+ * copy of the license can be found in the License.html file at the root of this distribution. If 
+ * you cannot locate the Apache License, Version 2.0, please send an email to 
+ * vspython@microsoft.com. By using this source code in any fashion, you are agreeing to be bound 
+ * by the terms of the Apache License, Version 2.0.
+ *
+ * You must not remove this notice, or any other, from this software.
+ *
+ * ***************************************************************************/
+
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Text;
+using System.Threading;
+using Microsoft.NodejsTools.Analysis.Analyzer;
+using Microsoft.NodejsTools.Interpreter;
+using Microsoft.NodejsTools.Parsing;
+
+
+namespace Microsoft.NodejsTools.Analysis.Values {
+#if FALSE
+    internal class DictionaryInfo : BuiltinInstanceInfo {
+        private SequenceInfo _keyValueTuple;
+        private readonly Node _node;
+        private VariableDef _keysVariable, _valuesVariable, _keyValueTupleVariable;
+
+        internal readonly DependentKeyValue _keysAndValues;
+        private readonly ProjectEntry _declaringModule;
+        private readonly int _declVersion;
+        private AnalysisValue _getMethod, _itemsMethod, _keysMethod, _valuesMethod, _iterKeysMethod, _iterValuesMethod, _popMethod, _popItemMethod, _iterItemsMethod, _updateMethod;
+
+        private ArrayInfo _keysList, _valuesList, _itemsList;
+        private IteratorInfo _keysIter, _valuesIter, _itemsIter;
+
+        private AnalysisUnit _unit;
+
+        public DictionaryInfo(ProjectEntry declaringModule, Node node)
+            : base(declaringModule.ProjectState.ClassInfos[BuiltinTypeId.Dict]) {
+            _keysAndValues = new DependentKeyValue();
+            _declaringModule = declaringModule;
+            _declVersion = declaringModule.AnalysisVersion;
+            _node = node;
+        }
+
+        private AnalysisUnit UpdateAnalysisUnit {
+            get {
+                return _unit = _unit ?? new UpdateItemsAnalysisUnit(this);
+            }
+        }
+
+        public override IEnumerable<KeyValuePair<IAnalysisSet, IAnalysisSet>> GetItems() {
+            foreach (var keyValue in _keysAndValues.KeyValueTypes) {
+                yield return new KeyValuePair<IAnalysisSet, IAnalysisSet>(
+                    keyValue.Key,
+                    keyValue.Value
+                );
+            }
+        }
+
+        public override IAnalysisSet GetIndex(Node node, AnalysisUnit unit, IAnalysisSet index) {
+            _keysAndValues.AddDependency(unit);
+            return _keysAndValues.GetValueType(index);
+        }
+
+        public override IAnalysisSet GetEnumeratorTypes(Node node, AnalysisUnit unit) {
+            _keysAndValues.AddDependency(unit);
+
+            return _keysAndValues.KeyTypes;
+        }
+
+        public override void SetIndex(Node node, AnalysisUnit unit, IAnalysisSet index, IAnalysisSet value) {
+            AddTypes(node, unit, index, value);
+        }
+
+        internal bool CopyFrom(DictionaryInfo other, bool enqueue = true) {
+            return _keysAndValues.CopyFrom(other._keysAndValues, enqueue);
+        }
+
+        internal bool AddTypes(Node node, AnalysisUnit unit, IAnalysisSet key, IAnalysisSet value, bool enqueue = true) {
+            if (_keysAndValues.AddTypes(unit, key, value, enqueue)) {
+                if (_keysVariable != null) {
+                    _keysVariable.MakeUnionStrongerIfMoreThan(ProjectState.Limits.DictKeyTypes, value);
+                    if (_keysVariable.AddTypes(unit, key, enqueue)) {
+                        if (_keysIter != null) {
+                            _keysIter.UnionType = null;
+                        }
+                        if (_keysList != null) {
+                            _keysList.UnionType = null;
+                        }
+                    }
+                }
+                if (_valuesVariable != null) {
+                    _valuesVariable.MakeUnionStrongerIfMoreThan(ProjectState.Limits.DictValueTypes, value);
+                    if (_valuesVariable.AddTypes(unit, value, enqueue)) {
+                        if (_valuesIter != null) {
+                            _valuesIter.UnionType = null;
+                        }
+                        if (_valuesList != null) {
+                            _valuesList.UnionType = null;
+                        }
+                    }
+                }
+                if (_keyValueTuple != null) {
+                    _keyValueTuple.IndexTypes[0].MakeUnionStrongerIfMoreThan(ProjectState.Limits.DictKeyTypes, key);
+                    _keyValueTuple.IndexTypes[1].MakeUnionStrongerIfMoreThan(ProjectState.Limits.DictValueTypes, value);
+                    _keyValueTuple.IndexTypes[0].AddTypes(unit, key, enqueue);
+                    _keyValueTuple.IndexTypes[1].AddTypes(unit, value, enqueue);
+                }
+                return true;
+            }
+            return false;
+        }
+
+        public override IAnalysisSet GetMember(Node node, AnalysisUnit unit, string name) {
+            // Must unconditionally call the base implementation of GetMember
+            var res = base.GetMember(node, unit, name);
+#if FALSE
+            switch (name) {
+                case "get":
+                    return _getMethod = _getMethod ?? new SpecializedCallable(
+                        res.OfType<BuiltinNamespace<IPythonType>>().FirstOrDefault(),
+                        DictionaryGet,
+                        false
+                    );
+                case "items":
+                    return _itemsMethod = _itemsMethod ?? new SpecializedCallable(
+                        res.OfType<BuiltinNamespace<IPythonType>>().FirstOrDefault(),
+                        unit.ProjectState.LanguageVersion.Is3x() ? (CallDelegate)DictionaryIterItems : DictionaryItems,
+                        false
+                    );
+                case "keys":
+                    return _keysMethod = _keysMethod ?? new SpecializedCallable(
+                        res.OfType<BuiltinNamespace<IPythonType>>().FirstOrDefault(),
+                        unit.ProjectState.LanguageVersion.Is3x() ? (CallDelegate)DictionaryIterKeys : DictionaryKeys,
+                        false
+                    );
+                case "values":
+                    return _valuesMethod = _valuesMethod ?? new SpecializedCallable(
+                        res.OfType<BuiltinNamespace<IPythonType>>().FirstOrDefault(),
+                        unit.ProjectState.LanguageVersion.Is3x() ? (CallDelegate)DictionaryIterValues : DictionaryValues,
+                        false
+                    );
+                case "pop":
+                    return _popMethod = _popMethod ?? new SpecializedCallable(
+                        res.OfType<BuiltinNamespace<IPythonType>>().FirstOrDefault(),
+                        DictionaryPop,
+                        false
+                    );
+                case "popitem":
+                    return _popItemMethod = _popItemMethod ?? new SpecializedCallable(
+                        res.OfType<BuiltinNamespace<IPythonType>>().FirstOrDefault(),
+                        DictionaryPopItem,
+                        false
+                    );
+                case "iterkeys":
+                    if (!unit.ProjectState.LanguageVersion.Is3x()) {
+                        return _iterKeysMethod = _iterKeysMethod ?? new SpecializedCallable(
+                            res.OfType<BuiltinNamespace<IPythonType>>().FirstOrDefault(),
+                            DictionaryIterKeys,
+                            false
+                        );
+                    }
+                    break;
+                case "itervalues":
+                    if (!unit.ProjectState.LanguageVersion.Is3x()) {
+                        return _iterValuesMethod = _iterValuesMethod ?? new SpecializedCallable(
+                            res.OfType<BuiltinNamespace<IPythonType>>().FirstOrDefault(),
+                            DictionaryIterValues,
+                            false
+                        );
+                    }
+                    break;
+                case "iteritems":
+                    if (!unit.ProjectState.LanguageVersion.Is3x()) {
+                        return _iterItemsMethod = _iterItemsMethod ?? new SpecializedCallable(
+                            res.OfType<BuiltinNamespace<IPythonType>>().FirstOrDefault(),
+                            DictionaryIterItems,
+                            false
+                        );
+                    }
+                    break;
+                case "update":
+                    return _updateMethod = _updateMethod ?? new SpecializedCallable(
+                        res.OfType<BuiltinNamespace<IPythonType>>().FirstOrDefault(),
+                        DictionaryUpdate,
+                        false
+                    );
+            }
+#endif
+            return res;
+        }
+
+        public override string ShortDescription {
+            get {
+                return "dict";
+            }
+        }
+
+        public override string Description {
+            get {
+                // dict({k : v})
+                AnalysisValue keyType = _keysAndValues.KeyTypes.GetUnionType();
+                string keyName = keyType == null ? null : keyType.ShortDescription;
+                AnalysisValue valueType = _keysAndValues.AllValueTypes.GetUnionType();
+                string valueName = valueType == null ? null : valueType.ShortDescription;
+
+                if (keyName != null || valueName != null) {
+                    return "dict({" +
+                        (keyName ?? "unknown") +
+                        " : " +
+                        (valueName ?? "unknown") +
+                        "})";
+                }
+
+                return "dict";
+            }
+        }
+
+        public override PythonMemberType MemberType {
+            get {
+                return PythonMemberType.Field;
+            }
+        }
+
+        public override IPythonProjectEntry DeclaringModule {
+            get {
+                return _declaringModule;
+            }
+        }
+
+        public override int DeclaringVersion {
+            get {
+                return _declVersion;
+            }
+        }
+
+        internal override AnalysisValue UnionMergeTypes(AnalysisValue ns, int strength) {
+            if (strength < MergeStrength.IgnoreIterableNode) {
+                return ClassInfo.Instance;
+            }
+            return base.UnionMergeTypes(ns, strength);
+        }
+
+        internal override int UnionHashCode(int strength) {
+            if (strength < MergeStrength.IgnoreIterableNode) {
+                return ClassInfo.Instance.UnionHashCode(strength);
+            }
+            return base.UnionHashCode(strength);
+        }
+
+        internal override bool UnionEquals(AnalysisValue ns, int strength) {
+            if (strength < MergeStrength.IgnoreIterableNode) {
+                if (ns == ProjectState.ClassInfos[BuiltinTypeId.Dict].Instance) {
+                    return true;
+                }
+                var ci = ns as ConstantInfo;
+                if (ci != null && ci.ClassInfo == ProjectState.ClassInfos[BuiltinTypeId.Dict]) {
+                    return true;
+                }
+                var di = ns as DictionaryInfo;
+                if (di != null) {
+                    return di._node.Equals(_node);
+                }
+                return false;
+            }
+            return base.UnionEquals(ns, strength);
+        }
+
+        /// <summary>
+        /// This is a special AnalysisUnit which just propagates changes from our DictionaryInfo
+        /// into our KeysAndValues tuple.  Once we've created the key/values tuple we make this
+        /// analysis unit dependent upon the dictionary infos key/values.  Therefore whenever 
+        /// those keys/values change we'll run this AnalysisUnit which will then copy the new
+        /// values to our keys/values tuple which will then enqueue any items dependent upon
+        /// them.
+        /// </summary>
+        class UpdateItemsAnalysisUnit : AnalysisUnit {
+            private readonly DictionaryInfo _dictInfo;
+
+            public UpdateItemsAnalysisUnit(DictionaryInfo dictInfo)
+                : base(null, ((ProjectEntry)dictInfo.DeclaringModule).MyScope.Scope) {
+                _dictInfo = dictInfo;
+            }
+
+            internal override void AnalyzeWorker(DDG ddg, CancellationToken cancel) {
+                if (_dictInfo._keyValueTuple != null) {
+                    if (_dictInfo._keysAndValues.CopyKeysTo(_dictInfo._keyValueTuple.IndexTypes[0]) |
+                        _dictInfo._keysAndValues.CopyValuesTo(_dictInfo._keyValueTuple.IndexTypes[1])) {
+                        _dictInfo._keyValueTuple.UnionType = null;
+                    }
+                }
+
+                bool updatedKeys = false, updatedValues = false;
+                if (_dictInfo._keysVariable != null) {
+                    updatedKeys |= _dictInfo._keysAndValues.CopyKeysTo(_dictInfo._keysVariable);
+                }
+                if (_dictInfo._valuesVariable != null) {
+                    updatedValues |= _dictInfo._keysAndValues.CopyValuesTo(_dictInfo._valuesVariable);
+                }
+
+                if (updatedKeys) {
+                    if (_dictInfo._keysIter != null) {
+                        _dictInfo._keysIter.UnionType = null;
+                    }
+                    if (_dictInfo._keysList != null) {
+                        _dictInfo._keysList.UnionType = null;
+                    }
+                }
+
+                if (updatedValues) {
+                    if (_dictInfo._valuesIter != null) {
+                        _dictInfo._valuesIter.UnionType = null;
+                    }
+                    if (_dictInfo._valuesList != null) {
+                        _dictInfo._valuesList.UnionType = null;
+                    }
+                }
+            }
+        }
+
+        /// <summary>
+        /// Gets a type which represents the tuple of (keyTypes, valueTypes)
+        /// </summary>
+        private SequenceInfo KeyValueTuple {
+            get {
+                if (_keyValueTuple == null) {
+                    var keysDef = new VariableDef();
+                    var valuesDef = new VariableDef();
+
+                    _keysAndValues.CopyKeysTo(keysDef);
+                    _keysAndValues.CopyValuesTo(valuesDef);
+
+                    _keyValueTuple = new SequenceInfo(
+                        new[] { keysDef, valuesDef },
+                        ProjectState.ClassInfos[BuiltinTypeId.Tuple],
+                        _node,
+                        _declaringModule
+                    );
+                    _keysAndValues.AddDependency(UpdateAnalysisUnit);
+                }
+                return _keyValueTuple;
+            }
+        }
+
+        private VariableDef KeyValueTupleVariable {
+            get {
+                if (_keyValueTupleVariable == null) {
+                    _keyValueTupleVariable = new VariableDef();
+                    _keyValueTupleVariable.AddTypes(DeclaringModule, KeyValueTuple.SelfSet);
+                }
+                return _keyValueTupleVariable;
+            }
+        }
+
+        private VariableDef KeysVariable {
+            get {
+                if (_keysVariable == null) {
+                    _keysVariable = new VariableDef();
+                    _keysAndValues.CopyKeysTo(_keysVariable);
+                    _keysAndValues.AddDependency(UpdateAnalysisUnit);
+                }
+                return _keysVariable;
+            }
+        }
+
+        private VariableDef ValuesVariable {
+            get {
+                if (_valuesVariable == null) {
+                    _valuesVariable = new VariableDef();
+                    _keysAndValues.CopyValuesTo(_valuesVariable);
+                    _keysAndValues.AddDependency(UpdateAnalysisUnit);
+                }
+                return _valuesVariable;
+            }
+        }
+
+        #region Specialized functions
+
+        private IAnalysisSet DictionaryUpdate(Node node, Analysis.AnalysisUnit unit, IAnalysisSet[] args) {
+            if (args.Length >= 1) {
+                foreach (var otherDict in args[0].OfType<DictionaryInfo>()) {
+                    if (!Object.ReferenceEquals(otherDict, this)) {
+                        _keysAndValues.CopyFrom(otherDict._keysAndValues);
+                    }
+                }
+            }
+            // TODO: Process keyword args and add those values to our dictionary, plus a string key
+
+            return AnalysisSet.Empty;
+        }
+
+        private IAnalysisSet DictionaryPopItem(Node node, Analysis.AnalysisUnit unit, IAnalysisSet[] args) {
+            _keysAndValues.AddDependency(unit);
+
+            return KeyValueTuple;
+        }
+
+        private IAnalysisSet DictionaryPop(Node node, Analysis.AnalysisUnit unit, IAnalysisSet[] args) {
+            _keysAndValues.AddDependency(unit);
+
+            return _keysAndValues.AllValueTypes;
+        }
+
+        private IAnalysisSet DictionaryItems(Node node, Analysis.AnalysisUnit unit, IAnalysisSet[] args) {
+            _keysAndValues.AddDependency(unit);
+
+            if (_itemsList == null) {
+                _itemsList = new ArrayInfo(
+                    new[] { KeyValueTupleVariable },
+                    unit.ProjectState.ClassInfos[BuiltinTypeId.Array],
+                    node,
+                    unit.ProjectEntry
+                );
+            }
+
+            return _itemsList;
+        }
+
+        private IAnalysisSet DictionaryIterItems(Node node, Analysis.AnalysisUnit unit, IAnalysisSet[] args) {
+            _keysAndValues.AddDependency(unit);
+
+            if (_itemsIter == null) {
+                _itemsIter = new IteratorInfo(
+                    new[] { KeyValueTupleVariable },
+                    unit.ProjectState.ClassInfos[BuiltinTypeId.DictItems],
+                    node
+                );
+            }
+            return _itemsIter;
+        }
+
+        private IAnalysisSet DictionaryKeys(Node node, Analysis.AnalysisUnit unit, IAnalysisSet[] args) {
+            _keysAndValues.AddDependency(unit);
+
+            if (_keysList == null) {
+                _keysList = new ArrayInfo(
+                    new[] { KeysVariable },
+                    unit.ProjectState.ClassInfos[BuiltinTypeId.Array],
+                    node,
+                    unit.ProjectEntry
+                );
+            }
+            return _keysList;
+        }
+
+        private IAnalysisSet DictionaryIterKeys(Node node, Analysis.AnalysisUnit unit, IAnalysisSet[] args) {
+            _keysAndValues.AddDependency(unit);
+
+            if (_keysIter == null) {
+                _keysIter = new IteratorInfo(
+                    new[] { KeysVariable },
+                    unit.ProjectState.ClassInfos[BuiltinTypeId.DictKeys],
+                    node
+                );
+            }
+            return _keysIter;
+        }
+
+        private IAnalysisSet DictionaryValues(Node node, Analysis.AnalysisUnit unit, IAnalysisSet[] args) {
+            _keysAndValues.AddDependency(unit);
+
+            if (_valuesList == null) {
+                _valuesList = new ArrayInfo(
+                    new[] { ValuesVariable },
+                    unit.ProjectState.ClassInfos[BuiltinTypeId.Array],
+                    node,
+                    unit.ProjectEntry
+                );
+            }
+            return _valuesList;
+        }
+
+        private IAnalysisSet DictionaryIterValues(Node node, Analysis.AnalysisUnit unit, IAnalysisSet[] args) {
+            _keysAndValues.AddDependency(unit);
+
+            if (_valuesIter == null) {
+                _valuesIter = new IteratorInfo(
+                    new[] { ValuesVariable },
+                    unit.ProjectState.ClassInfos[BuiltinTypeId.DictValues],
+                    node
+                );
+            }
+            return _valuesIter;
+        }
+
+        private IAnalysisSet DictionaryGet(Node node, Analysis.AnalysisUnit unit, IAnalysisSet[] args) {
+            _keysAndValues.AddDependency(unit);
+
+            if (args.Length == 1) {
+                return _keysAndValues.GetValueType(args[0]);
+            } else if (args.Length >= 2) {
+                return _keysAndValues.GetValueType(args[0]).Union(args[1]);
+            }
+
+            return AnalysisSet.Empty;
+        }
+
+
+        #endregion
+
+        static bool _makingString = false;
+        public override string ToString() {
+            if (_makingString) {
+                return "dict(...)";
+            } else if (_keysAndValues.KeyTypes.Count == 0 && _keysAndValues.AllValueTypes.Count == 0) {
+                return "dict()";
+            }
+            _makingString = true;
+            try {
+                StringBuilder sb = new StringBuilder();
+                sb.Append("dict(keys=(");
+                foreach (var type in _keysAndValues.KeyTypes) {
+                    if (type.Push()) {
+                        try {
+                            sb.Append(type.ToString());
+                            sb.Append(", ");
+                        } finally {
+                            type.Pop();
+                        }
+                    }
+                }
+                sb.Append("), values = (");
+                foreach (var type in _keysAndValues.AllValueTypes) {
+                    if (type.Push()) {
+                        try {
+                            sb.Append(type.ToString());
+                            sb.Append(", ");
+                        } finally {
+                            type.Pop();
+                        }
+                    }
+                }
+                sb.Append(")");
+                return sb.ToString();
+            } finally {
+                _makingString = false;
+            }
+        }
+    }
+
+    internal class StarArgsDictionaryInfo : DictionaryInfo {
+        public StarArgsDictionaryInfo(ProjectEntry declaringModule, Node node)
+            : base(declaringModule, node) { }
+
+
+        internal int TypesCount {
+            get {
+                return _keysAndValues.AllValueTypes.Count;
+            }
+        }
+
+        internal void MakeUnionStronger() {
+            foreach (var dep in _keysAndValues._dependencies.Values) {
+                dep.MakeUnionStronger();
+            }
+        }
+
+        internal void MakeUnionStrongerIfMoreThan(int typeCount, IAnalysisSet extraTypes = null) {
+            if (_keysAndValues.AllValueTypes.Count + (extraTypes ?? AnalysisSet.Empty).Count >= typeCount) {
+                foreach (var dep in _keysAndValues._dependencies.Values) {
+                    dep.MakeUnionStronger();
+                }
+            }
+        }
+    }
+#if FALSE
+    /// <summary>
+    /// Represents a **args parameter for a function definition.  Holds onto a DictionaryInfo
+    /// which includes all of the types passed in via splatting or unused keyword arguments.
+    /// </summary>
+    sealed class DictParameterVariableDef : LocatedVariableDef {
+        public readonly StarArgsDictionaryInfo Dict;
+
+        public DictParameterVariableDef(AnalysisUnit unit, Node location)
+            : base(unit.DeclaringModule.ProjectEntry, location) {
+            Dict = new StarArgsDictionaryInfo(unit.ProjectEntry, location);
+            AddTypes(unit, Dict);
+        }
+
+        public DictParameterVariableDef(AnalysisUnit unit, Node location, VariableDef copy)
+            : base(unit.DeclaringModule.ProjectEntry, location, copy) {
+            Dict = new StarArgsDictionaryInfo(unit.ProjectEntry, location);
+            AddTypes(unit, Dict);
+        }
+    }
+#endif
+#endif
+}

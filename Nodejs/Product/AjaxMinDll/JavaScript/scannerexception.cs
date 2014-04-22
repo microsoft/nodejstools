@@ -19,8 +19,9 @@ using System.Globalization;
 using System.Runtime.Serialization;
 using System.Security;
 using System.Security.Permissions;
+using Microsoft.Ajax.Utilities;
 
-namespace Microsoft.Ajax.Utilities
+namespace Microsoft.NodejsTools.Parsing
 {
 #if !SILVERLIGHT
     [Serializable]

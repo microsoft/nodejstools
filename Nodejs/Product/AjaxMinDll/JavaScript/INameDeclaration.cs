@@ -20,14 +20,14 @@ using System.Globalization;
 using System.Reflection;
 using System.Text;
 
-namespace Microsoft.Ajax.Utilities
+namespace Microsoft.NodejsTools.Parsing
 {
     public interface INameDeclaration
     {
         string Name { get; }
-        Context NameContext { get; }
-        AstNode Parent { get; }
-        AstNode Initializer { get; }
+        TokenWithSpan NameContext { get; }
+        Node Parent { get; }
+        Expression Initializer { get; }
         bool RenameNotAllowed { get; }
         JSVariableField VariableField { get; set; }
     }

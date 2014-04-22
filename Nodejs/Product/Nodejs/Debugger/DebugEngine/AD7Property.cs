@@ -114,7 +114,7 @@ namespace Microsoft.NodejsTools.Debugger.DebugEngine {
                 .WaitAsync(timeout, tokenSource.Token).Result;
 
             DEBUG_PROPERTY_INFO[] properties;
-            if (children == null || children.Count == 0) {
+            if (children.Count == 0) {
                 properties = new[] { new DEBUG_PROPERTY_INFO { dwFields = enum_DEBUGPROP_INFO_FLAGS.DEBUGPROP_INFO_NAME, bstrValue = "No children" } };
             } else {
                 properties = new DEBUG_PROPERTY_INFO[children.Count];
@@ -156,14 +156,7 @@ namespace Microsoft.NodejsTools.Debugger.DebugEngine {
             pceltFetched = buflen;
 
             NodeEvaluationResult result = _evaluationResult.Frame.ExecuteTextAsync(_evaluationResult.FullName).Result;
-            if (result != null && result.StringValue != null) {
-                result.StringValue.ToCharArray().CopyTo(rgString, 0);
-            } else {
-                if (rgString.Length > 0) {
-                    rgString[0] = 0;
-                }
-                pceltFetched = 0;
-            }
+            result.StringValue.ToCharArray().CopyTo(rgString, 0);
 
             return VSConstants.S_OK;
         }

@@ -14,7 +14,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-namespace Microsoft.Ajax.Utilities
+namespace Microsoft.NodejsTools.Parsing
 {
 
     public enum JSToken : int
@@ -41,17 +41,6 @@ namespace Microsoft.Ajax.Utilities
         Try,
         Function,
         Else,
-        ConditionalCommentStart,        // /*@ or //@
-        ConditionalCommentEnd,          // @*/ or EOL
-        ConditionalCompilationOn,       // @cc_on
-        ConditionalCompilationSet,      // @set
-        ConditionalCompilationIf,       // @if
-        ConditionalCompilationElseIf,   // @elif
-        ConditionalCompilationElse,     // @else
-        ConditionalCompilationEnd,      // @end
-        ConditionalCompilationVariable,           // entity defined defined during preprocessing
-
-        AspNetBlock,
 
         // used by both statement and expression switches
 
@@ -139,7 +128,6 @@ namespace Microsoft.Ajax.Utilities
         SingleLineComment,              // for authoring
         MultipleLineComment,            // for authoring
         UnterminatedComment,            // for authoring
-        PreprocessorDirective,
 
         // reserved words
         Class,
@@ -160,9 +148,6 @@ namespace Microsoft.Ajax.Utilities
         Public,
         Static,
         Yield,
-
-        // browser-specific don't uses
-        Native, // Chrome
 
         // always okay for identifiers
         Get,

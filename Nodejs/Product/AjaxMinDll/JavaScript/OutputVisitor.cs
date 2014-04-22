@@ -22,10 +22,11 @@ using System.IO;
 using System.Text;
 using System.Text.RegularExpressions;
 
-namespace Microsoft.Ajax.Utilities
+namespace Microsoft.NodejsTools.Parsing
 {
+#if FALSE
     [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Maintainability", "CA1506:AvoidExcessiveClassCoupling")]
-    public class OutputVisitor : IVisitor
+    public class OutputVisitor : AstVisitor
     {
         private TextWriter m_outputStream;
 
@@ -75,7 +76,7 @@ namespace Microsoft.Ajax.Utilities
             m_onNewLine = true;
         }
 
-        public static void Apply(TextWriter writer, AstNode node, CodeSettings settings)
+        public static void Apply(TextWriter writer, Node node, CodeSettings settings)
         {
             if (node != null)
             {
@@ -86,7 +87,7 @@ namespace Microsoft.Ajax.Utilities
 
         #region IVisitor Members
 
-        public void Visit(ArrayLiteral node)
+        public override void Visit(ArrayLiteral node)
         {
             var isNoIn = m_noIn;
             m_noIn = false;
@@ -104,7 +105,7 @@ namespace Microsoft.Ajax.Utilities
                 {
                     Indent();
 
-                    AstNode element = null;
+                    Node element = null;
                     for (var ndx = 0; ndx < node.Elements.Count; ++ndx)
                     {
                         if (ndx > 0)
@@ -137,18 +138,7 @@ namespace Microsoft.Ajax.Utilities
             m_noIn = isNoIn;
         }
 
-        public void Visit(AspNetBlockNode node)
-        {
-            if (node != null)
-            {
-                Output(node.AspNetBlockText);
-                MarkSegment(node, null, node.Context);
-
-                m_startOfStatement = false;
-            }
-        }
-
-        public void Visit(AstNodeList node)
+        public override void Visit(AstNodeList node)
         {
             if (node != null && node.Count > 0)
             {
@@ -205,198 +195,191 @@ namespace Microsoft.Ajax.Utilities
             }
         }
 
+        public override void Visit(CommaOperator node)
+        {
+            if (node != null)
+            {
+                for (int i = 0; i < node.Expressions.Length; i++)  {
+                    var child = node.Expressions[i];
+                    if (child == null)
+                    {
+                        continue;
+                    }
+                    child.Accept(this);
+                    if (i != node.Expressions.Length - 1) { 
+                        OutputPossibleLineBreak(',');
+                        MarkSegment(node, null, child.TerminatingContext);
+                        m_startOfStatement = false;
+                        // if the parent is a block, then the comma operator is separating
+                        // expression statements -- so break it on the line
+                        if (node.Parent is Block)
+                        {
+                            NewLine();
+                        }
+                        else if (Settings.OutputMode == OutputMode.MultipleLines)
+                        {
+                            OutputPossibleLineBreak(' ');
+                        }
+                    }
+                }
+            }
+        }
+
         [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Maintainability", "CA1502:AvoidExcessiveComplexity")]
-        public void Visit(BinaryOperator node)
+        public override void Visit(BinaryOperator node)
         {
             if (node != null)
             {
                 var symbol = StartSymbol(node);
 
-                if (node.OperatorToken == JSToken.Comma)
+                var ourPrecedence = node.Precedence;
+                var isNoIn = m_noIn;
+                if (isNoIn)
                 {
-                    // output the left-hand operand, if we have one
-                    if (node.Operand1 != null)
+                    if (node.OperatorToken == JSToken.In)
                     {
-                        node.Operand1.Accept(this);
+                        // we're in a no-in situation, but our operator is an in-operator.
+                        // so we need to wrap this operator in parens
+                        OutputPossibleLineBreak('(');
+                        m_noIn = false;
+                    }
+                    else
+                    {
+                        m_noIn = ourPrecedence <= OperatorPrecedence.Relational;
+                    }
+                }
 
-                        // if we don't have a right-hand operator, don't bother with the comma
-                        if (node.Operand2 != null)
-                        {
-                            OutputPossibleLineBreak(',');
-                            MarkSegment(node, null, node.Operand1.TerminatingContext);
-                            m_startOfStatement = false;
+                if (node.Operand1 != null)
+                {
+                    AcceptNodeWithParens(node.Operand1, node.Operand1.Precedence < ourPrecedence);
+                }
 
-                            // if the parent is a block, then the comma operator is separating
-                            // expression statements -- so break it on the line
-                            if (node.Parent is Block)
-                            {
-                                NewLine();
-                            }
-                            else if (Settings.OutputMode == OutputMode.MultipleLines)
-                            {
-                                OutputPossibleLineBreak(' ');
-                            }
-                        }
+                m_startOfStatement = false;
+
+                if (Settings.OutputMode == OutputMode.MultipleLines)
+                {
+                    // treat the comma-operator special, since we combine expression statements
+                    // with it very often
+                    if (node.OperatorToken != JSToken.Comma)
+                    {
+                        // anything other than a comma operator has a space before it, too
+                        OutputPossibleLineBreak(' ');
                     }
 
-                    // output the right-hand operator, if we have one
-                    if (node.Operand2 != null)
+                    Output(OperatorString(node.OperatorToken));
+                    MarkSegment(node, null, node.OperatorContext);
+
+                    BreakLine(false);
+                    if (!m_onNewLine)
                     {
-                        node.Operand2.Accept(this);
-                        m_startOfStatement = false;
+                        OutputPossibleLineBreak(' ');
                     }
                 }
                 else
                 {
-                    var ourPrecedence = node.Precedence;
-                    var isNoIn = m_noIn;
-                    if (isNoIn)
+                    Output(OperatorString(node.OperatorToken));
+                    MarkSegment(node, null, node.OperatorContext);
+                    BreakLine(false);
+                }
+
+                if (node.OperatorToken == JSToken.Divide)
+                {
+                    // add a function that will check if the next character is also
+                    // a forward slash. If it is, the output methods will separate them
+                    // with a space so they don't get interpreted as the start of a
+                    // single-line comment.
+                    m_addSpaceIfTrue = c => c == '/';
+                }
+
+                if (node.Operand2 != null)
+                {
+                    var rightPrecedence = node.Operand2.Precedence;
+                    var rightNeedsParens = rightPrecedence < ourPrecedence;
+
+                    var rightHandBinary = node.Operand2 as BinaryOperator;
+                    if (rightHandBinary != null)
                     {
-                        if (node.OperatorToken == JSToken.In)
+                        // they are BOTH binary expressions. This is where it gets complicated.
+                        // because most binary tokens (except assignment) are evaluated from left to right,
+                        // if we have a binary expression with the same precedence on the RIGHT, then that means the
+                        // developer must've put parentheses around it. For some operators, those parentheses 
+                        // may not be needed (associative operators like multiply and logical AND or logical OR).
+                        // Non-associative operators (divide) will need those parens, so we will want to say they
+                        // are a higher relative precedence because of those parentheses.
+                        // The plus operator is a special case. It is the same physical token, but it can be two
+                        // operations depending on the runtime data: numeric addition or string concatenation.
+                        // Because of that ambiguity, let's also calculate the precedence for it as if it were
+                        // non-associate as well.
+                        // commas never need the parens -- they always evaluate left to right and always return the
+                        // right value, so any parens will always be unneccessary.
+                        if (ourPrecedence == rightPrecedence
+                            && ourPrecedence != OperatorPrecedence.Assignment
+                            && ourPrecedence != OperatorPrecedence.Comma)
                         {
-                            // we're in a no-in situation, but our operator is an in-operator.
-                            // so we need to wrap this operator in parens
-                            OutputPossibleLineBreak('(');
-                            m_noIn = false;
-                        }
-                        else
-                        {
-                            m_noIn = ourPrecedence <= OperatorPrecedence.Relational;
-                        }
-                    }
-
-                    if (node.Operand1 != null)
-                    {
-                        AcceptNodeWithParens(node.Operand1, node.Operand1.Precedence < ourPrecedence);
-                    }
-
-                    m_startOfStatement = false;
-
-                    if (Settings.OutputMode == OutputMode.MultipleLines)
-                    {
-                        // treat the comma-operator special, since we combine expression statements
-                        // with it very often
-                        if (node.OperatorToken != JSToken.Comma)
-                        {
-                            // anything other than a comma operator has a space before it, too
-                            OutputPossibleLineBreak(' ');
-                        }
-
-                        Output(OperatorString(node.OperatorToken));
-                        MarkSegment(node, null, node.OperatorContext);
-
-                        BreakLine(false);
-                        if (!m_onNewLine)
-                        {
-                            OutputPossibleLineBreak(' ');
-                        }
-                    }
-                    else
-                    {
-                        Output(OperatorString(node.OperatorToken));
-                        MarkSegment(node, null, node.OperatorContext);
-                        BreakLine(false);
-                    }
-
-                    if (node.OperatorToken == JSToken.Divide)
-                    {
-                        // add a function that will check if the next character is also
-                        // a forward slash. If it is, the output methods will separate them
-                        // with a space so they don't get interpreted as the start of a
-                        // single-line comment.
-                        m_addSpaceIfTrue = c => c == '/';
-                    }
-
-                    if (node.Operand2 != null)
-                    {
-                        var rightPrecedence = node.Operand2.Precedence;
-                        var rightNeedsParens = rightPrecedence < ourPrecedence;
-
-                        var rightHandBinary = node.Operand2 as BinaryOperator;
-                        if (rightHandBinary != null)
-                        {
-                            // they are BOTH binary expressions. This is where it gets complicated.
-                            // because most binary tokens (except assignment) are evaluated from left to right,
-                            // if we have a binary expression with the same precedence on the RIGHT, then that means the
-                            // developer must've put parentheses around it. For some operators, those parentheses 
-                            // may not be needed (associative operators like multiply and logical AND or logical OR).
-                            // Non-associative operators (divide) will need those parens, so we will want to say they
-                            // are a higher relative precedence because of those parentheses.
-                            // The plus operator is a special case. It is the same physical token, but it can be two
-                            // operations depending on the runtime data: numeric addition or string concatenation.
-                            // Because of that ambiguity, let's also calculate the precedence for it as if it were
-                            // non-associate as well.
-                            // commas never need the parens -- they always evaluate left to right and always return the
-                            // right value, so any parens will always be unneccessary.
-                            if (ourPrecedence == rightPrecedence
-                                && ourPrecedence != OperatorPrecedence.Assignment
-                                && ourPrecedence != OperatorPrecedence.Comma)
+                            if (node.OperatorToken == rightHandBinary.OperatorToken)
                             {
-                                if (node.OperatorToken == rightHandBinary.OperatorToken)
+                                // the tokens are the same and we're not assignment or comma operators.
+                                // so for a few associative operators, we're going to say the relative precedence
+                                // is the same so unneeded parens are removed. But for all others, we'll say the
+                                // right-hand side is a higher precedence so we maintain the sematic structure
+                                // of the expression
+                                switch (node.OperatorToken)
                                 {
-                                    // the tokens are the same and we're not assignment or comma operators.
-                                    // so for a few associative operators, we're going to say the relative precedence
-                                    // is the same so unneeded parens are removed. But for all others, we'll say the
-                                    // right-hand side is a higher precedence so we maintain the sematic structure
-                                    // of the expression
-                                    switch (node.OperatorToken)
-                                    {
-                                        case JSToken.Multiply:
-                                        case JSToken.BitwiseAnd:
-                                        case JSToken.BitwiseXor:
-                                        case JSToken.BitwiseOr:
-                                        case JSToken.LogicalAnd:
-                                        case JSToken.LogicalOr:
-                                            // these are the same regardless
-                                            rightNeedsParens = false;
-                                            break;
+                                    case JSToken.Multiply:
+                                    case JSToken.BitwiseAnd:
+                                    case JSToken.BitwiseXor:
+                                    case JSToken.BitwiseOr:
+                                    case JSToken.LogicalAnd:
+                                    case JSToken.LogicalOr:
+                                        // these are the same regardless
+                                        rightNeedsParens = false;
+                                        break;
 
-                                        // TODO: the plus operator: if we can prove that it is a numeric operator
-                                        // or a string operator on BOTH sides, then it can be associative, too. But
-                                        // if one side is a string and the other numeric, or if we can't tell at 
-                                        // compile-time, then we need to preserve the structural precedence.
-                                        default:
-                                            // all other operators are structurally a lower precedence when they
-                                            // are on the right, so they need to be evaluated first
-                                            rightNeedsParens = true;
-                                            break;
-                                    }
-                                }
-                                else
-                                {
-                                    // they have the same precedence, but the tokens are different.
-                                    // and the developer had purposely put parens around the right-hand side
-                                    // to get them on the right (otherwise with the same precedence they
-                                    // would've ended up on the left. Keep the parens; must've been done for
-                                    // a purpose.
-                                    rightNeedsParens = true;
+                                    // TODO: the plus operator: if we can prove that it is a numeric operator
+                                    // or a string operator on BOTH sides, then it can be associative, too. But
+                                    // if one side is a string and the other numeric, or if we can't tell at 
+                                    // compile-time, then we need to preserve the structural precedence.
+                                    default:
+                                        // all other operators are structurally a lower precedence when they
+                                        // are on the right, so they need to be evaluated first
+                                        rightNeedsParens = true;
+                                        break;
                                 }
                             }
                             else
                             {
-                                // different precedence -- just base the decision on the relative precedence values
-                                rightNeedsParens = rightPrecedence < ourPrecedence;
+                                // they have the same precedence, but the tokens are different.
+                                // and the developer had purposely put parens around the right-hand side
+                                // to get them on the right (otherwise with the same precedence they
+                                // would've ended up on the left. Keep the parens; must've been done for
+                                // a purpose.
+                                rightNeedsParens = true;
                             }
                         }
-
-                        m_noIn = isNoIn && ourPrecedence <= OperatorPrecedence.Relational;
-                        AcceptNodeWithParens(node.Operand2, rightNeedsParens);
+                        else
+                        {
+                            // different precedence -- just base the decision on the relative precedence values
+                            rightNeedsParens = rightPrecedence < ourPrecedence;
+                        }
                     }
 
-                    if (isNoIn && node.OperatorToken == JSToken.In)
-                    {
-                        // we're in a no-in situation, but our operator is an in-operator.
-                        // so we need to wrap this entire operator in parens
-                        OutputPossibleLineBreak(')');
-                    }
-                    m_noIn = isNoIn;
-
-                    EndSymbol(symbol);
+                    m_noIn = isNoIn && ourPrecedence <= OperatorPrecedence.Relational;
+                    AcceptNodeWithParens(node.Operand2, rightNeedsParens);
                 }
+
+                if (isNoIn && node.OperatorToken == JSToken.In)
+                {
+                    // we're in a no-in situation, but our operator is an in-operator.
+                    // so we need to wrap this entire operator in parens
+                    OutputPossibleLineBreak(')');
+                }
+                m_noIn = isNoIn;
+
+                EndSymbol(symbol);
             }
         }
 
-        public void Visit(Block node)
+        public override void Visit(Block node)
         {
             if (node != null)
             {
@@ -429,7 +412,7 @@ namespace Microsoft.Ajax.Utilities
                     m_needsStrictDirective = node.EnclosingScope.UseStrict && !m_doneWithGlobalDirectives;
                 }
 
-                AstNode prevStatement = null;
+                Node prevStatement = null;
                 for (var ndx = 0; ndx < node.Count; ++ndx)
                 {
                     var statement = node[ndx];
@@ -490,7 +473,7 @@ namespace Microsoft.Ajax.Utilities
             }
         }
 
-        public void Visit(Break node)
+        public override void Visit(Break node)
         {
             if (node != null)
             {
@@ -523,7 +506,7 @@ namespace Microsoft.Ajax.Utilities
             }
         }
 
-        public void Visit(CallNode node)
+        public override void Visit(CallNode node)
         {
             if (node != null)
             {
@@ -583,7 +566,7 @@ namespace Microsoft.Ajax.Utilities
                     OutputPossibleLineBreak(node.InBrackets ? '[' : '(');
                     MarkSegment(node, null, node.Arguments.Context);
 
-                    AstNode argument = null;
+                    Node argument = null;
                     for (var ndx = 0; ndx < node.Arguments.Count; ++ndx)
                     {
                         if (ndx > 0)
@@ -614,7 +597,7 @@ namespace Microsoft.Ajax.Utilities
             }
         }
 
-        public void Visit(ConditionalCompilationComment node)
+        public override void Visit(ConditionalCompilationComment node)
         {
             if (node != null)
             {
@@ -660,7 +643,7 @@ namespace Microsoft.Ajax.Utilities
                     }
 
                     // go through the rest of the statements (if any)
-                    AstNode prevStatement = statement;
+                    Node prevStatement = statement;
                     while (++ndx < node.Statements.Count)
                     {
                         statement = node.Statements[ndx];
@@ -688,7 +671,7 @@ namespace Microsoft.Ajax.Utilities
             }
         }
 
-        public void Visit(ConditionalCompilationElse node)
+        public override void Visit(ConditionalCompilationElse node)
         {
             if (node != null)
             {
@@ -701,7 +684,7 @@ namespace Microsoft.Ajax.Utilities
             }
         }
 
-        public void Visit(ConditionalCompilationElseIf node)
+        public override void Visit(ConditionalCompilationElseIf node)
         {
             if (node != null)
             {
@@ -720,7 +703,7 @@ namespace Microsoft.Ajax.Utilities
             }
         }
 
-        public void Visit(ConditionalCompilationEnd node)
+        public override void Visit(ConditionalCompilationEnd node)
         {
             if (node != null)
             {
@@ -731,7 +714,7 @@ namespace Microsoft.Ajax.Utilities
             }
         }
 
-        public void Visit(ConditionalCompilationIf node)
+        public override void Visit(ConditionalCompilationIf node)
         {
             if (node != null)
             {
@@ -749,7 +732,7 @@ namespace Microsoft.Ajax.Utilities
             }
         }
 
-        public void Visit(ConditionalCompilationOn node)
+        public override void Visit(ConditionalCompilationOn node)
         {
             if (node != null)
             {
@@ -766,7 +749,7 @@ namespace Microsoft.Ajax.Utilities
             }
         }
 
-        public void Visit(ConditionalCompilationSet node)
+        public override void Visit(ConditionalCompilationSet node)
         {
             if (node != null)
             {
@@ -796,7 +779,7 @@ namespace Microsoft.Ajax.Utilities
             }
         }
 
-        public void Visit(Conditional node)
+        public override void Visit(Conditional node)
         {
             if (node != null)
             {
@@ -862,7 +845,7 @@ namespace Microsoft.Ajax.Utilities
             }
         }
 
-        public void Visit(ConstantWrapper node)
+        public override void Visit(ConstantWrapper node)
         {
             if (node != null)
             {
@@ -935,7 +918,7 @@ namespace Microsoft.Ajax.Utilities
             }
         }
 
-        public void Visit(ConstantWrapperPP node)
+        public override void Visit(ConstantWrapperPP node)
         {
             if (node != null)
             {
@@ -959,7 +942,7 @@ namespace Microsoft.Ajax.Utilities
             }
         }
 
-        public void Visit(ConstStatement node)
+        public override void Visit(ConstStatement node)
         {
             if (node != null)
             {
@@ -988,7 +971,7 @@ namespace Microsoft.Ajax.Utilities
             }
         }
 
-        public void Visit(ContinueNode node)
+        public override void Visit(ContinueNode node)
         {
             if (node != null)
             {
@@ -1020,7 +1003,7 @@ namespace Microsoft.Ajax.Utilities
             }
         }
 
-        public void Visit(CustomNode node)
+        public override void Visit(CustomNode node)
         {
             if (node != null)
             {
@@ -1038,7 +1021,7 @@ namespace Microsoft.Ajax.Utilities
             }
         }
 
-        public void Visit(DebuggerNode node)
+        public override void Visit(DebuggerNode node)
         {
             if (node != null)
             {
@@ -1050,7 +1033,7 @@ namespace Microsoft.Ajax.Utilities
             }
         }
 
-        public void Visit(DirectivePrologue node)
+        public override void Visit(DirectivePrologue node)
         {
             if (node != null)
             {
@@ -1069,7 +1052,7 @@ namespace Microsoft.Ajax.Utilities
             }
         }
 
-        public void Visit(DoWhile node)
+        public override void Visit(DoWhile node)
         {
             if (node != null)
             {
@@ -1151,7 +1134,7 @@ namespace Microsoft.Ajax.Utilities
             }
         }
 
-        public void Visit(EmptyStatement node)
+        public override void Visit(EmptyStatement node)
         {
             if (node != null)
             {
@@ -1161,7 +1144,7 @@ namespace Microsoft.Ajax.Utilities
             }
         }
 
-        public void Visit(ForIn node)
+        public override void Visit(ForIn node)
         {
             if (node != null)
             {
@@ -1211,7 +1194,7 @@ namespace Microsoft.Ajax.Utilities
             }
         }
 
-        public void Visit(ForNode node)
+        public override void Visit(ForNode node)
         {
             if (node != null)
             {
@@ -1267,7 +1250,7 @@ namespace Microsoft.Ajax.Utilities
             }
         }
 
-        public void Visit(FunctionObject node)
+        public override void Visit(FunctionObject node)
         {
             if (node != null)
             {
@@ -1364,7 +1347,7 @@ namespace Microsoft.Ajax.Utilities
             }
         }
 
-        public void Visit(GetterSetter node)
+        public override void Visit(GetterSetter node)
         {
             if (node != null)
             {
@@ -1400,7 +1383,7 @@ namespace Microsoft.Ajax.Utilities
         }
 
         [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Maintainability", "CA1502:AvoidExcessiveComplexity")]
-        public void Visit(IfNode node)
+        public override void Visit(IfNode node)
         {
             if (node != null)
             {
@@ -1529,7 +1512,7 @@ namespace Microsoft.Ajax.Utilities
             }
         }
 
-        public void Visit(ImportantComment node)
+        public override void Visit(ImportantComment node)
         {
             if (node != null)
             {
@@ -1596,7 +1579,7 @@ namespace Microsoft.Ajax.Utilities
             }
         }
 
-        public void Visit(LabeledStatement node)
+        public override void Visit(LabeledStatement node)
         {
             if (node != null)
             {
@@ -1630,7 +1613,7 @@ namespace Microsoft.Ajax.Utilities
             }
         }
 
-        public void Visit(LexicalDeclaration node)
+        public override void Visit(LexicalDeclaration node)
         {
             if (node != null)
             {
@@ -1676,7 +1659,7 @@ namespace Microsoft.Ajax.Utilities
             }
         }
 
-        public void Visit(Lookup node)
+        public override void Visit(Lookup node)
         {
             if (node != null)
             {
@@ -1701,7 +1684,7 @@ namespace Microsoft.Ajax.Utilities
             }
         }
 
-        public void Visit(Member node)
+        public override void Visit(Member node)
         {
             if (node != null)
             {
@@ -1772,7 +1755,7 @@ namespace Microsoft.Ajax.Utilities
             }
         }
 
-        public void Visit(ObjectLiteral node)
+        public override void Visit(ObjectLiteral node)
         {
             if (node != null)
             {
@@ -1824,7 +1807,7 @@ namespace Microsoft.Ajax.Utilities
             }
         }
 
-        public void Visit(ObjectLiteralField node)
+        public override void Visit(ObjectLiteralField node)
         {
             if (node != null)
             {
@@ -1884,7 +1867,7 @@ namespace Microsoft.Ajax.Utilities
             }
         }
 
-        public void Visit(ObjectLiteralProperty node)
+        public override void Visit(ObjectLiteralProperty node)
         {
             if (node != null)
             {
@@ -1896,7 +1879,7 @@ namespace Microsoft.Ajax.Utilities
                 if (node.Name is GetterSetter)
                 {
                     // always output the parameters
-                    OutputFunctionArgsAndBody(node.Value as FunctionObject, false);
+                    OutputFunctionArgsAndBody((node.Value as FunctionExpression).Function, false);
                 }
                 else if (node.Value != null)
                 {
@@ -1905,7 +1888,7 @@ namespace Microsoft.Ajax.Utilities
             }
         }
 
-        public void Visit(ParameterDeclaration node)
+        public override void Visit(ParameterDeclaration node)
         {
             if (node != null)
             {
@@ -1915,7 +1898,7 @@ namespace Microsoft.Ajax.Utilities
             }
         }
 
-        public void Visit(RegExpLiteral node)
+        public override void Visit(RegExpLiteral node)
         {
             if (node != null)
             {
@@ -1937,7 +1920,7 @@ namespace Microsoft.Ajax.Utilities
             }
         }
 
-        public void Visit(ReturnNode node)
+        public override void Visit(ReturnNode node)
         {
             if (node != null)
             {
@@ -1964,7 +1947,7 @@ namespace Microsoft.Ajax.Utilities
             }
         }
 
-        public void Visit(Switch node)
+        public override void Visit(Switch node)
         {
             if (node != null)
             {
@@ -1998,7 +1981,7 @@ namespace Microsoft.Ajax.Utilities
                 MarkSegment(node, null, node.BraceContext); 
                 Indent();
 
-                AstNode prevSwitchCase = null;
+                Node prevSwitchCase = null;
                 for (var ndx = 0; ndx < node.Cases.Count; ++ndx)
                 {
                     var switchCase = node.Cases[ndx];
@@ -2031,7 +2014,7 @@ namespace Microsoft.Ajax.Utilities
             }
         }
 
-        public void Visit(SwitchCase node)
+        public override void Visit(SwitchCase node)
         {
             if (node != null)
             {
@@ -2056,7 +2039,7 @@ namespace Microsoft.Ajax.Utilities
                 if (node.Statements != null && node.Statements.Count > 0)
                 {
                     Indent();
-                    AstNode prevStatement = null;
+                    Node prevStatement = null;
                     for (var ndx = 0; ndx < node.Statements.Count; ++ndx)
                     {
                         var statement = node.Statements[ndx];
@@ -2082,7 +2065,7 @@ namespace Microsoft.Ajax.Utilities
             }
         }
 
-        public void Visit(ThisLiteral node)
+        public override void Visit(ThisLiteral node)
         {
             if (node != null)
             {
@@ -2094,7 +2077,7 @@ namespace Microsoft.Ajax.Utilities
             }
         }
 
-        public void Visit(ThrowNode node)
+        public override void Visit(ThrowNode node)
         {
             if (node != null)
             {
@@ -2119,7 +2102,7 @@ namespace Microsoft.Ajax.Utilities
             }
         }
 
-        public void Visit(TryNode node)
+        public override void Visit(TryNode node)
         {
             if (node != null)
             {
@@ -2241,7 +2224,7 @@ namespace Microsoft.Ajax.Utilities
             }
         }
 
-        public void Visit(Var node)
+        public override void Visit(Var node)
         {
             if (node != null)
             {
@@ -2287,7 +2270,7 @@ namespace Microsoft.Ajax.Utilities
             }
         }
 
-        public void Visit(VariableDeclaration node)
+        public override void Visit(VariableDeclaration node)
         {
             if (node != null)
             {
@@ -2347,7 +2330,7 @@ namespace Microsoft.Ajax.Utilities
             }
         }
 
-        public void Visit(UnaryOperator node)
+        public override void Visit(UnaryOperator node)
         {
             if (node != null)
             {
@@ -2411,7 +2394,7 @@ namespace Microsoft.Ajax.Utilities
             }
         }
 
-        public void Visit(WhileNode node)
+        public override void Visit(WhileNode node)
         {
             if (node != null)
             {
@@ -2437,7 +2420,7 @@ namespace Microsoft.Ajax.Utilities
             }
         }
 
-        public void Visit(WithNode node)
+        public override void Visit(WithNode node)
         {
             if (node != null)
             {
@@ -2853,7 +2836,7 @@ namespace Microsoft.Ajax.Utilities
 
         #region Helper methods
 
-        private void AcceptNodeWithParens(AstNode node, bool needsParens)
+        private void AcceptNodeWithParens(Node node, bool needsParens)
         {
             // if we need parentheses, add the opening
             if (needsParens)
@@ -2922,7 +2905,7 @@ namespace Microsoft.Ajax.Utilities
                         }
                     }
 
-                    AstNode paramDecl = null;
+                    Node paramDecl = null;
                     for (var ndx = 0; ndx <= lastRef; ++ndx)
                     {
                         if (ndx > 0)
@@ -3507,7 +3490,7 @@ namespace Microsoft.Ajax.Utilities
 
         #region Map file methods
 
-        private object StartSymbol(AstNode node)
+        private object StartSymbol(Node node)
         {
             if (Settings.SymbolsMap != null)
             {
@@ -3517,7 +3500,7 @@ namespace Microsoft.Ajax.Utilities
             return null;
         }
 
-        private void MarkSegment(AstNode node, string name, Context context)
+        private void MarkSegment(Node node, string name, Context context)
         {
             if (Settings.SymbolsMap != null && node != null)
             {
@@ -3541,4 +3524,5 @@ namespace Microsoft.Ajax.Utilities
 
         #endregion Map file methods
     }
+#endif
 }

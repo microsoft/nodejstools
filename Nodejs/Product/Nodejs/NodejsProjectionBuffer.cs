@@ -21,7 +21,7 @@ using System.Linq;
 using System.Runtime.InteropServices;
 using System.Text;
 using System.Threading.Tasks;
-using Microsoft.Ajax.Utilities;
+using Microsoft.NodejsTools.Parsing;
 using Microsoft.NodejsTools.Project;
 using Microsoft.VisualStudio;
 using Microsoft.VisualStudio.Shell.Interop;
@@ -67,8 +67,8 @@ namespace Microsoft.NodejsTools {
         private readonly IProjectionBuffer _elisionBuffer;
         private readonly string _referenceFilename;
 
-        private int _endOfComments;
-        private string _leadingText;
+        //private int _endOfComments;
+        //private string _leadingText;
 
         public NodejsProjectionBuffer(IContentTypeRegistryService contentRegistry, IProjectionBufferFactoryService bufferFactory, ITextBuffer diskBuffer, IBufferGraphFactoryService bufferGraphFactory, IContentType contentType, string referenceFileName) {
             Debug.Assert(diskBuffer != null);
@@ -87,6 +87,7 @@ namespace Microsoft.NodejsTools {
         }
 
         private void DiskBufferChanged(object sender, TextContentChangedEventArgs e) {
+#if FALSE
             foreach (var change in e.Changes) {
                 if (change.OldPosition <= _endOfComments) {
                     string oldLeading = _leadingText;
@@ -107,13 +108,16 @@ namespace Microsoft.NodejsTools {
             }
             
             NodejsPackage.Instance.ChangedBuffers.Add(e.After.TextBuffer);
+#endif
         }
 
         private void UpdateLeadingText(ITextSnapshot current) {
+            throw new NotImplementedException();
+#if FALSE
             // change in the leading comments, update our list of leading comments
             var fullText = current.GetText();
             var document = new DocumentContext(null, fullText);
-            var scanner = new JSScanner(new Context(document));
+            var scanner = new JSScanner(document);
 
             var tokenContext = scanner.ScanNextToken(false);
             while (tokenContext.Token != JSToken.EndOfFile) {
@@ -131,6 +135,7 @@ namespace Microsoft.NodejsTools {
             _endOfComments = tokenContext.Token == JSToken.Divide ? tokenContext.EndPosition : tokenContext.StartPosition;
             string commentText = fullText.Substring(0, _endOfComments);
             _leadingText = commentText + GetBaseLeadingText();
+#endif
         }
 
         private IProjectionBuffer CreateProjectionBuffer(IProjectionBufferFactoryService bufferFactory) {
@@ -154,7 +159,8 @@ namespace Microsoft.NodejsTools {
 
         public string LeadingText {
             get {
-                return _leadingText;
+                throw new NotImplementedException();
+                //return _leadingText;
             }
         }
 

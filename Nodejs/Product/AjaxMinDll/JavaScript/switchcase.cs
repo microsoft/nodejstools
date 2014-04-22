@@ -17,14 +17,14 @@
 using System.Collections.Generic;
 using System.Text;
 
-namespace Microsoft.Ajax.Utilities
+namespace Microsoft.NodejsTools.Parsing
 {
-    public sealed class SwitchCase : AstNode
+    public sealed class SwitchCase : Statement
     {
-        private AstNode m_caseValue;
+        private Expression m_caseValue;
         private Block m_statements;
 
-        public AstNode CaseValue
+        public Expression CaseValue
         {
             get { return m_caseValue; }
             set
@@ -51,22 +51,24 @@ namespace Microsoft.Ajax.Utilities
             get { return (CaseValue == null); }
         }
 
-        public Context ColonContext { get; set; }
+        public TokenWithSpan ColonContext { get; set; }
 
-        public SwitchCase(Context context, JSParser parser)
+        public SwitchCase(TokenWithSpan context, JSParser parser)
             : base(context, parser)
         {
         }
 
-        public override void Accept(IVisitor visitor)
-        {
-            if (visitor != null)
-            {
-                visitor.Visit(this);
+        public override void Walk(AstVisitor visitor) {
+            if (visitor.Walk(this)) {
+                if (m_caseValue != null) {
+                    m_caseValue.Walk(visitor);
+                }
+                m_statements.Walk(visitor);
             }
+            visitor.PostWalk(this);
         }
 
-        public override IEnumerable<AstNode> Children
+        public override IEnumerable<Node> Children
         {
             get
             {
@@ -74,11 +76,11 @@ namespace Microsoft.Ajax.Utilities
             }
         }
 
-        public override bool ReplaceChild(AstNode oldNode, AstNode newNode)
+        public override bool ReplaceChild(Node oldNode, Node newNode)
         {
             if (CaseValue == oldNode)
             {
-                CaseValue = newNode;
+                CaseValue = (Expression)newNode;
                 return true;
             }
             if (Statements == oldNode)

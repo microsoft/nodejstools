@@ -17,14 +17,14 @@
 using System;
 using System.IO;
 
-namespace Microsoft.Ajax.Utilities
+namespace Microsoft.NodejsTools.Parsing
 {
     public interface ISourceMap : IDisposable
     {
         void StartPackage(string sourcePath, string mapPath);
         void EndPackage();
-        object StartSymbol(AstNode node, int startLine, int startColumn);
-        void MarkSegment(AstNode node, int startLine, int startColumn, string name, Context context);
+        object StartSymbol(Node node, int startLine, int startColumn);
+        void MarkSegment(Node node, int startLine, int startColumn, string name, TokenWithSpan context);
         void EndSymbol(object symbol, int endLine, int endColumn, string parentContext);
         void EndFile(TextWriter writer, string newLine);
         string Name { get; }

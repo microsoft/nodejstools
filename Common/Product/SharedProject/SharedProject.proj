@@ -23,10 +23,6 @@
       <Link>SharedProject\ProcessOutput.cs</Link>
       <Visible>true</Visible>
     </Compile>
-    <Compile Include="$(_ProjectSystemFilesLocation)\TaskDialog.cs">
-      <Link>SharedProject\TaskDialog.cs</Link>
-      <Visible>true</Visible>
-    </Compile>
     <Compile Include="$(_ProjectSystemFilesLocation)\OverwriteFileDialog.xaml.cs">
       <DependentUpon>OverwriteFileDialog.xaml</DependentUpon>
       <Link>SharedProject\OverwriteFileDialog.xaml.cs</Link>
@@ -563,10 +559,6 @@
     </Compile>
     <Compile Include="$(_ProjectSystemFilesLocation)\ProvideDebugExceptionAttribute.cs">
       <Link>SharedProject\Debugger\ProvideDebugExceptionAttribute.cs</Link>
-      <Visible>true</Visible>
-    </Compile>
-    <Compile Include="$(_ProjectSystemFilesLocation)\WebSocketStream.cs">
-      <Link>SharedProject\Debugger\WebSocketStream.cs</Link>
       <Visible>true</Visible>
     </Compile>
     <Compile Include="$(_ProjectSystemFilesLocation)\ProvideDebugLanguageAttribute.cs">

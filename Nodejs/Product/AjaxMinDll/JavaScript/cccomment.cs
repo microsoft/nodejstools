@@ -18,9 +18,10 @@ using System;
 using System.Collections.Generic;
 using System.Text;
 
-namespace Microsoft.Ajax.Utilities
+namespace Microsoft.NodejsTools.Parsing
 {
-    public class ConditionalCompilationComment : AstNode
+#if FALSE
+    public class ConditionalCompilationComment : Node
     {
         private Block m_statements;
         public Block Statements
@@ -49,7 +50,7 @@ namespace Microsoft.Ajax.Utilities
             }
         }
 
-        public override void Accept(IVisitor visitor)
+        public override void Accept(AstVisitor visitor)
         {
             if (visitor != null)
             {
@@ -57,7 +58,7 @@ namespace Microsoft.Ajax.Utilities
             }
         }
 
-        public void Append(AstNode statement)
+        public void Append(Node statement)
         {
             if (statement != null)
             {
@@ -66,7 +67,7 @@ namespace Microsoft.Ajax.Utilities
             }
         }
 
-        public override IEnumerable<AstNode> Children
+        public override IEnumerable<Node> Children
         {
             get
             {
@@ -74,7 +75,7 @@ namespace Microsoft.Ajax.Utilities
             }
         }
 
-        public override bool ReplaceChild(AstNode oldNode, AstNode newNode)
+        public override bool ReplaceChild(Node oldNode, Node newNode)
         {
             if (Statements == oldNode)
             {
@@ -85,4 +86,5 @@ namespace Microsoft.Ajax.Utilities
             return false;
         }
     }
+#endif
 }

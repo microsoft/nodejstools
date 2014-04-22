@@ -18,13 +18,13 @@ using System;
 using System.Collections.Generic;
 using System.Text;
 
-namespace Microsoft.Ajax.Utilities
+namespace Microsoft.NodejsTools.Parsing
 {
     public sealed class WhileNode : IterationStatement
     {
-        private AstNode m_condition;
+        private Expression m_condition;
 
-        public AstNode Condition
+        public Expression Condition
         {
             get { return m_condition; }
             set
@@ -35,7 +35,7 @@ namespace Microsoft.Ajax.Utilities
             }
         }
 
-        public override Context TerminatingContext
+        public override TokenWithSpan TerminatingContext
         {
             get
             {
@@ -44,20 +44,20 @@ namespace Microsoft.Ajax.Utilities
             }
         }
 
-        public WhileNode(Context context, JSParser parser)
+        public WhileNode(TokenWithSpan context, JSParser parser)
             : base(context, parser)
         {
         }
 
-        public override void Accept(IVisitor visitor)
-        {
-            if (visitor != null)
-            {
-                visitor.Visit(this);
+        public override void Walk(AstVisitor visitor) {
+            if (visitor.Walk(this)) {
+                m_condition.Walk(visitor);
+                Body.Walk(visitor);
             }
+            visitor.PostWalk(this);
         }
 
-        public override IEnumerable<AstNode> Children
+        public override IEnumerable<Node> Children
         {
             get
             {
@@ -65,16 +65,16 @@ namespace Microsoft.Ajax.Utilities
             }
         }
 
-        public override bool ReplaceChild(AstNode oldNode, AstNode newNode)
+        public override bool ReplaceChild(Node oldNode, Node newNode)
         {
             if (Condition == oldNode)
             {
-                Condition = newNode;
+                Condition = (Expression)newNode;
                 return true;
             }
             if (Body == oldNode)
             {
-                Body = ForceToBlock(newNode);
+                Body = ForceToBlock((Statement)newNode);
                 return true;
             }
             return false;

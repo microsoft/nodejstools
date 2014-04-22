@@ -21,7 +21,6 @@ using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
 using Microsoft.VisualStudioTools.Project;
-using Microsoft.Win32;
 
 namespace Microsoft.NodejsTools.Npm.SPI {
     internal abstract class NpmCommand : AbstractNpmLogSource {
@@ -50,31 +49,16 @@ namespace Microsoft.NodejsTools.Npm.SPI {
             if (null == _pathToNpm || !File.Exists(_pathToNpm)) {
                 if (_useFallbackIfNpmNotFound) {
                     string match = null;
-
-                    using (var key = Registry.CurrentUser.OpenSubKey("Software\\Node.js")) {
-                        if (key != null) {
-                            match = key.GetValue("InstallPath") as string;
-                            if (Directory.Exists(match)) {
-                                match = Path.Combine(match, "npm.cmd");
-                                if (!File.Exists(match)) {
-                                    match = null;
-                                }
-                            }
-                        }
-                    }
-
-                    if (null == match) {
-                        foreach (var potential in Environment.GetEnvironmentVariable("path").Split(Path.PathSeparator)) {
-                            var path = Path.Combine(potential, "npm.cmd");
-                            if (File.Exists(path)) {
-                                if (null == match ||
-                                    path.Contains(
-                                        string.Format(
-                                            "{0}nodejs{1}",
-                                            Path.DirectorySeparatorChar,
-                                            Path.DirectorySeparatorChar))) {
-                                    match = path;
-                                }
+                    foreach (var potential in Environment.GetEnvironmentVariable("path").Split(Path.PathSeparator)) {
+                        var path = Path.Combine(potential, "npm.cmd");
+                        if (File.Exists(path)) {
+                            if (null == match ||
+                                path.Contains(
+                                    string.Format(
+                                        "{0}nodejs{1}",
+                                        Path.DirectorySeparatorChar,
+                                        Path.DirectorySeparatorChar))) {
+                                match = path;
                             }
                         }
                     }
@@ -82,15 +66,17 @@ namespace Microsoft.NodejsTools.Npm.SPI {
                     if (null != match) {
                         _pathToNpm = match;
                     }
-                }
 
-                if (null == _pathToNpm || !File.Exists(_pathToNpm)) {
+                    //  That second condition deals with the situation where no match is found.
+                    if (null == _pathToNpm || !File.Exists(_pathToNpm)) {
+                        throw new NpmNotFoundException(
+                            string.Format(
+                                "Cannot find npm.cmd at '{0}' nor on your system PATH. Ensure node.js is installed.",
+                                _pathToNpm));
+                    }
+                } else {
                     throw new NpmNotFoundException(
-                        string.Format(
-                            "Cannot find npm.cmd at '{0}' nor on your system PATH. Ensure node.js is installed.",
-                            _pathToNpm ?? "(null)"
-                        )
-                    );
+                        string.Format("Cannot find npm.cmd at specified path: {0}", _pathToNpm));
                 }
             }
             return _pathToNpm;

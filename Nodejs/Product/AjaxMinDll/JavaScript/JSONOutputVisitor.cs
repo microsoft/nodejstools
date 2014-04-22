@@ -21,16 +21,16 @@ using System.IO;
 using System.Text;
 using System.Text.RegularExpressions;
 
-namespace Microsoft.Ajax.Utilities
+namespace Microsoft.NodejsTools.Parsing
 {
     using System;
     using System.Collections.Generic;
     using System.Text;
-
+#if FALSE
     /// <summary>
     /// output JSON-compatible code
     /// </summary>
-    public class JSONOutputVisitor : IVisitor
+    public class JSONOutputVisitor : AstVisitor
     {
         // this is a regular expression that we'll use to minimize numeric values
         // that don't employ the e-notation
@@ -52,7 +52,7 @@ namespace Microsoft.Ajax.Utilities
             IsValid = true;
         }
 
-        public static bool Apply(TextWriter writer, AstNode node)
+        public static bool Apply(TextWriter writer, Node node)
         {
             if (node != null)
             {
@@ -222,12 +222,6 @@ namespace Microsoft.Ajax.Utilities
         #endregion 
 
         #region unsupported nodes
-
-        public void Visit(AspNetBlockNode node)
-        {
-            // invalid! ignore
-            IsValid = false;
-        }
 
         public void Visit(BinaryOperator node)
         {
@@ -651,4 +645,5 @@ namespace Microsoft.Ajax.Utilities
 
         #endregion
     }
+#endif
 }

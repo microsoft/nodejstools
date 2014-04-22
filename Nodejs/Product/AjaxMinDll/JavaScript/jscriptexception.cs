@@ -15,12 +15,14 @@
 // limitations under the License.
 
 using System;
+using System.Diagnostics;
 using System.Globalization;
 using System.Runtime.Serialization;
 using System.Security;
 using System.Security.Permissions;
+using Microsoft.Ajax.Utilities;
 
-namespace Microsoft.Ajax.Utilities
+namespace Microsoft.NodejsTools.Parsing
 {
 
     //-------------------------------------------------------------------------------------------------------
@@ -47,27 +49,18 @@ namespace Microsoft.Ajax.Utilities
 #if !SILVERLIGHT
         [NonSerialized]
 #endif
-        private Context m_context;
+        private TokenWithSpan m_context;
 
         private string m_valueObject;
         private bool m_isError;
         private JSError m_errorCode;
         private bool m_canRecover = true;
-        private string m_fileContext;
 
         #endregion
 
         #region public properties
 
-        public string FileContext
-        {
-            get
-            {
-                return m_fileContext;
-            }
-        }
-
-        public Context Context {
+        public TokenWithSpan Context {
             get {
                 return m_context;
             }
@@ -109,7 +102,7 @@ namespace Microsoft.Ajax.Utilities
                 }
                 else
                 {
-                    return 0;
+                    return 1;
                 }
             }
         }
@@ -121,7 +114,7 @@ namespace Microsoft.Ajax.Utilities
                 if (m_context != null)
                 {
                     // one-based column number
-                    return m_context.StartColumn + 1;
+                    return m_context.StartColumn;
                 }
                 else
                 {
@@ -154,87 +147,18 @@ namespace Microsoft.Ajax.Utilities
                     if (m_context.EndColumn >= m_context.StartColumn)
                     {
                         // normal condition - one-based
-                        return m_context.EndColumn + 1;
+                        return m_context.EndColumn;
                     }
                     else
                     {
                         // end column before start column -- just set end to be the end of the line
-                        return LineText.Length;
+                        // TODO: 
+                        Debug.Fail("bad end column");
+                        return m_context.StartColumn;
                     }
                 }
                 else
                     return 0;
-            }
-        }
-
-        public string FullSource
-        {
-            get
-            {
-                return (m_context == null ? string.Empty : m_context.Document.Source);
-            }
-        }
-
-        public String LineText
-        {
-            get
-            {
-                string lineText = string.Empty;
-                if (m_context != null)
-                {
-                    int lineStart = m_context.StartLinePosition;
-                    string source = m_context.Document.Source;
-
-                    if (lineStart < source.Length)
-                    {
-                        int ndxLF = source.IndexOf('\n', lineStart);
-                        if (ndxLF < lineStart)
-                        {
-                            // no line endings for the rest of the source
-                            lineText = source.Substring(lineStart);
-                        }
-                        else if (ndxLF == lineStart || (ndxLF == lineStart + 1 && source[lineStart] == '\r'))
-                        {
-                            // blank line
-                        }
-                        else if (source[ndxLF - 1] == '\r')
-                        {
-                            // up to CRLF
-                            lineText = source.Substring(lineStart, ndxLF - lineStart - 1);
-                        }
-                        else
-                        {
-                            // up to LF
-                            lineText = source.Substring(lineStart, ndxLF - lineStart);
-                        }
-                    }
-                }
-                return lineText;
-            }
-        }
-
-        public string ErrorSegment
-        {
-            get
-            {
-                string source = m_context.Document.Source;
-                // just pull out the string that's between start position and end position
-                if (m_context.StartPosition >= source.Length)
-                {
-                    return string.Empty;
-                }
-                else
-                {
-                    int length = m_context.EndPosition - m_context.StartPosition;
-                    if (m_context.StartPosition + length <= source.Length)
-                    {
-                        return source.Substring(m_context.StartPosition, length).Trim();
-                    }
-                    else
-                    {
-                        return source.Substring(m_context.StartPosition).Trim();
-                    }
-                }
             }
         }
 
@@ -252,7 +176,10 @@ namespace Microsoft.Ajax.Utilities
 
                 // special case some errors with contextual information
                 return JScript.ResourceManager.GetString(code, JScript.Culture).FormatInvariant(
+                    "");    // TODO: Re-enable getting context code?
+#if FALSE
                     m_context.IfNotNull(c => c.HasCode) ? string.Empty : m_context.Code);
+#endif
             }
         }
 
@@ -273,23 +200,20 @@ namespace Microsoft.Ajax.Utilities
 
         #region constructors
 
-        public JScriptException() : this(JSError.UncaughtException, null) { }
         public JScriptException(string message) : this(message, null) { }
         public JScriptException(string message, Exception innerException)
             : base(message, innerException)
         {
             m_valueObject = message;
             m_context = null;
-            m_fileContext = null;
             m_errorCode = JSError.UncaughtException;
             SetHResult();
         }
 
-        internal JScriptException(JSError errorNumber, Context context)
+        internal JScriptException(JSError errorNumber, TokenWithSpan context)
         {
             m_valueObject = null;
             m_context = (context == null ? null : context.Clone());
-            m_fileContext = (context == null ? null : context.Document.FileContext);
             m_errorCode = errorNumber;
             SetHResult();
         }
@@ -307,7 +231,6 @@ namespace Microsoft.Ajax.Utilities
             m_isError = info.GetBoolean("IsError");
             m_errorCode = (JSError)info.GetInt32("JSError");
             m_canRecover = info.GetBoolean("CanRecover");
-            m_fileContext = info.GetString("FileContext");
         }
         #endif
 
@@ -326,7 +249,6 @@ namespace Microsoft.Ajax.Utilities
             info.AddValue("IsError", m_isError);
             info.AddValue("JSError", (int)m_errorCode);
             info.AddValue("CanRecover", m_canRecover);
-            info.AddValue("FileContext", m_fileContext);
         }
         #endif
 
@@ -429,13 +351,13 @@ namespace Microsoft.Ajax.Utilities
 #if !SILVERLIGHT
         [NonSerialized]
 #endif
-        private Context m_context;
+        private TokenWithSpan m_context;
 
 #if !SILVERLIGHT
         [NonSerialized]
 #endif
         private Lookup m_lookup;
-        public AstNode LookupNode
+        public Node LookupNode
         {
             get { return m_lookup; }
         }
@@ -460,11 +382,11 @@ namespace Microsoft.Ajax.Utilities
                 if (m_context != null)
                 {
                     // one-based
-                    return m_context.StartColumn + 1;
+                    return m_context.StartColumn;
                 }
                 else
                 {
-                    return 0;
+                    return 1;
                 }
             }
         }
@@ -479,12 +401,12 @@ namespace Microsoft.Ajax.Utilities
                 }
                 else
                 {
-                    return 0;
+                    return 1;
                 }
             }
         }
 
-        internal UndefinedReferenceException(Lookup lookup, Context context)
+        internal UndefinedReferenceException(Lookup lookup, TokenWithSpan context)
         {
             m_lookup = lookup;
             m_name = lookup.Name;

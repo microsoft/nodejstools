@@ -16,23 +16,21 @@
 
 using System;
 
-namespace Microsoft.Ajax.Utilities
+namespace Microsoft.NodejsTools.Parsing
 {
     public class ObjectLiteralField : ConstantWrapper
     {
-        public Context ColonContext { get; set; }
+        public TokenWithSpan ColonContext { get; set; }
 
-        public ObjectLiteralField(Object value, PrimitiveType primitiveType, Context context, JSParser parser)
+        public ObjectLiteralField(Object value, PrimitiveType primitiveType, TokenWithSpan context, JSParser parser)
             : base(value, primitiveType, context, parser)
         {
         }
 
-        public override void Accept(IVisitor visitor)
-        {
-            if (visitor != null)
-            {
-                visitor.Visit(this);
+        public override void Walk(AstVisitor visitor) {
+            if (visitor.Walk(this)) {
             }
+            visitor.PostWalk(this);
         }
     }
 }

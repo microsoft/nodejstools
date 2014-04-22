@@ -17,7 +17,7 @@
 using System.Collections;
 using System.Collections.Generic;
 
-namespace Microsoft.Ajax.Utilities
+namespace Microsoft.NodejsTools.Parsing
 {
     public class ResourceStrings
     {

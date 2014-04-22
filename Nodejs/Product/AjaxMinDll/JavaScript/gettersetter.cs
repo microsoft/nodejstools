@@ -17,25 +17,17 @@
 using System;
 using System.Text;
 
-namespace Microsoft.Ajax.Utilities
+namespace Microsoft.NodejsTools.Parsing
 {
 
     public sealed class GetterSetter : ObjectLiteralField
     {
         public bool IsGetter { get; set; }
 
-        public GetterSetter(String identifier, bool isGetter, Context context, JSParser parser)
+        public GetterSetter(String identifier, bool isGetter, TokenWithSpan context, JSParser parser)
             : base(identifier, PrimitiveType.String, context, parser)
         {
             IsGetter = isGetter;
-        }
-
-        public override void Accept(IVisitor visitor)
-        {
-            if (visitor != null)
-            {
-                visitor.Visit(this);
-            }
         }
 
         public override String ToString()

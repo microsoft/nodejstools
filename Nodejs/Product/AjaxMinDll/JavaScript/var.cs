@@ -17,7 +17,7 @@
 using System.Collections.Generic;
 using System.Text;
 
-namespace Microsoft.Ajax.Utilities
+namespace Microsoft.NodejsTools.Parsing
 {
     /// <summary>
     /// Summary description for variablestatement.
@@ -25,17 +25,18 @@ namespace Microsoft.Ajax.Utilities
     [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Naming", "CA1710:IdentifiersShouldHaveCorrectSuffix", Justification = "AST statement")]
     public sealed class Var : Declaration
     {
-        public Var(Context context, JSParser parser)
+        public Var(TokenWithSpan context, JSParser parser)
             : base(context, parser)
         {
         }
 
-        public override void Accept(IVisitor visitor)
-        {
-            if (visitor != null)
-            {
-                visitor.Visit(this);
+        public override void Walk(AstVisitor walker) {
+            if (walker.Walk(this)) {
+                foreach (var decl in this) {
+                    decl.Walk(walker);
+                }
             }
+            walker.PostWalk(this);
         }
     }
 }

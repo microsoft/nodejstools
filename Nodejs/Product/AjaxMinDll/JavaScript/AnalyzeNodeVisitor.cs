@@ -20,8 +20,9 @@ using System.Globalization;
 using System.Text;
 using System.Text.RegularExpressions;
 
-namespace Microsoft.Ajax.Utilities
+namespace Microsoft.NodejsTools.Parsing
 {
+#if FALSE
     internal class AnalyzeNodeVisitor : TreeVisitor
     {
         private JSParser m_parser;
@@ -521,7 +522,7 @@ namespace Microsoft.Ajax.Utilities
             }
         }
 
-        private static bool ContainsReference(AstNode node, JSVariableField targetField)
+        private static bool ContainsReference(Node node, JSVariableField targetField)
         {
             // if this is a lookup to the target field, return true and be done
             var lookup = node as Lookup;
@@ -553,7 +554,7 @@ namespace Microsoft.Ajax.Utilities
             return false;
         }
 
-        private static AstNode FindLastStatement(Block node)
+        private static Node FindLastStatement(Block node)
         {
             // start with the last statement in the block and back up over any function declarations
             // or important comments until we get the last statement
@@ -929,13 +930,13 @@ namespace Microsoft.Ajax.Utilities
                                 {
                                     // transform: ...;var name=expr;return name} to ...;return expr}
                                     // there's only one vardecl in the var, so get rid of the entire statement
-                                    lastReturn.Operand = varDecl.Initializer;
+                                    lastReturn.Operand = (Expression)varDecl.Initializer;
                                     node.RemoveAt(indexPrevious);
                                 }
                                 else
                                 {
                                     // multiple vardecls are in the statement; we only need to get rid of the last one
-                                    lastReturn.Operand = varDecl.Initializer;
+                                    lastReturn.Operand = (Expression)varDecl.Initializer;
                                     varStatement[varStatement.Count - 1] = null;
                                 }
                             }
@@ -1154,7 +1155,7 @@ namespace Microsoft.Ajax.Utilities
                                 var ifNode = new IfNode(lastReturn.Context, m_parser)
                                     {
                                         Condition = conditional.Condition,
-                                        TrueBlock = AstNode.ForceToBlock(new ReturnNode(null, m_parser)
+                                        TrueBlock = Node.ForceToBlock(new ReturnNode(null, m_parser)
                                             {
                                                 Operand = conditional.TrueExpression
                                             })
@@ -1180,7 +1181,7 @@ namespace Microsoft.Ajax.Utilities
                                 var ifNode = new IfNode(lastReturn.Context, m_parser)
                                     {
                                         Condition = conditional.Condition,
-                                        TrueBlock = AstNode.ForceToBlock(new ReturnNode(null, m_parser)
+                                        TrueBlock = Node.ForceToBlock(new ReturnNode(null, m_parser)
                                             {
                                                 Operand = conditional.FalseExpression
                                             })
@@ -1201,13 +1202,13 @@ namespace Microsoft.Ajax.Utilities
                     {
                         // see if the current statement is an if-statement with no else block, and a true
                         // block that contains a single return-statement WITH an expression.
-                        AstNode currentExpr = null;
-                        AstNode condition2;
+                        Node currentExpr = null;
+                        Expression condition2;
                         if (IsIfReturnExpr(node[ndx], out condition2, ref currentExpr) != null)
                         {
                             // see if the previous statement is also the same pattern, but with
                             // the equivalent expression as its return operand
-                            AstNode condition1;
+                            Expression condition1;
                             var matchedExpression = currentExpr;
                             var ifNode = IsIfReturnExpr(node[ndx - 1], out condition1, ref matchedExpression);
                             if (ifNode != null)
@@ -1276,14 +1277,6 @@ namespace Microsoft.Ajax.Utilities
                                             };
 
                                         ifNode.TrueBlock = secondIfNode.TrueBlock;
-                                    }
-                                    else if (node[ndxMove].IsExpression
-                                        && m_parser.Settings.IsModificationAllowed(TreeModifications.IfConditionCallToConditionAndCall))
-                                    {
-                                        // now we have if(cond)expr; optimize that!
-                                        var expression = node[ndxMove];
-                                        node.RemoveAt(ndxMove);
-                                        IfConditionExpressionToExpression(ifNode, expression);
                                     }
                                 }
 
@@ -1362,14 +1355,6 @@ namespace Microsoft.Ajax.Utilities
                                                 ifNode.TrueBlock = secondIfNode.TrueBlock;
                                                 node.RemoveAt(ndxMove);
                                             }
-                                            else if (node[ndxMove].IsExpression
-                                                && m_parser.Settings.IsModificationAllowed(TreeModifications.IfConditionCallToConditionAndCall))
-                                            {
-                                                // now we have if(cond)expr; optimize that!
-                                                var expression = node[ndxMove];
-                                                node.RemoveAt(ndxMove);
-                                                IfConditionExpressionToExpression(ifNode, expression);
-                                            }
                                         }
 
                                         // just move all the following statements inside the if-statement
@@ -1404,7 +1389,7 @@ namespace Microsoft.Ajax.Utilities
             }
         }
 
-        private static bool LabelMatchesParent(string label, AstNode parentNode)
+        private static bool LabelMatchesParent(string label, Node parentNode)
         {
             var isMatch = false;
 
@@ -1426,7 +1411,7 @@ namespace Microsoft.Ajax.Utilities
             return isMatch;
         }
 
-        private static IfNode IsIfReturnExpr(AstNode node, out AstNode condition, ref AstNode matchExpression)
+        private static IfNode IsIfReturnExpr(Node node, out Expression condition, ref Node matchExpression)
         {
             // set the condition to null initially
             condition = null;
@@ -1458,7 +1443,7 @@ namespace Microsoft.Ajax.Utilities
             return condition != null && matchExpression != null ? ifNode : null;
         }
 
-        private static int PreviousStatementIndex(Block node, AstNode child)
+        private static int PreviousStatementIndex(Block node, Node child)
         {
             // get the index of the statement before the last return
             // (skip over function decls and importand comments)
@@ -1896,8 +1881,8 @@ namespace Microsoft.Ajax.Utilities
 
                 // check to see if this node is an argument to a RegExp constructor.
                 // if it is, we'll want to not use certain string escapes
-                AstNode previousNode = null;
-                AstNode parentNode = node.Parent;
+                Node previousNode = null;
+                Node parentNode = node.Parent;
                 while (parentNode != null)
                 {
                     // is this a call node and the previous node was one of the parameters?
@@ -2200,7 +2185,7 @@ namespace Microsoft.Ajax.Utilities
                         foreach (var parameter in node.ParameterDeclarations)
                         {
                             // if it already exists in the map, then it's a dup
-                            var parameterName = (parameter as ParameterDeclaration).IfNotNull(p => p.Name);
+                            var parameterName = parameter.IfNotNull(p => p.Name);
                             if (parameterMap.Add(parameterName))
                             {
                                 // now check to see if it's one of the two forbidden names
@@ -2306,8 +2291,8 @@ namespace Microsoft.Ajax.Utilities
                             conditional = new Conditional(node.Context, m_parser)
                                 {
                                     Condition = node.Condition,
-                                    TrueExpression = node.FalseBlock[0],
-                                    FalseExpression = node.TrueBlock[0]
+                                    TrueExpression = (Expression)node.FalseBlock[0],
+                                    FalseExpression = (Expression)node.TrueBlock[0]
                                 };
                         }
                         else
@@ -2316,8 +2301,8 @@ namespace Microsoft.Ajax.Utilities
                             conditional = new Conditional(node.Context, m_parser)
                                 {
                                     Condition = node.Condition,
-                                    TrueExpression = node.TrueBlock[0],
-                                    FalseExpression = node.FalseBlock[0]
+                                    TrueExpression = (Expression)node.TrueBlock[0],
+                                    FalseExpression = (Expression)node.FalseBlock[0]
                                 };
                         }
 
@@ -2421,13 +2406,6 @@ namespace Microsoft.Ajax.Utilities
                 }
                 else if (node.TrueBlock != null)
                 {
-                    // false block must be null
-                    if (node.TrueBlock.IsExpression
-                        && m_parser.Settings.IsModificationAllowed(TreeModifications.IfConditionCallToConditionAndCall))
-                    {
-                        // convert the if-node to an expression
-                        IfConditionExpressionToExpression(node, node.TrueBlock[0]);
-                    }
                 }
                 else if (m_parser.Settings.IsModificationAllowed(TreeModifications.IfEmptyToExpression))
                 {
@@ -2478,36 +2456,6 @@ namespace Microsoft.Ajax.Utilities
                     }
                 }
             }
-        }
-
-        private void IfConditionExpressionToExpression(IfNode ifNode, AstNode expression)
-        {
-            // but first -- which operator to use? if(a)b --> a&&b, and if(!a)b --> a||b
-            // so determine which one is smaller: a or !a
-            // assume we'll use the logical-and, since that doesn't require changing the condition
-            var newOperator = JSToken.LogicalAnd;
-            var logicalNot = new LogicalNot(ifNode.Condition, m_parser);
-            if (logicalNot.Measure() < 0)
-            {
-                // !a is smaller, so apply it and use the logical-or operator
-                logicalNot.Apply();
-                newOperator = JSToken.LogicalOr;
-            }
-
-            // because the true block is an expression, we know it must only have
-            // ONE statement in it, so we can just dereference it directly.
-            var binaryOp = new BinaryOperator(ifNode.Context, m_parser)
-                {
-                    Operand1 = ifNode.Condition,
-                    Operand2 = expression,
-                    OperatorToken = newOperator,
-                };
-
-            // we don't need to analyse this new node because we've already analyzed
-            // the pieces parts as part of the if. And this visitor's method for the BinaryOperator
-            // doesn't really do anything else. Just replace our current node with this
-            // new node
-            ifNode.Parent.ReplaceChild(ifNode, binaryOp);
         }
 
         public override void Visit(Lookup node)
@@ -2976,7 +2924,7 @@ namespace Microsoft.Ajax.Utilities
                                         {
                                             // we'll need to append the deleted break statement if it doesn't already have
                                             // a flow-changing statement: break, continue, return, or throw
-                                            AstNode lastStatement = switchCase.Statements[switchCase.Statements.Count - 1];
+                                            Node lastStatement = switchCase.Statements[switchCase.Statements.Count - 1];
                                             if (!(lastStatement is Break) && !(lastStatement is ContinueNode)
                                               && !(lastStatement is ReturnNode) && !(lastStatement is ThrowNode))
                                             {
@@ -3328,7 +3276,7 @@ namespace Microsoft.Ajax.Utilities
             }
         }
 
-        private static string GuessAtName(AstNode node)
+        private static string GuessAtName(Node node)
         {
             string guess = string.Empty;
             var parent = node.Parent;
@@ -3478,4 +3426,5 @@ namespace Microsoft.Ajax.Utilities
                 };
         }
     }
+#endif
 }

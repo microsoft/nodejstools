@@ -17,13 +17,13 @@
 using System.Collections.Generic;
 using System.Diagnostics;
 
-namespace Microsoft.Ajax.Utilities
+namespace Microsoft.NodejsTools.Parsing
 {
     public class UnaryOperator : Expression
     {
-        private AstNode m_operand;
+        private Expression m_operand;
 
-        public AstNode Operand
+        public Expression Operand
         {
             get { return m_operand; }
             set
@@ -34,24 +34,23 @@ namespace Microsoft.Ajax.Utilities
             }
         }
 
-        public Context OperatorContext { get; set; }
+        public TokenWithSpan OperatorContext { get; set; }
 
         public JSToken OperatorToken { get; set; }
         public bool IsPostfix { get; set; }
         public bool OperatorInConditionalCompilationComment { get; set; }
         public bool ConditionalCommentContainsOn { get; set; }
 
-        public UnaryOperator(Context context, JSParser parser)
+        public UnaryOperator(TokenWithSpan context, JSParser parser)
             : base(context, parser)
         {
         }
 
-        public override void Accept(IVisitor visitor)
-        {
-            if (visitor != null)
-            {
-                visitor.Visit(this);
+        public override void Walk(AstVisitor visitor) {
+            if (visitor.Walk(this)) {
+                m_operand.Walk(visitor);
             }
+            visitor.PostWalk(this);
         }
 
         public override PrimitiveType FindPrimitiveType()
@@ -87,7 +86,7 @@ namespace Microsoft.Ajax.Utilities
             }
         }
 
-        public override IEnumerable<AstNode> Children
+        public override IEnumerable<Node> Children
         {
             get
             {
@@ -95,22 +94,14 @@ namespace Microsoft.Ajax.Utilities
             }
         }
 
-        public override bool ReplaceChild(AstNode oldNode, AstNode newNode)
+        public override bool ReplaceChild(Node oldNode, Node newNode)
         {
             if (Operand == oldNode)
             {
-                Operand = newNode;
+                Operand = (Expression)newNode;
                 return true;
             }
             return false;
-        }
-
-        public override bool IsEquivalentTo(AstNode otherNode)
-        {
-            var otherUnary = otherNode as UnaryOperator;
-            return otherUnary != null
-                && OperatorToken == otherUnary.OperatorToken
-                && Operand.IsEquivalentTo(otherUnary.Operand);
         }
 
         public override bool IsConstant
@@ -121,10 +112,12 @@ namespace Microsoft.Ajax.Utilities
             }
         }
 
+#if FALSE
         public override string ToString()
         {
             return OutputVisitor.OperatorString(OperatorToken)
                 + (Operand == null ? "<null>" : Operand.ToString());
         }
+#endif
     }
 }

@@ -1,0 +1,295 @@
+﻿/* ****************************************************************************
+ *
+ * Copyright (c) Microsoft Corporation. 
+ *
+ * This source code is subject to terms and conditions of the Apache License, Version 2.0. A 
+ * copy of the license can be found in the License.html file at the root of this distribution. If 
+ * you cannot locate the Apache License, Version 2.0, please send an email to 
+ * vspython@microsoft.com. By using this source code in any fashion, you are agreeing to be bound 
+ * by the terms of the Apache License, Version 2.0.
+ *
+ * You must not remove this notice, or any other, from this software.
+ *
+ * ***************************************************************************/
+
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using Microsoft.NodejsTools.Interpreter;
+using Microsoft.NodejsTools.Parsing;
+
+
+namespace Microsoft.NodejsTools.Analysis.Values {
+    abstract class SpecializedNamespace : AnalysisValue {
+        protected readonly AnalysisValue _original, _inst;
+        private IAnalysisSet _descriptor;
+
+        public SpecializedNamespace(AnalysisValue original) {
+            _original = original;
+        }
+
+        public SpecializedNamespace(AnalysisValue original, AnalysisValue inst) {
+            _original = original;
+            _inst = inst;
+        }
+
+        internal AnalysisValue Original {
+            get {
+                return _original;
+            }
+        }
+
+        public override IAnalysisSet Call(Node node, AnalysisUnit unit, IAnalysisSet @this, IAnalysisSet[] args) {
+            if (_original == null) {
+                return base.Call(node, unit, @this, args);
+            }
+
+            return _original.Call(node, unit, @this, args);
+        }
+
+        internal override void AddReference(Node node, AnalysisUnit analysisUnit) {
+            if (_original == null) {
+                base.AddReference(node, analysisUnit);
+                return;
+            }
+
+            _original.AddReference(node, analysisUnit);
+        }
+
+        public override void AugmentAssign(BinaryOperator node, AnalysisUnit unit, IAnalysisSet value) {
+            if (_original == null) {
+                base.AugmentAssign(node, unit, value);
+                return;
+            }
+
+            _original.AugmentAssign(node, unit, value);
+        }
+
+        public override IAnalysisSet BinaryOperation(Node node, AnalysisUnit unit, Parsing.JSToken operation, IAnalysisSet rhs) {
+            if (_original == null) {
+                return base.BinaryOperation(node, unit, operation, rhs);
+            }
+
+            return _original.BinaryOperation(node, unit, operation, rhs);
+        }
+
+        public override IPythonProjectEntry DeclaringModule {
+            get {
+                if (_original == null) {
+                    return base.DeclaringModule;
+                }
+
+                return _original.DeclaringModule;
+            }
+        }
+
+        public override int DeclaringVersion {
+            get {
+                if (_original == null) {
+                    return base.DeclaringVersion;
+                }
+
+                return _original.DeclaringVersion;
+            }
+        }
+
+        public override void DeleteMember(Node node, AnalysisUnit unit, string name) {
+            if (_original == null) {
+                base.DeleteMember(node, unit, name);
+                return;
+            }
+
+            _original.DeleteMember(node, unit, name);
+        }
+
+        public override string Description {
+            get {
+                if (_original == null) {
+                    return base.Description;
+                }
+
+                return _original.Description;
+            }
+        }
+
+        public override string Documentation {
+            get {
+                if (_original == null) {
+                    return base.Documentation;
+                }
+
+                return _original.Documentation;
+            }
+        }
+
+        public override Dictionary<string, IAnalysisSet> GetAllMembers() {
+            if (_original == null) {
+                return base.GetAllMembers();
+            }
+            return _original.GetAllMembers();
+        }
+
+        public override object GetConstantValue() {
+            if (_original == null) {
+                return base.GetConstantValue();
+            }
+
+            return _original.GetConstantValue();
+        }
+
+#if FALSE
+        public override IAnalysisSet GetDescriptor(Node node, AnalysisValue instance, AnalysisValue context, AnalysisUnit unit) {
+            if (_original == null) {
+                return base.GetDescriptor(node, instance, context, unit);
+            }
+
+            if (_descriptor == null) {
+                var res = _original.GetDescriptor(node, instance, context, unit);
+                // TODO: This kinda sucks...
+                if (Object.ReferenceEquals(res, _original)) {
+                    _descriptor = SelfSet;
+                } else if (res.Count >= 1) {
+                    // TODO: Dictionary per-instance
+
+                    _descriptor = Clone(res.First(), instance);
+                } else {
+                    _descriptor = Clone(_original, instance);
+                }
+            }
+            return _descriptor;
+        }
+#endif
+
+        protected abstract SpecializedNamespace Clone(AnalysisValue original, AnalysisValue instance);
+
+        public override IAnalysisSet GetEnumeratorTypes(Node node, AnalysisUnit unit) {
+            if (_original == null) {
+                return base.GetEnumeratorTypes(node, unit);
+            }
+
+            return _original.GetEnumeratorTypes(node, unit);
+        }
+
+        public override IAnalysisSet GetIndex(Node node, AnalysisUnit unit, IAnalysisSet index) {
+            if (_original == null) {
+                return base.GetIndex(node, unit, index);
+            }
+
+            return _original.GetIndex(node, unit, index);
+        }
+
+        public override int? GetLength() {
+            if (_original == null) {
+                return base.GetLength();
+            }
+
+            return _original.GetLength();
+        }
+
+        public override IAnalysisSet GetMember(Node node, AnalysisUnit unit, string name) {
+            // Must unconditionally call the base implementation of GetMember
+            var ignored = base.GetMember(node, unit, name);
+
+            if (_original == null) {
+                return AnalysisSet.Empty;
+            }
+
+            return _original.GetMember(node, unit, name);
+        }
+
+#if FALSE
+        public override IAnalysisSet GetStaticDescriptor(AnalysisUnit unit) {
+            if (_original == null) {
+                return this;
+            }
+
+            var res = _original.GetStaticDescriptor(unit);
+            if (res == _original) {
+                return this;
+            }
+            // TODO: We should support wrapping these up and producing another SpecializedNamespace
+            return res;
+        }
+#endif
+
+        public override IEnumerable<LocationInfo> Locations {
+            get {
+                if (_original == null) {
+                    return new LocationInfo[0];
+                }
+                return _original.Locations;
+            }
+        }
+
+        public override IEnumerable<OverloadResult> Overloads {
+            get {
+                if (_original == null) {
+                    return new OverloadResult[0];
+                }
+                return _original.Overloads;
+            }
+        }
+
+        internal override IEnumerable<LocationInfo> References {
+            get {
+                if (_original == null) {
+                    return new LocationInfo[0];
+                }
+                return _original.References;
+            }
+        }
+
+        public override PythonMemberType MemberType {
+            get {
+                if (_original == null) {
+                    return PythonMemberType.Unknown;
+                }
+                return _original.MemberType;
+            }
+        }
+
+        public override IAnalysisSet ReverseBinaryOperation(Node node, AnalysisUnit unit, Parsing.JSToken operation, IAnalysisSet rhs) {
+            if (_original == null) {
+                return AnalysisSet.Empty;
+            }
+            return _original.ReverseBinaryOperation(node, unit, operation, rhs);
+        }
+
+        public override void SetIndex(Node node, AnalysisUnit unit, IAnalysisSet index, IAnalysisSet value) {
+            if (_original != null) {
+                _original.SetIndex(node, unit, index, value);
+            }
+        }
+
+        public override void SetMember(Node node, AnalysisUnit unit, string name, IAnalysisSet value) {
+            if (_original != null) {
+                _original.SetMember(node, unit, name, value);
+            }
+        }
+
+        public override string ShortDescription {
+            get {
+                if (_original == null) {
+                    return string.Empty;
+                }
+                return _original.ShortDescription;
+            }
+        }
+
+        public override BuiltinTypeId TypeId {
+            get {
+                if (_original == null) {
+                    return BuiltinTypeId.Unknown;
+                }
+                return _original.TypeId;
+            }
+        }
+
+        public override IAnalysisSet UnaryOperation(Node node, AnalysisUnit unit, Parsing.JSToken operation) {
+            if (_original == null) {
+                return AnalysisSet.Empty;
+            }
+            return _original.UnaryOperation(node, unit, operation);
+        }
+    }
+}

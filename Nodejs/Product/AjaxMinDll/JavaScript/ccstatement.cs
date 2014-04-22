@@ -14,11 +14,11 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-namespace Microsoft.Ajax.Utilities
+namespace Microsoft.NodejsTools.Parsing
 {
-    public abstract class ConditionalCompilationStatement : AstNode
+    public abstract class ConditionalCompilationStatement : Node
     {
-        protected ConditionalCompilationStatement(Context context, JSParser parser)
+        protected ConditionalCompilationStatement(TokenWithSpan context, JSParser parser)
             : base(context, parser)
         {
         }

@@ -18,29 +18,29 @@ using System.Collections.Generic;
 using System.Globalization;
 using System.Text;
 
-namespace Microsoft.Ajax.Utilities
+namespace Microsoft.NodejsTools.Parsing
 {
     public sealed class ArrayLiteral : Expression
     {
-        private AstNodeList m_elements;
+        private AstNodeList<Expression> _elements;
 
-        public AstNodeList Elements 
+        public AstNodeList<Expression> Elements 
         {
-            get { return m_elements; }
+            get { return _elements; }
             set
             {
-                m_elements.IfNotNull(n => n.Parent = (n.Parent == this) ? null : n.Parent);
-                m_elements = value;
-                m_elements.IfNotNull(n => n.Parent = this);
+                _elements.IfNotNull(n => n.Parent = (n.Parent == this) ? null : n.Parent);
+                _elements = value;
+                _elements.IfNotNull(n => n.Parent = this);
             }
         }
 
-        public ArrayLiteral(Context context, JSParser parser)
+        public ArrayLiteral(TokenWithSpan context, JSParser parser)
             : base(context, parser)
         {
         }
 
-        public override IEnumerable<AstNode> Children
+        public override IEnumerable<Node> Children
         {
             get
             {
@@ -48,15 +48,15 @@ namespace Microsoft.Ajax.Utilities
             }
         }
 
-        public override void Accept(IVisitor visitor)
-        {
-            if (visitor != null)
-            {
-                visitor.Visit(this);
+        public override void Walk(AstVisitor walker) {
+            if (walker.Walk(this)) {
+                foreach (var node in _elements) {
+                    walker.Walk(_elements);
+                }
             }
         }
 
-        public override bool ReplaceChild(AstNode oldNode, AstNode newNode)
+        public override bool ReplaceChild(Node oldNode, Node newNode)
         {
             // if the old node isn't our element list, ignore the cal
             if (oldNode == Elements)
@@ -70,7 +70,7 @@ namespace Microsoft.Ajax.Utilities
                 else
                 {
                     // if the new node isn't an AstNodeList, then ignore the call
-                    AstNodeList newList = newNode as AstNodeList;
+                    var newList = newNode as AstNodeList<Expression>;
                     if (newList != null)
                     {
                         // replace it

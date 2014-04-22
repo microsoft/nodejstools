@@ -13,9 +13,11 @@
  * ***************************************************************************/
 
 using System;
-using System.Diagnostics;
+using System.Collections.Generic;
 using System.IO;
+using System.Linq;
 using System.Threading.Tasks;
+using Newtonsoft.Json;
 
 namespace Microsoft.NodejsTools.Npm.SPI {
     internal class NpmController : AbstractNpmLogSource, INpmController {
@@ -74,17 +76,6 @@ namespace Microsoft.NodejsTools.Npm.SPI {
         }
 
         public void Refresh() {
-            RefreshAsync().ContinueWith(t => {
-                var ex = t.Exception;
-                if (ex != null) {
-#if DEBUG
-                    Debug.Fail(ex.ToString());
-#endif
-                }
-            });
-        }
-        
-        public async Task RefreshAsync() {
             OnStartingRefresh();
             try {
                 RootPackage = RootPackageFactory.Create(
@@ -94,13 +85,18 @@ namespace Microsoft.NodejsTools.Npm.SPI {
                 var command = new NpmLsCommand(_fullPathToRootPackageDirectory, true, PathToNpm,
                     _useFallbackIfNpmNotFound);
 
-                GlobalPackages = (await command.ExecuteAsync())
-                    ? RootPackageFactory.Create(command.ListBaseDirectory)
-                    : null;
+                command.ExecuteAsync().ContinueWith(task => {
+                    try {
+                        GlobalPackages = task.Result
+                            ? RootPackageFactory.Create(command.ListBaseDirectory)
+                            : null;
+                    } catch (IOException) { } catch (AggregateException) { }    //  Latter for npm not installed.
+                    OnFinishedRefresh();
+                });
             } catch (IOException) {
                 // Can sometimes happen when packages are still installing because the file may still be used by another process
-            } finally {
-                OnFinishedRefresh();
+            } catch (AggregateException) {
+                //  npm not installed
             }
         }
 

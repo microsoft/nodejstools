@@ -121,15 +121,19 @@
     <value>Unable to retrieve npm catalog: the web service may be unavailable.</value>
   </data>
   <data name="PackagesDownloadComplete" xml:space="preserve">
-    <value>Download complete</value>
+    <value>Download complete
+</value>
   </data>
   <data name="PackagesDownloadedXMB" xml:space="preserve">
-    <value>Downloaded {0}MB of the package list</value>
+    <value>Downloaded {0}MB of the package list
+</value>
   </data>
   <data name="PackagesDownloadStarting" xml:space="preserve">
-    <value>Downloading list of packages from {0}</value>
+    <value>Downloading list of packages from {0}
+</value>
   </data>
   <data name="PackagesDownloadedXOfYMB" xml:space="preserve">
-    <value>Downloaded {0}MB of the package list ({1}MB total)</value>
+    <value>Downloaded {0}MB of the package list ({1}MB total)
+</value>
   </data>
 </root>

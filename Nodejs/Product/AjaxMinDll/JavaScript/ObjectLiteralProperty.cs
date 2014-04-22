@@ -17,12 +17,12 @@
 using System.Collections.Generic;
 using System.Text;
 
-namespace Microsoft.Ajax.Utilities
+namespace Microsoft.NodejsTools.Parsing
 {
-    public class ObjectLiteralProperty : AstNode
+    public class ObjectLiteralProperty : Node
     {
         private ObjectLiteralField m_propertyName;
-        private AstNode m_propertyValue;
+        private Expression m_propertyValue;
 
         public ObjectLiteralField Name
         {
@@ -35,7 +35,7 @@ namespace Microsoft.Ajax.Utilities
             }
         }
 
-        public AstNode Value
+        public Expression Value
         {
             get { return m_propertyValue; }
             set
@@ -56,20 +56,20 @@ namespace Microsoft.Ajax.Utilities
             }
         }
 
-        public ObjectLiteralProperty(Context context, JSParser parser)
+        public ObjectLiteralProperty(TokenWithSpan context, JSParser parser)
             : base(context, parser)
         {
         }
 
-        public override void Accept(IVisitor visitor)
-        {
-            if (visitor != null)
-            {
-                visitor.Visit(this);
+        public override void Walk(AstVisitor visitor) {
+            if (visitor.Walk(this)) {
+                m_propertyName.Walk(visitor);
+                m_propertyValue.Walk(visitor);
             }
+            visitor.PostWalk(this);
         }
 
-        public override IEnumerable<AstNode> Children
+        public override IEnumerable<Node> Children
         {
             get
             {
@@ -77,7 +77,7 @@ namespace Microsoft.Ajax.Utilities
             }
         }
 
-        public override bool ReplaceChild(AstNode oldNode, AstNode newNode)
+        public override bool ReplaceChild(Node oldNode, Node newNode)
         {
             if (Name == oldNode)
             {
@@ -91,14 +91,14 @@ namespace Microsoft.Ajax.Utilities
 
             if (Value == oldNode)
             {
-                Value = newNode;
+                Value = (Expression)newNode;
                 return true;
             }
 
             return false;
         }
 
-        internal override string GetFunctionGuess(AstNode target)
+        internal override string GetFunctionGuess(Node target)
         {
             return Name.ToString();
         }

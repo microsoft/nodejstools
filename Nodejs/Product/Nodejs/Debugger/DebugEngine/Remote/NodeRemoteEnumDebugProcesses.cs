@@ -86,7 +86,7 @@ namespace Microsoft.NodejsTools.Debugger.Remote {
                     exception = ex;
                 } catch (PlatformNotSupportedException) {
                     MessageBox.Show(
-                        "Remote debugging of node.js Microsoft Azure applications is only supported on Windows 8 and above.",
+                        "Remote debugging of node.js Windows Azure applications is only supported on Windows 8 and above.",
                         null, MessageBoxButtons.OK, MessageBoxIcon.Error);
                     return null;
                 }

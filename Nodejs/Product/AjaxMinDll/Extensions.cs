@@ -33,7 +33,7 @@ namespace System.Runtime.CompilerServices
 
 #endif
 
-namespace Microsoft.Ajax.Utilities
+namespace Microsoft.NodejsTools.Parsing
 {
     using System;
     using System.Collections.Generic;
@@ -56,35 +56,11 @@ namespace Microsoft.Ajax.Utilities
             }
         }
 
-        public static bool TryParseSingleInvariant(this string text, out float number)
-        {
-            try
-            {
-                number = System.Convert.ToSingle(text, CultureInfo.InvariantCulture);
-                return true;
-            }
-            catch (FormatException)
-            {
-                number = float.NaN;
-                return false;
-            }
-            catch (OverflowException)
-            {
-                number = float.NaN;
-                return false;
-            }
-        }
 
         public static bool TryParseIntInvariant(this string text, NumberStyles numberStyles, out int number)
         {
             number = default(int);
             return text == null ? false : int.TryParse(text, numberStyles, CultureInfo.InvariantCulture, out number);
-        }
-
-        public static bool TryParseLongInvariant(this string text, NumberStyles numberStyles, out long number)
-        {
-            number = default(long);
-            return text == null ? false : long.TryParse(text, numberStyles, CultureInfo.InvariantCulture, out number);
         }
 
         public static bool IsNullOrWhiteSpace(this string text)
@@ -140,17 +116,7 @@ namespace Microsoft.Ajax.Utilities
             return number.ToStringInvariant(null);
         }
 
-        public static string ToStringInvariant(this double number)
-        {
-            return number.ToStringInvariant(null);
-        }
-
-        public static IEnumerable<TSource> DistinctBy<TSource, TKey>(this IEnumerable<TSource> source, Func<TSource, TKey> keySelector)
-        {
-            var hash = new HashSet<TKey>();
-            return source.Where(p => hash.Add(keySelector(p)));
-        }
-
+        
         public static TResult IfNotNull<TObject, TResult>(this TObject obj, Func<TObject, TResult> action)
         {
             if (action == null)

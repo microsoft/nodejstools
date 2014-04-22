@@ -14,7 +14,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-namespace Microsoft.Ajax.Utilities
+namespace Microsoft.NodejsTools.Parsing
 {
     using System.Collections.Generic;
     using System.Globalization;
@@ -26,17 +26,15 @@ namespace Microsoft.Ajax.Utilities
     {
         public JSToken StatementToken { get; set; }
 
-        public LexicalDeclaration(Context context, JSParser parser)
+        public LexicalDeclaration(TokenWithSpan context, JSParser parser)
             : base(context, parser)
         {
         }
 
-        public override void Accept(IVisitor visitor)
-        {
-            if (visitor != null)
-            {
-                visitor.Visit(this);
+        public override void Walk(AstVisitor visitor) {
+            if (visitor.Walk(this)) {
             }
+            visitor.PostWalk(this);
         }
     }
 }

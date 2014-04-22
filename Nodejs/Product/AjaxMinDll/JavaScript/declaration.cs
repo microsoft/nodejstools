@@ -18,10 +18,10 @@ using System;
 using System.Collections.Generic;
 using System.Text;
 
-namespace Microsoft.Ajax.Utilities
+namespace Microsoft.NodejsTools.Parsing
 {
     [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Naming", "CA1710:IdentifiersShouldHaveCorrectSuffix", Justification = "AST statement")]
-    public abstract class Declaration : AstNode, IEnumerable<VariableDeclaration>
+    public abstract class Declaration : Statement, IEnumerable<VariableDeclaration>
     {
         private List<VariableDeclaration> m_list;
 
@@ -50,13 +50,13 @@ namespace Microsoft.Ajax.Utilities
 
         public ActivationObject Scope { get; set; }
 
-        protected Declaration(Context context, JSParser parser)
+        protected Declaration(TokenWithSpan context, JSParser parser)
             : base(context, parser)
         {
             m_list = new List<VariableDeclaration>();
         }
 
-        public override IEnumerable<AstNode> Children
+        public override IEnumerable<Node> Children
         {
             get
             {
@@ -64,7 +64,7 @@ namespace Microsoft.Ajax.Utilities
             }
         }
 
-        public override bool ReplaceChild(AstNode oldNode, AstNode newNode)
+        public override bool ReplaceChild(Node oldNode, Node newNode)
         {
             for (int ndx = 0; ndx < m_list.Count; ++ndx)
             {
@@ -86,7 +86,7 @@ namespace Microsoft.Ajax.Utilities
             return false;
         }
 
-        internal void Append(AstNode elem)
+        internal void Append(Node elem)
         {
             VariableDeclaration decl = elem as VariableDeclaration;
             if (decl != null)
@@ -119,7 +119,7 @@ namespace Microsoft.Ajax.Utilities
             }
         }
 
-        internal void InsertAt(int index, AstNode elem)
+        internal void InsertAt(int index, Node elem)
         {
             VariableDeclaration decl = elem as VariableDeclaration;
             if (decl != null)

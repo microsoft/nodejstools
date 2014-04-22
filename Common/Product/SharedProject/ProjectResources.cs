@@ -157,7 +157,6 @@ namespace Microsoft.VisualStudioTools.Project {
         internal const string WebPiFeed = "WebPiFeed";
         internal const string WebPiProduct = "WebPiProduct";
         internal const string WebPiFeedDescription = "WebPiFeedDescription";
-        internal const string WebPiFeedError = "WebPiFeedError";
         internal const string WebPiProductDescription = "WebPiProductDescription";
         internal const string WebPiReferenceProperties = "WebPiReferenceProperties";
         internal const string UnexpectedUpgradeError = "UnexpectedUpgradeError";
@@ -197,7 +196,7 @@ namespace Microsoft.VisualStudioTools.Project {
             }
 
             Debug.WriteLineIf(
-                Enumerable.Range(0, args.Length).Any(i => result.IndexOf(string.Format("{{{0}}}", i)) < 0),
+                Enumerable.Range(0, args.Length).Any(i => result.IndexOf(string.Format("{{{0}}}", i)) >= 0),
                 string.Format("Resource string '{0}' does not use all {1} arguments", value, args.Length)
             );
             Debug.WriteLineIf(

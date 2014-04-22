@@ -17,8 +17,9 @@
 using System;
 using System.Collections.Generic;
 
-namespace Microsoft.Ajax.Utilities
+namespace Microsoft.NodejsTools.Parsing
 {
+#if FALSE
     internal class ReorderScopeVisitor : TreeVisitor
     {
         // list of all function declarations found in this scope
@@ -214,7 +215,7 @@ namespace Microsoft.Ajax.Utilities
                         // constructing an expression statement that is made up of assignment
                         // operators for each of the declarations that have initializers (if any)
                         // and removing all the initializers
-                        var assignments = new List<AstNode>();
+                        var assignments = new List<Node>();
                         for (var ndx = 0; ndx < varStatement.Count; ++ndx)
                         {
                             var varDecl = varStatement[ndx];
@@ -734,4 +735,5 @@ namespace Microsoft.Ajax.Utilities
             return isHint;
         }
     }
+#endif
 }

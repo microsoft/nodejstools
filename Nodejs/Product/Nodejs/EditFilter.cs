@@ -80,15 +80,13 @@ namespace Microsoft.NodejsTools {
             }
         }
 
-        private SkipJsLsFilter SkipJsFilter {
-            get {
-                SkipJsLsFilter skipJsFilter;
-                if (_textView.Properties.TryGetProperty<SkipJsLsFilter>(typeof(SkipJsLsFilter), out skipJsFilter)) {
-                    return skipJsFilter;
-                }
-                return null;
-            }
+        private void OnCompletionSessionDismissedOrCommitted(object sender, System.EventArgs e) {
+            // We've just been told that our active session was dismissed.  We should remove all references to it.
+            _activeSession.Committed -= OnCompletionSessionDismissedOrCommitted;
+            _activeSession.Dismissed -= OnCompletionSessionDismissedOrCommitted;
+            _activeSession = null;
         }
+
 
         private static HashSet<char> _commitChars = new HashSet<char>("{}[](),:;+-*%&|^~=<>#\\");
 
@@ -106,6 +104,8 @@ namespace Microsoft.NodejsTools {
                             !_intellisenseStack.TopSession.IsDismissed) {
                             ((ICompletionSession)_intellisenseStack.TopSession).Commit();
                         } else {
+                            hr = _next.Exec(ref pguidCmdGroup, nCmdID, nCmdexecopt, pvaIn, pvaOut);
+#if FALSE
                             if (SkipJsFilter != null) {                                
                                 var res = SkipJsFilter.Exec(ref pguidCmdGroup, nCmdID, nCmdexecopt, pvaIn, pvaOut);
                                 SmartIndent smartIndent;
@@ -124,7 +124,9 @@ namespace Microsoft.NodejsTools {
                             }
 
                             _editorOps.InsertNewLine();
+#endif
                             FormatAfterTyping('\n');
+                            return hr;
                         }
                         return VSConstants.S_OK;
                     case VSConstants.VSStd2KCmdID.TYPECHAR:
@@ -140,16 +142,18 @@ namespace Microsoft.NodejsTools {
                                 }
                             }
 
+                            switch(ch) {
+                                case '.':
+                                    if (NodejsPackage.Instance.LangPrefs.AutoListMembers) {
+                                        TriggerCompletionSession(false);
+                                    }
+                                    break;
+                            }
                             if ((ch == '.' && !NodejsPackage.Instance.LangPrefs.AutoListMembers) ||
                                 (ch == '(' && !NodejsPackage.Instance.LangPrefs.AutoListParams)) {
-                                return (SkipJsFilter ?? _next).Exec(ref pguidCmdGroup, nCmdID, nCmdexecopt, pvaIn, pvaOut);
+                                return _next.Exec(ref pguidCmdGroup, nCmdID, nCmdexecopt, pvaIn, pvaOut);
                             } else if (ch == '}' || ch == ';') {
-                                if (SkipJsFilter != null) {
-                                    hr = SkipJsFilter.Exec(ref pguidCmdGroup, nCmdID, nCmdexecopt, pvaIn, pvaOut);
-                                } else {
-                                    _editorOps.InsertText(ch.ToString());
-                                    hr = VSConstants.S_OK;
-                                }
+                                hr = _next.Exec(ref pguidCmdGroup, nCmdID, nCmdexecopt, pvaIn, pvaOut);
 
                                 FormatAfterTyping(ch);
                                 return hr;
@@ -163,7 +167,7 @@ namespace Microsoft.NodejsTools {
                             }
 
                             if (!NodejsPackage.Instance.LangPrefs.AutoListMembers) {
-                                hr = (SkipJsFilter ?? _next).Exec(ref pguidCmdGroup, nCmdID, nCmdexecopt, pvaIn, pvaOut);
+                                hr = _next.Exec(ref pguidCmdGroup, nCmdID, nCmdexecopt, pvaIn, pvaOut);
                             } else {
                                 hr = _next.Exec(ref pguidCmdGroup, nCmdID, nCmdexecopt, pvaIn, pvaOut);
                             }
@@ -176,6 +180,8 @@ namespace Microsoft.NodejsTools {
                         break;
                     case VSConstants.VSStd2KCmdID.PASTE: 
                         var curVersion = _textView.TextBuffer.CurrentSnapshot;
+                        hr = _next.Exec(ref pguidCmdGroup, nCmdID, nCmdexecopt, pvaIn, pvaOut);
+#if FALSE
                         if (SkipJsFilter != null) {
                             hr = SkipJsFilter.Exec(ref pguidCmdGroup, nCmdID, nCmdexecopt, pvaIn, pvaOut);
                         } else {
@@ -185,6 +191,7 @@ namespace Microsoft.NodejsTools {
                                 hr = VSConstants.E_FAIL;
                             }
                         }
+#endif
 
                         if (ErrorHandler.Succeeded(hr)) {
                             FormatAfterPaste(curVersion);
@@ -196,11 +203,7 @@ namespace Microsoft.NodejsTools {
                             !_intellisenseStack.TopSession.IsDismissed) {
                             ((ICompletionSession)_intellisenseStack.TopSession).Commit();
                         } else {
-                            if (SkipJsFilter != null) {
-                                return SkipJsFilter.Exec(ref pguidCmdGroup, nCmdID, nCmdexecopt, pvaIn, pvaOut);
-                            }
-
-                            _editorOps.Indent();
+                            return _next.Exec(ref pguidCmdGroup, nCmdID, nCmdexecopt, pvaIn, pvaOut);
                         }
                         return VSConstants.S_OK;
                     case VSConstants.VSStd2KCmdID.SHOWMEMBERLIST:
@@ -224,13 +227,7 @@ namespace Microsoft.NodejsTools {
                 switch ((VSConstants.VSStd97CmdID)nCmdID) {
                     case VSConstants.VSStd97CmdID.Paste:
                         var curVersion = _textView.TextBuffer.CurrentSnapshot;
-                        if (SkipJsFilter != null) {
-                            hr = SkipJsFilter.Exec(ref pguidCmdGroup, nCmdID, nCmdexecopt, pvaIn, pvaOut);
-                        } else if (_editorOps.Paste()) {
-                            hr = VSConstants.S_OK;
-                        } else {
-                            hr = VSConstants.E_FAIL;
-                        }
+                        hr = _next.Exec(ref pguidCmdGroup, nCmdID, nCmdexecopt, pvaIn, pvaOut);
 
                         if (ErrorHandler.Succeeded(hr)) {
                             FormatAfterPaste(curVersion);
@@ -254,14 +251,17 @@ namespace Microsoft.NodejsTools {
             _activeSession = _broker.TriggerCompletion(_textView);
 
             if (_activeSession != null) {
+                FuzzyCompletionSet set;
                 if (completeWord &&
                     _activeSession.CompletionSets.Count == 1 &&
-                    _activeSession.CompletionSets[0].Completions.Count == 1) {
+                    (set = _activeSession.CompletionSets[0] as FuzzyCompletionSet) != null &&
+                    set.SelectSingleBest()) {
                     _activeSession.Commit();
                     _activeSession = null;
                 } else {
-                    _activeSession.Dismissed += OnCompletionSessionDismissed;
-                    _activeSession.Committed += OnCompletionSessionDismissed;
+                    _activeSession.Filter();
+                    _activeSession.Dismissed += OnCompletionSessionDismissedOrCommitted;
+                    _activeSession.Committed += OnCompletionSessionDismissedOrCommitted;
                 }
                 return true;
             }

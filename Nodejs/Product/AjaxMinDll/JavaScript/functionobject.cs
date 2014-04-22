@@ -20,29 +20,23 @@ using System.Globalization;
 using System.Reflection;
 using System.Text;
 
-namespace Microsoft.Ajax.Utilities
-{
-    public sealed class FunctionObject : AstNode, INameDeclaration
-    {
+namespace Microsoft.NodejsTools.Parsing {
+    public sealed class FunctionObject : Statement, INameDeclaration {
         private Block m_body;
-        private AstNodeList m_parameters;
+        private AstNodeList<ParameterDeclaration> m_parameters;
 
-        public Block Body
-        {
+        public Block Body {
             get { return m_body; }
-            set
-            {
+            set {
                 m_body.IfNotNull(n => n.Parent = (n.Parent == this) ? null : n.Parent);
                 m_body = value;
                 m_body.IfNotNull(n => n.Parent = this);
             }
         }
 
-        public AstNodeList ParameterDeclarations
-        {
+        public AstNodeList<ParameterDeclaration> ParameterDeclarations {
             get { return m_parameters; }
-            set
-            {
+            set {
                 m_parameters.IfNotNull(n => n.Parent = (n.Parent == this) ? null : n.Parent);
                 m_parameters = value;
                 m_parameters.IfNotNull(n => n.Parent = this);
@@ -51,50 +45,41 @@ namespace Microsoft.Ajax.Utilities
 
         public FunctionType FunctionType { get; set; }
 
-        public AstNode Initializer { get { return null; } }
+        public Expression Initializer { get { return null; } }
 
-        public Context NameContext { get { return IdContext; } }
+        public TokenWithSpan NameContext { get { return IdContext; } }
 
-        public bool RenameNotAllowed
-        {
-            get
-            {
+        public bool RenameNotAllowed {
+            get {
                 return VariableField == null ? true : !VariableField.CanCrunch;
             }
         }
 
         private bool m_leftHandFunction;// = false;
-        public bool LeftHandFunctionExpression
-        {
-            get
-            {
+        public bool LeftHandFunctionExpression {
+            get {
                 return (FunctionType == FunctionType.Expression && m_leftHandFunction);
             }
-            set
-            {
+            set {
                 m_leftHandFunction = value;
             }
         }
 
-        public string Name
-        {
+        public string Name {
             get;
             set;
         }
 
-        public string NameGuess
-        {
+        public string NameGuess {
             get;
             set;
         }
 
-        public Context IdContext { get; set; }
-        public Context ParametersContext { get; set; }
+        public TokenWithSpan IdContext { get; set; }
+        public TokenWithSpan ParametersContext { get; set; }
 
-        public override bool IsExpression
-        {
-            get
-            {
+        public override bool IsExpression {
+            get {
                 // if this is a declaration, then it's not an expression. Otherwise treat it 
                 // as if it were an expression.
                 return !(FunctionType == FunctionType.Declaration);
@@ -103,8 +88,7 @@ namespace Microsoft.Ajax.Utilities
 
         // when parsed, this flag indicates that a function declaration is in the
         // proper source-element location
-        public bool IsSourceElement
-        {
+        public bool IsSourceElement {
             get;
             set;
         }
@@ -114,87 +98,74 @@ namespace Microsoft.Ajax.Utilities
 
         public FunctionScope FunctionScope { get; set; }
 
-        public override ActivationObject EnclosingScope
-        {
-            get
-            {
+        public override ActivationObject EnclosingScope {
+            get {
                 return FunctionScope;
             }
         }
 
-        public override OperatorPrecedence Precedence
-        {
-            get
-            {
+        public override OperatorPrecedence Precedence {
+            get {
                 // just assume primary -- should only get called for expressions anyway
                 return OperatorPrecedence.Primary;
             }
         }
 
-        public FunctionObject(Context functionContext, JSParser parser)
-            : base(functionContext, parser)
-        {
+        public FunctionObject(TokenWithSpan functionContext, JSParser parser)
+            : base(functionContext, parser) {
         }
 
-        public override void Accept(IVisitor visitor)
-        {
-            if (visitor != null)
-            {
-                visitor.Visit(this);
+        public override void Walk(AstVisitor walker) {
+            if (walker.Walk(this)) {
+                foreach (var param in m_parameters) {
+                    param.Walk(walker);
+                }
+
+                if (Body != null) {
+                    Body.Walk(walker);
+                }
             }
+            walker.PostWalk(this);
         }
 
-        public bool IsReferenced
-        {
-            get
-            {
+        public bool IsReferenced {
+            get {
                 // call the checking method with a new empty hashset so it doesn't
                 // go in an endless circle
                 return SafeIsReferenced(new HashSet<FunctionObject>());
             }
         }
 
-        private bool SafeIsReferenced(HashSet<FunctionObject> visited)
-        {
+        private bool SafeIsReferenced(HashSet<FunctionObject> visited) {
             // if we've already been here, don't go in a circle
-            if (!visited.Contains(this))
-            {
+            if (!visited.Contains(this)) {
                 // add us to the visited list
                 visited.Add(this);
 
-                if (FunctionType == FunctionType.Declaration)
-                {
+                if (FunctionType == FunctionType.Declaration) {
                     // this is a function declaration, so it better have it's variable field set.
                     // if the variable (and therefore the function) is defined in the global scope,
                     // then this function declaration is called by a global function and therefore is
                     // referenced.
-                    if (VariableField.OwningScope is GlobalScope)
-                    {
+                    if (VariableField.OwningScope is GlobalScope) {
                         return true;
                     }
 
                     // not defined in the global scope. Check its references.
-                    foreach (var reference in VariableField.References)
-                    {
+                    foreach (var reference in VariableField.References) {
                         var referencingScope = reference.VariableScope;
-                        if (referencingScope is GlobalScope)
-                        {
+                        if (referencingScope is GlobalScope) {
                             // referenced by a lookup in the global scope -- we're good to go.
                             return true;
-                        }
-                        else
-                        {
+                        } else {
                             var functionScope = referencingScope as FunctionScope;
-                            if (functionScope != null && functionScope.FunctionObject.SafeIsReferenced(visited))
-                            {
+                            if (functionScope != null && functionScope.FunctionObject.SafeIsReferenced(visited)) {
                                 // as soon as we find one that's referenced, we stop
                                 return true;
                             }
                         }
                     }
-                }
-                else
-                {
+                } else {
                     // expressions are always referenced
                     return true;
                 }
@@ -204,26 +175,19 @@ namespace Microsoft.Ajax.Utilities
             return false;
         }
 
-        public override IEnumerable<AstNode> Children
-        {
-            get
-            {
+        public override IEnumerable<Node> Children {
+            get {
                 return EnumerateNonNullNodes(ParameterDeclarations, Body);
             }
         }
 
-        public override bool ReplaceChild(AstNode oldNode, AstNode newNode)
-        {
-            if (Body == oldNode)
-            {
-                Body = ForceToBlock(newNode);
+        public override bool ReplaceChild(Node oldNode, Node newNode) {
+            if (Body == oldNode) {
+                Body = ForceToBlock((Statement)newNode);
                 return true;
-            }
-            else if (ParameterDeclarations == oldNode)
-            {
-                var newList = newNode as AstNodeList;
-                if (newNode == null || newList != null)
-                {
+            } else if (ParameterDeclarations == oldNode) {
+                var newList = newNode as AstNodeList<ParameterDeclaration>;
+                if (newNode == null || newList != null) {
                     ParameterDeclarations = newList;
                     return true;
                 }
@@ -232,28 +196,19 @@ namespace Microsoft.Ajax.Utilities
             return false;
         }
 
-        internal override bool RequiresSeparator
-        {
-            get { return HideFromOutput; }
-        }
-
-        internal bool IsArgumentTrimmable(JSVariableField targetArgumentField)
-        {
+        internal bool IsArgumentTrimmable(JSVariableField targetArgumentField) {
             // walk backward until we either find the given argument field or the
             // first parameter that is referenced. 
             // If we find the argument field, then we can trim it because there are no
             // referenced parameters after it.
             // if we find a referenced argument, then the parameter is not trimmable.
             JSVariableField argumentField = null;
-            if (ParameterDeclarations != null)
-            {
-                for (int index = ParameterDeclarations.Count - 1; index >= 0; --index)
-                {
+            if (ParameterDeclarations != null) {
+                for (int index = ParameterDeclarations.Count - 1; index >= 0; --index) {
                     // better be a parameter declaration
                     argumentField = (ParameterDeclarations[index] as ParameterDeclaration).IfNotNull(p => p.VariableField);
                     if (argumentField != null
-                        && (argumentField == targetArgumentField || argumentField.IsReferenced))
-                    {
+                        && (argumentField == targetArgumentField || argumentField.IsReferenced)) {
                         break;
                     }
                 }

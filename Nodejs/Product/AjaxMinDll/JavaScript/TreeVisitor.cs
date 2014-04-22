@@ -14,15 +14,16 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-namespace Microsoft.Ajax.Utilities
+namespace Microsoft.NodejsTools.Parsing
 {
-    public class TreeVisitor : IVisitor
+#if FALSE
+    public class TreeVisitor : AstVisitor
     {
         public TreeVisitor() { }
 
         #region IVisitor Members
 
-        public virtual void Visit(ArrayLiteral node)
+        public override void Visit(ArrayLiteral node)
         {
             if (node != null)
             {
@@ -33,12 +34,7 @@ namespace Microsoft.Ajax.Utilities
             }
         }
 
-        public virtual void Visit(AspNetBlockNode node)
-        {
-            // no children
-        }
-
-        public virtual void Visit(AstNodeList node)
+        public override void Visit<T>(AstNodeList<T> node) 
         {
             if (node != null)
             {
@@ -49,7 +45,7 @@ namespace Microsoft.Ajax.Utilities
             }
         }
 
-        public virtual void Visit(BinaryOperator node)
+        public override void Visit(BinaryOperator node)
         {
             if (node != null)
             {
@@ -65,7 +61,7 @@ namespace Microsoft.Ajax.Utilities
             }
         }
 
-        public virtual void Visit(Block node)
+        public override void Visit(Block node)
         {
             if (node != null)
             {
@@ -76,7 +72,7 @@ namespace Microsoft.Ajax.Utilities
             }
         }
 
-        public virtual void Visit(Break node)
+        public override void Visit(Break node)
         {
             if (node != null)
             {
@@ -84,7 +80,7 @@ namespace Microsoft.Ajax.Utilities
             }
         }
 
-        public virtual void Visit(CallNode node)
+        public override void Visit(CallNode node)
         {
             if (node != null)
             {
@@ -99,8 +95,8 @@ namespace Microsoft.Ajax.Utilities
                 }
             }
         }
-
-        public virtual void Visit(ConditionalCompilationComment node)
+#if FALSE
+        public override void Visit(ConditionalCompilationComment node)
         {
             if (node != null)
             {
@@ -111,12 +107,12 @@ namespace Microsoft.Ajax.Utilities
             }
         }
 
-        public virtual void Visit(ConditionalCompilationElse node)
+        public override void Visit(ConditionalCompilationElse node)
         {
             // no children
         }
 
-        public virtual void Visit(ConditionalCompilationElseIf node)
+        public override void Visit(ConditionalCompilationElseIf node)
         {
             if (node != null)
             {
@@ -127,12 +123,12 @@ namespace Microsoft.Ajax.Utilities
             }
         }
 
-        public virtual void Visit(ConditionalCompilationEnd node)
+        public override void Visit(ConditionalCompilationEnd node)
         {
             // no children
         }
 
-        public virtual void Visit(ConditionalCompilationIf node)
+        public override void Visit(ConditionalCompilationIf node)
         {
             if (node != null)
             {
@@ -143,12 +139,12 @@ namespace Microsoft.Ajax.Utilities
             }
         }
 
-        public virtual void Visit(ConditionalCompilationOn node)
+        public override void Visit(ConditionalCompilationOn node)
         {
             // no children
         }
 
-        public virtual void Visit(ConditionalCompilationSet node)
+        public override void Visit(ConditionalCompilationSet node)
         {
             if (node != null)
             {
@@ -158,8 +154,8 @@ namespace Microsoft.Ajax.Utilities
                 }
             }
         }
-
-        public virtual void Visit(Conditional node)
+#endif
+        public override void Visit(Conditional node)
         {
             if (node != null)
             {
@@ -180,17 +176,17 @@ namespace Microsoft.Ajax.Utilities
             }
         }
 
-        public virtual void Visit(ConstantWrapper node)
+        public override void Visit(ConstantWrapper node)
         {
             // no children
         }
 
-        public virtual void Visit(ConstantWrapperPP node)
+        public override void Visit(ConstantWrapperPP node)
         {
             // no children
         }
 
-        public virtual void Visit(ConstStatement node)
+        public override void Visit(ConstStatement node)
         {
             if (node != null)
             {
@@ -201,7 +197,7 @@ namespace Microsoft.Ajax.Utilities
             }
         }
 
-        public virtual void Visit(ContinueNode node)
+        public override void Visit(ContinueNode node)
         {
             if (node != null)
             {
@@ -209,28 +205,17 @@ namespace Microsoft.Ajax.Utilities
             }
         }
 
-        public virtual void Visit(CustomNode node)
-        {
-            if (node != null)
-            {
-                foreach (var childNode in node.Children)
-                {
-                    childNode.Accept(this);
-                }
-            }
-        }
-
-        public virtual void Visit(DebuggerNode node)
+        public override void Visit(DebuggerNode node)
         {
             // no children
         }
 
-        public virtual void Visit(DirectivePrologue node)
+        public override void Visit(DirectivePrologue node)
         {
             // no children
         }
 
-        public virtual void Visit(DoWhile node)
+        public override void Visit(DoWhile node)
         {
             if (node != null)
             {
@@ -246,12 +231,12 @@ namespace Microsoft.Ajax.Utilities
             }
         }
 
-        public virtual void Visit(EmptyStatement node)
+        public override void Visit(EmptyStatement node)
         {
             // no children
         }
 
-        public virtual void Visit(ForIn node)
+        public override void Visit(ForIn node)
         {
             if (node != null)
             {
@@ -272,7 +257,7 @@ namespace Microsoft.Ajax.Utilities
             }
         }
 
-        public virtual void Visit(ForNode node)
+        public override void Visit(ForNode node)
         {
             if (node != null)
             {
@@ -298,7 +283,7 @@ namespace Microsoft.Ajax.Utilities
             }
         }
 
-        public virtual void Visit(FunctionObject node)
+        public override void Visit(FunctionObject node)
         {
             if (node != null)
             {
@@ -309,12 +294,12 @@ namespace Microsoft.Ajax.Utilities
             }
         }
 
-        public virtual void Visit(GetterSetter node)
+        public override void Visit(GetterSetter node)
         {
             // no children
         }
 
-        public virtual void Visit(GroupingOperator node)
+        public override void Visit(GroupingOperator node)
         {
             if (node != null && node.Operand != null)
             {
@@ -322,7 +307,7 @@ namespace Microsoft.Ajax.Utilities
             }
         }
 
-        public virtual void Visit(IfNode node)
+        public override void Visit(IfNode node)
         {
             if (node != null)
             {
@@ -343,12 +328,12 @@ namespace Microsoft.Ajax.Utilities
             }
         }
 
-        public virtual void Visit(ImportantComment node)
+        public override void Visit(ImportantComment node)
         {
             // no children
         }
 
-        public virtual void Visit(LabeledStatement node)
+        public override void Visit(LabeledStatement node)
         {
             if (node != null)
             {
@@ -359,7 +344,7 @@ namespace Microsoft.Ajax.Utilities
             }
         }
 
-        public virtual void Visit(LexicalDeclaration node)
+        public override void Visit(LexicalDeclaration node)
         {
             if (node != null)
             {
@@ -370,12 +355,12 @@ namespace Microsoft.Ajax.Utilities
             }
         }
 
-        public virtual void Visit(Lookup node)
+        public override void Visit(Lookup node)
         {
             // no children
         }
 
-        public virtual void Visit(Member node)
+        public override void Visit(Member node)
         {
             if (node != null)
             {
@@ -386,7 +371,7 @@ namespace Microsoft.Ajax.Utilities
             }
         }
 
-        public virtual void Visit(ObjectLiteral node)
+        public override void Visit(ObjectLiteral node)
         {
             if (node != null)
             {
@@ -397,12 +382,12 @@ namespace Microsoft.Ajax.Utilities
             }
         }
 
-        public virtual void Visit(ObjectLiteralField node)
+        public override void Visit(ObjectLiteralField node)
         {
             // no children
         }
 
-        public virtual void Visit(ObjectLiteralProperty node)
+        public override void Visit(ObjectLiteralProperty node)
         {
             if (node != null)
             {
@@ -418,17 +403,17 @@ namespace Microsoft.Ajax.Utilities
             }
         }
 
-        public virtual void Visit(ParameterDeclaration node)
+        public override void Visit(ParameterDeclaration node)
         {
             // no children
         }
 
-        public virtual void Visit(RegExpLiteral node)
+        public override void Visit(RegExpLiteral node)
         {
             // no children
         }
 
-        public virtual void Visit(ReturnNode node)
+        public override void Visit(ReturnNode node)
         {
             if (node != null)
             {
@@ -439,7 +424,7 @@ namespace Microsoft.Ajax.Utilities
             }
         }
 
-        public virtual void Visit(Switch node)
+        public override void Visit(Switch node)
         {
             if (node != null)
             {
@@ -455,7 +440,7 @@ namespace Microsoft.Ajax.Utilities
             }
         }
 
-        public virtual void Visit(SwitchCase node)
+        public override void Visit(SwitchCase node)
         {
             if (node != null)
             {
@@ -471,12 +456,12 @@ namespace Microsoft.Ajax.Utilities
             }
         }
 
-        public virtual void Visit(ThisLiteral node)
+        public override void Visit(ThisLiteral node)
         {
             // no children
         }
 
-        public virtual void Visit(ThrowNode node)
+        public override void Visit(ThrowNode node)
         {
             if (node != null)
             {
@@ -487,7 +472,7 @@ namespace Microsoft.Ajax.Utilities
             }
         }
 
-        public virtual void Visit(TryNode node)
+        public override void Visit(TryNode node)
         {
             if (node != null)
             {
@@ -508,7 +493,7 @@ namespace Microsoft.Ajax.Utilities
             }
         }
 
-        public virtual void Visit(Var node)
+        public override void Visit(Var node)
         {
             if (node != null)
             {
@@ -519,7 +504,7 @@ namespace Microsoft.Ajax.Utilities
             }
         }
 
-        public virtual void Visit(VariableDeclaration node)
+        public override void Visit(VariableDeclaration node)
         {
             if (node != null)
             {
@@ -530,7 +515,7 @@ namespace Microsoft.Ajax.Utilities
             }
         }
 
-        public virtual void Visit(UnaryOperator node)
+        public override void Visit(UnaryOperator node)
         {
             if (node != null)
             {
@@ -541,7 +526,7 @@ namespace Microsoft.Ajax.Utilities
             }
         }
 
-        public virtual void Visit(WhileNode node)
+        public override void Visit(WhileNode node)
         {
             if (node != null)
             {
@@ -557,7 +542,7 @@ namespace Microsoft.Ajax.Utilities
             }
         }
 
-        public virtual void Visit(WithNode node)
+        public override void Visit(WithNode node)
         {
             if (node != null)
             {
@@ -574,5 +559,21 @@ namespace Microsoft.Ajax.Utilities
         }
 
         #endregion
+
+        public override void Visit(CommaOperator node)
+        {
+            throw new System.NotImplementedException();
+        }
+
+        public override void Visit(JsAst jsAst)
+        {
+            throw new System.NotImplementedException();
+        }
+
+        public override void Visit(FunctionExpression functionExpression)
+        {
+            throw new System.NotImplementedException();
+        }
     }
+#endif
 }

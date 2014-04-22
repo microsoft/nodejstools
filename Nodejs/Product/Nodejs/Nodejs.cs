@@ -99,8 +99,7 @@ namespace Microsoft.NodejsTools {
         /// <returns></returns>
         public static bool CheckNodejsSupported(string path) {
             bool supported = true;
-            if (path != null && File.Exists(path) && 
-                string.Compare(Path.GetFileName(path), "node.exe", StringComparison.OrdinalIgnoreCase) == 0) {
+            if (path != null && File.Exists(path)) {
                 FileVersionInfo info = FileVersionInfo.GetVersionInfo(path);
                 if (info.FileMajorPart == 0) {
                     if (info.FileMinorPart < 10 ||

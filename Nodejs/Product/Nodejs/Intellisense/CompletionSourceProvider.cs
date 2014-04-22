@@ -21,7 +21,7 @@ using Microsoft.VisualStudio.Text.Classification;
 using Microsoft.VisualStudio.Utilities;
 
 namespace Microsoft.NodejsTools.Intellisense {
-    [Export(typeof(ICompletionSourceProvider)), ContentType("projection"), Order, Name("Node.js Completion Source")]
+    [Export(typeof(ICompletionSourceProvider)), ContentType(NodejsConstants.Nodejs), Order, Name("Node.js Completion Source")]
     sealed class CompletionSourceProvider : ICompletionSourceProvider {
         private readonly IClassifierAggregatorService _classifierAggregator;
         private readonly IServiceProvider _serviceProvider;

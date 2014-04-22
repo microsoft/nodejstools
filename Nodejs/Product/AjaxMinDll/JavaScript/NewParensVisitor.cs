@@ -15,14 +15,15 @@
 using System;
 using System.Diagnostics;
 
-namespace Microsoft.Ajax.Utilities
+namespace Microsoft.NodejsTools.Parsing
 {
-    internal class NewParensVisitor : IVisitor
+#if FALSE
+    internal class NewParensVisitor : AstVisitor
     {
         private bool m_needsParens;// = false;
         private bool m_outerHasNoArguments;
 
-        public static bool NeedsParens(AstNode expression, bool outerHasNoArguments)
+        public static bool NeedsParens(Node expression, bool outerHasNoArguments)
         {
             var visitor = new NewParensVisitor(outerHasNoArguments);
             expression.Accept(visitor);
@@ -37,25 +38,18 @@ namespace Microsoft.Ajax.Utilities
 
         #region IVisitor Members
 
-        public void Visit(ArrayLiteral node)
+        public override void Visit(ArrayLiteral node)
         {
             // don't recurse; we don't need parens around this
         }
 
-        public void Visit(AspNetBlockNode node)
-        {
-            // don't bother recursing, but let's wrap in parens, just in case 
-            // (since we don't know what will be inserted here)
-            m_needsParens = true;
-        }
-
-        public void Visit(BinaryOperator node)
+        public override void Visit(BinaryOperator node)
         {
             // lesser precedence than the new operator; use parens
             m_needsParens = true;
         }
 
-        public void Visit(CallNode node)
+        public override void Visit(CallNode node)
         {
             if (node != null)
             {
@@ -90,7 +84,7 @@ namespace Microsoft.Ajax.Utilities
             }
         }
 
-        public void Visit(ConditionalCompilationComment node)
+        public override void Visit(ConditionalCompilationComment node)
         {
             if (node != null)
             {
@@ -106,58 +100,58 @@ namespace Microsoft.Ajax.Utilities
             }
         }
 
-        public void Visit(ConditionalCompilationElse node)
+        public override void Visit(ConditionalCompilationElse node)
         {
             // preprocessor nodes are handled outside the real JavaScript parsing
         }
 
-        public void Visit(ConditionalCompilationElseIf node)
+        public override void Visit(ConditionalCompilationElseIf node)
         {
             // preprocessor nodes are handled outside the real JavaScript parsing
         }
 
-        public void Visit(ConditionalCompilationEnd node)
+        public override void Visit(ConditionalCompilationEnd node)
         {
             // preprocessor nodes are handled outside the real JavaScript parsing
         }
 
-        public void Visit(ConditionalCompilationIf node)
+        public override void Visit(ConditionalCompilationIf node)
         {
             // preprocessor nodes are handled outside the real JavaScript parsing
         }
 
-        public void Visit(ConditionalCompilationOn node)
+        public override void Visit(ConditionalCompilationOn node)
         {
             // preprocessor nodes are handled outside the real JavaScript parsing
         }
 
-        public void Visit(ConditionalCompilationSet node)
+        public override void Visit(ConditionalCompilationSet node)
         {
             // preprocessor nodes are handled outside the real JavaScript parsing
         }
 
-        public void Visit(Conditional node)
+        public override void Visit(Conditional node)
         {
             // lesser precedence than the new operator; use parens
             m_needsParens = true;
         }
 
-        public void Visit(ConstantWrapper node)
+        public override void Visit(ConstantWrapper node)
         {
             // we're good
         }
 
-        public void Visit(ConstantWrapperPP node)
+        public override void Visit(ConstantWrapperPP node)
         {
             // we're good
         }
 
-        public void Visit(CustomNode node)
+        public override void Visit(CustomNode node)
         {
             // we're good
         }
 
-        public void Visit(FunctionObject node)
+        public override void Visit(FunctionObject node)
         {
             // we're good
         }
@@ -168,17 +162,17 @@ namespace Microsoft.Ajax.Utilities
             // output parens ourselves. And don't bother recursing.
         }
 
-        public void Visit(ImportantComment node)
+        public override void Visit(ImportantComment node)
         {
             // don't recurse
         }
 
-        public void Visit(Lookup node)
+        public override void Visit(Lookup node)
         {
             // we're good
         }
 
-        public void Visit(Member node)
+        public override void Visit(Member node)
         {
             // need to recurse the collection
             if (node != null)
@@ -187,27 +181,27 @@ namespace Microsoft.Ajax.Utilities
             }
         }
 
-        public void Visit(ObjectLiteral node)
+        public override void Visit(ObjectLiteral node)
         {
             // we're good
         }
 
-        public void Visit(ParameterDeclaration node)
+        public override void Visit(ParameterDeclaration node)
         {
             // we're good
         }
 
-        public void Visit(RegExpLiteral node)
+        public override void Visit(RegExpLiteral node)
         {
             // we're good
         }
 
-        public void Visit(ThisLiteral node)
+        public override void Visit(ThisLiteral node)
         {
             // we're good
         }
 
-        public void Visit(UnaryOperator node)
+        public override void Visit(UnaryOperator node)
         {
             // lesser precedence than the new operator; use parens
             m_needsParens = true;
@@ -221,22 +215,22 @@ namespace Microsoft.Ajax.Utilities
         // expression elements we shouldn't get to
         //
 
-        public void Visit(AstNodeList node)
+        public override void Visit(AstNodeList node)
         {
             Debug.Fail("shouldn't get here");
         }
 
-        public void Visit(GetterSetter node)
+        public override void Visit(GetterSetter node)
         {
             Debug.Fail("shouldn't get here");
         }
 
-        public void Visit(ObjectLiteralField node)
+        public override void Visit(ObjectLiteralField node)
         {
             Debug.Fail("shouldn't get here");
         }
 
-        public void Visit(ObjectLiteralProperty node)
+        public override void Visit(ObjectLiteralProperty node)
         {
             Debug.Fail("shouldn't get here");
         }
@@ -245,116 +239,117 @@ namespace Microsoft.Ajax.Utilities
         // statements (we should only hit expressions)
         //
 
-        public void Visit(Block node)
+        public override void Visit(Block node)
         {
             Debug.Fail("shouldn't get here");
         }
 
-        public void Visit(Break node)
+        public override void Visit(Break node)
         {
             Debug.Fail("shouldn't get here");
         }
 
-        public void Visit(ConstStatement node)
+        public override void Visit(ConstStatement node)
         {
             Debug.Fail("shouldn't get here");
         }
 
-        public void Visit(ContinueNode node)
+        public override void Visit(ContinueNode node)
         {
             Debug.Fail("shouldn't get here");
         }
 
-        public void Visit(DebuggerNode node)
+        public override void Visit(DebuggerNode node)
         {
             Debug.Fail("shouldn't get here");
         }
 
-        public void Visit(DirectivePrologue node)
+        public override void Visit(DirectivePrologue node)
         {
             Debug.Fail("shouldn't get here");
         }
 
-        public void Visit(DoWhile node)
+        public override void Visit(DoWhile node)
         {
             Debug.Fail("shouldn't get here");
         }
 
-        public void Visit(EmptyStatement node)
+        public override void Visit(EmptyStatement node)
         {
             Debug.Fail("shouldn't get here");
         }
 
-        public void Visit(ForIn node)
+        public override void Visit(ForIn node)
         {
             Debug.Fail("shouldn't get here");
         }
 
-        public void Visit(ForNode node)
+        public override void Visit(ForNode node)
         {
             Debug.Fail("shouldn't get here");
         }
 
-        public void Visit(IfNode node)
+        public override void Visit(IfNode node)
         {
             Debug.Fail("shouldn't get here");
         }
 
-        public void Visit(LabeledStatement node)
+        public override void Visit(LabeledStatement node)
         {
             Debug.Fail("shouldn't get here");
         }
 
-        public void Visit(LexicalDeclaration node)
+        public override void Visit(LexicalDeclaration node)
         {
             Debug.Fail("shouldn't get here");
         }
 
-        public void Visit(ReturnNode node)
+        public override void Visit(ReturnNode node)
         {
             Debug.Fail("shouldn't get here");
         }
 
-        public void Visit(Switch node)
+        public override void Visit(Switch node)
         {
             Debug.Fail("shouldn't get here");
         }
 
-        public void Visit(SwitchCase node)
+        public override void Visit(SwitchCase node)
         {
             Debug.Fail("shouldn't get here");
         }
 
-        public void Visit(ThrowNode node)
+        public override void Visit(ThrowNode node)
         {
             Debug.Fail("shouldn't get here");
         }
 
-        public void Visit(TryNode node)
+        public override void Visit(TryNode node)
         {
             Debug.Fail("shouldn't get here");
         }
 
-        public void Visit(Var node)
+        public override void Visit(Var node)
         {
             Debug.Fail("shouldn't get here");
         }
 
-        public void Visit(VariableDeclaration node)
+        public override void Visit(VariableDeclaration node)
         {
             Debug.Fail("shouldn't get here");
         }
 
-        public void Visit(WhileNode node)
+        public override void Visit(WhileNode node)
         {
             Debug.Fail("shouldn't get here");
         }
 
-        public void Visit(WithNode node)
+        public override void Visit(WithNode node)
         {
             Debug.Fail("shouldn't get here");
         }
 
         #endregion
     }
+#endif
 }

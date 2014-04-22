@@ -32,14 +32,10 @@
             </Component>
             
             <Component Directory="INSTALLLOCATION" Guid="{351C08C3-1B35-48AB-A9D0-BC923F70CBC9}">
-                <File Id="filNodejsProject.ico" KeyPath="yes" Source="$(var.BinariesDir)\NodejsProject.ico" />
+                <File Id="filNodejsProject.ico" KeyPath="yes" Source="$(var.BinariesDir)\Resources\Icons\NodejsProject.ico" />
             </Component>
 
-          <Component Directory="INSTALLLOCATION" Guid="{FCE90179-FD0C-4C2F-A5E4-B4DE5B5E4040}">
-            <File Id="filNodejsProjectBig.ico" KeyPath="yes" Source="$(var.BinariesDir)\NodejsProjectBig.ico" />
-          </Component>
-
-          <Component Id="Comp_NjsPerfRegistration" DiskId="1" Guid="$(var.Comp_NjsPerfRegistrationGuid)" Directory="INSTALLLOCATION">
+            <Component Id="Comp_NjsPerfRegistration" DiskId="1" Guid="$(var.Comp_NjsPerfRegistrationGuid)" Directory="INSTALLLOCATION">
               <RegistryValue Root='HKCR' Key='.njsperf' Type='string' Name='PerceivedType' Value='text' />
               <RegistryValue Root='HKCR' Key='VisualStudio.Launcher.njsperf.$(var.VSTargetVersion)\DefaultIcon' Type='string' Value='[INSTALLLOCATION]\NodejsProject.ico' />
 

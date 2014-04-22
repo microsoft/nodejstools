@@ -24,26 +24,34 @@ namespace Microsoft.NodejsTools {
             _adapterService = adapterService;
         }
 
+#if FALSE
         internal static void AddSkipFilter(IVsEditorAdaptersFactoryService adapterService, IVsTextView primaryView) {
             var skipJsFilter = new SkipJsLsFilter(primaryView);
             var wpfView = adapterService.GetWpfTextView(primaryView);
             wpfView.Properties[typeof(SkipJsLsFilter)] = skipJsFilter;
         }
+#endif
 
         public int OnNewView(IVsTextView pView) {
+#if FALSE
             AddSkipFilter(_adapterService, pView);
+#endif
             return VSConstants.S_OK;
         }
 
         public int OnCloseView(IVsTextView pView) {
+#if FALSE
             RemoveSkipFilter(pView);
+#endif
             return VSConstants.S_OK;
         }
 
+#if FALSE
         private void RemoveSkipFilter(IVsTextView pView) {
             var wpfView = _adapterService.GetWpfTextView(pView);
             wpfView.Properties.RemoveProperty(typeof(SkipJsLsFilter));
         }
+#endif
 
         public int AddAdornments() {
             return VSConstants.S_OK;

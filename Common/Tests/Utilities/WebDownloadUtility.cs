@@ -16,7 +16,8 @@ using System;
 using System.IO;
 using System.Net;
 
-namespace TestUtilities {
+namespace TestUtilities
+{
     public static class WebDownloadUtility {
         public static string GetString(Uri siteUri) {
             string text;

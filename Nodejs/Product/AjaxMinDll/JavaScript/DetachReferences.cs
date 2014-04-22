@@ -18,9 +18,10 @@ using System;
 using System.Collections.Generic;
 using System.Text;
 
-namespace Microsoft.Ajax.Utilities
+namespace Microsoft.NodejsTools.Parsing
 {
-    public class DetachReferences : TreeVisitor
+#if FALSE
+    public class DetachReferences : AstVisitor
     {
         // singleton
         private static readonly DetachReferences s_instance = new DetachReferences();
@@ -29,7 +30,7 @@ namespace Microsoft.Ajax.Utilities
         {
         }
 
-        public static void Apply(AstNode node)
+        public static void Apply(Node node)
         {
             if (node != null)
             {
@@ -37,7 +38,7 @@ namespace Microsoft.Ajax.Utilities
             }
         }
 
-        public static void Apply(params AstNode[] nodes)
+        public static void Apply(params Node[] nodes)
         {
             if (nodes != null)
             {
@@ -63,4 +64,5 @@ namespace Microsoft.Ajax.Utilities
             }
         }
     }
+#endif
 }
