@@ -17,25 +17,23 @@ using System.Diagnostics;
 using System.IO;
 using System.Threading;
 using Microsoft.VisualStudio.TestPlatform.ObjectModel.Logging;
+using Microsoft.VisualStudioTools.Project;
 
 namespace Microsoft.NodejsTools.TestAdapter.TestFrameworks {
     class TestFramework {
-        private string _scriptFolder;
-        private string _discoverEntryScriptFile;
+        private string _vsixScriptFolder;
+        private string _findTestsScriptFile;
+        private string _runTestsScriptFile;
 
-        private const string UNITTEST_FILE_TOKEN = "#TEST-FILE#";
-        private const string TESTCASE_LIST_FILE_TOKEN = "#TEST-LIST#";
-        //private string _discoverScript =
-        //    @"var runner = require(process.argv[3]);" +
-        //    @"runner.find_tests('" + UNITTEST_FILE_TOKEN + @"'," + @"'" + TESTCASE_LIST_FILE_TOKEN + @"');";
-           
-        public TestFramework(string scriptFolder) {
-            _scriptFolder = scriptFolder;
-            Name = Path.GetFileNameWithoutExtension(scriptFolder);
-            _discoverEntryScriptFile = Path.Combine(Path.GetDirectoryName(scriptFolder), "discover.js");
+        public TestFramework(string vsixScriptFolder) {
+            _vsixScriptFolder = vsixScriptFolder;
+            Name = Path.GetFileNameWithoutExtension(vsixScriptFolder);
+            _findTestsScriptFile = Path.Combine(Path.GetDirectoryName(vsixScriptFolder), "find_tests.js");
+            _runTestsScriptFile = Path.Combine(Path.GetDirectoryName(vsixScriptFolder), "run_tests.js");
         }
+
         public string Name { get; private set; }
-        public string DiscoverTests(string testFile,
+        public string FindTests(string testFile,
             string nodeExe,
             IMessageLogger logger, 
             string workingDirectory) {
@@ -64,6 +62,18 @@ namespace Microsoft.NodejsTools.TestAdapter.TestFrameworks {
             return tests;
         }
 
+        public string[] ArgumentsToRunTests(string testName, string testFile, string workingDirectory) {
+            workingDirectory = workingDirectory.TrimEnd(new char['\\']);
+            return new string[] {
+                WrapWithQuot(_runTestsScriptFile),
+                Name,
+                WrapWithQuot(testName),
+                WrapWithQuot(testFile),
+                WrapWithQuot(workingDirectory)
+
+            };
+        }
+
         private string WrapWithQuot(string path) {
             if (!path.StartsWith("\"") && !path.StartsWith("\'")) {
                 path = "\"" + path + "\"";
@@ -73,7 +83,7 @@ namespace Microsoft.NodejsTools.TestAdapter.TestFrameworks {
 
         private string EvaluateJavaScript(string nodeExePath, string testFile, string discoverResultFile, IMessageLogger logger, string workingDirectory) {
             workingDirectory = workingDirectory.TrimEnd(new char['\\']);
-            string arguments = WrapWithQuot(_discoverEntryScriptFile)
+            string arguments = WrapWithQuot(_findTestsScriptFile)
                 + " " + Name +
                 " " + WrapWithQuot(testFile) +
                 " " + WrapWithQuot(discoverResultFile) +

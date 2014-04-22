@@ -108,42 +108,15 @@ namespace Microsoft.NodejsTools.TestAdapter {
             ).First();
         }
 
-        private static string GetWorkingDirectory(TestCase test, NodejsProjectSettings settings) {
+        private IEnumerable<string> GetInterpreterArgs(TestCase test, string workingDir) {
             string testFile;
             string testClass;
             string testMethod;
             string testFramework;
             TestDiscoverer.ParseFullyQualifiedTestName(test.FullyQualifiedName, out testFile, out testClass, out testMethod, out testFramework);
 
-            if (testFramework != "mocha") {
-                return Path.GetDirectoryName(CommonUtils.GetAbsoluteFilePath(settings.WorkingDir, testFile));
-            } else {
-                return settings.WorkingDir;
-            }
-        }
-
-        private static IEnumerable<string> GetInterpreterArgs(TestCase test) {
-            string testFile;
-            string testClass;
-            string testMethod;
-            string testFramework;
-            TestDiscoverer.ParseFullyQualifiedTestName(test.FullyQualifiedName, out testFile, out testClass, out testMethod, out testFramework);
-
-            if (testFramework != "mocha") {
-                var moduleName = Path.GetFileNameWithoutExtension(testFile);
-
-                return new[] { 
-                    "-e",                
-                    String.Format("var testCase = require('{0}'); testCase['{1}']();", testFile.Replace("\\","\\\\"), testMethod)
-                };
-            } else {
-                return new string[] {
-                    @"node_modules\mocha\bin\mocha",
-                    "-g",
-                    testMethod,
-                    testFile.StartsWith("\"")? testFile : "\"" + testFile + "\""
-                };
-            }
+            TestFrameworks.FrameworkDiscover discover = new TestFrameworks.FrameworkDiscover();
+            return discover.Get(testFramework).ArgumentsToRunTests(testMethod, testFile, workingDir);
         }
 
         private static IEnumerable<string> GetDebugArgs(NodejsProjectSettings settings, out string secret, out int port) {
@@ -163,7 +136,7 @@ namespace Microsoft.NodejsTools.TestAdapter {
             var testResult = new TestResult(test);
             frameworkHandle.RecordStart(test);
             testResult.StartTime = DateTimeOffset.Now;
-
+            Debug.Fail("Before execute");
             NodejsProjectSettings settings;
             if (!sourceToSettings.TryGetValue(test.Source, out settings)) {
                 sourceToSettings[test.Source] = settings = LoadProjectSettings(test.Source);
@@ -182,8 +155,9 @@ namespace Microsoft.NodejsTools.TestAdapter {
                 return;
             }
 
-            var workingDir = GetWorkingDirectory(test, settings);
-            var args = GetInterpreterArgs(test);
+            // GetWorkingDirectory(test, settings);
+            var workingDir = settings.WorkingDir; //TODOL figure out what is working directory
+            var args = GetInterpreterArgs(test, settings.WorkingDir);
             var searchPath = settings.SearchPath;
 
             if (!CommonUtils.IsSameDirectory(workingDir, settings.WorkingDir)) {
@@ -212,8 +186,7 @@ namespace Microsoft.NodejsTools.TestAdapter {
                                     null,
                                     false,
                                     null,
-                                    //TODO: HACK, skip wrapping for mocha; otherwise test failure message will be messed.
-                                    !test.FullyQualifiedName.EndsWith("mocha"))) {
+                                    false)) {
                 bool killed = false;
 
 #if DEBUG

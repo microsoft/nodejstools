@@ -17,19 +17,19 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
 using System.Linq;
-using System.Threading;
+
+using MSBuild = Microsoft.Build.Evaluation;
 using Microsoft.VisualStudio.TestPlatform.ObjectModel;
 using Microsoft.VisualStudio.TestPlatform.ObjectModel.Adapter;
 using Microsoft.VisualStudio.TestPlatform.ObjectModel.Logging;
 using Microsoft.VisualStudioTools;
-using MSBuild = Microsoft.Build.Evaluation;
 
 namespace Microsoft.NodejsTools.TestAdapter {
     [FileExtension(".njsproj")]
     [DefaultExecutorUri(TestExecutor.ExecutorUriString)]
     class TestDiscoverer : ITestDiscoverer {
-
-        public TestDiscoverer() { }
+        public TestDiscoverer() {
+        }
 
         /// <summary>
         /// ITestDiscover, Given a list of test sources this method pulls out the test cases
@@ -73,8 +73,7 @@ namespace Microsoft.NodejsTools.TestAdapter {
                             if (!TestContainerDiscoverer.IsValidTestFramework(value)) {
                                 continue;
                             }
-                            Debug.Fail("Before discover");
-                            TestFrameworks.ITestFramework testFramework = GetTestFrameworkObject(value);
+                            TestFrameworks.TestFramework testFramework = GetTestFrameworkObject(value);
 
                             string fileAbsolutePath = CommonUtils.GetAbsoluteFilePath(projectHome, item.EvaluatedInclude);
 
@@ -88,28 +87,7 @@ namespace Microsoft.NodejsTools.TestAdapter {
 
                             logger.SendMessage(TestMessageLevel.Informational, String.Format("Processing {0}", fileAbsolutePath));
 
-                            string testCases = String.Empty;
-                            string tempFile = Path.GetTempFileName();
-
-                            try {
-                                EvaluateJavaScript(nodeExePath, testFramework.DiscoverScript(fileAbsolutePath, tempFile), logger, projectHome);
-                                for (int i = 0; i < 4; i++) {
-                                    try {
-                                        testCases = File.ReadAllText(tempFile);
-                                        break;
-                                    } catch (IOException) {
-                                        //We took an error processing the file.  Wait a few and try again
-                                        Thread.Sleep(500);
-                                    }
-                                }
-                            } finally {
-                                try {
-                                    File.Delete(tempFile);
-                                } catch (Exception) { //
-                                    //Unable to delete for some reason
-                                    //  We leave the file behind in this case, its in TEMP so eventually OS will clean up
-                                }
-                            }
+                            string testCases = testFramework.FindTests(fileAbsolutePath, nodeExePath, logger, projectHome);
 
                             if (String.IsNullOrEmpty(testCases)) {
                                 logger.SendMessage(TestMessageLevel.Warning, String.Format("Discovered 0 testcases in: {0}", fileAbsolutePath));
@@ -140,12 +118,10 @@ namespace Microsoft.NodejsTools.TestAdapter {
             }
         }
 
-        private TestFrameworks.ITestFramework GetTestFrameworkObject(string testFramework) {
-            if (testFramework == "mocha") {
-                return new TestFrameworks.Mocha();
-            } else {
-                return new TestFrameworks.Default();
-            }
+        private TestFrameworks.TestFramework GetTestFrameworkObject(string testFramework) {
+            //Debug.Fail("Before Discover");
+            TestFrameworks.FrameworkDiscover discover = new TestFrameworks.FrameworkDiscover();
+            return discover.Get(testFramework);
         }
 
         internal static string MakeFullyQualifiedTestName(string modulePath, string className, string methodName, string testFramework) {
@@ -168,50 +144,6 @@ namespace Microsoft.NodejsTools.TestAdapter {
                 buildEngine.UnloadProject(buildProject);
             }
             return buildEngine.LoadProject(fullProjectPath);
-        }
-
-        private string EvaluateJavaScript(string nodeExePath, string code, IMessageLogger logger, string workingDirectory) {
-#if DEBUG
-            logger.SendMessage(TestMessageLevel.Informational, String.Format("  Code {0}", code));
-#endif
-            string arguments = "-e \"" + code + "\"";
-
-            var processStartInfo = new ProcessStartInfo(nodeExePath, arguments);
-            processStartInfo.CreateNoWindow = true;
-            processStartInfo.UseShellExecute = false;
-            processStartInfo.RedirectStandardError = true;
-            processStartInfo.RedirectStandardOutput = true;
-            processStartInfo.WorkingDirectory = workingDirectory;
-
-            string stdout = "";
-            try {
-                using (var process = Process.Start(processStartInfo)) {
-
-                    process.EnableRaisingEvents = true;
-                    process.OutputDataReceived += (sender, args) => {
-                        stdout += args.Data + Environment.NewLine;
-
-                    };
-                    process.ErrorDataReceived += (sender, args) => {
-                        stdout += args.Data + Environment.NewLine;
-
-                    };
-                    process.BeginErrorReadLine();
-                    process.BeginOutputReadLine();
-
-                    process.WaitForExit();
-#if DEBUG
-                    logger.SendMessage(TestMessageLevel.Informational, String.Format("  Process exited: {0}", process.ExitCode));
-#endif
-                }
-#if DEBUG
-                logger.SendMessage(TestMessageLevel.Informational, String.Format("  StdOut:{0}", stdout));
-#endif
-            } catch (FileNotFoundException e) {
-                logger.SendMessage(TestMessageLevel.Error, String.Format("Error starting node.exe.\n {0}", e));
-            }
-
-            return stdout;
         }
     }
 }

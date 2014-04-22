@@ -21,7 +21,8 @@ namespace Microsoft.NodejsTools.TestAdapter.TestFrameworks {
     class FrameworkDiscover {
         private List<TestFramework> _framworks;
         private TestFramework Default = null;
-        public FrameworkDiscover(string installFolder) {
+        public FrameworkDiscover() {
+            string installFolder = GetExecutingAssemblyPath();
             _framworks = new List<TestFramework>();
             foreach (string directory in Directory.GetDirectories(installFolder + @"\TestFrameworks")) {
                 TestFramework fx = new TestFramework(directory);
@@ -44,5 +45,12 @@ namespace Microsoft.NodejsTools.TestAdapter.TestFrameworks {
             });
             return matched;
         }
+        private string GetExecutingAssemblyPath() {
+            string codeBase = System.Reflection.Assembly.GetExecutingAssembly().CodeBase;
+            UriBuilder uri = new UriBuilder(codeBase);
+            string path = Uri.UnescapeDataString(uri.Path);
+            return Path.GetDirectoryName(path);
+        }
+
     }
 }

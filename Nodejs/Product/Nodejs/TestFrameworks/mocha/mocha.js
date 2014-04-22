@@ -1,12 +1,12 @@
 ﻿var fs = require('fs');
 
 var find_tests = function (testFile, discoverResultFile, projectFolder) {
-  var mocha = require(projectFolder + '\\node_modules\\mocha');
-  var discover = new mocha({});
+  var Mocha = require(projectFolder + '\\node_modules\\mocha');
+  var mocha = new Mocha();
   var testList;
   function getTestList(suite) {
     if (suite) {
-		  if (suite.tests && suite.tests.length !== 0) {
+      if (suite.tests && suite.tests.length !== 0) {
         testList = testList ? testList + '\r\n' + suite.title : suite.title;
       }
       if (suite.suites) {
@@ -16,9 +16,9 @@ var find_tests = function (testFile, discoverResultFile, projectFolder) {
       }
     }
   }
-  discover.addFile(testFile);
-  discover.loadFiles();
-  getTestList(discover.suite);
+  mocha.addFile(testFile);
+  mocha.loadFiles();
+  getTestList(mocha.suite);
   if (testList) {
     var fd = fs.openSync(discoverResultFile, 'w');
     fs.writeSync(fd, testList);
@@ -26,3 +26,17 @@ var find_tests = function (testFile, discoverResultFile, projectFolder) {
   }
 }
 module.exports.find_tests = find_tests;
+
+var run_tests = function (testName, testFile, projectFolder) {
+  var Mocha = new require(projectFolder + '\\node_modules\\mocha');
+  var mocha = new Mocha();
+  mocha.suite.timeout(30000); //TODO: config
+  if (testName) {
+    mocha.grep(testName);
+  }
+  mocha.addFile(testFile);
+  mocha.run(function () {
+    console.log('Done');
+  });
+}
+module.exports.run_tests = run_tests;

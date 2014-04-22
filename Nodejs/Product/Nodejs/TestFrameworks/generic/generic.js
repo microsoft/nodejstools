@@ -14,6 +14,11 @@ var find_tests = function(testFile, discoverResultFile) {
 }
 module.exports.find_tests = find_tests;
 
+var run_tests = function (testName, testFile) {
+  var testCase = require(testFile);
+  testCase[testName]();
+}
+module.exports.run_tests = run_tests;
 
 
 
