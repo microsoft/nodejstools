@@ -16,6 +16,7 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using System.Runtime.InteropServices;
 using System.Threading;
 using System.Windows;
 using System.Windows.Forms;
@@ -209,27 +210,20 @@ namespace Microsoft.NodejsTools.Project {
 
         private static readonly Guid NpmOutputPaneGuid = new Guid("25764421-33B8-4163-BD02-A94E299D52D8");
 
-        private IVsOutputWindowPane GetNpmOutputPane() {
-            var outputWindow = (IVsOutputWindow)_projectNode.GetService(typeof(SVsOutputWindow));
-            IVsOutputWindowPane pane;
-            if (outputWindow.GetPane(NpmOutputPaneGuid, out pane) != VSConstants.S_OK) {
-                outputWindow.CreatePane(NpmOutputPaneGuid, "Npm", 1, 1);
-                outputWindow.GetPane(NpmOutputPaneGuid, out pane);
-            }
-            return pane;
-        }
-
-        private void ShowNpmOutputPane() {
-            OutputWindowRedirector.GetGeneral(ProjectMgr.Package).ShowAndActivate();
-            var pane = GetNpmOutputPane();
-            if (null != pane) {
-                pane.Activate();
+        private OutputWindowRedirector GetNpmOutputPane() {
+            try {
+                return OutputWindowRedirector.Get(_projectNode.Site, NpmOutputPaneGuid, SR.GetString(SR.NpmOutputPaneTitle));
+            } catch (InvalidOperationException) {
+                return null;
             }
         }
 
         private void ConditionallyShowNpmOutputPane() {
             if (NodejsPackage.Instance.GeneralOptionsPage.ShowOutputWindowWhenExecutingNpm) {
-                ShowNpmOutputPane();
+                var pane = GetNpmOutputPane();
+                if (null != pane) {
+                    pane.ShowAndActivate();
+                }
             }
         }
 
@@ -297,10 +291,25 @@ namespace Microsoft.NodejsTools.Project {
             ForceUpdateStatusBarWithNpmActivitySafe(activity);
         }
 
+        private static string TrimLastNewline(string text) {
+            if (string.IsNullOrEmpty(text)) {
+                return string.Empty;
+            }
+
+            if (text.EndsWith("\r\n")) {
+                return text.Remove(text.Length - 2);
+            }
+            if (text.EndsWith("\r") || text.EndsWith("\n")) {
+                return text.Remove(text.Length - 1);
+            }
+
+            return text;
+        }
+
         private void WriteNpmLogToOutputWindow(string logText) {
             var pane = GetNpmOutputPane();
             if (null != pane) {
-                pane.OutputStringThreadSafe(logText);
+                pane.WriteLine(logText);
             }
 
             UpdateStatusBarWithNpmActivity(logText);
@@ -311,7 +320,7 @@ namespace Microsoft.NodejsTools.Project {
         }
 
         private void WriteNpmLogToOutputWindow(NpmLogEventArgs args) {
-            WriteNpmLogToOutputWindow(args.LogText);
+            WriteNpmLogToOutputWindow(TrimLastNewline(args.LogText));
         }
 
         private void NpmController_CommandStarted(object sender, EventArgs e) {

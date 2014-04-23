@@ -70,8 +70,7 @@ namespace Microsoft.NodejsTools.Npm {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Download complete
-        ///.
+        ///   Looks up a localized string similar to Download complete.
         /// </summary>
         internal static string PackagesDownloadComplete {
             get {
@@ -80,8 +79,7 @@ namespace Microsoft.NodejsTools.Npm {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Downloaded {0}MB of the package list
-        ///.
+        ///   Looks up a localized string similar to Downloaded {0}MB of the package list.
         /// </summary>
         internal static string PackagesDownloadedXMB {
             get {
@@ -90,8 +88,7 @@ namespace Microsoft.NodejsTools.Npm {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Downloaded {0}MB of the package list ({1}MB total)
-        ///.
+        ///   Looks up a localized string similar to Downloaded {0}MB of the package list ({1}MB total).
         /// </summary>
         internal static string PackagesDownloadedXOfYMB {
             get {
@@ -100,8 +97,7 @@ namespace Microsoft.NodejsTools.Npm {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Downloading list of packages from {0}
-        ///.
+        ///   Looks up a localized string similar to Downloading list of packages from {0}.
         /// </summary>
         internal static string PackagesDownloadStarting {
             get {

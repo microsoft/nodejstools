@@ -475,4 +475,7 @@
   <data name="NodejsPortDescription" xml:space="preserve">
     <value>Specifies the port number used for process.env.port, if unspecified a random port is generated.</value>
   </data>
+  <data name="NpmOutputPaneTitle" xml:space="preserve">
+    <value>Npm</value>
+  </data>
 </root>

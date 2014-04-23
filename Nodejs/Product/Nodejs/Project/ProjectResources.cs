@@ -64,6 +64,7 @@ namespace Microsoft.NodejsTools.Project {
         internal const string NpmNodePackageInstallationDescription = "NpmNodePackageInstallationDescription";
         internal const string NpmNodePath = "NpmNodePath";
         internal const string NpmNodePathDescription = "NpmNodePathDescription";
+        internal const string NpmOutputPaneTitle = "NpmOutputPaneTitle";
         internal const string NpmPackageAuthor = "NpmPackageAuthor";
         internal const string NpmPackageAuthorDescription = "NpmPackageAuthorDescription";
         internal const string NpmPackageDescription = "NpmPackageDescription";
