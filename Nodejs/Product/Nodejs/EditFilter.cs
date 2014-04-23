@@ -132,7 +132,7 @@ namespace Microsoft.NodejsTools {
                     case VSConstants.VSStd2KCmdID.TYPECHAR:
                         if (!_incSearch.IsActive) {
                             var ch = (char)(ushort)System.Runtime.InteropServices.Marshal.GetObjectForNativeVariant(pvaIn);
-
+#if FALSE
                             if (_activeSession != null && !_activeSession.IsDismissed) {
                                 if (_activeSession.SelectedCompletionSet.SelectionStatus.IsSelected &&
                                     _commitChars.Contains(ch)) {
@@ -141,41 +141,64 @@ namespace Microsoft.NodejsTools {
                                     _activeSession.Dismiss();
                                 }
                             }
+#endif
+                            int res = _next.Exec(ref pguidCmdGroup, nCmdID, nCmdexecopt, pvaIn, pvaOut);
 
                             switch(ch) {
+#if FALSE
                                 case '.':
                                     if (NodejsPackage.Instance.LangPrefs.AutoListMembers) {
                                         TriggerCompletionSession(false);
                                     }
                                     break;
-                            }
-                            if ((ch == '.' && !NodejsPackage.Instance.LangPrefs.AutoListMembers) ||
-                                (ch == '(' && !NodejsPackage.Instance.LangPrefs.AutoListParams)) {
-                                return _next.Exec(ref pguidCmdGroup, nCmdID, nCmdexecopt, pvaIn, pvaOut);
-                            } else if (ch == '}' || ch == ';') {
-                                hr = _next.Exec(ref pguidCmdGroup, nCmdID, nCmdexecopt, pvaIn, pvaOut);
+#endif
+                                case '}':
+                                case ':':
+                                    FormatAfterTyping(ch);
+                                    break;
+#if FALSE
+                                case '\'':
+                                case '"':
+                                    if (CompletionSource.ShouldTriggerRequireIntellisense(_textView.Caret.Position.BufferPosition, _classifier, ch != '(')) {
+                                        TriggerCompletionSession(false);
+                                    }
+                                    break;
+#endif
+#if FALSE
+                                case '(':
+                                    if (PythonToolsPackage.Instance.LangPrefs.AutoListParams) {
+                                        OpenParenStartSignatureSession();
+                                    }
+                                    break;
+                                case ')':
+                                    if (_sigHelpSession != null) {
+                                        _sigHelpSession.Dismiss();
+                                        _sigHelpSession = null;
+                                    }
 
-                                FormatAfterTyping(ch);
-                                return hr;
-                            } else if ((ch == '(' || ch == '"' || ch == '\'') && 
-                                CompletionSource.ShouldTriggerRequireIntellisense(_textView.Caret.Position.BufferPosition, _classifier, ch != '(')) {
-                                // we don't want to forward the ( down to JS as it'll trigger a signature help
-                                // session.
-                                _editorOps.InsertText(ch.ToString());
-                                TriggerCompletionSession(false);
-                                return VSConstants.S_OK;
+                                    if (PythonToolsPackage.Instance.LangPrefs.AutoListParams) {
+                                        // trigger help for outer call if there is one
+                                        TriggerSignatureHelp();
+                                    }
+                                    break;
+                                case '=':
+                                case ',':
+                                    if (_sigHelpSession == null) {
+                                        if (PythonToolsPackage.Instance.LangPrefs.AutoListParams) {
+                                            CommaStartSignatureSession();
+                                        }
+                                    } else {
+                                        UpdateCurrentParameter();
+                                    }
+                                    break;
+#endif
                             }
 
-                            if (!NodejsPackage.Instance.LangPrefs.AutoListMembers) {
-                                hr = _next.Exec(ref pguidCmdGroup, nCmdID, nCmdexecopt, pvaIn, pvaOut);
-                            } else {
-                                hr = _next.Exec(ref pguidCmdGroup, nCmdID, nCmdexecopt, pvaIn, pvaOut);
-                            }
-                            
-                            if (ErrorHandler.Succeeded(hr) && _activeSession != null && !_activeSession.IsDismissed) {
+                            if (_activeSession != null && !_activeSession.IsDismissed) {
                                 _activeSession.Filter();
                             }
-                            return hr;
+
+                            return res;
                         }
                         break;
                     case VSConstants.VSStd2KCmdID.PASTE: 
@@ -197,6 +220,7 @@ namespace Microsoft.NodejsTools {
                             FormatAfterPaste(curVersion);
                         }
                         return hr;
+#if FALSE
                     case VSConstants.VSStd2KCmdID.TAB:
                         if (_intellisenseStack.TopSession != null &&
                             _intellisenseStack.TopSession is ICompletionSession &&
@@ -222,6 +246,7 @@ namespace Microsoft.NodejsTools {
                             }
                             return res;
                         }
+#endif
                 }
             } else if (pguidCmdGroup == VSConstants.GUID_VSStandardCommandSet97) {
                 switch ((VSConstants.VSStd97CmdID)nCmdID) {
@@ -244,7 +269,7 @@ namespace Microsoft.NodejsTools {
                 _intellisenseStack.TopSession.Dismiss();
             }
         }
-
+#if FALSE
         internal bool TriggerCompletionSession(bool completeWord) {
             Dismiss();
 
@@ -274,9 +299,10 @@ namespace Microsoft.NodejsTools {
             _activeSession.Committed -= OnCompletionSessionDismissed;
             _activeSession = null;
         }
-
+#endif
         public int QueryStatus(ref Guid pguidCmdGroup, uint cCmds, OLECMD[] prgCmds, IntPtr pCmdText) {
             if (pguidCmdGroup == VSConstants.GUID_VSStandardCommandSet97) {
+#if FALSE
                 for (int i = 0; i < cCmds; i++) {
                     switch ((VSConstants.VSStd97CmdID)prgCmds[i].cmdID) {
                         case VSConstants.VSStd97CmdID.GotoDefn:
@@ -285,6 +311,7 @@ namespace Microsoft.NodejsTools {
                             return VSConstants.S_OK;
                     }
                 }
+#endif
             } else if (pguidCmdGroup == VSConstants.VSStd2K) {
                 for (int i = 0; i < cCmds; i++) {
                     switch ((VSConstants.VSStd2KCmdID)prgCmds[i].cmdID) {
@@ -428,11 +455,7 @@ namespace Microsoft.NodejsTools {
         }
 
         private string GetFilePath() {
-            NodejsProjectionBuffer projBuffer;
-            if (_textView.TextBuffer.Properties.TryGetProperty<NodejsProjectionBuffer>(typeof(NodejsProjectionBuffer), out projBuffer)) {
-                return projBuffer.DiskBuffer.GetFilePath();
-            }
-            return null;
+            return _textView.TextBuffer.GetFilePath();
         }
 
         internal static void ApplyEdits(ITextBuffer buffer, TextEdit[] edits) {

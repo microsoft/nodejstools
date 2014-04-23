@@ -29,7 +29,7 @@ namespace Microsoft.NodejsTools.Analysis.Analyzer {
         //public readonly GeneratorInfo Generator;
 
         public FunctionScope(
-            UserFunctionInfo function,
+            UserFunctionValue function,
             Node node,
             EnvironmentRecord declScope,
             IPythonProjectEntry declModule
@@ -44,8 +44,8 @@ namespace Microsoft.NodejsTools.Analysis.Analyzer {
 #endif
         }
 
-        public UserFunctionInfo FunctionInfo {
-            get { return (UserFunctionInfo)AnalysisValue; }
+        public UserFunctionValue FunctionInfo {
+            get { return (UserFunctionValue)AnalysisValue; }
         }
 
         public override IAnalysisSet ThisValue {
@@ -142,9 +142,9 @@ namespace Microsoft.NodejsTools.Analysis.Analyzer {
         }
 
 
-        public UserFunctionInfo Function {
+        public UserFunctionValue Function {
             get {
-                return (UserFunctionInfo)AnalysisValue;
+                return (UserFunctionValue)AnalysisValue;
             }
         }
 

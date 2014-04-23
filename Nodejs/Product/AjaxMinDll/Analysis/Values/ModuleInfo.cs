@@ -22,6 +22,7 @@ using Microsoft.NodejsTools.Parsing;
 
 
 namespace Microsoft.NodejsTools.Analysis.Values {
+    // TODO: This shouldn't be an AnalysisValue
     internal class ModuleInfo : AnalysisValue, IReferenceableContainer/*, IModule */{
         private readonly string _name;
         private readonly ProjectEntry _projectEntry;
@@ -252,9 +253,9 @@ namespace Microsoft.NodejsTools.Analysis.Values {
             get { return _projectEntry; }
         }
 
-        public override PythonMemberType MemberType {
+        public override NodejsMemberType MemberType {
             get {
-                return PythonMemberType.Module;
+                return NodejsMemberType.Module;
             }
         }
 

@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using Microsoft.NodejsTools.Analysis;
+using Microsoft.NodejsTools.Interpreter;
 using Microsoft.VisualStudio.Language.Intellisense;
 using Microsoft.VisualStudio.Text;
 
@@ -41,7 +42,45 @@ namespace Microsoft.NodejsTools.Intellisense {
                 }
             }
 
-            return null;
+            return new FuzzyCompletionSet(
+                "Node.js",
+                "Node.js",
+                Span,
+                members.Select(m => PythonCompletion(glyphService, m)),
+                CompletionComparer.UnderscoresLast);
+        }
+
+        internal static DynamicallyVisibleCompletion PythonCompletion(IGlyphService service, MemberResult memberResult) {
+            return new DynamicallyVisibleCompletion(memberResult.Name,
+                memberResult.Completion,
+                () => memberResult.Documentation,
+                () => service.GetGlyph(GetGlyphGroup(memberResult), StandardGlyphItem.GlyphItemPublic),
+                ""
+            );
+        }
+
+        private static StandardGlyphGroup GetGlyphGroup(MemberResult result) {
+            switch(result.MemberType) {
+                case NodejsMemberType.Function:
+                    return StandardGlyphGroup.GlyphGroupMethod;
+                case NodejsMemberType.Keyword:
+                    return StandardGlyphGroup.GlyphKeyword;
+                case NodejsMemberType.Module:
+                    return StandardGlyphGroup.GlyphGroupModule;
+                case NodejsMemberType.Multiple:
+                case NodejsMemberType.Object:
+                    return StandardGlyphGroup.GlyphGroupClass;
+                case NodejsMemberType.Boolean:
+                case NodejsMemberType.String:
+                case NodejsMemberType.Number:
+                    return StandardGlyphGroup.GlyphGroupValueType;
+                case NodejsMemberType.Undefined:
+                    return StandardGlyphGroup.GlyphGroupException;
+                case NodejsMemberType.Null:
+                    return StandardGlyphGroup.GlyphGroupConstant;
+                default:
+                    return StandardGlyphGroup.GlyphGroupUnknown;
+            }
         }
 
         private string FixupCompletionText(string exprText) {
@@ -65,15 +104,12 @@ namespace Microsoft.NodejsTools.Intellisense {
         internal string PrecedingExpression {
             get {
                 var startSpan = _snapshot.CreateTrackingSpan(Span.GetSpan(_snapshot).Start.Position, 0, SpanTrackingMode.EdgeInclusive);
-                throw new InvalidOperationException();
-#if FALSE
                 var parser = new ReverseExpressionParser(_snapshot, _snapshot.TextBuffer, startSpan);
                 var sourceSpan = parser.GetExpressionRange();
                 if (sourceSpan.HasValue && sourceSpan.Value.Length > 0) {
                     return sourceSpan.Value.GetText();
                 }
                 return string.Empty;
-#endif
             }
         }
 

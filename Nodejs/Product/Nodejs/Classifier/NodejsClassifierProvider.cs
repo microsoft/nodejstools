@@ -56,7 +56,7 @@ namespace Microsoft.NodejsTools.Classifier {
         [Import]
         public IClassificationTypeRegistryService _classificationRegistry = null; // Set via MEF
 
-        #region Python Classification Type Definitions
+        #region Node.js Classification Type Definitions
 
         [Export]
         [Name(NodejsPredefinedClassificationTypeNames.Grouping)]

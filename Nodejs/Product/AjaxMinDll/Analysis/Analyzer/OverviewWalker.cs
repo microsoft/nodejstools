@@ -102,7 +102,7 @@ namespace Microsoft.NodejsTools.Analysis.Analyzer {
 
         public override void PostWalk(FunctionObject node)
         {
-            if (node.Body != null && node.Name != null) {
+            if (node.Body != null) {
                 Debug.Assert(_scope.Node == node);
                 Debug.Assert(_scope.OuterScope.Node != node);
                 _scope = _scope.OuterScope;
@@ -148,18 +148,18 @@ namespace Microsoft.NodejsTools.Analysis.Analyzer {
             return _scope.CreateVariable(name, _curUnit, name.Name, false);
         }
 
-        internal UserFunctionInfo AddFunction(FunctionObject node, AnalysisUnit outerUnit) {
+        internal UserFunctionValue AddFunction(FunctionObject node, AnalysisUnit outerUnit) {
             return AddFunction(node, outerUnit, _scope);
         }
 
-        internal static UserFunctionInfo AddFunction(FunctionObject node, AnalysisUnit outerUnit, EnvironmentRecord prevScope) {
+        internal static UserFunctionValue AddFunction(FunctionObject node, AnalysisUnit outerUnit, EnvironmentRecord prevScope) {
             EnvironmentRecord scope;
             if (!prevScope.TryGetNodeScope(node, out scope)) {
                 if (node.Body == null) {
                     return null;
                 }
 
-                var func = new UserFunctionInfo(node, outerUnit, prevScope);
+                var func = new UserFunctionValue(node, outerUnit, prevScope);
                 var unit = func.AnalysisUnit;
                 scope = unit.Scope;
 
@@ -176,7 +176,7 @@ namespace Microsoft.NodejsTools.Analysis.Analyzer {
 
                 unit.Enqueue();
             }
-            return scope.AnalysisValue as UserFunctionInfo;
+            return scope.AnalysisValue as UserFunctionValue;
         }
 
 #if FALSE

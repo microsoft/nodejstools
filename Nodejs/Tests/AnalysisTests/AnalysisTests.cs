@@ -12,6 +12,55 @@ using TestUtilities;
 namespace AnalysisTests {
     [TestClass]
     public class AnalysisTests {
+        [TestMethod]
+        public void TestPrimitiveMembers() {
+            string code = @"
+var b = true;
+var n = 42.0;
+var s = 'abc';
+function f() {
+}
+";
+            var analysis = ProcessText(code);
+            AssertUtil.ContainsAtLeast(
+                GetMemberNames(analysis, "b"), 
+                "valueOf"
+            );
+            AssertUtil.ContainsAtLeast(
+                GetMemberNames(analysis, "n"),
+                "toFixed", "toExponential"
+            );
+            AssertUtil.ContainsAtLeast(
+                GetMemberNames(analysis, "s"),
+                "anchor", "big", "indexOf"
+            );
+            AssertUtil.ContainsAtLeast(
+                GetMemberNames(analysis, "f"),
+                "apply"
+            );
+            
+            AssertUtil.ContainsExactly(
+                analysis.GetTypeIdsByIndex("b.valueOf", 0),
+                BuiltinTypeId.Function
+            );
+            AssertUtil.ContainsExactly(
+                analysis.GetTypeIdsByIndex("n.toFixed", 0),
+                BuiltinTypeId.Function
+            );
+            AssertUtil.ContainsExactly(
+                analysis.GetTypeIdsByIndex("s.big", 0),
+                BuiltinTypeId.Function
+            );
+            AssertUtil.ContainsExactly(
+                analysis.GetTypeIdsByIndex("f.apply", 0),
+                BuiltinTypeId.Function
+            ); 
+        }
+
+        private static IEnumerable<string> GetMemberNames(ModuleAnalysis analysis, string name) {
+            return analysis.GetMembersByIndex(name, 0).Select(x => x.Name);
+        }
+
 
         [TestMethod]
         public void TestRequire() {
@@ -309,6 +358,35 @@ x = f.foo;
         }
 
         [TestMethod]
+        public void TestFunctionParametersMultipleCallers() {
+            var analysis = ProcessText(@"function f(a) {
+    return a;
+}
+
+var x = f(42);
+var y = f('abc');
+");
+            AssertUtil.ContainsExactly(
+                analysis.GetTypeIdsByIndex("x", 0),
+                BuiltinTypeId.Number
+            );
+            AssertUtil.ContainsExactly(
+                analysis.GetTypeIdsByIndex("y", 0),
+                BuiltinTypeId.String
+            );
+        }
+
+        [TestMethod]
+        public void TestFunctionParameters() {
+            var analysis = ProcessText(@"function x(a) { return a; }
+var y = x(42);");
+            AssertUtil.ContainsExactly(
+                analysis.GetTypeIdsByIndex("y", 0),
+                BuiltinTypeId.Number
+            );
+        }
+
+        [TestMethod]
         public void TestFunction() {
             var analysis = ProcessText("function x() { }");
             AssertUtil.ContainsExactly(
@@ -320,6 +398,42 @@ x = f.foo;
             AssertUtil.ContainsExactly(
                 analysis.GetTypeIdsByIndex("x()", 0),
                 BuiltinTypeId.Number
+            );
+
+            analysis = ProcessText("function x() { return 'abc'; }");
+            AssertUtil.ContainsExactly(
+                analysis.GetTypeIdsByIndex("x()", 0),
+                BuiltinTypeId.String
+            );
+
+            analysis = ProcessText("function x() { return null; }");
+            AssertUtil.ContainsExactly(
+                analysis.GetTypeIdsByIndex("x()", 0),
+                BuiltinTypeId.Null
+            );
+
+            analysis = ProcessText("function x() { return undefined; }");
+            AssertUtil.ContainsExactly(
+                analysis.GetTypeIdsByIndex("x()", 0),
+                BuiltinTypeId.Undefined
+            );
+
+            analysis = ProcessText("function x() { return true; }");
+            AssertUtil.ContainsExactly(
+                analysis.GetTypeIdsByIndex("x()", 0),
+                BuiltinTypeId.Boolean
+            );
+
+            analysis = ProcessText("function x() { return function() { }; }");
+            AssertUtil.ContainsExactly(
+                analysis.GetTypeIdsByIndex("x()", 0),
+                BuiltinTypeId.Function
+            );
+
+            analysis = ProcessText("function x() { return { }; }");
+            AssertUtil.ContainsExactly(
+                analysis.GetTypeIdsByIndex("x()", 0),
+                BuiltinTypeId.Object
             );
         }
 

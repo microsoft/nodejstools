@@ -277,6 +277,7 @@ namespace Microsoft.NodejsTools.Parsing
               var res = this;
               while (!(res is JsAst))
               {
+                  Debug.Assert(res != null);
                   res = res.Parent;
               }
               return (JsAst)res;

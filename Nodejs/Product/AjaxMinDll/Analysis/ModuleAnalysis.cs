@@ -36,6 +36,13 @@ namespace Microsoft.NodejsTools.Analysis {
         private readonly EnvironmentRecord _scope;
         private readonly IAnalysisCookie _cookie;
         private static Regex _otherPrivateRegex = new Regex("^_[a-zA-Z_]\\w*__[a-zA-Z_]\\w*$");
+        private static HashSet<string> _exprKeywords = new HashSet<string>() { 
+            "function", "null", "true", "false", "this", "void", 
+            "typeof", "delete", "in", "new" };
+        private static HashSet<string> _stmtKeywords = new HashSet<string>() { 
+            "debugger", "var", "if", "for", "do", "while", "continue", "break",
+            "return", "with", "switch", "throw", "try", "else",
+        };
 
         internal ModuleAnalysis(AnalysisUnit unit, EnvironmentRecord scope, IAnalysisCookie cookie) {
             _unit = unit;
@@ -266,6 +273,9 @@ namespace Microsoft.NodejsTools.Analysis {
             var scope = FindScope(index);
 
             var expr = Statement.GetExpression(GetAstFromText(exprText).Block);
+            if (expr == null) {
+                return new MemberResult[0];
+            }
             if (expr is ConstantWrapper && ((ConstantWrapper)expr).Value is int)
             {
                 // no completions on integer ., the user is typing a float
@@ -283,38 +293,31 @@ namespace Microsoft.NodejsTools.Analysis {
         /// <param name="exprText">The expression to get signatures for.</param>
         /// <param name="index">The 0-based absolute index into the file.</param>
         public IEnumerable<IOverloadResult> GetSignaturesByIndex(string exprText, int index) {
-            throw new InvalidOperationException("GetSignaturesByIndex");
-#if FALSE
             try {
                 var scope = FindScope(index);
                 var unit = GetNearestEnclosingAnalysisUnit(scope);
                 var eval = new ExpressionEvaluator(unit.CopyForEval(), scope, mergeScopes: true);
 
-                using (var parser = Parser.CreateParser(new StringReader(exprText), _unit.ProjectState.LanguageVersion)) {
-                    var expr = GetExpression(parser.ParseTopExpression().Body);
-                    if (expr is ListExpression ||
-                        expr is TupleExpression ||
-                        expr is DictionaryExpression) {
-                        return Enumerable.Empty<IOverloadResult>();
-                    }
-                    var lookup = eval.Evaluate(expr);
-
-                    var result = new HashSet<OverloadResult>(OverloadResultComparer.Instance);
-
-                    // TODO: Include relevant type info on the parameter...
-                    foreach (var ns in lookup) {
-                        if (ns.Overloads != null) {
-                            result.UnionWith(ns.Overloads);
-                        }
-                    }
-
-                    return result;
+                var expr = Statement.GetExpression(GetAstFromText(exprText).Block);
+                if (expr == null ||
+                    expr is ArrayLiteral) {
+                    return Enumerable.Empty<IOverloadResult>();
                 }
+                var lookup = eval.Evaluate(expr);
+
+                var result = new HashSet<OverloadResult>(OverloadResultComparer.Instance);
+
+                foreach (var ns in lookup) {
+                    if (ns.Overloads != null) {
+                        result.UnionWith(ns.Overloads);
+                    }
+                }
+
+                return result;
             } catch (Exception) {
                 // TODO: log exception
                 return new[] { new SimpleOverloadResult(new ParameterResult[0], "Unknown", "IntellisenseError_Sigs") };
             }
-#endif
         }
 
         /// <summary>
@@ -443,26 +446,18 @@ namespace Microsoft.NodejsTools.Analysis {
 
         private IEnumerable<MemberResult> GetKeywordMembers(GetMemberOptions options, EnvironmentRecord scope) {
             IEnumerable<string> keywords = null;
-#if FALSE
             if (options.ExpressionKeywords()) {
                 // keywords available in any context
-                keywords = PythonKeywords.Expression(ProjectState.LanguageVersion);
-            } else 
-#endif
-            {
+                keywords = _exprKeywords;
+            } else  {
                 keywords = Enumerable.Empty<string>();
             }
 
-#if FALSE
             if (options.StatementKeywords()) {
-                keywords = keywords.Union(PythonKeywords.Statement(ProjectState.LanguageVersion));
+                keywords = keywords.Union(_stmtKeywords);
             }
 
-            if (!(scope is FunctionScope)) {
-                keywords = keywords.Except(PythonKeywords.InvalidOutsideFunction(ProjectState.LanguageVersion));
-            }
-#endif
-            return keywords.Select(kw => new MemberResult(kw, PythonMemberType.Keyword));
+            return keywords.Select(kw => new MemberResult(kw, NodejsMemberType.Keyword));
         }
 
         #endregion

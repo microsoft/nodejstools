@@ -37,7 +37,9 @@ namespace Microsoft.NodejsTools.Parsing {
                 error.IsError = error.Severity < 2;
             }
 
-            OnCompilerError(error);
+            if (!OnCompilerError(error)) {
+                
+            }
         }
 
         internal bool OnCompilerError(JScriptException se) {

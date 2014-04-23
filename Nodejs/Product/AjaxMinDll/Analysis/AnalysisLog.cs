@@ -151,7 +151,7 @@ namespace Microsoft.NodejsTools.Analysis {
             Add("Cancel", queue.Count);
         }
 
-        public static void ReduceCallDepth(FunctionInfo functionInfo, int callCount, int newLimit) {
+        public static void ReduceCallDepth(FunctionValue functionInfo, int callCount, int newLimit) {
             Add("R", functionInfo, callCount, newLimit);
         }
 

@@ -159,10 +159,18 @@ namespace Microsoft.NodejsTools.Analysis.Analyzer {
         }
 
         public override bool Walk(ForNode node) {
-            node.Initializer.Walk(this);
-            node.Body.Walk(this);
-            _eval.Evaluate(node.Incrementer);
-            _eval.Evaluate(node.Condition);
+            if (node.Initializer != null) {
+                node.Initializer.Walk(this);
+            }
+            if (node.Body != null) {
+                node.Body.Walk(this);
+            }
+            if (node.Incrementer != null) {
+                _eval.Evaluate(node.Incrementer);
+            }
+            if (node.Condition != null) {
+                _eval.Evaluate(node.Condition);
+            }
             return false;
         }
 #if FALSE

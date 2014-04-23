@@ -150,6 +150,7 @@ namespace Microsoft.NodejsTools.Analysis.Analyzer {
             { typeof(CallNode), ExpressionEvaluator.EvaluateCall },
             { typeof(Conditional), ExpressionEvaluator.EvaluateConditional},
             { typeof(ConstantWrapper), ExpressionEvaluator.EvaluateConstant },
+            { typeof(DirectivePrologue), ExpressionEvaluator.EvaluateConstant },
             { typeof(ObjectLiteral), ExpressionEvaluator.EvaluateObjectLiteral },
             { typeof(Member), ExpressionEvaluator.EvaluateMember },
             { typeof(Lookup), ExpressionEvaluator.EvaluateLookup },
@@ -214,7 +215,7 @@ namespace Microsoft.NodejsTools.Analysis.Analyzer {
         private static IAnalysisSet EvaluateObjectLiteral(ExpressionEvaluator ee, Node node) {
             var n = (ObjectLiteral)node;
             IAnalysisSet result = ee.Scope.GetOrMakeNodeValue(node, _ => {
-                var objectInfo = new ObjectInfo(ee._unit.ProjectEntry);
+                var objectInfo = new ObjectValue(ee._unit.ProjectEntry);
                 result = objectInfo.SelfSet;
 
                 foreach (var x in n.Properties) {
@@ -494,8 +495,8 @@ namespace Microsoft.NodejsTools.Analysis.Analyzer {
         }
 
         private IAnalysisSet MakeSequence(ExpressionEvaluator ee, Node node) {
-            var sequence = (ArrayInfo)ee.Scope.GetOrMakeNodeValue(node, x => {
-                return new ArrayInfo(
+            var sequence = (ArrayValue)ee.Scope.GetOrMakeNodeValue(node, x => {
+                return new ArrayValue(
                     VariableDef.EmptyArray,
                     //_unit.ProjectState.ClassInfos[BuiltinTypeId.Array],
                     _unit.ProjectEntry

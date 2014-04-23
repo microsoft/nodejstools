@@ -28,7 +28,7 @@ namespace Microsoft.NodejsTools.Analysis.Values {
     /// subclass can beused if a set of types can be specified for the 
     /// return value.
     /// </summary>
-    internal class BuiltinFunctionInfo : FunctionInfo {
+    internal class BuiltinFunctionInfo : FunctionValue {
         private readonly string _name;
         private readonly string[] _signature;
         private readonly string _documentation;

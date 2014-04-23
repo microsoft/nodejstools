@@ -24,7 +24,7 @@ namespace Microsoft.NodejsTools.Analysis {
         private readonly string _name;
         private string _completion;
         private readonly Func<IEnumerable<AnalysisValue>> _vars;
-        private readonly Func<PythonMemberType> _type;
+        private readonly Func<NodejsMemberType> _type;
 
         internal MemberResult(string name, IEnumerable<AnalysisValue> vars) {
             _name = _completion = name;
@@ -33,13 +33,13 @@ namespace Microsoft.NodejsTools.Analysis {
             _type = GetMemberType;
         }
 
-        public MemberResult(string name, PythonMemberType type) {
+        public MemberResult(string name, NodejsMemberType type) {
             _name = _completion = name;
             _type = () => type;
             _vars = () => Empty;
         }
 
-        internal MemberResult(string name, string completion, IEnumerable<AnalysisValue> vars, PythonMemberType? type) {
+        internal MemberResult(string name, string completion, IEnumerable<AnalysisValue> vars, NodejsMemberType? type) {
             _name = name;
             _vars = () => vars;
             _completion = completion;
@@ -51,7 +51,7 @@ namespace Microsoft.NodejsTools.Analysis {
             }
         }
 
-        internal MemberResult(string name, Func<IEnumerable<AnalysisValue>> vars, Func<PythonMemberType> type) {
+        internal MemberResult(string name, Func<IEnumerable<AnalysisValue>> vars, Func<NodejsMemberType> type) {
             _name = _completion = name;
             _vars = vars;
             _type = type;
@@ -91,29 +91,15 @@ namespace Microsoft.NodejsTools.Analysis {
                     }
                 }
 
-                var mt = MemberType;
-                if (mt == PythonMemberType.Instance || mt == PythonMemberType.Constant) {
-                    switch (mt) {
-                        case PythonMemberType.Instance:
-                            doc.Append("Instance of ");
-                            break;
-                        case PythonMemberType.Constant:
-                            doc.Append("Constant ");
-                            break;
-                        default:
-                            doc.Append("Value of ");
-                            break;
-                    }
-                    if (types.Count == 0) {
-                        doc.AppendLine("unknown type");
-                    } else if (types.Count == 1) {
-                        doc.AppendLine(types[0]);
-                    } else {
-                        var orStr = types.Count == 2 ? " or " : ", or ";
-                        doc.AppendLine(string.Join(", ", types.Take(types.Count - 1)) + orStr + types.Last());
-                    }
-                    doc.AppendLine();
+                if (types.Count == 0) {
+                    doc.AppendLine("unknown type");
+                } else if (types.Count == 1) {
+                    doc.AppendLine(types[0]);
+                } else {
+                    var orStr = types.Count == 2 ? " or " : ", or ";
+                    doc.AppendLine(string.Join(", ", types.Take(types.Count - 1)) + orStr + types.Last());
                 }
+                doc.AppendLine();
                 foreach (var str in docs.OrderBy(s => s)) {
                     doc.AppendLine(str);
                     doc.AppendLine();
@@ -122,15 +108,15 @@ namespace Microsoft.NodejsTools.Analysis {
             }
         }
 
-        public PythonMemberType MemberType {
+        public NodejsMemberType MemberType {
             get {
                 return _type();
             }
         }
 
-        private PythonMemberType GetMemberType() {
-            bool includesNone = false;
-            PythonMemberType result = PythonMemberType.Unknown;
+        private NodejsMemberType GetMemberType() {
+            bool includesNull = false;
+            NodejsMemberType result = NodejsMemberType.Unknown;
 
             var allVars = _vars().SelectMany(ns => {
 #if FALSE
@@ -146,21 +132,23 @@ namespace Microsoft.NodejsTools.Analysis {
 
             foreach (var ns in allVars) {
                 var nsType = ns.MemberType;
-                if (ns.TypeId == BuiltinTypeId.Null) {
-                    includesNone = true;
-                } else if (result == PythonMemberType.Unknown) {
+                if (result == NodejsMemberType.Unknown &&
+                    (ns.TypeId == BuiltinTypeId.Null || 
+                    nsType == NodejsMemberType.Undefined)) {
+                    result = nsType;
+                    includesNull = true;
+                } else if (result == NodejsMemberType.Unknown || 
+                    result == NodejsMemberType.Null || 
+                    result == NodejsMemberType.Undefined) {
                     result = nsType;
                 } else if (result == nsType) {
                     // No change
-                } else if (result == PythonMemberType.Constant && nsType == PythonMemberType.Instance) {
-                    // Promote from Constant to Instance
-                    result = PythonMemberType.Instance;
                 } else {
-                    return PythonMemberType.Multiple;
+                    return NodejsMemberType.Multiple;
                 }
             }
-            if (result == PythonMemberType.Unknown) {
-                return includesNone ? PythonMemberType.Constant : PythonMemberType.Instance;
+            if (result == NodejsMemberType.Unknown) {
+                return NodejsMemberType.Object;
             }
             return result;
         }

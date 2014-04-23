@@ -31,7 +31,7 @@ using Microsoft.VisualStudioTools.Project;
 namespace Microsoft.NodejsTools.Intellisense {
     sealed partial class CompletionSource : ICompletionSource {
         private readonly ITextBuffer _textBuffer;
-        private readonly IClassifier _classifier;
+        private readonly NodejsClassifier _classifier;
         private readonly IServiceProvider _serviceProvider;
         private readonly IGlyphService _glyphService;
 
@@ -50,9 +50,9 @@ namespace Microsoft.NodejsTools.Intellisense {
             "transient", "volatile"
         };
 
-        public CompletionSource(ITextBuffer textBuffer, IClassifierAggregatorService classifierAggregator, IServiceProvider serviceProvider, IGlyphService glyphService) {
+        public CompletionSource(ITextBuffer textBuffer, NodejsClassifier classifier, IServiceProvider serviceProvider, IGlyphService glyphService) {
             _textBuffer = textBuffer;
-            _classifier = classifierAggregator.GetClassifier(textBuffer);
+            _classifier = classifier;
             _serviceProvider = serviceProvider;
             _glyphService = glyphService;
         }
@@ -271,8 +271,7 @@ namespace Microsoft.NodejsTools.Intellisense {
 
 
         private IEnumerable<Completion> GetProjectCompletions(bool? doubleQuote) {
-            var projBuffer = _textBuffer.Properties.GetProperty<NodejsProjectionBuffer>(typeof(NodejsProjectionBuffer));
-            var filePath = projBuffer.DiskBuffer.GetFilePath();
+            var filePath = _textBuffer.GetFilePath();
 
             var rdt = _serviceProvider.GetService(typeof(SVsRunningDocumentTable)) as IVsRunningDocumentTable;
             IVsHierarchy hierarchy;

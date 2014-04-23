@@ -30,14 +30,14 @@ namespace Microsoft.NodejsTools.Analysis.Analyzer {
     /// </summary>
     class FunctionAnalysisUnit : AnalysisUnit {
         private readonly FunctionAnalysisUnit _originalUnit;
-        public readonly UserFunctionInfo Function;
+        public readonly UserFunctionValue Function;
 
         public readonly CallChain CallChain;
         private readonly AnalysisUnit _declUnit;
         private readonly Dictionary<Node, Expression> _decoratorCalls;
 
         internal FunctionAnalysisUnit(
-            UserFunctionInfo function,
+            UserFunctionValue function,
             AnalysisUnit declUnit,
             EnvironmentRecord declScope,
             IPythonProjectEntry declEntry

@@ -38,10 +38,11 @@ namespace Microsoft.NodejsTools.Analysis {
         private readonly HashSet<ModuleInfo> _modulesWithUnresolvedImports;
         private readonly object _modulesWithUnresolvedImportsLock = new object();
         private readonly Dictionary<object, AnalysisValue> _itemCache;
-        internal readonly NullInfo _nullInst;
+        internal readonly NullValue _nullInst;
         internal readonly BooleanInfo _trueInst, _falseInst;
-        internal readonly UndefinedInfo _undefined;
-        internal AnalysisValue _globalObject;
+        internal readonly UndefinedValue _undefined;
+        internal readonly AnalysisValue _globalObject;
+        internal readonly AnalysisValue _numberPrototype, _stringPrototype, _booleanPrototype, _functionPrototype;
         private readonly Deque<AnalysisUnit> _queue;
         private Action<int> _reportQueueSize;
         private int _reportQueueInterval;
@@ -57,7 +58,7 @@ namespace Microsoft.NodejsTools.Analysis {
         private const string AnalysisLimitsKey = @"Software\Microsoft\NodejsTools\" + AssemblyVersionInfo.VSVersion +
             @"\Analysis\Project";
 
-        public JsAnalyzer(AnalysisValue globalObject = null) {
+        public JsAnalyzer() {
 #if FALSE
             _langVersion = factory.GetLanguageVersion();
             _interpreter = pythonInterpreter;
@@ -82,15 +83,24 @@ namespace Microsoft.NodejsTools.Analysis {
 
             _queue = new Deque<AnalysisUnit>();
 
-            _nullInst = new NullInfo(this);
+            _nullInst = new NullValue(this);
             _trueInst = new BooleanInfo(true, this);
             _falseInst = new BooleanInfo(false, this);
-            _undefined = new UndefinedInfo();
-            _globalObject = globalObject ?? GlobalBuilder.MakeGlobal(this);
+            _undefined = new UndefinedValue();
+
+            var globals = GlobalBuilder.MakeGlobal(this);
+            _globalObject = globals.GlobalObject;
+            _numberPrototype = globals.NumberPrototype;
+            _stringPrototype = globals.StringPrototype;
+            _booleanPrototype = globals.BooleanPrototype;
+            _functionPrototype = globals.FunctionPrototype;
+            
             var allJson = Path.Combine(
                 Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location),
                 "all.json"
             );
+            
+
             if (File.Exists(allJson)) {
                 NodejsModuleBuilder.Build(allJson, this);
             }
@@ -636,7 +646,7 @@ namespace Microsoft.NodejsTools.Analysis {
             switch (Type.GetTypeCode(attr.GetType())) {
                 case TypeCode.Double:
                     // TODO: What values should be cached?
-                    return GetCached(attr, () => new NumberInfo((double)attr, this));
+                    return GetCached(attr, () => new NumberValue((double)attr, this));
                 case TypeCode.Boolean:
                     if ((bool)attr) {
                         return _trueInst;
@@ -644,7 +654,10 @@ namespace Microsoft.NodejsTools.Analysis {
                         return _falseInst;
                     }
                 case TypeCode.String:
-                    return GetCached(attr, () => new StringInfo((string)attr, this));
+                    return GetCached(attr, () => new StringValue((string)attr, this));
+            }
+            if (attr == Parsing.Missing.Value) {
+                return _undefined;
             }
 
             throw new InvalidOperationException(attr.GetType().Name);

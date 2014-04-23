@@ -16,34 +16,36 @@ namespace Microsoft.NodejsTools.Analysis {
             _analyzer = analyzer;
         }
 
-        public static AnalysisValue MakeGlobal(JsAnalyzer analyzer) {
+        public static Globals MakeGlobal(JsAnalyzer analyzer) {
             return new GlobalBuilder(analyzer).MakeGlobal();
         }
 
-        private AnalysisValue MakeGlobal() {
+        private Globals MakeGlobal() {
             JsAnalyzer analyzer = _analyzer;
             var builtinEntry = analyzer._builtinEntry;
 
             var stringValue = _analyzer.GetConstant("");
             var boolValue = _analyzer.GetConstant(true);
             var doubleValue = _analyzer.GetConstant(0.0);
-            var res = new ObjectInfo(builtinEntry) {
+            AnalysisValue numberPrototype, stringPrototype, booleanPrototype, functionPrototype;
+
+            var globalObject = new ObjectValue(builtinEntry) {
                 ArrayFunction(),
-                BooleanFunction(),
+                BooleanFunction(out booleanPrototype),
                 DateFunction(),
                 ErrorFunction(),
                 ErrorFunction("EvalError"),
-                FunctionFunction(),
+                FunctionFunction(out functionPrototype),
                 Member("Infinity", analyzer.GetConstant(double.PositiveInfinity)),
                 Member("JSON", MakeJSONObject()),
                 Member("Math", MakeMathObject()),
                 Member("Infinity", analyzer.GetConstant(double.NaN)),
-                NumberFunction(),
+                NumberFunction(out numberPrototype),
                 ObjectFunction(),
                 ErrorFunction("RangeError"),
                 ErrorFunction("ReferenceError"),
                 RegExpFunction(),
-                StringFunction(),
+                StringFunction(out stringPrototype),
                 ErrorFunction("SyntaxError"),
                 ErrorFunction("TypeError"),
                 ErrorFunction("URIError"),
@@ -64,9 +66,9 @@ namespace Microsoft.NodejsTools.Analysis {
             };
 
             // aliases for global object:
-            res.Add("GLOBAL", res);
-            res.Add("global", res);
-            res.Add("root", res);
+            globalObject.Add("GLOBAL", globalObject);
+            globalObject.Add("global", globalObject);
+            globalObject.Add("root", globalObject);
 
             // Node specific stuff:
             //'setImmediate',
@@ -133,7 +135,7 @@ namespace Microsoft.NodejsTools.Analysis {
             //'util',
             //'vm',
             //'zlib' ]
-            return res;
+            return new Globals(globalObject, numberPrototype, stringPrototype, booleanPrototype, functionPrototype);
         }
 
         private BuiltinFunctionInfo ArrayFunction() {
@@ -141,7 +143,7 @@ namespace Microsoft.NodejsTools.Analysis {
 
             return new BuiltinFunctionInfo(builtinEntry, "Array") { 
                 Member("prototype", 
-                    new ObjectInfo(builtinEntry) {
+                    new ObjectValue(builtinEntry) {
                         BuiltinFunction("concat"),
                         BuiltinFunction("constructor"),
                         BuiltinFunction("every"),
@@ -171,17 +173,18 @@ namespace Microsoft.NodejsTools.Analysis {
             };
         }
 
-        private BuiltinFunctionInfo BooleanFunction() {
+        private BuiltinFunctionInfo BooleanFunction(out AnalysisValue booleanPrototype) {
             var builtinEntry = _analyzer._builtinEntry;
-
+            var prototype = Member("prototype",
+                new ObjectValue(builtinEntry) {
+                    BuiltinFunction("constructor"),
+                    BuiltinFunction("toString"),
+                    BuiltinFunction("valueOf"),
+                }
+            );
+            booleanPrototype = prototype.Value;
             return new BuiltinFunctionInfo(builtinEntry, "Boolean") { 
-                Member("prototype", 
-                    new ObjectInfo(builtinEntry) {
-                        BuiltinFunction("constructor"),
-                        BuiltinFunction("toString"),
-                        BuiltinFunction("valueOf"),
-                    }
-                )
+                prototype
             };
         }
 
@@ -190,7 +193,7 @@ namespace Microsoft.NodejsTools.Analysis {
 
             return new BuiltinFunctionInfo(builtinEntry, "Date") { 
                 Member("prototype", 
-                    new ObjectInfo(builtinEntry) {
+                    new ObjectValue(builtinEntry) {
                         BuiltinFunction("constructor"),
                         BuiltinFunction("getDate"),
                         BuiltinFunction("getDay"),
@@ -248,7 +251,7 @@ namespace Microsoft.NodejsTools.Analysis {
 
             return new BuiltinFunctionInfo(builtinEntry, "Error") { 
                 Member("prototype", 
-                    new ObjectInfo(builtinEntry) {
+                    new ObjectValue(builtinEntry) {
                         BuiltinFunction("constructor"),
                         BuiltinFunction("message"),
                         BuiltinFunction("name"),
@@ -265,7 +268,7 @@ namespace Microsoft.NodejsTools.Analysis {
 
             return new BuiltinFunctionInfo(builtinEntry, errorName) { 
                 Member("prototype", 
-                    new ObjectInfo(builtinEntry) {
+                    new ObjectValue(builtinEntry) {
                         BuiltinFunction("arguments"),
                         BuiltinFunction("constructor"),
                         BuiltinFunction("name"),
@@ -276,39 +279,40 @@ namespace Microsoft.NodejsTools.Analysis {
             };
         }
 
-        private BuiltinFunctionInfo FunctionFunction() {
+        private BuiltinFunctionInfo FunctionFunction(out AnalysisValue functionPrototype) {
             var builtinEntry = _analyzer._builtinEntry;
-
+            var prototype = Member("prototype",
+                new ReturningFunctionInfo(builtinEntry, "Empty", _analyzer._undefined) {
+                    BuiltinFunction("apply"),
+                    BuiltinFunction("bind"),
+                    BuiltinFunction("call"),
+                    BuiltinFunction("constructor"),
+                    BuiltinFunction("toString"),
+                }
+            );
+            functionPrototype = prototype.Value;
             return new BuiltinFunctionInfo(builtinEntry, "Function") { 
-                Member("prototype", 
-                    new ReturningFunctionInfo(builtinEntry, "Empty", _analyzer._undefined) {
-                        BuiltinFunction("apply"),
-                        BuiltinFunction("bind"),
-                        BuiltinFunction("call"),
-                        BuiltinFunction("constructor"),
-                        BuiltinFunction("toString"),
-                    }
-                )
+                prototype
             };
         }
 
-        private ObjectInfo MakeJSONObject() {
+        private ObjectValue MakeJSONObject() {
             var builtinEntry = _analyzer._builtinEntry;
 
             // TODO: Should we see if we have something that we should parse?
             // TODO: Should we have a per-node value for the result of parse?
-            var parseResult = new ObjectInfo(builtinEntry);
-            return new ObjectInfo(builtinEntry) { 
+            var parseResult = new ObjectValue(builtinEntry);
+            return new ObjectValue(builtinEntry) { 
                 ReturningFunction("parse", parseResult),
                 ReturningFunction("stringify", _analyzer.GetConstant("")),
             };
         }
 
-        private ObjectInfo MakeMathObject() {
+        private ObjectValue MakeMathObject() {
             var builtinEntry = _analyzer._builtinEntry;
 
             var doubleResult = _analyzer.GetConstant(0.0);
-            return new ObjectInfo(builtinEntry) { 
+            return new ObjectValue(builtinEntry) { 
                 Member("E", _analyzer.GetConstant(Math.E)),
                 Member("LN10", doubleResult),
                 Member("LN2", doubleResult),
@@ -338,26 +342,29 @@ namespace Microsoft.NodejsTools.Analysis {
             };
         }
 
-        private BuiltinFunctionInfo NumberFunction() {
+        private BuiltinFunctionInfo NumberFunction(out AnalysisValue numberPrototype) {
             var builtinEntry = _analyzer._builtinEntry;
 
+            var prototype = Member("prototype", 
+                new ObjectValue(builtinEntry) {
+                    BuiltinFunction("constructor"),
+                    BuiltinFunction("toExponential"),
+                    BuiltinFunction("toFixed"),
+                    BuiltinFunction("toLocaleString"),
+                    BuiltinFunction("toPrecision"),
+                    BuiltinFunction("toString"),
+                    BuiltinFunction("valueOf"),
+                }
+            );
+            numberPrototype = prototype.Value;
+
             return new BuiltinFunctionInfo(builtinEntry, "Number") { 
-                Member("prototype", 
-                    new ObjectInfo(builtinEntry) {
-                        BuiltinFunction("constructor"),
-                        BuiltinFunction("toExponential"),
-                        BuiltinFunction("toFixed"),
-                        BuiltinFunction("toLocaleString"),
-                        BuiltinFunction("toPrecision"),
-                        BuiltinFunction("toString"),
-                        BuiltinFunction("valueOf"),
-                    }
-                ),
+                prototype,
                 Member("length", _analyzer.GetConstant(1.0)),
                 Member("name", _analyzer.GetConstant("Number")),
                 Member("arguments", _analyzer._nullInst),
                 Member("caller", _analyzer._nullInst),
-                Member("prototype", new ObjectInfo(builtinEntry)),
+                Member("prototype", new ObjectValue(builtinEntry)),
                 Member("MAX_VALUE", _analyzer.GetConstant(Double.MaxValue)),
                 Member("MIN_VALUE", _analyzer.GetConstant(Double.MinValue)),
                 Member("NaN", _analyzer.GetConstant(Double.NaN)),
@@ -372,7 +379,7 @@ namespace Microsoft.NodejsTools.Analysis {
             var builtinEntry = _analyzer._builtinEntry;
 
             return new BuiltinFunctionInfo(builtinEntry, "Object") { 
-                Member("prototype", new ObjectInfo(builtinEntry)),
+                Member("prototype", new ObjectValue(builtinEntry)),
                 BuiltinFunction("getPrototypeOf"),
                 BuiltinFunction("getOwnPropertyDescriptor"),
                 BuiltinFunction("getOwnPropertyNames"),
@@ -438,7 +445,7 @@ namespace Microsoft.NodejsTools.Analysis {
 
             return new BuiltinFunctionInfo(builtinEntry, "RegExp") { 
                 Member("prototype", 
-                    new ObjectInfo(builtinEntry) {
+                    new ObjectValue(builtinEntry) {
                         BuiltinFunction("compile"),   
                         BuiltinFunction("constructor"),   
                         BuiltinFunction("exec"),  
@@ -486,51 +493,53 @@ namespace Microsoft.NodejsTools.Analysis {
             };
         }
 
-        private BuiltinFunctionInfo StringFunction() {
+        private BuiltinFunctionInfo StringFunction(out AnalysisValue stringPrototype) {
             var builtinEntry = _analyzer._builtinEntry;
+            var prototype = Member("prototype", 
+                new ObjectValue(builtinEntry) {
+                    BuiltinFunction("anchor"),
+                    BuiltinFunction("big"),
+                    BuiltinFunction("blink"),
+                    BuiltinFunction("bold"),
+                    BuiltinFunction("charAt"),
+                    BuiltinFunction("charCodeAt"),
+                    BuiltinFunction("concat"),
+                    BuiltinFunction("constructor"),
+                    BuiltinFunction("fixed"),
+                    BuiltinFunction("fontcolor"),
+                    BuiltinFunction("fontsize"),
+                    BuiltinFunction("indexOf"),
+                    BuiltinFunction("italics"),
+                    BuiltinFunction("lastIndexOf"),
+                    BuiltinFunction("length"),
+                    BuiltinFunction("link"),
+                    BuiltinFunction("localeCompare"),
+                    BuiltinFunction("match"),
+                    BuiltinFunction("replace"),
+                    BuiltinFunction("search"),
+                    BuiltinFunction("slice"),
+                    BuiltinFunction("small"),
+                    BuiltinFunction("split"),
+                    BuiltinFunction("strike"),
+                    BuiltinFunction("sub"),
+                    BuiltinFunction("substr"),
+                    BuiltinFunction("substring"),
+                    BuiltinFunction("sup"),
+                    BuiltinFunction("toLocaleLowerCase"),
+                    BuiltinFunction("toLocaleUpperCase"),
+                    BuiltinFunction("toLowerCase"),
+                    BuiltinFunction("toString"),
+                    BuiltinFunction("toUpperCase"),
+                    BuiltinFunction("trim"),
+                    BuiltinFunction("trimLeft"),
+                    BuiltinFunction("trimRight"),
+                    BuiltinFunction("valueOf"),
+                }
+            );
+            stringPrototype = prototype.Value;
 
             return new BuiltinFunctionInfo(builtinEntry, "String") { 
-                Member("prototype", 
-                    new ObjectInfo(builtinEntry) {
-                        BuiltinFunction("anchor"),
-                        BuiltinFunction("big"),
-                        BuiltinFunction("blink"),
-                        BuiltinFunction("bold"),
-                        BuiltinFunction("charAt"),
-                        BuiltinFunction("charCodeAt"),
-                        BuiltinFunction("concat"),
-                        BuiltinFunction("constructor"),
-                        BuiltinFunction("fixed"),
-                        BuiltinFunction("fontcolor"),
-                        BuiltinFunction("fontsize"),
-                        BuiltinFunction("indexOf"),
-                        BuiltinFunction("italics"),
-                        BuiltinFunction("lastIndexOf"),
-                        BuiltinFunction("length"),
-                        BuiltinFunction("link"),
-                        BuiltinFunction("localeCompare"),
-                        BuiltinFunction("match"),
-                        BuiltinFunction("replace"),
-                        BuiltinFunction("search"),
-                        BuiltinFunction("slice"),
-                        BuiltinFunction("small"),
-                        BuiltinFunction("split"),
-                        BuiltinFunction("strike"),
-                        BuiltinFunction("sub"),
-                        BuiltinFunction("substr"),
-                        BuiltinFunction("substring"),
-                        BuiltinFunction("sup"),
-                        BuiltinFunction("toLocaleLowerCase"),
-                        BuiltinFunction("toLocaleUpperCase"),
-                        BuiltinFunction("toLowerCase"),
-                        BuiltinFunction("toString"),
-                        BuiltinFunction("toUpperCase"),
-                        BuiltinFunction("trim"),
-                        BuiltinFunction("trimLeft"),
-                        BuiltinFunction("trimRight"),
-                        BuiltinFunction("valueOf"),
-                    }
-                ),
+                prototype,
                 ReturningFunction("fromCharCode", _analyzer.GetConstant("")),
             };
         }
@@ -558,5 +567,21 @@ namespace Microsoft.NodejsTools.Analysis {
         }
 
         #endregion
+    }
+
+    class Globals {
+        public readonly AnalysisValue GlobalObject,
+            NumberPrototype,
+            StringPrototype,
+            BooleanPrototype,
+            FunctionPrototype;
+
+        public Globals(AnalysisValue globalObject, AnalysisValue numberPrototype, AnalysisValue stringPrototype, AnalysisValue booleanPrototype, AnalysisValue functionPrototype) {
+            GlobalObject = globalObject;
+            NumberPrototype = numberPrototype;
+            StringPrototype = stringPrototype;
+            BooleanPrototype = booleanPrototype;
+            FunctionPrototype = functionPrototype;
+        }
     }
 }

@@ -30,13 +30,13 @@ namespace NodeReferenceGenerator {
         }
 
         public void Build() {
-            Dictionary<string, ObjectInfo> exportsTable = new Dictionary<string,ObjectInfo>();
+            Dictionary<string, ObjectValue> exportsTable = new Dictionary<string,ObjectValue>();
             // run through and initialize all of the modules.
             foreach (var module in _all["modules"]) {
                 var moduleName = FixModuleName((string)module["name"]);
                 var moduleRef = _analyzer.Modules.GetOrAdd(moduleName);
                 moduleRef.Module = new ModuleInfo(moduleName, _analyzer._builtinEntry);
-                var exports = new ObjectInfo(_analyzer._builtinEntry);
+                var exports = new ExportsValue(_analyzer._builtinEntry);
                 moduleRef.Module.Scope.GetOrAddVariable("exports").AddTypes(_analyzer._builtinEntry, exports);
 
                 exportsTable[moduleName] = exports;

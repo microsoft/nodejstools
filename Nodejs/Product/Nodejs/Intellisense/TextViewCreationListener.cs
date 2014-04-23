@@ -51,6 +51,10 @@ namespace Microsoft.NodejsTools.Intellisense {
                 _compModel.GetService<IIntellisenseSessionStackMapService>().GetStackForTextView(textView),
                 _compModel
             );
+            IntellisenseController controller;
+            if (textView.Properties.TryGetProperty<IntellisenseController>(typeof(IntellisenseController), out controller)) {
+                controller.AttachKeyboardFilter();
+            }
             editFilter.AttachKeyboardFilter(textViewAdapter);
         }
 

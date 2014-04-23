@@ -18,14 +18,17 @@ using System.IO;
 using System.Text;
 using Microsoft.NodejsTools;
 using Microsoft.NodejsTools.Analysis;
+using Microsoft.NodejsTools.Classifier;
 using Microsoft.NodejsTools.Intellisense;
 using Microsoft.NodejsTools.Project;
+using Microsoft.NodejsTools.Repl;
 using Microsoft.VisualStudio;
 using Microsoft.VisualStudio.Language.StandardClassification;
 using Microsoft.VisualStudio.Shell;
 using Microsoft.VisualStudio.Shell.Interop;
 using Microsoft.VisualStudio.Text;
 using Microsoft.VisualStudio.Text.Classification;
+using Microsoft.VisualStudio.Text.Editor;
 using Microsoft.VisualStudioTools;
 
 namespace Microsoft.NodejsTools {
@@ -120,7 +123,16 @@ namespace Microsoft.NodejsTools {
 
         internal static NodejsProjectNode GetPythonProject(this EnvDTE.Project project) {
             return project.GetCommonProject() as NodejsProjectNode;
-        }        
+        }
+
+        internal static VsProjectAnalyzer GetAnalyzer(this ITextView textView) {
+            NodejsReplEvaluator evaluator;
+            if (textView.Properties.TryGetProperty<NodejsReplEvaluator>(typeof(NodejsReplEvaluator), out evaluator)) {
+                //return evaluator.ReplAnalyzer;
+                throw new NotImplementedException("TODO: Repl analysis");
+            }
+            return textView.TextBuffer.GetAnalyzer();
+        }
 
         internal static VsProjectAnalyzer GetAnalyzer(this ITextBuffer buffer) {
             NodejsProjectNode pyProj;
@@ -155,6 +167,12 @@ namespace Microsoft.NodejsTools {
             }
             entry = null;
             return false;
+        }
+
+        internal static IProjectEntry GetProjectEntry(this ITextBuffer buffer) {
+            IProjectEntry res;
+            buffer.TryGetProjectEntry(out res);
+            return res;
         }
 
         internal static bool TryGetProjectEntry(this ITextBuffer buffer, out IProjectEntry entry) {
@@ -207,5 +225,16 @@ namespace Microsoft.NodejsTools {
                 token.ClassificationType.IsOfType(PredefinedClassificationTypeNames.Identifier);
         }
 
+        internal static bool IsOpenGrouping(this ClassificationSpan span) {
+            return span.ClassificationType.IsOfType(NodejsPredefinedClassificationTypeNames.Grouping) &&
+                span.Span.Length == 1 &&
+                (span.Span.GetText() == "{" || span.Span.GetText() == "[" || span.Span.GetText() == "(");
+        }
+
+        internal static bool IsCloseGrouping(this ClassificationSpan span) {
+            return span.ClassificationType.IsOfType(NodejsPredefinedClassificationTypeNames.Grouping) &&
+                span.Span.Length == 1 &&
+                (span.Span.GetText() == "}" || span.Span.GetText() == "]" || span.Span.GetText() == ")");
+        }
     }
 }

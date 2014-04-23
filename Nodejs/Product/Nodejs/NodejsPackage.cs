@@ -107,20 +107,6 @@ namespace Microsoft.NodejsTools {
             Instance = this;
         }
 
-        public override int FDoIdle(uint grfidlef) {
-            if (ChangedBuffers.Count > 0) {
-                foreach (var buffer in ChangedBuffers) {
-                    var fileNode = ((NodejsProjectionBuffer)buffer.Properties[typeof(NodejsProjectionBuffer)]).GetFileNode();
-                    if (fileNode != null) {
-                        fileNode.GenerateReferenceFile(buffer.CurrentSnapshot.GetText());
-                    }
-                }
-                ChangedBuffers.Clear();
-            }
-
-            return base.FDoIdle(grfidlef);
-        }
-
         public NodejsGeneralOptionsPage GeneralOptionsPage {
             get {
                 return (NodejsGeneralOptionsPage)GetDialogPage(typeof(NodejsGeneralOptionsPage));

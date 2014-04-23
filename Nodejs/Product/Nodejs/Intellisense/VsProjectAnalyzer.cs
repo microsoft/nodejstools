@@ -371,7 +371,7 @@ namespace Microsoft.NodejsTools.Intellisense {
             //return TrySpecialCompletions(snapshot, span, point, options) ??
             return GetNormalCompletionContext(snapshot, span, point);
         }
-#if FALSE
+
         /// <summary>
         /// Gets a list of signatuers available for the expression at the provided location in the snapshot.
         /// </summary>
@@ -392,13 +392,14 @@ namespace Microsoft.NodejsTools.Intellisense {
 
             var text = new SnapshotSpan(exprRange.Value.Snapshot, new Span(exprRange.Value.Start, sigStart.Value.Position - exprRange.Value.Start)).GetText();
             var applicableSpan = parser.Snapshot.CreateTrackingSpan(exprRange.Value.Span, SpanTrackingMode.EdgeInclusive);
-
+#if FALSE
             if (snapshot.TextBuffer.GetAnalyzer().ShouldEvaluateForCompletion(text)) {
                 var liveSigs = TryGetLiveSignatures(snapshot, paramIndex, text, applicableSpan, lastKeywordArg);
                 if (liveSigs != null) {
                     return liveSigs;
                 }
             }
+#endif
 
             var start = Stopwatch.ElapsedMilliseconds;
 
@@ -420,7 +421,7 @@ namespace Microsoft.NodejsTools.Intellisense {
 
                     var result = new List<ISignature>();
                     foreach (var sig in sigs) {
-                        result.Add(new PythonSignature(applicableSpan, sig, paramIndex, lastKeywordArg));
+                        result.Add(new NodejsSignature(applicableSpan, sig, paramIndex, lastKeywordArg));
                     }
 
                     return new SignatureAnalysis(
@@ -433,7 +434,7 @@ namespace Microsoft.NodejsTools.Intellisense {
             }
             return new SignatureAnalysis(text, paramIndex, new ISignature[0]);
         }
-#endif
+
         internal static int TranslateIndex(int index, ITextSnapshot fromSnapshot, ModuleAnalysis toAnalysisSnapshot) {
             var snapshotCookie = toAnalysisSnapshot.AnalysisCookie as SnapshotCookie;
             // TODO: buffers differ in the REPL window case, in the future we should handle this better
@@ -576,16 +577,9 @@ namespace Microsoft.NodejsTools.Intellisense {
                 new SnapshotSpanSourceCodeReader(
                     new SnapshotSpan(snapshot, 0, snapshot.Length)
                 ),
-                new CollectingErrorSink()
+                new ErrorSink()
             );
             return parser.Parse(new CodeSettings());
-            /*
-            using (var parser = Parser.CreateParser(
-                Project.LanguageVersion,
-                new ParserOptions() { Verbatim = true, BindReferences = true }
-            )) {
-                return ParseOneFile(null, parser);
-            }*/
         }
 
         internal ITextSnapshot GetOpenSnapshot(IProjectEntry entry) {
@@ -726,10 +720,9 @@ namespace Microsoft.NodejsTools.Intellisense {
             ast = CreateParser(new StreamReader(content), errorSink).Parse(new CodeSettings());
         }
 
-        private JSParser CreateParser(TextReader content, CollectingErrorSink sink) {
+        private JSParser CreateParser(TextReader content, ErrorSink sink) {
             // TODO: JSParser should accept a TextReader
-            var parser = new JSParser(content.ReadToEnd(), sink);
-            return parser;
+            return new JSParser(content.ReadToEnd(), sink);
         }
 
         private void ParsePythonCode(TextReader content, out JsAst ast, out CollectingErrorSink errorSink) {

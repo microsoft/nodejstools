@@ -89,9 +89,9 @@ namespace Microsoft.NodejsTools.Analysis {
         /// <summary>
         /// Returns the member type of the analysis value, or PythonMemberType.Unknown if it's unknown.
         /// </summary>
-        public virtual PythonMemberType MemberType {
+        public virtual NodejsMemberType MemberType {
             get {
-                return PythonMemberType.Unknown;
+                return NodejsMemberType.Unknown;
             }
         }
 
@@ -154,7 +154,7 @@ namespace Microsoft.NodejsTools.Analysis {
         public virtual AnalysisUnit AnalysisUnit {
             get { return null; }
         }
-
+        
         #region Dynamic Operations
 
         /// <summary>
@@ -255,7 +255,8 @@ namespace Microsoft.NodejsTools.Analysis {
         }
 
         public virtual IAnalysisSet GetIndex(Node node, AnalysisUnit unit, IAnalysisSet index) {
-            throw new NotImplementedException("GetIndex");
+            return AnalysisSet.Empty;
+            //throw new NotImplementedException("GetIndex");
             //return GetMember(node, unit, "__getitem__").Call(node, unit, new[] { index });
         }
 

@@ -208,8 +208,8 @@ namespace Microsoft.NodejsTools.Analysis {
         private void InitNodejsVariables() {
             var filename = _analyzer.GetConstant(_filePath);
             var dirName = _analyzer.GetConstant("");
-            var module = new ObjectInfo(this);
-            var exports = new ObjectInfo(this);
+            var module = new ObjectValue(this);
+            var exports = new ExportsValue(this);
             module.Add("exports", exports);
 
             MyScope.Scope.GetOrAddVariable("__dirname").AddTypes(this, dirName);

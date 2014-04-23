@@ -758,6 +758,30 @@ for(var i = 0; i<4; i++) { }
         }
 
         [TestMethod]
+        public void TestForNoVarStatement() {
+            const string ForCode = @"
+for(i = 0; i<4; i++) { }
+";
+            CheckAst(
+                ParseCode(ForCode),
+                CheckBlock(
+                    CheckForStmt(
+                        CheckExprStmt(
+                            CheckBinary(
+                                JSToken.Assign,
+                                CheckLookup("i"),
+                                Zero
+                            )
+                        ),
+                        CheckLessThan(I, Four),
+                        CheckIncrement(I),
+                        CheckBlock()
+                    )
+                )
+            );
+        }
+
+        [TestMethod]
         public void TestForInStatement() {
             const string ForCode = @"
 for(var i in []) { }

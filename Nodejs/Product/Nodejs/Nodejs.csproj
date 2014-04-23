@@ -267,12 +267,22 @@
     <Compile Include="Intellisense\AnalysisSynchronizationContext.cs" />
     <Compile Include="Intellisense\CollectingErrorSink.cs" />
     <Compile Include="Intellisense\CompletionAnalysis.cs" />
+    <Compile Include="Intellisense\CompletionComparer.cs" />
     <Compile Include="Intellisense\EntryEventArgs.cs" />
     <Compile Include="Intellisense\FuzzyCompletionSet.cs" />
     <Compile Include="Intellisense\FuzzyStringMatcher.cs" />
+    <Compile Include="Intellisense\IContentTypeMetadata.cs" />
+    <Compile Include="Intellisense\IntellisenseController.cs" />
+    <Compile Include="Intellisense\IntellisenseControllerProvider.cs" />
     <Compile Include="Intellisense\MonitoredBufferResult.cs" />
+    <Compile Include="Intellisense\NodejsParameter.cs" />
+    <Compile Include="Intellisense\NodejsSignature.cs" />
     <Compile Include="Intellisense\NormalCompletionAnalysis.cs" />
     <Compile Include="Intellisense\ParseQueue.cs" />
+    <Compile Include="Intellisense\ReverseExpressionParser.cs" />
+    <Compile Include="Intellisense\SignatureAnalysis.cs" />
+    <Compile Include="Intellisense\SignatureHelpSource.cs" />
+    <Compile Include="Intellisense\SignatureHelpSourceProvider.cs" />
     <Compile Include="Intellisense\VsProjectAnalyzer.cs" />
     <Compile Include="Intellisense\SnapshotCookie.cs" />
     <Compile Include="Intellisense\TaskProvider.cs" />
@@ -360,7 +370,6 @@
     </Compile>
     <Compile Include="Project\ProjectResources.cs" />
     <Compile Include="TaggerProviderMetadata.cs" />
-    <Compile Include="CustomTrackingSpan.cs" />
     <Compile Include="Debugger\Communication\BreakpointEventArgs.cs" />
     <Compile Include="Debugger\Communication\CompileScriptEventArgs.cs" />
     <Compile Include="Debugger\Communication\ExceptionEventArgs.cs" />
@@ -405,8 +414,6 @@
     <Compile Include="Intellisense\CompletionSource.cs" />
     <Compile Include="Intellisense\CompletionSourceProvider.cs" />
     <Compile Include="Intellisense\CompletionSource.Modules.cs" />
-    <Compile Include="Intellisense\ReferenceGroup.cs" />
-    <Compile Include="Intellisense\ReferenceGroupDispenser.cs" />
     <Compile Include="Intellisense\RequireCompletionCache.cs" />
     <Compile Include="Intellisense\TextViewCreationListener.cs" />
     <Compile Include="Jade\Classifier\IClassificationContextNameProvider.cs" />
@@ -606,7 +613,6 @@
     <Compile Include="Navigation\CodeWindowManager.cs" />
     <Compile Include="NodejsConstants.cs" />
     <Compile Include="NodejsEditorFactory.cs" />
-    <Compile Include="NodejsProjectionBuffer.cs" />
     <Compile Include="NodejsProject.cs" />
     <Compile Include="NodejsProjectFactory.cs" />
     <Compile Include="PkgCmdId.cs" />

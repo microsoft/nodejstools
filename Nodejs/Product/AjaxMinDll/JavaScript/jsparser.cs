@@ -1292,8 +1292,12 @@ namespace Microsoft.NodejsTools.Parsing
                             }
                             else
                             {
-                                throw new NotImplementedException("Parse initializer semicolon?");                                
-                                //initializer = ParseExpression(unary, false, isLHS, JSToken.In);
+                                var initializerExpr = ParseExpression(unary, false, isLHS, JSToken.In);
+                                initializer =
+                                    new ExpressionStatement(
+                                        initializerExpr.Context,
+                                        this
+                                    ) { Expression = initializerExpr };
                             }
                         }
                     }
@@ -2929,7 +2933,7 @@ namespace Microsoft.NodejsTools.Parsing
                         {
                             // function body's are SourceElements (Statements + FunctionDeclarations)
                             var statement = ParseStatement(true);
-                            if (possibleDirectivePrologue)
+                            if (possibleDirectivePrologue && !(statement is ReturnNode))
                             {
                                 var constantWrapper = Statement.GetExpression(statement) as ConstantWrapper;
                                 if (constantWrapper != null && constantWrapper.PrimitiveType == PrimitiveType.String)
@@ -4700,6 +4704,7 @@ namespace Microsoft.NodejsTools.Parsing
             eofCtx.EndPosition++;
 #endif
             m_errorSink.HandleError(errorId, eofCtx);
+            throw new EndOfFileException(); // this exception terminates the parser
         }
 
         //---------------------------------------------------------------------------------------
