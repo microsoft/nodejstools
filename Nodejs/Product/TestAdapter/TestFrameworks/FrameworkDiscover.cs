@@ -18,6 +18,7 @@ using System.IO;
 using System.Linq;
 
 namespace Microsoft.NodejsTools.TestAdapter.TestFrameworks {
+    //TODO, this should be an application level global object, where to put it?
     class FrameworkDiscover {
         private List<TestFramework> _framworks;
         private TestFramework Default = null;
@@ -51,6 +52,5 @@ namespace Microsoft.NodejsTools.TestAdapter.TestFrameworks {
             string path = Uri.UnescapeDataString(uri.Path);
             return Path.GetDirectoryName(path);
         }
-
     }
 }
