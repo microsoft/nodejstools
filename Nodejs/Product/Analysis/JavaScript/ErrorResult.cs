@@ -16,10 +16,18 @@ namespace Microsoft.NodejsTools.Parsing {
     public class ErrorResult {
         private readonly string _message;
         private readonly SourceSpan _span;
+        private readonly JSError _errorCode;
 
-        public ErrorResult(string message, SourceSpan span) {
+        public ErrorResult(string message, SourceSpan span, JSError errorCode) {
             _message = message;
             _span = span;
+            _errorCode = errorCode;
+        }
+
+        public JSError ErrorCode {
+            get {
+                return _errorCode;
+            }
         }
 
         public string Message {

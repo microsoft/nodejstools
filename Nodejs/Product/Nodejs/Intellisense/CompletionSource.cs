@@ -124,7 +124,10 @@ namespace Microsoft.NodejsTools.Intellisense {
                     session.GetTriggerPoint(buffer)
                 );
 
-                completionSets.Add(provider.GetCompletions(_glyphService));
+                var completions = provider.GetCompletions(_glyphService);
+                if (completions != null) {
+                    completionSets.Add(completions);
+                }
             }
         }
 

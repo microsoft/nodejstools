@@ -570,13 +570,13 @@ namespace Microsoft.NodejsTools.Analysis {
     }
 
     class Globals {
-        public readonly AnalysisValue GlobalObject,
-            NumberPrototype,
+        public readonly ObjectValue GlobalObject;
+        public readonly AnalysisValue NumberPrototype,
             StringPrototype,
             BooleanPrototype,
             FunctionPrototype;
 
-        public Globals(AnalysisValue globalObject, AnalysisValue numberPrototype, AnalysisValue stringPrototype, AnalysisValue booleanPrototype, AnalysisValue functionPrototype) {
+        public Globals(ObjectValue globalObject, AnalysisValue numberPrototype, AnalysisValue stringPrototype, AnalysisValue booleanPrototype, AnalysisValue functionPrototype) {
             GlobalObject = globalObject;
             NumberPrototype = numberPrototype;
             StringPrototype = stringPrototype;

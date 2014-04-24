@@ -372,6 +372,7 @@
     <Compile Include="Options\NodejsFormattingSpacingOptionsControl.Designer.cs">
       <DependentUpon>NodejsFormattingSpacingOptionsControl.cs</DependentUpon>
     </Compile>
+    <Compile Include="Project\PackageJsonFileNode.cs" />
     <Compile Include="Project\ProjectResources.cs" />
     <Compile Include="TaggerProviderMetadata.cs" />
     <Compile Include="Debugger\Communication\BreakpointEventArgs.cs" />

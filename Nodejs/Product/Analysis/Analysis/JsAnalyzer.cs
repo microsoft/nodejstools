@@ -38,7 +38,7 @@ namespace Microsoft.NodejsTools.Analysis {
         internal readonly NullValue _nullInst;
         internal readonly BooleanValue _trueInst, _falseInst;
         internal readonly UndefinedValue _undefined;
-        internal readonly AnalysisValue _globalObject;
+        internal readonly ObjectValue _globalObject;
         internal readonly AnalysisValue _numberPrototype, _stringPrototype, _booleanPrototype, _functionPrototype;
         private readonly Deque<AnalysisUnit> _queue;
         private Action<int> _reportQueueSize;
@@ -98,6 +98,12 @@ namespace Microsoft.NodejsTools.Analysis {
         }
 
         #region Public API
+
+        public IEnumerable<string> GlobalMembers {
+            get {
+                return _globalObject.Descriptors.Keys;
+            }
+        }
 
         /// <summary>
         /// Adds a new module of code to the list of available modules and returns a ProjectEntry object.

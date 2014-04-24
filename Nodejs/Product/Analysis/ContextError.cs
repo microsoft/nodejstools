@@ -25,7 +25,7 @@ namespace Microsoft.NodejsTools.Parsing
         public bool IsError { get; protected set; }
         public int Severity { get; protected set; }
         public string Subcategory { get; protected set; }
-        public string ErrorCode { get; protected set; }
+        public JSError ErrorCode { get; protected set; }
         public string HelpKeyword { get; protected set; }
         public string File { get; protected set; }
         public int StartLine { get; protected set; }
@@ -35,7 +35,7 @@ namespace Microsoft.NodejsTools.Parsing
         public string Message { get; protected set; }
 
         // constructor
-        public ContextError(bool isError, int severity, string subcategory, string errorCode, string helpKeyword, int startLine, int startColumn, int endLine, int endColumn, string message)
+        public ContextError(bool isError, int severity, string subcategory, JSError errorCode, string helpKeyword, int startLine, int startColumn, int endLine, int endColumn, string message)
         {
             // transfer the values as-is
             IsError = isError;
@@ -105,10 +105,8 @@ namespace Microsoft.NodejsTools.Parsing
             sb.Append(IsError ? " error " : " warning ");
 
             // if there is an error code
-            if (!string.IsNullOrEmpty(ErrorCode))
-            {
-                sb.Append(ErrorCode);
-            }
+            
+            sb.Append("JS{0}".FormatInvariant((int)ErrorCode));
 
             // separate description from the message
             sb.Append(": ");

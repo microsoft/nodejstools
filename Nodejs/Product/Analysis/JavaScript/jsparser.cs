@@ -78,7 +78,6 @@ namespace Microsoft.NodejsTools.Parsing
             m_noSkipTokenSet = new NoSkipTokenSet();
 
             m_errorSink = errorSink ?? new ErrorSink();
-            m_scanner = new JSScanner(source, m_errorSink);
             m_currentToken = new TokenWithSpan();
         }
 
@@ -86,6 +85,7 @@ namespace Microsoft.NodejsTools.Parsing
             // save the settings
             // if we are passed null, just create a default settings object
             m_settings = settings = settings ?? new CodeSettings();
+            m_scanner = new JSScanner(_source, m_errorSink, m_settings);
         }
 
         private class LabelInfo

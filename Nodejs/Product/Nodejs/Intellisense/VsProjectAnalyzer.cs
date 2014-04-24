@@ -62,6 +62,7 @@ namespace Microsoft.NodejsTools.Intellisense {
         private readonly JsAnalyzer _pyAnalyzer;
         private readonly bool _implicitProject;
         private readonly AutoResetEvent _queueActivityEvent = new AutoResetEvent(false);
+        private readonly CodeSettings _codeSettings = new CodeSettings();
 
         private int _userCount;
 
@@ -115,6 +116,16 @@ namespace Microsoft.NodejsTools.Intellisense {
             _projectFiles = new ConcurrentDictionary<string, IProjectEntry>(StringComparer.OrdinalIgnoreCase);
 
             _userCount = 1;
+
+            foreach (var name in _pyAnalyzer.GlobalMembers) {
+                _codeSettings.AddKnownGlobal(name);
+            }
+            _codeSettings.AddKnownGlobal("__dirname");
+            _codeSettings.AddKnownGlobal("__filename");
+            _codeSettings.AddKnownGlobal("module");
+            _codeSettings.AddKnownGlobal("exports");
+
+            _codeSettings.AllowShebangLine = true;
         }
 
         public void AddUser() {
@@ -579,7 +590,7 @@ namespace Microsoft.NodejsTools.Intellisense {
                 ),
                 new ErrorSink()
             );
-            return parser.Parse(new CodeSettings());
+            return parser.Parse(_codeSettings);
         }
 
         internal ITextSnapshot GetOpenSnapshot(IProjectEntry entry) {
@@ -717,7 +728,7 @@ namespace Microsoft.NodejsTools.Intellisense {
             ast = null;
             errorSink = new CollectingErrorSink();
 
-            ast = CreateParser(new StreamReader(content), errorSink).Parse(new CodeSettings());
+            ast = CreateParser(new StreamReader(content), errorSink).Parse(_codeSettings);
         }
 
         private JSParser CreateParser(TextReader content, ErrorSink sink) {
@@ -733,10 +744,10 @@ namespace Microsoft.NodejsTools.Intellisense {
             ast = ParseOneFile(ast, parser);            
         }
 
-        private static JsAst ParseOneFile(JsAst ast, JSParser parser) {
+        private JsAst ParseOneFile(JsAst ast, JSParser parser) {
             if (parser != null) {
                 try {
-                    ast = parser.Parse(new CodeSettings());
+                    ast = parser.Parse(_codeSettings);
                 } catch (Exception e) {
                     if (e.IsCriticalException()) {
                         throw;
@@ -765,7 +776,9 @@ namespace Microsoft.NodejsTools.Intellisense {
                 TaskProvider.Value.ReplaceItems(
                     entry,
                     ParserTaskMoniker,
-                    errorSink.Warnings.Select(er => f.FromParseWarning(er))
+                    errorSink.Warnings
+                        .Where(ShouldIncludeWarning)
+                        .Select(er => f.FromParseWarning(er))
                         .Concat(errorSink.Errors.Select(er => f.FromParseError(er)))
                         .ToList()
                 );
@@ -776,6 +789,21 @@ namespace Microsoft.NodejsTools.Intellisense {
             // Add a handler for the next complete analysis
             _unresolvedSquiggles.ListenForNextNewAnalysis(entry as IJsProjectEntry);
 #endif
+        }
+
+        private bool ShouldIncludeWarning(ErrorResult error) {
+            switch (error.ErrorCode) {
+                case JSError.SemicolonInsertion:
+                case JSError.ObjectLiteralKeyword:
+                case JSError.OctalLiteralsDeprecated:
+                case JSError.StatementBlockExpected:
+                case JSError.MisplacedFunctionDeclaration:
+                case JSError.KeywordUsedAsIdentifier:
+                case JSError.SuspectAssignment:
+                    // TODO: Allow the user to control what warnings are reported?
+                    return false;
+            }
+            return true;
         }
 
         #region Implementation Details
@@ -941,11 +969,9 @@ namespace Microsoft.NodejsTools.Intellisense {
         private static CompletionAnalysis GetNormalCompletionContext(ITextSnapshot snapshot, ITrackingSpan applicableSpan, ITrackingPoint point) {
             var span = applicableSpan.GetSpan(snapshot);
 
-#if FALSE
             if (IsSpaceCompletion(snapshot, point) && !IntellisenseController.ForceCompletions) {
                 return CompletionAnalysis.EmptyCompletionContext;
             }
-#endif
 
 #if FALSE
             var parser = new ReverseExpressionParser(snapshot, snapshot.TextBuffer, applicableSpan);
@@ -1206,20 +1232,13 @@ namespace Microsoft.NodejsTools.Intellisense {
 
         public void Dispose() {
             if (TaskProvider.IsValueCreated) {
-                lock (_openFiles) {
-                    foreach (var entry in _openFiles.Values) {
-                        TaskProvider.Value.Clear(entry, ParserTaskMoniker);
-                        TaskProvider.Value.Clear(entry, UnresolvedImportMoniker);
-                    }
+                foreach (var entry in _projectFiles.Values) {
+                    TaskProvider.Value.Clear(entry, ParserTaskMoniker);
+                    TaskProvider.Value.Clear(entry, UnresolvedImportMoniker);
                 }
             }
 
             _analysisQueue.Stop();
-            if (_pyAnalyzer != null) {
-                lock (_contentsLock) {
-                    ((IDisposable)_pyAnalyzer).Dispose();
-                }
-            }
         }
 
         #endregion

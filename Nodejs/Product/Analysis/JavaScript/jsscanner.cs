@@ -48,6 +48,7 @@ namespace Microsoft.NodejsTools.Parsing
         private int _tokenStartIndex, _tokenEndIndex;
 
         private readonly ErrorSink _errorSink;
+        private readonly CodeSettings _settings;
 
         #endregion
 
@@ -86,8 +87,9 @@ namespace Microsoft.NodejsTools.Parsing
         #region constructors
 
         
-        public JSScanner(string source, ErrorSink errorSink = null) {
+        public JSScanner(string source, ErrorSink errorSink = null, CodeSettings settings = null) {
             _errorSink = errorSink ?? new ErrorSink();
+            _settings = settings;
             _currentPosition = 0;
 
             Initialize(source, null, new SourceLocation(0, 1, 1));
@@ -97,11 +99,13 @@ namespace Microsoft.NodejsTools.Parsing
             _identifier = new StringBuilder(128);
         }
 
-        public JSScanner() {
+        public JSScanner(CodeSettings settings = null) {
             // stuff we don't want to copy
             _decodedString = null;
+            _settings = settings;
             _identifier = new StringBuilder(128);
             _errorSink = new ErrorSink();
+            _state.FirstLine = true;
         }
 
         /// <summary>
@@ -121,7 +125,7 @@ namespace Microsoft.NodejsTools.Parsing
 
             _currentPosition = 0;
             if (state == null) {
-                _state = new State();
+                _state = new State() { FirstLine = true };
             } else {
                 _state = (State)state;
             }
@@ -169,6 +173,17 @@ namespace Microsoft.NodejsTools.Parsing
             char c = GetChar(_currentPosition++);
             switch (c)
             {
+                case '#':
+                   if (_state.FirstLine && _settings != null && _settings.AllowShebangLine) {
+                        if (GetChar(_currentPosition) == '!') {
+                            SkipToEndOfLine();
+
+                            // fix up the end of the token
+                            _tokenEndIndex = _currentPosition;
+                            return ScanNextToken(scanForRegularExpressionLiterals);
+                        }
+                    }
+                    goto default;
                 case '\n':
                 case '\r':
                     token = ScanLineTerminator(c);
@@ -313,7 +328,6 @@ namespace Microsoft.NodejsTools.Parsing
                         case '/':
                             token = JSToken.SingleLineComment;
                             c = GetChar(++_currentPosition);
-
 
                             SkipSingleLineComment();
 
@@ -682,6 +696,7 @@ namespace Microsoft.NodejsTools.Parsing
                 }
             }
             _newLineLocations.Add(_currentPosition);
+            _state.FirstLine = false;
 
             // keep multiple line terminators together in a single token.
             // so get the current character after this last line terminator
@@ -702,6 +717,7 @@ namespace Microsoft.NodejsTools.Parsing
                     ++_currentPosition;
                 }
                 _newLineLocations.Add(_currentPosition);
+                _state.FirstLine = false;
             }
 
             return token;
@@ -1154,6 +1170,7 @@ namespace Microsoft.NodejsTools.Parsing
                         case '\u2028':
                         case '\u2029':
                             _newLineLocations.Add(_currentPosition);
+                            _state.FirstLine = false;
                             break;
 
                         // classic single char escape sequences
@@ -1486,6 +1503,7 @@ namespace Microsoft.NodejsTools.Parsing
                     ++_currentPosition;
                 }
                 _newLineLocations.Add(_currentPosition);
+                _state.FirstLine = false;
             }
             else if (c == '\n'
                 || c == '\x2028'
@@ -1494,6 +1512,7 @@ namespace Microsoft.NodejsTools.Parsing
                 // skip over the single line-feed character
                 ++_currentPosition;
                 _newLineLocations.Add(_currentPosition);
+                _state.FirstLine = false;
             }
         }
 
@@ -1526,6 +1545,7 @@ namespace Microsoft.NodejsTools.Parsing
                     {
                         c = GetChar(++_currentPosition);
                         _newLineLocations.Add(_currentPosition);
+                        _state.FirstLine = false;
                     }
                 }
 
@@ -1537,6 +1557,7 @@ namespace Microsoft.NodejsTools.Parsing
                 if (IsLineTerminator(c, 1))
                 {
                     _newLineLocations.Add(_currentPosition + 1);
+                    _state.FirstLine = false;
                 }
 
                 ++_currentPosition;
@@ -2076,12 +2097,11 @@ namespace Microsoft.NodejsTools.Parsing
         /// not changed.
         /// </summary>
         struct State : IEquatable<State> {
-            // TODO: If this stays as a single bool we should just
-            // re-use pre-boxed versions so the state's super cheap.
-            public bool UnterminatedComment;
+            public bool UnterminatedComment, FirstLine;
 
             public override int GetHashCode() {
-                return UnterminatedComment ? 1 : 0;
+                return (UnterminatedComment ? 1 : 0) ^
+                    (FirstLine ? 2 : 0);
             }
 
             public override bool Equals(object obj) {
@@ -2092,7 +2112,8 @@ namespace Microsoft.NodejsTools.Parsing
             }
 
             public bool Equals(State other) {
-                return other.UnterminatedComment == UnterminatedComment;
+                return other.UnterminatedComment == UnterminatedComment &&
+                    other.FirstLine == FirstLine;
             }
         }
     }

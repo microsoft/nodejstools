@@ -71,15 +71,6 @@ namespace Microsoft.NodejsTools.Parsing
             {
                 // start off with any known globals
                 m_assumedGlobals = settings.KnownGlobalCollection == null ? new HashSet<string>() : new HashSet<string>(settings.KnownGlobalCollection);
-
-                // and the root name of any resource strings is also an assumed global
-                foreach (var resourceStrings in settings.ResourceStrings)
-                {
-                    if (!resourceStrings.Name.IsNullOrWhiteSpace())
-                    {
-                        m_assumedGlobals.Add(resourceStrings.Name.SubstringUpToFirst('.'));
-                    }
-                }
             }
             else
             {

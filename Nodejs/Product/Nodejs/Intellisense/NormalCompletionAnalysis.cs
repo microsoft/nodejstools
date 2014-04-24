@@ -39,6 +39,14 @@ namespace Microsoft.NodejsTools.Intellisense {
                         )
                     );
                 }
+            } else {
+                members = analysis.GetAllAvailableMembersByIndex(
+                    VsProjectAnalyzer.TranslateIndex(
+                        Span.GetStartPoint(_snapshot).Position,
+                        _snapshot,
+                        analysis
+                    )
+                );
             }
 
             return new FuzzyCompletionSet(

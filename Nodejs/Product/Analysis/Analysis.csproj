@@ -226,7 +226,6 @@
     <Compile Include="Analysis\Values\Utils.cs" />
     <Compile Include="Analysis\VariableDef.cs" />
     <Compile Include="Analysis\VariableType.cs" />
-    <Compile Include="CommonSettings.cs" />
     <Compile Include="ContextError.cs" />
     <Compile Include="CssEncoderFallback.cs" />
     <Compile Include="Extensions.cs" />

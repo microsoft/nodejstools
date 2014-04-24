@@ -37,10 +37,31 @@ namespace AnalysisTests {
                 new TokenInfo(JSToken.EndOfLine, new SourceLocation(3, 1, 4), new SourceLocation(5, 3, 1)),
                 new TokenInfo(JSToken.Identifier, new SourceLocation(5, 3, 1), new SourceLocation(8, 3, 4))
             );
+
+            code = "// comment\none\n\ntwo";
+
+            VerifyTokens(
+                ScanTokens(code),
+                new TokenInfo(JSToken.SingleLineComment, new SourceLocation(0, 1, 1), new SourceLocation(10, 1, 11)),
+                new TokenInfo(JSToken.EndOfLine, new SourceLocation(10, 1, 11), new SourceLocation(11, 2, 1)),
+                new TokenInfo(JSToken.Identifier, new SourceLocation(11, 2, 1), new SourceLocation(14, 2, 4)),
+                new TokenInfo(JSToken.EndOfLine, new SourceLocation(14, 2, 4), new SourceLocation(16, 4, 1)),
+                new TokenInfo(JSToken.Identifier, new SourceLocation(16, 4, 1), new SourceLocation(19, 4, 4))
+            );
+
+            code = "#!/use/bin/node\none\n\ntwo";
+
+            VerifyTokens(
+                ScanTokens(code),
+                new TokenInfo(JSToken.EndOfLine, new SourceLocation(15, 1, 16), new SourceLocation(16, 2, 1)),
+                new TokenInfo(JSToken.Identifier, new SourceLocation(16, 2, 1), new SourceLocation(19, 2, 4)),
+                new TokenInfo(JSToken.EndOfLine, new SourceLocation(19, 2, 4), new SourceLocation(21, 4, 1)),
+                new TokenInfo(JSToken.Identifier, new SourceLocation(21, 4, 1), new SourceLocation(24, 4, 4))
+            );
         }
 
         private static List<TokenWithSpan> ScanTokens(string code) {
-            var scanner = new JSScanner(code);
+            var scanner = new JSScanner(code, null, new CodeSettings() { AllowShebangLine = true });
             List<TokenWithSpan> tokens = new List<TokenWithSpan>();
             for (TokenWithSpan curToken = scanner.ScanNextToken(true);
                 curToken.Token != JSToken.EndOfFile;

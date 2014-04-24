@@ -44,8 +44,6 @@ namespace Microsoft.NodejsTools.Parsing {
 
         internal bool OnCompilerError(JScriptException se) {
             // format the error code
-            string errorCode = "JS{0}".FormatInvariant((int)se.ErrorCode);
-
             OnError(
                 new JScriptExceptionEventArgs(
                     se,
@@ -53,7 +51,7 @@ namespace Microsoft.NodejsTools.Parsing {
                         se.IsError,
                         se.Severity,
                         GetSeverityString(se.Severity),
-                        errorCode,
+                        se.ErrorCode,
                         se.HelpLink,
                         se.Line,
                         se.Column,

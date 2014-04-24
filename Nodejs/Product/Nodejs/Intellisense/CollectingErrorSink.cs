@@ -33,7 +33,7 @@ namespace Microsoft.NodejsTools.Parsing {
                     error.Error.EndColumn
                 )
             );
-            var result = new ErrorResult(error.Error.Message, span);
+            var result = new ErrorResult(error.Error.Message, span, error.Error.ErrorCode);
 
             if (error.Error.IsError) {
                 Errors.Add(result);

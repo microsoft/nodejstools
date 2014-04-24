@@ -547,21 +547,6 @@ namespace Microsoft.NodejsTools.Intellisense {
                                 return VSConstants.S_OK;
                             }
                             break;
-                        case VSConstants.VSStd2KCmdID.SHOWMEMBERLIST:
-                        case VSConstants.VSStd2KCmdID.COMPLETEWORD:
-                            ForceCompletions = true;
-                            try {
-                                TriggerCompletionSession((VSConstants.VSStd2KCmdID)nCmdID == VSConstants.VSStd2KCmdID.COMPLETEWORD);
-                            } finally {
-                                ForceCompletions = false;
-                            }
-                            return VSConstants.S_OK;
-                        case VSConstants.VSStd2KCmdID.QUICKINFO:
-                            TriggerQuickInfo();
-                            return VSConstants.S_OK;
-                        case VSConstants.VSStd2KCmdID.PARAMINFO:
-                            TriggerSignatureHelp();
-                            return VSConstants.S_OK;
                         case VSConstants.VSStd2KCmdID.BACKSPACE:
                         case VSConstants.VSStd2KCmdID.DELETE:
                         case VSConstants.VSStd2KCmdID.DELETEWORDLEFT:
@@ -606,6 +591,26 @@ namespace Microsoft.NodejsTools.Intellisense {
                 }
             }
 
+            if (pguidCmdGroup == VSConstants.VSStd2K) {
+                switch ((VSConstants.VSStd2KCmdID)nCmdID) {
+                    case VSConstants.VSStd2KCmdID.SHOWMEMBERLIST:
+                    case VSConstants.VSStd2KCmdID.COMPLETEWORD:
+                        ForceCompletions = true;
+                        try {
+                            TriggerCompletionSession((VSConstants.VSStd2KCmdID)nCmdID == VSConstants.VSStd2KCmdID.COMPLETEWORD);
+                        } finally {
+                            ForceCompletions = false;
+                        }
+                        return VSConstants.S_OK;
+                    case VSConstants.VSStd2KCmdID.QUICKINFO:
+                        TriggerQuickInfo();
+                        return VSConstants.S_OK;
+                    case VSConstants.VSStd2KCmdID.PARAMINFO:
+                        TriggerSignatureHelp();
+                        return VSConstants.S_OK;
+                }
+            }
+        
             return _oldTarget.Exec(ref pguidCmdGroup, nCmdID, nCmdexecopt, pvaIn, pvaOut);
         }
 
@@ -631,6 +636,19 @@ namespace Microsoft.NodejsTools.Intellisense {
         }
 
         public int QueryStatus(ref Guid pguidCmdGroup, uint cCmds, OLECMD[] prgCmds, IntPtr pCmdText) {
+            if (pguidCmdGroup == VSConstants.VSStd2K) {
+                for (int i = 0; i < cCmds; i++) {
+                    switch ((VSConstants.VSStd2KCmdID)prgCmds[i].cmdID) {
+                        case VSConstants.VSStd2KCmdID.SHOWMEMBERLIST:
+                        case VSConstants.VSStd2KCmdID.COMPLETEWORD:
+                        case VSConstants.VSStd2KCmdID.QUICKINFO:
+                        case VSConstants.VSStd2KCmdID.PARAMINFO:
+                            prgCmds[i].cmdf = (uint)(OLECMDF.OLECMDF_ENABLED | OLECMDF.OLECMDF_SUPPORTED);
+                            return VSConstants.S_OK;
+                    }
+                }
+            }
+
             return _oldTarget.QueryStatus(ref pguidCmdGroup, cCmds, prgCmds, pCmdText);
         }
 

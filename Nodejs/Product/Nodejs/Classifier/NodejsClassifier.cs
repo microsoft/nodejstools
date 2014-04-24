@@ -83,7 +83,7 @@ namespace Microsoft.NodejsTools.Classifier {
 
         private JSScanner GetJSScanner() {
             if (_scanner == null) {
-                _scanner = new JSScanner();
+                _scanner = new JSScanner(new CodeSettings() { AllowShebangLine = true });
             }
             return _scanner;
         }
