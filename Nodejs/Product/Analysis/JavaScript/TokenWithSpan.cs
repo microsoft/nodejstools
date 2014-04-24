@@ -135,9 +135,6 @@ namespace Microsoft.NodejsTools.Parsing {
             );
         }
 
-        /// <summary>
-        /// TODO: This method prevents making _startPosition and _endPostion readonly
-        /// </summary>
         public TokenWithSpan UpdateWith(TokenWithSpan other) {
             if (other != null) {
                 int startPosition = StartPosition;
