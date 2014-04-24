@@ -61,11 +61,11 @@ namespace Microsoft.NodejsTools.Intellisense {
             _bufferParser = bufferParser;
         }
 
-        private static bool IsNodejsContent(ITextBuffer buffer) {
+        internal static bool IsNodejsContent(ITextBuffer buffer) {
             return buffer.ContentType.IsOfType(NodejsConstants.Nodejs);
         }
 
-        private static bool IsNodejsContent(ITextSnapshot snapshot) {
+        internal static bool IsNodejsContent(ITextSnapshot snapshot) {
             return snapshot.TextBuffer.ContentType.IsOfType(NodejsConstants.Nodejs);
         }
 

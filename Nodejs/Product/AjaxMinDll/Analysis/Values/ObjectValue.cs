@@ -12,7 +12,10 @@
  *
  * ***************************************************************************/
 
+using System;
 using System.Collections.Generic;
+using System.Linq;
+using System.Text;
 using Microsoft.NodejsTools.Parsing;
 
 namespace Microsoft.NodejsTools.Analysis.Values {
@@ -79,7 +82,44 @@ namespace Microsoft.NodejsTools.Analysis.Values {
             get {
                 return JsMemberType.Object;
             }
-        }        
+        }
+
+        public virtual string ObjectDescription {
+            get {
+                return "object";
+            }
+        }
+
+        public override string Description {
+            get {
+                StringBuilder res = new StringBuilder();
+                res.Append(ObjectDescription);
+                res.Append(' ');
+
+                var descriptors = Descriptors;
+                if (Descriptors != null && descriptors.Count > 0) {
+                    res.AppendLine();
+                    res.Append("Contains: ");
+                    int lineLength = "Contains: ".Length;
+                    var names = Descriptors.Keys.ToArray();
+                    Array.Sort(names);
+                    for (int i = 0; i < names.Length; i++) {
+                        res.Append(names[i]);
+                        lineLength += names[i].Length;
+                        if (i != names.Length - 1) {
+                            res.Append(", ");
+                            lineLength += 3;
+                        }
+                        if (lineLength > 160) {
+                            lineLength = 0;
+                            res.AppendLine();
+                        }
+                    }
+                }
+                res.AppendLine();
+                return res.ToString();
+            }
+        }
 
         internal override bool UnionEquals(AnalysisValue ns, int strength) {
             if (strength >= MergeStrength.ToObject) {

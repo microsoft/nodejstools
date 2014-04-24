@@ -269,6 +269,7 @@
     <Compile Include="Intellisense\CompletionAnalysis.cs" />
     <Compile Include="Intellisense\CompletionComparer.cs" />
     <Compile Include="Intellisense\EntryEventArgs.cs" />
+    <Compile Include="Intellisense\ExpressionAnalysis.cs" />
     <Compile Include="Intellisense\FileEventArgs.cs" />
     <Compile Include="Intellisense\FuzzyCompletionSet.cs" />
     <Compile Include="Intellisense\FuzzyStringMatcher.cs" />
@@ -280,6 +281,8 @@
     <Compile Include="Intellisense\NodejsSignature.cs" />
     <Compile Include="Intellisense\NormalCompletionAnalysis.cs" />
     <Compile Include="Intellisense\ParseQueue.cs" />
+    <Compile Include="Intellisense\QuickInfoSource.cs" />
+    <Compile Include="Intellisense\QuickInfoSourceProvider.cs" />
     <Compile Include="Intellisense\ReverseExpressionParser.cs" />
     <Compile Include="Intellisense\SignatureAnalysis.cs" />
     <Compile Include="Intellisense\SignatureHelpSource.cs" />

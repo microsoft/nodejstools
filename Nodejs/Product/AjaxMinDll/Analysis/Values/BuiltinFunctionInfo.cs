@@ -65,6 +65,12 @@ namespace Microsoft.NodejsTools.Analysis.Values {
                 return _name;
             }
         }
+
+        public override string Documentation {
+            get {
+                return String.Format("function {0} (built-in)", Name);
+            }
+        }
     }
 
     /// <summary>

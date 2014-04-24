@@ -32,20 +32,10 @@ using MSBuild = Microsoft.Build.Evaluation;
 
 namespace Microsoft.NodejsTools.Project {
     class NodejsProjectNode : CommonProjectNode, VsWebSite.VSWebSite, Microsoft.NodejsTools.ProjectWizard.INodePackageModulesCommands {
-        private static string _nodeRefCode = ReadNodeRefCode();
-        internal readonly string _referenceFilename = GetReferenceFilePath("NodejsProjectReference");
-        const string _userSwitchMarker = "// **NTVS** INSERT USER MODULE SWITCH HERE **NTVS**";
-        
-        /// <summary>
-        /// List of files to scan for require()
-        /// </summary>
-        private readonly JavaScriptSerializer _serializer = new JavaScriptSerializer();        
         private VsProjectAnalyzer _analyzer;
         private readonly HashSet<string> _warningFiles = new HashSet<string>();
         private readonly HashSet<string> _errorFiles = new HashSet<string>();
         internal readonly RequireCompletionCache _requireCompletionCache = new RequireCompletionCache();
-        internal int _currentFileCounter;
-        private static Random _random = new Random();
 
         public NodejsProjectNode(NodejsProjectPackage package)
             : base(package, Utilities.GetImageList(typeof(NodejsProjectNode).Assembly.GetManifestResourceStream("Microsoft.NodejsTools.Resources.Icons.NodejsImageList.bmp"))) {
@@ -56,8 +46,10 @@ namespace Microsoft.NodejsTools.Project {
             _analyzer = new VsProjectAnalyzer();
         }
 
-        public VsProjectAnalyzer GetAnalyzer() {
-            return _analyzer;
+        public VsProjectAnalyzer Analyzer {
+            get {
+                return _analyzer;
+            }
         }
 
         private static string[] _excludedAvailableItems = new[] { 
@@ -196,28 +188,10 @@ namespace Microsoft.NodejsTools.Project {
             return base.DisableCmdInCurrentMode(commandGroup, command);
         }
 
-        public override void Close() {
-            base.Close();
-            if (File.Exists(_referenceFilename)) {
-                File.Delete(_referenceFilename);
-            }
-        }
-
         public override string[] CodeFileExtensions {
             get {
                 return new[] { NodejsConstants.FileExtension };
             }
-        }
-
-        internal static string GetReferenceFilePath(string baseName) {
-            string res;
-            do {
-                res = Path.Combine(
-                    Path.GetTempPath(),
-                    baseName + _random.Next() + ".js"
-                );
-            } while (File.Exists(res));
-            return res;
         }
 
         protected internal override FolderNode CreateFolderNode(ProjectElement element) {
@@ -377,29 +351,8 @@ namespace Microsoft.NodejsTools.Project {
             folders.Add(folderChild);
         }
 
-        /// <summary>
-        /// Reads our baseline Node.js reference code.  If it doesn't exist for some reason
-        /// it'll use an empty skeleton.
-        /// </summary>
-        private static string ReadNodeRefCode() {
-            string nodeFile = NodejsPackage.NodejsReferencePath;
-
-            if (File.Exists(nodeFile)) {
-                try {
-                    return File.ReadAllText(nodeFile);
-                } catch {
-                }
-            }
-
-            // should never happen, we failed to find our baseline node code
-            // or failed to read it.
-            return @"
-function require(module) {
-    switch (module) {
-    " + _userSwitchMarker + @"
-    }
-}
-";
+        protected override bool IncludeNonMemberItemInProject(HierarchyNode node) {
+            return node is NodejsFileNode;
         }
 
         internal override object Object {

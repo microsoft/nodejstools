@@ -24,7 +24,11 @@ namespace Microsoft.NodejsTools.Parsing {
         }
 
         public LocationInfo ResolveLocation(IProjectEntry project, object location) {
-            throw new NotImplementedException();
+            return new LocationInfo(
+                project,
+                ((Node)location).Context.StartLineNumber,
+                ((Node)location).Context.StartColumn
+            );
         }
 
         public override void Walk(AstVisitor visitor) {

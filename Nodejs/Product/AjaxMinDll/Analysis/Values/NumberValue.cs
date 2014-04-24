@@ -34,6 +34,12 @@ namespace Microsoft.NodejsTools.Analysis.Values {
             }
         }
 
+        public override string Description {
+            get {
+                return "number";
+            }
+        }
+
         public override AnalysisValue Prototype {
             get { return _analyzer._numberPrototype; }
         }

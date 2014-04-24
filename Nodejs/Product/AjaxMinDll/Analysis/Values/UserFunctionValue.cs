@@ -81,33 +81,11 @@ namespace Microsoft.NodejsTools.Analysis.Values {
         public override string Description {
             get {
                 var result = new StringBuilder();
-#if FALSE
-                if (FunctionObject.IsLambda) {
-                    result.Append("lambda ");
-                    AddParameterString(result);
-                    result.Append(": ");
-
-                    if (FunctionObject.IsGenerator) {
-                        var lambdaExpr = ((ExpressionStatement)FunctionObject.Body).Expression;
-                        Expression yieldExpr = null;
-                        YieldExpression ye;
-                        YieldFromExpression yfe;
-                        if ((ye = lambdaExpr as YieldExpression) != null) {
-                            yieldExpr = ye.Expression;
-                        } else if ((yfe = lambdaExpr as YieldFromExpression) != null) {
-                            yieldExpr = yfe.Expression;
-                        } else {
-                            Debug.Assert(false, "lambdaExpr is not YieldExpression or YieldFromExpression");
-                        }
-                        result.Append(yieldExpr.ToCodeString(DeclaringModule.Tree));
-                    } else {
-                        result.Append(((ReturnStatement)FunctionObject.Body).Expression.ToCodeString(DeclaringModule.Tree));
-                    }
-                } else 
-#endif
                 {
                     result.Append("function ");
-                    result.Append(FunctionObject.Name);
+                    if (FunctionObject.Name != null) {
+                        result.Append(FunctionObject.Name);
+                    }
                     result.Append("(");
                     AddParameterString(result);
                     result.Append(")");
@@ -115,27 +93,10 @@ namespace Microsoft.NodejsTools.Analysis.Values {
 
                 AddReturnTypeString(result);
                 AddDocumentationString(result);
-                //AddQualifiedLocationString(result);
 
                 return result.ToString();
             }
         }
-
-#if FALSE
-        internal void AddQualifiedLocationString(StringBuilder result) {
-            var qualifiedNameParts = new Stack<string>();
-            for (var item = FunctionObject.Parent; item is FunctionObject || item is ClassDefinition; item = item.Parent) {
-                if (!string.IsNullOrEmpty(item.Name)) {
-                    qualifiedNameParts.Push(item.Name);
-                }
-            }
-            if (qualifiedNameParts.Count > 0) {
-                result.AppendLine();
-                result.Append("declared in ");
-                result.Append(string.Join(".", qualifiedNameParts));
-            }
-        }
-#endif
 
         private static void AppendDescription(StringBuilder result, AnalysisValue key) {
             result.Append(key.ShortDescription);

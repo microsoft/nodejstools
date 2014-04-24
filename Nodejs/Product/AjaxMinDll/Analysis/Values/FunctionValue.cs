@@ -66,29 +66,6 @@ namespace Microsoft.NodejsTools.Analysis.Values {
             return res;
         }
 
-#if FALSE
-        public override IAnalysisSet GetDescriptor(Node node, AnalysisValue instance, AnalysisValue context, AnalysisUnit unit) {
-            if (instance == ProjectState._noneInst || IsStatic) {
-                return SelfSet;
-            }
-            if (_methods == null) {
-                _methods = new Dictionary<AnalysisValue, IAnalysisSet>();
-            }
-
-            IAnalysisSet result;
-            if (!_methods.TryGetValue(instance, out result) || result == null) {
-                _methods[instance] = result = new BoundMethodInfo(this, instance).SelfSet;
-            }
-
-            if (IsProperty) {
-                throw new NotImplementedException("IsProperty function call");
-                //return result.Call(node, unit, ExpressionEvaluator.EmptySets);
-            }
-
-            return result;
-        }
-#endif
-
         public override JsMemberType MemberType {
             get {
                 return JsMemberType.Function;

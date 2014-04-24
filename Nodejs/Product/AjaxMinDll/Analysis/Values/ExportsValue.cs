@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using System.Text;
 using Microsoft.NodejsTools.Interpreter;
@@ -12,7 +13,7 @@ namespace Microsoft.NodejsTools.Analysis.Values {
 
     /// </summary>
     class ExportsValue : ObjectValue {
-        private readonly string _name;  // for debugging
+        private readonly string _name;
 
         public ExportsValue(string name, ProjectEntry projectEntry)
             : base(projectEntry) {
@@ -22,6 +23,12 @@ namespace Microsoft.NodejsTools.Analysis.Values {
         public override JsMemberType MemberType {
             get {
                 return JsMemberType.Module;
+            }
+        }
+
+        public override string ObjectDescription {
+            get {
+                return "exports from " + Path.GetFileName(_name);
             }
         }
     }

@@ -158,12 +158,10 @@ namespace Microsoft.NodejsTools.Analysis.Analyzer {
             { typeof(UnaryOperator), ExpressionEvaluator.EvaluateUnary },
             { typeof(ArrayLiteral), ExpressionEvaluator.EvaluateArrayLiteral },
             { typeof(FunctionExpression), ExpressionEvaluator.EvaluateFunctionExpression },
-            {typeof(ThisLiteral), ExpressionEvaluator.EvaluateThis }
+            { typeof(ThisLiteral), ExpressionEvaluator.EvaluateThis }
 #if FALSE
             { typeof(YieldExpression), ExpressionEvaluator.EvaluateYield },
             { typeof(YieldFromExpression), ExpressionEvaluator.EvaluateYieldFrom },
-            { typeof(TupleExpression), ExpressionEvaluator.EvaluateSequence },
-            { typeof(SliceExpression), ExpressionEvaluator.EvaluateSlice },
 #endif
         };
 

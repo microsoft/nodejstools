@@ -266,10 +266,10 @@ namespace Microsoft.NodejsTools.Intellisense {
         }
 
         internal static bool IsIdentifierChar(char ch) {
-            return ch == '_' || (ch >= 'a' && ch <= 'z') || (ch >= 'A' && ch <= 'Z') || (ch >= '0' && ch <= '9');
+            return ch == '_' || (ch >= 'a' && ch <= 'z') || (ch >= 'A' && ch <= 'Z') || (ch >= '0' && ch <= '9') || ch == '$';
         }
 
-
+        // TODO: require completions should move into the analyzer
         private IEnumerable<Completion> GetProjectCompletions(bool? doubleQuote) {
             var filePath = _textBuffer.GetFilePath();
 

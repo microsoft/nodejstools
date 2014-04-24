@@ -14,6 +14,7 @@
 
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.IO;
 using System.Text;
 using Microsoft.NodejsTools;
@@ -23,6 +24,7 @@ using Microsoft.NodejsTools.Intellisense;
 using Microsoft.NodejsTools.Project;
 using Microsoft.NodejsTools.Repl;
 using Microsoft.VisualStudio;
+using Microsoft.VisualStudio.Language.Intellisense;
 using Microsoft.VisualStudio.Language.StandardClassification;
 using Microsoft.VisualStudio.Shell;
 using Microsoft.VisualStudio.Shell.Interop;
@@ -157,7 +159,7 @@ namespace Microsoft.NodejsTools {
             }
 
             if (pyProj != null) {
-                analyzer = pyProj.GetAnalyzer();
+                analyzer = pyProj.Analyzer;
                 return analyzer;
             }
 
@@ -169,7 +171,7 @@ namespace Microsoft.NodejsTools {
             return NodejsPackage.Instance.DefaultAnalyzer;
         }
 
-        internal static bool TryGetNodejsProjectEntry(this ITextBuffer buffer, out IJsProjectEntry entry) {
+        internal static bool TryGetJsProjectEntry(this ITextBuffer buffer, out IJsProjectEntry entry) {
             IProjectEntry e;
             if (buffer.TryGetProjectEntry(out e) && (entry = e as IJsProjectEntry) != null) {
                 return true;
@@ -244,6 +246,157 @@ namespace Microsoft.NodejsTools {
             return span.ClassificationType.IsOfType(NodejsPredefinedClassificationTypeNames.Grouping) &&
                 span.Span.Length == 1 &&
                 (span.Span.GetText() == "}" || span.Span.GetText() == "]" || span.Span.GetText() == ")");
+        }
+
+        internal static void GotoSource(this LocationInfo location) {
+            NodejsPackage.NavigateTo(
+                location.FilePath,
+                Guid.Empty,
+                location.Line - 1,
+                location.Column - 1
+            );            
+        }
+
+        internal static SnapshotPoint? GetCaretPosition(this ITextView view) {
+            return view.BufferGraph.MapDownToFirstMatch(
+               new SnapshotPoint(view.TextBuffer.CurrentSnapshot, view.Caret.Position.BufferPosition),
+               PointTrackingMode.Positive,
+               IntellisenseController.IsNodejsContent,
+               PositionAffinity.Successor
+            );
+        }
+
+        private static bool IsIdentifierChar(char curChar) {
+            return Char.IsLetterOrDigit(curChar) || curChar == '_' || curChar == '$';
+        }
+
+        internal static ITrackingSpan GetCaretSpan(this ITextView view) {
+            var caretPoint = view.GetCaretPosition();
+            Debug.Assert(caretPoint != null);
+            var snapshot = caretPoint.Value.Snapshot;
+            var caretPos = caretPoint.Value.Position;
+
+            // fob(
+            //    ^
+            //    +---  Caret here
+            //
+            // We want to lookup fob, not fob(
+            //
+            ITrackingSpan span;
+            if (caretPos != snapshot.Length) {
+                string curChar = snapshot.GetText(caretPos, 1);
+                if (!IsIdentifierChar(curChar[0]) && caretPos > 0) {
+                    string prevChar = snapshot.GetText(caretPos - 1, 1);
+                    if (IsIdentifierChar(prevChar[0])) {
+                        caretPos--;
+                    }
+                }
+                span = snapshot.CreateTrackingSpan(
+                    caretPos,
+                    1,
+                    SpanTrackingMode.EdgeInclusive
+                );
+            } else {
+                span = snapshot.CreateTrackingSpan(
+                    caretPos,
+                    0,
+                    SpanTrackingMode.EdgeInclusive
+                );
+            }
+
+            return span;
+        }
+
+        internal static ITrackingSpan CreateTrackingSpan(this IQuickInfoSession session, ITextBuffer buffer) {
+            var triggerPoint = session.GetTriggerPoint(buffer);
+            var position = triggerPoint.GetPosition(buffer.CurrentSnapshot);
+            if (position == buffer.CurrentSnapshot.Length) {
+                return ((IIntellisenseSession)session).GetApplicableSpan(buffer);
+            }
+
+            return buffer.CurrentSnapshot.CreateTrackingSpan(position, 1, SpanTrackingMode.EdgeInclusive);
+        }
+
+        /// <summary>
+        /// Returns the span to use for the provided intellisense session.
+        /// </summary>
+        /// <returns>A tracking span. The span may be of length zero if there
+        /// is no suitable token at the trigger point.</returns>
+        internal static ITrackingSpan GetApplicableSpan(this IIntellisenseSession session, ITextBuffer buffer) {
+            var snapshot = buffer.CurrentSnapshot;
+            var triggerPoint = session.GetTriggerPoint(buffer);
+
+            var span = snapshot.GetApplicableSpan(triggerPoint);
+            if (span != null) {
+                return span;
+            }
+            return snapshot.CreateTrackingSpan(triggerPoint.GetPosition(snapshot), 0, SpanTrackingMode.EdgeInclusive);
+        }
+
+        /// <summary>
+        /// Returns the applicable span at the provided position.
+        /// </summary>
+        /// <returns>A tracking span, or null if there is no token at the
+        /// provided position.</returns>
+        internal static ITrackingSpan GetApplicableSpan(this ITextSnapshot snapshot, ITrackingPoint point) {
+            return snapshot.GetApplicableSpan(point.GetPosition(snapshot));
+        }
+
+        /// <summary>
+        /// Returns the applicable span at the provided position.
+        /// </summary>
+        /// <returns>A tracking span, or null if there is no token at the
+        /// provided position.</returns>
+        internal static ITrackingSpan GetApplicableSpan(this ITextSnapshot snapshot, int position) {
+            var classifier = snapshot.TextBuffer.GetNodejsClassifier();
+            var line = snapshot.GetLineFromPosition(position);
+            if (classifier == null || line == null) {
+                return null;
+            }
+
+            var spanLength = position - line.Start.Position;
+            // Increase position by one to include 'fob' in: "abc.|fob"
+            if (spanLength < line.Length) {
+                spanLength += 1;
+            }
+
+            var classifications = classifier.GetClassificationSpans(new SnapshotSpan(line.Start, spanLength));
+            // Handle "|"
+            if (classifications == null || classifications.Count == 0) {
+                return null;
+            }
+
+            var lastToken = classifications[classifications.Count - 1];
+            // Handle "fob |"
+            if (lastToken == null || position > lastToken.Span.End) {
+                return null;
+            }
+
+            if (position > lastToken.Span.Start) {
+                if (lastToken.CanComplete()) {
+                    // Handle "fo|o"
+                    return snapshot.CreateTrackingSpan(lastToken.Span, SpanTrackingMode.EdgeInclusive);
+                } else {
+                    // Handle "<|="
+                    return null;
+                }
+            }
+
+            var secondLastToken = classifications.Count >= 2 ? classifications[classifications.Count - 2] : null;
+            if (lastToken.Span.Start == position && lastToken.CanComplete() &&
+                (secondLastToken == null ||             // Handle "|fob"
+                 position > secondLastToken.Span.End || // Handle "if |fob"
+                 !secondLastToken.CanComplete())) {     // Handle "abc.|fob"
+                return snapshot.CreateTrackingSpan(lastToken.Span, SpanTrackingMode.EdgeInclusive);
+            }
+
+            // Handle "abc|."
+            // ("ab|c." would have been treated as "ab|c")
+            if (secondLastToken != null && secondLastToken.Span.End == position && secondLastToken.CanComplete()) {
+                return snapshot.CreateTrackingSpan(secondLastToken.Span, SpanTrackingMode.EdgeInclusive);
+            }
+
+            return null;
         }
     }
 }

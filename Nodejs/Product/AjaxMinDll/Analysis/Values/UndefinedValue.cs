@@ -20,6 +20,12 @@ namespace Microsoft.NodejsTools.Analysis.Values {
             }
         }
 
+        public override string Description {
+            get {
+                return "undefined";
+            }
+        }
+
         public override JsMemberType MemberType {
             get {
                 return JsMemberType.Undefined;

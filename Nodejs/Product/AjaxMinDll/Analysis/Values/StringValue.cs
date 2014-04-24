@@ -22,6 +22,12 @@ namespace Microsoft.NodejsTools.Analysis.Values {
             _analyzer = javaScriptAnalyzer;
         }
 
+        public override string Description {
+            get {
+                return "string";
+            }
+        }
+
         public override object GetConstantValue() {
             return _value;
         }

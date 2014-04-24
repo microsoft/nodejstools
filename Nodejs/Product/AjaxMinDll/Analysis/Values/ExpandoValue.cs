@@ -285,6 +285,12 @@ namespace Microsoft.NodejsTools.Analysis.Values {
             }
         }
 
+        public Dictionary<string, PropertyDescriptor> Descriptors {
+            get {
+                return _descriptors;
+            }
+        }
+
         #region IReferenceableContainer Members
 
         public IEnumerable<IReferenceable> GetDefinitions(string name) {

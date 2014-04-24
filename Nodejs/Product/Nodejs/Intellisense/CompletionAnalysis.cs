@@ -46,7 +46,7 @@ namespace Microsoft.NodejsTools.Intellisense {
 
         internal ModuleAnalysis GetAnalysisEntry() {
             IJsProjectEntry entry;
-            return TextBuffer.TryGetNodejsProjectEntry(out entry) && entry != null ?
+            return TextBuffer.TryGetJsProjectEntry(out entry) && entry != null ?
                 entry.Analysis :
                 null;
         }

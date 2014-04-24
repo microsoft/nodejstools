@@ -325,7 +325,7 @@ namespace Microsoft.NodejsTools.Intellisense {
             }
             return null;
         }
-#if FALSE
+
         /// <summary>
         /// Gets a ExpressionAnalysis for the expression at the provided span.  If the span is in
         /// part of an identifier then the expression is extended to complete the identifier.
@@ -348,8 +348,8 @@ namespace Microsoft.NodejsTools.Intellisense {
                 SpanTrackingMode.EdgeExclusive
             );
 
-            IPythonProjectEntry entry;
-            if (buffer.TryGetPythonProjectEntry(out entry) && entry.Analysis != null && text.Length > 0) {
+            IJsProjectEntry entry;
+            if (buffer.TryGetJsProjectEntry(out entry) && entry.Analysis != null && text.Length > 0) {
                 var lineNo = parser.Snapshot.GetLineNumberFromPosition(loc.Start);
                 return new ExpressionAnalysis(
                     snapshot.TextBuffer.GetAnalyzer(),
@@ -363,7 +363,7 @@ namespace Microsoft.NodejsTools.Intellisense {
 
             return ExpressionAnalysis.Empty;
         }
-#endif
+
         /// <summary>
         /// Gets a CompletionList providing a list of possible members the user can dot through.
         /// </summary>

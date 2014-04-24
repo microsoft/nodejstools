@@ -33,6 +33,12 @@ namespace Microsoft.NodejsTools.Analysis.Values {
             return UnionType;
         }
 
+        public override string ObjectDescription {
+            get {
+                return "array";
+            }
+        }
+
         public IAnalysisSet UnionType {
             get {
                 EnsureUnionType();

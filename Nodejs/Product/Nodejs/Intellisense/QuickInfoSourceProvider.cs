@@ -12,31 +12,16 @@
  *
  * ***************************************************************************/
 
-namespace Microsoft.NodejsTools.Analysis.Values {
+using System.ComponentModel.Composition;
+using Microsoft.VisualStudio.Language.Intellisense;
+using Microsoft.VisualStudio.Text;
+using Microsoft.VisualStudio.Utilities;
 
-    class NullValue : AnalysisValue {
-        private readonly JsAnalyzer _analyzer;
-
-        public NullValue(JsAnalyzer javaScriptAnalyzer) {
-            _analyzer = javaScriptAnalyzer;
-        }
-
-        public override string Description {
-            get {
-                return "null";
-            }
-        }
-
-        public override BuiltinTypeId TypeId {
-            get {
-                return BuiltinTypeId.Null;
-            }
-        }
-
-        public override JsMemberType MemberType {
-            get {
-                return JsMemberType.Null;
-            }
+namespace Microsoft.NodejsTools.Intellisense {
+    [Export(typeof(IQuickInfoSourceProvider)), ContentType(NodejsConstants.Nodejs), Order, Name("Node.js Quick Info Source")]
+    class QuickInfoSourceProvider : IQuickInfoSourceProvider {
+        public IQuickInfoSource TryCreateQuickInfoSource(ITextBuffer textBuffer) {
+            return new QuickInfoSource(this, textBuffer);
         }
     }
 }

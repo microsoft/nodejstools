@@ -15,6 +15,7 @@
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
+using System.IO;
 using System.Text;
 using Microsoft.NodejsTools.Analysis.Analyzer;
 using Microsoft.NodejsTools.Interpreter;
@@ -57,16 +58,9 @@ namespace Microsoft.NodejsTools.Analysis.Values {
             }
         }
 
-        public override string Description {
+        public override string ObjectDescription {
             get {
-                var result = new StringBuilder("Node.js module ");
-                result.Append(Name);
-                var doc = Documentation;
-                if (!string.IsNullOrEmpty(doc)) {
-                    result.Append("\n\n");
-                    result.Append(doc);
-                }
-                return result.ToString();
+                return String.Format("module ({0})", Path.GetFileName(_name));
             }
         }
 
