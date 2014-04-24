@@ -69,6 +69,7 @@ namespace Microsoft.NodejsTools.Project {
         internal const string NpmPackageAuthorDescription = "NpmPackageAuthorDescription";
         internal const string NpmPackageDescription = "NpmPackageDescription";
         internal const string NpmPackageDescriptionDescription = "NpmPackageDescriptionDescription";
+        internal const string NpmPackageInstallHelpMessage = "NpmPackageInstallHelpMessage";
         internal const string NpmPackageIsBundledDependency = "NpmPackageIsBundledDependency";
         internal const string NpmPackageIsBundledDependencyDescription = "NpmPackageIsBundledDependencyDescription";
         internal const string NpmPackageIsDevDependency = "NpmPackageIsDevDependency";

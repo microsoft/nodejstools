@@ -322,7 +322,7 @@
     <value>npm Packages Properties</value>
   </data>
   <data name="PropertiesClassGlobal" xml:space="preserve">
-    <value>Globally npm Packages Properties</value>
+    <value>Global npm Packages Properties</value>
   </data>
   <data name="ScriptArgumentsToolTip" xml:space="preserve">
     <value>Specifies the arguments passed to the script on launch.</value>
@@ -477,5 +477,8 @@
   </data>
   <data name="NpmOutputPaneTitle" xml:space="preserve">
     <value>Npm</value>
+  </data>
+  <data name="NpmPackageInstallHelpMessage" xml:space="preserve">
+    <value>(enter arguments above)</value>
   </data>
 </root>

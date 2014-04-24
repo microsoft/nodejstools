@@ -35,6 +35,7 @@ namespace NpmTests {
 
         [ClassInitialize]
         public static void Init(TestContext context) {
+            AssertListener.Initialize();
             NodejsTestData.Deploy();
         }
 

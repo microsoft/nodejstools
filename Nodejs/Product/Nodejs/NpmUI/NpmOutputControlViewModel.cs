@@ -26,7 +26,7 @@ using Microsoft.NodejsTools.Project;
 
 namespace Microsoft.NodejsTools.NpmUI {
     class NpmOutputControlViewModel : INotifyPropertyChanged, IDisposable {
-        private INpmController _npmController;
+        private readonly INpmController _npmController;
         private readonly Queue<QueuedNpmCommandInfo> _commandQueue = new Queue<QueuedNpmCommandInfo>();
         private readonly object _lock = new object();
         private bool _isDisposed;
@@ -39,7 +39,9 @@ namespace Microsoft.NodejsTools.NpmUI {
         private QueuedNpmCommandInfo _currentCommand;
         private INpmCommander _commander;
         
-        public NpmOutputControlViewModel() {
+        public NpmOutputControlViewModel(INpmController controller) {
+            _npmController = controller;
+
             var style = new Style(typeof(Paragraph));
             style.Setters.Add(new Setter(Block.MarginProperty, new Thickness(0)));
             _output.Resources.Add(typeof(Paragraph), style);
@@ -62,15 +64,6 @@ namespace Microsoft.NodejsTools.NpmUI {
         private void Pulse() {
             lock (_lock) {
                 Monitor.PulseAll(_lock);
-            }
-        }
-
-        public INpmController NpmController {
-            get { return _npmController; }
-            set {
-                _npmController = value;   
-                OnPropertyChanged();
-                Pulse();
             }
         }
 

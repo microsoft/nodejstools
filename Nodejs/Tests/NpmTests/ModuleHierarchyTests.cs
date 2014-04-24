@@ -12,8 +12,11 @@
  *
  * ***************************************************************************/
 
+using System;
 using System.Diagnostics;
+using System.Linq;
 using Microsoft.NodejsTools.Npm;
+using Microsoft.NodejsTools.Npm.SPI;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 
 namespace NpmTests {
@@ -31,7 +34,7 @@ namespace NpmTests {
     ""name"": ""TestPkg"",
     ""version"": ""0.1.0"",
     ""dependencies"": {
-        ""express"": ""*""
+        ""express"": ""4.0.0""
     }
 }";
 
@@ -51,9 +54,7 @@ namespace NpmTests {
         }
 
         private static void RunNpmInstall(string rootDir) {
-            var p = new Process { StartInfo = new ProcessStartInfo("npm", "install") { WorkingDirectory = rootDir } };
-            p.Start();
-            p.WaitForExit();
+            new NpmInstallCommand(rootDir).ExecuteAsync().GetAwaiter().GetResult();
         }
 
         [TestMethod, Priority(0)]
@@ -154,7 +155,7 @@ namespace NpmTests {
 
             IDependency dep = dependencies["express"];
             Assert.IsNotNull(dep, "express dependency should not be null.");
-            Assert.AreEqual("*", dep.VersionRangeText, "Version range mismatch.");
+            Assert.AreEqual("4.0.0", dep.VersionRangeText, "Version range mismatch.");
 
             var modules = pkg.Modules;
             Assert.AreEqual(1, modules.Count, "Module count mismatch");
@@ -171,23 +172,35 @@ namespace NpmTests {
 
             Assert.AreEqual("express", module.Name, "Module name mismatch.");
 
-            var expectedModules = new string[]{
-                "methods",
-                "fresh",
-                "cookie-signature",
-                "range-parser",
+            Assert.AreEqual("4.0.0", module.Version.ToString(), "Module version mismatch");
+
+            var expectedModules = new string[] {
+                "accepts",
                 "buffer-crc32",
                 "cookie",
+                "cookie-signature",
                 "debug",
-                "mkdirp",
-                "commander",
+                "escape-html",
+                "fresh",
+                "merge-descriptors",
+                "methods",
+                "parseurl",
+                "path-to-regexp",
+                "qs",
+                "range-parser",
                 "send",
-                "connect"
+                "serve-static",
+                "type-is",
+                "utils-merge"
             };
 
             modules = module.Modules;
+
+            Console.WriteLine("module.Modules includes: {0}", string.Join(", ", modules.Select(m => m.Name)));
+
             Assert.AreEqual(module.PackageJson.Dependencies.Count, modules.Count, "Sub-module count mismatch.");
             foreach (var name in expectedModules) {
+                Console.WriteLine("Expecting {0}", name);
                 var current = modules[name];
                 Assert.IsNotNull(current, "Module should not be null when retrieved by name.");
 
