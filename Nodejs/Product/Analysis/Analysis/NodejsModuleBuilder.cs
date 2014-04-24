@@ -11,7 +11,7 @@ using Microsoft.NodejsTools;
 using Microsoft.NodejsTools.Analysis;
 using Microsoft.NodejsTools.Analysis.Values;
 
-namespace NodeReferenceGenerator {
+namespace Microsoft.NodejsTools.Analysis {
 
     class NodejsModuleBuilder {
         private readonly JavaScriptSerializer _serializer = new JavaScriptSerializer();
@@ -51,7 +51,7 @@ namespace NodeReferenceGenerator {
                 if (module.ContainsKey("classes")) {
                     foreach (var klass in module["classes"]) {
                         exports.Add(
-                            new BuiltinFunctionInfo(
+                            new BuiltinFunctionValue(
                                 _analyzer._builtinEntry,
                                 FixClassName((string)klass["name"]),
                                 ParseDocumentation((string)klass["desc"])
@@ -83,7 +83,7 @@ namespace NodeReferenceGenerator {
 
                         foreach (var sig in method["signatures"]) {
                             exports.Add(
-                                new BuiltinFunctionInfo(
+                                new BuiltinFunctionValue(
                                     _analyzer._builtinEntry,
                                     methodName,
                                     ParseDocumentation((string)method["desc"]),

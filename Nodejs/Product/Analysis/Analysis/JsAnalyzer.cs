@@ -23,9 +23,7 @@ using System.Security;
 using System.Threading;
 using Microsoft.NodejsTools.Analysis.Analyzer;
 using Microsoft.NodejsTools.Analysis.Values;
-using Microsoft.NodejsTools.Interpreter;
 using Microsoft.Win32;
-using NodeReferenceGenerator;
 
 namespace Microsoft.NodejsTools.Analysis {
     /// <summary>
@@ -38,7 +36,7 @@ namespace Microsoft.NodejsTools.Analysis {
         private readonly object _modulesWithUnresolvedImportsLock = new object();
         private readonly Dictionary<object, AnalysisValue> _itemCache;
         internal readonly NullValue _nullInst;
-        internal readonly BooleanInfo _trueInst, _falseInst;
+        internal readonly BooleanValue _trueInst, _falseInst;
         internal readonly UndefinedValue _undefined;
         internal readonly AnalysisValue _globalObject;
         internal readonly AnalysisValue _numberPrototype, _stringPrototype, _booleanPrototype, _functionPrototype;
@@ -74,8 +72,8 @@ namespace Microsoft.NodejsTools.Analysis {
             _queue = new Deque<AnalysisUnit>();
 
             _nullInst = new NullValue(this);
-            _trueInst = new BooleanInfo(true, this);
-            _falseInst = new BooleanInfo(false, this);
+            _trueInst = new BooleanValue(true, this);
+            _falseInst = new BooleanValue(false, this);
             _undefined = new UndefinedValue();
 
             var globals = GlobalBuilder.MakeGlobal(this);

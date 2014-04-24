@@ -182,7 +182,7 @@
     <Compile Include="Analysis\ILocationResolver.cs" />
     <Compile Include="Analysis\IndexSpan.cs" />
     <Compile Include="Analysis\NodejsModuleBuilder.cs" />
-    <Compile Include="Analysis\NonObjectValue.cs" />
+    <Compile Include="Analysis\Values\NonObjectValue.cs" />
     <Compile Include="Analysis\BuiltinTypeId.cs" />
     <Compile Include="Analysis\Values\ExpandoValue.cs" />
     <Compile Include="Analysis\Values\ExportsValue.cs" />
@@ -213,7 +213,7 @@
     <Compile Include="Analysis\Validation.cs" />
     <Compile Include="Analysis\Values\ArgumentSet.cs" />
     <Compile Include="Analysis\Values\ArrayValue.cs" />
-    <Compile Include="Analysis\Values\BuiltinFunctionInfo.cs" />
+    <Compile Include="Analysis\Values\BuiltinFunctionValue.cs" />
     <Compile Include="Analysis\Values\CallChain.cs" />
     <Compile Include="Analysis\Values\FunctionValue.cs" />
     <Compile Include="Analysis\Values\GeneratorFunctionInfo.cs" />
@@ -246,13 +246,11 @@
     <Compile Include="JavaScript\conditional.cs" />
     <Compile Include="JavaScript\const.cs" />
     <Compile Include="JavaScript\constantwrapper.cs" />
-    <Compile Include="JavaScript\constantwrapperpp.cs" />
     <Compile Include="JavaScript\TokenWithSpan.cs" />
     <Compile Include="JavaScript\continue.cs" />
     <Compile Include="JavaScript\debugger.cs" />
     <Compile Include="JavaScript\declaration.cs" />
     <Compile Include="JavaScript\directiveprologue.cs" />
-    <Compile Include="JavaScript\documentcontext.cs" />
     <Compile Include="JavaScript\dowhile.cs" />
     <Compile Include="JavaScript\emptystatement.cs" />
     <Compile Include="JavaScript\ErrorResult.cs" />

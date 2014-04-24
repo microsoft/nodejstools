@@ -138,10 +138,10 @@ namespace Microsoft.NodejsTools.Analysis {
             return new Globals(globalObject, numberPrototype, stringPrototype, booleanPrototype, functionPrototype);
         }
 
-        private BuiltinFunctionInfo ArrayFunction() {
+        private BuiltinFunctionValue ArrayFunction() {
             var builtinEntry = _analyzer._builtinEntry;
 
-            return new BuiltinFunctionInfo(builtinEntry, "Array") { 
+            return new BuiltinFunctionValue(builtinEntry, "Array") { 
                 Member("prototype", 
                     new ObjectValue(builtinEntry) {
                         BuiltinFunction("concat"),
@@ -169,11 +169,11 @@ namespace Microsoft.NodejsTools.Analysis {
                         BuiltinFunction("unshift"),
                     }
                 ),
-                new ReturningFunctionInfo(builtinEntry, "isArray", _analyzer._falseInst)
+                new ReturningFunctionValue(builtinEntry, "isArray", _analyzer._falseInst)
             };
         }
 
-        private BuiltinFunctionInfo BooleanFunction(out AnalysisValue booleanPrototype) {
+        private BuiltinFunctionValue BooleanFunction(out AnalysisValue booleanPrototype) {
             var builtinEntry = _analyzer._builtinEntry;
             var prototype = Member("prototype",
                 new ObjectValue(builtinEntry) {
@@ -183,15 +183,15 @@ namespace Microsoft.NodejsTools.Analysis {
                 }
             );
             booleanPrototype = prototype.Value;
-            return new BuiltinFunctionInfo(builtinEntry, "Boolean") { 
+            return new BuiltinFunctionValue(builtinEntry, "Boolean") { 
                 prototype
             };
         }
 
-        private BuiltinFunctionInfo DateFunction() {
+        private BuiltinFunctionValue DateFunction() {
             var builtinEntry = _analyzer._builtinEntry;
 
-            return new BuiltinFunctionInfo(builtinEntry, "Date") { 
+            return new BuiltinFunctionValue(builtinEntry, "Date") { 
                 Member("prototype", 
                     new ObjectValue(builtinEntry) {
                         BuiltinFunction("constructor"),
@@ -246,10 +246,10 @@ namespace Microsoft.NodejsTools.Analysis {
             };
         }
 
-        private BuiltinFunctionInfo ErrorFunction() {
+        private BuiltinFunctionValue ErrorFunction() {
             var builtinEntry = _analyzer._builtinEntry;
 
-            return new BuiltinFunctionInfo(builtinEntry, "Error") { 
+            return new BuiltinFunctionValue(builtinEntry, "Error") { 
                 Member("prototype", 
                     new ObjectValue(builtinEntry) {
                         BuiltinFunction("constructor"),
@@ -258,15 +258,15 @@ namespace Microsoft.NodejsTools.Analysis {
                         BuiltinFunction("toString"),
                     }
                 ),
-                new BuiltinFunctionInfo(builtinEntry, "captureStackTrace"),
+                new BuiltinFunctionValue(builtinEntry, "captureStackTrace"),
                 Member("stackTraceLimit", _analyzer.GetConstant(10.0))
             };
         }
 
-        private BuiltinFunctionInfo ErrorFunction(string errorName) {
+        private BuiltinFunctionValue ErrorFunction(string errorName) {
             var builtinEntry = _analyzer._builtinEntry;
 
-            return new BuiltinFunctionInfo(builtinEntry, errorName) { 
+            return new BuiltinFunctionValue(builtinEntry, errorName) { 
                 Member("prototype", 
                     new ObjectValue(builtinEntry) {
                         BuiltinFunction("arguments"),
@@ -279,10 +279,10 @@ namespace Microsoft.NodejsTools.Analysis {
             };
         }
 
-        private BuiltinFunctionInfo FunctionFunction(out AnalysisValue functionPrototype) {
+        private BuiltinFunctionValue FunctionFunction(out AnalysisValue functionPrototype) {
             var builtinEntry = _analyzer._builtinEntry;
             var prototype = Member("prototype",
-                new ReturningFunctionInfo(builtinEntry, "Empty", _analyzer._undefined) {
+                new ReturningFunctionValue(builtinEntry, "Empty", _analyzer._undefined) {
                     BuiltinFunction("apply"),
                     BuiltinFunction("bind"),
                     BuiltinFunction("call"),
@@ -291,7 +291,7 @@ namespace Microsoft.NodejsTools.Analysis {
                 }
             );
             functionPrototype = prototype.Value;
-            return new BuiltinFunctionInfo(builtinEntry, "Function") { 
+            return new BuiltinFunctionValue(builtinEntry, "Function") { 
                 prototype
             };
         }
@@ -342,7 +342,7 @@ namespace Microsoft.NodejsTools.Analysis {
             };
         }
 
-        private BuiltinFunctionInfo NumberFunction(out AnalysisValue numberPrototype) {
+        private BuiltinFunctionValue NumberFunction(out AnalysisValue numberPrototype) {
             var builtinEntry = _analyzer._builtinEntry;
 
             var prototype = Member("prototype", 
@@ -358,7 +358,7 @@ namespace Microsoft.NodejsTools.Analysis {
             );
             numberPrototype = prototype.Value;
 
-            return new BuiltinFunctionInfo(builtinEntry, "Number") { 
+            return new BuiltinFunctionValue(builtinEntry, "Number") { 
                 prototype,
                 Member("length", _analyzer.GetConstant(1.0)),
                 Member("name", _analyzer.GetConstant("Number")),
@@ -375,10 +375,10 @@ namespace Microsoft.NodejsTools.Analysis {
             };
         }
 
-        private BuiltinFunctionInfo ObjectFunction() {
+        private BuiltinFunctionValue ObjectFunction() {
             var builtinEntry = _analyzer._builtinEntry;
 
-            return new BuiltinFunctionInfo(builtinEntry, "Object") { 
+            return new BuiltinFunctionValue(builtinEntry, "Object") { 
                 Member("prototype", new ObjectValue(builtinEntry)),
                 BuiltinFunction("getPrototypeOf"),
                 BuiltinFunction("getOwnPropertyDescriptor"),
@@ -397,7 +397,7 @@ namespace Microsoft.NodejsTools.Analysis {
             };
         }
 
-        private static IAnalysisSet DefineProperty(SpecializedFunctionInfo func, Node node, AnalysisUnit unit, IAnalysisSet @this, IAnalysisSet[] args) {
+        private static IAnalysisSet DefineProperty(SpecializedFunctionValue func, Node node, AnalysisUnit unit, IAnalysisSet @this, IAnalysisSet[] args) {
             // object, name, property desc
             if (args.Length >= 3) {
                 foreach (var obj in args[0]) {
@@ -420,7 +420,7 @@ namespace Microsoft.NodejsTools.Analysis {
             return AnalysisSet.Empty;
         }
 
-        private static IAnalysisSet Require(SpecializedFunctionInfo func, Node node, AnalysisUnit unit, IAnalysisSet @this, IAnalysisSet[] args) {
+        private static IAnalysisSet Require(SpecializedFunctionValue func, Node node, AnalysisUnit unit, IAnalysisSet @this, IAnalysisSet[] args) {
             IAnalysisSet res = AnalysisSet.Empty;
             if (args.Length > 0) {
                 foreach (var arg in args[0]) {
@@ -440,10 +440,10 @@ namespace Microsoft.NodejsTools.Analysis {
             return res;
         }
 
-        private BuiltinFunctionInfo RegExpFunction() {
+        private BuiltinFunctionValue RegExpFunction() {
             var builtinEntry = _analyzer._builtinEntry;
 
-            return new BuiltinFunctionInfo(builtinEntry, "RegExp") { 
+            return new BuiltinFunctionValue(builtinEntry, "RegExp") { 
                 Member("prototype", 
                     new ObjectValue(builtinEntry) {
                         BuiltinFunction("compile"),   
@@ -493,7 +493,7 @@ namespace Microsoft.NodejsTools.Analysis {
             };
         }
 
-        private BuiltinFunctionInfo StringFunction(out AnalysisValue stringPrototype) {
+        private BuiltinFunctionValue StringFunction(out AnalysisValue stringPrototype) {
             var builtinEntry = _analyzer._builtinEntry;
             var prototype = Member("prototype", 
                 new ObjectValue(builtinEntry) {
@@ -538,7 +538,7 @@ namespace Microsoft.NodejsTools.Analysis {
             );
             stringPrototype = prototype.Value;
 
-            return new BuiltinFunctionInfo(builtinEntry, "String") { 
+            return new BuiltinFunctionValue(builtinEntry, "String") { 
                 prototype,
                 ReturningFunction("fromCharCode", _analyzer.GetConstant("")),
             };
@@ -550,16 +550,16 @@ namespace Microsoft.NodejsTools.Analysis {
             return new MemberAddInfo(name, value);
         }
 
-        private BuiltinFunctionInfo BuiltinFunction(string name) {
-            return new BuiltinFunctionInfo(_analyzer._builtinEntry, name);
+        private BuiltinFunctionValue BuiltinFunction(string name) {
+            return new BuiltinFunctionValue(_analyzer._builtinEntry, name);
         }
 
-        private BuiltinFunctionInfo ReturningFunction(string name, AnalysisValue value) {
-            return new ReturningFunctionInfo(_analyzer._builtinEntry, name, value);
+        private BuiltinFunctionValue ReturningFunction(string name, AnalysisValue value) {
+            return new ReturningFunctionValue(_analyzer._builtinEntry, name, value);
         }
 
-        private BuiltinFunctionInfo SpecializedFunction(string name, Func<SpecializedFunctionInfo, Node, AnalysisUnit, IAnalysisSet, IAnalysisSet[], IAnalysisSet> value) {
-            return new SpecializedFunctionInfo(_analyzer._builtinEntry, name, value);
+        private BuiltinFunctionValue SpecializedFunction(string name, Func<SpecializedFunctionValue, Node, AnalysisUnit, IAnalysisSet, IAnalysisSet[], IAnalysisSet> value) {
+            return new SpecializedFunctionValue(_analyzer._builtinEntry, name, value);
         }
 
         private MemberAddInfo BuiltinProperty(string name, AnalysisValue propertyType) {

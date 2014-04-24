@@ -4,7 +4,7 @@ using System.Linq;
 using System.Text;
 using Microsoft.NodejsTools.Parsing;
 
-namespace Microsoft.NodejsTools.Analysis {
+namespace Microsoft.NodejsTools.Analysis.Values {
     /// <summary>
     /// Represents a value which is not an object (number, string, bool)
     /// </summary>

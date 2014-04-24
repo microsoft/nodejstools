@@ -17,7 +17,6 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
-using Microsoft.NodejsTools.Interpreter;
 
 namespace Microsoft.NodejsTools.Analysis {
     public class OverloadResult : IOverloadResult {

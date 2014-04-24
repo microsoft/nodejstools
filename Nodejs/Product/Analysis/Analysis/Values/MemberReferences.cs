@@ -14,7 +14,6 @@
 
 using System.Collections.Generic;
 using Microsoft.NodejsTools.Analysis.Analyzer;
-using Microsoft.NodejsTools.Interpreter;
 using Microsoft.NodejsTools.Parsing;
 
 namespace Microsoft.NodejsTools.Analysis.Values {

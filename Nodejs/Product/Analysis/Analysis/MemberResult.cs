@@ -17,7 +17,6 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using Microsoft.NodejsTools.Analysis.Values;
-using Microsoft.NodejsTools.Interpreter;
 
 namespace Microsoft.NodejsTools.Analysis {
     public struct MemberResult {

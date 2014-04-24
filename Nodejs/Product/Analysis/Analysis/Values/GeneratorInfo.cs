@@ -13,7 +13,6 @@
  * ***************************************************************************/
 
 using System.Linq;
-using Microsoft.NodejsTools.Interpreter;
 using Microsoft.NodejsTools.Parsing;
 
 

@@ -236,7 +236,7 @@ namespace Microsoft.NodejsTools.Analysis.Values {
                     desc.Get = def = new VariableDef();
                 }
 
-                def.AddTypes(ProjectState._builtinEntry, new ReturningFunctionInfo(ProjectEntry, member.Name, member.Value));
+                def.AddTypes(ProjectState._builtinEntry, new ReturningFunctionValue(ProjectEntry, member.Name, member.Value));
             }
         }
 

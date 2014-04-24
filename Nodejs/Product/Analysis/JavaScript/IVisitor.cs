@@ -24,7 +24,6 @@ namespace Microsoft.NodejsTools.Parsing {
         public virtual bool Walk(CallNode node) { return true; }
         public virtual bool Walk(Conditional node) { return true; }
         public virtual bool Walk(ConstantWrapper node) { return true; }
-        public virtual bool Walk(ConstantWrapperPP node) { return true; }
         public virtual bool Walk(ConstStatement node) { return true; }
         public virtual bool Walk(ContinueNode node) { return true; }
         public virtual bool Walk(DebuggerNode node) { return true; }
@@ -71,7 +70,6 @@ namespace Microsoft.NodejsTools.Parsing {
         public virtual void PostWalk(CallNode node) { }
         public virtual void PostWalk(Conditional node) { }
         public virtual void PostWalk(ConstantWrapper node) { }
-        public virtual void PostWalk(ConstantWrapperPP node) { }
         public virtual void PostWalk(ConstStatement node) { }
         public virtual void PostWalk(ContinueNode node) { }
         public virtual void PostWalk(DebuggerNode node) { }

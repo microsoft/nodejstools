@@ -4,7 +4,6 @@ using System.IO;
 using System.Linq;
 using System.Threading;
 using Microsoft.NodejsTools.Analysis;
-using Microsoft.NodejsTools.Interpreter;
 using Microsoft.NodejsTools.Parsing;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using TestUtilities;

@@ -21,7 +21,6 @@ using System.Text;
 using System.Text.RegularExpressions;
 using Microsoft.NodejsTools.Analysis.Analyzer;
 using Microsoft.NodejsTools.Analysis.Values;
-using Microsoft.NodejsTools.Interpreter;
 using Microsoft.NodejsTools.Parsing;
 
 

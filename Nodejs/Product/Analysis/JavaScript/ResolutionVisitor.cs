@@ -558,12 +558,6 @@ namespace Microsoft.NodejsTools.Parsing
             return false;
         }
 
-        public override bool Walk(ConstantWrapperPP node)
-        {
-            // nothing to do
-            return false;
-        }
-
         public override bool Walk(ConstStatement node)
         {
             if (node != null)

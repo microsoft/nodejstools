@@ -3,7 +3,6 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Text;
-using Microsoft.NodejsTools.Interpreter;
 
 namespace Microsoft.NodejsTools.Analysis.Values {
     /// <summary>

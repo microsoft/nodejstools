@@ -16,7 +16,6 @@ using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Linq;
-using Microsoft.NodejsTools.Interpreter;
 using Microsoft.NodejsTools.Parsing;
 
 
@@ -28,12 +27,12 @@ namespace Microsoft.NodejsTools.Analysis.Values {
     /// subclass can beused if a set of types can be specified for the 
     /// return value.
     /// </summary>
-    internal class BuiltinFunctionInfo : FunctionValue {
+    internal class BuiltinFunctionValue : FunctionValue {
         private readonly string _name;
         private readonly string[] _signature;
         private readonly string _documentation;
 
-        public BuiltinFunctionInfo(ProjectEntry projectEntry,
+        public BuiltinFunctionValue(ProjectEntry projectEntry,
             string name,
             string documentation = null,
             params string[] signature)
@@ -77,10 +76,10 @@ namespace Microsoft.NodejsTools.Analysis.Values {
     /// Represents a functoin not backed by user code which returns a known
     /// set of types.
     /// </summary>
-    internal class ReturningFunctionInfo : BuiltinFunctionInfo {
+    internal class ReturningFunctionValue : BuiltinFunctionValue {
         private readonly IAnalysisSet _retValue;
 
-        public ReturningFunctionInfo(ProjectEntry projectEntry, string name, IAnalysisSet retValue, string documentation = null, params string[] signature)
+        public ReturningFunctionValue(ProjectEntry projectEntry, string name, IAnalysisSet retValue, string documentation = null, params string[] signature)
             : base(projectEntry, name, documentation, signature) {
             _retValue = retValue;
         }
@@ -90,10 +89,10 @@ namespace Microsoft.NodejsTools.Analysis.Values {
         }
     }
 
-    internal class SpecializedFunctionInfo : BuiltinFunctionInfo {
-        private readonly Func<SpecializedFunctionInfo, Node, AnalysisUnit, IAnalysisSet, IAnalysisSet[], IAnalysisSet> _func;
+    internal class SpecializedFunctionValue : BuiltinFunctionValue {
+        private readonly Func<SpecializedFunctionValue, Node, AnalysisUnit, IAnalysisSet, IAnalysisSet[], IAnalysisSet> _func;
 
-        public SpecializedFunctionInfo(ProjectEntry projectEntry, string name, Func<SpecializedFunctionInfo, Node, AnalysisUnit, IAnalysisSet, IAnalysisSet[], IAnalysisSet> func, string documentation = null, params string[] signature)
+        public SpecializedFunctionValue(ProjectEntry projectEntry, string name, Func<SpecializedFunctionValue, Node, AnalysisUnit, IAnalysisSet, IAnalysisSet[], IAnalysisSet> func, string documentation = null, params string[] signature)
             : base(projectEntry, name, documentation, signature) {
             _func = func;
         }

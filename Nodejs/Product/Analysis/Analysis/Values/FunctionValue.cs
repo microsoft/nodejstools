@@ -18,7 +18,6 @@ using System.Diagnostics;
 using System.Linq;
 using System.Text;
 using Microsoft.NodejsTools.Analysis.Analyzer;
-using Microsoft.NodejsTools.Interpreter;
 using Microsoft.NodejsTools.Parsing;
 
 namespace Microsoft.NodejsTools.Analysis.Values {
