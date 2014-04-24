@@ -326,13 +326,11 @@ namespace Microsoft.NodejsTools.Parsing
             }
         }
 
-#if FALSE
         public override string ToString()
         {
             return (Operand1 == null ? "<null>" : Operand1.ToString())
-                + ' ' + OutputVisitor.OperatorString(OperatorToken) + ' '
+                + ' ' + OperatorToken.ToString() + ' '
                 + (Operand2 == null ? "<null>" : Operand2.ToString());
         }
-#endif
     }
 }

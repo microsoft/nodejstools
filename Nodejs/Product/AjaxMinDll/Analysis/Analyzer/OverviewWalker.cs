@@ -39,55 +39,6 @@ namespace Microsoft.NodejsTools.Analysis.Analyzer {
             _scope = topAnalysis.Scope;
         }
 
-#if FALSE
-        // TODO: What about names being redefined?
-        // remember classes/functions as they start new scopes
-        public override bool Walk(ClassDefinition node) {
-            var cls = AddClass(node, _curUnit);
-            if (cls != null) {
-                _analysisStack.Push(_curUnit);
-                _curUnit = cls.AnalysisUnit;
-                Debug.Assert(_scope.EnumerateTowardsGlobal.Contains(cls.AnalysisUnit.Scope.OuterScope));
-                _scope = cls.AnalysisUnit.Scope;
-                return true;
-            }
-            return false;
-        }
-
-        internal ClassInfo AddClass(ClassDefinition node, AnalysisUnit outerUnit) {
-            InterpreterScope scope;
-            var declScope = outerUnit.Scope;
-            if (!declScope.TryGetNodeScope(node, out scope)) {
-                if (node.Body == null || node.Name == null) {
-                    return null;
-                }
-
-                var unit = new ClassAnalysisUnit(node, declScope, outerUnit);
-                var classScope = (ClassScope)unit.Scope;
-
-                var classVar = declScope.AddLocatedVariable(node.Name, node.Lookup, unit);
-                classVar.AddTypes(unit, classScope.Class.SelfSet);
-
-                declScope.Children.Add(classScope);
-                declScope.AddNodeScope(node, classScope);
-
-                unit.Enqueue();
-                scope = classScope;
-            }
-            return scope.AnalysisValue as ClassInfo;
-        }
-
-        public override void PostWalk(ClassDefinition node) {
-            if (node.Body != null && node.Name != null) {
-                Debug.Assert(_scope.Node == node);
-                Debug.Assert(_scope.OuterScope.Node != node);
-                _scope = _scope.OuterScope;
-                _curUnit = _analysisStack.Pop();
-                Debug.Assert(_scope.EnumerateTowardsGlobal.Contains(_curUnit.Scope));
-            }
-        }
-#endif
-
         public override bool Walk(FunctionObject node) {
             var function = AddFunction(node, _curUnit);
             if (function != null) {
@@ -111,28 +62,6 @@ namespace Microsoft.NodejsTools.Analysis.Analyzer {
             }
         }
 
-#if FALSE
-        public override bool Walk(GlobalStatement node) {
-            foreach (var name in node.Names) {
-                if (name.Name != null) {
-                    // set the variable in the local scope to be the real variable in the global scope
-                    _scope.AddVariable(name.Name, _scope.GlobalScope.CreateVariable(node, _curUnit, name.Name, false));
-                }
-            }
-            return false;
-        }
-
-
-
-        public override bool Walk(NonlocalStatement node) {
-            foreach (var name in node.Names) {
-                if (name.Name != null) {
-                    _scope.AddVariable(name.Name, CreateVariableInDeclaredScope(name));
-                }
-            }
-            return false;
-        }
-#endif
         private VariableDef CreateVariableInDeclaredScope(Lookup name) {
 
             var reference = name.VariableField;// name.GetVariableReference(_entry.Tree);
@@ -399,45 +328,12 @@ namespace Microsoft.NodejsTools.Analysis.Analyzer {
             UpdateChildRanges(node);
             return base.Walk(node);
         }
-#if FALSE
-        public override bool Walk(EmptyStatement node) {
-            UpdateChildRanges(node);
-            base.Visit(node);
-        }
 
-        public override bool Walk(ExpressionStatement node) {
-            UpdateChildRanges(node);
-            base.Visit(node);
-        }
-
-        public override bool Walk(ExecStatement node) {
-            UpdateChildRanges(node);
-            base.Visit(node);
-        }
-#endif
         public override bool Walk(ForNode node) {
             UpdateChildRanges(node);
             return base.Walk(node);
         }
-#if FALSE
-        public override bool Walk(FromImportStatement node) {
-            UpdateChildRanges(node);
-            
-            var asNames = node.AsNames ?? node.Names;
-            int len = Math.Min(node.Names.Count, asNames.Count);
-            for (int i = 0; i < len; i++) {
-                var nameNode = asNames[i] ?? node.Names[i];
-                if (nameNode != null) {
-                    if (nameNode.Name == "*") {
-                        _scope.ContainsImportStar = true;
-                    } else {
-                        CreateVariableInDeclaredScope(nameNode);
-                    }
-                }
-            }
-            base.Visit(node);
-        }
-#endif
+
         public override bool Walk(IfNode node) {
             UpdateChildRanges(node);
 #if FALSE
@@ -468,31 +364,6 @@ namespace Microsoft.NodejsTools.Analysis.Analyzer {
 #endif
             return true;
         }
-
-#if FALSE
-        public override bool Walk(ImportStatement node) {
-            for (int i = 0; i < node.Names.Count; i++) {
-                Lookup name = null;
-                if (i < node.AsNames.Count && node.AsNames[i] != null) {
-                    name = node.AsNames[i];
-                } else if (node.Names[i].Names.Count > 0) {
-                    name = node.Names[i].Names[0];
-                }
-
-                if (name != null) {
-                    CreateVariableInDeclaredScope(name);
-                }
-            }
-
-            UpdateChildRanges(node);
-            base.Visit(node);
-        }
-
-        public override bool Walk(PrintStatement node) {
-            UpdateChildRanges(node);
-            base.Visit(node);
-        }
-#endif
       
         public override bool Walk(ThrowNode node) {          
             UpdateChildRanges(node);

@@ -106,22 +106,6 @@ namespace Microsoft.NodejsTools.Parsing
         /// </summary>
         public long Index { get; set; }
 
-        /// <summary>
-        /// Generates valid JavaScript code from the given node 
-        /// </summary>
-        /// <returns>string representation of the JavaScript code for this node</returns>
-        public virtual string ToCode() 
-        {
-#if FALSE
-            using (var writer = new StringWriter(CultureInfo.InvariantCulture))
-            {
-                OutputVisitor.Apply(writer, this, Parser.Settings);
-                return writer.ToString();
-            }
-#endif
-            throw new NotImplementedException("ToCode");
-        }
-
         public static Block ForceToBlock(Statement node)
         {
             // if the node is null or already a block, then we're 

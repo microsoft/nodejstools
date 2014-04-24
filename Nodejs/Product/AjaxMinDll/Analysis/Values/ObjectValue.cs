@@ -64,20 +64,6 @@ namespace Microsoft.NodejsTools.Analysis.Values {
             }
         }
 
-#if FALSE
-        public override string Description {
-            get {
-                return ClassInfo.ClassDefinition.Name + " instance";
-            }
-        }
-
-        public override string Documentation {
-            get {
-                return ClassInfo.Documentation;
-            }
-        }
-#endif
-
         public override JsMemberType MemberType {
             get {
                 return JsMemberType.Object;

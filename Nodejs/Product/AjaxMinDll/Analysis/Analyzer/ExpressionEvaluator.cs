@@ -124,16 +124,6 @@ namespace Microsoft.NodejsTools.Analysis.Analyzer {
         public EnvironmentRecord Scope;
 #endif
 
-#if FALSE
-        private IAnalysisSet[] Evaluate(IList<Arg> nodes) {
-            var result = new IAnalysisSet[nodes.Count];
-            for (int i = 0; i < nodes.Count; i++) {
-                result[i] = Evaluate(nodes[i].Expression);
-            }
-            return result;
-        }
-#endif
-
         private IAnalysisSet EvaluateWorker(Node node) {
             EvalDelegate eval;
             if (_evaluators.TryGetValue(node.GetType(), out eval)) {
@@ -259,12 +249,6 @@ namespace Microsoft.NodejsTools.Analysis.Analyzer {
             return result.Union(ee.Evaluate(n.FalseExpression));
         }
 
-#if FALSE
-        private static IAnalysisSet EvaluateBackQuote(ExpressionEvaluator ee, Node node) {
-            return ee.ProjectState.ClassInfos[BuiltinTypeId.String].SelfSet;
-        }
-#endif
-
         private static IAnalysisSet EvaluateCall(ExpressionEvaluator ee, Node node) {
             var n = (CallNode)node;
             if (n.InBrackets) {
@@ -388,64 +372,6 @@ namespace Microsoft.NodejsTools.Analysis.Analyzer {
             }
 
             return AnalysisSet.Empty;
-        }
-
-        private static IAnalysisSet EvaluateListComprehension(ExpressionEvaluator ee, Node node) {
-            if (!ee._unit.ProjectState.LanguageVersion.Is3x()) {
-                // list comprehension is in enclosing scope in 2.x
-                ListComprehension listComp = (ListComprehension)node;
-
-                WalkComprehension(ee, listComp, start: 0);
-
-                var listInfo = (ListInfo)ee.Scope.GetOrMakeNodeValue(
-                    node,
-                    (x) => new ListInfo(
-                        VariableDef.EmptyArray,
-                        ee._unit.ProjectState.ClassInfos[BuiltinTypeId.List],
-                        node,
-                        ee._unit.ProjectEntry
-                    ).SelfSet);
-
-                listInfo.AddTypes(ee._unit, new[] { ee.Evaluate(listComp.Item) });
-
-                return listInfo.SelfSet;
-            } else {
-                // list comprehension has its own scope in 3.x
-                return EvaluateComprehension(ee, node);
-            }
-        }
-
-        internal static void WalkComprehension(ExpressionEvaluator ee, Comprehension comp, int start = 1) {
-            for (int i = start; i < comp.Iterators.Count; i++) {
-                ComprehensionFor compFor = comp.Iterators[i] as ComprehensionFor;
-                if (compFor != null) {
-                    foreach (var listType in ee.Evaluate(compFor.List)) {
-                        ee.AssignTo(comp, compFor.Left, listType.GetEnumeratorTypes(comp, ee._unit));
-                    }
-                }
-
-                ComprehensionIf compIf = comp.Iterators[i] as ComprehensionIf;
-                if (compIf != null) {
-                    ee.EvaluateMaybeNull(compIf.Test);
-                }
-            }
-        }
-
-        private static IAnalysisSet EvaluateComprehension(ExpressionEvaluator ee, Node node) {
-            InterpreterScope scope;
-            if (!ee._unit.Scope.TryGetNodeScope(node, out scope)) {
-                // we can fail to find the module if the underlying interpreter triggers a module
-                // reload.  In that case we're already parsing, we start to clear out all of 
-                // our module state in ModuleInfo.Clear, and then we queue the nodes to be
-                // re-analyzed immediately after.  We continue analyzing, and we don't find
-                // the node.  We can safely ignore it here as the re-analysis will kick in
-                // and get us the right info.
-                return AnalysisSet.Empty;
-            }
-
-            ComprehensionScope compScope = (ComprehensionScope)scope;
-
-            return compScope.AnalysisValue.SelfSet;
         }
 #endif
 

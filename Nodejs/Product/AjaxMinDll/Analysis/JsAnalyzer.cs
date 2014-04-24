@@ -250,15 +250,6 @@ namespace Microsoft.NodejsTools.Analysis {
             string importingFrom = null;
             if (projectEntry != null) {
                 importingFrom = projectEntry.ModuleName;
-#if FALSE
-                if (ModulePath.IsInitPyFile(projectEntry.FilePath)) {
-                    if (string.IsNullOrEmpty(importingFrom)) {
-                        importingFrom = "__init__";
-                    } else {
-                        importingFrom += ".__init__";
-                    }
-                }
-#endif
             }
 
             if (string.IsNullOrEmpty(relativeModuleName)) {

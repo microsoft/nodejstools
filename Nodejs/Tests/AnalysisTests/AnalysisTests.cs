@@ -480,35 +480,6 @@ x = new j();
         public static IEnumerable<BuiltinTypeId> GetTypeIdsByIndex(this ModuleAnalysis analysis, string exprText, int index) {
             return analysis.GetValuesByIndex(exprText, index).Select(m => {
                 return m.TypeId;
-
-#if FALSE
-                var state = analysis.ProjectState;
-                if (m == state._noneInst)
-                {
-                    return BuiltinTypeId.NullType;
-                }
-                var bci = m as BuiltinClassInfo;
-                if (bci == null)
-                {
-                    var bii = m as BuiltinInstanceInfo;
-                    if (bii != null)
-                    {
-                        bci = bii.ClassInfo;
-                    }
-                }
-                if (bci != null)
-                {
-                    int count = (int)BuiltinTypeIdExtensions.LastTypeId;
-                    for (int i = 1; i <= count; ++i)
-                    {
-                        var bti = (BuiltinTypeId)i;
-                        if (!bti.IsVirtualId() && analysis.ProjectState.ClassInfos[bti] == bci)
-                        {
-                            return bti;
-                        }
-                    }
-                }
-#endif
             });
         }
     }

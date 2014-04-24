@@ -4033,32 +4033,6 @@ namespace Microsoft.NodejsTools.Parsing
                             // parse the number as a hex integer, converted to a double
                             doubleValue = (double)System.Convert.ToInt64(str, 16);
                         }
-#if FALSE
-                        else if (str[1] == 'o' || str[1] == 'O')
-                        {
-                            if (str.Length == 2)
-                            {
-                                // 0o???? must be a parse error. Just return zero
-                                doubleValue = 0;
-                                return false;
-                            }
-
-                            // parse the number as an octal integer without the prefix, converted to a double
-                            doubleValue = (double)System.Convert.ToInt64(str.Substring(2), 8);
-                        }
-                        else if (str[1] == 'b' || str[1] == 'B')
-                        {
-                            if (str.Length == 2)
-                            {
-                                // 0b???? must be a parse error. Just return zero
-                                doubleValue = 0;
-                                return false;
-                            }
-
-                            // parse the number as a binary integer without the prefix, converted to a double
-                            doubleValue = (double)System.Convert.ToInt64(str.Substring(2), 2);
-                        }
-#endif
                         else
                         {
                             // might be an octal value... try converting to octal
@@ -4692,16 +4666,7 @@ namespace Microsoft.NodejsTools.Parsing
                 _source.Length,
                 m_currentToken.Token
             );
-#if FALSE
-            Context eofCtx = m_currentToken.Clone();
-            
-            eofCtx.StartLineNumber = m_scanner.CurrentLine;
-            eofCtx.StartLinePosition = m_scanner.StartLinePosition;
-            eofCtx.EndLineNumber = eofCtx.StartLineNumber;
-            eofCtx.EndLinePosition = eofCtx.StartLinePosition;
-            eofCtx.StartPosition = _source.Length;
-            eofCtx.EndPosition++;
-#endif
+
             m_errorSink.HandleError(errorId, eofCtx);
             throw new EndOfFileException(); // this exception terminates the parser
         }

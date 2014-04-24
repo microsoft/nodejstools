@@ -118,15 +118,7 @@ namespace Microsoft.NodejsTools.Analysis {
             JsMemberType result = JsMemberType.Unknown;
 
             var allVars = _vars().SelectMany(ns => {
-#if FALSE
-                var mmi = ns as MultipleMemberInfo;
-                if (mmi != null) {
-                    return mmi.Members;
-                } else 
-#endif
-                {
-                    return Enumerable.Repeat(ns, 1);
-                }
+                return Enumerable.Repeat(ns, 1);
             });
 
             foreach (var ns in allVars) {

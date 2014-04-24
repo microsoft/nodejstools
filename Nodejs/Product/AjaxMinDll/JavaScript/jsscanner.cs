@@ -660,34 +660,12 @@ namespace Microsoft.NodejsTools.Parsing
 
         
         private TokenWithSpan MakeContext(JSToken token) {
-#if FALSE
-            var startLoc = IndexToLocation(_tokenStartIndex);
-            var endLoc = IndexToLocation(_tokenEndIndex);
-
-            Debug.Assert(startLoc.Line == _state.TokenStartLineNumber);
-            Debug.Assert(endLoc.Line == _state.TokenEndLineNumber);
-            Debug.Assert(startLoc.Column == _state.TokenStartLinePosition);
-            Debug.Assert(endLoc.Column == _state.TokenEndLinePosition);
-#endif
-
             return new TokenWithSpan(
                 _indexResolver,
                 _tokenStartIndex + _initialLocation.Index,
                 _tokenEndIndex + _initialLocation.Index,
                 token                
             );
-
-#if FALSE
-            return new Context(
-                _state.TokenStartLineNumber,
-                _state.TokenStartLinePosition,
-                _tokenStartIndex,
-                _state.TokenEndLineNumber,
-                _state.TokenEndLinePosition,
-                _tokenEndIndex,
-                token
-            );
-#endif
         }
 
         private JSToken ScanLineTerminator(char ch)
@@ -908,36 +886,6 @@ namespace Microsoft.NodejsTools.Parsing
 
                     return CheckForNumericBadEnding(token);
                 }
-#if FALSE
-                else if ('b' == c || 'B' == c)
-                {
-                    // ES6 binary literal?
-                    c = GetChar(m_currentPosition + 1);
-                    if (c == '1' || c == '0')
-                    {
-                        while ('0' == (c = GetChar(++m_currentPosition)) || c == '1')
-                        {
-                            // iterator handled in the condition
-                        }
-                    }
-
-                    return CheckForNumericBadEnding(token);
-                }
-                else if ('o' == c || 'O' == c)
-                {
-                    // ES6 octal literal?
-                    c = GetChar(m_currentPosition + 1);
-                    if ('0' <= c && c <= '7')
-                    {
-                        while ('0' <= (c = GetChar(++m_currentPosition)) && c <= '7')
-                        {
-                            // iterator handled in the condition
-                        }
-                    }
-
-                    return CheckForNumericBadEnding(token);
-                }
-#endif
                 else if ('0' <= c && c <= '7')
                 {
                     // this is a zero followed by a digit between 0 and 7.

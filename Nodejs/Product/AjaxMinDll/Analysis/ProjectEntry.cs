@@ -186,9 +186,6 @@ namespace Microsoft.NodejsTools.Analysis {
             // collect top-level definitions first
             var walker = new OverviewWalker(this, _unit);
             tree.Walk(walker);
-#if FALSE
-            _myScope.Specialize();
-#endif
 
             _unit.Enqueue();
 
@@ -249,12 +246,6 @@ namespace Microsoft.NodejsTools.Analysis {
         internal ModuleValue ModuleValue {
             get { return _module; }
         }
-
-#if FALSE
-        public IModuleContext AnalysisContext {
-            get { return _myScope.InterpreterContext; }
-        }
-#endif
 
         public string ModuleName {
             get {
@@ -332,12 +323,6 @@ namespace Microsoft.NodejsTools.Analysis {
         /// Implementors of this method must ensure this method is thread safe.
         /// </summary>
         void RemovedFromProject();
-
-#if FALSE
-        IModuleContext AnalysisContext {
-            get;
-        }
-#endif
     }
 
     /// <summary>

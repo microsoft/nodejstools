@@ -141,15 +141,6 @@ namespace Microsoft.NodejsTools.Analysis {
             return type ?? union.FirstOrDefault();
         }
 
-#if FALSE
-        /// <summary>
-        /// Gets instance representations of all members of the set.
-        /// </summary>
-        public static IAnalysisSet GetInstanceType(this IAnalysisSet types) {
-            return AnalysisSet.Create(types.SelectMany(ns => ns.GetInstanceType()));
-        }
-#endif
-
         /// <summary>
         /// Returns true if the set contains no or only the object type
         /// </summary>

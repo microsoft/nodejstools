@@ -21,10 +21,6 @@ using Microsoft.NodejsTools.Parsing;
 
 namespace Microsoft.NodejsTools.Analysis.Analyzer {
     sealed class FunctionScope : EnvironmentRecord {
-#if FALSE
-        private ListParameterVariableDef _seqParameters;
-        private DictParameterVariableDef _dictParameters;
-#endif
         public readonly VariableDef ReturnValue;
         //public readonly GeneratorInfo Generator;
 
@@ -71,16 +67,7 @@ namespace Microsoft.NodejsTools.Analysis.Analyzer {
             for (int i = 0; i < astParams.Count; ++i) {
                 VariableDef param;
                 if (!Variables.TryGetValue(astParams[i].Name, out param)) {
-#if FALSE
-                    if (astParams[i].Kind == ParameterKind.List) {
-                        param = _seqParameters = _seqParameters ?? new ListParameterVariableDef(unit, astParams[i]);
-                    } else if (astParams[i].Kind == ParameterKind.Dictionary) {
-                        param = _dictParameters = _dictParameters ?? new DictParameterVariableDef(unit, astParams[i]);
-                    } else 
-#endif
-                    {
-                        param = new LocatedVariableDef(unit.ProjectEntry, astParams[i].Context);
-                    }
+                    param = new LocatedVariableDef(unit.ProjectEntry, astParams[i].Context);
                     AddVariable(astParams[i].Name, param);
                 }
             }
