@@ -40,7 +40,7 @@ namespace Microsoft.NodejsTools.Analysis.Analyzer {
             UserFunctionValue function,
             AnalysisUnit declUnit,
             EnvironmentRecord declScope,
-            IPythonProjectEntry declEntry
+            IJsProjectEntry declEntry
         )
             : base(function.FunctionObject, null) {
             _declUnit = declUnit;

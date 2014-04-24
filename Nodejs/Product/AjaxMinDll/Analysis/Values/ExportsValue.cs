@@ -12,13 +12,16 @@ namespace Microsoft.NodejsTools.Analysis.Values {
 
     /// </summary>
     class ExportsValue : ObjectValue {
-        public ExportsValue(ProjectEntry projectEntry)
+        private readonly string _name;  // for debugging
+
+        public ExportsValue(string name, ProjectEntry projectEntry)
             : base(projectEntry) {
+            _name = name;
         }
 
-        public override NodejsMemberType MemberType {
+        public override JsMemberType MemberType {
             get {
-                return NodejsMemberType.Module;
+                return JsMemberType.Module;
             }
         }
     }

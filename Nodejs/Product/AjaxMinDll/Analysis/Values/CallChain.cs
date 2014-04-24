@@ -127,9 +127,9 @@ null, null);
     }
 
     internal class CallChainSet<T> {
-        Dictionary<IPythonProjectEntry, KeyValuePair<int, Dictionary<CallChain, T>>> _data;
+        Dictionary<IJsProjectEntry, KeyValuePair<int, Dictionary<CallChain, T>>> _data;
 
-        public bool TryGetValue(IPythonProjectEntry entry, CallChain chain, int prefixLength, out T value) {
+        public bool TryGetValue(IJsProjectEntry entry, CallChain chain, int prefixLength, out T value) {
             value = default(T);
             if (_data == null) {
                 return false;
@@ -163,9 +163,9 @@ null, null);
             }
         }
 
-        public void Add(IPythonProjectEntry entry, CallChain chain, T value) {
+        public void Add(IJsProjectEntry entry, CallChain chain, T value) {
             if (_data == null) {
-                _data = new Dictionary<IPythonProjectEntry, KeyValuePair<int, Dictionary<CallChain, T>>>();
+                _data = new Dictionary<IJsProjectEntry, KeyValuePair<int, Dictionary<CallChain, T>>>();
             }
 
             KeyValuePair<int, Dictionary<CallChain, T>> entryData;

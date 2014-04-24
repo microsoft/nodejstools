@@ -299,5 +299,9 @@ namespace Microsoft.NodejsTools.Parsing
                 return new IndexSpan(Context.StartPosition, Context.EndPosition - Context.StartPosition);
             }
         }
+
+        public override string ToString() {
+            return String.Format("{0} {1} {2}", GetType().Name, GetStart(GlobalParent), GetEnd(GlobalParent));
+        }
     }
 }

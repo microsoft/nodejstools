@@ -23,7 +23,7 @@ namespace Microsoft.NodejsTools.Profiling {
             _report = report;
         }
 
-        #region IPythonPerformanceReport Members
+        #region INodePerformanceReport Members
 
         public string Filename {
             get { return _report.Filename; }

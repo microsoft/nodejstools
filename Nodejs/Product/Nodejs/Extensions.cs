@@ -113,6 +113,15 @@ namespace Microsoft.NodejsTools {
         internal static EnvDTE.Project GetProject(this ITextBuffer buffer) {
             var path = buffer.GetFilePath();
             if (path != null && NodejsPackage.Instance != null) {
+                foreach (EnvDTE.Project proj in NodejsPackage.Instance.DTE.Solution.Projects) {
+                    var nodeProj = proj.GetNodeProject();
+                    if (nodeProj != null) {
+                        var nodeFile = nodeProj.FindNodeByFullPath(path);
+                        if (nodeFile != null) {
+                            return proj;
+                        }
+                    }
+                }
                 var item = NodejsPackage.Instance.DTE.Solution.FindProjectItem(path);
                 if (item != null) {
                     return item.ContainingProject;
@@ -121,7 +130,7 @@ namespace Microsoft.NodejsTools {
             return null;
         }
 
-        internal static NodejsProjectNode GetPythonProject(this EnvDTE.Project project) {
+        internal static NodejsProjectNode GetNodejsProject(this EnvDTE.Project project) {
             return project.GetCommonProject() as NodejsProjectNode;
         }
 
@@ -140,7 +149,7 @@ namespace Microsoft.NodejsTools {
             if (!buffer.Properties.TryGetProperty<NodejsProjectNode>(typeof(NodejsProjectNode), out pyProj)) {
                 var project = buffer.GetProject();
                 if (project != null) {
-                    pyProj = project.GetPythonProject();
+                    pyProj = project.GetNodejsProject();
                     if (pyProj != null) {
                         buffer.Properties.AddProperty(typeof(NodejsProjectNode), pyProj);
                     }
@@ -160,9 +169,9 @@ namespace Microsoft.NodejsTools {
             return NodejsPackage.Instance.DefaultAnalyzer;
         }
 
-        internal static bool TryGetPythonProjectEntry(this ITextBuffer buffer, out IPythonProjectEntry entry) {
+        internal static bool TryGetNodejsProjectEntry(this ITextBuffer buffer, out IJsProjectEntry entry) {
             IProjectEntry e;
-            if (buffer.TryGetProjectEntry(out e) && (entry = e as IPythonProjectEntry) != null) {
+            if (buffer.TryGetProjectEntry(out e) && (entry = e as IJsProjectEntry) != null) {
                 return true;
             }
             entry = null;

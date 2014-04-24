@@ -23,7 +23,7 @@ namespace Microsoft.NodejsTools.Analysis {
     /// the object is a Node.js module.  It can also include concepts
     /// such as keywords which we include in completions.
     /// </summary>
-    public enum NodejsMemberType {
+    public enum JsMemberType {
         Unknown,
         Object,
         Undefined,

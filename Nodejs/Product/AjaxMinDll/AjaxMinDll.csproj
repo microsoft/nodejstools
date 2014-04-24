@@ -153,7 +153,6 @@
     <Compile Include="Analysis\AnalysisValue.cs" />
     <Compile Include="Analysis\AnalysisVariable.cs" />
     <Compile Include="Analysis\Analyzer\AnalysisUnit.cs" />
-    <Compile Include="Analysis\Analyzer\AnalyzerStatusUpdater.cs" />
     <Compile Include="Analysis\Analyzer\ClassScope.cs" />
     <Compile Include="Analysis\Analyzer\ComprehensionScope.cs" />
     <Compile Include="Analysis\Analyzer\DDG.cs" />
@@ -172,7 +171,6 @@
     <Compile Include="Analysis\AssemblyInfo.cs" />
     <Compile Include="Analysis\Values\BooleanValue.cs" />
     <Compile Include="Analysis\Deque.cs" />
-    <Compile Include="Analysis\EmptyBuiltinModule.cs" />
     <Compile Include="Analysis\EncodedLocation.cs" />
     <Compile Include="Analysis\ExportedMemberInfo.cs" />
     <Compile Include="Analysis\FileCookie.cs" />
@@ -192,11 +190,9 @@
     <Compile Include="Analysis\Values\ExportsValue.cs" />
     <Compile Include="Analysis\NodejsMemberType.cs" />
     <Compile Include="Analysis\IOverloadResult.cs" />
-    <Compile Include="Analysis\KnownTypes.cs" />
     <Compile Include="Analysis\LocationInfo.cs" />
     <Compile Include="Analysis\MemberResult.cs" />
     <Compile Include="Analysis\ModuleAnalysis.cs" />
-    <Compile Include="Analysis\ModulePath.cs" />
     <Compile Include="Analysis\ModuleReference.cs" />
     <Compile Include="Analysis\ModuleTable.cs" />
     <Compile Include="Analysis\NativeMethods.cs" />
@@ -208,10 +204,8 @@
     <Compile Include="Analysis\ProjectEntryExtensions.cs" />
     <Compile Include="Analysis\JsAnalyzer.cs" />
     <Compile Include="Analysis\JsAnalyzer.Specializations.cs" />
-    <Compile Include="Analysis\PythonKeywords.cs" />
     <Compile Include="Analysis\ReadOnlyWrapper.cs" />
     <Compile Include="Analysis\Resources.Designer.cs" />
-    <Compile Include="Analysis\SaveAnalysis.cs" />
     <Compile Include="Analysis\SetOfOne.cs" />
     <Compile Include="Analysis\SetOfOneEnumerator.cs" />
     <Compile Include="Analysis\SetOfTwo.cs" />

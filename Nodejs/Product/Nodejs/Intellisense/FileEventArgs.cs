@@ -12,13 +12,14 @@
  *
  * ***************************************************************************/
 
-using Microsoft.NodejsTools.Analysis.Values;
+using System;
 
-namespace Microsoft.NodejsTools.Analysis {
-    static class ProjectEntryExtensions {
-        public static ModuleInfo GetModuleInfo(this IJsProjectEntry entry) {
-            var pe = entry as ProjectEntry;
-            return pe != null ? pe.MyScope : null;
+namespace Microsoft.NodejsTools.Intellisense {
+    class FileEventArgs : EventArgs {
+        public readonly string Filename;
+
+        public FileEventArgs(string filename) {
+            Filename = filename;
         }
     }
 }

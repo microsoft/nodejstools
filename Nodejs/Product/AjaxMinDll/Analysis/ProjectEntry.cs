@@ -30,7 +30,7 @@ namespace Microsoft.NodejsTools.Analysis {
     /// To analyze a file the tree should be updated with a call to UpdateTree and then PreParse
     /// should be called on all files.  Finally Parse should then be called on all files.
     /// </summary>
-    internal sealed class ProjectEntry : IPythonProjectEntry {
+    internal sealed class ProjectEntry : IJsProjectEntry {
         private readonly JsAnalyzer _analyzer;
         private readonly string _filePath;
         private readonly ModuleInfo _myScope;
@@ -171,8 +171,6 @@ namespace Microsoft.NodejsTools.Analysis {
                 return;
             }
 
-            var oldParent = _myScope.ParentPackage;
-
             _unit = new AnalysisUnit(tree, _myScope.Scope);
             AnalysisLog.NewUnit(_unit);
 
@@ -209,7 +207,7 @@ namespace Microsoft.NodejsTools.Analysis {
             var filename = _analyzer.GetConstant(_filePath);
             var dirName = _analyzer.GetConstant("");
             var module = new ObjectValue(this);
-            var exports = new ExportsValue(this);
+            var exports = new ExportsValue(_filePath, this);
             module.Add("exports", exports);
 
             MyScope.Scope.GetOrAddVariable("__dirname").AddTypes(this, dirName);
@@ -296,7 +294,7 @@ namespace Microsoft.NodejsTools.Analysis {
 
     /// <summary>
     /// Represents a file which is capable of being analyzed.  Can be cast to other project entry types
-    /// for more functionality.  See also IPythonProjectEntry and IXamlProjectEntry.
+    /// for more functionality.  See also IJsProjectEntry and IXamlProjectEntry.
     /// </summary>
     public interface IProjectEntry : IAnalyzable {
         /// <summary>
@@ -378,7 +376,7 @@ namespace Microsoft.NodejsTools.Analysis {
         void AnalyzeQueuedEntries(CancellationToken cancel);
     }
 
-    public interface IPythonProjectEntry : IGroupableAnalysisProjectEntry, IProjectEntry {
+    public interface IJsProjectEntry : IGroupableAnalysisProjectEntry, IProjectEntry {
         /// <summary>
         /// Returns the last parsed AST.
         /// </summary>

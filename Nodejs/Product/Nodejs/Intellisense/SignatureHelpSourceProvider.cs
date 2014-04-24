@@ -18,7 +18,7 @@ using Microsoft.VisualStudio.Text;
 using Microsoft.VisualStudio.Utilities;
 
 namespace Microsoft.NodejsTools.Intellisense {
-    [Export(typeof(ISignatureHelpSourceProvider)), ContentType(NodejsConstants.Nodejs), Order, Name("Python Signature Help Source")]
+    [Export(typeof(ISignatureHelpSourceProvider)), ContentType(NodejsConstants.Nodejs), Order, Name("Node.js Signature Help Source")]
     class SignatureHelpSourceProvider : ISignatureHelpSourceProvider {
         public ISignatureHelpSource TryCreateSignatureHelpSource(ITextBuffer textBuffer) {
             return new SignatureHelpSource(this, textBuffer);

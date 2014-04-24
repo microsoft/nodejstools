@@ -46,7 +46,7 @@ namespace Microsoft.NodejsTools.Analysis {
         /// Gets the name of the value if it has one, or null if it's a non-named item.
         /// 
         /// The name property here is typically the same value you'd get by accessing __name__
-        /// on the real Python object.
+        /// on the real JavaScript object.
         /// </summary>
         public virtual string Name {
             get {
@@ -87,26 +87,18 @@ namespace Microsoft.NodejsTools.Analysis {
         }
 
         /// <summary>
-        /// Returns the member type of the analysis value, or PythonMemberType.Unknown if it's unknown.
+        /// Returns the member type of the analysis value, or JsMemberType.Unknown if it's unknown.
         /// </summary>
-        public virtual NodejsMemberType MemberType {
+        public virtual JsMemberType MemberType {
             get {
-                return NodejsMemberType.Unknown;
+                return JsMemberType.Unknown;
             }
         }
 
         public virtual Dictionary<string, IAnalysisSet> GetAllMembers() {
             return new Dictionary<string, IAnalysisSet>();
         }
-
         
-        #region JS Operations
-        /*
-        public virtual IAnalysisValue ToPrimitive() {
-            return AnalysisSet.Empty;
-        }*/
-
-        #endregion
         /// <summary>
         /// Gets the constant value that this object represents, if it's a constant.
         /// 
@@ -133,7 +125,7 @@ namespace Microsoft.NodejsTools.Analysis {
             return null;
         }
 
-        public virtual IPythonProjectEntry DeclaringModule {
+        public virtual IJsProjectEntry DeclaringModule {
             get {
                 return null;
             }
@@ -194,64 +186,8 @@ namespace Microsoft.NodejsTools.Analysis {
         public virtual void AugmentAssign(BinaryOperator node, AnalysisUnit unit, IAnalysisSet value) {
         }
 
-        public virtual IAnalysisSet BinaryOperation(Node node, AnalysisUnit unit, JSToken operation, IAnalysisSet rhs) {
-            return CallReverseBinaryOp(node, unit, operation, rhs);
-        }
-
-        internal IAnalysisSet CallReverseBinaryOp(Node node, AnalysisUnit unit, JSToken operation, IAnalysisSet rhs) {
-            switch (operation) {
-#if FALSE
-                case JSToken.Is:
-                case JSToken.IsNot:
-                case JSToken.In:
-                case JSToken.NotIn:
-                    return unit.DeclaringModule.ProjectEntry.ProjectState.ClassInfos[BuiltinTypeId.Bool].Instance;
-#endif
-                default:
-                    var res = AnalysisSet.Empty;
-                    foreach (var value in rhs) {
-                        res = res.Union(value.ReverseBinaryOperation(node, unit, operation, SelfSet));
-                    }
-
-                    return res;
-            }
-        }
-
-        /// <summary>
-        /// Provides implementation of __r*__methods (__radd__, __rsub__, etc...)
-        /// 
-        /// This is dispatched to when the LHS doesn't understand the RHS.  Unlike normal Python it's currently
-        /// the LHS responsibility to dispatch to this.
-        /// </summary>
-        public virtual IAnalysisSet ReverseBinaryOperation(Node node, AnalysisUnit unit, JSToken operation, IAnalysisSet rhs) {
-            return AnalysisSet.Empty;
-        }
-
         public virtual IAnalysisSet UnaryOperation(Node node, AnalysisUnit unit, JSToken operation) {
             return this.SelfSet;
-        }
-
-        /// <summary>
-        /// Returns the length of the object if it's known, or null if it's not a fixed size object.
-        /// </summary>
-        /// <returns></returns>
-        public virtual int? GetLength() {
-            return null;
-        }
-
-        public virtual IAnalysisSet GetEnumeratorTypes(Node node, AnalysisUnit unit) {
-            // TODO: need more than constant 0...
-            //index = (VariableRef(ConstantInfo(0, self.ProjectState, False)), )
-            //self.AssignTo(self._state.IndexInto(listRefs, index), node, node.Left)
-#if FALSE
-            return GetIndex(node, unit, unit.ProjectState.ClassInfos[BuiltinTypeId.Number].SelfSet);
-#endif
-            return AnalysisSet.Empty;
-        }
-
-        public virtual IAnalysisSet GetIterator(Node node, AnalysisUnit unit) {
-            throw new NotImplementedException("GetIterator");
-            //return GetMember(node, unit, "__iter__").Call(node, unit, ExpressionEvaluator.EmptySets);
         }
 
         public virtual IAnalysisSet GetIndex(Node node, AnalysisUnit unit, IAnalysisSet index) {
@@ -260,41 +196,8 @@ namespace Microsoft.NodejsTools.Analysis {
             //return GetMember(node, unit, "__getitem__").Call(node, unit, new[] { index });
         }
 
-#if FALSE
-        /// <summary>
-        /// Returns a list of key/value pairs stored in the this object which are retrivable using
-        /// indexing.  For lists the key values will be integers (potentially constant, potentially not), 
-        /// for dicts the key values will be arbitrary analysis values.
-        /// </summary>
-        /// <returns></returns>
-        public virtual IEnumerable<KeyValuePair<IAnalysisSet, IAnalysisSet>> GetItems() {
-            yield break;
-        }
-#endif
         public virtual void SetIndex(Node node, AnalysisUnit unit, IAnalysisSet index, IAnalysisSet value) {
         }
-
-#if FALSE
-        public virtual IAnalysisSet GetDescriptor(Node node, AnalysisValue instance, AnalysisValue context, AnalysisUnit unit) {
-            return SelfSet;
-        }
-
-
-        public virtual IAnalysisSet GetStaticDescriptor(AnalysisUnit unit) {
-            return SelfSet;
-        }
-
-
-        public virtual IAnalysisSet GetDescriptor(JavaScriptAnalyzer projectState, AnalysisValue instance, AnalysisValue context) {
-            return SelfSet;
-        }
-#endif
-
-#if FALSE
-        public virtual IAnalysisSet GetInstanceType() {
-            return SelfSet;
-        }
-#endif
 
         public virtual BuiltinTypeId TypeId {
             get {
@@ -385,8 +288,6 @@ namespace Microsoft.NodejsTools.Analysis {
         }
 
         #endregion
-
-
 
         internal virtual void AddReference(Node node, AnalysisUnit analysisUnit) {
         }

@@ -46,11 +46,11 @@ namespace Microsoft.NodejsTools.Intellisense {
                 "Node.js",
                 "Node.js",
                 Span,
-                members.Select(m => PythonCompletion(glyphService, m)),
+                members.Select(m => JsCompletion(glyphService, m)),
                 CompletionComparer.UnderscoresLast);
         }
 
-        internal static DynamicallyVisibleCompletion PythonCompletion(IGlyphService service, MemberResult memberResult) {
+        internal static DynamicallyVisibleCompletion JsCompletion(IGlyphService service, MemberResult memberResult) {
             return new DynamicallyVisibleCompletion(memberResult.Name,
                 memberResult.Completion,
                 () => memberResult.Documentation,
@@ -61,22 +61,22 @@ namespace Microsoft.NodejsTools.Intellisense {
 
         private static StandardGlyphGroup GetGlyphGroup(MemberResult result) {
             switch(result.MemberType) {
-                case NodejsMemberType.Function:
+                case JsMemberType.Function:
                     return StandardGlyphGroup.GlyphGroupMethod;
-                case NodejsMemberType.Keyword:
+                case JsMemberType.Keyword:
                     return StandardGlyphGroup.GlyphKeyword;
-                case NodejsMemberType.Module:
+                case JsMemberType.Module:
                     return StandardGlyphGroup.GlyphGroupModule;
-                case NodejsMemberType.Multiple:
-                case NodejsMemberType.Object:
+                case JsMemberType.Multiple:
+                case JsMemberType.Object:
                     return StandardGlyphGroup.GlyphGroupClass;
-                case NodejsMemberType.Boolean:
-                case NodejsMemberType.String:
-                case NodejsMemberType.Number:
+                case JsMemberType.Boolean:
+                case JsMemberType.String:
+                case JsMemberType.Number:
                     return StandardGlyphGroup.GlyphGroupValueType;
-                case NodejsMemberType.Undefined:
+                case JsMemberType.Undefined:
                     return StandardGlyphGroup.GlyphGroupException;
-                case NodejsMemberType.Null:
+                case JsMemberType.Null:
                     return StandardGlyphGroup.GlyphGroupConstant;
                 default:
                     return StandardGlyphGroup.GlyphGroupUnknown;

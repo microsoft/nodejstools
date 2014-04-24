@@ -27,9 +27,9 @@ namespace Microsoft.NodejsTools.Analysis.Values {
             }
         }
 
-        public override NodejsMemberType MemberType {
+        public override JsMemberType MemberType {
             get {
-                return NodejsMemberType.Null;
+                return JsMemberType.Null;
             }
         }
     }

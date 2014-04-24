@@ -42,12 +42,12 @@ namespace Microsoft.NodejsTools.Intellisense {
 #endif
 
     /// <summary>
-    /// Performs centralized parsing and analysis of Python source code within Visual Studio.
+    /// Performs centralized parsing and analysis of Node.js source code within Visual Studio.
     /// 
     /// This class is responsible for maintaining the up-to-date analysis of the active files being worked
     /// on inside of a Visual Studio project.  
     /// 
-    /// This class is built upon the core PythonAnalyzer class which provides basic analysis services.  This class
+    /// This class is built upon the core JsAnalyzer class which provides basic analysis services.  This class
     /// maintains the thread safety invarients of working with that class, handles parsing of files as they're
     /// updated via interfacing w/ the Visual Studio editor APIs, and supports adding additional files to the 
     /// analysis.
@@ -405,7 +405,7 @@ namespace Microsoft.NodejsTools.Intellisense {
 
             var analysisItem = buffer.GetProjectEntry();
             if (analysisItem != null) {
-                var analysis = ((IPythonProjectEntry)analysisItem).Analysis;
+                var analysis = ((IJsProjectEntry)analysisItem).Analysis;
                 if (analysis != null) {
                     int index = TranslateIndex(loc.Start, snapshot, analysis);
 
@@ -599,7 +599,7 @@ namespace Microsoft.NodejsTools.Intellisense {
         }
 
         internal void ParseFile(IProjectEntry entry, string filename, Stream content) {
-            IPythonProjectEntry pyEntry;
+            IJsProjectEntry pyEntry;
             IExternalProjectEntry externalEntry;
 
             TextReader reader = null;
@@ -612,13 +612,13 @@ namespace Microsoft.NodejsTools.Intellisense {
                 cookie = new FileCookie(filename);
             }
 
-            if ((pyEntry = entry as IPythonProjectEntry) != null) {
+            if ((pyEntry = entry as IJsProjectEntry) != null) {
                 JsAst ast;
                 CollectingErrorSink errorSink;
                 if (reader != null) {
-                    ParsePythonCode(reader, out ast, out errorSink);
+                    ParseNodejsCode(reader, out ast, out errorSink);
                 } else {
-                    ParsePythonCode(content, out ast, out errorSink);
+                    ParseNodejsCode(content, out ast, out errorSink);
                 }
 
                 if (ast != null) {
@@ -645,7 +645,7 @@ namespace Microsoft.NodejsTools.Intellisense {
         internal void ParseBuffers(BufferParser bufferParser, params ITextSnapshot[] snapshots) {
             IProjectEntry entry = bufferParser._currentProjEntry;
 
-            IPythonProjectEntry pyProjEntry = entry as IPythonProjectEntry;
+            IJsProjectEntry pyProjEntry = entry as IJsProjectEntry;
             List<JsAst> asts = new List<JsAst>();
             foreach (var snapshot in snapshots) {
 #if FALSE
@@ -665,7 +665,7 @@ namespace Microsoft.NodejsTools.Intellisense {
                     CollectingErrorSink errorSink;
 
                     var reader = new SnapshotSpanSourceCodeReader(new SnapshotSpan(snapshot, new Span(0, snapshot.Length)));
-                    ParsePythonCode(reader, out ast, out errorSink);
+                    ParseNodejsCode(reader, out ast, out errorSink);
 
                     if (ast != null) {
                         asts.Add(ast);
@@ -713,7 +713,7 @@ namespace Microsoft.NodejsTools.Intellisense {
             }
         }
 
-        private void ParsePythonCode(Stream content, out JsAst ast, out CollectingErrorSink errorSink) {
+        private void ParseNodejsCode(Stream content, out JsAst ast, out CollectingErrorSink errorSink) {
             ast = null;
             errorSink = new CollectingErrorSink();
 
@@ -725,7 +725,7 @@ namespace Microsoft.NodejsTools.Intellisense {
             return new JSParser(content.ReadToEnd(), sink);
         }
 
-        private void ParsePythonCode(TextReader content, out JsAst ast, out CollectingErrorSink errorSink) {
+        private void ParseNodejsCode(TextReader content, out JsAst ast, out CollectingErrorSink errorSink) {
             ast = null;
             errorSink = new CollectingErrorSink();
 
@@ -741,7 +741,7 @@ namespace Microsoft.NodejsTools.Intellisense {
                     if (e.IsCriticalException()) {
                         throw;
                     }
-                    Debug.Assert(false, String.Format("Failure in Python parser: {0}", e.ToString()));
+                    Debug.Assert(false, String.Format("Failure in JavaScript parser: {0}", e.ToString()));
                 }
 
             }
@@ -774,7 +774,7 @@ namespace Microsoft.NodejsTools.Intellisense {
             }
 #if FALSE
             // Add a handler for the next complete analysis
-            _unresolvedSquiggles.ListenForNextNewAnalysis(entry as IPythonProjectEntry);
+            _unresolvedSquiggles.ListenForNextNewAnalysis(entry as IJsProjectEntry);
 #endif
         }
 
@@ -1098,11 +1098,11 @@ namespace Microsoft.NodejsTools.Intellisense {
             }
 
             if (entry != null) {
-                // If we remove a Python module, reanalyze any other modules
+                // If we remove a Node.js module, reanalyze any other modules
                 // that referenced it.
 #if FALSE
-                var pyEntry = entry as IPythonProjectEntry;
-                IPythonProjectEntry[] reanalyzeEntries = null;
+                var pyEntry = entry as IJsProjectEntry;
+                IJsProjectEntry[] reanalyzeEntries = null;
                 if (pyEntry != null && !string.IsNullOrEmpty(pyEntry.ModuleName)) {
                     reanalyzeEntries = _pyAnalyzer.GetEntriesThatImportModule(pyEntry.ModuleName, false).ToArray();
                 }
@@ -1122,11 +1122,56 @@ namespace Microsoft.NodejsTools.Intellisense {
             }
         }
 
+        internal void RemoveErrors(IProjectEntry entry, bool suppressUpdate) {
+            if (entry != null && entry.FilePath != null) {
+                if (_taskProvider.IsValueCreated) {
+                    // _taskProvider may not be created if we've never opened a Node.js file and
+                    // none of the project files have errors
+                    //_taskProvider.Value.Clear(entry.FilePath, !suppressUpdate);
+                }
+                OnWarningRemoved(entry.FilePath);
+                OnErrorRemoved(entry.FilePath);
+            }
+        }
+
+        private void OnWarningAdded(string path) {
+            var evt = WarningAdded;
+            if (evt != null) {
+                evt(this, new FileEventArgs(path));
+            }
+        }
+
+        private void OnWarningRemoved(string path) {
+            var evt = WarningRemoved;
+            if (evt != null) {
+                evt(this, new FileEventArgs(path));
+            }
+        }
+
+        private void OnErrorAdded(string path) {
+            var evt = ErrorAdded;
+            if (evt != null) {
+                evt(this, new FileEventArgs(path));
+            }
+        }
+
+        private void OnErrorRemoved(string path) {
+            var evt = ErrorRemoved;
+            if (evt != null) {
+                evt(this, new FileEventArgs(path));
+            }
+        }
+
+        internal EventHandler<FileEventArgs> WarningAdded;
+        internal EventHandler<FileEventArgs> WarningRemoved;
+        internal EventHandler<FileEventArgs> ErrorAdded;
+        internal EventHandler<FileEventArgs> ErrorRemoved;
+
         internal void ClearParserTasks(IProjectEntry entry) {
             if (entry != null) {
                 if (TaskProvider.IsValueCreated) {
                     // TaskProvider may not be created if we've never opened a
-                    // Python file and none of the project files have errors
+                    // Node.js file and none of the project files have errors
                     TaskProvider.Value.Clear(entry, ParserTaskMoniker);
                 }
                 if (_hasParseErrors.Remove(entry)) {
@@ -1172,24 +1217,11 @@ namespace Microsoft.NodejsTools.Intellisense {
             _analysisQueue.Stop();
             if (_pyAnalyzer != null) {
                 lock (_contentsLock) {
-#if FALSE
-                    _pyAnalyzer.Interpreter.ModuleNamesChanged -= OnModulesChanged;
-#endif
                     ((IDisposable)_pyAnalyzer).Dispose();
                 }
             }
         }
 
         #endregion
-#if FALSE
-        internal void RemoveReference(ProjectAssemblyReference reference) {
-            lock (_contentsLock) {
-                var interp = Interpreter as IPythonInterpreterWithProjectReferences;
-                if (interp != null) {
-                    interp.RemoveReference(reference);
-                }
-            }
-        }
-#endif
     }
 }

@@ -77,16 +77,6 @@ namespace Microsoft.NodejsTools.Analysis {
             var values = eval.Evaluate(expr);
             var res = AnalysisSet.EmptyUnion;
             foreach (var v in values) {
-#if FALSE
-                MultipleMemberInfo multipleMembers = v as MultipleMemberInfo;
-                if (multipleMembers != null) {
-                    foreach (var member in multipleMembers.Members) {
-                        if (member.IsCurrent) {
-                            res = res.Add(member);
-                        }
-                    }
-                } else 
-#endif
                 if (v.IsCurrent) {
                     res = res.Add(v);
                 }
@@ -146,13 +136,6 @@ namespace Microsoft.NodejsTools.Analysis {
                 var defScope = scope.EnumerateTowardsGlobal.FirstOrDefault(s =>
                     s.Variables.ContainsKey(name.Name));
 
-#if FALSE
-                if (defScope == null) {
-                    var variables = _unit.ProjectState.BuiltinModule.GetDefinitions(name.Name);
-                    return variables.SelectMany(ToVariables);
-                }
-#endif
-
                 return GetVariablesInScope(name, defScope).Distinct();
             }
 
@@ -183,33 +166,6 @@ namespace Microsoft.NodejsTools.Analysis {
             if (linked != null) {
                 result.AddRange(linked.SelectMany(ToVariables));
             }
-#if FALSE
-            var classScope = scope as ClassScope;
-            if (classScope != null) {
-                // if the member is defined in a base class as well include the base class member and references
-                var cls = classScope.Class;
-                if (cls.Push()) {
-                    try {
-                        foreach (var baseNs in cls.Bases.SelectMany()) {
-                            if (baseNs.Push()) {
-                                try {
-                                    ClassInfo baseClassNs = baseNs as ClassInfo;
-                                    if (baseClassNs != null) {
-                                        result.AddRange(
-                                            baseClassNs.Scope.GetMergedVariables(name.Name).SelectMany(ToVariables)
-                                        );
-                                    }
-                                } finally {
-                                    baseNs.Pop();
-                                }
-                            }
-                        }
-                    } finally {
-                        cls.Pop();
-                    }
-                }
-            }
-#endif
             return result;
         }
 
@@ -258,6 +214,7 @@ namespace Microsoft.NodejsTools.Analysis {
             return false;
         }
 #endif
+
         /// <summary>
         /// Evaluates a given expression and returns a list of members which exist in the expression.
         /// 
@@ -340,93 +297,11 @@ namespace Microsoft.NodejsTools.Analysis {
         }
 
         /// <summary>
-        /// Gets information about methods defined on base classes but not directly on the current class.
-        /// </summary>
-        /// <param name="index">The 0-based absolute index into the file.</param>
-        public IEnumerable<IOverloadResult> GetOverrideableByIndex(int index) {
-            try {
-                var result = new List<IOverloadResult>();
-
-                return result;
-#if FALSE
-                var scope = FindScope(index, useIndent: true);
-                var cls = scope as ClassScope;
-                if (cls == null) {
-                    return result;
-                }
-                var handled = new HashSet<string>(cls.Children.Select(child => child.Name));
-
-                var cls2 = scope as ClassScope;
-                var mro = (cls2 ?? cls).Class.Mro;
-                if (mro == null) {
-                    return result;
-                }
-
-                foreach (var baseClass in mro.Skip(1).SelectMany()) {
-                    ClassInfo klass;
-                    BuiltinClassInfo builtinClass;
-                    IEnumerable<AnalysisValue> source;
-
-                    if ((klass = baseClass as ClassInfo) != null) {
-                        source = klass.Scope.Children
-                            .Where(child => child != null && child.AnalysisValue != null)
-                            .Select(child => child.AnalysisValue);
-                    } else if ((builtinClass = baseClass as BuiltinClassInfo) != null) {
-                        source = builtinClass.GetAllMembers(InterpreterContext)
-                            .SelectMany(kv => kv.Value)
-                            .Where(child => child != null && 
-                                (child.MemberType == PythonMemberType.Function ||
-                                 child.MemberType == PythonMemberType.Method));
-                    } else {
-                        continue;
-                    }
-
-                    foreach (var child in source) {
-                        if (!child.Overloads.Any()) {
-                            continue;
-                        }
-
-                        try {
-                            var overload = child.Overloads.Aggregate(
-                                (best, o) => o.Parameters.Length > best.Parameters.Length ? o : best
-                            );
-
-                            if (handled.Contains(overload.Name)) {
-                                continue;
-                            }
-
-                            handled.Add(overload.Name);
-                            result.Add(overload);
-                        } catch {
-                            // TODO: log exception
-                            // Exceptions only affect the current override. Others may still be offerred.
-                        }
-                    }
-                }
-
-                return result;
-#endif
-            }
-            catch (Exception)
-            {
-                // TODO: log exception
-                return new IOverloadResult[0];
-            }
-        }
-
-        /// <summary>
         /// Gets the available names at the given location.  This includes built-in variables, global variables, and locals.
         /// </summary>
         /// <param name="index">The 0-based absolute index into the file where the available mebmers should be looked up.</param>
         public IEnumerable<MemberResult> GetAllAvailableMembersByIndex(int index, GetMemberOptions options = GetMemberOptions.IntersectMultipleResults) {
             var result = new Dictionary<string, List<AnalysisValue>>();
-
-            // collect builtins
-#if FALSE
-            foreach (var variable in ProjectState.BuiltinModule.GetAllMembers(ProjectState._defaultContext)) {
-                result[variable.Key] = new List<AnalysisValue>(variable.Value);
-            }
-#endif
 
             // collect variables from user defined scopes
             var scope = FindScope(index);
@@ -457,7 +332,7 @@ namespace Microsoft.NodejsTools.Analysis {
                 keywords = keywords.Union(_stmtKeywords);
             }
 
-            return keywords.Select(kw => new MemberResult(kw, NodejsMemberType.Keyword));
+            return keywords.Select(kw => new MemberResult(kw, JsMemberType.Keyword));
         }
 
         #endregion
@@ -486,14 +361,6 @@ namespace Microsoft.NodejsTools.Analysis {
                 return result.Module;
             }
         }
-
-#if FALSE
-        public IModuleContext InterpreterContext {
-            get {
-                return GlobalScope.InterpreterContext;
-            }
-        }
-#endif
 
         public JsAnalyzer ProjectState {
             get { return GlobalScope.ProjectEntry.Analyzer; }

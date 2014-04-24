@@ -81,20 +81,6 @@ namespace Microsoft.NodejsTools.Analysis {
         }
 
         /// <summary>
-        /// Performs a get iterator operation propagating any iterator types
-        /// into the value and returns the associated types associated with the
-        /// object.
-        /// </summary>
-        public static IAnalysisSet GetIterator(this IAnalysisSet self, Node node, AnalysisUnit unit) {
-            var res = AnalysisSet.Empty;
-            foreach (var ns in self) {
-                res = res.Union(ns.GetIterator(node, unit));
-            }
-
-            return res;
-        }
-
-        /// <summary>
         /// Performs a get index operation propagating any index types into the
         /// value and returns the associated types associated with the object.
         /// </summary>
@@ -132,59 +118,6 @@ namespace Microsoft.NodejsTools.Analysis {
             foreach (var ns in self) {
                 ns.AugmentAssign(node, unit, value);
             }
-        }
-
-        /// <summary>
-        /// Returns the set of types which are accessible when code enumerates
-        /// over the object
-        /// in a for statement.
-        /// </summary>
-        public static IAnalysisSet GetEnumeratorTypes(this IAnalysisSet self, Node node, AnalysisUnit unit) {
-            var res = AnalysisSet.Empty;
-            foreach (var ns in self) {
-                res = res.Union(ns.GetEnumeratorTypes(node, unit));
-            }
-
-            return res;
-        }
-
-#if FALSE
-        /// <summary>
-        /// Performs a __get__ on the object.
-        /// </summary>
-        public static IAnalysisSet GetDescriptor(this IAnalysisSet self, Node node, AnalysisValue instance, AnalysisValue context, AnalysisUnit unit) {
-            var res = AnalysisSet.Empty;
-            foreach (var ns in self) {
-                res = res.Union(ns.GetDescriptor(node, instance, context, unit));
-            }
-
-            return res;
-        }
-
-        /// <summary>
-        /// Performs a __get__ on the object when accessed from a class instead
-        /// of an instance.
-        /// </summary>
-        public static IAnalysisSet GetStaticDescriptor(this IAnalysisSet self, AnalysisUnit unit) {
-            var res = AnalysisSet.Empty;
-            foreach (var ns in self) {
-                res = res.Union(ns.GetStaticDescriptor(unit));
-            }
-
-            return res;
-        }
-#endif
-
-        /// <summary>
-        /// Performs the specified operation on the value and the rhs value.
-        /// </summary>
-        public static IAnalysisSet BinaryOperation(this IAnalysisSet self, Node node, AnalysisUnit unit, JSToken operation, IAnalysisSet rhs) {
-            var res = AnalysisSet.Empty;
-            foreach (var ns in self) {
-                res = res.Union(ns.BinaryOperation(node, unit, operation, rhs));
-            }
-
-            return res;
         }
 
         /// <summary>

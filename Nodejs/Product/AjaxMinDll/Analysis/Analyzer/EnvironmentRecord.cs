@@ -255,9 +255,9 @@ namespace Microsoft.NodejsTools.Analysis.Analyzer {
             var res = GetVariable(node, unit, name, addRef);
             if (res == null) {
                 res = AddVariable(name);
-                if (addRef) {
-                    res.AddReference(node, unit);
-                }
+            }
+            if (addRef) {
+                res.AddReference(node, unit);
             }
             return res;
         }

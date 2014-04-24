@@ -20,7 +20,7 @@ using System.Linq;
 namespace Microsoft.NodejsTools.Analysis {
     /// <summary>
     /// Represents an unordered collection of <see cref="AnalysisValue" /> objects;
-    /// in effect, a set of Python types. There are multiple implementing
+    /// in effect, a set of JavaScript objects. There are multiple implementing
     /// classes, including <see cref="AnalysisValue" /> itself, to improve memory
     /// usage for small sets.
     /// 

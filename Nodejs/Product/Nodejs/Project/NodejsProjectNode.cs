@@ -40,7 +40,9 @@ namespace Microsoft.NodejsTools.Project {
         /// List of files to scan for require()
         /// </summary>
         private readonly JavaScriptSerializer _serializer = new JavaScriptSerializer();        
-        private readonly VsProjectAnalyzer _analyzer;
+        private VsProjectAnalyzer _analyzer;
+        private readonly HashSet<string> _warningFiles = new HashSet<string>();
+        private readonly HashSet<string> _errorFiles = new HashSet<string>();
         internal readonly RequireCompletionCache _requireCompletionCache = new RequireCompletionCache();
         internal int _currentFileCounter;
         private static Random _random = new Random();
@@ -496,6 +498,78 @@ function require(module) {
             //Fire off the command to update the missing modules
             //  through NPM
             return ModulesNode.InstallMissingModules();
+        }
+
+        private void HookErrorsAndWarnings(VsProjectAnalyzer res) {
+            res.ErrorAdded += OnErrorAdded;
+            res.ErrorRemoved += OnErrorRemoved;
+            res.WarningAdded += OnWarningAdded;
+            res.WarningRemoved += OnWarningRemoved;
+        }
+
+        private void UnHookErrorsAndWarnings(VsProjectAnalyzer res) {
+            res.ErrorAdded -= OnErrorAdded;
+            res.ErrorRemoved -= OnErrorRemoved;
+            res.WarningAdded -= OnWarningAdded;
+            res.WarningRemoved -= OnWarningRemoved;
+        }
+
+        private void OnErrorAdded(object sender, FileEventArgs args) {
+            if (_diskNodes.ContainsKey(args.Filename)) {
+                _errorFiles.Add(args.Filename);
+            }
+        }
+
+        private void OnErrorRemoved(object sender, FileEventArgs args) {
+            _errorFiles.Remove(args.Filename);
+        }
+
+        private void OnWarningAdded(object sender, FileEventArgs args) {
+            if (_diskNodes.ContainsKey(args.Filename)) {
+                _warningFiles.Add(args.Filename);
+            }
+        }
+
+        private void OnWarningRemoved(object sender, FileEventArgs args) {
+            _warningFiles.Remove(args.Filename);
+        }
+
+        /// <summary>
+        /// File names within the project which contain errors.
+        /// </summary>
+        public HashSet<string> ErrorFiles {
+            get {
+                return _errorFiles;
+            }
+        }
+
+        /// <summary>
+        /// File names within the project which contain warnings.
+        /// </summary>
+        public HashSet<string> WarningFiles {
+            get {
+                return _warningFiles;
+            }
+        }
+
+        protected override void Dispose(bool disposing) {
+            if (disposing) {
+                UnHookErrorsAndWarnings(_analyzer);
+                if (WarningFiles.Count > 0 || ErrorFiles.Count > 0) {
+                    foreach (var file in WarningFiles.Concat(ErrorFiles)) {
+                        var node = FindNodeByFullPath(file) as NodejsFileNode;
+                        if (node != null) {
+                            //_analyzer.RemoveErrors(node.GetAnalysis(), suppressUpdate: false);
+                        }
+                    }
+                }
+
+                if (_analyzer.RemoveUser()) {
+                    _analyzer.Dispose();
+                }
+                _analyzer = null;
+            }
+            base.Dispose(disposing);
         }
     }
 }

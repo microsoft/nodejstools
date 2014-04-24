@@ -36,7 +36,7 @@ namespace NodeReferenceGenerator {
                 var moduleName = FixModuleName((string)module["name"]);
                 var moduleRef = _analyzer.Modules.GetOrAdd(moduleName);
                 moduleRef.Module = new ModuleInfo(moduleName, _analyzer._builtinEntry);
-                var exports = new ExportsValue(_analyzer._builtinEntry);
+                var exports = new ExportsValue(moduleName, _analyzer._builtinEntry);
                 moduleRef.Module.Scope.GetOrAddVariable("exports").AddTypes(_analyzer._builtinEntry, exports);
 
                 exportsTable[moduleName] = exports;

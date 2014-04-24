@@ -25,7 +25,7 @@ namespace Microsoft.NodejsTools.Profiling {
             _node = session;
         }
 
-        #region IPythonProfileSession Members
+        #region INodeProfileSession Members
 
 
         public string Name {

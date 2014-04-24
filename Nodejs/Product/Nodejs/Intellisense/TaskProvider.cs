@@ -31,7 +31,6 @@ using Microsoft.VisualStudio.Text;
 using Microsoft.VisualStudio.Text.Adornments;
 using Microsoft.VisualStudio.Text.Tagging;
 using Microsoft.VisualStudioTools;
-//using SR = Microsoft.PythonTools.Project.SR;
 
 namespace Microsoft.NodejsTools.Intellisense {
     class TaskProviderItem {
@@ -137,28 +136,6 @@ namespace Microsoft.NodejsTools.Intellisense {
             );
         }
 
-#if FALSE
-        internal TaskProviderItem FromUnresolvedImport(
-            IPythonInterpreterFactoryWithDatabase factory,
-            string importName,
-            SourceSpan span
-        ) {
-            string message;
-            if (factory != null && !factory.IsCurrent) {
-                message = SR.GetString(SR.UnresolvedModuleTooltipRefreshing, importName);
-            } else {
-                message = SR.GetString(SR.UnresolvedModuleTooltip, importName);
-            }
-
-            return new TaskProviderItem(
-                message,
-                span,
-                VSTASKPRIORITY.TP_NORMAL,
-                true,
-                _snapshot
-            );
-        }
-#endif
         #endregion
     }
 

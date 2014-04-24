@@ -62,90 +62,6 @@ function f() {
         }
 
 
-        [TestMethod]
-        public void TestRequire() {
-            var mod1 = @"exports.foo = 42;";
-            var mod2 = @"x = require('./one.js').foo";
-
-            var sourceUnit1 = GetSourceUnit(mod1, "fob");
-            var sourceUnit2 = GetSourceUnit(mod2, "fob");
-            var state = new JsAnalyzer();
-            var entry1 = state.AddModule("one.js", null);
-            var entry2 = state.AddModule("two.js", null);
-            Prepare(entry1, sourceUnit1);
-            Prepare(entry2, sourceUnit2);
-            
-            entry1.Analyze(CancellationToken.None);
-            entry2.Analyze(CancellationToken.None);
-
-            AssertUtil.ContainsExactly(
-                entry2.Analysis.GetTypeIdsByIndex("x", 0),
-                BuiltinTypeId.Number
-            );            
-        }
-
-        [TestMethod]
-        public void TestBadRequire() {
-            // foo.js
-            //      require('./rec1')
-            // rec1\
-            //      package.json
-            //          { "main": "../rec2" }
-            // rec2\
-            //      package.json
-            //          { "main": "../rec1" }
-
-            var analyzer = new JsAnalyzer();
-            var mod = @"var x = require('./rec1')";
-            analyzer.AddPackageJson("rec1\\package.json", "../rec2");
-            analyzer.AddPackageJson("rec2\\package.json", "../rec1");
-           
-            var sourceUnit = GetSourceUnit(mod, "fob");
-            var entry = analyzer.AddModule("one.js", null);
-            Prepare(entry, sourceUnit);
-
-            entry.Analyze(CancellationToken.None);
-
-            Assert.AreEqual(
-                0,
-                entry.Analysis.GetTypeIdsByIndex("x", 0).Count()
-            );
-        }
-
-        [TestMethod]
-        public void TestRequireNodeModules() {
-            var mod1 = @"exports.foo = 42;";
-            var mod2 = @"x = require('one.js').foo";
-
-            var sourceUnit1 = GetSourceUnit(mod1, "fob");
-            var sourceUnit2 = GetSourceUnit(mod2, "fob");
-            var state = new JsAnalyzer();
-            var entry1 = state.AddModule("node_modules\\one.js", null);
-            var entry2 = state.AddModule("two.js", null);
-            Prepare(entry1, sourceUnit1);
-            Prepare(entry2, sourceUnit2);
-
-            entry1.Analyze(CancellationToken.None);
-            entry2.Analyze(CancellationToken.None);
-
-            AssertUtil.ContainsExactly(
-                entry2.Analysis.GetTypeIdsByIndex("x", 0),
-                BuiltinTypeId.Number
-            );
-        }
-
-        [TestMethod]
-        public void TestRequireBuiltin() {
-            string code = @"
-var http = require('http');
-";
-            var analysis = ProcessText(code);
-            AssertUtil.ContainsAtLeast(
-                analysis.GetMembersByIndex("http", 0).Select(x => x.Name),
-                "Server", "ServerResponse", "Agent", "ClientRequest", 
-                "createServer", "createClient", "request", "get"
-            );
-        }
 
         [TestMethod]
         public void TestExports() {
@@ -248,6 +164,13 @@ x = f.foo;
                 BuiltinTypeId.Number
             );
         }
+
+
+        //[TestMethod]
+        //public void ReproTestCase() {
+        //    var analysis = ProcessText(File.ReadAllText(@"C:\Source\ExpressApp29\ExpressApp29\node_modules\jade\node_modules\with\node_modules\uglify-js\lib\scope.js"));
+        //    Console.WriteLine("Done processing");
+        //}
 
         [TestMethod]
         public void TestNumber() {
@@ -532,8 +455,8 @@ x = new j();
             }
         }
 
-        public ModuleAnalysis ProcessText(string text) {
-            var sourceUnit = GetSourceUnit(text, "fob");
+        public static ModuleAnalysis ProcessText(string text) {
+            var sourceUnit = GetSourceUnit(text);
             var state = new JsAnalyzer();
             var entry = state.AddModule("fob.js", null);
             Prepare(entry, sourceUnit);
@@ -542,13 +465,13 @@ x = new j();
             return entry.Analysis;
         }
 
-        public static void Prepare(IPythonProjectEntry entry, TextReader sourceUnit) {
+        public static void Prepare(IJsProjectEntry entry, TextReader sourceUnit) {
             var parser = new JSParser(sourceUnit.ReadToEnd());
             var ast = parser.Parse(new CodeSettings());
             entry.UpdateTree(ast, null);
         }
 
-        public static TextReader GetSourceUnit(string text, string name) {
+        public static TextReader GetSourceUnit(string text) {
             return new StringReader(text);
         }
     }

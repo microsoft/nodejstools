@@ -332,7 +332,7 @@ namespace Microsoft.NodejsTools {
                     // We need to forward the command to the web publish package and let it handle it, while
                     // we listen for the project which is going to get added.  After the command succeds
                     // we can then go and update the newly added project so that it is setup appropriately for
-                    // Python...
+                    // Node.js...
                     using (var listener = new AzureSolutionListener(this)) {
                         var shell = (IVsShell)((System.IServiceProvider)this).GetService(typeof(SVsShell));
                         Guid webPublishPackageGuid = Guids.WebPackage;
@@ -617,7 +617,7 @@ namespace Microsoft.NodejsTools {
             // We're flavored with a Web Application project and our normal project...  But we don't
             // want the web application project to influence our config as that alters our debug
             // launch story.  We control that w/ the Django project which is actually just letting the
-            // base Python project handle it.  So we keep the base Python project config here.
+            // base Node.js project handle it.  So we keep the base Node.js project config here.
             IVsProjectFlavorCfg webCfg;
             ErrorHandler.ThrowOnFailure(
                 _innerVsProjectFlavorCfgProvider.CreateProjectFlavorCfg(

@@ -32,7 +32,7 @@ namespace Microsoft.NodejsTools.Analysis.Analyzer {
             UserFunctionValue function,
             Node node,
             EnvironmentRecord declScope,
-            IPythonProjectEntry declModule
+            IJsProjectEntry declModule
         )
             : base(function, node, declScope) {
             ReturnValue = new VariableDef();

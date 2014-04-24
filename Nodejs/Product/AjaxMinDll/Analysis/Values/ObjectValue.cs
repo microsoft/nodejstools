@@ -17,7 +17,8 @@ using Microsoft.NodejsTools.Parsing;
 
 namespace Microsoft.NodejsTools.Analysis.Values {
     /// <summary>
-    /// Represents an instance of a class implemented in Python
+    /// Represents a JavaScript object (constructed via a literal or
+    /// as the result of a new someFunction call).
     /// </summary>
     internal class ObjectValue : ExpandoValue {
         private readonly FunctionValue _creator;
@@ -188,9 +189,9 @@ namespace Microsoft.NodejsTools.Analysis.Values {
         }
 #endif
 
-        public override NodejsMemberType MemberType {
+        public override JsMemberType MemberType {
             get {
-                return NodejsMemberType.Object;
+                return JsMemberType.Object;
             }
         }        
 

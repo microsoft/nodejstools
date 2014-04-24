@@ -97,10 +97,6 @@ namespace Microsoft.NodejsTools.Analysis.Analyzer {
             }
         }
 
-        public ModuleInfo GlobalScope {
-            get { return _unit.DeclaringModule; }
-        }
-
         public JsAnalyzer ProjectState {
             get { return _unit.Analyzer; }
         }
@@ -258,7 +254,7 @@ namespace Microsoft.NodejsTools.Analysis.Analyzer {
             if (node.FalseBlock != null) {
                 node.FalseBlock.Walk(this);
             }
-            return true;
+            return false;
         }
 
 #if FALSE
@@ -322,7 +318,7 @@ namespace Microsoft.NodejsTools.Analysis.Analyzer {
                 var lookupRes = _eval.Evaluate(node.Operand);
                 fnScope.AddReturnTypes(node, _unit, lookupRes);
             }
-            return true;
+            return false;
         }
 
 #if FALSE
@@ -379,8 +375,8 @@ namespace Microsoft.NodejsTools.Analysis.Analyzer {
             var prevScope = Scope;
 
             _curSuite = node;
-            foreach (var statement in node.Children) {
-                statement.Walk(this);
+            for (int i = 0; i < node.Count; i++) {
+                node[i].Walk(this);
             }
 
             Scope = prevScope;

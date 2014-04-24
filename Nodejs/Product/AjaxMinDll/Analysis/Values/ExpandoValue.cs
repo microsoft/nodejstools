@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+using System.Diagnostics;
 using Microsoft.NodejsTools.Analysis.Analyzer;
 using Microsoft.NodejsTools.Parsing;
 
@@ -27,7 +28,7 @@ namespace Microsoft.NodejsTools.Analysis.Values {
             }
         }
 
-        public override IPythonProjectEntry DeclaringModule {
+        public override IJsProjectEntry DeclaringModule {
             get {
                 return _projectEntry;
             }
@@ -204,7 +205,7 @@ namespace Microsoft.NodejsTools.Analysis.Values {
         /// <summary>
         /// Adds a member from the built-in module.
         /// </summary>
-        public void Add(string name, IAnalysisSet value) {
+        public VariableDef Add(string name, IAnalysisSet value) {
             PropertyDescriptor desc = GetDescriptor(name);
 
             VariableDef def = desc.Values;
@@ -213,6 +214,14 @@ namespace Microsoft.NodejsTools.Analysis.Values {
             }
 
             def.AddTypes(ProjectState._builtinEntry, value);
+            return def;
+        }
+
+        public void Add(string name, VariableDef variable) {
+            PropertyDescriptor desc = GetDescriptor(name);
+
+            Debug.Assert(desc.Values == null);
+            desc.Values = variable;
         }
 
         public void Add(AnalysisValue value) {

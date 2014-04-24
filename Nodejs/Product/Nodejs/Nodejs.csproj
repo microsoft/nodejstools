@@ -269,6 +269,7 @@
     <Compile Include="Intellisense\CompletionAnalysis.cs" />
     <Compile Include="Intellisense\CompletionComparer.cs" />
     <Compile Include="Intellisense\EntryEventArgs.cs" />
+    <Compile Include="Intellisense\FileEventArgs.cs" />
     <Compile Include="Intellisense\FuzzyCompletionSet.cs" />
     <Compile Include="Intellisense\FuzzyStringMatcher.cs" />
     <Compile Include="Intellisense\IContentTypeMetadata.cs" />

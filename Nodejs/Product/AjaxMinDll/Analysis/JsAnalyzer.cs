@@ -29,7 +29,7 @@ using NodeReferenceGenerator;
 
 namespace Microsoft.NodejsTools.Analysis {
     /// <summary>
-    /// Performs analysis of multiple Python code files and enables interrogation of the resulting analysis.
+    /// Performs analysis of multiple JavaScript code files and enables interrogation of the resulting analysis.
     /// </summary>
     public partial class JsAnalyzer : IGroupableAnalysisProject {
         private readonly ModuleTable _modules;
@@ -49,9 +49,6 @@ namespace Microsoft.NodejsTools.Analysis {
         //internal readonly IModuleContext _defaultContext;
         internal readonly AnalysisUnit _evalUnit;   // a unit used for evaluating when we don't otherwise have a unit available
         private readonly HashSet<string> _analysisDirs = new HashSet<string>(StringComparer.OrdinalIgnoreCase);
-#if FALSE
-        private Dictionary<string, List<SpecializationInfo>> _specializationInfo = new Dictionary<string, List<SpecializationInfo>>();  // delayed specialization information, for modules not yet loaded...
-#endif
         private AnalysisLimits _limits;
         private static object _nullKey = new object();
 
@@ -59,11 +56,6 @@ namespace Microsoft.NodejsTools.Analysis {
             @"\Analysis\Project";
 
         public JsAnalyzer() {
-#if FALSE
-            _langVersion = factory.GetLanguageVersion();
-            _interpreter = pythonInterpreter;
-            _builtinName = builtinName ?? (_langVersion.Is3x() ? SharedDatabaseState.BuiltinName3x : SharedDatabaseState.BuiltinName2x);
-#endif
             _modules = new ModuleTable(this);
             _modulesWithUnresolvedImports = new HashSet<ModuleInfo>();
             _itemCache = new Dictionary<object, AnalysisValue>();
@@ -109,12 +101,6 @@ namespace Microsoft.NodejsTools.Analysis {
             AnalysisLog.NewUnit(_evalUnit);
         }
 
-        private void LoadKnownTypes() {
-#if FALSE
-            AddBuiltInSpecializations();
-#endif
-        }
-
         #region Public API
 
         /// <summary>
@@ -126,13 +112,12 @@ namespace Microsoft.NodejsTools.Analysis {
         /// <param name="filePath">The path to the file on disk</param>
         /// <param name="cookie">An application-specific identifier for the module</param>
         /// <returns></returns>
-        public IPythonProjectEntry AddModule(string filePath, IAnalysisCookie cookie = null) {
+        public IJsProjectEntry AddModule(string filePath, IAnalysisCookie cookie = null) {
             var entry = new ProjectEntry(this, filePath, cookie);
 
             var moduleRef = Modules.GetOrAdd(filePath);
             moduleRef.Module = entry.MyScope;
 
-            //DoDelayedSpecialization(moduleName);
             return entry;
         }
 
@@ -155,7 +140,7 @@ namespace Microsoft.NodejsTools.Analysis {
             }
             Contract.EndContractBlock();
 
-            var pyEntry = entry as IPythonProjectEntry;
+            var pyEntry = entry as IJsProjectEntry;
             if (pyEntry != null) {
                 Modules.Remove(pyEntry.FilePath);
             }
@@ -192,7 +177,6 @@ namespace Microsoft.NodejsTools.Analysis {
 
             return entries;
         }
-#endif
 
         /// <summary>
         /// Returns a sequence of absolute module names that, if available,
@@ -217,6 +201,7 @@ namespace Microsoft.NodejsTools.Analysis {
                 }
             }
         }
+#endif
 
 #if FALSE
         /// <summary>
@@ -497,7 +482,6 @@ namespace Microsoft.NodejsTools.Analysis {
                     foreach (var child in module.GetChildrenPackages()) {
                         result.Add(new MemberResult(child.Key, child.Key, new[] { child.Value }, PythonMemberType.Module));
                     }
-#if FALSE
                     foreach (var keyValue in module.GetAllMembers(moduleContext)) {
                         bool anyModules = false;
 
@@ -511,7 +495,6 @@ namespace Microsoft.NodejsTools.Analysis {
                             result.Add(new MemberResult(keyValue.Key, keyValue.Value));
                         }
                     }
-#endif
                     return result.ToArray();
                 }
             }
@@ -531,42 +514,6 @@ namespace Microsoft.NodejsTools.Analysis {
             }
         }
 
-#if FALSE
-        public static string PathToModuleName(string path) {
-            return PathToModuleName(path, fileName => File.Exists(fileName));
-        }
-
-        /// <summary>
-        /// Converts a given absolute path name to a fully qualified Python module name by walking the directory tree.
-        /// </summary>
-        /// <param name="path">Path to convert.</param>
-        /// <param name="fileExists">A function that is used to verify the existence of files (in particular, __init__.py)
-        /// in the tree. Its signature and semantics should match that of <see cref="File.Exists"/>.</param>
-        /// <returns>A fully qualified module name.</returns>
-        public static string PathToModuleName(string path, Func<string, bool> fileExists) {
-            string moduleName;
-            string dirName;
-
-            if (path == null) {
-                return String.Empty;
-#if FALSE
-            } else if (ModulePath.IsInitPyFile(path)) {
-                moduleName = Path.GetFileName(Path.GetDirectoryName(path));
-                dirName = Path.GetDirectoryName(path);
-#endif
-            } else {
-                moduleName = Path.GetFileNameWithoutExtension(path);
-                dirName = path;
-            }
-
-            while (dirName.Length != 0 && (dirName = Path.GetDirectoryName(dirName)).Length != 0 &&
-                fileExists(Path.Combine(dirName, "__init__.py"))) {
-                moduleName = Path.GetFileName(dirName) + "." + moduleName;
-            }
-
-            return moduleName;
-        }
-#endif
         public AnalysisLimits Limits {
             get { return _limits; }
             set { _limits = value; }
@@ -575,18 +522,6 @@ namespace Microsoft.NodejsTools.Analysis {
         #endregion
 
         #region Internal Implementation
-
-#if FALSE
-        internal IKnownPythonTypes Types {
-            get;
-            private set;
-            }
-
-        internal IKnownClasses ClassInfos {
-            get;
-            private set;
-        }
-#endif
 
         internal Deque<AnalysisUnit> Queue {
             get {
@@ -603,25 +538,6 @@ namespace Microsoft.NodejsTools.Analysis {
             }
             return result;
         }
-
-#if FALSE
-        internal BuiltinClassInfo GetBuiltinType(IPythonType type) {
-            return (BuiltinClassInfo)GetCached(type,
-                () => MakeBuiltinType(type)
-            );
-        }
-#endif
-
-#if FALSE
-        private BuiltinClassInfo MakeBuiltinType(IPythonType type) {
-            switch (type.TypeId) {
-                case BuiltinTypeId.Array: return new ListBuiltinClassInfo(type, this);
-                case BuiltinTypeId.Tuple: return new TupleBuiltinClassInfo(type, this);
-                case BuiltinTypeId.Object: return new ObjectBuiltinClassInfo(type, this);
-                default: return new BuiltinClassInfo(type, this);
-            }
-        }
-#endif
 
         internal IAnalysisSet GetAnalysisSetFromObjects(object objects) {
             var typeList = objects as IEnumerable<object>;
@@ -677,13 +593,6 @@ namespace Microsoft.NodejsTools.Analysis {
         internal ModuleTable Modules {
             get { return _modules; }
         }
-
-#if FALSE
-        internal IAnalysisSet GetConstant(object value) {
-            object key = value ?? _nullKey;
-            return GetCached(key, () => new ConstantInfo(value, this)).SelfSet;
-        }
-#endif
 
         private static void Update<K, V>(IDictionary<K, V> dict, IDictionary<K, V> newValues) {
             foreach (var kvp in newValues) {

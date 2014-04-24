@@ -21,6 +21,105 @@ namespace AnalysisTests {
         }
 
         [TestMethod]
+        public void TestRequireAssignedExports() {
+            var entries = Analysis.Analyze(
+                new AnalysisFile("mod.js", @"var x = require('mymod').value;"),
+                new AnalysisFile("node_modules\\mymod\\index.js", @"module.exports = require('./realindex.js');"),
+                new AnalysisFile("node_modules\\mymod\\realindex.js", @"exports.value = 42;")
+            );
+
+            AssertUtil.ContainsExactly(
+                entries["mod.js"].Analysis.GetTypeIdsByIndex("x", 0),
+                BuiltinTypeId.Number
+            );
+        }
+
+        [TestMethod]
+        public void TestRequireSimple() {
+            var mod1 = @"exports.foo = 42;";
+            var mod2 = @"x = require('./one.js').foo";
+
+            var sourceUnit1 = AnalysisTests.GetSourceUnit(mod1);
+            var sourceUnit2 = AnalysisTests.GetSourceUnit(mod2);
+            var state = new JsAnalyzer();
+            var entry1 = state.AddModule("one.js", null);
+            var entry2 = state.AddModule("two.js", null);
+            AnalysisTests.Prepare(entry1, sourceUnit1);
+            AnalysisTests.Prepare(entry2, sourceUnit2);
+
+            entry1.Analyze(CancellationToken.None);
+            entry2.Analyze(CancellationToken.None);
+
+            AssertUtil.ContainsExactly(
+                entry2.Analysis.GetTypeIdsByIndex("x", 0),
+                BuiltinTypeId.Number
+            );
+        }
+
+        [TestMethod]
+        public void TestBadRequire() {
+            // foo.js
+            //      require('./rec1')
+            // rec1\
+            //      package.json
+            //          { "main": "../rec2" }
+            // rec2\
+            //      package.json
+            //          { "main": "../rec1" }
+
+            var analyzer = new JsAnalyzer();
+            var mod = @"var x = require('./rec1')";
+            analyzer.AddPackageJson("rec1\\package.json", "../rec2");
+            analyzer.AddPackageJson("rec2\\package.json", "../rec1");
+
+            var sourceUnit = AnalysisTests.GetSourceUnit(mod);
+            var entry = analyzer.AddModule("one.js", null);
+            AnalysisTests.Prepare(entry, sourceUnit);
+
+            entry.Analyze(CancellationToken.None);
+
+            Assert.AreEqual(
+                0,
+                entry.Analysis.GetTypeIdsByIndex("x", 0).Count()
+            );
+        }
+
+        [TestMethod]
+        public void TestRequireNodeModules() {
+            var mod1 = @"exports.foo = 42;";
+            var mod2 = @"x = require('one.js').foo";
+
+            var sourceUnit1 = AnalysisTests.GetSourceUnit(mod1);
+            var sourceUnit2 = AnalysisTests.GetSourceUnit(mod2);
+            var state = new JsAnalyzer();
+            var entry1 = state.AddModule("node_modules\\one.js", null);
+            var entry2 = state.AddModule("two.js", null);
+            AnalysisTests.Prepare(entry1, sourceUnit1);
+            AnalysisTests.Prepare(entry2, sourceUnit2);
+
+            entry1.Analyze(CancellationToken.None);
+            entry2.Analyze(CancellationToken.None);
+
+            AssertUtil.ContainsExactly(
+                entry2.Analysis.GetTypeIdsByIndex("x", 0),
+                BuiltinTypeId.Number
+            );
+        }
+
+        [TestMethod]
+        public void TestRequireBuiltin() {
+            string code = @"
+var http = require('http');
+";
+            var analysis = AnalysisTests.ProcessText(code);
+            AssertUtil.ContainsAtLeast(
+                analysis.GetMembersByIndex("http", 0).Select(x => x.Name),
+                "Server", "ServerResponse", "Agent", "ClientRequest",
+                "createServer", "createClient", "request", "get"
+            );
+        }
+
+        [TestMethod]
         public void TestRequire() {
             var testCases = new[] {
                 new { File="server.js", Line = 4, Type = "mymod.", Expected = "mymod_export" },
@@ -63,7 +162,7 @@ namespace AnalysisTests {
 
             var analyzer = new JsAnalyzer();
 
-            Dictionary<string, IPythonProjectEntry> entries = new Dictionary<string, IPythonProjectEntry>();
+            Dictionary<string, IJsProjectEntry> entries = new Dictionary<string, IJsProjectEntry>();
             var basePath = TestData.GetPath("TestData\\RequireTestApp\\RequireTestApp");
             foreach (var file in Directory.GetFiles(
                 basePath,

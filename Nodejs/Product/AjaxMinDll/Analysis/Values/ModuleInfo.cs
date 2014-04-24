@@ -30,11 +30,6 @@ namespace Microsoft.NodejsTools.Analysis.Values {
         private readonly ModuleScope _scope;
         private readonly Dictionary<Node, EnvironmentRecord> _scopes;    // scopes from Ast node to InterpreterScope
         private readonly WeakReference _weakModule;
-        private Dictionary<string, WeakReference> _packageModules;
-#if FALSE
-        private Dictionary<string, Tuple<CallDelegate, bool>> _specialized;
-#endif
-        private ModuleInfo _parentPackage;
         private DependentData _definition = new DependentData();
         private readonly HashSet<ModuleReference> _referencedModules;
         private readonly HashSet<String> _unresolvedModules;
@@ -59,6 +54,7 @@ namespace Microsoft.NodejsTools.Analysis.Values {
             _unresolvedModules.Clear();
         }
 
+#if FALSE
         /// <summary>
         /// Returns all the absolute module names that need to be resolved from
         /// this module.
@@ -71,7 +67,6 @@ namespace Microsoft.NodejsTools.Analysis.Values {
             return _unresolvedModules;
         }
 
-#if FALSE
         internal void AddUnresolvedModule(string relativeModuleName, bool absoluteImports) {
             _unresolvedModules.UnionWith(JsAnalyzer.ResolvePotentialModuleNames(_projectEntry, relativeModuleName, absoluteImports));
             _projectEntry.Analyzer.ModuleHasUnresolvedImports(this, true);
@@ -95,11 +90,6 @@ namespace Microsoft.NodejsTools.Analysis.Values {
                 }
             }
             return res;
-        }
-
-        public ModuleInfo ParentPackage {
-            get { return _parentPackage; }
-            set { _parentPackage = value; }
         }
 
 #if FALSE
@@ -128,26 +118,6 @@ namespace Microsoft.NodejsTools.Analysis.Values {
             return null;
         }
 #endif
-        public void AddModuleReference(ModuleReference moduleRef) {
-            if (moduleRef == null) {
-                Debug.Fail("moduleRef should never be null");
-                throw new ArgumentNullException("moduleRef");
-            }
-            _referencedModules.Add(moduleRef);
-            moduleRef.AddReference(this);
-        }
-
-        public void RemoveModuleReference(ModuleReference moduleRef) {
-            if (_referencedModules.Remove(moduleRef)) {
-                moduleRef.RemoveReference(this);
-            }
-        }
-
-        public IEnumerable<ModuleReference> ModuleReferences {
-            get {
-                return _referencedModules;
-            }
-        }
 
 #if FALSE
         public void SpecializeFunction(string name, CallDelegate callable, bool mergeOriginalAnalysis) {
@@ -224,15 +194,6 @@ namespace Microsoft.NodejsTools.Analysis.Values {
             variable.AddAssignment(node, unit);
         }
 
-        /// <summary>
-        /// Gets a weak reference to this module
-        /// </summary>
-        public WeakReference WeakModule {
-            get {
-                return _weakModule;
-            }
-        }
-
         public DependentData ModuleDefinition {
             get {
                 return _definition;
@@ -253,9 +214,9 @@ namespace Microsoft.NodejsTools.Analysis.Values {
             get { return _projectEntry; }
         }
 
-        public override NodejsMemberType MemberType {
+        public override JsMemberType MemberType {
             get {
-                return NodejsMemberType.Module;
+                return JsMemberType.Module;
             }
         }
 
@@ -265,13 +226,13 @@ namespace Microsoft.NodejsTools.Analysis.Values {
 
         public override string ShortDescription {
             get {
-                return "Python module " + Name;
+                return "Node.js module " + Name;
             }
         }
 
         public override string Description {
             get {
-                var result = new StringBuilder("Python module ");
+                var result = new StringBuilder("Node.js module ");
                 result.Append(Name);
                 var doc = Documentation;
                 if (!string.IsNullOrEmpty(doc)) {

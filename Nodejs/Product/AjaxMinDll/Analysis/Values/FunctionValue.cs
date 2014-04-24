@@ -89,9 +89,9 @@ namespace Microsoft.NodejsTools.Analysis.Values {
         }
 #endif
 
-        public override NodejsMemberType MemberType {
+        public override JsMemberType MemberType {
             get {
-                return NodejsMemberType.Function;
+                return JsMemberType.Function;
             }
         }
 
@@ -124,17 +124,18 @@ namespace Microsoft.NodejsTools.Analysis.Values {
         }
         
         internal override bool UnionEquals(AnalysisValue av, int strength) {
+#if FALSE
             if (strength >= MergeStrength.ToObject) {
                 return av is FunctionValue /*|| av is BuiltinFunctionInfo || av == ProjectState.ClassInfos[BuiltinTypeId.Function].Instance*/;
             }
+#endif
             return base.UnionEquals(av, strength);
         }
 
         internal override int UnionHashCode(int strength) {
 #if FALSE
-
             if (strength >= MergeStrength.ToObject) {
-                return ProjectState.ClassInfos[BuiltinTypeId.Function].Instance.UnionHashCode(strength);
+                return ProjectState._numberPrototype.GetHashCode();
             }
 #endif
             return base.UnionHashCode(strength);
@@ -146,6 +147,7 @@ namespace Microsoft.NodejsTools.Analysis.Values {
                 return ProjectState.ClassInfos[BuiltinTypeId.Function].Instance;
             }
 #endif
+
             return base.UnionMergeTypes(av, strength);
         }
     }

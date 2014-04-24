@@ -357,7 +357,7 @@ namespace Microsoft.NodejsTools.Analysis.Analyzer {
                     return rhs;
             }
 
-            return ee.Evaluate(n.Operand1).BinaryOperation(node, ee._unit, n.OperatorToken, ee.Evaluate(n.Operand2));
+            return ee.Evaluate(n.Operand1).Union(ee.Evaluate(n.Operand2));
         }
 
 #if FALSE

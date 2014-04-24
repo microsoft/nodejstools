@@ -95,7 +95,7 @@ namespace Microsoft.NodejsTools.Analysis {
 
         /// <summary>
         /// Looks up a sequence of types associated with the name using the
-        /// normal Python semantics.
+        /// normal JavaScript semantics.
         /// 
         /// This function is only safe to call during analysis. After analysis
         /// has completed, use a <see cref="ModuleAnalysis"/> instance.

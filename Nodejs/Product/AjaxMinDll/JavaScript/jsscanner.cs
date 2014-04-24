@@ -86,7 +86,7 @@ namespace Microsoft.NodejsTools.Parsing
         #region constructors
 
         
-        public JSScanner(string source, ErrorSink errorSink) {
+        public JSScanner(string source, ErrorSink errorSink = null) {
             _errorSink = errorSink ?? new ErrorSink();
             _currentPosition = 0;
 
@@ -703,6 +703,7 @@ namespace Microsoft.NodejsTools.Parsing
                     _currentPosition++;
                 }
             }
+            _newLineLocations.Add(_currentPosition);
 
             // keep multiple line terminators together in a single token.
             // so get the current character after this last line terminator
@@ -716,13 +717,13 @@ namespace Microsoft.NodejsTools.Parsing
                     {
                         ++_currentPosition;
                     }
-                    _newLineLocations.Add(_currentPosition);
                 }
                 else
                 {
                     // skip over any other non-\r character
                     ++_currentPosition;
                 }
+                _newLineLocations.Add(_currentPosition);
             }
 
             return token;

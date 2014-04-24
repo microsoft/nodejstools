@@ -96,7 +96,7 @@ namespace Microsoft.NodejsTools.Intellisense {
                     }
                 }
 
-                IPythonProjectEntry pyEntry = projEntry as IPythonProjectEntry;
+                IJsProjectEntry pyEntry = projEntry as IJsProjectEntry;
                 if (pyEntry != null) {
                     // failed to parse, keep the UpdateTree calls balanced
                     pyEntry.UpdateTree(null, null);
@@ -179,7 +179,7 @@ namespace Microsoft.NodejsTools.Intellisense {
                 return _buffers.ToArray();
 #if FALSE
                 return _buffers.Where(
-                    x => !x.Properties.ContainsProperty(PythonReplEvaluator.InputBeforeReset)
+                    x => !x.Properties.ContainsProperty(NodejsReplEvaluator.InputBeforeReset)
                 ).ToArray();
 #endif
             }
@@ -273,7 +273,7 @@ namespace Microsoft.NodejsTools.Intellisense {
         /// </summary>
         internal void EnqueingEntry() {
             lock (this) {
-                IPythonProjectEntry pyEntry = _currentProjEntry as IPythonProjectEntry;
+                IJsProjectEntry pyEntry = _currentProjEntry as IJsProjectEntry;
                 if (pyEntry != null) {
                     pyEntry.BeginParsingTree();
                 }
@@ -286,7 +286,7 @@ namespace Microsoft.NodejsTools.Intellisense {
         /// </summary>
         private void NotReparsing() {
             lock (this) {
-                IPythonProjectEntry pyEntry = _currentProjEntry as IPythonProjectEntry;
+                IJsProjectEntry pyEntry = _currentProjEntry as IJsProjectEntry;
                 if (pyEntry != null) {
                     pyEntry.UpdateTree(null, null);
                 }

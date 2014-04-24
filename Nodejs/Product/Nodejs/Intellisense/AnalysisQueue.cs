@@ -49,7 +49,7 @@ namespace Microsoft.NodejsTools.Intellisense {
             }
 
             _workThread = new Thread(Worker);
-            _workThread.Name = "Python Analysis Queue";
+            _workThread.Name = "Node.js Analysis Queue";
             _workThread.Priority = ThreadPriority.BelowNormal;
             _workThread.IsBackground = true;
             

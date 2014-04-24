@@ -105,26 +105,6 @@ namespace Microsoft.NodejsTools {
                             ((ICompletionSession)_intellisenseStack.TopSession).Commit();
                         } else {
                             hr = _next.Exec(ref pguidCmdGroup, nCmdID, nCmdexecopt, pvaIn, pvaOut);
-#if FALSE
-                            if (SkipJsFilter != null) {                                
-                                var res = SkipJsFilter.Exec(ref pguidCmdGroup, nCmdID, nCmdexecopt, pvaIn, pvaOut);
-                                SmartIndent smartIndent;
-                                if (ErrorHandler.Succeeded(res) && _textView.Properties.TryGetProperty<SmartIndent>(typeof(SmartIndent), out smartIndent)) {
-                                    var indentation = smartIndent.GetDesiredIndentation(_textView.Caret.Position.BufferPosition.GetContainingLine());
-                                    if (indentation != null) {
-                                        _textView.Caret.MoveTo(
-                                            new VisualStudio.Text.VirtualSnapshotPoint(
-                                                _textView.Caret.Position.BufferPosition.GetContainingLine(),
-                                                indentation.Value
-                                            )
-                                        );
-                                    }
-                                }
-                                return res;
-                            }
-
-                            _editorOps.InsertNewLine();
-#endif
                             FormatAfterTyping('\n');
                             return hr;
                         }
@@ -132,66 +112,13 @@ namespace Microsoft.NodejsTools {
                     case VSConstants.VSStd2KCmdID.TYPECHAR:
                         if (!_incSearch.IsActive) {
                             var ch = (char)(ushort)System.Runtime.InteropServices.Marshal.GetObjectForNativeVariant(pvaIn);
-#if FALSE
-                            if (_activeSession != null && !_activeSession.IsDismissed) {
-                                if (_activeSession.SelectedCompletionSet.SelectionStatus.IsSelected &&
-                                    _commitChars.Contains(ch)) {
-                                    _activeSession.Commit();
-                                } else if (!CompletionSource.IsIdentifierChar(ch) && ch != '.' && ch != '/') {
-                                    _activeSession.Dismiss();
-                                }
-                            }
-#endif
                             int res = _next.Exec(ref pguidCmdGroup, nCmdID, nCmdexecopt, pvaIn, pvaOut);
 
                             switch(ch) {
-#if FALSE
-                                case '.':
-                                    if (NodejsPackage.Instance.LangPrefs.AutoListMembers) {
-                                        TriggerCompletionSession(false);
-                                    }
-                                    break;
-#endif
                                 case '}':
                                 case ':':
                                     FormatAfterTyping(ch);
                                     break;
-#if FALSE
-                                case '\'':
-                                case '"':
-                                    if (CompletionSource.ShouldTriggerRequireIntellisense(_textView.Caret.Position.BufferPosition, _classifier, ch != '(')) {
-                                        TriggerCompletionSession(false);
-                                    }
-                                    break;
-#endif
-#if FALSE
-                                case '(':
-                                    if (PythonToolsPackage.Instance.LangPrefs.AutoListParams) {
-                                        OpenParenStartSignatureSession();
-                                    }
-                                    break;
-                                case ')':
-                                    if (_sigHelpSession != null) {
-                                        _sigHelpSession.Dismiss();
-                                        _sigHelpSession = null;
-                                    }
-
-                                    if (PythonToolsPackage.Instance.LangPrefs.AutoListParams) {
-                                        // trigger help for outer call if there is one
-                                        TriggerSignatureHelp();
-                                    }
-                                    break;
-                                case '=':
-                                case ',':
-                                    if (_sigHelpSession == null) {
-                                        if (PythonToolsPackage.Instance.LangPrefs.AutoListParams) {
-                                            CommaStartSignatureSession();
-                                        }
-                                    } else {
-                                        UpdateCurrentParameter();
-                                    }
-                                    break;
-#endif
                             }
 
                             if (_activeSession != null && !_activeSession.IsDismissed) {
@@ -204,49 +131,11 @@ namespace Microsoft.NodejsTools {
                     case VSConstants.VSStd2KCmdID.PASTE: 
                         var curVersion = _textView.TextBuffer.CurrentSnapshot;
                         hr = _next.Exec(ref pguidCmdGroup, nCmdID, nCmdexecopt, pvaIn, pvaOut);
-#if FALSE
-                        if (SkipJsFilter != null) {
-                            hr = SkipJsFilter.Exec(ref pguidCmdGroup, nCmdID, nCmdexecopt, pvaIn, pvaOut);
-                        } else {
-                            if (_editorOps.Paste()) {
-                                hr = VSConstants.S_OK;
-                            } else {
-                                hr = VSConstants.E_FAIL;
-                            }
-                        }
-#endif
 
                         if (ErrorHandler.Succeeded(hr)) {
                             FormatAfterPaste(curVersion);
                         }
                         return hr;
-#if FALSE
-                    case VSConstants.VSStd2KCmdID.TAB:
-                        if (_intellisenseStack.TopSession != null &&
-                            _intellisenseStack.TopSession is ICompletionSession &&
-                            !_intellisenseStack.TopSession.IsDismissed) {
-                            ((ICompletionSession)_intellisenseStack.TopSession).Commit();
-                        } else {
-                            return _next.Exec(ref pguidCmdGroup, nCmdID, nCmdexecopt, pvaIn, pvaOut);
-                        }
-                        return VSConstants.S_OK;
-                    case VSConstants.VSStd2KCmdID.SHOWMEMBERLIST:
-                    case VSConstants.VSStd2KCmdID.COMPLETEWORD:
-                        if (TriggerCompletionSession((VSConstants.VSStd2KCmdID)nCmdID == VSConstants.VSStd2KCmdID.COMPLETEWORD)) {
-                            return VSConstants.S_OK;
-                        }
-                        break;
-                    case VSConstants.VSStd2KCmdID.BACKSPACE:
-                    case VSConstants.VSStd2KCmdID.DELETE:
-                    case VSConstants.VSStd2KCmdID.DELETEWORDLEFT:
-                    case VSConstants.VSStd2KCmdID.DELETEWORDRIGHT: {
-                            int res = _next.Exec(ref pguidCmdGroup, nCmdID, nCmdexecopt, pvaIn, pvaOut);
-                            if (_activeSession != null && !_activeSession.IsDismissed) {
-                                _activeSession.Filter();
-                            }
-                            return res;
-                        }
-#endif
                 }
             } else if (pguidCmdGroup == VSConstants.GUID_VSStandardCommandSet97) {
                 switch ((VSConstants.VSStd97CmdID)nCmdID) {
@@ -269,37 +158,7 @@ namespace Microsoft.NodejsTools {
                 _intellisenseStack.TopSession.Dismiss();
             }
         }
-#if FALSE
-        internal bool TriggerCompletionSession(bool completeWord) {
-            Dismiss();
 
-            _activeSession = _broker.TriggerCompletion(_textView);
-
-            if (_activeSession != null) {
-                FuzzyCompletionSet set;
-                if (completeWord &&
-                    _activeSession.CompletionSets.Count == 1 &&
-                    (set = _activeSession.CompletionSets[0] as FuzzyCompletionSet) != null &&
-                    set.SelectSingleBest()) {
-                    _activeSession.Commit();
-                    _activeSession = null;
-                } else {
-                    _activeSession.Filter();
-                    _activeSession.Dismissed += OnCompletionSessionDismissedOrCommitted;
-                    _activeSession.Committed += OnCompletionSessionDismissedOrCommitted;
-                }
-                return true;
-            }
-            return false;
-        }
-
-        private void OnCompletionSessionDismissed(object sender, System.EventArgs e) {
-            // We've just been told that our active session was dismissed.  We should remove all references to it.
-            _activeSession.Dismissed -= OnCompletionSessionDismissed;
-            _activeSession.Committed -= OnCompletionSessionDismissed;
-            _activeSession = null;
-        }
-#endif
         public int QueryStatus(ref Guid pguidCmdGroup, uint cCmds, OLECMD[] prgCmds, IntPtr pCmdText) {
             if (pguidCmdGroup == VSConstants.GUID_VSStandardCommandSet97) {
 #if FALSE

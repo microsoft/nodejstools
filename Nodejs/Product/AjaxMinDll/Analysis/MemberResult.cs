@@ -24,7 +24,7 @@ namespace Microsoft.NodejsTools.Analysis {
         private readonly string _name;
         private string _completion;
         private readonly Func<IEnumerable<AnalysisValue>> _vars;
-        private readonly Func<NodejsMemberType> _type;
+        private readonly Func<JsMemberType> _type;
 
         internal MemberResult(string name, IEnumerable<AnalysisValue> vars) {
             _name = _completion = name;
@@ -33,13 +33,13 @@ namespace Microsoft.NodejsTools.Analysis {
             _type = GetMemberType;
         }
 
-        public MemberResult(string name, NodejsMemberType type) {
+        public MemberResult(string name, JsMemberType type) {
             _name = _completion = name;
             _type = () => type;
             _vars = () => Empty;
         }
 
-        internal MemberResult(string name, string completion, IEnumerable<AnalysisValue> vars, NodejsMemberType? type) {
+        internal MemberResult(string name, string completion, IEnumerable<AnalysisValue> vars, JsMemberType? type) {
             _name = name;
             _vars = () => vars;
             _completion = completion;
@@ -51,7 +51,7 @@ namespace Microsoft.NodejsTools.Analysis {
             }
         }
 
-        internal MemberResult(string name, Func<IEnumerable<AnalysisValue>> vars, Func<NodejsMemberType> type) {
+        internal MemberResult(string name, Func<IEnumerable<AnalysisValue>> vars, Func<JsMemberType> type) {
             _name = _completion = name;
             _vars = vars;
             _type = type;
@@ -108,15 +108,15 @@ namespace Microsoft.NodejsTools.Analysis {
             }
         }
 
-        public NodejsMemberType MemberType {
+        public JsMemberType MemberType {
             get {
                 return _type();
             }
         }
 
-        private NodejsMemberType GetMemberType() {
+        private JsMemberType GetMemberType() {
             bool includesNull = false;
-            NodejsMemberType result = NodejsMemberType.Unknown;
+            JsMemberType result = JsMemberType.Unknown;
 
             var allVars = _vars().SelectMany(ns => {
 #if FALSE
@@ -132,23 +132,23 @@ namespace Microsoft.NodejsTools.Analysis {
 
             foreach (var ns in allVars) {
                 var nsType = ns.MemberType;
-                if (result == NodejsMemberType.Unknown &&
+                if (result == JsMemberType.Unknown &&
                     (ns.TypeId == BuiltinTypeId.Null || 
-                    nsType == NodejsMemberType.Undefined)) {
+                    nsType == JsMemberType.Undefined)) {
                     result = nsType;
                     includesNull = true;
-                } else if (result == NodejsMemberType.Unknown || 
-                    result == NodejsMemberType.Null || 
-                    result == NodejsMemberType.Undefined) {
+                } else if (result == JsMemberType.Unknown || 
+                    result == JsMemberType.Null || 
+                    result == JsMemberType.Undefined) {
                     result = nsType;
                 } else if (result == nsType) {
                     // No change
                 } else {
-                    return NodejsMemberType.Multiple;
+                    return JsMemberType.Multiple;
                 }
             }
-            if (result == NodejsMemberType.Unknown) {
-                return NodejsMemberType.Object;
+            if (result == JsMemberType.Unknown) {
+                return JsMemberType.Object;
             }
             return result;
         }
