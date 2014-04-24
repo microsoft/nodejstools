@@ -65,22 +65,6 @@ namespace Microsoft.NodejsTools.Analysis.Values {
                 return _name;
             }
         }
-
-        /// <summary>
-        /// Used for C# initializer syntax to initialize members of the
-        /// built-in function.
-        /// </summary>
-        public void Add(AnalysisValue member) {
-            Add(member.Name, member);
-        }
-
-        /// <summary>
-        /// Used for C# initializer syntax to initialize members of the
-        /// built-in function.
-        /// </summary>
-        public void Add(MemberAddInfo member) {
-            Add(member.Name, member.Value);
-        }
     }
 
     /// <summary>

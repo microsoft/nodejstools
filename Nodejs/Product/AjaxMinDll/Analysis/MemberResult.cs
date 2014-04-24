@@ -115,7 +115,6 @@ namespace Microsoft.NodejsTools.Analysis {
         }
 
         private JsMemberType GetMemberType() {
-            bool includesNull = false;
             JsMemberType result = JsMemberType.Unknown;
 
             var allVars = _vars().SelectMany(ns => {
@@ -136,7 +135,6 @@ namespace Microsoft.NodejsTools.Analysis {
                     (ns.TypeId == BuiltinTypeId.Null || 
                     nsType == JsMemberType.Undefined)) {
                     result = nsType;
-                    includesNull = true;
                 } else if (result == JsMemberType.Unknown || 
                     result == JsMemberType.Null || 
                     result == JsMemberType.Undefined) {

@@ -3309,7 +3309,6 @@ namespace Microsoft.NodejsTools.Parsing
             TokenWithSpan exprCtx = null;
             Expression expr = null;
 
-            TryItAgain:
             Expression ast = null;
             switch (m_currentToken.Token)
             {

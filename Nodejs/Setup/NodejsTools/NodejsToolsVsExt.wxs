@@ -95,12 +95,21 @@
             </Component>
 
             <Component Directory="INSTALLLOCATION" Guid="{B43D5044-D8D5-42A8-BAEF-1A7DBC21AAE6}">
-              <File Id="filMicrosoft.NodejsTools.AjaxMin.dll" KeyPath="yes" Source="$(var.BinariesDir)\Microsoft.NodejsTools.AjaxMin.dll" />
+              <File Id="filMicrosoft.NodejsTools.Analysis.dll" KeyPath="yes" Source="$(var.BinariesDir)\Microsoft.NodejsTools.Analysis.dll" />
             </Component>
             <Component Directory="VWD_INSTALLLOCATION" Guid="{A8DD116C-36C3-48B8-B1F4-88A145AC5066}">
-              <File Id="filVWDMicrosoft.NodejsTools.AjaxMin.dll" KeyPath="yes" Source="$(var.BinariesDir)\Microsoft.NodejsTools.AjaxMin.dll" />
+              <File Id="filVWDMicrosoft.NodejsTools.Analysis.dll" KeyPath="yes" Source="$(var.BinariesDir)\Microsoft.NodejsTools.Analysis.dll" />
               <Condition>VWD_EXTENSION_INSTALLPATH</Condition>
             </Component>
+
+            <Component Directory="INSTALLLOCATION" Guid="{B1C1D160-EFB9-45E2-AEFD-62AB2B5C2C22}">
+              <File Id="filall.json" KeyPath="yes" Source="$(var.BinariesDir)\all.json" />
+            </Component>
+            <Component Directory="VWD_INSTALLLOCATION" Guid="{10D381D3-261D-4C96-BBF0-7516357E3321}">
+              <File Id="filVWDall.json" KeyPath="yes" Source="$(var.BinariesDir)\all.json" />
+              <Condition>VWD_EXTENSION_INSTALLPATH</Condition>
+            </Component>
+
 
             <Component Directory="INSTALLLOCATION" Guid="{E78AE0F0-8705-4E33-9178-F85A3AC74032}">
               <File Id="filNewtonsoft.Json.dll" KeyPath="yes" Source="$(var.BinariesDir)\Newtonsoft.Json.dll" />

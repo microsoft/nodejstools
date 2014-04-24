@@ -121,7 +121,7 @@ namespace Microsoft.NodejsTools.Analysis.Analyzer {
 
         private EnvironmentRecord _currentScope;
 #else
-        public InterpreterScope Scope;
+        public EnvironmentRecord Scope;
 #endif
 
 #if FALSE
@@ -168,7 +168,7 @@ namespace Microsoft.NodejsTools.Analysis.Analyzer {
         };
 
         private static IAnalysisSet EvaluateThis(ExpressionEvaluator ee, Node node) {
-            return ee._currentScope.ThisValue;
+            return ee.Scope.ThisValue;
         }
 
         private static IAnalysisSet EvaluateArrayLiteral(ExpressionEvaluator ee, Node node) {

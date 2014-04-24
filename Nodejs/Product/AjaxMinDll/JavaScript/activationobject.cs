@@ -26,7 +26,6 @@ namespace Microsoft.NodejsTools.Parsing
         #region private fields
 
         private bool m_useStrict;//= false;
-        private bool m_isKnownAtCompileTime;
         private readonly ErrorSink _errorSink;
 
         #endregion
@@ -74,7 +73,6 @@ namespace Microsoft.NodejsTools.Parsing
 
         protected ActivationObject(ActivationObject parent, ErrorSink errorSink)
         {
-            m_isKnownAtCompileTime = true;
             m_useStrict = false;
 
             Parent = parent;

@@ -34,7 +34,6 @@ namespace Microsoft.NodejsTools.Analysis {
     public partial class JsAnalyzer : IGroupableAnalysisProject {
         private readonly ModuleTable _modules;
         internal readonly ProjectEntry _builtinEntry;
-        private readonly ConcurrentDictionary<string, ModuleValue> _modulesByFilename;
         private readonly HashSet<ModuleValue> _modulesWithUnresolvedImports;
         private readonly object _modulesWithUnresolvedImportsLock = new object();
         private readonly Dictionary<object, AnalysisValue> _itemCache;
@@ -46,7 +45,6 @@ namespace Microsoft.NodejsTools.Analysis {
         private readonly Deque<AnalysisUnit> _queue;
         private Action<int> _reportQueueSize;
         private int _reportQueueInterval;
-        //internal readonly IModuleContext _defaultContext;
         internal readonly AnalysisUnit _evalUnit;   // a unit used for evaluating when we don't otherwise have a unit available
         private readonly HashSet<string> _analysisDirs = new HashSet<string>(StringComparer.OrdinalIgnoreCase);
         private AnalysisLimits _limits;

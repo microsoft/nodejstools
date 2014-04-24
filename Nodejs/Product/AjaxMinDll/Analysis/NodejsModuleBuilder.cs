@@ -16,9 +16,9 @@ namespace NodeReferenceGenerator {
     class NodejsModuleBuilder {
         private readonly JavaScriptSerializer _serializer = new JavaScriptSerializer();
         private readonly dynamic _all;
-        private readonly string _filename;
+        //private readonly string _filename;
         private readonly JsAnalyzer _analyzer;
-        private Dictionary<string, string> _moduleDocs;
+        private Dictionary<string, string> _moduleDocs = new Dictionary<string,string>();
 
         public NodejsModuleBuilder(string filename, JsAnalyzer analyzer) {
             _all = _serializer.DeserializeObject(File.ReadAllText(filename));

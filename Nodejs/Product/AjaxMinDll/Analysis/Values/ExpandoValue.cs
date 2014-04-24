@@ -14,7 +14,7 @@ namespace Microsoft.NodejsTools.Analysis.Values {
         private readonly int _declVersion;
         internal readonly DependentKeyValue _keysAndValues;
         private Dictionary<string, PropertyDescriptor> _descriptors;
-        private VariableDef _keysVariable, _valuesVariable, _keyValueTupleVariable;
+//        private VariableDef _keysVariable, _valuesVariable, _keyValueTupleVariable;
 
         internal ExpandoValue(ProjectEntry projectEntry) {
             _projectEntry = projectEntry;
@@ -130,10 +130,10 @@ namespace Microsoft.NodejsTools.Analysis.Values {
 
         internal bool AddTypes(Node node, AnalysisUnit unit, IAnalysisSet key, IAnalysisSet value, bool enqueue = true) {
             if (_keysAndValues.AddTypes(unit, key, value, enqueue)) {
+#if FALSE
                 if (_keysVariable != null) {
                     _keysVariable.MakeUnionStrongerIfMoreThan(ProjectState.Limits.DictKeyTypes, value);
                     if (_keysVariable.AddTypes(unit, key, enqueue)) {
-#if FALSE
                         if (_keysIter != null)
                         {
                             _keysIter.UnionType = null;
@@ -142,13 +142,13 @@ namespace Microsoft.NodejsTools.Analysis.Values {
                         {
                             _keysList.UnionType = null;
                         }
-#endif
                     }
                 }
+#endif
+#if FALSE
                 if (_valuesVariable != null) {
                     _valuesVariable.MakeUnionStrongerIfMoreThan(ProjectState.Limits.DictValueTypes, value);
                     if (_valuesVariable.AddTypes(unit, value, enqueue)) {
-#if FALSE
                         if (_valuesIter != null)
                         {
                             _valuesIter.UnionType = null;
@@ -157,9 +157,9 @@ namespace Microsoft.NodejsTools.Analysis.Values {
                         {
                             _valuesList.UnionType = null;
                         }
-#endif
                     }
                 }
+#endif
 #if FALSE
                 if (_keyValueTuple != null)
                 {

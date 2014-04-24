@@ -160,7 +160,7 @@ namespace Microsoft.NodejsTools.Analysis.Analyzer {
             get { return _variables; }
         }
 
-        public IDictionary<Node, InterpreterScope> NodeScopes {
+        public IDictionary<Node, EnvironmentRecord> NodeScopes {
             get { return _nodeScopes; }
         }
 
