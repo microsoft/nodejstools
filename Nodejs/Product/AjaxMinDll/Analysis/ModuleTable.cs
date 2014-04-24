@@ -167,7 +167,11 @@ namespace Microsoft.NodejsTools.Analysis {
                 if (curTree.ModuleReference != null &&
                     curTree.ModuleReference.Module != null) {
                     var moduleScope = curTree.ModuleReference.Module.Scope;
-                    return moduleScope.CreateVariable(node, unit, "exports").Types;
+                    return moduleScope.Module.GetMember(
+                        node,
+                        unit,
+                        "exports"
+                    );
                 } else if(curTree.Parent != null) {
                     // No ModuleReference, this is a folder, check and see
                     // if we have the default package file (either index.js

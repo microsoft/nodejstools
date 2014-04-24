@@ -224,7 +224,7 @@
     <Compile Include="Analysis\Values\ObjectValue.cs" />
     <Compile Include="Analysis\Values\MemberReferences.cs" />
     <Compile Include="Analysis\Values\MergeStrengths.cs" />
-    <Compile Include="Analysis\Values\ModuleInfo.cs" />
+    <Compile Include="Analysis\Values\ModuleValue.cs" />
     <Compile Include="Analysis\Values\UserFunctionValue.cs" />
     <Compile Include="Analysis\Values\Utils.cs" />
     <Compile Include="Analysis\VariableDef.cs" />

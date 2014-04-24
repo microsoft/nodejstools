@@ -35,7 +35,7 @@ namespace Microsoft.NodejsTools.Analysis {
     /// </summary>
     public class AnalysisUnit : ISet<AnalysisUnit> {
         internal EnvironmentRecord _scope;
-        private ModuleInfo _declaringModule;
+        private ModuleValue _declaringModule;
 #if DEBUG
         private long _analysisTime;
         private long _analysisCount;
@@ -71,7 +71,7 @@ namespace Microsoft.NodejsTools.Analysis {
         /// </summary>
         public readonly bool ForEval;
 
-        internal virtual ModuleInfo GetDeclaringModule() {
+        internal virtual ModuleValue GetDeclaringModule() {
             if (_scope != null) {
                 var moduleScope = _scope.EnumerateTowardsGlobal.OfType<ModuleScope>().FirstOrDefault();
                 if (moduleScope != null) {
@@ -84,7 +84,7 @@ namespace Microsoft.NodejsTools.Analysis {
         /// <summary>
         /// The global scope that the code associated with this analysis unit is declared within.
         /// </summary>
-        internal ModuleInfo DeclaringModule {
+        internal ModuleValue DeclaringModule {
             get {
                 if (_declaringModule == null) {
                     _declaringModule = GetDeclaringModule();

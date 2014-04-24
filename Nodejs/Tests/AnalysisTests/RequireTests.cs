@@ -34,6 +34,15 @@ namespace AnalysisTests {
             );
         }
 
+        // TODO: Negative tests
+        // module = {}
+        // module.exports = 42;
+        
+        //  and
+        // exports = 42
+        // Both should result in the original exports being seen, not the 
+        // assigned exports.
+
         [TestMethod]
         public void TestRequireSimple() {
             var mod1 = @"exports.foo = 42;";

@@ -89,7 +89,7 @@ namespace Microsoft.NodejsTools.Analysis.Analyzer {
             ((FunctionScope)Scope).AddParameterReferences(caller, names);
         }
 
-        internal override ModuleInfo GetDeclaringModule() {
+        internal override ModuleValue GetDeclaringModule() {
             return base.GetDeclaringModule() ?? _declUnit.DeclaringModule;
         }
 

@@ -19,11 +19,11 @@ using Microsoft.NodejsTools.Analysis.Values;
 
 namespace Microsoft.NodejsTools.Analysis {
     class ModuleReference {
-        public ModuleInfo Module;
+        public ModuleValue Module;
 
-        private readonly Lazy<HashSet<ModuleInfo>> _references = new Lazy<HashSet<ModuleInfo>>();
+        private readonly Lazy<HashSet<ModuleValue>> _references = new Lazy<HashSet<ModuleValue>>();
 
-        public ModuleReference(ModuleInfo module = null) {
+        public ModuleReference(ModuleValue module = null) {
             Module = module;
         }
 
@@ -33,11 +33,11 @@ namespace Microsoft.NodejsTools.Analysis {
             }
         }
 
-        public bool AddReference(ModuleInfo module) {
+        public bool AddReference(ModuleValue module) {
             return _references.Value.Add(module);
         }
 
-        public bool RemoveReference(ModuleInfo module) {
+        public bool RemoveReference(ModuleValue module) {
             return _references.IsValueCreated && _references.Value.Remove(module);
         }
 
@@ -47,9 +47,9 @@ namespace Microsoft.NodejsTools.Analysis {
             }
         }
 
-        public IEnumerable<ModuleInfo> References {
+        public IEnumerable<ModuleValue> References {
             get {
-                return _references.IsValueCreated ? _references.Value : Enumerable.Empty<ModuleInfo>();
+                return _references.IsValueCreated ? _references.Value : Enumerable.Empty<ModuleValue>();
             }
         }
     }

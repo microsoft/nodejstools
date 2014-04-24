@@ -47,29 +47,26 @@ namespace Microsoft.NodejsTools.Analysis.Values {
         }
 
         public override IAnalysisSet GetMember(Node node, AnalysisUnit unit, string name) {
-            // Must unconditionally call the base implementation of GetMember
-            var ignored = base.GetMember(node, unit, name);
-
+            if (_descriptors == null) {
+                _descriptors = new Dictionary<string, PropertyDescriptor>();
+            }
             PropertyDescriptor desc;
-            if (_descriptors != null && _descriptors.TryGetValue(name, out desc)) {
-                var res = AnalysisSet.Empty;
-                if (desc.Values != null) {
-                    desc.Values.AddDependency(unit);
-                    desc.Values.AddReference(node, unit);
-
-                    res = desc.Values.Types;
-                }
-
-                if (desc.Get != null) {
-                    res = res.Union(desc.Get.TypesNoCopy.Call(node, unit, AnalysisSet.Empty, ExpressionEvaluator.EmptySets));
-                }
-                return res;
+            if (!_descriptors.TryGetValue(name, out desc)) {
+                _descriptors[name] = desc = new PropertyDescriptor();
+            }
+            if (desc.Values == null) {
+                desc.Values = new EphemeralVariableDef();
             }
 
-#if FALSE
-            return ProjectState.ClassInfos[BuiltinTypeId.Function].GetMember(node, unit, name);
-#endif
-            return AnalysisSet.Empty;
+            desc.Values.AddDependency(unit);
+            desc.Values.AddReference(node, unit);
+
+            var res = desc.Values.Types;
+
+            if (desc.Get != null) {
+                res = res.Union(desc.Get.TypesNoCopy.Call(node, unit, AnalysisSet.Empty, ExpressionEvaluator.EmptySets));
+            }
+            return res;
         }
 
         public override void SetMember(Node node, AnalysisUnit unit, string name, IAnalysisSet value) {

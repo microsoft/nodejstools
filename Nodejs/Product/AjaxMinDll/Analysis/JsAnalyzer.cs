@@ -34,8 +34,8 @@ namespace Microsoft.NodejsTools.Analysis {
     public partial class JsAnalyzer : IGroupableAnalysisProject {
         private readonly ModuleTable _modules;
         internal readonly ProjectEntry _builtinEntry;
-        private readonly ConcurrentDictionary<string, ModuleInfo> _modulesByFilename;
-        private readonly HashSet<ModuleInfo> _modulesWithUnresolvedImports;
+        private readonly ConcurrentDictionary<string, ModuleValue> _modulesByFilename;
+        private readonly HashSet<ModuleValue> _modulesWithUnresolvedImports;
         private readonly object _modulesWithUnresolvedImportsLock = new object();
         private readonly Dictionary<object, AnalysisValue> _itemCache;
         internal readonly NullValue _nullInst;
@@ -57,7 +57,7 @@ namespace Microsoft.NodejsTools.Analysis {
 
         public JsAnalyzer() {
             _modules = new ModuleTable(this);
-            _modulesWithUnresolvedImports = new HashSet<ModuleInfo>();
+            _modulesWithUnresolvedImports = new HashSet<ModuleValue>();
             _itemCache = new Dictionary<object, AnalysisValue>();
             _builtinEntry = new ProjectEntry(this, "", null);
 
@@ -97,7 +97,7 @@ namespace Microsoft.NodejsTools.Analysis {
                 NodejsModuleBuilder.Build(allJson, this);
             }
 
-            _evalUnit = new AnalysisUnit(null, null, new ModuleInfo("$global", _builtinEntry).Scope, true);
+            _evalUnit = new AnalysisUnit(null, null, new ModuleValue("$global", _builtinEntry).Scope, true);
             AnalysisLog.NewUnit(_evalUnit);
         }
 
@@ -116,7 +116,7 @@ namespace Microsoft.NodejsTools.Analysis {
             var entry = new ProjectEntry(this, filePath, cookie);
 
             var moduleRef = Modules.GetOrAdd(filePath);
-            moduleRef.Module = entry.MyScope;
+            moduleRef.Module = entry.ModuleValue;
 
             return entry;
         }

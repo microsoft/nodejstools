@@ -18,7 +18,7 @@ using Microsoft.NodejsTools.Parsing;
 namespace Microsoft.NodejsTools.Analysis.Analyzer {
     sealed class ModuleScope : EnvironmentRecord {
 
-        public ModuleScope(ModuleInfo moduleInfo)
+        public ModuleScope(ModuleValue moduleInfo)
             : base(moduleInfo, null) {
         }
 
@@ -26,19 +26,10 @@ namespace Microsoft.NodejsTools.Analysis.Analyzer {
             : base(scope.AnalysisValue, scope, true) {
         }
 
-        public ModuleInfo Module { get { return AnalysisValue as ModuleInfo; } }
+        public ModuleValue Module { get { return AnalysisValue as ModuleValue; } }
 
         public override string Name {
             get { return Module.Name; }
-        }
-
-        public override bool AssignVariable(string name, Node location, AnalysisUnit unit, IAnalysisSet values) {
-            if (base.AssignVariable(name, location, unit, values)) {
-                Module.ModuleDefinition.EnqueueDependents();
-                return true;
-            }
-
-            return false;
         }
 
         public ModuleScope CloneForPublish() {

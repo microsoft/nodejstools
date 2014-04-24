@@ -95,7 +95,7 @@ namespace Microsoft.NodejsTools.Analysis.Analyzer {
 
         #region Implementation Details
 
-        private ModuleInfo GlobalScope {
+        private ModuleValue GlobalScope {
             get { return _unit.DeclaringModule; }
         }
 

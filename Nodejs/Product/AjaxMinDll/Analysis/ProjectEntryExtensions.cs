@@ -16,9 +16,9 @@ using Microsoft.NodejsTools.Analysis.Values;
 
 namespace Microsoft.NodejsTools.Analysis {
     static class ProjectEntryExtensions {
-        public static ModuleInfo GetModuleInfo(this IJsProjectEntry entry) {
+        public static ModuleValue GetModuleInfo(this IJsProjectEntry entry) {
             var pe = entry as ProjectEntry;
-            return pe != null ? pe.MyScope : null;
+            return pe != null ? pe.ModuleValue : null;
         }
     }
 }

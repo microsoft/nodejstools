@@ -33,7 +33,7 @@ namespace Microsoft.NodejsTools.Analysis {
     internal sealed class ProjectEntry : IJsProjectEntry {
         private readonly JsAnalyzer _analyzer;
         private readonly string _filePath;
-        private readonly ModuleInfo _myScope;
+        private readonly ModuleValue _module;
         private IAnalysisCookie _cookie;
         private JsAst _tree;
         private ModuleAnalysis _currentAnalysis;
@@ -50,9 +50,9 @@ namespace Microsoft.NodejsTools.Analysis {
             _analyzer = analyzer;
             _filePath = filePath;
             _cookie = cookie;
-            _myScope = new ModuleInfo(filePath, this);
+            _module = new ModuleValue(filePath, this);
             
-            _unit = new AnalysisUnit(_tree, _myScope.Scope);
+            _unit = new AnalysisUnit(_tree, _module.Scope);
             AnalysisLog.NewUnit(_unit);
         }
 
@@ -171,12 +171,12 @@ namespace Microsoft.NodejsTools.Analysis {
                 return;
             }
 
-            _unit = new AnalysisUnit(tree, _myScope.Scope);
+            _unit = new AnalysisUnit(tree, _module.Scope);
             AnalysisLog.NewUnit(_unit);
 
-            MyScope.Scope.Children.Clear();
-            MyScope.Scope.ClearNodeScopes();
-            MyScope.Scope.ClearNodeValues();
+            ModuleValue.Scope.Children.Clear();
+            ModuleValue.Scope.ClearNodeScopes();
+            ModuleValue.Scope.ClearNodeValues();
 #if FALSE
             MyScope.ClearUnresolvedModules();
 #endif
@@ -206,14 +206,14 @@ namespace Microsoft.NodejsTools.Analysis {
         private void InitNodejsVariables() {
             var filename = _analyzer.GetConstant(_filePath);
             var dirName = _analyzer.GetConstant("");
-            var module = new ObjectValue(this);
+            var module = _module;
             var exports = new ExportsValue(_filePath, this);
             module.Add("exports", exports);
 
-            MyScope.Scope.GetOrAddVariable("__dirname").AddTypes(this, dirName);
-            MyScope.Scope.GetOrAddVariable("__filename").AddTypes(this, filename);
-            MyScope.Scope.GetOrAddVariable("exports").AddTypes(this, exports);
-            MyScope.Scope.GetOrAddVariable("module").AddTypes(this, module);
+            ModuleValue.Scope.GetOrAddVariable("__dirname").AddTypes(this, dirName);
+            ModuleValue.Scope.GetOrAddVariable("__filename").AddTypes(this, filename);
+            ModuleValue.Scope.GetOrAddVariable("exports").AddTypes(this, exports);
+            ModuleValue.Scope.GetOrAddVariable("module").AddTypes(this, module);
         }
 
         public IGroupableAnalysisProject AnalysisGroup {
@@ -246,8 +246,8 @@ namespace Microsoft.NodejsTools.Analysis {
             get { return _tree; }
         }
 
-        internal ModuleInfo MyScope {
-            get { return _myScope; }
+        internal ModuleValue ModuleValue {
+            get { return _module; }
         }
 
 #if FALSE

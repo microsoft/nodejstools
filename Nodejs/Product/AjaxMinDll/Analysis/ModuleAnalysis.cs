@@ -355,7 +355,7 @@ namespace Microsoft.NodejsTools.Analysis {
         /// <summary>
         /// Gets the top-level scope for the module.
         /// </summary>
-        internal ModuleInfo GlobalScope {
+        internal ModuleValue ModuleValue {
             get {
                 var result = (ModuleScope)Scope;
                 return result.Module;
@@ -363,7 +363,7 @@ namespace Microsoft.NodejsTools.Analysis {
         }
 
         public JsAnalyzer ProjectState {
-            get { return GlobalScope.ProjectEntry.Analyzer; }
+            get { return ModuleValue.ProjectEntry.Analyzer; }
         }
 
         internal EnvironmentRecord Scope {
