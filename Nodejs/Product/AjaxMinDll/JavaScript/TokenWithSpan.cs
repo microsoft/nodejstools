@@ -20,8 +20,8 @@ namespace Microsoft.NodejsTools.Parsing {
     /// Represents a JavaScript token with a span.
     /// </summary>
     public class TokenWithSpan {
-        private int _startPosition, _endPosition;
-        internal JSToken _token;    // TODO: EOF handling prevents this from being readonly
+        private readonly int _startPosition, _endPosition;
+        private readonly JSToken _token;
         private readonly IndexResolver _indexResolver;
 
         internal TokenWithSpan() {
@@ -34,14 +34,23 @@ namespace Microsoft.NodejsTools.Parsing {
             _indexResolver = indexResolver;
         }
 
+        public TokenWithSpan(TokenWithSpan currentToken, JSToken newToken) {
+            _indexResolver = currentToken._indexResolver;
+            _startPosition = currentToken._startPosition;
+            _endPosition = currentToken._endPosition;
+            _token = newToken;
+        }
+
         /// <summary>
         /// Gets the 0 based starting position
         /// </summary>
         public int StartPosition { get { return _startPosition; } }
+
         /// <summary>
         /// Gets the 0 based end position
         /// </summary>
         public int EndPosition { get { return _endPosition; } }
+
         /// <summary>
         /// Gets the token
         /// </summary>
@@ -95,15 +104,6 @@ namespace Microsoft.NodejsTools.Parsing {
             }
         }
 
-        public TokenWithSpan Clone() {
-            return new TokenWithSpan(
-                _indexResolver,
-                StartPosition,
-                EndPosition,
-                Token
-            );
-        }
-
         public TokenWithSpan FlattenToStart() {
             return new TokenWithSpan(
                 _indexResolver,
@@ -124,7 +124,7 @@ namespace Microsoft.NodejsTools.Parsing {
 
         public TokenWithSpan CombineWith(TokenWithSpan other) {
             if (other == null) {
-                return Clone();
+                return this;
             }
 
             return new TokenWithSpan(
@@ -140,13 +140,18 @@ namespace Microsoft.NodejsTools.Parsing {
         /// </summary>
         public TokenWithSpan UpdateWith(TokenWithSpan other) {
             if (other != null) {
-                if (other.StartPosition < this.StartPosition) {
-                    _startPosition = other.StartPosition;
+                int startPosition = StartPosition;
+                int endPosition = EndPosition;
+
+                if (other.StartPosition < StartPosition) {
+                    startPosition = other.StartPosition;
                 }
 
-                if (other.EndPosition > this.EndPosition) {
-                    _endPosition = other.EndPosition;
+                if (other.EndPosition > EndPosition) {
+                    endPosition = other.EndPosition;
                 }
+
+                return new TokenWithSpan(_indexResolver, startPosition, endPosition, Token);
             }
 
             return this;

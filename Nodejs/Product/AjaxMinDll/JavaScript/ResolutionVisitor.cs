@@ -256,7 +256,7 @@ namespace Microsoft.NodejsTools.Parsing
                 // set up a ghost field to keep track of the relationship
                 ghostField = new JSVariableField(FieldType.GhostCatch, catchParameter.Name, 0, null)
                 {
-                    OriginalContext = catchParameter.Context.Clone()
+                    OriginalContext = catchParameter.Context
                 };
 
                 scope.AddField(ghostField);
@@ -314,7 +314,7 @@ namespace Microsoft.NodejsTools.Parsing
                 // nothing; good to go. Add a ghosted field to keep track of it.
                 ghostField = new JSVariableField(FieldType.GhostFunction, funcObject.Name, 0, funcObject)
                 {
-                    OriginalContext = functionField.OriginalContext.Clone(),
+                    OriginalContext = functionField.OriginalContext,
                     CanCrunch = funcObject.VariableField.IfNotNull(v => v.CanCrunch)
                 };
 

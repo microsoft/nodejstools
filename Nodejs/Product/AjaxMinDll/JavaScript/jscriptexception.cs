@@ -213,7 +213,7 @@ namespace Microsoft.NodejsTools.Parsing
         internal JScriptException(JSError errorNumber, TokenWithSpan context)
         {
             m_valueObject = null;
-            m_context = (context == null ? null : context.Clone());
+            m_context = (context == null ? null : context);
             m_errorCode = errorNumber;
             SetHResult();
         }

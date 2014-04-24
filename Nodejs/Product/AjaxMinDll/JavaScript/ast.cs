@@ -115,7 +115,7 @@ namespace Microsoft.NodejsTools.Parsing
             {
                 // it's not a block, so create a new block, append the astnode
                 // and return the block
-                block = new Block(node.Context.Clone(), node.Parser);
+                block = new Block(node.Context, node.Parser);
                 block.Append(node);
             }
 
@@ -249,7 +249,7 @@ namespace Microsoft.NodejsTools.Parsing
                 }
                 else
                 {
-                    this.Context.UpdateWith(context);
+                    Context = Context.UpdateWith(context);
                 }
             }
         }

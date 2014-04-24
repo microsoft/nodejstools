@@ -35,7 +35,7 @@ namespace Microsoft.NodejsTools.Parsing
                 throw new ArgumentNullException("context");
             }
 
-            m_context = context.Clone();
+            m_context = context;
         }
 
         #region scope setup methods

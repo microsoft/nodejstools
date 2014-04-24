@@ -125,7 +125,7 @@ namespace Microsoft.NodejsTools.Parsing
           // not another list
           node.Parent = this;
           m_list.Add(node);
-          Context.UpdateWith(node.Context);
+          Context = Context.UpdateWith(node.Context);
         }
 
         return this;
@@ -147,7 +147,7 @@ namespace Microsoft.NodejsTools.Parsing
           // not another list
           node.Parent = this;
           m_list.Insert(position, (T)node);
-          Context.UpdateWith(node.Context);
+          Context = Context.UpdateWith(node.Context);
         }
 
         return this;

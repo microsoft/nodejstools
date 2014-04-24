@@ -77,7 +77,7 @@ namespace Microsoft.NodejsTools.Parsing
             // add a field for the function expression name so it can be self-referencing.
             var functionField = this.CreateField(FunctionObject.Name, FunctionObject, 0);
             functionField.IsFunction = true;
-            functionField.OriginalContext = FunctionObject.IdContext.Clone();
+            functionField.OriginalContext = FunctionObject.IdContext;
 
             FunctionObject.VariableField = functionField;
 
@@ -99,7 +99,7 @@ namespace Microsoft.NodejsTools.Parsing
                         argumentField = new JSVariableField(FieldType.Argument, parameter.Name, 0, null)
                         {
                             Position = parameter.Position,
-                            OriginalContext = parameter.Context.Clone(),
+                            OriginalContext = parameter.Context,
                             CanCrunch = !parameter.RenameNotAllowed
                         };
 

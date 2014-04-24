@@ -141,7 +141,7 @@ namespace Microsoft.NodejsTools.Parsing
                     // no collision - create the catch-error field
                     field = new JSVariableField(FieldType.CatchError, nameDecl.Name, 0, null)
                     {
-                        OriginalContext = nameDecl.NameContext.Clone(),
+                        OriginalContext = nameDecl.NameContext,
                         IsDeclared = true
                     };
 
@@ -160,7 +160,7 @@ namespace Microsoft.NodejsTools.Parsing
                 {
                     // could be global or local depending on the scope, so let the scope create it.
                     field = this.CreateField(nameDecl.Name, null, 0);
-                    field.OriginalContext = nameDecl.NameContext.Clone();
+                    field.OriginalContext = nameDecl.NameContext;
                     field.IsDeclared = true;
                     field.IsFunction = (nameDecl is FunctionObject);
                     field.FieldValue = fieldValue;
