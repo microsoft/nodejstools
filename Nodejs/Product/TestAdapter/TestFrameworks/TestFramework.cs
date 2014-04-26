@@ -22,9 +22,9 @@ using Microsoft.VisualStudioTools.Project;
 
 namespace Microsoft.NodejsTools.TestAdapter.TestFrameworks {
     class TestFramework {
-        private string _vsixScriptFolder;
-        private string _findTestsScriptFile;
-        private string _runTestsScriptFile;
+        private readonly string _vsixScriptFolder;
+        private readonly string _findTestsScriptFile;
+        private readonly string _runTestsScriptFile;
 
         public TestFramework(string vsixScriptFolder) {
             _vsixScriptFolder = vsixScriptFolder;
@@ -77,7 +77,6 @@ namespace Microsoft.NodejsTools.TestAdapter.TestFrameworks {
                 WrapWithQuot(testName),
                 WrapWithQuot(testFile),
                 WrapWithQuot(workingDirectory)
-
             };
         }
 

@@ -18,18 +18,20 @@ using System.IO;
 using System.Linq;
 
 namespace Microsoft.NodejsTools.TestAdapter.TestFrameworks {
-    //TODO, this should be an application level global object, where to put it?
     class FrameworkDiscover {
-        private List<TestFramework> _framworks;
-        private TestFramework Default = null;
+        private readonly Dictionary<String, TestFramework> _framworks;
+        private readonly TestFramework Default;
         public FrameworkDiscover() {
             string installFolder = GetExecutingAssemblyPath();
-            _framworks = new List<TestFramework>();
+            _framworks = new Dictionary<string, TestFramework>();
             foreach (string directory in Directory.GetDirectories(installFolder + @"\TestFrameworks")) {
                 TestFramework fx = new TestFramework(directory);
-                _framworks.Add(fx);
+                _framworks.Add(fx.Name, fx);
             }
             Default = Search("generic");
+            if (Default == null) {
+                throw new InvalidOperationException("Missing generic test framework");
+            }
         }
 
         public TestFramework Get(string frameworkName) {
@@ -41,11 +43,11 @@ namespace Microsoft.NodejsTools.TestAdapter.TestFrameworks {
         }
 
         private TestFramework Search(string frameworkName) {
-            TestFramework matched = _framworks.FirstOrDefault((p) => { 
-                return p.Name.Equals(frameworkName, StringComparison.OrdinalIgnoreCase); 
-            });
-            return matched;
+            TestFramework testFX = null;
+            _framworks.TryGetValue(frameworkName, out testFX);
+            return testFX;
         }
+
         private string GetExecutingAssemblyPath() {
             string codeBase = System.Reflection.Assembly.GetExecutingAssembly().CodeBase;
             UriBuilder uri = new UriBuilder(codeBase);
