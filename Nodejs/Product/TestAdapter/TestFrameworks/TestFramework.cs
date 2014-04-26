@@ -14,6 +14,7 @@
 
 using System;
 using System.Diagnostics;
+using System.Collections.Generic;
 using System.IO;
 using System.Threading;
 using Microsoft.VisualStudio.TestPlatform.ObjectModel.Logging;
@@ -33,18 +34,18 @@ namespace Microsoft.NodejsTools.TestAdapter.TestFrameworks {
         }
 
         public string Name { get; private set; }
-        public string FindTests(string testFile,
+        public List<NodejsTestInfo> FindTests(string testFile,
             string nodeExe,
             IMessageLogger logger, 
             string workingDirectory) {
 
-            string tests = string.Empty;
+            string testNames = string.Empty;
             string discoverResultFile = Path.GetTempFileName();
             try {
                 EvaluateJavaScript(nodeExe, testFile, discoverResultFile, logger, workingDirectory);
                 for (int i = 0; i < 4; i++) {
                     try {
-                        tests = File.ReadAllText(discoverResultFile);
+                        testNames = File.ReadAllText(discoverResultFile);
                         break;
                     } catch (IOException) {
                         //We took an error processing the file.  Wait a few and try again
@@ -59,7 +60,13 @@ namespace Microsoft.NodejsTools.TestAdapter.TestFrameworks {
                     //We leave the file behind in this case, its in TEMP so eventually OS will clean up
                 }
             }
-            return tests;
+
+            List<NodejsTestInfo> testCases = new List<NodejsTestInfo>();
+            foreach (var testName in testNames.Split(new[] { "\r\n", "\r", "\n" }, StringSplitOptions.RemoveEmptyEntries)) {
+                NodejsTestInfo test = new NodejsTestInfo(testFile, testName, Name);
+                testCases.Add(test);
+            }
+            return testCases;
         }
 
         public string[] ArgumentsToRunTests(string testName, string testFile, string workingDirectory) {

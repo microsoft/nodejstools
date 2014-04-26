@@ -109,14 +109,9 @@ namespace Microsoft.NodejsTools.TestAdapter {
         }
 
         private IEnumerable<string> GetInterpreterArgs(TestCase test, string workingDir) {
-            string testFile;
-            string testClass;
-            string testMethod;
-            string testFramework;
-            TestDiscoverer.ParseFullyQualifiedTestName(test.FullyQualifiedName, out testFile, out testClass, out testMethod, out testFramework);
-
+            TestFrameworks.NodejsTestInfo testInfo = new TestFrameworks.NodejsTestInfo(test.FullyQualifiedName);
             TestFrameworks.FrameworkDiscover discover = new TestFrameworks.FrameworkDiscover();
-            return discover.Get(testFramework).ArgumentsToRunTests(testMethod, testFile, workingDir);
+            return discover.Get(testInfo.TestFramework).ArgumentsToRunTests(testInfo.TestName, testInfo.ModulePath, workingDir);
         }
 
         private static IEnumerable<string> GetDebugArgs(NodejsProjectSettings settings, out string secret, out int port) {

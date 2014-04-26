@@ -87,23 +87,19 @@ namespace Microsoft.NodejsTools.TestAdapter {
 
                             logger.SendMessage(TestMessageLevel.Informational, String.Format("Processing {0}", fileAbsolutePath));
 
-                            string testCases = testFramework.FindTests(fileAbsolutePath, nodeExePath, logger, projectHome);
+                            List<TestFrameworks.NodejsTestInfo> discoveredTestCases = testFramework.FindTests(fileAbsolutePath, nodeExePath, logger, projectHome);
 
-                            if (String.IsNullOrEmpty(testCases)) {
+                            if (discoveredTestCases.Count == 0) {
                                 logger.SendMessage(TestMessageLevel.Warning, String.Format("Discovered 0 testcases in: {0}", fileAbsolutePath));
                             } else {
-                                foreach (var testFunction in testCases.Split(new[] { "\r\n", "\r", "\n" }, StringSplitOptions.RemoveEmptyEntries)) {
-                                    //TestCase Qualified name format
-                                    //Path::ModuleName::TestName:TestFramework
-                                    string testName = MakeFullyQualifiedTestName(fileAbsolutePath, Path.GetFileNameWithoutExtension(fileAbsolutePath), testFunction, testFramework.Name);
-
-                                    logger.SendMessage(TestMessageLevel.Informational, String.Format("Creating TestCase:{0}", testName));
-                                    var testCase = new TestCase(testName, TestExecutor.ExecutorUri, projSource) {
+                                foreach (var discoveredTest in discoveredTestCases) {
+                                    string qualifiedName = discoveredTest.FullyQualifiedName;
+                                    logger.SendMessage(TestMessageLevel.Informational, String.Format("Creating TestCase:{0}", qualifiedName));
+                                    var testCase = new TestCase(qualifiedName, TestExecutor.ExecutorUri, projSource) {
                                         CodeFilePath = fileAbsolutePath,
                                         LineNumber = 0,
-                                        DisplayName = testFunction
+                                        DisplayName = discoveredTest.TestName
                                     };
-
                                     discoverySink.SendTestCase(testCase);
                                 }
                             }
@@ -122,19 +118,6 @@ namespace Microsoft.NodejsTools.TestAdapter {
             //Debug.Fail("Before Discover");
             TestFrameworks.FrameworkDiscover discover = new TestFrameworks.FrameworkDiscover();
             return discover.Get(testFramework);
-        }
-
-        internal static string MakeFullyQualifiedTestName(string modulePath, string className, string methodName, string testFramework) {
-            return modulePath + "::" + className + "::" + methodName + "::" + testFramework;
-        }
-
-        internal static void ParseFullyQualifiedTestName(string fullyQualifiedName, out string modulePath, out string className, out string methodName, out string testFramework) {
-            string[] parts = fullyQualifiedName.Split(new string[] { "::" }, StringSplitOptions.None);
-            Debug.Assert(parts.Length == 4);
-            modulePath = parts[0];
-            className = parts[1];
-            methodName = parts[2];
-            testFramework = parts[3];
         }
 
         internal static MSBuild.Project LoadProject(MSBuild.ProjectCollection buildEngine, string fullProjectPath) {

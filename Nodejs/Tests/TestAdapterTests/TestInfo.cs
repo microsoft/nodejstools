@@ -16,6 +16,7 @@ extern alias ta;
 using System;
 using System.IO;
 using Microsoft.NodejsTools.TestAdapter;
+using Microsoft.NodejsTools.TestAdapter.TestFrameworks;
 using Microsoft.VisualStudio.TestPlatform.ObjectModel;
 using ta::Microsoft.VisualStudioTools;
 using TestUtilities;
@@ -59,7 +60,7 @@ namespace TestAdapterTests {
 
         public TestCase TestCase {
             get {
-                var expectedFullyQualifiedName = TestDiscoverer.MakeFullyQualifiedTestName(RelativeClassFilePath, ClassName, MethodName, "Default");
+                var expectedFullyQualifiedName = new NodejsTestInfo(RelativeClassFilePath, MethodName, "Generic").FullyQualifiedName;
                 var tc = new TestCase(expectedFullyQualifiedName, new Uri(TestExecutor.ExecutorUriString), this.ProjectFilePath);
                 tc.CodeFilePath = SourceCodeFilePath;
                 tc.LineNumber = SourceCodeLineNumber;

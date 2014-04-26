@@ -142,6 +142,7 @@
     <Compile Include="..\..\..\Common\Product\TestAdapter\TestFilesUpdateWatcher.cs">
       <Link>TestFilesUpdateWatcher.cs</Link>
     </Compile>
+    <Compile Include="TestFrameworks\NodejsTestInfo.cs" />
     <Compile Include="TestFrameworks\TestFramework.cs" />
     <Compile Include="TestFrameworks\FrameworkDiscover.cs" />
     <Compile Include="TestMethodResolver.cs" />
