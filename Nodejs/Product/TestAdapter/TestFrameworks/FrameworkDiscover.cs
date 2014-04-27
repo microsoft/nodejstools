@@ -15,7 +15,8 @@
 using System;
 using System.Collections.Generic;
 using System.IO;
-using System.Linq;
+
+using Microsoft.VisualStudioTools.Project;
 
 namespace Microsoft.NodejsTools.TestAdapter.TestFrameworks {
     class FrameworkDiscover {
@@ -23,12 +24,17 @@ namespace Microsoft.NodejsTools.TestAdapter.TestFrameworks {
         private readonly TestFramework Default;
         public FrameworkDiscover() {
             string installFolder = GetExecutingAssemblyPath();
-            _framworks = new Dictionary<string, TestFramework>();
-            foreach (string directory in Directory.GetDirectories(installFolder + @"\TestFrameworks")) {
-                TestFramework fx = new TestFramework(directory);
+            _framworks = new Dictionary<string, TestFramework>(StringComparer.OrdinalIgnoreCase);
+            string baseTestframeworkFolder = installFolder + @"\TestFrameworks";
+            foreach (TestFrameworkType testFX in (TestFrameworkType[])Enum.GetValues(typeof(TestFrameworkType))) {
+                TestFramework fx = new TestFramework(Path.Combine(baseTestframeworkFolder, testFX.ToString()));
                 _framworks.Add(fx.Name, fx);
+                //the default value of the enum has the integer value of 0, 
+                //and it is associated with the default test frammework 
+                if (testFX == 0) {
+                    Default = fx;
+                }
             }
-            Default = Search("generic");
             if (Default == null) {
                 throw new InvalidOperationException("Missing generic test framework");
             }

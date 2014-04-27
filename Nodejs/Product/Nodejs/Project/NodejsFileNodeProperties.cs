@@ -19,6 +19,7 @@ using System.Diagnostics;
 using System.Diagnostics.CodeAnalysis;
 using System.Globalization;
 using System.IO;
+using System.Linq;
 using System.Runtime.InteropServices;
 using Microsoft.VisualStudio;
 using Microsoft.VisualStudioTools.Project;
@@ -39,7 +40,8 @@ namespace Microsoft.NodejsTools.Project {
         [SRCategoryAttribute(SR.Advanced)]
         [LocDisplayName(SR.TestFramework)]
         [SRDescriptionAttribute(SR.TestFrameworkDescription)]
-        public string TestFramework {
+        [TypeConverter(typeof(TestFrameworkStringConverter))]
+        public string ItemTestFramework {
             get {
                 var framework = this.HierarchyNode.ItemNode.GetMetadata(SR.TestFramework);
                 if (String.IsNullOrWhiteSpace(framework)) {
@@ -49,6 +51,24 @@ namespace Microsoft.NodejsTools.Project {
             }
             set {
                 this.HierarchyNode.ItemNode.SetMetadata(SR.TestFramework, value.ToString());
+            }
+        }
+
+        /// <summary>
+        /// Specifies the build action as a TestFrameworkType so that automation can get the
+        /// expected enum value.
+        /// </summary>
+        [Browsable(false)]
+        public TestFrameworkType TestFramework {
+            get {
+                var res = TestFrameworkStringConverter.Instance.ConvertFromString(HierarchyNode.ItemNode.ItemTypeName);
+                if (res is TestFrameworkType) {
+                    return (TestFrameworkType)res;
+                }
+                return TestFrameworkType.Default;
+            }
+            set {
+                this.HierarchyNode.ItemNode.ItemTypeName = TestFrameworkTypeConverter.Instance.ConvertToString(value);
             }
         }
     }
@@ -74,6 +94,95 @@ namespace Microsoft.NodejsTools.Project {
 
                 this.HierarchyNode.ItemNode.SetMetadata(SR.TestFramework, value.ToString());
             }
+        }
+    }
+
+    class TestFrameworkTypeConverter : StringConverter {
+        internal static readonly TestFrameworkTypeConverter Instance = new TestFrameworkTypeConverter();
+
+        public TestFrameworkTypeConverter() {
+        }
+
+        public override bool GetStandardValuesSupported(ITypeDescriptorContext context) {
+            return true;
+        }
+
+        public override bool CanConvertFrom(ITypeDescriptorContext context, Type sourceType) {
+            if (sourceType == typeof(string)) {
+                return true;
+            }
+            return base.CanConvertFrom(context, sourceType);
+        }
+
+        public override bool CanConvertTo(ITypeDescriptorContext context, Type destinationType) {
+            return base.CanConvertTo(context, destinationType);
+        }
+
+        public override object ConvertTo(ITypeDescriptorContext context, CultureInfo culture, object value, Type destinationType) {
+            if (destinationType == typeof(string)) {
+                switch ((TestFrameworkType)value) {
+                    case TestFrameworkType.Default:
+                        return "Default";
+                    case TestFrameworkType.Mocha:
+                        return "Mocha";
+                }
+            }
+            return base.ConvertTo(context, culture, value, destinationType);
+        }
+
+        public override object ConvertFrom(ITypeDescriptorContext context, CultureInfo culture, object value) {
+            if (value is string) {
+                string strVal = (string)value;
+                if (strVal.Equals("Default", StringComparison.OrdinalIgnoreCase)) {
+                    return TestFrameworkType.Default;
+                } else if (strVal.Equals("Mocha", StringComparison.OrdinalIgnoreCase)) {
+                    return TestFrameworkType.Mocha;
+                }
+            }
+            return base.ConvertFrom(context, culture, value);
+        }
+
+        public override StandardValuesCollection GetStandardValues(ITypeDescriptorContext context) {
+            return new StandardValuesCollection(new[] { TestFrameworkType.Default, TestFrameworkType.Mocha });
+        }
+    }
+    /// <summary>
+    /// This type converter doesn't really do any conversions, but allows us to provide
+    /// a list of standard values for the test framework.
+    /// </summary>
+    class TestFrameworkStringConverter : StringConverter {
+        internal static readonly TestFrameworkStringConverter Instance = new TestFrameworkStringConverter();
+
+        public TestFrameworkStringConverter() {
+        }
+
+        public override bool GetStandardValuesSupported(ITypeDescriptorContext context) {
+            return true;
+        }
+
+        public override bool CanConvertFrom(ITypeDescriptorContext context, Type sourceType) {
+            if (sourceType == typeof(string)) {
+                return true;
+            }
+            return base.CanConvertFrom(context, sourceType);
+        }
+
+        public override bool CanConvertTo(ITypeDescriptorContext context, Type destinationType) {
+            return base.CanConvertTo(context, destinationType);
+        }
+
+        public override object ConvertTo(ITypeDescriptorContext context, CultureInfo culture, object value, Type destinationType) {
+            return value;
+        }
+
+        public override object ConvertFrom(ITypeDescriptorContext context, CultureInfo culture, object value) {
+            return value;
+        }
+
+        public override StandardValuesCollection GetStandardValues(ITypeDescriptorContext context) {
+            FileNodeProperties nodeProps = context.Instance as FileNodeProperties;
+            IEnumerable<string> itemNames = new[] { "Default" /*TODO: share resource string*/, "Mocha" };
+            return new StandardValuesCollection(itemNames.ToArray());
         }
     }
 }

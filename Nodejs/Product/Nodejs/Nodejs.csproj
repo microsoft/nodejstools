@@ -535,6 +535,7 @@
     <Compile Include="SmartIndent.cs" />
     <Compile Include="SmartIndentProvider.cs" />
     <Compile Include="SourceMap.cs" />
+    <Compile Include="TestFrameworks\TestFrameworkType.cs" />
     <Compile Include="VsMenus.cs" />
     <Compile Include="AzureSolutionListener.cs" />
     <Compile Include="BaseNodeProjectFactory.cs" />
@@ -767,7 +768,7 @@
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
       <IncludeInVSIX>true</IncludeInVSIX>
     </Content>
-    <Content Include="TestFrameworks\generic\generic.js">
+    <Content Include="TestFrameworks\default\default.js">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
       <IncludeInVSIX>true</IncludeInVSIX>
     </Content>

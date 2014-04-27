@@ -74,6 +74,10 @@ namespace Microsoft.NodejsTools.TestAdapter {
                                 continue;
                             }
                             TestFrameworks.TestFramework testFramework = GetTestFrameworkObject(value);
+                            if (testFramework == null) {
+                                logger.SendMessage(TestMessageLevel.Warning, String.Format("Ignore unsupported test framework {0}", value));
+                                continue;
+                            }
 
                             string fileAbsolutePath = CommonUtils.GetAbsoluteFilePath(projectHome, item.EvaluatedInclude);
 
