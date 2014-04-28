@@ -32,6 +32,12 @@
             </Directory>
           </Directory>
         </Directory>
+        
+        <Directory Id="DIR_TestFrameworks" Name="TestFrameworks">
+          <Directory Id="DIR_TestFramework_Default" Name="default" />
+          <Directory Id="DIR_TestFramework_Mocha" Name="mocha" />
+        </Directory>
+        
       </Directory>
 
       <Directory Id="VWD_EXTENSION_INSTALLPATH">

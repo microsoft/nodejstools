@@ -434,6 +434,20 @@
               <Condition>VWD_EXTENSION_INSTALLPATH</Condition>
             </Component>
           
+            <!--Unit test framework support files-->
+            <Component Directory="DIR_TestFramework" Guid="{AD02BF85-EF90-4171-9BA9-2D562384CAA7}">
+              <File Id="fil_FindTests_Js" KeyPath="yes" Source="$(var.BinariesDir)\TestFrameworks\find_tests.js" />
+            </Component>
+            <Component Directory="DIR_TestFramework" Guid="{CCF217A4-C169-4B45-ABAE-D2D1BC94B7D6}">
+              <File Id="fil_RunTests_Js" KeyPath="yes" Source="$(var.BinariesDir)\TestFrameworks\run_tests.js" />
+            </Component>
+            <Component Directory="DIR_TestFramework_Default" Guid="{82BBD733-E1F5-4306-9D81-B19C247A70B6}">
+              <File Id="fil_Default_Js" KeyPath="yes" Source="$(var.BinariesDir)\TestFrameworks\default\default.js" />
+            </Component>
+            <Component Directory="DIR_TestFramework_Mocha" Guid="{783C5E44-6685-4BDA-98D6-0FA37AC4ACBF}">
+              <File Id="fil_Mocha_Js" KeyPath="yes" Source="$(var.BinariesDir)\TestFrameworks\mocha\default.js" />
+            </Component>
+            
             <!-- MSBuild support files -->
             <Component Directory="Dir_NodejsToolsMsBuild" Guid="{6D84572F-D895-443F-BD25-712394273A4E}">
                 <File Id="filNodejsTools.targets" KeyPath="yes" Source="$(var.BinariesDir)\Microsoft.NodejsTools.targets" />
