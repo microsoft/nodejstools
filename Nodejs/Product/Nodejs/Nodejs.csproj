@@ -237,6 +237,9 @@
     </COMReference>
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="..\..\..\Common\Product\SharedProject\TestFrameworkType.cs">
+      <Link>TestFrameworks\TestFrameworkType.cs</Link>
+    </Compile>
     <Compile Include="..\ReferenceGenerator\ReferenceCode.cs">
       <Link>Project\ReferenceCode.cs</Link>
     </Compile>
@@ -535,7 +538,6 @@
     <Compile Include="SmartIndent.cs" />
     <Compile Include="SmartIndentProvider.cs" />
     <Compile Include="SourceMap.cs" />
-    <Compile Include="TestFrameworks\TestFrameworkType.cs" />
     <Compile Include="VsMenus.cs" />
     <Compile Include="AzureSolutionListener.cs" />
     <Compile Include="BaseNodeProjectFactory.cs" />

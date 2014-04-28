@@ -41,6 +41,7 @@
     <Reference Include="Microsoft.VisualStudio.QualityTools.UnitTestFramework" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="FrameworkDiscoverTest.cs" />
     <Compile Include="MockRunContext.cs" />
     <Compile Include="MockMessageLogger.cs" />
     <Compile Include="MockDiscoveryContext.cs" />

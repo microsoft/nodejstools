@@ -22,17 +22,23 @@ namespace Microsoft.NodejsTools.TestAdapter.TestFrameworks {
     class FrameworkDiscover {
         private readonly Dictionary<String, TestFramework> _framworks;
         private readonly TestFramework Default;
-        public FrameworkDiscover() {
-            string installFolder = GetExecutingAssemblyPath();
+        public FrameworkDiscover(): this(null) {
+        }
+
+        public FrameworkDiscover(string installFolder) {
+            if (string.IsNullOrEmpty(installFolder)) {
+                installFolder = GetExecutingAssemblyPath();
+            }
             _framworks = new Dictionary<string, TestFramework>(StringComparer.OrdinalIgnoreCase);
             string baseTestframeworkFolder = installFolder + @"\TestFrameworks";
             foreach (TestFrameworkType testFX in (TestFrameworkType[])Enum.GetValues(typeof(TestFrameworkType))) {
-                TestFramework fx = new TestFramework(Path.Combine(baseTestframeworkFolder, testFX.ToString()));
-                _framworks.Add(fx.Name, fx);
-                //the default value of the enum has the integer value of 0, 
-                //and it is associated with the default test frammework 
-                if (testFX == 0) {
-                    Default = fx;
+                if (testFX != TestFrameworkType.None) {
+                    string frameworkFolder = Path.Combine(baseTestframeworkFolder, testFX.ToString());
+                    TestFramework fx = new TestFramework(frameworkFolder);
+                    _framworks.Add(fx.Name, fx);
+                    if (testFX == TestFrameworkType.Default) {
+                        Default = fx;
+                    }
                 }
             }
             if (Default == null) {
@@ -41,14 +47,6 @@ namespace Microsoft.NodejsTools.TestAdapter.TestFrameworks {
         }
 
         public TestFramework Get(string frameworkName) {
-            TestFramework matched = Search(frameworkName);
-            if (matched == null) {
-                matched = Default;
-            }
-            return matched;
-        }
-
-        private TestFramework Search(string frameworkName) {
             TestFramework testFX = null;
             _framworks.TryGetValue(frameworkName, out testFX);
             return testFX;

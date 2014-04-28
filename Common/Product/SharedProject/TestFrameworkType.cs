@@ -12,13 +12,11 @@
  *
  * ***************************************************************************/
 
-using System.Collections.Generic;
-using Microsoft.VisualStudio;
-using Microsoft.VisualStudio.Shell.Interop;
 
 namespace Microsoft.VisualStudioTools.Project {
     public enum TestFrameworkType{
-        Default = 0,
-        Mocha = 1
+        None = 0,
+        Default,
+        Mocha
     }
 }
