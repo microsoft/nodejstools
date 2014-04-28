@@ -443,7 +443,8 @@ namespace Microsoft.NodejsTools.Intellisense {
                 lock (_buffers) {
                     foreach (var kv in _buffers) {
                         List<TaskProviderItem> items;
-                        
+                        buffers.Add(kv.Value);
+
                         lock (_itemsLock) {
                             if (!_items.TryGetValue(kv.Key, out items)) {
                                 continue;
@@ -455,7 +456,6 @@ namespace Microsoft.NodejsTools.Intellisense {
                                 kv.Value,
                                 functions
                             ));
-                            buffers.Add(kv.Value);
                         }
                     }
                 }
@@ -478,12 +478,20 @@ namespace Microsoft.NodejsTools.Intellisense {
                         }
 
                         if (buffers.Remove(t.Item1)) {
-                            tagger.RemoveTagSpans(_ => true);
+                            tagger.RemoveTagSpans(span => span.Span.TextBuffer == t.Item1);
                         }
 
                         foreach (var func in t.Item2) {
                             func(tagger);
                         }
+                    }
+                }
+
+                if (_errorProvider != null && buffers.Any()) {
+                    // Clear tags for any remaining buffers.
+                    foreach (var buffer in buffers) {
+                        var tagger = _errorProvider.GetErrorTagger(buffer);
+                        tagger.RemoveTagSpans(span => span.Span.TextBuffer == buffer);
                     }
                 }
             });

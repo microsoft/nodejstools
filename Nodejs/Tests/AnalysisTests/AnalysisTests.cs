@@ -55,6 +55,75 @@ function f() {
                 BuiltinTypeId.Function
             ); 
         }
+        /// <summary>
+        /// Tests the internal [[Contruct]] method and makes sure
+        /// we return the value if the function returns an object.
+        /// </summary>
+        [TestMethod]
+        public void TestConstruct() {
+            var code = @"function f() {
+     return {abc:42};
+}
+var x = new f();
+";
+            var analysis = ProcessText(code);
+            AssertUtil.ContainsExactly(
+                analysis.GetTypeIdsByIndex("x", 0),
+                BuiltinTypeId.Object
+            );
+            AssertUtil.ContainsExactly(
+                analysis.GetTypeIdsByIndex("x.abc", 0),
+                BuiltinTypeId.Number
+            );
+
+            code = @"function f() {
+     return 42;
+     return {abc:42};
+}
+var x = new f();
+";
+            analysis = ProcessText(code);
+            AssertUtil.ContainsExactly(
+                analysis.GetTypeIdsByIndex("x", 0),
+                BuiltinTypeId.Object
+            );
+            AssertUtil.ContainsExactly(
+                analysis.GetTypeIdsByIndex("x.abc", 0),
+                BuiltinTypeId.Number
+            );
+
+            code = @"function f() {
+     return 42;
+}
+var x = new f();
+";
+            analysis = ProcessText(code);
+            AssertUtil.ContainsExactly(
+                analysis.GetTypeIdsByIndex("x", 0),
+                BuiltinTypeId.Object
+            );
+        }
+
+        [TestMethod]
+        public void TestConstructReturnFunction() {
+            var code = @"function f() {
+     function inner() {
+     }
+     inner.abc = 42;
+     return inner;
+}
+var x = new f();
+";
+            var analysis = ProcessText(code);
+            AssertUtil.ContainsAtLeast(
+                analysis.GetTypeIdsByIndex("x", 0),
+                BuiltinTypeId.Function
+            );
+            AssertUtil.ContainsExactly(
+                analysis.GetTypeIdsByIndex("x.abc", 0),
+                BuiltinTypeId.Number
+            );
+        }
 
         private static IEnumerable<string> GetMemberNames(ModuleAnalysis analysis, string name) {
             return analysis.GetMembersByIndex(name, 0).Select(x => x.Name);
@@ -92,6 +161,31 @@ x = f.foo;
                 analysis.GetTypeIdsByIndex("x", 0),
                 BuiltinTypeId.Number
             );
+        }
+
+        [TestMethod]
+        public void TestDefineProperties() {
+            string code = @"
+function f() {
+}
+Object.defineProperties(f, {abc:{get: function() { return 42; } } })
+x = f.abc;
+";
+            var analysis = ProcessText(code);
+            AssertUtil.ContainsExactly(
+                analysis.GetTypeIdsByIndex("x", 0),
+                BuiltinTypeId.Number
+            );
+        }
+
+        [TestMethod]
+        public void TestFunctionExpression() {
+            string code = @"
+var abc = {abc: function abcdefg() { } };
+var x = abcdefg;
+";
+            var analysis = ProcessText(code);
+            Assert.AreEqual(0, analysis.GetTypeIdsByIndex("x", 0).Count());
         }
 
         [TestMethod]

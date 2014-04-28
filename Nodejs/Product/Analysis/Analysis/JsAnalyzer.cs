@@ -128,6 +128,11 @@ namespace Microsoft.NodejsTools.Analysis {
                 throw new InvalidOperationException("path must be to package.json file");
             }
 
+            if (!entryPoint.StartsWith(".")) {
+                // entry point must be a relative path
+                entryPoint = "./" + entryPoint;
+            }
+
             Modules.GetModuleTree(Path.GetDirectoryName(filePath)).DefaultPackage = entryPoint;
         }
 

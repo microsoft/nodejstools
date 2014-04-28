@@ -180,13 +180,14 @@ namespace Microsoft.NodejsTools.Analysis {
             MyScope.ClearUnresolvedModules();
 #endif
 
+            _unit.Enqueue();
+
             InitNodejsVariables();
 
             // collect top-level definitions first
             var walker = new OverviewWalker(this, _unit);
             tree.Walk(walker);
 
-            _unit.Enqueue();
 
             if (!enqueOnly) {
                 _analyzer.AnalyzeQueuedEntries(cancel);

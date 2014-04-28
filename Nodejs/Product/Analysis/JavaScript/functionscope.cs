@@ -100,7 +100,6 @@ namespace Microsoft.NodejsTools.Parsing
                         {
                             Position = parameter.Position,
                             OriginalContext = parameter.Context,
-                            CanCrunch = !parameter.RenameNotAllowed
                         };
 
                         this.AddField(argumentField);

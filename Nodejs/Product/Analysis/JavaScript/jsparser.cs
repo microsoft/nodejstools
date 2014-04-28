@@ -191,8 +191,7 @@ namespace Microsoft.NodejsTools.Parsing
                     var parameters = new AstNodeList<ParameterDeclaration>(null, this);
                     parameters.Append(new ParameterDeclaration(null, this)
                         {
-                            Name = "event",
-                            RenameNotAllowed = true
+                            Name = "event"
                         });
 
                     var funcExpression = new FunctionObject(null, this)
@@ -4431,6 +4430,12 @@ namespace Microsoft.NodejsTools.Parsing
             switch (op.Token)
             {
                 case JSToken.Assign:
+                    if (operand1 is Member && 
+                        operand2 is FunctionExpression) {
+                        ((FunctionExpression)operand2).Function.NameGuess = ((Member)operand1).Name;
+                    }
+                    // fall through
+                    goto case JSToken.BitwiseAnd;
                 case JSToken.BitwiseAnd:
                 case JSToken.BitwiseAndAssign:
                 case JSToken.BitwiseOr:

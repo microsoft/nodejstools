@@ -26,8 +26,6 @@ namespace Microsoft.NodejsTools.Parsing
 
         public int Position { get; set; }
 
-        public bool RenameNotAllowed { get; set; }
-
         public JSVariableField VariableField { get; set; }
 
         public Expression Initializer { get { return null; } }

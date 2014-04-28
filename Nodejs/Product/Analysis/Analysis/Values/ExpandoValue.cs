@@ -14,6 +14,7 @@ namespace Microsoft.NodejsTools.Analysis.Values {
         private readonly int _declVersion;
         internal readonly DependentKeyValue _keysAndValues;
         private Dictionary<string, PropertyDescriptor> _descriptors;
+        private AnalysisValue _next;
 //        private VariableDef _keysVariable, _valuesVariable, _keyValueTupleVariable;
 
         internal ExpandoValue(ProjectEntry projectEntry) {
@@ -65,6 +66,14 @@ namespace Microsoft.NodejsTools.Analysis.Values {
 
             if (desc.Get != null) {
                 res = res.Union(desc.Get.TypesNoCopy.Call(node, unit, AnalysisSet.Empty, ExpressionEvaluator.EmptySets));
+            }
+
+            if (_next != null && _next.Push()) {
+                try {
+                    res = res.Union(_next.GetMember(node, unit, name));
+                } finally {
+                    _next.Pop();
+                }
             }
             return res;
         }
@@ -184,17 +193,31 @@ namespace Microsoft.NodejsTools.Analysis.Values {
 
             var res = new Dictionary<string, IAnalysisSet>();
             foreach (var kvp in _descriptors) {
-                // TODO: property support
+                var key = kvp.Key;
                 if (kvp.Value.Values != null) {
                     var types = kvp.Value.Values.TypesNoCopy;
-                    var key = kvp.Key;
                     kvp.Value.Values.ClearOldValues();
                     if (kvp.Value.Values.VariableStillExists) {
                         MergeTypes(res, key, types);
                     }
                 }
+
+                if (kvp.Value.Get != null || kvp.Value.Set != null) {
+                    MergeTypes(res, key, AnalysisSet.Empty);
+                }
             }
+
+            if (_next != null) {
+                MergeDictionaries(res, _next.GetAllMembers());
+            }
+
             return res;
+        }
+
+        internal static void MergeDictionaries(Dictionary<string, IAnalysisSet> target, Dictionary<string, IAnalysisSet> source) {
+            foreach (var keyValue in source) {
+                MergeTypes(target, keyValue.Key, keyValue.Value);
+            }
         }
 
         public JsAnalyzer ProjectState { get { return ProjectEntry.Analyzer; } }
@@ -288,6 +311,52 @@ namespace Microsoft.NodejsTools.Analysis.Values {
         public Dictionary<string, PropertyDescriptor> Descriptors {
             get {
                 return _descriptors;
+            }
+        }
+
+        /// <summary>
+        /// Makes this analysis value include all of the source analysis
+        /// values and automatically pick up new values if the source
+        /// changes.
+        /// </summary>
+        /// <param name="source"></param>
+        public void AddLinkedValue(AnalysisValue source) {
+            if (_next == null) {
+                _next = source;
+            } else if (_next != source) {
+                if (_next is LinkedAnalysisList) {
+                    ((LinkedAnalysisList)_next).AddLink(source);
+                } else {
+                    _next = new LinkedAnalysisList(_next, source);
+                }
+            }
+        }
+
+        class LinkedAnalysisList : AnalysisValue {
+            private readonly List<AnalysisValue> _values;
+
+            public LinkedAnalysisList(AnalysisValue one, AnalysisValue two) {
+                _values = new List<AnalysisValue>() { one, two };
+            }
+
+            public override IAnalysisSet GetMember(Node node, AnalysisUnit unit, string name) {
+                var res = AnalysisSet.Empty;
+                foreach (var value in _values) {
+                    res = res.Union(value.GetMember(node, unit, name));
+                }
+                return res;
+            }
+
+            public override Dictionary<string, IAnalysisSet> GetAllMembers() {
+                var res = new Dictionary<string, IAnalysisSet>();
+                foreach (var value in _values) {
+                    ExpandoValue.MergeDictionaries(res, value.GetAllMembers());
+                }
+                return res;
+            }
+
+            internal void AddLink(AnalysisValue source) {
+                _values.Add(source);
             }
         }
 

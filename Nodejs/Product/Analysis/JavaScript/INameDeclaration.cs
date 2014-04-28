@@ -28,7 +28,6 @@ namespace Microsoft.NodejsTools.Parsing
         TokenWithSpan NameContext { get; }
         Node Parent { get; }
         Expression Initializer { get; }
-        bool RenameNotAllowed { get; }
         JSVariableField VariableField { get; set; }
     }
 }

@@ -93,6 +93,33 @@ namespace AnalysisTests {
             );
         }
 
+        /// <summary>
+        /// Require w/ a package.json which specifies a relative path
+        /// without the leading .
+        /// </summary>
+        [TestMethod]
+        public void TestRequireNonRelativePackageJson() {
+            var analyzer = new JsAnalyzer();
+            var mod = @"var x = require('./rec1')";
+            var myindex = @"exports.abc = 100;";
+            analyzer.AddPackageJson("rec1\\package.json", "lib/myindex.js");
+
+            var sourceUnit = AnalysisTests.GetSourceUnit(mod);
+            var myindexSourceUnit = AnalysisTests.GetSourceUnit(myindex);
+            var entry = analyzer.AddModule("one.js", null);
+            var myindexEntry = analyzer.AddModule("rec1\\lib\\myindex.js", null);
+            AnalysisTests.Prepare(entry, sourceUnit);
+            AnalysisTests.Prepare(myindexEntry, myindexSourceUnit);
+
+            entry.Analyze(CancellationToken.None);
+            myindexEntry.Analyze(CancellationToken.None);
+
+            AssertUtil.ContainsExactly(
+                entry.Analysis.GetTypeIdsByIndex("x.abc", 0),
+                BuiltinTypeId.Number
+            );
+        }
+
         [TestMethod]
         public void TestRequireNodeModules() {
             var mod1 = @"exports.foo = 42;";

@@ -44,10 +44,8 @@ namespace Microsoft.NodejsTools.Parsing
         private HashSet<INameReference> m_referenceTable;
         private HashSet<INameDeclaration> m_declarationTable;
 
-        private bool m_canCrunch;// = false;
         private bool m_isDeclared; //= false;
         private bool m_isGenerated;
-        private string m_crunchedName;// = null;
 
         public TokenWithSpan OriginalContext { get; set; }
         public string Name { get; private set; }
@@ -60,7 +58,6 @@ namespace Microsoft.NodejsTools.Parsing
         public bool IsPlaceholder { get; set; }
         public bool InitializationOnly { get; set; }
         public int Position { get; set; }
-        public bool WasRemoved { get; set; }
 
         public JSVariableField OuterField { get; set; }
 
@@ -145,24 +142,6 @@ namespace Microsoft.NodejsTools.Parsing
             }
         }
 
-        public bool CanCrunch
-        {
-            get { return m_canCrunch; }
-            set 
-            { 
-                m_canCrunch = value;
-
-                // if there is an outer field, we only want to propagate
-                // our crunch setting if we are setting it to false. We never
-                // want to set an outer field to true because we might have already
-                // determined that we can't crunch it.
-                if (OuterField != null && !value)
-                {
-                    OuterField.CanCrunch = false;
-                }
-            }
-        }
-
         public bool IsDeclared
         {
             get { return m_isDeclared; }
@@ -223,36 +202,6 @@ namespace Microsoft.NodejsTools.Parsing
                 // if we get here, then we didn't find any real (non-placeholder)
                 // outer field, so we are not an outer reference.
                 return false;
-            }
-        }
-
-        // we'll set this after analyzing all the variables in the
-        // script in order to shrink it down even further
-        public string CrunchedName
-        {
-            get
-            {
-                // return the outer field's crunched name if there is one,
-                // otherwise return ours
-                return (OuterField != null
-                    ? OuterField.CrunchedName
-                    : m_crunchedName);
-            }
-            set
-            {
-                // only set this if we CAN
-                if (m_canCrunch)
-                {
-                    // if this is an outer reference, pass this on to the outer field
-                    if (OuterField != null)
-                    {
-                        OuterField.CrunchedName = value;
-                    }
-                    else
-                    {
-                        m_crunchedName = value;
-                    }
-                }
             }
         }
 
@@ -340,44 +289,35 @@ namespace Microsoft.NodejsTools.Parsing
                 case FieldType.Argument:
                 case FieldType.CatchError:
                     IsDeclared = true;
-                    CanCrunch = true;
                     break;
 
                 case FieldType.Arguments:
                     IsDeclared = false;
-                    CanCrunch = false;
                     break;
 
                 case FieldType.Global:
-                    CanCrunch = false;
                     break;
 
                 case FieldType.Local:
-                    CanCrunch = true;
                     break;
 
                 case FieldType.Predefined:
                     IsDeclared = false;
-                    CanCrunch = false;
                     break;
 
                 case FieldType.WithField:
-                    CanCrunch = false;
                     break;
 
                 case FieldType.GhostCatch:
-                    CanCrunch = true;
                     IsPlaceholder = true;
                     break;
 
                 case FieldType.GhostFunction:
-                    CanCrunch = OuterField == null ? true : OuterField.CanCrunch;
                     IsFunction = true;
                     IsPlaceholder = true;
                     break;
 
                 case FieldType.UndefinedGlobal:
-                    CanCrunch = false;
                     break;
 
                 default:
@@ -417,8 +357,7 @@ namespace Microsoft.NodejsTools.Parsing
 
         public override string ToString()
         {
-            string crunch = CrunchedName;
-            return string.IsNullOrEmpty(crunch) ? Name : crunch;
+            return Name;
         }
 
 

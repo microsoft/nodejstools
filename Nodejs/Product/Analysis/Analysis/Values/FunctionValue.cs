@@ -28,6 +28,7 @@ namespace Microsoft.NodejsTools.Analysis.Values {
         internal FunctionValue(ProjectEntry projectEntry)
             : base(projectEntry) {
             _instance = new ObjectValue(ProjectEntry, this);
+            //Add("prototype", new ObjectValue(ProjectEntry, this));
         }
 
         public IAnalysisSet NewThis {
@@ -37,6 +38,30 @@ namespace Microsoft.NodejsTools.Analysis.Values {
         }
 
         public override IAnalysisSet Construct(Node node, AnalysisUnit unit, IAnalysisSet[] args) {
+            var result = Call(node, unit, _instance, args);
+            if (result.Count != 0) {
+                // function returned a value, we want to return any values
+                // which are typed to object.
+                foreach (var resultValue in result) {
+                    if (!resultValue.IsObject) {
+                        // we need to do some filtering
+                        var tmpRes = AnalysisSet.Empty;
+                        foreach (var resultValue2 in result) {
+                            if (resultValue2.IsObject) {
+                                tmpRes = tmpRes.Add(resultValue2);
+                            }
+                        }
+                        result = tmpRes;
+                        break;
+                    }
+                }
+
+                if (result.Count != 0) {
+                    return result;
+                }
+            }
+            // we didn't return a value or returned a non-object
+            // value.  The result is our newly created instance object.
             return _instance;
         }
 

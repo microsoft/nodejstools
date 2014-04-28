@@ -49,12 +49,6 @@ namespace Microsoft.NodejsTools.Parsing {
 
         public TokenWithSpan NameContext { get { return IdContext; } }
 
-        public bool RenameNotAllowed {
-            get {
-                return VariableField == null ? true : !VariableField.CanCrunch;
-            }
-        }
-
         private bool m_leftHandFunction;// = false;
         public bool LeftHandFunctionExpression {
             get {

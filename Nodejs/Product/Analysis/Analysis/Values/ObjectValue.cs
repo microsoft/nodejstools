@@ -52,7 +52,13 @@ namespace Microsoft.NodejsTools.Analysis.Values {
 
             if (_creator != null) {
                 var prototype = _creator.GetMember(node, unit, "prototype");
-                res = res.Union(prototype.GetMember(node, unit, name));
+                if (Push()) {
+                    try {
+                        res = res.Union(prototype.GetMember(node, unit, name));
+                    } finally {
+                        Pop();
+                    }
+                }
             }
 
             return res;
@@ -82,29 +88,38 @@ namespace Microsoft.NodejsTools.Analysis.Values {
                 res.Append(ObjectDescription);
                 res.Append(' ');
 
-                var descriptors = Descriptors;
-                if (Descriptors != null && descriptors.Count > 0) {
-                    res.AppendLine();
-                    res.Append("Contains: ");
-                    int lineLength = "Contains: ".Length;
-                    var names = Descriptors.Keys.ToArray();
-                    Array.Sort(names);
-                    for (int i = 0; i < names.Length; i++) {
-                        res.Append(names[i]);
-                        lineLength += names[i].Length;
-                        if (i != names.Length - 1) {
-                            res.Append(", ");
-                            lineLength += 3;
-                        }
-                        if (lineLength > 160) {
-                            lineLength = 0;
-                            res.AppendLine();
+                if (Descriptors != null) {
+                    var names = Descriptors
+                        .Where(VariableIsDefined)
+                        .Select(x => x.Key).ToArray();
+
+                    if (names.Length > 0) {
+                        res.AppendLine();
+                        res.Append("Contains: ");
+                        int lineLength = "Contains: ".Length;
+                        Array.Sort(names);
+                        for (int i = 0; i < names.Length; i++) {
+                            res.Append(names[i]);
+                            lineLength += names[i].Length;
+                            if (i != names.Length - 1) {
+                                res.Append(", ");
+                                lineLength += 3;
+                            }
+                            if (lineLength > 160) {
+                                lineLength = 0;
+                                res.AppendLine();
+                            }
                         }
                     }
                 }
                 res.AppendLine();
                 return res.ToString();
             }
+        }
+
+        private static bool VariableIsDefined(KeyValuePair<string, PropertyDescriptor> desc) {
+            return (desc.Value.Values != null && desc.Value.Values.VariableStillExists) ||
+                   desc.Value.Get != null;
         }
 
         internal override bool UnionEquals(AnalysisValue ns, int strength) {

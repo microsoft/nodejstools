@@ -165,6 +165,7 @@
     <Compile Include="Analysis\Analyzer\IsInstanceScope.cs" />
     <Compile Include="Analysis\Analyzer\ModuleScope.cs" />
     <Compile Include="Analysis\Analyzer\OverviewWalker.cs" />
+    <Compile Include="Analysis\Analyzer\OverviewWalker.Specializations.cs" />
     <Compile Include="Analysis\Analyzer\StatementScope.cs" />
     <Compile Include="Analysis\AssemblyInfo.cs" />
     <Compile Include="Analysis\Values\BooleanValue.cs" />
@@ -208,6 +209,7 @@
     <Compile Include="Analysis\SetOfTwo.cs" />
     <Compile Include="Analysis\SingleDict.cs" />
     <Compile Include="Analysis\SourceLocationResolver.cs" />
+    <Compile Include="Analysis\Values\SpecializedUserFunctionValue.cs" />
     <Compile Include="Analysis\Values\StringValue.cs" />
     <Compile Include="Analysis\Values\UndefinedValue.cs" />
     <Compile Include="Analysis\Validation.cs" />

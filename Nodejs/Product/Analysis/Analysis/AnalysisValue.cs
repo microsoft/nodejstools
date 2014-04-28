@@ -85,6 +85,22 @@ namespace Microsoft.NodejsTools.Analysis {
         }
 
         /// <summary>
+        /// Checks to see if the value is of type object.
+        /// 
+        /// This differs from the 'typeof' operator as the typeof
+        /// operator also takes into account whether or not the
+        /// object has the internal [[Call]] method when
+        /// determing the result of typeof rather than basing
+        /// the decision solely on the object type.
+        /// </summary>
+        public bool IsObject {
+            get {
+                return TypeId == BuiltinTypeId.Object ||
+                    TypeId == BuiltinTypeId.Function;
+            }
+        }
+
+        /// <summary>
         /// Returns the member type of the analysis value, or JsMemberType.Unknown if it's unknown.
         /// </summary>
         public virtual JsMemberType MemberType {

@@ -25,7 +25,7 @@ namespace Microsoft.NodejsTools.Analysis.Analyzer {
     /// Performs the 1st pass over the AST to gather all of the classes and
     /// function definitions.
     /// </summary>
-    internal class OverviewWalker : AstVisitor {
+    internal partial class OverviewWalker : AstVisitor {
         private EnvironmentRecord _scope;
         private readonly ProjectEntry _entry;
         private readonly Stack<AnalysisUnit> _analysisStack = new Stack<AnalysisUnit>();
@@ -39,8 +39,20 @@ namespace Microsoft.NodejsTools.Analysis.Analyzer {
             _scope = topAnalysis.Scope;
         }
 
+        public override bool Walk(FunctionExpression node) {
+            if (WalkFunction(node.Function, true)) {
+                node.Function.Body.Walk(this);
+                PostWalk(node.Function);
+            }
+           return false;
+        }
+
         public override bool Walk(FunctionObject node) {
-            var function = AddFunction(node, _curUnit);
+            return WalkFunction(node, false);
+        }
+
+        private bool WalkFunction(FunctionObject node, bool isExpression) {
+            var function = AddFunction(node, _curUnit, isExpression);
             if (function != null) {
                 _analysisStack.Push(_curUnit);
                 _curUnit = function.AnalysisUnit;
@@ -48,6 +60,7 @@ namespace Microsoft.NodejsTools.Analysis.Analyzer {
                 _scope = function.AnalysisUnit.Scope;
                 return true;
             }
+
             return false;
         }
 
@@ -77,25 +90,44 @@ namespace Microsoft.NodejsTools.Analysis.Analyzer {
             return _scope.CreateVariable(name, _curUnit, name.Name, false);
         }
 
-        internal UserFunctionValue AddFunction(FunctionObject node, AnalysisUnit outerUnit) {
-            return AddFunction(node, outerUnit, _scope);
+        internal UserFunctionValue AddFunction(FunctionObject node, AnalysisUnit outerUnit, bool isExpression = false) {
+            return AddFunction(node, outerUnit, _scope, isExpression);
         }
 
-        internal static UserFunctionValue AddFunction(FunctionObject node, AnalysisUnit outerUnit, EnvironmentRecord prevScope) {
+        internal static UserFunctionValue AddFunction(FunctionObject node, AnalysisUnit outerUnit, EnvironmentRecord prevScope, bool isExpression = false) {
             EnvironmentRecord scope;
             if (!prevScope.TryGetNodeScope(node, out scope)) {
                 if (node.Body == null) {
                     return null;
                 }
 
-                var func = new UserFunctionValue(node, outerUnit, prevScope);
+                UserFunctionValue func = null;
+                FunctionSpecialization specialization;
+                var funcName = node.Name ?? node.NameGuess;
+                if (funcName != null &&
+                    _specializations.TryGetValue(funcName, out specialization)) {
+                    MatchState state = new MatchState();
+                    if (specialization.Body.IsMatch(state, node.Body)) {
+                        func = new SpecializedUserFunctionValue(
+                            specialization.Specialization,
+                            node,
+                            outerUnit,
+                            prevScope
+                        );
+                    }
+                }
+
+                if (func == null) {
+                    func = new UserFunctionValue(node, outerUnit, prevScope);
+                }
+
                 var unit = func.AnalysisUnit;
                 scope = unit.Scope;
 
                 prevScope.Children.Add(scope);
                 prevScope.AddNodeScope(node, scope);
 
-                if (node.Name != null) 
+                if (!isExpression && node.Name != null) 
                 {
                     // lambdas don't have their names published
 

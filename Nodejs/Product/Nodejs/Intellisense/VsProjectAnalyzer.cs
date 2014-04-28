@@ -728,7 +728,14 @@ namespace Microsoft.NodejsTools.Intellisense {
             ast = null;
             errorSink = new CollectingErrorSink();
 
-            ast = CreateParser(new StreamReader(content), errorSink).Parse(_codeSettings);
+            try {
+                ast = CreateParser(new StreamReader(content), errorSink).Parse(_codeSettings);
+            } catch (Exception e) {
+                if (e.IsCriticalException()) {
+                    throw;
+                }
+                Debug.Assert(false, String.Format("Failure in JavaScript parser: {0}", e.ToString()));
+            }
         }
 
         private JSParser CreateParser(TextReader content, ErrorSink sink) {

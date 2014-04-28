@@ -35,10 +35,6 @@ namespace Microsoft.NodejsTools.Parsing
                 // this scope.
                 var withField = AddField(CreateField(outerField));
 
-                // and we need to make sure that any field that may be referenced from inside
-                // a with-statement does not get automatically renamed
-                outerField.CanCrunch = false;
-
                 // if the outer field is an undefined global, then we want to flag it with a
                 // special attribute that tells us that it might not actually be an undefined global,
                 // because it might just be a property reference on the with-object.
@@ -61,16 +57,6 @@ namespace Microsoft.NodejsTools.Parsing
         {
             // only bind lexical declarations
             DefineLexicalDeclarations();
-
-            // however, take a look at the var-decl fields and make sure that
-            // their fields all get marked as cannot-rename.
-            foreach (var varDecl in VarDeclaredNames)
-            {
-                if (varDecl.VariableField != null)
-                {
-                    varDecl.VariableField.CanCrunch = false;
-                }
-            }
         }
 
         public override JSVariableField CreateField(JSVariableField outerField)

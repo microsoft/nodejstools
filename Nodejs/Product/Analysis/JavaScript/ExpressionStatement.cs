@@ -16,6 +16,12 @@ namespace Microsoft.NodejsTools.Parsing
       
     }
 
+    public override IEnumerable<Node> Children {
+        get {
+            return new[] { Expression };
+        }
+    }
+
     public Expression Expression
     {
       get

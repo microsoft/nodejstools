@@ -385,7 +385,7 @@ namespace Microsoft.NodejsTools.Analysis {
                 BuiltinFunction("getOwnPropertyNames"),
                 BuiltinFunction("create"),
                 SpecializedFunction("defineProperty", DefineProperty),
-                BuiltinFunction("defineProperties"),
+                SpecializedFunction("defineProperties", DefineProperties),
                 BuiltinFunction("seal"),
                 BuiltinFunction("freeze"),
                 BuiltinFunction("preventExtensions"),
@@ -397,7 +397,7 @@ namespace Microsoft.NodejsTools.Analysis {
             };
         }
 
-        private static IAnalysisSet DefineProperty(SpecializedFunctionValue func, Node node, AnalysisUnit unit, IAnalysisSet @this, IAnalysisSet[] args) {
+        private static IAnalysisSet DefineProperty(FunctionValue func, Node node, AnalysisUnit unit, IAnalysisSet @this, IAnalysisSet[] args) {
             // object, name, property desc
             if (args.Length >= 3) {
                 foreach (var obj in args[0]) {
@@ -420,7 +420,37 @@ namespace Microsoft.NodejsTools.Analysis {
             return AnalysisSet.Empty;
         }
 
-        private static IAnalysisSet Require(SpecializedFunctionValue func, Node node, AnalysisUnit unit, IAnalysisSet @this, IAnalysisSet[] args) {
+        private static IAnalysisSet DefineProperties(FunctionValue func, Node node, AnalysisUnit unit, IAnalysisSet @this, IAnalysisSet[] args) {
+            // object, {propName: {desc}, ...}
+            if (args.Length >= 2) {
+                foreach (var obj in args[0]) {
+                    ExpandoValue target = obj as ExpandoValue;
+                    if (target != null) {
+                        foreach (var properties in args[1]) {
+                            ExpandoValue propsObj = properties as ExpandoValue;
+                            if (propsObj != null) {
+                                foreach (var keyValue in propsObj.Descriptors) {
+                                    foreach (var propValue in propsObj.GetMember(node, unit, keyValue.Key)) {
+                                        target.AddProperty(
+                                            node,
+                                            unit,
+                                            keyValue.Key,
+                                            propValue
+                                        );
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+            if (args.Length > 0) {
+                return args[0];
+            }
+            return AnalysisSet.Empty;
+        }
+
+        private static IAnalysisSet Require(FunctionValue func, Node node, AnalysisUnit unit, IAnalysisSet @this, IAnalysisSet[] args) {
             IAnalysisSet res = AnalysisSet.Empty;
             if (args.Length > 0) {
                 foreach (var arg in args[0]) {
@@ -558,7 +588,7 @@ namespace Microsoft.NodejsTools.Analysis {
             return new ReturningFunctionValue(_analyzer._builtinEntry, name, value);
         }
 
-        private BuiltinFunctionValue SpecializedFunction(string name, Func<SpecializedFunctionValue, Node, AnalysisUnit, IAnalysisSet, IAnalysisSet[], IAnalysisSet> value) {
+        private BuiltinFunctionValue SpecializedFunction(string name, CallDelegate value) {
             return new SpecializedFunctionValue(_analyzer._builtinEntry, name, value);
         }
 

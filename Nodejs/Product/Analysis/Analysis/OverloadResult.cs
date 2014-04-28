@@ -85,7 +85,7 @@ namespace Microsoft.NodejsTools.Analysis {
         public override int GetHashCode(OverloadResult obj) {
             // Don't use Documentation for hash code, since it changes over time
             // in some implementations of IOverloadResult.
-            int hc = 552127 ^ obj.Name.GetHashCode();
+            int hc = 552127 ^ (obj.Name != null ? obj.Name.GetHashCode() : 0);
             if (obj.Parameters != null) {
                 foreach (var p in obj.Parameters) {
                     hc ^= p.GetHashCode();

@@ -315,7 +315,6 @@ namespace Microsoft.NodejsTools.Parsing
                 ghostField = new JSVariableField(FieldType.GhostFunction, funcObject.Name, 0, funcObject)
                 {
                     OriginalContext = functionField.OriginalContext,
-                    CanCrunch = funcObject.VariableField.IfNotNull(v => v.CanCrunch)
                 };
 
                 scope.AddField(ghostField);

@@ -65,6 +65,12 @@ namespace Microsoft.NodejsTools.Analysis.Values {
             }
         }
 
+        public override string Description {
+            get {
+                return Documentation;
+            }
+        }
+
         public override string Documentation {
             get {
                 return String.Format("function {0} (built-in)", Name);
@@ -90,9 +96,9 @@ namespace Microsoft.NodejsTools.Analysis.Values {
     }
 
     internal class SpecializedFunctionValue : BuiltinFunctionValue {
-        private readonly Func<SpecializedFunctionValue, Node, AnalysisUnit, IAnalysisSet, IAnalysisSet[], IAnalysisSet> _func;
+        private readonly CallDelegate _func;
 
-        public SpecializedFunctionValue(ProjectEntry projectEntry, string name, Func<SpecializedFunctionValue, Node, AnalysisUnit, IAnalysisSet, IAnalysisSet[], IAnalysisSet> func, string documentation = null, params string[] signature)
+        public SpecializedFunctionValue(ProjectEntry projectEntry, string name, CallDelegate func, string documentation = null, params string[] signature)
             : base(projectEntry, name, documentation, signature) {
             _func = func;
         }
@@ -118,4 +124,6 @@ namespace Microsoft.NodejsTools.Analysis.Values {
             IsProperty = isProperty;
         }
     }
+
+    delegate IAnalysisSet CallDelegate(FunctionValue func, Node node, AnalysisUnit unit, IAnalysisSet @this, IAnalysisSet[]args);
 }

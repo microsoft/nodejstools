@@ -49,13 +49,6 @@ namespace Microsoft.NodejsTools.Parsing
             get { return Identifier; }
         }
 
-        public bool RenameNotAllowed
-        {
-            get
-            {
-                return VariableField == null ? true : !VariableField.CanCrunch;
-            }
-        }
 
         private bool m_isGenerated;
         public bool IsGenerated

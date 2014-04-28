@@ -206,13 +206,6 @@ namespace Microsoft.NodejsTools.Parsing
 
             nameDecl.VariableField = field;
             field.Declarations.Add(nameDecl);
-
-            // if this scope is within a with-statement, or if the declaration was flagged
-            // as not being renamable, then mark the field as not crunchable
-            if (IsInWithScope || nameDecl.RenameNotAllowed)
-            {
-                field.CanCrunch = false;
-            }
         }
 
         #endregion
