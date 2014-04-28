@@ -131,7 +131,6 @@ namespace Microsoft.NodejsTools.TestAdapter {
             var testResult = new TestResult(test);
             frameworkHandle.RecordStart(test);
             testResult.StartTime = DateTimeOffset.Now;
-            Debug.Fail("Before execute");
             NodejsProjectSettings settings;
             if (!sourceToSettings.TryGetValue(test.Source, out settings)) {
                 sourceToSettings[test.Source] = settings = LoadProjectSettings(test.Source);
