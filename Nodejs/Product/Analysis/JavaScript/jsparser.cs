@@ -564,7 +564,6 @@ namespace Microsoft.NodejsTools.Parsing
                         // semicolon to terminate it.
                         if (JSToken.Semicolon == m_currentToken.Token)
                         {
-                            expr.IfNotNull(s => s.TerminatingContext = m_currentToken);
                             GetNextToken();
                         }
                         else if (m_foundEndOfLine || JSToken.RightCurly == m_currentToken.Token || JSToken.EndOfFile == m_currentToken.Token)
@@ -703,7 +702,6 @@ namespace Microsoft.NodejsTools.Parsing
             if (JSToken.Semicolon == m_currentToken.Token)
             {
                 // add the semicolon to the cloned context and skip it
-                node.TerminatingContext = m_currentToken;
                 GetNextToken();
             }
             else if (m_foundEndOfLine || JSToken.RightCurly == m_currentToken.Token || JSToken.EndOfFile == m_currentToken.Token)
@@ -820,11 +818,9 @@ namespace Microsoft.NodejsTools.Parsing
                 if (m_currentToken.Token == JSToken.Comma)
                 {
                     single = false;
-                    vdecl.IfNotNull(d => d.TerminatingContext = m_currentToken);
                 }
                 else if (m_currentToken.Token == JSToken.Semicolon)
                 {
-                    varList.TerminatingContext = m_currentToken;
                     GetNextToken();
                     break;
                 }
@@ -1631,7 +1627,6 @@ namespace Microsoft.NodejsTools.Parsing
                     Body = Node.ForceToBlock(body),
                     WhileContext = whileContext,
                     Condition = (Expression)condition,
-                    TerminatingContext = terminatorContext
                 };
         }
 
@@ -1803,7 +1798,6 @@ namespace Microsoft.NodejsTools.Parsing
 
             if (JSToken.Semicolon == m_currentToken.Token)
             {
-                continueNode.TerminatingContext = m_currentToken;
                 GetNextToken();
             }
             else if (m_foundEndOfLine || m_currentToken.Token == JSToken.RightCurly || m_currentToken.Token == JSToken.EndOfFile)
@@ -1895,7 +1889,6 @@ namespace Microsoft.NodejsTools.Parsing
 
             if (JSToken.Semicolon == m_currentToken.Token)
             {
-                breakNode.TerminatingContext = m_currentToken;
                 GetNextToken();
             }
             else if (m_foundEndOfLine || m_currentToken.Token == JSToken.RightCurly || m_currentToken.Token == JSToken.EndOfFile)
@@ -1979,7 +1972,6 @@ namespace Microsoft.NodejsTools.Parsing
 
                 if (JSToken.Semicolon == m_currentToken.Token)
                 {
-                    returnNode.TerminatingContext = m_currentToken;
                     GetNextToken();
                 }
                 else if (m_foundEndOfLine || m_currentToken.Token == JSToken.RightCurly || m_currentToken.Token == JSToken.EndOfFile)
@@ -2430,7 +2422,6 @@ namespace Microsoft.NodejsTools.Parsing
 
                 if (m_currentToken.Token == JSToken.Semicolon)
                 {
-                    throwNode.TerminatingContext = m_currentToken;
                     GetNextToken();
                 }
                 else if (m_foundEndOfLine || m_currentToken.Token == JSToken.RightCurly || m_currentToken.Token == JSToken.EndOfFile)
@@ -2861,7 +2852,6 @@ namespace Microsoft.NodejsTools.Parsing
                             else if (JSToken.Comma == m_currentToken.Token)
                             {
                                 // append the comma context as the terminator for the parameter
-                                paramDecl.IfNotNull(p => p.TerminatingContext = m_currentToken);
                             }
                             else
                             {
@@ -3679,7 +3669,6 @@ namespace Microsoft.NodejsTools.Parsing
                                 {
                                     // we have a comma -- skip it after adding it as a terminator
                                     // on the previous expression
-                                    expression.IfNotNull(e => e.TerminatingContext = m_currentToken);
                                     GetNextToken();
                                 }
                             }
@@ -3710,10 +3699,7 @@ namespace Microsoft.NodejsTools.Parsing
                         else
                         {
                             // comma -- missing array item in the list
-                            list.Append(new ConstantWrapper(Missing.Value, PrimitiveType.Other, m_currentToken, this)
-                                {
-                                    TerminatingContext = m_currentToken
-                                });
+                            list.Append(new ConstantWrapper(Missing.Value, PrimitiveType.Other, m_currentToken, this));
 
                             // skip over the comma
                             GetNextToken();
@@ -3894,7 +3880,6 @@ namespace Microsoft.NodejsTools.Parsing
                                         if (JSToken.Comma == m_currentToken.Token)
                                         {
                                             // skip the comma after adding it to the property as a terminating context
-                                            property.IfNotNull(p => p.TerminatingContext = m_currentToken);
                                             GetNextToken();
 
                                             // if the next token is the right-curly brace, then we ended 
@@ -4366,7 +4351,6 @@ namespace Microsoft.NodejsTools.Parsing
                         {
                             if (JSToken.Comma == m_currentToken.Token)
                             {
-                                item.IfNotNull(n => n.TerminatingContext = m_currentToken);
                             }
                             else
                             {

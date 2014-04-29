@@ -52,15 +52,6 @@ namespace Microsoft.NodejsTools.Parsing
         public JSToken OperatorToken { get; set; }
         public TokenWithSpan OperatorContext { get; set; }
 
-        public override TokenWithSpan TerminatingContext
-        {
-            get
-            {
-                // if we have one, return it. If not, see ifthe right-hand side has one
-                return base.TerminatingContext ?? Operand2.IfNotNull(n => n.TerminatingContext);
-            }
-        }
-
         public BinaryOperator(TokenWithSpan context, JSParser parser)
             : base(context, parser)
         {

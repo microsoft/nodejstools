@@ -26,16 +26,6 @@ namespace Microsoft.NodejsTools.Parsing
     {
       private List<T> m_list;
 
-      public override TokenWithSpan TerminatingContext
-      {
-        get
-        {
-          // if we have one, return it. If not, see if we are empty, and if not,
-          // return the last item's terminator
-          return base.TerminatingContext ?? (m_list.Count > 0 ? m_list[m_list.Count - 1].TerminatingContext : null);
-        }
-      }
-
       public AstNodeList(TokenWithSpan context, JSParser parser)
         : base(context, parser)
       {

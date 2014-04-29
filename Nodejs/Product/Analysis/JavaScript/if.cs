@@ -62,31 +62,6 @@ namespace Microsoft.NodejsTools.Parsing
 
         public TokenWithSpan ElseContext { get; set; }
 
-        public override TokenWithSpan TerminatingContext
-        {
-            get
-            {
-                // if we have one, return it.
-                var term = base.TerminatingContext;
-                if (term == null)
-                {
-                    // we didn't have a terminator. See if there's an else-block. If so,
-                    // return it's terminator (if any)
-                    if (FalseBlock != null)
-                    {
-                        term = FalseBlock.TerminatingContext;
-                    }
-                    else
-                    {
-                        // no else-block. Return the true-block's, if there is one.
-                        term = TrueBlock.IfNotNull(b => b.TerminatingContext);
-                    }
-                }
-
-                return term;
-            }
-        }
-
         public IfNode(TokenWithSpan context, JSParser parser)
             : base(context, parser)
         {

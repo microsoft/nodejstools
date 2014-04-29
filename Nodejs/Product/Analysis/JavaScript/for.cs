@@ -69,15 +69,6 @@ namespace Microsoft.NodejsTools.Parsing
 
         public BlockScope BlockScope { get; set; }
 
-        public override TokenWithSpan TerminatingContext
-        {
-            get
-            {
-                // if we have one, return it. If not, return what the body has (if any)
-                return base.TerminatingContext ?? Body.IfNotNull(b => b.TerminatingContext);
-            }
-        }
-
         public ForNode(TokenWithSpan context, JSParser parser)
             : base(context, parser)
         {

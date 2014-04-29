@@ -44,15 +44,6 @@ namespace Microsoft.NodejsTools.Parsing {
         /// </summary>
         public JSParser Parser { get; private set; }
 
-        /// <summary>the context of any terminating character parsed after this node
-        /// e.g. the semicolon after a statement or a comma in a parameter list</summary>
-        private TokenWithSpan m_terminatingContext;
-
-        public virtual TokenWithSpan TerminatingContext {
-            get { return m_terminatingContext; }
-            set { m_terminatingContext = value; }
-        }
-
         protected Node(TokenWithSpan context, JSParser parser) {
             Parser = parser;
             if (context != null) {

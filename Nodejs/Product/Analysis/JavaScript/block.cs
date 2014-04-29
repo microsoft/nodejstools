@@ -72,16 +72,6 @@ namespace Microsoft.NodejsTools.Parsing
         /// </summary>
         public bool BraceOnNewLine { get; set; }
 
-        public override TokenWithSpan TerminatingContext
-        {
-            get
-            {
-                // if we have one, return it. If not, see if there's only one
-                // line in our block, and if so, return it's terminator.
-                return base.TerminatingContext ?? (m_list.Count == 1 ? m_list[0].TerminatingContext : null);
-            }
-        }
-
         public Block(TokenWithSpan context, JSParser parser)
             : base(context, parser)
         {
