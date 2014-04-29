@@ -48,21 +48,6 @@ namespace Microsoft.NodejsTools.Parsing
             visitor.PostWalk(this);
         }
 
-        public override PrimitiveType FindPrimitiveType()
-        {
-            return Operand != null
-                ? Operand.FindPrimitiveType()
-                : PrimitiveType.Other;
-        }
-
-        public override OperatorPrecedence Precedence
-        {
-            get
-            {
-                return OperatorPrecedence.Primary;
-            }
-        }
-
         public override IEnumerable<Node> Children
         {
             get
@@ -80,14 +65,6 @@ namespace Microsoft.NodejsTools.Parsing
             }
 
             return false;
-        }
-
-        public override bool IsConstant
-        {
-            get
-            {
-                return Operand.IfNotNull(o => o.IsConstant);
-            }
         }
 
         public override string ToString()

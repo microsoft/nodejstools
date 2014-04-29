@@ -51,7 +51,7 @@ namespace Microsoft.NodejsTools.Parsing
         public override void Walk(AstVisitor walker) {
             if (walker.Walk(this)) {
                 foreach (var node in _elements) {
-                    walker.Walk(_elements);
+                    node.Walk(walker);
                 }
             }
         }
@@ -80,14 +80,6 @@ namespace Microsoft.NodejsTools.Parsing
                 }
             }
             return false;
-        }
-
-        public override bool IsConstant
-        {
-            get
-            {
-                return Elements == null ? true : Elements.IsConstant;
-            }
         }
     }
 }

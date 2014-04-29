@@ -100,11 +100,5 @@ namespace Microsoft.NodejsTools.Parsing
             }
             return false;
         }
-
-        internal override bool EncloseBlock(EncloseBlockType type)
-        {
-            // pass the query on to the body
-            return Body == null ? false : Body.EncloseBlock(type);
-        }
     }
 }

@@ -24,6 +24,9 @@ namespace Microsoft.NodejsTools.Parsing {
     public sealed class FunctionObject : Statement, INameDeclaration {
         private Block m_body;
         private AstNodeList<ParameterDeclaration> m_parameters;
+        public FunctionObject(TokenWithSpan functionContext, JSParser parser)
+            : base(functionContext, parser) {
+        }
 
         public Block Body {
             get { return m_body; }
@@ -47,56 +50,43 @@ namespace Microsoft.NodejsTools.Parsing {
 
         public Expression Initializer { get { return null; } }
 
-        public TokenWithSpan NameContext { get { return IdContext; } }
+        public TokenWithSpan NameContext { get; set; }
 
-        public string Name {
-            get;
-            set;
-        }
+        public string Name { get; set; }
 
-        public string NameGuess {
-            get;
-            set;
-        }
+        public string NameGuess { get; set; }
 
-        public TokenWithSpan IdContext { get; set; }
-        public TokenWithSpan ParametersContext { get; set; }
-
-        public override bool IsExpression {
+        public int NameStart {
             get {
-                // if this is a declaration, then it's not an expression. Otherwise treat it 
-                // as if it were an expression.
-                return !(FunctionType == FunctionType.Declaration);
+                if (NameContext != null) {
+                    return NameContext.StartPosition;
+                }
+                return -1;
             }
         }
 
-        // when parsed, this flag indicates that a function declaration is in the
-        // proper source-element location
-        public bool IsSourceElement {
-            get;
-            set;
+        public TokenWithSpan ParametersContext { get; set; }
+
+        public int ParameterStart {
+            get {
+                return ParametersContext.StartPosition;
+            }
+        }
+
+        public int ParameterEnd {
+            get {
+                return ParametersContext.EndPosition;
+            }
         }
 
         public JSVariableField VariableField { get; set; }
-        public int RefCount { get { return (VariableField == null ? 0 : VariableField.RefCount); } }
-
+        
         public FunctionScope FunctionScope { get; set; }
 
         public override ActivationObject EnclosingScope {
             get {
                 return FunctionScope;
             }
-        }
-
-        public override OperatorPrecedence Precedence {
-            get {
-                // just assume primary -- should only get called for expressions anyway
-                return OperatorPrecedence.Primary;
-            }
-        }
-
-        public FunctionObject(TokenWithSpan functionContext, JSParser parser)
-            : base(functionContext, parser) {
         }
 
         public override void Walk(AstVisitor walker) {
@@ -110,53 +100,6 @@ namespace Microsoft.NodejsTools.Parsing {
                 }
             }
             walker.PostWalk(this);
-        }
-
-        public bool IsReferenced {
-            get {
-                // call the checking method with a new empty hashset so it doesn't
-                // go in an endless circle
-                return SafeIsReferenced(new HashSet<FunctionObject>());
-            }
-        }
-
-        private bool SafeIsReferenced(HashSet<FunctionObject> visited) {
-            // if we've already been here, don't go in a circle
-            if (!visited.Contains(this)) {
-                // add us to the visited list
-                visited.Add(this);
-
-                if (FunctionType == FunctionType.Declaration) {
-                    // this is a function declaration, so it better have it's variable field set.
-                    // if the variable (and therefore the function) is defined in the global scope,
-                    // then this function declaration is called by a global function and therefore is
-                    // referenced.
-                    if (VariableField.OwningScope is GlobalScope) {
-                        return true;
-                    }
-
-                    // not defined in the global scope. Check its references.
-                    foreach (var reference in VariableField.References) {
-                        var referencingScope = reference.VariableScope;
-                        if (referencingScope is GlobalScope) {
-                            // referenced by a lookup in the global scope -- we're good to go.
-                            return true;
-                        } else {
-                            var functionScope = referencingScope as FunctionScope;
-                            if (functionScope != null && functionScope.FunctionObject.SafeIsReferenced(visited)) {
-                                // as soon as we find one that's referenced, we stop
-                                return true;
-                            }
-                        }
-                    }
-                } else {
-                    // expressions are always referenced
-                    return true;
-                }
-            }
-
-            // if we get here, we aren't referenced by anything that's referenced
-            return false;
         }
 
         public override IEnumerable<Node> Children {
@@ -178,30 +121,6 @@ namespace Microsoft.NodejsTools.Parsing {
             }
 
             return false;
-        }
-
-        internal bool IsArgumentTrimmable(JSVariableField targetArgumentField) {
-            // walk backward until we either find the given argument field or the
-            // first parameter that is referenced. 
-            // If we find the argument field, then we can trim it because there are no
-            // referenced parameters after it.
-            // if we find a referenced argument, then the parameter is not trimmable.
-            JSVariableField argumentField = null;
-            if (ParameterDeclarations != null) {
-                for (int index = ParameterDeclarations.Count - 1; index >= 0; --index) {
-                    // better be a parameter declaration
-                    argumentField = (ParameterDeclarations[index] as ParameterDeclaration).IfNotNull(p => p.VariableField);
-                    if (argumentField != null
-                        && (argumentField == targetArgumentField || argumentField.IsReferenced)) {
-                        break;
-                    }
-                }
-            }
-
-            // if the argument field we landed on is the same as the target argument field,
-            // then we found the target argument BEFORE we found a referenced parameter. Therefore
-            // the argument can be trimmed.
-            return (argumentField == targetArgumentField);
         }
     }
 }

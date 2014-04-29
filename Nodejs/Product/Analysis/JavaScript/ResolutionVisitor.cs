@@ -29,26 +29,24 @@ namespace Microsoft.NodejsTools.Parsing
     /// </summary>
     public class ResolutionVisitor : AstVisitor
     {
-        #region private fields
-
-        /// <summary>index to use for ordering the statements in this scope</summary>
-        private long m_orderIndex;
-
-        /// <summary>flag indicating whether we've encountered some unreachable code</summary>
-        private bool m_isUnreachable;
-
         /// <summary>depth level of with-statements, needed so we can treat decls within with-scopes specially</summary>
         private int m_withDepth;
-
         /// <summary>stack to maintain the current lexical scope as we traverse the tree</summary>
         private Stack<ActivationObject> m_lexicalStack;
-
         /// <summary>stack to maintain the current variable scope as we traverse the tree</summary>
         private Stack<ActivationObject> m_variableStack;
-
         private ErrorSink _errorSink;
 
-        #endregion
+        private ResolutionVisitor(ActivationObject rootScope, ErrorSink errorSink) {
+            // create the lexical and variable scope stacks and push the root scope onto them
+            m_lexicalStack = new Stack<ActivationObject>();
+            m_lexicalStack.Push(rootScope);
+
+            m_variableStack = new Stack<ActivationObject>();
+            m_variableStack.Push(rootScope);
+
+            _errorSink = errorSink;
+        }
 
         #region private properties
 
@@ -68,31 +66,6 @@ namespace Microsoft.NodejsTools.Parsing
             {
                 return m_variableStack.Peek();
             }
-        }
-
-        /// <summary>retrieve the next order index</summary>
-        private long NextOrderIndex
-        {
-            get
-            {
-                return m_isUnreachable ? 0 : ++m_orderIndex;
-            }
-        }
-
-        #endregion
-
-        #region private constructor
-
-        private ResolutionVisitor(ActivationObject rootScope, ErrorSink errorSink)
-        {
-            // create the lexical and variable scope stacks and push the root scope onto them
-            m_lexicalStack = new Stack<ActivationObject>();
-            m_lexicalStack.Push(rootScope);
-
-            m_variableStack = new Stack<ActivationObject>();
-            m_variableStack.Push(rootScope);
-
-            _errorSink = errorSink;
         }
 
         #endregion
@@ -343,9 +316,9 @@ namespace Microsoft.NodejsTools.Parsing
                     // IE browsers will link to this function expression!
                     // fire a cross-browser error warning
                     ghostField.IsAmbiguous = true;
-                    _errorSink.HandleError(JSError.AmbiguousNamedFunctionExpression, funcObject.IdContext);
+                    _errorSink.HandleError(JSError.AmbiguousNamedFunctionExpression, funcObject.NameContext);
                 }
-                else if (ghostField.IsReferenced)
+                else
                 {
                     // if the ghosted field isn't even referenced, then who cares?
                     // but it is referenced. Let's see if it matters.
@@ -403,8 +376,6 @@ namespace Microsoft.NodejsTools.Parsing
                 {
                     node.Elements.Walk(this);
                 }
-
-                node.Index = NextOrderIndex;
             }
             return false;
         }
@@ -422,8 +393,6 @@ namespace Microsoft.NodejsTools.Parsing
                 {
                     node.Operand2.Walk(this);
                 }
-
-                node.Index = NextOrderIndex;
             }
             return false;
         }
@@ -432,7 +401,6 @@ namespace Microsoft.NodejsTools.Parsing
         {
             if (node != null)
             {
-                node.Index = NextOrderIndex;
                 if (node.BlockScope == null
                     && node.Parent != null
                     && !(node.Parent is SwitchCase)
@@ -464,8 +432,6 @@ namespace Microsoft.NodejsTools.Parsing
                 }
                 finally
                 {
-                    // be sure to reset the unreachable flag when we exit this block
-                    m_isUnreachable = false;
 
                     if (node.BlockScope != null)
                     {
@@ -489,14 +455,6 @@ namespace Microsoft.NodejsTools.Parsing
 
         public override bool Walk(Break node)
         {
-            if (node != null)
-            {
-                node.Index = NextOrderIndex;
-
-                // we can stop marking order for subsequent statements in this block,
-                // since this stops execution
-                m_isUnreachable = true;
-            }
             return false;
         }
 
@@ -513,8 +471,6 @@ namespace Microsoft.NodejsTools.Parsing
                 {
                     node.Arguments.Walk(this);
                 }
-
-                node.Index = NextOrderIndex;
             }
             return false;
         }
@@ -528,32 +484,21 @@ namespace Microsoft.NodejsTools.Parsing
                     node.Condition.Walk(this);
                 }
 
-                var startingIndex = m_orderIndex;
                 if (node.TrueExpression != null)
                 {
                     node.TrueExpression.Walk(this);
                 }
 
-                var trueEndIndex = m_orderIndex;
-                m_orderIndex = startingIndex;
-
                 if (node.FalseExpression != null)
                 {
                     node.FalseExpression.Walk(this);
                 }
-
-                m_orderIndex = Math.Max(trueEndIndex, m_orderIndex);
-                node.Index = NextOrderIndex;
             }
             return false;
         }
 
         public override bool Walk(ConstantWrapper node)
         {
-            if (node != null)
-            {
-                node.Index = NextOrderIndex;
-            }
             return false;
         }
 
@@ -561,9 +506,6 @@ namespace Microsoft.NodejsTools.Parsing
         {
             if (node != null)
             {
-                // declarations get -1 position
-                node.Index = -1;
-
                 // the statement itself doesn't get executed, but the initializers do
                 for (var ndx = 0; ndx < node.Count; ++ndx)
                 {
@@ -579,23 +521,11 @@ namespace Microsoft.NodejsTools.Parsing
 
         public override bool Walk(ContinueNode node)
         {
-            if (node != null)
-            {
-                node.Index = NextOrderIndex;
-
-                // we can stop marking order for subsequent statements in this block,
-                // since this stops execution
-                m_isUnreachable = true;
-            }
             return false;
         }
 
         public override bool Walk(DebuggerNode node)
         {
-            if (node != null)
-            {
-                node.Index = NextOrderIndex;
-            }
             return false;
         }
 
@@ -603,7 +533,6 @@ namespace Microsoft.NodejsTools.Parsing
         {
             if (node != null)
             {
-                node.Index = NextOrderIndex;
                 if (node.UseStrict)
                 {
                     CurrentVariableScope.UseStrict = true;
@@ -616,7 +545,6 @@ namespace Microsoft.NodejsTools.Parsing
         {
             if (node != null)
             {
-                node.Index = NextOrderIndex;
                 if (node.Body != null)
                 {
                     node.Body.Walk(this);
@@ -640,8 +568,6 @@ namespace Microsoft.NodejsTools.Parsing
         {
             if (node != null)
             {
-                node.Index = NextOrderIndex;
-
                 if (node.Collection != null)
                 {
                     node.Collection.Walk(this);
@@ -693,8 +619,6 @@ namespace Microsoft.NodejsTools.Parsing
         {
             if (node != null)
             {
-                node.Index = NextOrderIndex;
-
                 if (node.Initializer != null)
                 {
                     // if the variable portion of the for-in statement is a lexical
@@ -751,9 +675,6 @@ namespace Microsoft.NodejsTools.Parsing
         {
             if (node != null)
             {
-                // it's a declaration; put the index to -1.
-                node.Index = -1;
-
                 // create a function scope, assign it to the function object,
                 // and push it on the stack
                 var parentScope = CurrentLexicalScope;
@@ -781,13 +702,11 @@ namespace Microsoft.NodejsTools.Parsing
                 m_lexicalStack.Push(node.FunctionScope);
                 m_variableStack.Push(node.FunctionScope);
 
-                var savedIndex = m_orderIndex;
                 try
                 {
                     // recurse into the function to handle it after saving the current index and resetting it
                     if (node.Body != null)
                     {
-                        m_orderIndex = 0;
                         node.Body.Walk(this);
                     }
                 }
@@ -796,8 +715,6 @@ namespace Microsoft.NodejsTools.Parsing
                     Debug.Assert(CurrentLexicalScope == node.FunctionScope);
                     m_lexicalStack.Pop();
                     m_variableStack.Pop();
-
-                    m_orderIndex = savedIndex;
                 }
 
                 // nothing to add to the var-decl list.
@@ -837,8 +754,6 @@ namespace Microsoft.NodejsTools.Parsing
                 {
                     node.Operand.Walk(this);
                 }
-
-                node.Index = NextOrderIndex;
             }
             return false;
         }
@@ -847,29 +762,21 @@ namespace Microsoft.NodejsTools.Parsing
         {
             if (node != null)
             {
-                node.Index = NextOrderIndex;
                 if (node.Condition != null)
                 {
                     node.Condition.Walk(this);
                 }
 
                 // make true and false block numbered from the same starting point?
-                var startingPoint = m_orderIndex;
                 if (node.TrueBlock != null)
                 {
                     node.TrueBlock.Walk(this);
                 }
 
-                var trueStop = m_orderIndex;
-                m_orderIndex = startingPoint;
-
                 if (node.FalseBlock != null)
                 {
                     node.FalseBlock.Walk(this);
                 }
-
-                // and keep counting from the farthest point
-                m_orderIndex = Math.Max(trueStop, m_orderIndex);
             }
             return false;
         }
@@ -878,7 +785,6 @@ namespace Microsoft.NodejsTools.Parsing
         {
             if (node != null)
             {
-                node.Index = NextOrderIndex;
                 if (node.Statement != null)
                 {
                     node.Statement.Walk(this);
@@ -891,8 +797,6 @@ namespace Microsoft.NodejsTools.Parsing
         {
             if (node != null)
             {
-                // lexical declarations get an order index
-                node.Index = NextOrderIndex;
                 for (var ndx = 0; ndx < node.Count; ++ndx)
                 {
                     var decl = node[ndx];
@@ -909,8 +813,6 @@ namespace Microsoft.NodejsTools.Parsing
         {
             if (node != null)
             {
-                node.Index = NextOrderIndex;
-
                 // add the lookup node to the current lexical scope, because
                 // that's the starting point for this node's lookup resolution.
                 CurrentLexicalScope.ScopeLookups.Add(node);
@@ -926,8 +828,6 @@ namespace Microsoft.NodejsTools.Parsing
                 {
                     node.Root.Walk(this);
                 }
-
-                node.Index = NextOrderIndex;
             }
             return false;
         }
@@ -937,7 +837,6 @@ namespace Microsoft.NodejsTools.Parsing
             if (node != null)
             {
                 node.Properties.Walk(this);
-                node.Index = NextOrderIndex;
             }
             return false;
         }
@@ -957,8 +856,6 @@ namespace Microsoft.NodejsTools.Parsing
                 {
                     node.Value.Walk(this);
                 }
-
-                node.Index = NextOrderIndex;
             }
             return false;
         }
@@ -971,10 +868,6 @@ namespace Microsoft.NodejsTools.Parsing
 
         public override bool Walk(RegExpLiteral node)
         {
-            if (node != null)
-            {
-                node.Index = NextOrderIndex;
-            }
             return true;
         }
 
@@ -986,12 +879,6 @@ namespace Microsoft.NodejsTools.Parsing
                 {
                     node.Operand.Walk(this);
                 }
-
-                node.Index = NextOrderIndex;
-
-                // we can stop marking order for subsequent statements in this block,
-                // since this stops execution
-                m_isUnreachable = true;
             }
             return false;
         }
@@ -1000,7 +887,6 @@ namespace Microsoft.NodejsTools.Parsing
         {
             if (node != null)
             {
-                node.Index = NextOrderIndex;
                 if (node.Expression != null)
                 {
                     node.Expression.Walk(this);
@@ -1044,10 +930,6 @@ namespace Microsoft.NodejsTools.Parsing
 
         public override bool Walk(ThisLiteral node)
         {
-            if (node != null)
-            {
-                node.Index = NextOrderIndex;
-            }
             return true;
         }
 
@@ -1059,12 +941,6 @@ namespace Microsoft.NodejsTools.Parsing
                 {
                     node.Operand.Walk(this);
                 }
-
-                node.Index = NextOrderIndex;
-
-                // we can stop marking order for subsequent statements in this block,
-                // since this stops execution
-                m_isUnreachable = true;
             }
             return false;
         }
@@ -1073,8 +949,6 @@ namespace Microsoft.NodejsTools.Parsing
         {
             if (node != null)
             {
-                node.Index = NextOrderIndex;
-
                 if (node.TryBlock != null)
                 {
                     node.TryBlock.Walk(this);
@@ -1115,8 +989,6 @@ namespace Microsoft.NodejsTools.Parsing
                 {
                     node.Operand.Walk(this);
                 }
-
-                node.Index = NextOrderIndex;
             }
             return false;
         }
@@ -1125,9 +997,6 @@ namespace Microsoft.NodejsTools.Parsing
         {
             if (node != null)
             {
-                // declarations get a -1 position index
-                node.Index = -1;
-
                 for (var ndx = 0; ndx < node.Count; ++ndx)
                 {
                     var decl = node[ndx];
@@ -1163,13 +1032,6 @@ namespace Microsoft.NodejsTools.Parsing
                 {
                     // recurse the initializer
                     node.Initializer.Walk(this);
-                    node.Index = NextOrderIndex;
-                }
-                else
-                {
-                    // no initializer; give it an index of -1 because it doesn't actually
-                    // do anything at execution time.
-                    node.Index = -1;
                 }
             }
             return false;
@@ -1177,10 +1039,6 @@ namespace Microsoft.NodejsTools.Parsing
 
         public override bool Walk(WhileNode node)
         {
-            if (node != null)
-            {
-                node.Index = NextOrderIndex;
-            }
             return true;
         }
 
@@ -1188,7 +1046,6 @@ namespace Microsoft.NodejsTools.Parsing
         {
             if (node != null)
             {
-                node.Index = NextOrderIndex;
                 if (node.WithObject != null)
                 {
                     node.WithObject.Walk(this);

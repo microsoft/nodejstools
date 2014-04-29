@@ -25,24 +25,6 @@ namespace Microsoft.NodejsTools.Parsing
         {
         }
 
-        public override bool IsExpression
-        {
-            get
-            {
-                // by definition we're an expression
-                return true;
-            }
-        }
-
-        public override OperatorPrecedence Precedence
-        {
-            get
-            {
-                // assume primary (lookup, literals, etc) and override for operators
-                return OperatorPrecedence.Primary;
-            }
-        }
-
         public virtual bool ReplaceChild(Expression oldNode, Expression newNode) {
             return false;
         }

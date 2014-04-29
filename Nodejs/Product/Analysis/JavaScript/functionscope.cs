@@ -77,7 +77,7 @@ namespace Microsoft.NodejsTools.Parsing
             // add a field for the function expression name so it can be self-referencing.
             var functionField = this.CreateField(FunctionObject.Name, FunctionObject, 0);
             functionField.IsFunction = true;
-            functionField.OriginalContext = FunctionObject.IdContext;
+            functionField.OriginalContext = FunctionObject.NameContext;
 
             FunctionObject.VariableField = functionField;
 

@@ -73,14 +73,5 @@ namespace Microsoft.NodejsTools.Parsing
             }
             return false;
         }
-
-        internal override bool EncloseBlock(EncloseBlockType type)
-        {
-            // there is an IE bug (up to IE7, at this time) that do-while
-            // statements cause problems when they happen before else or while
-            // statements without a closing curly-brace between them.
-            // So if we get here, flag this as possibly requiring a block.
-            return (type == EncloseBlockType.SingleDoWhile);
-        }
     }
 }

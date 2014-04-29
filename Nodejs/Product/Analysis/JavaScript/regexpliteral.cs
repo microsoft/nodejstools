@@ -25,14 +25,6 @@ namespace Microsoft.NodejsTools.Parsing
         public string Pattern { get; set; }
         public string PatternSwitches { get; set; }
 
-        public override bool IsConstant
-        {
-            get
-            {
-                return true;
-            }
-        }
-
         public RegExpLiteral(TokenWithSpan context, JSParser parser)
             : base(context, parser)
         {

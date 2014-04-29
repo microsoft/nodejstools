@@ -29,6 +29,5 @@ namespace Microsoft.NodejsTools.Parsing
         Node AssignmentValue { get; }
         JSVariableField VariableField { get; }
         string Name { get; }
-        long Index { get; }
     }
 }

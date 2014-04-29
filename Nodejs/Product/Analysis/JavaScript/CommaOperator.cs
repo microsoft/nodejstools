@@ -30,10 +30,6 @@ namespace Microsoft.NodejsTools.Parsing
         {
         }
 
-        public override PrimitiveType FindPrimitiveType() {
-            return _expressions[_expressions.Length - 1].FindPrimitiveType();
-        }
-
         public override IEnumerable<Node> Children
         {
             get

@@ -43,14 +43,6 @@ namespace Microsoft.NodejsTools.Parsing
         {
         }
 
-        public override OperatorPrecedence Precedence
-        {
-            get
-            {
-                return OperatorPrecedence.FieldAccess;
-            }
-        }
-
         public override void Walk(AstVisitor visitor) {
             if (visitor.Walk(this)) {
                 m_root.Walk(visitor);

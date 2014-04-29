@@ -234,7 +234,7 @@
     <Compile Include="Helpers.cs" />
     <Compile Include="JavaScript\activationobject.cs" />
     <Compile Include="JavaScript\arrayliteral.cs" />
-    <Compile Include="JavaScript\ast.cs" />
+    <Compile Include="JavaScript\Node.cs" />
     <Compile Include="JavaScript\astlist.cs" />
     <Compile Include="JavaScript\binaryop.cs" />
     <Compile Include="JavaScript\block.cs" />

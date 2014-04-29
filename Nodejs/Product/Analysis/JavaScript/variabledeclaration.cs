@@ -95,17 +95,6 @@ namespace Microsoft.NodejsTools.Parsing
             visitor.PostWalk(this);
         }
 
-        public override bool IsExpression
-        {
-            get
-            {
-                // sure. treat a vardecl like an expression. normally this wouldn't be anywhere but
-                // in a var statement, but sometimes the special-cc case might be moved into an expression
-                // statement
-                return true;
-            }
-        }
-
         internal override string GetFunctionGuess(Node target)
         {
             return Identifier;

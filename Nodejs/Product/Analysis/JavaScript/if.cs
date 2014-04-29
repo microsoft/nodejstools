@@ -139,24 +139,5 @@ namespace Microsoft.NodejsTools.Parsing
             }
             return false;
         }
-
-        internal override bool EncloseBlock(EncloseBlockType type)
-        {
-            // if there's an else block, recurse down that branch
-            if (FalseBlock != null)
-            {
-                return FalseBlock.EncloseBlock(type);
-            }
-            else if (type == EncloseBlockType.IfWithoutElse)
-            {
-                // there is no else branch -- we might have to enclose the outer block
-                return true;
-            }
-            else if (TrueBlock != null)
-            {
-                return TrueBlock.EncloseBlock(type);
-            }
-            return false;
-        }
     }
 }

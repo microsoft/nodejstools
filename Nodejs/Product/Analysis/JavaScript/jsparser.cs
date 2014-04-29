@@ -275,7 +275,7 @@ namespace Microsoft.NodejsTools.Parsing
                             // parse a statement -- pass true because we really want a SourceElement,
                             // which is a Statement OR a FunctionDeclaration. Technically, FunctionDeclarations
                             // are not statements!
-                            ast = ParseStatement(true);
+                            ast = ParseStatement();
 
                             // if we are still possibly looking for directive prologues
                             if (possibleDirectivePrologue)
@@ -402,7 +402,7 @@ namespace Microsoft.NodejsTools.Parsing
         // ParseXXX routine does it as well, it should return directly from the switch statement
         // without any further execution in the ParseStatement
         [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Maintainability", "CA1502:AvoidExcessiveComplexity"), System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Maintainability", "CA1505:AvoidUnmaintainableCode")]
-        private Statement ParseStatement(bool fSourceElement)
+        private Statement ParseStatement()
         {
             Statement statement = null;
 
@@ -472,7 +472,6 @@ namespace Microsoft.NodejsTools.Parsing
                 case JSToken.Function:
                     // parse a function declaration
                     FunctionObject function = ParseFunction(FunctionType.Declaration, m_currentToken);
-                    function.IsSourceElement = fSourceElement;
                     return function;
                 case JSToken.Else:
                     ReportError(JSError.InvalidElse);
@@ -515,7 +514,7 @@ namespace Microsoft.NodejsTools.Parsing
                                             Label = id,
                                             ColonContext = colonContext,
                                             NestCount = labelNestCount,
-                                            Statement = ParseStatement(fSourceElement)
+                                            Statement = ParseStatement()
                                         };
                                 }
                                 else
@@ -537,7 +536,7 @@ namespace Microsoft.NodejsTools.Parsing
                         expr = ParseExpression(expr, false, bAssign, JSToken.None);
 
                         // if we just started a new module and this statement happens to be an expression statement...
-                        if (isNewModule && expr.IsExpression)
+                        if (isNewModule)
                         {
                             // see if it's a constant wrapper
                             var constantWrapper = expr as ConstantWrapper;
@@ -649,7 +648,7 @@ namespace Microsoft.NodejsTools.Parsing
                         {
                             // pass false because we really only want Statements, and FunctionDeclarations
                             // are technically not statements. We'll still handle them, but we'll issue a warning.
-                            codeBlock.Append(ParseStatement(false));
+                            codeBlock.Append(ParseStatement());
                         }
                         catch (RecoveryTokenException exc)
                         {
@@ -1054,7 +1053,7 @@ namespace Microsoft.NodejsTools.Parsing
                 try
                 {
                     // parse a Statement, not a SourceElement
-                    trueBranch = ParseStatement(false);
+                    trueBranch = ParseStatement();
                 }
                 catch (RecoveryTokenException exc)
                 {
@@ -1103,7 +1102,7 @@ namespace Microsoft.NodejsTools.Parsing
                     try
                     {
                         // parse a Statement, not a SourceElement
-                        falseBranch = ParseStatement(false);
+                        falseBranch = ParseStatement();
                     }
                     catch (RecoveryTokenException exc)
                     {
@@ -1318,7 +1317,7 @@ namespace Microsoft.NodejsTools.Parsing
                     try
                     {
                         // parse a Statement, not a SourceElement
-                        body = ParseStatement(false);
+                        body = ParseStatement();
                     }
                     catch (RecoveryTokenException exc)
                     {
@@ -1453,7 +1452,7 @@ namespace Microsoft.NodejsTools.Parsing
                     try
                     {
                         // parse a Statement, not a SourceElement
-                        body = ParseStatement(false);
+                        body = ParseStatement();
                     }
                     catch (RecoveryTokenException exc)
                     {
@@ -1517,7 +1516,7 @@ namespace Microsoft.NodejsTools.Parsing
                 try
                 {
                     // parse a Statement, not a SourceElement
-                    body = ParseStatement(false);
+                    body = ParseStatement();
                 }
                 catch (RecoveryTokenException exc)
                 {
@@ -1712,7 +1711,7 @@ namespace Microsoft.NodejsTools.Parsing
                 try
                 {
                     // parse a Statement, not a SourceElement
-                    body = ParseStatement(false);
+                    body = ParseStatement();
                 }
                 catch (RecoveryTokenException exc)
                 {
@@ -2067,7 +2066,7 @@ namespace Microsoft.NodejsTools.Parsing
                 try
                 {
                     // parse a Statement, not a SourceElement
-                    Statement statement = ParseStatement(false);
+                    Statement statement = ParseStatement();
 
                     // but make sure we save it as a block
                     block = statement as Block;
@@ -2299,7 +2298,7 @@ namespace Microsoft.NodejsTools.Parsing
                                     try
                                     {
                                         // parse a Statement, not a SourceElement
-                                        statements.Append(ParseStatement(false));
+                                        statements.Append(ParseStatement());
                                     }
                                     catch (RecoveryTokenException exc)
                                     {
@@ -2921,7 +2920,7 @@ namespace Microsoft.NodejsTools.Parsing
                         try
                         {
                             // function body's are SourceElements (Statements + FunctionDeclarations)
-                            var statement = ParseStatement(true);
+                            var statement = ParseStatement();
                             if (possibleDirectivePrologue && !(statement is ReturnNode))
                             {
                                 var constantWrapper = Statement.GetExpression(statement) as ConstantWrapper;
@@ -2973,7 +2972,7 @@ namespace Microsoft.NodejsTools.Parsing
                         exc._partiallyComputedNode = new FunctionObject(fncCtx, this)
                             {
                                 FunctionType = (inExpression ? FunctionType.Expression : FunctionType.Declaration),
-                                IdContext = name.IfNotNull(n => n.Context),
+                                NameContext = name.IfNotNull(n => n.Context),
                                 Name = name.IfNotNull(n => n.Name),
                                 ParameterDeclarations = formalParameters,
                                 ParametersContext = paramsContext,
@@ -3001,7 +3000,7 @@ namespace Microsoft.NodejsTools.Parsing
             return new FunctionObject(fncCtx, this)
                 {
                     FunctionType = functionType,
-                    IdContext = name.IfNotNull(n => n.Context),
+                    NameContext = name.IfNotNull(n => n.Context),
                     Name = name.IfNotNull(n => n.Name),
                     ParameterDeclarations = formalParameters,
                     ParametersContext = paramsContext,
@@ -3594,13 +3593,22 @@ namespace Microsoft.NodejsTools.Parsing
 
                 case JSToken.Divide:
                     // could it be a regexp?
+                    var start = m_currentToken;
                     String source = m_scanner.ScanRegExp();
                     if (source != null)
                     {
                         // parse the flags (if any)
                         String flags = m_scanner.ScanRegExpFlags();
                         // create the literal
-                        ast = new RegExpLiteral(m_currentToken, this)
+                        var regExpToken = m_currentToken.UpdateWith(
+                            new TokenWithSpan(
+                                null,
+                                m_scanner.CurrentSpan.Start,
+                                m_scanner.CurrentSpan.End,
+                                JSToken.RegularExpression
+                            )
+                        );
+                        ast = new RegExpLiteral(regExpToken, this)
                             {
                                 Pattern = source,
                                 PatternSwitches = flags
@@ -3805,7 +3813,7 @@ namespace Microsoft.NodejsTools.Parsing
                                             field = new GetterSetter(
                                               functionExpr.Function.Name,
                                               isGet,
-                                              functionExpr.Function.IdContext,
+                                              functionExpr.Function.NameContext,
                                               this
                                               );
                                         }

@@ -68,36 +68,11 @@ namespace Microsoft.NodejsTools.Parsing
         {
         }
 
-        public override OperatorPrecedence Precedence
-        {
-            get
-            {
-                return OperatorPrecedence.Conditional;
-            }
-        }
-
         public void SwapBranches()
         {
             var temp = m_trueExpression;
             m_trueExpression = m_falseExpression;
             m_falseExpression = temp;
-        }
-
-        public override PrimitiveType FindPrimitiveType()
-        {
-            if (TrueExpression != null && FalseExpression != null)
-            {
-                // if the primitive type of both true and false expressions is the same, then
-                // we know the primitive type. Otherwise we do not.
-                PrimitiveType trueType = TrueExpression.FindPrimitiveType();
-                if (trueType == FalseExpression.FindPrimitiveType())
-                {
-                    return trueType;
-                }
-            }
-
-            // nope -- they don't match, so we don't know
-            return PrimitiveType.Other;
         }
 
         public override IEnumerable<Node> Children

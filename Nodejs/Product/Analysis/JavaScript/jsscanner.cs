@@ -682,6 +682,12 @@ namespace Microsoft.NodejsTools.Parsing
             );
         }
 
+        internal IndexSpan CurrentSpan {
+            get {
+                return new IndexSpan(_tokenStartIndex, _tokenEndIndex - _tokenStartIndex);
+            }
+        }
+
         private JSToken ScanLineTerminator(char ch)
         {
             // line terminator

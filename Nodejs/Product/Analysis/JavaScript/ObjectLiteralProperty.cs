@@ -46,16 +46,6 @@ namespace Microsoft.NodejsTools.Parsing
             }
         }
 
-        public override bool IsConstant
-        {
-            get
-            {
-                // we are constant if our value is constant.
-                // If we don't have a value, then assume it's constant?
-                return Value != null ? Value.IsConstant : true;
-            }
-        }
-
         public ObjectLiteralProperty(TokenWithSpan context, JSParser parser)
             : base(context, parser)
         {

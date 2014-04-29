@@ -97,29 +97,6 @@ namespace Microsoft.NodejsTools.Parsing
             walker.PostWalk(this);
         }
 
-        internal override bool EncloseBlock(EncloseBlockType type)
-        {
-            // if there's more than one item, then return false.
-            // otherwise recurse the call
-            return (m_list.Count == 1 && m_list[0].EncloseBlock(type));
-        }
-
-        /// <summary>
-        /// Returns false unless the block constains only a single statement that is itself an expression.
-        /// </summary>
-        public override bool IsExpression
-        {
-            get
-            {
-                // if this block contains a single statement, then recurse.
-                // otherwise it isn't.
-                //
-                // TODO: if there are no statements -- empty block -- then is is an expression?
-                // I mean, we can make an empty block be an expression by just making it a zero. 
-                return m_list.Count == 1 && m_list[0].IsExpression;
-            }
-        }
-
         /// <summary>
         /// Gets the count of statements making up this block
         /// </summary>

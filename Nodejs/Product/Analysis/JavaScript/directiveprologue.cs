@@ -33,25 +33,6 @@ namespace Microsoft.NodejsTools.Parsing
         public bool UseStrict { get; private set; }
         public bool IsRedundant { get; set; }
 
-        public override bool IsExpression
-        {
-            get
-            {
-                // directive prologues aren't expressions -- we don't want to
-                // combine them with other expressions, for instance.
-                return false;
-            }
-        }
-
-        public override bool IsConstant
-        {
-            get
-            {
-                // not a constant, really; it's a directive prologue.
-                return false;
-            }
-        }
-
         public override void Walk(AstVisitor visitor) {
             if (visitor.Walk(this)) {
             }

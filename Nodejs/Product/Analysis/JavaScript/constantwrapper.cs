@@ -54,15 +54,6 @@ namespace Microsoft.NodejsTools.Parsing
             set;
         }
 
-        public override bool IsConstant
-        {
-            get
-            {
-                // this is a constant
-                return true;
-            }
-        }
-        
         public bool IsParameterToRegExp { get; set; }
 
         public ConstantWrapper(Object value, PrimitiveType primitiveType, TokenWithSpan context, JSParser parser)
@@ -72,12 +63,6 @@ namespace Microsoft.NodejsTools.Parsing
 
             // force numerics to be of type double
             Value = (primitiveType == PrimitiveType.Number ? System.Convert.ToDouble(value, CultureInfo.InvariantCulture) : value);
-        }
-
-        public override PrimitiveType FindPrimitiveType()
-        {
-            // we know the primitive type of this node
-            return PrimitiveType;
         }
 
         public override void Walk(AstVisitor visitor) {

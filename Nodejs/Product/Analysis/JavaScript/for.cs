@@ -101,12 +101,6 @@ namespace Microsoft.NodejsTools.Parsing
             visitor.PostWalk(this);
         }
 
-        internal override bool EncloseBlock(EncloseBlockType type)
-        {
-            // pass the query on to the body
-            return Body == null || Body.Count == 0 ? false : Body.EncloseBlock(type);
-        }
-
         public override IEnumerable<Node> Children
         {
             get

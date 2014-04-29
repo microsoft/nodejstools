@@ -64,42 +64,6 @@ namespace Microsoft.NodejsTools.Parsing
         {
         }
 
-        public override OperatorPrecedence Precedence
-        {
-            get
-            {
-                // new-operator is the unary precedence; () and [] are  field access
-                return /*IsConstructor ? OperatorPrecedence.Unary :*/ OperatorPrecedence.FieldAccess;
-            }
-        }
-
-        public override bool IsExpression
-        {
-            get
-            {
-                // normall this would be an expression. BUT we want to check for a
-                // call to a member function that is in the "onXXXX" pattern and passing
-                // parameters. This is because of a bug in IE that will throw a script error 
-                // if you call a native event handler like onclick and pass in a parameter
-                // IN A LOGICAL EXPRESSION. For some reason, the simple statement:
-                // elem.onclick(e) will work, but elem&&elem.onclick(e) will not. So treat
-                // calls to any member operator where the property name starts with "on" and
-                // we are passing in arguments as if it were NOT an expression, and it won't
-                // get combined.
-                Member callMember = Function as Member;
-                if (callMember != null
-                    && callMember.Name.StartsWith("on", StringComparison.Ordinal)
-                    && Arguments.Count > 0)
-                {
-                    // popped positive -- don't treat it like an expression.
-                    return false;
-                }
-
-                // otherwise it's okay -- it's an expression and can be combined.
-                return true;
-            }
-        }
-
         public override void Walk(AstVisitor visitor) {
             if (visitor.Walk(this)) {
                 m_function.Walk(visitor);

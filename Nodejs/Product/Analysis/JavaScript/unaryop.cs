@@ -53,39 +53,6 @@ namespace Microsoft.NodejsTools.Parsing
             visitor.PostWalk(this);
         }
 
-        public override PrimitiveType FindPrimitiveType()
-        {
-            switch (OperatorToken)
-            {
-                case JSToken.TypeOf:
-                    // typeof ALWAYS returns type string
-                    return PrimitiveType.String;
-
-                case JSToken.LogicalNot:
-                    // ! always return boolean
-                    return PrimitiveType.Boolean;
-
-                case JSToken.Void:
-                case JSToken.Delete:
-                    // void returns undefined.
-                    // delete returns number, but just return other
-                    return PrimitiveType.Other;
-
-                default:
-                    // all other unary operators return a number
-                    return PrimitiveType.Number;
-            }
-        }
-
-        public override OperatorPrecedence Precedence
-        {
-            get
-            {
-                // assume unary precedence
-                return OperatorPrecedence.Unary;
-            }
-        }
-
         public override IEnumerable<Node> Children
         {
             get
@@ -102,14 +69,6 @@ namespace Microsoft.NodejsTools.Parsing
                 return true;
             }
             return false;
-        }
-
-        public override bool IsConstant
-        {
-            get
-            {
-                return Operand.IfNotNull(o => o.IsConstant);
-            }
         }
 
         public override string ToString()

@@ -51,16 +51,6 @@ namespace Microsoft.NodejsTools.Parsing
           visitor.PostWalk(this);
       }
 
-        public override OperatorPrecedence Precedence
-      {
-        get
-        {
-          // the only time this should be called is when we are outputting a
-          // comma-operator, so the list should have the comma precedence.
-          return OperatorPrecedence.Comma;
-        }
-      }
-
       public int Count
       {
         get { return m_list.Count; }
@@ -208,25 +198,6 @@ namespace Microsoft.NodejsTools.Parsing
             }
           }
           return constantValue;
-        }
-      }
-
-      public override bool IsConstant
-      {
-        get
-        {
-          foreach (var item in m_list)
-          {
-            if (item != null)
-            {
-              if (!item.IsConstant)
-              {
-                return false;
-              }
-            }
-          }
-
-          return true;
         }
       }
 
