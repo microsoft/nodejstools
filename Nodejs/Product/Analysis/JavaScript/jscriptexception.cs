@@ -58,6 +58,40 @@ namespace Microsoft.NodejsTools.Parsing
 
         #endregion
 
+        #region constructors
+
+        public JScriptException(string message) : this(message, null) { }
+        public JScriptException(string message, Exception innerException)
+            : base(message, innerException) {
+            m_valueObject = message;
+            m_context = null;
+            m_errorCode = JSError.UncaughtException;
+            SetHResult();
+        }
+
+        internal JScriptException(JSError errorNumber, TokenWithSpan context) {
+            m_valueObject = null;
+            m_context = (context == null ? null : context);
+            m_errorCode = errorNumber;
+            SetHResult();
+        }
+
+#if !SILVERLIGHT
+        protected JScriptException(SerializationInfo info, StreamingContext context)
+            : base(info, context) {
+            if (info == null) {
+                throw new ArgumentException(JScript.InternalCompilerError);
+            }
+
+            m_valueObject = info.GetString("Value");
+            m_isError = info.GetBoolean("IsError");
+            m_errorCode = (JSError)info.GetInt32("JSError");
+            m_canRecover = info.GetBoolean("CanRecover");
+        }
+#endif
+
+        #endregion
+
         #region public properties
 
         public TokenWithSpan Context {
@@ -153,7 +187,7 @@ namespace Microsoft.NodejsTools.Parsing
                     {
                         // end column before start column -- just set end to be the end of the line
                         // TODO: 
-                        Debug.Fail("bad end column");
+                        Debug.Fail("bad end column ");
                         return m_context.StartColumn;
                     }
                 }
@@ -197,44 +231,7 @@ namespace Microsoft.NodejsTools.Parsing
         }
 
         #endregion
-
-        #region constructors
-
-        public JScriptException(string message) : this(message, null) { }
-        public JScriptException(string message, Exception innerException)
-            : base(message, innerException)
-        {
-            m_valueObject = message;
-            m_context = null;
-            m_errorCode = JSError.UncaughtException;
-            SetHResult();
-        }
-
-        internal JScriptException(JSError errorNumber, TokenWithSpan context)
-        {
-            m_valueObject = null;
-            m_context = (context == null ? null : context);
-            m_errorCode = errorNumber;
-            SetHResult();
-        }
-
-        #if !SILVERLIGHT
-        protected JScriptException(SerializationInfo info, StreamingContext context)
-            : base(info, context)
-        {
-            if (info == null)
-            {
-                throw new ArgumentException(JScript.InternalCompilerError);
-            }
-
-            m_valueObject = info.GetString("Value");
-            m_isError = info.GetBoolean("IsError");
-            m_errorCode = (JSError)info.GetInt32("JSError");
-            m_canRecover = info.GetBoolean("CanRecover");
-        }
-        #endif
-
-        #endregion
+        
 
         #region public methods
 

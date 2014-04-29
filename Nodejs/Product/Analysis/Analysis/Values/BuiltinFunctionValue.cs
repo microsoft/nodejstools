@@ -68,13 +68,13 @@ namespace Microsoft.NodejsTools.Analysis.Values {
 
         public override string Description {
             get {
-                return Documentation;
+                return String.Format("function {0} (built-in)", Name);
             }
         }
 
         public override string Documentation {
             get {
-                return String.Format("function {0} (built-in)", Name);
+                return "";
             }
         }
     }

@@ -39,6 +39,7 @@ namespace Microsoft.NodejsTools.Analysis {
         internal readonly BooleanValue _trueInst, _falseInst;
         internal readonly UndefinedValue _undefined;
         internal readonly ObjectValue _globalObject;
+        internal readonly FunctionValue _arrayFunction;
         internal readonly AnalysisValue _numberPrototype, _stringPrototype, _booleanPrototype, _functionPrototype;
         private readonly Deque<AnalysisUnit> _queue;
         private Action<int> _reportQueueSize;
@@ -82,7 +83,8 @@ namespace Microsoft.NodejsTools.Analysis {
             _stringPrototype = globals.StringPrototype;
             _booleanPrototype = globals.BooleanPrototype;
             _functionPrototype = globals.FunctionPrototype;
-            
+            _arrayFunction = globals.ArrayFunction;
+
             var allJson = Path.Combine(
                 Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location),
                 "all.json"

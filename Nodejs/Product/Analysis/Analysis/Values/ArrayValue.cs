@@ -10,7 +10,7 @@ namespace Microsoft.NodejsTools.Analysis.Values {
         private VariableDef[] _indexTypes;     // types for known indices
 
         public ArrayValue(VariableDef[] indexTypes, ProjectEntry entry)
-            : base(entry) {
+            : base(entry, entry.Analyzer._arrayFunction) {
             _indexTypes = indexTypes;
         }
 

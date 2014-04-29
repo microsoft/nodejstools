@@ -209,9 +209,9 @@ namespace Microsoft.NodejsTools.Analysis.Values {
 
                     IEnumerable<AnalysisVariable>[] refs;
                     if (references.TryGetValue(parameters, out refs)) {
-                        refs = refs.Zip(vars, (r, v) => r.Concat(ProjectEntry.Analysis.ToVariables(v))).ToArray();
+                        refs = refs.Zip(vars, (r, v) => r.Concat(VariableTransformer.OtherToVariables.ToVariables(v))).ToArray();
                     } else {
-                        refs = vars.Select(v => ProjectEntry.Analysis.ToVariables(v)).ToArray();
+                        refs = vars.Select(v => VariableTransformer.OtherToVariables.ToVariables(v)).ToArray();
                     }
                     references[parameters] = refs;
                 }
@@ -249,7 +249,7 @@ namespace Microsoft.NodejsTools.Analysis.Values {
                     if (unit.ForEval) {
                         // Call expressions that weren't analyzed get the union result
                         // of all calls to this function.
-                        var res = AnalysisSet.Empty;
+                        var res = _analysisUnit.ReturnValue.Types;
                         foreach (var call in _allCalls.Values) {
                             res = res.Union(call.ReturnValue.TypesNoCopy);
                         }
@@ -264,14 +264,19 @@ namespace Microsoft.NodejsTools.Analysis.Values {
                             _allCalls.Clear();
                             chain = chain.Trim(_callDepthLimit);
                         }
-                        calledUnit = new FunctionAnalysisUnit((FunctionAnalysisUnit)AnalysisUnit, chain, callArgs);
+                        calledUnit = new FunctionAnalysisUnit(
+                            (FunctionAnalysisUnit)AnalysisUnit, 
+                            chain, 
+                            @this,
+                            callArgs
+                        );
                         _allCalls.Add(unit.ProjectEntry, chain, calledUnit);
                         updateArguments = false;
                     }
                 }
             }
 
-            if (updateArguments && calledUnit.UpdateParameters(callArgs)) {
+            if (updateArguments && calledUnit.UpdateParameters(@this, callArgs)) {
                 AnalysisLog.UpdateUnit(calledUnit);
             }
 

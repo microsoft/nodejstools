@@ -53,7 +53,7 @@ namespace Microsoft.NodejsTools.Analysis.Analyzer {
             AnalysisLog.NewUnit(this);
         }
 
-        public FunctionAnalysisUnit(FunctionAnalysisUnit originalUnit, CallChain callChain, ArgumentSet callArgs)
+        public FunctionAnalysisUnit(FunctionAnalysisUnit originalUnit, CallChain callChain, IAnalysisSet @this, ArgumentSet callArgs)
             : base(originalUnit.Ast, null) {
             _originalUnit = originalUnit;
             _declUnit = originalUnit._declUnit;
@@ -67,7 +67,7 @@ namespace Microsoft.NodejsTools.Analysis.Analyzer {
                 originalUnit.Scope.OuterScope,
                 originalUnit.DeclaringModule.ProjectEntry
             );
-            scope.UpdateParameters(this, callArgs, false, originalUnit.Scope as FunctionScope);
+            scope.UpdateParameters(this, @this, callArgs, false, originalUnit.Scope as FunctionScope);
             _scope = scope;
 
             var walker = new OverviewWalker(originalUnit.ProjectEntry, this);
@@ -79,9 +79,9 @@ namespace Microsoft.NodejsTools.Analysis.Analyzer {
             Enqueue();
         }
 
-        internal bool UpdateParameters(ArgumentSet callArgs, bool enqueue = true) {
+        internal bool UpdateParameters(IAnalysisSet @this, ArgumentSet callArgs, bool enqueue = true) {
             var defScope = _originalUnit != null ? _originalUnit.Scope as FunctionScope : null;
-            return ((FunctionScope)Scope).UpdateParameters(this, callArgs, enqueue, defScope);
+            return ((FunctionScope)Scope).UpdateParameters(this, @this, callArgs, enqueue, defScope);
         }
 
         internal void AddNamedParameterReferences(AnalysisUnit caller, Lookup[] names) {

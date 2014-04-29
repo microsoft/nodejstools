@@ -16,6 +16,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using Microsoft.NodejsTools.Analysis.Analyzer;
 using Microsoft.NodejsTools.Parsing;
 
 namespace Microsoft.NodejsTools.Analysis.Values {
@@ -194,6 +195,27 @@ namespace Microsoft.NodejsTools.Analysis.Values {
             }
 
             return base.UnionMergeTypes(ns, strength);
+        }
+
+        public override IEnumerable<IReferenceable> GetDefinitions(string name) {
+            foreach (var res in base.GetDefinitions(name)) {
+                yield return res;
+            }
+
+            PropertyDescriptor prototype;
+            if (_creator != null &&
+                _creator.InstanceAttributes.TryGetValue("prototype", out prototype) &&
+                prototype.Values != null) {
+                foreach (var protoValue in prototype.Values.TypesNoCopy) {
+                    var protoContainer = protoValue as IReferenceableContainer;
+                    if (protoContainer != null) {
+                        foreach (var res in protoContainer.GetDefinitions(name)) {
+                            yield return res;
+                        }
+                    }
+                }
+            }
+            
         }
     }
 }

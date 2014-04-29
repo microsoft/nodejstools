@@ -22,6 +22,7 @@ using Microsoft.NodejsTools.Parsing;
 namespace Microsoft.NodejsTools.Analysis.Analyzer {
     sealed class FunctionScope : EnvironmentRecord {
         public readonly VariableDef ReturnValue;
+        private readonly VariableDef _this;
         //public readonly GeneratorInfo Generator;
 
         public FunctionScope(
@@ -32,6 +33,7 @@ namespace Microsoft.NodejsTools.Analysis.Analyzer {
         )
             : base(function, node, declScope) {
             ReturnValue = new VariableDef();
+            _this = new VariableDef();
 #if FALSE
             if (Function.FunctionObject.IsGenerator) {
                 Generator = new GeneratorInfo(function.ProjectState, declModule);
@@ -46,7 +48,55 @@ namespace Microsoft.NodejsTools.Analysis.Analyzer {
 
         public override IAnalysisSet ThisValue {
             get {
+                if (_this != null) {
+                    return _this.Types.Union(FunctionInfo.NewThis);
+                }
+
                 return this.FunctionInfo.NewThis;
+            }
+        }
+
+        public override IAnalysisSet MergedThisValue {
+            get {
+                IAnalysisSet res = AnalysisSet.Empty;
+                FunctionScope fnScope;
+
+                var nodes = new HashSet<Node>();
+                var seen = new HashSet<EnvironmentRecord>();
+                var queue = new Queue<FunctionScope>();
+                queue.Enqueue(this);
+
+                while (queue.Any()) {
+                    var scope = queue.Dequeue();
+                    if (scope == null || !seen.Add(scope)) {
+                        continue;
+                    }
+
+                    if (scope.Node == Node) {
+                        res = res.Union(scope.ThisValue);
+                    }
+
+                    if (scope.Function._allCalls != null) {
+                        foreach (var callUnit in scope.Function._allCalls.Values) {
+                            fnScope = callUnit.Scope as FunctionScope;
+                            if (fnScope != null && fnScope != this) {
+                                queue.Enqueue(fnScope);
+                            }
+                        }
+                    }
+
+                    foreach (var keyValue in scope.NodeScopes.Where(kv => nodes.Contains(kv.Key))) {
+                        if ((fnScope = keyValue.Value as FunctionScope) != null) {
+                            queue.Enqueue(fnScope);
+                        }
+                    }
+
+                    if ((fnScope = scope.OuterScope as FunctionScope) != null) {
+                        nodes.Add(scope.Node);
+                        queue.Enqueue(fnScope);
+                    }
+                }
+                return res;
             }
         }
 
@@ -82,7 +132,7 @@ namespace Microsoft.NodejsTools.Analysis.Analyzer {
             }
         }
 
-        internal bool UpdateParameters(FunctionAnalysisUnit unit, ArgumentSet others, bool enqueue = true, FunctionScope scopeWithDefaultParameters = null) {
+        internal bool UpdateParameters(FunctionAnalysisUnit unit, IAnalysisSet @this, ArgumentSet others, bool enqueue = true, FunctionScope scopeWithDefaultParameters = null) {
             EnsureParameters(unit);
 
             var astParams = Function.FunctionObject.ParameterDeclarations;
@@ -90,6 +140,10 @@ namespace Microsoft.NodejsTools.Analysis.Analyzer {
             var entry = unit.ProjectEntry;
             var state = unit.Analyzer;
             var limits = state.Limits;
+
+            if (@this != null) {
+                added |= _this.AddTypes(entry, @this, false);
+            }
 
             for (int i = 0; i < others.Args.Length && i < astParams.Count; ++i) {
                 VariableDef param;

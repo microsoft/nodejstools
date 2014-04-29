@@ -55,6 +55,42 @@ function f() {
                 BuiltinTypeId.Function
             ); 
         }
+
+        [TestMethod]
+        public void TestArrayForEach() {
+            string code = @"
+var arr = [1,2,3];
+function f(a) {
+    // here
+}
+arr.forEach(f);
+";
+            var analysis = ProcessText(code);
+            AssertUtil.ContainsExactly(
+                analysis.GetTypeIdsByIndex("a", code.IndexOf("// here")),
+                BuiltinTypeId.Number
+            );
+        }
+
+        [TestMethod]
+        public void TestThisFlows() {
+            string code = @"
+function f() {
+    this.func();
+}
+f.prototype.func = function() {
+    this.value = 42;
+}
+
+var x = new f().value;
+";
+            var analysis = ProcessText(code);
+            AssertUtil.ContainsExactly(
+                analysis.GetTypeIdsByIndex("x", 0),
+                BuiltinTypeId.Number
+            ); 
+        }
+
         /// <summary>
         /// Tests the internal [[Contruct]] method and makes sure
         /// we return the value if the function returns an object.

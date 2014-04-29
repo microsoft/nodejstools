@@ -373,7 +373,7 @@ namespace Microsoft.NodejsTools.Analysis.Values {
 
         #region IReferenceableContainer Members
 
-        public IEnumerable<IReferenceable> GetDefinitions(string name) {
+        public virtual IEnumerable<IReferenceable> GetDefinitions(string name) {
             PropertyDescriptor desc;
             // TODO: access descriptor support
             if (_descriptors != null && _descriptors.TryGetValue(name, out desc)) {

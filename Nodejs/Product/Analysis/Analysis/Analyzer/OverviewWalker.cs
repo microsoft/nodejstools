@@ -327,7 +327,7 @@ namespace Microsoft.NodejsTools.Analysis.Analyzer {
 #endif
 
         public override bool Walk(VariableDeclaration node) {
-            _scope.AddVariable(node.Name);
+            _scope.AddLocatedVariable(node.Name, node.Context, _curUnit);
             return base.Walk(node);
         }
 

@@ -72,20 +72,23 @@ namespace Microsoft.NodejsTools.Analysis {
 
             var unit = GetNearestEnclosingAnalysisUnit(scope);
             var eval = new ExpressionEvaluator(unit.CopyForEval(), scope, mergeScopes: true);
-
-            var values = eval.Evaluate(expr);
             var res = AnalysisSet.EmptyUnion;
-            foreach (var v in values) {
-                if (v.IsCurrent) {
-                    res = res.Add(v);
+
+            if (expr != null) {
+                var values = eval.Evaluate(expr);
+                foreach (var v in values) {
+                    if (v.IsCurrent) {
+                        res = res.Add(v);
+                    }
                 }
             }
+
             return res;
         }
 
         internal IEnumerable<AnalysisVariable> ReferencablesToVariables(IEnumerable<IReferenceable> defs) {
             foreach (var def in defs) {
-                foreach (var res in ToVariables(def)) {
+                foreach (var res in VariableTransformer.ScopeToVariables.ToVariables(def)) {
                     yield return res;
                 }
             }
@@ -135,6 +138,10 @@ namespace Microsoft.NodejsTools.Analysis {
                 var defScope = scope.EnumerateTowardsGlobal.FirstOrDefault(s =>
                     s.Variables.ContainsKey(name.Name));
 
+                if (defScope == null) {
+                    defScope = scope.GlobalScope;
+                }
+
                 return GetVariablesInScope(name, defScope).Distinct();
             }
 
@@ -157,13 +164,13 @@ namespace Microsoft.NodejsTools.Analysis {
         private IEnumerable<IAnalysisVariable> GetVariablesInScope(Lookup name, EnvironmentRecord scope) {
             var result = new List<IAnalysisVariable>();
 
-            result.AddRange(scope.GetMergedVariables(name.Name).SelectMany(ToVariables));
+            result.AddRange(scope.GetMergedVariables(name.Name).SelectMany(VariableTransformer.ScopeToVariables.ToVariables));
 
             // if a variable is imported from another module then also yield the defs/refs for the 
             // value in the defining module.
             var linked = scope.GetLinkedVariablesNoCreate(name.Name);
             if (linked != null) {
-                result.AddRange(linked.SelectMany(ToVariables));
+                result.AddRange(linked.SelectMany(VariableTransformer.ScopeToVariables.ToVariables));
             }
             return result;
         }
@@ -703,4 +710,44 @@ namespace Microsoft.NodejsTools.Analysis {
             return units.FirstOrDefault() ?? _unit;
         }
     }
+
+    class VariableTransformer {
+        private readonly bool _definitionsAreReferences;
+        public static VariableTransformer OtherToVariables = new VariableTransformer(false);
+        public static VariableTransformer ScopeToVariables = new VariableTransformer(true);
+
+        public VariableTransformer(bool definitionsAreReferences) {
+            _definitionsAreReferences = definitionsAreReferences;
+        }
+
+        internal IEnumerable<AnalysisVariable> ToVariables(IReferenceable referenceable) {
+            LocatedVariableDef locatedDef = referenceable as LocatedVariableDef;
+
+            if (locatedDef != null &&
+                locatedDef.Entry.Tree != null &&    // null tree if there are errors in the file
+                locatedDef.DeclaringVersion == locatedDef.Entry.AnalysisVersion) {
+                var start = locatedDef.Context;
+                yield return new AnalysisVariable(VariableType.Definition, new LocationInfo(locatedDef.Entry, start.StartLineNumber, start.StartColumn));
+            }
+
+            VariableDef def = referenceable as VariableDef;
+            if (def != null) {
+                foreach (var location in def.TypesNoCopy.SelectMany(type => type.Locations)) {
+                    yield return new AnalysisVariable(VariableType.Value, location);
+                }
+            }
+
+            foreach (var reference in referenceable.Definitions) {
+                yield return new AnalysisVariable(
+                    _definitionsAreReferences ? VariableType.Reference : VariableType.Definition,
+                    reference.Value.GetLocationInfo(reference.Key)
+                );
+            }
+
+            foreach (var reference in referenceable.References) {
+                yield return new AnalysisVariable(VariableType.Reference, reference.Value.GetLocationInfo(reference.Key));
+            }
+        }
+    }
+
 }

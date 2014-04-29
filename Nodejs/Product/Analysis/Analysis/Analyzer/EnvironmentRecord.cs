@@ -54,6 +54,12 @@ namespace Microsoft.NodejsTools.Analysis.Analyzer {
             }
         }
 
+        public virtual IAnalysisSet MergedThisValue {
+            get {
+                return ThisValue;
+            }
+        }
+
         public EnvironmentRecord(AnalysisValue av, EnvironmentRecord outerScope)
             : this(av, null, outerScope) { }
 

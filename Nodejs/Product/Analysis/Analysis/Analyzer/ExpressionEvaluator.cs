@@ -155,6 +155,9 @@ namespace Microsoft.NodejsTools.Analysis.Analyzer {
         };
 
         private static IAnalysisSet EvaluateThis(ExpressionEvaluator ee, Node node) {
+            if (ee._mergeScopes) {
+                return ee.Scope.MergedThisValue;
+            }
             return ee.Scope.ThisValue;
         }
 
@@ -258,20 +261,43 @@ namespace Microsoft.NodejsTools.Analysis.Analyzer {
             var argTypes = ee.Evaluate(n.Arguments);
 
             // Then lookup the possible methods we're calling
-            var targetRefs = ee.Evaluate(n.Function);
+
 
             var res = AnalysisSet.Empty;
             if (n.IsConstructor) {
+                var targetRefs = ee.Evaluate(n.Function);
                 foreach (var target in targetRefs) {
                     res = res.Union(target.Construct(node, ee._unit, argTypes));
                 }
             } else {
+                IAnalysisSet @this;
+                IAnalysisSet targetRefs = ee.EvaluateReference(node, n, out @this);
+
                 foreach (var target in targetRefs) {
-                    res = res.Union(target.Call(node, ee._unit, null, argTypes));
+                    res = res.Union(target.Call(node, ee._unit, @this, argTypes));
                 }
 
             }
             return res;
+        }
+
+        private IAnalysisSet EvaluateReference(Node node, CallNode n, out IAnalysisSet baseValue) {
+            Member member = n.Function as Member;
+            IAnalysisSet targetRefs;
+            if (member != null) {
+                baseValue = Evaluate(member.Root);
+                @targetRefs = baseValue.GetMember(node, _unit, member.Name);
+            } else {
+                CallNode call = n.Function as CallNode;
+                if (call != null && call.InBrackets && call.Arguments.Count == 1) {
+                    baseValue = Evaluate(call.Arguments[0]);
+                    targetRefs = Evaluate(call.Function);
+                } else {
+                    baseValue = null;
+                    targetRefs = Evaluate(n.Function);
+                }
+            }
+            return targetRefs;
         }
 
         private IAnalysisSet[] Evaluate(AstNodeList<Expression> astNodeList) {

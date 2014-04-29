@@ -245,7 +245,7 @@ namespace Microsoft.NodejsTools.Intellisense {
                         nestingChanged = true;
                         lastTokenWasCommaOrOperator = true;
                         lastTokenWasKeywordArgAssignment = false;
-                    } else if (token.ClassificationType == Classifier.Provider.Keyword ||
+                    } else if ((token.ClassificationType == Classifier.Provider.Keyword && text != "this") ||
                                token.ClassificationType == Classifier.Provider.Operator) {
                         lastTokenWasKeywordArgAssignment = false;
 
@@ -291,16 +291,7 @@ namespace Microsoft.NodejsTools.Intellisense {
                                 return null;
                             } else if ((nestingChanged || forCompletion) && token.ClassificationType == Classifier.Provider.Keyword && text == "def") {
                                 return null;
-                            }
-                            if (text == "*" || text == "**") {
-                                if (enumerator.MoveNext()) {
-                                    if (enumerator.Current.ClassificationType == _classifier.Provider.CommaClassification) {
-                                        isParameterName = IsParameterNameComma(enumerator);
-                                    } else if (enumerator.Current.IsOpenGrouping() && enumerator.Current.Span.GetText() == "(") {
-                                        isParameterName = IsParameterNameOpenParen(enumerator);
-                                    }
-                                }
-                            }
+                            }                            
                             break;
                         } else if ((token.ClassificationType == Classifier.Provider.Keyword &&
                             _stmtKeywords.Contains(text)) ||

@@ -28,9 +28,10 @@ namespace Microsoft.NodejsTools.Analysis {
             var boolValue = _analyzer.GetConstant(true);
             var doubleValue = _analyzer.GetConstant(0.0);
             AnalysisValue numberPrototype, stringPrototype, booleanPrototype, functionPrototype;
+            FunctionValue arrayFunction;
 
             var globalObject = new ObjectValue(builtinEntry) {
-                ArrayFunction(),
+                (arrayFunction = ArrayFunction()),
                 BooleanFunction(out booleanPrototype),
                 DateFunction(),
                 ErrorFunction(),
@@ -135,7 +136,14 @@ namespace Microsoft.NodejsTools.Analysis {
             //'util',
             //'vm',
             //'zlib' ]
-            return new Globals(globalObject, numberPrototype, stringPrototype, booleanPrototype, functionPrototype);
+            return new Globals(
+                globalObject, 
+                numberPrototype, 
+                stringPrototype, 
+                booleanPrototype, 
+                functionPrototype,
+                arrayFunction
+            );
         }
 
         private BuiltinFunctionValue ArrayFunction() {
@@ -148,7 +156,7 @@ namespace Microsoft.NodejsTools.Analysis {
                         BuiltinFunction("constructor"),
                         BuiltinFunction("every"),
                         BuiltinFunction("filter"),
-                        BuiltinFunction("forEach"),
+                        SpecializedFunction("forEach", ArrayForEach),
                         BuiltinFunction("indexOf"),
                         BuiltinFunction("join"),
                         BuiltinFunction("lastIndexOf"),
@@ -171,6 +179,31 @@ namespace Microsoft.NodejsTools.Analysis {
                 ),
                 new ReturningFunctionValue(builtinEntry, "isArray", _analyzer._falseInst)
             };
+        }
+
+        private IAnalysisSet ArrayForEach(FunctionValue func, Node node, AnalysisUnit unit, IAnalysisSet @this, IAnalysisSet[] args) {
+            if (args.Length >= 1) {
+                foreach (var value in @this) {
+                    ArrayValue arr = value as ArrayValue;
+                    if (arr != null) {
+                        for (int i = 0; i < arr.IndexTypes.Length; i++) {
+                            foreach (var indexType in arr.IndexTypes) {
+                                args[0].Call(
+                                    node, 
+                                    unit, 
+                                    null, 
+                                    new IAnalysisSet[] { 
+                                        indexType.Types, 
+                                        AnalysisSet.Empty, 
+                                        @this 
+                                    }
+                                );
+                            }
+                        }
+                    }
+                }
+            }
+            return _analyzer._undefined;
         }
 
         private BuiltinFunctionValue BooleanFunction(out AnalysisValue booleanPrototype) {
@@ -603,13 +636,15 @@ namespace Microsoft.NodejsTools.Analysis {
             StringPrototype,
             BooleanPrototype,
             FunctionPrototype;
+        public readonly FunctionValue ArrayFunction;
 
-        public Globals(ObjectValue globalObject, AnalysisValue numberPrototype, AnalysisValue stringPrototype, AnalysisValue booleanPrototype, AnalysisValue functionPrototype) {
+        public Globals(ObjectValue globalObject, AnalysisValue numberPrototype, AnalysisValue stringPrototype, AnalysisValue booleanPrototype, AnalysisValue functionPrototype, FunctionValue arrayFunction) {
             GlobalObject = globalObject;
             NumberPrototype = numberPrototype;
             StringPrototype = stringPrototype;
             BooleanPrototype = booleanPrototype;
             FunctionPrototype = functionPrototype;
+            ArrayFunction = arrayFunction;
         }
     }
 }
