@@ -66,16 +66,6 @@ namespace Microsoft.NodejsTools.Parsing
             visitor.PostWalk(this);
         }
 
-        internal override bool RequiresSeparator
-        {
-            get
-            {
-                // switch always has curly-braces, so we don't
-                // require the separator
-                return false;
-            }
-        }
-
         public override IEnumerable<Node> Children
         {
             get

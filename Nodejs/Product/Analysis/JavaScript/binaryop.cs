@@ -251,15 +251,6 @@ namespace Microsoft.NodejsTools.Parsing
             return false;
         }
 
-        public override Node LeftHandSide
-        {
-            get
-            {
-                // the operand1 is on the left
-                return Operand1.LeftHandSide;
-            }
-        }
-
         public void SwapOperands()
         {
             // swap the operands -- we don't need to go through ReplaceChild or the
@@ -301,21 +292,6 @@ namespace Microsoft.NodejsTools.Parsing
             return Operand2 == target
                 ? IsAssign ? Operand1.GetFunctionGuess(this) : Parent.GetFunctionGuess(this)
                 : string.Empty;
-        }
-
-        /// <summary>
-        /// Returns true if the expression contains an in-operator
-        /// </summary>
-        public override bool ContainsInOperator
-        {
-            get
-            {
-                // if we are an in-operator, then yeah: we contain one.
-                // otherwise recurse the operands.
-                return OperatorToken == JSToken.In
-                    ? true
-                    : Operand1.ContainsInOperator || Operand2.ContainsInOperator;
-            }
         }
 
         public override bool IsConstant

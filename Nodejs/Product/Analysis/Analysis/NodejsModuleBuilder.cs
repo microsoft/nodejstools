@@ -54,7 +54,8 @@ namespace Microsoft.NodejsTools.Analysis {
                             new BuiltinFunctionValue(
                                 _analyzer._builtinEntry,
                                 FixClassName((string)klass["name"]),
-                                ParseDocumentation((string)klass["desc"])
+                                ParseDocumentation((string)klass["desc"]),
+                                true
                                 // TODO: Signature?
                             )
                         );
@@ -87,6 +88,7 @@ namespace Microsoft.NodejsTools.Analysis {
                                     _analyzer._builtinEntry,
                                     methodName,
                                     ParseDocumentation((string)method["desc"]),
+                                    true,
                                     GetParameters(sig["params"])
                                 )
                             );

@@ -35,8 +35,9 @@ namespace Microsoft.NodejsTools.Analysis.Values {
         public BuiltinFunctionValue(ProjectEntry projectEntry,
             string name,
             string documentation = null,
+            bool createPrototype = true,
             params string[] signature)
-            : base(projectEntry) {
+            : base(projectEntry, createPrototype, name) {
             _name = name;
             _documentation = documentation;
             _signature = signature;
@@ -85,9 +86,26 @@ namespace Microsoft.NodejsTools.Analysis.Values {
     internal class ReturningFunctionValue : BuiltinFunctionValue {
         private readonly IAnalysisSet _retValue;
 
-        public ReturningFunctionValue(ProjectEntry projectEntry, string name, IAnalysisSet retValue, string documentation = null, params string[] signature)
-            : base(projectEntry, name, documentation, signature) {
+        public ReturningFunctionValue(ProjectEntry projectEntry, string name, IAnalysisSet retValue, string documentation = null, bool createPrototype = true, params string[] signature)
+            : base(projectEntry, name, documentation, createPrototype, signature) {
             _retValue = retValue;
+        }
+
+        public override IAnalysisSet Call(Node node, AnalysisUnit unit, IAnalysisSet @this, IAnalysisSet[] args) {
+            return _retValue;
+        }
+    }
+
+    internal class ReturningConstructingFunctionValue : BuiltinFunctionValue {
+        private readonly IAnalysisSet _retValue;
+
+        public ReturningConstructingFunctionValue(ProjectEntry projectEntry, string name, IAnalysisSet retValue, string documentation = null, bool createPrototype = true, params string[] signature)
+            : base(projectEntry, name, documentation, createPrototype, signature) {
+            _retValue = retValue;
+        }
+
+        public override IAnalysisSet Construct(Node node, AnalysisUnit unit, IAnalysisSet[] args) {
+            return _retValue;
         }
 
         public override IAnalysisSet Call(Node node, AnalysisUnit unit, IAnalysisSet @this, IAnalysisSet[] args) {
@@ -99,7 +117,7 @@ namespace Microsoft.NodejsTools.Analysis.Values {
         private readonly CallDelegate _func;
 
         public SpecializedFunctionValue(ProjectEntry projectEntry, string name, CallDelegate func, string documentation = null, params string[] signature)
-            : base(projectEntry, name, documentation, signature) {
+            : base(projectEntry, name, documentation, true, signature) {
             _func = func;
         }
 

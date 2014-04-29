@@ -51,24 +51,6 @@ namespace Microsoft.NodejsTools.Parsing
             visitor.PostWalk(this);
         }
 
-        internal override bool RequiresSeparator
-        {
-            get
-            {
-                // requires a separator if the statement does
-                return (Statement != null ? Statement.RequiresSeparator : false);
-            }
-        }
-
-        public override Node LeftHandSide
-        {
-            get
-            {
-                // the label is on the left, but it's sorta ignored
-                return (Statement != null ? Statement.LeftHandSide : null);
-            }
-        }
-
         internal override bool EncloseBlock(EncloseBlockType type)
         {
             // pass the query on to the statement

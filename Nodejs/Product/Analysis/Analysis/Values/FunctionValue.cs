@@ -25,10 +25,27 @@ namespace Microsoft.NodejsTools.Analysis.Values {
         private readonly ObjectValue _instance;
         private ReferenceDict _references;
 
-        internal FunctionValue(ProjectEntry projectEntry)
+        internal FunctionValue(ProjectEntry projectEntry, bool createPrototype = true, string name = null)
             : base(projectEntry) {
-            _instance = new ObjectValue(ProjectEntry, this);
-            //Add("prototype", new ObjectValue(ProjectEntry, this));
+            _instance = new ObjectValue(ProjectEntry, this, description: "instance of " + Name ?? name);
+            if (createPrototype) {
+                string description = null;
+#if DEBUG
+                if (String.IsNullOrWhiteSpace(Name ?? name)) {
+                    if (AnalysisUnit != null) {
+                        var loc = Locations.First();
+                        description = "prototype object of " + AnalysisUnit.FullName + " " + loc.FilePath + "(" + loc.Column + ")";
+                    } else {
+                        description = "prototype object of <unknown objects>";
+                    }
+                } else {
+                    description = "prototype object of " + (Name ?? name);
+                }
+#endif
+                var prototype = new ObjectValue(ProjectEntry, description: description);
+                Add("prototype", prototype);
+                prototype.Add("constructor", this);
+            }
         }
 
         public IAnalysisSet NewThis {
@@ -84,7 +101,10 @@ namespace Microsoft.NodejsTools.Analysis.Values {
 
         public override IAnalysisSet GetMember(Node node, AnalysisUnit unit, string name) {
             var res = base.GetMember(node, unit, name);
-            if (this != ProjectState._functionPrototype) {
+            // we won't recurse on prototype because we have a prototype
+            // value, and it's correct.  Recursing on prototype results in
+            // prototypes getting merged and the analysis bloating
+            if (this != ProjectState._functionPrototype && name != "prototype") {
                 res = res.Union(ProjectState._functionPrototype.GetMember(node, unit, name));
             }
             return res;

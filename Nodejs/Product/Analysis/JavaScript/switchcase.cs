@@ -94,20 +94,5 @@ namespace Microsoft.NodejsTools.Parsing
             }
             return false;
         }
-
-        internal override bool RequiresSeparator
-        {
-            get
-            {
-                // no statements doesn't require a separator.
-                // otherwise only if statements require it
-                if (Statements == null || Statements.Count == 0)
-                {
-                    return false;
-                }
-
-                return Statements[Statements.Count - 1].RequiresSeparator;
-            }
-        }
     }
 }

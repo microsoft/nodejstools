@@ -97,24 +97,6 @@ namespace Microsoft.NodejsTools.Parsing
             walker.PostWalk(this);
         }
 
-        internal override bool RequiresSeparator
-        {
-            get
-            {
-                // 0 statements, true (lone semicolon)
-                // 1 and list[0].HideFromOutput = false 
-                // 1 = ask list[0]
-                // > 1, false (enclosed in braces
-                // if there are 2 or more statements in the block, then
-                // we'll wrap them in braces and they won't need a separator
-                return (
-                  m_list.Count == 0
-                  ? true
-                  : (m_list.Count == 1 ? m_list[0].RequiresSeparator : false)
-                  );
-            }
-        }
-
         internal override bool EncloseBlock(EncloseBlockType type)
         {
             // if there's more than one item, then return false.

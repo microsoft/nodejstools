@@ -136,14 +136,5 @@ namespace Microsoft.NodejsTools.Parsing
             }
             return false;
         }
-
-        public override Node LeftHandSide
-        {
-            get
-            {
-                // the condition is on the left
-                return Condition.LeftHandSide;
-            }
-        }
     }
 }

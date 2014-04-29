@@ -217,28 +217,7 @@ namespace Microsoft.NodejsTools.Parsing
         }
 
         public abstract void Walk(AstVisitor walker);
-
-        /// <summary>
-        /// Returns true if the node contains an in-operator
-        /// </summary>
-        public virtual bool ContainsInOperator
-        {
-            get
-            {
-                // recursivelt check all children
-                foreach (var child in Children)
-                {
-                    if (child.ContainsInOperator)
-                    {
-                        return true;
-                    }
-                }
-
-                // if we get here, we didn'thave any in-operators
-                return false;
-            }
-        }
-
+        
         public void UpdateWith(TokenWithSpan context)
         {
             if (context != null)

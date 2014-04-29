@@ -141,7 +141,7 @@ namespace Microsoft.NodejsTools.Analysis {
         private BuiltinFunctionValue ArrayFunction() {
             var builtinEntry = _analyzer._builtinEntry;
 
-            return new BuiltinFunctionValue(builtinEntry, "Array") { 
+            return new BuiltinFunctionValue(builtinEntry, "Array", createPrototype:false) { 
                 Member("prototype", 
                     new ObjectValue(builtinEntry) {
                         BuiltinFunction("concat"),
@@ -183,7 +183,7 @@ namespace Microsoft.NodejsTools.Analysis {
                 }
             );
             booleanPrototype = prototype.Value;
-            return new BuiltinFunctionValue(builtinEntry, "Boolean") { 
+            return new BuiltinFunctionValue(builtinEntry, "Boolean", createPrototype: false) { 
                 prototype
             };
         }
@@ -191,7 +191,7 @@ namespace Microsoft.NodejsTools.Analysis {
         private BuiltinFunctionValue DateFunction() {
             var builtinEntry = _analyzer._builtinEntry;
 
-            return new BuiltinFunctionValue(builtinEntry, "Date") { 
+            return new BuiltinFunctionValue(builtinEntry, "Date", createPrototype: false) { 
                 Member("prototype", 
                     new ObjectValue(builtinEntry) {
                         BuiltinFunction("constructor"),
@@ -249,7 +249,7 @@ namespace Microsoft.NodejsTools.Analysis {
         private BuiltinFunctionValue ErrorFunction() {
             var builtinEntry = _analyzer._builtinEntry;
 
-            return new BuiltinFunctionValue(builtinEntry, "Error") { 
+            return new BuiltinFunctionValue(builtinEntry, "Error", createPrototype: false) { 
                 Member("prototype", 
                     new ObjectValue(builtinEntry) {
                         BuiltinFunction("constructor"),
@@ -266,7 +266,7 @@ namespace Microsoft.NodejsTools.Analysis {
         private BuiltinFunctionValue ErrorFunction(string errorName) {
             var builtinEntry = _analyzer._builtinEntry;
 
-            return new BuiltinFunctionValue(builtinEntry, errorName) { 
+            return new BuiltinFunctionValue(builtinEntry, errorName, createPrototype: false) { 
                 Member("prototype", 
                     new ObjectValue(builtinEntry) {
                         BuiltinFunction("arguments"),
@@ -282,7 +282,7 @@ namespace Microsoft.NodejsTools.Analysis {
         private BuiltinFunctionValue FunctionFunction(out AnalysisValue functionPrototype) {
             var builtinEntry = _analyzer._builtinEntry;
             var prototype = Member("prototype",
-                new ReturningFunctionValue(builtinEntry, "Empty", _analyzer._undefined) {
+                new ReturningConstructingFunctionValue(builtinEntry, "Empty", _analyzer._undefined, null) {
                     BuiltinFunction("apply"),
                     BuiltinFunction("bind"),
                     BuiltinFunction("call"),
@@ -291,7 +291,7 @@ namespace Microsoft.NodejsTools.Analysis {
                 }
             );
             functionPrototype = prototype.Value;
-            return new BuiltinFunctionValue(builtinEntry, "Function") { 
+            return new BuiltinFunctionValue(builtinEntry, "Function", createPrototype: false) { 
                 prototype
             };
         }
@@ -358,13 +358,12 @@ namespace Microsoft.NodejsTools.Analysis {
             );
             numberPrototype = prototype.Value;
 
-            return new BuiltinFunctionValue(builtinEntry, "Number") { 
+            return new BuiltinFunctionValue(builtinEntry, "Number", createPrototype: false) { 
                 prototype,
                 Member("length", _analyzer.GetConstant(1.0)),
                 Member("name", _analyzer.GetConstant("Number")),
                 Member("arguments", _analyzer._nullInst),
                 Member("caller", _analyzer._nullInst),
-                Member("prototype", new ObjectValue(builtinEntry)),
                 Member("MAX_VALUE", _analyzer.GetConstant(Double.MaxValue)),
                 Member("MIN_VALUE", _analyzer.GetConstant(Double.MinValue)),
                 Member("NaN", _analyzer.GetConstant(Double.NaN)),
@@ -379,7 +378,6 @@ namespace Microsoft.NodejsTools.Analysis {
             var builtinEntry = _analyzer._builtinEntry;
 
             return new BuiltinFunctionValue(builtinEntry, "Object") { 
-                Member("prototype", new ObjectValue(builtinEntry)),
                 BuiltinFunction("getPrototypeOf"),
                 BuiltinFunction("getOwnPropertyDescriptor"),
                 BuiltinFunction("getOwnPropertyNames"),
@@ -473,7 +471,7 @@ namespace Microsoft.NodejsTools.Analysis {
         private BuiltinFunctionValue RegExpFunction() {
             var builtinEntry = _analyzer._builtinEntry;
 
-            return new BuiltinFunctionValue(builtinEntry, "RegExp") { 
+            return new BuiltinFunctionValue(builtinEntry, "RegExp", createPrototype: false) { 
                 Member("prototype", 
                     new ObjectValue(builtinEntry) {
                         BuiltinFunction("compile"),   
@@ -568,7 +566,7 @@ namespace Microsoft.NodejsTools.Analysis {
             );
             stringPrototype = prototype.Value;
 
-            return new BuiltinFunctionValue(builtinEntry, "String") { 
+            return new BuiltinFunctionValue(builtinEntry, "String", createPrototype: false) { 
                 prototype,
                 ReturningFunction("fromCharCode", _analyzer.GetConstant("")),
             };

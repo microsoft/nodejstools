@@ -106,14 +106,5 @@ namespace Microsoft.NodejsTools.Parsing
             // pass the query on to the body
             return Body == null ? false : Body.EncloseBlock(type);
         }
-
-        internal override bool RequiresSeparator
-        {
-            get
-            {
-                // requires a separator if the body does
-                return Body == null || Body.Count == 0 ? false : Body.RequiresSeparator;
-            }
-        }
     }
 }

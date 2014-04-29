@@ -43,18 +43,6 @@ namespace Microsoft.NodejsTools.Parsing
         {
         }
 
-        internal override bool RequiresSeparator
-        {
-            get
-            {
-                // do-while statements TECHNICALLY should end with a semicolon.
-                // but IE seems to parse do-while statements WITHOUT the semicolon, so
-                // the terminating semicolon ends up being an empty statement AFTER the
-                // do-while. Which throws off else or other do-while while-clauses.
-                return true;
-            }
-        }
-
         public override void Walk(AstVisitor visitor) {
             if (visitor.Walk(this)) {
                 m_condition.Walk(visitor);

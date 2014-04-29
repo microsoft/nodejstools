@@ -34,13 +34,5 @@ namespace Microsoft.NodejsTools.Parsing
             visitor.PostWalk(this);
         }
 
-        internal override bool RequiresSeparator
-        {
-            get
-            {
-                // never requires a semicolon because we ARE a semicolon
-                return false;
-            }
-        }
     }
 }

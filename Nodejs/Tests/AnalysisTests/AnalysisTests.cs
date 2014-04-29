@@ -374,6 +374,75 @@ var x = abcdefg;
         }
 
         [TestMethod]
+        public void TestFunctionCreation() {
+            var analysis = ProcessText(@"function f() {
+}
+f.prototype.abc = 42
+
+var x = new f().abc;
+");
+            AssertUtil.ContainsExactly(
+                analysis.GetTypeIdsByIndex("x", 0),
+                BuiltinTypeId.Number
+            );
+
+            analysis = ProcessText(@"function f() {
+}
+f.abc = 42
+
+var x = f.prototype.constructor.abc;
+");
+            AssertUtil.ContainsExactly(
+                analysis.GetTypeIdsByIndex("x", 0),
+                BuiltinTypeId.Number
+            );
+
+        }
+
+        [TestMethod]
+        public void TestPrototypeNoMerge() {
+            var analysis = ProcessText(@"
+var abc = Function.prototype;
+abc.bar = 42;
+function f() {
+}
+var x = new f().bar;
+");
+            AssertUtil.ContainsExactly(
+                analysis.GetTypeIdsByIndex("x", 0)
+            );
+        }
+
+        [TestMethod]
+        public void TestMergeSpecialization() {
+            var analysis = ProcessText(@"function merge(a, b){
+  if (a && b) {
+    for (var key in b) {
+      a[key] = b[key];
+    }
+  }
+  return a;
+};
+
+
+function f() {
+}
+
+f.abc = 42
+
+function g() {
+}
+
+merge(g, f)
+var x = g.abc;
+");
+            AssertUtil.ContainsExactly(
+                analysis.GetTypeIdsByIndex("x", 0),
+                BuiltinTypeId.Number
+            );
+        }
+
+        [TestMethod]
         public void TestFunctionParametersMultipleCallers() {
             var analysis = ProcessText(@"function f(a) {
     return a;

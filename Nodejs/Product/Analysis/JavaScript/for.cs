@@ -101,15 +101,6 @@ namespace Microsoft.NodejsTools.Parsing
             visitor.PostWalk(this);
         }
 
-		internal override bool RequiresSeparator
-        {
-            get
-            {
-                // requires a separator if the body does
-                return Body == null ? false : Body.RequiresSeparator;
-            }
-        }
-
         internal override bool EncloseBlock(EncloseBlockType type)
         {
             // pass the query on to the body

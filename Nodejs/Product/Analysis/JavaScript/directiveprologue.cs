@@ -43,17 +43,6 @@ namespace Microsoft.NodejsTools.Parsing
             }
         }
 
-        internal override bool RequiresSeparator
-        {
-            get
-            {
-                // we hide redundant directives.
-                // if we aren't hiding this node, then yes: we need a semicolon.
-                // but if we are, we don't want to add some mystery semicolon to the output 
-                return !IsRedundant;
-            }
-        }
-
         public override bool IsConstant
         {
             get

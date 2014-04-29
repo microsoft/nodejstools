@@ -148,14 +148,5 @@ namespace Microsoft.NodejsTools.Parsing
             }
             return false;
         }
-
-        internal override bool RequiresSeparator
-        {
-            get
-            {
-                // try requires no separator
-                return false;
-            }
-        }
     }
 }

@@ -80,14 +80,5 @@ namespace Microsoft.NodejsTools.Parsing
             }
             return false;
         }
-
-        public override Node LeftHandSide
-        {
-            get
-            {
-                // the root object is on the left
-                return Root.LeftHandSide;
-            }
-        }
     }
 }

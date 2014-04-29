@@ -332,7 +332,7 @@ namespace Microsoft.NodejsTools.Analysis.Values {
             }
         }
 
-        class LinkedAnalysisList : AnalysisValue {
+        class LinkedAnalysisList : AnalysisValue, IReferenceableContainer {
             private readonly List<AnalysisValue> _values;
 
             public LinkedAnalysisList(AnalysisValue one, AnalysisValue two) {
@@ -358,6 +358,17 @@ namespace Microsoft.NodejsTools.Analysis.Values {
             internal void AddLink(AnalysisValue source) {
                 _values.Add(source);
             }
+
+            public IEnumerable<IReferenceable> GetDefinitions(string name) {
+                foreach (var value in _values) {
+                    IReferenceableContainer refContainer = value as IReferenceableContainer;
+                    if (refContainer != null) {
+                        foreach (var result in refContainer.GetDefinitions(name)) {
+                            yield return result;
+                        }
+                    }
+                }
+            }
         }
 
         #region IReferenceableContainer Members
@@ -367,10 +378,18 @@ namespace Microsoft.NodejsTools.Analysis.Values {
             // TODO: access descriptor support
             if (_descriptors != null && _descriptors.TryGetValue(name, out desc)) {
                 if (desc.Values != null) {
-                    return new IReferenceable[] { desc.Values };
+                    yield return desc.Values;
                 }
             }
-            return new IReferenceable[0];
+
+            if (_next != null) {
+                IReferenceableContainer nextRef = _next as IReferenceableContainer;
+                if (nextRef != null) {
+                    foreach (var value in nextRef.GetDefinitions(name)) {
+                        yield return value;
+                    }
+                }
+            }
         }
 
         #endregion

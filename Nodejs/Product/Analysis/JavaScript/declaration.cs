@@ -219,29 +219,6 @@ namespace Microsoft.NodejsTools.Parsing
             return false;
         }
 
-        /// <summary>
-        /// Returns true if any of the variable declarations contain initializers using the in-operator
-        /// </summary>
-        public override bool ContainsInOperator
-        {
-            get
-            {
-                // go through each child var-decl
-                foreach (var decl in m_list)
-                {
-                    // if it has an initializer and it contains an in-operator, then we know that
-                    // at least one of our decls contain an in-operator, so WE do.
-                    if (decl.Initializer != null && decl.Initializer.ContainsInOperator)
-                    {
-                        return true;
-                    }
-                }
-
-                // if we get here, we don't have any in-operators
-                return false;
-            }
-        }
-
         #region IEnumerable<VariableDeclaration> Members
 
         public IEnumerator<VariableDeclaration> GetEnumerator()

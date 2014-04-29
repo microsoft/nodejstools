@@ -140,25 +140,6 @@ namespace Microsoft.NodejsTools.Parsing
             return false;
         }
 
-        internal override bool RequiresSeparator
-        {
-            get
-            {
-                // if we have an else block, then the if statement
-                // requires a separator if the else block does. 
-                // otherwise only if the true case requires one.
-                if (FalseBlock != null && FalseBlock.Count > 0)
-                {
-                    return FalseBlock.RequiresSeparator;
-                }
-                if (TrueBlock != null && TrueBlock.Count > 0)
-                {
-                    return TrueBlock.RequiresSeparator;
-                }
-                return false;
-            }
-        }
-
         internal override bool EncloseBlock(EncloseBlockType type)
         {
             // if there's an else block, recurse down that branch

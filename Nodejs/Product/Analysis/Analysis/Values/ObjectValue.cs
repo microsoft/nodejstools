@@ -25,10 +25,16 @@ namespace Microsoft.NodejsTools.Analysis.Values {
     /// </summary>
     internal class ObjectValue : ExpandoValue {
         private readonly FunctionValue _creator;
+#if DEBUG
+        private readonly string _description;
+#endif
 
-        public ObjectValue(ProjectEntry projectEntry, FunctionValue creator = null)
+        public ObjectValue(ProjectEntry projectEntry, FunctionValue creator = null, string description = null)
             : base(projectEntry) {
             _creator = creator;
+#if DEBUG
+            _description = description;
+#endif
         }
 
         public override Dictionary<string, IAnalysisSet> GetAllMembers() {
@@ -50,7 +56,11 @@ namespace Microsoft.NodejsTools.Analysis.Values {
         public override IAnalysisSet GetMember(Node node, AnalysisUnit unit, string name) {
             var res = base.GetMember(node, unit, name);
 
-            if (_creator != null) {
+            // we won't recurse on prototype because we either have
+            // a prototype value and it's correct, or we don't have
+            // a prototype.  Recursing on prototype results in
+            // prototypes getting merged and the analysis bloating
+            if (_creator != null && name != "prototype") {
                 var prototype = _creator.GetMember(node, unit, "prototype");
                 if (Push()) {
                     try {
