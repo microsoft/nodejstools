@@ -23,6 +23,13 @@ namespace Microsoft.NodejsTools.Parsing
     public sealed class VariableDeclaration : Node, INameDeclaration, INameReference
     {
         private Expression m_initializer;
+        public string Identifier { get; set; }
+        public IndexSpan NameSpan { get; set; }
+        public JSVariableField VariableField { get; set; }
+
+        public VariableDeclaration(IndexSpan span)
+            : base(span) {
+        }
 
         public Expression Initializer
         {
@@ -35,55 +42,11 @@ namespace Microsoft.NodejsTools.Parsing
             }
         }
 
-        public string Identifier { get; set; }
-        public TokenWithSpan NameContext { get; set; }
-
-        public TokenWithSpan AssignContext { get; set; }
-
         public bool HasInitializer { get { return Initializer != null; } }
-
-        public JSVariableField VariableField { get; set; }
 
         public string Name
         {
             get { return Identifier; }
-        }
-
-
-        private bool m_isGenerated;
-        public bool IsGenerated
-        {
-            get { return m_isGenerated; }
-            set
-            {
-                m_isGenerated = value;
-                if (VariableField != null)
-                {
-                    VariableField.IsGenerated = m_isGenerated;
-                }
-            }
-        }
-
-        public bool IsAssignment
-        {
-            get
-            {
-                // if there is an initializer, we are an assignment
-                return Initializer != null;
-            }
-        }
-
-        public Node AssignmentValue
-        {
-            get
-            {
-                return Initializer;
-            }
-        }
-
-        public VariableDeclaration(TokenWithSpan context, JSParser parser)
-            : base(context, parser)
-        {
         }
 
         public override void Walk(AstVisitor visitor) {

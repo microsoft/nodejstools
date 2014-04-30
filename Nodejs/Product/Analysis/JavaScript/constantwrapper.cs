@@ -48,21 +48,10 @@ namespace Microsoft.NodejsTools.Parsing
 
         public Object Value { get; set; }
 
-        public PrimitiveType PrimitiveType
+        public ConstantWrapper(Object value, IndexSpan span)
+            : base(span)
         {
-            get;
-            set;
-        }
-
-        public bool IsParameterToRegExp { get; set; }
-
-        public ConstantWrapper(Object value, PrimitiveType primitiveType, TokenWithSpan context, JSParser parser)
-            : base(context, parser)
-        {
-            PrimitiveType = primitiveType;
-
-            // force numerics to be of type double
-            Value = (primitiveType == PrimitiveType.Number ? System.Convert.ToDouble(value, CultureInfo.InvariantCulture) : value);
+            Value = value;
         }
 
         public override void Walk(AstVisitor visitor) {
@@ -73,46 +62,33 @@ namespace Microsoft.NodejsTools.Parsing
 
         public override string ToString()
         {
-            // this function returns the STRING representation
-            // of this primitive value -- NOT the same as the CODE representation
-            // of this AST node.
-            switch (PrimitiveType)
-            {
-                case PrimitiveType.Null:
-                    // null is just "null"
-                    return "null";
+            if (Value == null) {
+                // null is just "null"
+                return "null";
+            } else if (Value is bool) {
+                // boolean is "true" or "false"
+                return (bool)Value ? "true" : "false";
+            } else if (Value is double) {
+                // handle some special values, otherwise just fall through
+                // to the default ToString implementation
+                double doubleValue = (double)Value;
+                if (doubleValue == 0) {
+                    // both -0 and 0 return "0". Go figure.
+                    return "0";
+                }
+                if (double.IsNaN(doubleValue)) {
+                    return "NaN";
+                }
+                if (double.IsPositiveInfinity(doubleValue)) {
+                    return "Infinity";
+                }
+                if (double.IsNegativeInfinity(doubleValue)) {
+                    return "-Infinity";
+                }
 
-                case PrimitiveType.Boolean:
-                    // boolean is "true" or "false"
-                    return (bool)Value ? "true" : "false";
-
-                case PrimitiveType.Number:
-                    {
-                        // handle some special values, otherwise just fall through
-                        // to the default ToString implementation
-                        double doubleValue = (double)Value;
-                        if (doubleValue == 0)
-                        {
-                            // both -0 and 0 return "0". Go figure.
-                            return "0";
-                        }
-                        if (double.IsNaN(doubleValue))
-                        {
-                            return "NaN";
-                        }
-                        if (double.IsPositiveInfinity(doubleValue))
-                        {
-                            return "Infinity";
-                        }
-                        if (double.IsNegativeInfinity(doubleValue))
-                        {
-                            return "-Infinity";
-                        }
-
-                        // use the "R" format, which guarantees that the double value can
-                        // be round-tripped to the same value
-                        return doubleValue.ToStringInvariant("R");
-                    }
+                // use the "R" format, which guarantees that the double value can
+                // be round-tripped to the same value
+                return doubleValue.ToStringInvariant("R");
             }
 
             // otherwise this must be a string
@@ -120,12 +96,15 @@ namespace Microsoft.NodejsTools.Parsing
         }
     }
 
-    public enum PrimitiveType
-    {
-        Null = 0,
-        Boolean,
-        Number,
-        String,
-        Other
+    public class InvalidNumericErrorValue {
+        private readonly string _code;
+
+        public InvalidNumericErrorValue(string code) {
+            _code = code;
+        }
+
+        public override string ToString() {
+            return "Invalid numeric literal: " + _code;
+        }
     }
 }

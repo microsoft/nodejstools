@@ -61,16 +61,10 @@ namespace Microsoft.NodejsTools.Parsing
             }
         }
 
-        /// <summary>Context for the first semicolon, separating the initializer and the condition</summary>
-        public TokenWithSpan Separator1Context { get; set; }
-
-        /// <summary>Context for the second semicolon, separating the condition and the incrementor</summary>
-        public TokenWithSpan Separator2Context { get; set; }
-
         public BlockScope BlockScope { get; set; }
 
-        public ForNode(TokenWithSpan context, JSParser parser)
-            : base(context, parser)
+        public ForNode(IndexSpan span)
+            : base(span)
         {
         }
 

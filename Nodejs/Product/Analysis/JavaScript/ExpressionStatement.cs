@@ -10,8 +10,8 @@ namespace Microsoft.NodejsTools.Parsing
   {
     private Expression _expression;
 
-    public ExpressionStatement(TokenWithSpan context, JSParser parser)
-      : base(context, parser)
+    public ExpressionStatement(IndexSpan span)
+        : base(span)
     {
       
     }

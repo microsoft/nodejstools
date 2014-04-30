@@ -37,10 +37,8 @@ namespace Microsoft.NodejsTools.Parsing
         public int NestCount { get; set; }
         public string Label { get; set; }
 
-        public TokenWithSpan ColonContext { get; set; }
-
-        public LabeledStatement(TokenWithSpan context, JSParser parser)
-            : base(context, parser)
+        public LabeledStatement(IndexSpan span)
+            : base(span)
         {
         }
 

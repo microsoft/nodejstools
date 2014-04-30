@@ -16,20 +16,20 @@ namespace Microsoft.NodejsTools.Parsing {
 
         }
 
-        internal void HandleUndeclaredVariable(string name, TokenWithSpan context) {
+        internal void HandleUndeclaredVariable(string name, IndexSpan span, IndexResolver indexResolver) {
             if (!HasAlreadySeenErrorFor(name)) {
-                HandleError(JSError.UndeclaredVariable, context);
+                HandleError(JSError.UndeclaredVariable, span, indexResolver);
             }
         }
 
-        internal void HandleUndeclaredFunction(string name, TokenWithSpan context) {
+        internal void HandleUndeclaredFunction(string name, IndexSpan span, IndexResolver indexResolver) {
             if (!HasAlreadySeenErrorFor(name)) {
-                HandleError(JSError.UndeclaredFunction, context);
+                HandleError(JSError.UndeclaredFunction, span, indexResolver);
             }
         }
 
-        internal void HandleError(JSError errorId, TokenWithSpan context, bool forceToError = false) {
-            var error = new JScriptException(errorId, context);
+        internal void HandleError(JSError errorId, IndexSpan span, IndexResolver resolver, bool forceToError = false) {
+            var error = new JScriptException(errorId, span, resolver);
 
             if (forceToError) {
                 error.IsError = true;
@@ -38,7 +38,7 @@ namespace Microsoft.NodejsTools.Parsing {
             }
 
             if (!OnCompilerError(error)) {
-                
+
             }
         }
 

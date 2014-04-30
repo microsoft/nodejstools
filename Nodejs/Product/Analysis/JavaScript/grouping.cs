@@ -36,8 +36,8 @@ namespace Microsoft.NodejsTools.Parsing
             }
         }
 
-        public GroupingOperator(TokenWithSpan context, JSParser parser)
-            : base(context, parser)
+        public GroupingOperator(IndexSpan span)
+            : base(span)
         {
         }
 

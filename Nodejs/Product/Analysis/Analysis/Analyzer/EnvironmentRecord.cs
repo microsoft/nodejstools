@@ -198,7 +198,7 @@ namespace Microsoft.NodejsTools.Analysis.Analyzer {
             return vars.AddTypes(unit, values);
         }
 
-        public VariableDef AddLocatedVariable(string name, TokenWithSpan location, AnalysisUnit unit/*, ParameterKind paramKind = ParameterKind.Normal*/) {
+        public VariableDef AddLocatedVariable(string name, Node location, AnalysisUnit unit/*, ParameterKind paramKind = ParameterKind.Normal*/) {
             VariableDef value;
             if (!Variables.TryGetValue(name, out value)) {
                 VariableDef def = new LocatedVariableDef(unit.DeclaringModule.ProjectEntry, location); 

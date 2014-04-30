@@ -69,7 +69,6 @@ namespace Microsoft.NodejsTools.Parsing
                 SourceMode = this.SourceMode,
                 StrictMode = this.StrictMode,
                 ErrorIfNotInlineSafe = this.ErrorIfNotInlineSafe,
-                SymbolsMap = this.SymbolsMap,
             };
 
             return newSettings;
@@ -232,15 +231,6 @@ namespace Microsoft.NodejsTools.Parsing
         /// or rely on the sources to turn on strict mode via the "use strict" prologue directive (false, default).
         /// </summary>
         public bool StrictMode
-        {
-            get;
-            set;
-        }
-
-        /// <summary>
-        /// Gets or sets the <see cref="ISourceMap"/> instance. Default is null, which won't output a symbol map.
-        /// </summary>
-        public ISourceMap SymbolsMap
         {
             get;
             set;

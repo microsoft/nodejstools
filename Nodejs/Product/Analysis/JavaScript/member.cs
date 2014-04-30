@@ -36,10 +36,10 @@ namespace Microsoft.NodejsTools.Parsing
         }
 
         public string Name { get; set; }
-        public TokenWithSpan NameContext { get; set; }
+        public IndexSpan NameSpan { get; set; }
 
-        public Member(TokenWithSpan context, JSParser parser)
-            : base(context, parser)
+        public Member(IndexSpan span)
+            : base(span)
         {
         }
 

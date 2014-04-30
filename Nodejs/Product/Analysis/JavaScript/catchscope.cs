@@ -24,15 +24,15 @@ namespace Microsoft.NodejsTools.Parsing
     {
         public ParameterDeclaration CatchParameter { get; private set; }
 
-        internal CatchScope(ActivationObject parent, TokenWithSpan catchContext, ParameterDeclaration catchParameter, ErrorSink errorSink)
-            : base(parent, catchContext, errorSink)
+        internal CatchScope(ActivationObject parent, IndexSpan span, ParameterDeclaration catchParameter, ErrorSink errorSink)
+            : base(parent, span, errorSink)
         {
             CatchParameter = catchParameter;
         }
 
-        public override JSVariableField CreateField(string name, object value, FieldAttributes attributes)
+        public override JSVariableField CreateField(string name)
         {
-            return new JSVariableField(FieldType.Local, name, attributes, value);
+            return new JSVariableField(FieldType.Local, name);
         }
     }
 }

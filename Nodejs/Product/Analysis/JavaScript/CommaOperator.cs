@@ -25,8 +25,8 @@ namespace Microsoft.NodejsTools.Parsing
     {
         private Expression[] _expressions;
 
-        public CommaOperator(TokenWithSpan context, JSParser parser)
-            : base(context, parser)
+        public CommaOperator(IndexSpan span)
+            : base(span)
         {
         }
 
@@ -53,9 +53,9 @@ namespace Microsoft.NodejsTools.Parsing
             }
         }
 
-        public static Expression CombineWithComma(TokenWithSpan context, JSParser parser, Expression operand1, Expression operand2)
+        public static Expression CombineWithComma(IndexSpan span, JSParser parser, Expression operand1, Expression operand2)
         {
-            var comma = new CommaOperator(context, parser);
+            var comma = new CommaOperator(span);
 
             List<Expression> res = new List<Expression>();
             CommaOperator left = operand1 as CommaOperator;

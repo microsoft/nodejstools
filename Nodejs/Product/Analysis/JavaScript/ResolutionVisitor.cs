@@ -27,7 +27,7 @@ namespace Microsoft.NodejsTools.Parsing
     /// Traverse the tree to build up scope lexically-declared names, var-declared names,
     /// and lookups, then resolve everything.
     /// </summary>
-    public class ResolutionVisitor : AstVisitor
+    public sealed class ResolutionVisitor : AstVisitor
     {
         /// <summary>depth level of with-statements, needed so we can treat decls within with-scopes specially</summary>
         private int m_withDepth;
@@ -36,8 +36,9 @@ namespace Microsoft.NodejsTools.Parsing
         /// <summary>stack to maintain the current variable scope as we traverse the tree</summary>
         private Stack<ActivationObject> m_variableStack;
         private ErrorSink _errorSink;
+        internal readonly IndexResolver _indexResolver;
 
-        private ResolutionVisitor(ActivationObject rootScope, ErrorSink errorSink) {
+        private ResolutionVisitor(ActivationObject rootScope, IndexResolver indexResolver, ErrorSink errorSink) {
             // create the lexical and variable scope stacks and push the root scope onto them
             m_lexicalStack = new Stack<ActivationObject>();
             m_lexicalStack.Push(rootScope);
@@ -45,6 +46,7 @@ namespace Microsoft.NodejsTools.Parsing
             m_variableStack = new Stack<ActivationObject>();
             m_variableStack.Push(rootScope);
 
+            _indexResolver = indexResolver;
             _errorSink = errorSink;
         }
 
@@ -70,19 +72,19 @@ namespace Microsoft.NodejsTools.Parsing
 
         #endregion
 
-        public static void Apply(Node node, ActivationObject scope, ErrorSink errorSink)
+        public static void Apply(Node node, ActivationObject scope, IndexResolver indexResolver, ErrorSink errorSink)
         {
             if (node != null && scope != null)
             {
                 // create the visitor and run it. This will create all the child
                 // scopes and populate all the scopes with the var-decl, lex-decl,
                 // and lookup references within them.
-                var visitor = new ResolutionVisitor(scope, errorSink);
+                var visitor = new ResolutionVisitor(scope, indexResolver, errorSink);
                 node.Walk(visitor);
 
                 // now that all the scopes are created and they all know what decls
                 // they contains, create all the fields
-                CreateFields(scope);
+                visitor.CreateFields(scope);
 
                 // now that all the fields have been created in all the scopes,
                 // let's go through and resolve all the references
@@ -110,10 +112,10 @@ namespace Microsoft.NodejsTools.Parsing
             blockScope.Parent.ChildScopes.Remove(blockScope);
         }
 
-        private static void CreateFields(ActivationObject scope)
+        private void CreateFields(ActivationObject scope)
         {
             // declare this scope
-            scope.DeclareScope();
+            scope.DeclareScope(this);
 
             // and recurse
             foreach (var childScope in scope.ChildScopes)
@@ -156,49 +158,41 @@ namespace Microsoft.NodejsTools.Parsing
             if (lookup.VariableField.FieldType == FieldType.UndefinedGlobal)
             {
                 // couldn't find it.
-                // if the lookup isn't generated and isn't the object of a typeof operator,
+                // if the lookup isn't the object of a typeof operator,
                 // then we want to throw an error.
-                if (!lookup.IsGenerated)
+                var parentUnaryOp = lookup.Parent as UnaryOperator;
+                if (parentUnaryOp != null && parentUnaryOp.OperatorToken == JSToken.TypeOf)
                 {
-                    var parentUnaryOp = lookup.Parent as UnaryOperator;
-                    if (parentUnaryOp != null && parentUnaryOp.OperatorToken == JSToken.TypeOf)
-                    {
-                        // this undefined lookup is the target of a typeof operator.
-                        // I think it's safe to assume we're going to use it. Don't throw an error
-                        // and instead add it to the "known" expected globals of the global scope
-                        MakeExpectedGlobal(lookup.VariableField);
-                    }
-                    else
-                    {
-                        // report this undefined reference
-                        _errorSink.ReportUndefined(lookup);
+                    // this undefined lookup is the target of a typeof operator.
+                    // I think it's safe to assume we're going to use it. Don't throw an error
+                    // and instead add it to the "known" expected globals of the global scope
+                    MakeExpectedGlobal(lookup.VariableField);
+                }
+                else
+                {
+                    // report this undefined reference
+                    _errorSink.ReportUndefined(lookup);
 
-                        // possibly undefined global (but definitely not local).
-                        // see if this is a function or a variable.
-                        var callNode = lookup.Parent as CallNode;
-                        var isFunction = callNode != null && callNode.Function == lookup;
+                    // possibly undefined global (but definitely not local).
+                    // see if this is a function or a variable.
+                    var callNode = lookup.Parent as CallNode;
+                    var isFunction = callNode != null && callNode.Function == lookup;
 
-                        if (isFunction) {
-                            _errorSink.HandleUndeclaredFunction(
-                                lookup.Name,
-                                lookup.Context
-                            );
-                        } else {
-                            _errorSink.HandleUndeclaredVariable(
-                                lookup.Name,
-                                lookup.Context
-                            );
-                        }
+                    if (isFunction) {
+                        _errorSink.HandleUndeclaredFunction(
+                            lookup.Name,
+                            lookup.Span,
+                            _indexResolver
+                        );
+                    } else {
+                        _errorSink.HandleUndeclaredVariable(
+                            lookup.Name,
+                            lookup.Span,
+                            _indexResolver
+                        );
                     }
                 }
             }
-
-            // add the reference
-            lookup.VariableField.AddReference(lookup);
-
-            // we are actually referencing this field, so it's no longer a placeholder field if it
-            // happens to have been one.
-            lookup.VariableField.IsPlaceholder = false;
         }
 
         private void AddGhostedFields(ActivationObject scope)
@@ -227,9 +221,9 @@ namespace Microsoft.NodejsTools.Parsing
             if (ghostField == null)
             {
                 // set up a ghost field to keep track of the relationship
-                ghostField = new JSVariableField(FieldType.GhostCatch, catchParameter.Name, 0, null)
+                ghostField = new JSVariableField(FieldType.GhostCatch, catchParameter.Name)
                 {
-                    OriginalContext = catchParameter.Context
+                    OriginalSpan = catchParameter.Span
                 };
 
                 scope.AddField(ghostField);
@@ -247,7 +241,6 @@ namespace Microsoft.NodejsTools.Parsing
                 // collision in IE -- if an error happens, it will clobber the existing field's value,
                 // although that MAY be the intention; we don't know for sure. But it IS a cross-
                 // browser behavior difference.
-                ghostField.IsAmbiguous = true;
 
                 if (ghostField.OuterField != null)
                 {
@@ -255,25 +248,13 @@ namespace Microsoft.NodejsTools.Parsing
                     // in modern browsers, but will bind to this catch variable in older
                     // versions of IE! Definitely a cross-browser difference!
                     // throw a cross-browser issue error.
-                    _errorSink.HandleError(JSError.AmbiguousCatchVar, catchParameter.Context);
+                    _errorSink.HandleError(JSError.AmbiguousCatchVar, catchParameter.Span, _indexResolver);
                 }
             }
 
             // link them so they all keep the same name going forward
             // (since they are named the same in the sources)
             catchParameter.VariableField.OuterField = ghostField;
-
-            // TODO: this really should be a LIST of ghosted fields, since multiple 
-            // elements can ghost to the same field.
-            ghostField.GhostedField = catchParameter.VariableField;
-
-            // if the actual field has references, we want to bubble those up
-            // since we're now linking those fields
-            if (catchParameter.VariableField.RefCount > 0)
-            {
-                // add the catch parameter's references to the ghost field
-                ghostField.AddReferences(catchParameter.VariableField.References);
-            }
         }
 
         private void ResolveGhostedFunctions(ActivationObject scope, FunctionObject funcObject)
@@ -285,9 +266,9 @@ namespace Microsoft.NodejsTools.Parsing
             if (ghostField == null)
             {
                 // nothing; good to go. Add a ghosted field to keep track of it.
-                ghostField = new JSVariableField(FieldType.GhostFunction, funcObject.Name, 0, funcObject)
+                ghostField = new JSVariableField(FieldType.GhostFunction, funcObject.Name)
                 {
-                    OriginalContext = functionField.OriginalContext,
+                    OriginalSpan = functionField.OriginalSpan,
                 };
 
                 scope.AddField(ghostField);
@@ -298,14 +279,12 @@ namespace Microsoft.NodejsTools.Parsing
                 // what if a lookup is resolved to this field later? We probably still need to
                 // at least flag it as ambiguous. We will only need to throw an error, though,
                 // if someone actually references the outer ghost variable. 
-                ghostField.IsAmbiguous = true;
             }
             else
             {
                 // something already exists. Could be a naming collision for IE or at least a
                 // a cross-browser behavior difference if it's not coded properly.
                 // mark this field as a function, even if it wasn't before
-                ghostField.IsFunction = true;
 
                 if (ghostField.OuterField != null)
                 {
@@ -315,53 +294,13 @@ namespace Microsoft.NodejsTools.Parsing
                     // modern browsers will have the link to the outer field, but older
                     // IE browsers will link to this function expression!
                     // fire a cross-browser error warning
-                    ghostField.IsAmbiguous = true;
-                    _errorSink.HandleError(JSError.AmbiguousNamedFunctionExpression, funcObject.NameContext);
-                }
-                else
-                {
-                    // if the ghosted field isn't even referenced, then who cares?
-                    // but it is referenced. Let's see if it matters.
-                    // something like: var nm = function nm() {}
-                    // is TOTALLY cool common cross-browser syntax.
-                    var parentVarDecl = funcObject.Parent as VariableDeclaration;
-                    if (parentVarDecl == null
-                        || parentVarDecl.Name != funcObject.Name)
-                    {
-                        // see if it's a simple assignment.
-                        // something like: var nm; nm = function nm(){},
-                        // would also be cool, although less-common than the vardecl version.
-                        Lookup lookup;
-                        var parentAssignment = funcObject.Parent as BinaryOperator;
-                        if (parentAssignment == null || 
-                            parentAssignment.OperatorToken != JSToken.Assign
-                            || !(parentAssignment.Operand2 is FunctionExpression)
-                            || ((FunctionExpression)parentAssignment.Operand2).Function != funcObject
-                            || (lookup = parentAssignment.Operand1 as Lookup) == null
-                            || lookup.Name != funcObject.Name)
-                        {
-                            // something else. Flag it as ambiguous.
-                            ghostField.IsAmbiguous = true;
-                        }
-                    }
+                    _errorSink.HandleError(JSError.AmbiguousNamedFunctionExpression, funcObject.NameSpan, _indexResolver);
                 }
             }
 
             // link them so they all keep the same name going forward
             // (since they are named the same in the sources)
             functionField.OuterField = ghostField;
-
-            // TODO: this really should be a LIST of ghosted fields, since multiple 
-            // elements can ghost to the same field.
-            ghostField.GhostedField = functionField;
-
-            // if the actual field has references, we want to bubble those up
-            // since we're now linking those fields
-            if (functionField.RefCount > 0)
-            {
-                // add the function's references to the ghost field
-                ghostField.AddReferences(functionField.References);
-            }
         }
 
         #endregion
@@ -407,7 +346,7 @@ namespace Microsoft.NodejsTools.Parsing
                     && !(node.Parent is FunctionObject)
                     /*&& !(node.Parent is ConditionalCompilationComment)*/)
                 {
-                    node.BlockScope = new BlockScope(CurrentLexicalScope, node.Context, _errorSink)
+                    node.BlockScope = new BlockScope(CurrentLexicalScope, node.Span, _errorSink)
                     {
                         IsInWithScope = m_withDepth > 0
                     };
@@ -583,7 +522,7 @@ namespace Microsoft.NodejsTools.Parsing
                     if (lexDeclaration != null)
                     {
                         // create the scope on the block
-                        node.BlockScope = new BlockScope(CurrentLexicalScope, node.Context, _errorSink)
+                        node.BlockScope = new BlockScope(CurrentLexicalScope, node.Span, _errorSink)
                         {
                             IsInWithScope = m_withDepth > 0
                         };
@@ -629,7 +568,7 @@ namespace Microsoft.NodejsTools.Parsing
                     if (lexDeclaration != null)
                     {
                         // create the scope on the block
-                        node.BlockScope = new BlockScope(CurrentLexicalScope, node.Context, _errorSink)
+                        node.BlockScope = new BlockScope(CurrentLexicalScope, node.Span, _errorSink)
                         {
                             IsInWithScope = m_withDepth > 0
                         };
@@ -732,7 +671,7 @@ namespace Microsoft.NodejsTools.Parsing
                         // this is ES6 syntax: a function declaration inside a block scope. Not allowed
                         // in ES5 code, so throw a warning and ghost this function in the outer variable scope 
                         // to make sure that we don't generate any naming collisions.
-                        _errorSink.HandleError(JSError.MisplacedFunctionDeclaration, node.NameContext);
+                        _errorSink.HandleError(JSError.MisplacedFunctionDeclaration, node.NameSpan, _indexResolver);
                         CurrentVariableScope.GhostedFunctions.Add(node);
                     }
                 }
@@ -894,7 +833,7 @@ namespace Microsoft.NodejsTools.Parsing
 
                 // the switch has its own block scope to use for all the blocks that are under
                 // its child switch-case nodes
-                node.BlockScope = new BlockScope(CurrentLexicalScope, node.Context, _errorSink)
+                node.BlockScope = new BlockScope(CurrentLexicalScope, node.Span, _errorSink)
                 {
                     IsInWithScope = m_withDepth > 0
                 };
@@ -965,7 +904,7 @@ namespace Microsoft.NodejsTools.Parsing
                 {
                     // create the catch-scope, add the catch parameter to it, and recurse the catch block.
                     // the block itself will push the scope onto the stack and pop it off, so we don't have to.
-                    node.CatchBlock.BlockScope = new CatchScope(CurrentLexicalScope, node.CatchBlock.Context, node.CatchParameter, _errorSink)
+                    node.CatchBlock.BlockScope = new CatchScope(CurrentLexicalScope, node.CatchBlock.Span, node.CatchParameter, _errorSink)
                     {
                         IsInWithScope = m_withDepth > 0
                     };
@@ -1055,7 +994,7 @@ namespace Microsoft.NodejsTools.Parsing
                 {
                     // create the with-scope and recurse the block.
                     // the block itself will push the scope onto the stack and pop it off, so we don't have to.
-                    node.Body.BlockScope = new WithScope(CurrentLexicalScope, node.Body.Context, _errorSink);
+                    node.Body.BlockScope = new WithScope(CurrentLexicalScope, node.Body.Span, _errorSink);
 
                     try
                     {

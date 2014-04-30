@@ -46,13 +46,10 @@ namespace Microsoft.NodejsTools.Parsing
             }
         }
 
-        public bool BraceOnNewLine { get; set; }
-        public TokenWithSpan BraceContext { get; set; }
-
         public ActivationObject BlockScope { get; set; }
 
-        public Switch(TokenWithSpan context, JSParser parser)
-            : base(context, parser)
+        public Switch(IndexSpan span)
+            : base(span)
         {
         }
 

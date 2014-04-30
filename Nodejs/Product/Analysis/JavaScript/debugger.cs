@@ -19,8 +19,8 @@ namespace Microsoft.NodejsTools.Parsing
     public sealed class DebuggerNode : Statement
     {
 
-        public DebuggerNode(TokenWithSpan context, JSParser parser)
-            : base(context, parser)
+        public DebuggerNode(IndexSpan span)
+            : base(span)
         {
         }
 

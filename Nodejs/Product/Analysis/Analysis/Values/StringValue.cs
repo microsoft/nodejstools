@@ -47,5 +47,27 @@ namespace Microsoft.NodejsTools.Analysis.Values {
         public override AnalysisValue Prototype {
             get { return _analyzer._stringPrototype; }
         }
+
+        internal override bool UnionEquals(AnalysisValue av, int strength) {
+            if (strength >= MergeStrength.ToObject) {
+                return av is StringValue;
+            }
+            return base.UnionEquals(av, strength);
+        }
+
+        internal override int UnionHashCode(int strength) {
+            if (strength >= MergeStrength.ToObject) {
+                return _analyzer._stringPrototype.GetHashCode();
+            }
+            return base.UnionHashCode(strength);
+        }
+
+        internal override AnalysisValue UnionMergeTypes(AnalysisValue av, int strength) {
+            if (strength >= MergeStrength.ToObject) {
+                return _analyzer._emptyStringValue;
+            }
+
+            return base.UnionMergeTypes(av, strength);
+        }
     }
 }

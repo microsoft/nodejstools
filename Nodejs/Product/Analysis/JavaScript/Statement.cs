@@ -8,8 +8,8 @@ namespace Microsoft.NodejsTools.Parsing
 {
     public abstract class Statement : Node
     {
-        protected Statement(TokenWithSpan context, JSParser parser)
-            : base(context, parser)
+        protected Statement(IndexSpan span)
+            : base(span)
         {
         }
 

@@ -34,15 +34,13 @@ namespace Microsoft.NodejsTools.Parsing
             }
         }
 
-        public TokenWithSpan OperatorContext { get; set; }
-
         public JSToken OperatorToken { get; set; }
         public bool IsPostfix { get; set; }
         public bool OperatorInConditionalCompilationComment { get; set; }
         public bool ConditionalCommentContainsOn { get; set; }
 
-        public UnaryOperator(TokenWithSpan context, JSParser parser)
-            : base(context, parser)
+        public UnaryOperator(IndexSpan span)
+            : base(span)
         {
         }
 

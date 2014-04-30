@@ -21,21 +21,12 @@ namespace Microsoft.NodejsTools.Parsing
 {
     public class BlockScope : ActivationObject
     {
-        private TokenWithSpan m_context;// = null;
-        public TokenWithSpan Context
-        {
-            get { return m_context; }
-        }
+        private IndexSpan _span;
 
-        public BlockScope(ActivationObject parent, TokenWithSpan context, ErrorSink errorSink)
+        public BlockScope(ActivationObject parent, IndexSpan span, ErrorSink errorSink)
             : base(parent, errorSink)
         {
-            if (context == null)
-            {
-                throw new ArgumentNullException("context");
-            }
-
-            m_context = context;
+            _span = span;
         }
 
         #region scope setup methods
@@ -43,17 +34,17 @@ namespace Microsoft.NodejsTools.Parsing
         /// <summary>
         /// Set up this scopes lexically-declared fields
         /// </summary>
-        public override void DeclareScope()
+        public override void DeclareScope(ResolutionVisitor resolutionVisitor)
         {
             // only bind lexical declarations
-            DefineLexicalDeclarations();
+            DefineLexicalDeclarations(resolutionVisitor);
         }
 
         #endregion
 
-        public override JSVariableField CreateField(string name, object value, FieldAttributes attributes)
+        public override JSVariableField CreateField(string name)
         {
-            return new JSVariableField(FieldType.Local, name, attributes, value);
+            return new JSVariableField(FieldType.Local, name);
         }
     }
 }

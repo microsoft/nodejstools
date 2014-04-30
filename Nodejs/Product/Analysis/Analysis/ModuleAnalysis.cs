@@ -101,7 +101,8 @@ namespace Microsoft.NodejsTools.Analysis {
                 locatedDef.Entry.Tree != null &&    // null tree if there are errors in the file
                 locatedDef.DeclaringVersion == locatedDef.Entry.AnalysisVersion) {
                 var start = locatedDef.Context;
-                yield return new AnalysisVariable(VariableType.Definition, new LocationInfo(locatedDef.Entry, start.StartLineNumber, start.StartColumn));
+
+                yield return new AnalysisVariable(VariableType.Definition, locatedDef.Entry.Tree.ResolveLocation(locatedDef.Entry, start));
             }
 
             VariableDef def = referenceable as VariableDef;
@@ -599,7 +600,7 @@ namespace Microsoft.NodejsTools.Analysis {
                                 foreach (var param in funcDef.ParameterDeclarations)
                                 {
                                     string paramName = /*param.GetVerbatimImage(_unit.Tree) ??*/ param.Name;
-                                    var nameStart = param.IndexSpan.Start;
+                                    var nameStart = param.Span.Start;
 
                                     if (index >= nameStart && index <= (nameStart + paramName.Length)) {
                                         curScope = scope;
@@ -727,7 +728,8 @@ namespace Microsoft.NodejsTools.Analysis {
                 locatedDef.Entry.Tree != null &&    // null tree if there are errors in the file
                 locatedDef.DeclaringVersion == locatedDef.Entry.AnalysisVersion) {
                 var start = locatedDef.Context;
-                yield return new AnalysisVariable(VariableType.Definition, new LocationInfo(locatedDef.Entry, start.StartLineNumber, start.StartColumn));
+
+                yield return new AnalysisVariable(VariableType.Definition, locatedDef.Entry.Tree.ResolveLocation(locatedDef.Entry, start));
             }
 
             VariableDef def = referenceable as VariableDef;

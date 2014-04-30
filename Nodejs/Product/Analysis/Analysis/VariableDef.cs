@@ -520,15 +520,15 @@ namespace Microsoft.NodejsTools.Analysis {
     class LocatedVariableDef : VariableDef {
         private readonly ProjectEntry _entry;
         private int _declaringVersion;
-        private TokenWithSpan _location;
+        private Node _location;
 
-        public LocatedVariableDef(ProjectEntry entry, TokenWithSpan location) {
+        public LocatedVariableDef(ProjectEntry entry, Node location) {
             _entry = entry;
             _location = location;
             _declaringVersion = entry.AnalysisVersion;
         }
 
-        public LocatedVariableDef(ProjectEntry entry, TokenWithSpan location, VariableDef copy) {
+        public LocatedVariableDef(ProjectEntry entry, Node location, VariableDef copy) {
             _entry = entry;
             _location = location;
             _dependencies = copy._dependencies;
@@ -550,7 +550,7 @@ namespace Microsoft.NodejsTools.Analysis {
             }
         }
 
-        public TokenWithSpan Context {
+        public Node Context {
             get {
                 return _location;
             }

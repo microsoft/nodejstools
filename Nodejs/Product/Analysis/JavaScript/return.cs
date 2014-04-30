@@ -33,8 +33,8 @@ namespace Microsoft.NodejsTools.Parsing
             }
         }
 
-        public ReturnNode(TokenWithSpan context, JSParser parser)
-            : base(context, parser)
+        public ReturnNode(IndexSpan span)
+            : base(span)
         {
         }
 

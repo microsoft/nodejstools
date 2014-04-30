@@ -117,7 +117,7 @@ namespace Microsoft.NodejsTools.Analysis.Analyzer {
             for (int i = 0; i < astParams.Count; ++i) {
                 VariableDef param;
                 if (!Variables.TryGetValue(astParams[i].Name, out param)) {
-                    param = new LocatedVariableDef(unit.ProjectEntry, astParams[i].Context);
+                    param = new LocatedVariableDef(unit.ProjectEntry, astParams[i]);
                     AddVariable(astParams[i].Name, param);
                 }
             }
@@ -265,7 +265,7 @@ namespace Microsoft.NodejsTools.Analysis.Analyzer {
         }
 
         public override int GetBodyStart(JsAst ast) {
-            return ((FunctionObject)Node).Body.Context.StartPosition;
+            return ((FunctionObject)Node).Body.Span.Start;
         }
 
         public override string Name {

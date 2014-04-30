@@ -16,18 +16,10 @@
 
 using System;
 
-namespace Microsoft.NodejsTools.Parsing
-{
-    public abstract class Expression : Node
-    {
-        protected Expression(TokenWithSpan context, JSParser parser)
-            : base(context, parser)
-        {
+namespace Microsoft.NodejsTools.Parsing {
+    public abstract class Expression : Node {
+        protected Expression(IndexSpan span)
+            : base(span) {
         }
-
-        public virtual bool ReplaceChild(Expression oldNode, Expression newNode) {
-            return false;
-        }
-
     }
 }

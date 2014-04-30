@@ -72,8 +72,8 @@ namespace Microsoft.NodejsTools.Parsing
         /// </summary>
         public bool BraceOnNewLine { get; set; }
 
-        public Block(TokenWithSpan context, JSParser parser)
-            : base(context, parser)
+        public Block(IndexSpan span)
+            : base(span)
         {
             m_list = new List<Statement>();
         }

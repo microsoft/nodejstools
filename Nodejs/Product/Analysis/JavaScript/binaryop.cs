@@ -50,10 +50,9 @@ namespace Microsoft.NodejsTools.Parsing
         }
 
         public JSToken OperatorToken { get; set; }
-        public TokenWithSpan OperatorContext { get; set; }
 
-        public BinaryOperator(TokenWithSpan context, JSParser parser)
-            : base(context, parser)
+        public BinaryOperator(IndexSpan span)
+            : base(span)
         {
         }
 

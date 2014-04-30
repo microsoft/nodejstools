@@ -44,7 +44,7 @@ namespace Microsoft.NodejsTools.Parsing
         /// <summary>
         /// Set up this scopes lexically- and var-declared fields, plus formal parameters and the arguments object
         /// </summary>
-        public override void DeclareScope()
+        public override void DeclareScope(ResolutionVisitor resolutionVisitor)
         {
             // we are a function expression that points to a function object. 
             // if the function object points back to us, then this is the main
@@ -57,13 +57,13 @@ namespace Microsoft.NodejsTools.Parsing
                 DefineParameters();
 
                 // bind lexical declarations next
-                DefineLexicalDeclarations();
+                DefineLexicalDeclarations(resolutionVisitor);
 
                 // bind the arguments object if this is a function scope
                 DefineArgumentsObject();
 
                 // bind the variable declarations
-                DefineVarDeclarations();
+                DefineVarDeclarations(resolutionVisitor);
             }
             else
             {
@@ -75,9 +75,8 @@ namespace Microsoft.NodejsTools.Parsing
         private void DefineFunctionExpressionName()
         {
             // add a field for the function expression name so it can be self-referencing.
-            var functionField = this.CreateField(FunctionObject.Name, FunctionObject, 0);
-            functionField.IsFunction = true;
-            functionField.OriginalContext = FunctionObject.NameContext;
+            var functionField = this.CreateField(FunctionObject.Name);
+            functionField.OriginalSpan = FunctionObject.NameSpan;
 
             FunctionObject.VariableField = functionField;
 
@@ -96,10 +95,9 @@ namespace Microsoft.NodejsTools.Parsing
                     if (argumentField == null)
                     {
                         // not already defined -- create a field now
-                        argumentField = new JSVariableField(FieldType.Argument, parameter.Name, 0, null)
+                        argumentField = new JSArgumentField(FieldType.Argument, parameter.Name, parameter.Position)
                         {
-                            Position = parameter.Position,
-                            OriginalContext = parameter.Context,
+                            OriginalSpan = parameter.Span,
                         };
 
                         this.AddField(argumentField);
@@ -108,7 +106,6 @@ namespace Microsoft.NodejsTools.Parsing
                     // make the parameter reference the field and the field reference
                     // the parameter as its declaration
                     parameter.VariableField = argumentField;
-                    argumentField.Declarations.Add(parameter);
                 }
             }
         }
@@ -119,15 +116,15 @@ namespace Microsoft.NodejsTools.Parsing
             const string name = "arguments";
             if (this[name] == null)
             {
-                this.AddField(new JSVariableField(FieldType.Arguments, name, 0, null));
+                this.AddField(new JSVariableField(FieldType.Arguments, name));
             }
         }
 
         #endregion
 
-        public override JSVariableField CreateField(string name, object value, FieldAttributes attributes)
+        public override JSVariableField CreateField(string name)
         {
-            return new JSVariableField(FieldType.Local, name, attributes, value);
+            return new JSVariableField(FieldType.Local, name);
         }
 
         internal void AddReference(ActivationObject scope)

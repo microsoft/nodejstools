@@ -41,179 +41,15 @@ namespace Microsoft.NodejsTools.Parsing
     public class JSVariableField
     {
         private ActivationObject m_owningScope; 
-        private HashSet<INameReference> m_referenceTable;
-        private HashSet<INameDeclaration> m_declarationTable;
-
-        private bool m_isDeclared; //= false;
-        private bool m_isGenerated;
-
-        public TokenWithSpan OriginalContext { get; set; }
+        public IndexSpan OriginalSpan { get; set; }
         public string Name { get; private set; }
         public FieldType FieldType { get; set; }
-        public FieldAttributes Attributes { get; set; }
-        public Object FieldValue { get; set; }
-
-        public bool IsFunction { get; internal set; }
-        public bool IsAmbiguous { get; set; }
-        public bool IsPlaceholder { get; set; }
-        public bool InitializationOnly { get; set; }
-        public int Position { get; set; }
-
         public JSVariableField OuterField { get; set; }
 
-        public ActivationObject OwningScope 
+        public JSVariableField(FieldType fieldType, string name)
         {
-            get
-            {
-                // but the get -- if we are an inner field, we always
-                // want to get the owning scope of the outer field
-                return OuterField == null ? m_owningScope : OuterField.OwningScope;
-            }
-            set
-            {
-                // simple set -- should always point to the scope in whose
-                // name table this field has been added, which isn't necessarily
-                // the owning scope, because this may be an inner field. But keep
-                // this value in case we ever break the link to the outer field.
-                m_owningScope = value;
-            }
-        }
-
-        public JSVariableField GhostedField { get; set; }
-
-        public int RefCount
-        {
-            get
-            {
-                return m_referenceTable.Count;
-            }
-        }
-        public ICollection<INameReference> References
-        {
-            get { return m_referenceTable; }
-        }
-
-        /// <summary>
-        /// returns the only reference IF there is only ONE reference
-        /// in the collection; otherwise returns false.
-        /// </summary>
-        public INameReference OnlyReference
-        {
-            get
-            {
-                var array = new INameReference[1];
-                if (m_referenceTable.Count == 1)
-                {
-                    m_referenceTable.CopyTo(array, 0);
-                }
-
-                return array[0];
-            }
-        }
-
-        public ICollection<INameDeclaration> Declarations
-        {
-            get { return m_declarationTable; }
-        }
-
-        /// <summary>
-        /// returns the only declaration IF there is only ONE name declaration
-        /// in the collection; otherwise returns false.
-        /// </summary>
-        public INameDeclaration OnlyDeclaration
-        {
-            get
-            {
-                var array = new INameDeclaration[1];
-                if (m_declarationTable.Count == 1)
-                {
-                    m_declarationTable.CopyTo(array, 0);
-                }
-
-                return array[0];
-            }
-        }
-
-        public bool IsLiteral
-        {
-            get
-            {
-                return ((Attributes & FieldAttributes.Literal) != 0);
-            }
-        }
-
-        public bool IsDeclared
-        {
-            get { return m_isDeclared; }
-            set 
-            { 
-                m_isDeclared = value;
-                if (OuterField != null)
-                {
-                    OuterField.IsDeclared = value;
-                }
-            }
-        }
-
-        public bool IsGenerated
-        {
-            get
-            {
-                // if we are pointing to an outer field, return ITS flag, not ours
-                return OuterField != null ? OuterField.IsGenerated : m_isGenerated;
-            }
-            set
-            {
-                // always set our flag, just in case
-                m_isGenerated = value;
-
-                // if we are pointing to an outer field, set it's flag as well
-                if (OuterField != null)
-                {
-                    OuterField.IsGenerated = value;
-                }
-            }
-        }
-
-        public bool IsOuterReference
-        {
-            get
-            {
-                if (this.OuterField != null)
-                {
-                    // there is an outer field reference.
-                    // go up the chain and make sure that there is a non-placeholder field
-                    // somewhere up there. If there is nothing but placeholders (ghosts), then
-                    // this is not an outer field.
-                    var outerField = this.OuterField;
-                    while (outerField != null)
-                    {
-                        if (!outerField.IsPlaceholder)
-                        {
-                            // we found an outer field that is not a placeholder, therefore
-                            // the original field IS an outer field.
-                            return true;
-                        }
-
-                        outerField = outerField.OuterField;
-                    }
-                }
-
-                // if we get here, then we didn't find any real (non-placeholder)
-                // outer field, so we are not an outer reference.
-                return false;
-            }
-        }
-
-        public JSVariableField(FieldType fieldType, string name, FieldAttributes fieldAttributes, object value)
-        {
-            m_referenceTable = new HashSet<INameReference>();
-            m_declarationTable = new HashSet<INameDeclaration>();
-
+            FieldType = fieldType;
             Name = name;
-            Attributes = fieldAttributes;
-            FieldValue = value;
-            SetFieldsBasedOnType(fieldType);
         }
 
         internal JSVariableField(FieldType fieldType, JSVariableField outerField)
@@ -223,87 +59,30 @@ namespace Microsoft.NodejsTools.Parsing
                 throw new ArgumentNullException("outerField");
             }
 
-            m_referenceTable = new HashSet<INameReference>();
-            m_declarationTable = new HashSet<INameDeclaration>();
-
             // set values based on the outer field
             OuterField = outerField;
 
             Name = outerField.Name;
-            Attributes = outerField.Attributes;
-            FieldValue = outerField.FieldValue;
-            IsGenerated = outerField.IsGenerated;
-
-            // and set some other fields on our object based on the type we are
-            SetFieldsBasedOnType(fieldType);
         }
 
-        private void SetFieldsBasedOnType(FieldType fieldType)
-        {
-            FieldType = fieldType;
-            switch (FieldType)
-            {
-                case FieldType.Argument:
-                case FieldType.CatchError:
-                    IsDeclared = true;
-                    break;
-
-                case FieldType.Arguments:
-                    IsDeclared = false;
-                    break;
-
-                case FieldType.Global:
-                    break;
-
-                case FieldType.Local:
-                    break;
-
-                case FieldType.Predefined:
-                    IsDeclared = false;
-                    break;
-
-                case FieldType.WithField:
-                    break;
-
-                case FieldType.GhostCatch:
-                    IsPlaceholder = true;
-                    break;
-
-                case FieldType.GhostFunction:
-                    IsFunction = true;
-                    IsPlaceholder = true;
-                    break;
-
-                case FieldType.UndefinedGlobal:
-                    break;
-
-                default:
-                    // shouldn't get here
-                    throw new ArgumentException("Invalid field type", "fieldType");
+        public ActivationObject OwningScope {
+            get {
+                // but the get -- if we are an inner field, we always
+                // want to get the owning scope of the outer field
+                return OuterField == null ? m_owningScope : OuterField.OwningScope;
+            }
+            set {
+                // simple set -- should always point to the scope in whose
+                // name table this field has been added, which isn't necessarily
+                // the owning scope, because this may be an inner field. But keep
+                // this value in case we ever break the link to the outer field.
+                m_owningScope = value;
             }
         }
 
-        public void AddReference(INameReference reference)
-        {
-            if (reference != null)
-            {
-                m_referenceTable.Add(reference);
-
-                if (this.OuterField != null)
-                {
-                    this.OuterField.AddReference(reference);
-                }
-            }
-        }
-
-        public void AddReferences(IEnumerable<INameReference> references)
-        {
-            if (references != null)
-            {
-                foreach (var reference in references)
-                {
-                    AddReference(reference);
-                }
+        public virtual int Position {
+            get {
+                return -1;
             }
         }
 
@@ -322,43 +101,20 @@ namespace Microsoft.NodejsTools.Parsing
         {
             return Name.GetHashCode();
         }
+    }
 
-        /// <summary>
-        /// returns true if the fields point to the same ultimate reference object.
-        /// Needs to walk up the outer-reference chain for each field in order to
-        /// find the ultimate reference
-        /// </summary>
-        /// <param name="otherField"></param>
-        /// <returns></returns>
-        public bool IsSameField(JSVariableField otherField)
-        {
-            // shortcuts -- if they are already the same object, we're done;
-            // and if the other field is null, then we are NOT the same object.
-            if (this == otherField)
-            {
-                return true;
-            }
-            else if (otherField == null)
-            {
-                return false;
-            }
+    class JSArgumentField : JSVariableField {
+        private readonly int _position;
 
-            // get the ultimate field for this field
-            var thisOuter = OuterField != null ? OuterField : this;
-            while (thisOuter.OuterField != null)
-            {
-                thisOuter = thisOuter.OuterField;
-            }
+        public JSArgumentField(FieldType fieldType, string name, int position)
+            : base(fieldType, name) {
+                _position = position;
+        }
 
-            // get the ultimate field for the other field
-            var otherOuter = otherField.OuterField != null ? otherField.OuterField : otherField;
-            while (otherOuter.OuterField != null)
-            {
-                otherOuter = otherOuter.OuterField;
+        public override int Position {
+            get {
+                return _position;
             }
-
-            // now that we have the same outer fields, check to see if they are the same
-            return thisOuter == otherOuter;
         }
     }
 }

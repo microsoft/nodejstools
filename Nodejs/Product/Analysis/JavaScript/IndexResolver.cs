@@ -5,7 +5,7 @@ using System.Text;
 using Microsoft.NodejsTools.Parsing;
 
 namespace Microsoft.NodejsTools.Parsing {
-    class IndexResolver {
+    public class IndexResolver {
         private readonly List<int> _newLineLocations;
         private readonly SourceLocation _initialLocation;
 

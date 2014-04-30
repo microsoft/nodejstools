@@ -51,10 +51,8 @@ namespace Microsoft.NodejsTools.Parsing
             get { return (CaseValue == null); }
         }
 
-        public TokenWithSpan ColonContext { get; set; }
-
-        public SwitchCase(TokenWithSpan context, JSParser parser)
-            : base(context, parser)
+        public SwitchCase(IndexSpan span)
+            : base(span)
         {
         }
 

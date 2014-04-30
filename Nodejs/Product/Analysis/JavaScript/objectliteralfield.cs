@@ -20,10 +20,8 @@ namespace Microsoft.NodejsTools.Parsing
 {
     public class ObjectLiteralField : ConstantWrapper
     {
-        public TokenWithSpan ColonContext { get; set; }
-
-        public ObjectLiteralField(Object value, PrimitiveType primitiveType, TokenWithSpan context, JSParser parser)
-            : base(value, primitiveType, context, parser)
+        public ObjectLiteralField(Object value, IndexSpan span)
+            : base(value, span)
         {
         }
 

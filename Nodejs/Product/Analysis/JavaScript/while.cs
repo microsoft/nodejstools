@@ -35,8 +35,8 @@ namespace Microsoft.NodejsTools.Parsing
             }
         }
 
-        public WhileNode(TokenWithSpan context, JSParser parser)
-            : base(context, parser)
+        public WhileNode(IndexSpan span)
+            : base(span)
         {
         }
 

@@ -77,9 +77,9 @@ namespace AnalysisTests {
         private static List<TokenWithSpan> ScanTokens(string code) {
             var scanner = new JSScanner(code, null, new CodeSettings() { AllowShebangLine = true });
             List<TokenWithSpan> tokens = new List<TokenWithSpan>();
-            for (TokenWithSpan curToken = scanner.ScanNextToken(true);
+            for (TokenWithSpan curToken = scanner.ScanNextTokenWithSpan(true);
                 curToken.Token != JSToken.EndOfFile;
-                curToken = scanner.ScanNextToken(true)) {
+                curToken = scanner.ScanNextTokenWithSpan(true)) {
                 tokens.Add(curToken);
             }
             return tokens;
@@ -91,12 +91,12 @@ namespace AnalysisTests {
                 Assert.AreEqual(expected.Length, tokens.Count);
                 for (int i = 0; i < expected.Length; i++) {
                     Assert.AreEqual(expected[i].TokenKind, tokens[i].Token);
-                    Assert.AreEqual(expected[i].Start.Line, tokens[i].StartLineNumber);
+                    Assert.AreEqual(expected[i].Start.Line, tokens[i].StartLine);
                     Assert.AreEqual(expected[i].Start.Column, tokens[i].StartColumn);
-                    Assert.AreEqual(expected[i].Start.Index, tokens[i].StartPosition);
-                    Assert.AreEqual(expected[i].End.Line, tokens[i].EndLineNumber);
+                    Assert.AreEqual(expected[i].Start.Index, tokens[i].Start);
+                    Assert.AreEqual(expected[i].End.Line, tokens[i].EndLine);
                     Assert.AreEqual(expected[i].End.Column, tokens[i].EndColumn);
-                    Assert.AreEqual(expected[i].End.Index, tokens[i].EndPosition);
+                    Assert.AreEqual(expected[i].End.Index, tokens[i].End);
                 }
                 success = true;
             } finally {
@@ -110,11 +110,11 @@ namespace AnalysisTests {
             foreach (var token in tokens) {
                 Console.WriteLine("new TokenInfo(JSToken.{0}, new SourceLocation({1}, {2}, {3}), new SourceLocation({4}, {5}, {6})),",
                     token.Token,
-                    token.StartPosition,
-                    token.StartLineNumber,
+                    token.Start,
+                    token.StartLine,
                     token.StartColumn,
-                    token.EndPosition,
-                    token.EndLineNumber,
+                    token.End,
+                    token.EndLine,
                     token.EndColumn
                 );
             }

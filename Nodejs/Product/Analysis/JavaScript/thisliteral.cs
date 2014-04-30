@@ -19,8 +19,8 @@ namespace Microsoft.NodejsTools.Parsing
     public sealed class ThisLiteral : Expression
     {
 
-        public ThisLiteral(TokenWithSpan context, JSParser parser)
-            : base(context, parser)
+        public ThisLiteral(IndexSpan span)
+            : base(span)
         {
         }
 

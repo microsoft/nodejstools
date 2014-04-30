@@ -105,27 +105,27 @@ namespace Microsoft.NodejsTools.Parsing
         /// <summary>
         /// Set up this scope's fields from the declarations it contains
         /// </summary>
-        public abstract void DeclareScope();
+        public abstract void DeclareScope(ResolutionVisitor resolutionVisitor);
 
-        protected void DefineLexicalDeclarations()
+        protected void DefineLexicalDeclarations(ResolutionVisitor resolutionVisitor)
         {
             foreach (var lexDecl in LexicallyDeclaredNames)
             {
                 // use the function as the field value if it's a function
-                DefineField(lexDecl, lexDecl as FunctionObject);
+                DefineField(resolutionVisitor, lexDecl);
             }
         }
 
-        protected void DefineVarDeclarations()
+        protected void DefineVarDeclarations(ResolutionVisitor resolutionVisitor)
         {
             foreach (var varDecl in VarDeclaredNames)
             {
                 // var-decls are always initialized to null
-                DefineField(varDecl, null);
+                DefineField(resolutionVisitor, varDecl);
             }
         }
 
-        private void DefineField(INameDeclaration nameDecl, FunctionObject fieldValue)
+        private void DefineField(ResolutionVisitor resolutionVisitor, INameDeclaration nameDecl)
         {
             if (nameDecl == null) {
                 // malformed code, for example catch w/o a variable.
@@ -139,10 +139,9 @@ namespace Microsoft.NodejsTools.Parsing
                 if (field == null)
                 {
                     // no collision - create the catch-error field
-                    field = new JSVariableField(FieldType.CatchError, nameDecl.Name, 0, null)
+                    field = new JSVariableField(FieldType.CatchError, nameDecl.Name)
                     {
-                        OriginalContext = nameDecl.NameContext,
-                        IsDeclared = true
+                        OriginalSpan = nameDecl.NameSpan
                     };
 
                     this.AddField(field);
@@ -151,7 +150,7 @@ namespace Microsoft.NodejsTools.Parsing
                 {
                     // it's an error to declare anything in the catch scope with the same name as the
                     // error variable
-                    ErrorSink.HandleError(JSError.DuplicateCatch, field.OriginalContext, true);
+                    ErrorSink.HandleError(JSError.DuplicateCatch, field.OriginalSpan, resolutionVisitor._indexResolver, true);
                 }
             }
             else
@@ -159,16 +158,11 @@ namespace Microsoft.NodejsTools.Parsing
                 if (field == null)
                 {
                     // could be global or local depending on the scope, so let the scope create it.
-                    field = this.CreateField(nameDecl.Name, null, 0);
-                    field.OriginalContext = nameDecl.NameContext;
-                    field.IsDeclared = true;
-                    field.IsFunction = (nameDecl is FunctionObject);
-                    field.FieldValue = fieldValue;
-
+                    field = this.CreateField(nameDecl.Name);
+                    field.OriginalSpan = nameDecl.NameSpan;
+                    
                     // if this field is a constant, mark it now
                     var lexDeclaration = nameDecl.Parent as LexicalDeclaration;
-                    field.InitializationOnly = nameDecl.Parent is ConstStatement
-                        || (lexDeclaration != null && lexDeclaration.StatementToken == JSToken.Const);
 
                     this.AddField(field);
                 }
@@ -179,33 +173,12 @@ namespace Microsoft.NodejsTools.Parsing
                     // lexical declarations with the same name in the same scope.
                     if (nameDecl.Parent is LexicalDeclaration)
                     {
-                        _errorSink.HandleError(JSError.DuplicateLexicalDeclaration, nameDecl.NameContext, true);
-                    }
-
-                    if (nameDecl.Initializer != null)
-                    {
-                        // if this is an initialized declaration, then the var part is
-                        // superfluous and the "initializer" is really a lookup assignment. 
-                        // So bump up the ref-count for those cases.
-                        var nameReference = nameDecl as INameReference;
-                        if (nameReference != null)
-                        {
-                            field.AddReference(nameReference);
-                        }
-                    }
-
-                    // don't clobber an existing field value with null. For instance, the last 
-                    // function declaration is the winner, so always set the value if we have something,
-                    // but a var following a function shouldn't reset it to null.
-                    if (fieldValue != null)
-                    {
-                        field.FieldValue = fieldValue;
+                        _errorSink.HandleError(JSError.DuplicateLexicalDeclaration, nameDecl.NameSpan, resolutionVisitor._indexResolver, true);
                     }
                 }
             }
 
             nameDecl.VariableField = field;
-            field.Declarations.Add(nameDecl);
         }
 
         #endregion
@@ -241,16 +214,11 @@ namespace Microsoft.NodejsTools.Parsing
                     // then create an inner field to point to it and we'll return
                     // that one.
                     variableField = CreateInnerField(this.Parent.FindReference(name));
-
-                    // mark it as a placeholder. we might be going down a chain of scopes,
-                    // where we will want to reserve the variable name, but not actually reference it.
-                    // at the end where it is actually referenced we will reset the flag.
-                    variableField.IsPlaceholder = true;
                 }
                 else
                 {
                     // must be global scope. the field is undefined!
-                    variableField = AddField(new JSVariableField(FieldType.UndefinedGlobal, name, 0, null));
+                    variableField = AddField(new JSVariableField(FieldType.UndefinedGlobal, name));
                 }
             }
 
@@ -263,7 +231,7 @@ namespace Microsoft.NodejsTools.Parsing
             return outerField.IfNotNull(o => new JSVariableField(o.FieldType, o));
         }
 
-        public abstract JSVariableField CreateField(string name, object value, FieldAttributes attributes);
+        public abstract JSVariableField CreateField(string name);
 
         public virtual JSVariableField CreateInnerField(JSVariableField outerField)
         {

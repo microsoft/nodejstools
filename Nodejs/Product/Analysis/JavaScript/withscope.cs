@@ -20,8 +20,8 @@ namespace Microsoft.NodejsTools.Parsing
 {
     public sealed class WithScope : BlockScope
     {
-        public WithScope(ActivationObject parent, TokenWithSpan context, ErrorSink errorSink)
-            : base(parent, context, errorSink)
+        public WithScope(ActivationObject parent, IndexSpan span, ErrorSink errorSink)
+            : base(parent, span, errorSink)
         {
             IsInWithScope = true;
         }
@@ -35,17 +35,6 @@ namespace Microsoft.NodejsTools.Parsing
                 // this scope.
                 var withField = AddField(CreateField(outerField));
 
-                // if the outer field is an undefined global, then we want to flag it with a
-                // special attribute that tells us that it might not actually be an undefined global,
-                // because it might just be a property reference on the with-object.
-                if (outerField.FieldType == FieldType.UndefinedGlobal)
-                {
-                    do
-                    {
-                        outerField.Attributes |= FieldAttributes.RTSpecialName;
-                    } while ((outerField = outerField.OuterField) != null);
-                }
-
                 return withField;
             });
         }
@@ -53,10 +42,10 @@ namespace Microsoft.NodejsTools.Parsing
         /// <summary>
         /// Set up this scopes lexically-declared fields
         /// </summary>
-        public override void DeclareScope()
+        public override void DeclareScope(ResolutionVisitor resolutionVisitor)
         {
             // only bind lexical declarations
-            DefineLexicalDeclarations();
+            DefineLexicalDeclarations(resolutionVisitor);
         }
 
         public override JSVariableField CreateField(JSVariableField outerField)
@@ -66,9 +55,9 @@ namespace Microsoft.NodejsTools.Parsing
             return new JSVariableField(FieldType.WithField, outerField);
         }
 
-        public override JSVariableField CreateField(string name, object value, FieldAttributes attributes)
+        public override JSVariableField CreateField(string name)
         {
-            return new JSVariableField(FieldType.WithField, name, attributes, null);
+            return new JSVariableField(FieldType.WithField, name);
         }
     }
 }

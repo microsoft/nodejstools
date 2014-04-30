@@ -78,20 +78,8 @@ namespace Microsoft.NodejsTools.Parsing
             }
         }
 
-        public TokenWithSpan CatchContext { get; set; }
-
-        public TokenWithSpan CatchVarContext
-        {
-            get
-            {
-                return CatchParameter.IfNotNull(v => v.Context);
-            }
-        }
-
-        public TokenWithSpan FinallyContext { get; set; }
-
-        public TryNode(TokenWithSpan context, JSParser parser)
-            : base(context, parser)
+        public TryNode(IndexSpan span)
+            : base(span)
         {
         }
 

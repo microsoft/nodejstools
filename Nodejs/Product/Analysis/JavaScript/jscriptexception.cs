@@ -49,11 +49,12 @@ namespace Microsoft.NodejsTools.Parsing
 #if !SILVERLIGHT
         [NonSerialized]
 #endif
-        private TokenWithSpan m_context;
 
         private string m_valueObject;
         private bool m_isError;
         private JSError m_errorCode;
+        private readonly IndexSpan _span;
+        private readonly IndexResolver _resolver;
         private bool m_canRecover = true;
 
         #endregion
@@ -64,14 +65,14 @@ namespace Microsoft.NodejsTools.Parsing
         public JScriptException(string message, Exception innerException)
             : base(message, innerException) {
             m_valueObject = message;
-            m_context = null;
             m_errorCode = JSError.UncaughtException;
             SetHResult();
         }
 
-        internal JScriptException(JSError errorNumber, TokenWithSpan context) {
+        internal JScriptException(JSError errorNumber, IndexSpan span, IndexResolver resolver) {
             m_valueObject = null;
-            m_context = (context == null ? null : context);
+            _span = span;
+            _resolver = resolver;
             m_errorCode = errorNumber;
             SetHResult();
         }
@@ -94,9 +95,9 @@ namespace Microsoft.NodejsTools.Parsing
 
         #region public properties
 
-        public TokenWithSpan Context {
+        public IndexSpan Span {
             get {
-                return m_context;
+                return _span;
             }
         }
 
@@ -130,9 +131,9 @@ namespace Microsoft.NodejsTools.Parsing
         {
             get
             {
-                if (m_context != null)
+                if (_resolver != null)
                 {
-                    return m_context.StartLineNumber;
+                    return _resolver.IndexToLocation(_span.Start).Line;
                 }
                 else
                 {
@@ -145,10 +146,10 @@ namespace Microsoft.NodejsTools.Parsing
         {
             get
             {
-                if (m_context != null)
+                if (_resolver != null)
                 {
                     // one-based column number
-                    return m_context.StartColumn;
+                    return _resolver.IndexToLocation(_span.Start).Column;
                 }
                 else
                 {
@@ -161,9 +162,9 @@ namespace Microsoft.NodejsTools.Parsing
         {
             get
             {
-                if (m_context != null)
+                if (_resolver != null)
                 {
-                    return m_context.EndLineNumber;
+                    return _resolver.IndexToLocation(_span.End).Line;
                 }
                 else
                 {
@@ -176,20 +177,9 @@ namespace Microsoft.NodejsTools.Parsing
         {
             get
             {
-                if (m_context != null)
+                if (_resolver != null)
                 {
-                    if (m_context.EndColumn >= m_context.StartColumn)
-                    {
-                        // normal condition - one-based
-                        return m_context.EndColumn;
-                    }
-                    else
-                    {
-                        // end column before start column -- just set end to be the end of the line
-                        // TODO: 
-                        Debug.Fail("bad end column ");
-                        return m_context.StartColumn;
-                    }
+                    return _resolver.IndexToLocation(_span.End).Column;
                 }
                 else
                     return 0;
@@ -337,125 +327,6 @@ namespace Microsoft.NodejsTools.Parsing
         {
             Error = error;
             Exception = exception;
-        }
-    }
-
-#if !SILVERLIGHT
-    [Serializable]
-#endif
-    public class UndefinedReferenceException : Exception
-    {
-#if !SILVERLIGHT
-        [NonSerialized]
-#endif
-        private TokenWithSpan m_context;
-
-#if !SILVERLIGHT
-        [NonSerialized]
-#endif
-        private Lookup m_lookup;
-        public Node LookupNode
-        {
-            get { return m_lookup; }
-        }
-
-        private string m_name;
-        private ReferenceType m_type;
-
-        public string Name
-        {
-            get { return m_name; }
-        }
-
-        public ReferenceType ReferenceType
-        {
-            get { return m_type; }
-        }
-
-        public int Column
-        {
-            get
-            {
-                if (m_context != null)
-                {
-                    // one-based
-                    return m_context.StartColumn;
-                }
-                else
-                {
-                    return 1;
-                }
-            }
-        }
-
-        public int Line
-        {
-            get
-            {
-                if (m_context != null)
-                {
-                    return m_context.StartLineNumber;
-                }
-                else
-                {
-                    return 1;
-                }
-            }
-        }
-
-        internal UndefinedReferenceException(Lookup lookup, TokenWithSpan context)
-        {
-            m_lookup = lookup;
-            m_name = lookup.Name;
-            m_type = lookup.RefType;
-            m_context = context;
-        }
-
-        public UndefinedReferenceException() : base() { }
-        public UndefinedReferenceException(string message) : base(message) { }
-        public UndefinedReferenceException(string message, Exception innerException) : base(message, innerException) { }
-
-#if !SILVERLIGHT
-        protected UndefinedReferenceException(SerializationInfo info, StreamingContext context)
-            : base(info, context)
-        {
-            if (info == null)
-            {
-                throw new ArgumentNullException("info");
-            }
-            m_name = info.GetString("name");
-            m_type = (ReferenceType)Enum.Parse(typeof(ReferenceType), info.GetString("type"));
-        }
-
-        [SecurityCritical] 
-        [SecurityPermission(SecurityAction.Demand, SerializationFormatter = true)]
-        public override void GetObjectData(SerializationInfo info, StreamingContext context)
-        {
-            if (info == null)
-            {
-                throw new ArgumentNullException("info");
-            }
-
-            base.GetObjectData(info, context);
-            info.AddValue("name", m_name);
-            info.AddValue("type", m_type.ToString());
-        }
-#endif
-
-        public override string ToString()
-        {
-            return m_name;
-        }
-    }
-
-    public class UndefinedReferenceEventArgs : EventArgs
-    {
-        private UndefinedReferenceException m_exception;
-        public UndefinedReferenceException Exception { get { return m_exception; } }
-
-        public UndefinedReferenceEventArgs(UndefinedReferenceException exception)
-        {
-            m_exception = exception;
         }
     }
 }

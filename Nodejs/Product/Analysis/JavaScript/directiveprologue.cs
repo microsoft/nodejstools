@@ -22,8 +22,8 @@ namespace Microsoft.NodejsTools.Parsing
 {
     public class DirectivePrologue : ConstantWrapper
     {
-        public DirectivePrologue(string value, TokenWithSpan context, JSParser parser)
-            : base(value, PrimitiveType.String, context, parser)
+        public DirectivePrologue(string value, IndexSpan span)
+            : base(value, span)
         {
             // this is a "use strict" directive if the source context is EXACTLY "use strict"
             // don't consider the quotes so it can be " or ' delimiters

@@ -47,8 +47,8 @@ namespace Microsoft.NodejsTools.Parsing
             }
         }
 
-        public WithNode(TokenWithSpan context, JSParser parser)
-            : base(context, parser)
+        public WithNode(IndexSpan span)
+            : base(span)
         {
         }
 

@@ -97,8 +97,8 @@ namespace AnalysisTests {
         public void TestCallNode() {
             TestOneSnippet("f(1,2,3)",
                 new NodeInfo(typeof(Block), 0, 8),
-                new NodeInfo(typeof(ExpressionStatement), 0, 7),
-                new NodeInfo(typeof(CallNode), 0, 7),
+                new NodeInfo(typeof(ExpressionStatement), 0, 8),
+                new NodeInfo(typeof(CallNode), 0, 8),
                 new NodeInfo(typeof(Lookup), 0, 1),
                 new NodeInfo(typeof(ConstantWrapper), 2, 3),
                 new NodeInfo(typeof(ConstantWrapper), 4, 5),
@@ -107,8 +107,8 @@ namespace AnalysisTests {
 
             TestOneSnippet("new f(1,2,3)",
                 new NodeInfo(typeof(Block), 0, 12),
-                new NodeInfo(typeof(ExpressionStatement), 0, 11),
-                new NodeInfo(typeof(CallNode), 0, 11),
+                new NodeInfo(typeof(ExpressionStatement), 0, 12),
+                new NodeInfo(typeof(CallNode), 0, 12),
                 new NodeInfo(typeof(Lookup), 4, 5),
                 new NodeInfo(typeof(ConstantWrapper), 6, 7),
                 new NodeInfo(typeof(ConstantWrapper), 8, 9),
@@ -308,8 +308,8 @@ namespace AnalysisTests {
 console.log('hi');",
                 new NodeInfo(typeof(Block), 0, 28),
                 new NodeInfo(typeof(LabeledStatement), 0, 7),
-                new NodeInfo(typeof(ExpressionStatement), 10, 26),
-                new NodeInfo(typeof(CallNode), 10, 26),
+                new NodeInfo(typeof(ExpressionStatement), 10, 27),
+                new NodeInfo(typeof(CallNode), 10, 27),
                 new NodeInfo(typeof(Member), 10, 21),
                 new NodeInfo(typeof(Lookup), 10, 17),
                 new NodeInfo(typeof(ConstantWrapper), 22, 26)
@@ -543,7 +543,7 @@ console.log('hi');",
                 new NodeInfo(typeof(BinaryOperator), 0, 12),
                 new NodeInfo(typeof(Lookup), 0, 1),
                 new NodeInfo(typeof(FunctionExpression), 4, 12),
-                new NodeInfo(typeof(FunctionObject), 4, 18, -1, 12, 13),
+                new NodeInfo(typeof(FunctionObject), 4, 18, 0, 12, 13),
                 new NodeInfo(typeof(Block), 15, 18)
             );
         }
@@ -594,6 +594,11 @@ console.log('hi');",
                 Start = start;
                 End = end;
                 ExtraIndicies = extraIndicies;
+            }
+
+            public override int GetHashCode() {
+                // not a good hash code, but we don't need it, we never hash these.
+                return NodeType.GetHashCode();
             }
 
             public override bool Equals(object obj) {
@@ -666,7 +671,7 @@ console.log('hi');",
             public override bool Walk(EmptyStatement node) { AddNode(node); return true; }
             public override bool Walk(ForIn node) { AddNode(node); return true; }
             public override bool Walk(ForNode node) { AddNode(node); return true; }
-            public override bool Walk(FunctionObject node) { AddNode(node, node.NameStart, node.ParameterStart, node.ParameterEnd); return true; }
+            public override bool Walk(FunctionObject node) { AddNode(node, node.NameSpan.Start, node.ParameterStart, node.ParameterEnd); return true; }
             public override bool Walk(GetterSetter node) { AddNode(node); return true; }
             public override bool Walk(GroupingOperator node) { AddNode(node); return true; }
             public override bool Walk(IfNode node) { AddNode(node); return true; }

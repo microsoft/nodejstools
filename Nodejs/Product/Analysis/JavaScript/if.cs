@@ -60,10 +60,8 @@ namespace Microsoft.NodejsTools.Parsing
             }
         }
 
-        public TokenWithSpan ElseContext { get; set; }
-
-        public IfNode(TokenWithSpan context, JSParser parser)
-            : base(context, parser)
+        public IfNode(IndexSpan span)
+            : base(span)
         {
         }
 

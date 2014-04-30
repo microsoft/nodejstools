@@ -36,8 +36,8 @@ namespace Microsoft.NodejsTools.Parsing
             }
         }
 
-        protected IterationStatement(TokenWithSpan context, JSParser parser)
-            : base(context, parser)
+        protected IterationStatement(IndexSpan span)
+            : base(span)
         {
         }
     }

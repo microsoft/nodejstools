@@ -24,8 +24,8 @@ namespace Microsoft.NodejsTools.Parsing {
     public sealed class FunctionObject : Statement, INameDeclaration {
         private Block m_body;
         private AstNodeList<ParameterDeclaration> m_parameters;
-        public FunctionObject(TokenWithSpan functionContext, JSParser parser)
-            : base(functionContext, parser) {
+        public FunctionObject(IndexSpan functionSpan)
+            : base(functionSpan) {
         }
 
         public Block Body {
@@ -50,32 +50,28 @@ namespace Microsoft.NodejsTools.Parsing {
 
         public Expression Initializer { get { return null; } }
 
-        public TokenWithSpan NameContext { get; set; }
-
         public string Name { get; set; }
 
         public string NameGuess { get; set; }
 
-        public int NameStart {
-            get {
-                if (NameContext != null) {
-                    return NameContext.StartPosition;
-                }
-                return -1;
-            }
+        // TODO: NameIndex?
+        public IndexSpan NameSpan {
+            get;
+            set;
         }
 
-        public TokenWithSpan ParametersContext { get; set; }
+
+        public IndexSpan ParametersSpan { get; set; }
 
         public int ParameterStart {
             get {
-                return ParametersContext.StartPosition;
+                return ParametersSpan.Start;
             }
         }
 
         public int ParameterEnd {
             get {
-                return ParametersContext.EndPosition;
+                return ParametersSpan.End;
             }
         }
 

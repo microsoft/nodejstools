@@ -35,8 +35,8 @@ namespace Microsoft.NodejsTools.Parsing
             }
         }
 
-        public ArrayLiteral(TokenWithSpan context, JSParser parser)
-            : base(context, parser)
+        public ArrayLiteral(IndexSpan span)
+            : base(span)
         {
         }
 

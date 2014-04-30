@@ -23,10 +23,10 @@ namespace Microsoft.NodejsTools.Parsing
         public int NestLevel { get; set; }
 
         public string Label { get; set; }
-        public TokenWithSpan LabelContext { get; set; }
+        public IndexSpan LabelSpan { get; set; }
 
-        public Break(TokenWithSpan context, JSParser parser)
-            : base(context, parser)
+        public Break(IndexSpan span)
+            : base(span)
         {
         }
 

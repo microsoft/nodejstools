@@ -50,8 +50,8 @@ namespace Microsoft.NodejsTools.Parsing
 
         public ActivationObject Scope { get; set; }
 
-        protected Declaration(TokenWithSpan context, JSParser parser)
-            : base(context, parser)
+        protected Declaration(IndexSpan span)
+            : base(span)
         {
             m_list = new List<VariableDeclaration>();
         }
@@ -102,7 +102,7 @@ namespace Microsoft.NodejsTools.Parsing
                     // set the parent and add it to the list
                     decl.Parent = this;
                     m_list.Add(decl);
-                    UpdateWith(decl.Context);
+                    UpdateWith(decl.Span);
                 }
             }
             else

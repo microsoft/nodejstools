@@ -41,6 +41,7 @@ namespace Microsoft.NodejsTools.Analysis {
         internal readonly ObjectValue _globalObject;
         internal readonly FunctionValue _arrayFunction;
         internal readonly AnalysisValue _numberPrototype, _stringPrototype, _booleanPrototype, _functionPrototype;
+        internal readonly AnalysisValue _emptyStringValue;
         private readonly Deque<AnalysisUnit> _queue;
         private Action<int> _reportQueueSize;
         private int _reportQueueInterval;
@@ -84,6 +85,8 @@ namespace Microsoft.NodejsTools.Analysis {
             _booleanPrototype = globals.BooleanPrototype;
             _functionPrototype = globals.FunctionPrototype;
             _arrayFunction = globals.ArrayFunction;
+
+            _emptyStringValue = GetConstant("");
 
             var allJson = Path.Combine(
                 Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location),
@@ -574,6 +577,8 @@ namespace Microsoft.NodejsTools.Analysis {
             }
             if (attr == Parsing.Missing.Value) {
                 return _undefined;
+            } else if(attr is Parsing.InvalidNumericErrorValue) {
+                return GetConstant(0.0);
             }
 
             throw new InvalidOperationException(attr.GetType().Name);

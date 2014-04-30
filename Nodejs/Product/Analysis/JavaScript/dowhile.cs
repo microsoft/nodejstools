@@ -36,10 +36,8 @@ namespace Microsoft.NodejsTools.Parsing
             }
         }
 
-        public TokenWithSpan WhileContext { get; set; }
-
-        public DoWhile(TokenWithSpan context, JSParser parser)
-            : base(context, parser)
+        public DoWhile(IndexSpan span)
+            : base(span)
         {
         }
 

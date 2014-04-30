@@ -105,7 +105,7 @@ namespace Microsoft.NodejsTools.Repl {
                         Unterminated = true;
                         break;
                     default:
-                        if (e.Exception.Context.StartPosition == Text.Length) {
+                        if (e.Exception.Span.Start == Text.Length) {
                             // EOF error
                             Unterminated = true;
                         }

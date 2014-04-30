@@ -543,13 +543,13 @@ namespace Microsoft.NodejsTools.Classifier {
         private static SourceSpan GetSpan(TokenWithSpan context) {
             return new SourceSpan(
                 new SourceLocation(
-                    context.StartPosition,
-                    context.StartLineNumber,
+                    context.Start,
+                    context.StartLine,
                     context.StartColumn
                 ),
                 new SourceLocation(
-                    context.EndPosition,
-                    context.EndLineNumber,
+                    context.End,
+                    context.EndLine,
                     context.EndColumn
                 )
             );

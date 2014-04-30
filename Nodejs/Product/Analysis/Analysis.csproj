@@ -269,7 +269,6 @@
     <Compile Include="JavaScript\if.cs" />
     <Compile Include="JavaScript\INameReference.cs" />
     <Compile Include="JavaScript\IndexResolver.cs" />
-    <Compile Include="JavaScript\ISourceMap.cs" />
     <Compile Include="JavaScript\IterationStatement.cs" />
     <Compile Include="JavaScript\IVisitor.cs" />
     <Compile Include="JavaScript\JsAst.cs" />

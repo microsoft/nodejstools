@@ -23,8 +23,8 @@ namespace Microsoft.NodejsTools.Parsing
 {
     public class EmptyStatement : Statement
     {
-        public EmptyStatement(TokenWithSpan context, JSParser parser)
-            : base(context, parser)
+        public EmptyStatement(IndexSpan context)
+            : base(context)
         {
         }
 

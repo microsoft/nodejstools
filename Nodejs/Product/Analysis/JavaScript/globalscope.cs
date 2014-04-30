@@ -26,9 +26,6 @@ namespace Microsoft.NodejsTools.Parsing
         private HashSet<string> m_globalProperties;
         private HashSet<string> m_globalFunctions;
         private HashSet<string> m_assumedGlobals;
-        private HashSet<UndefinedReferenceException> m_undefined;
-
-        public ICollection<UndefinedReferenceException> UndefinedReferences { get { return m_undefined; } }
 
         internal GlobalScope(ErrorSink errorSink)
             : base(null, errorSink)
@@ -46,23 +43,13 @@ namespace Microsoft.NodejsTools.Parsing
         /// <summary>
         /// Set up this scopes lexically- and var-declared fields
         /// </summary>
-        public override void DeclareScope()
+        public override void DeclareScope(ResolutionVisitor resolutionVisitor)
         {
             // bind lexical declarations
-            DefineLexicalDeclarations();
+            DefineLexicalDeclarations(resolutionVisitor);
 
             // bind the variable declarations
-            DefineVarDeclarations();
-        }
-
-        public void AddUndefinedReference(UndefinedReferenceException exception)
-        {
-            if (m_undefined == null)
-            {
-                m_undefined = new HashSet<UndefinedReferenceException>();
-            }
-
-            m_undefined.Add(exception);
+            DefineVarDeclarations(resolutionVisitor);
         }
 
         internal void SetAssumedGlobals(CodeSettings settings)
@@ -89,41 +76,40 @@ namespace Microsoft.NodejsTools.Parsing
                 // not found so far, check the global properties
                 if (variableField == null)
                 {
-                    variableField = ResolveFromCollection(name, m_globalProperties, FieldType.Predefined, false);
+                    variableField = ResolveFromCollection(name, m_globalProperties, FieldType.Predefined);
                 }
 
                 // not found so far, check the global properties
                 if (variableField == null)
                 {
-                    variableField = ResolveFromCollection(name, m_globalFunctions, FieldType.Predefined, true);
+                    variableField = ResolveFromCollection(name, m_globalFunctions, FieldType.Predefined);
                 }
 
                 // if not found so far, check to see if this value is provided in our "assumed" 
                 // global list specified on the command line
                 if (variableField == null)
                 {
-                    variableField = ResolveFromCollection(name, m_assumedGlobals, FieldType.Global, false);
+                    variableField = ResolveFromCollection(name, m_assumedGlobals, FieldType.Global);
                 }
 
                 return variableField;
             }
         }
 
-        private JSVariableField ResolveFromCollection(string name, HashSet<string> collection, FieldType fieldType, bool isFunction)
+        private JSVariableField ResolveFromCollection(string name, HashSet<string> collection, FieldType fieldType)
         {
             if (collection.Contains(name))
             {
-                var variableField = new JSVariableField(fieldType, name, 0, null);
-                variableField.IsFunction = isFunction;
+                var variableField = new JSVariableField(fieldType, name);
                 return AddField(variableField);
             }
 
             return null;
         }
 
-        public override JSVariableField CreateField(string name, object value, FieldAttributes attributes)
+        public override JSVariableField CreateField(string name)
         {
-            return new JSVariableField(FieldType.Global, name, attributes, value);
+            return new JSVariableField(FieldType.Global, name);
         }
 
         public override JSVariableField CreateField(JSVariableField outerField)

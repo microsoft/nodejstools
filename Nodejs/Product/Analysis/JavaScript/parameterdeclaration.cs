@@ -30,10 +30,9 @@ namespace Microsoft.NodejsTools.Parsing
 
         public Expression Initializer { get { return null; } }
 
-        public TokenWithSpan NameContext { get { return Context; } }
 
-        public ParameterDeclaration(TokenWithSpan context, JSParser parser)
-            : base(context, parser)
+        public ParameterDeclaration(IndexSpan span)
+            : base(span)
         {
         }
 
@@ -44,6 +43,11 @@ namespace Microsoft.NodejsTools.Parsing
                 }
             }
             visitor.PostWalk(this);
+        }
+
+
+        public IndexSpan NameSpan {
+            get { return Span; }
         }
     }
 }

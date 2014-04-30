@@ -59,11 +59,7 @@ namespace Microsoft.NodejsTools.Analysis.Values {
         public override IEnumerable<LocationInfo> Locations {
             get {
                 return new[] { 
-                    new LocationInfo(
-                        ProjectEntry,
-                        FunctionObject.Context.StartLineNumber,
-                        FunctionObject.Context.StartColumn
-                    )
+                    FunctionObject.GlobalParent.ResolveLocation(ProjectEntry, FunctionObject)
                 };
             }
         }

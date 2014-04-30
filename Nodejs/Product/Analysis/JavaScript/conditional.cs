@@ -60,11 +60,8 @@ namespace Microsoft.NodejsTools.Parsing
             }
         }
 
-        public TokenWithSpan QuestionContext { get; set; }
-        public TokenWithSpan ColonContext { get; set; }
-
-        public Conditional(TokenWithSpan context, JSParser parser)
-            : base(context, parser)
+        public Conditional(IndexSpan span)
+            : base(span)
         {
         }
 

@@ -20,63 +20,65 @@ namespace Microsoft.NodejsTools.Parsing {
     /// Represents a JavaScript token with a span.
     /// </summary>
     public class TokenWithSpan {
-        private readonly int _startPosition, _endPosition;
+        private readonly int _start, _end;
         private readonly JSToken _token;
         private readonly IndexResolver _indexResolver;
 
         internal TokenWithSpan() {
         }
 
-        internal TokenWithSpan(IndexResolver indexResolver, int startPosition, int endPosition, JSToken token) {
+        internal TokenWithSpan(IndexResolver indexResolver, int start, int end, JSToken token) {
             _token = token;
-            _startPosition = startPosition;
-            _endPosition = endPosition;
+            _start = start;
+            _end = end;
             _indexResolver = indexResolver;
         }
 
         public TokenWithSpan(TokenWithSpan currentToken, JSToken newToken) {
             _indexResolver = currentToken._indexResolver;
-            _startPosition = currentToken._startPosition;
-            _endPosition = currentToken._endPosition;
+            _start = currentToken._start;
+            _end = currentToken._end;
             _token = newToken;
         }
 
         /// <summary>
         /// Gets the 0 based starting position
         /// </summary>
-        public int StartPosition { get { return _startPosition; } }
+        public int Start { get { return _start; } }
 
         /// <summary>
         /// Gets the 0 based end position
         /// </summary>
-        public int EndPosition { get { return _endPosition; } }
+        public int End { get { return _end; } }
 
         /// <summary>
         /// Gets the token
         /// </summary>
         public JSToken Token { get { return _token; } }
 
+        public IndexSpan Span { get { return IndexSpan.FromBounds(_start, _end); } }
+
         /// <summary>
         /// Gets the 1 based starting line number
         /// </summary>
-        public int StartLineNumber {
+        public int StartLine {
             get {
                 if (_indexResolver == null) {
                     return 1;
                 }
-                return _indexResolver.IndexToLocation(StartPosition).Line;
+                return _indexResolver.IndexToLocation(Start).Line;
             }
         }
 
         /// <summary>
         /// Gets the 1 based ending line number
         /// </summary>
-        public int EndLineNumber {
+        public int EndLine {
             get {
                 if (_indexResolver == null) {
                     return 1;
                 }
-                return _indexResolver.IndexToLocation(EndPosition).Line;
+                return _indexResolver.IndexToLocation(End).Line;
             }
         }
 
@@ -88,7 +90,7 @@ namespace Microsoft.NodejsTools.Parsing {
                 if (_indexResolver == null) {
                     return 1;
                 }
-                return _indexResolver.IndexToLocation(StartPosition).Column;
+                return _indexResolver.IndexToLocation(Start).Column;
             }
         }
 
@@ -100,58 +102,8 @@ namespace Microsoft.NodejsTools.Parsing {
                 if (_indexResolver == null) {
                     return 1;
                 }
-                return _indexResolver.IndexToLocation(EndPosition).Column;
+                return _indexResolver.IndexToLocation(End).Column;
             }
-        }
-
-        public TokenWithSpan FlattenToStart() {
-            return new TokenWithSpan(
-                _indexResolver,
-                StartPosition,
-                StartPosition,
-                Token
-            );
-        }
-
-        public TokenWithSpan FlattenToEnd() {
-            return new TokenWithSpan(
-                _indexResolver,
-                EndPosition,
-                EndPosition,
-                Token
-            );
-        }
-
-        public TokenWithSpan CombineWith(TokenWithSpan other) {
-            if (other == null) {
-                return this;
-            }
-
-            return new TokenWithSpan(
-                _indexResolver,
-                StartPosition,
-                other.EndPosition,
-                Token
-            );
-        }
-
-        public TokenWithSpan UpdateWith(TokenWithSpan other) {
-            if (other != null) {
-                int startPosition = StartPosition;
-                int endPosition = EndPosition;
-
-                if (other.StartPosition < StartPosition) {
-                    startPosition = other.StartPosition;
-                }
-
-                if (other.EndPosition > EndPosition) {
-                    endPosition = other.EndPosition;
-                }
-
-                return new TokenWithSpan(_indexResolver, startPosition, endPosition, Token);
-            }
-
-            return this;
         }
 
         public override string ToString() {

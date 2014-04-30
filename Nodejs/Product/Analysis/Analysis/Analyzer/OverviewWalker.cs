@@ -131,7 +131,7 @@ namespace Microsoft.NodejsTools.Analysis.Analyzer {
                 {
                     // lambdas don't have their names published
 
-                    var funcVar = prevScope.AddLocatedVariable(node.Name, node.NameContext, unit);
+                    var funcVar = prevScope.AddLocatedVariable(node.Name, node, unit);
                       funcVar.AddTypes(unit, func.SelfSet);
                 }
 
@@ -327,7 +327,7 @@ namespace Microsoft.NodejsTools.Analysis.Analyzer {
 #endif
 
         public override bool Walk(VariableDeclaration node) {
-            _scope.AddLocatedVariable(node.Name, node.Context, _curUnit);
+            _scope.AddLocatedVariable(node.Name, node, _curUnit);
             return base.Walk(node);
         }
 

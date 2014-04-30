@@ -23,8 +23,7 @@ namespace Microsoft.NodejsTools.Analysis.Values {
     internal struct CallChain : IEnumerable<Node> {
         private readonly object _chain;
 
-        private static Node EmptyNode = new Lookup(
-null, null);
+        private static Node EmptyNode = new Lookup(new IndexSpan());
         private static IEnumerable<Node> EmptyNodes {
             get {
                 while (true) {

@@ -24,8 +24,8 @@ namespace Microsoft.NodejsTools.Parsing
     {
         public bool IsGetter { get; set; }
 
-        public GetterSetter(String identifier, bool isGetter, TokenWithSpan context, JSParser parser)
-            : base(identifier, PrimitiveType.String, context, parser)
+        public GetterSetter(String identifier, bool isGetter, IndexSpan span, JSParser parser)
+            : base(identifier, span)
         {
             IsGetter = isGetter;
         }

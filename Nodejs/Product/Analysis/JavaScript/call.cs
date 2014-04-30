@@ -59,8 +59,8 @@ namespace Microsoft.NodejsTools.Parsing
             set;
         }
 
-        public CallNode(TokenWithSpan context, JSParser parser)
-            : base(context, parser)
+        public CallNode(IndexSpan span)
+            : base(span)
         {
         }
 

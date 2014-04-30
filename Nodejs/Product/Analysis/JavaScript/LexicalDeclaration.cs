@@ -26,8 +26,8 @@ namespace Microsoft.NodejsTools.Parsing
     {
         public JSToken StatementToken { get; set; }
 
-        public LexicalDeclaration(TokenWithSpan context, JSParser parser)
-            : base(context, parser)
+        public LexicalDeclaration(IndexSpan span)
+            : base(span)
         {
         }
 

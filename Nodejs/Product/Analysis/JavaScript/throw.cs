@@ -34,8 +34,8 @@ namespace Microsoft.NodejsTools.Parsing
             }
         }
 
-        public ThrowNode(TokenWithSpan context, JSParser parser)
-            : base(context, parser)
+        public ThrowNode(IndexSpan span)
+            : base(span)
         {
         }
 

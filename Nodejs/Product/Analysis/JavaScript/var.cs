@@ -25,8 +25,8 @@ namespace Microsoft.NodejsTools.Parsing
     [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Naming", "CA1710:IdentifiersShouldHaveCorrectSuffix", Justification = "AST statement")]
     public sealed class Var : Declaration
     {
-        public Var(TokenWithSpan context, JSParser parser)
-            : base(context, parser)
+        public Var(IndexSpan span)
+            : base(span)
         {
         }
 

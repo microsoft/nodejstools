@@ -21,12 +21,16 @@ namespace Microsoft.NodejsTools.Parsing
     /// 
     /// It is closed on the left and open on the right: [Start .. End). 
     /// </summary>
-    internal struct IndexSpan : IEquatable<IndexSpan> {
+    public struct IndexSpan : IEquatable<IndexSpan> {
         private readonly int _start, _length;
 
         public IndexSpan(int start, int length) {
             _start = start;
             _length = length;
+        }
+
+        public static IndexSpan FromBounds(int start, int end) {
+            return new IndexSpan(start, end - start);
         }
 
         public int Start {
@@ -48,7 +52,7 @@ namespace Microsoft.NodejsTools.Parsing
         }
 
         public override int GetHashCode() {
-            return Length.GetHashCode() ^ Start.GetHashCode();
+            return Length.GetHashCode() ^ Start.GetHashCode() ^ End.GetHashCode();
         }
 
         public override bool Equals(object obj) {
@@ -64,6 +68,41 @@ namespace Microsoft.NodejsTools.Parsing
 
         public static bool operator !=(IndexSpan self, IndexSpan other) {
             return !self.Equals(other);
+        }
+
+        public IndexSpan FlattenToStart() {
+            return new IndexSpan(Start, 0);
+        }
+
+        public IndexSpan FlattenToEnd() {
+            return new IndexSpan(End, 0);
+        }
+
+        public IndexSpan CombineWith(IndexSpan other) {
+            if (other == null) {
+                return this;
+            }
+
+            return IndexSpan.FromBounds(Start, other.End);
+        }
+
+        public IndexSpan UpdateWith(IndexSpan other) {
+            if (other != null) {
+                int startPosition = Start;
+                int endPosition = End;
+
+                if (other.Start < Start) {
+                    startPosition = other.Start;
+                }
+
+                if (other.End > End) {
+                    endPosition = other.End;
+                }
+
+                return IndexSpan.FromBounds(startPosition, endPosition);
+            }
+
+            return this;
         }
 
         #region IEquatable<IndexSpan> Members

@@ -23,12 +23,12 @@ namespace Microsoft.NodejsTools.Parsing {
         public override void OnError(JScriptExceptionEventArgs error) {
             var span = new SourceSpan(
                 new SourceLocation(
-                    error.Exception.Context.StartPosition,
+                    error.Exception.Span.Start,
                     error.Error.StartLine,
                     error.Error.StartColumn
                 ),
                 new SourceLocation(
-                    error.Exception.Context.EndPosition,
+                    error.Exception.Span.End,
                     error.Error.EndLine,
                     error.Error.EndColumn
                 )

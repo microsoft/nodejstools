@@ -26,8 +26,8 @@ namespace Microsoft.NodejsTools.Parsing
     {
       private List<T> m_list;
 
-      public AstNodeList(TokenWithSpan context, JSParser parser)
-        : base(context, parser)
+      public AstNodeList(IndexSpan span)
+        : base(span)
       {
         m_list = new List<T>();
       }
@@ -105,7 +105,7 @@ namespace Microsoft.NodejsTools.Parsing
           // not another list
           node.Parent = this;
           m_list.Add(node);
-          Context = Context.UpdateWith(node.Context);
+          Span = Span.UpdateWith(node.Span);
         }
 
         return this;
@@ -127,7 +127,7 @@ namespace Microsoft.NodejsTools.Parsing
           // not another list
           node.Parent = this;
           m_list.Insert(position, (T)node);
-          Context = Context.UpdateWith(node.Context);
+          Span = Span.UpdateWith(node.Span);
         }
 
         return this;

@@ -34,35 +34,24 @@ namespace Microsoft.NodejsTools.Parsing {
         /// </summary>
         public Node Parent { get; set; }
 
-        /// <summary>
-        /// Gets or sets the source context of this node
-        /// </summary>
-        public TokenWithSpan Context { get; set; }
+        public IndexSpan Span {
+            get;
+            set;
+        }
 
-        /// <summary>
-        /// Gets a reference to the JSParser object that generated this node
-        /// </summary>
-        public JSParser Parser { get; private set; }
-
-        protected Node(TokenWithSpan context, JSParser parser) {
-            Parser = parser;
-            if (context != null) {
-                Context = context;
-            } else {
-                // generate a bogus context
-                Context = new TokenWithSpan();
-            }
+        protected Node(IndexSpan span) {
+            Span = span;
         }
 
         public int StartIndex {
             get {
-                return Context.StartPosition;
+                return Span.Start;
             }
         }
 
         public int EndIndex {
             get {
-                return Context.EndPosition;
+                return Span.End;
             }
         }
 
@@ -73,7 +62,7 @@ namespace Microsoft.NodejsTools.Parsing {
             if (block == null && node != null) {
                 // it's not a block, so create a new block, append the astnode
                 // and return the block
-                block = new Block(node.Context, node.Parser);
+                block = new Block(node.Span);
                 block.Append(node);
             }
 
@@ -121,20 +110,14 @@ namespace Microsoft.NodejsTools.Parsing {
             get {
                 // if we don't have a parent, then we are in the global scope.
                 // otherwise, just ask our parent. Nodes with scope will override this property.
-                return Parent != null ? Parent.EnclosingScope : Parser.GlobalScope;
+                return Parent != null ? Parent.EnclosingScope : GlobalParent.GlobalScope;
             }
         }
 
         public abstract void Walk(AstVisitor walker);
 
-        public void UpdateWith(TokenWithSpan context) {
-            if (context != null) {
-                if (this.Context == null) {
-                    this.Context = context;
-                } else {
-                    Context = Context.UpdateWith(context);
-                }
-            }
+        public void UpdateWith(IndexSpan span) {
+            Span = Span.UpdateWith(span);
         }
 
         public JsAst GlobalParent {
@@ -149,17 +132,11 @@ namespace Microsoft.NodejsTools.Parsing {
         }
 
         internal SourceLocation GetStart(JsAst jsAst) {
-            return new SourceLocation(Context.EndPosition, Context.StartLineNumber, Context.StartColumn);
+            return jsAst.IndexToLocation(Span.Start);
         }
 
         internal SourceLocation GetEnd(JsAst jsAst) {
-            return new SourceLocation(Context.EndPosition, Context.EndLineNumber, Context.EndColumn);
-        }
-
-        internal IndexSpan IndexSpan {
-            get {
-                return new IndexSpan(Context.StartPosition, Context.EndPosition - Context.StartPosition);
-            }
+            return jsAst.IndexToLocation(Span.End);
         }
 
         public override string ToString() {

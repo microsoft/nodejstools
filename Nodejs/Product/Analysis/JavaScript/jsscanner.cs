@@ -108,6 +108,12 @@ namespace Microsoft.NodejsTools.Parsing
             _state.FirstLine = true;
         }
 
+        internal IndexResolver IndexResolver {
+            get {
+                return _indexResolver;
+            }
+        }
+
         /// <summary>
         /// Initializes the scanner for parsing from a previous location
         /// where it left off.  DocumentContext provides the source code,
@@ -122,8 +128,8 @@ namespace Microsoft.NodejsTools.Parsing
             _initialLocation = initialLocation;
             _newLineLocations = new List<int>();
             _indexResolver = new IndexResolver(_newLineLocations, initialLocation);
-
             _currentPosition = 0;
+
             if (state == null) {
                 _state = new State() { FirstLine = true };
             } else {
@@ -147,13 +153,17 @@ namespace Microsoft.NodejsTools.Parsing
 
         #endregion
 
+        public TokenWithSpan ScanNextTokenWithSpan(bool scanForRegularExpressionLiterals) {
+            return MakeTokenWithSpan(ScanNextToken(scanForRegularExpressionLiterals));
+        }
+
         /// <summary>
         /// main method for the scanner; scans the next token from the input stream.
         /// </summary>
         /// <param name="scanForRegularExpressionLiterals">whether to try scanning a regexp when encountering a /</param>
         /// <returns>next token from the input</returns>
         [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Maintainability", "CA1502:AvoidExcessiveComplexity"), System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Maintainability", "CA1505:AvoidUnmaintainableCode", Justification = "big case statement")]
-        public TokenWithSpan ScanNextToken(bool scanForRegularExpressionLiterals)
+        public JSToken ScanNextToken(bool scanForRegularExpressionLiterals)
         {
             var token = JSToken.None;
 
@@ -165,7 +175,7 @@ namespace Microsoft.NodejsTools.Parsing
                 SkipMultilineComment();
                 token = JSToken.MultipleLineComment;
                 _tokenEndIndex = _currentPosition;
-                return MakeContext(token);
+                return token;
             }
 
             // our case switch should be pretty efficient -- it's 9-13 and 32-126. Thsose are the most common characters 
@@ -653,7 +663,7 @@ namespace Microsoft.NodejsTools.Parsing
 
             // fix up the end of the token
             _tokenEndIndex = _currentPosition;            
-            return MakeContext(token);
+            return token;
         }
 
         public List<TokenWithSpan> ReadTokens(int characterCount) {
@@ -662,7 +672,7 @@ namespace Microsoft.NodejsTools.Parsing
             int start = _currentPosition;
 
             while (_currentPosition- start < characterCount) {
-                var token = ScanNextToken(true);
+                var token = ScanNextTokenWithSpan(true);
                 tokens.Add(token);
                 if (IsEndOfFile) {
                     break;
@@ -671,9 +681,8 @@ namespace Microsoft.NodejsTools.Parsing
 
             return tokens;
         }
-
         
-        private TokenWithSpan MakeContext(JSToken token) {
+        private TokenWithSpan MakeTokenWithSpan(JSToken token) {
             return new TokenWithSpan(
                 _indexResolver,
                 _tokenStartIndex + _initialLocation.Index,
@@ -1978,7 +1987,11 @@ namespace Microsoft.NodejsTools.Parsing
             _tokenEndIndex = _currentPosition;
             var errorEx = new JScriptException(
                 error, 
-                MakeContext(JSToken.None)
+                new IndexSpan(
+                    _tokenStartIndex + _initialLocation.Index,
+                    _tokenEndIndex - _tokenStartIndex
+                ),
+                _indexResolver
             );
 
             _errorSink.OnCompilerError(
@@ -2032,9 +2045,9 @@ namespace Microsoft.NodejsTools.Parsing
             return JSToken.FirstBinaryOperator <= token && token <= JSToken.ConditionalIf;
         }
 
-        internal static OperatorPrecedence GetOperatorPrecedence(TokenWithSpan op)
+        internal static OperatorPrecedence GetOperatorPrecedence(JSToken op)
         {
-            return op == null || op.Token == JSToken.None ? OperatorPrecedence.None : JSScanner.s_OperatorsPrec[op.Token - JSToken.FirstBinaryOperator];
+            return op == JSToken.None ? OperatorPrecedence.None : JSScanner.s_OperatorsPrec[op - JSToken.FirstBinaryOperator];
         }
 
         //internal static OperatorPrecedence GetOperatorPrecedence(JSToken op)

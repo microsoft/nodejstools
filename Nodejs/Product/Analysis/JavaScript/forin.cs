@@ -46,12 +46,10 @@ namespace Microsoft.NodejsTools.Parsing
             }
         }
 
-        public TokenWithSpan OperatorContext { get; set; }
-
         public BlockScope BlockScope { get; set; }
 
-        public ForIn(TokenWithSpan context, JSParser parser)
-            : base(context, parser)
+        public ForIn(IndexSpan span)
+            : base(span)
         {
         }
 

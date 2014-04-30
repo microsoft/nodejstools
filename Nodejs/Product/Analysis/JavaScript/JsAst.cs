@@ -6,11 +6,21 @@ namespace Microsoft.NodejsTools.Parsing {
 
     public class JsAst : Statement, ILocationResolver {
         private readonly Block _block;
+        private readonly IndexResolver _indexResolver;
+        private readonly GlobalScope _globalScope;
 
-        public JsAst(Block block, TokenWithSpan context, JSParser parser)
-            : base(context, parser) {
+        internal JsAst(Block block, IndexSpan span, GlobalScope scope, IndexResolver indexResolver)
+            : base(span) {
             _block = block;
             _block.Parent = this;
+            _indexResolver = indexResolver;
+            _globalScope = scope;
+        }
+
+        public GlobalScope GlobalScope {
+            get {
+                return _globalScope;
+            }
         }
 
         public Block Block {
@@ -19,15 +29,16 @@ namespace Microsoft.NodejsTools.Parsing {
             }
         }
 
-        internal SourceLocation IndexToLocation(int startIndex) {
-            throw new NotImplementedException();
+        internal SourceLocation IndexToLocation(int index) {
+            return _indexResolver.IndexToLocation(index);
         }
 
         public LocationInfo ResolveLocation(IProjectEntry project, object location) {
+            var loc = _indexResolver.IndexToLocation(((Node)location).Span.Start);
             return new LocationInfo(
                 project,
-                ((Node)location).Context.StartLineNumber,
-                ((Node)location).Context.StartColumn
+                loc.Line,
+                loc.Column
             );
         }
 
