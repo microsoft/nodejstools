@@ -36,6 +36,7 @@ namespace Microsoft.NodejsTools.Project {
         private readonly HashSet<string> _warningFiles = new HashSet<string>();
         private readonly HashSet<string> _errorFiles = new HashSet<string>();
         internal readonly RequireCompletionCache _requireCompletionCache = new RequireCompletionCache();
+        private string _intermediateOutputPath;
 
         public NodejsProjectNode(NodejsProjectPackage package)
             : base(package, Utilities.GetImageList(typeof(NodejsProjectNode).Assembly.GetManifestResourceStream("Microsoft.NodejsTools.Resources.Icons.NodejsImageList.bmp"))) {
@@ -282,6 +283,8 @@ namespace Microsoft.NodejsTools.Project {
 
         protected override void Reload() {
             using (new DebugTimer("Project Load")) {
+                _intermediateOutputPath = Path.Combine(ProjectHome, GetProjectProperty("BaseIntermediateOutputPath"));
+
                 base.Reload();
 
                 SyncFileSystem();                
@@ -355,7 +358,18 @@ namespace Microsoft.NodejsTools.Project {
         }
 
         protected override bool IncludeNonMemberItemInProject(HierarchyNode node) {
-            return node is NodejsFileNode;
+            var fileNode = node as NodejsFileNode;
+            if (fileNode != null) {
+                return IncludeNodejsFile(fileNode);
+            }
+            return false;
+        }
+
+        internal bool IncludeNodejsFile(NodejsFileNode fileNode) {
+            if (CommonUtils.IsSubpathOf(_intermediateOutputPath, fileNode.Url)) {
+                return false;
+            }
+            return true;
         }
 
         internal override object Object {

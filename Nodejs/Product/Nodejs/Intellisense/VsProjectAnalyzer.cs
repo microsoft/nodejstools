@@ -734,7 +734,12 @@ namespace Microsoft.NodejsTools.Intellisense {
                 if (e.IsCriticalException()) {
                     throw;
                 }
-                Debug.Assert(false, String.Format("Failure in JavaScript parser: {0}", e.ToString()));
+                FileStream stream = content as FileStream;
+                string file = "";
+                if (stream != null) {
+                    file = stream.Name + Environment.NewLine + Environment.NewLine;
+                }
+                Debug.Assert(false, String.Format(file + "Failure in JavaScript parser: {0}", e.ToString()));
             }
         }
 

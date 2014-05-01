@@ -34,7 +34,9 @@ namespace Microsoft.NodejsTools.Project {
 #if FALSE
             CreateWatcher(Url);
 #endif
-            root.Analyzer.AnalyzeFile(Url);
+            if (!IsNonMemberItem || root.IncludeNodejsFile(this)) {
+                root.Analyzer.AnalyzeFile(Url);
+            }
         }
 
         protected override NodeProperties CreatePropertiesObject() {

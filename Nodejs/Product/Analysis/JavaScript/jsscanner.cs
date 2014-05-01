@@ -50,6 +50,8 @@ namespace Microsoft.NodejsTools.Parsing
         private readonly ErrorSink _errorSink;
         private readonly CodeSettings _settings;
 
+        private static CacheDict<string, string> _internTable = new CacheDict<string, string>(4096);
+
         #endregion
 
         #region public properties
@@ -64,7 +66,14 @@ namespace Microsoft.NodejsTools.Parsing
             }
         }
 
-        public string StringLiteralValue { get { return _decodedString; } }
+        public string StringLiteralValue { 
+            get {
+                if (_decodedString.Length < 200) {
+                    return InternString(_decodedString);
+                }
+                return _decodedString; 
+            } 
+        }
 
         public bool IsEndOfFile { get { return _currentPosition >= _source.Length; } }
 
@@ -73,13 +82,24 @@ namespace Microsoft.NodejsTools.Parsing
             get
             {
                 return _identifier.Length > 0
-                    ? _identifier.ToString() :
+                    ? InternString(_identifier.ToString()) :
                     CurrentTokenString();
             }
         }
 
+        private static string InternString(string value) {
+            lock (_internTable) {
+                string res;
+                if (_internTable.TryGetValue(value, out res)) {
+                    return res;
+                }
+                _internTable.Add(value, value);
+                return value;
+            }
+        }
+
         private string CurrentTokenString() {
-            return _source.Substring(_tokenStartIndex, _tokenEndIndex - _tokenStartIndex);
+            return InternString(_source.Substring(_tokenStartIndex, _tokenEndIndex - _tokenStartIndex));
         }
 
         #endregion

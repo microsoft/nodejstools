@@ -7,20 +7,10 @@ namespace Microsoft.NodejsTools.Parsing {
     public class JsAst : Statement, ILocationResolver {
         private Block _block;
         private readonly IndexResolver _indexResolver;
-        private GlobalScope _globalScope;
 
         internal JsAst(IndexSpan span, IndexResolver indexResolver)
             : base(span) {
             _indexResolver = indexResolver;
-        }
-
-        public GlobalScope GlobalScope {
-            get {
-                return _globalScope;
-            }
-            internal set {
-                _globalScope = value;
-            }
         }
 
         public Block Block {
