@@ -5,27 +5,31 @@ using System;
 namespace Microsoft.NodejsTools.Parsing {
 
     public class JsAst : Statement, ILocationResolver {
-        private readonly Block _block;
+        private Block _block;
         private readonly IndexResolver _indexResolver;
-        private readonly GlobalScope _globalScope;
+        private GlobalScope _globalScope;
 
-        internal JsAst(Block block, IndexSpan span, GlobalScope scope, IndexResolver indexResolver)
+        internal JsAst(IndexSpan span, IndexResolver indexResolver)
             : base(span) {
-            _block = block;
-            _block.Parent = this;
             _indexResolver = indexResolver;
-            _globalScope = scope;
         }
 
         public GlobalScope GlobalScope {
             get {
                 return _globalScope;
             }
+            internal set {
+                _globalScope = value;
+            }
         }
 
         public Block Block {
             get {
                 return _block;
+            }
+            internal set {
+                _block = value;
+                _block.Parent = this;
             }
         }
 

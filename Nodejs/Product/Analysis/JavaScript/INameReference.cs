@@ -24,7 +24,6 @@ namespace Microsoft.NodejsTools.Parsing
 {
     public interface INameReference
     {
-        ActivationObject VariableScope { get; }
         JSVariableField VariableField { get; }
         string Name { get; }
     }

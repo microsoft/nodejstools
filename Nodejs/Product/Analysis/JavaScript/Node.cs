@@ -103,17 +103,6 @@ namespace Microsoft.NodejsTools.Parsing {
             return false;
         }
 
-        /// <summary>
-        /// Get the enclosing lexical scope for this node.
-        /// </summary>
-        public virtual ActivationObject EnclosingScope {
-            get {
-                // if we don't have a parent, then we are in the global scope.
-                // otherwise, just ask our parent. Nodes with scope will override this property.
-                return Parent != null ? Parent.EnclosingScope : GlobalParent.GlobalScope;
-            }
-        }
-
         public abstract void Walk(AstVisitor walker);
 
         public void UpdateWith(IndexSpan span) {

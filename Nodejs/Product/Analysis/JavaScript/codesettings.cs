@@ -31,9 +31,6 @@ namespace Microsoft.NodejsTools.Parsing
 
         /// <summary>Input is a single JavaScript Expression</summary>
         Expression,
-
-        /// <summary>Input is an implicit function block, as in the value of an HTML onclick attribute</summary>
-        EventHandler
     }
 
     /// <summary>

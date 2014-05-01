@@ -56,17 +56,6 @@ namespace Microsoft.NodejsTools.Parsing
         }
 
         /// <summary>
-        /// Returns the enclosing scope of this block
-        /// </summary>
-        public override ActivationObject EnclosingScope
-        {
-            get
-            {
-                return m_blockScope != null ? m_blockScope : base.EnclosingScope;
-            }
-        }
-
-        /// <summary>
         /// Gets or sets a boolean value indicating whether the brace for this block (if there was one) started
         /// on a newline (true) or the same line as the statement to which it belongs (false)
         /// </summary>

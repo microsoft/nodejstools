@@ -40,7 +40,7 @@ namespace Microsoft.NodejsTools.Parsing
 
     public class JSVariableField
     {
-        private ActivationObject m_owningScope; 
+        private Statement _scope;
         public IndexSpan OriginalSpan { get; set; }
         public string Name { get; private set; }
         public FieldType FieldType { get; set; }
@@ -65,18 +65,18 @@ namespace Microsoft.NodejsTools.Parsing
             Name = outerField.Name;
         }
 
-        public ActivationObject OwningScope {
+        public Statement Scope {
             get {
                 // but the get -- if we are an inner field, we always
                 // want to get the owning scope of the outer field
-                return OuterField == null ? m_owningScope : OuterField.OwningScope;
+                return OuterField == null ? _scope : OuterField.Scope;
             }
             set {
                 // simple set -- should always point to the scope in whose
                 // name table this field has been added, which isn't necessarily
                 // the owning scope, because this may be an inner field. But keep
                 // this value in case we ever break the link to the outer field.
-                m_owningScope = value;
+                _scope = value;
             }
         }
 
@@ -84,11 +84,6 @@ namespace Microsoft.NodejsTools.Parsing
             get {
                 return -1;
             }
-        }
-
-        public void Detach()
-        {
-            OuterField = null;
         }
 
         public override string ToString()

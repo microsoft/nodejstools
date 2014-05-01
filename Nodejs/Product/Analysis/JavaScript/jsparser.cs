@@ -63,7 +63,6 @@ namespace Microsoft.NodejsTools.Parsing
 
         private int m_breakRecursion;// = 0;
         private int m_severity;
-        private GlobalScope m_globalScope;
         private JSToken _curToken;
         private IndexSpan _curSpan;
 
@@ -114,18 +113,6 @@ namespace Microsoft.NodejsTools.Parsing
             }
         }
 
-        public GlobalScope GlobalScope
-        {
-            get
-            {
-                if (m_globalScope == null)
-                {
-                    m_globalScope = new GlobalScope(m_errorSink);
-                }
-                return m_globalScope;
-            }
-        }        
-
         /// <summary>
         /// Parse the source code using the given settings, getting back an abstract syntax tree Block node as the root
         /// representing the list of statements in the source code.
@@ -138,14 +125,19 @@ namespace Microsoft.NodejsTools.Parsing
             // make sure the RawTokens setting is OFF or we won't be able to create our AST
             InitializeScanner(settings);
 
+            var ast = new JsAst(
+                new IndexSpan(0, _source.Length), 
+                m_scanner.IndexResolver
+            );
+            var globalScope = new GlobalScope(ast, m_errorSink);
             // make sure we initialize the global scope's strict mode to our flag, whether or not it
             // is true. This means if the setting is false, we will RESET the flag to false if we are 
             // reusing the scope and a previous Parse call had code that set it to strict with a 
             // program directive. 
-            GlobalScope.UseStrict = m_settings.StrictMode;
+            globalScope.UseStrict = m_settings.StrictMode;
 
             // make sure the global scope knows about our known global names
-            GlobalScope.SetAssumedGlobals(m_settings);
+            globalScope.SetAssumedGlobals(m_settings);
 
             // start of a new module
             m_newModule = true;
@@ -180,50 +172,21 @@ namespace Microsoft.NodejsTools.Parsing
                         Debug.WriteLine("EOF");
                     }
                     break;
-#if FALSE
-                case JavaScriptSourceMode.EventHandler:
-                    // we're going to create the global block, add in a function expression with a single
-                    // parameter named "event", and then we're going to parse the input as the body of that
-                    // function expression. We're going to resolve the global block, but only return the body
-                    // of the function.
-                    scriptBlock = new Block(null, this);
-
-                    var parameters = new AstNodeList<ParameterDeclaration>(null, this);
-                    parameters.Append(new ParameterDeclaration(null, this)
-                        {
-                            Name = "event"
-                        });
-
-                    var funcExpression = new FunctionObject(null, this)
-                        {
-                            FunctionType = FunctionType.Expression, 
-                            ParameterDeclarations = parameters
-                        };
-                    scriptBlock.Append(funcExpression);
-
-                    returnBlock = ParseStatements();
-                    funcExpression.Body = returnBlock;
-                    break;
-#endif
                 default:
                     Debug.Fail("Unexpected source mode enumeration");
                     return null;
             }
 
             // resolve everything
-            ResolutionVisitor.Apply(scriptBlock, GlobalScope, m_scanner.IndexResolver, m_errorSink);
+            ResolutionVisitor.Apply(scriptBlock, globalScope, m_scanner.IndexResolver, m_errorSink);
 
             if (returnBlock.Parent != null)
             {
                 returnBlock.Parent = null;
             }
+            ast.Block = returnBlock;
 
-            return new JsAst(
-                returnBlock, 
-                new IndexSpan(0, _source.Length), 
-                GlobalScope, 
-                m_scanner.IndexResolver
-            );
+            return ast;
         }
 
 #if FALSE
@@ -1327,11 +1290,7 @@ namespace Microsoft.NodejsTools.Parsing
                     m_noSkipTokenSet.Add(NoSkipTokenSet.s_BlockConditionNoSkipTokenSet);
                     try
                     {
-                        if (JSToken.Semicolon == _curToken)
-                        {
-                        }
-                        else
-                        {
+                        if (JSToken.Semicolon != _curToken) {
                             ReportError(JSError.NoSemicolon);
                             if (JSToken.Colon == _curToken)
                             {

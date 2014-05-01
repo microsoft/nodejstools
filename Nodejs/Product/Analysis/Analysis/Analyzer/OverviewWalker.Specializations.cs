@@ -142,6 +142,14 @@ namespace Microsoft.NodejsTools.Analysis.Analyzer {
 
         abstract class ExpectedChild {
             public abstract bool IsMatch(MatchState state, Node node);
+
+            protected static bool NoMatch {
+                get {
+                    // convenient spot for a breakpoint when debugging
+                    // lack of matches...
+                    return false;
+                }
+            }
         }
 
         class ExpectedVariableDeclaration : ExpectedChild {
@@ -153,16 +161,16 @@ namespace Microsoft.NodejsTools.Analysis.Analyzer {
 
             public override bool IsMatch(MatchState state, Node node) {
                 if (node.GetType() != typeof(Var)) {
-                    return false;
+                    return NoMatch;
                 }
 
                 Var var = (Var)node;
                 if (var.Count != 1) {
-                    return false;
+                    return NoMatch;
                 }
 
                 if (var[0].Initializer != null) {
-                    return false;
+                    return NoMatch;
                 }
                 state[this] = var[0].VariableField;
 
@@ -178,14 +186,14 @@ namespace Microsoft.NodejsTools.Analysis.Analyzer {
 
             public override bool IsMatch(MatchState state, Node node) {
                 if (node.GetType() != typeof(Lookup)) {
-                    return false;
+                    return NoMatch;
                 }
 
                 object field;
                 if (state.TryGetState(_decl, out field)) {
                     return ((Lookup)node).VariableField == field;
                 }
-                return false;
+                return NoMatch;
             }
         }
 
@@ -198,7 +206,7 @@ namespace Microsoft.NodejsTools.Analysis.Analyzer {
 
             public override bool IsMatch(MatchState state, Node node) {
                 if (node.GetType() != typeof(Lookup)) {
-                    return false;
+                    return NoMatch;
                 }
 
                 var lookup = (Lookup)node;
@@ -208,7 +216,7 @@ namespace Microsoft.NodejsTools.Analysis.Analyzer {
                     return true;
 
                 }
-                return false;
+                return NoMatch;
             }
         }
 
@@ -223,15 +231,15 @@ namespace Microsoft.NodejsTools.Analysis.Analyzer {
 
             public override bool IsMatch(MatchState state, Node node) {
                 if (node.GetType() != Type) {
-                    return false;
+                    return NoMatch;
                 }
                 var children = node.Children.ToArray();
                 if (children.Length != Expected.Length) {
-                    return false;
+                    return NoMatch;
                 }
                 for (int i = 0; i < Expected.Length; i++) {
                     if (!Expected[i].IsMatch(state, children[i])) {
-                        return false;
+                        return NoMatch;
                     }
                 }
                 return true;
@@ -250,12 +258,12 @@ namespace Microsoft.NodejsTools.Analysis.Analyzer {
 
             public override bool IsMatch(MatchState state, Node node) {
                 if (node.GetType() != typeof(BinaryOperator)) {
-                    return false;
+                    return NoMatch;
                 }
 
                 BinaryOperator binOp = (BinaryOperator)node;
                 if (binOp.OperatorToken != Token) {
-                    return false;
+                    return NoMatch;
                 }
 
                 return Left.IsMatch(state, binOp.Operand1) &&
@@ -273,12 +281,12 @@ namespace Microsoft.NodejsTools.Analysis.Analyzer {
 
             public override bool IsMatch(MatchState state, Node node) {
                 if (node.GetType() != typeof(CallNode)) {
-                    return false;
+                    return NoMatch;
                 }
 
                 CallNode call = (CallNode)node;
                 if (!call.InBrackets || call.Arguments.Count != 1) {
-                    return false;
+                    return NoMatch;
                 }
 
                 return Value.IsMatch(state, call.Function) &&

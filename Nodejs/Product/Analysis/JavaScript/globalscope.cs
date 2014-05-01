@@ -27,8 +27,8 @@ namespace Microsoft.NodejsTools.Parsing
         private HashSet<string> m_globalFunctions;
         private HashSet<string> m_assumedGlobals;
 
-        internal GlobalScope(ErrorSink errorSink)
-            : base(null, errorSink)
+        internal GlobalScope(Statement node, ErrorSink errorSink)
+            : base(node, null, errorSink)
         {
             // define the Global object's properties, and methods
             m_globalProperties = new HashSet<string>(new[] { 

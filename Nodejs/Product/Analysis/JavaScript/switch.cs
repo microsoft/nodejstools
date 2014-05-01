@@ -46,8 +46,6 @@ namespace Microsoft.NodejsTools.Parsing
             }
         }
 
-        public ActivationObject BlockScope { get; set; }
-
         public Switch(IndexSpan span)
             : base(span)
         {

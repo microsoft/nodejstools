@@ -37,6 +37,7 @@ namespace Microsoft.NodejsTools.Parsing
         private Stack<ActivationObject> m_variableStack;
         private ErrorSink _errorSink;
         internal readonly IndexResolver _indexResolver;
+        private Dictionary<Node, ActivationObject> _scopes = new Dictionary<Node, ActivationObject>();
 
         private ResolutionVisitor(ActivationObject rootScope, IndexResolver indexResolver, ErrorSink errorSink) {
             // create the lexical and variable scope stacks and push the root scope onto them
@@ -336,25 +337,39 @@ namespace Microsoft.NodejsTools.Parsing
             return false;
         }
 
+        internal ActivationObject GetScope(Node node) {
+            ActivationObject scope;
+            if (_scopes.TryGetValue(node, out scope) && scope != null) {
+                return scope;
+            }
+            return null;
+        }
+
+        private void SetScope(Node node, ActivationObject scope) {
+            _scopes[node] = scope;
+        }
+
         public override bool Walk(Block node)
         {
             if (node != null)
             {
-                if (node.BlockScope == null
+                if (GetScope(node) == null
                     && node.Parent != null
                     && !(node.Parent is SwitchCase)
-                    && !(node.Parent is FunctionObject)
-                    /*&& !(node.Parent is ConditionalCompilationComment)*/)
+                    && !(node.Parent is FunctionObject))
                 {
-                    node.BlockScope = new BlockScope(CurrentLexicalScope, node.Span, _errorSink)
-                    {
-                        IsInWithScope = m_withDepth > 0
-                    };
+                    SetScope(
+                        node,
+                        new BlockScope(node, CurrentLexicalScope, node.Span, _errorSink)
+                        {
+                            IsInWithScope = m_withDepth > 0
+                        }
+                    );
                 }
 
-                if (node.BlockScope != null)
+                if (GetScope(node) != null)
                 {
-                    m_lexicalStack.Push(node.BlockScope);
+                    m_lexicalStack.Push(GetScope(node));
                 }
 
                 try
@@ -372,21 +387,21 @@ namespace Microsoft.NodejsTools.Parsing
                 finally
                 {
 
-                    if (node.BlockScope != null)
+                    if (GetScope(node) != null)
                     {
-                        Debug.Assert(CurrentLexicalScope == node.BlockScope);
+                        Debug.Assert(CurrentLexicalScope == GetScope(node));
                         m_lexicalStack.Pop();
                     }
                 }
 
                 // now, if the block has no lex-decls, we really don't need a separate scope.
-                if (node.BlockScope != null
-                    && !(node.BlockScope is WithScope)
-                    && !(node.BlockScope is CatchScope)
-                    && node.BlockScope.LexicallyDeclaredNames.Count == 0)
+                if (GetScope(node) != null
+                    && !(GetScope(node) is WithScope)
+                    && !(GetScope(node) is CatchScope)
+                    && GetScope(node).LexicallyDeclaredNames.Count == 0)
                 {
-                    CollapseBlockScope(node.BlockScope);
-                    node.BlockScope = null;
+                    CollapseBlockScope(GetScope(node));
+                    SetScope(node, null);
                 }
             }
             return false;
@@ -522,11 +537,14 @@ namespace Microsoft.NodejsTools.Parsing
                     if (lexDeclaration != null)
                     {
                         // create the scope on the block
-                        node.BlockScope = new BlockScope(CurrentLexicalScope, node.Span, _errorSink)
-                        {
-                            IsInWithScope = m_withDepth > 0
-                        };
-                        m_lexicalStack.Push(node.BlockScope);
+                        SetScope(
+                            node,
+                            new BlockScope(node, CurrentLexicalScope, node.Span, _errorSink)
+                            {
+                                IsInWithScope = m_withDepth > 0
+                            }
+                        );
+                        m_lexicalStack.Push(GetScope(node));
                     }
                 }
 
@@ -544,9 +562,9 @@ namespace Microsoft.NodejsTools.Parsing
                 }
                 finally
                 {
-                    if (node.BlockScope != null)
+                    if (GetScope(node) != null)
                     {
-                        Debug.Assert(CurrentLexicalScope == node.BlockScope);
+                        Debug.Assert(CurrentLexicalScope == GetScope(node));
                         m_lexicalStack.Pop();
                     }
                 }
@@ -568,11 +586,14 @@ namespace Microsoft.NodejsTools.Parsing
                     if (lexDeclaration != null)
                     {
                         // create the scope on the block
-                        node.BlockScope = new BlockScope(CurrentLexicalScope, node.Span, _errorSink)
-                        {
-                            IsInWithScope = m_withDepth > 0
-                        };
-                        m_lexicalStack.Push(node.BlockScope);
+                        SetScope(
+                            node,
+                            new BlockScope(node, CurrentLexicalScope, node.Span, _errorSink)
+                            {
+                                IsInWithScope = m_withDepth > 0
+                            }
+                        );
+                        m_lexicalStack.Push(GetScope(node));
                     }
                 }
 
@@ -600,9 +621,9 @@ namespace Microsoft.NodejsTools.Parsing
                 }
                 finally
                 {
-                    if (node.BlockScope != null)
+                    if (GetScope(node) != null)
                     {
-                        Debug.Assert(CurrentLexicalScope == node.BlockScope);
+                        Debug.Assert(CurrentLexicalScope == GetScope(node));
                         m_lexicalStack.Pop();
                     }
                 }
@@ -614,32 +635,27 @@ namespace Microsoft.NodejsTools.Parsing
         {
             if (node != null)
             {
+
                 // create a function scope, assign it to the function object,
                 // and push it on the stack
                 var parentScope = CurrentLexicalScope;
                 if (node.FunctionType == FunctionType.Expression 
                     && !string.IsNullOrEmpty(node.Name))
-                {
-                    // function expressions have an intermediate scope between the parent and the
-                    // function's scope that contains just the function name so the function can
-                    // be self-referencing without the function expression polluting the parent scope.
-                    // don't add the function name field yet, because it's not a decl per se.
-                    parentScope = new FunctionScope(parentScope, true, node, _errorSink)
-                    {
-                        IsInWithScope = m_withDepth > 0
-                    };
-
+                {                    
                     // add this function object to the list of function objects the variable scope
                     // will need to ghost later
                     CurrentVariableScope.GhostedFunctions.Add(node);
                 }
 
-                node.FunctionScope = new FunctionScope(parentScope, node.FunctionType != FunctionType.Declaration, node, _errorSink)
-                {
-                    IsInWithScope = m_withDepth > 0
-                };
-                m_lexicalStack.Push(node.FunctionScope);
-                m_variableStack.Push(node.FunctionScope);
+                SetScope(
+                    node,
+                    new FunctionScope(node, parentScope, node.FunctionType != FunctionType.Declaration, node, _errorSink)
+                    {
+                        IsInWithScope = m_withDepth > 0
+                    }
+                );
+                m_lexicalStack.Push(GetScope(node));
+                m_variableStack.Push(GetScope(node));
 
                 try
                 {
@@ -651,7 +667,7 @@ namespace Microsoft.NodejsTools.Parsing
                 }
                 finally
                 {
-                    Debug.Assert(CurrentLexicalScope == node.FunctionScope);
+                    Debug.Assert(CurrentLexicalScope == GetScope(node));
                     m_lexicalStack.Pop();
                     m_variableStack.Pop();
                 }
@@ -833,11 +849,14 @@ namespace Microsoft.NodejsTools.Parsing
 
                 // the switch has its own block scope to use for all the blocks that are under
                 // its child switch-case nodes
-                node.BlockScope = new BlockScope(CurrentLexicalScope, node.Span, _errorSink)
-                {
-                    IsInWithScope = m_withDepth > 0
-                };
-                m_lexicalStack.Push(node.BlockScope);
+                SetScope(
+                    node,
+                    new BlockScope(node, CurrentLexicalScope, node.Span, _errorSink)
+                    {
+                        IsInWithScope = m_withDepth > 0
+                    }
+                );
+                m_lexicalStack.Push(GetScope(node));
 
                 try
                 {
@@ -848,15 +867,15 @@ namespace Microsoft.NodejsTools.Parsing
                 }
                 finally
                 {
-                    Debug.Assert(CurrentLexicalScope == node.BlockScope);
+                    Debug.Assert(CurrentLexicalScope == GetScope(node));
                     m_lexicalStack.Pop();
                 }
 
                 // if the block has no lex-decls, we really don't need a separate scope.
-                if (node.BlockScope.LexicallyDeclaredNames.Count == 0)
+                if (GetScope(node).LexicallyDeclaredNames.Count == 0)
                 {
-                    CollapseBlockScope(node.BlockScope);
-                    node.BlockScope = null;
+                    CollapseBlockScope(GetScope(node));
+                    SetScope(node, null);
                 }
             }
             return false;
@@ -904,11 +923,14 @@ namespace Microsoft.NodejsTools.Parsing
                 {
                     // create the catch-scope, add the catch parameter to it, and recurse the catch block.
                     // the block itself will push the scope onto the stack and pop it off, so we don't have to.
-                    node.CatchBlock.BlockScope = new CatchScope(CurrentLexicalScope, node.CatchBlock.Span, node.CatchParameter, _errorSink)
-                    {
-                        IsInWithScope = m_withDepth > 0
-                    };
-                    node.CatchBlock.BlockScope.LexicallyDeclaredNames.Add(node.CatchParameter);
+                    SetScope(
+                        node.CatchBlock, 
+                        new CatchScope(node.CatchBlock, CurrentLexicalScope, node.CatchBlock.Span, node.CatchParameter, _errorSink)
+                        {
+                            IsInWithScope = m_withDepth > 0
+                        }
+                    );
+                    GetScope(node.CatchBlock).LexicallyDeclaredNames.Add(node.CatchParameter);
                     node.CatchBlock.Walk(this);
                 }
 
@@ -994,7 +1016,10 @@ namespace Microsoft.NodejsTools.Parsing
                 {
                     // create the with-scope and recurse the block.
                     // the block itself will push the scope onto the stack and pop it off, so we don't have to.
-                    node.Body.BlockScope = new WithScope(CurrentLexicalScope, node.Body.Span, _errorSink);
+                    SetScope(
+                        node.Body, 
+                        new WithScope(node.Body, CurrentLexicalScope, node.Body.Span, _errorSink)
+                    );
 
                     try
                     {

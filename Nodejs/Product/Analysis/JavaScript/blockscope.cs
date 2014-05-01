@@ -23,8 +23,8 @@ namespace Microsoft.NodejsTools.Parsing
     {
         private IndexSpan _span;
 
-        public BlockScope(ActivationObject parent, IndexSpan span, ErrorSink errorSink)
-            : base(parent, errorSink)
+        public BlockScope(Statement node, ActivationObject parent, IndexSpan span, ErrorSink errorSink)
+            : base(node, parent, errorSink)
         {
             _span = span;
         }

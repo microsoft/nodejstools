@@ -625,6 +625,49 @@ x = new j();
         }
 
         [TestMethod]
+        public void TestVariableShadowing() {
+            var code = @"var a = 'abc';
+function f() {
+console.log(a);
+var a = 100;
+}
+f();";
+            var analysis = ProcessText(code);
+            AssertUtil.ContainsExactly(
+                analysis.GetTypeIdsByIndex("a", code.IndexOf("console.log")),
+                BuiltinTypeId.Number
+            );
+
+            AssertUtil.ContainsExactly(
+                analysis.GetTypeIdsByIndex("a", code.IndexOf("f();")),
+                BuiltinTypeId.String
+            );
+        }
+
+        [TestMethod]
+        public void TestFunctionExpressionNameScoping() {
+            var code = @"var x = function abc() {
+    // here
+    var x = 42;
+    return abc.bar;
+}
+x.bar = 42;
+";
+            var analysis = ProcessText(code);
+            
+            AssertUtil.ContainsExactly(
+                analysis.GetTypeIdsByIndex("abc", code.IndexOf("// here")),
+                BuiltinTypeId.Function
+            );
+
+            AssertUtil.ContainsExactly(
+                analysis.GetTypeIdsByIndex("x()", code.Length),
+                BuiltinTypeId.Number
+            );
+        }
+
+
+        [TestMethod]
         public void TestTypes() {
             var analysis = ProcessText("x = {undefined:undefined, number:42, string:'str', null:null, boolean:true, function: function() {}, object: {}}");
             var testCases = new[] { 

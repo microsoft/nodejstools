@@ -80,18 +80,5 @@ namespace Microsoft.NodejsTools.Parsing
             }
             return false;
         }
-
-        #region INameReference Members
-
-        public ActivationObject VariableScope
-        {
-            get
-            {
-                // if we don't have a field, return null. Otherwise it's the field's owning scope.
-                return this.VariableField.IfNotNull(f => f.OwningScope);
-            }
-        }
-
-        #endregion
     }
 }

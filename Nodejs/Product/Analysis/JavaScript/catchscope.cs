@@ -24,8 +24,8 @@ namespace Microsoft.NodejsTools.Parsing
     {
         public ParameterDeclaration CatchParameter { get; private set; }
 
-        internal CatchScope(ActivationObject parent, IndexSpan span, ParameterDeclaration catchParameter, ErrorSink errorSink)
-            : base(parent, span, errorSink)
+        internal CatchScope(Statement node, ActivationObject parent, IndexSpan span, ParameterDeclaration catchParameter, ErrorSink errorSink)
+            : base(node, parent, span, errorSink)
         {
             CatchParameter = catchParameter;
         }

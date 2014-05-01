@@ -556,31 +556,7 @@ namespace Microsoft.NodejsTools.Analysis {
                     if (curStart < index) {
                         var curEnd = scope.GetStop(parent);
 
-                        bool inScope = curEnd >= index;
-                        if (!inScope || useIndent) {
-                            // Artificially extend the scope up to the start of the following
-                            // child, but only if index is at an indentation that is not as
-                            // deep as the current child.
-                            int scopeIndent = int.MaxValue/*, indexIndent*/;
-                            if (scope.Node != null) {
-                                scopeIndent = scope.Node.GetStart(parent).Column;
-                            }
-#if FALSE
-                            if (index <= parent.EndIndex) {
-                                indexIndent = parent.IndexToLocation(index).Column;
-                            } else {
-                                // This implicitly includes one character for a newline.
-                                // When using CRLF, this may place the indent at one
-                                // character less than it should be, but this will only
-                                // affect scope resolution if the user is indenting by
-                                // one space instead of four.
-                                indexIndent = index - parent.EndIndex;
-                            }
-#endif
-                            inScope = (inScope || i == curScope.Children.Count - 1 || index < lastStart) /*&& indexIndent > scopeIndent*/;
-                        }
-
-                        if (inScope) {
+                        if (curEnd >= index) {
                             if (!(scope is StatementScope)) {
                                 curScope = scope;
                             }

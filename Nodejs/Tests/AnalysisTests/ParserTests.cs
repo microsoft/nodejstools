@@ -772,6 +772,24 @@ for(var i = 0; i<4; i++) { }
         }
 
         [TestMethod]
+        public void TestForStatementLexical() {
+            const string ForCode = @"
+for(const i = 0; false; ) { }
+";
+            CheckAst(
+                ParseCode(ForCode),
+                CheckBlock(
+                    CheckForStmt(
+                        CheckLexicalDecl(CheckVarDecl("i", Zero)),
+                        CheckConstant(false),
+                        IsNullExpr,
+                        CheckBlock()
+                    )
+                )
+            );
+        }
+
+        [TestMethod]
         public void TestForNoVarStatement() {
             const string ForCode = @"
 for(i = 0; i<4; i++) { }
@@ -979,10 +997,12 @@ do {
         private static Action<Expression> Two = CheckConstant(2.0);
         private static Action<Expression> Three = CheckConstant(3.0);
         private static Action<Expression> Four = CheckConstant(4.0);
-        private static Action<Expression> None = CheckConstant(null);
+        private static Action<Expression> Null = CheckConstant(null);
         private static Action<Expression> True = CheckConstant(true);
         private static Action<Expression> False = CheckConstant(false);
         private static Action<Expression> I = CheckLookup("i");
+
+        private static Action<Expression> IsNullExpr = expr => Assert.IsNull(expr);
 
         private Action<Statement> CheckIfStmt(Action<Expression> condition, Action<Statement> trueBlock, Action<Statement> falseBlock = null) {
             return stmt => {
@@ -1111,6 +1131,18 @@ do {
                 }
             };
         }
+
+        private static Action<Statement> CheckLexicalDecl(params Action<VariableDeclaration>[] decls) {
+            return expr => {
+                Assert.AreEqual(typeof(LexicalDeclaration), expr.GetType());
+                var varNode = (LexicalDeclaration)expr;
+                Assert.AreEqual(varNode.Count, decls.Length);
+                for (int i = 0; i < decls.Length; i++) {
+                    decls[i](varNode[i]);
+                }
+            };
+        }
+
 
         private static Action<Expression> CheckConstant(object value) {
             return expr => {

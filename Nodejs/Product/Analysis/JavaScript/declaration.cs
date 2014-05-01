@@ -48,8 +48,6 @@ namespace Microsoft.NodejsTools.Parsing
             }
         }
 
-        public ActivationObject Scope { get; set; }
-
         protected Declaration(IndexSpan span)
             : base(span)
         {

@@ -46,8 +46,6 @@ namespace Microsoft.NodejsTools.Parsing
             }
         }
 
-        public BlockScope BlockScope { get; set; }
-
         public ForIn(IndexSpan span)
             : base(span)
         {

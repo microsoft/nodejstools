@@ -26,8 +26,8 @@ namespace Microsoft.NodejsTools.Parsing
 
         private HashSet<ActivationObject> m_refScopes;
 
-        internal FunctionScope(ActivationObject parent, bool isExpression, FunctionObject funcObj, ErrorSink errorSink)
-            : base(parent, errorSink)
+        internal FunctionScope(Statement node, ActivationObject parent, bool isExpression, FunctionObject funcObj, ErrorSink errorSink)
+            : base(node, parent, errorSink)
         {
             m_refScopes = new HashSet<ActivationObject>();
             if (isExpression)
@@ -51,7 +51,7 @@ namespace Microsoft.NodejsTools.Parsing
             // function scope. But if it doesn't, then this is actually the parent
             // scope for named function expressions that should contain just a field
             // for the function name
-            if (FunctionObject.FunctionScope == this)
+            if (resolutionVisitor.GetScope(FunctionObject) == this)
             {
                 // first bind any parameters
                 DefineParameters();
@@ -64,23 +64,22 @@ namespace Microsoft.NodejsTools.Parsing
 
                 // bind the variable declarations
                 DefineVarDeclarations(resolutionVisitor);
-            }
-            else
-            {
-                // we just need to define the function name in this scope
+
                 DefineFunctionExpressionName();
             }
         }
 
         private void DefineFunctionExpressionName()
         {
-            // add a field for the function expression name so it can be self-referencing.
-            var functionField = this.CreateField(FunctionObject.Name);
-            functionField.OriginalSpan = FunctionObject.NameSpan;
+            if (FunctionObject.Name != null) {
+                // add a field for the function expression name so it can be self-referencing.
+                var functionField = this.CreateField(FunctionObject.Name);
+                functionField.OriginalSpan = FunctionObject.NameSpan;
 
-            FunctionObject.VariableField = functionField;
+                FunctionObject.VariableField = functionField;
 
-            this.AddField(functionField);
+                this.AddField(functionField);
+            }
         }
 
         private void DefineParameters()

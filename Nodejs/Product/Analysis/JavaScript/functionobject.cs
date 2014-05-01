@@ -79,12 +79,6 @@ namespace Microsoft.NodejsTools.Parsing {
         
         public FunctionScope FunctionScope { get; set; }
 
-        public override ActivationObject EnclosingScope {
-            get {
-                return FunctionScope;
-            }
-        }
-
         public override void Walk(AstVisitor walker) {
             if (walker.Walk(this)) {
                 foreach (var param in m_parameters) {

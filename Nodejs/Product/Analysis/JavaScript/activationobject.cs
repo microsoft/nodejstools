@@ -23,12 +23,47 @@ namespace Microsoft.NodejsTools.Parsing
 {
     public abstract class ActivationObject
     {
-        #region private fields
-
         private bool m_useStrict;//= false;
         private readonly ErrorSink _errorSink;
+        private readonly Statement _node;
+        public ActivationObject Parent { get; private set; }
+        public bool IsInWithScope { get; set; }
+        public IDictionary<string, JSVariableField> NameTable { get; private set; }
+        public IList<ActivationObject> ChildScopes { get; private set; }
+        public ICollection<Lookup> ScopeLookups { get; private set; }
+        public ICollection<INameDeclaration> VarDeclaredNames { get; private set; }
+        public ICollection<INameDeclaration> LexicallyDeclaredNames { get; private set; }
+        public ICollection<ParameterDeclaration> GhostedCatchParameters { get; private set; }
+        public ICollection<FunctionObject> GhostedFunctions { get; private set; }
 
-        #endregion
+        protected ActivationObject(Statement node, ActivationObject parent, ErrorSink errorSink) {
+            _node = node;
+            m_useStrict = false;
+
+            Parent = parent;
+            NameTable = new Dictionary<string, JSVariableField>();
+            ChildScopes = new List<ActivationObject>();
+
+            // if our parent is a scope....
+            if (parent != null) {
+                // add us to the parent's list of child scopes
+                parent.ChildScopes.Add(this);
+
+                // if the parent is strict, so are we
+                UseStrict = parent.UseStrict;
+            }
+
+            // create the two lists of declared items for this scope
+            ScopeLookups = new HashSet<Lookup>();
+            VarDeclaredNames = new HashSet<INameDeclaration>();
+            LexicallyDeclaredNames = new HashSet<INameDeclaration>();
+
+            GhostedCatchParameters = new HashSet<ParameterDeclaration>();
+            GhostedFunctions = new HashSet<FunctionObject>();
+
+            _errorSink = errorSink;
+        }
+
 
         #region public properties
 
@@ -55,51 +90,10 @@ namespace Microsoft.NodejsTools.Parsing
             }
         }
         
-        public ActivationObject Parent { get; private set; }
-        public bool IsInWithScope { get; set; }
-
-        public IDictionary<string, JSVariableField> NameTable { get; private set; }
-
-        public IList<ActivationObject> ChildScopes { get; private set; }
-
-        public ICollection<Lookup> ScopeLookups { get; private set; }
-        public ICollection<INameDeclaration> VarDeclaredNames { get; private set; }
-        public ICollection<INameDeclaration> LexicallyDeclaredNames { get; private set; }
-
-        public ICollection<ParameterDeclaration> GhostedCatchParameters { get; private set; }
-        public ICollection<FunctionObject> GhostedFunctions { get; private set; }
-
+        
         #endregion
 
-        protected ActivationObject(ActivationObject parent, ErrorSink errorSink)
-        {
-            m_useStrict = false;
-
-            Parent = parent;
-            NameTable = new Dictionary<string, JSVariableField>();
-            ChildScopes = new List<ActivationObject>();
-
-            // if our parent is a scope....
-            if (parent != null)
-            {
-                // add us to the parent's list of child scopes
-                parent.ChildScopes.Add(this);
-
-                // if the parent is strict, so are we
-                UseStrict = parent.UseStrict;
-            }
-
-            // create the two lists of declared items for this scope
-            ScopeLookups = new HashSet<Lookup>();
-            VarDeclaredNames = new HashSet<INameDeclaration>();
-            LexicallyDeclaredNames = new HashSet<INameDeclaration>();
-
-            GhostedCatchParameters = new HashSet<ParameterDeclaration>();
-            GhostedFunctions = new HashSet<FunctionObject>();
-
-            _errorSink = errorSink;
-        }
-
+        
         #region scope setup methods
 
         /// <summary>
@@ -253,7 +247,7 @@ namespace Microsoft.NodejsTools.Parsing
 
             // set the owning scope to this is we are the outer field, or the outer field's
             // owning scope if this is an inner field
-            variableField.OwningScope = variableField.OuterField == null ? this : variableField.OuterField.OwningScope;
+            variableField.Scope = variableField.OuterField == null ? _node : variableField.OuterField.Scope;
             return variableField;
         }
 

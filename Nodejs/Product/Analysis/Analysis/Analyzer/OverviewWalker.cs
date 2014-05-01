@@ -42,6 +42,24 @@ namespace Microsoft.NodejsTools.Analysis.Analyzer {
         public override bool Walk(FunctionExpression node) {
             if (WalkFunction(node.Function, true)) {
                 node.Function.Body.Walk(this);
+
+                EnvironmentRecord funcScope;
+                VariableDef funcVarDef;
+                if (node.Function.Name != null &&
+                    _scope.TryGetNodeScope(node.Function, out funcScope) &&
+                    !funcScope.Variables.TryGetValue(node.Function.Name, out funcVarDef)) {
+                    // the function variable gets added if it's not
+                    // already declared.
+                    var funcDef = funcScope.AddLocatedVariable(
+                        node.Function.Name,
+                        node,
+                        _curUnit
+                    );
+                    funcDef.AddTypes(
+                        _curUnit,
+                        ((FunctionScope)funcScope).Function
+                    );
+                }
                 PostWalk(node.Function);
             }
            return false;
@@ -77,11 +95,11 @@ namespace Microsoft.NodejsTools.Analysis.Analyzer {
 
         private VariableDef CreateVariableInDeclaredScope(Lookup name) {
 
-            var reference = name.VariableField;// name.GetVariableReference(_entry.Tree);
+            var reference = name.VariableField;
 
             if (reference != null) {
-                var declNode = reference.OwningScope;
-                var declScope = _scope.EnumerateTowardsGlobal.FirstOrDefault(s => s.Node != null && s.Node.EnclosingScope == declNode);
+                var declNode = reference.Scope;
+                var declScope = _scope.EnumerateTowardsGlobal.FirstOrDefault(s => s.Node == declNode);
                 if (declScope != null) {
                     return declScope.CreateVariable(name, _curUnit, name.Name, false);
                 }
@@ -130,9 +148,8 @@ namespace Microsoft.NodejsTools.Analysis.Analyzer {
                 if (!isExpression && node.Name != null) 
                 {
                     // lambdas don't have their names published
-
                     var funcVar = prevScope.AddLocatedVariable(node.Name, node, unit);
-                      funcVar.AddTypes(unit, func.SelfSet);
+                    funcVar.AddTypes(unit, func.SelfSet);
                 }
 
                 unit.Enqueue();
