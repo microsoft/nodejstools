@@ -60,7 +60,7 @@ namespace AnalysisTests {
             entry2.Analyze(CancellationToken.None);
 
             AssertUtil.ContainsExactly(
-                entry2.Analysis.GetTypeIdsByIndex("x", 0),
+                entry2.Analysis.GetTypeIdsByIndex("x", mod2.Length),
                 BuiltinTypeId.Number
             );
         }
@@ -137,7 +137,7 @@ namespace AnalysisTests {
             entry2.Analyze(CancellationToken.None);
 
             AssertUtil.ContainsExactly(
-                entry2.Analysis.GetTypeIdsByIndex("x", 0),
+                entry2.Analysis.GetTypeIdsByIndex("x", mod2.Length),
                 BuiltinTypeId.Number
             );
         }

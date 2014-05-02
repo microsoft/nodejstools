@@ -32,7 +32,7 @@ namespace Microsoft.NodejsTools.Analysis {
     /// </summary>
     public sealed class ModuleAnalysis {
         private readonly AnalysisUnit _unit;
-        private readonly EnvironmentRecord _scope;
+        private readonly ModuleEnvironmentRecord _scope;
         private readonly IAnalysisCookie _cookie;
         private static Regex _otherPrivateRegex = new Regex("^_[a-zA-Z_]\\w*__[a-zA-Z_]\\w*$");
         private static HashSet<string> _exprKeywords = new HashSet<string>() { 
@@ -43,7 +43,7 @@ namespace Microsoft.NodejsTools.Analysis {
             "return", "with", "switch", "throw", "try", "else",
         };
 
-        internal ModuleAnalysis(AnalysisUnit unit, EnvironmentRecord scope, IAnalysisCookie cookie) {
+        internal ModuleAnalysis(AnalysisUnit unit, ModuleEnvironmentRecord scope, IAnalysisCookie cookie) {
             _unit = unit;
             _scope = scope;
             _cookie = cookie;
@@ -67,7 +67,7 @@ namespace Microsoft.NodejsTools.Analysis {
         /// <param name="exprText">The expression to determine the result of.</param>
         /// <param name="index">The 0-based absolute index into the file where the expression should be evaluated within the module.</param>
         public IEnumerable<AnalysisValue> GetValuesByIndex(string exprText, int index) {
-            var scope = FindScope(index);
+            var scope = FindEnvironment(index);
             var expr = Statement.GetExpression(GetAstFromText(exprText).Block);
 
             var unit = GetNearestEnclosingAnalysisUnit(scope);
@@ -130,17 +130,17 @@ namespace Microsoft.NodejsTools.Analysis {
         /// index is a 0-based absolute index into the file.
         /// </summary>
         public IEnumerable<IAnalysisVariable> GetVariablesByIndex(string exprText, int index) {
-            var scope = FindScope(index);
+            var scope = FindEnvironment(index);
             var expr = Statement.GetExpression(GetAstFromText(exprText).Block);
 
             var unit = GetNearestEnclosingAnalysisUnit(scope);
             Lookup name = expr as Lookup;
             if (name != null) {
                 var defScope = scope.EnumerateTowardsGlobal.FirstOrDefault(s =>
-                    s.Variables.ContainsKey(name.Name));
+                    s.ContainsVariable(name.Name));
 
                 if (defScope == null) {
-                    defScope = scope.GlobalScope;
+                    defScope = scope.GlobalEnvironment;
                 }
 
                 return GetVariablesInScope(name, defScope).Distinct();
@@ -234,7 +234,7 @@ namespace Microsoft.NodejsTools.Analysis {
                 return GetAllAvailableMembersByIndex(index, options);
             }
 
-            var scope = FindScope(index);
+            var scope = FindEnvironment(index);
 
             var expr = Statement.GetExpression(GetAstFromText(exprText).Block);
             if (expr == null) {
@@ -258,7 +258,7 @@ namespace Microsoft.NodejsTools.Analysis {
         /// <param name="index">The 0-based absolute index into the file.</param>
         public IEnumerable<IOverloadResult> GetSignaturesByIndex(string exprText, int index) {
             try {
-                var scope = FindScope(index);
+                var scope = FindEnvironment(index);
                 var unit = GetNearestEnclosingAnalysisUnit(scope);
                 var eval = new ExpressionEvaluator(unit.CopyForEval(), scope, mergeScopes: true);
 
@@ -285,25 +285,6 @@ namespace Microsoft.NodejsTools.Analysis {
         }
 
         /// <summary>
-        /// Gets the hierarchy of class and function definitions at the specified index.
-        /// </summary>
-        /// <param name="index">The 0-based absolute index into the file.</param>
-        public IEnumerable<MemberResult> GetDefinitionTreeByIndex(int index) {
-            try {
-                var result = new List<MemberResult>();
-
-                foreach (var scope in FindScope(index).EnumerateTowardsGlobal) {
-                    result.Add(new MemberResult(scope.Name, scope.GetMergedAnalysisValues()));
-                }
-
-                return result;
-            } catch (Exception) {
-                // TODO: log exception
-                return new[] { new MemberResult("Unknown", null) };
-            }
-        }
-
-        /// <summary>
         /// Gets the available names at the given location.  This includes built-in variables, global variables, and locals.
         /// </summary>
         /// <param name="index">The 0-based absolute index into the file where the available mebmers should be looked up.</param>
@@ -311,7 +292,7 @@ namespace Microsoft.NodejsTools.Analysis {
             var result = new Dictionary<string, List<AnalysisValue>>();
 
             // collect variables from user defined scopes
-            var scope = FindScope(index);
+            var scope = FindEnvironment(index);
             foreach (var s in scope.EnumerateTowardsGlobal) {
                 foreach (var kvp in s.GetAllMergedVariables()) {
                     result[kvp.Key] = new List<AnalysisValue>(kvp.Value.TypesNoCopy);
@@ -352,28 +333,18 @@ namespace Microsoft.NodejsTools.Analysis {
         /// <param name="index">The index where the available mebmers should be looked up.</param>
         internal IEnumerable<string> GetVariablesNoBuiltinsByIndex(int index) {
             var result = Enumerable.Empty<string>();
-            var chain = FindScope(index);
+            var chain = FindEnvironment(index);
             foreach (var scope in chain.EnumerateFromGlobal) {
                 result = result.Concat(scope.GetAllMergedVariables().Select(val => val.Key));
             }
             return result.Distinct();
         }
 
-        /// <summary>
-        /// Gets the top-level scope for the module.
-        /// </summary>
-        internal ModuleValue ModuleValue {
-            get {
-                var result = (ModuleScope)Scope;
-                return result.Module;
-            }
-        }
-
         public JsAnalyzer ProjectState {
-            get { return ModuleValue.ProjectEntry.Analyzer; }
+            get { return _scope.ProjectEntry.Analyzer; }
         }
 
-        internal EnvironmentRecord Scope {
+        internal EnvironmentRecord Environment {
             get { return _scope; }
         }
 
@@ -503,13 +474,13 @@ namespace Microsoft.NodejsTools.Analysis {
         /// New in 1.1.
         /// </summary>
         public JsAst GetAstFromTextByIndex(string exprText, int index) {
-            var scopes = FindScope(index);
+            var scopes = FindEnvironment(index);
             return GetAstFromText(exprText);
         }
 
         public string ModuleName {
             get {
-                return _scope.GlobalScope.Name;
+                return _scope.GlobalEnvironment.Name;
             }
         }
 
@@ -528,15 +499,15 @@ namespace Microsoft.NodejsTools.Analysis {
         }
 
         /// <summary>
-        /// Gets the chain of scopes which are associated with the given position in the code.
+        /// Gets the chain of environments which are associated with the given position in the code.
         /// </summary>
-        private EnvironmentRecord FindScope(int index, bool useIndent = false) {
-            EnvironmentRecord curScope = Scope;
-            EnvironmentRecord prevScope = null;
+        private EnvironmentRecord FindEnvironment(int index) {
+            EnvironmentRecord curEnv = Environment;
+            EnvironmentRecord prevEnv = null;
             var parent = _unit.Tree;
 
-            while (curScope != prevScope) {
-                prevScope = curScope;
+            while (curEnv != prevEnv) {
+                prevEnv = curEnv;
 
                 // TODO: Binary search?
                 // We currently search backwards because the end positions are sometimes unreliable
@@ -546,58 +517,57 @@ namespace Microsoft.NodejsTools.Analysis {
                 //     pass
                 // def g():  # starts on 3, ends on 4
                 //     pass
-                int lastStart = curScope.GetStart(parent) - 1;
+                int lastStart = curEnv.GetStart(parent) - 1;
 
-                for (int i = curScope.Children.Count - 1; i >= 0; i--) {
-                    var scope = curScope.Children[i];
-                    var curStart = scope.GetBodyStart(parent);
+                if (curEnv.HasChildren) {
+                    for (int i = curEnv.Children.Count - 1; i >= 0; i--) {
+                        var env = curEnv.Children[i];
+                        var curStart = env.GetBodyStart(parent);
 
 
-                    if (curStart < index) {
-                        var curEnd = scope.GetStop(parent);
+                        if (curStart < index) {
+                            var curEnd = env.GetStop(parent);
 
-                        if (curEnd >= index) {
-                            if (!(scope is StatementScope)) {
-                                curScope = scope;
+                            if (curEnd >= index) {
+                                curEnv = env;
+                                break;
                             }
-                            break;
-                        }
-                    } else if (scope is Microsoft.NodejsTools.Analysis.Analyzer.FunctionScope) {
-                        var initialStart = scope.GetStart(parent);
-                        if (initialStart < curStart) {
-                            // we could be on a parameter or we could be on a default value.
-                            // If we're on a parameter then we're logically in the function
-                            // scope.  If we're on a default value then we're in the outer
-                            // scope.
-                            var funcDef = (FunctionObject)((Microsoft.NodejsTools.Analysis.Analyzer.FunctionScope)scope).Node;
+                        } else if (env is FunctionEnvironmentRecord) {
+                            var initialStart = env.GetStart(parent);
+                            if (initialStart < curStart) {
+                                // we could be on a parameter or we could be on a default value.
+                                // If we're on a parameter then we're logically in the function
+                                // scope.  If we're on a default value then we're in the outer
+                                // scope.
+                                var funcDef = (FunctionObject)((FunctionEnvironmentRecord)env).Node;
 
-                            if (funcDef.ParameterDeclarations != null) {
-                                bool isParam = false;
-                                foreach (var param in funcDef.ParameterDeclarations)
-                                {
-                                    string paramName = /*param.GetVerbatimImage(_unit.Tree) ??*/ param.Name;
-                                    var nameStart = param.Span.Start;
+                                if (funcDef.ParameterDeclarations != null) {
+                                    bool isParam = false;
+                                    foreach (var param in funcDef.ParameterDeclarations) {
+                                        string paramName = /*param.GetVerbatimImage(_unit.Tree) ??*/ param.Name;
+                                        var nameStart = param.Span.Start;
 
-                                    if (index >= nameStart && index <= (nameStart + paramName.Length)) {
-                                        curScope = scope;
-                                        isParam = true;
-                                        break;
+                                        if (index >= nameStart && index <= (nameStart + paramName.Length)) {
+                                            curEnv = env;
+                                            isParam = true;
+                                            break;
+                                        }
+
                                     }
 
+                                    if (isParam) {
+                                        break;
+                                    }
                                 }
 
-                                if (isParam) {
-                                    break;
-                                }
                             }
-
                         }
-                    }
 
-                    lastStart = scope.GetStart(parent);
+                    lastStart = env.GetStart(parent);
                 }
             }
-            return curScope;
+            }
+            return curEnv;
         }
 
         private static IEnumerable<MemberResult> MemberDictToResultList(GetMemberOptions options, Dictionary<string, List<AnalysisValue>> memberDict,

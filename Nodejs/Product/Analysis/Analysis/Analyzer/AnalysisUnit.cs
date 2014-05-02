@@ -33,8 +33,17 @@ namespace Microsoft.NodejsTools.Analysis {
     /// AnalysisUnit's will be re-enqueued.  This proceeds until we reach a fixed point.
     /// </summary>
     public class AnalysisUnit : ISet<AnalysisUnit> {
-        internal EnvironmentRecord _scope;
-        private ModuleValue _declaringModule;
+        /// <summary>
+        /// The AST which will be analyzed when this node is analyzed
+        /// </summary>
+        public readonly Node Ast;
+        public readonly JsAst Tree;
+        internal EnvironmentRecord _env;
+        private ModuleEnvironmentRecord _declaringModuleEnv;
+        /// <summary>
+        /// True if this analysis unit is currently in the queue.
+        /// </summary>
+        public bool IsInQueue;
 #if DEBUG
         private long _analysisTime;
         private long _analysisCount;
@@ -45,36 +54,31 @@ namespace Microsoft.NodejsTools.Analysis {
         }
 #endif
 
-        public static AnalysisUnit EvalUnit = new AnalysisUnit(null, null, null, true);
-
-        internal AnalysisUnit(Statement ast, EnvironmentRecord scope)
-            : this(ast, (ast != null ? ast.GlobalParent : null), scope, false) {
+        internal AnalysisUnit(Statement ast, EnvironmentRecord environment)
+            : this(ast, (ast != null ? ast.GlobalParent : null), environment) {
         }
 
-        internal AnalysisUnit(Node ast, JsAst tree, EnvironmentRecord scope, bool forEval)
-        {
+        internal AnalysisUnit(Node ast, JsAst tree, EnvironmentRecord environment) {
             Ast = ast;
             Tree = tree;
-            _scope = scope;
-            ForEval = forEval;
+            _env = environment;
         }
-
-        /// <summary>
-        /// True if this analysis unit is currently in the queue.
-        /// </summary>
-        public bool IsInQueue;
 
         /// <summary>
         /// True if this analysis unit is being used to evaluate the result of the analysis.  In this
         /// mode we don't track references or re-queue items.
         /// </summary>
-        public readonly bool ForEval;
+        public bool ForEval {
+            get {
+                return this is EvalAnalysisUnit;
+            }
+        }
 
-        internal virtual ModuleValue GetDeclaringModule() {
-            if (_scope != null) {
-                var moduleScope = _scope.EnumerateTowardsGlobal.OfType<ModuleScope>().FirstOrDefault();
-                if (moduleScope != null) {
-                    return moduleScope.Module;
+        internal virtual ModuleEnvironmentRecord GetDeclaringModuleEnvironment() {
+            if (_env != null) {
+                var env = _env.EnumerateTowardsGlobal.OfType<ModuleEnvironmentRecord>().FirstOrDefault();
+                if (env != null) {
+                    return env;
                 }
             }
             return null;
@@ -83,12 +87,12 @@ namespace Microsoft.NodejsTools.Analysis {
         /// <summary>
         /// The global scope that the code associated with this analysis unit is declared within.
         /// </summary>
-        internal ModuleValue DeclaringModule {
+        internal ModuleEnvironmentRecord DeclaringModuleEnvironment {
             get {
-                if (_declaringModule == null) {
-                    _declaringModule = GetDeclaringModule();
+                if (_declaringModuleEnv == null) {
+                    _declaringModuleEnv = GetDeclaringModuleEnvironment();
                 }
-                return _declaringModule;
+                return _declaringModuleEnv;
             }
         }
 
@@ -115,10 +119,10 @@ namespace Microsoft.NodejsTools.Analysis {
         /// </remarks>
         public IAnalysisSet FindAnalysisValueByName(Node node, string name)
         {
-            foreach (var scope in Scope.EnumerateTowardsGlobal) {
-                var refs = scope.GetVariable(node, this, name, true);
+            foreach (var env in Environment.EnumerateTowardsGlobal) {
+                var refs = env.GetVariable(node, this, name, true);
                 if (refs != null) {
-                    var linkedVars = scope.GetLinkedVariablesNoCreate(name);
+                    var linkedVars = env.GetLinkedVariablesNoCreate(name);
                     if (linkedVars != null) {
                         foreach (var linkedVar in linkedVars) {
                             linkedVar.AddReference(node, this);
@@ -131,17 +135,21 @@ namespace Microsoft.NodejsTools.Analysis {
           return AnalysisSet.Empty;
         }
         
-      internal ProjectEntry ProjectEntry
+       internal ProjectEntry ProjectEntry
         {
-            get { return DeclaringModule.ProjectEntry; }
+            get { return DeclaringModuleEnvironment.ProjectEntry; }
         }
 
         public JsAnalyzer Analyzer {
-            get { return DeclaringModule.ProjectEntry.Analyzer; }
+            get { return DeclaringModuleEnvironment.ProjectEntry.Analyzer; }
         }
 
+        /// <summary>
+        /// Creates an analysis unit in the same scope used for 
+        /// evaluating an expression to get results for.
+        /// </summary>
         public AnalysisUnit CopyForEval() {
-            return new AnalysisUnit(Ast, Tree, _scope, true);
+            return new EvalAnalysisUnit(Ast, Tree, _env);
         }
 
         public void Enqueue() {
@@ -151,15 +159,6 @@ namespace Microsoft.NodejsTools.Analysis {
                 this.IsInQueue = true;
             }
         }
-
-
-
-        /// <summary>
-        /// The AST which will be analyzed when this node is analyzed
-        /// </summary>
-        public readonly Node Ast;
-
-        public readonly JsAst Tree;
 
         internal void Analyze(DDG ddg, CancellationToken cancel) {
 #if DEBUG
@@ -184,14 +183,14 @@ namespace Microsoft.NodejsTools.Analysis {
         }
 
         internal virtual void AnalyzeWorker(DDG ddg, CancellationToken cancel) {
-            DeclaringModule.Scope.ClearLinkedVariables();
+            DeclaringModuleEnvironment.ClearLinkedVariables();
 
             ddg.SetCurrentUnit(this);
             Ast.Walk(ddg);
 
             List<KeyValuePair<string, VariableDef>> toRemove = null;
 
-            foreach (var variableInfo in DeclaringModule.Scope.Variables) {
+            foreach (var variableInfo in DeclaringModuleEnvironment.Variables) {
                 variableInfo.Value.ClearOldValues(ProjectEntry);
                 if (variableInfo.Value._dependencies.Count == 0 &&
                     variableInfo.Value.TypesNoCopy.Count == 0) {
@@ -203,7 +202,7 @@ namespace Microsoft.NodejsTools.Analysis {
             }
             if (toRemove != null) {
                 foreach (var nameValue in toRemove) {
-                    DeclaringModule.Scope.RemoveVariable(nameValue.Key);
+                    DeclaringModuleEnvironment.RemoveVariable(nameValue.Key);
 
                     // if anyone read this value it could now be gone (e.g. user 
                     // deletes a class definition) so anyone dependent upon it
@@ -216,8 +215,8 @@ namespace Microsoft.NodejsTools.Analysis {
         /// <summary>
         /// The chain of scopes in which this analysis is defined.
         /// </summary>
-        internal EnvironmentRecord Scope {
-            get { return _scope; }
+        internal EnvironmentRecord Environment {
+            get { return _env; }
         }
 
         public override string ToString() {
@@ -236,8 +235,8 @@ namespace Microsoft.NodejsTools.Analysis {
         /// </summary>
         internal string FullName {
             get {
-                if (Scope != null) {
-                    return string.Join(".", Scope.EnumerateFromGlobal.Select(s => s.Name));
+                if (Environment != null) {
+                    return string.Join(".", Environment.EnumerateFromGlobal.Select(s => s.Name));
                 } else {
                     return "<Unnamed unit>";
                 }

@@ -12,28 +12,18 @@
  *
  * ***************************************************************************/
 
-using Microsoft.NodejsTools.Analysis.Values;
 using Microsoft.NodejsTools.Parsing;
 
 namespace Microsoft.NodejsTools.Analysis.Analyzer {
-    sealed class ModuleScope : EnvironmentRecord {
-
-        public ModuleScope(ModuleValue moduleInfo)
-            : base(moduleInfo, null) {
-        }
-
-        private ModuleScope(ModuleScope scope)
-            : base(scope.AnalysisValue, scope, true) {
-        }
-
-        public ModuleValue Module { get { return AnalysisValue as ModuleValue; } }
-
-        public override string Name {
-            get { return Module.Name; }
-        }
-
-        public ModuleScope CloneForPublish() {
-            return new ModuleScope(this);
+    /// <summary>
+    /// Analysis unit used for when we query the results of the analysis.
+    /// 
+    /// This analysis unit won't add references and side effects won't
+    /// propagate types.
+    /// </summary>
+    sealed class EvalAnalysisUnit : AnalysisUnit {
+        internal EvalAnalysisUnit(Node ast, JsAst tree, EnvironmentRecord scope)
+            : base(ast, tree, scope) {
         }
     }
 }

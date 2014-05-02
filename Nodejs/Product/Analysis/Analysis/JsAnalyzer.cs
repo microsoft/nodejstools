@@ -98,7 +98,7 @@ namespace Microsoft.NodejsTools.Analysis {
                 NodejsModuleBuilder.Build(allJson, this);
             }
 
-            _evalUnit = new AnalysisUnit(null, null, new ModuleValue("$global", _builtinEntry).Scope, true);
+            _evalUnit = new EvalAnalysisUnit(null, null, new ModuleValue("$global", _builtinEntry).EnvironmentRecord);
             AnalysisLog.NewUnit(_evalUnit);
         }
 

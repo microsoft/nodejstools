@@ -193,7 +193,7 @@ namespace Microsoft.NodejsTools.Analysis.Values {
                 foreach (var unit in units) {
                     var vars = FunctionObject.ParameterDeclarations.Select(p => {
                         VariableDef param;
-                        if (unit.Scope.Variables.TryGetValue(p.Name, out param)) {
+                        if (unit.Environment.TryGetVariable(p.Name, out param)) {
                             return param;
                         }
                         return null;
@@ -295,7 +295,7 @@ namespace Microsoft.NodejsTools.Analysis.Values {
 
                 VariableDef param;
                 foreach (var unit in units) {
-                    if (unit != null && unit.Scope != null && unit.Scope.Variables.TryGetValue(FunctionObject.ParameterDeclarations[i].Name, out param)) {
+                    if (unit != null && unit.Environment != null && unit.Environment.TryGetVariable(FunctionObject.ParameterDeclarations[i].Name, out param)) {
                         result[i] = result[i].Union(param.TypesNoCopy);
                     }
                 }

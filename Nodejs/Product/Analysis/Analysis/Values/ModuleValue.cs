@@ -23,15 +23,15 @@ using Microsoft.NodejsTools.Parsing;
 namespace Microsoft.NodejsTools.Analysis.Values {
     internal class ModuleValue : ObjectValue {
         private readonly string _name;
-        private readonly ModuleScope _scope;
+        private readonly ModuleEnvironmentRecord _scope;
 
         public ModuleValue(string moduleName, ProjectEntry projectEntry)
             : base(projectEntry) {
             _name = moduleName;
-            _scope = new ModuleScope(this);
+            _scope = new ModuleEnvironmentRecord(this, projectEntry);
         }
 
-        public ModuleScope Scope {
+        public ModuleEnvironmentRecord EnvironmentRecord {
             get {
                 return _scope;
             }

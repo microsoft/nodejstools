@@ -125,7 +125,7 @@ namespace Microsoft.NodejsTools.Analysis.Values {
                 if (_references == null) {
                     _references = new ReferenceDict();
                 }
-                _references.GetReferences(unit.DeclaringModule.ProjectEntry).AddReference(new EncodedLocation(unit.Tree, node));
+                _references.GetReferences(unit.DeclaringModuleEnvironment.ProjectEntry).AddReference(new EncodedLocation(unit.Tree, node));
             }
         }
 

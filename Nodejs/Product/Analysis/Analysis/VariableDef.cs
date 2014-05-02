@@ -83,7 +83,7 @@ namespace Microsoft.NodejsTools.Analysis {
 
         public bool AddDependency(AnalysisUnit unit) {
             if (!unit.ForEval) {
-                return GetDependentItems(unit.DeclaringModule.ProjectEntry).AddDependentUnit(unit);
+                return GetDependentItems(unit.DeclaringModuleEnvironment.ProjectEntry).AddDependentUnit(unit);
             }
             return false;
         }
@@ -357,7 +357,7 @@ namespace Microsoft.NodejsTools.Analysis {
 
         public bool AddReference(Node node, AnalysisUnit unit) {
             if (!unit.ForEval) {
-                var deps = GetDependentItems(unit.DeclaringModule.ProjectEntry);
+                var deps = GetDependentItems(unit.DeclaringModuleEnvironment.ProjectEntry);
                 return deps.AddReference(new EncodedLocation(unit.Tree, node)) && deps.AddDependentUnit(unit);
             }
             return false;
@@ -373,7 +373,7 @@ namespace Microsoft.NodejsTools.Analysis {
 
         public bool AddAssignment(Node node, AnalysisUnit unit) {
             if (!unit.ForEval) {
-                return AddAssignment(new EncodedLocation(unit.Tree, node), unit.DeclaringModule.ProjectEntry);
+                return AddAssignment(new EncodedLocation(unit.Tree, node), unit.DeclaringModuleEnvironment.ProjectEntry);
             }
             return false;
         }

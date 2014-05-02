@@ -46,9 +46,9 @@ namespace Microsoft.NodejsTools.Analysis.Analyzer {
             Function = function;
             _decoratorCalls = new Dictionary<Node, Expression>();
 
-            var scope = new FunctionScope(Function, Function.FunctionObject, declScope, declEntry);
+            var scope = new FunctionEnvironmentRecord(Function, Function.FunctionObject, declScope, declEntry);
             scope.EnsureParameters(this);
-            _scope = scope;
+            _env = scope;
 
             AnalysisLog.NewUnit(this);
         }
@@ -61,14 +61,14 @@ namespace Microsoft.NodejsTools.Analysis.Analyzer {
 
             CallChain = callChain;
 
-            var scope = new FunctionScope(
+            var scope = new FunctionEnvironmentRecord(
                 Function,
                 Ast,
-                originalUnit.Scope.OuterScope,
-                originalUnit.DeclaringModule.ProjectEntry
+                originalUnit.Environment.Parent,
+                originalUnit.DeclaringModuleEnvironment.ProjectEntry
             );
-            scope.UpdateParameters(this, @this, callArgs, false, originalUnit.Scope as FunctionScope);
-            _scope = scope;
+            scope.UpdateParameters(this, @this, callArgs, false, originalUnit.Environment as FunctionEnvironmentRecord);
+            _env = scope;
 
             var walker = new OverviewWalker(originalUnit.ProjectEntry, this);
             if (Ast.Body != null) {
@@ -80,25 +80,25 @@ namespace Microsoft.NodejsTools.Analysis.Analyzer {
         }
 
         internal bool UpdateParameters(IAnalysisSet @this, ArgumentSet callArgs, bool enqueue = true) {
-            var defScope = _originalUnit != null ? _originalUnit.Scope as FunctionScope : null;
-            return ((FunctionScope)Scope).UpdateParameters(this, @this, callArgs, enqueue, defScope);
+            var defScope = _originalUnit != null ? _originalUnit.Environment as FunctionEnvironmentRecord : null;
+            return ((FunctionEnvironmentRecord)Environment).UpdateParameters(this, @this, callArgs, enqueue, defScope);
         }
 
         internal void AddNamedParameterReferences(AnalysisUnit caller, Lookup[] names) {
-            ((FunctionScope)Scope).AddParameterReferences(caller, names);
+            ((FunctionEnvironmentRecord)Environment).AddParameterReferences(caller, names);
         }
 
-        internal override ModuleValue GetDeclaringModule() {
-            return base.GetDeclaringModule() ?? _declUnit.DeclaringModule;
+        internal override ModuleEnvironmentRecord GetDeclaringModuleEnvironment() {
+            return base.GetDeclaringModuleEnvironment() ?? _declUnit.DeclaringModuleEnvironment;
         }
 
         internal override void AnalyzeWorker(DDG ddg, CancellationToken cancel) {
             // Resolve default parameters and decorators in the outer scope but
             // continue to associate changes with this unit.
-            ddg.Scope = _declUnit.Scope;
+            ddg.Scope = _declUnit.Environment;
 
             // Set the scope to within the function
-            ddg.Scope = Scope;
+            ddg.Scope = Environment;
 
             Ast.Body.Walk(ddg);
         }
@@ -112,7 +112,7 @@ namespace Microsoft.NodejsTools.Analysis.Analyzer {
 
         public VariableDef ReturnValue {
             get {
-                return ((FunctionScope)Scope).ReturnValue;
+                return ((FunctionEnvironmentRecord)Environment).ReturnValue;
             }
         }
 
@@ -120,8 +120,8 @@ namespace Microsoft.NodejsTools.Analysis.Analyzer {
             return string.Format("{0}{1}({2})->{3}",
                 base.ToString(),
                 _originalUnit == null ? " def:" : "",
-                string.Join(", ", Ast.ParameterDeclarations.Select(p => Scope.Variables[p.Name].TypesNoCopy.ToString())),
-                ((FunctionScope)Scope).ReturnValue.TypesNoCopy.ToString()
+                string.Join(", ", Ast.ParameterDeclarations.Select(p => Environment.GetVariable(p.Name).TypesNoCopy.ToString())),
+                ((FunctionEnvironmentRecord)Environment).ReturnValue.TypesNoCopy.ToString()
             );
         }
     }

@@ -492,7 +492,7 @@ namespace Microsoft.NodejsTools.Analysis {
                                 node,
                                 unit,
                                 moduleName, 
-                                unit.DeclaringModule.Name
+                                unit.DeclaringModuleEnvironment.Name
                             )
                         );
                     }

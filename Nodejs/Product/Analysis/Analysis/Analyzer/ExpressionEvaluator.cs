@@ -33,7 +33,7 @@ namespace Microsoft.NodejsTools.Analysis.Analyzer {
         /// </summary>
         public ExpressionEvaluator(AnalysisUnit unit) {
             _unit = unit;
-            Scope = unit.Scope;
+            Scope = unit.Environment;
         }
 
         public ExpressionEvaluator(AnalysisUnit unit, EnvironmentRecord scope, bool mergeScopes = false) {
@@ -66,9 +66,11 @@ namespace Microsoft.NodejsTools.Analysis.Analyzer {
         /// </summary>
         public IAnalysisSet LookupAnalysisSetByName(Node node, string name, bool addRef = true) {
             if (_mergeScopes) {
-                var scope = Scope.EnumerateTowardsGlobal.FirstOrDefault(s => s.Variables.ContainsKey(name));
-                if (scope != null) {
-                    return scope.GetMergedVariableTypes(name);
+                foreach (var scope in Scope.EnumerateTowardsGlobal) {
+                    VariableDef def;
+                    if (scope.TryGetVariable(name, out def)) {
+                        return scope.GetMergedVariableTypes(name);
+                    }
                 }
             } else {
                 foreach (var scope in Scope.EnumerateTowardsGlobal) {
@@ -95,7 +97,7 @@ namespace Microsoft.NodejsTools.Analysis.Analyzer {
         #region Implementation Details
 
         private ModuleValue GlobalScope {
-            get { return _unit.DeclaringModule; }
+            get { return _unit.DeclaringModuleEnvironment.Module; }
         }
 
         private JsAnalyzer ProjectState {
@@ -111,7 +113,7 @@ namespace Microsoft.NodejsTools.Analysis.Analyzer {
             set {
                 // Scopes must be from a common stack.
                 Debug.Assert(_currentScope == null ||
-                    _currentScope.OuterScope == value.OuterScope ||
+                    _currentScope.Parent == value.Parent ||
                     _currentScope.EnumerateTowardsGlobal.Contains(value) ||
                     value.EnumerateTowardsGlobal.Contains(_currentScope));
                 _currentScope = value;

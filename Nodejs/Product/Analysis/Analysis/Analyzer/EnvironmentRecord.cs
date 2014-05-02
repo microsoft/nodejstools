@@ -21,30 +21,11 @@ using Microsoft.NodejsTools.Parsing;
 
 namespace Microsoft.NodejsTools.Analysis.Analyzer {
     abstract class EnvironmentRecord {
-        public readonly EnvironmentRecord OuterScope;
-        public readonly List<EnvironmentRecord> Children = new List<EnvironmentRecord>();
+        public readonly EnvironmentRecord Parent;
+        private List<EnvironmentRecord> _children;
 
-        private readonly AnalysisValue _av;
-        private readonly Node _node;
-        private readonly Dictionary<Node, EnvironmentRecord> _nodeScopes;
-        private readonly Dictionary<Node, IAnalysisSet> _nodeValues;
-        private readonly Dictionary<string, VariableDef> _variables;
-        private Dictionary<string, HashSet<VariableDef>> _linkedVariables;
-
-        public EnvironmentRecord(AnalysisValue av, Node ast, EnvironmentRecord outerScope) {
-            _av = av;
-            _node = ast;
-            OuterScope = outerScope;
-
-            _nodeScopes = new Dictionary<Node, EnvironmentRecord>();
-            _nodeValues = new Dictionary<Node, IAnalysisSet>();
-            _variables = new Dictionary<string, VariableDef>();
-
-#if DEBUG
-            NodeScopes = new ReadOnlyDictionary<Node, EnvironmentRecord>(_nodeScopes);
-            NodeValues = new ReadOnlyDictionary<Node, IAnalysisSet>(_nodeValues);
-            Variables = new ReadOnlyDictionary<string, VariableDef>(_variables);
-#endif
+        public EnvironmentRecord(EnvironmentRecord outerScope) {
+            Parent = outerScope;
         }
 
         public virtual IAnalysisSet ThisValue {
@@ -60,32 +41,33 @@ namespace Microsoft.NodejsTools.Analysis.Analyzer {
             }
         }
 
-        public EnvironmentRecord(AnalysisValue av, EnvironmentRecord outerScope)
-            : this(av, null, outerScope) { }
-
-        protected EnvironmentRecord(AnalysisValue av, EnvironmentRecord cloned, bool isCloned) {
+        protected EnvironmentRecord(EnvironmentRecord cloned, bool isCloned) {
             Debug.Assert(isCloned);
-            _av = av;
-            Children.AddRange(cloned.Children);
-            _nodeScopes = cloned._nodeScopes;
-            _nodeValues = cloned._nodeValues;
-            _variables = cloned._variables;
-            if (cloned._linkedVariables == null) {
-                // linkedVariables could be created later, and we need to share them if it.
-                cloned._linkedVariables = new Dictionary<string, HashSet<VariableDef>>();
+            if (cloned.HasChildren) {
+                _children = new List<EnvironmentRecord>();
+                _children.AddRange(cloned.Children);
             }
-            _linkedVariables = cloned._linkedVariables;
-#if DEBUG
-            NodeScopes = new ReadOnlyDictionary<Node, EnvironmentRecord>(_nodeScopes);
-            NodeValues = new ReadOnlyDictionary<Node, IAnalysisSet>(_nodeValues);
-            Variables = new ReadOnlyDictionary<string, VariableDef>(_variables);
-#endif
         }
 
-        public EnvironmentRecord GlobalScope {
+        public bool HasChildren {
             get {
-                for (var scope = this; scope != null; scope = scope.OuterScope) {
-                    if (scope.OuterScope == null) {
+                return _children != null && _children.Count > 0;
+            }
+        }
+
+        public List<EnvironmentRecord> Children {
+            get {
+                if (_children == null) {
+                    _children = new List<EnvironmentRecord>();
+                }
+                return _children;
+            }
+        }
+
+        public EnvironmentRecord GlobalEnvironment {
+            get {
+                for (var scope = this; scope != null; scope = scope.Parent) {
+                    if (scope.Parent == null) {
                         return scope;
                     }
                 }
@@ -95,7 +77,7 @@ namespace Microsoft.NodejsTools.Analysis.Analyzer {
 
         public IEnumerable<EnvironmentRecord> EnumerateTowardsGlobal {
             get {
-                for (var scope = this; scope != null; scope = scope.OuterScope) {
+                for (var scope = this; scope != null; scope = scope.Parent) {
                     yield return scope;
                 }
             }
@@ -111,74 +93,36 @@ namespace Microsoft.NodejsTools.Analysis.Analyzer {
         /// Gets the index in the file/buffer that the scope actually starts on.  This is the index where the colon
         /// is on for the start of the body if we're a function or class definition.
         /// </summary>
-        public virtual int GetBodyStart(JsAst ast) {
-            return GetStart(ast);
-        }
+        public abstract int GetBodyStart(JsAst ast);
 
         /// <summary>
         /// Gets the index in the file/buffer that this scope starts at.  This is the index which includes
         /// the definition it's self (e.g. def fob(...) or class fob(...)).
         /// </summary>
-        public virtual int GetStart(JsAst ast) {
-            if (_node == null) {
-                return 1;
-            }
-            return _node.GetStart(ast).Index;
-        }
+        public abstract int GetStart(JsAst ast);
 
         /// <summary>
         /// Gets the index in the file/buffer that this scope ends at.
         /// </summary>
-        public virtual int GetStop(JsAst ast) {
-            if (_node == null) {
-                return int.MaxValue;
-            }
-            return _node.GetEnd(ast).Index;
-        }
+        public abstract int GetStop(JsAst ast);
 
         public abstract string Name {
             get;
         }
 
-        public Node Node {
-            get {
-                return _node;
-            }
-        }
+        #region Variables
 
-#if DEBUG
-        public ReadOnlyDictionary<string, VariableDef> Variables {
+        public abstract IEnumerable<KeyValuePair<string, VariableDef>> Variables {
             get;
-            private set;
         }
 
-        public ReadOnlyDictionary<Node, EnvironmentRecord> NodeScopes {
-            get;
-            private set;
-        }
+        public abstract bool TryGetVariable(string name, out VariableDef variable);
 
-        public ReadOnlyDictionary<Node, IAnalysisSet> NodeValues {
-            get;
-            private set;
-        }
-#else
-        public IDictionary<string, VariableDef> Variables {
-            get { return _variables; }
-        }
-
-        public IDictionary<Node, EnvironmentRecord> NodeScopes {
-            get { return _nodeScopes; }
-        }
-
-        public IDictionary<Node, IAnalysisSet> NodeValues {
-            get { return _nodeValues; }
-        }
-#endif
+        public abstract bool ContainsVariable(string name);
 
         /// <summary>
-        /// Assigns a variable in the given scope, creating the variable if necessary, and performing
-        /// any scope specific behavior such as propagating to outer scopes (is instance), updating
-        /// __metaclass__ (class scopes), or enqueueing dependent readers (modules).
+        /// Assigns a variable in the given environment, creating the variable if necessary, and performing
+        /// any environment specific behavior such as propagating to outer environments (is instance)
         /// 
         /// Returns true if a new type has been signed to the variable, false if the variable
         /// is left unchanged.
@@ -198,13 +142,18 @@ namespace Microsoft.NodejsTools.Analysis.Analyzer {
             return vars.AddTypes(unit, values);
         }
 
+        /// <summary>
+        /// Adds a variable that is associated with a particular location in code.
+        /// 
+        /// Goto definition on the variable can then offer the location in code.
+        /// </summary>
         public VariableDef AddLocatedVariable(string name, Node location, AnalysisUnit unit/*, ParameterKind paramKind = ParameterKind.Normal*/) {
             VariableDef value;
-            if (!Variables.TryGetValue(name, out value)) {
-                VariableDef def = new LocatedVariableDef(unit.DeclaringModule.ProjectEntry, location); 
+            if (!TryGetVariable(name, out value)) {
+                VariableDef def = new LocatedVariableDef(unit.DeclaringModuleEnvironment.ProjectEntry, location);
                 return AddVariable(name, def);
             } else if (!(value is LocatedVariableDef)) {
-                VariableDef def = new LocatedVariableDef(unit.DeclaringModule.ProjectEntry, location, value);
+                VariableDef def = new LocatedVariableDef(unit.DeclaringModuleEnvironment.ProjectEntry, location, value);
                 return AddVariable(name, def);
             } else {
                 ((LocatedVariableDef)value).Context = location;
@@ -222,149 +171,77 @@ namespace Microsoft.NodejsTools.Analysis.Analyzer {
             }
         }
 
-        public VariableDef GetVariable(Node node, AnalysisUnit unit, string name, bool addRef = true) {
-            VariableDef res;
-            if (_variables.TryGetValue(name, out res)) {
-                if (addRef) {
-                    res.AddReference(node, unit);
-                }
-                return res;
-            }
-            return null;
-        }
+        public abstract VariableDef GetVariable(string name);
+        public abstract VariableDef GetVariable(Node node, AnalysisUnit unit, string name, bool addRef = true);
+        public abstract IEnumerable<KeyValuePair<string, VariableDef>> GetAllMergedVariables();
+        public abstract IEnumerable<VariableDef> GetMergedVariables(string name);
+        public abstract IAnalysisSet GetMergedVariableTypes(string name);
+        public abstract VariableDef CreateVariable(Node node, AnalysisUnit unit, string name, bool addRef = true);
+        public abstract VariableDef CreateEphemeralVariable(Node node, AnalysisUnit unit, string name, bool addRef = true);
+        public abstract VariableDef GetOrAddVariable(string name);
+        public abstract VariableDef AddVariable(string name, VariableDef variable = null);
+        internal abstract bool RemoveVariable(string name);
+        internal abstract bool RemoveVariable(string name, out VariableDef value);
+        internal abstract void ClearVariables();
+        public abstract void ClearLinkedVariables();
+        internal abstract HashSet<VariableDef> GetLinkedVariables(string saveName);
+        internal abstract HashSet<VariableDef> GetLinkedVariablesNoCreate(string saveName);
 
-        public virtual IEnumerable<KeyValuePair<string, VariableDef>> GetAllMergedVariables() {
-            return _variables;
-        }
+        #endregion
 
-        public virtual IEnumerable<VariableDef> GetMergedVariables(string name) {
-            VariableDef res;
-            if (_variables.TryGetValue(name, out res)) {
-                yield return res;
-            }
-        }
+        #region Node Environment Records
 
-        public virtual IAnalysisSet GetMergedVariableTypes(string name) {
-            var res = AnalysisSet.Empty;
-            foreach (var val in GetMergedVariables(name)) {
-                res = res.Union(val.Types);
-            }
-
-            return res;
-        }
-
-        public virtual IEnumerable<AnalysisValue> GetMergedAnalysisValues() {
-            yield return AnalysisValue;
-        }
-
-        public virtual VariableDef CreateVariable(Node node, AnalysisUnit unit, string name, bool addRef = true) {
-            var res = GetVariable(node, unit, name, addRef);
-            if (res == null) {
-                res = AddVariable(name);
-            }
-            if (addRef) {
-                res.AddReference(node, unit);
-            }
-            return res;
-        }
-
-        public VariableDef CreateEphemeralVariable(Node node, AnalysisUnit unit, string name, bool addRef = true) {
-            var res = GetVariable(node, unit, name, addRef);
-            if (res == null) {
-                res = AddVariable(name, new EphemeralVariableDef());
-                if (addRef) {
-                    res.AddReference(node, unit);
+        /// <summary>
+        /// Gets the environment record associated with the specified node within
+        /// the current environment.  If there is no association in the current
+        /// record outer records will be searched
+        /// </summary>
+        internal bool TryGetNodeEnvironment(Node node, out EnvironmentRecord scope) {
+            foreach (var s in EnumerateTowardsGlobal) {
+                if (s.TryGetLocalNodeEnvironment(node, out scope)) {
+                    return true;
                 }
             }
-            return res;
-        }
-
-        public VariableDef GetOrAddVariable(string name) {
-            VariableDef res;
-            if (_variables.TryGetValue(name, out res)) {
-                return res;
-            }
-            return AddVariable(name);
-        }
-
-        public virtual VariableDef AddVariable(string name, VariableDef variable = null) {
-            return _variables[name] = (variable ?? new VariableDef());
-        }
-
-        internal virtual bool RemoveVariable(string name) {
-            return _variables.Remove(name);
-        }
-
-        internal bool RemoveVariable(string name, out VariableDef value) {
-            if (_variables.TryGetValue(name, out value)) {
-                return _variables.Remove(name);
-            }
-            value = null;
+            scope = null;
             return false;
         }
+        
+        /// <summary>
+        /// Adds an environment record associated with the specified node.
+        /// </summary>
+        public abstract EnvironmentRecord AddNodeEnvironment(Node node, EnvironmentRecord scope);
+        internal abstract bool RemoveNodeEnvironment(Node node);
+        internal abstract void ClearNodeEnvironments();
+        /// <summary>
+        /// Gets the environment record associated with the specified node
+        /// without recursing through outer records.
+        /// </summary>
+        internal abstract bool TryGetLocalNodeEnvironment(Node node, out EnvironmentRecord scope);
 
-        internal virtual void ClearVariables() {
-            _variables.Clear();
+        /// <summary>
+        /// Gets all of the associations between nodes and environment records.
+        /// </summary>
+        public abstract IEnumerable<KeyValuePair<Node, EnvironmentRecord>> NodeEnvironments {
+            get;
         }
 
-        public virtual EnvironmentRecord AddNodeScope(Node node, EnvironmentRecord scope) {
-            return _nodeScopes[node] = scope;
-        }
+        #endregion
 
-        internal virtual bool RemoveNodeScope(Node node) {
-            return _nodeScopes.Remove(node);
-        }
+        #region Node Values
 
-        internal virtual void ClearNodeScopes() {
-            _nodeScopes.Clear();
-        }
+        public abstract IAnalysisSet AddNodeValue(Node node, IAnalysisSet variable);
 
-        public virtual IAnalysisSet AddNodeValue(Node node, IAnalysisSet variable) {
-            return _nodeValues[node] = variable;
-        }
+        internal abstract bool RemoveNodeValue(Node node);
 
-        internal virtual bool RemoveNodeValue(Node node) {
-            return _nodeValues.Remove(node);
-        }
+        internal abstract void ClearNodeValues();
 
-        internal virtual void ClearNodeValues() {
-            _nodeValues.Clear();
-        }
-
-        public AnalysisValue AnalysisValue {
-            get {
-                return _av;
-            }
-        }
-
-        public void ClearLinkedVariables() {
-            if (_linkedVariables != null) {
-                _linkedVariables.Clear();
-            }
-        }
-
-        internal HashSet<VariableDef> GetLinkedVariables(string saveName) {
-            if (_linkedVariables == null) {
-                _linkedVariables = new Dictionary<string, HashSet<VariableDef>>();
-            }
-            HashSet<VariableDef> links;
-            if (!_linkedVariables.TryGetValue(saveName, out links)) {
-                _linkedVariables[saveName] = links = new HashSet<VariableDef>();
-            }
-            return links;
-        }
-
-        internal HashSet<VariableDef> GetLinkedVariablesNoCreate(string saveName) {
-            HashSet<VariableDef> linkedVars;
-            if (_linkedVariables == null || !_linkedVariables.TryGetValue(saveName, out linkedVars)) {
-                return null;
-            }
-            return linkedVars;
-        }
-
+        /// <summary>
+        /// Gets the value associated with the specifed node, recursing through
+        /// outer environments if it's not defined locally.
+        /// </summary>
         internal bool TryGetNodeValue(Node node, out IAnalysisSet variable) {
             foreach (var s in EnumerateTowardsGlobal) {
-                if (s._nodeValues.TryGetValue(node, out variable)) {
+                if (s.TryGetLocalNodeValue(node, out variable)) {
                     return true;
                 }
             }
@@ -372,15 +249,11 @@ namespace Microsoft.NodejsTools.Analysis.Analyzer {
             return false;
         }
 
-        internal bool TryGetNodeScope(Node node, out EnvironmentRecord scope) {
-            foreach (var s in EnumerateTowardsGlobal) {
-                if (s._nodeScopes.TryGetValue(node, out scope)) {
-                    return true;
-                }
-            }
-            scope = null;
-            return false;
-        }
+        /// <summary>
+        /// Gets the value associated with the specifed node within the
+        /// this environment record.  Outer records are not searched.
+        /// </summary>
+        internal abstract bool TryGetLocalNodeValue(Node node, out IAnalysisSet variable);
 
         /// <summary>
         /// Cached node variables so that we don't continually create new entries for basic nodes such
@@ -393,6 +266,12 @@ namespace Microsoft.NodejsTools.Analysis.Analyzer {
                 AddNodeValue(node, result);
             }
             return result;
+        }
+
+        #endregion
+
+        public abstract AnalysisValue AnalysisValue {
+            get;
         }
     }
 }

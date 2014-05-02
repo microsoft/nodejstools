@@ -120,8 +120,8 @@ namespace Microsoft.NodejsTools.Analysis.Analyzer {
         /// Gets the function which we are processing code for currently or
         /// null if we are not inside of a function body.
         /// </summary>
-        public FunctionScope CurrentFunction {
-            get { return CurrentContainer<FunctionScope>(); }
+        public FunctionEnvironmentRecord CurrentFunction {
+            get { return CurrentContainer<FunctionEnvironmentRecord>(); }
         }
 
 #if FALSE
@@ -134,6 +134,10 @@ namespace Microsoft.NodejsTools.Analysis.Analyzer {
         }
 
         public override bool Walk(ExpressionStatement node) {
+            BinaryOperator binOp = node.Expression as BinaryOperator;
+            if (binOp != null && binOp.OperatorToken == JSToken.Assign) {
+                TryPushDefinitiveAssignmentEnvironment(node.Expression);
+            }
             _eval.Evaluate(node.Expression);
             return false;
         }
@@ -210,9 +214,9 @@ namespace Microsoft.NodejsTools.Analysis.Analyzer {
 
         public override bool Walk(FunctionObject node) {
             EnvironmentRecord funcScope;
-            if (_unit.Scope.TryGetNodeScope(node, out funcScope)) {
-                var function = ((FunctionScope)funcScope).Function;
-                var analysisUnit = (FunctionAnalysisUnit)((FunctionScope)funcScope).Function.AnalysisUnit;
+            if (_unit.Environment.TryGetNodeEnvironment(node, out funcScope)) {
+                var function = ((FunctionEnvironmentRecord)funcScope).Function;
+                var analysisUnit = (FunctionAnalysisUnit)((FunctionEnvironmentRecord)funcScope).Function.AnalysisUnit;
 #if FALSE
                 var curClass = Scope as ClassScope;
                 if (curClass != null) {
@@ -321,54 +325,20 @@ namespace Microsoft.NodejsTools.Analysis.Analyzer {
             return false;
         }
 
-#if FALSE
-        public override bool Walk(WithStatement node) {
-            foreach (var item in node.Items) {
-                var ctxMgr = _eval.Evaluate(item.ContextManager);
-                if (item.Variable != null) {
-                    _eval.AssignTo(node, item.Variable, ctxMgr);
-                }
-            }
-
-            return true;
-        }
-
-        public override bool Walk(PrintStatement node) {
-            foreach (var expr in node.Expressions) {
-                _eval.Evaluate(expr);
-            }
-            return false;
-        }
-
-        public override bool Walk(AssertStatement node) {
-            TryPushIsInstanceScope(node, node.Test);
-
-            _eval.EvaluateMaybeNull(node.Test);
-            _eval.EvaluateMaybeNull(node.Message);
-            return false;
-        }
-
-        private void TryPushIsInstanceScope(Node node, Expression test) {
-            InterpreterScope newScope;
-            if (Scope.TryGetNodeScope(node, out newScope)) {
-                var outerScope = Scope;
-                var isInstanceScope = (IsInstanceScope)newScope;
-
-                // magic assert isinstance statement alters the type information for a node
-                var namesAndExpressions = OverviewWalker.GetIsInstanceNamesAndExpressions(test);
-                foreach (var nameAndExpr in namesAndExpressions) {
-                    var name = nameAndExpr.Key;
-                    var type = nameAndExpr.Value;
-
-                    var typeObj = _eval.EvaluateMaybeNull(type);
-                    isInstanceScope.CreateTypedVariable(name, _unit, name.Name, typeObj);
-                }
-
+        private void TryPushDefinitiveAssignmentEnvironment(Node node) {
+            EnvironmentRecord newEnv;
+            if (Scope.TryGetNodeEnvironment(node, out newEnv)) {
                 // push the scope, it will be popped when we leave the current SuiteStatement.
-                Scope = newScope;
+                Scope = newEnv;
             }
         }
-#endif
+
+        public override bool Walk(BinaryOperator node) {
+            if (node.OperatorToken == JSToken.Assign) {
+                TryPushDefinitiveAssignmentEnvironment(node);
+            }
+            return base.Walk(node);
+        }
 
         public override bool Walk(Block node) {
             var prevSuite = _curSuite;

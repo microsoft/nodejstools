@@ -91,6 +91,82 @@ var x = new f().value;
             ); 
         }
 
+        [TestMethod]
+        public void TestDefinitiveAssignmentMerged() {
+            string code = @"
+if(true) {
+    y = 100;
+}else{
+    y = 'abc';
+}
+x = y;
+";
+            var analysis = ProcessText(code);
+            AssertUtil.ContainsExactly(
+                analysis.GetTypeIdsByIndex("x", code.Length),
+                BuiltinTypeId.Number,
+                BuiltinTypeId.String
+            );
+        }
+
+        [TestMethod]
+        public void TestDefinitiveAssignment() {
+            string code = @"
+a = 100;
+// int value
+a = 'abc';
+// string value
+";
+            var analysis = ProcessText(code);
+            AssertUtil.ContainsExactly(
+                analysis.GetTypeIdsByIndex("a", code.IndexOf("int value")),
+                BuiltinTypeId.Number
+            );
+            AssertUtil.ContainsExactly(
+                analysis.GetTypeIdsByIndex("a", code.IndexOf("string value")),
+                BuiltinTypeId.String
+            );
+        }
+
+        [TestMethod]
+        public void TestDefinitiveAssignmentNested() {
+            string code = @"
+a = 100;
+// a int value
+b = 200;
+// b int value
+a = 'abc';
+// a string value
+b = 'abc';
+// b string value
+";
+            var analysis = ProcessText(code);
+            AssertUtil.ContainsExactly(
+                analysis.GetTypeIdsByIndex("a", code.IndexOf("b int value")),
+                BuiltinTypeId.Number
+            );
+            AssertUtil.ContainsExactly(
+                analysis.GetTypeIdsByIndex("a", code.IndexOf("a int value")),
+                BuiltinTypeId.Number
+            );
+            AssertUtil.ContainsExactly(
+                analysis.GetTypeIdsByIndex("a", code.IndexOf("a string value")),
+                BuiltinTypeId.String
+            );
+            AssertUtil.ContainsExactly(
+                analysis.GetTypeIdsByIndex("b", code.IndexOf("b int value")),
+                BuiltinTypeId.Number
+            );
+            AssertUtil.ContainsExactly(
+                analysis.GetTypeIdsByIndex("b", code.IndexOf("b string value")),
+                BuiltinTypeId.String
+            );
+            AssertUtil.ContainsExactly(
+                analysis.GetTypeIdsByIndex("a", code.IndexOf("b string value")),
+                BuiltinTypeId.String
+            );
+        }
+
         /// <summary>
         /// Tests the internal [[Contruct]] method and makes sure
         /// we return the value if the function returns an object.
@@ -194,7 +270,7 @@ x = f.foo;
 ";
             var analysis = ProcessText(code);
             AssertUtil.ContainsExactly(
-                analysis.GetTypeIdsByIndex("x", 0),
+                analysis.GetTypeIdsByIndex("x", code.Length),
                 BuiltinTypeId.Number
             );
         }
@@ -209,7 +285,7 @@ x = f.abc;
 ";
             var analysis = ProcessText(code);
             AssertUtil.ContainsExactly(
-                analysis.GetTypeIdsByIndex("x", 0),
+                analysis.GetTypeIdsByIndex("x", code.Length),
                 BuiltinTypeId.Number
             );
         }
@@ -303,9 +379,10 @@ var x = abcdefg;
 
         [TestMethod]
         public void TestNumber() {
-            var analysis = ProcessText("x = 42;");
+            string code = "x = 42;";
+            var analysis = ProcessText(code);
             AssertUtil.ContainsExactly(
-                analysis.GetTypeIdsByIndex("x", 0),
+                analysis.GetTypeIdsByIndex("x", code.Length),
                 BuiltinTypeId.Number
             );
             /*
@@ -318,9 +395,10 @@ var x = abcdefg;
 
         [TestMethod]
         public void TestVariableLookup() {
-            var analysis = ProcessText("x = 42; y = x;");
+            string code = "x = 42; y = x;";
+            var analysis = ProcessText(code);
             AssertUtil.ContainsExactly(
-                analysis.GetTypeIdsByIndex("y", 0),
+                analysis.GetTypeIdsByIndex("y", code.Length),
                 BuiltinTypeId.Number
             );
         }
@@ -336,66 +414,75 @@ var x = abcdefg;
 
         [TestMethod]
         public void TestStringLiteral() {
-            var analysis = ProcessText("x = 'abc';");
+            string code = "x = 'abc';";
+            var analysis = ProcessText(code);
             AssertUtil.ContainsExactly(
-                analysis.GetTypeIdsByIndex("x", 0),
+                analysis.GetTypeIdsByIndex("x", code.Length),
                 BuiltinTypeId.String
             );
         }
 
         [TestMethod]
         public void TestArrayLiteral() {
-            var analysis = ProcessText("x = [1,2,3];");
+            string code = "x = [1,2,3];";
+            var analysis = ProcessText(code);
             AssertUtil.ContainsExactly(
-                analysis.GetTypeIdsByIndex("x[0]", 0),
+                analysis.GetTypeIdsByIndex("x[0]", code.Length),
                 BuiltinTypeId.Number
             );
         }
 
         [TestMethod]
         public void TestTrueFalse() {
-            var analysis = ProcessText("x = true;");
+            string code = "x = true;";
+            var analysis = ProcessText(code);
             AssertUtil.ContainsExactly(
-                analysis.GetTypeIdsByIndex("x", 0),
+                analysis.GetTypeIdsByIndex("x", code.Length),
                 BuiltinTypeId.Boolean
             );
 
-            analysis = ProcessText("x = false;");
+            code = "x = false;";
+            analysis = ProcessText(code);
             AssertUtil.ContainsExactly(
-                analysis.GetTypeIdsByIndex("x", 0),
+                analysis.GetTypeIdsByIndex("x", code.Length),
                 BuiltinTypeId.Boolean
             );
         }
 
         [TestMethod]
         public void TestObjectLiteral() {
-            var analysis = ProcessText("x = {abc:42};");
+            string code = "x = {abc:42};";
+            var analysis = ProcessText(code);
             AssertUtil.ContainsExactly(
-                analysis.GetTypeIdsByIndex("x.abc", 0),
+                analysis.GetTypeIdsByIndex("x.abc", code.Length),
                 BuiltinTypeId.Number
             );
 
-            analysis = ProcessText("x = {42:42};");
+            code = "x = {42:42};";
+            analysis = ProcessText(code);
             AssertUtil.ContainsExactly(
-                analysis.GetTypeIdsByIndex("x[42]", 0),
+                analysis.GetTypeIdsByIndex("x[42]", code.Length),
                 BuiltinTypeId.Number
             );
 
-            analysis = ProcessText("x = {abc:42};");
+            code = "x = {abc:42};";
+            analysis = ProcessText(code);
             AssertUtil.ContainsExactly(
-                analysis.GetTypeIdsByIndex("x['abc']", 0),
+                analysis.GetTypeIdsByIndex("x['abc']", code.Length),
                 BuiltinTypeId.Number
             );
 
-            analysis = ProcessText("x = {}; x['abc'] = 42;");
+            code = "x = {}; x['abc'] = 42;";
+            analysis = ProcessText(code);
             AssertUtil.ContainsExactly(
-                analysis.GetTypeIdsByIndex("x.abc", 0),
+                analysis.GetTypeIdsByIndex("x.abc", code.Length),
                 BuiltinTypeId.Number
             );
 
-            analysis = ProcessText("x = {abc:42};");
+            code = "x = {abc:42};";
+            analysis = ProcessText(code);
             AssertUtil.ContainsExactly(
-                analysis.GetTypeIdsByIndex("x[0, 'abc']", 0),
+                analysis.GetTypeIdsByIndex("x[0, 'abc']", code.Length),
                 BuiltinTypeId.Number
             );
         }
@@ -560,45 +647,49 @@ var y = x(42);");
 
         [TestMethod]
         public void TestNewFunction() {
-            var analysis = ProcessText("function y() { return 42; }\r\nx = new y();");
+            string code = "function y() { return 42; }\r\nx = new y();";
+            var analysis = ProcessText(code);
             AssertUtil.ContainsExactly(
-                analysis.GetTypeIdsByIndex("x", 0),
+                analysis.GetTypeIdsByIndex("x", code.Length),
                 BuiltinTypeId.Object
             );
 
-            analysis = ProcessText("function f() { this.abc = 42; }\r\nx = new f();");
+            code = "function f() { this.abc = 42; }\r\nx = new f();";
+            analysis = ProcessText(code);
             AssertUtil.ContainsExactly(
-                analysis.GetTypeIdsByIndex("x.abc", 0),
+                analysis.GetTypeIdsByIndex("x.abc", code.Length),
                 BuiltinTypeId.Number
             );
         }
 
         [TestMethod]
         public void TestNewFunctionInstanceVariable() {
-            var analysis = ProcessText("function f() { this.abc = 42; }\r\nx = new f();");
+            string code = "function f() { this.abc = 42; }\r\nx = new f();";
+            var analysis = ProcessText(code);
             AssertUtil.ContainsExactly(
-                analysis.GetTypeIdsByIndex("x.abc", 0),
+                analysis.GetTypeIdsByIndex("x.abc", code.Length),
                 BuiltinTypeId.Number
             );
 
-            analysis = ProcessText(@"
+            code = @"
 function x() { this.abc = 42; }
 function y() { this.abc = 'abc'; }
 abcx = new x();
-abcy = new y();");
+abcy = new y();";
+            analysis = ProcessText(code);
             AssertUtil.ContainsExactly(
-                analysis.GetTypeIdsByIndex("abcx.abc", 0),
+                analysis.GetTypeIdsByIndex("abcx.abc", code.Length),
                 BuiltinTypeId.Number
             );
             AssertUtil.ContainsExactly(
-                analysis.GetTypeIdsByIndex("abcy.abc", 0),
+                analysis.GetTypeIdsByIndex("abcy.abc", code.Length),
                 BuiltinTypeId.String
             );
         }
 
         [TestMethod]
         public void TestSimplePrototype() {
-            var analysis = ProcessText(@"
+            string code = @"
 function f() {
 }
 f.abc = 42;
@@ -608,18 +699,20 @@ function j() {
 j.prototype = f;
 
 x = new j();
-");
+";
+            var analysis = ProcessText(code);
             AssertUtil.ContainsExactly(
-                analysis.GetTypeIdsByIndex("x.abc", 0),
+                analysis.GetTypeIdsByIndex("x.abc", code.Length),
                 BuiltinTypeId.Number
             );
         }
 
         [TestMethod]
         public void TestTypeOf() {
-            var analysis = ProcessText("x = typeof 42;");
+            string code = "x = typeof 42;";
+            var analysis = ProcessText(code);
             AssertUtil.ContainsExactly(
-                analysis.GetTypeIdsByIndex("x", 0),
+                analysis.GetTypeIdsByIndex("x", code.Length),
                 BuiltinTypeId.String
             );
         }
@@ -669,7 +762,8 @@ x.bar = 42;
 
         [TestMethod]
         public void TestTypes() {
-            var analysis = ProcessText("x = {undefined:undefined, number:42, string:'str', null:null, boolean:true, function: function() {}, object: {}}");
+            string code = "x = {undefined:undefined, number:42, string:'str', null:null, boolean:true, function: function() {}, object: {}}";
+            var analysis = ProcessText(code);
             var testCases = new[] { 
                 new {Name="number", TypeId = BuiltinTypeId.Number},
                 new {Name="string", TypeId = BuiltinTypeId.String},
@@ -682,15 +776,15 @@ x.bar = 42;
 
             foreach (var testCase in testCases) {
                 AssertUtil.ContainsExactly(
-                    analysis.GetTypeIdsByIndex("x." + testCase.Name, 0),
+                    analysis.GetTypeIdsByIndex("x." + testCase.Name, code.Length),
                     testCase.TypeId
                 );
                 AssertUtil.ContainsExactly(
-                    analysis.GetTypeIdsByIndex("typeof x." + testCase.Name, 0),
+                    analysis.GetTypeIdsByIndex("typeof x." + testCase.Name, code.Length),
                     BuiltinTypeId.String
                 );
                 AssertUtil.ContainsExactly(
-                    analysis.GetTypeIdsByIndex("x[typeof x." + testCase.Name + "]", 0),
+                    analysis.GetTypeIdsByIndex("x[typeof x." + testCase.Name + "]", code.Length),
                     testCase.TypeId
                 );
             }

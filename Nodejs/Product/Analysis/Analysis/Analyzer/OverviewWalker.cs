@@ -36,7 +36,7 @@ namespace Microsoft.NodejsTools.Analysis.Analyzer {
             _entry = entry;
             _curUnit = topAnalysis;
 
-            _scope = topAnalysis.Scope;
+            _scope = topAnalysis.Environment;
         }
 
         public override bool Walk(FunctionExpression node) {
@@ -46,8 +46,8 @@ namespace Microsoft.NodejsTools.Analysis.Analyzer {
                 EnvironmentRecord funcScope;
                 VariableDef funcVarDef;
                 if (node.Function.Name != null &&
-                    _scope.TryGetNodeScope(node.Function, out funcScope) &&
-                    !funcScope.Variables.TryGetValue(node.Function.Name, out funcVarDef)) {
+                    _scope.TryGetNodeEnvironment(node.Function, out funcScope) &&
+                    !funcScope.TryGetVariable(node.Function.Name, out funcVarDef)) {
                     // the function variable gets added if it's not
                     // already declared.
                     var funcDef = funcScope.AddLocatedVariable(
@@ -57,7 +57,7 @@ namespace Microsoft.NodejsTools.Analysis.Analyzer {
                     );
                     funcDef.AddTypes(
                         _curUnit,
-                        ((FunctionScope)funcScope).Function
+                        ((FunctionEnvironmentRecord)funcScope).Function
                     );
                 }
                 PostWalk(node.Function);
@@ -74,8 +74,8 @@ namespace Microsoft.NodejsTools.Analysis.Analyzer {
             if (function != null) {
                 _analysisStack.Push(_curUnit);
                 _curUnit = function.AnalysisUnit;
-                Debug.Assert(_scope.EnumerateTowardsGlobal.Contains(function.AnalysisUnit.Scope.OuterScope));
-                _scope = function.AnalysisUnit.Scope;
+                Debug.Assert(_scope.EnumerateTowardsGlobal.Contains(function.AnalysisUnit.Environment.Parent));
+                _scope = function.AnalysisUnit.Environment;
                 return true;
             }
 
@@ -85,11 +85,11 @@ namespace Microsoft.NodejsTools.Analysis.Analyzer {
         public override void PostWalk(FunctionObject node)
         {
             if (node.Body != null) {
-                Debug.Assert(_scope.Node == node);
-                Debug.Assert(_scope.OuterScope.Node != node);
-                _scope = _scope.OuterScope;
+                Debug.Assert(_scope is DeclarativeEnvironmentRecord && ((DeclarativeEnvironmentRecord)_scope).Node == node);
+                Debug.Assert(!(_scope.Parent is DeclarativeEnvironmentRecord) || ((DeclarativeEnvironmentRecord)_scope.Parent).Node != node);
+                _scope = _scope.Parent;
                 _curUnit = _analysisStack.Pop();
-                Debug.Assert(_scope.EnumerateTowardsGlobal.Contains(_curUnit.Scope));
+                Debug.Assert(_scope.EnumerateTowardsGlobal.Contains(_curUnit.Environment));
             }
         }
 
@@ -99,7 +99,7 @@ namespace Microsoft.NodejsTools.Analysis.Analyzer {
 
             if (reference != null) {
                 var declNode = reference.Scope;
-                var declScope = _scope.EnumerateTowardsGlobal.FirstOrDefault(s => s.Node == declNode);
+                var declScope = _scope.EnumerateTowardsGlobal.FirstOrDefault(s => s is DeclarativeEnvironmentRecord && ((DeclarativeEnvironmentRecord)s).Node == declNode);
                 if (declScope != null) {
                     return declScope.CreateVariable(name, _curUnit, name.Name, false);
                 }
@@ -114,7 +114,7 @@ namespace Microsoft.NodejsTools.Analysis.Analyzer {
 
         internal static UserFunctionValue AddFunction(FunctionObject node, AnalysisUnit outerUnit, EnvironmentRecord prevScope, bool isExpression = false) {
             EnvironmentRecord scope;
-            if (!prevScope.TryGetNodeScope(node, out scope)) {
+            if (!prevScope.TryGetNodeEnvironment(node, out scope)) {
                 if (node.Body == null) {
                     return null;
                 }
@@ -140,10 +140,10 @@ namespace Microsoft.NodejsTools.Analysis.Analyzer {
                 }
 
                 var unit = func.AnalysisUnit;
-                scope = unit.Scope;
+                scope = unit.Environment;
 
                 prevScope.Children.Add(scope);
-                prevScope.AddNodeScope(node, scope);
+                prevScope.AddNodeEnvironment(node, scope);
 
                 if (!isExpression && node.Name != null) 
                 {
@@ -260,21 +260,21 @@ namespace Microsoft.NodejsTools.Analysis.Analyzer {
 #endif
 
         private void UpdateChildRanges(Node node) {
-            var declScope = _curUnit.Scope;
-            var prevScope = declScope.Children.LastOrDefault();
-            StatementScope prevStmtScope;
+            var declScope = _curUnit.Environment;
+            var prevScope = declScope.HasChildren ? declScope.Children.Last() : null;
+            StatementEnvironmentRecord prevStmtScope;
 #if FALSE
             IsInstanceScope prevInstanceScope;
 #endif
 
-            if ((prevStmtScope = prevScope as StatementScope) != null) {
+            if ((prevStmtScope = prevScope as StatementEnvironmentRecord) != null) {
                 prevStmtScope.EndIndex = node.EndIndex;
 #if FALSE
             } else if ((prevInstanceScope = prevScope as IsInstanceScope) != null) {
                 prevInstanceScope.EndIndex = node.EndIndex;
 #endif
             } else {
-                declScope.Children.Add(new StatementScope(node.StartIndex, declScope));
+                //declScope.Children.Add(new StatementEnvironmentRecord(node.StartIndex, declScope));
             }
         }
 
@@ -320,28 +320,20 @@ namespace Microsoft.NodejsTools.Analysis.Analyzer {
 #endif
         }
 
-#if FALSE
-        private void PushIsInstanceScope(Node node, KeyValuePair<Lookup, Expression>[] isInstanceNames, SuiteStatement effectiveSuite) {
-            InterpreterScope scope;
-            if (!_curUnit.Scope.TryGetNodeScope(node, out scope)) {
-                if (_scope is IsInstanceScope) {
-                    // Reuse the current scope
-                    _curUnit.Scope.AddNodeScope(node, _scope);
-                    return;
-                }
-
+        private void PushDefiniteAssignmentEnvironmentRecord(Node node, string name) {
+            EnvironmentRecord scope;
+            if (!_scope.TryGetNodeEnvironment(node, out scope)) {
                 // find our parent scope, it may not be just the last entry in _scopes
                 // because that can be a StatementScope and we would start a new range.
-                var declScope = _scope.EnumerateTowardsGlobal.FirstOrDefault(s => !(s is StatementScope));
+                var declScope = _scope;
 
-                scope = new IsInstanceScope(node.StartIndex, effectiveSuite, declScope);
-
+                scope = new DefinitiveAssignmentEnvironmentRecord(node.StartIndex, name, declScope);
+                
                 declScope.Children.Add(scope);
-                declScope.AddNodeScope(node, scope);
+                declScope.AddNodeEnvironment(node, scope);
                 _scope = scope;
             }
         }
-#endif
 
         public override bool Walk(VariableDeclaration node) {
             _scope.AddLocatedVariable(node.Name, node, _curUnit);
@@ -359,8 +351,19 @@ namespace Microsoft.NodejsTools.Analysis.Analyzer {
         {
             if (node.OperatorToken == JSToken.Assign) {
                 if (node.Operand1 is Lookup) {
+                    var declScope = _curUnit.Environment;
+                    var prevScope = declScope.HasChildren ? declScope.Children.Last() : null;
+                    StatementEnvironmentRecord prevStmtScope;
+                    if ((prevStmtScope = prevScope as StatementEnvironmentRecord) != null) {
+                        prevStmtScope.EndIndex = node.StartIndex;
+                    }
+
                     var nameExpr = node.Operand1 as Lookup;
+                    PushDefiniteAssignmentEnvironmentRecord(node, nameExpr.Name);
+
                     _scope.AddVariable(nameExpr.Name, CreateVariableInDeclaredScope(nameExpr));
+                } else {
+                    UpdateChildRanges(node);
                 }
             } else if (node.OperatorToken > JSToken.Assign && node.OperatorToken <= JSToken.LastAssign) {
                 UpdateChildRanges(node);
@@ -458,9 +461,14 @@ namespace Microsoft.NodejsTools.Analysis.Analyzer {
                 innerNode.Walk(this);
             }
             
-
             _curSuite = prevSuite;
-            _scope = prevScope;
+            while (_scope != prevScope) {
+                StatementEnvironmentRecord stmtRec = _scope as StatementEnvironmentRecord;
+                if (stmtRec != null) {
+                    stmtRec.EndIndex = node.EndIndex;
+                }
+                _scope = _scope.Parent;
+            }            
 #if FALSE
             // then check if we encountered an assert which added an isinstance scope.
             IsInstanceScope isInstanceScope = _scope as IsInstanceScope;
@@ -479,7 +487,7 @@ namespace Microsoft.NodejsTools.Analysis.Analyzer {
                 } else {
                     offset = lineNo < _entry.Tree._lineLocations.Length ? _entry.Tree._lineLocations[lineNo] : _entry.Tree._lineLocations[_entry.Tree._lineLocations.Length - 1];
                 }
-                var closingScope = new StatementScope(offset, declScope);
+                var closingScope = new StatementEnvironmentRecord(offset, declScope);
                 _scope = closingScope;
                 declScope.Children.Add(closingScope);
             }
@@ -488,9 +496,6 @@ namespace Microsoft.NodejsTools.Analysis.Analyzer {
         }
 
         public override void PostWalk(Block node) {
-            while (_scope is StatementScope) {
-                _scope = _scope.OuterScope;
-            }
             base.PostWalk(node);
         }
     }

@@ -165,7 +165,7 @@ namespace Microsoft.NodejsTools.Analysis {
             if (curTree != null) {
                 if (curTree.ModuleReference != null &&
                     curTree.ModuleReference.Module != null) {
-                    var moduleScope = curTree.ModuleReference.Module.Scope;
+                    var moduleScope = curTree.ModuleReference.Module.EnvironmentRecord;
                     return moduleScope.Module.GetMember(
                         node,
                         unit,

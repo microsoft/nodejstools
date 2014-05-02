@@ -51,7 +51,7 @@ namespace Microsoft.NodejsTools.Analysis {
             _cookie = cookie;
             _module = new ModuleValue(filePath, this);
             
-            _unit = new AnalysisUnit(_tree, _module.Scope);
+            _unit = new AnalysisUnit(_tree, _module.EnvironmentRecord);
             AnalysisLog.NewUnit(_unit);
         }
 
@@ -170,12 +170,14 @@ namespace Microsoft.NodejsTools.Analysis {
                 return;
             }
 
-            _unit = new AnalysisUnit(tree, _module.Scope);
+            _unit = new AnalysisUnit(tree, _module.EnvironmentRecord);
             AnalysisLog.NewUnit(_unit);
 
-            ModuleValue.Scope.Children.Clear();
-            ModuleValue.Scope.ClearNodeScopes();
-            ModuleValue.Scope.ClearNodeValues();
+            if (ModuleValue.EnvironmentRecord.HasChildren) {
+                ModuleValue.EnvironmentRecord.Children.Clear();
+            }
+            ModuleValue.EnvironmentRecord.ClearNodeEnvironments();
+            ModuleValue.EnvironmentRecord.ClearNodeValues();
 #if FALSE
             MyScope.ClearUnresolvedModules();
 #endif
@@ -196,7 +198,7 @@ namespace Microsoft.NodejsTools.Analysis {
             // publish the analysis now that it's complete
             _currentAnalysis = new ModuleAnalysis(
                 _unit, 
-                ((ModuleScope)_unit.Scope).CloneForPublish(),
+                ((ModuleEnvironmentRecord)_unit.Environment).CloneForPublish(),
                 cookie);
         }
 
@@ -207,10 +209,10 @@ namespace Microsoft.NodejsTools.Analysis {
             var exports = new ExportsValue(_filePath, this);
             module.Add("exports", exports);
 
-            ModuleValue.Scope.GetOrAddVariable("__dirname").AddTypes(this, dirName);
-            ModuleValue.Scope.GetOrAddVariable("__filename").AddTypes(this, filename);
-            ModuleValue.Scope.GetOrAddVariable("exports").AddTypes(this, exports);
-            ModuleValue.Scope.GetOrAddVariable("module").AddTypes(this, module);
+            ModuleValue.EnvironmentRecord.GetOrAddVariable("__dirname").AddTypes(this, dirName);
+            ModuleValue.EnvironmentRecord.GetOrAddVariable("__filename").AddTypes(this, filename);
+            ModuleValue.EnvironmentRecord.GetOrAddVariable("exports").AddTypes(this, exports);
+            ModuleValue.EnvironmentRecord.GetOrAddVariable("module").AddTypes(this, module);
         }
 
         public IGroupableAnalysisProject AnalysisGroup {
