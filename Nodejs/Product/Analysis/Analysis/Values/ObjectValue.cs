@@ -42,7 +42,7 @@ namespace Microsoft.NodejsTools.Analysis.Values {
             var res = base.GetAllMembers();
             if (_creator != null) {
                 PropertyDescriptor prototype;
-                if (_creator.InstanceAttributes.TryGetValue("prototype", out prototype) &&
+                if (_creator.Descriptors.TryGetValue("prototype", out prototype) &&
                     prototype.Values != null) {
                     foreach (var value in prototype.Values.TypesNoCopy) {
                         foreach (var kvp in value.GetAllMembers()) {
@@ -204,7 +204,7 @@ namespace Microsoft.NodejsTools.Analysis.Values {
 
             PropertyDescriptor prototype;
             if (_creator != null &&
-                _creator.InstanceAttributes.TryGetValue("prototype", out prototype) &&
+                _creator.Descriptors.TryGetValue("prototype", out prototype) &&
                 prototype.Values != null) {
                 foreach (var protoValue in prototype.Values.TypesNoCopy) {
                     var protoContainer = protoValue as IReferenceableContainer;
@@ -218,4 +218,5 @@ namespace Microsoft.NodejsTools.Analysis.Values {
             
         }
     }
+
 }

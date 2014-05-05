@@ -14,10 +14,7 @@
 
 using System;
 using System.Collections.Generic;
-using System.Diagnostics;
 using System.Linq;
-using System.Text;
-using Microsoft.NodejsTools.Analysis.Analyzer;
 using Microsoft.NodejsTools.Parsing;
 
 namespace Microsoft.NodejsTools.Analysis.Values {
@@ -27,7 +24,7 @@ namespace Microsoft.NodejsTools.Analysis.Values {
 
         internal FunctionValue(ProjectEntry projectEntry, bool createPrototype = true, string name = null)
             : base(projectEntry) {
-            _instance = new ObjectValue(ProjectEntry, this, description: "instance of " + Name ?? name);
+            _instance = new InstanceValue(ProjectEntry, this, description: "instance of " + Name ?? name);
             if (createPrototype) {
                 string description = null;
 #if DEBUG
@@ -42,7 +39,7 @@ namespace Microsoft.NodejsTools.Analysis.Values {
                     description = "prototype object of " + (Name ?? name);
                 }
 #endif
-                var prototype = new ObjectValue(ProjectEntry, description: description);
+                var prototype = new PrototypeValue(ProjectEntry, description: description);
                 Add("prototype", prototype);
                 prototype.Add("constructor", this);
             }

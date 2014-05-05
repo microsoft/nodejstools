@@ -14,7 +14,6 @@
 
 using System;
 using System.Collections.Generic;
-using System.Collections.ObjectModel;
 using System.Linq;
 using Microsoft.NodejsTools.Parsing;
 
@@ -46,6 +45,8 @@ namespace Microsoft.NodejsTools.Analysis.Values {
             Add("name", projectEntry.Analyzer.GetConstant(name));
             Add("arguments", projectEntry.Analyzer._nullInst);
             Add("caller", projectEntry.Analyzer._nullInst);
+
+            projectEntry.Analyzer.AnalysisValueCreated(typeof(BuiltinFunctionValue));
         }
 
         public override IEnumerable<OverloadResult> Overloads {

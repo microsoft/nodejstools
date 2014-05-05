@@ -20,6 +20,7 @@ namespace Microsoft.NodejsTools.Analysis.Values {
         public NumberValue(double p, JsAnalyzer javaScriptAnalyzer) {
             _value = p;
             _analyzer = javaScriptAnalyzer;
+            javaScriptAnalyzer.AnalysisValueCreated(typeof(NumberValue));
         }
 
         public override BuiltinTypeId TypeId {
@@ -42,6 +43,33 @@ namespace Microsoft.NodejsTools.Analysis.Values {
 
         public override AnalysisValue Prototype {
             get { return _analyzer._numberPrototype; }
+        }
+
+
+        internal override bool UnionEquals(AnalysisValue av, int strength) {
+            if (strength >= MergeStrength.ToBaseClass) {
+                return av is NumberValue;
+            }
+            return base.UnionEquals(av, strength);
+        }
+
+        internal override int UnionHashCode(int strength) {
+            if (strength >= MergeStrength.ToBaseClass) {
+                return _analyzer._numberPrototype.GetHashCode();
+            }
+            return base.UnionHashCode(strength);
+        }
+
+        internal override AnalysisValue UnionMergeTypes(AnalysisValue av, int strength) {
+            if (strength >= MergeStrength.ToBaseClass) {
+                return _analyzer._zeroIntValue;
+            }
+
+            return base.UnionMergeTypes(av, strength);
+        }
+
+        public override string ToString() {
+            return "number: " + _value;
         }
     }
 }

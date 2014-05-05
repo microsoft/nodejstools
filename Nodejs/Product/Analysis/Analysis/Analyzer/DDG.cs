@@ -345,12 +345,31 @@ namespace Microsoft.NodejsTools.Analysis.Analyzer {
             var prevScope = Scope;
 
             _curSuite = node;
-            for (int i = 0; i < node.Count; i++) {
-                node[i].Walk(this);
-            }
+            try {
+                for (int i = 0; i < node.Count; i++) {
+                    if (IsGwtCode(node, i)) {
+                        return false;
+                    }
 
-            Scope = prevScope;
-            _curSuite = prevSuite;
+                    node[i].Walk(this);
+                }
+            } finally {
+                Scope = prevScope;
+                _curSuite = prevSuite;
+            }
+            return false;
+        }
+
+        internal static bool IsGwtCode(Block node, int i) {
+            if (i == 0) {
+                var varDecl = node[i] as Declaration;
+                if (varDecl != null && varDecl.Count == 1) {
+                    if (varDecl[i].Name == "$gwt_version") {
+                        // this code is ugly, generated, and not analyzable...
+                        return true;
+                    }
+                }
+            }
             return false;
         }
 #if FALSE

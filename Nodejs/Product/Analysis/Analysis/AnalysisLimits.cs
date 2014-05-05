@@ -121,7 +121,7 @@ namespace Microsoft.NodejsTools.Analysis {
         public static readonly object CallDepthKey = new object();
 
         public AnalysisLimits() {
-            CallDepth = 3;
+            CallDepth = 2;
             DecreaseCallDepth = 30;
             NormalArgumentTypes = 50;
             ListArgumentTypes = 20;

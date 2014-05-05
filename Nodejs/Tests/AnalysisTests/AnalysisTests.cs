@@ -566,6 +566,56 @@ var x = g.abc;
         }
 
         [TestMethod]
+        public void TestCopySpecialization() {
+            var analysis = ProcessText(@"function copy (obj) {
+  var o = {}
+  Object.keys(obj).forEach(function (i) {
+    o[i] = obj[i]
+  })
+  return o
+}
+
+var x = {abc:42};
+var y = {abc:'abc'};
+var c1 = copy(x);
+var c2 = copy(y);
+var abc1 = c1.abc;
+var abc2 = c2.abc;
+");
+            AssertUtil.ContainsExactly(
+                analysis.GetTypeIdsByIndex("abc1", 0),
+                BuiltinTypeId.Number
+            );
+            AssertUtil.ContainsExactly(
+                analysis.GetTypeIdsByIndex("abc2", 0),
+                BuiltinTypeId.String
+            );
+        }
+
+        [TestMethod]
+        public void TestCreateSpecialization() {
+            var analysis = ProcessText(@"function F() {
+}
+
+create = function create(o) {
+    F.prototype = o;
+    return new F();
+}
+
+abc1 = create({abc:42}).abc
+abc2 = create({abc:'abc'}).abc
+");
+            AssertUtil.ContainsExactly(
+                analysis.GetTypeIdsByIndex("abc1", 0),
+                BuiltinTypeId.Number
+            );
+            AssertUtil.ContainsExactly(
+                analysis.GetTypeIdsByIndex("abc2", 0),
+                BuiltinTypeId.String
+            );
+        }
+
+        [TestMethod]
         public void TestFunctionParametersMultipleCallers() {
             var analysis = ProcessText(@"function f(a) {
     return a;

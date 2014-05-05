@@ -186,6 +186,7 @@
     <Compile Include="Analysis\ILocationResolver.cs" />
     <Compile Include="Analysis\IndexSpan.cs" />
     <Compile Include="Analysis\NodejsModuleBuilder.cs" />
+    <Compile Include="Analysis\Values\InstanceValue.cs" />
     <Compile Include="Analysis\Values\NonObjectValue.cs" />
     <Compile Include="Analysis\BuiltinTypeId.cs" />
     <Compile Include="Analysis\Values\ExpandoValue.cs" />
@@ -212,6 +213,8 @@
     <Compile Include="Analysis\SetOfTwo.cs" />
     <Compile Include="Analysis\SingleDict.cs" />
     <Compile Include="Analysis\SourceLocationResolver.cs" />
+    <Compile Include="Analysis\Values\ObjectLiteralValue.cs" />
+    <Compile Include="Analysis\Values\PrototypeValue.cs" />
     <Compile Include="Analysis\Values\SpecializedUserFunctionValue.cs" />
     <Compile Include="Analysis\Values\StringValue.cs" />
     <Compile Include="Analysis\Values\UndefinedValue.cs" />

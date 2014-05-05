@@ -22,36 +22,23 @@ namespace Microsoft.NodejsTools.Analysis.Values {
         public readonly IAnalysisSet[] Args;
 
         public ArgumentSet(IAnalysisSet[] args) {
-            this.Args = args;
+            Args = args;
         }
 
-        public IAnalysisSet SequenceArgs {
-            get {
-                return Args[Args.Length - 2];
-            }
-        }
-
-        public IAnalysisSet DictArgs {
-            get {
-                return Args[Args.Length - 1];
-            }
-        }
         public int Count {
             get {
-                return Args.Length - 2;
+                return Args.Length;
             }
         }
 
         public int CombinationCount {
             get {
-                return Args.Take(Count).Where(y => y.Count >= 2).Aggregate(1, (x, y) => x * y.Count);
+                return Args.Take(Count).Where(y => y.Count >= 0).Aggregate(1, (x, y) => x * y.Count);
             }
         }
 
         public override string ToString() {
-            return string.Join(", ", Args.Take(Count).Select(a => a.ToString())) +
-                (SequenceArgs.Any() ? ", *" + SequenceArgs.ToString() : "") +
-                (DictArgs.Any() ? ", **" + DictArgs.ToString() : "");
+            return string.Join(", ", Args.Take(Count).Select(a => a.ToString()));
         }
 
         public static bool AreCompatible(ArgumentSet x, ArgumentSet y) {
@@ -59,7 +46,6 @@ namespace Microsoft.NodejsTools.Analysis.Values {
         }
 
         public static ArgumentSet FromArgs(FunctionObject node, AnalysisUnit unit, IAnalysisSet[] args) {
-            int argCount = node.ParameterDeclarations.Count;
             var limits = unit.Analyzer.Limits;
             for (int i = 0; i < args.Length; i++) {
                 args[i] = ReduceArgs(args[i], limits.NormalArgumentTypes);

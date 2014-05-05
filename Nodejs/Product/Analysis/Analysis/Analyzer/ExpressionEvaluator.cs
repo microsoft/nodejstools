@@ -164,9 +164,6 @@ namespace Microsoft.NodejsTools.Analysis.Analyzer {
         }
 
         private static IAnalysisSet EvaluateArrayLiteral(ExpressionEvaluator ee, Node node) {
-            // Covers both ListExpression and TupleExpression
-            // TODO: We need to update the sequence on each re-evaluation, not just
-            // evaluate it once.
             return ee.MakeSequence(ee, node);
         }
 
@@ -207,25 +204,16 @@ namespace Microsoft.NodejsTools.Analysis.Analyzer {
         private static IAnalysisSet EvaluateObjectLiteral(ExpressionEvaluator ee, Node node) {
             var n = (ObjectLiteral)node;
             IAnalysisSet result = ee.Scope.GetOrMakeNodeValue(node, _ => {
-                var objectInfo = new ObjectValue(ee._unit.ProjectEntry);
+                var objectInfo = new ObjectLiteralValue(ee._unit.ProjectEntry, node);
                 result = objectInfo.SelfSet;
 
-                foreach (var x in n.Properties) {
-                    if (x.Name.Value is string) {
-                        objectInfo.SetMember(
-                            node,
-                            ee._unit,
-                            (string)x.Name.Value,
-                            ee.EvaluateMaybeNull(x.Value) ?? AnalysisSet.Empty
-                        );
-                    } else {
-                        // {42:42}
-                        objectInfo.SetIndex(
-                            node,
-                            ee._unit,
-                            ee.ProjectState.GetConstant(x.Name.Value) ?? AnalysisSet.Empty,
-                            ee.EvaluateMaybeNull(x.Value) ?? AnalysisSet.Empty
-                        );
+                if (n.Properties.Count > 30) {
+                    // probably some generated object literal, ignore it
+                    // for the post part.
+                    AssignProperty(ee, node, objectInfo, n.Properties.First());
+                } else {
+                    foreach (var x in n.Properties) {
+                        AssignProperty(ee, node, objectInfo, x);
                     }
                 }
 
@@ -234,14 +222,27 @@ namespace Microsoft.NodejsTools.Analysis.Analyzer {
             return result;
         }
 
+        private static void AssignProperty(ExpressionEvaluator ee, Node node, ObjectLiteralValue objectInfo, ObjectLiteralProperty x) {
+            if (x.Name.Value is string) {
+                objectInfo.SetMember(
+                    node,
+                    ee._unit,
+                    (string)x.Name.Value,
+                    ee.EvaluateMaybeNull(x.Value) ?? AnalysisSet.Empty
+                );
+            } else {
+                // {42:42}
+                objectInfo.SetIndex(
+                    node,
+                    ee._unit,
+                    ee.ProjectState.GetConstant(x.Name.Value) ?? AnalysisSet.Empty,
+                    ee.EvaluateMaybeNull(x.Value) ?? AnalysisSet.Empty
+                );
+            }
+        }
+
         private static IAnalysisSet EvaluateConstant(ExpressionEvaluator ee, Node node) {
             var n = (ConstantWrapper)node;
-#if FALSE
-            if (n.Value is double ||
-                (n.Value is int && ((int)n.Value) > 100)) {
-                return ee.ProjectState.GetAnalysisValueFromObjects(ee.ProjectState.GetTypeFromObject(n.Value)).GetInstanceType();
-            }
-#endif
 
             return ee.ProjectState.GetConstant(n.Value);
         }
@@ -331,9 +332,9 @@ namespace Microsoft.NodejsTools.Analysis.Analyzer {
                     }
                     return res;
                 case JSToken.Void:
-                    // TODO: Return undefined
-                    return AnalysisSet.Empty;
+                    return ee._unit.Analyzer._undefined;
             }
+
             return operand.UnaryOperation(node, ee._unit, n.OperatorToken);
         }
 
@@ -433,8 +434,13 @@ namespace Microsoft.NodejsTools.Analysis.Analyzer {
 
         private static IAnalysisSet EvaluateFunctionExpression(ExpressionEvaluator ee, Node node) {
             var func = (FunctionExpression)node;
-
-            return ee.Scope.GetOrMakeNodeValue(node, n => MakeLambdaFunction(func, ee));
+            EnvironmentRecord funcRec;
+            if (ee.Scope.TryGetNodeEnvironment(func.Function, out funcRec)) {
+                return funcRec.AnalysisValue.SelfSet;
+            }
+            Debug.Fail("Failed to find function record");
+            return AnalysisSet.Empty;
+            //return ee.Scope.GetOrMakeNodeValue(node, n => MakeLambdaFunction(func, ee));
         }
 
         private static IAnalysisSet MakeLambdaFunction(FunctionExpression node, ExpressionEvaluator ee) {
@@ -449,7 +455,6 @@ namespace Microsoft.NodejsTools.Analysis.Analyzer {
             var sequence = (ArrayValue)ee.Scope.GetOrMakeNodeValue(node, x => {
                 return new ArrayValue(
                     VariableDef.EmptyArray,
-                    //_unit.ProjectState.ClassInfos[BuiltinTypeId.Array],
                     _unit.ProjectEntry
                 ).SelfSet;
             });

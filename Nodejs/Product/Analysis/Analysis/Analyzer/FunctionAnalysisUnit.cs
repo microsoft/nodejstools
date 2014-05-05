@@ -33,7 +33,6 @@ namespace Microsoft.NodejsTools.Analysis.Analyzer {
 
         public readonly CallChain CallChain;
         private readonly AnalysisUnit _declUnit;
-        private readonly Dictionary<Node, Expression> _decoratorCalls;
 
         internal FunctionAnalysisUnit(
             UserFunctionValue function,
@@ -44,7 +43,6 @@ namespace Microsoft.NodejsTools.Analysis.Analyzer {
             : base(function.FunctionObject, null) {
             _declUnit = declUnit;
             Function = function;
-            _decoratorCalls = new Dictionary<Node, Expression>();
 
             var scope = new FunctionEnvironmentRecord(Function, Function.FunctionObject, declScope, declEntry);
             scope.EnsureParameters(this);

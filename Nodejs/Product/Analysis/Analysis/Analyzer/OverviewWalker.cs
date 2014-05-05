@@ -82,8 +82,7 @@ namespace Microsoft.NodejsTools.Analysis.Analyzer {
             return false;
         }
 
-        public override void PostWalk(FunctionObject node)
-        {
+        public override void PostWalk(FunctionObject node) {
             if (node.Body != null) {
                 Debug.Assert(_scope is DeclarativeEnvironmentRecord && ((DeclarativeEnvironmentRecord)_scope).Node == node);
                 Debug.Assert(!(_scope.Parent is DeclarativeEnvironmentRecord) || ((DeclarativeEnvironmentRecord)_scope.Parent).Node != node);
@@ -94,7 +93,6 @@ namespace Microsoft.NodejsTools.Analysis.Analyzer {
         }
 
         private VariableDef CreateVariableInDeclaredScope(Lookup name) {
-
             var reference = name.VariableField;
 
             if (reference != null) {
@@ -124,13 +122,14 @@ namespace Microsoft.NodejsTools.Analysis.Analyzer {
                 var funcName = node.Name ?? node.NameGuess;
                 if (funcName != null &&
                     _specializations.TryGetValue(funcName, out specialization)) {
-                    MatchState state = new MatchState();
+                    MatchState state = new MatchState(node);
                     if (specialization.Body.IsMatch(state, node.Body)) {
                         func = new SpecializedUserFunctionValue(
                             specialization.Specialization,
                             node,
                             outerUnit,
-                            prevScope
+                            prevScope,
+                            specialization.CallBase
                         );
                     }
                 }
@@ -157,122 +156,13 @@ namespace Microsoft.NodejsTools.Analysis.Analyzer {
             return scope.AnalysisValue as UserFunctionValue;
         }
 
-#if FALSE
-        public override bool Walk(GeneratorExpression node) {
-            EnsureComprehensionScope(node, MakeGeneratorComprehensionScope);
-            Debug.Assert(_scope is ComprehensionScope);
-
-            base.Visit(node);
-        }
-
-        public override void PostWalk(GeneratorExpression node) {
-            Debug.Assert(_scope is ComprehensionScope);
-            _scope = _scope.OuterScope;
-
-            base.PostWalk(node);
-        }
-
-        public override bool Walk(ListComprehension node) {
-            // List comprehension runs in a new scope in 3.x, runs in the same
-            // scope in 2.x.  But these don't get their own analysis units
-            // because they are still just expressions.
-            if (_curUnit.ProjectState.LanguageVersion.Is3x()) {
-                EnsureComprehensionScope(node, MakeListComprehensionScope);
-            }
-
-            base.Visit(node);
-        }
-
-        public override void PostWalk(ListComprehension node) {
-            if (_curUnit.ProjectState.LanguageVersion.Is3x()) {
-                Debug.Assert(_scope is ComprehensionScope);
-                _scope = _scope.OuterScope;
-            }
-            base.PostWalk(node);
-        }
-
-        public override bool Walk(SetComprehension node) {
-            EnsureComprehensionScope(node, MakeSetComprehensionScope);
-            Debug.Assert(_scope is ComprehensionScope);
-
-            base.Visit(node);
-        }
-
-        public override void PostWalk(SetComprehension node) {
-            Debug.Assert(_scope is ComprehensionScope);
-            _scope = _scope.OuterScope;
-
-            base.PostWalk(node);
-        }
-
-        public override bool Walk(DictionaryComprehension node) {
-            EnsureComprehensionScope(node, MakeDictComprehensionScope);
-            Debug.Assert(_scope is ComprehensionScope);
-
-            base.Visit(node);
-        }
-
-        public override void PostWalk(DictionaryComprehension node) {
-            Debug.Assert(_scope is ComprehensionScope);
-            _scope = _scope.OuterScope;
-
-            base.PostWalk(node);
-        }
-
-        /// <summary>
-        /// Makes sure we create a scope for a comprehension (generator, set, dict, or list comprehension in 3.x) where
-        /// the variables which are assigned will be stored.  
-        /// </summary>
-        private void EnsureComprehensionScope(Comprehension node, Func<Comprehension, ComprehensionScope> makeScope) {
-            InterpreterScope scope, declScope = _scope;
-            if (!declScope.TryGetNodeScope(node, out scope)) {
-                scope = makeScope(node);
-                
-                declScope.AddNodeScope(node, scope);
-                declScope.Children.Add(scope);
-            }
-            _scope = scope;
-        }
-
-        private ComprehensionScope MakeGeneratorComprehensionScope(Comprehension node) {
-            var unit = new GeneratorComprehensionAnalysisUnit(node, _entry.Tree, _curUnit, _scope);
-            unit.Enqueue();
-            return (ComprehensionScope)unit.Scope;
-        }
-
-        private ComprehensionScope MakeListComprehensionScope(Comprehension node) {
-            var unit = new ListComprehensionAnalysisUnit(node, _entry.Tree, _curUnit, _scope);
-            unit.Enqueue();
-            return (ComprehensionScope)unit.Scope;
-        }
-
-        private ComprehensionScope MakeSetComprehensionScope(Comprehension node) {
-            var unit = new SetComprehensionAnalysisUnit(node, _entry.Tree, _curUnit, _scope);
-            unit.Enqueue();
-            return (ComprehensionScope)unit.Scope;
-        }
-
-        private ComprehensionScope MakeDictComprehensionScope(Comprehension node) {
-            var unit = new DictionaryComprehensionAnalysisUnit(node, _entry.Tree, _curUnit, _scope);
-            unit.Enqueue();
-            return (ComprehensionScope)unit.Scope;
-        }
-#endif
-
         private void UpdateChildRanges(Node node) {
             var declScope = _curUnit.Environment;
             var prevScope = declScope.HasChildren ? declScope.Children.Last() : null;
             StatementEnvironmentRecord prevStmtScope;
-#if FALSE
-            IsInstanceScope prevInstanceScope;
-#endif
 
             if ((prevStmtScope = prevScope as StatementEnvironmentRecord) != null) {
                 prevStmtScope.EndIndex = node.EndIndex;
-#if FALSE
-            } else if ((prevInstanceScope = prevScope as IsInstanceScope) != null) {
-                prevInstanceScope.EndIndex = node.EndIndex;
-#endif
             } else {
                 //declScope.Children.Add(new StatementEnvironmentRecord(node.StartIndex, declScope));
             }
@@ -307,17 +197,6 @@ namespace Microsoft.NodejsTools.Analysis.Analyzer {
                     }
                 }
             }
-#if FALSE
-            AndExpression andExpr = node as AndExpression;
-            OrExpression orExpr = node as OrExpression;
-            if (andExpr != null) {
-                GetIsInstanceNamesAndExpressions(ref names, andExpr.Left);
-                GetIsInstanceNamesAndExpressions(ref names, andExpr.Right);
-            } else if (orExpr != null) {
-                GetIsInstanceNamesAndExpressions(ref names, orExpr.Left);
-                GetIsInstanceNamesAndExpressions(ref names, orExpr.Right);
-            }
-#endif
         }
 
         private void PushDefiniteAssignmentEnvironmentRecord(Node node, string name) {
@@ -388,32 +267,6 @@ namespace Microsoft.NodejsTools.Analysis.Analyzer {
 
         public override bool Walk(IfNode node) {
             UpdateChildRanges(node);
-#if FALSE
-            if (node.Tests != null) {
-                foreach (var test in node.Tests) {
-                    var isInstanceNames = GetIsInstanceNamesAndExpressions(test.Test);
-                    if (isInstanceNames != null) {
-                        if (test.Test != null) {
-                            test.Test.Walk(this);
-                        }
-
-                        if (test.Body != null && !(test.Body is ErrorStatement)) {
-                            Debug.Assert(test.Body is SuiteStatement);
-
-                            PushIsInstanceScope(test, isInstanceNames, (SuiteStatement)test.Body);
-
-                            test.Body.Walk(this);
-                        }
-                    } else {
-                        test.Walk(this);
-                    }
-                }
-            }
-            if (node.ElseStatement != null) {
-                node.ElseStatement.Walk(this);
-            }
-            return false;
-#endif
             return true;
         }
       
@@ -440,15 +293,6 @@ namespace Microsoft.NodejsTools.Analysis.Analyzer {
         public override bool Walk(WithNode node) {
             UpdateChildRanges(node);
             return base.Walk(node);
-#if FALSE
-            foreach (var item in node.Items) {
-                var assignTo = item.Variable as Lookup;
-                if (assignTo != null) {
-                    _scope.AddVariable(assignTo.Name, CreateVariableInDeclaredScope(assignTo));
-                }
-            }
-            base.Visit(node);
-#endif
         }
 
         public override bool Walk(Block node) {
@@ -456,42 +300,24 @@ namespace Microsoft.NodejsTools.Analysis.Analyzer {
             var prevSuite = _curSuite;
             _curSuite = node;
 
-            // recursively walk the statements in the suite
-            foreach (var innerNode in node.Children) {
-                innerNode.Walk(this);
-            }
-            
-            _curSuite = prevSuite;
-            while (_scope != prevScope) {
-                StatementEnvironmentRecord stmtRec = _scope as StatementEnvironmentRecord;
-                if (stmtRec != null) {
-                    stmtRec.EndIndex = node.EndIndex;
+            try {
+                // recursively walk the statements in the suite
+                for (int i = 0; i < node.Count; i++) {
+                    if (DDG.IsGwtCode(node, i)) {
+                        return false;
+                    }
+                    node[i].Walk(this);
                 }
-                _scope = _scope.Parent;
-            }            
-#if FALSE
-            // then check if we encountered an assert which added an isinstance scope.
-            IsInstanceScope isInstanceScope = _scope as IsInstanceScope;
-            if (isInstanceScope != null && isInstanceScope._effectiveSuite == node) {
-                // pop the isinstance scope
-                _scope = _scope.OuterScope;
-                var declScope = _curUnit.Scope;
-                // transform back into a line number and start the new statement scope on the line
-                // after the suite statement.
-                var lineNo = _entry.Tree.IndexToLocation(node.EndIndex).Line;
-
-                int offset;
-                if (_entry.Tree._lineLocations.Length == 0) {
-                    // single line input
-                    offset = 0;
-                } else {
-                    offset = lineNo < _entry.Tree._lineLocations.Length ? _entry.Tree._lineLocations[lineNo] : _entry.Tree._lineLocations[_entry.Tree._lineLocations.Length - 1];
+            } finally {
+                _curSuite = prevSuite;
+                while (_scope != prevScope) {
+                    StatementEnvironmentRecord stmtRec = _scope as StatementEnvironmentRecord;
+                    if (stmtRec != null) {
+                        stmtRec.EndIndex = node.EndIndex;
+                    }
+                    _scope = _scope.Parent;
                 }
-                var closingScope = new StatementEnvironmentRecord(offset, declScope);
-                _scope = closingScope;
-                declScope.Children.Add(closingScope);
             }
-#endif
             return false;
         }
 

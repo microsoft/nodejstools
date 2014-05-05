@@ -37,6 +37,7 @@ namespace Microsoft.NodejsTools.Analysis.Values {
                 (_callDepthLimit = (value as int?) ?? -1) < 0) {
                 _callDepthLimit = ProjectEntry.Analyzer.Limits.CallDepth;
             }
+            declUnit.Analyzer.AnalysisValueCreated(typeof(UserFunctionValue));
         }
 
         public FunctionObject FunctionObject {
@@ -71,7 +72,11 @@ namespace Microsoft.NodejsTools.Analysis.Values {
         }
 
         public override string ToString() {
-            return "FunctionInfo " + _analysisUnit.FullName + " (" + DeclaringVersion + ")";
+            return String.Format("UserFunction {0} {1}\r\n{2}", 
+                FunctionObject.Name,
+                FunctionObject.GetStart(ProjectEntry.Tree),
+                ProjectEntry.FilePath
+            );
         }
 
         public override string Description {
@@ -250,25 +255,26 @@ namespace Microsoft.NodejsTools.Analysis.Values {
                             res = res.Union(call.ReturnValue.TypesNoCopy);
                         }
                         return res;
-                    } else {
-                        _callsSinceLimitChange += 1;
-                        if (_callsSinceLimitChange >= ProjectState.Limits.DecreaseCallDepth && _callDepthLimit > 1) {
-                            _callDepthLimit -= 1;
-                            _callsSinceLimitChange = 0;
-                            AnalysisLog.ReduceCallDepth(this, _allCalls.Count, _callDepthLimit);
+                    } 
 
-                            _allCalls.Clear();
-                            chain = chain.Trim(_callDepthLimit);
-                        }
-                        calledUnit = new FunctionAnalysisUnit(
-                            (FunctionAnalysisUnit)AnalysisUnit, 
-                            chain, 
-                            @this,
-                            callArgs
-                        );
-                        _allCalls.Add(unit.ProjectEntry, chain, calledUnit);
-                        updateArguments = false;
+                    _callsSinceLimitChange += 1;
+                    if (_callsSinceLimitChange >= ProjectState.Limits.DecreaseCallDepth && 
+                        _callDepthLimit > 1) {
+                        _callDepthLimit -= 1;
+                        _callsSinceLimitChange = 0;
+                        AnalysisLog.ReduceCallDepth(this, _allCalls.Count, _callDepthLimit);
+
+                        _allCalls.Clear();
+                        chain = chain.Trim(_callDepthLimit);
                     }
+                    calledUnit = new FunctionAnalysisUnit(
+                        (FunctionAnalysisUnit)AnalysisUnit, 
+                        chain, 
+                        @this,
+                        callArgs
+                    );
+                    _allCalls.Add(unit.ProjectEntry, chain, calledUnit);
+                    updateArguments = false;
                 }
             }
 
@@ -342,6 +348,56 @@ namespace Microsoft.NodejsTools.Analysis.Values {
                 }
                 return hc;
             }
+        }
+
+
+        internal override bool UnionEquals(AnalysisValue av, int strength) {
+            if (strength >= MergeStrength.ToObject) {
+                var func = av as UserFunctionValue;
+                if (func != null) {
+                    return true;
+                }
+            }
+
+            if (strength >= MergeStrength.ToBaseClass) {
+                var func = av as UserFunctionValue;
+                if (func != null) {
+                    // two literals from the same node, these
+                    // literals were created by independent function
+                    // analysis, merge them together now.
+                    return func.FunctionObject == FunctionObject;
+                }
+            }
+            return base.UnionEquals(av, strength);
+        }
+
+        internal override int UnionHashCode(int strength) {
+            if (strength >= MergeStrength.ToObject) {
+                return ProjectState._functionPrototype.GetHashCode();
+            }
+
+            if (strength >= MergeStrength.ToBaseClass) {
+                return FunctionObject.GetHashCode();
+            }
+            return base.UnionHashCode(strength);
+        }
+
+        internal override AnalysisValue UnionMergeTypes(AnalysisValue av, int strength) {
+            if (strength >= MergeStrength.ToObject) {
+                var func = av as UserFunctionValue;
+                if (func != null) {
+                    return this;
+                }
+            }
+
+            if (strength >= MergeStrength.ToBaseClass) {
+                var func = av as UserFunctionValue;
+                if (func != null && func.FunctionObject == FunctionObject) {
+                    return this;
+                }
+            }
+
+            return base.UnionMergeTypes(av, strength);
         }
     }
 }

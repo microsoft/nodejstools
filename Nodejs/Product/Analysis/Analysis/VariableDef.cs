@@ -307,7 +307,6 @@ namespace Microsoft.NodejsTools.Analysis {
                     }
                 }
             }
-
             if (added && enqueue) {
                 EnqueueDependents();
             }

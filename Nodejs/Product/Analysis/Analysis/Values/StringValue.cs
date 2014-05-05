@@ -20,6 +20,7 @@ namespace Microsoft.NodejsTools.Analysis.Values {
         public StringValue(string value, JsAnalyzer javaScriptAnalyzer) {
             _value = value;
             _analyzer = javaScriptAnalyzer;
+            javaScriptAnalyzer.AnalysisValueCreated(typeof(StringValue));
         }
 
         public override string Description {
@@ -49,25 +50,29 @@ namespace Microsoft.NodejsTools.Analysis.Values {
         }
 
         internal override bool UnionEquals(AnalysisValue av, int strength) {
-            if (strength >= MergeStrength.ToObject) {
+            if (strength >= MergeStrength.ToBaseClass) {
                 return av is StringValue;
             }
             return base.UnionEquals(av, strength);
         }
 
         internal override int UnionHashCode(int strength) {
-            if (strength >= MergeStrength.ToObject) {
+            if (strength >= MergeStrength.ToBaseClass) {
                 return _analyzer._stringPrototype.GetHashCode();
             }
             return base.UnionHashCode(strength);
         }
 
         internal override AnalysisValue UnionMergeTypes(AnalysisValue av, int strength) {
-            if (strength >= MergeStrength.ToObject) {
+            if (strength >= MergeStrength.ToBaseClass) {
                 return _analyzer._emptyStringValue;
             }
 
             return base.UnionMergeTypes(av, strength);
+        }
+
+        public override string ToString() {
+            return "string: " + _value;
         }
     }
 }

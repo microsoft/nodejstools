@@ -15,11 +15,13 @@
 using System;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Diagnostics.Contracts;
 using System.IO;
 using System.Linq;
 using System.Reflection;
 using System.Security;
+using System.Text;
 using System.Threading;
 using Microsoft.NodejsTools.Analysis.Analyzer;
 using Microsoft.NodejsTools.Analysis.Values;
@@ -41,7 +43,7 @@ namespace Microsoft.NodejsTools.Analysis {
         internal readonly ObjectValue _globalObject;
         internal readonly FunctionValue _arrayFunction;
         internal readonly AnalysisValue _numberPrototype, _stringPrototype, _booleanPrototype, _functionPrototype;
-        internal readonly AnalysisValue _emptyStringValue;
+        internal readonly AnalysisValue _emptyStringValue, _zeroIntValue;
         private readonly Deque<AnalysisUnit> _queue;
         private Action<int> _reportQueueSize;
         private int _reportQueueInterval;
@@ -49,6 +51,9 @@ namespace Microsoft.NodejsTools.Analysis {
         private readonly HashSet<string> _analysisDirs = new HashSet<string>(StringComparer.OrdinalIgnoreCase);
         private AnalysisLimits _limits;
         private static object _nullKey = new object();
+#if DEBUG
+        private static Dictionary<object, int> _analysisCreationCount = new Dictionary<object, int>();
+#endif
 
         private const string AnalysisLimitsKey = @"Software\Microsoft\NodejsTools\" + AssemblyVersionInfo.VSVersion +
             @"\Analysis\Project";
@@ -78,6 +83,9 @@ namespace Microsoft.NodejsTools.Analysis {
             _falseInst = new BooleanValue(false, this);
             _undefined = new UndefinedValue();
 
+            _emptyStringValue = GetConstant("");
+            _zeroIntValue = GetConstant(0.0);
+
             var globals = GlobalBuilder.MakeGlobal(this);
             _globalObject = globals.GlobalObject;
             _numberPrototype = globals.NumberPrototype;
@@ -86,7 +94,6 @@ namespace Microsoft.NodejsTools.Analysis {
             _functionPrototype = globals.FunctionPrototype;
             _arrayFunction = globals.ArrayFunction;
 
-            _emptyStringValue = GetConstant("");
 
             var allJson = Path.Combine(
                 Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location),
@@ -564,7 +571,12 @@ namespace Microsoft.NodejsTools.Analysis {
 
             switch (Type.GetTypeCode(attr.GetType())) {
                 case TypeCode.Double:
-                    // TODO: What values should be cached?
+                    double dblValue = (double)attr;
+                    if(dblValue < -2 || dblValue > 100 ||
+                        (dblValue % 1.0) != 0) {
+                        Debug.Assert(_zeroIntValue != null);
+                        return _zeroIntValue;
+                    }
                     return GetCached(attr, () => new NumberValue((double)attr, this));
                 case TypeCode.Boolean:
                     if ((bool)attr) {
@@ -665,9 +677,41 @@ namespace Microsoft.NodejsTools.Analysis {
         /// Event fired when the analysis directories have changed.  
         /// 
         /// This event can be fired on any thread.
-        /// 
-        /// New in 1.1.
         /// </summary>
         public event EventHandler AnalysisDirectoriesChanged;
+
+        [Conditional("DEBUG")]
+        internal void AnalysisValueCreated(object key) {
+#if DEBUG
+            int count;
+            if (!_analysisCreationCount.TryGetValue(key, out count)) {
+                count = 0;
+            }
+            _analysisCreationCount[key] = count + 1;
+#endif
+        }
+
+#if DEBUG
+        public string GetAnalysisStats() {
+            int totalCount = 0;
+            foreach (var value in _analysisCreationCount.Values) {
+                totalCount += value;
+            }
+
+            StringBuilder res = new StringBuilder();
+            res.AppendFormat("Total: {0}", totalCount);
+            res.AppendLine();
+
+            var counts = new List<KeyValuePair<object, int>>(_analysisCreationCount);
+            counts.Sort((x, y) => x.Value - y.Value);
+            res.AppendLine("Stats: ");
+            foreach (var kvp in counts) {
+                res.AppendFormat("{0} - {1}", kvp.Value, kvp.Key);
+                res.AppendLine();
+            }
+
+            return res.ToString();
+        }
+#endif
     }
 }

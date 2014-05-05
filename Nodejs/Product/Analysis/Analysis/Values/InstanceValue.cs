@@ -13,30 +13,10 @@
  * ***************************************************************************/
 
 namespace Microsoft.NodejsTools.Analysis.Values {
-    class BooleanValue : NonObjectValue {
-        private readonly bool _value;
-        private readonly JsAnalyzer _analyzer;
-
-        public BooleanValue(bool value, JsAnalyzer javaScriptAnalyzer) {
-            _value = value;
-            _analyzer = javaScriptAnalyzer;
-            javaScriptAnalyzer.AnalysisValueCreated(typeof(BooleanValue));
-        }
-
-        public override BuiltinTypeId TypeId {
-            get {
-                return BuiltinTypeId.Boolean;
-            }
-        }
-
-        public override JsMemberType MemberType {
-            get {
-                return JsMemberType.Boolean;
-            }
-        }
-
-        public override AnalysisValue Prototype {
-            get { return _analyzer._booleanPrototype; }
+    class InstanceValue : ObjectValue {
+        public InstanceValue(ProjectEntry projectEntry, FunctionValue creator = null, string description = null)
+            : base(projectEntry, creator, description) {
+            projectEntry.Analyzer.AnalysisValueCreated(typeof(InstanceValue));
         }
     }
 }
