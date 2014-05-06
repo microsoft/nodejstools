@@ -282,7 +282,6 @@
     <Compile Include="Debugger\Communication\NetworkClientFactory.cs" />
     <Compile Include="Debugger\Communication\WebSocketNetworkClient.cs" />
     <Compile Include="Debugger\Communication\TcpNetworkClient.cs" />
-    <Compile Include="Debugger\Communication\WebSocketStream.cs" />
     <Compile Include="Debugger\ExceptionHitTreatment.cs" />
     <Compile Include="Debugger\ExceptionHandler.cs" />
     <Compile Include="Debugger\JavaScriptSourceMapInfo.cs" />
