@@ -449,7 +449,7 @@ sd.StringDecoder
                 using (var newProjDialog = app.FileNewProject()) {
                 newProjDialog.FocusLanguageNode("JavaScript");
 
-                var djangoApp = newProjDialog.ProjectTypes.FindItem("Blank Windows Azure Node.js Application");
+                var djangoApp = newProjDialog.ProjectTypes.FindItem("Blank Microsoft Azure Node.js Application");
                 djangoApp.Select();
                     newProjDialog.OK();
                 }

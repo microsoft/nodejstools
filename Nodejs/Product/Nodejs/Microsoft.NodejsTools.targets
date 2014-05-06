@@ -181,7 +181,7 @@
     Returns="@(TransformedFilenames)"
     >
     <Error 
-      Text="web.config not found in project, to create a project to deploy to Windows Azure you must create a Windows Azure Node.js project." 
+      Text="web.config not found in project, to create a project to deploy to Microsoft Azure you must create a Microsoft Azure Node.js project." 
       Condition="'@(_FoundWebConfig)' == ''"/>
 
     <ItemGroup>

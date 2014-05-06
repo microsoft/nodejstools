@@ -231,7 +231,7 @@
         <Strings>
           <ButtonText>Attach Debugger (&amp;node.js)</ButtonText>
           <MenuText>Attach Debugger (&amp;node.js)</MenuText>
-          <ToolTipText>Attach the node.js debugger to the remote Windows Azure site</ToolTipText>
+          <ToolTipText>Attach the node.js debugger to the remote Microsoft Azure site</ToolTipText>
           <CommandName>Attach node.js Debugger</CommandName>
         </Strings>
       </Button>
