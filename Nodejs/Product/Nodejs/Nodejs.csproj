@@ -999,20 +999,16 @@
   </ItemGroup>
   <ItemGroup>
     <Content Include="..\Icons\NodejsProject.ico">
-      <Link>Resources\Icons\NodejsProject.ico</Link>
+      <Link>NodejsProject.ico</Link>
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
       <IncludeInVSIX>true</IncludeInVSIX>
       <VSIXSubpath>.</VSIXSubpath>
     </Content>
-    <Content Include="..\Icons\NodejsToolsforVisualStudio.ico">
-      <Link>Resources\Icons\NodejsToolsforVisualStudio.ico</Link>
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-      <IncludeInVSIX>true</IncludeInVSIX>
-    </Content>
     <Content Include="..\Icons\NodejsProjectBig.ico">
-      <Link>Resources\Icons\NodejsProjectBig.ico</Link>
+      <Link>NodejsProjectBig.ico</Link>
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
       <IncludeInVSIX>true</IncludeInVSIX>
+      <VSIXSubpath>.</VSIXSubpath>
     </Content>
     <Resource Include="..\Icons\NodejsProjectBigResource.ico">
       <Link>Resources\Icons\NodejsProjectBigResource.ico</Link>
