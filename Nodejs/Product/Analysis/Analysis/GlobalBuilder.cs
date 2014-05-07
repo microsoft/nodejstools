@@ -199,29 +199,128 @@ All other strings are considered decimal.", isOptional:true)
             return new BuiltinFunctionValue(builtinEntry, "Array", createPrototype:false) { 
                 Member("prototype", 
                     new ObjectValue(builtinEntry) {
-                        BuiltinFunction("concat"),
+                        BuiltinFunction(
+                            "concat",
+                            "Combines two or more arrays.",
+                            Parameter("item"),
+                            Parameter("item...")
+                        ),
                         BuiltinFunction("constructor"),
-                        BuiltinFunction("every"),
-                        BuiltinFunction("filter"),
-                        SpecializedFunction("forEach", ArrayForEach),
-                        BuiltinFunction("indexOf"),
-                        BuiltinFunction("join"),
-                        BuiltinFunction("lastIndexOf"),
-                        BuiltinFunction("length"),
-                        BuiltinFunction("map"),
-                        BuiltinFunction("pop"),
-                        BuiltinFunction("push"),
-                        BuiltinFunction("reduce"),
-                        BuiltinFunction("reduceRight"),
-                        BuiltinFunction("reverse"),
-                        BuiltinFunction("shift"),
-                        BuiltinFunction("slice"),
-                        BuiltinFunction("some"),
-                        BuiltinFunction("sort"),
-                        BuiltinFunction("splice"),
+                        ReturningFunction(
+                            "every",
+                            _analyzer._trueInst,
+                            "Determines whether all the members of an array satisfy the specified test.",
+                            Parameter("callbackfn", "A function that accepts up to three arguments. The every method calls the callbackfn function for each element in array1 until the callbackfn returns false, or until the end of the array."),
+                            Parameter("thisArg", "An object to which the this keyword can refer in the callbackfn function. If thisArg is omitted, undefined is used as the this value.", isOptional:true)
+                        ),
+                        BuiltinFunction(
+                            "filter",
+                            "Returns the elements of an array that meet the condition specified in a callback function.",
+                            Parameter("callbackfn", "A function that accepts up to three arguments. The filter method calls the callbackfn function one time for each element in the array."),
+                            Parameter("thisArg", "An object to which the this keyword can refer in the callbackfn function. If thisArg is omitted, undefined is used as the this value.", isOptional:true)
+                        ),
+                        SpecializedFunction(
+                            "forEach", 
+                            ArrayForEach,
+                            "Performs the specified action for each element in an array.",
+                            Parameter("callbackfn", "A function that accepts up to three arguments. forEach calls the callbackfn function one time for each element in the array."),
+                            Parameter("thisArg", "An object to which the this keyword can refer in the callbackfn function. If thisArg is omitted, undefined is used as the this value.")
+                        ),
+                        ReturningFunction(
+                            "indexOf",
+                            _analyzer._zeroIntValue,
+                            "Returns the index of the first occurrence of a value in an array.",
+                            Parameter("searchElement", "The value to locate in the array."),
+                            Parameter("fromIndex", "The array index at which to begin the search. If fromIndex is omitted, the search starts at index 0.", isOptional: true)
+                        ),
+                        ReturningFunction(
+                            "join",
+                            _analyzer._emptyStringValue,
+                            "Adds all the elements of an array separated by the specified separator string.",
+                            Parameter("separator", "A string used to separate one element of an array from the next in the resulting String. If omitted, the array elements are separated with a comma.", isOptional: true)
+                        ),
+                        ReturningFunction(
+                            "lastIndexOf",
+                            _analyzer._zeroIntValue,
+                            "Returns the index of the last occurrence of a specified value in an array.",
+                            Parameter("searchElement", "The value to locate in the array."),
+                            Parameter("fromIndex", "The array index at which to begin the search. If fromIndex is omitted, the search starts at the last index in the array.", isOptional: true)
+                        ),
+                        BuiltinProperty(
+                            "length", 
+                            _analyzer._zeroIntValue,
+                            "Gets or sets the length of the array. This is a number one higher than the highest element defined in an array."
+                        ),
+                        BuiltinFunction(
+                            "map",
+                            "Calls a defined callback function on each element of an array, and returns an array that contains the results.",
+                            Parameter("callbackfn", "A function that accepts up to three arguments. The map method calls the callbackfn function one time for each element in the array."),
+                            Parameter("thisArg", "An object to which the this keyword can refer in the callbackfn function. If thisArg is omitted, undefined is used as the this value.")
+                        ),
+                        BuiltinFunction(
+                            "pop",
+                            "Removes the last element from an array and returns it"
+                        ),
+                        BuiltinFunction(
+                            "push",
+                            "Appends new elements to an array, and returns the new length of the array.",
+                            Parameter("item", "New element of the Array."),
+                            Parameter("item...",  "New element of the Array.", isOptional: true)
+                        ),
+                        BuiltinFunction(
+                            "reduce",
+                            "Calls the specified callback function for all the elements in an array. The return value of the callback function is the accumulated result, and is provided as an argument in the next call to the callback function.",
+                            Parameter("callbackfn", "A function that accepts up to four arguments. The reduce method calls the callbackfn function one time for each element in the array."),
+                            Parameter("initialValue", "If initialValue is specified, it is used as the initial value to start the accumulation. The first call to the callbackfn function provides this value as an argument instead of an array value.", isOptional: true)
+                        ),
+                        BuiltinFunction(
+                            "reduceRight",
+                            "Calls the specified callback function for all the elements in an array, in descending order. The return value of the callback function is the accumulated result, and is provided as an argument in the next call to the callback function.",
+                            Parameter("callbackfn", "A function that accepts up to four arguments. The reduceRight method calls the callbackfn function one time for each element in the array."),
+                            Parameter("initialValue", "If initialValue is specified, it is used as the initial value to start the accumulation. The first call to the callbackfn function provides this value as an argument instead of an array value.", isOptional: true)
+                        ),
+                        BuiltinFunction(
+                            "reverse", 
+                            "Reverses the elements in an Array."
+                        ),
+                        BuiltinFunction(
+                            "shift", 
+                            "Removes the first element from an array and returns it."
+                        ),
+                        BuiltinFunction(
+                            "slice",
+                            "Returns a section of an array.",
+                            Parameter("start", "The beginning of the specified portion of the array.", isOptional: true),
+                            Parameter("end", "end The end of the specified portion of the array.", isOptional: true)
+                        ),
+                        ReturningFunction(
+                            "some",
+                            _analyzer._trueInst,
+                            "Determines whether the specified callback function returns true for any element of an array.",
+                            Parameter("callbackfn", "A function that accepts up to three arguments. The some method calls the callbackfn function for each element in array1 until the callbackfn returns true, or until the end of the array."),
+                            Parameter("thisArg", "An object to which the this keyword can refer in the callbackfn function. If thisArg is omitted, undefined is used as the this value.", isOptional:true)
+                        ),
+                        BuiltinFunction(
+                            "sort",
+                            "Sorts an array.",
+                            Parameter("compareFn", "The function used to determine the order of the elements. If omitted, the elements are sorted in ascending, ASCII character order.")
+                        ),
+                        BuiltinFunction(
+                            "splice", 
+                            "Removes elements from an array and, if necessary, inserts new elements in their place, returning the deleted elements.",
+                            Parameter("start", "The zero-based location in the array from which to start removing elements.")
+                        ),
                         BuiltinFunction("toLocaleString"),
-                        ReturningFunction("toString", _analyzer._emptyStringValue),
-                        BuiltinFunction("unshift"),
+                        ReturningFunction(
+                            "toString", 
+                            _analyzer._emptyStringValue,
+                            "Returns a string representation of an array."
+                        ),
+                        BuiltinFunction(
+                            "unshift",
+                            "Inserts new elements at the start of an array.",
+                            Parameter("item...", "Element to insert at the start of the Array.")
+                        ),
                     }
                 ),
                 new ReturningFunctionValue(builtinEntry, "isArray", _analyzer._falseInst)
