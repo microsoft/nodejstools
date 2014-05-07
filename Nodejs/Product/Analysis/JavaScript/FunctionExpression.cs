@@ -25,6 +25,7 @@ namespace Microsoft.NodejsTools.Parsing
             {
                 _function = value;
                 _function.Parent = this;
+                _function.IsExpression = true;
             }
         }
 

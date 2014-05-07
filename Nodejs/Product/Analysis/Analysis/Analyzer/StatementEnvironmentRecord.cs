@@ -27,7 +27,7 @@ namespace Microsoft.NodejsTools.Analysis.Analyzer {
     /// records which do not forward all of their accesses to the
     /// outermost scope.
     /// </summary>
-    class StatementEnvironmentRecord : EnvironmentRecord {
+    abstract class StatementEnvironmentRecord : EnvironmentRecord {
         public int _startIndex, _endIndex;
 
         public StatementEnvironmentRecord(int index, EnvironmentRecord outerScope)
@@ -65,6 +65,10 @@ namespace Microsoft.NodejsTools.Analysis.Analyzer {
             get { return Parent.Variables; }
         }
 
+        public override IEnumerable<KeyValuePair<string, VariableDef>> LocalVariables {
+            get { return new KeyValuePair<string, VariableDef>[0]; }
+        }
+
         public override bool TryGetVariable(string name, out VariableDef variable) {
             return Parent.TryGetVariable(name, out variable);
         }
@@ -79,18 +83,6 @@ namespace Microsoft.NodejsTools.Analysis.Analyzer {
 
         public override VariableDef GetVariable(Node node, AnalysisUnit unit, string name, bool addRef = true) {
             return Parent.GetVariable(node, unit, name, addRef);
-        }
-
-        public override IEnumerable<KeyValuePair<string, VariableDef>> GetAllMergedVariables() {
-            return Parent.GetAllMergedVariables();
-        }
-
-        public override IEnumerable<VariableDef> GetMergedVariables(string name) {
-            return Parent.GetMergedVariables(name);
-        }
-
-        public override IAnalysisSet GetMergedVariableTypes(string name) {
-            return Parent.GetMergedVariableTypes(name);
         }
 
         public override VariableDef CreateVariable(Node node, AnalysisUnit unit, string name, bool addRef = true) {
@@ -131,42 +123,6 @@ namespace Microsoft.NodejsTools.Analysis.Analyzer {
 
         internal override HashSet<VariableDef> GetLinkedVariablesNoCreate(string saveName) {
             return Parent.GetLinkedVariablesNoCreate(saveName);
-        }
-
-        public override EnvironmentRecord AddNodeEnvironment(Node node, EnvironmentRecord scope) {
-            return Parent.AddNodeEnvironment(node, scope);
-        }
-
-        internal override bool RemoveNodeEnvironment(Node node) {
-            return Parent.RemoveNodeEnvironment(node);
-        }
-
-        internal override void ClearNodeEnvironments() {
-            Parent.ClearNodeEnvironments();
-        }
-
-        internal override bool TryGetLocalNodeEnvironment(Node node, out EnvironmentRecord scope) {
-            return Parent.TryGetLocalNodeEnvironment(node, out scope);
-        }
-
-        public override IEnumerable<KeyValuePair<Node, EnvironmentRecord>> NodeEnvironments {
-            get { return Parent.NodeEnvironments; }
-        }
-
-        public override IAnalysisSet AddNodeValue(Node node, IAnalysisSet variable) {
-            return Parent.AddNodeValue(node, variable);
-        }
-
-        internal override bool RemoveNodeValue(Node node) {
-            return Parent.RemoveNodeValue(node);
-        }
-
-        internal override void ClearNodeValues() {
-            Parent.ClearNodeValues();
-        }
-
-        internal override bool TryGetLocalNodeValue(Node node, out IAnalysisSet variable) {
-            return Parent.TryGetLocalNodeValue(node, out variable);
         }
     }
 }

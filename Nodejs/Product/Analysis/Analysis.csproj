@@ -153,6 +153,7 @@
     <Compile Include="Analysis\AnalysisValue.cs" />
     <Compile Include="Analysis\AnalysisVariable.cs" />
     <Compile Include="Analysis\Analyzer\AnalysisUnit.cs" />
+    <Compile Include="Analysis\Analyzer\CarteseanProductFunctionAnalysisUnit.cs" />
     <Compile Include="Analysis\Analyzer\DDG.cs" />
     <Compile Include="Analysis\Analyzer\DeclarativeEnvironmentRecord.cs" />
     <Compile Include="Analysis\Analyzer\DefinitiveAssignmentEnvironmentRecord.cs" />

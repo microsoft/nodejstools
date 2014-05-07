@@ -28,11 +28,9 @@ namespace Microsoft.NodejsTools.Analysis.Analyzer {
     /// if we take a dependency on something which later gets updated.
     /// </summary>
     class FunctionAnalysisUnit : AnalysisUnit {
-        private readonly FunctionAnalysisUnit _originalUnit;
         public readonly UserFunctionValue Function;
-
         public readonly CallChain CallChain;
-        private readonly AnalysisUnit _declUnit;
+        internal readonly AnalysisUnit _declUnit;
 
         internal FunctionAnalysisUnit(
             UserFunctionValue function,
@@ -44,42 +42,27 @@ namespace Microsoft.NodejsTools.Analysis.Analyzer {
             _declUnit = declUnit;
             Function = function;
 
-            var scope = new FunctionEnvironmentRecord(Function, Function.FunctionObject, declScope, declEntry);
+            var scope = new FunctionEnvironmentRecord(Function, this, Function.FunctionObject, declScope, declEntry);
             scope.EnsureParameters(this);
             _env = scope;
 
             AnalysisLog.NewUnit(this);
         }
 
-        public FunctionAnalysisUnit(FunctionAnalysisUnit originalUnit, CallChain callChain, IAnalysisSet @this, ArgumentSet callArgs)
-            : base(originalUnit.Ast, null) {
-            _originalUnit = originalUnit;
-            _declUnit = originalUnit._declUnit;
-            Function = originalUnit.Function;
+        internal FunctionAnalysisUnit(
+            UserFunctionValue function,
+            AnalysisUnit declUnit,
+            EnvironmentRecord declScope,
+            IJsProjectEntry declEntry,
+            EnvironmentRecord scope
+        )
+            : base(function.FunctionObject, null) {
+            _declUnit = declUnit;
+            Function = function;
 
-            CallChain = callChain;
-
-            var scope = new FunctionEnvironmentRecord(
-                Function,
-                Ast,
-                originalUnit.Environment.Parent,
-                originalUnit.DeclaringModuleEnvironment.ProjectEntry
-            );
-            scope.UpdateParameters(this, @this, callArgs, false, originalUnit.Environment as FunctionEnvironmentRecord);
             _env = scope;
 
-            var walker = new OverviewWalker(originalUnit.ProjectEntry, this);
-            if (Ast.Body != null) {
-                Ast.Body.Walk(walker);
-            }
-
             AnalysisLog.NewUnit(this);
-            Enqueue();
-        }
-
-        internal bool UpdateParameters(IAnalysisSet @this, ArgumentSet callArgs, bool enqueue = true) {
-            var defScope = _originalUnit != null ? _originalUnit.Environment as FunctionEnvironmentRecord : null;
-            return ((FunctionEnvironmentRecord)Environment).UpdateParameters(this, @this, callArgs, enqueue, defScope);
         }
 
         internal void AddNamedParameterReferences(AnalysisUnit caller, Lookup[] names) {
@@ -91,16 +74,11 @@ namespace Microsoft.NodejsTools.Analysis.Analyzer {
         }
 
         internal override void AnalyzeWorker(DDG ddg, CancellationToken cancel) {
-            // Resolve default parameters and decorators in the outer scope but
-            // continue to associate changes with this unit.
-            ddg.Scope = _declUnit.Environment;
-
             // Set the scope to within the function
             ddg.Scope = Environment;
 
             Ast.Body.Walk(ddg);
         }
-
 
         public new FunctionObject Ast {
             get {
@@ -110,16 +88,15 @@ namespace Microsoft.NodejsTools.Analysis.Analyzer {
 
         public VariableDef ReturnValue {
             get {
-                return ((FunctionEnvironmentRecord)Environment).ReturnValue;
+                return Function.ReturnValue;
             }
         }
 
         public override string ToString() {
-            return string.Format("{0}{1}({2})->{3}",
+            return string.Format("{0}({1})->{2}",
                 base.ToString(),
-                _originalUnit == null ? " def:" : "",
                 string.Join(", ", Ast.ParameterDeclarations.Select(p => Environment.GetVariable(p.Name).TypesNoCopy.ToString())),
-                ((FunctionEnvironmentRecord)Environment).ReturnValue.TypesNoCopy.ToString()
+                Function.ReturnValue.TypesNoCopy.ToString()
             );
         }
     }

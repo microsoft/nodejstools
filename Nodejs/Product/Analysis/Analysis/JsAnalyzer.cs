@@ -25,6 +25,7 @@ using System.Text;
 using System.Threading;
 using Microsoft.NodejsTools.Analysis.Analyzer;
 using Microsoft.NodejsTools.Analysis.Values;
+using Microsoft.NodejsTools.Parsing;
 using Microsoft.Win32;
 
 namespace Microsoft.NodejsTools.Analysis {
@@ -585,8 +586,14 @@ namespace Microsoft.NodejsTools.Analysis {
                         return _falseInst;
                     }
                 case TypeCode.String:
+                    var strValue = (string)attr;
+                    if (DontCacheString(strValue)) {
+                        Debug.Assert(_emptyStringValue != null);
+                        return _emptyStringValue;
+                    }
                     return GetCached(attr, () => new StringValue((string)attr, this));
             }
+
             if (attr == Parsing.Missing.Value) {
                 return _undefined;
             } else if(attr is Parsing.InvalidNumericErrorValue) {
@@ -595,17 +602,30 @@ namespace Microsoft.NodejsTools.Analysis {
 
             throw new InvalidOperationException(attr.GetType().Name);
         }
-#if FALSE
-        internal IDictionary<string, IAnalysisSet> GetAllMembers(IMemberContainer container, IModuleContext moduleContext) {
-            var names = container.GetMemberNames(moduleContext);
-            var result = new Dictionary<string, IAnalysisSet>();
-            foreach (var name in names) {
-                result[name] = GetAnalysisValueFromObjects(container.GetMember(moduleContext, name));
-            }
 
-            return result;
+        /// <summary>
+        /// We really only care about caching strings that are likely
+        /// to be identifiers.  Everything else we'll coalesce into the
+        /// empty string.
+        /// </summary>
+        private static bool DontCacheString(string strValue) {
+            if (strValue.Length > 100) {
+                return true;
+            }
+            for (int i = 0; i < strValue.Length; i++) {
+                char ch = strValue[i];
+                if (ch == '-' || ch == '.' || ch == '/' || ch == '\\') {
+                    // not valid identifiers, but likely to show up in
+                    // require string literals, so we still care about preserving
+                    // these strings.
+                    continue;
+                }
+                if (!JSScanner.IsValidIdentifierPart(strValue[i])) {
+                    return true;
+                }
+            }
+            return false;
         }
-#endif
 
         internal ModuleTable Modules {
             get { return _modules; }

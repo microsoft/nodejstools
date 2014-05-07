@@ -136,9 +136,17 @@ namespace Microsoft.NodejsTools.Analysis.Analyzer {
         public override bool Walk(ExpressionStatement node) {
             BinaryOperator binOp = node.Expression as BinaryOperator;
             if (binOp != null && binOp.OperatorToken == JSToken.Assign) {
-                TryPushDefinitiveAssignmentEnvironment(node.Expression);
+                EnvironmentRecord newEnv;
+                if (Scope.GlobalEnvironment.TryGetNodeEnvironment(node.Expression, out newEnv)) {
+                    var res = _eval.Evaluate(binOp.Operand2);                    
+                    Scope = newEnv;
+                    _eval.AssignTo(binOp, binOp.Operand1, res);
+                } else {
+                    _eval.Evaluate(node.Expression);
+                }
+            } else {
+                _eval.Evaluate(node.Expression);
             }
-            _eval.Evaluate(node.Expression);
             return false;
         }
 
@@ -213,27 +221,6 @@ namespace Microsoft.NodejsTools.Analysis.Analyzer {
 #endif
 
         public override bool Walk(FunctionObject node) {
-            EnvironmentRecord funcScope;
-            if (_unit.Environment.TryGetNodeEnvironment(node, out funcScope)) {
-                var function = ((FunctionEnvironmentRecord)funcScope).Function;
-                var analysisUnit = (FunctionAnalysisUnit)((FunctionEnvironmentRecord)funcScope).Function.AnalysisUnit;
-#if FALSE
-                var curClass = Scope as ClassScope;
-                if (curClass != null) {
-                    var bases = LookupBaseMethods(
-                        analysisUnit.Ast.Name,
-                        curClass.Class.Mro,
-                        analysisUnit.Ast,
-                        analysisUnit
-                    );
-                    foreach (var method in bases.OfType<BuiltinMethodInfo>()) {
-                        foreach (var overload in method.Function.Overloads) {
-                            function.UpdateDefaultParameters(_unit, overload.GetParameters());
-                        }
-                    }
-                }
-#endif
-            }
             return false;
         }
 
@@ -323,21 +310,6 @@ namespace Microsoft.NodejsTools.Analysis.Analyzer {
                 fnScope.AddReturnTypes(node, _unit, lookupRes);
             }
             return false;
-        }
-
-        private void TryPushDefinitiveAssignmentEnvironment(Node node) {
-            EnvironmentRecord newEnv;
-            if (Scope.TryGetNodeEnvironment(node, out newEnv)) {
-                // push the scope, it will be popped when we leave the current SuiteStatement.
-                Scope = newEnv;
-            }
-        }
-
-        public override bool Walk(BinaryOperator node) {
-            if (node.OperatorToken == JSToken.Assign) {
-                TryPushDefinitiveAssignmentEnvironment(node);
-            }
-            return base.Walk(node);
         }
 
         public override bool Walk(Block node) {

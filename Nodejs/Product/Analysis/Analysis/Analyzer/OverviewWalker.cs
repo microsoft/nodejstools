@@ -31,10 +31,12 @@ namespace Microsoft.NodejsTools.Analysis.Analyzer {
         private readonly Stack<AnalysisUnit> _analysisStack = new Stack<AnalysisUnit>();
         private AnalysisUnit _curUnit;
         private Block _curSuite;
+        private readonly bool _isNested;
 
-        public OverviewWalker(ProjectEntry entry, AnalysisUnit topAnalysis) {
+        public OverviewWalker(ProjectEntry entry, AnalysisUnit topAnalysis, bool isNested = false) {
             _entry = entry;
             _curUnit = topAnalysis;
+            _isNested = isNested;
 
             _scope = topAnalysis.Environment;
         }
@@ -46,13 +48,13 @@ namespace Microsoft.NodejsTools.Analysis.Analyzer {
                 EnvironmentRecord funcScope;
                 VariableDef funcVarDef;
                 if (node.Function.Name != null &&
-                    _scope.TryGetNodeEnvironment(node.Function, out funcScope) &&
+                    _scope.GlobalEnvironment.TryGetNodeEnvironment(node.Function, out funcScope) &&
                     !funcScope.TryGetVariable(node.Function.Name, out funcVarDef)) {
                     // the function variable gets added if it's not
                     // already declared.
                     var funcDef = funcScope.AddLocatedVariable(
                         node.Function.Name,
-                        node,
+                        node.Function,
                         _curUnit
                     );
                     funcDef.AddTypes(
@@ -70,12 +72,12 @@ namespace Microsoft.NodejsTools.Analysis.Analyzer {
         }
 
         private bool WalkFunction(FunctionObject node, bool isExpression) {
-            var function = AddFunction(node, _curUnit, isExpression);
-            if (function != null) {
+            var functionAnalysis = AddFunction(node, _curUnit, isExpression);
+            if (functionAnalysis != null) {
                 _analysisStack.Push(_curUnit);
-                _curUnit = function.AnalysisUnit;
-                Debug.Assert(_scope.EnumerateTowardsGlobal.Contains(function.AnalysisUnit.Environment.Parent));
-                _scope = function.AnalysisUnit.Environment;
+                _curUnit = functionAnalysis;
+                Debug.Assert(_scope.EnumerateTowardsGlobal.Contains(functionAnalysis.Environment.Parent));
+                _scope = functionAnalysis.Environment;
                 return true;
             }
 
@@ -106,54 +108,76 @@ namespace Microsoft.NodejsTools.Analysis.Analyzer {
             return _scope.CreateVariable(name, _curUnit, name.Name, false);
         }
 
-        internal UserFunctionValue AddFunction(FunctionObject node, AnalysisUnit outerUnit, bool isExpression = false) {
-            return AddFunction(node, outerUnit, _scope, isExpression);
-        }
-
-        internal static UserFunctionValue AddFunction(FunctionObject node, AnalysisUnit outerUnit, EnvironmentRecord prevScope, bool isExpression = false) {
+        internal FunctionAnalysisUnit AddFunction(FunctionObject node, AnalysisUnit outerUnit, bool isExpression = false) {
             EnvironmentRecord scope;
-            if (!prevScope.TryGetNodeEnvironment(node, out scope)) {
+            if (!_scope.GlobalEnvironment.TryGetNodeEnvironment(node, out scope)) {
                 if (node.Body == null) {
                     return null;
                 }
 
+                IAnalysisSet functionObj;
                 UserFunctionValue func = null;
-                FunctionSpecialization specialization;
-                var funcName = node.Name ?? node.NameGuess;
-                if (funcName != null &&
-                    _specializations.TryGetValue(funcName, out specialization)) {
-                    MatchState state = new MatchState(node);
-                    if (specialization.Body.IsMatch(state, node.Body)) {
-                        func = new SpecializedUserFunctionValue(
-                            specialization.Specialization,
-                            node,
-                            outerUnit,
-                            prevScope,
-                            specialization.CallBase
-                        );
-                    }
+                if (!_scope.GlobalEnvironment.TryGetNodeValue(node, out functionObj)) {
+                    func = CreateUserFunction(node, outerUnit);
+                } else {
+                    func = (UserFunctionValue)functionObj;
                 }
 
-                if (func == null) {
-                    func = new UserFunctionValue(node, outerUnit, prevScope);
+                var funcScope = GetFunctionEnvironment(func);
+                scope = funcScope;
+                
+                VariableDef[] parameters = new VariableDef[node.ParameterDeclarations.Count];
+                for (int i = 0; i < parameters.Length; i++) {
+                    parameters[i] = funcScope.AddLocatedVariable(
+                        node.ParameterDeclarations[i].Name,
+                        node.ParameterDeclarations[i],
+                        _curUnit.ProjectEntry
+                    );
                 }
 
-                var unit = func.AnalysisUnit;
-                scope = unit.Environment;
+                _scope.Children.Add(scope);
+                _scope.GlobalEnvironment.AddNodeEnvironment(node, scope);
 
-                prevScope.Children.Add(scope);
-                prevScope.AddNodeEnvironment(node, scope);
-
-                if (!isExpression && node.Name != null) 
-                {
+                if (!isExpression && node.Name != null) {
                     // lambdas don't have their names published
-                    var funcVar = prevScope.AddLocatedVariable(node.Name, node, unit);
-                    funcVar.AddTypes(unit, func.SelfSet);
+                    var funcVar = _scope.AddLocatedVariable(node.Name, node, funcScope.AnalysisUnit);
+                    funcVar.AddTypes(funcScope.AnalysisUnit, func.SelfSet);
                 }
 
-                unit.Enqueue();
+                funcScope.AnalysisUnit.Enqueue();
             }
-            return scope.AnalysisValue as UserFunctionValue;
+
+            return ((FunctionEnvironmentRecord)scope).AnalysisUnit;
+        }
+
+        protected virtual FunctionEnvironmentRecord GetFunctionEnvironment(UserFunctionValue function) {
+            return (FunctionEnvironmentRecord)function.AnalysisUnit.Environment;
+        }
+
+        private UserFunctionValue CreateUserFunction(FunctionObject node, AnalysisUnit outerUnit) {
+            UserFunctionValue func = null;
+            FunctionSpecialization specialization;
+            var funcName = node.Name ?? node.NameGuess;
+            if (funcName != null &&
+                _specializations.TryGetValue(funcName, out specialization)) {
+                MatchState state = new MatchState(node);
+                if (specialization.Body.IsMatch(state, node.Body)) {
+                    func = new SpecializedUserFunctionValue(
+                        specialization.Specialization,
+                        node,
+                        outerUnit,
+                        _scope,
+                        specialization.CallBase
+                    );
+                }
+            }
+
+            if (func == null) {
+                func = new UserFunctionValue(node, outerUnit, _scope, _isNested);
+            }
+
+            _scope.GlobalEnvironment.AddNodeValue(node, func);
+            return func;
         }
 
         private void UpdateChildRanges(Node node) {
@@ -201,15 +225,15 @@ namespace Microsoft.NodejsTools.Analysis.Analyzer {
 
         private void PushDefiniteAssignmentEnvironmentRecord(Node node, string name) {
             EnvironmentRecord scope;
-            if (!_scope.TryGetNodeEnvironment(node, out scope)) {
+            if (!_scope.GlobalEnvironment.TryGetNodeEnvironment(node, out scope)) {
                 // find our parent scope, it may not be just the last entry in _scopes
                 // because that can be a StatementScope and we would start a new range.
                 var declScope = _scope;
 
-                scope = new DefinitiveAssignmentEnvironmentRecord(node.StartIndex, name, declScope);
+                scope = new DefinitiveAssignmentEnvironmentRecord(node.EndIndex, name, declScope);
                 
                 declScope.Children.Add(scope);
-                declScope.AddNodeEnvironment(node, scope);
+                declScope.GlobalEnvironment.AddNodeEnvironment(node, scope);
                 _scope = scope;
             }
         }

@@ -14,6 +14,7 @@
 
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Linq;
 using System.Text;
 using Microsoft.NodejsTools.Parsing;
@@ -29,8 +30,6 @@ namespace Microsoft.NodejsTools.Analysis.Analyzer {
     /// are associated with their analysis.
     /// </summary>
     abstract class DeclarativeEnvironmentRecord : EnvironmentRecord {
-        private readonly Dictionary<Node, EnvironmentRecord> _nodeScopes;
-        private readonly Dictionary<Node, IAnalysisSet> _nodeValues;
         private readonly Dictionary<string, VariableDef> _variables;
         private Dictionary<string, HashSet<VariableDef>> _linkedVariables;
         private readonly Node _node;
@@ -38,8 +37,6 @@ namespace Microsoft.NodejsTools.Analysis.Analyzer {
         public DeclarativeEnvironmentRecord(Node ast, EnvironmentRecord outerScope)
             : base(outerScope) {
             _node = ast;
-            _nodeScopes = new Dictionary<Node, EnvironmentRecord>();
-            _nodeValues = new Dictionary<Node, IAnalysisSet>();
             _variables = new Dictionary<string, VariableDef>();
         }
         
@@ -48,8 +45,6 @@ namespace Microsoft.NodejsTools.Analysis.Analyzer {
 
         protected DeclarativeEnvironmentRecord(DeclarativeEnvironmentRecord cloned, bool isCloned)
             : base(cloned, isCloned) {
-            _nodeScopes = cloned._nodeScopes;
-            _nodeValues = cloned._nodeValues;
             _variables = cloned._variables;
             if (cloned._linkedVariables == null) {
                 // linkedVariables could be created later, and we need to share them if it.
@@ -95,6 +90,12 @@ namespace Microsoft.NodejsTools.Analysis.Analyzer {
 
         #region Variable Access
 
+        public sealed override IEnumerable<KeyValuePair<string, VariableDef>> LocalVariables {
+            get {
+                return _variables;
+            }
+        }
+
         public sealed override IEnumerable<KeyValuePair<string, VariableDef>> Variables {
             get {
                 return _variables;
@@ -106,6 +107,7 @@ namespace Microsoft.NodejsTools.Analysis.Analyzer {
         }
 
         public sealed override VariableDef GetVariable(string name) {
+            Debug.Assert(_variables.ContainsKey(name));
             return _variables[name];
         }
 
@@ -122,26 +124,6 @@ namespace Microsoft.NodejsTools.Analysis.Analyzer {
                 return res;
             }
             return null;
-        }
-
-        public override IEnumerable<KeyValuePair<string, VariableDef>> GetAllMergedVariables() {
-            return _variables;
-        }
-
-        public override IEnumerable<VariableDef> GetMergedVariables(string name) {
-            VariableDef res;
-            if (_variables.TryGetValue(name, out res)) {
-                yield return res;
-            }
-        }
-
-        public override IAnalysisSet GetMergedVariableTypes(string name) {
-            var res = AnalysisSet.Empty;
-            foreach (var val in GetMergedVariables(name)) {
-                res = res.Union(val.Types);
-            }
-
-            return res;
         }
 
         public sealed override VariableDef CreateVariable(Node node, AnalysisUnit unit, string name, bool addRef = true) {
@@ -180,6 +162,10 @@ namespace Microsoft.NodejsTools.Analysis.Analyzer {
 
         internal sealed override bool RemoveVariable(string name) {
             return _variables.Remove(name);
+        }
+
+        internal sealed override void ReplaceVariable(string name, VariableDef def) {
+            _variables[name] = def;
         }
 
         internal sealed override bool RemoveVariable(string name, out VariableDef value) {
@@ -221,50 +207,5 @@ namespace Microsoft.NodejsTools.Analysis.Analyzer {
 
         #endregion
 
-        #region Node Environments
-
-        public sealed override IEnumerable<KeyValuePair<Node, EnvironmentRecord>> NodeEnvironments {
-            get {
-                return _nodeScopes;
-            }
-        }
-
-        internal sealed override bool TryGetLocalNodeEnvironment(Node node, out EnvironmentRecord scope) {
-            return _nodeScopes.TryGetValue(node, out scope);
-        }
-
-        public sealed override EnvironmentRecord AddNodeEnvironment(Node node, EnvironmentRecord scope) {
-            return _nodeScopes[node] = scope;
-        }
-
-        internal sealed override bool RemoveNodeEnvironment(Node node) {
-            return _nodeScopes.Remove(node);
-        }
-
-        internal sealed override void ClearNodeEnvironments() {
-            _nodeScopes.Clear();
-        }
-
-        #endregion
-
-        #region Node Values
-
-        public sealed override IAnalysisSet AddNodeValue(Node node, IAnalysisSet variable) {
-            return _nodeValues[node] = variable;
-        }
-
-        internal sealed override bool RemoveNodeValue(Node node) {
-            return _nodeValues.Remove(node);
-        }
-
-        internal sealed override void ClearNodeValues() {
-            _nodeValues.Clear();
-        }
-
-        internal sealed override bool TryGetLocalNodeValue(Node node, out IAnalysisSet variable) {
-            return _nodeValues.TryGetValue(node, out variable);
-        }
-
-        #endregion
     }
 }

@@ -22,20 +22,21 @@ using Microsoft.NodejsTools.Parsing;
 namespace Microsoft.NodejsTools.Analysis.Analyzer {
     sealed class FunctionEnvironmentRecord : DeclarativeEnvironmentRecord {
         private readonly UserFunctionValue _function;
-        public readonly VariableDef ReturnValue;
-        private readonly VariableDef _this;
+        internal VariableDef _this;
+        public readonly FunctionAnalysisUnit AnalysisUnit;
         //public readonly GeneratorInfo Generator;
 
         public FunctionEnvironmentRecord(
             UserFunctionValue function,
+            FunctionAnalysisUnit analysisUnit,
             Node node,
             EnvironmentRecord declScope,
             IJsProjectEntry declModule
         )
             : base(node, declScope) {
             _function = function;
-            ReturnValue = new VariableDef();
             _this = new VariableDef();
+            AnalysisUnit = analysisUnit;
 #if FALSE
             if (Function.FunctionObject.IsGenerator) {
                 Generator = new GeneratorInfo(function.ProjectState, declModule);
@@ -56,45 +57,7 @@ namespace Microsoft.NodejsTools.Analysis.Analyzer {
 
         public override IAnalysisSet MergedThisValue {
             get {
-                IAnalysisSet res = AnalysisSet.Empty;
-                FunctionEnvironmentRecord fnEnv;
-
-                var nodes = new HashSet<Node>();
-                var seen = new HashSet<EnvironmentRecord>();
-                var queue = new Queue<FunctionEnvironmentRecord>();
-                queue.Enqueue(this);
-
-                while (queue.Any()) {
-                    var env = queue.Dequeue();
-                    if (env == null || !seen.Add(env)) {
-                        continue;
-                    }
-
-                    if (env.Node == Node) {
-                        res = res.Union(env.ThisValue);
-                    }
-
-                    if (env.Function._allCalls != null) {
-                        foreach (var callUnit in env.Function._allCalls.Values) {
-                            fnEnv = callUnit.Environment as FunctionEnvironmentRecord;
-                            if (fnEnv != null && fnEnv != this) {
-                                queue.Enqueue(fnEnv);
-                            }
-                        }
-                    }
-
-                    foreach (var keyValue in env.NodeEnvironments.Where(kv => nodes.Contains(kv.Key))) {
-                        if ((fnEnv = keyValue.Value as FunctionEnvironmentRecord) != null) {
-                            queue.Enqueue(fnEnv);
-                        }
-                    }
-
-                    if ((fnEnv = env.Parent as FunctionEnvironmentRecord) != null) {
-                        nodes.Add(env.Node);
-                        queue.Enqueue(fnEnv);
-                    }
-                }
-                return res;
+                return ThisValue;
             }
         }
 
@@ -105,8 +68,8 @@ namespace Microsoft.NodejsTools.Analysis.Analyzer {
             } else 
 #endif
             {
-                ReturnValue.MakeUnionStrongerIfMoreThan(unit.Analyzer.Limits.ReturnTypes, types);
-                ReturnValue.AddTypes(unit, types, enqueue);
+                Function.ReturnValue.MakeUnionStrongerIfMoreThan(unit.Analyzer.Limits.ReturnTypes, types);
+                Function.ReturnValue.AddTypes(unit, types, enqueue);
             }
         }
 
@@ -130,48 +93,6 @@ namespace Microsoft.NodejsTools.Analysis.Analyzer {
             }
         }
 
-        internal bool UpdateParameters(FunctionAnalysisUnit unit, IAnalysisSet @this, ArgumentSet others, bool enqueue = true, FunctionEnvironmentRecord envWithDefaultParams = null) {
-            EnsureParameters(unit);
-
-            var astParams = Function.FunctionObject.ParameterDeclarations;
-            bool added = false;
-            var entry = unit.ProjectEntry;
-            var state = unit.Analyzer;
-            var limits = state.Limits;
-
-            if (@this != null) {
-                added |= _this.AddTypes(entry, @this, false);
-            }
-
-            for (int i = 0; i < others.Args.Length && i < astParams.Count; ++i) {
-                VariableDef param;
-                if (!TryGetVariable(astParams[i].Name, out param)) {
-                    Debug.Assert(false, "Parameter " + astParams[i].Name + " has no variable in this scope");
-                    param = AddVariable(astParams[i].Name);
-                }
-                param.MakeUnionStrongerIfMoreThan(limits.NormalArgumentTypes, others.Args[i]);
-                added |= param.AddTypes(entry, others.Args[i], false);
-            }
-
-            if (envWithDefaultParams != null) {
-                for (int i = 0; i < others.Args.Length && i < astParams.Count; ++i) {
-                    VariableDef defParam, param;
-                    if (TryGetVariable(astParams[i].Name, out param) &&
-                        !param.TypesNoCopy.Any() &&
-                        envWithDefaultParams.TryGetVariable(astParams[i].Name, out defParam)) {
-                        param.MakeUnionStrongerIfMoreThan(limits.NormalArgumentTypes, defParam.TypesNoCopy);
-                        added |= param.AddTypes(entry, defParam.TypesNoCopy, false);
-                    }
-                }
-            }
-
-            if (enqueue && added) {
-                unit.Enqueue();
-            }
-            return added;
-        }
-
-
         public UserFunctionValue Function {
             get {
                 return _function;
@@ -181,70 +102,6 @@ namespace Microsoft.NodejsTools.Analysis.Analyzer {
         public override AnalysisValue AnalysisValue {
             get {
                 return _function;
-            }
-        }
-
-        public override IEnumerable<KeyValuePair<string, VariableDef>> GetAllMergedVariables() {
-            if (this != Function.AnalysisUnit.Environment) {
-                // Many scopes reference one FunctionInfo, which references one
-                // FunctionAnalysisUnit which references one scope. Since we
-                // are not that scope, we won't look at _allCalls for other
-                // variables.
-                return Variables;
-            }
-            
-            var scopes = new HashSet<EnvironmentRecord>();
-            var result = Variables.AsEnumerable();
-            if (Function._allCalls != null) {
-                foreach (var callUnit in Function._allCalls.Values) {
-                    scopes.Add(callUnit.Environment);
-                }
-                scopes.Remove(this);
-                foreach (var scope in scopes) {
-                    result = result.Concat(scope.GetAllMergedVariables());
-                }
-            }
-            return result;
-        }
-
-        public override IEnumerable<VariableDef> GetMergedVariables(string name) {
-            VariableDef res;
-            FunctionEnvironmentRecord fnEnv;
-
-            var nodes = new HashSet<Node>();
-            var seen = new HashSet<EnvironmentRecord>();
-            var queue = new Queue<FunctionEnvironmentRecord>();
-            queue.Enqueue(this);
-
-            while (queue.Any()) {
-                var env = queue.Dequeue();
-                if (env == null || !seen.Add(env)) {
-                    continue;
-                }
-
-                if (env.Node == Node && env.TryGetVariable(name, out res)) {
-                    yield return res;
-                }
-
-                if (env.Function._allCalls != null) {
-                    foreach (var callUnit in env.Function._allCalls.Values) {
-                        fnEnv = callUnit.Environment as FunctionEnvironmentRecord;
-                        if (fnEnv != null && fnEnv != this) {
-                            queue.Enqueue(fnEnv);
-                        }
-                    }
-                }
-
-                foreach (var keyValue in env.NodeEnvironments.Where(kv => nodes.Contains(kv.Key))) {
-                    if ((fnEnv = keyValue.Value as FunctionEnvironmentRecord) != null) {
-                        queue.Enqueue(fnEnv);
-                    }
-                }
-
-                if ((fnEnv = env.Parent as FunctionEnvironmentRecord) != null) {
-                    nodes.Add(env.Node);
-                    queue.Enqueue(fnEnv);
-                }
             }
         }
 

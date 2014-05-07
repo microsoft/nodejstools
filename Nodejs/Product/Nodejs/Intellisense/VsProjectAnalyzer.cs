@@ -51,15 +51,13 @@ namespace Microsoft.NodejsTools.Intellisense {
     /// maintains the thread safety invarients of working with that class, handles parsing of files as they're
     /// updated via interfacing w/ the Visual Studio editor APIs, and supports adding additional files to the 
     /// analysis.
-    /// 
-    /// New in 1.5.
     /// </summary>
     public sealed class VsProjectAnalyzer : IDisposable {
         private readonly ParseQueue _queue;
         private readonly AnalysisQueue _analysisQueue;
         private readonly Dictionary<BufferParser, IProjectEntry> _openFiles = new Dictionary<BufferParser, IProjectEntry>();
         private readonly ConcurrentDictionary<string, IProjectEntry> _projectFiles;
-        private readonly JsAnalyzer _pyAnalyzer;
+        private readonly JsAnalyzer _jsAnalyzer;
         private readonly bool _implicitProject;
         private readonly AutoResetEvent _queueActivityEvent = new AutoResetEvent(false);
         private readonly CodeSettings _codeSettings = new CodeSettings();
@@ -112,12 +110,12 @@ namespace Microsoft.NodejsTools.Intellisense {
             _interpreterFactory = factory;
 #endif
             _implicitProject = implicitProject;
-            _pyAnalyzer = new JsAnalyzer();
+            _jsAnalyzer = new JsAnalyzer();
             _projectFiles = new ConcurrentDictionary<string, IProjectEntry>(StringComparer.OrdinalIgnoreCase);
 
             _userCount = 1;
 
-            foreach (var name in _pyAnalyzer.GlobalMembers) {
+            foreach (var name in _jsAnalyzer.GlobalMembers) {
                 _codeSettings.AddKnownGlobal(name);
             }
             _codeSettings.AddKnownGlobal("__dirname");
@@ -231,7 +229,7 @@ namespace Microsoft.NodejsTools.Intellisense {
         }
 
         private IProjectEntry CreateProjectEntry(ITextBuffer buffer, IAnalysisCookie analysisCookie) {
-            if (_pyAnalyzer == null) {
+            if (_jsAnalyzer == null) {
                 // We aren't able to analyze code, so don't create an entry.
                 return null;
             }
@@ -255,7 +253,7 @@ namespace Microsoft.NodejsTools.Intellisense {
                     var reanalyzeEntries = Project.GetEntriesThatImportModule(modName, true).ToArray();
 #endif
 
-                    entry = _pyAnalyzer.AddModule(
+                    entry = _jsAnalyzer.AddModule(
                         buffer.GetFilePath(),
                         analysisCookie
                     );
@@ -283,7 +281,7 @@ namespace Microsoft.NodejsTools.Intellisense {
         }
 
         internal IProjectEntry AnalyzeFile(string path) {
-            if (_pyAnalyzer == null) {
+            if (_jsAnalyzer == null) {
                 // We aren't able to analyze code, so don't create an entry.
                 return null;
             }
@@ -295,7 +293,7 @@ namespace Microsoft.NodejsTools.Intellisense {
                     var reanalyzeEntries = Project.GetEntriesThatImportModule(modName, true).ToArray();
 #endif
 
-                    var pyEntry = _pyAnalyzer.AddModule(
+                    var pyEntry = _jsAnalyzer.AddModule(
                         path,
                         null
                     );
@@ -579,7 +577,7 @@ namespace Microsoft.NodejsTools.Intellisense {
 
         public JsAnalyzer Project {
             get {
-                return _pyAnalyzer;
+                return _jsAnalyzer;
             }
         }
 
@@ -1053,7 +1051,7 @@ namespace Microsoft.NodejsTools.Intellisense {
         }
 
         private void AnalyzeDirectoryWorker(string dir, bool addDir, Action<IProjectEntry> onFileAnalyzed, CancellationToken cancel) {
-            if (_pyAnalyzer == null) {
+            if (_jsAnalyzer == null) {
                 // We aren't able to analyze code.
                 return;
             }
@@ -1065,7 +1063,7 @@ namespace Microsoft.NodejsTools.Intellisense {
 
             if (addDir) {
                 lock (_contentsLock) {
-                    _pyAnalyzer.AddAnalysisDirectory(dir);
+                    _jsAnalyzer.AddAnalysisDirectory(dir);
                 }
             }
 
@@ -1115,13 +1113,13 @@ namespace Microsoft.NodejsTools.Intellisense {
         }
 
         internal void StopAnalyzingDirectory(string directory) {
-            if (_pyAnalyzer == null) {
+            if (_jsAnalyzer == null) {
                 // We aren't able to analyze code.
                 return;
             }
 
             lock (_contentsLock) {
-                _pyAnalyzer.RemoveAnalysisDirectory(directory);
+                _jsAnalyzer.RemoveAnalysisDirectory(directory);
             }
         }
 
@@ -1130,7 +1128,7 @@ namespace Microsoft.NodejsTools.Intellisense {
         }
 
         internal void UnloadFile(IProjectEntry entry) {
-            if (_pyAnalyzer == null) {
+            if (_jsAnalyzer == null) {
                 // We aren't able to analyze code.
                 return;
             }
@@ -1147,7 +1145,7 @@ namespace Microsoft.NodejsTools.Intellisense {
 #endif
 
                 ClearParserTasks(entry);
-                _pyAnalyzer.RemoveModule(entry);
+                _jsAnalyzer.RemoveModule(entry);
                 IProjectEntry removed;
                 _projectFiles.TryRemove(entry.FilePath, out removed);
 #if FALSE

@@ -330,7 +330,9 @@ namespace Microsoft.NodejsTools.Analysis {
                     } else {
 
                         foreach (var mod in _dependencies.DictValues) {
-                            res = res.Union(mod.Types);
+                            if (mod.Types.Count > 0) {
+                                res = res.Union(mod.Types);
+                            }
                         }
                     }
                 }
@@ -549,7 +551,7 @@ namespace Microsoft.NodejsTools.Analysis {
             }
         }
 
-        public Node Context {
+        public Node Node {
             get {
                 return _location;
             }

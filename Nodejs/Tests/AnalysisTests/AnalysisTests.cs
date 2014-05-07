@@ -92,6 +92,20 @@ var x = new f().value;
         }
 
         [TestMethod]
+        public void TestDefinitiveAssignmentScoping() {
+            string code = @"
+var x = {abc:42};
+x = x.abc;
+";
+            var analysis = ProcessText(code);
+            AssertUtil.ContainsExactly(
+                analysis.GetTypeIdsByIndex("x", code.Length),
+                BuiltinTypeId.Number
+            );
+        }
+
+
+        [TestMethod]
         public void TestDefinitiveAssignmentMerged() {
             string code = @"
 if(true) {
@@ -645,18 +659,21 @@ var y = x(42);");
         }
 
         [TestMethod]
+        public void TestFunctionReturn() {
+            var analysis = ProcessText("function x() { return 42; }");
+            AssertUtil.ContainsExactly(
+                analysis.GetTypeIdsByIndex("x()", 0),
+                BuiltinTypeId.Number
+            );
+        }
+
+        [TestMethod]
         public void TestFunction() {
             var analysis = ProcessText("function x() { }");
             AssertUtil.ContainsExactly(
                 analysis.GetTypeIdsByIndex("x", 0),
                 BuiltinTypeId.Function
-            );
-
-            analysis = ProcessText("function x() { return 42; }");
-            AssertUtil.ContainsExactly(
-                analysis.GetTypeIdsByIndex("x()", 0),
-                BuiltinTypeId.Number
-            );
+            );            
 
             analysis = ProcessText("function x() { return 'abc'; }");
             AssertUtil.ContainsExactly(
@@ -806,6 +823,59 @@ x.bar = 42;
             AssertUtil.ContainsExactly(
                 analysis.GetTypeIdsByIndex("x()", code.Length),
                 BuiltinTypeId.Number
+            );
+        }
+
+
+        [TestMethod]
+        public void TestFunctionExpressionNameScopingNested() {
+            var code = @"
+function f() {
+    var x = function abc() {
+        // here
+        var x = 42;
+        return abc.bar;
+    }
+    x.bar = 42;
+    var inner = x();
+}
+";
+            var analysis = ProcessText(code);
+
+            AssertUtil.ContainsExactly(
+                analysis.GetTypeIdsByIndex("abc", code.IndexOf("// here")),
+                BuiltinTypeId.Function
+            );
+
+            AssertUtil.ContainsExactly(
+                analysis.GetTypeIdsByIndex("inner", code.IndexOf("var inner")),
+                BuiltinTypeId.Number
+            );
+        }
+        
+        [TestMethod]
+        public void TestFunctionClosureCall() {
+            var code = @"function abc() {
+    function g(x) {
+        function inner() {
+        }
+        return x;
+    }
+    return g;
+}
+var x = abc()(42);
+var y = abc()('abc');
+";
+            var analysis = ProcessText(code);
+
+            AssertUtil.ContainsExactly(
+                analysis.GetTypeIdsByIndex("x", code.Length),
+                BuiltinTypeId.Number
+            );
+
+            AssertUtil.ContainsExactly(
+                analysis.GetTypeIdsByIndex("y", code.Length),
+                BuiltinTypeId.String
             );
         }
 

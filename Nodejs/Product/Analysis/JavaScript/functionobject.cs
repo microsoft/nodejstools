@@ -62,6 +62,7 @@ namespace Microsoft.NodejsTools.Parsing {
 
 
         public IndexSpan ParametersSpan { get; set; }
+        public bool IsExpression { get; set; }
 
         public int ParameterStart {
             get {
@@ -77,8 +78,6 @@ namespace Microsoft.NodejsTools.Parsing {
 
         public JSVariableField VariableField { get; set; }
         
-        public FunctionScope FunctionScope { get; set; }
-
         public override void Walk(AstVisitor walker) {
             if (walker.Walk(this)) {
                 foreach (var param in m_parameters) {

@@ -15,6 +15,7 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+
 using System.Text;
 using Microsoft.NodejsTools.Analysis.Analyzer;
 using Microsoft.NodejsTools.Parsing;
@@ -23,21 +24,43 @@ namespace Microsoft.NodejsTools.Analysis.Values {
     class UserFunctionValue : FunctionValue {
         private readonly FunctionObject _funcObject;
         private readonly FunctionAnalysisUnit _analysisUnit;
-        private int _callDepthLimit;
-        private int _callsSinceLimitChange;
-        internal CallChainSet<FunctionAnalysisUnit> _allCalls;
+        public VariableDef ReturnValue;
+        //private VariableDef[] _parameters;
+        internal Dictionary<CallArgs, CallInfo> _allCalls;
+        private OverflowState _overflowed;
+        const int MaximumCallCount = 100;
 
-        public UserFunctionValue(FunctionObject node, AnalysisUnit declUnit, EnvironmentRecord declScope)
+        public UserFunctionValue(FunctionObject node, AnalysisUnit declUnit, EnvironmentRecord declScope, bool isNested = false)
             : base(declUnit.ProjectEntry) {
+            ReturnValue = new VariableDef();
             _funcObject = node;
             _analysisUnit = new FunctionAnalysisUnit(this, declUnit, declScope, ProjectEntry);
-            
-            object value;
-            if (!ProjectEntry.Properties.TryGetValue(AnalysisLimits.CallDepthKey, out value) ||
-                (_callDepthLimit = (value as int?) ?? -1) < 0) {
-                _callDepthLimit = ProjectEntry.Analyzer.Limits.CallDepth;
-            }
+
             declUnit.Analyzer.AnalysisValueCreated(typeof(UserFunctionValue));
+        }
+
+        class LookupChecker : AstVisitor {
+            public bool IsClosure;
+            public readonly Statement DeclNode;
+
+            public LookupChecker(Statement declNode) {
+                DeclNode = declNode;
+            }
+
+            public override bool Walk(Lookup node) {
+                var curField = node.VariableField;                
+                while (curField.OuterField != null) {
+                    curField = curField.OuterField;
+                }
+                if (curField.Scope != DeclNode) {
+                    IsClosure = true;
+                }
+                return base.Walk(node);
+            }
+
+            public override bool Walk(FunctionObject node) {
+                return false;
+            }
         }
 
         public FunctionObject FunctionObject {
@@ -126,56 +149,36 @@ namespace Microsoft.NodejsTools.Analysis.Values {
 
         internal void AddReturnTypeString(StringBuilder result) {
             bool first = true;
-            for (int strength = 0; strength <= UnionComparer.MAX_STRENGTH; ++strength) {
-                var retTypes = GetReturnValue(strength);
-                if (retTypes.Count == 0) {
-                    first = false;
-                    break;
-                }
-                if (retTypes.Count <= 10) {
-                    var seenNames = new HashSet<string>();
-                    foreach (var av in retTypes) {
-                        if (av == null) {
-                            continue;
-                        }
-
-                        if (av.Push()) {
-                            try {
-                                if (!string.IsNullOrWhiteSpace(av.ShortDescription) && seenNames.Add(av.ShortDescription)) {
-                                    if (first) {
-                                        result.Append(" -> ");
-                                        first = false;
-                                    } else {
-                                        result.Append(", ");
-                                    }
-                                    AppendDescription(result, av);
-                                }
-                            } finally {
-                                av.Pop();
-                            }
-                        } else {
-                            result.Append("...");
-                        }
+            var retTypes = ReturnValue.Types;
+            if (retTypes.Count == 0) {
+                return;
+            }
+            if (retTypes.Count <= 10) {
+                var seenNames = new HashSet<string>();
+                foreach (var av in retTypes) {
+                    if (av == null) {
+                        continue;
                     }
-                    break;
+
+                    if (av.Push()) {
+                        try {
+                            if (!string.IsNullOrWhiteSpace(av.ShortDescription) && seenNames.Add(av.ShortDescription)) {
+                                if (first) {
+                                    result.Append(" -> ");
+                                    first = false;
+                                } else {
+                                    result.Append(", ");
+                                }
+                                AppendDescription(result, av);
+                            }
+                        } finally {
+                            av.Pop();
+                        }
+                    } else {
+                        result.Append("...");
+                    }
                 }
             }
-        }
-
-        internal IAnalysisSet GetReturnValue(int unionStrength = 0) {
-            var result = (unionStrength >= 0 && unionStrength <= UnionComparer.MAX_STRENGTH)
-                ? AnalysisSet.CreateUnion(UnionComparer.Instances[unionStrength])
-                : AnalysisSet.Empty;
-
-            var units = new HashSet<AnalysisUnit>();
-            units.Add(AnalysisUnit);
-            if (_allCalls != null) {
-                units.UnionWith(_allCalls.Values);
-            }
-
-            result = result.UnionAll(units.OfType<FunctionAnalysisUnit>().Select(unit => unit.ReturnValue.TypesNoCopy));
-
-            return result;
         }
 
         internal void AddDocumentationString(StringBuilder result) {
@@ -191,9 +194,11 @@ namespace Microsoft.NodejsTools.Analysis.Values {
 
                 var units = new HashSet<AnalysisUnit>();
                 units.Add(AnalysisUnit);
+#if FALSE
                 if (_allCalls != null) {
                     units.UnionWith(_allCalls.Values);
                 }
+#endif
 
                 foreach (var unit in units) {
                     var vars = FunctionObject.ParameterDeclarations.Select(p => {
@@ -233,82 +238,56 @@ namespace Microsoft.NodejsTools.Analysis.Values {
         }
 
         public override IAnalysisSet Call(Node node, AnalysisUnit unit, IAnalysisSet @this, IAnalysisSet[] args) {
-            var callArgs = ArgumentSet.FromArgs(FunctionObject, unit, args);
+            if (_overflowed == OverflowState.OverflowedBigTime) {
+                return AnalysisSet.Empty;
+            }
 
-            FunctionAnalysisUnit calledUnit;
-            bool updateArguments = true;
+            var callArgs = new CallArgs(@this, args, _overflowed == OverflowState.OverflowedOnce);
 
-            if (callArgs.Count == 0 || _callDepthLimit == 0) {
-                calledUnit = (FunctionAnalysisUnit)AnalysisUnit;
-            } else {
-                if (_allCalls == null) {
-                    _allCalls = new CallChainSet<FunctionAnalysisUnit>();
+            CallInfo callInfo;
+
+            if (_allCalls == null) {
+                _allCalls = new Dictionary<CallArgs, CallInfo>();
+            }
+
+            if (!_allCalls.TryGetValue(callArgs, out callInfo)) {
+                if (unit.ForEval) {
+                    return ReturnValue.Types;
                 }
 
-                var chain = new CallChain(node, unit, _callDepthLimit);
-                if (!_allCalls.TryGetValue(unit.ProjectEntry, chain, _callDepthLimit, out calledUnit)) {
-                    if (unit.ForEval) {
-                        // Call expressions that weren't analyzed get the union result
-                        // of all calls to this function.
-                        var res = _analysisUnit.ReturnValue.Types;
-                        foreach (var call in _allCalls.Values) {
-                            res = res.Union(call.ReturnValue.TypesNoCopy);
+                _allCalls[callArgs] = callInfo = new CallInfo(this, 
+                    _analysisUnit.Environment, 
+                    ((FunctionAnalysisUnit)_analysisUnit)._declUnit, 
+                    callArgs
+                );
+
+                if (_allCalls.Count > 10) {
+                    // try and compress args using UnionEquality...
+                    if (_overflowed == OverflowState.None) {
+                        _overflowed = OverflowState.OverflowedOnce;
+                        var newAllCalls = new Dictionary<CallArgs, CallInfo>();
+                        foreach (var keyValue in _allCalls) {
+                            newAllCalls[new CallArgs(@this, keyValue.Key.Args, overflowed: true)] = keyValue.Value;
                         }
-                        return res;
-                    } 
-
-                    _callsSinceLimitChange += 1;
-                    if (_callsSinceLimitChange >= ProjectState.Limits.DecreaseCallDepth && 
-                        _callDepthLimit > 1) {
-                        _callDepthLimit -= 1;
-                        _callsSinceLimitChange = 0;
-                        AnalysisLog.ReduceCallDepth(this, _allCalls.Count, _callDepthLimit);
-
-                        _allCalls.Clear();
-                        chain = chain.Trim(_callDepthLimit);
-                    }
-                    calledUnit = new FunctionAnalysisUnit(
-                        (FunctionAnalysisUnit)AnalysisUnit, 
-                        chain, 
-                        @this,
-                        callArgs
-                    );
-                    _allCalls.Add(unit.ProjectEntry, chain, calledUnit);
-                    updateArguments = false;
-                }
-            }
-
-            if (updateArguments && calledUnit.UpdateParameters(@this, callArgs)) {
-                AnalysisLog.UpdateUnit(calledUnit);
-            }
-
-            calledUnit.ReturnValue.AddDependency(unit);
-            return calledUnit.ReturnValue.Types;
-        }
-
-        internal IAnalysisSet[] GetParameterTypes(int unionStrength = 0) {
-            var result = new IAnalysisSet[FunctionObject.ParameterDeclarations.Count];
-            var units = new HashSet<AnalysisUnit>();
-            units.Add(AnalysisUnit);
-            if (_allCalls != null) {
-                units.UnionWith(_allCalls.Values);
-            }
-
-            for (int i = 0; i < result.Length; ++i) {
-                result[i] = (unionStrength >= 0 && unionStrength <= UnionComparer.MAX_STRENGTH)
-                    ? AnalysisSet.CreateUnion(UnionComparer.Instances[unionStrength])
-                    : AnalysisSet.Empty;
-
-                VariableDef param;
-                foreach (var unit in units) {
-                    if (unit != null && unit.Environment != null && unit.Environment.TryGetVariable(FunctionObject.ParameterDeclarations[i].Name, out param)) {
-                        result[i] = result[i].Union(param.TypesNoCopy);
+                        _allCalls = newAllCalls;
                     }
                 }
-            }
 
-            return result;
+                if (_allCalls.Count > MaximumCallCount) {
+                    _overflowed = OverflowState.OverflowedBigTime;
+                    return AnalysisSet.Empty;
+                }
+
+                callInfo.ReturnValue.AddDependency(unit);
+
+                callInfo.AnalysisUnit.Enqueue();
+                return AnalysisSet.Empty;
+            } else {
+                callInfo.ReturnValue.AddDependency(unit);
+                return callInfo.ReturnValue.Types;
+            }
         }
+
 
         private class StringArrayComparer : IEqualityComparer<string[]> {
             private IEqualityComparer<string> _comparer;
@@ -398,6 +377,171 @@ namespace Microsoft.NodejsTools.Analysis.Values {
             }
 
             return base.UnionMergeTypes(av, strength);
+        }
+
+        /// <summary>
+        /// Hashable set of arguments for analyzing the cartesian product of the received arguments.
+        /// 
+        /// Each time we get called we check and see if we've seen the current argument set.  If we haven't
+        /// then we'll schedule the function to be analyzed for those args (and if that results in a new
+        /// return type then we'll use the return type to analyze afterwards).
+        /// </summary>
+        internal class CallArgs : IEquatable<CallArgs> {
+            public readonly IAnalysisSet This;
+            public readonly IAnalysisSet[] Args;
+            private int _hashCode;
+
+            public CallArgs(IAnalysisSet @this, IAnalysisSet[] args, bool overflowed) {
+                if (!overflowed) {
+                    for (int i = 0; i < args.Length; i++) {                        
+                        if (args[i].Count >= 10) {
+                            overflowed = true;
+                            break;
+                        }
+                    }
+                }
+                if (overflowed) {
+                    for (int i = 0; i < args.Length; i++) {
+                        args[i] = args[i].AsStrongerUnion();
+                    }
+                }
+                This = @this;
+                Args = args;
+            }
+
+            public override string ToString() {
+                StringBuilder res = new StringBuilder();
+
+                res.Append("{");
+                foreach (var arg in Args) {
+                    res.Append("{");
+                    bool appended = false;
+                    foreach (var argVal in arg) {
+                        if (appended) {
+                            res.Append(", ");
+                        }
+                        res.Append(argVal.ToString());
+                        res.Append(" ");
+                        res.Append(GetComparer().GetHashCode(argVal));
+                        appended = true;
+                    }
+                    res.Append("}");
+                }
+                res.Append("}");
+                return res.ToString();
+            }
+
+            public override bool Equals(object obj) {
+                CallArgs other = obj as CallArgs;
+                if (other != null) {
+                    return Equals(other);
+                }
+                return false;
+            }
+
+            #region IEquatable<CallArgs> Members
+
+            public bool Equals(CallArgs other) {
+                if (Object.ReferenceEquals(this, other)) {
+                    return true;
+                }
+                
+                if (Args.Length != other.Args.Length) {
+                    return false;
+                }
+
+                if (This != null) {
+                    if (other.This != null) {
+                        if (This.Count != other.This.Count) {
+                            return false;
+                        }
+                    } else if (This.Count != 0) {
+                        return false;
+                    }
+                } else if (other.This != null && other.This.Count > 0) {
+                    return false;
+                }
+
+                if (This != null) {
+                    foreach (var @this in This) {
+                        if (!other.This.Contains(@this)) {
+                            return false;
+                        }
+                    }
+                }
+
+                for (int i = 0; i < Args.Length; i++) {
+                    if (Args[i].Count != other.Args[i].Count) {
+                        return false;
+                    }
+                }
+
+                for (int i = 0; i < Args.Length; i++) {
+                    foreach (var arg in Args[i]) {
+                        if (!other.Args[i].Contains(arg)) {
+                            return false;
+                        }
+                    }
+                }
+                return true;
+            }
+
+            #endregion
+
+            public override int GetHashCode() {
+                if (_hashCode == 0) {
+                    int hc = 6551;
+                    if (Args.Length > 0) {
+                        IEqualityComparer<AnalysisValue> comparer = GetComparer();
+                        for (int i = 0; i < Args.Length; i++) {
+                            foreach (var value in Args[i]) {
+                                hc ^= comparer.GetHashCode(value);
+                            }
+                        }
+                    }
+                    if (This != null) {
+                        foreach (var value in This) {
+                            hc ^= value.GetHashCode();
+                        }
+                    }
+
+                    _hashCode = hc;
+                }
+                return _hashCode;
+            }
+
+            private IEqualityComparer<AnalysisValue> GetComparer() {
+                var arg0 = Args[0] as HashSet<AnalysisValue>;
+                IEqualityComparer<AnalysisValue> comparer;
+                if (arg0 != null) {
+                    comparer = arg0.Comparer;
+                } else {
+                    comparer = EqualityComparer<AnalysisValue>.Default;
+                }
+                return comparer;
+            }
+        }
+
+        internal class CallInfo {
+            public readonly VariableDef ReturnValue;
+            public readonly CartesianProductFunctionAnalysisUnit AnalysisUnit;
+
+            public CallInfo(UserFunctionValue funcValue, EnvironmentRecord environment, AnalysisUnit outerUnit, CallArgs args) {
+                ReturnValue = new VariableDef();
+                AnalysisUnit = new CartesianProductFunctionAnalysisUnit(
+                    funcValue, 
+                    environment, 
+                    outerUnit, 
+                    args, 
+                    ReturnValue
+                );
+            }
+        }
+
+        enum OverflowState {
+            None,
+            OverflowedOnce,
+            OverflowedBigTime
         }
     }
 }

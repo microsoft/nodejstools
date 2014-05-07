@@ -71,7 +71,7 @@ namespace Microsoft.NodejsTools.Analysis {
             var expr = Statement.GetExpression(GetAstFromText(exprText).Block);
 
             var unit = GetNearestEnclosingAnalysisUnit(scope);
-            var eval = new ExpressionEvaluator(unit.CopyForEval(), scope, mergeScopes: true);
+            var eval = new ExpressionEvaluator(unit.CopyForEval(), scope);
             var res = AnalysisSet.EmptyUnion;
 
             if (expr != null) {
@@ -100,7 +100,7 @@ namespace Microsoft.NodejsTools.Analysis {
             if (locatedDef != null &&
                 locatedDef.Entry.Tree != null &&    // null tree if there are errors in the file
                 locatedDef.DeclaringVersion == locatedDef.Entry.AnalysisVersion) {
-                var start = locatedDef.Context;
+                var start = locatedDef.Node;
 
                 yield return new AnalysisVariable(VariableType.Definition, locatedDef.Entry.Tree.ResolveLocation(locatedDef.Entry, start));
             }
@@ -148,7 +148,7 @@ namespace Microsoft.NodejsTools.Analysis {
 
             var member = expr as Member;
             if (member != null) {
-                var eval = new ExpressionEvaluator(unit.CopyForEval(), scope, mergeScopes: true);
+                var eval = new ExpressionEvaluator(unit.CopyForEval(), scope);
                 var objects = eval.Evaluate(member.Root);
 
                 foreach (var v in objects) {
@@ -165,7 +165,10 @@ namespace Microsoft.NodejsTools.Analysis {
         private IEnumerable<IAnalysisVariable> GetVariablesInScope(Lookup name, EnvironmentRecord scope) {
             var result = new List<IAnalysisVariable>();
 
-            result.AddRange(scope.GetMergedVariables(name.Name).SelectMany(VariableTransformer.ScopeToVariables.ToVariables));
+            VariableDef var;
+            if (scope.TryGetVariable(name.Name, out var)) {
+                result.AddRange(VariableTransformer.ScopeToVariables.ToVariables(var));
+            }
 
             // if a variable is imported from another module then also yield the defs/refs for the 
             // value in the defining module.
@@ -247,7 +250,7 @@ namespace Microsoft.NodejsTools.Analysis {
             }
 
             var unit = GetNearestEnclosingAnalysisUnit(scope);
-            var lookup = new ExpressionEvaluator(unit.CopyForEval(), scope, mergeScopes: true).Evaluate(expr);
+            var lookup = new ExpressionEvaluator(unit.CopyForEval(), scope).Evaluate(expr);
             return GetMemberResults(lookup, scope, options);
         }
 
@@ -260,7 +263,7 @@ namespace Microsoft.NodejsTools.Analysis {
             try {
                 var scope = FindEnvironment(index);
                 var unit = GetNearestEnclosingAnalysisUnit(scope);
-                var eval = new ExpressionEvaluator(unit.CopyForEval(), scope, mergeScopes: true);
+                var eval = new ExpressionEvaluator(unit.CopyForEval(), scope);
 
                 var expr = Statement.GetExpression(GetAstFromText(exprText).Block);
                 if (expr == null ||
@@ -294,7 +297,7 @@ namespace Microsoft.NodejsTools.Analysis {
             // collect variables from user defined scopes
             var scope = FindEnvironment(index);
             foreach (var s in scope.EnumerateTowardsGlobal) {
-                foreach (var kvp in s.GetAllMergedVariables()) {
+                foreach (var kvp in s.Variables) {
                     result[kvp.Key] = new List<AnalysisValue>(kvp.Value.TypesNoCopy);
                 }
             }
@@ -335,7 +338,7 @@ namespace Microsoft.NodejsTools.Analysis {
             var result = Enumerable.Empty<string>();
             var chain = FindEnvironment(index);
             foreach (var scope in chain.EnumerateFromGlobal) {
-                result = result.Concat(scope.GetAllMergedVariables().Select(val => val.Key));
+                result = result.Concat(scope.Variables.Select(val => val.Key));
             }
             return result.Distinct();
         }
@@ -673,7 +676,7 @@ namespace Microsoft.NodejsTools.Analysis {
             if (locatedDef != null &&
                 locatedDef.Entry.Tree != null &&    // null tree if there are errors in the file
                 locatedDef.DeclaringVersion == locatedDef.Entry.AnalysisVersion) {
-                var start = locatedDef.Context;
+                var start = locatedDef.Node;
 
                 yield return new AnalysisVariable(VariableType.Definition, locatedDef.Entry.Tree.ResolveLocation(locatedDef.Entry, start));
             }

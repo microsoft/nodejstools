@@ -7,12 +7,18 @@ using Microsoft.NodejsTools.Parsing;
 namespace Microsoft.NodejsTools.Analysis.Analyzer {
     class DefinitiveAssignmentEnvironmentRecord : StatementEnvironmentRecord {
         private readonly string _name;
-        private readonly VariableDef _variable;
+        private VariableDef _variable;
 
         public DefinitiveAssignmentEnvironmentRecord(int startIndex, string name, EnvironmentRecord outerRecord)
             : base(startIndex, outerRecord) {
             _name = name;
             _variable = new VariableDef();
+        }
+
+        public override IEnumerable<KeyValuePair<string, VariableDef>> LocalVariables {
+            get {
+                return new[] { new KeyValuePair<string, VariableDef>(_name, _variable) };
+            }
         }
 
         public override IEnumerable<KeyValuePair<string, VariableDef>> Variables {
@@ -52,11 +58,11 @@ namespace Microsoft.NodejsTools.Analysis.Analyzer {
             return env as DeclarativeEnvironmentRecord;
         }
 
-        public override IAnalysisSet GetMergedVariableTypes(string name) {
-            if (name == _name) {
-                return _variable.Types;
+        internal override void ReplaceVariable(string name, VariableDef def) {
+            if (_name != name) {
+                throw new InvalidOperationException("Replacing variable " + name);
             }
-            return base.GetMergedVariableTypes(name);
+            _variable = def;
         }
 
         public override bool TryGetVariable(string name, out VariableDef variable) {

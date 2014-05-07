@@ -23,7 +23,6 @@ using Microsoft.NodejsTools.Parsing;
 namespace Microsoft.NodejsTools.Analysis.Analyzer {
     internal class ExpressionEvaluator {
         private readonly AnalysisUnit _unit;
-        private readonly bool _mergeScopes;
 
         internal static readonly IAnalysisSet[] EmptySets = new IAnalysisSet[0];
         internal static readonly Lookup[] EmptyNames = new Lookup[0];
@@ -36,10 +35,9 @@ namespace Microsoft.NodejsTools.Analysis.Analyzer {
             Scope = unit.Environment;
         }
 
-        public ExpressionEvaluator(AnalysisUnit unit, EnvironmentRecord scope, bool mergeScopes = false) {
+        public ExpressionEvaluator(AnalysisUnit unit, EnvironmentRecord scope) {
             _unit = unit;
             Scope = scope;
-            _mergeScopes = mergeScopes;
         }
 
         #region Public APIs
@@ -65,27 +63,18 @@ namespace Microsoft.NodejsTools.Analysis.Analyzer {
         /// Returns a sequence of possible types associated with the name in the expression evaluators scope.
         /// </summary>
         public IAnalysisSet LookupAnalysisSetByName(Node node, string name, bool addRef = true) {
-            if (_mergeScopes) {
-                foreach (var scope in Scope.EnumerateTowardsGlobal) {
-                    VariableDef def;
-                    if (scope.TryGetVariable(name, out def)) {
-                        return scope.GetMergedVariableTypes(name);
-                    }
-                }
-            } else {
-                foreach (var scope in Scope.EnumerateTowardsGlobal) {
-                    var refs = scope.GetVariable(node, _unit, name, addRef);
-                    if (refs != null) {
-                        if (addRef) {
-                            var linkedVars = scope.GetLinkedVariablesNoCreate(name);
-                            if (linkedVars != null) {
-                                foreach (var linkedVar in linkedVars) {
-                                    linkedVar.AddReference(node, _unit);
-                                }
+            foreach (var scope in Scope.EnumerateTowardsGlobal) {
+                var refs = scope.GetVariable(node, _unit, name, addRef);
+                if (refs != null) {
+                    if (addRef) {
+                        var linkedVars = scope.GetLinkedVariablesNoCreate(name);
+                        if (linkedVars != null) {
+                            foreach (var linkedVar in linkedVars) {
+                                linkedVar.AddReference(node, _unit);
                             }
                         }
-                        return refs.Types;
                     }
+                    return refs.Types;
                 }
             }
 
@@ -157,14 +146,11 @@ namespace Microsoft.NodejsTools.Analysis.Analyzer {
         };
 
         private static IAnalysisSet EvaluateThis(ExpressionEvaluator ee, Node node) {
-            if (ee._mergeScopes) {
-                return ee.Scope.MergedThisValue;
-            }
             return ee.Scope.ThisValue;
         }
 
         private static IAnalysisSet EvaluateArrayLiteral(ExpressionEvaluator ee, Node node) {
-            return ee.MakeSequence(ee, node);
+            return ee.MakeArrayValue(ee, node);
         }
 
         private static IAnalysisSet EvaluateGroupingOperator(ExpressionEvaluator ee, Node node) {
@@ -203,7 +189,7 @@ namespace Microsoft.NodejsTools.Analysis.Analyzer {
 
         private static IAnalysisSet EvaluateObjectLiteral(ExpressionEvaluator ee, Node node) {
             var n = (ObjectLiteral)node;
-            IAnalysisSet result = ee.Scope.GetOrMakeNodeValue(node, _ => {
+            IAnalysisSet result = ee.Scope.GlobalEnvironment.GetOrMakeNodeValue(node, _ => {
                 var objectInfo = new ObjectLiteralValue(ee._unit.ProjectEntry, node);
                 result = objectInfo.SelfSet;
 
@@ -435,24 +421,16 @@ namespace Microsoft.NodejsTools.Analysis.Analyzer {
         private static IAnalysisSet EvaluateFunctionExpression(ExpressionEvaluator ee, Node node) {
             var func = (FunctionExpression)node;
             EnvironmentRecord funcRec;
-            if (ee.Scope.TryGetNodeEnvironment(func.Function, out funcRec)) {
+            if (ee.Scope.GlobalEnvironment.TryGetNodeEnvironment(func.Function, out funcRec)) {
                 return funcRec.AnalysisValue.SelfSet;
             }
+            
             Debug.Fail("Failed to find function record");
             return AnalysisSet.Empty;
-            //return ee.Scope.GetOrMakeNodeValue(node, n => MakeLambdaFunction(func, ee));
         }
 
-        private static IAnalysisSet MakeLambdaFunction(FunctionExpression node, ExpressionEvaluator ee) {
-            var res = OverviewWalker.AddFunction(node.Function, ee._unit, ee.Scope);
-            if (res != null) {
-                return res.SelfSet;
-            }
-            return AnalysisSet.Empty;
-        }
-
-        private IAnalysisSet MakeSequence(ExpressionEvaluator ee, Node node) {
-            var sequence = (ArrayValue)ee.Scope.GetOrMakeNodeValue(node, x => {
+        private IAnalysisSet MakeArrayValue(ExpressionEvaluator ee, Node node) {
+            var sequence = (ArrayValue)ee.Scope.GlobalEnvironment.GetOrMakeNodeValue(node, x => {
                 return new ArrayValue(
                     VariableDef.EmptyArray,
                     _unit.ProjectEntry

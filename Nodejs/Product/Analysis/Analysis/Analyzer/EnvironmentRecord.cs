@@ -64,11 +64,11 @@ namespace Microsoft.NodejsTools.Analysis.Analyzer {
             }
         }
 
-        public EnvironmentRecord GlobalEnvironment {
+        public ModuleEnvironmentRecord GlobalEnvironment {
             get {
                 for (var scope = this; scope != null; scope = scope.Parent) {
                     if (scope.Parent == null) {
-                        return scope;
+                        return (ModuleEnvironmentRecord)scope;
                     }
                 }
                 return null;
@@ -112,6 +112,10 @@ namespace Microsoft.NodejsTools.Analysis.Analyzer {
 
         #region Variables
 
+        public abstract IEnumerable<KeyValuePair<string, VariableDef>> LocalVariables {
+            get;
+        }
+
         public abstract IEnumerable<KeyValuePair<string, VariableDef>> Variables {
             get;
         }
@@ -147,17 +151,23 @@ namespace Microsoft.NodejsTools.Analysis.Analyzer {
         /// 
         /// Goto definition on the variable can then offer the location in code.
         /// </summary>
-        public VariableDef AddLocatedVariable(string name, Node location, AnalysisUnit unit/*, ParameterKind paramKind = ParameterKind.Normal*/) {
+        public VariableDef AddLocatedVariable(string name, Node location, AnalysisUnit unit) {
+            var projectEntry = unit.ProjectEntry;
+
+            return AddLocatedVariable(name, location, projectEntry);
+        }
+
+        public VariableDef AddLocatedVariable(string name, Node location, ProjectEntry projectEntry) {
             VariableDef value;
             if (!TryGetVariable(name, out value)) {
-                VariableDef def = new LocatedVariableDef(unit.DeclaringModuleEnvironment.ProjectEntry, location);
+                VariableDef def = new LocatedVariableDef(projectEntry, location);
                 return AddVariable(name, def);
             } else if (!(value is LocatedVariableDef)) {
-                VariableDef def = new LocatedVariableDef(unit.DeclaringModuleEnvironment.ProjectEntry, location, value);
+                VariableDef def = new LocatedVariableDef(projectEntry, location, value);
                 return AddVariable(name, def);
             } else {
-                ((LocatedVariableDef)value).Context = location;
-                ((LocatedVariableDef)value).DeclaringVersion = unit.ProjectEntry.AnalysisVersion;
+                ((LocatedVariableDef)value).Node = location;
+                ((LocatedVariableDef)value).DeclaringVersion = projectEntry.AnalysisVersion;
             }
             return value;
         }
@@ -173,100 +183,18 @@ namespace Microsoft.NodejsTools.Analysis.Analyzer {
 
         public abstract VariableDef GetVariable(string name);
         public abstract VariableDef GetVariable(Node node, AnalysisUnit unit, string name, bool addRef = true);
-        public abstract IEnumerable<KeyValuePair<string, VariableDef>> GetAllMergedVariables();
-        public abstract IEnumerable<VariableDef> GetMergedVariables(string name);
-        public abstract IAnalysisSet GetMergedVariableTypes(string name);
         public abstract VariableDef CreateVariable(Node node, AnalysisUnit unit, string name, bool addRef = true);
         public abstract VariableDef CreateEphemeralVariable(Node node, AnalysisUnit unit, string name, bool addRef = true);
         public abstract VariableDef GetOrAddVariable(string name);
         public abstract VariableDef AddVariable(string name, VariableDef variable = null);
         internal abstract bool RemoveVariable(string name);
         internal abstract bool RemoveVariable(string name, out VariableDef value);
+        internal abstract void ReplaceVariable(string name, VariableDef def);
+
         internal abstract void ClearVariables();
         public abstract void ClearLinkedVariables();
         internal abstract HashSet<VariableDef> GetLinkedVariables(string saveName);
         internal abstract HashSet<VariableDef> GetLinkedVariablesNoCreate(string saveName);
-
-        #endregion
-
-        #region Node Environment Records
-
-        /// <summary>
-        /// Gets the environment record associated with the specified node within
-        /// the current environment.  If there is no association in the current
-        /// record outer records will be searched
-        /// </summary>
-        internal bool TryGetNodeEnvironment(Node node, out EnvironmentRecord scope) {
-            foreach (var s in EnumerateTowardsGlobal) {
-                if (s.TryGetLocalNodeEnvironment(node, out scope)) {
-                    return true;
-                }
-            }
-            scope = null;
-            return false;
-        }
-        
-        /// <summary>
-        /// Adds an environment record associated with the specified node.
-        /// </summary>
-        public abstract EnvironmentRecord AddNodeEnvironment(Node node, EnvironmentRecord scope);
-        internal abstract bool RemoveNodeEnvironment(Node node);
-        internal abstract void ClearNodeEnvironments();
-        /// <summary>
-        /// Gets the environment record associated with the specified node
-        /// without recursing through outer records.
-        /// </summary>
-        internal abstract bool TryGetLocalNodeEnvironment(Node node, out EnvironmentRecord scope);
-
-        /// <summary>
-        /// Gets all of the associations between nodes and environment records.
-        /// </summary>
-        public abstract IEnumerable<KeyValuePair<Node, EnvironmentRecord>> NodeEnvironments {
-            get;
-        }
-
-        #endregion
-
-        #region Node Values
-
-        public abstract IAnalysisSet AddNodeValue(Node node, IAnalysisSet variable);
-
-        internal abstract bool RemoveNodeValue(Node node);
-
-        internal abstract void ClearNodeValues();
-
-        /// <summary>
-        /// Gets the value associated with the specifed node, recursing through
-        /// outer environments if it's not defined locally.
-        /// </summary>
-        internal bool TryGetNodeValue(Node node, out IAnalysisSet variable) {
-            foreach (var s in EnumerateTowardsGlobal) {
-                if (s.TryGetLocalNodeValue(node, out variable)) {
-                    return true;
-                }
-            }
-            variable = null;
-            return false;
-        }
-
-        /// <summary>
-        /// Gets the value associated with the specifed node within the
-        /// this environment record.  Outer records are not searched.
-        /// </summary>
-        internal abstract bool TryGetLocalNodeValue(Node node, out IAnalysisSet variable);
-
-        /// <summary>
-        /// Cached node variables so that we don't continually create new entries for basic nodes such
-        /// as sequences, lambdas, etc...
-        /// </summary>
-        public IAnalysisSet GetOrMakeNodeValue(Node node, Func<Node, IAnalysisSet> maker) {
-            IAnalysisSet result;
-            if (!TryGetNodeValue(node, out result)) {
-                result = maker(node);
-                AddNodeValue(node, result);
-            }
-            return result;
-        }
 
         #endregion
 

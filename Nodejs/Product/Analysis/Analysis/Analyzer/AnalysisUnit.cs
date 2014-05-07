@@ -117,8 +117,7 @@ namespace Microsoft.NodejsTools.Analysis {
         /// variable. Future updates to the variable may result in the unit
         /// being reanalyzed.
         /// </remarks>
-        public IAnalysisSet FindAnalysisValueByName(Node node, string name)
-        {
+        public IAnalysisSet FindAnalysisValueByName(Node node, string name) {
             foreach (var env in Environment.EnumerateTowardsGlobal) {
                 var refs = env.GetVariable(node, this, name, true);
                 if (refs != null) {
@@ -132,11 +131,10 @@ namespace Microsoft.NodejsTools.Analysis {
                 }
             }
 
-          return AnalysisSet.Empty;
+            return AnalysisSet.Empty;
         }
-        
-       internal ProjectEntry ProjectEntry
-        {
+
+        internal ProjectEntry ProjectEntry {
             get { return DeclaringModuleEnvironment.ProjectEntry; }
         }
 
