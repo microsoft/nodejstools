@@ -122,13 +122,13 @@ namespace Microsoft.NodejsTools.Analysis {
             }
         }
 
-        private string[] GetParameters(dynamic parameters) {
-            List<string> res = new List<string>();
+        private ParameterResult[] GetParameters(dynamic parameters) {
+            List<ParameterResult> res = new List<ParameterResult>();
             foreach (var param in parameters) {
                 if (param["name"] == "...") {
                     break;
                 }
-                res.Add(FixModuleName(param["name"]));
+                res.Add(new ParameterResult(FixModuleName(param["name"])));
             }
             return res.ToArray();
         }

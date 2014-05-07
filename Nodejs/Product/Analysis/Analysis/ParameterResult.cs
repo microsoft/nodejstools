@@ -20,6 +20,7 @@ namespace Microsoft.NodejsTools.Analysis {
         public string Name { get; private set; }
         public string Documentation { get; private set; }
         public string Type { get; private set; }
+        public bool IsOptional { get; private set; }
         public IEnumerable<IAnalysisVariable> Variables { get; private set; }
 
         public ParameterResult(string name)
@@ -42,6 +43,7 @@ namespace Microsoft.NodejsTools.Analysis {
             Documentation = doc;
             Type = type;
             Variables = variable;
+            IsOptional = isOptional;
         }
 
         public override bool Equals(object obj) {

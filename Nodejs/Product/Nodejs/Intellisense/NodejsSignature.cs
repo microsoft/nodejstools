@@ -53,6 +53,10 @@ namespace Microsoft.NodejsTools.Intellisense {
 
                 content.Append(param.Name);
                 ppContent.Append(param.Name);
+                if (param.IsOptional) {
+                    content.Append("?");
+                    ppContent.Append("?");
+                }
                 if (!string.IsNullOrEmpty(param.Type) && param.Type != "object") {
                     content.Append(": ");
                     content.Append(param.Type);

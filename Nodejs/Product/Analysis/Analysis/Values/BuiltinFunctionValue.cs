@@ -28,14 +28,14 @@ namespace Microsoft.NodejsTools.Analysis.Values {
     /// </summary>
     internal class BuiltinFunctionValue : FunctionValue {
         private readonly string _name;
-        private readonly string[] _signature;
+        private readonly ParameterResult[] _signature;
         private readonly string _documentation;
 
         public BuiltinFunctionValue(ProjectEntry projectEntry,
             string name,
             string documentation = null,
             bool createPrototype = true,
-            params string[] signature)
+            params ParameterResult[] signature)
             : base(projectEntry, createPrototype, name) {
             _name = name;
             _documentation = documentation;
@@ -53,7 +53,7 @@ namespace Microsoft.NodejsTools.Analysis.Values {
             get {
                 return new[] {
                     new SimpleOverloadResult(
-                        _signature.Select(x => new ParameterResult(x)).ToArray(),
+                        _signature,
                         _name,
                         _documentation
                     )
@@ -87,7 +87,7 @@ namespace Microsoft.NodejsTools.Analysis.Values {
     internal class ReturningFunctionValue : BuiltinFunctionValue {
         private readonly IAnalysisSet _retValue;
 
-        public ReturningFunctionValue(ProjectEntry projectEntry, string name, IAnalysisSet retValue, string documentation = null, bool createPrototype = true, params string[] signature)
+        public ReturningFunctionValue(ProjectEntry projectEntry, string name, IAnalysisSet retValue, string documentation = null, bool createPrototype = true, params ParameterResult[] signature)
             : base(projectEntry, name, documentation, createPrototype, signature) {
             _retValue = retValue;
         }
@@ -100,7 +100,7 @@ namespace Microsoft.NodejsTools.Analysis.Values {
     internal class ReturningConstructingFunctionValue : BuiltinFunctionValue {
         private readonly IAnalysisSet _retValue;
 
-        public ReturningConstructingFunctionValue(ProjectEntry projectEntry, string name, IAnalysisSet retValue, string documentation = null, bool createPrototype = true, params string[] signature)
+        public ReturningConstructingFunctionValue(ProjectEntry projectEntry, string name, IAnalysisSet retValue, string documentation = null, bool createPrototype = true, params ParameterResult[] signature)
             : base(projectEntry, name, documentation, createPrototype, signature) {
             _retValue = retValue;
         }
@@ -117,7 +117,7 @@ namespace Microsoft.NodejsTools.Analysis.Values {
     internal class SpecializedFunctionValue : BuiltinFunctionValue {
         private readonly CallDelegate _func;
 
-        public SpecializedFunctionValue(ProjectEntry projectEntry, string name, CallDelegate func, string documentation = null, params string[] signature)
+        public SpecializedFunctionValue(ProjectEntry projectEntry, string name, CallDelegate func, string documentation = null, params ParameterResult[] signature)
             : base(projectEntry, name, documentation, true, signature) {
             _func = func;
         }
@@ -136,11 +136,13 @@ namespace Microsoft.NodejsTools.Analysis.Values {
         internal readonly string Name;
         internal readonly AnalysisValue Value;
         internal readonly bool IsProperty;
+        internal readonly string Documentation;
 
-        public MemberAddInfo(string name, AnalysisValue value, bool isProperty = false) {
+        public MemberAddInfo(string name, AnalysisValue value, string documentation = null, bool isProperty = false) {
             Name = name;
             Value = value;
             IsProperty = isProperty;
+            Documentation = documentation;
         }
     }
 
