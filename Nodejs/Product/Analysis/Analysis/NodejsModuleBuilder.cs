@@ -1,19 +1,28 @@
-﻿using System;
+﻿/* ****************************************************************************
+ *
+ * Copyright (c) Microsoft Corporation. 
+ *
+ * This source code is subject to terms and conditions of the Apache License, Version 2.0. A 
+ * copy of the license can be found in the License.html file at the root of this distribution. If 
+ * you cannot locate the Apache License, Version 2.0, please send an email to 
+ * vspython@microsoft.com. By using this source code in any fashion, you are agreeing to be bound 
+ * by the terms of the Apache License, Version 2.0.
+ *
+ * You must not remove this notice, or any other, from this software.
+ *
+ * ***************************************************************************/
+
+using System;
 using System.Collections.Generic;
-using System.Diagnostics;
 using System.IO;
-using System.Linq;
 using System.Text;
-using System.Threading.Tasks;
 using System.Web.Script.Serialization;
 using System.Xml;
-using Microsoft.NodejsTools;
-using Microsoft.NodejsTools.Analysis;
 using Microsoft.NodejsTools.Analysis.Values;
 
 namespace Microsoft.NodejsTools.Analysis {
 
-    class NodejsModuleBuilder {
+    partial class NodejsModuleBuilder {
         private readonly JavaScriptSerializer _serializer = new JavaScriptSerializer();
         private readonly dynamic _all;
         //private readonly string _filename;
@@ -66,6 +75,8 @@ namespace Microsoft.NodejsTools.Analysis {
             foreach (var module in _all["modules"]) {
                 var moduleName = FixModuleName((string)module["name"]);
                 var exports = exportsTable[moduleName];
+                Dictionary<string, CallDelegate> specialMethods;
+                _specializations.TryGetValue(moduleName, out specialMethods);
 
                 if (module.ContainsKey("methods")) {
                     foreach (var method in module["methods"]) {
@@ -83,15 +94,28 @@ namespace Microsoft.NodejsTools.Analysis {
                         //GenerateMethod(name, method, indentation + 1, body);
 
                         foreach (var sig in method["signatures"]) {
-                            exports.Add(
-                                new BuiltinFunctionValue(
+                            BuiltinFunctionValue function;
+                            CallDelegate specialMethod;
+                            if (specialMethods != null && 
+                                specialMethods.TryGetValue(methodName, out specialMethod)) {
+                                function = new SpecializedFunctionValue(
+                                    _analyzer._builtinEntry,
+                                    methodName,
+                                    specialMethod,
+                                    ParseDocumentation((string)method["desc"]),
+                                    GetParameters(sig["params"])
+                                );
+                            } else {
+                                function = new BuiltinFunctionValue(
                                     _analyzer._builtinEntry,
                                     methodName,
                                     ParseDocumentation((string)method["desc"]),
                                     true,
                                     GetParameters(sig["params"])
-                                )
-                            );
+                                );
+                            }
+
+                            exports.Add(function);
                         }
                     }
                 }

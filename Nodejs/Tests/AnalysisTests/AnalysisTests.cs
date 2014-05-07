@@ -910,6 +910,34 @@ var y = abc()('abc');
             }
         }
 
+        [TestMethod]
+        public void TestUtilInherits() {
+            var code = @"util = require('util');
+
+function f() {
+}
+function g() {
+}
+g.prototype.abc = 42;
+
+util.inherits(f, g);
+var super_ = f.super_;
+var abc = new f().abc;
+";
+            var analysis = ProcessText(code);
+
+            AssertUtil.ContainsExactly(
+                analysis.GetTypeIdsByIndex("super_", code.Length),
+                BuiltinTypeId.Function
+            );
+
+            AssertUtil.ContainsExactly(
+                analysis.GetTypeIdsByIndex("abc", code.Length),
+                BuiltinTypeId.Number
+            );
+        }
+
+
         public static ModuleAnalysis ProcessText(string text) {
             var sourceUnit = GetSourceUnit(text);
             var state = new JsAnalyzer();

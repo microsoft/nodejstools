@@ -25,7 +25,6 @@ namespace Microsoft.NodejsTools.Analysis.Values {
         private readonly FunctionObject _funcObject;
         private readonly FunctionAnalysisUnit _analysisUnit;
         public VariableDef ReturnValue;
-        //private VariableDef[] _parameters;
         internal Dictionary<CallArgs, CallInfo> _allCalls;
         private OverflowState _overflowed;
         const int MaximumCallCount = 100;
