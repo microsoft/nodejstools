@@ -1,10 +1,10 @@
-﻿var assert = require('assert');
+﻿import assert = require('assert');
 
-exports['Test 1'] = function (test) {
+export function Test1(test) {
     assert.ok(true, "This shouldn't fail");
 }
 
-exports['Test 2'] = function (test) {
+export function Test2(test) {
     assert.ok(1 === 1, "This shouldn't fail");
     assert.ok(false, "This should fail");
 }

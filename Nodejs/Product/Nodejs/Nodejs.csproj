@@ -753,7 +753,13 @@
       <SubType>Designer</SubType>
     </MultiProjectZipProject>
     <ZipItem Include="Templates\Files\UnitTest\UnitTest.js" />
-    <ZipItem Include="Templates\Files\UnitTest\UnitTest.vstemplate" />
+    <ZipItem Include="Templates\Files\UnitTest\UnitTest.vstemplate">
+      <SubType>Designer</SubType>
+    </ZipItem>
+    <ZipItem Include="Templates\Files\TypeScriptUnitTest\UnitTest.ts" />
+    <ZipItem Include="Templates\Files\TypeScriptUnitTest\UnitTest.vstemplate">
+      <SubType>Designer</SubType>
+    </ZipItem>
     <Content Include="VSTemplateStore.pkgdef">
       <IncludeInVSIX>true</IncludeInVSIX>
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
