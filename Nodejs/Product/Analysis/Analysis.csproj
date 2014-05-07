@@ -198,7 +198,6 @@
     <Compile Include="Analysis\LocationInfo.cs" />
     <Compile Include="Analysis\MemberResult.cs" />
     <Compile Include="Analysis\ModuleAnalysis.cs" />
-    <Compile Include="Analysis\ModuleReference.cs" />
     <Compile Include="Analysis\ModuleTable.cs" />
     <Compile Include="Analysis\NativeMethods.cs" />
     <Compile Include="Analysis\Values\NullValue.cs" />

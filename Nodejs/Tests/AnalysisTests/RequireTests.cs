@@ -34,6 +34,25 @@ namespace AnalysisTests {
             );
         }
 
+        [TestMethod]
+        public void TestRequireMultiAssign() {
+            var entries = Analysis.Analyze(
+                new AnalysisFile("server.js", @"var mymod = require('mymod')"),
+                new AnalysisFile("node_modules\\mymod\\index.js", @"module.exports = require('./lib/');"),
+                new AnalysisFile("node_modules\\mymod\\lib\\index.js", @"function MyMod() {
+	this.abc = 42;
+}
+
+var mymod = module.exports = exports = new MyMod")
+            );
+
+            AssertUtil.ContainsExactly(
+                entries["server.js"].Analysis.GetTypeIdsByIndex("mymod.abc", 0),
+                BuiltinTypeId.Number
+            );
+        }
+
+
         // TODO: Negative tests
         // module = {}
         // module.exports = 42;

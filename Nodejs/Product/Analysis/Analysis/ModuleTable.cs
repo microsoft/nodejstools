@@ -60,10 +60,6 @@ namespace Microsoft.NodejsTools.Analysis {
                     curTree = nextTree;
                 }
 
-                if (curTree.ModuleReference == null) {
-                    curTree.ModuleReference = new ModuleReference();
-                }
-
                 _modulesByFilename[name] = curTree;
                 return curTree;
             }
@@ -88,25 +84,29 @@ namespace Microsoft.NodejsTools.Analysis {
             return false;
         }
 
-        public ModuleReference GetOrAdd(string name) {
-            return GetModuleTree(name).ModuleReference;
+        public void AddModule(string name, ModuleValue value) {
+            lock (_lock) {
+                GetModuleTree(name).Module = value;
+            }
         }
 
         /// <summary>
         /// Attempts to resolve the required module when required from the declaring module.
         /// </summary>
         public IAnalysisSet RequireModule(Node node, AnalysisUnit unit, string moduleName, string declModule) {
-            ModuleTree moduleTree;
-            if (TryGetValue(moduleName, out moduleTree)) {
-                // exact filename match or built-in module
-                return GetExports(node, unit, moduleTree);
-            }
+            lock (_lock) {
+                ModuleTree moduleTree;
+                if (TryGetValue(moduleName, out moduleTree)) {
+                    // exact filename match or built-in module
+                    return GetExports(node, unit, moduleTree);
+                }
 
-            if (TryGetValue(declModule, out moduleTree)) {
-                return RequireModule(node, unit, moduleName, moduleTree.Parent);
-            }
+                if (TryGetValue(declModule, out moduleTree)) {
+                    return RequireModule(node, unit, moduleName, moduleTree.Parent);
+                }
 
-            return AnalysisSet.Empty;
+                return AnalysisSet.Empty;
+            }
         }
 
         private IAnalysisSet RequireModule(Node node, AnalysisUnit unit, string moduleName, ModuleTree relativeTo) {
@@ -115,19 +115,17 @@ namespace Microsoft.NodejsTools.Analysis {
                 return GetExports(
                     node, 
                     unit, 
-                    ResolveModule(relativeTo, moduleName)
+                    ResolveModule(relativeTo, unit, moduleName)
                 );
             } else {
                 // must be in node_modules, search in the current directory
-                // and up through our parents
-                ModuleTree nodeModules;
+                // and up through our parents                
                 do {
-                    if (relativeTo.Children.TryGetValue("node_modules", out nodeModules)) {
-                        var curTree = ResolveModule(nodeModules, moduleName);
+                    var nodeModules = relativeTo.GetChild("node_modules", unit);
+                    var curTree = ResolveModule(nodeModules, unit, moduleName);
 
-                        if (curTree != null) {
-                            return GetExports(node, unit, curTree);
-                        }
+                    if (curTree != null) {
+                        return GetExports(node, unit, curTree);
                     }
 
                     relativeTo = relativeTo.Parent;
@@ -136,7 +134,7 @@ namespace Microsoft.NodejsTools.Analysis {
             return AnalysisSet.Empty;
         }
 
-        private static ModuleTree ResolveModule(ModuleTree parentTree, string relativeName) {
+        private static ModuleTree ResolveModule(ModuleTree parentTree, AnalysisUnit unit, string relativeName) {
             ModuleTree curTree = parentTree;
             foreach (var comp in ModuleTable.GetPathComponents(relativeName)) {
                 if (comp == ".") {
@@ -146,14 +144,20 @@ namespace Microsoft.NodejsTools.Analysis {
                     continue;
                 }
 
-                ModuleTree nextTree;
-                if (!curTree.Children.TryGetValue(comp, out nextTree) &&
-                    !curTree.Children.TryGetValue(comp + ".js", out nextTree)) {
-                    return null;
+                ModuleTree nextTree = curTree.GetChild(comp, unit);
+                if (nextTree.Children.Count > 0 || nextTree.Module != null) {
+                    curTree = nextTree;
+                    continue;
                 }
 
-                curTree = nextTree;
+                nextTree = curTree.GetChild(comp + ".js", unit);
+                if (nextTree.Children.Count > 0 || nextTree.Module != null) {
+                    curTree = nextTree;
+                    continue;
+                }
+                return null;
             }
+
             return curTree;
         }
 
@@ -163,9 +167,8 @@ namespace Microsoft.NodejsTools.Analysis {
         /// </summary>
         private IAnalysisSet GetExports(Node node, AnalysisUnit unit, ModuleTree curTree) {
             if (curTree != null) {
-                if (curTree.ModuleReference != null &&
-                    curTree.ModuleReference.Module != null) {
-                    var moduleScope = curTree.ModuleReference.Module.EnvironmentRecord;
+                if (curTree.Module != null) {
+                    var moduleScope = curTree.Module.EnvironmentRecord;
                     return moduleScope.Module.GetMember(
                         node,
                         unit,
@@ -240,12 +243,51 @@ namespace Microsoft.NodejsTools.Analysis {
         public readonly ModuleTree Parent;
         public readonly string Name;
         public readonly Dictionary<string, ModuleTree> Children = new Dictionary<string, ModuleTree>(StringComparer.OrdinalIgnoreCase);
-        public string DefaultPackage = "./index.js";
-        public ModuleReference ModuleReference;
+        private ModuleValue _module;
+        private string _defaultPackage = "./index.js";
+        DependentData _dependencies = new DependentData();
+
+        public string DefaultPackage {
+            get {
+                return _defaultPackage;
+            }
+            set {
+                _defaultPackage = value;
+                EnqueueDependents();
+
+            }
+        }
+
+        private void EnqueueDependents() {
+            var curTree = this;
+            while (curTree != null) {
+                curTree._dependencies.EnqueueDependents();
+                curTree = curTree.Parent;
+            }
+        }
+
+        public ModuleValue Module {
+            get {
+                return _module;
+            }
+            set {
+                _module = value;
+                EnqueueDependents();
+            }
+        }
 
         public ModuleTree(ModuleTree parent, string name) {
             Parent = parent;
             Name = name;
+        }
+
+        public ModuleTree GetChild(string name, AnalysisUnit unit) {
+            ModuleTree tree;
+            if (!Children.TryGetValue(name, out tree)) {
+                Children[name] = tree = new ModuleTree(this, name);
+            }
+            tree.AddDependency(unit);
+            return tree;
         }
 
 #if DEBUG
@@ -267,5 +309,9 @@ namespace Microsoft.NodejsTools.Analysis {
             }
         }
 #endif
+
+        internal void AddDependency(AnalysisUnit unit) {
+            _dependencies.AddDependency(unit);
+        }
     }
 }

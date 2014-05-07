@@ -30,36 +30,12 @@ namespace Microsoft.NodejsTools.Analysis.Values {
         const int MaximumCallCount = 100;
 
         public UserFunctionValue(FunctionObject node, AnalysisUnit declUnit, EnvironmentRecord declScope, bool isNested = false)
-            : base(declUnit.ProjectEntry) {
+            : base(declUnit.ProjectEntry, true, node.Name ?? node.NameGuess) {
             ReturnValue = new VariableDef();
             _funcObject = node;
             _analysisUnit = new FunctionAnalysisUnit(this, declUnit, declScope, ProjectEntry);
 
             declUnit.Analyzer.AnalysisValueCreated(typeof(UserFunctionValue));
-        }
-
-        class LookupChecker : AstVisitor {
-            public bool IsClosure;
-            public readonly Statement DeclNode;
-
-            public LookupChecker(Statement declNode) {
-                DeclNode = declNode;
-            }
-
-            public override bool Walk(Lookup node) {
-                var curField = node.VariableField;                
-                while (curField.OuterField != null) {
-                    curField = curField.OuterField;
-                }
-                if (curField.Scope != DeclNode) {
-                    IsClosure = true;
-                }
-                return base.Walk(node);
-            }
-
-            public override bool Walk(FunctionObject node) {
-                return false;
-            }
         }
 
         public FunctionObject FunctionObject {

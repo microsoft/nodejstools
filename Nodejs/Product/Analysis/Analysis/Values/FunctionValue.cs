@@ -24,7 +24,7 @@ namespace Microsoft.NodejsTools.Analysis.Values {
 
         internal FunctionValue(ProjectEntry projectEntry, bool createPrototype = true, string name = null)
             : base(projectEntry) {
-            _instance = new InstanceValue(ProjectEntry, this, description: "instance of " + Name ?? name);
+            _instance = new InstanceValue(ProjectEntry, this, description: "instance of " + name);
             if (createPrototype) {
                 string description = null;
 #if DEBUG

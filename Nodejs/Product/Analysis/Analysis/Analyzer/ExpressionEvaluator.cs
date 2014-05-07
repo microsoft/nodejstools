@@ -193,7 +193,7 @@ namespace Microsoft.NodejsTools.Analysis.Analyzer {
                 var objectInfo = new ObjectLiteralValue(ee._unit.ProjectEntry, node);
                 result = objectInfo.SelfSet;
 
-                if (n.Properties.Count > 30) {
+                if (n.Properties.Count > 50) {
                     // probably some generated object literal, ignore it
                     // for the post part.
                     AssignProperty(ee, node, objectInfo, n.Properties.First());
