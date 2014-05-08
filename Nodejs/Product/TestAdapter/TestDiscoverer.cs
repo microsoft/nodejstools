@@ -75,6 +75,7 @@ namespace Microsoft.NodejsTools.TestAdapter {
                             }
 
                             string fileAbsolutePath = CommonUtils.GetAbsoluteFilePath(projectHome, item.EvaluatedInclude);
+                            string testFileAbsolutePath = fileAbsolutePath;
 
                             if (Path.GetExtension(fileAbsolutePath).Equals(".ts", StringComparison.OrdinalIgnoreCase)) {
                                 //We're dealing with TypeScript
@@ -120,7 +121,7 @@ namespace Microsoft.NodejsTools.TestAdapter {
 
                                     logger.SendMessage(TestMessageLevel.Informational, String.Format("Creating TestCase:{0}", testName));
                                     var testCase = new TestCase(testName, TestExecutor.ExecutorUri, projSource) {
-                                        CodeFilePath = fileAbsolutePath,
+                                        CodeFilePath = testFileAbsolutePath,
                                         LineNumber = 0,
                                         DisplayName = testFunction
                                     };

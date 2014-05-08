@@ -318,7 +318,6 @@
     <Compile Include="Debugger\Communication\NetworkClientFactory.cs" />
     <Compile Include="Debugger\Communication\WebSocketNetworkClient.cs" />
     <Compile Include="Debugger\Communication\TcpNetworkClient.cs" />
-    <Compile Include="Debugger\Communication\WebSocketStream.cs" />
     <Compile Include="Debugger\ExceptionHitTreatment.cs" />
     <Compile Include="Debugger\ExceptionHandler.cs" />
     <Compile Include="Debugger\JavaScriptSourceMapInfo.cs" />
@@ -787,7 +786,13 @@
       <SubType>Designer</SubType>
     </MultiProjectZipProject>
     <ZipItem Include="Templates\Files\UnitTest\UnitTest.js" />
-    <ZipItem Include="Templates\Files\UnitTest\UnitTest.vstemplate" />
+    <ZipItem Include="Templates\Files\UnitTest\UnitTest.vstemplate">
+      <SubType>Designer</SubType>
+    </ZipItem>
+    <ZipItem Include="Templates\Files\TypeScriptUnitTest\UnitTest.ts" />
+    <ZipItem Include="Templates\Files\TypeScriptUnitTest\UnitTest.vstemplate">
+      <SubType>Designer</SubType>
+    </ZipItem>
     <Content Include="VSTemplateStore.pkgdef">
       <IncludeInVSIX>true</IncludeInVSIX>
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
@@ -1027,20 +1032,16 @@
   </ItemGroup>
   <ItemGroup>
     <Content Include="..\Icons\NodejsProject.ico">
-      <Link>Resources\Icons\NodejsProject.ico</Link>
+      <Link>NodejsProject.ico</Link>
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
       <IncludeInVSIX>true</IncludeInVSIX>
       <VSIXSubpath>.</VSIXSubpath>
     </Content>
-    <Content Include="..\Icons\NodejsToolsforVisualStudio.ico">
-      <Link>Resources\Icons\NodejsToolsforVisualStudio.ico</Link>
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-      <IncludeInVSIX>true</IncludeInVSIX>
-    </Content>
     <Content Include="..\Icons\NodejsProjectBig.ico">
-      <Link>Resources\Icons\NodejsProjectBig.ico</Link>
+      <Link>NodejsProjectBig.ico</Link>
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
       <IncludeInVSIX>true</IncludeInVSIX>
+      <VSIXSubpath>.</VSIXSubpath>
     </Content>
     <Resource Include="..\Icons\NodejsProjectBigResource.ico">
       <Link>Resources\Icons\NodejsProjectBigResource.ico</Link>

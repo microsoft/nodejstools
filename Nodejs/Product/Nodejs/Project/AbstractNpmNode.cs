@@ -25,6 +25,13 @@ namespace Microsoft.NodejsTools.Project {
             get { return VsMenus.IDM_VS_CTXT_ITEMNODE; }
         }
 
+        /// <summary>
+        /// Disable inline editing of Caption.
+        /// </summary>
+        public override string GetEditLabel() {
+            return null;
+        }
+
         protected override NodeProperties CreatePropertiesObject() {
             return new NpmNodeProperties(this);
         }

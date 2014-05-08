@@ -414,14 +414,17 @@ namespace TestUtilities.UI {
             IntPtr hwnd;
             uiShell.GetDialogOwnerHwnd(out hwnd);
 
-            for (int i = 0; i < 20 && hwnd == originalHwnd; i++) {
+            int timeout = task == null ? 10000 : 60000;
+
+            while (timeout > 0 && hwnd == originalHwnd && (task == null || !task.IsCompleted)) {
+                timeout -= 500;
                 System.Threading.Thread.Sleep(500);
                 uiShell.GetDialogOwnerHwnd(out hwnd);
-                if (task != null && task.IsFaulted) {
-                    return IntPtr.Zero;
-                }
             }
 
+            if (task != null && task.IsFaulted) {
+                return IntPtr.Zero;
+            }
 
             if (hwnd == originalHwnd) {
                 DumpElement(AutomationElement.FromHandle(hwnd));
@@ -633,9 +636,15 @@ namespace TestUtilities.UI {
                                     AutomationElement.ClassNameProperty,
                                     "GenericPane"
                                 ),
-                                new PropertyCondition(
-                                    AutomationElement.NameProperty,
-                                    "Windows Azure Activity Log"
+                                new OrCondition(
+                                    new PropertyCondition(
+                                        AutomationElement.NameProperty,
+                                        "Microsoft Azure Activity Log"
+                                    ),
+                                    new PropertyCondition(
+                                        AutomationElement.NameProperty,
+                                        "Windows Azure Activity Log"
+                                    )
                                 )
                             )
                         );

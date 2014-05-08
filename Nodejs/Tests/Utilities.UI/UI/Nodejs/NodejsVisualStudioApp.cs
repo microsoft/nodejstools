@@ -26,8 +26,8 @@ namespace TestUtilities.UI.Nodejs {
         public const string JavaScriptTemplateLanguageName = "JavaScript";
         public const string TypeScriptTemplateLanguageName = "TypeScript";
 
-        public const string JavaScriptAzureWebAppTemplate = "Blank Windows Azure Node.js Application";
-        public const string TypeScriptAzureWebAppTemplate = "Blank Windows Azure Node.js Web Application";
+        public const string JavaScriptAzureWebAppTemplate = "Blank Microsoft Azure Node.js Application";
+        public const string TypeScriptAzureWebAppTemplate = "Blank Microsoft Azure Node.js Web Application";
 
 
         public NodejsVisualStudioApp(DTE dte)
