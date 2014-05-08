@@ -60,6 +60,12 @@ namespace Microsoft.NodejsTools.Analysis.Analyzer {
         public override int GetBodyStart(JsAst ast) {
             return _startIndex;
         }
+        
+        public override IAnalysisSet ThisValue {
+            get {
+                return Parent.ThisValue;
+            }
+        }
 
         public override IEnumerable<KeyValuePair<string, VariableDef>> Variables {
             get { return Parent.Variables; }

@@ -35,12 +35,6 @@ namespace Microsoft.NodejsTools.Analysis.Analyzer {
             }
         }
 
-        public virtual IAnalysisSet MergedThisValue {
-            get {
-                return ThisValue;
-            }
-        }
-
         protected EnvironmentRecord(EnvironmentRecord cloned, bool isCloned) {
             Debug.Assert(isCloned);
             if (cloned.HasChildren) {

@@ -55,12 +55,6 @@ namespace Microsoft.NodejsTools.Analysis.Analyzer {
             }
         }
 
-        public override IAnalysisSet MergedThisValue {
-            get {
-                return ThisValue;
-            }
-        }
-
         internal void AddReturnTypes(Node node, AnalysisUnit unit, IAnalysisSet types, bool enqueue = true) {
 #if FALSE
             if (Generator != null) {

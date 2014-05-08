@@ -92,6 +92,28 @@ var x = new f().value;
         }
 
         [TestMethod]
+        public void TestThisPassedAndReturned() {
+            string code = @"function X(csv) {
+    abc = 100;
+    return csv;
+}
+
+function Y() {
+    abc = 42;
+    this.abc = X(this);
+}
+
+xyz = new Y();";
+
+            var analysis = ProcessText(code);
+            
+            AssertUtil.ContainsExactly(
+                analysis.GetValuesByIndex("xyz.abc", code.Length),
+                analysis.GetValuesByIndex("new Y()", code.Length)
+            );
+        }
+
+        [TestMethod]
         public void TestDefinitiveAssignmentScoping() {
             string code = @"
 var x = {abc:42};
