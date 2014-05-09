@@ -165,6 +165,8 @@ namespace Microsoft.NodejsTools.Analysis {
 
         /// <summary>
         /// Attempts to call this object and returns the set of possible types it can return.
+        /// 
+        /// Implements the internal [[Call]] method.
         /// </summary>
         /// <param name="node">The node which is triggering the call, for reference tracking</param>
         /// <param name="unit">The analysis unit performing the analysis</param>
@@ -173,21 +175,26 @@ namespace Microsoft.NodejsTools.Analysis {
             return AnalysisSet.Empty;
         }
 
+        /// <summary>
+        /// Implements the internal [[Construct]] method.
+        /// </summary>
+        /// </summary>
+        /// <param name="node">The node which is triggering the call, for reference tracking</param>
+        /// <param name="unit">The analysis unit performing the analysis</param>
+        /// <param name="args">The arguments provided to construct the object.</param>
         public virtual IAnalysisSet Construct(Node node, AnalysisUnit unit, IAnalysisSet[] args) {
             return AnalysisSet.Empty;
         }
 
         /// <summary>
         /// Attempts to get a member from this object with the specified name.
+        /// 
+        /// Implements the internal [[Get]] method.
         /// </summary>
         /// <param name="node">The node which is triggering the call, for reference tracking</param>
         /// <param name="unit">The analysis unit performing the analysis</param>
         /// <param name="name">The name of the member.</param>
-        /// <remarks>
-        /// Overrides of this method must unconditionally call the base
-        /// implementation, even if the return value is ignored.
-        /// </remarks>
-        public virtual IAnalysisSet GetMember(Node node, AnalysisUnit unit, string name) {
+        public virtual IAnalysisSet Get(Node node, AnalysisUnit unit, string name) {
             return AnalysisSet.Empty;
         }
 

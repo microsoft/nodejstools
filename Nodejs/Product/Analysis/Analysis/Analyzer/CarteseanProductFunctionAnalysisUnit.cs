@@ -129,12 +129,14 @@ namespace Microsoft.NodejsTools.Analysis.Analyzer {
             }
 
             // Propagate the call types into the variables...
-            for (int i = 0; i < Ast.ParameterDeclarations.Count && i < args.Args.Length; i++) {
-                funcScope.GetVariable(Ast.ParameterDeclarations[i].Name).AddTypes(
-                    this,
-                    args.Args[i],
-                    false
-                );
+            if (Ast.ParameterDeclarations != null) {
+                for (int i = 0; i < Ast.ParameterDeclarations.Count && i < args.Args.Length; i++) {
+                    funcScope.GetVariable(Ast.ParameterDeclarations[i].Name).AddTypes(
+                        this,
+                        args.Args[i],
+                        false
+                    );
+                }
             }
 
             var unifiedReturn = function.ReturnValue;

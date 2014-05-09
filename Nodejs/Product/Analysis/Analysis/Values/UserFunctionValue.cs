@@ -111,14 +111,16 @@ namespace Microsoft.NodejsTools.Analysis.Values {
         }
 
         internal void AddParameterString(StringBuilder result) {
-            for (int i = 0; i < FunctionObject.ParameterDeclarations.Count; i++) {
-                if (i != 0) {
-                    result.Append(", ");
-                }
-                var p = FunctionObject.ParameterDeclarations[i];
+            if (FunctionObject.ParameterDeclarations != null) {
+                for (int i = 0; i < FunctionObject.ParameterDeclarations.Count; i++) {
+                    if (i != 0) {
+                        result.Append(", ");
+                    }
+                    var p = FunctionObject.ParameterDeclarations[i];
 
-                var name = MakeParameterName(p);
-                result.Append(name);
+                    var name = MakeParameterName(p);
+                    result.Append(name);
+                }
             }
         }
 
@@ -185,7 +187,7 @@ namespace Microsoft.NodejsTools.Analysis.Values {
                     }).ToArray();
 
                     var parameters = vars
-                        .Select(p => string.Join(", ", p.TypesNoCopy.Select(av => av.ShortDescription).OrderBy(s => s).Distinct()))
+                        .Select(p => string.Join(", ", p.TypesNoCopy.Select(av => av.ShortDescription).Where(s => !String.IsNullOrWhiteSpace(s)).OrderBy(s => s).Distinct()))
                         .ToArray();
 
                     IEnumerable<AnalysisVariable>[] refs;
@@ -199,12 +201,14 @@ namespace Microsoft.NodejsTools.Analysis.Values {
 
                 foreach (var keyValue in references) {
                     yield return new SimpleOverloadResult(
-                        FunctionObject.ParameterDeclarations.Select((p, i) => {
-                            var name = MakeParameterName(p);
-                            var type = keyValue.Key[i];
-                            var refs = keyValue.Value[i];
-                            return new ParameterResult(name, string.Empty, type, false, refs);
-                        }).ToArray(),
+                        FunctionObject.ParameterDeclarations == null ?
+                            new ParameterResult[0] :
+                            FunctionObject.ParameterDeclarations.Select((p, i) => {
+                                var name = MakeParameterName(p);
+                                var type = keyValue.Key[i];
+                                var refs = keyValue.Value[i];
+                                return new ParameterResult(name, string.Empty, type, false, refs);
+                            }).ToArray(),
                         FunctionObject.Name,
                         Documentation
                     );

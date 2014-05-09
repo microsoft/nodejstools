@@ -169,7 +169,7 @@ namespace Microsoft.NodejsTools.Analysis {
             if (curTree != null) {
                 if (curTree.Module != null) {
                     var moduleScope = curTree.Module.EnvironmentRecord;
-                    return moduleScope.Module.GetMember(
+                    return moduleScope.Module.Get(
                         node,
                         unit,
                         "exports"

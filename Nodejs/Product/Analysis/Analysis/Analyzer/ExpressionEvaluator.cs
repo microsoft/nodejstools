@@ -78,7 +78,7 @@ namespace Microsoft.NodejsTools.Analysis.Analyzer {
                 }
             }
 
-            return ProjectState._globalObject.GetMember(node, _unit, name);
+            return ProjectState._globalObject.Get(node, _unit, name);
         }
 
         #endregion
@@ -169,7 +169,7 @@ namespace Microsoft.NodejsTools.Analysis.Analyzer {
 
         private static IAnalysisSet EvaluateMember(ExpressionEvaluator ee, Node node) {
             var n = (Member)node;
-            return ee.Evaluate(n.Root).GetMember(node, ee._unit, n.Name);
+            return ee.Evaluate(n.Root).Get(node, ee._unit, n.Name);
         }
 
         private static IAnalysisSet EvaluateIndex(ExpressionEvaluator ee, Node node) {
@@ -275,7 +275,7 @@ namespace Microsoft.NodejsTools.Analysis.Analyzer {
             IAnalysisSet targetRefs;
             if (member != null) {
                 baseValue = Evaluate(member.Root);
-                @targetRefs = baseValue.GetMember(node, _unit, member.Name);
+                @targetRefs = baseValue.Get(node, _unit, member.Name);
             } else {
                 CallNode call = n.Function as CallNode;
                 if (call != null && call.InBrackets && call.Arguments.Count == 1) {

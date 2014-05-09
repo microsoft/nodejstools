@@ -29,6 +29,7 @@ namespace Microsoft.NodejsTools.Analysis {
             var doubleValue = _analyzer.GetConstant(0.0);
             AnalysisValue numberPrototype, stringPrototype, booleanPrototype, functionPrototype;
             FunctionValue arrayFunction;
+            ObjectValue objectPrototype;
 
             var globalObject = new ObjectValue(builtinEntry) {
                 (arrayFunction = ArrayFunction()),
@@ -42,7 +43,7 @@ namespace Microsoft.NodejsTools.Analysis {
                 Member("Math", MakeMathObject()),
                 Member("Infinity", analyzer.GetConstant(double.NaN)),
                 NumberFunction(out numberPrototype),
-                ObjectFunction(),
+                ObjectFunction(out objectPrototype),
                 ErrorFunction("RangeError"),
                 ErrorFunction("ReferenceError"),
                 RegExpFunction(),
@@ -189,7 +190,8 @@ All other strings are considered decimal.", isOptional:true)
                 stringPrototype, 
                 booleanPrototype, 
                 functionPrototype,
-                arrayFunction
+                arrayFunction,
+                objectPrototype
             );
         }
 
@@ -902,10 +904,56 @@ For example, the absolute value of -5 is the same as the absolute value of 5.",
             };
         }
 
-        private BuiltinFunctionValue ObjectFunction() {
+        private BuiltinFunctionValue ObjectFunction(out ObjectValue objectPrototype) {
             var builtinEntry = _analyzer._builtinEntry;
 
-            return new BuiltinFunctionValue(builtinEntry, "Object") { 
+            objectPrototype = new ObjectValue(builtinEntry) {
+                SpecializedFunction(
+                    "__defineGetter__",
+                    DefineGetter,
+                    "Creates a getter method for the given property name",
+                    Parameter("sprop", "The property name"),
+                    Parameter("fun", "The function to be invoked")
+                ),   
+                BuiltinFunction(
+                    "__lookupGetter__",
+                    "Gets the getter function for the given property name",
+                    Parameter("sprop", "The property name")
+                ),   
+                SpecializedFunction(
+                    "__defineSetter__",
+                    DefineSetter,
+                    "Creates a setter method for the given property name",
+                    Parameter("sprop", "The property name"),
+                    Parameter("fun", "The function to be invoked")
+                ),   
+                BuiltinFunction(
+                    "__lookupSetter__",
+                    "Gets the setter function for the given property name",
+                    Parameter("sprop", "The property name")
+                ),   
+
+                BuiltinFunction("constructor"),   
+                BuiltinFunction("toString"),   
+                BuiltinFunction("toLocaleString"),   
+                BuiltinFunction("valueOf"),   
+                BuiltinFunction("hasOwnProperty"),   
+                ReturningFunction(
+                    "isPrototypeOf",
+                    _analyzer._trueInst,
+                    "Determines whether an object exists in another object's prototype chain.",
+                    Parameter("v", "Another object whose prototype chain is to be checked.")
+                ),   
+                ReturningFunction(
+                    "propertyIsEnumerable",
+                    _analyzer._trueInst,
+                    "Determines whether a specified property is enumerable.",
+                    Parameter("v", "A property name.")
+                ),   
+            };
+
+            return new BuiltinFunctionValue(builtinEntry, "Object", createPrototype: false) { 
+                Member("prototype", objectPrototype),
                 BuiltinFunction(
                     "getPrototypeOf",
                     "Returns the prototype of an object."
@@ -987,6 +1035,42 @@ on that object, and are not inherited from the object's prototype. The propertie
             };
         }
 
+        private IAnalysisSet DefineSetter(FunctionValue func, Node node, AnalysisUnit unit, IAnalysisSet @this, IAnalysisSet[] args) {
+            if (@this != null && args.Length >= 2) {
+                foreach (var thisVal in @this) {
+                    ExpandoValue expando = thisVal as ExpandoValue;
+                    if (expando != null) {
+                        foreach (var name in args[0]) {
+                            var nameStr = name.GetConstantValueAsString();
+                            if (nameStr != null) {
+                                expando.DefineSetter(unit, nameStr, args[1]);
+                            }
+                        }
+                    }
+                }
+            }
+            return _analyzer._undefined;
+        }
+
+        private IAnalysisSet DefineGetter(FunctionValue func, Node node, AnalysisUnit unit, IAnalysisSet @this, IAnalysisSet[] args) {
+            if (@this != null && args.Length >= 2) {
+                foreach (var thisVal in @this) {
+                    ExpandoValue expando = thisVal as ExpandoValue;
+                    if (expando != null) {
+                        foreach (var name in args[0]) {
+                            var nameStr = name.GetConstantValueAsString();
+                            if (nameStr != null) {
+                                expando.DefineGetter(unit, nameStr, args[1]);
+                                // call the function w/ our this arg...
+                                args[1].Call(node, unit, thisVal, Analyzer.ExpressionEvaluator.EmptySets);
+                            }
+                        }
+                    }
+                }
+            }
+            return _analyzer._undefined;
+        }
+
         private static IAnalysisSet DefineProperty(FunctionValue func, Node node, AnalysisUnit unit, IAnalysisSet @this, IAnalysisSet[] args) {
             // object, name, property desc
             if (args.Length >= 3) {
@@ -1018,9 +1102,9 @@ on that object, and are not inherited from the object's prototype. The propertie
                     if (target != null) {
                         foreach (var properties in args[1]) {
                             ExpandoValue propsObj = properties as ExpandoValue;
-                            if (propsObj != null) {
+                            if (propsObj != null && propsObj.Descriptors != null) {
                                 foreach (var keyValue in propsObj.Descriptors) {
-                                    foreach (var propValue in propsObj.GetMember(node, unit, keyValue.Key)) {
+                                    foreach (var propValue in propsObj.Get(node, unit, keyValue.Key)) {
                                         target.AddProperty(
                                             node,
                                             unit,
@@ -1338,20 +1422,21 @@ on that object, and are not inherited from the object's prototype. The propertie
     }
 
     class Globals {
-        public readonly ObjectValue GlobalObject;
+        public readonly ObjectValue GlobalObject, ObjectPrototype;
         public readonly AnalysisValue NumberPrototype,
             StringPrototype,
             BooleanPrototype,
             FunctionPrototype;
         public readonly FunctionValue ArrayFunction;
 
-        public Globals(ObjectValue globalObject, AnalysisValue numberPrototype, AnalysisValue stringPrototype, AnalysisValue booleanPrototype, AnalysisValue functionPrototype, FunctionValue arrayFunction) {
+        public Globals(ObjectValue globalObject, AnalysisValue numberPrototype, AnalysisValue stringPrototype, AnalysisValue booleanPrototype, AnalysisValue functionPrototype, FunctionValue arrayFunction, ObjectValue objectPrototype) {
             GlobalObject = globalObject;
             NumberPrototype = numberPrototype;
             StringPrototype = stringPrototype;
             BooleanPrototype = booleanPrototype;
             FunctionPrototype = functionPrototype;
             ArrayFunction = arrayFunction;
+            ObjectPrototype = objectPrototype;
         }
     }
 }

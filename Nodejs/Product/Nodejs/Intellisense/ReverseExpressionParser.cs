@@ -91,7 +91,7 @@ namespace Microsoft.NodejsTools.Intellisense {
                 if (enumerator.Current.ClassificationType.IsOfType(PredefinedClassificationTypeNames.Identifier)) {
                     if (MoveNextSkipExplicitNewLines(enumerator) &&
                         enumerator.Current.ClassificationType == Classifier.Provider.Keyword &&
-                        enumerator.Current.Span.GetText() == "def") {
+                        enumerator.Current.Span.GetText() == "function") {
                         return true;
                     }
                 }
@@ -108,7 +108,7 @@ namespace Microsoft.NodejsTools.Intellisense {
 
             while (MoveNextSkipExplicitNewLines(enumerator)) {
                 if (enumerator.Current.ClassificationType == _classifier.Provider.Keyword) {
-                    if (enumerator.Current.Span.GetText() == "def" && groupingLevel == 0) {
+                    if (enumerator.Current.Span.GetText() == "function" && groupingLevel == 0) {
                         return true;
                     }
 
@@ -245,7 +245,7 @@ namespace Microsoft.NodejsTools.Intellisense {
                         nestingChanged = true;
                         lastTokenWasCommaOrOperator = true;
                         lastTokenWasKeywordArgAssignment = false;
-                    } else if ((token.ClassificationType == Classifier.Provider.Keyword && text != "this") ||
+                    } else if ((token.ClassificationType == Classifier.Provider.Keyword && text != "this" && text != "get" && text != "set" && text != "delete") ||
                                token.ClassificationType == Classifier.Provider.Operator) {
                         lastTokenWasKeywordArgAssignment = false;
 
@@ -289,7 +289,7 @@ namespace Microsoft.NodejsTools.Intellisense {
 
                                 // hovering directly over a keyword, don't provide a tooltip
                                 return null;
-                            } else if ((nestingChanged || forCompletion) && token.ClassificationType == Classifier.Provider.Keyword && text == "def") {
+                            } else if ((nestingChanged || forCompletion) && token.ClassificationType == Classifier.Provider.Keyword && text == "function") {
                                 return null;
                             }                            
                             break;

@@ -29,8 +29,8 @@ namespace Microsoft.NodejsTools.Analysis.Values {
             return Prototype.GetAllMembers();
         }
 
-        public override IAnalysisSet GetMember(Node node, AnalysisUnit unit, string name) {
-            return Prototype.GetMember(node, unit, name);
+        public override IAnalysisSet Get(Node node, AnalysisUnit unit, string name) {
+            return Prototype.Get(node, unit, name);
         }
 
         public IEnumerable<IReferenceable> GetDefinitions(string name) {

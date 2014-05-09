@@ -775,7 +775,13 @@ namespace Microsoft.NodejsTools.Intellisense {
             CollectingErrorSink errorSink
         ) {
             // Update the warn-on-launch state for this entry
-            if (errorSink.Errors.Any() ? _hasParseErrors.Add(entry) : _hasParseErrors.Remove(entry)) {
+            bool changed = false;
+            lock (_hasParseErrors) {
+                if (errorSink.Errors.Any() ? _hasParseErrors.Add(entry) : _hasParseErrors.Remove(entry)) {
+                    changed = true;
+                }
+            }
+            if (changed) {
                 OnShouldWarnOnLaunchChanged(entry);
             }
 
@@ -1210,7 +1216,12 @@ namespace Microsoft.NodejsTools.Intellisense {
                     // Node.js file and none of the project files have errors
                     TaskProvider.Value.Clear(entry, ParserTaskMoniker);
                 }
-                if (_hasParseErrors.Remove(entry)) {
+                bool changed;
+                lock (_hasParseErrors) {                    
+                    changed = _hasParseErrors.Remove(entry);
+                }
+
+                if (changed) {
                     OnShouldWarnOnLaunchChanged(entry);
                 }
             }
@@ -1220,7 +1231,9 @@ namespace Microsoft.NodejsTools.Intellisense {
             if (TaskProvider.IsValueCreated) {
                 TaskProvider.Value.ClearAll();
             }
-            _hasParseErrors.Clear();
+            lock (_hasParseErrors) {
+                _hasParseErrors.Clear();
+            }
         }
 
         internal bool ShouldWarnOnLaunch(IProjectEntry entry) {

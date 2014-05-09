@@ -125,8 +125,8 @@ namespace Microsoft.NodejsTools.Analysis.Analyzer {
 
                 var funcScope = GetFunctionEnvironment(func);
                 scope = funcScope;
-                
-                VariableDef[] parameters = new VariableDef[node.ParameterDeclarations.Count];
+
+                VariableDef[] parameters = new VariableDef[node.ParameterDeclarations != null ? node.ParameterDeclarations.Count : 0];
                 for (int i = 0; i < parameters.Length; i++) {
                     parameters[i] = funcScope.AddLocatedVariable(
                         node.ParameterDeclarations[i].Name,

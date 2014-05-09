@@ -39,7 +39,7 @@ namespace Microsoft.NodejsTools.Analysis {
             if (args.Length >= 2) {
                 args[0].SetMember(node, unit, "super_", args[1]);
 
-                args[0].SetMember(node, unit, "prototype", args[1].GetMember(node, unit, "prototype"));
+                args[0].SetMember(node, unit, "prototype", args[1].Get(node, unit, "prototype"));
             }
             return AnalysisSet.Empty;
         }

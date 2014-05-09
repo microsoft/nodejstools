@@ -93,9 +93,13 @@ namespace Microsoft.NodejsTools.Analysis.Analyzer {
         }
 
         public override string ToString() {
+            string parameters = "";
+            if(Ast.ParameterDeclarations != null) {
+                parameters = string.Join(", ", Ast.ParameterDeclarations.Select(p => Environment.GetVariable(p.Name).TypesNoCopy.ToString()));
+            }
             return string.Format("{0}({1})->{2}",
                 base.ToString(),
-                string.Join(", ", Ast.ParameterDeclarations.Select(p => Environment.GetVariable(p.Name).TypesNoCopy.ToString())),
+                parameters,
                 Function.ReturnValue.TypesNoCopy.ToString()
             );
         }

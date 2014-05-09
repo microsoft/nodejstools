@@ -27,12 +27,12 @@ namespace Microsoft.NodejsTools.Analysis {
         /// Performs a GetMember operation for the given name and returns the
         /// types of variables which are associated with that name.
         /// </summary>
-        public static IAnalysisSet GetMember(this IAnalysisSet self, Node node, AnalysisUnit unit, string name) {
+        public static IAnalysisSet Get(this IAnalysisSet self, Node node, AnalysisUnit unit, string name) {
             var res = AnalysisSet.Empty;
             // name can be empty if we have "fob."
             if (name != null && name.Length > 0) {
                 foreach (var ns in self) {
-                    res = res.Union(ns.GetMember(node, unit, name));
+                    res = res.Union(ns.Get(node, unit, name));
                 }
             }
             return res;

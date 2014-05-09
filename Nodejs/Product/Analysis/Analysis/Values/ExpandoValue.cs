@@ -55,7 +55,7 @@ namespace Microsoft.NodejsTools.Analysis.Values {
             }
         }
 
-        public override IAnalysisSet GetMember(Node node, AnalysisUnit unit, string name) {
+        public override IAnalysisSet Get(Node node, AnalysisUnit unit, string name) {
             if (_descriptors == null) {
                 _descriptors = new Dictionary<string, PropertyDescriptor>();
             }
@@ -78,7 +78,7 @@ namespace Microsoft.NodejsTools.Analysis.Values {
 
             if (_next != null && _next.Push()) {
                 try {
-                    res = res.Union(_next.GetMember(node, unit, name));
+                    res = res.Union(_next.Get(node, unit, name));
                 } finally {
                     _next.Pop();
                 }
@@ -139,7 +139,7 @@ namespace Microsoft.NodejsTools.Analysis.Values {
             foreach (var value in index) {
                 string strValue;
                 if ((strValue = value.GetConstantValueAsString()) != null) {
-                    res = res.Union(GetMember(node, unit, strValue));
+                    res = res.Union(Get(node, unit, strValue));
                 }
             }
             return res;
@@ -207,7 +207,16 @@ namespace Microsoft.NodejsTools.Analysis.Values {
                     }
                 }
 
-                if (kvp.Value.Get != null || kvp.Value.Set != null) {
+                if (kvp.Value.Get != null) {
+                    foreach (var value in kvp.Value.Get.TypesNoCopy) {
+                        UserFunctionValue userFunc = value as UserFunctionValue;
+                        if (userFunc != null) {
+                            MergeTypes(res, key, userFunc.ReturnValue.Types);
+                        }
+                    }
+                }
+
+                if (kvp.Value.Set != null) {
                     MergeTypes(res, key, AnalysisSet.Empty);
                 }
             }
@@ -271,7 +280,7 @@ namespace Microsoft.NodejsTools.Analysis.Values {
         public void AddProperty(Node node, AnalysisUnit unit, string name, AnalysisValue value) {
             PropertyDescriptor desc = GetDescriptor(name);
 
-            var get = value.GetMember(node, unit, "get");
+            var get = value.Get(node, unit, "get");
             if (get.Count > 0) {
                 if (desc.Get == null) {
                     desc.Get = new VariableDef();
@@ -279,7 +288,7 @@ namespace Microsoft.NodejsTools.Analysis.Values {
                 desc.Get.AddTypes(unit, get);
             }
 
-            var set = value.GetMember(node, unit, "set");
+            var set = value.Get(node, unit, "set");
             if (set.Count > 0) {
                 if (desc.Set == null) {
                     desc.Set = new VariableDef();
@@ -344,10 +353,10 @@ namespace Microsoft.NodejsTools.Analysis.Values {
                 _values = new List<AnalysisValue>() { one, two };
             }
 
-            public override IAnalysisSet GetMember(Node node, AnalysisUnit unit, string name) {
+            public override IAnalysisSet Get(Node node, AnalysisUnit unit, string name) {
                 var res = AnalysisSet.Empty;
                 foreach (var value in _values) {
-                    res = res.Union(value.GetMember(node, unit, name));
+                    res = res.Union(value.Get(node, unit, name));
                 }
                 return res;
             }
@@ -398,6 +407,33 @@ namespace Microsoft.NodejsTools.Analysis.Values {
         }
 
         #endregion
+
+        internal void DefineSetter(AnalysisUnit unit, string nameStr, IAnalysisSet analysisSet) {
+            EnsureDescriptors();
+
+            PropertyDescriptor propDesc;
+            if (!_descriptors.TryGetValue(nameStr, out propDesc)) {
+                _descriptors[nameStr] = propDesc = new PropertyDescriptor();
+            }
+
+            if (propDesc.Set == null) {
+                propDesc.Set = new VariableDef();
+            }
+            propDesc.Set.AddTypes(unit, analysisSet);
+        }
+
+        internal void DefineGetter(AnalysisUnit unit, string nameStr, IAnalysisSet analysisSet) {
+            EnsureDescriptors();
+            PropertyDescriptor propDesc;
+            if (!_descriptors.TryGetValue(nameStr, out propDesc)) {
+                _descriptors[nameStr] = propDesc = new PropertyDescriptor();
+            }
+
+            if (propDesc.Get == null) {
+                propDesc.Get = new VariableDef();
+            }
+            propDesc.Get.AddTypes(unit, analysisSet);
+        }
     }
 
     /// <summary>

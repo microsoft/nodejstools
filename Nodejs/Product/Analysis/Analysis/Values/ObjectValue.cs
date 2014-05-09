@@ -54,23 +54,35 @@ namespace Microsoft.NodejsTools.Analysis.Values {
             return res;
         }
 
-        public override IAnalysisSet GetMember(Node node, AnalysisUnit unit, string name) {
-            var res = base.GetMember(node, unit, name);
+        public override IAnalysisSet Get(Node node, AnalysisUnit unit, string name) {
+            var res = base.Get(node, unit, name);
 
             // we won't recurse on prototype because we either have
             // a prototype value and it's correct, or we don't have
             // a prototype.  Recursing on prototype results in
             // prototypes getting merged and the analysis bloating
-            if (_creator != null && name != "prototype") {
-                var prototype = _creator.GetMember(node, unit, "prototype");
-                if (Push()) {
-                    try {
-                        res = res.Union(prototype.GetMember(node, unit, name));
-                    } finally {
-                        Pop();
+            if (name != "prototype") {
+                // We lookup prototype on the function here each time, rather than looking
+                // it up when we construct the object.  This allows prototype to have
+                // its value assigned after we analyze the construction and we'll
+                // still pick up the members.  The final outcome is we are getting the 
+                // [[Prototype]] internal property here.
+                if (_creator != null) {
+                    if (name != "prototype") {
+                        var prototype = _creator.Get(node, unit, "prototype");
+                        if (Push()) {
+                            try {
+                                res = res.Union(prototype.Get(node, unit, name));
+                            } finally {
+                                Pop();
+                            }
+                        }
                     }
+                } else if (this != ProjectState._objectPrototype) {
+                    res = res.Union(ProjectState._objectPrototype.Get(node, unit, name));
                 }
             }
+
 
             return res;
         }
@@ -90,6 +102,12 @@ namespace Microsoft.NodejsTools.Analysis.Values {
         public virtual string ObjectDescription {
             get {
                 return "object";
+            }
+        }
+
+        public override string ShortDescription {
+            get {
+                return ObjectDescription;
             }
         }
 

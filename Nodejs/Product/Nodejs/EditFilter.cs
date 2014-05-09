@@ -758,6 +758,7 @@ namespace Microsoft.NodejsTools {
         }
 
         private bool ShouldFormatOnCharacter(char ch) {
+#if FALSE
             switch (ch) {
                 case '}':
                     return NodejsPackage.Instance.FormattingGeneralOptionsPage.FormatOnCloseBrace;
@@ -766,6 +767,7 @@ namespace Microsoft.NodejsTools {
                 case '\n':
                     return NodejsPackage.Instance.FormattingGeneralOptionsPage.FormatOnEnter;
             }
+#endif
             return false;
         }
 

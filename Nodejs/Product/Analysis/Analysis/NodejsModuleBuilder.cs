@@ -58,15 +58,7 @@ namespace Microsoft.NodejsTools.Analysis {
 
                 if (module.ContainsKey("classes")) {
                     foreach (var klass in module["classes"]) {
-                        exports.Add(
-                            new BuiltinFunctionValue(
-                                _analyzer._builtinEntry,
-                                FixClassName((string)klass["name"]),
-                                ParseDocumentation((string)klass["desc"]),
-                                true
-                                // TODO: Signature?
-                            )
-                        );
+                        GenerateClass(exports, klass);
                     }
                 }
             }
@@ -79,44 +71,128 @@ namespace Microsoft.NodejsTools.Analysis {
 
                 if (module.ContainsKey("methods")) {
                     foreach (var method in module["methods"]) {
-                        string methodName = (string)method["name"];
-                        /*
-                        string body = null;
-                        if (name == "path" && method["name"] is string) {
-                            switch ((string)method["name"]) {
-                                case "relative": body = ReferenceCode.PathRelativeBody; break;
-                                case "normalize": body = ReferenceCode.PathNormalizeBody; break;
-                                case "resolve": body = ReferenceCode.PathResolveBody; break;
-                                case "join": body = ReferenceCode.PathJoinBody; break;
-                            }
-                        }*/
-                        //GenerateMethod(name, method, indentation + 1, body);
-
-                        foreach (var sig in method["signatures"]) {
-                            BuiltinFunctionValue function;
-                            CallDelegate specialMethod;
-                            if (specialMethods != null && 
-                                specialMethods.TryGetValue(methodName, out specialMethod)) {
-                                function = new SpecializedFunctionValue(
-                                    _analyzer._builtinEntry,
-                                    methodName,
-                                    specialMethod,
-                                    ParseDocumentation((string)method["desc"]),
-                                    GetParameters(sig["params"])
-                                );
-                            } else {
-                                function = new BuiltinFunctionValue(
-                                    _analyzer._builtinEntry,
-                                    methodName,
-                                    ParseDocumentation((string)method["desc"]),
-                                    true,
-                                    GetParameters(sig["params"])
-                                );
-                            }
-
-                            exports.Add(function);
-                        }
+                        GenerateMethod(exports, specialMethods, method);
                     }
+                }
+            }
+            
+            foreach (var misc in _all["miscs"]) {
+                if (misc["name"] == "Global Objects") {
+                    GenerateGlobals(misc["globals"]);
+                    break;
+                }
+            }
+
+        }
+
+        private void GenerateMethod(ExpandoValue exports, Dictionary<string, CallDelegate> specialMethods, dynamic method) {
+            string methodName = (string)method["name"];
+            /*
+            string body = null;
+            if (name == "path" && method["name"] is string) {
+                switch ((string)method["name"]) {
+                    case "relative": body = ReferenceCode.PathRelativeBody; break;
+                    case "normalize": body = ReferenceCode.PathNormalizeBody; break;
+                    case "resolve": body = ReferenceCode.PathResolveBody; break;
+                    case "join": body = ReferenceCode.PathJoinBody; break;
+                }
+            }*/
+            //GenerateMethod(name, method, indentation + 1, body);
+
+            foreach (var sig in method["signatures"]) {
+                BuiltinFunctionValue function;
+                CallDelegate specialMethod;
+                if (specialMethods != null &&
+                    specialMethods.TryGetValue(methodName, out specialMethod)) {
+                    function = new SpecializedFunctionValue(
+                        _analyzer._builtinEntry,
+                        methodName,
+                        specialMethod,
+                        ParseDocumentation((string)method["desc"]),
+                        GetParameters(sig["params"])
+                    );
+                } else {
+                    function = new BuiltinFunctionValue(
+                        _analyzer._builtinEntry,
+                        methodName,
+                        ParseDocumentation((string)method["desc"]),
+                        true,
+                        GetParameters(sig["params"])
+                    );
+                }
+
+                exports.Add(function);
+            }
+        }
+
+        private void GenerateClass(ObjectValue exports, dynamic klass) {
+            BuiltinFunctionValue klassValue = new BuiltinFunctionValue(
+                _analyzer._builtinEntry,
+                FixClassName((string)klass["name"]),
+                ParseDocumentation((string)klass["desc"]),
+                true
+                // TODO: Signature?
+            );
+
+            exports.Add(klassValue);
+
+            if (klass.ContainsKey("methods")) {
+                foreach (var method in klass["methods"]) {
+                    GenerateMethod(
+                        klassValue,
+                        null,
+                        method
+                    );
+                }
+            }
+        }
+
+        private void GenerateGlobal(ObjectValue exports, dynamic klass) {
+            string name = FixClassName((string)klass["name"]);
+            ObjectValue value = new ObjectValue(
+                _analyzer._builtinEntry,
+                null,
+                ParseDocumentation((string)klass["desc"])
+            );
+
+            exports.Add(name, value);
+
+            if (klass.ContainsKey("methods")) {
+                foreach (var method in klass["methods"]) {
+                    GenerateMethod(
+                        value,
+                        null,
+                        method
+                    );
+                }
+            }
+
+            if (klass.ContainsKey("properties")) {
+                foreach (var prop in klass["properties"]) {
+                    string propName = prop["name"];
+                    string desc = ParseDocumentation(prop["desc"]);
+
+                    value.Add(
+                        new MemberAddInfo(
+                            propName,
+                            new ObjectValue(
+                                _analyzer._builtinEntry
+                            ),
+                            desc,
+                            true
+                        )
+                    );
+                }
+            }            
+        }
+
+        private void GenerateGlobals(dynamic globals) {
+            foreach (var global in globals) {
+                if (global.ContainsKey("events") ||
+                    global.ContainsKey("methods") ||
+                    global.ContainsKey("properties") ||
+                    global.ContainsKey("classes")) {
+                    GenerateGlobal(_analyzer._globalObject, global);
                 }
             }
         }
@@ -171,12 +247,7 @@ namespace Microsoft.NodejsTools.Analysis {
                         }
                         break;
                     case XmlNodeType.Text:
-                        var text = reader.Value
-                            .Replace("\\", "\\\\")
-                            .Replace("\"", "\\\"")
-                            .Replace("\r\n", "\\r\\n")
-                            .Replace("\n", "\\r\\n");
-
+                        var text = reader.Value;
                         output.Append(text);
                         break;
                     case XmlNodeType.EndElement:
