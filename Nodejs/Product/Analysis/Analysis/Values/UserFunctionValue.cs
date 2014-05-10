@@ -104,7 +104,7 @@ namespace Microsoft.NodejsTools.Analysis.Values {
         public override string Name {
             get {
                 if (FunctionObject != null) {
-                    return FunctionObject.Name;
+                    return FunctionObject.Name ?? FunctionObject.NameGuess;
                 }
                 return "<unknown function>";
             }

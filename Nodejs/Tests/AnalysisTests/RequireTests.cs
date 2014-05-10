@@ -175,6 +175,19 @@ var http = require('http');
         }
 
         [TestMethod]
+        public void TestRequireBinaryOp() {
+            string code = @"
+var http = require('ht' + 'tp');
+";
+            var analysis = AnalysisTests.ProcessText(code);
+            AssertUtil.ContainsAtLeast(
+                analysis.GetMembersByIndex("http", 0).Select(x => x.Name),
+                "Server", "ServerResponse", "Agent", "ClientRequest",
+                "createServer", "createClient", "request", "get"
+            );
+        }
+
+        [TestMethod]
         public void TestRequire() {
             var testCases = new[] {
                 new { File="server.js", Line = 4, Type = "mymod.", Expected = "mymod_export" },

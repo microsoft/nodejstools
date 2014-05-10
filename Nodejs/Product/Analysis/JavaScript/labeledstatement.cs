@@ -44,7 +44,9 @@ namespace Microsoft.NodejsTools.Parsing
 
         public override void Walk(AstVisitor visitor) {
             if (visitor.Walk(this)) {
-                m_statement.Walk(visitor);
+                if (m_statement != null) {
+                    m_statement.Walk(visitor);
+                }
             }
             visitor.PostWalk(this);
         }

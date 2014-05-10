@@ -232,7 +232,7 @@ namespace Microsoft.NodejsTools.Analysis {
         /// 
         /// index is a zero-based absolute index into the file.
         /// </summary>
-        public IEnumerable<MemberResult> GetMembersByIndex(string exprText, int index, GetMemberOptions options = GetMemberOptions.IntersectMultipleResults) {
+        public IEnumerable<MemberResult> GetMembersByIndex(string exprText, int index, GetMemberOptions options = GetMemberOptions.None) {
             if (exprText.Length == 0) {
                 return GetAllAvailableMembersByIndex(index, options);
             }
@@ -291,7 +291,7 @@ namespace Microsoft.NodejsTools.Analysis {
         /// Gets the available names at the given location.  This includes built-in variables, global variables, and locals.
         /// </summary>
         /// <param name="index">The 0-based absolute index into the file where the available mebmers should be looked up.</param>
-        public IEnumerable<MemberResult> GetAllAvailableMembersByIndex(int index, GetMemberOptions options = GetMemberOptions.IntersectMultipleResults) {
+        public IEnumerable<MemberResult> GetAllAvailableMembersByIndex(int index, GetMemberOptions options = GetMemberOptions.None) {
             var result = new Dictionary<string, List<AnalysisValue>>();
 
             // collect variables from user defined scopes
@@ -382,6 +382,7 @@ namespace Microsoft.NodejsTools.Analysis {
                 var newMembers = ns.GetAllMembers();
                 // IntersectMembers(members, memberSet, memberDict);
                 if (newMembers == null || newMembers.Count == 0) {
+                    namespacesCount -= 1;
                     continue;
                 }
 
@@ -400,25 +401,9 @@ namespace Microsoft.NodejsTools.Analysis {
                     HashSet<string> toRemove;
                     IEnumerable<string> adding;
 
-                    if (options.Intersect()) {
-                        adding = new HashSet<string>(newMembers.Keys);
-                        // Find the things only in memberSet that we need to remove from memberDict
-                        // toRemove = (memberSet ^ adding) & memberSet
-
-                        toRemove = new HashSet<string>(memberSet);
-                        toRemove.SymmetricExceptWith(adding);
-                        toRemove.IntersectWith(memberSet);
-
-                        // intersect memberSet with what we're adding
-                        memberSet.IntersectWith(adding);
-
-                        // we're only adding things they both had
-                        adding = memberSet;
-                    } else {
-                        // we're adding all of newMembers keys
-                        adding = newMembers.Keys;
-                        toRemove = null;
-                    }
+                    // we're adding all of newMembers keys
+                    adding = newMembers.Keys;
+                    toRemove = null;
 
                     // update memberDict
                     foreach (var name in adding) {
@@ -444,11 +429,6 @@ namespace Microsoft.NodejsTools.Analysis {
 
             if (memberDict == null) {
                 return new MemberResult[0];
-            }
-            if (options.Intersect()) {
-                // No need for this information if we're only showing the
-                // intersection. Setting it to null saves lookups later.
-                ownerDict = null;
             }
             return MemberDictToResultList(options, memberDict, ownerDict, namespacesCount);
         }

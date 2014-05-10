@@ -25,7 +25,7 @@ namespace Microsoft.NodejsTools.Analysis.Values {
     /// as the result of a new someFunction call).
     /// </summary>
     internal class ObjectValue : ExpandoValue {
-        private readonly FunctionValue _creator;
+        protected readonly FunctionValue _creator;
 #if DEBUG
         private readonly string _description;
 #endif

@@ -30,6 +30,7 @@ namespace Microsoft.NodejsTools.Analysis {
             AnalysisValue numberPrototype, stringPrototype, booleanPrototype, functionPrototype;
             FunctionValue arrayFunction;
             ObjectValue objectPrototype;
+            BuiltinFunctionValue requireFunc;
 
             var globalObject = new ObjectValue(builtinEntry) {
                 (arrayFunction = ArrayFunction()),
@@ -111,7 +112,7 @@ All other strings are considered decimal.", isOptional:true)
                 ReturningFunction("unescape", stringValue),
                 Member("undefined", analyzer._undefined),
 
-                SpecializedFunction("require", Require)
+                (requireFunc = SpecializedFunction("require", Require))
             };
 
             // aliases for global object:
@@ -191,7 +192,8 @@ All other strings are considered decimal.", isOptional:true)
                 booleanPrototype, 
                 functionPrototype,
                 arrayFunction,
-                objectPrototype
+                objectPrototype,
+                requireFunc
             );
         }
 
@@ -934,10 +936,10 @@ For example, the absolute value of -5 is the same as the absolute value of 5.",
                 ),   
 
                 BuiltinFunction("constructor"),   
-                BuiltinFunction("toString"),   
-                BuiltinFunction("toLocaleString"),   
+                ReturningFunction("toString", _analyzer._emptyStringValue),   
+                ReturningFunction("toLocaleString", _analyzer._emptyStringValue),   
                 BuiltinFunction("valueOf"),   
-                BuiltinFunction("hasOwnProperty"),   
+                ReturningFunction("hasOwnProperty", _analyzer._trueInst),   
                 ReturningFunction(
                     "isPrototypeOf",
                     _analyzer._trueInst,
@@ -1428,8 +1430,9 @@ on that object, and are not inherited from the object's prototype. The propertie
             BooleanPrototype,
             FunctionPrototype;
         public readonly FunctionValue ArrayFunction;
+        public readonly BuiltinFunctionValue RequireFunction;
 
-        public Globals(ObjectValue globalObject, AnalysisValue numberPrototype, AnalysisValue stringPrototype, AnalysisValue booleanPrototype, AnalysisValue functionPrototype, FunctionValue arrayFunction, ObjectValue objectPrototype) {
+        public Globals(ObjectValue globalObject, AnalysisValue numberPrototype, AnalysisValue stringPrototype, AnalysisValue booleanPrototype, AnalysisValue functionPrototype, FunctionValue arrayFunction, ObjectValue objectPrototype, BuiltinFunctionValue requireFunction) {
             GlobalObject = globalObject;
             NumberPrototype = numberPrototype;
             StringPrototype = stringPrototype;
@@ -1437,6 +1440,7 @@ on that object, and are not inherited from the object's prototype. The propertie
             FunctionPrototype = functionPrototype;
             ArrayFunction = arrayFunction;
             ObjectPrototype = objectPrototype;
+            RequireFunction = requireFunction;
         }
     }
 }

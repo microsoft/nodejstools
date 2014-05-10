@@ -19,12 +19,6 @@ namespace Microsoft.NodejsTools.Analysis {
     public enum GetMemberOptions {
         None,
         /// <summary>
-        /// When an expression resolves to multiple types the intersection of members is returned.  When this flag
-        /// is not present the union of all members is returned.
-        /// </summary>
-        IntersectMultipleResults = 0x01,
-
-        /// <summary>
         /// True if advanced members (currently defined as name mangled private members) should be hidden.
         /// </summary>
         HideAdvancedMembers = 0x02,
@@ -51,9 +45,6 @@ namespace Microsoft.NodejsTools.Analysis {
     }
 
     internal static class GetMemberOptionsExtensions {
-        public static bool Intersect(this GetMemberOptions self) {
-            return (self & GetMemberOptions.IntersectMultipleResults) != 0;
-        }
         public static bool HideAdvanced(this GetMemberOptions self) {
             return (self & GetMemberOptions.HideAdvancedMembers) != 0;
         }

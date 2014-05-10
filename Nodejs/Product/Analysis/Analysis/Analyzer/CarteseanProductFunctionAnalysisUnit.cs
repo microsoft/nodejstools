@@ -149,6 +149,7 @@ namespace Microsoft.NodejsTools.Analysis.Analyzer {
             } finally {
                 funcScope._this = originalThis;
                 function.ReturnValue = unifiedReturn;
+                function.ReturnValue.AddTypes(this, _returnValue.TypesNoCopy, false);
 
                 // restore the locals, merging types back into the shared...
                 foreach (var variable in _specializedLocals) {

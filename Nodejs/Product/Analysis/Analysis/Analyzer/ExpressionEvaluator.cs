@@ -263,11 +263,52 @@ namespace Microsoft.NodejsTools.Analysis.Analyzer {
                 IAnalysisSet targetRefs = ee.EvaluateReference(node, n, out @this);
 
                 foreach (var target in targetRefs) {
+                    if (target == ee._unit.Analyzer._requireFunc && n.Arguments.Count == 1) {
+                        // we care a lot about require analysis and people do some pretty
+                        // crazy dynamic things for require calls.  If we let our normal
+                        // analysis and specialized function handle it we won't get things
+                        // like handling './' + somePath.  So we'll go ahead and handle
+                        // some special cases here...
+                        if (IsSpecialRequire(ee, node, n, ref res)) {
+                            continue;
+                        }
+                    }
+                    
                     res = res.Union(target.Call(node, ee._unit, @this, argTypes));
+                    
                 }
 
             }
             return res;
+        }
+
+        private static bool IsSpecialRequire(ExpressionEvaluator ee, Node node, CallNode n, ref IAnalysisSet res) {
+            BinaryOperator binOp = n.Arguments[0] as BinaryOperator;
+            if (binOp != null && binOp.OperatorToken == JSToken.Plus) {
+                var lhs = ee.EvaluateMaybeNull(binOp.Operand1);
+                var rhs = ee.EvaluateMaybeNull(binOp.Operand2);
+                foreach (var left in lhs) {
+                    var leftStr = left.GetConstantValueAsString();
+                    if (leftStr != null) {
+                        foreach (var right in rhs) {
+                            var rightStr = right.GetConstantValueAsString();
+                            if (rightStr != null) {
+                                res = res.Union(
+                                    ee._unit.Analyzer.Modules.RequireModule(
+                                        node,
+                                        ee._unit,
+                                        leftStr + rightStr,
+                                        ee._unit.DeclaringModuleEnvironment.Name
+                                    )
+                                );
+                            }
+                        }
+                    }
+                }
+
+                return true;
+            }
+            return false;
         }
 
         private IAnalysisSet EvaluateReference(Node node, CallNode n, out IAnalysisSet baseValue) {

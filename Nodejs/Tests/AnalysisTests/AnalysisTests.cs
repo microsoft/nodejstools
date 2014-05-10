@@ -11,6 +11,88 @@ using TestUtilities;
 namespace AnalysisTests {
     [TestClass]
     public class AnalysisTests {
+        /// <summary>
+        /// https://nodejstools.codeplex.com/workitem/945
+        /// </summary>
+        [TestMethod]
+        public void TestToString() {
+            string code = @"
+var x = new Object();
+var y = x.toString();
+";
+            var analysis = ProcessText(code);
+
+            AssertUtil.ContainsExactly(
+                analysis.GetTypeIdsByIndex("y", 0),
+                BuiltinTypeId.String
+            );
+        }
+
+        /// <summary>
+        /// https://nodejstools.codeplex.com/workitem/965
+        /// </summary>
+        [TestMethod]
+        public void TestBuiltinDoc() {
+            string code = @"
+var x = 'abc'
+";
+            var analysis = ProcessText(code);
+
+            var members = analysis.GetMembersByIndex("x", code.Length);
+            Assert.AreNotEqual(
+                -1,
+                members.Where(x => x.Name == "substring").First().Documentation.IndexOf("Returns the substring at")
+            );
+        }
+
+        /// <summary>
+        /// https://nodejstools.codeplex.com/workitem/935
+        /// </summary>
+        [TestMethod]
+        public void TestAllMembers() {
+            string code = @"
+function f() {
+    if(true) {
+        return {abc:42};
+    }else{
+        return {def:'abc'};
+    }
+}
+var x = f();
+";
+            var analysis = ProcessText(code);
+
+            var members = analysis.GetMembersByIndex("x", code.Length).Select(x => x.Completion);
+            AssertUtil.ContainsAtLeast(
+                members,
+                "abc",
+                "def"
+            );
+        }
+
+        /// <summary>
+        /// https://nodejstools.codeplex.com/workitem/950
+        /// </summary>
+        [TestMethod]
+        public void TestReturnValues() {
+            string code = @"
+function f(x) {
+    return x;
+}
+f({abc:42});
+f({def:'abc'});
+";
+            var analysis = ProcessText(code);
+
+            var members = analysis.GetMembersByIndex("f(42)", code.Length).Select(x => x.Completion);
+            AssertUtil.ContainsAtLeast(
+                members,
+                "abc",
+                "def"
+            );
+        }
+
+
         [TestMethod]
         public void TestPrimitiveMembers() {
             string code = @"

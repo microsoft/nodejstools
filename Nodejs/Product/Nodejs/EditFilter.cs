@@ -772,6 +772,7 @@ namespace Microsoft.NodejsTools {
         }
 
         private void FormatAfterPaste(ITextSnapshot curVersion) {
+#if FALSE
             if (NodejsPackage.Instance.FormattingGeneralOptionsPage.FormatOnPaste) {
                 // calculate the range for the paste...
                 var afterVersion = _textView.TextBuffer.CurrentSnapshot;
@@ -812,6 +813,7 @@ namespace Microsoft.NodejsTools {
                     }
                 }
             }
+#endif
         }
 
         private string GetFilePath() {
