@@ -15,6 +15,30 @@ namespace AnalysisTests {
         /// https://nodejstools.codeplex.com/workitem/945
         /// </summary>
         [TestMethod]
+        public void TestFunctionApply() {
+            string code = @"
+function g() {
+    this.abc = 42;
+}
+
+function f() {
+    g.apply(this);
+}
+
+var x = new f().abc;
+";
+            var analysis = ProcessText(code);
+
+            AssertUtil.ContainsExactly(
+                analysis.GetTypeIdsByIndex("x", code.Length),
+                BuiltinTypeId.Number
+            );
+        }
+
+        /// <summary>
+        /// https://nodejstools.codeplex.com/workitem/945
+        /// </summary>
+        [TestMethod]
         public void TestToString() {
             string code = @"
 var x = new Object();

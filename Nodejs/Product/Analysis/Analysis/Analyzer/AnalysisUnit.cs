@@ -181,6 +181,12 @@ namespace Microsoft.NodejsTools.Analysis {
         }
 
         internal virtual void AnalyzeWorker(DDG ddg, CancellationToken cancel) {
+            if (Tree != ProjectEntry.Tree) {
+                // we were enqueued and a new version became available, don't re-analyze against
+                // the old version.
+                return;
+            }
+
             DeclaringModuleEnvironment.ClearLinkedVariables();
 
             ddg.SetCurrentUnit(this);

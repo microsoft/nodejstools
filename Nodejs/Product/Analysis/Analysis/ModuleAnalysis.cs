@@ -151,12 +151,14 @@ namespace Microsoft.NodejsTools.Analysis {
                 var eval = new ExpressionEvaluator(unit.CopyForEval(), scope);
                 var objects = eval.Evaluate(member.Root);
 
+                var refs = Enumerable.Empty<IAnalysisVariable>();
                 foreach (var v in objects) {
                     var container = v as IReferenceableContainer;
                     if (container != null) {
-                        return ReferencablesToVariables(container.GetDefinitions(member.Name));
+                        refs = refs.Concat(ReferencablesToVariables(container.GetDefinitions(member.Name)));
                     }
                 }
+                return refs;
             }
 
             return Enumerable.Empty<IAnalysisVariable>();

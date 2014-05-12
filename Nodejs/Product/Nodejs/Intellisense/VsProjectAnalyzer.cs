@@ -24,6 +24,7 @@ using System.Threading;
 using System.Windows.Forms;
 using System.Windows.Threading;
 using Microsoft.NodejsTools.Analysis;
+using Microsoft.NodejsTools.Classifier;
 using Microsoft.NodejsTools.Parsing;
 using Microsoft.NodejsTools.Project;
 using Microsoft.VisualStudio;
@@ -377,8 +378,8 @@ namespace Microsoft.NodejsTools.Intellisense {
         /// Gets a CompletionList providing a list of possible members the user can dot through.
         /// </summary>
         internal static CompletionAnalysis GetCompletions(ITextSnapshot snapshot, ITrackingSpan span, ITrackingPoint point) {
-            //return TrySpecialCompletions(snapshot, span, point, options) ??
-            return GetNormalCompletionContext(snapshot, span, point);
+            return TrySpecialCompletions(snapshot, span, point) ??
+                GetNormalCompletionContext(snapshot, span, point);
         }
 
         /// <summary>
@@ -981,6 +982,42 @@ namespace Microsoft.NodejsTools.Intellisense {
             return null;
         }
 #endif
+
+        private static CompletionAnalysis TrySpecialCompletions(ITextSnapshot snapshot, ITrackingSpan span, ITrackingPoint point) {
+            var snapSpan = span.GetSpan(snapshot);
+            var buffer = snapshot.TextBuffer;
+            var classifier = buffer.GetNodejsClassifier();
+            if (classifier == null) {
+                return null;
+            }
+            var start = snapSpan.Start;
+
+            var parser = new ReverseExpressionParser(snapshot, buffer, span);
+            if (parser.IsInGrouping()) {
+                var range = parser.GetExpressionRange(nesting: 1);
+                if (range != null) {
+                    start = range.Value.Start;
+                }
+            }
+
+            var tokens = classifier.GetClassificationSpans(new SnapshotSpan(start.GetContainingLine().Start, snapSpan.Start));
+            if (tokens.Count > 0) {
+                // Check for context-sensitive intellisense
+                var lastClass = tokens[tokens.Count - 1];
+
+                if (lastClass.ClassificationType == classifier.Provider.Comment) {
+                    // No completions in comments
+                    return CompletionAnalysis.EmptyCompletionContext;
+                } else if (lastClass.ClassificationType == classifier.Provider.StringLiteral) {
+                    // String completion
+                    return CompletionAnalysis.EmptyCompletionContext;
+                }
+
+                return null;
+            }
+
+            return null;
+        }
 
         private static CompletionAnalysis GetNormalCompletionContext(ITextSnapshot snapshot, ITrackingSpan applicableSpan, ITrackingPoint point) {
             var span = applicableSpan.GetSpan(snapshot);

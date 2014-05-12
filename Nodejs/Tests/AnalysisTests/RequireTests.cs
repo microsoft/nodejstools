@@ -24,6 +24,21 @@ namespace AnalysisTests {
         public void TestRequireAssignedExports() {
             var entries = Analysis.Analyze(
                 new AnalysisFile("mod.js", @"var x = require('mymod').value;"),
+                AnalysisFile.PackageJson("node_modules\\mymod\\package.json", "./lib/mymod"),
+                new AnalysisFile("node_modules\\mymod\\lib\\mymod.js", @"exports.value = 42;"),
+                new AnalysisFile("node_modules\\mymod\\lib\\mymod\\foo.js", @"exports.value = 'abc';")
+            );
+
+            AssertUtil.ContainsExactly(
+                entries["mod.js"].Analysis.GetTypeIdsByIndex("x", 0),
+                BuiltinTypeId.Number
+            );
+        }
+
+        [TestMethod]
+        public void TestRequireDirectoryFileOverload() {
+            var entries = Analysis.Analyze(
+                new AnalysisFile("mod.js", @"var x = require('mymod').value;"),
                 new AnalysisFile("node_modules\\mymod\\index.js", @"module.exports = require('./realindex.js');"),
                 new AnalysisFile("node_modules\\mymod\\realindex.js", @"exports.value = 42;")
             );

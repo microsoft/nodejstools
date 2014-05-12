@@ -284,11 +284,14 @@ namespace Microsoft.NodejsTools.NpmUI {
                 newItems = new List<PackageCatalogEntryViewModel> {
                     _installCommand
                 };
+
+                if (rootPackage != null && globalPackages != null) {
                 newItems.AddRange(filtered.Select(package => new ReadOnlyPackageCatalogEntryViewModel(
                     package,
                     rootPackage != null ? rootPackage.Modules[package.Name] : null,
                     globalPackages != null ? globalPackages.Modules[package.Name] : null
                 )));
+            }
             }
 
             _dispatcher.BeginInvoke((Action)(() => {
