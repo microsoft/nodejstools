@@ -181,6 +181,28 @@ namespace Microsoft.NodejsTools.Analysis.Analyzer {
             }
             return false;
         }
+
+        public override bool Walk(ForIn node) {
+            var coll = _eval.Evaluate(node.Collection);
+            var variable = node.Variable as Var;
+            var lookupVar = node.Variable as ExpressionStatement;
+            var values = coll.GetEnumerationValues(node, _unit);
+            if (variable != null) {
+                _eval.Scope.AssignVariable(
+                    variable.First().Name,
+                    node,
+                    _unit,
+                    values
+                );
+            } else if (lookupVar != null) {
+                _eval.AssignTo(node, lookupVar.Expression, values);
+            }
+                       
+            node.Body.Walk(this);
+
+            return false;
+        }
+
 #if FALSE
         private bool TryImportModule(string modName, bool forceAbsolute, out ModuleReference moduleRef) {
             if (ProjectState.Limits.CrossModule != null &&

@@ -630,13 +630,23 @@ var x = abcdefg;
         }
 
         [TestMethod]
-        public void TestForLoop() {
+        public void TestForInLoop() {
             var analysis = ProcessText("for(var x in [1,2,3]) { }");
             AssertUtil.ContainsExactly(
                 analysis.GetTypeIdsByIndex("x", 0),
                 BuiltinTypeId.String
             );
         }
+
+        [TestMethod]
+        public void TestForInLoop2() {
+            var analysis = ProcessText("for(x in [1,2,3]) { }");
+            AssertUtil.ContainsExactly(
+                analysis.GetTypeIdsByIndex("x", 0),
+                BuiltinTypeId.String
+            );
+        }
+
 
         [TestMethod]
         public void TestFunctionCreation() {

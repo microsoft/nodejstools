@@ -85,6 +85,15 @@ namespace Microsoft.NodejsTools.Analysis {
         }
 
         /// <summary>
+        /// Provides the owner descrpition in a member completion list when there are multiple owners.
+        /// </summary>
+        public virtual string OwnerName {
+            get {
+                return ShortDescription;
+            }
+        }
+
+        /// <summary>
         /// Checks to see if the value is of type object.
         /// 
         /// This differs from the 'typeof' operator as the typeof
@@ -205,6 +214,10 @@ namespace Microsoft.NodejsTools.Analysis {
         }
 
         public virtual void AugmentAssign(BinaryOperator node, AnalysisUnit unit, IAnalysisSet value) {
+        }
+
+        public virtual IAnalysisSet GetEnumerationValues(Node node, AnalysisUnit unit) {
+            return AnalysisSet.Empty;
         }
 
         public virtual IAnalysisSet UnaryOperation(Node node, AnalysisUnit unit, JSToken operation) {

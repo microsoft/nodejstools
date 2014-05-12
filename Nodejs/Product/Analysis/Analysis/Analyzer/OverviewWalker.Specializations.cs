@@ -146,6 +146,7 @@ namespace Microsoft.NodejsTools.Analysis.Analyzer {
             var keyVar = new ExpectedVariableDeclaration();
             return new FunctionSpecialization(
                 MergeSpecialization,
+                false,
                 new ExpectedNode(
                     typeof(IfNode),
                     new ExpectedBinary(

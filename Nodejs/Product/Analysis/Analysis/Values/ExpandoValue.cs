@@ -112,6 +112,29 @@ namespace Microsoft.NodejsTools.Analysis.Values {
             def.AddReference(node, unit);
         }
 
+        public override IAnalysisSet GetEnumerationValues(Node node, AnalysisUnit unit) {
+            var res = AnalysisSet.Empty;
+            if (_descriptors != null) {
+                foreach (var kvp in _descriptors) {
+                    var key = kvp.Key;
+                    if (kvp.Value.Values != null) {
+                        var types = kvp.Value.Values.TypesNoCopy;
+                        kvp.Value.Values.ClearOldValues();
+                        if (kvp.Value.Values.VariableStillExists) {
+                            res = res.Add(ProjectState.GetConstant(kvp.Key));
+                        }
+                    }
+
+                    if (kvp.Value.Get != null) {
+                        foreach (var value in kvp.Value.Get.TypesNoCopy) {
+                            res = res.Add(ProjectState.GetConstant(kvp.Key));
+                        }
+                    }
+                }
+            }
+            return res;
+        }
+
         private VariableDef GetValuesDef(string name) {
             PropertyDescriptor desc = GetDescriptor(name);
 

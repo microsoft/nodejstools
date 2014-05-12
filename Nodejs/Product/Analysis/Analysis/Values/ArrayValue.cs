@@ -26,6 +26,10 @@ namespace Microsoft.NodejsTools.Analysis.Values {
             entry.Analyzer.AnalysisValueCreated(typeof(ArrayValue));
         }
 
+        public override IAnalysisSet GetEnumerationValues(Node node, AnalysisUnit unit) {
+            return this.ProjectState._emptyStringValue.SelfSet;
+        }
+
         public override IAnalysisSet GetIndex(Node node, AnalysisUnit unit, IAnalysisSet index) {
             int? constIndex = GetConstantIndex(index);
 

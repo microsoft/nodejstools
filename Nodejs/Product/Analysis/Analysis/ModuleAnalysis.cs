@@ -569,13 +569,13 @@ namespace Microsoft.NodejsTools.Analysis {
                         var newName = new StringBuilder(name);
                         newName.Append(" (");
                         foreach (var v in owners) {
-                            if (!string.IsNullOrWhiteSpace(v.ShortDescription) && seenNames.Add(v.ShortDescription)) {
+                            if (!string.IsNullOrWhiteSpace(v.OwnerName) && seenNames.Add(v.OwnerName)) {
                                 // Restrict each displayed type to 25 characters
-                                if (v.ShortDescription.Length > 25) {
-                                    newName.Append(v.ShortDescription.Substring(0, 22));
+                                if (v.OwnerName.Length > 25) {
+                                    newName.Append(v.OwnerName.Substring(0, 22));
                                     newName.Append("...");
                                 } else {
-                                    newName.Append(v.ShortDescription);
+                                    newName.Append(v.OwnerName);
                                 }
                                 newName.Append(", ");
                             }
