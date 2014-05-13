@@ -17,32 +17,20 @@ using System.Collections.Generic;
 using System.IO;
 
 using Microsoft.VisualStudioTools.Project;
+using Microsoft.NodejsTools.TestFrameworks;
 
 namespace Microsoft.NodejsTools.TestAdapter.TestFrameworks {
     class FrameworkDiscover {
         private readonly Dictionary<String, TestFramework> _framworks;
-        private readonly TestFramework Default;
         public FrameworkDiscover(): this(null) {
         }
 
         public FrameworkDiscover(string installFolder) {
-            if (string.IsNullOrEmpty(installFolder)) {
-                installFolder = GetExecutingAssemblyPath();
-            }
+            TestFrameworkDirectories directoryLoader = new TestFrameworkDirectories(installFolder);
             _framworks = new Dictionary<string, TestFramework>(StringComparer.OrdinalIgnoreCase);
-            string baseTestframeworkFolder = installFolder + @"\TestFrameworks";
-            foreach (TestFrameworkType testFX in (TestFrameworkType[])Enum.GetValues(typeof(TestFrameworkType))) {
-                if (testFX != TestFrameworkType.None) {
-                    string frameworkFolder = Path.Combine(baseTestframeworkFolder, testFX.ToString());
-                    TestFramework fx = new TestFramework(frameworkFolder);
-                    _framworks.Add(fx.Name, fx);
-                    if (testFX == TestFrameworkType.Default) {
-                        Default = fx;
-                    }
-                }
-            }
-            if (Default == null) {
-                throw new InvalidOperationException("Missing generic test framework");
+            foreach (string directory in directoryLoader.GetFrameworkDirectories()) {
+                TestFramework fx = new TestFramework(directory);
+                _framworks.Add(fx.Name, fx);
             }
         }
 
@@ -50,13 +38,6 @@ namespace Microsoft.NodejsTools.TestAdapter.TestFrameworks {
             TestFramework testFX = null;
             _framworks.TryGetValue(frameworkName, out testFX);
             return testFX;
-        }
-
-        private string GetExecutingAssemblyPath() {
-            string codeBase = System.Reflection.Assembly.GetExecutingAssembly().CodeBase;
-            UriBuilder uri = new UriBuilder(codeBase);
-            string path = Uri.UnescapeDataString(uri.Path);
-            return Path.GetDirectoryName(path);
         }
     }
 }

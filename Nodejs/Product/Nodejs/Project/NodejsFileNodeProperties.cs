@@ -28,6 +28,7 @@ using Microsoft.VisualStudio.Shell;
 using Microsoft.VisualStudio.Shell.Interop;
 using VSLangProj;
 using IOleServiceProvider = Microsoft.VisualStudio.OLE.Interop.IServiceProvider;
+using Microsoft.NodejsTools.TestFrameworks;
 
 namespace Microsoft.NodejsTools.Project {
 
@@ -41,29 +42,9 @@ namespace Microsoft.NodejsTools.Project {
         [LocDisplayName(SR.TestFramework)]
         [SRDescriptionAttribute(SR.TestFrameworkDescription)]
         [TypeConverter(typeof(TestFrameworkStringConverter))]
-        public string TestFrameworkInStringType {
+        public string TestFramework {
             get {
                 return GetProperty(SR.TestFramework, string.Empty);
-            }
-            set {
-                SetProperty(SR.TestFramework, value.ToString());
-            }
-        }
-
-        /// <summary>
-        /// Used by automation to get/set using strong type
-        /// </summary>
-        [Browsable(false)]
-        public TestFrameworkType TestFramework {
-            get {
-                string srcValue = GetProperty(SR.TestFramework, string.Empty);
-                TestFrameworkType targetVal;
-
-                if (!Enum.TryParse<TestFrameworkType>(srcValue, out targetVal)) {
-                    targetVal = TestFrameworkType.None;
-                }
-
-                return targetVal;
             }
             set {
                 SetProperty(SR.TestFramework, value.ToString());
@@ -81,29 +62,9 @@ namespace Microsoft.NodejsTools.Project {
         [LocDisplayName(SR.TestFramework)]
         [SRDescriptionAttribute(SR.TestFrameworkDescription)]
         [TypeConverter(typeof(TestFrameworkStringConverter))]
-        public string TestFrameworkInStringType {
+        public string TestFramework {
             get {
                 return GetProperty(SR.TestFramework, string.Empty);
-            }
-            set {
-                SetProperty(SR.TestFramework, value.ToString());
-            }
-        }
-
-        /// <summary>
-        /// Used by automation to get/set using strong type
-        /// </summary>
-        [Browsable(false)]
-        public TestFrameworkType TestFramework {
-            get {
-                string srcValue = GetProperty(SR.TestFramework, string.Empty);
-                TestFrameworkType targetVal;
-
-                if (!Enum.TryParse<TestFrameworkType>(srcValue, out targetVal)) {
-                    targetVal = TestFrameworkType.None;
-                }
-
-                return targetVal;
             }
             set {
                 SetProperty(SR.TestFramework, value.ToString());
@@ -143,13 +104,8 @@ namespace Microsoft.NodejsTools.Project {
         }
 
         public override StandardValuesCollection GetStandardValues(ITypeDescriptorContext context) {
-            List<string> knownFrameworkList = new List<string>();
-            foreach (TestFrameworkType v in (TestFrameworkType[])Enum.GetValues(typeof(TestFrameworkType))) {
-                //Hide the 'None' from the value list 
-                if (v != TestFrameworkType.None) {
-                    knownFrameworkList.Add(v.ToString());
-                }
-            }
+            TestFrameworkDirectories discover = new TestFrameworkDirectories();
+            List<string> knownFrameworkList = discover.GetFrameworkNames();
             return new StandardValuesCollection(knownFrameworkList);
         }
     }

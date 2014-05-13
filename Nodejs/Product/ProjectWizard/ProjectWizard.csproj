@@ -87,9 +87,6 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="..\..\..\Common\Product\SharedProject\TestFrameworkType.cs">
-      <Link>TestFrameworkType.cs</Link>
-    </Compile>
     <Compile Include="..\Nodejs\Guids.cs">
       <Link>Guids.cs</Link>
     </Compile>
@@ -98,6 +95,9 @@
     </Compile>
     <Compile Include="..\Nodejs\PkgCmdID.cs">
       <Link>PkgCmdID.cs</Link>
+    </Compile>
+    <Compile Include="..\Nodejs\TestFrameworks\TestFrameworkDirectories.cs">
+      <Link>TestFrameworkDirectories.cs</Link>
     </Compile>
     <Compile Include="INodePackageModulesCommands.cs" />
     <Compile Include="ImportWizard.cs" />
