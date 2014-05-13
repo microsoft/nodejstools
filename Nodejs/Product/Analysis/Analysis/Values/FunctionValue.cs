@@ -19,7 +19,7 @@ using Microsoft.NodejsTools.Parsing;
 
 namespace Microsoft.NodejsTools.Analysis.Values {
     internal class FunctionValue : ExpandoValue {
-        private readonly ObjectValue _instance;
+        internal readonly ObjectValue _instance;
         private ReferenceDict _references;
 
         internal FunctionValue(ProjectEntry projectEntry, bool createPrototype = true, string name = null)

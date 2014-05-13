@@ -186,16 +186,23 @@ namespace Microsoft.NodejsTools.Analysis.Analyzer {
             var coll = _eval.Evaluate(node.Collection);
             var variable = node.Variable as Var;
             var lookupVar = node.Variable as ExpressionStatement;
-            var values = coll.GetEnumerationValues(node, _unit);
-            if (variable != null) {
-                _eval.Scope.AssignVariable(
-                    variable.First().Name,
-                    node,
-                    _unit,
-                    values
-                );
-            } else if (lookupVar != null) {
-                _eval.AssignTo(node, lookupVar.Expression, values);
+            foreach (var value in coll) {
+                if (value is ExportsValue) {
+                    var values = value.GetEnumerationValues(node, _unit);
+                    if (values.Count < 20) {
+                        Debug.WriteLine(String.Format("Enumerating: {1} {0}", value, values.Count));
+                        if (variable != null) {
+                            _eval.Scope.AssignVariable(
+                                variable.First().Name,
+                                node,
+                                _unit,
+                                values
+                            );
+                        } else if (lookupVar != null) {
+                            //_eval.AssignTo(node, lookupVar.Expression, values);
+                        }
+                    }
+                }
             }
                        
             node.Body.Walk(this);

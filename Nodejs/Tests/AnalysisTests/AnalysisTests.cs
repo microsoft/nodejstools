@@ -689,6 +689,23 @@ var x = new f().bar;
         }
 
         [TestMethod]
+        public void TestKeysSpecialization() {
+            var analysis = ProcessText(@"
+function keys(o) {
+  var a = []
+  for (var i in o) if (o.hasOwnProperty(i)) a.push(i)
+  return a
+}        
+
+var x = keys({'abc':42});
+");
+            AssertUtil.ContainsExactly(
+                analysis.GetDescriptionByIndex("x", 0),
+                "Array object \r\n"
+            );
+        }
+
+        [TestMethod]
         public void TestMergeSpecialization() {
             var analysis = ProcessText(@"function merge(a, b){
   if (a && b) {
@@ -1101,6 +1118,11 @@ var abc = new f().abc;
         public static IEnumerable<BuiltinTypeId> GetTypeIdsByIndex(this ModuleAnalysis analysis, string exprText, int index) {
             return analysis.GetValuesByIndex(exprText, index).Select(m => {
                 return m.TypeId;
+            });
+        }
+        public static IEnumerable<string> GetDescriptionByIndex(this ModuleAnalysis analysis, string exprText, int index) {
+            return analysis.GetValuesByIndex(exprText, index).Select(m => {
+                return m.Description;
             });
         }
     }

@@ -567,9 +567,13 @@ namespace Microsoft.NodejsTools.Analysis {
                         // This member came from less than the full set of types.
                         var seenNames = new HashSet<string>();
                         var newName = new StringBuilder(name);
-                        newName.Append(" (");
+                        bool appended = false;
                         foreach (var v in owners) {
                             if (!string.IsNullOrWhiteSpace(v.OwnerName) && seenNames.Add(v.OwnerName)) {
+                                if (!appended) {
+                                    newName.Append(" (");
+                                    appended = true;
+                                }
                                 // Restrict each displayed type to 25 characters
                                 if (v.OwnerName.Length > 25) {
                                     newName.Append(v.OwnerName.Substring(0, 22));
@@ -589,10 +593,12 @@ namespace Microsoft.NodejsTools.Analysis {
                                 newName.Length -= 1;
                             }
                             newName.Append("...");
-                        } else {
+                        } else if (appended) {
                             newName.Length -= 2;
                         }
-                        newName.Append(")");
+                        if (appended) {
+                            newName.Append(")");
+                        }
                         name = newName.ToString();
                     }
                     yield return new MemberResult(name, completion, kvp.Value, null);
