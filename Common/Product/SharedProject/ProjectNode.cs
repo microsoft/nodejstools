@@ -5504,7 +5504,7 @@ If the files in the existing folder have the same names as files in the folder y
 
         private string EnsureRootedPath(string name) {
             if (!Path.IsPathRooted(name)) {
-                name = CommonUtils.GetAbsoluteDirectoryPath(
+                name = CommonUtils.GetAbsoluteFilePath(
                     ProjectHome,
                     name
                 );
