@@ -26,18 +26,32 @@
     </Fragment>
     <Fragment>
         <DirectoryRef Id="INSTALLLOCATION">
-            <Directory Id="DIR_INSTALLOCATION_Scripts" Name="Scripts">
-              <Directory Id="DIR_INSTALLOCATION_Scripts_typings" Name="typings">
-                <Directory Id="DIR_INSTALLOCATION_Scripts_typings_node" Name="node"/>
-              </Directory>
+          <Directory Id="DIR_INSTALLOCATION_Scripts" Name="Scripts">
+            <Directory Id="DIR_INSTALLOCATION_Scripts_typings" Name="typings">
+              <Directory Id="DIR_INSTALLOCATION_Scripts_typings_node" Name="node"/>
             </Directory>
+          </Directory>
+        </DirectoryRef>
+      
+        <DirectoryRef Id="VWD_INSTALLLOCATION">
+          <Directory Id="DIR_VWDINSTALLOCATION_Scripts" Name="Scripts">
+            <Directory Id="DIR_VWDINSTALLOCATION_Scripts_typings" Name="typings">
+              <Directory Id="DIR_VWDINSTALLOCATION_Scripts_typings_node" Name="node"/>
+            </Directory>
+          </Directory>
+        </DirectoryRef>
+      
+        <DirectoryRef Id="INSTALLLOCATION">
+          <Directory Id="DIR_INSTALLOCATION_TestFrameworks" Name="TestFrameworks">
+            <Directory Id="DIR_INSTALLOCATION_TestFrameworks_Default" Name="default" />
+            <Directory Id="DIR_INSTALLOCATION_TestFrameworks_Mocha" Name="mocha" />
+          </Directory>
         </DirectoryRef>
         <DirectoryRef Id="VWD_INSTALLLOCATION">
-            <Directory Id="DIR_VWDINSTALLOCATION_Scripts" Name="Scripts">
-              <Directory Id="DIR_VWDINSTALLOCATION_Scripts_typings" Name="typings">
-                <Directory Id="DIR_VWDINSTALLOCATION_Scripts_typings_node" Name="node"/>
-              </Directory>
-            </Directory>
+          <Directory Id="DIR_VWDINSTALLOCATION_TestFrameworks" Name="TestFrameworks">
+            <Directory Id="DIR_VWDINSTALLOCATION_TestFrameworks_Default" Name="default" />
+            <Directory Id="DIR_VWDINSTALLOCATION_TestFrameworks_Mocha" Name="mocha" />
+          </Directory>
         </DirectoryRef>
     </Fragment>
     <Fragment>
@@ -452,19 +466,34 @@
             </Component>
           
             <!--Unit test framework support files-->
-            <Component Directory="DIR_TestFramework" Guid="{AD02BF85-EF90-4171-9BA9-2D562384CAA7}">
+            <Component Directory="DIR_INSTALLOCATION_TestFrameworks" Guid="{AD02BF85-EF90-4171-9BA9-2D562384CAA7}">
               <File Id="fil_FindTests_Js" KeyPath="yes" Source="$(var.BinariesDir)\TestFrameworks\find_tests.js" />
             </Component>
-            <Component Directory="DIR_TestFramework" Guid="{CCF217A4-C169-4B45-ABAE-D2D1BC94B7D6}">
+            <Component Directory="DIR_VWDINSTALLOCATION_TestFrameworks" Guid="{71EB347A-9072-4D74-8D7D-9FE34DD9332E}">
+              <File Id="filVWD_FindTests_Js" KeyPath="yes" Source="$(var.BinariesDir)\TestFrameworks\find_tests.js" />
+              <Condition>VWD_EXTENSION_INSTALLPATH</Condition>
+            </Component>
+            <Component Directory="DIR_INSTALLOCATION_TestFrameworks" Guid="{CCF217A4-C169-4B45-ABAE-D2D1BC94B7D6}">
               <File Id="fil_RunTests_Js" KeyPath="yes" Source="$(var.BinariesDir)\TestFrameworks\run_tests.js" />
             </Component>
-            <Component Directory="DIR_TestFramework_Default" Guid="{82BBD733-E1F5-4306-9D81-B19C247A70B6}">
+            <Component Directory="DIR_VWDINSTALLOCATION_TestFrameworks" Guid="{4261FB46-8345-472D-ABDA-63FECD3A89DB}">
+              <File Id="filVWD_RunTests_Js" KeyPath="yes" Source="$(var.BinariesDir)\TestFrameworks\run_tests.js" />
+              <Condition>VWD_EXTENSION_INSTALLPATH</Condition>
+            </Component>
+            <Component Directory="DIR_INSTALLOCATION_TestFrameworks_Default" Guid="{82BBD733-E1F5-4306-9D81-B19C247A70B6}">
               <File Id="fil_Default_Js" KeyPath="yes" Source="$(var.BinariesDir)\TestFrameworks\default\default.js" />
             </Component>
-            <Component Directory="DIR_TestFramework_Mocha" Guid="{783C5E44-6685-4BDA-98D6-0FA37AC4ACBF}">
-              <File Id="fil_Mocha_Js" KeyPath="yes" Source="$(var.BinariesDir)\TestFrameworks\mocha\default.js" />
+            <Component Directory="DIR_VWDINSTALLOCATION_TestFrameworks_Default" Guid="{B9355A89-ECFC-41B6-BD0A-76D4F074D9DB}">
+              <File Id="filVWD_Default_Js" KeyPath="yes" Source="$(var.BinariesDir)\TestFrameworks\default\default.js" />
+              <Condition>VWD_EXTENSION_INSTALLPATH</Condition>
+            </Component>          
+            <Component Directory="DIR_INSTALLOCATION_TestFrameworks_Mocha" Guid="{783C5E44-6685-4BDA-98D6-0FA37AC4ACBF}">
+              <File Id="fil_Mocha_Js" KeyPath="yes" Source="$(var.BinariesDir)\TestFrameworks\mocha\mocha.js" />
             </Component>
-            
+            <Component Directory="DIR_VWDINSTALLOCATION_TestFrameworks_Mocha" Guid="{2F5608B2-47F6-4D9D-8182-9A7B73843FC4}">
+              <File Id="filVWD_Mocha_Js" KeyPath="yes" Source="$(var.BinariesDir)\TestFrameworks\mocha\mocha.js" />
+              <Condition>VWD_EXTENSION_INSTALLPATH</Condition>
+            </Component>            
             <!-- MSBuild support files -->
             <Component Directory="Dir_NodejsToolsMsBuild" Guid="{6D84572F-D895-443F-BD25-712394273A4E}">
                 <File Id="filNodejsTools.targets" KeyPath="yes" Source="$(var.BinariesDir)\Microsoft.NodejsTools.targets" />
