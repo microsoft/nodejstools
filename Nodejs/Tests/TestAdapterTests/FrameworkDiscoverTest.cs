@@ -11,9 +11,10 @@
  * You must not remove this notice, or any other, from this software.
  *
  * ***************************************************************************/
-
+using System.Collections.Generic;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using Microsoft.NodejsTools.TestAdapter.TestFrameworks;
+using Microsoft.NodejsTools.TestFrameworks;
 
 namespace TestAdapterTests {
 
@@ -22,7 +23,11 @@ namespace TestAdapterTests {
         [TestMethod]
         public void InitializeAllFrameworks() {
             //Arrange and Act
-            FrameworkDiscover discover = new FrameworkDiscover("c:\\Dummy");
+            string[] frameworkDirectories = new string[] {
+                "c:\\nodejstools\\" + TestFrameworkDirectories.DefaultFramework,
+                "c:\\nodejstools\\" + "mocha"
+             };
+            FrameworkDiscover discover = new FrameworkDiscover(frameworkDirectories);
 
             //Assert
             TestFramework defaultOne = discover.Get("Default");
@@ -40,16 +45,17 @@ namespace TestAdapterTests {
             string testFile = "dummyTestFile.js";
             string vsixInstallFolder = "c:\\dummyFolder";
             string workingFolder = "c:\\DummyNodejsProject";
-            string frameworkName = "Default";
-            FrameworkDiscover discover = new FrameworkDiscover(vsixInstallFolder);
+            string framework = TestFrameworkDirectories.DefaultFramework;
+            string testFrameworkDirectory = vsixInstallFolder + "\\" + framework;
+            FrameworkDiscover discover = new FrameworkDiscover(new string[] { testFrameworkDirectory });
 
             //Act
-            TestFramework defaultOne = discover.Get(frameworkName);
+            TestFramework defaultOne = discover.Get(TestFrameworkDirectories.DefaultFramework);
             string[] args = defaultOne.ArgumentsToRunTests(testName, testFile, workingFolder);
 
             //Assert
-            Assert.AreEqual("\"" + vsixInstallFolder + "\\TestFrameworks\\run_tests.js" + "\"", args[0]);
-            Assert.AreEqual(frameworkName, args[1]);
+            Assert.AreEqual("\"" + vsixInstallFolder + "\\run_tests.js" + "\"", args[0]);
+            Assert.AreEqual(framework, args[1]);
             Assert.AreEqual("\"" + testName + "\"", args[2]);
             Assert.AreEqual("\"" + testFile + "\"", args[3]);
             Assert.AreEqual("\"" + workingFolder + "\"", args[4]);

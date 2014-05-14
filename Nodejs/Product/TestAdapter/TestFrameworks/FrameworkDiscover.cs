@@ -25,10 +25,13 @@ namespace Microsoft.NodejsTools.TestAdapter.TestFrameworks {
         public FrameworkDiscover(): this(null) {
         }
 
-        public FrameworkDiscover(string installFolder) {
-            TestFrameworkDirectories directoryLoader = new TestFrameworkDirectories(installFolder);
+        public FrameworkDiscover(IEnumerable<string> testFrameworkDirectories) {
+            if (testFrameworkDirectories == null) {
+                TestFrameworkDirectories directoryLoader = new TestFrameworkDirectories();
+                testFrameworkDirectories = directoryLoader.GetFrameworkDirectories();
+            }
             _framworks = new Dictionary<string, TestFramework>(StringComparer.OrdinalIgnoreCase);
-            foreach (string directory in directoryLoader.GetFrameworkDirectories()) {
+            foreach (string directory in testFrameworkDirectories) {
                 TestFramework fx = new TestFramework(directory);
                 _framworks.Add(fx.Name, fx);
             }

@@ -19,15 +19,11 @@ using System.IO;
 
 namespace Microsoft.NodejsTools.TestFrameworks {
     class TestFrameworkDirectories {
-        private Dictionary<string, string> _frameworkDirectories;
+        private readonly Dictionary<string, string> _frameworkDirectories;
         public const string DefaultFramework = "Default"; 
-        public TestFrameworkDirectories(): this(null) {
-        }
 
-        public TestFrameworkDirectories(string installFolder) {
-            if (string.IsNullOrEmpty(installFolder)) {
-                installFolder = GetExecutingAssemblyPath();
-            }
+        public TestFrameworkDirectories() {
+            string installFolder = GetExecutingAssemblyPath();
             _frameworkDirectories = new Dictionary<string, string>(System.StringComparer.OrdinalIgnoreCase);
             string baseTestframeworkFolder = installFolder + @"\TestFrameworks";
             foreach (string directory in Directory.GetDirectories(baseTestframeworkFolder)) {
@@ -44,6 +40,7 @@ namespace Microsoft.NodejsTools.TestFrameworks {
         public List<string> GetFrameworkNames() {
             return new List<string>(_frameworkDirectories.Keys);
         }
+
         public List<string> GetFrameworkDirectories() {
             return new List<string>(_frameworkDirectories.Values);
         }

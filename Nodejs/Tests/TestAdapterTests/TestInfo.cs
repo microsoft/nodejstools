@@ -20,6 +20,7 @@ using Microsoft.NodejsTools.TestAdapter.TestFrameworks;
 using Microsoft.VisualStudio.TestPlatform.ObjectModel;
 using ta::Microsoft.VisualStudioTools;
 using TestUtilities;
+using Microsoft.NodejsTools.TestFrameworks;
 
 namespace TestAdapterTests {
     class TestInfo {
@@ -60,7 +61,7 @@ namespace TestAdapterTests {
 
         public TestCase TestCase {
             get {
-                var expectedFullyQualifiedName = new NodejsTestInfo(RelativeClassFilePath, MethodName, "Default").FullyQualifiedName;
+                var expectedFullyQualifiedName = new NodejsTestInfo(RelativeClassFilePath, MethodName, TestFrameworkDirectories.DefaultFramework).FullyQualifiedName;
                 var tc = new TestCase(expectedFullyQualifiedName, new Uri(TestExecutor.ExecutorUriString), this.ProjectFilePath);
                 tc.CodeFilePath = SourceCodeFilePath;
                 tc.LineNumber = SourceCodeLineNumber;
