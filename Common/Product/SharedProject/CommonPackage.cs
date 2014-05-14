@@ -47,12 +47,36 @@ namespace Microsoft.VisualStudioTools {
 
         #endregion
 
-        static CommonPackage() {
-            // ensure the UI thread is initialized
-            UIThread.Instance.Run(() => { });
-        }
-
         internal CommonPackage() {
+#if DEBUG
+            AppDomain.CurrentDomain.UnhandledException += (sender, e) => {
+                if (e.IsTerminating) {
+                    var ex = e.ExceptionObject as Exception;
+                    if (ex != null) {
+                        Debug.Fail(
+                            string.Format("An unhandled exception is about to terminate the process:\n\n{0}", ex.Message),
+                            ex.ToString()
+                        );
+                    } else {
+                        Debug.Fail(string.Format(
+                            "An unhandled exception is about to terminate the process:\n\n{0}",
+                            e.ExceptionObject
+                        ));
+                    }
+                }
+            };
+            System.Threading.Tasks.TaskScheduler.UnobservedTaskException += (sender, e) => {
+                if (!e.Observed) {
+                    Debug.Fail(
+                        string.Format("An exception in a task was not observed:\n    {0}\n\nThis is not fatal - click 'Ignore' to continue running.", e.Exception.Message),
+                        e.Exception.ToString()
+                    );
+                    e.SetObserved();
+                }
+            };
+#endif
+            UIThread.MustBeCalledFromUIThread();
+
             IServiceContainer container = this as IServiceContainer;
             ServiceCreatorCallback callback = new ServiceCreatorCallback(CreateService);
             //container.AddService(GetLanguageServiceType(), callback, true);
@@ -190,15 +214,17 @@ namespace Microsoft.VisualStudioTools {
         }
 
         internal static void OpenVsWebBrowser(string url) {
-            var web = GetGlobalService(typeof(SVsWebBrowsingService)) as IVsWebBrowsingService;
-            if (web == null) {
-                OpenWebBrowser(url);
-                return;
-            }
+            UIThread.Invoke(() => {
+                var web = GetGlobalService(typeof(SVsWebBrowsingService)) as IVsWebBrowsingService;
+                if (web == null) {
+                    OpenWebBrowser(url);
+                    return;
+                }
 
-            IVsWindowFrame frame;
-            ErrorHandler.ThrowOnFailure(web.Navigate(url, (uint)__VSWBNAVIGATEFLAGS.VSNWB_ForceNew, out frame));
-            frame.Show();
+                IVsWindowFrame frame;
+                ErrorHandler.ThrowOnFailure(web.Navigate(url, (uint)__VSWBNAVIGATEFLAGS.VSNWB_ForceNew, out frame));
+                frame.Show();
+            });
         }
 
         #region IOleComponent Members

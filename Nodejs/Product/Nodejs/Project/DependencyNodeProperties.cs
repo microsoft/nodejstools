@@ -30,13 +30,14 @@ namespace Microsoft.NodejsTools.Project {
         private IPackage Package { get { return DependencyNode.Package; } }
 
         public override string GetClassName() {
-            return IsSubPackage
-                ? (IsGlobalInstall ? Resources.PropertiesClassGlobalSubPackage : Resources.PropertiesClassLocalSubPackage)
-                : (IsGlobalInstall ? Resources.PropertiesClassGlobalPackage : Resources.PropertiesClassLocalPackage);
+            return SR.GetString(IsSubPackage
+                ? (IsGlobalInstall ? SR.PropertiesClassGlobalSubPackage : SR.PropertiesClassLocalSubPackage)
+                : (IsGlobalInstall ? SR.PropertiesClassGlobalPackage : SR.PropertiesClassLocalPackage)
+            );
         }
 
         [SRCategoryAttribute(SR.General)]
-        [LocDisplayName(SR.NpmPackageName)]
+        [SRDisplayName(SR.NpmPackageName)]
         [SRDescriptionAttribute(SR.NpmPackageNameDescription)]
         public string PackageName {
             get {
@@ -45,7 +46,7 @@ namespace Microsoft.NodejsTools.Project {
         }
 
         [SRCategoryAttribute(SR.CategoryVersion)]
-        [LocDisplayName(SR.NpmPackageVersion)]
+        [SRDisplayName(SR.NpmPackageVersion)]
         [SRDescriptionAttribute(SR.NpmPackageVersionDescription)]
         public string PackageVersion {
             get {
@@ -54,12 +55,12 @@ namespace Microsoft.NodejsTools.Project {
         }
 
         [SRCategoryAttribute(SR.CategoryVersion)]
-        [LocDisplayName(SR.NpmPackageRequestedVersionRange)]
+        [SRDisplayName(SR.NpmPackageRequestedVersionRange)]
         [SRDescriptionAttribute(SR.NpmPackageRequestedVersionRangeDescription)]
         public string RequestedVersionRange {
             get {
                 var range = null == Package ? null : Package.RequestedVersionRange;
-                return range ?? Resources.RequestedVersionRangeNone;
+                return range ?? SR.GetString(SR.RequestedVersionRangeNone);
             }
         }
 
@@ -71,33 +72,33 @@ namespace Microsoft.NodejsTools.Project {
         }
 
         [SRCategoryAttribute(SR.CategoryVersion)]
-        [LocDisplayName(SR.NpmPackageNewVersionAvailable)]
+        [SRDisplayName(SR.NpmPackageNewVersionAvailable)]
         [SRDescriptionAttribute(SR.NpmPackageNewVersionAvailableDescription)]
         public string NewVersionAvailable {
             get {
                 if (IsSubPackage) {
-                    return Resources.NewVersionNotApplicableSubpackage;
+                    return SR.GetString(SR.NewVersionNotApplicableSubpackage);
                 }
 
                 var package = Package;
                 var catalog = MostRecentlyLoadedCatalog;
                 if (null == catalog || null == package) {
-                    return Resources.NewVersionUnknown;
+                    return SR.GetString(SR.NewVersionUnknown);
                 }
 
                 var listed = catalog[package.Name];
                 if (null == listed) {
-                    return Resources.NewVersionUnknown;
+                    return SR.GetString(SR.NewVersionUnknown);
                 }
 
                 return listed.Version > package.Version
-                    ? string.Format(Resources.NewVersionYes, listed.Version)
-                    : string.Format(Resources.NewVersionNo);
+                    ? SR.GetString(SR.NewVersionYes, listed.Version)
+                    : SR.GetString(SR.NewVersionNo);
             }
         }
 
         [SRCategoryAttribute(SR.General)]
-        [LocDisplayName(SR.NpmPackageDescription)]
+        [SRDisplayName(SR.NpmPackageDescription)]
         [SRDescriptionAttribute(SR.NpmPackageDescriptionDescription)]
         public string Description {
             get {
@@ -106,7 +107,7 @@ namespace Microsoft.NodejsTools.Project {
         }
 
         [SRCategoryAttribute(SR.General)]
-        [LocDisplayName(SR.NpmPackageKeywords)]
+        [SRDisplayName(SR.NpmPackageKeywords)]
         [SRDescriptionAttribute(SR.NpmPackageKeywordsDescription)]
         public string Keywords {
             get {
@@ -126,7 +127,7 @@ namespace Microsoft.NodejsTools.Project {
         }
 
         [SRCategoryAttribute(SR.General)]
-        [LocDisplayName(SR.NpmPackageAuthor)]
+        [SRDisplayName(SR.NpmPackageAuthor)]
         [SRDescriptionAttribute(SR.NpmPackageAuthorDescription)]
         public string Author {
             get {
@@ -136,7 +137,7 @@ namespace Microsoft.NodejsTools.Project {
         }
 
         [SRCategoryAttribute(SR.General)]
-        [LocDisplayName(SR.NpmPackagePath)]
+        [SRDisplayName(SR.NpmPackagePath)]
         [SRDescriptionAttribute(SR.NpmPackagePathDescription)]
         public string Path {
             get {
@@ -169,30 +170,30 @@ namespace Microsoft.NodejsTools.Project {
         }
 
         [SRCategoryAttribute(SR.General)]
-        [LocDisplayName(SR.NpmPackageType)]
+        [SRDisplayName(SR.NpmPackageType)]
         [SRDescriptionAttribute(SR.NpmPackageTypeDescription)]
         public string PackageType {
             get {
                 if (IsGlobalInstall) {
                     return IsSubPackage
-                        ? Resources.PackageTypeGlobalSubpackage
-                        : Resources.PackageTypeGlobal;
+                        ? SR.GetString(SR.PackageTypeGlobalSubpackage)
+                        : SR.GetString(SR.PackageTypeGlobal);
                 }
 
                 return IsSubPackage
-                    ? Resources.PackageTypeLocalSubpackage
-                    : Resources.PackageTypeLocal;
+                    ? SR.GetString(SR.PackageTypeLocalSubpackage)
+                    : SR.GetString(SR.PackageTypeLocal);
             }
         }
 
 
         [SRCategoryAttribute(SR.General)]
-        [LocDisplayName(SR.NpmPackageLinkStatus)]
+        [SRDisplayName(SR.NpmPackageLinkStatus)]
         [SRDescriptionAttribute(SR.NpmPackageLinkStatusDescription)]
         public string LinkStatus {
             get {
                 if (IsSubPackage) {
-                    return Resources.LinkStatusNotApplicableSubPackages;
+                    return SR.GetString(SR.LinkStatusNotApplicableSubPackages);
                 }
 
                 var package = Package;
@@ -203,26 +204,26 @@ namespace Microsoft.NodejsTools.Project {
                         if (null != root) {
                             var local = root.Modules[package.Name];
                             return null == local || local.Version != package.Version
-                                ? Resources.LinkStatusNotLinkedToProject
-                                : Resources.LinkStatusLinkedToProject;
+                                ? SR.GetString(SR.LinkStatusNotLinkedToProject)
+                                : SR.GetString(SR.LinkStatusLinkedToProject);
                         }
                     } else {
                         var global = controller.GlobalPackages;
                         if (null != global) {
                             var installed = global.Modules[package.Name];
                             return null == installed || installed.Version != package.Version
-                                ? Resources.LinkStatusLocallyInstalled
-                                : Resources.LinkStatusLinkedFromGlobal;
+                                ? SR.GetString(SR.LinkStatusLocallyInstalled)
+                                : SR.GetString(SR.LinkStatusLinkedFromGlobal);
                         }
                     }
                 }
 
-                return Resources.LinkStatusUnknown;
+                return SR.GetString(SR.LinkStatusUnknown);
             }
         }
 
         [SRCategoryAttribute(SR.CategoryStatus)]
-        [LocDisplayName(SR.NpmPackageIsListedInParentPackageJson)]
+        [SRDisplayName(SR.NpmPackageIsListedInParentPackageJson)]
         [SRDescriptionAttribute(SR.NpmPackageIsListedInParentPackageJsonDescription)]
         public bool IsListedInParentPackageJson {
             get {
@@ -231,7 +232,7 @@ namespace Microsoft.NodejsTools.Project {
         }
 
         [SRCategoryAttribute(SR.CategoryStatus)]
-        [LocDisplayName(SR.NpmPackageIsMissing)]
+        [SRDisplayName(SR.NpmPackageIsMissing)]
         [SRDescriptionAttribute(SR.NpmPackageIsMissingDescription)]
         public bool IsMissing {
             get {
@@ -240,7 +241,7 @@ namespace Microsoft.NodejsTools.Project {
         }
 
         [SRCategoryAttribute(SR.CategoryStatus)]
-        [LocDisplayName(SR.NpmPackageIsDevDependency)]
+        [SRDisplayName(SR.NpmPackageIsDevDependency)]
         [SRDescriptionAttribute(SR.NpmPackageIsDevDependencyDescription)]
         public bool IsDevDependency {
             get {
@@ -249,7 +250,7 @@ namespace Microsoft.NodejsTools.Project {
         }
 
         [SRCategoryAttribute(SR.CategoryStatus)]
-        [LocDisplayName(SR.NpmPackageIsOptionalDependency)]
+        [SRDisplayName(SR.NpmPackageIsOptionalDependency)]
         [SRDescriptionAttribute(SR.NpmPackageIsOptionalDependencyDescription)]
         public bool IsOptionalDependency {
             get {
@@ -258,7 +259,7 @@ namespace Microsoft.NodejsTools.Project {
         }
 
         [SRCategoryAttribute(SR.CategoryStatus)]
-        [LocDisplayName(SR.NpmPackageIsBundledDependency)]
+        [SRDisplayName(SR.NpmPackageIsBundledDependency)]
         [SRDescriptionAttribute(SR.NpmPackageIsBundledDependencyDescription)]
         public bool IsBundledDependency {
             get {

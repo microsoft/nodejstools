@@ -19,7 +19,7 @@ using Newtonsoft.Json.Linq;
 namespace NodejsTests.Debugger.Events {
     [TestClass]
     public class BreakpointEventTests {
-        [TestMethod, Priority(0)]
+        [TestMethod, Priority(0), TestCategory("Debugging")]
         public void CreateBreakpointEvent() {
             // Arrange
             JObject message = JObject.Parse(Resources.NodeBreakpointResponse);

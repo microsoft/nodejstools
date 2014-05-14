@@ -1,5 +1,4 @@
-﻿// UnitTest.js 
-var assert = require('assert');
+﻿var assert = require('assert');
 
 exports['Test 1'] = function (test) {
     assert.ok(true, "This shouldn't fail");

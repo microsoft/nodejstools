@@ -25,7 +25,8 @@ using System.Threading;
 using System.Threading.Tasks;
 using System.Web.Script.Serialization;
 using System.Windows.Forms;
-using Microsoft.Ajax.Utilities;
+using Microsoft.NodejsTools.Parsing;
+using Microsoft.NodejsTools.Project;
 using Microsoft.VisualStudio.Text;
 
 namespace Microsoft.NodejsTools.Repl {
@@ -53,6 +54,9 @@ namespace Microsoft.NodejsTools.Repl {
             _window.SetOptionValue(ReplOptions.DisplayPromptInMargin, false);
             _window.SetOptionValue(ReplOptions.SupportAnsiColors, true);
             _window.SetOptionValue(ReplOptions.UseSmartUpDown, true);
+
+            _window.WriteLine(SR.GetString(SR.ReplInitializationMessage));
+
             return ExecutionResult.Succeeded;
         }
 
@@ -65,25 +69,23 @@ namespace Microsoft.NodejsTools.Repl {
         }
 
         public bool CanExecuteText(string text) {
-            var parser = new JSParser(text);
-            var errorSink = new ErrorSink(text);
-            parser.CompilerError += errorSink.CompilerError;
+            var errorSink = new ReplErrorSink(text);
+            var parser = new JSParser(text, errorSink);
             parser.Parse(new CodeSettings());
 
             return !errorSink.Unterminated;
         }
 
-        class ErrorSink {
+        class ReplErrorSink : ErrorSink {
             public bool Unterminated;
             public readonly string Text;
 
-            public ErrorSink(string text) {
+            public ReplErrorSink(string text) {
                 Text = text;
             }
 
-            public void CompilerError(object sender, JScriptExceptionEventArgs e) {
-                
-                switch(e.Exception.ErrorCode) {
+            public override void OnError(JScriptExceptionEventArgs e) {
+                switch (e.Exception.ErrorCode) {
                     case JSError.NoCatch:
                     case JSError.UnclosedFunction:
                     case JSError.NoCommentEnd:
@@ -103,7 +105,7 @@ namespace Microsoft.NodejsTools.Repl {
                         Unterminated = true;
                         break;
                     default:
-                        if (e.Exception.Context.StartPosition == Text.Length) {
+                        if (e.Exception.Span.Start == Text.Length) {
                             // EOF error
                             Unterminated = true;
                         }
@@ -161,11 +163,11 @@ namespace Microsoft.NodejsTools.Repl {
 
             string nodeExePath = GetNodeExePath();
             if (String.IsNullOrWhiteSpace(nodeExePath)) {
-                _window.WriteError(Resources.NodejsNotInstalled);
+                _window.WriteError(SR.GetString(SR.NodejsNotInstalled));
                 _window.WriteError(Environment.NewLine);
                 return;
             } else if (!File.Exists(nodeExePath)) {
-                _window.WriteError(String.Format(Resources.NodeExeDoesntExist, nodeExePath));
+                _window.WriteError(SR.GetString(SR.NodeExeDoesntExist, nodeExePath));
                 _window.WriteError(Environment.NewLine);
                 return;
             }

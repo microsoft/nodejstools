@@ -24,7 +24,7 @@ namespace Microsoft.NodejsTools.Project {
         /// <summary>
         /// The caption to display for this node
         /// </summary>
-        private const string _cCaption = "Global Modules";
+        private const string _cCaption = "global";
 
         /// <summary>
         /// The virtual name of this node.

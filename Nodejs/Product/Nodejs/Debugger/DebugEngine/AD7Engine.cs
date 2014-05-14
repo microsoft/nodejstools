@@ -19,12 +19,15 @@ using System.IO;
 using System.Runtime.InteropServices;
 using System.Web;
 using EnvDTE;
+using Microsoft.NodejsTools.Debugger.Communication;
 using Microsoft.NodejsTools.Debugger.Remote;
 using Microsoft.NodejsTools.Project;
 using Microsoft.VisualStudio;
 using Microsoft.VisualStudio.Debugger.Interop;
 using Microsoft.VisualStudio.Shell;
 using Microsoft.VisualStudio.Shell.Interop;
+using Microsoft.VisualStudioTools.Project;
+using SR = Microsoft.NodejsTools.Project.SR;
 
 namespace Microsoft.NodejsTools.Debugger.DebugEngine {
     // AD7Engine is the primary entrypoint object for the debugging engine. 
@@ -47,7 +50,7 @@ namespace Microsoft.NodejsTools.Debugger.DebugEngine {
 
         // The core of the engine is implemented by NodeDebugger - we wrap and expose that to VS.
         private NodeDebugger _process;
-        
+
         // mapping between NodeThread threads and AD7Threads
         private readonly Dictionary<NodeThread, AD7Thread> _threads = new Dictionary<NodeThread, AD7Thread>();
         private readonly Dictionary<NodeModule, AD7Module> _modules = new Dictionary<NodeModule, AD7Module>();
@@ -62,8 +65,6 @@ namespace Microsoft.NodejsTools.Debugger.DebugEngine {
         private Guid _ad7ProgramId;             // A unique identifier for the program being debugged.
         private static readonly HashSet<WeakReference> Engines = new HashSet<WeakReference>();
         private string _webBrowserUrl;
-
-        // These constants are duplicated in HpcLauncher and cannot be changed
 
         public const string DebugEngineId = "{0A638DAC-429B-4973-ADA0-E8DCDFB29B61}";
         public static Guid DebugEngineGuid = new Guid(DebugEngineId);
@@ -91,7 +92,7 @@ namespace Microsoft.NodejsTools.Debugger.DebugEngine {
         /// semi-colon.
         /// </summary>
         public const string InterpreterOptions = "INTERPRETER_OPTIONS";
-                
+
         /// <summary>
         /// Specifies URL to which to open web browser on node debug connect.
         /// </summary>
@@ -181,7 +182,7 @@ namespace Microsoft.NodejsTools.Debugger.DebugEngine {
                 Debug.Fail("Node debugging only supports one program in a process");
                 throw new ArgumentException();
             }
-            
+
             int processId = EngineUtils.GetProcessId(rgpPrograms[0]);
             if (processId == 0) {
                 // engine only supports system processes
@@ -193,7 +194,7 @@ namespace Microsoft.NodejsTools.Debugger.DebugEngine {
 
             // Attach can either be called to attach to a new process, or to complete an attach
             // to a launched process
-            if (_process == null) {                
+            if (_process == null) {
                 _events = ad7Callback;
 
                 var program = (NodeRemoteDebugProgram)rgpPrograms[0];
@@ -218,7 +219,7 @@ namespace Microsoft.NodejsTools.Debugger.DebugEngine {
             }
 
             lock (_syncLock) {
-                _sdmAttached = true;                
+                _sdmAttached = true;
                 HandleLoadComplete();
             }
 
@@ -330,7 +331,7 @@ namespace Microsoft.NodejsTools.Debugger.DebugEngine {
             // Check whether breakpoint request for our language
             var requestInfo = new BP_REQUEST_INFO[1];
             EngineUtils.CheckOk(pBpRequest.GetRequestInfo(enum_BPREQI_FIELDS.BPREQI_LANGUAGE | enum_BPREQI_FIELDS.BPREQI_BPLOCATION, requestInfo));
-            if (requestInfo[0].guidLanguage != Guids.NodejsDebugLanguage && 
+            if (requestInfo[0].guidLanguage != Guids.NodejsDebugLanguage &&
                 requestInfo[0].guidLanguage != Guids.ScriptDebugLanguage &&
                 requestInfo[0].guidLanguage != Guids.TypeScriptDebugLanguage) {
                 // Check whether breakpoint request for our "downloaded" script
@@ -489,7 +490,7 @@ namespace Microsoft.NodejsTools.Debugger.DebugEngine {
             ushort? debugPort = null;
             if (options != null) {
                 var splitOptions = SplitOptions(options);
-                
+
                 foreach (var optionSetting in splitOptions) {
                     var setting = optionSetting.Split(new[] { '=' }, 2);
 
@@ -581,7 +582,7 @@ namespace Microsoft.NodejsTools.Debugger.DebugEngine {
                     }
                 }
             }
-            if (options.Length  - lastStart > 0) {
+            if (options.Length - lastStart > 0) {
                 res.Add(options.Substring(lastStart, options.Length - lastStart));
             }
             return res;
@@ -696,6 +697,7 @@ namespace Microsoft.NodejsTools.Debugger.DebugEngine {
             _breakpointManager.ClearBreakpointBindingResults();
 
             _process.Detach();
+            DetachEvents(_process);
             _ad7ProgramId = Guid.Empty;
 
             return VSConstants.S_OK;
@@ -830,7 +832,7 @@ namespace Microsoft.NodejsTools.Debugger.DebugEngine {
             switch (sk) {
                 case enum_STEPKIND.STEP_INTO: thread.StepInto(); break;
                 case enum_STEPKIND.STEP_OUT: thread.StepOut(); break;
-                case enum_STEPKIND.STEP_OVER: thread.StepOver(); break; 
+                case enum_STEPKIND.STEP_OVER: thread.StepOver(); break;
             }
             return VSConstants.S_OK;
         }
@@ -937,9 +939,14 @@ namespace Microsoft.NodejsTools.Debugger.DebugEngine {
 
             EngineUtils.RequireOk(eventObject.GetAttributes(out attributes));
             
+            if ((attributes & (uint)enum_EVENTATTRIBUTES.EVENT_STOPPING) != 0 && thread == null) {
+                Debug.Fail("A thread must be provided for a stopping event");
+                return;
+            }
+
             try {
                 EngineUtils.RequireOk(events.Event(this, null, program, thread, eventObject, ref riidEvent, attributes));
-            } catch (InvalidCastException) {                
+            } catch (InvalidCastException) {
                 // COM object has gone away
             }
         }
@@ -976,6 +983,29 @@ namespace Microsoft.NodejsTools.Debugger.DebugEngine {
             }
 
             process.StartListening();
+        }
+
+        private void DetachEvents(NodeDebugger process) {
+            process.ProcessLoaded -= OnProcessLoaded;
+            process.ModuleLoaded -= OnModuleLoaded;
+            process.ThreadCreated -= OnThreadCreated;
+
+            process.BreakpointBound -= OnBreakpointBound;
+            process.BreakpointUnbound -= OnBreakpointUnbound;
+            process.BreakpointBindFailure -= OnBreakpointBindFailure;
+
+            process.BreakpointHit -= OnBreakpointHit;
+            process.AsyncBreakComplete -= OnAsyncBreakComplete;
+            process.ExceptionRaised -= OnExceptionRaised;
+            process.ProcessExited -= OnProcessExited;
+            process.EntryPointHit -= OnEntryPointHit;
+            process.StepComplete -= OnStepComplete;
+            process.ThreadExited -= OnThreadExited;
+            process.DebuggerOutput -= OnDebuggerOutput;
+
+            if (_documentEvents != null) {
+                _documentEvents.DocumentSaved -= OnDocumentSaved;
+            }
         }
 
         private void OnThreadExited(object sender, ThreadEventArgs e) {
@@ -1043,7 +1073,7 @@ namespace Microsoft.NodejsTools.Debugger.DebugEngine {
             if (defaultBrowsers.Count != 1 || defaultBrowsers[0].DisplayName != "Internet Explorer") {
                 // if we use UseDefaultBrowser we lose the nice control & debugging of IE, so
                 // instead launch w/ no debugging when the user has selected a browser other than IE.
-                info.LaunchFlags |= (uint)__VSDBGLAUNCHFLAGS.DBGLAUNCH_StopDebuggingOnEnd  | 
+                info.LaunchFlags |= (uint)__VSDBGLAUNCHFLAGS.DBGLAUNCH_StopDebuggingOnEnd |
                                     (uint)__VSDBGLAUNCHFLAGS4.DBGLAUNCH_UseDefaultBrowser |
                                     (uint)__VSDBGLAUNCHFLAGS.DBGLAUNCH_NoDebug;
             }
@@ -1143,7 +1173,7 @@ namespace Microsoft.NodejsTools.Debugger.DebugEngine {
             var pendingBreakpoint = _breakpointManager.GetPendingBreakpoint(e.Breakpoint);
             var breakpointErrorEvent = new AD7BreakpointErrorEvent(pendingBreakpoint, this);
             pendingBreakpoint.AddBreakpointError(breakpointErrorEvent);
-            Send(breakpointErrorEvent, AD7BreakpointErrorEvent.IID, null );
+            Send(breakpointErrorEvent, AD7BreakpointErrorEvent.IID, null);
         }
 
         private void OnAsyncBreakComplete(object sender, ThreadEventArgs e) {
@@ -1155,30 +1185,37 @@ namespace Microsoft.NodejsTools.Debugger.DebugEngine {
         }
 
         private void OnDebuggerOutput(object sender, OutputEventArgs e) {
-            AD7Thread thread;
-            if (!_threads.TryGetValue(e.Thread, out thread)) {
+            AD7Thread thread = null;
+            if (e.Thread != null && !_threads.TryGetValue(e.Thread, out thread)) {
                 _threads[e.Thread] = thread = new AD7Thread(this, e.Thread);
             }
 
+            // thread can be null for an output string event because it is not
+            // a stopping event.
             Send(new AD7DebugOutputStringEvent2(e.Output), AD7DebugOutputStringEvent2.IID, thread);
         }
 
-        private async void OnDocumentSaved(Document document) {
+        private void OnDocumentSaved(Document document) {
             var module = Process.GetModuleForFilePath(document.FullName);
             if (module == null) {
                 return;
             }
 
-            // Rebuild current project if required
+            // For .ts files, we need to build the project to regenerate .js code.
             if (String.Equals(Path.GetExtension(module.FileName), NodejsConstants.TypeScriptExtension, StringComparison.OrdinalIgnoreCase)) {
-                document.ProjectItem.ContainingProject.GetNodeProject().Build(null, null);
+                if (document.ProjectItem.ContainingProject.GetNodeProject().Build(null, null) != MSBuildResult.Successful) {
+                    var statusBar = (IVsStatusbar)ServiceProvider.GlobalProvider.GetService(typeof(SVsStatusbar));
+                    statusBar.SetText(SR.GetString(SR.DebuggerModuleUpdateFailed));
+                    return;
+                } 
             }
 
-            // Update module source
-            if (!await Process.UpdateModuleSourceAsync(module).ConfigureAwait(false)) {
-                var statusBar = (IVsStatusbar)ServiceProvider.GlobalProvider.GetService(typeof(SVsStatusbar));
-                statusBar.SetText(Resources.DebuggerModuleUpdateFailed);
-            }
+            DebuggerClient.RunWithRequestExceptionsHandled(async () => {
+                if (!await Process.UpdateModuleSourceAsync(module).ConfigureAwait(false)) {
+                    var statusBar = (IVsStatusbar)ServiceProvider.GlobalProvider.GetService(typeof(SVsStatusbar));
+                    statusBar.SetText(SR.GetString(SR.DebuggerModuleUpdateFailed));
+                }
+            });
         }
 
         #endregion
@@ -1198,7 +1235,7 @@ namespace Microsoft.NodejsTools.Debugger.DebugEngine {
         /// </summary>
         /// <returns>File names collection.</returns>
         private IEnumerable<string> EnumerateSolutionFiles() {
-            var solution = Package.GetGlobalService(typeof (SVsSolution)) as IVsSolution;
+            var solution = Package.GetGlobalService(typeof(SVsSolution)) as IVsSolution;
             if (solution != null) {
                 foreach (IVsProject project in solution.EnumerateLoadedProjects(false)) {
                     foreach (uint itemid in project.EnumerateProjectItems()) {

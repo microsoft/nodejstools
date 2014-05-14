@@ -54,16 +54,16 @@ namespace AzurePublishingUITests {
 
         public TestContext TestContext { get; set; }
 
-        private void CreateProject(VisualStudioApp app, string languageName, string templateName, string location, string projectName, string expectedProjectItem) {
-            var newProjDialog = app.FileNewProject();
+        internal static void CreateProject(VisualStudioApp app, string languageName, string templateName, string location, string projectName, string expectedProjectItem) {
+            using (var newProjDialog = app.FileNewProject()) {
+                newProjDialog.FocusLanguageNode(languageName);
+                newProjDialog.Location = location;
+                newProjDialog.ProjectName = projectName;
 
-            newProjDialog.FocusLanguageNode(languageName);
-            newProjDialog.Location = location;
-            newProjDialog.ProjectName = projectName;
-
-            var djangoApp = newProjDialog.ProjectTypes.FindItem(templateName);
-            djangoApp.Select();
-            newProjDialog.ClickOK();
+                var djangoApp = newProjDialog.ProjectTypes.FindItem(templateName);
+                djangoApp.Select();
+                newProjDialog.OK();
+            }
 
             // wait for new solution to load...
             for (int i = 0; i < 40 && app.Dte.Solution.Projects.Count == 0; i++) {

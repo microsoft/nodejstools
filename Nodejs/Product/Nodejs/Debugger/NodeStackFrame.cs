@@ -136,6 +136,10 @@ namespace Microsoft.NodejsTools.Debugger {
 
             NodeEvaluationResult result = await Process.SetVariableValueAsync(this, name, value, cancellationToken).ConfigureAwait(false);
 
+            if (result == null) {
+                return null;
+            }
+
             // Update variable in locals
             for (int i = 0; i < Locals.Count; i++) {
                 NodeEvaluationResult evaluationResult = Locals[i];

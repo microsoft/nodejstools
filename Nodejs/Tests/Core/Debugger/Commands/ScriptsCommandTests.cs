@@ -19,7 +19,7 @@ using Microsoft.VisualStudio.TestTools.UnitTesting;
 namespace NodejsTests.Debugger.Commands {
     [TestClass]
     public class ScriptsCommandTests {
-        [TestMethod, Priority(0)]
+        [TestMethod, Priority(0), TestCategory("Debugging")]
         public void CreateScriptsCommand() {
             // Arrange
             const int commandId = 3;
@@ -37,7 +37,7 @@ namespace NodejsTests.Debugger.Commands {
                 scriptsCommand.ToString());
         }
 
-        [TestMethod, Priority(0)]
+        [TestMethod, Priority(0), TestCategory("Debugging")]
         public void CreateScriptsCommandWithOptionalParameters() {
             // Arrange
             const int commandId = 3;
@@ -56,7 +56,7 @@ namespace NodejsTests.Debugger.Commands {
                 scriptsCommand.ToString());
         }
 
-        [TestMethod, Priority(0)]
+        [TestMethod, Priority(0), TestCategory("Debugging")]
         public void ProcessScriptsResponse() {
             // Arrange
             const int commandId = 3;

@@ -16,6 +16,7 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using System.Runtime.InteropServices;
 using System.Threading;
 using System.Windows;
 using System.Windows.Forms;
@@ -26,6 +27,7 @@ using Microsoft.NodejsTools.NpmUI;
 using Microsoft.VisualStudio;
 using Microsoft.VisualStudio.Shell;
 using Microsoft.VisualStudio.Shell.Interop;
+using Microsoft.VisualStudioTools;
 using Microsoft.VisualStudioTools.Project;
 using MessageBox = System.Windows.MessageBox;
 using Timer = System.Threading.Timer;
@@ -208,27 +210,20 @@ namespace Microsoft.NodejsTools.Project {
 
         private static readonly Guid NpmOutputPaneGuid = new Guid("25764421-33B8-4163-BD02-A94E299D52D8");
 
-        private IVsOutputWindowPane GetNpmOutputPane() {
-            var outputWindow = (IVsOutputWindow)_projectNode.GetService(typeof(SVsOutputWindow));
-            IVsOutputWindowPane pane;
-            if (outputWindow.GetPane(NpmOutputPaneGuid, out pane) != VSConstants.S_OK) {
-                outputWindow.CreatePane(NpmOutputPaneGuid, "Npm", 1, 1);
-                outputWindow.GetPane(NpmOutputPaneGuid, out pane);
-            }
-            return pane;
-        }
-
-        private void ShowNpmOutputPane() {
-            OutputWindowRedirector.GetGeneral(ProjectMgr.Package).ShowAndActivate();
-            var pane = GetNpmOutputPane();
-            if (null != pane) {
-                pane.Activate();
+        private OutputWindowRedirector GetNpmOutputPane() {
+            try {
+                return OutputWindowRedirector.Get(_projectNode.Site, NpmOutputPaneGuid, SR.GetString(SR.NpmOutputPaneTitle));
+            } catch (InvalidOperationException) {
+                return null;
             }
         }
 
         private void ConditionallyShowNpmOutputPane() {
             if (NodejsPackage.Instance.GeneralOptionsPage.ShowOutputWindowWhenExecutingNpm) {
-                ShowNpmOutputPane();
+                var pane = GetNpmOutputPane();
+                if (null != pane) {
+                    pane.ShowAndActivate();
+                }
             }
         }
 
@@ -281,12 +276,10 @@ namespace Microsoft.NodejsTools.Project {
         }
 
         private void ForceUpdateStatusBarWithNpmActivitySafe(string activity) {
-            if (UIThread.Instance.IsUIThread) {
-                ForceUpdateStatusBarWithNpmActivity(activity);
-            } else {
-                UIThread.Instance.Run(() => ForceUpdateStatusBarWithNpmActivity(activity));
+            UIThread.InvokeAsync(() => ForceUpdateStatusBarWithNpmActivity(activity))
+                .HandleAllExceptions(SR.ProductName)
+                .DoNotWait();
             }
-        }
 
         private void UpdateStatusBarWithNpmActivity(string activity) {
             lock (_commandCountLock) {
@@ -298,10 +291,25 @@ namespace Microsoft.NodejsTools.Project {
             ForceUpdateStatusBarWithNpmActivitySafe(activity);
         }
 
+        private static string TrimLastNewline(string text) {
+            if (string.IsNullOrEmpty(text)) {
+                return string.Empty;
+            }
+
+            if (text.EndsWith("\r\n")) {
+                return text.Remove(text.Length - 2);
+            }
+            if (text.EndsWith("\r") || text.EndsWith("\n")) {
+                return text.Remove(text.Length - 1);
+            }
+
+            return text;
+        }
+
         private void WriteNpmLogToOutputWindow(string logText) {
             var pane = GetNpmOutputPane();
             if (null != pane) {
-                pane.OutputStringThreadSafe(logText);
+                pane.WriteLine(logText);
             }
 
             UpdateStatusBarWithNpmActivity(logText);
@@ -312,7 +320,7 @@ namespace Microsoft.NodejsTools.Project {
         }
 
         private void WriteNpmLogToOutputWindow(NpmLogEventArgs args) {
-            WriteNpmLogToOutputWindow(args.LogText);
+            WriteNpmLogToOutputWindow(TrimLastNewline(args.LogText));
         }
 
         private void NpmController_CommandStarted(object sender, EventArgs e) {
@@ -343,13 +351,14 @@ namespace Microsoft.NodejsTools.Project {
 
             string message;
             if (e.WithErrors) {
-                message = e.Cancelled
-                    ? string.Format(Resources.NpmCancelledWithErrors, e.CommandText)
-                    : string.Format(Resources.NpmCompletedWithErrors, e.CommandText);
+                message = SR.GetString(
+                    e.Cancelled ? SR.NpmCancelledWithErrors : SR.NpmCompletedWithErrors,
+                    e.CommandText
+                );
             } else if (e.Cancelled) {
-                message = string.Format(Resources.NpmCancelled, e.CommandText);
+                message = SR.GetString(SR.NpmCancelled, e.CommandText);
             } else {
-                message = string.Format(Resources.NpmSuccessfullyCompleted, e.CommandText);
+                message = SR.GetString(SR.NpmSuccessfullyCompleted, e.CommandText);
             }
 
             ForceUpdateStatusBarWithNpmActivitySafe(message);
@@ -379,11 +388,9 @@ namespace Microsoft.NodejsTools.Project {
         }
 
         internal void ReloadHierarchySafe() {
-            if (UIThread.Instance.IsUIThread) {
-                ReloadHierarchy();
-            } else {
-                UIThread.Instance.Run(ReloadHierarchy);
-            }
+            UIThread.InvokeAsync(ReloadHierarchy)
+                .HandleAllExceptions(SR.ProductName)
+                .DoNotWait();
         }
 
         private void UpdateModulesFromTimer() {
@@ -568,18 +575,10 @@ namespace Microsoft.NodejsTools.Project {
                 }
             }
             
-            using (var executeVm = new NpmOutputControlViewModel()) {
-                executeVm.NpmController = NpmController;
-                var viewModel = new NpmPackageInstallViewModel(executeVm);
-                viewModel.NpmController = NpmController;
-                var manager = new NpmPackageInstallWindow(viewModel);
-                manager.NpmExecuteControl.DataContext = executeVm;
+            using (var executeVm = new NpmOutputControlViewModel(NpmController))
+            using (var manager = new NpmPackageInstallWindow(NpmController, executeVm)) {
                 manager.Owner = System.Windows.Application.Current.MainWindow;
                 manager.ShowDialog();
-
-                //  This will unregister event handlers on the controller and prevent
-                //  us from leaking view models.
-                viewModel.NpmController = null;
             }
             ReloadHierarchy();
         }
@@ -645,12 +644,12 @@ namespace Microsoft.NodejsTools.Project {
                             package.Name,
                             null == dep ? "*" : dep.VersionRangeText);
                     } else {
-                        await commander.InstallPackageByVersionAsync(
-                            package.Name,
-                            null == dep ? "*" : dep.VersionRangeText,
-                            DependencyType.Standard,
-                            false);
-                    }
+                    await commander.InstallPackageByVersionAsync(
+                        package.Name,
+                        null == dep ? "*" : dep.VersionRangeText,
+                        DependencyType.Standard,
+                        false);
+                }
                 }
             } catch (NpmNotFoundException nnfe) {
                 ErrorHelper.ReportNpmNotInstalled(null, nnfe);

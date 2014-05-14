@@ -25,11 +25,8 @@ using Microsoft.VisualStudioTools.Project;
 
 namespace Microsoft.NodejsTools.Project {
     class NodejsTypeScriptFileNode : CommonFileNode {
-        internal int _fileId;
-
         public NodejsTypeScriptFileNode(NodejsProjectNode root, ProjectElement e)
             : base(root, e) {
-            _fileId = root._currentFileCounter++;
         }
 
         protected override NodeProperties CreatePropertiesObject() {
@@ -40,12 +37,6 @@ namespace Microsoft.NodejsTools.Project {
             }
 
             return new NodejsTypeScriptFileNodeProperties(this);
-        }
-
-        internal string MangledModuleFunctionName {
-            get {
-                return NodejsConstants.NodejsHiddenUserModule + _fileId;
-            }
         }
 
         public new NodejsProjectNode ProjectMgr {

@@ -14,6 +14,7 @@
 
 using System;
 using System.ComponentModel.Composition;
+using Microsoft.NodejsTools.Classifier;
 using Microsoft.VisualStudio.Language.Intellisense;
 using Microsoft.VisualStudio.Shell;
 using Microsoft.VisualStudio.Text;
@@ -21,17 +22,14 @@ using Microsoft.VisualStudio.Text.Classification;
 using Microsoft.VisualStudio.Utilities;
 
 namespace Microsoft.NodejsTools.Intellisense {
-    [Export(typeof(ICompletionSourceProvider)), ContentType("projection"), Order, Name("Node.js Completion Source")]
+    [Export(typeof(ICompletionSourceProvider)), ContentType(NodejsConstants.Nodejs), Order, Name("Node.js Completion Source")]
     sealed class CompletionSourceProvider : ICompletionSourceProvider {
-        private readonly IClassifierAggregatorService _classifierAggregator;
         private readonly IServiceProvider _serviceProvider;
         private readonly IGlyphService _glyphService;
 
         [ImportingConstructor]
-        public CompletionSourceProvider(IClassifierAggregatorService classifierAggregator, 
-            [Import(typeof(SVsServiceProvider))]IServiceProvider serviceProvider,
+        public CompletionSourceProvider([Import(typeof(SVsServiceProvider))]IServiceProvider serviceProvider,
             IGlyphService glyphService) {
-            _classifierAggregator = classifierAggregator;
             _serviceProvider = serviceProvider;
             _glyphService = glyphService;
         }
@@ -39,9 +37,14 @@ namespace Microsoft.NodejsTools.Intellisense {
         #region ICompletionSourceProvider Members
 
         public ICompletionSource TryCreateCompletionSource(ITextBuffer textBuffer) {
-            // only provide completions for our own buffers
-            if (textBuffer.Properties.ContainsProperty(typeof(NodejsProjectionBuffer))) {
-                return new CompletionSource(textBuffer, _classifierAggregator, _serviceProvider, _glyphService);
+            NodejsClassifier classifier;
+            if (textBuffer.Properties.TryGetProperty<NodejsClassifier>(typeof(NodejsClassifier), out classifier)) {
+                return new CompletionSource(
+                    textBuffer,
+                    classifier,
+                    _serviceProvider,
+                    _glyphService
+                );
             }
             return null;
         }

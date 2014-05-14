@@ -107,6 +107,7 @@ namespace Microsoft.VisualStudioTools.Project {
         private ProcessWaitHandle _waitHandle;
         private readonly Redirector _redirector;
         private bool _isDisposed;
+        private bool _haveRaisedExitedEvent;
 
         private static readonly char[] EolChars = new[] { '\r', '\n' };
         private static readonly char[] _needToBeQuoted = new[] { ' ', '"' };
@@ -156,14 +157,19 @@ namespace Microsoft.VisualStudioTools.Project {
         /// <see cref="RunElevated"/>.
         /// </param>
         /// <returns>A <see cref="ProcessOutput"/> object.</returns>
-        public static ProcessOutput Run(string filename,
+        public static ProcessOutput Run(
+            string filename,
                                         IEnumerable<string> arguments,
                                         string workingDirectory,
                                         IEnumerable<KeyValuePair<string, string>> env,
                                         bool visible,
                                         Redirector redirector,
                                         bool quoteArgs = true,
-                                        bool elevate = false) {
+            bool elevate = false
+        ) {
+            if (string.IsNullOrEmpty(filename)) {
+                throw new ArgumentException("Filename required", "filename");
+            }
             if (elevate) {
                 return RunElevated(filename, arguments, workingDirectory, redirector, quoteArgs);
             }
@@ -244,16 +250,38 @@ namespace Microsoft.VisualStudioTools.Project {
                             foreach (var line in lines) {
                                 redirector.WriteLine(line);
                             }
-                        } catch (Exception) {
+                        } catch (Exception ex) {
+                            if (IsCriticalException(ex)) {
+                                throw;
+                            }
                             redirector.WriteErrorLine("Failed to obtain standard output from elevated process.");
+#if DEBUG
+                            foreach (var line in SplitLines(ex.ToString())) {
+                                redirector.WriteErrorLine(line);
+                        }
+#else
+                            Trace.TraceError("Failed to obtain standard output from elevated process.");
+                            Trace.TraceError(ex.ToString());
+#endif
                         }
                         try {
                             var lines = File.ReadAllLines(errFile);
                             foreach (var line in lines) {
                                 redirector.WriteErrorLine(line);
                             }
-                        } catch (Exception) {
+                        } catch (Exception ex) {
+                            if (IsCriticalException(ex)) {
+                                throw;
+                            }
                             redirector.WriteErrorLine("Failed to obtain standard error from elevated process.");
+#if DEBUG
+                            foreach (var line in SplitLines(ex.ToString())) {
+                                redirector.WriteErrorLine(line);
+                        }
+#else
+                            Trace.TraceError("Failed to obtain standard error from elevated process.");
+                            Trace.TraceError(ex.ToString());
+#endif
                         }
                     } finally {
                         try {
@@ -343,13 +371,29 @@ namespace Microsoft.VisualStudioTools.Project {
                 _process.ErrorDataReceived += OnErrorDataReceived;
             }
 
+            if (!_process.StartInfo.RedirectStandardOutput && !_process.StartInfo.RedirectStandardError) {
+                // If we are receiving output events, we signal that the process
+                // has exited when one of them receives null. Otherwise, we have
+                // to listen for the Exited event.
+                // If we just listen for the Exited event, we may receive it
+                // before all the output has arrived.
             _process.Exited += OnExited;
+            }
             _process.EnableRaisingEvents = true;
 
             try {
                 _process.Start();
             } catch (Exception ex) {
+                if (IsCriticalException(ex)) {
+                    throw;
+                }
+                if (_redirector != null) {
+                    foreach (var line in SplitLines(ex.ToString())) {
+                        _redirector.WriteErrorLine(line);
+                    }
+                } else if (_error != null) {
                 _error.AddRange(SplitLines(ex.ToString()));
+                }
                 _process = null;
             }
 
@@ -368,7 +412,9 @@ namespace Microsoft.VisualStudioTools.Project {
                 return;
             }
 
-            if (!string.IsNullOrEmpty(e.Data)) {
+            if (e.Data == null) {
+                OnExited(_process, EventArgs.Empty);
+            } else if (!string.IsNullOrEmpty(e.Data)) {
                 foreach (var line in SplitLines(e.Data)) {
                     if (_output != null) {
                         _output.Add(line);
@@ -385,7 +431,9 @@ namespace Microsoft.VisualStudioTools.Project {
                 return;
             }
 
-            if (!string.IsNullOrEmpty(e.Data)) {
+            if (e.Data == null) {
+                OnExited(_process, EventArgs.Empty);
+            } else if (!string.IsNullOrEmpty(e.Data)) {
                 foreach (var line in SplitLines(e.Data)) {
                     if (_error != null) {
                         _error.Add(line);
@@ -537,14 +585,14 @@ namespace Microsoft.VisualStudioTools.Project {
             if (_process == null) {
                 tcs.SetCanceled();
             } else {
-                _process.Exited += (s, e) => {
+                Exited += (s, e) => {
                     FlushAndCloseOutput();
                     tcs.TrySetResult(_process.ExitCode);
                 };
-                if (_process.HasExited) {
+            if (_process.HasExited) {
                     FlushAndCloseOutput();
-                    tcs.TrySetResult(_process.ExitCode);
-                }
+                tcs.TrySetResult(_process.ExitCode);
+            }
             }
 
             return tcs.Task.GetAwaiter();
@@ -566,6 +614,10 @@ namespace Microsoft.VisualStudioTools.Project {
         public event EventHandler Exited;
 
         private void OnExited(object sender, EventArgs e) {
+            if (_isDisposed || _haveRaisedExitedEvent) {
+                return;
+            }
+            _haveRaisedExitedEvent = true;
             var evt = Exited;
             if (evt != null) {
                 evt(this, e);
@@ -602,6 +654,13 @@ namespace Microsoft.VisualStudioTools.Project {
                     _waitHandle.Dispose();
                 }
             }
+        }
+
+        private static bool IsCriticalException(Exception ex) {
+            return ex is StackOverflowException ||
+                ex is OutOfMemoryException ||
+                ex is ThreadAbortException ||
+                ex is AccessViolationException;
         }
     }
 }

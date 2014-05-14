@@ -22,14 +22,15 @@ using System.Windows;
 using System.Windows.Documents;
 using System.Windows.Media;
 using Microsoft.NodejsTools.Npm;
+using Microsoft.NodejsTools.Project;
 
 namespace Microsoft.NodejsTools.NpmUI {
     class NpmOutputControlViewModel : INotifyPropertyChanged, IDisposable {
-        private INpmController _npmController;
+        private readonly INpmController _npmController;
         private readonly Queue<QueuedNpmCommandInfo> _commandQueue = new Queue<QueuedNpmCommandInfo>();
         private readonly object _lock = new object();
         private bool _isDisposed;
-        private string _statusText = Resources.NpmStatusReady;
+        private string _statusText;
         private bool _isExecutingCommand;
         private Visibility _commandCancelVisibility = Visibility.Visible;
         private bool _withErrors;
@@ -38,10 +39,14 @@ namespace Microsoft.NodejsTools.NpmUI {
         private QueuedNpmCommandInfo _currentCommand;
         private INpmCommander _commander;
         
-        public NpmOutputControlViewModel() {
+        public NpmOutputControlViewModel(INpmController controller) {
+            _npmController = controller;
+
             var style = new Style(typeof(Paragraph));
             style.Setters.Add(new Setter(Block.MarginProperty, new Thickness(0)));
             _output.Resources.Add(typeof(Paragraph), style);
+
+            _statusText = SR.GetString(SR.NpmStatusReady);
 
             _worker = new Thread(Run);
             _worker.Name = "npm UI Execution";
@@ -59,15 +64,6 @@ namespace Microsoft.NodejsTools.NpmUI {
         private void Pulse() {
             lock (_lock) {
                 Monitor.PulseAll(_lock);
-            }
-        }
-
-        public INpmController NpmController {
-            get { return _npmController; }
-            set {
-                _npmController = value;   
-                OnPropertyChanged();
-                Pulse();
             }
         }
 
@@ -298,17 +294,19 @@ namespace Microsoft.NodejsTools.NpmUI {
             if (executingCommand && null != command) {
                 var commandText = command.ToString();
                 if (count > 0) {
-                    status = string.Format(
-                        _withErrors ? Resources.NpmStatusExecutingQueuedErrors : Resources.NpmStatusExecutingQueued,
+                    status = SR.GetString(
+                        _withErrors ? SR.NpmStatusExecutingQueuedErrors : SR.NpmStatusExecutingQueued,
                         commandText,
-                        count);
+                        count
+                    );
                 } else {
-                    status = string.Format(
-                        _withErrors ? Resources.NpmStatusExecutingErrors : Resources.NpmStatusExecuting,
-                        commandText);
+                    status = SR.GetString(
+                        _withErrors ? SR.NpmStatusExecutingErrors : SR.NpmStatusExecuting,
+                        commandText
+                    );
                 }
             } else {
-                status = _withErrors ? Resources.NpmStatusReadyWithErrors : Resources.NpmStatusReady;
+                status = SR.GetString(_withErrors ? SR.NpmStatusReadyWithErrors : SR.NpmStatusReady);
             }
 
             StatusText = status;

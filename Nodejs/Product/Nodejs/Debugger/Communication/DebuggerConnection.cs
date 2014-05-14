@@ -50,9 +50,9 @@ namespace Microsoft.NodejsTools.Debugger.Communication {
                 if (_networkClient != null) {
                     _networkClient.Dispose();
                     _networkClient = null;
-                }
             }
-        }
+            }
+            }
 
         /// <summary>
         /// Send a message.
@@ -90,7 +90,7 @@ namespace Microsoft.NodejsTools.Debugger.Communication {
             get {
                 lock (_networkClientLock) {
                     return _networkClient != null && _networkClient.Connected;
-                }
+        }
             }
         }
 
@@ -159,46 +159,46 @@ namespace Microsoft.NodejsTools.Debugger.Communication {
 
             try {
                 using (var streamReader = new StreamReader(networkClient.GetStream(), Encoding.Default)) {
-                    while (Connected) {
-                        // Read message header
+                while (Connected) {
+                    // Read message header
                         string result = await streamReader.ReadLineAsync().ConfigureAwait(false);
-                        if (result == null) {
-                            continue;
+                    if (result == null) {
+                        continue;
+                    }
+
+                    // Check whether result is content length header
+                    Match match = _contentLength.Match(result);
+                    if (!match.Success) {
+                        // Check whether result is node.js version string
+                        match = _nodeVersion.Match(result);
+                        if (match.Success) {
+                            NodeVersion = new Version(match.Groups[1].Value);
+                        } else {
+                            DebugWriteLine(string.Format("Debugger info: {0}", result));
                         }
 
-                        // Check whether result is content length header
-                        Match match = _contentLength.Match(result);
-                        if (!match.Success) {
-                            // Check whether result is node.js version string
-                            match = _nodeVersion.Match(result);
-                            if (match.Success) {
-                                NodeVersion = new Version(match.Groups[1].Value);
-                            } else {
-                                DebugWriteLine(string.Format("Debugger info: {0}", result));
-                            }
-
-                            continue;
-                        }
+                        continue;
+                    }
 
                         await streamReader.ReadLineAsync().ConfigureAwait(false);
 
-                        // Retrieve content length
-                        int length = int.Parse(match.Groups[1].Value);
-                        if (length == 0) {
-                            continue;
-                        }
+                    // Retrieve content length
+                    int length = int.Parse(match.Groups[1].Value);
+                    if (length == 0) {
+                        continue;
+                    }
 
-                        // Read content
+                    // Read content
                         string message = await streamReader.ReadLineBlockAsync(length).ConfigureAwait(false);
 
-                        DebugWriteLine("Response: " + message);
+                    DebugWriteLine("Response: " + message);
 
-                        // Notify subscribers
-                        EventHandler<MessageEventArgs> outputMessage = OutputMessage;
-                        if (outputMessage != null) {
-                            outputMessage(this, new MessageEventArgs(message));
-                        }
+                    // Notify subscribers
+                    EventHandler<MessageEventArgs> outputMessage = OutputMessage;
+                    if (outputMessage != null) {
+                        outputMessage(this, new MessageEventArgs(message));
                     }
+                }
                 }
             } catch (SocketException) {
             } catch (ObjectDisposedException) {

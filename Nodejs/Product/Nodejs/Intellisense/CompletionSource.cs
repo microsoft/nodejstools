@@ -19,6 +19,7 @@ using System.IO;
 using System.Linq;
 using System.Runtime.InteropServices;
 using Microsoft.NodejsTools.Project;
+using Microsoft.NodejsTools.Classifier;
 using Microsoft.VisualStudio;
 using Microsoft.VisualStudio.Language.Intellisense;
 using Microsoft.VisualStudio.Shell.Interop;
@@ -30,7 +31,7 @@ using Microsoft.VisualStudioTools.Project;
 namespace Microsoft.NodejsTools.Intellisense {
     sealed partial class CompletionSource : ICompletionSource {
         private readonly ITextBuffer _textBuffer;
-        private readonly IClassifier _classifier;
+        private readonly NodejsClassifier _classifier;
         private readonly IServiceProvider _serviceProvider;
         private readonly IGlyphService _glyphService;
 
@@ -49,9 +50,9 @@ namespace Microsoft.NodejsTools.Intellisense {
             "transient", "volatile"
         };
 
-        public CompletionSource(ITextBuffer textBuffer, IClassifierAggregatorService classifierAggregator, IServiceProvider serviceProvider, IGlyphService glyphService) {
+        public CompletionSource(ITextBuffer textBuffer, NodejsClassifier classifier, IServiceProvider serviceProvider, IGlyphService glyphService) {
             _textBuffer = textBuffer;
-            _classifier = classifierAggregator.GetClassifier(textBuffer);
+            _classifier = classifier;
             _serviceProvider = serviceProvider;
             _glyphService = glyphService;
         }
@@ -114,7 +115,102 @@ namespace Microsoft.NodejsTools.Intellisense {
                         null
                     )
                 );
+            } else {
+                var textBuffer = _textBuffer;
+                var span = GetApplicableSpan(session, textBuffer);
+                var provider = VsProjectAnalyzer.GetCompletions(
+                    _textBuffer.CurrentSnapshot,
+                    span,
+                    session.GetTriggerPoint(buffer)
+                );
+
+                var completions = provider.GetCompletions(_glyphService);
+                if (completions != null) {
+                    completionSets.Add(completions);
+                }
             }
+        }
+
+        /// <summary>
+        /// Returns the span to use for the provided intellisense session.
+        /// </summary>
+        /// <returns>A tracking span. The span may be of length zero if there
+        /// is no suitable token at the trigger point.</returns>
+        internal static ITrackingSpan GetApplicableSpan(IIntellisenseSession session, ITextBuffer buffer) {
+            var snapshot = buffer.CurrentSnapshot;
+            var triggerPoint = session.GetTriggerPoint(buffer);
+
+            var span = GetApplicableSpan(snapshot, triggerPoint);
+            if (span != null) {
+                return span;
+            }
+            return snapshot.CreateTrackingSpan(triggerPoint.GetPosition(snapshot), 0, SpanTrackingMode.EdgeInclusive);
+        }
+
+        /// <summary>
+        /// Returns the applicable span at the provided position.
+        /// </summary>
+        /// <returns>A tracking span, or null if there is no token at the
+        /// provided position.</returns>
+        internal static ITrackingSpan GetApplicableSpan(ITextSnapshot snapshot, ITrackingPoint point) {
+            return GetApplicableSpan(snapshot, point.GetPosition(snapshot));
+        }
+
+        /// <summary>
+        /// Returns the applicable span at the provided position.
+        /// </summary>
+        /// <returns>A tracking span, or null if there is no token at the
+        /// provided position.</returns>
+        internal static ITrackingSpan GetApplicableSpan(ITextSnapshot snapshot, int position) {
+            var classifier = snapshot.TextBuffer.GetNodejsClassifier();
+            var line = snapshot.GetLineFromPosition(position);
+            if (classifier == null || line == null) {
+                return null;
+            }
+
+            var spanLength = position - line.Start.Position;
+            // Increase position by one to include 'fob' in: "abc.|fob"
+            if (spanLength < line.Length) {
+                spanLength += 1;
+            }
+
+            var classifications = classifier.GetClassificationSpans(new SnapshotSpan(line.Start, spanLength));
+            // Handle "|"
+            if (classifications == null || classifications.Count == 0) {
+                return null;
+            }
+
+            var lastToken = classifications[classifications.Count - 1];
+            // Handle "fob |"
+            if (lastToken == null || position > lastToken.Span.End) {
+                return null;
+            }
+
+            if (position > lastToken.Span.Start) {
+                if (lastToken.CanComplete()) {
+                    // Handle "fo|o"
+                    return snapshot.CreateTrackingSpan(lastToken.Span, SpanTrackingMode.EdgeInclusive);
+                } else {
+                    // Handle "<|="
+                    return null;
+                }
+            }
+
+            var secondLastToken = classifications.Count >= 2 ? classifications[classifications.Count - 2] : null;
+            if (lastToken.Span.Start == position && lastToken.CanComplete() &&
+                (secondLastToken == null ||             // Handle "|fob"
+                 position > secondLastToken.Span.End || // Handle "if |fob"
+                 !secondLastToken.CanComplete())) {     // Handle "abc.|fob"
+                return snapshot.CreateTrackingSpan(lastToken.Span, SpanTrackingMode.EdgeInclusive);
+            }
+
+            // Handle "abc|."
+            // ("ab|c." would have been treated as "ab|c")
+            if (secondLastToken != null && secondLastToken.Span.End == position && secondLastToken.CanComplete()) {
+                return snapshot.CreateTrackingSpan(secondLastToken.Span, SpanTrackingMode.EdgeInclusive);
+            }
+
+            return null;
         }
 
         private int CompletionSorter(Completion x, Completion y) {
@@ -173,13 +269,12 @@ namespace Microsoft.NodejsTools.Intellisense {
         }
 
         internal static bool IsIdentifierChar(char ch) {
-            return ch == '_' || (ch >= 'a' && ch <= 'z') || (ch >= 'A' && ch <= 'Z') || (ch >= '0' && ch <= '9');
+            return ch == '_' || (ch >= 'a' && ch <= 'z') || (ch >= 'A' && ch <= 'Z') || (ch >= '0' && ch <= '9') || ch == '$';
         }
 
-
+        // TODO: require completions should move into the analyzer
         private IEnumerable<Completion> GetProjectCompletions(bool? doubleQuote) {
-            var projBuffer = _textBuffer.Properties.GetProperty<NodejsProjectionBuffer>(typeof(NodejsProjectionBuffer));
-            var filePath = projBuffer.DiskBuffer.GetFilePath();
+            var filePath = _textBuffer.GetFilePath();
 
             var rdt = _serviceProvider.GetService(typeof(SVsRunningDocumentTable)) as IVsRunningDocumentTable;
             IVsHierarchy hierarchy;

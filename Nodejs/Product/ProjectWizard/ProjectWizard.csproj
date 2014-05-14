@@ -107,16 +107,7 @@
     <Compile Include="OuterWorkerRoleWizard.cs" />
     <Compile Include="UnitTestFileWizard.cs" />
   </ItemGroup>
-  <ItemGroup>
-    <EmbeddedResource Include="..\Nodejs\Resources.resx">
-      <Link>Resources.resx</Link>
-    </EmbeddedResource>
-    <Compile Include="..\Nodejs\Resources.Designer.cs">
-      <AutoGen>True</AutoGen>
-      <DesignTime>True</DesignTime>
-      <DependentUpon>Resources.resx</DependentUpon>
-    </Compile>
-  </ItemGroup>
+  <Import Project="..\Nodejs\SharedResources.proj" />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
        Other similar extension points exist, see Microsoft.Common.targets.

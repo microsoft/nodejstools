@@ -424,6 +424,8 @@ namespace Microsoft.NodejsTools.LogParsing {
             return ExtractNamespaceAndMethodName(method, isRecompilation, type, _sourceMaps);
         }
 
+        internal const string _topLevelModule = "<top-level module code>";
+
         internal static FunctionInformation ExtractNamespaceAndMethodName(string method, bool isRecompilation, string type = "LazyCompile", Dictionary<string, SourceMap> sourceMaps = null) {
             string methodName = method;
             string ns = "";
@@ -442,13 +444,13 @@ namespace Microsoft.NodejsTools.LogParsing {
                 // code-creation,Script,0xf1c141c0,844,"native runtime.js",0xa6d1aa98,~
 
                 // this is a top level script or module, report it as such
-                methodName = "<node module>";
+                methodName = _topLevelModule;
 
                 string fileTemp = method;
                 if (type == "Function") {
                     fileTemp = fileTemp.Substring(fileTemp.IndexOf(' ') + 1);
                 }
-                return MaybeMap(new FunctionInformation("<node module>", GetModuleName(method), 1, GetFileName(fileTemp), isRecompilation), sourceMaps);
+                return MaybeMap(new FunctionInformation(_topLevelModule, GetModuleName(method), 1, GetFileName(fileTemp), isRecompilation), sourceMaps);
             }
 
             // " net.js:931"
@@ -554,7 +556,7 @@ namespace Microsoft.NodejsTools.LogParsing {
             method = StripLine(method);
 
             if (method.IndexOfAny(_invalidPathChars) == -1) {
-                method = Path.GetFileName(method);
+                method = Path.GetFileNameWithoutExtension(method);
             }
 
             return method;

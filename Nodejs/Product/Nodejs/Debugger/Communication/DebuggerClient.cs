@@ -22,6 +22,7 @@ using Microsoft.NodejsTools.Debugger.Commands;
 using Microsoft.NodejsTools.Debugger.Events;
 using Microsoft.VisualStudioTools.Project;
 using Newtonsoft.Json.Linq;
+using SR = Microsoft.NodejsTools.Project.SR;
 
 namespace Microsoft.NodejsTools.Debugger.Communication {
     sealed class DebuggerClient : IDebuggerClient {
@@ -62,6 +63,22 @@ namespace Microsoft.NodejsTools.Debugger.Communication {
         }
 
         /// <summary>
+        /// Execudes the provided code, and catches any expected exceptions that may arise from direct or indirect use of <see cref="DebuggerClient.SendRequestAsync"/>.
+        /// (in particular, when the connection is shut down, or is forcibly dropped from the other end).
+        /// </summary>
+        /// <remarks>
+        /// This is intended to be used primarily with fire-and-forget async void methods that run on threadpool threads and cannot leak those exceptions
+        /// without crashing the process.
+        /// </remarks>
+        public static async void RunWithRequestExceptionsHandled(Func<Task> action) {
+            try {
+                await action();
+            } catch (IOException) {
+            } catch (OperationCanceledException) {
+            }
+        }
+
+        /// <summary>
         /// Break point event handler.
         /// </summary>
         public event EventHandler<BreakpointEventArgs> BreakpointEvent;
@@ -84,7 +101,7 @@ namespace Microsoft.NodejsTools.Debugger.Communication {
         private void OnConnectionClosed(object sender, EventArgs e) {
             ConcurrentDictionary<int, TaskCompletionSource<JObject>> messages = Interlocked.Exchange(ref _messages, new ConcurrentDictionary<int, TaskCompletionSource<JObject>>());
             foreach (var kv in messages) {
-                var exception = new IOException(Resources.DebuggerConnectionClosed);
+                var exception = new IOException(SR.GetString(SR.DebuggerConnectionClosed));
                 kv.Value.SetException(exception);
             }
 

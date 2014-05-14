@@ -32,20 +32,11 @@ using MSBuild = Microsoft.Build.Evaluation;
 
 namespace Microsoft.NodejsTools.Project {
     class NodejsProjectNode : CommonProjectNode, VsWebSite.VSWebSite, Microsoft.NodejsTools.ProjectWizard.INodePackageModulesCommands {
-        private static string _nodeRefCode = ReadNodeRefCode();
-        internal readonly string _referenceFilename = GetReferenceFilePath();
-        const string _userSwitchMarker = "// **NTVS** INSERT USER MODULE SWITCH HERE **NTVS**";
-        
-        /// <summary>
-        /// List of files to scan for require()
-        /// </summary>
-        internal readonly List<NodejsFileNode> _nodeFiles = new List<NodejsFileNode>();
-        private readonly JavaScriptSerializer _serializer = new JavaScriptSerializer();        
-        private readonly Timer _timer;
-        internal readonly ReferenceGroupDispenser _refGroupDispenser = new ReferenceGroupDispenser();
-        private readonly HashSet<ReferenceGroup> _pendingRefGroupGenerations = new HashSet<ReferenceGroup>();
+        private VsProjectAnalyzer _analyzer;
+        private readonly HashSet<string> _warningFiles = new HashSet<string>();
+        private readonly HashSet<string> _errorFiles = new HashSet<string>();
         internal readonly RequireCompletionCache _requireCompletionCache = new RequireCompletionCache();
-        internal int _currentFileCounter;
+        private string _intermediateOutputPath;
 
         public NodejsProjectNode(NodejsProjectPackage package)
             : base(package, Utilities.GetImageList(typeof(NodejsProjectNode).Assembly.GetManifestResourceStream("Microsoft.NodejsTools.Resources.Icons.NodejsImageList.bmp"))) {
@@ -53,7 +44,13 @@ namespace Microsoft.NodejsTools.Project {
             Type projectNodePropsType = typeof(NodejsProjectNodeProperties);
             AddCATIDMapping(projectNodePropsType, projectNodePropsType.GUID);
             InitDependencyImages();
-            _timer = new Timer(RefreshReferenceFile);
+            _analyzer = new VsProjectAnalyzer();
+        }
+
+        public VsProjectAnalyzer Analyzer {
+            get {
+                return _analyzer;
+            }
         }
 
         private static string[] _excludedAvailableItems = new[] { 
@@ -106,18 +103,6 @@ namespace Microsoft.NodejsTools.Project {
         public int ImageIndexDependencyDevMissing { get; private set; }
         public int ImageIndexDependencyOptionalMissing { get; private set; }
         public int ImageIndexDependencyBundledMissing { get; private set; }
-
-        private void RefreshReferenceFile(object state) {
-            UpdateReferenceFile();
-        }
-        
-        public override int InitializeForOuter(string filename, string location, string name, uint flags, ref Guid iid, out IntPtr projectPointer, out int canceled) {
-            int res = base.InitializeForOuter(filename, location, name, flags, ref iid, out projectPointer, out canceled);
-            if (ErrorHandler.Succeeded(res)) {
-                UpdateReferenceFile();
-            }
-            return res;
-        }
 
         public override Guid SharedCommandGuid {
             get {
@@ -176,6 +161,12 @@ namespace Microsoft.NodejsTools.Project {
             }
         }
 
+        internal static bool IsNodejsFile(string strFileName) {
+            var ext = Path.GetExtension(strFileName);
+
+            return String.Equals(ext, NodejsConstants.FileExtension, StringComparison.OrdinalIgnoreCase);
+        }
+
         protected override string GetItemType(string filename) {
             if (string.Equals(Path.GetExtension(filename), NodejsConstants.TypeScriptExtension, StringComparison.OrdinalIgnoreCase)) {
                 return NodejsConstants.TypeScriptCompileItemType;
@@ -198,30 +189,10 @@ namespace Microsoft.NodejsTools.Project {
             return base.DisableCmdInCurrentMode(commandGroup, command);
         }
 
-        public override void Close() {
-            base.Close();
-            if (File.Exists(_referenceFilename)) {
-                File.Delete(_referenceFilename);
-            }
-        }
-
         public override string[] CodeFileExtensions {
             get {
                 return new[] { NodejsConstants.FileExtension };
             }
-        }
-
-        internal static string GetReferenceFilePath() {
-            string res;
-            do {
-                // .js files instead of just using Path.GetTempPath because the JS
-                // language service analyzes .js files.                
-                res = Path.Combine(
-                    Path.GetTempPath(),
-                    Path.GetFileNameWithoutExtension(Path.GetRandomFileName()) + ".js"
-                );
-            } while (File.Exists(res));
-            return res;
         }
 
         protected internal override FolderNode CreateFolderNode(ProjectElement element) {
@@ -230,23 +201,18 @@ namespace Microsoft.NodejsTools.Project {
 
         public override CommonFileNode CreateCodeFileNode(ProjectElement item) {
             var res = new NodejsFileNode(this, item);
-
-            if (ParentHierarchy != null) {
-                lock (_pendingRefGroupGenerations) {
-                    _pendingRefGroupGenerations.Add(res._refGroup);
-                }
-            }
-
-            _timer.Change(250, Timeout.Infinite);
             return res;
         }
 
         public override CommonFileNode CreateNonCodeFileNode(ProjectElement item) {
-            string fileName = item.GetFullPathForElement();
+            string fileName = item.Url;
             if (!String.IsNullOrWhiteSpace(fileName)
                 && Path.GetExtension(fileName).Equals(".ts", StringComparison.OrdinalIgnoreCase)
                 && !fileName.EndsWith(".d.ts",StringComparison.OrdinalIgnoreCase)) {
                 return new NodejsTypeScriptFileNode(this, item);
+            }
+            if (Path.GetFileName(fileName).Equals("package.json", StringComparison.OrdinalIgnoreCase)) {
+                return new PackageJsonFileNode(this, item);
             }
 
             return base.CreateNonCodeFileNode(item);
@@ -267,6 +233,26 @@ namespace Microsoft.NodejsTools.Project {
 
         public override string GetFormatList() {
             return NodejsConstants.ProjectFileFilter;
+        }
+
+        protected override Guid[] GetConfigurationDependentPropertyPages() {
+            var res = base.GetConfigurationDependentPropertyPages();
+
+            var enableTs = GetProjectProperty(NodejsConstants.EnableTypeScript, false);
+            bool fEnableTs;
+            if (enableTs != null && Boolean.TryParse(enableTs, out fEnableTs) && fEnableTs) {
+                var typeScriptPages = GetProjectProperty(NodejsConstants.TypeScriptCfgProperty);
+                if (typeScriptPages != null) {
+                    foreach (var strGuid in typeScriptPages.Split(';')) {
+                        Guid guid;
+                        if (Guid.TryParse(strGuid, out guid)) {
+                            res = res.Append(guid);
+                        }
+                    }
+                }
+            }
+
+            return res;
         }
 
         public override Type GetGeneralPropertyPageType() {
@@ -297,13 +283,11 @@ namespace Microsoft.NodejsTools.Project {
 
         protected override void Reload() {
             using (new DebugTimer("Project Load")) {
+                _intermediateOutputPath = Path.Combine(ProjectHome, GetProjectProperty("BaseIntermediateOutputPath"));
+
                 base.Reload();
 
-                SyncFileSystem();
-
-                foreach (var group in _refGroupDispenser.Groups) {
-                    group.GenerateReferenceFile();
-                }
+                SyncFileSystem();                
 
                 NodejsPackage.Instance.CheckSurveyNews(false);
                 ModulesNode.ReloadHierarchySafe();
@@ -365,325 +349,6 @@ namespace Microsoft.NodejsTools.Project {
             }
         }
 
-        /// <summary>
-        /// Updates our per-project reference .js file.  This file gets our baseline node reference file
-        /// merged with all of the user's code as well.  This allows the user to do require('mymodule') and
-        /// get the correct intellisense back.
-        /// </summary>
-        internal void UpdateReferenceFile(NodejsFileNode changedFile = null) {
-            // don't update if we're closing the project
-            if (!IsClosed && !IsClosing) {
-                _uiSync.BeginInvoke((Action<NodejsFileNode>)UpdateReferenceFileUIThread, changedFile);
-            }
-        }
-
-        private void UpdateReferenceFileUIThread(NodejsFileNode changedFile) {            
-            lock (_pendingRefGroupGenerations) {
-                foreach (var refGroup in _pendingRefGroupGenerations) {
-                    refGroup.GenerateReferenceFile();
-                }
-                _pendingRefGroupGenerations.Clear();
-            }
-
-            StringBuilder header = new StringBuilder();
-            foreach (var refGroup in _refGroupDispenser.Groups) {
-                header.AppendLine("/// <reference path=\"" + refGroup.Filename + "\" />");
-            }
-
-            StringBuilder switchCode = new StringBuilder();
-            UpdateReferenceFile(this, switchCode);
-
-            _requireCompletionCache.Clear();
-            
-            WriteReferenceFile(
-                _referenceFilename, 
-                header + _nodeRefCode.Replace(_userSwitchMarker, switchCode.ToString())
-            );
-        }
-
-        internal static void WriteReferenceFile(string filename, string output) {
-            for (int i = 0; i < 10; i++) {
-                try {
-                    File.WriteAllText(filename, output);
-                    break;
-                } catch (IOException) {
-                    System.Threading.Thread.Sleep(100);
-                }
-            }
-        }
-
-        /// <summary>
-        /// Walks the project and generates the reference code for each .js file present.
-        /// </summary>
-        private void UpdateReferenceFile(HierarchyNode node, StringBuilder switchCode) {
-            // collect all of the node_modules folders
-            Dictionary<FileNode, List<CommonFolderNode>> directoryPackages = GetModuleFolderMapping();
-
-            switchCode.Append(@"
-function relative_match(match_dir, dirname, mod_name, alt_mod_name, ref_path) {
-     if(ref_path.substr(0, 3) == '../') {
-        // fall into ./ case below
-        ref_path = './' + ref_path;
-     }
-     if(ref_path.substr(0, 2) == './') {
-         var components = ref_path.split('/');
-         var upCount = 0;
-
-        // loops are unrolled here so that the JavaScript language service will always fully process
-        // them, otherwise it may stop executing them if execution takes too long, and then
-        // we get incorrect results.
-         if(components.length >= 2 && components[1] == '..') {
-            upCount++;
-         }
-         if(components.length >= 3 && components[2] == '..') {
-            upCount++;
-         }
-         if(components.length >= 4 && components[3] == '..') {
-            upCount++;
-         }
-         if(components.length >= 5 && components[4] == '..') {
-            upCount++;
-         }
-         for(var i = 5; i < components.length; i++) {
-             if (components[i] == '..') {
-                 upCount++;
-             } else {
-                 break;
-             }
-         }
-
-         if (upCount != 0) {
-             var dirComponents = dirname.split('\\');
-             if(upCount > 0) {
-                dirComponents.pop();
-             }
-             if(upCount > 1) {
-                dirComponents.pop();
-             }
-             if(upCount > 2) {
-                dirComponents.pop();
-             }
-             if(upCount > 3) {
-                dirComponents.pop();
-             }
-             for(var i = 4; i < upCount; i++) {
-                 dirComponents.pop();
-             }
-             dirComponents = dirComponents.concat(components.slice(upCount+1, components.length-1));
-             var res = match_dir === dirComponents.join('\\') && (components[components.length - 1] == mod_name || components[components.length - 1] == alt_mod_name);
-             return res;
-         }
-     }
-     return false;
-}
-
-function starts_with(a, b) {
-    return a.substr(0, b.length) == b;
-}
-");
-
-            // If we get passed a fully qualified path turn it into a relative path
-            switchCode.Append("function relative(from, to) {");
-            switchCode.AppendLine(ReferenceCode.PathRelativeBody);
-            switchCode.Append("}");
-
-            switchCode.Append(@"if(module[1] == ':') { 
-    intellisense.logMessage('making relative ' + __dirname + ' -- ' + module); 
-    new_module = relative(__dirname, module); 
-    if (new_module != module) {
-        module = './' + new_module;
-    }
-    intellisense.logMessage('now ' + module); 
-}");
-
-            foreach (NodejsFileNode nodeFile in _nodeFiles) {
-                if (nodeFile.Url.Length > NativeMethods.MAX_PATH) {
-                    // .NET can't handle long filename paths, so ignore these modules...
-                    continue;
-                }
-
-                // for each file we setup if statements which check and see if the current
-                // file doing the require() call will match based upon the string being
-                // passed in.   
-                //
-                // __dirname is the directory that the file doing the require call exists 
-                // in during intellisense
-                //
-                // module is the string passed in by the user to require(...)
-                //
-
-                switchCode.Append("if(");
-                for (var curParent = nodeFile.Parent; curParent != null; curParent = curParent.Parent) {
-                    if (curParent != nodeFile.Parent) {
-                        switchCode.Append(" || ");
-                    }
-
-                    var baseDir = curParent.FullPathToChildren;
-                    var trimmedBaseDir = CommonUtils.TrimEndSeparator(baseDir);
-                    string name = CommonUtils.CreateFriendlyFilePath(
-                            baseDir,
-                            nodeFile.Url
-                        ).Replace("\\", "/");
-
-                    // For each parent above the file, the file can be accessed with a relative
-                    // path, e.g ./my/parent and with or without a .js extension
-                    switchCode.AppendFormat(
-                        "    (__dirname == '{0}' && (module == './{1}' || module == './{2}')) || relative_match('{0}', __dirname, '{1}', '{2}', module)\r\n",
-                        trimmedBaseDir.Replace("\\", "\\\\"),
-                        Path.Combine(Path.GetDirectoryName(name), Path.GetFileNameWithoutExtension(name)).Replace('\\', '/'),
-                        name
-                    );
-
-                    if (String.Equals(Path.GetFileName(trimmedBaseDir), NodejsConstants.NodeModulesFolder, StringComparison.OrdinalIgnoreCase)) {
-                        // when we're in node_modules we're accessible by a plain name as well, and
-                        // we're accessible from either our immediate parent directory or children
-                        // within the package.
-                        var filePath = CommonUtils.CreateFriendlyFilePath(baseDir, nodeFile.Url);
-                        string parentBaseDir = Path.GetDirectoryName(CommonUtils.TrimEndSeparator(baseDir));
-
-                        switchCode.AppendFormat(
-                            "    || ((__dirname == '{0}' || __dirname == '{1}') && (module == '{2}' || module == '{3}'))\r\n",
-                            parentBaseDir.Replace("\\", "\\\\"),
-                            trimmedBaseDir.Replace("\\", "\\\\"),
-                            Path.GetFileNameWithoutExtension(filePath),
-                            Path.GetFileName(filePath)
-                        );
-                    }
-
-                    List<CommonFolderNode> folderPackageList;
-                    if (directoryPackages.TryGetValue(nodeFile, out folderPackageList)) {
-                        foreach (var folderPackage in folderPackageList) {
-                                // this file is also exposed as the folder
-                            if (Path.GetFileName(CommonUtils.TrimEndSeparator(folderPackage.Parent.Url)) == NodejsConstants.NodeModulesFolder) {
-                                switchCode.AppendFormat(
-                                    "    || (starts_with(__dirname, '{0}') && (module == '{1}'))\r\n",
-                                    CommonUtils.TrimEndSeparator(folderPackage.Parent.Parent.FullPathToChildren).Replace("\\", "\\\\"),
-                                    Path.GetFileName(CommonUtils.TrimEndSeparator(folderPackage.Url))
-                                );
-                            } else {
-                                switchCode.AppendFormat(
-                                    "    || (starts_with(__dirname, '{0}') && (module == './{1}' || module == './{1}/'))\r\n",
-                                    CommonUtils.TrimEndSeparator(folderPackage.Parent.FullPathToChildren).Replace("\\", "\\\\"),
-                                    Path.GetFileName(CommonUtils.TrimEndSeparator(folderPackage.Url))
-                                );
-                            }
-                        }
-                    }
-
-                    if (String.Equals(Path.GetFileName(trimmedBaseDir), NodejsConstants.NodeModulesFolder, StringComparison.OrdinalIgnoreCase)) {
-                        break;
-                    }
-                }
-
-                switchCode.Append(") {");
-                switchCode.AppendLine("intellisense.progress();");
-                switchCode.AppendFormat("if (typeof {0}{1} == 'undefined') {{",
-                    NodejsConstants.NodejsHiddenUserModuleInstance,
-                    nodeFile._fileId
-                );
-
-                // Scale back the depth of analysis based upon how many requires a package does
-                // The reference file automatically restores max_require_depth back to it's default
-                // after this require finishes executing.
-                if (nodeFile._requireCount >= 25) {
-                    switchCode.AppendLine("max_require_depth -= 2;");
-                } else if (nodeFile._requireCount >= 10) {
-                    switchCode.AppendLine("max_require_depth -= 1;");
-                }
-
-                // if we're analyzing too much code bail (if the module was already analyzed at a lower
-                // level we'll have already short-circuited and returned its value)
-                switchCode.AppendLine("if (require_depth > max_require_depth) { return undefined; }");
-
-                switchCode.AppendFormat("{0}{1} = {2}{1}();",
-                    NodejsConstants.NodejsHiddenUserModuleInstance,
-                    nodeFile._fileId,
-                    NodejsConstants.NodejsHiddenUserModule
-                );
-                switchCode.AppendLine("}");
-                switchCode.AppendFormat("return " + NodejsConstants.NodejsHiddenUserModuleInstance + "{0};", nodeFile._fileId);
-                switchCode.AppendLine("}");
-            }
-
-            switchCode.AppendLine("intellisense.logMessage('Intellisense failed to resolve module: ' + module + ' in ' + __filename);");
-        }
-
-        /// <summary>
-        /// Generates a mapping from file node to folder node.  The file node is the node which
-        /// is the entry point for the folder in node_modules.  Typically the file will be index.js
-        /// or a file specified in package.json.
-        /// </summary>
-        private Dictionary<FileNode, List<CommonFolderNode>> GetModuleFolderMapping() {
-            List<CommonFolderNode> folderNodes = new List<CommonFolderNode>();
-            FindNodesOfType<CommonFolderNode>(folderNodes);
-            var directoryPackages = new Dictionary<FileNode, List<CommonFolderNode>>();
-
-            // collect all of the packages in node_modules folders and their associated entry point
-            foreach (var folderNode in folderNodes) {
-                if (String.Equals(
-                    Path.GetFileName(CommonUtils.TrimEndSeparator(folderNode.Url)),
-                    NodejsConstants.NodeModulesFolder,
-                    StringComparison.OrdinalIgnoreCase)) {
-
-                    for (var curChild = folderNode.FirstChild; curChild != null; curChild = curChild.NextSibling) {
-                        CommonFolderNode folderChild = curChild as CommonFolderNode;
-                        if (folderChild != null) {
-                            var packageJsonChild = curChild.FindImmediateChildByName(NodejsConstants.PackageJsonFile);
-
-                            Dictionary<string, object> packageJson = null;
-                            if (packageJsonChild != null && File.Exists(packageJsonChild.Url)) {
-                                try {
-                                    packageJson = (Dictionary<string, object>)_serializer.DeserializeObject(File.ReadAllText(packageJsonChild.Url));
-                                } catch (Exception e) {
-                                    // can't read, failed to deserialize json, fallback to index.js if it exists
-                                    var outputWindow = Package.GetOutputPane(VSConstants.OutputWindowPaneGuid.GeneralPane_guid, "General");
-                                    if (outputWindow != null) {
-                                        outputWindow.OutputStringThreadSafe(String.Format("Failed to parse {0}:\r\n\r\n{1}\r\n\r\n", packageJsonChild.Url, e.Message));
-                                    }
-                                }
-                            }
-
-                            object mainFile;
-                            string mainFileStr;
-                            if (packageJson != null &&
-                                packageJson.TryGetValue(NodejsConstants.PackageJsonMainFileKey, out mainFile) &&
-                                (mainFileStr = mainFile as string) != null) {
-
-                                if (mainFileStr.StartsWith("./")) {
-                                    mainFileStr = mainFileStr.Substring(2);
-                                }
-                                mainFileStr = mainFileStr.Replace('/', '\\');
-                                var pathToRootFile = Path.Combine(folderChild.FullPathToChildren, mainFileStr);
-                                var rootFile = FindNodeByFullPath(pathToRootFile) as FileNode;
-                                if (rootFile == null) {
-                                    rootFile = FindNodeByFullPath(pathToRootFile + NodejsConstants.FileExtension) as FileNode;
-                                    if (rootFile == null) {
-                                        rootFile = FindNodeByFullPath(Path.Combine(pathToRootFile, "index.js")) as FileNode;
-                                    }
-                                }
-
-                                if (rootFile != null) {
-                                    AddFolderForFile(directoryPackages, rootFile, folderChild);
-                                }
-                            }
-
-
-                            var indexJsChild = curChild.FindImmediateChildByName(NodejsConstants.DefaultPackageMainFile) as FileNode;
-                            if (indexJsChild != null && File.Exists(indexJsChild.Url)) {
-                                AddFolderForFile(directoryPackages, indexJsChild, folderChild);
-                            }
-                        }
-                    }
-                } else {
-                    var indexJsChild = folderNode.FindImmediateChildByName(NodejsConstants.DefaultPackageMainFile) as FileNode;
-                    if (indexJsChild != null && File.Exists(indexJsChild.Url)) {
-                        AddFolderForFile(directoryPackages, indexJsChild, folderNode);
-                    }
-                }
-            }
-            return directoryPackages;
-        }
-
         private static void AddFolderForFile(Dictionary<FileNode, List<CommonFolderNode>> directoryPackages, FileNode rootFile, CommonFolderNode folderChild) {
             List<CommonFolderNode> folders;
             if (!directoryPackages.TryGetValue(rootFile, out folders)) {
@@ -692,29 +357,19 @@ function starts_with(a, b) {
             folders.Add(folderChild);
         }
 
-        /// <summary>
-        /// Reads our baseline Node.js reference code.  If it doesn't exist for some reason
-        /// it'll use an empty skeleton.
-        /// </summary>
-        private static string ReadNodeRefCode() {
-            string nodeFile = NodejsPackage.NodejsReferencePath;
-
-            if (File.Exists(nodeFile)) {
-                try {
-                    return File.ReadAllText(nodeFile);
-                } catch {
-                }
+        protected override bool IncludeNonMemberItemInProject(HierarchyNode node) {
+            var fileNode = node as NodejsFileNode;
+            if (fileNode != null) {
+                return IncludeNodejsFile(fileNode);
             }
+            return false;
+        }
 
-            // should never happen, we failed to find our baseline node code
-            // or failed to read it.
-            return @"
-function require(module) {
-    switch (module) {
-    " + _userSwitchMarker + @"
-    }
-}
-";
+        internal bool IncludeNodejsFile(NodejsFileNode fileNode) {
+            if (CommonUtils.IsSubpathOf(_intermediateOutputPath, fileNode.Url)) {
+                return false;
+            }
+            return true;
         }
 
         internal override object Object {
@@ -813,6 +468,78 @@ function require(module) {
             //Fire off the command to update the missing modules
             //  through NPM
             return ModulesNode.InstallMissingModules();
+        }
+
+        private void HookErrorsAndWarnings(VsProjectAnalyzer res) {
+            res.ErrorAdded += OnErrorAdded;
+            res.ErrorRemoved += OnErrorRemoved;
+            res.WarningAdded += OnWarningAdded;
+            res.WarningRemoved += OnWarningRemoved;
+        }
+
+        private void UnHookErrorsAndWarnings(VsProjectAnalyzer res) {
+            res.ErrorAdded -= OnErrorAdded;
+            res.ErrorRemoved -= OnErrorRemoved;
+            res.WarningAdded -= OnWarningAdded;
+            res.WarningRemoved -= OnWarningRemoved;
+        }
+
+        private void OnErrorAdded(object sender, FileEventArgs args) {
+            if (_diskNodes.ContainsKey(args.Filename)) {
+                _errorFiles.Add(args.Filename);
+            }
+        }
+
+        private void OnErrorRemoved(object sender, FileEventArgs args) {
+            _errorFiles.Remove(args.Filename);
+        }
+
+        private void OnWarningAdded(object sender, FileEventArgs args) {
+            if (_diskNodes.ContainsKey(args.Filename)) {
+                _warningFiles.Add(args.Filename);
+            }
+        }
+
+        private void OnWarningRemoved(object sender, FileEventArgs args) {
+            _warningFiles.Remove(args.Filename);
+        }
+
+        /// <summary>
+        /// File names within the project which contain errors.
+        /// </summary>
+        public HashSet<string> ErrorFiles {
+            get {
+                return _errorFiles;
+            }
+        }
+
+        /// <summary>
+        /// File names within the project which contain warnings.
+        /// </summary>
+        public HashSet<string> WarningFiles {
+            get {
+                return _warningFiles;
+            }
+        }
+
+        protected override void Dispose(bool disposing) {
+            if (disposing) {
+                UnHookErrorsAndWarnings(_analyzer);
+                if (WarningFiles.Count > 0 || ErrorFiles.Count > 0) {
+                    foreach (var file in WarningFiles.Concat(ErrorFiles)) {
+                        var node = FindNodeByFullPath(file) as NodejsFileNode;
+                        if (node != null) {
+                            //_analyzer.RemoveErrors(node.GetAnalysis(), suppressUpdate: false);
+                        }
+                    }
+                }
+
+                if (_analyzer.RemoveUser()) {
+                    _analyzer.Dispose();
+                }
+                _analyzer = null;
+            }
+            base.Dispose(disposing);
         }
     }
 }

@@ -12,6 +12,7 @@
  *
  * ***************************************************************************/
 
+extern alias util;
 using System;
 using System.Collections.Generic;
 using System.Collections.Specialized;
@@ -28,6 +29,7 @@ using TestUtilities;
 using TestUtilities.SharedProject;
 using TestUtilities.UI;
 using VSLangProj;
+using UIThread = util::Microsoft.VisualStudioTools.UIThread;
 
 namespace Microsoft.VisualStudioTools.SharedProjectTests {
     [TestClass]
@@ -1278,9 +1280,7 @@ namespace Microsoft.VisualStudioTools.SharedProjectTests {
             AutomationWrapper.Select(element);
             VsIdeTestHostContext.Dte.ExecuteCommand("Project.CopyFullPath");
             
-            UIThreadInvoker.Invoke((Action)(() => {
-                clipboardText = System.Windows.Clipboard.GetText();
-            }));
+            UIThread.Invoke(() => clipboardText = System.Windows.Clipboard.GetText());
 
             Assert.AreEqual(expected, clipboardText);
         }
@@ -1429,7 +1429,7 @@ namespace Microsoft.VisualStudioTools.SharedProjectTests {
 
             public int OnQueryRemoveFiles(IVsProject pProject, int cFiles, string[] rgpszMkDocuments, VSQUERYREMOVEFILEFLAGS[] rgFlags, VSQUERYREMOVEFILERESULTS[] pSummaryResult, VSQUERYREMOVEFILERESULTS[] rgResults) {
                 return VSConstants.S_OK;
-            }
+        }
 
             public int OnQueryRenameDirectories(IVsProject pProject, int cDirs, string[] rgszMkOldNames, string[] rgszMkNewNames, VSQUERYRENAMEDIRECTORYFLAGS[] rgFlags, VSQUERYRENAMEDIRECTORYRESULTS[] pSummaryResult, VSQUERYRENAMEDIRECTORYRESULTS[] rgResults) {
                 return VSConstants.S_OK;
@@ -1532,6 +1532,36 @@ namespace Microsoft.VisualStudioTools.SharedProjectTests {
                     } finally {
                         if (hierarchyCookie != VSConstants.VSCOOKIE_NIL) {
                             project.UnadviseHierarchyEvents(hierarchyCookie);
+                        }
+                    }
+                }
+            }
+        }
+
+        [TestMethod, Priority(0), TestCategory("Core")]
+        [HostType("TC Dynamic"), DynamicHostType(typeof(VsIdeHostAdapter))]
+        public void IsDocumentInProject() {
+            foreach (var projectType in ProjectTypes) {
+                var proj = new ProjectDefinition(
+                    "HelloWorld",
+                    projectType,
+                    Compile("file1"),
+                    Folder("folder"),
+                    Compile("folder\\file2")
+                );
+                using (var solution = proj.Generate().ToVs()) {
+                    var project = (IVsProject)((dynamic)solution.Project).Project;
+                    foreach (var item in proj.Items.OfType<CompileItem>()) {
+                        foreach (var name in new[] { item.Name, item.Name.Replace('\\', '/') }) {
+                            string fullName = Path.Combine(solution.Directory, proj.Name, name) + projectType.CodeExtension; 
+                            Console.WriteLine(fullName);
+
+                            int found = 0;
+                            var priority = new VSDOCUMENTPRIORITY[1];
+                            uint itemid;
+
+                            UIThread.Invoke(() => ErrorHandler.ThrowOnFailure(project.IsDocumentInProject(fullName, out found, priority, out itemid)));
+                            Assert.AreNotEqual(0, found);
                         }
                     }
                 }

@@ -95,12 +95,21 @@
             </Component>
 
             <Component Directory="INSTALLLOCATION" Guid="{B43D5044-D8D5-42A8-BAEF-1A7DBC21AAE6}">
-              <File Id="filMicrosoft.NodejsTools.AjaxMin.dll" KeyPath="yes" Source="$(var.BinariesDir)\Microsoft.NodejsTools.AjaxMin.dll" />
+              <File Id="filMicrosoft.NodejsTools.Analysis.dll" KeyPath="yes" Source="$(var.BinariesDir)\Microsoft.NodejsTools.Analysis.dll" />
             </Component>
             <Component Directory="VWD_INSTALLLOCATION" Guid="{A8DD116C-36C3-48B8-B1F4-88A145AC5066}">
-              <File Id="filVWDMicrosoft.NodejsTools.AjaxMin.dll" KeyPath="yes" Source="$(var.BinariesDir)\Microsoft.NodejsTools.AjaxMin.dll" />
+              <File Id="filVWDMicrosoft.NodejsTools.Analysis.dll" KeyPath="yes" Source="$(var.BinariesDir)\Microsoft.NodejsTools.Analysis.dll" />
               <Condition>VWD_EXTENSION_INSTALLPATH</Condition>
             </Component>
+
+            <Component Directory="INSTALLLOCATION" Guid="{B1C1D160-EFB9-45E2-AEFD-62AB2B5C2C22}">
+              <File Id="filall.json" KeyPath="yes" Source="$(var.BinariesDir)\all.json" />
+            </Component>
+            <Component Directory="VWD_INSTALLLOCATION" Guid="{10D381D3-261D-4C96-BBF0-7516357E3321}">
+              <File Id="filVWDall.json" KeyPath="yes" Source="$(var.BinariesDir)\all.json" />
+              <Condition>VWD_EXTENSION_INSTALLPATH</Condition>
+            </Component>
+
 
             <Component Directory="INSTALLLOCATION" Guid="{E78AE0F0-8705-4E33-9178-F85A3AC74032}">
               <File Id="filNewtonsoft.Json.dll" KeyPath="yes" Source="$(var.BinariesDir)\Newtonsoft.Json.dll" />
@@ -118,18 +127,18 @@
             </Component>
 
             <Component Directory="INSTALLLOCATION" Guid="{0AE160E1-51FF-4153-9882-E89DDFAE07B5}">
-              <File Id="filNodejsProject.ico" KeyPath="yes" Source="$(var.BinariesDir)\Resources\Icons\NodejsProject.ico" />
+              <File Id="filNodejsProject.ico" KeyPath="yes" Source="$(var.BinariesDir)\NodejsProject.ico" />
             </Component>
             <Component Directory="VWD_INSTALLLOCATION" Guid="{54912CB4-BCB0-49AA-9ABA-872BA50DC9E7}">
-              <File Id="filVWDNodejsProject.ico" KeyPath="yes" Source="$(var.BinariesDir)\Resources\Icons\NodejsProject.ico" />
+              <File Id="filVWDNodejsProject.ico" KeyPath="yes" Source="$(var.BinariesDir)\NodejsProject.ico" />
               <Condition>VWD_EXTENSION_INSTALLPATH</Condition>
             </Component>
 
             <Component Directory="INSTALLLOCATION" Guid="{60D3CA23-457C-4AA9-AD84-A8992687A234}">
-              <File Id="filNodejsProjectBig.ico" KeyPath="yes" Source="$(var.BinariesDir)\Resources\Icons\NodejsProjectBig.ico" />
+              <File Id="filNodejsProjectBig.ico" KeyPath="yes" Source="$(var.BinariesDir)\NodejsProjectBig.ico" />
             </Component>
             <Component Directory="VWD_INSTALLLOCATION" Guid="{EE0E3254-9FCD-4D10-93CF-2776536755C9}">
-              <File Id="filVWDNodejsProjectBig.ico" KeyPath="yes" Source="$(var.BinariesDir)\Resources\Icons\NodejsProjectBig.ico" />
+              <File Id="filVWDNodejsProjectBig.ico" KeyPath="yes" Source="$(var.BinariesDir)\NodejsProjectBig.ico" />
               <Condition>VWD_EXTENSION_INSTALLPATH</Condition>
             </Component>
 
@@ -367,6 +376,14 @@
             </Component>
             <Component Directory="DIR_VWD_ItemTemplates_JavaScript" Guid="{DAB80542-5649-49DE-ACD1-04CEB7AFFF5D}">
               <File Id="fil_VWD_ItemTemplates_JavaScript_UnitTest" KeyPath="yes" Source="$(var.BinariesDir)\ItemTemplates\JavaScript\UnitTest.zip" />
+              <Condition>VWD_EXTENSION_INSTALLPATH</Condition>
+            </Component>
+
+            <Component Directory="DIR_ItemTemplates_JavaScript" Guid="{82E2AB7E-3DBD-47F7-8F20-4D661013CB1E}">
+              <File Id="fil_ItemTemplates_JavaScript_TypeScriptUnitTest" KeyPath="yes" Source="$(var.BinariesDir)\ItemTemplates\JavaScript\TypeScriptUnitTest.zip" />
+            </Component>
+            <Component Directory="DIR_VWD_ItemTemplates_JavaScript" Guid="{D147A47B-71C2-469D-83A5-99FFB5A9CC91}">
+              <File Id="fil_VWD_ItemTemplates_JavaScript_TypeScriptUnitTest" KeyPath="yes" Source="$(var.BinariesDir)\ItemTemplates\JavaScript\TypeScriptUnitTest.zip" />
               <Condition>VWD_EXTENSION_INSTALLPATH</Condition>
             </Component>
 

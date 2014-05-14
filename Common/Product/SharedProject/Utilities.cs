@@ -122,6 +122,16 @@ namespace Microsoft.VisualStudioTools.Project {
             return guids.ToArray();
         }
 
+        internal static bool GuidEquals(string x, string y) {
+            Guid gx, gy;
+            return Guid.TryParse(x, out gx) && Guid.TryParse(y, out gy) && gx == gy;
+        }
+
+        internal static bool GuidEquals(Guid x, string y) {
+            Guid gy;
+            return Guid.TryParse(y, out gy) && x == gy;
+        }
+
         internal static void CheckNotNull(object value, string message = null) {
             if (value == null) {
                 throw new InvalidOperationException(message);
@@ -148,17 +158,17 @@ namespace Microsoft.VisualStudioTools.Project {
         public static void ValidateFileName(IServiceProvider serviceProvider, string filePath) {
             string errorMessage = String.Empty;
             if (String.IsNullOrEmpty(filePath)) {
-                errorMessage = String.Format(SR.GetString(SR.ErrorInvalidFileName, CultureInfo.CurrentUICulture), filePath);
+                errorMessage = SR.GetString(SR.ErrorInvalidFileName, filePath);
             } else if (filePath.Length > NativeMethods.MAX_PATH) {
-                errorMessage = String.Format(CultureInfo.CurrentCulture, SR.GetString(SR.PathTooLong, CultureInfo.CurrentUICulture), filePath);
+                errorMessage = SR.GetString(SR.PathTooLong, filePath);
             } else if (ContainsInvalidFileNameChars(filePath)) {
-                errorMessage = String.Format(SR.GetString(SR.ErrorInvalidFileName, CultureInfo.CurrentUICulture), filePath);
+                errorMessage = SR.GetString(SR.ErrorInvalidFileName, filePath);
             }
 
             if (errorMessage.Length == 0) {
                 string fileName = Path.GetFileName(filePath);
                 if (String.IsNullOrEmpty(fileName) || IsFileNameInvalid(fileName)) {
-                    errorMessage = String.Format(SR.GetString(SR.ErrorInvalidFileName, CultureInfo.CurrentUICulture), filePath);
+                    errorMessage = SR.GetString(SR.ErrorInvalidFileName, filePath);
                 }
             }
 
@@ -554,7 +564,7 @@ namespace Microsoft.VisualStudioTools.Project {
         public static void RecursivelyCopyDirectory(string source, string target) {
             // Make sure it doesn't already exist
             if (Directory.Exists(target))
-                throw new ArgumentException(String.Format(CultureInfo.CurrentCulture, SR.GetString(SR.FileOrFolderAlreadyExists, CultureInfo.CurrentUICulture), target));
+                throw new ArgumentException(SR.GetString(SR.FileOrFolderAlreadyExists, target));
 
             Directory.CreateDirectory(target);
             DirectoryInfo directory = new DirectoryInfo(source);

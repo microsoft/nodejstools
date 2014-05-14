@@ -19,6 +19,10 @@ Features in Depth
 * [wiki:"npm" Npm]
 * [wiki:"Profiling" Profiling]
 * [wiki:"Azure Deployment" AzureDeployment]
+	* [wiki:"Azure Web Site using Web Deploy" AzureWebSiteWebDeploy]
+	* [wiki:"Azure Web Site using Git" AzureWebSiteGit]
+	* [wiki:"Azure Cloud Service - Web Role and Worker Role" AzureCloudService]
+* [wiki:"Unit Tests" UnitTests]
 
 Release Notes
 -------------

@@ -22,7 +22,7 @@ namespace Microsoft.NodejsTools.Project {
 
     /// <summary>
     /// Implementation of the service that builds the information to expose to the symbols
-    /// navigation tools (class view or object browser) from the Python files inside a
+    /// navigation tools (class view or object browser) from the Node.js files inside a
     /// hierarchy.
     /// </summary>
     [Guid("1CCB584B-2876-4416-99B0-60C91B938147")]

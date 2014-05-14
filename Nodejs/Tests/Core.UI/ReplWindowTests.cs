@@ -14,6 +14,7 @@
 
 using System.Collections.Generic;
 using System.Threading;
+using System.Threading.Tasks;
 using Microsoft.NodejsTools.Repl;
 using Microsoft.TC.TestHostAdapters;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
@@ -119,22 +120,32 @@ namespace Microsoft.Nodejs.Tests.UI {
                 app.Element.SetFocus();
                 interactive.Element.SetFocus();
 
+                int timeout = 10000;
+
                 if (!reopenOnly) {
-                    interactive.ClearScreen();
-                    interactive.ReplWindow.ClearHistory();
-                    interactive.WaitForReadyState();
+                    interactive.ClearInput();
 
-                    interactive.Reset();
-                    interactive.ClearScreen();
-                    var task = interactive.ReplWindow.Evaluator.ExecuteText("console.log('READY')");
-                    Assert.IsTrue(task.Wait(10000), "ReplWindow did not initialize in time");
-                    Assert.AreEqual(ExecutionResult.Success, task.Result);
-                    interactive.WaitForTextEnd("READY", "undefined", "> ");
+                    bool isReady = false;
+                    for (int retries = 10; retries > 0; --retries) {
+                        interactive.Reset();
+                        try {
+                            var task = interactive.ReplWindow.Evaluator.ExecuteText("console.log('READY')");
+                            Assert.IsTrue(task.Wait(timeout), "ReplWindow did not initialize in time");
+                            if (!task.Result.IsSuccessful) {
+                                continue;
+                            }
+                        } catch (TaskCanceledException) {
+                            continue;
+                        }
 
+                        interactive.WaitForTextEnd("READY", "undefined", "> ");
+                        isReady = true;
+                        break;
+                    }
+                    Assert.IsTrue(isReady, "ReplWindow did not initialize");
                     interactive.ClearScreen();
                     interactive.ReplWindow.ClearHistory();
                 }
-                interactive.WaitForReadyState();
                 return interactive;
             }
         }

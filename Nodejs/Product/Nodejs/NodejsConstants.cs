@@ -45,6 +45,8 @@ namespace Microsoft.NodejsTools {
         public const string NodejsHiddenUserModule = "nodejs_tools_for_visual_studio_hidden_usermodule_";
         public const string NodejsHiddenUserModuleInstance = "nodejs_tools_for_visual_studio_hidden_module_instance_";
 
+        public const string TypeScriptCfgProperty = "CfgPropertyPagesGuidsAddTypeScript";
+
         public const ushort DefaultDebuggerPort = 5858;
 
         [Export, Name(Nodejs), BaseDefinition("text")]

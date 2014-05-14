@@ -322,7 +322,7 @@
     <value>npm Packages Properties</value>
   </data>
   <data name="PropertiesClassGlobal" xml:space="preserve">
-    <value>Globally npm Packages Properties</value>
+    <value>Global npm Packages Properties</value>
   </data>
   <data name="ScriptArgumentsToolTip" xml:space="preserve">
     <value>Specifies the arguments passed to the script on launch.</value>
@@ -465,5 +465,20 @@
   </data>
   <data name="PackageCatalogRefreshFailed" xml:space="preserve">
     <value>Refresh failed - see output below for details</value>
+  </data>
+  <data name="ReplInitializationMessage" xml:space="preserve">
+    <value>Node.js interactive window. Type .help for a list of commands.</value>
+  </data>
+  <data name="NodeExePathDescription" xml:space="preserve">
+    <value>Specifies the path to the node.exe executable.</value>
+  </data>
+  <data name="NodejsPortDescription" xml:space="preserve">
+    <value>Specifies the port number used for process.env.port, if unspecified a random port is generated.</value>
+  </data>
+  <data name="NpmOutputPaneTitle" xml:space="preserve">
+    <value>Npm</value>
+  </data>
+  <data name="NpmPackageInstallHelpMessage" xml:space="preserve">
+    <value>(enter arguments above)</value>
   </data>
 </root>

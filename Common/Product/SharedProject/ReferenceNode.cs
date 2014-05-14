@@ -13,8 +13,10 @@
  * ***************************************************************************/
 
 using System;
+using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
+using System.Linq;
 using System.Runtime.InteropServices;
 using System.Security.Permissions;
 using System.Text;
@@ -146,6 +148,12 @@ namespace Microsoft.VisualStudioTools.Project {
             return base.ExecCommandOnNode(cmdGroup, cmd, nCmdexecopt, pvaIn, pvaOut);
         }
 
+        protected internal override void ShowDeleteMessage(IList<HierarchyNode> nodes, __VSDELETEITEMOPERATION action, out bool cancel, out bool useStandardDialog) {
+            // Don't prompt if all the nodes are references
+            useStandardDialog = !nodes.All(n => n is ReferenceNode);
+            cancel = false;
+        }
+
         #endregion
 
         #region  methods
@@ -155,7 +163,7 @@ namespace Microsoft.VisualStudioTools.Project {
         /// Links a reference node to the project and hierarchy.
         /// </summary>
         public virtual void AddReference() {
-            UIThread.Instance.MustBeCalledFromUIThread();
+            UIThread.MustBeCalledFromUIThread();
 
             ReferenceContainerNode referencesFolder = this.ProjectMgr.GetReferenceContainer() as ReferenceContainerNode;
             Utilities.CheckNotNull(referencesFolder, "Could not find the References node");

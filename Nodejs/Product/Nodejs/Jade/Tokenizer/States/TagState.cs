@@ -78,6 +78,8 @@ namespace Microsoft.NodejsTools.Jade {
                         OnStyle(blockIndent);
                     } else if (IsAllWhiteSpaceBeforeEndOfLine(_cs.Position + 1)) {
                         SkipToEndOfBlock(blockIndent, text: true);
+                    } else {
+                        _cs.MoveToNextChar();
                     }
 
                     return;

@@ -12,7 +12,7 @@ Node.js is built for 32-bit and 64-bit architectures. NTVS supports both. Only o
 
 Step 2: Install Visual Studio
 -----------------------------
-NTVS is a plug-in built on top of Visual Studio 2012 or 2013. Currently NTVS only supports full VS editions (Premium, Professional, Test Professional, Ultimate):
+NTVS is a plug-in built on top of Visual Studio 2012 or 2013. NTVS supports the free Visual Studio Express 2013 for Web, and the full VS editions of 2012 and 2013 (Professional, Premium, Ultimate):
 
 * Visual Studio 2013: [http://www.microsoft.com/visualstudio/eng/downloads#d-2013-editions](http://www.microsoft.com/visualstudio/eng/downloads#d-2013-editions)
 * Visual Studio 2012 [http://www.microsoft.com/en-us/download/details.aspx?id=30678](http://www.microsoft.com/en-us/download/details.aspx?id=30678)

@@ -20,7 +20,7 @@ using Microsoft.VisualStudio.TestTools.UnitTesting;
 namespace NodejsTests.Debugger.FileNameMapping {
     [TestClass]
     public class FuzzyLogicFileNameMapperTests {
-        [TestMethod, Priority(0)]
+        [TestMethod, Priority(0), TestCategory("Debugging")]
         public void GetLocalFileNameForBuiltInModuleTests() {
             // Arrange
             const string remoteFileName = "node.js";
@@ -34,7 +34,7 @@ namespace NodejsTests.Debugger.FileNameMapping {
             Assert.AreEqual(remoteFileName, fileName);
         }
 
-        [TestMethod, Priority(0)]
+        [TestMethod, Priority(0), TestCategory("Debugging")]
         public void GetLocalFileNameForRemoteModuleTests() {
             // Arrange
             const string remoteFileName = "/root/other/project/path/app.js";
@@ -49,7 +49,7 @@ namespace NodejsTests.Debugger.FileNameMapping {
             Assert.AreEqual(localFileName, fileName);
         }
 
-        [TestMethod, Priority(0)]
+        [TestMethod, Priority(0), TestCategory("Debugging")]
         public void GetLocalFileNameIfProjectContainsDuplicatesTests() {
             // Arrange
             const string remoteFileName1 = "/root/other/project/path/app.js";

@@ -315,8 +315,10 @@ namespace Microsoft.NodejsTools {
                 var contentRegistry = _compModel.GetService<IContentTypeRegistryService>();
 
                 IContentType contentType = SniffContentType(diskBuffer) ??
-                                           contentRegistry.GetContentType("JavaScript");
+                                           contentRegistry.GetContentType(NodejsConstants.Nodejs);
 
+                diskBuffer.ChangeContentType(contentRegistry.GetContentType(NodejsConstants.Nodejs), null);
+#if FALSE
                 var proj = VsExtensions.GetCommonProject(Extensions.GetProject(_hierarchy)) as NodejsProjectNode;
 
                 NodejsProjectionBuffer projBuffer;
@@ -342,7 +344,7 @@ namespace Microsoft.NodejsTools {
                 IVsTextView view;
                 ErrorHandler.ThrowOnFailure(_window.GetPrimaryView(out view));
                 CodeWindowManager.AddSkipFilter(adapterService, view);
-
+#endif
                 return VSConstants.S_OK;
             }
 
@@ -366,6 +368,7 @@ namespace Microsoft.NodejsTools {
         }
     }
 
+#if FALSE
     class SkipJsLsFilter : IOleCommandTarget {
         private readonly IOleCommandTarget _next;
 
@@ -381,6 +384,7 @@ namespace Microsoft.NodejsTools {
             return _next.QueryStatus(pguidCmdGroup, cCmds, prgCmds, pCmdText);
         }
     }
+#endif
 
     [Guid(Guids.NodejsEditorFactoryPromptEncodingString)]
     class NodejsEditorFactoryPromptForEncoding : NodejsEditorFactory {

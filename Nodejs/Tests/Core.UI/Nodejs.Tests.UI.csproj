@@ -114,6 +114,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="BasicIntellisense.cs" />
+    <Compile Include="ClassificationTests.cs" />
     <Compile Include="DebuggerUITests.cs" />
     <Compile Include="JadeUITests.cs" />
     <Compile Include="NodejsBasicProjectTests.cs" />

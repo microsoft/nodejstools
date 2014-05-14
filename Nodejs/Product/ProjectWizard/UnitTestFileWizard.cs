@@ -28,7 +28,7 @@ namespace Microsoft.NodejsTools.ProjectWizard {
             EnvDTE.Project project = projectItem.ContainingProject;
         }
 
-        public void ProjectFinishedGenerating(Project project) { }
+        public void ProjectFinishedGenerating(EnvDTE.Project project) { }
 
         public void ProjectItemFinishedGenerating(ProjectItem projectItem) {            
             EnvDTE.Property property = projectItem.Properties.Item("TestFramework");

@@ -14,118 +14,50 @@
 
 using System;
 using System.ComponentModel;
-using System.Diagnostics;
-using System.Globalization;
-using CommonSR = Microsoft.VisualStudioTools.Project.SR;
 
 namespace Microsoft.NodejsTools.Project {
-    internal class SR : CommonSR {
-
-        internal const string TestFramework = "TestFramework";
-        internal const string TestFrameworkDescription = "TestFrameworkDescription";
-        internal const string NodeExeArguments = "NodeExeArguments";
-        internal const string NodeExeArgumentsDescription = "NodeExeArgumentsDescription";
-        internal const string NodeExePath = "NodeExePath";
-        internal const string NodeExePathDescription = "NodeExePathDescription";
-        internal const string NodejsPort = "NodejsPort";
-        internal const string NodejsPortDescription = "NodejsPortDescription";
-
-        internal const string NpmPackageName = "NpmPackageName";
-        internal const string NpmPackageNameDescription = "NpmPackageNameDescription";
-        internal const string NpmPackageVersion = "NpmPackageVersion";
-        internal const string NpmPackageVersionDescription = "NpmPackageVersionDescription";
-        internal const string NpmPackageRequestedVersionRange = "NpmPackageRequestedVersionRange";
-        internal const string NpmPackageRequestedVersionRangeDescription = "NpmPackageRequestedVersionRangeDescription";
-        internal const string NpmPackageNewVersionAvailable = "NpmPackageNewVersionAvailable";
-        internal const string NpmPackageNewVersionAvailableDescription = "NpmPackageNewVersionAvailableDescription";
-        internal const string NpmPackageDescription = "NpmPackageDescription";
-        internal const string NpmPackageDescriptionDescription = "NpmPackageDescriptionDescription";
-        internal const string NpmPackageKeywords = "NpmPackageKeywords";
-        internal const string NpmPackageKeywordsDescription = "NpmPackageKeywordsDescription";
-        internal const string NpmPackageAuthor = "NpmPackageAuthor";
-        internal const string NpmPackageAuthorDescription = "NpmPackageAuthorDescription";
-        internal const string NpmPackagePublishDateTime = "NpmPackagePublishDateTime";
-        internal const string NpmPackagePublishDateTimeDescription = "NpmPackagePublishDateTimeDescription";
-        internal const string NpmPackagePath = "NpmPackagePath";
-        internal const string NpmPackagePathDescription = "NpmPackagePathDescription";
-        internal const string NpmPackageType = "NpmPackageType";
-        internal const string NpmPackageTypeDescription = "NpmPackageTypeDescription";
-        internal const string NpmPackageLinkStatus = "NpmPackageLinkStatus";
-        internal const string NpmPackageLinkStatusDescription = "NpmPackageLinkStatusDescription";
-        internal const string NpmPackageIsListedInParentPackageJson = "NpmPackageIsListedInParentPackageJson";
-        internal const string NpmPackageIsListedInParentPackageJsonDescription = "NpmPackageIsListedInParentPackageJsonDescription";
-        internal const string NpmPackageIsMissing = "NpmPackageIsMissing";
-        internal const string NpmPackageIsMissingDescription = "NpmPackageIsMissingDescription";
-        internal const string NpmPackageIsDevDependency = "NpmPackageIsDevDependency";
-        internal const string NpmPackageIsDevDependencyDescription = "NpmPackageIsDevDependencyDescription";
-        internal const string NpmPackageIsOptionalDependency = "NpmPackageIsOptionalDependency";
-        internal const string NpmPackageIsOptionalDependencyDescription = "NpmPackageIsOptionalDependencyDescription";
-        internal const string NpmPackageIsBundledDependency = "NpmPackageIsBundledDependency";
-        internal const string NpmPackageIsBundledDependencyDescription = "NpmPackageIsBundledDependencyDescription";
-
-        internal const string CategoryVersion = "CategoryVersion";
-        internal const string CategoryStatus = "CategoryStatus";
-
-        internal const string NpmNodePackageInstallation = "NpmNodePackageInstallation";
-        internal const string NpmNodePackageInstallationDescription = "NpmNodePackageInstallationDescription";
-        internal const string NpmNodePath = "NpmNodePath";
-        internal const string NpmNodePathDescription = "NpmNodePathDescription";
-
-        internal static new string GetString(string value) {
-            string result = Microsoft.NodejsTools.Resources.ResourceManager.GetString(value, CultureInfo.CurrentUICulture) ?? CommonSR.GetString(value);
-            if (result == null) {
-                Debug.Assert(false, "String resource '" + value + "' is missing");
-                result = value;
-            }
-            return result;
-        }
-
-        internal static new string GetString(string value, params object[] args) {
-            string result = Microsoft.NodejsTools.Resources.ResourceManager.GetString(value, CultureInfo.CurrentUICulture) ?? CommonSR.GetString(value);
-            if (result == null) {
-                Debug.Assert(false, "String resource '" + value + "' is missing");
-                result = value;
-            }
-            return string.Format(CultureInfo.CurrentUICulture, result, args);
-        }
-    }
-
     [AttributeUsage(AttributeTargets.Class | AttributeTargets.Property | AttributeTargets.Field, Inherited = false, AllowMultiple = false)]
-    internal sealed class LocDisplayNameAttribute : DisplayNameAttribute {
-        readonly string value;
+    internal sealed class SRDisplayNameAttribute : DisplayNameAttribute {
+        string _name;
 
-        public LocDisplayNameAttribute(string name) {
-            value = name;
+        public SRDisplayNameAttribute(string name) {
+            _name = name;
         }
 
         public override string DisplayName {
             get {
-                return SR.GetString(value);
+                return SR.GetString(_name);
             }
         }
     }
 
-    [AttributeUsage(AttributeTargets.Class | AttributeTargets.Property | AttributeTargets.Field, Inherited = false, AllowMultiple = false)]
-    internal sealed class SRCategoryAttribute : CategoryAttribute {
-        public SRCategoryAttribute(string name) : base(name) { }
-
-        protected override string GetLocalizedString(string value) {
-            return SR.GetString(value);
-        }
-    }
-
-    [AttributeUsage(AttributeTargets.Class | AttributeTargets.Property | AttributeTargets.Field, Inherited = false, AllowMultiple = false)]
+    [AttributeUsage(AttributeTargets.All)]
     internal sealed class SRDescriptionAttribute : DescriptionAttribute {
-        readonly string value;
+        private bool _replaced;
 
-        public SRDescriptionAttribute(string name) {
-            value = name;
+        public SRDescriptionAttribute(string description)
+            : base(description) {
         }
 
         public override string Description {
             get {
-                return SR.GetString(value);
+                if (!_replaced) {
+                    _replaced = true;
+                    DescriptionValue = SR.GetString(base.Description);
+                }
+                return base.Description;
             }
+        }
+    }
+
+    [AttributeUsage(AttributeTargets.All)]
+    internal sealed class SRCategoryAttribute : CategoryAttribute {
+        public SRCategoryAttribute(string category)
+            : base(category) {
+        }
+
+        protected override string GetLocalizedString(string value) {
+            return SR.GetString(value);
         }
     }
 }

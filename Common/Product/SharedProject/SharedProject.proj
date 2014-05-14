@@ -15,12 +15,16 @@
       <Link>SharedProject\HierarchyNodeFlags.cs</Link>
       <Visible>true</Visible>
     </Compile>
-	<Compile Include="$(_ProjectSystemFilesLocation)\OutputWindowRedirector.cs">
+    <Compile Include="$(_ProjectSystemFilesLocation)\OutputWindowRedirector.cs">
       <Link>SharedProject\OutputWindowRedirector.cs</Link>
       <Visible>true</Visible>
     </Compile>
-	<Compile Include="$(_ProjectSystemFilesLocation)\ProcessOutput.cs">
+    <Compile Include="$(_ProjectSystemFilesLocation)\ProcessOutput.cs">
       <Link>SharedProject\ProcessOutput.cs</Link>
+      <Visible>true</Visible>
+    </Compile>
+    <Compile Include="$(_ProjectSystemFilesLocation)\TaskDialog.cs">
+      <Link>SharedProject\TaskDialog.cs</Link>
       <Visible>true</Visible>
     </Compile>
     <Compile Include="$(_ProjectSystemFilesLocation)\OverwriteFileDialog.xaml.cs">
@@ -306,6 +310,10 @@
       <Link>SharedProject\HierarchyNode.cs</Link>
       <Visible>true</Visible>
     </Compile>
+    <Compile Include="$(_ProjectSystemFilesLocation)\HierarchyIdMap.cs">
+      <Link>SharedProject\HierarchyIdMap.cs</Link>
+      <Visible>true</Visible>
+    </Compile>
     <Compile Include="$(_ProjectSystemFilesLocation)\IDEBuildLogger.cs">
       <Link>SharedProject\IDEBuildLogger.cs</Link>
       <Visible>true</Visible>
@@ -458,10 +466,6 @@
       <Link>SharedProject\ReferenceNode.cs</Link>
       <Visible>true</Visible>
     </Compile>
-    <Compile Include="$(_ProjectSystemFilesLocation)\Resources.cs">
-      <Link>SharedProject\Resources.cs</Link>
-      <Visible>true</Visible>
-    </Compile>
     <Compile Include="$(_ProjectSystemFilesLocation)\SolutionListener.cs">
       <Link>SharedProject\SolutionListener.cs</Link>
       <Visible>true</Visible>
@@ -561,6 +565,10 @@
       <Link>SharedProject\Debugger\ProvideDebugExceptionAttribute.cs</Link>
       <Visible>true</Visible>
     </Compile>
+    <Compile Include="$(_ProjectSystemFilesLocation)\WebSocketStream.cs">
+      <Link>SharedProject\Debugger\WebSocketStream.cs</Link>
+      <Visible>true</Visible>
+    </Compile>
     <Compile Include="$(_ProjectSystemFilesLocation)\ProvideDebugLanguageAttribute.cs">
       <Link>SharedProject\ProvideDebugLanguageAttribute.cs</Link>
       <Visible>true</Visible>
@@ -579,6 +587,14 @@
     </Compile>
     <Compile Include="$(_ProjectSystemFilesLocation)\SolutionEventsListener.cs">
       <Link>SharedProject\SolutionEventsListener.cs</Link>
+      <Visible>true</Visible>
+    </Compile>
+    <Compile Include="$(_ProjectSystemFilesLocation)\ExceptionExtensions.cs">
+      <Link>SharedProject\ExceptionExtensions.cs</Link>
+      <Visible>true</Visible>
+    </Compile>
+    <Compile Include="$(_ProjectSystemFilesLocation)\TaskExtensions.cs">
+      <Link>SharedProject\TaskExtensions.cs</Link>
       <Visible>true</Visible>
     </Compile>
     <Compile Include="$(_ProjectSystemFilesLocation)\Wpf\Commands.cs">
@@ -616,11 +632,6 @@
     <EmbeddedResource Include="$(_ProjectSystemFilesLocation)\ProjectResources.resx">
       <Link>SharedProject\ProjectResources.resx</Link>
       <ManifestResourceName>Microsoft.VisualStudio.Project</ManifestResourceName>
-      <Visible>true</Visible>
-    </EmbeddedResource>
-    <EmbeddedResource Include="$(_ProjectSystemFilesLocation)\Resources.resx">
-      <Link>SharedProject\Resources.resx</Link>
-      <ManifestResourceName>Microsoft.VisualStudioTools.SharedProject</ManifestResourceName>
       <Visible>true</Visible>
     </EmbeddedResource>
     <EmbeddedResource Include="$(_ProjectSystemFilesLocation)\WebPiComponentPickerControl.resx">

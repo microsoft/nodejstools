@@ -26,6 +26,7 @@ using System.Windows.Forms;
 using Microsoft.NodejsTools.Commands;
 using Microsoft.NodejsTools.Debugger.DebugEngine;
 using Microsoft.NodejsTools.Debugger.Remote;
+using Microsoft.NodejsTools.Intellisense;
 using Microsoft.NodejsTools.Jade;
 using Microsoft.NodejsTools.Options;
 using Microsoft.NodejsTools.Project;
@@ -39,6 +40,7 @@ using Microsoft.VisualStudio.Text;
 using Microsoft.VisualStudio.TextManager.Interop;
 using Microsoft.VisualStudio.Utilities;
 using Microsoft.VisualStudioTools;
+using Microsoft.VisualStudioTools.Project;
 using Microsoft.Win32;
 
 namespace Microsoft.NodejsTools {
@@ -90,6 +92,7 @@ namespace Microsoft.NodejsTools {
         private object _surveyNewsUrlLock = new object();
         internal HashSet<ITextBuffer> ChangedBuffers = new HashSet<ITextBuffer>();
         private LanguagePreferences _langPrefs;
+        private VsProjectAnalyzer _analyzer;
 
         /// <summary>
         /// Default constructor of the package.
@@ -102,20 +105,6 @@ namespace Microsoft.NodejsTools {
             Debug.WriteLine(string.Format(CultureInfo.CurrentCulture, "Entering constructor for: {0}", this.ToString()));
             Debug.Assert(Instance == null, "NodejsPackage created multiple times");
             Instance = this;
-        }
-
-        public override int FDoIdle(uint grfidlef) {
-            if (ChangedBuffers.Count > 0) {
-                foreach (var buffer in ChangedBuffers) {
-                    var fileNode = ((NodejsProjectionBuffer)buffer.Properties[typeof(NodejsProjectionBuffer)]).GetFileNode();
-                    if (fileNode != null) {
-                        fileNode.GenerateReferenceFile(buffer.CurrentSnapshot.GetText());
-                    }
-                }
-                ChangedBuffers.Clear();
-            }
-
-            return base.FDoIdle(grfidlef);
         }
 
         public NodejsGeneralOptionsPage GeneralOptionsPage {
@@ -615,6 +604,38 @@ namespace Microsoft.NodejsTools {
                 CheckSurveyNewsThread(new Uri(options.SurveyNewsFeedUrl), forceCheckAndWarnIfNoneAvailable);
             }
         }
+
+        internal static void NavigateTo(string filename, Guid docViewGuidType, int line, int col) {
+            VsUtilities.NavigateTo(Instance, filename, docViewGuidType, line, col);
+        }
+
+        internal static void NavigateTo(string filename, Guid docViewGuidType, int pos) {
+            IVsTextView viewAdapter;
+            IVsWindowFrame pWindowFrame;
+            VsUtilities.OpenDocument(Instance, filename, out viewAdapter, out pWindowFrame);
+
+            ErrorHandler.ThrowOnFailure(pWindowFrame.Show());
+
+            // Set the cursor at the beginning of the declaration.          
+            int line, col;
+            ErrorHandler.ThrowOnFailure(viewAdapter.GetLineAndColumn(pos, out line, out col));
+            ErrorHandler.ThrowOnFailure(viewAdapter.SetCaretPos(line, col));
+            // Make sure that the text is visible.
+            viewAdapter.CenterLines(line, 1);
+        }
+
+        /// <summary>
+        /// The analyzer which is used for loose files.
+        /// </summary>
+        internal VsProjectAnalyzer DefaultAnalyzer {
+            get {
+                if (_analyzer == null) {
+                    _analyzer = new VsProjectAnalyzer(true);
+                }
+                return _analyzer;
+            }
+        }
+
 
 #if UNIT_TEST_INTEGRATION
         // var testCase = require('./test/test-doubled.js'); for(var x in testCase) { console.log(x); }

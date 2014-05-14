@@ -25,6 +25,12 @@ using Microsoft.VisualStudio.Debugger.Interop;
 
 namespace Microsoft.NodejsTools.Debugger.Remote {
     internal class NodeRemoteEnumDebugProcesses : NodeRemoteEnumDebug<IDebugProcess2>, IEnumDebugProcesses2 {
+        private class DebuggerAlreadyAttachedException : Exception {
+            public DebuggerAlreadyAttachedException()
+                : base("A debugger is already attached to this node.js process.") {
+            }
+        }
+
         public NodeRemoteEnumDebugProcesses(NodeRemoteDebugPort port, INetworkClientFactory networkClientFactory)
             : base(Connect(port, networkClientFactory)) {
         }
@@ -54,7 +60,13 @@ namespace Microsoft.NodejsTools.Debugger.Remote {
                         var buffer = new byte[1024];
                         var readTask = stream.ReadAsync(buffer, 0, buffer.Length);
                         if (readTask.Wait(5000)) {
-                            Debug.WriteLine("NodeRemoteEnumDebugProcesses debugger response: " + Encoding.UTF8.GetString(buffer, 0, readTask.Result));
+                            string response = Encoding.UTF8.GetString(buffer, 0, readTask.Result);
+                            Debug.WriteLine("NodeRemoteEnumDebugProcesses debugger response: " + response);
+
+                            if (response == "Remote debugging session already active\r\n") {
+                                throw new DebuggerAlreadyAttachedException();
+                            }
+
                             process = new NodeRemoteDebugProcess(port, "node.exe", "", "");
                             Debug.WriteLine("NodeRemoteEnumDebugProcesses ping successful.");
                             break;
@@ -62,6 +74,8 @@ namespace Microsoft.NodejsTools.Debugger.Remote {
                             Debug.WriteLine("NodeRemoteEnumDebugProcesses ping timed out.");
                         }
                     }
+                } catch (DebuggerAlreadyAttachedException ex) {
+                    exception = ex;
                 } catch (AggregateException ex) {
                     exception = ex;
                 } catch (IOException ex) {
@@ -72,7 +86,7 @@ namespace Microsoft.NodejsTools.Debugger.Remote {
                     exception = ex;
                 } catch (PlatformNotSupportedException) {
                     MessageBox.Show(
-                        "Remote debugging of node.js Windows Azure applications is only supported on Windows 8 and above.",
+                        "Remote debugging of node.js Microsoft Azure applications is only supported on Windows 8 and above.",
                         null, MessageBoxButtons.OK, MessageBoxIcon.Error);
                     return null;
                 }
@@ -87,15 +101,17 @@ namespace Microsoft.NodejsTools.Debugger.Remote {
                     "Could not attach to Node.js process at {0}{1}\r\n\r\n",
                     port.Uri,
                     exception != null ? ":\r\n\r\n" + exception.Message : ".");
-                if (port.Uri.Scheme == "ws" || port.Uri.Scheme == "wss") {
-                    errText +=
-                        "Make sure that the Azure web site is deployed in the Debug configuration, and web sockets " +
-                        "are enabled for it in the Azure management portal.";
-                } else {
-                    errText += string.Format(
-                        "Make sure that the process is running behind the remote debug proxy (RemoteDebug.js), " +
-                        "and the debugger port (default {0}) is open on the target host.",
-                        NodejsConstants.DefaultDebuggerPort);
+                if (!(exception is DebuggerAlreadyAttachedException)) {
+                    if (port.Uri.Scheme == "ws" || port.Uri.Scheme == "wss") {
+                        errText +=
+                            "Make sure that the Azure web site is deployed in the Debug configuration, and web sockets " +
+                            "are enabled for it in the Azure management portal.";
+                    } else {
+                        errText += string.Format(
+                            "Make sure that the process is running behind the remote debug proxy (RemoteDebug.js), " +
+                            "and the debugger port (default {0}) is open on the target host.",
+                            NodejsConstants.DefaultDebuggerPort);
+                    }
                 }
 
                 DialogResult dlgRes = MessageBox.Show(errText, null, MessageBoxButtons.RetryCancel, MessageBoxIcon.Error);

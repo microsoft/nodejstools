@@ -18,6 +18,7 @@ using System.Runtime.InteropServices;
 using EnvDTE;
 using Microsoft.VisualStudio.OLE.Interop;
 using Microsoft.VisualStudioTools.Project;
+using Process = System.Diagnostics.Process;
 
 namespace Microsoft.VisualStudioTools {
     class VisualStudioApp : IDisposable {
@@ -40,8 +41,10 @@ namespace Microsoft.VisualStudioTools {
                 if (commandLineArgs[i].Equals("/parentProcessId", StringComparison.InvariantCultureIgnoreCase) &&
                     int.TryParse(commandLineArgs[i + 1], out processId)) {
                     VisualStudioApp inst;
-                    if (!_knownInstances.TryGetValue(processId, out inst)) {
-                        _knownInstances[processId] = inst = new VisualStudioApp(processId);
+                    lock (_knownInstances) {
+                        if (!_knownInstances.TryGetValue(processId, out inst)) {
+                            _knownInstances[processId] = inst = new VisualStudioApp(processId);
+                        }
                     }
                     return inst;
                 }
@@ -54,7 +57,9 @@ namespace Microsoft.VisualStudioTools {
         }
 
         public void Dispose() {
-            _knownInstances.Remove(_processId);
+            lock (_knownInstances) {
+                _knownInstances.Remove(_processId);
+            }
             if (_dte != null) {
                 Marshal.ReleaseComObject(_dte);
                 _dte = null;
@@ -69,8 +74,13 @@ namespace Microsoft.VisualStudioTools {
 
         private static DTE GetDTE(int processId) {
             MessageFilter.Register();
-            
-            string progId = string.Format("!VisualStudio.DTE.{0}:{1}", AssemblyVersionInfo.VSVersion, processId);
+
+            var prefix = Process.GetProcessById(processId).ProcessName;
+            if ("devenv".Equals(prefix, StringComparison.OrdinalIgnoreCase)) {
+                prefix = "VisualStudio";
+            }
+
+            string progId = string.Format("!{0}.DTE.{1}:{2}", prefix, AssemblyVersionInfo.VSVersion, processId);
             object runningObject = null;
 
             IBindCtx bindCtx = null;

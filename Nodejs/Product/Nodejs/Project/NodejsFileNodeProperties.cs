@@ -29,6 +29,7 @@ using Microsoft.VisualStudio.Shell.Interop;
 using VSLangProj;
 using IOleServiceProvider = Microsoft.VisualStudio.OLE.Interop.IServiceProvider;
 using Microsoft.NodejsTools.TestFrameworks;
+using SR = Microsoft.NodejsTools.Project.SR;
 
 namespace Microsoft.NodejsTools.Project {
 

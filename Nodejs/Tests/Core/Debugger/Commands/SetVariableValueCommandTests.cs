@@ -21,7 +21,7 @@ using Moq;
 namespace NodejsTests.Debugger.Commands {
     [TestClass]
     public class SetVariableValueCommandTests {
-        [TestMethod, Priority(0)]
+        [TestMethod, Priority(0), TestCategory("Debugging")]
         public void CreateSetVariableValueCommand() {
             // Arrange
             const int commandId = 3;
@@ -42,7 +42,7 @@ namespace NodejsTests.Debugger.Commands {
                 setVariableValueCommand.ToString());
         }
 
-        [TestMethod, Priority(0)]
+        [TestMethod, Priority(0), TestCategory("Debugging")]
         public void ProcessSetVariableValueResponse() {
             // Arrange
             const int commandId = 3;

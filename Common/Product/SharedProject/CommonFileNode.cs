@@ -134,23 +134,13 @@ namespace Microsoft.VisualStudioTools.Project {
         /// Gets the text buffer for the file opening the document if necessary.
         /// </summary>
         public ITextBuffer GetTextBuffer() {
-            if (UIThread.Instance.IsUIThread) {
-                // http://pytools.codeplex.com/workitem/672
-                // When we FindAndLockDocument we marshal on the main UI thread, and the docdata we get
-                // back is marshalled back so that we'll marshal any calls on it back.  When we pass it
-                // into IVsEditorAdaptersFactoryService we don't go through a COM boundary (it's a managed
-                // call) and we therefore don't get the marshaled value, and it doesn't know what we're
-                // talking about.  So run the whole operation on the UI thread.
-                return GetTextBufferOnUIThread();
-            }
-
-            ITextBuffer res = null;
-            UIThread.Instance.RunSync(
-                () => {
-                    res = GetTextBufferOnUIThread();
-                }
-            );
-            return res;
+            // http://pytools.codeplex.com/workitem/672
+            // When we FindAndLockDocument we marshal on the main UI thread, and the docdata we get
+            // back is marshalled back so that we'll marshal any calls on it back.  When we pass it
+            // into IVsEditorAdaptersFactoryService we don't go through a COM boundary (it's a managed
+            // call) and we therefore don't get the marshaled value, and it doesn't know what we're
+            // talking about.  So run the whole operation on the UI thread.
+            return UIThread.Invoke(() => GetTextBufferOnUIThread());
         }
 
         private ITextBuffer GetTextBufferOnUIThread() {
@@ -341,20 +331,13 @@ namespace Microsoft.VisualStudioTools.Project {
         }
         #endregion
 
-        #region methods
-
-        internal OleServiceProvider.ServiceCreatorCallback ServiceCreator {
-            get { return new OleServiceProvider.ServiceCreatorCallback(this.CreateServices); }
-        }
-
-        protected virtual object CreateServices(Type serviceType) {
-            object service = null;
-            if (typeof(EnvDTE.ProjectItem) == serviceType) {
-                service = GetAutomationObject();
+        public override int QueryService(ref Guid guidService, out object result) {
+            if (guidService == typeof(VSLangProj.VSProject).GUID) {
+                result = ProjectMgr.VSProject;
+                return VSConstants.S_OK;
             }
-            return service;
-        }
 
-        #endregion
+            return base.QueryService(ref guidService, out result);
+        }
     }
 }

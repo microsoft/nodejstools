@@ -5,8 +5,8 @@
     <Description xml:space="preserve">Provides support for editing and debugging Node.js programs.</Description>
     <MoreInfo>http://nodejstools.codeplex.com</MoreInfo>
     <GettingStartedGuide>http://nodejstools.codeplex.com</GettingStartedGuide>
-    <Icon>Resources\Icons\NodejsProject.ico</Icon>
-    <PreviewImage>Resources\Icons\NodejsProjectBig.ico</PreviewImage>
+    <Icon>NodejsProject.ico</Icon>
+    <PreviewImage>NodejsProjectBig.ico</PreviewImage>
   </Metadata>
   <!-- Version="11.0" specifies the minimum (not the maximum) version, and the
        Id specifications are minimums; any SKU equal or 'higher' will accept

@@ -24,9 +24,9 @@ using EnvDTE80;
 using Microsoft.TC.TestHostAdapters;
 using Microsoft.VisualStudio;
 using Microsoft.VisualStudio.ComponentModelHost;
-using Microsoft.VisualStudio.Shell;
 using Microsoft.VisualStudio.Shell.Interop;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
+using Microsoft.VisualStudioTools;
 using Task = System.Threading.Tasks.Task;
 
 namespace TestUtilities.UI {
@@ -36,8 +36,10 @@ namespace TestUtilities.UI {
     public class VisualStudioApp : AutomationWrapper, IDisposable {
         private SolutionExplorerTree _solutionExplorerTreeView;
         private ObjectBrowser _objectBrowser, _resourceView;
+        private AzureCloudServiceActivityLog _azureActivityLog;
         private IntPtr _mainWindowHandle;
         private readonly DTE _dte;
+        private List<Action> _onDispose;
         private bool _isDisposed, _skipCloseAll;
 
         public VisualStudioApp(DTE dte)
@@ -54,10 +56,25 @@ namespace TestUtilities.UI {
             get { return _isDisposed; }
         }
 
+        public void OnDispose(Action action) {
+            Debug.Assert(action != null);
+            if (_onDispose == null) {
+                _onDispose = new List<Action> { action };
+            } else {
+                _onDispose.Add(action);
+            }
+        }
+
         protected virtual void Dispose(bool disposing) {
             if (!_isDisposed) {
                 _isDisposed = true;
                 try {
+                    if (_onDispose != null) {
+                        foreach (var action in _onDispose) {
+                            action();
+                        }
+                    }
+
                     if (_dte != null && _dte.Debugger.CurrentMode != dbgDebugMode.dbgDesignMode) {
                         _dte.Debugger.TerminateAll();
                         _dte.Debugger.Stop();
@@ -274,7 +291,7 @@ namespace TestUtilities.UI {
 
         public NewProjectDialog FileNewProject() {
             var dialog = OpenDialogWithDteExecuteCommand("File.NewProject");
-            return new NewProjectDialog(AutomationElement.FromHandle(dialog));
+            return new NewProjectDialog(this, AutomationElement.FromHandle(dialog));
         }
 
         public AttachToProcessDialog OpenDebugAttach() {
@@ -397,14 +414,17 @@ namespace TestUtilities.UI {
             IntPtr hwnd;
             uiShell.GetDialogOwnerHwnd(out hwnd);
 
-            for (int i = 0; i < 20 && hwnd == originalHwnd; i++) {
+            int timeout = task == null ? 10000 : 60000;
+
+            while (timeout > 0 && hwnd == originalHwnd && (task == null || !task.IsCompleted)) {
+                timeout -= 500;
                 System.Threading.Thread.Sleep(500);
                 uiShell.GetDialogOwnerHwnd(out hwnd);
-                if (task != null && task.IsFaulted) {
-                    return IntPtr.Zero;
-                }
             }
 
+            if (task != null && task.IsFaulted) {
+                return IntPtr.Zero;
+            }
 
             if (hwnd == originalHwnd) {
                 DumpElement(AutomationElement.FromHandle(hwnd));
@@ -603,6 +623,42 @@ namespace TestUtilities.UI {
         }
 
         /// <summary>
+        /// Provides access to Azure's VS Activity Log window.
+        /// </summary>
+        public AzureCloudServiceActivityLog AzureActivityLog {
+            get {
+                if (_azureActivityLog == null) {
+                    AutomationElement element = null;
+                    for (int i = 0; i < 10 && element == null; i++) {
+                        element = Element.FindFirst(TreeScope.Descendants,
+                            new AndCondition(
+                                new PropertyCondition(
+                                    AutomationElement.ClassNameProperty,
+                                    "GenericPane"
+                                ),
+                                new OrCondition(
+                                    new PropertyCondition(
+                                        AutomationElement.NameProperty,
+                                        "Microsoft Azure Activity Log"
+                                    ),
+                                    new PropertyCondition(
+                                        AutomationElement.NameProperty,
+                                        "Windows Azure Activity Log"
+                                    )
+                                )
+                            )
+                        );
+                        if (element == null) {
+                            System.Threading.Thread.Sleep(500);
+                        }
+                    }
+                    _azureActivityLog = new AzureCloudServiceActivityLog(element);
+                }
+                return _azureActivityLog;
+            }
+        }
+
+        /// <summary>
         /// Produces a name which is compatible with x:Name requirements (starts with a letter/underscore, contains
         /// only letter, numbers, or underscores).
         /// </summary>
@@ -749,30 +805,38 @@ namespace TestUtilities.UI {
         }
 
         internal void Invoke(Action action) {
-            ThreadHelper.Generic.Invoke(action);
+            UIThread.Invoke(action);
+        }
+
+        public Uri PublishToAzureCloudService(string serviceName, string subscriptionPublishSettingsFilePath) {
+            using (var publishDialog = AzureCloudServicePublishDialog.FromDte(this)) {
+                using (var manageSubscriptionsDialog = publishDialog.SelectManageSubscriptions()) {
+                    LoadPublishSettings(manageSubscriptionsDialog, subscriptionPublishSettingsFilePath);
+                    manageSubscriptionsDialog.Close();
+                }
+
+                publishDialog.ClickNext();
+
+                using (var createServiceDialog = publishDialog.SelectCreateNewService()) {
+                    createServiceDialog.ServiceName = serviceName;
+                    createServiceDialog.Location = "West US";
+                    createServiceDialog.ClickCreate();
+                }
+
+                publishDialog.ClickPublish();
+            }
+
+            return new Uri(string.Format("http://{0}.cloudapp.net", serviceName));
         }
 
         public Uri PublishToAzureWebSite(string siteName, string subscriptionPublishSettingsFilePath) {
-            using (var publishDialog = AzureWebSitePublishDialog.Open(this)) {
+            using (var publishDialog = AzureWebSitePublishDialog.FromDte(this)) {
                 using (var importSettingsDialog = publishDialog.ClickImportSettings()) {
                     importSettingsDialog.ClickImportFromWindowsAzureWebSite();
 
                     using (var manageSubscriptionsDialog = importSettingsDialog.ClickImportOrManageSubscriptions()) {
-                        manageSubscriptionsDialog.ClickCertificates();
-
-                        while (manageSubscriptionsDialog.SubscriptionsListBox.Count > 0) {
-                            manageSubscriptionsDialog.SubscriptionsListBox[0].Select();
-                            manageSubscriptionsDialog.ClickRemove();
-                            WaitForDialogToReplace(manageSubscriptionsDialog.Element);
-                            VisualStudioApp.CheckMessageBox(TestUtilities.UI.MessageBoxButton.Yes);
-                        }
-
-                        using (var importSubscriptionDialog = manageSubscriptionsDialog.ClickImport()) {
-                            importSubscriptionDialog.FileName = subscriptionPublishSettingsFilePath;
-                            importSubscriptionDialog.ClickImport();
-
-                            manageSubscriptionsDialog.Close();
-                        }
+                        LoadPublishSettings(manageSubscriptionsDialog, subscriptionPublishSettingsFilePath);
+                        manageSubscriptionsDialog.Close();
                     }
 
                     using (var createSiteDialog = importSettingsDialog.ClickNew()) {
@@ -787,6 +851,22 @@ namespace TestUtilities.UI {
             }
 
             return new Uri(string.Format("http://{0}.azurewebsites.net", siteName));
+        }
+
+        private void LoadPublishSettings(AzureManageSubscriptionsDialog manageSubscriptionsDialog, string publishSettingsFilePath) {
+            manageSubscriptionsDialog.ClickCertificates();
+
+            while (manageSubscriptionsDialog.SubscriptionsListBox.Count > 0) {
+                manageSubscriptionsDialog.SubscriptionsListBox[0].Select();
+                manageSubscriptionsDialog.ClickRemove();
+                WaitForDialogToReplace(manageSubscriptionsDialog.Element);
+                VisualStudioApp.CheckMessageBox(TestUtilities.UI.MessageBoxButton.Yes);
+            }
+
+            using (var importSubscriptionDialog = manageSubscriptionsDialog.ClickImport()) {
+                importSubscriptionDialog.FileName = publishSettingsFilePath;
+                importSubscriptionDialog.ClickImport();
+            }
         }
 
         public List<IVsTaskItem> WaitForErrorListItems(int expectedCount) {

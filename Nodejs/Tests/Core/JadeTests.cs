@@ -143,6 +143,11 @@ namespace NodejsTests {
             Tokenize("022.jade");
         }
 
+        [TestMethod, Priority(0)]
+        public void JadeTokenizerTest_File23() {
+            Tokenize("023.jade");
+        }
+
         private void Tokenize(string fileName) {
             string path = TestData.GetPath(Path.Combine("TestData", "Jade", fileName));
             TokenizeFile<JadeToken, JadeTokenType>(path, new JadeTokenizer(null), _regenerateBaselineFiles);

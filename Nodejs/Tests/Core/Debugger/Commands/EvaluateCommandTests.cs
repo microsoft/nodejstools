@@ -22,7 +22,7 @@ using Moq;
 namespace NodejsTests.Debugger.Commands {
     [TestClass]
     public class EvaluateCommandTests {
-        [TestMethod, Priority(0)]
+        [TestMethod, Priority(0), TestCategory("Debugging")]
         public void CreateEvaluateCommand() {
             // Arrange
             const int commandId = 3;
@@ -41,7 +41,7 @@ namespace NodejsTests.Debugger.Commands {
                 evaluateCommand.ToString());
         }
 
-        [TestMethod, Priority(0)]
+        [TestMethod, Priority(0), TestCategory("Debugging")]
         public void CreateEvaluateCommandWithVariableId() {
             // Arrange
             const int commandId = 3;
@@ -60,7 +60,7 @@ namespace NodejsTests.Debugger.Commands {
                 evaluateCommand.ToString());
         }
 
-        [TestMethod, Priority(0)]
+        [TestMethod, Priority(0), TestCategory("Debugging")]
         public void ProcessEvaluateResponse() {
             // Arrange
             const int commandId = 3;
@@ -80,7 +80,7 @@ namespace NodejsTests.Debugger.Commands {
             resultFactoryMock.Verify(factory => factory.Create(It.IsAny<INodeVariable>()), Times.Once);
         }
 
-        [TestMethod, Priority(0)]
+        [TestMethod, Priority(0), TestCategory("Debugging")]
         public void ProcessEvaluateResponseWithReferenceError() {
             // Arrange
             const int commandId = 3;
