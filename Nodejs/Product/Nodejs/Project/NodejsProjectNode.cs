@@ -211,7 +211,7 @@ namespace Microsoft.NodejsTools.Project {
                 && !fileName.EndsWith(".d.ts",StringComparison.OrdinalIgnoreCase)) {
                 return new NodejsTypeScriptFileNode(this, item);
             }
-            if (Path.GetFileName(fileName).Equals("package.json", StringComparison.OrdinalIgnoreCase)) {
+            if (Path.GetFileName(fileName).Equals(NodejsConstants.PackageJsonFile, StringComparison.OrdinalIgnoreCase)) {
                 return new PackageJsonFileNode(this, item);
             }
 

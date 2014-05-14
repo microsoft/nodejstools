@@ -25,6 +25,7 @@ using Microsoft.VisualStudioTools.Project;
 
 namespace Microsoft.NodejsTools.Project {
     class PackageJsonFileNode : CommonNonCodeFileNode {
+
         private FileSystemWatcher _watcher;
 
         public PackageJsonFileNode(NodejsProjectNode root, ProjectElement e)
