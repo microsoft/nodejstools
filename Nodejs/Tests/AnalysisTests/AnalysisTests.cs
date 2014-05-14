@@ -1092,6 +1092,16 @@ var abc = new f().abc;
             );
         }
 
+        /// <summary>
+        /// https://nodejstools.codeplex.com/workitem/974
+        /// </summary>
+        [TestMethod]
+        public void TestInvalidGrouping() {
+            // shouldn't crash
+            var code = @"var x = ();
+";
+            var analysis = ProcessText(code);
+        }
 
         public static ModuleAnalysis ProcessText(string text) {
             var sourceUnit = GetSourceUnit(text);

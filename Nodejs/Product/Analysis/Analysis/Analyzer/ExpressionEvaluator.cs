@@ -155,6 +155,10 @@ namespace Microsoft.NodejsTools.Analysis.Analyzer {
 
         private static IAnalysisSet EvaluateGroupingOperator(ExpressionEvaluator ee, Node node) {
             var n = (GroupingOperator)node;
+            if (n.Operand == null) {
+                // can happen with invalid code such as var x = ()
+                return AnalysisSet.Empty;
+            }
             return ee.Evaluate(n.Operand);
         }
 

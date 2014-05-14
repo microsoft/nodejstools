@@ -36,6 +36,7 @@ namespace Microsoft.NodejsTools.Project {
 #endif
             if (!IsNonMemberItem || root.IncludeNodejsFile(this)) {
                 root.Analyzer.AnalyzeFile(Url);
+                root._requireCompletionCache.Clear();
             }
         }
 
