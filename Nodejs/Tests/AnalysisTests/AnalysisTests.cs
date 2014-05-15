@@ -2,7 +2,9 @@
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using System.Text;
 using System.Threading;
+using System.Web.Script.Serialization;
 using Microsoft.NodejsTools.Analysis;
 using Microsoft.NodejsTools.Parsing;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
@@ -1093,6 +1095,33 @@ var abc = new f().abc;
         }
 
         /// <summary>
+        /// Assigning to __proto__ should result in apparent update
+        /// to the internal [[Prototype]] property.
+        /// </summary>
+        [TestMethod]
+        public void TestDunderProto() {
+            // shouldn't crash
+            var code = @"
+function f() { }
+function g() { }
+g.prototype.abc = 42
+f.prototype.__proto__ = g.prototype
+var x = new f().abc;
+";
+            var analysis = ProcessText(code);
+
+            AssertUtil.ContainsExactly(
+                analysis.GetTypeIdsByIndex("x", code.Length),
+                BuiltinTypeId.Number
+            );
+
+            AssertUtil.ContainsAtLeast(
+                analysis.GetMembersByIndex("new f()", code.Length).Select(x => x.Name),
+                "abc"
+            );
+        }
+
+        /// <summary>
         /// https://nodejstools.codeplex.com/workitem/974
         /// </summary>
         [TestMethod]
@@ -1102,6 +1131,81 @@ var abc = new f().abc;
 ";
             var analysis = ProcessText(code);
         }
+
+        [TestMethod]
+        public void UncalledPrototypeMethod() {
+            var code = @"
+function Class() {
+	this.abc = 42;
+}
+
+Class.prototype.foo = function(fn) {
+	var x = this.abc;
+}
+";
+            var analysis = ProcessText(code);
+
+            AssertUtil.ContainsExactly(
+                analysis.GetTypeIdsByIndex("x", code.IndexOf("var x")),
+                BuiltinTypeId.Number
+            );
+        }
+
+        [TestMethod]
+        public void TestEventEmitter() {
+            var code = @"
+var events = require('events')
+ee = new events.EventEmitter();
+function f(args) {
+    // here
+}
+ee.on('myevent', f)
+ee.emit('myevent', 42)
+";
+            var analysis = ProcessText(code);
+            AssertUtil.ContainsExactly(
+                analysis.GetTypeIdsByIndex("args", code.IndexOf("// here")),
+                BuiltinTypeId.Number
+            );
+        }
+
+#if FALSE
+        [TestMethod]
+        public void AnalyzeExpress() {
+            File.WriteAllText("C:\\Source\\Express\\express.txt", DumpAnalysis("C:\\Source\\Express"));
+        }
+
+        public string DumpAnalysis(string directory) {
+            List<AnalysisFile> files = new List<AnalysisFile>();
+            foreach (var file in Directory.GetFiles(directory, "*", SearchOption.AllDirectories)) {
+                if (String.Equals(Path.GetExtension(file), ".js", StringComparison.OrdinalIgnoreCase)) {
+                    files.Add(new AnalysisFile(file, File.ReadAllText(file)));
+                } else if (String.Equals(Path.GetFileName(file), "package.json", StringComparison.OrdinalIgnoreCase)) {
+                    JavaScriptSerializer serializer = new JavaScriptSerializer();
+                    Dictionary<string, object> json;
+                    try {
+                        json = serializer.Deserialize<Dictionary<string, object>>(File.ReadAllText(file));
+                    } catch {
+                        continue;
+                    }
+
+                    object mainFile;
+                    if (json.TryGetValue("main", out mainFile) && mainFile is string) {
+                        files.Add(AnalysisFile.PackageJson(file, (string)mainFile));
+                    }
+                }
+            }
+
+            var entries = Analysis.Analyze(files.ToArray()).ToArray();
+            Array.Sort(entries, (x, y) => String.Compare(x.Key, y.Key));
+            StringBuilder analysis = new StringBuilder();
+            foreach (var entry in entries) {
+                analysis.AppendLine(entry.Value.Analysis.Dump());
+            }
+
+            return analysis.ToString();
+        }
+#endif
 
         public static ModuleAnalysis ProcessText(string text) {
             var sourceUnit = GetSourceUnit(text);

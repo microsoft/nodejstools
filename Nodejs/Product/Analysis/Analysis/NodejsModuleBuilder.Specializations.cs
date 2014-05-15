@@ -21,11 +21,22 @@ using Microsoft.NodejsTools.Parsing;
 
 namespace Microsoft.NodejsTools.Analysis {
     partial class NodejsModuleBuilder {
-        private static Dictionary<string, Dictionary<string, CallDelegate>> _specializations = new Dictionary<string, Dictionary<string, CallDelegate>>() { 
+        private static Dictionary<string, Dictionary<string, CallDelegate>> _moduleSpecializations = new Dictionary<string, Dictionary<string, CallDelegate>>() { 
             { 
                 "util", 
                 new Dictionary<string, CallDelegate>() {
                     { "inherits", UtilInherits }
+                }
+            }
+        };
+
+        private static Dictionary<string, Dictionary<string, CallDelegate>> _classSpecializations = new Dictionary<string, Dictionary<string, CallDelegate>>() { 
+            { 
+                "events.EventEmitter", 
+                new Dictionary<string, CallDelegate>() {
+                    { "addListener", EventEmitterAddListener },
+                    { "on", EventEmitterAddListener },
+                    { "emit", EventEmitterEmit }
                 }
             }
         };
@@ -44,5 +55,89 @@ namespace Microsoft.NodejsTools.Analysis {
             return AnalysisSet.Empty;
         }
 
+        class EventListenerKey {
+            public readonly string EventName;
+
+            public EventListenerKey(string eventName) {
+                EventName = eventName;
+            }
+
+            public override int GetHashCode() {
+                return EventName.GetHashCode();
+            }
+
+            public override bool Equals(object obj) {
+                EventListenerKey key = obj as EventListenerKey;
+                if (key == null) {
+                    return false;
+                }
+
+                return EventName == key.EventName;
+            }
+        }
+
+        /// <summary>
+        /// this.addListener(name, handler)
+        /// 
+        /// returns the event listener
+        /// </summary>
+        private static IAnalysisSet EventEmitterAddListener(FunctionValue func, Node node, AnalysisUnit unit, IAnalysisSet @this, IAnalysisSet[] args) {
+            if (args.Length >= 2 && args[1].Count > 0) {
+                foreach (var thisArg in @this) {
+                    ExpandoValue expando = @thisArg as ExpandoValue;
+                    if (expando != null) {
+                        foreach (var arg in args[0]) {
+                            var strValue = arg.GetConstantValueAsString();
+                            if (strValue != null) {
+                                var md = expando.EnsureMetadata();
+                                var key = new EventListenerKey(strValue);
+                                object value;
+                                VariableDef events;
+                                if (!md.TryGetValue(key, out value)) {
+                                    md[key] = value = events = new VariableDef();
+                                } else {
+                                    events = (VariableDef)value;
+                                }
+
+                                events.AddTypes(unit, args[1]);
+                            }
+                        }
+                    }
+                }
+            }
+            return @this;
+        }
+
+        /// <summary>
+        /// eventListener.emit(eventName, args...)
+        /// 
+        /// Returns bool indicating if event was raised.
+        /// </summary>
+        private static IAnalysisSet EventEmitterEmit(FunctionValue func, Node node, AnalysisUnit unit, IAnalysisSet @this, IAnalysisSet[] args) {
+            if (args.Length >= 1) {
+                foreach (var thisArg in @this) {
+                    ExpandoValue expando = @thisArg as ExpandoValue;
+                    if (expando != null) {
+                        foreach (var arg in args[0]) {
+                            var strValue = arg.GetConstantValueAsString();
+                            if (strValue != null) {
+                                var md = expando.Metadata;
+                                if (md != null) {
+                                    object value;
+                                    if(md.TryGetValue(new EventListenerKey(strValue), out value)) {
+                                        VariableDef events = (VariableDef)value;
+                                        foreach (var type in events.TypesNoCopy) {
+                                            type.Call(node, unit, @this, args.Skip(1).ToArray());
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+            
+            return func.ProjectState._trueInst;
+        }
     }
 }

@@ -227,6 +227,22 @@ namespace Microsoft.NodejsTools.Analysis {
         }
 #endif
 
+#if DEBUG
+        public string Dump() {
+            StringBuilder res = new StringBuilder();
+            var curScope = _scope;
+            DumpScope(res, curScope);
+            return res.ToString();
+        }
+
+        private static void DumpScope(StringBuilder output, EnvironmentRecord curScope, int level = 0) {
+            curScope.DumpScope(output, level);
+            foreach (var child in curScope.Children) {
+                DumpScope(output, child, level + 1);
+            }
+        }
+#endif
+
         /// <summary>
         /// Evaluates a given expression and returns a list of members which exist in the expression.
         /// 

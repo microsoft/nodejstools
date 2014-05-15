@@ -28,6 +28,7 @@ namespace Microsoft.NodejsTools.Analysis.Values {
         private readonly int _declVersion;
         internal readonly DependentKeyValue _keysAndValues;
         private Dictionary<string, PropertyDescriptor> _descriptors;
+        private Dictionary<object, object> _metadata;
         private AnalysisValue _next;
 //        private VariableDef _keysVariable, _valuesVariable, _keyValueTupleVariable;
 
@@ -47,6 +48,19 @@ namespace Microsoft.NodejsTools.Analysis.Values {
             get {
                 return _projectEntry;
             }
+        }
+
+        public Dictionary<object, object> Metadata {
+            get {
+                return _metadata;
+            }
+        }
+
+        public Dictionary<object, object> EnsureMetadata() {
+            if (_metadata == null) {
+                _metadata = new Dictionary<object, object>();
+            }
+            return _metadata;
         }
 
         public override int DeclaringVersion {

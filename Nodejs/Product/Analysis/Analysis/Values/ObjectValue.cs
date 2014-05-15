@@ -40,7 +40,26 @@ namespace Microsoft.NodejsTools.Analysis.Values {
 
         public override Dictionary<string, IAnalysisSet> GetAllMembers() {
             var res = base.GetAllMembers();
-            if (_creator != null) {
+            IAnalysisSet protoTypes;
+            PropertyDescriptor protoDesc;
+            if (Descriptors != null &&
+                Descriptors.TryGetValue("__proto__", out protoDesc) &&
+                protoDesc.Values != null &&
+                (protoTypes = protoDesc.Values.TypesNoCopy).Count > 0) {
+                // someone has assigned to __proto__, so that's our [[Prototype]]
+                // property now.
+                if (Push()) {
+                    try {
+                        foreach (var value in protoTypes) {
+                            foreach (var kvp in value.GetAllMembers()) {
+                                MergeTypes(res, kvp.Key, kvp.Value);
+                            }
+                        }
+                    } finally {
+                        Pop();
+                    }
+                }
+            } else if (_creator != null) {
                 PropertyDescriptor prototype;
                 if (_creator.Descriptors.TryGetValue("prototype", out prototype) &&
                     prototype.Values != null) {
@@ -49,6 +68,10 @@ namespace Microsoft.NodejsTools.Analysis.Values {
                             MergeTypes(res, kvp.Key, kvp.Value);
                         }
                     }
+                }
+            } else if (this != ProjectState._objectPrototype) {
+                foreach(var kvp in ProjectState._objectPrototype.GetAllMembers()) {
+                    MergeTypes(res, kvp.Key, kvp.Value);
                 }
             }
             return res;
@@ -66,16 +89,28 @@ namespace Microsoft.NodejsTools.Analysis.Values {
                 // it up when we construct the object.  This allows prototype to have
                 // its value assigned after we analyze the construction and we'll
                 // still pick up the members.  The final outcome is we are getting the 
-                // [[Prototype]] internal property here.
-                if (_creator != null) {
-                    if (name != "prototype") {
-                        var prototype = _creator.Get(node, unit, "prototype");
-                        if (Push()) {
-                            try {
-                                res = res.Union(prototype.Get(node, unit, name));
-                            } finally {
-                                Pop();
-                            }
+                // [[Prototype]] internal property here.     
+                IAnalysisSet protoTypes;
+                PropertyDescriptor protoDesc;
+                if (Descriptors.TryGetValue("__proto__", out protoDesc) && 
+                    protoDesc.Values != null && 
+                    (protoTypes = protoDesc.Values.TypesNoCopy).Count > 0) {
+                    // someone has assigned to __proto__, so that's our [[Prototype]]
+                    // property now.
+                    if (Push()) {
+                        try {
+                            res = res.Union(protoTypes.Get(node, unit, name));
+                        } finally {
+                            Pop();
+                        }
+                    }
+                } else if (_creator != null) {
+                    var prototype = _creator.Get(node, unit, "prototype");
+                    if (Push()) {
+                        try {
+                            res = res.Union(prototype.Get(node, unit, name));
+                        } finally {
+                            Pop();
                         }
                     }
                 } else if (this != ProjectState._objectPrototype) {

@@ -16,6 +16,7 @@ using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
+using System.Text;
 using Microsoft.NodejsTools.Analysis.Values;
 using Microsoft.NodejsTools.Parsing;
 
@@ -195,5 +196,24 @@ namespace Microsoft.NodejsTools.Analysis.Analyzer {
         public abstract AnalysisValue AnalysisValue {
             get;
         }
+#if DEBUG
+        internal virtual void DumpScope(StringBuilder output, int level) {
+            Indent(level);
+            output.AppendLine(String.Format(" --- {0}", Name));
+            foreach (var variable in Variables) {
+                var types = variable.Value.Types;
+                var distinctTypes = variable.Value.Types.Select(x => x.ShortDescription).Distinct().ToArray();
+                Indent(level); output.AppendLine(String.Format(" {0} contains {1} types, distinct types {2}", variable.Key, types.Count, distinctTypes.Length));
+
+                foreach (var type in distinctTypes) {
+                    Indent(level + 1); output.AppendLine(type);
+                }
+            }
+        }
+
+        private static void Indent(int level) {
+            Console.Write(new string(' ', level * 4));
+        }
+#endif
     }
 }

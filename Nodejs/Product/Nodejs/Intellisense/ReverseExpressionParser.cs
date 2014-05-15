@@ -245,8 +245,14 @@ namespace Microsoft.NodejsTools.Intellisense {
                         nestingChanged = true;
                         lastTokenWasCommaOrOperator = true;
                         lastTokenWasKeywordArgAssignment = false;
-                    } else if ((token.ClassificationType == Classifier.Provider.Keyword && text != "this" && text != "get" && text != "set" && text != "delete") ||
+                    } else if ((token.ClassificationType == Classifier.Provider.Keyword && 
+                                text != "this" && text != "get" && text != "set" && text != "delete") ||
                                token.ClassificationType == Classifier.Provider.Operator) {
+                        if (forCompletion && text == "new") {
+                            start = token.Span;
+                            break;
+                        }
+
                         lastTokenWasKeywordArgAssignment = false;
 
                         if (token.ClassificationType == Classifier.Provider.Keyword && text == "lambda") {
@@ -302,15 +308,6 @@ namespace Microsoft.NodejsTools.Intellisense {
                             } else if (start == null || (nestingChanged && nesting != 0)) {
                                 return null;
                             } else {
-                                break;
-                            }
-                        } else if (token.ClassificationType == Classifier.Provider.Keyword && (text == "if" || text == "else")) {
-                            // if and else can be used in an expression context or a statement context
-                            if (currentParamAtLastColon != -1) {
-                                start = startAtLastToken;
-                                if (start == null) {
-                                    return null;
-                                }
                                 break;
                             }
                         }
