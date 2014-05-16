@@ -14,6 +14,7 @@
 
 
 using Microsoft.NodejsTools.Analysis.Analyzer;
+
 namespace Microsoft.NodejsTools.Analysis.Values {
     class PrototypeValue : ObjectValue {
         private readonly InstanceValue _instance;
@@ -22,6 +23,12 @@ namespace Microsoft.NodejsTools.Analysis.Values {
             : base(projectEntry, description: description) {
             _instance = instance;
             projectEntry.Analyzer.AnalysisValueCreated(typeof(PrototypeValue));
+        }
+
+        public override string Name {
+            get {
+                return _instance._creator.Name;
+            }
         }
 
         public override void SetMember(Parsing.Node node, AnalysisUnit unit, string name, IAnalysisSet value) {

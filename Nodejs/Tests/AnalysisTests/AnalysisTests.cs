@@ -1094,6 +1094,32 @@ var abc = new f().abc;
             );
         }
 
+        [TestMethod]
+        public void TestUtilInherits2() {
+            var code = @"util = require('util');
+
+function f() {
+}
+function g() {
+}
+
+util.inherits(f, g);
+var super_ = f.super_;
+f.prototype.abc = 'abc';
+var abc = new g().abc;
+";
+            var analysis = ProcessText(code);
+
+            AssertUtil.ContainsExactly(
+                analysis.GetTypeIdsByIndex("super_", code.Length),
+                BuiltinTypeId.Function
+            );
+
+            AssertUtil.ContainsExactly(
+                analysis.GetTypeIdsByIndex("abc", code.Length)
+            );
+        }
+
         /// <summary>
         /// Assigning to __proto__ should result in apparent update
         /// to the internal [[Prototype]] property.

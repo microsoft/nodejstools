@@ -12,6 +12,7 @@
  *
  * ***************************************************************************/
 
+using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using Microsoft.NodejsTools.Analysis.Analyzer;
@@ -50,13 +51,21 @@ namespace Microsoft.NodejsTools.Analysis.Values {
             }
         }
 
-        public Dictionary<object, object> Metadata {
-            get {
-                return _metadata;
+        public bool TryGetMetadata<T>(object key, out T metadata) {
+            object res;
+            if (_metadata != null && _metadata.TryGetValue(key, out res)) {
+                metadata = (T)res;
+                return true;
             }
+            metadata = default(T);
+            return false;
         }
 
-        public Dictionary<object, object> EnsureMetadata() {
+        public void SetMetadata<T>(object key, T value) {
+            EnsureMetadata()[key] = value;
+        }
+
+        private Dictionary<object, object> EnsureMetadata() {
             if (_metadata == null) {
                 _metadata = new Dictionary<object, object>();
             }
@@ -69,7 +78,7 @@ namespace Microsoft.NodejsTools.Analysis.Values {
             }
         }
 
-        public override IAnalysisSet Get(Node node, AnalysisUnit unit, string name) {
+        public override IAnalysisSet Get(Node node, AnalysisUnit unit, string name, bool addRef = true) {
             if (_descriptors == null) {
                 _descriptors = new Dictionary<string, PropertyDescriptor>();
             }
@@ -82,7 +91,9 @@ namespace Microsoft.NodejsTools.Analysis.Values {
             }
 
             desc.Values.AddDependency(unit);
-            desc.Values.AddReference(node, unit);
+            if (addRef) {
+                desc.Values.AddReference(node, unit);
+            }
 
             var res = desc.Values.Types;
 
@@ -92,7 +103,7 @@ namespace Microsoft.NodejsTools.Analysis.Values {
 
             if (_next != null && _next.Push()) {
                 try {
-                    res = res.Union(_next.Get(node, unit, name));
+                    res = res.Union(_next.Get(node, unit, name, addRef));
                 } finally {
                     _next.Pop();
                 }
@@ -114,7 +125,6 @@ namespace Microsoft.NodejsTools.Analysis.Values {
             }
 
             VariableDef varRef = GetValuesDef(name);
-
             varRef.AddAssignment(node, unit);
             varRef.MakeUnionStrongerIfMoreThan(ProjectState.Limits.InstanceMembers, value);
             varRef.AddTypes(unit, value);
@@ -390,7 +400,7 @@ namespace Microsoft.NodejsTools.Analysis.Values {
                 _values = new List<AnalysisValue>() { one, two };
             }
 
-            public override IAnalysisSet Get(Node node, AnalysisUnit unit, string name) {
+            public override IAnalysisSet Get(Node node, AnalysisUnit unit, string name, bool addRef = true) {
                 var res = AnalysisSet.Empty;
                 foreach (var value in _values) {
                     res = res.Union(value.Get(node, unit, name));

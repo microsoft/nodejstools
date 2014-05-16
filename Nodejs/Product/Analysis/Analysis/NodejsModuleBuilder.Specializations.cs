@@ -45,12 +45,21 @@ namespace Microsoft.NodejsTools.Analysis {
             // function inherits(ctor, superCtor)
             // sets ctor.super_ to superCtor
             // sets ctor.prototype = {copy of superCtor.prototype}
-            // We skip the copy here which is cheating but lack of flow control
-            // means even if we did copy we'd continue to need to copy, so it's fine.
             if (args.Length >= 2) {
                 args[0].SetMember(node, unit, "super_", args[1]);
 
-                args[0].SetMember(node, unit, "prototype", args[1].Get(node, unit, "prototype"));
+                IAnalysisSet prototypeValue;
+                InheritsPrototypeValue copied;
+                var prototype = args[1].Get(node, unit, "prototype");
+                if (!unit.DeclaringModuleEnvironment.TryGetNodeValue(node, out prototypeValue)) {
+                    copied = new InheritsPrototypeValue(unit.ProjectEntry, prototype);
+                    unit.DeclaringModuleEnvironment.AddNodeValue(node, copied);
+                } else {
+                    copied = (InheritsPrototypeValue)prototypeValue.First();
+                    copied.AddPrototypes(prototype);
+                }
+
+                args[0].SetMember(node, unit, "prototype", copied);
             }
             return AnalysisSet.Empty;
         }
@@ -89,14 +98,10 @@ namespace Microsoft.NodejsTools.Analysis {
                         foreach (var arg in args[0]) {
                             var strValue = arg.GetConstantValueAsString();
                             if (strValue != null) {
-                                var md = expando.EnsureMetadata();
                                 var key = new EventListenerKey(strValue);
-                                object value;
                                 VariableDef events;
-                                if (!md.TryGetValue(key, out value)) {
-                                    md[key] = value = events = new VariableDef();
-                                } else {
-                                    events = (VariableDef)value;
+                                if (!expando.TryGetMetadata(key, out events)) {
+                                    expando.SetMetadata(key, events = new VariableDef());
                                 }
 
                                 events.AddTypes(unit, args[1]);
@@ -121,14 +126,10 @@ namespace Microsoft.NodejsTools.Analysis {
                         foreach (var arg in args[0]) {
                             var strValue = arg.GetConstantValueAsString();
                             if (strValue != null) {
-                                var md = expando.Metadata;
-                                if (md != null) {
-                                    object value;
-                                    if(md.TryGetValue(new EventListenerKey(strValue), out value)) {
-                                        VariableDef events = (VariableDef)value;
-                                        foreach (var type in events.TypesNoCopy) {
-                                            type.Call(node, unit, @this, args.Skip(1).ToArray());
-                                        }
+                                VariableDef events;
+                                if (expando.TryGetMetadata<VariableDef>(new EventListenerKey(strValue), out events)) {
+                                    foreach (var type in events.TypesNoCopy) {
+                                        type.Call(node, unit, @this, args.Skip(1).ToArray());
                                     }
                                 }
                             }
@@ -136,7 +137,7 @@ namespace Microsoft.NodejsTools.Analysis {
                     }
                 }
             }
-            
+
             return func.ProjectState._trueInst;
         }
     }

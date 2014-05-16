@@ -203,7 +203,7 @@ namespace Microsoft.NodejsTools.Analysis {
         /// <param name="node">The node which is triggering the call, for reference tracking</param>
         /// <param name="unit">The analysis unit performing the analysis</param>
         /// <param name="name">The name of the member.</param>
-        public virtual IAnalysisSet Get(Node node, AnalysisUnit unit, string name) {
+        public virtual IAnalysisSet Get(Node node, AnalysisUnit unit, string name, bool addRef = true) {
             return AnalysisSet.Empty;
         }
 

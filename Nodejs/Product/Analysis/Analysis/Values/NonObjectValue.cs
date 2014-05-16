@@ -29,7 +29,7 @@ namespace Microsoft.NodejsTools.Analysis.Values {
             return Prototype.GetAllMembers();
         }
 
-        public override IAnalysisSet Get(Node node, AnalysisUnit unit, string name) {
+        public override IAnalysisSet Get(Node node, AnalysisUnit unit, string name, bool addRef = true) {
             return Prototype.Get(node, unit, name);
         }
 

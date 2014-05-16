@@ -96,8 +96,8 @@ namespace Microsoft.NodejsTools.Analysis.Values {
             return res;
         }
 
-        public override IAnalysisSet Get(Node node, AnalysisUnit unit, string name) {
-            var res = base.Get(node, unit, name);
+        public override IAnalysisSet Get(Node node, AnalysisUnit unit, string name, bool addRef = true) {
+            var res = base.Get(node, unit, name, addRef);
             // we won't recurse on prototype because we have a prototype
             // value, and it's correct.  Recursing on prototype results in
             // prototypes getting merged and the analysis bloating

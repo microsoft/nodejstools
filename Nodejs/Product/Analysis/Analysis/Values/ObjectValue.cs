@@ -25,7 +25,7 @@ namespace Microsoft.NodejsTools.Analysis.Values {
     /// as the result of a new someFunction call).
     /// </summary>
     internal class ObjectValue : ExpandoValue {
-        protected readonly FunctionValue _creator;
+        internal readonly FunctionValue _creator;
 #if DEBUG
         private readonly string _description;
 #endif
@@ -77,8 +77,8 @@ namespace Microsoft.NodejsTools.Analysis.Values {
             return res;
         }
 
-        public override IAnalysisSet Get(Node node, AnalysisUnit unit, string name) {
-            var res = base.Get(node, unit, name);
+        public override IAnalysisSet Get(Node node, AnalysisUnit unit, string name, bool addRef = true) {
+            var res = base.Get(node, unit, name, addRef);
 
             // we won't recurse on prototype because we either have
             // a prototype value and it's correct, or we don't have
@@ -105,7 +105,7 @@ namespace Microsoft.NodejsTools.Analysis.Values {
                         }
                     }
                 } else if (_creator != null) {
-                    var prototype = _creator.Get(node, unit, "prototype");
+                    var prototype = _creator.Get(node, unit, "prototype", false);
                     if (Push()) {
                         try {
                             res = res.Union(prototype.Get(node, unit, name));
