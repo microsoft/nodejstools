@@ -30,14 +30,18 @@ module.exports.find_tests = find_tests;
 var run_tests = function (testName, testFile, projectFolder) {
   var Mocha = new require(projectFolder + '\\node_modules\\mocha');
   var mocha = new Mocha();
-  mocha.suite.timeout(30000); //TODO: config
+  //default at 2 sec might be too short (TODO: make it configuable)
+  mocha.suite.timeout(30000); 
   if (testName) {
     mocha.grep(testName);
   }
   mocha.addFile(testFile);
-  mocha.run(function (code) {
-    console.log('Done with Code:' + code);
-    process.exit(code);
-  });
+  //Choose 'xunit' rather 'min'. The reason is when under piped/redirect,
+  //mocha produces undisplayable text to stdout and stderr. Using xunit works fine 
+  mocha.reporter('xunit');
+  mocha.run(exitLater);
+}
+function exitLater(code) {
+  process.on('exit', function () { process.exit(code); })
 }
 module.exports.run_tests = run_tests;
