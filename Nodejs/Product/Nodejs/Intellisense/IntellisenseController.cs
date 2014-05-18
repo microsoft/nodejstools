@@ -499,7 +499,14 @@ namespace Microsoft.NodejsTools.Intellisense {
                     if (_activeSession.SelectedCompletionSet.SelectionStatus.IsSelected &&
                         // TODO: Fix me
                         /*NodejsPackage.Instance.AdvancedEditorOptionsPage.CompletionCommittedBy*/"{}[]().,:;+-*/%&|^!~=<>?@#'\"\\".IndexOf(ch) != -1) {
+                        var completion = _activeSession.SelectedCompletionSet.SelectionStatus.Completion;
                         _activeSession.Commit();
+                        if ((completion.InsertionText.EndsWith("'") && ch == '\'') ||
+                            (completion.InsertionText.EndsWith("\"") && ch == '"')) {
+                            // https://nodejstools.codeplex.com/workitem/960
+                            // ' triggers the completion, but we don't want to insert the quote.
+                            return VSConstants.S_OK;
+                        }
                     } else if (!IsIdentifierChar(ch)) {
                         _activeSession.Dismiss();
                     }

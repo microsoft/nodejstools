@@ -2,7 +2,9 @@
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using System.Text;
 using System.Threading;
+using System.Web.Script.Serialization;
 using Microsoft.NodejsTools.Analysis;
 using Microsoft.NodejsTools.Parsing;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
@@ -11,6 +13,30 @@ using TestUtilities;
 namespace AnalysisTests {
     [TestClass]
     public class AnalysisTests {
+        /// <summary>
+        /// https://nodejstools.codeplex.com/workitem/945
+        /// </summary>
+        [TestMethod]
+        public void TestFunctionApply() {
+            string code = @"
+function g() {
+    this.abc = 42;
+}
+
+function f() {
+    g.apply(this);
+}
+
+var x = new f().abc;
+";
+            var analysis = ProcessText(code);
+
+            AssertUtil.ContainsExactly(
+                analysis.GetTypeIdsByIndex("x", code.Length),
+                BuiltinTypeId.Number
+            );
+        }
+
         /// <summary>
         /// https://nodejstools.codeplex.com/workitem/945
         /// </summary>
@@ -606,13 +632,23 @@ var x = abcdefg;
         }
 
         [TestMethod]
-        public void TestForLoop() {
+        public void TestForInLoop() {
             var analysis = ProcessText("for(var x in [1,2,3]) { }");
             AssertUtil.ContainsExactly(
                 analysis.GetTypeIdsByIndex("x", 0),
                 BuiltinTypeId.String
             );
         }
+
+        [TestMethod]
+        public void TestForInLoop2() {
+            var analysis = ProcessText("for(x in [1,2,3]) { }");
+            AssertUtil.ContainsExactly(
+                analysis.GetTypeIdsByIndex("x", 0),
+                BuiltinTypeId.String
+            );
+        }
+
 
         [TestMethod]
         public void TestFunctionCreation() {
@@ -651,6 +687,23 @@ var x = new f().bar;
 ");
             AssertUtil.ContainsExactly(
                 analysis.GetTypeIdsByIndex("x", 0)
+            );
+        }
+
+        [TestMethod]
+        public void TestKeysSpecialization() {
+            var analysis = ProcessText(@"
+function keys(o) {
+  var a = []
+  for (var i in o) if (o.hasOwnProperty(i)) a.push(i)
+  return a
+}        
+
+var x = keys({'abc':42});
+");
+            AssertUtil.ContainsExactly(
+                analysis.GetDescriptionByIndex("x", 0),
+                "Array object \r\n"
             );
         }
 
@@ -1041,6 +1094,118 @@ var abc = new f().abc;
             );
         }
 
+        /// <summary>
+        /// Assigning to __proto__ should result in apparent update
+        /// to the internal [[Prototype]] property.
+        /// </summary>
+        [TestMethod]
+        public void TestDunderProto() {
+            // shouldn't crash
+            var code = @"
+function f() { }
+function g() { }
+g.prototype.abc = 42
+f.prototype.__proto__ = g.prototype
+var x = new f().abc;
+";
+            var analysis = ProcessText(code);
+
+            AssertUtil.ContainsExactly(
+                analysis.GetTypeIdsByIndex("x", code.Length),
+                BuiltinTypeId.Number
+            );
+
+            AssertUtil.ContainsAtLeast(
+                analysis.GetMembersByIndex("new f()", code.Length).Select(x => x.Name),
+                "abc"
+            );
+        }
+
+        /// <summary>
+        /// https://nodejstools.codeplex.com/workitem/974
+        /// </summary>
+        [TestMethod]
+        public void TestInvalidGrouping() {
+            // shouldn't crash
+            var code = @"var x = ();
+";
+            var analysis = ProcessText(code);
+        }
+
+        [TestMethod]
+        public void UncalledPrototypeMethod() {
+            var code = @"
+function Class() {
+	this.abc = 42;
+}
+
+Class.prototype.foo = function(fn) {
+	var x = this.abc;
+}
+";
+            var analysis = ProcessText(code);
+
+            AssertUtil.ContainsExactly(
+                analysis.GetTypeIdsByIndex("x", code.IndexOf("var x")),
+                BuiltinTypeId.Number
+            );
+        }
+
+        [TestMethod]
+        public void TestEventEmitter() {
+            var code = @"
+var events = require('events')
+ee = new events.EventEmitter();
+function f(args) {
+    // here
+}
+ee.on('myevent', f)
+ee.emit('myevent', 42)
+";
+            var analysis = ProcessText(code);
+            AssertUtil.ContainsExactly(
+                analysis.GetTypeIdsByIndex("args", code.IndexOf("// here")),
+                BuiltinTypeId.Number
+            );
+        }
+
+#if FALSE
+        [TestMethod]
+        public void AnalyzeExpress() {
+            File.WriteAllText("C:\\Source\\Express\\express.txt", DumpAnalysis("C:\\Source\\Express"));
+        }
+
+        public string DumpAnalysis(string directory) {
+            List<AnalysisFile> files = new List<AnalysisFile>();
+            foreach (var file in Directory.GetFiles(directory, "*", SearchOption.AllDirectories)) {
+                if (String.Equals(Path.GetExtension(file), ".js", StringComparison.OrdinalIgnoreCase)) {
+                    files.Add(new AnalysisFile(file, File.ReadAllText(file)));
+                } else if (String.Equals(Path.GetFileName(file), "package.json", StringComparison.OrdinalIgnoreCase)) {
+                    JavaScriptSerializer serializer = new JavaScriptSerializer();
+                    Dictionary<string, object> json;
+                    try {
+                        json = serializer.Deserialize<Dictionary<string, object>>(File.ReadAllText(file));
+                    } catch {
+                        continue;
+                    }
+
+                    object mainFile;
+                    if (json.TryGetValue("main", out mainFile) && mainFile is string) {
+                        files.Add(AnalysisFile.PackageJson(file, (string)mainFile));
+                    }
+                }
+            }
+
+            var entries = Analysis.Analyze(files.ToArray()).ToArray();
+            Array.Sort(entries, (x, y) => String.Compare(x.Key, y.Key));
+            StringBuilder analysis = new StringBuilder();
+            foreach (var entry in entries) {
+                analysis.AppendLine(entry.Value.Analysis.Dump());
+            }
+
+            return analysis.ToString();
+        }
+#endif
 
         public static ModuleAnalysis ProcessText(string text) {
             var sourceUnit = GetSourceUnit(text);
@@ -1067,6 +1232,11 @@ var abc = new f().abc;
         public static IEnumerable<BuiltinTypeId> GetTypeIdsByIndex(this ModuleAnalysis analysis, string exprText, int index) {
             return analysis.GetValuesByIndex(exprText, index).Select(m => {
                 return m.TypeId;
+            });
+        }
+        public static IEnumerable<string> GetDescriptionByIndex(this ModuleAnalysis analysis, string exprText, int index) {
+            return analysis.GetValuesByIndex(exprText, index).Select(m => {
+                return m.Description;
             });
         }
     }

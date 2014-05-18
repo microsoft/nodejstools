@@ -86,6 +86,9 @@
 .Parameter skipdebug
     If specified, does not build Debug configurations.
 
+.Parameter dev
+    If specified, generates a build name from the current date.
+
 .Example
     .\BuildRelease.ps1 -release
     
@@ -104,7 +107,9 @@
 
 #>
 [CmdletBinding()]
-param( [string] $outdir, [string] $vsTarget, [string] $name, [switch] $release, [switch] $internal, [switch] $mockrelease, [switch] $scorch, [switch] $skiptests, [switch] $skipclean, [switch] $skipcopy, [switch] $skipdebug)
+param( [string] $outdir, [string] $vsTarget, [string] $name, [switch] $release, [switch] $internal, [switch] $mockrelease, [switch] $scorch, [switch] $skiptests, [switch] $skipclean, [switch] $skipcopy, [switch] $skipdebug,
+    [switch] $dev
+)
 
 # This value is used to determine the most significant digit of the build number.
 $base_year = 2012
@@ -128,6 +133,14 @@ if (-not $outdir) {
         Write-Error -EA:Stop "
     Invalid output directory '$outdir'"
     }
+}
+
+if ($dev) {
+    if ($name) {
+        Write-Error -EA:Stop "
+    Cannot specify both -dev and -name"
+    }
+    $name = "Dev {0:yyyy-MM-dd}" -f (Get-Date)
 }
 
 if ($name -eq "RTM") {

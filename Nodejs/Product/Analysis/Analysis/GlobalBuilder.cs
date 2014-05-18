@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using Microsoft.NodejsTools.Analysis.Analyzer;
 using Microsoft.NodejsTools.Analysis.Values;
 using Microsoft.NodejsTools.Parsing;
 
@@ -667,8 +668,9 @@ All other strings are considered decimal.", isOptional:true)
             var builtinEntry = _analyzer._builtinEntry;
             var prototype = Member("prototype",
                 new ReturningConstructingFunctionValue(builtinEntry, "Empty", _analyzer._undefined, null) {
-                    BuiltinFunction(
+                    SpecializedFunction(
                         "apply",
+                        ApplyFunction,
                         "Calls the function, substituting the specified object for the this value of the function, and the specified array for the arguments of the function.",
                         Parameter("thisArg", "The object to be used as the this object."),
                         Parameter("argArray", "A set of arguments to be passed to the function.")
@@ -695,6 +697,18 @@ The this object of the bound function is associated with the specified object, a
             return new BuiltinFunctionValue(builtinEntry, "Function", createPrototype: false) { 
                 prototype
             };
+        }
+
+        private IAnalysisSet ApplyFunction(FunctionValue func, Node node, AnalysisUnit unit, IAnalysisSet @this, IAnalysisSet[] args) {
+            var res = AnalysisSet.Empty;
+            if (@this != null && args.Length > 0) {                
+                foreach (var value in @this) {
+                    // TODO: We should support flowing through the arguments.  That requires supporting
+                    // arguments as well as unpacking the values in args[1]
+                    res = res.Union(value.Call(node, unit, args[0], ExpressionEvaluator.EmptySets));
+                }
+            }
+            return res;
         }
 
         private ObjectValue MakeJSONObject() {

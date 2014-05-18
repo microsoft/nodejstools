@@ -84,6 +84,8 @@ namespace Microsoft.NodejsTools.Analysis.Values {
                     result.Append("function ");
                     if (FunctionObject.Name != null) {
                         result.Append(FunctionObject.Name);
+                    } else {
+                        result.Append("<anonymous>");
                     }
                     result.Append("(");
                     AddParameterString(result);
@@ -165,54 +167,74 @@ namespace Microsoft.NodejsTools.Analysis.Values {
             }
         }
 
+        public override string OwnerName {
+            get {
+                if (FunctionObject.Name == null) {
+                    return "";
+                }
+
+                return FunctionObject.Name;
+            }
+        }
+
+        class ArgumentsWalker : AstVisitor {
+            public bool UsesArguments;
+
+            public override bool Walk(Lookup node) {
+                if (node.Name == "arguments") {
+                    UsesArguments = true;
+                }
+                return base.Walk(node);
+            }
+
+            public override bool Walk(FunctionObject node) {
+                return false;
+            }
+        }
+
         public override IEnumerable<OverloadResult> Overloads {
             get {
                 var references = new Dictionary<string[], IEnumerable<AnalysisVariable>[]>(new StringArrayComparer());
 
-                var units = new HashSet<AnalysisUnit>();
-                units.Add(AnalysisUnit);
-#if FALSE
-                if (_allCalls != null) {
-                    units.UnionWith(_allCalls.Values);
-                }
-#endif
-
-                foreach (var unit in units) {
-                    var vars = FunctionObject.ParameterDeclarations.Select(p => {
-                        VariableDef param;
-                        if (unit.Environment.TryGetVariable(p.Name, out param)) {
-                            return param;
-                        }
-                        return null;
-                    }).ToArray();
-
-                    var parameters = vars
-                        .Select(p => string.Join(", ", p.TypesNoCopy.Select(av => av.ShortDescription).Where(s => !String.IsNullOrWhiteSpace(s)).OrderBy(s => s).Distinct()))
-                        .ToArray();
-
-                    IEnumerable<AnalysisVariable>[] refs;
-                    if (references.TryGetValue(parameters, out refs)) {
-                        refs = refs.Zip(vars, (r, v) => r.Concat(VariableTransformer.OtherToVariables.ToVariables(v))).ToArray();
-                    } else {
-                        refs = vars.Select(v => VariableTransformer.OtherToVariables.ToVariables(v)).ToArray();
+                var vars = FunctionObject.ParameterDeclarations.Select(p => {
+                    VariableDef param;
+                    if (AnalysisUnit.Environment.TryGetVariable(p.Name, out param)) {
+                        return param;
                     }
-                    references[parameters] = refs;
+                    return null;
+                }).ToArray();
+
+                var parameters = vars
+                    .Select(p => string.Join(", ", p.TypesNoCopy.Select(av => av.ShortDescription).Where(s => !String.IsNullOrWhiteSpace(s)).OrderBy(s => s).Distinct()))
+                    .ToArray();
+
+                IEnumerable<AnalysisVariable>[] refs = vars.Select(v => VariableTransformer.OtherToVariables.ToVariables(v)).ToArray();
+
+                ParameterResult[] parameterResults = FunctionObject.ParameterDeclarations == null ?
+                    new ParameterResult[0] :
+                    FunctionObject.ParameterDeclarations.Select((p, i) => 
+                        new ParameterResult(
+                            MakeParameterName(p), 
+                            string.Empty, 
+                            parameters[i], 
+                            false, 
+                            refs[i]
+                        )
+                    ).ToArray();
+
+                var argsWalker = new ArgumentsWalker();
+                FunctionObject.Body.Walk(argsWalker);
+                if (argsWalker.UsesArguments) {
+                    parameterResults = parameterResults.Concat(
+                        new[] { new ParameterResult("...") }
+                    ).ToArray();
                 }
 
-                foreach (var keyValue in references) {
-                    yield return new SimpleOverloadResult(
-                        FunctionObject.ParameterDeclarations == null ?
-                            new ParameterResult[0] :
-                            FunctionObject.ParameterDeclarations.Select((p, i) => {
-                                var name = MakeParameterName(p);
-                                var type = keyValue.Key[i];
-                                var refs = keyValue.Value[i];
-                                return new ParameterResult(name, string.Empty, type, false, refs);
-                            }).ToArray(),
-                        FunctionObject.Name,
-                        Documentation
-                    );
-                }
+                yield return new SimpleOverloadResult(
+                    parameterResults,
+                    FunctionObject.Name ?? "<anonymous function>",
+                    Documentation
+                );
             }
         }
 

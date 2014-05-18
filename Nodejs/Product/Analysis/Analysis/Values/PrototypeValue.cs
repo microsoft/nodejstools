@@ -13,11 +13,36 @@
  * ***************************************************************************/
 
 
+using Microsoft.NodejsTools.Analysis.Analyzer;
 namespace Microsoft.NodejsTools.Analysis.Values {
     class PrototypeValue : ObjectValue {
-        public PrototypeValue(ProjectEntry projectEntry, FunctionValue creator = null, string description = null)
-            : base(projectEntry, creator, description) {
+        private readonly InstanceValue _instance;
+
+        public PrototypeValue(ProjectEntry projectEntry, InstanceValue instance, string description = null)
+            : base(projectEntry, description: description) {
+            _instance = instance;
             projectEntry.Analyzer.AnalysisValueCreated(typeof(PrototypeValue));
+        }
+
+        public override void SetMember(Parsing.Node node, AnalysisUnit unit, string name, IAnalysisSet value) {
+            foreach (var obj in value) {
+                // function Class() {
+                //     this.abc = 42;
+                // }
+                //   
+                // Class.prototype.foo = function(fn) {
+                //     var x = this.abc;
+                // }
+                // this now includes us.
+
+                UserFunctionValue userFunc = obj as UserFunctionValue;
+                if (userFunc != null) {
+                    var env = (FunctionEnvironmentRecord)(userFunc.AnalysisUnit._env);
+
+                    env._this.AddTypes(unit, _instance.SelfSet);
+                }
+            }
+            base.SetMember(node, unit, name, value);
         }
     }
 }

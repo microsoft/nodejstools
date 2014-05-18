@@ -16,7 +16,71 @@ namespace Microsoft.NodejsTools.Analysis.Analyzer {
             { "merge", MergeSpecialization() },
             { "copy", CopySpecialization() },
             { "create", CreateSpecialization() },
+            { "keys", ObjectKeysSpecialization() }
         };
+
+        /// <summary>
+        /// function (o) {
+        ///   var a = []
+        ///   for (var i in o) if (o.hasOwnProperty(i)) a.push(i)
+        ///   return a
+        /// }        
+        /// </summary>
+        private static FunctionSpecialization ObjectKeysSpecialization() {
+            var oParam = new ExpectedParameter(0);
+            var aVar = new ExpectedVariableDeclaration(ExpectedArrayLiteral.Empty);
+
+            var iVar = new ExpectedVariableDeclaration(null);
+
+
+            return new FunctionSpecialization(
+                ObjectKeysSpecialization,
+                false,
+                aVar,                
+                new ExpectedNode(
+                    typeof(ForIn),
+                    iVar,
+                    oParam,
+                    new ExpectedNode(
+                        typeof(Block),
+                        new ExpectedNode(
+                            typeof(IfNode),
+                            new ExpectedCall(
+                                new ExpectedMember(
+                                    oParam,
+                                    "hasOwnProperty"
+                                ),
+                                iVar.Variable
+                            ),
+                            new ExpectedNode(
+                                typeof(Block),
+                                new ExpectedNode(
+                                    typeof(ExpressionStatement),
+                                    new ExpectedCall(
+                                        new ExpectedMember(
+                                            aVar.Variable,
+                                            "push"
+                                        ),
+                                        iVar.Variable
+                                    )
+                                )
+                            )
+                        )
+                    )
+                ),
+                new ExpectedNode(
+                    typeof(ReturnNode),
+                    aVar.Variable
+                )
+            );
+        }
+
+        private static IAnalysisSet ObjectKeysSpecialization(FunctionValue func, Node node, AnalysisUnit unit, IAnalysisSet @this, IAnalysisSet[] args) {
+            if (args.Length >= 1) {
+                return unit.Analyzer._arrayFunction._instance;
+            }
+            return AnalysisSet.Empty;
+        }
 
 
         /// <summary>
@@ -146,6 +210,7 @@ namespace Microsoft.NodejsTools.Analysis.Analyzer {
             var keyVar = new ExpectedVariableDeclaration();
             return new FunctionSpecialization(
                 MergeSpecialization,
+                false,
                 new ExpectedNode(
                     typeof(IfNode),
                     new ExpectedBinary(
@@ -326,6 +391,23 @@ namespace Microsoft.NodejsTools.Analysis.Analyzer {
 
                 var objLit = (ObjectLiteral)node;
                 if (objLit.Properties.Count > 0) {
+                    return NoMatch;
+                }
+
+                return true;
+            }
+        }
+
+        class ExpectedArrayLiteral : ExpectedChild {
+            public static ExpectedArrayLiteral Empty = new ExpectedArrayLiteral();
+
+            public override bool IsMatch(MatchState state, Node node) {
+                if (node.GetType() != typeof(ArrayLiteral)) {
+                    return NoMatch;
+                }
+
+                var arrLit = (ArrayLiteral)node;
+                if (arrLit.Elements.Count > 0) {
                     return NoMatch;
                 }
 

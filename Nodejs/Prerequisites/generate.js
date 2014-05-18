@@ -26,6 +26,7 @@ var assemblies = [
     'TestAdapterTests',
     'NpmTests',
     'Microsoft.NodejsTools',
+    'Microsoft.NodejsTools.Analysis',
     'Microsoft.NodejsTools.Profiling',
     'Microsoft.NodejsTools.ProjectWizard',
     'Microsoft.NodejsTools.NodeLogConverter',

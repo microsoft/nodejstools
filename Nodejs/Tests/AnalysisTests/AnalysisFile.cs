@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using System.Text;
 using System.Threading;
@@ -14,6 +15,10 @@ namespace AnalysisTests {
             Filename = filename;
             Content = content;
         }
+
+        public static AnalysisFile PackageJson(string path, string mainFile) {
+            return new AnalysisFile(path, mainFile);
+        }
     }
 
     static class Analysis {
@@ -22,20 +27,28 @@ namespace AnalysisTests {
             var analyzer = new JsAnalyzer();
 
             foreach (var file in files) {
-                var projEntry = analyzer.AddModule(file.Filename);
-                entries[file.Filename] = projEntry;
+                if (Path.GetFileName(file.Filename).Equals("package.json", StringComparison.OrdinalIgnoreCase)) {
+                    analyzer.AddPackageJson(file.Filename, file.Content);
+                } else {
+                    var projEntry = analyzer.AddModule(file.Filename);
+                    entries[file.Filename] = projEntry;
+                }
             }
 
             foreach (var file in files) {
-                var source = AnalysisTests.GetSourceUnit(file.Content);
-                AnalysisTests.Prepare(
-                    entries[file.Filename],
-                    source
-                );
+                if (!Path.GetFileName(file.Filename).Equals("package.json", StringComparison.OrdinalIgnoreCase)) {
+                    var source = AnalysisTests.GetSourceUnit(file.Content);
+                    AnalysisTests.Prepare(
+                        entries[file.Filename],
+                        source
+                    );
+                }
             }
 
             foreach (var file in files) {
-                entries[file.Filename].Analyze(CancellationToken.None);
+                if (!Path.GetFileName(file.Filename).Equals("package.json", StringComparison.OrdinalIgnoreCase)) {
+                    entries[file.Filename].Analyze(CancellationToken.None);
+                }
             }
 
             return entries;

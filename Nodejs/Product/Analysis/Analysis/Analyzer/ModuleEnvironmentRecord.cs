@@ -122,6 +122,6 @@ namespace Microsoft.NodejsTools.Analysis.Analyzer {
         }
 
         #endregion
-    
+
     }
 }

@@ -151,12 +151,14 @@ namespace Microsoft.NodejsTools.Analysis {
                 var eval = new ExpressionEvaluator(unit.CopyForEval(), scope);
                 var objects = eval.Evaluate(member.Root);
 
+                var refs = Enumerable.Empty<IAnalysisVariable>();
                 foreach (var v in objects) {
                     var container = v as IReferenceableContainer;
                     if (container != null) {
-                        return ReferencablesToVariables(container.GetDefinitions(member.Name));
+                        refs = refs.Concat(ReferencablesToVariables(container.GetDefinitions(member.Name)));
                     }
                 }
+                return refs;
             }
 
             return Enumerable.Empty<IAnalysisVariable>();
@@ -222,6 +224,22 @@ namespace Microsoft.NodejsTools.Analysis {
                 }
             }
             return false;
+        }
+#endif
+
+#if DEBUG
+        public string Dump() {
+            StringBuilder res = new StringBuilder();
+            var curScope = _scope;
+            DumpScope(res, curScope);
+            return res.ToString();
+        }
+
+        private static void DumpScope(StringBuilder output, EnvironmentRecord curScope, int level = 0) {
+            curScope.DumpScope(output, level);
+            foreach (var child in curScope.Children) {
+                DumpScope(output, child, level + 1);
+            }
         }
 #endif
 
@@ -565,15 +583,19 @@ namespace Microsoft.NodejsTools.Analysis {
                         // This member came from less than the full set of types.
                         var seenNames = new HashSet<string>();
                         var newName = new StringBuilder(name);
-                        newName.Append(" (");
+                        bool appended = false;
                         foreach (var v in owners) {
-                            if (!string.IsNullOrWhiteSpace(v.ShortDescription) && seenNames.Add(v.ShortDescription)) {
+                            if (!string.IsNullOrWhiteSpace(v.OwnerName) && seenNames.Add(v.OwnerName)) {
+                                if (!appended) {
+                                    newName.Append(" (");
+                                    appended = true;
+                                }
                                 // Restrict each displayed type to 25 characters
-                                if (v.ShortDescription.Length > 25) {
-                                    newName.Append(v.ShortDescription.Substring(0, 22));
+                                if (v.OwnerName.Length > 25) {
+                                    newName.Append(v.OwnerName.Substring(0, 22));
                                     newName.Append("...");
                                 } else {
-                                    newName.Append(v.ShortDescription);
+                                    newName.Append(v.OwnerName);
                                 }
                                 newName.Append(", ");
                             }
@@ -587,10 +609,12 @@ namespace Microsoft.NodejsTools.Analysis {
                                 newName.Length -= 1;
                             }
                             newName.Append("...");
-                        } else {
+                        } else if (appended) {
                             newName.Length -= 2;
                         }
-                        newName.Append(")");
+                        if (appended) {
+                            newName.Append(")");
+                        }
                         name = newName.ToString();
                     }
                     yield return new MemberResult(name, completion, kvp.Value, null);

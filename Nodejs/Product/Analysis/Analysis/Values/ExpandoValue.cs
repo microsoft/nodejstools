@@ -28,6 +28,7 @@ namespace Microsoft.NodejsTools.Analysis.Values {
         private readonly int _declVersion;
         internal readonly DependentKeyValue _keysAndValues;
         private Dictionary<string, PropertyDescriptor> _descriptors;
+        private Dictionary<object, object> _metadata;
         private AnalysisValue _next;
 //        private VariableDef _keysVariable, _valuesVariable, _keyValueTupleVariable;
 
@@ -47,6 +48,19 @@ namespace Microsoft.NodejsTools.Analysis.Values {
             get {
                 return _projectEntry;
             }
+        }
+
+        public Dictionary<object, object> Metadata {
+            get {
+                return _metadata;
+            }
+        }
+
+        public Dictionary<object, object> EnsureMetadata() {
+            if (_metadata == null) {
+                _metadata = new Dictionary<object, object>();
+            }
+            return _metadata;
         }
 
         public override int DeclaringVersion {
@@ -110,6 +124,29 @@ namespace Microsoft.NodejsTools.Analysis.Values {
             VariableDef def = GetValuesDef(name);
 
             def.AddReference(node, unit);
+        }
+
+        public override IAnalysisSet GetEnumerationValues(Node node, AnalysisUnit unit) {
+            var res = AnalysisSet.Empty;
+            if (_descriptors != null) {
+                foreach (var kvp in _descriptors) {
+                    var key = kvp.Key;
+                    if (kvp.Value.Values != null) {
+                        var types = kvp.Value.Values.TypesNoCopy;
+                        kvp.Value.Values.ClearOldValues();
+                        if (kvp.Value.Values.VariableStillExists) {
+                            res = res.Add(ProjectState.GetConstant(kvp.Key));
+                        }
+                    }
+
+                    if (kvp.Value.Get != null) {
+                        foreach (var value in kvp.Value.Get.TypesNoCopy) {
+                            res = res.Add(ProjectState.GetConstant(kvp.Key));
+                        }
+                    }
+                }
+            }
+            return res;
         }
 
         private VariableDef GetValuesDef(string name) {

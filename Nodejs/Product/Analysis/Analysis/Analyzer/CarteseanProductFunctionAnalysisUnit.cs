@@ -113,6 +113,12 @@ namespace Microsoft.NodejsTools.Analysis.Analyzer {
         }
 
         internal override void AnalyzeWorker(DDG ddg, CancellationToken cancel) {
+            if (_env.AnalysisValue.DeclaringVersion != ProjectEntry.AnalysisVersion) {
+                // we were enqueued and a new version became available, don't re-analyze against
+                // the old version.
+                return;
+            }
+
             var args = _callArgs;
             var funcScope = (FunctionEnvironmentRecord)Environment;
             var function = Function;

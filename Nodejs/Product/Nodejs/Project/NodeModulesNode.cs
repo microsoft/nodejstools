@@ -153,7 +153,7 @@ namespace Microsoft.NodejsTools.Project {
         private INpmController CreateNpmController() {
             if (null == _npmController) {
                 _npmController = NpmControllerFactory.Create(
-                    _projectNode.BuildProject.DirectoryPath,
+                    _projectNode.ProjectHome,
                     false,
                     new NpmPathProvider(this));
                 _npmController.CommandStarted += NpmController_CommandStarted;
@@ -279,7 +279,7 @@ namespace Microsoft.NodejsTools.Project {
             UIThread.InvokeAsync(() => ForceUpdateStatusBarWithNpmActivity(activity))
                 .HandleAllExceptions(SR.ProductName)
                 .DoNotWait();
-            }
+        }
 
         private void UpdateStatusBarWithNpmActivity(string activity) {
             lock (_commandCountLock) {
@@ -380,7 +380,7 @@ namespace Microsoft.NodejsTools.Project {
 
         private void Watcher_Modified(object sender, FileSystemEventArgs e) {
             string path = e.FullPath;
-            if (!path.EndsWith("package.json") && !path.Contains("\\node_modules")) {
+            if (!path.EndsWith(NodejsConstants.PackageJsonFile, StringComparison.OrdinalIgnoreCase) && path.IndexOf("\\node_modules", StringComparison.OrdinalIgnoreCase) == -1) {
                 return;
             }
 
@@ -446,7 +446,7 @@ namespace Microsoft.NodejsTools.Project {
                 }
 
                 var global = controller.GlobalPackages;
-                if (null != global){
+                if (null != global) {
                     _globalModulesNode.GlobalPackages = global;
                     ReloadHierarchy(_globalModulesNode, global.Modules);
                 }
@@ -570,11 +570,11 @@ namespace Microsoft.NodejsTools.Project {
             if (NpmController.RootPackage == null) {
                 NpmController.Refresh();
                 if (NpmController.RootPackage == null) {
-                    MessageBox.Show("Unable to parse package.json from your project.  Please fix any errors and try again.");
+                    MessageBox.Show(String.Format("Unable to parse {0} from your project.  Please fix any errors and try again.", NodejsConstants.PackageJsonFile));
                     return;
                 }
             }
-            
+
             using (var executeVm = new NpmOutputControlViewModel(NpmController))
             using (var manager = new NpmPackageInstallWindow(NpmController, executeVm)) {
                 manager.Owner = System.Windows.Application.Current.MainWindow;
@@ -644,12 +644,12 @@ namespace Microsoft.NodejsTools.Project {
                             package.Name,
                             null == dep ? "*" : dep.VersionRangeText);
                     } else {
-                    await commander.InstallPackageByVersionAsync(
-                        package.Name,
-                        null == dep ? "*" : dep.VersionRangeText,
-                        DependencyType.Standard,
-                        false);
-                }
+                        await commander.InstallPackageByVersionAsync(
+                            package.Name,
+                            null == dep ? "*" : dep.VersionRangeText,
+                            DependencyType.Standard,
+                            false);
+                    }
                 }
             } catch (NpmNotFoundException nnfe) {
                 ErrorHelper.ReportNpmNotInstalled(null, nnfe);

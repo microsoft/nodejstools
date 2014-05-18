@@ -15,6 +15,7 @@
 using System;
 using System.Collections.Generic;
 using System.IO;
+using System.Linq;
 using System.Text;
 using System.Web.Script.Serialization;
 using System.Xml;
@@ -67,7 +68,7 @@ namespace Microsoft.NodejsTools.Analysis {
                 var moduleName = FixModuleName((string)module["name"]);
                 var exports = exportsTable[moduleName];
                 Dictionary<string, CallDelegate> specialMethods;
-                _specializations.TryGetValue(moduleName, out specialMethods);
+                _moduleSpecializations.TryGetValue(moduleName, out specialMethods);
 
                 if (module.ContainsKey("methods")) {
                     foreach (var method in module["methods"]) {
@@ -126,9 +127,11 @@ namespace Microsoft.NodejsTools.Analysis {
         }
 
         private void GenerateClass(ObjectValue exports, dynamic klass) {
+            string className = (string)klass["name"];
+
             BuiltinFunctionValue klassValue = new BuiltinFunctionValue(
                 _analyzer._builtinEntry,
-                FixClassName((string)klass["name"]),
+                FixClassName(className),
                 ParseDocumentation((string)klass["desc"]),
                 true
                 // TODO: Signature?
@@ -137,6 +140,18 @@ namespace Microsoft.NodejsTools.Analysis {
             exports.Add(klassValue);
 
             if (klass.ContainsKey("methods")) {
+                var prototype = (PrototypeValue)klassValue.Descriptors["prototype"].Values.Types.First();
+                Dictionary<string, CallDelegate> classSpecializations;
+                _classSpecializations.TryGetValue(className, out classSpecializations);
+                foreach (var method in klass["methods"]) {
+                    GenerateMethod(
+                        prototype,
+                        classSpecializations,
+                        method
+                    );
+                }
+            }
+            if (klass.ContainsKey("classMethods")) {
                 foreach (var method in klass["methods"]) {
                     GenerateMethod(
                         klassValue,

@@ -93,6 +93,19 @@ namespace Microsoft.NodejsTools.Analysis {
         }
 
         /// <summary>
+        /// Performs a get index operation propagating any index types into the
+        /// value and returns the associated types associated with the object.
+        /// </summary>
+        public static IAnalysisSet GetEnumerationValues(this IAnalysisSet self, Node node, AnalysisUnit unit) {
+            var res = AnalysisSet.Empty;
+            foreach (var ns in self) {
+                res = res.Union(ns.GetEnumerationValues(node, unit));
+            }
+
+            return res;
+        }
+
+        /// <summary>
         /// Performs a set index operation propagating the index types and value
         /// types into the provided object.
         /// </summary>

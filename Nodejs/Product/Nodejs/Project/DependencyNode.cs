@@ -42,7 +42,7 @@ namespace Microsoft.NodejsTools.Project {
                 buff.Append(package.Version);
 
                 if (!package.IsListedInParentPackageJson) {
-                    buff.Append(" (not listed in package.json)");
+                    buff.AppendFormat(" (not listed in {0})", NodejsConstants.PackageJsonFile);
                 } else if (package.IsDevDependency) {
                     buff.Append(" (dev)");
                 } else if (package.IsOptionalDependency) {

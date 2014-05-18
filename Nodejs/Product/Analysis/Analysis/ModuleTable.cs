@@ -144,17 +144,18 @@ namespace Microsoft.NodejsTools.Analysis {
                     continue;
                 }
 
-                ModuleTree nextTree = curTree.GetChild(comp, unit);
+                var nextTree = curTree.GetChild(comp + ".js", unit);
                 if (nextTree.Children.Count > 0 || nextTree.Module != null) {
                     curTree = nextTree;
                     continue;
                 }
 
-                nextTree = curTree.GetChild(comp + ".js", unit);
+                nextTree = curTree.GetChild(comp, unit);
                 if (nextTree.Children.Count > 0 || nextTree.Module != null) {
                     curTree = nextTree;
                     continue;
                 }
+
                 return null;
             }
 

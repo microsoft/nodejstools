@@ -4,6 +4,7 @@ Windows Registry Editor Version 5.00
 [HKEY_LOCAL_MACHINE\SOFTWARE\Microsoft\StrongName\Verification\DebuggerUITests,B03F5F7F11D50A3A]
 [HKEY_LOCAL_MACHINE\SOFTWARE\Microsoft\StrongName\Verification\Microsoft.NodejsTools,B03F5F7F11D50A3A]
 [HKEY_LOCAL_MACHINE\SOFTWARE\Microsoft\StrongName\Verification\Microsoft.NodejsTools.AjaxMin,B03F5F7F11D50A3A]
+[HKEY_LOCAL_MACHINE\SOFTWARE\Microsoft\StrongName\Verification\Microsoft.NodejsTools.Analysis,B03F5F7F11D50A3A]
 [HKEY_LOCAL_MACHINE\SOFTWARE\Microsoft\StrongName\Verification\Microsoft.NodejsTools.InteractiveWindow,B03F5F7F11D50A3A]
 [HKEY_LOCAL_MACHINE\SOFTWARE\Microsoft\StrongName\Verification\Microsoft.NodejsTools.NodeLogConverter,B03F5F7F11D50A3A]
 [HKEY_LOCAL_MACHINE\SOFTWARE\Microsoft\StrongName\Verification\Microsoft.NodejsTools.Npm,B03F5F7F11D50A3A]
