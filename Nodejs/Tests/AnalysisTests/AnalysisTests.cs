@@ -222,6 +222,40 @@ xyz = new Y();";
         }
 
         [TestMethod]
+        public void Failing_TestThis() {
+            var code = @"function SimpleTest(x, y) {
+    this._name = 'SimpleTest';
+    this._number = 1;
+    this._y = y;
+}
+
+SimpleTest.prototype.performRequest = function (webResource, outputData, options, callback) {
+  this._performRequest(webResource, { outputData: outputData }, options, callback);
+};
+
+SimpleTest.prototype._performRequest = function (webResource, body, options, callback, chunkedCallback) {
+  var self = this;
+  // here
+};";
+
+            var analysis = ProcessText(code);
+            AssertUtil.ContainsAtLeast(
+                analysis.GetTypeIdsByIndex("self", code.IndexOf("// here")),
+                BuiltinTypeId.Function
+            );
+            AssertUtil.ContainsExactly(
+                analysis.GetTypeIdsByIndex("self._name", code.IndexOf("// here")),
+                BuiltinTypeId.String
+            );
+            AssertUtil.ContainsExactly(
+                analysis.GetTypeIdsByIndex("self._number", code.IndexOf("// here")),
+                BuiltinTypeId.Number
+            );
+
+        }
+
+
+        [TestMethod]
         public void TestDefinitiveAssignmentScoping() {
             string code = @"
 var x = {abc:42};
