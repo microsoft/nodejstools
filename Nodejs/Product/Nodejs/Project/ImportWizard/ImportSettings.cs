@@ -15,6 +15,7 @@
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
+using System.Diagnostics;
 using System.IO;
 using System.Linq;
 using System.Text;
@@ -220,6 +221,21 @@ namespace Microsoft.NodejsTools.Project.ImportWizard {
             });
         }
 
+        private static bool ShouldIncludeDirectory(string dirName) {
+            // Why relative paths only?
+            // Consider the following absolute path:
+            //   c:\sources\.dotted\myselectedfolder\routes\
+            // Where the folder selected in the wizard is:
+            //   c:\sources\.dotted\myselectedfolder\
+            // We don't want to exclude that folder from the project, despite a part
+            // of that path having a dot prefix.
+            // By evaluating relative paths only:
+            //   routes\
+            // We won't reject the folder.
+            Debug.Assert(!Path.IsPathRooted(dirName));
+            return !dirName.Split(new char[] { '/', '\\' }).Any(name => name.StartsWith("."));
+        }
+
         internal static void WriteProjectXml(
             XmlWriter writer,
             string projectPath,
@@ -292,6 +308,7 @@ namespace Microsoft.NodejsTools.Project.ImportWizard {
                             CommonUtils.GetRelativeDirectoryPath(sourcePath, dirName)
                         )
                     )
+                    .Where(ShouldIncludeDirectory)
             );
             if (excludeNodeModules) {
                 folders.Remove("node_modules");
@@ -381,7 +398,10 @@ namespace Microsoft.NodejsTools.Project.ImportWizard {
             var directories = new List<string>() { source };
 
             try {
-                directories.AddRange(Directory.EnumerateDirectories(source, "*", SearchOption.AllDirectories));
+                directories.AddRange(
+                    Directory.EnumerateDirectories(source, "*", SearchOption.AllDirectories)
+                    .Where(dirName => ShouldIncludeDirectory(CommonUtils.TrimEndSeparator(CommonUtils.GetRelativeDirectoryPath(source, dirName))))
+                );
             } catch (UnauthorizedAccessException) {
             }
 

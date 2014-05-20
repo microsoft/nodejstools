@@ -184,8 +184,7 @@ namespace NodejsTests {
 
             AssertUtil.ContainsExactly(proj.Descendants(proj.GetName("Compile")).Select(x => x.Attribute("Include").Value),
                 "server.js",
-                "node_modules\\mymod.js",
-                "node_modules\\.bin\\myapp.js");
+                "node_modules\\mymod.js");
         }
 
         [TestMethod, Priority(0)]
@@ -207,6 +206,30 @@ namespace NodejsTests {
                 "server.js");
         }
 
+        [TestMethod, Priority(0)]
+        public void ImportWizardExcludeDotPrefixedFolders() {
+            var settings = new ImportSettings();
+
+            settings.SourcePath = TestData.GetPath("TestData\\HelloWorld5\\");
+            settings.Filters = "*.js;*.njsproj";
+            settings.StartupFile = "server.js";
+            settings.ExcludeNodeModules = true;
+            settings.ProjectPath = TestData.GetPath("TestData\\TestDestination\\Subdirectory\\ProjectName.njsproj");
+
+            var path = settings.CreateRequestedProject();
+
+            Assert.AreEqual(settings.ProjectPath, path);
+            var proj = XDocument.Load(path);
+
+            AssertUtil.ContainsExactly(proj.Descendants(proj.GetName("Compile")).Select(x => x.Attribute("Include").Value),
+                "server.js",
+                "TestFolder\\SubItem.js",
+                "TestFolderWith.Extension\\SubItem.js");
+
+            AssertUtil.ContainsExactly(proj.Descendants(proj.GetName("Folder")).Select(x => x.Attribute("Include").Value),
+                "TestFolder",
+                "TestFolderWith.Extension");
+        }
 
         [TestMethod, Priority(0)]
         public void ImportWizardEmptyFolders() {
