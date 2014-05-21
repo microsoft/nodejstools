@@ -35,7 +35,6 @@ namespace Microsoft.NodejsTools.Options {
         }
 
         public bool FormatOnEnter { get; set; }
-
         public bool FormatOnSemiColon { get; set; }
         public bool FormatOnCloseBrace { get; set; }
         public bool FormatOnPaste { get; set; }
@@ -50,13 +49,22 @@ namespace Microsoft.NodejsTools.Options {
         }
 
         private const string FormatOnEnterSetting = "FormatOnEnter";
+        private const string FormatOnSemiColonSetting = "FormatOnSemiColon";
+        private const string FormatOnCloseBraceSetting = "FormatOnCloseBrace";
+        private const string FormatOnPasteSetting = "FormatOnPaste";
 
         public override void LoadSettingsFromStorage(){
             FormatOnEnter = LoadBool(FormatOnEnterSetting) ?? true;
+            FormatOnSemiColon = LoadBool(FormatOnSemiColonSetting) ?? true;
+            FormatOnCloseBrace = LoadBool(FormatOnCloseBraceSetting) ?? true;
+            FormatOnPaste = LoadBool(FormatOnPasteSetting) ?? true;
         }
 
         public override void SaveSettingsToStorage() {
             SaveBool(FormatOnEnterSetting, FormatOnEnter);
+            SaveBool(FormatOnSemiColonSetting, FormatOnSemiColon);
+            SaveBool(FormatOnCloseBraceSetting, FormatOnCloseBrace);
+            SaveBool(FormatOnPasteSetting, FormatOnPaste);
         }
     }
 }
