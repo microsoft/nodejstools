@@ -75,7 +75,7 @@ namespace Microsoft.NodejsTools.TestAdapter {
                             }
                             TestFrameworks.TestFramework testFramework = GetTestFrameworkObject(value);
                             if (testFramework == null) {
-                                logger.SendMessage(TestMessageLevel.Warning, String.Format("Ignore unsupported test framework {0}", value));
+                                logger.SendMessage(TestMessageLevel.Warning, String.Format("Ignoring unsupported test framework {0}", value));
                                 continue;
                             }
 

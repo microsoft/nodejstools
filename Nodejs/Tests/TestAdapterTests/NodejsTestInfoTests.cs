@@ -9,8 +9,8 @@ namespace TestAdapterTests {
         [TestMethod, Priority(0)]
         public void ConstructFullyQualifiedName_ValidInput() {
             //Arrange
-            string testFile = "c:\\dummy.js";
-            string testFileNameNoExt = "dummy";
+            string testFile = "c:\\dummyWhatever.js";
+            string testFileNameNoExt = "dummyWhatever";
             string testName = "myMochaTest";
             string testFramework = "mocha";
 

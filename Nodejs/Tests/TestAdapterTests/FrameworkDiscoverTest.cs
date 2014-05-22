@@ -38,7 +38,7 @@ namespace TestAdapterTests {
             Assert.IsNull(nonSenseOne);
         }
 
-        [TestMethod]
+        [TestMethod, Priority(0)]
         public void DefaultFramework_HasCorrectFolderInformation() {
             //Arrange
             string testName = "dummyUT";
