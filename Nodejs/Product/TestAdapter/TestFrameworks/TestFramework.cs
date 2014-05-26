@@ -69,14 +69,16 @@ namespace Microsoft.NodejsTools.TestAdapter.TestFrameworks {
             return testCases;
         }
 
-        public string[] ArgumentsToRunTests(string testName, string testFile, string workingDirectory) {
+        public string[] ArgumentsToRunTests(string testName, string testFile, string workingDirectory, string projectRootDir) {
             workingDirectory = workingDirectory.TrimEnd(new char['\\']);
+            projectRootDir = projectRootDir.TrimEnd(new char['\\']);
             return new string[] {
                 WrapWithQuot(_runTestsScriptFile),
                 Name,
                 WrapWithQuot(testName),
                 WrapWithQuot(testFile),
-                WrapWithQuot(workingDirectory)
+                WrapWithQuot(workingDirectory),
+                WrapWithQuot(projectRootDir)
             };
         }
 

@@ -27,7 +27,7 @@ var find_tests = function (testFile, discoverResultFile, projectFolder) {
 }
 module.exports.find_tests = find_tests;
 
-var run_tests = function (testName, testFile, projectFolder) {
+var run_tests = function (testName, testFile, workingFolder, projectFolder) {
   var Mocha = new require(projectFolder + '\\node_modules\\mocha');
   var mocha = new Mocha();
   //default at 2 sec might be too short (TODO: make it configuable)

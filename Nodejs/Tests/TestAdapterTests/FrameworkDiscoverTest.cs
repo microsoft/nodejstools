@@ -51,7 +51,7 @@ namespace TestAdapterTests {
 
             //Act
             TestFramework defaultOne = discover.Get(TestFrameworkDirectories.DefaultFramework);
-            string[] args = defaultOne.ArgumentsToRunTests(testName, testFile, workingFolder);
+            string[] args = defaultOne.ArgumentsToRunTests(testName, testFile, workingFolder, workingFolder);
 
             //Assert
             Assert.AreEqual("\"" + vsixInstallFolder + "\\run_tests.js" + "\"", args[0]);
