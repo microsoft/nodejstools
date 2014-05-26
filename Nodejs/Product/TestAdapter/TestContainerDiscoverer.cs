@@ -355,6 +355,11 @@ namespace Microsoft.NodejsTools.TestAdapter {
                 return false;
             }
 
+            //updating test framework cause item metedata change in the project file 
+            if (pathToItem.EndsWith(".njsproj", StringComparison.OrdinalIgnoreCase)) {
+                return true;
+            }
+
             if (IsTestFile(pathToItem)) {
                 if (EqtTrace.IsVerboseEnabled) {
                     EqtTrace.Verbose("TestContainerDiscoverer: Found a test {0}.", pathToItem);
