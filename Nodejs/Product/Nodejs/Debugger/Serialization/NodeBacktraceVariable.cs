@@ -12,6 +12,7 @@
  *
  * ***************************************************************************/
 
+using System;
 using Microsoft.VisualStudioTools.Project;
 using Newtonsoft.Json.Linq;
 
@@ -29,7 +30,11 @@ namespace Microsoft.NodejsTools.Debugger.Serialization {
             TypeName = (string)value["type"];
             Value = (string)value["value"];
             Class = (string)value["className"];
-            Text = (string)value["text"];
+            try {
+                Text = (string)value["text"];
+            } catch (ArgumentException) {
+                Text = "";
+            }
             Attributes = NodePropertyAttributes.None;
             Type = NodePropertyType.Normal;
         }

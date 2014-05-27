@@ -25,12 +25,13 @@ namespace Microsoft.NodejsTools.Debugger.Commands {
         private readonly Dictionary<int, NodeEvaluationResult> _parents;
         private readonly IEvaluationResultFactory _resultFactory;
 
-        public LookupCommand(int id, IEvaluationResultFactory resultFactory, List<NodeEvaluationResult> parents)
-            : this(id, resultFactory, parents.Select(p => p.Handle).ToArray()) {
+        public LookupCommand(int id, IEvaluationResultFactory resultFactory, IEnumerable<NodeEvaluationResult> parents)
+            : this(id, resultFactory, EnsureUniqueHandles(ref parents).Select(p => p.Handle).ToArray()) {
             _parents = parents.ToDictionary(p => p.Handle);
         }
 
-        public LookupCommand(int id, IEvaluationResultFactory resultFactory, int[] handles) : base(id, "lookup") {
+        public LookupCommand(int id, IEvaluationResultFactory resultFactory, int[] handles)
+            : base(id, "lookup") {
             _resultFactory = resultFactory;
             _handles = handles;
 
@@ -38,6 +39,22 @@ namespace Microsoft.NodejsTools.Debugger.Commands {
                 { "handles", handles },
                 { "includeSource", false }
             };
+        }
+
+        private class HandleEqualityComparer : EqualityComparer<NodeEvaluationResult> {
+            public static readonly HandleEqualityComparer Instance = new HandleEqualityComparer();
+
+            public override bool Equals(NodeEvaluationResult x, NodeEvaluationResult y) {
+                return x.Handle == y.Handle;
+            }
+
+            public override int GetHashCode(NodeEvaluationResult obj) {
+                return obj.Handle.GetHashCode();
+            }
+        }
+
+        private static IEnumerable<NodeEvaluationResult> EnsureUniqueHandles(ref IEnumerable<NodeEvaluationResult> parents) {
+            return parents = parents.Distinct(HandleEqualityComparer.Instance);
         }
 
         protected override IDictionary<string, object> Arguments {
