@@ -431,7 +431,7 @@ namespace Microsoft.NodejsTools.Intellisense {
         }
 
         private void Refresh() {
-            Debug.Assert(UIThread.InvokeRequired, "Refresh must not be called from the UI thread");
+            UIThread.MustNotBeCalledFromUIThread("Refresh must not be called from the UI thread");
             RefreshAsync().WaitAndHandleAllExceptions(SR.ProductName, GetType());
         }
 

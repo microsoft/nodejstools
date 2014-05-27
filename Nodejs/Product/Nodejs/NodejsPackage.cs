@@ -24,6 +24,7 @@ using System.Threading;
 using System.Web.Script.Serialization;
 using System.Windows.Forms;
 using Microsoft.NodejsTools.Commands;
+using Microsoft.NodejsTools.Debugger.DataTips;
 using Microsoft.NodejsTools.Debugger.DebugEngine;
 using Microsoft.NodejsTools.Debugger.Remote;
 using Microsoft.NodejsTools.Intellisense;
@@ -171,18 +172,23 @@ namespace Microsoft.NodejsTools {
             }
             RegisterCommands(commands, Guids.NodejsCmdSet);
 
-
             IVsTextManager textMgr = (IVsTextManager)Instance.GetService(typeof(SVsTextManager));
+
             var langPrefs = new LANGPREFERENCES[1];
             langPrefs[0].guidLang = typeof(NodejsLanguageInfo).GUID;
             ErrorHandler.ThrowOnFailure(textMgr.GetUserPreferences(null, null, langPrefs, null));
             _langPrefs = new LanguagePreferences(langPrefs[0]);
 
-            Guid guid = typeof(IVsTextManagerEvents2).GUID;
-            IConnectionPoint connectionPoint;
-            ((IConnectionPointContainer)textMgr).FindConnectionPoint(ref guid, out connectionPoint);
+            var textManagerEvents2Guid = typeof(IVsTextManagerEvents2).GUID;
+            IConnectionPoint textManagerEvents2ConnectionPoint;
+            ((IConnectionPointContainer)textMgr).FindConnectionPoint(ref textManagerEvents2Guid, out textManagerEvents2ConnectionPoint);
             uint cookie;
-            connectionPoint.Advise(_langPrefs, out cookie);
+            textManagerEvents2ConnectionPoint.Advise(_langPrefs, out cookie);
+
+            var textManagerEventsGuid = typeof(IVsTextManagerEvents).GUID;
+            IConnectionPoint textManagerEventsConnectionPoint;
+            ((IConnectionPointContainer)textMgr).FindConnectionPoint(ref textManagerEventsGuid, out textManagerEventsConnectionPoint);
+            textManagerEventsConnectionPoint.Advise(new DataTipTextManagerEvents(this), out cookie);
 
             MakeDebuggerContextAvailable();
         }

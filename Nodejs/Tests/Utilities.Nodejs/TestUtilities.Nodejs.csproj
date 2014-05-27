@@ -99,11 +99,16 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="NodejsTestData.cs" />
+    <Compile Include="MockClassificationTypeRegistryService.cs" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\..\..\Common\Tests\Utilities\TestUtilities.csproj">
       <Project>{d092d54e-ff29-4d32-9aee-4ef704c92f67}</Project>
       <Name>TestUtilities</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\..\Product\Nodejs\Nodejs.csproj">
+      <Project>{32ec5259-98da-40ca-9e2d-1b1b2e966f88}</Project>
+      <Name>Nodejs</Name>
     </ProjectReference>
   </ItemGroup>
   <Import Project="..\TestProjectAfter.settings" />
