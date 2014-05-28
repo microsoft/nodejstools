@@ -31,7 +31,6 @@ namespace Microsoft.NodejsTools.Parsing
         }
 
         public bool UseStrict { get; private set; }
-        public bool IsRedundant { get; set; }
 
         public override void Walk(AstVisitor visitor) {
             if (visitor.Walk(this)) {

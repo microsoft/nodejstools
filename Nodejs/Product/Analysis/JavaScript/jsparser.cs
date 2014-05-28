@@ -45,8 +45,6 @@ namespace Microsoft.NodejsTools.Parsing
         private NoSkipTokenSet m_noSkipTokenSet;
         private long m_goodTokensProcessed;
 
-        private bool m_newModule;
-
         // we're going to copy the debug lookups from the settings passed to us,
         // then use this collection, because we might programmatically add more
         // as we process the code, and we don't want to change the settings object.
@@ -65,6 +63,7 @@ namespace Microsoft.NodejsTools.Parsing
         private int m_severity;
         private JSToken _curToken;
         private IndexSpan _curSpan;
+        private GlobalScope _globalScope;
 
         /// <summary>
         /// Creates an instance of the JSParser class that can be used to parse the given source code.
@@ -99,20 +98,6 @@ namespace Microsoft.NodejsTools.Parsing
             }
         }
 
-        public CodeSettings Settings
-        {
-            get
-            {
-                // if it's null....
-                if (m_settings == null)
-                {
-                    // just use the default settings
-                    m_settings = new CodeSettings();
-                }
-                return m_settings;
-            }
-        }
-
         /// <summary>
         /// Parse the source code using the given settings, getting back an abstract syntax tree Block node as the root
         /// representing the list of statements in the source code.
@@ -130,6 +115,7 @@ namespace Microsoft.NodejsTools.Parsing
                 m_scanner.IndexResolver
             );
             var globalScope = new GlobalScope(ast, m_errorSink);
+            _globalScope = globalScope;
             // make sure we initialize the global scope's strict mode to our flag, whether or not it
             // is true. This means if the setting is false, we will RESET the flag to false if we are 
             // reusing the scope and a previous Parse call had code that set it to strict with a 
@@ -138,9 +124,6 @@ namespace Microsoft.NodejsTools.Parsing
 
             // make sure the global scope knows about our known global names
             globalScope.SetAssumedGlobals(m_settings);
-
-            // start of a new module
-            m_newModule = true;
 
             Block scriptBlock;
             Block returnBlock;
@@ -254,23 +237,19 @@ namespace Microsoft.NodejsTools.Parsing
                                     {
                                         // use a directive prologue node instead
                                         var exprStmt = new ExpressionStatement(constantWrapper.Span);
-                                        exprStmt.Expression = 
-                                            new DirectivePrologue(constantWrapper.Value.ToString(), ast.Span);
+                                        var directive = new DirectivePrologue(constantWrapper.Value.ToString(), ast.Span);
+                                        exprStmt.Expression = directive;
+                                        if (directive.UseStrict) {
+                                            _globalScope.UseStrict = true;
+                                        }
                                         ast = exprStmt;
                                     }
                                 }
-                                else if (!m_newModule)
+                                else
                                 {
                                     // nope -- no longer finding directive prologues
                                     possibleDirectivePrologue = false;
                                 }
-                            }
-                            else if (m_newModule)
-                            {
-                                // we aren't looking for directive prologues anymore, but we did scan
-                                // into a new module after that last AST, so reset the flag because that
-                                // new module might have directive prologues for next time
-                                possibleDirectivePrologue = true;
                             }
                         }
                         catch (RecoveryTokenException exc)
@@ -278,7 +257,7 @@ namespace Microsoft.NodejsTools.Parsing
                             if (TokenInList(NoSkipTokenSet.s_TopLevelNoSkipTokenSet, exc)
                                 || TokenInList(NoSkipTokenSet.s_StartStatementNoSkipTokenSet, exc))
                             {
-                                ast = (Statement)exc._partiallyComputedNode;
+                                ast = exc.PartiallyComputedStatement;
                                 GetNextToken();
                             }
                             else
@@ -327,7 +306,7 @@ namespace Microsoft.NodejsTools.Parsing
             {
                 // a scanner exception implies that the end of file has been reached with an error.
                 // Mark the end of file as the error location
-                EOFError(se.Error);
+                throw EOFError(se.Error);
             }
 
             program.UpdateWith(CurrentPositionSpan());
@@ -374,13 +353,11 @@ namespace Microsoft.NodejsTools.Parsing
             Statement statement = null;
 
             String id = null;
-            var isNewModule = m_newModule;
 
             switch (_curToken)
             {
                 case JSToken.EndOfFile:
-                    EOFError(JSError.ErrorEndOfFile);
-                    throw new EndOfFileException(); // abort parsing, get back to the main parse routine
+                    throw EOFError(JSError.ErrorEndOfFile);
                 case JSToken.Semicolon:
                     // make an empty statement
                     statement = new EmptyStatement(_curSpan);
@@ -394,9 +371,13 @@ namespace Microsoft.NodejsTools.Parsing
                     return ParseBlock();
                 case JSToken.Debugger:
                     return ParseDebuggerStatement();
+                case JSToken.Let:
+                    if (JSScanner.IsKeyword("let", _globalScope.UseStrict)) {
+                        return ParseVariableStatement();
+                    }
+                    goto default;
                 case JSToken.Var:
                 case JSToken.Const:
-                case JSToken.Let:
                     return ParseVariableStatement();
                 case JSToken.If:
                     return ParseIfStatement();
@@ -419,21 +400,14 @@ namespace Microsoft.NodejsTools.Parsing
                     else
                         return statement;
                 case JSToken.Return:
-                    statement = ParseReturnStatement();
-                    if (null == statement)
-                        return new Block(CurrentPositionSpan());
-                    else
-                        return statement;
+                    return ParseReturnStatement();
                 case JSToken.With:
                     return ParseWithStatement();
                 case JSToken.Switch:
                     return ParseSwitchStatement();
                 case JSToken.Throw:
                     statement = ParseThrowStatement();
-                    if (statement == null)
-                        return new Block(CurrentPositionSpan());
-                    else
-                        break;
+                    break;
                 case JSToken.Try:
                     return ParseTryStatement();
                 case JSToken.Function:
@@ -460,7 +434,7 @@ namespace Microsoft.NodejsTools.Parsing
                             if (m_labelTable.ContainsKey(id))
                             {
                                 // there is already a label with that name. Ignore the current label
-                                ReportError(JSError.BadLabel, statement.Span, true);
+                                ReportError(JSError.BadLabel, expr.Span, true);
                                 id = null;
                                 GetNextToken(); // skip over ':'
                                 return new Block(CurrentPositionSpan());
@@ -499,22 +473,6 @@ namespace Microsoft.NodejsTools.Parsing
                         Debug.Assert(statement == null, "losing statement");
                         expr = ParseExpression(expr, false, bAssign, JSToken.None);
 
-                        // if we just started a new module and this statement happens to be an expression statement...
-                        if (isNewModule)
-                        {
-                            // see if it's a constant wrapper
-                            var constantWrapper = expr as ConstantWrapper;
-                            if (constantWrapper != null && constantWrapper.Value is string)
-                            {
-                                // we found a string constant expression statement right after the start of a new
-                                // module. Let's make it a DirectivePrologue if it isn't already
-                                if (!(expr is DirectivePrologue))
-                                {
-                                    expr = new DirectivePrologue(constantWrapper.Value.ToString(), constantWrapper.Span);
-                                }
-                            }
-                        }
-
                         var binaryOp = expr as BinaryOperator;
                         if (binaryOp != null
                             && (binaryOp.OperatorToken == JSToken.Equal || binaryOp.OperatorToken == JSToken.StrictEqual))
@@ -552,8 +510,9 @@ namespace Microsoft.NodejsTools.Parsing
                     }
                     catch (RecoveryTokenException exc)
                     {
-                        if (exc._partiallyComputedNode != null)
-                            statement = (Statement)exc._partiallyComputedNode;
+                        if (exc._partiallyComputedNode != null) {
+                            statement = exc.PartiallyComputedStatement;
+                        }
 
                         if (statement == null)
                         {
@@ -609,7 +568,7 @@ namespace Microsoft.NodejsTools.Parsing
                         catch (RecoveryTokenException exc)
                         {
                             if (exc._partiallyComputedNode != null)
-                                codeBlock.Append((Statement)exc._partiallyComputedNode);
+                                codeBlock.Append(exc.PartiallyComputedStatement);
                             if (IndexOfToken(NoSkipTokenSet.s_StartStatementNoSkipTokenSet, exc) == -1)
                                 throw;
                         }
@@ -1009,7 +968,7 @@ namespace Microsoft.NodejsTools.Parsing
                 {
                     // make up a block for the if part
                     if (exc._partiallyComputedNode != null)
-                        trueBranch = (Statement)exc._partiallyComputedNode;
+                        trueBranch = exc.PartiallyComputedStatement;
                     else
                         trueBranch = new Block(CurrentPositionSpan());
                     if (IndexOfToken(NoSkipTokenSet.s_IfBodyNoSkipTokenSet, exc) == -1)
@@ -1057,7 +1016,7 @@ namespace Microsoft.NodejsTools.Parsing
                     {
                         // make up a block for the else part
                         if (exc._partiallyComputedNode != null)
-                            falseBranch = (Statement)exc._partiallyComputedNode;
+                            falseBranch = exc.PartiallyComputedStatement;
                         else
                             falseBranch = new Block(CurrentPositionSpan());
                         exc._partiallyComputedNode = new IfNode(ifSpan)
@@ -1163,7 +1122,7 @@ namespace Microsoft.NodejsTools.Parsing
                         if (isForIn)
                         {
                             if (JSToken.In == _curToken
-                                || (_curToken == JSToken.Identifier && string.CompareOrdinal(GetCode(_curSpan), "of") == 0))
+                                /*|| (_curToken == JSToken.Identifier && string.CompareOrdinal(GetCode(_curSpan), "of") == 0)*/)
                             {
                                 GetNextToken();
                                 condOrColl = ParseExpression();
@@ -1181,7 +1140,7 @@ namespace Microsoft.NodejsTools.Parsing
                             bool isLHS;
                             var unary = ParseUnaryExpression(out isLHS, false);
                             if (isLHS && (JSToken.In == _curToken
-                                || (_curToken == JSToken.Identifier && string.CompareOrdinal(GetCode(_curSpan), "of") == 0)))
+                                /*|| (_curToken == JSToken.Identifier && string.CompareOrdinal(GetCode(_curSpan), "of") == 0)*/))
                             {
                                 isForIn = true;
 
@@ -1264,7 +1223,7 @@ namespace Microsoft.NodejsTools.Parsing
                         if (exc._partiallyComputedNode == null)
                             body = new Block(CurrentPositionSpan());
                         else
-                            body = (Statement)exc._partiallyComputedNode;
+                            body = exc.PartiallyComputedStatement;
                         exc._partiallyComputedNode = new ForIn(forSpan)
                             {
                                 Variable = (lhs != null ? lhs : initializer),
@@ -1391,7 +1350,7 @@ namespace Microsoft.NodejsTools.Parsing
                         if (exc._partiallyComputedNode == null) {
                             body = new Block(CurrentPositionSpan());
                         } else {
-                            body = (Statement)exc._partiallyComputedNode;
+                            body = exc.PartiallyComputedStatement;
                         }
                         exc._partiallyComputedNode = new ForNode(forSpan)
                             {
@@ -1450,7 +1409,7 @@ namespace Microsoft.NodejsTools.Parsing
                 {
                     // make up a block for the do while
                     if (exc._partiallyComputedNode != null)
-                        body = (Statement)exc._partiallyComputedNode;
+                        body = exc.PartiallyComputedStatement;
                     else
                         body = new Block(CurrentPositionSpan());
                     if (IndexOfToken(NoSkipTokenSet.s_DoWhileBodyNoSkipTokenSet, exc) == -1)
@@ -1639,7 +1598,7 @@ namespace Microsoft.NodejsTools.Parsing
                 catch (RecoveryTokenException exc)
                 {
                     if (exc._partiallyComputedNode != null)
-                        body = (Statement)exc._partiallyComputedNode;
+                        body = exc.PartiallyComputedStatement;
                     else
                         body = new Block(CurrentPositionSpan());
 
@@ -1704,8 +1663,7 @@ namespace Microsoft.NodejsTools.Parsing
                     continueNode.NestLevel = labelInfo.NestLevel;
 
                     blocks = labelInfo.BlockIndex;
-                    if (m_blockType[blocks] != BlockType.Loop)
-                    {
+                    if (blocks >= m_blockType.Count || m_blockType[blocks] != BlockType.Loop) {
                         ReportError(JSError.BadContinue, continueNode.Span, true);
                     }
                 }
@@ -1986,15 +1944,7 @@ namespace Microsoft.NodejsTools.Parsing
                 try
                 {
                     // parse a Statement, not a SourceElement
-                    Statement statement = ParseStatement();
-
-                    // but make sure we save it as a block
-                    block = statement as Block;
-                    if (block == null)
-                    {
-                        block = new Block(statement.Span);
-                        block.Append(statement);
-                    }
+                    block = EnsureBlock(ParseStatement());
                 }
                 catch (RecoveryTokenException exc)
                 {
@@ -2004,12 +1954,7 @@ namespace Microsoft.NodejsTools.Parsing
                     }
                     else
                     {
-                        block = exc._partiallyComputedNode as Block;
-                        if (block == null)
-                        {
-                            block = new Block(exc._partiallyComputedNode.Span);
-                            block.Append((Statement)exc._partiallyComputedNode);
-                        }
+                        block = EnsureBlock(exc.PartiallyComputedStatement);
                     }
                     exc._partiallyComputedNode = new WithNode(withSpan)
                         {
@@ -2029,6 +1974,16 @@ namespace Microsoft.NodejsTools.Parsing
                     WithObject = (Expression)obj,
                     Body = block
                 };
+        }
+
+        private static Block EnsureBlock(Statement statement) {
+            // make sure we save it as a block
+            var block = statement as Block;
+            if (block == null) {
+                block = new Block(statement.Span);
+                block.Append(statement);
+            }
+            return block;
         }
 
         //---------------------------------------------------------------------------------------
@@ -2214,7 +2169,7 @@ namespace Microsoft.NodejsTools.Parsing
                                     {
                                         if (exc._partiallyComputedNode != null)
                                         {
-                                            statements.Append((Statement)exc._partiallyComputedNode);
+                                            statements.Append(exc.PartiallyComputedStatement);
                                             exc._partiallyComputedNode = null;
                                         }
 
@@ -2399,12 +2354,7 @@ namespace Microsoft.NodejsTools.Parsing
                     }
                     else
                     {
-                        body = exc._partiallyComputedNode as Block;
-                        if (body == null)
-                        {
-                            body = new Block(exc._partiallyComputedNode.Span);
-                            body.Append((Statement)exc._partiallyComputedNode);
-                        }
+                        body = EnsureBlock(exc.PartiallyComputedStatement);
                     }
                 }
                 finally
@@ -2436,6 +2386,9 @@ namespace Microsoft.NodejsTools.Parsing
                             else
                             {
                                 ReportError(JSError.NoIdentifier);
+                                catchParameter = new ParameterDeclaration(_curSpan) {
+                                    Name = GetCode(_curSpan)
+                                };
                             }
                         }
                         else
@@ -2454,22 +2407,6 @@ namespace Microsoft.NodejsTools.Parsing
                                 ReportError(JSError.NoRightParenthesis);
                             }
                             GetNextToken();
-                        }
-                        catch (RecoveryTokenException exc)
-                        {
-                            if (IndexOfToken(NoSkipTokenSet.s_BlockConditionNoSkipTokenSet, exc) == -1)
-                            {
-                                exc._partiallyComputedNode = null;
-                                // rethrow
-                                throw;
-                            }
-                            else
-                            {
-                                if (_curToken == JSToken.RightParenthesis)
-                                {
-                                    GetNextToken();
-                                }
-                            }
                         }
                         finally
                         {
@@ -2494,12 +2431,7 @@ namespace Microsoft.NodejsTools.Parsing
                         }
                         else
                         {
-                            handler = exc._partiallyComputedNode as Block;
-                            if (handler == null)
-                            {
-                                handler = new Block(exc._partiallyComputedNode.Span);
-                                handler.Append((Statement)exc._partiallyComputedNode);
-                            }
+                            handler = EnsureBlock(exc.PartiallyComputedStatement);
                         }
                         if (IndexOfToken(NoSkipTokenSet.s_NoTrySkipTokenSet, exc) == -1)
                         {
@@ -2670,7 +2602,9 @@ namespace Microsoft.NodejsTools.Parsing
                         && _curToken != JSToken.Semicolon
                         && _curToken != JSToken.EndOfFile)
                     {
-                        name.Span = name.Span.UpdateWith(_curSpan);
+                        if (name != null) {
+                            name.Span = name.Span.UpdateWith(_curSpan);
+                        }
                         GetNextToken();
                         expandedIndentifier = true;
                     }
@@ -2680,8 +2614,12 @@ namespace Microsoft.NodejsTools.Parsing
                     // name, so just report that we expected an open paren at this point.
                     if (expandedIndentifier)
                     {
-                        name.Name = GetCode(name.Span);
-                        m_errorSink.HandleError(JSError.FunctionNameMustBeIdentifier, name.Span, m_scanner.IndexResolver);
+                        if (name != null) {
+                            name.Name = GetCode(name.Span);
+                            m_errorSink.HandleError(JSError.FunctionNameMustBeIdentifier, name.Span, m_scanner.IndexResolver);
+                        } else {
+                            m_errorSink.HandleError(JSError.FunctionNameMustBeIdentifier, CurrentPositionSpan(), m_scanner.IndexResolver);
+                        }
                     }
                     else
                     {
@@ -2820,16 +2758,11 @@ namespace Microsoft.NodejsTools.Parsing
                                     exprStmt.Expression = new DirectivePrologue(constantWrapper.Value.ToString(), constantWrapper.Span);
                                     statement = exprStmt;
                                 }
-                                else if (!m_newModule)
+                                else
                                 {
                                     // no longer considering constant wrappers
                                     possibleDirectivePrologue = false;
                                 }
-                            }
-                            else if (m_newModule)
-                            {
-                                // we scanned into a new module -- we might find directive prologues again
-                                possibleDirectivePrologue = true;
                             }
                             // add it to the body
                             body.Append(statement);
@@ -2838,7 +2771,7 @@ namespace Microsoft.NodejsTools.Parsing
                         {
                             if (exc._partiallyComputedNode != null)
                             {
-                                body.Append((Statement)exc._partiallyComputedNode);
+                                body.Append(exc.PartiallyComputedStatement);
                             }
                             if (IndexOfToken(NoSkipTokenSet.s_StartStatementNoSkipTokenSet, exc) == -1)
                                 throw;
@@ -3655,20 +3588,13 @@ namespace Microsoft.NodejsTools.Parsing
                                         bool isGet = (_curToken == JSToken.Get);
                                         var functionExpr = ParseFunctionExpression(JSToken.Get == _curToken ? FunctionType.Getter : FunctionType.Setter);
                                         value = functionExpr;
-                                        if (functionExpr.Function != null)
-                                        {
-                                            // getter/setter is just the literal name with a get/set flag
-                                            field = new GetterSetter(
-                                              functionExpr.Function.Name,
-                                              isGet,
-                                              functionExpr.Function.NameSpan,
-                                              this
-                                              );
-                                        }
-                                        else
-                                        {
-                                            ReportError(JSError.FunctionExpressionExpected);
-                                        }
+                                        // getter/setter is just the literal name with a get/set flag
+                                        field = new GetterSetter(
+                                            functionExpr.Function.Name,
+                                            isGet,
+                                            functionExpr.Function.NameSpan,
+                                            this
+                                            );
                                     }
                                     break;
 
@@ -3913,9 +3839,7 @@ namespace Microsoft.NodejsTools.Parsing
                                     // throw a warning!
                                     ReportError(JSError.OctalLiteralsDeprecated, _curSpan, true);
 
-                                    // return false because octals are deprecated and might have
-                                    // cross-browser issues
-                                    return false;
+                                    return true;
                                 }
                             }
                             catch (FormatException)
@@ -4020,18 +3944,7 @@ namespace Microsoft.NodejsTools.Parsing
                             if (null != newSpans && newSpans.Count > 0)
                             {
                                 newSpans[newSpans.Count - 1] = newSpans[newSpans.Count - 1].UpdateWith(expression.Span);
-                                if (!(expression is CallNode))
-                                {
-                                    expression = new CallNode(newSpans[newSpans.Count - 1])
-                                        {
-                                            Function = expression,
-                                            Arguments = new AstNodeList<Expression>(CurrentPositionSpan())
-                                        };
-                                }
-                                else
-                                {
-                                    expression.Span = newSpans[newSpans.Count - 1];
-                                }
+                                expression.Span = newSpans[newSpans.Count - 1];
 
                                 ((CallNode)expression).IsConstructor = true;
                                 newSpans.RemoveAt(newSpans.Count - 1);
@@ -4048,6 +3961,7 @@ namespace Microsoft.NodejsTools.Parsing
 
                         case JSToken.LeftBracket:
                             m_noSkipTokenSet.Add(NoSkipTokenSet.s_BracketToken);
+                            args = new AstNodeList<Expression>(CurrentPositionSpan());
                             try
                             {
                                 //
@@ -4061,7 +3975,6 @@ namespace Microsoft.NodejsTools.Parsing
                                 //
                                 //args = ParseExpressionList(JSToken.RightBracket);
                                 GetNextToken();
-                                args = new AstNodeList<Expression>(CurrentPositionSpan());
 
                                 Expression accessor = ParseExpression();
                                 if (accessor != null)
@@ -4071,26 +3984,22 @@ namespace Microsoft.NodejsTools.Parsing
                             }
                             catch (RecoveryTokenException exc)
                             {
-                                if (IndexOfToken(NoSkipTokenSet.s_BracketToken, exc) == -1)
-                                {
-                                    if (exc._partiallyComputedNode != null)
-                                    {
+                                if (IndexOfToken(NoSkipTokenSet.s_BracketToken, exc) == -1) {
+                                    if (exc._partiallyComputedNode != null) {
+                                        args.Append((Expression)exc._partiallyComputedNode);
                                         exc._partiallyComputedNode =
-                                           new CallNode(expression.Span.CombineWith(_curSpan))
-                                            {
-                                                Function = expression,
-                                                Arguments = (AstNodeList<Expression>)exc._partiallyComputedNode,
-                                                InBrackets = true
-                                            };
-                                    }
-                                    else
-                                    {
+                                           new CallNode(expression.Span.CombineWith(_curSpan)) {
+                                               Function = expression,
+                                               Arguments = args,
+                                               InBrackets = true
+                                           };
+                                    } else {
                                         exc._partiallyComputedNode = expression;
                                     }
                                     throw;
+                                } else {
+                                    args.Append((Expression)exc._partiallyComputedNode);
                                 }
-                                else
-                                    args = (AstNodeList<Expression>)exc._partiallyComputedNode;
                             }
                             finally
                             {
@@ -4172,11 +4081,9 @@ namespace Microsoft.NodejsTools.Parsing
                 }
                 catch (RecoveryTokenException exc)
                 {
-                    if (IndexOfToken(NoSkipTokenSet.s_MemberExprNoSkipTokenSet, exc) != -1)
+                    if (IndexOfToken(NoSkipTokenSet.s_MemberExprNoSkipTokenSet, exc) != -1) {
                         expression = (Expression)exc._partiallyComputedNode;
-                    else
-                    {
-                        Debug.Assert(exc._partiallyComputedNode == expression);
+                    } else {
                         throw;
                     }
                 }
@@ -4225,37 +4132,11 @@ namespace Microsoft.NodejsTools.Parsing
                         {
                             break;
                         }
-                        else
+                        else if (JSToken.Comma != _curToken)
                         {
-                            if (JSToken.Comma == _curToken)
-                            {
-                            }
-                            else
-                            {
-                                if (terminator == JSToken.RightParenthesis)
-                                {
-                                    //  in ASP+ it's easy to write a semicolon at the end of an expression
-                                    //  not realizing it is going to go inside a function call
-                                    //  (ie. Response.Write()), so make a special check here
-                                    if (JSToken.Semicolon == _curToken)
-                                    {
-                                        if (JSToken.RightParenthesis == PeekToken())
-                                        {
-                                            ReportError(JSError.UnexpectedSemicolon, true);
-                                            GetNextToken();
-                                            break;
-                                        }
-                                    }
+                            ReportError(JSError.NoRightBracketOrComma);
 
-                                    ReportError(JSError.NoRightParenthesisOrComma);
-                                }
-                                else
-                                {
-                                    ReportError(JSError.NoRightBracketOrComma);
-                                }
-
-                                SkipTokensAndThrow();
-                            }
+                            SkipTokensAndThrow();
                         }
                     }
                     catch (RecoveryTokenException exc)
@@ -4406,7 +4287,6 @@ namespace Microsoft.NodejsTools.Parsing
 
         private JSToken ScanNextToken()
         {
-            m_newModule = false;
             m_foundEndOfLine = false;
 
             var nextToken = m_scanner.ScanNextToken(false);
@@ -4495,7 +4375,7 @@ namespace Microsoft.NodejsTools.Parsing
             m_severity = JScriptException.GetSeverity(errorId);
             // EOF error is special and it's the last error we can possibly get
             if (JSToken.EndOfFile == _curToken) {
-                EOFError(errorId); // EOF context is special
+                throw EOFError(errorId); // EOF context is special
             } else {
                 // report the error if not in error condition and the
                 // error for this token is not worse than the one for the
@@ -4520,10 +4400,10 @@ namespace Microsoft.NodejsTools.Parsing
         //  Create a context for EOF error. The created context points to the end of the source
         //  code. Assume the the scanner actually reached the end of file
         //---------------------------------------------------------------------------------------
-        private void EOFError(JSError errorId)
+        private Exception EOFError(JSError errorId)
         {
             m_errorSink.HandleError(errorId, new IndexSpan(_source.Length, 0), m_scanner.IndexResolver);
-            throw new EndOfFileException(); // this exception terminates the parser
+            return new EndOfFileException(); // this exception terminates the parser
         }
 
         //---------------------------------------------------------------------------------------
@@ -4533,12 +4413,7 @@ namespace Microsoft.NodejsTools.Parsing
         //  A call to this function always ends in a throw statement that will be caught by the
         //  proper rule
         //---------------------------------------------------------------------------------------
-        private void SkipTokensAndThrow()
-        {
-            SkipTokensAndThrow(null);
-        }
-
-        private void SkipTokensAndThrow(Expression partialAST)
+        private void SkipTokensAndThrow(Expression partialAST = null)
         {
             m_useCurrentForNext = false; // make sure we go to the next token
             bool checkForEndOfLine = m_noSkipTokenSet.HasToken(JSToken.EndOfLine);
@@ -4579,18 +4454,14 @@ namespace Microsoft.NodejsTools.Parsing
 
         private int IndexOfToken(JSToken[] tokens, JSToken token)
         {
-            int i, c;
-            for (i = 0, c = tokens.Length; i < c; i++)
-                if (tokens[i] == token)
-                    break;
-            if (i >= c)
-                i = -1;
-            else
-            {
-                // assume that the caller will deal with the token so move the state back to normal
-                m_useCurrentForNext = false;
+            for (int i = 0; i < tokens.Length; i++) {
+                if (tokens[i] == token) {
+                    // assume that the caller will deal with the token so move the state back to normal
+                    m_useCurrentForNext = false;
+                    return i;
+                }
             }
-            return i;
+            return -1;
         }
 
         private bool TokenInList(JSToken[] tokens, JSToken token)
@@ -4664,6 +4535,17 @@ namespace Microsoft.NodejsTools.Parsing
             _token = token;
             _partiallyComputedNode = partialAST;
         }
+
+        public Statement PartiallyComputedStatement {
+            get {
+                var expr = _partiallyComputedNode as Expression;
+                if (expr != null) {
+                    return new ExpressionStatement(expr.Span) { Expression = expr };
+                } 
+                return _partiallyComputedNode as Statement;
+            }
+        }
+
 #if !SILVERLIGHT
         protected RecoveryTokenException(SerializationInfo info, StreamingContext context) : base(info, context) { }
 #endif

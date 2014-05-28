@@ -112,5 +112,9 @@ namespace Microsoft.NodejsTools.Parsing
         }
 
         #endregion
+
+        public override string ToString() {
+            return String.Format("({0}, {1}) length: {2}", Start, End, Length);
+        }
     }
 }

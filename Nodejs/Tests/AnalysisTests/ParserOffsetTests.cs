@@ -318,10 +318,26 @@ console.log('hi');",
 
         [TestMethod]
         public void TestLexicalDeclaration() {
+            TestOneSnippet(@"'use strict';
+let x = 42;",
+                new NodeInfo(typeof(Block), 0, 26),
+                new NodeInfo(typeof(ExpressionStatement), 0, 12),
+                new NodeInfo(typeof(DirectivePrologue), 0, 12),
+                new NodeInfo(typeof(LexicalDeclaration), 15, 25),
+                new NodeInfo(typeof(VariableDeclaration), 19, 25),
+                new NodeInfo(typeof(ConstantWrapper), 23, 25)
+            );
+        }
+
+        [TestMethod]
+        public void TestBogusLexicalDeclaration() {
             TestOneSnippet(@"let x = 42;",
                 new NodeInfo(typeof(Block), 0, 11),
-                new NodeInfo(typeof(LexicalDeclaration), 0, 10),
-                new NodeInfo(typeof(VariableDeclaration), 4, 10),
+                new NodeInfo(typeof(ExpressionStatement), 0, 3),
+                new NodeInfo(typeof(Lookup), 0, 3),
+                new NodeInfo(typeof(ExpressionStatement), 4, 10),
+                new NodeInfo(typeof(BinaryOperator), 4, 10),
+                new NodeInfo(typeof(Lookup), 4, 5),
                 new NodeInfo(typeof(ConstantWrapper), 8, 10)
             );
         }

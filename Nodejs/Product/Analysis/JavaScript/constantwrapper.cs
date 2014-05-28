@@ -106,5 +106,17 @@ namespace Microsoft.NodejsTools.Parsing
         public override string ToString() {
             return "Invalid numeric literal: " + _code;
         }
+
+        public override bool Equals(object obj) {
+            var other = obj as InvalidNumericErrorValue;
+            if (other != null) {
+                return other._code == _code;
+            }
+            return false;
+        }
+
+        public override int GetHashCode() {
+            return _code.GetHashCode() + 1;
+        }
     }
 }
