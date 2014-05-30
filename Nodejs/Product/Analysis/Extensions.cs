@@ -56,54 +56,6 @@ namespace Microsoft.NodejsTools.Parsing
             }
         }
 
-
-        public static bool TryParseIntInvariant(this string text, NumberStyles numberStyles, out int number)
-        {
-            number = default(int);
-            return text == null ? false : int.TryParse(text, numberStyles, CultureInfo.InvariantCulture, out number);
-        }
-
-        public static bool IsNullOrWhiteSpace(this string text)
-        {
-#if NET_20 || NET_35
-            return string.IsNullOrEmpty(text) || text.Trim().Length == 0;
-#else
-            return string.IsNullOrWhiteSpace(text);
-#endif
-        }
-
-        public static string IfNullOrWhiteSpace(this string text, string defaultValue)
-        {
-#if NET_20 || NET_35
-            return string.IsNullOrEmpty(text) || text.Trim().Length == 0 ? defaultValue : text;
-#else
-            return string.IsNullOrWhiteSpace(text) ? defaultValue : text;
-#endif
-        }
-
-        public static string SubstringUpToFirst(this string text, char delimiter)
-        {
-            // if the string is null, return null
-            if (text == null)
-            {
-                return null;
-            }
-
-            // get the index of the first delimiter character
-            var indexOf = text.IndexOf(delimiter);
-
-            // if the delimiter doesn't exist in the string, return the whole string.
-            // otherwise return from the beginning up to BUT NOT INCLUDING the delimiter.
-            return indexOf < 0 ? text : text.Substring(0, indexOf);
-        }
-
-        public static string ToStringInvariant(this int number, string format)
-        {
-            return format == null
-                ? number.ToString(CultureInfo.InvariantCulture)
-                : number.ToString(format, CultureInfo.InvariantCulture);
-        }
-
         public static string ToStringInvariant(this double number, string format)
         {
             return format == null
@@ -111,12 +63,6 @@ namespace Microsoft.NodejsTools.Parsing
                 : number.ToString(format, CultureInfo.InvariantCulture);
         }
 
-        public static string ToStringInvariant(this int number)
-        {
-            return number.ToStringInvariant(null);
-        }
-
-        
         public static TResult IfNotNull<TObject, TResult>(this TObject obj, Func<TObject, TResult> action)
         {
             if (action == null)
@@ -125,19 +71,6 @@ namespace Microsoft.NodejsTools.Parsing
             }
 
             return obj == null ? default(TResult) : action(obj);
-        }
-
-        public static void IfNotNull<TObject>(this TObject obj, Action<TObject> action)
-        {
-            if (action == null)
-            {
-                throw new ArgumentNullException("action");
-            }
-
-            if (obj != null)
-            {
-                action(obj);
-            }
         }
 
         public static void CopyItemsTo<TSource>(this ICollection<TSource> fromSet, ICollection<TSource> toSet)

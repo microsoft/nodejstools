@@ -159,7 +159,6 @@
     <Compile Include="Analysis\Analyzer\DefinitiveAssignmentEnvironmentRecord.cs" />
     <Compile Include="Analysis\Analyzer\DependencyInfo.cs" />
     <Compile Include="Analysis\Analyzer\DependentKeyValue.cs" />
-    <Compile Include="Analysis\Analyzer\EmptySet.cs" />
     <Compile Include="Analysis\Analyzer\EvalAnalysisUnit.cs" />
     <Compile Include="Analysis\Analyzer\ExpressionEvaluator.cs" />
     <Compile Include="Analysis\Analyzer\FunctionAnalysisUnit.cs" />
@@ -173,6 +172,7 @@
     <Compile Include="Analysis\Analyzer\StatementEnvironmentRecord.cs" />
     <Compile Include="Analysis\AssemblyInfo.cs" />
     <Compile Include="Analysis\NodejsModuleBuilder.Specializations.cs" />
+    <Compile Include="Analysis\Validation.cs" />
     <Compile Include="Analysis\Values\BooleanValue.cs" />
     <Compile Include="Analysis\Deque.cs" />
     <Compile Include="Analysis\EncodedLocation.cs" />
@@ -206,9 +206,7 @@
     <Compile Include="Analysis\OverloadResult.cs" />
     <Compile Include="Analysis\ParameterResult.cs" />
     <Compile Include="Analysis\ProjectEntry.cs" />
-    <Compile Include="Analysis\ProjectEntryExtensions.cs" />
     <Compile Include="Analysis\JsAnalyzer.cs" />
-    <Compile Include="Analysis\ReadOnlyWrapper.cs" />
     <Compile Include="Analysis\Resources.Designer.cs" />
     <Compile Include="Analysis\SetOfOne.cs" />
     <Compile Include="Analysis\SetOfOneEnumerator.cs" />
@@ -220,11 +218,9 @@
     <Compile Include="Analysis\Values\SpecializedUserFunctionValue.cs" />
     <Compile Include="Analysis\Values\StringValue.cs" />
     <Compile Include="Analysis\Values\UndefinedValue.cs" />
-    <Compile Include="Analysis\Validation.cs" />
     <Compile Include="Analysis\Values\ArgumentSet.cs" />
     <Compile Include="Analysis\Values\ArrayValue.cs" />
     <Compile Include="Analysis\Values\BuiltinFunctionValue.cs" />
-    <Compile Include="Analysis\Values\CallChain.cs" />
     <Compile Include="Analysis\Values\FunctionValue.cs" />
     <Compile Include="Analysis\Values\GeneratorFunctionInfo.cs" />
     <Compile Include="Analysis\Values\GeneratorInfo.cs" />
@@ -307,7 +303,6 @@
     <Compile Include="JavaScript\regexpliteral.cs" />
     <Compile Include="JavaScript\ResolutionVisitor.cs" />
     <Compile Include="JavaScript\return.cs" />
-    <Compile Include="JavaScript\scannerexception.cs" />
     <Compile Include="JavaScript\SourceLocation.cs" />
     <Compile Include="JavaScript\SourceSpan.cs" />
     <Compile Include="JavaScript\Statement.cs" />
@@ -322,11 +317,9 @@
     <Compile Include="JavaScript\while.cs" />
     <Compile Include="JavaScript\with.cs" />
     <Compile Include="JavaScript\withscope.cs" />
-    <Compile Include="JSEncoderFallback.cs" />
     <Compile Include="Properties\AssemblyInfo.cs">
       <SubType>Code</SubType>
     </Compile>
-    <Compile Include="ResourceStrings.cs" />
   </ItemGroup>
   <ItemGroup>
     <Content Include="all.json">

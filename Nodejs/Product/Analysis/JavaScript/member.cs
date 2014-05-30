@@ -29,9 +29,9 @@ namespace Microsoft.NodejsTools.Parsing
             get { return m_root; }
             set
             {
-                m_root.IfNotNull(n => n.Parent = (n.Parent == this) ? null : n.Parent);
+                m_root.ClearParent(this);
                 m_root = value;
-                m_root.IfNotNull(n => n.Parent = this);
+                m_root.AssignParent(this);
             }
         }
 
@@ -50,27 +50,12 @@ namespace Microsoft.NodejsTools.Parsing
             visitor.PostWalk(this);
         }
 
-        internal override string GetFunctionGuess(Node target)
-        {
-            return Root.GetFunctionGuess(this) + '.' + Name;
-        }
-
         public override IEnumerable<Node> Children
         {
             get
             {
                 return EnumerateNonNullNodes(Root);
             }
-        }
-
-        public override bool ReplaceChild(Node oldNode, Node newNode)
-        {
-            if (Root == oldNode)
-            {
-                Root = (Expression)newNode;
-                return true;
-            }
-            return false;
         }
     }
 }

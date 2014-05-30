@@ -31,9 +31,9 @@ namespace Microsoft.NodejsTools.Parsing
             get { return m_tryBlock; }
             set
             {
-                m_tryBlock.IfNotNull(n => n.Parent = (n.Parent == this) ? null : n.Parent);
+                m_tryBlock.ClearParent(this);
                 m_tryBlock = value;
-                m_tryBlock.IfNotNull(n => n.Parent = this);
+                m_tryBlock.AssignParent(this);
             }
         }
 
@@ -42,9 +42,9 @@ namespace Microsoft.NodejsTools.Parsing
             get { return m_catchBlock; }
             set
             {
-                m_catchBlock.IfNotNull(n => n.Parent = (n.Parent == this) ? null : n.Parent);
+                m_catchBlock.ClearParent(this);
                 m_catchBlock = value;
-                m_catchBlock.IfNotNull(n => n.Parent = this);
+                m_catchBlock.AssignParent(this);
             }
         }
 
@@ -53,9 +53,9 @@ namespace Microsoft.NodejsTools.Parsing
             get { return m_finallyBlock; }
             set
             {
-                m_finallyBlock.IfNotNull(n => n.Parent = (n.Parent == this) ? null : n.Parent);
+                m_finallyBlock.ClearParent(this);
                 m_finallyBlock = value;
-                m_finallyBlock.IfNotNull(n => n.Parent = this);
+                m_finallyBlock.AssignParent(this);
             }
         }
 
@@ -64,9 +64,9 @@ namespace Microsoft.NodejsTools.Parsing
             get { return m_catchParameter; }
             set
             {
-                m_catchParameter.IfNotNull(n => n.Parent = (n.Parent == this) ? null : n.Parent);
+                m_catchParameter.ClearParent(this);
                 m_catchParameter = value;
-                m_catchParameter.IfNotNull(n => n.Parent = this);
+                m_catchParameter.AssignParent(this);
             }
         }
 
@@ -110,31 +110,6 @@ namespace Microsoft.NodejsTools.Parsing
             {
                 return EnumerateNonNullNodes(TryBlock, CatchParameter, CatchBlock, FinallyBlock);
             }
-        }
-
-        public override bool ReplaceChild(Node oldNode, Node newNode)
-        {
-            if (TryBlock == oldNode)
-            {
-                TryBlock = ForceToBlock((Statement)newNode);
-                return true;
-            }
-            if (CatchParameter == oldNode)
-            {
-                CatchParameter = newNode as ParameterDeclaration;
-                return true;
-            }
-            if (CatchBlock == oldNode)
-            {
-                CatchBlock = ForceToBlock((Statement)newNode);
-                return true;
-            }
-            if (FinallyBlock == oldNode)
-            {
-                FinallyBlock = ForceToBlock((Statement)newNode);
-                return true;
-            }
-            return false;
         }
     }
 }

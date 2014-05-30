@@ -302,12 +302,6 @@ namespace Microsoft.NodejsTools.Parsing
             catch (EndOfFileException)
             {
             }
-            catch (ScannerException se)
-            {
-                // a scanner exception implies that the end of file has been reached with an error.
-                // Mark the end of file as the error location
-                throw EOFError(se.Error);
-            }
 
             program.UpdateWith(CurrentPositionSpan());
             return program;
@@ -4244,43 +4238,28 @@ namespace Microsoft.NodejsTools.Parsing
         private void GetNextToken()
         {
             JSToken curToken;
-            try
+            if (m_useCurrentForNext)
             {
-                if (m_useCurrentForNext)
-                {
-                    // we just want to keep using the current token.
-                    // but don't get into an infinite loop -- after a while,
-                    // give up and grab the next token from the scanner anyway
-                    m_useCurrentForNext = false;
-                    if (m_breakRecursion++ > 10) {
-                        curToken = ScanNextToken();
-                    } else {
-                        return;
-                    }
-                }
-                else
-                {
-                    m_goodTokensProcessed++;
-                    m_breakRecursion = 0;
-
-                    // the scanner reuses the same context object for performance,
-                    // so if we ever mean to hold onto it later, we need to clone it.
+                // we just want to keep using the current token.
+                // but don't get into an infinite loop -- after a while,
+                // give up and grab the next token from the scanner anyway
+                m_useCurrentForNext = false;
+                if (m_breakRecursion++ > 10) {
                     curToken = ScanNextToken();
+                } else {
+                    return;
                 }
             }
-            catch (ScannerException e)
+            else
             {
-                if (e.Error != JSError.NoCommentEnd)
-                {
-                    // rethrow anything that isn't an unterminated comment
-                    throw;
-                }
-                else
-                {
-                    curToken = JSToken.EndOfFile;
-                    m_errorSink.HandleError(JSError.NoCommentEnd, _curSpan, m_scanner.IndexResolver);
-                }
+                m_goodTokensProcessed++;
+                m_breakRecursion = 0;
+
+                // the scanner reuses the same context object for performance,
+                // so if we ever mean to hold onto it later, we need to clone it.
+                curToken = ScanNextToken();
             }
+
             _curToken = curToken;
             _curSpan = m_scanner.CurrentSpan;
         }

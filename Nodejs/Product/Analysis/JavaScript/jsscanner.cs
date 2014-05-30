@@ -191,7 +191,7 @@ namespace Microsoft.NodejsTools.Parsing
 
             _identifier.Length = 0;
 
-            if (_state.UnterminatedComment) {
+            if (_state.UnterminatedComment && !IsEndOfFile) {
                 SkipMultilineComment();
                 token = JSToken.MultipleLineComment;
                 _tokenEndIndex = _currentPosition;
@@ -371,21 +371,11 @@ namespace Microsoft.NodejsTools.Parsing
                         default:
                             // if we were passed the hint that we prefer regular expressions
                             // over divide operators, then try parsing one now.
-                            if (scanForRegularExpressionLiterals)
+                            if (scanForRegularExpressionLiterals && ScanRegExp() != null)
                             {
-                                // we think this is probably a regular expression.
-                                // if it is...
-                                if (ScanRegExp() != null)
-                                {
-                                    // also scan the flags (if any)
-                                    ScanRegExpFlags();
-                                    token = JSToken.RegularExpression;
-                                }
-                                else if (c == '=')
-                                {
-                                    _currentPosition++;
-                                    token = JSToken.DivideAssign;
-                                }
+                                // also scan the flags (if any)
+                                ScanRegExpFlags();
+                                token = JSToken.RegularExpression;
                             }
                             else if (c == '=')
                             {
@@ -539,20 +529,6 @@ namespace Microsoft.NodejsTools.Parsing
                             ScanIdentifier();
 
                             // because it STARTS with an escaped character it cannot be a keyword
-                            token = JSToken.Identifier;
-                            break;
-                        }
-                    }
-                    else
-                    {
-                        // not a valid unicode escape sequence
-                        // see if the next character is a valid identifier character
-                        if (IsValidIdentifierStart(GetChar(_currentPosition)))
-                        {
-                            // we're going to just assume this is an escaped identifier character
-                            // because some older browsers allow things like \foo ("foo") and 
-                            // \while to be an identifer "while" and not the reserved word
-                            ScanIdentifier();
                             token = JSToken.Identifier;
                             break;
                         }
@@ -820,38 +796,6 @@ namespace Microsoft.NodejsTools.Parsing
             }
 
             return isKeyword;
-        }
-
-        private bool CheckSubstring(int startIndex, string target)
-        {
-            for (int ndx = 0; ndx < target.Length; ++ndx)
-            {
-                if (target[ndx] != GetChar(startIndex + ndx))
-                {
-                    // no match
-                    return false;
-                }
-            }
-
-            // if we got here, the strings match
-            return true;
-        }
-
-        private bool CheckCaseInsensitiveSubstring(string target)
-        {
-            var startIndex = _currentPosition;
-            for (int ndx = 0; ndx < target.Length; ++ndx)
-            {
-                if (target[ndx] != char.ToUpperInvariant(GetChar(startIndex + ndx)))
-                {
-                    // no match
-                    return false;
-                }
-            }
-
-            // if we got here, the strings match. Advance the current position over it
-            _currentPosition += target.Length;
-            return true;
         }
 
         private char GetChar(int index)
@@ -1481,29 +1425,6 @@ namespace Microsoft.NodejsTools.Parsing
             return isGoodValue;
         }
 
-        private void SkipAspNetReplacement()
-        {
-            // the current position is on the % of the opening delimiter, so
-            // advance the pointer forward to the first character AFTER the opening
-            // delimiter, then keep skipping
-            // forward until we find the closing %>. Be sure to set the current pointer
-            // to the NEXT character AFTER the > when we find it.
-            ++_currentPosition;
-
-            char ch;
-            while ((ch = GetChar(_currentPosition++)) != '\0' || !IsEndOfFile)
-            {
-                if (ch == '%'
-                    && GetChar(_currentPosition) == '>')
-                {
-                    // found the closing delimiter -- the current position in on the >
-                    // so we need to advance to the next character and break out of the loop
-                    ++_currentPosition;
-                    break;
-                }
-            }
-        }
-
         private void SkipSingleLineComment()
         {
             // skip up to the terminator, but don't include them.
@@ -1524,30 +1445,6 @@ namespace Microsoft.NodejsTools.Parsing
                 && c != '\x2029')
             {
                 c = GetChar(++_currentPosition);
-            }
-        }
-
-        private void SkipOneLineTerminator()
-        {
-            var c = GetChar(_currentPosition);
-            if (c == '\r')
-            {
-                // skip over the \r; and if it's followed by a \n, skip it, too
-                if (GetChar(++_currentPosition) == '\n')
-                {
-                    ++_currentPosition;
-                }
-                _newLineLocations.Add(_currentPosition);
-                _state.FirstLine = false;
-            }
-            else if (c == '\n'
-                || c == '\x2028'
-                || c == '\x2029')
-            {
-                // skip over the single line-feed character
-                ++_currentPosition;
-                _newLineLocations.Add(_currentPosition);
-                _state.FirstLine = false;
             }
         }
 
@@ -1602,15 +1499,6 @@ namespace Microsoft.NodejsTools.Parsing
             _tokenEndIndex = _currentPosition;
             _state.UnterminatedComment = true;
             //throw new ScannerException(JSError.NoCommentEnd);
-        }
-
-        private void SkipBlanks()
-        {
-            char c = GetChar(_currentPosition);
-            while (JSScanner.IsBlankSpace(c))
-            {
-                c = GetChar(++_currentPosition);
-            }
         }
 
         private static bool IsBlankSpace(char c)
@@ -1716,33 +1604,6 @@ namespace Microsoft.NodejsTools.Parsing
             return isValid;
         }
 
-        // assumes all unicode characters in the string -- NO escape sequences
-        public static bool IsSafeIdentifier(string name)
-        {
-            bool isValid = false;
-            if (!string.IsNullOrEmpty(name))
-            {
-                if (IsSafeIdentifierStart(name[0]))
-                {
-                    // loop through all the rest
-                    for (int ndx = 1; ndx < name.Length; ++ndx)
-                    {
-                        char ch = name[ndx];
-                        if (!IsSafeIdentifierPart(ch))
-                        {
-                            // fail!
-                            return false;
-                        }
-                    }
-
-                    // if we get here, everything is okay
-                    isValid = true;
-                }
-            }
-
-            return isValid;
-        }
-
         // unescaped unicode characters
         public static bool IsValidIdentifierStart(char letter)
         {
@@ -1770,39 +1631,6 @@ namespace Microsoft.NodejsTools.Parsing
             }
 
             return false;
-        }
-
-        // unescaped unicode characters.
-        // the same as the "IsValid" method, except various browsers have problems with some
-        // of the Unicode characters in the ModifierLetter, OtherLetter, and LetterNumber categories.
-        public static bool IsSafeIdentifierStart(char letter)
-        {
-            if (('a' <= letter && letter <= 'z') || ('A' <= letter && letter <= 'Z') || letter == '_' || letter == '$')
-            {
-                // good
-                return true;
-            }
-
-            return false;
-        }
-
-        public static bool IsValidIdentifierPart(string text)
-        {
-            var isValid = false;
-
-            // pull the first character from the string, which may be an escape character
-            if (!string.IsNullOrEmpty(text))
-            {
-                char ch = text[0];
-                if (ch == '\\')
-                {
-                    PeekUnicodeEscape(text, ref ch);
-                }
-
-                isValid = IsValidIdentifierPart(ch);
-            }
-
-            return isValid;
         }
 
         // unescaped unicode characters
@@ -1844,45 +1672,10 @@ namespace Microsoft.NodejsTools.Parsing
             return false;
         }
 
-        // unescaped unicode characters.
-        // the same as the "IsValid" method, except various browsers have problems with some
-        // of the Unicode characters in the ModifierLetter, OtherLetter, LetterNumber,
-        // NonSpacingMark, SpacingCombiningMark, DecimalDigitNumber, and ConnectorPunctuation categories.
-        public static bool IsSafeIdentifierPart(char letter)
-        {
-            // look for valid ranges
-            if (('a' <= letter && letter <= 'z')
-                || ('A' <= letter && letter <= 'Z')
-                || ('0' <= letter && letter <= '9')
-                || letter == '_'
-                || letter == '$')
-            {
-                return true;
-            }
-
-            return false;
-        }
-
         // pulling unescaped characters off the input stream
         internal bool IsIdentifierPartChar(char c)
         {
             return IsIdentifierStartChar(ref c) || IsValidIdentifierPart(c);
-        }
-
-        private static void PeekUnicodeEscape(string str, ref char ch)
-        {
-            // if the length isn't at least six characters starting with a backslash, do nothing
-            if (!string.IsNullOrEmpty(str) && ch == '\\' && str.Length >= 6)
-            {
-                if (str[1] == 'u' 
-                    && IsHexDigit(str[2])
-                    && IsHexDigit(str[3])
-                    && IsHexDigit(str[4])
-                    && IsHexDigit(str[5]))
-                {
-                    ch = (char)(GetHexValue(str[2]) << 12 | GetHexValue(str[3]) << 8 | GetHexValue(str[4]) << 4 | GetHexValue(str[5]));
-                }
-            }
         }
 
         private bool PeekUnicodeEscape(int index, ref char ch)
@@ -1984,24 +1777,6 @@ namespace Microsoft.NodejsTools.Parsing
             return ('A' <= c && c <= 'Z') || ('a' <= c && c <= 'z');
         }
 
-        private Func<string,string,bool> CheckForOperator(SortedDictionary<string, Func<string,string,bool>> operators)
-        {
-            // we need to make SURE we are checking the longer strings before we check the
-            // shorter strings, because if the source is === and we check for ==, we'll pop positive
-            // for it and miss that last =. 
-            foreach (var entry in operators)
-            {
-                if (CheckCaseInsensitiveSubstring(entry.Key))
-                {
-                    // found it! return the comparison function for this text
-                    return entry.Value;
-                }
-            }
-
-            // if we got here, we didn't find anything we were looking for
-            return null;
-        }
-
         private void HandleError(JSError error)
         {
             _tokenEndIndex = _currentPosition;
@@ -2013,39 +1788,13 @@ namespace Microsoft.NodejsTools.Parsing
                 ),
                 _indexResolver
             );
+            if (error != JSError.OctalLiteralsDeprecated) {
+                errorEx.IsError = true;
+            }
 
             _errorSink.OnCompilerError(
                 errorEx
             );
-        }
-
-        /// <summary>
-        /// Given an assignment operator (=, +=, -=, *=, /=, %=, &amp;=, |=, ^=, &lt;&lt;=, &gt;&gt;=, &gt;&gt;&gt;=), strip
-        /// the assignment to return (+, -, *, /, %, &amp;, |, ^, &lt;&lt;, &gt;&gt;, &gt;&gt;&gt;). For all other operators,
-        /// include the normal assign (=), just return the same operator token.
-        /// This only works if the two groups of tokens are actually defined in those orders!!! 
-        /// </summary>
-        /// <param name="assignOp"></param>
-        /// <returns></returns>
-        internal static JSToken StripAssignment(JSToken assignOp)
-        {
-            // gotta be an assignment operator
-            if (IsAssignmentOperator(assignOp))
-            {
-                // get the delta from assign (=), which is the first assignment operator
-                int delta = assignOp - JSToken.Assign;
-
-                // assign (=) will be zero -- we don't want to modify that one, so if
-                // the delta is GREATER than zero...
-                if (delta > 0)
-                {
-                    // add it to the plus token, less one since the delta for +=
-                    // will be one.
-                    assignOp = JSToken.Plus + delta - 1;
-                }
-            }
-
-            return assignOp;
         }
 
         internal static bool IsAssignmentOperator(JSToken token)

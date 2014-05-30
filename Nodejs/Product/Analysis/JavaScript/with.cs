@@ -30,9 +30,9 @@ namespace Microsoft.NodejsTools.Parsing
             get { return m_withObject; }
             set
             {
-                m_withObject.IfNotNull(n => n.Parent = (n.Parent == this) ? null : n.Parent);
+                m_withObject.ClearParent(this);
                 m_withObject = value;
-                m_withObject.IfNotNull(n => n.Parent = this);
+                m_withObject.AssignParent(this);
             }
         }
 
@@ -41,9 +41,9 @@ namespace Microsoft.NodejsTools.Parsing
             get { return m_body; }
             set
             {
-                m_body.IfNotNull(n => n.Parent = (n.Parent == this) ? null : n.Parent);
+                m_body.ClearParent(this);
                 m_body = value;
-                m_body.IfNotNull(n => n.Parent = this);
+                m_body.AssignParent(this);
             }
         }
 
@@ -66,21 +66,6 @@ namespace Microsoft.NodejsTools.Parsing
             {
                 return EnumerateNonNullNodes(WithObject, Body);
             }
-        }
-
-        public override bool ReplaceChild(Node oldNode, Node newNode)
-        {
-            if (WithObject == oldNode)
-            {
-                WithObject = (Expression)newNode;
-                return true;
-            }
-            if (Body == oldNode)
-            {
-                Body = ForceToBlock((Statement)newNode);
-                return true;
-            }
-            return false;
         }
     }
 }

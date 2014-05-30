@@ -36,9 +36,9 @@ namespace Microsoft.NodejsTools.Parsing
             get { return m_initializer; }
             set
             {
-                m_initializer.IfNotNull(n => n.Parent = (n.Parent == this) ? null : n.Parent);
+                m_initializer.ClearParent(this);
                 m_initializer = value;
-                m_initializer.IfNotNull(n => n.Parent = this);
+                m_initializer.AssignParent(this);
             }
         }
 
@@ -58,27 +58,12 @@ namespace Microsoft.NodejsTools.Parsing
             visitor.PostWalk(this);
         }
 
-        internal override string GetFunctionGuess(Node target)
-        {
-            return Identifier;
-        }
-
         public override IEnumerable<Node> Children
         {
             get
             {
                 return EnumerateNonNullNodes(Initializer);
             }
-        }
-
-        public override bool ReplaceChild(Node oldNode, Node newNode)
-        {
-            if (Initializer == oldNode)
-            {
-                Initializer = (Expression)newNode;
-                return true;
-            }
-            return false;
         }
     }
 }

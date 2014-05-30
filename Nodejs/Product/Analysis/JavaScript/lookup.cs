@@ -42,12 +42,6 @@ namespace Microsoft.NodejsTools.Parsing
             visitor.PostWalk(this);
         }
 
-        internal override string GetFunctionGuess(Node target)
-        {
-            // return the source name
-            return Name;
-        }
-
         //code in parser relies on this.name being returned from here
         public override String ToString()
         {

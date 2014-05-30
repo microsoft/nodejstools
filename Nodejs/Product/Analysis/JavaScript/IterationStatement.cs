@@ -30,9 +30,9 @@ namespace Microsoft.NodejsTools.Parsing
             get { return m_body; }
             set
             {
-                m_body.IfNotNull(n => n.Parent = (n.Parent == this) ? null : n.Parent);
+                m_body.ClearParent(this);
                 m_body = value;
-                m_body.IfNotNull(n => n.Parent = this);
+                m_body.AssignParent(this);
             }
         }
 

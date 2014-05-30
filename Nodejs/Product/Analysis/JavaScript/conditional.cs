@@ -32,9 +32,9 @@ namespace Microsoft.NodejsTools.Parsing
             get { return m_condition; }
             set
             {
-                m_condition.IfNotNull(n => n.Parent = (n.Parent == this) ? null : n.Parent);
+                m_condition.ClearParent(this);
                 m_condition = value;
-                m_condition.IfNotNull(n => n.Parent = this);
+                m_condition.AssignParent(this);
             }
         }
 
@@ -43,9 +43,9 @@ namespace Microsoft.NodejsTools.Parsing
             get { return m_trueExpression; }
             set
             {
-                m_trueExpression.IfNotNull(n => n.Parent = (n.Parent == this) ? null : n.Parent);
+                m_trueExpression.ClearParent(this);
                 m_trueExpression = value;
-                m_trueExpression.IfNotNull(n => n.Parent = this);
+                m_trueExpression.AssignParent(this);
             }
         }
 
@@ -54,9 +54,9 @@ namespace Microsoft.NodejsTools.Parsing
             get { return m_falseExpression; }
             set
             {
-                m_falseExpression.IfNotNull(n => n.Parent = (n.Parent == this) ? null : n.Parent);
+                m_falseExpression.ClearParent(this);
                 m_falseExpression = value;
-                m_falseExpression.IfNotNull(n => n.Parent = this);
+                m_falseExpression.AssignParent(this);
             }
         }
 
@@ -87,26 +87,6 @@ namespace Microsoft.NodejsTools.Parsing
                 m_falseExpression.Walk(visitor);
             }
             visitor.PostWalk(this);
-        }
-
-        public override bool ReplaceChild(Node oldNode, Node newNode)
-        {
-            if (Condition == oldNode)
-            {
-                Condition = (Expression)newNode;
-                return true;
-            }
-            if (TrueExpression == oldNode)
-            {
-                TrueExpression = (Expression)newNode;
-                return true;
-            }
-            if (FalseExpression == oldNode)
-            {
-                FalseExpression = (Expression)newNode;
-                return true;
-            }
-            return false;
         }
     }
 }

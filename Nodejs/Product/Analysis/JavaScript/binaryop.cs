@@ -32,9 +32,9 @@ namespace Microsoft.NodejsTools.Parsing
             get { return m_operand1; }
             set
             {
-                m_operand1.IfNotNull(n => n.Parent = (n.Parent == this) ? null : n.Parent);
+                m_operand1.ClearParent(this);
                 m_operand1 = value;
-                m_operand1.IfNotNull(n => n.Parent = this);
+                m_operand1.AssignParent(this);
             }
         }
 
@@ -43,9 +43,9 @@ namespace Microsoft.NodejsTools.Parsing
             get { return m_operand2; }
             set
             {
-                m_operand2.IfNotNull(n => n.Parent = (n.Parent == this) ? null : n.Parent);
+                m_operand2.ClearParent(this);
                 m_operand2 = value;
-                m_operand2.IfNotNull(n => n.Parent = this);
+                m_operand2.AssignParent(this);
             }
         }
 
@@ -72,21 +72,6 @@ namespace Microsoft.NodejsTools.Parsing
             walker.PostWalk(this);
         }
         
-        public override bool ReplaceChild(Node oldNode, Node newNode)
-        {
-            if (Operand1 == oldNode)
-            {
-                Operand1 = (Expression)newNode;
-                return true;
-            }
-            if (Operand2 == oldNode)
-            {
-                Operand2 = (Expression)newNode;
-                return true;
-            }
-            return false;
-        }
-
         public void SwapOperands()
         {
             // swap the operands -- we don't need to go through ReplaceChild or the
@@ -121,13 +106,6 @@ namespace Microsoft.NodejsTools.Parsing
                         return false;
                 }
             }
-        }
-
-        internal override string GetFunctionGuess(Node target)
-        {
-            return Operand2 == target
-                ? IsAssign ? Operand1.GetFunctionGuess(this) : Parent.GetFunctionGuess(this)
-                : string.Empty;
         }
 
         public override string ToString()

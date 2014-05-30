@@ -29,7 +29,6 @@ namespace Microsoft.NodejsTools.Analysis.Analyzer {
     /// </summary>
     class FunctionAnalysisUnit : AnalysisUnit {
         public readonly UserFunctionValue Function;
-        public readonly CallChain CallChain;
         internal readonly AnalysisUnit _declUnit;
 
         internal FunctionAnalysisUnit(

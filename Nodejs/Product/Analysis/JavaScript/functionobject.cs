@@ -31,18 +31,18 @@ namespace Microsoft.NodejsTools.Parsing {
         public Block Body {
             get { return m_body; }
             set {
-                m_body.IfNotNull(n => n.Parent = (n.Parent == this) ? null : n.Parent);
+                m_body.ClearParent(this);
                 m_body = value;
-                m_body.IfNotNull(n => n.Parent = this);
+                m_body.AssignParent(this);
             }
         }
 
         public AstNodeList<ParameterDeclaration> ParameterDeclarations {
             get { return m_parameters; }
             set {
-                m_parameters.IfNotNull(n => n.Parent = (n.Parent == this) ? null : n.Parent);
+                m_parameters.ClearParent(this);
                 m_parameters = value;
-                m_parameters.IfNotNull(n => n.Parent = this);
+                m_parameters.AssignParent(this);
             }
         }
 
@@ -80,8 +80,10 @@ namespace Microsoft.NodejsTools.Parsing {
         
         public override void Walk(AstVisitor walker) {
             if (walker.Walk(this)) {
-                foreach (var param in m_parameters) {
-                    param.Walk(walker);
+                if (m_parameters != null) {
+                    foreach (var param in m_parameters) {
+                        param.Walk(walker);
+                    }
                 }
 
                 if (Body != null) {
@@ -95,21 +97,6 @@ namespace Microsoft.NodejsTools.Parsing {
             get {
                 return EnumerateNonNullNodes(ParameterDeclarations, Body);
             }
-        }
-
-        public override bool ReplaceChild(Node oldNode, Node newNode) {
-            if (Body == oldNode) {
-                Body = ForceToBlock((Statement)newNode);
-                return true;
-            } else if (ParameterDeclarations == oldNode) {
-                var newList = newNode as AstNodeList<ParameterDeclaration>;
-                if (newNode == null || newList != null) {
-                    ParameterDeclarations = newList;
-                    return true;
-                }
-            }
-
-            return false;
         }
     }
 }

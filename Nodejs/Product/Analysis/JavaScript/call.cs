@@ -30,9 +30,9 @@ namespace Microsoft.NodejsTools.Parsing
             get { return m_function; }
             set
             {
-                m_function.IfNotNull(n => n.Parent = (n.Parent == this) ? null : n.Parent);
+                m_function.ClearParent(this);
                 m_function = value;
-                m_function.IfNotNull(n => n.Parent = this);
+                m_function.AssignParent(this);
             }
         }
 
@@ -41,9 +41,9 @@ namespace Microsoft.NodejsTools.Parsing
             get { return m_arguments; }
             set
             {
-                m_arguments.IfNotNull(n => n.Parent = (n.Parent == this) ? null : n.Parent);
+                m_arguments.ClearParent(this);
                 m_arguments = value;
-                m_arguments.IfNotNull(n => n.Parent = this);
+                m_arguments.AssignParent(this);
             }
         }
 
@@ -80,35 +80,6 @@ namespace Microsoft.NodejsTools.Parsing
             {
                 return EnumerateNonNullNodes(Function, Arguments);
             }
-        }
-
-        public override bool ReplaceChild(Node oldNode, Node newNode)
-        {
-            if (Function == oldNode)
-            {
-                Function = (Expression)newNode;
-                return true;
-            }
-            if (Arguments == oldNode)
-            {
-                if (newNode == null)
-                {
-                    // remove it
-                    Arguments = null;
-                    return true;
-                }
-                else
-                {
-                    // if the new node isn't an AstNodeList, ignore it
-                    var newList = newNode as AstNodeList<Expression>;
-                    if (newList != null)
-                    {
-                        Arguments = newList;
-                        return true;
-                    }
-                }
-            }
-            return false;
         }
     }
 }

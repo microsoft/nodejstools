@@ -69,11 +69,6 @@ namespace Microsoft.NodejsTools.Parsing {
             return block;
         }
 
-        internal virtual string GetFunctionGuess(Node target) {
-            // most objects serived from AST return an empty string
-            return string.Empty;
-        }
-
         /// <summary>
         /// Gets an enumeration representing the child nodes of this node in the abstract syntax tree
         /// </summary>
@@ -91,16 +86,6 @@ namespace Microsoft.NodejsTools.Parsing {
 
         internal static IEnumerable<Node> EnumerateNonNullNodes(Node n1, Node n2 = null, Node n3 = null, Node n4 = null) {
             return EnumerateNonNullNodes(new[] { n1, n2, n3, n4 });
-        }
-
-        /// <summary>
-        /// Replace this node's specified child with another given node. 
-        /// </summary>
-        /// <param name="oldNode">Child node to be replaced</param>
-        /// <param name="newNode">New node with which to replace the existing child node</param>
-        /// <returns>true if the replacement succeeded; false otherwise</returns>
-        public virtual bool ReplaceChild(Node oldNode, Node newNode) {
-            return false;
         }
 
         public abstract void Walk(AstVisitor walker);
@@ -130,6 +115,16 @@ namespace Microsoft.NodejsTools.Parsing {
 
         public override string ToString() {
             return String.Format("{0} {1} {2}", GetType().Name, GetStart(GlobalParent), GetEnd(GlobalParent));
+        }
+    }
+
+    internal static class NodeExtensions {
+        internal static void ClearParent(this Node self, Node parent) {
+            self.IfNotNull(n => n.Parent = (n.Parent == parent) ? null : n.Parent);
+        }
+
+        internal static void AssignParent(this Node self, Node parent) {
+            self.IfNotNull(n => n.Parent = parent);
         }
     }
 }

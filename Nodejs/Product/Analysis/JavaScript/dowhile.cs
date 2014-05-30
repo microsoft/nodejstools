@@ -30,9 +30,9 @@ namespace Microsoft.NodejsTools.Parsing
             get { return m_condition; }
             set
             {
-                m_condition.IfNotNull(n => n.Parent = (n.Parent == this) ? null : n.Parent);
+                m_condition.ClearParent(this);
                 m_condition = value;
-                m_condition.IfNotNull(n => n.Parent = this);
+                m_condition.AssignParent(this);
             }
         }
 
@@ -55,21 +55,6 @@ namespace Microsoft.NodejsTools.Parsing
             {
                 return EnumerateNonNullNodes(Body, Condition);
             }
-        }
-
-        public override bool ReplaceChild(Node oldNode, Node newNode)
-        {
-            if (Body == oldNode)
-            {
-                Body = ForceToBlock((Statement)newNode);
-                return true;
-            }
-            if (Condition == oldNode)
-            {
-                Condition = (Expression)newNode;
-                return true;
-            }
-            return false;
         }
     }
 }

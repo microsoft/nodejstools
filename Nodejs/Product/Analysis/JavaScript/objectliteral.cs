@@ -28,9 +28,9 @@ namespace Microsoft.NodejsTools.Parsing
             get { return m_properties; }
             set
             {
-                m_properties.IfNotNull(n => n.Parent = (n.Parent == this) ? null : n.Parent);
+                m_properties.ClearParent(this);
                 m_properties = value;
-                m_properties.IfNotNull(n => n.Parent = this);
+                m_properties.AssignParent(this);
             }
         }
 
@@ -54,19 +54,6 @@ namespace Microsoft.NodejsTools.Parsing
             {
                 return EnumerateNonNullNodes(m_properties);
             }
-        }
-
-        public override bool ReplaceChild(Node oldNode, Node newNode)
-        {
-            if (oldNode == m_properties)
-            {
-                var properties = newNode as AstNodeList<ObjectLiteralProperty>;
-                if (newNode == null || properties != null)
-                {
-                    Properties = properties;
-                }
-            }
-            return false;
         }
     }
 }

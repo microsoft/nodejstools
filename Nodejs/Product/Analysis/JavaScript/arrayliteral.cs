@@ -29,9 +29,9 @@ namespace Microsoft.NodejsTools.Parsing
             get { return _elements; }
             set
             {
-                _elements.IfNotNull(n => n.Parent = (n.Parent == this) ? null : n.Parent);
+                _elements.ClearParent(this);
                 _elements = value;
-                _elements.IfNotNull(n => n.Parent = this);
+                _elements.AssignParent(this);
             }
         }
 
@@ -54,32 +54,6 @@ namespace Microsoft.NodejsTools.Parsing
                     node.Walk(walker);
                 }
             }
-        }
-
-        public override bool ReplaceChild(Node oldNode, Node newNode)
-        {
-            // if the old node isn't our element list, ignore the cal
-            if (oldNode == Elements)
-            {
-                if (newNode == null)
-                {
-                    // we want to remove the list altogether
-                    Elements = null;
-                    return true;
-                }
-                else
-                {
-                    // if the new node isn't an AstNodeList, then ignore the call
-                    var newList = newNode as AstNodeList<Expression>;
-                    if (newList != null)
-                    {
-                        // replace it
-                        Elements = newList;
-                        return true;
-                    }
-                }
-            }
-            return false;
         }
     }
 }

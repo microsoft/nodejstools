@@ -32,9 +32,9 @@ namespace Microsoft.NodejsTools.Parsing
             get { return m_initializer; }
             set
             {
-                m_initializer.IfNotNull(n => n.Parent = (n.Parent == this) ? null : n.Parent);
+                m_initializer.ClearParent(this);
                 m_initializer = value;
-                m_initializer.IfNotNull(n => n.Parent = this);
+                m_initializer.AssignParent(this);
             }
         }
 
@@ -43,9 +43,9 @@ namespace Microsoft.NodejsTools.Parsing
             get { return m_condition; }
             set
             {
-                m_condition.IfNotNull(n => n.Parent = (n.Parent == this) ? null : n.Parent);
+                m_condition.ClearParent(this);
                 m_condition = value;
-                m_condition.IfNotNull(n => n.Parent = this);
+                m_condition.AssignParent(this);
             }
         }
 
@@ -55,9 +55,9 @@ namespace Microsoft.NodejsTools.Parsing
             get { return m_incrementer; }
             set
             {
-                m_incrementer.IfNotNull(n => n.Parent = (n.Parent == this) ? null : n.Parent);
+                m_incrementer.ClearParent(this);
                 m_incrementer = value;
-                m_incrementer.IfNotNull(n => n.Parent = this);
+                m_incrementer.AssignParent(this);
             }
         }
 
@@ -90,31 +90,6 @@ namespace Microsoft.NodejsTools.Parsing
             {
                 return EnumerateNonNullNodes(Initializer, Condition, Incrementer, Body);
             }
-        }
-
-        public override bool ReplaceChild(Node oldNode, Node newNode)
-        {
-            if (Initializer == oldNode)
-            {
-                Initializer = (Statement)newNode;
-                return true;
-            }
-            if (Condition == oldNode)
-            {
-                Condition = (Expression)newNode;
-                return true;
-            }
-            if (Incrementer == oldNode)
-            {
-                Incrementer = (Expression)newNode;
-                return true;
-            }
-            if (Body == oldNode)
-            {
-                Body = ForceToBlock((Statement)newNode);
-                return true;
-            }
-            return false;
         }
     }
 }

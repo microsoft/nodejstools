@@ -29,9 +29,9 @@ namespace Microsoft.NodejsTools.Parsing
             get { return m_caseValue; }
             set
             {
-                m_caseValue.IfNotNull(n => n.Parent = (n.Parent == this) ? null : n.Parent);
+                m_caseValue.ClearParent(this);
                 m_caseValue = value;
-                m_caseValue.IfNotNull(n => n.Parent = this);
+                m_caseValue.AssignParent(this);
             }
         }
 
@@ -40,9 +40,9 @@ namespace Microsoft.NodejsTools.Parsing
             get { return m_statements; }
             set
             {
-                m_statements.IfNotNull(n => n.Parent = (n.Parent == this) ? null : n.Parent);
+                m_statements.ClearParent(this);
                 m_statements = value;
-                m_statements.IfNotNull(n => n.Parent = this);
+                m_statements.AssignParent(this);
             }
         }
 
@@ -72,25 +72,6 @@ namespace Microsoft.NodejsTools.Parsing
             {
                 return EnumerateNonNullNodes(CaseValue, Statements);
             }
-        }
-
-        public override bool ReplaceChild(Node oldNode, Node newNode)
-        {
-            if (CaseValue == oldNode)
-            {
-                CaseValue = (Expression)newNode;
-                return true;
-            }
-            if (Statements == oldNode)
-            {
-                var newBlock = newNode as Block;
-                if (newNode == null || newBlock != null)
-                {
-                    Statements = newBlock;
-                    return true;
-                }
-            }
-            return false;
         }
     }
 }

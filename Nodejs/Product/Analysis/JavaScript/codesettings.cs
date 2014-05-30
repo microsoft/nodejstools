@@ -44,7 +44,6 @@ namespace Microsoft.NodejsTools.Parsing
         public CodeSettings()
         {
             // other fields we want initialized
-            this.MacSafariQuirks = true;
             this.StrictMode = false;
             
             // no default globals
@@ -62,10 +61,9 @@ namespace Microsoft.NodejsTools.Parsing
             {
                 ConstStatementsMozilla = this.ConstStatementsMozilla,
                 KnownGlobalNamesList = this.KnownGlobalNamesList,
-                MacSafariQuirks = this.MacSafariQuirks,
                 SourceMode = this.SourceMode,
                 StrictMode = this.StrictMode,
-                ErrorIfNotInlineSafe = this.ErrorIfNotInlineSafe,
+                AllowShebangLine = this.AllowShebangLine
             };
 
             return newSettings;
@@ -81,20 +79,7 @@ namespace Microsoft.NodejsTools.Parsing
 
         #region known globals
 
-        private HashSet<string> m_knownGlobals;
-        
-        /// <summary>
-        /// read-only collection of known global names
-        /// </summary>
-        [Obsolete("This property is deprecated; use KnownGlobalsCollection instead")]
-        [System.ComponentModel.EditorBrowsable(System.ComponentModel.EditorBrowsableState.Never)]
-        public ReadOnlyCollection<string> KnownGlobalNames
-        {
-            get
-            {
-                return new ReadOnlyCollection<string>(new List<string>(KnownGlobalCollection));
-            }
-        }
+        private HashSet<string> m_knownGlobals;        
 
         /// <summary>
         /// sets the collection of known global names to the array of string passed to this method
@@ -194,25 +179,6 @@ namespace Microsoft.NodejsTools.Parsing
         {
             get;
             set;
-        }
-
-        /// <summary>
-        /// Throw an error if a source string is not safe for inclusion 
-        /// in an HTML inline script block. Default is false.
-        /// </summary>
-        public bool ErrorIfNotInlineSafe
-        {
-            get;
-            set;
-        }
-
-        /// <summary>
-        /// Gets or sets a boolean value indicating whether to add characters to the output to make sure Mac Safari bugs are not generated [true, default], or to
-        /// disregard potential known Mac Safari bugs in older versions [false]
-        /// </summary>
-        public bool MacSafariQuirks
-        {
-            get; set;
         }
 
         /// <summary>

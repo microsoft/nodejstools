@@ -53,41 +53,6 @@ namespace Microsoft.NodejsTools.Parsing
           return EnumerateNonNullNodes(m_list);
         }
       }
-        /*
-      public new IEnumerable<T> Children
-      {
-          get
-          {
-              return EnumerateNonNullNodes(m_list).Cast<T>();
-          }
-      }*/
-
-      public override bool ReplaceChild(Node oldNode, Node newNode)
-      {
-        for (int ndx = 0; ndx < m_list.Count; ++ndx)
-        {
-          if (m_list[ndx] == (T)oldNode)
-          {
-            oldNode.IfNotNull(n => n.Parent = (n.Parent == this) ? null : n.Parent);
-
-            if (newNode == null)
-            {
-              // remove it
-              m_list.RemoveAt(ndx);
-            }
-            else
-            {
-              // replace with the new node
-              m_list[ndx] = (T)newNode;
-              newNode.Parent = this;
-            }
-
-            return true;
-          }
-        }
-
-        return false;
-      }
 
       internal AstNodeList<T> Append(T node)
       {
@@ -111,83 +76,11 @@ namespace Microsoft.NodejsTools.Parsing
         return this;
       }
 
-      public AstNodeList<T> Insert(int position, T node)
-      {
-        var list = node as AstNodeList<T>;
-        if (list != null)
-        {
-          // another list. 
-          for (var ndx = 0; ndx < list.Count; ++ndx)
-          {
-            Insert(position + ndx, list[ndx]);
-          }
-        }
-        else if (node != null)
-        {
-          // not another list
-          node.Parent = this;
-          m_list.Insert(position, (T)node);
-          Span = Span.UpdateWith(node.Span);
-        }
-
-        return this;
-      }
-
-      internal void RemoveAt(int position)
-      {
-        m_list[position].IfNotNull(n => n.Parent = (n.Parent == this) ? null : n.Parent);
-        m_list.RemoveAt(position);
-      }
-
       public T this[int index]
       {
         get
         {
           return m_list[index];
-        }
-        set
-        {
-          m_list[index].IfNotNull(n => n.Parent = (n.Parent == this) ? null : n.Parent);
-          if (value != null)
-          {
-            m_list[index] = value;
-            m_list[index].Parent = this;
-          }
-          else
-          {
-            m_list.RemoveAt(index);
-          }
-        }
-      }
-
-      public bool IsSingleConstantArgument(string argumentValue)
-      {
-        if (m_list.Count == 1)
-        {
-          ConstantWrapper constantWrapper = m_list[0] as ConstantWrapper;
-          if (constantWrapper != null
-              && string.CompareOrdinal(constantWrapper.Value.ToString(), argumentValue) == 0)
-          {
-            return true;
-          }
-        }
-        return false;
-      }
-
-      public string SingleConstantArgument
-      {
-        get
-        {
-          string constantValue = null;
-          if (m_list.Count == 1)
-          {
-            ConstantWrapper constantWrapper = m_list[0] as ConstantWrapper;
-            if (constantWrapper != null)
-            {
-              constantValue = constantWrapper.ToString();
-            }
-          }
-          return constantValue;
         }
       }
 

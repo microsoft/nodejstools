@@ -33,19 +33,6 @@ namespace Microsoft.NodejsTools.Parsing
         public VariableDeclaration this[int index]
         {
             get { return m_list[index]; }
-            set
-            {
-                m_list[index].IfNotNull(n => n.Parent = (n.Parent == this) ? null : n.Parent);
-                if (value != null)
-                {
-                    m_list[index] = value;
-                    m_list[index].Parent = this;
-                }
-                else
-                {
-                    m_list.RemoveAt(index);
-                }
-            }
         }
 
         protected Declaration(IndexSpan span)
@@ -60,28 +47,6 @@ namespace Microsoft.NodejsTools.Parsing
             {
                 return EnumerateNonNullNodes(m_list);
             }
-        }
-
-        public override bool ReplaceChild(Node oldNode, Node newNode)
-        {
-            for (int ndx = 0; ndx < m_list.Count; ++ndx)
-            {
-                if (m_list[ndx] == oldNode)
-                {
-                    // if the new node isn't a variabledeclaration, ignore the call
-                    VariableDeclaration newDecl = newNode as VariableDeclaration;
-                    if (newNode == null || newDecl != null)
-                    {
-                        m_list[ndx].IfNotNull(n => n.Parent = (n.Parent == this) ? null : n.Parent);
-                        m_list[ndx] = newDecl;
-                        m_list[ndx].IfNotNull(n => n.Parent = this);
-                        return true;
-                    }
-
-                    break;
-                }
-            }
-            return false;
         }
 
         internal void Append(Node elem)
@@ -117,39 +82,6 @@ namespace Microsoft.NodejsTools.Parsing
             }
         }
 
-        internal void InsertAt(int index, Node elem)
-        {
-            VariableDeclaration decl = elem as VariableDeclaration;
-            if (decl != null)
-            {
-                // first check the list for existing instances of this name.
-                // if there are no duplicates (indicated by returning true), add it to the list.
-                // if there is a dup (indicated by returning false) then that dup
-                // has an initializer, and we DON'T want to add this new one if it doesn't
-                // have it's own initializer.
-                if (HandleDuplicates(decl.Identifier)
-                    || decl.Initializer != null)
-                {
-                    // set the parent and add it to the list
-                    decl.Parent = this;
-                    m_list.Insert(index, decl);
-                }
-            }
-            else
-            {
-                // TODO: what should we do if we try to add a const to a var, or a var to a const???
-                var otherVar = elem as Declaration;
-                if (otherVar != null)
-                {
-                    // walk the source backwards so they end up in the right order
-                    for (int ndx = otherVar.m_list.Count - 1; ndx >= 0; --ndx)
-                    {
-                        InsertAt(index, otherVar.m_list[ndx]);
-                    }
-                }
-            }
-        }
-
         private bool HandleDuplicates(string name)
         {
             var hasInitializer = true;
@@ -179,42 +111,6 @@ namespace Microsoft.NodejsTools.Parsing
             }
 
             return hasInitializer;
-        }
-
-        public void RemoveAt(int index)
-        {
-            if (0 <= index & index < m_list.Count)
-            {
-                m_list[index].IfNotNull(n => n.Parent = (n.Parent == this) ? null : n.Parent);
-                m_list.RemoveAt(index);
-            }
-        }
-
-        public void Remove(VariableDeclaration variableDeclaration)
-        {
-            // remove the vardecl from the list. If it was there and was
-            // successfully remove, Remove will return true. At that point, if the
-            // vardecl still thinks we are the parent, reset the parent pointer.
-            if (variableDeclaration != null && m_list.Remove(variableDeclaration) && variableDeclaration.Parent == this)
-            {
-                variableDeclaration.Parent = null;
-            }
-        }
-
-        public bool Contains(string name)
-        {
-            // look at each vardecl in our list
-            foreach(var varDecl in m_list)
-            {
-                // if it matches the target name exactly...
-                if (string.CompareOrdinal(varDecl.Identifier, name) == 0)
-                {
-                    // ...we found a match
-                    return true;
-                }
-            }
-            // if we get here, we didn't find any matches
-            return false;
         }
 
         #region IEnumerable<VariableDeclaration> Members

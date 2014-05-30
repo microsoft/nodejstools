@@ -13,16 +13,72 @@
  * ***************************************************************************/
 
 using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using Microsoft.NodejsTools.Parsing;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
+using TestUtilities;
 
 namespace AnalysisTests {
     [TestClass]
     public class ParserTests {
-        
+        [TestMethod]
+        public void TestCodeSettings() {
+            var settings1 = new CodeSettings();
+            var settings2 = new CodeSettings() { AllowShebangLine = true, SourceMode = JavaScriptSourceMode.Expression, StrictMode = true };
+            var settings3 = new CodeSettings() { KnownGlobalNamesList = "foo;bar" };
+
+            foreach (var curSetting in new[] { settings1, settings2, settings3 }) {
+                var other = curSetting.Clone();
+                Assert.AreEqual(curSetting.AllowShebangLine, other.AllowShebangLine);
+                Assert.AreEqual(curSetting.ConstStatementsMozilla, other.ConstStatementsMozilla);
+                Assert.AreEqual(curSetting.KnownGlobalNamesList, other.KnownGlobalNamesList);
+                Assert.AreEqual(curSetting.SourceMode, other.SourceMode);
+                Assert.AreEqual(curSetting.StrictMode, other.StrictMode);                
+            }
+        }
+
+        [TestMethod]
+        public void TestSourceSpan() {
+            var span = new SourceSpan(
+                new SourceLocation(1, 1, 1),
+                new SourceLocation(100, 2, 100)
+            );
+
+            var span2 = span;
+
+            Assert.IsTrue(span.Start < span.End);
+            AssertUtil.Throws<ArgumentException>(() => new SourceSpan(span.End, span.Start));
+            AssertUtil.Throws<ArgumentException>(() => new SourceSpan(span.End, SourceLocation.Invalid));
+            AssertUtil.Throws<ArgumentException>(() => new SourceSpan(SourceLocation.Invalid, span.Start));
+            Assert.AreEqual(99, span.Length);
+            Assert.IsTrue(span == span2);
+            Assert.IsFalse(span != span2);
+            Assert.IsTrue(span.Equals(span2));
+        }
+
+
+        [TestMethod]
+        public void TestParseExpression() {
+            const string code = @"
+42
+";
+            CheckAst(
+                ParseExpression(
+                    code,
+                    false
+                ),
+                CheckBlock(
+                    CheckExprStmt(
+                        CheckConstant(42.0)
+                    )
+                )
+            );
+        }
+
+
         [TestMethod]
         public void ErrorCallBadArgs() {
             const string code = @"
@@ -4684,10 +4740,10 @@ do {
 
                 body(func.Body);
                 if (func.ParameterDeclarations != null) {
-                    Assert.AreEqual(args.Length, func.ParameterDeclarations.Count);
-                    for (int i = 0; i < func.ParameterDeclarations.Count; i++) {
-                        args[i](func.ParameterDeclarations[i]);
-                    }
+                Assert.AreEqual(args.Length, func.ParameterDeclarations.Count);
+                for (int i = 0; i < func.ParameterDeclarations.Count; i++) {
+                    args[i](func.ParameterDeclarations[i]);
+                }
                 } else {
                     Assert.IsNull(args);
                 }
@@ -4749,16 +4805,139 @@ do {
             var parser = new JSParser(code, errorSink);
             var ast = parser.Parse(new CodeSettings());
 
+            errorSink.CheckErrors(errors);
+            return ast;
+        }
+
+        private static JsAst ParseExpression(string code, bool collectWarnings, params ErrorInfo[] errors) {
+            CollectingErrorSink errorSink = new CollectingErrorSink(collectWarnings);
+
+            var parser = new JSParser(code, errorSink);
+            var ast = parser.Parse(new CodeSettings() { SourceMode = JavaScriptSourceMode.Expression });
+
+            errorSink.CheckErrors(errors);
+            return ast;
+        }
+        
+
+        private void CheckAst(JsAst ast, Action<Statement> checkBody) {
+            checkBody(ast.Block);
+
+            ast.Walk(new TestVisitor());
+        }
+
+        class TestVisitor : AstVisitor {
+            private void TestNode(Node node) {
+                if (node != null) {
+                    Assert.IsNotNull(node.ToString());
+                    foreach (var child in node.Children) {
+                        Assert.IsNotNull(child);
+                    }
+
+                    IEnumerable enumerable = node as IEnumerable;
+                    if (enumerable != null) {
+                        foreach (var value in enumerable) {
+                            Assert.IsNotNull(value);
+                        }
+                    }
+                }
+            }
+
+            public override bool Walk(ArrayLiteral node) { TestNode(node); TestNode(node.Elements);  return base.Walk(node); }
+            public override bool Walk(BinaryOperator node) { TestNode(node); return base.Walk(node); }
+            public override bool Walk(CommaOperator node) { TestNode(node); return base.Walk(node); }
+            public override bool Walk(Block node) { TestNode(node); return base.Walk(node); }
+            public override bool Walk(Break node) { TestNode(node); return base.Walk(node); }
+            public override bool Walk(CallNode node) { TestNode(node); TestNode(node.Arguments);  return base.Walk(node); }
+            public override bool Walk(Conditional node) { TestNode(node); return base.Walk(node); }
+            public override bool Walk(ConstantWrapper node) { TestNode(node); return base.Walk(node); }
+            public override bool Walk(ConstStatement node) { TestNode(node); return base.Walk(node); }
+            public override bool Walk(ContinueNode node) { TestNode(node); return base.Walk(node); }
+            public override bool Walk(DebuggerNode node) { TestNode(node); return base.Walk(node); }
+            public override bool Walk(DirectivePrologue node) { TestNode(node); return base.Walk(node); }
+            public override bool Walk(DoWhile node) { TestNode(node); return base.Walk(node); }
+            public override bool Walk(EmptyStatement node) { TestNode(node); return base.Walk(node); }
+            public override bool Walk(ForIn node) { TestNode(node); return base.Walk(node); }
+            public override bool Walk(ForNode node) { TestNode(node); return base.Walk(node); }
+            public override bool Walk(FunctionObject node) { TestNode(node); TestNode(node.ParameterDeclarations);  return base.Walk(node); }
+            public override bool Walk(GetterSetter node) { TestNode(node); return base.Walk(node); }
+            public override bool Walk(GroupingOperator node) { TestNode(node); return base.Walk(node); }
+            public override bool Walk(IfNode node) { TestNode(node); return base.Walk(node); }
+            public override bool Walk(LabeledStatement node) { TestNode(node); return base.Walk(node); }
+            public override bool Walk(LexicalDeclaration node) { TestNode(node); return base.Walk(node); }
+            public override bool Walk(Lookup node) { TestNode(node); return base.Walk(node); }
+            public override bool Walk(Member node) { TestNode(node); return base.Walk(node); }
+            public override bool Walk(ObjectLiteral node) { TestNode(node); TestNode(node.Properties);  return base.Walk(node); }
+            public override bool Walk(ObjectLiteralField node) { TestNode(node); return base.Walk(node); }
+            public override bool Walk(ObjectLiteralProperty node) { TestNode(node); return base.Walk(node); }
+            public override bool Walk(ParameterDeclaration node) { TestNode(node); return base.Walk(node); }
+            public override bool Walk(RegExpLiteral node) { TestNode(node); return base.Walk(node); }
+            public override bool Walk(ReturnNode node) { TestNode(node); return base.Walk(node); }
+            public override bool Walk(Switch node) { TestNode(node); TestNode(node.Cases); return base.Walk(node); }
+            public override bool Walk(SwitchCase node) { TestNode(node); return base.Walk(node); }
+            public override bool Walk(ThisLiteral node) { TestNode(node); return base.Walk(node); }
+            public override bool Walk(ThrowNode node) { TestNode(node); return base.Walk(node); }
+            public override bool Walk(TryNode node) { TestNode(node); return base.Walk(node); }
+            public override bool Walk(Var node) { TestNode(node); return base.Walk(node); }
+            public override bool Walk(VariableDeclaration node) { TestNode(node); return base.Walk(node); }
+            public override bool Walk(UnaryOperator node) { TestNode(node); return base.Walk(node); }
+            public override bool Walk(WhileNode node) { TestNode(node); return base.Walk(node); }
+            public override bool Walk(WithNode node) { TestNode(node); return base.Walk(node); }
+            public override bool Walk(JsAst jsAst) { TestNode(jsAst); return base.Walk(jsAst); }
+            public override bool Walk<T>(AstNodeList<T> node) { TestNode(node); return base.Walk(node); }
+            public override bool Walk(FunctionExpression functionExpression) { TestNode(functionExpression); return base.Walk(functionExpression); }
+            public override bool Walk(ExpressionStatement node) { TestNode(node); return base.Walk(node); }
+        }
+    }
+
+    class ErrorInfo {
+        public readonly bool IsError;
+        public readonly JSError Error;
+        public readonly IndexSpan Span;
+
+        public ErrorInfo(JSError error, bool isError, IndexSpan span) {
+            Error = error;
+            IsError = isError;
+            Span = span;
+        }
+
+        public override string ToString() {
+            return String.Format("{0}: JSError.{1} {2}",
+                IsError ? "Error" : "Warning",
+                Error,
+                Span
+            );
+        }
+    }
+
+    class CollectingErrorSink : ErrorSink {
+        private readonly List<ErrorInfo> _errors = new List<ErrorInfo>();
+        public bool _collectWarnings;
+
+        public CollectingErrorSink(bool collectWarnings = false) {
+            _collectWarnings = collectWarnings;
+        }
+
+        public override void OnError(JScriptExceptionEventArgs error) {
+            error.Error.ToString();
+            var result = new ErrorInfo(error.Error.ErrorCode, error.Error.IsError, error.Exception.Span);
+
+            if (error.Error.IsError || _collectWarnings) {
+                _errors.Add(result);
+            }
+        }
+
+        public void CheckErrors(ErrorInfo[] errors) {
             bool success = false;
             try {
-                Assert.AreEqual(errors.Length, errorSink.Errors.Count);
+                Assert.AreEqual(errors.Length, Errors.Count);
                 for (int i = 0; i < errors.Length; i++) {
-                    Assert.AreEqual(errors[i].ToString(), errorSink.Errors[i].ToString());
+                    Assert.AreEqual(errors[i].ToString(), Errors[i].ToString());
                 }
                 success = true;
             } finally {
                 if (!success) {
-                    foreach (var error in errorSink.Errors) {
+                    foreach (var error in Errors) {
                         Console.WriteLine(
                             "new ErrorInfo(JSError.{0}, {1}, new IndexSpan({2}, {3})),",
                             error.Error,
@@ -4769,56 +4948,12 @@ do {
                     }
                 }
             }
-            return ast;
         }
 
-        private void CheckAst(JsAst ast, Action<Statement> checkBody) {
-            checkBody(ast.Block);
-        }
-
-
-        class ErrorInfo {
-            public readonly bool IsError;
-            public readonly JSError Error;
-            public readonly IndexSpan Span;
-
-            public ErrorInfo(JSError error, bool isError, IndexSpan span) {
-                Error = error;
-                IsError = isError;
-                Span = span;
-            }
-
-            public override string ToString() {
-                return String.Format("{0}: JSError.{1} {2}",
-                    IsError ? "Error" : "Warning",
-                    Error,
-                    Span
-                );
+        public List<ErrorInfo> Errors {
+            get {
+                return _errors;
             }
         }
-
-        class CollectingErrorSink : ErrorSink {
-            private readonly List<ErrorInfo> _errors = new List<ErrorInfo>();
-            public bool _collectWarnings;
-
-            public CollectingErrorSink(bool collectWarnings = false) {
-                _collectWarnings = collectWarnings;
-            }
-
-            public override void OnError(JScriptExceptionEventArgs error) {
-                var result = new ErrorInfo(error.Error.ErrorCode, error.Error.IsError, error.Exception.Span);
-
-                if (error.Error.IsError || _collectWarnings) {
-                    _errors.Add(result);
-                }
-            }
-
-            public List<ErrorInfo> Errors {
-                get {
-                    return _errors;
-                }
-            }
-        }
-
     }
 }

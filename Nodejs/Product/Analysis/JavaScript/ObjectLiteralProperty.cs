@@ -29,9 +29,9 @@ namespace Microsoft.NodejsTools.Parsing
             get { return m_propertyName; }
             set
             {
-                m_propertyName.IfNotNull(n => n.Parent = (n.Parent == this) ? null : n.Parent);
+                m_propertyName.ClearParent(this);
                 m_propertyName = value;
-                m_propertyName.IfNotNull(n => n.Parent = this);
+                m_propertyName.AssignParent(this);
             }
         }
 
@@ -40,9 +40,9 @@ namespace Microsoft.NodejsTools.Parsing
             get { return m_propertyValue; }
             set
             {
-                m_propertyValue.IfNotNull(n => n.Parent = (n.Parent == this) ? null : n.Parent);
+                m_propertyValue.ClearParent(this);
                 m_propertyValue = value;
-                m_propertyValue.IfNotNull(n => n.Parent = this);
+                m_propertyValue.AssignParent(this);
             }
         }
 
@@ -65,32 +65,6 @@ namespace Microsoft.NodejsTools.Parsing
             {
                 return EnumerateNonNullNodes(Name, Value);
             }
-        }
-
-        public override bool ReplaceChild(Node oldNode, Node newNode)
-        {
-            if (Name == oldNode)
-            {
-                var objectField = newNode as ObjectLiteralField;
-                if (newNode == null || objectField != null)
-                {
-                    Name = objectField;
-                }
-                return true;
-            }
-
-            if (Value == oldNode)
-            {
-                Value = (Expression)newNode;
-                return true;
-            }
-
-            return false;
-        }
-
-        internal override string GetFunctionGuess(Node target)
-        {
-            return Name.ToString();
         }
     }
 }
