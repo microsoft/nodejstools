@@ -84,7 +84,7 @@ namespace Microsoft.NodejsTools.Analysis.Analyzer {
                 IAnalysisSet value;
                 EnvironmentRecord record;
                 if (_scope.GlobalEnvironment.TryGetNodeEnvironment(node, out record) && 
-                    _scope.GlobalEnvironment.TryGetNodeValue(node, out value) &&
+                    _scope.GlobalEnvironment.TryGetNodeValue(NodeEnvironmentKind.UserFunctionValue, node, out value) &&
                     node.Name != null) {
                     if (node.IsExpression) {
                         // Only assign if the variable wasn't defined explicitly in the

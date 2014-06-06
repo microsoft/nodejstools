@@ -57,14 +57,14 @@ namespace Microsoft.NodejsTools.Analysis.Values {
         }
 
         internal override int UnionHashCode(int strength) {
-            if (strength >= MergeStrength.ToBaseClass) {
+            if (strength >= MergeStrength.ToObject) {
                 return _analyzer._stringPrototype.GetHashCode();
             }
             return base.UnionHashCode(strength);
         }
 
         internal override AnalysisValue UnionMergeTypes(AnalysisValue av, int strength) {
-            if (strength >= MergeStrength.ToBaseClass) {
+            if (strength >= MergeStrength.ToObject) {
                 return _analyzer._emptyStringValue;
             }
 

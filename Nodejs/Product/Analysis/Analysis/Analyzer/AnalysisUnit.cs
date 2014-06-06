@@ -17,9 +17,8 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
 using System.Threading;
-using Microsoft.NodejsTools.Analysis.Values;
-using Microsoft.NodejsTools.Parsing;
 using Microsoft.NodejsTools.Analysis.Analyzer;
+using Microsoft.NodejsTools.Parsing;
 
 
 namespace Microsoft.NodejsTools.Analysis {
@@ -173,7 +172,7 @@ namespace Microsoft.NodejsTools.Analysis {
                 long endTime = _sw.ElapsedMilliseconds;
                 var thisTime = endTime - startTime;
                 _analysisTime += thisTime;
-                if (thisTime >= 500 || (_analysisTime / _analysisCount) > 500) {
+                if (thisTime >= 500 || (_analysisTime / _analysisCount) > 500) {                
                     Trace.TraceWarning("Analyzed: {0} {1} ({2} count, {3}ms total, {4}ms mean)", this, thisTime, _analysisCount, _analysisTime, (double)_analysisTime / _analysisCount);
                 }
             }
@@ -225,11 +224,12 @@ namespace Microsoft.NodejsTools.Analysis {
 
         public override string ToString() {
             return String.Format(
-                "<{3}: Name={0} ({1}), NodeType={2}>",
+                "<{3}: Name={0} {4} ({1}), NodeType={2}>",
                 FullName,
                 GetHashCode(),
                 Ast != null ? Ast.GetType().Name : "<unknown>",
-                GetType().Name
+                GetType().Name,
+                Ast != null ? Ast.GetStart(Ast.GlobalParent) : SourceLocation.Invalid
             );
         }
 

@@ -229,7 +229,7 @@ namespace Microsoft.NodejsTools.Analysis {
             switch (Type.GetTypeCode(attr.GetType())) {
                 case TypeCode.Double:
                     double dblValue = (double)attr;
-                    if(dblValue < -2 || dblValue > 100 ||
+                    if(dblValue < -2 || dblValue > 30 ||
                         (dblValue % 1.0) != 0) {
                         Debug.Assert(_zeroIntValue != null);
                         return _zeroIntValue;

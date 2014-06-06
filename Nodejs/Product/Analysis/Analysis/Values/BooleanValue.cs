@@ -23,6 +23,12 @@ namespace Microsoft.NodejsTools.Analysis.Values {
             javaScriptAnalyzer.AnalysisValueCreated(typeof(BooleanValue));
         }
 
+        public override string ShortDescription {
+            get {
+                return "boolean";
+            }
+        }
+
         public override BuiltinTypeId TypeId {
             get {
                 return BuiltinTypeId.Boolean;

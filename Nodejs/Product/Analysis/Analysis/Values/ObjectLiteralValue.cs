@@ -36,7 +36,7 @@ namespace Microsoft.NodejsTools.Analysis.Values {
         }
 
         internal override bool UnionEquals(AnalysisValue av, int strength) {
-            if (strength >= MergeStrength.ToObject) {
+            if (strength >= MergeStrength.ToBaseClass) {
                 var literal = av as ObjectLiteralValue;
                 if (literal != null) {
                     return true;
@@ -56,7 +56,7 @@ namespace Microsoft.NodejsTools.Analysis.Values {
         }
 
         internal override int UnionHashCode(int strength) {
-            if (strength >= MergeStrength.ToObject) {
+            if (strength >= MergeStrength.ToBaseClass) {
                 return typeof(ObjectLiteralValue).GetHashCode();
             }
 
@@ -67,7 +67,7 @@ namespace Microsoft.NodejsTools.Analysis.Values {
         }
 
         internal override AnalysisValue UnionMergeTypes(AnalysisValue av, int strength) {
-            if (strength >= MergeStrength.ToObject) {
+            if (strength >= MergeStrength.ToBaseClass) {
                 var literal = av as ObjectLiteralValue;
                 if (literal != null) {
                     return this;

@@ -25,6 +25,12 @@ namespace Microsoft.NodejsTools.Analysis.Values {
             projectEntry.Analyzer.AnalysisValueCreated(typeof(PrototypeValue));
         }
 
+        public override string ObjectDescription {
+            get {
+                return "object prototype";
+            }
+        }
+
         public override string Name {
             get {
                 return _instance._creator.Name;

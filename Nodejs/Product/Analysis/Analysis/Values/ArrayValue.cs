@@ -12,6 +12,7 @@
  *
  * ***************************************************************************/
 
+using System;
 using System.Linq;
 using Microsoft.NodejsTools.Parsing;
 
@@ -19,11 +20,22 @@ namespace Microsoft.NodejsTools.Analysis.Values {
     class ArrayValue : ObjectValue {
         private IAnalysisSet _unionType;        // all types that have been seen
         private VariableDef[] _indexTypes;     // types for known indices
+        private readonly Node _node;
 
-        public ArrayValue(VariableDef[] indexTypes, ProjectEntry entry)
+        public ArrayValue(VariableDef[] indexTypes, ProjectEntry entry, Node node)
             : base(entry, entry.Analyzer._arrayFunction) {
             _indexTypes = indexTypes;
+            _node = node;
             entry.Analyzer.AnalysisValueCreated(typeof(ArrayValue));
+        }
+
+        public override string ToString() {
+            return String.Format(
+                "Array literal: {0} - {1}\r\n{2}",
+                _node.GetStart(ProjectEntry.Tree),
+                _node.GetEnd(ProjectEntry.Tree),
+                ProjectEntry.FilePath
+            );
         }
 
         public override IAnalysisSet GetEnumerationValues(Node node, AnalysisUnit unit) {
@@ -120,7 +132,7 @@ namespace Microsoft.NodejsTools.Analysis.Values {
         }
 
         internal override bool UnionEquals(AnalysisValue av, int strength) {
-            if (strength >= MergeStrength.ToObject) {
+            if (strength >= MergeStrength.ToBaseClass) {
                 var array = av as ArrayValue;
                 if (array != null) {
                     return true;
@@ -131,7 +143,7 @@ namespace Microsoft.NodejsTools.Analysis.Values {
         }
 
         internal override int UnionHashCode(int strength) {
-            if (strength >= MergeStrength.ToObject) {
+            if (strength >= MergeStrength.ToBaseClass) {
                 return typeof(ArrayValue).GetHashCode();
             }
 
@@ -139,7 +151,7 @@ namespace Microsoft.NodejsTools.Analysis.Values {
         }
 
         internal override AnalysisValue UnionMergeTypes(AnalysisValue av, int strength) {
-            if (strength >= MergeStrength.ToObject) {
+            if (strength >= MergeStrength.ToBaseClass) {
                 var array = av as ArrayValue;
                 if (array != null) {
                     return this;

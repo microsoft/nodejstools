@@ -16,6 +16,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using Microsoft.NodejsTools.Analysis.Analyzer;
 using Microsoft.NodejsTools.Analysis.Values;
 using Microsoft.NodejsTools.Parsing;
 
@@ -51,9 +52,9 @@ namespace Microsoft.NodejsTools.Analysis {
                 IAnalysisSet prototypeValue;
                 InheritsPrototypeValue copied;
                 var prototype = args[1].Get(node, unit, "prototype");
-                if (!unit.DeclaringModuleEnvironment.TryGetNodeValue(node, out prototypeValue)) {
+                if (!unit.DeclaringModuleEnvironment.TryGetNodeValue(NodeEnvironmentKind.InheritsPrototypeValue, node, out prototypeValue)) {
                     copied = new InheritsPrototypeValue(unit.ProjectEntry, prototype);
-                    unit.DeclaringModuleEnvironment.AddNodeValue(node, copied);
+                    unit.DeclaringModuleEnvironment.AddNodeValue(NodeEnvironmentKind.InheritsPrototypeValue, node, copied);
                 } else {
                     copied = (InheritsPrototypeValue)prototypeValue.First();
                     copied.AddPrototypes(prototype);

@@ -27,7 +27,7 @@ namespace Microsoft.NodejsTools.Analysis.Values {
         public VariableDef ReturnValue;
         internal Dictionary<CallArgs, CallInfo> _allCalls;
         private OverflowState _overflowed;
-        const int MaximumCallCount = 100;
+        const int MaximumCallCount = 30;
 
         public UserFunctionValue(FunctionObject node, AnalysisUnit declUnit, EnvironmentRecord declScope, bool isNested = false)
             : base(declUnit.ProjectEntry, true, node.Name ?? node.NameGuess) {
@@ -240,7 +240,7 @@ namespace Microsoft.NodejsTools.Analysis.Values {
 
         public override IAnalysisSet Call(Node node, AnalysisUnit unit, IAnalysisSet @this, IAnalysisSet[] args) {
             if (_overflowed == OverflowState.OverflowedBigTime) {
-                return AnalysisSet.Empty;
+                return _analysisUnit.ReturnValue.Types;
             }
 
             var callArgs = new CallArgs(@this, args, _overflowed == OverflowState.OverflowedOnce);
@@ -276,7 +276,7 @@ namespace Microsoft.NodejsTools.Analysis.Values {
 
                 if (_allCalls.Count > MaximumCallCount) {
                     _overflowed = OverflowState.OverflowedBigTime;
-                    return AnalysisSet.Empty;
+                    return _analysisUnit.ReturnValue.Types;
                 }
 
                 callInfo.ReturnValue.AddDependency(unit);
@@ -403,7 +403,7 @@ namespace Microsoft.NodejsTools.Analysis.Values {
                 }
                 if (overflowed) {
                     for (int i = 0; i < args.Length; i++) {
-                        args[i] = args[i].AsStrongerUnion();
+                        args[i] = args[i].AsUnion(2);
                     }
                 }
                 This = @this;
@@ -412,6 +412,18 @@ namespace Microsoft.NodejsTools.Analysis.Values {
 
             public override string ToString() {
                 StringBuilder res = new StringBuilder();
+
+                if (This != null) {
+                    bool appended = false;
+                    foreach (var @this in This) {
+                        if (appended) {
+                            res.Append(", ");
+                        }
+                        res.Append(@this.ToString());
+                        appended = true;
+                    }
+                    res.Append(" ");
+                }
 
                 res.Append("{");
                 foreach (var arg in Args) {

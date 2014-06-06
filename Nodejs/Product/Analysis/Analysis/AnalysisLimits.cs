@@ -30,35 +30,21 @@ namespace Microsoft.NodejsTools.Analysis {
         /// </summary>
         public static AnalysisLimits GetStandardLibraryLimits() {
             var limits = new AnalysisLimits();
-            limits.CallDepth = 2;
-            limits.DecreaseCallDepth = 20;
-            limits.NormalArgumentTypes = 10;
-            limits.ListArgumentTypes = 5;
-            limits.DictArgumentTypes = 5;
             limits.ReturnTypes = 10;
-            limits.YieldTypes = 10;
             limits.InstanceMembers = 5;
             limits.DictKeyTypes = 5;
             limits.DictValueTypes = 20;
             limits.IndexTypes = 5;
             limits.AssignedTypes = 50;
-            limits.UnifyCallsToNew = true;
             return limits;
         }
 
-        private const string CallDepthId = "CallDepth";
-        private const string DecreaseCallDepthId = "DecreaseCallDepth";
-        private const string NormalArgumentTypesId = "NormalArgumentTypes";
-        private const string ListArgumentTypesId = "ListArgumentTypes";
-        private const string DictArgumentTypesId = "DictArgumentTypes";
         private const string ReturnTypesId = "ReturnTypes";
-        private const string YieldTypesId = "YieldTypes";
         private const string InstanceMembersId = "InstanceMembers";
         private const string DictKeyTypesId = "DictKeyTypes";
         private const string DictValueTypesId = "DictValueTypes";
         private const string IndexTypesId = "IndexTypes";
         private const string AssignedTypesId = "AssignedTypes";
-        private const string UnifyCallsToNewId = "UnifyCallsToNew";
 
         /// <summary>
         /// Loads a new instance from the specified registry key.
@@ -77,19 +63,12 @@ namespace Microsoft.NodejsTools.Analysis {
             var limits = defaultToStdLib ? GetStandardLibraryLimits() : new AnalysisLimits();
 
             if (key != null) {
-                limits.CallDepth = (key.GetValue(CallDepthId) as int?) ?? limits.CallDepth;
-                limits.DecreaseCallDepth = (key.GetValue(DecreaseCallDepthId) as int?) ?? limits.DecreaseCallDepth;
-                limits.NormalArgumentTypes = (key.GetValue(NormalArgumentTypesId) as int?) ?? limits.NormalArgumentTypes;
-                limits.ListArgumentTypes = (key.GetValue(ListArgumentTypesId) as int?) ?? limits.ListArgumentTypes;
-                limits.DictArgumentTypes = (key.GetValue(DictArgumentTypesId) as int?) ?? limits.DictArgumentTypes;
                 limits.ReturnTypes = (key.GetValue(ReturnTypesId) as int?) ?? limits.ReturnTypes;
-                limits.YieldTypes = (key.GetValue(YieldTypesId) as int?) ?? limits.YieldTypes;
                 limits.InstanceMembers = (key.GetValue(InstanceMembersId) as int?) ?? limits.InstanceMembers;
                 limits.DictKeyTypes = (key.GetValue(DictKeyTypesId) as int?) ?? limits.DictKeyTypes;
                 limits.DictValueTypes = (key.GetValue(DictValueTypesId) as int?) ?? limits.DictValueTypes;
                 limits.IndexTypes = (key.GetValue(IndexTypesId) as int?) ?? limits.IndexTypes;
                 limits.AssignedTypes = (key.GetValue(AssignedTypesId) as int?) ?? limits.AssignedTypes;
-                limits.UnifyCallsToNew = ((key.GetValue(UnifyCallsToNewId) as int?) ?? (limits.UnifyCallsToNew ? 1 : 0)) != 0;
             }
 
             return limits;
@@ -99,35 +78,16 @@ namespace Microsoft.NodejsTools.Analysis {
         /// Saves the current instance's settings to the specified registry key.
         /// </summary>
         public void SaveToStorage(RegistryKey key) {
-            key.SetValue(CallDepthId, CallDepth, RegistryValueKind.DWord);
-            key.SetValue(DecreaseCallDepthId, DecreaseCallDepth, RegistryValueKind.DWord);
-            key.SetValue(NormalArgumentTypesId, NormalArgumentTypes, RegistryValueKind.DWord);
-            key.SetValue(ListArgumentTypesId, ListArgumentTypes, RegistryValueKind.DWord);
-            key.SetValue(DictArgumentTypesId, DictArgumentTypes, RegistryValueKind.DWord);
             key.SetValue(ReturnTypesId, ReturnTypes, RegistryValueKind.DWord);
-            key.SetValue(YieldTypesId, YieldTypes, RegistryValueKind.DWord);
             key.SetValue(InstanceMembersId, InstanceMembers, RegistryValueKind.DWord);
             key.SetValue(DictKeyTypesId, DictKeyTypes, RegistryValueKind.DWord);
             key.SetValue(DictValueTypesId, DictValueTypes, RegistryValueKind.DWord);
             key.SetValue(IndexTypesId, IndexTypes, RegistryValueKind.DWord);
             key.SetValue(AssignedTypesId, AssignedTypes, RegistryValueKind.DWord);
-            key.SetValue(UnifyCallsToNewId, UnifyCallsToNew ? 1 : 0, RegistryValueKind.DWord);
         }
 
-        /// <summary>
-        /// The key to use with ProjectEntry.Properties to override the call
-        /// depth for functions in that module.
-        /// </summary>
-        public static readonly object CallDepthKey = new object();
-
         public AnalysisLimits() {
-            CallDepth = 2;
-            DecreaseCallDepth = 30;
-            NormalArgumentTypes = 50;
-            ListArgumentTypes = 20;
-            DictArgumentTypes = 20;
             ReturnTypes = 20;
-            YieldTypes = 20;
             InstanceMembers = 50;
             DictKeyTypes = 10;
             DictValueTypes = 30;
@@ -146,68 +106,16 @@ namespace Microsoft.NodejsTools.Analysis {
         public int? CrossModule { get; set; }
 
         /// <summary>
-        /// The initial call stack depth to compare for reusing function
-        /// analysis units.
-        /// 
-        /// The minimum value (1) will produce one unit for each call site.
-        /// Higher values take the callers of the function containing the call
-        /// site into account. Calls outside of functions are unaffected.
-        /// 
-        /// This value cannot vary during analysis.
-        /// </summary>
-        public int CallDepth { get; set; }
-
-        /// <summary>
-        /// The number of calls to a function at which to decrement the depth
-        /// used to distinguish calls to that function.
-        /// 
-        /// This value applies to all new calls following the last decrement.
-        /// It is permitted to vary during analysis.
-        /// </summary>
-        public int DecreaseCallDepth { get; set; }
-
-        /// <summary>
-        /// The number of types in a normal argument at which to start
-        /// combining similar types.
-        /// </summary>
-        public int NormalArgumentTypes { get; set; }
-
-        /// <summary>
-        /// The number of types in a list argument at which to start combining
-        /// similar types.
-        /// </summary>
-        public int ListArgumentTypes { get; set; }
-
-        /// <summary>
-        /// The number of types in a dict argument at which to start combining
-        /// similar types.
-        /// </summary>
-        public int DictArgumentTypes { get; set; }
-
-        /// <summary>
         /// The number of types in a return value at which to start combining
         /// similar types.
         /// </summary>
         public int ReturnTypes { get; set; }
 
         /// <summary>
-        /// The number of types in a yielded value at which to start combining
-        /// similar types.
-        /// </summary>
-        public int YieldTypes { get; set; }
-
-        /// <summary>
         /// The number of types in an instance attribute at which to start
         /// combining similar types.
         /// </summary>
         public int InstanceMembers { get; set; }
-
-        /// <summary>
-        /// True if calls to '__new__' should not be distinguished based on the
-        /// call site. This applies to both implicit and explicit calls for
-        /// user-defined '__new__' functions.
-        /// </summary>
-        public bool UnifyCallsToNew { get; set; }
 
         /// <summary>
         /// The number of keys in a dictionary at which to start combining

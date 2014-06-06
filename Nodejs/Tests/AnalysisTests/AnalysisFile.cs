@@ -46,10 +46,13 @@ namespace AnalysisTests {
             }
 
             foreach (var file in files) {
+                
                 if (!Path.GetFileName(file.Filename).Equals("package.json", StringComparison.OrdinalIgnoreCase)) {
-                    entries[file.Filename].Analyze(CancellationToken.None);
+                    ((IGroupableAnalysisProjectEntry)entries[file.Filename]).Analyze(CancellationToken.None, true);
                 }
             }
+
+            entries[files.First().Filename].AnalysisGroup.AnalyzeQueuedEntries(CancellationToken.None);
 
             return entries;
         }

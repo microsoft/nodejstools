@@ -218,7 +218,6 @@
     <Compile Include="Analysis\Values\SpecializedUserFunctionValue.cs" />
     <Compile Include="Analysis\Values\StringValue.cs" />
     <Compile Include="Analysis\Values\UndefinedValue.cs" />
-    <Compile Include="Analysis\Values\ArgumentSet.cs" />
     <Compile Include="Analysis\Values\ArrayValue.cs" />
     <Compile Include="Analysis\Values\BuiltinFunctionValue.cs" />
     <Compile Include="Analysis\Values\FunctionValue.cs" />

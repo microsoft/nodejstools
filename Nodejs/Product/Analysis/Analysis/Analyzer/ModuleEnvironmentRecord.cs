@@ -22,14 +22,14 @@ namespace Microsoft.NodejsTools.Analysis.Analyzer {
         private readonly ProjectEntry _projectEntry;
         private readonly ModuleValue _module;   // the object which corresponds to "module" in the users module
         private readonly Dictionary<Node, EnvironmentRecord> _nodeScopes;
-        private readonly Dictionary<Node, IAnalysisSet> _nodeValues;
+        private readonly Dictionary<NodeEnvironmentKey, IAnalysisSet> _nodeValues;
 
         public ModuleEnvironmentRecord(ModuleValue module, ProjectEntry projectEntry)
             : base(null) {
             _module = module;
             _projectEntry = projectEntry;
             _nodeScopes = new Dictionary<Node, EnvironmentRecord>();
-            _nodeValues = new Dictionary<Node, IAnalysisSet>();
+            _nodeValues = new Dictionary<NodeEnvironmentKey, IAnalysisSet>();
         }
 
         private ModuleEnvironmentRecord(ModuleEnvironmentRecord scope)
@@ -92,36 +92,90 @@ namespace Microsoft.NodejsTools.Analysis.Analyzer {
         #region Node Values
 
 
-        public IAnalysisSet AddNodeValue(Node node, IAnalysisSet variable) {
-            return _nodeValues[node] = variable;
+        public IAnalysisSet AddNodeValue(NodeEnvironmentKind kind, object node, IAnalysisSet variable) {
+            return _nodeValues[new NodeEnvironmentKey(kind, node)] = variable;
         }
 
-        internal bool RemoveNodeValue(Node node) {
-            return _nodeValues.Remove(node);
+        internal bool RemoveNodeValue(NodeEnvironmentKind kind, object node) {
+            return _nodeValues.Remove(new NodeEnvironmentKey(kind, node));
         }
 
         internal void ClearNodeValues() {
             _nodeValues.Clear();
         }
 
-        internal bool TryGetNodeValue(Node node, out IAnalysisSet variable) {
-            return _nodeValues.TryGetValue(node, out variable);
+        internal bool TryGetNodeValue(NodeEnvironmentKind kind, object node, out IAnalysisSet variable) {
+            return _nodeValues.TryGetValue(new NodeEnvironmentKey(kind, node), out variable);
         }
 
         /// <summary>
         /// Cached node variables so that we don't continually create new entries for basic nodes such
         /// as sequences, lambdas, etc...
         /// </summary>
-        public IAnalysisSet GetOrMakeNodeValue(Node node, Func<Node, IAnalysisSet> maker) {
+        public IAnalysisSet GetOrMakeNodeValue(NodeEnvironmentKind kind, object node, Func<object, IAnalysisSet> maker) {
             IAnalysisSet result;
-            if (!TryGetNodeValue(node, out result)) {
+            if (!TryGetNodeValue(kind, node, out result)) {
                 result = maker(node);
-                AddNodeValue(node, result);
+                AddNodeValue(kind, node, result);
             }
             return result;
         }
 
+        struct NodeEnvironmentKey : IEquatable<NodeEnvironmentKey> {
+            public readonly NodeEnvironmentKind Kind;
+            public readonly object Key;
+
+            public NodeEnvironmentKey(NodeEnvironmentKind kind, object key) {
+                Kind = kind;
+                Key = key;
+            }
+
+            public override bool Equals(object obj) {
+                if (obj is NodeEnvironmentKey) {
+                    return ((NodeEnvironmentKey)obj).Equals(this);
+                }
+                return false;
+            }
+
+            public override int GetHashCode() {
+                return Kind.GetHashCode() ^ Key.GetHashCode();
+            }
+
+            public bool Equals(NodeEnvironmentKey other) {
+                return Kind == other.Kind &&
+                    Key.Equals(other.Key);
+            }
+        }
+
         #endregion
 
+    }
+
+    enum NodeEnvironmentKind {
+        None,
+        /// <summary>
+        /// The value stored is a ObjectLiteralValue instance.
+        /// 
+        /// This is used to key unique values for object literals.
+        /// </summary>
+        ObjectLiteralValue,
+        /// <summary>
+        /// The value stored is an ArrayValue instance.
+        /// 
+        /// This is used to key unique values for array literals.
+        /// </summary>
+        ArrayValue,
+        /// <summary>
+        /// The value stored is a Function.
+        /// 
+        /// This is used to key unique values for function objects.
+        /// </summary>
+        UserFunctionValue,
+        /// <summary>
+        /// The value stored is a InheritsPrototypeValue
+        /// 
+        /// This is used to key unique values for util.inherits calls
+        /// </summary>
+        InheritsPrototypeValue
     }
 }

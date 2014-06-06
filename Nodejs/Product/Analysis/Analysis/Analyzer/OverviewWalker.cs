@@ -84,6 +84,98 @@ namespace Microsoft.NodejsTools.Analysis.Analyzer {
             return false;
         }
 
+        class ObjectLiteralKey {
+            public readonly string[] PropertyNames;
+            public readonly int HashCode;
+
+            public ObjectLiteralKey(string[] propNames) {
+                PropertyNames = propNames;
+                HashCode = 6551;
+                for (int i = 0; i < propNames.Length; i++) {
+                    if (propNames[i] != null) {
+                        HashCode ^= propNames[i].GetHashCode();
+                    }
+                }
+            }
+
+            public override bool Equals(object obj) {
+                ObjectLiteralKey other = obj as ObjectLiteralKey;
+                if (other != null) {
+                    if (other.PropertyNames.Length != PropertyNames.Length) {
+                        return false;
+                    }
+
+                    for (int i = 0; i < PropertyNames.Length; i++) {
+                        if (PropertyNames[i] != other.PropertyNames[i]) {
+                            return false;
+                        }
+                    }
+                    return true;
+                }
+                return false;
+            }
+
+            public override int GetHashCode() {
+                return HashCode;
+            }
+        }
+
+        public override bool Walk(ObjectLiteral node) {
+            // If a single file has a bunch of duplicate ObjectLiteral values with the same 
+            // property names we will merge them together into a single ObjectLiteralValue to
+            // avoid an explosion in object literals.  We only do this for literals with
+            // at least one member defined.
+            if (node.Properties.Count > 0) {
+                // first see if we have a object literal that we should share with...
+                string[] propNames = new string[node.Properties.Count];
+                for (int i = 0; i < node.Properties.Count; i++) {
+                    string propName = null;
+                    if (node.Properties[i].Name.Value != null) {
+                        propName = node.Properties[i].Name.Value.ToString();
+                    }
+
+                    propNames[i] = propName;
+                }
+
+                var key = new ObjectLiteralKey(propNames);
+                IAnalysisSet value;
+                if (_scope.GlobalEnvironment.TryGetNodeValue(
+                    NodeEnvironmentKind.ObjectLiteralValue,
+                    key,
+                    out value)) {
+                    // cache the value under our node...
+                    _scope.GlobalEnvironment.AddNodeValue(
+                        NodeEnvironmentKind.ObjectLiteralValue,
+                        node,
+                        value
+                    );
+                } else {
+                    // create the value and cache it under oru node and the 
+                    // shared key.
+                    var objLiteral = new ObjectLiteralValue(_entry, node);
+
+                    _scope.GlobalEnvironment.AddNodeValue(
+                        NodeEnvironmentKind.ObjectLiteralValue,
+                        node,
+                        objLiteral
+                    );
+                    _scope.GlobalEnvironment.AddNodeValue(
+                        NodeEnvironmentKind.ObjectLiteralValue,
+                        key,
+                        objLiteral
+                    );
+                }
+            } else {
+                _scope.GlobalEnvironment.AddNodeValue(
+                    NodeEnvironmentKind.ObjectLiteralValue,
+                    node,
+                    new ObjectLiteralValue(_entry, node)
+                );
+            }
+
+            return base.Walk(node);
+        }
+
         public override void PostWalk(FunctionObject node) {
             if (node.Body != null) {
                 Debug.Assert(_scope is DeclarativeEnvironmentRecord && ((DeclarativeEnvironmentRecord)_scope).Node == node);
@@ -117,7 +209,7 @@ namespace Microsoft.NodejsTools.Analysis.Analyzer {
 
                 IAnalysisSet functionObj;
                 UserFunctionValue func = null;
-                if (!_scope.GlobalEnvironment.TryGetNodeValue(node, out functionObj)) {
+                if (!_scope.GlobalEnvironment.TryGetNodeValue(NodeEnvironmentKind.UserFunctionValue, node, out functionObj)) {
                     func = CreateUserFunction(node, outerUnit);
                 } else {
                     func = (UserFunctionValue)functionObj;
@@ -176,7 +268,7 @@ namespace Microsoft.NodejsTools.Analysis.Analyzer {
                 func = new UserFunctionValue(node, outerUnit, _scope, _isNested);
             }
 
-            _scope.GlobalEnvironment.AddNodeValue(node, func);
+            _scope.GlobalEnvironment.AddNodeValue(NodeEnvironmentKind.UserFunctionValue, node, func);
             return func;
         }
 

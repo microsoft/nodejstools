@@ -198,21 +198,55 @@ namespace Microsoft.NodejsTools.Analysis.Analyzer {
         }
 #if DEBUG
         internal virtual void DumpScope(StringBuilder output, int level) {
-            Indent(level);
-            output.AppendLine(String.Format(" --- {0}", Name));
+            Indent(output, level);
+            output.AppendLine(EnvironmentDescription);
             foreach (var variable in Variables) {
                 var types = variable.Value.Types;
-                var distinctTypes = variable.Value.Types.Select(x => x.ShortDescription).Distinct().ToArray();
-                Indent(level); output.AppendLine(String.Format(" {0} contains {1} types, distinct types {2}", variable.Key, types.Count, distinctTypes.Length));
+                var distinctTypes = variable.Value.Types
+                    .GroupBy(GetDescription)
+                    .Select(g => new { Description = g.Key, Count = g.Distinct().Count() })                    
+                    .ToArray();
+                Array.Sort(distinctTypes, (x, y) => x.Description.CompareTo(y.Description));
+                string extra = "";
+                if (types.Count >= 20) {
+                    extra = "**20+**";
+                } else if (types.Count >= 10) {
+                    extra = "**10+**";
+                }
+                Indent(output, level + 1); 
+                output.AppendLine(String.Format(" {0} contains {1} types (strength {4}), distinct types {2}{3}:", variable.Key, types.Count, distinctTypes.Length, extra, variable.Value.UnionStrength));
 
                 foreach (var type in distinctTypes) {
-                    Indent(level + 1); output.AppendLine(type);
+                    Indent(output, level + 2);
+                    if (type.Count > 30) {
+                        output.AppendLine(type.Description + " (" + type.Count + " **HOT**)");
+                        foreach (var innerType in types.Where(x => GetDescription(x) == type.Description)) {
+                            Indent(output, level + 3);
+                            output.AppendLine(innerType.ToString());
+                        }
+                    } else {
+                        output.AppendLine(type.Description + " (" + type.Count + ")");
+                    }
                 }
             }
         }
 
-        private static void Indent(int level) {
-            Console.Write(new string(' ', level * 4));
+        protected virtual string EnvironmentDescription {
+            get {
+                return String.Format(" --- {0}", Name);
+            }
+        }
+
+        private static string GetDescription(AnalysisValue value) {
+            var res = value.ShortDescription;
+            if (string.IsNullOrWhiteSpace(res)) {
+                res = value.GetType().FullName;
+            }
+            return res;
+        }
+
+        private static void Indent(StringBuilder output, int level) {
+            output.Append(' ', level * 4);
         }
 #endif
     }

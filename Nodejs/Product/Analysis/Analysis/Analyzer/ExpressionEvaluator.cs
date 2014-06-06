@@ -192,11 +192,14 @@ namespace Microsoft.NodejsTools.Analysis.Analyzer {
         }
 
         private static IAnalysisSet EvaluateObjectLiteral(ExpressionEvaluator ee, Node node) {
-            var n = (ObjectLiteral)node;
-            IAnalysisSet result = ee.Scope.GlobalEnvironment.GetOrMakeNodeValue(node, _ => {
-                var objectInfo = new ObjectLiteralValue(ee._unit.ProjectEntry, node);
-                result = objectInfo.SelfSet;
 
+            var n = (ObjectLiteral)node;
+            IAnalysisSet value;
+            if (ee.Scope.GlobalEnvironment.TryGetNodeValue(
+                NodeEnvironmentKind.ObjectLiteralValue,
+                node,
+                out value)) {
+                var objectInfo = (ObjectLiteralValue)value;
                 if (n.Properties.Count > 50) {
                     // probably some generated object literal, ignore it
                     // for the post part.
@@ -207,9 +210,10 @@ namespace Microsoft.NodejsTools.Analysis.Analyzer {
                     }
                 }
 
-                return result;
-            });
-            return result;
+                return value;
+            }
+            Debug.Fail("Failed to find object literal value");
+            return AnalysisSet.Empty;
         }
 
         private static void AssignProperty(ExpressionEvaluator ee, Node node, ObjectLiteralValue objectInfo, ObjectLiteralProperty x) {
@@ -475,19 +479,30 @@ namespace Microsoft.NodejsTools.Analysis.Analyzer {
         }
 
         private IAnalysisSet MakeArrayValue(ExpressionEvaluator ee, Node node) {
-            var sequence = (ArrayValue)ee.Scope.GlobalEnvironment.GetOrMakeNodeValue(node, x => {
+            var sequence = (ArrayValue)ee.Scope.GlobalEnvironment.GetOrMakeNodeValue(
+                NodeEnvironmentKind.ArrayValue,
+                node, x => {
                 return new ArrayValue(
                     VariableDef.EmptyArray,
-                    _unit.ProjectEntry
+                    _unit.ProjectEntry,
+                    node
                 ).SelfSet;
             });
-            var seqItems = ((ArrayLiteral)node).Elements;
-            var indexValues = new IAnalysisSet[seqItems.Count];
+            var array = (ArrayLiteral)node;
+            if (array.Elements.Count >= 50) {
+                // probably some generated object literal, ignore it
+                // for the post part.
+                sequence.AddTypes(ee._unit, new[] { Evaluate(array.Elements.First()) });
+            } else {
+                var seqItems = ((ArrayLiteral)node).Elements;
+                var indexValues = new IAnalysisSet[seqItems.Count];
 
-            for (int i = 0; i < seqItems.Count; i++) {
-                indexValues[i] = Evaluate(seqItems[i]);
+
+                for (int i = 0; i < seqItems.Count; i++) {
+                    indexValues[i] = Evaluate(seqItems[i]);
+                }
+                sequence.AddTypes(ee._unit, indexValues);
             }
-            sequence.AddTypes(ee._unit, indexValues);
             return sequence.SelfSet;
         }
 
