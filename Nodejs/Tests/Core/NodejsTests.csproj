@@ -136,6 +136,7 @@
     <Compile Include="SerializationTestData.cs" />
     <Compile Include="SourceMapTests.cs" />
     <Compile Include="TemplateTests.cs" />
+    <Compile Include="TestFrameworkStringConverterTest.cs" />
     <Compile Include="TestNodejsReplSite.cs" />
   </ItemGroup>
   <ItemGroup>

@@ -355,6 +355,12 @@ namespace Microsoft.NodejsTools.TestAdapter {
                 return false;
             }
 
+            //Setting/updating "TestFramework" property on a file item will cause metedata change in the project file,
+            //so we need to re-discover when file change happens. 
+            if (pathToItem.EndsWith(".njsproj", StringComparison.OrdinalIgnoreCase)) {
+                return true;
+            }
+
             if (IsTestFile(pathToItem)) {
                 if (EqtTrace.IsVerboseEnabled) {
                     EqtTrace.Verbose("TestContainerDiscoverer: Found a test {0}.", pathToItem);

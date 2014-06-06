@@ -17,6 +17,7 @@ using System.Collections.Generic;
 using System.IO;
 using System.Windows.Forms;
 using EnvDTE;
+using Microsoft.NodejsTools.TestFrameworks;
 using Microsoft.VisualStudio.Shell;
 using Microsoft.VisualStudio.Shell.Interop;
 using Microsoft.VisualStudio.TemplateWizard;
@@ -31,7 +32,7 @@ namespace Microsoft.NodejsTools.ProjectWizard {
 
         public void ProjectItemFinishedGenerating(ProjectItem projectItem) {            
             EnvDTE.Property property = projectItem.Properties.Item("TestFramework");
-            property.Value = "Default";
+            property.Value = TestFrameworkDirectories.DefaultFramework;
         }
 
         public void RunFinished() { }

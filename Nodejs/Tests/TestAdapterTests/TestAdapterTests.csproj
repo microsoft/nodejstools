@@ -41,11 +41,13 @@
     <Reference Include="Microsoft.VisualStudio.QualityTools.UnitTestFramework" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="FrameworkDiscoverTest.cs" />
     <Compile Include="MockRunContext.cs" />
     <Compile Include="MockMessageLogger.cs" />
     <Compile Include="MockDiscoveryContext.cs" />
     <Compile Include="MockTestCaseDiscoverySink.cs" />
     <Compile Include="MockTestExecutionRecorder.cs" />
+    <Compile Include="NodejsTestInfoTests.cs" />
     <Compile Include="TestExecutorTests.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="TestInfo.cs" />

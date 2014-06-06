@@ -566,6 +566,7 @@
     <Compile Include="SmartIndent.cs" />
     <Compile Include="SmartIndentProvider.cs" />
     <Compile Include="SourceMap.cs" />
+    <Compile Include="TestFrameworks\TestFrameworkDirectories.cs" />
     <Compile Include="VsMenus.cs" />
     <Compile Include="AzureSolutionListener.cs" />
     <Compile Include="BaseNodeProjectFactory.cs" />
@@ -788,6 +789,23 @@
       <SubType>Designer</SubType>
     </MultiProjectZipProject>
     <ZipItem Include="Templates\Files\UnitTest\UnitTest.js" />
+    <ZipItem Include="Templates\Files\UnitTest\UnitTest.vstemplate" />
+    <Content Include="TestFrameworks\find_tests.js">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+      <IncludeInVSIX>true</IncludeInVSIX>
+    </Content>
+    <Content Include="TestFrameworks\run_tests.js">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+      <IncludeInVSIX>true</IncludeInVSIX>
+    </Content>
+    <Content Include="TestFrameworks\Default\default.js">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+      <IncludeInVSIX>true</IncludeInVSIX>
+    </Content>
+    <Content Include="TestFrameworks\Mocha\mocha.js">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+      <IncludeInVSIX>true</IncludeInVSIX>
+    </Content>
     <ZipItem Include="Templates\Files\UnitTest\UnitTest.vstemplate">
       <SubType>Designer</SubType>
     </ZipItem>
@@ -1139,6 +1157,7 @@
     <TypeScriptProject Include="ProjectTemplates\TypeScriptAzureExpressApp\stylus.d.ts" />
     <TypeScriptProject Include="ProjectTemplates\TypeScriptExpressApp\stylus.d.ts" />
   </ItemGroup>
+  <ItemGroup />
   <PropertyGroup>
     <!--
     To specify a different registry root to register your package, uncomment the TargetRegistryRoot

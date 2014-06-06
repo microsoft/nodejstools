@@ -17,19 +17,19 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
 using System.Linq;
-using System.Threading;
+
+using MSBuild = Microsoft.Build.Evaluation;
 using Microsoft.VisualStudio.TestPlatform.ObjectModel;
 using Microsoft.VisualStudio.TestPlatform.ObjectModel.Adapter;
 using Microsoft.VisualStudio.TestPlatform.ObjectModel.Logging;
 using Microsoft.VisualStudioTools;
-using MSBuild = Microsoft.Build.Evaluation;
 
 namespace Microsoft.NodejsTools.TestAdapter {
     [FileExtension(".njsproj")]
     [DefaultExecutorUri(TestExecutor.ExecutorUriString)]
     class TestDiscoverer : ITestDiscoverer {
-
-        public TestDiscoverer() { }
+        public TestDiscoverer() {
+        }
 
         /// <summary>
         /// ITestDiscover, Given a list of test sources this method pulls out the test cases
@@ -73,6 +73,11 @@ namespace Microsoft.NodejsTools.TestAdapter {
                             if (!TestContainerDiscoverer.IsValidTestFramework(value)) {
                                 continue;
                             }
+                            TestFrameworks.TestFramework testFramework = GetTestFrameworkObject(value);
+                            if (testFramework == null) {
+                                logger.SendMessage(TestMessageLevel.Warning, String.Format("Ignoring unsupported test framework {0}", value));
+                                continue;
+                            }
 
                             string fileAbsolutePath = CommonUtils.GetAbsoluteFilePath(projectHome, item.EvaluatedInclude);
                             string testFileAbsolutePath = fileAbsolutePath;
@@ -87,45 +92,19 @@ namespace Microsoft.NodejsTools.TestAdapter {
 
                             logger.SendMessage(TestMessageLevel.Informational, String.Format("Processing {0}", fileAbsolutePath));
 
-                            string testCases = String.Empty;
-                            string tempFile = Path.GetTempFileName();
+                            List<TestFrameworks.NodejsTestInfo> discoveredTestCases = testFramework.FindTests(fileAbsolutePath, nodeExePath, logger, projectHome);
 
-                            try {
-                                EvaluateJavaScript(nodeExePath, String.Format("var fs = require('fs'); var stream = fs.createWriteStream('{0}'); var testCase = require('{1}'); for(var x in testCase) {{ stream.write(x + '\\r\\n'); }} stream.end();", tempFile.Replace("\\", "\\\\"), fileAbsolutePath.Replace("\\", "\\\\")), logger);
-                                for (int i = 0; i < 4; i++) {
-                                    try {
-                                        testCases = File.ReadAllText(tempFile);
-                                        break;
-                                    } catch (IOException) {
-                                        //We took an error processing the file.  Wait a few and try again
-                                        Thread.Sleep(500);
-                                    }
-                                }
-                            } finally {
-                                try {
-                                    File.Delete(tempFile);
-                                } catch (Exception) { //
-                                    //Unable to delete for some reason
-                                    //  We leave the file behind in this case, its in TEMP so eventually OS will clean up
-                                }
-                            }
-
-
-                            if (String.IsNullOrEmpty(testCases)) {
+                            if (discoveredTestCases.Count == 0) {
                                 logger.SendMessage(TestMessageLevel.Warning, String.Format("Discovered 0 testcases in: {0}", fileAbsolutePath));
                             } else {
-                                foreach (var testFunction in testCases.Split(new[] { "\r\n", "\r", "\n" }, StringSplitOptions.RemoveEmptyEntries)) {
-                                    //TestCase Qualified name format
-                                    //Path::ModuleName::TestName
-                                    string testName = MakeFullyQualifiedTestName(fileAbsolutePath, Path.GetFileNameWithoutExtension(fileAbsolutePath), testFunction);
-
-                                    logger.SendMessage(TestMessageLevel.Informational, String.Format("Creating TestCase:{0}", testName));
-                                    var testCase = new TestCase(testName, TestExecutor.ExecutorUri, projSource) {
-                                        CodeFilePath = testFileAbsolutePath,
+                                foreach (var discoveredTest in discoveredTestCases) {
+                                    string qualifiedName = discoveredTest.FullyQualifiedName;
+                                    logger.SendMessage(TestMessageLevel.Informational, String.Format("Creating TestCase:{0}", qualifiedName));
+                                    var testCase = new TestCase(qualifiedName, TestExecutor.ExecutorUri, projSource) {
+                                        CodeFilePath = fileAbsolutePath,
                                         LineNumber = 0,
-                                        DisplayName = testFunction
+                                        DisplayName = discoveredTest.TestName
                                     };
-
                                     discoverySink.SendTestCase(testCase);
                                 }
                             }
@@ -140,16 +119,10 @@ namespace Microsoft.NodejsTools.TestAdapter {
             }
         }
 
-        internal static string MakeFullyQualifiedTestName(string modulePath, string className, string methodName) {
-            return modulePath + "::" + className + "::" + methodName;
-        }
-
-        internal static void ParseFullyQualifiedTestName(string fullyQualifiedName, out string modulePath, out string className, out string methodName) {
-            string[] parts = fullyQualifiedName.Split(new string[] { "::" }, StringSplitOptions.None);
-            Debug.Assert(parts.Length == 3);
-            modulePath = parts[0];
-            className = parts[1];
-            methodName = parts[2];
+        private TestFrameworks.TestFramework GetTestFrameworkObject(string testFramework) {
+            //Debug.Fail("Before Discover");
+            TestFrameworks.FrameworkDiscover discover = new TestFrameworks.FrameworkDiscover();
+            return discover.Get(testFramework);
         }
 
         internal static MSBuild.Project LoadProject(MSBuild.ProjectCollection buildEngine, string fullProjectPath) {
@@ -159,49 +132,6 @@ namespace Microsoft.NodejsTools.TestAdapter {
                 buildEngine.UnloadProject(buildProject);
             }
             return buildEngine.LoadProject(fullProjectPath);
-        }
-
-        private string EvaluateJavaScript(string nodeExePath, string code, IMessageLogger logger) {
-#if DEBUG
-            logger.SendMessage(TestMessageLevel.Informational, String.Format("  Code {0}", code));
-#endif
-            string arguments = "-e \"" + code + "\"";
-
-            var processStartInfo = new ProcessStartInfo(nodeExePath, arguments);
-            processStartInfo.CreateNoWindow = true;
-            processStartInfo.UseShellExecute = false;
-            processStartInfo.RedirectStandardError = true;
-            processStartInfo.RedirectStandardOutput = true;
-
-            string stdout = "";
-            try {
-                using (var process = Process.Start(processStartInfo)) {
-
-                    process.EnableRaisingEvents = true;
-                    process.OutputDataReceived += (sender, args) => {
-                        stdout += args.Data + Environment.NewLine;
-
-                    };
-                    process.ErrorDataReceived += (sender, args) => {
-                        stdout += args.Data + Environment.NewLine;
-
-                    };
-                    process.BeginErrorReadLine();
-                    process.BeginOutputReadLine();
-
-                    process.WaitForExit();
-#if DEBUG
-                    logger.SendMessage(TestMessageLevel.Informational, String.Format("  Process exited: {0}", process.ExitCode));
-#endif
-                }
-#if DEBUG
-                logger.SendMessage(TestMessageLevel.Informational, String.Format("  StdOut:{0}", stdout));
-#endif
-            } catch (FileNotFoundException e) {
-                logger.SendMessage(TestMessageLevel.Error, String.Format("Error starting node.exe.\n {0}", e));
-            }
-
-            return stdout;
         }
     }
 }

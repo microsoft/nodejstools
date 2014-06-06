@@ -96,6 +96,9 @@
     <Compile Include="..\Nodejs\PkgCmdID.cs">
       <Link>PkgCmdID.cs</Link>
     </Compile>
+    <Compile Include="..\Nodejs\TestFrameworks\TestFrameworkDirectories.cs">
+      <Link>TestFrameworkDirectories.cs</Link>
+    </Compile>
     <Compile Include="INodePackageModulesCommands.cs" />
     <Compile Include="ImportWizard.cs" />
     <Compile Include="NpmWizardExtension.cs" />

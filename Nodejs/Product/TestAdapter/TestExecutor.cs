@@ -24,6 +24,7 @@ using System.Security.Cryptography;
 using System.Text;
 using System.Threading;
 using Microsoft.NodejsTools;
+using Microsoft.NodejsTools.TestAdapter.TestFrameworks;
 using Microsoft.VisualStudio.TestPlatform.ObjectModel;
 using Microsoft.VisualStudio.TestPlatform.ObjectModel.Adapter;
 using Microsoft.VisualStudio.TestPlatform.ObjectModel.Logging;
@@ -108,27 +109,10 @@ namespace Microsoft.NodejsTools.TestAdapter {
             ).First();
         }
 
-        private static string GetWorkingDirectory(TestCase test, NodejsProjectSettings settings) {
-            string testFile;
-            string testClass;
-            string testMethod;
-            TestDiscoverer.ParseFullyQualifiedTestName(test.FullyQualifiedName, out testFile, out testClass, out testMethod);
-
-            return Path.GetDirectoryName(CommonUtils.GetAbsoluteFilePath(settings.WorkingDir, testFile));
-        }
-
-        private static IEnumerable<string> GetInterpreterArgs(TestCase test) {
-            string testFile;
-            string testClass;
-            string testMethod;
-            TestDiscoverer.ParseFullyQualifiedTestName(test.FullyQualifiedName, out testFile, out testClass, out testMethod);
-
-            var moduleName = Path.GetFileNameWithoutExtension(testFile);
-
-            return new[] { 
-                "-e",                
-                String.Format("var testCase = require('{0}'); testCase['{1}']();", testFile.Replace("\\","\\\\"), testMethod)
-            };
+        private IEnumerable<string> GetInterpreterArgs(TestCase test, string workingDir, string projectRootDir) {
+            TestFrameworks.NodejsTestInfo testInfo = new TestFrameworks.NodejsTestInfo(test.FullyQualifiedName);
+            TestFrameworks.FrameworkDiscover discover = new TestFrameworks.FrameworkDiscover();
+            return discover.Get(testInfo.TestFramework).ArgumentsToRunTests(testInfo.TestName, testInfo.ModulePath, workingDir, projectRootDir);
         }
 
         private static IEnumerable<string> GetDebugArgs(NodejsProjectSettings settings, out string secret, out int port) {
@@ -148,7 +132,6 @@ namespace Microsoft.NodejsTools.TestAdapter {
             var testResult = new TestResult(test);
             frameworkHandle.RecordStart(test);
             testResult.StartTime = DateTimeOffset.Now;
-
             NodejsProjectSettings settings;
             if (!sourceToSettings.TryGetValue(test.Source, out settings)) {
                 sourceToSettings[test.Source] = settings = LoadProjectSettings(test.Source);
@@ -167,17 +150,9 @@ namespace Microsoft.NodejsTools.TestAdapter {
                 return;
             }
 
-            var workingDir = GetWorkingDirectory(test, settings);
-            var args = GetInterpreterArgs(test);
-            var searchPath = settings.SearchPath;
-
-            if (!CommonUtils.IsSameDirectory(workingDir, settings.WorkingDir)) {
-                if (string.IsNullOrEmpty(searchPath)) {
-                    searchPath = settings.WorkingDir;
-                } else {
-                    searchPath = settings.WorkingDir + ";" + searchPath;
-                }
-            }
+            NodejsTestInfo testInfo = new NodejsTestInfo(test.FullyQualifiedName);
+            var workingDir = Path.GetDirectoryName(CommonUtils.GetAbsoluteFilePath(settings.WorkingDir, testInfo.ModulePath));
+            var args = GetInterpreterArgs(test, workingDir, settings.ProjectRootDir);
 
             string secret = null;
             int port = 0;
@@ -196,7 +171,8 @@ namespace Microsoft.NodejsTools.TestAdapter {
                                     workingDir,
                                     null,
                                     false,
-                                    null)) {
+                                    null,
+                                    false)) {
                 bool killed = false;
 
 #if DEBUG
@@ -244,11 +220,13 @@ namespace Microsoft.NodejsTools.TestAdapter {
             var buildEngine = new MSBuild.ProjectCollection();
             var proj = buildEngine.LoadProject(projectFile);
             
-            var projectHome = Path.GetFullPath(Path.Combine(proj.DirectoryPath, proj.GetPropertyValue(CommonConstants.ProjectHome) ?? "."));
+            var projectRootDir = Path.GetFullPath(Path.Combine(proj.DirectoryPath, proj.GetPropertyValue(CommonConstants.ProjectHome) ?? "."));
 
-            var projSettings = new NodejsProjectSettings();
-                        
-            projSettings.WorkingDir = Path.GetFullPath(Path.Combine(projectHome, proj.GetPropertyValue(CommonConstants.WorkingDirectory) ?? "."));
+            NodejsProjectSettings projSettings = new NodejsProjectSettings();
+            
+            projSettings.ProjectRootDir = projectRootDir;
+
+            projSettings.WorkingDir = Path.GetFullPath(Path.Combine(projectRootDir, proj.GetPropertyValue(CommonConstants.WorkingDirectory) ?? "."));
             
             projSettings.NodeExePath = proj.GetPropertyValue(NodejsConstants.NodeExePath);
             if (string.IsNullOrEmpty(projSettings.NodeExePath)) {
@@ -302,6 +280,7 @@ namespace Microsoft.NodejsTools.TestAdapter {
             public string NodeExePath { get; set; }
             public string SearchPath { get; set; }
             public string WorkingDir { get; set; }
+            public string ProjectRootDir { get;set; } 
         }
     }
 }

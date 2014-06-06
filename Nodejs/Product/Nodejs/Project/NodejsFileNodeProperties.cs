@@ -19,6 +19,7 @@ using System.Diagnostics;
 using System.Diagnostics.CodeAnalysis;
 using System.Globalization;
 using System.IO;
+using System.Linq;
 using System.Runtime.InteropServices;
 using Microsoft.VisualStudio;
 using Microsoft.VisualStudioTools.Project;
@@ -27,6 +28,7 @@ using Microsoft.VisualStudio.Shell;
 using Microsoft.VisualStudio.Shell.Interop;
 using VSLangProj;
 using IOleServiceProvider = Microsoft.VisualStudio.OLE.Interop.IServiceProvider;
+using Microsoft.NodejsTools.TestFrameworks;
 using SR = Microsoft.NodejsTools.Project.SR;
 
 namespace Microsoft.NodejsTools.Project {
@@ -40,16 +42,13 @@ namespace Microsoft.NodejsTools.Project {
         [SRCategoryAttribute(SR.Advanced)]
         [LocDisplayName(SR.TestFramework)]
         [SRDescriptionAttribute(SR.TestFrameworkDescription)]
+        [TypeConverter(typeof(TestFrameworkStringConverter))]
         public string TestFramework {
             get {
-                var framework = this.HierarchyNode.ItemNode.GetMetadata(SR.TestFramework);
-                if (String.IsNullOrWhiteSpace(framework)) {
-                    return String.Empty;
-                }
-                return Convert.ToString(framework);
+                return GetProperty(SR.TestFramework, string.Empty);
             }
             set {
-                this.HierarchyNode.ItemNode.SetMetadata(SR.TestFramework, value.ToString());
+                SetProperty(SR.TestFramework, value.ToString());
             }
         }
     }
@@ -63,18 +62,52 @@ namespace Microsoft.NodejsTools.Project {
         [SRCategoryAttribute(SR.Advanced)]
         [LocDisplayName(SR.TestFramework)]
         [SRDescriptionAttribute(SR.TestFrameworkDescription)]
+        [TypeConverter(typeof(TestFrameworkStringConverter))]
         public string TestFramework {
             get {
-                var framework = this.HierarchyNode.ItemNode.GetMetadata(SR.TestFramework);
-                if (String.IsNullOrEmpty(framework)) {
-                    return String.Empty;
-                }
-                return Convert.ToString(framework);
+                return GetProperty(SR.TestFramework, string.Empty);
             }
             set {
-
-                this.HierarchyNode.ItemNode.SetMetadata(SR.TestFramework, value.ToString());
+                SetProperty(SR.TestFramework, value.ToString());
             }
+        }
+    }
+
+    /// <summary>
+    /// This type converter doesn't really do any conversions, but allows us to provide
+    /// a list of standard values for the test framework.
+    /// </summary>
+    class TestFrameworkStringConverter : StringConverter {
+        public TestFrameworkStringConverter() {
+        }
+
+        public override bool GetStandardValuesSupported(ITypeDescriptorContext context) {
+            return true;
+        }
+
+        public override bool CanConvertFrom(ITypeDescriptorContext context, Type sourceType) {
+            if (sourceType == typeof(string)) {
+                return true;
+            }
+            return base.CanConvertFrom(context, sourceType);
+        }
+
+        public override bool CanConvertTo(ITypeDescriptorContext context, Type destinationType) {
+            return base.CanConvertTo(context, destinationType);
+        }
+
+        public override object ConvertTo(ITypeDescriptorContext context, CultureInfo culture, object value, Type destinationType) {
+            return value;
+        }
+
+        public override object ConvertFrom(ITypeDescriptorContext context, CultureInfo culture, object value) {
+            return value;
+        }
+
+        public override StandardValuesCollection GetStandardValues(ITypeDescriptorContext context) {
+            TestFrameworkDirectories discover = new TestFrameworkDirectories();
+            List<string> knownFrameworkList = discover.GetFrameworkNames();
+            return new StandardValuesCollection(knownFrameworkList);
         }
     }
 }
