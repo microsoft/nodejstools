@@ -21,6 +21,7 @@ using Microsoft.NodejsTools.Analysis.Analyzer;
 using Microsoft.NodejsTools.Parsing;
 
 namespace Microsoft.NodejsTools.Analysis.Values {
+    [Serializable]
     internal class ModuleValue : ObjectValue {
         private readonly string _name;
         private readonly ModuleEnvironmentRecord _scope;

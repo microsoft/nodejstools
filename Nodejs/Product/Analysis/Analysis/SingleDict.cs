@@ -23,13 +23,10 @@ namespace Microsoft.NodejsTools.Analysis {
     /// A simple dictionary like object which has efficient storage when there's only a single item in the dictionary.
     /// </summary>
     [DebuggerDisplay("Count = {Count}")]
+    [Serializable]
     struct SingleDict<TKey, TValue> : IEnumerable<KeyValuePair<TKey, TValue>> {
         [DebuggerBrowsable(DebuggerBrowsableState.Collapsed)]
-        private object _data; // Dictionary<TKey, TValue>, SingleEntry<TKey, TValue> or IEqualityComparer<TKey>
-
-        public SingleDict(IEqualityComparer<TKey> comparer) {
-            _data = comparer;
-        }
+        private object _data; // Dictionary<TKey, TValue>, SingleEntry<TKey, TValue>
 
         [DebuggerBrowsable(DebuggerBrowsableState.RootHidden)]
         private KeyValuePair<TKey, TValue>[] AllItems {
@@ -48,31 +45,15 @@ namespace Microsoft.NodejsTools.Analysis {
             }
         }
 
-        public IEqualityComparer<TKey> Comparer {
-            get {
-                var single = _data as SingleDependency;
-                if (single != null) {
-                    return single.Comparer;
-                }
 
-                var dict = _data as Dictionary<TKey, TValue>;
-                if (dict != null) {
-                    return dict.Comparer;
-                }
-
-                return (_data as IEqualityComparer<TKey>) ?? EqualityComparer<TKey>.Default;
-            }
-        }
-
-        sealed class SingleDependency {
+        [Serializable]
+        internal sealed class SingleDependency {
             public readonly TKey Key;
             public TValue Value;
-            public readonly IEqualityComparer<TKey> Comparer;
 
-            public SingleDependency(TKey key, TValue value, IEqualityComparer<TKey> comparer) {
+            public SingleDependency(TKey key, TValue value) {
                 Key = key;
                 Value = value;
-                Comparer = comparer;
             }
         }
 
@@ -80,7 +61,7 @@ namespace Microsoft.NodejsTools.Analysis {
         public bool ContainsKey(TKey key) {
             var single = _data as SingleDependency;
             if (single != null) {
-                return single.Comparer.Equals(single.Key, key);
+                return EqualityComparer<TKey>.Default.Equals(single.Key, key);
             }
             var dict = _data as Dictionary<TKey, TValue>;
             if (dict != null) {
@@ -92,7 +73,7 @@ namespace Microsoft.NodejsTools.Analysis {
         public bool TryGetValue(TKey key, out TValue value) {
             SingleDependency single = _data as SingleDependency;
             if (single != null) {
-                if (single.Comparer.Equals(single.Key, key)) {
+                if (EqualityComparer<TKey>.Default.Equals(single.Key, key)) {
                     value = single.Value;
                     return true;
                 }
@@ -119,20 +100,19 @@ namespace Microsoft.NodejsTools.Analysis {
                 throw new KeyNotFoundException();
             }
             set {
-                IEqualityComparer<TKey> comparer = null;
-                if (_data == null || (comparer = _data as IEqualityComparer<TKey>) != null) {
-                    _data = new SingleDependency(key, value, comparer ?? EqualityComparer<TKey>.Default);
+                if (_data == null) {
+                    _data = new SingleDependency(key, value);
                     return;
                 }
 
                 var single = _data as SingleDependency;
                 if (single != null) {
-                    if (single.Comparer.Equals(single.Key, key)) {
+                    if (EqualityComparer<TKey>.Default.Equals(single.Key, key)) {
                         single.Value = value;
                         return;
                     }
 
-                    var data = new Dictionary<TKey, TValue>(single.Comparer);
+                    var data = new Dictionary<TKey, TValue>();
                     data[single.Key] = single.Value;
                     data[key] = value;
                     _data = data;
@@ -141,7 +121,7 @@ namespace Microsoft.NodejsTools.Analysis {
 
                 var dict = _data as Dictionary<TKey, TValue>;
                 if (dict == null) {
-                    _data = dict = new Dictionary<TKey, TValue>(comparer ?? EqualityComparer<TKey>.Default);
+                    _data = dict = new Dictionary<TKey, TValue>();
                 }
                 dict[key] = value;
             }
@@ -150,8 +130,8 @@ namespace Microsoft.NodejsTools.Analysis {
         internal void Remove(TKey fromModule) {
             var single = _data as SingleDependency;
             if (single != null) {
-                if (single.Comparer.Equals(single.Key, fromModule)) {
-                    _data = single.Comparer;
+                if (EqualityComparer<TKey>.Default.Equals(single.Key, fromModule)) {
+                    _data = null;
                 }
                 return;
             }
@@ -191,7 +171,7 @@ namespace Microsoft.NodejsTools.Analysis {
                 if (value.Count == 1) {
                     using (var e = value.GetEnumerator()) {
                         e.MoveNext();
-                        _data = new SingleDependency(e.Current.Key, e.Current.Value, value.Comparer);
+                        _data = new SingleDependency(e.Current.Key, e.Current.Value);
                     }
                 } else {
                     _data = value;
@@ -244,10 +224,6 @@ namespace Microsoft.NodejsTools.Analysis {
 
                 return 0;
             }
-        }
-
-        public void Clear() {
-            _data = Comparer;
         }
 
         #region IEnumerable<KeyValuePair<TKey,TValue>> Members

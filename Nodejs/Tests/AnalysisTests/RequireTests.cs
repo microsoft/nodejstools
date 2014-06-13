@@ -1,10 +1,22 @@
-﻿using System;
+﻿/* ****************************************************************************
+ *
+ * Copyright (c) Microsoft Corporation. 
+ *
+ * This source code is subject to terms and conditions of the Apache License, Version 2.0. A 
+ * copy of the license can be found in the License.html file at the root of this distribution. If 
+ * you cannot locate the Apache License, Version 2.0, please send an email to 
+ * vspython@microsoft.com. By using this source code in any fashion, you are agreeing to be bound 
+ * by the terms of the Apache License, Version 2.0.
+ *
+ * You must not remove this notice, or any other, from this software.
+ *
+ * ***************************************************************************/
+
+using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
-using System.Text;
 using System.Threading;
-using System.Threading.Tasks;
 using System.Web.Script.Serialization;
 using Microsoft.NodejsTools.Analysis;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
@@ -181,7 +193,7 @@ var mymod = module.exports = exports = new MyMod")
             string code = @"
 var http = require('http');
 ";
-            var analysis = AnalysisTests.ProcessText(code);
+            var analysis = AnalysisTests.ProcessOneText(code);
             AssertUtil.ContainsAtLeast(
                 analysis.GetMembersByIndex("http", 0).Select(x => x.Name),
                 "Server", "ServerResponse", "Agent", "ClientRequest",
@@ -194,7 +206,7 @@ var http = require('http');
             string code = @"
 var http = require('ht' + 'tp');
 ";
-            var analysis = AnalysisTests.ProcessText(code);
+            var analysis = AnalysisTests.ProcessOneText(code);
             AssertUtil.ContainsAtLeast(
                 analysis.GetMembersByIndex("http", 0).Select(x => x.Name),
                 "Server", "ServerResponse", "Agent", "ClientRequest",

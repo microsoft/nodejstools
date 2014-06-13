@@ -38,6 +38,7 @@ namespace Microsoft.NodejsTools.Parsing
         UndefinedGlobal,
     }
 
+    [Serializable]
     public class JSVariableField
     {
         private Statement _scope;
@@ -98,6 +99,7 @@ namespace Microsoft.NodejsTools.Parsing
         }
     }
 
+    [Serializable]
     class JSArgumentField : JSVariableField {
         private readonly int _position;
 

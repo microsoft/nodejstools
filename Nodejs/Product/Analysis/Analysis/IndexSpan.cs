@@ -21,6 +21,7 @@ namespace Microsoft.NodejsTools.Parsing
     /// 
     /// It is closed on the left and open on the right: [Start .. End). 
     /// </summary>
+    [Serializable]
     public struct IndexSpan : IEquatable<IndexSpan> {
         private readonly int _start, _length;
 

@@ -53,6 +53,8 @@
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="RequireTests.cs" />
     <Compile Include="ScannerTests.cs" />
+    <Compile Include="SerializationTests.cs" />
+    <Compile Include="SerializedAnalysisTests.cs" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\..\..\Common\Tests\Utilities\TestUtilities.csproj">

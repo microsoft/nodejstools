@@ -25,6 +25,7 @@ namespace Microsoft.NodejsTools.Analysis.Values {
     /// keeps member assignments amongst it's self.  This means that the value
     /// we inherit from won't pick up values assigned to the new prototype.
     /// </summary>
+    [Serializable]
     class InheritsPrototypeValue : ObjectValue {
         private IAnalysisSet _prototypes;
 

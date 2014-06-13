@@ -12,65 +12,16 @@
  *
  * ***************************************************************************/
 
+using System;
 using System.Collections.Generic;
 using Microsoft.NodejsTools.Analysis.Analyzer;
 using Microsoft.NodejsTools.Parsing;
 
 namespace Microsoft.NodejsTools.Analysis.Values {
-#if FALSE
-    /// <summary>
-    /// Maintains a list of references keyed off of name.
-    /// </summary>
-    class MemberReferences {
-        private Dictionary<string, ReferenceDict> _references;
-        
-        public void AddReference(Node node, AnalysisUnit unit, string name) {
-            if (!unit.ForEval) {
-                if (_references == null) {
-                    _references = new Dictionary<string, ReferenceDict>();
-                }
-                ReferenceDict refs;
-                if (!_references.TryGetValue(name, out refs)) {
-                    _references[name] = refs = new ReferenceDict();
-                }
-                refs.GetReferences(unit.DeclaringModule.ProjectEntry).AddReference(new EncodedLocation(unit.Tree, node));
-            }
-        }
-
-#if FALSE
-        public IEnumerable<IReferenceable> GetDefinitions(string name, IMemberContainer innerContainer, IModuleContext context) {
-            IEnumerable<IReferenceable> refs = null;
-            ReferenceDict references;
-            if (_references != null && _references.TryGetValue(name, out references)) {
-                refs = references.Values;
-            }
-
-            var member = innerContainer.GetMember(context, name);
-            if (member != null) {
-                List<IReferenceable> res;
-                if (refs == null) {
-                    res = new List<IReferenceable>();
-                } else {
-                    res = new List<IReferenceable>(refs);
-                }
-
-                ILocatedMember locatedMember = member as ILocatedMember;
-                if (locatedMember != null) {
-                    foreach(var location in locatedMember.Locations) {
-                        res.Add(new DefinitionList(location));
-                    }
-                }
-                return res;
-            }
-
-            return new IReferenceable[0];
-        }
-#endif
-    }
-#endif
     /// <summary>
     /// A collection of references which are keyd off of project entry.
     /// </summary>
+    [Serializable]
     class ReferenceDict : Dictionary<IProjectEntry, ReferenceList> {
         public ReferenceList GetReferences(ProjectEntry project) {
             ReferenceList builtinRef;
@@ -96,6 +47,7 @@ namespace Microsoft.NodejsTools.Analysis.Values {
     /// <summary>
     /// A list of references as stored for a single project entry.
     /// </summary>
+    [Serializable]
     class ReferenceList : IReferenceable {
         public readonly int Version;
         public readonly IProjectEntry Project;

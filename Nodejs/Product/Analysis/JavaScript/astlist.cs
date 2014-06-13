@@ -22,6 +22,7 @@ using System.Text;
 namespace Microsoft.NodejsTools.Parsing
 {
     [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Naming", "CA1710:IdentifiersShouldHaveCorrectSuffix")]
+    [Serializable]
     public sealed class AstNodeList<T>: Node, IEnumerable<T> where T : Node
     {
       private List<T> m_list;

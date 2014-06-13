@@ -29,6 +29,7 @@ namespace Microsoft.NodejsTools.Analysis.Analyzer {
     /// number of variables and have caches of children scopes and nodes which
     /// are associated with their analysis.
     /// </summary>
+    [Serializable]
     abstract class DeclarativeEnvironmentRecord : EnvironmentRecord {
         private readonly Dictionary<string, VariableDef> _variables;
         private Dictionary<string, HashSet<VariableDef>> _linkedVariables;

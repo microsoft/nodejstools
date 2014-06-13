@@ -20,7 +20,7 @@ using System.Text;
 
 namespace Microsoft.NodejsTools.Parsing
 {
-
+    [Serializable]
     public sealed class IfNode : Statement
     {
         private Expression m_condition;

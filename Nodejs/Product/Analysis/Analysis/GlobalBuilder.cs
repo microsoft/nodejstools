@@ -33,7 +33,7 @@ namespace Microsoft.NodejsTools.Analysis {
             ObjectValue objectPrototype;
             BuiltinFunctionValue requireFunc;
 
-            var globalObject = new ObjectValue(builtinEntry) {
+            var globalObject = new GlobalValue(builtinEntry) {
                 (arrayFunction = ArrayFunction()),
                 BooleanFunction(out booleanPrototype),
                 DateFunction(),
@@ -332,7 +332,7 @@ All other strings are considered decimal.", isOptional:true)
             };
         }
 
-        private IAnalysisSet ArrayForEach(FunctionValue func, Node node, AnalysisUnit unit, IAnalysisSet @this, IAnalysisSet[] args) {
+        private static IAnalysisSet ArrayForEach(FunctionValue func, Node node, AnalysisUnit unit, IAnalysisSet @this, IAnalysisSet[] args) {
             if (args.Length >= 1) {
                 foreach (var value in @this) {
                     ArrayValue arr = value as ArrayValue;
@@ -354,7 +354,7 @@ All other strings are considered decimal.", isOptional:true)
                     }
                 }
             }
-            return _analyzer._undefined;
+            return unit.Analyzer._undefined;
         }
 
         private BuiltinFunctionValue BooleanFunction(out AnalysisValue booleanPrototype) {
@@ -699,7 +699,7 @@ The this object of the bound function is associated with the specified object, a
             };
         }
 
-        private IAnalysisSet ApplyFunction(FunctionValue func, Node node, AnalysisUnit unit, IAnalysisSet @this, IAnalysisSet[] args) {
+        private static IAnalysisSet ApplyFunction(FunctionValue func, Node node, AnalysisUnit unit, IAnalysisSet @this, IAnalysisSet[] args) {
             var res = AnalysisSet.Empty;
             if (@this != null && args.Length > 0) {                
                 foreach (var value in @this) {
@@ -1051,7 +1051,7 @@ on that object, and are not inherited from the object's prototype. The propertie
             };
         }
 
-        private IAnalysisSet DefineSetter(FunctionValue func, Node node, AnalysisUnit unit, IAnalysisSet @this, IAnalysisSet[] args) {
+        private static IAnalysisSet DefineSetter(FunctionValue func, Node node, AnalysisUnit unit, IAnalysisSet @this, IAnalysisSet[] args) {
             if (@this != null && args.Length >= 2) {
                 foreach (var thisVal in @this) {
                     ExpandoValue expando = thisVal as ExpandoValue;
@@ -1065,10 +1065,10 @@ on that object, and are not inherited from the object's prototype. The propertie
                     }
                 }
             }
-            return _analyzer._undefined;
+            return unit.Analyzer._undefined;
         }
 
-        private IAnalysisSet DefineGetter(FunctionValue func, Node node, AnalysisUnit unit, IAnalysisSet @this, IAnalysisSet[] args) {
+        private static IAnalysisSet DefineGetter(FunctionValue func, Node node, AnalysisUnit unit, IAnalysisSet @this, IAnalysisSet[] args) {
             if (@this != null && args.Length >= 2) {
                 foreach (var thisVal in @this) {
                     ExpandoValue expando = thisVal as ExpandoValue;
@@ -1084,7 +1084,7 @@ on that object, and are not inherited from the object's prototype. The propertie
                     }
                 }
             }
-            return _analyzer._undefined;
+            return unit.Analyzer._undefined;
         }
 
         private static IAnalysisSet DefineProperty(FunctionValue func, Node node, AnalysisUnit unit, IAnalysisSet @this, IAnalysisSet[] args) {

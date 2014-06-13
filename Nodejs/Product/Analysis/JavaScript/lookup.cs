@@ -25,7 +25,7 @@ namespace Microsoft.NodejsTools.Parsing
         Constructor
     }
 
-
+    [Serializable]
     public sealed class Lookup : Expression, INameReference
     {
         public JSVariableField VariableField { get; internal set; }

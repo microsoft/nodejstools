@@ -17,6 +17,7 @@ using System.Linq;
 using Microsoft.NodejsTools.Parsing;
 
 namespace Microsoft.NodejsTools.Analysis.Values {
+    [Serializable]
     class ArrayValue : ObjectValue {
         private IAnalysisSet _unionType;        // all types that have been seen
         private VariableDef[] _indexTypes;     // types for known indices

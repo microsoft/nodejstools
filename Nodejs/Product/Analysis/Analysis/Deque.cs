@@ -17,6 +17,7 @@ using System.Collections;
 using System.Collections.Generic;
 
 namespace Microsoft.NodejsTools.Analysis {
+    [Serializable]
     class Deque<T> : IEnumerable, ICollection {
         private T[] _data;
         private int _head, _tail;

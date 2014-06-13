@@ -21,6 +21,7 @@ using Microsoft.NodejsTools.Analysis.Values;
 using Microsoft.NodejsTools.Parsing;
 
 namespace Microsoft.NodejsTools.Analysis.Analyzer {
+    [Serializable]
     abstract class EnvironmentRecord {
         public readonly EnvironmentRecord Parent;
         private List<EnvironmentRecord> _children;

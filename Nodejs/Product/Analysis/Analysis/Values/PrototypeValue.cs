@@ -13,9 +13,11 @@
  * ***************************************************************************/
 
 
+using System;
 using Microsoft.NodejsTools.Analysis.Analyzer;
 
 namespace Microsoft.NodejsTools.Analysis.Values {
+    [Serializable]
     class PrototypeValue : ObjectValue {
         private readonly InstanceValue _instance;
 

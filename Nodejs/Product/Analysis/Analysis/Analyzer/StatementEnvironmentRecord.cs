@@ -27,6 +27,7 @@ namespace Microsoft.NodejsTools.Analysis.Analyzer {
     /// records which do not forward all of their accesses to the
     /// outermost scope.
     /// </summary>
+    [Serializable]
     abstract class StatementEnvironmentRecord : EnvironmentRecord {
         public int _startIndex, _endIndex;
 

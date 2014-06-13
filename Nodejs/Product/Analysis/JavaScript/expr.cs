@@ -17,6 +17,7 @@
 using System;
 
 namespace Microsoft.NodejsTools.Parsing {
+    [Serializable]
     public abstract class Expression : Node {
         protected Expression(IndexSpan span)
             : base(span) {

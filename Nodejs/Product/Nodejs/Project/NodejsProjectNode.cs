@@ -44,7 +44,6 @@ namespace Microsoft.NodejsTools.Project {
             Type projectNodePropsType = typeof(NodejsProjectNodeProperties);
             AddCATIDMapping(projectNodePropsType, projectNodePropsType.GUID);
             InitDependencyImages();
-            _analyzer = new VsProjectAnalyzer();
         }
 
         public VsProjectAnalyzer Analyzer {
@@ -285,12 +284,28 @@ namespace Microsoft.NodejsTools.Project {
             using (new DebugTimer("Project Load")) {
                 _intermediateOutputPath = Path.Combine(ProjectHome, GetProjectProperty("BaseIntermediateOutputPath"));
 
+                if (_analyzer != null && _analyzer.RemoveUser()) {
+                    _analyzer.Dispose();
+                }
+                _analyzer = new VsProjectAnalyzer(ProjectHome);
+
                 base.Reload();
 
                 SyncFileSystem();                
 
                 NodejsPackage.Instance.CheckSurveyNews(false);
                 ModulesNode.ReloadHierarchySafe();
+
+                // scan for files which were loaded from cached analysis but no longer
+                // exist and remove them.
+                foreach (var module in _analyzer.Project.AllModules) {
+                    if (Path.IsPathRooted(module.FilePath)) {   // ignore built-in modules
+                        var treeNode = FindNodeByFullPath(module.FilePath);
+                        if (treeNode == null) {
+                            _analyzer.UnloadFile(module);
+                        }
+                    }
+                }
             }
         }
 

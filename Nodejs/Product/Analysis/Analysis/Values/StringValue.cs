@@ -12,9 +12,11 @@
  *
  * ***************************************************************************/
 
+using System;
 namespace Microsoft.NodejsTools.Analysis.Values {
+    [Serializable]
     class StringValue : NonObjectValue {
-        private readonly string _value;
+        internal readonly string _value;
         private readonly JsAnalyzer _analyzer;
 
         public StringValue(string value, JsAnalyzer javaScriptAnalyzer) {

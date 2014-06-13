@@ -12,6 +12,7 @@
  *
  * ***************************************************************************/
 
+using System;
 using System.Collections.Generic;
 
 namespace Microsoft.NodejsTools.Analysis.Analyzer {
@@ -28,6 +29,7 @@ namespace Microsoft.NodejsTools.Analysis.Analyzer {
     /// This works best for dictionaries whoses keys are objects that we closel track.
     /// Currently that includes strings, types, small integers, etc...
     /// </summary>
+    [Serializable]
     class DependentKeyValue : DependentData<KeyValueDependencyInfo> {
         private static Dictionary<AnalysisValue, IAnalysisSet> EmptyDict = new Dictionary<AnalysisValue, IAnalysisSet>();
         private IAnalysisSet _allValues;

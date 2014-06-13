@@ -12,6 +12,7 @@
  *
  * ***************************************************************************/
 
+using System;
 using Microsoft.NodejsTools.Parsing;
 
 namespace Microsoft.NodejsTools.Analysis.Analyzer {
@@ -21,6 +22,7 @@ namespace Microsoft.NodejsTools.Analysis.Analyzer {
     /// This analysis unit won't add references and side effects won't
     /// propagate types.
     /// </summary>
+    [Serializable]
     sealed class EvalAnalysisUnit : AnalysisUnit {
         internal EvalAnalysisUnit(Node ast, JsAst tree, EnvironmentRecord scope)
             : base(ast, tree, scope) {

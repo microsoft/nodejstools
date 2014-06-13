@@ -12,25 +12,14 @@
  *
  * ***************************************************************************/
 
-using System;
+using Microsoft.NodejsTools.Analysis;
+using Microsoft.VisualStudio.TestTools.UnitTesting;
 
-namespace Microsoft.NodejsTools.Analysis.Values {
-    [Serializable]
-    class InstanceValue : ObjectValue {
-        public InstanceValue(ProjectEntry projectEntry, FunctionValue creator, string description = null)
-            : base(projectEntry, creator, description) {
-            projectEntry.Analyzer.AnalysisValueCreated(typeof(InstanceValue));
-        }
-
-        public override string ObjectDescription {
-            get {
-                var name = _creator.Name;
-                if (name != null) {
-                    return name + " object";
-                }
-
-                return base.ObjectDescription;
-            }
+namespace AnalysisTests {
+    [TestClass]
+    public class SerializedAnalysisTests : AnalysisTests {
+        public override ModuleAnalysis ProcessText(string text) {
+            return SerializationTests.RoundTrip(ProcessOneText(text));
         }
     }
 }

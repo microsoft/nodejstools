@@ -24,6 +24,7 @@ namespace Microsoft.NodejsTools.Analysis.Values {
     /// arbitrary values on the object and indexing into the object using
     /// strings.
     /// </summary>
+    [Serializable]
     class ExpandoValue : AnalysisValue, IReferenceableContainer {
         private readonly ProjectEntry _projectEntry;
         private readonly int _declVersion;
@@ -31,7 +32,6 @@ namespace Microsoft.NodejsTools.Analysis.Values {
         private Dictionary<string, PropertyDescriptor> _descriptors;
         private Dictionary<object, object> _metadata;
         private AnalysisValue _next;
-//        private VariableDef _keysVariable, _valuesVariable, _keyValueTupleVariable;
 
         internal ExpandoValue(ProjectEntry projectEntry) {
             _projectEntry = projectEntry;
@@ -393,7 +393,8 @@ namespace Microsoft.NodejsTools.Analysis.Values {
             }
         }
 
-        class LinkedAnalysisList : AnalysisValue, IReferenceableContainer {
+        [Serializable]
+        internal class LinkedAnalysisList : AnalysisValue, IReferenceableContainer {
             private readonly List<AnalysisValue> _values;
 
             public LinkedAnalysisList(AnalysisValue one, AnalysisValue two) {
@@ -492,6 +493,7 @@ namespace Microsoft.NodejsTools.Analysis.Values {
     /// 
     /// We don't currently track anything like writable/enumerable/configurable.
     /// </summary>
+    [Serializable]
     class PropertyDescriptor {
         public VariableDef Values, Get, Set;
     }

@@ -15,7 +15,6 @@
 using System;
 using System.Collections;
 using System.Collections.Generic;
-using System.IO;
 using System.Linq;
 using Microsoft.NodejsTools.Parsing;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
@@ -4819,11 +4818,15 @@ do {
             return ast;
         }
         
-
         private void CheckAst(JsAst ast, Action<Statement> checkBody) {
             checkBody(ast.Block);
 
             ast.Walk(new TestVisitor());
+
+            var newAst = SerializationTests.RoundTrip(ast);
+
+            checkBody(newAst.Block);
+            newAst.Walk(new TestVisitor());
         }
 
         class TestVisitor : AstVisitor {

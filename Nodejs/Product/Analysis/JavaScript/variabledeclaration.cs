@@ -14,12 +14,14 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+using System;
 using System.Collections.Generic;
 using System.Reflection;
 using System.Text;
 
 namespace Microsoft.NodejsTools.Parsing
 {
+    [Serializable]
     public sealed class VariableDeclaration : Node, INameDeclaration, INameReference
     {
         private Expression m_initializer;

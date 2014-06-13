@@ -20,6 +20,7 @@ using System.Text;
 
 namespace Microsoft.NodejsTools.Parsing
 {
+    [Serializable]
     public sealed class CallNode : Expression
     {
         private Expression m_function;

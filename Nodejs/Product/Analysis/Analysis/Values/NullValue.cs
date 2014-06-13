@@ -12,8 +12,9 @@
  *
  * ***************************************************************************/
 
+using System;
 namespace Microsoft.NodejsTools.Analysis.Values {
-
+    [Serializable]
     class NullValue : AnalysisValue {
         private readonly JsAnalyzer _analyzer;
 

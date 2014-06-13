@@ -21,6 +21,7 @@ using System.Text;
 namespace Microsoft.NodejsTools.Parsing
 {
     [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Naming", "CA1710:IdentifiersShouldHaveCorrectSuffix", Justification = "AST statement")]
+    [Serializable]
     public abstract class Declaration : Statement, IEnumerable<VariableDeclaration>
     {
         private List<VariableDeclaration> m_list;

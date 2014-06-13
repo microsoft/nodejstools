@@ -12,6 +12,7 @@
  *
  * ***************************************************************************/
 
+using System;
 using System.IO;
 
 namespace Microsoft.NodejsTools.Analysis.Values {
@@ -21,6 +22,7 @@ namespace Microsoft.NodejsTools.Analysis.Values {
     /// a different icon in intellisense for modules.
 
     /// </summary>
+    [Serializable]
     class ExportsValue : ObjectValue {
         private readonly string _name;
 

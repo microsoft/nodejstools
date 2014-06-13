@@ -20,7 +20,7 @@ using System.Text;
 
 namespace Microsoft.NodejsTools.Parsing
 {
-
+    [Serializable]
     public sealed class Block : Statement
     {
         private List<Statement> m_list;

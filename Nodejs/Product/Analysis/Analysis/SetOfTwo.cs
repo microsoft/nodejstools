@@ -21,6 +21,7 @@ namespace Microsoft.NodejsTools.Analysis {
     /// Lightweight ISet object which always holds onto 2 values for reduced memory usage (we have lots of sets)
     /// </summary>
     /// <typeparam name="T"></typeparam>
+    [Serializable]
     sealed class SetOfTwo<T> : ISet<T> {
         private readonly T _value1, _value2;
 

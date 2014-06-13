@@ -20,6 +20,7 @@ namespace Microsoft.NodejsTools.Analysis {
     /// Lightweight ISet which holds onto a single value (we have lots of sets)
     /// </summary>
     /// <typeparam name="T"></typeparam>
+    [Serializable]
     sealed class SetOfOne<T> : ISet<T> {
         private readonly T _value;
 

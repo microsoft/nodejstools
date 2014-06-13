@@ -29,6 +29,7 @@ namespace Microsoft.NodejsTools.Analysis {
     /// To analyze a file the tree should be updated with a call to UpdateTree and then PreParse
     /// should be called on all files.  Finally Parse should then be called on all files.
     /// </summary>
+    [Serializable]
     internal sealed class ProjectEntry : IJsProjectEntry {
         private readonly JsAnalyzer _analyzer;
         private readonly string _filePath;

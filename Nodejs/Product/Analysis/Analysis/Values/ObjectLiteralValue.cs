@@ -16,7 +16,7 @@ using System;
 using Microsoft.NodejsTools.Parsing;
 
 namespace Microsoft.NodejsTools.Analysis.Values {
-
+    [Serializable]
     internal class ObjectLiteralValue : ObjectValue {
         private readonly Node _node;
 

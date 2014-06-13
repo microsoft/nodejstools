@@ -5,6 +5,7 @@ using System.Text;
 using Microsoft.NodejsTools.Parsing;
 
 namespace Microsoft.NodejsTools.Analysis.Analyzer {
+    [Serializable]
     class DefinitiveAssignmentEnvironmentRecord : StatementEnvironmentRecord {
         private readonly string _name;
         private VariableDef _variable;

@@ -21,6 +21,7 @@ using System.Reflection;
 using System.Text;
 
 namespace Microsoft.NodejsTools.Parsing {
+    [Serializable]
     public sealed class FunctionObject : Statement, INameDeclaration {
         private Block m_body;
         private AstNodeList<ParameterDeclaration> m_parameters;

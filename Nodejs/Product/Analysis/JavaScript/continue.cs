@@ -14,11 +14,12 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+using System;
 using System.Text;
 
 namespace Microsoft.NodejsTools.Parsing
 {
-
+    [Serializable]
     public sealed class ContinueNode : Statement
     {
         public int NestLevel { get; set; }

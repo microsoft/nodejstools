@@ -21,6 +21,7 @@ using Microsoft.NodejsTools.Analysis.Analyzer;
 using Microsoft.NodejsTools.Parsing;
 
 namespace Microsoft.NodejsTools.Analysis.Values {
+    [Serializable]
     class UserFunctionValue : FunctionValue {
         private readonly FunctionObject _funcObject;
         private readonly FunctionAnalysisUnit _analysisUnit;
@@ -387,6 +388,7 @@ namespace Microsoft.NodejsTools.Analysis.Values {
         /// then we'll schedule the function to be analyzed for those args (and if that results in a new
         /// return type then we'll use the return type to analyze afterwards).
         /// </summary>
+        [Serializable]
         internal class CallArgs : IEquatable<CallArgs> {
             public readonly IAnalysisSet This;
             public readonly IAnalysisSet[] Args;
@@ -535,6 +537,7 @@ namespace Microsoft.NodejsTools.Analysis.Values {
             }
         }
 
+        [Serializable]
         internal class CallInfo {
             public readonly VariableDef ReturnValue;
             public readonly CartesianProductFunctionAnalysisUnit AnalysisUnit;

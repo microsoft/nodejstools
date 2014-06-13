@@ -12,6 +12,7 @@
  *
  * ***************************************************************************/
 
+using System;
 using System.Collections.Generic;
 using System.Linq;
 
@@ -24,6 +25,7 @@ namespace Microsoft.NodejsTools.Analysis.Analyzer {
     /// DependentUnits -> What needs to change if this VariableRef is updated.
     /// Types -> Types that this VariableRef has received from the Module.
     /// </summary>
+    [Serializable]
     internal class DependencyInfo {
         private readonly int _version;
         private ISet<AnalysisUnit> _dependentUnits;
@@ -72,6 +74,7 @@ namespace Microsoft.NodejsTools.Analysis.Analyzer {
         }
     }
 
+    [Serializable]
     internal class KeyValueDependencyInfo : DependencyInfo {
         internal Dictionary<AnalysisValue, IAnalysisSet> KeyValues = new Dictionary<AnalysisValue, IAnalysisSet>();
 
@@ -115,6 +118,7 @@ namespace Microsoft.NodejsTools.Analysis.Analyzer {
         }
     }
 
+    [Serializable]
     internal class TypedDependencyInfo<T> : DependencyInfo where T : AnalysisValue {
         private IAnalysisSet _types;
         public ISet<EncodedLocation> _references, _assignments;

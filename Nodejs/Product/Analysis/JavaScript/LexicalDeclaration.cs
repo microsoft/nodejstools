@@ -16,12 +16,14 @@
 
 namespace Microsoft.NodejsTools.Parsing
 {
+    using System;
     using System.Collections.Generic;
     using System.Globalization;
     using System.IO;
     using System.Text;
 
     [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Naming", "CA1710:IdentifiersShouldHaveCorrectSuffix", Justification = "AST statement")]
+    [Serializable]
     public class LexicalDeclaration : Declaration
     {
         public JSToken StatementToken { get; set; }

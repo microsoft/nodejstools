@@ -20,6 +20,7 @@ using System.Text.RegularExpressions;
 
 namespace Microsoft.NodejsTools.Parsing
 {
+    [Serializable]
     public sealed class RegExpLiteral : Expression
     {
         public string Pattern { get; set; }

@@ -16,11 +16,13 @@
 
 namespace Microsoft.NodejsTools.Parsing
 {
+    using System;
     using System.Collections.Generic;
 
     /// <summary>
     /// Implementation of parenthetical '(' expr ')' operators
     /// </summary>
+    [Serializable]
     public class GroupingOperator : Expression
     {
         private Expression m_operand;

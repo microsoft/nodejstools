@@ -14,12 +14,14 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+using System;
 using System.Collections.Generic;
 using System.Globalization;
 using System.Text;
 
 namespace Microsoft.NodejsTools.Parsing
 {
+    [Serializable]
     public sealed class ArrayLiteral : Expression
     {
         private AstNodeList<Expression> _elements;

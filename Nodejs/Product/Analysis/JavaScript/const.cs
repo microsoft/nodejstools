@@ -27,6 +27,7 @@ namespace Microsoft.NodejsTools.Parsing
     /// parsed, because we default to the ES6 behavior.
     /// </summary>
     [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Naming", "CA1710:IdentifiersShouldHaveCorrectSuffix", Justification="AST statement")]
+    [Serializable]
     public class ConstStatement : Declaration
     {
         public ConstStatement(IndexSpan span)

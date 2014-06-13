@@ -590,6 +590,7 @@ namespace Microsoft.NodejsTools.Analysis {
         }
 
         [DebuggerDisplay(DebugViewProxy.DisplayString), DebuggerTypeProxy(typeof(DebugViewProxy))]
+        [Serializable]
         sealed class AnalysisSetManyObject : IAnalysisSet {
             public readonly HashSet<AnalysisValue> Set;
 
@@ -795,6 +796,7 @@ namespace Microsoft.NodejsTools.Analysis {
         }
 
         [DebuggerDisplay(DebugViewProxy.DisplayString), DebuggerTypeProxy(typeof(DebugViewProxy))]
+        [Serializable]
         sealed class AnalysisSetOneObject : IAnalysisSet {
             public readonly AnalysisValue Value;
 
@@ -903,6 +905,7 @@ namespace Microsoft.NodejsTools.Analysis {
         }
 
         [DebuggerDisplay(DebugViewProxy.DisplayString), DebuggerTypeProxy(typeof(DebugViewProxy))]
+        [Serializable]
         sealed class AnalysisSetTwoObject : IAnalysisSet {
             public readonly AnalysisValue Value1, Value2;
 
@@ -1026,6 +1029,7 @@ namespace Microsoft.NodejsTools.Analysis {
 
 
         [DebuggerDisplay(DebugViewProxy.DisplayString), DebuggerTypeProxy(typeof(DebugViewProxy))]
+        [Serializable]
         sealed class AnalysisSetManyUnion : IAnalysisSet {
             public readonly HashSet<AnalysisValue> Set;
 
@@ -1219,6 +1223,7 @@ namespace Microsoft.NodejsTools.Analysis {
         }
 
         [DebuggerDisplay(DebugViewProxy.DisplayString), DebuggerTypeProxy(typeof(DebugViewProxy))]
+        [Serializable]
         sealed class AnalysisSetEmptyUnion : IAnalysisSet {
             public static readonly IAnalysisSet[] Instances = UnionComparer.Instances.Select(cmp => new AnalysisSetEmptyUnion(cmp)).ToArray();
 
@@ -1297,6 +1302,7 @@ namespace Microsoft.NodejsTools.Analysis {
         }
 
         [DebuggerDisplay(DebugViewProxy.DisplayString), DebuggerTypeProxy(typeof(DebugViewProxy))]
+        [Serializable]
         sealed class AnalysisSetOneUnion : IAnalysisSet {
             public readonly AnalysisValue Value;
             private readonly UnionComparer _comparer;
@@ -1419,6 +1425,7 @@ namespace Microsoft.NodejsTools.Analysis {
         }
 
         [DebuggerDisplay(DebugViewProxy.DisplayString), DebuggerTypeProxy(typeof(DebugViewProxy))]
+        [Serializable]
         sealed class AnalysisSetTwoUnion : IAnalysisSet {
             public readonly AnalysisValue Value1, Value2;
             private readonly UnionComparer _comparer;

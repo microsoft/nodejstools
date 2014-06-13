@@ -12,9 +12,12 @@
  *
  * ***************************************************************************/
 
+using System;
+
 namespace Microsoft.NodejsTools.Analysis.Values {
+    [Serializable]
     class BooleanValue : NonObjectValue {
-        private readonly bool _value;
+        internal readonly bool _value;
         private readonly JsAnalyzer _analyzer;
 
         public BooleanValue(bool value, JsAnalyzer javaScriptAnalyzer) {

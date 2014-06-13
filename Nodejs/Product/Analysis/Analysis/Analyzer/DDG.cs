@@ -27,7 +27,7 @@ namespace Microsoft.NodejsTools.Analysis.Analyzer {
         internal ExpressionEvaluator _eval;
         private Block _curSuite;
 
-        public void Analyze(Deque<AnalysisUnit> queue, CancellationToken cancel, Action<int> reportQueueSize = null, int reportQueueInterval = 1) {
+        public void Analyze(Deque<AnalysisUnit> queue, CancellationToken cancel) {
             if (cancel.IsCancellationRequested) {
                 return;
             }
@@ -36,7 +36,6 @@ namespace Microsoft.NodejsTools.Analysis.Analyzer {
                 // the log how frequently the queue empties.
                 var endOfQueueMarker = new AnalysisUnit(null, null);
                 int queueCountAtStart = queue.Count;
-                int reportInterval = reportQueueInterval - 1;
 
                 if (queueCountAtStart > 0) {
                     queue.Append(endOfQueueMarker);
@@ -45,11 +44,8 @@ namespace Microsoft.NodejsTools.Analysis.Analyzer {
                 while (queue.Count > 0 && !cancel.IsCancellationRequested) {
                     _unit = queue.PopLeft();
 
-                    if (_unit == endOfQueueMarker) {
+                    if (_unit.Environment == null) {    // endOfQueueMarker
                         AnalysisLog.EndOfQueue(queueCountAtStart, queue.Count);
-                        if (reportInterval < 0 && reportQueueSize != null) {
-                            reportQueueSize(queue.Count);
-                        }
 
                         queueCountAtStart = queue.Count;
                         if (queueCountAtStart > 0) {
@@ -59,20 +55,10 @@ namespace Microsoft.NodejsTools.Analysis.Analyzer {
                     }
 
                     AnalysisLog.Dequeue(queue, _unit);
-                    if (reportInterval == 0 && reportQueueSize != null) {
-                        reportQueueSize(queue.Count);
-                        reportInterval = reportQueueInterval - 1;
-                    } else if (reportInterval > 0) {
-                        reportInterval -= 1;
-                    }
 
                     _unit.IsInQueue = false;
                     SetCurrentUnit(_unit);
                     _unit.Analyze(this, cancel);
-                }
-
-                if (reportQueueSize != null) {
-                    reportQueueSize(0);
                 }
 
                 if (cancel.IsCancellationRequested) {

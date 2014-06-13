@@ -25,6 +25,7 @@ namespace Microsoft.NodejsTools.Analysis {
     /// An analysis value represents a set of variables and code.  Examples of 
     /// analysis values include top-level code, classes, and functions.
     /// </summary>
+    [Serializable]
     public class AnalysisValue : IAnalysisSet {
         [ThreadStatic]
         private static HashSet<AnalysisValue> _processing;

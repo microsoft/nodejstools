@@ -16,6 +16,7 @@ namespace Microsoft.NodejsTools.Analysis.Analyzer {
     /// It's possible that we still need to perform the analysis multiple times which can occur 
     /// if we take a dependency on something which later gets updated.
     /// </summary>
+    [Serializable]
     class CartesianProductFunctionAnalysisUnit : FunctionAnalysisUnit {
         private readonly UserFunctionValue.CallArgs _callArgs;
         private readonly VariableDef _this;
@@ -179,7 +180,8 @@ namespace Microsoft.NodejsTools.Analysis.Analyzer {
         /// <summary>
         /// A pair of variable defs - the old one, and the new one.
         /// </summary>
-        struct CartesianLocalVariable {
+        [Serializable]
+        internal struct CartesianLocalVariable {
             /// <summary>
             /// The specialized variable which is used for each individual analysis.
             /// </summary>

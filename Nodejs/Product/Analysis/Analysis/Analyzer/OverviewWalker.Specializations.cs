@@ -1,4 +1,18 @@
-﻿using System;
+﻿/* ****************************************************************************
+ *
+ * Copyright (c) Microsoft Corporation. 
+ *
+ * This source code is subject to terms and conditions of the Apache License, Version 2.0. A 
+ * copy of the license can be found in the License.html file at the root of this distribution. If 
+ * you cannot locate the Apache License, Version 2.0, please send an email to 
+ * vspython@microsoft.com. By using this source code in any fashion, you are agreeing to be bound 
+ * by the terms of the Apache License, Version 2.0.
+ *
+ * You must not remove this notice, or any other, from this software.
+ *
+ * ***************************************************************************/
+
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -34,7 +48,7 @@ namespace Microsoft.NodejsTools.Analysis.Analyzer {
 
 
             return new FunctionSpecialization(
-                ObjectKeysSpecialization,
+                ObjectKeysSpecializationImpl,
                 false,
                 aVar,                
                 new ExpectedNode(
@@ -75,7 +89,7 @@ namespace Microsoft.NodejsTools.Analysis.Analyzer {
             );
         }
 
-        private static IAnalysisSet ObjectKeysSpecialization(FunctionValue func, Node node, AnalysisUnit unit, IAnalysisSet @this, IAnalysisSet[] args) {
+        private static IAnalysisSet ObjectKeysSpecializationImpl(FunctionValue func, Node node, AnalysisUnit unit, IAnalysisSet @this, IAnalysisSet[] args) {
             if (args.Length >= 1) {
                 return unit.Analyzer._arrayFunction._instance;
             }
@@ -93,7 +107,7 @@ namespace Microsoft.NodejsTools.Analysis.Analyzer {
             var fLookup = new ExpectedFlexibleLookup();
 
             return new FunctionSpecialization(
-                CreateSpecialization,
+                CreateSpecializationImpl,
                 false,
                 new ExpectedNode(
                     typeof(ExpressionStatement),
@@ -115,7 +129,7 @@ namespace Microsoft.NodejsTools.Analysis.Analyzer {
             );
         }
 
-        private static IAnalysisSet CreateSpecialization(FunctionValue func, Node node, AnalysisUnit unit, IAnalysisSet @this, IAnalysisSet[] args) {
+        private static IAnalysisSet CreateSpecializationImpl(FunctionValue func, Node node, AnalysisUnit unit, IAnalysisSet @this, IAnalysisSet[] args) {
             if (args.Length >= 1) {
                 // fake out copy by just returning the
                 // original input object
@@ -138,7 +152,7 @@ namespace Microsoft.NodejsTools.Analysis.Analyzer {
             var oVar = new ExpectedVariableDeclaration(ExpectedObjectLiteral.Empty);
 
             return new FunctionSpecialization(
-                CopySpecialization,
+                CopySpecializationImpl,
                 false,
                 oVar,
                 new ExpectedNode(
@@ -182,7 +196,7 @@ namespace Microsoft.NodejsTools.Analysis.Analyzer {
             );
         }
 
-        private static IAnalysisSet CopySpecialization(FunctionValue func, Node node, AnalysisUnit unit, IAnalysisSet @this, IAnalysisSet[] args) {
+        private static IAnalysisSet CopySpecializationImpl(FunctionValue func, Node node, AnalysisUnit unit, IAnalysisSet @this, IAnalysisSet[] args) {
             if (args.Length >= 1) {
                 // fake out copy by just returning the
                 // original input object
@@ -209,7 +223,7 @@ namespace Microsoft.NodejsTools.Analysis.Analyzer {
             var sourceParam = new ExpectedParameter(1);
             var keyVar = new ExpectedVariableDeclaration();
             return new FunctionSpecialization(
-                MergeSpecialization,
+                MergeSpecializationImpl,
                 false,
                 new ExpectedNode(
                     typeof(IfNode),
@@ -254,7 +268,7 @@ namespace Microsoft.NodejsTools.Analysis.Analyzer {
             );
         }
 
-        private static IAnalysisSet MergeSpecialization(FunctionValue func, Node node, AnalysisUnit unit, IAnalysisSet @this, IAnalysisSet[] args) {
+        private static IAnalysisSet MergeSpecializationImpl(FunctionValue func, Node node, AnalysisUnit unit, IAnalysisSet @this, IAnalysisSet[] args) {
             if (args.Length >= 2) {
                 foreach (var targetValue in args[0]) {
                     var target = targetValue as ExpandoValue;

@@ -31,7 +31,7 @@ namespace NodejsTests.Debugger.FileNameMapping {
             classifierProvider._classificationRegistry = new MockClassificationTypeRegistryService();
             classifierProvider.GetClassifier(buffer);
 
-            var analyzer = new VsProjectAnalyzer(true);
+            var analyzer = new VsProjectAnalyzer();
             buffer.AddProperty(typeof(VsProjectAnalyzer), analyzer);
             var monitoredBuffer = analyzer.MonitorTextBuffer(view, buffer);
             analyzer.WaitForCompleteAnalysis(_ => true);

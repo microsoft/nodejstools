@@ -18,6 +18,7 @@ using Microsoft.NodejsTools.Analysis.Values;
 using Microsoft.NodejsTools.Parsing;
 
 namespace Microsoft.NodejsTools.Analysis.Analyzer {
+    [Serializable]
     sealed class ModuleEnvironmentRecord : DeclarativeEnvironmentRecord {
         private readonly ProjectEntry _projectEntry;
         private readonly ModuleValue _module;   // the object which corresponds to "module" in the users module
@@ -121,7 +122,8 @@ namespace Microsoft.NodejsTools.Analysis.Analyzer {
             return result;
         }
 
-        struct NodeEnvironmentKey : IEquatable<NodeEnvironmentKey> {
+        [Serializable]
+        internal struct NodeEnvironmentKey : IEquatable<NodeEnvironmentKey> {
             public readonly NodeEnvironmentKind Kind;
             public readonly object Key;
 

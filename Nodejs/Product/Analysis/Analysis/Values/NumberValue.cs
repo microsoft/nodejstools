@@ -12,9 +12,12 @@
  *
  * ***************************************************************************/
 
+using System;
+
 namespace Microsoft.NodejsTools.Analysis.Values {
+    [Serializable]
     class NumberValue : NonObjectValue {
-        private double _value;
+        internal double _value;
         private JsAnalyzer _analyzer;
 
         public NumberValue(double p, JsAnalyzer javaScriptAnalyzer) {

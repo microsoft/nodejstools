@@ -16,6 +16,7 @@ using Microsoft.NodejsTools.Analysis;
 using Microsoft.VisualStudio.Text;
 
 namespace Microsoft.NodejsTools.Intellisense {
+    [AnalysisSerializeAsNull]
     class SnapshotCookie : IAnalysisCookie {
         private readonly ITextSnapshot _snapshot;
         

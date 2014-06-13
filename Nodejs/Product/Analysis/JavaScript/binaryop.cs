@@ -21,7 +21,7 @@ using System.Text;
 
 namespace Microsoft.NodejsTools.Parsing
 {
-
+    [Serializable]
     public class BinaryOperator : Expression
     {
         private Expression m_operand1;

@@ -32,6 +32,7 @@ namespace Microsoft.NodejsTools.Analysis {
     /// storing the line/column info directly while still allowing multiple schemes
     /// to be used.
     /// </summary>
+    [Serializable]
     struct EncodedLocation : IEquatable<EncodedLocation> {
         public readonly ILocationResolver Resolver;
         public readonly object Location;

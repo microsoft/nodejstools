@@ -17,25 +17,18 @@ using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
-using System.IO.Compression;
 using System.Linq;
-using System.Runtime.InteropServices;
 using System.Threading;
-using System.Windows.Forms;
-using System.Windows.Threading;
 using Microsoft.NodejsTools.Analysis;
 using Microsoft.NodejsTools.Classifier;
 using Microsoft.NodejsTools.Parsing;
 using Microsoft.NodejsTools.Project;
-using Microsoft.VisualStudio;
 using Microsoft.VisualStudio.Language.Intellisense;
 using Microsoft.VisualStudio.Shell.Interop;
 using Microsoft.VisualStudio.Text;
 using Microsoft.VisualStudio.Text.Adornments;
 using Microsoft.VisualStudio.Text.Editor;
-using Microsoft.VisualStudio.Text.Tagging;
 using Microsoft.VisualStudioTools;
-using Microsoft.VisualStudioTools.Project;
 
 namespace Microsoft.NodejsTools.Intellisense {
 #if INTERACTIVE_WINDOW
@@ -62,6 +55,8 @@ namespace Microsoft.NodejsTools.Intellisense {
         private readonly bool _implicitProject;
         private readonly AutoResetEvent _queueActivityEvent = new AutoResetEvent(false);
         private readonly CodeSettings _codeSettings = new CodeSettings();
+        private readonly string _projectDir;
+        private DateTime? _reparseDateTime;
 
         private int _userCount;
 
@@ -96,23 +91,58 @@ namespace Microsoft.NodejsTools.Intellisense {
 
         private object _contentsLock = new object();
 
+        const int _dbVersion = 1;
+        private static byte[] _dbHeader = new byte[] { (byte)'J', (byte)'S', (byte)'A', (byte)'N' }.Concat(BitConverter.GetBytes(_dbVersion)).ToArray();
+
         internal VsProjectAnalyzer(
-            bool implicitProject = false
+            string projectDir = null
         ) {
-#if FALSE
-            _unresolvedSquiggles = new UnresolvedImportSquiggleProvider(TaskProvider);
-#endif
-
             _queue = new ParseQueue(this);
-            _analysisQueue = new AnalysisQueue(this);
-#if FALSE
-            _allFactories = allFactories;
-
-            _interpreterFactory = factory;
-#endif
-            _implicitProject = implicitProject;
-            _jsAnalyzer = new JsAnalyzer();
             _projectFiles = new ConcurrentDictionary<string, IProjectEntry>(StringComparer.OrdinalIgnoreCase);
+
+            if (projectDir != null) {
+                _projectDir = projectDir;
+                string analysisDb = GetAnalysisPath();
+                if (File.Exists(analysisDb)) {
+
+                    using (FileStream stream = new FileStream(analysisDb, FileMode.Open)) {
+                        byte[] header = new byte[_dbHeader.Length];
+                        stream.Read(header, 0, header.Length);
+                        bool match = true;
+                        for (int i = 0; i < header.Length; i++) {
+                            if (header[i] != _dbHeader[i]) {
+                                match = false;
+                                break;
+                            }
+                        }
+                        if (match) {
+                            try {
+                                var serializer = new AnalysisSerializer();
+                                _jsAnalyzer = (JsAnalyzer)serializer.Deserialize(stream);
+                                _analysisQueue = new AnalysisQueue(this, serializer, stream);
+                                foreach (var file in _jsAnalyzer.AllModules) {
+                                    _projectFiles[file.FilePath] = file;
+                                }
+                                _reparseDateTime = new FileInfo(analysisDb).LastWriteTime;
+                            } catch (InvalidOperationException) {
+                                // corrupt or invalid DB
+                                _jsAnalyzer = null;
+                                _analysisQueue = null;
+                            } catch (IOException) {
+                                _jsAnalyzer = null;
+                                _analysisQueue = null;
+                            }
+                        }
+                    }
+                }
+            } else {
+                _implicitProject = true;
+            }
+
+            if (_jsAnalyzer == null) {
+                _jsAnalyzer = new JsAnalyzer();
+                _analysisQueue = new AnalysisQueue(this);
+            }
 
             _userCount = 1;
 
@@ -125,6 +155,10 @@ namespace Microsoft.NodejsTools.Intellisense {
             _codeSettings.AddKnownGlobal("exports");
 
             _codeSettings.AllowShebangLine = true;
+        }
+
+        private string GetAnalysisPath() {
+            return Path.Combine(_projectDir, ".ntvs_analysis.dat");
         }
 
         public void AddUser() {
@@ -250,19 +284,10 @@ namespace Microsoft.NodejsTools.Intellisense {
             IProjectEntry entry;
             if (!_projectFiles.TryGetValue(path, out entry)) {
                 if (buffer.ContentType.IsOfType(NodejsConstants.Nodejs)) {
-#if FALSE
-                    var reanalyzeEntries = Project.GetEntriesThatImportModule(modName, true).ToArray();
-#endif
-
                     entry = _jsAnalyzer.AddModule(
                         buffer.GetFilePath(),
                         analysisCookie
                     );
-#if FALSE
-                    foreach (var entryRef in reanalyzeEntries) {
-                        _analysisQueue.Enqueue(entryRef, AnalysisPriority.Low);
-                    }
-#endif
                 } else {
                     return null;
                 }
@@ -290,10 +315,6 @@ namespace Microsoft.NodejsTools.Intellisense {
             IProjectEntry item;
             if (!_projectFiles.TryGetValue(path, out item)) {
                 if (NodejsProjectNode.IsNodejsFile(path)) {
-#if FALSE
-                    var reanalyzeEntries = Project.GetEntriesThatImportModule(modName, true).ToArray();
-#endif
-
                     var pyEntry = _jsAnalyzer.AddModule(
                         path,
                         null
@@ -301,20 +322,16 @@ namespace Microsoft.NodejsTools.Intellisense {
 
                     pyEntry.BeginParsingTree();
 
-#if FALSE
-                    foreach (var entryRef in reanalyzeEntries) {
-                        _analysisQueue.Enqueue(entryRef, AnalysisPriority.Low);
-                    }
-#endif
                     item = pyEntry;
-#if FALSE
-                } else if (path.EndsWith(".xaml", StringComparison.OrdinalIgnoreCase)) {
-                    item = _pyAnalyzer.AddXamlFile(path, null);
-#endif
                 }
 
                 if (item != null) {
                     _projectFiles[path] = item;
+                    _queue.EnqueueFile(item, path);
+                }
+            } else {
+                if (_reparseDateTime != null && new FileInfo(path).LastWriteTime > _reparseDateTime.Value) {
+                    // this file was written to since our cached analysis was saved, reload it.
                     _queue.EnqueueFile(item, path);
                 }
             }
@@ -621,7 +638,7 @@ namespace Microsoft.NodejsTools.Intellisense {
             } else {
                 cookie = new FileCookie(filename);
             }
-
+            
             if ((pyEntry = entry as IJsProjectEntry) != null) {
                 JsAst ast;
                 CollectingErrorSink errorSink;
@@ -1299,6 +1316,24 @@ namespace Microsoft.NodejsTools.Intellisense {
             }
 
             _analysisQueue.Stop();
+
+            if (_projectDir != null) {
+                ThreadPool.QueueUserWorkItem(_ => SaveAnalysis());
+            }
+        }
+
+        private void SaveAnalysis() {
+            using (FileStream fs = new FileStream(GetAnalysisPath(), FileMode.Create)) {
+                fs.Write(_dbHeader, 0, _dbHeader.Length);
+                try {
+                    var serializer = new AnalysisSerializer();
+                    serializer.Serialize(fs, _jsAnalyzer);
+                    _analysisQueue.Serialize(serializer, fs);
+                } catch (Exception e) {
+                    Debug.Fail("Failed to save analysis " + e);
+                }
+            }
+            new FileInfo(GetAnalysisPath()).Attributes |= FileAttributes.Hidden;
         }
 
         #endregion

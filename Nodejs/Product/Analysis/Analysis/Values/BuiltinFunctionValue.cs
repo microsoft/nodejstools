@@ -26,6 +26,7 @@ namespace Microsoft.NodejsTools.Analysis.Values {
     /// subclass can beused if a set of types can be specified for the 
     /// return value.
     /// </summary>
+    [Serializable]
     internal class BuiltinFunctionValue : FunctionValue {
         private readonly string _name;
         private readonly ParameterResult[] _signature;
@@ -84,6 +85,7 @@ namespace Microsoft.NodejsTools.Analysis.Values {
     /// Represents a functoin not backed by user code which returns a known
     /// set of types.
     /// </summary>
+    [Serializable]
     internal class ReturningFunctionValue : BuiltinFunctionValue {
         private readonly IAnalysisSet _retValue;
 
@@ -97,6 +99,7 @@ namespace Microsoft.NodejsTools.Analysis.Values {
         }
     }
 
+    [Serializable]
     internal class ReturningConstructingFunctionValue : BuiltinFunctionValue {
         private readonly IAnalysisSet _retValue;
 
@@ -114,6 +117,7 @@ namespace Microsoft.NodejsTools.Analysis.Values {
         }
     }
 
+    [Serializable]
     internal class SpecializedFunctionValue : BuiltinFunctionValue {
         private readonly CallDelegate _func;
 
@@ -131,7 +135,7 @@ namespace Microsoft.NodejsTools.Analysis.Values {
     /// Helper class for building up built-in objects and functions.  Specifies
     /// the name and value so it can use C#'s initializer syntax which calls
     /// the Add method.
-    /// </summary>
+    /// </summary>    
     struct MemberAddInfo {
         internal readonly string Name;
         internal readonly AnalysisValue Value;

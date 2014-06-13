@@ -32,12 +32,12 @@ namespace Microsoft.NodejsTools.Analysis {
     /// <summary>
     /// Performs analysis of multiple JavaScript code files and enables interrogation of the resulting analysis.
     /// </summary>
-    public partial class JsAnalyzer : IGroupableAnalysisProject {
+    [Serializable]
+    public partial class JsAnalyzer : IGroupableAnalysisProject, IDeserializeInitialization {
         private readonly ModuleTable _modules;
         internal readonly ProjectEntry _builtinEntry;
-        private readonly HashSet<ModuleValue> _modulesWithUnresolvedImports;
-        private readonly object _modulesWithUnresolvedImportsLock = new object();
-        private readonly Dictionary<object, AnalysisValue> _itemCache;
+        [NonSerialized]
+        private Dictionary<object, AnalysisValue> _itemCache;
         internal readonly NullValue _nullInst;
         internal readonly BooleanValue _trueInst, _falseInst;
         internal readonly UndefinedValue _undefined;
@@ -47,36 +47,19 @@ namespace Microsoft.NodejsTools.Analysis {
         internal readonly AnalysisValue _emptyStringValue, _zeroIntValue;
         internal readonly BuiltinFunctionValue _requireFunc;
         private readonly Deque<AnalysisUnit> _queue;
-        private Action<int> _reportQueueSize;
-        private int _reportQueueInterval;
         internal readonly AnalysisUnit _evalUnit;   // a unit used for evaluating when we don't otherwise have a unit available
         private readonly HashSet<string> _analysisDirs = new HashSet<string>(StringComparer.OrdinalIgnoreCase);
         private AnalysisLimits _limits;
-        private static object _nullKey = new object();
 #if DEBUG
         private static Dictionary<object, int> _analysisCreationCount = new Dictionary<object, int>();
 #endif
 
-        private const string AnalysisLimitsKey = @"Software\Microsoft\NodejsTools\" + AssemblyVersionInfo.VSVersion +
-            @"\Analysis\Project";
-
         public JsAnalyzer() {
             _modules = new ModuleTable(this);
-            _modulesWithUnresolvedImports = new HashSet<ModuleValue>();
             _itemCache = new Dictionary<object, AnalysisValue>();
             _builtinEntry = new ProjectEntry(this, "", null);
 
-            try {
-                using (var key = Registry.CurrentUser.OpenSubKey(AnalysisLimitsKey)) {
-                    Limits = AnalysisLimits.LoadFromStorage(key);
-                }
-            } catch (SecurityException) {
-                Limits = new AnalysisLimits();
-            } catch (UnauthorizedAccessException) {
-                Limits = new AnalysisLimits();
-            } catch (IOException) {
-                Limits = new AnalysisLimits();
-            }
+            Limits = AnalysisLimits.Load();
 
             _queue = new Deque<AnalysisUnit>();
 
@@ -168,16 +151,19 @@ namespace Microsoft.NodejsTools.Analysis {
             entry.RemovedFromProject();
         }
 
-        /// <summary>
-        /// Gets the list of directories which should be analyzed.
-        /// 
-        /// This property is thread safe.
-        /// </summary>
-        public IEnumerable<string> AnalysisDirectories {
+        public IJsProjectEntry this[string filename] {
             get {
-                lock (_analysisDirs) {
-                    return _analysisDirs.ToArray();
+                ModuleTree tree;
+                if (Modules.TryGetValue(filename, out tree) && tree.Module != null) {
+                    return tree.Module.ProjectEntry;
                 }
+                throw new KeyNotFoundException();
+            }
+        }
+
+        public IEnumerable<IJsProjectEntry> AllModules {
+            get {
+                return Modules.Modules;
             }
         }
 
@@ -301,19 +287,10 @@ namespace Microsoft.NodejsTools.Analysis {
             if (cancel.IsCancellationRequested) {
                 return;
             }
-            new DDG().Analyze(Queue, cancel, _reportQueueSize, _reportQueueInterval);
+            new DDG().Analyze(Queue, cancel);
         }
 
         #endregion
-
-        /// <summary>
-        /// Specifies a callback to invoke to provide feedback on the number of
-        /// items being processed.
-        /// </summary>
-        public void SetQueueReporting(Action<int> reportFunction, int interval = 1) {
-            _reportQueueSize = reportFunction;
-            _reportQueueInterval = interval;
-        }
 
         /// <summary>
         /// Adds a directory to the list of directories being analyzed.
@@ -389,5 +366,9 @@ namespace Microsoft.NodejsTools.Analysis {
             return res.ToString();
         }
 #endif
+
+        void IDeserializeInitialization.Init() {
+            _itemCache = new Dictionary<object, AnalysisValue>();
+        }
     }
 }

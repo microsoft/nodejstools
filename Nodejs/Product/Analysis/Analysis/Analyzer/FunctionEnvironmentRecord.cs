@@ -12,6 +12,7 @@
  *
  * ***************************************************************************/
 
+using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
@@ -20,6 +21,7 @@ using Microsoft.NodejsTools.Parsing;
 
 
 namespace Microsoft.NodejsTools.Analysis.Analyzer {
+    [Serializable]
     sealed class FunctionEnvironmentRecord : DeclarativeEnvironmentRecord {
         private readonly UserFunctionValue _function;
         internal VariableDef _this;

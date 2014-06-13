@@ -16,11 +16,13 @@
 
 namespace Microsoft.NodejsTools.Parsing
 {
+    using System;
     using System.Collections.Generic;
     using System.Globalization;
     using System.IO;
     using System.Text;
 
+    [Serializable]
     public abstract class IterationStatement : Statement
     {
         private Block m_body;

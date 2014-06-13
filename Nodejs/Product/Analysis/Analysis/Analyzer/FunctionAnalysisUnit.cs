@@ -12,6 +12,7 @@
  *
  * ***************************************************************************/
 
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading;
@@ -27,6 +28,7 @@ namespace Microsoft.NodejsTools.Analysis.Analyzer {
     /// It's possible that we still need to perform the analysis multiple times which can occur 
     /// if we take a dependency on something which later gets updated.
     /// </summary>
+    [Serializable]
     class FunctionAnalysisUnit : AnalysisUnit {
         public readonly UserFunctionValue Function;
         internal readonly AnalysisUnit _declUnit;

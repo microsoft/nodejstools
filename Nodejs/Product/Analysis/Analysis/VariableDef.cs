@@ -12,14 +12,16 @@
  *
  * ***************************************************************************/
 
+using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
 using System.Runtime.CompilerServices;
-using Microsoft.NodejsTools.Parsing;
 using Microsoft.NodejsTools.Analysis.Analyzer;
+using Microsoft.NodejsTools.Parsing;
 
 namespace Microsoft.NodejsTools.Analysis {
+    [Serializable]
     abstract class DependentData<TStorageType> where TStorageType : DependencyInfo {
         internal SingleDict<IProjectEntry, TStorageType> _dependencies;
 
@@ -89,6 +91,7 @@ namespace Microsoft.NodejsTools.Analysis {
         }
     }
 
+    [Serializable]
     class DependentData : DependentData<DependencyInfo> {
         protected override DependencyInfo NewDefinition(int version) {
             return new DependencyInfo(version);
@@ -126,6 +129,7 @@ namespace Microsoft.NodejsTools.Analysis {
     /// 
     /// TODO: We should store built-in types not keyed off of the ModuleInfo.
     /// </summary>
+    [Serializable]
     class VariableDef : DependentData<TypedDependencyInfo<AnalysisValue>>, IReferenceable {
         internal static VariableDef[] EmptyArray = new VariableDef[0];
 
@@ -507,6 +511,7 @@ namespace Microsoft.NodejsTools.Analysis {
     /// get all of the references back if there is later an assignment.  But if there are
     /// no assignments then the variable doesn't really exist and we won't list it in the available members.
     /// </summary>
+    [Serializable]
     sealed class EphemeralVariableDef : VariableDef {
         public override bool IsEphemeral {
             get {
@@ -518,6 +523,7 @@ namespace Microsoft.NodejsTools.Analysis {
     /// <summary>
     /// A variable def which has a specific location where it is defined (currently just function parameters).
     /// </summary>
+    [Serializable]
     class LocatedVariableDef : VariableDef {
         private readonly ProjectEntry _entry;
         private int _declaringVersion;

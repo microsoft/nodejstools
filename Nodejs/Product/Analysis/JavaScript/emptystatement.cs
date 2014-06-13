@@ -21,6 +21,7 @@ using System.Text;
 
 namespace Microsoft.NodejsTools.Parsing
 {
+    [Serializable]
     public class EmptyStatement : Statement
     {
         public EmptyStatement(IndexSpan context)

@@ -24,6 +24,7 @@ namespace Microsoft.NodejsTools.Analysis.Values {
     /// Represents a JavaScript object (constructed via a literal or
     /// as the result of a new someFunction call).
     /// </summary>
+    [Serializable]
     internal class ObjectValue : ExpandoValue {
         internal readonly FunctionValue _creator;
 #if DEBUG

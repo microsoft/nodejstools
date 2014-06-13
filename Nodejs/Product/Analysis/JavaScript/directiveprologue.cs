@@ -20,6 +20,7 @@ using System.Text;
 
 namespace Microsoft.NodejsTools.Parsing
 {
+    [Serializable]
     public class DirectivePrologue : ConstantWrapper
     {
         public DirectivePrologue(string value, IndexSpan span)

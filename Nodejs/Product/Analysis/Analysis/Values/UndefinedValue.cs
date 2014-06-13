@@ -12,7 +12,9 @@
  *
  * ***************************************************************************/
 
+using System;
 namespace Microsoft.NodejsTools.Analysis.Values {
+    [Serializable]
     class UndefinedValue : AnalysisValue {
         public override BuiltinTypeId TypeId {
             get {

@@ -65,7 +65,8 @@ namespace Microsoft.NodejsTools.Analysis {
             return AnalysisSet.Empty;
         }
 
-        class EventListenerKey {
+        [Serializable]
+        internal class EventListenerKey {
             public readonly string EventName;
 
             public EventListenerKey(string eventName) {

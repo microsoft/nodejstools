@@ -84,7 +84,8 @@ namespace Microsoft.NodejsTools.Analysis.Analyzer {
             return false;
         }
 
-        class ObjectLiteralKey {
+        [Serializable]
+        internal class ObjectLiteralKey {
             public readonly string[] PropertyNames;
             public readonly int HashCode;
 

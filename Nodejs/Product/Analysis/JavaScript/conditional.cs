@@ -20,7 +20,7 @@ using System.Text;
 
 namespace Microsoft.NodejsTools.Parsing
 {
-
+    [Serializable]
     public sealed class Conditional : Expression
     {
         private Expression m_condition;

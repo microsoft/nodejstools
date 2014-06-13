@@ -20,7 +20,7 @@ using System.Text;
 
 namespace Microsoft.NodejsTools.Parsing
 {
-
+    [Serializable]
     public sealed class DoWhile : IterationStatement
     {
         private Expression m_condition;

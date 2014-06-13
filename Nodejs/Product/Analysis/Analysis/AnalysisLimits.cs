@@ -12,9 +12,13 @@
  *
  * ***************************************************************************/
 
+using System;
+using System.IO;
+using System.Security;
 using Microsoft.Win32;
 
 namespace Microsoft.NodejsTools.Analysis {
+    [Serializable]
     public class AnalysisLimits {
         /// <summary>
         /// Returns a new set of limits, set to the defaults for analyzing user
@@ -37,6 +41,21 @@ namespace Microsoft.NodejsTools.Analysis {
             limits.IndexTypes = 5;
             limits.AssignedTypes = 50;
             return limits;
+        }
+
+        private const string AnalysisLimitsKey = @"Software\Microsoft\NodejsTools\" + AssemblyVersionInfo.VSVersion +
+    @"\Analysis\Project";
+
+        public static AnalysisLimits Load() {
+            try {
+                using (var key = Registry.CurrentUser.OpenSubKey(AnalysisLimitsKey)) {
+                    return LoadFromStorage(key);
+                }
+            } catch (SecurityException) {
+            } catch (UnauthorizedAccessException) {
+            } catch (IOException) {
+            }
+            return new AnalysisLimits();
         }
 
         private const string ReturnTypesId = "ReturnTypes";

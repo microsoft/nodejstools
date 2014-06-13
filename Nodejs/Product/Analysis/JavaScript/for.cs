@@ -20,7 +20,7 @@ using System.Text;
 
 namespace Microsoft.NodejsTools.Parsing
 {
-
+    [Serializable]
     public sealed class ForNode : IterationStatement
     {
         private Statement m_initializer;

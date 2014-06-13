@@ -31,6 +31,7 @@ namespace Microsoft.NodejsTools.Analysis {
     /// AnalysisUnit which is dependent upon the variable.  If the value of a variable changes then all of the dependent
     /// AnalysisUnit's will be re-enqueued.  This proceeds until we reach a fixed point.
     /// </summary>
+    [Serializable]
     public class AnalysisUnit : ISet<AnalysisUnit> {
         /// <summary>
         /// The AST which will be analyzed when this node is analyzed

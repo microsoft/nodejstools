@@ -15,6 +15,7 @@
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
+using System.IO;
 using System.Threading;
 using System.Threading.Tasks;
 using Microsoft.NodejsTools.Analysis;
@@ -30,7 +31,7 @@ namespace Microsoft.NodejsTools.Intellisense {
         private readonly VsProjectAnalyzer _analyzer;
         private readonly object _queueLock = new object();
         private readonly List<IAnalyzable>[] _queue;
-        private readonly HashSet<IGroupableAnalysisProject> _enqueuedGroups = new HashSet<IGroupableAnalysisProject>();
+        private readonly HashSet<IGroupableAnalysisProject> _enqueuedGroups;
         private TaskScheduler _scheduler;
         private CancellationTokenSource _cancel;
         private bool _isAnalyzing;
@@ -38,14 +39,21 @@ namespace Microsoft.NodejsTools.Intellisense {
 
         private const int PriorityCount = (int)AnalysisPriority.High + 1;
 
-        internal AnalysisQueue(VsProjectAnalyzer analyzer) {
+        internal AnalysisQueue(VsProjectAnalyzer analyzer, AnalysisSerializer serializer = null, Stream stream = null) {
             _workEvent = new AutoResetEvent(false);
             _cancel = new CancellationTokenSource();
             _analyzer = analyzer;
 
-            _queue = new List<IAnalyzable>[PriorityCount];
-            for (int i = 0; i < PriorityCount; i++) {
-                _queue[i] = new List<IAnalyzable>();
+            if (serializer != null && stream != null) {
+                // must be kept in sync with Serialize
+                _queue = (List<IAnalyzable>[])serializer.Deserialize(stream);
+                _enqueuedGroups = (HashSet<IGroupableAnalysisProject>)serializer.Deserialize(stream);
+            } else {
+                _queue = new List<IAnalyzable>[PriorityCount];
+                for (int i = 0; i < PriorityCount; i++) {
+                    _queue[i] = new List<IAnalyzable>();
+                }
+                _enqueuedGroups = new HashSet<IGroupableAnalysisProject>();
             }
 
             _workThread = new Thread(Worker);
@@ -58,6 +66,18 @@ namespace Microsoft.NodejsTools.Intellisense {
                 _workThread.Start(threadStarted);
                 threadStarted.WaitOne();
             }
+
+            foreach (var priority in _queue) {
+                if (priority.Count > 0) {
+                    _workEvent.Set();
+                }
+            }
+        }
+
+        public void Serialize(AnalysisSerializer serializer, Stream stream) {
+            // must be kept in sync with constructor deserialization
+            serializer.Serialize(stream, _queue);
+            serializer.Serialize(stream, _enqueuedGroups);
         }
 
         public TaskScheduler Scheduler {

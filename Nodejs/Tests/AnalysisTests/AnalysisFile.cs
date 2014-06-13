@@ -22,7 +22,7 @@ namespace AnalysisTests {
     }
 
     static class Analysis {
-        public static Dictionary<string, IJsProjectEntry> Analyze(params AnalysisFile[] files) {
+        public static JsAnalyzer Analyze(params AnalysisFile[] files) {
             Dictionary<string, IJsProjectEntry> entries = new Dictionary<string, IJsProjectEntry>();
             var analyzer = new JsAnalyzer();
 
@@ -54,7 +54,7 @@ namespace AnalysisTests {
 
             entries[files.First().Filename].AnalysisGroup.AnalyzeQueuedEntries(CancellationToken.None);
 
-            return entries;
+            return analyzer;
         }
     }
 }

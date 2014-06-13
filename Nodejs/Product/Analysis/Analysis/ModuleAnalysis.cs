@@ -30,6 +30,7 @@ namespace Microsoft.NodejsTools.Analysis {
     /// 
     /// Can be queried for various information about the resulting analysis.
     /// </summary>
+    [Serializable]
     public sealed class ModuleAnalysis {
         private readonly AnalysisUnit _unit;
         private readonly ModuleEnvironmentRecord _scope;

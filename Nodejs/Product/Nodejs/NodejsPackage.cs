@@ -636,7 +636,7 @@ namespace Microsoft.NodejsTools {
         internal VsProjectAnalyzer DefaultAnalyzer {
             get {
                 if (_analyzer == null) {
-                    _analyzer = new VsProjectAnalyzer(true);
+                    _analyzer = new VsProjectAnalyzer();
                 }
                 return _analyzer;
             }

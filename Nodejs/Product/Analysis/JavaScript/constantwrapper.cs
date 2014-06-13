@@ -21,6 +21,7 @@ using System.Text.RegularExpressions;
 
 namespace Microsoft.NodejsTools.Parsing
 {
+    [Serializable]
     public class ConstantWrapper : Expression
     {
         // this is a regular expression that we'll use to strip a leading "0x" from
@@ -96,6 +97,7 @@ namespace Microsoft.NodejsTools.Parsing
         }
     }
 
+    [Serializable]
     public class InvalidNumericErrorValue {
         private readonly string _code;
 

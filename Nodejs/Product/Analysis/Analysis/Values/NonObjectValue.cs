@@ -12,6 +12,7 @@
  *
  * ***************************************************************************/
 
+using System;
 using System.Collections.Generic;
 using Microsoft.NodejsTools.Analysis.Analyzer;
 using Microsoft.NodejsTools.Parsing;
@@ -20,6 +21,7 @@ namespace Microsoft.NodejsTools.Analysis.Values {
     /// <summary>
     /// Represents a value which is not an object (number, string, bool)
     /// </summary>
+    [Serializable]
     abstract class NonObjectValue : AnalysisValue, IReferenceableContainer {
         public abstract AnalysisValue Prototype {
             get;

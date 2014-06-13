@@ -18,6 +18,7 @@ using System.Linq;
 using Microsoft.NodejsTools.Parsing;
 
 namespace Microsoft.NodejsTools.Analysis.Values {
+    [Serializable]
     internal class FunctionValue : ExpandoValue {
         internal readonly InstanceValue _instance;
         private ReferenceDict _references;

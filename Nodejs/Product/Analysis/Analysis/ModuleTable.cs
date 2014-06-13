@@ -30,6 +30,7 @@ namespace Microsoft.NodejsTools.Analysis {
     /// up various elements we need to keep track of such as thread safety and lazy loading of built-in
     /// modules.
     /// </summary>
+    [Serializable]
     class ModuleTable {
         private readonly JsAnalyzer _analyzer;
         private readonly Dictionary<string, ModuleTree> _modulesByFilename = new Dictionary<string, ModuleTree>(StringComparer.OrdinalIgnoreCase);
@@ -46,7 +47,26 @@ namespace Microsoft.NodejsTools.Analysis {
             lock (_lock) {
                 return _modulesByFilename.TryGetValue(name, out moduleTree);
             }
-        }        
+        }
+
+        public IEnumerable<IJsProjectEntry> Modules {
+            get {
+                List<IJsProjectEntry> res = new List<IJsProjectEntry>();
+                lock (_lock) {
+                    EnumerateChildren(res, _modules);
+                }
+                return res;
+            }
+        }
+
+        private static void EnumerateChildren(List<IJsProjectEntry> res, ModuleTree cur) {
+            if (cur.Module != null) {
+                res.Add(cur.Module.ProjectEntry);
+            }
+            foreach (var child in cur.Children.Values) {
+                EnumerateChildren(res, child);
+            }
+        }
 
         public ModuleTree GetModuleTree(string name) {
             lock (_lock) {
@@ -240,6 +260,7 @@ namespace Microsoft.NodejsTools.Analysis {
         private static char[] PathSplitter = new[] { '\\', '/', ':' };
     }
 
+    [Serializable]
     sealed class ModuleTree {
         public readonly ModuleTree Parent;
         public readonly string Name;
