@@ -28,9 +28,10 @@ namespace Microsoft.NodejsTools.TestAdapter.TestFrameworks {
             TestFramework = parts[3];
         }
 
-        public NodejsTestInfo(string modulePath, string testName, string testFramework) {
+        public NodejsTestInfo(string modulePath, string testName, string modulaName, string testFramework)
+        {
             ModulePath = modulePath;
-            ModuleName = Path.GetFileNameWithoutExtension(modulePath);
+            ModuleName = modulaName;
             TestName = testName;
             TestFramework = testFramework;
         }
@@ -47,5 +48,11 @@ namespace Microsoft.NodejsTools.TestAdapter.TestFrameworks {
         public string TestName { get; private set; }
 
         public string TestFramework { get; private set; }
+
+        public string DisplayName {
+            get {
+                return string.IsNullOrWhiteSpace(ModuleName) ? TestName : string.Format("{0}:{1}", ModuleName, TestName);
+            }
+        }
     }
 }

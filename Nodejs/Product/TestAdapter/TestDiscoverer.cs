@@ -103,7 +103,7 @@ namespace Microsoft.NodejsTools.TestAdapter {
                                     var testCase = new TestCase(qualifiedName, TestExecutor.ExecutorUri, projSource) {
                                         CodeFilePath = fileAbsolutePath,
                                         LineNumber = 0,
-                                        DisplayName = discoveredTest.TestName
+                                        DisplayName = discoveredTest.DisplayName
                                     };
                                     discoverySink.SendTestCase(testCase);
                                 }

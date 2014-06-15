@@ -25,11 +25,9 @@ var find_tests = function (testFile, discoverResultFile, projectFolder) {
   mocha.addFile(testFile);
   mocha.loadFiles();
   getTestList(mocha.suite);
-  if (testList) {
-    var fd = fs.openSync(discoverResultFile, 'w');
-    fs.writeSync(fd, JSON.stringify(testList));
-    fs.closeSync(fd);
-  }
+  var fd = fs.openSync(discoverResultFile, 'w');
+  fs.writeSync(fd, JSON.stringify(testList));
+  fs.closeSync(fd);
 }
 module.exports.find_tests = find_tests;
 

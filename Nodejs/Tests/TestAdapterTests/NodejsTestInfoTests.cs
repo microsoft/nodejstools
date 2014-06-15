@@ -10,19 +10,20 @@ namespace TestAdapterTests {
         public void ConstructFullyQualifiedName_ValidInput() {
             //Arrange
             string testFile = "c:\\dummyWhatever.js";
-            string testFileNameNoExt = "dummyWhatever";
+            string testSuiteName = "testsuite1";
             string testName = "myMochaTest";
             string testFramework = "mocha";
 
             //Act
-            NodejsTestInfo testInfo = new NodejsTestInfo(testFile, testName, testFramework);
+            NodejsTestInfo testInfo = new NodejsTestInfo(testFile, testName, testSuiteName, testFramework);
 
             //Assert
-            string expected = testFile + "::" + testFileNameNoExt + "::" + testName + "::" + testFramework;
+            string expected = testFile + "::" + testSuiteName + "::" + testName + "::" + testFramework;
             Assert.AreEqual(expected, testInfo.FullyQualifiedName);
             Assert.AreEqual(testName, testInfo.TestName);
             Assert.AreEqual(testFramework, testInfo.TestFramework);
             Assert.AreEqual(testFile, testInfo.ModulePath);
+            Assert.AreEqual(testSuiteName + ":" + testName, testInfo.DisplayName);
         }
 
         [TestMethod, Priority(0)]
