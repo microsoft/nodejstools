@@ -3,14 +3,20 @@
 var find_tests = function (testFile, discoverResultFile, projectFolder) {
   var Mocha = require(projectFolder + '\\node_modules\\mocha');
   var mocha = new Mocha();
-  var testList;
+  var testList = [];
   function getTestList(suite) {
     if (suite) {
       if (suite.tests && suite.tests.length !== 0) {
-        testList = testList ? testList + '\r\n' + suite.title : suite.title;
+        suite.tests.forEach(function (t, i, testArray) {
+          testList.push({
+            test: t.title,
+            suite: suite.fullTitle()
+          });
+        });
       }
+
       if (suite.suites) {
-        suite.suites.forEach(function (s, i, ss) {
+        suite.suites.forEach(function (s, i, suiteArray) {
           getTestList(s);
         });
       }
@@ -21,7 +27,7 @@ var find_tests = function (testFile, discoverResultFile, projectFolder) {
   getTestList(mocha.suite);
   if (testList) {
     var fd = fs.openSync(discoverResultFile, 'w');
-    fs.writeSync(fd, testList);
+    fs.writeSync(fd, JSON.stringify(testList));
     fs.closeSync(fd);
   }
 }
@@ -31,7 +37,7 @@ var run_tests = function (testName, testFile, workingFolder, projectFolder) {
   var Mocha = new require(projectFolder + '\\node_modules\\mocha');
   var mocha = new Mocha();
   //default at 2 sec might be too short (TODO: make it configuable)
-  mocha.suite.timeout(30000); 
+  mocha.suite.timeout(30000);
   if (testName) {
     mocha.grep(testName);
   }
