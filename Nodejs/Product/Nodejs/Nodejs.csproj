@@ -788,8 +788,6 @@
     <MultiProjectZipProject Include="ProjectTemplates\AzureNodejsWorker\Cloud\Cloud.ccproj">
       <SubType>Designer</SubType>
     </MultiProjectZipProject>
-    <ZipItem Include="Templates\Files\UnitTest\UnitTest.js" />
-    <ZipItem Include="Templates\Files\UnitTest\UnitTest.vstemplate" />
     <Content Include="TestFrameworks\find_tests.js">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
       <IncludeInVSIX>true</IncludeInVSIX>
