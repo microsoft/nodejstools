@@ -207,7 +207,7 @@ namespace Microsoft.NodejsTools.Project {
             string fileName = item.Url;
             if (!String.IsNullOrWhiteSpace(fileName)
                 && Path.GetExtension(fileName).Equals(".ts", StringComparison.OrdinalIgnoreCase)
-                && !fileName.EndsWith(".d.ts",StringComparison.OrdinalIgnoreCase)) {
+                && !fileName.EndsWith(".d.ts", StringComparison.OrdinalIgnoreCase)) {
                 return new NodejsTypeScriptFileNode(this, item);
             }
             if (Path.GetFileName(fileName).Equals(NodejsConstants.PackageJsonFile, StringComparison.OrdinalIgnoreCase)) {
@@ -291,7 +291,7 @@ namespace Microsoft.NodejsTools.Project {
 
                 base.Reload();
 
-                SyncFileSystem();                
+                SyncFileSystem();
 
                 NodejsPackage.Instance.CheckSurveyNews(false);
                 ModulesNode.ReloadHierarchySafe();

@@ -710,7 +710,8 @@ namespace TestUtilities.UI {
             string templateName,
             string createLocation,
             string projectName,
-            bool newSolution = true
+            bool newSolution = true,
+            bool suppressUI = true
         ) {
             var sln = (Solution2)Dte.Solution;
             var templatePath = sln.GetProjectTemplate(templateName, languageName);
@@ -723,7 +724,13 @@ namespace TestUtilities.UI {
                 projectDir = Path.Combine(createLocation, projectName);
             }
 
-            sln.AddFromTemplate(templatePath, projectDir, projectName, newSolution);
+            var previousSuppressUI = Dte.SuppressUI;
+            try {
+                Dte.SuppressUI = suppressUI;
+                sln.AddFromTemplate(templatePath, projectDir, projectName, newSolution);
+            } finally {
+                Dte.SuppressUI = previousSuppressUI;
+            }
 
             return sln.Projects.Cast<Project>().FirstOrDefault(p => p.Name == projectName);
         }
@@ -802,10 +809,6 @@ namespace TestUtilities.UI {
                     ((EnvDTE90a.Breakpoint3)bp).Delete();
                 }
             }
-        }
-
-        internal void Invoke(Action action) {
-            UIThread.Invoke(action);
         }
 
         public Uri PublishToAzureCloudService(string serviceName, string subscriptionPublishSettingsFilePath) {
@@ -898,6 +901,11 @@ namespace TestUtilities.UI {
                 System.Threading.Thread.Sleep(1000);
             }
             return allItems;
+        }
+
+        internal ProjectItem AddItem(Project project, string language, string template, string filename) {
+            var fullTemplate = ((Solution2)project.DTE.Solution).GetProjectItemTemplate(template, language);
+            return project.ProjectItems.AddFromTemplate(fullTemplate, filename);
         }
     }
 }

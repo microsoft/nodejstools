@@ -12,15 +12,9 @@
  *
  * ***************************************************************************/
 
-#if DEV11_OR_LATER
-
 using System;
-using System.Collections.Generic;
-using System.Diagnostics;
 using System.IO;
-using System.Linq;
 using System.Net.WebSockets;
-using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
 
@@ -30,9 +24,18 @@ namespace Microsoft.VisualStudioTools {
     /// </summary>
     internal class WebSocketStream : Stream {
         private readonly WebSocket _webSocket;
+        private bool _ownsSocket;
 
-        public WebSocketStream(WebSocket webSocket) {
+        public WebSocketStream(WebSocket webSocket, bool ownsSocket = false) {
             _webSocket = webSocket;
+            _ownsSocket = ownsSocket;
+        }
+
+        protected override void Dispose(bool disposing) {
+            base.Dispose(disposing);
+            if (disposing && _ownsSocket) {
+                _webSocket.Dispose();
+            }
         }
 
         public override bool CanRead {
@@ -96,5 +99,3 @@ namespace Microsoft.VisualStudioTools {
         }
     }
 }
-
-#endif

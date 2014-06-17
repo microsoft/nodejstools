@@ -12,7 +12,6 @@
  *
  * ***************************************************************************/
 
-extern alias util;
 using System;
 using System.Collections.Generic;
 using System.Collections.Specialized;
@@ -23,13 +22,13 @@ using System.Windows;
 using EnvDTE;
 using Microsoft.TC.TestHostAdapters;
 using Microsoft.VisualStudio;
+using Microsoft.VisualStudio.Shell;
 using Microsoft.VisualStudio.Shell.Interop;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using TestUtilities;
 using TestUtilities.SharedProject;
 using TestUtilities.UI;
 using VSLangProj;
-using UIThread = util::Microsoft.VisualStudioTools.UIThread;
 
 namespace Microsoft.VisualStudioTools.SharedProjectTests {
     [TestClass]
@@ -1243,8 +1242,6 @@ namespace Microsoft.VisualStudioTools.SharedProjectTests {
         [TestMethod, Priority(0), TestCategory("Core")]
         [HostType("TC Dynamic"), DynamicHostType(typeof(VsIdeHostAdapter))]
         public void CopyFullPath() {
-            var existing = System.Diagnostics.Process.GetProcesses().Select(x => x.Id).ToSet();
-
             foreach (var projectType in ProjectTypes) {
                 var def = new ProjectDefinition(
                     "HelloWorld",
@@ -1280,7 +1277,7 @@ namespace Microsoft.VisualStudioTools.SharedProjectTests {
             AutomationWrapper.Select(element);
             VsIdeTestHostContext.Dte.ExecuteCommand("Project.CopyFullPath");
             
-            UIThread.Invoke(() => clipboardText = System.Windows.Clipboard.GetText());
+            ThreadHelper.Generic.Invoke(() => clipboardText = System.Windows.Clipboard.GetText());
 
             Assert.AreEqual(expected, clipboardText);
         }
@@ -1373,6 +1370,32 @@ namespace Microsoft.VisualStudioTools.SharedProjectTests {
                 VsIdeTestHostContext.Dte.Solution.Close();
                 GC.Collect();
                 GC.WaitForPendingFinalizers();
+            }
+        }
+
+        [TestMethod, Priority(0), TestCategory("Core")]
+        [HostType("TC Dynamic"), DynamicHostType(typeof(VsIdeHostAdapter))]
+        public void ProjectAddExistingExcludedFolder() {
+            foreach (var projectType in ProjectTypes) {
+                var def = new ProjectDefinition(
+                    "HelloWorld",
+                    projectType,
+                    Folder("Folder", isExcluded: true)
+                );
+
+                using (var solution = def.Generate().ToVs()) {
+                    try {
+                        solution.Project.ProjectItems.Item("Folder");
+                        Assert.Fail("Expected ArgumentException");
+                    } catch (ArgumentException ex) {
+                        Console.WriteLine("Handled {0}", ex);
+                    }
+
+                    // This should no longer fail
+                    var item = solution.Project.ProjectItems.AddFolder("Folder");
+
+                    Assert.AreEqual(item.FileNames[0], solution.Project.ProjectItems.Item("Folder").FileNames[0]);
+                }
             }
         }
 
@@ -1561,11 +1584,11 @@ namespace Microsoft.VisualStudioTools.SharedProjectTests {
                             uint itemid;
 
                             Console.WriteLine(relativeName);
-                            UIThread.Invoke(() => ErrorHandler.ThrowOnFailure(project.IsDocumentInProject(relativeName, out found, priority, out itemid)));
+                            ThreadHelper.Generic.Invoke(() => ErrorHandler.ThrowOnFailure(project.IsDocumentInProject(relativeName, out found, priority, out itemid)));
                             Assert.AreNotEqual(0, found);
 
                             Console.WriteLine(absoluteName);
-                            UIThread.Invoke(() => ErrorHandler.ThrowOnFailure(project.IsDocumentInProject(absoluteName, out found, priority, out itemid)));
+                            ThreadHelper.Generic.Invoke(() => ErrorHandler.ThrowOnFailure(project.IsDocumentInProject(absoluteName, out found, priority, out itemid)));
                             Assert.AreNotEqual(0, found);
                         }
                     }

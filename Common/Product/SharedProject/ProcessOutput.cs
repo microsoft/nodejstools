@@ -107,6 +107,7 @@ namespace Microsoft.VisualStudioTools.Project {
         private ProcessWaitHandle _waitHandle;
         private readonly Redirector _redirector;
         private bool _isDisposed;
+        private bool _seenNullInOutput, _seenNullInError;
         private bool _haveRaisedExitedEvent;
 
         private static readonly char[] EolChars = new[] { '\r', '\n' };
@@ -159,12 +160,12 @@ namespace Microsoft.VisualStudioTools.Project {
         /// <returns>A <see cref="ProcessOutput"/> object.</returns>
         public static ProcessOutput Run(
             string filename,
-                                        IEnumerable<string> arguments,
-                                        string workingDirectory,
-                                        IEnumerable<KeyValuePair<string, string>> env,
-                                        bool visible,
-                                        Redirector redirector,
-                                        bool quoteArgs = true,
+            IEnumerable<string> arguments,
+            string workingDirectory,
+            IEnumerable<KeyValuePair<string, string>> env,
+            bool visible,
+            Redirector redirector,
+            bool quoteArgs = true,
             bool elevate = false
         ) {
             if (string.IsNullOrEmpty(filename)) {
@@ -210,11 +211,13 @@ namespace Microsoft.VisualStudioTools.Project {
         /// </param>
         /// <param name="quoteArgs"></param>
         /// <returns>A <see cref="ProcessOutput"/> object.</returns>
-        public static ProcessOutput RunElevated(string filename,
-                                                IEnumerable<string> arguments,
-                                                string workingDirectory,
-                                                Redirector redirector,
-                                                bool quoteArgs = true) {
+        public static ProcessOutput RunElevated(
+            string filename,
+            IEnumerable<string> arguments,
+            string workingDirectory,
+            Redirector redirector,
+            bool quoteArgs = true
+        ) {
             var outFile = Path.GetTempFileName();
             var errFile = Path.GetTempFileName();
             var psi = new ProcessStartInfo("cmd.exe");
@@ -258,7 +261,7 @@ namespace Microsoft.VisualStudioTools.Project {
 #if DEBUG
                             foreach (var line in SplitLines(ex.ToString())) {
                                 redirector.WriteErrorLine(line);
-                        }
+                            }
 #else
                             Trace.TraceError("Failed to obtain standard output from elevated process.");
                             Trace.TraceError(ex.ToString());
@@ -277,7 +280,7 @@ namespace Microsoft.VisualStudioTools.Project {
 #if DEBUG
                             foreach (var line in SplitLines(ex.ToString())) {
                                 redirector.WriteErrorLine(line);
-                        }
+                            }
 #else
                             Trace.TraceError("Failed to obtain standard error from elevated process.");
                             Trace.TraceError(ex.ToString());
@@ -377,7 +380,7 @@ namespace Microsoft.VisualStudioTools.Project {
                 // to listen for the Exited event.
                 // If we just listen for the Exited event, we may receive it
                 // before all the output has arrived.
-            _process.Exited += OnExited;
+                _process.Exited += OnExited;
             }
             _process.EnableRaisingEvents = true;
 
@@ -392,7 +395,7 @@ namespace Microsoft.VisualStudioTools.Project {
                         _redirector.WriteErrorLine(line);
                     }
                 } else if (_error != null) {
-                _error.AddRange(SplitLines(ex.ToString()));
+                    _error.AddRange(SplitLines(ex.ToString()));
                 }
                 _process = null;
             }
@@ -413,7 +416,10 @@ namespace Microsoft.VisualStudioTools.Project {
             }
 
             if (e.Data == null) {
-                OnExited(_process, EventArgs.Empty);
+                _seenNullInOutput = true;
+                if (_seenNullInError || !_process.StartInfo.RedirectStandardError) {
+                    OnExited(_process, EventArgs.Empty);
+                }
             } else if (!string.IsNullOrEmpty(e.Data)) {
                 foreach (var line in SplitLines(e.Data)) {
                     if (_output != null) {
@@ -432,7 +438,10 @@ namespace Microsoft.VisualStudioTools.Project {
             }
 
             if (e.Data == null) {
-                OnExited(_process, EventArgs.Empty);
+                _seenNullInError = true;
+                if (_seenNullInOutput || !_process.StartInfo.RedirectStandardOutput) {
+                    OnExited(_process, EventArgs.Empty);
+                }
             } else if (!string.IsNullOrEmpty(e.Data)) {
                 foreach (var line in SplitLines(e.Data)) {
                     if (_error != null) {
@@ -509,10 +518,18 @@ namespace Microsoft.VisualStudioTools.Project {
             }
 
             if (_process.StartInfo.RedirectStandardOutput) {
-                _process.CancelOutputRead();
+                try {
+                    _process.CancelOutputRead();
+                } catch (InvalidOperationException) {
+                    // Reader has already been cancelled
+                }
             }
             if (_process.StartInfo.RedirectStandardError) {
-                _process.CancelErrorRead();
+                try {
+                    _process.CancelErrorRead();
+                } catch (InvalidOperationException) {
+                    // Reader has already been cancelled
+                }
             }
         }
 
@@ -581,7 +598,7 @@ namespace Microsoft.VisualStudioTools.Project {
         /// </summary>
         public TaskAwaiter<int> GetAwaiter() {
             var tcs = new TaskCompletionSource<int>();
-            
+
             if (_process == null) {
                 tcs.SetCanceled();
             } else {
@@ -589,10 +606,10 @@ namespace Microsoft.VisualStudioTools.Project {
                     FlushAndCloseOutput();
                     tcs.TrySetResult(_process.ExitCode);
                 };
-            if (_process.HasExited) {
+                if (_process.HasExited) {
                     FlushAndCloseOutput();
-                tcs.TrySetResult(_process.ExitCode);
-            }
+                    tcs.TrySetResult(_process.ExitCode);
+                }
             }
 
             return tcs.Task.GetAwaiter();

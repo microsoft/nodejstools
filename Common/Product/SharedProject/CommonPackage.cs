@@ -48,6 +48,14 @@ namespace Microsoft.VisualStudioTools {
         #endregion
 
         internal CommonPackage() {
+            // This call is essential for ensuring that future calls to methods
+            // of UIThread will succeed. Unit tests can disable invoking by
+            // calling UIThread.InitializeAndNeverInvoke before or after this
+            // call. If this call does not occur here, your process will
+            // terminate immediately when an attempt is made to use the UIThread
+            // methods.
+            UIThread.InitializeAndAlwaysInvokeToCurrentThread();
+
 #if DEBUG
             AppDomain.CurrentDomain.UnhandledException += (sender, e) => {
                 if (e.IsTerminating) {
@@ -65,18 +73,7 @@ namespace Microsoft.VisualStudioTools {
                     }
                 }
             };
-            System.Threading.Tasks.TaskScheduler.UnobservedTaskException += (sender, e) => {
-                if (!e.Observed) {
-                    Debug.Fail(
-                        string.Format("An exception in a task was not observed:\n    {0}\n\nThis is not fatal - click 'Ignore' to continue running.", e.Exception.Message),
-                        e.Exception.ToString()
-                    );
-                    e.SetObserved();
-                }
-            };
 #endif
-            UIThread.MustBeCalledFromUIThreadOrThrow();
-
             IServiceContainer container = this as IServiceContainer;
             ServiceCreatorCallback callback = new ServiceCreatorCallback(CreateService);
             //container.AddService(GetLanguageServiceType(), callback, true);

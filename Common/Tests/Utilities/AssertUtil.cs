@@ -169,12 +169,12 @@ namespace TestUtilities
         }
 
         [System.Diagnostics.DebuggerStepThrough]
-        public static void Equals<T>(IEnumerable<T> source, params T[] value) {
+        public static void AreEqual<T>(IEnumerable<T> source, params T[] value) {
             var items = source.ToArray();
             var message = string.Format(
-                "Expected: <{0}>. Actual: <{1}>.",
-                string.Join(", ", value),
-                string.Join(", ", items)
+                "Expected: <\n{0}\n>.\nActual: <\n{1}\n>.",
+                string.Join("\n", value),
+                string.Join("\n", items)
             );
             Console.WriteLine(message);
 
