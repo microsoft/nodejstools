@@ -13,10 +13,12 @@
  * ***************************************************************************/
 
 using System;
+using System.Linq;
 using System.Threading;
 using Microsoft.NodejsTools.Debugger.Commands;
 using Microsoft.VisualStudio;
 using Microsoft.VisualStudio.Debugger.Interop;
+using Microsoft.VisualStudioTools;
 
 namespace Microsoft.NodejsTools.Debugger.DebugEngine {
     // This class represents a succesfully parsed expression to the debugger. 
@@ -49,22 +51,26 @@ namespace Microsoft.NodejsTools.Debugger.DebugEngine {
         // This method should return immediately after it has started the expression evaluation. 
         // When the expression is successfully evaluated, an IDebugExpressionEvaluationCompleteEvent2 
         // must be sent to the IDebugEventCallback2 event callback
-        //
-        // This is primarily used for the immediate window which this engine does not currently support.
         int IDebugExpression2.EvaluateAsync(enum_EVALFLAGS dwFlags, IDebugEventCallback2 pExprCallback) {
             _tokenSource = new CancellationTokenSource();
 
             _frame.StackFrame.ExecuteTextAsync(_expression, _tokenSource.Token)
                 .ContinueWith(p => {
                     try {
-                        if (p.IsFaulted || p.IsCanceled || p.Result == null) {
-                            return;
+                        IDebugProperty2 property;
+                        if (p.Exception != null && p.Exception.InnerException != null) {
+                            property = new AD7EvalErrorProperty(p.Exception.InnerException.Message);
+                        } else if (p.IsCanceled) {
+                            property = new AD7EvalErrorProperty("Evaluation canceled");
+                        } else if (p.IsFaulted || p.Result == null) {
+                            property = new AD7EvalErrorProperty("Error");
+                        } else {
+                            property = new AD7Property(_frame, p.Result);
                         }
 
                         _tokenSource.Token.ThrowIfCancellationRequested();
-
                         _frame.Engine.Send(
-                            new AD7ExpressionEvaluationCompleteEvent(this, new AD7Property(_frame, p.Result)),
+                            new AD7ExpressionEvaluationCompleteEvent(this, property),
                             AD7ExpressionEvaluationCompleteEvent.IID,
                             _frame.Engine,
                             _frame.Thread);
@@ -85,15 +91,12 @@ namespace Microsoft.NodejsTools.Debugger.DebugEngine {
 
             NodeEvaluationResult result;
             try {
-                result = _frame.StackFrame.ExecuteTextAsync(_expression, tokenSource.Token)
-                    .WaitAsync(timeout, tokenSource.Token).Result;
-            } catch (AggregateException ae) {
-                Exception baseException = ae.GetBaseException();
-                if (baseException is DebuggerCommandException) {
-                    return VSConstants.E_FAIL;
-                }
-
-                throw;
+                result = _frame.StackFrame.ExecuteTextAsync(_expression, tokenSource.Token).WaitAsync(timeout, tokenSource.Token).WaitAndUnwrapExceptions();
+            } catch (DebuggerCommandException ex) {
+                ppResult = new AD7EvalErrorProperty(ex.Message);
+                return VSConstants.S_OK;
+            } catch (OperationCanceledException) {
+                return DebuggerConstants.E_EVALUATE_TIMEOUT;
             }
 
             if (result == null) {
@@ -101,7 +104,6 @@ namespace Microsoft.NodejsTools.Debugger.DebugEngine {
             }
 
             ppResult = new AD7Property(_frame, result);
-
             return VSConstants.S_OK;
         }
 

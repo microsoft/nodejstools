@@ -20,6 +20,7 @@ using System.Net;
 using System.Threading;
 using Microsoft.NodejsTools.Debugger;
 using Microsoft.NodejsTools.Debugger.Serialization;
+using Microsoft.VisualStudioTools;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using TestUtilities;
 using TestUtilities.Nodejs;
@@ -67,15 +68,15 @@ namespace NodejsTests.Debugger {
 
             var frames = thread.Frames;
 
-            NodeEvaluationResult evalRes = frames[frame].ExecuteTextAsync(text).Result;
+            NodeEvaluationResult evalRes = frames[frame].ExecuteTextAsync(text).WaitAndUnwrapExceptions();
             Assert.IsTrue(evalRes != null, "didn't get evaluation result");
 
             if (children == null) {
                 Assert.IsTrue(!evalRes.Type.HasFlag(NodeExpressionType.Expandable));
-                Assert.IsTrue(evalRes.GetChildrenAsync().Result == null);
+                Assert.IsTrue(evalRes.GetChildrenAsync().WaitAndUnwrapExceptions() == null);
             } else {
                 Assert.IsTrue(evalRes.Type.HasFlag(NodeExpressionType.Expandable));
-                var childrenReceived = new List<NodeEvaluationResult>(evalRes.GetChildrenAsync().Result);
+                var childrenReceived = new List<NodeEvaluationResult>(evalRes.GetChildrenAsync().WaitAndUnwrapExceptions());
 
                 Assert.AreEqual(children.Length, childrenReceived.Count, String.Format("received incorrect number of children: {0} expected, received {1}", children.Length, childrenReceived.Count));
                 for (int i = 0; i < children.Length; i++) {
@@ -145,7 +146,7 @@ namespace NodejsTests.Debugger {
                     Assert.AreEqual(thread, args.Thread);
                     breakComplete.Set();
                 };
-                process.BreakAllAsync().Wait();
+                process.BreakAllAsync().WaitAndUnwrapExceptions();
                 AssertWaited(breakComplete);
                 breakComplete.Reset();
 

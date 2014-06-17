@@ -221,7 +221,7 @@ namespace Microsoft.NodejsTools.Debugger {
 
             var tokenSource = new CancellationTokenSource(_timeout);
             var suspendCommand = new SuspendCommand(CommandId);
-            await SendRequestAsync(suspendCommand, tokenSource.Token).ConfigureAwait(false);
+            await TrySendRequestAsync(suspendCommand, tokenSource.Token).ConfigureAwait(false);
 
             // Handle success
             // We need to get the backtrace before we break, so we request the backtrace
@@ -273,7 +273,7 @@ namespace Microsoft.NodejsTools.Debugger {
             _handleEntryPointHit = false;
 
             var continueCommand = new ContinueCommand(CommandId, stepping, stepCount);
-            await SendRequestAsync(continueCommand, cancellationToken).ConfigureAwait(false);
+            await TrySendRequestAsync(continueCommand, cancellationToken).ConfigureAwait(false);
         }
 
         private Task AutoResumeAsync(bool haveCallstack, CancellationToken cancellationToken = new CancellationToken()) {
@@ -459,7 +459,7 @@ namespace Microsoft.NodejsTools.Debugger {
             var changeLiveCommand = new ChangeLiveCommand(CommandId, module);
 
             // Check whether update was successfull
-            if (!await SendRequestAsync(changeLiveCommand).ConfigureAwait(false) ||
+            if (!await TrySendRequestAsync(changeLiveCommand).ConfigureAwait(false) ||
                 !changeLiveCommand.Updated) {
                 return false;
             }
@@ -467,7 +467,7 @@ namespace Microsoft.NodejsTools.Debugger {
             // Make step into if required
             if (changeLiveCommand.NeedStepIn) {
                 var continueCommand = new ContinueCommand(CommandId, SteppingKind.Into);
-                await SendRequestAsync(continueCommand).ConfigureAwait(false);
+                await TrySendRequestAsync(continueCommand).ConfigureAwait(false);
             }
 
             // Update stacktrace if required
@@ -525,7 +525,7 @@ namespace Microsoft.NodejsTools.Debugger {
 
         private async Task GetScriptsAsync(CancellationToken cancellationToken = new CancellationToken()) {
             var scriptsCommand = new ScriptsCommand(CommandId);
-            if (await SendRequestAsync(scriptsCommand, cancellationToken).ConfigureAwait(false)) {
+            if (await TrySendRequestAsync(scriptsCommand, cancellationToken).ConfigureAwait(false)) {
                 AddModules(scriptsCommand.Modules);
             }
         }
@@ -559,14 +559,14 @@ namespace Microsoft.NodejsTools.Debugger {
 
             if (_breakOnAllExceptions != breakOnAllExceptions) {
                 var setExceptionBreakCommand = new SetExceptionBreakCommand(CommandId, false, breakOnAllExceptions);
-                await SendRequestAsync(setExceptionBreakCommand, cancellationToken).ConfigureAwait(false);
+                await TrySendRequestAsync(setExceptionBreakCommand, cancellationToken).ConfigureAwait(false);
 
                 _breakOnAllExceptions = breakOnAllExceptions;
             }
 
             if (_breakOnUncaughtExceptions != breakOnUncaughtExceptions) {
                 var setExceptionBreakCommand = new SetExceptionBreakCommand(CommandId, true, breakOnUncaughtExceptions);
-                await SendRequestAsync(setExceptionBreakCommand, cancellationToken).ConfigureAwait(false);
+                await TrySendRequestAsync(setExceptionBreakCommand, cancellationToken).ConfigureAwait(false);
 
                 _breakOnUncaughtExceptions = breakOnUncaughtExceptions;
             }
@@ -697,7 +697,7 @@ namespace Microsoft.NodejsTools.Debugger {
                 var lookupCommand = new LookupCommand(CommandId, _resultFactory, new[] { exception.ErrorNumber.Value });
                 string errorCodeFromLookup = null;
                 
-                if (await SendRequestAsync(lookupCommand).ConfigureAwait(false)) {
+                if (await TrySendRequestAsync(lookupCommand).ConfigureAwait(false)) {
                     errorCodeFromLookup = lookupCommand.Results[errorNumber][0].StringValue;
                     _errorCodes[errorNumber] = errorCodeFromLookup;
                 }
@@ -740,7 +740,7 @@ namespace Microsoft.NodejsTools.Debugger {
                     // Serialize exception object to get a proper description
                     var tokenSource = new CancellationTokenSource(_timeout);
                     var evaluateCommand = new EvaluateCommand(CommandId, _resultFactory, exceptionEvent.ExceptionId);
-                    if (await SendRequestAsync(evaluateCommand, tokenSource.Token).ConfigureAwait(false)) {
+                    if (await TrySendRequestAsync(evaluateCommand, tokenSource.Token).ConfigureAwait(false)) {
                         description = evaluateCommand.Result.StringValue;
                     }
                 }
@@ -752,7 +752,7 @@ namespace Microsoft.NodejsTools.Debugger {
 
         private async Task<int> GetCallstackDepthAsync(CancellationToken cancellationToken = new CancellationToken()) {
             var backtraceCommand = new BacktraceCommand(CommandId, _resultFactory, 0, 1, true);
-            await SendRequestAsync(backtraceCommand, cancellationToken).ConfigureAwait(false);
+            await TrySendRequestAsync(backtraceCommand, cancellationToken).ConfigureAwait(false);
             return backtraceCommand.CallstackDepth;
         }
 
@@ -800,7 +800,7 @@ namespace Microsoft.NodejsTools.Debugger {
             // approximate 'bottom' for 'toFrame' using int.MaxValue.  Node.js silently handles toFrame depths
             // greater than the current callstack.
             var backtraceCommand = new BacktraceCommand(CommandId, _resultFactory, 0, int.MaxValue);
-            if (!await SendRequestAsync(backtraceCommand, cancellationToken).ConfigureAwait(false)) {
+            if (!await TrySendRequestAsync(backtraceCommand, cancellationToken).ConfigureAwait(false)) {
                 return false;
             }
 
@@ -819,7 +819,7 @@ namespace Microsoft.NodejsTools.Debugger {
 
             if (numbersWithNullValue.Count > 0) {
                 var lookupCommand = new LookupCommand(CommandId, _resultFactory, numbersWithNullValue);
-                if (await SendRequestAsync(lookupCommand, cancellationToken).ConfigureAwait(false)) {
+                if (await TrySendRequestAsync(lookupCommand, cancellationToken).ConfigureAwait(false)) {
                     foreach (NodeEvaluationResult targetResult in numbersWithNullValue) {
                         NodeEvaluationResult lookupResult = lookupCommand.Results[targetResult.Handle][0];
                         targetResult.StringValue = targetResult.HexValue = lookupResult.StringValue;
@@ -937,7 +937,7 @@ namespace Microsoft.NodejsTools.Debugger {
                 // Disconnect request has no response
                 var tokenSource = new CancellationTokenSource(_timeout);
                 var disconnectCommand = new DisconnectCommand(CommandId);
-                await SendRequestAsync(disconnectCommand, tokenSource.Token).ConfigureAwait(false);
+                await TrySendRequestAsync(disconnectCommand, tokenSource.Token).ConfigureAwait(false);
                 _connection.Close();
             });
         }
@@ -981,7 +981,7 @@ namespace Microsoft.NodejsTools.Debugger {
             NodeModule module = GetModuleForFilePath(breakpoint.Target.FileName);
 
             var setBreakpointCommand = new SetBreakpointCommand(CommandId, module, breakpoint, withoutPredicate, IsRemote);
-            await SendRequestAsync(setBreakpointCommand, cancellationToken).ConfigureAwait(false);
+            await TrySendRequestAsync(setBreakpointCommand, cancellationToken).ConfigureAwait(false);
 
             return setBreakpointCommand;
         }
@@ -1027,14 +1027,14 @@ namespace Microsoft.NodejsTools.Debugger {
             DebugWriteCommand("Update Breakpoint binding");
 
             var changeBreakPointCommand = new ChangeBreakpointCommand(CommandId, breakpointId, enabled, condition, ignoreCount);
-            await SendRequestAsync(changeBreakPointCommand, cancellationToken).ConfigureAwait(false);
+            await TrySendRequestAsync(changeBreakPointCommand, cancellationToken).ConfigureAwait(false);
         }
 
         internal async Task<int?> GetBreakpointHitCountAsync(int breakpointId, CancellationToken cancellationToken = new CancellationToken()) {
             var listBreakpointsCommand = new ListBreakpointsCommand(CommandId);
             
             int hitCount;
-            if (await SendRequestAsync(listBreakpointsCommand, cancellationToken).ConfigureAwait(false) &&
+            if (await TrySendRequestAsync(listBreakpointsCommand, cancellationToken).ConfigureAwait(false) &&
                 listBreakpointsCommand.Breakpoints.TryGetValue(breakpointId, out hitCount)) {
                 return hitCount;
             }
@@ -1049,10 +1049,7 @@ namespace Microsoft.NodejsTools.Debugger {
             DebugWriteCommand("Execute Text Async");
 
             var evaluateCommand = new EvaluateCommand(CommandId, _resultFactory, text, stackFrame);
-            if (!await SendRequestAsync(evaluateCommand, cancellationToken).ConfigureAwait(false)) {
-                return null;
-            }
-
+            await _client.SendRequestAsync(evaluateCommand, cancellationToken).ConfigureAwait(false);
             return evaluateCommand.Result;
         }
 
@@ -1065,14 +1062,14 @@ namespace Microsoft.NodejsTools.Debugger {
 
             // Create a new value
             var evaluateValueCommand = new EvaluateCommand(CommandId, _resultFactory, value, stackFrame);
-            if (!await SendRequestAsync(evaluateValueCommand, cancellationToken).ConfigureAwait(false)) {
+            if (!await TrySendRequestAsync(evaluateValueCommand, cancellationToken).ConfigureAwait(false)) {
                 return null;
             }
             int handle = evaluateValueCommand.Result.Handle;
 
             // Set variable value
             var setVariableValuecommand = new SetVariableValueCommand(CommandId, _resultFactory, stackFrame, name, handle);
-            if (!await SendRequestAsync(setVariableValuecommand, cancellationToken).ConfigureAwait(false)) {
+            if (!await TrySendRequestAsync(setVariableValuecommand, cancellationToken).ConfigureAwait(false)) {
                 return null;
             }
             return setVariableValuecommand.Result;
@@ -1082,7 +1079,7 @@ namespace Microsoft.NodejsTools.Debugger {
             DebugWriteCommand("Enum Children");
 
             var lookupCommand = new LookupCommand(CommandId, _resultFactory, new List<NodeEvaluationResult> { nodeEvaluationResult });
-            if (!await SendRequestAsync(lookupCommand, cancellationToken).ConfigureAwait(false)) {
+            if (!await TrySendRequestAsync(lookupCommand, cancellationToken).ConfigureAwait(false)) {
                 return null;
             }
 
@@ -1100,7 +1097,7 @@ namespace Microsoft.NodejsTools.Debugger {
             int breakpointId = breakpointBinding.BreakpointId;
             if (_connection.Connected) {
                 var clearBreakpointsCommand = new ClearBreakpointCommand(CommandId, breakpointId);
-                await SendRequestAsync(clearBreakpointsCommand, cancellationToken).ConfigureAwait(false);
+                await TrySendRequestAsync(clearBreakpointsCommand, cancellationToken).ConfigureAwait(false);
             }
 
             NodeBreakpoint breakpoint = breakpointBinding.Breakpoint;
@@ -1118,7 +1115,7 @@ namespace Microsoft.NodejsTools.Debugger {
             DebugWriteCommand("GetScriptText: " + moduleId);
 
             var scriptsCommand = new ScriptsCommand(CommandId, true, moduleId);
-            if (!await SendRequestAsync(scriptsCommand, cancellationToken).ConfigureAwait(false) ||
+            if (!await TrySendRequestAsync(scriptsCommand, cancellationToken).ConfigureAwait(false) ||
                 scriptsCommand.Modules.Count == 0) {
                 return null;
             }
@@ -1132,13 +1129,13 @@ namespace Microsoft.NodejsTools.Debugger {
             string predicateExpression = string.Format("Boolean({0})", expression);
             var evaluateCommand = new EvaluateCommand(CommandId, _resultFactory, predicateExpression);
 
-            return await SendRequestAsync(evaluateCommand, cancellationToken).ConfigureAwait(false) &&
+            return await TrySendRequestAsync(evaluateCommand, cancellationToken).ConfigureAwait(false) &&
                    evaluateCommand.Result != null &&
                    evaluateCommand.Result.Type == NodeExpressionType.Boolean &&
                    evaluateCommand.Result.StringValue == "true";
         }
 
-        private async Task<bool> SendRequestAsync(DebuggerCommand command, CancellationToken cancellationToken = new CancellationToken()) {
+        private async Task<bool> TrySendRequestAsync(DebuggerCommand command, CancellationToken cancellationToken = new CancellationToken()) {
             try {
                 await _client.SendRequestAsync(command, cancellationToken).ConfigureAwait(false);
                 return true;
@@ -1147,8 +1144,8 @@ namespace Microsoft.NodejsTools.Debugger {
                 if (evt != null) {
                     evt(this, new OutputEventArgs(null, ex.Message + Environment.NewLine));
                 }
+                return false;
             }
-            return false;
         }
         
         #endregion

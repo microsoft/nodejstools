@@ -178,22 +178,10 @@ namespace Microsoft.NodejsTools.Debugger {
             return true;
         }
 
-        internal static async Task<T> WaitAsync<T>(this Task<T> task, TimeSpan timeout, CancellationToken token = default (CancellationToken)) {
-            var cancellationTokenSource = new CancellationTokenSource();
-            var linkedTokenSource = CancellationTokenSource.CreateLinkedTokenSource(token, cancellationTokenSource.Token);
-            
-            await Task.WhenAny(new[] {
-                task,
-                Task.Delay(timeout, linkedTokenSource.Token)
-            }).ConfigureAwait(false);
-            
-            linkedTokenSource.Cancel();
-
-            if (task.IsCompleted) {
-                return task.Result;
-            }
-
-            throw new TimeoutException();
+        internal static Task<T> WaitAsync<T>(this Task<T> task, TimeSpan timeout, CancellationToken token = default(CancellationToken)) {
+            var linkedTokenSource = CancellationTokenSource.CreateLinkedTokenSource(token);
+            linkedTokenSource.CancelAfter(timeout);
+            return task.ContinueWith(t => t.Result, linkedTokenSource.Token, TaskContinuationOptions.OnlyOnRanToCompletion, TaskScheduler.Current);
         }
 
         internal static async Task<string> ReadLineBlockAsync(this StreamReader streamReader, int length) {

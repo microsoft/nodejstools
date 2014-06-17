@@ -21,6 +21,7 @@ using Microsoft.NodejsTools.Debugger.Commands;
 using Microsoft.NodejsTools.Debugger.Serialization;
 using Microsoft.VisualStudio;
 using Microsoft.VisualStudio.Debugger.Interop;
+using Microsoft.VisualStudioTools;
 
 namespace Microsoft.NodejsTools.Debugger.DebugEngine {
     // An implementation of IDebugProperty3
@@ -155,7 +156,13 @@ namespace Microsoft.NodejsTools.Debugger.DebugEngine {
         public int GetStringChars(uint buflen, ushort[] rgString, out uint pceltFetched) {
             pceltFetched = buflen;
 
-            NodeEvaluationResult result = _evaluationResult.Frame.ExecuteTextAsync(_evaluationResult.FullName).Result;
+            NodeEvaluationResult result;
+            try {
+                result = _evaluationResult.Frame.ExecuteTextAsync(_evaluationResult.FullName).WaitAndUnwrapExceptions();
+            } catch (DebuggerCommandException) {
+                return VSConstants.E_FAIL;
+            }
+
             if (result != null && result.StringValue != null) {
                 result.StringValue.ToCharArray().CopyTo(rgString, 0);
             } else {
@@ -189,17 +196,11 @@ namespace Microsoft.NodejsTools.Debugger.DebugEngine {
         public int SetValueAsStringWithError(string pszValue, uint dwRadix, uint dwTimeout, out string errorString) {
             errorString = "Unable to set new value.";
             try {
-                SetValueAsStringAsync(pszValue, TimeSpan.FromMilliseconds(dwTimeout)).Wait();
-            } catch (AggregateException ae) {
-                Exception baseException = ae.GetBaseException();
-                if (baseException is DebuggerCommandException) {
-                    errorString = baseException.Message;
-                    return VSConstants.E_FAIL;
-                }
-
-                throw;
+                SetValueAsStringAsync(pszValue, TimeSpan.FromMilliseconds(dwTimeout)).WaitAndUnwrapExceptions();
+            } catch (DebuggerCommandException ex) {
+                errorString = ex.Message;
+                return VSConstants.E_FAIL;
             }
-
             return VSConstants.S_OK;
         }
 
@@ -224,7 +225,6 @@ namespace Microsoft.NodejsTools.Debugger.DebugEngine {
 
         // Fills in a DEBUG_PROPERTY_INFO structure that describes a property.
         public int GetPropertyInfo(enum_DEBUGPROP_INFO_FLAGS dwFields, uint dwRadix, uint dwTimeout, IDebugReference2[] rgpArgs, uint dwArgCount, DEBUG_PROPERTY_INFO[] pPropertyInfo) {
-            pPropertyInfo[0] = new DEBUG_PROPERTY_INFO();
             pPropertyInfo[0] = ConstructDebugPropertyInfo(dwRadix, dwFields);
             return VSConstants.S_OK;
         }
@@ -249,7 +249,7 @@ namespace Microsoft.NodejsTools.Debugger.DebugEngine {
 
         // The debugger will call this when the user tries to edit the property's values in one of the debugger windows.
         public int SetValueAsString(string pszValue, uint dwRadix, uint dwTimeout) {
-            SetValueAsStringAsync(pszValue, TimeSpan.FromMilliseconds(dwTimeout)).Wait();
+            SetValueAsStringAsync(pszValue, TimeSpan.FromMilliseconds(dwTimeout)).WaitAndUnwrapExceptions();
             return VSConstants.S_OK;
         }
 

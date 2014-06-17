@@ -18,9 +18,11 @@ using System.Diagnostics;
 using System.IO;
 using System.Linq;
 using System.Threading;
+using System.Threading.Tasks;
 using Microsoft.NodejsTools;
 using Microsoft.NodejsTools.Debugger;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
+using Microsoft.VisualStudioTools;
 using TestUtilities;
 
 namespace NodejsTests.Debugger {
@@ -29,9 +31,9 @@ namespace NodejsTests.Debugger {
     };
 
     internal static class Extensions {
-        internal static void Remove(this NodeBreakpoint breakpoint) {
+        internal static async Task Remove(this NodeBreakpoint breakpoint) {
             foreach (var binding in breakpoint.GetBindings()) {
-                binding.Remove();
+                await binding.Remove().ConfigureAwait(false);
             }
         }
     }
@@ -53,7 +55,7 @@ namespace NodejsTests.Debugger {
             string condition = ""
         ) {
             NodeBreakpoint breakPoint = newproc.AddBreakpoint(fileName, line, column, enabled, breakOn, condition);
-            breakPoint.BindAsync().Wait();
+            breakPoint.BindAsync().WaitAndUnwrapExceptions();
             return breakPoint;
         }
 
@@ -250,12 +252,12 @@ namespace NodejsTests.Debugger {
         ) {
             var frame = thread.Frames[frameIndex];
             NodeEvaluationResult evaluationResult = null;
-            AggregateException exception = null;
+            Exception exception = null;
             
             try {
-                evaluationResult = frame.ExecuteTextAsync(expression).Result;
-            } catch (AggregateException ae) {
-                exception = ae;
+                evaluationResult = frame.ExecuteTextAsync(expression).WaitAndUnwrapExceptions();
+            } catch (Exception ex) {
+                exception = ex;
             }
             
             if (expectedType != null) {
@@ -268,7 +270,7 @@ namespace NodejsTests.Debugger {
             }
             if (expectedException != null) {
                 Assert.IsNotNull(exception);
-                Assert.AreEqual(expectedException, exception.GetBaseException().Message);
+                Assert.AreEqual(expectedException, exception.Message);
             }
             if (expectedFrame != null) {
                 Assert.AreEqual(expectedFrame, frame.FunctionName);
@@ -610,7 +612,7 @@ namespace NodejsTests.Debugger {
                         breakpointLine = step._targetBreakpoint.Value;
                         breakpointColumn = step._targetBreakpointColumn.HasValue ? step._targetBreakpointColumn.Value : 0;
                         breakpoint = new Breakpoint(breakpointFileName, breakpointLine, breakpointColumn);
-                        breakpoints[breakpoint].Remove();
+                        breakpoints[breakpoint].Remove().WaitAndUnwrapExceptions();
                         breakpoints.Remove(breakpoint);
                         AssertWaited(breakpointUnbound);
                         breakpointUnbound.Reset();
@@ -623,16 +625,16 @@ namespace NodejsTests.Debugger {
                         nodeBreakpoint = breakpoints[breakpoint];
                         foreach (var breakpointBinding in nodeBreakpoint.GetBindings()) {
                             if (step._hitCount != null) {
-                                Assert.IsTrue(breakpointBinding.SetHitCountAsync(step._hitCount.Value).Result);
+                                Assert.IsTrue(breakpointBinding.SetHitCountAsync(step._hitCount.Value).WaitAndUnwrapExceptions());
                             }
                             if (step._enabled != null) {
-                                Assert.IsTrue(breakpointBinding.SetEnabledAsync(step._enabled.Value).Result);
+                                Assert.IsTrue(breakpointBinding.SetEnabledAsync(step._enabled.Value).WaitAndUnwrapExceptions());
                             }
                             if (step._breakOn != null) {
-                                Assert.IsTrue(breakpointBinding.SetBreakOnAsync(step._breakOn.Value).Result);
+                                Assert.IsTrue(breakpointBinding.SetBreakOnAsync(step._breakOn.Value).WaitAndUnwrapExceptions());
                             }
                             if (step._condition != null) {
-                                Assert.IsTrue(breakpointBinding.SetConditionAsync(step._condition).Result);
+                                Assert.IsTrue(breakpointBinding.SetConditionAsync(step._condition).WaitAndUnwrapExceptions());
                             }
                         }
                         break;

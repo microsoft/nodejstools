@@ -115,7 +115,7 @@ namespace Microsoft.NodejsTools.Debugger {
         }
 
         /// <summary>
-        /// Executes the given text against this stack frame.
+        /// Executes the given text against this stack frame. Throws on failure.
         /// </summary>
         /// <param name="text">Text expression.</param>
         /// <param name="cancellationToken">Cancellation token.</param>

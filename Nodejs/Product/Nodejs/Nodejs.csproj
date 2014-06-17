@@ -257,6 +257,7 @@
     <Compile Include="Commands\OpenRemoteDebugProxyFolderCommand.cs" />
     <Compile Include="Commands\SurveyNewsCommand.cs" />
     <Compile Include="Debugger\DataTips\DataTipTextManagerEvents.cs" />
+    <Compile Include="Debugger\DebugEngine\AD7EvalErrorProperty.cs" />
     <Compile Include="Debugger\FilePosition.cs" />
     <Compile Include="Debugger\FuzzyLogicFileNameMapper.cs" />
     <Compile Include="Debugger\IFileNameMapper.cs" />

@@ -18,6 +18,7 @@ using System.Linq;
 using System.Runtime.InteropServices;
 using Microsoft.VisualStudio;
 using Microsoft.VisualStudio.Debugger.Interop;
+using Microsoft.VisualStudioTools;
 
 namespace Microsoft.NodejsTools.Debugger.DebugEngine {
     // This class represents a pending breakpoint which is an abstract representation of a breakpoint before it is bound.
@@ -228,6 +229,7 @@ namespace Microsoft.NodejsTools.Debugger.DebugEngine {
                         var boundBreakpoint = (IDebugBoundBreakpoint2)_bpManager.GetBoundBreakpoint(binding);
                         if (boundBreakpoint != null) {
                             boundBreakpoint.Delete();
+                            binding.Remove().WaitAndUnwrapExceptions();
                         }
                     }
                 }
