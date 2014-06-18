@@ -58,6 +58,45 @@ namespace AnalysisTests {
             Assert.IsTrue(span.Equals(span2));
         }
 
+        [TestMethod]
+        public void TestFunctionRecovery() {
+            const string code = @"
+[1,2,
+function Y() {
+	(abcde X());
+;abcde
+}
+]
+";
+            CheckAst(
+                ParseCode(
+                    code,
+                    new ErrorInfo(JSError.NoRightParenthesis, true, new IndexSpan(31, 1)),
+                    new ErrorInfo(JSError.NoSemicolon, true, new IndexSpan(34, 1)),
+                    new ErrorInfo(JSError.NoRightBracket, true, new IndexSpan(35, 1)),
+                    new ErrorInfo(JSError.SyntaxError, true, new IndexSpan(44, 1))
+                ),
+                CheckBlock(
+                    CheckExprStmt(
+                        CheckArrayLiteral(
+                            CheckConstant(1.0),
+                            CheckConstant(2.0),
+                            CheckFunctionExpr(
+                                CheckFunctionObject(
+                                    "Y",                                        
+                                    CheckBlock(
+                                        CheckExprStmt(CheckGrouping(CheckLookup("abcde"))),
+                                        CheckExprStmt(CheckCall(CheckLookup("X")))
+                                    )
+                                )
+                            )
+                        )
+                    ),
+                    CheckEmptyStmt(),
+                    CheckLookupStmt("abcde")
+                )
+            );
+        }
 
         [TestMethod]
         public void TestParseExpression() {

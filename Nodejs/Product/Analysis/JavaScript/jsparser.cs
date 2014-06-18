@@ -3780,10 +3780,19 @@ namespace Microsoft.NodejsTools.Parsing
         private FunctionExpression ParseFunctionExpression(FunctionType functionType = FunctionType.Expression)
         {
             var span = _curSpan;
-            var function = ParseFunction(functionType, _curSpan);
-            var functionExpr = new FunctionExpression(span);
-            functionExpr.Function = function;
-            return functionExpr;
+            try {
+                var function = ParseFunction(functionType, _curSpan);
+                var functionExpr = new FunctionExpression(span);
+                functionExpr.Function = function;
+                return functionExpr;
+            } catch (RecoveryTokenException exc) {
+                if (exc._partiallyComputedNode is FunctionObject) {
+                    var functionExpr = new FunctionExpression(span);
+                    functionExpr.Function = (FunctionObject)exc._partiallyComputedNode;
+                    return functionExpr;
+                }
+                throw;
+            }
         }
 
         /// <summary>
