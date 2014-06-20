@@ -343,6 +343,8 @@ try {
                     /p:VisualStudioVersion=$($targetVs.number) `
                     /p:"CustomBuildIdentifier=$name" `
                     /p:ReleaseBuild=$signedbuildText `
+                    /p:DeployExtension=false `
+                    /p:DeployVSTemplates=false `
                     Nodejs\Tests\dirs.proj
                 if ($LASTEXITCODE -gt 0) {
                     Write-Error -EA:Continue "Test build failed: $config"
@@ -359,6 +361,8 @@ try {
                 /p:VisualStudioVersion=$($targetVs.number) `
                 /p:"CustomBuildIdentifier=$name" `
                 /p:ReleaseBuild=$signedbuildText `
+                /p:DeployExtension=false `
+                /p:DeployVSTemplates=false `
                 Nodejs\Setup\dirs.proj
             if ($LASTEXITCODE -gt 0) {
                 Write-Error -EA:Continue "Build failed: $config"
