@@ -72,5 +72,43 @@ namespace Microsoft.NodejsTools.NpmUI {
                 ((UIElement)sender).Focus();
             }
         }
+
+        private void FilterTextBox_PreviewKeyDown(object sender, KeyEventArgs e) {
+            switch (e.Key) {
+                case Key.Down:
+                    if (_packageList.SelectedIndex < _packageList.Items.Count - 1) {
+                        _packageList.SelectedIndex++;
+                    }
+                    FocusOnSelectedItemInPackageList();
+                    e.Handled = true;
+                    break;
+
+                case Key.Up:
+                    if (_packageList.SelectedIndex > 0) {
+                        _packageList.SelectedIndex--;
+                        FocusOnSelectedItemInPackageList();
+                    }
+                    e.Handled = true;
+                    break;
+            }
+        }
+
+        private void FocusOnSelectedItemInPackageList() {
+            var itemContainer = (ListViewItem)_packageList.ItemContainerGenerator.ContainerFromItem(_packageList.SelectedItem);
+            if (itemContainer != null) {
+                itemContainer.Focus();
+            }
+        }
+
+        private void _packageList_SelectionChanged(object sender, SelectionChangedEventArgs e) {
+            _packageList.ScrollIntoView(_packageList.SelectedItem);
+        }
+
+        private void _packageList_PreviewKeyDown(object sender, KeyEventArgs e) {
+            if (e.Key == Key.Up && _packageList.SelectedIndex == 0) {
+                FilterTextBox.Focus();
+                e.Handled = true;
+            }
+        }
     }
 }

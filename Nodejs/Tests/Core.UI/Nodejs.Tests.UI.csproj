@@ -90,12 +90,18 @@
     <Reference Include="Microsoft.VisualStudio.Text.UI, Version=$(VSTarget).0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a, processorArchitecture=MSIL" />
     <Reference Include="Microsoft.VisualStudio.Text.UI.Wpf, Version=$(VSTarget).0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a, processorArchitecture=MSIL" />
     <Reference Include="Microsoft.VisualStudio.TextManager.Interop, Version=7.1.40304.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a" />
+    <Reference Include="Moq, Version=4.2.1312.1622, Culture=neutral, PublicKeyToken=69f491c39445e920, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\..\packages\Moq.4.2.1312.1622\lib\net40\Moq.dll</HintPath>
+    </Reference>
     <Reference Include="PresentationCore" />
+    <Reference Include="PresentationFramework" />
     <Reference Include="System" />
     <Reference Include="System.ComponentModel.Composition" />
     <Reference Include="System.Core" />
     <Reference Include="System.Drawing" />
     <Reference Include="System.Windows.Forms" />
+    <Reference Include="System.Xaml" />
     <Reference Include="System.Xml.Linq" />
     <Reference Include="System.Data.DataSetExtensions" />
     <Reference Include="Microsoft.CSharp" />
@@ -118,6 +124,7 @@
     <Compile Include="DebuggerUITests.cs" />
     <Compile Include="JadeUITests.cs" />
     <Compile Include="NodejsBasicProjectTests.cs" />
+    <Compile Include="NpmUITests.cs" />
     <Compile Include="OptionHolder.cs" />
     <Compile Include="ProjectPropertiesTests.cs" />
     <Compile Include="SmartIndent.cs" />
@@ -148,9 +155,17 @@
       <Project>{d092d54e-ff29-4d32-9aee-4ef704c92f67}</Project>
       <Name>TestUtilities</Name>
     </ProjectReference>
+    <ProjectReference Include="..\..\Product\Npm\Npm.csproj">
+      <Project>{e5ef4b0a-ab41-4b98-8fa8-98d6348003a8}</Project>
+      <Name>Npm</Name>
+    </ProjectReference>
     <ProjectReference Include="..\..\Product\ProjectWizard\ProjectWizard.csproj">
       <Project>{dbc73df7-1b4c-48be-8b48-715297487e7a}</Project>
       <Name>ProjectWizard</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\NpmTests\NpmTests.csproj">
+      <Project>{95494195-dca4-4633-b78b-2087836c11d0}</Project>
+      <Name>NpmTests</Name>
     </ProjectReference>
     <ProjectReference Include="..\Utilities.Nodejs\TestUtilities.Nodejs.csproj">
       <Project>{9e395ba3-765e-4f35-a520-19f1c323d625}</Project>

@@ -30,6 +30,7 @@ using TestUtilities;
 using TestUtilities.Nodejs;
 using TestUtilities.UI;
 using VSLangProj;
+using MessageBoxButton = TestUtilities.UI.MessageBoxButton;
 using ST = System.Threading;
 
 namespace Microsoft.Nodejs.Tests.UI {
@@ -299,7 +300,7 @@ namespace Microsoft.Nodejs.Tests.UI {
             var project = OpenProject(@"TestData\NodejsProjectData\AddExistingFolder.sln");
             var window = project.ProjectItems.Item("server.js").Open();
             window.Activate();
-
+            
             using (var app = new VisualStudioApp(VsIdeTestHostContext.Dte)) {
                 var docWindow = app.GetDocument(window.Document.FullName);
 
@@ -744,10 +745,10 @@ namespace Microsoft.Nodejs.Tests.UI {
 
                 Keyboard.Type("X");
                 Keyboard.Type(System.Windows.Input.Key.Enter);
-
+                
                 // item should be successfully added now.
                 VisualStudioApp.CheckMessageBox(MessageBoxButton.Ok, "The folder X already exists.");
-
+                
                 Keyboard.Type("Z");
                 Keyboard.Type(System.Windows.Input.Key.Enter);
                 WaitForItem(project, "Z");

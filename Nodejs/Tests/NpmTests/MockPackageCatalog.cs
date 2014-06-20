@@ -17,7 +17,7 @@ using System.Collections.Generic;
 using Microsoft.NodejsTools.Npm;
 
 namespace NpmTests {
-    internal class MockPackageCatalog : IPackageCatalog {
+    public class MockPackageCatalog : IPackageCatalog {
         private IDictionary<string, IPackage> _byName = new Dictionary<string, IPackage>();
  
         public MockPackageCatalog(IList<IPackage> results) {

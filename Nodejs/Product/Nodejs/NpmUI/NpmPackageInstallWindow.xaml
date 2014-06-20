@@ -254,24 +254,30 @@
                              x:Name="FilterTextBox"
                              IsVisibleChanged="FilterTextBox_IsVisibleChanged"
                              Height="24"
-                             Text="{Binding FilterText,UpdateSourceTrigger=PropertyChanged}" />
+                             Text="{Binding FilterText,UpdateSourceTrigger=PropertyChanged}"
+                             PreviewKeyDown="FilterTextBox_PreviewKeyDown"
+                             KeyboardNavigation.TabIndex="0" />
 
-                    <ComboBox Grid.Column="1"
+                    <ComboBox x:Name="DependencyComboBox"
+                              Grid.Column="1"
                               Width="100"
                               MaxHeight="24"
                               Padding="3"
                               Margin="4 0 0 0"
-                              SelectedIndex="{Binding SelectedDependencyTypeIndex}">
+                              SelectedIndex="{Binding SelectedDependencyTypeIndex}"
+                              KeyboardNavigation.TabIndex="2">
                         <ComboBoxItem Tag="St" IsSelected="True">Standard</ComboBoxItem>
                         <ComboBoxItem Tag="Dev">Development</ComboBoxItem>
                         <ComboBoxItem Tag="Opt">Optional</ComboBoxItem>
                         <ComboBoxItem Tag="Global">Global</ComboBoxItem>
                     </ComboBox>
-                    <Button Grid.Column="2"
+                    <Button x:Name="InstallButton"
+                            Grid.Column="2"
                             Grid.Row="0"
                             Content="Install"
                             Command="{x:Static npmUi:NpmPackageInstallViewModel.InstallCommand}"
-                            CommandParameter="{Binding SelectedPackage}"/>
+                            CommandParameter="{Binding SelectedPackage}"
+                            KeyboardNavigation.TabIndex="3" />
                 </Grid>
             </wpf:LabelledControl>
 
@@ -292,9 +298,11 @@
                     </TextBlock>
                 </Border>
                 
-                <Button Grid.Column="1"
+                <Button x:Name="CloseButton"
+                        Grid.Column="1"
                         Command="ApplicationCommands.Close"
-                        IsCancel="True">
+                        IsCancel="True"
+                        KeyboardNavigation.TabIndex="5">
                     _Close
                 </Button>
             </Grid>
@@ -313,10 +321,13 @@
                           Grid.Row="0"
                           ItemsSource="{Binding FilteredPackages}"
                           SelectedItem="{Binding SelectedPackage}"
+                          SelectionChanged="_packageList_SelectionChanged"
                           Visibility="{Binding FilteredCatalogListVisibility}"
+                          PreviewKeyDown="_packageList_PreviewKeyDown"
                           HorizontalContentAlignment="Stretch"
                           ScrollViewer.HorizontalScrollBarVisibility="Disabled"
-                          MinHeight="0" />
+                          MinHeight="0"
+                          KeyboardNavigation.TabIndex="1" />
 
 
                 <StackPanel Grid.Row="0"
@@ -348,7 +359,7 @@
                               Background="Transparent"
                               HorizontalAlignment="Stretch"
                               VerticalAlignment="Stretch"
-                              ShowsPreview="False" />
+                              KeyboardNavigation.IsTabStop="False" />
 
                 <!-- Cache control and output -->
                 <!-- (Together in the same grid so the splitter works) -->
@@ -374,11 +385,13 @@
                                         Foreground="{DynamicResource {x:Static wpf:Controls.ForegroundKey}}"
                                         VerticalAlignment="Center"
                                         HorizontalAlignment="Stretch"
-                                        Focusable="False" />
+                                        Focusable="False"
+                                        IsTabStop="False" />
                         
                         <Button Grid.Column="1"
-                                Name="_BtnRefresh"
-                                Command="{x:Static npmUi:NpmPackageInstallViewModel.RefreshCatalogCommand}">
+                                Name="RefreshButton"
+                                Command="{x:Static npmUi:NpmPackageInstallViewModel.RefreshCatalogCommand}"
+                                KeyboardNavigation.TabIndex="4">
                             _Refresh Catalog
                         </Button>
                     </Grid>
@@ -387,7 +400,8 @@
 
                     <npmUi:NpmOutputControl Grid.Row="1"
                                             x:Name="ExecuteControl"
-                                            DataContext="{Binding Path=ExecuteViewModel}" />
+                                            DataContext="{Binding Path=ExecuteViewModel}"
+                                            IsTabStop="False" />
                 </Grid>
             </Grid>
 

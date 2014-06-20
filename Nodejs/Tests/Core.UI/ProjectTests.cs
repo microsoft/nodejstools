@@ -17,7 +17,6 @@ using System.IO;
 using System.Linq;
 using System.Runtime.InteropServices;
 using System.Threading;
-using System.Windows;
 using System.Windows.Automation;
 using EnvDTE;
 using Microsoft.NodejsTools;
@@ -133,7 +132,7 @@ http.createServer(function (req, res) {
                 var openFile = OpenProjectItem("server.js", out window);
 
                 openFile.MoveCaret(8, 40);
-                openFile.Invoke(() => Clipboard.SetText("\r\n"));
+                openFile.Invoke(() => System.Windows.Clipboard.SetText("\r\n"));
                 Keyboard.ControlV();
                 openFile.WaitForText(@"var http = require('http');
 

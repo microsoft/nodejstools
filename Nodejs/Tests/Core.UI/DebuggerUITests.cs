@@ -101,7 +101,7 @@ process.exit(" + exitCode + ");"),
         }
 
         /// <summary>
-        /// Verfiies that we can launch node.exe in a way where debugging doesn't
+        /// Verifies that we can launch node.exe in a way where debugging doesn't
         /// start (in this case -v is passed to display the version).  VS shouldn't crash.
         /// </summary>
         [TestMethod, Priority(0), TestCategory("Core"), TestCategory("Debugging UI")]
