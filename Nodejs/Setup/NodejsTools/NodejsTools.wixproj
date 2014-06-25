@@ -13,15 +13,16 @@
     <SccAuxPath>SAK</SccAuxPath>
     <SccLocalPath>SAK</SccLocalPath>
     <VsTarget Condition="'$(VsTarget)' == ''">11.0</VsTarget>
-    <DefineConstants>
-      ObjDir=$(BuildRoot)\Nodejs\Product\Nodejs\obj\Dev$(VSTarget)\$(Configuration);
-      BinariesDir=$(BuildRoot)\Binaries\$(Configuration)$(VsTarget);
-      VSTargetVersion=$(VSTarget)
+    <DefineConstants Condition="'$(CustomBuildIdentifier)' != ''">
+      $(DefineConstants);
+      CustomBuildIdentifier=$(CustomBuildIdentifier)
     </DefineConstants>
   </PropertyGroup>
   <ItemGroup>
+    <BindInputPaths Include="$(OutDir)" />
+  </ItemGroup>
+  <ItemGroup>
     <Compile Include="NodejsTools.wxs" />
-    <Compile Include="NodejsToolsVsExt.wxs" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="$(BuildRoot)\Nodejs\Product\Nodejs\Nodejs.csproj">
@@ -48,6 +49,12 @@
       <RefTargetDir>INSTALLLOCATION</RefTargetDir>
       <DoNotHarvest>true</DoNotHarvest>
     </ProjectReference>
+  </ItemGroup>
+  <ItemGroup>
+    <Content Include="..\MergeModule.wxi">
+      <Link>MergeModule.wxi</Link>
+    </Content>
+    <FilesProj Include="NodejsToolsFiles.proj" />
   </ItemGroup>
   <Import Project="..\SetupProjectAfter.settings" />
 </Project>

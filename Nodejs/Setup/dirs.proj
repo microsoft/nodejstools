@@ -16,7 +16,8 @@
   <ItemGroup>
     <ProjectFile Include="InteractiveWindow\InteractiveWindow.wixproj"/>
     <ProjectFile Include="NodejsTools\NodejsTools.wixproj"/>
-    <ProjectFile Include="NodejsToolsInstaller\NodejsToolsInstaller.wixproj"/>    
+    <ProjectFile Include="NodejsToolsInstaller\NodejsToolsInstaller.wixproj"/>
+    <ProjectFile Include="..\..\Internal\Nodejs\VsLoggerSetup\VsLogger.wixproj" Condition="'$(IncludeVsLogger)' == 'True'"/>        
   </ItemGroup>
 
   <Import Project="$(TargetsPath)\Common.Build.Traversal.targets" />

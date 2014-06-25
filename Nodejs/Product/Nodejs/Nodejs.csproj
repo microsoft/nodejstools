@@ -292,6 +292,10 @@
     <Compile Include="Intellisense\VsProjectAnalyzer.cs" />
     <Compile Include="Intellisense\SnapshotCookie.cs" />
     <Compile Include="Intellisense\TaskProvider.cs" />
+    <Compile Include="Logging\InMemoryLogger.cs" />
+    <Compile Include="Logging\INodejsToolsLogger.cs" />
+    <Compile Include="Logging\NodejsToolsLogEvent.cs" />
+    <Compile Include="Logging\NodejsToolsLogger.cs" />
     <Compile Include="Navigation\DropDownBarClient.cs" />
     <Compile Include="Debugger\DataTips\DataTipTextViewFilter.cs" />
     <Compile Include="NodejsPackage.Debugger.cs" />
@@ -690,6 +694,12 @@
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
       <IncludeInVSIX>true</IncludeInVSIX>
     </Content>
+    <Content Include="Debugger\RemoteDebug\RemoteDebug.js">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Debugger\RemoteDebug\RemoteDebugging.html">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
     <Content Include="FileTemplates\NewItem\EmptyTs.ts">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
       <IncludeInVSIX>true</IncludeInVSIX>
@@ -735,6 +745,9 @@
     <TypeScriptProject Include="ProjectTemplates\TypeScriptWebApp\Preview.png" />
     <TypeScriptProject Include="ProjectTemplates\TypeScriptWebApp\package.json" />
     <TypeScriptProject Include="ProjectTemplates\TypeScriptWebApp\README.md" />
+    <Content Include="License.html">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
     <Content Include="Scripts\Typings\node\node.d.ts">
       <IncludeInVSIX>true</IncludeInVSIX>
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>

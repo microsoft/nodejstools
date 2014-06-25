@@ -1,35 +1,20 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <Wix xmlns="http://schemas.microsoft.com/wix/2006/wi">
-  <?define InstallLocationName = "Node.js Interactive Window" ?>
+    <Module Id="InteractiveWindow" Language="1033" Version="1.0.0.0">
+        <Package Id="BF6BC19A-9714-42D9-B0B2-33823C19EA55" Manufacturer="Microsoft Corporation" InstallerVersion="200" />
 
-  <Module Id="ReplWindow" Language="1033" Version="1.0.0.0">
-    <Package Id="BF6BC19A-9714-42D9-B0B2-33823C19EA55" Manufacturer="Microsoft Corporation" InstallerVersion="200" />
+        <?include ..\MergeModule.wxi ?>
 
-    <?include ..\InstallPath.wxi ?>
-    <?include ..\MergeModule.wxi ?>
+        <Component Id="PerUserInstallRegistry" Directory="Dir_VSInstallLocation" Guid="{1FA57071-B39A-4320-9678-ABE1AB4D04DD}">
+            <Condition>NOT ALLUSERS = 1</Condition>
+            <RegistryKey Root='HKCU' Key='Software\Microsoft\VisualStudio\$(var.VSTargetVersion)\ExtensionManager\EnabledExtensions'>
+                <RegistryValue Type='string' Name='B515653F-FB69-4B64-9D3F-F1FCF8421DD0,$(var.ReleaseVersion)' Value='[Dir_VSInstallLocation]'/>
+            </RegistryKey>
+            <RegistryKey Root='HKCU' Key='Software\Microsoft\VisualStudio\$(var.VSTargetVersion)\ExtensionManager\ExtensionTypes'>
+                <RegistryValue Type='string' Name='B515653F-FB69-4B64-9D3F-F1FCF8421DD0,$(var.ReleaseVersion)' Value='Tool'/>
+            </RegistryKey>
+        </Component>
 
-    <Directory Id="TARGETDIR" Name="SourceDir">
-      <Directory Id="EXTENSION_INSTALLPATH">
-        <Directory Id="_0AC62D6FF09F49DCB209A740D8BED631" Name="Extensions">
-          <Directory Id="_16BB2A4F12774B36AA7994C01AE3479A" Name="Microsoft">
-            <Directory Id="_871B6EB931744CE8A3B8A4156A4AF028" Name="Node.js Tools - Interactive Window">
-              <Directory Id="INSTALLLOCATION" Name="1.0">
-              </Directory>
-            </Directory>
-          </Directory>
-        </Directory>
-      </Directory>
-
-      <Directory Id="VWD_EXTENSION_INSTALLPATH">
-        <Directory Id="_VWD_EXTENSIONS_MS" Name="Microsoft">
-          <Directory Id="_VWD_EXTENSIONS_MS_INTERACTIVE" Name="Node.js Tools - Interactive Window">
-            <Directory Id="VWDINSTALLLOCATION" Name="1.0">
-            </Directory>
-          </Directory>
-        </Directory>
-      </Directory>
-    </Directory>
-
-    <ComponentGroupRef Id="InteractiveWindowExt"/>
-  </Module>
+        <ComponentGroupRef Id="CGroup_InteractiveWindowFiles"/>
+    </Module>
 </Wix>

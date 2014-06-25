@@ -1,317 +1,142 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <Wix xmlns="http://schemas.microsoft.com/wix/2006/wi"
      xmlns:util="http://schemas.microsoft.com/wix/UtilExtension">
-  <?include NodejsToolsInstallerVars.wxi ?>
+    <?include NodejsToolsInstallerVars.wxi ?>
 
-  <Product Id="$(var.InstallerGuid)" Name="$(var.ProductName)" Language="1033" Version="$(var.MsiVersion)" Manufacturer="Microsoft Corporation" UpgradeCode="$(var.InstallerUpgradeGuid)">
-    <Package InstallerVersion="300" Compressed="yes"  />
-    <MajorUpgrade AllowDowngrades="no" AllowSameVersionUpgrades="yes"
-                  DowngradeErrorMessage="A newer version of [ProductName] is already installed." />
-    <Media Id="1" Cabinet="media1.cab" EmbedCab="yes" />
+    <Product Id="$(var.InstallerGuid)" Name="$(var.ProductName)" Language="1033" Version="$(var.MsiVersion)" Manufacturer="Microsoft Corporation" UpgradeCode="$(var.InstallerUpgradeGuid)">
+        <Package InstallerVersion="300" Compressed="yes"  />
+        <MajorUpgrade AllowDowngrades="no" AllowSameVersionUpgrades="yes"
+                      DowngradeErrorMessage="A newer version of [ProductName] is already installed." />
+        <Media Id="1" Cabinet="media1.cab" EmbedCab="yes" />
 
-    <!-- Properties that we need to search for -->
+        <!-- Properties that we need to search for -->
 
-    <!-- By default we install for all users, users can change this -->
-    <Property Id="ALLUSERS" Value="1"/>
-    
-    <!-- we detect other installed software (Node.js, HPC pack) and set the install level of the feature to 2 if they're not installed to uncheck them by default.  -->
-    <Property Id="INSTALLLEVEL" Value="1"/>
-    <Property Id="ApplicationFolderName" Value="$(var.ProductName)" />
+        <!-- By default we install for all users, users can change this -->
+        <Property Id="ALLUSERS" Value="1"/>
 
-    <?include ..\InstallPath.wxi ?>
+        <!-- we detect other installed software (Node.js, HPC pack) and set the install level of the feature to 2 if they're not installed to uncheck them by default.  -->
+        <Property Id="INSTALLLEVEL" Value="1"/>
+        <Property Id="ApplicationFolderName" Value="$(var.ProductName)" />
+        <Icon Id="AddRemoveProgramsIcon" SourceFile="$(var.TargetDir)NodejsProject.ico"/>
+        <Property Id="ARPPRODUCTICON">AddRemoveProgramsIcon</Property>
 
-    <Icon Id="AddRemoveProgramsIcon" SourceFile="$(var.TargetDir)NodejsProject.ico"/>
-    <Property Id="ARPPRODUCTICON">AddRemoveProgramsIcon</Property>
+        <PropertyRef Id="VS2013_PRERELEASE"/>
+        <PropertyRef Id="NETFRAMEWORK45"/>
 
-    <Property Id="VSLAUNCHER" >
-        <DirectorySearch Path="[ProgramFilesFolder]\Common Files\Microsoft Shared\MSEnv" Depth="4" Id="FindVSLauncher">
-            <FileSearch Name="VSLauncher.exe" />
-        </DirectorySearch>
-    </Property>
+        <PropertyRef Id="VSINSTALLPATH"/>
+        <PropertyRef Id="VWDINSTALLPATH"/>
+        <PropertyRef Id="DEVENV_PATH"/>
+        <PropertyRef Id="VWDEXPRESS_PATH"/>
+        
+        <!-- Conditions for install -->
+        <Condition Message="!(loc.VSPrerelease)"> NOT VS2013_PRERELEASE OR Installed </Condition>
+        <Condition Message="!(loc.NetFx45NotInstalled)"> NETFRAMEWORK45 OR Installed </Condition>
 
-<!--
-    <?if $(var.Msix64)?>
-      <Property Id="VisualStudioInstallRegistry" Value="SOFTWARE\Wow6432Node\Microsoft\VisualStudio\11.0"/>    
-    <?else?>
-      <Property Id="VisualStudioInstallRegistry" Value="SOFTWARE\Microsoft\VisualStudio\11.0\"/>
-    <?endif?>
--->
-    <Property Id="VWDEXPRESS_INSTALLED" Secure="yes">
-      <?if "$(var.VSTargetVersion)" = "11.0" ?>
-        <RegistrySearch Id="WebExpressInstallRegSearch" Root="HKLM" Key="SOFTWARE\Microsoft\VWDExpress\11.0\Setup\VS" Name="ProductDir" Type="raw" />
-      <?elseif "$(var.VSTargetVersion)" = "12.0" ?>
-        <RegistrySearch Id="WebExpressInstallRegSearch" Root="HKLM" Key="SOFTWARE\Microsoft\VWDExpress\12.0\Setup\VS" Name="ProductDir" Type="raw" />
-      <?endif ?>
-    </Property>
+        <!-- At least one installation path means some version is installed. -->
+        <Condition Message="!(loc.NoInstallPath)">
+            VSINSTALLPATH OR VWDINSTALLPATH OR Installed
+        </Condition>
+        <!-- Skip this message if VWD's install path was not found -->
+        <Condition Message="!(loc.VWDInstallPathButNoExe)">
+            DEVENV_PATH OR VWDEXPRESS_PATH OR NOT VWDINSTALLPATH OR Installed
+        </Condition>
+        <!-- Always show this message if there are no suitable versions -->
+        <Condition Message="!(loc.NoExePath)">
+            DEVENV_PATH OR VWDEXPRESS_PATH OR Installed
+        </Condition>
 
-    <Property Id="VSPRO_INSTALLED" Secure="yes">
-      <?if "$(var.VSTargetVersion)" = "11.0" ?>
-        <RegistrySearch Id="ProInstallRegSearch" Root="HKLM" Key="SOFTWARE\Microsoft\VisualStudio\11.0\Setup\Microsoft Visual Studio Professional 2012" Name="InstallSuccess" Type="raw" />
-      <?elseif "$(var.VSTargetVersion)" = "12.0" ?>
-        <RegistrySearch Id="ProInstallRegSearch" Root="HKLM" Key="SOFTWARE\Microsoft\VisualStudio\12.0\Setup\Microsoft Visual Studio Professional 2013" Name="InstallSuccess" Type="raw" />
-      <?endif ?>
-    </Property>
-
-    <Property Id="VSPREMIUM_INSTALLED" Secure="yes">
-      <?if "$(var.VSTargetVersion)" = "11.0" ?>
-        <RegistrySearch Id="PremiumInstallRegSearch" Root="HKLM" Key="SOFTWARE\Microsoft\VisualStudio\11.0\Setup\Microsoft Visual Studio Premium 2012" Name="InstallSuccess" Type="raw" />
-      <?elseif "$(var.VSTargetVersion)" = "12.0" ?>
-        <RegistrySearch Id="PremiumInstallRegSearch" Root="HKLM" Key="SOFTWARE\Microsoft\VisualStudio\12.0\Setup\Microsoft Visual Studio Premium 2013" Name="InstallSuccess" Type="raw" />
-      <?endif ?>
-    </Property>
-
-    <Property Id="VSULTIMATE_INSTALLED" Secure="yes">
-      <?if "$(var.VSTargetVersion)" = "11.0" ?>
-        <RegistrySearch Id="UltimateInstallRegSearch" Root="HKLM" Key="SOFTWARE\Microsoft\VisualStudio\11.0\Setup\Microsoft Visual Studio Ultimate 2012" Name="InstallSuccess" Type="raw" />
-      <?elseif "$(var.VSTargetVersion)" = "12.0" ?>
-        <RegistrySearch Id="UltimateInstallRegSearch" Root="HKLM" Key="SOFTWARE\Microsoft\VisualStudio\12.0\Setup\Microsoft Visual Studio Ultimate 2013" Name="InstallSuccess" Type="raw" />
-      <?endif ?>
-    </Property>
-
-    <Property Id="DEVENV_PATH" Secure="yes">
-      <RegistrySearch Id="DevEnvPath" Root="HKLM" Key="Software\Microsoft\VisualStudio\$(var.VSTargetVersion)\Setup\VS" Name="EnvironmentPath" Type="raw" />
-    </Property>
-
-    <CustomAction Id="GetVwdPath" Property="VWD_PATH" Value="[VWDINSTALLPATH]\VWDExpress.exe" Execute="immediate" />     
-
-    <!-- Conditions for install -->
-    
-    <?if "$(var.VSTargetVersion)" = "11.0" ?>
-    <Condition Message="Visual Studio 2012 (Professional, Premium, Ultimate, or Web Express) must be installed."> VSPRO_INSTALLED OR VSPREMIUM_INSTALLED OR VSULTIMATE_INSTALLED OR VWDEXPRESS_INSTALLED OR Installed </Condition>
-    <?elseif "$(var.VSTargetVersion)" = "12.0" ?>
-    <Condition Message="Visual Studio 2013 (Professional, Premium, Ultimate, or Web Express) must be installed."> VSPRO_INSTALLED OR VSPREMIUM_INSTALLED OR VSULTIMATE_INSTALLED OR VWDEXPRESS_INSTALLED OR Installed </Condition>
-    <?endif ?>
-    
-    <!-- Files/Components/MSMs to install -->
-
-  <Directory Id="TARGETDIR" Name="SourceDir">
-      <!-- Install the tools into the VS directory -->
-      <Directory Id="EXTENSION_INSTALLPATH">
-        <Directory Id="_C4404CF0638F4D569707EC3680C13E5F" Name="Extensions">
-          <Directory Id="_942B894A8C5749A3998ECCA325E88902" Name="Microsoft">
-            <Directory Id="_CDA62BE31FDD4AA9B82B0ECA65B30854" Name="Node.js Tools">
-              <Directory Id="INSTALLLOCATION" Name="1.0">
-                <Directory Id="Dir_RemoteDebug" Name="RemoteDebug"/>
-              </Directory>
+        <!-- This location is the directory that NodejsTools.msm will install into.
+             We use it to reference some installed files. -->
+        <DirectoryRef Id="Dir_VSExtensions">
+            <Directory Id="Dir_NTVSInstallLocationParent" Name="Node.js Tools for Visual Studio">
+                <Directory Id="Dir_NTVSInstallLocation" Name="$(var.ReleaseVersion)" />
             </Directory>
-          </Directory>
-        </Directory>
+        </DirectoryRef>
 
-        <Merge Id="InteractiveWindow" Language="1033" SourceFile="$(var.TargetDir)InteractiveWindow.msm" DiskId="1" />
-        <Merge Id="NodejsTools" Language="1033" SourceFile="$(var.TargetDir)NodejsTools.msm" DiskId="1" />
-        <Merge Id="NodejsProfiling" Language="1033" SourceFile="$(var.TargetDir)NodejsProfiling.msm" DiskId="1" />
+        <PropertyRef Id="VSLAUNCHER"/>
 
-        <Component Id="Comp_InstallLocation" Guid="$(var.Comp_InstallLocationGuid)">
-          <RegistryKey Root="HKMU" Key="Software\Microsoft\NodejsTools\$(var.VSTargetVersion)">
-            <RegistryValue Type="string" Name="InstallDir" Value="[INSTALLLOCATION]" KeyPath="yes"/>
-          </RegistryKey>
-        </Component>
+        <DirectoryRef Id="Dir_NTVSInstallLocation">
 
-        <Component Id="Comp_NjsProgRegistration" DiskId="1" Guid="$(var.Comp_NjsProjRegistrationGuid)">
-          <RegistryValue Root='HKCR' Key='.njsproj' Type='string' Name='PerceivedType' Value='text' />
-          <RegistryValue Root='HKCR' Key='VisualStudio.Launcher.njsproj.$(var.VSTargetVersion)\DefaultIcon' Type='string' Value='[INSTALLLOCATION]\NodejsProject.ico' />
+            <!-- Double click to open Node.js projects with Visual Studio -->
+            <Component Id="Comp_NjsProgRegistration" DiskId="1" Guid="$(var.Comp_NjsProjRegistrationGuid)">
+                <RegistryValue Root='HKCR' Key='.njsproj' Type='string' Name='PerceivedType' Value='text' />
+                <RegistryValue Root='HKCR' Key='VisualStudio.Launcher.njsproj.$(var.VSTargetVersion)\DefaultIcon' Type='string' Value='[Dir_NTVSInstallLocation]\NodejsProject.ico' />
 
-          <ProgId Id="VisualStudio.Launcher.njsproj.$(var.VSTargetVersion)" Description="Node.js Project">
-            <Extension Id="njsproj" ContentType="text/plain">
-              <Verb Id="Open" Command="Open" TargetProperty="VSLAUNCHER" Argument="&quot;%1&quot;"/>
-            </Extension>
-          </ProgId>
-        </Component>        
+                <ProgId Id="VisualStudio.Launcher.njsproj.$(var.VSTargetVersion)" Description="Node.js Project">
+                    <Extension Id="njsproj" ContentType="text/plain">
+                        <Verb Id="Open" Command="Open" TargetProperty="VSLAUNCHER" Argument="&quot;%1&quot;"/>
+                    </Extension>
+                </ProgId>
+            </Component>
+
+            <Merge Id="Merge_InteractiveWindow" Language="1033" SourceFile="InteractiveWindow.msm" DiskId="1">
+                <?foreach key in VS;VWD?>
+                <ConfigurationData Name="Config_$(var.key)ExtensionsParent" Value="Dir_$(var.key)Extensions" />
+                <ConfigurationData Name="Config_$(var.key)TemplatesParent" Value="Dir_$(var.key)Templates"/>
+                <?endforeach?>
+                <ConfigurationData Name="Config_MSBuildLocation" Value="Dir_MSBuildTargets"/>
+            </Merge>
+            <Merge Id="Merge_Profiling" Language="1033" SourceFile="Profiling.msm" DiskId="1">
+                <?foreach key in VS;VWD?>
+                <ConfigurationData Name="Config_$(var.key)ExtensionsParent" Value="Dir_$(var.key)Extensions" />
+                <ConfigurationData Name="Config_$(var.key)TemplatesParent" Value="Dir_$(var.key)Templates"/>
+                <?endforeach?>
+                <ConfigurationData Name="Config_MSBuildLocation" Value="Dir_MSBuildTargets"/>
+            </Merge>
+            <Merge Id="Merge_NodejsTools" Language="1033" SourceFile="NodejsTools.msm" DiskId="1">
+                <?foreach key in VS;VWD?>
+                <ConfigurationData Name="Config_$(var.key)ExtensionsParent" Value="Dir_$(var.key)Extensions" />
+                <ConfigurationData Name="Config_$(var.key)TemplatesParent" Value="Dir_$(var.key)Templates"/>
+                <?endforeach?>
+                <ConfigurationData Name="Config_MSBuildLocation" Value="Dir_MSBuildTargets"/>
+            </Merge>
+            <?if "$(var.IncludeVsLogger)" = "True" ?>
+            <Merge Id="Merge_VsLogger" Language="1033" SourceFile="VsLogger.msm" DiskId="1">
+                <?foreach key in VS;VWD?>
+                <ConfigurationData Name="Config_$(var.key)ExtensionsParent" Value="Dir_$(var.key)Extensions" />
+                <ConfigurationData Name="Config_$(var.key)TemplatesParent" Value="Dir_$(var.key)Templates"/>
+                <?endforeach?>
+                <ConfigurationData Name="Config_MSBuildLocation" Value="Dir_MSBuildTargets"/>
+            </Merge>
+            <?endif?>
+        </DirectoryRef>
+
+        <!-- Main visual studio support feature, requires Visual Studio. -->
+        <Feature Id="ProductFeature" Title="$(var.ProductName)" Description="!(loc.ProductDescription)"
+                 Display="expand" Level="1" AllowAdvertise="no" Absent="disallow"  >
+                        
+            <MergeRef Id="Merge_NodejsTools"/>
+            <MergeRef Id="Merge_InteractiveWindow"/>
+            <MergeRef Id="Merge_Profiling" />
+
+            <?if "$(var.IncludeVsLogger)" = "True" ?>
+            <MergeRef Id="Merge_VsLogger"/>
+            <?endif?>
+
+            <Feature Id="Feature_VsNjsFile" AllowAdvertise="no" Level="1" Title="Register file associations" Description="Associates Node.js projects and source files with Visual Studio (existing source file associations are not modified).">
+                <ComponentRef Id="Comp_NjsProgRegistration"/>
+            </Feature>
+        </Feature>
         
-      </Directory>
-    </Directory>
+        <!-- Execute devenv /setup -->
+        <CustomAction Id="DevEnvSetup" Property="DEVENV_PATH" ExeCommand="/setup" Execute="deferred" Return="check" Impersonate="no" />
+        <CustomAction Id="DevEnvSetup_Rollback" Property="DEVENV_PATH" ExeCommand="/setup" Execute="rollback" Return="check" Impersonate="no" />
+        <CustomAction Id="VWDExpressSetup" Property="VWDEXPRESS_PATH" ExeCommand="/setup" Execute="deferred" Return="check" Impersonate="no" />
+        <CustomAction Id="VWDExpressSetup_Rollback" Property="VWDEXPRESS_PATH" ExeCommand="/setup" Execute="rollback" Return="check" Impersonate="no" />
 
-    <DirectoryRef Id="Dir_RemoteDebug">
-      <Component Id="Comp_InstallDirItems" DiskId="1" Guid="$(var.Comp_InstallDirItemGuid)">
-        <File Id="File_License.html" Name="License.html" Source="$(var.NodejsToolsDir)\License.html" />
-        <File Id="File_RemoteDebug.js" Name="RemoteDebug.js" Source="$(var.NodejsToolsDir)\RemoteDebug.js" />
-        <File Id="File_RemoteDebugging.html" Name="RemoteDebugging.html" Source="$(var.NodejsToolsDir)\RemoteDebugging.html" />
-        <RegistryValue Root='HKMU' Key='SOFTWARE\Microsoft\NodejsTools\$(var.VSTargetVersion)' Type='string' Value='Readme' KeyPath='yes' />
-        <RegistryValue Root='HKMU' Key='SOFTWARE\Microsoft\NodejsTools\$(var.VSTargetVersion)' Type='string' Name='RemoteDebugProxyFolder' Value='[Dir_RemoteDebug]' />
-        <RemoveFolder Id='Comp_InstallDirItems' On='uninstall'/>
+        <InstallExecuteSequence>
+            <Custom Action="DevEnvSetup_Rollback" Before="DevEnvSetup" Overridable="yes">DEVENV_PATH</Custom>
+            <Custom Action="DevEnvSetup" Before="InstallFinalize" Overridable="yes">DEVENV_PATH</Custom>
+            <Custom Action="VWDExpressSetup_Rollback" Before="VWDExpressSetup" Overridable="yes">VWDEXPRESS_PATH</Custom>
+            <Custom Action="VWDExpressSetup" Before="InstallFinalize" Overridable="yes">VWDEXPRESS_PATH</Custom>
+        </InstallExecuteSequence>
+        <InstallUISequence>
+            <Show Dialog="CustomAdvancedWelcomeEulaDlg" Before="FindRelatedProducts">NOT Installed</Show>
+            <Show Dialog="CustomFeaturesDlg" After="CostFinalize">NOT Installed AND EasyInstall=0</Show>
+        </InstallUISequence>
 
-        <util:RestartResource Path="[DEVENV_PATH]" />
-        <util:RestartResource Path="[VWD_PATH]" />
-      </Component>
-    </DirectoryRef>
-
-    <!-- Features to install -->
-    
-    <!-- Main visual studio support feature, requires Visual Studio. -->
-    <Feature Id="ProductFeature" Title="$(var.ProductName)" Description="$(var.ProductName)"
-             Display="expand" Level="1" AllowAdvertise="no" Absent="disallow"  >
-      <ComponentRef Id="Comp_InstallDirItems" Primary="yes" />
-      <ComponentRef Id="Comp_NjsProgRegistration" Primary="yes" />
-      <ComponentRef Id="Comp_InstallLocation" Primary="yes" />
-
-      <MergeRef Id="NodejsTools"/>
-      <MergeRef Id="InteractiveWindow"/>
-      <MergeRef Id="NodejsProfiling" />
-    </Feature>
-    
-    
-    <!-- User interface elements -->
-
-    <CustomAction Id="DevEnvSetup" Property="DEVENV_PATH" ExeCommand="/setup" Execute="deferred" Return="check" Impersonate="no" />
-    <CustomAction Id="DevEnvSetup_Rollback" Property="DEVENV_PATH" ExeCommand="/setup" Execute="rollback" Return="check" Impersonate="no" />
-
-    <CustomAction Id="VWDSetup" Property="VWD_PATH" ExeCommand="/setup" Execute="deferred" Return="check" Impersonate="no" />
-    <CustomAction Id="VWDSetup_Rollback" Property="VWD_PATH" ExeCommand="/setup" Execute="rollback" Return="check" Impersonate="no" />
-
-    <InstallExecuteSequence>
-      <Custom Action="DevEnvSetup_Rollback" Before="DevEnvSetup" Overridable="yes">DEVENV_PATH</Custom>
-      <Custom Action="DevEnvSetup" Before="InstallFinalize" Overridable="yes">DEVENV_PATH</Custom>
-      <Custom Action="GetVwdPath" Before="CostFinalize">VWDINSTALLPATH</Custom>
-      <Custom Action="VWDSetup_Rollback" Before="VWDSetup" Overridable="yes">VWD_PATH</Custom>
-      <Custom Action="VWDSetup" Before="InstallFinalize" Overridable="yes">VWD_PATH</Custom>
-    </InstallExecuteSequence>
-    <InstallUISequence>
-      <Show Dialog="CustomAdvancedWelcomeEulaDlg" Before="FindRelatedProducts">NOT Installed</Show>
-      <Show Dialog="CustomFeaturesDlg" After="CostFinalize">NOT Installed AND EasyInstall=0</Show>
-    </InstallUISequence>
-
-    <UI>
-      <ProgressText Action="DevEnvSetup">Updating extension registration with Visual Studio...</ProgressText>
-      <ProgressText Action="DevEnvSetup_Rollback">Removing extension registration with Visual Studio...</ProgressText>
-      <ProgressText Action="VWDSetup">Updating extension registration with Visual Studio Web Express...</ProgressText>
-      <ProgressText Action="VWDSetup_Rollback">Removing extension registration with Visual Studio Web Express...</ProgressText>
-
-      <Dialog Id="CustomAdvancedWelcomeEulaDlg" Width="370" Height="270" Title="!(loc.AdvancedWelcomeEulaDlg_Title)">
-        <Control Id="BannerBitmap" Type="Bitmap" X="0" Y="0" Width="370" Height="44" TabSkip="no" Text="!(loc.AdvancedWelcomeEulaDlgBannerBitmap)" />
-        <Control Id="Title" Type="Text" X="20" Y="10" Width="300" Height="24" Transparent="yes" NoPrefix="yes" Text="!(loc.AdvancedWelcomeEulaDlgTitle)" />
-        <Control Id="LicenseText" Type="ScrollableText" X="20" Y="55" Width="330" Height="121" Sunken="yes" TabSkip="no">
-          <Text SourceFile="License.rtf" />
-        </Control>
-        <Control Id="LicenseAcceptedCheckBox" Type="CheckBox" X="20" Y="180" Width="226" Height="18" CheckBoxValue="1" Property="LicenseAccepted" Text="!(loc.WelcomeEulaDlgLicenseAcceptedCheckBox)" />
-        <Control Id="DescriptionPerMachine" Type="Text" X="20" Y="202" Width="330" Height="31" Transparent="yes" NoPrefix="yes" Hidden="yes" Text="!(loc.AdvancedWelcomeEulaDlgDescriptionPerMachine)">
-          <Condition Action="show">ALLUSERS</Condition>
-        </Control>
-        <Control Id="DescriptionPerUser" Type="Text" X="20" Y="202" Width="330" Height="31" Transparent="yes" NoPrefix="yes" Hidden="yes" Text="!(loc.AdvancedWelcomeEulaDlgDescriptionPerUser)">
-          <Condition Action="show">NOT ALLUSERS</Condition>
-        </Control>
-        <Control Id="Advanced" Type="PushButton" X="156" Y="243" Width="56" Height="17" Text="!(loc.AdvancedWelcomeEulaDlgAdvanced)" Disabled="yes">
-          <Publish Property="EasyInstall" Value="0">1</Publish>
-          <Publish Event="EndDialog" Value="Return">1</Publish>
-          <Condition Action="enable">LicenseAccepted</Condition>
-        </Control>
-        <Control Id="Install" Type="PushButton" ElevationShield="yes" X="212" Y="243" Width="80" Height="17" Default="yes" Text="!(loc.AdvancedWelcomeEulaDlgInstall)" Hidden="yes" Disabled="yes">
-          <Publish Property="EasyInstall" Value="1">1</Publish>
-          <Publish Event="EndDialog" Value="Return">1</Publish>
-          <Condition Action="show">ALLUSERS</Condition>
-          <Condition Action="enable">LicenseAccepted</Condition>
-        </Control>
-        <Control Id="InstallNoShield" Type="PushButton" ElevationShield="no" X="212" Y="243" Width="80" Height="17" Default="yes" Text="!(loc.AdvancedWelcomeEulaDlgInstall)" Hidden="yes" Disabled="yes">
-          <Publish Property="EasyInstall" Value="1">1</Publish>
-          <Publish Event="EndDialog" Value="Return">1</Publish>
-          <Condition Action="show">NOT ALLUSERS</Condition>
-          <Condition Action="enable">LicenseAccepted</Condition>
-        </Control>
-        <Control Id="Cancel" Type="PushButton" X="304" Y="243" Width="56" Height="17" Cancel="yes" Text="!(loc.WixUICancel)">
-          <Publish Event="SpawnDialog" Value="CancelDlg">1</Publish>
-        </Control>
-        <Control Id="Print" Type="PushButton" X="88" Y="243" Width="56" Height="17" Text="!(loc.WixUIPrint)">
-          <Publish Event="DoAction" Value="WixUIPrintEula">1</Publish>
-        </Control>
-        <Control Id="BottomLine" Type="Line" X="0" Y="234" Width="370" Height="0" />
-      </Dialog>
-      <Dialog Id="CustomFeaturesDlg" Width="370" Height="270" Title="!(loc.FeaturesDlg_Title)" TrackDiskSpace="yes">
-        <Control Id="Tree" Type="SelectionTree" X="20" Y="55" Width="330" Height="121" Property="_BrowseProperty" TabSkip="no" Text="!(loc.FeaturesDlgTree)" />
-        <Control Id="Install" Type="PushButton" ElevationShield="yes" X="212" Y="243" Width="80" Height="17" Hidden="yes" Text="!(loc.FeaturesDlgInstall)">
-          <Condition Action="show">NOT Installed AND ALLUSERS</Condition>
-          <Condition Action="default">NOT Installed</Condition>
-          <Publish Event="SpawnWaitDialog" Value="WaitForCostingDlg">CostingComplete = 1</Publish>
-          <Publish Event="EndDialog" Value="Return"><![CDATA[OutOfDiskSpace <> 1]]></Publish>
-          <Publish Event="SpawnDialog" Value="OutOfRbDiskDlg">OutOfDiskSpace = 1 AND OutOfNoRbDiskSpace = 0 AND (PROMPTROLLBACKCOST="P" OR NOT PROMPTROLLBACKCOST)</Publish>
-          <Publish Event="EndDialog" Value="Return">OutOfDiskSpace = 1 AND OutOfNoRbDiskSpace = 0 AND PROMPTROLLBACKCOST="D"</Publish>
-          <Publish Event="EnableRollback" Value="False">OutOfDiskSpace = 1 AND OutOfNoRbDiskSpace = 0 AND PROMPTROLLBACKCOST="D"</Publish>
-          <Publish Event="SpawnDialog" Value="OutOfDiskDlg">(OutOfDiskSpace = 1 AND OutOfNoRbDiskSpace = 1) OR (OutOfDiskSpace = 1 AND PROMPTROLLBACKCOST="F")</Publish>
-        </Control>
-        <Control Id="InstallNoShield" Type="PushButton" ElevationShield="no" X="212" Y="243" Width="80" Height="17" Hidden="yes" Text="!(loc.FeaturesDlgInstall)">
-          <Condition Action="show">NOT Installed AND NOT ALLUSERS</Condition>
-          <Condition Action="default">NOT Installed</Condition>
-          <Publish Event="SpawnWaitDialog" Value="WaitForCostingDlg">CostingComplete = 1</Publish>
-          <Publish Event="EndDialog" Value="Return"><![CDATA[OutOfDiskSpace <> 1]]></Publish>
-          <Publish Event="SpawnDialog" Value="OutOfRbDiskDlg">OutOfDiskSpace = 1 AND OutOfNoRbDiskSpace = 0 AND (PROMPTROLLBACKCOST="P" OR NOT PROMPTROLLBACKCOST)</Publish>
-          <Publish Event="EndDialog" Value="Return">OutOfDiskSpace = 1 AND OutOfNoRbDiskSpace = 0 AND PROMPTROLLBACKCOST="D"</Publish>
-          <Publish Event="EnableRollback" Value="False">OutOfDiskSpace = 1 AND OutOfNoRbDiskSpace = 0 AND PROMPTROLLBACKCOST="D"</Publish>
-          <Publish Event="SpawnDialog" Value="OutOfDiskDlg">(OutOfDiskSpace = 1 AND OutOfNoRbDiskSpace = 1) OR (OutOfDiskSpace = 1 AND PROMPTROLLBACKCOST="F")</Publish>
-        </Control>
-        <Control Id="Change" Type="PushButton" ElevationShield="yes" X="212" Y="243" Width="80" Height="17" Hidden="yes" Text="!(loc.FeaturesDlgChange)">
-          <Condition Action="show">Installed AND ALLUSERS AND (ADDLOCAL OR REMOVE)</Condition>
-          <Condition Action="default">Installed</Condition>
-          <Publish Event="EndDialog" Value="Return"><![CDATA[OutOfDiskSpace <> 1]]></Publish>
-          <Publish Event="SpawnDialog" Value="OutOfRbDiskDlg">OutOfDiskSpace = 1 AND OutOfNoRbDiskSpace = 0 AND (PROMPTROLLBACKCOST="P" OR NOT PROMPTROLLBACKCOST)</Publish>
-          <Publish Event="EndDialog" Value="Return">OutOfDiskSpace = 1 AND OutOfNoRbDiskSpace = 0 AND PROMPTROLLBACKCOST="D"</Publish>
-          <Publish Event="EnableRollback" Value="False">OutOfDiskSpace = 1 AND OutOfNoRbDiskSpace = 0 AND PROMPTROLLBACKCOST="D"</Publish>
-          <Publish Event="SpawnDialog" Value="OutOfDiskDlg">(OutOfDiskSpace = 1 AND OutOfNoRbDiskSpace = 1) OR (OutOfDiskSpace = 1 AND PROMPTROLLBACKCOST="F")</Publish>
-        </Control>
-        <Control Id="ChangeNoShield" Type="PushButton" ElevationShield="no" X="212" Y="243" Width="80" Height="17" Hidden="yes" Text="!(loc.FeaturesDlgChange)">
-          <Condition Action="show">Installed AND (NOT ALLUSERS OR (NOT ADDLOCAL AND NOT REMOVE))</Condition>
-          <Condition Action="default">Installed</Condition>
-          <Publish Event="EndDialog" Value="Return"><![CDATA[OutOfDiskSpace <> 1]]></Publish>
-          <Publish Event="SpawnDialog" Value="OutOfRbDiskDlg">OutOfDiskSpace = 1 AND OutOfNoRbDiskSpace = 0 AND (PROMPTROLLBACKCOST="P" OR NOT PROMPTROLLBACKCOST)</Publish>
-          <Publish Event="EndDialog" Value="Return">OutOfDiskSpace = 1 AND OutOfNoRbDiskSpace = 0 AND PROMPTROLLBACKCOST="D"</Publish>
-          <Publish Event="EnableRollback" Value="False">OutOfDiskSpace = 1 AND OutOfNoRbDiskSpace = 0 AND PROMPTROLLBACKCOST="D"</Publish>
-          <Publish Event="SpawnDialog" Value="OutOfDiskDlg">(OutOfDiskSpace = 1 AND OutOfNoRbDiskSpace = 1) OR (OutOfDiskSpace = 1 AND PROMPTROLLBACKCOST="F")</Publish>
-        </Control>
-        <Control Id="Cancel" Type="PushButton" X="304" Y="243" Width="56" Height="17" Cancel="yes" Text="!(loc.WixUICancel)">
-          <Publish Event="SpawnDialog" Value="CancelDlg">1</Publish>
-        </Control>
-        <Control Id="BannerBitmap" Type="Bitmap" X="0" Y="0" Width="370" Height="44" TabSkip="no" Text="!(loc.FeaturesDlgBannerBitmap)" />
-        <Control Id="BannerLine" Type="Line" X="0" Y="44" Width="370" Height="0" />
-        <Control Id="BottomLine" Type="Line" X="0" Y="234" Width="370" Height="0" />
-        <Control Id="Description" Type="Text" X="25" Y="23" Width="280" Height="15" Transparent="yes" NoPrefix="yes" Text="!(loc.FeaturesDlgDescription)" />
-        <Control Id="Title" Type="Text" X="15" Y="6" Width="210" Height="15" Transparent="yes" NoPrefix="yes" Text="!(loc.FeaturesDlgTitle)" />
-        <Control Id="ItemDescription" Type="Text" X="20" Y="180" Width="330" Height="24" Transparent="yes" NoPrefix="yes" Text="!(loc.FeaturesDlgItemDescription)">
-          <Subscribe Event="SelectionDescription" Attribute="Text" />
-        </Control>
-        <Control Id="ItemSize" Type="Text" X="20" Y="209" Width="330" Height="24" Transparent="yes" NoPrefix="yes" Text="!(loc.FeaturesDlgItemSize)">
-          <Subscribe Event="SelectionSize" Attribute="Text" />
-        </Control>
-      </Dialog>
-    </UI>
-    <UI Id="WixUI_AdvancedCustom">
-      <TextStyle Id="WixUI_Font_Normal" FaceName="!(loc.Advanced_Font_FaceName)" Size="!(loc.Advanced_Font_Normal_Size)" />
-      <TextStyle Id="WixUI_Font_Bigger" FaceName="!(loc.Advanced_Font_FaceName)" Size="!(loc.Advanced_Font_Bigger_Size)" />
-      <TextStyle Id="WixUI_Font_Title" FaceName="!(loc.Advanced_Font_FaceName)" Size="!(loc.Advanced_Font_Title_Size)" Bold="yes" />
-      <TextStyle Id="WixUI_Font_Emphasized" FaceName="!(loc.Advanced_Font_FaceName)" Size="!(loc.Advanced_Font_Emphasized_Size)" Bold="yes" />
-
-      <Property Id="DefaultUIFont" Value="WixUI_Font_Normal" />
-      <Property Id="WixUI_Mode" Value="Advanced" />
-
-      <DialogRef Id="BrowseDlg" />
-      <DialogRef Id="DiskCostDlg" />
-      <DialogRef Id="ErrorDlg" />
-      <DialogRef Id="FatalError" />
-      <DialogRef Id="FilesInUse" />
-      <DialogRef Id="MsiRMFilesInUse" />
-      <DialogRef Id="PrepareDlg" />
-      <DialogRef Id="ProgressDlg" />
-      <DialogRef Id="ResumeDlg" />
-      <DialogRef Id="UserExit" />
-
-      <Publish Dialog="ExitDialog" Control="Finish" Event="EndDialog" Value="Return" Order="999">1</Publish>
+        <!-- Include the UI from UI.wxs -->
+        <UIRef Id="UI_Default"/>
         
-      <Publish Dialog="BrowseDlg" Control="OK" Event="DoAction" Value="WixUIValidatePath" Order="1">1</Publish>
-      <Publish Dialog="BrowseDlg" Control="OK" Event="SpawnDialog" Value="InvalidDirDlg" Order="2"><![CDATA[WIXUI_INSTALLDIR_VALID<>"1"]]></Publish>
-
-      <Publish Dialog="MaintenanceWelcomeDlg" Control="Next" Event="NewDialog" Value="MaintenanceTypeDlg">1</Publish>
-
-      <Publish Dialog="MaintenanceTypeDlg" Control="ChangeButton" Event="NewDialog" Value="CustomFeaturesDlg">1</Publish>
-      <Publish Dialog="MaintenanceTypeDlg" Control="RepairButton" Event="NewDialog" Value="VerifyReadyDlg">1</Publish>
-      <Publish Dialog="MaintenanceTypeDlg" Control="RemoveButton" Event="NewDialog" Value="VerifyReadyDlg">1</Publish>
-      <Publish Dialog="MaintenanceTypeDlg" Control="Back" Event="NewDialog" Value="MaintenanceWelcomeDlg">1</Publish>
-
-      <Publish Dialog="VerifyReadyDlg" Control="Back" Event="NewDialog" Value="MaintenanceTypeDlg" Order="2">1</Publish>
-    </UI>
-
-    <Property Id="EasyInstall" Value="0" />
-    <UIRef Id="WixUI_Common" />
-    
-    <WixVariable Id="WixUILicenseRtf" Value="License.rtf" />
-    
-    <WixVariable Id="WixUIBannerBmp" Value="UIBanner2012.bmp" />
-    <WixVariable Id="WixUIDialogBmp" Value="Dialog2012.bmp" />
-
-  </Product>
+    </Product>
 </Wix>

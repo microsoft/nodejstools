@@ -220,12 +220,23 @@ if (-not (tf status $asmverfile /format:detailed | Select-String "There are no p
 }
 $asmverfileIsReadOnly = $asmverfile.Attributes -band [io.fileattributes]::ReadOnly
 
+$releaseVersion = [regex]::Match((Get-Content $asmverfile), 'ReleaseVersion = "([0-9.]+)";').Groups[1].Value
+$fileVersion = [regex]::Match((Get-Content $asmverfile), 'FileVersion = "([0-9.]+)";').Groups[1].Value
+
+if ($release -and -not $outdir) {
+    $outdir = "$base_outdir\$fileVersion"
+}
 
 $buildnumber = '{0}{1:MMdd}.{2:D2}' -f (((Get-Date).Year - $base_year), (Get-Date), 0)
 if ($release -or $mockrelease -or $internal) {
+    if ($internal) {
+        $outdirwithname = "$outdir\$name"
+    } else {
+        $outdirwithname = $outdir
+    }
     for ($buildindex = 0; $buildindex -lt 10000; $buildindex += 1) {
         $buildnumber = '{0}{1:MMdd}.{2:D2}' -f (((Get-Date).Year - $base_year), (Get-Date), $buildindex)
-        if (-not (Test-Path $outdir\$buildnumber)) {
+        if (-not (Test-Path $outdirwithname\$buildnumber)) {
             break
         }
         $buildnumber = ''
@@ -241,11 +252,11 @@ if ([int]::Parse([regex]::Match($buildnumber, '^[0-9]+').Value) -ge 65535) {
     (If the year is not yet $($base_year + 7) then something else has gone wrong.)"
 }
 
-$releaseVersion = [regex]::Match((Get-Content $asmverfile), 'ReleaseVersion = "([0-9.]+)";').Groups[1].Value
-$minorVersion = [regex]::Match((Get-Content $asmverfile), 'MinorVersion = "([0-9.]+)";').Groups[1].Value
-$version = "$releaseVersion.$buildnumber"
+$version = "$fileVersion.$buildnumber"
 
-if ($release -or $mockrelease -or $internal) {
+if ($internal) {
+    $outdir = "$outdir\$name\$buildnumber"
+} elseif ($release -or $mockrelease) {
     $outdir = "$outdir\$buildnumber"
 }
 
@@ -283,7 +294,7 @@ if ($skipclean) {
 
 Write-Output "Output Dir: $outdir"
 Write-Output ""
-Write-Output "Product version: $releaseversion.$minorVersion.`$(VS version)"
+Write-Output "Product version: $releaseversion.`$(VS version)"
 Write-Output "File version: $version"
 foreach ($targetVs in $targetversions) {
     Write-Output "Building for: $($targetVs.name)"
@@ -332,6 +343,7 @@ try {
             $bindir = "Binaries\$config$($targetVs.number)"
             $destdir = "$outdir\$($targetVs.name)\$config"
             mkdir $destdir -EA 0 | Out-Null
+            $includeVsLogger = test-path Internal\Nodejs\VsLogger\VsLogger.csproj
             
             if (-not $skiptests)
             {
@@ -339,6 +351,7 @@ try {
                     /t:$target `
                     /p:Configuration=$config `
                     /p:WixVersion=$version `
+                    /p:WixReleaseVersion=$fileVersion `
                     /p:VSTarget=$($targetVs.number) `
                     /p:VisualStudioVersion=$($targetVs.number) `
                     /p:"CustomBuildIdentifier=$name" `
@@ -357,10 +370,12 @@ try {
                 /t:$target `
                 /p:Configuration=$config `
                 /p:WixVersion=$version `
+                /p:WixReleaseVersion=$fileVersion `
                 /p:VSTarget=$($targetVs.number) `
                 /p:VisualStudioVersion=$($targetVs.number) `
                 /p:"CustomBuildIdentifier=$name" `
                 /p:ReleaseBuild=$signedbuildText `
+                /p:IncludeVsLogger=$includeVsLogger `
                 /p:DeployExtension=false `
                 /p:DeployVSTemplates=false `
                 Nodejs\Setup\dirs.proj
@@ -370,7 +385,7 @@ try {
                 continue
             }
             
-            Copy-Item -force $bindir\*.msi $destdir\
+            Copy-Item -force $bindir\en-us\*.msi $destdir\
             Copy-Item -force Nodejs\Prerequisites\*.reg $destdir\
             
             mkdir $destdir\Symbols -EA 0 | Out-Null
@@ -407,7 +422,8 @@ try {
                     "Microsoft.NodejsTools.WebRole.dll",
                     "Microsoft.NodejsTools.Npm.dll",
                     "Microsoft.NodejsTools.TestAdapter.dll",
-                    "Microsoft.NodejsTools.PressAnyKey.exe"
+                    "Microsoft.NodejsTools.PressAnyKey.exe",
+                    "Microsoft.NodejsTools.VsLogger.dll"
                     ) | ForEach {@{path="$destdir\Binaries\$_"; name=$projectName}})
 
                 Write-Output "Submitting signing job for $($targetVs.name)"
@@ -457,7 +473,7 @@ try {
                 mkdir $destdir\SignedBinariesUnsignedMsi -EA 0 | Out-Null
                 
                 Move-Item $destdir\*.msi $destdir\UnsignedMsi -Force
-                Move-Item $bindir\*.msi $destdir\SignedBinariesUnsignedMsi -Force
+                Move-Item $bindir\en-us\*.msi $destdir\SignedBinariesUnsignedMsi -Force
             }
             
             $jobs = @()

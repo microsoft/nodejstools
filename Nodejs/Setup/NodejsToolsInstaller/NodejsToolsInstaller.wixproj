@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="utf-8"?>
+﻿<?xml version="1.0" encoding="utf-8"?>
 <Project ToolsVersion="4.0" DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <Import Project="..\SetupProjectBefore.settings" />
   <PropertyGroup>
@@ -13,9 +13,8 @@
     <SccAuxPath>SAK</SccAuxPath>
     <SccLocalPath>SAK</SccLocalPath>
     <DefineConstants>
-      NodejsToolsDir=$(BuildRoot)\Nodejs\Product\Nodejs;
-      MsiVersion=$(WixVersion);
-      VSTargetVersion=$(VSTarget)
+      $(DefineConstants);
+      IncludeVsLogger=$(IncludeVsLogger)
     </DefineConstants>
     <DefineConstants Condition="'$(CustomBuildIdentifier)' != ''">
       $(DefineConstants);
@@ -23,13 +22,38 @@
     </DefineConstants>
   </PropertyGroup>
   <ItemGroup>
-    <WixExtension Include="WixUIExtension;WixUtilExtension;WixDependencyExtension" />
+    <WixExtension Include="WixUIExtension">
+      <HintPath>WixUIExtension</HintPath>
+      <Name>WixUIExtension</Name>
+    </WixExtension>
+    <WixExtension Include="WixUtilExtension">
+      <HintPath>WixUtilExtension</HintPath>
+      <Name>WixUtilExtension</Name>
+    </WixExtension>
+    <WixExtension Include="WixDependencyExtension">
+      <HintPath>WixDependencyExtension</HintPath>
+      <Name>WixDependencyExtension</Name>
+    </WixExtension>
+    <WixExtension Include="WixNetFxExtension">
+      <HintPath>WixNetFxExtension</HintPath>
+      <Name>WixNetFxExtension</Name>
+    </WixExtension>
+    <BindInputPaths Include="$(OutDir)">
+      <Visible>false</Visible>
+    </BindInputPaths>
+    <BindInputPaths Include="$(BuildRoot)\Nodejs\Product\NodejsTools">
+      <Visible>false</Visible>
+    </BindInputPaths>
   </ItemGroup>
   <ItemGroup>
     <Compile Include="NodejsToolsInstaller.wxs" />
+    <Compile Include="LaunchConditions.wxs" />
+    <Compile Include="Directories.wxs" />
+    <Compile Include="UI.wxs" />
   </ItemGroup>
   <ItemGroup>
     <Content Include="License.rtf" />
+    <Content Include="NodejsToolsInstallerVars.wxi" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\InteractiveWindow\InteractiveWindow.wixproj">
@@ -53,6 +77,23 @@
       <RefProjectOutputGroups>Binaries;Content;Satellites</RefProjectOutputGroups>
       <RefTargetDir>INSTALLLOCATION</RefTargetDir>
     </ProjectReference>
+    <ProjectReference Include="..\..\..\Internal\Nodejs\VsLoggerSetup\VsLogger.wixproj" Condition="'$(IncludeVsLogger)' == 'True'">
+      <Name>VsLoggerMsm</Name>
+      <Project>{639BFC80-B31B-4D3F-9DF3-A65913000B4B}</Project>
+      <Private>True</Private>
+      <RefProjectOutputGroups>Binaries;Content;Satellites</RefProjectOutputGroups>
+      <RefTargetDir>INSTALLLOCATION</RefTargetDir>
+    </ProjectReference>
   </ItemGroup>
+  <ItemGroup>
+    <EmbeddedResource Include="Strings11.0.wxl" />
+    <EmbeddedResource Include="Strings12.0.wxl" />
+  </ItemGroup>
+  <Target Name="ExcludeStrings" BeforeTargets="BeforeBuild">
+    <ItemGroup>
+      <EmbeddedResource Remove="Strings11.0.wxl" Condition="'$(VSTarget)' != '11.0'" />
+      <EmbeddedResource Remove="Strings12.0.wxl" Condition="'$(VSTarget)' != '12.0'" />
+    </ItemGroup>
+  </Target>
   <Import Project="..\SetupProjectAfter.settings" />
 </Project>

@@ -36,6 +36,10 @@ namespace Microsoft.NodejsTools {
         public const string StartWebBrowser = "StartWebBrowser";
 
         public const string NodeModulesFolder = "node_modules";
+        
+        /// <summary>
+        /// The name of the package.json file
+        /// </summary>
         public const string PackageJsonFile = "package.json";
         public const string PackageJsonMainFileKey = "main";
         public const string DefaultPackageMainFile = "index.js";

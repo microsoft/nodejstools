@@ -1,0 +1,110 @@
+﻿<Project DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+    <PropertyGroup>
+        <BuildRoot Condition="'$(BuildRoot)' == ''">$([MSBuild]::GetDirectoryNameOfFileAbove($(MSBuildThisFileDirectory), build.root))</BuildRoot>
+
+        <TargetName>NodejsToolsFiles</TargetName>
+        <SourceDir>$(BuildRoot)\Nodejs\Product\Nodejs\</SourceDir>
+        <ObjDir>$(SourceDir)obj\Dev$(VSTarget)\$(Configuration)</ObjDir>
+    </PropertyGroup>
+    <ItemGroup>
+        <!-- Registration files -->
+        <File Include="$(ObjDir)\extension.vsixmanifest" />
+        <File Include="Microsoft.NodejsTools.pkgdef" />
+
+        <!-- Core extension -->
+        <File Include="Microsoft.NodejsTools.dll" />
+        <File Include="Microsoft.NodejsTools.PressAnyKey.exe" />
+        <File Include="Microsoft.NodejsTools.Npm.dll" />
+        <File Include="Microsoft.NodejsTools.ProjectWizard.dll" />
+        <File Include="Microsoft.NodejsTools.Analysis.dll" />
+        <File Include="Microsoft.NodejsTools.TestAdapter.dll" />
+
+        <!-- Support Files -->
+        <File Include="all.json" />
+        <File Include="Newtonsoft.Json.dll"/>
+        <File Include="visualstudio_nodejs_repl.js"/>
+        <File Include="nodejsref.js"/>
+        <File Include="Credits.txt"/>
+        <File Include="NoSurveyNewsFeed.html"/>
+
+        <!-- Definitely Typed files -->
+        <File Include="Scripts\Typings\node\node.d.ts">
+            <InstallDirectory>ScriptsTypingsNode</InstallDirectory>
+        </File>
+
+        <!-- Formatting -->
+        <File Include="Formatting\typescriptServices.js"/>
+
+        <!-- Resources -->
+        <File Include="NodejsProject.ico;
+                       NodejsProjectBig.ico" />
+
+        <!-- Templates -->
+        <File Include="FileTemplates\NewItem\NewItems.vsdir;
+                       FileTemplates\NewItem\TextFile.txt;
+                       FileTemplates\NewItem\EmptyJs.js;
+                       FileTemplates\NewItem\EmptyXml.xml;
+                       FileTemplates\NewItem\EmptyTs.ts;
+                       FileTemplates\NewItem\EmptyStyl.styl;
+                       FileTemplates\NewItem\EmptyLess.less;
+                       FileTemplates\NewItem\EmptyJson.json;
+                       FileTemplates\NewItem\EmptyJade.jade;
+                       FileTemplates\NewItem\EmptyCss.css;
+                       FileTemplates\NewItem\EmptyHtml.html">
+
+            <InstallDirectory>FileTemplatesNewItem</InstallDirectory>
+        </File>
+
+        <ItemTemplate Include="ItemTemplates\JavaScript\UnitTest.zip;
+                               ItemTemplates\JavaScript\TypeScriptUnitTest.zip"/>
+
+        <ProjectTemplate Include="ProjectTemplates\JavaScript\Node.js\1033\AzureExpressApp.zip;
+                                  ProjectTemplates\JavaScript\Node.js\1033\AzureNodejsApp.zip;
+                                  ProjectTemplates\JavaScript\Node.js\1033\ExpressApp.zip;
+                                  ProjectTemplates\JavaScript\Node.js\1033\FromExistingCode.zip;
+                                  ProjectTemplates\JavaScript\Node.js\1033\NodejsWebApp.zip;
+                                  ProjectTemplates\JavaScript\Node.js\1033\NodejsConsoleApp.zip;
+                                  ProjectTemplates\JavaScript\Node.js\1033\AzureNodejsWorker.zip;
+                                  ProjectTemplates\JavaScript\Node.js\1033\AddWebSiteAzureExpressApp.zip;
+                                  ProjectTemplates\JavaScript\Node.js\1033\AddWebSiteAzureNodejsApp.zip;
+                                  ProjectTemplates\JavaScript\Node.js\1033\AddWebSiteExpressApp.zip;
+                                  ProjectTemplates\JavaScript\Node.js\1033\AddWebSiteNodejsWebApp.zip;
+                                  ProjectTemplates\TypeScript\Node.js\1033\TypeScriptAzureExpressApp.zip;
+                                  ProjectTemplates\TypeScript\Node.js\1033\TypeScriptAzureWebApp.zip;
+                                  ProjectTemplates\TypeScript\Node.js\1033\TypeScriptConsoleApp.zip;
+                                  ProjectTemplates\TypeScript\Node.js\1033\TypeScriptExpressApp.zip;
+                                  ProjectTemplates\TypeScript\Node.js\1033\TypeScriptWebApp.zip;
+                                  ProjectTemplates\TypeScript\Node.js\1033\TypeScriptFromExistingCode.zip;
+                                  ProjectTemplates\TypeScript\Node.js\1033\TypeScriptAzureNodejsWorker.zip"/>
+
+
+        <!--Unit test framework support files-->
+        <File Include="TestFrameworks\find_tests.js;
+                       TestFrameworks\run_tests.js">
+            <InstallDirectory>TestFrameworks</InstallDirectory>
+        </File>
+        
+        <File Include="TestFrameworks\default\default.js">
+            <InstallDirectory>TestFrameworksDefault</InstallDirectory>
+        </File>
+
+        <File Include="TestFrameworks\mocha\mocha.js">
+            <InstallDirectory>TestFrameworksMocha</InstallDirectory>
+        </File>
+
+        <!-- Remote Debug files -->
+        <File Include="License.html;
+                       Debugger\RemoteDebug\RemoteDebug.js;
+                       Debugger\RemoteDebug\RemoteDebugging.html">
+            <InstallDirectory>RemoteDebug</InstallDirectory>
+        </File>
+
+        <!-- MSBuild files-->
+        <MSBuildFile Include="Microsoft.NodejsTools.targets;
+                              Microsoft.NodejsTools.WebRole.dll"/>
+                
+
+    </ItemGroup>
+
+    <Import Project="$(BuildRoot)\Nodejs\Setup\WixGenerator.targets"/>
+</Project>

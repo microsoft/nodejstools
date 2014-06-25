@@ -18,6 +18,7 @@ using System.ComponentModel.Design;
 using System.Diagnostics;
 using System.Globalization;
 using System.IO;
+using System.Linq;
 using System.Reflection;
 using System.Runtime.InteropServices;
 using System.Threading;
@@ -29,6 +30,7 @@ using Microsoft.NodejsTools.Debugger.DebugEngine;
 using Microsoft.NodejsTools.Debugger.Remote;
 using Microsoft.NodejsTools.Intellisense;
 using Microsoft.NodejsTools.Jade;
+using Microsoft.NodejsTools.Logging;
 using Microsoft.NodejsTools.Options;
 using Microsoft.NodejsTools.Project;
 using Microsoft.NodejsTools.Repl;
@@ -94,6 +96,7 @@ namespace Microsoft.NodejsTools {
         internal HashSet<ITextBuffer> ChangedBuffers = new HashSet<ITextBuffer>();
         private LanguagePreferences _langPrefs;
         private VsProjectAnalyzer _analyzer;
+        private NodejsToolsLogger _logger;
 
         /// <summary>
         /// Default constructor of the package.
@@ -191,6 +194,20 @@ namespace Microsoft.NodejsTools {
             textManagerEventsConnectionPoint.Advise(new DataTipTextManagerEvents(this), out cookie);
 
             MakeDebuggerContextAvailable();
+            InitializeLogging();
+        }
+
+        private void InitializeLogging() {
+            _logger = new NodejsToolsLogger(ComponentModel.GetExtensions<INodejsToolsLogger>().ToArray());
+
+            // log interesting stats on startup
+            _logger.LogEvent(NodejsToolsLogEvent.SurveyNewsFrequency, GeneralOptionsPage.SurveyNewsCheck);
+        }
+
+        internal NodejsToolsLogger Logger {
+            get {
+                return _logger;
+            }
         }
 
         /// <summary>

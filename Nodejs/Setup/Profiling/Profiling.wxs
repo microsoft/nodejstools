@@ -1,34 +1,50 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <Wix xmlns="http://schemas.microsoft.com/wix/2006/wi">
-  <?define InstallLocationName = "NodejsProfiling" ?>
+    <?define InstallLocationName = "NodejsProfiling" ?>
 
-  <Module Id="NodejsProfiling" Language="1033" Version="1.0.0.0">
-    <Package Id="983F1847-97A1-4E6C-A7AF-C21762B00A75" Manufacturer="Microsoft Corporation" InstallerVersion="200" />
+    <Module Id="Profiling" Language="1033" Version="1.0.0.0">
+        <Package Id="983F1847-97A1-4E6C-A7AF-C21762B00A75" Manufacturer="Microsoft Corporation" InstallerVersion="200" />
 
-    <?include ..\InstallPath.wxi ?>
-    <?include ..\MergeModule.wxi ?>
+        <?include ..\MergeModule.wxi ?>
 
-    <Property Id="VSLAUNCHER" >
-        <DirectorySearch Path="[ProgramFilesFolder]\Common Files\Microsoft Shared\MSEnv" Depth="4" Id="FindVSLauncher">
-            <FileSearch Name="VSLauncher.exe" />
-        </DirectorySearch>
-    </Property>
+        <Property Id="VSLAUNCHER" >
+            <DirectorySearch Path="[ProgramFilesFolder]\Common Files\Microsoft Shared\MSEnv" Depth="4" Id="FindVSLauncher">
+                <FileSearch Name="VSLauncher.exe" />
+            </DirectorySearch>
+        </Property>
 
-    <Directory Id="TARGETDIR" Name="SourceDir">
-      <Directory Id="EXTENSION_INSTALLPATH">
-          <Directory Id="_0D6D364235164B24AC58E38A08968129" Name="Extensions">
-            <Directory Id="_8C5B593518EE4149B9ADAF76B704E2A6" Name="Microsoft">
-              <Directory Id="_3453B56831F34B48935E1DD6A1B44AC1" Name="Node.js Tools - Profiling">
-                <Directory Id="INSTALLLOCATION" Name="1.0">
-                </Directory>
-              </Directory>
-          </Directory>
-        </Directory>
-      </Directory>
-      <Directory Id="ProgramFilesFolder" Name="PFILES">
-      </Directory>
-    </Directory>
 
-    <ComponentGroupRef Id="NodejsProfilingExt"/>
-  </Module>
+        <Component Id="PerUserInstallRegistry" Directory="Dir_VSInstallLocation" Guid="{1FA57071-B39A-4320-9678-ABE1AB4D04DD}">
+            <Condition>NOT ALLUSERS = 1</Condition>
+            <RegistryKey Root='HKCU' Key='Software\Microsoft\VisualStudio\$(var.VSTargetVersion)\ExtensionManager\EnabledExtensions'>
+                <RegistryValue Type='string' Name='B515653F-FB69-4B64-9D3F-F1FCF8421DD0,$(var.ReleaseVersion)' Value='[Dir_VSInstallLocation]'/>
+            </RegistryKey>
+            <RegistryKey Root='HKCU' Key='Software\Microsoft\VisualStudio\$(var.VSTargetVersion)\ExtensionManager\ExtensionTypes'>
+                <RegistryValue Type='string' Name='B515653F-FB69-4B64-9D3F-F1FCF8421DD0,$(var.ReleaseVersion)' Value='Microsoft.VisualStudio.VsPackage'/>
+            </RegistryKey>
+        </Component>
+
+        <?if "$(var.VSTargetVersion)" = "11.0" ?>
+        <?define Comp_NjsPerfRegistrationGuid=3A0DE583-354F-449A-AF25-9C05766035C9?>
+        <?elseif "$(var.VSTargetVersion)" = "12.0" ?>
+        <?define Comp_NjsPerfRegistrationGuid=CD1F26B8-C6EE-4711-AE83-3AEC2B567874?>
+        <?else?>
+        <!--Unknown VS version, We'll insert a bunch of bogus values such that Wix will error out-->
+        <!--  To fix this define a new section above for the new VS version.  Leave this such that future new versions continue to crash on build-->
+        <?define Comp_NjsPerfRegistrationGuid=UNKNOWN_VSTARGET?>
+        <?endif ?>
+
+        <Component Id="Comp_ProfilingRegistration" DiskId="1" Guid="$(var.Comp_NjsPerfRegistrationGuid)" Directory="Dir_VSInstallLocation">
+            <RegistryValue Root='HKCR' Key='.njsperf' Type='string' Name='PerceivedType' Value='text' />
+            <RegistryValue Root='HKCR' Key='VisualStudio.Launcher.njsperf.$(var.VSTargetVersion)\DefaultIcon' Type='string' Value='[Dir_VSInstallLocation]\NodejsProject.ico' />
+
+            <ProgId Id="VisualStudio.Launcher.njsperf.$(var.VSTargetVersion)" Description="Node.js Performance File">
+                <Extension Id="njsperf" ContentType="text/plain">
+                    <Verb Id="Open" Command="Open" TargetProperty="VSLAUNCHER" Argument="&quot;%1&quot;"/>
+                </Extension>
+            </ProgId>
+        </Component>
+        
+        <ComponentGroupRef Id="CGroup_ProfilingFiles"/>
+    </Module>
 </Wix>

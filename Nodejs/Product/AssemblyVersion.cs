@@ -1,6 +1,16 @@
-// <copyright>
-// Copyright (c) Microsoft Corporation.  All rights reserved.
-// </copyright>
+/* ****************************************************************************
+ *
+ * Copyright (c) Microsoft Corporation. 
+ *
+ * This source code is subject to terms and conditions of the Apache License, Version 2.0. A 
+ * copy of the license can be found in the License.html file at the root of this distribution. If 
+ * you cannot locate the Apache License, Version 2.0, please send an email to 
+ * vspython@microsoft.com. By using this source code in any fashion, you are agreeing to be bound 
+ * by the terms of the Apache License, Version 2.0.
+ *
+ * You must not remove this notice, or any other, from this software.
+ *
+ * ***************************************************************************/
 
 using System.Reflection;
 using System.Runtime.CompilerServices;
@@ -14,23 +24,21 @@ using System.Runtime.InteropServices;
 [assembly: AssemblyFileVersion(AssemblyVersionInfo.Version)]
 
 class AssemblyVersionInfo {
-    // This version string (and the comments for StableVersion and Version)
-    // should be updated manually between major releases.
-    // Servicing branches should retain the value
-    public const string ReleaseVersion = "1.0";
     // This version string (and the comment for StableVersion) should be
-    // updated manually between minor releases.
-    // Servicing branches should retain the value
-    public const string MinorVersion = "0";
+    // updated manually between major releases (e.g. from 1.0 to 2.0).
+    // Servicing branches and minor releases should retain the value.
+    public const string ReleaseVersion = "1.0";
+    
+    // This version string (and the comment for Version) should be updated
+    // manually between minor releases (e.g. from 1.0 to 1.1).
+    // Servicing branches and prereleases should retain the value.
+    public const string FileVersion = "1.0";
 
     // This version should never change from "4100.00"; BuildRelease.ps1
     // will replace it with a generated value.
     public const string BuildNumber = "4100.00";
 
-#if DEV10
-    public const string VSMajorVersion = "10";
-    const string VSVersionSuffix = "2010";
-#elif DEV11
+#if DEV11
     public const string VSMajorVersion = "11";
     const string VSVersionSuffix = "2012";
 #elif DEV12
@@ -42,9 +50,9 @@ class AssemblyVersionInfo {
 
     public const string VSVersion = VSMajorVersion + ".0";
 
-    // Defaults to "1.0.0.(2010|2012|2013)"
-    public const string StableVersion = ReleaseVersion + "." + MinorVersion + "." + VSVersionSuffix;
+    // Defaults to "1.0.0.(2012|2013)"
+    public const string StableVersion = ReleaseVersion + "." + VSVersionSuffix;
 
     // Defaults to "1.0.4100.00"
-    public const string Version = ReleaseVersion + "." + BuildNumber;
+    public const string Version = FileVersion + "." + BuildNumber;
 }

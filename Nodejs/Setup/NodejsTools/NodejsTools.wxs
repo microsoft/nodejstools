@@ -1,90 +1,58 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <Wix xmlns="http://schemas.microsoft.com/wix/2006/wi">
-  <?define InstallLocationName = "Node.js Tools for Visual Studio" ?>
+    <?define InstallLocationName = "Node.js Tools for Visual Studio" ?>
 
-  <Module Id="NodejsTools" Language="1033" Version="1.0.0.0">
-    <Package Id="590FDCAA-C383-4112-9D84-49FB1AFA060B" Manufacturer="Microsoft Corporation" InstallerVersion="200" />
-    
-    <?include ..\InstallPath.wxi ?>
-    <?include ..\MergeModule.wxi ?>
+    <Module Id="NodejsTools" Language="1033" Version="1.0.0.0">
+        <Package Id="590FDCAA-C383-4112-9D84-49FB1AFA060B" Manufacturer="Microsoft Corporation" InstallerVersion="200" />
 
-    <Directory Id="TARGETDIR" Name="SourceDir">
-      <Directory Id="EXTENSION_INSTALLPATH">
-        <Directory Id="_0D6D364235164B24AC58E38A08968129" Name="Extensions">
-          <Directory Id="_8C5B593518EE4149B9ADAF76B704E2A6" Name="Microsoft">
-            <Directory Id="_4737EE92D34842BAB521438C6A4FAF3D" Name="Node.js Tools">
-              <Directory Id="INSTALLLOCATION" Name="1.0">
-                <Directory Id="X64INSTALL" Name="x64" />
-              </Directory>
-            </Directory>
-          </Directory>
-        </Directory>
-        
-        <Directory Id="ProjectTemplates" Name="ProjectTemplates">
-          <Directory Id="PrjTempl_JS" Name="JavaScript">
-            <Directory Id="PrjTempl_JS_Nodejs" Name="Node.js">
-              <Directory Id="PrjTempl_JS_Nodejs_1033" Name="1033"/>
-            </Directory>
-          </Directory>
-          <Directory Id="PrjTempl_TS" Name="TypeScript">
-            <Directory Id="PrjTempl_TS_Nodejs" Name="Node.js">
-              <Directory Id="PrjTempl_TS_Nodejs_1033" Name="1033"/>
-            </Directory>
-          </Directory>
-        </Directory>
-        
-        <Directory Id="DIR_TestFrameworks" Name="TestFrameworks">
-          <Directory Id="DIR_TestFramework_Default" Name="default" />
-          <Directory Id="DIR_TestFramework_Mocha" Name="mocha" />
-        </Directory>
-        
-      </Directory>
+        <?include ..\MergeModule.wxi ?>
 
-      <Directory Id="VWD_EXTENSION_INSTALLPATH">
-          <Directory Id="VWD_Microsoft" Name="Microsoft">
-            <Directory Id="VWD_NodejsTools" Name="Node.js Tools">
-              <Directory Id="VWD_INSTALLLOCATION" Name="1.0">
-                <Directory Id="VWD_X64INSTALL" Name="x64">
-                  </Directory>
-              </Directory>
+        <?foreach key in VS;VWD?>
+        <DirectoryRef Id="Dir_$(var.key)InstallLocation">
+            <Directory Id="Dir_$(var.key)InstallLocationFileTemplates" Name="FileTemplates">
+                <Directory Id="Dir_$(var.key)FileTemplatesNewItem" Name="NewItem" />
             </Directory>
-        </Directory>
-      </Directory>
-      <Directory Id="VWDINSTALLPATH">
-        <Directory Id="VWDExpress" Name="VWDExpress">
-          <Directory Id="VWD_ProjectTemplates" Name="ProjectTemplates">
-            <Directory Id="VWD_PrjTempl_JS" Name="JavaScript">
-              <Directory Id="VWD_PrjTempl_JS_Nodejs" Name="Node.js">
-                <Directory Id="VWD_PrjTempl_JS_Nodejs_1033" Name="1033">
+            <Directory Id="Dir_$(var.key)TestFrameworks" Name="TestFrameworks">
+                <Directory Id="Dir_$(var.key)TestFrameworksDefault" Name="Default" />
+                <Directory Id="Dir_$(var.key)TestFrameworksMocha" Name="Mocha" />
+            </Directory>
+            <Directory Id="Dir_$(var.key)InstallLocationScripts" Name="Scripts">
+                <Directory Id="Dir_$(var.key)InstallLocationScriptsTypings" Name="Typings">
+                    <Directory Id="Dir_$(var.key)ScriptsTypingsNode" Name="Node" />
                 </Directory>
-              </Directory>
             </Directory>
-            <Directory Id="VWD_PrjTempl_TS" Name="TypeScript">
-              <Directory Id="VWD_PrjTempl_TS_Nodejs" Name="Node.js">
-                <Directory Id="VWD_PrjTempl_TS_Nodejs_1033" Name="1033">
-                </Directory>
-              </Directory>
-            </Directory>
-          </Directory>
-        </Directory>
-      </Directory>
-      
-      <Directory Id="ProgramFilesFolder" Name="PFILES">
-          <Directory Id="Dir_MSBuild" Name="MSBuild"> 
-              <Directory Id="Dir_MSBuildMS" Name="Microsoft"> 
-                  <Directory Id="Dir_MSBuildVisualStudio" Name="VisualStudio"> 
-                      <Directory Id="Dir_VSVersion" Name="v$(var.VSTargetVersion)">
-                        <Directory Id="Dir_NodejsToolsMsBuild" Name="Node.js Tools"> 
-                        </Directory>
-                      </Directory>
-                  </Directory> 
-              </Directory> 
-          </Directory> 
-      </Directory>
+            <Directory Id="Dir_$(var.key)RemoteDebug" Name="RemoteDebug"/>
+        </DirectoryRef>
+        <?endforeach?>
 
+        <Configuration Name="Config_StartMenuLocation" Format="Key" Type="Identifier" DefaultValue="TARGETDIR" />
+        <Substitution Table="Directory" Column="Directory_Parent" Row="Dir_StartMenu" Value="[=Config_StartMenuLocation]" />
 
-    </Directory>
+        <DirectoryRef Id="TARGETDIR">
+            <Directory Id="Dir_StartMenu" />
+        </DirectoryRef>
 
-    <ComponentGroupRef Id="NodejsToolsExt"/>
-  </Module>
+        <Component Id="Comp_RemoteDebug" Directory="Dir_VSInstallLocation" Guid="*">
+            <RegistryValue Root='HKMU' Key='SOFTWARE\Microsoft\NodejsTools\$(var.VSTargetVersion)' Type='string' Value='Readme' KeyPath='yes' />
+            <RegistryValue Root='HKMU' Key='SOFTWARE\Microsoft\NodejsTools\$(var.VSTargetVersion)' Type='string' Name='RemoteDebugProxyFolder' Value='[Dir_VSInstallLocationRemoteDebug]' />                          
+        </Component>       
+        
+        <!-- Per user components -->
+        <Component Id="PerUserInstallRegistry" Directory="Dir_VSInstallLocation" Guid="*">
+            <Condition>NOT ALLUSERS = 1</Condition>
+            <RegistryKey Root='HKCU' Key='Software\Microsoft\VisualStudio\$(var.VSTargetVersion)\ExtensionManager\EnabledExtensions'>
+                <RegistryValue Type='string' Name='FE8A8C3D-328A-476D-99F9-2A24B75F8C7F,$(var.ReleaseVersion)' Value='[Dir_VSInstallLocation]'/>
+            </RegistryKey>
+            <RegistryKey Root='HKCU' Key='Software\Microsoft\VisualStudio\$(var.VSTargetVersion)\ExtensionManager\ExtensionTypes'>
+                <RegistryValue Type='string' Name='FE8A8C3D-328A-476D-99F9-2A24B75F8C7F,$(var.ReleaseVersion)' Value='Tool'/>
+            </RegistryKey>
+        </Component>
+
+        <Component Directory="Dir_VSInstallLocation" Guid="*">
+            <Condition>NOT ALLUSERS = 1</Condition>
+            <File KeyPath="yes" Source='VSTemplateStore.pkgdef' />
+        </Component>
+
+        <ComponentGroupRef Id="CGroup_NodejsToolsFiles"/>
+    </Module>
 </Wix>
