@@ -35,7 +35,8 @@ var assemblies = [
     'Microsoft.NodejsTools.AjaxMin',
     'Microsoft.NodejsTools.WebRole',
     'Microsoft.NodejsTools.Npm',
-    'Microsoft.NodejsTools.PressAnyKey'
+    'Microsoft.NodejsTools.PressAnyKey',
+    'Microsoft.NodejsTools.VsLogger'
 ].sort();
 
 var files = [
