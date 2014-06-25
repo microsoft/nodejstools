@@ -30,26 +30,25 @@ namespace NodejsTests {
     [TestClass]
     public sealed class FormattingTests {
         private readonly JavaScriptSerializer _serializer = new JavaScriptSerializer();
-        private static readonly FormatCodeOptions Options = new FormatCodeOptions() {
-            InsertSpaceAfterCommaDelimiter = true,
-            InsertSpaceAfterKeywordsInControlFlowStatements = true,
-            InsertSpaceAfterSemicolonInForStatements = true,
-            InsertSpaceBeforeAndAfterBinaryOperators = true,
-            InsertSpaceAfterFunctionKeywordForAnonymousFunctions = false,
-            TabSize = 4, IndentSize = 4,
-            ConvertTabsToSpaces = true,
-            NewLineCharacter = "\n"
+        private static readonly FormattingOptions Options = new FormattingOptions() {
+            SpaceAfterComma = true,
+            SpaceAfterKeywordsInControlFlowStatements = true,
+            SpaceAfterSemiColonInFor = true,
+            SpaceBeforeAndAfterBinaryOperator = true,
+            SpaceAfterFunctionInAnonymousFunctions = false,
+            SpacesPerIndent = 4,
+            NewLine = "\n"
         };
 
         [ClassInitialize]
         public static void DoDeployment(TestContext context) {
             AssertListener.Initialize();
-            ExtractResource("typescriptServices.js");
             ExtractResource("ruleFormattingTests.json");
         }
 
         private static void ExtractResource(string file) {
-            if (!File.Exists(file)) {
+            //if (!File.Exists(file)) 
+            {
                 File.WriteAllText(
                     file,
                     new StreamReader(Assembly.GetExecutingAssembly().GetManifestResourceStream("NodejsTests." + file)).ReadToEnd()
@@ -60,17 +59,14 @@ namespace NodejsTests {
         [TestMethod, Priority(0)]
         public void TypeScriptPortedTests() {
             dynamic testCases = _serializer.DeserializeObject("[" + File.ReadAllText("ruleFormattingTests.json") + "]");
-
-            var inst = JavaScriptFormattingService.Instance;
-            var options = new FormatCodeOptions();
+            
+            var options = new FormattingOptions();
             int testCaseId = 0;
             foreach (var testCase in testCases) {
                 string filename = "fob" + testCaseId++ + ".js";
-
-                var buffer = new MockTextBuffer(testCase["input"], filename, "Node.js");
-                inst.AddDocument(filename, buffer);
-
-                if (!ApplyEdits(filename, inst, testCase, buffer)) {
+                Console.WriteLine(testCase["input"]);
+                var buffer = new MockTextBuffer(testCase["input"], "test.py", "Node.js");
+                if (!ApplyEdits(filename, testCase, buffer)) {
                     continue;
                 }
 
@@ -81,53 +77,54 @@ namespace NodejsTests {
             }
         }
 
-        private static bool ApplyEdits(string filename, JavaScriptFormattingService inst, dynamic testCase, MockTextBuffer buffer) {
+        private static bool ApplyEdits(string filename, dynamic testCase, MockTextBuffer buffer) {
             foreach (var operation in testCase["operations"]) {
-                TextEdit[] edits = null;
+                Edit[] edits = null;
                 switch ((string)operation["operation"]) {
                     case "Document":
-                        edits = inst.GetFormattingEditsForDocument(
-                            filename,
-                            0,
-                            buffer.CurrentSnapshot.Length,
+                        edits = Formatter.GetEditsForDocument(
+                            buffer.CurrentSnapshot.GetText(),
                             Options
                         );
                         break;
                     case "CloseBrace":
-                        edits = inst.GetFormattingEditsAfterKeystroke(
-                            filename,
+                        edits = Formatter.GetEditsAfterKeystroke(
+                            buffer.CurrentSnapshot.GetText(),
                             (int)operation["point"]["position"],
-                            "}",
+                           '}',
                             Options
                         );
                         break;
                     case "Enter":
-                        edits = inst.GetFormattingEditsAfterKeystroke(
-                            filename,
-                            (int)operation["point"]["position"],
-                            "\r\n",
-                            Options
-                        );
+                        var line = buffer.CurrentSnapshot.GetLineFromPosition((int)operation["point"]["position"]);
+                        if(line.LineNumber > 0) {
+                            edits = Formatter.GetEditsAfterEnter(
+                                buffer.CurrentSnapshot.GetText(),
+                                buffer.CurrentSnapshot.GetLineFromLineNumber(line.LineNumber - 1).Start,
+                                line.End,
+                                Options
+                            );
+                        }
                         break;
                     case "Semicolon":
-                        edits = inst.GetFormattingEditsAfterKeystroke(
-                            filename,
+                        edits = Formatter.GetEditsAfterKeystroke(
+                            buffer.CurrentSnapshot.GetText(),
                             (int)operation["point"]["position"],
-                            ";",
+                           ';',
                             Options
                         );
                         break;
                     case "Paste":
-                        edits = inst.GetFormattingEditsOnPaste(
-                            filename,
+                        edits = Formatter.GetEditsForRange(
+                            buffer.CurrentSnapshot.GetText(),
                             (int)operation["span"]["start"],
                             (int)operation["span"]["start"] + (int)operation["span"]["length"],
                             Options
                         );
                         break;
                     case "Selection":
-                        edits = inst.GetFormattingEditsForRange(
-                            filename,
+                        edits = Formatter.GetEditsForRange(
+                            buffer.CurrentSnapshot.GetText(),
                             (int)operation["span"]["start"],
                             (int)operation["span"]["start"] + (int)operation["span"]["length"],
                             Options
@@ -143,43 +140,29 @@ namespace NodejsTests {
             return true;
         }
 
-        private static void FormatDocumentTest(string input, string expected, FormatCodeOptions options = null) {
-            var inst = JavaScriptFormattingService.Instance;
+        private static void FormatDocumentTest(string input, string expected, FormattingOptions options = null) {
             string pathToFile = "fob.py";
             var buffer = new MockTextBuffer(input, pathToFile, "Node.js");
-            inst.AddDocument(pathToFile, buffer);
-            try {
-                var edits = inst.GetFormattingEditsForDocument(
-                    pathToFile,
-                    0,
-                    buffer.CurrentSnapshot.Length,
-                    options ?? new FormatCodeOptions()
-                );
+            var edits = Formatter.GetEditsForDocument(
+                buffer.CurrentSnapshot.GetText(),
+                options ?? new FormattingOptions()
+            );
 
-                EditFilter.ApplyEdits(buffer, edits);
-                Assert.AreEqual(expected, buffer.CurrentSnapshot.GetText());
-            } finally {
-                inst.RemoveDocument(pathToFile);
-            }
+            EditFilter.ApplyEdits(buffer, edits);
+            Assert.AreEqual(expected, buffer.CurrentSnapshot.GetText());
         }
 
-        private static void FormatSelectionTest(string input, string expected, int start, int end, FormatCodeOptions options = null) {
-            var inst = JavaScriptFormattingService.Instance;
+        private static void FormatSelectionTest(string input, string expected, int start, int end, FormattingOptions options = null) {
             string pathToFile = "fob.py";
             var buffer = new MockTextBuffer(input, pathToFile, "Node.js");
-            inst.AddDocument("fob.py", buffer);
-            try {
-                var edits = inst.GetFormattingEditsForRange(
-                    pathToFile,
-                    start,
-                    end,
-                    options ?? new FormatCodeOptions()
-                );
-                EditFilter.ApplyEdits(buffer, edits);
-                Assert.AreEqual(expected, buffer.CurrentSnapshot.GetText());
-            } finally {
-                inst.RemoveDocument(pathToFile);
-            }
+            var edits = Formatter.GetEditsForRange(
+                buffer.CurrentSnapshot.GetText(),
+                start,
+                end,
+                options ?? new FormattingOptions()
+            );
+            EditFilter.ApplyEdits(buffer, edits);
+            Assert.AreEqual(expected, buffer.CurrentSnapshot.GetText());
         }
     }
 }

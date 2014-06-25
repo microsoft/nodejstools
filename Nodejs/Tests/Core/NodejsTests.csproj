@@ -179,11 +179,6 @@
     <None Include="packages.config" />
   </ItemGroup>
   <ItemGroup>
-    <EmbeddedResource Include="..\..\Product\Nodejs\Formatting\typescriptServices.js">
-      <Link>typescriptServices.js</Link>
-    </EmbeddedResource>
-  </ItemGroup>
-  <ItemGroup>
     <EmbeddedResource Include="ruleFormattingTests.json" />
   </ItemGroup>
   <Import Project="..\TestProjectAfter.settings" />

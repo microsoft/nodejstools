@@ -53,6 +53,14 @@ namespace Microsoft.NodejsTools.Parsing
         {
         }
 
+        /// <summary>
+        /// Gets the index where the switch block starts
+        /// </summary>
+        public int BlockStart {
+            get;
+            set;
+        }
+
         public override void Walk(AstVisitor visitor) {
             if (visitor.Walk(this)) {
                 Expression.Walk(visitor);

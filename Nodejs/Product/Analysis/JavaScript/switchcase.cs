@@ -53,6 +53,11 @@ namespace Microsoft.NodejsTools.Parsing
             get { return (CaseValue == null); }
         }
 
+        public int ColonIndex {
+            get;
+            set;
+        }
+
         public SwitchCase(IndexSpan span)
             : base(span)
         {

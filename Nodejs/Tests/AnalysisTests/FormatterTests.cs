@@ -1,0 +1,1751 @@
+﻿/* ****************************************************************************
+ *
+ * Copyright (c) Microsoft Corporation. 
+ *
+ * This source code is subject to terms and conditions of the Apache License, Version 2.0. A 
+ * copy of the license can be found in the License.html file at the root of this distribution. If 
+ * you cannot locate the Apache License, Version 2.0, please send an email to 
+ * vspython@microsoft.com. By using this source code in any fashion, you are agreeing to be bound 
+ * by the terms of the Apache License, Version 2.0.
+ *
+ * You must not remove this notice, or any other, from this software.
+ *
+ * ***************************************************************************/
+
+using System;
+using System.IO;
+using System.Text;
+using Microsoft.NodejsTools.Formatting;
+using Microsoft.NodejsTools.Parsing;
+using Microsoft.VisualStudio.TestTools.UnitTesting;
+
+namespace AnalysisTests {
+    [TestClass]
+    public class FormatterTests {
+#if FALSE
+        [TestMethod, Priority(0)]
+        public void ReformatDirectory() {
+            ReformatDirectory("C:\\Source\\Express\\node_modules\\", "C:\\Source\\Express\\formatted\\");
+        }
+
+        private void ReformatDirectory(string inp, string output) {
+            FormattingOptions options = new FormattingOptions() { SpacesPerIndent = 2, SpaceAfterFunctionInAnonymousFunctions = false };
+            foreach (var file in Directory.GetFiles(inp, "*.js", SearchOption.AllDirectories)) {
+                var newCode = FormatCode(File.ReadAllText(file), options);
+                var outFile = Path.Combine(output, file.Substring(inp.Length));
+                Directory.CreateDirectory(Path.GetDirectoryName(outFile));
+
+                File.WriteAllText(outFile, newCode);
+            }
+        }
+#endif
+
+        [TestMethod, Priority(0)]
+        public void TestAnonymousFunction() {
+            TestCode(
+@"a('hello', 15, function(err, res) {
+console.log(err);
+  b(res, 55, function(err, res2) {
+console.log(err);
+  });
+});",
+    @"a('hello', 15, function (err, res) {
+  console.log(err);
+  b(res, 55, function (err, res2) {
+    console.log(err);
+  });
+});", new FormattingOptions() { SpacesPerIndent = 2 });
+
+        }
+
+        [TestMethod, Priority(0)]
+        public void TestFormatAfterInvalidKey() {
+            Assert.AreEqual(0, Formatter.GetEditsAfterKeystroke("function f  () { }", 0, ':').Length);
+        }
+
+        [TestMethod, Priority(0)]
+        public void TestFormatAfterSemiColon() {
+            string surroundingCode = "x=1";
+            var testCode = new[] { 
+                new { Before = "function f() {    \r\n    return   42;\r\n}", After = "function f() {    \r\n    return 42;\r\n}" },
+                new { Before = "function f() {    \r\n    return   42 ;\r\n}", After = "function f() {    \r\n    return 42;\r\n}" },
+                new { Before = "function f() {    \r\n    return   ;\r\n}", After = "function f() {    \r\n    return;\r\n}" },
+                new { Before = "throw   42;", After = "throw 42;" },
+                new { Before = "throw ;", After = "throw;" },
+                new { Before = "x=42;", After = "x = 42;" },
+                new { Before = "x=42;", After = "x = 42;" },
+                new { Before = "debugger ;", After = "debugger;" },
+                new { Before = "while (true) {    \r\n    break ;\r\n}", After = "while (true) {    \r\n    break;\r\n}" },
+                new { Before = "while (true) {    \r\n    continue ;\r\n}", After = "while (true) {    \r\n    continue;\r\n}" },
+                new { Before = "var x=1,y=2;", After = "var x = 1, y = 2;" },
+            };
+
+            foreach (var test in testCode) {
+                Console.WriteLine(test.Before);
+                string code = surroundingCode + "\r\n" + test.Before + "\r\n" + surroundingCode;
+                string expected = surroundingCode + "\r\n" + test.After + "\r\n" + surroundingCode;
+                TestCode(
+                    code.IndexOf(';') + 1,
+                    ';',
+                    code,
+                    expected
+                );
+            }
+        }
+
+        [TestMethod, Priority(0)]
+        public void TestMember() {
+            TestCode(" a.b", "a.b");
+            TestCode("a .b", "a.b");
+            TestCode("a. b", "a.b");
+            TestCode(" a . b", "a.b");
+        }
+
+        [TestMethod, Priority(0)]
+        public void TestCall() {
+            TestCode("a()", "a()");
+            TestCode("a ()", "a()");
+            TestCode("a( b)", "a(b)");
+            TestCode("a(b )", "a(b)");
+            TestCode("a( b )", "a(b)");
+            TestCode("a(b,c)", "a(b, c)");
+            TestCode("a(b,  c)", "a(b, c)");
+            TestCode("a(b, c )", "a(b, c)");
+        }
+
+        [TestMethod, Priority(0)]
+        public void TestUnaryOperator() {
+            TestCode("typeof  x", "typeof x");
+            TestCode("delete  x", "delete x");
+            TestCode("void  x", "void x");
+            TestCode("++ x", "++x");
+        }
+
+        [TestMethod, Priority(0)]
+        public void TestEmpty() {
+            TestCode("if (true);", "if (true);");
+            TestCode("if (true) ;", "if (true);");
+        }
+
+        [TestMethod, Priority(0)]
+        public void TestNew() {
+            TestCode("var x = new  Blah();", "var x = new Blah();");
+
+        }
+
+        [TestMethod, Priority(0)]
+        public void TestFormatRange() {
+            string surroundingCode = "x=1";
+            var testCode = new[] { 
+                new { Before = "function f() {    \r\n    return   42;\r\n}", After = "function f() {\r\n    return 42;\r\n}" },
+                new { Before = "throw   42;", After = "throw 42;" },
+                new { Before = "throw ;", After = "throw;" },
+                new { Before = "x=42;", After = "x = 42;" },
+                new { Before = "x=42;", After = "x = 42;" },
+                new { Before = "debugger ;", After = "debugger;" },
+                new { Before = "while (true) {    \r\n    break ;\r\n}", After = "while (true) {\r\n    break;\r\n}" },
+                new { Before = "while (true) {    \r\n    continue ;\r\n}", After = "while (true) {\r\n    continue;\r\n}" },
+                new { Before = "var x=1,y=2;", After = "var x = 1, y = 2;" },
+                new { Before = "var x=1,y=2 ;", After = "var x = 1, y = 2;" },
+            };
+
+            foreach (var test in testCode) {
+                Console.WriteLine(test.Before);
+                string code = surroundingCode + "\r\n" + test.Before + "\r\n" + surroundingCode;
+                string expected = surroundingCode + "\r\n" + test.After + "\r\n" + surroundingCode;
+
+                // also check range
+                TestCode(
+                    surroundingCode.Length,
+                    code.Length - surroundingCode.Length,
+                    code,
+                    expected
+                );
+            }
+        }
+
+        [TestMethod, Priority(0)]
+        public void TestFormatAfterCloseBrace() {
+            string surroundingCode = "x=1";
+            var testCode = new[] { 
+                new { Before = "while(true) {\r\nblah\r\n!", After = "while (true) {\r\n    blah\r\n}" },
+                new { Before = "with(true) {\r\nblah\r\n!", After = "with (true) {\r\n    blah\r\n}" },
+                new { Before = "for(var i=0;i<10;i++) {\r\nblah\r\n!", After = "for (var i = 0; i < 10; i++) {\r\n    blah\r\n}" },
+                new { Before = "for(var x  in  []) {\r\nblah\r\n!", After = "for (var x in []) {\r\n    blah\r\n}" },
+                new { Before = "{\r\nblah\r\n!", After = "{\r\n    blah\r\n}" },
+                new { Before = "switch(abc){\r\ncase 42: return null;\r\n!", After = "switch (abc) {\r\n    case 42: return null;\r\n}" },
+                new { Before = "try {\r\nabc\r\n!", After = "try {\r\n    abc\r\n}" },
+                new { Before = "try {\r\nabc\r\n}catch(abc){\r\nabc\r\n!", After = "try {\r\n    abc\r\n} catch (abc) {\r\n    abc\r\n}" },
+                new { Before = "try {\r\nabc\r\n}finally{\r\nabc\r\n!", After = "try {\r\n    abc\r\n} finally {\r\n    abc\r\n}" },
+            };
+
+            foreach (var test in testCode) {
+                Console.WriteLine(test.Before);
+                string indexCode = surroundingCode + "\r\n" + test.Before + "\r\n" + surroundingCode;
+                string code = surroundingCode + "\r\n" + test.Before.Replace('!', '}') + "\r\n" + surroundingCode;
+                string expected = surroundingCode + "\r\n" + test.After + "\r\n" + surroundingCode;
+                TestCode(
+                    indexCode.IndexOf('!') + 1,
+                    '}',
+                    code,
+                    expected
+                );
+            }
+        }
+
+        [TestMethod, Priority(0)]
+        public void TestLabeledStatement() {
+            TestCode(@"foo: {
+    42;
+}",
+ @"foo: {
+    42;
+}");
+
+        }
+
+        [TestMethod, Priority(0)]
+        public void TestContinue() {
+            TestCode(
+@"while (true) {
+    continue
+}",
+@"while (true) {
+    continue
+}"
+);
+
+            TestCode(
+@"while (true) {
+    continue  
+}",
+@"while (true) {
+    continue
+}"
+);
+            TestCode(
+@"while (true) {
+label:
+    while (true) {
+        continue   label
+    }
+}",
+@"while (true) {
+    label:
+        while (true) {
+            continue label
+        }
+}"
+);
+        }
+
+        [TestMethod, Priority(0)]
+        public void TestBlock() {
+            TestCode("{\nvar b;\n}",
+@"{
+    var b;
+}"
+);
+
+            TestCode("{\rvar b;\r}",
+@"{
+    var b;
+}"
+);
+
+            TestCode(
+@"{ var b;
+}",
+@"{
+    var b;
+}"
+);
+        }
+
+        [TestMethod, Priority(0)]
+        public void TestBreak() {
+            TestCode(
+@"while (true) {
+    break
+}",
+@"while (true) {
+    break
+}"
+);
+
+            TestCode(
+@"while (true) {
+    break  
+}",
+@"while (true) {
+    break
+}"
+);
+            TestCode(
+@"while (true) {
+    break}",
+@"while (true) {
+    break
+}"
+);
+
+            TestCode(
+@"while (true) {
+label:
+    while (true) {
+        break   label
+    }
+}",
+@"while (true) {
+    label:
+        while (true) {
+            break label
+        }
+}"
+);
+        }
+
+        [TestMethod, Priority(0)]
+        public void TestFunction() {
+            TestCode(
+@"function f () {
+}",
+@"function f() {
+}");
+        }
+
+        [TestMethod, Priority(0)]
+        public void TestReturn() {
+            TestCode(
+@"function f() {
+    return
+}",
+@"function f() {
+    return
+}"
+);
+
+            TestCode(
+@"function f() {
+    return  
+}",
+@"function f() {
+    return
+}"
+);
+            TestCode(
+@"function f() {
+    return   42
+}",
+@"function f() {
+    return 42
+}"
+);
+
+            TestCode(
+@"function f() {
+    return   42;
+}",
+@"function f() {
+    return 42;
+}"
+);
+        }
+
+        [TestMethod, Priority(0)]
+        public void TestThrow() {
+            TestCode(
+@"function f() {
+    throw
+}",
+@"function f() {
+    throw
+}"
+);
+
+            TestCode(
+@"function f() {
+    throw  
+}",
+@"function f() {
+    throw
+}"
+);
+            TestCode(
+@"function f() {
+    throw   42
+}",
+@"function f() {
+    throw 42
+}"
+);
+
+            TestCode(
+@"function f() {
+    throw   42;
+}",
+@"function f() {
+    throw 42;
+}"
+);
+        }
+
+        [TestMethod, Priority(0)]
+        public void TestObjectLiteral() {
+            TestCode(
+@"x = { get   foo() { }, set   foo(value) { } }",
+@"x = { get foo() { }, set foo(value) { } }"
+);
+
+
+            TestCode(
+@"x = {  }",
+@"x = {}"
+);
+
+            TestCode(
+@"x = {
+}",
+@"x = {
+}"
+);
+
+            TestCode(
+@"x = {
+a: 42,
+b: 100}",
+@"x = {
+    a: 42,
+    b: 100
+}"
+            );
+
+            TestCode(
+@"x = {
+a: 42, b: 100,
+c: 42, d: 100}",
+@"x = {
+    a: 42, b: 100,
+    c: 42, d: 100
+}"
+            );
+            TestCode(
+@"x = {a:42, b:100}",
+@"x = { a: 42, b: 100 }"
+            );
+
+        }
+
+        [TestMethod, Priority(0)]
+        public void TestDoWhile() {
+            TestCode(@"do
+    { var a
+}   while (1)",
+              @"do {
+    var a
+} while (1)");
+
+
+        }
+
+        [TestMethod, Priority(0)]
+        public void TestControlFlowBraceCombo() {
+            var options = new FormattingOptions() { OpenBracesOnNewLineForControl = false, SpaceAfterKeywordsInControlFlowStatements = false };
+
+            TestCode(
+@"do {
+} while (true);",
+@"do {
+} while (true);",
+                options
+            );
+
+            TestCode(
+@"try {
+} finally {
+}",
+@"try {
+} finally {
+}",
+                options
+            );
+        }
+
+        [TestMethod, Priority(0)]
+        public void TestSpaceAfterOpeningAndBeforeClosingNonEmptyParenthesis() {
+            var options = new FormattingOptions() { SpaceAfterOpeningAndBeforeClosingNonEmptyParenthesis = true };
+
+            TestCode(
+@"for (var x in abc) {
+}",
+@"for ( var x in abc ) {
+}",
+                options
+            );
+
+
+            TestCode(
+@"for (var i = 0; i < 10; i++) {
+}",
+@"for ( var i = 0; i < 10; i++ ) {
+}",
+                options
+            );
+
+            TestCode(
+@"if (true) {
+}",
+@"if ( true ) {
+}",
+                options
+            );
+
+            TestCode(
+@"while (true) {
+}",
+@"while ( true ) {
+}",
+                options
+            );
+
+            TestCode(
+@"do {
+} while (true);",
+@"do {
+} while ( true );",
+                options
+            );
+
+            TestCode(
+@"try {
+} catch (foo) {
+}",
+@"try {
+} catch ( foo ) {
+}",
+                options
+            );
+
+            TestCode(
+@"function () {
+}",
+@"function () {
+}",
+                options
+            );
+
+            TestCode(
+@"function (  ) {
+}",
+@"function () {
+}",
+                options
+            );
+
+            TestCode(
+@"function (a) {
+}",
+@"function ( a ) {
+}",
+                options
+            );
+
+            TestCode(
+@"function (a, b) {
+}",
+@"function ( a, b ) {
+}",
+        options
+    );
+
+            TestCode(
+@"(a)",
+@"( a )",
+        options
+    );
+
+            TestCode(
+@"f(a)",
+@"f( a )",
+        options
+    );
+
+            TestCode(
+@"f(a, b)",
+@"f( a, b )",
+        options
+    );
+
+            TestCode(
+@"new f(a)",
+@"new f( a )",
+       options
+   );
+
+            TestCode(
+@"new f(a, b)",
+@"new f( a, b )",
+        options
+    );
+
+            TestCode(
+@"f[a]",
+@"f[a]",
+        options
+    );
+
+            TestCode(
+@"f[a, b]",
+@"f[a, b]",
+        options
+    );
+
+            TestCode(
+@"switch (abc) {
+    case 42: break;
+}",
+@"switch ( abc ) {
+    case 42: break;
+}",
+        options
+    );
+
+            TestCode(
+@"(x)",
+@"( x )",
+        options
+    );
+        }
+
+        [TestMethod, Priority(0)]
+        public void TestSpaceAfterOpeningAndBeforeClosingNonEmptyParenthesis2() {
+            var options = new FormattingOptions() { SpaceAfterOpeningAndBeforeClosingNonEmptyParenthesis = false };
+
+            TestCode(
+@"for ( var x in abc ) {
+}",
+@"for (var x in abc) {
+}",
+                options
+            );
+
+
+            TestCode(
+@"for ( var i = 0; i < 10; i++ ) {
+}",
+@"for (var i = 0; i < 10; i++) {
+}",
+                options
+            );
+
+            TestCode(
+@"if ( true ) {
+}",
+@"if (true) {
+}",
+                options
+            );
+
+            TestCode(
+@"while ( true ) {
+}",
+@"while (true) {
+}",
+                options
+            );
+
+            TestCode(
+@"do {
+} while ( true );",
+@"do {
+} while (true);",
+                options
+            );
+
+            TestCode(
+@"try {
+} catch ( foo ) {
+}",
+@"try {
+} catch (foo) {
+}",
+                options
+            );
+
+            TestCode(
+@"function () {
+}",
+@"function () {
+}",
+                options
+            );
+
+
+            TestCode(
+@"function ( a ) {
+}",
+@"function (a) {
+}",
+                options
+            );
+
+            TestCode(
+@"function ( a, b ) {
+}",
+@"function (a, b) {
+}",
+        options
+    );
+
+            TestCode(
+@"( a )",
+@"(a)",
+        options
+    );
+
+            TestCode(
+@"f( a )",
+@"f(a)",
+        options
+    );
+
+            TestCode(
+@"f( a, b )",
+@"f(a, b)",
+        options
+    );
+
+            TestCode(
+@"new f( a )",
+@"new f(a)",
+       options
+   );
+
+            TestCode(
+@"new f( a, b )",
+@"new f(a, b)",
+        options
+    );
+
+            TestCode(
+@"f[a]",
+@"f[a]",
+        options
+    );
+
+            TestCode(
+@"f[a, b]",
+@"f[a, b]",
+        options
+    );
+
+            TestCode(
+@"switch ( abc ) {
+    case 42: break;
+}",
+@"switch (abc) {
+    case 42: break;
+}",
+        options
+    );
+
+            TestCode(
+@"( x )",
+@"(x)",
+        options
+    );
+        }
+
+        [TestMethod, Priority(0)]
+        public void TestVariableDecl() {
+            TestCode(@"var i = 0, j = 1;", @"var i = 0, j = 1;");
+            TestCode(@"var i=0, j=1;", @"var i = 0, j = 1;");
+            TestCode(@"var    i   =   0    ,   j  =  1;", @"var i = 0, j = 1;");
+
+            TestCode(@"var i = 0, j = 1;", @"var i=0, j=1;", new FormattingOptions() { SpaceBeforeAndAfterBinaryOperator = false });
+        }
+
+        [TestMethod, Priority(0)]
+        public void TestLexcialDecl() {
+            TestCode(@"i=1", @"i = 1");
+        }
+
+        [TestMethod, Priority(0)]
+        public void TestForIn() {
+            TestCode(
+@"for(    var    x     in    abc) {
+}",
+@"for (var x in abc) {
+}");
+        }
+
+        [TestMethod, Priority(0)]
+        public void TestFor() {
+            var options = new FormattingOptions() { SpaceAfterSemiColonInFor = true };
+            TestCode(
+@"for (var i = 0;i < 10;i++) {
+}",
+@"for (var i = 0; i < 10; i++) {
+}",
+  options);
+
+            options = new FormattingOptions() { SpaceAfterSemiColonInFor = false };
+            TestCode(
+@"for (var i = 0; i < 10; i++) {
+}",
+@"for (var i = 0;i < 10;i++) {
+}",
+  options);
+        }
+
+        [TestMethod, Priority(0)]
+        public void TestSpaceAfterComma() {
+            var options = new FormattingOptions() { SpaceAfterComma = true };
+            TestCode(
+@"
+1,2,3
+x(1,2,3)
+function x(a,b,c) {
+}",
+@"
+1, 2, 3
+x(1, 2, 3)
+function x(a, b, c) {
+}",
+  options);
+
+            options = new FormattingOptions() { SpaceAfterComma = false };
+            TestCode(
+@"
+1, 2, 3
+x(1, 2, 3)
+function x(a, b, c) {
+}",
+@"
+1,2,3
+x(1,2,3)
+function x(a,b,c) {
+}",
+                options);
+        }
+
+        [TestMethod, Priority(0)]
+        public void TestSpaceAfterFunctionInAnonymousFunctions() {
+            var options = new FormattingOptions() { SpaceAfterFunctionInAnonymousFunctions = true };
+            TestCode(
+@"
+x = function() {
+}",
+@"
+x = function () {
+}",
+  options);
+
+            options = new FormattingOptions() { SpaceAfterFunctionInAnonymousFunctions = false };
+            TestCode(
+@"
+x = function () {
+}",
+@"
+x = function() {
+}",
+
+                options);
+        }
+        
+        [TestMethod, Priority(0)]
+        public void TestNestedSwitch() {
+TestCode("switch (a){\r\n    case 1: x += 2;\r\n case   2  : \r\n     for (var i=0;i<10;i++)\r\ni  --;\r\n}\r\n",
+@"switch (a) {
+    case 1: x += 2;
+    case 2:
+        for (var i = 0; i < 10; i++)
+            i--;
+}
+");
+        }
+
+        [TestMethod, Priority(0)]
+        public void TestNestedIfs() {
+            TestCode(@"if(1)if(1)if(1)if(1) {
+    x += 2
+}",
+@"if (1) if (1) if (1) if (1) {
+    x += 2
+}");
+
+            TestCode(@"if(1)if(1)if(1)if(1) {x += 2
+}",
+@"if (1) if (1) if (1) if (1) {
+    x += 2
+}");
+        }
+
+        [TestMethod, Priority(0)]
+        public void TestSwitch() {
+            TestCode("switch (a){\r\ncase   1   :   x+=2 ;    break;\r\n    case 2:{\r\n    }\r\n}\r\n",
+                     "switch (a) {\r\n    case 1: x += 2; break;\r\n    case 2: {\r\n    }\r\n}\r\n");
+
+            TestCode(
+    "switch (x)\r\n     { case 1:   { var a }\r\n}",
+    "switch (x) {\r\n    case 1: { var a }\r\n}"
+);
+
+            TestCode(@"switch(abc) {
+    case 1:   x;
+break;
+}",
+@"switch (abc) {
+    case 1: x;
+        break;
+}");
+
+            TestCode(@"switch(abc) {
+    case 1:   x;   y;
+break;
+}",
+@"switch (abc) {
+    case 1: x; y;
+        break;
+}");
+
+            TestCode(@"switch(abc) {
+    case 1:   x;   y;
+z;   zz;
+break;
+}",
+@"switch (abc) {
+    case 1: x; y;
+        z; zz;
+        break;
+}");
+
+            TestCode(
+@"switch(abc) {
+    case 42: break;
+}",
+@"switch (abc) {
+    case 42: break;
+}"
+    );
+
+            TestCode(
+@"switch(abc) {
+case 42: break;
+}",
+@"switch (abc) {
+    case 42: break;
+}"
+    );
+
+            TestCode(@"switch(abc) {
+    case 1:
+x
+break;
+}",
+@"switch (abc) {
+    case 1:
+        x
+        break;
+}");
+
+            
+        }
+
+        [TestMethod, Priority(0)]
+        public void TestNewLineBracesForFunctions() {
+            var options = new FormattingOptions() { OpenBracesOnNewLineForFunctions = true };
+
+            TestCode(
+@"function x() {
+}",
+@"function x()
+{
+}",
+               options);
+
+            options = new FormattingOptions() { OpenBracesOnNewLineForFunctions = false };
+            TestCode(
+@"function x()
+{
+}",
+@"function x() {
+}",
+               options);
+        }
+
+        [TestMethod, Priority(0)]
+        public void TestInsertTabs() {
+            var options = new FormattingOptions() { SpacesPerIndent = null };
+            TestCode(
+@"switch (abc) {
+    case 42: break;
+}",
+"switch (abc) {\r\n\tcase 42: break;\r\n}",
+                options
+            );
+
+            TestCode(
+                "switch (abc) {\r\n\tcase 42: break;\r\n}",
+                "switch (abc) {\r\n\tcase 42: break;\r\n}",
+                options
+            );
+
+            TestCode(
+@"switch (abc) {
+  case 42: break;
+}",
+"switch (abc) {\r\n\tcase 42: break;\r\n}",
+                options
+            );
+        }
+
+        [TestMethod, Priority(0)]
+        public void TestComments() {
+            // comments in weird spots can result in some slightly odd 
+            // insertions or missing insertions.  These aren't set in stone
+            // necessarily but these test cases make sure we're not doing
+            // anything particularly horrible.  The current behavior is
+            // mostly driven by whether or not we're scanning forwards or
+            // backwards to replace a particular piece of white space.
+            var options = new FormattingOptions() { SpaceAfterOpeningAndBeforeClosingNonEmptyParenthesis = true };
+            TestCode(
+@"if (/*comment*/true/*comment*/) {
+}",
+@"if (/*comment*/true /*comment*/) {
+}",
+  options);
+
+            TestCode(
+@"switch (abc) /*comment*/ {
+    case 'abc': break;
+}",
+@"switch (abc) /*comment*/ {
+    case 'abc': break;
+}");
+
+            TestCode(
+@"switch (abc) /*comment*/
+{
+    case 'abc': break;
+}",
+@"switch (abc) /*comment*/ {
+    case 'abc': break;
+}");
+
+            TestCode(
+@"var x = 1, /* comment */
+    y = 2;",
+@"var x = 1, /* comment */
+    y = 2;"
+);
+
+            TestCode(
+@"var x = 1, /* comment */y = 2;",
+@"var x = 1, /* comment */ y = 2;"
+);
+
+            TestCode(
+@"x = a/*comment*/+/*comment*/b;",
+@"x = a /*comment*/+/*comment*/ b;"
+);
+
+            TestCode(
+@"x = a/*comment*/+/*comment*/
+      b;",
+@"x = a /*comment*/+/*comment*/
+      b;"
+);
+
+            TestCode(
+@"x = a/*comment*/+
+      /*comment*/b;",
+@"x = a /*comment*/+
+      /*comment*/ b;"
+);
+        }
+
+        [TestMethod, Priority(0)]
+        public void TestSingleLineComments() {
+            TestCode(
+@"var x = {'abc':42,
+         'bar':100 // foo
+}",
+@"var x = {
+    'abc': 42,
+    'bar': 100 // foo
+}");
+
+            TestCode(@"if(true)
+// test
+test;", 
+@"if (true)
+    // test
+    test;");
+
+            TestCode(@"var x=function () {
+//comment
+return 1;
+}", @"var x = function () {
+    //comment
+    return 1;
+}");
+
+            TestCode(
+@"if(foo) // bar
+    abc",
+@"if (foo) // bar
+    abc");
+
+            TestCode(
+@"switch (foo) // foo
+{
+}",
+@"switch (foo) // foo
+{
+}");
+
+            TestCode(
+@"if (foo) // foo
+{
+}",
+@"if (foo) // foo
+{
+}");
+
+            TestCode(
+@"if(foo) /*bar*/ // foo
+{
+}",
+@"if (foo) /*bar*/ // foo
+{
+}");
+
+            TestCode(
+@"if(foo/*comment*/) // foo
+{
+}",
+@"if (foo/*comment*/) // foo
+{
+}");
+
+            
+
+            TestCode(
+@"if(foo) // foo
+{
+} else // bar
+{
+}",
+@"if (foo) // foo
+{
+} else // bar
+{
+}");
+
+            TestCode(
+@"if(foo)
+{
+} else // bar
+{
+}",
+@"if (foo) {
+} else // bar
+{
+}");
+
+            TestCode(
+@"var x = {'abc':42,
+         'ba':100, // foo
+         'quox':99
+}",
+@"var x = {
+    'abc': 42,
+    'ba': 100, // foo
+    'quox': 99
+}");
+
+            TestCode(
+@"for(var x in []) // abc
+{
+}",
+@"for (var x in []) // abc
+{
+}");
+
+            TestCode(
+@"try {
+} catch(abc) // comment
+{
+}",
+@"try {
+} catch (abc) // comment
+{
+}");
+
+            TestCode(
+@"try {
+} finally // comment
+{
+}",
+@"try {
+} finally // comment
+{
+}");
+
+            TestCode(
+@"while(foo) // comment
+{
+}",
+@"while (foo) // comment
+{
+}");
+
+            TestCode(
+@"with(foo) // comment
+{
+}",
+@"with (foo) // comment
+{
+}");
+
+            TestCode(
+@"for(var i = 0; i < 10; i++) // comment
+{
+}",
+@"for (var i = 0; i < 10; i++) // comment
+{
+}");
+
+            TestCode(
+@"for(; ;) // comment
+{
+}",
+@"for (; ;) // comment
+{
+}");
+
+            TestCode(
+@"function f() // comment
+{
+}",
+@"function f() // comment
+{
+}");
+        }
+
+        [TestMethod, Priority(0)]
+        public void TestInsertSpaces() {
+            var options = new FormattingOptions() { SpacesPerIndent = 2 };
+            TestCode(
+"switch (abc) {\r\n\tcase 42: break;\r\n}",
+"switch (abc) {\r\n  case 42: break;\r\n}",
+                options
+            );
+
+            TestCode(
+                "switch (abc) {\r\n\t\tcase 42: break;\r\n}", 
+                "switch (abc) {\r\n  case 42: break;\r\n}",
+                options
+            );
+
+            options = new FormattingOptions() { SpacesPerIndent = 6 };
+            TestCode(
+                "switch (abc) {\r\n\tcase 42: break;\r\n}", 
+                "switch (abc) {\r\n      case 42: break;\r\n}",
+                options
+            );
+
+            TestCode(
+                "switch (abc) {\r\n    case 42: break;\r\n}",
+                "switch (abc) {\r\n      case 42: break;\r\n}",
+                options
+            );
+        }
+
+        [TestMethod, Priority(0)]
+        public void TestNewLineBracesForFlowControl() {
+            var options = new FormattingOptions() { OpenBracesOnNewLineForControl = true };
+            TestCode(
+@"switch (abc) {
+    case 42: break;
+}",
+@"switch (abc)
+{
+    case 42: break;
+}",
+        options);
+
+            TestCode(
+@"do {
+} while(true);",
+@"do
+{
+} while(true);",
+               options);
+
+            TestCode(
+@"while (true) {
+}",
+@"while (true)
+{
+}",
+               options);
+
+            TestCode(
+@"with (true) {
+}",
+@"with (true)
+{
+}",
+               options);
+
+            TestCode(
+@"for (var i = 0; i < 10; i++) {
+}",
+@"for (var i = 0; i < 10; i++)
+{
+}",
+               options);
+
+            TestCode(
+@"for (var x in []) {
+}",
+@"for (var x in [])
+{
+}",
+                options);
+
+            TestCode(
+@"if (true) {
+}",
+@"if (true)
+{
+}",
+        options);
+
+            TestCode(
+@"if (true) {
+} else {
+}",
+@"if (true)
+{
+} else
+{
+}",
+        options);
+
+            TestCode(
+@"try {
+} finally {
+}",
+@"try
+{
+} finally
+{
+}",
+        options);
+
+            TestCode(
+@"try {
+} catch(abc) {
+}",
+@"try
+{
+} catch (abc)
+{
+}",
+        options);
+        }
+
+        [TestMethod, Priority(0)]
+        public void TestNewLineBracesForFlowControl2() {
+            var options = new FormattingOptions() { OpenBracesOnNewLineForControl = false };
+            TestCode(
+            @"switch (abc)
+{
+    case 42: break;
+}",
+            @"switch (abc) {
+    case 42: break;
+}",
+                    options);
+
+            TestCode(
+@"do
+{
+} while(true);",
+@"do {
+} while(true);",
+               options);
+
+            TestCode(
+@"while (true)
+{
+}",
+@"while (true) {
+}",
+               options);
+
+            TestCode(
+@"with (true)
+{
+}",
+@"with (true) {
+}",
+               options);
+
+            TestCode(
+@"for (var i = 0; i < 10; i++)
+{
+}",
+@"for (var i = 0; i < 10; i++) {
+}",
+               options);
+
+            TestCode(
+@"for (var x in [])
+{
+}",
+@"for (var x in []) {
+}",
+                options);
+
+            TestCode(
+@"if (true)
+{
+}",
+@"if (true) {
+}",
+        options);
+
+            TestCode(
+@"if (true)
+{
+} else
+{
+}",
+@"if (true) {
+} else {
+}",
+        options);
+
+            TestCode(
+@"try
+{
+} finally
+{
+}",
+@"try {
+} finally {
+}",
+        options);
+
+            TestCode(
+@"try
+{
+} catch(abc)
+{
+}",
+@"try {
+} catch (abc) {
+}",
+        options);
+        }
+
+        [TestMethod, Priority(0)]
+        public void TestNestedBlock() {
+            TestCode(
+@"do {
+if (true) {
+aa
+} else {
+bb
+}
+} while(true);",
+@"do {
+    if (true) {
+        aa
+    } else {
+        bb
+    }
+} while(true);");
+
+            TestCode(@"if(true) {
+    aa;  bb;
+    cc;  dd
+}",
+@"if (true) {
+    aa; bb;
+    cc; dd
+}");
+
+            TestCode(
+@"do {
+for (var i = 0; i < 10; i++) {
+}
+} while(true);",
+@"do {
+    for (var i = 0; i < 10; i++) {
+    }
+} while(true);");
+
+
+            TestCode(
+@"do {
+while (true) {
+}
+} while(true);",
+@"do {
+    while (true) {
+    }
+} while(true);");
+
+            TestCode(
+@"do {
+with (true) {
+}
+} while(true);",
+@"do {
+    with (true) {
+    }
+} while(true);");
+
+            TestCode(
+@"do {
+for (var x in []) {
+}
+} while(true);",
+@"do {
+    for (var x in []) {
+    }
+} while(true);");
+
+            TestCode(
+@"do {
+do {
+} while (true);
+} while(true);",
+@"do {
+    do {
+    } while (true);
+} while(true);");
+
+            TestCode(
+@"do {
+try {
+} finally {
+}
+} while(true);",
+@"do {
+    try {
+    } finally {
+    }
+} while(true);");
+
+            TestCode(
+@"do {
+try {
+} catch(arg) {
+}
+} while(true);",
+@"do {
+    try {
+    } catch (arg) {
+    }
+} while(true);");
+
+            TestCode(
+@"do {
+switch (abc) {
+case 42: break;
+}
+} while(true);",
+@"do {
+    switch (abc) {
+        case 42: break;
+    }
+} while(true);");
+        }
+
+        [TestMethod, Priority(0)]
+        public void TestSpacesAroundBinaryOperator() {
+            TestCode("x+y", "x + y", new FormattingOptions() { SpaceBeforeAndAfterBinaryOperator = true });
+            TestCode("x+y", "x+y", new FormattingOptions() { SpaceBeforeAndAfterBinaryOperator = false });
+            TestCode("x + y", "x + y", new FormattingOptions() { SpaceBeforeAndAfterBinaryOperator = true });
+            TestCode("x + y", "x+y", new FormattingOptions() { SpaceBeforeAndAfterBinaryOperator = false });
+            TestCode("x+y+z", "x + y + z", new FormattingOptions() { SpaceBeforeAndAfterBinaryOperator = true });
+            TestCode("x+y+z", "x+y+z", new FormattingOptions() { SpaceBeforeAndAfterBinaryOperator = false });
+            TestCode("x + y + z", "x + y + z", new FormattingOptions() { SpaceBeforeAndAfterBinaryOperator = true });
+            TestCode("x + y + z", "x+y+z", new FormattingOptions() { SpaceBeforeAndAfterBinaryOperator = false });
+        }
+
+        [TestMethod, Priority(0)]
+        public void TestSpaceAfterKeywordsInControlFlowStatements() {
+            TestCode(
+@"if(true) {
+}",
+@"if (true) {
+}", new FormattingOptions() { SpaceAfterKeywordsInControlFlowStatements = true });
+
+            TestCode(
+@"if(true) {
+}",
+@"if(true) {
+}", new FormattingOptions() { SpaceAfterKeywordsInControlFlowStatements = false });
+
+            TestCode(
+@"if (true) {
+}",
+@"if(true) {
+}", new FormattingOptions() { SpaceAfterKeywordsInControlFlowStatements = false });
+
+            TestCode(
+@"with(true) {
+}",
+@"with (true) {
+}", new FormattingOptions() { SpaceAfterKeywordsInControlFlowStatements = true });
+
+            TestCode(
+@"with(true) {
+}",
+@"with(true) {
+}", new FormattingOptions() { SpaceAfterKeywordsInControlFlowStatements = false });
+
+            TestCode(
+@"with (true) {
+}",
+@"with(true) {
+}", new FormattingOptions() { SpaceAfterKeywordsInControlFlowStatements = false });
+
+            TestCode(
+@"while(true) {
+}",
+@"while (true) {
+}", new FormattingOptions() { SpaceAfterKeywordsInControlFlowStatements = true });
+
+            TestCode(
+@"while(true) {
+}",
+@"while(true) {
+}", new FormattingOptions() { SpaceAfterKeywordsInControlFlowStatements = false });
+
+            TestCode(
+@"while (true) {
+}",
+@"while(true) {
+}", new FormattingOptions() { SpaceAfterKeywordsInControlFlowStatements = false });
+        }
+
+        [TestMethod, Priority(0)]
+        public void TestSimple() {
+            TestCode(
+@"do {
+x
+} while(true);",
+@"do {
+    x
+} while(true);");
+
+            TestCode(
+@"do {
+break
+} while(true);",
+@"do {
+    break
+} while(true);");
+
+            TestCode(
+@"do {
+continue
+} while(true);",
+@"do {
+    continue
+} while(true);");
+
+            TestCode(
+@"do {
+;
+} while(true);",
+@"do {
+    ;
+} while(true);");
+
+            TestCode(
+@"do {
+debugger
+} while(true);",
+@"do {
+    debugger
+} while(true);");
+
+            TestCode(
+@"do {
+var x = 100;
+} while(true);",
+@"do {
+    var x = 100;
+} while(true);");
+
+            TestCode(
+@"do {
+return 42;
+} while(true);",
+@"do {
+    return 42;
+} while(true);");
+
+            TestCode(
+@"do {
+throw null;
+} while(true);",
+@"do {
+    throw null;
+} while(true);");
+        }
+
+
+        private static void TestCode(string code, string expected, FormattingOptions options = null) {
+            Assert.AreEqual(expected, FormatCode(code, options));
+        }
+
+        private static void TestCode(int position, char ch, string code, string expected, FormattingOptions options = null) {
+            Assert.AreEqual(expected, FormatCode(code, position, ch, options));
+        }
+
+        private static void TestCode(int start, int end, string code, string expected, FormattingOptions options = null) {
+            Assert.AreEqual(expected, FormatCode(code, start, end, options));
+        }
+
+
+        private static string FormatCode(string code, FormattingOptions options) {
+            var ast = new JSParser(code).Parse(new CodeSettings());
+            var edits = Formatter.GetEditsForDocument(code, options);
+            return ApplyEdits(code, edits);
+        }
+
+        private static string FormatCode(string code, int position, char ch, FormattingOptions options) {
+            var ast = new JSParser(code).Parse(new CodeSettings());
+            var edits = Formatter.GetEditsAfterKeystroke(code, position, ch, options);
+            return ApplyEdits(code, edits);
+        }
+
+        private static string FormatCode(string code, int start, int end, FormattingOptions options) {
+            var ast = new JSParser(code).Parse(new CodeSettings());
+            var edits = Formatter.GetEditsForRange(code, start, end, options);
+            return ApplyEdits(code, edits);
+        }
+
+        private static string ApplyEdits(string code, Edit[] edits) {
+            StringBuilder newCode = new StringBuilder(code);
+            int delta = 0;
+            foreach (var edit in edits) {
+                newCode.Remove(edit.Start + delta, edit.Length);
+                newCode.Insert(edit.Start + delta, edit.Text);
+                delta -= edit.Length;
+                delta += edit.Text.Length;
+            }
+            return newCode.ToString();
+        }
+    }
+}

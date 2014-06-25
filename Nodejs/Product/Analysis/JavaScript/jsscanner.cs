@@ -1448,8 +1448,7 @@ namespace Microsoft.NodejsTools.Parsing
             }
         }
 
-        // this method is public because it's used from the authoring code
-        public void SkipMultilineComment()
+        private void SkipMultilineComment()
         {
             for (; ; )
             {

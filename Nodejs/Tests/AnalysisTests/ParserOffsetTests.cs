@@ -65,7 +65,7 @@ namespace AnalysisTests {
     continue;
 }",
                 new NodeInfo(typeof(Block), 0, 57),
-                new NodeInfo(typeof(ForNode), 0, 25),
+                new NodeInfo(typeof(ForNode), 0, 57),
                 new NodeInfo(typeof(Var), 4, 13),
                 new NodeInfo(typeof(VariableDeclaration), 8, 13),
                 new NodeInfo(typeof(ConstantWrapper), 12, 13),
@@ -73,8 +73,8 @@ namespace AnalysisTests {
                 new NodeInfo(typeof(Lookup), 15, 16),
                 new NodeInfo(typeof(ConstantWrapper), 17, 19),
                 new NodeInfo(typeof(Block), 26, 57),
-                new NodeInfo(typeof(Break), 33, 38),
-                new NodeInfo(typeof(ContinueNode), 45, 53),
+                new NodeInfo(typeof(Break), 33, 39),
+                new NodeInfo(typeof(ContinueNode), 45, 54),
                 new NodeInfo(typeof(UnaryOperator), 21, 24),
                 new NodeInfo(typeof(Lookup), 21, 22)
             );
@@ -155,7 +155,7 @@ namespace AnalysisTests {
         public void TestConstStatement() {
             TestOneSnippet("const x = 42;",
                 new NodeInfo(typeof(Block), 0, 13),
-                new NodeInfo(typeof(LexicalDeclaration), 0, 12),
+                new NodeInfo(typeof(LexicalDeclaration), 0, 13),
                 new NodeInfo(typeof(VariableDeclaration), 6, 12),
                 new NodeInfo(typeof(ConstantWrapper), 10, 12)
             );
@@ -165,7 +165,7 @@ namespace AnalysisTests {
         public void TestDebuggerStatement() {
             TestOneSnippet("debugger;",
                 new NodeInfo(typeof(Block), 0, 9),
-                new NodeInfo(typeof(DebuggerNode), 0, 8)
+                new NodeInfo(typeof(DebuggerNode), 0, 9)
             );
         }
 
@@ -240,7 +240,7 @@ namespace AnalysisTests {
             TestOneSnippet(@"function f(a, b, c) {
 }",
                 new NodeInfo(typeof(Block), 0, 24),
-                new NodeInfo(typeof(FunctionObject), 0, 24, 9, 10, 11),
+                new NodeInfo(typeof(FunctionObject), 0, 24, 9, 10, 19),
                 new NodeInfo(typeof(ParameterDeclaration), 11, 12),
                 new NodeInfo(typeof(ParameterDeclaration), 14, 15),
                 new NodeInfo(typeof(ParameterDeclaration), 17, 18),
@@ -256,9 +256,9 @@ namespace AnalysisTests {
                 new NodeInfo(typeof(BinaryOperator), 0, 23),
                 new NodeInfo(typeof(Lookup), 0, 1),
                 new NodeInfo(typeof(ObjectLiteral), 4, 23),
-                new NodeInfo(typeof(ObjectLiteralProperty), 9, 8),
-                new NodeInfo(typeof(GetterSetter), 9, 12),
-                new NodeInfo(typeof(FunctionExpression), 5, 8),
+                new NodeInfo(typeof(ObjectLiteralProperty), 5, 22),
+                new NodeInfo(typeof(GetterSetter), 5, 8),
+                new NodeInfo(typeof(FunctionExpression), 5, 22),
                 new NodeInfo(typeof(FunctionObject), 5, 22, 9, 13, 14),
                 new NodeInfo(typeof(Block), 16, 22),
                 new NodeInfo(typeof(ExpressionStatement), 18, 20),
@@ -270,10 +270,10 @@ namespace AnalysisTests {
                 new NodeInfo(typeof(BinaryOperator), 0, 25),
                 new NodeInfo(typeof(Lookup), 0, 1),
                 new NodeInfo(typeof(ObjectLiteral), 4, 25),
-                new NodeInfo(typeof(ObjectLiteralProperty), 9, 8),
-                new NodeInfo(typeof(GetterSetter), 9, 12),
-                new NodeInfo(typeof(FunctionExpression), 5, 8),
-                new NodeInfo(typeof(FunctionObject), 5, 24, 9, 13, 14),
+                new NodeInfo(typeof(ObjectLiteralProperty), 5, 24),
+                new NodeInfo(typeof(GetterSetter), 5, 8),
+                new NodeInfo(typeof(FunctionExpression), 5, 24),
+                new NodeInfo(typeof(FunctionObject), 5, 24, 9, 13, 20),
                 new NodeInfo(typeof(ParameterDeclaration), 14, 19),
                 new NodeInfo(typeof(Block), 21, 24)
             );
@@ -307,8 +307,8 @@ namespace AnalysisTests {
             TestOneSnippet(@"myLabel:
 console.log('hi');",
                 new NodeInfo(typeof(Block), 0, 28),
-                new NodeInfo(typeof(LabeledStatement), 0, 7),
-                new NodeInfo(typeof(ExpressionStatement), 10, 27),
+                new NodeInfo(typeof(LabeledStatement), 0, 28),
+                new NodeInfo(typeof(ExpressionStatement), 10, 28),
                 new NodeInfo(typeof(CallNode), 10, 27),
                 new NodeInfo(typeof(Member), 10, 21),
                 new NodeInfo(typeof(Lookup), 10, 17),
@@ -322,8 +322,8 @@ console.log('hi');",
 let x = 42;",
                 new NodeInfo(typeof(Block), 0, 26),
                 new NodeInfo(typeof(ExpressionStatement), 0, 12),
-                new NodeInfo(typeof(DirectivePrologue), 0, 12),
-                new NodeInfo(typeof(LexicalDeclaration), 15, 25),
+                new NodeInfo(typeof(DirectivePrologue), 0, 13),
+                new NodeInfo(typeof(LexicalDeclaration), 15, 26),
                 new NodeInfo(typeof(VariableDeclaration), 19, 25),
                 new NodeInfo(typeof(ConstantWrapper), 23, 25)
             );
@@ -335,7 +335,7 @@ let x = 42;",
                 new NodeInfo(typeof(Block), 0, 11),
                 new NodeInfo(typeof(ExpressionStatement), 0, 3),
                 new NodeInfo(typeof(Lookup), 0, 3),
-                new NodeInfo(typeof(ExpressionStatement), 4, 10),
+                new NodeInfo(typeof(ExpressionStatement), 4, 11),
                 new NodeInfo(typeof(BinaryOperator), 4, 10),
                 new NodeInfo(typeof(Lookup), 4, 5),
                 new NodeInfo(typeof(ConstantWrapper), 8, 10)
@@ -371,7 +371,7 @@ let x = 42;",
             TestOneSnippet(@"{abc:42, aaa:100}",
                 new NodeInfo(typeof(Block), 0, 17),
                 new NodeInfo(typeof(Block), 0, 17),
-                new NodeInfo(typeof(LabeledStatement), 1, 4),
+                new NodeInfo(typeof(LabeledStatement), 1, 12),
                 new NodeInfo(typeof(ExpressionStatement), 5, 12),
                 new NodeInfo(typeof(CommaOperator), 5, 12),
                 new NodeInfo(typeof(ConstantWrapper), 5, 7),
@@ -396,7 +396,7 @@ let x = 42;",
                 new NodeInfo(typeof(Block), 0, 33),
                 new NodeInfo(typeof(FunctionObject), 0, 33, 9, 10, 11),
                 new NodeInfo(typeof(Block), 13, 33),
-                new NodeInfo(typeof(ReturnNode), 20, 29),
+                new NodeInfo(typeof(ReturnNode), 20, 30),
                 new NodeInfo(typeof(ConstantWrapper), 27, 29)
             );
             TestOneSnippet(@"function f() {
@@ -405,7 +405,7 @@ let x = 42;",
                 new NodeInfo(typeof(Block), 0, 30),
                 new NodeInfo(typeof(FunctionObject), 0, 30, 9, 10, 11),
                 new NodeInfo(typeof(Block), 13, 30),
-                new NodeInfo(typeof(ReturnNode), 20, 26)
+                new NodeInfo(typeof(ReturnNode), 20, 27)
             );
         }
 
@@ -422,17 +422,17 @@ let x = 42;",
                 new NodeInfo(typeof(Block), 0, 109),
                 new NodeInfo(typeof(Switch), 0, 109),
                 new NodeInfo(typeof(Lookup), 7, 10),
-                new NodeInfo(typeof(SwitchCase), 19, 42),
+                new NodeInfo(typeof(SwitchCase), 19, 43),
                 new NodeInfo(typeof(ConstantWrapper), 24, 26),
-                new NodeInfo(typeof(Block), 37, 42),
-                new NodeInfo(typeof(Break), 37, 42),
-                new NodeInfo(typeof(SwitchCase), 49, 75),
+                new NodeInfo(typeof(Block), 37, 43),
+                new NodeInfo(typeof(Break), 37, 43),
+                new NodeInfo(typeof(SwitchCase), 49, 76),
                 new NodeInfo(typeof(ConstantWrapper), 54, 59),
-                new NodeInfo(typeof(Block), 70, 75),
-                new NodeInfo(typeof(Break), 70, 75),
-                new NodeInfo(typeof(SwitchCase), 82, 105),
-                new NodeInfo(typeof(Block), 100, 105),
-                new NodeInfo(typeof(Break), 100, 105)
+                new NodeInfo(typeof(Block), 70, 76),
+                new NodeInfo(typeof(Break), 70, 76),
+                new NodeInfo(typeof(SwitchCase), 82, 106),
+                new NodeInfo(typeof(Block), 100, 106),
+                new NodeInfo(typeof(Break), 100, 106)
             );
         }
 
@@ -440,7 +440,7 @@ let x = 42;",
         public void TestThis() {
             TestOneSnippet(@"var x = this.foo;",
                 new NodeInfo(typeof(Block), 0, 17),
-                new NodeInfo(typeof(Var), 0, 16),
+                new NodeInfo(typeof(Var), 0, 17),
                 new NodeInfo(typeof(VariableDeclaration), 4, 16),
                 new NodeInfo(typeof(Member), 8, 16),
                 new NodeInfo(typeof(ThisLiteral), 8, 12)
@@ -451,7 +451,7 @@ let x = 42;",
         public void TestThrow() {
             TestOneSnippet(@"throw 'error';",
                 new NodeInfo(typeof(Block), 0, 14),
-                new NodeInfo(typeof(ThrowNode), 0, 13),
+                new NodeInfo(typeof(ThrowNode), 0, 14),
                 new NodeInfo(typeof(ConstantWrapper), 6, 13)
             );
         }
@@ -509,7 +509,7 @@ let x = 42;",
         public void TestVariableDeclaration() {
             TestOneSnippet(@"var abc = 42, foo = 100;",
                 new NodeInfo(typeof(Block), 0, 24),
-                new NodeInfo(typeof(Var), 0, 23),
+                new NodeInfo(typeof(Var), 0, 24),
                 new NodeInfo(typeof(VariableDeclaration), 4, 12),
                 new NodeInfo(typeof(ConstantWrapper), 10, 12),
                 new NodeInfo(typeof(VariableDeclaration), 14, 23),
@@ -531,10 +531,10 @@ let x = 42;",
         public void TestWhileNode() {
             TestOneSnippet(@"while(foo) { hi; }",
                 new NodeInfo(typeof(Block), 0, 18),
-                new NodeInfo(typeof(WhileNode), 0, 10),
+                new NodeInfo(typeof(WhileNode), 0, 18),
                 new NodeInfo(typeof(Lookup), 6, 9),
                 new NodeInfo(typeof(Block), 11, 18),
-                new NodeInfo(typeof(ExpressionStatement), 13, 15),
+                new NodeInfo(typeof(ExpressionStatement), 13, 16),
                 new NodeInfo(typeof(Lookup), 13, 15)
             );
         }
@@ -543,10 +543,10 @@ let x = 42;",
         public void TestWithNode() {
             TestOneSnippet(@"with(foo) { hi; }",
                 new NodeInfo(typeof(Block), 0, 17),
-                new NodeInfo(typeof(WithNode), 0, 9),
+                new NodeInfo(typeof(WithNode), 0, 17),
                 new NodeInfo(typeof(Lookup), 5, 8),
                 new NodeInfo(typeof(Block), 10, 17),
-                new NodeInfo(typeof(ExpressionStatement), 12, 14),
+                new NodeInfo(typeof(ExpressionStatement), 12, 15),
                 new NodeInfo(typeof(Lookup), 12, 14)
             );
         }
@@ -555,10 +555,10 @@ let x = 42;",
         public void TestFunctionExpression() {
             TestOneSnippet(@"x = function() { }",
                 new NodeInfo(typeof(Block), 0, 18),
-                new NodeInfo(typeof(ExpressionStatement), 0, 12),
-                new NodeInfo(typeof(BinaryOperator), 0, 12),
+                new NodeInfo(typeof(ExpressionStatement), 0, 18),
+                new NodeInfo(typeof(BinaryOperator), 0, 18),
                 new NodeInfo(typeof(Lookup), 0, 1),
-                new NodeInfo(typeof(FunctionExpression), 4, 12),
+                new NodeInfo(typeof(FunctionExpression), 4, 18),
                 new NodeInfo(typeof(FunctionObject), 4, 18, 0, 12, 13),
                 new NodeInfo(typeof(Block), 15, 18)
             );
@@ -568,10 +568,10 @@ let x = 42;",
         public void TestFunctionExpressionWithName() {
             TestOneSnippet(@"x = function name() { }",
                 new NodeInfo(typeof(Block), 0, 23),
-                new NodeInfo(typeof(ExpressionStatement), 0, 12),
-                new NodeInfo(typeof(BinaryOperator), 0, 12),
+                new NodeInfo(typeof(ExpressionStatement), 0, 23),
+                new NodeInfo(typeof(BinaryOperator), 0, 23),
                 new NodeInfo(typeof(Lookup), 0, 1),
-                new NodeInfo(typeof(FunctionExpression), 4, 12),
+                new NodeInfo(typeof(FunctionExpression), 4, 23),
                 new NodeInfo(typeof(FunctionObject), 4, 23, 13, 17, 18),
                 new NodeInfo(typeof(Block), 20, 23)
             );

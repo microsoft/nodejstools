@@ -15,6 +15,7 @@
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
+using System.Threading.Tasks;
 using System.Windows;
 using Microsoft.NodejsTools.Analysis;
 using Microsoft.NodejsTools.Formatting;
@@ -59,19 +60,6 @@ namespace Microsoft.NodejsTools {
             _incSearch = _compModel.GetService<IIncrementalSearchFactoryService>().GetIncrementalSearch(_textView);
             _broker = _compModel.GetService<ICompletionBroker>();
             _editorOptions = editorOptions;
-            textView.Closed += TextViewClosed;
-            string path = GetFilePath();
-            if (path != null) {
-                System.Diagnostics.Debug.Assert(JavaScriptFormattingService.Instance != null);
-                JavaScriptFormattingService.Instance.AddDocument(path, textView.TextBuffer);
-            }
-        }
-
-        private void TextViewClosed(object sender, EventArgs e) {
-            string path = GetFilePath();
-            if (path != null) {
-                JavaScriptFormattingService.Instance.RemoveDocument(path);
-            }
         }
 
         private bool ShouldTriggerRequireIntellisense() {
@@ -113,7 +101,7 @@ namespace Microsoft.NodejsTools {
                             ((ICompletionSession)_intellisenseStack.TopSession).Commit();
                         } else {
                             hr = _next.Exec(ref pguidCmdGroup, nCmdID, nCmdexecopt, pvaIn, pvaOut);
-                            FormatAfterTyping('\n');
+                            FormatOnEnter();
                             return hr;
                         }
                         return VSConstants.S_OK;
@@ -124,7 +112,7 @@ namespace Microsoft.NodejsTools {
 
                             switch(ch) {
                                 case '}':
-                                case ':':
+                                case ';':
                                     FormatAfterTyping(ch);
                                     break;
                             }
@@ -689,36 +677,37 @@ namespace Microsoft.NodejsTools {
 
         #region Formatting support
 
-        private FormatCodeOptions CreateFormatOptions() {
-            FormatCodeOptions res = new FormatCodeOptions();
-            res.TabSize = _editorOptions.GetTabSize();
-            res.IndentSize = _editorOptions.GetIndentSize();
-            res.ConvertTabsToSpaces = _editorOptions.IsConvertTabsToSpacesEnabled();
-            res.NewLineCharacter = _editorOptions.GetNewLineCharacter();
+        private FormattingOptions CreateFormattingOptions() {
+            FormattingOptions res = new FormattingOptions();
+            if (_editorOptions.IsConvertTabsToSpacesEnabled()) {
+                res.SpacesPerIndent = _editorOptions.GetIndentSize();
+            } else {
+                res.SpacesPerIndent = null;
+            }
+            res.NewLine = _editorOptions.GetNewLineCharacter();
 
-            res.InsertSpaceAfterCommaDelimiter = NodejsPackage.Instance.FormattingSpacingOptionsPage.SpaceAfterComma;
-            res.InsertSpaceAfterSemicolonInForStatements = NodejsPackage.Instance.FormattingSpacingOptionsPage.SpaceAfterSemicolonInFor;
-            res.InsertSpaceBeforeAndAfterBinaryOperators = NodejsPackage.Instance.FormattingSpacingOptionsPage.SpaceBeforeAndAfterBinaryOperator;
-            res.InsertSpaceAfterKeywordsInControlFlowStatements = NodejsPackage.Instance.FormattingSpacingOptionsPage.SpaceAfterKeywordsInControlFlow;
-            res.InsertSpaceAfterFunctionKeywordForAnonymousFunctions = NodejsPackage.Instance.FormattingSpacingOptionsPage.SpaceAfterFunctionKeywordForAnonymousFunctions;
-            res.InsertSpaceAfterOpeningAndBeforeClosingNonemptyParenthesis = NodejsPackage.Instance.FormattingSpacingOptionsPage.SpaceAfterOpeningAndBeforeClosingNonEmptyParens;
+            res.SpaceAfterComma = NodejsPackage.Instance.FormattingSpacingOptionsPage.SpaceAfterComma;
+            res.SpaceAfterSemiColonInFor = NodejsPackage.Instance.FormattingSpacingOptionsPage.SpaceAfterSemicolonInFor;
+            res.SpaceBeforeAndAfterBinaryOperator = NodejsPackage.Instance.FormattingSpacingOptionsPage.SpaceBeforeAndAfterBinaryOperator;
+            res.SpaceAfterKeywordsInControlFlowStatements = NodejsPackage.Instance.FormattingSpacingOptionsPage.SpaceAfterKeywordsInControlFlow;
+            res.SpaceAfterFunctionInAnonymousFunctions = NodejsPackage.Instance.FormattingSpacingOptionsPage.SpaceAfterFunctionKeywordForAnonymousFunctions;
+            res.SpaceAfterOpeningAndBeforeClosingNonEmptyParenthesis = NodejsPackage.Instance.FormattingSpacingOptionsPage.SpaceAfterOpeningAndBeforeClosingNonEmptyParens;
 
-            res.PlaceOpenBraceOnNewLineForFunctions = NodejsPackage.Instance.FormattingBracesOptionsPage.BraceOnNewLineForFunctions;
-            res.PlaceOpenBraceOnNewLineForControlBlocks = NodejsPackage.Instance.FormattingBracesOptionsPage.BraceOnNewLineForControlBlocks;
+            res.OpenBracesOnNewLineForFunctions = NodejsPackage.Instance.FormattingBracesOptionsPage.BraceOnNewLineForFunctions;
+            res.OpenBracesOnNewLineForControl = NodejsPackage.Instance.FormattingBracesOptionsPage.BraceOnNewLineForControlBlocks;
 
             return res;
         }
-
         private void FormatSelection() {
             string path = GetFilePath();
             if (path != null) {
                 ApplyEdits(
                     _textView.TextBuffer,
-                    JavaScriptFormattingService.Instance.GetFormattingEditsForRange(
-                        path,
+                    Formatter.GetEditsForRange(
+                        _textView.TextBuffer.CurrentSnapshot.GetText(),
                         _textView.Selection.Start.Position,
                         _textView.Selection.End.Position,
-                        CreateFormatOptions()
+                        CreateFormattingOptions()
                     )
                 );
             }
@@ -730,13 +719,28 @@ namespace Microsoft.NodejsTools {
             if (path != null) {
                 ApplyEdits(
                     _textView.TextBuffer,
-                    JavaScriptFormattingService.Instance.GetFormattingEditsForDocument(
-                        path,
-                        0,
-                        _textView.TextBuffer.CurrentSnapshot.Length,
-                        CreateFormatOptions()
+                    Formatter.GetEditsForDocument(
+                        _textView.TextBuffer.CurrentSnapshot.GetText(), 
+                        CreateFormattingOptions()
                     )
                 );
+            }
+        }
+
+        private void FormatOnEnter() {
+            if (NodejsPackage.Instance.FormattingGeneralOptionsPage.FormatOnEnter) {
+                var line = _textView.Caret.Position.BufferPosition.GetContainingLine();
+                if (line.LineNumber > 0) {
+                    ApplyEdits(
+                        _textView.TextBuffer,
+                        Formatter.GetEditsAfterEnter(
+                            _textView.TextBuffer.CurrentSnapshot.GetText(),
+                            _textView.TextBuffer.CurrentSnapshot.GetLineFromLineNumber(line.LineNumber - 1).Start,
+                            line.End,
+                            CreateFormattingOptions()
+                        )
+                    );
+                }
             }
         }
 
@@ -744,13 +748,14 @@ namespace Microsoft.NodejsTools {
             if (ShouldFormatOnCharacter(ch)) {
                 string path = GetFilePath();
                 if (path != null) {
+
                     ApplyEdits(
                         _textView.TextBuffer,
-                        JavaScriptFormattingService.Instance.GetFormattingEditsAfterKeystroke(
-                            path,
+                        Formatter.GetEditsAfterKeystroke(
+                            _textView.TextBuffer.CurrentSnapshot.GetText(), 
                             _textView.Caret.Position.BufferPosition.Position,
-                            ch.ToString(),
-                            CreateFormatOptions()
+                            ch,
+                            CreateFormattingOptions()
                         )
                     );
                 }
@@ -758,21 +763,16 @@ namespace Microsoft.NodejsTools {
         }
 
         private bool ShouldFormatOnCharacter(char ch) {
-#if FALSE
             switch (ch) {
                 case '}':
                     return NodejsPackage.Instance.FormattingGeneralOptionsPage.FormatOnCloseBrace;
                 case ';':
                     return NodejsPackage.Instance.FormattingGeneralOptionsPage.FormatOnSemiColon;
-                case '\n':
-                    return NodejsPackage.Instance.FormattingGeneralOptionsPage.FormatOnEnter;
             }
-#endif
             return false;
         }
 
         private void FormatAfterPaste(ITextSnapshot curVersion) {
-#if FALSE
             if (NodejsPackage.Instance.FormattingGeneralOptionsPage.FormatOnPaste) {
                 // calculate the range for the paste...
                 var afterVersion = _textView.TextBuffer.CurrentSnapshot;
@@ -803,28 +803,27 @@ namespace Microsoft.NodejsTools {
                     if (path != null) {
                         ApplyEdits(
                             _textView.TextBuffer,
-                            JavaScriptFormattingService.Instance.GetFormattingEditsOnPaste(
-                                path,
+                            Formatter.GetEditsForRange(
+                                _textView.TextBuffer.CurrentSnapshot.GetText(),
                                 start,
                                 end,
-                                CreateFormatOptions()
+                                CreateFormattingOptions()
                             )
                         );
                     }
                 }
             }
-#endif
         }
 
         private string GetFilePath() {
             return _textView.TextBuffer.GetFilePath();
         }
 
-        internal static void ApplyEdits(ITextBuffer buffer, TextEdit[] edits) {
+        internal static void ApplyEdits(ITextBuffer buffer, Edit[] edits) {
             using (var edit = buffer.CreateEdit()) {
                 foreach (var toApply in edits) {
                     edit.Replace(
-                        Span.FromBounds(toApply.MinChar, toApply.LimChar),
+                        new Span(toApply.Start, toApply.Length),
                         toApply.Text
                     );
                 }

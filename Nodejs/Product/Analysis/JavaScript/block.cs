@@ -48,11 +48,17 @@ namespace Microsoft.NodejsTools.Parsing
             }
         }
 
+        public IList<Statement> Statements {
+            get {
+                return m_list;
+            }
+        }
+
         /// <summary>
-        /// Gets or sets a boolean value indicating whether the brace for this block (if there was one) started
-        /// on a newline (true) or the same line as the statement to which it belongs (false)
+        /// Gets or sets a boolean value indicating whether this block has braces (a normal block) or
+        /// if it was forced to be a block even w/o braces.
         /// </summary>
-        public bool BraceOnNewLine { get; set; }
+        public bool HasBraces { get; set; }
 
         public Block(IndexSpan span)
             : base(span)

@@ -60,6 +60,11 @@ namespace Microsoft.NodejsTools.Parsing
             }
         }
 
+        public int ElseStart {
+            get;
+            set;
+        }
+
         public IfNode(IndexSpan span)
             : base(span)
         {
@@ -76,13 +81,6 @@ namespace Microsoft.NodejsTools.Parsing
                 }
             }
             visitor.PostWalk(this);
-        }
-
-        public void SwapBranches()
-        {
-            Block temp = m_trueBlock;
-            m_trueBlock = m_falseBlock;
-            m_falseBlock = temp;
         }
 
         public override IEnumerable<Node> Children

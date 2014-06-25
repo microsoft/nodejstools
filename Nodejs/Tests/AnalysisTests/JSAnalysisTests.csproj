@@ -48,6 +48,7 @@
   <ItemGroup>
     <Compile Include="AnalysisFile.cs" />
     <Compile Include="AnalysisTests.cs" />
+    <Compile Include="FormatterTests.cs" />
     <Compile Include="ParserOffsetTests.cs" />
     <Compile Include="ParserTests.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />

@@ -13,12 +13,16 @@
  * ***************************************************************************/
 
 namespace Microsoft.NodejsTools.Formatting {
-    enum ScriptState {
-        Uninitialized = 0,
-        Initialized = 5,
-        Started = 1,
-        Connected = 2,
-        Disconnected = 3,
-        Closed = 4
+
+    public sealed class Edit {
+        public readonly int Start, Length;
+        public readonly string Text;
+
+        public Edit(int start, int length, string text) {
+            Start = start;
+            Length = length;
+            Text = text;
+        }
     }
+
 }

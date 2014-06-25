@@ -38,8 +38,7 @@ namespace Microsoft.NodejsTools.Parsing
 
         public JSToken OperatorToken { get; set; }
         public bool IsPostfix { get; set; }
-        public bool OperatorInConditionalCompilationComment { get; set; }
-        public bool ConditionalCommentContainsOn { get; set; }
+        
 
         public UnaryOperator(IndexSpan span)
             : base(span)

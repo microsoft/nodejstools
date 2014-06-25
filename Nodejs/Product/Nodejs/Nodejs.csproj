@@ -333,23 +333,6 @@
     <Compile Include="Debugger\SourceMapper.cs" />
     <Compile Include="Debugger\SteppingKind.cs" />
     <Compile Include="Project\NodejsFileNodeProperties.cs" />
-    <Compile Include="Formatting\AddNamedItemFlags.cs" />
-    <Compile Include="Formatting\ArrayHelper.cs" />
-    <Compile Include="Formatting\ByteOrderMark.cs" />
-    <Compile Include="Formatting\FormatCodeOptions.cs" />
-    <Compile Include="Formatting\JavaScriptFormattingService.cs" />
-    <Compile Include="Formatting\GetItemInfoFlags.cs" />
-    <Compile Include="Formatting\IActiveScript.cs" />
-    <Compile Include="Formatting\IActiveScriptError.cs" />
-    <Compile Include="Formatting\IActiveScriptParse.cs" />
-    <Compile Include="Formatting\IActiveScriptSite.cs" />
-    <Compile Include="Formatting\ParseScriptTextFlags.cs" />
-    <Compile Include="Formatting\ScriptState.cs" />
-    <Compile Include="Formatting\ScriptThreadState.cs" />
-    <Compile Include="Formatting\TextEdit.cs" />
-    <Compile Include="Formatting\TypeScriptLanguageService.cs" />
-    <Compile Include="Formatting\TypeScriptServiceHost.cs" />
-    <Compile Include="Formatting\TypeScriptSnapshot.cs" />
     <Compile Include="Jade\JadeEditorFactory.cs" />
     <Compile Include="Options\NodejsFormattingBracesOptionsPage.cs">
       <SubType>Component</SubType>
@@ -706,11 +689,6 @@
     </Content>
     <Content Include="FileTemplates\NewItem\EmptyHtml.html">
       <IncludeInVSIX>true</IncludeInVSIX>
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </Content>
-    <Content Include="Formatting\typescriptServices.js">
-      <IncludeInVSIX>true</IncludeInVSIX>
-      <VSIXSubpath>.</VSIXSubpath>
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
     <ZipProject Include="ProjectTemplates\FromExistingCode\FromExistingCode.njsproj">

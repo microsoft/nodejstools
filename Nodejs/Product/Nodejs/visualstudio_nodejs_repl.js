@@ -14,8 +14,7 @@
 
 if (process.argv.length <= 2) {
     console.log('Repl requires port number to connect to');
-    while (true) {
-    }
+    process.exit(1);
 }
 
 var path = require('path');

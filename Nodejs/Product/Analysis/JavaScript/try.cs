@@ -50,6 +50,14 @@ namespace Microsoft.NodejsTools.Parsing
             }
         }
 
+        /// <summary>
+        /// Gets the index where the catch keyword begins
+        /// </summary>
+        public int CatchStart {
+            get;
+            set;
+        }
+
 		public Block FinallyBlock
         {
             get { return m_finallyBlock; }
@@ -59,6 +67,14 @@ namespace Microsoft.NodejsTools.Parsing
                 m_finallyBlock = value;
                 m_finallyBlock.AssignParent(this);
             }
+        }
+
+        /// <summary>
+        /// Gets the index where the finally keyword begins
+        /// </summary>
+        public int FinallyStart {
+            get;
+            set;
         }
 
         public ParameterDeclaration CatchParameter

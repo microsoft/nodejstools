@@ -30,6 +30,12 @@ namespace Microsoft.NodejsTools.Parsing
             IsGetter = isGetter;
         }
 
+        public override void Walk(AstVisitor visitor) {
+            if (visitor.Walk(this)) {
+            }
+            visitor.PostWalk(this);
+        }
+
         public override String ToString()
         {
             return Value.ToString();

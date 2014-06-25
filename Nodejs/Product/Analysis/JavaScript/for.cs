@@ -61,6 +61,14 @@ namespace Microsoft.NodejsTools.Parsing
             }
         }
 
+        /// <summary>
+        /// The end of the "for(;;)" portion of the statement
+        /// </summary>
+        public int HeaderEnd {
+            get;
+            set;
+        }
+
         public ForNode(IndexSpan span)
             : base(span)
         {

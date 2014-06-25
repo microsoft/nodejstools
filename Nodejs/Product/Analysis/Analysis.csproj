@@ -145,6 +145,9 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="..\..\..\Common\Product\SharedProject\DebugTimer.cs">
+      <Link>DebugTimer.cs</Link>
+    </Compile>
     <Compile Include="Analysis\AnalysisExtensions.cs" />
     <Compile Include="Analysis\AnalysisSerializationSupportedTypeAttribute.cs" />
     <Compile Include="Analysis\AnalysisSerializeAsNullAttribute.cs" />
@@ -238,6 +241,9 @@
     <Compile Include="ContextError.cs" />
     <Compile Include="CssEncoderFallback.cs" />
     <Compile Include="Extensions.cs" />
+    <Compile Include="Formatting\Edit.cs" />
+    <Compile Include="Formatting\Formatter.cs" />
+    <Compile Include="Formatting\FormattingOptions.cs" />
     <Compile Include="Helpers.cs" />
     <Compile Include="JavaScript\activationobject.cs" />
     <Compile Include="JavaScript\arrayliteral.cs" />
@@ -255,6 +261,7 @@
     <Compile Include="JavaScript\conditional.cs" />
     <Compile Include="JavaScript\const.cs" />
     <Compile Include="JavaScript\constantwrapper.cs" />
+    <Compile Include="Formatting\FormattingVisitor.cs" />
     <Compile Include="JavaScript\TokenWithSpan.cs" />
     <Compile Include="JavaScript\continue.cs" />
     <Compile Include="JavaScript\debugger.cs" />
@@ -339,6 +346,7 @@
       <LastGenOutput>JScript.Designer.cs</LastGenOutput>
     </EmbeddedResource>
   </ItemGroup>
+  <ItemGroup />
   <Import Project="..\ProjectAfter.settings" />
   <PropertyGroup>
     <PreBuildEvent>
