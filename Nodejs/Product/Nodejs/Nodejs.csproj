@@ -363,6 +363,7 @@
     </Compile>
     <Compile Include="Project\PackageJsonFileNode.cs" />
     <Compile Include="Project\ProjectResources.cs" />
+    <Compile Include="Repl\NpmReplCommand.cs" />
     <Compile Include="TaggerProviderMetadata.cs" />
     <Compile Include="Debugger\Communication\BreakpointEventArgs.cs" />
     <Compile Include="Debugger\Communication\CompileScriptEventArgs.cs" />

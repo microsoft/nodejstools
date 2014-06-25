@@ -35,6 +35,7 @@
       <Link>ProcessOutput.cs</Link>
     </Compile>
     <Compile Include="NpmArgumentBuilder.cs" />
+    <Compile Include="NpmHelpers.cs" />
     <Compile Include="SemverVersionComparer.cs" />
     <Compile Include="SPI\AbstractNpmSearchComparer.cs" />
     <Compile Include="DependencyType.cs" />

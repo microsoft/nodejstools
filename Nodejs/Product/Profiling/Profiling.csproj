@@ -181,7 +181,6 @@
     </Compile>
     <Compile Include="AssemblyInfo.cs" />
     <Compile Include="DialogWindowVersioningWorkaround.cs" />
-    <Compile Include="Extensions.cs" />
     <Compile Include="NativeMethods.cs" />
     <Compile Include="Profiling\AutomationProfiling.cs" />
     <Compile Include="Profiling\AutomationReport.cs" />

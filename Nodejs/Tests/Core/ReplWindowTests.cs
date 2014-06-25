@@ -15,6 +15,7 @@
 using System;
 using System.IO;
 using System.Reflection;
+using System.Text;
 using Microsoft.NodejsTools;
 using Microsoft.NodejsTools.Repl;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
@@ -464,5 +465,52 @@ undefined";
             }
         }
 
+        [TestMethod, Priority(0)]
+        public void TestNpmReplRedirector() {
+            using (var eval = ProjectlessEvaluator()) {
+                var mockWindow = new MockReplWindow(eval) {
+                    ShowAnsiCodes = true
+                };
+                mockWindow.ClearScreen();
+                var redirector = new NpmReplCommand.NpmReplRedirector(mockWindow);
+                
+                redirector.WriteLine("npm The sky is at a stable equilibrium");
+                var expectedInfoLine =
+                    NpmReplCommand.NpmReplRedirector.NormalAnsiColor + "npm The sky is at a stable equilibrium" +
+                    Environment.NewLine;
+
+                Assert.AreEqual(expectedInfoLine, mockWindow.Output);
+                Assert.IsFalse(redirector.HasErrors);
+                mockWindow.ClearScreen();
+
+                redirector.WriteLine("npm WARN The sky is at an unstable equilibrium!");
+                var expectedWarnLine =
+                    NpmReplCommand.NpmReplRedirector.WarnAnsiColor + "npm WARN" +
+                    NpmReplCommand.NpmReplRedirector.NormalAnsiColor + " The sky is at an unstable equilibrium!" +
+                    Environment.NewLine;
+
+                Assert.AreEqual(expectedWarnLine, mockWindow.Output);
+                Assert.IsFalse(redirector.HasErrors);
+                mockWindow.ClearScreen();
+
+                redirector.WriteLine("npm ERR! The sky is falling!");
+                var expectedErrorLine =
+                    NpmReplCommand.NpmReplRedirector.ErrorAnsiColor + "npm ERR!" +
+                    NpmReplCommand.NpmReplRedirector.NormalAnsiColor + " The sky is falling!" +
+                    Environment.NewLine;
+                Assert.AreEqual(expectedErrorLine, mockWindow.Output);
+                Assert.IsTrue(redirector.HasErrors);
+                mockWindow.ClearScreen();
+
+                var decodedInfoLine = "├── parseurl@1.0.1";
+                string encodedText = Console.OutputEncoding.GetString(Encoding.UTF8.GetBytes(decodedInfoLine));
+                redirector.WriteLine(encodedText);
+                var expectedDecodedInfoLine = NpmReplCommand.NpmReplRedirector.NormalAnsiColor + decodedInfoLine
+                    + Environment.NewLine;
+
+                Assert.AreEqual(expectedDecodedInfoLine, mockWindow.Output);
+                Assert.IsTrue(redirector.HasErrors, "Errors should remain until end");
+            }
+        }
     }
 }

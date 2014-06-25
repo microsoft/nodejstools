@@ -41,7 +41,7 @@ namespace Microsoft.NodejsTools.Profiling {
             var solution = NodejsProfilingPackage.Instance.Solution;
             
             var availableProjects = new List<ProjectTargetView>();
-            foreach (var project in solution.EnumerateLoadedProjects()) {
+            foreach (var project in solution.EnumerateLoadedProjects(onlyNodeProjects: true)) {
                 availableProjects.Add(new ProjectTargetView((IVsHierarchy)project));
             }
             _availableProjects = new ReadOnlyCollection<ProjectTargetView>(availableProjects);

@@ -35,12 +35,12 @@ using Microsoft.VisualStudioTools;
 
 namespace Microsoft.NodejsTools {
     public static class Extensions {
-        internal static IEnumerable<IVsProject> EnumerateLoadedProjects(this IVsSolution solution, bool onlyNodeProjects = true) {
+        public static IEnumerable<IVsProject> EnumerateLoadedProjects(this IVsSolution solution, bool onlyNodeProjects = true) {
             var flags =
                 onlyNodeProjects ?
                 (uint)(__VSENUMPROJFLAGS.EPF_LOADEDINSOLUTION | __VSENUMPROJFLAGS.EPF_MATCHTYPE) :
                 (uint)(__VSENUMPROJFLAGS.EPF_LOADEDINSOLUTION | __VSENUMPROJFLAGS.EPF_ALLVIRTUAL);
-            var guid = new Guid(Guids.NodejsProjectFactoryString);
+            var guid = new Guid(Guids.NodejsBaseProjectFactoryString);
             IEnumHierarchies hierarchies;
             ErrorHandler.ThrowOnFailure((solution.GetProjectEnum(
                 flags,
