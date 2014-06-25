@@ -32,9 +32,6 @@
             <InstallDirectory>ScriptsTypingsNode</InstallDirectory>
         </File>
 
-        <!-- Formatting -->
-        <File Include="Formatting\typescriptServices.js"/>
-
         <!-- Resources -->
         <File Include="NodejsProject.ico;
                        NodejsProjectBig.ico" />
