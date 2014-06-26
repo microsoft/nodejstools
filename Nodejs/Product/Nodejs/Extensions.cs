@@ -145,6 +145,15 @@ namespace Microsoft.NodejsTools {
             return textView.TextBuffer.GetAnalyzer();
         }
 
+        /// <summary>
+        /// Checks to see if this is a REPL buffer starting with a extensible command such as .cls, .load, etc...
+        /// </summary>
+        internal static bool IsReplBufferWithCommand(this ITextSnapshot snapshot) {
+            return snapshot.TextBuffer.Properties.ContainsProperty(typeof(IReplEvaluator)) &&
+                   snapshot.Length != 0 &&
+                   snapshot[0] == '.';
+        }
+
         internal static VsProjectAnalyzer GetAnalyzer(this ITextBuffer buffer) {
             NodejsProjectNode pyProj;
             VsProjectAnalyzer analyzer;

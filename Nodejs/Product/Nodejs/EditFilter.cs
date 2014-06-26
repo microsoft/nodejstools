@@ -124,31 +124,38 @@ namespace Microsoft.NodejsTools {
                             return res;
                         }
                         break;
-                    case VSConstants.VSStd2KCmdID.PASTE: 
-                        var curVersion = _textView.TextBuffer.CurrentSnapshot;
-                        hr = _next.Exec(ref pguidCmdGroup, nCmdID, nCmdexecopt, pvaIn, pvaOut);
-
-                        if (ErrorHandler.Succeeded(hr)) {
-                            FormatAfterPaste(curVersion);
-                        }
-                        return hr;
+                    case VSConstants.VSStd2KCmdID.PASTE:
+                        return Paste(ref pguidCmdGroup, nCmdID, nCmdexecopt, pvaIn, pvaOut, out hr);
                 }
             } else if (pguidCmdGroup == VSConstants.GUID_VSStandardCommandSet97) {
                 switch ((VSConstants.VSStd97CmdID)nCmdID) {
                     case VSConstants.VSStd97CmdID.GotoDefn: return GotoDefinition();
                     case VSConstants.VSStd97CmdID.FindReferences: return FindAllReferences();
                     case VSConstants.VSStd97CmdID.Paste:
-                        var curVersion = _textView.TextBuffer.CurrentSnapshot;
-                        hr = _next.Exec(ref pguidCmdGroup, nCmdID, nCmdexecopt, pvaIn, pvaOut);
-
-                        if (ErrorHandler.Succeeded(hr)) {
-                            FormatAfterPaste(curVersion);
-                        }
-                        return hr;
+                        return Paste(ref pguidCmdGroup, nCmdID, nCmdexecopt, pvaIn, pvaOut, out hr);
                 }
             }
 
             return _next.Exec(ref pguidCmdGroup, nCmdID, nCmdexecopt, pvaIn, pvaOut);
+        }
+
+        private int Paste(ref Guid pguidCmdGroup, uint nCmdID, uint nCmdexecopt, IntPtr pvaIn, IntPtr pvaOut, out int hr) {
+            var insertionPoint = _textView.BufferGraph.MapDownToInsertionPoint(
+                _textView.Caret.Position.BufferPosition,
+                PointTrackingMode.Negative,
+                x => x.ContentType.IsOfType(NodejsConstants.Nodejs)
+            );
+
+            ITextSnapshot curVersion = null;
+            if (insertionPoint != null) {
+                curVersion = insertionPoint.Value.Snapshot;
+            }
+            hr = _next.Exec(ref pguidCmdGroup, nCmdID, nCmdexecopt, pvaIn, pvaOut);
+
+            if (insertionPoint != null && ErrorHandler.Succeeded(hr)) {
+                FormatAfterPaste(curVersion);
+            }
+            return hr;
         }
 
         /// <summary>
@@ -699,14 +706,26 @@ namespace Microsoft.NodejsTools {
             return res;
         }
         private void FormatSelection() {
-            string path = GetFilePath();
-            if (path != null) {
+            var insertionPoint = _textView.BufferGraph.MapDownToInsertionPoint(
+                _textView.Selection.Start.Position,
+                PointTrackingMode.Negative,
+                x => x.ContentType.IsOfType(NodejsConstants.Nodejs)
+            );
+            var endPoint = _textView.BufferGraph.MapDownToInsertionPoint(
+                _textView.Selection.End.Position,
+                PointTrackingMode.Negative,
+                x => x.ContentType.IsOfType(NodejsConstants.Nodejs)
+            );
+
+            if (insertionPoint != null && endPoint != null) {
+                var buffer = insertionPoint.Value.Snapshot.TextBuffer;
+
                 ApplyEdits(
-                    _textView.TextBuffer,
+                    buffer,
                     Formatter.GetEditsForRange(
-                        _textView.TextBuffer.CurrentSnapshot.GetText(),
-                        _textView.Selection.Start.Position,
-                        _textView.Selection.End.Position,
+                        buffer.CurrentSnapshot.GetText(),
+                        insertionPoint.Value.Position,
+                        endPoint.Value.Position,
                         CreateFormattingOptions()
                     )
                 );
@@ -714,13 +733,11 @@ namespace Microsoft.NodejsTools {
         }
 
         private void FormatDocument() {
-            string path;
-            path = GetFilePath();
-            if (path != null) {
+            foreach (var buffer in _textView.BufferGraph.GetTextBuffers(x => x.ContentType.IsOfType(NodejsConstants.Nodejs))) {
                 ApplyEdits(
-                    _textView.TextBuffer,
+                    buffer,
                     Formatter.GetEditsForDocument(
-                        _textView.TextBuffer.CurrentSnapshot.GetText(), 
+                        buffer.CurrentSnapshot.GetText(),
                         CreateFormattingOptions()
                     )
                 );
@@ -729,31 +746,48 @@ namespace Microsoft.NodejsTools {
 
         private void FormatOnEnter() {
             if (NodejsPackage.Instance.FormattingGeneralOptionsPage.FormatOnEnter) {
-                var line = _textView.Caret.Position.BufferPosition.GetContainingLine();
-                if (line.LineNumber > 0) {
-                    ApplyEdits(
-                        _textView.TextBuffer,
-                        Formatter.GetEditsAfterEnter(
-                            _textView.TextBuffer.CurrentSnapshot.GetText(),
-                            _textView.TextBuffer.CurrentSnapshot.GetLineFromLineNumber(line.LineNumber - 1).Start,
-                            line.End,
-                            CreateFormattingOptions()
-                        )
-                    );
+                var insertionPoint = _textView.BufferGraph.MapDownToInsertionPoint(
+                    _textView.Caret.Position.BufferPosition,
+                    PointTrackingMode.Negative,
+                    x => x.ContentType.IsOfType(NodejsConstants.Nodejs)
+                );
+
+                if (insertionPoint != null) {
+                    var buffer = insertionPoint.Value.Snapshot.TextBuffer;
+                    var line = insertionPoint.Value.GetContainingLine();
+
+                    if (line.LineNumber > 0) {
+                        ApplyEdits(
+                            buffer,
+                            Formatter.GetEditsAfterEnter(
+                                buffer.CurrentSnapshot.GetText(),
+                                buffer.CurrentSnapshot.GetLineFromLineNumber(line.LineNumber - 1).Start,
+                                line.End,
+                                CreateFormattingOptions()
+                            )
+                        );
+                    }
                 }
             }
         }
 
         private void FormatAfterTyping(char ch) {
             if (ShouldFormatOnCharacter(ch)) {
-                string path = GetFilePath();
-                if (path != null) {
+
+                var insertionPoint = _textView.BufferGraph.MapDownToInsertionPoint(
+                    _textView.Caret.Position.BufferPosition,
+                    PointTrackingMode.Negative,
+                    x => x.ContentType.IsOfType(NodejsConstants.Nodejs)
+                );
+
+                if (insertionPoint != null) {
+                    var buffer = insertionPoint.Value.Snapshot.TextBuffer;
 
                     ApplyEdits(
-                        _textView.TextBuffer,
+                        buffer,
                         Formatter.GetEditsAfterKeystroke(
-                            _textView.TextBuffer.CurrentSnapshot.GetText(), 
-                            _textView.Caret.Position.BufferPosition.Position,
+                            buffer.CurrentSnapshot.GetText(),
+                            insertionPoint.Value.Position,
                             ch,
                             CreateFormattingOptions()
                         )
@@ -775,7 +809,7 @@ namespace Microsoft.NodejsTools {
         private void FormatAfterPaste(ITextSnapshot curVersion) {
             if (NodejsPackage.Instance.FormattingGeneralOptionsPage.FormatOnPaste) {
                 // calculate the range for the paste...
-                var afterVersion = _textView.TextBuffer.CurrentSnapshot;
+                var afterVersion = curVersion.TextBuffer.CurrentSnapshot;
                 int start = afterVersion.Length, end = 0;
                 for (var version = curVersion.Version;
                     version != afterVersion.Version;
@@ -799,18 +833,15 @@ namespace Microsoft.NodejsTools {
 
                 if (start < end) {
                     // then format it
-                    string path = GetFilePath();
-                    if (path != null) {
-                        ApplyEdits(
-                            _textView.TextBuffer,
-                            Formatter.GetEditsForRange(
-                                _textView.TextBuffer.CurrentSnapshot.GetText(),
-                                start,
-                                end,
-                                CreateFormattingOptions()
-                            )
-                        );
-                    }
+                    ApplyEdits(
+                        curVersion.TextBuffer,
+                        Formatter.GetEditsForRange(
+                            curVersion.TextBuffer.CurrentSnapshot.GetText(),
+                            start,
+                            end,
+                            CreateFormattingOptions()
+                        )
+                    );
                 }
             }
         }

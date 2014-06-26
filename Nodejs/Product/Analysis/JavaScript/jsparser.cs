@@ -547,7 +547,7 @@ namespace Microsoft.NodejsTools.Parsing
         {
             m_blockType.Add(BlockType.Block);
             Block codeBlock = new Block(_curSpan);
-            codeBlock.HasBraces = true;
+            codeBlock.Braces = BraceState.Start;
             GetNextToken();
 
             m_noSkipTokenSet.Add(NoSkipTokenSet.s_StartStatementNoSkipTokenSet);
@@ -572,6 +572,7 @@ namespace Microsoft.NodejsTools.Parsing
                                 throw;
                         }
                     }
+                    codeBlock.Braces = BraceState.StartAndEnd;
                 }
                 catch (RecoveryTokenException exc)
                 {
@@ -2777,7 +2778,7 @@ namespace Microsoft.NodejsTools.Parsing
                 {
                     // parse the block locally to get the exact end of function
                     body = new Block(_curSpan);
-                    body.HasBraces = true;
+                    body.Braces = BraceState.Start;
                     GetNextToken();
 
                     var possibleDirectivePrologue = true;
@@ -2817,7 +2818,7 @@ namespace Microsoft.NodejsTools.Parsing
                                 throw;
                         }
                     }
-
+                    body.Braces = BraceState.StartAndEnd;
                     body.Span = body.Span.UpdateWith(_curSpan);
                     fncSpan = fncSpan.UpdateWith(_curSpan);
                 }

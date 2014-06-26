@@ -40,6 +40,7 @@ namespace NodejsTests {
         public void TestNumber() {
             using (var eval = ProjectlessEvaluator()) {
                 var window = new MockReplWindow(eval);
+                window.ClearScreen();
                 var res = eval.ExecuteText("42");
                 Assert.IsTrue(res.Wait(10000));
                 Assert.AreEqual(window.Output, "42");
@@ -54,6 +55,7 @@ namespace NodejsTests {
         public void TestRequire() {
             using (var eval = ProjectlessEvaluator()) {
                 var window = new MockReplWindow(eval);
+                window.ClearScreen();
                 var res = eval.ExecuteText("require('http').constructor");
                 Assert.IsTrue(res.Wait(10000));
                 Assert.AreEqual("[Function: Object]", window.Output);
@@ -67,6 +69,7 @@ namespace NodejsTests {
                 foreach (var whitespace in whitespaces) {
                     Console.WriteLine("Whitespace: {0}", whitespace);
                     var window = new MockReplWindow(eval);
+                    window.ClearScreen();
                     var res = eval.ExecuteText(whitespace + "function f() { }");
                     Assert.IsTrue(res.Wait(10000));
                     Assert.AreEqual("undefined", window.Output);
@@ -83,6 +86,7 @@ namespace NodejsTests {
         public void TestConsoleLog() {
             using (var eval = ProjectlessEvaluator()) {
                 var window = new MockReplWindow(eval);
+                window.ClearScreen();
                 var res = eval.ExecuteText("console.log('hi')");
                 Assert.IsTrue(res.Wait(10000));
                 Assert.AreEqual("hi\r\nundefined", window.Output);
@@ -93,6 +97,7 @@ namespace NodejsTests {
         public void TestConsoleWarn() {
             using (var eval = ProjectlessEvaluator()) {
                 var window = new MockReplWindow(eval);
+                window.ClearScreen();
                 var res = eval.ExecuteText("console.warn('hi')");
                 Assert.IsTrue(res.Wait(10000));
                 Assert.AreEqual("hi\r\n", window.Error);
@@ -103,6 +108,7 @@ namespace NodejsTests {
         public void TestConsoleError() {
             using (var eval = ProjectlessEvaluator()) {
                 var window = new MockReplWindow(eval);
+                window.ClearScreen();
                 var res = eval.ExecuteText("console.error('hi')");
                 Assert.IsTrue(res.Wait(10000));
                 Assert.AreEqual("hi\r\n", window.Error);
@@ -113,6 +119,7 @@ namespace NodejsTests {
         public void TestConsoleDir() {
             using (var eval = ProjectlessEvaluator()) {
                 var window = new MockReplWindow(eval);
+                window.ClearScreen();
                 var res = eval.ExecuteText("console.dir({'abc': {'foo': [1,2,3,4,5,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23,24,25,26,27,28,29,30,31,32,33,34,35,36,37,38,39,40]}})");
                 var expected = @"{ abc: 
    { foo: 
@@ -174,6 +181,7 @@ undefined";
         public void LargeOutput() {
             using (var eval = ProjectlessEvaluator()) {
                 var window = new MockReplWindow(eval);
+                window.ClearScreen();
                 var res = eval.ExecuteText("var x = 'abc'; for(i = 0; i<12; i++) { x += x; }; x");
                 string expected = "abc";
                 for (int i = 0; i < 12; i++) {
@@ -189,6 +197,7 @@ undefined";
         public void TestException() {
             using (var eval = ProjectlessEvaluator()) {
                 var window = new MockReplWindow(eval);
+                window.ClearScreen();
                 var res = eval.ExecuteText("throw 'an error';");
 
                 Assert.IsTrue(res.Wait(10000));
@@ -201,6 +210,7 @@ undefined";
         public void TestExceptionNull() {
             using (var eval = ProjectlessEvaluator()) {
                 var window = new MockReplWindow(eval);
+                window.ClearScreen();
                 var res = eval.ExecuteText("throw null;");
 
                 Assert.IsTrue(res.Wait(10000));
@@ -213,6 +223,7 @@ undefined";
         public void TestExceptionUndefined() {
             using (var eval = ProjectlessEvaluator()) {
                 var window = new MockReplWindow(eval);
+                window.ClearScreen();
                 var res = eval.ExecuteText("throw undefined;");
 
                 Assert.IsTrue(res.Wait(10000));
@@ -225,6 +236,7 @@ undefined";
         public void TestProcessExit() {
             using (var eval = ProjectlessEvaluator()) {
                 var window = new MockReplWindow(eval);
+                window.ClearScreen();
                 var res = eval.ExecuteText("process.exit(0);");
 
                 Assert.IsTrue(res.Wait(10000));
@@ -242,6 +254,7 @@ undefined";
         public void TestReset() {
             using (var eval = ProjectlessEvaluator()) {
                 var window = new MockReplWindow(eval);
+                window.ClearScreen();
 
                 var res = eval.ExecuteText("1");
                 Assert.IsTrue(res.Wait(10000));
@@ -268,6 +281,7 @@ undefined";
         public void TestSaveNoFile() {
             using (var eval = ProjectlessEvaluator()) {
                 var window = new MockReplWindow(eval);
+                window.ClearScreen();
                 var res = eval.ExecuteText("function f() { }");
 
                 Assert.IsTrue(res.Wait(10000));
@@ -285,6 +299,7 @@ undefined";
         public void TestSaveBadFile() {
             using (var eval = ProjectlessEvaluator()) {
                 var window = new MockReplWindow(eval);
+                window.ClearScreen();
                 var res = eval.ExecuteText("function f() { }");
 
                 Assert.IsTrue(res.Wait(10000));
@@ -302,6 +317,7 @@ undefined";
         public void TestSave() {
             using (var eval = ProjectlessEvaluator()) {
                 var window = new MockReplWindow(eval, NodejsConstants.JavaScript);
+                window.ClearScreen();
                 var res = window.Execute("function f() { }");
 
                 Assert.IsTrue(res.Wait(10000));
@@ -327,6 +343,7 @@ undefined";
         public void TestBadSave() {
             using (var eval = ProjectlessEvaluator()) {
                 var window = new MockReplWindow(eval);
+                window.ClearScreen();
                 var res = eval.ExecuteText("function f() { }");
 
                 Assert.IsTrue(res.Wait(10000));
@@ -406,6 +423,7 @@ undefined";
         public void TestVarI() {
             using (var eval = ProjectlessEvaluator()) {
                 var window = new MockReplWindow(eval);
+                window.ClearScreen();
 
                 var res = eval.ExecuteText("i");
                 Assert.IsTrue(res.Wait(10000));
@@ -424,6 +442,7 @@ undefined";
         public void TestObjectLiteral() {
             using (var eval = ProjectlessEvaluator()) {
                 var window = new MockReplWindow(eval);
+                window.ClearScreen();
                 var res = eval.ExecuteText("{x:42}");
                 Assert.IsTrue(res.Wait(10000));
                 Assert.AreEqual("{ x: 42 }", window.Output);
@@ -448,6 +467,7 @@ undefined";
             try {
                 using (var eval = new NodejsReplEvaluator(new TestNodejsReplSite(null, testDir))) {
                     var window = new MockReplWindow(eval);
+                    window.ClearScreen();
                     var res = eval.ExecuteText("require('foo.js');");
                     Assert.IsTrue(res.Wait(10000));
                     Assert.AreEqual(window.Output, "{ foo: [Function] }");

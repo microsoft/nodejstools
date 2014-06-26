@@ -59,42 +59,4 @@ namespace Microsoft.NodejsTools {
 
         #endregion
     }
-
-    [Export(typeof(ISmartIndentProvider))]
-    [ContentType(NodejsConstants.NodejsRepl)]
-    [Name("NodejsReplSmartIndent")]
-    class ReplSmartIndentProvider : ISmartIndentProvider {
-        private readonly IEditorOptionsFactoryService _editorOptionsFactory;
-        private readonly ITaggerProvider _taggerProvider;
-        [ImportingConstructor]
-        public ReplSmartIndentProvider(
-            IEditorOptionsFactoryService editorOptionsFactory,
-            [ImportMany(typeof(ITaggerProvider))]Lazy<ITaggerProvider, TaggerProviderMetadata>[] classifierProviders
-            ) {
-            _editorOptionsFactory = editorOptionsFactory;
-
-            // we use a tagger provider here instead of an IClassifierProvider because the 
-            // JS language service doesn't actually implement IClassifierProvider and instead implemnets
-            // ITaggerProvider<ClassificationTag> instead.  We can get those tags via IClassifierAggregatorService
-            // but that merges together adjacent tokens of the same type, so we go straight to the
-            // source here.
-            _taggerProvider = classifierProviders.Where(
-                provider =>
-                    provider.Metadata.ContentTypes.Contains(NodejsConstants.JavaScript) &&
-                    provider.Metadata.TagTypes.Any(tagType => tagType.IsSubclassOf(typeof(ClassificationTag)))
-            ).First().Value;
-        }
-
-        #region ISmartIndentProvider Members
-
-        public ISmartIndent CreateSmartIndent(ITextView textView) {
-            return new SmartIndent(
-                textView,
-                _editorOptionsFactory.GetOptions(textView),
-                _taggerProvider.CreateTagger<ClassificationTag>(textView.TextBuffer)
-            );
-        }
-
-        #endregion
-    }
 }

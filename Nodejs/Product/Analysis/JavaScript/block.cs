@@ -58,7 +58,7 @@ namespace Microsoft.NodejsTools.Parsing
         /// Gets or sets a boolean value indicating whether this block has braces (a normal block) or
         /// if it was forced to be a block even w/o braces.
         /// </summary>
-        public bool HasBraces { get; set; }
+        public BraceState Braces { get; set; }
 
         public Block(IndexSpan span)
             : base(span)
@@ -106,5 +106,11 @@ namespace Microsoft.NodejsTools.Parsing
                 m_list.Add(element);
             }
         }
+    }
+
+    public enum BraceState {
+        None,
+        Start,
+        StartAndEnd
     }
 }

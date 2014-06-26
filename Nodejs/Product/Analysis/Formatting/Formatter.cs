@@ -195,7 +195,7 @@ namespace Microsoft.NodejsTools.Formatting {
             }
 
             private bool CheckBlock(Block block) {
-                if (_typedChar == '}' && block != null && block.HasBraces && block.EndIndex == _position) {
+                if (_typedChar == '}' && block != null && block.Braces != BraceState.None && block.EndIndex == _position) {
                     return true;
                 }
                 return false;

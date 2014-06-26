@@ -35,6 +35,7 @@ namespace Microsoft.NodejsTools.Repl {
         private ListenerThread _listener;
         private IReplWindow _window;
         private readonly INodejsReplSite _site;
+        internal static readonly object InputBeforeReset = new object();    // used to mark buffers which are no longer valid because we've done a reset
 
         public NodejsReplEvaluator()
             : this(VsNodejsReplSite.Site) {
@@ -64,8 +65,21 @@ namespace Microsoft.NodejsTools.Repl {
         }
 
         public Task<ExecutionResult> Reset() {
+            var buffersBeforeReset = _window.TextView.BufferGraph.GetTextBuffers(TruePredicate);
+            for (int i = 0; i < buffersBeforeReset.Count - 1; i++) {
+                var buffer = buffersBeforeReset[i];
+
+                if (!buffer.Properties.ContainsProperty(InputBeforeReset)) {
+                    buffer.Properties.AddProperty(InputBeforeReset, InputBeforeReset);
+                }
+            }
+
             Connect();
             return ExecutionResult.Succeeded;
+        }
+
+        private static bool TruePredicate(ITextBuffer buffer) {
+            return true;
         }
 
         public bool CanExecuteText(string text) {

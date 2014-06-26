@@ -64,7 +64,7 @@ namespace Microsoft.NodejsTools.Options {
             SpaceBeforeAndAfterBinaryOperator = LoadBool(SpaceBeforeAndAfterBinaryOperatorSetting) ?? true;
             SpaceAfterKeywordsInControlFlow = LoadBool(SpaceAfterKeywordsInControlFlowSetting) ?? true;
             SpaceAfterFunctionKeywordForAnonymousFunctions = LoadBool(SpaceAfterFunctionKeywordForAnonymousFunctionsSetting) ?? true;
-            SpaceAfterOpeningAndBeforeClosingNonEmptyParens = LoadBool(SpaceAfterOpeningAndBeforeClosingNonEmptyParensSetting) ?? true;
+            SpaceAfterOpeningAndBeforeClosingNonEmptyParens = LoadBool(SpaceAfterOpeningAndBeforeClosingNonEmptyParensSetting) ?? false;
         }
 
         public override void SaveSettingsToStorage() {

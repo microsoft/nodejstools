@@ -89,7 +89,6 @@ namespace Microsoft.NodejsTools {
         internal const string NodeExpressionEvaluatorGuid = "{F16F2A71-1C45-4BAB-BECE-09D28CFDE3E6}";
         private IContentType _contentType;
         internal const string NodeJsFileType = ".njs";
-        internal static readonly Guid _jsLangSvcGuid = new Guid("{71d61d27-9011-4b17-9469-d20f798fb5c0}");
         internal static NodejsPackage Instance;
         private string _surveyNewsUrl;
         private object _surveyNewsUrlLock = new object();
@@ -232,7 +231,7 @@ namespace Microsoft.NodejsTools {
                 window = provider.CreateReplWindow(
                     ReplContentType,
                     "Node.js Interactive Window",
-                    _jsLangSvcGuid,
+                    typeof(NodejsLanguageInfo).GUID,
                     NodejsReplEvaluatorProvider.NodeReplId
                 );
             }
@@ -306,7 +305,7 @@ namespace Microsoft.NodejsTools {
         private IContentType ReplContentType {
             get {
                 if (_contentType == null) {
-                    _contentType = ComponentModel.GetService<IContentTypeRegistryService>().GetContentType(NodejsConstants.NodejsRepl);
+                    _contentType = ComponentModel.GetService<IContentTypeRegistryService>().GetContentType(NodejsConstants.Nodejs);
                 }
                 return _contentType;
             }

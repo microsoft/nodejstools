@@ -18,11 +18,13 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
 using System.Linq;
+using System.Reflection;
 using System.Threading;
 using Microsoft.NodejsTools.Analysis;
 using Microsoft.NodejsTools.Classifier;
 using Microsoft.NodejsTools.Parsing;
 using Microsoft.NodejsTools.Project;
+using Microsoft.NodejsTools.Repl;
 using Microsoft.VisualStudio.Language.Intellisense;
 using Microsoft.VisualStudio.Shell.Interop;
 using Microsoft.VisualStudio.Text;
@@ -191,6 +193,8 @@ namespace Microsoft.NodejsTools.Intellisense {
                     if (classifier != null) {
                         classifier.NewVersion();
                     }
+
+                    ConnectErrorList(projEntry, buffer);
                 }
 
                 bufferParser._currentProjEntry = _openFiles[bufferParser] = projEntry;
@@ -220,6 +224,15 @@ namespace Microsoft.NodejsTools.Intellisense {
             }
         }
 #endif
+
+        public static void ConnectErrorList(IProjectEntry projEntry, ITextBuffer buffer) {
+            TaskProvider.Value.AddBufferForErrorSource(projEntry, ParserTaskMoniker, buffer);
+        }
+
+        public static void DisconnectErrorList(IProjectEntry projEntry, ITextBuffer buffer) {
+            TaskProvider.Value.RemoveBufferForErrorSource(projEntry, ParserTaskMoniker, buffer);
+        }
+
         /// <summary>
         /// Starts monitoring a buffer for changes so we will re-parse the buffer to update the analysis
         /// as the text changes.
@@ -227,11 +240,11 @@ namespace Microsoft.NodejsTools.Intellisense {
         internal MonitoredBufferResult MonitorTextBuffer(ITextView textView, ITextBuffer buffer) {
             IProjectEntry projEntry = CreateProjectEntry(buffer, new SnapshotCookie(buffer.CurrentSnapshot));
 
-            TaskProvider.Value.RegisterTextBuffer(projEntry, ParserTaskMoniker, buffer);
-#if FALSE
-            TaskProvider.Value.RegisterTextBuffer(projEntry, UnresolvedImportMoniker, buffer);
-            _unresolvedSquiggles.ListenForNextNewAnalysis(projEntry as IPythonProjectEntry);
-#endif
+            ConnectErrorList(projEntry, buffer);
+
+            if (!buffer.Properties.ContainsProperty(typeof(IReplEvaluator))) {
+                TaskProvider.Value.AddBufferForErrorSource(projEntry, UnresolvedImportMoniker, buffer);
+            }
 
             // kick off initial processing on the buffer
             lock (_openFiles) {
@@ -252,8 +265,8 @@ namespace Microsoft.NodejsTools.Intellisense {
 #endif
 
             if (TaskProvider.IsValueCreated) {
-                TaskProvider.Value.UnregisterTextBuffer(bufferParser._currentProjEntry, ParserTaskMoniker);
-                TaskProvider.Value.UnregisterTextBuffer(bufferParser._currentProjEntry, UnresolvedImportMoniker);
+                TaskProvider.Value.ClearErrorSource(bufferParser._currentProjEntry, ParserTaskMoniker);
+                TaskProvider.Value.ClearErrorSource(bufferParser._currentProjEntry, UnresolvedImportMoniker);
 
                 if (ImplicitProject) {
                     // remove the file from the error list
@@ -268,13 +281,15 @@ namespace Microsoft.NodejsTools.Intellisense {
                 // We aren't able to analyze code, so don't create an entry.
                 return null;
             }
-#if FALSE
+
             var replEval = buffer.GetReplEvaluator();
             if (replEval != null) {
                 // We have a repl window, create an untracked module.
-                return _pyAnalyzer.AddModule(null, null, analysisCookie);
+                return _jsAnalyzer.AddModule(
+                    Path.Combine(Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location), "repl" + Guid.NewGuid() + ".js"), 
+                    analysisCookie
+                );
             }
-#endif
 
             string path = buffer.GetFilePath();
             if (path == null) {
@@ -675,17 +690,13 @@ namespace Microsoft.NodejsTools.Intellisense {
             IJsProjectEntry pyProjEntry = entry as IJsProjectEntry;
             List<JsAst> asts = new List<JsAst>();
             foreach (var snapshot in snapshots) {
-#if FALSE
-                if (snapshot.TextBuffer.Properties.ContainsProperty(PythonReplEvaluator.InputBeforeReset)) {
+                if (snapshot.TextBuffer.Properties.ContainsProperty(NodejsReplEvaluator.InputBeforeReset)) {
                     continue;
                 }
-#endif
 
-#if FALSE
                 if (snapshot.IsReplBufferWithCommand()) {
                     continue;
                 }
-#endif
 
                 if (pyProjEntry != null && snapshot.TextBuffer.ContentType.IsOfType(NodejsConstants.Nodejs)) {
                     JsAst ast;
@@ -717,15 +728,12 @@ namespace Microsoft.NodejsTools.Intellisense {
                     if (asts.Count == 1) {
                         finalAst = asts[0];
                     } else {
-                        throw new NotImplementedException();
-#if FALSE
                         // multiple ASTs, merge them together
-                        finalAst = new JsAst(
-                            new SuiteStatement(asts.Select(ast => ast.Body).ToArray()),
-                            new int[0],
-                            asts[0].LanguageVersion
-                        );
-#endif
+                        var block = new Block(default(IndexSpan));
+                        foreach (var code in asts) {
+                            block.Append(code.Block);
+                        }
+                        finalAst = asts.Last().CloneWithNewBlock(block);
                     }
 
                     pyProjEntry.UpdateTree(finalAst, new SnapshotCookie(snapshots[0])); // SnapshotCookie is not entirely right, we should merge the snapshots
@@ -1323,17 +1331,20 @@ namespace Microsoft.NodejsTools.Intellisense {
         }
 
         private void SaveAnalysis() {
-            using (FileStream fs = new FileStream(GetAnalysisPath(), FileMode.Create)) {
-                fs.Write(_dbHeader, 0, _dbHeader.Length);
-                try {
-                    var serializer = new AnalysisSerializer();
-                    serializer.Serialize(fs, _jsAnalyzer);
-                    _analysisQueue.Serialize(serializer, fs);
-                } catch (Exception e) {
-                    Debug.Fail("Failed to save analysis " + e);
+            try {
+                using (FileStream fs = new FileStream(GetAnalysisPath(), FileMode.Create)) {
+                    fs.Write(_dbHeader, 0, _dbHeader.Length);
+                    try {
+                        var serializer = new AnalysisSerializer();
+                        serializer.Serialize(fs, _jsAnalyzer);
+                        _analysisQueue.Serialize(serializer, fs);
+                    } catch (Exception e) {
+                        Debug.Fail("Failed to save analysis " + e);
+                    }
                 }
+                new FileInfo(GetAnalysisPath()).Attributes |= FileAttributes.Hidden;
+            } catch (UnauthorizedAccessException) {
             }
-            new FileInfo(GetAnalysisPath()).Attributes |= FileAttributes.Hidden;
         }
 
         #endregion

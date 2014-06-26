@@ -23,7 +23,6 @@ namespace Microsoft.NodejsTools {
         public const string JavaScript = "JavaScript";
         public const string CSS = "CSS";
         public const string Nodejs = "Node.js";
-        public const string NodejsRepl = "Node.jsRepl";
 
         public const string DebuggerPort = "DebuggerPort";
         public const string EnvironmentVariables = "EnvironmentVariables";
@@ -55,9 +54,6 @@ namespace Microsoft.NodejsTools {
 
         [Export, Name(Nodejs), BaseDefinition("text")]
         internal static ContentTypeDefinition ContentTypeDefinition = null;
-
-        [Export, Name(NodejsRepl), BaseDefinition(Nodejs), BaseDefinition("JavaScript")]
-        internal static ContentTypeDefinition ReplContentTypeDefinition = null;
 
         public const string TypeScriptCompileItemType = "TypeScriptCompile";
         public const string EnableTypeScript = "EnableTypeScript";

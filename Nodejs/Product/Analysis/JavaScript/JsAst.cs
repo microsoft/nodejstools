@@ -49,6 +49,12 @@ namespace Microsoft.NodejsTools.Parsing {
             );
         }
 
+        public JsAst CloneWithNewBlock(Block block) {
+            return new JsAst(Span, _indexResolver) {
+                Block = block
+            };
+        }
+
         public override void Walk(AstVisitor visitor) {
             if (visitor.Walk(this)) {
                 Block.Walk(visitor);

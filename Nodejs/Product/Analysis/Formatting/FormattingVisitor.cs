@@ -101,7 +101,7 @@ namespace Microsoft.NodejsTools.Formatting {
 
         private void WalkFlowControlBlockWithOptionalParens(Block block, int startIndex, int previousExpressionEnd, bool inParens) {
             if (block != null) {
-                if (!block.HasBraces) {
+                if (block.Braces == BraceState.None) {
                     // braces are omitted...
 
                     // if (foo) 
@@ -341,7 +341,7 @@ namespace Microsoft.NodejsTools.Formatting {
         }
 
         public override bool Walk(Block node) {
-            Debug.Assert(node.HasBraces);
+            Debug.Assert(node.Braces != BraceState.None);
             WalkBlock(node);
             return false;
         }
@@ -388,7 +388,7 @@ namespace Microsoft.NodejsTools.Formatting {
             //     code
             // }
             return !(block is Block &&
-                ((Block)block).HasBraces &&
+                ((Block)block).Braces != BraceState.None &&
                 !ContainsLineFeed(parent.StartIndex, block.StartIndex));
         }
 
@@ -793,8 +793,8 @@ namespace Microsoft.NodejsTools.Formatting {
         /// <param name="block"></param>
         /// <param name="braceOnNewline"></param>
         private void WalkBlock(Block block) {
-            Debug.Assert(block == null || block.HasBraces);
-            if (block != null && block.HasBraces) {
+            Debug.Assert(block == null || block.Braces != BraceState.None);
+            if (block != null && block.Braces != BraceState.None) {
                 bool isMultiLine = ContainsLineFeed(block.StartIndex, block.EndIndex);
                 if (block.Count > 0 && isMultiLine) {
                     // multiline block statement, make sure the 1st statement
@@ -809,10 +809,12 @@ namespace Microsoft.NodejsTools.Formatting {
 
                 Dedent();
 
-                if (isMultiLine) {
-                    EnsureNewLinePreceeding(block.EndIndex - 1);
-                } else {
-                    ReplacePreceedingWhiteSpaceMaybeMultiline(block.EndIndex - 1);
+                if (block.Braces == BraceState.StartAndEnd) {
+                    if (isMultiLine) {
+                        EnsureNewLinePreceeding(block.EndIndex - 1);
+                    } else {
+                        ReplacePreceedingWhiteSpaceMaybeMultiline(block.EndIndex - 1);
+                    }
                 }
             }
         }

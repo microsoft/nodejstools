@@ -192,6 +192,8 @@ namespace Microsoft.NodejsTools.Intellisense {
                 _buffers.Add(textBuffer);
 
                 InitBuffer(textBuffer);
+
+                VsProjectAnalyzer.ConnectErrorList(_currentProjEntry, textBuffer);
             }
         }
 
@@ -202,6 +204,8 @@ namespace Microsoft.NodejsTools.Intellisense {
                 UninitBuffer(subjectBuffer);
 
                 _buffers.Remove(subjectBuffer);
+
+                VsProjectAnalyzer.DisconnectErrorList(_currentProjEntry, subjectBuffer);
             }
         }
 

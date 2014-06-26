@@ -70,10 +70,7 @@ namespace Microsoft.NodejsTools.Classifier {
 
             if (span.Length > 0) {
                 // don't add classifications for REPL commands.
-#if FALSE
-                if (!span.Snapshot.IsReplBufferWithCommand()) 
-#endif
-                {
+                if (!span.Snapshot.IsReplBufferWithCommand()) {
                     AddClassifications(GetJSScanner(), classifications, span);
                 }
             }
@@ -113,10 +110,7 @@ namespace Microsoft.NodejsTools.Classifier {
 
         private void BufferChanged(object sender, TextContentChangedEventArgs e) {
             var snapshot = e.After;
-#if FALSE
-            if (!snapshot.IsReplBufferWithCommand()) 
-#endif
-            {
+            if (!snapshot.IsReplBufferWithCommand()) {
                 _tokenCache.EnsureCapacity(snapshot.LineCount);
 
                 var JSScanner = GetJSScanner();

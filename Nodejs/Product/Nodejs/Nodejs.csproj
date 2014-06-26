@@ -549,7 +549,6 @@
     <Compile Include="ProvideLanguageTemplates.cs" />
     <Compile Include="Repl\ClearReplCommand.cs" />
     <Compile Include="Repl\INodejsReplSite.cs" />
-    <Compile Include="Repl\ReplBraceCompletionSessionProvider.cs" />
     <Compile Include="Repl\SaveReplCommand.cs" />
     <Compile Include="Repl\VsNodejsReplSite.cs" />
     <Compile Include="SmartIndent.cs" />

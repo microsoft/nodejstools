@@ -14,6 +14,7 @@
 
 using System;
 using System.ComponentModel.Composition;
+using Microsoft.NodejsTools.Repl;
 using Microsoft.VisualStudio.ComponentModelHost;
 using Microsoft.VisualStudio.Editor;
 using Microsoft.VisualStudio.Language.Intellisense;
@@ -59,5 +60,37 @@ namespace Microsoft.NodejsTools.Intellisense {
         }
 
         #endregion
+    }
+
+    [Export(typeof(IReplWindowCreationListener))]
+    [ContentType(NodejsConstants.Nodejs)]
+    class ReplWindowTextViewCreationListener : IReplWindowCreationListener {
+        private readonly IVsEditorAdaptersFactoryService _adaptersFactory;
+        private readonly IEditorOperationsFactoryService _editorOperationsFactory;
+        private readonly IComponentModel _compModel;
+        private readonly IEditorOptionsFactoryService _editorOptionsFactory;
+
+        [ImportingConstructor]
+        public ReplWindowTextViewCreationListener(IVsEditorAdaptersFactoryService adaptersFactory, IEditorOperationsFactoryService editorOperationsFactory, [Import(typeof(SVsServiceProvider))]IServiceProvider serviceProvider, IEditorOptionsFactoryService editorOptionsFactory) {
+            _adaptersFactory = adaptersFactory;
+            _editorOperationsFactory = editorOperationsFactory;
+            _compModel = (IComponentModel)serviceProvider.GetService(typeof(SComponentModel));
+            _editorOptionsFactory = editorOptionsFactory;
+        }
+
+        public void ReplWindowCreated(IReplWindow window) {
+            var textView = window.TextView;
+            var editFilter = new EditFilter(
+                textView,
+                _editorOperationsFactory.GetEditorOperations(textView),
+                _editorOptionsFactory.GetOptions(textView),
+                _compModel.GetService<IIntellisenseSessionStackMapService>().GetStackForTextView(textView),
+                _compModel
+            );
+            IntellisenseController controller = IntellisenseControllerProvider.GetOrCreateController(_compModel, textView);
+            controller.AttachKeyboardFilter();
+            
+            editFilter.AttachKeyboardFilter(_adaptersFactory.GetViewAdapter(window.TextView));
+        }
     }
 }
