@@ -256,9 +256,9 @@ namespace Microsoft.NodejsTools.Analysis.Values {
 
                 if (kvp.Value.Get != null) {
                     foreach (var value in kvp.Value.Get.TypesNoCopy) {
-                        UserFunctionValue userFunc = value as UserFunctionValue;
+                        FunctionValue userFunc = value as FunctionValue;
                         if (userFunc != null) {
-                            MergeTypes(res, key, userFunc.ReturnValue.Types);
+                            MergeTypes(res, key, userFunc.ReturnTypes);
                         }
                     }
                 }

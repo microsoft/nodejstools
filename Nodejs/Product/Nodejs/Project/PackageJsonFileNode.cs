@@ -72,7 +72,7 @@ namespace Microsoft.NodejsTools.Project {
                 
                 object mainFile;
                 if (json.TryGetValue("main", out mainFile) && mainFile is string) {
-                    ((NodejsProjectNode)ProjectMgr).Analyzer.Project.AddPackageJson(Url, (string)mainFile);
+                    ((NodejsProjectNode)ProjectMgr).Analyzer.AddPackageJson(Url, (string)mainFile);
                 }
             }
         }

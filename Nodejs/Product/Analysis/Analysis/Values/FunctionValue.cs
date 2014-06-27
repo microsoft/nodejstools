@@ -46,6 +46,12 @@ namespace Microsoft.NodejsTools.Analysis.Values {
             }
         }
 
+        public virtual IAnalysisSet ReturnTypes {
+            get {
+                return AnalysisSet.Empty;
+            }
+        }
+
         public IAnalysisSet NewThis {
             get {
                 return _instance.SelfSet;

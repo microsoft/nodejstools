@@ -75,6 +75,7 @@ namespace Microsoft.NodejsTools.Profiling {
         /// initialization is the Initialize method.
         /// </summary>
         public NodejsProfilingPackage() {
+            UIThread.InitializeAndAlwaysInvokeToCurrentThread();
             Instance = this;
         }
 
@@ -415,10 +416,12 @@ namespace Microsoft.NodejsTools.Profiling {
 
             bool jmc = true;
             using (var vsperfKey = VSRegistry.RegistryRoot(__VsLocalRegistryType.RegType_UserSettings).OpenSubKey("VSPerf")) {
-                var value = vsperfKey.GetValue("tools.options.justmycode");
-                int jmcSetting;
-                if (value != null && value is string && Int32.TryParse((string)value, out jmcSetting)) {
-                    jmc = jmcSetting != 0;
+                if (vsperfKey != null) {
+                    var value = vsperfKey.GetValue("tools.options.justmycode");
+                    int jmcSetting;
+                    if (value != null && value is string && Int32.TryParse((string)value, out jmcSetting)) {
+                        jmc = jmcSetting != 0;
+                    }
                 }
             }
 

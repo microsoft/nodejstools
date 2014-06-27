@@ -265,6 +265,17 @@ SimpleTest.prototype._performRequest = function (webResource, body, options, cal
 
         }
 
+        [TestMethod]
+        public void TestGlobals() {
+            string code = @"
+var x = 42;
+";
+            var analysis = ProcessText(code);
+            AssertUtil.ContainsAtLeast(
+                analysis.GetAllAvailableMembersByIndex(code.Length).Select(x => x.Name),
+                "require"
+            );
+        }
 
         [TestMethod]
         public void TestDefinitiveAssignmentScoping() {
@@ -279,6 +290,30 @@ x = x.abc;
             );
         }
 
+        [TestMethod]
+        public void TestStringMembers() {
+            string code = @"
+var x = 'abc';
+";
+            var analysis = ProcessText(code);
+            AssertUtil.ContainsAtLeast(
+                analysis.GetMembersByIndex("x", code.Length).Select(x => x.Name),
+                "length"
+            );
+        }
+
+        [TestMethod]
+        public void TestBadIndexes() {
+            string code = @"
+var x = {};
+x[] = 42;
+var y = x[];
+";
+            var analysis = ProcessText(code);
+            AssertUtil.ContainsExactly(
+                analysis.GetMembersByIndex("y", code.Length)
+            );
+        }
 
         [TestMethod]
         public void TestDefinitiveAssignmentMerged() {

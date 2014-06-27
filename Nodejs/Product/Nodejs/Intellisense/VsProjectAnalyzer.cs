@@ -93,7 +93,13 @@ namespace Microsoft.NodejsTools.Intellisense {
 
         private object _contentsLock = new object();
 
-        const int _dbVersion = 1;
+        const int _curDbVersion = 2;
+#if DEBUG
+        const int _dbVersion = unchecked((int)(0x80000000 | _curDbVersion));
+#else
+        const int _dbVersion = _curDbVersion;
+#endif
+
         private static byte[] _dbHeader = new byte[] { (byte)'J', (byte)'S', (byte)'A', (byte)'N' }.Concat(BitConverter.GetBytes(_dbVersion)).ToArray();
 
         internal VsProjectAnalyzer(
@@ -352,6 +358,13 @@ namespace Microsoft.NodejsTools.Intellisense {
             }
 
             return item;
+        }
+
+        internal void AddPackageJson(string path, string mainFile) {
+            _analysisQueue.Enqueue(
+                _jsAnalyzer.AddPackageJson(path, mainFile),
+                AnalysisPriority.Normal
+            );
         }
 
         internal IEnumerable<KeyValuePair<string, IProjectEntry>> LoadedFiles {
@@ -1213,7 +1226,7 @@ namespace Microsoft.NodejsTools.Intellisense {
 #endif
 
                 ClearParserTasks(entry);
-                _jsAnalyzer.RemoveModule(entry);
+                _analysisQueue.Enqueue(_jsAnalyzer.RemoveModule(entry), AnalysisPriority.Normal);
                 IProjectEntry removed;
                 _projectFiles.TryRemove(entry.FilePath, out removed);
 #if FALSE

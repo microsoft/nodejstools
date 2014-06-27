@@ -179,16 +179,23 @@ namespace Microsoft.NodejsTools.Analysis.Analyzer {
         private static IAnalysisSet EvaluateIndex(ExpressionEvaluator ee, Node node) {
             var n = (CallNode)node;
 
-            return ee.Evaluate(n.Function).GetIndex(n, ee._unit, ee.Evaluate(GetIndexArgument(n)));
+            var indexArg = GetIndexArgument(n);
+            if (indexArg != null) {
+                return ee.Evaluate(n.Function).GetIndex(n, ee._unit, ee.Evaluate(indexArg));
+            }
+            return AnalysisSet.Empty;
         }
 
         private static Expression GetIndexArgument(CallNode n) {
-            Debug.Assert(n.Arguments.Count == 1);
-            var comma = n.Arguments[0] as CommaOperator;
-            if (comma != null) {
-                return comma.Expressions[comma.Expressions.Length - 1];
+            if (n.Arguments.Count > 0) {
+                Debug.Assert(n.Arguments.Count == 1);
+                var comma = n.Arguments[0] as CommaOperator;
+                if (comma != null) {
+                    return comma.Expressions[comma.Expressions.Length - 1];
+                }
+                return n.Arguments[0];
             }
-            return n.Arguments[0];
+            return null;
         }
 
         private static IAnalysisSet EvaluateObjectLiteral(ExpressionEvaluator ee, Node node) {
@@ -460,8 +467,11 @@ namespace Microsoft.NodejsTools.Analysis.Analyzer {
                 var call = (CallNode)left;
                 if (call.InBrackets) {
                     var indexObj = Evaluate(call.Function);
-                    foreach (var obj in Evaluate(GetIndexArgument(call))) {
-                        indexObj.SetIndex(assignStmt, _unit, obj, values);
+                    var indexArg = GetIndexArgument(call);
+                    if (indexArg != null) {
+                        foreach (var obj in Evaluate(indexArg)) {
+                            indexObj.SetIndex(assignStmt, _unit, obj, values);
+                        }
                     }
                 }
             }
@@ -474,7 +484,7 @@ namespace Microsoft.NodejsTools.Analysis.Analyzer {
                 return funcRec.AnalysisValue.SelfSet;
             }
             
-            Debug.Fail("Failed to find function record");
+            Debug.Assert(ee._unit.ForEval, "Failed to find function record");
             return AnalysisSet.Empty;
         }
 

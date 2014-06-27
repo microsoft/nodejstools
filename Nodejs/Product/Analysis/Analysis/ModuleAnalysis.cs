@@ -321,6 +321,15 @@ namespace Microsoft.NodejsTools.Analysis {
                 }
             }
 
+            foreach (var kvp in this._unit.Analyzer._globalObject.GetAllMembers()) {
+                List<AnalysisValue> values;
+                if (!result.TryGetValue(kvp.Key, out values)) {
+                    result[kvp.Key] = new List<AnalysisValue>(kvp.Value);
+                } else {
+                    values.AddRange(kvp.Value);
+                }
+            }
+
             var res = MemberDictToResultList(options, result);
             if (options.Keywords()) {
                 res = GetKeywordMembers(options, scope).Union(res);

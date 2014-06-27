@@ -63,6 +63,54 @@ console.log(err);
             Assert.AreEqual(0, Formatter.GetEditsAfterKeystroke("function f  () { }", 0, ':').Length);
         }
 
+        /// <summary>
+        /// 
+        /// </summary>
+        [TestMethod, Priority(0)]
+        public void TestSemicolonEndOfDocument() {
+            var testCode = new[] { 
+                // https://nodejstools.codeplex.com/workitem/1102
+                new { Before = "x=1\r\nconsole.log( 'hi');", After = "x=1\r\nconsole.log('hi');" },
+                // https://nodejstools.codeplex.com/workitem/1075
+                new { Before = "function hello () {\r\n    return;", After = "function hello() {\r\n    return;" }
+            };
+
+            foreach (var test in testCode) {
+                var code = test.Before;
+                Console.WriteLine(code);
+
+                TestCode(code.IndexOf(';') + 1, ';', code, test.After);
+            }
+        }
+
+        [TestMethod, Priority(0)]
+        public void TestFormatAfterEnter() {
+            var testCode = new[] { 
+                // https://nodejstools.codeplex.com/workitem/1078
+                new { Before = "function f() {\r\n    if(true)!\r\n}", After = "function f() {\r\n    if (true)\r\n\r\n}" },
+                // https://nodejstools.codeplex.com/workitem/1075
+                new { Before = "function hello() {!", After = "function hello() {\r\n" }
+            };
+
+            foreach (var test in testCode) {
+                Console.WriteLine(test.Before);
+                string code = test.Before.Replace("!", "\r\n");
+                int enterIndex = code.IndexOf(';') + 2;
+                var lines = code.Split(new[] { "\r\n" }, StringSplitOptions.None);
+                int startIndex = 0, endIndex = lines[0].Length + lines[1].Length + ("\r\n".Length * 2);
+                for(int i = 1; i<lines.Length; i++) {
+                    if (enterIndex < endIndex) {
+                        break;
+                    }
+
+                    startIndex += lines[i - 1].Length + "\r\n".Length;
+                    endIndex += lines[i].Length + "\r\n".Length;
+                }
+
+                TestEnter(startIndex, endIndex, code, test.After);
+            }
+        }
+
         [TestMethod, Priority(0)]
         public void TestFormatAfterSemiColon() {
             string surroundingCode = "x=1";
@@ -1717,6 +1765,9 @@ throw null;
             Assert.AreEqual(expected, FormatCode(code, start, end, options));
         }
 
+        private static void TestEnter(int start, int end, string code, string expected, FormattingOptions options = null) {
+            Assert.AreEqual(expected, FormatEnter(code, start, end, options));
+        }
 
         private static string FormatCode(string code, FormattingOptions options) {
             var ast = new JSParser(code).Parse(new CodeSettings());
@@ -1733,6 +1784,12 @@ throw null;
         private static string FormatCode(string code, int start, int end, FormattingOptions options) {
             var ast = new JSParser(code).Parse(new CodeSettings());
             var edits = Formatter.GetEditsForRange(code, start, end, options);
+            return ApplyEdits(code, edits);
+        }
+
+        private static string FormatEnter(string code, int start, int end, FormattingOptions options) {
+            var ast = new JSParser(code).Parse(new CodeSettings());
+            var edits = Formatter.GetEditsAfterEnter(code, start, end, options);
             return ApplyEdits(code, edits);
         }
 

@@ -115,12 +115,12 @@ namespace Microsoft.NodejsTools.Analysis {
         public IJsProjectEntry AddModule(string filePath, IAnalysisCookie cookie = null) {
             var entry = new ProjectEntry(this, filePath, cookie);
 
-            Modules.AddModule(filePath, entry.ModuleValue);
+            Modules.AddModule(filePath, entry);
 
             return entry;
         }
 
-        public void AddPackageJson(string filePath, string entryPoint) {
+        public IAnalyzable AddPackageJson(string filePath, string entryPoint) {
             if (Path.GetFileName(filePath) != "package.json") {
                 throw new InvalidOperationException("path must be to package.json file");
             }
@@ -130,7 +130,29 @@ namespace Microsoft.NodejsTools.Analysis {
                 entryPoint = "./" + entryPoint;
             }
 
-            Modules.GetModuleTree(Path.GetDirectoryName(filePath)).DefaultPackage = entryPoint;
+            var tree = Modules.GetModuleTree(Path.GetDirectoryName(filePath));
+            
+            tree.DefaultPackage = entryPoint;
+
+            return new TreeUpdateAnalysis(tree);
+        }
+
+        /// <summary>
+        /// When our module tree changes any dependencies that have required
+        /// that portion of the module tree need to be re-analyzed.  This
+        /// analyzable will handle enqueuing those changes on the correct thread.
+        /// </summary>
+        class TreeUpdateAnalysis : IAnalyzable {
+            private readonly ModuleTree _tree;
+            public TreeUpdateAnalysis(ModuleTree tree) {
+                _tree = tree;
+            }
+
+            public void Analyze(CancellationToken cancel) {
+                if (_tree != null) {
+                    _tree.EnqueueDependents();
+                }
+            }
         }
 
         /// <summary>
@@ -138,7 +160,7 @@ namespace Microsoft.NodejsTools.Analysis {
         /// 
         /// This method is thread safe.
         /// </summary>
-        public void RemoveModule(IProjectEntry entry) {
+        public IAnalyzable RemoveModule(IProjectEntry entry) {
             if (entry == null) {
                 throw new ArgumentNullException("entry");
             }
@@ -146,9 +168,13 @@ namespace Microsoft.NodejsTools.Analysis {
 
             var pyEntry = entry as IJsProjectEntry;
             if (pyEntry != null) {
-                Modules.Remove(pyEntry.FilePath);
+                var tree = Modules.Remove(pyEntry.FilePath);
+                if (tree != null) {
+                    return new TreeUpdateAnalysis(tree);
+                }
             }
             entry.RemovedFromProject();
+            return new TreeUpdateAnalysis(null);
         }
 
         public IJsProjectEntry this[string filename] {

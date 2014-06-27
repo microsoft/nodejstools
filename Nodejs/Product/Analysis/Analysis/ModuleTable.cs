@@ -85,28 +85,30 @@ namespace Microsoft.NodejsTools.Analysis {
             }
         }
 
-        internal bool Remove(string filename) {
+        internal ModuleTree Remove(string filename) {
             lock (_lock) {
                 var curTree = _modules;
                 _modulesByFilename.Remove(filename);
                 foreach (var comp in GetPathComponents(filename)) {
                     ModuleTree nextTree;
                     if (!curTree.Children.TryGetValue(comp, out nextTree)) {
-                        return false;
+                        return null;
                     }
 
                     curTree = nextTree;
                 }
                 if (curTree.Parent != null) {
-                    return curTree.Parent.Children.Remove(Path.GetFileName(filename));
+                    curTree.Parent.Children.Remove(Path.GetFileName(filename));
+                    return curTree.Parent;
                 }
             }
-            return false;
+            return null;
         }
 
-        public void AddModule(string name, ModuleValue value) {
+        public void AddModule(string name, ProjectEntry value) {
             lock (_lock) {
-                GetModuleTree(name).Module = value;
+                GetModuleTree(name).Module = value.ModuleValue;
+                value._enqueueModuleDependencies = true;
             }
         }
 
@@ -275,12 +277,15 @@ namespace Microsoft.NodejsTools.Analysis {
             }
             set {
                 _defaultPackage = value;
-                EnqueueDependents();
-
             }
         }
 
-        private void EnqueueDependents() {
+        /// <summary>
+        /// Enqueues dependents which have required this tree.  This method must be called
+        /// on the analysis thread which means any mutations to the tree need to propagate
+        /// out an IAnalyzable or capture their updates in an existing analysis.
+        /// </summary>
+        public void EnqueueDependents() {
             var curTree = this;
             while (curTree != null) {
                 curTree._dependencies.EnqueueDependents();
@@ -294,7 +299,6 @@ namespace Microsoft.NodejsTools.Analysis {
             }
             set {
                 _module = value;
-                EnqueueDependents();
             }
         }
 

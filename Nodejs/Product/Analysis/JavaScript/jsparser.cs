@@ -2831,10 +2831,10 @@ namespace Microsoft.NodejsTools.Parsing
                 }
                 catch (RecoveryTokenException exc)
                 {
+                    fncSpan = fncSpan.UpdateWith(_curSpan);
                     if (IndexOfToken(NoSkipTokenSet.s_BlockNoSkipTokenSet, exc) == -1)
                     {
                         body.Span = body.Span.UpdateWith(_curSpan);
-                        fncSpan = fncSpan.UpdateWith(_curSpan);
                         exc._partiallyComputedNode = new FunctionObject(fncSpan)
                             {
                                 FunctionType = (inExpression ? FunctionType.Expression : FunctionType.Declaration),

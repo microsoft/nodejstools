@@ -123,6 +123,12 @@ namespace Microsoft.NodejsTools.Formatting {
                 Node targetNode = node;
                 while (targetNode.Parent != null &&
                     targetNode.Parent.EndIndex == node.EndIndex) {
+                    if (targetNode.Parent != null && targetNode.Parent.Parent is JsAst) {
+                        // https://nodejstools.codeplex.com/workitem/1102
+                        // We don't want to reformat the entire document just because someone
+                        // is doing something at the end of the document.
+                        break;
+                    }
                     targetNode = targetNode.Parent;
                 }
                 return targetNode;

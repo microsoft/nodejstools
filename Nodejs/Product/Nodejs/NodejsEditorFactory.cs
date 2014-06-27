@@ -257,7 +257,7 @@ namespace Microsoft.NodejsTools {
             }
             var textMgr = (IVsTextManager)_package.GetService(typeof(SVsTextManager));
 
-            var bufferEventListener = new TextBufferEventListener(compModel, textLines, textMgr, window, hierarchy, itemid);
+            var bufferEventListener = new TextBufferEventListener(textLines);
             if (!createdDocData) {
                 // we have a pre-created buffer, go ahead and initialize now as the buffer already
                 // exists and is initialized.
@@ -279,19 +279,9 @@ namespace Microsoft.NodejsTools {
             private readonly IVsTextLines _textLines;
             private readonly uint _cookie;
             private readonly IConnectionPoint _cp;
-            private readonly IComponentModel _compModel;
-            private readonly IVsTextManager _textMgr;
-            private readonly IVsCodeWindow _window;
-            private readonly IVsHierarchy _hierarchy;
-            private readonly uint _itemid;
 
-            public TextBufferEventListener(IComponentModel compModel, IVsTextLines textLines, IVsTextManager textMgr, IVsCodeWindow window, IVsHierarchy hierarchy, uint itemid) {
+            public TextBufferEventListener(IVsTextLines textLines) {
                 _textLines = textLines;
-                _compModel = compModel;
-                _textMgr = textMgr;
-                _window = window;
-                _hierarchy = hierarchy;
-                _itemid = itemid;
 
                 var cpc = textLines as IConnectionPointContainer;
                 var bufferEventsGuid = typeof(IVsTextBufferDataEvents).GUID;
@@ -307,84 +297,15 @@ namespace Microsoft.NodejsTools {
             public int OnLoadCompleted(int fReload) {
                 _cp.Unadvise(_cookie);
 
-                var adapterService = _compModel.GetService<IVsEditorAdaptersFactoryService>();
-                ITextBuffer diskBuffer = adapterService.GetDocumentBuffer(_textLines);
-
-                var factService = _compModel.GetService<IProjectionBufferFactoryService>();
-
-                var contentRegistry = _compModel.GetService<IContentTypeRegistryService>();
-
-                IContentType contentType = SniffContentType(diskBuffer) ??
-                                           contentRegistry.GetContentType(NodejsConstants.Nodejs);
-
-                diskBuffer.ChangeContentType(contentRegistry.GetContentType(NodejsConstants.Nodejs), null);
-#if FALSE
-                var proj = VsExtensions.GetCommonProject(Extensions.GetProject(_hierarchy)) as NodejsProjectNode;
-
-                NodejsProjectionBuffer projBuffer;
-                if (!diskBuffer.Properties.TryGetProperty(typeof(NodejsProjectionBuffer), out projBuffer)) {
-                    projBuffer = new NodejsProjectionBuffer(
-                        contentRegistry,
-                        factService,
-                        diskBuffer,
-                        _compModel.GetService<IBufferGraphFactoryService>(),
-                        contentType,
-                        proj != null ? proj._referenceFilename : NodejsPackage.NodejsReferencePath
-                    );
-
-                    diskBuffer.Properties.AddProperty(typeof(NodejsProjectionBuffer), projBuffer);
-                    adapterService.SetDataBuffer(_textLines, projBuffer.EllisionBuffer);
-
-                    Guid langSvcGuid = typeof(NodejsLanguageInfo).GUID;
-                    _textLines.SetLanguageServiceID(ref langSvcGuid);
-                    
-                    diskBuffer.ChangeContentType(contentRegistry.GetContentType(NodejsConstants.Nodejs), null);
-                }
-
-                IVsTextView view;
-                ErrorHandler.ThrowOnFailure(_window.GetPrimaryView(out view));
-                CodeWindowManager.AddSkipFilter(adapterService, view);
-#endif
+                Guid langSvcGuid = typeof(NodejsLanguageInfo).GUID;
+                _textLines.SetLanguageServiceID(ref langSvcGuid);
+                
                 return VSConstants.S_OK;
-            }
-
-            private IContentType SniffContentType(ITextBuffer diskBuffer) {
-                // try and sniff the content type from a double extension, and if we can't
-                // do that then return null to indicate we couldn't figure out the type,
-                // then we'll default to JavaScript.
-                IContentType contentType = null;
-                ITextDocument textDocument;
-                if (diskBuffer.Properties.TryGetProperty<ITextDocument>(typeof(ITextDocument), out textDocument)) {
-                    string subExt = Path.GetExtension(textDocument.FilePath).Substring(1);
-
-                    var fileExtRegistry = _compModel.GetService<IFileExtensionRegistryService>();
-
-                    contentType = fileExtRegistry.GetContentTypeForExtension(subExt);
-                }
-                return contentType;
             }
 
             #endregion
         }
     }
-
-#if FALSE
-    class SkipJsLsFilter : IOleCommandTarget {
-        private readonly IOleCommandTarget _next;
-
-        public SkipJsLsFilter(IVsTextView view) {
-            ErrorHandler.ThrowOnFailure(view.AddCommandFilter(this, out _next));
-        }
-
-        public int Exec(ref Guid pguidCmdGroup, uint nCmdID, uint nCmdexecopt, IntPtr pvaIn, IntPtr pvaOut) {
-            return _next.Exec(pguidCmdGroup, nCmdID, nCmdexecopt, pvaIn, pvaOut);
-        }
-
-        public int QueryStatus(ref Guid pguidCmdGroup, uint cCmds, OLECMD[] prgCmds, IntPtr pCmdText) {
-            return _next.QueryStatus(pguidCmdGroup, cCmds, prgCmds, pCmdText);
-        }
-    }
-#endif
 
     [Guid(Guids.NodejsEditorFactoryPromptEncodingString)]
     class NodejsEditorFactoryPromptForEncoding : NodejsEditorFactory {

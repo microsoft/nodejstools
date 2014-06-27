@@ -83,7 +83,9 @@ namespace Microsoft.NodejsTools.Parsing {
             if (walker.Walk(this)) {
                 if (m_parameters != null) {
                     foreach (var param in m_parameters) {
-                        param.Walk(walker);
+                        if (param != null) {
+                            param.Walk(walker);
+                        }
                     }
                 }
 

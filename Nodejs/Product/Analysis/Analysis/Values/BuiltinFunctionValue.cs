@@ -97,6 +97,12 @@ namespace Microsoft.NodejsTools.Analysis.Values {
         public override IAnalysisSet Call(Node node, AnalysisUnit unit, IAnalysisSet @this, IAnalysisSet[] args) {
             return _retValue;
         }
+
+        public override IAnalysisSet ReturnTypes {
+            get {
+                return _retValue;
+            }
+        }
     }
 
     [Serializable]

@@ -42,6 +42,7 @@ namespace Microsoft.NodejsTools.Analysis {
         private Dictionary<object, object> _properties = new Dictionary<object, object>();
         private ManualResetEventSlim _curWaiter;
         private int _updatesPending, _waiters;
+        internal bool _enqueueModuleDependencies;
 
         // we expect to have at most 1 waiter on updated project entries, so we attempt to share the event.
         private static ManualResetEventSlim _sharedWaitEvent = new ManualResetEventSlim(false);
@@ -139,6 +140,14 @@ namespace Microsoft.NodejsTools.Analysis {
             if (cancel.IsCancellationRequested) {
                 return;
             }
+            if (_enqueueModuleDependencies) {
+                var tree = _analyzer.Modules.GetModuleTree(_filePath);
+                if (tree != null) {
+                    tree.EnqueueDependents();
+                }
+                _enqueueModuleDependencies = false;
+            }
+
             lock (this) {
                 _analysisVersion++;
 

@@ -39,6 +39,12 @@ namespace Microsoft.NodejsTools.Analysis.Values {
             declUnit.Analyzer.AnalysisValueCreated(typeof(UserFunctionValue));
         }
 
+        public override IAnalysisSet ReturnTypes {
+            get {
+                return ReturnValue.Types;
+            }
+        }
+
         public FunctionObject FunctionObject {
             get {
                 return _funcObject;
