@@ -19,6 +19,7 @@ using System.IO;
 using System.Threading;
 using Microsoft.VisualStudio.TestPlatform.ObjectModel.Logging;
 using Microsoft.VisualStudioTools.Project;
+using Newtonsoft.Json;
 
 namespace Microsoft.NodejsTools.TestAdapter.TestFrameworks {
     class TestFramework {
@@ -39,13 +40,13 @@ namespace Microsoft.NodejsTools.TestAdapter.TestFrameworks {
             IMessageLogger logger, 
             string workingDirectory) {
 
-            string testNames = string.Empty;
+            string testInfo = string.Empty;
             string discoverResultFile = Path.GetTempFileName();
             try {
                 EvaluateJavaScript(nodeExe, testFile, discoverResultFile, logger, workingDirectory);
                 for (int i = 0; i < 4; i++) {
                     try {
-                        testNames = File.ReadAllText(discoverResultFile);
+                        testInfo = File.ReadAllText(discoverResultFile);
                         break;
                     } catch (IOException) {
                         //We took an error processing the file.  Wait a few and try again
@@ -62,8 +63,10 @@ namespace Microsoft.NodejsTools.TestAdapter.TestFrameworks {
             }
 
             List<NodejsTestInfo> testCases = new List<NodejsTestInfo>();
-            foreach (var testName in testNames.Split(new[] { "\r\n", "\r", "\n" }, StringSplitOptions.RemoveEmptyEntries)) {
-                NodejsTestInfo test = new NodejsTestInfo(testFile, testName, Name);
+            List<DiscoveredTest> discoveredTests = (List<DiscoveredTest>)JsonConvert.DeserializeObject(testInfo, typeof(List<DiscoveredTest>));
+
+            foreach (DiscoveredTest discoveredTest in discoveredTests) {
+                NodejsTestInfo test = new NodejsTestInfo(testFile, discoveredTest.Test, discoveredTest.Suite, Name);
                 testCases.Add(test);
             }
             return testCases;
@@ -132,6 +135,11 @@ namespace Microsoft.NodejsTools.TestAdapter.TestFrameworks {
             }
 
             return stdout;
+        }
+
+        private class DiscoveredTest {
+            public string Test { get; set; }
+            public string Suite { get; set; }
         }
     }
 }
