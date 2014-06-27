@@ -26,7 +26,8 @@
                              IsEnabled="True"
                              IsReadOnly="True"
                              Height="24"
-                             Text="{Binding Path=StatusText}"></TextBox>
+                             Text="{Binding Path=StatusText}"
+                             IsTabStop="False"></TextBox>
                 </DockPanel>
                 <ProgressBar Name="_progress"
                              Height="4"
@@ -37,7 +38,8 @@
                          Background="Black"
                          Foreground="GreenYellow"
                          IsReadOnly="True"
-                         FontFamily="Consolas">
+                         FontFamily="Consolas"
+                         IsTabStop="False">
             </RichTextBox>
         </DockPanel>            
     </Grid>

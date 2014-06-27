@@ -481,4 +481,7 @@
   <data name="NpmPackageInstallHelpMessage" xml:space="preserve">
     <value>(enter arguments above)</value>
   </data>
+  <data name="NpmReplCommandCompletedWithErrors" xml:space="preserve">
+    <value>{0} completed with errors</value>
+  </data>
 </root>

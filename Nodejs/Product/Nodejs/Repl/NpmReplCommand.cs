@@ -57,9 +57,9 @@ namespace Microsoft.NodejsTools.Repl {
             var solution = Package.GetGlobalService(typeof(SVsSolution)) as IVsSolution;
             IEnumerable<IVsProject> loadedProjects = solution.EnumerateLoadedProjects(onlyNodeProjects: true);
 
-            var projectNameToDirectoryDictionary = new Dictionary<string, string>();
-            object projectName, projectDirectory;
-            foreach (var project in loadedProjects) {
+            var projectNameToDirectoryDictionary = new Dictionary<string, string>(StringComparer.OrdinalIgnoreCase);
+            foreach (IVsProject project in loadedProjects) {
+                object projectName, projectDirectory;
                 var hierarchy = (IVsHierarchy)project;
                 var nameResult = hierarchy.GetProperty(VSConstants.VSITEMID_ROOT, (int)__VSHPROPID.VSHPROPID_Name, out projectName);
                 var projectResult = hierarchy.GetProperty(VSConstants.VSITEMID_ROOT, (int)__VSHPROPID.VSHPROPID_ProjectDir, out projectDirectory);
@@ -81,7 +81,10 @@ namespace Microsoft.NodejsTools.Repl {
                 }
             }
 
-            if (!(Directory.Exists(projectPath) && File.Exists(Path.Combine(projectPath, "package.json")))){
+            // In case someone copies filename
+            string projectDirectoryPath = File.Exists(projectPath) ? Path.GetDirectoryName(projectPath) : projectPath;
+            
+            if (!(Directory.Exists(projectDirectoryPath) && File.Exists(Path.Combine(projectDirectoryPath, "package.json")))){
                 window.WriteError("Please specify a valid Node.js project or project directory in solution. If solution contains multiple projects, specify target project using .npm [ProjectName or ProjectDir] <npm arguments>");
                 return ExecutionResult.Failure;
             }
@@ -93,7 +96,7 @@ namespace Microsoft.NodejsTools.Repl {
             using (var process = ProcessOutput.Run(
                     _npmPath,
                     new[] { npmArguments },
-                    projectPath,
+                    projectDirectoryPath,
                     null,
                     false,
                     npmReplRedirector,
@@ -102,7 +105,7 @@ namespace Microsoft.NodejsTools.Repl {
             }
 
             if (npmReplRedirector.HasErrors) {
-                window.WriteError(SR.GetString(SR.NpmCompletedWithErrors, arguments));
+                window.WriteError(SR.GetString(SR.NpmReplCommandCompletedWithErrors, arguments));
             }
             else {
                 window.WriteLine(SR.GetString(SR.NpmSuccessfullyCompleted, arguments));

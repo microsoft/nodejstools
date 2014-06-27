@@ -96,6 +96,7 @@ namespace Microsoft.NodejsTools.Project {
         internal const string NpmPackageTypeDescription = "NpmPackageTypeDescription";
         internal const string NpmPackageVersion = "NpmPackageVersion";
         internal const string NpmPackageVersionDescription = "NpmPackageVersionDescription";
+        internal const string NpmReplCommandCompletedWithErrors = "NpmReplCommandCompletedWithErrors";
         internal const string NpmStatusExecuting = "NpmStatusExecuting";
         internal const string NpmStatusExecutingErrors = "NpmStatusExecutingErrors";
         internal const string NpmStatusExecutingQueued = "NpmStatusExecutingQueued";
