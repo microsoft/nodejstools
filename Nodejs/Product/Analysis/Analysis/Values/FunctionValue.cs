@@ -21,7 +21,7 @@ namespace Microsoft.NodejsTools.Analysis.Values {
     [Serializable]
     internal class FunctionValue : ExpandoValue {
         internal readonly InstanceValue _instance;
-        private ReferenceDict _references;
+        internal ReferenceDict _references;
 
         internal FunctionValue(ProjectEntry projectEntry, bool createPrototype = true, string name = null)
             : base(projectEntry) {

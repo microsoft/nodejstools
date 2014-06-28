@@ -702,6 +702,15 @@ namespace Microsoft.NodejsTools.Analysis {
                 }
             }
 
+            UserFunctionValue func = referenceable as UserFunctionValue;
+            if (func != null &&
+                func.ProjectEntry.Tree != null &&
+                func.DeclaringVersion == func.ProjectEntry.AnalysisVersion) {
+                    var start = func.FunctionObject;
+
+                yield return new AnalysisVariable(VariableType.Definition, func.ProjectEntry.Tree.ResolveLocation(func.ProjectEntry, start));
+            }
+
             foreach (var reference in referenceable.Definitions) {
                 yield return new AnalysisVariable(
                     _definitionsAreReferences ? VariableType.Reference : VariableType.Definition,

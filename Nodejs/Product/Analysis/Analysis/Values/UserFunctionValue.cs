@@ -22,7 +22,7 @@ using Microsoft.NodejsTools.Parsing;
 
 namespace Microsoft.NodejsTools.Analysis.Values {
     [Serializable]
-    class UserFunctionValue : FunctionValue {
+    class UserFunctionValue : FunctionValue, IReferenceable {
         private readonly FunctionObject _funcObject;
         private readonly FunctionAnalysisUnit _analysisUnit;
         public VariableDef ReturnValue;
@@ -565,5 +565,30 @@ namespace Microsoft.NodejsTools.Analysis.Values {
             OverflowedOnce,
             OverflowedBigTime
         }
+
+        public IEnumerable<KeyValuePair<IProjectEntry, EncodedLocation>> Definitions {
+            get {
+                yield return new KeyValuePair<IProjectEntry, EncodedLocation>(
+                    ProjectEntry,
+                    new EncodedLocation(_analysisUnit.Tree, _funcObject)
+                );
+            }
+        }
+
+        public new IEnumerable<KeyValuePair<IProjectEntry, EncodedLocation>> References {
+            get {
+                if (_references != null) {
+                    foreach (var keyValue in _references) {
+                        foreach (var loc in keyValue.Value.References) {
+                            yield return new KeyValuePair<IProjectEntry, EncodedLocation>(
+                                keyValue.Key,
+                                loc
+                            );
+                        }
+                    }
+                }
+            }
+        }
+
     }
 }

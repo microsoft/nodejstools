@@ -437,10 +437,25 @@ namespace Microsoft.NodejsTools.Analysis.Values {
 
         public virtual IEnumerable<IReferenceable> GetDefinitions(string name) {
             PropertyDescriptor desc;
-            // TODO: access descriptor support
             if (_descriptors != null && _descriptors.TryGetValue(name, out desc)) {
                 if (desc.Values != null) {
                     yield return desc.Values;
+                }
+
+                if (desc.Get != null) {
+                    foreach (var type in desc.Get.Types) {
+                        var func = type as IReferenceable;
+                        if (func != null) {
+                            yield return func;
+                        }
+                    }
+                } else if (desc.Set != null) {
+                    foreach (var type in desc.Set.Types) {
+                        var func = type as IReferenceable;
+                        if (func != null) {
+                            yield return func;
+                        }
+                    }
                 }
             }
 

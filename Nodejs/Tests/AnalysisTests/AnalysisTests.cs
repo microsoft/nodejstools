@@ -266,6 +266,20 @@ SimpleTest.prototype._performRequest = function (webResource, body, options, cal
         }
 
         [TestMethod]
+        public void TestPropertyGotoDef() {
+            string code = @"
+Object.defineProperty(Object.prototype, 'should', { set: function() { }, get: function() { 42 } });
+var x = {};
+";
+            var analysis = ProcessText(code);
+            AssertUtil.ContainsAtLeast(
+                analysis.GetVariablesByIndex("x.should", code.Length)
+                    .Select(x => x.Location.Line + ", " + x.Location.Column + ", " + x.Type),
+                "2, 79, Definition"
+            );
+        }
+
+        [TestMethod]
         public void TestGlobals() {
             string code = @"
 var x = 42;
