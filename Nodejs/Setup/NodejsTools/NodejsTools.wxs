@@ -21,7 +21,7 @@
                     <Directory Id="Dir_$(var.key)ScriptsTypingsNode" Name="Node" />
                 </Directory>
             </Directory>
-            <Directory Id="Dir_$(var.key)RemoteDebug" Name="RemoteDebug"/>
+            <Directory Id="Dir_$(var.key)InstallLocationRemoteDebug" Name="RemoteDebug"/>
         </DirectoryRef>
         <?endforeach?>
 
@@ -44,7 +44,7 @@
                 <RegistryValue Type='string' Name='FE8A8C3D-328A-476D-99F9-2A24B75F8C7F,$(var.ReleaseVersion)' Value='[Dir_VSInstallLocation]'/>
             </RegistryKey>
             <RegistryKey Root='HKCU' Key='Software\Microsoft\VisualStudio\$(var.VSTargetVersion)\ExtensionManager\ExtensionTypes'>
-                <RegistryValue Type='string' Name='FE8A8C3D-328A-476D-99F9-2A24B75F8C7F,$(var.ReleaseVersion)' Value='Tool'/>
+                <RegistryValue KeyPath='yes' Type='string' Name='FE8A8C3D-328A-476D-99F9-2A24B75F8C7F,$(var.ReleaseVersion)' Value='Tool'/>
             </RegistryKey>
         </Component>
 

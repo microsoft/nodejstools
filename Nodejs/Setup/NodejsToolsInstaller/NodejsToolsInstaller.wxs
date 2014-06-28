@@ -4,18 +4,19 @@
     <?include NodejsToolsInstallerVars.wxi ?>
 
     <Product Id="$(var.InstallerGuid)" Name="$(var.ProductName)" Language="1033" Version="$(var.MsiVersion)" Manufacturer="Microsoft Corporation" UpgradeCode="$(var.InstallerUpgradeGuid)">
-        <Package InstallerVersion="300" Compressed="yes"  />
+        <Package InstallerVersion="300" Compressed="yes" InstallScope="perMachine"  />
         <MajorUpgrade AllowDowngrades="no" AllowSameVersionUpgrades="yes"
                       DowngradeErrorMessage="A newer version of [ProductName] is already installed." />
-        <Media Id="1" Cabinet="media1.cab" EmbedCab="yes" />
+
+        <MediaTemplate EmbedCab="yes" CompressionLevel="high" />
 
         <!-- Properties that we need to search for -->
 
-        <!-- By default we install for all users, users can change this -->
-        <Property Id="ALLUSERS" Value="1"/>
-
-        <!-- we detect other installed software (Node.js, HPC pack) and set the install level of the feature to 2 if they're not installed to uncheck them by default.  -->
+        <!-- Detect other installed software (Node.js, HPC pack) and set 
+             the install level of the feature to 2 if they're not installed.  This will
+             cause them to be unselected by default.  -->
         <Property Id="INSTALLLEVEL" Value="1"/>
+        
         <Property Id="ApplicationFolderName" Value="$(var.ProductName)" />
         <Icon Id="AddRemoveProgramsIcon" SourceFile="$(var.TargetDir)NodejsProject.ico"/>
         <Property Id="ARPPRODUCTICON">AddRemoveProgramsIcon</Property>
@@ -55,8 +56,22 @@
 
         <PropertyRef Id="VSLAUNCHER"/>
 
+        <DirectoryRef Id="TARGETDIR">
+            <Directory Id="ProgramMenuFolder">
+                <Directory Id="Dir_StartMenu" Name="!(loc.ProductName) !(loc.ForVisualStudio)">
+                    <Component Id="Comp_ProgramMenuFolder" Guid="$(var.Comp_ProgramMenuFolder)">
+                        <RemoveFolder Id='DeleteDir_StartMenu' Directory='Dir_StartMenu' On='uninstall'/>
+                        <RegistryKey Root="HKMU" Key="Software\Microsoft\NodeJSTools\$(var.VSTargetVersion)">
+                            <RegistryValue Type="string" Name="InstallDir" Value="[Dir_NTVSInstallLocation]" KeyPath="yes"/>
+                        </RegistryKey>
+                        <util:RestartResource Path="[DEVENV_PATH]" />
+                        <util:RestartResource Path="[VWDEXPRESS_PATH]" />
+                    </Component>
+                </Directory>
+            </Directory>
+        </DirectoryRef>
+        
         <DirectoryRef Id="Dir_NTVSInstallLocation">
-
             <!-- Double click to open Node.js projects with Visual Studio -->
             <Component Id="Comp_NjsProgRegistration" DiskId="1" Guid="$(var.Comp_NjsProjRegistrationGuid)">
                 <RegistryValue Root='HKCR' Key='.njsproj' Type='string' Name='PerceivedType' Value='text' />
@@ -104,7 +119,9 @@
         <!-- Main visual studio support feature, requires Visual Studio. -->
         <Feature Id="ProductFeature" Title="$(var.ProductName)" Description="!(loc.ProductDescription)"
                  Display="expand" Level="1" AllowAdvertise="no" Absent="disallow"  >
-                        
+
+            <ComponentRef Id="Comp_ProgramMenuFolder" />
+            
             <MergeRef Id="Merge_NodejsTools"/>
             <MergeRef Id="Merge_InteractiveWindow"/>
             <MergeRef Id="Merge_Profiling" />
