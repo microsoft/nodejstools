@@ -30,6 +30,8 @@ using Microsoft.VisualStudioTools.Project;
 
 namespace Microsoft.NodejsTools.Intellisense {
     sealed partial class CompletionSource : ICompletionSource {
+        public const string NodejsRequireCompletionSetMoniker = "Node.js require";
+
         private readonly ITextBuffer _textBuffer;
         private readonly NodejsClassifier _classifier;
         private readonly IServiceProvider _serviceProvider;
@@ -104,7 +106,7 @@ namespace Microsoft.NodejsTools.Intellisense {
 
                 completionSets.Add(
                     new CompletionSet(
-                        "Node.js require",
+                        NodejsRequireCompletionSetMoniker,
                         "Node.js require",
                         _textBuffer.CurrentSnapshot.CreateTrackingSpan(
                             triggerPoint,

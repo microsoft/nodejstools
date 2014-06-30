@@ -71,7 +71,7 @@ namespace Microsoft.NodejsTools.Project {
                 }
                 
                 object mainFile;
-                if (json.TryGetValue("main", out mainFile) && mainFile is string) {
+                if (json != null && json.TryGetValue("main", out mainFile) && mainFile is string) {
                     ((NodejsProjectNode)ProjectMgr).Analyzer.AddPackageJson(Url, (string)mainFile);
                 }
             }
