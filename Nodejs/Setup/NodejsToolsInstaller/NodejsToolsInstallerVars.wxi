@@ -10,6 +10,7 @@
     <?define Comp_AllUserInstallDirItemGuid=133E49D5-31D9-4726-876C-243078F399BF?>
     <?define Comp_InstallDirItemGuid=32ADB1E0-C9AE-4847-A731-423DFA1DF097?>
     <?define Comp_NjsProjRegistrationGuid=428F728A-7A33-42D4-8692-B38E146BD21A?>
+    <?define Comp_ProgramMenuFolder=C7D8A133-EE6E-4A24-B200-3902AAB4D5CD?>
   <?elseif "$(var.VSTargetVersion)" = "12.0" ?>
     <?define InstallerGuid=*?>
     <?define InstallerUpgradeGuid=58AFA70A-C693-4A9A-894F-F16E9495DA9D?>  
@@ -17,6 +18,7 @@
     <?define Comp_AllUserInstallDirItemGuid=DEAD96CB-1E67-4BDC-99C6-79ADE9A2F927?>
     <?define Comp_InstallDirItemGuid=D3596841-CDE9-426E-901E-3A4580BA39A2?>
     <?define Comp_NjsProjRegistrationGuid=566FD245-A9F5-432D-B98E-77DEE9DC442F?>
+    <?define Comp_ProgramMenuFolder=8DD244BE-0E12-4154-9E12-E46B1E87499E?>
   <?else?>
     <!--Unknown VS version, We'll insert a bunch of bogus values such that Wix will error out-->
     <!--  To fix this define a new section above for the new VS version.  Leave this such that future new versions continue to crash on build-->
