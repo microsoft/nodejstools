@@ -37,7 +37,7 @@ namespace Microsoft.NodejsTools.TestAdapter {
     class TestExecutor : ITestExecutor {
         public const string ExecutorUriString = "executor://NodejsTestExecutor/v1";
         public static readonly Uri ExecutorUri = new Uri(ExecutorUriString);
-        private static readonly Guid NodejsRemoteDebugPortSupplierUnsecuredId = new Guid("{2AF68ED9-6A8A-4210-9B4D-92DDEBAB8CCC}");
+        private static readonly Guid NodejsRemoteDebugPortSupplierUnsecuredId = new Guid("{9E16F805-5EFC-4CE5-8B67-9AE9B643EF80}"); //new Guid("{2AF68ED9-6A8A-4210-9B4D-92DDEBAB8CCC}");
         //private static readonly string TestLauncherPath = "";//NodejsToolsInstallPath.GetFile("visualstudio_py_testlauncher.py");
                 
         private readonly ManualResetEvent _cancelRequested = new ManualResetEvent(false);
@@ -123,8 +123,7 @@ namespace Microsoft.NodejsTools.TestAdapter {
             port = GetFreePort();
 
             return new[] {
-                "--debug",
-                "-p", port.ToString()
+                "--debug-brk=" + port.ToString()
             };
         }
 
@@ -151,16 +150,18 @@ namespace Microsoft.NodejsTools.TestAdapter {
             }
 
             NodejsTestInfo testInfo = new NodejsTestInfo(test.FullyQualifiedName);
-            var workingDir = Path.GetDirectoryName(CommonUtils.GetAbsoluteFilePath(settings.WorkingDir, testInfo.ModulePath));
-            var args = GetInterpreterArgs(test, workingDir, settings.ProjectRootDir);
-
+            List<string> args = new List<string>();
             string secret = null;
             int port = 0;
             if (runContext.IsBeingDebugged && app != null) {
                 app.DTE.Debugger.DetachAll();
-                args = args.Concat(GetDebugArgs(settings, out secret, out port));
+                args.AddRange(GetDebugArgs(settings, out secret, out port));
             }
 
+            var workingDir = Path.GetDirectoryName(CommonUtils.GetAbsoluteFilePath(settings.WorkingDir, testInfo.ModulePath));
+            args.AddRange(GetInterpreterArgs(test, workingDir, settings.ProjectRootDir));
+
+            Debug.Fail("attach debugger");
             if (!File.Exists(settings.NodeExePath)) {
                 frameworkHandle.SendMessage(TestMessageLevel.Error, "Interpreter path does not exist: " + settings.NodeExePath);
                 return;
