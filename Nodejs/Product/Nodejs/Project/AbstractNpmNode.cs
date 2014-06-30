@@ -25,12 +25,22 @@ namespace Microsoft.NodejsTools.Project {
             get { return VsMenus.IDM_VS_CTXT_ITEMNODE; }
         }
 
+        #region HierarchyNode implementation
+
         /// <summary>
         /// Disable inline editing of Caption.
         /// </summary>
-        public override string GetEditLabel() {
+        public sealed override string GetEditLabel() {
             return null;
         }
+
+        public sealed override object GetIconHandle(bool open) {
+            //We don't want the icon to become an expanded folder 'OpenReferenceFolder'
+            //  Thus we always return 'ReferenceFolder'
+            return ProjectMgr.GetIconHandleByName(ProjectNode.ImageName.ReferenceFolder);
+        }
+
+        #endregion
 
         protected override NodeProperties CreatePropertiesObject() {
             return new NpmNodeProperties(this);

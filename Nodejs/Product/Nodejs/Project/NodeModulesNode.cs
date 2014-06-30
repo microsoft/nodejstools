@@ -462,18 +462,8 @@ namespace Microsoft.NodejsTools.Project {
 
         #region HierarchyNode implementation
 
-        public override string GetEditLabel() {
-            return null;
-        }
-
         public override int SortPriority {
             get { return DefaultSortOrderNode.ReferenceContainerNode + 1; }
-        }
-
-        public override object GetIconHandle(bool open) {
-            //We don't want the icon to become an expanded folder 'OpenReferenceFolder'
-            //  Thus we always return 'ReferenceFolder'
-            return ProjectMgr.GetIconHandleByName(ProjectNode.ImageName.ReferenceFolder);
         }
 
         public override string Url {
