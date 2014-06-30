@@ -382,17 +382,9 @@ namespace Microsoft.NodejsTools.Parsing
                 case JSToken.While:
                     return ParseWhileStatement();
                 case JSToken.Continue:
-                    statement = ParseContinueStatement();
-                    if (null == statement)
-                        return new Block(CurrentPositionSpan());
-                    else
-                        return statement;
+                    return ParseContinueStatement();
                 case JSToken.Break:
-                    statement = ParseBreakStatement();
-                    if (null == statement)
-                        return new Block(CurrentPositionSpan());
-                    else
-                        return statement;
+                    return ParseBreakStatement();
                 case JSToken.Return:
                     return ParseReturnStatement();
                 case JSToken.With:
@@ -1688,7 +1680,6 @@ namespace Microsoft.NodejsTools.Parsing
                 {
                     // the continue is malformed. Continue as if there was no continue at all
                     ReportError(JSError.BadContinue, continueNode.Span, true);
-                    return null;
                 }
             }
 
@@ -1712,20 +1703,19 @@ namespace Microsoft.NodejsTools.Parsing
                 ReportError(JSError.NoSemicolon, false);
             }
 
-            // must ignore the Finally block
-            var finallyNum = 0;
-            for (int i = blocks, n = m_blockType.Count; i < n; i++)
-            {
-                if (m_blockType[i] == BlockType.Finally)
-                {
-                    blocks++;
-                    finallyNum++;
+            if (blocks >= 0) {
+                // must ignore the Finally block
+                var finallyNum = 0;
+                for (int i = blocks, n = m_blockType.Count; i < n; i++) {
+                    if (m_blockType[i] == BlockType.Finally) {
+                        blocks++;
+                        finallyNum++;
+                    }
                 }
-            }
 
-            if (finallyNum > m_finallyEscaped)
-            {
-                m_finallyEscaped = finallyNum;
+                if (finallyNum > m_finallyEscaped) {
+                    m_finallyEscaped = finallyNum;
+                }
             }
 
             return continueNode;
@@ -1780,7 +1770,6 @@ namespace Microsoft.NodejsTools.Parsing
                 if (blocks < 0)
                 {
                     ReportError(JSError.BadBreak, breakNode.Span, true);
-                    return null;
                 }
             }
 
@@ -1804,20 +1793,19 @@ namespace Microsoft.NodejsTools.Parsing
                 ReportError(JSError.NoSemicolon, false);
             }
 
-            // must ignore the Finally block
-            var finallyNum = 0;
-            for (int i = blocks, n = m_blockType.Count; i < n; i++)
-            {
-                if (m_blockType[i] == BlockType.Finally)
-                {
-                    blocks++;
-                    finallyNum++;
+            if (blocks >= 0) {
+                // must ignore the Finally block
+                var finallyNum = 0;
+                for (int i = blocks, n = m_blockType.Count; i < n; i++) {
+                    if (m_blockType[i] == BlockType.Finally) {
+                        blocks++;
+                        finallyNum++;
+                    }
                 }
-            }
 
-            if (finallyNum > m_finallyEscaped)
-            {
-                m_finallyEscaped = finallyNum;
+                if (finallyNum > m_finallyEscaped) {
+                    m_finallyEscaped = finallyNum;
+                }
             }
 
             return breakNode;

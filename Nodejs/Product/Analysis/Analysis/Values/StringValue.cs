@@ -51,22 +51,24 @@ namespace Microsoft.NodejsTools.Analysis.Values {
             get { return _analyzer._stringPrototype; }
         }
 
+        private const int StringUnionStrength = MergeStrength.ToObject;
+
         internal override bool UnionEquals(AnalysisValue av, int strength) {
-            if (strength >= MergeStrength.ToBaseClass) {
+            if (strength >= StringUnionStrength) {
                 return av is StringValue;
             }
             return base.UnionEquals(av, strength);
         }
 
         internal override int UnionHashCode(int strength) {
-            if (strength >= MergeStrength.ToObject) {
+            if (strength >= StringUnionStrength) {
                 return _analyzer._stringPrototype.GetHashCode();
             }
             return base.UnionHashCode(strength);
         }
 
         internal override AnalysisValue UnionMergeTypes(AnalysisValue av, int strength) {
-            if (strength >= MergeStrength.ToObject) {
+            if (strength >= StringUnionStrength) {
                 return _analyzer._emptyStringValue;
             }
 

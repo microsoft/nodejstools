@@ -225,6 +225,8 @@ console.log(err);
                 new { Before = "try {\r\nabc\r\n!", After = "try {\r\n    abc\r\n}" },
                 new { Before = "try {\r\nabc\r\n}catch(abc){\r\nabc\r\n!", After = "try {\r\n    abc\r\n} catch (abc) {\r\n    abc\r\n}" },
                 new { Before = "try {\r\nabc\r\n}finally{\r\nabc\r\n!", After = "try {\r\n    abc\r\n} finally {\r\n    abc\r\n}" },
+                new { Before = "{\r\n    break;\r\n!", After = "{\r\n    break;\r\n}" },
+                new { Before = "{\r\n    break ;\r\n!", After = "{\r\n    break;\r\n}" },
             };
 
             foreach (var test in testCode) {

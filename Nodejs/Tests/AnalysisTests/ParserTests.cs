@@ -71,10 +71,10 @@ function Y() {
             CheckAst(
                 ParseCode(
                     code,
-                    new ErrorInfo(JSError.NoRightParenthesis, true, new IndexSpan(31, 1)),
-                    new ErrorInfo(JSError.NoSemicolon, true, new IndexSpan(34, 1)),
-                    new ErrorInfo(JSError.NoRightBracket, true, new IndexSpan(35, 1)),
-                    new ErrorInfo(JSError.SyntaxError, true, new IndexSpan(44, 1))
+                    new ErrorInfo(JSError.NoRightParenthesis, true, new IndexSpan(33, 1)),
+                    new ErrorInfo(JSError.NoSemicolon, true, new IndexSpan(36, 1)),
+                    new ErrorInfo(JSError.NoRightBracket, true, new IndexSpan(37, 1)),
+                    new ErrorInfo(JSError.SyntaxError, true, new IndexSpan(48, 1))
                 ),
                 CheckBlock(
                     CheckExprStmt(
@@ -1822,7 +1822,7 @@ blah
                     new ErrorInfo(JSError.BadContinue, true, new IndexSpan(2, 8))
                 ),
                 CheckBlock(
-                    CheckBlock(),
+                    CheckContinue(),
                     CheckLookupStmt("blah")
                 )
             );
@@ -1840,7 +1840,7 @@ blah
                     new ErrorInfo(JSError.BadBreak, true, new IndexSpan(2, 5))
                 ),
                 CheckBlock(
-                    CheckBlock(),
+                    CheckBreak(),
                     CheckLookupStmt("blah")
                 )
             );
