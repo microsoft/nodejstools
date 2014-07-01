@@ -37,7 +37,7 @@ namespace Microsoft.NodejsTools.Analysis.Analyzer {
                 var endOfQueueMarker = new AnalysisUnit(null, null);
                 int queueCountAtStart = queue.Count;
 
-                if (queueCountAtStart > 0) {
+                if (queueCountAtStart > 0 && queue[queue.Count - 1].Environment != null) {
                     queue.Append(endOfQueueMarker);
                 }
 

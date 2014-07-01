@@ -99,6 +99,20 @@ namespace Microsoft.NodejsTools.Analysis {
                 }
             }*/
             //GenerateMethod(name, method, indentation + 1, body);
+            ObjectValue returnValue = null;
+            if (methodName.StartsWith("create") && methodName.Length > 6) {
+                string klassName = methodName.Substring(6);
+                PropertyDescriptor propDesc;
+                if (exports.Descriptors.TryGetValue(klassName, out propDesc) && propDesc.Values != null) {
+                    var types = propDesc.Values.Types;
+                    if (types != null && types.Count == 1) {
+                        var type = types.First();
+                        if (type is FunctionValue) {
+                            returnValue = ((FunctionValue)type)._instance;
+                        }
+                    }
+                }
+            }
 
             foreach (var sig in method["signatures"]) {
                 BuiltinFunctionValue function;
@@ -110,6 +124,15 @@ namespace Microsoft.NodejsTools.Analysis {
                         methodName,
                         specialMethod,
                         ParseDocumentation((string)method["desc"]),
+                        GetParameters(sig["params"])
+                    );
+                } else if(returnValue != null) {
+                    function = new ReturningFunctionValue(
+                        _analyzer._builtinEntry,
+                        methodName,
+                        returnValue.SelfSet,
+                        ParseDocumentation((string)method["desc"]),
+                        true,
                         GetParameters(sig["params"])
                     );
                 } else {

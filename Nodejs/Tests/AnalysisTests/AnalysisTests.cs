@@ -872,6 +872,24 @@ var x = g.abc;
         }
 
         [TestMethod]
+        public void TestNodejsCreateFunctions() {
+            var code = @"var x = require('http').createServer(null, null);
+var y = require('net').createServer(null, null);
+";
+            var analysis = ProcessText(code);
+            AssertUtil.ContainsAtLeast(
+                analysis.GetMembersByIndex("x", code.Length).Select(x => x.Name),
+                "listen"
+            );
+            analysis = ProcessText(code);
+            AssertUtil.ContainsAtLeast(
+                analysis.GetMembersByIndex("y", code.Length).Select(x => x.Name),
+                "listen"
+            );
+        }
+
+
+        [TestMethod]
         public void TestCopySpecialization() {
             var analysis = ProcessText(@"function copy (obj) {
   var o = {}
