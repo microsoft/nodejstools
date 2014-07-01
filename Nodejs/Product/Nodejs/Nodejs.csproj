@@ -793,6 +793,15 @@
     <MultiProjectZipProject Include="ProjectTemplates\AzureNodejsWorker\Cloud\Cloud.ccproj">
       <SubType>Designer</SubType>
     </MultiProjectZipProject>
+    <ZipItem Include="Templates\Files\MochaUnitTest\UnitTest.vstemplate">
+      <SubType>Designer</SubType>
+    </ZipItem>
+    <ZipItem Include="Templates\Files\MochaUnitTest\UnitTest.js" />
+    <ZipItem Include="Templates\Files\TypeScriptMochaUnitTest\UnitTest.ts" />
+    <ZipItem Include="Templates\Files\TypeScriptMochaUnitTest\UnitTest.vstemplate">
+      <SubType>Designer</SubType>
+    </ZipItem>
+    <ZipItem Include="Templates\Files\UnitTest\UnitTest.js" />
     <Content Include="TestFrameworks\find_tests.js">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
       <IncludeInVSIX>true</IncludeInVSIX>

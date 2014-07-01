@@ -24,20 +24,27 @@ using Microsoft.VisualStudio.TemplateWizard;
 
 namespace Microsoft.NodejsTools.ProjectWizard {
     public sealed class UnitTestFileWizard : IWizard {
+        private string _framework;
+
         public void BeforeOpeningFile(ProjectItem projectItem) {
             EnvDTE.Project project = projectItem.ContainingProject;
         }
 
         public void ProjectFinishedGenerating(EnvDTE.Project project) { }
 
-        public void ProjectItemFinishedGenerating(ProjectItem projectItem) {            
+        public void ProjectItemFinishedGenerating(ProjectItem projectItem) {
             EnvDTE.Property property = projectItem.Properties.Item("TestFramework");
-            property.Value = TestFrameworkDirectories.DefaultFramework;
+            property.Value = _framework;
         }
 
         public void RunFinished() { }
 
-        public void RunStarted(object automationObject, Dictionary<string, string> replacementsDictionary, WizardRunKind runKind, object[] customParams) {}
+        public void RunStarted(object automationObject, Dictionary<string, string> replacementsDictionary, WizardRunKind runKind, object[] customParams) {
+            if (!replacementsDictionary.TryGetValue("$wizarddata$", out _framework) ||
+                string.IsNullOrEmpty(_framework)) {
+                _framework = TestFrameworkDirectories.DefaultFramework;
+            }
+        }
 
         public bool ShouldAddProjectItem(string filePath) {
             return true;
