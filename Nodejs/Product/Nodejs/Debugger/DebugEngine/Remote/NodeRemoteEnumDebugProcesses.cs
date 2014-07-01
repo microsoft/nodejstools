@@ -47,6 +47,10 @@ namespace Microsoft.NodejsTools.Debugger.Remote {
         // Connect to the remote debugging server. If any errors occur, display an error dialog, and keep
         // trying for as long as user clicks "Retry".
         private static NodeRemoteDebugProcess Connect(NodeRemoteDebugPort port, INetworkClientFactory networkClientFactory) {
+            if (port.Uri.Fragment == "#ping=0") {
+                return new NodeRemoteDebugProcess(port, "node.exe", "", "");
+            }
+
             NodeRemoteDebugProcess process = null;
             while (true) {
                 Exception exception = null;

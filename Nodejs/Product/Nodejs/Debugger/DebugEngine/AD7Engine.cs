@@ -973,13 +973,24 @@ namespace Microsoft.NodejsTools.Debugger.DebugEngine {
             process.ThreadExited += OnThreadExited;
             process.DebuggerOutput += OnDebuggerOutput;
 
-            // Subscribe to document changes when enabled Edit and Continue
-            NodejsPackage package = NodejsPackage.Instance;
-            _trackFileChanges = package.GeneralOptionsPage.EditAndContinue;
+            // Subscribe to document changes if Edit and Continue is enabled.
+            var shell = (IVsShell)Package.GetGlobalService(typeof(SVsShell));
+            if (shell != null) {
+                // The debug engine is loaded by VS separately from the main NTVS package, so we
+                // need to make sure that the package is also loaded before querying its options.
+                var packageGuid = new Guid(Guids.NodejsPackageString);
+                IVsPackage package;
+                shell.LoadPackage(ref packageGuid, out package);
 
-            if (_trackFileChanges) {
-                _documentEvents = package.DTE.Events.DocumentEvents;
-                _documentEvents.DocumentSaved += OnDocumentSaved;
+                var nodejsPackage = package as NodejsPackage;
+                if (nodejsPackage != null) {
+                    _trackFileChanges = nodejsPackage.GeneralOptionsPage.EditAndContinue;
+
+                    if (_trackFileChanges) {
+                        _documentEvents = nodejsPackage.DTE.Events.DocumentEvents;
+                        _documentEvents.DocumentSaved += OnDocumentSaved;
+                    }
+                }
             }
 
             process.StartListening();
