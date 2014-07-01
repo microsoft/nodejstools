@@ -610,7 +610,6 @@ namespace Microsoft.NodejsTools.Intellisense {
             }
         }
 
-#if FALSE
         internal void WaitForCompleteAnalysis(Func<int, bool> itemsLeftUpdated) {
             if (IsAnalyzing) {
                 while (IsAnalyzing) {
@@ -626,7 +625,6 @@ namespace Microsoft.NodejsTools.Intellisense {
                 itemsLeftUpdated(0);
             }
         }
-#endif
 
         internal AutoResetEvent QueueActivityEvent {
             get {
