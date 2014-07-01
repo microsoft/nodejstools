@@ -106,6 +106,12 @@ namespace Microsoft.NodejsTools.Analysis.Values {
             }
         }
 
+        public override string ShortDescription {
+            get {
+                return "function";
+            }
+        }
+
         private static void AppendDescription(StringBuilder result, AnalysisValue key) {
             result.Append(key.ShortDescription);
         }
@@ -212,7 +218,7 @@ namespace Microsoft.NodejsTools.Analysis.Values {
                 }).ToArray();
 
                 var parameters = vars
-                    .Select(p => string.Join(", ", p.TypesNoCopy.Select(av => av.ShortDescription).Where(s => !String.IsNullOrWhiteSpace(s)).OrderBy(s => s).Distinct()))
+                    .Select(p => string.Join(" or ", p.TypesNoCopy.Select(av => av.ShortDescription).Where(s => !String.IsNullOrWhiteSpace(s)).OrderBy(s => s).Distinct()))
                     .ToArray();
 
                 IEnumerable<AnalysisVariable>[] refs = vars.Select(v => VariableTransformer.OtherToVariables.ToVariables(v)).ToArray();

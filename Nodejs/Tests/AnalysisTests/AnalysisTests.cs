@@ -309,6 +309,43 @@ x = x.abc;
         }
 
         [TestMethod]
+        public void TestSignatureHelp() {
+            string code = @"
+function foo(x, y) {}
+foo(123, 'abc');
+foo('abc', 123);
+
+function abc(f) {
+}
+
+abc(abc);
+";
+            var analysis = ProcessText(code);
+            AssertUtil.ContainsExactly(
+                GetSignatures(analysis, "foo", code.Length),
+                "x number or string, y number or string"
+            );
+            AssertUtil.ContainsExactly(
+                GetSignatures(analysis, "abc", code.Length),
+                "f function"
+            );
+        }
+
+        private static string[] GetSignatures(ModuleAnalysis analysis, string name, int index) {
+            List<string> sigs = new List<string>();
+
+            foreach (var sig in analysis.GetSignaturesByIndex(name, index)) {
+                sigs.Add(
+                    String.Join(
+                        ", ",
+                        sig.Parameters.Select(x => x.Name + " " + x.Type)
+                    )
+                );
+            }
+            return sigs.ToArray();
+        }
+
+        [TestMethod]
         public void TestStringMembers() {
             string code = @"
 var x = 'abc';

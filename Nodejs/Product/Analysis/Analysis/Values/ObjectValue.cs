@@ -137,11 +137,7 @@ namespace Microsoft.NodejsTools.Analysis.Values {
 
         public virtual string ObjectDescription {
             get {
-#if DEBUG
-                return "object " + GetType().Name;
-#else
                 return "object";
-#endif
             }
         }
 
