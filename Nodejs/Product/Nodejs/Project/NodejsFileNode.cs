@@ -34,9 +34,15 @@ namespace Microsoft.NodejsTools.Project {
 #if FALSE
             CreateWatcher(Url);
 #endif
-            if (!IsNonMemberItem || root.IncludeNodejsFile(this)) {
+            if (ShouldAnalyze) {
                 root.Analyzer.AnalyzeFile(Url);
                 root._requireCompletionCache.Clear();
+            }
+        }
+
+        internal bool ShouldAnalyze {
+            get {
+                return !IsNonMemberItem || ProjectMgr.IncludeNodejsFile(this);
             }
         }
 

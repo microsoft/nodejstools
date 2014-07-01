@@ -12,10 +12,14 @@
  *
  * ***************************************************************************/
 
+using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.IO;
 using System.Linq;
+using System.Text;
 using System.Threading;
+using System.Web.Script.Serialization;
 using Microsoft.NodejsTools.Analysis;
 using Microsoft.NodejsTools.Parsing;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
@@ -1292,11 +1296,41 @@ ee.emit('myevent', 42)
 
 #if FALSE
         [TestMethod]
+        public void AnalyzeX() {
+            var limits = new AnalysisLimits() {
+                ReturnTypes = 1,
+                AssignedTypes = 1,
+                DictKeyTypes = 1,
+                DictValueTypes = 1,
+                IndexTypes = 1,
+                InstanceMembers = 1
+            };
+            var sw = new Stopwatch();
+            sw.Start();
+            Analyze("C:\\Source\\azure-sdk-tools-xplat", limits);
+            Console.WriteLine("Time: {0}", sw.Elapsed);
+        }
+
+        [TestMethod]
         public void AnalyzeExpress() {
             File.WriteAllText("C:\\Source\\Express\\express.txt", DumpAnalysis("C:\\Source\\Express"));
         }
+#endif
 
         public string DumpAnalysis(string directory) {
+            var analyzer = Analyze(directory);
+
+            var entries = analyzer.AllModules.ToArray();
+            Array.Sort(entries, (x, y) => String.Compare(x.FilePath, y.FilePath));
+            StringBuilder analysis = new StringBuilder();
+            foreach (var entry in entries) {
+                analysis.AppendLine(entry.Analysis.Dump());
+            }
+
+            return analysis.ToString();
+        }
+
+        private static JsAnalyzer Analyze(string directory, AnalysisLimits limits = null) {
             List<AnalysisFile> files = new List<AnalysisFile>();
             foreach (var file in Directory.GetFiles(directory, "*", SearchOption.AllDirectories)) {
                 if (String.Equals(Path.GetExtension(file), ".js", StringComparison.OrdinalIgnoreCase)) {
@@ -1317,16 +1351,10 @@ ee.emit('myevent', 42)
                 }
             }
 
-            var entries = Analysis.Analyze(files.ToArray()).ToArray();
-            Array.Sort(entries, (x, y) => String.Compare(x.Key, y.Key));
-            StringBuilder analysis = new StringBuilder();
-            foreach (var entry in entries) {
-                analysis.AppendLine(entry.Value.Analysis.Dump());
-            }
-
-            return analysis.ToString();
+            var analyzer = Analysis.Analyze(limits, files.ToArray());
+            return analyzer;
         }
-#endif
+
 
         public virtual ModuleAnalysis ProcessText(string text) {
             return ProcessOneText(text);

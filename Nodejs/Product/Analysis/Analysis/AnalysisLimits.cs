@@ -20,91 +20,6 @@ using Microsoft.Win32;
 namespace Microsoft.NodejsTools.Analysis {
     [Serializable]
     public class AnalysisLimits {
-        /// <summary>
-        /// Returns a new set of limits, set to the defaults for analyzing user
-        /// projects.
-        /// </summary>
-        public static AnalysisLimits GetDefaultLimits() {
-            return new AnalysisLimits();
-        }
-
-        /// <summary>
-        /// Returns a new set of limits, set to the default for analyzing a
-        /// standard library.
-        /// </summary>
-        public static AnalysisLimits GetStandardLibraryLimits() {
-            var limits = new AnalysisLimits();
-            limits.ReturnTypes = 10;
-            limits.InstanceMembers = 5;
-            limits.DictKeyTypes = 5;
-            limits.DictValueTypes = 20;
-            limits.IndexTypes = 5;
-            limits.AssignedTypes = 50;
-            return limits;
-        }
-
-        private const string AnalysisLimitsKey = @"Software\Microsoft\NodejsTools\" + AssemblyVersionInfo.VSVersion +
-    @"\Analysis\Project";
-
-        public static AnalysisLimits Load() {
-            try {
-                using (var key = Registry.CurrentUser.OpenSubKey(AnalysisLimitsKey)) {
-                    return LoadFromStorage(key);
-                }
-            } catch (SecurityException) {
-            } catch (UnauthorizedAccessException) {
-            } catch (IOException) {
-            }
-            return new AnalysisLimits();
-        }
-
-        private const string ReturnTypesId = "ReturnTypes";
-        private const string InstanceMembersId = "InstanceMembers";
-        private const string DictKeyTypesId = "DictKeyTypes";
-        private const string DictValueTypesId = "DictValueTypes";
-        private const string IndexTypesId = "IndexTypes";
-        private const string AssignedTypesId = "AssignedTypes";
-
-        /// <summary>
-        /// Loads a new instance from the specified registry key.
-        /// </summary>
-        /// <param name="key">
-        /// The key to load settings from. Each setting is a DWORD value. If
-        /// null, all settings are assumed to be unspecified and the default
-        /// values are used.
-        /// </param>
-        /// <param name="defaultToStdLib">
-        /// If True, unspecified settings are taken from the defaults for
-        /// standard library analysis. Otherwise, they are taken from the
-        /// usual defaults.
-        /// </param>
-        public static AnalysisLimits LoadFromStorage(RegistryKey key, bool defaultToStdLib = false) {
-            var limits = defaultToStdLib ? GetStandardLibraryLimits() : new AnalysisLimits();
-
-            if (key != null) {
-                limits.ReturnTypes = (key.GetValue(ReturnTypesId) as int?) ?? limits.ReturnTypes;
-                limits.InstanceMembers = (key.GetValue(InstanceMembersId) as int?) ?? limits.InstanceMembers;
-                limits.DictKeyTypes = (key.GetValue(DictKeyTypesId) as int?) ?? limits.DictKeyTypes;
-                limits.DictValueTypes = (key.GetValue(DictValueTypesId) as int?) ?? limits.DictValueTypes;
-                limits.IndexTypes = (key.GetValue(IndexTypesId) as int?) ?? limits.IndexTypes;
-                limits.AssignedTypes = (key.GetValue(AssignedTypesId) as int?) ?? limits.AssignedTypes;
-            }
-
-            return limits;
-        }
-
-        /// <summary>
-        /// Saves the current instance's settings to the specified registry key.
-        /// </summary>
-        public void SaveToStorage(RegistryKey key) {
-            key.SetValue(ReturnTypesId, ReturnTypes, RegistryValueKind.DWord);
-            key.SetValue(InstanceMembersId, InstanceMembers, RegistryValueKind.DWord);
-            key.SetValue(DictKeyTypesId, DictKeyTypes, RegistryValueKind.DWord);
-            key.SetValue(DictValueTypesId, DictValueTypes, RegistryValueKind.DWord);
-            key.SetValue(IndexTypesId, IndexTypes, RegistryValueKind.DWord);
-            key.SetValue(AssignedTypesId, AssignedTypes, RegistryValueKind.DWord);
-        }
-
         public AnalysisLimits() {
             ReturnTypes = 20;
             InstanceMembers = 50;
@@ -113,16 +28,6 @@ namespace Microsoft.NodejsTools.Analysis {
             IndexTypes = 30;
             AssignedTypes = 100;
         }
-
-        /// <summary>
-        /// The maximum number of files which will be used for cross module
-        /// analysis.
-        /// 
-        /// If null, cross module analysis will not be limited. Otherwise, a
-        /// value will cause cross module analysis to be disabled after that
-        /// number of files have been loaded.
-        /// </summary>
-        public int? CrossModule { get; set; }
 
         /// <summary>
         /// The number of types in a return value at which to start combining
@@ -161,5 +66,29 @@ namespace Microsoft.NodejsTools.Analysis {
         /// analysis.
         /// </summary>
         public int AssignedTypes { get; set; }
+
+        public override bool Equals(object obj) {
+            AnalysisLimits other = obj as AnalysisLimits;
+            if (other != null) {
+                return 
+                    other.ReturnTypes == ReturnTypes &&
+                    other.InstanceMembers == InstanceMembers &&
+                    other.DictKeyTypes == DictKeyTypes &&
+                    other.DictValueTypes == DictValueTypes &&
+                    other.IndexTypes == IndexTypes &&
+                    other.AssignedTypes == AssignedTypes;
+            }
+            return false;
+        }
+
+        public override int GetHashCode() {
+            return 
+                ReturnTypes +
+                InstanceMembers +
+                DictKeyTypes +
+                DictValueTypes +
+                IndexTypes +
+                AssignedTypes;
+        }
     }
 }

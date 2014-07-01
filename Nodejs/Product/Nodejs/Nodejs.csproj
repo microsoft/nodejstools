@@ -311,6 +311,16 @@
       <DependentUpon>NpmPackageInstallWindow.xaml</DependentUpon>
     </Compile>
     <Compile Include="NpmUI\PackageCatalogEntryViewModel.cs" />
+    <Compile Include="Options\AnalysisLevel.cs" />
+    <Compile Include="Options\NodejsAdvancedOptionsControl.cs">
+      <SubType>UserControl</SubType>
+    </Compile>
+    <Compile Include="Options\NodejsAdvancedOptionsControl.Designer.cs">
+      <DependentUpon>NodejsAdvancedOptionsControl.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Options\NodejsAdvancedOptionsPage.cs">
+      <SubType>Component</SubType>
+    </Compile>
     <Compile Include="Project\DependencyNodeProperties.cs" />
     <Compile Include="Project\NodejsTypeScriptFileNode.cs" />
     <Compile Include="Project\NodejsTypeScriptFileNodeProperties.cs" />
@@ -626,6 +636,9 @@
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>
+    <EmbeddedResource Include="Options\NodejsAdvancedOptionsControl.resx">
+      <DependentUpon>NodejsAdvancedOptionsControl.cs</DependentUpon>
+    </EmbeddedResource>
     <EmbeddedResource Include="Options\NodejsFormattingBracesOptionsControl.resx">
       <DependentUpon>NodejsFormattingBracesOptionsControl.cs</DependentUpon>
     </EmbeddedResource>

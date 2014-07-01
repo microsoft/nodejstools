@@ -54,12 +54,12 @@ namespace Microsoft.NodejsTools.Analysis {
         private static Dictionary<object, int> _analysisCreationCount = new Dictionary<object, int>();
 #endif
 
-        public JsAnalyzer() {
+        public JsAnalyzer(AnalysisLimits limits = null) {
             _modules = new ModuleTable(this);
             _itemCache = new Dictionary<object, AnalysisValue>();
             _builtinEntry = new ProjectEntry(this, "", null);
 
-            Limits = AnalysisLimits.Load();
+            Limits = limits ?? new AnalysisLimits();
 
             _queue = new Deque<AnalysisUnit>();
 

@@ -280,6 +280,12 @@ namespace Microsoft.NodejsTools.Project {
             return Path.GetExtension(fileName).Equals(".js", StringComparison.OrdinalIgnoreCase);
         }
 
+        public override int InitializeForOuter(string filename, string location, string name, uint flags, ref Guid iid, out IntPtr projectPointer, out int canceled) {
+            NodejsPackage.Instance.AdvancedOptionsPage.AnalysisLevelChanged += AdvancedOptionsPageAnalysisLevelChanged;
+
+            return base.InitializeForOuter(filename, location, name, flags, ref iid, out projectPointer, out canceled);
+        }
+
         protected override void Reload() {
             using (new DebugTimer("Project Load")) {
                 _intermediateOutputPath = Path.Combine(ProjectHome, GetProjectProperty("BaseIntermediateOutputPath"));
@@ -307,6 +313,34 @@ namespace Microsoft.NodejsTools.Project {
                     }
                 }
             }
+        }
+
+        private void Reanalyze(HierarchyNode node, VsProjectAnalyzer newAnalyzer) {
+            if (node != null) {
+                for (var child = node.FirstChild; child != null; child = child.NextSibling) {
+                    if (child is PackageJsonFileNode) {
+                        ((PackageJsonFileNode)child).AnalyzePackageJson(newAnalyzer);
+                    } else if (child is NodejsFileNode) {
+                        if (((NodejsFileNode)child).ShouldAnalyze) {
+                            newAnalyzer.AnalyzeFile(child.Url);
+                        }
+                    }
+
+                    Reanalyze(child, newAnalyzer);
+                }
+            }
+        }
+
+        private void AdvancedOptionsPageAnalysisLevelChanged(object sender, EventArgs e) {
+            var analyzer = new VsProjectAnalyzer(ProjectHome);
+            Reanalyze(this, analyzer);
+            if (_analyzer != null) {
+                analyzer.SwitchAnalyzers(_analyzer);
+                if (_analyzer.RemoveUser()) {
+                    _analyzer.Dispose();
+                }
+            }
+            _analyzer = analyzer;
         }
 
         protected override void RaiseProjectPropertyChanged(string propertyName, string oldValue, string newValue) {
@@ -553,6 +587,7 @@ namespace Microsoft.NodejsTools.Project {
                     _analyzer.Dispose();
                 }
                 _analyzer = null;
+                NodejsPackage.Instance.AdvancedOptionsPage.AnalysisLevelChanged -= AdvancedOptionsPageAnalysisLevelChanged;
             }
             base.Dispose(disposing);
         }

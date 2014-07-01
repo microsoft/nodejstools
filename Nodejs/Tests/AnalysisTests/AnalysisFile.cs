@@ -23,8 +23,12 @@ namespace AnalysisTests {
 
     static class Analysis {
         public static JsAnalyzer Analyze(params AnalysisFile[] files) {
+            return Analyze(null, files);
+        }
+
+        public static JsAnalyzer Analyze(AnalysisLimits limits, params AnalysisFile[] files) {
             Dictionary<string, IJsProjectEntry> entries = new Dictionary<string, IJsProjectEntry>();
-            var analyzer = new JsAnalyzer();
+            var analyzer = new JsAnalyzer(limits);
 
             foreach (var file in files) {
                 if (Path.GetFileName(file.Filename).Equals("package.json", StringComparison.OrdinalIgnoreCase)) {
@@ -52,7 +56,13 @@ namespace AnalysisTests {
                 }
             }
 
-            entries[files.First().Filename].AnalysisGroup.AnalyzeQueuedEntries(CancellationToken.None);
+            foreach (var file in files) {
+                IJsProjectEntry projEntry;
+                if (entries.TryGetValue(file.Filename, out projEntry)) {
+                    projEntry.AnalysisGroup.AnalyzeQueuedEntries(CancellationToken.None);
+                    break;
+                }
+            }
 
             return analyzer;
         }
