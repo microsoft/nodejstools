@@ -129,11 +129,6 @@ namespace Microsoft.VisualStudioTools {
             return (DTE)runningObject;
         }
 
-        public bool AttachToProcess(ProcessOutput proc, Guid portSupplier, string secret, int port) {
-            string qualifierUri = string.Format("tcp://{0}@localhost:{1}", secret, port);
-            return AttachToProcess(proc, portSupplier, qualifierUri);
-        }
-
         public bool AttachToProcess(ProcessOutput proc, Guid portSupplier, string transportQualifierUri) {
             var debugger3 = (EnvDTE90.Debugger3)DTE.Debugger;
             var transports = debugger3.Transports;
