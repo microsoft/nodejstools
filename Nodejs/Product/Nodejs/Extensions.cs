@@ -177,6 +177,17 @@ namespace Microsoft.NodejsTools {
                 return analyzer;
             }
 
+            if (NodejsPackage.Instance == null) {
+                // The REPL is open on restart, but our package isn't loaded yet.  Force
+                // it to load now.
+                var shell = (IVsShell)NodejsPackage.GetGlobalService(typeof(SVsShell));
+                Guid packageGuid = typeof(NodejsPackage).GUID;
+                IVsPackage package;
+                if (ErrorHandler.Failed(shell.LoadPackage(ref packageGuid, out package))) {
+                    return null;
+                }
+                Debug.Assert(NodejsPackage.Instance != null);
+            }
             return NodejsPackage.Instance.DefaultAnalyzer;
         }
 
