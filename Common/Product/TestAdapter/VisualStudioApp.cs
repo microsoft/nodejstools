@@ -130,7 +130,7 @@ namespace Microsoft.VisualStudioTools {
         }
 
 
-        public bool AttachToProcess(ProcessOutput proc, Guid portSupplier, string secret, int port) {
+        public bool AttachToProcess(ProcessOutput proc, Guid portSupplier, int port) {
             var debugger3 = (EnvDTE90.Debugger3)DTE.Debugger;
             var transports = debugger3.Transports;
             EnvDTE80.Transport transport = null;
@@ -145,23 +145,21 @@ namespace Microsoft.VisualStudioTools {
                 return false;
             }
 
-            var processes = debugger3.GetProcesses(transport, string.Format("tcp://{0}@localhost:{1}", secret, port));
+            var processes = debugger3.GetProcesses(transport, string.Format("tcp://localhost:{0}#ping=0", port));
             if (processes.Count < 1) {
                 return false;
             }
 
-            // Retry the attach itself 3 times before displaying a Retry/Cancel
-            // dialog to the user.
             DTE.SuppressUI = true;
+
             try {
-                try {
-                    processes.Item(1).Attach();
-                    return true;
-                } catch (COMException) {
-                    if (proc.Wait(TimeSpan.FromMilliseconds(500))) {
-                        // Process exited while we were trying
-                        return false;
-                    }
+                processes.Item(1).Attach();
+                return true;
+            } catch (COMException ex) {
+                System.Diagnostics.Trace.WriteLine(ex.Message);
+                if (proc.Wait(TimeSpan.FromMilliseconds(500))) {
+                    // Process exited while we were trying
+                    return false;
                 }
             } finally {
                 DTE.SuppressUI = false;

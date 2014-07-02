@@ -115,11 +115,7 @@ namespace Microsoft.NodejsTools.TestAdapter {
             return discover.Get(testInfo.TestFramework).ArgumentsToRunTests(testInfo.TestName, testInfo.ModulePath, workingDir, projectRootDir);
         }
 
-        private static IEnumerable<string> GetDebugArgs(NodejsProjectSettings settings, out string secret, out int port) {
-            var secretBuffer = new byte[24];
-            RandomNumberGenerator.Create().GetNonZeroBytes(secretBuffer);
-            secret = Convert.ToBase64String(secretBuffer);
-
+        private static IEnumerable<string> GetDebugArgs(NodejsProjectSettings settings, out int port) {
             port = GetFreePort();
 
             return new[] {
@@ -151,17 +147,16 @@ namespace Microsoft.NodejsTools.TestAdapter {
 
             NodejsTestInfo testInfo = new NodejsTestInfo(test.FullyQualifiedName);
             List<string> args = new List<string>();
-            string secret = null;
             int port = 0;
             if (runContext.IsBeingDebugged && app != null) {
                 app.DTE.Debugger.DetachAll();
-                args.AddRange(GetDebugArgs(settings, out secret, out port));
+                args.AddRange(GetDebugArgs(settings, out port));
             }
 
             var workingDir = Path.GetDirectoryName(CommonUtils.GetAbsoluteFilePath(settings.WorkingDir, testInfo.ModulePath));
             args.AddRange(GetInterpreterArgs(test, workingDir, settings.ProjectRootDir));
 
-            Debug.Fail("attach debugger");
+            //Debug.Fail("attach debugger");
             if (!File.Exists(settings.NodeExePath)) {
                 frameworkHandle.SendMessage(TestMessageLevel.Error, "Interpreter path does not exist: " + settings.NodeExePath);
                 return;
@@ -184,7 +179,7 @@ namespace Microsoft.NodejsTools.TestAdapter {
                 proc.Wait(TimeSpan.FromMilliseconds(500));
                 if (runContext.IsBeingDebugged && app != null) {
                     try {
-                        while (!app.AttachToProcess(proc, NodejsRemoteDebugPortSupplierUnsecuredId, secret, port)) {
+                        while (!app.AttachToProcess(proc, NodejsRemoteDebugPortSupplierUnsecuredId, port)) {
                             if (proc.Wait(TimeSpan.FromMilliseconds(500))) {
                                 break;
                             }
