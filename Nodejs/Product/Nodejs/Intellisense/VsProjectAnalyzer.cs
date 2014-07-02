@@ -19,9 +19,11 @@ using System.Diagnostics;
 using System.IO;
 using System.Linq;
 using System.Reflection;
+using System.Security;
 using System.Threading;
 using Microsoft.NodejsTools.Analysis;
 using Microsoft.NodejsTools.Classifier;
+using Microsoft.NodejsTools.Options;
 using Microsoft.NodejsTools.Parsing;
 using Microsoft.NodejsTools.Project;
 using Microsoft.NodejsTools.Repl;
@@ -31,6 +33,7 @@ using Microsoft.VisualStudio.Text;
 using Microsoft.VisualStudio.Text.Adornments;
 using Microsoft.VisualStudio.Text.Editor;
 using Microsoft.VisualStudioTools;
+using Microsoft.Win32;
 
 namespace Microsoft.NodejsTools.Intellisense {
 #if INTERACTIVE_WINDOW
@@ -58,11 +61,14 @@ namespace Microsoft.NodejsTools.Intellisense {
         private readonly AutoResetEvent _queueActivityEvent = new AutoResetEvent(false);
         private readonly CodeSettings _codeSettings = new CodeSettings();
         private readonly string _projectDir;
+        private readonly AnalysisLevel _analysisLevel;
         private DateTime? _reparseDateTime;
 
         private int _userCount;
 
         internal readonly HashSet<IProjectEntry> _hasParseErrors = new HashSet<IProjectEntry>();
+        private static AnalysisLimits _lowLimits = MakeLowAnalysisLimits();
+        private static AnalysisLimits _highLimits = new AnalysisLimits();
 
         // Moniker strings allow the task provider to distinguish between
         // different sources of items for the same file.
@@ -107,49 +113,59 @@ namespace Microsoft.NodejsTools.Intellisense {
         ) {
             _queue = new ParseQueue(this);
             _projectFiles = new ConcurrentDictionary<string, IProjectEntry>(StringComparer.OrdinalIgnoreCase);
+            if (NodejsPackage.Instance != null) {
+                _analysisLevel = NodejsPackage.Instance.AdvancedOptionsPage.AnalysisLevel;
+            } else {
+                _analysisLevel = AnalysisLevel.High;
+            }
 
             if (projectDir != null) {
                 _projectDir = projectDir;
                 string analysisDb = GetAnalysisPath();
-                if (File.Exists(analysisDb)) {
-
-                    using (FileStream stream = new FileStream(analysisDb, FileMode.Open)) {
-                        byte[] header = new byte[_dbHeader.Length];
-                        stream.Read(header, 0, header.Length);
-                        bool match = true;
-                        for (int i = 0; i < header.Length; i++) {
-                            if (header[i] != _dbHeader[i]) {
-                                match = false;
-                                break;
-                            }
-                        }
-                        if (match) {
-                            try {
-                                var serializer = new AnalysisSerializer();
-                                _jsAnalyzer = (JsAnalyzer)serializer.Deserialize(stream);
-                                _analysisQueue = new AnalysisQueue(this, serializer, stream);
-                                foreach (var file in _jsAnalyzer.AllModules) {
-                                    _projectFiles[file.FilePath] = file;
+                if (File.Exists(analysisDb) && _analysisLevel != AnalysisLevel.None) {
+                    try {
+                        using (FileStream stream = new FileStream(analysisDb, FileMode.Open)) {
+                            byte[] header = new byte[_dbHeader.Length];
+                            stream.Read(header, 0, header.Length);
+                            bool match = true;
+                            for (int i = 0; i < header.Length; i++) {
+                                if (header[i] != _dbHeader[i]) {
+                                    match = false;
+                                    break;
                                 }
-                                _reparseDateTime = new FileInfo(analysisDb).LastWriteTime;
-                            } catch (InvalidOperationException) {
-                                // corrupt or invalid DB
-                                _jsAnalyzer = null;
-                                _analysisQueue = null;
-                            } catch (IOException) {
-                                _jsAnalyzer = null;
-                                _analysisQueue = null;
+                            }
+                            if (match) {
+                                try {
+                                    var serializer = new AnalysisSerializer();
+                                    _jsAnalyzer = (JsAnalyzer)serializer.Deserialize(stream);
+                                    _analysisQueue = new AnalysisQueue(this, serializer, stream);
+                                    foreach (var file in _jsAnalyzer.AllModules) {
+                                        _projectFiles[file.FilePath] = file;
+                                    }
+                                    _reparseDateTime = new FileInfo(analysisDb).LastWriteTime;
+                                } catch (InvalidOperationException) {
+                                    // corrupt or invalid DB
+                                    _jsAnalyzer = null;
+                                    _analysisQueue = null;
+                                }
                             }
                         }
+                    } catch (IOException) {
+                        _jsAnalyzer = null;
+                        _analysisQueue = null;
                     }
                 }
             } else {
                 _implicitProject = true;
             }
 
-            if (_jsAnalyzer == null) {
-                _jsAnalyzer = new JsAnalyzer();
-                _analysisQueue = new AnalysisQueue(this);
+
+            var limits = LoadLimits();
+            if (_jsAnalyzer == null || _jsAnalyzer.Limits != limits) {
+                _jsAnalyzer = new JsAnalyzer(limits);
+                if (_analysisLevel != AnalysisLevel.None) {
+                    _analysisQueue = new AnalysisQueue(this);
+                }
             }
 
             _userCount = 1;
@@ -163,6 +179,17 @@ namespace Microsoft.NodejsTools.Intellisense {
             _codeSettings.AddKnownGlobal("exports");
 
             _codeSettings.AllowShebangLine = true;
+        }
+
+        private static AnalysisLimits MakeLowAnalysisLimits() {
+            return new AnalysisLimits() {
+                ReturnTypes = 1,
+                AssignedTypes = 1,
+                DictKeyTypes = 1,
+                DictValueTypes = 1,
+                IndexTypes = 1,
+                InstanceMembers = 1
+            };
         }
 
         private string GetAnalysisPath() {
@@ -181,7 +208,6 @@ namespace Microsoft.NodejsTools.Intellisense {
             return Interlocked.Decrement(ref _userCount) == 0;
         }
 
-#if FALSE
         /// <summary>
         /// Creates a new ProjectEntry for the collection of buffers.
         /// 
@@ -195,7 +221,7 @@ namespace Microsoft.NodejsTools.Intellisense {
                     buffer.Properties.RemoveProperty(typeof(IProjectEntry));
                     buffer.Properties.AddProperty(typeof(IProjectEntry), projEntry);
 
-                    var classifier = buffer.GetPythonClassifier();
+                    var classifier = buffer.GetNodejsClassifier();
                     if (classifier != null) {
                         classifier.NewVersion();
                     }
@@ -206,6 +232,7 @@ namespace Microsoft.NodejsTools.Intellisense {
                 bufferParser._currentProjEntry = _openFiles[bufferParser] = projEntry;
                 bufferParser._parser = this;
 
+#if FALSE
                 foreach (var buffer in buffers) {
                     // A buffer may have multiple DropDownBarClients, given one may open multiple CodeWindows
                     // over a single buffer using Window/New Window
@@ -216,6 +243,7 @@ namespace Microsoft.NodejsTools.Intellisense {
                         }
                     }
                 }
+#endif
 
                 bufferParser.Requeue();
             }
@@ -229,7 +257,6 @@ namespace Microsoft.NodejsTools.Intellisense {
                 }
             }
         }
-#endif
 
         public static void ConnectErrorList(IProjectEntry projEntry, ITextBuffer buffer) {
             TaskProvider.Value.AddBufferForErrorSource(projEntry, ParserTaskMoniker, buffer);
@@ -314,17 +341,9 @@ namespace Microsoft.NodejsTools.Intellisense {
                 }
 
                 _projectFiles[path] = entry;
-
-                if (ImplicitProject) {
-                    QueueDirectoryAnalysis(path);
-                }
             }
 
             return entry;
-        }
-
-        private void QueueDirectoryAnalysis(string path) {
-            ThreadPool.QueueUserWorkItem(x => { lock (_contentsLock) { AnalyzeDirectory(CommonUtils.NormalizeDirectoryPath(Path.GetDirectoryName(path))); } });
         }
 
         internal IProjectEntry AnalyzeFile(string path) {
@@ -361,10 +380,12 @@ namespace Microsoft.NodejsTools.Intellisense {
         }
 
         internal void AddPackageJson(string path, string mainFile) {
-            _analysisQueue.Enqueue(
-                _jsAnalyzer.AddPackageJson(path, mainFile),
-                AnalysisPriority.Normal
-            );
+            if (_analysisLevel != AnalysisLevel.None) {
+                _analysisQueue.Enqueue(
+                    _jsAnalyzer.AddPackageJson(path, mainFile),
+                    AnalysisPriority.Normal
+                );
+            }
         }
 
         internal IEnumerable<KeyValuePair<string, IProjectEntry>> LoadedFiles {
@@ -585,7 +606,7 @@ namespace Microsoft.NodejsTools.Intellisense {
 #endif
         internal bool IsAnalyzing {
             get {
-                return _queue.IsParsing || _analysisQueue.IsAnalyzing;
+                return _queue.IsParsing || (_analysisQueue != null && _analysisQueue.IsAnalyzing);
             }
         }
 
@@ -594,7 +615,7 @@ namespace Microsoft.NodejsTools.Intellisense {
                 while (IsAnalyzing) {
                     QueueActivityEvent.WaitOne(100);
 
-                    int itemsLeft = _queue.ParsePending + _analysisQueue.AnalysisPending;
+                    int itemsLeft = _queue.ParsePending + (_analysisQueue != null ? _analysisQueue.AnalysisPending : 0);
 
                     if (!itemsLeftUpdated(itemsLeft)) {
                         break;
@@ -688,12 +709,14 @@ namespace Microsoft.NodejsTools.Intellisense {
                 UpdateErrorsAndWarnings(entry, snapshot, errorSink);
 
                 // enqueue analysis of the file
-                if (ast != null) {
+                if (ast != null && _analysisLevel != AnalysisLevel.None) {
                     _analysisQueue.Enqueue(pyEntry, AnalysisPriority.Normal);
                 }
             } else if ((externalEntry = entry as IExternalProjectEntry) != null) {
                 externalEntry.ParseContent(reader ?? new StreamReader(content), cookie);
-                _analysisQueue.Enqueue(entry, AnalysisPriority.Normal);
+                if (_analysisLevel != AnalysisLevel.None) {
+                    _analysisQueue.Enqueue(entry, AnalysisPriority.Normal);
+                }
             }
         }
 
@@ -730,7 +753,9 @@ namespace Microsoft.NodejsTools.Intellisense {
                     if ((externalEntry = (entry as IExternalProjectEntry)) != null) {
                         var snapshotContent = new SnapshotSpanSourceCodeReader(new SnapshotSpan(snapshot, new Span(0, snapshot.Length)));
                         externalEntry.ParseContent(snapshotContent, new SnapshotCookie(snapshotContent.Snapshot));
-                        _analysisQueue.Enqueue(entry, AnalysisPriority.High);
+                        if (_analysisLevel != AnalysisLevel.None) {
+                            _analysisQueue.Enqueue(entry, AnalysisPriority.High);
+                        }
                     }
                 }
             }
@@ -750,7 +775,9 @@ namespace Microsoft.NodejsTools.Intellisense {
                     }
 
                     pyProjEntry.UpdateTree(finalAst, new SnapshotCookie(snapshots[0])); // SnapshotCookie is not entirely right, we should merge the snapshots
-                    _analysisQueue.Enqueue(entry, AnalysisPriority.High);
+                    if (_analysisLevel != AnalysisLevel.None) {
+                        _analysisQueue.Enqueue(entry, AnalysisPriority.High);
+                    }
                 } else {
                     // indicate that we are done parsing.
                     JsAst prevTree;
@@ -1096,118 +1123,6 @@ namespace Microsoft.NodejsTools.Intellisense {
             return res;
         }
 
-        /// <summary>
-        /// Analyzes a complete directory including all of the contained files and packages.
-        /// </summary>
-        /// <param name="dir">Directory to analyze.</param>
-        /// <param name="onFileAnalyzed">If specified, this callback is invoked for every <see cref="IProjectEntry"/>
-        /// that is analyzed while analyzing this directory.</param>
-        /// <remarks>The callback may be invoked on a thread different from the one that this function was originally invoked on.</remarks>
-        public void AnalyzeDirectory(string dir, Action<IProjectEntry> onFileAnalyzed = null) {
-            _analysisQueue.Enqueue(new AddDirectoryAnalysis(dir, onFileAnalyzed, this), AnalysisPriority.High);
-        }
-
-        class AddDirectoryAnalysis : IAnalyzable {
-            private readonly string _dir;
-            private readonly Action<IProjectEntry> _onFileAnalyzed;
-            private readonly VsProjectAnalyzer _analyzer;
-
-            public AddDirectoryAnalysis(string dir, Action<IProjectEntry> onFileAnalyzed, VsProjectAnalyzer analyzer) {
-                _dir = dir;
-                _onFileAnalyzed = onFileAnalyzed;
-                _analyzer = analyzer;
-            }
-
-            #region IAnalyzable Members
-
-            public void Analyze(CancellationToken cancel) {
-                if (cancel.IsCancellationRequested) {
-                    return;
-                }
-
-                _analyzer.AnalyzeDirectoryWorker(_dir, true, _onFileAnalyzed, cancel);
-            }
-
-            #endregion
-        }
-
-        private void AnalyzeDirectoryWorker(string dir, bool addDir, Action<IProjectEntry> onFileAnalyzed, CancellationToken cancel) {
-            if (_jsAnalyzer == null) {
-                // We aren't able to analyze code.
-                return;
-            }
-
-            if (string.IsNullOrEmpty(dir)) {
-                Debug.Assert(false, "Unexpected empty dir");
-                return;
-            }
-
-            if (addDir) {
-                lock (_contentsLock) {
-                    _jsAnalyzer.AddAnalysisDirectory(dir);
-                }
-            }
-
-            try {
-                foreach (string filename in Directory.GetFiles(dir, "*.py")) {
-                    if (cancel.IsCancellationRequested) {
-                        break;
-                    }
-                    IProjectEntry entry = AnalyzeFile(filename);
-                    if (onFileAnalyzed != null) {
-                        onFileAnalyzed(entry);
-                    }
-                }
-            } catch (IOException) {
-                // We want to handle DirectoryNotFound, DriveNotFound, PathTooLong
-            } catch (UnauthorizedAccessException) {
-            }
-
-            try {
-                foreach (string filename in Directory.GetFiles(dir, "*.pyw")) {
-                    if (cancel.IsCancellationRequested) {
-                        break;
-                    }
-                    IProjectEntry entry = AnalyzeFile(filename);
-                    if (onFileAnalyzed != null) {
-                        onFileAnalyzed(entry);
-                    }
-                }
-            } catch (IOException) {
-                // We want to handle DirectoryNotFound, DriveNotFound, PathTooLong
-            } catch (UnauthorizedAccessException) {
-            }
-
-            try {
-                foreach (string innerDir in Directory.GetDirectories(dir)) {
-                    if (cancel.IsCancellationRequested) {
-                        break;
-                    }
-                    if (File.Exists(Path.Combine(innerDir, "__init__.py"))) {
-                        AnalyzeDirectoryWorker(innerDir, false, onFileAnalyzed, cancel);
-                    }
-                }
-            } catch (IOException) {
-                // We want to handle DirectoryNotFound, DriveNotFound, PathTooLong
-            } catch (UnauthorizedAccessException) {
-            }
-        }
-
-        internal void StopAnalyzingDirectory(string directory) {
-            if (_jsAnalyzer == null) {
-                // We aren't able to analyze code.
-                return;
-            }
-
-            lock (_contentsLock) {
-                _jsAnalyzer.RemoveAnalysisDirectory(directory);
-            }
-        }
-
-        internal void Cancel() {
-            _analysisQueue.Stop();
-        }
-
         internal void UnloadFile(IProjectEntry entry) {
             if (_jsAnalyzer == null) {
                 // We aren't able to analyze code.
@@ -1226,7 +1141,9 @@ namespace Microsoft.NodejsTools.Intellisense {
 #endif
 
                 ClearParserTasks(entry);
-                _analysisQueue.Enqueue(_jsAnalyzer.RemoveModule(entry), AnalysisPriority.Normal);
+                if (_analysisLevel != AnalysisLevel.None) {
+                    _analysisQueue.Enqueue(_jsAnalyzer.RemoveModule(entry), AnalysisPriority.Normal);
+                }
                 IProjectEntry removed;
                 _projectFiles.TryRemove(entry.FilePath, out removed);
 #if FALSE
@@ -1336,7 +1253,9 @@ namespace Microsoft.NodejsTools.Intellisense {
                 }
             }
 
-            _analysisQueue.Stop();
+            if (_analysisQueue != null) {
+                _analysisQueue.Stop();
+            }
 
             if (_projectDir != null) {
                 ThreadPool.QueueUserWorkItem(_ => SaveAnalysis());
@@ -1345,20 +1264,99 @@ namespace Microsoft.NodejsTools.Intellisense {
 
         private void SaveAnalysis() {
             try {
-                using (FileStream fs = new FileStream(GetAnalysisPath(), FileMode.Create)) {
-                    fs.Write(_dbHeader, 0, _dbHeader.Length);
-                    try {
-                        var serializer = new AnalysisSerializer();
-                        serializer.Serialize(fs, _jsAnalyzer);
-                        _analysisQueue.Serialize(serializer, fs);
-                    } catch (Exception e) {
-                        Debug.Fail("Failed to save analysis " + e);
+                if (_analysisLevel != AnalysisLevel.None) {
+                    if (File.Exists(GetAnalysisPath())) {
+                        // CreateNew doesn't overwrite hidden files, so delete it
+                        File.Delete(GetAnalysisPath());
                     }
+                    using (FileStream fs = new FileStream(GetAnalysisPath(), FileMode.Create)) {
+                        fs.Write(_dbHeader, 0, _dbHeader.Length);
+                        try {
+                            var serializer = new AnalysisSerializer();
+                            serializer.Serialize(fs, _jsAnalyzer);
+                            _analysisQueue.Serialize(serializer, fs);
+                        } catch (Exception e) {
+                            Debug.Fail("Failed to save analysis " + e);
+                        }
+                    }
+                    new FileInfo(GetAnalysisPath()).Attributes |= FileAttributes.Hidden;
                 }
-                new FileInfo(GetAnalysisPath()).Attributes |= FileAttributes.Hidden;
+            } catch (IOException) {
             } catch (UnauthorizedAccessException) {
             }
         }
+
+        #endregion
+
+        #region Analysis Limits
+
+        private const string AnalysisLimitsKey = @"Software\Microsoft\NodejsTools\" + AssemblyVersionInfo.VSVersion +
+    @"\Analysis\Project";
+
+        public AnalysisLimits LoadLimits() {
+            AnalysisLimits defaults = null;
+
+            if (NodejsPackage.Instance != null) {
+                switch (_analysisLevel) {
+                    case Options.AnalysisLevel.Low:
+                        defaults = _lowLimits;
+                        break;
+                }
+            }
+            if (defaults == null) {
+                defaults = _highLimits;
+            }
+
+            try {
+                using (var key = Registry.CurrentUser.OpenSubKey(AnalysisLimitsKey)) {
+                    return LoadLimitsFromStorage(key, defaults);
+                }
+            } catch (SecurityException) {
+            } catch (UnauthorizedAccessException) {
+            } catch (IOException) {
+            }
+            return defaults;
+        }
+
+
+        /// <summary>
+        /// Loads a new instance from the specified registry key.
+        /// </summary>
+        /// <param name="key">
+        /// The key to load settings from. If
+        /// null, all settings are assumed to be unspecified and the default
+        /// values are used.
+        /// </param>
+        /// <param name="defaults">
+        /// The default analysis limits if they're not available in the regkey.
+        /// </param>
+        public static AnalysisLimits LoadLimitsFromStorage(RegistryKey key, AnalysisLimits defaults) {
+            AnalysisLimits limits = new AnalysisLimits();
+
+            limits.ReturnTypes = GetSetting(key, ReturnTypesId) ?? defaults.ReturnTypes;
+            limits.InstanceMembers = GetSetting(key, InstanceMembersId) ?? defaults.InstanceMembers;
+            limits.DictKeyTypes = GetSetting(key, DictKeyTypesId) ?? defaults.DictKeyTypes;
+            limits.DictValueTypes = GetSetting(key, DictValueTypesId) ?? defaults.DictValueTypes;
+            limits.IndexTypes = GetSetting(key, IndexTypesId) ?? defaults.IndexTypes;
+            limits.AssignedTypes = GetSetting(key, AssignedTypesId) ?? defaults.AssignedTypes;
+
+            return limits;
+        }
+
+        private static int? GetSetting(RegistryKey key, string setting) {
+            if (key != null) {
+                return key.GetValue(ReturnTypesId) as int?;
+            }
+            return null;
+        }
+
+
+        private const string ReturnTypesId = "ReturnTypes";
+        private const string InstanceMembersId = "InstanceMembers";
+        private const string DictKeyTypesId = "DictKeyTypes";
+        private const string DictValueTypesId = "DictValueTypes";
+        private const string IndexTypesId = "IndexTypes";
+        private const string AssignedTypesId = "AssignedTypes";
 
         #endregion
     }

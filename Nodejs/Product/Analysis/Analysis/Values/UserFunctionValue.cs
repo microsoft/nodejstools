@@ -22,7 +22,7 @@ using Microsoft.NodejsTools.Parsing;
 
 namespace Microsoft.NodejsTools.Analysis.Values {
     [Serializable]
-    class UserFunctionValue : FunctionValue {
+    class UserFunctionValue : FunctionValue, IReferenceable {
         private readonly FunctionObject _funcObject;
         private readonly FunctionAnalysisUnit _analysisUnit;
         public VariableDef ReturnValue;
@@ -103,6 +103,12 @@ namespace Microsoft.NodejsTools.Analysis.Values {
                 AddDocumentationString(result);
 
                 return result.ToString();
+            }
+        }
+
+        public override string ShortDescription {
+            get {
+                return "function";
             }
         }
 
@@ -212,7 +218,7 @@ namespace Microsoft.NodejsTools.Analysis.Values {
                 }).ToArray();
 
                 var parameters = vars
-                    .Select(p => string.Join(", ", p.TypesNoCopy.Select(av => av.ShortDescription).Where(s => !String.IsNullOrWhiteSpace(s)).OrderBy(s => s).Distinct()))
+                    .Select(p => string.Join(" or ", p.TypesNoCopy.Select(av => av.ShortDescription).Where(s => !String.IsNullOrWhiteSpace(s)).OrderBy(s => s).Distinct()))
                     .ToArray();
 
                 IEnumerable<AnalysisVariable>[] refs = vars.Select(v => VariableTransformer.OtherToVariables.ToVariables(v)).ToArray();
@@ -565,5 +571,30 @@ namespace Microsoft.NodejsTools.Analysis.Values {
             OverflowedOnce,
             OverflowedBigTime
         }
+
+        public IEnumerable<KeyValuePair<IProjectEntry, EncodedLocation>> Definitions {
+            get {
+                yield return new KeyValuePair<IProjectEntry, EncodedLocation>(
+                    ProjectEntry,
+                    new EncodedLocation(_analysisUnit.Tree, _funcObject)
+                );
+            }
+        }
+
+        public new IEnumerable<KeyValuePair<IProjectEntry, EncodedLocation>> References {
+            get {
+                if (_references != null) {
+                    foreach (var keyValue in _references) {
+                        foreach (var loc in keyValue.Value.References) {
+                            yield return new KeyValuePair<IProjectEntry, EncodedLocation>(
+                                keyValue.Key,
+                                loc
+                            );
+                        }
+                    }
+                }
+            }
+        }
+
     }
 }

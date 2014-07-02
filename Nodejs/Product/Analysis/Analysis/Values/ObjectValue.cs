@@ -137,11 +137,7 @@ namespace Microsoft.NodejsTools.Analysis.Values {
 
         public virtual string ObjectDescription {
             get {
-#if DEBUG
-                return "object " + GetType().Name;
-#else
                 return "object";
-#endif
             }
         }
 
@@ -273,7 +269,12 @@ namespace Microsoft.NodejsTools.Analysis.Values {
                     }
                 }
             }
-            
+
+            if (this != ProjectState._objectPrototype) {
+                foreach (var res in ProjectState._objectPrototype.GetDefinitions(name)) {
+                    yield return res;
+                }
+            }
         }
     }
 

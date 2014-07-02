@@ -311,6 +311,16 @@
       <DependentUpon>NpmPackageInstallWindow.xaml</DependentUpon>
     </Compile>
     <Compile Include="NpmUI\PackageCatalogEntryViewModel.cs" />
+    <Compile Include="Options\AnalysisLevel.cs" />
+    <Compile Include="Options\NodejsAdvancedOptionsControl.cs">
+      <SubType>UserControl</SubType>
+    </Compile>
+    <Compile Include="Options\NodejsAdvancedOptionsControl.Designer.cs">
+      <DependentUpon>NodejsAdvancedOptionsControl.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Options\NodejsAdvancedOptionsPage.cs">
+      <SubType>Component</SubType>
+    </Compile>
     <Compile Include="Project\DependencyNodeProperties.cs" />
     <Compile Include="Project\NodejsTypeScriptFileNode.cs" />
     <Compile Include="Project\NodejsTypeScriptFileNodeProperties.cs" />
@@ -626,6 +636,9 @@
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>
+    <EmbeddedResource Include="Options\NodejsAdvancedOptionsControl.resx">
+      <DependentUpon>NodejsAdvancedOptionsControl.cs</DependentUpon>
+    </EmbeddedResource>
     <EmbeddedResource Include="Options\NodejsFormattingBracesOptionsControl.resx">
       <DependentUpon>NodejsFormattingBracesOptionsControl.cs</DependentUpon>
     </EmbeddedResource>
@@ -780,6 +793,15 @@
     <MultiProjectZipProject Include="ProjectTemplates\AzureNodejsWorker\Cloud\Cloud.ccproj">
       <SubType>Designer</SubType>
     </MultiProjectZipProject>
+    <ZipItem Include="Templates\Files\MochaUnitTest\UnitTest.vstemplate">
+      <SubType>Designer</SubType>
+    </ZipItem>
+    <ZipItem Include="Templates\Files\MochaUnitTest\UnitTest.js" />
+    <ZipItem Include="Templates\Files\TypeScriptMochaUnitTest\UnitTest.ts" />
+    <ZipItem Include="Templates\Files\TypeScriptMochaUnitTest\UnitTest.vstemplate">
+      <SubType>Designer</SubType>
+    </ZipItem>
+    <ZipItem Include="Templates\Files\UnitTest\UnitTest.js" />
     <Content Include="TestFrameworks\find_tests.js">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
       <IncludeInVSIX>true</IncludeInVSIX>
@@ -788,7 +810,7 @@
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
       <IncludeInVSIX>true</IncludeInVSIX>
     </Content>
-    <Content Include="TestFrameworks\Default\default.js">
+    <Content Include="TestFrameworks\ExportRunner\exportrunner.js">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
       <IncludeInVSIX>true</IncludeInVSIX>
     </Content>

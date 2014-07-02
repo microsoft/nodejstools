@@ -12,10 +12,14 @@
  *
  * ***************************************************************************/
 
+using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.IO;
 using System.Linq;
+using System.Text;
 using System.Threading;
+using System.Web.Script.Serialization;
 using Microsoft.NodejsTools.Analysis;
 using Microsoft.NodejsTools.Parsing;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
@@ -266,6 +270,20 @@ SimpleTest.prototype._performRequest = function (webResource, body, options, cal
         }
 
         [TestMethod]
+        public void TestPropertyGotoDef() {
+            string code = @"
+Object.defineProperty(Object.prototype, 'should', { set: function() { }, get: function() { 42 } });
+var x = {};
+";
+            var analysis = ProcessText(code);
+            AssertUtil.ContainsAtLeast(
+                analysis.GetVariablesByIndex("x.should", code.Length)
+                    .Select(x => x.Location.Line + ", " + x.Location.Column + ", " + x.Type),
+                "2, 79, Definition"
+            );
+        }
+
+        [TestMethod]
         public void TestGlobals() {
             string code = @"
 var x = 42;
@@ -288,6 +306,43 @@ x = x.abc;
                 analysis.GetTypeIdsByIndex("x", code.Length),
                 BuiltinTypeId.Number
             );
+        }
+
+        [TestMethod]
+        public void TestSignatureHelp() {
+            string code = @"
+function foo(x, y) {}
+foo(123, 'abc');
+foo('abc', 123);
+
+function abc(f) {
+}
+
+abc(abc);
+";
+            var analysis = ProcessText(code);
+            AssertUtil.ContainsExactly(
+                GetSignatures(analysis, "foo", code.Length),
+                "x number or string, y number or string"
+            );
+            AssertUtil.ContainsExactly(
+                GetSignatures(analysis, "abc", code.Length),
+                "f function"
+            );
+        }
+
+        private static string[] GetSignatures(ModuleAnalysis analysis, string name, int index) {
+            List<string> sigs = new List<string>();
+
+            foreach (var sig in analysis.GetSignaturesByIndex(name, index)) {
+                sigs.Add(
+                    String.Join(
+                        ", ",
+                        sig.Parameters.Select(x => x.Name + " " + x.Type)
+                    )
+                );
+            }
+            return sigs.ToArray();
         }
 
         [TestMethod]
@@ -817,6 +872,24 @@ var x = g.abc;
         }
 
         [TestMethod]
+        public void TestNodejsCreateFunctions() {
+            var code = @"var x = require('http').createServer(null, null);
+var y = require('net').createServer(null, null);
+";
+            var analysis = ProcessText(code);
+            AssertUtil.ContainsAtLeast(
+                analysis.GetMembersByIndex("x", code.Length).Select(x => x.Name),
+                "listen"
+            );
+            analysis = ProcessText(code);
+            AssertUtil.ContainsAtLeast(
+                analysis.GetMembersByIndex("y", code.Length).Select(x => x.Name),
+                "listen"
+            );
+        }
+
+
+        [TestMethod]
         public void TestCopySpecialization() {
             var analysis = ProcessText(@"function copy (obj) {
   var o = {}
@@ -1278,11 +1351,41 @@ ee.emit('myevent', 42)
 
 #if FALSE
         [TestMethod]
+        public void AnalyzeX() {
+            var limits = new AnalysisLimits() {
+                ReturnTypes = 1,
+                AssignedTypes = 1,
+                DictKeyTypes = 1,
+                DictValueTypes = 1,
+                IndexTypes = 1,
+                InstanceMembers = 1
+            };
+            var sw = new Stopwatch();
+            sw.Start();
+            Analyze("C:\\Source\\azure-sdk-tools-xplat", limits);
+            Console.WriteLine("Time: {0}", sw.Elapsed);
+        }
+
+        [TestMethod]
         public void AnalyzeExpress() {
             File.WriteAllText("C:\\Source\\Express\\express.txt", DumpAnalysis("C:\\Source\\Express"));
         }
+#endif
 
         public string DumpAnalysis(string directory) {
+            var analyzer = Analyze(directory);
+
+            var entries = analyzer.AllModules.ToArray();
+            Array.Sort(entries, (x, y) => String.Compare(x.FilePath, y.FilePath));
+            StringBuilder analysis = new StringBuilder();
+            foreach (var entry in entries) {
+                analysis.AppendLine(entry.Analysis.Dump());
+            }
+
+            return analysis.ToString();
+        }
+
+        private static JsAnalyzer Analyze(string directory, AnalysisLimits limits = null) {
             List<AnalysisFile> files = new List<AnalysisFile>();
             foreach (var file in Directory.GetFiles(directory, "*", SearchOption.AllDirectories)) {
                 if (String.Equals(Path.GetExtension(file), ".js", StringComparison.OrdinalIgnoreCase)) {
@@ -1303,16 +1406,10 @@ ee.emit('myevent', 42)
                 }
             }
 
-            var entries = Analysis.Analyze(files.ToArray()).ToArray();
-            Array.Sort(entries, (x, y) => String.Compare(x.Key, y.Key));
-            StringBuilder analysis = new StringBuilder();
-            foreach (var entry in entries) {
-                analysis.AppendLine(entry.Value.Analysis.Dump());
-            }
-
-            return analysis.ToString();
+            var analyzer = Analysis.Analyze(limits, files.ToArray());
+            return analyzer;
         }
-#endif
+
 
         public virtual ModuleAnalysis ProcessText(string text) {
             return ProcessOneText(text);

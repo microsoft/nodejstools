@@ -24,13 +24,13 @@ namespace TestAdapterTests {
         public void InitializeAllFrameworks() {
             //Arrange and Act
             string[] frameworkDirectories = new string[] {
-                "c:\\nodejstools\\" + TestFrameworkDirectories.DefaultFramework,
+                "c:\\nodejstools\\" + TestFrameworkDirectories.ExportRunnerFramework,
                 "c:\\nodejstools\\" + "mocha"
              };
             FrameworkDiscover discover = new FrameworkDiscover(frameworkDirectories);
 
             //Assert
-            TestFramework defaultOne = discover.Get("Default");
+            TestFramework defaultOne = discover.Get(TestFrameworkDirectories.ExportRunnerFramework);
             Assert.IsNotNull(defaultOne);
             TestFramework mocha = discover.Get("moCHA");//searching on name is case insensitive
             Assert.IsNotNull(mocha);
@@ -45,12 +45,12 @@ namespace TestAdapterTests {
             string testFile = "dummyTestFile.js";
             string vsixInstallFolder = "c:\\dummyFolder";
             string workingFolder = "c:\\DummyNodejsProject";
-            string framework = TestFrameworkDirectories.DefaultFramework;
+            string framework = TestFrameworkDirectories.ExportRunnerFramework;
             string testFrameworkDirectory = vsixInstallFolder + "\\" + framework;
             FrameworkDiscover discover = new FrameworkDiscover(new string[] { testFrameworkDirectory });
 
             //Act
-            TestFramework defaultOne = discover.Get(TestFrameworkDirectories.DefaultFramework);
+            TestFramework defaultOne = discover.Get(TestFrameworkDirectories.ExportRunnerFramework);
             string[] args = defaultOne.ArgumentsToRunTests(testName, testFile, workingFolder, workingFolder);
 
             //Assert

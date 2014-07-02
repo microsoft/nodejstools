@@ -12,6 +12,7 @@
  *
  * ***************************************************************************/
 
+using System;
 using System.IO;
 using Microsoft.TC.TestHostAdapters;
 using Microsoft.VisualStudio.Language.Intellisense;
@@ -119,9 +120,37 @@ namespace Microsoft.Nodejs.Tests.UI {
                         "https"
                     );
 
-                    Keyboard.Type("\t)");
-
+                    // this should trigger completion
+                    Keyboard.Type(")");
                     server.WaitForText("require('http')");
+                }
+
+                Keyboard.Backspace(8);
+                server.WaitForText("require");
+
+                Keyboard.Type("(");
+                using (var completionSession = server.WaitForSession<ICompletionSession>()) {
+                    Assert.AreEqual(1, completionSession.Session.CompletionSets.Count);
+
+                    // this should dismiss the session and not complete anything
+                    Keyboard.Type("'".ToString());
+                    server.WaitForText("require('");
+
+                    Assert.IsTrue(completionSession.Session.IsDismissed);
+                }
+
+                Keyboard.Backspace(2);
+                server.WaitForText("require");
+
+                Keyboard.Type("(");
+                using (var completionSession = server.WaitForSession<ICompletionSession>()) {
+                    Assert.AreEqual(1, completionSession.Session.CompletionSets.Count);
+
+                    // this should dismiss the session and not complete anything
+                    Keyboard.Type("\"".ToString());
+                    server.WaitForText("require(\"");
+
+                    Assert.IsTrue(completionSession.Session.IsDismissed);
                 }
             }
         }
@@ -168,9 +197,50 @@ namespace Microsoft.Nodejs.Tests.UI {
                         "https"
                     );
 
-                    Keyboard.Type("\t)");
-
+                    // this should trigger completion
+                    Keyboard.Type("')");
                     server.WaitForText("require('http')");
+                }
+
+                Keyboard.Backspace(7);
+                server.WaitForText("require(");
+
+                Keyboard.Type("'./");
+                server.WaitForText("require('./");
+                using (var completionSession = server.WaitForSession<ICompletionSession>()) {
+                    AssertUtil.ContainsExactly(
+                        completionSession.Session.GetInsertionTexts(),
+                        "./myapp.js'",
+                        "./SomeFolder/baz.js'"
+                    );
+                }
+
+                Keyboard.Backspace(3);
+                server.WaitForText("require(");
+
+                Keyboard.Type("'");
+                using (var completionSession = server.WaitForSession<ICompletionSession>()) {
+                    Assert.AreEqual(1, completionSession.Session.CompletionSets.Count);
+
+                    // this should dismiss the session and not complete anything
+                    Keyboard.Type(")".ToString());
+                    server.WaitForText("require(')");
+
+                    Assert.IsTrue(completionSession.Session.IsDismissed);
+                }
+
+                Keyboard.Backspace(2);
+                server.WaitForText("require(");
+
+                Keyboard.Type("'");
+                using (var completionSession = server.WaitForSession<ICompletionSession>()) {
+                    Assert.AreEqual(1, completionSession.Session.CompletionSets.Count);
+
+                    // this should dismiss the session and not complete anything
+                    Keyboard.Type("\"".ToString());
+                    server.WaitForText("require('\"");
+
+                    Assert.IsTrue(completionSession.Session.IsDismissed);
                 }
             }
         }
@@ -217,9 +287,50 @@ namespace Microsoft.Nodejs.Tests.UI {
                         "https"
                     );
 
-                    Keyboard.Type("\t)");
+                    Keyboard.Type("\")");
 
                     server.WaitForText("require(\"http\")");
+                }
+
+                Keyboard.Backspace(7);
+                server.WaitForText("require(");
+
+                Keyboard.Type("'./");
+                server.WaitForText("require('./");
+                using (var completionSession = server.WaitForSession<ICompletionSession>()) {
+                    AssertUtil.ContainsExactly(
+                        completionSession.Session.GetInsertionTexts(),
+                        "./myapp.js'",
+                        "./SomeFolder/baz.js'"
+                    );
+                }
+
+                Keyboard.Backspace(3);
+                server.WaitForText("require(");
+
+                Keyboard.Type("\"");
+                using (var completionSession = server.WaitForSession<ICompletionSession>()) {
+                    Assert.AreEqual(1, completionSession.Session.CompletionSets.Count);
+
+                    // this should dismiss the session and not complete anything
+                    Keyboard.Type(")".ToString());
+                    server.WaitForText("require(\")");
+
+                    Assert.IsTrue(completionSession.Session.IsDismissed);
+                }
+
+                Keyboard.Backspace(2);
+                server.WaitForText("require(");
+
+                Keyboard.Type("\"");
+                using (var completionSession = server.WaitForSession<ICompletionSession>()) {
+                    Assert.AreEqual(1, completionSession.Session.CompletionSets.Count);
+
+                    // this should dismiss the session and not complete anything
+                    Keyboard.Type("'".ToString());
+                    server.WaitForText("require(\"'");
+
+                    Assert.IsTrue(completionSession.Session.IsDismissed);
                 }
             }
         }

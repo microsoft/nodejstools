@@ -20,7 +20,7 @@ using System.IO;
 namespace Microsoft.NodejsTools.TestFrameworks {
     class TestFrameworkDirectories {
         private readonly Dictionary<string, string> _frameworkDirectories;
-        public const string DefaultFramework = "Default"; 
+        public const string ExportRunnerFramework = "ExportRunner"; 
 
         public TestFrameworkDirectories() {
             string installFolder = GetExecutingAssemblyPath();
@@ -31,7 +31,7 @@ namespace Microsoft.NodejsTools.TestFrameworks {
                 _frameworkDirectories.Add(name, directory);
             }
             string defaultFx;
-            _frameworkDirectories.TryGetValue(DefaultFramework, out defaultFx);
+            _frameworkDirectories.TryGetValue(ExportRunnerFramework, out defaultFx);
             if (defaultFx == null) {
                 throw new InvalidOperationException("Missing generic test framework");
             }

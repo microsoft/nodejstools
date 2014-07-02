@@ -39,7 +39,7 @@ namespace Microsoft.NodejsTools.Intellisense {
                         )
                     );
                 }
-            } else {
+            } else if (analysis != null) {
                 members = analysis.GetAllAvailableMembersByIndex(
                     VsProjectAnalyzer.TranslateIndex(
                         Span.GetStartPoint(_snapshot).Position,

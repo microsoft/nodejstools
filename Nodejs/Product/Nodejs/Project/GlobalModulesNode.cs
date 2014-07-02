@@ -38,12 +38,6 @@ namespace Microsoft.NodejsTools.Project {
             _parent = parent;
         }
 
-        public override object GetIconHandle(bool open) {
-            return ProjectMgr.ImageHandler.GetIconHandle(open
-                ? (int)ProjectNode.ImageName.OpenReferenceFolder
-                : (int)ProjectNode.ImageName.ReferenceFolder);
-        }
-
         public override string Url {
             get { return GlobalModulesVirtualName; }
         }

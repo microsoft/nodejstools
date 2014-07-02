@@ -644,7 +644,7 @@ namespace Microsoft.NodejsTools {
             var statusBar = (IVsStatusbar)CommonPackage.GetGlobalService(typeof(SVsStatusbar));
             var analyzer = _textView.GetAnalyzer();
             if (analyzer != null && analyzer.IsAnalyzing) {
-                statusBar.SetText("Python source analysis is not up to date");
+                statusBar.SetText("Node.js source analysis is not up to date");
             }
         }
 

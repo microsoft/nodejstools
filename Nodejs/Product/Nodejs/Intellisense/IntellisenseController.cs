@@ -496,16 +496,31 @@ namespace Microsoft.NodejsTools.Intellisense {
                 var ch = (char)(ushort)System.Runtime.InteropServices.Marshal.GetObjectForNativeVariant(pvaIn);
 
                 if (_activeSession != null && !_activeSession.IsDismissed) {
-                    if (_activeSession.SelectedCompletionSet.SelectionStatus.IsSelected &&
-                        // TODO: Fix me
-                        /*NodejsPackage.Instance.AdvancedEditorOptionsPage.CompletionCommittedBy*/"{}[]().,:;+-*/%&|^!~=<>?@#'\"\\".IndexOf(ch) != -1) {
+                    if (_activeSession.SelectedCompletionSet.SelectionStatus.IsSelected) {
                         var completion = _activeSession.SelectedCompletionSet.SelectionStatus.Completion;
-                        _activeSession.Commit();
-                        if ((completion.InsertionText.EndsWith("'") && ch == '\'') ||
-                            (completion.InsertionText.EndsWith("\"") && ch == '"')) {
-                            // https://nodejstools.codeplex.com/workitem/960
-                            // ' triggers the completion, but we don't want to insert the quote.
-                            return VSConstants.S_OK;
+
+                        string committedBy = "";
+                        if (_activeSession.SelectedCompletionSet.Moniker == CompletionSource.NodejsRequireCompletionSetMoniker) {
+                            if (completion.InsertionText.StartsWith("'")) { // require(
+                                committedBy = ")";
+                            } else if (completion.InsertionText.EndsWith("'")) { // require('
+                                committedBy = "'";
+                            } else if (completion.InsertionText.EndsWith("\"")) { // require("
+                                committedBy = "\"";
+                            }
+                        } else {
+                            // TODO: Fix me (NodejsPackage.Instance.AdvancedEditorOptionsPage.CompletionCommittedBy)
+                            committedBy = "{}[]().,:;+-*/%&|^!~=<>?@#'\"\\";
+                        }
+
+                        if (committedBy.IndexOf(ch) != -1) {
+                            _activeSession.Commit();
+                            if ((completion.InsertionText.EndsWith("'") && ch == '\'') ||
+                                (completion.InsertionText.EndsWith("\"") && ch == '"')) {
+                                // https://nodejstools.codeplex.com/workitem/960
+                                // ' triggers the completion, but we don't want to insert the quote.
+                                return VSConstants.S_OK;
+                            }
                         }
                     } else if (!IsIdentifierChar(ch)) {
                         _activeSession.Dismiss();

@@ -53,7 +53,9 @@
         </File>
 
         <ItemTemplate Include="ItemTemplates\JavaScript\UnitTest.zip;
-                               ItemTemplates\JavaScript\TypeScriptUnitTest.zip"/>
+                               ItemTemplates\JavaScript\MochaUnitTest.zip;
+                               ItemTemplates\JavaScript\TypeScriptUnitTest.zip;
+                               ItemTemplates\JavaScript\TypeScriptMochaUnitTest.zip"/>
 
         <ProjectTemplate Include="ProjectTemplates\JavaScript\Node.js\1033\AzureExpressApp.zip;
                                   ProjectTemplates\JavaScript\Node.js\1033\AzureNodejsApp.zip;
@@ -81,8 +83,8 @@
             <InstallDirectory>TestFrameworks</InstallDirectory>
         </File>
         
-        <File Include="TestFrameworks\default\default.js">
-            <InstallDirectory>TestFrameworksDefault</InstallDirectory>
+        <File Include="TestFrameworks\ExportRunner\exportrunner.js">
+            <InstallDirectory>TestFrameworksExportRunner</InstallDirectory>
         </File>
 
         <File Include="TestFrameworks\mocha\mocha.js">

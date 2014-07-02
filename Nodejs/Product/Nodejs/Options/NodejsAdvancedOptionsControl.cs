@@ -12,27 +12,24 @@
  *
  * ***************************************************************************/
 
-
-using System.ComponentModel;
-
+using System;
+using System.Windows.Forms;
 using Microsoft.NodejsTools.Project;
-using Microsoft.VisualStudio.TestTools.UnitTesting;
-using Microsoft.VisualStudioTools.Project;
 
-namespace NodejsTests {
+namespace Microsoft.NodejsTools.Options {
+    public partial class NodejsAdvancedOptionsControl : UserControl {
+        public NodejsAdvancedOptionsControl() {
+            InitializeComponent();
+            AnalysisLevel = NodejsPackage.Instance.AdvancedOptionsPage.AnalysisLevel;
+        }
 
-    [TestClass]
-    public class TestFrameworkStringConverterTest {
-        [TestMethod]
-        public void GetStandardValues_CheckValueSequence() {
-            //Arrange
-            TestFrameworkStringConverter convert = new TestFrameworkStringConverter();
-            //Act
-            TypeConverter.StandardValuesCollection values = convert.GetStandardValues(null);
-            //Assert
-            Assert.AreEqual("ExportRunner", values[0]);
-            Assert.AreEqual("Mocha", values[1]);
-            Assert.AreEqual(2, values.Count);
+        internal AnalysisLevel AnalysisLevel {
+            get {
+                return (AnalysisLevel)_codeAnalysisLevel.SelectedIndex;
+            }
+            set {
+                _codeAnalysisLevel.SelectedIndex = (int)value;
+            }
         }
     }
 }

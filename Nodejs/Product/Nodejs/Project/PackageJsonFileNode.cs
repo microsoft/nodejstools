@@ -51,6 +51,11 @@ namespace Microsoft.NodejsTools.Project {
         }
 
         private void FileContentsChanged(object sender, FileSystemEventArgs e) {
+            var analyzer = ((NodejsProjectNode)ProjectMgr).Analyzer;
+            AnalyzePackageJson(analyzer);
+        }
+
+        internal void AnalyzePackageJson(Intellisense.VsProjectAnalyzer analyzer) {
             string fileContents = null;
             for (int i = 0; i < 10; i++) {
                 try {
@@ -71,8 +76,8 @@ namespace Microsoft.NodejsTools.Project {
                 }
                 
                 object mainFile;
-                if (json.TryGetValue("main", out mainFile) && mainFile is string) {
-                    ((NodejsProjectNode)ProjectMgr).Analyzer.AddPackageJson(Url, (string)mainFile);
+                if (json != null && json.TryGetValue("main", out mainFile) && mainFile is string) {
+                    analyzer.AddPackageJson(Url, (string)mainFile);
                 }
             }
         }

@@ -16,10 +16,12 @@ using System;
 using System.Diagnostics;
 using System.Collections.Generic;
 using System.IO;
+using System.Text.RegularExpressions;
 using System.Threading;
 using Microsoft.VisualStudio.TestPlatform.ObjectModel.Logging;
 using Microsoft.VisualStudioTools.Project;
 using Newtonsoft.Json;
+using System.Linq;
 
 namespace Microsoft.NodejsTools.TestAdapter.TestFrameworks {
     class TestFramework {
@@ -43,7 +45,20 @@ namespace Microsoft.NodejsTools.TestAdapter.TestFrameworks {
             string testInfo = string.Empty;
             string discoverResultFile = Path.GetTempFileName();
             try {
-                EvaluateJavaScript(nodeExe, testFile, discoverResultFile, logger, workingDirectory);
+                string stdout = EvaluateJavaScript(nodeExe, testFile, discoverResultFile, logger, workingDirectory);
+                if (!String.IsNullOrWhiteSpace(stdout)) {
+                    IEnumerable<String> stdoutLines = stdout.Split(new string[] {Environment.NewLine},
+                        StringSplitOptions.RemoveEmptyEntries).Where(s => s.StartsWith("NTVS_ERROR:")).Select(s => s.Trim().Remove(0,11));
+
+                    if (stdoutLines != null && stdoutLines.Count() > 0) {
+                        foreach (string s in stdoutLines) {
+                            logger.SendMessage(TestMessageLevel.Error, s);
+                        }
+                        //There was an error during detection, return an empty set
+                        return new List<NodejsTestInfo>();
+                    }
+                }
+
                 for (int i = 0; i < 4; i++) {
                     try {
                         testInfo = File.ReadAllText(discoverResultFile);
@@ -64,10 +79,11 @@ namespace Microsoft.NodejsTools.TestAdapter.TestFrameworks {
 
             List<NodejsTestInfo> testCases = new List<NodejsTestInfo>();
             List<DiscoveredTest> discoveredTests = (List<DiscoveredTest>)JsonConvert.DeserializeObject(testInfo, typeof(List<DiscoveredTest>));
-
-            foreach (DiscoveredTest discoveredTest in discoveredTests) {
-                NodejsTestInfo test = new NodejsTestInfo(testFile, discoveredTest.Test, discoveredTest.Suite, Name);
-                testCases.Add(test);
+            if (discoveredTests != null) {
+                foreach (DiscoveredTest discoveredTest in discoveredTests) {
+                    NodejsTestInfo test = new NodejsTestInfo(testFile, discoveredTest.Test, discoveredTest.Suite, Name);
+                    testCases.Add(test);
+                }
             }
             return testCases;
         }
