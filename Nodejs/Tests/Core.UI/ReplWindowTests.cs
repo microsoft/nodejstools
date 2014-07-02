@@ -12,11 +12,14 @@
  *
  * ***************************************************************************/
 
+using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using Microsoft.NodejsTools.Repl;
 using Microsoft.TC.TestHostAdapters;
+using Microsoft.VisualStudio.Language.Intellisense;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using Microsoft.VisualStudio.Text;
 using Microsoft.VisualStudio.Text.Classification;
@@ -35,54 +38,20 @@ namespace Microsoft.Nodejs.Tests.UI {
         [TestMethod, Priority(0), TestCategory("Core")]
         [HostType("TC Dynamic"), DynamicHostType(typeof(VsIdeHostAdapter))]
         public void TestErrorNewLine() {
-            var window = Prepare();
-            Keyboard.Type("abc\r");
-            window.WaitForText("> abc", "ReferenceError: abc is not defined", "> ");
-            Keyboard.Type("42\r");
-            window.WaitForText("> abc", "ReferenceError: abc is not defined", "> 42", "42", "> ");
+            Test((app, window) => {
+                Keyboard.Type("abc\r");
+                window.WaitForText("> abc", "ReferenceError: abc is not defined", "> ");
+                Keyboard.Type("42\r");
+                window.WaitForText("> abc", "ReferenceError: abc is not defined", "> 42", "42", "> ");
+            });
         }
 
         [TestMethod, Priority(0), TestCategory("Core")]
         [HostType("TC Dynamic"), DynamicHostType(typeof(VsIdeHostAdapter))]
         public void TestColorOutput() {
-            var window = Prepare();
-            Keyboard.Type("[1,2,3]\r");
-            window.WaitForText("> [1,2,3]", "[ 1, 2, 3 ]", "> ");
-
-            IList<ClassificationSpan> spans = null;
-            window.Invoke(() => {
-                var snapshot = window.TextView.TextBuffer.CurrentSnapshot;
-                spans = window.Classifier.GetClassificationSpans(new SnapshotSpan(snapshot, 0, snapshot.Length));
-            });
-            
-            Classification.Verify(spans,
-                new Classification("operator", 2, 3, "["),
-                new Classification("number", 3, 4, "1"),
-                new Classification("operator", 4, 5, ","),
-                new Classification("number", 5, 6, "2"),
-                new Classification("operator", 6, 7, ","),
-                new Classification("number", 7, 8, "3"),
-                new Classification("operator", 8, 9, "]"),
-                new Classification("Node.js Interactive - Black", 11, 13, "[ "),
-                new Classification("Node.js Interactive - Blue", 13, 14, "1"),
-                new Classification("Node.js Interactive - Black", 14, 16, ", "),
-                new Classification("Node.js Interactive - Blue", 16, 17, "2"),
-                new Classification("Node.js Interactive - Black", 17, 19, ", "),
-                new Classification("Node.js Interactive - Blue", 19, 20, "3"),
-                new Classification("Node.js Interactive - Black", 20, 24, " ]\r\n")
-            );
-        }
-
-        [TestMethod, Priority(0), TestCategory("Core")]
-        [HostType("TC Dynamic"), DynamicHostType(typeof(VsIdeHostAdapter))]
-        public void ReplStdErr() {
-            var window = Prepare();
-            window.ReplWindow.Evaluator.ExecuteText("setTimeout(function () { not_a_fn(); }, 0);\r").Wait();
-
-            bool receivedError = false;
-            for (int retries = 10; retries >= 0; --retries) {
-                // Text from stderr takes longer to appear than the console.log()
-                // message, so we need to wait for it.
+            Test((app, window) => {
+                Keyboard.Type("[1,2,3]\r");
+                window.WaitForText("> [1,2,3]", "[ 1, 2, 3 ]", "> ");
 
                 IList<ClassificationSpan> spans = null;
                 window.Invoke(() => {
@@ -90,23 +59,76 @@ namespace Microsoft.Nodejs.Tests.UI {
                     spans = window.Classifier.GetClassificationSpans(new SnapshotSpan(snapshot, 0, snapshot.Length));
                 });
 
-                if (spans.Count > 0 && "Node.js Interactive - Red" == spans[spans.Count - 1].ClassificationType.Classification) {
-                    receivedError = true;
-                    break;
-                }
-                Thread.Sleep(500);
-            }            
-            Assert.IsTrue(receivedError, "Did not get text from stderr");
-            //Flush the screen once the test is done
-            //This way output isn't left which could lead to confusion
-            window.ReplWindow.ClearScreen();
+                Classification.Verify(spans,
+                    new Classification("operator", 2, 3, "["),
+                    new Classification("number", 3, 4, "1"),
+                    new Classification("operator", 4, 5, ","),
+                    new Classification("number", 5, 6, "2"),
+                    new Classification("operator", 6, 7, ","),
+                    new Classification("number", 7, 8, "3"),
+                    new Classification("operator", 8, 9, "]"),
+                    new Classification("Node.js Interactive - Black", 11, 13, "[ "),
+                    new Classification("Node.js Interactive - Blue", 13, 14, "1"),
+                    new Classification("Node.js Interactive - Black", 14, 16, ", "),
+                    new Classification("Node.js Interactive - Blue", 16, 17, "2"),
+                    new Classification("Node.js Interactive - Black", 17, 19, ", "),
+                    new Classification("Node.js Interactive - Blue", 19, 20, "3"),
+                    new Classification("Node.js Interactive - Black", 20, 24, " ]\r\n")
+                );
+            });
         }
 
+        [TestMethod, Priority(0), TestCategory("Core")]
+        [HostType("TC Dynamic"), DynamicHostType(typeof(VsIdeHostAdapter))]
+        public void TestStdErrIsRed() {
+            Test((app, window) => {
+                window.ReplWindow.Evaluator.ExecuteText("setTimeout(function () { not_a_fn(); }, 0);\r").Wait();
+
+                bool receivedError = false;
+                for (int retries = 10; retries >= 0; --retries) {
+                    // Text from stderr takes longer to appear than the console.log()
+                    // message, so we need to wait for it.
+
+                    IList<ClassificationSpan> spans = null;
+                    window.Invoke(() => {
+                        var snapshot = window.TextView.TextBuffer.CurrentSnapshot;
+                        spans = window.Classifier.GetClassificationSpans(new SnapshotSpan(snapshot, 0, snapshot.Length));
+                    });
+
+                    if (spans.Count > 0 && "Node.js Interactive - Red" == spans[spans.Count - 1].ClassificationType.Classification) {
+                        receivedError = true;
+                        break;
+                    }
+                    Thread.Sleep(500);
+                }
+                Assert.IsTrue(receivedError, "Did not get text from stderr");
+            });
+        }
+
+        [TestMethod, Priority(0), TestCategory("Core")]
+        [HostType("TC Dynamic"), DynamicHostType(typeof(VsIdeHostAdapter))]
+        public void TestCompletion() {
+            Test((app, window) => {
+                Keyboard.Type("''.");
+                using (var session = window.WaitForSession<ICompletionSession>()) {
+                    Assert.IsTrue(session.Session.CompletionSets.First().Completions.Any(x => x.InsertionText == "length"));
+                }
+            });
+        }
+
+        [TestMethod, Priority(0), TestCategory("Core")]
+        [HostType("TC Dynamic"), DynamicHostType(typeof(VsIdeHostAdapter))]
+        public void TestNoSpecialCommandCompletion() {
+            Test((app, window) => {
+                Keyboard.Type(".");
+                window.AssertNoIntellisenseSession();
+            });
+        }
 
         /// <summary>
         /// Opens the interactive window, clears the screen.
         /// </summary>
-        internal InteractiveWindow Prepare(bool reopenOnly = false) {
+        internal void Test(Action<NodejsVisualStudioApp, InteractiveWindow> body) {
             using (var app = new NodejsVisualStudioApp(VsIdeTestHostContext.Dte)) {
                 app.SuppressCloseAllOnDispose();
 
@@ -120,33 +142,34 @@ namespace Microsoft.Nodejs.Tests.UI {
                 app.Element.SetFocus();
                 interactive.Element.SetFocus();
 
-                int timeout = 10000;
+                interactive.ClearInput();
 
-                if (!reopenOnly) {
-                    interactive.ClearInput();
-
-                    bool isReady = false;
-                    for (int retries = 10; retries > 0; --retries) {
-                        interactive.Reset();
-                        try {
-                            var task = interactive.ReplWindow.Evaluator.ExecuteText("console.log('READY')");
-                            Assert.IsTrue(task.Wait(timeout), "ReplWindow did not initialize in time");
-                            if (!task.Result.IsSuccessful) {
-                                continue;
-                            }
-                        } catch (TaskCanceledException) {
+                bool isReady = false;
+                for (int retries = 10; retries > 0; --retries) {
+                    interactive.Reset();
+                    try {
+                        var task = interactive.ReplWindow.Evaluator.ExecuteText("console.log('READY')");
+                        Assert.IsTrue(task.Wait(10000), "ReplWindow did not initialize in time");
+                        if (!task.Result.IsSuccessful) {
                             continue;
                         }
-
-                        interactive.WaitForTextEnd("READY", "undefined", "> ");
-                        isReady = true;
-                        break;
+                    } catch (TaskCanceledException) {
+                        continue;
                     }
-                    Assert.IsTrue(isReady, "ReplWindow did not initialize");
-                    interactive.ClearScreen();
-                    interactive.ReplWindow.ClearHistory();
+
+                    interactive.WaitForTextEnd("READY", "undefined", "> ");
+                    isReady = true;
+                    break;
                 }
-                return interactive;
+                Assert.IsTrue(isReady, "ReplWindow did not initialize");
+
+                interactive.ClearScreen();
+                interactive.ReplWindow.ClearHistory();
+
+                body(app, interactive);
+
+                interactive.ClearScreen();
+                interactive.ReplWindow.ClearHistory();
             }
         }
     }

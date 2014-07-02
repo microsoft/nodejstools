@@ -18,8 +18,9 @@ using System.Diagnostics;
 using System.IO;
 using System.Linq;
 using System.Runtime.InteropServices;
-using Microsoft.NodejsTools.Project;
 using Microsoft.NodejsTools.Classifier;
+using Microsoft.NodejsTools.Project;
+using Microsoft.NodejsTools.Repl;
 using Microsoft.VisualStudio;
 using Microsoft.VisualStudio.Language.Intellisense;
 using Microsoft.VisualStudio.Shell.Interop;
@@ -63,74 +64,83 @@ namespace Microsoft.NodejsTools.Intellisense {
 
         public void AugmentCompletionSession(ICompletionSession session, IList<CompletionSet> completionSets) {
             var buffer = _textBuffer;
-            var triggerPoint = session.GetTriggerPoint(buffer).GetPoint(buffer.CurrentSnapshot);
-            bool shouldTrigger = ShouldTriggerRequireIntellisense(triggerPoint, _classifier, true, true);
+            var snapshot = buffer.CurrentSnapshot;
+            var triggerPoint = session.GetTriggerPoint(buffer).GetPoint(snapshot);
 
-            if (shouldTrigger) {
-                var classifications = EnumerateClassificationsInReverse(_classifier, triggerPoint);
-                bool? doubleQuote = null;
-                int length = 0;
-
-                // check which one of these we're doing:
-                // require(         inserting 'module' at trigger point
-                // require('        inserting module' at trigger point
-                // requre('ht')     ctrl space at ht, inserting http' at trigger point - 2
-                // requre('addo')   ctrl space at add, inserting addons' at trigger point - 3
-
-                // Therefore we have no quotes or quotes.  In no quotes we insert both
-                // leading and trailing quotes.  In quotes we leave the leading quote in
-                // place and replace any other quotes value that was already there.
-
-                if (classifications.MoveNext()) {
-                    var curText = classifications.Current.Span.GetText();
-                    if (curText.StartsWith("'") || curText.StartsWith("\"")) {
-                        // we're in the quotes case, figure out the existing string,
-                        // and use that at the applicable span.
-                        var fullSpan = _classifier.GetClassificationSpans(
-                            new SnapshotSpan(
-                                classifications.Current.Span.Start,
-                                classifications.Current.Span.End.GetContainingLine().End
-                            )
-                        ).First();
-
-                        doubleQuote = curText[0] == '"';
-                        triggerPoint -= (curText.Length - 1);
-                        length = fullSpan.Span.Length - 1;
-                    }
-                    // else it's require(
-                }
-
-                var completions = GenerateBuiltinCompletions(doubleQuote);
-                completions.AddRange(GetProjectCompletions(doubleQuote));
-                completions.Sort(CompletionSorter);
-
-                completionSets.Add(
-                    new CompletionSet(
-                        NodejsRequireCompletionSetMoniker,
-                        "Node.js require",
-                        _textBuffer.CurrentSnapshot.CreateTrackingSpan(
-                            triggerPoint,
-                            length,
-                            SpanTrackingMode.EdgeInclusive
-                        ),
-                        completions,
-                        null
-                    )
-                );
-            } else {
-                var textBuffer = _textBuffer;
-                var span = GetApplicableSpan(session, textBuffer);
-                var provider = VsProjectAnalyzer.GetCompletions(
-                    _textBuffer.CurrentSnapshot,
-                    span,
-                    session.GetTriggerPoint(buffer)
-                );
-
-                var completions = provider.GetCompletions(_glyphService);
-                if (completions != null) {
-                    completionSets.Add(completions);
-                }
+            // Disable completions if user is editing a special command (e.g. ".cls") in the REPL.
+            if (snapshot.TextBuffer.Properties.ContainsProperty(typeof(IReplEvaluator)) && snapshot.Length != 0 && snapshot[0] == '.') {
+                return;
             }
+
+            if (ShouldTriggerRequireIntellisense(triggerPoint, _classifier, true, true)) {
+                AugmentCompletionSessionForRequire(triggerPoint, session, completionSets);
+                return;
+            }
+
+            var textBuffer = _textBuffer;
+            var span = GetApplicableSpan(session, textBuffer);
+            var provider = VsProjectAnalyzer.GetCompletions(
+                _textBuffer.CurrentSnapshot,
+                span,
+                session.GetTriggerPoint(buffer)
+            );
+
+            var completions = provider.GetCompletions(_glyphService);
+            if (completions != null) {
+                completionSets.Add(completions);
+            }
+        }
+        private void AugmentCompletionSessionForRequire(SnapshotPoint triggerPoint, ICompletionSession session, IList<CompletionSet> completionSets) {
+            var classifications = EnumerateClassificationsInReverse(_classifier, triggerPoint);
+            bool? doubleQuote = null;
+            int length = 0;
+
+            // check which one of these we're doing:
+            // require(         inserting 'module' at trigger point
+            // require('        inserting module' at trigger point
+            // requre('ht')     ctrl space at ht, inserting http' at trigger point - 2
+            // requre('addo')   ctrl space at add, inserting addons' at trigger point - 3
+
+            // Therefore we have no quotes or quotes.  In no quotes we insert both
+            // leading and trailing quotes.  In quotes we leave the leading quote in
+            // place and replace any other quotes value that was already there.
+
+            if (classifications.MoveNext()) {
+                var curText = classifications.Current.Span.GetText();
+                if (curText.StartsWith("'") || curText.StartsWith("\"")) {
+                    // we're in the quotes case, figure out the existing string,
+                    // and use that at the applicable span.
+                    var fullSpan = _classifier.GetClassificationSpans(
+                        new SnapshotSpan(
+                            classifications.Current.Span.Start,
+                            classifications.Current.Span.End.GetContainingLine().End
+                        )
+                    ).First();
+
+                    doubleQuote = curText[0] == '"';
+                    triggerPoint -= (curText.Length - 1);
+                    length = fullSpan.Span.Length - 1;
+                }
+                // else it's require(
+            }
+
+            var completions = GenerateBuiltinCompletions(doubleQuote);
+            completions.AddRange(GetProjectCompletions(doubleQuote));
+            completions.Sort(CompletionSorter);
+
+            completionSets.Add(
+                new CompletionSet(
+                    NodejsRequireCompletionSetMoniker,
+                    "Node.js require",
+                    _textBuffer.CurrentSnapshot.CreateTrackingSpan(
+                        triggerPoint,
+                        length,
+                        SpanTrackingMode.EdgeInclusive
+                    ),
+                    completions,
+                    null
+                )
+            );
         }
 
         /// <summary>

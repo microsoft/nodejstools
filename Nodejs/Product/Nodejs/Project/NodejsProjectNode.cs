@@ -573,20 +573,24 @@ namespace Microsoft.NodejsTools.Project {
 
         protected override void Dispose(bool disposing) {
             if (disposing) {
-                UnHookErrorsAndWarnings(_analyzer);
-                if (WarningFiles.Count > 0 || ErrorFiles.Count > 0) {
-                    foreach (var file in WarningFiles.Concat(ErrorFiles)) {
-                        var node = FindNodeByFullPath(file) as NodejsFileNode;
-                        if (node != null) {
-                            //_analyzer.RemoveErrors(node.GetAnalysis(), suppressUpdate: false);
+                if (_analyzer != null) {
+                    UnHookErrorsAndWarnings(_analyzer);
+                    if (WarningFiles.Count > 0 || ErrorFiles.Count > 0) {
+                        foreach (var file in WarningFiles.Concat(ErrorFiles)) {
+                            var node = FindNodeByFullPath(file) as NodejsFileNode;
+                            if (node != null) {
+                                //_analyzer.RemoveErrors(node.GetAnalysis(), suppressUpdate: false);
+                            }
                         }
                     }
+
+                    if (_analyzer.RemoveUser()) {
+                        _analyzer.Dispose();
+                    }
+
+                    _analyzer = null;
                 }
 
-                if (_analyzer.RemoveUser()) {
-                    _analyzer.Dispose();
-                }
-                _analyzer = null;
                 NodejsPackage.Instance.AdvancedOptionsPage.AnalysisLevelChanged -= AdvancedOptionsPageAnalysisLevelChanged;
             }
             base.Dispose(disposing);
