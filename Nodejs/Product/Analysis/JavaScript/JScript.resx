@@ -417,4 +417,10 @@
   <data name="SemicolonInsertion" xml:space="preserve">
     <value>Semicolon insertion rules applied</value>
   </data>
+  <data name="UnclosedBlock" xml:space="preserve">
+    <value>End of file encountered before block is properly closed</value>
+  </data>
+  <data name="UnclosedObjectLiteral" xml:space="preserve">
+    <value>End of file encountered before object literal is properly closed</value>
+  </data>
 </root>

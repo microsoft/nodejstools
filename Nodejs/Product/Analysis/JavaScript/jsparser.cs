@@ -544,42 +544,36 @@ namespace Microsoft.NodejsTools.Parsing
 
             m_noSkipTokenSet.Add(NoSkipTokenSet.s_StartStatementNoSkipTokenSet);
             m_noSkipTokenSet.Add(NoSkipTokenSet.s_BlockNoSkipTokenSet);
-            try
-            {
-                try
-                {
-                    while (JSToken.RightCurly != _curToken)
-                    {
-                        try
-                        {
-                            // pass false because we really only want Statements, and FunctionDeclarations
-                            // are technically not statements. We'll still handle them, but we'll issue a warning.
-                            codeBlock.Append(ParseStatement());
+            try {
+                try {
+                    try {
+                        while (JSToken.RightCurly != _curToken) {
+                            try {
+                                // pass false because we really only want Statements, and FunctionDeclarations
+                                // are technically not statements. We'll still handle them, but we'll issue a warning.
+                                codeBlock.Append(ParseStatement());
+                            } catch (RecoveryTokenException exc) {
+                                if (exc._partiallyComputedNode != null)
+                                    codeBlock.Append(exc.PartiallyComputedStatement);
+                                if (IndexOfToken(NoSkipTokenSet.s_StartStatementNoSkipTokenSet, exc) == -1)
+                                    throw;
+                            }
                         }
-                        catch (RecoveryTokenException exc)
-                        {
-                            if (exc._partiallyComputedNode != null)
-                                codeBlock.Append(exc.PartiallyComputedStatement);
-                            if (IndexOfToken(NoSkipTokenSet.s_StartStatementNoSkipTokenSet, exc) == -1)
-                                throw;
+                        codeBlock.Braces = BraceState.StartAndEnd;
+                    } catch (RecoveryTokenException exc) {
+                        if (IndexOfToken(NoSkipTokenSet.s_BlockNoSkipTokenSet, exc) == -1) {
+                            exc._partiallyComputedNode = codeBlock;
+                            throw;
                         }
                     }
-                    codeBlock.Braces = BraceState.StartAndEnd;
+                } finally {
+                    m_noSkipTokenSet.Remove(NoSkipTokenSet.s_BlockNoSkipTokenSet);
+                    m_noSkipTokenSet.Remove(NoSkipTokenSet.s_StartStatementNoSkipTokenSet);
+                    m_blockType.RemoveAt(m_blockType.Count - 1);
                 }
-                catch (RecoveryTokenException exc)
-                {
-                    if (IndexOfToken(NoSkipTokenSet.s_BlockNoSkipTokenSet, exc) == -1)
-                    {
-                        exc._partiallyComputedNode = codeBlock;
-                        throw;
-                    }
-                }
-            }
-            finally
-            {
-                m_noSkipTokenSet.Remove(NoSkipTokenSet.s_BlockNoSkipTokenSet);
-                m_noSkipTokenSet.Remove(NoSkipTokenSet.s_StartStatementNoSkipTokenSet);
-                m_blockType.RemoveAt(m_blockType.Count - 1);
+            } catch (EndOfFileException) {
+                // unclosed block
+                m_errorSink.HandleError(JSError.UnclosedBlock, codeBlock.Span, m_scanner._indexResolver, true);
             }
 
             // update the block context
@@ -3553,220 +3547,7 @@ namespace Microsoft.NodejsTools.Parsing
 
                 // object initializer
                 case JSToken.LeftCurly:
-                    IndexSpan objSpan = _curSpan;
-                    GetNextToken();
-
-                    var propertyList = new AstNodeList<ObjectLiteralProperty>(CurrentPositionSpan());
-
-                    if (JSToken.RightCurly != _curToken)
-                    {
-                        for (; ; )
-                        {
-                            ObjectLiteralField field = null;
-                            Expression value = null;
-                            bool getterSetter = false;
-                            string ident;
-
-                            switch (_curToken)
-                            {
-                                case JSToken.Identifier:
-                                    field = new ObjectLiteralField(m_scanner.Identifier, _curSpan);
-                                    break;
-
-                                case JSToken.StringLiteral:
-                                    field = new ObjectLiteralField(m_scanner.StringLiteralValue, _curSpan);
-                                    break;
-
-                                case JSToken.IntegerLiteral:
-                                case JSToken.NumericLiteral:
-                                    {
-                                        double doubleValue;
-                                        if (ConvertNumericLiteralToDouble(GetCode(_curSpan), (_curToken == JSToken.IntegerLiteral), out doubleValue))
-                                        {
-                                            // conversion worked fine
-                                            field = new ObjectLiteralField(
-                                              doubleValue,
-                                              _curSpan
-                                            );
-                                        }
-                                        else
-                                        {
-                                            // something went wrong and we're not sure the string representation in the source is 
-                                            // going to convert to a numeric value well
-                                            if (double.IsInfinity(doubleValue))
-                                            {
-                                                ReportError(JSError.NumericOverflow, _curSpan, true);
-                                            }
-
-                                            // use the source as the field name, not the numeric value
-                                            field = new ObjectLiteralField(
-                                                new InvalidNumericErrorValue(GetCode(_curSpan)),
-                                                _curSpan
-                                            );
-                                        }
-                                        break;
-                                    }
-
-                                case JSToken.Get:
-                                case JSToken.Set:
-                                    if (PeekToken() == JSToken.Colon)
-                                    {
-                                        // the field is either "get" or "set" and isn't the special Mozilla getter/setter
-                                        field = new ObjectLiteralField(GetCode(_curSpan), _curSpan);
-                                    }
-                                    else
-                                    {
-                                        // ecma-script get/set property construct
-                                        getterSetter = true;
-                                        bool isGet = (_curToken == JSToken.Get);
-                                        var span = _curSpan;
-                                        var functionExpr = ParseFunctionExpression(JSToken.Get == _curToken ? FunctionType.Getter : FunctionType.Setter);
-                                        value = functionExpr;
-                                        // getter/setter is just the literal name with a get/set flag
-                                        field = new GetterSetter(
-                                            functionExpr.Function.Name,
-                                            isGet,
-                                            span,
-                                            this
-                                        );
-                                    }
-                                    break;
-
-                                default:
-                                    // NOT: identifier token, string, number, or getter/setter.
-                                    // see if it's a token that COULD be an identifierName.
-                                    ident = m_scanner.Identifier;
-                                    if (JSScanner.IsValidIdentifier(ident))
-                                    {
-                                        // BY THE SPEC, if it's a valid identifierName -- which includes reserved words -- then it's
-                                        // okay for object literal syntax. However, reserved words here won't work in all browsers,
-                                        // so if it is a reserved word, let's throw a low-sev cross-browser warning on the code.
-                                        if (JSKeyword.CanBeIdentifier(_curToken) == null)
-                                        {
-                                            ReportError(JSError.ObjectLiteralKeyword, _curSpan, true);
-                                        }
-
-                                        field = new ObjectLiteralField(ident, _curSpan);
-                                    }
-                                    else
-                                    {
-                                        // throw an error but use it anyway, since that's what the developer has going on
-                                        ReportError(JSError.NoMemberIdentifier, _curSpan, true);
-                                        field = new ObjectLiteralField(GetCode(_curSpan), _curSpan);
-                                    }
-                                    break;
-                            }
-
-                            if (field != null)
-                            {
-                                if (!getterSetter)
-                                {
-                                    GetNextToken();
-                                }
-
-                                m_noSkipTokenSet.Add(NoSkipTokenSet.s_ObjectInitNoSkipTokenSet);
-                                try
-                                {
-                                    if (!getterSetter)
-                                    {
-                                        // get the value
-                                        if (JSToken.Colon != _curToken)
-                                        {
-                                            ReportError(JSError.NoColon, true);
-                                            value = ParseExpression(true);
-                                        }
-                                        else
-                                        {
-                                            GetNextToken();
-                                            value = ParseExpression(true);
-                                        }
-                                    }
-
-                                    // put the pair into the list of fields
-                                    var propSpan = field.Span.CombineWith(value.IfNotNull(v => v.Span));
-                                    var property = new ObjectLiteralProperty(propSpan)
-                                        {
-                                            Name = field,
-                                            Value = value
-                                        };
-
-                                    propertyList.Append(property);
-
-                                    if (JSToken.RightCurly == _curToken)
-                                    {
-                                        break;
-                                    }
-                                    else
-                                    {
-                                        if (JSToken.Comma == _curToken)
-                                        {
-                                            // skip the comma after adding it to the property as a terminating context
-                                            GetNextToken();
-
-                                            // if the next token is the right-curly brace, then we ended 
-                                            // the list with a comma, which is perfectly fine
-                                            if (_curToken == JSToken.RightCurly)
-                                            {
-                                                break;
-                                            }
-                                        }
-                                        else
-                                        {
-                                            if (m_foundEndOfLine)
-                                            {
-                                                ReportError(JSError.NoRightCurly);
-                                            }
-                                            else
-                                                ReportError(JSError.NoComma, true);
-                                            SkipTokensAndThrow();
-                                        }
-                                    }
-                                }
-                                catch (RecoveryTokenException exc)
-                                {
-                                    if (exc._partiallyComputedNode != null)
-                                    {
-                                        // the problem was in ParseExpression trying to determine value
-                                        value = (Expression)exc._partiallyComputedNode;
-
-                                        var propSpan = field.Span.CombineWith(value.IfNotNull(v => v.Span));
-                                        var property = new ObjectLiteralProperty(propSpan)
-                                        {
-                                            Name = field,
-                                            Value = value
-                                        };
-
-                                        propertyList.Append(property);
-                                    }
-
-                                    if (IndexOfToken(NoSkipTokenSet.s_ObjectInitNoSkipTokenSet, exc) == -1)
-                                    {
-                                        exc._partiallyComputedNode = new ObjectLiteral(objSpan)
-                                            {
-                                                Properties = propertyList
-                                            };
-                                        throw;
-                                    }
-                                    else
-                                    {
-                                        if (JSToken.Comma == _curToken)
-                                            GetNextToken();
-                                        if (JSToken.RightCurly == _curToken)
-                                            break;
-                                    }
-                                }
-                                finally
-                                {
-                                    m_noSkipTokenSet.Remove(NoSkipTokenSet.s_ObjectInitNoSkipTokenSet);
-                                }
-                            }
-                        }
-                    }
-                    objSpan = objSpan.UpdateWith(_curSpan);
-                    ast = new ObjectLiteral(objSpan)
-                        {
-                            Properties = propertyList
-                        };
+                    ast = ParseObjectLiteral();
                     break;
 
                 // function expression
@@ -3798,6 +3579,184 @@ namespace Microsoft.NodejsTools.Parsing
                 GetNextToken();
 
             return MemberExpression(ast, newSpans);
+        }
+
+        private Expression ParseObjectLiteral() {
+            IndexSpan objSpan = _curSpan;
+            GetNextToken();
+
+            var propertyList = new AstNodeList<ObjectLiteralProperty>(CurrentPositionSpan());
+
+            if (JSToken.RightCurly != _curToken) {
+                try {
+                    for (; ; ) {
+                        ObjectLiteralField field = null;
+                        Expression value = null;
+                        bool getterSetter = false;
+                        string ident;
+
+                        switch (_curToken) {
+                            case JSToken.Identifier:
+                                field = new ObjectLiteralField(m_scanner.Identifier, _curSpan);
+                                break;
+
+                            case JSToken.StringLiteral:
+                                field = new ObjectLiteralField(m_scanner.StringLiteralValue, _curSpan);
+                                break;
+
+                            case JSToken.IntegerLiteral:
+                            case JSToken.NumericLiteral: {
+                                    double doubleValue;
+                                    if (ConvertNumericLiteralToDouble(GetCode(_curSpan), (_curToken == JSToken.IntegerLiteral), out doubleValue)) {
+                                        // conversion worked fine
+                                        field = new ObjectLiteralField(
+                                          doubleValue,
+                                          _curSpan
+                                        );
+                                    } else {
+                                        // something went wrong and we're not sure the string representation in the source is 
+                                        // going to convert to a numeric value well
+                                        if (double.IsInfinity(doubleValue)) {
+                                            ReportError(JSError.NumericOverflow, _curSpan, true);
+                                        }
+
+                                        // use the source as the field name, not the numeric value
+                                        field = new ObjectLiteralField(
+                                            new InvalidNumericErrorValue(GetCode(_curSpan)),
+                                            _curSpan
+                                        );
+                                    }
+                                    break;
+                                }
+
+                            case JSToken.Get:
+                            case JSToken.Set:
+                                if (PeekToken() == JSToken.Colon) {
+                                    // the field is either "get" or "set" and isn't the special Mozilla getter/setter
+                                    field = new ObjectLiteralField(GetCode(_curSpan), _curSpan);
+                                } else {
+                                    // ecma-script get/set property construct
+                                    getterSetter = true;
+                                    bool isGet = (_curToken == JSToken.Get);
+                                    var span = _curSpan;
+                                    var functionExpr = ParseFunctionExpression(JSToken.Get == _curToken ? FunctionType.Getter : FunctionType.Setter);
+                                    value = functionExpr;
+                                    // getter/setter is just the literal name with a get/set flag
+                                    field = new GetterSetter(
+                                        functionExpr.Function.Name,
+                                        isGet,
+                                        span,
+                                        this
+                                    );
+                                }
+                                break;
+
+                            default:
+                                // NOT: identifier token, string, number, or getter/setter.
+                                // see if it's a token that COULD be an identifierName.
+                                ident = m_scanner.Identifier;
+                                if (JSScanner.IsValidIdentifier(ident)) {
+                                    // BY THE SPEC, if it's a valid identifierName -- which includes reserved words -- then it's
+                                    // okay for object literal syntax. However, reserved words here won't work in all browsers,
+                                    // so if it is a reserved word, let's throw a low-sev cross-browser warning on the code.
+                                    if (JSKeyword.CanBeIdentifier(_curToken) == null) {
+                                        ReportError(JSError.ObjectLiteralKeyword, _curSpan, true);
+                                    }
+
+                                    field = new ObjectLiteralField(ident, _curSpan);
+                                } else {
+                                    // throw an error but use it anyway, since that's what the developer has going on
+                                    ReportError(JSError.NoMemberIdentifier, _curSpan, true);
+                                    field = new ObjectLiteralField(GetCode(_curSpan), _curSpan);
+                                }
+                                break;
+                        }
+
+                        if (field != null) {
+                            if (!getterSetter) {
+                                GetNextToken();
+                            }
+
+                            m_noSkipTokenSet.Add(NoSkipTokenSet.s_ObjectInitNoSkipTokenSet);
+                            try {
+                                if (!getterSetter) {
+                                    // get the value
+                                    if (JSToken.Colon != _curToken) {
+                                        ReportError(JSError.NoColon, true);
+                                        value = ParseExpression(true);
+                                    } else {
+                                        GetNextToken();
+                                        value = ParseExpression(true);
+                                    }
+                                }
+
+                                // put the pair into the list of fields
+                                var propSpan = field.Span.CombineWith(value.IfNotNull(v => v.Span));
+                                var property = new ObjectLiteralProperty(propSpan) {
+                                    Name = field,
+                                    Value = value
+                                };
+
+                                propertyList.Append(property);
+
+                                if (JSToken.RightCurly == _curToken) {
+                                    break;
+                                } else {
+                                    if (JSToken.Comma == _curToken) {
+                                        // skip the comma after adding it to the property as a terminating context
+                                        GetNextToken();
+
+                                        // if the next token is the right-curly brace, then we ended 
+                                        // the list with a comma, which is perfectly fine
+                                        if (_curToken == JSToken.RightCurly) {
+                                            break;
+                                        }
+                                    } else {
+                                        if (m_foundEndOfLine) {
+                                            ReportError(JSError.NoRightCurly);
+                                        } else
+                                            ReportError(JSError.NoComma, true);
+                                        SkipTokensAndThrow();
+                                    }
+                                }
+                            } catch (RecoveryTokenException exc) {
+                                if (exc._partiallyComputedNode != null) {
+                                    // the problem was in ParseExpression trying to determine value
+                                    value = (Expression)exc._partiallyComputedNode;
+
+                                    var propSpan = field.Span.CombineWith(value.IfNotNull(v => v.Span));
+                                    var property = new ObjectLiteralProperty(propSpan) {
+                                        Name = field,
+                                        Value = value
+                                    };
+
+                                    propertyList.Append(property);
+                                }
+
+                                if (IndexOfToken(NoSkipTokenSet.s_ObjectInitNoSkipTokenSet, exc) == -1) {
+                                    exc._partiallyComputedNode = new ObjectLiteral(objSpan) {
+                                        Properties = propertyList
+                                    };
+                                    throw;
+                                } else {
+                                    if (JSToken.Comma == _curToken)
+                                        GetNextToken();
+                                    if (JSToken.RightCurly == _curToken)
+                                        break;
+                                }
+                            } finally {
+                                m_noSkipTokenSet.Remove(NoSkipTokenSet.s_ObjectInitNoSkipTokenSet);
+                            }
+                        }
+                    }
+                } catch (EndOfFileException) {
+                    m_errorSink.HandleError(JSError.UnclosedObjectLiteral, objSpan, m_scanner._indexResolver, true);
+                }
+            }
+            objSpan = objSpan.UpdateWith(_curSpan);
+            return new ObjectLiteral(objSpan) {
+                Properties = propertyList
+            };
         }
 
         private static object[] _cachedDoubles = new object[200];

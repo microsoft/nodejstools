@@ -1158,18 +1158,6 @@ folder you are copying, do you want to replace the existing files?", Path.GetFil
 
                 public override void DoAddition(ref bool? overwrite) {
                     string newPath = Path.Combine(TargetFolder, NewFileName);
-
-                    if (!Directory.Exists(TargetFolder)) {
-                        try {
-                            Directory.CreateDirectory(TargetFolder);
-                        } catch (ArgumentException) {
-                        } catch (UnauthorizedAccessException) {
-                        } catch (PathTooLongException) {
-                        } catch (DirectoryNotFoundException) {
-                        } catch (NotSupportedException) {
-                        }
-                    }
-
                     if (DropEffect == DropEffect.Move && Utilities.IsSameComObject(Project, SourceHierarchy)) {
                         // we are doing a move, we need to remove the old item, and add the new.
                         // This also allows us to have better behavior if the user is selectively answering

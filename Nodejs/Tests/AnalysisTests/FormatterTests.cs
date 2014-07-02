@@ -89,7 +89,11 @@ console.log(err);
                 // https://nodejstools.codeplex.com/workitem/1078
                 new { Before = "function f() {\r\n    if(true)!\r\n}", After = "function f() {\r\n    if (true)\r\n\r\n}" },
                 // https://nodejstools.codeplex.com/workitem/1075
-                new { Before = "function hello() {!", After = "function hello() {\r\n" }
+                new { Before = "function hello() {!", After = "function hello() {\r\n" },
+                // https://nodejstools.codeplex.com/workitem/1136
+                new { Before = ";\r\n{\r\n    /*!\r\n}", After = ";\r\n{\r\n    /*\r\n\r\n}" },
+                // https://nodejstools.codeplex.com/workitem/1133
+                new { Before = ";\r\nvar mailOptions = {\r\n    from: 'blahblah',!", After = ";\r\nvar mailOptions = {\r\n    from: 'blahblah',\r\n" }
             };
 
             foreach (var test in testCode) {

@@ -882,6 +882,8 @@ namespace Microsoft.NodejsTools.Intellisense {
                 case JSError.MisplacedFunctionDeclaration:
                 case JSError.KeywordUsedAsIdentifier:
                 case JSError.SuspectAssignment:
+                case JSError.UndeclaredFunction:
+                case JSError.UndeclaredVariable:
                     // TODO: Allow the user to control what warnings are reported?
                     return false;
             }

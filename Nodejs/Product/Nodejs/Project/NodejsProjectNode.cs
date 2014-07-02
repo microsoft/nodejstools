@@ -19,6 +19,7 @@ using System.IO;
 using System.Linq;
 using System.Reflection;
 using System.Text;
+using System.Text.RegularExpressions;
 using System.Threading;
 using System.Threading.Tasks;
 using System.Web.Script.Serialization;
@@ -35,6 +36,7 @@ namespace Microsoft.NodejsTools.Project {
         private VsProjectAnalyzer _analyzer;
         private readonly HashSet<string> _warningFiles = new HashSet<string>();
         private readonly HashSet<string> _errorFiles = new HashSet<string>();
+        private string[] _analysisIgnoredDirs = new string[0];
         internal readonly RequireCompletionCache _requireCompletionCache = new RequireCompletionCache();
         private string _intermediateOutputPath;
 
@@ -312,6 +314,14 @@ namespace Microsoft.NodejsTools.Project {
                         }
                     }
                 }
+
+                var ignoredPaths = GetProjectProperty(NodejsConstants.AnalysisIgnoredDirectories);
+
+                if (!string.IsNullOrWhiteSpace(ignoredPaths)) {
+                    _analysisIgnoredDirs = ignoredPaths.Split(';').Select(x => '\\' + x + '\\').ToArray();
+                } else {
+                    _analysisIgnoredDirs = new string[0];
+                }
             }
         }
 
@@ -415,8 +425,14 @@ namespace Microsoft.NodejsTools.Project {
         }
 
         internal bool IncludeNodejsFile(NodejsFileNode fileNode) {
+            var url = fileNode.Url;
             if (CommonUtils.IsSubpathOf(_intermediateOutputPath, fileNode.Url)) {
                 return false;
+            }
+            foreach (var path in _analysisIgnoredDirs) {
+                if (url.IndexOf(path, 0, StringComparison.OrdinalIgnoreCase) != -1) {
+                    return false;
+                }
             }
             return true;
         }

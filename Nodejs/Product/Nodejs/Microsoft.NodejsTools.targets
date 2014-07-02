@@ -5,6 +5,12 @@
     <VSToolsPath Condition="'$(VSToolsPath)' == ''">$(MSBuildExtensionsPath32)\Microsoft\VisualStudio\v$(VisualStudioVersion)</VSToolsPath>
   </PropertyGroup>
 
+  <PropertyGroup>
+    <!-- Specifies the directories which are ignored.  Any paths which contain these directory names
+         will be ignored.  The directory name must completely match and no wild cards are allowed
+     -->
+    <AnalysisIgnoredDirectories Condition="'$(AnalysisIgnoredDirectories)' == ''">bower_components</AnalysisIgnoredDirectories>
+  </PropertyGroup>
   <!-- *********************************************************************************** -->
   <!-- Normal install environment, use the current version -->
   <PropertyGroup>

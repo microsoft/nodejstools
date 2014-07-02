@@ -35,6 +35,7 @@ namespace Microsoft.NodejsTools {
         public const string StartWebBrowser = "StartWebBrowser";
 
         public const string NodeModulesFolder = "node_modules";
+        public const string AnalysisIgnoredDirectories = "AnalysisIgnoredDirectories";
         
         /// <summary>
         /// The name of the package.json file

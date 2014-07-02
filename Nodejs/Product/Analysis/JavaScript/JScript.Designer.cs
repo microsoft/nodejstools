@@ -889,11 +889,29 @@ namespace Microsoft.Ajax.Utilities {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to End of file encountered before block is properly closed.
+        /// </summary>
+        internal static string UnclosedBlock {
+            get {
+                return ResourceManager.GetString("UnclosedBlock", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to End of file encountered before function is properly closed.
         /// </summary>
         internal static string UnclosedFunction {
             get {
                 return ResourceManager.GetString("UnclosedFunction", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to End of file encountered before object literal is properly closed.
+        /// </summary>
+        internal static string UnclosedObjectLiteral {
+            get {
+                return ResourceManager.GetString("UnclosedObjectLiteral", resourceCulture);
             }
         }
         

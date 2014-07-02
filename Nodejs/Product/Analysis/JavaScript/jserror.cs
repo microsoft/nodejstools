@@ -101,7 +101,7 @@ namespace Microsoft.NodejsTools.Parsing
         AssignmentToConstant = 1298, // assignment to constant
         StringNotInlineSafe = 1299, // string literal is not inline safe
         StrictModeUndefinedVariable = 1300, // undefined variable in strict mode
-        UnclosedFunction = 1301, // end of file encountered before function is properly closed
+        UnclosedFunction = 1301, // end of file encountered before function is properly closed        
         ObjectLiteralKeyword = 1303, // reserved word used as object literal property name
         NoEndIfDirective = 1304, // expected #ENDIF directive
         NoEndDebugDirective = 1305, // expected #ENDDEBUG directive
@@ -110,6 +110,8 @@ namespace Microsoft.NodejsTools.Parsing
         DuplicateCatch = 1308, // variable declaration duplicates catch error name
         SuspectEquality = 1309, // suspect equality comparison
         SemicolonInsertion = 1310, // semicolon insertion
+        UnclosedBlock = 1311, // end of file encountered before block is properly closed
+        UnclosedObjectLiteral = 1312, // end of file encountered before object literal is properly closed
 
         //5000 - 6000 JScript errors that can occur during execution. Typically (also) used in "throw new JScriptException".
         IllegalAssignment = 5008, // "Illegal assignment"
