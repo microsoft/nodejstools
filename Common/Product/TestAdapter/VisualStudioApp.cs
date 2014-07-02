@@ -145,6 +145,8 @@ namespace Microsoft.VisualStudioTools {
                 return false;
             }
 
+            //the '#ping=0' is a special flag to tell VS node debugger not to connect to the port 
+            //because a connecting carries the consequence of setting off --debug-brk, and breakpoints will be missed.
             var processes = debugger3.GetProcesses(transport, string.Format("tcp://localhost:{0}#ping=0", port));
             if (processes.Count < 1) {
                 return false;
