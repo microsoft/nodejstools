@@ -37,8 +37,8 @@ namespace Microsoft.NodejsTools.TestAdapter {
     class TestExecutor : ITestExecutor {
         public const string ExecutorUriString = "executor://NodejsTestExecutor/v1";
         public static readonly Uri ExecutorUri = new Uri(ExecutorUriString);
-        private static readonly Guid NodejsRemoteDebugPortSupplierUnsecuredId = new Guid("{9E16F805-5EFC-4CE5-8B67-9AE9B643EF80}"); //new Guid("{2AF68ED9-6A8A-4210-9B4D-92DDEBAB8CCC}");
-        //private static readonly string TestLauncherPath = "";//NodejsToolsInstallPath.GetFile("visualstudio_py_testlauncher.py");
+        //get from NodeRemoteDebugPortSupplier::PortSupplierId
+        private static readonly Guid NodejsRemoteDebugPortSupplierUnsecuredId = new Guid("{9E16F805-5EFC-4CE5-8B67-9AE9B643EF80}");
                 
         private readonly ManualResetEvent _cancelRequested = new ManualResetEvent(false);
 
