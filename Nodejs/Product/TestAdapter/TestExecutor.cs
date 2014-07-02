@@ -179,7 +179,10 @@ namespace Microsoft.NodejsTools.TestAdapter {
                 proc.Wait(TimeSpan.FromMilliseconds(500));
                 if (runContext.IsBeingDebugged && app != null) {
                     try {
-                        while (!app.AttachToNodeProcess(proc, NodejsRemoteDebugPortSupplierUnsecuredId, port)) {
+                        //the '#ping=0' is a special flag to tell VS node debugger not to connect to the port,
+                        //because a connection carries the consequence of setting off --debug-brk, and breakpoints will be missed.
+                        string qualifierUri = string.Format("tcp://localhost:{0}#ping=0", port);
+                        while (!app.AttachToProcess(proc, NodejsRemoteDebugPortSupplierUnsecuredId, qualifierUri)) {
                             if (proc.Wait(TimeSpan.FromMilliseconds(500))) {
                                 break;
                             }

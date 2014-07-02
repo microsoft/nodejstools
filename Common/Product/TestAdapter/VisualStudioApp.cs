@@ -129,19 +129,12 @@ namespace Microsoft.VisualStudioTools {
             return (DTE)runningObject;
         }
 
-        public bool AttachToNodeProcess(ProcessOutput proc, Guid portSupplier, int port) {
-            //the '#ping=0' is a special flag to tell VS node debugger not to connect to the port,
-            //because a connection carries the consequence of setting off --debug-brk, and breakpoints will be missed.
-            string qualifierUrl = string.Format("tcp://localhost:{0}#ping=0", port);
-            return AttachToProcess(proc, portSupplier, qualifierUrl);
-        }
-
         public bool AttachToProcess(ProcessOutput proc, Guid portSupplier, string secret, int port) {
-            string qualifierUrl = string.Format("tcp://{0}@localhost:{1}", secret, port);
-            return AttachToProcess(proc, portSupplier, qualifierUrl);
+            string qualifierUri = string.Format("tcp://{0}@localhost:{1}", secret, port);
+            return AttachToProcess(proc, portSupplier, qualifierUri);
         }
 
-        private bool AttachToProcess(ProcessOutput proc, Guid portSupplier, string transportQualifierUrl) {
+        public bool AttachToProcess(ProcessOutput proc, Guid portSupplier, string transportQualifierUri) {
             var debugger3 = (EnvDTE90.Debugger3)DTE.Debugger;
             var transports = debugger3.Transports;
             EnvDTE80.Transport transport = null;
@@ -156,7 +149,7 @@ namespace Microsoft.VisualStudioTools {
                 return false;
             }
 
-            var processes = debugger3.GetProcesses(transport, transportQualifierUrl);
+            var processes = debugger3.GetProcesses(transport, transportQualifierUri);
             if (processes.Count < 1) {
                 return false;
             }
