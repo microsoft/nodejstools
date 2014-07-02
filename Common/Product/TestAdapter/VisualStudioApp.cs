@@ -182,7 +182,6 @@ namespace Microsoft.VisualStudioTools {
             processes.Item(1).Attach();
             return true;
         }
-
     }
 
     public class MessageFilter : IOleMessageFilter {
