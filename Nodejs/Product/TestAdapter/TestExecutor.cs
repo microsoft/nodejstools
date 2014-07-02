@@ -179,7 +179,7 @@ namespace Microsoft.NodejsTools.TestAdapter {
                 proc.Wait(TimeSpan.FromMilliseconds(500));
                 if (runContext.IsBeingDebugged && app != null) {
                     try {
-                        while (!app.AttachToProcess(proc, NodejsRemoteDebugPortSupplierUnsecuredId, port)) {
+                        while (!app.AttachToNodeProcess(proc, NodejsRemoteDebugPortSupplierUnsecuredId, port)) {
                             if (proc.Wait(TimeSpan.FromMilliseconds(500))) {
                                 break;
                             }
