@@ -131,7 +131,7 @@ namespace Microsoft.VisualStudioTools {
 
         public bool AttachToNodeProcess(ProcessOutput proc, Guid portSupplier, int port) {
             //the '#ping=0' is a special flag to tell VS node debugger not to connect to the port,
-            //because a connect carries the consequence of setting off --debug-brk, and breakpoints will be missed.
+            //because a connection carries the consequence of setting off --debug-brk, and breakpoints will be missed.
             string qualifierUrl = string.Format("tcp://localhost:{0}#ping=0", port);
             return AttachToProcess(proc, portSupplier, qualifierUrl);
         }
