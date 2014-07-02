@@ -83,8 +83,8 @@
             <InstallDirectory>TestFrameworks</InstallDirectory>
         </File>
         
-        <File Include="TestFrameworks\default\default.js">
-            <InstallDirectory>TestFrameworksDefault</InstallDirectory>
+        <File Include="TestFrameworks\ExportRunner\exportrunner.js">
+            <InstallDirectory>TestFrameworksExportRunner</InstallDirectory>
         </File>
 
         <File Include="TestFrameworks\mocha\mocha.js">

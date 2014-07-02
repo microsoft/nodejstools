@@ -13,7 +13,7 @@
                 <Directory Id="Dir_$(var.key)FileTemplatesNewItem" Name="NewItem" />
             </Directory>
             <Directory Id="Dir_$(var.key)TestFrameworks" Name="TestFrameworks">
-                <Directory Id="Dir_$(var.key)TestFrameworksDefault" Name="Default" />
+                <Directory Id="Dir_$(var.key)TestFrameworksExportRunner" Name="ExportRunner" />
                 <Directory Id="Dir_$(var.key)TestFrameworksMocha" Name="Mocha" />
             </Directory>
             <Directory Id="Dir_$(var.key)InstallLocationScripts" Name="Scripts">

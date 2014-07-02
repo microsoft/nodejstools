@@ -30,7 +30,7 @@ namespace NodejsTests {
             //Act
             TypeConverter.StandardValuesCollection values = convert.GetStandardValues(null);
             //Assert
-            Assert.AreEqual("Default", values[0]);
+            Assert.AreEqual("ExportRunner", values[0]);
             Assert.AreEqual("Mocha", values[1]);
             Assert.AreEqual(2, values.Count);
         }

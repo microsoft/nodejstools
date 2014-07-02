@@ -42,7 +42,7 @@ namespace Microsoft.NodejsTools.ProjectWizard {
         public void RunStarted(object automationObject, Dictionary<string, string> replacementsDictionary, WizardRunKind runKind, object[] customParams) {
             if (!replacementsDictionary.TryGetValue("$wizarddata$", out _framework) ||
                 string.IsNullOrEmpty(_framework)) {
-                _framework = TestFrameworkDirectories.DefaultFramework;
+                _framework = TestFrameworkDirectories.ExportRunnerFramework;
             }
         }
 
