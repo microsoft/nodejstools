@@ -13,22 +13,42 @@
  * ***************************************************************************/
 
 using System;
+using System.Diagnostics;
 using System.Windows.Forms;
 using Microsoft.NodejsTools.Project;
 
 namespace Microsoft.NodejsTools.Options {
-    public partial class NodejsAdvancedOptionsControl : UserControl {
-        public NodejsAdvancedOptionsControl() {
+    public partial class NodejsIntellisenseOptionsControl : UserControl {
+        public NodejsIntellisenseOptionsControl() {
             InitializeComponent();
             AnalysisLevel = NodejsPackage.Instance.AdvancedOptionsPage.AnalysisLevel;
         }
 
         internal AnalysisLevel AnalysisLevel {
             get {
-                return (AnalysisLevel)_codeAnalysisLevel.SelectedIndex;
+                if (_fullIntelliSenseRadioButton.Checked) {
+                    return AnalysisLevel.High;
+                } else if (_limitedIntelliSenseRadioButton.Checked) {
+                    return AnalysisLevel.Low;
+                } else {
+                    return AnalysisLevel.None;
+                }
             }
             set {
-                _codeAnalysisLevel.SelectedIndex = (int)value;
+                switch (value) {
+                    case AnalysisLevel.High:
+                        _fullIntelliSenseRadioButton.Checked = true;
+                        break;
+                    case AnalysisLevel.Low:
+                        _limitedIntelliSenseRadioButton.Checked = true;
+                        break;
+                    case AnalysisLevel.None:
+                        _noIntelliSenseRadioButton.Checked = true;
+                        break;
+                    default:
+                        Debug.Fail("Unrecognized AnalysisLevel: " + value);
+                        break;
+                }
             }
         }
     }

@@ -312,13 +312,13 @@
     </Compile>
     <Compile Include="NpmUI\PackageCatalogEntryViewModel.cs" />
     <Compile Include="Options\AnalysisLevel.cs" />
-    <Compile Include="Options\NodejsAdvancedOptionsControl.cs">
+    <Compile Include="Options\NodejsIntellisenseOptionsControl.cs">
       <SubType>UserControl</SubType>
     </Compile>
-    <Compile Include="Options\NodejsAdvancedOptionsControl.Designer.cs">
-      <DependentUpon>NodejsAdvancedOptionsControl.cs</DependentUpon>
+    <Compile Include="Options\NodejsIntellisenseOptionsControl.Designer.cs">
+      <DependentUpon>NodejsIntellisenseOptionsControl.cs</DependentUpon>
     </Compile>
-    <Compile Include="Options\NodejsAdvancedOptionsPage.cs">
+    <Compile Include="Options\NodejsIntellisenseOptionsPage.cs">
       <SubType>Component</SubType>
     </Compile>
     <Compile Include="Project\DependencyNodeProperties.cs" />
@@ -636,8 +636,8 @@
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>
-    <EmbeddedResource Include="Options\NodejsAdvancedOptionsControl.resx">
-      <DependentUpon>NodejsAdvancedOptionsControl.cs</DependentUpon>
+    <EmbeddedResource Include="Options\NodejsIntellisenseOptionsControl.resx">
+      <DependentUpon>NodejsIntellisenseOptionsControl.cs</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="Options\NodejsFormattingBracesOptionsControl.resx">
       <DependentUpon>NodejsFormattingBracesOptionsControl.cs</DependentUpon>

@@ -17,19 +17,19 @@ using System.Runtime.InteropServices;
 
 namespace Microsoft.NodejsTools.Options {
     [ComVisible(true)]
-    public class NodejsAdvancedOptionsPage : NodejsDialogPage {
-        private NodejsAdvancedOptionsControl _window;
+    public class NodejsIntellisenseOptionsPage : NodejsDialogPage {
+        private NodejsIntellisenseOptionsControl _window;
         private AnalysisLevel _level;
 
-        public NodejsAdvancedOptionsPage()
-            : base("Advanced") {
+        public NodejsIntellisenseOptionsPage()
+            : base("IntelliSense") {
         }
 
         // replace the default UI of the dialog page w/ our own UI.
         protected override System.Windows.Forms.IWin32Window Window {
             get {
                 if (_window == null) {
-                    _window = new NodejsAdvancedOptionsControl();
+                    _window = new NodejsIntellisenseOptionsControl();
                 }
                 return _window;
             }

@@ -85,7 +85,7 @@ namespace Microsoft.NodejsTools {
     [ProvideLanguageEditorOptionPage(typeof(NodejsFormattingSpacingOptionsPage), NodejsConstants.Nodejs, "Formatting", "Spacing", "3042")]
     [ProvideLanguageEditorOptionPage(typeof(NodejsFormattingBracesOptionsPage), NodejsConstants.Nodejs, "Formatting", "Braces", "3043")]
     [ProvideLanguageEditorOptionPage(typeof(NodejsFormattingGeneralOptionsPage), NodejsConstants.Nodejs, "Formatting", "General", "3044")]
-    [ProvideLanguageEditorOptionPage(typeof(NodejsAdvancedOptionsPage), NodejsConstants.Nodejs, "Advanced", "", "3048")]
+    [ProvideLanguageEditorOptionPage(typeof(NodejsIntellisenseOptionsPage), NodejsConstants.Nodejs, "IntelliSense", "", "3048")]
     internal sealed partial class NodejsPackage : CommonPackage {
         internal const string NodeExpressionEvaluatorGuid = "{F16F2A71-1C45-4BAB-BECE-09D28CFDE3E6}";
         private IContentType _contentType;
@@ -135,9 +135,9 @@ namespace Microsoft.NodejsTools {
             }
         }
 
-        public NodejsAdvancedOptionsPage AdvancedOptionsPage {
+        public NodejsIntellisenseOptionsPage AdvancedOptionsPage {
             get {
-                return (NodejsAdvancedOptionsPage)GetDialogPage(typeof(NodejsAdvancedOptionsPage));
+                return (NodejsIntellisenseOptionsPage)GetDialogPage(typeof(NodejsIntellisenseOptionsPage));
             }
         }
 
