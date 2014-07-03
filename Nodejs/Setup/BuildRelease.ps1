@@ -31,7 +31,7 @@
 
 .Parameter release
     When specified:
-    * `outdir` will default to \\pytools\release if unspecified
+    * `outdir` will default to \\pytools\release\Nodejs\x.y if unspecified
     * A build number is generated and appended to `outdir`
      - The build number includes an index
     * Debug configurations are not built
@@ -113,6 +113,10 @@ param( [string] $outdir, [string] $vsTarget, [string] $name, [switch] $release, 
 
 # This value is used to determine the most significant digit of the build number.
 $base_year = 2012
+# This value is used to automatically generate outdir for -release and -internal builds
+$base_outdir = "\\pytools\Release\Nodejs"
+
+$signedbuild = $release -or $mockrelease
 
 $buildroot = (Split-Path -Parent $MyInvocation.MyCommand.Definition)
 while ((Test-Path $buildroot) -and -not (Test-Path "$buildroot\build.root")) {
@@ -125,9 +129,9 @@ if (-not (get-command msbuild -EA 0)) {
     Visual Studio build tools are required."
 }
 
-if (-not $outdir) {
-    if ($release -or $internal) {
-        $outdir = Get-Item \\pytools\Release\Nodejs -EA 0
+if (-not $outdir -and -not $signedbuild) {
+    if ($internal) {
+        $outdir = "$base_outdir\Internal"
     }
     if (-not $outdir) {
         Write-Error -EA:Stop "
@@ -169,11 +173,6 @@ if ($name) {
     '-name [build name]' must be specified when using '-internal'"
 }
 
-if ($internal) {
-    $outdir = "$outdir\Internal\$name"
-}
-
-$signedbuild = $release -or $mockrelease
 if ($signedbuild) {
     $signedbuildText = "true"
     $approvers = "smortaz", "dinov", "stevdo", "pminaev", "gilbertw", "huvalo", "jinglou", "sitani"
@@ -223,12 +222,12 @@ $asmverfileIsReadOnly = $asmverfile.Attributes -band [io.fileattributes]::ReadOn
 $releaseVersion = [regex]::Match((Get-Content $asmverfile), 'ReleaseVersion = "([0-9.]+)";').Groups[1].Value
 $fileVersion = [regex]::Match((Get-Content $asmverfile), 'FileVersion = "([0-9.]+)";').Groups[1].Value
 
-if ($release -and -not $outdir) {
+if ($signedbuild -and -not $outdir) {
     $outdir = "$base_outdir\$fileVersion"
 }
 
 $buildnumber = '{0}{1:MMdd}.{2:D2}' -f (((Get-Date).Year - $base_year), (Get-Date), 0)
-if ($release -or $mockrelease -or $internal) {
+if ($signedbuild -or $internal) {
     if ($internal) {
         $outdirwithname = "$outdir\$name"
     } else {
@@ -256,7 +255,7 @@ $version = "$fileVersion.$buildnumber"
 
 if ($internal) {
     $outdir = "$outdir\$name\$buildnumber"
-} elseif ($release -or $mockrelease) {
+} elseif ($signedbuild) {
     $outdir = "$outdir\$buildnumber"
 }
 
@@ -280,7 +279,7 @@ if (-not $targetVersions) {
     No supported versions of Visual Studio installed."
 }
 
-if ($skipdebug -or $release) {
+if ($skipdebug -or $signedbuild) {
     $targetConfigs = ("Release")
 } else {
     $targetConfigs = ("Debug", "Release")
@@ -291,8 +290,16 @@ if ($skipclean) {
     $target = "Build"
 }
 
-
+Write-Output ""
+Write-Output "============================================================"
+Write-Output ""
+if ($name) {
+    Write-Output "Build Name: $name"
+}
 Write-Output "Output Dir: $outdir"
+if ($mockrelease) {
+    Write-Output "Auto-generated release outdir: $base_outdir\$fileVersion\$buildnumber"
+}
 Write-Output ""
 Write-Output "Product version: $releaseversion.`$(VS version)"
 Write-Output "File version: $version"
@@ -526,7 +533,6 @@ try {
         $bindir = "$outdir\$($targetVersions[0].name)\$($targetConfigs[0])"
         Copy-Item "$bindir\*.reg" "$outdir\" -Force -EA:0
     }
-
     
     if ($scorch) {
         tfpt scorch /noprompt
