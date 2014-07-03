@@ -142,7 +142,7 @@ namespace Microsoft.NodejsTools.Analysis {
         /// that portion of the module tree need to be re-analyzed.  This
         /// analyzable will handle enqueuing those changes on the correct thread.
         /// </summary>
-        class TreeUpdateAnalysis : IAnalyzable {
+        internal class TreeUpdateAnalysis : IAnalyzable {
             private readonly ModuleTree _tree;
             public TreeUpdateAnalysis(ModuleTree tree) {
                 _tree = tree;

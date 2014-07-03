@@ -29,6 +29,7 @@ using Microsoft.NodejsTools.Parsing;
 [assembly: AnalysisSerializationSupportedType(typeof(Deque<AnalysisUnit>))]
 [assembly: AnalysisSerializationSupportedType(typeof(ProjectEntry))]
 [assembly: AnalysisSerializationSupportedType(typeof(JsAnalyzer))]
+[assembly: AnalysisSerializationSupportedType(typeof(JsAnalyzer.TreeUpdateAnalysis))]
 [assembly: AnalysisSerializationSupportedType(typeof(ModuleTable))]
 [assembly: AnalysisSerializationSupportedType(typeof(ModuleTree))]
 [assembly: AnalysisSerializationSupportedType(typeof(FunctionValue))]
