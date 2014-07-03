@@ -92,14 +92,11 @@ namespace Microsoft.NodejsTools.Debugger.DataTips {
             }
 
             // Check whether this is an expression with side effects - if it does, we don't want to show a data tip for it.
-
-            var analysis = VsProjectAnalyzer.AnalyzeExpression(snapshot, snapshot.CreateTrackingSpan(exprSpan.Value, SpanTrackingMode.EdgeExclusive), false);
-            if (analysis == ExpressionAnalysis.Empty) {
-                return null;
-            }
+            string text = exprSpan.Value.GetText();
+            var ast = new JSParser(text).Parse(new CodeSettings());
 
             var sideEffectsDetectingVisitor = new SideEffectsDetectingVisitor();
-            analysis.GetEvaluatedAst().Walk(sideEffectsDetectingVisitor);
+            ast.Walk(sideEffectsDetectingVisitor);
             if (sideEffectsDetectingVisitor.HasSideEffects) {
                 return null;
             }
