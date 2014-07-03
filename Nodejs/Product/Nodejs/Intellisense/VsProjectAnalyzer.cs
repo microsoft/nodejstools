@@ -99,7 +99,7 @@ namespace Microsoft.NodejsTools.Intellisense {
 
         private object _contentsLock = new object();
 
-        const int _curDbVersion = 2;
+        const int _curDbVersion = 3;
 #if DEBUG
         const int _dbVersion = unchecked((int)(0x80000000 | _curDbVersion));
 #else
