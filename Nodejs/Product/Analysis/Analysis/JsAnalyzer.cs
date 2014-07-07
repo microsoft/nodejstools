@@ -228,18 +228,19 @@ namespace Microsoft.NodejsTools.Analysis {
             using (new DebugTimer("SerializationVersionInitialization")) {
                 SHA256 sha = SHA256Managed.Create();
                 StringBuilder sb = new StringBuilder();
-                AnalysisSerializationSupportedTypeAttribute[] attrs = (AnalysisSerializationSupportedTypeAttribute[])typeof(AnalysisSerializationSupportedTypeAttribute).Assembly.GetCustomAttributes(typeof(AnalysisSerializationSupportedTypeAttribute), false);
+                var attrs = (AnalysisSerializationSupportedTypeAttribute[])typeof(AnalysisSerializationSupportedTypeAttribute).Assembly.GetCustomAttributes(typeof(AnalysisSerializationSupportedTypeAttribute), false);
                 // we don't want to rely upon the order of reflection here...
                 Array.Sort<AnalysisSerializationSupportedTypeAttribute>(
                     attrs,
-                    (Comparison<AnalysisSerializationSupportedTypeAttribute>)((x, y) => String.Compare(x.Type.Name, y.Type.Name))
+                    (Comparison<AnalysisSerializationSupportedTypeAttribute>)((x, y) => String.CompareOrdinal(x.Type.Name, y.Type.Name))
                 );
 
-                foreach (AnalysisSerializationSupportedTypeAttribute attr in attrs) {
+                foreach (var attr in attrs) {
                     var type = attr.Type;
                     sb.AppendLine(type.FullName);
                     foreach (FieldInfo field in FormatterServices.GetSerializableMembers(type)) {
                         sb.Append(field.FieldType.FullName);
+                        sb.Append(' ');
                         sb.Append(field.Name);
                         sb.AppendLine();
                     }

@@ -709,7 +709,7 @@ namespace Microsoft.NodejsTools.Analysis {
                 res = FormatterServices.GetSerializableMembers(type);
                 Array.Sort<MemberInfo>(
                     res,
-                    (x, y) => String.Compare(x.DeclaringType.FullName + ":" + x.Name, y.DeclaringType.FullName + ":" + y.Name)
+                    (x, y) => String.CompareOrdinal(x.DeclaringType.FullName + ":" + x.Name, y.DeclaringType.FullName + ":" + y.Name)
                 );
                 _serializationMembers[type] = res;
             }
