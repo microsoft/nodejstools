@@ -24,19 +24,20 @@ using Newtonsoft.Json;
 
 namespace Microsoft.NodejsTools.Debugger.Communication {
     sealed class DebuggerConnection : IDebuggerConnection {
-        private readonly Regex _contentLength = new Regex(@"Content-Length: (\d+)", RegexOptions.Compiled);
-        private readonly AsyncProducerConsumerCollection<string> _messages;
+        private static readonly Encoding _encoding = new UTF8Encoding(encoderShouldEmitUTF8Identifier: false, throwOnInvalidBytes: true);
+        private static readonly Regex _contentLengthFieldRegex = new Regex(@"Content-Length: (\d+)", RegexOptions.Compiled);
+        private static readonly Regex _nodeVersionFieldRegex = new Regex(@"Embedding-Host: node v([0-9.]+)", RegexOptions.Compiled);
+
+        private readonly AsyncProducerConsumerCollection<byte[]> _packetsToSend = new AsyncProducerConsumerCollection<byte[]>();
         private readonly INetworkClientFactory _networkClientFactory;
-        private readonly Regex _nodeVersion = new Regex(@"Embedding-Host: node v([0-9.]+)", RegexOptions.Compiled);
         private INetworkClient _networkClient;
         private readonly object _networkClientLock = new object();
+        private volatile Version _nodeVersion;
 
         public DebuggerConnection(INetworkClientFactory networkClientFactory) {
             Utilities.ArgumentNotNull("networkClientFactory", networkClientFactory);
 
             _networkClientFactory = networkClientFactory;
-            _messages = new AsyncProducerConsumerCollection<string>();
-            NodeVersion = new Version();
         }
 
         public void Dispose() {
@@ -66,12 +67,12 @@ namespace Microsoft.NodejsTools.Debugger.Communication {
                 return;
             }
 
-            DebugWriteLine("Request: " + message);
+            Debug.WriteLine("Request: " + message, typeof(DebuggerConnection).Name);
 
-            int byteCount = Encoding.UTF8.GetByteCount(message);
-            string request = string.Format("Content-Length: {0}{1}{1}{2}", byteCount, Environment.NewLine, message);
-
-            _messages.Add(request);
+            var messageBody = _encoding.GetBytes(message);
+            var messageHeader = _encoding.GetBytes(string.Format("Content-Length: {0}\r\n\r\n", messageBody.Length));
+            _packetsToSend.Add(messageHeader);
+            _packetsToSend.Add(messageBody);
         }
 
         /// <summary>
@@ -96,9 +97,11 @@ namespace Microsoft.NodejsTools.Debugger.Communication {
         }
 
         /// <summary>
-        /// Gets a node.js version.
+        /// Gets a node.js version, or <c>null</c> if it was not supplied by the debuggee.
         /// </summary>
-        public Version NodeVersion { get; private set; }
+        public Version NodeVersion {
+            get { return _nodeVersion;  }
+        }
 
         /// <summary>
         /// Connect to specified debugger endpoint.
@@ -111,14 +114,15 @@ namespace Microsoft.NodejsTools.Debugger.Communication {
             lock (_networkClientLock) {
                 _networkClient = _networkClientFactory.CreateNetworkClient(uri);
             }
-            Task.Factory.StartNew(ReadStreamAsync);
-            Task.Factory.StartNew(WriteStreamAsync);
+
+            Task.Factory.StartNew(ReceiveAndDispatchMessagesWorker);
+            Task.Factory.StartNew(SendPacketsWorker);
         }
 
         /// <summary>
-        /// Writes messages to debugger input stream.
+        /// Sends packets queued by <see cref="SendMessage"/>.
         /// </summary>
-        private async void WriteStreamAsync() {
+        private async void SendPacketsWorker() {
             INetworkClient networkClient;
             lock (_networkClientLock) {
                 networkClient = _networkClient;
@@ -128,27 +132,26 @@ namespace Microsoft.NodejsTools.Debugger.Communication {
             }
 
             try {
-                using (var streamWriter = new StreamWriter(networkClient.GetStream())) {
-                    while (Connected) {
-                        string message = await _messages.TakeAsync().ConfigureAwait(false);
-                        await streamWriter.WriteAsync(message).ConfigureAwait(false);
-                        await streamWriter.FlushAsync().ConfigureAwait(false);
-                    }
+                var stream = networkClient.GetStream();
+                while (Connected) {
+                    byte[] packet = await _packetsToSend.TakeAsync().ConfigureAwait(false);
+                    await stream.WriteAsync(packet, 0, packet.Length).ConfigureAwait(false);
+                    await stream.FlushAsync().ConfigureAwait(false);
                 }
             } catch (SocketException) {
             } catch (ObjectDisposedException) {
             } catch (IOException) {
             } catch (Exception e) {
-                DebugWriteLine(string.Format("DebuggerConnection: failed to write message {0}.", e));
+                Debug.WriteLine(string.Format("Failed to write message {0}.", e), typeof(DebuggerConnection).Name);
                 throw;
             }
         }
 
         /// <summary>
-        /// Reads data from debugger output stream.
+        /// Receives messages from debugger, parses them to extract the body, and dispatches them to <see cref="OutputMessage"/> listeners.
         /// </summary>
-        private async void ReadStreamAsync() {
-            DebugWriteLine("DebuggerConnection: established connection.");
+        private async void ReceiveAndDispatchMessagesWorker() {
+            Debug.WriteLine("Established connection.", typeof(DebuggerConnection).Name);
 
             INetworkClient networkClient;
             lock (_networkClientLock) {
@@ -159,69 +162,108 @@ namespace Microsoft.NodejsTools.Debugger.Communication {
             }
 
             try {
-                using (var streamReader = new StreamReader(networkClient.GetStream(), Encoding.Default)) {
-                    while (Connected) {
-                        // Read message header
-                        string result = await streamReader.ReadLineAsync().ConfigureAwait(false);
-                        if (result == null) {
-                            continue;
-                        }
+                var stream = networkClient.GetStream();
 
-                        // Check whether result is content length header
-                        Match match = _contentLength.Match(result);
-                        if (!match.Success) {
-                            // Check whether result is node.js version string
-                            match = _nodeVersion.Match(result);
-                            if (match.Success) {
-                                NodeVersion = new Version(match.Groups[1].Value);
-                            } else {
-                                DebugWriteLine(string.Format("Debugger info: {0}", result));
+                // Use a single read buffer and a single StringBuilder (periodically cleared) across loop iterations,
+                // to avoid costly repeated allocations.
+                var buffer = new byte[0x1000];
+                var sb = new StringBuilder();
+
+                // Read and process incoming messages until disconnected.
+                while (true) {
+                    // Read the header of this message.
+                    int contentLength = 0;
+                    while (true) {
+                        // Read a single header field.
+                        string field;
+                        sb.Clear();
+                        while (true) {
+                            int bytesRead = await stream.ReadAsync(buffer, 0, 1).ConfigureAwait(false);
+                            if (bytesRead < 1) {
+                                // End of stream - we are disconnected from debuggee.
+                                throw new EndOfStreamException();
                             }
 
+                            // All fields that we care about are ASCII, and for all the other fields we only need to recognize
+                            // the trailing \r\n, so there's no need to do proper decoding here.
+                            sb.Append((char)buffer[0]);
+
+                            // "\r\n" terminates the field.
+                            if (sb.Length >= 2 && sb[sb.Length - 2] == '\r' && sb[sb.Length - 1] == '\n') {
+                                field = sb.ToString(0, sb.Length - 2);
+                                break;
+                            }
+                        }
+
+                        // Blank line terminates the header.
+                        if (string.IsNullOrEmpty(field)) {
+                            break;
+                        }
+
+                        // Otherwise, it's an actual field. Parse it if it's something we care about.
+
+                        // Content-Length
+                        var match = _contentLengthFieldRegex.Match(field);
+                        if (match.Success) {
+                            int.TryParse(match.Groups[1].Value, out contentLength);
                             continue;
+                        } 
+
+                        // Embedding-Host, which contains the node.js version number. Only try parsing that if we don't know the version yet -
+                        // it normally comes in the very first packet, so this saves time trying to parse all the consequent ones.
+                        if (NodeVersion == null) {
+                            match = _nodeVersionFieldRegex.Match(field);
+                            if (match.Success) {
+                                Version nodeVersion;
+                                Version.TryParse(match.Groups[1].Value, out nodeVersion);
+                                _nodeVersion = nodeVersion;
+                            }
                         }
+                    }
 
-                        await streamReader.ReadLineAsync().ConfigureAwait(false);
+                    if (contentLength == 0) {
+                        continue;
+                    }
 
-                        // Retrieve content length
-                        int length = int.Parse(match.Groups[1].Value);
-                        if (length == 0) {
-                            continue;
-                        }
+                    // Read the body of this message.
 
-                        // Read content
-                        string message = await streamReader.ReadLineBlockAsync(length).ConfigureAwait(false);
+                    // If our preallocated buffer is large enough, use it - this should be true for vast majority of messages.
+                    // If not, allocate a buffer that is large enough and use that, then throw it away - don't replace the original
+                    // buffer with it, so that we don't hold onto a huge chunk of memory for the rest of the debugging session just
+                    // because of a single long message.
+                    var bodyBuffer = buffer.Length >= contentLength ? buffer : new byte[contentLength];
 
-                        DebugWriteLine("Response: " + message);
+                    for (int i = 0; i < contentLength; ) {
+                        i += await stream.ReadAsync(bodyBuffer, i, contentLength - i).ConfigureAwait(false);
+                    }
 
-                        // Notify subscribers
-                        EventHandler<MessageEventArgs> outputMessage = OutputMessage;
-                        if (outputMessage != null) {
-                            outputMessage(this, new MessageEventArgs(message));
-                        }
+                    string message = _encoding.GetString(bodyBuffer, 0, contentLength);
+                    Debug.WriteLine("Response: " + message, typeof(DebuggerConnection).Name);
+
+                    // Notify subscribers.
+                    var outputMessage = OutputMessage;
+                    if (outputMessage != null) {
+                        outputMessage(this, new MessageEventArgs(message));
                     }
                 }
             } catch (SocketException) {
-            } catch (ObjectDisposedException) {
             } catch (IOException) {
+            } catch (ObjectDisposedException) {
+            } catch (DecoderFallbackException ex) {
+                Debug.WriteLine(string.Format("Error decoding response body: {0}", ex), typeof(DebuggerConnection).Name);
             } catch (JsonReaderException ex) {
-                DebugWriteLine(string.Format("DebuggerConnection: error parsing JSON response: {0}", ex));
+                Debug.WriteLine(string.Format("Error parsing JSON response: {0}", ex), typeof(DebuggerConnection).Name);
             } catch (Exception ex) {
-                DebugWriteLine(string.Format("DebuggerConnection: message processing failed: {0}", ex));
+                Debug.WriteLine(string.Format("Message processing failed: {0}", ex), typeof(DebuggerConnection).Name);
                 throw;
             } finally {
-                DebugWriteLine("DebuggerConnection: connection was closed.");
+                Debug.WriteLine("Connection was closed.", typeof(DebuggerConnection).Name);
 
-                EventHandler<EventArgs> connectionClosed = ConnectionClosed;
+                var connectionClosed = ConnectionClosed;
                 if (connectionClosed != null) {
                     connectionClosed(this, EventArgs.Empty);
                 }
             }
-        }
-
-        [Conditional("DEBUG")]
-        private void DebugWriteLine(string message) {
-            Debug.WriteLine("[{0}] {1}", DateTime.UtcNow.TimeOfDay, message);
         }
     }
 }

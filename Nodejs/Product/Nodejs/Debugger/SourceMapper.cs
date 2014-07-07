@@ -36,24 +36,25 @@ namespace Microsoft.NodejsTools.Debugger {
                     string markerLine = contents.Reverse().FirstOrDefault(x => x.IndexOf(marker, StringComparison.Ordinal) != -1);
                     if (markerLine != null && (markerStart = markerLine.IndexOf(marker, StringComparison.Ordinal)) != -1) {
                         string sourceMapFilename = markerLine.Substring(markerStart + marker.Length).Trim();
-                        if (!File.Exists(sourceMapFilename)) {
-                            try {
+
+                        try {
+                            if (!File.Exists(sourceMapFilename)) {
                                 sourceMapFilename = Path.Combine(Path.GetDirectoryName(filename) ?? string.Empty, Path.GetFileName(sourceMapFilename));
-                            } catch (ArgumentException) {
-                            } catch (PathTooLongException) {
                             }
+                        } catch (ArgumentException) {
+                        } catch (PathTooLongException) {
                         }
 
-                        if (File.Exists(sourceMapFilename)) {
-                            try {
+                        try {
+                            if (File.Exists(sourceMapFilename)) {
                                 var sourceMap = new SourceMap(new StreamReader(sourceMapFilename));
                                 _originalFileToSourceMap[filename] = mapInfo = new JavaScriptSourceMapInfo(sourceMap, contents);
-                            } catch (InvalidOperationException) {
-                                _originalFileToSourceMap[filename] = null;
-                            } catch (NotSupportedException) {
-                                _originalFileToSourceMap[filename] = null;
                             }
-                        }
+                        } catch (ArgumentException) {
+                        } catch (PathTooLongException) {
+                        } catch (NotSupportedException) {
+                        } catch (InvalidOperationException) {
+                        } 
                     }
                 }
             }

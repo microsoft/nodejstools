@@ -156,7 +156,7 @@ namespace NodejsTests.Debugger.Communication {
         public async Task RetrieveNodeVersion() {
             // Arrange
             const string version = "0.10.25";
-            const string message = "Embedding-Host: node v" + version;
+            string message = string.Format("Embedding-Host: node v{0}\r\n\r\n", version);
             byte[] rawMessage = Encoding.UTF8.GetBytes(message);
 
             var memoryStream = new MemoryStream();
@@ -175,13 +175,14 @@ namespace NodejsTests.Debugger.Communication {
 
             // Act
             debuggerConnection.Connect(new Uri("tcp://localhost:5858"));
-
-            await Task.Delay(TimeSpan.FromMilliseconds(100));
+            for (int i = 0; i < 10 && debuggerConnection.NodeVersion == null; ++i) {
+                await Task.Delay(TimeSpan.FromMilliseconds(100));
+            }
             memoryStream.Close();
 
             // Assert
             Assert.IsNotNull(debuggerConnection.NodeVersion);
             Assert.AreEqual(version, debuggerConnection.NodeVersion.ToString());
-        }
+       }
     }
 }

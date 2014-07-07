@@ -17,6 +17,7 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
 using System.Runtime.InteropServices;
+using System.Threading;
 using System.Web;
 using EnvDTE;
 using Microsoft.NodejsTools.Debugger.Communication;
@@ -60,7 +61,8 @@ namespace Microsoft.NodejsTools.Debugger.DebugEngine {
         private bool _processLoadedRunning;
         private bool _loadComplete;
         private readonly object _syncLock = new object();
-        private bool _attached/*, _pseudoAttach*/;
+        private bool _attached;
+        private readonly AutoResetEvent _threadExitedEvent = new AutoResetEvent(false), _processExitedEvent = new AutoResetEvent(false);
         private readonly BreakpointManager _breakpointManager;
         private Guid _ad7ProgramId;             // A unique identifier for the program being debugged.
         private static readonly HashSet<WeakReference> Engines = new HashSet<WeakReference>();
@@ -697,6 +699,12 @@ namespace Microsoft.NodejsTools.Debugger.DebugEngine {
             _breakpointManager.ClearBreakpointBindingResults();
 
             _process.Detach();
+
+            // Before unregistering event handlers, make sure that we have received thread exit and process exit events,
+            // since we need to report these as AD7 events to VS to gracefully terminate the debugging session.
+            _threadExitedEvent.WaitOne(3000);
+            _processExitedEvent.WaitOne(3000);
+
             DetachEvents(_process);
             _ad7ProgramId = Guid.Empty;
 
@@ -1025,6 +1033,8 @@ namespace Microsoft.NodejsTools.Debugger.DebugEngine {
             _threads.TryGetValue(e.Thread, out oldThread);
             _threads.Remove(e.Thread);
 
+            _threadExitedEvent.Set();
+
             if (oldThread != null) {
                 Send(new AD7ThreadDestroyEvent(0), AD7ThreadDestroyEvent.IID, oldThread);
             }
@@ -1118,6 +1128,7 @@ namespace Microsoft.NodejsTools.Debugger.DebugEngine {
 
         private void OnProcessExited(object sender, ProcessExitedEventArgs e) {
             try {
+                _processExitedEvent.Set();
                 _processLoaded = false;
                 _processLoadedRunning = false;
                 Send(new AD7ProgramDestroyEvent((uint)e.ExitCode), AD7ProgramDestroyEvent.IID, null);
