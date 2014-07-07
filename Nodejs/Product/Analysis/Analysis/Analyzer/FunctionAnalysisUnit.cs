@@ -46,8 +46,6 @@ namespace Microsoft.NodejsTools.Analysis.Analyzer {
             var scope = new FunctionEnvironmentRecord(Function, this, Function.FunctionObject, declScope, declEntry);
             scope.EnsureParameters(this);
             _env = scope;
-
-            AnalysisLog.NewUnit(this);
         }
 
         internal FunctionAnalysisUnit(
@@ -62,8 +60,6 @@ namespace Microsoft.NodejsTools.Analysis.Analyzer {
             Function = function;
 
             _env = scope;
-
-            AnalysisLog.NewUnit(this);
         }
 
         internal void AddNamedParameterReferences(AnalysisUnit caller, Lookup[] names) {

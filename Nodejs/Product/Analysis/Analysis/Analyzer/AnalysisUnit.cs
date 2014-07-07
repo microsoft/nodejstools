@@ -44,6 +44,8 @@ namespace Microsoft.NodejsTools.Analysis {
         /// True if this analysis unit is currently in the queue.
         /// </summary>
         public bool IsInQueue;
+        private int _id;
+        private static int _idCount;
 #if DEBUG
         private long _analysisTime;
         private long _analysisCount;
@@ -62,6 +64,15 @@ namespace Microsoft.NodejsTools.Analysis {
             Ast = ast;
             Tree = tree;
             _env = environment;
+            _id = Interlocked.Increment(ref _idCount);
+
+            AnalysisLog.NewUnit(this);
+        }
+
+        internal int Id {
+            get {
+                return _id;
+            }
         }
 
         /// <summary>

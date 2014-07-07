@@ -31,41 +31,37 @@ namespace Microsoft.NodejsTools.Analysis.Analyzer {
             if (cancel.IsCancellationRequested) {
                 return;
             }
-            try {
-                // Including a marker at the end of the queue allows us to see in
-                // the log how frequently the queue empties.
-                var endOfQueueMarker = new AnalysisUnit(null, null);
-                int queueCountAtStart = queue.Count;
+            // Including a marker at the end of the queue allows us to see in
+            // the log how frequently the queue empties.
+            var endOfQueueMarker = new AnalysisUnit(null, null);
+            int queueCountAtStart = queue.Count;
 
-                if (queueCountAtStart > 0 && queue[queue.Count - 1].Environment != null) {
-                    queue.Append(endOfQueueMarker);
-                }
+            if (queueCountAtStart > 0 && queue[queue.Count - 1].Environment != null) {
+                queue.Append(endOfQueueMarker);
+            }
 
-                while (queue.Count > 0 && !cancel.IsCancellationRequested) {
-                    _unit = queue.PopLeft();
+            while (queue.Count > 0 && !cancel.IsCancellationRequested) {
+                _unit = queue.PopLeft();
 
-                    if (_unit.Environment == null) {    // endOfQueueMarker
-                        AnalysisLog.EndOfQueue(queueCountAtStart, queue.Count);
+                if (_unit.Environment == null) {    // endOfQueueMarker
+                    AnalysisLog.EndOfQueue(queueCountAtStart, queue.Count);
 
-                        queueCountAtStart = queue.Count;
-                        if (queueCountAtStart > 0) {
-                            queue.Append(endOfQueueMarker);
-                        }
-                        continue;
+                    queueCountAtStart = queue.Count;
+                    if (queueCountAtStart > 0) {
+                        queue.Append(endOfQueueMarker);
                     }
-
-                    AnalysisLog.Dequeue(queue, _unit);
-
-                    _unit.IsInQueue = false;
-                    SetCurrentUnit(_unit);
-                    _unit.Analyze(this, cancel);
+                    continue;
                 }
 
-                if (cancel.IsCancellationRequested) {
-                    AnalysisLog.Cancelled(queue);
-                }
-            } finally {
-                AnalysisLog.Flush();
+                AnalysisLog.Dequeue(queue, _unit);
+
+                _unit.IsInQueue = false;
+                SetCurrentUnit(_unit);
+                _unit.Analyze(this, cancel);
+            }
+
+            if (cancel.IsCancellationRequested) {
+                AnalysisLog.Cancelled(queue);
             }
         }
 

@@ -235,6 +235,16 @@
           <CommandName>Attach node.js Debugger</CommandName>
         </Strings>
       </Button>
+
+      <Button guid="guidNodeToolsCmdSet" id="cmdidDiagnostics" priority="0x001" type="Button">
+        <Parent guid="guidNodeToolsCmdSet" id="ToolsMenuItemsGroup"/>
+        <Strings>
+          <ButtonText>&amp;Diagnostic Info...</ButtonText>
+          <MenuText>&amp;Diagnostic Info...</MenuText>
+          <ToolTipText>Diagnostic Info...</ToolTipText>
+          <CommandName>Diagnostic Info...</CommandName>
+        </Strings>
+      </Button>
     </Buttons>
 
 
@@ -300,6 +310,7 @@
       <IDSymbol name="cmdidNpmInstallSingleMissingModule" value="0x020B" />
       <IDSymbol name="cmdidNpmUpdateSingleModule" value="0x020C" />
       <IDSymbol name="cmdidAzureExplorerAttachNodejsDebugger" value="0x020D" />
+      <IDSymbol name="cmdidDiagnostics" value="0x020E" />
 
       <!-- Shared commands, defined in CommonConstants.cs -->
       <IDSymbol name="cmdidAddExistingFolder" value="0x10001" />

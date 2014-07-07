@@ -54,7 +54,6 @@ namespace Microsoft.NodejsTools.Analysis {
             _module = new ModuleValue(filePath, this);
             
             _unit = new AnalysisUnit(_tree, _module.EnvironmentRecord);
-            AnalysisLog.NewUnit(_unit);
         }
 
         public event EventHandler<EventArgs> OnNewParseTree;
@@ -181,7 +180,6 @@ namespace Microsoft.NodejsTools.Analysis {
             }
 
             _unit = new AnalysisUnit(tree, _module.EnvironmentRecord);
-            AnalysisLog.NewUnit(_unit);
 
             if (ModuleValue.EnvironmentRecord.HasChildren) {
                 ModuleValue.EnvironmentRecord.Children.Clear();

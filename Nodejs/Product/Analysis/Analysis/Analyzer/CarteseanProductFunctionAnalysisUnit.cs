@@ -171,9 +171,11 @@ namespace Microsoft.NodejsTools.Analysis.Analyzer {
         }
 
         public override string ToString() {
-            StringBuilder res = new StringBuilder(base.ToString());
-            res.AppendLine();
-            res.Append(_callArgs.ToString());
+            StringBuilder res = new StringBuilder(base.ToString());            
+            if (_callArgs != null) {
+                res.AppendLine();
+                res.Append(_callArgs.ToString());
+            }
             return res.ToString();
         }
 

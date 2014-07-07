@@ -19,15 +19,15 @@ using System.Linq;
 using Microsoft.NodejsTools.Analysis.Values;
 
 namespace Microsoft.NodejsTools.Analysis {
-    internal static class AnalysisLog {
+    public static class AnalysisLog {
         static DateTime StartTime = DateTime.UtcNow;
-        static TimeSpan? LastDisplayedTime = null;
-        static List<List<LogItem>> LogItems;
+        static TimeSpan? LastDisplayedTime;
+        static Deque<LogItem> LogItems = new Deque<LogItem>();
+        static int LogIndex;
 
-        public static bool AsCSV { get; set; }
-        public static TextWriter Output { get; set; }
+        public static int MaxItems { get; set; }
 
-        public struct LogItem {
+        struct LogItem {
             public TimeSpan Time;
             public string Event;
             public object[] Args;
@@ -37,30 +37,32 @@ namespace Microsoft.NodejsTools.Analysis {
             }
         }
 
-        public static void Flush() {
-            Dump();
-        }
-
-        private static void Dump() {
-            var items = LogItems;
-            LogItems = null;
-            if (Output != null && items != null) {
-                foreach (var item in items.SelectMany()) {
-                    if (!LastDisplayedTime.HasValue || item.Time.Subtract(LastDisplayedTime.GetValueOrDefault()) > TimeSpan.FromMilliseconds(100)) {
-                        LastDisplayedTime = item.Time;
-                        Output.WriteLine(AsCSV ? "TS, {0}, {1}" : "[TS] {0}, {1}", item.Time.TotalMilliseconds, item.Time);
-                    }
-
-                    try {
-                        if (AsCSV) {
-                            Output.WriteLine("{0}, {1}", item.Event, string.Join(", ", AsCsvStrings(item.Args)));
-                        } else {
-                            Output.WriteLine("[{0}] {1}", item.Event, string.Join(", ", item.Args));
-                        }
-                    } catch { }
+        public static void Dump(TextWriter output, bool asCsv = false) {
+            // we don't enumerate here because that can throw if the log is being updated
+            // by another thread in the background.  We should either catch the new events
+            // being appended at the end, or hopefully we stay in front of the updates
+            // which are coming at the beginning.  
+            for (int i = 0; i < LogItems.Count; i++) {
+                var item = LogItems[i];
+                if (!LastDisplayedTime.HasValue || item.Time.Subtract(LastDisplayedTime.GetValueOrDefault()) > TimeSpan.FromMilliseconds(100)) {
+                    LastDisplayedTime = item.Time;
+                    output.WriteLine(asCsv ? "TS, {0}, {1}" : "[TS] {0}, {1}", item.Time.TotalMilliseconds, item.Time);
+                } else if (item.Time.Subtract(LastDisplayedTime.GetValueOrDefault()) < TimeSpan.Zero) {
+                    LastDisplayedTime = item.Time;
+                    // racing with the analysis...
+                    output.WriteLine(asCsv ? "TSW" : "[TSW]");
                 }
-                Output.Flush();
+
+
+                try {
+                    if (asCsv) {
+                        output.WriteLine("{0}, {1}", item.Event, string.Join(", ", AsCsvStrings(item.Args)));
+                    } else {
+                        output.WriteLine("[{0}] {1}", item.Event, string.Join(", ", item.Args));
+                    }
+                } catch { }
             }
+            output.Flush();
         }
 
         static IEnumerable<string> AsCsvStrings(IEnumerable<object> items) {
@@ -73,40 +75,23 @@ namespace Microsoft.NodejsTools.Analysis {
             }
         }
 
-        public static void Add(string Event, params object[] Args) {
-            if (Output == null) {
-                return;
-            }
+        private static void Add(string Event, params object[] Args) {
+            int max = MaxItems;
 
-            if (LogItems == null) {
-                LogItems = new List<List<LogItem>>();
-            }
-            if (LogItems.Count >= 100) {
-                Dump();
-                if (LogItems == null) {
-                    LogItems = new List<List<LogItem>>();
+            if (max != 0) {
+                if (LogItems.Count >= max) {
+                    while (LogItems.Count > max) {
+                        // if the queue was set to shrink remove any old items.
+                        LogItems.PopLeft();
+                    }
+                    if (LogIndex >= max) {
+                        LogIndex = 0;
+                    }
+                    LogItems[LogIndex++] = new LogItem { Time = Time, Event = Event, Args = Args };
+                } else {
+                    LogItems.Append(new LogItem { Time = Time, Event = Event, Args = Args });
                 }
             }
-            if (LogItems.Count == 0) {
-                LogItems.Add(new List<LogItem>(100));
-            }
-            var dest = LogItems[LogItems.Count - 1];
-            if (dest.Count >= 100) {
-                dest = new List<LogItem>();
-                LogItems.Add(dest);
-            }
-
-            dest.Add(new LogItem { Time = Time, Event = Event, Args = Args });
-        }
-
-        public static void Reset() {
-            LogItems = new List<List<LogItem>>();
-            LogItems.Add(new List<LogItem>());
-        }
-
-        public static void ResetTime() {
-            StartTime = DateTime.UtcNow;
-            LastDisplayedTime = null;
         }
 
         static TimeSpan Time {
@@ -115,55 +100,59 @@ namespace Microsoft.NodejsTools.Analysis {
             }
         }
 
-        public static void Enqueue(Deque<AnalysisUnit> deque, AnalysisUnit unit) {
-            if (Output != null) {
-                Add("E", IdDispenser.GetId(unit), deque.Count);
+        internal static void Enqueue(Deque<AnalysisUnit> deque, AnalysisUnit unit) {
+            if (MaxItems != 0) {
+                Add("E", unit.Id, deque.Count);
             }
         }
 
-        public static void Dequeue(Deque<AnalysisUnit> deque, AnalysisUnit unit) {
-            if (Output != null) {
-                Add("D", IdDispenser.GetId(unit), deque.Count);
+        internal static void Dequeue(Deque<AnalysisUnit> deque, AnalysisUnit unit) {
+            if (MaxItems != 0) {
+                Add("D", unit.Id, deque.Count);
             }
         }
 
-        public static void NewUnit(AnalysisUnit unit) {
-            if (Output != null) {
-                Add("N", IdDispenser.GetId(unit), unit.FullName, unit.ToString());
+        class AnalysisUnitWrapper {
+            private readonly WeakReference _unit;
+
+            public AnalysisUnitWrapper(AnalysisUnit unit) {
+                _unit = new WeakReference(unit);
+            }
+
+            public override string ToString() {
+                var value = _unit.Target as AnalysisUnit;
+                if(value != null) {
+                    return String.Format("{0} {1}", value.FullName, value.ToString());
+                }
+                return "<collected unit>";
             }
         }
 
-        public static void UpdateUnit(AnalysisUnit unit) {
-            if (Output != null) {
-                Add("U", IdDispenser.GetId(unit), unit.FullName, unit.ToString());
+        internal static void NewUnit(AnalysisUnit unit) {
+            if (MaxItems != 0) {
+                Add("N", unit.Id, new AnalysisUnitWrapper(unit));
             }
         }
 
-        public static void EndOfQueue(int beforeLength, int afterLength) {
-            Add("Q", beforeLength, afterLength, afterLength - beforeLength);
+        internal static void EndOfQueue(int beforeLength, int afterLength) {
+            if (MaxItems != 0) {
+                Add("Q", beforeLength, afterLength, afterLength - beforeLength);
+            }
         }
 
-        public static void ExceedsTypeLimit(string variableDefType, int total, string contents) {
-            Add("X", variableDefType, total, contents);
+        internal static void ExceedsTypeLimit(string variableDefType, int total, string contents) {
+            if (MaxItems != 0) {
+                Add("X", variableDefType, total, contents);
+            }
         }
 
-        public static void Cancelled(Deque<AnalysisUnit> queue) {
-            Add("Cancel", queue.Count);
+        internal static void Cancelled(Deque<AnalysisUnit> queue) {
+            if (MaxItems != 0) {
+                Add("Cancel", queue.Count);
+            }
         }
 
-        public static void ReduceCallDepth(FunctionValue functionInfo, int callCount, int newLimit) {
-            Add("R", functionInfo, callCount, newLimit);
-        }
-
-        public static void StartFileGroup(string library, int fileCount) {
-            Add("FG", library, fileCount);
-        }
-
-        public static void EndFileGroup() {
-            Add("EFG");
-        }
-
-        public static void Assert(bool condition, string message = null) {
+        internal static void Assert(bool condition, string message = null) {
             if (!condition) {
                 try {
                     throw new InvalidOperationException(message);

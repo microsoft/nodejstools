@@ -174,7 +174,6 @@ namespace Microsoft.NodejsTools.Analysis {
                 MakeUnion(uc.Strength + 1);
             } else if (!LockedVariableDefs.TryGetValue(this, out dummy)) {
                 LockedVariableDefs.Add(this, LockedVariableDefsValue);
-#if FALSE
                 // The remainder of this block logs diagnostic information to
                 // allow the VariableDef to be identified.
                 int total = 0;
@@ -195,7 +194,6 @@ namespace Microsoft.NodejsTools.Analysis {
                     total,
                     string.Join("\n    ", typeCountList)));
                 AnalysisLog.ExceedsTypeLimit(GetType().Name, total, string.Join(", ", typeCountList));
-#endif
             }
         }
 

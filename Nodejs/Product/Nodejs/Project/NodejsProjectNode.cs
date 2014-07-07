@@ -283,7 +283,7 @@ namespace Microsoft.NodejsTools.Project {
         }
 
         public override int InitializeForOuter(string filename, string location, string name, uint flags, ref Guid iid, out IntPtr projectPointer, out int canceled) {
-            NodejsPackage.Instance.AdvancedOptionsPage.AnalysisLevelChanged += AdvancedOptionsPageAnalysisLevelChanged;
+            NodejsPackage.Instance.IntellisenseOptionsPage.AnalysisLevelChanged += AdvancedOptionsPageAnalysisLevelChanged;
 
             return base.InitializeForOuter(filename, location, name, flags, ref iid, out projectPointer, out canceled);
         }
@@ -607,7 +607,7 @@ namespace Microsoft.NodejsTools.Project {
                     _analyzer = null;
                 }
 
-                NodejsPackage.Instance.AdvancedOptionsPage.AnalysisLevelChanged -= AdvancedOptionsPageAnalysisLevelChanged;
+                NodejsPackage.Instance.IntellisenseOptionsPage.AnalysisLevelChanged -= AdvancedOptionsPageAnalysisLevelChanged;
             }
             base.Dispose(disposing);
         }

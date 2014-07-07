@@ -30,6 +30,8 @@
             this._noIntelliSenseRadioButton = new System.Windows.Forms.RadioButton();
             this._limitedIntelliSenseRadioButton = new System.Windows.Forms.RadioButton();
             this._fullIntelliSenseRadioButton = new System.Windows.Forms.RadioButton();
+            this._analysisLogMaxLabel = new System.Windows.Forms.Label();
+            this._analysisLogMax = new System.Windows.Forms.ComboBox();
             intellisenseLevelGroupBox = new System.Windows.Forms.GroupBox();
             toolTip = new System.Windows.Forms.ToolTip(this.components);
             intellisenseLevelGroupBox.SuspendLayout();
@@ -68,10 +70,29 @@
             toolTip.SetToolTip(this._fullIntelliSenseRadioButton, resources.GetString("_fullIntelliSenseRadioButton.ToolTip"));
             this._fullIntelliSenseRadioButton.UseVisualStyleBackColor = true;
             // 
+            // _analysisLogMaxLabel
+            // 
+            resources.ApplyResources(this._analysisLogMaxLabel, "_analysisLogMaxLabel");
+            this._analysisLogMaxLabel.Name = "_analysisLogMaxLabel";
+            // 
+            // _analysisLogMax
+            // 
+            this._analysisLogMax.FormattingEnabled = true;
+            this._analysisLogMax.Items.AddRange(new object[] {
+            resources.GetString("_analysisLogMax.Items"),
+            resources.GetString("_analysisLogMax.Items1"),
+            resources.GetString("_analysisLogMax.Items2"),
+            resources.GetString("_analysisLogMax.Items3"),
+            resources.GetString("_analysisLogMax.Items4")});
+            resources.ApplyResources(this._analysisLogMax, "_analysisLogMax");
+            this._analysisLogMax.Name = "_analysisLogMax";
+            // 
             // NodejsIntellisenseOptionsControl
             // 
             resources.ApplyResources(this, "$this");
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
+            this.Controls.Add(this._analysisLogMax);
+            this.Controls.Add(this._analysisLogMaxLabel);
             this.Controls.Add(intellisenseLevelGroupBox);
             this.Name = "NodejsIntellisenseOptionsControl";
             intellisenseLevelGroupBox.ResumeLayout(false);
@@ -86,6 +107,8 @@
         private System.Windows.Forms.RadioButton _fullIntelliSenseRadioButton;
         private System.Windows.Forms.RadioButton _noIntelliSenseRadioButton;
         private System.Windows.Forms.RadioButton _limitedIntelliSenseRadioButton;
+        private System.Windows.Forms.Label _analysisLogMaxLabel;
+        private System.Windows.Forms.ComboBox _analysisLogMax;
 
     }
 }

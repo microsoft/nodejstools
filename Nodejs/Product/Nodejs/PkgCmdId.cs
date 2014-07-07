@@ -33,6 +33,7 @@ namespace Microsoft.NodejsTools {
         public const int cmdidNpmUninstallModule            = 0x20A;
         public const int cmdidNpmInstallSingleMissingModule = 0x20B;
         public const int cmdidNpmUpdateSingleModule         = 0x20C;
+        public const int cmdidDiagnostics                   = 0x20E;
 
         public const uint cmdidAzureExplorerAttachNodejsDebugger = 0x20D;
 

@@ -251,6 +251,13 @@
     <Compile Include="Classifier\TokenInfo.cs" />
     <Compile Include="CodeWindowManager.cs" />
     <Compile Include="Commands\AzureExplorerAttachDebuggerCommand.cs" />
+    <Compile Include="Commands\DiagnosticsCommand.cs" />
+    <Compile Include="Commands\DiagnosticsForm.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="Commands\DiagnosticsForm.Designer.cs">
+      <DependentUpon>DiagnosticsForm.cs</DependentUpon>
+    </Compile>
     <Compile Include="Commands\ImportWizardCommand.cs" />
     <Compile Include="Commands\OpenReplWindowCommand.cs" />
     <Compile Include="Commands\OpenRemoteDebugDocumentationCommand.cs" />
@@ -637,6 +644,9 @@
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>
+    <EmbeddedResource Include="Commands\DiagnosticsForm.resx">
+      <DependentUpon>DiagnosticsForm.cs</DependentUpon>
+    </EmbeddedResource>
     <EmbeddedResource Include="Options\NodejsIntellisenseOptionsControl.resx">
       <DependentUpon>NodejsIntellisenseOptionsControl.cs</DependentUpon>
     </EmbeddedResource>

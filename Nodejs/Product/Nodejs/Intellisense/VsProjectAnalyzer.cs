@@ -114,7 +114,7 @@ namespace Microsoft.NodejsTools.Intellisense {
             _queue = new ParseQueue(this);
             _projectFiles = new ConcurrentDictionary<string, IProjectEntry>(StringComparer.OrdinalIgnoreCase);
             if (NodejsPackage.Instance != null) {
-                _analysisLevel = NodejsPackage.Instance.AdvancedOptionsPage.AnalysisLevel;
+                _analysisLevel = NodejsPackage.Instance.IntellisenseOptionsPage.AnalysisLevel;
             } else {
                 _analysisLevel = AnalysisLevel.High;
             }

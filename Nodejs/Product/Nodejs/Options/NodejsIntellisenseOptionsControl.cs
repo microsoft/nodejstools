@@ -21,7 +21,6 @@ namespace Microsoft.NodejsTools.Options {
     public partial class NodejsIntellisenseOptionsControl : UserControl {
         public NodejsIntellisenseOptionsControl() {
             InitializeComponent();
-            AnalysisLevel = NodejsPackage.Instance.AdvancedOptionsPage.AnalysisLevel;
         }
 
         internal AnalysisLevel AnalysisLevel {
@@ -49,6 +48,31 @@ namespace Microsoft.NodejsTools.Options {
                         Debug.Fail("Unrecognized AnalysisLevel: " + value);
                         break;
                 }
+            }
+        }
+
+        internal int AnalysisLogMaximum {
+            get {
+                int max;
+                if (Int32.TryParse(_analysisLogMax.Text, out max)) {
+                    return max;
+                }
+                return 100;
+            }
+            set {
+                if (value == 0) {
+                    _analysisLogMax.SelectedIndex = 0;
+                    return;
+                }
+                string index = value.ToString();
+                for (int i = 0; i < _analysisLogMax.Items.Count; i++) {
+                    if (_analysisLogMax.Items[i].ToString() == index) {
+                        _analysisLogMax.SelectedIndex = i;
+                        return;
+                    }
+                }
+
+                _analysisLogMax.Text = index;
             }
         }
     }

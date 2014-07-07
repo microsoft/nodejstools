@@ -24,6 +24,7 @@ using System.Runtime.InteropServices;
 using System.Threading;
 using System.Web.Script.Serialization;
 using System.Windows.Forms;
+using Microsoft.NodejsTools.Analysis;
 using Microsoft.NodejsTools.Commands;
 using Microsoft.NodejsTools.Debugger.DataTips;
 using Microsoft.NodejsTools.Debugger.DebugEngine;
@@ -135,7 +136,7 @@ namespace Microsoft.NodejsTools {
             }
         }
 
-        public NodejsIntellisenseOptionsPage AdvancedOptionsPage {
+        public NodejsIntellisenseOptionsPage IntellisenseOptionsPage {
             get {
                 return (NodejsIntellisenseOptionsPage)GetDialogPage(typeof(NodejsIntellisenseOptionsPage));
             }
@@ -173,7 +174,8 @@ namespace Microsoft.NodejsTools {
                 new OpenRemoteDebugProxyFolderCommand(),
                 new OpenRemoteDebugDocumentationCommand(),
                 new SurveyNewsCommand(),
-                new ImportWizardCommand()
+                new ImportWizardCommand(),
+                new DiagnosticsCommand()
             };
             try {
                 commands.Add(new AzureExplorerAttachDebuggerCommand());
@@ -200,7 +202,15 @@ namespace Microsoft.NodejsTools {
             textManagerEventsConnectionPoint.Advise(new DataTipTextManagerEvents(this), out cookie);
 
             MakeDebuggerContextAvailable();
+
+            AnalysisLog.MaxItems = IntellisenseOptionsPage.AnalysisLogMax;
+            IntellisenseOptionsPage.AnalysisLogMaximumChanged += IntellisenseOptionsPage_AnalysisLogMaximumChanged;
+
             InitializeLogging();
+        }
+
+        private void IntellisenseOptionsPage_AnalysisLogMaximumChanged(object sender, EventArgs e) {
+            AnalysisLog.MaxItems = IntellisenseOptionsPage.AnalysisLogMax;
         }
 
         private void InitializeLogging() {
@@ -660,7 +670,7 @@ namespace Microsoft.NodejsTools {
             get {
                 if (_analyzer == null) {
                     _analyzer = new VsProjectAnalyzer();
-                    AdvancedOptionsPage.AnalysisLevelChanged += AdvancedOptionsPageAnalysisLevelChanged;
+                    IntellisenseOptionsPage.AnalysisLevelChanged += AdvancedOptionsPageAnalysisLevelChanged;
                 }
                 return _analyzer;
             }

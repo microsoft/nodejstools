@@ -20,6 +20,7 @@ namespace Microsoft.NodejsTools.Options {
     public class NodejsIntellisenseOptionsPage : NodejsDialogPage {
         private NodejsIntellisenseOptionsControl _window;
         private AnalysisLevel _level;
+        private int _analysisLogMax;
 
         public NodejsIntellisenseOptionsPage()
             : base("IntelliSense") {
@@ -28,10 +29,14 @@ namespace Microsoft.NodejsTools.Options {
         // replace the default UI of the dialog page w/ our own UI.
         protected override System.Windows.Forms.IWin32Window Window {
             get {
-                if (_window == null) {
-                    _window = new NodejsIntellisenseOptionsControl();
-                }
+                EnsureWindow();
                 return _window;
+            }
+        }
+
+        private void EnsureWindow() {
+            if (_window == null) {
+                _window = new NodejsIntellisenseOptionsControl();
             }
         }
 
@@ -51,7 +56,24 @@ namespace Microsoft.NodejsTools.Options {
             }
         }
 
+        internal int AnalysisLogMax {
+            get {
+                return _analysisLogMax;
+            }
+            set {
+                var oldMax = _analysisLogMax;
+                _analysisLogMax = value;
+                if (oldMax != _analysisLogMax) {
+                    var changed = AnalysisLogMaximumChanged;
+                    if (changed != null) {
+                        changed(this, EventArgs.Empty);
+                    }
+                }
+            }
+        }
+
         public event EventHandler<EventArgs> AnalysisLevelChanged;
+        public event EventHandler<EventArgs> AnalysisLogMaximumChanged;
 
         /// <summary>
         /// Resets settings back to their defaults. This should be followed by
@@ -60,17 +82,26 @@ namespace Microsoft.NodejsTools.Options {
         /// </summary>
         public override void ResetSettings() {
             AnalysisLevel = AnalysisLevel.High;
+            AnalysisLogMax = 100;
         }
 
         private const string AnalysisLevelSetting = "AnalysisLevel";
+        private const string AnalysisLogMaximumSetting = "AnalysisLogMaximum";
 
         public override void LoadSettingsFromStorage() {
             AnalysisLevel = LoadEnum<AnalysisLevel>(AnalysisLevelSetting) ?? AnalysisLevel.High;
+            AnalysisLogMax = LoadInt(AnalysisLogMaximumSetting) ?? 100;
+            EnsureWindow();
+
+            _window.AnalysisLevel = AnalysisLevel;
+            _window.AnalysisLogMaximum = AnalysisLogMax;
         }
 
         public override void SaveSettingsToStorage() {
             AnalysisLevel = _window.AnalysisLevel;
             SaveEnum(AnalysisLevelSetting, AnalysisLevel);
+            AnalysisLogMax = _window.AnalysisLogMaximum;
+            SaveInt(AnalysisLogMaximumSetting, AnalysisLogMax);
         }
     }
 }

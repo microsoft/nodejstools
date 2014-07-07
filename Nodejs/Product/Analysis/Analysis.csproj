@@ -189,7 +189,6 @@
     <Compile Include="Analysis\HashSetExtensions.cs" />
     <Compile Include="Analysis\IAnalysisCookie.cs" />
     <Compile Include="Analysis\IAnalysisVariable.cs" />
-    <Compile Include="Analysis\IdDispenser.cs" />
     <Compile Include="Analysis\IEnumerableExtensions.cs" />
     <Compile Include="Analysis\ILocationResolver.cs" />
     <Compile Include="Analysis\IndexSpan.cs" />

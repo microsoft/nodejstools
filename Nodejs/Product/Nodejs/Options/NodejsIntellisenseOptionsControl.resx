@@ -124,6 +124,12 @@
   <data name="intellisenseLevelGroupBox.AutoSize" type="System.Boolean, mscorlib">
     <value>True</value>
   </data>
+  <metadata name="toolTip.GenerateMember" type="System.Boolean, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089">
+    <value>False</value>
+  </metadata>
+  <metadata name="toolTip.TrayLocation" type="System.Drawing.Point, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a">
+    <value>17, 17</value>
+  </metadata>
   <data name="_noIntelliSenseRadioButton.AutoSize" type="System.Boolean, mscorlib">
     <value>True</value>
   </data>
@@ -153,12 +159,6 @@
   <data name="_noIntelliSenseRadioButton.TextAlign" type="System.Drawing.ContentAlignment, System.Drawing">
     <value>TopLeft</value>
   </data>
-  <metadata name="toolTip.GenerateMember" type="System.Boolean, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089">
-    <value>False</value>
-  </metadata>
-  <metadata name="toolTip.TrayLocation" type="System.Drawing.Point, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a">
-    <value>17, 17</value>
-  </metadata>
   <data name="_noIntelliSenseRadioButton.ToolTip" xml:space="preserve">
     <value>Source code is not analyzed at all, and no memory or CPU time is consumed for this purpose. Completions are not available.</value>
   </data>
@@ -283,6 +283,75 @@
     <value>$this</value>
   </data>
   <data name="&gt;&gt;intellisenseLevelGroupBox.ZOrder" xml:space="preserve">
+    <value>2</value>
+  </data>
+  <metadata name="toolTip.GenerateMember" type="System.Boolean, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089">
+    <value>False</value>
+  </metadata>
+  <metadata name="toolTip.TrayLocation" type="System.Drawing.Point, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a">
+    <value>17, 17</value>
+  </metadata>
+  <data name="_analysisLogMaxLabel.AutoSize" type="System.Boolean, mscorlib">
+    <value>True</value>
+  </data>
+  <data name="_analysisLogMaxLabel.Location" type="System.Drawing.Point, System.Drawing">
+    <value>3, 93</value>
+  </data>
+  <data name="_analysisLogMaxLabel.Size" type="System.Drawing.Size, System.Drawing">
+    <value>100, 13</value>
+  </data>
+  <data name="_analysisLogMaxLabel.TabIndex" type="System.Int32, mscorlib">
+    <value>3</value>
+  </data>
+  <data name="_analysisLogMaxLabel.Text" xml:space="preserve">
+    <value>Intellisense log size:</value>
+  </data>
+  <data name="&gt;&gt;_analysisLogMaxLabel.Name" xml:space="preserve">
+    <value>_analysisLogMaxLabel</value>
+  </data>
+  <data name="&gt;&gt;_analysisLogMaxLabel.Type" xml:space="preserve">
+    <value>System.Windows.Forms.Label, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </data>
+  <data name="&gt;&gt;_analysisLogMaxLabel.Parent" xml:space="preserve">
+    <value>$this</value>
+  </data>
+  <data name="&gt;&gt;_analysisLogMaxLabel.ZOrder" xml:space="preserve">
+    <value>1</value>
+  </data>
+  <data name="_analysisLogMax.Items" xml:space="preserve">
+    <value>Off</value>
+  </data>
+  <data name="_analysisLogMax.Items1" xml:space="preserve">
+    <value>100</value>
+  </data>
+  <data name="_analysisLogMax.Items2" xml:space="preserve">
+    <value>1000</value>
+  </data>
+  <data name="_analysisLogMax.Items3" xml:space="preserve">
+    <value>10000</value>
+  </data>
+  <data name="_analysisLogMax.Items4" xml:space="preserve">
+    <value>100000</value>
+  </data>
+  <data name="_analysisLogMax.Location" type="System.Drawing.Point, System.Drawing">
+    <value>109, 90</value>
+  </data>
+  <data name="_analysisLogMax.Size" type="System.Drawing.Size, System.Drawing">
+    <value>121, 21</value>
+  </data>
+  <data name="_analysisLogMax.TabIndex" type="System.Int32, mscorlib">
+    <value>4</value>
+  </data>
+  <data name="&gt;&gt;_analysisLogMax.Name" xml:space="preserve">
+    <value>_analysisLogMax</value>
+  </data>
+  <data name="&gt;&gt;_analysisLogMax.Type" xml:space="preserve">
+    <value>System.Windows.Forms.ComboBox, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </data>
+  <data name="&gt;&gt;_analysisLogMax.Parent" xml:space="preserve">
+    <value>$this</value>
+  </data>
+  <data name="&gt;&gt;_analysisLogMax.ZOrder" xml:space="preserve">
     <value>0</value>
   </data>
   <metadata name="$this.Localizable" type="System.Boolean, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089">

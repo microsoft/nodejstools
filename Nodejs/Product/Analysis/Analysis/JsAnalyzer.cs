@@ -92,7 +92,6 @@ namespace Microsoft.NodejsTools.Analysis {
             }
 
             _evalUnit = new EvalAnalysisUnit(null, null, new ModuleValue("$global", _builtinEntry).EnvironmentRecord);
-            AnalysisLog.NewUnit(_evalUnit);
         }
 
         #region Public API
