@@ -20,12 +20,15 @@ using System.Diagnostics.Contracts;
 using System.IO;
 using System.Linq;
 using System.Reflection;
+using System.Runtime.Serialization;
 using System.Security;
+using System.Security.Cryptography;
 using System.Text;
 using System.Threading;
 using Microsoft.NodejsTools.Analysis.Analyzer;
 using Microsoft.NodejsTools.Analysis.Values;
 using Microsoft.NodejsTools.Parsing;
+using Microsoft.VisualStudioTools;
 using Microsoft.Win32;
 
 namespace Microsoft.NodejsTools.Analysis {
@@ -50,6 +53,7 @@ namespace Microsoft.NodejsTools.Analysis {
         internal readonly AnalysisUnit _evalUnit;   // a unit used for evaluating when we don't otherwise have a unit available
         private readonly HashSet<string> _analysisDirs = new HashSet<string>(StringComparer.OrdinalIgnoreCase);
         private AnalysisLimits _limits;
+        private static byte[] _serializationVersion;
 #if DEBUG
         private static Dictionary<object, int> _analysisCreationCount = new Dictionary<object, int>();
 #endif
@@ -141,6 +145,7 @@ namespace Microsoft.NodejsTools.Analysis {
         /// that portion of the module tree need to be re-analyzed.  This
         /// analyzable will handle enqueuing those changes on the correct thread.
         /// </summary>
+        [Serializable]
         internal class TreeUpdateAnalysis : IAnalyzable {
             private readonly ModuleTree _tree;
             public TreeUpdateAnalysis(ModuleTree tree) {
@@ -200,6 +205,52 @@ namespace Microsoft.NodejsTools.Analysis {
         #endregion
 
         #region Internal Implementation
+
+        /// <summary>
+        /// Captures the version of the analyzer.  This should include how we version various
+        /// built-in JavaScript objects as our intellisense information for those will get
+        /// serialized in addition to the users objects.  This does not capture any information
+        /// about the underlying formats of our objects which is handled entirely with the
+        /// SHA256 of our internal data structures.
+        /// </summary>
+        private const int _analyzerVersion = 0x04;
+
+        public static byte[] SerializationVersion {
+            get {
+                if (_serializationVersion == null) {
+                    _serializationVersion = GetSerializationVersion();
+                }
+                return _serializationVersion;
+            }
+        }
+
+        private static byte[] GetSerializationVersion() {
+            using (new DebugTimer("SerializationVersionInitialization")) {
+                SHA256 sha = SHA256Managed.Create();
+                StringBuilder sb = new StringBuilder();
+                AnalysisSerializationSupportedTypeAttribute[] attrs = (AnalysisSerializationSupportedTypeAttribute[])typeof(AnalysisSerializationSupportedTypeAttribute).Assembly.GetCustomAttributes(typeof(AnalysisSerializationSupportedTypeAttribute), false);
+                // we don't want to rely upon the order of reflection here...
+                Array.Sort<AnalysisSerializationSupportedTypeAttribute>(
+                    attrs,
+                    (Comparison<AnalysisSerializationSupportedTypeAttribute>)((x, y) => String.Compare(x.Type.Name, y.Type.Name))
+                );
+
+                foreach (AnalysisSerializationSupportedTypeAttribute attr in attrs) {
+                    var type = attr.Type;
+                    sb.AppendLine(type.FullName);
+                    foreach (FieldInfo field in FormatterServices.GetSerializableMembers(type)) {
+                        sb.Append(field.FieldType.FullName);
+                        sb.Append(field.Name);
+                        sb.AppendLine();
+                    }
+                }
+
+                return BitConverter.GetBytes(_analyzerVersion)
+                    .Concat(sha.ComputeHash(Encoding.UTF8.GetBytes(sb.ToString())))
+                    .ToArray();
+            }
+        }
+
 
         internal Deque<AnalysisUnit> Queue {
             get {

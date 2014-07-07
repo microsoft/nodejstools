@@ -29,6 +29,7 @@ namespace Microsoft.NodejsTools.Analysis {
         private readonly List<object> _memoDict = new List<object>();
         private readonly Dictionary<object, int> _reverseMemo = new Dictionary<object, int>(new ReferenceComparer<object>());
         private readonly List<Action> _postProcess = new List<Action>();
+        private static Dictionary<Type, MemberInfo[]> _serializationMembers = new Dictionary<Type, MemberInfo[]>();
 
         private static readonly Dictionary<Type, SerializerFunction> _serializer = new Dictionary<Type, SerializerFunction>() {
             { typeof(CallDelegate), SerializeCallDelegate },
@@ -156,7 +157,7 @@ namespace Microsoft.NodejsTools.Analysis {
                         }
                         Memoize(value);
 
-                        var members = FormatterServices.GetSerializableMembers(value.GetType());
+                        var members = GetSerializableMembers(value.GetType());
                         for (int i = members.Length - 1; i >= 0; i--) {
                             var member = (FieldInfo)members[i];
                             if (i == members.Length - 1 && value is ValueType) {
@@ -228,7 +229,7 @@ namespace Microsoft.NodejsTools.Analysis {
                     writer.Write((byte)SerializationType.ClrObject);
                     writer.Write((byte)AnalysisSerializationSupportedTypeAttribute.AllowedTypeIndexes[value.GetType()]);
 
-                    var members = FormatterServices.GetSerializableMembers(value.GetType());
+                    var members = GetSerializableMembers(value.GetType());
                     for (int i = members.Length - 1; i >= 0; i--) {
                         stack.Push(((FieldInfo)members[i]).GetValue(value));
                     }
@@ -695,10 +696,24 @@ namespace Microsoft.NodejsTools.Analysis {
             writer.Write((byte)SerializationType.ClrObject);
             writer.Write((byte)AnalysisSerializationSupportedTypeAttribute.AllowedTypeIndexes[obj.GetType()]);
 
-            var members = FormatterServices.GetSerializableMembers(obj.GetType());
+            var members = GetSerializableMembers(obj.GetType());
             foreach (FieldInfo member in members) {
                 Serialize(member.GetValue(obj), writer);
             }
+        }
+
+        private static MemberInfo[] GetSerializableMembers(Type type) {
+            MemberInfo[] res;
+            // we care about the order but reflection doesn't guarantee it.
+            if (!_serializationMembers.TryGetValue(type, out res)) {
+                res = FormatterServices.GetSerializableMembers(type);
+                Array.Sort<MemberInfo>(
+                    res,
+                    (x, y) => String.Compare(x.DeclaringType.FullName + ":" + x.Name, y.DeclaringType.FullName + ":" + y.Name)
+                );
+                _serializationMembers[type] = res;
+            }
+            return res;
         }
 
         #endregion

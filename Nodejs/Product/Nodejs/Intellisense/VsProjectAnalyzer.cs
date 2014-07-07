@@ -99,14 +99,18 @@ namespace Microsoft.NodejsTools.Intellisense {
 
         private object _contentsLock = new object();
 
-        const int _curDbVersion = 3;
-#if DEBUG
-        const int _dbVersion = unchecked((int)(0x80000000 | _curDbVersion));
-#else
-        const int _dbVersion = _curDbVersion;
-#endif
+        private static byte[] _dbHeader;
 
-        private static byte[] _dbHeader = new byte[] { (byte)'J', (byte)'S', (byte)'A', (byte)'N' }.Concat(BitConverter.GetBytes(_dbVersion)).ToArray();
+        private static byte[] DbHeader {
+            get {
+                if (_dbHeader == null) {
+                    _dbHeader = new byte[] { (byte)'J', (byte)'S', (byte)'A', (byte)'N' }
+                        .Concat(JsAnalyzer.SerializationVersion)
+                        .ToArray();
+                }
+                return _dbHeader;
+            }
+        }
 
         internal VsProjectAnalyzer(
             string projectDir = null
@@ -125,11 +129,11 @@ namespace Microsoft.NodejsTools.Intellisense {
                 if (File.Exists(analysisDb) && _analysisLevel != AnalysisLevel.None) {
                     try {
                         using (FileStream stream = new FileStream(analysisDb, FileMode.Open)) {
-                            byte[] header = new byte[_dbHeader.Length];
+                            byte[] header = new byte[DbHeader.Length];
                             stream.Read(header, 0, header.Length);
                             bool match = true;
                             for (int i = 0; i < header.Length; i++) {
-                                if (header[i] != _dbHeader[i]) {
+                                if (header[i] != DbHeader[i]) {
                                     match = false;
                                     break;
                                 }
@@ -1272,7 +1276,7 @@ namespace Microsoft.NodejsTools.Intellisense {
                         File.Delete(GetAnalysisPath());
                     }
                     using (FileStream fs = new FileStream(GetAnalysisPath(), FileMode.Create)) {
-                        fs.Write(_dbHeader, 0, _dbHeader.Length);
+                        fs.Write(DbHeader, 0, DbHeader.Length);
                         try {
                             var serializer = new AnalysisSerializer();
                             serializer.Serialize(fs, _jsAnalyzer);
