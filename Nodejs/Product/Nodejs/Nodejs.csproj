@@ -264,6 +264,7 @@
     <Compile Include="Debugger\LocalFileNameMapper.cs" />
     <Compile Include="Debugger\NodeProcess.cs" />
     <Compile Include="Debugger\ScriptTree.cs" />
+    <Compile Include="Editor\EditorExtensions.cs" />
     <Compile Include="Intellisense\AnalysisPriority.cs" />
     <Compile Include="Intellisense\AnalysisQueue.cs" />
     <Compile Include="Intellisense\AnalysisSynchronizationContext.cs" />

@@ -13,13 +13,14 @@
  * ***************************************************************************/
 
 using System.ComponentModel.Composition;
+using Microsoft.VisualStudio.Text;
 using Microsoft.VisualStudio.Utilities;
 
 namespace Microsoft.NodejsTools {
     class NodejsConstants {
         public const string FileExtension = ".js";
         public const string TypeScriptExtension = ".ts";
-        
+
         public const string JavaScript = "JavaScript";
         public const string CSS = "CSS";
         public const string Nodejs = "Node.js";
@@ -36,7 +37,7 @@ namespace Microsoft.NodejsTools {
 
         public const string NodeModulesFolder = "node_modules";
         public const string AnalysisIgnoredDirectories = "AnalysisIgnoredDirectories";
-        
+
         /// <summary>
         /// The name of the package.json file
         /// </summary>

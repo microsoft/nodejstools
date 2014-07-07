@@ -15,9 +15,9 @@
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
-using System.Threading.Tasks;
 using System.Windows;
 using Microsoft.NodejsTools.Analysis;
+using Microsoft.NodejsTools.Editor.Core;
 using Microsoft.NodejsTools.Formatting;
 using Microsoft.NodejsTools.Intellisense;
 using Microsoft.NodejsTools.Project;
@@ -84,7 +84,6 @@ namespace Microsoft.NodejsTools {
             _activeSession = null;
         }
 
-
         private static HashSet<char> _commitChars = new HashSet<char>("{}[](),:;+-*%&|^~=<>#\\");
 
         public int Exec(ref Guid pguidCmdGroup, uint nCmdID, uint nCmdexecopt, IntPtr pvaIn, IntPtr pvaOut) {
@@ -127,6 +126,21 @@ namespace Microsoft.NodejsTools {
                         break;
                     case VSConstants.VSStd2KCmdID.PASTE:
                         return Paste(ref pguidCmdGroup, nCmdID, nCmdexecopt, pvaIn, pvaOut, out hr);
+
+                    case VSConstants.VSStd2KCmdID.COMMENT_BLOCK:
+                    case VSConstants.VSStd2KCmdID.COMMENTBLOCK:
+                        if (EditorExtensions.CommentOrUncommentBlock(_textView, comment: true))
+                        {
+                            return VSConstants.S_OK;
+                        }
+                        break;
+                    case VSConstants.VSStd2KCmdID.UNCOMMENT_BLOCK:
+                    case VSConstants.VSStd2KCmdID.UNCOMMENTBLOCK:
+                        if (EditorExtensions.CommentOrUncommentBlock(_textView, comment: false))
+                        {
+                            return VSConstants.S_OK;
+                        }
+                        break;
                 }
             } else if (pguidCmdGroup == VSConstants.GUID_VSStandardCommandSet97) {
                 switch ((VSConstants.VSStd97CmdID)nCmdID) {
@@ -677,6 +691,13 @@ namespace Microsoft.NodejsTools {
                                 return VSConstants.S_OK;
                             }
                             break;
+
+                        case VSConstants.VSStd2KCmdID.COMMENT_BLOCK:
+                        case VSConstants.VSStd2KCmdID.COMMENTBLOCK:
+                        case VSConstants.VSStd2KCmdID.UNCOMMENT_BLOCK:
+                        case VSConstants.VSStd2KCmdID.UNCOMMENTBLOCK:
+                            prgCmds[i].cmdf = (uint)(OLECMDF.OLECMDF_ENABLED | OLECMDF.OLECMDF_SUPPORTED);
+                            return VSConstants.S_OK;
                     }
                 }
             }
