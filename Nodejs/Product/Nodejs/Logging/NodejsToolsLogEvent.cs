@@ -27,6 +27,12 @@ namespace Microsoft.NodejsTools.Logging {
         /// 
         /// Data is an int enum mapping to SurveyNews* setting
         /// </summary>
-        SurveyNewsFrequency
+        SurveyNewsFrequency,
+        /// <summary>
+        /// Logs the analysis detail level
+        /// 
+        /// Data is an int enum mapping to AnalysisLevel* setting
+        /// </summary>
+        AnalysisLevel
     }
 }

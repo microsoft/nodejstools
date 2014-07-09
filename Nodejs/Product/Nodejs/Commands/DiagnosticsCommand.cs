@@ -57,8 +57,8 @@ namespace Microsoft.NodejsTools.Commands {
             res.AppendLine("Projects: ");
 
             var projects = dte.Solution.Projects;
-            var interestingDteProperties = new[] { "InterpreterId", "InterpreterVersion", "StartupFile", "WorkingDirectory", "PublishUrl", "SearchPath", "CommandLineArguments", "InterpreterPath" };
-            var interestingProjectProperties = new[] { "ClusterRunEnvironment", "ClusterPublishBeforeRun", "ClusterWorkingDir", "ClusterMpiExecCommand", "ClusterAppCommand", "ClusterAppArguments", "ClusterDeploymentDir", "ClusterTargetPlatform" };
+            var interestingDteProperties = new[] { "StartupFile", "WorkingDirectory", "PublishUrl", "SearchPath", "CommandLineArguments" };
+            //var interestingProjectProperties = new[] { "AnalysisLevel" };
 
             foreach (EnvDTE.Project project in projects) {
                 string name;
@@ -89,22 +89,23 @@ namespace Microsoft.NodejsTools.Commands {
                 }
                 res.AppendLine("    Project: " + name);
 
-                if (Utilities.GuidEquals(Guids.NodejsProjectFactoryString, project.Kind)) {
+                if (Utilities.GuidEquals(Guids.NodejsBaseProjectFactoryString, project.Kind)) {
                     res.AppendLine("        Kind: Node.js");
 
                     foreach (var prop in interestingDteProperties) {
                         res.AppendLine("        " + prop + ": " + GetProjectProperty(project, prop));
                     }
-
-                    var pyProj = project.GetNodejsProject();
-                    if (pyProj != null) {
+                    /*
+                    var njsProj = project.GetNodejsProject();
+                    if (njsProj != null) {
                         foreach (var prop in interestingProjectProperties) {
-                            var propValue = pyProj.GetProjectProperty(prop);
+                            var propValue = njsProj.GetProjectProperty(prop);
                             if (propValue != null) {
                                 res.AppendLine("        " + prop + ": " + propValue);
                             }
                         }
                     }
+                    */
                 } else {
                     res.AppendLine("        Kind: " + project.Kind);
                 }
@@ -139,6 +140,7 @@ namespace Microsoft.NodejsTools.Commands {
             
             StringWriter writer = new StringWriter(res);
 
+            res.AppendLine(String.Format("Analysis Level: {0}", NodejsPackage.Instance.IntellisenseOptionsPage.AnalysisLevel.ToString()));
             res.AppendLine("Analysis Log: ");
             AnalysisLog.Dump(writer);
             res.AppendLine();

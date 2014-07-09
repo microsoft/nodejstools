@@ -218,6 +218,7 @@ namespace Microsoft.NodejsTools {
 
             // log interesting stats on startup
             _logger.LogEvent(NodejsToolsLogEvent.SurveyNewsFrequency, GeneralOptionsPage.SurveyNewsCheck);
+            _logger.LogEvent(NodejsToolsLogEvent.AnalysisLevel, IntellisenseOptionsPage.AnalysisLevel);
         }
 
         internal NodejsToolsLogger Logger {
@@ -670,16 +671,27 @@ namespace Microsoft.NodejsTools {
             get {
                 if (_analyzer == null) {
                     _analyzer = new VsProjectAnalyzer();
-                    IntellisenseOptionsPage.AnalysisLevelChanged += AdvancedOptionsPageAnalysisLevelChanged;
+                    LogLooseFileAnalysisLevel();
+                    IntellisenseOptionsPage.AnalysisLevelChanged += IntellisenseOptionsPageAnalysisLevelChanged;                    
                 }
                 return _analyzer;
             }
         }
 
-        private void AdvancedOptionsPageAnalysisLevelChanged(object sender, EventArgs e) {
+        private void IntellisenseOptionsPageAnalysisLevelChanged(object sender, EventArgs e) {
             var analyzer = new VsProjectAnalyzer();
             analyzer.SwitchAnalyzers(_analyzer);
             _analyzer = analyzer;
+            LogLooseFileAnalysisLevel();
+        }
+
+        private void LogLooseFileAnalysisLevel() {
+            var analyzer = _analyzer;
+            if(analyzer != null)
+            {
+                var val = analyzer.AnalysisLevel;
+                _logger.LogEvent(NodejsToolsLogEvent.AnalysisLevel, (int)val);
+            }
         }
 
 

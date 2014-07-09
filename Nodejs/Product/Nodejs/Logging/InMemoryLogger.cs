@@ -17,6 +17,7 @@ using System.ComponentModel.Composition;
 using System.Text;
 using Microsoft.NodejsTools.Options;
 
+
 namespace Microsoft.NodejsTools.Logging {
     /// <summary>
     /// Keeps track of logged events and makes them available for display in the diagnostics window.
@@ -27,10 +28,12 @@ namespace Microsoft.NodejsTools.Logging {
         private int _debugLaunchCount, _normalLaunchCount;
 
         private SurveyNewsPolicy _surveyNewsPolicy;
+        private AnalysisLevel _analysisLevel;
 
         #region INodejsToolsLogger Members
 
         public void LogEvent(NodejsToolsLogEvent logEvent, object argument) {
+            int val;
             switch (logEvent) {
                 case NodejsToolsLogEvent.Launch:
                     if ((int)argument != 0) {
@@ -40,9 +43,16 @@ namespace Microsoft.NodejsTools.Logging {
                     }
                     break;
                 case NodejsToolsLogEvent.SurveyNewsFrequency:
-                    int val = (int)argument;
+                    val = (int)argument;
                     if (Enum.IsDefined(typeof(SurveyNewsPolicy), val)) {
                         _surveyNewsPolicy = (SurveyNewsPolicy)val;
+                    }
+                    break;
+
+                case NodejsToolsLogEvent.AnalysisLevel:
+                    val = (int)argument;
+                    if (Enum.IsDefined(typeof(AnalysisLevel), val)) {
+                        _analysisLevel = (AnalysisLevel)val;
                     }
                     break;
             }
@@ -52,9 +62,10 @@ namespace Microsoft.NodejsTools.Logging {
 
         public override string ToString() {
             StringBuilder res = new StringBuilder();
-            res.AppendLine("SurveyNewsFrequency: " + _surveyNewsPolicy);
-            res.AppendLine("Debug Launches: " + _debugLaunchCount);
-            res.AppendLine("Normal Launches: " + _normalLaunchCount);
+            res.AppendLine("    Analysis Level: " + _analysisLevel);
+            res.AppendLine("    SurveyNewsFrequency: " + _surveyNewsPolicy);
+            res.AppendLine("    Debug Launches: " + _debugLaunchCount);
+            res.AppendLine("    Normal Launches: " + _normalLaunchCount);
             return res.ToString();
         }
     }

@@ -283,7 +283,7 @@ namespace Microsoft.NodejsTools.Project {
         }
 
         public override int InitializeForOuter(string filename, string location, string name, uint flags, ref Guid iid, out IntPtr projectPointer, out int canceled) {
-            NodejsPackage.Instance.IntellisenseOptionsPage.AnalysisLevelChanged += AdvancedOptionsPageAnalysisLevelChanged;
+            NodejsPackage.Instance.IntellisenseOptionsPage.AnalysisLevelChanged += IntellisenseOptionsPageAnalysisLevelChanged;
 
             return base.InitializeForOuter(filename, location, name, flags, ref iid, out projectPointer, out canceled);
         }
@@ -296,6 +296,7 @@ namespace Microsoft.NodejsTools.Project {
                     _analyzer.Dispose();
                 }
                 _analyzer = new VsProjectAnalyzer(ProjectHome);
+                LogAnalysisLevel();
 
                 base.Reload();
 
@@ -341,7 +342,24 @@ namespace Microsoft.NodejsTools.Project {
             }
         }
 
-        private void AdvancedOptionsPageAnalysisLevelChanged(object sender, EventArgs e) {
+        private void LogAnalysisLevel() {
+            var analyzer = _analyzer;
+            if (analyzer != null) {
+                NodejsPackage.Instance.Logger.LogEvent(Logging.NodejsToolsLogEvent.AnalysisLevel, (int)analyzer.AnalysisLevel);
+            }
+        }
+
+        /*
+         * Needed if we switch to per project Analysis levels
+        internal NodejsTools.Options.AnalysisLevel AnalysisLevel(){
+            var analyzer = _analyzer;
+            if (_analyzer != null) {
+                return _analyzer.AnalysisLevel;
+            }
+            return NodejsTools.Options.AnalysisLevel.None;
+        }
+        */
+        private void IntellisenseOptionsPageAnalysisLevelChanged(object sender, EventArgs e) {
             var analyzer = new VsProjectAnalyzer(ProjectHome);
             Reanalyze(this, analyzer);
             if (_analyzer != null) {
@@ -351,6 +369,7 @@ namespace Microsoft.NodejsTools.Project {
                 }
             }
             _analyzer = analyzer;
+            LogAnalysisLevel();
         }
 
         protected override void RaiseProjectPropertyChanged(string propertyName, string oldValue, string newValue) {
@@ -607,7 +626,7 @@ namespace Microsoft.NodejsTools.Project {
                     _analyzer = null;
                 }
 
-                NodejsPackage.Instance.IntellisenseOptionsPage.AnalysisLevelChanged -= AdvancedOptionsPageAnalysisLevelChanged;
+                NodejsPackage.Instance.IntellisenseOptionsPage.AnalysisLevelChanged -= IntellisenseOptionsPageAnalysisLevelChanged;
             }
             base.Dispose(disposing);
         }

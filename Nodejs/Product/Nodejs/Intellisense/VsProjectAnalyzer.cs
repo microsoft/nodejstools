@@ -112,6 +112,10 @@ namespace Microsoft.NodejsTools.Intellisense {
             }
         }
 
+        internal AnalysisLevel AnalysisLevel {
+            get { return _analysisLevel; }
+        }
+
         internal VsProjectAnalyzer(
             string projectDir = null
         ) {
