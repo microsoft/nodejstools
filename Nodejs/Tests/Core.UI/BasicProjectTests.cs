@@ -300,7 +300,7 @@ namespace Microsoft.Nodejs.Tests.UI {
             var project = OpenProject(@"TestData\NodejsProjectData\AddExistingFolder.sln");
             var window = project.ProjectItems.Item("server.js").Open();
             window.Activate();
-            
+
             using (var app = new VisualStudioApp(VsIdeTestHostContext.Dte)) {
                 var docWindow = app.GetDocument(window.Document.FullName);
 
@@ -433,6 +433,24 @@ namespace Microsoft.Nodejs.Tests.UI {
                 var project = OpenProject(@"TestData\NodejsProjectData\HelloWorld.sln");
 
                 VsIdeTestHostContext.Dte.Solution.SolutionBuild.Build(true);
+            } finally {
+                VsIdeTestHostContext.Dte.Solution.Close();
+                GC.Collect();
+                GC.WaitForPendingFinalizers();
+            }
+        }
+
+        /// <summary>
+        /// https://nodejstools.codeplex.com/workitem/823
+        /// </summary>
+        [TestMethod, Priority(0), TestCategory("Core")]
+        [HostType("TC Dynamic"), DynamicHostType(typeof(VsIdeHostAdapter))]
+        public void ProjectBuildWithProjFileSeparateFromSources() {
+            try {
+                var project = OpenProject(@"TestData\NodejsProjectData\HelloWorld3.sln");
+
+                VsIdeTestHostContext.Dte.Solution.SolutionBuild.Build(true);
+                Assert.AreEqual(0, VsIdeTestHostContext.Dte.Solution.SolutionBuild.LastBuildInfo, "Expected no build failures");
             } finally {
                 VsIdeTestHostContext.Dte.Solution.Close();
                 GC.Collect();
@@ -745,10 +763,10 @@ namespace Microsoft.Nodejs.Tests.UI {
 
                 Keyboard.Type("X");
                 Keyboard.Type(System.Windows.Input.Key.Enter);
-                
+
                 // item should be successfully added now.
                 VisualStudioApp.CheckMessageBox(MessageBoxButton.Ok, "The folder X already exists.");
-                
+
                 Keyboard.Type("Z");
                 Keyboard.Type(System.Windows.Input.Key.Enter);
                 WaitForItem(project, "Z");

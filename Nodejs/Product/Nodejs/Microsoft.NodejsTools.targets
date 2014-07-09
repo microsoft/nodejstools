@@ -21,7 +21,14 @@
     <FakesImported>true</FakesImported> <!-- disables quality tools fakes imports -->
     <TypeScriptTarget Condition="'$(TypeScriptTarget)' == ''">ES5</TypeScriptTarget>
   </PropertyGroup>
-  
+
+  <!-- Gets the fully qualified path to the project home.  -->
+  <PropertyGroup>
+    <QualifiedProjectHome>$(MSBuildProjectDirectory)</QualifiedProjectHome>
+    <QualifiedProjectHome Condition="'$(ProjectHome)' != '' and '$(ProjectHome)' != '.'">$([System.IO.Path]::GetFullPath($([System.IO.Path]::Combine($(MSBuildProjectDirectory), $(ProjectHome)))))</QualifiedProjectHome>
+    <QualifiedProjectHome Condition="!HasTrailingSlash('$(QualifiedProjectHome)')">$(QualifiedProjectHome)\</QualifiedProjectHome>
+  </PropertyGroup>
+
   <ItemGroup Condition="'$(BuildingInsideVisualStudio)'=='true'">
     <AvailableItemName Include="TypeScriptCompile" Condition="'$(EnableTypeScript)' == 'true'"/>
   </ItemGroup>
@@ -46,7 +53,7 @@
   </ItemGroup>
 
   <Target Name="CopyFilesToOutputDirectory"/>
-  
+
   <Target Name="CoreCompile">
     <Error Condition="!Exists('$(VSToolsPath)\TypeScript\Microsoft.TypeScript.targets') And '$(EnableTypeScript)' == 'true'" Text="TypeScript is not installed but TypeScript support is enabled in this project.  Please download and install TypeScript http://go.microsoft.com/fwlink/?LinkID=393159&amp;clcid=0x409."></Error>
     <PropertyGroup>
@@ -54,7 +61,7 @@
     </PropertyGroup>
     <Error Condition="$(_NodeModulesContentProperty.IndexOf('*')) != -1"
            Text="Files in your project exceed MAX_PATH, please move your project to a location with a shorter path."></Error>
-    
+
     <!-- Target used for generating a package which can be uploaded to web server -->
     <ItemGroup>
       <_FoundWebConfig Include="@(Content)" Condition=" '%(Content.Filename)%(Content.Extension)' == 'web.config' " />
@@ -62,36 +69,40 @@
     </ItemGroup>
 
     <Copy
-        SourceFiles="@(Compile)"
-        DestinationFiles="@(Compile->'$(IntermediateOutputPath)%(RelativeDir)%(Filename)%(Extension)')"
-        SkipUnchangedFiles="true">
+		  SourceFiles="@(Compile->'$(QualifiedProjectHome)%(RelativeDir)%(Filename)%(Extension)')"
+		  DestinationFiles="@(Compile->'$(IntermediateOutputPath)%(RelativeDir)%(Filename)%(Extension)')"
+		  SkipUnchangedFiles="true">
       <Output TaskParameter="DestinationFiles" ItemName="FileWrites"/>
     </Copy>
-    <Copy SourceFiles="@(Include)"
-          DestinationFiles="@(Include->'$(IntermediateOutputPath)%(RelativeDir)%(Filename)%(Extension)')"          
-          SkipUnchangedFiles="true">
+    <Copy
+      SourceFiles="@(Include->'$(QualifiedProjectHome)%(RelativeDir)%(Filename)%(Extension)')"
+      DestinationFiles="@(Include->'$(IntermediateOutputPath)%(RelativeDir)%(Filename)%(Extension)')"
+      SkipUnchangedFiles="true">
       <Output TaskParameter="DestinationFiles" ItemName="FileWrites"/>
     </Copy>
-    <Copy SourceFiles="@(Content)"
-          DestinationFiles="@(Content->'$(IntermediateOutputPath)%(RelativeDir)%(Filename)%(Extension)')"
-          SkipUnchangedFiles="true">
+    <Copy
+      SourceFiles="@(Content->'$(QualifiedProjectHome)%(RelativeDir)%(Filename)%(Extension)')"
+      DestinationFiles="@(Content->'$(IntermediateOutputPath)%(RelativeDir)%(Filename)%(Extension)')"
+      SkipUnchangedFiles="true">
       <Output TaskParameter="DestinationFiles" ItemName="FileWrites"/>
     </Copy>
-    <Copy SourceFiles="@(NodeModulesContent)"
-          DestinationFiles="@(NodeModulesContent->'$(IntermediateOutputPath)%(RelativeDir)%(Filename)%(Extension)')"
-          SkipUnchangedFiles="true">
+    <Copy
+      SourceFiles="@(NodeModulesContent)"
+      DestinationFiles="@(NodeModulesContent->'$(IntermediateOutputPath)%(RelativeDir)%(Filename)%(Extension)')"
+      SkipUnchangedFiles="true">
       <Output TaskParameter="DestinationFiles" ItemName="FileWrites"/>
     </Copy>
-    <Copy SourceFiles="@(NodejsAzureDeploymentFile)"
-          DestinationFolder="$(IntermediateOutputPath)\bin"
-          SkipUnchangedFiles="true">
+    <Copy
+      SourceFiles="@(NodejsAzureDeploymentFile)"
+      DestinationFolder="$(IntermediateOutputPath)\bin"
+      SkipUnchangedFiles="true">
       <Output TaskParameter="DestinationFiles" ItemName="FileWrites"/>
       <Output TaskParameter="DestinationFiles" ItemName="FilesCopiedToIntermediate"/>
     </Copy>
   </Target>
 
-  <Target Name="BuiltProjectOutputGroup" 
-          Returns="@(BuiltProjectOutputGroupOutput)" 
+  <Target Name="BuiltProjectOutputGroup"
+          Returns="@(BuiltProjectOutputGroupOutput)"
           DependsOnTargets="$(BuiltProjectOutputGroupDependsOn)">
     <ItemGroup>
       <!-- We can't depend upon GeneratedJavascript defined by TypeScript because it 
@@ -101,8 +112,8 @@
            Worker Roles won't invoke PublishPipeline, they invoke some targets directly -->
       <_GeneratedJavascript Include="@(TypeScriptCompile->'%(RelativeDir)%(Filename).js')"
                             Condition="'%(Filename)' != '' and '$([System.IO.Path]::GetExtension(%(Filename)))' != '.d'"/>
-      
-      <!-- Building scripts results in the scripts -->      
+
+      <!-- Building scripts results in the scripts -->
       <_TempBuiltProjectOutputGroup Include="@(Compile->'%(FullPath)');@(Content->'%(FullPath)');@(_GeneratedJavascript->'%(FullPath)');@(NodeModulesContent->'%(FullPath)')"/>
 
       <!-- Include the project file -->
@@ -110,7 +121,7 @@
         <OriginalItemSpec>$(MSBuildProjectFullPath)</OriginalItemSpec>
         <TargetPath>$(ProjectFileName)</TargetPath>
       </_TempBuiltProjectOutputGroup>
-      
+
     </ItemGroup>
 
     <AssignTargetPath Files="@(_TempBuiltProjectOutputGroup)" RootFolder="$(MSBuildProjectDirectory)">
@@ -139,7 +150,7 @@
     </ItemGroup>
 
   </Target>
-  
+
   <Target Name="DebugSymbolsProjectOutputGroup" />
 
   <ItemGroup>
@@ -186,8 +197,8 @@
     DependsOnTargets="CoreCompile"
     Returns="@(TransformedFilenames)"
     >
-    <Error 
-      Text="web.config not found in project, to create a project to deploy to Microsoft Azure you must create a Microsoft Azure Node.js project." 
+    <Error
+      Text="web.config not found in project, to create a project to deploy to Microsoft Azure you must create a Microsoft Azure Node.js project."
       Condition="'@(_FoundWebConfig)' == ''"/>
 
     <ItemGroup>
@@ -204,7 +215,7 @@
         <Category>Run</Category>
         <ProjectFileType>Default</ProjectFileType>
       </TransformedFilenames>
-    
+
       <TransformedFilenames Include="@(GeneratedFiles)">
         <DestinationRelativePath>bin\%(Filename)%(Extension)</DestinationRelativePath>
         <Exclude>false</Exclude>
@@ -267,7 +278,7 @@
     <!-- Node.js compile files are actually content -->
     <Content Include="@(Compile)" />
   </ItemGroup>
-  
+
   <!-- Override content collection to look in the intermediate directory where we've copied
       all of our items.  This enables us to pick the correct web.config when doing a deployment.
     -->
