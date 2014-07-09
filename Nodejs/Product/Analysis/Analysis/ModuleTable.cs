@@ -159,6 +159,10 @@ namespace Microsoft.NodejsTools.Analysis {
         private static ModuleTree ResolveModule(ModuleTree parentTree, AnalysisUnit unit, string relativeName) {
             ModuleTree curTree = parentTree;
             foreach (var comp in ModuleTable.GetPathComponents(relativeName)) {
+                if (curTree == null) {
+                    return null;
+                }
+
                 if (comp == ".") {
                     continue;
                 } else if (comp == "..") {
