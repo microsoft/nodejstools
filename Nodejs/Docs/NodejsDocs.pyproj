@@ -200,8 +200,11 @@
     <Content Include="User\Images\SignatureHelp.png" />
     <Content Include="User\Images\SolutionExplorer.png" />
     <Content Include="User\Images\UnitTestsAddNewItem.png" />
+    <Content Include="User\Images\UnitTestsAddNewItemMocha.png" />
     <Content Include="User\Images\UnitTestsDiscovery.png" />
-    <Content Include="User\Images\UnitTestsFramework.png" />
+    <Content Include="User\Images\UnitTestsDiscoveryMocha.png" />
+    <Content Include="User\Images\UnitTestsFrameworkExportRunner.png" />
+    <Content Include="User\Images\UnitTestsFrameworkMocha.png" />
     <Content Include="User\Images\UnitTestsGroupByTraits.png" />
     <Content Include="User\Images\UnitTestsRunFailed.png" />
     <Content Include="User\Images\UnitTestsRunFailedOutput.png" />
