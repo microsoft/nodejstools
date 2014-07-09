@@ -14,8 +14,8 @@
 
 using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
-
 using System.Text;
 using Microsoft.NodejsTools.Analysis.Analyzer;
 using Microsoft.NodejsTools.Parsing;
@@ -28,7 +28,7 @@ namespace Microsoft.NodejsTools.Analysis.Values {
         public VariableDef ReturnValue;
         internal Dictionary<CallArgs, CallInfo> _allCalls;
         private OverflowState _overflowed;
-        const int MaximumCallCount = 30;
+        private const int MaximumCallCount = 5;
 
         public UserFunctionValue(FunctionObject node, AnalysisUnit declUnit, EnvironmentRecord declScope, bool isNested = false)
             : base(declUnit.ProjectEntry, true, node.Name ?? node.NameGuess) {
@@ -77,7 +77,7 @@ namespace Microsoft.NodejsTools.Analysis.Values {
         }
 
         public override string ToString() {
-            return String.Format("UserFunction {0} {1}\r\n{2}", 
+            return String.Format("UserFunction {0} {1}\r\n{2}",
                 FunctionObject.Name,
                 FunctionObject.GetStart(ProjectEntry.Tree),
                 ProjectEntry.FilePath
@@ -225,12 +225,12 @@ namespace Microsoft.NodejsTools.Analysis.Values {
 
                 ParameterResult[] parameterResults = FunctionObject.ParameterDeclarations == null ?
                     new ParameterResult[0] :
-                    FunctionObject.ParameterDeclarations.Select((p, i) => 
+                    FunctionObject.ParameterDeclarations.Select((p, i) =>
                         new ParameterResult(
-                            MakeParameterName(p), 
-                            string.Empty, 
-                            parameters[i], 
-                            false, 
+                            MakeParameterName(p),
+                            string.Empty,
+                            parameters[i],
+                            false,
                             refs[i]
                         )
                     ).ToArray();
@@ -253,6 +253,15 @@ namespace Microsoft.NodejsTools.Analysis.Values {
 
         public override IAnalysisSet Call(Node node, AnalysisUnit unit, IAnalysisSet @this, IAnalysisSet[] args) {
             if (_overflowed == OverflowState.OverflowedBigTime) {
+                // start merging all arguments into a single call analysis                
+                if (_analysisUnit.AddArgumentTypes(
+                    (FunctionEnvironmentRecord)_analysisUnit._env,
+                    args,
+                    _analysisUnit.Analyzer.Limits.MergedArgumentTypes
+                )) {
+                    _analysisUnit.Enqueue();
+                }
+                _analysisUnit.ReturnValue.AddDependency(unit);
                 return _analysisUnit.ReturnValue.Types;
             }
 
@@ -269,13 +278,14 @@ namespace Microsoft.NodejsTools.Analysis.Values {
                     return ReturnValue.Types;
                 }
 
-                _allCalls[callArgs] = callInfo = new CallInfo(this, 
-                    _analysisUnit.Environment, 
-                    ((FunctionAnalysisUnit)_analysisUnit)._declUnit, 
+                _allCalls[callArgs] = callInfo = new CallInfo(
+                    this,
+                    _analysisUnit.Environment,
+                    _analysisUnit._declUnit,
                     callArgs
                 );
 
-                if (_allCalls.Count > 10) {
+                if (_allCalls.Count > MaximumCallCount) {
                     // try and compress args using UnionEquality...
                     if (_overflowed == OverflowState.None) {
                         _overflowed = OverflowState.OverflowedOnce;
@@ -285,15 +295,15 @@ namespace Microsoft.NodejsTools.Analysis.Values {
                         }
                         _allCalls = newAllCalls;
                     }
-                }
 
-                if (_allCalls.Count > MaximumCallCount) {
-                    _overflowed = OverflowState.OverflowedBigTime;
-                    return _analysisUnit.ReturnValue.Types;
+                    if (_allCalls.Count > MaximumCallCount) {
+                        _overflowed = OverflowState.OverflowedBigTime;
+                        _analysisUnit.ReturnValue.AddDependency(unit);
+                        return _analysisUnit.ReturnValue.Types;
+                    }
                 }
 
                 callInfo.ReturnValue.AddDependency(unit);
-
                 callInfo.AnalysisUnit.Enqueue();
                 return AnalysisSet.Empty;
             } else {
@@ -343,49 +353,30 @@ namespace Microsoft.NodejsTools.Analysis.Values {
             }
         }
 
-
+        private const int FunctionMergeStrength = 2;
         internal override bool UnionEquals(AnalysisValue av, int strength) {
-            if (strength >= MergeStrength.ToObject) {
+            if (strength >= FunctionMergeStrength) {
                 var func = av as UserFunctionValue;
                 if (func != null) {
                     return true;
                 }
             }
-
-            if (strength >= MergeStrength.ToBaseClass) {
-                var func = av as UserFunctionValue;
-                if (func != null) {
-                    // two literals from the same node, these
-                    // literals were created by independent function
-                    // analysis, merge them together now.
-                    return func.FunctionObject == FunctionObject;
-                }
-            }
+            
             return base.UnionEquals(av, strength);
         }
 
         internal override int UnionHashCode(int strength) {
-            if (strength >= MergeStrength.ToObject) {
+            if (strength >= FunctionMergeStrength) {
                 return ProjectState._functionPrototype.GetHashCode();
             }
-
-            if (strength >= MergeStrength.ToBaseClass) {
-                return FunctionObject.GetHashCode();
-            }
+            
             return base.UnionHashCode(strength);
         }
 
         internal override AnalysisValue UnionMergeTypes(AnalysisValue av, int strength) {
-            if (strength >= MergeStrength.ToObject) {
+            if (strength >= FunctionMergeStrength) {
                 var func = av as UserFunctionValue;
                 if (func != null) {
-                    return this;
-                }
-            }
-
-            if (strength >= MergeStrength.ToBaseClass) {
-                var func = av as UserFunctionValue;
-                if (func != null && func.FunctionObject == FunctionObject) {
                     return this;
                 }
             }
@@ -408,16 +399,23 @@ namespace Microsoft.NodejsTools.Analysis.Values {
 
             public CallArgs(IAnalysisSet @this, IAnalysisSet[] args, bool overflowed) {
                 if (!overflowed) {
-                    for (int i = 0; i < args.Length; i++) {                        
+                    for (int i = 0; i < args.Length; i++) {
                         if (args[i].Count >= 10) {
                             overflowed = true;
                             break;
                         }
                     }
+
+                    if (@this != null && @this.Count >= 10) {
+                        overflowed = true;
+                    }
                 }
                 if (overflowed) {
                     for (int i = 0; i < args.Length; i++) {
-                        args[i] = args[i].AsUnion(2);
+                        args[i] = args[i].AsUnion(MergeStrength.ToObject);
+                    }
+                    if (@this != null) {
+                        @this = @this.AsUnion(MergeStrength.ToObject);
                     }
                 }
                 This = @this;
@@ -472,7 +470,7 @@ namespace Microsoft.NodejsTools.Analysis.Values {
                 if (Object.ReferenceEquals(this, other)) {
                     return true;
                 }
-                
+
                 if (Args.Length != other.Args.Length) {
                     return false;
                 }
@@ -518,8 +516,8 @@ namespace Microsoft.NodejsTools.Analysis.Values {
             public override int GetHashCode() {
                 if (_hashCode == 0) {
                     int hc = 6551;
+                    IEqualityComparer<AnalysisValue> comparer = GetComparer();
                     if (Args.Length > 0) {
-                        IEqualityComparer<AnalysisValue> comparer = GetComparer();
                         for (int i = 0; i < Args.Length; i++) {
                             foreach (var value in Args[i]) {
                                 hc ^= comparer.GetHashCode(value);
@@ -528,7 +526,7 @@ namespace Microsoft.NodejsTools.Analysis.Values {
                     }
                     if (This != null) {
                         foreach (var value in This) {
-                            hc ^= value.GetHashCode();
+                            hc ^= comparer.GetHashCode(value);
                         }
                     }
 
@@ -538,14 +536,17 @@ namespace Microsoft.NodejsTools.Analysis.Values {
             }
 
             private IEqualityComparer<AnalysisValue> GetComparer() {
-                var arg0 = Args[0] as HashSet<AnalysisValue>;
-                IEqualityComparer<AnalysisValue> comparer;
-                if (arg0 != null) {
-                    comparer = arg0.Comparer;
-                } else {
-                    comparer = EqualityComparer<AnalysisValue>.Default;
+                var @this = This as HashSet<AnalysisValue>;
+                if (@this != null) {
+                    return @this.Comparer;
                 }
-                return comparer;
+                if (Args.Length > 0) {
+                    var arg0 = Args[0] as HashSet<AnalysisValue>;
+                    if (arg0 != null) {
+                        return arg0.Comparer;
+                    }
+                }
+                return EqualityComparer<AnalysisValue>.Default;
             }
         }
 
@@ -557,10 +558,10 @@ namespace Microsoft.NodejsTools.Analysis.Values {
             public CallInfo(UserFunctionValue funcValue, EnvironmentRecord environment, AnalysisUnit outerUnit, CallArgs args) {
                 ReturnValue = new VariableDef();
                 AnalysisUnit = new CartesianProductFunctionAnalysisUnit(
-                    funcValue, 
-                    environment, 
-                    outerUnit, 
-                    args, 
+                    funcValue,
+                    environment,
+                    outerUnit,
+                    args,
                     ReturnValue
                 );
             }

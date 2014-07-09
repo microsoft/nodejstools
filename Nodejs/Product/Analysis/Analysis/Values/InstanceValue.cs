@@ -32,5 +32,34 @@ namespace Microsoft.NodejsTools.Analysis.Values {
                 return base.ObjectDescription;
             }
         }
+
+        internal override bool UnionEquals(AnalysisValue ns, int strength) {
+            if (strength >= MergeStrength.ToObject) {
+                if (ns is InstanceValue) {
+                    return true;
+                }
+            }
+
+            return base.UnionEquals(ns, strength);
+        }
+
+        internal override int UnionHashCode(int strength) {
+            if (strength >= MergeStrength.ToObject) {
+                return ProjectState._immutableObject.GetHashCode();
+            }
+
+            return base.UnionHashCode(strength);
+        }
+
+        internal override AnalysisValue UnionMergeTypes(AnalysisValue ns, int strength) {
+            if (strength >= MergeStrength.ToObject) {
+                if (ns is InstanceValue) {
+                    return ProjectState._immutableObject;
+                }
+            }
+
+            return base.UnionMergeTypes(ns, strength);
+        }
+
     }
 }

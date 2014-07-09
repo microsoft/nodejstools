@@ -28,7 +28,7 @@ namespace Microsoft.NodejsTools {
         private readonly IEditorOptions _editorOptions;
         private readonly ITagger<ClassificationTag> _classifier;
 
-        private static HashSet<string> _dedentKeywords = new HashSet<string>(new[] { "return", "continue", "break" });
+        private static HashSet<string> _dedentKeywords = new HashSet<string>(new[] { "return", "continue", "break", "throw" });
         private static HashSet<string> _stmtKeywords = new HashSet<string>(
                 new[] { "try", "if", "switch", "for", "do", "break", "return", "throw", "default", "var" }
             );

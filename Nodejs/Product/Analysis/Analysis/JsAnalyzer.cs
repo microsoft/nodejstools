@@ -44,7 +44,7 @@ namespace Microsoft.NodejsTools.Analysis {
         internal readonly NullValue _nullInst;
         internal readonly BooleanValue _trueInst, _falseInst;
         internal readonly UndefinedValue _undefined;
-        internal readonly ObjectValue _globalObject, _objectPrototype;
+        internal readonly ObjectValue _globalObject, _objectPrototype, _immutableObject;
         internal readonly FunctionValue _arrayFunction;
         internal readonly AnalysisValue _numberPrototype, _stringPrototype, _booleanPrototype, _functionPrototype;
         internal readonly AnalysisValue _emptyStringValue, _zeroIntValue;
@@ -84,6 +84,7 @@ namespace Microsoft.NodejsTools.Analysis {
             _arrayFunction = globals.ArrayFunction;
             _objectPrototype = globals.ObjectPrototype;
             _requireFunc = globals.RequireFunction;
+            _immutableObject = new ImmutableObjectValue(_builtinEntry);
 
             var allJson = Path.Combine(
                 Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location),

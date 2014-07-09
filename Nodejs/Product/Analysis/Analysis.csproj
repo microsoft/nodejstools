@@ -194,6 +194,7 @@
     <Compile Include="Analysis\IndexSpan.cs" />
     <Compile Include="Analysis\NodejsModuleBuilder.cs" />
     <Compile Include="Analysis\Values\GlobalValue.cs" />
+    <Compile Include="Analysis\Values\ImmutableObjectValue.cs" />
     <Compile Include="Analysis\Values\InheritsPrototypeValue.cs" />
     <Compile Include="Analysis\Values\InstanceValue.cs" />
     <Compile Include="Analysis\Values\NonObjectValue.cs" />

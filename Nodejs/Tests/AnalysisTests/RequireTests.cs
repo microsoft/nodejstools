@@ -94,13 +94,13 @@ var mymod = module.exports = exports = new MyMod")
             var mod1 = @"exports.foo = 42;";
             var mod2 = @"x = require('./one.js').foo";
 
-            var sourceUnit1 = AnalysisTests.GetSourceUnit(mod1);
-            var sourceUnit2 = AnalysisTests.GetSourceUnit(mod2);
+            var sourceUnit1 = Analysis.GetSourceUnit(mod1);
+            var sourceUnit2 = Analysis.GetSourceUnit(mod2);
             var state = new JsAnalyzer();
             var entry1 = state.AddModule("one.js", null);
             var entry2 = state.AddModule("two.js", null);
-            AnalysisTests.Prepare(entry1, sourceUnit1);
-            AnalysisTests.Prepare(entry2, sourceUnit2);
+            Analysis.Prepare(entry1, sourceUnit1);
+            Analysis.Prepare(entry2, sourceUnit2);
 
             entry1.Analyze(CancellationToken.None);
             entry2.Analyze(CancellationToken.None);
@@ -127,9 +127,9 @@ var mymod = module.exports = exports = new MyMod")
             analyzer.AddPackageJson("rec1\\package.json", "../rec2");
             analyzer.AddPackageJson("rec2\\package.json", "../rec1");
 
-            var sourceUnit = AnalysisTests.GetSourceUnit(mod);
+            var sourceUnit = Analysis.GetSourceUnit(mod);
             var entry = analyzer.AddModule("one.js", null);
-            AnalysisTests.Prepare(entry, sourceUnit);
+            Analysis.Prepare(entry, sourceUnit);
 
             entry.Analyze(CancellationToken.None);
 
@@ -150,12 +150,12 @@ var mymod = module.exports = exports = new MyMod")
             var myindex = @"exports.abc = 100;";
             analyzer.AddPackageJson("rec1\\package.json", "lib/myindex.js");
 
-            var sourceUnit = AnalysisTests.GetSourceUnit(mod);
-            var myindexSourceUnit = AnalysisTests.GetSourceUnit(myindex);
+            var sourceUnit = Analysis.GetSourceUnit(mod);
+            var myindexSourceUnit = Analysis.GetSourceUnit(myindex);
             var entry = analyzer.AddModule("one.js", null);
             var myindexEntry = analyzer.AddModule("rec1\\lib\\myindex.js", null);
-            AnalysisTests.Prepare(entry, sourceUnit);
-            AnalysisTests.Prepare(myindexEntry, myindexSourceUnit);
+            Analysis.Prepare(entry, sourceUnit);
+            Analysis.Prepare(myindexEntry, myindexSourceUnit);
 
             entry.Analyze(CancellationToken.None);
             myindexEntry.Analyze(CancellationToken.None);
@@ -171,13 +171,13 @@ var mymod = module.exports = exports = new MyMod")
             var mod1 = @"exports.foo = 42;";
             var mod2 = @"x = require('one.js').foo";
 
-            var sourceUnit1 = AnalysisTests.GetSourceUnit(mod1);
-            var sourceUnit2 = AnalysisTests.GetSourceUnit(mod2);
+            var sourceUnit1 = Analysis.GetSourceUnit(mod1);
+            var sourceUnit2 = Analysis.GetSourceUnit(mod2);
             var state = new JsAnalyzer();
             var entry1 = state.AddModule("node_modules\\one.js", null);
             var entry2 = state.AddModule("two.js", null);
-            AnalysisTests.Prepare(entry1, sourceUnit1);
-            AnalysisTests.Prepare(entry2, sourceUnit2);
+            Analysis.Prepare(entry1, sourceUnit1);
+            Analysis.Prepare(entry2, sourceUnit2);
 
             entry1.Analyze(CancellationToken.None);
             entry2.Analyze(CancellationToken.None);
@@ -268,7 +268,7 @@ var http = require('ht' + 'tp');
 
                 entries[file.Substring(basePath.Length + 1)] = entry;
 
-                AnalysisTests.Prepare(entry, new StreamReader(file));
+                Analysis.Prepare(entry, new StreamReader(file));
             }
             var serializer = new JavaScriptSerializer();
             foreach (var file in Directory.GetFiles(

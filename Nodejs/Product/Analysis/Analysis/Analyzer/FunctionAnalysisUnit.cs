@@ -14,6 +14,7 @@
 
 using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using System.Threading;
 using Microsoft.NodejsTools.Analysis.Values;
@@ -87,6 +88,21 @@ namespace Microsoft.NodejsTools.Analysis.Analyzer {
             get {
                 return Function.ReturnValue;
             }
+        }
+
+        public bool AddArgumentTypes(FunctionEnvironmentRecord funcScope, IAnalysisSet[] arguments, int typeLimit = Int32.MaxValue) {
+            bool added = false;
+            if (Ast.ParameterDeclarations != null) {
+                for (int i = 0; i < Ast.ParameterDeclarations.Count && i < arguments.Length; i++) {
+                    var variable = funcScope.GetVariable(Ast.ParameterDeclarations[i].Name);
+                    if (typeLimit != Int32.MaxValue) {
+                        added |= variable.MakeUnionStrongerIfMoreThan(typeLimit, arguments[i]);
+                    }
+                    
+                    added |= variable.AddTypes(this, arguments[i], false);
+                }
+            }
+            return added;
         }
 
         public override string ToString() {

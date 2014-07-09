@@ -65,8 +65,14 @@ namespace Microsoft.NodejsTools.Analysis.Values {
                 if (_creator.Descriptors.TryGetValue("prototype", out prototype) &&
                     prototype.Values != null) {
                     foreach (var value in prototype.Values.TypesNoCopy) {
-                        foreach (var kvp in value.GetAllMembers()) {
-                            MergeTypes(res, kvp.Key, kvp.Value);
+                        if (value.Push()) {
+                            try {
+                                foreach (var kvp in value.GetAllMembers()) {
+                                    MergeTypes(res, kvp.Key, kvp.Value);
+                                }
+                            } finally {
+                                value.Pop();
+                            }
                         }
                     }
                 }
@@ -189,11 +195,6 @@ namespace Microsoft.NodejsTools.Analysis.Values {
 
         internal override bool UnionEquals(AnalysisValue ns, int strength) {
             if (strength >= MergeStrength.ToObject) {
-                if (ns.TypeId == BuiltinTypeId.Null) {
-                    // II + BII(None) => do not merge
-                    return false;
-                }
-
                 // II + II => BII(object)
                 // II + BII => BII(object)
 #if FALSE
@@ -277,5 +278,4 @@ namespace Microsoft.NodejsTools.Analysis.Values {
             }
         }
     }
-
 }

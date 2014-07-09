@@ -41,28 +41,34 @@ namespace Microsoft.NodejsTools.Analysis {
             // we don't enumerate here because that can throw if the log is being updated
             // by another thread in the background.  We should either catch the new events
             // being appended at the end, or hopefully we stay in front of the updates
-            // which are coming at the beginning.  
-            for (int i = 0; i < LogItems.Count; i++) {
-                var item = LogItems[i];
-                if (!LastDisplayedTime.HasValue || item.Time.Subtract(LastDisplayedTime.GetValueOrDefault()) > TimeSpan.FromMilliseconds(100)) {
-                    LastDisplayedTime = item.Time;
-                    output.WriteLine(asCsv ? "TS, {0}, {1}" : "[TS] {0}, {1}", item.Time.TotalMilliseconds, item.Time);
-                } else if (item.Time.Subtract(LastDisplayedTime.GetValueOrDefault()) < TimeSpan.Zero) {
-                    LastDisplayedTime = item.Time;
-                    // racing with the analysis...
-                    output.WriteLine(asCsv ? "TSW" : "[TSW]");
-                }
+            // which are coming at the beginning.
+            for (int i = LogIndex; i < LogItems.Count; i++) {
+                DumpItem(output, asCsv, LogItems[i]);
+            }
 
-
-                try {
-                    if (asCsv) {
-                        output.WriteLine("{0}, {1}", item.Event, string.Join(", ", AsCsvStrings(item.Args)));
-                    } else {
-                        output.WriteLine("[{0}] {1}", item.Event, string.Join(", ", item.Args));
-                    }
-                } catch { }
+            for (int i = 0; i < LogIndex; i++) {
+                DumpItem(output, asCsv, LogItems[i]);
             }
             output.Flush();
+        }
+
+        private static void DumpItem(TextWriter output, bool asCsv, LogItem item) {
+            if (!LastDisplayedTime.HasValue || item.Time.Subtract(LastDisplayedTime.GetValueOrDefault()) > TimeSpan.FromMilliseconds(100)) {
+                LastDisplayedTime = item.Time;
+                output.WriteLine(asCsv ? "TS, {0}, {1}" : "[TS] {0}, {1}", item.Time.TotalMilliseconds, item.Time);
+            } else if (item.Time.Subtract(LastDisplayedTime.GetValueOrDefault()) < TimeSpan.Zero) {
+                LastDisplayedTime = item.Time;
+                // racing with the analysis...
+                output.WriteLine(asCsv ? "TSW" : "[TSW]");
+            }
+
+            try {
+                if (asCsv) {
+                    output.WriteLine("{0}, {1}", item.Event, string.Join(", ", AsCsvStrings(item.Args)));
+                } else {
+                    output.WriteLine("[{0}] {1}", item.Event, string.Join(", ", item.Args));
+                }
+            } catch { }
         }
 
         static IEnumerable<string> AsCsvStrings(IEnumerable<object> items) {

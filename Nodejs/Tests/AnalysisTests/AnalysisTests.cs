@@ -1362,53 +1362,15 @@ ee.emit('myevent', 42)
             };
             var sw = new Stopwatch();
             sw.Start();
-            Analyze("C:\\Source\\azure-sdk-tools-xplat", limits);
+            Analysis.Analyze("C:\\Source\\azure-sdk-tools-xplat", limits);
             Console.WriteLine("Time: {0}", sw.Elapsed);
         }
 
         [TestMethod]
         public void AnalyzeExpress() {
-            File.WriteAllText("C:\\Source\\Express\\express.txt", DumpAnalysis("C:\\Source\\Express"));
+            File.WriteAllText("C:\\Source\\Express\\express.txt", Analyzer.DumpAnalysis("C:\\Source\\Express"));
         }
 #endif
-
-        public string DumpAnalysis(string directory) {
-            var analyzer = Analyze(directory);
-
-            var entries = analyzer.AllModules.ToArray();
-            Array.Sort(entries, (x, y) => String.Compare(x.FilePath, y.FilePath));
-            StringBuilder analysis = new StringBuilder();
-            foreach (var entry in entries) {
-                analysis.AppendLine(entry.Analysis.Dump());
-            }
-
-            return analysis.ToString();
-        }
-
-        private static JsAnalyzer Analyze(string directory, AnalysisLimits limits = null) {
-            List<AnalysisFile> files = new List<AnalysisFile>();
-            foreach (var file in Directory.GetFiles(directory, "*", SearchOption.AllDirectories)) {
-                if (String.Equals(Path.GetExtension(file), ".js", StringComparison.OrdinalIgnoreCase)) {
-                    files.Add(new AnalysisFile(file, File.ReadAllText(file)));
-                } else if (String.Equals(Path.GetFileName(file), "package.json", StringComparison.OrdinalIgnoreCase)) {
-                    JavaScriptSerializer serializer = new JavaScriptSerializer();
-                    Dictionary<string, object> json;
-                    try {
-                        json = serializer.Deserialize<Dictionary<string, object>>(File.ReadAllText(file));
-                    } catch {
-                        continue;
-                    }
-
-                    object mainFile;
-                    if (json.TryGetValue("main", out mainFile) && mainFile is string) {
-                        files.Add(AnalysisFile.PackageJson(file, (string)mainFile));
-                    }
-                }
-            }
-
-            var analyzer = Analysis.Analyze(limits, files.ToArray());
-            return analyzer;
-        }
 
 
         public virtual ModuleAnalysis ProcessText(string text) {
@@ -1416,24 +1378,15 @@ ee.emit('myevent', 42)
         }
 
         public static ModuleAnalysis ProcessOneText(string text) {
-            var sourceUnit = GetSourceUnit(text);
+            var sourceUnit = Analysis.GetSourceUnit(text);
             var state = new JsAnalyzer();
             var entry = state.AddModule("fob.js", null);
-            Prepare(entry, sourceUnit);
+            Analysis.Prepare(entry, sourceUnit);
             entry.Analyze(CancellationToken.None);
 
             return entry.Analysis;
         }
 
-        public static void Prepare(IJsProjectEntry entry, TextReader sourceUnit) {
-            var parser = new JSParser(sourceUnit.ReadToEnd());
-            var ast = parser.Parse(new CodeSettings());
-            entry.UpdateTree(ast, null);
-        }
-
-        public static TextReader GetSourceUnit(string text) {
-            return new StringReader(text);
-        }
     }
 
     static class AnalysisTestExtensions {

@@ -27,6 +27,7 @@ namespace Microsoft.NodejsTools.Analysis {
             DictValueTypes = 30;
             IndexTypes = 30;
             AssignedTypes = 100;
+            MergedArgumentTypes = 30;
         }
 
         /// <summary>
@@ -67,28 +68,37 @@ namespace Microsoft.NodejsTools.Analysis {
         /// </summary>
         public int AssignedTypes { get; set; }
 
+        /// <summary>
+        /// The number of types that will force us to start combining
+        /// types for arguments to functions.  This is only used after
+        /// we've exceeded the limits on our cartesian function analysis.
+        /// </summary>
+        public int MergedArgumentTypes { get; set; }
+
         public override bool Equals(object obj) {
             AnalysisLimits other = obj as AnalysisLimits;
             if (other != null) {
-                return 
+                return
                     other.ReturnTypes == ReturnTypes &&
                     other.InstanceMembers == InstanceMembers &&
                     other.DictKeyTypes == DictKeyTypes &&
                     other.DictValueTypes == DictValueTypes &&
                     other.IndexTypes == IndexTypes &&
-                    other.AssignedTypes == AssignedTypes;
+                    other.AssignedTypes == AssignedTypes &&
+                    other.MergedArgumentTypes == MergedArgumentTypes;
             }
             return false;
         }
 
         public override int GetHashCode() {
-            return 
+            return
                 ReturnTypes +
                 InstanceMembers +
                 DictKeyTypes +
                 DictValueTypes +
                 IndexTypes +
-                AssignedTypes;
+                AssignedTypes +
+                MergedArgumentTypes;
         }
     }
 }

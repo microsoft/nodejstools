@@ -169,7 +169,6 @@ namespace Microsoft.NodejsTools.Intellisense {
 
             if (!_incSearch.IsActive) {
                 switch (ch) {
-                    case '@':
                     case '.':
                     case ' ':
                         if (NodejsPackage.Instance.LangPrefs.AutoListMembers) {
