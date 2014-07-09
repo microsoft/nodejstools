@@ -565,7 +565,7 @@ namespace Microsoft.NodejsTools.Project {
                 }
             }
 
-            using (var executeVm = new NpmOutputControlViewModel(NpmController))
+            using (var executeVm = new NpmOutputViewModel(NpmController))
             using (var manager = new NpmPackageInstallWindow(NpmController, executeVm)) {
                 manager.Owner = System.Windows.Application.Current.MainWindow;
                 manager.ShowDialog();

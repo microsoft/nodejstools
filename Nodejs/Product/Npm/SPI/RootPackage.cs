@@ -61,6 +61,10 @@ The following error was reported:
             get { return null == PackageJson ? null : PackageJson.Description; }
         }
 
+        public string Homepage {
+            get { return null == PackageJson ? null : PackageJson.Homepage; }
+        }
+
         public string Path { get; private set; }
 
         public INodeModules Modules { get; private set; }

@@ -13,10 +13,13 @@
  * ***************************************************************************/
 
 using System;
+using System.Diagnostics;
 using System.Windows;
 using System.Windows.Controls;
+using System.Windows.Documents;
 using System.Windows.Input;
 using System.Windows.Media;
+using System.Windows.Threading;
 using Microsoft.NodejsTools.Npm;
 using Microsoft.VisualStudioTools;
 
@@ -26,18 +29,29 @@ namespace Microsoft.NodejsTools.NpmUI {
     /// </summary>
     sealed partial class NpmPackageInstallWindow : DialogWindowVersioningWorkaround, IDisposable {
         private readonly NpmPackageInstallViewModel _vm;
+        private NpmOutputWindow _outputWindow;
         
-        internal NpmPackageInstallWindow(INpmController controller, NpmOutputControlViewModel executeVm) {
+        internal NpmPackageInstallWindow(INpmController controller, NpmOutputViewModel executeVm) {
             DataContext = _vm = new NpmPackageInstallViewModel(executeVm, Dispatcher);
             _vm.NpmController = controller;
             InitializeComponent();
-            ExecuteControl.DataContext = executeVm;
+            _outputWindow = new NpmOutputWindow();
+            _outputWindow.Closing += _outputWindow_Closing;
+            _outputWindow.Topmost = true;
+            _outputWindow.DataContext = _vm.ExecuteViewModel;
         }
 
         public void Dispose() {
             //  This will unregister event handlers on the controller and prevent
             //  us from leaking view models.
+            _outputWindow.Closing -= _outputWindow_Closing;
+            _outputWindow.Close();
             _vm.NpmController = null;
+        }
+
+        void _outputWindow_Closing(object sender, System.ComponentModel.CancelEventArgs e) {
+            e.Cancel = true;
+            _outputWindow.Hide();
         }
 
         private void Close_Executed(object sender, ExecutedRoutedEventArgs e) {
@@ -108,6 +122,20 @@ namespace Microsoft.NodejsTools.NpmUI {
             if (e.Key == Key.Up && _packageList.SelectedIndex == 0) {
                 FilterTextBox.Focus();
                 e.Handled = true;
+            }
+        }
+
+        private void ShowOutputWindow_Click(object sender, RoutedEventArgs e) {
+            _outputWindow.Show();
+            if (_outputWindow.WindowState == WindowState.Minimized) {
+                _outputWindow.WindowState = WindowState.Normal;
+            }
+        }
+
+        private void HomepageLink_Click(object sender, RoutedEventArgs e) {
+            var homepageLink = (string)HomepageLink.Content;
+            if (!string.IsNullOrEmpty(homepageLink)) {
+                Process.Start(homepageLink);
             }
         }
     }

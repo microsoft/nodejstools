@@ -54,25 +54,24 @@ namespace Microsoft.NodejsTools.NpmUI {
         private PackageCatalogEntryViewModel _selectedPackage;
         private bool _npmNotFound;
         private bool _isCatalogEmpty;
-        private Visibility _catalogControlVisibility = Visibility.Visible;
+        private Visibility _catalogControlVisibility = Visibility.Collapsed;
         private string _catalogLoadingMessage = string.Empty;
-        private Visibility _loadingCatalogControlVisibility = Visibility.Hidden;
+        private Visibility _loadingCatalogControlVisibility = Visibility.Collapsed;
         private Visibility _filteredCatalogListVisibility = Visibility.Visible;
         private int _selectedDependencyTypeIndex;
 
         private string _currentFilter;
         private string _filterText;
         private readonly Timer _filterTimer;
+        private string _arguments = string.Empty;
+        private bool _saveToPackageJson = true;
 
         private readonly Dispatcher _dispatcher;
 
-        private NpmOutputControlViewModel _executeViewModel;
-
-        private readonly InstallCommandPackageCatalogEntryViewModel _installCommand =
-            new InstallCommandPackageCatalogEntryViewModel();
+        private NpmOutputViewModel _executeViewModel;
         
         public NpmPackageInstallViewModel(
-            NpmOutputControlViewModel executeViewModel,
+            NpmOutputViewModel executeViewModel,
             Dispatcher dispatcher
         ) {
             _dispatcher = dispatcher;
@@ -107,7 +106,7 @@ namespace Microsoft.NodejsTools.NpmUI {
             StartFilter();
         }
 
-        public NpmOutputControlViewModel ExecuteViewModel {
+        public NpmOutputViewModel ExecuteViewModel {
             get { return _executeViewModel; }
         }
 
@@ -179,8 +178,8 @@ namespace Microsoft.NodejsTools.NpmUI {
         private async void LoadCatalog(bool forceRefresh) {
             IsLoadingCatalog = true;
 
-            FilteredCatalogListVisibility = Visibility.Hidden;
-            CatalogControlVisibility = Visibility.Hidden;
+            FilteredCatalogListVisibility = Visibility.Collapsed;
+            CatalogControlVisibility = Visibility.Collapsed;
             LoadingCatalogControlVisibility = Visibility.Visible;
             LoadingCatalogMessage = SR.GetString(SR.CatalogLoadingDefault);
 
@@ -210,7 +209,7 @@ namespace Microsoft.NodejsTools.NpmUI {
             IsLoadingCatalog = false;
 
             if (showList) {
-                LoadingCatalogControlVisibility = Visibility.Hidden;
+                LoadingCatalogControlVisibility = Visibility.Collapsed;
                 FilteredCatalogListVisibility = Visibility.Visible;
                 StartFilter();
             }
@@ -254,7 +253,6 @@ namespace Microsoft.NodejsTools.NpmUI {
             get { return _filterText; }
             set {
                 _filterText = value;
-                _installCommand.Command = value;
                 if (_currentFilter != _filterText) {
                     StartFilter();
                 }
@@ -281,9 +279,7 @@ namespace Microsoft.NodejsTools.NpmUI {
                     globalPackages = controller.GlobalPackages;
                 }
 
-                newItems = new List<PackageCatalogEntryViewModel> {
-                    _installCommand
-                };
+                newItems = new List<PackageCatalogEntryViewModel>();
 
                 if (rootPackage != null && globalPackages != null) {
                 newItems.AddRange(filtered.Select(package => new ReadOnlyPackageCatalogEntryViewModel(
@@ -301,7 +297,7 @@ namespace Microsoft.NodejsTools.NpmUI {
                         _currentFilter = filterText;
                     }
                 }
-                SelectedPackage = _installCommand;
+                SelectedPackage = FilteredPackages.FirstOrDefault();
 
                 LastRefreshedMessage = IsCatalogEmpty
                     ? LastRefreshedMessageProvider.RefreshFailed
@@ -354,22 +350,17 @@ namespace Microsoft.NodejsTools.NpmUI {
             get {
                 return Indices.IndexGlobal == (Indices) SelectedDependencyTypeIndex
                     ? Visibility.Visible
-                    : Visibility.Hidden;
+                    : Visibility.Collapsed;
             }
         }
 
         internal bool CanInstall(PackageCatalogEntryViewModel package) {
-            var install = package as InstallCommandPackageCatalogEntryViewModel;
-            if (install != null) {
-                return !string.IsNullOrEmpty(install.Command);
-            }
-
             return package != null;
         }
 
         internal void Install(PackageCatalogEntryViewModel package) {
             var type = DependencyType.Standard;
-            var global = false;
+            var isGlobal = false;
             switch ((Indices)SelectedDependencyTypeIndex) {
                 case Indices.IndexDev:
                     type = DependencyType.Development;
@@ -380,21 +371,29 @@ namespace Microsoft.NodejsTools.NpmUI {
                     break;
 
                 case Indices.IndexGlobal:
-                    global = true;
+                    isGlobal = true;
                     break;
             }
 
-            var install = package as InstallCommandPackageCatalogEntryViewModel;
-            if (install != null) {
-                if (!string.IsNullOrEmpty(install.Command)) {
-                    _executeViewModel.QueueCommand("install " + install.Command);
-                }
-            } else if (package != null) {
-                if (global) {
-                    _executeViewModel.QueueInstallGlobalPackage(package.Name, "*");
-                } else {
-                    _executeViewModel.QueueInstallPackage(package.Name, "*", type);
-                }
+            if (!string.IsNullOrEmpty(package.Name)) {
+                _executeViewModel.QueueCommand(
+                    NpmArgumentBuilder.GetNpmInstallArguments(package.Name, string.Empty, type, isGlobal, SaveToPackageJson, Arguments));
+            }
+        }
+
+        public string Arguments {
+            get { return _arguments; }
+            set {
+                _arguments = value;
+                OnPropertyChanged();
+            }
+        }
+
+        public bool SaveToPackageJson {
+            get { return _saveToPackageJson; }
+            set {
+                _saveToPackageJson = value;
+                OnPropertyChanged();
             }
         }
 

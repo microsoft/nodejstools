@@ -18,25 +18,34 @@ namespace Microsoft.NodejsTools.Npm {
             string versionRange,
             DependencyType type,
             bool global = false,
-            bool saveToPackageJson = true) {
-            if (global || saveToPackageJson) {
-                return string.Format(
-                    "install {0} -{1}",
-                    string.IsNullOrEmpty(versionRange)
-                        ? packageName
-                        : string.Format("{0}@\"{1}\"", packageName, versionRange),
-                    global
-                        ? "g"
-                        : (type == DependencyType.Standard
-                            ? "-save"
-                            : (type == DependencyType.Development ? "-save-dev" : "-save-optional")));
+            bool saveToPackageJson = true,
+            string otherArguments = "") 
+        {
+            string dependencyArguments = string.Empty;
+            if (global) {
+                dependencyArguments = "-g";
+            } else if (saveToPackageJson) {
+                switch(type) {
+                    case DependencyType.Standard:
+                        dependencyArguments = "--save";
+                        break;
+                    case DependencyType.Development:
+                        dependencyArguments = "--save-dev";
+                        break;
+                    case DependencyType.Optional:
+                        dependencyArguments = "--save-optional";
+                        break;
+                }
             }
 
-            return string.Format(
-                "install {0}",
-                string.IsNullOrEmpty(versionRange)
-                    ? packageName
-                    : string.Format("{0}@\"{1}\"", packageName, versionRange));
+            otherArguments = otherArguments.TrimStart(' ', '\t');
+            if (otherArguments.StartsWith("@")) {
+                return string.Format("install {0}{1} {2}", packageName, otherArguments, dependencyArguments);
+            } else if (!string.IsNullOrEmpty(versionRange)) {
+                return string.Format("install {0}@\"{1}\" {2} {3}", packageName, versionRange, dependencyArguments, otherArguments);
+            }
+
+            return string.Format("install {0} {1} {2}", packageName, dependencyArguments, otherArguments);
         }
     }
 }

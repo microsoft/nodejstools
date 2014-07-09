@@ -23,6 +23,7 @@ namespace Microsoft.NodejsTools.Npm.SPI {
         public SemverVersion Version { get; internal set; }
         public IPerson Author { get; internal set; }
         public string Description { get; internal set; }
+        public string Homepage { get; internal set; }
         public string Path { get; internal set; }
         public string PublishDateTimeString { get; internal set; }
         public string RequestedVersionRange { get; internal set; }

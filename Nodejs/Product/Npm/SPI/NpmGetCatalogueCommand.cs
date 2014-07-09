@@ -82,6 +82,9 @@ namespace Microsoft.NodejsTools.Npm.SPI {
                         }
 
                         AddAuthor(builder, module["author"]);
+
+                        var homepage = module["homepage"];
+                        builder.Homepage = (string)homepage;
                         
 
                         results.Add(builder.Build());

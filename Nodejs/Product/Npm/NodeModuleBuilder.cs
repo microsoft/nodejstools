@@ -66,6 +66,8 @@ namespace Microsoft.NodejsTools.Npm {
 
         public SemverVersion Version { get; set; }
 
+        public string Homepage { get; set; }
+
         public void AppendToDescription(string text) {
             _descriptionBuff.Append(text);
         }
@@ -123,6 +125,7 @@ namespace Microsoft.NodejsTools.Npm {
             proxy.Name = Name;
             proxy.Version = Version;
             proxy.Description = Description;
+            proxy.Homepage = Homepage;
             proxy.PublishDateTimeString = PublishDateTimeString;
             proxy.RequestedVersionRange = RequestedVersionRange;
             proxy.Flags = Flags;

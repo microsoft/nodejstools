@@ -126,24 +126,24 @@ namespace Microsoft.Nodejs.Tests.UI {
                     TestUtilities.UI.Keyboard.PressAndRelease(Key.Tab);
                     WaitForUIInputIdle();
 
+                    Assert.IsTrue(npmWindow.SaveToPackageJsonCheckbox.IsKeyboardFocused);
+
+                    TestUtilities.UI.Keyboard.PressAndRelease(Key.Tab);
+                    WaitForUIInputIdle();
+
+                    Assert.IsTrue(npmWindow.ArgumentsTextBox.IsKeyboardFocused);
+
+                    TestUtilities.UI.Keyboard.PressAndRelease(Key.Tab);
+                    WaitForUIInputIdle();
+
                     Assert.IsTrue(npmWindow.InstallButton.IsKeyboardFocused);
-
-                    TestUtilities.UI.Keyboard.PressAndRelease(Key.Tab);
-                    WaitForUIInputIdle();
-
-                    Assert.IsTrue(npmWindow.RefreshButton.IsKeyboardFocused);
-
-                    TestUtilities.UI.Keyboard.PressAndRelease(Key.Tab);
-                    WaitForUIInputIdle();
-
-                    Assert.IsTrue(npmWindow.CloseButton.IsKeyboardFocused);
                 });
             }
         }
 
         private NpmPackageInstallWindow OpenNpmWindowAndWaitForReady() {
             var npmControllerMock = GetNpmControllerMock();
-            NpmPackageInstallWindow npmWindow = new NpmPackageInstallWindow(npmControllerMock.Object, new NpmOutputControlViewModel(npmControllerMock.Object));
+            NpmPackageInstallWindow npmWindow = new NpmPackageInstallWindow(npmControllerMock.Object, new NpmOutputViewModel(npmControllerMock.Object));
             npmWindow.Show();
             WaitForPackageListItemsToAppear(npmWindow);
             return npmWindow;
@@ -160,7 +160,8 @@ namespace Microsoft.Nodejs.Tests.UI {
 
             var packageList = new List<IPackage>() {
                 packageMock.Object,
-                packageMock.Object 
+                packageMock.Object,
+                packageMock.Object
             };
 
             var globalPackages = new Mock<IGlobalPackages>();

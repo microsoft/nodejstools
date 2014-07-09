@@ -6,7 +6,7 @@
     xmlns:npmUi="clr-namespace:Microsoft.NodejsTools.NpmUI"
     xmlns:ui="clr-namespace:Microsoft.VisualStudioTools"
     xmlns:wpf="clr-namespace:Microsoft.VisualStudioTools.Wpf"
-    Title="npm Package Manager"
+    Title="Install New npm Modules"
     Height="500"
     MinHeight="500"
     Width="600"
@@ -17,39 +17,24 @@
     <!-- Theming -->
     <Window.Resources>
         <ResourceDictionary>
+            <Geometry x:Key="SearchGeometry">F1 M 8.5,7.0 C 7.12,7.00 6.0,5.88 6.0,4.5 C 6.0,3.12 7.12,2.0 8.5,2.0 C 9.88,2.0 11.0,3.12 11.0,4.5 C 11.0,5.88 9.88,7.0 8.5,7.0 Z M 8.5,0.0 C 6.02,0.0 4.0,2.02 4.0,4.500 C 4.0,5.23 4.19,5.9 4.49,6.5 L 0.0,11.0 L 2.0,13.0 L 6.49,8.51 C 7.1,8.81 7.77,9.0 8.5,9.0 C 11.0,9.0 13.0,7.0 13.0,4.5 C 13.0,2.02 11.0,0.0 8.5,0.0 Z</Geometry>
+            <Style x:Key="SearchStyle" TargetType="ContentControl">
+                <Setter Property="ContentTemplate">
+                    <Setter.Value>
+                        <DataTemplate>
+                            <Path Data="{StaticResource SearchGeometry}" Fill="{DynamicResource {x:Static wpf:Controls.SearchGlyphBrushKey}}" HorizontalAlignment="Right" VerticalAlignment="Center" Margin="0 0 4 0" />
+                        </DataTemplate>
+                    </Setter.Value>
+                </Setter>
+            </Style>
             <ResourceDictionary.MergedDictionaries>
+
                 <ResourceDictionary Source="pack://application:,,,/Microsoft.NodejsTools;component/SharedProject/Wpf/Controls.xaml" />
-                
                 <ResourceDictionary>
                     <Style TargetType="{x:Type ListViewItem}" BasedOn="{StaticResource {x:Type ListViewItem}}">
                         <Setter Property="HorizontalAlignment" Value="Stretch" />
                     </Style>
-                    
-                    <DataTemplate DataType="{x:Type npmUi:InstallCommandPackageCatalogEntryViewModel}">
-                        <Grid>
-                            <Grid.RowDefinitions>
-                                <!-- Command -->
-                                <RowDefinition Height="auto" />
-                                <!-- Separator -->
-                                <RowDefinition Height="auto" />
-                            </Grid.RowDefinitions>
 
-                            <TextBlock Grid.Row="0" TextWrapping="Wrap" Margin="3 6">
-                                <Run>Execute</Run>
-                                <Run FontWeight="Bold">npm install</Run>
-                                <Run FontWeight="Bold" Text="{Binding Name,Mode=OneWay}" />
-                            </TextBlock>
-                            
-                            <Separator Grid.Row="1" Margin="0 4 0 2" />
-
-                            <Grid.InputBindings>
-                                <MouseBinding Gesture="LeftDoubleClick"
-                                              Command="{x:Static npmUi:NpmPackageInstallViewModel.InstallCommand}"
-                                              CommandParameter="{Binding}" />
-                            </Grid.InputBindings>
-                        </Grid>
-                    </DataTemplate>
-                    
                     <DataTemplate DataType="{x:Type npmUi:ReadOnlyPackageCatalogEntryViewModel}">
                         <Grid>
                             <Grid.RowDefinitions>
@@ -91,7 +76,8 @@
                             <TextBlock Grid.Row="1"
                                        Margin="3"
                                        Text="{Binding Description,Mode=OneWay}"
-                                       TextWrapping="Wrap" />
+                                       TextWrapping="Wrap" 
+                                       TextTrimming="CharacterEllipsis" Height="30"/>
 
                             <Grid Grid.Row="2" Margin="3 6 3 3">
                                 <Grid.ColumnDefinitions>
@@ -100,11 +86,6 @@
                                     <ColumnDefinition Width="auto" />
                                     <ColumnDefinition Width="auto" />
                                 </Grid.ColumnDefinitions>
-
-                                <TextBlock Grid.Column="0"
-                                           Text="{Binding Keywords,Mode=OneWay}"
-                                           TextWrapping="Wrap"
-                                           Opacity="0.5" />
 
                                 <TextBlock Grid.Column="1"
                                            x:Name="LocalInstallMessage"
@@ -126,7 +107,7 @@
                                            Visibility="Collapsed">
                                     <Run xml:space="preserve">; </Run>
                                 </TextBlock>
-                                
+
                                 <TextBlock Grid.Column="3"
                                            x:Name="GlobalInstallMessage"
                                            Visibility="Collapsed"
@@ -145,14 +126,14 @@
                             </Grid>
 
                             <Separator Grid.Row="3" Margin="0 4 0 2" />
-                            
+
                             <Grid.InputBindings>
                                 <MouseBinding Gesture="LeftDoubleClick"
                                               Command="{x:Static npmUi:NpmPackageInstallViewModel.InstallCommand}"
                                               CommandParameter="{Binding}" />
                             </Grid.InputBindings>
                         </Grid>
-                        
+
                         <DataTemplate.Triggers>
                             <DataTrigger Binding="{Binding IsInstalledLocally}" Value="true">
                                 <Setter TargetName="LocalInstallMessage" Property="Visibility" Value="Visible" />
@@ -177,7 +158,7 @@
                             </MultiDataTrigger>
                         </DataTemplate.Triggers>
                     </DataTemplate>
-                    
+
                     <DataTemplate DataType="{x:Type npmUi:LastRefreshedMessageProvider}">
                         <Grid HorizontalAlignment="Stretch">
                             <Grid.ColumnDefinitions>
@@ -187,7 +168,7 @@
                             <TextBlock Grid.Column="0"
                                        Margin="0 0 3 0"
                                        VerticalAlignment="Center">
-                                Catalog last updated: 
+                                Catalog Updated
                             </TextBlock>
                             <TextBlock Grid.Column="1"
                                        x:Name="Message"
@@ -203,11 +184,24 @@
                             </DataTrigger>
                         </DataTemplate.Triggers>
                     </DataTemplate>
+
+                    <DataTemplate DataType="{x:Type npmUi:NpmOutputViewModel}">
+                        <Ellipse x:Name="StatusIcon" Width="14" Height="14" Stroke="Gray" StrokeThickness="1" Margin="0 0 2 0" VerticalAlignment="Center"/>
+
+                        <DataTemplate.Triggers>
+                            <DataTrigger Binding="{Binding WithErrors}" Value="True">
+                                <Setter TargetName="StatusIcon" Property="Fill" Value="Red"/>
+                            </DataTrigger>
+                            <DataTrigger Binding="{Binding WithErrors}" Value="False">
+                                <Setter TargetName="StatusIcon" Property="Fill" Value="#80B5FFA9"/>
+                            </DataTrigger>
+                        </DataTemplate.Triggers>
+                    </DataTemplate>
                 </ResourceDictionary>
             </ResourceDictionary.MergedDictionaries>
         </ResourceDictionary>
     </Window.Resources>
-    
+
     <Window.CommandBindings>
         <CommandBinding Command="ApplicationCommands.Close"
                         Executed="Close_Executed"
@@ -224,105 +218,77 @@
         <KeyBinding Command="{x:Static npmUi:NpmPackageInstallViewModel.InstallCommand}" Gesture="ENTER" />
     </Window.InputBindings>
 
-    <Grid>
-        <DockPanel VerticalAlignment="Stretch"
+    <Grid VerticalAlignment="Stretch"
                    Height="Auto"
                    HorizontalAlignment="Stretch"
                    Width="Auto"
                    Margin="4 4 4 4">
+        <Grid.RowDefinitions>
+            <RowDefinition Height="*" />
+            <RowDefinition Height="Auto"/>
+        </Grid.RowDefinitions>
 
-            <!-- These labels should be Hidden but not Collapsed, to ensure
-                 the spacing is correct. -->
-            <wpf:LabelledControl Title="Enter a search term or arguments for npm install:"
-                                 DockPanel.Dock="Top"
-                                 HorizontalAlignment="Stretch"
-                                 VerticalAlignment="Center"
-                                 Visibility="{Binding FilterControlsVisibility}">
-                <Grid>
-                    <Grid.ColumnDefinitions>
-                        <!-- Text field -->
-                        <ColumnDefinition Width="*" />
-                        <!-- Dependency type: standard, dev, optional, global -->
-                        <ColumnDefinition Width="Auto" />
-                        <!-- Install button -->
-                        <ColumnDefinition Width="Auto" />
-                    </Grid.ColumnDefinitions>
-                    <Grid.RowDefinitions>
-                        <RowDefinition Height="Auto" />
-                    </Grid.RowDefinitions>
-                    <TextBox Grid.Column="0" Grid.Row="0"
+        <Grid Grid.Row="1">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="*" />
+                <ColumnDefinition Width="Auto" />
+            </Grid.ColumnDefinitions>
+            <Grid.RowDefinitions>
+                <RowDefinition Height="*"/>
+                <RowDefinition Height="Auto"/>
+            </Grid.RowDefinitions>
+            <ProgressBar Name="_progress"
+                             Height="4"
+                             IsIndeterminate="true"
+                             Visibility="{Binding Path=ExecuteViewModel.ExecutionProgressVisibility}" Grid.Row="1" Grid.ColumnSpan="2"/>
+            <StackPanel Grid.Row="0" Grid.Column="0" VerticalAlignment="Center">
+                <StackPanel HorizontalAlignment="Stretch" VerticalAlignment="Bottom" Margin="4" Orientation="Horizontal">
+
+                    <ContentControl Content="{Binding ExecuteViewModel}" Focusable="False" IsTabStop="False"/>
+
+                    <Button x:Name="npmInstallOutputLink"
+                            Style="{StaticResource NavigationButton}"
+                            Click="ShowOutputWindow_Click"
+                            KeyboardNavigation.TabIndex="9"
+                            ContentStringFormat="{}npm install Output: {0}"
+                            Content="{Binding ExecuteViewModel.StatusText}" />
+                </StackPanel>
+            </StackPanel>
+
+            <Button x:Name="CloseButton"
+                        Grid.Column="1"
+                        Command="ApplicationCommands.Close"
+                        IsCancel="True"
+                        KeyboardNavigation.TabIndex="7">
+                _Close
+            </Button>
+        </Grid>
+
+        <Grid Visibility="{Binding FilterControlsVisibility}">
+            <Grid.RowDefinitions>
+                <RowDefinition Height="Auto"/>
+                <RowDefinition Height="*" MinHeight="30" />
+                <RowDefinition Height="Auto" />
+            </Grid.RowDefinitions>
+
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="5*"/>
+                <ColumnDefinition Width="7*"/>
+            </Grid.ColumnDefinitions>
+
+            <TextBox Grid.Column="0" Grid.Row="0"
                              x:Name="FilterTextBox"
                              IsVisibleChanged="FilterTextBox_IsVisibleChanged"
                              Height="24"
                              Text="{Binding FilterText,UpdateSourceTrigger=PropertyChanged}"
                              PreviewKeyDown="FilterTextBox_PreviewKeyDown"
-                             KeyboardNavigation.TabIndex="0" />
-
-                    <ComboBox x:Name="DependencyComboBox"
-                              Grid.Column="1"
-                              Width="100"
-                              MaxHeight="24"
-                              Padding="3"
-                              Margin="4 0 0 0"
-                              SelectedIndex="{Binding SelectedDependencyTypeIndex}"
-                              KeyboardNavigation.TabIndex="2">
-                        <ComboBoxItem Tag="St" IsSelected="True">Standard</ComboBoxItem>
-                        <ComboBoxItem Tag="Dev">Development</ComboBoxItem>
-                        <ComboBoxItem Tag="Opt">Optional</ComboBoxItem>
-                        <ComboBoxItem Tag="Global">Global</ComboBoxItem>
-                    </ComboBox>
-                    <Button x:Name="InstallButton"
-                            Grid.Column="2"
-                            Grid.Row="0"
-                            Content="Install"
-                            Command="{x:Static npmUi:NpmPackageInstallViewModel.InstallCommand}"
-                            CommandParameter="{Binding SelectedPackage}"
-                            KeyboardNavigation.TabIndex="3" />
-                </Grid>
-            </wpf:LabelledControl>
-
-            <!-- Dialog control -->
-            
-            <Grid DockPanel.Dock="Bottom">
-                <Grid.ColumnDefinitions>
-                    <ColumnDefinition Width="*" />
-                    <ColumnDefinition Width="auto" />
-                </Grid.ColumnDefinitions>
-
-                <Border Style="{StaticResource TooltipBorder}"
-                        Visibility="{Binding GlobalWarningVisibility}">
-                    <TextBlock VerticalAlignment="Center"
-                               Foreground="{DynamicResource {x:Static wpf:Controls.TooltipTextKey}}">
-                        <Run FontWeight="Bold">Warning:</Run> Global installs
-                        will affect other apps that use packages via 'npm link'.
-                    </TextBlock>
-                </Border>
-                
-                <Button x:Name="CloseButton"
-                        Grid.Column="1"
-                        Command="ApplicationCommands.Close"
-                        IsCancel="True"
-                        KeyboardNavigation.TabIndex="5">
-                    _Close
-                </Button>
-            </Grid>
-            
-            
-            <Grid>
-                <Grid.RowDefinitions>
-                    <RowDefinition Height="3*" MinHeight="30" />
-                    <RowDefinition Height="Auto" />
-                    <RowDefinition Height="*" />
-                </Grid.RowDefinitions>
-                
-                <!-- Package List -->
-                
-                <ListView x:Name="_packageList"
-                          Grid.Row="0"
+                             KeyboardNavigation.TabIndex="0"/>
+            <ContentControl Style="{StaticResource SearchStyle}" HorizontalAlignment="Stretch" VerticalAlignment="Stretch" IsTabStop="False" Focusable="False"/>
+            <ListView x:Name="_packageList"
+                          Grid.Row="1"
                           ItemsSource="{Binding FilteredPackages}"
                           SelectedItem="{Binding SelectedPackage}"
                           SelectionChanged="_packageList_SelectionChanged"
-                          Visibility="{Binding FilteredCatalogListVisibility}"
                           PreviewKeyDown="_packageList_PreviewKeyDown"
                           HorizontalContentAlignment="Stretch"
                           ScrollViewer.HorizontalScrollBarVisibility="Disabled"
@@ -330,83 +296,158 @@
                           KeyboardNavigation.TabIndex="1" />
 
 
-                <StackPanel Grid.Row="0"
+
+
+            <Grid Grid.Row="2" VerticalAlignment="Top" Margin="0 4 0 0">
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="*" />
+                    <ColumnDefinition Width="Auto" />
+                </Grid.ColumnDefinitions>
+
+                <!-- Package cache control -->
+
+
+                <ContentControl Grid.Column="0"
+                                    Content="{Binding LastRefreshedMessage}"
+                                    Foreground="{DynamicResource {x:Static wpf:Controls.ForegroundKey}}"
+                                    VerticalAlignment="Center"
+                                    HorizontalAlignment="Stretch"
+                                    Focusable="False"
+                                    IsTabStop="False"/>
+
+                <Button Grid.Column="1" HorizontalAlignment="Right" Margin="0"
+                        Name="RefreshButton"
+                        Command="{x:Static npmUi:NpmPackageInstallViewModel.RefreshCatalogCommand}"
+                        KeyboardNavigation.TabIndex="8"
+                        xml:space="preserve">Refresh</Button>
+            </Grid>
+
+            <Grid Grid.Column="1" Grid.RowSpan="2" Margin="8 0 0 0" >
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="*"/>
+                    <RowDefinition Height="auto"/>
+                </Grid.RowDefinitions>
+                <ScrollViewer VerticalScrollBarVisibility="Auto">
+                    <StackPanel Name="PackageInfo">
+                        <TextBlock>
+                            <TextBlock FontSize="15pt" FontWeight="Bold" Text="{Binding Path=SelectedPackage.Name, Mode=OneWay}"></TextBlock>
+                            <TextBlock Text="{Binding Path=SelectedPackage.Version, Mode=OneWay}"/>
+                        </TextBlock>
+
+                        <TextBlock Margin="0 4 0 4"
+                            Text="{Binding SelectedPackage.Keywords, Mode=OneWay}"
+                            TextWrapping="Wrap"
+                            Opacity="0.5" />
+
+                        <StackPanel Orientation="Horizontal" Margin="0 4 0 4" x:Name="AuthorBlock" Visibility="{Binding SelectedPackage.AuthorVisibility, Mode=OneWay}">
+                            <TextBlock FontWeight="Bold">Author:</TextBlock>
+                            <TextBlock Text="{Binding Path=SelectedPackage.Author, Mode=OneWay}"/>
+                        </StackPanel>
+
+                        <StackPanel Margin="0 4 0 4" x:Name="HomepageBlock"
+                                    Visibility="{Binding SelectedPackage.HomepageVisibility}"
+                                    Orientation="Horizontal">
+                            <TextBlock FontWeight="Bold">Homepage:</TextBlock>
+                            <Button x:Name="HomepageLink" Style="{StaticResource NavigationButton}"
+                                    Content="{Binding Path=SelectedPackage.Homepage, Mode=OneWay}"
+                                    Click="HomepageLink_Click"
+                                    KeyboardNavigation.IsTabStop="False"
+                                    Margin="0"
+                                    Padding="0"/>
+                        </StackPanel>
+
+                        <StackPanel Margin="0 4 0 4" Orientation="Horizontal" x:Name="DescriptionBlock" Visibility="{Binding SelectedPackage.DescriptionVisibility, Mode=OneWay}">
+                             <TextBlock FontWeight="Bold">Description:</TextBlock>
+                            <TextBlock Text="{Binding Path=SelectedPackage.Description, Mode=OneWay}"/>
+                        </StackPanel>
+
+                    </StackPanel>
+                </ScrollViewer>
+
+                <StackPanel Grid.Row="1"
+                        Orientation="Vertical"
+                        HorizontalAlignment="Stretch">
+                    <Separator/>
+                    <Grid x:Name="InstallOptions" DockPanel.Dock="Top" VerticalAlignment="Stretch">
+                        <Grid.RowDefinitions>
+                            <RowDefinition/>
+                            <RowDefinition/>
+                            <RowDefinition/>
+                            <RowDefinition/>
+                            <RowDefinition/>
+                            <RowDefinition/>
+                            <RowDefinition/>
+                        </Grid.RowDefinitions>
+
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="auto"/>
+                            <ColumnDefinition/>
+                        </Grid.ColumnDefinitions>
+                        <Border Style="{StaticResource TooltipBorder}"
+                        Visibility="{Binding GlobalWarningVisibility}" Grid.Row="5" Grid.Column="0" Grid.ColumnSpan="2">
+                            <TextBlock VerticalAlignment="Center" HorizontalAlignment="Stretch"
+                               Foreground="{DynamicResource {x:Static wpf:Controls.TooltipTextKey}}" TextWrapping="Wrap">
+                        <Run FontWeight="Bold">Warning:</Run> Global installs
+                        will affect other apps that use packages via 'npm link'.
+                            </TextBlock>
+                        </Border>
+                        <Button x:Name="InstallButton"
+                            Grid.Column="0" Grid.ColumnSpan="2"
+                            Grid.Row="6"
+                            Content="Install"
+                                    Margin="4"
+                            Height="30"
+                            Command="{x:Static npmUi:NpmPackageInstallViewModel.InstallCommand}"
+                            CommandParameter="{Binding SelectedPackage}"
+                            KeyboardNavigation.TabIndex="6"/>
+
+                        <TextBlock Grid.Row="1" FontWeight="Bold" Padding="4">Options</TextBlock>
+                        <Label Grid.Row="4" HorizontalAlignment="Right" VerticalAlignment="Center">Other npm arguments</Label>
+                        <TextBox x:Name="ArgumentsTextBox" Grid.Column="1" Grid.Row="4" HorizontalAlignment="Stretch" Text="{Binding Arguments}" Margin="4" TabIndex="5"/>
+                        <Label Grid.Row="3" HorizontalAlignment="Right" VerticalAlignment="Center">Add to package.json</Label>
+                        <CheckBox x:Name="SaveToPackageJsonCheckbox" Grid.Column="1" Grid.Row="3" VerticalAlignment="Center" HorizontalAlignment="Left" IsChecked="{Binding SaveToPackageJson}" Margin="4" TabIndex="4">(recommended)</CheckBox>
+                        <Label Grid.Row="2" HorizontalAlignment="Right" VerticalAlignment="Center">Dependency type</Label>
+
+                        <ComboBox Name="DependencyComboBox"
+                                  Grid.Row="2"
+                                  Grid.Column="1"
+                                  Width="100"
+                                  MaxHeight="24"
+                                      Margin="4"
+                                  KeyboardNavigation.TabIndex="3" SelectedIndex="{Binding SelectedDependencyTypeIndex}"
+                              HorizontalAlignment="Left">
+                            <ComboBoxItem Tag="St" IsSelected="True">Standard</ComboBoxItem>
+                            <ComboBoxItem Tag="Dev">Development</ComboBoxItem>
+                            <ComboBoxItem Tag="Opt">Optional</ComboBoxItem>
+                            <ComboBoxItem Tag="Global">Global</ComboBoxItem>
+                        </ComboBox>
+
+                    </Grid>
+
+                </StackPanel>
+            </Grid>
+
+            <!-- Cache control and output -->
+            <!-- (Together in the same grid so the splitter works) -->
+
+        </Grid>
+
+        <Grid Visibility="{Binding LoadingCatalogControlVisibility}">
+            <StackPanel 
                             HorizontalAlignment="Stretch"
-                            VerticalAlignment="Center"
-                            Visibility="{Binding LoadingCatalogControlVisibility}">
-                    <Label Content="{Binding LoadingCatalogMessage}"
+                            VerticalAlignment="Center">
+
+                <Label Content="{Binding LoadingCatalogMessage}"
                            HorizontalAlignment="Center"
-                           HorizontalContentAlignment="Center"></Label>
-                    <ProgressBar Height="16"
+                           HorizontalContentAlignment="Center" />
+
+                <ProgressBar Height="16"
                                  Margin="50, 4, 50, 4"
                                  IsIndeterminate="True"
                                  IsEnabled="{Binding IsLoadingCatalog}" />
-                </StackPanel>
+            </StackPanel>
+        </Grid>
 
-                <!-- Splitter -->
-
-                <Separator Grid.Row="1"
-                           Margin="0 3 0 5"
-                           Height="2"
-                           IsHitTestVisible="False"/>
-                <Separator Grid.Row="1"
-                           Margin="0 5 0 3"
-                           Height="2"
-                           IsHitTestVisible="False"/>
-                <GridSplitter Grid.Row="1"
-                              ResizeBehavior="PreviousAndNext"
-                              ResizeDirection="Rows"
-                              Background="Transparent"
-                              HorizontalAlignment="Stretch"
-                              VerticalAlignment="Stretch"
-                              KeyboardNavigation.IsTabStop="False" />
-
-                <!-- Cache control and output -->
-                <!-- (Together in the same grid so the splitter works) -->
-                
-                <Grid Grid.Row="2">
-                    <Grid.RowDefinitions>
-                        <RowDefinition Height="auto" />
-                        <RowDefinition Height="*" />
-                    </Grid.RowDefinitions>
-                    
-                    <!-- Package cache control -->
-
-                    <Grid Grid.Row="0"
-                          HorizontalAlignment="Stretch"
-                          Visibility="{Binding CatalogControlVisibility}">
-                        <Grid.ColumnDefinitions>
-                            <ColumnDefinition Width="*" />
-                            <ColumnDefinition Width="auto" />
-                        </Grid.ColumnDefinitions>
-
-                        <ContentControl Grid.Column="0"
-                                        Content="{Binding LastRefreshedMessage}"
-                                        Foreground="{DynamicResource {x:Static wpf:Controls.ForegroundKey}}"
-                                        VerticalAlignment="Center"
-                                        HorizontalAlignment="Stretch"
-                                        Focusable="False"
-                                        IsTabStop="False" />
-                        
-                        <Button Grid.Column="1"
-                                Name="RefreshButton"
-                                Command="{x:Static npmUi:NpmPackageInstallViewModel.RefreshCatalogCommand}"
-                                KeyboardNavigation.TabIndex="4">
-                            _Refresh Catalog
-                        </Button>
-                    </Grid>
-
-                    <!-- Npm Output -->
-
-                    <npmUi:NpmOutputControl Grid.Row="1"
-                                            x:Name="ExecuteControl"
-                                            DataContext="{Binding Path=ExecuteViewModel}"
-                                            IsTabStop="False" />
-                </Grid>
-            </Grid>
-
-            
-        </DockPanel>
-        
     </Grid>
+
 </ui:DialogWindowVersioningWorkaround>

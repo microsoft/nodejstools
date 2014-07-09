@@ -22,6 +22,7 @@ namespace Microsoft.NodejsTools.Npm {
         SemverVersion Version { get; }
         IPerson Author { get; }
         string Description { get; }
+        string Homepage { get; }
 
         string Path { get; }
     }

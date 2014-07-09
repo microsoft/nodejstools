@@ -29,6 +29,7 @@ namespace Microsoft.NodejsTools.NpmUI {
         private readonly SemverVersion? _version;
         private readonly string _author;
         private readonly string _description;
+        private readonly string _homepage;
         private readonly string _keywords;
 
         private readonly SemverVersion? _localVersion, _globalVersion;
@@ -38,6 +39,7 @@ namespace Microsoft.NodejsTools.NpmUI {
             SemverVersion? version,
             string author,
             string description,
+            string homepage,
             string keywords,
             SemverVersion? localVersion,
             SemverVersion? globalVersion
@@ -46,82 +48,85 @@ namespace Microsoft.NodejsTools.NpmUI {
             _version = version;
             _author = author;
             _description = description;
+            _homepage = homepage;
             _keywords = keywords;
             _localVersion = localVersion;
             _globalVersion = globalVersion;
         }
 
-        public virtual string Name { get { return _name; } }
-        public string Version { get { return ToString(_version); } }
-        public string Author { get { return _author; } }
+        public virtual string Name { 
+            get { return _name; } 
+        }
+
+        public string Version { 
+            get { return ToString(_version); } 
+        }
+
+        public string Author { 
+            get { return _author; } 
+        }
+
+        public Visibility AuthorVisibility { 
+            get { return string.IsNullOrEmpty(_author) ? Visibility.Collapsed : Visibility.Visible; } 
+        }
+
         public string Description { get { return _description; } }
-        public string Keywords { get { return _keywords; } }
-        public bool IsInstalledLocally { get { return _localVersion.HasValue; } }
-        public bool IsInstalledGlobally { get { return _globalVersion.HasValue; } }
-        public bool IsLocalInstallOutOfDate { get { return _localVersion.HasValue && _localVersion < _version; } }
-        public bool IsGlobalInstallOutOfDate { get { return _globalVersion.HasValue && _globalVersion < _version; } }
-        public string LocalVersion { get { return ToString(_localVersion); } }
-        public string GlobalVersion { get { return ToString(_globalVersion); } }
+
+        public Visibility DescriptionVisibility { get { return string.IsNullOrEmpty(_description) ? Visibility.Collapsed : Visibility.Visible; } }
+
+        public string Homepage { get { return _homepage; } }
+
+        public Visibility HomepageVisibility { 
+            get { return string.IsNullOrEmpty(_homepage) ? Visibility.Collapsed : Visibility.Visible; } 
+        }
+        
+        public string Keywords { 
+            get { return _keywords; } 
+        }
+        
+        public bool IsInstalledLocally { 
+            get { return _localVersion.HasValue; } 
+        }
+        
+        public bool IsInstalledGlobally { 
+            get { return _globalVersion.HasValue; } 
+        }
+        
+        public bool IsLocalInstallOutOfDate { 
+            get { return _localVersion.HasValue && _localVersion < _version; } 
+        }
+        
+        public bool IsGlobalInstallOutOfDate { 
+            get { return _globalVersion.HasValue && _globalVersion < _version; } 
+        }
+        
+        public string LocalVersion { 
+            get { return ToString(_localVersion); } 
+        }
+        
+        public string GlobalVersion { 
+            get { return ToString(_globalVersion); } 
+        }
 
         private static string ToString(SemverVersion? version) {
             return version.HasValue ? version.ToString() : string.Empty;
         }
     }
 
-    internal class InstallCommandPackageCatalogEntryViewModel : PackageCatalogEntryViewModel, INotifyPropertyChanged {
-        private string _name;
-
-        public InstallCommandPackageCatalogEntryViewModel()
-        : base(
-            string.Empty,
-            null,
-            string.Empty,
-            string.Empty,
-            string.Empty,
-            null,
-            null
-        ) { }
-
-        public override string Name {
-            get {
-                return string.IsNullOrEmpty(_name)
-                    ? SR.GetString(SR.NpmPackageInstallHelpMessage)
-                    : _name;
-            }
-        }
-
-        public string Command {
-            get { return _name; }
-            set {
-                _name = value;
-                OnPropertyChanged();
-                OnPropertyChanged("Name");
-            }
-        }
-
-        public event PropertyChangedEventHandler PropertyChanged;
-
-        protected virtual void OnPropertyChanged([CallerMemberName] string propertyName = null) {
-            var handler = PropertyChanged;
-            if (handler != null) {
-                handler(this, new PropertyChangedEventArgs(propertyName));
-            }
-        }
-    }
-
     internal class ReadOnlyPackageCatalogEntryViewModel : PackageCatalogEntryViewModel {
         public ReadOnlyPackageCatalogEntryViewModel(IPackage package, IPackage localInstall, IPackage globalInstall)
-        : base(
-            package.Name ?? "",
-            package.Version,
-            package.Author == null ? "" : package.Author.ToString(),
-            package.Description ?? "",
-            (package.Keywords != null && package.Keywords.Any())
-                ? string.Join(", ", package.Keywords)
-                : SR.GetString(SR.NoKeywordsInPackage),
-            localInstall != null ? (SemverVersion?)localInstall.Version : null,
-            globalInstall != null ? (SemverVersion?)globalInstall.Version : null
-        ) {
+            : base(
+                package.Name ?? string.Empty,
+                package.Version,
+                package.Author == null ? string.Empty : package.Author.ToString(),
+                package.Description ?? string.Empty,
+                package.Homepage ?? string.Empty,
+                (package.Keywords != null && package.Keywords.Any())
+                    ? string.Join(", ", package.Keywords)
+                    : SR.GetString(SR.NoKeywordsInPackage),
+                localInstall != null ? (SemverVersion?)localInstall.Version : null,
+                globalInstall != null ? (SemverVersion?)globalInstall.Version : null
+            ) {
             if (string.IsNullOrEmpty(Name)) {
                 throw new ArgumentNullException("package.Name");
             }
