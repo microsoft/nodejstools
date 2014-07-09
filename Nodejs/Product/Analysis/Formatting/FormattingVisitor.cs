@@ -170,7 +170,10 @@ namespace Microsoft.NodejsTools.Formatting {
             EnsureSpacesAroundParenthesisedExpression(node.Condition);
 
             WalkFlowControlBlockWithOptionalParens(node.TrueBlock, node.Condition.EndIndex, true);
-            WalkFlowControlBlockWithOptionalParens(node.FalseBlock, node.ElseStart, node.ElseStart + "else".Length, false);
+            if (node.FalseBlock != null) {
+                ReplacePreceedingWhiteSpaceMaybeMultiline(node.ElseStart);
+                WalkFlowControlBlockWithOptionalParens(node.FalseBlock, node.ElseStart, node.ElseStart + "else".Length, false);
+            }
             return false;
         }
 

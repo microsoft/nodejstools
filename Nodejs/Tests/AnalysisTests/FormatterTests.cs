@@ -1508,6 +1508,56 @@ return 1;
         }
 
         [TestMethod, Priority(0)]
+        public void TestIf() {
+            // https://nodejstools.codeplex.com/workitem/1175
+            TestCode(
+@"if (true){
+}else{
+}",
+@"if (true) {
+} else {
+}");
+
+            TestCode(
+@"if (true){
+}
+else{
+}",
+@"if (true) {
+}
+else {
+}");
+
+            TestCode(
+@"if(true) {
+if (true){
+}
+else{
+}
+}",
+@"if (true) {
+    if (true) {
+    }
+    else {
+    }
+}");
+
+            TestCode(
+@"if(true) {
+    if (true){
+    }
+ else{
+    }
+}",
+@"if (true) {
+    if (true) {
+    }
+    else {
+    }
+}");
+        }
+
+        [TestMethod, Priority(0)]
         public void TestNestedBlock() {
             TestCode(
 @"do {
