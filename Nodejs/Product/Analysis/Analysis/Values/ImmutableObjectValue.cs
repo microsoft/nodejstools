@@ -12,6 +12,7 @@
  *
  * ***************************************************************************/
 
+using System;
 using Microsoft.NodejsTools.Parsing;
 
 namespace Microsoft.NodejsTools.Analysis.Values {
@@ -19,6 +20,7 @@ namespace Microsoft.NodejsTools.Analysis.Values {
     /// Value that we promote instance values to when merging which doesn't allow any
     /// assignments.
     /// </summary>
+    [Serializable]
     class ImmutableObjectValue : InstanceValue {
         public ImmutableObjectValue(ProjectEntry projectEntry)
             : base(projectEntry, null) {

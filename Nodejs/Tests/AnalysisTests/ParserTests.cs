@@ -800,9 +800,17 @@ try {
                     code,
                     new ErrorInfo(JSError.NoIdentifier, true, new IndexSpan(17, 8)),
                     new ErrorInfo(JSError.NoIdentifier, true, new IndexSpan(25, 1)),
-                    new ErrorInfo(JSError.ErrorEndOfFile, true, new IndexSpan(31, 0))
+                    new ErrorInfo(JSError.ErrorEndOfFile, true, new IndexSpan(31, 0)),
+                    new ErrorInfo(JSError.UnclosedBlock, true, new IndexSpan(17, 8))
                 ),
                 CheckBlock(
+                    CheckTryCatch(
+                        CheckBlock(),
+                        CheckParameterDeclaration("function"),
+                        CheckBlock(
+                            CheckFunctionObject(")", CheckBlock(), null)
+                        )
+                    )
                 )
             );
         }
@@ -1432,9 +1440,19 @@ i = {abc:42, foo:0 foo
             CheckAst(
                 ParseCode(
                     code,
-                    new ErrorInfo(JSError.NoComma, true, new IndexSpan(21, 3))
+                    new ErrorInfo(JSError.NoComma, true, new IndexSpan(21, 3)),
+                    new ErrorInfo(JSError.UnclosedObjectLiteral, true, new IndexSpan(6, 1))
                 ),
                 CheckBlock(
+                    CheckExprStmt(
+                    	CheckAssign(
+                            I, 
+                            CheckObjectLiteral(
+                                Property("abc", CheckConstant(42.0)),
+                                Property("foo", Zero)
+                            )
+                        )
+                    )
                 )
             );
         }

@@ -29,11 +29,8 @@ namespace Microsoft.NodejsTools {
         private readonly ITagger<ClassificationTag> _classifier;
 
         private static HashSet<string> _dedentKeywords = new HashSet<string>(new[] { "return", "continue", "break", "throw" });
-        private static HashSet<string> _stmtKeywords = new HashSet<string>(
-                new[] { "try", "if", "switch", "for", "do", "break", "return", "throw", "default", "var" }
-            );
         private static HashSet<string> _indentKeywords = new HashSet<string>(
-                new[] { "try", "if", "while", "for", "do", "else" }
+            new[] { "try", "if", "while", "for", "do", "else", "catch" }
             );
 
 
@@ -68,6 +65,7 @@ namespace Microsoft.NodejsTools {
             public static readonly LineInfo Empty = new LineInfo();
             public bool NeedsUpdate;
             public int? Indentation;
+            public int? DedentTo;
             public bool WasIndentKeyword;
             /// <summary>
             /// When we have an indent keyword this tracks whether or not it was "do",
@@ -122,8 +120,7 @@ namespace Microsoft.NodejsTools {
                     if (token == null && endAtNextNull) {
                         break;
                     } else if (token != null &&
-                        token.Tag.ClassificationType.IsOfType("keyword") &&
-                        IsStmtKeyword(token.Span.GetText())) {
+                        token.Span.GetText() == "{") {
                         endAtNextNull = true;
                     }
                 } while (classifications.MoveNext());
@@ -145,16 +142,31 @@ namespace Microsoft.NodejsTools {
                         indentStack.Push(current);
                         var start = token.Span.Start;
                         current = new LineInfo {
-                            Indentation = GetLeadingWhiteSpace(start.GetContainingLine().GetText()) + _editorOptions.GetTabSize(),
-                            WasIndentKeyword = _indentKeywords.Contains(token.Span.GetText())
+                            Indentation = GetLeadingWhiteSpace(start.GetContainingLine().GetText()) + _editorOptions.GetTabSize()
                         };
                     } else if (_indentKeywords.Contains(token.Span.GetText()) && !current.WasDoKeyword) {
                         // if (foo) 
                         //      console.log('hi')
                         // We should indent here
                         var start = token.Span.Start;
+                        int dedentTo = GetLeadingWhiteSpace(start.GetContainingLine().GetText());
+                        if (current.DedentTo != null && token.Span.GetText() != "if") {
+                            // https://nodejstools.codeplex.com/workitem/1176
+                            // if (true)
+                            //     while (true)
+                            //         ;
+                            //
+                            // We should dedent to the if (true)
+                            // But for:
+                            // if (true)
+                            //     if (true)
+                            //          ;
+                            // We still want to dedent to our current level for the else
+                            dedentTo = current.DedentTo.Value;
+                        }
                         current = new LineInfo {
                             Indentation = GetLeadingWhiteSpace(start.GetContainingLine().GetText()) + _editorOptions.GetTabSize(),
+                            DedentTo = dedentTo,
                             WasIndentKeyword = true,
                             WasDoKeyword = token.Span.GetText() == "do"
                         };
@@ -174,7 +186,8 @@ namespace Microsoft.NodejsTools {
                         // we've encountered a token after the opening of the indented
                         // statement, go ahead and decrement our indentation level now.
                         current = new LineInfo {
-                            Indentation = current.Indentation - _editorOptions.GetTabSize(),
+                            Indentation = current.DedentTo,
+                            DedentTo = current.DedentTo - _editorOptions.GetTabSize(),
                             WasDoKeyword = current.WasDoKeyword
                         };
                     } else if (current.NeedsUpdate) {
@@ -219,10 +232,6 @@ namespace Microsoft.NodejsTools {
             return text == ")" || text == "}" || text == "]";
         }
 
-        private bool IsStmtKeyword(string keyword) {
-            return _stmtKeywords.Contains(keyword);
-        }
-
         /// <summary>
         /// Enumerates all of the classifications in reverse starting at start to the beginning of the file.
         /// </summary>
@@ -249,26 +258,6 @@ namespace Microsoft.NodejsTools {
             }
         }
 
-        private int? SameLevel(ITagSpan<ClassificationTag> current) {
-            return GetLeadingWhiteSpace(current.Span.Start.GetContainingLine().GetText());
-        }
-
-        private int? IndentLevel(ITagSpan<ClassificationTag> current) {
-            var res = GetLeadingWhiteSpace(current.Span.Start.GetContainingLine().GetText());
-            if (res != null) {
-                return res + _editorOptions.GetTabSize();
-            }
-            return null;
-        }
-
-        private int? DedentLevel(ITagSpan<ClassificationTag> current) {
-            var res = GetLeadingWhiteSpace(current.Span.Start.GetContainingLine().GetText());
-            if (res != null && res.Value > _editorOptions.GetTabSize()) {
-                return res - _editorOptions.GetTabSize();
-            }
-            return null;
-        }
-
         private int? DoBlockIndent(ITextSnapshotLine line) {
             ITextSnapshotLine previousLine = null;
 
@@ -286,7 +275,7 @@ namespace Microsoft.NodejsTools {
             return null;
         }
 
-        private int? GetLeadingWhiteSpace(string text) {
+        private int GetLeadingWhiteSpace(string text) {
             int size = 0;
             foreach (var ch in text) {
                 if (ch == '\t') {

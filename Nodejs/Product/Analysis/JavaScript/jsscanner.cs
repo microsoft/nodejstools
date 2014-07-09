@@ -1134,6 +1134,16 @@ namespace Microsoft.NodejsTools.Parsing
                     int esc = 0;
 
                     ch = GetChar(_currentPosition++);
+                    if ('\0' == ch) {
+                        // whether it's a null literal character within the string or an
+                        // actual end of file, this string literal has issues....
+                        if (IsEndOfFile) {
+                            _currentPosition--;
+                            HandleError(JSError.UnterminatedString);
+                            break;
+                        }
+                    }
+
                     switch (ch)
                     {
                         // line terminator crap

@@ -251,7 +251,9 @@ namespace Microsoft.NodejsTools.Analysis.Analyzer {
         public override bool Walk(IfNode node) {
             _eval.Evaluate(node.Condition);
             //TryPushIsInstanceScope(test, test.Test);
-            node.TrueBlock.Walk(this);
+            if (node.TrueBlock != null) {
+                node.TrueBlock.Walk(this);
+            }
 
             if (node.FalseBlock != null) {
                 node.FalseBlock.Walk(this);
@@ -412,8 +414,9 @@ namespace Microsoft.NodejsTools.Analysis.Analyzer {
 
         public override bool Walk(WhileNode node) {
             _eval.Evaluate(node.Condition);
-
-            node.Body.Walk(this);
+            if (node.Body != null) {
+                node.Body.Walk(this);
+            }
             return false;
         }
 

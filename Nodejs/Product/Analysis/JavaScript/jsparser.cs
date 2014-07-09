@@ -935,95 +935,85 @@ namespace Microsoft.NodejsTools.Parsing
                 }
 
                 m_noSkipTokenSet.Add(NoSkipTokenSet.s_IfBodyNoSkipTokenSet);
-                if (JSToken.Semicolon == _curToken)
-                {
-                    m_errorSink.HandleError(JSError.SuspectSemicolon, 
-                        _curSpan, 
-                        m_scanner.IndexResolver
-                    );
-                }
-                else if (JSToken.LeftCurly != _curToken)
-                {
-                    // if the statements aren't withing curly-braces, throw a possible error
-                    ReportError(JSError.StatementBlockExpected, CurrentPositionSpan(), true);
-                }
+                try {
+                    try {
+                        if (JSToken.Semicolon == _curToken) {
+                            m_errorSink.HandleError(JSError.SuspectSemicolon,
+                                _curSpan,
+                                m_scanner.IndexResolver
+                            );
+                        } else if (JSToken.LeftCurly != _curToken) {
+                            // if the statements aren't withing curly-braces, throw a possible error
+                            ReportError(JSError.StatementBlockExpected, CurrentPositionSpan(), true);
+                        }
 
-                try
-                {
-                    // parse a Statement, not a SourceElement
-                    trueBranch = ParseStatement();
-                }
-                catch (RecoveryTokenException exc)
-                {
-                    // make up a block for the if part
-                    if (exc._partiallyComputedNode != null)
-                        trueBranch = exc.PartiallyComputedStatement;
-                    else
-                        trueBranch = new Block(CurrentPositionSpan());
-                    if (IndexOfToken(NoSkipTokenSet.s_IfBodyNoSkipTokenSet, exc) == -1)
-                    {
-                        // we have to pass the exception to someone else, make as much as you can from the if
-                        exc._partiallyComputedNode = new IfNode(ifSpan)
-                            {
-                                Condition = condition,
-                                TrueBlock = Node.ForceToBlock(trueBranch)
-                            };
-                        throw;
-                    }
-                }
-                finally
-                {
-                    if (trueBranch != null)
-                    {
-                        ifSpan = ifSpan.UpdateWith(trueBranch.Span);
-                    }
+                        try {
+                            // parse a Statement, not a SourceElement
+                            trueBranch = ParseStatement();
+                        } catch (RecoveryTokenException exc) {
+                            // make up a block for the if part
+                            if (exc._partiallyComputedNode != null)
+                                trueBranch = exc.PartiallyComputedStatement;
+                            else
+                                trueBranch = new Block(CurrentPositionSpan());
+                            if (IndexOfToken(NoSkipTokenSet.s_IfBodyNoSkipTokenSet, exc) == -1) {
+                                // we have to pass the exception to someone else, make as much as you can from the if
+                                exc._partiallyComputedNode = new IfNode(ifSpan) {
+                                    Condition = condition,
+                                    TrueBlock = Node.ForceToBlock(trueBranch)
+                                };
+                                throw;
+                            }
+                        }
+                    } finally {
+                        if (trueBranch != null) {
+                            ifSpan = ifSpan.UpdateWith(trueBranch.Span);
+                        }
 
-                    m_noSkipTokenSet.Remove(NoSkipTokenSet.s_IfBodyNoSkipTokenSet);
+                        m_noSkipTokenSet.Remove(NoSkipTokenSet.s_IfBodyNoSkipTokenSet);
+                    }
+                } catch (EndOfFileException) {
+                    // we still want to produce the if node...
                 }
 
                 // parse else, if any
                 if (JSToken.Else == _curToken)
                 {
                     elseStart = _curSpan.Start;
+                    ifSpan = ifSpan.UpdateWith(_curSpan);
                     GetNextToken();
-                    if (JSToken.Semicolon == _curToken)
-                    {
-                        m_errorSink.HandleError(JSError.SuspectSemicolon, _curSpan, m_scanner.IndexResolver);
-                    }
-                    else if (JSToken.LeftCurly != _curToken
-                      && JSToken.If != _curToken)
-                    {
-                        // if the statements aren't withing curly-braces (or start another if-statement), throw a possible error
-                        ReportError(JSError.StatementBlockExpected, CurrentPositionSpan(), true);
-                    }
+                    try {
+                        if (JSToken.Semicolon == _curToken) {
+                            m_errorSink.HandleError(JSError.SuspectSemicolon, _curSpan, m_scanner.IndexResolver);
+                        } else if (JSToken.LeftCurly != _curToken
+                            && JSToken.If != _curToken) {
+                            // if the statements aren't withing curly-braces (or start another if-statement), throw a possible error
+                            ReportError(JSError.StatementBlockExpected, CurrentPositionSpan(), true);
+                        }
 
-                    try
-                    {
-                        // parse a Statement, not a SourceElement
-                        falseBranch = ParseStatement();
-                    }
-                    catch (RecoveryTokenException exc)
-                    {
-                        // make up a block for the else part
-                        if (exc._partiallyComputedNode != null)
-                            falseBranch = exc.PartiallyComputedStatement;
-                        else
-                            falseBranch = new Block(CurrentPositionSpan());
-                        exc._partiallyComputedNode = new IfNode(ifSpan)
-                            {
+                        try {
+                            // parse a Statement, not a SourceElement
+                            falseBranch = ParseStatement();
+                        } catch (RecoveryTokenException exc) {
+                            // make up a block for the else part
+                            if (exc._partiallyComputedNode != null)
+                                falseBranch = exc.PartiallyComputedStatement;
+                            else
+                                falseBranch = new Block(CurrentPositionSpan());
+                            exc._partiallyComputedNode = new IfNode(ifSpan) {
                                 Condition = condition,
                                 TrueBlock = Node.ForceToBlock(trueBranch),
                                 FalseBlock = Node.ForceToBlock(falseBranch),
                                 ElseStart = elseStart
                             };
-                        throw;
-                    }
-                    finally
-                    {
-                        if (falseBranch != null)
-                        {
-                            ifSpan = ifSpan.UpdateWith(falseBranch.Span);
+                            throw;
+                        } finally {
+                            if (falseBranch != null) {
+                                ifSpan = ifSpan.UpdateWith(falseBranch.Span);
+                            }
                         }
+                    } catch (EndOfFileException) {
+                        // we still want to produce the if node...
                     }
                 }
             }
@@ -1582,28 +1572,30 @@ namespace Microsoft.NodejsTools.Parsing
                 }
 
                 // if the statements aren't withing curly-braces, throw a possible error
-                if (JSToken.LeftCurly != _curToken)
-                {
-                    ReportError(JSError.StatementBlockExpected, CurrentPositionSpan(), true);
-                }
-                try
-                {
-                    // parse a Statement, not a SourceElement
-                    body = ParseStatement();
-                }
-                catch (RecoveryTokenException exc)
-                {
-                    if (exc._partiallyComputedNode != null)
-                        body = exc.PartiallyComputedStatement;
-                    else
-                        body = new Block(CurrentPositionSpan());
+                try {
+                    if (JSToken.LeftCurly != _curToken)
+                    {
+                        ReportError(JSError.StatementBlockExpected, CurrentPositionSpan(), true);
+                    }
+                    whileSpan = whileSpan.UpdateWith(_curSpan);
+                    try {
+                        // parse a Statement, not a SourceElement
+                        body = ParseStatement();
+                        whileSpan = whileSpan.UpdateWith(body.Span);
+                    } catch (RecoveryTokenException exc) {
+                        if (exc._partiallyComputedNode != null)
+                            body = exc.PartiallyComputedStatement;
+                        else
+                            body = new Block(CurrentPositionSpan());
 
-                    exc._partiallyComputedNode = new WhileNode(whileSpan)
-                        {
+                        exc._partiallyComputedNode = new WhileNode(whileSpan) {
                             Condition = condition,
                             Body = Node.ForceToBlock(body)
                         };
-                    throw;
+                        throw;
+                    }
+                } catch (EndOfFileException) {
+                    // still produce the while block...
                 }
 
             }
@@ -1612,7 +1604,7 @@ namespace Microsoft.NodejsTools.Parsing
                 m_blockType.RemoveAt(m_blockType.Count - 1);
             }
 
-            return new WhileNode(whileSpan.UpdateWith(body.Span))
+            return new WhileNode(whileSpan)
                 {
                     Condition = condition,
                     Body = Node.ForceToBlock(body)

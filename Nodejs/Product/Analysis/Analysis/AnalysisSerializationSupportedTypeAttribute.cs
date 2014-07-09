@@ -49,6 +49,7 @@ using Microsoft.NodejsTools.Parsing;
 [assembly: AnalysisSerializationSupportedType(typeof(ObjectLiteralValue))]
 [assembly: AnalysisSerializationSupportedType(typeof(OverviewWalker.ObjectLiteralKey))]
 [assembly: AnalysisSerializationSupportedType(typeof(InstanceValue))]
+[assembly: AnalysisSerializationSupportedType(typeof(ImmutableObjectValue))]
 [assembly: AnalysisSerializationSupportedType(typeof(ExportsValue))]
 [assembly: AnalysisSerializationSupportedType(typeof(BuiltinFunctionValue))]
 [assembly: AnalysisSerializationSupportedType(typeof(ModuleValue))]

@@ -169,7 +169,9 @@ namespace Microsoft.NodejsTools.Formatting {
 
             EnsureSpacesAroundParenthesisedExpression(node.Condition);
 
-            WalkFlowControlBlockWithOptionalParens(node.TrueBlock, node.Condition.EndIndex, true);
+            if (node.TrueBlock != null) {
+                WalkFlowControlBlockWithOptionalParens(node.TrueBlock, node.Condition.EndIndex, true);
+            }
             if (node.FalseBlock != null) {
                 ReplacePreceedingWhiteSpaceMaybeMultiline(node.ElseStart);
                 WalkFlowControlBlockWithOptionalParens(node.FalseBlock, node.ElseStart, node.ElseStart + "else".Length, false);
@@ -282,7 +284,9 @@ namespace Microsoft.NodejsTools.Formatting {
 
             EnsureSpacesAroundParenthesisedExpression(node.Condition);
 
-            WalkFlowControlBlockWithOptionalParens(node.Body, node.Condition.EndIndex, true);
+            if (node.Body != null) {
+                WalkFlowControlBlockWithOptionalParens(node.Body, node.Condition.EndIndex, true);
+            }
             return false;
         }
 
@@ -838,7 +842,8 @@ namespace Microsoft.NodejsTools.Formatting {
                     if (!FixStatementIndentation(prevStart, curStmt.StartIndex)) {
                         if (curStmt is EmptyStatement) {
                             // if (blah); shouldn't get a space...
-                            ReplacePreceedingWhiteSpace(curStmt.StartIndex, null);
+                            // abort terminators prevents foo;; from getting extra whitespace
+                            ReplacePreceedingWhiteSpace(curStmt.StartIndex, null, abortTerminators: _semicolon);
                         } else {
                             ReplacePreceedingWhiteSpaceMaybeMultiline(curStmt.StartIndex);
                         }

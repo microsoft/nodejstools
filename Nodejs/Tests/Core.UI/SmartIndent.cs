@@ -72,12 +72,27 @@ namespace Microsoft.Nodejs.Tests.UI {
                 props.Item("BraceCompletion").Value = false;
 #endif
                 var testCases = new[] {
+                // https://nodejstools.codeplex.com/workitem/1176
+                new {
+                    Typed = "if (true)\rwhile(true)\rfalse;\r100",
+                    Expected = @"if (true)
+    while (true)
+        false;
+100"
+                },
+                new {
+                    Typed = "if (true)\rif (true)\rfalse;\relse",
+                    Expected = @"if (true)
+    if (true)
+        false;
+    else"
+                },
                 // no {
                 new { 
                     Typed = "if (true)\r42\relse \r100\r200",
                     Expected = @"if (true)
     42
-else 
+else
     100
 200"              
                 },
@@ -129,7 +144,7 @@ while(false)
                     Typed = "function a() {\rfunction b() {\rfoo \r\b}\r\b}",
                     Expected = @"function a() {
     function b() {
-        foo 
+        foo
     }
 }"              },
                 // basic indentation
@@ -159,21 +174,21 @@ bar*/
                 new {
                     Typed = "if (true) {\rreturn \r}",
                     Expected = @"if (true) {
-    return 
+    return
 }"
                 },
                 // auto dedent after return;
                 new {
                     Typed = "if (true) {\rreturn; \r}",
                     Expected = @"if (true) {
-    return; 
+    return;
 }"
                 },
                 // auto dedent after return;
                 new {
                     Typed = "if (true) {\rreturn;; \r}",
                     Expected = @"if (true) {
-    return;; 
+    return;;
 }"
                 },
                 // auto dedent normal statement

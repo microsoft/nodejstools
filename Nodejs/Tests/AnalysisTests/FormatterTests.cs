@@ -93,7 +93,9 @@ console.log(err);
                 // https://nodejstools.codeplex.com/workitem/1136
                 new { Before = ";\r\n{\r\n    /*!\r\n}", After = ";\r\n{\r\n    /*\r\n\r\n}" },
                 // https://nodejstools.codeplex.com/workitem/1133
-                new { Before = ";\r\nvar mailOptions = {\r\n    from: 'blahblah',!", After = ";\r\nvar mailOptions = {\r\n    from: 'blahblah',\r\n" }
+                new { Before = ";\r\nvar mailOptions = {\r\n    from: 'blahblah',!", After = ";\r\nvar mailOptions = {\r\n    from: 'blahblah',\r\n" },
+                // https://nodejstools.codeplex.com/workitem/1175
+                new { Before = ";\r\nif(true)\r\n    if (true)!", After = ";\r\nif (true)\r\n    if (true)\r\n" },
             };
 
             foreach (var test in testCode) {
@@ -1555,6 +1557,7 @@ else{
     else {
     }
 }");
+
         }
 
         [TestMethod, Priority(0)]
