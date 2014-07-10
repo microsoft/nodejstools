@@ -10,6 +10,7 @@ var util = require('util');
 var assemblies = [
     'DebuggerTests',
     'DebuggerUITests',
+    'JSAnalysisTests',
     'ProfilingUITests',
     'ReplWindowUITests',
     'TestSccPackage',

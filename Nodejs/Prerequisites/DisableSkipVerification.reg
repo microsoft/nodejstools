@@ -2,6 +2,7 @@ Windows Registry Editor Version 5.00
 
 [-HKEY_LOCAL_MACHINE\SOFTWARE\Microsoft\StrongName\Verification\DebuggerTests,B03F5F7F11D50A3A]
 [-HKEY_LOCAL_MACHINE\SOFTWARE\Microsoft\StrongName\Verification\DebuggerUITests,B03F5F7F11D50A3A]
+[-HKEY_LOCAL_MACHINE\SOFTWARE\Microsoft\StrongName\Verification\JSAnalysisTests,B03F5F7F11D50A3A]
 [-HKEY_LOCAL_MACHINE\SOFTWARE\Microsoft\StrongName\Verification\Microsoft.NodejsTools,B03F5F7F11D50A3A]
 [-HKEY_LOCAL_MACHINE\SOFTWARE\Microsoft\StrongName\Verification\Microsoft.NodejsTools.AjaxMin,B03F5F7F11D50A3A]
 [-HKEY_LOCAL_MACHINE\SOFTWARE\Microsoft\StrongName\Verification\Microsoft.NodejsTools.Analysis,B03F5F7F11D50A3A]
@@ -31,6 +32,7 @@ Windows Registry Editor Version 5.00
 [-HKEY_LOCAL_MACHINE\SOFTWARE\Microsoft\StrongName\Verification\TestUtilities.UI.Nodejs,B03F5F7F11D50A3A]
 [-HKEY_LOCAL_MACHINE\SOFTWARE\Wow6432Node\Microsoft\StrongName\Verification\DebuggerTests,B03F5F7F11D50A3A]
 [-HKEY_LOCAL_MACHINE\SOFTWARE\Wow6432Node\Microsoft\StrongName\Verification\DebuggerUITests,B03F5F7F11D50A3A]
+[-HKEY_LOCAL_MACHINE\SOFTWARE\Wow6432Node\Microsoft\StrongName\Verification\JSAnalysisTests,B03F5F7F11D50A3A]
 [-HKEY_LOCAL_MACHINE\SOFTWARE\Wow6432Node\Microsoft\StrongName\Verification\Microsoft.NodejsTools,B03F5F7F11D50A3A]
 [-HKEY_LOCAL_MACHINE\SOFTWARE\Wow6432Node\Microsoft\StrongName\Verification\Microsoft.NodejsTools.AjaxMin,B03F5F7F11D50A3A]
 [-HKEY_LOCAL_MACHINE\SOFTWARE\Wow6432Node\Microsoft\StrongName\Verification\Microsoft.NodejsTools.Analysis,B03F5F7F11D50A3A]
