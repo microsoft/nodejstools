@@ -333,7 +333,7 @@ namespace Microsoft.NodejsTools.Project {
                         ((PackageJsonFileNode)child).AnalyzePackageJson(newAnalyzer);
                     } else if (child is NodejsFileNode) {
                         if (((NodejsFileNode)child).ShouldAnalyze) {
-                            newAnalyzer.AnalyzeFile(child.Url);
+                            newAnalyzer.AnalyzeFile(child.Url, !child.IsNonMemberItem);
                         }
                     }
 

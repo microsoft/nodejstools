@@ -35,7 +35,7 @@ namespace Microsoft.NodejsTools.Project {
             CreateWatcher(Url);
 #endif
             if (ShouldAnalyze) {
-                root.Analyzer.AnalyzeFile(Url);
+                root.Analyzer.AnalyzeFile(Url, !IsNonMemberItem);
                 root._requireCompletionCache.Clear();
             }
         }
@@ -44,6 +44,16 @@ namespace Microsoft.NodejsTools.Project {
             get {
                 return !IsNonMemberItem || ProjectMgr.IncludeNodejsFile(this);
             }
+        }
+
+        internal override int IncludeInProject(bool includeChildren) {
+            ProjectMgr.Analyzer.AnalyzeFile(Url, true);
+            return base.IncludeInProject(includeChildren);
+        }
+
+        internal override int ExcludeFromProject() {
+            ProjectMgr.Analyzer.AnalyzeFile(Url, false);
+            return base.ExcludeFromProject();
         }
 
         protected override NodeProperties CreatePropertiesObject() {

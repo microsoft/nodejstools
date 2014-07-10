@@ -13,12 +13,14 @@
  * ***************************************************************************/
 
 using System;
+using System.Collections.Generic;
 using System.IO;
 using System.Threading;
 using System.Windows.Automation;
 using EnvDTE;
 using Microsoft.NodejsTools;
 using Microsoft.TC.TestHostAdapters;
+using Microsoft.VisualStudio.Shell.Interop;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using Microsoft.VisualStudioTools;
 using TestUtilities;
@@ -50,6 +52,38 @@ namespace Microsoft.Nodejs.Tests.UI {
                 }
             }
         }
+
+        /// <summary>
+        /// https://nodejstools.codeplex.com/workitem/1195
+        /// </summary>
+        [TestMethod, Priority(0), TestCategory("Core")]
+        [HostType("TC Dynamic"), DynamicHostType(typeof(VsIdeHostAdapter))]
+        public void TestExcludedErrors() {
+            var project = Project("TestExcludedErrors",
+                Compile("server", "function f(a, b, c) { }\r\n\r\n"),
+                Compile("excluded", "aa bb", isExcluded: true)
+            );
+
+            using (var solution = project.Generate().ToVs()) {
+                List<IVsTaskItem> allItems = solution.App.WaitForErrorListItems(0);
+                Assert.AreEqual(0, allItems.Count);
+
+                var excluded = solution.WaitForItem("TestExcludedErrors", "excluded.js");
+                AutomationWrapper.Select(excluded);
+                solution.App.Dte.ExecuteCommand("Project.IncludeInProject");
+
+                allItems = solution.App.WaitForErrorListItems(1);
+                Assert.AreEqual(1, allItems.Count);
+
+                excluded = solution.WaitForItem("TestExcludedErrors", "excluded.js");
+                AutomationWrapper.Select(excluded);
+                solution.App.Dte.ExecuteCommand("Project.ExcludeFromProject");
+
+                allItems = solution.App.WaitForErrorListItems(0);
+                Assert.AreEqual(0, allItems.Count);
+            }
+        }
+
 
         [TestMethod, Priority(0), TestCategory("Core")]
         [HostType("TC Dynamic"), DynamicHostType(typeof(VsIdeHostAdapter))]

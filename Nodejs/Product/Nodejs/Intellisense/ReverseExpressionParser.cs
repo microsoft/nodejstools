@@ -154,7 +154,7 @@ namespace Microsoft.NodejsTools.Intellisense {
         /// <param name="nesting">1 if we have an opening parenthesis for sig completion</param>
         /// <param name="paramIndex">The current parameter index.</param>
         /// <returns></returns>
-        public SnapshotSpan? GetExpressionRange(int nesting, out int paramIndex, out SnapshotPoint? sigStart, out string lastKeywordArg, out bool isParameterName, bool forCompletion = true) {
+        public SnapshotSpan? GetExpressionRange(int nesting, out int paramIndex, out SnapshotPoint? sigStart, out string lastKeywordArg, out bool isParameterName, bool forCompletion = true, bool forSignatureHelp = false) {
             SnapshotSpan? start = null;
             paramIndex = 0;
             sigStart = null;
@@ -249,7 +249,9 @@ namespace Microsoft.NodejsTools.Intellisense {
                                 text != "this" && text != "get" && text != "set" && text != "delete") ||
                                token.ClassificationType == Classifier.Provider.Operator) {
                         if (forCompletion && text == "new") {
-                            start = token.Span;
+                            if (!forSignatureHelp) {
+                                start = token.Span;
+                            }
                             break;
                         }
 

@@ -12,8 +12,12 @@
  *
  * ***************************************************************************/
 
+using System;
+using System.Windows;
 using Microsoft.TC.TestHostAdapters;
+using Microsoft.VisualStudio.Language.Intellisense;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
+using Microsoft.VisualStudio.Text;
 using TestUtilities;
 using TestUtilities.UI;
 using Key = System.Windows.Input.Key;
@@ -121,6 +125,41 @@ namespace Microsoft.Nodejs.Tests.UI {
                 System.Threading.Thread.Sleep(3000);
                 Keyboard.Type("toF\t");
                 server.WaitForText("require('mymod').x.toFixed");
+            }
+        }
+
+        /// <summary>
+        /// https://nodejstools.codeplex.com/workitem/1203
+        /// </summary>
+        [TestMethod, Priority(0), TestCategory("Core")]
+        [HostType("TC Dynamic"), DynamicHostType(typeof(VsIdeHostAdapter))]
+        public void SignaturesTest() {
+            var project = Project("SignaturesTest",
+                Compile("server", "function f(a, b, c) { }\r\n\r\n")
+            );
+
+            using (var solution = project.Generate().ToVs()) {
+                var server = solution.OpenItem("SignaturesTest", "server.js");
+
+                server.MoveCaret(3, 1);
+
+                Keyboard.Type("f(");
+                
+                using (var sh = server.WaitForSession<ISignatureHelpSession>()) {
+                    var session = sh.Session;
+                    Assert.AreEqual("a", session.SelectedSignature.CurrentParameter.Name);
+                }
+
+                Keyboard.Backspace();
+                Keyboard.Backspace();
+
+                Keyboard.Type("new f(");
+
+                using (var sh = server.WaitForSession<ISignatureHelpSession>()) {
+                    var session = sh.Session;
+                    Assert.AreEqual("a", session.SelectedSignature.CurrentParameter.Name);
+                }
+
             }
         }
     }

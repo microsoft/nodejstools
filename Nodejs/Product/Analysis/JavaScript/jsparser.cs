@@ -4099,56 +4099,44 @@ namespace Microsoft.NodejsTools.Parsing
             IndexSpan listSpan = _curSpan;
             GetNextToken();
             var list = new AstNodeList<Expression>(listSpan);
-            if (terminator != _curToken)
-            {
-                for (; ; )
-                {
-                    m_noSkipTokenSet.Add(NoSkipTokenSet.s_ExpressionListNoSkipTokenSet);
-                    try
-                    {
-                        Expression item;
-                        if (JSToken.Comma == _curToken)
-                        {
-                            item = new ConstantWrapper(Missing.Value, _curSpan);
-                            list.Append(item);
-                        }
-                        else if (terminator == _curToken)
-                        {
-                            break;
-                        }
-                        else
-                        {
-                            item = ParseExpression(true);
-                            list.Append(item);
-                        }
+            try {
+                if (terminator != _curToken) {
+                    for (; ; ) {
+                        m_noSkipTokenSet.Add(NoSkipTokenSet.s_ExpressionListNoSkipTokenSet);
+                        try {
+                            Expression item;
+                            if (JSToken.Comma == _curToken) {
+                                item = new ConstantWrapper(Missing.Value, _curSpan);
+                                list.Append(item);
+                            } else if (terminator == _curToken) {
+                                break;
+                            } else {
+                                item = ParseExpression(true);
+                                list.Append(item);
+                            }
 
-                        if (terminator == _curToken)
-                        {
-                            break;
-                        }
-                        else if (JSToken.Comma != _curToken)
-                        {
-                            ReportError(JSError.NoRightBracketOrComma);
+                            if (terminator == _curToken) {
+                                break;
+                            } else if (JSToken.Comma != _curToken) {
+                                ReportError(JSError.NoRightBracketOrComma);
 
-                            SkipTokensAndThrow();
+                                SkipTokensAndThrow();
+                            }
+                        } catch (RecoveryTokenException exc) {
+                            if (exc._partiallyComputedNode != null)
+                                list.Append((Expression)exc._partiallyComputedNode);
+                            if (IndexOfToken(NoSkipTokenSet.s_ExpressionListNoSkipTokenSet, exc) == -1) {
+                                exc._partiallyComputedNode = list;
+                                throw;
+                            }
+                        } finally {
+                            m_noSkipTokenSet.Remove(NoSkipTokenSet.s_ExpressionListNoSkipTokenSet);
                         }
+                        GetNextToken();
                     }
-                    catch (RecoveryTokenException exc)
-                    {
-                        if (exc._partiallyComputedNode != null)
-                            list.Append((Expression)exc._partiallyComputedNode);
-                        if (IndexOfToken(NoSkipTokenSet.s_ExpressionListNoSkipTokenSet, exc) == -1)
-                        {
-                            exc._partiallyComputedNode = list;
-                            throw;
-                        }
-                    }
-                    finally
-                    {
-                        m_noSkipTokenSet.Remove(NoSkipTokenSet.s_ExpressionListNoSkipTokenSet);
-                    }
-                    GetNextToken();
                 }
+            } catch (EndOfFileException) {
+                // return the partially completed list...
             }
             list.Span = listSpan.UpdateWith(_curSpan);
             return list;

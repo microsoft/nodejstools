@@ -55,7 +55,7 @@ namespace Microsoft.NodejsTools.Intellisense {
         private readonly ParseQueue _queue;
         private readonly AnalysisQueue _analysisQueue;
         private readonly Dictionary<BufferParser, IProjectEntry> _openFiles = new Dictionary<BufferParser, IProjectEntry>();
-        private readonly ConcurrentDictionary<string, IProjectEntry> _projectFiles;
+        private readonly ConcurrentDictionary<string, ProjectItem> _projectFiles;
         private readonly JsAnalyzer _jsAnalyzer;
         private readonly bool _implicitProject;
         private readonly AutoResetEvent _queueActivityEvent = new AutoResetEvent(false);
@@ -120,7 +120,7 @@ namespace Microsoft.NodejsTools.Intellisense {
             string projectDir = null
         ) {
             _queue = new ParseQueue(this);
-            _projectFiles = new ConcurrentDictionary<string, IProjectEntry>(StringComparer.OrdinalIgnoreCase);
+            _projectFiles = new ConcurrentDictionary<string, ProjectItem>(StringComparer.OrdinalIgnoreCase);
             if (NodejsPackage.Instance != null) {
                 _analysisLevel = NodejsPackage.Instance.IntellisenseOptionsPage.AnalysisLevel;
             } else {
@@ -147,8 +147,8 @@ namespace Microsoft.NodejsTools.Intellisense {
                                     var serializer = new AnalysisSerializer();
                                     _jsAnalyzer = (JsAnalyzer)serializer.Deserialize(stream);
                                     _analysisQueue = new AnalysisQueue(this, serializer, stream);
-                                    foreach (var file in _jsAnalyzer.AllModules) {
-                                        _projectFiles[file.FilePath] = file;
+                                    foreach (var entry in _jsAnalyzer.AllModules) {
+                                        _projectFiles[entry.FilePath] = new ProjectItem(entry);
                                     }
                                     _reparseDateTime = new FileInfo(analysisDb).LastWriteTime;
                                 } catch (InvalidOperationException) {
@@ -318,11 +318,6 @@ namespace Microsoft.NodejsTools.Intellisense {
         }
 
         private IProjectEntry CreateProjectEntry(ITextBuffer buffer, IAnalysisCookie analysisCookie) {
-            if (_jsAnalyzer == null) {
-                // We aren't able to analyze code, so don't create an entry.
-                return null;
-            }
-
             var replEval = buffer.GetReplEvaluator();
             if (replEval != null) {
                 // We have a repl window, create an untracked module.
@@ -337,8 +332,9 @@ namespace Microsoft.NodejsTools.Intellisense {
                 return null;
             }
 
+            ProjectItem file;
             IProjectEntry entry;
-            if (!_projectFiles.TryGetValue(path, out entry)) {
+            if (!_projectFiles.TryGetValue(path, out file)) {
                 if (buffer.ContentType.IsOfType(NodejsConstants.Nodejs)) {
                     entry = _jsAnalyzer.AddModule(
                         buffer.GetFilePath(),
@@ -348,19 +344,23 @@ namespace Microsoft.NodejsTools.Intellisense {
                     return null;
                 }
 
-                _projectFiles[path] = entry;
+                _projectFiles[path] = file = new ProjectItem(entry);
             }
 
-            return entry;
+            return file.Entry;
         }
 
-        internal IProjectEntry AnalyzeFile(string path) {
-            if (_jsAnalyzer == null) {
-                // We aren't able to analyze code, so don't create an entry.
-                return null;
-            }
+        class ProjectItem {
+            public readonly IProjectEntry Entry;
+            public bool ReportErrors;
 
-            IProjectEntry item;
+            public ProjectItem(IProjectEntry entry) {
+                Entry = entry;
+            }
+        }
+
+        internal IProjectEntry AnalyzeFile(string path, bool reportErrors = true) {
+            ProjectItem item;
             if (!_projectFiles.TryGetValue(path, out item)) {
                 if (NodejsProjectNode.IsNodejsFile(path)) {
                     var pyEntry = _jsAnalyzer.AddModule(
@@ -370,21 +370,39 @@ namespace Microsoft.NodejsTools.Intellisense {
 
                     pyEntry.BeginParsingTree();
 
-                    item = pyEntry;
+                    item = new ProjectItem(pyEntry);
                 }
 
                 if (item != null) {
+                    item.ReportErrors = reportErrors;
                     _projectFiles[path] = item;
-                    _queue.EnqueueFile(item, path);
+                    // only parse the file if we need to report errors on it or if
+                    // we're analyzing.s
+                    if (reportErrors || _analysisQueue != null) {
+                        _queue.EnqueueFile(item.Entry, path);
+                    } else if(item is IJsProjectEntry) {
+                        // balance BeginParsingTree call...
+                        ((IJsProjectEntry)item.Entry).UpdateTree(null, null);
+                    }
                 }
             } else {
-                if (_reparseDateTime != null && new FileInfo(path).LastWriteTime > _reparseDateTime.Value) {
-                    // this file was written to since our cached analysis was saved, reload it.
-                    _queue.EnqueueFile(item, path);
+                if (!reportErrors) {
+                    TaskProvider.Value.Clear(item.Entry, ParserTaskMoniker);
                 }
+
+                if ((_reparseDateTime != null && new FileInfo(path).LastWriteTime > _reparseDateTime.Value)
+                        || (reportErrors && !item.ReportErrors)) {
+                    // this file was written to since our cached analysis was saved, reload it.
+                    // Or it was just included in the project and we need to parse for reporting
+                    // errors.
+                    if (reportErrors || _analysisQueue != null) {
+                        _queue.EnqueueFile(item.Entry, path);
+                    }
+                }
+                item.ReportErrors = reportErrors;
             }
 
-            return item;
+            return item.Entry;
         }
 
         internal void AddPackageJson(string path, string mainFile) {
@@ -396,16 +414,10 @@ namespace Microsoft.NodejsTools.Intellisense {
             }
         }
 
-        internal IEnumerable<KeyValuePair<string, IProjectEntry>> LoadedFiles {
-            get {
-                return _projectFiles;
-            }
-        }
-
         internal IProjectEntry GetEntryFromFile(string path) {
-            IProjectEntry res;
-            if (_projectFiles.TryGetValue(path, out res)) {
-                return res;
+            ProjectItem item;
+            if (_projectFiles.TryGetValue(path, out item)) {
+                return item.Entry;
             }
             return null;
         }
@@ -469,7 +481,7 @@ namespace Microsoft.NodejsTools.Intellisense {
             SnapshotPoint? sigStart;
             string lastKeywordArg;
             bool isParameterName;
-            var exprRange = parser.GetExpressionRange(1, out paramIndex, out sigStart, out lastKeywordArg, out isParameterName);
+            var exprRange = parser.GetExpressionRange(1, out paramIndex, out sigStart, out lastKeywordArg, out isParameterName, forSignatureHelp: true);
             if (exprRange == null || sigStart == null) {
                 return new SignatureAnalysis("", 0, new ISignature[0]);
             }
@@ -711,10 +723,14 @@ namespace Microsoft.NodejsTools.Intellisense {
                     // notify that we failed to update the existing analysis
                     pyEntry.UpdateTree(null, null);
                 }
-
-                // update squiggles for the buffer. snapshot may be null if we
-                // are analyzing a file that is not open
-                UpdateErrorsAndWarnings(entry, snapshot, errorSink);
+                ProjectItem item;
+                if (!_projectFiles.TryGetValue(filename, out item) || item.ReportErrors) {
+                    // update squiggles for the buffer. snapshot may be null if we
+                    // are analyzing a file that is not open
+                    UpdateErrorsAndWarnings(entry, snapshot, errorSink);
+                } else {
+                    TaskProvider.Value.Clear(entry, ParserTaskMoniker);
+                }
 
                 // enqueue analysis of the file
                 if (ast != null && _analysisLevel != AnalysisLevel.None) {
@@ -1134,11 +1150,6 @@ namespace Microsoft.NodejsTools.Intellisense {
         }
 
         internal void UnloadFile(IProjectEntry entry) {
-            if (_jsAnalyzer == null) {
-                // We aren't able to analyze code.
-                return;
-            }
-
             if (entry != null) {
                 // If we remove a Node.js module, reanalyze any other modules
                 // that referenced it.
@@ -1154,7 +1165,7 @@ namespace Microsoft.NodejsTools.Intellisense {
                 if (_analysisLevel != AnalysisLevel.None) {
                     _analysisQueue.Enqueue(_jsAnalyzer.RemoveModule(entry), AnalysisPriority.Normal);
                 }
-                IProjectEntry removed;
+                ProjectItem removed;
                 _projectFiles.TryRemove(entry.FilePath, out removed);
 #if FALSE
                 if (reanalyzeEntries != null) {
@@ -1257,9 +1268,9 @@ namespace Microsoft.NodejsTools.Intellisense {
 
         public void Dispose() {
             if (TaskProvider.IsValueCreated) {
-                foreach (var entry in _projectFiles.Values) {
-                    TaskProvider.Value.Clear(entry, ParserTaskMoniker);
-                    TaskProvider.Value.Clear(entry, UnresolvedImportMoniker);
+                foreach (var file in _projectFiles.Values) {
+                    TaskProvider.Value.Clear(file.Entry, ParserTaskMoniker);
+                    TaskProvider.Value.Clear(file.Entry, UnresolvedImportMoniker);
                 }
             }
 

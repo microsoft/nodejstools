@@ -98,6 +98,40 @@ function Y() {
             );
         }
 
+        /// <summary>
+        /// https://nodejstools.codeplex.com/workitem/1194
+        /// https://nodejstools.codeplex.com/workitem/1200
+        /// </summary>
+        [TestMethod, Priority(0)]
+        public void TestParseUnterminatedFunctionInList() {
+            const string code = @"console.log(function(error, response) {";
+
+            CheckAst(
+                ParseCode(
+                    code,
+                    false,
+                    new ErrorInfo(JSError.ErrorEndOfFile, true, new IndexSpan(39, 0)),
+                    new ErrorInfo(JSError.UnclosedFunction, true, new IndexSpan(12, 25)),
+                    new ErrorInfo(JSError.NoRightBracketOrComma, true, new IndexSpan(39, 0))
+                ),
+                CheckBlock(
+                    CheckExprStmt(
+                        CheckCall(
+                            CheckMember("log", CheckLookup("console")),
+                            CheckFunctionExpr(
+                                CheckFunctionObject(
+                                    null,
+                                    CheckBlock(),
+                                    CheckParameterDeclaration("error"),
+                                    CheckParameterDeclaration("response")
+                                )
+                            )
+                        )
+                    )
+                )
+            );
+        }
+
         [TestMethod, Priority(0)]
         public void TestParseExpression() {
             const string code = @"
