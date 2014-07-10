@@ -1,6 +1,6 @@
 <VSTemplate Version="3.0.0" Type="Project" xmlns="http://schemas.microsoft.com/developer/vstemplate/2005">
   <TemplateData>
-    <Name>Blank Microsoft Azure Node.js Application</Name>
+    <Name>Blank Microsoft Azure Node.js Web Application</Name>
     <Description>An empty Node.js application for Microsoft Azure.</Description>
     <Icon Package="{FE8A8C3D-328A-476D-99F9-2A24B75F8C7F}" ID="401" />
     <ProjectType>Web</ProjectType>

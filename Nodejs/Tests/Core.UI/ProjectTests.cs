@@ -27,6 +27,7 @@ using Microsoft.VisualStudio.TestTools.UnitTesting;
 using TestUtilities;
 using TestUtilities.Nodejs;
 using TestUtilities.UI;
+using TestUtilities.UI.Nodejs;
 
 namespace Microsoft.Nodejs.Tests.UI {
     [TestClass]
@@ -417,7 +418,7 @@ sd.StringDecoder
                 using (var newProjDialog = app.FileNewProject()) {
                 newProjDialog.FocusLanguageNode("JavaScript");
 
-                var nodejsApp = newProjDialog.ProjectTypes.FindItem("Blank Node.js Web Application");
+                var nodejsApp = newProjDialog.ProjectTypes.FindItem(NodejsVisualStudioApp.JavascriptWebAppTemplate);
                 nodejsApp.Select();
 
                     newProjDialog.OK();
@@ -448,7 +449,7 @@ sd.StringDecoder
                 using (var newProjDialog = app.FileNewProject()) {
                 newProjDialog.FocusLanguageNode("JavaScript");
 
-                var azureApp = newProjDialog.ProjectTypes.FindItem("Blank Microsoft Azure Node.js Application");
+                var azureApp = newProjDialog.ProjectTypes.FindItem(NodejsVisualStudioApp.JavaScriptAzureWebAppTemplate);
                 azureApp.Select();
                     newProjDialog.OK();
                 }
