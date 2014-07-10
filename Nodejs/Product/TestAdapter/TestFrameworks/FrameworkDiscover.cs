@@ -21,7 +21,7 @@ using Microsoft.NodejsTools.TestFrameworks;
 
 namespace Microsoft.NodejsTools.TestAdapter.TestFrameworks {
     class FrameworkDiscover {
-        private readonly Dictionary<String, TestFramework> _framworks;
+        private readonly Dictionary<String, TestFramework> _frameworks;
         public FrameworkDiscover(): this(null) {
         }
 
@@ -30,16 +30,16 @@ namespace Microsoft.NodejsTools.TestAdapter.TestFrameworks {
                 TestFrameworkDirectories directoryLoader = new TestFrameworkDirectories();
                 testFrameworkDirectories = directoryLoader.GetFrameworkDirectories();
             }
-            _framworks = new Dictionary<string, TestFramework>(StringComparer.OrdinalIgnoreCase);
+            _frameworks = new Dictionary<string, TestFramework>(StringComparer.OrdinalIgnoreCase);
             foreach (string directory in testFrameworkDirectories) {
                 TestFramework fx = new TestFramework(directory);
-                _framworks.Add(fx.Name, fx);
+                _frameworks.Add(fx.Name, fx);
             }
         }
 
         public TestFramework Get(string frameworkName) {
             TestFramework testFX = null;
-            _framworks.TryGetValue(frameworkName, out testFX);
+            _frameworks.TryGetValue(frameworkName, out testFX);
             return testFX;
         }
     }

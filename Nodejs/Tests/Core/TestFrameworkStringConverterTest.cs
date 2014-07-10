@@ -23,7 +23,7 @@ namespace NodejsTests {
 
     [TestClass]
     public class TestFrameworkStringConverterTest {
-        [TestMethod]
+        [TestMethod, Priority(0)]
         public void GetStandardValues_CheckValueSequence() {
             //Arrange
             TestFrameworkStringConverter convert = new TestFrameworkStringConverter();

@@ -31,7 +31,7 @@ namespace AnalysisTests {
         /// <summary>
         /// https://nodejstools.codeplex.com/workitem/945
         /// </summary>
-        [TestMethod]
+        [TestMethod, Priority(0)]
         public void TestFunctionApply() {
             string code = @"
 function g() {
@@ -55,7 +55,7 @@ var x = new f().abc;
         /// <summary>
         /// https://nodejstools.codeplex.com/workitem/945
         /// </summary>
-        [TestMethod]
+        [TestMethod, Priority(0)]
         public void TestToString() {
             string code = @"
 var x = new Object();
@@ -72,7 +72,7 @@ var y = x.toString();
         /// <summary>
         /// https://nodejstools.codeplex.com/workitem/965
         /// </summary>
-        [TestMethod]
+        [TestMethod, Priority(0)]
         public void TestBuiltinDoc() {
             string code = @"
 var x = 'abc'
@@ -89,7 +89,7 @@ var x = 'abc'
         /// <summary>
         /// https://nodejstools.codeplex.com/workitem/935
         /// </summary>
-        [TestMethod]
+        [TestMethod, Priority(0)]
         public void TestAllMembers() {
             string code = @"
 function f() {
@@ -114,7 +114,7 @@ var x = f();
         /// <summary>
         /// https://nodejstools.codeplex.com/workitem/950
         /// </summary>
-        [TestMethod]
+        [TestMethod, Priority(0)]
         public void TestReturnValues() {
             string code = @"
 function f(x) {
@@ -134,7 +134,7 @@ f({def:'abc'});
         }
 
 
-        [TestMethod]
+        [TestMethod, Priority(0)]
         public void TestPrimitiveMembers() {
             string code = @"
 var b = true;
@@ -179,7 +179,7 @@ function f() {
             ); 
         }
 
-        [TestMethod]
+        [TestMethod, Priority(0)]
         public void TestArrayForEach() {
             string code = @"
 var arr = [1,2,3];
@@ -195,7 +195,7 @@ arr.forEach(f);
             );
         }
 
-        [TestMethod]
+        [TestMethod, Priority(0)]
         public void TestThisFlows() {
             string code = @"
 function f() {
@@ -214,7 +214,7 @@ var x = new f().value;
             ); 
         }
 
-        [TestMethod]
+        [TestMethod, Priority(0)]
         public void TestThisPassedAndReturned() {
             string code = @"function X(csv) {
     abc = 100;
@@ -236,7 +236,7 @@ xyz = new Y();";
             );
         }
 
-        [TestMethod]
+        [TestMethod, Priority(0)]
         public void Failing_TestThis() {
             var code = @"function SimpleTest(x, y) {
     this._name = 'SimpleTest';
@@ -269,7 +269,7 @@ SimpleTest.prototype._performRequest = function (webResource, body, options, cal
 
         }
 
-        [TestMethod]
+        [TestMethod, Priority(0)]
         public void TestPropertyGotoDef() {
             string code = @"
 Object.defineProperty(Object.prototype, 'should', { set: function() { }, get: function() { 42 } });
@@ -283,7 +283,7 @@ var x = {};
             );
         }
 
-        [TestMethod]
+        [TestMethod, Priority(0)]
         public void TestGlobals() {
             string code = @"
 var x = 42;
@@ -295,7 +295,7 @@ var x = 42;
             );
         }
 
-        [TestMethod]
+        [TestMethod, Priority(0)]
         public void TestDefinitiveAssignmentScoping() {
             string code = @"
 var x = {abc:42};
@@ -308,7 +308,7 @@ x = x.abc;
             );
         }
 
-        [TestMethod]
+        [TestMethod, Priority(0)]
         public void TestSignatureHelp() {
             string code = @"
 function foo(x, y) {}
@@ -345,7 +345,7 @@ abc(abc);
             return sigs.ToArray();
         }
 
-        [TestMethod]
+        [TestMethod, Priority(0)]
         public void TestStringMembers() {
             string code = @"
 var x = 'abc';
@@ -357,7 +357,7 @@ var x = 'abc';
             );
         }
 
-        [TestMethod]
+        [TestMethod, Priority(0)]
         public void TestBadIndexes() {
             string code = @"
 var x = {};
@@ -370,7 +370,7 @@ var y = x[];
             );
         }
 
-        [TestMethod]
+        [TestMethod, Priority(0)]
         public void TestDefinitiveAssignmentMerged() {
             string code = @"
 if(true) {
@@ -388,7 +388,7 @@ x = y;
             );
         }
 
-        [TestMethod]
+        [TestMethod, Priority(0)]
         public void TestDefinitiveAssignment() {
             string code = @"
 a = 100;
@@ -407,7 +407,7 @@ a = 'abc';
             );
         }
 
-        [TestMethod]
+        [TestMethod, Priority(0)]
         public void TestDefinitiveAssignmentNested() {
             string code = @"
 a = 100;
@@ -450,7 +450,7 @@ b = 'abc';
         /// Tests the internal [[Contruct]] method and makes sure
         /// we return the value if the function returns an object.
         /// </summary>
-        [TestMethod]
+        [TestMethod, Priority(0)]
         public void TestConstruct() {
             var code = @"function f() {
      return {abc:42};
@@ -495,7 +495,7 @@ var x = new f();
             );
         }
 
-        [TestMethod]
+        [TestMethod, Priority(0)]
         public void TestConstructReturnFunction() {
             var code = @"function f() {
      function inner() {
@@ -522,7 +522,7 @@ var x = new f();
 
 
 
-        [TestMethod]
+        [TestMethod, Priority(0)]
         public void TestExports() {
             string code = @"
 exports.num = 42;
@@ -539,7 +539,7 @@ module.exports.str = 'abc'
             );
         }
 
-        [TestMethod]
+        [TestMethod, Priority(0)]
         public void TestAccessorDescriptor() {
             string code = @"
 function f() {
@@ -554,7 +554,7 @@ x = f.foo;
             );
         }
 
-        [TestMethod]
+        [TestMethod, Priority(0)]
         public void TestDefineProperties() {
             string code = @"
 function f() {
@@ -569,7 +569,7 @@ x = f.abc;
             );
         }
 
-        [TestMethod]
+        [TestMethod, Priority(0)]
         public void TestFunctionExpression() {
             string code = @"
 var abc = {abc: function abcdefg() { } };
@@ -579,7 +579,7 @@ var x = abcdefg;
             Assert.AreEqual(0, analysis.GetTypeIdsByIndex("x", 0).Count());
         }
 
-        [TestMethod]
+        [TestMethod, Priority(0)]
         public void TestGlobal() {
             var analysis = ProcessText(";");
 
@@ -595,7 +595,7 @@ var x = abcdefg;
             );*/
         }
 
-        [TestMethod]
+        [TestMethod, Priority(0)]
         public void TestNumberFunction() {
             var analysis = ProcessText(";");
 
@@ -634,7 +634,7 @@ var x = abcdefg;
             );
         }
 
-        [TestMethod]
+        [TestMethod, Priority(0)]
         public void TestSimpleClosure() {
             var code = @" function f()
 {
@@ -650,13 +650,13 @@ var x = abcdefg;
         }
 
 
-        //[TestMethod]
+        //[TestMethod, Priority(0)]
         //public void ReproTestCase() {
         //    var analysis = ProcessText(File.ReadAllText(@"C:\Source\ExpressApp29\ExpressApp29\node_modules\jade\node_modules\with\node_modules\uglify-js\lib\scope.js"));
         //    Console.WriteLine("Done processing");
         //}
 
-        [TestMethod]
+        [TestMethod, Priority(0)]
         public void TestNumber() {
             string code = "x = 42;";
             var analysis = ProcessText(code);
@@ -672,7 +672,7 @@ var x = abcdefg;
             );*/
         }
 
-        [TestMethod]
+        [TestMethod, Priority(0)]
         public void TestVariableLookup() {
             string code = "x = 42; y = x;";
             var analysis = ProcessText(code);
@@ -682,7 +682,7 @@ var x = abcdefg;
             );
         }
 
-        [TestMethod]
+        [TestMethod, Priority(0)]
         public void TestVariableDeclaration() {
             var analysis = ProcessText("var x = 42;");
             AssertUtil.ContainsExactly(
@@ -691,7 +691,7 @@ var x = abcdefg;
             );
         }
 
-        [TestMethod]
+        [TestMethod, Priority(0)]
         public void TestStringLiteral() {
             string code = "x = 'abc';";
             var analysis = ProcessText(code);
@@ -701,7 +701,7 @@ var x = abcdefg;
             );
         }
 
-        [TestMethod]
+        [TestMethod, Priority(0)]
         public void TestArrayLiteral() {
             string code = "x = [1,2,3];";
             var analysis = ProcessText(code);
@@ -711,7 +711,7 @@ var x = abcdefg;
             );
         }
 
-        [TestMethod]
+        [TestMethod, Priority(0)]
         public void TestTrueFalse() {
             string code = "x = true;";
             var analysis = ProcessText(code);
@@ -728,7 +728,7 @@ var x = abcdefg;
             );
         }
 
-        [TestMethod]
+        [TestMethod, Priority(0)]
         public void TestObjectLiteral() {
             string code = "x = {abc:42};";
             var analysis = ProcessText(code);
@@ -766,7 +766,7 @@ var x = abcdefg;
             );
         }
 
-        [TestMethod]
+        [TestMethod, Priority(0)]
         public void TestForInLoop() {
             var analysis = ProcessText("for(var x in [1,2,3]) { }");
             AssertUtil.ContainsExactly(
@@ -775,7 +775,7 @@ var x = abcdefg;
             );
         }
 
-        [TestMethod]
+        [TestMethod, Priority(0)]
         public void TestForInLoop2() {
             var analysis = ProcessText("for(x in [1,2,3]) { }");
             AssertUtil.ContainsExactly(
@@ -785,7 +785,7 @@ var x = abcdefg;
         }
 
 
-        [TestMethod]
+        [TestMethod, Priority(0)]
         public void TestFunctionCreation() {
             var analysis = ProcessText(@"function f() {
 }
@@ -811,7 +811,7 @@ var x = f.prototype.constructor.abc;
 
         }
 
-        [TestMethod]
+        [TestMethod, Priority(0)]
         public void TestPrototypeNoMerge() {
             var analysis = ProcessText(@"
 var abc = Function.prototype;
@@ -825,7 +825,7 @@ var x = new f().bar;
             );
         }
 
-        [TestMethod]
+        [TestMethod, Priority(0)]
         public void TestKeysSpecialization() {
             var analysis = ProcessText(@"
 function keys(o) {
@@ -842,7 +842,7 @@ var x = keys({'abc':42});
             );
         }
 
-        [TestMethod]
+        [TestMethod, Priority(0)]
         public void TestMergeSpecialization() {
             var analysis = ProcessText(@"function merge(a, b){
   if (a && b) {
@@ -871,7 +871,7 @@ var x = g.abc;
             );
         }
 
-        [TestMethod]
+        [TestMethod, Priority(0)]
         public void TestNodejsCreateFunctions() {
             var code = @"var x = require('http').createServer(null, null);
 var y = require('net').createServer(null, null);
@@ -889,7 +889,7 @@ var y = require('net').createServer(null, null);
         }
 
 
-        [TestMethod]
+        [TestMethod, Priority(0)]
         public void TestCopySpecialization() {
             var analysis = ProcessText(@"function copy (obj) {
   var o = {}
@@ -916,7 +916,7 @@ var abc2 = c2.abc;
             );
         }
 
-        [TestMethod]
+        [TestMethod, Priority(0)]
         public void TestCreateSpecialization() {
             var analysis = ProcessText(@"function F() {
 }
@@ -939,7 +939,7 @@ abc2 = create({abc:'abc'}).abc
             );
         }
 
-        [TestMethod]
+        [TestMethod, Priority(0)]
         public void TestFunctionParametersMultipleCallers() {
             var analysis = ProcessText(@"function f(a) {
     return a;
@@ -958,7 +958,7 @@ var y = f('abc');
             );
         }
 
-        [TestMethod]
+        [TestMethod, Priority(0)]
         public void TestFunctionParameters() {
             var analysis = ProcessText(@"function x(a) { return a; }
 var y = x(42);");
@@ -968,7 +968,7 @@ var y = x(42);");
             );
         }
 
-        [TestMethod]
+        [TestMethod, Priority(0)]
         public void TestFunctionReturn() {
             var analysis = ProcessText("function x() { return 42; }");
             AssertUtil.ContainsExactly(
@@ -977,7 +977,7 @@ var y = x(42);");
             );
         }
 
-        [TestMethod]
+        [TestMethod, Priority(0)]
         public void TestFunction() {
             var analysis = ProcessText("function x() { }");
             AssertUtil.ContainsExactly(
@@ -1022,7 +1022,7 @@ var y = x(42);");
             );
         }
 
-        [TestMethod]
+        [TestMethod, Priority(0)]
         public void TestNewFunction() {
             string code = "function y() { return 42; }\r\nx = new y();";
             var analysis = ProcessText(code);
@@ -1039,7 +1039,7 @@ var y = x(42);");
             );
         }
 
-        [TestMethod]
+        [TestMethod, Priority(0)]
         public void TestNewFunctionInstanceVariable() {
             string code = "function f() { this.abc = 42; }\r\nx = new f();";
             var analysis = ProcessText(code);
@@ -1064,7 +1064,7 @@ abcy = new y();";
             );
         }
 
-        [TestMethod]
+        [TestMethod, Priority(0)]
         public void TestSimplePrototype() {
             string code = @"
 function f() {
@@ -1084,7 +1084,7 @@ x = new j();
             );
         }
 
-        [TestMethod]
+        [TestMethod, Priority(0)]
         public void TestTypeOf() {
             string code = "x = typeof 42;";
             var analysis = ProcessText(code);
@@ -1094,7 +1094,7 @@ x = new j();
             );
         }
 
-        [TestMethod]
+        [TestMethod, Priority(0)]
         public void TestVariableShadowing() {
             var code = @"var a = 'abc';
 function f() {
@@ -1114,7 +1114,7 @@ f();";
             );
         }
 
-        [TestMethod]
+        [TestMethod, Priority(0)]
         public void TestFunctionExpressionNameScoping() {
             var code = @"var x = function abc() {
     // here
@@ -1137,7 +1137,7 @@ x.bar = 42;
         }
 
 
-        [TestMethod]
+        [TestMethod, Priority(0)]
         public void TestFunctionExpressionNameScopingNested() {
             var code = @"
 function f() {
@@ -1163,7 +1163,7 @@ function f() {
             );
         }
         
-        [TestMethod]
+        [TestMethod, Priority(0)]
         public void TestFunctionClosureCall() {
             var code = @"function abc() {
     function g(x) {
@@ -1190,7 +1190,7 @@ var y = abc()('abc');
         }
 
 
-        [TestMethod]
+        [TestMethod, Priority(0)]
         public void TestTypes() {
             string code = "x = {undefined:undefined, number:42, string:'str', null:null, boolean:true, function: function() {}, object: {}}";
             var analysis = ProcessText(code);
@@ -1220,7 +1220,7 @@ var y = abc()('abc');
             }
         }
 
-        [TestMethod]
+        [TestMethod, Priority(0)]
         public void TestUtilInherits() {
             var code = @"util = require('util');
 
@@ -1247,7 +1247,7 @@ var abc = new f().abc;
             );
         }
 
-        [TestMethod]
+        [TestMethod, Priority(0)]
         public void TestUtilInherits2() {
             var code = @"util = require('util');
 
@@ -1277,7 +1277,7 @@ var abc = new g().abc;
         /// Assigning to __proto__ should result in apparent update
         /// to the internal [[Prototype]] property.
         /// </summary>
-        [TestMethod]
+        [TestMethod, Priority(0)]
         public void TestDunderProto() {
             // shouldn't crash
             var code = @"
@@ -1303,7 +1303,7 @@ var x = new f().abc;
         /// <summary>
         /// https://nodejstools.codeplex.com/workitem/974
         /// </summary>
-        [TestMethod]
+        [TestMethod, Priority(0)]
         public void TestInvalidGrouping() {
             // shouldn't crash
             var code = @"var x = ();
@@ -1311,7 +1311,7 @@ var x = new f().abc;
             var analysis = ProcessText(code);
         }
 
-        [TestMethod]
+        [TestMethod, Priority(0)]
         public void UncalledPrototypeMethod() {
             var code = @"
 function Class() {
@@ -1330,7 +1330,7 @@ Class.prototype.foo = function(fn) {
             );
         }
 
-        [TestMethod]
+        [TestMethod, Priority(0)]
         public void TestEventEmitter() {
             var code = @"
 var events = require('events')
@@ -1350,7 +1350,7 @@ ee.emit('myevent', 42)
 
 
 #if FALSE
-        [TestMethod]
+        [TestMethod, Priority(0)]
         public void AnalyzeX() {
             var limits = new AnalysisLimits() {
                 ReturnTypes = 1,
@@ -1366,7 +1366,7 @@ ee.emit('myevent', 42)
             Console.WriteLine("Time: {0}", sw.Elapsed);
         }
 
-        [TestMethod]
+        [TestMethod, Priority(0)]
         public void AnalyzeExpress() {
             File.WriteAllText("C:\\Source\\Express\\express.txt", Analyzer.DumpAnalysis("C:\\Source\\Express"));
         }

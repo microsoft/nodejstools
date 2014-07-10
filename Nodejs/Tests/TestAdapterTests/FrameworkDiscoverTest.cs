@@ -20,7 +20,7 @@ namespace TestAdapterTests {
 
     [TestClass]
     public class FrameworkDiscoverTest {
-        [TestMethod]
+        [TestMethod, Priority(0)]
         public void InitializeAllFrameworks() {
             //Arrange and Act
             string[] frameworkDirectories = new string[] {

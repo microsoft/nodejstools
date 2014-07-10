@@ -20,7 +20,7 @@ using TestUtilities;
 namespace AnalysisTests {
     [TestClass]
     public class SerializationTests {
-        [TestMethod]
+        [TestMethod, Priority(0)]
         public void BasicTest() {
             var analyzer = new JsAnalyzer();
             RoundTrip(analyzer);
@@ -33,7 +33,7 @@ namespace AnalysisTests {
             return (T)new AnalysisSerializer().Deserialize(ms);
         }
 
-        [TestMethod]
+        [TestMethod, Priority(0)]
         public void RequireTest() {
             var entries = RoundTrip(
                 Analysis.Analyze(
