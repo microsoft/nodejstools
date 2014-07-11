@@ -6,6 +6,7 @@
     <ProjectFile Include="$(BuildRoot)\Common\Tests\SharedProjectTests\SharedProjectTests.csproj" />
     <ProjectFile Include="$(BuildRoot)\Common\Tests\Utilities\TestUtilities.csproj" />
     <ProjectFile Include="$(BuildRoot)\Common\Tests\Utilities.UI\TestUtilities.UI.csproj" />
+    <ProjectFile Include="$(BuildRoot)\Nodejs\Tests\AnalysisTests\JSAnalysisTests.csproj" />
     <ProjectFile Include="$(BuildRoot)\Nodejs\Tests\AzurePublishing.UI\AzurePublishing.Tests.UI.csproj" />
     <ProjectFile Include="$(BuildRoot)\Nodejs\Tests\Core\NodejsTests.csproj" />
     <ProjectFile Include="$(BuildRoot)\Nodejs\Tests\Core.UI\Nodejs.Tests.UI.csproj" />

@@ -92,6 +92,7 @@ namespace AnalysisTests {
             return new StringReader(text);
         }
 
+#if DEBUG
         public static string DumpAnalysis(string directory) {
             var analyzer = Analysis.Analyze(directory);
 
@@ -110,6 +111,7 @@ namespace AnalysisTests {
 
             return analysis.ToString();
         }
+#endif
 
         public static JsAnalyzer Analyze(string directory, AnalysisLimits limits = null) {
             List<AnalysisFile> files = new List<AnalysisFile>();

@@ -103,7 +103,7 @@ namespace Microsoft.NodejsTools.TestAdapter {
                                     string qualifiedName = discoveredTest.FullyQualifiedName;
                                     logger.SendMessage(TestMessageLevel.Informational, String.Format("Creating TestCase:{0}", qualifiedName));
                                     var testCase = new TestCase(qualifiedName, TestExecutor.ExecutorUri, projSource) {
-                                        CodeFilePath = fileAbsolutePath,
+                                        CodeFilePath = testFileAbsolutePath,
                                         LineNumber = 0,
                                         DisplayName = discoveredTest.DisplayName
                                     };
