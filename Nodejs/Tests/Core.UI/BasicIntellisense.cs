@@ -13,6 +13,7 @@
  * ***************************************************************************/
 
 using System;
+using System.Linq;
 using System.Windows;
 using Microsoft.TC.TestHostAdapters;
 using Microsoft.VisualStudio.Language.Intellisense;
@@ -160,6 +161,30 @@ namespace Microsoft.Nodejs.Tests.UI {
                     Assert.AreEqual("a", session.SelectedSignature.CurrentParameter.Name);
                 }
 
+            }
+        }
+
+        /// <summary>
+        /// https://nodejstools.codeplex.com/workitem/1201
+        /// </summary>
+        [TestMethod, Priority(0), TestCategory("Core")]
+        [HostType("TC Dynamic"), DynamicHostType(typeof(VsIdeHostAdapter))]
+        public void IntellisenseAfterNewLine() {
+            var project = Project("NewLineTest",
+                Compile("server", "'blah'\r\n")
+            );
+
+            using (var solution = project.Generate().ToVs()) {
+                var server = solution.OpenItem("NewLineTest", "server.js");
+
+                server.MoveCaret(2, 1);
+
+                Keyboard.Type(".");
+
+                using (var sh = server.WaitForSession<ICompletionSession>()) {
+                    var session = sh.Session;
+                    Assert.IsTrue(session.CompletionSets[0].Completions.Select(x => x.InsertionText).Contains("big"));
+                }
             }
         }
     }

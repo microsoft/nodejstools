@@ -147,6 +147,14 @@ console.log(err);
             }
         }
 
+        /// <summary>
+        /// https://nodejstools.codeplex.com/workitem/1204
+        /// </summary>
+        [TestMethod, Priority(0)]
+        public void TestShebang() {
+            TestCode("#!/usr/env/node\r\n function f() {\r\n}", "#!/usr/env/node\r\nfunction f() {\r\n}");
+        }
+
         [TestMethod, Priority(0)]
         public void TestMember() {
             TestCode(" a.b", "a.b");

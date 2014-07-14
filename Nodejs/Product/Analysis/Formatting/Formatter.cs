@@ -35,7 +35,7 @@ namespace Microsoft.NodejsTools.Formatting {
         public static Edit[] GetEditsAfterKeystroke(string code, int position, char ch, FormattingOptions options = null) {
             using (new DebugTimer("FormatKeyStroke")) {
                 if (ch == ';' || ch == '}') {
-                    var ast = new JSParser(code).Parse(new CodeSettings());
+                    var ast = new JSParser(code).Parse(new CodeSettings() { AllowShebangLine = true });
                     var visitor = new RangeVisitor(ch, position);
                     ast.Walk(visitor);
                     if (visitor.Span != default(IndexSpan)) {
@@ -213,7 +213,7 @@ namespace Microsoft.NodejsTools.Formatting {
         }
 
         private static List<Edit> GetEdits(string code, FormattingOptions options, bool onEnter = false) {
-            var ast = new JSParser(code).Parse(new CodeSettings());
+            var ast = new JSParser(code).Parse(new CodeSettings() { AllowShebangLine = true });
             return GetEdits(code, options, ast, onEnter);
         }
 

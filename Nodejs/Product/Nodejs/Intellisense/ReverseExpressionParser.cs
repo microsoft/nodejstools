@@ -190,12 +190,7 @@ namespace Microsoft.NodejsTools.Intellisense {
 
                     if (token == null) {
                         // new line
-                        if (nesting != 0 || otherNesting != 0 || (enumerator.MoveNext() && IsExplicitLineJoin(enumerator.Current))) {
-                            // we're in a grouping, or the previous token is an explicit line join, we'll keep going.
-                            continue;
-                        } else {
-                            break;
-                        }
+                        continue;
                     }
 
                     var text = token.Span.GetText();
