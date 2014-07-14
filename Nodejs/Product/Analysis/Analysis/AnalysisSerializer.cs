@@ -17,8 +17,10 @@ using System.Collections;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
+using System.Linq;
 using System.Reflection;
 using System.Runtime.Serialization;
+using System.Security;
 using Microsoft.NodejsTools.Analysis.AnalysisSetDetails;
 using Microsoft.NodejsTools.Analysis.Analyzer;
 using Microsoft.NodejsTools.Analysis.Values;
@@ -105,6 +107,9 @@ namespace Microsoft.NodejsTools.Analysis {
                         break;
                     case SerializationType.List:
                         nextValue = DeserializeList(stack, reader);
+                        break;
+                    case SerializationType.AnalysisDictionary:
+                        nextValue = DeserializeAnalysisDictionary(stack, reader);
                         break;
                     case SerializationType.Dictionary:
                         nextValue = DeserializeDictionary(stack, reader);
@@ -246,6 +251,20 @@ namespace Microsoft.NodejsTools.Analysis {
                         writer.Write(list.Count);
                         for (int i = list.Count - 1; i >= 0; i--) {
                             stack.Push(list[i]);
+                        }
+                    } else if(gtd == typeof(AnalysisDictionary<,>)) {
+                        ReverseMemoize(value);
+
+                        writer.Write((byte)SerializationType.AnalysisDictionary);
+                        WriteClrType(value.GetType().GetGenericArguments()[0], writer);
+                        WriteClrType(value.GetType().GetGenericArguments()[1], writer);
+                        var dictionary = (IAnalysisDictionary)value;
+                        var items = dictionary.GetItems();
+                        writer.Write(items.Length);
+                        Serialize(dictionary.GetType().GetProperty("Comparer").GetValue(dictionary, new object[0]), writer);
+                        foreach (var key in items) {
+                            stack.Push(key.Value);
+                            stack.Push(key.Key);
                         }
                     } else if (gtd == typeof(Dictionary<,>)) {
                         ReverseMemoize(value);
@@ -523,6 +542,29 @@ namespace Microsoft.NodejsTools.Analysis {
             }
         }
 
+        class AnalysisDictionaryKeyDeserializer : IClrClassTypeDeserializer {
+            private readonly AnalysisSerializer _serializer;
+            public AnalysisDictionaryKeyDeserializer(AnalysisSerializer serializer) {
+                _serializer = serializer;
+            }
+
+            public object Deserialize<T>(Stack<DeserializationFunc> stack, BinaryReader reader) where T : class {
+                return DeserializeClrType(stack, new AnalysisDictionaryValueDeserializer<T>(_serializer), reader);
+            }
+        }
+
+        class AnalysisDictionaryValueDeserializer<TKey> : IClrClassTypeDeserializer where TKey : class {
+            private readonly AnalysisSerializer _serializer;
+
+            public AnalysisDictionaryValueDeserializer(AnalysisSerializer serializer) {
+                _serializer = serializer;
+            }
+
+            public object Deserialize<T>(Stack<DeserializationFunc> stack, BinaryReader reader) where T : class {
+                return _serializer.DeserializeAnalysisDictionary<TKey, T>(stack, reader);
+            }
+        }
+
         private object DeserializeDictionary(Stack<DeserializationFunc> stack, BinaryReader reader) {
             return DeserializeClrType(stack, new DictionaryKeyDeserializer(this), reader);
         }
@@ -531,12 +573,38 @@ namespace Microsoft.NodejsTools.Analysis {
             int count = reader.ReadInt32();
             
             var comparer = (IEqualityComparer<TKey>)DeserializeObject(reader);
-            var value = new Dictionary<TKey, TValue>(comparer);
+            var value = new Dictionary<TKey, TValue>(count, comparer);
 
             return DeserializeDictionary<TKey, TValue>(stack, reader, value, count);
         }
 
         private IDictionary DeserializeDictionary<TKey, TValue>(Stack<DeserializationFunc> stack, BinaryReader reader, Dictionary<TKey, TValue> value, int count) {            
+            Memoize(value);
+
+            for (int i = 0; i < count; i++) {
+                object key = null;
+                stack.Push(newValue => _postProcess.Add(() => value[(TKey)key] = (TValue)newValue));
+                stack.Push(newKey => key = newKey);
+            }
+            return value;
+        }
+
+        private object DeserializeAnalysisDictionary(Stack<DeserializationFunc> stack, BinaryReader reader) {
+            return DeserializeClrType(stack, new AnalysisDictionaryKeyDeserializer(this), reader);
+        }
+
+        private object DeserializeAnalysisDictionary<TKey, TValue>(Stack<DeserializationFunc> stack, BinaryReader reader) where TKey : class where TValue : class {
+            int count = reader.ReadInt32();
+
+            var comparer = (IEqualityComparer<TKey>)DeserializeObject(reader);
+            var value = new AnalysisDictionary<TKey, TValue>(count, comparer);
+
+            return DeserializeAnalysisDictionary<TKey, TValue>(stack, reader, value, count);
+        }
+
+        private object DeserializeAnalysisDictionary<TKey, TValue>(Stack<DeserializationFunc> stack, BinaryReader reader, AnalysisDictionary<TKey, TValue> value, int count)
+            where TKey : class
+            where TValue : class {
             Memoize(value);
 
             for (int i = 0; i < count; i++) {
@@ -622,19 +690,26 @@ namespace Microsoft.NodejsTools.Analysis {
         /// callback with a generic type parameter so that we can create generic instances of lists,
         /// dicts, arrays, etc...
         /// </summary>
-        private static Func<Stack<DeserializationFunc>, IClrTypeDeserializer, BinaryReader, object> CreateClrDeserializer() {
+        private static Func<Stack<DeserializationFunc>, TInterface, BinaryReader, object> CreateClrDeserializer<TInterface>() {
             var stack = LinqExpr.Parameter(typeof(Stack<DeserializationFunc>));
-            var deserializer = LinqExpr.Parameter(typeof(IClrTypeDeserializer));
+            var deserializer = LinqExpr.Parameter(typeof(TInterface));
             var reader = LinqExpr.Parameter(typeof(BinaryReader));
             var valueType = LinqExpr.Parameter(typeof(int));
 
             var cases = new List<System.Linq.Expressions.SwitchCase>();
             foreach (var type in AnalysisSerializationSupportedTypeAttribute.AllowedTypeIndexes) {
+                MethodInfo method = typeof(TInterface).GetMethod("Deserialize");
+                var args = method.GetGenericArguments();
+                if ((args[0].GenericParameterAttributes & GenericParameterAttributes.ReferenceTypeConstraint) != 0 &&
+                    type.Key.IsValueType) {
+                        continue;
+                }
+
                 cases.Add(
                     LinqExpr.SwitchCase(
                         LinqExpr.Call(
                             deserializer,
-                            typeof(IClrTypeDeserializer).GetMethod("Deserialize").MakeGenericMethod(type.Key),
+                            method.MakeGenericMethod(type.Key),
                             stack,
                             reader
                         ),
@@ -643,7 +718,7 @@ namespace Microsoft.NodejsTools.Analysis {
                 );
             }
 
-            return LinqExpr.Lambda<Func<Stack<DeserializationFunc>, IClrTypeDeserializer, BinaryReader, object>>(
+            return LinqExpr.Lambda<Func<Stack<DeserializationFunc>, TInterface, BinaryReader, object>>(
                 LinqExpr.Block(
                     new[] { valueType },
 
@@ -676,16 +751,28 @@ namespace Microsoft.NodejsTools.Analysis {
         }
 
         private static Func<Stack<DeserializationFunc>, IClrTypeDeserializer, BinaryReader, object> ClrTypeDeserializer;
+        private static Func<Stack<DeserializationFunc>, IClrClassTypeDeserializer, BinaryReader, object> ClrClassTypeDeserializer;
 
         private static object DeserializeClrType(Stack<DeserializationFunc> stack, IClrTypeDeserializer deserializer, BinaryReader reader) {
             if (ClrTypeDeserializer == null) {
-                ClrTypeDeserializer = CreateClrDeserializer();
+                ClrTypeDeserializer = CreateClrDeserializer<IClrTypeDeserializer>();
             }
             return ClrTypeDeserializer(stack, deserializer, reader);
         }
 
+        private static object DeserializeClrType(Stack<DeserializationFunc> stack, IClrClassTypeDeserializer deserializer, BinaryReader reader) {
+            if (ClrClassTypeDeserializer == null) {
+                ClrClassTypeDeserializer = CreateClrDeserializer<IClrClassTypeDeserializer>();
+            }
+            return ClrClassTypeDeserializer(stack, deserializer, reader);
+        }
+
         interface IClrTypeDeserializer {
             object Deserialize<T>(Stack<DeserializationFunc> stack, BinaryReader reader);
+        }
+
+        interface IClrClassTypeDeserializer {
+            object Deserialize<T>(Stack<DeserializationFunc> stack, BinaryReader reader) where T : class;
         }
 
         #endregion
@@ -758,6 +845,8 @@ namespace Microsoft.NodejsTools.Analysis {
             FalseValue,
             UndefinedValue,
             GlobalValue,
+
+            AnalysisDictionary,
 
             // Variable analysis instances
             StringValue,

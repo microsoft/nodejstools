@@ -29,7 +29,7 @@ namespace Microsoft.NodejsTools.Analysis.Values {
         private readonly ProjectEntry _projectEntry;
         private readonly int _declVersion;
         internal readonly DependentKeyValue _keysAndValues;
-        private Dictionary<string, PropertyDescriptor> _descriptors;
+        private AnalysisDictionary<string, PropertyDescriptor> _descriptors;
         private Dictionary<object, object> _metadata;
         private AnalysisValue _next;
 
@@ -80,7 +80,7 @@ namespace Microsoft.NodejsTools.Analysis.Values {
 
         public override IAnalysisSet Get(Node node, AnalysisUnit unit, string name, bool addRef = true) {
             if (_descriptors == null) {
-                _descriptors = new Dictionary<string, PropertyDescriptor>();
+                _descriptors = new AnalysisDictionary<string, PropertyDescriptor>();
             }
             PropertyDescriptor desc;
             if (!_descriptors.TryGetValue(name, out desc)) {
@@ -356,7 +356,7 @@ namespace Microsoft.NodejsTools.Analysis.Values {
 
         private void EnsureDescriptors() {
             if (_descriptors == null) {
-                _descriptors = new Dictionary<string, PropertyDescriptor>();
+                _descriptors = new AnalysisDictionary<string, PropertyDescriptor>();
             }
         }
 
@@ -369,7 +369,7 @@ namespace Microsoft.NodejsTools.Analysis.Values {
             }
         }
 
-        public Dictionary<string, PropertyDescriptor> Descriptors {
+        public AnalysisDictionary<string, PropertyDescriptor> Descriptors {
             get {
                 return _descriptors;
             }

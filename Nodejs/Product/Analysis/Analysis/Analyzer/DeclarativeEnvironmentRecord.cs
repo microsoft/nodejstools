@@ -31,14 +31,14 @@ namespace Microsoft.NodejsTools.Analysis.Analyzer {
     /// </summary>
     [Serializable]
     abstract class DeclarativeEnvironmentRecord : EnvironmentRecord {
-        private readonly Dictionary<string, VariableDef> _variables;
+        private readonly AnalysisDictionary<string, VariableDef> _variables;
         private Dictionary<string, HashSet<VariableDef>> _linkedVariables;
         private readonly Node _node;
 
         public DeclarativeEnvironmentRecord(Node ast, EnvironmentRecord outerScope)
             : base(outerScope) {
             _node = ast;
-            _variables = new Dictionary<string, VariableDef>();
+            _variables = new AnalysisDictionary<string, VariableDef>();
         }
         
         public DeclarativeEnvironmentRecord(EnvironmentRecord outerScope)

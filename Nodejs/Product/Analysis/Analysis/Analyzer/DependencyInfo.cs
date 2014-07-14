@@ -76,7 +76,7 @@ namespace Microsoft.NodejsTools.Analysis.Analyzer {
 
     [Serializable]
     internal class KeyValueDependencyInfo : DependencyInfo {
-        internal Dictionary<AnalysisValue, IAnalysisSet> KeyValues = new Dictionary<AnalysisValue, IAnalysisSet>();
+        internal AnalysisDictionary<AnalysisValue, IAnalysisSet> KeyValues = new AnalysisDictionary<AnalysisValue, IAnalysisSet>();
 
         public KeyValueDependencyInfo(int version)
             : base(version) {
@@ -102,7 +102,7 @@ namespace Microsoft.NodejsTools.Analysis.Analyzer {
                 values.Add(keyValue);
             }
 
-            KeyValues = new Dictionary<AnalysisValue, IAnalysisSet>(cmp);
+            KeyValues = new AnalysisDictionary<AnalysisValue, IAnalysisSet>(cmp);
             foreach (var list in matches.Values) {
                 bool dummy;
                 var key = list[0].Key;

@@ -24,9 +24,11 @@ namespace Microsoft.NodejsTools.Analysis {
     /// </summary>
     [DebuggerDisplay("Count = {Count}")]
     [Serializable]
-    struct SingleDict<TKey, TValue> : IEnumerable<KeyValuePair<TKey, TValue>> {
+    struct SingleDict<TKey, TValue> : IEnumerable<KeyValuePair<TKey, TValue>>
+        where TKey : class
+        where TValue : class {
         [DebuggerBrowsable(DebuggerBrowsableState.Collapsed)]
-        private object _data; // Dictionary<TKey, TValue>, SingleEntry<TKey, TValue>
+        private object _data; // AnalysisDictionary<TKey, TValue>, SingleEntry<TKey, TValue>
 
         [DebuggerBrowsable(DebuggerBrowsableState.RootHidden)]
         private KeyValuePair<TKey, TValue>[] AllItems {
@@ -36,7 +38,7 @@ namespace Microsoft.NodejsTools.Analysis {
                     return new[] { new KeyValuePair<TKey, TValue>(single.Key, single.Value) };
                 }
 
-                var dict = _data as Dictionary<TKey, TValue>;
+                var dict = _data as AnalysisDictionary<TKey, TValue>;
                 if (dict != null) {
                     return dict.ToArray();
                 }
@@ -63,7 +65,7 @@ namespace Microsoft.NodejsTools.Analysis {
             if (single != null) {
                 return EqualityComparer<TKey>.Default.Equals(single.Key, key);
             }
-            var dict = _data as Dictionary<TKey, TValue>;
+            var dict = _data as AnalysisDictionary<TKey, TValue>;
             if (dict != null) {
                 return dict.ContainsKey(key);
             }
@@ -81,7 +83,7 @@ namespace Microsoft.NodejsTools.Analysis {
                 return false;
             }
 
-            var dict = _data as Dictionary<TKey, TValue>;
+            var dict = _data as AnalysisDictionary<TKey, TValue>;
             if (dict != null) {
                 return dict.TryGetValue(key, out value);
             }
@@ -112,16 +114,16 @@ namespace Microsoft.NodejsTools.Analysis {
                         return;
                     }
 
-                    var data = new Dictionary<TKey, TValue>();
+                    var data = new AnalysisDictionary<TKey, TValue>();
                     data[single.Key] = single.Value;
                     data[key] = value;
                     _data = data;
                     return;
                 }
 
-                var dict = _data as Dictionary<TKey, TValue>;
+                var dict = _data as AnalysisDictionary<TKey, TValue>;
                 if (dict == null) {
-                    _data = dict = new Dictionary<TKey, TValue>();
+                    _data = dict = new AnalysisDictionary<TKey, TValue>();
                 }
                 dict[key] = value;
             }
@@ -136,7 +138,7 @@ namespace Microsoft.NodejsTools.Analysis {
                 return;
             }
 
-            var dict = _data as Dictionary<TKey, TValue>;
+            var dict = _data as AnalysisDictionary<TKey, TValue>;
             if (dict != null) {
                 dict.Remove(fromModule);
             }
@@ -154,18 +156,18 @@ namespace Microsoft.NodejsTools.Analysis {
 
 
         [DebuggerBrowsable(DebuggerBrowsableState.Never)]
-        public Dictionary<TKey, TValue>.ValueCollection DictValues {
+        public IEnumerable<TValue> DictValues {
             get {
-                Debug.Assert(_data is Dictionary<TKey, TValue>);
+                Debug.Assert(_data is AnalysisDictionary<TKey, TValue>);
 
-                return ((Dictionary<TKey, TValue>)_data).Values;
+                return ((AnalysisDictionary<TKey, TValue>)_data).EnumerateValues;
             }
         }
 
         [DebuggerBrowsable(DebuggerBrowsableState.Never)]
-        internal Dictionary<TKey, TValue> InternalDict {
+        internal AnalysisDictionary<TKey, TValue> InternalDict {
             get {
-                return _data as Dictionary<TKey, TValue>;
+                return _data as AnalysisDictionary<TKey, TValue>;
             }
             set {
                 if (value.Count == 1) {
@@ -183,9 +185,9 @@ namespace Microsoft.NodejsTools.Analysis {
         public IEnumerable<TValue> Values {
             get {
                 SingleDependency single;
-                var dict = _data as Dictionary<TKey, TValue>;
+                var dict = _data as AnalysisDictionary<TKey, TValue>;
                 if (dict != null) {
-                    return dict.Values;
+                    return dict.EnumerateValues;
                 } else if ((single = _data as SingleDependency) != null) {
                     return new[] { single.Value };
                 }
@@ -201,9 +203,9 @@ namespace Microsoft.NodejsTools.Analysis {
                     yield return single.Key;
                 }
 
-                var dict = _data as Dictionary<TKey, TValue>;
+                var dict = _data as AnalysisDictionary<TKey, TValue>;
                 if (dict != null) {
-                    foreach (var value in dict.Keys) {
+                    foreach (var value in dict.KeysNoCopy) {
                         yield return value;
                     }
                 }
@@ -217,7 +219,7 @@ namespace Microsoft.NodejsTools.Analysis {
                     return 1;
                 }
 
-                var dict = _data as Dictionary<TKey, TValue>;
+                var dict = _data as AnalysisDictionary<TKey, TValue>;
                 if (dict != null) {
                     return dict.Count;
                 }
@@ -234,7 +236,7 @@ namespace Microsoft.NodejsTools.Analysis {
                 yield return new KeyValuePair<TKey, TValue>(single.Key, single.Value);
             }
 
-            Dictionary<TKey, TValue> dict = _data as Dictionary<TKey, TValue>;
+            AnalysisDictionary<TKey, TValue> dict = _data as AnalysisDictionary<TKey, TValue>;
             if (dict != null) {
                 foreach (var keyValue in dict) {
                     yield return keyValue;

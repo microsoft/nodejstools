@@ -148,6 +148,7 @@
     <Compile Include="..\..\..\Common\Product\SharedProject\DebugTimer.cs">
       <Link>DebugTimer.cs</Link>
     </Compile>
+    <Compile Include="Analysis\AnalysisDictionary.cs" />
     <Compile Include="Analysis\AnalysisExtensions.cs" />
     <Compile Include="Analysis\AnalysisSerializationSupportedTypeAttribute.cs" />
     <Compile Include="Analysis\AnalysisSerializeAsNullAttribute.cs" />

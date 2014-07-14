@@ -57,6 +57,7 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="AnalysisDictionaryTests.cs" />
     <Compile Include="AnalysisFile.cs" />
     <Compile Include="AnalysisTests.cs" />
     <Compile Include="FormatterTests.cs" />
