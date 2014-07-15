@@ -31,6 +31,9 @@ LINK_PATTERNS = None
 HEADER = ''''''
 
 FOOTER = '''
+<br/>
+<br/>
+<p><i>This page was generated using a tool. Changes will be lost when the html is regenerated. Source file: {0}</i></p>
 '''
 
 def get_build_root(start):
@@ -252,6 +255,6 @@ def main(start_dir, site, doc_root):
                 with open(filename[:-3] + '.html', 'w', encoding='utf-8') as dest:
                     dest.write(HEADER)
                     dest.write(html)
-                    dest.write(FOOTER)
+                    dest.write(FOOTER.format(filename))
             finally:
                 os.chdir(cwd)
