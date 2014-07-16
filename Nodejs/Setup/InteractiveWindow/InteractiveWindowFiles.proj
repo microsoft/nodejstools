@@ -17,8 +17,7 @@
     <File Include="Microsoft.NodejsTools.InteractiveWindow.dll" />
       
     <!-- Resources -->
-    <File Include="NodejsProject.ico;
-                   NodejsProjectBig.ico" />
+    <File Include="NodeJS.ico" />
   </ItemGroup>
 
   <Import Project="..\WixGenerator.targets"/>

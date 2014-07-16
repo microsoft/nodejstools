@@ -18,7 +18,7 @@
         <Property Id="INSTALLLEVEL" Value="1"/>
         
         <Property Id="ApplicationFolderName" Value="$(var.ProductName)" />
-        <Icon Id="AddRemoveProgramsIcon" SourceFile="$(var.TargetDir)NodejsProject.ico"/>
+        <Icon Id="AddRemoveProgramsIcon" SourceFile="$(var.TargetDir)NodeJS.ico"/>
         <Property Id="ARPPRODUCTICON">AddRemoveProgramsIcon</Property>
 
         <PropertyRef Id="VS2013_PRERELEASE"/>

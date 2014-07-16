@@ -33,8 +33,7 @@
         </File>
 
         <!-- Resources -->
-        <File Include="NodejsProject.ico;
-                       NodejsProjectBig.ico" />
+        <File Include="NodeJS.ico" />
 
         <!-- Templates -->
         <File Include="FileTemplates\NewItem\NewItems.vsdir;
