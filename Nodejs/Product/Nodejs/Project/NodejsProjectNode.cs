@@ -168,7 +168,7 @@ namespace Microsoft.NodejsTools.Project {
             return String.Equals(ext, NodejsConstants.FileExtension, StringComparison.OrdinalIgnoreCase);
         }
 
-        protected override string GetItemType(string filename) {
+        internal override string GetItemType(string filename) {
             if (string.Equals(Path.GetExtension(filename), NodejsConstants.TypeScriptExtension, StringComparison.OrdinalIgnoreCase)) {
                 return NodejsConstants.TypeScriptCompileItemType;
             }
@@ -208,9 +208,8 @@ namespace Microsoft.NodejsTools.Project {
         public override CommonFileNode CreateNonCodeFileNode(ProjectElement item) {
             string fileName = item.Url;
             if (!String.IsNullOrWhiteSpace(fileName)
-                && Path.GetExtension(fileName).Equals(".ts", StringComparison.OrdinalIgnoreCase)
-                && !fileName.EndsWith(".d.ts", StringComparison.OrdinalIgnoreCase)) {
-                return new NodejsTypeScriptFileNode(this, item);
+				&& Path.GetExtension(fileName).Equals(NodejsConstants.TypeScriptExtension, StringComparison.OrdinalIgnoreCase)){
+				return new NodejsTypeScriptFileNode(this, item);
             }
             if (Path.GetFileName(fileName).Equals(NodejsConstants.PackageJsonFile, StringComparison.OrdinalIgnoreCase)) {
                 return new PackageJsonFileNode(this, item);
@@ -279,7 +278,7 @@ namespace Microsoft.NodejsTools.Project {
         }
 
         public override bool IsCodeFile(string fileName) {
-            return Path.GetExtension(fileName).Equals(".js", StringComparison.OrdinalIgnoreCase);
+			return Path.GetExtension(fileName).Equals(".js", StringComparison.OrdinalIgnoreCase); 
         }
 
         public override int InitializeForOuter(string filename, string location, string name, uint flags, ref Guid iid, out IntPtr projectPointer, out int canceled) {

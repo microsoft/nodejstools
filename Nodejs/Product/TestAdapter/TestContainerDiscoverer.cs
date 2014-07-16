@@ -164,8 +164,8 @@ namespace Microsoft.NodejsTools.TestAdapter {
             //Check to see if we are dealing with a TypeScript file
             //  If we are then switch the test container to the underlying js file
             //
-            if (".ts".Equals(testCaseFileExtension, StringComparison.OrdinalIgnoreCase)) {
-                testCaseFile = testCaseFile.Substring(0,testCaseFile.Length -3) + ".js";
+            if (NodejsConstants.TypeScriptExtension.Equals(testCaseFileExtension, StringComparison.OrdinalIgnoreCase)) {
+                testCaseFile = testCaseFile.Substring(0,testCaseFile.Length -3) + NodejsConstants.FileExtension;
                 if (!File.Exists(testCaseFile)) {
                     //Ignore the file for now.  On the next build event the typescript compiler will generate the file
                     //  at that point this function gets invoked again on the .ts file and we'll see the newly created .js file

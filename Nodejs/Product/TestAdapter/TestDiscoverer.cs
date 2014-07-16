@@ -84,7 +84,7 @@ namespace Microsoft.NodejsTools.TestAdapter {
                             string fileAbsolutePath = CommonUtils.GetAbsoluteFilePath(projectHome, item.EvaluatedInclude);
                             string testFileAbsolutePath = fileAbsolutePath;
 
-                            if (Path.GetExtension(fileAbsolutePath).Equals(".ts", StringComparison.OrdinalIgnoreCase)) {
+                            if (Path.GetExtension(fileAbsolutePath).Equals(NodejsConstants.TypeScriptExtension, StringComparison.OrdinalIgnoreCase)) {
                                 //We're dealing with TypeScript
                                 //Switch to the underlying js file
                                 fileAbsolutePath = fileAbsolutePath.Substring(0, fileAbsolutePath.Length - 3) + ".js";

@@ -124,7 +124,7 @@ namespace Microsoft.NodejsTools.Project.ImportWizard {
                 Task.Factory.StartNew(() => {
                     var files = Directory.EnumerateFiles(sourcePath, "*.js", SearchOption.TopDirectoryOnly);
 
-                    if (filters.Split(';').Any(x => x.EndsWith(".ts", StringComparison.OrdinalIgnoreCase))) {
+                    if (filters.Split(';').Any(x => x.EndsWith(NodejsConstants.TypeScriptExtension, StringComparison.OrdinalIgnoreCase))) {
                         files = Directory.EnumerateFiles(
                             sourcePath, 
                             "*.ts", 
