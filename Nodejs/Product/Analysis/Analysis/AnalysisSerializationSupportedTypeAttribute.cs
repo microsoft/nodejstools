@@ -51,6 +51,7 @@ using Microsoft.NodejsTools.Parsing;
 [assembly: AnalysisSerializationSupportedType(typeof(InstanceValue))]
 [assembly: AnalysisSerializationSupportedType(typeof(ImmutableObjectValue))]
 [assembly: AnalysisSerializationSupportedType(typeof(ExportsValue))]
+[assembly: AnalysisSerializationSupportedType(typeof(PartiallyImmutableBuiltinFunctionValue))]
 [assembly: AnalysisSerializationSupportedType(typeof(BuiltinFunctionValue))]
 [assembly: AnalysisSerializationSupportedType(typeof(ModuleValue))]
 [assembly: AnalysisSerializationSupportedType(typeof(ModuleEnvironmentRecord.NodeEnvironmentKey))]

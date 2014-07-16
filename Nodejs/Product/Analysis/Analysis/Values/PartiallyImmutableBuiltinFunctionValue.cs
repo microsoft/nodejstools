@@ -25,7 +25,7 @@ namespace Microsoft.NodejsTools.Analysis.Values {
     /// for improving browser support but the augmentation only makes
     /// our analysis more difficult.
     /// </summary>
-
+    [Serializable]
     class PartiallyImmutableBuiltinFunctionValue : BuiltinFunctionValue {
         private readonly HashSet<string> _immutableFields = new HashSet<string>();
 
