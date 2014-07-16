@@ -160,7 +160,7 @@
     <value>TopLeft</value>
   </data>
   <data name="_noIntelliSenseRadioButton.ToolTip" xml:space="preserve">
-    <value>Source code is not analyzed at all, and no memory or CPU time is consumed for this purpose. Completions are not available.</value>
+    <value>No completions (minimum memory/CPU usage)</value>
   </data>
   <data name="&gt;&gt;_noIntelliSenseRadioButton.Name" xml:space="preserve">
     <value>_noIntelliSenseRadioButton</value>
@@ -196,13 +196,13 @@
     <value>1</value>
   </data>
   <data name="_limitedIntelliSenseRadioButton.Text" xml:space="preserve">
-    <value>&amp;Limited IntelliSense</value>
+    <value>&amp;Quick IntelliSense</value>
   </data>
   <data name="_limitedIntelliSenseRadioButton.TextAlign" type="System.Drawing.ContentAlignment, System.Drawing">
     <value>TopLeft</value>
   </data>
   <data name="_limitedIntelliSenseRadioButton.ToolTip" xml:space="preserve">
-    <value>A quick analysis of source code is performed to obtain basic information about types and members is possible. This option produces less accurate completions, but the consumption of memory and CPU time is also limited.</value>
+    <value>Limited completions (reduced memory/CPU usage)</value>
   </data>
   <data name="&gt;&gt;_limitedIntelliSenseRadioButton.Name" xml:space="preserve">
     <value>_limitedIntelliSenseRadioButton</value>
@@ -241,7 +241,7 @@
     <value>TopLeft</value>
   </data>
   <data name="_fullIntelliSenseRadioButton.ToolTip" xml:space="preserve">
-    <value>A detailed analysis of source code is performed to obtain as much information about types and members is possible. This option produces best completions, but consumes most memory and CPU time.</value>
+    <value>Best completions (substantial memory/CPU usage)</value>
   </data>
   <data name="&gt;&gt;_fullIntelliSenseRadioButton.Name" xml:space="preserve">
     <value>_fullIntelliSenseRadioButton</value>

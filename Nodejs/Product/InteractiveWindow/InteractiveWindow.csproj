@@ -203,16 +203,8 @@
     </VSCTCompile>
   </ItemGroup>
   <ItemGroup>
-    <Content Include="..\Icons\NodejsProject.ico">
-      <Link>NodejsProject.ico</Link>
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-      <IncludeInVSIX>true</IncludeInVSIX>
-      <VSIXSubpath>.</VSIXSubpath>
-    </Content>
-  </ItemGroup>
-  <ItemGroup>
-    <Content Include="..\Icons\NodejsProjectBig.ico">
-      <Link>NodejsProjectBig.ico</Link>
+    <Content Include="..\Icons\SystemRegisteredICO\NodeJS.ico">
+      <Link>NodeJS.ico</Link>
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
       <IncludeInVSIX>true</IncludeInVSIX>
       <VSIXSubpath>.</VSIXSubpath>

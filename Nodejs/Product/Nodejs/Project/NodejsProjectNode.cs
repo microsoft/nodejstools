@@ -76,38 +76,30 @@ namespace Microsoft.NodejsTools.Project {
             var images = ImageHandler.ImageList.Images;
             ImageIndexDependency = images.Count;
             images.Add(Image.FromStream(typeof(NodejsProjectNode).Assembly.GetManifestResourceStream("Microsoft.NodejsTools.Resources.Dependency_16.png")));
-            ImageIndexDependencyDev = images.Count;
-            images.Add(Image.FromStream(typeof(NodejsProjectNode).Assembly.GetManifestResourceStream("Microsoft.NodejsTools.Resources.DependencyDev_16.png")));
-            ImageIndexDependnecyOptional = images.Count;
-            images.Add(Image.FromStream(typeof(NodejsProjectNode).Assembly.GetManifestResourceStream("Microsoft.NodejsTools.Resources.DependencyOptional_16.png")));
             ImageIndexDependencyNotListed = images.Count;
             images.Add(Image.FromStream(typeof(NodejsProjectNode).Assembly.GetManifestResourceStream("Microsoft.NodejsTools.Resources.DependencyExtraneous_16.png")));
-            ImageIndexDependencyBundled = images.Count;
-            images.Add(Image.FromStream(typeof(NodejsProjectNode).Assembly.GetManifestResourceStream("Microsoft.NodejsTools.Resources.DependencyBundled_16.png")));
             ImageIndexDependencyMissing = images.Count;
             images.Add(Image.FromStream(typeof(NodejsProjectNode).Assembly.GetManifestResourceStream("Microsoft.NodejsTools.Resources.DependencyMissing_16.png")));
-            ImageIndexDependencyDevMissing = images.Count;
-            images.Add(Image.FromStream(typeof(NodejsProjectNode).Assembly.GetManifestResourceStream("Microsoft.NodejsTools.Resources.DependencyDevMissing_16.png")));
-            ImageIndexDependencyOptionalMissing = images.Count;
-            images.Add(Image.FromStream(typeof(NodejsProjectNode).Assembly.GetManifestResourceStream("Microsoft.NodejsTools.Resources.DependencyOptionalMissing_16.png")));
-            ImageIndexDependencyBundledMissing = images.Count;
-            images.Add(Image.FromStream(typeof(NodejsProjectNode).Assembly.GetManifestResourceStream("Microsoft.NodejsTools.Resources.DependencyBundledMissing_16.png")));
         }
 
         public int ImageIndexDependency { get; private set; }
-        public int ImageIndexDependencyDev { get; private set; }
-        public int ImageIndexDependnecyOptional { get; private set; }
+
         public int ImageIndexDependencyNotListed { get; private set; }
-        public int ImageIndexDependencyBundled { get; private set; }
 
         public int ImageIndexDependencyMissing { get; private set; }
-        public int ImageIndexDependencyDevMissing { get; private set; }
-        public int ImageIndexDependencyOptionalMissing { get; private set; }
-        public int ImageIndexDependencyBundledMissing { get; private set; }
 
         public override Guid SharedCommandGuid {
             get {
                 return Guids.NodejsCmdSet;
+            }
+        }
+
+        public override int ImageIndex {
+            get {
+                if (string.Equals(GetProjectProperty(NodejsConstants.EnableTypeScript), "true", StringComparison.OrdinalIgnoreCase)) {
+                    return this.ImageOffset + (int)NodejsProjectImageName.TypeScriptProject;
+                }
+                return base.ImageIndex;
             }
         }
 

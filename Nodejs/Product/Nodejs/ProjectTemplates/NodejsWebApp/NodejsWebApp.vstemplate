@@ -2,7 +2,7 @@
   <TemplateData>
     <Name>Blank Node.js Web Application</Name>
     <Description>An empty Node.js Web application.</Description>
-    <Icon Package="{FE8A8C3D-328A-476D-99F9-2A24B75F8C7F}" ID="401" />
+    <Icon Package="{FE8A8C3D-328A-476D-99F9-2A24B75F8C7F}" ID="406" />
     <ProjectType>JavaScript</ProjectType>
     <TemplateID>Microsoft.JavaScript.NodejsWebApp</TemplateID>
     <SortOrder>130</SortOrder>

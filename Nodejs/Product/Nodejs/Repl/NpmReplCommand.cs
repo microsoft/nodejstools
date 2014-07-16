@@ -81,10 +81,16 @@ namespace Microsoft.NodejsTools.Repl {
                 }
             }
 
+            bool isGlobalInstall = false;
+            if (npmArguments.Contains(" -g") || npmArguments.Contains(" --global")) {
+                projectPath = Environment.GetFolderPath(Environment.SpecialFolder.UserProfile);
+                isGlobalInstall = true;
+            }
+
             // In case someone copies filename
             string projectDirectoryPath = File.Exists(projectPath) ? Path.GetDirectoryName(projectPath) : projectPath;
             
-            if (!(Directory.Exists(projectDirectoryPath) && File.Exists(Path.Combine(projectDirectoryPath, "package.json")))){
+            if (!isGlobalInstall && !(Directory.Exists(projectDirectoryPath) && File.Exists(Path.Combine(projectDirectoryPath, "package.json")))){
                 window.WriteError("Please specify a valid Node.js project or project directory in solution. If solution contains multiple projects, specify target project using .npm [ProjectName or ProjectDir] <npm arguments>");
                 return ExecutionResult.Failure;
             }

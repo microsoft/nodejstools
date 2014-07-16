@@ -9,8 +9,8 @@
     <GettingStartedGuide>http://nodejstools.codeplex.com</GettingStartedGuide>
     <Locale>1033</Locale>
     <InstalledByMsi>true</InstalledByMsi>
-    <Icon>NodejsProject.ico</Icon>
-    <PreviewImage>NodejsProjectBig.ico</PreviewImage>
+    <Icon>NodeJS.ico</Icon>
+    <PreviewImage>NodeJS.ico</PreviewImage>
     <SystemComponent>false</SystemComponent>
     <SupportedProducts>
       <VisualStudio Version="11.0">

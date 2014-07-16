@@ -330,7 +330,7 @@ namespace Microsoft.NodejsTools.NpmUI {
 
 
         public Visibility FilterControlsVisibility {
-            get { return LoadingCatalogControlVisibility == Visibility.Visible ? Visibility.Collapsed : Visibility.Visible; }
+            get { return SelectedPackage == null ||  LoadingCatalogControlVisibility == Visibility.Visible ? Visibility.Collapsed : Visibility.Visible; }
         }
 
         #endregion
@@ -402,6 +402,7 @@ namespace Microsoft.NodejsTools.NpmUI {
             set {
                 _selectedPackage = value;
                 OnPropertyChanged();
+                OnPropertyChanged("FilterControlsVisibility");
             }
         }
 

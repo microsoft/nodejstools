@@ -2,7 +2,7 @@
   <TemplateData>
     <Name>Blank Node.js Console Application</Name>
     <Description>An empty Node.js application.</Description>
-    <Icon Package="{FE8A8C3D-328A-476D-99F9-2A24B75F8C7F}" ID="401" />
+    <Icon Package="{FE8A8C3D-328A-476D-99F9-2A24B75F8C7F}" ID="405" />
     <ProjectType>JavaScript</ProjectType>
     <TemplateID>Microsoft.JavaScript.NodejsConsoleApp</TemplateID>
     <SortOrder>125</SortOrder>

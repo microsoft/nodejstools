@@ -101,6 +101,7 @@
       </Button>
 
       <Button guid="guidNodeToolsCmdSet" id="cmdidOpenCommandPromptHere" priority="0x0600" type="Button">
+        <Icon guid="guidCommandPromptImage" id="1" />
         <Parent guid="guidSHLMainMenu" id="IDG_VS_CTXT_FOLDER_EXPLORE"/>
         <CommandFlag>DefaultInvisible</CommandFlag>
         <CommandFlag>DynamicVisibility</CommandFlag>
@@ -122,7 +123,7 @@
 
       <Button guid="guidNodeToolsCmdSet" id="cmdidReplWindow" priority="0x7f00" type="Button">
         <Parent guid="guidSHLMainMenu" id="IDG_VS_WNDO_OTRWNDWS1"/>
-        <Icon guid="guidImages" id="nodeReplPic" />
+        <Icon guid="guidReplImage" id="1"/>
         <Strings>
           <CommandName>Node.js Interactive Window</CommandName>
           <ButtonText>Node.js Interactive Window</ButtonText>
@@ -159,7 +160,7 @@
         <CommandFlag>DynamicVisibility</CommandFlag>
         <Strings>
           <CommandName>cmdidNpmManageModules</CommandName>
-          <ButtonText>Install &amp;New npm Modules...</ButtonText>
+          <ButtonText>Install &amp;New npm Packages...</ButtonText>
         </Strings>
       </Button>
       
@@ -169,7 +170,7 @@
         <CommandFlag>DynamicVisibility</CommandFlag>
         <Strings>
           <CommandName>cmdidNpmInstallModules</CommandName>
-          <ButtonText>&amp;Install Missing npm Modules</ButtonText>
+          <ButtonText>&amp;Install Missing npm Packages</ButtonText>
         </Strings>
       </Button>
 
@@ -179,7 +180,7 @@
         <CommandFlag>DynamicVisibility</CommandFlag>
         <Strings>
           <CommandName>cmdidNpmUpdateModules</CommandName>
-          <ButtonText>Up&amp;date npm Modules</ButtonText>
+          <ButtonText>Up&amp;date npm Packages</ButtonText>
         </Strings>
       </Button>
 
@@ -189,7 +190,7 @@
         <CommandFlag>DynamicVisibility</CommandFlag>
         <Strings>
           <CommandName>cmdidNpmUninstallModules</CommandName>
-          <ButtonText>Unins&amp;tall npm Module(s)</ButtonText>
+          <ButtonText>Unins&amp;tall npm Package(s)</ButtonText>
         </Strings>
       </Button>
 
@@ -199,7 +200,7 @@
         <CommandFlag>DynamicVisibility</CommandFlag>
         <Strings>
           <CommandName>cmdidNpmInstallSingleMissingModule</CommandName>
-          <ButtonText>&amp;Install Missing npm Module(s)</ButtonText>
+          <ButtonText>&amp;Install Missing npm Package(s)</ButtonText>
         </Strings>
       </Button>
 
@@ -209,7 +210,7 @@
         <CommandFlag>DynamicVisibility</CommandFlag>
         <Strings>
           <CommandName>cmdidNpmUpdateSingleModule</CommandName>
-          <ButtonText>&amp;Update npm Module(s)</ButtonText>
+          <ButtonText>&amp;Update npm Package(s)</ButtonText>
         </Strings>
       </Button>
 
@@ -255,7 +256,8 @@
             bitmap strip containing the bitmaps and then there are the numeric ids of the elements used 
             inside a button definition. An important aspect of this declaration is that the element id 
             must be the actual index (1-based) of the bitmap inside the bitmap strip. -->
-
+      <Bitmap guid="guidCommandPromptImage" href="..\Icons\ContextMenuBMP32\OpenCommandPromptHere_16x_32.bmp" />
+      <Bitmap guid="guidReplImage" href="..\Icons\ToolMenuPNG\NodeJSInteractiveWindow_16x.png" />
       <Bitmap guid="guidImages" href="..\Icons\Images_32bit.png" usedList="nodeReplPic, bmpPic2, bmpPicSearch, bmpPicX, bmpPicArrows, nodeDebugRepl"/>
     </Bitmaps>
   </Commands>
@@ -329,6 +331,9 @@
       <IDSymbol name="ToolsMenu" value ="0x2001" />
       <IDSymbol name="RemoteDebugProxyMenu" value ="0x2002" />
     </GuidSymbol>
+
+    <GuidSymbol name="guidCommandPromptImage" value="{6CFD0EC5-3818-4439-AC50-71365BD2A756}" />
+    <GuidSymbol name="guidReplImage" value="{31C0C4BE-487E-4CCB-BEA2-A2EE8D23EDBB}" />
 
     <GuidSymbol name="guidImages" value="{C616533C-7A95-4A3D-A22A-A5361A8037D8}" >
       <IDSymbol name="nodeReplPic" value="1" />

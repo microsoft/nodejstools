@@ -327,6 +327,8 @@
       <SubType>Component</SubType>
     </Compile>
     <Compile Include="Project\DependencyNodeProperties.cs" />
+    <Compile Include="Project\LocalModulesNode.cs" />
+    <Compile Include="Project\NodejsProjectImageName.cs" />
     <Compile Include="Project\NodejsTypeScriptFileNode.cs" />
     <Compile Include="Project\NodejsTypeScriptFileNodeProperties.cs" />
     <Compile Include="Project\NpmNodeProperties.cs" />
@@ -642,6 +644,7 @@
     </EmbeddedResource>
     <EmbeddedResource Include="Options\NodejsIntellisenseOptionsControl.resx">
       <DependentUpon>NodejsIntellisenseOptionsControl.cs</DependentUpon>
+      <SubType>Designer</SubType>
     </EmbeddedResource>
     <EmbeddedResource Include="Options\NodejsFormattingBracesOptionsControl.resx">
       <DependentUpon>NodejsFormattingBracesOptionsControl.cs</DependentUpon>
@@ -1045,12 +1048,6 @@
     </None>
   </ItemGroup>
   <ItemGroup>
-    <Resource Include="..\Icons\blankts.ico">
-      <Link>Resources\Icons\blankts.ico</Link>
-    </Resource>
-    <Resource Include="..\Icons\blankjs.ico">
-      <Link>Resources\Icons\blankjs.ico</Link>
-    </Resource>
     <Resource Include="..\Icons\JScript.ico">
       <Link>Resources\Icons\JScript.ico</Link>
     </Resource>
@@ -1067,40 +1064,20 @@
     </None>
   </ItemGroup>
   <ItemGroup>
-    <Content Include="..\Icons\NodejsProject.ico">
-      <Link>NodejsProject.ico</Link>
+    <Content Include="..\Icons\SystemRegisteredICO\NodeJS.ico">
+      <Link>NodeJS.ico</Link>
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
       <IncludeInVSIX>true</IncludeInVSIX>
       <VSIXSubpath>.</VSIXSubpath>
     </Content>
-    <Content Include="..\Icons\NodejsProjectBig.ico">
-      <Link>NodejsProjectBig.ico</Link>
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-      <IncludeInVSIX>true</IncludeInVSIX>
-      <VSIXSubpath>.</VSIXSubpath>
-    </Content>
-    <Resource Include="..\Icons\NodejsProjectBigResource.ico">
-      <Link>Resources\Icons\NodejsProjectBigResource.ico</Link>
-    </Resource>
     <Content Include="NoSurveyNewsFeed.html">
       <IncludeInVSIX>true</IncludeInVSIX>
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
     <Content Include="Resources\Package.ico" />
-    <EmbeddedResource Include="Resources\DependencyBundledMissing_16.png" />
-    <EmbeddedResource Include="Resources\DependencyBundled_16.png" />
-    <EmbeddedResource Include="Resources\DependencyDevMissing_16.png" />
-    <EmbeddedResource Include="Resources\DependencyDev_16.png" />
-    <EmbeddedResource Include="Resources\DependencyExtraneousBundled_16.png" />
     <EmbeddedResource Include="Resources\DependencyExtraneous_16.png" />
     <EmbeddedResource Include="Resources\DependencyMissing_16.png" />
-    <EmbeddedResource Include="Resources\DependencyOptionalMissing_16.png" />
-    <EmbeddedResource Include="Resources\DependencyOptional_16.png" />
     <EmbeddedResource Include="Resources\Dependency_16.png" />
-    <EmbeddedResource Include="Resources\Warning_16.png" />
-    <EmbeddedResource Include="Resources\DependencyDev_32.png" />
-    <EmbeddedResource Include="Resources\DependencyOptional_32.png" />
-    <EmbeddedResource Include="Resources\Dependency_32.png" />
   </ItemGroup>
   <ItemGroup>
     <Content Include="nodejsref.js">

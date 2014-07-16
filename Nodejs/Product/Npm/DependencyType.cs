@@ -14,7 +14,7 @@
 
 namespace Microsoft.NodejsTools.Npm {
     public enum DependencyType {
-        Standard,
+        Standard = 0,
         Development,
         Optional
     }

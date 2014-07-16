@@ -58,6 +58,13 @@ namespace Microsoft.NodejsTools.Npm.SPI {
             }
         }
 
+        public bool IsDependency {
+            get {
+                IPackageJson parentPackageJson = _parent.PackageJson;
+                return null != parentPackageJson && parentPackageJson.Dependencies.Contains(Name);
+            }
+        }
+
         public bool IsOptionalDependency {
             get {
                 IPackageJson parentPackageJson = _parent.PackageJson;

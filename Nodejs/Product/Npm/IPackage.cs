@@ -20,12 +20,19 @@ namespace Microsoft.NodejsTools.Npm {
         string PublishDateTimeString { get; }
 
         string RequestedVersionRange { get; }
+
         IEnumerable<string> Keywords { get; }
 
         bool IsListedInParentPackageJson { get; }
+
         bool IsMissing { get; }
+
+        bool IsDependency { get; }
+
         bool IsDevDependency { get; }
+
         bool IsOptionalDependency { get; }
+
         bool IsBundledDependency { get; }
 
         PackageFlags Flags { get; }

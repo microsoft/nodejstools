@@ -14,6 +14,7 @@
 
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.IO;
 using System.Linq;
 using System.Runtime.InteropServices;
@@ -51,7 +52,11 @@ namespace Microsoft.NodejsTools.Project {
         #region Member variables
 
         private readonly GlobalModulesNode _globalModulesNode;
-        private readonly FileSystemWatcher _watcher;
+        private readonly LocalModulesNode _devModulesNode;
+        private readonly LocalModulesNode _optionalModulesNode;
+
+        private readonly FileSystemWatcher _localWatcher;
+        private readonly FileSystemWatcher _globalWatcher;
         private Timer _fileSystemWatcherTimer;
         private INpmController _npmController;
         private int _npmCommandsExecuting;
@@ -71,19 +76,49 @@ namespace Microsoft.NodejsTools.Project {
             : base(root) {
             ExcludeNodeFromScc = true;
 
-            _watcher = new FileSystemWatcher(_projectNode.ProjectHome) {
-                NotifyFilter = NotifyFilters.LastWrite,
-                IncludeSubdirectories = true
-            };
-            _watcher.Changed += Watcher_Modified;
-            _watcher.Created += Watcher_Modified;
-            _watcher.Deleted += Watcher_Modified;
-            _watcher.EnableRaisingEvents = true;
-
             CreateNpmController();
+
+            _localWatcher = CreateModuleDirectoryWatcherIfDirectoryExists(_projectNode.ProjectHome);
+
+            _globalWatcher = CreateModuleDirectoryWatcherIfDirectoryExists(_npmController.ListBaseDirectory);
 
             _globalModulesNode = new GlobalModulesNode(root, this);
             AddChild(_globalModulesNode);
+
+            _devModulesNode = new LocalModulesNode(root, this, "dev", "DevelopmentModules");
+            AddChild(_devModulesNode);
+
+            _optionalModulesNode = new LocalModulesNode(root, this, "optional", "OptionalModules");
+            AddChild(_optionalModulesNode);
+        }
+
+        private FileSystemWatcher CreateModuleDirectoryWatcherIfDirectoryExists(string directory) {
+            if (!Directory.Exists(directory)) {
+                return null;
+            }
+
+            FileSystemWatcher watcher = null;
+            try {
+                watcher = new FileSystemWatcher(directory) {
+                    NotifyFilter = NotifyFilters.LastWrite,
+                    IncludeSubdirectories = true
+                };
+
+                watcher.Changed += Watcher_Modified;
+                watcher.Created += Watcher_Modified;
+                watcher.Deleted += Watcher_Modified;
+                watcher.EnableRaisingEvents = true;
+            } catch (IOException) {
+                if (watcher != null) {
+                    watcher.Dispose();
+                }
+            } catch (ArgumentException ex) {
+                if (watcher != null) {
+                    watcher.Dispose();
+                }
+                Debug.WriteLine("Error starting FileSystemWatcher:\r\n{0}", ex);
+            }
+            return watcher;
         }
 
         private void CheckNotDisposed() {
@@ -96,10 +131,19 @@ namespace Microsoft.NodejsTools.Project {
         protected override void Dispose(bool disposing) {
             if (!_isDisposed) {
                 lock (_fileBitsLock) {
-                    _watcher.Changed -= Watcher_Modified;
-                    _watcher.Created -= Watcher_Modified;
-                    _watcher.Deleted -= Watcher_Modified;
-                    _watcher.Dispose();
+                    if (_localWatcher != null) {
+                        _localWatcher.Changed -= Watcher_Modified;
+                        _localWatcher.Created -= Watcher_Modified;
+                        _localWatcher.Deleted -= Watcher_Modified;
+                        _localWatcher.Dispose();
+                    }
+
+                    if (_globalWatcher != null) {
+                        _globalWatcher.Changed -= Watcher_Modified;
+                        _globalWatcher.Created -= Watcher_Modified;
+                        _globalWatcher.Deleted -= Watcher_Modified;
+                        _globalWatcher.Dispose();
+                    }
                 }
 
                 if (null != _fileSystemWatcherTimer) {
@@ -440,9 +484,20 @@ namespace Microsoft.NodejsTools.Project {
 
             var controller = _npmController;
             if (null != controller) {
-                var root = controller.RootPackage;
-                if (null != root) {
-                    ReloadHierarchy(this, root.Modules);
+                if (null != RootPackage) {
+                    var dev = controller.RootPackage.Modules.Where(package => package.IsDevDependency);
+                    _devModulesNode.Packages = dev;
+                    ReloadHierarchy(_devModulesNode, dev);
+
+                    var optional = controller.RootPackage.Modules.Where(package => package.IsOptionalDependency);
+                    _optionalModulesNode.Packages = optional;
+                    ReloadHierarchy(_optionalModulesNode, optional);
+
+                    var root = controller.RootPackage.Modules.Where(package => 
+                        package.IsDependency || 
+                        !package.IsListedInParentPackageJson);
+                    
+                    ReloadHierarchy(this, root);
                 }
 
                 var global = controller.GlobalPackages;

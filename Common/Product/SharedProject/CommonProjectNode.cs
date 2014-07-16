@@ -43,10 +43,7 @@ namespace Microsoft.VisualStudioTools.Project {
         SearchPathContainer,
         SearchPath,
         MissingSearchPath,
-        StartupFile,
-        InterpretersContainer = SearchPathContainer,
-        Interpreter = SearchPath,
-        InterpretersPackage = SearchPath
+        StartupFile
     }
 
     internal abstract class CommonProjectNode : ProjectNode, IVsProjectSpecificEditorMap2, IVsDeferredSaveProject {

@@ -6,10 +6,10 @@
     xmlns:npmUi="clr-namespace:Microsoft.NodejsTools.NpmUI"
     xmlns:ui="clr-namespace:Microsoft.VisualStudioTools"
     xmlns:wpf="clr-namespace:Microsoft.VisualStudioTools.Wpf"
-    Title="Install New npm Modules"
+    Title="Install New npm Packages"
     Height="500"
     MinHeight="500"
-    Width="600"
+    Width="700"
     MinWidth="600"
     WindowStartupLocation="CenterOwner"
     Background="{DynamicResource {x:Static wpf:Controls.BackgroundKey}}"
@@ -36,7 +36,14 @@
                     </Style>
 
                     <DataTemplate DataType="{x:Type npmUi:ReadOnlyPackageCatalogEntryViewModel}">
-                        <Grid>
+                    <Grid>
+                            <Grid.InputBindings>
+                                <MouseBinding Gesture="LeftDoubleClick"
+                                              Command="{x:Static npmUi:NpmPackageInstallViewModel.InstallCommand}"
+                                              CommandParameter="{Binding}" />
+                                <KeyBinding Command="{x:Static npmUi:NpmPackageInstallViewModel.InstallCommand}"
+                                CommandParameter="{Binding}" Key="Enter" Gesture="ENTER"/>
+                            </Grid.InputBindings>
                             <Grid.RowDefinitions>
                                 <!-- Name/Version/Author -->
                                 <RowDefinition Height="auto" />
@@ -126,12 +133,6 @@
                             </Grid>
 
                             <Separator Grid.Row="3" Margin="0 4 0 2" />
-
-                            <Grid.InputBindings>
-                                <MouseBinding Gesture="LeftDoubleClick"
-                                              Command="{x:Static npmUi:NpmPackageInstallViewModel.InstallCommand}"
-                                              CommandParameter="{Binding}" />
-                            </Grid.InputBindings>
                         </Grid>
 
                         <DataTemplate.Triggers>
@@ -173,7 +174,7 @@
                             <TextBlock Grid.Column="1"
                                        x:Name="Message"
                                        Text="{Binding Description}"
-                                       VerticalAlignment="Center" />
+                                       VerticalAlignment="Center"/>
                         </Grid>
                         <DataTemplate.Triggers>
                             <DataTrigger Binding="{Binding IsAncient}" Value="True">
@@ -213,10 +214,6 @@
                         Executed="RefreshCatalogCommand_Executed"
                         CanExecute="RefreshCatalogCommand_CanExecute" />
     </Window.CommandBindings>
-
-    <Window.InputBindings>
-        <KeyBinding Command="{x:Static npmUi:NpmPackageInstallViewModel.InstallCommand}" Gesture="ENTER" />
-    </Window.InputBindings>
 
     <Grid VerticalAlignment="Stretch"
                    Height="Auto"
@@ -259,7 +256,7 @@
                         Grid.Column="1"
                         Command="ApplicationCommands.Close"
                         IsCancel="True"
-                        KeyboardNavigation.TabIndex="7">
+                        KeyboardNavigation.TabIndex="10">
                 _Close
             </Button>
         </Grid>
@@ -295,9 +292,6 @@
                           MinHeight="0"
                           KeyboardNavigation.TabIndex="1" />
 
-
-
-
             <Grid Grid.Row="2" VerticalAlignment="Top" Margin="0 4 0 0">
                 <Grid.ColumnDefinitions>
                     <ColumnDefinition Width="*" />
@@ -329,9 +323,9 @@
                 </Grid.RowDefinitions>
                 <ScrollViewer VerticalScrollBarVisibility="Auto">
                     <StackPanel Name="PackageInfo">
-                        <TextBlock>
-                            <TextBlock FontSize="15pt" FontWeight="Bold" Text="{Binding Path=SelectedPackage.Name, Mode=OneWay}"></TextBlock>
-                            <TextBlock Text="{Binding Path=SelectedPackage.Version, Mode=OneWay}"/>
+                        <TextBlock Margin="0">
+                            <Run FontSize="15pt" FontWeight="Bold" Text="{Binding Path=SelectedPackage.Name, Mode=OneWay}"/>
+                            <Run Text="{Binding Path=SelectedPackage.Version, Mode=OneWay}"/>
                         </TextBlock>
 
                         <TextBlock Margin="0 4 0 4"
@@ -340,14 +334,14 @@
                             Opacity="0.5" />
 
                         <StackPanel Orientation="Horizontal" Margin="0 4 0 4" x:Name="AuthorBlock" Visibility="{Binding SelectedPackage.AuthorVisibility, Mode=OneWay}">
-                            <TextBlock FontWeight="Bold">Author:</TextBlock>
+                            <TextBlock Margin="0" FontWeight="Bold">Author:</TextBlock>
                             <TextBlock Text="{Binding Path=SelectedPackage.Author, Mode=OneWay}"/>
                         </StackPanel>
 
                         <StackPanel Margin="0 4 0 4" x:Name="HomepageBlock"
                                     Visibility="{Binding SelectedPackage.HomepageVisibility}"
                                     Orientation="Horizontal">
-                            <TextBlock FontWeight="Bold">Homepage:</TextBlock>
+                            <TextBlock Margin="0" FontWeight="Bold" xml:space="preserve">Homepage: </TextBlock>
                             <Button x:Name="HomepageLink" Style="{StaticResource NavigationButton}"
                                     Content="{Binding Path=SelectedPackage.Homepage, Mode=OneWay}"
                                     Click="HomepageLink_Click"
@@ -356,10 +350,10 @@
                                     Padding="0"/>
                         </StackPanel>
 
-                        <StackPanel Margin="0 4 0 4" Orientation="Horizontal" x:Name="DescriptionBlock" Visibility="{Binding SelectedPackage.DescriptionVisibility, Mode=OneWay}">
-                             <TextBlock FontWeight="Bold">Description:</TextBlock>
-                            <TextBlock Text="{Binding Path=SelectedPackage.Description, Mode=OneWay}"/>
-                        </StackPanel>
+                        <TextBlock Margin="0 4 0 4" TextWrapping="Wrap" x:Name="DescriptionBlock" Visibility="{Binding SelectedPackage.DescriptionVisibility, Mode=OneWay}">
+                             <Run FontWeight="Bold">Description:</Run>
+                            <Run Text="{Binding Path=SelectedPackage.Description, Mode=OneWay}"/>
+                        </TextBlock>
 
                     </StackPanel>
                 </ScrollViewer>
@@ -391,17 +385,8 @@
                         will affect other apps that use packages via 'npm link'.
                             </TextBlock>
                         </Border>
-                        <Button x:Name="InstallButton"
-                            Grid.Column="0" Grid.ColumnSpan="2"
-                            Grid.Row="6"
-                            Content="Install"
-                                    Margin="4"
-                            Height="30"
-                            Command="{x:Static npmUi:NpmPackageInstallViewModel.InstallCommand}"
-                            CommandParameter="{Binding SelectedPackage}"
-                            KeyboardNavigation.TabIndex="6"/>
 
-                        <TextBlock Grid.Row="1" FontWeight="Bold" Padding="4">Options</TextBlock>
+                        <TextBlock Grid.Row="1" FontWeight="Bold" Margin="0 4 0 4">Options</TextBlock>
                         <Label Grid.Row="4" HorizontalAlignment="Right" VerticalAlignment="Center">Other npm arguments</Label>
                         <TextBox x:Name="ArgumentsTextBox" Grid.Column="1" Grid.Row="4" HorizontalAlignment="Stretch" Text="{Binding Arguments}" Margin="4" TabIndex="5"/>
                         <Label Grid.Row="3" HorizontalAlignment="Right" VerticalAlignment="Center">Add to package.json</Label>
@@ -423,7 +408,20 @@
                         </ComboBox>
 
                     </Grid>
-
+                    <StackPanel Orientation="Horizontal" Margin="0 8 0 0">
+                        <Button x:Name="InstallButton" Margin="0 0 4 0"
+                                HorizontalAlignment="Left"
+                                Command="{x:Static npmUi:NpmPackageInstallViewModel.InstallCommand}"
+                                CommandParameter="{Binding SelectedPackage}"
+                                KeyboardNavigation.TabIndex="6"
+                                IsDefault="True">
+                            _Install Package
+                        </Button>
+                        <Button Style="{StaticResource NavigationButton}" VerticalAlignment="Center" Margin="5 0 0 0" 
+                                Click="ResetOptionsButton_Click" KeyboardNavigation.TabIndex="7">
+                            Reset Options
+                        </Button>
+                    </StackPanel>
                 </StackPanel>
             </Grid>
 

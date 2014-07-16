@@ -27,5 +27,7 @@ namespace Microsoft.NodejsTools.Npm {
 
         Task<IPackageCatalog> GetRepositoryCatalogueAsync(bool forceDownload);
         IPackageCatalog MostRecentlyLoadedCatalog { get; }
+
+        string ListBaseDirectory { get; }
     }
 }

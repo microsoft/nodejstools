@@ -2,7 +2,7 @@
   <TemplateData>
     <Name>From Existing Node.js code</Name>
     <Description>Creates a new Node.js project from existing code.</Description>
-    <Icon Package="{FE8A8C3D-328A-476D-99F9-2A24B75F8C7F}" ID="402" />
+    <Icon Package="{FE8A8C3D-328A-476D-99F9-2A24B75F8C7F}" ID="409" />
     <ProjectType>TypeScript</ProjectType>
     <TemplateID>Microsoft.TypeScript.NodejsFromExistingCode</TemplateID>
     <SortOrder>120</SortOrder>

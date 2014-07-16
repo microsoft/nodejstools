@@ -16,6 +16,7 @@ using System;
 using System.Diagnostics;
 using System.Windows;
 using System.Windows.Controls;
+using System.Windows.Data;
 using System.Windows.Documents;
 using System.Windows.Input;
 using System.Windows.Media;
@@ -137,6 +138,14 @@ namespace Microsoft.NodejsTools.NpmUI {
             if (!string.IsNullOrEmpty(homepageLink)) {
                 Process.Start(homepageLink);
             }
+        }
+
+        private void ResetOptionsButton_Click(object sender, RoutedEventArgs e) {
+            this.DependencyComboBox.SelectedIndex = (int)DependencyType.Standard;
+            this.SaveToPackageJsonCheckbox.IsChecked = true;
+
+            ArgumentsTextBox.Text = string.Empty;
+            ArgumentsTextBox.GetBindingExpression(TextBox.TextProperty).UpdateSource();
         }
     }
 }

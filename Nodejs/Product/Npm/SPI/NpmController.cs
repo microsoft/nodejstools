@@ -104,6 +104,19 @@ namespace Microsoft.NodejsTools.Npm.SPI {
             }
         }
 
+        public string ListBaseDirectory {
+            get {
+                var command = new NpmLsCommand(_fullPathToRootPackageDirectory, true, PathToNpm,
+                    _useFallbackIfNpmNotFound);
+
+                if (Task.Run(async () => { return await command.ExecuteAsync(); } ).Result) {
+                    return command.ListBaseDirectory;
+                }
+
+                return null;
+            }
+        }
+
         public IRootPackage RootPackage {
             get {
                 lock (_lock) {

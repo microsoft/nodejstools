@@ -2,7 +2,7 @@
   <TemplateData>
     <Name>Blank Microsoft Azure Node.js Worker Role</Name>
     <Description>A basic Node.js worker role for Microsoft Azure.</Description>
-    <Icon Package="{FE8A8C3D-328A-476D-99F9-2A24B75F8C7F}" ID="401" />
+    <Icon Package="{FE8A8C3D-328A-476D-99F9-2A24B75F8C7F}" ID="407" />
     <ProjectType>JavaScript</ProjectType>
     <TemplateID>Microsoft.JavaScript.AzureNodejsWorker</TemplateID>
     <SortOrder>150</SortOrder>

@@ -13,6 +13,7 @@
  * ***************************************************************************/
 
 using System;
+using System.Collections.Generic;
 using System.Text;
 using Microsoft.NodejsTools.Npm;
 using Microsoft.VisualStudio;
@@ -43,10 +44,23 @@ namespace Microsoft.NodejsTools.Project {
 
                 if (!package.IsListedInParentPackageJson) {
                     buff.AppendFormat(" (not listed in {0})", NodejsConstants.PackageJsonFile);
-                } else if (package.IsDevDependency) {
-                    buff.Append(" (dev)");
-                } else if (package.IsOptionalDependency) {
-                    buff.Append(" (optional)");
+                } else {
+                    List<string> dependencyTypes = new List<string>(3);
+                    if (package.IsDependency) {
+                        dependencyTypes.Add("standard");
+                    }
+                    if (package.IsDevDependency) {
+                        dependencyTypes.Add("dev");
+                    }
+                    if (package.IsOptionalDependency) {
+                        dependencyTypes.Add("optional");
+                    }
+
+                    if (package.IsDevDependency || package.IsOptionalDependency) {
+                        buff.Append(" (");
+                        buff.Append(string.Join(", ", dependencyTypes.ToArray()));
+                        buff.Append(")");
+                    }
                 }
             }
 
@@ -104,24 +118,10 @@ namespace Microsoft.NodejsTools.Project {
         public override object GetIconHandle(bool open) {
             int imageIndex = _projectNode.ImageIndexDependency;
             if (Package.IsMissing) {
-                if (Package.IsDevDependency) {
-                    imageIndex = _projectNode.ImageIndexDependencyDevMissing;
-                } else if (Package.IsOptionalDependency) {
-                    imageIndex = _projectNode.ImageIndexDependencyOptionalMissing;
-                } else if (Package.IsBundledDependency) {
-                    imageIndex = _projectNode.ImageIndexDependencyBundledMissing;
-                } else {
-                    imageIndex = _projectNode.ImageIndexDependencyMissing;
-                }
+                imageIndex = _projectNode.ImageIndexDependencyMissing;
             } else {
                 if (!Package.IsListedInParentPackageJson) {
                     imageIndex = _projectNode.ImageIndexDependencyNotListed;
-                } else if (Package.IsDevDependency) {
-                    imageIndex = _projectNode.ImageIndexDependencyDev;
-                } else if (Package.IsOptionalDependency) {
-                    imageIndex = _projectNode.ImageIndexDependnecyOptional;
-                } else if (Package.IsBundledDependency) {
-                    imageIndex = _projectNode.ImageIndexDependencyBundled;
                 } else {
                     imageIndex = _projectNode.ImageIndexDependency;
                 }
