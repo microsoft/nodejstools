@@ -1,0 +1,102 @@
+﻿<html>
+<head>
+    <title>Analysis Results</title>
+    <style>
+        body {
+            background-color: #000000;
+            color: #FFFFFF;
+            font-family: sans-serif;
+        }
+
+        td.better {
+            color: #00FF00;
+            font-weight: bold;
+        }
+
+        td.worse {
+            color: #FF0000;
+            font-weight: bold;
+        }
+
+        td.diff {
+            color: #0000FF;
+            font-weight: bold;
+        }
+    </style>
+</head>
+<body>
+    <table class="chart">
+        <tr>
+            <td>Module</td>
+            <td>Total Completions</td>
+            <td>2nd level completions</td>
+            <td>Time (MS)</td>
+            <td>File Count</td>
+            <td>Working Set (MB)</td>
+            <td>GC Mem (MB)</td>
+            <td>Run order</td>
+        </tr>
+    </table>
+    <script src="http://d3js.org/d3.v3.min.js" charset="utf-8"></script>
+    <script>
+        // INSERT DATA HERE
+        var columns=[
+          ['Module', null],
+          ['Total Completions', 1],
+          ['2nd level completions', 1],
+          ['Time (MS)', -1],
+          ['File Count', null],
+          ['Working Set (MB)', -1],
+          ['GC Mem (MB)', -1],
+          ['Run Order', null]
+        ];
+
+        var parent=d3.select('.chart')
+          .selectAll('table')
+            .data(data)
+          .enter()
+            .append('tr')
+            .call(
+                function (selection) {
+                    selection.append('td').text(function (d) { return d[0][0]; })
+
+                    for(var i=1; i<data[0][0].length; i++) {
+                        var elem=selection.append('td')
+                          .text(function (d) {
+                              var res=d[0][i].toString();
+                              if(columns[i][1]!==null&&d[1][i]!==undefined&&d[1][i]!==d[0][i]) {
+                                  res+=' (was '+d[1][i].toString();
+                                  var change=((d[0][i]-d[1][i])/d[0][i])*100;
+                                  res+=' '+change.toString().substr(0, 5)+'%';
+                                  res+=')';
+                              }
+                              return res;
+                          }).attr(
+                          'class',
+                          function (d) {
+                              if(d[1][i]!==undefined) {
+                                  // we have a baseline
+                                  if(columns[i][1]!==null) {
+                                      var diff=(d[0][i]-d[1][i])*columns[i][1];
+                                      if(diff>0) {
+                                          return 'better';
+                                      } else if(diff<0) {
+                                          return 'worse'
+                                      }
+                                  } else {
+                                      if(d[0][i]!=d[1][i]) {
+                                          // different, highlight it
+                                          return 'diff';
+                                      }
+                                  }
+                              }
+                              return null;
+                          }
+                        );
+                    }
+                }
+              )
+
+    </script>
+</body>
+</html>

@@ -72,6 +72,7 @@
     <Content Include="package_list.txt">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
+    <EmbeddedResource Include="template.html" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\..\..\Common\Tests\Utilities\TestUtilities.csproj">

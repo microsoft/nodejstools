@@ -17,6 +17,7 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
 using System.Linq;
+using System.Text;
 using AnalysisTests;
 using Microsoft.NodejsTools.Analysis;
 using Microsoft.NodejsTools.Npm;
@@ -25,32 +26,36 @@ using Microsoft.VisualStudio.TestTools.UnitTesting;
 using TestUtilities;
 
 namespace AnalysisDriver {
-    class AnalysisDriver {
+    class AnalysisDriver : IDisposable {
         private readonly string[] _packages;
         private readonly string _packagePath;
         private readonly Random _random;
         private readonly bool _installMissingPackages, _installAll, _cleanup;
         private readonly INpmController _npmController;
-        private readonly TextWriter _logger;
+        private readonly TextWriter _logger, _htmlLogger;
         private readonly int? _dumpMembers;
         private readonly Dictionary<string, RunStats> _baselineStats;
         private readonly bool _lowAnalysis;
+        private readonly DependencyType _depType;
+        private readonly StringBuilder _jsonResults = new StringBuilder();
 
-        private AnalysisDriver(string[] packages, string packagePath, bool installMissingPackages, bool installAll, bool cleanup, Random random, TextWriter logger, int? dumpMembers, bool lowAnalysis, Dictionary<string, RunStats> baselineStats) {
+        private AnalysisDriver(string[] packages, string packagePath, bool installMissingPackages, bool installAll, DependencyType depType, bool cleanup, Random random, TextWriter logger, TextWriter htmlLogger, int? dumpMembers, bool lowAnalysis, Dictionary<string, RunStats> baselineStats) {
             _packages = packages;
             _random = random;
             _packagePath = packagePath;
             _installMissingPackages = installMissingPackages;
             _installAll = installAll;
+            _depType = depType;
             _cleanup = cleanup;
             _logger = logger;
+            _htmlLogger = htmlLogger;
             _dumpMembers = dumpMembers;
             _lowAnalysis = lowAnalysis;
             _baselineStats = baselineStats;
 
-            if (_logger != null) {
-                _logger.WriteLine("Modules,Total Completions,Time (MS),File Count, Working Set (MB), GC Mem (MB),Run Order");
-            }
+            WriteCsvHeader();
+
+            _jsonResults.Append("[");
 
             _npmController = NpmControllerFactory.Create(packagePath);
             _npmController.OutputLogged += NpmControllerOutputLogged;
@@ -63,6 +68,12 @@ namespace AnalysisDriver {
                         InstallPackage(package);
                     }
                 }
+            }
+        }
+
+        private void WriteCsvHeader() {
+            if (_logger != null) {
+                _logger.WriteLine("Modules,Total Completions,2nd level completions,Time (MS),File Count, Working Set (MB), GC Mem (MB),Run Order");
             }
         }
 
@@ -84,7 +95,7 @@ namespace AnalysisDriver {
             var task = _npmController.CreateNpmCommander().InstallPackageByVersionAsync(
                 packageName,
                 packageVersion,
-                DependencyType.Standard,
+                _depType,
                 true
             );
             task.Wait();
@@ -143,10 +154,13 @@ namespace AnalysisDriver {
             };
         }
 
-
         private void RunOne(string[] packages, int runOrder) {
             string testDir = PrepareDirectory(packages);
+            string packageId = string.Join(", ", packages);
+            RunDirectory(testDir, packageId, packages, runOrder);
+        }
 
+        public void RunDirectory(string testDir, string packageId, string[] packages, int runOrder) {
             Stopwatch sw = new Stopwatch();
             for (int i = 0; i < 3; i++) {
                 GC.Collect(GC.MaxGeneration);
@@ -164,7 +178,9 @@ namespace AnalysisDriver {
             int completionCount = 0, secondLevelCompletionCount = 0;
 
             foreach (var module in analyzer.AllModules) {
-                if (String.Equals(Path.Combine(testDir, "app.js"), module.FilePath, StringComparison.OrdinalIgnoreCase)) {
+                if (String.Equals(Path.Combine(testDir, "app.js"), module.FilePath, StringComparison.OrdinalIgnoreCase) ||
+                    String.Equals(Path.Combine(testDir, "index.js"), module.FilePath, StringComparison.OrdinalIgnoreCase) ||
+                    String.Equals(Path.Combine(testDir, "server.js"), module.FilePath, StringComparison.OrdinalIgnoreCase)) {
                     foreach (var package in packages) {
                         string packageName = package.Split('@')[0];
                         string requireCode = String.Format("require('{0}')", packageName);
@@ -201,7 +217,7 @@ namespace AnalysisDriver {
                 runOrder
             );
 
-            Log(packages, stats);
+            Log(stats, packageId);
 
             GC.KeepAlive(analyzer);
 
@@ -225,20 +241,26 @@ namespace AnalysisDriver {
             }
         }
 
-        private void Log(string[] packages, RunStats stats) {
-            string packageId = string.Join(", ", packages);
+        private void Log(RunStats stats, string packageId) {
             if (_logger != null) {
                 _logger.WriteLine(stats.ToCsv(packageId));
                 _logger.Flush();
             }
 
-            
             RunStats prevStats = null;
             if (_baselineStats != null) {
                 if (!_baselineStats.TryGetValue(packageId, out prevStats)) {
                     Console.WriteLine("Didn't find baseline package: {0}", packageId);
                 }
             }
+            if (_htmlLogger != null) {
+                _jsonResults.AppendFormat(@"[
+    [{0}],
+    [{1}]
+],
+", stats.ToCsv(packageId), prevStats == null ? "" : prevStats.ToCsv(packageId));
+            }
+
 
             stats.Write(prevStats);
         }
@@ -284,23 +306,49 @@ namespace AnalysisDriver {
             public void Write(RunStats baseline = null) {
                 Console.ForegroundColor = ConsoleColor.Gray;
                 int left = Console.CursorLeft;
-                Console.WriteLine("{0,6} ms {1,4} files {2,4} MB working set, {5,4} MB GC Mem, {3,3} ({4,5}) completions",
+                const string timeFormat = "{0,6} ms ",
+                    fileFormat = "{0,4} files ",
+                    workingSetFormat = "{0,4} MB working set, ",
+                    gcFormat = "{0,4} MB GC Mem, ",
+                    totalCompletionFormat = "{0,3} ",
+                    secondLevelCompletionFormat = "({0,5}) completions";
+
+                string format = timeFormat +
+                    fileFormat.Replace("{0", "{1") +
+                    workingSetFormat.Replace("{0", "{2") +
+                    gcFormat.Replace("{0", "{5") +
+                    totalCompletionFormat.Replace("{0", "{3") +
+                    secondLevelCompletionFormat.Replace("{0", "{4");
+
+                Console.WriteLine(format,
                     Time,
                     FileCount,
                     TotalWorkingSet,
                     TotalCompletions,
                     SecondLevelCompletions,
                     GcMem
+
                 );
                 if (baseline != null) {
+                    Console.CursorLeft = Math.Max(1, left - "BASE: ".Length);
+                    Console.Write("BASE: ");
+                    Console.WriteLine(format,
+                        baseline.Time,
+                        baseline.FileCount,
+                        baseline.TotalWorkingSet,
+                        baseline.TotalCompletions,
+                        baseline.SecondLevelCompletions,
+                        baseline.GcMem
+                    );
+
                     Console.CursorLeft = Math.Max(1, left - "DIFF: ".Length);
                     Console.Write("DIFF: ");
-                    LogDiff("{0,6} ms ", Time - baseline.Time);
-                    LogDiff("{0,4} files ", FileCount - baseline.FileCount);
-                    LogDiff("{0,4} MB working set, ", TotalWorkingSet - baseline.TotalWorkingSet);
-                    LogDiff("{0,4} MB GC Mem, ", GcMem - baseline.GcMem);
-                    LogDiff("{0,3} ", TotalCompletions - baseline.TotalCompletions, reversed: true);
-                    LogDiff("({0,5}) completions", SecondLevelCompletions - baseline.SecondLevelCompletions, reversed: true);
+                    LogDiff(timeFormat, Time - baseline.Time);
+                    LogDiff(fileFormat, FileCount - baseline.FileCount);
+                    LogDiff(workingSetFormat, TotalWorkingSet - baseline.TotalWorkingSet);
+                    LogDiff(gcFormat, GcMem - baseline.GcMem);
+                    LogDiff(totalCompletionFormat, TotalCompletions - baseline.TotalCompletions, reversed: true);
+                    LogDiff(secondLevelCompletionFormat, SecondLevelCompletions - baseline.SecondLevelCompletions, reversed: true);
                     Console.WriteLine();
                     Console.ForegroundColor = ConsoleColor.Gray;
                 }
@@ -332,7 +380,7 @@ namespace AnalysisDriver {
             }
 
             public static KeyValuePair<string, RunStats> Parse(string csv) {
-                var columns = new TextFieldParser(new StringReader(csv)) { Delimiters = new [] { "," } }.ReadFields();
+                var columns = new TextFieldParser(new StringReader(csv)) { Delimiters = new[] { "," } }.ReadFields();
 
                 try {
                     return new KeyValuePair<string, RunStats>(
@@ -363,7 +411,8 @@ namespace AnalysisDriver {
             int? topCount = null, comboCount = null, runCount = null;
             bool combo = false;
             int? seed = null, dumpMembers = null;
-            string packagePath = null, logPath = null;
+            string packagePath = null, logPath = null, htmlLogPath = null, dirRun = null;
+            DependencyType depType = DependencyType.Standard;
             bool installMissingPackages = false, installAll = false, cleanup = true, lowAnalysis = false;
             Dictionary<string, RunStats> stats = null;
             foreach (var arg in args) {
@@ -396,11 +445,27 @@ namespace AnalysisDriver {
                     foreach (var name in packageName.Split(',')) {
                         packages.Add(name.Trim());
                     }
+                } else if (arg.StartsWith("/dir:")) {
+                    dirRun = arg.Substring("/dir:".Length);
+                    if (String.IsNullOrWhiteSpace(dirRun)) {
+                        Console.WriteLine("/dir: missing directory name");
+                        return -3;
+                    } else if (!Directory.Exists(dirRun)) {
+                        Console.WriteLine("/dir: Directory does not exist");
+                        return -52;
+                    }
+                    cleanup = false;
                 } else if (arg.StartsWith("/log:")) {
                     logPath = arg.Substring("/log:".Length);
                     if (String.IsNullOrWhiteSpace(logPath)) {
                         Console.WriteLine("Missing log file name");
                         return -16;
+                    }
+                } else if (arg.StartsWith("/html:")) {
+                    htmlLogPath = arg.Substring("/html:".Length);
+                    if (String.IsNullOrWhiteSpace(htmlLogPath)) {
+                        Console.WriteLine("Missing HTML log file name");
+                        return -25;
                     }
                 } else if (arg.StartsWith("/package_path:")) {
                     packagePath = arg.Substring("/package_path:".Length);
@@ -445,6 +510,8 @@ namespace AnalysisDriver {
                     }
                 } else if (arg.StartsWith("/combo")) {
                     combo = true;
+                } else if (arg.StartsWith("/devdependencies")) {
+                    depType = DependencyType.Development;
                 } else if (arg.StartsWith("/top:")) {
                     int topCountInt;
                     if (!Int32.TryParse(arg.Substring("/top:".Length), out topCountInt)) {
@@ -492,9 +559,13 @@ namespace AnalysisDriver {
             }
 
             if (packagePath == null) {
-                packagePath = CreateTempDirectoryPath();
-                Console.WriteLine("Packages cached at {0}", packagePath);
-                installMissingPackages = true;
+                if (dirRun == null) {
+                    packagePath = CreateTempDirectoryPath();
+                    Console.WriteLine("Packages cached at {0}", packagePath);
+                    installMissingPackages = true;
+                } else {
+                    packagePath = dirRun;
+                }
             }
 
             Random random;
@@ -506,61 +577,77 @@ namespace AnalysisDriver {
             }
 
             random = new Random(seed.Value);
-            TextWriter logger = null;
+            TextWriter logger = null, htmlLogger = null;
             if (logPath != null) {
                 logger = new StreamWriter(logPath);
             }
 
-            var driver = new AnalysisDriver(
-                packages.ToArray(),
-                packagePath,
-                installMissingPackages,
-                installAll,
-                cleanup,
-                random,
-                logger,
-                dumpMembers,
-                lowAnalysis,
-                stats
-            );
-            if (combo) {
-                comboCount = packages.Count;
-                runCount = 1;
+            if (htmlLogPath != null) {
+                htmlLogger = new StreamWriter(htmlLogPath);
             }
-            try {
+
+            using (logger)
+            using (htmlLogger)
+            using (var driver = new AnalysisDriver(
+                    packages.ToArray(),
+                    packagePath,
+                    installMissingPackages,
+                    installAll,
+                    depType,
+                    cleanup,
+                    random,
+                    logger,
+                    htmlLogger,
+                    dumpMembers,
+                    lowAnalysis,
+                    stats
+                )) {
+                if (combo) {
+                    comboCount = packages.Count;
+                    runCount = 1;
+                }
                 try {
-                    if (comboCount == null) {
+                    if (dirRun != null) {
+                        driver.RunDirectory(
+                            dirRun,
+                            Path.GetFileName(dirRun),
+                            packages.ToArray(),
+                            1
+                        );
+                    } else if (comboCount == null) {
                         driver.RunAll();
                     } else {
                         for (int i = 0; i < (runCount ?? 1); i++) {
                             driver.RunCombo(comboCount.Value, i + 1);
                         }
                     }
-                } finally {
-                    if (logger != null) {
-                        logger.Close();
-                    }
+                } catch (AssertFailedException e) {
+                    Console.WriteLine("Run failed: {0}", e.Message);
+                    return -100;
+                } catch (Exception e) {
+                    Console.WriteLine("Error during run: {0}\r\n{1}", e.Message, e.StackTrace);
+                    return -200;
                 }
-            } catch (AssertFailedException e) {
-                Console.WriteLine("Run failed: {0}", e.Message);
-                return -100;
-            } catch (Exception e) {
-                Console.WriteLine("Error during run: {0}\r\n{1}", e.Message, e.StackTrace);
-                return -200;
             }
             return 0;
         }
 
         private static void DisplayHelp() {
-            Console.WriteLine("AnalysisDriver [/package_list:<filename>] [/package:<package_name>]");
+            Console.WriteLine("AnalysisDriver [/package_list:<filename>] [/package:<package_name>] [/dir:dir_path]");
             Console.WriteLine("               [/combo[:<package_count>[,run_count]] [/seed:<seed>]");
             Console.WriteLine("               [/package_path:<path>] [/install_missing] [/log:<log_file>]");
             Console.WriteLine("               [/dump_members[:level]] [/baseline:<baseline_csv_path>]");
-            Console.WriteLine("               [/low]");
+            Console.WriteLine("               [/low] [/html:<HTML file>] [/devdependencies]");
             Console.WriteLine();
-            Console.WriteLine("At least one package must be specified.  By default all of the packages will be");
-            Console.WriteLine("analyzed one by one.  If /combo is provided a packages will be analyzed together");
-            Console.WriteLine("with a potential maximum number of packages picked randomly");
+            Console.WriteLine("At least one package must be specified or an already prepared directory must be");
+            Console.WriteLine("specified.");
+            Console.WriteLine();
+            Console.WriteLine("If a directory is specified then all the files in that directory will be analyzed.");
+            Console.WriteLine("A package list can still be specified for reporting completion statistics.");
+            Console.WriteLine();
+            Console.WriteLine("When packages are specified by default all of the packages will be analyzed one");
+            Console.WriteLine("by one.  If /combo is provided a packages will be analyzed together with a ");
+            Console.WriteLine("potential maximum number of packages picked randomly");
             Console.WriteLine();
             Console.WriteLine("By default when running without providing a package path packages will be");
             Console.WriteLine("downloaded and installed to a temporary folder.  When providing package_path");
@@ -568,29 +655,39 @@ namespace AnalysisDriver {
             Console.WriteLine("to use /install_all to force the installation of all packages before the run");
             Console.WriteLine("begins.");
             Console.WriteLine();
-            Console.WriteLine(" /package_list:<filename>                 Specifies a list of packages to be read from");
-            Console.WriteLine("                                            a filename");
-            Console.WriteLine(" /package:<package_name>[,...]            Specifies an one or more packages");
-            Console.WriteLine(" /combo[:<package_count>[,<run_count>]]   Specifies to run with multiple packages.");
-            Console.WriteLine("                                            package_count: number of packages to");
-            Console.WriteLine("                                              randomly select (or run with all if not");
-            Console.WriteLine("                                              provided)");
-            Console.WriteLine("                                            run_count: number of runs to perform with");
-            Console.WriteLine("                                              randomly selected packages");
-            Console.WriteLine(" /top:<package_count>                     Only consider the top # of packages (in order");
-            Console.WriteLine("                                            provided)");
-            Console.WriteLine(" /seed:<seed>                             Run with the specified seed");
-            Console.WriteLine(" /package_path:<path>                     Copy packages from specified path.  If omitted");
-            Console.WriteLine("                                            packages are saved to a temporary directory");
-            Console.WriteLine("                                            and installed on demand");
-            Console.WriteLine(" /install_missing                         Install missing packages");
-            Console.WriteLine(" /install_all                             Install all packages if not installed before");
-            Console.WriteLine("                                            analyzing");
-            Console.WriteLine(" /no_cleanup                              Don't delete package run directories");
-            Console.WriteLine(" /log:<log file>                          Write results to CSV style log file");
-            Console.WriteLine(" /dump_members[:level]                    Dump members of module up to specified level");
-            Console.WriteLine(" /baseline:<baseline_csv_path>            Compare results to specified baseline");
-            Console.WriteLine(" /low                                     Run with low analysis limits");
+            Console.WriteLine("  Inputs: ");
+            Console.WriteLine("    /package_list:<filename>                 Specifies a list of packages to be read from");
+            Console.WriteLine("                                               a filename");
+            Console.WriteLine("    /package:<package_name>[,...]            Specifies an one or more packages");
+            Console.WriteLine("    /dir:<dir_name                           Run against an already prepared directory of code");
+            Console.WriteLine();
+            Console.WriteLine("  Run Controls:");
+            Console.WriteLine("    /combo[:<package_count>[,<run_count>]]   Specifies to run with multiple packages.");
+            Console.WriteLine("                                               package_count: number of packages to");
+            Console.WriteLine("                                                 randomly select (or run with all if not");
+            Console.WriteLine("                                                 provided)");
+            Console.WriteLine("                                               run_count: number of runs to perform with");
+            Console.WriteLine("                                                 randomly selected packages");
+            Console.WriteLine("    /top:<package_count>                     Only consider the top # of packages (in order");
+            Console.WriteLine("                                               provided)");
+            Console.WriteLine("    /seed:<seed>                             Run with the specified seed");
+            Console.WriteLine("    /low                                     Run with low analysis limits");
+            Console.WriteLine();
+            Console.WriteLine("  Installation options:");
+            Console.WriteLine("    /package_path:<path>                     Copy packages from specified path.  If omitted");
+            Console.WriteLine("                                               packages are saved to a temporary directory");
+            Console.WriteLine("                                               and installed on demand");
+            Console.WriteLine("    /devdependencies                           Install dev dependencies");
+            Console.WriteLine("    /install_missing                         Install missing packages");
+            Console.WriteLine("    /install_all                             Install all packages if not installed before");
+            Console.WriteLine("                                               analyzing");
+            Console.WriteLine("    /no_cleanup                              Don't delete package run directories");
+            Console.WriteLine();
+            Console.WriteLine("  Logging/Reporting:");
+            Console.WriteLine("    /log:<log file>                          Write results to CSV style log file");
+            Console.WriteLine("    /html:<HTML file>                        Write results to an HTML style log file");
+            Console.WriteLine("    /dump_members[:level]                    Dump members of module up to specified level");
+            Console.WriteLine("    /baseline:<baseline_csv_path>            Compare results to specified baseline");
         }
 
         private static string CreateTempDirectoryPath() {
@@ -604,5 +701,16 @@ namespace AnalysisDriver {
             return dirPath;
         }
 
+
+        public void Dispose() {
+            if (_htmlLogger != null) {
+                var template = new StreamReader(GetType().Assembly.GetManifestResourceStream("NodejsTests.template.html")).ReadToEnd();
+
+                _jsonResults.AppendLine("]");
+                template = template.Replace("// INSERT DATA HERE", "var data = " + _jsonResults.ToString());
+
+                _htmlLogger.Write(template);
+            }
+        }
     }
 }
