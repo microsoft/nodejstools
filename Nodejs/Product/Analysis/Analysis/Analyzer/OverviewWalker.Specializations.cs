@@ -30,8 +30,78 @@ namespace Microsoft.NodejsTools.Analysis.Analyzer {
             { "merge", MergeSpecialization() },
             { "copy", CopySpecialization() },
             { "create", CreateSpecialization() },
-            { "keys", ObjectKeysSpecialization() }
+            { "keys", ObjectKeysSpecialization() },
+            { "setProto", SetProtoSpecialization() },
         };
+
+        /// <summary>
+        /// function setProto(obj, proto) {
+        ///   if (typeof Object.setPrototypeOf === "function")
+        ///     return Object.setPrototypeOf(obj, proto)
+        ///   else
+        ///     obj.__proto__ = proto
+        /// }
+        /// 
+        /// This specialization exists to avoid type merging when calling this function
+        /// which results in an explosion of analysis.
+        /// </summary>
+        private static FunctionSpecialization SetProtoSpecialization() {
+            var objParam = new ExpectedParameter(0);
+            var protoParam = new ExpectedParameter(1);
+            var objectSetPrototypeOf = new ExpectedMember(
+                    new ExpectedLookup("Object"),
+                    "setPrototypeOf"
+                );
+
+
+            return new FunctionSpecialization(
+                SetProtoSpecializationImpl,
+                false,
+                new ExpectedNode(
+                    typeof(IfNode),
+                    new ExpectedBinary(
+                        JSToken.StrictEqual,
+                        new ExpectedUnary(
+                            JSToken.TypeOf,
+                            objectSetPrototypeOf
+                        ),
+                        new ExpectedConstant("function")
+                    ),
+                    new ExpectedNode(
+                        typeof(Block),
+                        new ExpectedNode(
+                            typeof(ReturnNode),
+                            new ExpectedCall(
+                                objectSetPrototypeOf,
+                                objParam,
+                                protoParam
+                            )
+                        )
+                    ),
+                    new ExpectedNode(
+                        typeof(Block),
+                        new ExpectedNode(
+                            typeof(ExpressionStatement),
+                            new ExpectedBinary(
+                                JSToken.Assign,
+                                new ExpectedMember(
+                                    objParam,
+                                    "__proto__"
+                                ),
+                                protoParam
+                            )
+                        )
+                    )
+                )
+            );
+        }
+
+        private static IAnalysisSet SetProtoSpecializationImpl(FunctionValue func, Node node, AnalysisUnit unit, IAnalysisSet @this, IAnalysisSet[] args) {
+            if (args.Length >= 2) {
+                args[0].SetMember(node, unit, "__proto__", args[1]);
+            }
+            return AnalysisSet.Empty;
+        }
 
         /// <summary>
         /// function (o) {
@@ -541,6 +611,29 @@ namespace Microsoft.NodejsTools.Analysis.Analyzer {
             }
         }
 
+        class ExpectedUnary : ExpectedChild {
+            public readonly JSToken Token;
+            public readonly ExpectedChild Operand;
+
+            public ExpectedUnary(JSToken token, ExpectedChild operand) {
+                Token = token;
+                Operand = operand;
+            }
+
+            public override bool IsMatch(MatchState state, Node node) {
+                if (node.GetType() != typeof(UnaryOperator)) {
+                    return NoMatch;
+                }
+
+                var op = (UnaryOperator)node;
+                if (op.OperatorToken != Token) {
+                    return NoMatch;
+                }
+
+                return Operand.IsMatch(state, op.Operand);
+            }
+        }
+
         class ExpectedMember : ExpectedChild {
             public readonly ExpectedChild Root;
             public readonly string Name;
@@ -578,6 +671,27 @@ namespace Microsoft.NodejsTools.Analysis.Analyzer {
 
                 Lookup member = (Lookup)node;
                 if (member.Name != Name) {
+                    return NoMatch;
+                }
+
+                return true;
+            }
+        }
+
+        class ExpectedConstant : ExpectedChild {
+            public readonly object Value;
+
+            public ExpectedConstant(string value) {
+                Value = value;
+            }
+
+            public override bool IsMatch(MatchState state, Node node) {
+                if (node.GetType() != typeof(ConstantWrapper)) {
+                    return NoMatch;
+                }
+
+                var member = (ConstantWrapper)node;
+                if (!member.Value.Equals(Value)) {
                     return NoMatch;
                 }
 

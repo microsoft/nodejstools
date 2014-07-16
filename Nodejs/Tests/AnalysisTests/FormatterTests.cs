@@ -156,6 +156,15 @@ console.log(err);
         }
 
         [TestMethod, Priority(0)]
+        public void TestInvalidTrailingQuote() {
+            TestCode("var x = foo()'", "var x = foo() '");
+            TestCode("return 42'", "return 42 '");
+            TestCode("continue'", "continue '");
+            TestCode("break'", "break '");
+            TestCode("throw 42'", "throw 42 '");
+        }
+
+        [TestMethod, Priority(0)]
         public void TestMember() {
             TestCode(" a.b", "a.b");
             TestCode("a .b", "a.b");

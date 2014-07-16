@@ -740,7 +740,7 @@ namespace Microsoft.NodejsTools.Parsing
                 }
                 else
                 {
-                    ReportError(JSError.NoSemicolon, false);
+                    ReportError(JSError.NoSemicolon, true);
                     break;
                 }
             }
@@ -1686,7 +1686,7 @@ namespace Microsoft.NodejsTools.Parsing
             }
             else
             {
-                ReportError(JSError.NoSemicolon, false);
+                ReportError(JSError.NoSemicolon, true);
             }
 
             if (blocks >= 0) {
@@ -1776,7 +1776,7 @@ namespace Microsoft.NodejsTools.Parsing
             }
             else
             {
-                ReportError(JSError.NoSemicolon, false);
+                ReportError(JSError.NoSemicolon, true);
             }
 
             if (blocks >= 0) {
@@ -1859,7 +1859,7 @@ namespace Microsoft.NodejsTools.Parsing
                 }
                 else
                 {
-                    ReportError(JSError.NoSemicolon, false);
+                    ReportError(JSError.NoSemicolon, true);
                 }
             }
 
@@ -2301,7 +2301,7 @@ namespace Microsoft.NodejsTools.Parsing
                 }
                 else
                 {
-                    ReportError(JSError.NoSemicolon, false);
+                    ReportError(JSError.NoSemicolon, true);
                 }
             }
 

@@ -14,6 +14,7 @@
 
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Linq;
 using System.Text;
 using Microsoft.NodejsTools.Analysis.Analyzer;
@@ -129,6 +130,21 @@ namespace Microsoft.NodejsTools.Analysis.Values {
             return res;
         }
 
+        public override void SetMember(Node node, AnalysisUnit unit, string name, IAnalysisSet value) {
+            if (name == "__proto__" && value.Count > 0) {
+                if (SetMemberWorker(node, unit, name, value)) {
+                    // assignment to __proto__ means all of our previous lookups
+                    // need to be re-evaluated with the new __proto__ value.
+                    foreach (var kvp in Descriptors) {
+                        if (kvp.Value.Values != null) {
+                            kvp.Value.Values.EnqueueDependents();
+                        }
+                    }
+                }
+            } else {
+                base.SetMember(node, unit, name, value);
+            }
+        }
         public override BuiltinTypeId TypeId {
             get {
                 return BuiltinTypeId.Object;

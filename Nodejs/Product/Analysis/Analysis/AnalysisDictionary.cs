@@ -387,7 +387,7 @@ namespace Microsoft.NodejsTools.Analysis {
                         var value = buckets[i].Value;
 
                         Thread.MemoryBarrier();
-
+                        
                         // check the key again, if it's changed we need to re-read
                         // the value as we could be racing with a replacement...
                         if (Object.ReferenceEquals(key, buckets[i].Key)) {

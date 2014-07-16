@@ -35,7 +35,7 @@ namespace AnalysisTests {
                 Assert.AreEqual(curSetting.ConstStatementsMozilla, other.ConstStatementsMozilla);
                 Assert.AreEqual(curSetting.KnownGlobalNamesList, other.KnownGlobalNamesList);
                 Assert.AreEqual(curSetting.SourceMode, other.SourceMode);
-                Assert.AreEqual(curSetting.StrictMode, other.StrictMode);                
+                Assert.AreEqual(curSetting.StrictMode, other.StrictMode);
             }
         }
 
@@ -83,7 +83,7 @@ function Y() {
                             CheckConstant(2.0),
                             CheckFunctionExpr(
                                 CheckFunctionObject(
-                                    "Y",                                        
+                                    "Y",
                                     CheckBlock(
                                         CheckExprStmt(CheckGrouping(CheckLookup("abcde"))),
                                         CheckExprStmt(CheckCall(CheckLookup("X")))
@@ -161,7 +161,7 @@ foo(abc.'foo')
                     code,
                     new ErrorInfo(JSError.NoIdentifier, true, new IndexSpan(10, 5))
                 ),
-                CheckBlock(                
+                CheckBlock(
                     CheckExprStmt(
                         CheckCall(
                             CheckLookup("foo"),
@@ -997,7 +997,6 @@ throw foo foo";
                     CheckThrow(
                         CheckLookup("foo")
                     ),
-                    CheckLookupStmt("foo"),
                     CheckLookupStmt("foo")
                 )
             );
@@ -1479,8 +1478,8 @@ i = {abc:42, foo:0 foo
                 ),
                 CheckBlock(
                     CheckExprStmt(
-                    	CheckAssign(
-                            I, 
+                        CheckAssign(
+                            I,
                             CheckObjectLiteral(
                                 Property("abc", CheckConstant(42.0)),
                                 Property("foo", Zero)
@@ -1617,6 +1616,37 @@ var i = foo.'abc' else function;";
                     CheckEmptyStmt()
                 )
             );
+        }
+
+        /// <summary>
+        /// https://nodejstools.codeplex.com/workitem/1227
+        /// 
+        /// Verify that when we report the missing semicolon error that we properly
+        /// don't treat the current token twice.
+        /// </summary>
+        [TestMethod, Priority(0)]
+        public void InvalidTrailingStringLiteral() {
+            var preceedingTests = new[] { 
+                new { Code = "var i = 0", Expected = CheckVar(CheckVarDecl("i", Zero)) },
+                new { Code = "break", Expected = CheckBreak() },
+                new { Code = "continue", Expected = CheckContinue() },
+                new { Code = "return 0", Expected = CheckReturn(Zero) },
+                new { Code = "throw 0", Expected = CheckThrow(Zero) },
+            };
+            foreach (var test in preceedingTests) {
+                Console.WriteLine(test.Code);
+                string code = test.Code + "'";
+                CheckAst(
+                    ParseCode(
+                        code,
+                        null
+                    ),
+                    CheckBlock(
+                        test.Expected,
+                        CheckConstantStmt("")
+                    )
+                );
+            }
         }
 
         [TestMethod, Priority(0)]
@@ -1936,7 +1966,6 @@ return 4 4
                 ),
                 CheckBlock(
                     CheckReturn(Four),
-                    CheckExprStmt(Four),
                     CheckExprStmt(Four)
                 )
             );
@@ -2286,7 +2315,7 @@ if(true) {
                 CheckBlock(
                     CheckIfStmt(
                         True,
-                        CheckBlock(                            
+                        CheckBlock(
                         ),
                         CheckBlock(
                             CheckExprStmt(CheckLookup("foo"))
@@ -3196,7 +3225,7 @@ for(var i = 0;) {
                 )
             );
 
-            
+
 
             code = @"
 for(var i = 0;
@@ -3512,7 +3541,7 @@ abc--;
             CheckAst(
                 ParseCode(identifiers),
                 CheckBlock(
-                    CheckUnaryStmt(JSToken.Increment, CheckLookup("abc"), isPostFix:true),
+                    CheckUnaryStmt(JSToken.Increment, CheckLookup("abc"), isPostFix: true),
                     CheckUnaryStmt(JSToken.Decrement, CheckLookup("abc"), isPostFix: true)
                 )
             );
@@ -3586,8 +3615,8 @@ x = {set abc (value) { 42 }}
                         CheckLookup("abc"),
                         CheckObjectLiteral(
                             GetterSetter(
-                                true, 
-                                "abc", 
+                                true,
+                                "abc",
                                 CheckFunctionExpr(
                                     CheckFunctionObject(
                                         null,
@@ -4215,9 +4244,9 @@ continue myLabel;
                         CheckLessThan(I, Four),
                         CheckIncrement(I),
                         CheckBlock(
-                            CheckLabel("myLabel", CheckContinue("myLabel"))                            
+                            CheckLabel("myLabel", CheckContinue("myLabel"))
                         )
-                    )                    
+                    )
                 )
             );
         }
@@ -4257,7 +4286,7 @@ for(var j = 0; j<4; j++) {
                     )
                 )
             );
-        }        
+        }
 
         [TestMethod, Priority(0)]
         public void TestForBreakLabelStatement() {
@@ -4726,7 +4755,7 @@ do {
                 } else {
                     Assert.IsNull(switchCase.CaseValue, "expected default case");
                 }
-                body(switchCase.Statements);                
+                body(switchCase.Statements);
             };
         }
 
@@ -4782,7 +4811,7 @@ do {
                 for (int i = 0; i < values.Length; i++) {
                     values[i](array.Elements[i]);
                 }
-            };            
+            };
         }
 
         private Action<Expression> CheckObjectLiteral(params Action<ObjectLiteralProperty>[] values) {
@@ -4803,7 +4832,7 @@ do {
 
                 var prop = (ObjectLiteralProperty)expr;
                 Assert.AreEqual(name, prop.Name.Value);
-                value(prop.Value);                
+                value(prop.Value);
             };
         }
 
@@ -4830,10 +4859,10 @@ do {
 
                 body(func.Body);
                 if (func.ParameterDeclarations != null) {
-                Assert.AreEqual(args.Length, func.ParameterDeclarations.Count);
-                for (int i = 0; i < func.ParameterDeclarations.Count; i++) {
-                    args[i](func.ParameterDeclarations[i]);
-                }
+                    Assert.AreEqual(args.Length, func.ParameterDeclarations.Count);
+                    for (int i = 0; i < func.ParameterDeclarations.Count; i++) {
+                        args[i](func.ParameterDeclarations[i]);
+                    }
                 } else {
                     Assert.IsNull(args);
                 }
@@ -4895,7 +4924,9 @@ do {
             var parser = new JSParser(code, errorSink);
             var ast = parser.Parse(new CodeSettings());
 
-            errorSink.CheckErrors(errors);
+            if (errors != null) {
+                errorSink.CheckErrors(errors);
+            }
             return ast;
         }
 
@@ -4908,7 +4939,7 @@ do {
             errorSink.CheckErrors(errors);
             return ast;
         }
-        
+
         private void CheckAst(JsAst ast, Action<Statement> checkBody) {
             checkBody(ast.Block);
 
@@ -4937,12 +4968,12 @@ do {
                 }
             }
 
-            public override bool Walk(ArrayLiteral node) { TestNode(node); TestNode(node.Elements);  return base.Walk(node); }
+            public override bool Walk(ArrayLiteral node) { TestNode(node); TestNode(node.Elements); return base.Walk(node); }
             public override bool Walk(BinaryOperator node) { TestNode(node); return base.Walk(node); }
             public override bool Walk(CommaOperator node) { TestNode(node); return base.Walk(node); }
             public override bool Walk(Block node) { TestNode(node); return base.Walk(node); }
             public override bool Walk(Break node) { TestNode(node); return base.Walk(node); }
-            public override bool Walk(CallNode node) { TestNode(node); TestNode(node.Arguments);  return base.Walk(node); }
+            public override bool Walk(CallNode node) { TestNode(node); TestNode(node.Arguments); return base.Walk(node); }
             public override bool Walk(Conditional node) { TestNode(node); return base.Walk(node); }
             public override bool Walk(ConstantWrapper node) { TestNode(node); return base.Walk(node); }
             public override bool Walk(ConstStatement node) { TestNode(node); return base.Walk(node); }
@@ -4953,7 +4984,7 @@ do {
             public override bool Walk(EmptyStatement node) { TestNode(node); return base.Walk(node); }
             public override bool Walk(ForIn node) { TestNode(node); return base.Walk(node); }
             public override bool Walk(ForNode node) { TestNode(node); return base.Walk(node); }
-            public override bool Walk(FunctionObject node) { TestNode(node); TestNode(node.ParameterDeclarations);  return base.Walk(node); }
+            public override bool Walk(FunctionObject node) { TestNode(node); TestNode(node.ParameterDeclarations); return base.Walk(node); }
             public override bool Walk(GetterSetter node) { TestNode(node); return base.Walk(node); }
             public override bool Walk(GroupingOperator node) { TestNode(node); return base.Walk(node); }
             public override bool Walk(IfNode node) { TestNode(node); return base.Walk(node); }
@@ -4961,7 +4992,7 @@ do {
             public override bool Walk(LexicalDeclaration node) { TestNode(node); return base.Walk(node); }
             public override bool Walk(Lookup node) { TestNode(node); return base.Walk(node); }
             public override bool Walk(Member node) { TestNode(node); return base.Walk(node); }
-            public override bool Walk(ObjectLiteral node) { TestNode(node); TestNode(node.Properties);  return base.Walk(node); }
+            public override bool Walk(ObjectLiteral node) { TestNode(node); TestNode(node.Properties); return base.Walk(node); }
             public override bool Walk(ObjectLiteralField node) { TestNode(node); return base.Walk(node); }
             public override bool Walk(ObjectLiteralProperty node) { TestNode(node); return base.Walk(node); }
             public override bool Walk(ParameterDeclaration node) { TestNode(node); return base.Walk(node); }

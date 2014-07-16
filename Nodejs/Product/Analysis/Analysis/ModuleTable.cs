@@ -158,22 +158,27 @@ namespace Microsoft.NodejsTools.Analysis {
 
         private static ModuleTree ResolveModule(ModuleTree parentTree, AnalysisUnit unit, string relativeName) {
             ModuleTree curTree = parentTree;
-            foreach (var comp in ModuleTable.GetPathComponents(relativeName)) {
+            var components = ModuleTable.GetPathComponents(relativeName);
+            for (int i = 0; i < components.Length; i++) {
+                var comp = components[i];
+
                 if (curTree == null) {
                     return null;
                 }
 
-                if (comp == ".") {
+                if (comp == "." || comp == "") {
                     continue;
                 } else if (comp == "..") {
                     curTree = curTree.Parent;
                     continue;
                 }
 
-                var nextTree = curTree.GetChild(comp + ".js", unit);
-                if (nextTree.Children.Count > 0 || nextTree.Module != null) {
-                    curTree = nextTree;
-                    continue;
+                ModuleTree nextTree;
+                if (i == components.Length - 1) {
+                    nextTree = curTree.GetChild(comp + ".js", unit);
+                    if (nextTree.Module != null) {
+                        return nextTree;
+                    }
                 }
 
                 nextTree = curTree.GetChild(comp, unit);
@@ -259,8 +264,8 @@ namespace Microsoft.NodejsTools.Analysis {
             }
         }
 
-        internal static IEnumerable<string> GetPathComponents(string path) {
-            return path.Split(PathSplitter, StringSplitOptions.RemoveEmptyEntries);
+        internal static string[] GetPathComponents(string path) {
+            return path.Split(PathSplitter);
         }
 
         private static char[] PathSplitter = new[] { '\\', '/', ':' };

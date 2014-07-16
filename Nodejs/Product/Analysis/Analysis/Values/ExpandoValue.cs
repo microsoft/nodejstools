@@ -112,6 +112,10 @@ namespace Microsoft.NodejsTools.Analysis.Values {
         }
 
         public override void SetMember(Node node, AnalysisUnit unit, string name, IAnalysisSet value) {
+            SetMemberWorker(node, unit, name, value);
+        }
+
+        protected bool SetMemberWorker(Node node, AnalysisUnit unit, string name, IAnalysisSet value) {
             PropertyDescriptor desc;
             if (_descriptors != null && _descriptors.TryGetValue(name, out desc)) {
                 if (desc.Set != null) {
@@ -127,7 +131,7 @@ namespace Microsoft.NodejsTools.Analysis.Values {
             VariableDef varRef = GetValuesDef(name);
             varRef.AddAssignment(node, unit);
             varRef.MakeUnionStrongerIfMoreThan(ProjectState.Limits.InstanceMembers, value);
-            varRef.AddTypes(unit, value);
+            return varRef.AddTypes(unit, value);
         }
 
         public override void DeleteMember(Node node, AnalysisUnit unit, string name) {
@@ -159,7 +163,7 @@ namespace Microsoft.NodejsTools.Analysis.Values {
             return res;
         }
 
-        private VariableDef GetValuesDef(string name) {
+        protected VariableDef GetValuesDef(string name) {
             PropertyDescriptor desc = GetDescriptor(name);
 
             VariableDef def = desc.Values;

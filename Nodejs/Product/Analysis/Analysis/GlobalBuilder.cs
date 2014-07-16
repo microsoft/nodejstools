@@ -920,6 +920,15 @@ For example, the absolute value of -5 is the same as the absolute value of 5.",
             };
         }
 
+        private static readonly string[] _immutableObjectFields = new string[] { 
+            "create",
+            "defineProperty",
+            "defineProperties",
+            "getPrototypeOf",
+            "getOwnPropertyDescriptor",
+            "getOwnPropertyNames",
+        };
+
         private BuiltinFunctionValue ObjectFunction(out ObjectValue objectPrototype) {
             var builtinEntry = _analyzer._builtinEntry;
 
@@ -968,7 +977,7 @@ For example, the absolute value of -5 is the same as the absolute value of 5.",
                 ),   
             };
 
-            return new BuiltinFunctionValue(builtinEntry, "Object", createPrototype: false) { 
+            return new PartiallyImmutableBuiltinFunctionValue(builtinEntry, "Object", _immutableObjectFields, createPrototype: false) { 
                 Member("prototype", objectPrototype),
                 BuiltinFunction(
                     "getPrototypeOf",

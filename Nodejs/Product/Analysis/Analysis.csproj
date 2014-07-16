@@ -222,6 +222,7 @@
     <Compile Include="Analysis\SingleDict.cs" />
     <Compile Include="Analysis\SourceLocationResolver.cs" />
     <Compile Include="Analysis\Values\ObjectLiteralValue.cs" />
+    <Compile Include="Analysis\Values\PartiallyImmutableBuiltinFunctionValue.cs" />
     <Compile Include="Analysis\Values\PrototypeValue.cs" />
     <Compile Include="Analysis\Values\SpecializedUserFunctionValue.cs" />
     <Compile Include="Analysis\Values\StringValue.cs" />

@@ -32,6 +32,24 @@ namespace AnalysisTests {
             NodejsTestData.Deploy();
         }
 
+        /// <summary>
+        /// https://nodejstools.codeplex.com/workitem/1234
+        /// </summary>
+        [TestMethod, Priority(0)]
+        public void TestRequireTrailingSlash() {
+            var entries = Analysis.Analyze(
+                new AnalysisFile("mod.js", @"var x = require('mymod').value;"),
+                new AnalysisFile("node_modules\\mymod\\mymod.js", @"module.exports = require('./mymod/')"),
+                AnalysisFile.PackageJson("node_modules\\mymod\\package.json", "./mymod.js"),
+                new AnalysisFile("node_modules\\mymod\\mymod\\index.js", @"exports.value = 'abc';")
+            );
+
+            AssertUtil.ContainsExactly(
+                entries["mod.js"].Analysis.GetTypeIdsByIndex("x", 0),
+                BuiltinTypeId.String
+            );
+        }	
+
         [TestMethod, Priority(0)]
         public void TestRequireAssignedExports() {
             var entries = Analysis.Analyze(

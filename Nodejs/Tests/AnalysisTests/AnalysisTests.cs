@@ -890,6 +890,49 @@ var y = require('net').createServer(null, null);
 
 
         [TestMethod, Priority(0)]
+        public void TestSetPrototypeSpecialization() {
+            StringBuilder code = new StringBuilder(@"function setProto(obj, proto) {
+  if (typeof Object.setPrototypeOf === 'function')
+    return Object.setPrototypeOf(obj, proto)
+  else
+    obj.__proto__ = proto
+}
+
+");
+
+            const int varCount = 25;
+            for (int i = 0; i < varCount; i++) {
+                code.AppendLine(String.Format("var v{0} = {{p{0}:42}};", i));
+            }
+            for (int i = 1; i < varCount; i++) {
+                code.AppendLine(String.Format("setProto(v{0}, v{1});", i, i - 1));
+            }
+
+
+            for (int i = 0; i < varCount; i++) {
+                code.AppendLine(String.Format("i{0} = v{0}.p{0};", i));
+            }
+
+            var analysis = ProcessText(code.ToString());
+            // we should have our own value...
+            AssertUtil.ContainsExactly(
+                analysis.GetTypeIdsByIndex("v0.p0", 0),
+                BuiltinTypeId.Number
+            );
+            // we shouldn't have merged and shouldn't have other values
+            AssertUtil.ContainsExactly(
+                analysis.GetTypeIdsByIndex("v0.p1", 0)
+            );
+
+            // and we should be able to follow the prototype chain from the
+            // last value back to the 1st value
+            AssertUtil.ContainsExactly(
+                analysis.GetTypeIdsByIndex("v" + (varCount - 1) + ".p0", 0),
+                BuiltinTypeId.Number
+            );
+        }
+
+        [TestMethod, Priority(0)]
         public void TestCopySpecialization() {
             var analysis = ProcessText(@"function copy (obj) {
   var o = {}
