@@ -39,8 +39,9 @@ namespace Microsoft.NodejsTools.Analysis {
     public partial class JsAnalyzer : IGroupableAnalysisProject, IDeserializeInitialization {
         private readonly ModuleTable _modules;
         internal readonly ProjectEntry _builtinEntry;
-        [NonSerialized]
         private Dictionary<object, AnalysisValue> _itemCache;
+        [NonSerialized]
+        private AnalysisLog _log = new AnalysisLog();
         internal readonly NullValue _nullInst;
         internal readonly BooleanValue _trueInst, _falseInst;
         internal readonly UndefinedValue _undefined;
@@ -365,7 +366,7 @@ namespace Microsoft.NodejsTools.Analysis {
             if (cancel.IsCancellationRequested) {
                 return;
             }
-            new DDG().Analyze(Queue, cancel);
+            new DDG(this).Analyze(Queue, cancel);
         }
 
         #endregion
@@ -446,7 +447,26 @@ namespace Microsoft.NodejsTools.Analysis {
 #endif
 
         void IDeserializeInitialization.Init() {
-            _itemCache = new Dictionary<object, AnalysisValue>();
+            _log = new AnalysisLog();
+        }
+
+        public void DumpLog(TextWriter output, bool asCsv = false) {
+            _log.Dump(output, asCsv);
+        }
+
+        public int MaxLogLength {
+            get {
+                return _log.MaxItems;
+            }
+            set {
+                _log.MaxItems = value;
+            }
+        }
+
+        internal AnalysisLog Log {
+            get {
+                return _log;
+            }
         }
     }
 }

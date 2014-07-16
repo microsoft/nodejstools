@@ -66,7 +66,9 @@ namespace Microsoft.NodejsTools.Analysis {
             _env = environment;
             _id = Interlocked.Increment(ref _idCount);
 
-            AnalysisLog.NewUnit(this);
+            if (environment != null) {
+                ProjectEntry.Analyzer.Log.NewUnit(this);
+            }
         }
 
         internal int Id {
@@ -164,7 +166,7 @@ namespace Microsoft.NodejsTools.Analysis {
         public void Enqueue() {
             if (!ForEval && !IsInQueue) {
                 Analyzer.Queue.Append(this);
-                AnalysisLog.Enqueue(Analyzer.Queue, this);
+                Analyzer.Log.Enqueue(Analyzer.Queue, this);
                 this.IsInQueue = true;
             }
         }

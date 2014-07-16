@@ -48,19 +48,19 @@ namespace Microsoft.NodejsTools.Analysis.Values {
                 Descriptors.TryGetValue("__proto__", out protoDesc) &&
                 protoDesc.Values != null &&
                 (protoTypes = protoDesc.Values.TypesNoCopy).Count > 0) {
-                // someone has assigned to __proto__, so that's our [[Prototype]]
-                // property now.
-                if (Push()) {
-                    try {
-                        foreach (var value in protoTypes) {
-                            foreach (var kvp in value.GetAllMembers()) {
-                                MergeTypes(res, kvp.Key, kvp.Value);
+                    // someone has assigned to __proto__, so that's our [[Prototype]]
+                    // property now.                
+                    foreach (var value in protoTypes) {
+                        if (value.Push()) {
+                            try {
+                                foreach (var kvp in value.GetAllMembers()) {
+                                    MergeTypes(res, kvp.Key, kvp.Value);
+                                }
+                            } finally {
+                                value.Pop();
                             }
                         }
-                    } finally {
-                        Pop();
-                    }
-                }
+                    }                
             } else if (_creator != null) {
                 PropertyDescriptor prototype;
                 if (_creator.Descriptors.TryGetValue("prototype", out prototype) &&

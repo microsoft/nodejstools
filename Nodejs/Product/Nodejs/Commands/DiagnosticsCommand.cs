@@ -95,22 +95,29 @@ namespace Microsoft.NodejsTools.Commands {
                     foreach (var prop in interestingDteProperties) {
                         res.AppendLine("        " + prop + ": " + GetProjectProperty(project, prop));
                     }
-                    /*
                     var njsProj = project.GetNodejsProject();
                     if (njsProj != null) {
-                        foreach (var prop in interestingProjectProperties) {
-                            var propValue = njsProj.GetProjectProperty(prop);
-                            if (propValue != null) {
-                                res.AppendLine("        " + prop + ": " + propValue);
-                            }
+                        var jsAnalyzer = njsProj.Analyzer.Project;
+                        res.AppendLine("Analysis Log: ");
+                        
+                        using (StringWriter writer = new StringWriter(res)) {
+                            jsAnalyzer.DumpLog(writer);
                         }
+
+                        //foreach (var prop in interestingProjectProperties) {
+                        //    var propValue = njsProj.GetProjectProperty(prop);
+                        //    if (propValue != null) {
+                        //        res.AppendLine("        " + prop + ": " + propValue);
+                        //    }
+                        //}
                     }
-                    */
                 } else {
                     res.AppendLine("        Kind: " + project.Kind);
                 }
 
                 res.AppendLine();
+
+
             }
 
             try {
@@ -138,12 +145,17 @@ namespace Microsoft.NodejsTools.Commands {
             }
             res.AppendLine();
             
-            StringWriter writer = new StringWriter(res);
 
             res.AppendLine(String.Format("Analysis Level: {0}", NodejsPackage.Instance.IntellisenseOptionsPage.AnalysisLevel.ToString()));
-            res.AppendLine("Analysis Log: ");
-            AnalysisLog.Dump(writer);
             res.AppendLine();
+            if(NodejsPackage.Instance._analyzer != null) {
+                var jsAnalyzer = NodejsPackage.Instance._analyzer.Project;
+                res.AppendLine("Default Analysis Log: ");
+
+                using (StringWriter writer = new StringWriter(res)) {
+                    jsAnalyzer.DumpLog(writer);
+                }
+            }
 
             return res.ToString();
         }

@@ -178,7 +178,11 @@ namespace Microsoft.NodejsTools.Analysis {
                 // allow the VariableDef to be identified.
                 int total = 0;
                 var typeCounts = new Dictionary<string, int>();
+                JsAnalyzer analyzer = null;
                 foreach (var type in TypesNoCopy) {
+                    if (analyzer == null && type.DeclaringModule != null) {
+                        analyzer = type.DeclaringModule.Analysis.ProjectState;
+                    }
                     var str = type.ToString();
                     int count;
                     if (!typeCounts.TryGetValue(str, out count)) {
@@ -193,7 +197,9 @@ namespace Microsoft.NodejsTools.Analysis {
                     new StackTrace(true),
                     total,
                     string.Join("\n    ", typeCountList)));
-                AnalysisLog.ExceedsTypeLimit(GetType().Name, total, string.Join(", ", typeCountList));
+                if (analyzer != null) {
+                    analyzer.Log.ExceedsTypeLimit(GetType().Name, total, string.Join(", ", typeCountList));
+                }
             }
         }
 

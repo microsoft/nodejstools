@@ -96,7 +96,7 @@ namespace Microsoft.NodejsTools {
         private object _surveyNewsUrlLock = new object();
         internal HashSet<ITextBuffer> ChangedBuffers = new HashSet<ITextBuffer>();
         private LanguagePreferences _langPrefs;
-        private VsProjectAnalyzer _analyzer;
+        internal VsProjectAnalyzer _analyzer;
         private NodejsToolsLogger _logger;
 
         /// <summary>
@@ -203,14 +203,15 @@ namespace Microsoft.NodejsTools {
 
             MakeDebuggerContextAvailable();
 
-            AnalysisLog.MaxItems = IntellisenseOptionsPage.AnalysisLogMax;
             IntellisenseOptionsPage.AnalysisLogMaximumChanged += IntellisenseOptionsPage_AnalysisLogMaximumChanged;
 
             InitializeLogging();
         }
 
         private void IntellisenseOptionsPage_AnalysisLogMaximumChanged(object sender, EventArgs e) {
-            AnalysisLog.MaxItems = IntellisenseOptionsPage.AnalysisLogMax;
+            if (_analyzer != null) {
+                _analyzer.Project.MaxLogLength = IntellisenseOptionsPage.AnalysisLogMax;
+            }
         }
 
         private void InitializeLogging() {
@@ -672,6 +673,7 @@ namespace Microsoft.NodejsTools {
                 if (_analyzer == null) {
                     _analyzer = new VsProjectAnalyzer();
                     LogLooseFileAnalysisLevel();
+                    _analyzer.Project.MaxLogLength = IntellisenseOptionsPage.AnalysisLogMax;
                     IntellisenseOptionsPage.AnalysisLevelChanged += IntellisenseOptionsPageAnalysisLevelChanged;                    
                 }
                 return _analyzer;

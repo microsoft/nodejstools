@@ -193,7 +193,7 @@ namespace AnalysisTests {
             TestOneSnippet(@"for(var x in abc) {
 }",
                 new NodeInfo(typeof(Block), 0, 22),
-                new NodeInfo(typeof(ForIn), 0, 17),
+                new NodeInfo(typeof(ForIn), 0, 22),
                 new NodeInfo(typeof(Lookup), 13, 16),
                 new NodeInfo(typeof(Var), 4, 9),
                 new NodeInfo(typeof(VariableDeclaration), 8, 9),
@@ -207,7 +207,7 @@ namespace AnalysisTests {
             TestOneSnippet(@"for(var x = 0; x<100; x++) {
 }",
                 new NodeInfo(typeof(Block), 0, 31),
-                new NodeInfo(typeof(ForNode), 0, 26),
+                new NodeInfo(typeof(ForNode), 0, 31),
                 new NodeInfo(typeof(Var), 4, 13),
                 new NodeInfo(typeof(VariableDeclaration), 8, 13),
                 new NodeInfo(typeof(ConstantWrapper), 12, 13),
@@ -221,7 +221,7 @@ namespace AnalysisTests {
             TestOneSnippet(@"for(x = 0; x<100; x++) {
 }",
                 new NodeInfo(typeof(Block), 0, 27),
-                new NodeInfo(typeof(ForNode), 0, 22),
+                new NodeInfo(typeof(ForNode), 0, 27),
                 new NodeInfo(typeof(ExpressionStatement), 4, 9),
                 new NodeInfo(typeof(BinaryOperator), 4, 9),
                 new NodeInfo(typeof(Lookup), 4, 5),

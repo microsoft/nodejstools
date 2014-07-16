@@ -283,6 +283,7 @@ namespace Microsoft.NodejsTools.Project {
 
         public override int InitializeForOuter(string filename, string location, string name, uint flags, ref Guid iid, out IntPtr projectPointer, out int canceled) {
             NodejsPackage.Instance.IntellisenseOptionsPage.AnalysisLevelChanged += IntellisenseOptionsPageAnalysisLevelChanged;
+            NodejsPackage.Instance.IntellisenseOptionsPage.AnalysisLogMaximumChanged += AnalysisLogMaximumChanged;
 
             return base.InitializeForOuter(filename, location, name, flags, ref iid, out projectPointer, out canceled);
         }
@@ -295,6 +296,7 @@ namespace Microsoft.NodejsTools.Project {
                     _analyzer.Dispose();
                 }
                 _analyzer = new VsProjectAnalyzer(ProjectHome);
+                _analyzer.Project.MaxLogLength = NodejsPackage.Instance.IntellisenseOptionsPage.AnalysisLogMax;
                 LogAnalysisLevel();
 
                 base.Reload();
@@ -368,7 +370,12 @@ namespace Microsoft.NodejsTools.Project {
                 }
             }
             _analyzer = analyzer;
+            _analyzer.Project.MaxLogLength = NodejsPackage.Instance.IntellisenseOptionsPage.AnalysisLogMax;
             LogAnalysisLevel();
+        }
+
+        private void AnalysisLogMaximumChanged(object sender, EventArgs e) {
+            _analyzer.Project.MaxLogLength = NodejsPackage.Instance.IntellisenseOptionsPage.AnalysisLogMax;
         }
 
         protected override void RaiseProjectPropertyChanged(string propertyName, string oldValue, string newValue) {
@@ -626,6 +633,7 @@ namespace Microsoft.NodejsTools.Project {
                 }
 
                 NodejsPackage.Instance.IntellisenseOptionsPage.AnalysisLevelChanged -= IntellisenseOptionsPageAnalysisLevelChanged;
+                NodejsPackage.Instance.IntellisenseOptionsPage.AnalysisLogMaximumChanged -= AnalysisLogMaximumChanged;
             }
             base.Dispose(disposing);
         }

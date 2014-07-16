@@ -19,13 +19,13 @@ using System.Linq;
 using Microsoft.NodejsTools.Analysis.Values;
 
 namespace Microsoft.NodejsTools.Analysis {
-    public static class AnalysisLog {
-        static DateTime StartTime = DateTime.UtcNow;
-        static TimeSpan? LastDisplayedTime;
-        static Deque<LogItem> LogItems = new Deque<LogItem>();
-        static int LogIndex;
+    internal class AnalysisLog {
+        DateTime StartTime = DateTime.UtcNow;
+        TimeSpan? LastDisplayedTime;
+        Deque<LogItem> LogItems = new Deque<LogItem>();
+        int LogIndex;
 
-        public static int MaxItems { get; set; }
+        public int MaxItems { get; set; }
 
         struct LogItem {
             public TimeSpan Time;
@@ -37,7 +37,7 @@ namespace Microsoft.NodejsTools.Analysis {
             }
         }
 
-        public static void Dump(TextWriter output, bool asCsv = false) {
+        public void Dump(TextWriter output, bool asCsv = false) {
             // we don't enumerate here because that can throw if the log is being updated
             // by another thread in the background.  We should either catch the new events
             // being appended at the end, or hopefully we stay in front of the updates
@@ -52,7 +52,7 @@ namespace Microsoft.NodejsTools.Analysis {
             output.Flush();
         }
 
-        private static void DumpItem(TextWriter output, bool asCsv, LogItem item) {
+        private void DumpItem(TextWriter output, bool asCsv, LogItem item) {
             if (!LastDisplayedTime.HasValue || item.Time.Subtract(LastDisplayedTime.GetValueOrDefault()) > TimeSpan.FromMilliseconds(100)) {
                 LastDisplayedTime = item.Time;
                 output.WriteLine(asCsv ? "TS, {0}, {1}" : "[TS] {0}, {1}", item.Time.TotalMilliseconds, item.Time);
@@ -81,7 +81,7 @@ namespace Microsoft.NodejsTools.Analysis {
             }
         }
 
-        private static void Add(string Event, params object[] Args) {
+        private void Add(string Event, params object[] Args) {
             int max = MaxItems;
 
             if (max != 0) {
@@ -100,19 +100,19 @@ namespace Microsoft.NodejsTools.Analysis {
             }
         }
 
-        static TimeSpan Time {
+        TimeSpan Time {
             get {
                 return DateTime.UtcNow - StartTime;
             }
         }
 
-        internal static void Enqueue(Deque<AnalysisUnit> deque, AnalysisUnit unit) {
+        internal void Enqueue(Deque<AnalysisUnit> deque, AnalysisUnit unit) {
             if (MaxItems != 0) {
                 Add("E", unit.Id, deque.Count);
             }
         }
 
-        internal static void Dequeue(Deque<AnalysisUnit> deque, AnalysisUnit unit) {
+        internal void Dequeue(Deque<AnalysisUnit> deque, AnalysisUnit unit) {
             if (MaxItems != 0) {
                 Add("D", unit.Id, deque.Count);
             }
@@ -134,25 +134,25 @@ namespace Microsoft.NodejsTools.Analysis {
             }
         }
 
-        internal static void NewUnit(AnalysisUnit unit) {
+        internal void NewUnit(AnalysisUnit unit) {
             if (MaxItems != 0) {
                 Add("N", unit.Id, new AnalysisUnitWrapper(unit));
             }
         }
 
-        internal static void EndOfQueue(int beforeLength, int afterLength) {
+        internal void EndOfQueue(int beforeLength, int afterLength) {
             if (MaxItems != 0) {
                 Add("Q", beforeLength, afterLength, afterLength - beforeLength);
             }
         }
 
-        internal static void ExceedsTypeLimit(string variableDefType, int total, string contents) {
+        internal void ExceedsTypeLimit(string variableDefType, int total, string contents) {
             if (MaxItems != 0) {
                 Add("X", variableDefType, total, contents);
             }
         }
 
-        internal static void Cancelled(Deque<AnalysisUnit> queue) {
+        internal void Cancelled(Deque<AnalysisUnit> queue) {
             if (MaxItems != 0) {
                 Add("Cancel", queue.Count);
             }

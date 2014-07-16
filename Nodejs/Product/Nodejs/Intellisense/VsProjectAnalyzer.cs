@@ -127,6 +127,7 @@ namespace Microsoft.NodejsTools.Intellisense {
                 _analysisLevel = AnalysisLevel.High;
             }
 
+            var limits = LoadLimits();
             if (projectDir != null) {
                 _projectDir = projectDir;
                 string analysisDb = GetAnalysisPath();
@@ -146,11 +147,15 @@ namespace Microsoft.NodejsTools.Intellisense {
                                 try {
                                     var serializer = new AnalysisSerializer();
                                     _jsAnalyzer = (JsAnalyzer)serializer.Deserialize(stream);
-                                    _analysisQueue = new AnalysisQueue(this, serializer, stream);
-                                    foreach (var entry in _jsAnalyzer.AllModules) {
-                                        _projectFiles[entry.FilePath] = new ProjectItem(entry);
+                                    if (_jsAnalyzer.Limits.Equals(limits)) {
+                                        _analysisQueue = new AnalysisQueue(this, serializer, stream);
+                                        foreach (var entry in _jsAnalyzer.AllModules) {
+                                            _projectFiles[entry.FilePath] = new ProjectItem(entry);
+                                        }
+                                        _reparseDateTime = new FileInfo(analysisDb).LastWriteTime;
+                                    } else {
+                                        _jsAnalyzer = null;
                                     }
-                                    _reparseDateTime = new FileInfo(analysisDb).LastWriteTime;
                                 } catch (InvalidOperationException) {
                                     // corrupt or invalid DB
                                     _jsAnalyzer = null;
@@ -168,8 +173,7 @@ namespace Microsoft.NodejsTools.Intellisense {
             }
 
 
-            var limits = LoadLimits();
-            if (_jsAnalyzer == null || _jsAnalyzer.Limits != limits) {
+            if (_jsAnalyzer == null) {
                 _jsAnalyzer = new JsAnalyzer(limits);
                 if (_analysisLevel != AnalysisLevel.None) {
                     _analysisQueue = new AnalysisQueue(this);

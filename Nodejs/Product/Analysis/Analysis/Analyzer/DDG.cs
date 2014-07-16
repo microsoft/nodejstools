@@ -23,9 +23,14 @@ using Microsoft.NodejsTools.Parsing;
 
 namespace Microsoft.NodejsTools.Analysis.Analyzer {
     internal class DDG : AstVisitor {
+        private readonly JsAnalyzer _analyzer;
         internal AnalysisUnit _unit;
         internal ExpressionEvaluator _eval;
         private Block _curSuite;
+
+        public DDG(JsAnalyzer analyzer) {
+            _analyzer = analyzer;
+        }
 
         public void Analyze(Deque<AnalysisUnit> queue, CancellationToken cancel) {
             if (cancel.IsCancellationRequested) {
@@ -44,7 +49,7 @@ namespace Microsoft.NodejsTools.Analysis.Analyzer {
                 _unit = queue.PopLeft();
 
                 if (_unit.Environment == null) {    // endOfQueueMarker
-                    AnalysisLog.EndOfQueue(queueCountAtStart, queue.Count);
+                    _analyzer.Log.EndOfQueue(queueCountAtStart, queue.Count);
 
                     queueCountAtStart = queue.Count;
                     if (queueCountAtStart > 0) {
@@ -53,7 +58,7 @@ namespace Microsoft.NodejsTools.Analysis.Analyzer {
                     continue;
                 }
 
-                AnalysisLog.Dequeue(queue, _unit);
+                _analyzer.Log.Dequeue(queue, _unit);
 
                 _unit.IsInQueue = false;
                 SetCurrentUnit(_unit);
@@ -61,7 +66,7 @@ namespace Microsoft.NodejsTools.Analysis.Analyzer {
             }
 
             if (cancel.IsCancellationRequested) {
-                AnalysisLog.Cancelled(queue);
+                _analyzer.Log.Cancelled(queue);
             }
         }
 
