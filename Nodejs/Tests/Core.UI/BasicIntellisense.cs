@@ -187,5 +187,38 @@ namespace Microsoft.Nodejs.Tests.UI {
                 }
             }
         }
+
+        /// <summary>
+        /// https://nodejstools.codeplex.com/workitem/1201
+        /// </summary>
+        [TestMethod, Priority(0), TestCategory("Core")]
+        [HostType("TC Dynamic"), DynamicHostType(typeof(VsIdeHostAdapter))]
+        public void IntellisenseAfterNewLine2() {
+            var project = Project("NewLineTest",
+                Compile("server", "var x = 'abc';\r\n// foo\r\nx\r\nvar abc=42\r\nx")
+            );
+
+            using (var solution = project.Generate().ToVs()) {
+                var server = solution.OpenItem("NewLineTest", "server.js");
+
+                server.MoveCaret(3, 2);
+
+                Keyboard.Type(".");
+
+                using (var sh = server.WaitForSession<ICompletionSession>()) {
+                    var session = sh.Session;
+                    Assert.IsTrue(session.CompletionSets[0].Completions.Select(x => x.InsertionText).Contains("big"));
+                }
+
+                server.MoveCaret(5, 2);
+
+                Keyboard.Type(".");
+
+                using (var sh = server.WaitForSession<ICompletionSession>()) {
+                    var session = sh.Session;
+                    Assert.IsTrue(session.CompletionSets[0].Completions.Select(x => x.InsertionText).Contains("big"));
+                }
+            }
+        }
     }
 }

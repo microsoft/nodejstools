@@ -184,14 +184,20 @@ namespace Microsoft.NodejsTools.Intellisense {
 
                 int currentParamAtLastColon = -1;   // used to track the current param index at this last colon, before we hit a lambda.
                 SnapshotSpan? startAtLastToken = null;
+                bool lastNewLine = false;
                 // Walk backwards over the tokens in the current line
                 do {
                     var token = enumerator.Current;
 
                     if (token == null) {
                         // new line
+                        lastNewLine = true;
                         continue;
+                    } else if (lastNewLine && !lastTokenWasCommaOrOperator) {
+                        break;
                     }
+
+                    lastNewLine = false;
 
                     var text = token.Span.GetText();
                     if (text == "(") {
@@ -240,7 +246,7 @@ namespace Microsoft.NodejsTools.Intellisense {
                         nestingChanged = true;
                         lastTokenWasCommaOrOperator = true;
                         lastTokenWasKeywordArgAssignment = false;
-                    } else if ((token.ClassificationType == Classifier.Provider.Keyword && 
+                    } else if ((token.ClassificationType == Classifier.Provider.Keyword &&
                                 text != "this" && text != "get" && text != "set" && text != "delete") ||
                                token.ClassificationType == Classifier.Provider.Operator) {
                         if (forCompletion && text == "new") {
@@ -294,7 +300,7 @@ namespace Microsoft.NodejsTools.Intellisense {
                                 return null;
                             } else if ((nestingChanged || forCompletion) && token.ClassificationType == Classifier.Provider.Keyword && text == "function") {
                                 return null;
-                            }                            
+                            }
                             break;
                         } else if ((token.ClassificationType == Classifier.Provider.Keyword &&
                             _stmtKeywords.Contains(text)) ||
