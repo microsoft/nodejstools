@@ -32,10 +32,13 @@ namespace Microsoft.NodejsTools.Intellisense {
         private readonly object _queueLock = new object();
         private readonly List<IAnalyzable>[] _queue;
         private readonly HashSet<IGroupableAnalysisProject> _enqueuedGroups;
+        [NonSerialized]
+        private DateTime _lastSave;
         private TaskScheduler _scheduler;
         private CancellationTokenSource _cancel;
         private bool _isAnalyzing;
         private int _analysisPending;
+        private static readonly TimeSpan _SaveAnalysisTime = TimeSpan.FromMinutes(15);
 
         private const int PriorityCount = (int)AnalysisPriority.High + 1;
 
@@ -48,6 +51,7 @@ namespace Microsoft.NodejsTools.Intellisense {
                 // must be kept in sync with Serialize
                 _queue = (List<IAnalyzable>[])serializer.Deserialize(stream);
                 _enqueuedGroups = (HashSet<IGroupableAnalysisProject>)serializer.Deserialize(stream);
+                _lastSave = DateTime.Now + TimeSpan.FromMinutes(1);
             } else {
                 _queue = new List<IAnalyzable>[PriorityCount];
                 for (int i = 0; i < PriorityCount; i++) {
@@ -197,6 +201,11 @@ namespace Microsoft.NodejsTools.Intellisense {
                         workItem.Analyze(_cancel.Token);
                     }
                 } else {
+                    if (_lastSave == default(DateTime) || (DateTime.Now - _lastSave) > _SaveAnalysisTime) {
+                        _analyzer.SaveAnalysis();
+                        _lastSave = DateTime.Now;
+                    }
+
                     _isAnalyzing = false;
                     WaitHandle.SignalAndWait(
                         _analyzer.QueueActivityEvent,

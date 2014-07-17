@@ -135,7 +135,7 @@ namespace Microsoft.NodejsTools.Intellisense {
                     try {
                         using (FileStream stream = new FileStream(analysisDb, FileMode.Open)) {
                             byte[] header = new byte[DbHeader.Length];
-                            stream.Read(header, 0, header.Length);
+                            stream.Read(header, 0, header.Length);                            
                             bool match = true;
                             for (int i = 0; i < header.Length; i++) {
                                 if (header[i] != DbHeader[i]) {
@@ -145,19 +145,26 @@ namespace Microsoft.NodejsTools.Intellisense {
                             }
                             if (match) {
                                 try {
-                                    var serializer = new AnalysisSerializer();
-                                    _jsAnalyzer = (JsAnalyzer)serializer.Deserialize(stream);
-                                    if (_jsAnalyzer.Limits.Equals(limits)) {
-                                        _analysisQueue = new AnalysisQueue(this, serializer, stream);
-                                        foreach (var entry in _jsAnalyzer.AllModules) {
-                                            _projectFiles[entry.FilePath] = new ProjectItem(entry);
+                                    using (new DebugTimer("LoadAnalysis")) {
+                                        var serializer = new AnalysisSerializer();
+                                        _jsAnalyzer = (JsAnalyzer)serializer.Deserialize(stream);
+                                        if (_jsAnalyzer.Limits.Equals(limits)) {
+                                            _analysisQueue = new AnalysisQueue(this, serializer, stream);
+                                            foreach (var entry in _jsAnalyzer.AllModules) {
+                                                _projectFiles[entry.FilePath] = new ProjectItem(entry);
+                                            }
+                                            _reparseDateTime = new FileInfo(analysisDb).LastWriteTime;
+                                        } else {
+                                            _jsAnalyzer = null;
                                         }
-                                        _reparseDateTime = new FileInfo(analysisDb).LastWriteTime;
-                                    } else {
-                                        _jsAnalyzer = null;
                                     }
                                 } catch (InvalidOperationException) {
                                     // corrupt or invalid DB
+                                    _jsAnalyzer = null;
+                                    _analysisQueue = null;
+                                } catch (Exception e) {
+                                    Debug.Fail(String.Format("Unexpected exception while loading analysis: {0}", e));
+                                    // bug in deserialization
                                     _jsAnalyzer = null;
                                     _analysisQueue = null;
                                 }
@@ -1281,30 +1288,43 @@ namespace Microsoft.NodejsTools.Intellisense {
             if (_analysisQueue != null) {
                 _analysisQueue.Stop();
             }
-
-            if (_projectDir != null) {
-                ThreadPool.QueueUserWorkItem(_ => SaveAnalysis());
-            }
         }
 
-        private void SaveAnalysis() {
+        internal void SaveAnalysis() {
+            if (_projectDir == null || _analysisLevel == AnalysisLevel.None) {
+                return;
+            }
+
             try {
-                if (_analysisLevel != AnalysisLevel.None) {
-                    if (File.Exists(GetAnalysisPath())) {
-                        // CreateNew doesn't overwrite hidden files, so delete it
-                        File.Delete(GetAnalysisPath());
+                using (new DebugTimer("SaveAnalysis")) {
+                    var path = GetAnalysisPath();
+                    var tempPath = path + ".tmp";
+                    bool failed = false;
+                    if (File.Exists(tempPath)) {
+                        // Create doesn't overwrite hidden files, so delete it
+                        File.Delete(tempPath);
                     }
-                    using (FileStream fs = new FileStream(GetAnalysisPath(), FileMode.Create)) {
-                        fs.Write(DbHeader, 0, DbHeader.Length);
+                    using (FileStream fs = new FileStream(tempPath, FileMode.Create)) {
+                        new FileInfo(tempPath).Attributes |= FileAttributes.Hidden;
+                        fs.Write(DbHeader, 0, DbHeader.Length);                        
                         try {
                             var serializer = new AnalysisSerializer();
                             serializer.Serialize(fs, _jsAnalyzer);
                             _analysisQueue.Serialize(serializer, fs);
                         } catch (Exception e) {
                             Debug.Fail("Failed to save analysis " + e);
+                            failed = true;
                         }
                     }
-                    new FileInfo(GetAnalysisPath()).Attributes |= FileAttributes.Hidden;
+
+                    if (!failed) {
+                        if (File.Exists(path)) {
+                            File.Delete(path);
+                        }
+                        File.Move(tempPath, path);
+                    } else {
+                        File.Delete(tempPath);
+                    }
                 }
             } catch (IOException) {
             } catch (UnauthorizedAccessException) {

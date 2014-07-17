@@ -30,6 +30,7 @@ namespace Microsoft.NodejsTools.Analysis {
     public class AnalysisSerializer {
         private readonly List<object> _memoDict = new List<object>();
         private readonly Dictionary<object, int> _reverseMemo = new Dictionary<object, int>(new ReferenceComparer<object>());
+        private readonly Dictionary<string, int> _stringMemo = new Dictionary<string,int>();
         private readonly List<Action> _postProcess = new List<Action>();
         private static Dictionary<Type, MemberInfo[]> _serializationMembers = new Dictionary<Type, MemberInfo[]>();
 
@@ -119,7 +120,10 @@ namespace Microsoft.NodejsTools.Analysis {
                         break;
                     case SerializationType.Bool: nextValue = reader.ReadBoolean(); break;
                     case SerializationType.Double: nextValue = reader.ReadDouble(); break;
-                    case SerializationType.String: nextValue = reader.ReadString(); break;
+                    case SerializationType.String: 
+                        nextValue = reader.ReadString();
+                        Memoize(nextValue);
+                        break;
                     case SerializationType.Int: nextValue = reader.ReadInt32(); break;
                     case SerializationType.Long: nextValue = reader.ReadInt64(); break;
                     case SerializationType.Enum:
@@ -437,8 +441,17 @@ namespace Microsoft.NodejsTools.Analysis {
         }
 
         private static void SerializeString(object value, AnalysisSerializer serializer, Stack<object> stack, BinaryWriter writer) {
-            writer.Write((byte)SerializationType.String);
-            writer.Write((string)value);
+            string str = (string)value;
+            int memoId;
+            if (!serializer._stringMemo.TryGetValue(str, out memoId)) {
+                // save the string in the normal memo so deserialization is simplified
+                memoId = serializer._stringMemo[str] = serializer._reverseMemo[str] = serializer._reverseMemo.Count;
+                writer.Write((byte)SerializationType.String);
+                writer.Write((string)value);
+            } else {
+                writer.Write((byte)SerializationType.ObjectReference);
+                writer.Write(memoId);
+            }
         }
 
         private static void SerializeDouble(object value, AnalysisSerializer serializer, Stack<object> stack, BinaryWriter writer) {
