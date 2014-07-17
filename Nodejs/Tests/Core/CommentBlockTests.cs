@@ -28,7 +28,7 @@ console.log('Goodbye');"));
 
             view.Caret.MoveTo(view.TextBuffer.CurrentSnapshot.GetLineFromLineNumber(0).Start);
 
-            EditorExtensions.CommentOrUncommentBlock(view, true);
+            view.CommentOrUncommentBlock(true);
 
             Assert.AreEqual(@"//console.log('Hello');
 console.log('Goodbye');",
@@ -36,7 +36,7 @@ console.log('Goodbye');",
 
             view.Caret.MoveTo(view.TextBuffer.CurrentSnapshot.GetLineFromLineNumber(1).Start);
 
-            EditorExtensions.CommentOrUncommentBlock(view, true);
+            view.CommentOrUncommentBlock(true);
 
             Assert.AreEqual(@"//console.log('Hello');
 //console.log('Goodbye');",
@@ -51,7 +51,7 @@ console.log('Goodbye');",
 
             view.Caret.MoveTo(view.TextBuffer.CurrentSnapshot.GetLineFromLineNumber(0).Start);
 
-            EditorExtensions.CommentOrUncommentBlock(view, false);
+            view.CommentOrUncommentBlock(false);
 
             Assert.AreEqual(@"console.log('Hello');
 //console.log('Goodbye');",
@@ -59,7 +59,7 @@ console.log('Goodbye');",
 
             view.Caret.MoveTo(view.TextBuffer.CurrentSnapshot.GetLineFromLineNumber(1).Start);
 
-            EditorExtensions.CommentOrUncommentBlock(view, false);
+            view.CommentOrUncommentBlock(false);
 
             Assert.AreEqual(@"console.log('Hello');
 console.log('Goodbye');",
@@ -77,7 +77,7 @@ console.log('Goodbye');"));
                 false
             );
 
-            EditorExtensions.CommentOrUncommentBlock(view, true);
+            view.CommentOrUncommentBlock(true);
 
             Assert.AreEqual(@"//console.log('Hello');
 //console.log('Goodbye');",
@@ -96,7 +96,7 @@ console.log('Goodbye');"));
                 false
             );
 
-            EditorExtensions.CommentOrUncommentBlock(view, true);
+            view.CommentOrUncommentBlock(true);
 
             Assert.AreEqual(@"//console.log('Hello');
 
@@ -116,7 +116,7 @@ console.log('Goodbye');"));
                 false
             );
 
-            EditorExtensions.CommentOrUncommentBlock(view, true);
+            view.CommentOrUncommentBlock(true);
 
             Assert.AreEqual(@"//console.log('Hello');
    
@@ -141,7 +141,7 @@ console.log('Goodbye');"));
                 false
             );
 
-            EditorExtensions.CommentOrUncommentBlock(view, true);
+            view.CommentOrUncommentBlock(true);
 
             Assert.AreEqual(@"function f(){
     //console.log('Hello');
@@ -169,7 +169,7 @@ console.log('Goodbye');"));
                 false
             );
 
-            EditorExtensions.CommentOrUncommentBlock(view, true);
+            view.CommentOrUncommentBlock(true);
 
             Assert.AreEqual(@"function f(){
     //console.log('Hello');
@@ -189,7 +189,7 @@ console.log('bye');"));
 
             view.Caret.MoveTo(view.TextBuffer.CurrentSnapshot.GetLineFromLineNumber(1).Start);
 
-            EditorExtensions.CommentOrUncommentBlock(view, true);
+            view.CommentOrUncommentBlock(true);
 
             Assert.AreEqual(@"console.log('hi');
 
@@ -215,7 +215,7 @@ console.log('bye');",
                 false
             );
 
-            EditorExtensions.CommentOrUncommentBlock(view, true);
+            view.CommentOrUncommentBlock(true);
 
             Assert.AreEqual(@"function f(){
     //console.log('Hello');
@@ -243,7 +243,7 @@ console.log('bye');",
                 false
             );
 
-            EditorExtensions.CommentOrUncommentBlock(view, false);
+            view.CommentOrUncommentBlock(false);
 
             Assert.AreEqual(@"function f(){
     console.log('Hello');
@@ -264,7 +264,7 @@ console.log('bye');",
                 false
             );
 
-            EditorExtensions.CommentOrUncommentBlock(view, false);
+            view.CommentOrUncommentBlock(false);
 
             Assert.AreEqual(@"console.log('Hello');
 console.log('Goodbye');",
@@ -282,7 +282,7 @@ console.log('Goodbye');"));
                 false
             );
 
-            EditorExtensions.CommentOrUncommentBlock(view, true);
+            view.CommentOrUncommentBlock(true);
 
             Assert.AreEqual(@"//console.log('Hello');
 console.log('Goodbye');",
@@ -301,7 +301,7 @@ console.log('Goodbye');"));
                 false
             );
 
-            EditorExtensions.CommentOrUncommentBlock(view, false);
+            view.CommentOrUncommentBlock(false);
 
             Assert.AreEqual(@"console.log('Hello');//comment that should stay a comment;
 console.log('Still here');//another comment that should stay a comment;

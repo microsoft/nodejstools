@@ -89,6 +89,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="BaselineCompare.cs" />
+    <Compile Include="MultiLineCommentTests.cs" />
     <Compile Include="CommentBlockTests.cs" />
     <Compile Include="Debugger\BaseDebuggerTests.cs" />
     <Compile Include="Debugger\Commands\BacktraceCommandTests.cs" />

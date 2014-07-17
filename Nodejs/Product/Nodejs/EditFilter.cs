@@ -53,7 +53,7 @@ namespace Microsoft.NodejsTools {
 
         public EditFilter(ITextView textView, IEditorOperations editorOps, IEditorOptions editorOptions, IIntellisenseSessionStack intellisenseStack, IComponentModel compModel) {
             _textView = textView;
-            _editorOps = editorOps;            
+            _editorOps = editorOps;
             _intellisenseStack = intellisenseStack;
             _compModel = compModel;
             var agg = _compModel.GetService<IClassifierAggregatorService>();
@@ -95,7 +95,7 @@ namespace Microsoft.NodejsTools {
                     case VSConstants.VSStd2KCmdID.FORMATSELECTION: FormatSelection(); return VSConstants.S_OK;
                     case VSConstants.VSStd2KCmdID.FORMATDOCUMENT: FormatDocument(); return VSConstants.S_OK;
                     case VSConstants.VSStd2KCmdID.RETURN:
-                        if (_intellisenseStack.TopSession != null && 
+                        if (_intellisenseStack.TopSession != null &&
                             _intellisenseStack.TopSession is ICompletionSession &&
                             !_intellisenseStack.TopSession.IsDismissed) {
                             ((ICompletionSession)_intellisenseStack.TopSession).Commit();
@@ -110,7 +110,7 @@ namespace Microsoft.NodejsTools {
                             var ch = (char)(ushort)System.Runtime.InteropServices.Marshal.GetObjectForNativeVariant(pvaIn);
                             int res = _next.Exec(ref pguidCmdGroup, nCmdID, nCmdexecopt, pvaIn, pvaOut);
 
-                            switch(ch) {
+                            switch (ch) {
                                 case '}':
                                 case ';':
                                     FormatAfterTyping(ch);
@@ -129,15 +129,13 @@ namespace Microsoft.NodejsTools {
 
                     case VSConstants.VSStd2KCmdID.COMMENT_BLOCK:
                     case VSConstants.VSStd2KCmdID.COMMENTBLOCK:
-                        if (EditorExtensions.CommentOrUncommentBlock(_textView, comment: true))
-                        {
+                        if (_textView.CommentOrUncommentBlock(comment: true)) {
                             return VSConstants.S_OK;
                         }
                         break;
                     case VSConstants.VSStd2KCmdID.UNCOMMENT_BLOCK:
                     case VSConstants.VSStd2KCmdID.UNCOMMENTBLOCK:
-                        if (EditorExtensions.CommentOrUncommentBlock(_textView, comment: false))
-                        {
+                        if (_textView.CommentOrUncommentBlock(comment: false)) {
                             return VSConstants.S_OK;
                         }
                         break;
@@ -779,15 +777,20 @@ namespace Microsoft.NodejsTools {
                     var line = insertionPoint.Value.GetContainingLine();
 
                     if (line.LineNumber > 0) {
-                        ApplyEdits(
-                            buffer,
-                            Formatter.GetEditsAfterEnter(
-                                buffer.CurrentSnapshot.GetText(),
-                                buffer.CurrentSnapshot.GetLineFromLineNumber(line.LineNumber - 1).Start,
-                                line.End,
-                                CreateFormattingOptions()
-                            )
-                        );
+						SnapshotSpan commentSpan;
+                        if (insertionPoint.Value.IsMultilineComment(out commentSpan)) {
+                            _textView.FormatMultilineComment(commentSpan.Start, insertionPoint.Value);
+                        } else {
+                            ApplyEdits(
+                                buffer,
+                                Formatter.GetEditsAfterEnter(
+                                    buffer.CurrentSnapshot.GetText(),
+                                    buffer.CurrentSnapshot.GetLineFromLineNumber(line.LineNumber - 1).Start,
+                                    line.End,
+                                    CreateFormattingOptions()
+                                )
+                            );
+                        }
                     }
                 }
             }
