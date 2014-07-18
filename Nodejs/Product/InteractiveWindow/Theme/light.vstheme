@@ -1,0 +1,54 @@
+<Themes>
+  <Theme Name="Light" GUID="{de3dbbcd-f642-433c-8353-8f1df4370aba}">
+    <Category Name="Text Editor" GUID="{75A05685-00A8-4DED-BAE5-E7A50BFA929A}">
+      <!--<Color Name="Node.js Interactive - Black">
+        <Foreground Type="CT_RAW" Source="FF000000" />
+      </Color>
+      <Color Name="Node.js Interactive - Blue">
+        <Foreground Type="CT_RAW" Source="FFFF0000" />
+      </Color>
+      <Color Name="Node.js Interactive - Cyan">
+        <Foreground Type="CT_RAW" Source="FFFFFF00" />
+      </Color>
+      <Color Name="Node.js Interactive - DarkBlue">
+        <Foreground Type="CT_RAW" Source="FF7F0000" />
+      </Color>
+      <Color Name="Node.js Interactive - DarkCyan">
+        <Foreground Type="CT_RAW" Source="FF7F7F00" />
+      </Color>
+      <Color Name="Node.js Interactive - DarkGray">
+        <Foreground Type="CT_RAW" Source="FF7F7F7F" />
+      </Color>
+      <Color Name="Node.js Interactive - DarkGreen">
+        <Foreground Type="CT_RAW" Source="FF007F00" />
+      </Color>
+      <Color Name="Node.js Interactive - DarkMagenta">
+        <Foreground Type="CT_RAW" Source="FF7F007F" />
+      </Color>
+      <Color Name="Node.js Interactive - DarkRed">
+        <Foreground Type="CT_RAW" Source="FF00007F" />
+      </Color>
+      <Color Name="Node.js Interactive - DarkYellow">
+        <Foreground Type="CT_RAW" Source="FF7F7F00" />
+      </Color>
+      <Color Name="Node.js Interactive - Gray">
+        <Foreground Type="CT_RAW" Source="FFC0C0C0" />
+      </Color>
+      <Color Name="Node.js Interactive - Green">
+        <Foreground Type="CT_RAW" Source="FF00FF00" />
+      </Color>
+      <Color Name="Node.js Interactive - Magenta">
+        <Foreground Type="CT_RAW" Source="FFFF00FF" />
+      </Color>
+      <Color Name="Node.js Interactive - Red">
+        <Foreground Type="CT_RAW" Source="FF0000FF" />
+      </Color>-->
+      <Color Name="Node.js Interactive - White">
+        <Foreground Type="CT_RAW" Source="FF7F7F7F" />
+      </Color>
+      <Color Name="Node.js Interactive - Yellow">
+        <Foreground Type="CT_RAW" Source="FF20C0C0" />
+      </Color>
+    </Category>
+  </Theme>
+</Themes>

@@ -24,7 +24,6 @@
       </PropertyGroup>
     </When>
   </Choose>
-  <Import Project="$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props" Condition="Exists('$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props')" />
   <Import Project="..\ProjectBefore.settings" />
   <PropertyGroup>
     <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
@@ -50,26 +49,6 @@
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Platform)' == 'x86' ">
     <PlatformTarget>x86</PlatformTarget>
-  </PropertyGroup>
-  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|x86' ">
-    <DebugSymbols>true</DebugSymbols>
-    <DebugType>full</DebugType>
-    <Optimize>false</Optimize>
-    <OutputPath>bin\Debug\</OutputPath>
-    <DefineConstants>$(DefineConstants);TRACE;DEBUG</DefineConstants>
-    <ErrorReport>prompt</ErrorReport>
-    <WarningLevel>4</WarningLevel>
-    <Prefer32Bit>false</Prefer32Bit>
-  </PropertyGroup>
-  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|x86' ">
-    <DebugType>pdbonly</DebugType>
-    <Optimize>true</Optimize>
-    <OutputPath>bin\Release\</OutputPath>
-    <DefineConstants>$(DefineConstants);TRACE</DefineConstants>
-    <ErrorReport>prompt</ErrorReport>
-    <WarningLevel>4</WarningLevel>
-    <RunCodeAnalysis>false</RunCodeAnalysis>
-    <Prefer32Bit>false</Prefer32Bit>
   </PropertyGroup>
   <PropertyGroup>
     <DefineConstants>$(DefineConstants);NTVS_FEATURE_INTERACTIVEWINDOW</DefineConstants>
@@ -195,6 +174,10 @@
     <None Include="source.extension.vsixmanifest">
       <SubType>Designer</SubType>
     </None>
+    <None Include="Theme\blue.vstheme" />
+    <None Include="Theme\contrast.vstheme" />
+    <None Include="Theme\dark.vstheme" />
+    <None Include="Theme\light.vstheme" />
   </ItemGroup>
   <ItemGroup>
     <VSCTCompile Include="InteractiveWindow.vsct">
@@ -209,6 +192,8 @@
       <IncludeInVSIX>true</IncludeInVSIX>
       <VSIXSubpath>.</VSIXSubpath>
     </Content>
+    <None Include="Theme\make_theme_pkgdef.py" />
+    <None Include="Theme\Microsoft.NodejsTools.InteractiveWindow.theme.pkgdef" />
   </ItemGroup>
   <PropertyGroup>
     <UseCodebase>true</UseCodebase>
@@ -227,4 +212,13 @@
   <Target Name="AfterBuild">
   </Target>
   -->
+  <Target Name="DeployThemePkgdef" AfterTargets="CopyPkgDef" Inputs="Theme\Microsoft.NodejsTools.InteractiveWindow.theme.pkgdef" Outputs="$(OutputPath)Microsoft.NodejsTools.InteractiveWindow.theme.pkgdef" Condition="'$(VSTarget)' != '10.0'">
+    <Copy SourceFiles="Theme\Microsoft.NodejsTools.InteractiveWindow.theme.pkgdef" DestinationFiles="$(OutputPath)Microsoft.NodejsTools.InteractiveWindow.theme.pkgdef" OverwriteReadOnlyFiles="true" />
+    <ItemGroup>
+      <VSIXSourceItem Include="$(OutputPath)Microsoft.NodejsTools.InteractiveWindow.theme.pkgdef">
+        <VSIXSubPath>
+        </VSIXSubPath>
+      </VSIXSourceItem>
+    </ItemGroup>
+  </Target>
 </Project>

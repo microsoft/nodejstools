@@ -12,6 +12,7 @@
     <!-- Registration files -->
     <File Include="$(ObjDir)\extension.vsixmanifest" />
     <File Include="Microsoft.NodejsTools.InteractiveWindow.pkgdef" />
+    <File Include="Microsoft.NodejsTools.InteractiveWindow.theme.pkgdef" />
 
     <!-- Core extension -->
     <File Include="Microsoft.NodejsTools.InteractiveWindow.dll" />

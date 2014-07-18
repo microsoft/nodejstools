@@ -55,26 +55,9 @@
     <StartProgram>$(DevEnvDir)devenv.exe</StartProgram>
     <StartArguments>/rootSuffix Exp /Log</StartArguments>
   </PropertyGroup>
-  <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'Debug|x86'">
+  <PropertyGroup Condition=" '$(Platform)' == 'x86' ">
     <PlatformTarget>x86</PlatformTarget>
-    <Optimize>false</Optimize>
-    <DebugSymbols>true</DebugSymbols>
-    <DebugType>full</DebugType>
-    <OutputPath>bin\Debug\</OutputPath>
-    <DefineConstants>$(DefineConstants);TRACE;DEBUG</DefineConstants>
-    <TreatWarningsAsErrors>true</TreatWarningsAsErrors>
-    <ErrorReport>prompt</ErrorReport>
-    <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
-  </PropertyGroup>
-  <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'Release|x86'">
-    <PlatformTarget>x86</PlatformTarget>
-    <Optimize>true</Optimize>
-    <DebugType>pdbonly</DebugType>
-    <OutputPath>bin\Release\</OutputPath>
-    <DefineConstants>$(DefineConstants);TRACE</DefineConstants>
-    <TreatWarningsAsErrors>true</TreatWarningsAsErrors>
-    <ErrorReport>prompt</ErrorReport>
-    <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
+    <AllowUnsafeBlocks>True</AllowUnsafeBlocks>
   </PropertyGroup>
   <PropertyGroup>
     <DefineConstants>$(DefineConstants);NODEJS_TOOLS;NTVS_FEATURE_INTERACTIVEWINDOW</DefineConstants>
