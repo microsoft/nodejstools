@@ -1612,10 +1612,10 @@ namespace Microsoft.VisualStudioTools.Project {
         }
 
         public bool GetIsExpanded() {
-            if (ProjectMgr == null || ProjectMgr.Site == null) {
+            if (ProjectMgr == null || ProjectMgr.Site == null || ProjectMgr.ParentHierarchy == null) {
                 return false;
             }
-            ProjectMgr.AssertHasParentHierarchy();
+            
             IVsUIHierarchyWindow2 windows = UIHierarchyUtilities.GetUIHierarchyWindow(
                 ProjectMgr.Site,
                 new Guid(ToolWindowGuids80.SolutionExplorer)) as IVsUIHierarchyWindow2;

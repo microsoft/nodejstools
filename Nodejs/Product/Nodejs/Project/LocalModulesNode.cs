@@ -64,9 +64,7 @@ namespace Microsoft.NodejsTools.Project {
             set {
                 _packages = value;
                 IsVisible = value == null || value.Any();
-                if (this.ProjectMgr.ParentHierarchy != null) {
-                    this.ProjectMgr.OnInvalidateItems(_parent);
-                }
+                this.ProjectMgr.OnInvalidateItems(_parent);
             }
         }
 
