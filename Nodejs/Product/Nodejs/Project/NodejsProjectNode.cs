@@ -39,13 +39,15 @@ namespace Microsoft.NodejsTools.Project {
         private string[] _analysisIgnoredDirs = new string[0];
         internal readonly RequireCompletionCache _requireCompletionCache = new RequireCompletionCache();
         private string _intermediateOutputPath;
+        private readonly Dictionary<NodejsProjectImageName, int> _imageIndexFromNameDictionary = new Dictionary<NodejsProjectImageName, int>();
+
 
         public NodejsProjectNode(NodejsProjectPackage package)
             : base(package, Utilities.GetImageList(typeof(NodejsProjectNode).Assembly.GetManifestResourceStream("Microsoft.NodejsTools.Resources.Icons.NodejsImageList.bmp"))) {
 
             Type projectNodePropsType = typeof(NodejsProjectNodeProperties);
             AddCATIDMapping(projectNodePropsType, projectNodePropsType.GUID);
-            InitDependencyImages();
+            InitNodejsProjectImages();
         }
 
         public VsProjectAnalyzer Analyzer {
@@ -72,21 +74,27 @@ namespace Microsoft.NodejsTools.Project {
             return base.GetAvailableItemNames().Except(_excludedAvailableItems);
         }
 
-        private void InitDependencyImages() {
-            var images = ImageHandler.ImageList.Images;
-            ImageIndexDependency = images.Count;
-            images.Add(Image.FromStream(typeof(NodejsProjectNode).Assembly.GetManifestResourceStream("Microsoft.NodejsTools.Resources.Dependency_16.png")));
-            ImageIndexDependencyNotListed = images.Count;
-            images.Add(Image.FromStream(typeof(NodejsProjectNode).Assembly.GetManifestResourceStream("Microsoft.NodejsTools.Resources.DependencyExtraneous_16.png")));
-            ImageIndexDependencyMissing = images.Count;
-            images.Add(Image.FromStream(typeof(NodejsProjectNode).Assembly.GetManifestResourceStream("Microsoft.NodejsTools.Resources.DependencyMissing_16.png")));
+        public Dictionary<NodejsProjectImageName, int> ImageIndexFromNameDictionary {
+            get { return _imageIndexFromNameDictionary; }
         }
 
-        public int ImageIndexDependency { get; private set; }
+        private void InitNodejsProjectImages() {
+            // HACK: https://nodejstools.codeplex.com/workitem/1268
 
-        public int ImageIndexDependencyNotListed { get; private set; }
+            // Project file images
+            AddProjectImage(NodejsProjectImageName.TypeScriptProjectFile, "Microsoft.VisualStudioTools.Resources.Icons.TSProject_SolutionExplorerNode.png");
 
-        public int ImageIndexDependencyMissing { get; private set; }
+            // Dependency images
+            AddProjectImage(NodejsProjectImageName.Dependency, "Microsoft.VisualStudioTools.Resources.Icons.NodeJSPackage_16x.png");
+            AddProjectImage(NodejsProjectImageName.DependencyNotListed, "Microsoft.VisualStudioTools.Resources.Icons.NodeJSPackageMissing_16x.png");
+            AddProjectImage(NodejsProjectImageName.DependencyMissing, "Microsoft.VisualStudioTools.Resources.Icons.PackageWarning_16x.png");
+        }
+
+        private void AddProjectImage(NodejsProjectImageName name, string resourceId) {
+            var images = ImageHandler.ImageList.Images;
+            ImageIndexFromNameDictionary.Add(name, images.Count);
+            images.Add(Image.FromStream(typeof(NodejsProjectNode).Assembly.GetManifestResourceStream(resourceId)));
+        }
 
         public override Guid SharedCommandGuid {
             get {
@@ -97,7 +105,7 @@ namespace Microsoft.NodejsTools.Project {
         public override int ImageIndex {
             get {
                 if (string.Equals(GetProjectProperty(NodejsConstants.EnableTypeScript), "true", StringComparison.OrdinalIgnoreCase)) {
-                    return this.ImageOffset + (int)NodejsProjectImageName.TypeScriptProject;
+                    return this.ImageOffset + ImageIndexFromNameDictionary[NodejsProjectImageName.TypeScriptProjectFile];
                 }
                 return base.ImageIndex;
             }

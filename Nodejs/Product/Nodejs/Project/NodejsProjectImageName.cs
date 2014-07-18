@@ -14,8 +14,9 @@
 
 namespace Microsoft.NodejsTools.Project {
     enum NodejsProjectImageName {
-        File = 0,
-        JavaScriptProject = 1,
-        TypeScriptProject = 2
+        TypeScriptProjectFile,
+        Dependency,
+        DependencyNotListed,
+        DependencyMissing
     }
 }

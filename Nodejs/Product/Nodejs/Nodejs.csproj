@@ -746,6 +746,22 @@
     <Content Include="License.html">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
+    <EmbeddedResource Include="..\Icons\SolutionExplorerIconsPNG\NodeJSPackageMissing_16x.png" >
+      <Link>Resources\Icons\NodeJSPackageMissing_16x.png</Link>
+      <LogicalName>Microsoft.VisualStudioTools.Resources.Icons.NodeJSPackageMissing_16x.png</LogicalName>
+    </EmbeddedResource>
+    <EmbeddedResource Include="..\Icons\SolutionExplorerIconsPNG\NodeJSPackage_16x.png" >
+      <Link>Resources\Icons\NodeJSPackage_16x.png</Link>
+      <LogicalName>Microsoft.VisualStudioTools.Resources.Icons.NodeJSPackage_16x.png</LogicalName>
+    </EmbeddedResource>
+    <EmbeddedResource Include="..\Icons\SolutionExplorerIconsPNG\PackageWarning_16x.png" >
+      <Link>Resources\Icons\PackageWarning_16x.png</Link>
+      <LogicalName>Microsoft.VisualStudioTools.Resources.Icons.PackageWarning_16x.png</LogicalName>
+    </EmbeddedResource>
+    <EmbeddedResource Include="..\Icons\SolutionExplorerIconsPNG\TSProject_SolutionExplorerNode.png" >
+      <Link>Resources\Icons\TSProject_SolutionExplorerNode.png</Link>
+      <LogicalName>Microsoft.VisualStudioTools.Resources.Icons.TSProject_SolutionExplorerNode.png</LogicalName>
+    </EmbeddedResource>
     <Content Include="Scripts\Typings\node\node.d.ts">
       <IncludeInVSIX>true</IncludeInVSIX>
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
@@ -1074,10 +1090,6 @@
       <IncludeInVSIX>true</IncludeInVSIX>
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
-    <Content Include="Resources\Package.ico" />
-    <EmbeddedResource Include="Resources\DependencyExtraneous_16.png" />
-    <EmbeddedResource Include="Resources\DependencyMissing_16.png" />
-    <EmbeddedResource Include="Resources\Dependency_16.png" />
   </ItemGroup>
   <ItemGroup>
     <Content Include="nodejsref.js">

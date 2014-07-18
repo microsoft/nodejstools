@@ -116,14 +116,14 @@ namespace Microsoft.NodejsTools.Project {
         }
 
         public override object GetIconHandle(bool open) {
-            int imageIndex = _projectNode.ImageIndexDependency;
+            int imageIndex = _projectNode.ImageIndexFromNameDictionary[NodejsProjectImageName.Dependency];
             if (Package.IsMissing) {
-                imageIndex = _projectNode.ImageIndexDependencyMissing;
+                imageIndex = _projectNode.ImageIndexFromNameDictionary[NodejsProjectImageName.DependencyMissing];
             } else {
                 if (!Package.IsListedInParentPackageJson) {
-                    imageIndex = _projectNode.ImageIndexDependencyNotListed;
+                    imageIndex = _projectNode.ImageIndexFromNameDictionary[NodejsProjectImageName.DependencyNotListed];
                 } else {
-                    imageIndex = _projectNode.ImageIndexDependency;
+                    imageIndex = _projectNode.ImageIndexFromNameDictionary[NodejsProjectImageName.Dependency];
                 }
             }
 
