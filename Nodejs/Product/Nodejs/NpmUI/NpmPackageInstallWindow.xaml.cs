@@ -36,17 +36,15 @@ namespace Microsoft.NodejsTools.NpmUI {
             DataContext = _vm = new NpmPackageInstallViewModel(executeVm, Dispatcher);
             _vm.NpmController = controller;
             InitializeComponent();
-            _outputWindow = new NpmOutputWindow();
-            _outputWindow.Closing += _outputWindow_Closing;
-            _outputWindow.Topmost = true;
-            _outputWindow.DataContext = _vm.ExecuteViewModel;
         }
 
         public void Dispose() {
             //  This will unregister event handlers on the controller and prevent
             //  us from leaking view models.
-            _outputWindow.Closing -= _outputWindow_Closing;
-            _outputWindow.Close();
+            if (_outputWindow != null) {
+                _outputWindow.Closing -= _outputWindow_Closing;
+                _outputWindow.Close();
+            }
             _vm.NpmController = null;
         }
 
@@ -91,18 +89,10 @@ namespace Microsoft.NodejsTools.NpmUI {
         private void FilterTextBox_PreviewKeyDown(object sender, KeyEventArgs e) {
             switch (e.Key) {
                 case Key.Down:
-                    if (_packageList.SelectedIndex < _packageList.Items.Count - 1) {
-                        _packageList.SelectedIndex++;
+                    if (_packageList.SelectedIndex == -1 && _packageList.Items.Count > 0) {
+                        _packageList.SelectedIndex = 0;
                     }
                     FocusOnSelectedItemInPackageList();
-                    e.Handled = true;
-                    break;
-
-                case Key.Up:
-                    if (_packageList.SelectedIndex > 0) {
-                        _packageList.SelectedIndex--;
-                        FocusOnSelectedItemInPackageList();
-                    }
                     e.Handled = true;
                     break;
             }
@@ -127,6 +117,19 @@ namespace Microsoft.NodejsTools.NpmUI {
         }
 
         private void ShowOutputWindow_Click(object sender, RoutedEventArgs e) {
+            if (_outputWindow == null) {
+                _outputWindow = new NpmOutputWindow() {
+                    Owner = this,
+                    WindowStartupLocation = System.Windows.WindowStartupLocation.Manual
+                };
+                
+                _outputWindow.Left = Math.Max(0, this.Left - _outputWindow.Width - 30);
+                _outputWindow.Top = Math.Max(0, this.Top);
+
+                _outputWindow.Closing += _outputWindow_Closing;
+                _outputWindow.DataContext = _vm.ExecuteViewModel;
+            }
+
             _outputWindow.Show();
             if (_outputWindow.WindowState == WindowState.Minimized) {
                 _outputWindow.WindowState = WindowState.Normal;

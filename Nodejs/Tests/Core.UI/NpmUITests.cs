@@ -70,21 +70,23 @@ namespace Microsoft.Nodejs.Tests.UI {
 
                     var selectedItem = GetSelectedPackageListItemContainer(npmWindow);
                     Assert.IsTrue(selectedItem.IsKeyboardFocused, "Focus should be on newly selected item");
-                    Assert.AreEqual(1, npmWindow._packageList.SelectedIndex);
+                    Assert.AreEqual(0, npmWindow._packageList.SelectedIndex);
 
                     TestUtilities.UI.Keyboard.PressAndRelease(Key.Down);
                     WaitForUIInputIdle();
 
-                    Assert.AreEqual(2, npmWindow._packageList.SelectedIndex);
+                    Assert.AreEqual(1, npmWindow._packageList.SelectedIndex);
 
                     npmWindow.FilterTextBox.Focus();
                     TestUtilities.UI.Keyboard.PressAndRelease(Key.Up);
                     WaitForUIInputIdle();
 
                     selectedItem = GetSelectedPackageListItemContainer(npmWindow);
-                    Assert.IsTrue(selectedItem.IsKeyboardFocused, "Focus should be on newly selected item");
-                    Assert.AreEqual(1, npmWindow._packageList.SelectedIndex, "Pressing up while in filter box should move selected item up");
+                    Assert.IsTrue(npmWindow.FilterTextBox.IsKeyboardFocused, "Focus should remain on filter box");
+                    Assert.AreEqual(1, npmWindow._packageList.SelectedIndex, "Pressing up while in filter box should maintain current selection");
 
+                    selectedItem = GetSelectedPackageListItemContainer(npmWindow);
+                    selectedItem.Focus();
                     TestUtilities.UI.Keyboard.PressAndRelease(Key.Up);
                     TestUtilities.UI.Keyboard.PressAndRelease(Key.Up);
                     WaitForUIInputIdle();

@@ -59,16 +59,33 @@ namespace Microsoft.NodejsTools.Repl {
 
             var projectNameToDirectoryDictionary = new Dictionary<string, string>(StringComparer.OrdinalIgnoreCase);
             foreach (IVsProject project in loadedProjects) {
-                object projectName, projectDirectory;
                 var hierarchy = (IVsHierarchy)project;
-                var nameResult = hierarchy.GetProperty(VSConstants.VSITEMID_ROOT, (int)__VSHPROPID.VSHPROPID_Name, out projectName);
-                var projectResult = hierarchy.GetProperty(VSConstants.VSITEMID_ROOT, (int)__VSHPROPID.VSHPROPID_ProjectDir, out projectDirectory);
-                var projectNameString = projectName as string;
-                var projectDirectoryString = projectDirectory as string;
+                object extObject;
 
-                if (ErrorHandler.Succeeded(nameResult) && ErrorHandler.Succeeded(projectResult) &&
-                    projectNameString != null && projectDirectoryString != null) {
-                    projectNameToDirectoryDictionary.Add((string)projectName, (string)projectDirectory);
+                var projectResult = hierarchy.GetProperty(VSConstants.VSITEMID_ROOT, (int)__VSHPROPID.VSHPROPID_ExtObject, out extObject);
+                if (!ErrorHandler.Succeeded(projectResult)) {
+                    continue;
+                }
+
+                EnvDTE.Project dteProject = extObject as EnvDTE.Project;
+                if (dteProject == null) {
+                    continue;
+                }
+
+                EnvDTE.Properties properties = dteProject.Properties;
+                if (dteProject.Properties == null) {
+                    continue;
+                }
+
+                string projectName = dteProject.Name;
+                EnvDTE.Property projectHome = properties.Item("ProjectHome");
+                if (projectHome == null || projectName == null) {
+                    continue;
+                }
+
+                var projectDirectory = projectHome.Value as string;
+                if (projectDirectory != null) {
+                    projectNameToDirectoryDictionary.Add(projectName, projectDirectory);
                 }
             }
 

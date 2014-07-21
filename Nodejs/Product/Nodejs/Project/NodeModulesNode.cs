@@ -100,7 +100,7 @@ namespace Microsoft.NodejsTools.Project {
             FileSystemWatcher watcher = null;
             try {
                 watcher = new FileSystemWatcher(directory) {
-                    NotifyFilter = NotifyFilters.LastWrite,
+                    NotifyFilter = NotifyFilters.LastWrite | NotifyFilters.CreationTime,
                     IncludeSubdirectories = true
                 };
 

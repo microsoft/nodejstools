@@ -265,6 +265,9 @@ namespace Microsoft.NodejsTools.NpmUI {
         }
 
         private void FilterTimer_Elapsed(object state) {
+            if (_allPackages == null) {
+                return;
+            }
             List<PackageCatalogEntryViewModel> newItems = null;
 
             var filterText = _filterText;
@@ -330,7 +333,7 @@ namespace Microsoft.NodejsTools.NpmUI {
 
 
         public Visibility FilterControlsVisibility {
-            get { return SelectedPackage == null ||  LoadingCatalogControlVisibility == Visibility.Visible ? Visibility.Collapsed : Visibility.Visible; }
+            get { return LoadingCatalogControlVisibility == Visibility.Visible ? Visibility.Collapsed : Visibility.Visible; }
         }
 
         #endregion
@@ -402,7 +405,6 @@ namespace Microsoft.NodejsTools.NpmUI {
             set {
                 _selectedPackage = value;
                 OnPropertyChanged();
-                OnPropertyChanged("FilterControlsVisibility");
             }
         }
 
