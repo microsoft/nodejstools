@@ -297,7 +297,7 @@ namespace Microsoft.NodejsTools.Analysis {
                             case "h3":
                             case "h4":
                             case "h5":
-                                output.Append("\\r\\n");
+                                output.Append("\r\n");
                                 break;
                         }
                         break;
