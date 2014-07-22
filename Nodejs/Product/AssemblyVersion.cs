@@ -37,13 +37,15 @@ class AssemblyVersionInfo {
     // This version should never change from "4100.00"; BuildRelease.ps1
     // will replace it with a generated value.
     public const string BuildNumber = "4100.00";
-
 #if DEV11
     public const string VSMajorVersion = "11";
     const string VSVersionSuffix = "2012";
 #elif DEV12
     public const string VSMajorVersion = "12";
     const string VSVersionSuffix = "2013";
+#elif DEV14
+    public const string VSMajorVersion = "14";
+    const string VSVersionSuffix = "2014";
 #else
 #error Unrecognized VS Version.
 #endif

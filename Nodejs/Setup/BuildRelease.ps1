@@ -21,7 +21,7 @@
     [Optional] The VS version to build for. If omitted, builds for all versions
     that are installed.
     
-    Valid values: "10.0", "11.0", "12.0"
+    Valid values: "10.0", "11.0", "12.0", "14.0"
 
 .Parameter name
     [Optional] A suffix to append to the name of the build.
@@ -259,7 +259,7 @@ if ($internal) {
     $outdir = "$outdir\$buildnumber"
 }
 
-$supportedVersions = @{number="12.0"; name="VS 2013"}, @{number="11.0"; name="VS 2012"}
+$supportedVersions = @{number="14.0"; name="VS 14"}, @{number="12.0"; name="VS 2013"}, @{number="11.0"; name="VS 2012"}
 $targetVersions = @()
 
 foreach ($targetVs in $supportedVersions) {

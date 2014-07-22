@@ -80,30 +80,22 @@ namespace Microsoft.NodejsTools.Parsing
         }
 
         public IndexSpan CombineWith(IndexSpan other) {
-            if (other == null) {
-                return this;
-            }
-
             return IndexSpan.FromBounds(Start, other.End);
         }
 
         public IndexSpan UpdateWith(IndexSpan other) {
-            if (other != null) {
-                int startPosition = Start;
-                int endPosition = End;
+            int startPosition = Start;
+            int endPosition = End;
 
-                if (other.Start < Start) {
-                    startPosition = other.Start;
-                }
-
-                if (other.End > End) {
-                    endPosition = other.End;
-                }
-
-                return IndexSpan.FromBounds(startPosition, endPosition);
+            if (other.Start < Start) {
+                startPosition = other.Start;
             }
 
-            return this;
+            if (other.End > End) {
+                endPosition = other.End;
+            }
+
+            return IndexSpan.FromBounds(startPosition, endPosition);
         }
 
         #region IEquatable<IndexSpan> Members

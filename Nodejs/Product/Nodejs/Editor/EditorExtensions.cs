@@ -77,13 +77,11 @@ namespace Microsoft.NodejsTools.Editor.Core {
 			// Since this was marked as a comment span (before calling this method), this method does not 
 			// handle being called from insertion points not in/following a multiline comment.
 			bool commentStartingPointPrechecks = 
-				commentStartingPoint != null &&
 				commentStartingPoint.Snapshot != null &&
 				commentStartingPoint.Position + 2 <= commentStartingPoint.Snapshot.Length  &&
 				commentStartingPoint.Snapshot.GetText(commentStartingPoint.Position, 2) == "/*";
 
 			bool insertionPointPrechecks = 
-				insertionPoint != null &&
 				insertionPoint.Snapshot != null &&
 				insertionPoint.Position > commentStartingPoint.Position;
 

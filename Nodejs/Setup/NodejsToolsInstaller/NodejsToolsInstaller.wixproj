@@ -88,11 +88,13 @@
   <ItemGroup>
     <EmbeddedResource Include="Strings11.0.wxl" />
     <EmbeddedResource Include="Strings12.0.wxl" />
+    <EmbeddedResource Include="Strings14.0.wxl" />
   </ItemGroup>
   <Target Name="ExcludeStrings" BeforeTargets="BeforeBuild">
     <ItemGroup>
       <EmbeddedResource Remove="Strings11.0.wxl" Condition="'$(VSTarget)' != '11.0'" />
       <EmbeddedResource Remove="Strings12.0.wxl" Condition="'$(VSTarget)' != '12.0'" />
+      <EmbeddedResource Remove="Strings14.0.wxl" Condition="'$(VSTarget)' != '14.0'" />
     </ItemGroup>
   </Target>
   <Import Project="..\SetupProjectAfter.settings" />

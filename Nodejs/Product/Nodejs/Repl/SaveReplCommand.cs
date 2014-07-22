@@ -52,9 +52,7 @@ namespace Microsoft.NodejsTools.Repl {
                     window.TextView.TextBuffer
                 );
 
-                if (target.Value != null) {
-                    positions.Add(new KeyValuePair<int, ITextBuffer>(target.Value, buffer));
-                }
+                positions.Add(new KeyValuePair<int, ITextBuffer>(target.Value, buffer));
             }
 
             positions.Sort((x, y) => x.Key.CompareTo(y.Key));
