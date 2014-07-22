@@ -1069,6 +1069,12 @@
       <IncludeInVSIX>true</IncludeInVSIX>
       <VSIXSubpath>.</VSIXSubpath>
     </Content>
+    <Content Include="..\Icons\NodejsProject.ico">
+      <Link>NodejsProject.ico</Link>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+      <IncludeInVSIX>true</IncludeInVSIX>
+      <VSIXSubpath>.</VSIXSubpath>
+    </Content>
     <Content Include="NoSurveyNewsFeed.html">
       <IncludeInVSIX>true</IncludeInVSIX>
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>

@@ -105,7 +105,7 @@ namespace Microsoft.NodejsTools.Project {
         public override int ImageIndex {
             get {
                 if (string.Equals(GetProjectProperty(NodejsConstants.EnableTypeScript), "true", StringComparison.OrdinalIgnoreCase)) {
-                    return this.ImageOffset + ImageIndexFromNameDictionary[NodejsProjectImageName.TypeScriptProjectFile];
+                    return ImageIndexFromNameDictionary[NodejsProjectImageName.TypeScriptProjectFile];
                 }
                 return base.ImageIndex;
             }
