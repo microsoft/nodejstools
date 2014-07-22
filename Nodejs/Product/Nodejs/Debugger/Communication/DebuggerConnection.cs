@@ -97,7 +97,7 @@ namespace Microsoft.NodejsTools.Debugger.Communication {
         }
 
         /// <summary>
-        /// Gets a node.js version, or <c>null</c> if it was not supplied by the debuggee.
+        /// Gets a Node.js version, or <c>null</c> if it was not supplied by the debuggee.
         /// </summary>
         public Version NodeVersion {
             get { return _nodeVersion;  }
@@ -209,7 +209,7 @@ namespace Microsoft.NodejsTools.Debugger.Communication {
                             continue;
                         } 
 
-                        // Embedding-Host, which contains the node.js version number. Only try parsing that if we don't know the version yet -
+                        // Embedding-Host, which contains the Node.js version number. Only try parsing that if we don't know the version yet -
                         // it normally comes in the very first packet, so this saves time trying to parse all the consequent ones.
                         if (NodeVersion == null) {
                             match = _nodeVersionFieldRegex.Match(field);

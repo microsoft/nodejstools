@@ -21,7 +21,7 @@ Node.js Tools for Visual Studio includes five starter projects covering the most
 
 ### Blank Node.js Console Application
 
-This is a basic application that is a good starting point for any non-web Node.js project. With the default settings, your project will run and be debugged with the node.js interpreter. After creation, you can add new modules and packages, edit files with intellisense, and interactively debug code.
+This is a basic application that is a good starting point for any non-web Node.js project. With the default settings, your project will run and be debugged with the Node.js interpreter. After creation, you can add new modules and packages, edit files with intellisense, and interactively debug code.
 
 ### Blank Node.js Web Application
 

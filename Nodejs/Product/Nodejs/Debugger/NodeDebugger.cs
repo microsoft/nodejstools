@@ -171,7 +171,7 @@ namespace Microsoft.NodejsTools.Debugger {
         }
 
         /// <summary>
-        /// Terminates node.js process.
+        /// Terminates Node.js process.
         /// </summary>
         public void Terminate(bool killProcess = true) {
             lock (this) {

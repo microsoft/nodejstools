@@ -40,7 +40,7 @@ The code calls three identical functions spin1, spin2, spin3 to do similar work.
 port = 1337;
 ```
 
-### 2. Launch node.js profiling
+### 2. Launch Node.js profiling
 
 
 Note that Node.js has its own specific menu item under the Analyze menu

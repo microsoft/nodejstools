@@ -230,10 +230,10 @@
         <CommandFlag>DefaultInvisible</CommandFlag>
         <CommandFlag>DynamicVisibility</CommandFlag>
         <Strings>
-          <ButtonText>Attach Debugger (&amp;node.js)</ButtonText>
-          <MenuText>Attach Debugger (&amp;node.js)</MenuText>
-          <ToolTipText>Attach the node.js debugger to the remote Microsoft Azure site</ToolTipText>
-          <CommandName>Attach node.js Debugger</CommandName>
+          <ButtonText>Attach Debugger (&amp;Node.js)</ButtonText>
+          <MenuText>Attach Debugger (&amp;Node.js)</MenuText>
+          <ToolTipText>Attach the Node.js debugger to the remote Microsoft Azure site</ToolTipText>
+          <CommandName>Attach Node.js Debugger</CommandName>
         </Strings>
       </Button>
 

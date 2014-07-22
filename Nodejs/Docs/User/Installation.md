@@ -34,7 +34,7 @@ We can do this validation using the Node.js Interactive Window.  The interactive
 
 ![Node.js Interactive Window](Images\InstallationREPLCommand.png)
 
-Now that the interactive window is open, let's type some JavaScript. The interactive window supports everything you can do in code including require(). I'll keep it simple showing a variable and the location of the node.js interpreter.
+Now that the interactive window is open, let's type some JavaScript. The interactive window supports everything you can do in code including require(). I'll keep it simple showing a variable and the location of the Node.js interpreter.
 
 ![Node.js Interactive Window](Images\InstallationREPL.png)
 

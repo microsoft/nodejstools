@@ -160,11 +160,11 @@ Since the Azure remote debugging uses web sockets, it must be enabled for your w
 
 ![Enabling web sockets in Azure portal](Images/DebuggingAdvancedEnableWebSockets.png)
 
-Once your project is properly deployed and web sockets are enabled, you can attach to the web site from Server Explorer. If you do not have the Server Explorer window open, you can open it via <span class="menu">View</span> → <span class="menu">Server Explorer</span>. Then, locate your web site under Windows Azure → Web Sites, and right-click on it. If it is running, and your project has been deployed to it using the Debug configuration, you should see the "Attach Debugger (node.js)" command in the context menu:
+Once your project is properly deployed and web sockets are enabled, you can attach to the web site from Server Explorer. If you do not have the Server Explorer window open, you can open it via <span class="menu">View</span> → <span class="menu">Server Explorer</span>. Then, locate your web site under Windows Azure → Web Sites, and right-click on it. If it is running, and your project has been deployed to it using the Debug configuration, you should see the "Attach Debugger (Node.js)" command in the context menu:
 
 ![Attaching to Azure Web Site](Images/DebuggingAdvancedAzureWebSiteAttach.png)
 
-Note that on Visual Studio Professional and above, you will see two "Attach Debugger" commands - the default one with no qualifiers is used to debug .NET applications running under IIS, and is only useful if you co-host .NET code alongside your node.js app. To attach to your node.js app, you need to use the "Attach Debugger (node.js)" command. If you do not see that command in the context menu for your site (i.e. you only see "Attach Debugger", or you see neither), then one of the following applies:
+Note that on Visual Studio Professional and above, you will see two "Attach Debugger" commands - the default one with no qualifiers is used to debug .NET applications running under IIS, and is only useful if you co-host .NET code alongside your Node.js app. To attach to your Node.js app, you need to use the "Attach Debugger (Node.js)" command. If you do not see that command in the context menu for your site (i.e. you only see "Attach Debugger", or you see neither), then one of the following applies:
 
 * You do not have Visual Studio 2013:
  * Server Explorer functionality is not available on your version of Visual Studio. You will have to use attach via Attach to Process dialog as described [below](#attaching-without-server-explorer).

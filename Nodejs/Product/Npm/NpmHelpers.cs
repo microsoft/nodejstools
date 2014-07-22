@@ -62,7 +62,7 @@ namespace Microsoft.NodejsTools.Npm {
             if (null == pathToNpm || !File.Exists(pathToNpm)) {
                 throw new NpmNotFoundException(
                     string.Format(
-                        "Cannot find npm.cmd at '{0}' nor on your system PATH. Ensure node.js is installed.",
+                        "Cannot find npm.cmd at '{0}' nor on your system PATH. Ensure Node.js is installed.",
                         pathToNpm ?? "(null)"
                     )
                 );

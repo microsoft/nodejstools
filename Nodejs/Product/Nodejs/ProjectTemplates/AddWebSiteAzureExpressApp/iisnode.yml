@@ -12,7 +12,7 @@ node_env:
 
 # nodeProcessCommandLine: "C:\Program Files\nodejs\node.exe"
 
-# interceptor - fully qualified file name of a node.js application that will run instead of an actual application
+# interceptor - fully qualified file name of a Node.js application that will run instead of an actual application
 # the request targets; the fully qualified file name of the actual application file is provided as the first parameter
 # to the interceptor application; default interceptor supports iisnode logging
 
@@ -73,7 +73,7 @@ watchedFiles: *.js;iisnode.yml
 
 uncFileChangesPollingInterval: 5000
 
-# gracefulShutdownTimeout - when a node.js file is modified, all node processes handling running this application are recycled;
+# gracefulShutdownTimeout - when a Node.js file is modified, all node processes handling running this application are recycled;
 # this setting controls the time (in milliseconds) given for currently active requests to gracefully finish before the
 # process is terminated; during this time, all new requests are already dispatched to a new node process based on the fresh version
 # of the application
@@ -102,7 +102,7 @@ debuggingEnabled: true
 
 debuggerPortRange: 5058-6058
 
-# debuggerPathSegment - URL path segment used to access the built-in node-inspector debugger; given a node.js application at
+# debuggerPathSegment - URL path segment used to access the built-in node-inspector debugger; given a Node.js application at
 http://foo.com/bar/baz.js, the debugger can be accessed at http://foo.com/bar/baz.js/{debuggerPathSegment}, by default
 http://foo.com/bar/baz.js/debug
 

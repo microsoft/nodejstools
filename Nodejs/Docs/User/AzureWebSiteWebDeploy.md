@@ -21,7 +21,7 @@ The easiest way to do so is to select the web site from the picker by choosing t
 
 Alternatively, if you have a downloaded publish profile for your web site, you can use "Import" to use the corresponding publish settings without logging in.
 
-If you plan on debugging your published project directly on Windows Azure servers by using node.js remote debugging, you need to publish the site in "Debug" configuration. This setting is separate from the current active solution configuration, and always defaults to "Release". To change it, open the "Settings" tab, and use the "Configuration" combo box:
+If you plan on debugging your published project directly on Windows Azure servers by using Node.js remote debugging, you need to publish the site in "Debug" configuration. This setting is separate from the current active solution configuration, and always defaults to "Release". To change it, open the "Settings" tab, and use the "Configuration" combo box:
 
 ![Changing the publish configuration](Images/AzureWebSitePublishConfig.png)
 

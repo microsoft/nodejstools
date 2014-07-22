@@ -22,7 +22,7 @@ namespace Microsoft.NodejsTools.Debugger.Communication {
         bool Connected { get; }
 
         /// <summary>
-        /// Gets a node.js version.
+        /// Gets a Node.js version.
         /// </summary>
         Version NodeVersion { get; }
 
