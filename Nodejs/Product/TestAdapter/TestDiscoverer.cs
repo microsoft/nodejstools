@@ -29,7 +29,6 @@ namespace Microsoft.NodejsTools.TestAdapter {
     [DefaultExecutorUri(TestExecutor.ExecutorUriString)]
     class TestDiscoverer : ITestDiscoverer {
         public TestDiscoverer() {
-            System.Diagnostics.Debugger.Break();
         }
 
         /// <summary>
@@ -40,7 +39,6 @@ namespace Microsoft.NodejsTools.TestAdapter {
         /// <param name="logger">Used to relay messages to registered loggers</param>
         /// <param name="discoverySink">Callback used to notify client upon discovery of test cases</param>
         public void DiscoverTests(IEnumerable<string> sources, IDiscoveryContext discoveryContext, IMessageLogger logger, ITestCaseDiscoverySink discoverySink) {
-            System.Diagnostics.Debugger.Break();
             ValidateArg.NotNull(sources, "sources");
             ValidateArg.NotNull(discoverySink, "discoverySink");
             ValidateArg.NotNull(logger, "logger");

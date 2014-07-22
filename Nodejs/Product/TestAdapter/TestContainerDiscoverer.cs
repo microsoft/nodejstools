@@ -45,7 +45,7 @@ namespace Microsoft.NodejsTools.TestAdapter {
             : this(serviceProvider,
                    new SolutionEventsListener(serviceProvider),
                    new TestFilesUpdateWatcher(),
-                   new TestFileAddRemoveListener(serviceProvider, Guids.NodejsBaseProjectFactory),
+                   new TestFileAddRemoveListener(serviceProvider,Guids.NodejsBaseProjectFactory),
                     operationState) { }
 
         public TestContainerDiscoverer(IServiceProvider serviceProvider,
@@ -53,9 +53,6 @@ namespace Microsoft.NodejsTools.TestAdapter {
                                        TestFilesUpdateWatcher testFilesUpdateWatcher,
                                        TestFileAddRemoveListener testFilesAddRemoveListener,
                                        IOperationState operationState) {
-
-                                           
-            System.Diagnostics.Debugger.Break();
             ValidateArg.NotNull(serviceProvider, "serviceProvider");
             ValidateArg.NotNull(solutionListener, "solutionListener");
             ValidateArg.NotNull(testFilesUpdateWatcher, "testFilesUpdateWatcher");
