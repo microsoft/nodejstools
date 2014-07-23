@@ -54,7 +54,9 @@ namespace Microsoft.NodejsTools.Intellisense {
                 "Node.js",
                 Span,
                 members.Select(m => JsCompletion(glyphService, m)),
-                CompletionComparer.UnderscoresLast);
+                CompletionComparer.UnderscoresLast,
+                matchInsertionText: true
+            );
         }
 
         internal static DynamicallyVisibleCompletion JsCompletion(IGlyphService service, MemberResult memberResult) {
