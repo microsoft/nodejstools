@@ -57,7 +57,7 @@ namespace Microsoft.NodejsTools.Project {
 
         private readonly FileSystemWatcher _localWatcher;
         private readonly FileSystemWatcher _globalWatcher;
-        private Timer _fileSystemWatcherTimer;
+        private Timer _fileSystemWatcherTimer, _npmIdleTimer;
         private INpmController _npmController;
         private int _npmCommandsExecuting;
         private bool _suppressCommands;
@@ -149,6 +149,11 @@ namespace Microsoft.NodejsTools.Project {
                 if (null != _fileSystemWatcherTimer) {
                     _fileSystemWatcherTimer.Dispose();
                     _fileSystemWatcherTimer = null;
+                }
+
+                if (null != _npmIdleTimer) {
+                    _npmIdleTimer.Dispose();
+                    _npmIdleTimer = null;
                 }
 
                 if (null != _npmController) {
@@ -368,6 +373,7 @@ namespace Microsoft.NodejsTools.Project {
         }
 
         private void NpmController_CommandStarted(object sender, EventArgs e) {
+            StopNpmIdleTimer();
             lock (_commandCountLock) {
                 ++_npmCommandsExecuting;
             }
@@ -406,6 +412,23 @@ namespace Microsoft.NodejsTools.Project {
             }
 
             ForceUpdateStatusBarWithNpmActivitySafe(message);
+
+            RestartNpmIdleTimer();
+        }
+
+        private void StopNpmIdleTimer() {
+            if (null != _npmIdleTimer) {
+                _npmIdleTimer.Dispose();
+            }
+        }
+
+        private void RestartNpmIdleTimer() {
+            StopNpmIdleTimer();
+            _npmIdleTimer = new Timer(CheckForLongPaths, null, 1000, Timeout.Infinite);
+        }
+
+        private void CheckForLongPaths(object state) {
+            UIThread.Invoke(() => _projectNode.CheckForLongPaths().HandleAllExceptions(SR.ProductName).DoNotWait());
         }
 
         #endregion

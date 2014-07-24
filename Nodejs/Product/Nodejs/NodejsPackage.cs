@@ -241,13 +241,13 @@ namespace Microsoft.NodejsTools {
             }
         }
 
-        internal void OpenReplWindow() {
+        internal IReplWindow2 OpenReplWindow(bool focus = true) {
             var compModel = ComponentModel;
             var provider = compModel.GetService<IReplWindowProvider>();
 
-            var window = provider.FindReplWindow(NodejsReplEvaluatorProvider.NodeReplId);
+            var window = (IReplWindow2)provider.FindReplWindow(NodejsReplEvaluatorProvider.NodeReplId);
             if (window == null) {
-                window = provider.CreateReplWindow(
+                window = (IReplWindow2)provider.CreateReplWindow(
                     ReplContentType,
                     "Node.js Interactive Window",
                     typeof(NodejsLanguageInfo).GUID,
@@ -257,7 +257,12 @@ namespace Microsoft.NodejsTools {
 
             IVsWindowFrame windowFrame = (IVsWindowFrame)((ToolWindowPane)window).Frame;
             ErrorHandler.ThrowOnFailure(windowFrame.Show());
-            ((IReplWindow)window).Focus();
+
+            if (focus) {
+                window.Focus();
+            }
+
+            return window;
         }
 
         internal static bool TryGetStartupFileAndDirectory(out string fileName, out string directory) {

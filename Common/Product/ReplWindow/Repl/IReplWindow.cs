@@ -166,4 +166,15 @@ namespace Microsoft.VisualStudio.Repl {
         /// </summary>
         event Action ReadyForInput;
     }
+
+    public interface IReplWindow2 : IReplWindow {
+
+        /// <summary>
+        /// Executes a special REPL command as if it were submitted as an input.
+        /// </summary>
+        /// <remarks>
+        /// This method can only execute special (prefixed) commands. To evaluate code snippers, use <see cref="Evaluator"/>.
+        /// </remarks>
+        Task<ExecutionResult> ExecuteCommand(string text);
+    }
 }

@@ -13,6 +13,8 @@
  * ***************************************************************************/
 
 using System;
+using System.Collections.Generic;
+using System.ComponentModel;
 using System.IO;
 using System.Linq;
 using System.Runtime.InteropServices;
@@ -21,6 +23,7 @@ using System.Windows.Automation;
 using EnvDTE;
 using Microsoft.NodejsTools;
 using Microsoft.NodejsTools.Project;
+using Microsoft.NodejsTools.Repl;
 using Microsoft.TC.TestHostAdapters;
 using Microsoft.VisualStudio.Language.Intellisense;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
@@ -49,7 +52,7 @@ namespace Microsoft.Nodejs.Tests.UI {
                 var openFile = OpenProjectItem("server.js", out window);
 
                 openFile.MoveCaret(7, 1);
-                
+
                 // we need to ensure the snippets are initialized by starting
                 // and dismissing an intellisense session.
                 Keyboard.Type(Keyboard.CtrlSpace.ToString());
@@ -416,10 +419,10 @@ sd.StringDecoder
         public void TestNewProject() {
             using (var app = new VisualStudioApp(VsIdeTestHostContext.Dte)) {
                 using (var newProjDialog = app.FileNewProject()) {
-                newProjDialog.FocusLanguageNode("JavaScript");
+                    newProjDialog.FocusLanguageNode("JavaScript");
 
-                var nodejsApp = newProjDialog.ProjectTypes.FindItem(NodejsVisualStudioApp.JavascriptWebAppTemplate);
-                nodejsApp.Select();
+                    var nodejsApp = newProjDialog.ProjectTypes.FindItem(NodejsVisualStudioApp.JavascriptWebAppTemplate);
+                    nodejsApp.Select();
 
                     newProjDialog.OK();
                 }
@@ -447,10 +450,10 @@ sd.StringDecoder
         public void TestNewAzureProject() {
             using (var app = new VisualStudioApp(VsIdeTestHostContext.Dte)) {
                 using (var newProjDialog = app.FileNewProject()) {
-                newProjDialog.FocusLanguageNode("JavaScript");
+                    newProjDialog.FocusLanguageNode("JavaScript");
 
-                var azureApp = newProjDialog.ProjectTypes.FindItem(NodejsVisualStudioApp.JavaScriptAzureWebAppTemplate);
-                azureApp.Select();
+                    var azureApp = newProjDialog.ProjectTypes.FindItem(NodejsVisualStudioApp.JavaScriptAzureWebAppTemplate);
+                    azureApp.Select();
                     newProjDialog.OK();
                 }
 
@@ -706,6 +709,244 @@ sd.StringDecoder
             }
 
             return project;
+        }
+
+        private string CreateTempPathOfLength(int length) {
+            var path = TestData.GetTempPath(randomSubPath: true) + "\\";
+
+            int padding = length - path.Length;
+            if (padding <= 0) {
+                Assert.Inconclusive("Could not obtain a base directory with a sufficiently short path.");
+            }
+
+            path += new string('a', padding);
+            Directory.CreateDirectory(path);
+
+            return path;
+        }
+
+        private void DeleteLongPath(string path) {
+            if (!path.StartsWith(@"\\?\")) {
+                path = @"\\?\" + path;
+            }
+
+            Microsoft.VisualStudioTools.Project.WIN32_FIND_DATA wfd;
+            IntPtr hFind = Microsoft.VisualStudioTools.Project.NativeMethods.FindFirstFile(path + "\\*", out wfd);
+            if (hFind == Microsoft.VisualStudioTools.Project.NativeMethods.INVALID_HANDLE_VALUE) {
+                return;
+            }
+
+            try {
+                do {
+                    if (wfd.cFileName == "." || wfd.cFileName == "..") {
+                        continue;
+                    }
+
+                    string childPath = path;
+                    if (childPath != "") {
+                        childPath += "\\";
+                    }
+                    childPath += wfd.cFileName;
+
+                    bool isDirectory = (wfd.dwFileAttributes & Microsoft.VisualStudioTools.Project.NativeMethods.FILE_ATTRIBUTE_DIRECTORY) != 0;
+                    if (isDirectory) {
+                        DeleteLongPath(childPath);
+                    } else {
+                        Console.WriteLine("DeleteFile " + childPath);
+                        if (!Microsoft.VisualStudioTools.Project.NativeMethods.DeleteFile(childPath)) {
+                            throw new Win32Exception(Marshal.GetLastWin32Error());
+                        }
+                    }
+                } while (Microsoft.VisualStudioTools.Project.NativeMethods.FindNextFile(hFind, out wfd));
+
+                Console.WriteLine("RemoveDirectory " + path);
+                if (!Microsoft.VisualStudioTools.Project.NativeMethods.RemoveDirectory(path)) {
+                    throw new Win32Exception(Marshal.GetLastWin32Error());
+                }
+            } finally {
+                Microsoft.VisualStudioTools.Project.NativeMethods.FindClose(hFind);
+            }
+        }
+
+        [TestMethod, Priority(0), TestCategory("Core")]
+        public void GetLongSubPaths() {
+            string
+                basePath = CreateTempPathOfLength(248 - 1 - @"\d\d".Length),
+                shortFile = basePath + @"\f",
+                shortDir = basePath + @"\d",
+                shortShortFile = shortDir + @"\f",
+                shortShortDir = shortDir + @"\d",
+                shortLongDir = shortDir + @"\dd",
+                shortLongFile = shortDir + @"\f.ffffffffffffff",
+                longFile = basePath + @"\f.ffffffffffffff",
+                longDir = basePath + @"\d.dd",
+                longLongFile = longDir + @"\ff",
+                longLongDir = longDir + @"\dd";
+            try {
+                foreach (var path in new[] { shortDir, shortShortDir, shortLongDir, longDir, longLongDir }) {
+                    Console.WriteLine("CreateDirectory {0}", path);
+                    Assert.IsTrue(NativeMethods.CreateDirectory(@"\\?\" + path, IntPtr.Zero), path);
+                }
+
+                File.WriteAllText(shortFile, "");
+                foreach (var path in new[] { shortShortFile, shortLongFile, longFile, longLongFile }) {
+                    Console.WriteLine("CopyFile {0}", path);
+                    Assert.IsTrue(NativeMethods.CopyFile(shortFile, @"\\?\" + path, true), path);
+                }
+
+                var longPaths = NodejsProjectNode.GetLongSubPaths(basePath).ToList();
+
+                // Single() acts as assert here (throws if it doesn't find the element matching the condition).
+                longPaths.Remove(longPaths.Single(lpi => lpi.FullPath == shortLongFile && !lpi.IsDirectory));
+                longPaths.Remove(longPaths.Single(lpi => lpi.FullPath == shortLongDir && lpi.IsDirectory));
+                longPaths.Remove(longPaths.Single(lpi => lpi.FullPath == longFile && !lpi.IsDirectory));
+                longPaths.Remove(longPaths.Single(lpi => lpi.FullPath == longDir && lpi.IsDirectory));
+                // longLongFile and longLongDir should not be reported, because their parent longDir is already reported.
+
+                // There should be no other elements reported.
+                Assert.AreEqual(0, longPaths.Count);
+            } finally {
+                DeleteLongPath(basePath);
+            }
+        }
+
+        [TestMethod, Priority(0), TestCategory("Core")]
+        [HostType("TC Dynamic"), DynamicHostType(typeof(VsIdeHostAdapter))]
+        public void TestLongPathCheck() {
+            string[] expectedLongPaths = {
+                @"node_modules\azure\node_modules\azure-common\node_modules\xml2js\node_modules\sax\test\trailing-attribute-no-value.js",
+                @"node_modules\azure\node_modules\azure-common\node_modules\xml2js\node_modules\sax\test\xmlns-xml-default-prefix-attribute.js",
+                @"node_modules\azure\node_modules\azure-common\node_modules\xml2js\node_modules\sax\test\xmlns-xml-default-redefine.js",
+                @"node_modules\azure\node_modules\request\node_modules\form-data\node_modules\combined-stream\node_modules",
+                @"node_modules\azure\node_modules\request\node_modules\http-signature\node_modules\ctype\tst\ctio\uint\tst.roundtrip.js",
+            };                                         
+
+            string projectDir = CreateTempPathOfLength(248 - 1 - expectedLongPaths.Min(s => s.Length));
+            try {
+                foreach (var fileName in new[] { "HelloWorld.njsproj", "HelloWorld.sln", "package.json", "README.md", "server.js" }) {
+                    File.Copy(TestData.GetPath(@"TestData\HelloWorld\" + fileName), projectDir + "\\" + fileName);
+                }
+
+                using (var app = new NodejsVisualStudioApp(VsIdeTestHostContext.Dte)) {
+                    try {
+                        NodejsPackage.Instance.GeneralOptionsPage.CheckForLongPaths = true;
+
+                        var project = OpenProject(projectDir + "\\HelloWorld.sln");
+
+                        // Wait for new solution to load.
+                        for (int i = 0; i < 40 && app.Dte.Solution.Projects.Count == 0; i++) {
+                            System.Threading.Thread.Sleep(250);
+                        }
+
+                        const string interpreterDescription = "Node.js Interactive Window";
+                        VsIdeTestHostContext.Dte.ExecuteCommand("View.Node.jsInteractiveWindow");
+                        var interactive = app.GetInteractiveWindow(interpreterDescription);
+                        if (interactive == null) {
+                            Assert.Inconclusive("Need " + interpreterDescription);
+                        }
+
+                        interactive.WaitForIdleState();
+                        var npmTask = interactive.ReplWindow.ExecuteCommand(".npm install azure@0.9.12");
+
+                        using (var dialog = new AutomationDialog(app, AutomationElement.FromHandle(app.WaitForDialog(npmTask)))) {
+                            // The option to offer "npm dedup" should be there.
+                            var firstCommandLink = dialog.FindByAutomationId("CommandLink_1000");
+                            Assert.IsNotNull(firstCommandLink);
+                            Assert.IsTrue(firstCommandLink.Current.Name.Contains("npm dedup"));
+
+                            dialog.ClickButtonByAutomationId("ExpandoButton");
+                            var detailsText = dialog.FindByAutomationId("ExpandedFooterTextLink");
+                            Assert.IsNotNull(detailsText);
+
+                            var reportedLongPaths =
+                                (from line in detailsText.Current.Name.Split(new[] { '\r', '\n' }, StringSplitOptions.RemoveEmptyEntries)
+                                 where line.StartsWith("•")
+                                 let nbspIndex = line.IndexOf('\u00A0')
+                                 where nbspIndex >= 0
+                                 select line.Substring(1, nbspIndex - 1).Trim()
+                                ).ToArray();
+                            Console.WriteLine("Reported paths:");
+                            foreach (var path in reportedLongPaths) {
+                                Console.WriteLine("\t" + path);
+                            }
+
+                            reportedLongPaths = reportedLongPaths.Except(expectedLongPaths).ToArray();
+                            if (reportedLongPaths.Length != 0) {
+                                Console.WriteLine("Unexpected paths:");
+                                foreach (var path in reportedLongPaths) {
+                                    Console.WriteLine("\t" + path);
+                                }
+                                Assert.Fail("Unexpected long paths reported.");
+                            }
+
+                            dialog.WaitForClosed(TimeSpan.FromSeconds(1), () => {
+                                // Click the first command button (dedup).
+                                firstCommandLink.SetFocus();
+                                Keyboard.Press(System.Windows.Input.Key.Enter);
+                            });
+                        }
+
+                        // Clicking on that button should not change the option.
+                        Assert.IsTrue(NodejsPackage.Instance.GeneralOptionsPage.CheckForLongPaths);
+
+                        interactive.WaitForTextContainsAll("dedup successfully completed");
+                        interactive.WaitForIdleState();
+
+                        // npm dedup won't be able to fix the problem, so we should get the dialog once again.
+                        using (var dialog = new AutomationDialog(app, AutomationElement.FromHandle(app.WaitForDialog(npmTask)))) {
+                            // The option to offer "npm dedup" should not be there anymore.
+                            var firstCommandLink = dialog.FindByAutomationId("CommandLink_1000");
+                            Assert.IsNotNull(firstCommandLink);
+                            Assert.IsFalse(firstCommandLink.Current.Name.Contains("npm dedup"));
+
+                            dialog.WaitForClosed(TimeSpan.FromSeconds(1), () => {
+                                Keyboard.Type("\r"); // click the first command button (do nothing, but warn next time)
+                            });
+                        }
+
+                        npmTask.Wait(1000);
+                        Assert.IsTrue(npmTask.IsCompleted);
+
+                        // Clicking on that button should not change the option.
+                        Assert.IsTrue(NodejsPackage.Instance.GeneralOptionsPage.CheckForLongPaths);
+
+                        // Try again to see that the dialog still appears. Any npm command triggers the check.
+                        // and since we didn't do anything to fix the problem, we should still get the dialog.
+                        interactive.WaitForIdleState();
+                        npmTask = interactive.ReplWindow.ExecuteCommand(".npm list");
+
+                        using (var dialog = new AutomationDialog(app, AutomationElement.FromHandle(app.WaitForDialog(npmTask)))) {
+                            // The option to offer "npm dedup" should be there again, since this is a new check.
+                            var firstCommandLink = dialog.FindByAutomationId("CommandLink_1000");
+                            Assert.IsNotNull(firstCommandLink);
+                            Assert.IsTrue(firstCommandLink.Current.Name.Contains("npm dedup"));
+
+                            dialog.WaitForClosed(TimeSpan.FromSeconds(1), () => {
+                                // Click the third command button (do nothing, do not warn anymore)
+                                firstCommandLink.SetFocus();
+                                Keyboard.Press(System.Windows.Input.Key.Tab);
+                                Keyboard.Press(System.Windows.Input.Key.Tab);
+                                Keyboard.Press(System.Windows.Input.Key.Enter);
+                            });
+                        }
+
+                        npmTask.Wait(1000);
+                        Assert.IsTrue(npmTask.IsCompleted);
+
+                        // Clicking on that button should change the option to false.
+                        Assert.IsFalse(NodejsPackage.Instance.GeneralOptionsPage.CheckForLongPaths);
+
+                        // Try again to see that the dialog does not appear anymore.
+                        interactive.WaitForIdleState();
+                        npmTask = interactive.ReplWindow.ExecuteCommand(".npm list");
+                        app.WaitForNoDialog(TimeSpan.FromSeconds(3));
+                    } finally {
+                        NodejsPackage.Instance.GeneralOptionsPage.CheckForLongPaths = true;
+                    }
+                }
+            } finally {
+                DeleteLongPath(projectDir);
+            }
         }
     }
 }

@@ -14,6 +14,7 @@
 
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Drawing;
 using System.IO;
 using System.Linq;
@@ -24,6 +25,7 @@ using System.Threading;
 using System.Threading.Tasks;
 using System.Web.Script.Serialization;
 using Microsoft.NodejsTools.Intellisense;
+using Microsoft.NodejsTools.Repl;
 using Microsoft.VisualStudio;
 using Microsoft.VisualStudioTools;
 using Microsoft.VisualStudioTools.Project;
@@ -609,6 +611,133 @@ namespace Microsoft.NodejsTools.Project {
         public HashSet<string> WarningFiles {
             get {
                 return _warningFiles;
+            }
+        }
+
+        internal struct LongPathInfo {
+            public string FullPath;
+            public string RelativePath;
+            public bool IsDirectory;
+        }
+
+        private static readonly char[] _pathSeparators = { '\\', '/' };
+        private bool _isCheckingForLongPaths;
+
+        public async Task CheckForLongPaths() {
+            if (_isCheckingForLongPaths || !NodejsPackage.Instance.GeneralOptionsPage.CheckForLongPaths) {
+                return;
+            }
+            try {
+                _isCheckingForLongPaths = true;
+                TaskDialogButton dedupButton, ignoreButton, disableButton;
+                var taskDialog = new TaskDialog(NodejsPackage.Instance) {
+                    AllowCancellation = true,
+                    EnableHyperlinks = true,
+                    Title = SR.GetString(SR.LongPathWarningTitle),
+                    MainIcon = TaskDialogIcon.Warning,
+                    Content = SR.GetString(SR.LongPathWarningText),
+                    CollapsedControlText = SR.GetString(SR.LongPathShowPathsExceedingTheLimit),
+                    ExpandedControlText = SR.GetString(SR.LongPathHidePathsExceedingTheLimit),
+                    Buttons = {
+                        (dedupButton = new TaskDialogButton(SR.GetString(SR.LongPathNpmDedup), SR.GetString(SR.LongPathNpmDedupDetail))),
+                        (ignoreButton = new TaskDialogButton(SR.GetString(SR.LongPathDoNothingButWarnNextTime))),
+                        (disableButton = new TaskDialogButton(SR.GetString(SR.LongPathDoNothingAndDoNotWarnAgain), SR.GetString(SR.LongPathDoNothingAndDoNotWarnAgainDetail)))
+                    },
+                    FooterIcon = TaskDialogIcon.Information,
+                    Footer = SR.GetString(SR.LongPathFooter)
+                };
+
+                taskDialog.HyperlinkClicked += (sender, e) => {
+                    switch (e.Url) {
+                        case "#msdn":
+                            Process.Start("http://go.microsoft.com/fwlink/?LinkId=454508");
+                            break;
+                        case "#uservoice":
+                            Process.Start("http://go.microsoft.com/fwlink/?LinkID=456509");
+                            break;
+                        case "#help":
+                            Process.Start("http://go.microsoft.com/fwlink/?LinkId=456511");
+                            break;
+                        default:
+                            System.Windows.Clipboard.SetText(e.Url);
+                            break;
+                    }
+                };
+
+            recheck:
+
+                var longPaths = await Task.Factory.StartNew(() =>
+                    GetLongSubPaths(ProjectHome)
+                    .Concat(GetLongSubPaths(_intermediateOutputPath))
+                    .Select(lpi => string.Format("• {1}\u00A0<a href=\"{0}\">{2}</a>", lpi.FullPath, lpi.RelativePath, SR.GetString(SR.LongPathClickToCopy)))
+                    .ToArray());
+                if (longPaths.Length == 0) {
+                    return;
+                }
+                taskDialog.ExpandedInformation = string.Join("\r\n", longPaths);
+
+                var button = taskDialog.ShowModal();
+                if (button == dedupButton) {
+                    var repl = NodejsPackage.Instance.OpenReplWindow(focus: false);
+                    await repl.ExecuteCommand(".npm dedup").HandleAllExceptions(SR.ProductName);
+
+                    taskDialog.Content += "\r\n\r\n" + SR.GetString(SR.LongPathNpmDedupDidNotHelp);
+                    taskDialog.Buttons.Remove(dedupButton);
+                    goto recheck;
+                } else if (button == disableButton) {
+                    NodejsPackage.Instance.GeneralOptionsPage.CheckForLongPaths = false;
+                } 
+            } finally {
+                _isCheckingForLongPaths = false;
+            }
+        }
+
+        internal static IEnumerable<LongPathInfo> GetLongSubPaths(string basePath, string path = "") {
+            const int MaxFilePathLength = 260 - 1; // account for terminating NULL
+            const int MaxDirectoryPathLength = 248 - 1;
+
+            basePath = CommonUtils.EnsureEndSeparator(basePath);
+
+            WIN32_FIND_DATA wfd;
+            IntPtr hFind = NativeMethods.FindFirstFile(basePath + path + "\\*", out wfd);
+            if (hFind == NativeMethods.INVALID_HANDLE_VALUE) {
+                yield break;
+            }
+
+            try {
+                do {
+                    if (wfd.cFileName == "." || wfd.cFileName == "..") {
+                        continue;
+                    }
+
+                    bool isDirectory = (wfd.dwFileAttributes & NativeMethods.FILE_ATTRIBUTE_DIRECTORY) != 0;
+
+                    string childPath = path;
+                    if (childPath != "") {
+                        childPath += "\\";
+                    }
+                    childPath += wfd.cFileName;
+
+                    string fullChildPath = basePath + childPath;
+                    bool isTooLong;
+                    try {
+                        isTooLong = Path.GetFullPath(fullChildPath).Length > (isDirectory ? MaxDirectoryPathLength : MaxFilePathLength);
+                    } catch (PathTooLongException) {
+                        isTooLong = true;
+                    } catch (Exception) {
+                        continue;
+                    }
+
+                    if (isTooLong) {
+                        yield return new LongPathInfo { FullPath = fullChildPath, RelativePath = childPath, IsDirectory = isDirectory };
+                    } else if (isDirectory) {
+                        foreach (var item in GetLongSubPaths(basePath, childPath)) {
+                            yield return item;
+                        }
+                    }
+                } while (NativeMethods.FindNextFile(hFind, out wfd));
+            } finally {
+                NativeMethods.FindClose(hFind);
             }
         }
 

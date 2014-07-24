@@ -27,10 +27,11 @@
             this._surveyNewsCheckLabel = new System.Windows.Forms.Label();
             this._surveyNewsCheckCombo = new System.Windows.Forms.ComboBox();
             this._topOptionsPanel = new System.Windows.Forms.Panel();
+            this._editAndContinue = new System.Windows.Forms.CheckBox();
             this._waitOnNormalExit = new System.Windows.Forms.CheckBox();
             this._waitOnAbnormalExit = new System.Windows.Forms.CheckBox();
             this._showOutputWhenRunningNpm = new System.Windows.Forms.CheckBox();
-            this._editAndContinue = new System.Windows.Forms.CheckBox();
+            this._checkForLongPaths = new System.Windows.Forms.CheckBox();
             this.tableLayoutPanel3.SuspendLayout();
             this._topOptionsPanel.SuspendLayout();
             this.SuspendLayout();
@@ -45,7 +46,7 @@
             this.tableLayoutPanel3.Controls.Add(this._surveyNewsCheckLabel, 0, 7);
             this.tableLayoutPanel3.Controls.Add(this._surveyNewsCheckCombo, 1, 7);
             this.tableLayoutPanel3.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.tableLayoutPanel3.Location = new System.Drawing.Point(0, 84);
+            this.tableLayoutPanel3.Location = new System.Drawing.Point(0, 121);
             this.tableLayoutPanel3.Margin = new System.Windows.Forms.Padding(3, 4, 3, 4);
             this.tableLayoutPanel3.Name = "tableLayoutPanel3";
             this.tableLayoutPanel3.RowCount = 9;
@@ -58,7 +59,7 @@
             this.tableLayoutPanel3.RowStyles.Add(new System.Windows.Forms.RowStyle());
             this.tableLayoutPanel3.RowStyles.Add(new System.Windows.Forms.RowStyle());
             this.tableLayoutPanel3.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Absolute, 20F));
-            this.tableLayoutPanel3.Size = new System.Drawing.Size(381, 206);
+            this.tableLayoutPanel3.Size = new System.Drawing.Size(381, 169);
             this.tableLayoutPanel3.TabIndex = 0;
             // 
             // _surveyNewsCheckLabel
@@ -93,6 +94,7 @@
             // 
             // _topOptionsPanel
             // 
+            this._topOptionsPanel.Controls.Add(this._checkForLongPaths);
             this._topOptionsPanel.Controls.Add(this._editAndContinue);
             this._topOptionsPanel.Controls.Add(this._waitOnNormalExit);
             this._topOptionsPanel.Controls.Add(this._waitOnAbnormalExit);
@@ -100,13 +102,24 @@
             this._topOptionsPanel.Dock = System.Windows.Forms.DockStyle.Top;
             this._topOptionsPanel.Location = new System.Drawing.Point(0, 0);
             this._topOptionsPanel.Name = "_topOptionsPanel";
-            this._topOptionsPanel.Size = new System.Drawing.Size(381, 84);
+            this._topOptionsPanel.Size = new System.Drawing.Size(381, 121);
             this._topOptionsPanel.TabIndex = 1;
+            // 
+            // _editAndContinue
+            // 
+            this._editAndContinue.AutoSize = true;
+            this._editAndContinue.Location = new System.Drawing.Point(4, 73);
+            this._editAndContinue.Name = "_editAndContinue";
+            this._editAndContinue.Size = new System.Drawing.Size(146, 17);
+            this._editAndContinue.TabIndex = 3;
+            this._editAndContinue.Text = "Enable &Edit and Continue";
+            this._editAndContinue.UseVisualStyleBackColor = true;
+            this._editAndContinue.CheckedChanged += new System.EventHandler(this._editAndContinue_CheckedChanged);
             // 
             // _waitOnNormalExit
             // 
             this._waitOnNormalExit.AutoSize = true;
-            this._waitOnNormalExit.Location = new System.Drawing.Point(4, 44);
+            this._waitOnNormalExit.Location = new System.Drawing.Point(4, 50);
             this._waitOnNormalExit.Name = "_waitOnNormalExit";
             this._waitOnNormalExit.Size = new System.Drawing.Size(223, 17);
             this._waitOnNormalExit.TabIndex = 2;
@@ -117,7 +130,7 @@
             // _waitOnAbnormalExit
             // 
             this._waitOnAbnormalExit.AutoSize = true;
-            this._waitOnAbnormalExit.Location = new System.Drawing.Point(4, 24);
+            this._waitOnAbnormalExit.Location = new System.Drawing.Point(4, 27);
             this._waitOnAbnormalExit.Name = "_waitOnAbnormalExit";
             this._waitOnAbnormalExit.Size = new System.Drawing.Size(235, 17);
             this._waitOnAbnormalExit.TabIndex = 1;
@@ -136,16 +149,16 @@
             this._showOutputWhenRunningNpm.UseVisualStyleBackColor = true;
             this._showOutputWhenRunningNpm.CheckedChanged += new System.EventHandler(this._showOutputWhenRunningNpm_CheckedChanged);
             // 
-            // _editAndContinue
+            // _checkForLongPaths
             // 
-            this._editAndContinue.AutoSize = true;
-            this._editAndContinue.Location = new System.Drawing.Point(4, 63);
-            this._editAndContinue.Name = "_editAndContinue";
-            this._editAndContinue.Size = new System.Drawing.Size(182, 17);
-            this._editAndContinue.TabIndex = 3;
-            this._editAndContinue.Text = "Enable &Edit and Continue";
-            this._editAndContinue.UseVisualStyleBackColor = true;
-            this._editAndContinue.CheckedChanged += new System.EventHandler(this._editAndContinue_CheckedChanged);
+            this._checkForLongPaths.AutoSize = true;
+            this._checkForLongPaths.Location = new System.Drawing.Point(4, 96);
+            this._checkForLongPaths.Name = "_checkForLongPaths";
+            this._checkForLongPaths.Size = new System.Drawing.Size(291, 17);
+            this._checkForLongPaths.TabIndex = 4;
+            this._checkForLongPaths.Text = "Check for paths that exceed the &MAX_PATH length limit";
+            this._checkForLongPaths.UseVisualStyleBackColor = true;
+            this._checkForLongPaths.CheckedChanged += new System.EventHandler(this._checkForLongPaths_CheckedChanged);
             // 
             // NodejsGeneralOptionsControl
             // 
@@ -175,5 +188,6 @@
         private System.Windows.Forms.CheckBox _waitOnNormalExit;
         private System.Windows.Forms.CheckBox _waitOnAbnormalExit;
         private System.Windows.Forms.CheckBox _editAndContinue;
+        private System.Windows.Forms.CheckBox _checkForLongPaths;
     }
 }

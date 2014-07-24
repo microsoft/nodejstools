@@ -22,8 +22,11 @@ using System.Linq;
 using System.Text;
 using System.Text.RegularExpressions;
 using System.Threading.Tasks;
+using Microsoft.NodejsTools;
 using Microsoft.NodejsTools.Npm;
 using Microsoft.NodejsTools.Npm.SPI;
+using Microsoft.NodejsTools.Project;
+using Microsoft.NodejsTools.ProjectWizard;
 using Microsoft.VisualStudio;
 using Microsoft.VisualStudio.Shell;
 using Microsoft.VisualStudio.Shell.Interop;
@@ -57,7 +60,7 @@ namespace Microsoft.NodejsTools.Repl {
             var solution = Package.GetGlobalService(typeof(SVsSolution)) as IVsSolution;
             IEnumerable<IVsProject> loadedProjects = solution.EnumerateLoadedProjects(onlyNodeProjects: true);
 
-            var projectNameToDirectoryDictionary = new Dictionary<string, string>(StringComparer.OrdinalIgnoreCase);
+            var projectNameToDirectoryDictionary = new Dictionary<string, Tuple<string, IVsHierarchy>>(StringComparer.OrdinalIgnoreCase);
             foreach (IVsProject project in loadedProjects) {
                 var hierarchy = (IVsHierarchy)project;
                 object extObject;
@@ -85,16 +88,22 @@ namespace Microsoft.NodejsTools.Repl {
 
                 var projectDirectory = projectHome.Value as string;
                 if (projectDirectory != null) {
-                    projectNameToDirectoryDictionary.Add(projectName, projectDirectory);
+                    projectNameToDirectoryDictionary.Add(projectName, Tuple.Create(projectDirectory, hierarchy));
                 }
             }
 
+            Tuple<string, IVsHierarchy> projectInfo;
             if (string.IsNullOrEmpty(projectPath) && projectNameToDirectoryDictionary.Count == 1) {
-                projectPath = projectNameToDirectoryDictionary.Values.First();
+                projectInfo = projectNameToDirectoryDictionary.Values.First();
             } else {
-                string directoryFromName;
-                if (projectNameToDirectoryDictionary.TryGetValue(projectPath, out directoryFromName)) {
-                    projectPath = directoryFromName;
+                projectNameToDirectoryDictionary.TryGetValue(projectPath, out projectInfo);
+            }
+
+            NodejsProjectNode nodejsProject = null;
+            if (projectInfo != null) {
+                projectPath = projectInfo.Item1;
+                if (projectInfo.Item2 != null) {
+                    nodejsProject = projectInfo.Item2.GetProject().GetNodejsProject();
                 }
             }
 
@@ -132,6 +141,10 @@ namespace Microsoft.NodejsTools.Repl {
             }
             else {
                 window.WriteLine(SR.GetString(SR.NpmSuccessfullyCompleted, arguments));
+            }
+
+            if (nodejsProject != null) {
+                await nodejsProject.CheckForLongPaths();
             }
 
             return ExecutionResult.Success;

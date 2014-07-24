@@ -328,5 +328,15 @@ namespace TestUtilities
             FO_DELETE = 0x0003,
             FO_RENAME = 0x0004,
         }
+
+        public const int MAX_PATH = 260;
+
+        [DllImport("kernel32.dll", SetLastError = true)]
+        [return: MarshalAs(UnmanagedType.Bool)]
+        public static extern bool CreateDirectory(string lpPathName, IntPtr lpSecurityAttributes);
+
+        [DllImport("kernel32.dll", CharSet = CharSet.Unicode, SetLastError = true)]
+        [return: MarshalAs(UnmanagedType.Bool)]
+        public static extern bool CopyFile(string lpExistingFileName, string lpNewFileName, bool bFailIfExists);
     }
 }

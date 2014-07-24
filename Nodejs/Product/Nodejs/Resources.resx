@@ -484,4 +484,40 @@
   <data name="NpmReplCommandCompletedWithErrors" xml:space="preserve">
     <value>{0} completed with errors</value>
   </data>
+  <data name="LongPathWarningTitle" xml:space="preserve">
+    <value>Path Too Long Warning</value>
+  </data>
+  <data name="LongPathWarningText" xml:space="preserve">
+    <value>Your project folder contains one or more paths that exceed the &lt;a href="#msdn"&gt;260 character limit&lt;/a&gt;. Visual Studio &lt;a href="#uservoice"&gt;does not fully support&lt;/a&gt; such projects. You may run into issues building and publishing your project, or interference with other Visual Studio and Node.js Tools features.</value>
+  </data>
+  <data name="LongPathShowPathsExceedingTheLimit" xml:space="preserve">
+    <value>Show &amp;paths exceeding the limit</value>
+  </data>
+  <data name="LongPathHidePathsExceedingTheLimit" xml:space="preserve">
+    <value>Hide &amp;paths exceeding the limit</value>
+  </data>
+  <data name="LongPathNpmDedup" xml:space="preserve">
+    <value>Run 'npm &amp;dedup' on the project</value>
+  </data>
+  <data name="LongPathNpmDedupDetail" xml:space="preserve">
+    <value>In some cases, deduplicating packages can reduce the amount of nesting in node_modules sufficiently to resolve the issue.</value>
+  </data>
+  <data name="LongPathDoNothingButWarnNextTime" xml:space="preserve">
+    <value>Do nothing, but &amp;warn me next time it happens</value>
+  </data>
+  <data name="LongPathDoNothingAndDoNotWarnAgain" xml:space="preserve">
+    <value>Do nothing and &amp;never warn me again</value>
+  </data>
+  <data name="LongPathDoNothingAndDoNotWarnAgainDetail" xml:space="preserve">
+    <value>You can re-enable the check in Tools → Options → Node.js Tools → General.</value>
+  </data>
+  <data name="LongPathFooter" xml:space="preserve">
+    <value>&lt;a href="#help"&gt;Get more information&lt;/a&gt;</value>
+  </data>
+  <data name="LongPathClickToCopy" xml:space="preserve">
+    <value>Copy Full Path</value>
+  </data>
+  <data name="LongPathNpmDedupDidNotHelp" xml:space="preserve">
+    <value>Unfortunately, running 'npm dedup' did not resolve the issue. Please consult the &lt;a href="#help"&gt;documentation&lt;/a&gt; for other potential workarounds.</value>
+  </data>
 </root>

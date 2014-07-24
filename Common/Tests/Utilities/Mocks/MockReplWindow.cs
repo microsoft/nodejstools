@@ -111,6 +111,12 @@ namespace TestUtilities.Mocks {
             _eval.AbortCommand();
         }
 
+        public Task<ExecutionResult> ExecuteCommand(string command) {
+            var tcs = new TaskCompletionSource<ExecutionResult>();
+            tcs.SetException(new NotImplementedException());
+            return tcs.Task;
+        }
+
         public void WriteLine(string text) {
             if (!ShowAnsiCodes && text.IndexOf('\x1b') != -1) {
                 AppendEscapedText(text);

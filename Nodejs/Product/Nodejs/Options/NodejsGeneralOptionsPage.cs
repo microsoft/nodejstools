@@ -29,6 +29,7 @@ namespace Microsoft.NodejsTools.Options {
         private const string WaitOnAbnormalExitSetting = "WaitOnAbnormalExit";
         private const string WaitOnNormalExitSetting = "WaitOnNormalExit";
         private const string EditAndContinueSetting = "EditAndContinue";
+        private const string CheckForLongPathsSetting = "CheckForLongPaths";
         private SurveyNewsPolicy _surveyNewsCheck;
         private string _surveyNewsFeedUrl;
         private string _surveyNewsIndexUrl;
@@ -66,6 +67,11 @@ namespace Microsoft.NodejsTools.Options {
         /// Indicates whether Edit and Continue feature should be enabled.
         /// </summary>
         public bool EditAndContinue { get; set; }
+
+        /// <summary>
+        /// Indicates whether checks for long paths (exceeding MAX_PATH) are performed after installing packages.
+        /// </summary>
+        public bool CheckForLongPaths { get; set; }
 
         /// <summary>
         /// The frequency at which to check for updated news. Default is once
@@ -114,6 +120,7 @@ namespace Microsoft.NodejsTools.Options {
             WaitOnAbnormalExit = true;
             WaitOnNormalExit = false;
             EditAndContinue = true;
+            CheckForLongPaths = true;
         }
 
         public override void LoadSettingsFromStorage() {
@@ -125,6 +132,7 @@ namespace Microsoft.NodejsTools.Options {
             WaitOnAbnormalExit = LoadBool(WaitOnAbnormalExitSetting) ?? true;
             WaitOnNormalExit = LoadBool(WaitOnNormalExitSetting) ?? false;
             EditAndContinue = LoadBool(EditAndContinueSetting) ?? true;
+            CheckForLongPaths = LoadBool(CheckForLongPathsSetting) ?? true;
         }
 
         public override void SaveSettingsToStorage() {
@@ -134,6 +142,7 @@ namespace Microsoft.NodejsTools.Options {
             SaveBool(WaitOnNormalExitSetting, WaitOnNormalExit);
             SaveBool(WaitOnAbnormalExitSetting, WaitOnAbnormalExit);
             SaveBool(EditAndContinueSetting, EditAndContinue);
+            SaveBool(CheckForLongPathsSetting, CheckForLongPaths);
         }
     }
 }

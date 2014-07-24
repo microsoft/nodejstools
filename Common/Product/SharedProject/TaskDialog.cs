@@ -209,6 +209,8 @@ namespace Microsoft.VisualStudioTools {
                 config.pszCollapsedControlText = CollapsedControlText;
                 config.pszFooter = Footer;
                 config.pfCallback = Callback;
+                config.hMainIcon = (IntPtr)GetIconResource(MainIcon);
+                config.hFooterIcon = (IntPtr)GetIconResource(FooterIcon);
 
                 if (Width.HasValue) {
                     config.cxWidth = (uint)Width.Value;
@@ -333,6 +335,9 @@ namespace Microsoft.VisualStudioTools {
         public bool UseCommandLinks { get; set; }
         public bool CanMinimize { get; set; }
 
+        public TaskDialogIcon MainIcon { get; set; }
+        public TaskDialogIcon FooterIcon { get; set; }
+
         /// <summary>
         /// Raised when a hyperlink in the dialog is clicked. If no event
         /// handlers are added, the default behavior is to open an external
@@ -372,6 +377,23 @@ namespace Microsoft.VisualStudioTools {
                 return NativeMethods.TASKDIALOG_COMMON_BUTTON_FLAGS.TDCBF_CLOSE_BUTTON;
             } else {
                 return 0;
+            }
+        }
+
+        private static NativeMethods.TASKDIALOG_ICON GetIconResource(TaskDialogIcon icon) {
+            switch (icon) {
+                case TaskDialogIcon.None:
+                    return 0;
+                case TaskDialogIcon.Error:
+                    return NativeMethods.TASKDIALOG_ICON.TD_ERROR_ICON;
+                case TaskDialogIcon.Warning:
+                    return NativeMethods.TASKDIALOG_ICON.TD_WARNING_ICON;
+                case TaskDialogIcon.Information:
+                    return NativeMethods.TASKDIALOG_ICON.TD_INFORMATION_ICON;
+                case TaskDialogIcon.Shield:
+                    return NativeMethods.TASKDIALOG_ICON.TD_SHIELD_ICON;
+                default:
+                    throw new ArgumentException("Invalid TaskDialogIcon value", "icon");
             }
         }
 
@@ -502,6 +524,13 @@ namespace Microsoft.VisualStudioTools {
                 TDN_EXPANDO_BUTTON_CLICKED = 10 // wParam = 0 (dialog is now collapsed), wParam != 0 (dialog is now expanded)
             };
 
+            internal enum TASKDIALOG_ICON : ushort {
+              TD_WARNING_ICON = unchecked((ushort)-1),
+              TD_ERROR_ICON = unchecked((ushort)-2),
+              TD_INFORMATION_ICON = unchecked((ushort)-3),
+              TD_SHIELD_ICON = unchecked((ushort)-4)
+            }
+
             [DllImport("comctl32.dll", SetLastError = true)]
             internal static extern int TaskDialogIndirect(
                 ref TASKDIALOGCONFIG pTaskConfig,
@@ -592,5 +621,13 @@ namespace Microsoft.VisualStudioTools {
         }
 
         public string Url { get { return _url; } }
+    }
+
+    enum TaskDialogIcon {
+        None,
+        Error,
+        Warning,
+        Information,
+        Shield
     }
 }

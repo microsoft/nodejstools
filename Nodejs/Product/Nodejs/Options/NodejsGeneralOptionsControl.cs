@@ -44,6 +44,7 @@ namespace Microsoft.NodejsTools.Options {
             _waitOnAbnormalExit.Checked = NodejsPackage.Instance.GeneralOptionsPage.WaitOnAbnormalExit;
             _waitOnNormalExit.Checked = NodejsPackage.Instance.GeneralOptionsPage.WaitOnNormalExit;
             _editAndContinue.Checked = NodejsPackage.Instance.GeneralOptionsPage.EditAndContinue;
+            _checkForLongPaths.Checked = NodejsPackage.Instance.GeneralOptionsPage.CheckForLongPaths;
         }
 
         private void _surveyNewsCheckCombo_SelectedIndexChanged(object sender, EventArgs e) {
@@ -78,6 +79,10 @@ namespace Microsoft.NodejsTools.Options {
 
         private void _editAndContinue_CheckedChanged(object sender, EventArgs e) {
             NodejsPackage.Instance.GeneralOptionsPage.EditAndContinue = _editAndContinue.Checked;
+        }
+
+        private void _checkForLongPaths_CheckedChanged(object sender, EventArgs e) {
+            NodejsPackage.Instance.GeneralOptionsPage.CheckForLongPaths = _checkForLongPaths.Checked;
         }
     }
 }

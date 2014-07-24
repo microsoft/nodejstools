@@ -63,7 +63,7 @@ namespace Microsoft.VisualStudio.Repl {
     /// starts having problems w/ a large number of inputs.
     /// </summary>
     [Guid(ReplWindow.TypeGuid)]
-    class ReplWindow : ToolWindowPane, IOleCommandTarget, IReplWindow, IVsFindTarget {
+    class ReplWindow : ToolWindowPane, IOleCommandTarget, IReplWindow2, IVsFindTarget {
 #if NTVS_FEATURE_INTERACTIVEWINDOW
         public const string TypeGuid = "2153A414-267E-4731-B891-E875ADBA1993";
 #else
@@ -2323,7 +2323,7 @@ namespace Microsoft.VisualStudio.Repl {
 
                     _sw = Stopwatch.StartNew();
 
-                    Task<ExecutionResult> task = ExecuteCommand(text) ?? Evaluator.ExecuteText(text) ?? ExecutionResult.Failed;
+                    Task<ExecutionResult> task = ExecuteCommand(text, updateHistory: true) ?? Evaluator.ExecuteText(text) ?? ExecutionResult.Failed;
                     
                     task.ContinueWith(FinishExecute, _uiScheduler);
                 }
@@ -2373,7 +2373,11 @@ namespace Microsoft.VisualStudio.Repl {
         }
 
         // Returns null if the text isn't recognized as a command
-        private Task<ExecutionResult> ExecuteCommand(string text) {
+        public Task<ExecutionResult> ExecuteCommand(string text) {
+            return ExecuteCommand(text, updateHistory: false);
+        }
+
+        private Task<ExecutionResult> ExecuteCommand(string text, bool updateHistory) {
             if (!text.StartsWith(_commandPrefix)) {
                 return null;
             }
@@ -2402,7 +2406,9 @@ namespace Microsoft.VisualStudio.Repl {
                 }
             }
 
-            _history.Last.Command = true;
+            if (updateHistory) {
+                _history.Last.Command = true;
+            }
 
             try {
                 return commandHandler.Execute(this, args) ?? ExecutionResult.Failed;

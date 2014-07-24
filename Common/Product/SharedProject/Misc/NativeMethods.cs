@@ -416,7 +416,8 @@ namespace Microsoft.VisualStudioTools.Project {
         TVM_GETEDITCONTROL = (0x1100 + 15);
 
         public const int
-        FILE_ATTRIBUTE_READONLY = 0x00000001;
+            FILE_ATTRIBUTE_READONLY = 0x00000001,
+            FILE_ATTRIBUTE_DIRECTORY = 0x00000010;
 
         public const int
             PSP_DEFAULT = 0x00000000,
@@ -815,6 +816,7 @@ namespace Microsoft.VisualStudioTools.Project {
         }
 
         public static IntPtr INVALID_FILE_HANDLE = new IntPtr(-1);
+        public static IntPtr INVALID_HANDLE_VALUE = new IntPtr(-1);
 
         public enum LogonType {
             LOGON32_LOGON_INTERACTIVE = 2,
@@ -862,6 +864,21 @@ namespace Microsoft.VisualStudioTools.Project {
             Source = 4,  // run from source, CD or net
             Default = 5  // use default, local or source
         }
+
+        [DllImport("kernel32.dll", CharSet = CharSet.Unicode, SetLastError = true)]
+        public static extern IntPtr FindFirstFile(string lpFileName, out WIN32_FIND_DATA lpFindFileData);
+
+        [DllImport("kernel32.dll", CharSet = CharSet.Unicode, SetLastError = true)]
+        public static extern bool FindNextFile(IntPtr hFindFile, out WIN32_FIND_DATA lpFindFileData);
+
+        [DllImport("kernel32.dll", CharSet = CharSet.Unicode, SetLastError = true)]
+        public static extern bool FindClose(IntPtr hFindFile);
+
+        [DllImport("kernel32.dll", CharSet = CharSet.Unicode, SetLastError = true)]
+        public static extern bool DeleteFile(string lpFileName);
+
+        [DllImport("kernel32.dll", CharSet = CharSet.Unicode, SetLastError = true)]
+        public static extern bool RemoveDirectory(string lpPathName);
     }
 
 
@@ -1033,8 +1050,6 @@ namespace Microsoft.VisualStudioTools.Project {
             [MarshalAs(UnmanagedType.U4)]
             uint iDomainMaxChars
             );
-
-
     }
 
     struct User32RECT {
@@ -1070,6 +1085,22 @@ namespace Microsoft.VisualStudioTools.Project {
         int SetHelpFile(string szHelpFile);
 
         int SetHelpContext(uint dwHelpContext);
+    }
+
+    [StructLayout(LayoutKind.Sequential, CharSet = CharSet.Unicode)]
+    struct WIN32_FIND_DATA {
+        public uint dwFileAttributes;
+        public System.Runtime.InteropServices.ComTypes.FILETIME ftCreationTime;
+        public System.Runtime.InteropServices.ComTypes.FILETIME ftLastAccessTime;
+        public System.Runtime.InteropServices.ComTypes.FILETIME ftLastWriteTime;
+        public uint nFileSizeHigh;
+        public uint nFileSizeLow;
+        public uint dwReserved0;
+        public uint dwReserved1;
+        [MarshalAs(UnmanagedType.ByValTStr, SizeConst = 260)]
+        public string cFileName;
+        [MarshalAs(UnmanagedType.ByValTStr, SizeConst = 14)]
+        public string cAlternateFileName;
     }
 }
 

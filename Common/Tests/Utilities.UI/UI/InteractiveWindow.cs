@@ -271,7 +271,7 @@ namespace TestUtilities.UI {
             Assert.IsTrue(ReadyForInput.WaitOne(10000));
         }
 
-        internal IReplWindow ReplWindow {
+        internal IReplWindow2 ReplWindow {
             get {
                 return _replWindow;
             }

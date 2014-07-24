@@ -882,16 +882,21 @@ namespace Microsoft.VisualStudioTools.Project {
                 return;
             }
 
-            lock (_fileSystemChanges) {
-                // we just generate a delete and creation here - we're just updating the hierarchy
-                // either changing icons or updating the non-project elements, so we don't need to
-                // generate rename events or anything like that.  This saves us from having to 
-                // handle updating the hierarchy in a special way for renames.
-                if (NoPendingFileSystemRescan()) {
-                    _fileSystemChanges.Enqueue(new FileSystemChange(this, WatcherChangeTypes.Deleted, e.OldFullPath, true));
-                    _fileSystemChanges.Enqueue(new FileSystemChange(this, WatcherChangeTypes.Created, e.FullPath, true));
-                    TriggerIdle();
+            try {
+                lock (_fileSystemChanges) {
+                    // we just generate a delete and creation here - we're just updating the hierarchy
+                    // either changing icons or updating the non-project elements, so we don't need to
+                    // generate rename events or anything like that.  This saves us from having to 
+                    // handle updating the hierarchy in a special way for renames.
+                    if (NoPendingFileSystemRescan()) {
+                        _fileSystemChanges.Enqueue(new FileSystemChange(this, WatcherChangeTypes.Deleted, e.OldFullPath, true));
+                        _fileSystemChanges.Enqueue(new FileSystemChange(this, WatcherChangeTypes.Created, e.FullPath, true));
+                        TriggerIdle();
+                    }
                 }
+            } catch (PathTooLongException) {
+                // A rename event can be reported for a path that's too long, and then access to RenamedEventArgs
+                // properties will throw this - nothing we can do other than ignoring it.
             }
         }
 
