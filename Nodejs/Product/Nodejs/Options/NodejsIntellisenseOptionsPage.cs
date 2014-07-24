@@ -21,6 +21,7 @@ namespace Microsoft.NodejsTools.Options {
         private NodejsIntellisenseOptionsControl _window;
         private AnalysisLevel _level;
         private int _analysisLogMax;
+		private string _completionCommittedBy;
 
         public NodejsIntellisenseOptionsPage()
             : base("IntelliSense") {
@@ -72,8 +73,25 @@ namespace Microsoft.NodejsTools.Options {
             }
         }
 
+		internal string CompletionCommittedBy {
+			get {
+				return _completionCommittedBy;
+			}
+			set {
+				var oldChars = _completionCommittedBy;
+				_completionCommittedBy = value;
+				if (oldChars != _completionCommittedBy) {
+					var changed = CompletionCommittedByChanged;
+					if (changed != null) {
+						changed(this, EventArgs.Empty);
+					}
+				}
+			}
+		}
+
         public event EventHandler<EventArgs> AnalysisLevelChanged;
         public event EventHandler<EventArgs> AnalysisLogMaximumChanged;
+		public event EventHandler<EventArgs> CompletionCommittedByChanged;
 
         /// <summary>
         /// Resets settings back to their defaults. This should be followed by
@@ -87,21 +105,28 @@ namespace Microsoft.NodejsTools.Options {
 
         private const string AnalysisLevelSetting = "AnalysisLevel";
         private const string AnalysisLogMaximumSetting = "AnalysisLogMaximum";
+		private const string CompletionCommittedBySetting = "CompletionCommittedBy";
 
         public override void LoadSettingsFromStorage() {
             AnalysisLevel = LoadEnum<AnalysisLevel>(AnalysisLevelSetting) ?? AnalysisLevel.High;
             AnalysisLogMax = LoadInt(AnalysisLogMaximumSetting) ?? 100;
+			CompletionCommittedBy = LoadString(CompletionCommittedBySetting) ?? NodejsConstants.DefaultIntellisenseCompletionCommittedBy;
             EnsureWindow();
 
             _window.AnalysisLevel = AnalysisLevel;
             _window.AnalysisLogMaximum = AnalysisLogMax;
+			_window.CompletionCommittedBy = CompletionCommittedBy;
         }
 
         public override void SaveSettingsToStorage() {
             AnalysisLevel = _window.AnalysisLevel;
             SaveEnum(AnalysisLevelSetting, AnalysisLevel);
-            AnalysisLogMax = _window.AnalysisLogMaximum;
+            
+			AnalysisLogMax = _window.AnalysisLogMaximum;
             SaveInt(AnalysisLogMaximumSetting, AnalysisLogMax);
+			
+			CompletionCommittedBy = _window.CompletionCommittedBy;
+			SaveString(CompletionCommittedBySetting, CompletionCommittedBy);
         }
     }
 }

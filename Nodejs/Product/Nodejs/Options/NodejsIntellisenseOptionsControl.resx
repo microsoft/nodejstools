@@ -117,119 +117,35 @@
   <resheader name="writer">
     <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
   </resheader>
-  <metadata name="intellisenseLevelGroupBox.GenerateMember" type="System.Boolean, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089">
-    <value>False</value>
-  </metadata>
-  <assembly alias="mscorlib" name="mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089" />
-  <data name="intellisenseLevelGroupBox.AutoSize" type="System.Boolean, mscorlib">
-    <value>True</value>
-  </data>
   <metadata name="toolTip.GenerateMember" type="System.Boolean, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089">
     <value>False</value>
   </metadata>
   <metadata name="toolTip.TrayLocation" type="System.Drawing.Point, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a">
     <value>17, 17</value>
   </metadata>
-  <data name="_noIntelliSenseRadioButton.AutoSize" type="System.Boolean, mscorlib">
-    <value>True</value>
-  </data>
-  <assembly alias="System.Drawing" name="System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a" />
-  <data name="_noIntelliSenseRadioButton.CheckAlign" type="System.Drawing.ContentAlignment, System.Drawing">
-    <value>TopLeft</value>
-  </data>
   <assembly alias="System.Windows.Forms" name="System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089" />
-  <data name="_noIntelliSenseRadioButton.Dock" type="System.Windows.Forms.DockStyle, System.Windows.Forms">
-    <value>Top</value>
+  <data name="_fullIntelliSenseRadioButton.Anchor" type="System.Windows.Forms.AnchorStyles, System.Windows.Forms">
+    <value>Left</value>
   </data>
-  <data name="_noIntelliSenseRadioButton.ImeMode" type="System.Windows.Forms.ImeMode, System.Windows.Forms">
-    <value>NoControl</value>
-  </data>
-  <data name="_noIntelliSenseRadioButton.Location" type="System.Drawing.Point, System.Drawing">
-    <value>8, 55</value>
-  </data>
-  <data name="_noIntelliSenseRadioButton.Size" type="System.Drawing.Size, System.Drawing">
-    <value>453, 17</value>
-  </data>
-  <data name="_noIntelliSenseRadioButton.TabIndex" type="System.Int32, mscorlib">
-    <value>2</value>
-  </data>
-  <data name="_noIntelliSenseRadioButton.Text" xml:space="preserve">
-    <value>&amp;No IntelliSense</value>
-  </data>
-  <data name="_noIntelliSenseRadioButton.TextAlign" type="System.Drawing.ContentAlignment, System.Drawing">
-    <value>TopLeft</value>
-  </data>
-  <data name="_noIntelliSenseRadioButton.ToolTip" xml:space="preserve">
-    <value>No completions (minimum memory/CPU usage)</value>
-  </data>
-  <data name="&gt;&gt;_noIntelliSenseRadioButton.Name" xml:space="preserve">
-    <value>_noIntelliSenseRadioButton</value>
-  </data>
-  <data name="&gt;&gt;_noIntelliSenseRadioButton.Type" xml:space="preserve">
-    <value>System.Windows.Forms.RadioButton, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
-  </data>
-  <data name="&gt;&gt;_noIntelliSenseRadioButton.Parent" xml:space="preserve">
-    <value>intellisenseLevelGroupBox</value>
-  </data>
-  <data name="&gt;&gt;_noIntelliSenseRadioButton.ZOrder" xml:space="preserve">
-    <value>0</value>
-  </data>
-  <data name="_limitedIntelliSenseRadioButton.AutoSize" type="System.Boolean, mscorlib">
-    <value>True</value>
-  </data>
-  <data name="_limitedIntelliSenseRadioButton.CheckAlign" type="System.Drawing.ContentAlignment, System.Drawing">
-    <value>TopLeft</value>
-  </data>
-  <data name="_limitedIntelliSenseRadioButton.Dock" type="System.Windows.Forms.DockStyle, System.Windows.Forms">
-    <value>Top</value>
-  </data>
-  <data name="_limitedIntelliSenseRadioButton.ImeMode" type="System.Windows.Forms.ImeMode, System.Windows.Forms">
-    <value>NoControl</value>
-  </data>
-  <data name="_limitedIntelliSenseRadioButton.Location" type="System.Drawing.Point, System.Drawing">
-    <value>8, 38</value>
-  </data>
-  <data name="_limitedIntelliSenseRadioButton.Size" type="System.Drawing.Size, System.Drawing">
-    <value>453, 17</value>
-  </data>
-  <data name="_limitedIntelliSenseRadioButton.TabIndex" type="System.Int32, mscorlib">
-    <value>1</value>
-  </data>
-  <data name="_limitedIntelliSenseRadioButton.Text" xml:space="preserve">
-    <value>&amp;Quick IntelliSense</value>
-  </data>
-  <data name="_limitedIntelliSenseRadioButton.TextAlign" type="System.Drawing.ContentAlignment, System.Drawing">
-    <value>TopLeft</value>
-  </data>
-  <data name="_limitedIntelliSenseRadioButton.ToolTip" xml:space="preserve">
-    <value>Limited completions (reduced memory/CPU usage)</value>
-  </data>
-  <data name="&gt;&gt;_limitedIntelliSenseRadioButton.Name" xml:space="preserve">
-    <value>_limitedIntelliSenseRadioButton</value>
-  </data>
-  <data name="&gt;&gt;_limitedIntelliSenseRadioButton.Type" xml:space="preserve">
-    <value>System.Windows.Forms.RadioButton, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
-  </data>
-  <data name="&gt;&gt;_limitedIntelliSenseRadioButton.Parent" xml:space="preserve">
-    <value>intellisenseLevelGroupBox</value>
-  </data>
-  <data name="&gt;&gt;_limitedIntelliSenseRadioButton.ZOrder" xml:space="preserve">
-    <value>1</value>
-  </data>
+  <assembly alias="mscorlib" name="mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089" />
   <data name="_fullIntelliSenseRadioButton.AutoSize" type="System.Boolean, mscorlib">
     <value>True</value>
   </data>
+  <assembly alias="System.Drawing" name="System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a" />
   <data name="_fullIntelliSenseRadioButton.CheckAlign" type="System.Drawing.ContentAlignment, System.Drawing">
     <value>TopLeft</value>
   </data>
-  <data name="_fullIntelliSenseRadioButton.Dock" type="System.Windows.Forms.DockStyle, System.Windows.Forms">
-    <value>Top</value>
+  <data name="_fullIntelliSenseRadioButton.ImeMode" type="System.Windows.Forms.ImeMode, System.Windows.Forms">
+    <value>NoControl</value>
   </data>
   <data name="_fullIntelliSenseRadioButton.Location" type="System.Drawing.Point, System.Drawing">
-    <value>8, 21</value>
+    <value>6, 3</value>
+  </data>
+  <data name="_fullIntelliSenseRadioButton.Margin" type="System.Windows.Forms.Padding, System.Windows.Forms">
+    <value>6, 3, 6, 3</value>
   </data>
   <data name="_fullIntelliSenseRadioButton.Size" type="System.Drawing.Size, System.Drawing">
-    <value>453, 17</value>
+    <value>98, 17</value>
   </data>
   <data name="_fullIntelliSenseRadioButton.TabIndex" type="System.Int32, mscorlib">
     <value>0</value>
@@ -250,73 +166,118 @@
     <value>System.Windows.Forms.RadioButton, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
   </data>
   <data name="&gt;&gt;_fullIntelliSenseRadioButton.Parent" xml:space="preserve">
-    <value>intellisenseLevelGroupBox</value>
+    <value>tableLayoutPanel2</value>
   </data>
   <data name="&gt;&gt;_fullIntelliSenseRadioButton.ZOrder" xml:space="preserve">
-    <value>2</value>
-  </data>
-  <data name="intellisenseLevelGroupBox.Dock" type="System.Windows.Forms.DockStyle, System.Windows.Forms">
-    <value>Top</value>
-  </data>
-  <data name="intellisenseLevelGroupBox.Location" type="System.Drawing.Point, System.Drawing">
-    <value>0, 0</value>
-  </data>
-  <data name="intellisenseLevelGroupBox.Padding" type="System.Windows.Forms.Padding, System.Windows.Forms">
-    <value>8, 8, 8, 8</value>
-  </data>
-  <data name="intellisenseLevelGroupBox.Size" type="System.Drawing.Size, System.Drawing">
-    <value>469, 80</value>
-  </data>
-  <data name="intellisenseLevelGroupBox.TabIndex" type="System.Int32, mscorlib">
-    <value>2</value>
-  </data>
-  <data name="intellisenseLevelGroupBox.Text" xml:space="preserve">
-    <value>IntelliSense Level</value>
-  </data>
-  <data name="&gt;&gt;intellisenseLevelGroupBox.Name" xml:space="preserve">
-    <value>intellisenseLevelGroupBox</value>
-  </data>
-  <data name="&gt;&gt;intellisenseLevelGroupBox.Type" xml:space="preserve">
-    <value>System.Windows.Forms.GroupBox, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
-  </data>
-  <data name="&gt;&gt;intellisenseLevelGroupBox.Parent" xml:space="preserve">
-    <value>$this</value>
-  </data>
-  <data name="&gt;&gt;intellisenseLevelGroupBox.ZOrder" xml:space="preserve">
-    <value>2</value>
-  </data>
-  <metadata name="toolTip.GenerateMember" type="System.Boolean, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089">
-    <value>False</value>
-  </metadata>
-  <metadata name="toolTip.TrayLocation" type="System.Drawing.Point, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a">
-    <value>17, 17</value>
-  </metadata>
-  <data name="_analysisLogMaxLabel.AutoSize" type="System.Boolean, mscorlib">
-    <value>True</value>
-  </data>
-  <data name="_analysisLogMaxLabel.Location" type="System.Drawing.Point, System.Drawing">
-    <value>3, 93</value>
-  </data>
-  <data name="_analysisLogMaxLabel.Size" type="System.Drawing.Size, System.Drawing">
-    <value>100, 13</value>
-  </data>
-  <data name="_analysisLogMaxLabel.TabIndex" type="System.Int32, mscorlib">
     <value>3</value>
   </data>
-  <data name="_analysisLogMaxLabel.Text" xml:space="preserve">
-    <value>Intellisense log size:</value>
+  <data name="_limitedIntelliSenseRadioButton.Anchor" type="System.Windows.Forms.AnchorStyles, System.Windows.Forms">
+    <value>Left</value>
   </data>
-  <data name="&gt;&gt;_analysisLogMaxLabel.Name" xml:space="preserve">
-    <value>_analysisLogMaxLabel</value>
+  <data name="_limitedIntelliSenseRadioButton.AutoSize" type="System.Boolean, mscorlib">
+    <value>True</value>
   </data>
-  <data name="&gt;&gt;_analysisLogMaxLabel.Type" xml:space="preserve">
-    <value>System.Windows.Forms.Label, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  <data name="_limitedIntelliSenseRadioButton.CheckAlign" type="System.Drawing.ContentAlignment, System.Drawing">
+    <value>TopLeft</value>
   </data>
-  <data name="&gt;&gt;_analysisLogMaxLabel.Parent" xml:space="preserve">
-    <value>$this</value>
+  <data name="_limitedIntelliSenseRadioButton.ImeMode" type="System.Windows.Forms.ImeMode, System.Windows.Forms">
+    <value>NoControl</value>
   </data>
-  <data name="&gt;&gt;_analysisLogMaxLabel.ZOrder" xml:space="preserve">
+  <data name="_limitedIntelliSenseRadioButton.Location" type="System.Drawing.Point, System.Drawing">
+    <value>6, 26</value>
+  </data>
+  <data name="_limitedIntelliSenseRadioButton.Margin" type="System.Windows.Forms.Padding, System.Windows.Forms">
+    <value>6, 3, 6, 3</value>
+  </data>
+  <data name="_limitedIntelliSenseRadioButton.Size" type="System.Drawing.Size, System.Drawing">
+    <value>110, 17</value>
+  </data>
+  <data name="_limitedIntelliSenseRadioButton.TabIndex" type="System.Int32, mscorlib">
     <value>1</value>
+  </data>
+  <data name="_limitedIntelliSenseRadioButton.Text" xml:space="preserve">
+    <value>&amp;Quick IntelliSense</value>
+  </data>
+  <data name="_limitedIntelliSenseRadioButton.TextAlign" type="System.Drawing.ContentAlignment, System.Drawing">
+    <value>TopLeft</value>
+  </data>
+  <data name="_limitedIntelliSenseRadioButton.ToolTip" xml:space="preserve">
+    <value>Limited completions (reduced memory/CPU usage)</value>
+  </data>
+  <data name="&gt;&gt;_limitedIntelliSenseRadioButton.Name" xml:space="preserve">
+    <value>_limitedIntelliSenseRadioButton</value>
+  </data>
+  <data name="&gt;&gt;_limitedIntelliSenseRadioButton.Type" xml:space="preserve">
+    <value>System.Windows.Forms.RadioButton, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </data>
+  <data name="&gt;&gt;_limitedIntelliSenseRadioButton.Parent" xml:space="preserve">
+    <value>tableLayoutPanel2</value>
+  </data>
+  <data name="&gt;&gt;_limitedIntelliSenseRadioButton.ZOrder" xml:space="preserve">
+    <value>2</value>
+  </data>
+  <data name="_noIntelliSenseRadioButton.Anchor" type="System.Windows.Forms.AnchorStyles, System.Windows.Forms">
+    <value>Left</value>
+  </data>
+  <data name="_noIntelliSenseRadioButton.AutoSize" type="System.Boolean, mscorlib">
+    <value>True</value>
+  </data>
+  <data name="_noIntelliSenseRadioButton.CheckAlign" type="System.Drawing.ContentAlignment, System.Drawing">
+    <value>TopLeft</value>
+  </data>
+  <data name="_noIntelliSenseRadioButton.ImeMode" type="System.Windows.Forms.ImeMode, System.Windows.Forms">
+    <value>NoControl</value>
+  </data>
+  <data name="_noIntelliSenseRadioButton.Location" type="System.Drawing.Point, System.Drawing">
+    <value>6, 49</value>
+  </data>
+  <data name="_noIntelliSenseRadioButton.Margin" type="System.Windows.Forms.Padding, System.Windows.Forms">
+    <value>6, 3, 6, 3</value>
+  </data>
+  <data name="_noIntelliSenseRadioButton.Size" type="System.Drawing.Size, System.Drawing">
+    <value>96, 17</value>
+  </data>
+  <data name="_noIntelliSenseRadioButton.TabIndex" type="System.Int32, mscorlib">
+    <value>2</value>
+  </data>
+  <data name="_noIntelliSenseRadioButton.Text" xml:space="preserve">
+    <value>&amp;No IntelliSense</value>
+  </data>
+  <data name="_noIntelliSenseRadioButton.TextAlign" type="System.Drawing.ContentAlignment, System.Drawing">
+    <value>TopLeft</value>
+  </data>
+  <data name="_noIntelliSenseRadioButton.ToolTip" xml:space="preserve">
+    <value>No completions (minimum memory/CPU usage)</value>
+  </data>
+  <data name="&gt;&gt;_noIntelliSenseRadioButton.Name" xml:space="preserve">
+    <value>_noIntelliSenseRadioButton</value>
+  </data>
+  <data name="&gt;&gt;_noIntelliSenseRadioButton.Type" xml:space="preserve">
+    <value>System.Windows.Forms.RadioButton, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </data>
+  <data name="&gt;&gt;_noIntelliSenseRadioButton.Parent" xml:space="preserve">
+    <value>tableLayoutPanel2</value>
+  </data>
+  <data name="&gt;&gt;_noIntelliSenseRadioButton.ZOrder" xml:space="preserve">
+    <value>1</value>
+  </data>
+  <metadata name="intellisenseLevelGroupBox.GenerateMember" type="System.Boolean, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089">
+    <value>False</value>
+  </metadata>
+  <data name="intellisenseLevelGroupBox.AutoSize" type="System.Boolean, mscorlib">
+    <value>True</value>
+  </data>
+  <data name="tableLayoutPanel2.AutoSize" type="System.Boolean, mscorlib">
+    <value>True</value>
+  </data>
+  <data name="tableLayoutPanel2.AutoSizeMode" type="System.Windows.Forms.AutoSizeMode, System.Windows.Forms">
+    <value>GrowAndShrink</value>
+  </data>
+  <data name="tableLayoutPanel2.ColumnCount" type="System.Int32, mscorlib">
+    <value>2</value>
+  </data>
+  <data name="_analysisLogMax.Anchor" type="System.Windows.Forms.AnchorStyles, System.Windows.Forms">
+    <value>Left</value>
   </data>
   <data name="_analysisLogMax.Items" xml:space="preserve">
     <value>Off</value>
@@ -334,10 +295,13 @@
     <value>100000</value>
   </data>
   <data name="_analysisLogMax.Location" type="System.Drawing.Point, System.Drawing">
-    <value>109, 90</value>
+    <value>145, 72</value>
+  </data>
+  <data name="_analysisLogMax.Margin" type="System.Windows.Forms.Padding, System.Windows.Forms">
+    <value>6, 3, 6, 3</value>
   </data>
   <data name="_analysisLogMax.Size" type="System.Drawing.Size, System.Drawing">
-    <value>121, 21</value>
+    <value>125, 21</value>
   </data>
   <data name="_analysisLogMax.TabIndex" type="System.Int32, mscorlib">
     <value>4</value>
@@ -349,10 +313,292 @@
     <value>System.Windows.Forms.ComboBox, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
   </data>
   <data name="&gt;&gt;_analysisLogMax.Parent" xml:space="preserve">
-    <value>$this</value>
+    <value>tableLayoutPanel2</value>
   </data>
   <data name="&gt;&gt;_analysisLogMax.ZOrder" xml:space="preserve">
     <value>0</value>
+  </data>
+  <data name="_analysisLogMaxLabel.Anchor" type="System.Windows.Forms.AnchorStyles, System.Windows.Forms">
+    <value>Left</value>
+  </data>
+  <data name="_analysisLogMaxLabel.AutoSize" type="System.Boolean, mscorlib">
+    <value>True</value>
+  </data>
+  <data name="_analysisLogMaxLabel.ImeMode" type="System.Windows.Forms.ImeMode, System.Windows.Forms">
+    <value>NoControl</value>
+  </data>
+  <data name="_analysisLogMaxLabel.Location" type="System.Drawing.Point, System.Drawing">
+    <value>6, 76</value>
+  </data>
+  <data name="_analysisLogMaxLabel.Margin" type="System.Windows.Forms.Padding, System.Windows.Forms">
+    <value>6, 3, 6, 3</value>
+  </data>
+  <data name="_analysisLogMaxLabel.Size" type="System.Drawing.Size, System.Drawing">
+    <value>127, 13</value>
+  </data>
+  <data name="_analysisLogMaxLabel.TabIndex" type="System.Int32, mscorlib">
+    <value>3</value>
+  </data>
+  <data name="_analysisLogMaxLabel.Text" xml:space="preserve">
+    <value>IntelliSense log entry limit:</value>
+  </data>
+  <data name="&gt;&gt;_analysisLogMaxLabel.Name" xml:space="preserve">
+    <value>_analysisLogMaxLabel</value>
+  </data>
+  <data name="&gt;&gt;_analysisLogMaxLabel.Type" xml:space="preserve">
+    <value>System.Windows.Forms.Label, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </data>
+  <data name="&gt;&gt;_analysisLogMaxLabel.Parent" xml:space="preserve">
+    <value>tableLayoutPanel2</value>
+  </data>
+  <data name="&gt;&gt;_analysisLogMaxLabel.ZOrder" xml:space="preserve">
+    <value>4</value>
+  </data>
+  <data name="tableLayoutPanel2.Dock" type="System.Windows.Forms.DockStyle, System.Windows.Forms">
+    <value>Fill</value>
+  </data>
+  <data name="tableLayoutPanel2.Location" type="System.Drawing.Point, System.Drawing">
+    <value>8, 21</value>
+  </data>
+  <data name="tableLayoutPanel2.Margin" type="System.Windows.Forms.Padding, System.Windows.Forms">
+    <value>3, 4, 3, 4</value>
+  </data>
+  <data name="tableLayoutPanel2.RowCount" type="System.Int32, mscorlib">
+    <value>4</value>
+  </data>
+  <data name="tableLayoutPanel2.Size" type="System.Drawing.Size, System.Drawing">
+    <value>611, 96</value>
+  </data>
+  <data name="tableLayoutPanel2.TabIndex" type="System.Int32, mscorlib">
+    <value>4</value>
+  </data>
+  <data name="&gt;&gt;tableLayoutPanel2.Name" xml:space="preserve">
+    <value>tableLayoutPanel2</value>
+  </data>
+  <data name="&gt;&gt;tableLayoutPanel2.Type" xml:space="preserve">
+    <value>System.Windows.Forms.TableLayoutPanel, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </data>
+  <data name="&gt;&gt;tableLayoutPanel2.Parent" xml:space="preserve">
+    <value>intellisenseLevelGroupBox</value>
+  </data>
+  <data name="&gt;&gt;tableLayoutPanel2.ZOrder" xml:space="preserve">
+    <value>0</value>
+  </data>
+  <data name="tableLayoutPanel2.LayoutSettings" type="System.Windows.Forms.TableLayoutSettings, System.Windows.Forms">
+    <value>&lt;?xml version="1.0" encoding="utf-16"?&gt;&lt;TableLayoutSettings&gt;&lt;Controls&gt;&lt;Control Name="_analysisLogMax" Row="3" RowSpan="1" Column="1" ColumnSpan="1" /&gt;&lt;Control Name="_noIntelliSenseRadioButton" Row="2" RowSpan="1" Column="0" ColumnSpan="1" /&gt;&lt;Control Name="_limitedIntelliSenseRadioButton" Row="1" RowSpan="1" Column="0" ColumnSpan="1" /&gt;&lt;Control Name="_fullIntelliSenseRadioButton" Row="0" RowSpan="1" Column="0" ColumnSpan="1" /&gt;&lt;Control Name="_analysisLogMaxLabel" Row="3" RowSpan="1" Column="0" ColumnSpan="1" /&gt;&lt;/Controls&gt;&lt;Columns Styles="AutoSize,0,Percent,100" /&gt;&lt;Rows Styles="Percent,100,AutoSize,0,AutoSize,0,AutoSize,0" /&gt;&lt;/TableLayoutSettings&gt;</value>
+  </data>
+  <data name="intellisenseLevelGroupBox.Dock" type="System.Windows.Forms.DockStyle, System.Windows.Forms">
+    <value>Fill</value>
+  </data>
+  <data name="intellisenseLevelGroupBox.Location" type="System.Drawing.Point, System.Drawing">
+    <value>6, 3</value>
+  </data>
+  <data name="intellisenseLevelGroupBox.Margin" type="System.Windows.Forms.Padding, System.Windows.Forms">
+    <value>6, 3, 6, 3</value>
+  </data>
+  <data name="intellisenseLevelGroupBox.Padding" type="System.Windows.Forms.Padding, System.Windows.Forms">
+    <value>8, 8, 8, 8</value>
+  </data>
+  <data name="intellisenseLevelGroupBox.Size" type="System.Drawing.Size, System.Drawing">
+    <value>627, 125</value>
+  </data>
+  <data name="intellisenseLevelGroupBox.TabIndex" type="System.Int32, mscorlib">
+    <value>0</value>
+  </data>
+  <data name="intellisenseLevelGroupBox.Text" xml:space="preserve">
+    <value>IntelliSense Level</value>
+  </data>
+  <data name="&gt;&gt;intellisenseLevelGroupBox.Name" xml:space="preserve">
+    <value>intellisenseLevelGroupBox</value>
+  </data>
+  <data name="&gt;&gt;intellisenseLevelGroupBox.Type" xml:space="preserve">
+    <value>System.Windows.Forms.GroupBox, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </data>
+  <data name="&gt;&gt;intellisenseLevelGroupBox.Parent" xml:space="preserve">
+    <value>tableLayoutPanel1</value>
+  </data>
+  <data name="&gt;&gt;intellisenseLevelGroupBox.ZOrder" xml:space="preserve">
+    <value>1</value>
+  </data>
+  <data name="tableLayoutPanel1.AutoSize" type="System.Boolean, mscorlib">
+    <value>True</value>
+  </data>
+  <data name="tableLayoutPanel1.AutoSizeMode" type="System.Windows.Forms.AutoSizeMode, System.Windows.Forms">
+    <value>GrowAndShrink</value>
+  </data>
+  <data name="tableLayoutPanel1.ColumnCount" type="System.Int32, mscorlib">
+    <value>1</value>
+  </data>
+  <data name="_selectionInCompletionListGroupBox.AutoSize" type="System.Boolean, mscorlib">
+    <value>True</value>
+  </data>
+  <data name="tableLayoutPanel3.AutoSize" type="System.Boolean, mscorlib">
+    <value>True</value>
+  </data>
+  <data name="tableLayoutPanel3.AutoSizeMode" type="System.Windows.Forms.AutoSizeMode, System.Windows.Forms">
+    <value>GrowAndShrink</value>
+  </data>
+  <data name="tableLayoutPanel3.ColumnCount" type="System.Int32, mscorlib">
+    <value>1</value>
+  </data>
+  <data name="_completionCommittedBy.Anchor" type="System.Windows.Forms.AnchorStyles, System.Windows.Forms">
+    <value>Left, Right</value>
+  </data>
+  <data name="_completionCommittedBy.Location" type="System.Drawing.Point, System.Drawing">
+    <value>6, 22</value>
+  </data>
+  <data name="_completionCommittedBy.Margin" type="System.Windows.Forms.Padding, System.Windows.Forms">
+    <value>6, 3, 6, 3</value>
+  </data>
+  <data name="_completionCommittedBy.Size" type="System.Drawing.Size, System.Drawing">
+    <value>609, 20</value>
+  </data>
+  <data name="_completionCommittedBy.TabIndex" type="System.Int32, mscorlib">
+    <value>1</value>
+  </data>
+  <data name="&gt;&gt;_completionCommittedBy.Name" xml:space="preserve">
+    <value>_completionCommittedBy</value>
+  </data>
+  <data name="&gt;&gt;_completionCommittedBy.Type" xml:space="preserve">
+    <value>System.Windows.Forms.TextBox, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </data>
+  <data name="&gt;&gt;_completionCommittedBy.Parent" xml:space="preserve">
+    <value>tableLayoutPanel3</value>
+  </data>
+  <data name="&gt;&gt;_completionCommittedBy.ZOrder" xml:space="preserve">
+    <value>0</value>
+  </data>
+  <data name="_completionCommittedByLabel.Anchor" type="System.Windows.Forms.AnchorStyles, System.Windows.Forms">
+    <value>Left</value>
+  </data>
+  <data name="_completionCommittedByLabel.AutoSize" type="System.Boolean, mscorlib">
+    <value>True</value>
+  </data>
+  <data name="_completionCommittedByLabel.ImeMode" type="System.Windows.Forms.ImeMode, System.Windows.Forms">
+    <value>NoControl</value>
+  </data>
+  <data name="_completionCommittedByLabel.Location" type="System.Drawing.Point, System.Drawing">
+    <value>6, 3</value>
+  </data>
+  <data name="_completionCommittedByLabel.Margin" type="System.Windows.Forms.Padding, System.Windows.Forms">
+    <value>6, 3, 6, 3</value>
+  </data>
+  <data name="_completionCommittedByLabel.Size" type="System.Drawing.Size, System.Drawing">
+    <value>219, 13</value>
+  </data>
+  <data name="_completionCommittedByLabel.TabIndex" type="System.Int32, mscorlib">
+    <value>0</value>
+  </data>
+  <data name="_completionCommittedByLabel.Text" xml:space="preserve">
+    <value>Committed by typing the following characters:</value>
+  </data>
+  <data name="&gt;&gt;_completionCommittedByLabel.Name" xml:space="preserve">
+    <value>_completionCommittedByLabel</value>
+  </data>
+  <data name="&gt;&gt;_completionCommittedByLabel.Type" xml:space="preserve">
+    <value>System.Windows.Forms.Label, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </data>
+  <data name="&gt;&gt;_completionCommittedByLabel.Parent" xml:space="preserve">
+    <value>tableLayoutPanel3</value>
+  </data>
+  <data name="&gt;&gt;_completionCommittedByLabel.ZOrder" xml:space="preserve">
+    <value>1</value>
+  </data>
+  <data name="tableLayoutPanel3.Dock" type="System.Windows.Forms.DockStyle, System.Windows.Forms">
+    <value>Fill</value>
+  </data>
+  <data name="tableLayoutPanel3.Location" type="System.Drawing.Point, System.Drawing">
+    <value>3, 16</value>
+  </data>
+  <data name="tableLayoutPanel3.Margin" type="System.Windows.Forms.Padding, System.Windows.Forms">
+    <value>3, 4, 3, 4</value>
+  </data>
+  <data name="tableLayoutPanel3.RowCount" type="System.Int32, mscorlib">
+    <value>2</value>
+  </data>
+  <data name="tableLayoutPanel3.Size" type="System.Drawing.Size, System.Drawing">
+    <value>621, 45</value>
+  </data>
+  <data name="tableLayoutPanel3.TabIndex" type="System.Int32, mscorlib">
+    <value>7</value>
+  </data>
+  <data name="&gt;&gt;tableLayoutPanel3.Name" xml:space="preserve">
+    <value>tableLayoutPanel3</value>
+  </data>
+  <data name="&gt;&gt;tableLayoutPanel3.Type" xml:space="preserve">
+    <value>System.Windows.Forms.TableLayoutPanel, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </data>
+  <data name="&gt;&gt;tableLayoutPanel3.Parent" xml:space="preserve">
+    <value>_selectionInCompletionListGroupBox</value>
+  </data>
+  <data name="&gt;&gt;tableLayoutPanel3.ZOrder" xml:space="preserve">
+    <value>0</value>
+  </data>
+  <data name="tableLayoutPanel3.LayoutSettings" type="System.Windows.Forms.TableLayoutSettings, System.Windows.Forms">
+    <value>&lt;?xml version="1.0" encoding="utf-16"?&gt;&lt;TableLayoutSettings&gt;&lt;Controls&gt;&lt;Control Name="_completionCommittedBy" Row="1" RowSpan="1" Column="0" ColumnSpan="1" /&gt;&lt;Control Name="_completionCommittedByLabel" Row="0" RowSpan="1" Column="0" ColumnSpan="1" /&gt;&lt;/Controls&gt;&lt;Columns Styles="Percent,100,Absolute,20" /&gt;&lt;Rows Styles="AutoSize,0,AutoSize,0" /&gt;&lt;/TableLayoutSettings&gt;</value>
+  </data>
+  <data name="_selectionInCompletionListGroupBox.Dock" type="System.Windows.Forms.DockStyle, System.Windows.Forms">
+    <value>Fill</value>
+  </data>
+  <data name="_selectionInCompletionListGroupBox.Location" type="System.Drawing.Point, System.Drawing">
+    <value>6, 134</value>
+  </data>
+  <data name="_selectionInCompletionListGroupBox.Margin" type="System.Windows.Forms.Padding, System.Windows.Forms">
+    <value>6, 3, 6, 3</value>
+  </data>
+  <data name="_selectionInCompletionListGroupBox.Size" type="System.Drawing.Size, System.Drawing">
+    <value>627, 64</value>
+  </data>
+  <data name="_selectionInCompletionListGroupBox.TabIndex" type="System.Int32, mscorlib">
+    <value>1</value>
+  </data>
+  <data name="_selectionInCompletionListGroupBox.Text" xml:space="preserve">
+    <value>Selection in Completion List</value>
+  </data>
+  <data name="&gt;&gt;_selectionInCompletionListGroupBox.Name" xml:space="preserve">
+    <value>_selectionInCompletionListGroupBox</value>
+  </data>
+  <data name="&gt;&gt;_selectionInCompletionListGroupBox.Type" xml:space="preserve">
+    <value>System.Windows.Forms.GroupBox, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </data>
+  <data name="&gt;&gt;_selectionInCompletionListGroupBox.Parent" xml:space="preserve">
+    <value>tableLayoutPanel1</value>
+  </data>
+  <data name="&gt;&gt;_selectionInCompletionListGroupBox.ZOrder" xml:space="preserve">
+    <value>0</value>
+  </data>
+  <data name="tableLayoutPanel1.Dock" type="System.Windows.Forms.DockStyle, System.Windows.Forms">
+    <value>Fill</value>
+  </data>
+  <data name="tableLayoutPanel1.Location" type="System.Drawing.Point, System.Drawing">
+    <value>0, 0</value>
+  </data>
+  <data name="tableLayoutPanel1.Margin" type="System.Windows.Forms.Padding, System.Windows.Forms">
+    <value>3, 4, 3, 4</value>
+  </data>
+  <data name="tableLayoutPanel1.RowCount" type="System.Int32, mscorlib">
+    <value>4</value>
+  </data>
+  <data name="tableLayoutPanel1.Size" type="System.Drawing.Size, System.Drawing">
+    <value>639, 323</value>
+  </data>
+  <data name="tableLayoutPanel1.TabIndex" type="System.Int32, mscorlib">
+    <value>0</value>
+  </data>
+  <data name="&gt;&gt;tableLayoutPanel1.Name" xml:space="preserve">
+    <value>tableLayoutPanel1</value>
+  </data>
+  <data name="&gt;&gt;tableLayoutPanel1.Type" xml:space="preserve">
+    <value>System.Windows.Forms.TableLayoutPanel, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </data>
+  <data name="&gt;&gt;tableLayoutPanel1.Parent" xml:space="preserve">
+    <value>$this</value>
+  </data>
+  <data name="&gt;&gt;tableLayoutPanel1.ZOrder" xml:space="preserve">
+    <value>0</value>
+  </data>
+  <data name="tableLayoutPanel1.LayoutSettings" type="System.Windows.Forms.TableLayoutSettings, System.Windows.Forms">
+    <value>&lt;?xml version="1.0" encoding="utf-16"?&gt;&lt;TableLayoutSettings&gt;&lt;Controls&gt;&lt;Control Name="_selectionInCompletionListGroupBox" Row="1" RowSpan="1" Column="0" ColumnSpan="1" /&gt;&lt;Control Name="intellisenseLevelGroupBox" Row="0" RowSpan="1" Column="0" ColumnSpan="1" /&gt;&lt;/Controls&gt;&lt;Columns Styles="Percent,100" /&gt;&lt;Rows Styles="AutoSize,0,AutoSize,0,AutoSize,0,Absolute,22" /&gt;&lt;/TableLayoutSettings&gt;</value>
   </data>
   <metadata name="$this.Localizable" type="System.Boolean, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089">
     <value>True</value>
@@ -360,8 +606,11 @@
   <data name="$this.AutoScaleDimensions" type="System.Drawing.SizeF, System.Drawing">
     <value>6, 13</value>
   </data>
+  <data name="$this.AutoSize" type="System.Boolean, mscorlib">
+    <value>True</value>
+  </data>
   <data name="$this.Size" type="System.Drawing.Size, System.Drawing">
-    <value>469, 176</value>
+    <value>639, 323</value>
   </data>
   <data name="&gt;&gt;toolTip.Name" xml:space="preserve">
     <value>toolTip</value>

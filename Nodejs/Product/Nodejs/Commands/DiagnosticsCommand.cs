@@ -157,6 +157,9 @@ namespace Microsoft.NodejsTools.Commands {
                 }
             }
 
+			res.AppendLine(String.Format("Intellisense Completion Committed By: {0}", NodejsPackage.Instance.IntellisenseOptionsPage.CompletionCommittedBy));
+			res.AppendLine();
+
             return res.ToString();
         }
 

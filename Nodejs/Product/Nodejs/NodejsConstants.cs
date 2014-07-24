@@ -37,6 +37,7 @@ namespace Microsoft.NodejsTools {
 
         public const string NodeModulesFolder = "node_modules";
         public const string AnalysisIgnoredDirectories = "AnalysisIgnoredDirectories";
+		public const string DefaultIntellisenseCompletionCommittedBy = "{}[]().,:;+-*/%&|^!~=<>?@#'\"\\";
 
         /// <summary>
         /// The name of the package.json file
