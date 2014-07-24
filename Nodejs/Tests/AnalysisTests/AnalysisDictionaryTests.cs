@@ -262,10 +262,6 @@ namespace NodejsTests {
             while (enumer2.MoveNext()) {
                 Assert.AreEqual("1", ((KeyValuePair<string, string>)enumer2.Current).Key);
             }
-
-            var items = ((IAnalysisDictionary)dict).GetItems();
-            Assert.AreEqual("1", items.First().Key);
-            Assert.AreEqual("One", items.First().Value);
         }
 
         [TestMethod, Priority(0)]

@@ -49,7 +49,7 @@ namespace Microsoft.NodejsTools.Analysis {
     /// free.
     /// </remarks>
     [Serializable]
-    internal class AnalysisDictionary<TKey, TValue> : IDictionary<TKey, TValue>, IAnalysisDictionary
+    internal class AnalysisDictionary<TKey, TValue> : IDictionary<TKey, TValue>
         where TKey : class
         where TValue : class {
 
@@ -518,13 +518,5 @@ namespace Microsoft.NodejsTools.Analysis {
         IEnumerator IEnumerable.GetEnumerator() {
             return GetEnumerator();
         }
-
-        KeyValuePair<object, object>[] IAnalysisDictionary.GetItems() {
-            return this.Select(x => new KeyValuePair<object, object>(x.Key, x.Value)).ToArray();
-        }
-    }
-
-    interface IAnalysisDictionary {
-        KeyValuePair<object, object>[] GetItems();
     }
 }

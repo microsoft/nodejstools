@@ -15,7 +15,6 @@
 using System;
 
 namespace Microsoft.NodejsTools.Analysis {
-    [AttributeUsage(AttributeTargets.Class)]
-    public sealed class AnalysisSerializeAsNullAttribute : Attribute {
+    public interface IAnalysisSerializeAsNull {
     }
 }

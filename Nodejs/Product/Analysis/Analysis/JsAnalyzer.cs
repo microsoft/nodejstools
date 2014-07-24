@@ -215,7 +215,7 @@ namespace Microsoft.NodejsTools.Analysis {
         /// about the underlying formats of our objects which is handled entirely with the
         /// SHA256 of our internal data structures.
         /// </summary>
-        private const int _analyzerVersion = 0x04;
+        private const int _analyzerVersion = 0x05;
 
         public static byte[] SerializationVersion {
             get {
@@ -240,7 +240,7 @@ namespace Microsoft.NodejsTools.Analysis {
                 foreach (var attr in attrs) {
                     var type = attr.Type;
                     sb.AppendLine(type.FullName);
-                    foreach (FieldInfo field in FormatterServices.GetSerializableMembers(type)) {
+                    foreach (FieldInfo field in AnalysisSerializer.GetSerializableMembers(type)) {
                         sb.Append(field.FieldType.FullName);
                         sb.Append(' ');
                         sb.Append(field.Name);

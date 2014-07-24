@@ -3754,11 +3754,11 @@ namespace Microsoft.NodejsTools.Parsing
         private static object[] _cachedDoubles = new object[200];
         private const int _smallestNegative = 2;
 
-        private static object BoxDouble(double doubleValue) {
+        internal static object BoxDouble(double doubleValue) {
             if ((doubleValue % 1) == 0 &&
                 doubleValue > -_smallestNegative &&
                 doubleValue < _cachedDoubles.Length - (_smallestNegative + 1)) {
-                int index = (int)doubleValue;
+                int index = (int)doubleValue + _smallestNegative;
                 object value;
                 if ((value = _cachedDoubles[index]) == null) {
                     value = _cachedDoubles[index] = (object)doubleValue;

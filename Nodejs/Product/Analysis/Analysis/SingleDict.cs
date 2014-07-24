@@ -28,7 +28,7 @@ namespace Microsoft.NodejsTools.Analysis {
         where TKey : class
         where TValue : class {
         [DebuggerBrowsable(DebuggerBrowsableState.Collapsed)]
-        private object _data; // AnalysisDictionary<TKey, TValue>, SingleEntry<TKey, TValue>
+        internal object _data; // AnalysisDictionary<TKey, TValue>, SingleEntry<TKey, TValue>
 
         [DebuggerBrowsable(DebuggerBrowsableState.RootHidden)]
         private KeyValuePair<TKey, TValue>[] AllItems {
@@ -50,7 +50,7 @@ namespace Microsoft.NodejsTools.Analysis {
 
         [Serializable]
         internal sealed class SingleDependency {
-            public readonly TKey Key;
+            public TKey Key;    // not readonly for serialization perf
             public TValue Value;
 
             public SingleDependency(TKey key, TValue value) {

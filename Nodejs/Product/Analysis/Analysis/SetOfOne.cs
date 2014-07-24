@@ -22,7 +22,7 @@ namespace Microsoft.NodejsTools.Analysis {
     /// <typeparam name="T"></typeparam>
     [Serializable]
     sealed class SetOfOne<T> : ISet<T> {
-        private readonly T _value;
+        private T _value;   // not readonly for serialization perf
 
         public SetOfOne(T value) {
             _value = value;

@@ -27,7 +27,7 @@ namespace Microsoft.NodejsTools.Analysis.Analyzer {
     /// </summary>
     [Serializable]
     internal class DependencyInfo {
-        private readonly int _version;
+        private int _version;   // not readonly for serialization perf
         private ISet<AnalysisUnit> _dependentUnits;
 
         public DependencyInfo(int version) {

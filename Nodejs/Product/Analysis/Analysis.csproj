@@ -162,7 +162,7 @@
     <Compile Include="Analysis\AnalysisDictionary.cs" />
     <Compile Include="Analysis\AnalysisExtensions.cs" />
     <Compile Include="Analysis\AnalysisSerializationSupportedTypeAttribute.cs" />
-    <Compile Include="Analysis\AnalysisSerializeAsNullAttribute.cs" />
+    <Compile Include="Analysis\IAnalysisSerializeAsNull.cs" />
     <Compile Include="Analysis\AnalysisSerializer.cs" />
     <Compile Include="Analysis\AnalysisLimits.cs" />
     <Compile Include="Analysis\AnalysisLog.cs" />
