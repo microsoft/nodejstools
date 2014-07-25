@@ -31,7 +31,7 @@ namespace NodejsTests {
             TypeConverter.StandardValuesCollection values = convert.GetStandardValues(null);
             //Assert
             Assert.AreEqual("ExportRunner", values[0]);
-            Assert.AreEqual("Mocha", values[1]);
+            Assert.AreEqual("mocha", values[1]);
             Assert.AreEqual(2, values.Count);
         }
     }

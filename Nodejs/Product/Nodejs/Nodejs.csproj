@@ -266,6 +266,9 @@
     <Compile Include="Debugger\LocalFileNameMapper.cs" />
     <Compile Include="Debugger\NodeProcess.cs" />
     <Compile Include="Debugger\ScriptTree.cs" />
+    <Compile Include="Editor\BraceCompletion\BraceKind.cs" />
+    <Compile Include="Editor\BraceCompletion\BraceCompletionContext.cs" />
+    <Compile Include="Editor\BraceCompletion\BraceCompletionContextProvider.cs" />
     <Compile Include="Editor\EditorExtensions.cs" />
     <Compile Include="Intellisense\AnalysisPriority.cs" />
     <Compile Include="Intellisense\AnalysisQueue.cs" />
@@ -741,19 +744,19 @@
     <Content Include="License.html">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
-    <EmbeddedResource Include="..\Icons\SolutionExplorerIconsPNG\NodeJSPackageMissing_16x.png" >
+    <EmbeddedResource Include="..\Icons\SolutionExplorerIconsPNG\NodeJSPackageMissing_16x.png">
       <Link>Resources\Icons\NodeJSPackageMissing_16x.png</Link>
       <LogicalName>Microsoft.VisualStudioTools.Resources.Icons.NodeJSPackageMissing_16x.png</LogicalName>
     </EmbeddedResource>
-    <EmbeddedResource Include="..\Icons\SolutionExplorerIconsPNG\NodeJSPackage_16x.png" >
+    <EmbeddedResource Include="..\Icons\SolutionExplorerIconsPNG\NodeJSPackage_16x.png">
       <Link>Resources\Icons\NodeJSPackage_16x.png</Link>
       <LogicalName>Microsoft.VisualStudioTools.Resources.Icons.NodeJSPackage_16x.png</LogicalName>
     </EmbeddedResource>
-    <EmbeddedResource Include="..\Icons\SolutionExplorerIconsPNG\PackageWarning_16x.png" >
+    <EmbeddedResource Include="..\Icons\SolutionExplorerIconsPNG\PackageWarning_16x.png">
       <Link>Resources\Icons\PackageWarning_16x.png</Link>
       <LogicalName>Microsoft.VisualStudioTools.Resources.Icons.PackageWarning_16x.png</LogicalName>
     </EmbeddedResource>
-    <EmbeddedResource Include="..\Icons\SolutionExplorerIconsPNG\TSProject_SolutionExplorerNode.png" >
+    <EmbeddedResource Include="..\Icons\SolutionExplorerIconsPNG\TSProject_SolutionExplorerNode.png">
       <Link>Resources\Icons\TSProject_SolutionExplorerNode.png</Link>
       <LogicalName>Microsoft.VisualStudioTools.Resources.Icons.TSProject_SolutionExplorerNode.png</LogicalName>
     </EmbeddedResource>
