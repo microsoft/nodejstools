@@ -72,7 +72,7 @@
   </ItemGroup>
 
   <PropertyGroup>
-    <CodeAnalysisRuleSet>$(TargetsPath)\TCWCS.ruleset</CodeAnalysisRuleSet>
+    <CodeAnalysisRuleSet>$(BuildRoot)\Build\xTVS.ruleset</CodeAnalysisRuleSet>
   </PropertyGroup>
 
 </Project>

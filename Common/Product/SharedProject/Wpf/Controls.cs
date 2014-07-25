@@ -55,6 +55,10 @@ namespace Microsoft.VisualStudioTools.Wpf {
         public static readonly object ControlForegroundDisabledKey = VsBrushes.ComboBoxDisabledGlyphKey;
         public static readonly object ControlBorderDisabledKey = VsBrushes.ComboBoxDisabledBorderKey;
 
+        public static readonly object ComboBoxPopupBackgroundKey = VsBrushes.ComboBoxPopupBackgroundGradientKey;
+        public static readonly object ComboBoxPopupBorderKey = VsBrushes.ComboBoxPopupBorderKey;
+        public static readonly object ComboBoxPopupForegroundKey = VsBrushes.WindowTextKey;
+
         public static readonly object ButtonForegroundPressedKey = VsBrushes.ActiveCaptionKey;
         public static readonly object ButtonBackgroundPressedKey = VsBrushes.ComboBoxMouseDownBorderKey;
         public static readonly object ButtonBackgroundHoverKey = VsBrushes.CommandBarHoverOverSelectedKey;
@@ -73,7 +77,11 @@ namespace Microsoft.VisualStudioTools.Wpf {
         public static readonly object ScrollBarArrowBackgroundPressedKey = VsBrushes.ScrollBarArrowPressedBackgroundKey;
         public static readonly object ScrollBarArrowBackgroundDisabledKey = VsBrushes.ScrollBarArrowDisabledBackgroundKey;
 
+#if DEV11_OR_LATER
         public static readonly object SearchGlyphBrushKey = SearchControlColors.SearchGlyphBrushKey;
+#else
+        public static readonly object SearchGlyphBrushKey = VsBrushes.WindowTextKey;
+#endif
 
         public static readonly BitmapSource UacShield = CreateUacShield();
 

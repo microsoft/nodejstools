@@ -47,7 +47,6 @@ namespace Microsoft.VisualStudioTools.Project {
         /// <param name="selectedNodes">The list of the selected nodes.</param>
         /// <param name="handled">An out parameter specifying that the command was handled.</param>
         /// <returns>If the method succeeds, it returns S_OK. If it fails, it returns an error code.</returns>
-        [SuppressMessage("Microsoft.Naming", "CA1702:CompoundWordsShouldBeCasedCorrectly", MessageId = "vaIn")]
         protected virtual int ExecCommandThatDependsOnSelectedNodes(Guid cmdGroup, uint cmdId, uint cmdExecOpt, IntPtr vaIn, IntPtr vaOut, CommandOrigin commandOrigin, IList<HierarchyNode> selectedNodes, out bool handled) {
             handled = false;
             if (cmdGroup == VsMenus.guidVsUIHierarchyWindowCmds) {
@@ -91,7 +90,6 @@ namespace Microsoft.VisualStudioTools.Project {
         /// <param name="commandOrigin">The origin of the command. From IOleCommandTarget or hierarchy.</param>
         /// <param name="handled">An out parameter specifying that the command was handled.</param>
         /// <returns>If the method succeeds, it returns S_OK. If it fails, it returns an error code.</returns>
-        [SuppressMessage("Microsoft.Naming", "CA1702:CompoundWordsShouldBeCasedCorrectly", MessageId = "vaIn")]
         protected virtual int ExecCommandIndependentOfSelection(Guid cmdGroup, uint cmdId, uint cmdExecOpt, IntPtr vaIn, IntPtr vaOut, CommandOrigin commandOrigin, out bool handled) {
             handled = false;
 
@@ -154,7 +152,6 @@ namespace Microsoft.VisualStudioTools.Project {
         /// <param name="vaOut">VARIANTARG structure to receive command output. Can be NULL.</param>
         /// <param name="commandOrigin">The origin of the command. From IOleCommandTarget or hierarchy.</param>
         /// <returns>If the method succeeds, it returns S_OK. If it fails, it returns an error code.</returns>
-        [SuppressMessage("Microsoft.Naming", "CA1702:CompoundWordsShouldBeCasedCorrectly", MessageId = "vaIn")]
         protected virtual int InternalExecCommand(Guid cmdGroup, uint cmdId, uint cmdExecOpt, IntPtr vaIn, IntPtr vaOut, CommandOrigin commandOrigin) {
             if (IsClosed) {
                 return (int)OleConstants.OLECMDERR_E_NOTSUPPORTED;
@@ -162,6 +159,22 @@ namespace Microsoft.VisualStudioTools.Project {
 
             if (cmdGroup == Guid.Empty) {
                 return (int)OleConstants.OLECMDERR_E_NOTSUPPORTED;
+            }
+
+            if ((cmdExecOpt & 0xFFFF) == (uint)OLECMDEXECOPT.OLECMDEXECOPT_SHOWHELP &&
+                (cmdExecOpt >> 16) == (uint)VsMenus.VSCmdOptQueryParameterList &&
+                vaOut != IntPtr.Zero) {
+                // The command accepts arguments and VS is trying to get the
+                // format string before executing the actual command.
+                // Format strings are space-separated lists of switches:
+                //
+                //   s,s1,switch1 w,s2,switch2 ...
+                var args = QueryCommandArguments(cmdGroup, cmdId, commandOrigin);
+                if (string.IsNullOrEmpty(args)) {
+                    return (int)OleConstants.OLECMDERR_E_NOTSUPPORTED;
+                }
+                Marshal.GetNativeVariantForObject(args, vaOut);
+                return VSConstants.S_OK;
             }
 
             IList<HierarchyNode> selectedNodes = GetSelectedNodes();
@@ -207,6 +220,14 @@ namespace Microsoft.VisualStudioTools.Project {
             }
 
             return returnValue;
+        }
+
+        /// <summary>
+        /// Returns a space-separated string representing the supported switches
+        /// for the specified command.
+        /// </summary>
+        protected internal virtual string QueryCommandArguments(Guid cmdGroup, uint cmdId, CommandOrigin commandOrigin) {
+            return null;
         }
 
         #endregion
@@ -261,7 +282,6 @@ namespace Microsoft.VisualStudioTools.Project {
         /// <param name="selectedNodes">The list of selected nodes.</param>
         /// <param name="handled">Specifies whether the menu was handled.</param>
         /// <returns>A QueryStatusResult describing the status of the menu.</returns>
-        [SuppressMessage("Microsoft.Naming", "CA1704:IdentifiersShouldBeSpelledCorrectly", MessageId = "Multi")]
         protected virtual QueryStatusResult DisableCommandOnNodesThatDoNotSupportMultiSelection(Guid cmdGroup, uint cmd, IList<HierarchyNode> selectedNodes, out bool handled) {
             handled = false;
             QueryStatusResult queryResult = QueryStatusResult.NOTSUPPORTED;
@@ -306,7 +326,6 @@ namespace Microsoft.VisualStudioTools.Project {
         /// <param name="commandGroup">Unique identifier of the command group</param>
         /// <param name="command">The command to be executed.</param>
         /// <returns>A QueryStatusResult describing the status of the menu.</returns>
-        [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Maintainability", "CA1502:AvoidExcessiveComplexity"), SuppressMessage("Microsoft.Naming", "CA1702:CompoundWordsShouldBeCasedCorrectly", MessageId = "InCurrent")]
         protected virtual bool DisableCmdInCurrentMode(Guid commandGroup, uint command) {
             if (IsClosed) {
                 return false;
@@ -371,10 +390,6 @@ namespace Microsoft.VisualStudioTools.Project {
         /// <param name="pCmdText">Pointer to an OLECMDTEXT structure in which to return the name and/or status information of a single command. Can be NULL to indicate that the caller does not require this information. </param>
         /// <param name="commandOrigin">Specifies the origin of the command. Either it was called from the QueryStatusCommand on IVsUIHierarchy or from the IOleCommandTarget</param>
         /// <returns>If the method succeeds, it returns S_OK. If it fails, it returns an error code.</returns>
-        [SuppressMessage("Microsoft.Naming", "CA1704:IdentifiersShouldBeSpelledCorrectly", MessageId = "Cmds")]
-        [SuppressMessage("Microsoft.Naming", "CA1704:IdentifiersShouldBeSpelledCorrectly", MessageId = "c")]
-        [SuppressMessage("Microsoft.Naming", "CA1704:IdentifiersShouldBeSpelledCorrectly", MessageId = "p")]
-        [SuppressMessage("Microsoft.Naming", "CA1704:IdentifiersShouldBeSpelledCorrectly", MessageId = "prg")]
         protected virtual int QueryStatusSelection(Guid cmdGroup, uint cCmds, OLECMD[] prgCmds, IntPtr pCmdText, CommandOrigin commandOrigin) {
             if (IsClosed) {
                 return (int)OleConstants.OLECMDERR_E_NOTSUPPORTED;
@@ -456,7 +471,6 @@ namespace Microsoft.VisualStudioTools.Project {
         /// <param name="cmd">The command id to query for.</param>
         /// <param name="pCmdText">Pointer to an OLECMDTEXT structure in which to return the name and/or status information of a single command. Can be NULL to indicate that the caller does not require this information. </param>
         /// <returns>Retuns the result of the query on the slected nodes.</returns>
-        [SuppressMessage("Microsoft.Naming", "CA1704:IdentifiersShouldBeSpelledCorrectly", MessageId = "p")]
         protected virtual QueryStatusResult QueryStatusSelectionOnNodes(IList<HierarchyNode> selectedNodes, Guid cmdGroup, uint cmd, IntPtr pCmdText) {
             if (selectedNodes == null || selectedNodes.Count == 0) {
                 return QueryStatusResult.NOTSUPPORTED;

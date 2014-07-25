@@ -13,6 +13,7 @@
  * ***************************************************************************/
 
 using System;
+using System.Diagnostics.CodeAnalysis;
 using System.Reflection;
 using System.Runtime.InteropServices;
 using System.Text;
@@ -760,7 +761,7 @@ namespace Microsoft.VisualStudioTools.Project {
         public extern static bool DuplicateToken(IntPtr ExistingTokenHandle,
            int SECURITY_IMPERSONATION_LEVEL, ref IntPtr DuplicateTokenHandle);
 
-        [DllImport("ADVAPI32.dll", SetLastError = true)]
+        [DllImport("ADVAPI32.dll", SetLastError = true, CharSet = CharSet.Unicode)]
         internal static extern bool LogonUser(
             [In] string lpszUsername,
             [In] string lpszDomain,
@@ -774,7 +775,7 @@ namespace Microsoft.VisualStudioTools.Project {
         [return: MarshalAs(UnmanagedType.Bool)]
         public static extern bool CloseHandle(IntPtr handle);
 
-        [DllImport("kernel32.dll", SetLastError = true)]
+        [DllImport("kernel32.dll", SetLastError = true, CharSet = CharSet.Unicode)]
         public static extern uint GetFinalPathNameByHandle(
             SafeHandle hFile,
             [Out]StringBuilder lpszFilePath,
@@ -782,7 +783,7 @@ namespace Microsoft.VisualStudioTools.Project {
             uint dwFlags
         );
 
-        [DllImport("kernel32.dll", SetLastError = true)]
+        [DllImport("kernel32.dll", SetLastError = true, CharSet = CharSet.Unicode)]
         public static extern SafeFileHandle CreateFile(
             string lpFileName,
             FileDesiredAccess dwDesiredAccess,
@@ -835,7 +836,7 @@ namespace Microsoft.VisualStudioTools.Project {
             LOGON32_PROVIDER_WINNT50
         }
 
-        [DllImport("msi.dll", CharSet = CharSet.Auto)]
+        [DllImport("msi.dll", CharSet = CharSet.Unicode)]
         internal static extern MsiInstallState MsiGetComponentPath(string szProduct, string szComponent, [Out]StringBuilder lpPathBuf, ref uint pcchBuf);
 
         /// <summary>
@@ -844,7 +845,7 @@ namespace Microsoft.VisualStudioTools.Project {
         /// <param name="szComponent"></param>
         /// <param name="lpProductBuf"></param>
         /// <returns></returns>
-        [DllImport("msi.dll", CharSet = CharSet.Auto)]
+        [DllImport("msi.dll", CharSet = CharSet.Unicode)]
         internal static extern uint MsiGetProductCode(string szComponent, [Out]StringBuilder lpProductBuf);
 
 
@@ -863,6 +864,27 @@ namespace Microsoft.VisualStudioTools.Project {
             Local = 3,  // installed on local drive
             Source = 4,  // run from source, CD or net
             Default = 5  // use default, local or source
+        }
+
+        [DllImport("user32", CallingConvention = CallingConvention.Winapi)]
+        public static extern bool AllowSetForegroundWindow(int dwProcessId);
+
+        [DllImport("mpr", CharSet = CharSet.Unicode)]
+        public static extern uint WNetAddConnection3(IntPtr handle, ref _NETRESOURCE lpNetResource, string lpPassword, string lpUsername, uint dwFlags);
+
+        public const int CONNECT_INTERACTIVE = 0x08;
+        public const int CONNECT_PROMPT = 0x10;
+        public const int RESOURCETYPE_DISK = 1;
+
+        public struct _NETRESOURCE {
+            public uint dwScope;
+            public uint dwType;
+            public uint dwDisplayType;
+            public uint dwUsage;
+            public string lpLocalName;
+            public string lpRemoteName;
+            public string lpComment;
+            public string lpProvider;
         }
 
         [DllImport("kernel32.dll", CharSet = CharSet.Unicode, SetLastError = true)]
@@ -986,6 +1008,7 @@ namespace Microsoft.VisualStudioTools.Project {
             public string userName;
         };
 
+        [SuppressMessage("Microsoft.Design", "CA1060:MovePInvokesToNativeMethodsClass")]
         [DllImport(advapi32Dll, CharSet = CharSet.Unicode, SetLastError = true, EntryPoint = "CredReadW")]
         public static extern bool
         CredRead(
@@ -998,6 +1021,7 @@ namespace Microsoft.VisualStudioTools.Project {
             out IntPtr credential
             );
 
+        [SuppressMessage("Microsoft.Design", "CA1060:MovePInvokesToNativeMethodsClass")]
         [DllImport(advapi32Dll, CharSet = CharSet.Unicode, SetLastError = true, EntryPoint = "CredWriteW")]
         public static extern bool
         CredWrite(
@@ -1006,12 +1030,14 @@ namespace Microsoft.VisualStudioTools.Project {
             uint flags
             );
 
+        [SuppressMessage("Microsoft.Design", "CA1060:MovePInvokesToNativeMethodsClass")]
         [DllImport(advapi32Dll, SetLastError = true)]
         public static extern bool
         CredFree(
             IntPtr buffer
             );
 
+        [SuppressMessage("Microsoft.Design", "CA1060:MovePInvokesToNativeMethodsClass")]
         [DllImport(credUIDll, EntryPoint = "CredUIPromptForCredentialsW", CharSet = CharSet.Unicode)]
         public static extern CredUIReturnCodes CredUIPromptForCredentials(
             CREDUI_INFO pUiInfo,  // Optional (one can pass null here)
@@ -1037,6 +1063,7 @@ namespace Microsoft.VisualStudioTools.Project {
         /// ERROR_INSUFFICIENT_BUFFER
         /// ERROR_INVALID_PARAMETER
         /// </returns>
+        [SuppressMessage("Microsoft.Design", "CA1060:MovePInvokesToNativeMethodsClass")]
         [DllImport(credUIDll, CharSet = CharSet.Unicode, SetLastError = true, EntryPoint = "CredUIParseUserNameW")]
         public static extern CredUIReturnCodes CredUIParseUserName(
             [MarshalAs(UnmanagedType.LPWStr)]

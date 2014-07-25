@@ -88,8 +88,6 @@ namespace Microsoft.VisualStudioTools.Project {
                 ImageHandler.AddImage(img);
             }
 
-            InitializeCATIDs();
-
             package.OnIdle += OnIdle;
         }
 
@@ -501,14 +499,22 @@ namespace Microsoft.VisualStudioTools.Project {
         }
 
         protected override void Dispose(bool disposing) {
+            if (disposing) {
 #if DEV11_OR_LATER
-            HierarchyManager = null;
+                HierarchyManager = null;
 #endif
 
-            if (this._userBuildProject != null) {
-                _userBuildProject.ProjectCollection.UnloadProject(_userBuildProject);
+                var pdl = _projectDocListenerForStartupFileUpdates;
+                _projectDocListenerForStartupFileUpdates = null;
+                if (pdl != null) {
+                    pdl.Dispose();
+                }
+
+                if (this._userBuildProject != null) {
+                    _userBuildProject.ProjectCollection.UnloadProject(_userBuildProject);
+                }
+                _package.OnIdle -= OnIdle;
             }
-            _package.OnIdle -= OnIdle;
 
             base.Dispose(disposing);
         }
@@ -1125,7 +1131,7 @@ namespace Microsoft.VisualStudioTools.Project {
 
                     if (Directory.Exists(_path)) {
                         if (IsFileSymLink(_path)) {
-                            string parentDir = Path.GetDirectoryName(CommonUtils.TrimEndSeparator(_path)) + Path.DirectorySeparatorChar;
+                            string parentDir = CommonUtils.GetParent(_path);
                             if (IsRecursiveSymLink(parentDir, _path)) {
                                 // don't add recusrive sym link directory
                                 return;
@@ -1593,7 +1599,7 @@ namespace Microsoft.VisualStudioTools.Project {
         /// <summary>
         /// Provide mapping from our browse objects and automation objects to our CATIDs
         /// </summary>
-        private void InitializeCATIDs() {
+        protected override void InitializeCATIDs() {
             // The following properties classes are specific to current language so we can use their GUIDs directly
             AddCATIDMapping(typeof(OAProject), typeof(OAProject).GUID);
             // The following is not language specific and as such we need a separate GUID
@@ -1606,7 +1612,7 @@ namespace Microsoft.VisualStudioTools.Project {
             // as the browse object of the project node so that filtering is possible.
             var genPropPage = GetGeneralPropertyPageType();
             if (genPropPage != null) {
-                AddCATIDMapping(GetGeneralPropertyPageType(), GetGeneralPropertyPageType().GUID);
+                AddCATIDMapping(genPropPage, genPropPage.GUID);
             }
             // We could also provide CATIDs for references and the references container node, if we wanted to.
         }

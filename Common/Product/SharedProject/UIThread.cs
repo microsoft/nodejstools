@@ -114,11 +114,6 @@ namespace Microsoft.VisualStudioTools {
             }
         }
 
-        [Conditional("DEBUG")]
-        public static void MustNotBeCalledFromUIThread() {
-            MustNotBeCalledFromUIThread("Invalid UI-thread call");
-        }
-
         /// <summary>
         /// Executes the specified action on the UI thread. Returns once the
         /// action has been completed.
