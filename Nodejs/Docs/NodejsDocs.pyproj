@@ -12,7 +12,7 @@
     <Name>NodejsDocs</Name>
     <RootNamespace>NodejsDocs</RootNamespace>
     <InterpreterId>{2af0f10d-7135-4994-9156-5d01c9c11b7e}</InterpreterId>
-    <InterpreterVersion>3.3</InterpreterVersion>
+    <InterpreterVersion>3.4</InterpreterVersion>
     <LaunchProvider>Standard Python launcher</LaunchProvider>
     <CommandLineArguments>--site nodejstools --doc-root Nodejs\Docs --dir User</CommandLineArguments>
     <InterpreterPath />
@@ -148,37 +148,22 @@
     <Content Include="User\Images\DebuggingStepping.png" />
     <Content Include="User\Images\DebuggingWatch.jpg" />
     <Content Include="User\Images\DebuggingWatch.png" />
-    <Content Include="User\Images\DependencyBundledMissing_16.png" />
-    <Content Include="User\Images\DependencyBundled_16.png" />
-    <Content Include="User\Images\DependencyDevMissing_16.png" />
-    <Content Include="User\Images\DependencyDev_16.png" />
-    <Content Include="User\Images\DependencyExtraneousBundled_16.png" />
-    <Content Include="User\Images\DependencyExtraneous_16.png" />
-    <Content Include="User\Images\DependencyMissing_16.png" />
-    <Content Include="User\Images\DependencyOptionalMissing_16.png" />
-    <Content Include="User\Images\DependencyOptional_16.png" />
-    <Content Include="User\Images\Dependency_16.png" />
     <Content Include="User\Images\InstallationMSI.png" />
     <Content Include="User\Images\InstallationREPL.png" />
     <Content Include="User\Images\InstallationREPLCommand.png" />
     <Content Include="User\Images\LinkedFileIcon.png" />
-    <Content Include="User\Images\npm-catalog-retrieval.png" />
-    <Content Include="User\Images\npm-context-menu.png" />
-    <Content Include="User\Images\npm-dev-opt-explorer.png" />
-    <Content Include="User\Images\npm-dev-opt-management.png" />
-    <Content Include="User\Images\npm-global-warning.png" />
-    <Content Include="User\Images\npm-install-as-combo.png" />
-    <Content Include="User\Images\npm-install-from-details-log.png" />
-    <Content Include="User\Images\npm-install-from-details.png" />
-    <Content Include="User\Images\npm-install-from-search-log.png" />
-    <Content Include="User\Images\npm-install-from-search.png" />
+    <Content Include="User\Images\npm-context-menu-install-packages.png" />
+    <Content Include="User\Images\npm-expanded-module-treeview.png" />
+    <Content Include="User\Images\npm-install-executing-details.png" />
+    <Content Include="User\Images\npm-install-new-package.png" />
+    <Content Include="User\Images\npm-interactive-window.png" />
     <Content Include="User\Images\npm-log.png" />
-    <Content Include="User\Images\npm-package-manager.png" />
-    <Content Include="User\Images\npm-search-filtering.png" />
-    <Content Include="User\Images\npm-solution-explorer.png" />
-    <Content Include="User\Images\npm-specify-package-details.png" />
-    <Content Include="User\Images\npm-uninstall-local-log.png" />
-    <Content Include="User\Images\npm-uninstall.png" />
+    <Content Include="User\Images\npm-open-command-prompt-here.png" />
+    <Content Include="User\Images\npm-package-installed.png" />
+    <Content Include="User\Images\npm-package-missing.png" />
+    <Content Include="User\Images\npm-package-warning.png" />
+    <Content Include="User\Images\npm-solution-explorer" />
+    <Content Include="User\Images\npm-solution-explorer-context-menu.png" />
     <Content Include="User\Images\prof-callercalee.png" />
     <Content Include="User\Images\prof-calltree.png" />
     <Content Include="User\Images\prof-compare-result.png" />
@@ -245,7 +230,7 @@
     </Compile>
   </ItemGroup>
   <ItemGroup>
-    <InterpreterReference Include="{2af0f10d-7135-4994-9156-5d01c9c11b7e}\3.3" />
+    <InterpreterReference Include="{2af0f10d-7135-4994-9156-5d01c9c11b7e}\3.4" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.Common.targets" />
 </Project>
