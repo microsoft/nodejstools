@@ -162,7 +162,7 @@
     <Content Include="User\Images\npm-package-installed.png" />
     <Content Include="User\Images\npm-package-missing.png" />
     <Content Include="User\Images\npm-package-warning.png" />
-    <Content Include="User\Images\npm-solution-explorer" />
+    <Content Include="User\Images\npm-solution-explorer.png" />
     <Content Include="User\Images\npm-solution-explorer-context-menu.png" />
     <Content Include="User\Images\prof-callercalee.png" />
     <Content Include="User\Images\prof-calltree.png" />
