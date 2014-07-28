@@ -2,8 +2,6 @@
 
 When developing, most of your time is spent in the text editor. Node.js Tools provides a rich editor with functionality to help you be more productive, such as syntax highlighting, identifier and member completion, signature help, method overrides, and search and navigation. A background analysis engine runs your code in the background to determine the possible members of each variable, ensuring that the information provided is accurate and up to date.
 
-Node.js Tools uses the same JavaScript language service as various other JavaScript-based project types in Visual Studio. Please refer to its [documentation](http://msdn.microsoft.com/en-US/library/vstudio/bb385682.aspx) on MSDN for more information.
-
 This section will cover the most commonly used editor features in more detail.
 
 ## IntelliSense
@@ -38,7 +36,8 @@ Signature help is displayed when writing a function call, and includes any docum
 
 (To stop automatically showing signature help, disable Tools -> Options -> Text Editor -> Node.js -> General -> Parameter information. You can still manually display signature help by pressing Ctrl+Shift+Space.)
 
+### Settings
 
-## Known bugs and issues for alpha
+The new analysis engine introduced in NTVS Beta 2 should do a better job of providing completions in larger projects and should be faster to provide those completions.
 
-For large projects with lots of packages, Intellisense will sometimes stop working partway through the file.  This is dependent upon how many `require` calls are in the file, and how many other packages the required packages require, as well as the speed of your computer, and the amount of free RAM.
+You can change the amount of CPU time and memory used or disable it completely in Tools -> Options -> Text Editor -> Node.js -> IntelliSense.
