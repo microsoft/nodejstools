@@ -11,7 +11,7 @@
  * You must not remove this notice, or any other, from this software.
  *
  * ***************************************************************************/
-
+#if DEV12_OR_LATER
 using System.ComponentModel.Composition;
 using Microsoft.NodejsTools.Classifier;
 using Microsoft.VisualStudio.Text;
@@ -57,3 +57,4 @@ namespace Microsoft.NodejsTools.Editor.BraceCompletion {
 		}
 	}
 }
+#endif

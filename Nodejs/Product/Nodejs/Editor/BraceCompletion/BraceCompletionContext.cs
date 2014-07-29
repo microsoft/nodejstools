@@ -11,7 +11,7 @@
  * You must not remove this notice, or any other, from this software.
  *
  * ***************************************************************************/
-
+#if DEV12_OR_LATER
 using System.ComponentModel.Composition;
 using Microsoft.VisualStudio.Text.BraceCompletion;
 
@@ -29,3 +29,4 @@ namespace Microsoft.NodejsTools.Editor.BraceCompletion {
 		public void Start(IBraceCompletionSession session) { }
 	}
 }
+#endif
