@@ -42,15 +42,17 @@ namespace Microsoft.NodejsTools.TestAdapter {
                 
         private readonly ManualResetEvent _cancelRequested = new ManualResetEvent(false);
 
-        private ProcessOutput _nodeProcess = null;
-        private bool _nodeProcessKilled = false;
+        private ProcessOutput _nodeProcess;
+        private bool _nodeProcessKilled;
 
         public void Cancel() {
             _cancelRequested.Set();
             try {
                 _nodeProcess.Kill();
                 _nodeProcessKilled = true;
-            } catch {};
+            } catch (Exception ex) {
+                Trace.WriteLine(TestMessageLevel.Error, ex.ToString());
+            };
         }
 
         /// <summary>
