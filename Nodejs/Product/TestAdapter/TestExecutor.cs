@@ -42,8 +42,15 @@ namespace Microsoft.NodejsTools.TestAdapter {
                 
         private readonly ManualResetEvent _cancelRequested = new ManualResetEvent(false);
 
+        private ProcessOutput _nodeProcess = null;
+        private bool _nodeProcessKilled = false;
+
         public void Cancel() {
             _cancelRequested.Set();
+            try {
+                _nodeProcess.Kill();
+                _nodeProcessKilled = true;
+            } catch {};
         }
 
         /// <summary>
@@ -161,7 +168,7 @@ namespace Microsoft.NodejsTools.TestAdapter {
                 frameworkHandle.SendMessage(TestMessageLevel.Error, "Interpreter path does not exist: " + settings.NodeExePath);
                 return;
             }
-            using (var proc = ProcessOutput.Run(
+            using (_nodeProcess = ProcessOutput.Run(
                                     settings.NodeExePath,
                                     args,
                                     workingDir,
@@ -169,21 +176,21 @@ namespace Microsoft.NodejsTools.TestAdapter {
                                     false,
                                     null,
                                     false)) {
-                bool killed = false;
+                _nodeProcessKilled = false;
 
 #if DEBUG
                 frameworkHandle.SendMessage(TestMessageLevel.Informational, "cd " + workingDir);
-                frameworkHandle.SendMessage(TestMessageLevel.Informational, proc.Arguments);
+                frameworkHandle.SendMessage(TestMessageLevel.Informational, _nodeProcess.Arguments);
 #endif
 
-                proc.Wait(TimeSpan.FromMilliseconds(500));
+                _nodeProcess.Wait(TimeSpan.FromMilliseconds(500));
                 if (runContext.IsBeingDebugged && app != null) {
                     try {
                         //the '#ping=0' is a special flag to tell VS node debugger not to connect to the port,
                         //because a connection carries the consequence of setting off --debug-brk, and breakpoints will be missed.
                         string qualifierUri = string.Format("tcp://localhost:{0}#ping=0", port);
-                        while (!app.AttachToProcess(proc, NodejsRemoteDebugPortSupplierUnsecuredId, qualifierUri)) {
-                            if (proc.Wait(TimeSpan.FromMilliseconds(500))) {
+                        while (!app.AttachToProcess(_nodeProcess, NodejsRemoteDebugPortSupplierUnsecuredId, qualifierUri)) {
+                            if (_nodeProcess.Wait(TimeSpan.FromMilliseconds(500))) {
                                 break;
                             }
                         }
@@ -191,8 +198,9 @@ namespace Microsoft.NodejsTools.TestAdapter {
                     } catch (COMException ex) {
                         frameworkHandle.SendMessage(TestMessageLevel.Error, "Error occurred connecting to debuggee.");
                         frameworkHandle.SendMessage(TestMessageLevel.Error, ex.ToString());
-                        proc.Kill();
-                        killed = true;
+                        _nodeProcess.Kill();
+                        _nodeProcess = null;
+                        _nodeProcessKilled = true;
                     }
 #else
                     } catch (COMException) {
@@ -202,16 +210,11 @@ namespace Microsoft.NodejsTools.TestAdapter {
                     }
 #endif
                 }
-
-                if (!killed && WaitHandle.WaitAny(new WaitHandle[] { _cancelRequested, proc.WaitHandle }) == 0) {
-                    proc.Kill();
-                    killed = true;
-                } else {
-                    RecordEnd(frameworkHandle, test, testResult,
-                        string.Join(Environment.NewLine, proc.StandardOutputLines),
-                        string.Join(Environment.NewLine, proc.StandardErrorLines),
-                        (proc.ExitCode == 0 && !killed) ? TestOutcome.Passed : TestOutcome.Failed);
-                }
+                WaitHandle.WaitAll(new WaitHandle[] { _nodeProcess.WaitHandle });
+                RecordEnd(frameworkHandle, test, testResult,
+                    string.Join(Environment.NewLine, _nodeProcess.StandardOutputLines),
+                    string.Join(Environment.NewLine, _nodeProcess.StandardErrorLines),
+                    (_nodeProcess.ExitCode == 0 && !_nodeProcessKilled) ? TestOutcome.Passed : TestOutcome.Failed);
             }
         }
 
