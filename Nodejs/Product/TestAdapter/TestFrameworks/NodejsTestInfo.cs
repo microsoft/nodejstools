@@ -19,40 +19,30 @@ namespace Microsoft.NodejsTools.TestAdapter.TestFrameworks {
     class NodejsTestInfo {
         public NodejsTestInfo(string fullyQualifiedName) {
             string[] parts = fullyQualifiedName.Split(new string[] { "::" }, StringSplitOptions.None);
-            if (parts.Length != 4) {
+            if (parts.Length != 3) {
                 throw new ArgumentException("Invalid fully qualified test name");
             }
             ModulePath = parts[0];
-            ModuleName = parts[1];
-            TestName = parts[2];
-            TestFramework = parts[3];
+            TestName = parts[1];
+            TestFramework = parts[2];
         }
 
         public NodejsTestInfo(string modulePath, string testName, string modulaName, string testFramework)
         {
             ModulePath = modulePath;
-            ModuleName = modulaName;
             TestName = testName;
             TestFramework = testFramework;
         }
 
         public string FullyQualifiedName {
             get {
-                return ModulePath + "::" + ModuleName + "::" + TestName + "::" + TestFramework;
+                return ModulePath + "::" + TestName + "::" + TestFramework;
             }
         }
         public string ModulePath { get; private set; }
 
-        public string ModuleName { get; private set; }
-
         public string TestName { get; private set; }
 
         public string TestFramework { get; private set; }
-
-        public string DisplayName {
-            get {
-                return string.IsNullOrWhiteSpace(ModuleName) ? TestName : string.Format("{0}:{1}", ModuleName, TestName);
-            }
-        }
     }
 }

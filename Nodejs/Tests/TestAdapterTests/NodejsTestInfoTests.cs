@@ -23,7 +23,7 @@ namespace TestAdapterTests {
             Assert.AreEqual(testName, testInfo.TestName);
             Assert.AreEqual(testFramework, testInfo.TestFramework);
             Assert.AreEqual(testFile, testInfo.ModulePath);
-            Assert.AreEqual(testSuiteName + ":" + testName, testInfo.DisplayName);
+            Assert.AreEqual(testName, testInfo.TestName);
         }
 
         [TestMethod, Priority(0)]

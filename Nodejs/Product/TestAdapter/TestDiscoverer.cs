@@ -29,7 +29,6 @@ namespace Microsoft.NodejsTools.TestAdapter {
     [DefaultExecutorUri(TestExecutor.ExecutorUriString)]
     class TestDiscoverer : ITestDiscoverer {
         public TestDiscoverer() {
-            System.Diagnostics.Debugger.Break();
         }
 
         /// <summary>
@@ -105,7 +104,7 @@ namespace Microsoft.NodejsTools.TestAdapter {
                                     var testCase = new TestCase(qualifiedName, TestExecutor.ExecutorUri, projSource) {
                                         CodeFilePath = testFileAbsolutePath,
                                         LineNumber = 0,
-                                        DisplayName = discoveredTest.DisplayName
+                                        DisplayName = discoveredTest.TestName
                                     };
                                     discoverySink.SendTestCase(testCase);
                                 }
