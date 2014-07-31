@@ -52,7 +52,6 @@ namespace Microsoft.NodejsTools.TestAdapter {
             _cancelRequested.Set();
         }
 
-
         /// <summary>
         /// This is the equivallent of "RunAll" functionality
         /// </summary>
