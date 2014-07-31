@@ -247,41 +247,41 @@ def main(start_dir, site, doc_root, list_outputs_only):
     
     sources = os.path.join(BUILD_ROOT, doc_root)
     if not list_outputs_only:
-    print('Reading from ' + sources)
+        print('Reading from ' + sources)
     
     for dirname, _, filenames in os.walk(sources):
         for filename in (f for f in filenames if f.upper().endswith('.MD')):
             if not list_outputs_only:
-            print('Converting {}'.format(filename))
-            cwd = os.getcwd()
-            os.chdir(dirname)
-            try:
-                with open(filename, 'r', encoding='utf-8-sig') as src:
-                    text = src.read()
+                print('Converting {}'.format(filename))
+                cwd = os.getcwd()
+                os.chdir(dirname)
+                try:
+                    with open(filename, 'r', encoding='utf-8-sig') as src:
+                        text = src.read()
             
-                # Do our own link replacements, rather than markdown2's
-                for pattern, repl, has_outputs in link_mapper.patterns:
-                    if list_outputs_only:
-                        if has_outputs:
-                            for mo in re.finditer(pattern, text):
-                                repl(mo)
-                    else:
-                    text = re.sub(pattern, repl, text)
+                    # Do our own link replacements, rather than markdown2's
+                    for pattern, repl, has_outputs in link_mapper.patterns:
+                        if list_outputs_only:
+                            if has_outputs:
+                                for mo in re.finditer(pattern, text):
+                                    repl(mo)
+                        else:
+                            text = re.sub(pattern, repl, text)
             
-                html_filename = filename[:-3] + '.html'
+                    html_filename = filename[:-3] + '.html'
 
-                if list_outputs_only:
-                    log_output(html_filename)
-                else:
-                html = markdown.convert(text)
+                    if list_outputs_only:
+                        log_output(html_filename)
+                    else:
+                        html = markdown.convert(text)
             
-                # Do any post-conversion replacements
-                for pattern, repl in HTML_PATTERNS:
-                    html = re.sub(pattern, repl, html)
+                    # Do any post-conversion replacements
+                    for pattern, repl in HTML_PATTERNS:
+                        html = re.sub(pattern, repl, html)
             
-                    with open(html_filename, 'w', encoding='utf-8') as dest:
-                    dest.write(HEADER)
-                    dest.write(html)
-                    dest.write(FOOTER.format(filename))
-            finally:
-                os.chdir(cwd)
+                        with open(html_filename, 'w', encoding='utf-8') as dest:
+                            dest.write(HEADER)
+                            dest.write(html)
+                            dest.write(FOOTER.format(filename))
+                finally:
+                    os.chdir(cwd)

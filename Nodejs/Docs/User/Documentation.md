@@ -23,7 +23,8 @@ Features in Depth
 	* [wiki:"Azure Web Site using Web Deploy" AzureWebSiteWebDeploy]
 	* [wiki:"Azure Web Site using Git" AzureWebSiteGit]
 	* [wiki:"Azure Cloud Service - Web Role and Worker Role" AzureCloudService]
-* [wiki:"Unit Tests" UnitTests]
+* [wiki:"Test Explorer" TestExplorer]
+	* [wiki:"Extensibility" TestFrameworkExtensibility]
 
 Release Notes
 -------------

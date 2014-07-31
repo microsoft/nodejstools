@@ -1,4 +1,4 @@
-Unit Tests
+Test Explorer
 ==========
 
 Unit tests are short sections of code that test small pieces of functionality belonging to a larger program. By demonstrating that each piece of a program is correct, it is easier to infer that the entire program is correct.
@@ -103,27 +103,12 @@ Tests that fail are shown with a red cross.
 
 ![Test Failed](Images/UnitTestsRunFailed.png)
 
- The "Output" link can be clicked to display the text that was printed to the console during the test, including the standard unittest output.
+The "Output" link can be clicked to display the text that was printed to the console during the test, including the standard unittest output.
 
 ![Test Output](Images/UnitTestsRunFailedOutput.png)
 
 Test Framework Extensibility
 ============================
 
-NTVS can be extended to support additional test frameworks by implementing the discovery and execution logic using JavaScript.
+NTVS can be extended to support additional test frameworks by implementing the discovery and execution logic.  See [wiki:"Test Framework Extensibility" TestFrameworkExtensibility] for details.
 
-In the following location:
-`<VisualStudioFolder>\Common7\IDE\Extensions\Microsoft\Node.js Tools for Visual Studio\1.0\TestFrameworks`
-
-You'll see folders for ExportRunner and Mocha.
-
-Under each folder, a JavaScript file named after the folder contains 2 exported functions:
-
-* `find_tests`
-* `run_tests`
-
-See the implementation of ExportRunner and Mocha for examples of `find_tests` and `run_tests` implementations.
-
-In your NTVS project, make sure to set the TestFramework property on your test file(s) to match the name of the subfolder under TestFrameworks.
-
-If you implement support for other test frameworks and wish to contribute them, please let us know!
