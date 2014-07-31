@@ -151,13 +151,16 @@ namespace Microsoft.NodejsTools.Editor.ShowBraces {
 		private static void GetOpeningAndClosureCount(SnapshotPoint snapshotPoint, char openBrace, char closeBrace, ref int closeBracesEncountered, ref int openBracesEncountered) {
 			var classifier = snapshotPoint.Snapshot.TextBuffer.GetNodejsClassifier();
 
-			var classifications = classifier.GetClassificationSpans(new SnapshotSpan(snapshotPoint, 1));
-			foreach (var classification in classifications) {
-				if (classification.ClassificationType.IsOfType(NodejsPredefinedClassificationTypeNames.Grouping) && classification.Span.Length == 1) {
-					if (classification.Span.GetText() == openBrace.ToString()) {
-						openBracesEncountered++;
-					} else if (classification.Span.GetText() == closeBrace.ToString()) {
-						closeBracesEncountered++;
+			// If the classifier is null, rather than throw, we should just return without doing anything.
+			if (classifier != null) {
+				var classifications = classifier.GetClassificationSpans(new SnapshotSpan(snapshotPoint, 1));
+				foreach (var classification in classifications) {
+					if (classification.ClassificationType.IsOfType(NodejsPredefinedClassificationTypeNames.Grouping) && classification.Span.Length == 1) {
+						if (classification.Span.GetText() == openBrace.ToString()) {
+							openBracesEncountered++;
+						} else if (classification.Span.GetText() == closeBrace.ToString()) {
+							closeBracesEncountered++;
+						}
 					}
 				}
 			}

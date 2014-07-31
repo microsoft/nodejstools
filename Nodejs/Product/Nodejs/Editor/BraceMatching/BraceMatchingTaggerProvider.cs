@@ -20,7 +20,7 @@ using Microsoft.VisualStudio.Utilities;
 
 namespace Microsoft.NodejsTools.Editor.ShowBraces {
 	[Export(typeof(IViewTaggerProvider))]
-	[ContentType("text")]
+	[ContentType(NodejsConstants.Nodejs)]
 	[TagType(typeof(TextMarkerTag))]
 	internal class BraceMatchingTaggerProvider : IViewTaggerProvider {
 		public ITagger<T> CreateTagger<T>(ITextView textView, ITextBuffer buffer) where T : ITag {
