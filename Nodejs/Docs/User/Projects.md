@@ -27,17 +27,17 @@ This is a basic application that is a good starting point for any non-web Node.j
 
 This project will run and debug in the web browser.  This is a good starting point for any web based Node.js application.  After creation, you can add new modules and packages, edit files with intellisense, and interactively debug code.
 
-### Blank Express Application
+### Blank Node.js Express Application
 
-This project is based on the standard Express template. This project will run and debug in the web browser.  After creation you can add new apps to the project, add new packages and modules, edit page templates, and interactively debug code.
+This project is based on the standard Node.js Express template. This project will run and debug in the web browser.  After creation you can add new apps to the project, add new packages and modules, edit page templates, and interactively debug code.
 
-### Blank Windows Azure Node.js Application
+### Blank Azure Node.js Application
 
 This is the basic web application pre-configured to run in Windows Azure.
 
-### Blank Windows Azure Express Application
+### Blank Azure Node.js Express Application
 
-This is the Blank Express Application pre-configured to run in Windows Azure.
+This is the Blank Node.js Express Application pre-configured to run in Windows Azure.
 
 <p id="NewProjectFromExisting" />
 Create Project from Existing Files

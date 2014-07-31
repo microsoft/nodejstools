@@ -1161,7 +1161,7 @@ declare module "express" {
             (): Application;
 
             /**
-            * Create an express application.
+            * Create a Node.js Express application.
             */
             createApplication(): Application;
 

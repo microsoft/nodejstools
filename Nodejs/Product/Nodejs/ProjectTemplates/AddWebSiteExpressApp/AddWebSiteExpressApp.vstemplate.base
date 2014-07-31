@@ -1,7 +1,7 @@
 <VSTemplate Version="3.0.0" Type="Project" xmlns="http://schemas.microsoft.com/developer/vstemplate/2005">
   <TemplateData>
-    <Name>Basic Express Application</Name>
-    <Description>A basic Express application.</Description>
+    <Name>Basic Node.js Express Application</Name>
+    <Description>A basic Node.js Express application.</Description>
     <Icon Package="{FE8A8C3D-328A-476D-99F9-2A24B75F8C7F}" ID="406" />
     <ProjectType>Web</ProjectType>
     <ProjectSubType>JavaScript</ProjectSubType>
