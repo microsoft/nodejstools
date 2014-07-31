@@ -706,7 +706,7 @@ namespace Microsoft.NodejsTools.Intellisense {
         }
 
         internal void ParseFile(IProjectEntry entry, string filename, Stream content) {
-            IJsProjectEntry pyEntry;
+            IJsProjectEntry jsEntry;
             IExternalProjectEntry externalEntry;
 
             TextReader reader = null;
@@ -719,7 +719,7 @@ namespace Microsoft.NodejsTools.Intellisense {
                 cookie = new FileCookie(filename);
             }
             
-            if ((pyEntry = entry as IJsProjectEntry) != null) {
+            if ((jsEntry = entry as IJsProjectEntry) != null) {
                 JsAst ast;
                 CollectingErrorSink errorSink;
                 if (reader != null) {
@@ -729,10 +729,10 @@ namespace Microsoft.NodejsTools.Intellisense {
                 }
 
                 if (ast != null) {
-                    pyEntry.UpdateTree(ast, cookie);
+                    jsEntry.UpdateTree(ast, cookie);
                 } else {
                     // notify that we failed to update the existing analysis
-                    pyEntry.UpdateTree(null, null);
+                    jsEntry.UpdateTree(null, null);
                 }
                 ProjectItem item;
                 if (!_projectFiles.TryGetValue(filename, out item) || item.ReportErrors) {
@@ -745,7 +745,7 @@ namespace Microsoft.NodejsTools.Intellisense {
 
                 // enqueue analysis of the file
                 if (ast != null && _analysisLevel != AnalysisLevel.None) {
-                    _analysisQueue.Enqueue(pyEntry, AnalysisPriority.Normal);
+                    _analysisQueue.Enqueue(jsEntry, AnalysisPriority.Normal);
                 }
             } else if ((externalEntry = entry as IExternalProjectEntry) != null) {
                 externalEntry.ParseContent(reader ?? new StreamReader(content), cookie);

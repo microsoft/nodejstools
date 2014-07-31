@@ -280,7 +280,7 @@ namespace Microsoft.NodejsTools.Project {
         }
 
         public override bool IsCodeFile(string fileName) {
-			return Path.GetExtension(fileName).Equals(".js", StringComparison.OrdinalIgnoreCase); 
+			return Path.GetExtension(fileName).Equals(NodejsConstants.FileExtension, StringComparison.OrdinalIgnoreCase); 
         }
 
         public override int InitializeForOuter(string filename, string location, string name, uint flags, ref Guid iid, out IntPtr projectPointer, out int canceled) {

@@ -269,6 +269,8 @@
     <Compile Include="Editor\BraceCompletion\BraceKind.cs" />
     <Compile Include="Editor\BraceCompletion\BraceCompletionContext.cs" />
     <Compile Include="Editor\BraceCompletion\BraceCompletionContextProvider.cs" />
+    <Compile Include="Editor\BraceMatching\BraceMatchingTaggerProvider.cs" />
+    <Compile Include="Editor\BraceMatching\BraceMatchingTagger.cs" />
     <Compile Include="Editor\EditorExtensions.cs" />
     <Compile Include="Intellisense\AnalysisPriority.cs" />
     <Compile Include="Intellisense\AnalysisQueue.cs" />
