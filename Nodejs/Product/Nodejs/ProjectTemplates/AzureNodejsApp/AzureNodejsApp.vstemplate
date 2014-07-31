@@ -16,14 +16,16 @@
   <TemplateContent>
     <Project File="AzureNodejsApp.njsproj" ReplaceParameters="true">
       <ProjectItem OpenInEditor="true">server.js</ProjectItem>
-      <ProjectItem>Web.config</ProjectItem>
-      <ProjectItem ReplaceParameters="true">Web.Debug.config</ProjectItem>
-      <ProjectItem TargetFileName="bin\ChangeConfig.ps1">ChangeConfig.ps1</ProjectItem>
-      <ProjectItem TargetFileName="bin\download.ps1">download.ps1</ProjectItem>
-      <ProjectItem TargetFileName="bin\setup_web.cmd">setup_web.cmd</ProjectItem>
       <ProjectItem ReplaceParameters="true">package.json</ProjectItem>
       <ProjectItem ReplaceParameters="true">README.md</ProjectItem>
-      <ProjectItem TargetFileName="bin\node.cmd">node.cmd</ProjectItem>
+      <ProjectItem>Web.config</ProjectItem>
+      <ProjectItem ReplaceParameters="true">Web.Debug.config</ProjectItem>
+      <Folder Name="bin">
+        <ProjectItem>ChangeConfig.ps1</ProjectItem>
+        <ProjectItem>download.ps1</ProjectItem>
+        <ProjectItem>setup_web.cmd</ProjectItem>
+        <ProjectItem>node.cmd</ProjectItem>
+      </Folder>
     </Project>
   </TemplateContent>
 </VSTemplate>

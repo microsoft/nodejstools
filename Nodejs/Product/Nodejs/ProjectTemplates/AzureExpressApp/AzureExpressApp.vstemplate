@@ -35,10 +35,12 @@
       <ProjectItem ReplaceParameters="true">README.md</ProjectItem>
       <ProjectItem>Web.config</ProjectItem>
       <ProjectItem ReplaceParameters="true">Web.Debug.config</ProjectItem>
-      <ProjectItem TargetFileName="bin\ChangeConfig.ps1">ChangeConfig.ps1</ProjectItem>
-      <ProjectItem TargetFileName="bin\download.ps1">download.ps1</ProjectItem>
-      <ProjectItem TargetFileName="bin\setup_web.cmd">setup_web.cmd</ProjectItem>
-      <ProjectItem TargetFileName="bin\node.cmd">node.cmd</ProjectItem>
+      <Folder Name="bin">
+        <ProjectItem>ChangeConfig.ps1</ProjectItem>
+        <ProjectItem>download.ps1</ProjectItem>
+        <ProjectItem>setup_web.cmd</ProjectItem>
+        <ProjectItem>node.cmd</ProjectItem>
+      </Folder>
     </Project>
   </TemplateContent>
   <WizardExtension>
