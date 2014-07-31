@@ -210,8 +210,9 @@
     <Content Include="User\Images\UnitTestsRunFailed.png" />
     <Content Include="User\Images\UnitTestsRunFailedOutput.png" />
     <Content Include="User\Images\UnitTestsRunPassed.png" />
+    <Content Include="User\TestFrameworkExtensibility.md" />
     <Content Include="User\TypeScript.md" />
-    <Content Include="User\UnitTests.md" />
+    <Content Include="User\TestExplorer.md" />
     <Content Include="User\Installation.md" />
     <Content Include="User\NodeJSOnLinuxOnAzure.md" />
     <Content Include="User\Npm.md" />
