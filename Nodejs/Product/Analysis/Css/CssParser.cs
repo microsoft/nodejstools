@@ -524,7 +524,7 @@ namespace Microsoft.Ajax.Utilities
               || ParseFontFace() == Parsed.True
               || ParseKeyFrames() == Parsed.True
               || ParseAtKeyword() == Parsed.True
-			  || ParseAspNetBlock() == Parsed.True)
+              || ParseAspNetBlock() == Parsed.True)
             {
                 // any number of S, Comment, CDO or CDC elements
                 ParseSCDOCDCComments();
@@ -549,7 +549,7 @@ namespace Microsoft.Ajax.Utilities
                   || ParsePage() == Parsed.True
                   || ParseFontFace() == Parsed.True
                   || ParseAtKeyword() == Parsed.True
-				  || ParseAspNetBlock() == Parsed.True)
+                  || ParseAspNetBlock() == Parsed.True)
                 {
                     // any number of S, Comment, CDO or CDC elements
                     ParseSCDOCDCComments();
@@ -682,18 +682,18 @@ namespace Microsoft.Ajax.Utilities
             return parsed;
         }
 
-		private Parsed ParseAspNetBlock()
-		{
-			Parsed parsed = Parsed.False;
-			if (Settings.AllowEmbeddedAspNetBlocks &&
-				CurrentTokenType == TokenType.AspNetBlock)
-			{
-				AppendCurrent();
-				SkipSpace();
-				parsed = Parsed.True;
-			}
-			return parsed;
-		}
+        private Parsed ParseAspNetBlock()
+        {
+            Parsed parsed = Parsed.False;
+            if (Settings.AllowEmbeddedAspNetBlocks &&
+                CurrentTokenType == TokenType.AspNetBlock)
+            {
+                AppendCurrent();
+                SkipSpace();
+                parsed = Parsed.True;
+            }
+            return parsed;
+        }
 
         private Parsed ParseNamespace()
         {

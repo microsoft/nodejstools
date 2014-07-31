@@ -28,7 +28,7 @@ namespace Microsoft.NodejsTools.Parsing
         private Block m_finallyBlock;
         private ParameterDeclaration m_catchParameter;
 
-		public Block TryBlock
+        public Block TryBlock
         {
             get { return m_tryBlock; }
             set
@@ -39,7 +39,7 @@ namespace Microsoft.NodejsTools.Parsing
             }
         }
 
-		public Block CatchBlock
+        public Block CatchBlock
         {
             get { return m_catchBlock; }
             set
@@ -58,7 +58,7 @@ namespace Microsoft.NodejsTools.Parsing
             set;
         }
 
-		public Block FinallyBlock
+        public Block FinallyBlock
         {
             get { return m_finallyBlock; }
             set

@@ -63,8 +63,8 @@ namespace Microsoft.Ajax.Utilities
             , RegexOptions.Compiled
 #endif
             );
-		
-		public bool AllowEmbeddedAspNetBlocks { get; set; }
+        
+        public bool AllowEmbeddedAspNetBlocks { get; set; }
 
         public bool GotEndOfLine { get; set; }
 

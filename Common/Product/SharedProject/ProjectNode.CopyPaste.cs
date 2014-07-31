@@ -1211,10 +1211,10 @@ namespace Microsoft.VisualStudioTools.Project {
                     } else {
                         // we are copying and adding a new file node
                         File.Copy(SourceMoniker, newPath, true);
-                        
+
                         // best effort to reset the ReadOnly attribute
                         try {
-                            File.SetAttributes(newPath, File.GetAttributes(newPath) &~ FileAttributes.ReadOnly);
+                            File.SetAttributes(newPath, File.GetAttributes(newPath) & ~FileAttributes.ReadOnly);
                         } catch (ArgumentException) {
                         } catch (UnauthorizedAccessException) {
                         } catch (IOException) {

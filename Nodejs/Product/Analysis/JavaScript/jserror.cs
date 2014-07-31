@@ -83,7 +83,7 @@ namespace Microsoft.NodejsTools.Parsing
         ResourceReferenceMustBeConstant = 1280, // "Resource reference must be single constant value"
         AmbiguousNamedFunctionExpression = 1281, // "Ambiguous named function expression"
         ConditionalCompilationTooComplex = 1282, // "Conditiona compilation structure too complex"
-		UnterminatedAspNetBlock = 1283, // Unterminated asp.net block.
+        UnterminatedAspNetBlock = 1283, // Unterminated asp.net block.
         MisplacedFunctionDeclaration = 1284, // function declaration other than where SourceElements are expected
         OctalLiteralsDeprecated = 1285, // octal literal encountered; possible cross-browser issues
         FunctionNameMustBeIdentifier = 1286, // function names must be a single identifier

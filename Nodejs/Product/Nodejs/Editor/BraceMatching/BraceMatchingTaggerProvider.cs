@@ -19,17 +19,17 @@ using Microsoft.VisualStudio.Text.Tagging;
 using Microsoft.VisualStudio.Utilities;
 
 namespace Microsoft.NodejsTools.Editor.ShowBraces {
-	[Export(typeof(IViewTaggerProvider))]
-	[ContentType(NodejsConstants.Nodejs)]
-	[TagType(typeof(TextMarkerTag))]
-	internal class BraceMatchingTaggerProvider : IViewTaggerProvider {
-		public ITagger<T> CreateTagger<T>(ITextView textView, ITextBuffer buffer) where T : ITag {
-			// Provide highlighting only on the top-level buffer.
-			if (textView == null || textView.TextBuffer != buffer) {
-				return null;
-			}
+    [Export(typeof(IViewTaggerProvider))]
+    [ContentType(NodejsConstants.Nodejs)]
+    [TagType(typeof(TextMarkerTag))]
+    internal class BraceMatchingTaggerProvider : IViewTaggerProvider {
+        public ITagger<T> CreateTagger<T>(ITextView textView, ITextBuffer buffer) where T : ITag {
+            // Provide highlighting only on the top-level buffer.
+            if (textView == null || textView.TextBuffer != buffer) {
+                return null;
+            }
 
-			return new BraceMatchingTagger(textView, buffer) as ITagger<T>;
-		}
-	}
+            return new BraceMatchingTagger(textView, buffer) as ITagger<T>;
+        }
+    }
 }

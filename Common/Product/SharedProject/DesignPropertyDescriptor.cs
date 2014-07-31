@@ -24,7 +24,7 @@ namespace Microsoft.VisualStudioTools.Project {
     /// </summary>
     public class DesignPropertyDescriptor : PropertyDescriptor {
         private string displayName; // Custom display name
-        private PropertyDescriptor property;	// Base property descriptor
+        private PropertyDescriptor property; // Base property descriptor
         private Hashtable editors = new Hashtable(); // Type -> editor instance
         private TypeConverter converter;
 

@@ -276,7 +276,7 @@ namespace Microsoft.VisualStudioTools.Project {
 
         /// <summary>
         /// This is the delegate for Message event types
-        /// </summary>		
+        /// </summary>
         protected virtual void MessageHandler(object sender, BuildMessageEventArgs messageEvent) {
             // NOTE: This may run on a background thread!
             QueueOutputEvent(messageEvent.Importance, messageEvent);

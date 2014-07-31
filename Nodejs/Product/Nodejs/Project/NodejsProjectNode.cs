@@ -210,8 +210,8 @@ namespace Microsoft.NodejsTools.Project {
         public override CommonFileNode CreateNonCodeFileNode(ProjectElement item) {
             string fileName = item.Url;
             if (!String.IsNullOrWhiteSpace(fileName)
-				&& Path.GetExtension(fileName).Equals(NodejsConstants.TypeScriptExtension, StringComparison.OrdinalIgnoreCase)){
-				return new NodejsTypeScriptFileNode(this, item);
+                && Path.GetExtension(fileName).Equals(NodejsConstants.TypeScriptExtension, StringComparison.OrdinalIgnoreCase)) {
+                return new NodejsTypeScriptFileNode(this, item);
             }
             if (Path.GetFileName(fileName).Equals(NodejsConstants.PackageJsonFile, StringComparison.OrdinalIgnoreCase)) {
                 return new PackageJsonFileNode(this, item);
@@ -280,7 +280,7 @@ namespace Microsoft.NodejsTools.Project {
         }
 
         public override bool IsCodeFile(string fileName) {
-			return Path.GetExtension(fileName).Equals(NodejsConstants.FileExtension, StringComparison.OrdinalIgnoreCase); 
+            return Path.GetExtension(fileName).Equals(NodejsConstants.FileExtension, StringComparison.OrdinalIgnoreCase);
         }
 
         public override int InitializeForOuter(string filename, string location, string name, uint flags, ref Guid iid, out IntPtr projectPointer, out int canceled) {
@@ -686,7 +686,7 @@ namespace Microsoft.NodejsTools.Project {
                     goto recheck;
                 } else if (button == disableButton) {
                     NodejsPackage.Instance.GeneralOptionsPage.CheckForLongPaths = false;
-                } 
+                }
             } finally {
                 _isCheckingForLongPaths = false;
             }

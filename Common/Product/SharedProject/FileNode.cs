@@ -425,7 +425,7 @@ namespace Microsoft.VisualStudioTools.Project {
 
             return base.QueryService(ref guidService, out result);
         }
-        
+
         /// <summary>
         /// Called by the drag&drop implementation to ask the node
         /// which is being dragged/droped over which nodes should
@@ -558,7 +558,7 @@ namespace Microsoft.VisualStudioTools.Project {
             sfc.Suspend();
 
             try {
-                // Rename the node.	
+                // Rename the node.
                 DocumentManager.UpdateCaption(this.ProjectMgr.Site, Path.GetFileName(newFilePath), docData);
                 // Check if the file name was actually changed.
                 // In same cases (e.g. if the item is a file and the user has changed its encoding) this function
@@ -836,8 +836,8 @@ namespace Microsoft.VisualStudioTools.Project {
                 } else {
                     this.RenameCaseOnlyChange(oldName, newName);
                 }
-                
-                DocumentManager.UpdateCaption(this.ProjectMgr.Site, Caption, docData);                
+
+                DocumentManager.UpdateCaption(this.ProjectMgr.Site, Caption, docData);
 
                 // changed from MPFProj:
                 // http://mpfproj10.codeplex.com/WorkItem/View.aspx?WorkItemId=8231

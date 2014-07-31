@@ -18,71 +18,71 @@ using System.Windows.Forms;
 using Microsoft.NodejsTools.Project;
 
 namespace Microsoft.NodejsTools.Options {
-	public partial class NodejsIntellisenseOptionsControl : UserControl {
-		public NodejsIntellisenseOptionsControl() {
-			InitializeComponent();
-		}
+    public partial class NodejsIntellisenseOptionsControl : UserControl {
+        public NodejsIntellisenseOptionsControl() {
+            InitializeComponent();
+        }
 
-		internal AnalysisLevel AnalysisLevel {
-			get {
-				if (_fullIntelliSenseRadioButton.Checked) {
-					return AnalysisLevel.High;
-				} else if (_limitedIntelliSenseRadioButton.Checked) {
-					return AnalysisLevel.Low;
-				} else {
-					return AnalysisLevel.None;
-				}
-			}
-			set {
-				switch (value) {
-					case AnalysisLevel.High:
-						_fullIntelliSenseRadioButton.Checked = true;
-						break;
-					case AnalysisLevel.Low:
-						_limitedIntelliSenseRadioButton.Checked = true;
-						break;
-					case AnalysisLevel.None:
-						_noIntelliSenseRadioButton.Checked = true;
-						break;
-					default:
-						Debug.Fail("Unrecognized AnalysisLevel: " + value);
-						break;
-				}
-			}
-		}
+        internal AnalysisLevel AnalysisLevel {
+            get {
+                if (_fullIntelliSenseRadioButton.Checked) {
+                    return AnalysisLevel.High;
+                } else if (_limitedIntelliSenseRadioButton.Checked) {
+                    return AnalysisLevel.Low;
+                } else {
+                    return AnalysisLevel.None;
+                }
+            }
+            set {
+                switch (value) {
+                    case AnalysisLevel.High:
+                        _fullIntelliSenseRadioButton.Checked = true;
+                        break;
+                    case AnalysisLevel.Low:
+                        _limitedIntelliSenseRadioButton.Checked = true;
+                        break;
+                    case AnalysisLevel.None:
+                        _noIntelliSenseRadioButton.Checked = true;
+                        break;
+                    default:
+                        Debug.Fail("Unrecognized AnalysisLevel: " + value);
+                        break;
+                }
+            }
+        }
 
-		internal int AnalysisLogMaximum {
-			get {
-				int max;
-				if (Int32.TryParse(_analysisLogMax.Text, out max)) {
-					return max;
-				}
-				return 100;
-			}
-			set {
-				if (value == 0) {
-					_analysisLogMax.SelectedIndex = 0;
-					return;
-				}
-				string index = value.ToString();
-				for (int i = 0; i < _analysisLogMax.Items.Count; i++) {
-					if (_analysisLogMax.Items[i].ToString() == index) {
-						_analysisLogMax.SelectedIndex = i;
-						return;
-					}
-				}
+        internal int AnalysisLogMaximum {
+            get {
+                int max;
+                if (Int32.TryParse(_analysisLogMax.Text, out max)) {
+                    return max;
+                }
+                return 100;
+            }
+            set {
+                if (value == 0) {
+                    _analysisLogMax.SelectedIndex = 0;
+                    return;
+                }
+                string index = value.ToString();
+                for (int i = 0; i < _analysisLogMax.Items.Count; i++) {
+                    if (_analysisLogMax.Items[i].ToString() == index) {
+                        _analysisLogMax.SelectedIndex = i;
+                        return;
+                    }
+                }
 
-				_analysisLogMax.Text = index;
-			}
-		}
+                _analysisLogMax.Text = index;
+            }
+        }
 
-		internal string CompletionCommittedBy {
-			get {
-				return _completionCommittedBy.Text;
-			}
-			set {
-				_completionCommittedBy.Text = value;
-			}
-		}
-	}
+        internal string CompletionCommittedBy {
+            get {
+                return _completionCommittedBy.Text;
+            }
+            set {
+                _completionCommittedBy.Text = value;
+            }
+        }
+    }
 }

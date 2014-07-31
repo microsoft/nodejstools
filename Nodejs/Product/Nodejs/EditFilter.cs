@@ -777,7 +777,7 @@ namespace Microsoft.NodejsTools {
                     var line = insertionPoint.Value.GetContainingLine();
 
                     if (line.LineNumber > 0) {
-						SnapshotSpan commentSpan;
+                        SnapshotSpan commentSpan;
                         if (insertionPoint.Value.IsMultilineComment(out commentSpan)) {
                             _textView.FormatMultilineComment(commentSpan.Start, insertionPoint.Value);
                         } else {

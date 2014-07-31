@@ -48,7 +48,7 @@ namespace AnalysisTests {
                 entries["mod.js"].Analysis.GetTypeIdsByIndex("x", 0),
                 BuiltinTypeId.String
             );
-        }	
+        }
 
         [TestMethod, Priority(0)]
         public void TestRequireAssignedExports() {
