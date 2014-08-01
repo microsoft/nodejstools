@@ -13,9 +13,11 @@
  * ***************************************************************************/
 
 using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
+using System.Runtime.InteropServices;
 using Microsoft.NodejsTools.Analysis.Analyzer;
 using Microsoft.NodejsTools.Analysis.Values;
 using Microsoft.NodejsTools.Parsing;
@@ -26,11 +28,20 @@ namespace Microsoft.NodejsTools.Analysis {
     /// analysis values include top-level code, classes, and functions.
     /// </summary>
     [Serializable]
-    public class AnalysisValue : IAnalysisSet {
+    public class AnalysisValue : IEnumerable {
         [ThreadStatic]
         private static HashSet<AnalysisValue> _processing;
+        private readonly AnalysisProxy _proxy;
 
-        protected AnalysisValue() { }
+        internal AnalysisValue(ProjectEntry projectEntry) {
+            _proxy = projectEntry.WrapAnalysisValue(this);
+        }
+
+        public AnalysisProxy Proxy {
+            get {
+                return _proxy;
+            }
+        }
 
         /// <summary>
         /// Returns an immutable set which contains just this AnalysisValue.
@@ -38,7 +49,7 @@ namespace Microsoft.NodejsTools.Analysis {
         /// Currently implemented as returning the AnalysisValue object directly which implements ISet{AnalysisValue}.
         /// </summary>
         public IAnalysisSet SelfSet {
-            get { return this; }
+            get { return Proxy; }
         }
 
         /// <summary>
@@ -119,7 +130,7 @@ namespace Microsoft.NodejsTools.Analysis {
             }
         }
 
-        public virtual Dictionary<string, IAnalysisSet> GetAllMembers() {
+        internal virtual Dictionary<string, IAnalysisSet> GetAllMembers(ProjectEntry accessor) {
             return new Dictionary<string, IAnalysisSet>();
         }
         
@@ -149,7 +160,7 @@ namespace Microsoft.NodejsTools.Analysis {
             return null;
         }
 
-        public virtual IJsProjectEntry DeclaringModule {
+        internal virtual ProjectEntry DeclaringModule {
             get {
                 return null;
             }
@@ -163,7 +174,10 @@ namespace Microsoft.NodejsTools.Analysis {
 
         public bool IsCurrent {
             get {
-                return DeclaringModule == null || DeclaringVersion == DeclaringModule.AnalysisVersion;
+                var declModule = DeclaringModule;
+
+                return declModule == null ||
+                       DeclaringVersion == declModule.AnalysisVersion;
             }
         }
 
@@ -337,72 +351,8 @@ namespace Microsoft.NodejsTools.Analysis {
             return ShortDescription;
         }
 
-        IAnalysisSet IAnalysisSet.Add(AnalysisValue item, bool canMutate) {
-            if (((IAnalysisSet)this).Comparer.Equals(this, item)) {
-                return this;
-            }
-            return new AnalysisSetDetails.AnalysisSetTwoObject(this, item);
-        }
-
-        IAnalysisSet IAnalysisSet.Add(AnalysisValue item, out bool wasChanged, bool canMutate) {
-            if (((IAnalysisSet)this).Comparer.Equals(this, item)) {
-                wasChanged = false;
-                return this;
-            }
-            wasChanged = true;
-            return new AnalysisSetDetails.AnalysisSetTwoObject(this, item);
-        }
-
-        IAnalysisSet IAnalysisSet.Union(IEnumerable<AnalysisValue> items, bool canMutate) {
-            if (items.All(av => ((IAnalysisSet)this).Comparer.Equals(this, av))) {
-                return this;
-            }
-            return AnalysisSet.Create(items).Add(this, false);
-        }
-
-        IAnalysisSet IAnalysisSet.Union(IEnumerable<AnalysisValue> items, out bool wasChanged, bool canMutate) {
-            if (items.All(av => ((IAnalysisSet)this).Comparer.Equals(this, av))) {
-                wasChanged = false;
-                return this;
-            }
-            wasChanged = true;
-            return AnalysisSet.Create(items).Add(this, false);
-        }
-
-        IAnalysisSet IAnalysisSet.Clone() {
-            return this;
-        }
-
-        bool IAnalysisSet.Contains(AnalysisValue item) {
-            return ((IAnalysisSet)this).Comparer.Equals(this, item);
-        }
-
-        bool IAnalysisSet.SetEquals(IAnalysisSet other) {
-            if (other.Count != 1) {
-                return false;
-            }
-            var av = other as AnalysisValue;
-            if (av != null) {
-                return ((IAnalysisSet)this).Comparer.Equals(this, av);
-            }
-
-            return ((IAnalysisSet)this).Comparer.Equals(this, other.First());
-        }
-
-        int IAnalysisSet.Count {
-            get { return 1; }
-        }
-
-        IEqualityComparer<AnalysisValue> IAnalysisSet.Comparer {
-            get { return ObjectComparer.Instance; }
-        }
-
-        IEnumerator<AnalysisValue> IEnumerable<AnalysisValue>.GetEnumerator() {
+        IEnumerator IEnumerable.GetEnumerator() {
             yield return this;
-        }
-
-        System.Collections.IEnumerator System.Collections.IEnumerable.GetEnumerator() {
-            return ((IEnumerable<AnalysisValue>)this).GetEnumerator();
         }
     }
 }

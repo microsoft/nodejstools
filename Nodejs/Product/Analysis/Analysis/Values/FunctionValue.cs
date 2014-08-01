@@ -41,8 +41,8 @@ namespace Microsoft.NodejsTools.Analysis.Values {
                 }
 #endif
                 var prototype = new PrototypeValue(ProjectEntry, _instance, description: description);
-                Add("prototype", prototype);
-                prototype.Add("constructor", this);
+                Add("prototype", prototype.Proxy);
+                prototype.Add("constructor", this.Proxy);
             }
         }
 
@@ -59,16 +59,16 @@ namespace Microsoft.NodejsTools.Analysis.Values {
         }
 
         public override IAnalysisSet Construct(Node node, AnalysisUnit unit, IAnalysisSet[] args) {
-            var result = Call(node, unit, _instance, args);
+            var result = Call(node, unit, _instance.Proxy, args);
             if (result.Count != 0) {
                 // function returned a value, we want to return any values
                 // which are typed to object.
                 foreach (var resultValue in result) {
-                    if (!resultValue.IsObject) {
+                    if (!resultValue.Value.IsObject) {
                         // we need to do some filtering
                         var tmpRes = AnalysisSet.Empty;
                         foreach (var resultValue2 in result) {
-                            if (resultValue2.IsObject) {
+                            if (resultValue2.Value.IsObject) {
                                 tmpRes = tmpRes.Add(resultValue2);
                             }
                         }
@@ -83,14 +83,14 @@ namespace Microsoft.NodejsTools.Analysis.Values {
             }
             // we didn't return a value or returned a non-object
             // value.  The result is our newly created instance object.
-            return _instance;
+            return _instance.Proxy;
         }
 
-        public override Dictionary<string, IAnalysisSet> GetAllMembers() {
-            var res = base.GetAllMembers();
+        internal override Dictionary<string, IAnalysisSet> GetAllMembers(ProjectEntry accessor) {
+            var res = base.GetAllMembers(accessor);
 
             if (this != ProjectState._functionPrototype) {
-                foreach (var keyValue in ProjectState._functionPrototype.GetAllMembers()) {
+                foreach (var keyValue in ProjectState._functionPrototype.GetAllMembers(accessor)) {
                     IAnalysisSet existing;
                     if (!res.TryGetValue(keyValue.Key, out existing)) {
                         res[keyValue.Key] = keyValue.Value;

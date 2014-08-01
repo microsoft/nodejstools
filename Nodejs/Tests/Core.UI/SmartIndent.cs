@@ -59,6 +59,7 @@ namespace Microsoft.Nodejs.Tests.UI {
                     doc.TextView.Caret.Position.BufferPosition.GetContainingLine().Length
                 );
             }
+            
         }
 
         [TestMethod, Priority(0), TestCategory("Core")]

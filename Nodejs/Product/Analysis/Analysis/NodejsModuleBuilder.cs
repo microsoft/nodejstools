@@ -28,7 +28,7 @@ namespace Microsoft.NodejsTools.Analysis {
         private readonly dynamic _all;
         //private readonly string _filename;
         private readonly JsAnalyzer _analyzer;
-        private Dictionary<string, string> _moduleDocs = new Dictionary<string,string>();
+        private Dictionary<string, string> _moduleDocs = new Dictionary<string, string>();
 
         public NodejsModuleBuilder(string filename, JsAnalyzer analyzer) {
             _all = _serializer.DeserializeObject(File.ReadAllText(filename));
@@ -40,20 +40,19 @@ namespace Microsoft.NodejsTools.Analysis {
         }
 
         public void Build() {
-            Dictionary<string, ObjectValue> exportsTable = new Dictionary<string,ObjectValue>();
+            Dictionary<string, ExportsValue> exportsTable = new Dictionary<string, ExportsValue>();
             // run through and initialize all of the modules.
             foreach (var module in _all["modules"]) {
                 var moduleName = FixModuleName((string)module["name"]);
                 var entry = new ProjectEntry(_analyzer, "builtin:" + moduleName, null);
-                _analyzer.Modules.AddModule(moduleName, entry);
-                var exports = new ExportsValue(moduleName, _analyzer._builtinEntry);
-                entry.ModuleValue.Add("exports", exports);
 
-                exportsTable[moduleName] = exports;
+                _analyzer.Modules.AddModule(moduleName, entry);
+
+                exportsTable[moduleName] = entry.InitNodejsVariables();
             }
 
             // next create all of the classes
-            foreach(var module in _all["modules"]) {
+            foreach (var module in _all["modules"]) {
                 var moduleName = FixModuleName((string)module["name"]);
                 var exports = exportsTable[moduleName];
 
@@ -76,7 +75,7 @@ namespace Microsoft.NodejsTools.Analysis {
                     }
                 }
             }
-            
+
             foreach (var misc in _all["miscs"]) {
                 if (misc["name"] == "Global Objects") {
                     GenerateGlobals(misc["globals"]);
@@ -106,7 +105,7 @@ namespace Microsoft.NodejsTools.Analysis {
                 if (exports.Descriptors.TryGetValue(klassName, out propDesc) && propDesc.Values != null) {
                     var types = propDesc.Values.Types;
                     if (types != null && types.Count == 1) {
-                        var type = types.First();
+                        var type = types.First().Value;
                         if (type is FunctionValue) {
                             returnValue = ((FunctionValue)type)._instance;
                         }
@@ -120,15 +119,15 @@ namespace Microsoft.NodejsTools.Analysis {
                 if (specialMethods != null &&
                     specialMethods.TryGetValue(methodName, out specialMethod)) {
                     function = new SpecializedFunctionValue(
-                        _analyzer._builtinEntry,
+                        exports.ProjectEntry,
                         methodName,
                         specialMethod,
                         ParseDocumentation((string)method["desc"]),
                         GetParameters(sig["params"])
                     );
-                } else if(returnValue != null) {
+                } else if (returnValue != null) {
                     function = new ReturningFunctionValue(
-                        _analyzer._builtinEntry,
+                        exports.ProjectEntry,
                         methodName,
                         returnValue.SelfSet,
                         ParseDocumentation((string)method["desc"]),
@@ -137,7 +136,7 @@ namespace Microsoft.NodejsTools.Analysis {
                     );
                 } else {
                     function = new BuiltinFunctionValue(
-                        _analyzer._builtinEntry,
+                        exports.ProjectEntry,
                         methodName,
                         ParseDocumentation((string)method["desc"]),
                         true,
@@ -153,7 +152,7 @@ namespace Microsoft.NodejsTools.Analysis {
             string className = (string)klass["name"];
 
             BuiltinFunctionValue klassValue = new BuiltinFunctionValue(
-                _analyzer._builtinEntry,
+                exports.ProjectEntry,
                 FixClassName(className),
                 ParseDocumentation((string)klass["desc"]),
                 true
@@ -163,7 +162,7 @@ namespace Microsoft.NodejsTools.Analysis {
             exports.Add(klassValue);
 
             if (klass.ContainsKey("methods")) {
-                var prototype = (PrototypeValue)klassValue.Descriptors["prototype"].Values.Types.First();
+                var prototype = (PrototypeValue)klassValue.Descriptors["prototype"].Values.Types.First().Value;
                 Dictionary<string, CallDelegate> classSpecializations;
                 _classSpecializations.TryGetValue(className, out classSpecializations);
                 foreach (var method in klass["methods"]) {
@@ -188,12 +187,12 @@ namespace Microsoft.NodejsTools.Analysis {
         private void GenerateGlobal(ObjectValue exports, dynamic klass) {
             string name = FixClassName((string)klass["name"]);
             ObjectValue value = new ObjectValue(
-                _analyzer._builtinEntry,
+                exports.ProjectEntry,
                 null,
                 ParseDocumentation((string)klass["desc"])
             );
 
-            exports.Add(name, value);
+            exports.Add(name, value.Proxy);
 
             if (klass.ContainsKey("methods")) {
                 foreach (var method in klass["methods"]) {
@@ -214,14 +213,14 @@ namespace Microsoft.NodejsTools.Analysis {
                         new MemberAddInfo(
                             propName,
                             new ObjectValue(
-                                _analyzer._builtinEntry
+                                exports.ProjectEntry
                             ),
                             desc,
                             true
                         )
                     );
                 }
-            }            
+            }
         }
 
         private void GenerateGlobals(dynamic globals) {
@@ -297,6 +296,8 @@ namespace Microsoft.NodejsTools.Analysis {
                             case "h3":
                             case "h4":
                             case "h5":
+                            case "pre":
+                            case "code":
                                 output.Append("\r\n");
                                 break;
                         }

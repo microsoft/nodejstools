@@ -49,20 +49,17 @@ namespace Microsoft.NodejsTools.Analysis {
     /// free.
     /// </remarks>
     [Serializable]
-    internal class AnalysisDictionary<TKey, TValue> : IDictionary<TKey, TValue>
+    internal sealed class AnalysisDictionary<TKey, TValue> : IDictionary<TKey, TValue>
         where TKey : class
         where TValue : class {
 
-        protected Bucket[] _buckets;
+        private Bucket[] _buckets;
         private int _count;
         private IEqualityComparer<TKey> _comparer;
 
         private const int InitialBucketSize = 3;
         private const int ResizeMultiplier = 2;
         private const double Load = .9;
-
-        // Marker object used to indicate we have a removed value
-        private static readonly object _removed = new object();
 
         /// <summary>
         /// Creates a new dictionary storage with no buckets
@@ -141,7 +138,7 @@ namespace Microsoft.NodejsTools.Analysis {
         }
 
         private const Int32 HashPrime = 101;
-        private static int GetPrime(int min) {
+        internal static int GetPrime(int min) {
             for (int i = 0; i < _primes.Length; i++) {
                 int prime = _primes[i];
                 if (prime >= min) return prime;
@@ -164,7 +161,7 @@ namespace Microsoft.NodejsTools.Analysis {
 
             for (int i = 0; i < oldBuckets.Length; i++) {
                 var curBucket = oldBuckets[i];
-                if (curBucket.Key != null && curBucket.Key != _removed) {
+                if (curBucket.Key != null && curBucket.Key != AnalysisDictionaryRemovedValue.Instance) {
                     AddWorker(newBuckets, (TKey)curBucket.Key, curBucket.Value, curBucket.HashCode);
                 }
             }
@@ -205,7 +202,7 @@ namespace Microsoft.NodejsTools.Analysis {
             for (; ; ) {
                 Bucket cur = buckets[index];
                 var existingKey = cur.Key;
-                if (existingKey == null || existingKey == _removed) {
+                if (existingKey == null || existingKey == AnalysisDictionaryRemovedValue.Instance) {
                     if (addIndex == -1) {
                         addIndex = index;
                     }
@@ -265,11 +262,11 @@ namespace Microsoft.NodejsTools.Analysis {
                     break;
                 } else if (
                     Object.ReferenceEquals(key, existingKey) ||
-                    (existingKey != _removed &&
+                    (existingKey != AnalysisDictionaryRemovedValue.Instance &&
                     bucket.HashCode == hc &&
                     _comparer.Equals(key, (TKey)existingKey))) {
                     // clear the key first so readers won't see it.
-                    _buckets[index].Key = _removed;
+                    _buckets[index].Key = AnalysisDictionaryRemovedValue.Instance;
                     Thread.MemoryBarrier();
                     _buckets[index].Value = null;
                     _count--;
@@ -325,7 +322,7 @@ namespace Microsoft.NodejsTools.Analysis {
             return false;
         }
 
-        protected bool TryGetValue(Bucket[] buckets, TKey key, int hc, out TValue value) {
+        private bool TryGetValue(Bucket[] buckets, TKey key, int hc, out TValue value) {
             int index = hc % buckets.Length;
             int startIndex = index;
             do {
@@ -334,7 +331,7 @@ namespace Microsoft.NodejsTools.Analysis {
                     break;
                 } else {
                     while (Object.ReferenceEquals(key, existingKey) ||
-                        (existingKey != _removed &&
+                        (existingKey != AnalysisDictionaryRemovedValue.Instance &&
                         buckets[index].HashCode == hc &&
                         _comparer.Equals(key, (TKey)existingKey))) {
 
@@ -378,26 +375,86 @@ namespace Microsoft.NodejsTools.Analysis {
             }
         }
 
-        public IEnumerator<KeyValuePair<TKey, TValue>> GetEnumerator() {
-            var buckets = _buckets;
-            if (buckets != null) {
-                for (int i = 0; i < buckets.Length; i++) {
-                    var key = buckets[i].Key;
-                    while (key != null && key != _removed) {
-                        var value = buckets[i].Value;
+        //public IEnumerator<KeyValuePair<TKey, TValue>> GetEnumerator() {
+        //    var buckets = _buckets;
+        //    if (buckets != null) {
+        //        for (int i = 0; i < buckets.Length; i++) {
+        //            var key = buckets[i].Key;
+        //            while (key != null && key != AnalysisDictionaryRemovedValue.Instance) {
+        //                var value = buckets[i].Value;
 
-                        Thread.MemoryBarrier();
+        //                Thread.MemoryBarrier();
                         
-                        // check the key again, if it's changed we need to re-read
-                        // the value as we could be racing with a replacement...
-                        if (Object.ReferenceEquals(key, buckets[i].Key)) {
-                            yield return new KeyValuePair<TKey, TValue>((TKey)key, value);
-                            break;
-                        }
+        //                // check the key again, if it's changed we need to re-read
+        //                // the value as we could be racing with a replacement...
+        //                if (Object.ReferenceEquals(key, buckets[i].Key)) {
+        //                    yield return new KeyValuePair<TKey, TValue>((TKey)key, value);
+        //                    break;
+        //                }
 
-                        key = buckets[i].Key;
+        //                key = buckets[i].Key;
+        //            }
+        //        }
+        //    }
+        //}
+
+
+        IEnumerator<KeyValuePair<TKey, TValue>> IEnumerable<KeyValuePair<TKey, TValue>>.GetEnumerator() {
+            return GetEnumerator();
+        }
+
+        public AnalysisDictionaryEnumerator GetEnumerator() {
+            return new AnalysisDictionaryEnumerator(this);
+        }
+
+        public struct AnalysisDictionaryEnumerator : IEnumerator<KeyValuePair<TKey, TValue>> {
+            private readonly Bucket[] _buckets;
+            private int _curBucket;
+            private KeyValuePair<TKey, TValue> _curValue;
+
+            internal AnalysisDictionaryEnumerator(AnalysisDictionary<TKey, TValue> dict) {
+                _buckets = dict._buckets;
+                _curValue = default(KeyValuePair<TKey, TValue>);
+                _curBucket = 0;
+            }
+
+            public KeyValuePair<TKey, TValue> Current {
+                get {
+                    return _curValue;
+                }
+            }
+
+            public void Dispose() {
+            }
+
+            object IEnumerator.Current {
+                get { return _curValue;  }
+            }
+
+            public bool MoveNext() {
+                if (_buckets != null) {
+                    for (; _curBucket < _buckets.Length; _curBucket++) {
+                        var key = _buckets[_curBucket].Key;
+                        while (key != null && key != AnalysisDictionaryRemovedValue.Instance) {
+                            var value = _buckets[_curBucket].Value;
+                            Thread.MemoryBarrier();
+
+                            // check the key again, if it's changed we need to re-read
+                            // the value as we could be racing with a replacement...
+                            if (Object.ReferenceEquals(key, _buckets[_curBucket].Key)) {
+                                _curBucket++;
+                                _curValue = new KeyValuePair<TKey, TValue>((TKey)key, value);
+                                return true;
+                            }
+
+                            key = _buckets[_curBucket].Key;
+                        }
                     }
                 }
+                return false;
+            }
+
+            public void Reset() {
             }
         }
 
@@ -407,7 +464,7 @@ namespace Microsoft.NodejsTools.Analysis {
         /// Bucket is not serializable because it stores the computed hash
         /// code which could change between serialization and deserialization.
         /// </summary>
-        protected struct Bucket {
+        private struct Bucket {
             public object Key;          // the key to be hashed (not strongly typed because we need our remove marker)
             public TValue Value;        // the value associated with the key
             public int HashCode;        // the hash code of the contained key.
@@ -435,7 +492,7 @@ namespace Microsoft.NodejsTools.Analysis {
                 if (buckets != null) {
                     for (int i = 0; i < buckets.Length; i++) {
                         var key = buckets[i].Key;
-                        while (key != null && key != _removed) {
+                        while (key != null && key != AnalysisDictionaryRemovedValue.Instance) {
                             var value = buckets[i].Value;
 
                             Thread.MemoryBarrier();
@@ -518,5 +575,13 @@ namespace Microsoft.NodejsTools.Analysis {
         IEnumerator IEnumerable.GetEnumerator() {
             return GetEnumerator();
         }
+    }
+
+    /// <summary>
+    /// Holdes the marker object for values removed from our AnalysisDictionary.
+    /// Hoisted to a non-generic class for perf reasons.
+    /// </summary>
+    class AnalysisDictionaryRemovedValue {
+        public static readonly object Instance = new object();
     }
 }

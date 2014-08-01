@@ -16,29 +16,34 @@ using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
+using Microsoft.NodejsTools.Analysis.AnalysisSetDetails;
 
 namespace Microsoft.NodejsTools.Analysis {
     /// <summary>
-    /// Represents an unordered collection of <see cref="AnalysisValue" /> objects;
+    /// Represents an unordered collection of <see cref="AnalysisProxy" /> objects;
     /// in effect, a set of JavaScript objects. There are multiple implementing
-    /// classes, including <see cref="AnalysisValue" /> itself, to improve memory
+    /// classes, including <see cref="AnalysisProxy" /> itself, to improve memory
     /// usage for small sets.
     /// 
     /// <see cref="AnalysisSet" /> does not implement this interface, but
     /// provides factory and extension methods.
     /// </summary>
-    public interface IAnalysisSet : IEnumerable<AnalysisValue> {
-        IAnalysisSet Add(AnalysisValue item, bool canMutate = true);
-        IAnalysisSet Add(AnalysisValue item, out bool wasChanged, bool canMutate = true);
-        IAnalysisSet Union(IEnumerable<AnalysisValue> items, bool canMutate = true);
-        IAnalysisSet Union(IEnumerable<AnalysisValue> items, out bool wasChanged, bool canMutate = true);
+    public interface IAnalysisSet : IEnumerable<AnalysisProxy> {
+        IAnalysisSet Add(AnalysisProxy item, out bool wasChanged);
+        IAnalysisSet Union(IEnumerable<AnalysisProxy> items, out bool wasChanged);
         IAnalysisSet Clone();
 
-        bool Contains(AnalysisValue item);
-        bool SetEquals(IAnalysisSet other);
+        bool Contains(AnalysisProxy item);
 
         int Count { get; }
-        IEqualityComparer<AnalysisValue> Comparer { get; }
+        IEqualityComparer<AnalysisProxy> Comparer { get; }
+    }    
+
+    /// <summary>
+    /// Marker interface to indicate that an analysis set is a read-only copy on write
+    /// analysis set.
+    /// </summary>
+    public interface IImmutableAnalysisSet : IAnalysisSet {
     }
 
     /// <summary>
@@ -73,7 +78,7 @@ namespace Microsoft.NodejsTools.Analysis {
         /// cref="IAnalysisSet" />.
         /// </summary>
         /// <param name="ns">The namespace to contain in the set.</param>
-        public static IAnalysisSet Create(AnalysisValue ns) {
+        public static IAnalysisSet Create(AnalysisProxy ns) {
             return ns;
         }
 
@@ -82,9 +87,27 @@ namespace Microsoft.NodejsTools.Analysis {
         /// This is the usual way of creating a new set from any sequence.
         /// </summary>
         /// <param name="ns">The namespaces to contain in the set.</param>
-        public static IAnalysisSet Create(IEnumerable<AnalysisValue> ns) {
-            // TODO: Replace Trim() call with more efficient enumeration.
-            return new AnalysisSetDetails.AnalysisSetManyObject(ns).Trim();
+        public static IAnalysisSet Create(IEnumerable<AnalysisProxy> ns) {
+            var hs = ns as AnalysisHashSet;
+            if (hs != null) {
+                if (hs.Comparer == ObjectComparer.Instance) {
+                    return hs.Clone();
+                }
+                return new AnalysisHashSet(hs);
+            }
+
+            if (ns is IImmutableAnalysisSet && ((IImmutableAnalysisSet)ns).Comparer == ObjectComparer.Instance) {
+                return (IAnalysisSet)ns;
+            }
+
+            switch (ns.Count()) {
+                case 0: return Empty;
+                case 1: return ns.First();
+                case 2: return new AnalysisSetDetails.AnalysisSetTwoObject(ns);
+                default: 
+                    // this should be unreachable...
+                    return new AnalysisSetDetails.AnalysisHashSet(ns);
+            }
         }
 
         /// <summary>
@@ -102,7 +125,7 @@ namespace Microsoft.NodejsTools.Analysis {
         /// <exception name="InvalidOperationException"><paramref
         /// name="comparer" /> is not an instance of <see cref="ObjectComparer"
         /// /> or <see cref="UnionComparer" />.</exception>
-        public static IAnalysisSet Create(IEnumerable<AnalysisValue> ns, IEqualityComparer<AnalysisValue> comparer) {
+        public static IAnalysisSet Create(IEnumerable<AnalysisProxy> ns, IEqualityComparer<AnalysisProxy> comparer) {
             var set = ns as IAnalysisSet;
             if (set == null) {
                 UnionComparer uc;
@@ -153,13 +176,13 @@ namespace Microsoft.NodejsTools.Analysis {
         /// Returns a set containing only <paramref name="ns" /> that uses the
         /// specified <see cref="UnionComparer" />.
         /// 
-        /// This is different to casting from <see cref="AnalysisValue" /> to <see
+        /// This is different to casting from <see cref="AnalysisProxy" /> to <see
         /// cref="IAnalysisSet" />, because the implementation in <see
-        /// cref="AnalysisValue" /> always uses <see cref="ObjectComparer" />.
+        /// cref="AnalysisProxy" /> always uses <see cref="ObjectComparer" />.
         /// </summary>
         /// <param name="ns">The namespace to contain in the set.</param>
         /// <param name="comparer">The comparer to use for the set.</param>
-        internal static IAnalysisSet CreateUnion(AnalysisValue ns, UnionComparer comparer) {
+        internal static IAnalysisSet CreateUnion(AnalysisProxy ns, UnionComparer comparer) {
             return new AnalysisSetDetails.AnalysisSetOneUnion(ns, comparer);
         }
 
@@ -171,10 +194,10 @@ namespace Microsoft.NodejsTools.Analysis {
         /// </summary>
         /// <param name="ns">The namespaces to contain in the set.</param>
         /// <param name="comparer">The comparer to use for the set.</param>
-        internal static IAnalysisSet CreateUnion(IEnumerable<AnalysisValue> ns, UnionComparer comparer) {
+        internal static IAnalysisSet CreateUnion(IEnumerable<AnalysisProxy> ns, UnionComparer comparer) {
             bool dummy;
             // TODO: Replace Trim() call with more intelligent enumeration.
-            return new AnalysisSetDetails.AnalysisSetManyUnion(ns.UnionIter(comparer, out dummy), comparer).Trim();
+            return new AnalysisSetDetails.AnalysisHashSet(ns.UnionIter(comparer, out dummy), comparer).Trim();
         }
 
         /// <summary>
@@ -182,10 +205,8 @@ namespace Microsoft.NodejsTools.Analysis {
         /// name="sets" />.
         /// </summary>
         /// <param name="sets">The sets to contain in the set.</param>
-        /// <param name="canMutate">True if sets in <paramref name="sets"/> may
-        /// be modified.</param>
-        public static IAnalysisSet UnionAll(IEnumerable<IAnalysisSet> sets, bool canMutate = true) {
-            return Empty.UnionAll(sets, canMutate);
+        public static IAnalysisSet UnionAll(IEnumerable<IAnalysisSet> sets) {
+            return Empty.UnionAll(sets);
         }
 
         /// <summary>
@@ -195,15 +216,24 @@ namespace Microsoft.NodejsTools.Analysis {
         /// <param name="sets">The sets to contain in the set.</param>
         /// <param name="wasChanged">Returns True if the result is not an empty
         /// set.</param>
-        /// <param name="canMutate">True if sets in <paramref name="sets"/> may
         /// be modified.</param>
-        public static IAnalysisSet UnionAll(IEnumerable<IAnalysisSet> sets, out bool wasChanged, bool canMutate = true) {
-            return Empty.UnionAll(sets, out wasChanged, canMutate);
+        public static IAnalysisSet UnionAll(IEnumerable<IAnalysisSet> sets, out bool wasChanged) {
+            return Empty.UnionAll(sets, out wasChanged);
         }
 
         #endregion
 
         #region Extension Methods
+
+        public static IAnalysisSet Add(this IAnalysisSet set, AnalysisProxy item) {
+            bool dummy;
+            return set.Add(item, out dummy);
+        }
+
+        public static IAnalysisSet Union(this IAnalysisSet set, IEnumerable<AnalysisProxy> items) {
+            bool dummy;
+            return set.Union(items, out dummy);
+        }
 
         /// <summary>
         /// Returns <paramref name="set"/> with a comparer with increased
@@ -264,7 +294,7 @@ namespace Microsoft.NodejsTools.Analysis {
             if ((set is AnalysisSetDetails.AnalysisSetOneUnion ||
                 set is AnalysisSetDetails.AnalysisSetTwoUnion ||
                 set is AnalysisSetDetails.AnalysisSetEmptyUnion ||
-                set is AnalysisSetDetails.AnalysisSetManyUnion) &&
+                set is AnalysisSetDetails.AnalysisHashSet) &&
                 set.Comparer == comparer) {
                 wasChanged = false;
                 return set;
@@ -272,13 +302,9 @@ namespace Microsoft.NodejsTools.Analysis {
 
             wasChanged = true;
 
-            var ns = set as AnalysisValue;
+            var ns = set as AnalysisProxy;
             if (ns != null) {
                 return CreateUnion(ns, comparer);
-            }
-            var ns1 = set as AnalysisSetDetails.AnalysisSetOneObject;
-            if (ns1 != null) {
-                return CreateUnion(ns1.Value, comparer);
             }
             var ns2 = set as AnalysisSetDetails.AnalysisSetTwoObject;
             if (ns2 != null) {
@@ -289,8 +315,7 @@ namespace Microsoft.NodejsTools.Analysis {
                     return new AnalysisSetDetails.AnalysisSetTwoUnion(ns2.Value1, ns2.Value2, comparer);
                 }
             }
-
-            return new AnalysisSetDetails.AnalysisSetManyUnion(set, comparer);
+            return new AnalysisSetDetails.AnalysisHashSet(set, comparer);
         }
 
         /// <summary>
@@ -298,7 +323,7 @@ namespace Microsoft.NodejsTools.Analysis {
         /// cref="UnionComparer"/>.
         /// </summary>
 #if FULL_VALIDATION
-        internal static IEnumerable<AnalysisValue> UnionIter(this IEnumerable<AnalysisValue> items, UnionComparer comparer, out bool wasChanged) {
+        internal static IEnumerable<AnalysisWrapper> UnionIter(this IEnumerable<AnalysisWrapper> items, UnionComparer comparer, out bool wasChanged) {
             var originalItems = items.ToList();
             var newItems = UnionIterInternal(items, comparer, out wasChanged).ToList();
 
@@ -318,9 +343,9 @@ namespace Microsoft.NodejsTools.Analysis {
             return newItems;
         }
 
-        private static IEnumerable<AnalysisValue> UnionIterInternal(IEnumerable<AnalysisValue> items, UnionComparer comparer, out bool wasChanged) {
+        private static IEnumerable<AnalysisWrapper> UnionIterInternal(IEnumerable<AnalysisWrapper> items, UnionComparer comparer, out bool wasChanged) {
 #else
-        internal static IEnumerable<AnalysisValue> UnionIter(this IEnumerable<AnalysisValue> items, UnionComparer comparer, out bool wasChanged) {
+        internal static IEnumerable<AnalysisProxy> UnionIter(this IEnumerable<AnalysisProxy> items, UnionComparer comparer, out bool wasChanged) {
 #endif
             wasChanged = false;
 
@@ -329,18 +354,18 @@ namespace Microsoft.NodejsTools.Analysis {
                 return items;
             }
 
-            var newItems = new List<AnalysisValue>();
+            var newItems = new List<AnalysisProxy>();
             var anyMerged = true;
 
             while (anyMerged) {
                 anyMerged = false;
-                var matches = new Dictionary<AnalysisValue, List<AnalysisValue>>(comparer);
+                var matches = new Dictionary<AnalysisProxy, List<AnalysisProxy>>(comparer);
 
                 foreach (var ns in items) {
-                    List<AnalysisValue> list;
+                    List<AnalysisProxy> list;
                     if (matches.TryGetValue(ns, out list)) {
                         if (list == null) {
-                            matches[ns] = list = new List<AnalysisValue>();
+                            matches[ns] = list = new List<AnalysisProxy>();
                         }
                         list.Add(ns);
                     } else {
@@ -377,24 +402,20 @@ namespace Microsoft.NodejsTools.Analysis {
         /// Removes excess capacity from <paramref name="set"/>.
         /// </summary>
         public static IAnalysisSet Trim(this IAnalysisSet set) {
-            if (set is AnalysisSetDetails.AnalysisSetManyObject) {
+            if (set is AnalysisSetDetails.AnalysisHashSet) {
                 switch (set.Count) {
                     case 0:
+                        if (set.Comparer is UnionComparer) {
+                            return AnalysisSetDetails.AnalysisSetEmptyUnion.Instances[((UnionComparer)set.Comparer).Strength];
+                        }
                         return Empty;
                     case 1:
+                        if (set.Comparer is UnionComparer) {
+                            return new AnalysisSetDetails.AnalysisSetOneUnion(set.First(), (UnionComparer)set.Comparer);
+                        }
                         return set.First();
                     case 2:
-                        return new AnalysisSetDetails.AnalysisSetTwoObject(set);
-                    default:
-                        return set;
-                }
-            } else if (set is AnalysisSetDetails.AnalysisSetManyUnion) {
-                switch (set.Count) {
-                    case 0:
-                        return AnalysisSetDetails.AnalysisSetEmptyUnion.Instances[((UnionComparer)set.Comparer).Strength];
-                    case 1:
-                        return new AnalysisSetDetails.AnalysisSetOneUnion(set.First(), (UnionComparer)set.Comparer);
-                    case 2: {
+                        if (set.Comparer is UnionComparer) {
                             var tup = AnalysisSetDetails.AnalysisSetTwoUnion.FromEnumerable(set, (UnionComparer)set.Comparer);
                             if (tup == null) {
                                 return set;
@@ -406,22 +427,19 @@ namespace Microsoft.NodejsTools.Analysis {
                                 return new AnalysisSetDetails.AnalysisSetTwoUnion(tup.Item1, tup.Item2, (UnionComparer)set.Comparer);
                             }
                         }
-                    default:
-                        return set;
+                        return new AnalysisSetDetails.AnalysisSetTwoObject(set);
                 }
-            } else {
-                return set;
-            }
+            } 
+            return set;
         }
 
         /// <summary>
         /// Merges all the types in <paramref name="sets" /> into this set.
         /// </summary>
         /// <param name="sets">The sets to merge into this set.</param>
-        /// <param name="canMutate">True if this set may be modified.</param>
-        public static IAnalysisSet UnionAll(this IAnalysisSet set, IEnumerable<IAnalysisSet> sets, bool canMutate = true) {
+        public static IAnalysisSet UnionAll(this IAnalysisSet set, IEnumerable<IAnalysisSet> sets) {
             bool dummy;
-            return set.UnionAll(sets, out dummy, canMutate);
+            return set.UnionAll(sets, out dummy);
         }
 
         /// <summary>
@@ -430,12 +448,11 @@ namespace Microsoft.NodejsTools.Analysis {
         /// <param name="sets">The sets to merge into this set.</param>
         /// <param name="wasChanged">Returns True if the contents of the
         /// returned set are different to the original set.</param>
-        /// <param name="canMutate">True if this set may be modified.</param>
-        public static IAnalysisSet UnionAll(this IAnalysisSet set, IEnumerable<IAnalysisSet> sets, out bool wasChanged, bool canMutate = true) {
+        public static IAnalysisSet UnionAll(this IAnalysisSet set, IEnumerable<IAnalysisSet> sets, out bool wasChanged) {
             bool changed;
             wasChanged = false;
             foreach (var s in sets) {
-                var newSet = set.Union(s, out changed, canMutate);
+                var newSet = set.Union(s, out changed);
                 if (changed) {
                     wasChanged = true;
                 }
@@ -447,10 +464,10 @@ namespace Microsoft.NodejsTools.Analysis {
         #endregion
     }
 
-    sealed class ObjectComparer : IEqualityComparer<AnalysisValue>, IEqualityComparer<IAnalysisSet> {
+    sealed class ObjectComparer : IEqualityComparer<AnalysisProxy>, IEqualityComparer<IAnalysisSet> {
         public static readonly ObjectComparer Instance = new ObjectComparer();
 
-        public bool Equals(AnalysisValue x, AnalysisValue y) {
+        public bool Equals(AnalysisProxy x, AnalysisProxy y) {
 #if FULL_VALIDATION
             if (x != null && y != null) {
                 Validation.Assert(x.Equals(y) == y.Equals(x));
@@ -462,15 +479,15 @@ namespace Microsoft.NodejsTools.Analysis {
             return (x == null) ? (y == null) : x.Equals(y);
         }
 
-        public int GetHashCode(AnalysisValue obj) {
+        public int GetHashCode(AnalysisProxy obj) {
             return (obj == null) ? 0 : obj.GetHashCode();
         }
 
         public bool Equals(IAnalysisSet set1, IAnalysisSet set2) {
             if (set1.Comparer == this) {
-                return set1.SetEquals(set2);
+                return new HashSet<AnalysisProxy>(set1, set1.Comparer).SetEquals(set2);
             } else if (set2.Comparer == this) {
-                return set2.SetEquals(set1);
+                return new HashSet<AnalysisProxy>(set2, set2.Comparer).SetEquals(set1);
             } else {
                 return set1.All(ns => set2.Contains(ns, this)) &&
                        set2.All(ns => set1.Contains(ns, this));
@@ -482,7 +499,7 @@ namespace Microsoft.NodejsTools.Analysis {
         }
     }
 
-    sealed class UnionComparer : IEqualityComparer<AnalysisValue>, IEqualityComparer<IAnalysisSet> {
+    sealed class UnionComparer : IEqualityComparer<AnalysisProxy> {
         public const int MAX_STRENGTH = 3;
         public static readonly UnionComparer[] Instances = Enumerable.Range(0, MAX_STRENGTH + 1).Select(i => new UnionComparer(i)).ToArray();
 
@@ -493,7 +510,7 @@ namespace Microsoft.NodejsTools.Analysis {
             Strength = strength;
         }
 
-        public bool Equals(AnalysisValue x, AnalysisValue y) {
+        public bool Equals(AnalysisProxy x, AnalysisProxy y) {
 #if FULL_VALIDATION
             if (x != null && y != null) {
                 Validation.Assert(x.UnionEquals(y, Strength) == y.UnionEquals(x, Strength), string.Format("{0}\n{1}\n{2}", Strength, x, y));
@@ -505,19 +522,19 @@ namespace Microsoft.NodejsTools.Analysis {
             if (Object.ReferenceEquals(x, y)) {
                 return true;
             }
-            return (x == null) ? (y == null) : x.UnionEquals(y, Strength);
+            return (x == null) ? (y == null) : x.Value.UnionEquals(y.Value, Strength);
         }
 
-        public int GetHashCode(AnalysisValue obj) {
-            return (obj == null) ? 0 : obj.UnionHashCode(Strength);
+        public int GetHashCode(AnalysisProxy obj) {
+            return (obj == null) ? 0 : obj.Value.UnionHashCode(Strength);
         }
 
-        public AnalysisValue MergeTypes(AnalysisValue x, AnalysisValue y, out bool wasChanged) {
+        public AnalysisProxy MergeTypes(AnalysisProxy x, AnalysisProxy y, out bool wasChanged) {
             if (Object.ReferenceEquals(x, y)) {
                 wasChanged = false;
                 return x;
             }
-            var z = x.UnionMergeTypes(y, Strength);
+            var z = x.Value.UnionMergeTypes(y.Value, Strength).Proxy;
             wasChanged = !Object.ReferenceEquals(x, z);
 #if FULL_VALIDATION
             var z2 = y.UnionMergeTypes(x, Strength);
@@ -527,17 +544,6 @@ namespace Microsoft.NodejsTools.Analysis {
             }
 #endif
             return z;
-        }
-
-        public bool Equals(IAnalysisSet set1, IAnalysisSet set2) {
-            if (set1.Comparer == this) {
-                return set1.SetEquals(set2);
-            } else if (set2.Comparer == this) {
-                return set2.SetEquals(set1);
-            } else {
-                return set1.All(ns => set2.Contains(ns, this)) &&
-                    (set2.Comparer == set1.Comparer || set2.All(ns => set1.Contains(ns, this)));
-            }
         }
 
         public int GetHashCode(IAnalysisSet obj) {
@@ -558,7 +564,7 @@ namespace Microsoft.NodejsTools.Analysis {
             }
 
             [DebuggerBrowsable(DebuggerBrowsableState.RootHidden)]
-            public AnalysisValue[] Data;
+            public AnalysisProxy[] Data;
 
             public override string ToString() {
                 return ToString(Data);
@@ -568,7 +574,7 @@ namespace Microsoft.NodejsTools.Analysis {
                 return ToString(source.ToArray());
             }
 
-            public static string ToString(AnalysisValue[] source) {
+            public static string ToString(AnalysisProxy[] source) {
                 var data = source.ToArray();
                 if (data.Length == 0) {
                     return "{}";
@@ -579,7 +585,7 @@ namespace Microsoft.NodejsTools.Analysis {
                 }
             }
 
-            public IEqualityComparer<AnalysisValue> Comparer {
+            public IEqualityComparer<AnalysisProxy> Comparer {
                 get;
                 private set;
             }
@@ -590,171 +596,25 @@ namespace Microsoft.NodejsTools.Analysis {
         }
 
         [DebuggerDisplay(DebugViewProxy.DisplayString), DebuggerTypeProxy(typeof(DebugViewProxy))]
-        [Serializable]
-        sealed class AnalysisSetManyObject : IAnalysisSet {
-            public readonly HashSet<AnalysisValue> Set;
-
-            public AnalysisSetManyObject(IEnumerable<AnalysisValue> items) {
-                Set = new HashSet<AnalysisValue>(items, ObjectComparer.Instance);
-            }
-
-            internal AnalysisSetManyObject(AnalysisSetTwoObject firstTwo, AnalysisValue third) {
-                Set = new HashSet<AnalysisValue>(ObjectComparer.Instance);
-                Set.Add(firstTwo.Value1);
-                Set.Add(firstTwo.Value2);
-                Set.Add(third);
-            }
-
-            public IAnalysisSet Add(AnalysisValue item, bool canMutate = true) {
-                if (canMutate) {
-                    Set.Add(item);
-                    return this;
-                }
-                if (Set.Contains(item)) {
-                    return this;
-                }
-                var set = new AnalysisSetManyObject(this.Set);
-                set.Set.Add(item);
-                return set;
-            }
-
-            public IAnalysisSet Add(AnalysisValue item, out bool wasChanged, bool canMutate = true) {
-                if (canMutate) {
-                    wasChanged = Set.Add(item);
-                    return this;
-                }
-                if (Set.Contains(item)) {
-                    wasChanged = false;
-                    return this;
-                }
-                var set = new AnalysisSetManyObject(this.Set);
-                wasChanged = set.Set.Add(item);
-                return set;
-            }
-
-            public IAnalysisSet Union(IEnumerable<AnalysisValue> items, bool canMutate = true) {
-                if (items == null) {
-                    return this;
-                }
-                if (canMutate) {
-                    Set.UnionWith(items);
-                    return this;
-                }
-                if (Set.IsSupersetOf(items)) {
-                    return this;
-                }
-                var set = new AnalysisSetManyObject(this.Set);
-                set.Set.UnionWith(items);
-                return set;
-            }
-
-            public IAnalysisSet Union(IEnumerable<AnalysisValue> items, out bool wasChanged, bool canMutate = true) {
-                if (items == null) {
-                    wasChanged = false;
-                    return this;
-                }
-                if (canMutate) {
-                    var prevCount = Count;
-                    Set.UnionWith(items);
-                    wasChanged = prevCount != Count;
-                    return this;
-                }
-                if (Set.IsSupersetOf(items)) {
-                    wasChanged = false;
-                    return this;
-                }
-                var set = new AnalysisSetManyObject(this.Set);
-                wasChanged = true;
-                set.Set.UnionWith(items);
-                return set;
-            }
-
-            public IAnalysisSet Clone() {
-                switch (Set.Count) {
-                    case 0:
-                        return new AnalysisSetEmptyObject();
-                    case 1:
-                        return new AnalysisSetOneObject(Set.First());
-                    case 2:
-                        return new AnalysisSetTwoObject(Set);
-                    default:
-                        return new AnalysisSetManyObject(Set);
-                }
-            }
-
-            public bool Contains(AnalysisValue item) {
-                return Set.Contains(item);
-            }
-
-            public bool SetEquals(IAnalysisSet other) {
-                if (other == null) {
-                    return false;
-                }
-                foreach (var ns in Set) {
-                    if (!other.Contains(ns, Comparer)) {
-                        return false;
-                    }
-                }
-                if (other.Comparer != Comparer) {
-                    foreach (var ns in Set) {
-                        if (!other.Contains(ns, Comparer)) {
-                            return false;
-                        }
-                    }
-                }
-                return true;
-            }
-
-            public int Count {
-                get { return Set.Count; }
-            }
-
-            public IEnumerator<AnalysisValue> GetEnumerator() {
-                return Set.GetEnumerator();
-            }
-
-            System.Collections.IEnumerator System.Collections.IEnumerable.GetEnumerator() {
-                return Set.GetEnumerator();
-            }
-
-            public IEqualityComparer<AnalysisValue> Comparer {
-                get { return ObjectComparer.Instance; }
-            }
-
-            public override string ToString() {
-                return DebugViewProxy.ToString(this);
-            }
-        }
-
-        [DebuggerDisplay(DebugViewProxy.DisplayString), DebuggerTypeProxy(typeof(DebugViewProxy))]
-        sealed class AnalysisSetEmptyObject : IAnalysisSet {
+        sealed class AnalysisSetEmptyObject : IAnalysisSet, IImmutableAnalysisSet {
             public static readonly IAnalysisSet Instance = new AnalysisSetEmptyObject();
 
-            public IAnalysisSet Add(AnalysisValue item, bool canMutate = true) {
-                return item;
-            }
+            public IAnalysisSet Add(AnalysisProxy item, out bool wasChanged) {
+                if (!item.IsAlive) {
+                    wasChanged = false;
+                    return this;
+                }
 
-            public IAnalysisSet Add(AnalysisValue item, out bool wasChanged, bool canMutate = true) {
                 wasChanged = true;
                 return item;
             }
 
-            public IAnalysisSet Union(IEnumerable<AnalysisValue> items, bool canMutate = true) {
-                if (items == null || items is AnalysisSetEmptyObject || items is AnalysisSetEmptyUnion) {
-                    return this;
-                }
-                if (items is AnalysisValue || items is AnalysisSetOneObject || items is AnalysisSetTwoObject) {
-                    return (IAnalysisSet)items;
-                }
-                return items.Any() ? AnalysisSet.Create(items) : this;
-            }
-
-            public IAnalysisSet Union(IEnumerable<AnalysisValue> items, out bool wasChanged, bool canMutate = true) {
+            public IAnalysisSet Union(IEnumerable<AnalysisProxy> items, out bool wasChanged) {
                 if (items == null || items is AnalysisSetEmptyObject || items is AnalysisSetEmptyUnion) {
                     wasChanged = false;
                     return this;
                 }
-                if (items is AnalysisValue || items is AnalysisSetOneObject || items is AnalysisSetTwoObject) {
+                if (items is AnalysisProxy || items is AnalysisSetTwoObject) {
                     wasChanged = true;
                     return (IAnalysisSet)items;
                 }
@@ -766,7 +626,7 @@ namespace Microsoft.NodejsTools.Analysis {
                 return this;
             }
 
-            public bool Contains(AnalysisValue item) {
+            public bool Contains(AnalysisProxy item) {
                 return false;
             }
 
@@ -778,7 +638,7 @@ namespace Microsoft.NodejsTools.Analysis {
                 get { return 0; }
             }
 
-            public IEnumerator<AnalysisValue> GetEnumerator() {
+            public IEnumerator<AnalysisProxy> GetEnumerator() {
                 yield break;
             }
 
@@ -786,7 +646,7 @@ namespace Microsoft.NodejsTools.Analysis {
                 return GetEnumerator();
             }
 
-            public IEqualityComparer<AnalysisValue> Comparer {
+            public IEqualityComparer<AnalysisProxy> Comparer {
                 get { return ObjectComparer.Instance; }
             }
 
@@ -794,127 +654,18 @@ namespace Microsoft.NodejsTools.Analysis {
                 return DebugViewProxy.ToString(this);
             }
         }
-
+        
         [DebuggerDisplay(DebugViewProxy.DisplayString), DebuggerTypeProxy(typeof(DebugViewProxy))]
         [Serializable]
-        sealed class AnalysisSetOneObject : IAnalysisSet {
-            public readonly AnalysisValue Value;
+        sealed class AnalysisSetTwoObject : IImmutableAnalysisSet {
+            public readonly AnalysisProxy Value1, Value2;
 
-            public AnalysisSetOneObject(AnalysisValue value) {
-                Value = value;
-            }
-
-            public IAnalysisSet Add(AnalysisValue item, bool canMutate = true) {
-                if (ObjectComparer.Instance.Equals(Value, item)) {
-                    return this;
-                } else {
-                    return new AnalysisSetTwoObject(Value, item);
-                }
-            }
-
-            public IAnalysisSet Add(AnalysisValue item, out bool wasChanged, bool canMutate = true) {
-                if (ObjectComparer.Instance.Equals(Value, item)) {
-                    wasChanged = false;
-                    return this;
-                } else {
-                    wasChanged = true;
-                    return new AnalysisSetTwoObject(Value, item);
-                }
-            }
-
-            public IAnalysisSet Union(IEnumerable<AnalysisValue> items, bool canMutate = true) {
-                AnalysisSetOneObject ns1;
-                AnalysisSetTwoObject ns2;
-                if (items == null) {
-                    return this;
-                } else if ((ns1 = items as AnalysisSetOneObject) != null) {
-                    return Add(ns1.Value, canMutate);
-                } else if ((ns2 = items as AnalysisSetTwoObject) != null) {
-                    if (ns2.Contains(Value)) {
-                        return ns2;
-                    }
-                    return new AnalysisSetManyObject(ns2, Value);
-                } else {
-                    return new AnalysisSetManyObject(items).Add(Value);
-                }
-            }
-
-            public IAnalysisSet Union(IEnumerable<AnalysisValue> items, out bool wasChanged, bool canMutate = true) {
-                AnalysisSetOneObject ns1;
-                AnalysisSetTwoObject ns2;
-                if (items == null) {
-                    wasChanged = false;
-                    return this;
-                } else if ((ns1 = items as AnalysisSetOneObject) != null) {
-                    return Add(ns1.Value, out wasChanged, canMutate);
-                } else if ((ns2 = items as AnalysisSetTwoObject) != null) {
-                    wasChanged = true;
-                    if (ns2.Contains(Value)) {
-                        return ns2;
-                    }
-                    return new AnalysisSetManyObject(ns2, Value);
-                } else {
-                    return new AnalysisSetManyObject(items).Add(Value, out wasChanged);
-                }
-            }
-
-            public IAnalysisSet Clone() {
-                return this;
-            }
-
-            public bool Contains(AnalysisValue item) {
-                return ObjectComparer.Instance.Equals(Value, item);
-            }
-
-            public bool SetEquals(IAnalysisSet other) {
-                AnalysisValue ns;
-                AnalysisSetOneObject ns1o;
-                AnalysisSetOneUnion ns1u;
-                if ((ns = other as AnalysisValue) != null) {
-                    return ObjectComparer.Instance.Equals(Value, ns);
-                } else if ((ns1o = other as AnalysisSetOneObject) != null) {
-                    return ObjectComparer.Instance.Equals(Value, ns1o.Value);
-                } else if ((ns1u = other as AnalysisSetOneUnion) != null) {
-                    return ObjectComparer.Instance.Equals(Value, ns1u.Value);
-                } else if (other != null && other.Count == 1) {
-                    return ObjectComparer.Instance.Equals(Value, other.First());
-                } else {
-                    return false;
-                }
-            }
-
-            public int Count {
-                get { return 1; }
-            }
-
-            public IEnumerator<AnalysisValue> GetEnumerator() {
-                return new SetOfOneEnumerator<AnalysisValue>(Value);
-            }
-
-            System.Collections.IEnumerator System.Collections.IEnumerable.GetEnumerator() {
-                return GetEnumerator();
-            }
-
-            public IEqualityComparer<AnalysisValue> Comparer {
-                get { return ObjectComparer.Instance; }
-            }
-
-            public override string ToString() {
-                return DebugViewProxy.ToString(this);
-            }
-        }
-
-        [DebuggerDisplay(DebugViewProxy.DisplayString), DebuggerTypeProxy(typeof(DebugViewProxy))]
-        [Serializable]
-        sealed class AnalysisSetTwoObject : IAnalysisSet {
-            public readonly AnalysisValue Value1, Value2;
-
-            public AnalysisSetTwoObject(AnalysisValue value1, AnalysisValue value2) {
+            public AnalysisSetTwoObject(AnalysisProxy value1, AnalysisProxy value2) {
                 Value1 = value1;
                 Value2 = value2;
             }
 
-            public AnalysisSetTwoObject(IEnumerable<AnalysisValue> set) {
+            public AnalysisSetTwoObject(IEnumerable<AnalysisProxy> set) {
                 using (var e = set.GetEnumerator()) {
                     if (!e.MoveNext()) {
                         throw new InvalidOperationException("Sequence requires exactly two values");
@@ -930,51 +681,101 @@ namespace Microsoft.NodejsTools.Analysis {
                 }
             }
 
-            public IAnalysisSet Add(AnalysisValue item, bool canMutate = true) {
-                if (ObjectComparer.Instance.Equals(Value1, item) || ObjectComparer.Instance.Equals(Value2, item)) {
+            public IAnalysisSet Add(AnalysisProxy item, out bool wasChanged) {
+                if (!item.IsAlive) {
+                    wasChanged = false;
                     return this;
                 }
-                return new AnalysisSetManyObject(this, item);
-            }
 
-            public IAnalysisSet Add(AnalysisValue item, out bool wasChanged, bool canMutate = true) {
                 if (ObjectComparer.Instance.Equals(Value1, item) || ObjectComparer.Instance.Equals(Value2, item)) {
                     wasChanged = false;
                     return this;
                 }
                 wasChanged = true;
-                return new AnalysisSetManyObject(this, item);
-            }
-
-            public IAnalysisSet Union(IEnumerable<AnalysisValue> items, bool canMutate = true) {
-                AnalysisValue ns;
-                AnalysisSetOneObject ns1;
-                if (items == null) {
-                    return this;
-                } else if ((ns = items as AnalysisValue) != null) {
-                    return Add(ns, canMutate);
-                } else if ((ns1 = items as AnalysisSetOneObject) != null) {
-                    return Add(ns1.Value, canMutate);
-                } else {
-                    return new AnalysisSetManyObject(items).Add(Value1).Add(Value2);
+                if (!Value1.IsAlive) {
+                    if (!Value2.IsAlive) {
+                        return item;
+                    }
+                    return new AnalysisSetTwoObject(Value2, item);
+                } else if (!Value2.IsAlive) {
+                    return new AnalysisSetTwoObject(Value1, item);
                 }
+
+                return new AnalysisHashSet(this).Add(item);
             }
 
-            public IAnalysisSet Union(IEnumerable<AnalysisValue> items, out bool wasChanged, bool canMutate = true) {
-                AnalysisValue ns;
-                AnalysisSetOneObject ns1;
+            public IAnalysisSet Union(IEnumerable<AnalysisProxy> items, out bool wasChanged) {
+                AnalysisProxy ns;
                 if (items == null) {
                     wasChanged = false;
                     return this;
-                } else if ((ns = items as AnalysisValue) != null) {
-                    return Add(ns, out wasChanged, canMutate);
-                } else if ((ns1 = items as AnalysisSetOneObject) != null) {
-                    return Add(ns1.Value, out wasChanged, canMutate);
+                } else if ((ns = items as AnalysisProxy) != null) {
+                    return Add(ns, out wasChanged);
                 } else {
-                    bool wasChanged1, wasChanged2;
-                    var set = new AnalysisSetManyObject(items).Add(Value1, out wasChanged1).Add(Value2, out wasChanged2);
-                    wasChanged = wasChanged1 || wasChanged2;
-                    return set;
+                    int count = items.Count();
+                    if (Value1.IsAlive) {
+                        if (!items.Contains(Value1)) {
+                            count++;
+                        }
+                    }
+                    if (Value2.IsAlive) {
+                        if (!items.Contains(Value2)) {
+                            count++;
+                        }
+                    }
+
+                    switch (count) {
+                        case 0:
+                            wasChanged = false;
+                            return AnalysisSetEmptyObject.Instance;
+                        case 1:
+                            if (Value1.IsAlive) {
+                                wasChanged = false;
+                                return Value1;
+                            } else if (Value2.IsAlive) {
+                                wasChanged = false;
+                                return Value2;
+                            }
+                            wasChanged = true;
+                            return items.First();
+                        case 2:
+                            AnalysisProxy first = null;
+                            if (Value1.IsAlive) {
+                                first = Value1;
+                            }
+                            if (Value2.IsAlive) {
+                                if (first == null) {
+                                    first = Value2;
+                                } else {
+                                    // items is empty...
+                                    wasChanged = false;
+                                    return this;
+                                }
+                            }
+                            if (first == null) {
+                                // Value1 & Value2 are gone
+                                wasChanged = true;
+                                return new AnalysisSetTwoObject(items);
+                            }
+                            // Value1 or Value2 is gone...
+                            if (!items.First().IsAlive) {
+                                // and so is the 1 item we have...
+                                wasChanged = false;
+                                return first;
+                            }
+                            wasChanged = true;
+                            return new AnalysisSetTwoObject(first, items.First());
+                        default:
+                            var res = new AnalysisHashSet();
+                            if (Value1.IsAlive) {
+                                res.Add(Value1);
+                            }
+                            if (Value2.IsAlive) {
+                                res.Add(Value2);
+                            }
+                            res.Union(items, out wasChanged);
+                            return res;
+                    }
                 }
             }
 
@@ -982,41 +783,38 @@ namespace Microsoft.NodejsTools.Analysis {
                 return this;
             }
 
-            public bool Contains(AnalysisValue item) {
+            public bool Contains(AnalysisProxy item) {
                 return ObjectComparer.Instance.Equals(Value1, item) || ObjectComparer.Instance.Equals(Value2, item);
             }
 
-            public bool SetEquals(IAnalysisSet other) {
-                var ns2 = other as AnalysisSetTwoObject;
-                if (ns2 != null) {
-                    return ObjectComparer.Instance.Equals(Value1, ns2.Value1) && ObjectComparer.Instance.Equals(Value2, ns2.Value2) ||
-                        ObjectComparer.Instance.Equals(Value1, ns2.Value2) && ObjectComparer.Instance.Equals(Value2, ns2.Value1);
-                } else if (other != null && other.Count == 2) {
-                    foreach (var ns in other) {
-                        if (!ObjectComparer.Instance.Equals(Value1, ns) && !ObjectComparer.Instance.Equals(Value2, ns)) {
-                            return false;
+            public int Count {
+                get {
+                    if (Value1.IsAlive) {
+                        if (Value2.IsAlive) {
+                            return 2;
                         }
+                        return 1;
+                    } else if (Value2.IsAlive) {
+                        return 1;
                     }
-                    return true;
-                } else {
-                    return false;
+                    return 0; 
                 }
             }
 
-            public int Count {
-                get { return 2; }
-            }
-
-            public IEnumerator<AnalysisValue> GetEnumerator() {
-                yield return Value1;
-                yield return Value2;
+            public IEnumerator<AnalysisProxy> GetEnumerator() {
+                if (Value1.IsAlive) {
+                    yield return Value1;
+                } 
+                if (Value2.IsAlive) {
+                    yield return Value2;
+                }
             }
 
             System.Collections.IEnumerator System.Collections.IEnumerable.GetEnumerator() {
                 return GetEnumerator();
             }
 
-            public IEqualityComparer<AnalysisValue> Comparer {
+            public IEqualityComparer<AnalysisProxy> Comparer {
                 get { return ObjectComparer.Instance; }
             }
 
@@ -1025,206 +823,9 @@ namespace Microsoft.NodejsTools.Analysis {
             }
         }
 
-
-
-
         [DebuggerDisplay(DebugViewProxy.DisplayString), DebuggerTypeProxy(typeof(DebugViewProxy))]
         [Serializable]
-        sealed class AnalysisSetManyUnion : IAnalysisSet {
-            public readonly HashSet<AnalysisValue> Set;
-
-            public AnalysisSetManyUnion(IEnumerable<AnalysisValue> items, UnionComparer comparer) {
-                Set = new HashSet<AnalysisValue>(items, comparer);
-            }
-
-            internal AnalysisSetManyUnion(AnalysisSetTwoUnion firstTwo, AnalysisValue third, UnionComparer comparer, out bool wasChanged) {
-                Set = new HashSet<AnalysisValue>(comparer);
-                Set.Add(firstTwo.Value1);
-                wasChanged = true;
-                if (!Set.Add(firstTwo.Value2) || !Set.Add(third)) {
-                    Set.Clear();
-                    Set.UnionWith(firstTwo.Concat(third).UnionIter(comparer, out wasChanged));
-                }
-            }
-
-            private AnalysisSetManyUnion(HashSet<AnalysisValue> set) {
-                Set = set;
-            }
-
-            public IAnalysisSet Add(AnalysisValue item, bool canMutate = true) {
-                bool dummy;
-                return Add(item, out dummy, canMutate);
-            }
-
-            public IAnalysisSet Add(AnalysisValue item, out bool wasChanged, bool canMutate = true) {
-                var set = Set;
-                if (canMutate) {
-                    if (set.Add(item)) {
-                        wasChanged = true;
-                        return this;
-                    }
-                } else if (!set.Contains(item)) {
-                    set = new HashSet<AnalysisValue>(set, set.Comparer);
-                    wasChanged = set.Add(item);
-                    return wasChanged ? new AnalysisSetManyUnion(set) : this;
-                } else {
-                    set = new HashSet<AnalysisValue>(set, set.Comparer);
-                }
-
-                var cmp = Comparer;
-                var newItem = item;
-                bool newItemAlreadyInSet = false;
-                foreach (var ns in Set) {
-                    if (cmp.Equals(ns, newItem)) {
-                        bool changed = false;
-                        newItem = cmp.MergeTypes(ns, newItem, out changed);
-                        newItemAlreadyInSet = !changed;
-                    }
-                }
-                if (!newItemAlreadyInSet) {
-                    wasChanged = (set.RemoveWhere(ns => cmp.Equals(ns, newItem)) > 0);
-                    wasChanged |= set.Add(newItem);
-                } else {
-                    wasChanged = (set.RemoveWhere(ns => !Object.ReferenceEquals(ns, newItem) && cmp.Equals(ns, newItem)) > 0);
-                }
-
-                return (canMutate | !wasChanged) ? this : new AnalysisSetManyUnion(set);
-            }
-
-            public IAnalysisSet Union(IEnumerable<AnalysisValue> items, bool canMutate = true) {
-                if (items == null) {
-                    return this;
-                }
-                bool anyAdded = false;
-                var cmp = Comparer;
-                var set = canMutate ? Set : new HashSet<AnalysisValue>(Set, Set.Comparer);
-                foreach (var item in items) {
-                    if (set.Add(item)) {
-                        anyAdded = true;
-                    } else {
-                        bool dummy;
-                        var newItem = item;
-                        foreach (var ns in set) {
-                            if (Object.ReferenceEquals(ns, newItem)) {
-                                return this;
-                            }
-                            if (cmp.Equals(ns, newItem)) {
-                                newItem = cmp.MergeTypes(ns, newItem, out dummy);
-                            }
-                        }
-                        set.RemoveWhere(ns => cmp.Equals(ns, newItem));
-                        set.Add(newItem);
-                    }
-                }
-                return (canMutate | !anyAdded) ? this : new AnalysisSetManyUnion(set);
-            }
-
-            public IAnalysisSet Union(IEnumerable<AnalysisValue> items, out bool wasChanged, bool canMutate = true) {
-                if (items == null) {
-                    wasChanged = false;
-                    return this;
-                } 
-                bool anyAdded = false;
-                var cmp = Comparer;
-                var set = canMutate ? Set : new HashSet<AnalysisValue>(Set, Set.Comparer);
-                wasChanged = false;
-                foreach (var item in items) {
-                    if (set.Add(item)) {
-                        anyAdded = true;
-                    } else {
-                        bool changed = false;
-                        var newItem = item;
-                        foreach (var ns in set) {
-                            if (Object.ReferenceEquals(ns, newItem)) {
-                                return this;
-                            }
-                            if (cmp.Equals(ns, newItem)) {
-                                newItem = cmp.MergeTypes(ns, newItem, out changed);
-                            }
-                        }
-                        int removed = set.RemoveWhere(ns => cmp.Equals(ns, newItem));
-                        set.Add(newItem);
-                        anyAdded |= (removed > 1) | changed;
-                    }
-                }
-                wasChanged = anyAdded;
-                return (canMutate | !anyAdded) ? this : new AnalysisSetManyUnion(set);
-            }
-
-            public IAnalysisSet Clone() {
-                switch (Set.Count) {
-                    case 0:
-                        return AnalysisSetEmptyUnion.Instances[Comparer.Strength];
-                    case 1:
-                        return new AnalysisSetOneUnion(Set.First(), Comparer);
-                    case 2: {
-                            var tup = AnalysisSetTwoUnion.FromEnumerable(Set, Comparer);
-                            if (tup == null) {
-                                return new AnalysisSetManyUnion(Set, Comparer);
-                            } else if (tup.Item1 == null && tup.Item2 == null) {
-                                return AnalysisSetEmptyUnion.Instances[Comparer.Strength];
-                            } else if (tup.Item2 == null) {
-                                return new AnalysisSetOneUnion(tup.Item1, Comparer);
-                            } else {
-                                return new AnalysisSetTwoUnion(tup.Item1, tup.Item2, Comparer);
-                            }
-                        }
-                    default:
-                        return new AnalysisSetManyUnion(Set, Comparer);
-                }
-            }
-
-            public bool Contains(AnalysisValue item) {
-                return Set.Contains(item);
-            }
-
-            public bool SetEquals(IAnalysisSet other) {
-                if (other == null) {
-                    return false;
-                }
-                foreach (var ns in Set) {
-                    if (!other.Contains(ns, Comparer)) {
-                        return false;
-                    }
-                }
-                if (other.Comparer != Comparer) {
-                    foreach (var ns in Set) {
-                        if (!other.Contains(ns, Comparer)) {
-                            return false;
-                        }
-                    }
-                }
-                return true;
-            }
-
-            public int Count {
-                get { return Set.Count; }
-            }
-
-            public IEnumerator<AnalysisValue> GetEnumerator() {
-                return Set.GetEnumerator();
-            }
-
-            System.Collections.IEnumerator System.Collections.IEnumerable.GetEnumerator() {
-                return Set.GetEnumerator();
-            }
-
-            internal UnionComparer Comparer {
-                get { return (UnionComparer)Set.Comparer; }
-            }
-
-            IEqualityComparer<AnalysisValue> IAnalysisSet.Comparer {
-                get { return Set.Comparer; }
-            }
-
-            public override string ToString() {
-                return DebugViewProxy.ToString(this);
-            }
-        }
-
-        [DebuggerDisplay(DebugViewProxy.DisplayString), DebuggerTypeProxy(typeof(DebugViewProxy))]
-        [Serializable]
-        sealed class AnalysisSetEmptyUnion : IAnalysisSet {
+        sealed class AnalysisSetEmptyUnion : IAnalysisSet, IImmutableAnalysisSet {
             public static readonly IAnalysisSet[] Instances = UnionComparer.Instances.Select(cmp => new AnalysisSetEmptyUnion(cmp)).ToArray();
 
             private readonly UnionComparer _comparer;
@@ -1233,25 +834,17 @@ namespace Microsoft.NodejsTools.Analysis {
                 _comparer = comparer;
             }
 
-            public IAnalysisSet Add(AnalysisValue item, bool canMutate = true) {
-                return new AnalysisSetOneUnion(item, Comparer);
-            }
+            public IAnalysisSet Add(AnalysisProxy item, out bool wasChanged) {
+                if (!item.IsAlive) {
+                    wasChanged = false;
+                    return this;
+                }
 
-            public IAnalysisSet Add(AnalysisValue item, out bool wasChanged, bool canMutate = true) {
                 wasChanged = true;
                 return new AnalysisSetOneUnion(item, Comparer);
             }
 
-            public IAnalysisSet Union(IEnumerable<AnalysisValue> items, bool canMutate = true) {
-                if (items == null) {
-                    return this;
-                } else if (items is AnalysisSetOneUnion || items is AnalysisSetTwoUnion || items is AnalysisSetEmptyUnion) {
-                    return (IAnalysisSet)items;
-                }
-                return items.Any() ? AnalysisSet.CreateUnion(items, Comparer) : this;
-            }
-
-            public IAnalysisSet Union(IEnumerable<AnalysisValue> items, out bool wasChanged, bool canMutate = true) {
+            public IAnalysisSet Union(IEnumerable<AnalysisProxy> items, out bool wasChanged) {
                 if (items == null || items is AnalysisSetEmptyObject || items is AnalysisSetEmptyUnion) {
                     wasChanged = false;
                     return this;
@@ -1268,7 +861,7 @@ namespace Microsoft.NodejsTools.Analysis {
                 return this;
             }
 
-            public bool Contains(AnalysisValue item) {
+            public bool Contains(AnalysisProxy item) {
                 return false;
             }
 
@@ -1280,7 +873,7 @@ namespace Microsoft.NodejsTools.Analysis {
                 get { return 0; }
             }
 
-            public IEnumerator<AnalysisValue> GetEnumerator() {
+            public IEnumerator<AnalysisProxy> GetEnumerator() {
                 yield break;
             }
 
@@ -1292,7 +885,7 @@ namespace Microsoft.NodejsTools.Analysis {
                 get { return _comparer; }
             }
 
-            IEqualityComparer<AnalysisValue> IAnalysisSet.Comparer {
+            IEqualityComparer<AnalysisProxy> IAnalysisSet.Comparer {
                 get { return ((AnalysisSetEmptyUnion)this).Comparer; }
             }
 
@@ -1303,28 +896,26 @@ namespace Microsoft.NodejsTools.Analysis {
 
         [DebuggerDisplay(DebugViewProxy.DisplayString), DebuggerTypeProxy(typeof(DebugViewProxy))]
         [Serializable]
-        sealed class AnalysisSetOneUnion : IAnalysisSet {
-            public readonly AnalysisValue Value;
+        sealed class AnalysisSetOneUnion : IImmutableAnalysisSet {
+            public readonly AnalysisProxy Value;
             private readonly UnionComparer _comparer;
 
-            public AnalysisSetOneUnion(AnalysisValue value, UnionComparer comparer) {
+            public AnalysisSetOneUnion(AnalysisProxy value, UnionComparer comparer) {
                 Value = value;
                 _comparer = comparer;
             }
 
-            public IAnalysisSet Add(AnalysisValue item, bool canMutate = true) {
-                if (Object.ReferenceEquals(Value, item)) {
+            public IAnalysisSet Add(AnalysisProxy item, out bool wasChanged) {
+                if (!item.IsAlive) {
+                    wasChanged = false;
                     return this;
-                } else if (Comparer.Equals(Value, item)) {
-                    bool wasChanged;
-                    var newItem = Comparer.MergeTypes(Value, item, out wasChanged);
-                    return wasChanged ? new AnalysisSetOneUnion(newItem, Comparer) : this;
-                } else {
-                    return new AnalysisSetTwoUnion(Value, item, Comparer);
                 }
-            }
 
-            public IAnalysisSet Add(AnalysisValue item, out bool wasChanged, bool canMutate = true) {
+                if (!Value.IsAlive) {
+                    wasChanged = true;
+                    return item;
+                }
+
                 if (Object.ReferenceEquals(Value, item)) {
                     wasChanged = false;
                     return this;
@@ -1337,44 +928,21 @@ namespace Microsoft.NodejsTools.Analysis {
                 }
             }
 
-            public IAnalysisSet Union(IEnumerable<AnalysisValue> items, bool canMutate = true) {
-                AnalysisValue ns;
+            public IAnalysisSet Union(IEnumerable<AnalysisProxy> items, out bool wasChanged) {
+                AnalysisProxy ns;
                 AnalysisSetOneUnion ns1;
-                AnalysisSetOneObject nsO1;
-                AnalysisSetTwoUnion ns2;
-                if (items == null) {
-                    return this;
-                } else if ((ns = items as AnalysisValue) != null) {
-                    return Add(ns, canMutate);
-                } else if ((ns1 = items as AnalysisSetOneUnion) != null) {
-                    return Add(ns1.Value, canMutate);
-                } else if ((nsO1 = items as AnalysisSetOneObject) != null) {
-                    return Add(nsO1.Value, canMutate);
-                } else if ((ns2 = items as AnalysisSetTwoUnion) != null && ns2.Comparer == Comparer) {
-                    return ns2.Add(Value, false);
-                } else {
-                    return new AnalysisSetManyUnion(items, Comparer).Add(Value).Trim();
-                }
-            }
-
-            public IAnalysisSet Union(IEnumerable<AnalysisValue> items, out bool wasChanged, bool canMutate = true) {
-                AnalysisValue ns;
-                AnalysisSetOneUnion ns1;
-                AnalysisSetOneObject nsO1;
                 AnalysisSetTwoUnion ns2;
                 if (items == null) {
                     wasChanged = false;
                     return this;
-                } else if ((ns = items as AnalysisValue) != null) {
-                    return Add(ns, out wasChanged, canMutate);
+                } else if ((ns = items as AnalysisProxy) != null) {
+                    return Add(ns, out wasChanged);
                 } else if ((ns1 = items as AnalysisSetOneUnion) != null) {
-                    return Add(ns1.Value, out wasChanged, canMutate);
-                } else if ((nsO1 = items as AnalysisSetOneObject) != null) {
-                    return Add(nsO1.Value, out wasChanged, canMutate);
+                    return Add(ns1.Value, out wasChanged);
                 } else if ((ns2 = items as AnalysisSetTwoUnion) != null && ns2.Comparer == Comparer) {
-                    return ns2.Add(Value, out wasChanged, false);
+                    return ns2.Add(Value, out wasChanged);
                 } else {
-                    return new AnalysisSetManyUnion(Value, Comparer).Union(items, out wasChanged).Trim();
+                    return new AnalysisHashSet(Value, Comparer).Union(items, out wasChanged).Trim();
                 }
             }
 
@@ -1382,29 +950,21 @@ namespace Microsoft.NodejsTools.Analysis {
                 return this;
             }
 
-            public bool Contains(AnalysisValue item) {
+            public bool Contains(AnalysisProxy item) {
                 return Comparer.Equals(Value, item);
             }
 
-            public bool SetEquals(IAnalysisSet other) {
-                var ns1 = other as AnalysisSetOneUnion;
-                if (ns1 != null) {
-                    return Comparer.Equals(Value, ns1.Value);
-                } else if (other == null) {
-                    return false;
-                } else if (other.Count == 1) {
-                    return Comparer.Equals(Value, other.First());
-                } else {
-                    return other.All(ns => Comparer.Equals(ns, Value));
+            public int Count {
+                get {
+                    if (Value.IsAlive) {
+                        return 1;
+                    }
+                    return 0;
                 }
             }
 
-            public int Count {
-                get { return 1; }
-            }
-
-            public IEnumerator<AnalysisValue> GetEnumerator() {
-                return new SetOfOneEnumerator<AnalysisValue>(Value);
+            public IEnumerator<AnalysisProxy> GetEnumerator() {
+                return new SetOfOneEnumerator<AnalysisProxy>(Value);
             }
 
             System.Collections.IEnumerator System.Collections.IEnumerable.GetEnumerator() {
@@ -1415,7 +975,7 @@ namespace Microsoft.NodejsTools.Analysis {
                 get { return _comparer; }
             }
 
-            IEqualityComparer<AnalysisValue> IAnalysisSet.Comparer {
+            IEqualityComparer<AnalysisProxy> IAnalysisSet.Comparer {
                 get { return ((AnalysisSetOneUnion)this).Comparer; }
             }
 
@@ -1426,39 +986,39 @@ namespace Microsoft.NodejsTools.Analysis {
 
         [DebuggerDisplay(DebugViewProxy.DisplayString), DebuggerTypeProxy(typeof(DebugViewProxy))]
         [Serializable]
-        sealed class AnalysisSetTwoUnion : IAnalysisSet {
-            public readonly AnalysisValue Value1, Value2;
+        sealed class AnalysisSetTwoUnion : IImmutableAnalysisSet {
+            public readonly AnalysisProxy Value1, Value2;
             private readonly UnionComparer _comparer;
 
-            public AnalysisSetTwoUnion(AnalysisValue value1, AnalysisValue value2, UnionComparer comparer) {
+            public AnalysisSetTwoUnion(AnalysisProxy value1, AnalysisProxy value2, UnionComparer comparer) {
                 Debug.Assert(!comparer.Equals(value1, value2));
                 Value1 = value1;
                 Value2 = value2;
                 _comparer = comparer;
             }
 
-            internal static Tuple<AnalysisValue, AnalysisValue> FromEnumerable(IEnumerable<AnalysisValue> set, UnionComparer comparer) {
+            internal static Tuple<AnalysisProxy, AnalysisProxy> FromEnumerable(IEnumerable<AnalysisProxy> set, UnionComparer comparer) {
                 using (var e = set.GetEnumerator()) {
                     if (!e.MoveNext()) {
-                        return new Tuple<AnalysisValue, AnalysisValue>(null, null);
+                        return new Tuple<AnalysisProxy, AnalysisProxy>(null, null);
                     }
                     var value1 = e.Current;
                     if (!e.MoveNext()) {
-                        return new Tuple<AnalysisValue, AnalysisValue>(value1, null);
+                        return new Tuple<AnalysisProxy, AnalysisProxy>(value1, null);
                     }
                     var value2 = e.Current;
                     if (comparer.Equals(e.Current, value1)) {
                         bool dummy;
-                        return new Tuple<AnalysisValue, AnalysisValue>(comparer.MergeTypes(value1, value2, out dummy), null);
+                        return new Tuple<AnalysisProxy, AnalysisProxy>(comparer.MergeTypes(value1, value2, out dummy), null);
                     }
                     if (e.MoveNext()) {
                         return null;
                     }
-                    return new Tuple<AnalysisValue, AnalysisValue>(value1, value2);
+                    return new Tuple<AnalysisProxy, AnalysisProxy>(value1, value2);
                 }
             }
 
-            public AnalysisSetTwoUnion(IEnumerable<AnalysisValue> set, UnionComparer comparer) {
+            public AnalysisSetTwoUnion(IEnumerable<AnalysisProxy> set, UnionComparer comparer) {
                 _comparer = comparer;
                 var tup = FromEnumerable(set, comparer);
                 if (tup == null || tup.Item2 == null) {
@@ -1468,12 +1028,12 @@ namespace Microsoft.NodejsTools.Analysis {
                 Value2 = tup.Item2;
             }
 
-            public IAnalysisSet Add(AnalysisValue item, bool canMutate = true) {
-                bool dummy;
-                return Add(item, out dummy, canMutate);
-            }
+            public IAnalysisSet Add(AnalysisProxy item, out bool wasChanged) {
+                if (!item.IsAlive) {
+                    wasChanged = false;
+                    return this;
+                }
 
-            public IAnalysisSet Add(AnalysisValue item, out bool wasChanged, bool canMutate = true) {
                 bool dummy;
                 if (Object.ReferenceEquals(Value1, item) || Object.ReferenceEquals(Value2, item)) {
                     wasChanged = false;
@@ -1500,41 +1060,21 @@ namespace Microsoft.NodejsTools.Analysis {
                     }
                 }
                 wasChanged = true;
-                return new AnalysisSetManyUnion(this, item, Comparer, out dummy);
+                return new AnalysisHashSet(this, Comparer).Add(item);
             }
 
-            public IAnalysisSet Union(IEnumerable<AnalysisValue> items, bool canMutate = true) {
-                AnalysisValue ns;
-                AnalysisSetOneObject ns1o;
-                AnalysisSetOneUnion ns1u;
-                if (items == null) {
-                    return this;
-                } else if ((ns = items as AnalysisValue) != null) {
-                    return Add(ns, canMutate);
-                } else if ((ns1o = items as AnalysisSetOneObject) != null) {
-                    return Add(ns1o.Value, canMutate);
-                } else if ((ns1u = items as AnalysisSetOneUnion) != null) {
-                    return Add(ns1u.Value, canMutate);
-                } else {
-                    return new AnalysisSetManyUnion(this, Comparer).Union(items);
-                }
-            }
-
-            public IAnalysisSet Union(IEnumerable<AnalysisValue> items, out bool wasChanged, bool canMutate = true) {
-                AnalysisValue ns;
-                AnalysisSetOneObject ns1o;
+            public IAnalysisSet Union(IEnumerable<AnalysisProxy> items, out bool wasChanged) {
+                AnalysisProxy ns;
                 AnalysisSetOneUnion ns1u;
                 if (items == null) {
                     wasChanged = false;
                     return this;
-                } else if ((ns = items as AnalysisValue) != null) {
-                    return Add(ns, out wasChanged, canMutate);
-                } else if ((ns1o = items as AnalysisSetOneObject) != null) {
-                    return Add(ns1o.Value, out wasChanged, canMutate);
+                } else if ((ns = items as AnalysisProxy) != null) {
+                    return Add(ns, out wasChanged);
                 } else if ((ns1u = items as AnalysisSetOneUnion) != null) {
-                    return Add(ns1u.Value, out wasChanged, canMutate);
+                    return Add(ns1u.Value, out wasChanged);
                 } else {
-                    return new AnalysisSetManyUnion(this, Comparer).Union(items, out wasChanged);
+                    return new AnalysisHashSet(this, Comparer).Union(items, out wasChanged);
                 }
             }
 
@@ -1542,29 +1082,31 @@ namespace Microsoft.NodejsTools.Analysis {
                 return this;
             }
 
-            public bool Contains(AnalysisValue item) {
+            public bool Contains(AnalysisProxy item) {
                 return Comparer.Equals(Value1, item) || Comparer.Equals(Value2, item);
             }
 
-            public bool SetEquals(IAnalysisSet other) {
-                var ns2 = other as AnalysisSetTwoUnion;
-                if (ns2 != null) {
-                    return Comparer.Equals(Value1, ns2.Value1) && Comparer.Equals(Value2, ns2.Value2) ||
-                        Comparer.Equals(Value1, ns2.Value2) && Comparer.Equals(Value2, ns2.Value1);
-                } else if (other != null) {
-                    return other.All(ns => Comparer.Equals(Value1) || Comparer.Equals(Value2));
-                } else {
-                    return false;
+            public int Count {
+                get {
+                    if (Value1.IsAlive) {
+                        if (Value2.IsAlive) {
+                            return 2;
+                        }
+                        return 1;
+                    } else if (Value2.IsAlive) {
+                        return 2;
+                    }
+                    return 0; 
                 }
             }
 
-            public int Count {
-                get { return 2; }
-            }
-
-            public IEnumerator<AnalysisValue> GetEnumerator() {
-                yield return Value1;
-                yield return Value2;
+            public IEnumerator<AnalysisProxy> GetEnumerator() {
+                if (Value1.IsAlive) {
+                    yield return Value1;
+                }
+                if (Value2.IsAlive) {
+                    yield return Value2;
+                }
             }
 
             System.Collections.IEnumerator System.Collections.IEnumerable.GetEnumerator() {
@@ -1575,7 +1117,7 @@ namespace Microsoft.NodejsTools.Analysis {
                 get { return _comparer; }
             }
 
-            IEqualityComparer<AnalysisValue> IAnalysisSet.Comparer {
+            IEqualityComparer<AnalysisProxy> IAnalysisSet.Comparer {
                 get { return ((AnalysisSetTwoUnion)this).Comparer; }
             }
 

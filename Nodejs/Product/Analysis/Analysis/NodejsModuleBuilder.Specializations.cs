@@ -54,13 +54,13 @@ namespace Microsoft.NodejsTools.Analysis {
                 var prototype = args[1].Get(node, unit, "prototype");
                 if (!unit.DeclaringModuleEnvironment.TryGetNodeValue(NodeEnvironmentKind.InheritsPrototypeValue, node, out prototypeValue)) {
                     copied = new InheritsPrototypeValue(unit.ProjectEntry, prototype);
-                    unit.DeclaringModuleEnvironment.AddNodeValue(NodeEnvironmentKind.InheritsPrototypeValue, node, copied);
+                    unit.DeclaringModuleEnvironment.AddNodeValue(NodeEnvironmentKind.InheritsPrototypeValue, node, copied.Proxy);
                 } else {
-                    copied = (InheritsPrototypeValue)prototypeValue.First();
+                    copied = (InheritsPrototypeValue)prototypeValue.First().Value;
                     copied.AddPrototypes(prototype);
                 }
 
-                args[0].SetMember(node, unit, "prototype", copied);
+                args[0].SetMember(node, unit, "prototype", copied.Proxy);
             }
             return AnalysisSet.Empty;
         }
@@ -95,10 +95,10 @@ namespace Microsoft.NodejsTools.Analysis {
         private static IAnalysisSet EventEmitterAddListener(FunctionValue func, Node node, AnalysisUnit unit, IAnalysisSet @this, IAnalysisSet[] args) {
             if (args.Length >= 2 && args[1].Count > 0) {
                 foreach (var thisArg in @this) {
-                    ExpandoValue expando = @thisArg as ExpandoValue;
+                    ExpandoValue expando = @thisArg.Value as ExpandoValue;
                     if (expando != null) {
                         foreach (var arg in args[0]) {
-                            var strValue = arg.GetConstantValueAsString();
+                            var strValue = arg.Value.GetConstantValueAsString();
                             if (strValue != null) {
                                 var key = new EventListenerKey(strValue);
                                 VariableDef events;
@@ -123,14 +123,14 @@ namespace Microsoft.NodejsTools.Analysis {
         private static IAnalysisSet EventEmitterEmit(FunctionValue func, Node node, AnalysisUnit unit, IAnalysisSet @this, IAnalysisSet[] args) {
             if (args.Length >= 1) {
                 foreach (var thisArg in @this) {
-                    ExpandoValue expando = @thisArg as ExpandoValue;
+                    ExpandoValue expando = @thisArg.Value as ExpandoValue;
                     if (expando != null) {
                         foreach (var arg in args[0]) {
-                            var strValue = arg.GetConstantValueAsString();
+                            var strValue = arg.Value.GetConstantValueAsString();
                             if (strValue != null) {
                                 VariableDef events;
                                 if (expando.TryGetMetadata<VariableDef>(new EventListenerKey(strValue), out events)) {
-                                    foreach (var type in events.TypesNoCopy) {
+                                    foreach (var type in events.GetTypesNoCopy(unit)) {
                                         type.Call(node, unit, @this, args.Skip(1).ToArray());
                                     }
                                 }
@@ -140,7 +140,7 @@ namespace Microsoft.NodejsTools.Analysis {
                 }
             }
 
-            return func.ProjectState._trueInst;
+            return func.ProjectState._trueInst.Proxy;
         }
     }
 }

@@ -161,6 +161,7 @@
     </Compile>
     <Compile Include="Analysis\AnalysisDictionary.cs" />
     <Compile Include="Analysis\AnalysisExtensions.cs" />
+    <Compile Include="Analysis\AnalysisHashSet.cs" />
     <Compile Include="Analysis\AnalysisSerializationSupportedTypeAttribute.cs" />
     <Compile Include="Analysis\IAnalysisSerializeAsNull.cs" />
     <Compile Include="Analysis\AnalysisSerializer.cs" />
@@ -170,6 +171,7 @@
     <Compile Include="Analysis\AnalysisSetExtensions.cs" />
     <Compile Include="Analysis\AnalysisValue.cs" />
     <Compile Include="Analysis\AnalysisVariable.cs" />
+    <Compile Include="Analysis\AnalysisProxy.cs" />
     <Compile Include="Analysis\Analyzer\AnalysisUnit.cs" />
     <Compile Include="Analysis\Analyzer\CarteseanProductFunctionAnalysisUnit.cs" />
     <Compile Include="Analysis\Analyzer\DDG.cs" />
@@ -189,6 +191,7 @@
     <Compile Include="Analysis\Analyzer\OverviewWalker.Specializations.cs" />
     <Compile Include="Analysis\Analyzer\StatementEnvironmentRecord.cs" />
     <Compile Include="Analysis\AssemblyInfo.cs" />
+    <Compile Include="Analysis\IDetachableProxy.cs" />
     <Compile Include="Analysis\NodejsModuleBuilder.Specializations.cs" />
     <Compile Include="Analysis\Validation.cs" />
     <Compile Include="Analysis\Values\BooleanValue.cs" />

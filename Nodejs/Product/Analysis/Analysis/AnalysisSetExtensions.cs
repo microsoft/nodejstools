@@ -32,7 +32,7 @@ namespace Microsoft.NodejsTools.Analysis {
             // name can be empty if we have "fob."
             if (name != null && name.Length > 0) {
                 foreach (var ns in self) {
-                    res = res.Union(ns.Get(node, unit, name, addRef));
+                    res = res.Union(ns.Value.Get(node, unit, name, addRef));
                 }
             }
             return res;
@@ -45,7 +45,7 @@ namespace Microsoft.NodejsTools.Analysis {
         public static void SetMember(this IAnalysisSet self, Node node, AnalysisUnit unit, string name, IAnalysisSet value) {
             if (name != null && name.Length > 0) {
                 foreach (var ns in self) {
-                    ns.SetMember(node, unit, name, value);
+                    ns.Value.SetMember(node, unit, name, value);
                 }
             }
         }
@@ -57,7 +57,7 @@ namespace Microsoft.NodejsTools.Analysis {
         public static void DeleteMember(this IAnalysisSet self, Node node, AnalysisUnit unit, string name) {
             if (name != null && name.Length > 0) {
                 foreach (var ns in self) {
-                    ns.DeleteMember(node, unit, name);
+                    ns.Value.DeleteMember(node, unit, name);
                 }
             }
         }
@@ -70,7 +70,7 @@ namespace Microsoft.NodejsTools.Analysis {
         public static IAnalysisSet Call(this IAnalysisSet self, Node node, AnalysisUnit unit, IAnalysisSet @this, IAnalysisSet[] args) {
             var res = AnalysisSet.Empty;
             foreach (var ns in self) {
-                var call = ns.Call(node, unit, @this, args);
+                var call = ns.Value.Call(node, unit, @this, args);
                 Debug.Assert(call != null);
 
                 res = res.Union(call);
@@ -86,7 +86,7 @@ namespace Microsoft.NodejsTools.Analysis {
         public static IAnalysisSet GetIndex(this IAnalysisSet self, Node node, AnalysisUnit unit, IAnalysisSet index) {
             var res = AnalysisSet.Empty;
             foreach (var ns in self) {
-                res = res.Union(ns.GetIndex(node, unit, index));
+                res = res.Union(ns.Value.GetIndex(node, unit, index));
             }
 
             return res;
@@ -99,7 +99,7 @@ namespace Microsoft.NodejsTools.Analysis {
         public static IAnalysisSet GetEnumerationValues(this IAnalysisSet self, Node node, AnalysisUnit unit) {
             var res = AnalysisSet.Empty;
             foreach (var ns in self) {
-                res = res.Union(ns.GetEnumerationValues(node, unit));
+                res = res.Union(ns.Value.GetEnumerationValues(node, unit));
             }
 
             return res;
@@ -111,7 +111,7 @@ namespace Microsoft.NodejsTools.Analysis {
         /// </summary>
         public static void SetIndex(this IAnalysisSet self, Node node, AnalysisUnit unit, IAnalysisSet index, IAnalysisSet value) {
             foreach (var ns in self) {
-                ns.SetIndex(node, unit, index, value);
+                ns.Value.SetIndex(node, unit, index, value);
             }
         }
 
@@ -128,7 +128,7 @@ namespace Microsoft.NodejsTools.Analysis {
         /// </summary>
         public static void AugmentAssign(this IAnalysisSet self, BinaryOperator node, AnalysisUnit unit, IAnalysisSet value) {
             foreach (var ns in self) {
-                ns.AugmentAssign(node, unit, value);
+                ns.Value.AugmentAssign(node, unit, value);
             }
         }
 
@@ -138,17 +138,17 @@ namespace Microsoft.NodejsTools.Analysis {
         public static IAnalysisSet UnaryOperation(this IAnalysisSet self, Node node, AnalysisUnit unit, JSToken operation) {
             var res = AnalysisSet.Empty;
             foreach (var ns in self) {
-                res = res.Union(ns.UnaryOperation(node, unit, operation));
+                res = res.Union(ns.Value.UnaryOperation(node, unit, operation));
             }
 
             return res;
         }
 
-        internal static AnalysisValue GetUnionType(this IAnalysisSet types) {
+        internal static AnalysisProxy GetUnionType(this IAnalysisSet types) {
             var union = AnalysisSet.CreateUnion(types, UnionComparer.Instances[0]);
-            AnalysisValue type = null;
+            AnalysisProxy type = null;
             if (union.Count == 2) {
-                type = union.FirstOrDefault(t => t.GetConstantValue() != null);
+                type = union.FirstOrDefault(t => t.Value.GetConstantValue() != null);
             }
             return type ?? union.FirstOrDefault();
         }
@@ -157,7 +157,7 @@ namespace Microsoft.NodejsTools.Analysis {
         /// Returns true if the set contains no or only the object type
         /// </summary>
         internal static bool IsObjectOrUnknown(this IAnalysisSet res) {
-            return res.Count == 0 || (res.Count == 1 && res.First().TypeId == BuiltinTypeId.Object);
+            return res.Count == 0 || (res.Count == 1 && res.First().Value.TypeId == BuiltinTypeId.Object);
         }
 
     }

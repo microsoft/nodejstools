@@ -114,7 +114,7 @@ namespace Microsoft.NodejsTools.Analysis.Analyzer {
         }
 
         internal override void AnalyzeWorker(DDG ddg, CancellationToken cancel) {
-            if (_env.AnalysisValue.DeclaringVersion != ProjectEntry.AnalysisVersion) {
+            if (((FunctionEnvironmentRecord)_env).AnalysisValue.DeclaringVersion != ProjectEntry.AnalysisVersion) {
                 // we were enqueued and a new version became available, don't re-analyze against
                 // the old version.
                 return;
@@ -148,7 +148,7 @@ namespace Microsoft.NodejsTools.Analysis.Analyzer {
             } finally {
                 funcScope._this = originalThis;
                 function.ReturnValue = unifiedReturn;
-                function.ReturnValue.AddTypes(this, _returnValue.TypesNoCopy, false);
+                function.ReturnValue.AddTypes(this, _returnValue.GetTypesNoCopy(this), false);
 
                 // restore the locals, merging types back into the shared...
                 foreach (var variable in _specializedLocals) {

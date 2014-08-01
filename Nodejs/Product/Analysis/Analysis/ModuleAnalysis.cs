@@ -71,25 +71,25 @@ namespace Microsoft.NodejsTools.Analysis {
             var scope = FindEnvironment(index);
             var expr = Statement.GetExpression(GetAstFromText(exprText).Block);
 
-            var unit = GetNearestEnclosingAnalysisUnit(scope);
-            var eval = new ExpressionEvaluator(unit.CopyForEval(), scope);
+            var unit = GetEvalAnalysisUnit(scope);
+            var eval = new ExpressionEvaluator(unit, scope);
             var res = AnalysisSet.EmptyUnion;
 
             if (expr != null) {
                 var values = eval.Evaluate(expr);
                 foreach (var v in values) {
-                    if (v.IsCurrent) {
+                    if (v.Value.IsCurrent) {
                         res = res.Add(v);
                     }
                 }
             }
 
-            return res;
+            return res.Select(x => x.Value);
         }
 
         internal IEnumerable<AnalysisVariable> ReferencablesToVariables(IEnumerable<IReferenceable> defs) {
             foreach (var def in defs) {
-                foreach (var res in VariableTransformer.ScopeToVariables.ToVariables(def)) {
+                foreach (var res in VariableTransformer.ScopeToVariables.ToVariables(_unit, def)) {
                     yield return res;
                 }
             }
@@ -108,7 +108,7 @@ namespace Microsoft.NodejsTools.Analysis {
 
             VariableDef def = referenceable as VariableDef;
             if (def != null) {
-                foreach (var location in def.TypesNoCopy.SelectMany(type => type.Locations)) {
+                foreach (var location in def.GetTypesNoCopy(_unit).SelectMany(type => type.Value.Locations)) {
                     yield return new AnalysisVariable(VariableType.Value, location);
                 }
             }
@@ -134,7 +134,7 @@ namespace Microsoft.NodejsTools.Analysis {
             var scope = FindEnvironment(index);
             var expr = Statement.GetExpression(GetAstFromText(exprText).Block);
 
-            var unit = GetNearestEnclosingAnalysisUnit(scope);
+            var unit = GetEvalAnalysisUnit(scope);
             Lookup name = expr as Lookup;
             if (name != null) {
                 var defScope = scope.EnumerateTowardsGlobal.FirstOrDefault(s =>
@@ -149,12 +149,12 @@ namespace Microsoft.NodejsTools.Analysis {
 
             var member = expr as Member;
             if (member != null) {
-                var eval = new ExpressionEvaluator(unit.CopyForEval(), scope);
+                var eval = new ExpressionEvaluator(unit, scope);
                 var objects = eval.Evaluate(member.Root);
 
                 var refs = Enumerable.Empty<IAnalysisVariable>();
                 foreach (var v in objects) {
-                    var container = v as IReferenceableContainer;
+                    var container = v.Value as IReferenceableContainer;
                     if (container != null) {
                         refs = refs.Concat(ReferencablesToVariables(container.GetDefinitions(member.Name)));
                     }
@@ -170,14 +170,14 @@ namespace Microsoft.NodejsTools.Analysis {
 
             VariableDef var;
             if (scope.TryGetVariable(name.Name, out var)) {
-                result.AddRange(VariableTransformer.ScopeToVariables.ToVariables(var));
+                result.AddRange(VariableTransformer.ScopeToVariables.ToVariables(_unit, var));
             }
 
             // if a variable is imported from another module then also yield the defs/refs for the 
             // value in the defining module.
             var linked = scope.GetLinkedVariablesNoCreate(name.Name);
             if (linked != null) {
-                result.AddRange(linked.SelectMany(VariableTransformer.ScopeToVariables.ToVariables));
+                result.AddRange(linked.SelectMany(x => VariableTransformer.ScopeToVariables.ToVariables(_unit, x)));
             }
             return result;
         }
@@ -268,8 +268,8 @@ namespace Microsoft.NodejsTools.Analysis {
                 return new MemberResult[0];
             }
 
-            var unit = GetNearestEnclosingAnalysisUnit(scope);
-            var lookup = new ExpressionEvaluator(unit.CopyForEval(), scope).Evaluate(expr);
+            var unit = GetEvalAnalysisUnit(scope);
+            var lookup = new ExpressionEvaluator(unit, scope).Evaluate(expr);
             return GetMemberResults(lookup, scope, options);
         }
 
@@ -281,8 +281,8 @@ namespace Microsoft.NodejsTools.Analysis {
         public IEnumerable<IOverloadResult> GetSignaturesByIndex(string exprText, int index) {
             try {
                 var scope = FindEnvironment(index);
-                var unit = GetNearestEnclosingAnalysisUnit(scope);
-                var eval = new ExpressionEvaluator(unit.CopyForEval(), scope);
+                var unit = GetEvalAnalysisUnit(scope);
+                var eval = new ExpressionEvaluator(unit, scope);
 
                 var expr = Statement.GetExpression(GetAstFromText(exprText).Block);
                 if (expr == null ||
@@ -294,8 +294,8 @@ namespace Microsoft.NodejsTools.Analysis {
                 var result = new HashSet<OverloadResult>(OverloadResultComparer.Instance);
 
                 foreach (var ns in lookup) {
-                    if (ns.Overloads != null) {
-                        result.UnionWith(ns.Overloads);
+                    if (ns.Value.Overloads != null) {
+                        result.UnionWith(ns.Value.Overloads);
                     }
                 }
 
@@ -317,16 +317,16 @@ namespace Microsoft.NodejsTools.Analysis {
             var scope = FindEnvironment(index);
             foreach (var s in scope.EnumerateTowardsGlobal) {
                 foreach (var kvp in s.Variables) {
-                    result[kvp.Key] = new List<AnalysisValue>(kvp.Value.TypesNoCopy);
+                    result[kvp.Key] = new List<AnalysisValue>(kvp.Value.GetTypesNoCopy(_unit).Select(x => x.Value));
                 }
             }
 
-            foreach (var kvp in this._unit.Analyzer._globalObject.GetAllMembers()) {
+            foreach (var kvp in this._unit.Analyzer._globalObject.GetAllMembers(_unit.ProjectEntry)) {
                 List<AnalysisValue> values;
                 if (!result.TryGetValue(kvp.Key, out values)) {
-                    result[kvp.Key] = new List<AnalysisValue>(kvp.Value);
+                    result[kvp.Key] = new List<AnalysisValue>(kvp.Value.Select(x => x.Value));
                 } else {
-                    values.AddRange(kvp.Value);
+                    values.AddRange(kvp.Value.Select(x => x.Value));
                 }
             }
 
@@ -379,17 +379,17 @@ namespace Microsoft.NodejsTools.Analysis {
             get { return _scope; }
         }
 
-        internal IEnumerable<MemberResult> GetMemberResults(IEnumerable<AnalysisValue> vars, EnvironmentRecord scope, GetMemberOptions options) {
+        internal IEnumerable<MemberResult> GetMemberResults(IAnalysisSet vars, EnvironmentRecord scope, GetMemberOptions options) {
             IList<AnalysisValue> namespaces = new List<AnalysisValue>();
             foreach (var ns in vars) {
                 if (ns != null) {
-                    namespaces.Add(ns);
+                    namespaces.Add(ns.Value);
                 }
             }
 
             if (namespaces.Count == 1) {
                 // optimize for the common case of only a single namespace
-                var newMembers = namespaces[0].GetAllMembers();
+                var newMembers = namespaces[0].GetAllMembers(_unit.ProjectEntry);
                 if (newMembers == null || newMembers.Count == 0) {
                     return new MemberResult[0];
                 }
@@ -407,7 +407,7 @@ namespace Microsoft.NodejsTools.Analysis {
                     continue;
                 }
 
-                var newMembers = ns.GetAllMembers();
+                var newMembers = ns.GetAllMembers(_unit.ProjectEntry);
                 // IntersectMembers(members, memberSet, memberDict);
                 if (newMembers == null || newMembers.Count == 0) {
                     namespacesCount -= 1;
@@ -420,7 +420,7 @@ namespace Microsoft.NodejsTools.Analysis {
                     memberDict = new Dictionary<string, List<AnalysisValue>>();
                     ownerDict = new Dictionary<string, List<AnalysisValue>>();
                     foreach (var kvp in newMembers) {
-                        var tmp = new List<AnalysisValue>(kvp.Value);
+                        var tmp = new List<AnalysisValue>(kvp.Value.Select(x => x.Value));
                         memberDict[kvp.Key] = tmp;
                         ownerDict[kvp.Key] = new List<AnalysisValue> { ns };
                     }
@@ -439,7 +439,7 @@ namespace Microsoft.NodejsTools.Analysis {
                         if (!memberDict.TryGetValue(name, out values)) {
                             memberDict[name] = values = new List<AnalysisValue>();
                         }
-                        values.AddRange(newMembers[name]);
+                        values.AddRange(newMembers[name].Select(x => x.Value));
                         if (!ownerDict.TryGetValue(name, out values)) {
                             ownerDict[name] = values = new List<AnalysisValue>();
                         }
@@ -636,7 +636,7 @@ namespace Microsoft.NodejsTools.Analysis {
             foreach (var kvp in memberDict) {
                 string name = GetMemberName(options, kvp.Key);
                 if (name != null) {
-                    yield return new MemberResult(name, kvp.Value);
+                    yield return new MemberResult(name, kvp.Value.Select(x => x.Value));
                 }
             }
         }
@@ -664,14 +664,14 @@ namespace Microsoft.NodejsTools.Analysis {
         /// Finds the best available analysis unit for lookup. This will be the one that is provided
         /// by the nearest enclosing scope that is capable of providing one.
         /// </summary>
-        private AnalysisUnit GetNearestEnclosingAnalysisUnit(EnvironmentRecord scopes) {
-            var units = from scope in scopes.EnumerateTowardsGlobal
-                        let ns = scope.AnalysisValue
-                        where ns != null
-                        let unit = ns.AnalysisUnit
-                        where unit != null
-                        select unit;
-            return units.FirstOrDefault() ?? _unit;
+        private AnalysisUnit GetEvalAnalysisUnit(EnvironmentRecord scope) {
+            var projEntry = scope.GlobalEnvironment.ProjectEntry;
+
+            return new EvalAnalysisUnit(
+                projEntry.Tree,
+                projEntry.Tree,
+                scope
+            );
         }
     }
 
@@ -684,7 +684,7 @@ namespace Microsoft.NodejsTools.Analysis {
             _definitionsAreReferences = definitionsAreReferences;
         }
 
-        internal IEnumerable<AnalysisVariable> ToVariables(IReferenceable referenceable) {
+        internal IEnumerable<AnalysisVariable> ToVariables(AnalysisUnit unit, IReferenceable referenceable) {
             LocatedVariableDef locatedDef = referenceable as LocatedVariableDef;
 
             if (locatedDef != null &&
@@ -697,7 +697,7 @@ namespace Microsoft.NodejsTools.Analysis {
 
             VariableDef def = referenceable as VariableDef;
             if (def != null) {
-                foreach (var location in def.TypesNoCopy.SelectMany(type => type.Locations)) {
+                foreach (var location in def.GetTypesNoCopy(unit).SelectMany(type => type.Value.Locations)) {
                     yield return new AnalysisVariable(VariableType.Value, location);
                 }
             }

@@ -20,10 +20,11 @@ namespace Microsoft.NodejsTools.Analysis.Values {
         internal double _value;
         private JsAnalyzer _analyzer;
 
-        public NumberValue(double p, JsAnalyzer javaScriptAnalyzer) {
+        public NumberValue(double p, JsAnalyzer analyzer)
+            : base(analyzer._builtinEntry) {
             _value = p;
-            _analyzer = javaScriptAnalyzer;
-            javaScriptAnalyzer.AnalysisValueCreated(typeof(NumberValue));
+            _analyzer = analyzer;
+            analyzer.AnalysisValueCreated(typeof(NumberValue));
         }
 
         public override BuiltinTypeId TypeId {

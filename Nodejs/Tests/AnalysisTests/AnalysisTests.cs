@@ -24,10 +24,16 @@ using Microsoft.NodejsTools.Analysis;
 using Microsoft.NodejsTools.Parsing;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using TestUtilities;
+using TestUtilities.Nodejs;
 
 namespace AnalysisTests {
     [TestClass]
     public class AnalysisTests {
+        [ClassInitialize]
+        public static void DoDeployment(TestContext context) {
+            NodejsTestData.Deploy();
+        }
+
         /// <summary>
         /// https://nodejstools.codeplex.com/workitem/945
         /// </summary>
@@ -1305,7 +1311,8 @@ f.prototype.abc = 'abc';
 var abc = new g().abc;
 ";
             var analysis = ProcessText(code);
-
+            var util = analysis.GetTypeIdsByIndex("util", code.Length);
+            var inherits = analysis.GetTypeIdsByIndex("util.inherits", code.Length);
             AssertUtil.ContainsExactly(
                 analysis.GetTypeIdsByIndex("super_", code.Length),
                 BuiltinTypeId.Function
@@ -1391,6 +1398,31 @@ ee.emit('myevent', 42)
             );
         }
 
+        [TestMethod, Priority(0)]
+        public void TestAnalysisWrapperLifetime() {
+                var server1 = @"var mymod = require('./mymod.js');
+mymod.value = {abc:42}";
+                var server2 = @"var mymod = require('./mymod.js');
+mymod.value = {abc:'abc'}";
+
+            var entries = Analysis.Analyze(
+                new AnalysisFile("server.js", server1),
+                new AnalysisFile("mymod.js", @"function f() {
+    return exports.value;
+}
+exports.f = f;
+")
+            );
+            
+            Analysis.Prepare(entries["server.js"], server2);
+
+            entries["server.js"].Analyze(default(CancellationToken));
+
+            AssertUtil.ContainsExactly(
+                entries["mymod.js"].Analysis.GetTypeIdsByIndex("f().abc", 0),
+                BuiltinTypeId.String
+            );
+        }
 
 #if FALSE
         [TestMethod, Priority(0)]

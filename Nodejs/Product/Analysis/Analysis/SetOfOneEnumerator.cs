@@ -47,7 +47,7 @@ namespace Microsoft.NodejsTools.Analysis {
         }
 
         bool System.Collections.IEnumerator.MoveNext() {
-            if (_enumerated) {
+            if (_enumerated || !DetachableProxy.IsAlive(_value)) {
                 return false;
             }
             _enumerated = true;

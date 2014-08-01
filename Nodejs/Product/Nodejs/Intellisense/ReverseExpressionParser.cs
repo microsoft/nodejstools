@@ -246,7 +246,7 @@ namespace Microsoft.NodejsTools.Intellisense {
                         nestingChanged = true;
                         lastTokenWasCommaOrOperator = true;
                         lastTokenWasKeywordArgAssignment = false;
-                    } else if ((token.ClassificationType == Classifier.Provider.Keyword &&
+                    } else if ((token.ClassificationType == Classifier.Provider.Keyword && 
                                 text != "this" && text != "get" && text != "set" && text != "delete") ||
                                token.ClassificationType == Classifier.Provider.Operator) {
                         if (forCompletion && text == "new") {
@@ -300,7 +300,7 @@ namespace Microsoft.NodejsTools.Intellisense {
                                 return null;
                             } else if ((nestingChanged || forCompletion) && token.ClassificationType == Classifier.Provider.Keyword && text == "function") {
                                 return null;
-                            }
+                            }                            
                             break;
                         } else if ((token.ClassificationType == Classifier.Provider.Keyword &&
                             _stmtKeywords.Contains(text)) ||

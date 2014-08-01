@@ -40,24 +40,24 @@ namespace Microsoft.NodejsTools.Analysis.Values {
 #endif
         }
 
-        public override Dictionary<string, IAnalysisSet> GetAllMembers() {
-            var res = base.GetAllMembers();
+        internal override Dictionary<string, IAnalysisSet> GetAllMembers(ProjectEntry accessor) {
+            var res = base.GetAllMembers(accessor);
             IAnalysisSet protoTypes;
             PropertyDescriptor protoDesc;
             if (Descriptors != null &&
                 Descriptors.TryGetValue("__proto__", out protoDesc) &&
                 protoDesc.Values != null &&
-                (protoTypes = protoDesc.Values.TypesNoCopy).Count > 0) {
+                (protoTypes = protoDesc.Values.GetTypesNoCopy(accessor)).Count > 0) {
                     // someone has assigned to __proto__, so that's our [[Prototype]]
                     // property now.                
                     foreach (var value in protoTypes) {
-                        if (value.Push()) {
+                        if (value.Value.Push()) {
                             try {
-                                foreach (var kvp in value.GetAllMembers()) {
+                                foreach (var kvp in value.Value.GetAllMembers(accessor)) {
                                     MergeTypes(res, kvp.Key, kvp.Value);
                                 }
                             } finally {
-                                value.Pop();
+                                value.Value.Pop();
                             }
                         }
                     }                
@@ -65,20 +65,20 @@ namespace Microsoft.NodejsTools.Analysis.Values {
                 PropertyDescriptor prototype;
                 if (_creator.Descriptors.TryGetValue("prototype", out prototype) &&
                     prototype.Values != null) {
-                    foreach (var value in prototype.Values.TypesNoCopy) {
-                        if (value.Push()) {
+                    foreach (var value in prototype.Values.GetTypesNoCopy(accessor)) {
+                        if (value.Value.Push()) {
                             try {
-                                foreach (var kvp in value.GetAllMembers()) {
+                                foreach (var kvp in value.Value.GetAllMembers(accessor)) {
                                     MergeTypes(res, kvp.Key, kvp.Value);
                                 }
                             } finally {
-                                value.Pop();
+                                value.Value.Pop();
                             }
                         }
                     }
                 }
             } else if (this != ProjectState._objectPrototype) {
-                foreach(var kvp in ProjectState._objectPrototype.GetAllMembers()) {
+                foreach(var kvp in ProjectState._objectPrototype.GetAllMembers(accessor)) {
                     MergeTypes(res, kvp.Key, kvp.Value);
                 }
             }
@@ -102,7 +102,7 @@ namespace Microsoft.NodejsTools.Analysis.Values {
                 PropertyDescriptor protoDesc;
                 if (Descriptors.TryGetValue("__proto__", out protoDesc) && 
                     protoDesc.Values != null && 
-                    (protoTypes = protoDesc.Values.TypesNoCopy).Count > 0) {
+                    (protoTypes = protoDesc.Values.GetTypesNoCopy(unit, ProjectEntry)).Count > 0) {
                     // someone has assigned to __proto__, so that's our [[Prototype]]
                     // property now.
                     if (Push()) {
@@ -278,7 +278,7 @@ namespace Microsoft.NodejsTools.Analysis.Values {
                 _creator.Descriptors.TryGetValue("prototype", out prototype) &&
                 prototype.Values != null) {
                 foreach (var protoValue in prototype.Values.TypesNoCopy) {
-                    var protoContainer = protoValue as IReferenceableContainer;
+                    var protoContainer = protoValue.Value as IReferenceableContainer;
                     if (protoContainer != null) {
                         foreach (var res in protoContainer.GetDefinitions(name)) {
                             yield return res;

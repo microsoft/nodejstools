@@ -59,7 +59,7 @@ namespace Microsoft.NodejsTools.Analysis.Analyzer {
                     );
                     funcDef.AddTypes(
                         _curUnit,
-                        ((FunctionEnvironmentRecord)funcScope).Function
+                        ((FunctionEnvironmentRecord)funcScope).Function.Proxy
                     );
                 }
                 PostWalk(node.Function);
@@ -158,19 +158,19 @@ namespace Microsoft.NodejsTools.Analysis.Analyzer {
                     _scope.GlobalEnvironment.AddNodeValue(
                         NodeEnvironmentKind.ObjectLiteralValue,
                         node,
-                        objLiteral
+                        objLiteral.Proxy
                     );
                     _scope.GlobalEnvironment.AddNodeValue(
                         NodeEnvironmentKind.ObjectLiteralValue,
                         key,
-                        objLiteral
+                        objLiteral.Proxy
                     );
                 }
             } else {
                 _scope.GlobalEnvironment.AddNodeValue(
                     NodeEnvironmentKind.ObjectLiteralValue,
                     node,
-                    new ObjectLiteralValue(_entry, node)
+                    new ObjectLiteralValue(_entry, node).Proxy
                 );
             }
 
@@ -269,7 +269,7 @@ namespace Microsoft.NodejsTools.Analysis.Analyzer {
                 func = new UserFunctionValue(node, outerUnit, _scope, _isNested);
             }
 
-            _scope.GlobalEnvironment.AddNodeValue(NodeEnvironmentKind.UserFunctionValue, node, func);
+            _scope.GlobalEnvironment.AddNodeValue(NodeEnvironmentKind.UserFunctionValue, node, func.Proxy);
             return func;
         }
 

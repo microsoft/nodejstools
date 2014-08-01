@@ -33,7 +33,7 @@ namespace Microsoft.NodejsTools.Analysis.Values {
         private Dictionary<object, object> _metadata;
         private AnalysisValue _next;
 
-        internal ExpandoValue(ProjectEntry projectEntry) {
+        internal ExpandoValue(ProjectEntry projectEntry) : base(projectEntry) {
             _projectEntry = projectEntry;
             _declVersion = projectEntry.AnalysisVersion;
             _keysAndValues = new DependentKeyValue();
@@ -45,7 +45,7 @@ namespace Microsoft.NodejsTools.Analysis.Values {
             }
         }
 
-        public override IJsProjectEntry DeclaringModule {
+        internal override ProjectEntry DeclaringModule {
             get {
                 return _projectEntry;
             }
@@ -95,10 +95,10 @@ namespace Microsoft.NodejsTools.Analysis.Values {
                 desc.Values.AddReference(node, unit);
             }
 
-            var res = desc.Values.Types;
+            var res = desc.Values.GetTypes(unit, ProjectEntry);
 
             if (desc.Get != null) {
-                res = res.Union(desc.Get.TypesNoCopy.Call(node, unit, AnalysisSet.Empty, ExpressionEvaluator.EmptySets));
+                res = res.Union(desc.Get.GetTypesNoCopy(unit, ProjectEntry).Call(node, unit, AnalysisSet.Empty, ExpressionEvaluator.EmptySets));
             }
 
             if (_next != null && _next.Push()) {
@@ -119,7 +119,7 @@ namespace Microsoft.NodejsTools.Analysis.Values {
             PropertyDescriptor desc;
             if (_descriptors != null && _descriptors.TryGetValue(name, out desc)) {
                 if (desc.Set != null) {
-                    desc.Set.TypesNoCopy.Call(
+                    desc.Set.GetTypesNoCopy(unit, ProjectEntry).Call(
                         node,
                         unit,
                         AnalysisSet.Empty,
@@ -146,16 +146,16 @@ namespace Microsoft.NodejsTools.Analysis.Values {
                 foreach (var kvp in _descriptors) {
                     var key = kvp.Key;
                     if (kvp.Value.Values != null) {
-                        var types = kvp.Value.Values.TypesNoCopy;
+                        var types = kvp.Value.Values.GetTypesNoCopy(unit, ProjectEntry);
                         kvp.Value.Values.ClearOldValues();
                         if (kvp.Value.Values.VariableStillExists) {
-                            res = res.Add(ProjectState.GetConstant(kvp.Key));
+                            res = res.Add(ProjectState.GetConstant(kvp.Key).Proxy);
                         }
                     }
 
                     if (kvp.Value.Get != null) {
-                        foreach (var value in kvp.Value.Get.TypesNoCopy) {
-                            res = res.Add(ProjectState.GetConstant(kvp.Key));
+                        foreach (var value in kvp.Value.Get.GetTypesNoCopy(unit, ProjectEntry)) {
+                            res = res.Add(ProjectState.GetConstant(kvp.Key).Proxy);
                         }
                     }
                 }
@@ -176,7 +176,7 @@ namespace Microsoft.NodejsTools.Analysis.Values {
         public override void SetIndex(Node node, AnalysisUnit unit, IAnalysisSet index, IAnalysisSet value) {
             foreach (var type in index) {
                 string strValue;
-                if ((strValue = type.GetConstantValueAsString()) != null) {
+                if ((strValue = type.Value.GetConstantValueAsString()) != null) {
                     // x = {}; x['abc'] = 42; should be available as x.abc
                     SetMember(node, unit, strValue, value);
                 }
@@ -189,7 +189,7 @@ namespace Microsoft.NodejsTools.Analysis.Values {
             var res = _keysAndValues.GetValueType(index);
             foreach (var value in index) {
                 string strValue;
-                if ((strValue = value.GetConstantValueAsString()) != null) {
+                if ((strValue = value.Value.GetConstantValueAsString()) != null) {
                     res = res.Union(Get(node, unit, strValue));
                 }
             }
@@ -242,7 +242,7 @@ namespace Microsoft.NodejsTools.Analysis.Values {
             return false;
         }
 
-        public override Dictionary<string, IAnalysisSet> GetAllMembers() {
+        internal override Dictionary<string, IAnalysisSet> GetAllMembers(ProjectEntry accessor) {
             if (_descriptors == null || _descriptors.Count == 0) {
                 return new Dictionary<string, IAnalysisSet>();
             }
@@ -251,16 +251,19 @@ namespace Microsoft.NodejsTools.Analysis.Values {
             foreach (var kvp in _descriptors) {
                 var key = kvp.Key;
                 if (kvp.Value.Values != null) {
-                    var types = kvp.Value.Values.TypesNoCopy;
+                    var types = kvp.Value.Values.GetTypesNoCopy(accessor, ProjectEntry);
                     kvp.Value.Values.ClearOldValues();
                     if (kvp.Value.Values.VariableStillExists) {
-                        MergeTypes(res, key, types);
+                        if (types.Count != 0 || 
+                            kvp.Value.Values.TypesNoCopy.Count == 0) {
+                                MergeTypes(res, key, types);
+                        }
                     }
                 }
 
                 if (kvp.Value.Get != null) {
-                    foreach (var value in kvp.Value.Get.TypesNoCopy) {
-                        FunctionValue userFunc = value as FunctionValue;
+                    foreach (var value in kvp.Value.Get.GetTypesNoCopy(accessor, ProjectEntry)) {
+                        FunctionValue userFunc = value.Value as FunctionValue;
                         if (userFunc != null) {
                             MergeTypes(res, key, userFunc.ReturnTypes);
                         }
@@ -273,7 +276,7 @@ namespace Microsoft.NodejsTools.Analysis.Values {
             }
 
             if (_next != null) {
-                MergeDictionaries(res, _next.GetAllMembers());
+                MergeDictionaries(res, _next.GetAllMembers(accessor));
             }
 
             return res;
@@ -298,7 +301,7 @@ namespace Microsoft.NodejsTools.Analysis.Values {
                 desc.Values = def = new VariableDef();
             }
 
-            def.AddTypes(ProjectState._builtinEntry, value);
+            def.AddTypes(ProjectEntry, value);
             return def;
         }
 
@@ -315,7 +318,7 @@ namespace Microsoft.NodejsTools.Analysis.Values {
 
         public void Add(MemberAddInfo member) {
             if (!member.IsProperty) {
-                Add(member.Name, member.Value);
+                Add(member.Name, member.Value.Proxy);
             } else {
                 PropertyDescriptor desc = GetDescriptor(member.Name);
 
@@ -324,7 +327,7 @@ namespace Microsoft.NodejsTools.Analysis.Values {
                     desc.Get = def = new VariableDef();
                 }
 
-                def.AddTypes(ProjectState._builtinEntry, new ReturningFunctionValue(ProjectEntry, member.Name, member.Value));
+                def.AddTypes(ProjectState._builtinEntry, new ReturningFunctionValue(ProjectEntry, member.Name, member.Value.Proxy).Proxy);
             }
         }
 
@@ -364,7 +367,7 @@ namespace Microsoft.NodejsTools.Analysis.Values {
             }
         }
 
-        protected static void MergeTypes(Dictionary<string, IAnalysisSet> res, string key, IEnumerable<AnalysisValue> types) {
+        protected static void MergeTypes(Dictionary<string, IAnalysisSet> res, string key, IEnumerable<AnalysisProxy> types) {
             IAnalysisSet set;
             if (!res.TryGetValue(key, out set)) {
                 res[key] = set = AnalysisSet.Create(types);
@@ -399,10 +402,11 @@ namespace Microsoft.NodejsTools.Analysis.Values {
 
         [Serializable]
         internal class LinkedAnalysisList : AnalysisValue, IReferenceableContainer {
-            private readonly List<AnalysisValue> _values;
+            private readonly HashSet<AnalysisValue> _values;
 
-            public LinkedAnalysisList(AnalysisValue one, AnalysisValue two) {
-                _values = new List<AnalysisValue>() { one, two };
+            public LinkedAnalysisList(AnalysisValue one, AnalysisValue two)
+                : base(one.DeclaringModule) {
+                _values = new HashSet<AnalysisValue>() { one, two };
             }
 
             public override IAnalysisSet Get(Node node, AnalysisUnit unit, string name, bool addRef = true) {
@@ -413,10 +417,10 @@ namespace Microsoft.NodejsTools.Analysis.Values {
                 return res;
             }
 
-            public override Dictionary<string, IAnalysisSet> GetAllMembers() {
+            internal override Dictionary<string, IAnalysisSet> GetAllMembers(ProjectEntry accessor) {
                 var res = new Dictionary<string, IAnalysisSet>();
                 foreach (var value in _values) {
-                    ExpandoValue.MergeDictionaries(res, value.GetAllMembers());
+                    ExpandoValue.MergeDictionaries(res, value.GetAllMembers(accessor));
                 }
                 return res;
             }
@@ -448,14 +452,14 @@ namespace Microsoft.NodejsTools.Analysis.Values {
 
                 if (desc.Get != null) {
                     foreach (var type in desc.Get.Types) {
-                        var func = type as IReferenceable;
+                        var func = type.Value as IReferenceable;
                         if (func != null) {
                             yield return func;
                         }
                     }
                 } else if (desc.Set != null) {
                     foreach (var type in desc.Set.Types) {
-                        var func = type as IReferenceable;
+                        var func = type.Value as IReferenceable;
                         if (func != null) {
                             yield return func;
                         }

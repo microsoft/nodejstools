@@ -50,7 +50,7 @@ namespace Microsoft.NodejsTools.Analysis.Analyzer {
         public override IAnalysisSet ThisValue {
             get {
                 if (_this != null) {
-                    return _this.Types.Union(Function.NewThis);
+                    return _this.GetTypes(AnalysisUnit).Union(Function.NewThis);
                 }
 
                 return this.Function.NewThis;
@@ -97,7 +97,7 @@ namespace Microsoft.NodejsTools.Analysis.Analyzer {
             }
         }
 
-        public override AnalysisValue AnalysisValue {
+        public AnalysisValue AnalysisValue {
             get {
                 return _function;
             }

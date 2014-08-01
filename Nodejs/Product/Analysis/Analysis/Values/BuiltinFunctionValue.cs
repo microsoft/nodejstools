@@ -42,10 +42,10 @@ namespace Microsoft.NodejsTools.Analysis.Values {
             _documentation = documentation;
             _signature = signature;
 
-            Add("length", projectEntry.Analyzer.GetConstant(1.0));
-            Add("name", projectEntry.Analyzer.GetConstant(name));
-            Add("arguments", projectEntry.Analyzer._nullInst);
-            Add("caller", projectEntry.Analyzer._nullInst);
+            Add("length", projectEntry.Analyzer.GetConstant(1.0).Proxy);
+            Add("name", projectEntry.Analyzer.GetConstant(name).Proxy);
+            Add("arguments", projectEntry.Analyzer._nullInst.Proxy);
+            Add("caller", projectEntry.Analyzer._nullInst.Proxy);
 
             projectEntry.Analyzer.AnalysisValueCreated(typeof(BuiltinFunctionValue));
         }

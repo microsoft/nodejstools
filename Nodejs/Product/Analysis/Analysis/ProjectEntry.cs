@@ -33,7 +33,8 @@ namespace Microsoft.NodejsTools.Analysis {
     internal sealed class ProjectEntry : IJsProjectEntry {
         private readonly JsAnalyzer _analyzer;
         private readonly string _filePath;
-        private readonly ModuleValue _module;
+        private ModuleValue _module;
+        private readonly ModuleEnvironmentRecord _moduleRecord;
         private IAnalysisCookie _cookie;
         private JsAst _tree;
         private ModuleAnalysis _currentAnalysis;
@@ -43,6 +44,9 @@ namespace Microsoft.NodejsTools.Analysis {
         private ManualResetEventSlim _curWaiter;
         private int _updatesPending, _waiters;
         internal bool _enqueueModuleDependencies;
+        private readonly List<AnalysisProxy> _proxies = new List<AnalysisProxy>();
+        internal readonly HashSet<ProjectEntry> _visibleEntries = new HashSet<ProjectEntry>();
+        private readonly DependentData _moduleDeps = new DependentData();
 
         // we expect to have at most 1 waiter on updated project entries, so we attempt to share the event.
         private static ManualResetEventSlim _sharedWaitEvent = new ManualResetEventSlim(false);
@@ -51,9 +55,15 @@ namespace Microsoft.NodejsTools.Analysis {
             _analyzer = analyzer;
             _filePath = filePath;
             _cookie = cookie;
-            _module = new ModuleValue(filePath, this);
-            
-            _unit = new AnalysisUnit(_tree, _module.EnvironmentRecord);
+            _moduleRecord = new ModuleEnvironmentRecord(this);
+
+            _unit = new AnalysisUnit(_tree, EnvironmentRecord);
+        }
+
+        public AnalysisProxy WrapAnalysisValue(AnalysisValue value) {
+            var res = new AnalysisProxy(value);
+            _proxies.Add(res);
+            return res;
         }
 
         public event EventHandler<EventArgs> OnNewParseTree;
@@ -179,16 +189,21 @@ namespace Microsoft.NodejsTools.Analysis {
                 return;
             }
 
-            _unit = new AnalysisUnit(tree, _module.EnvironmentRecord);
+            _unit = new AnalysisUnit(tree, EnvironmentRecord);
+            _moduleDeps.EnqueueDependents();
 
-            if (ModuleValue.EnvironmentRecord.HasChildren) {
-                ModuleValue.EnvironmentRecord.Children.Clear();
+            if (EnvironmentRecord.HasChildren) {
+                EnvironmentRecord.Children.Clear();
             }
-            ModuleValue.EnvironmentRecord.ClearNodeEnvironments();
-            ModuleValue.EnvironmentRecord.ClearNodeValues();
+            EnvironmentRecord.ClearNodeEnvironments();
+            EnvironmentRecord.ClearNodeValues();
 #if FALSE
             MyScope.ClearUnresolvedModules();
 #endif
+            foreach (var wrapper in _proxies) {
+                wrapper.NewVersion();
+            }
+            _proxies.Clear();
 
             _unit.Enqueue();
 
@@ -210,17 +225,24 @@ namespace Microsoft.NodejsTools.Analysis {
                 cookie);
         }
 
-        private void InitNodejsVariables() {
+        internal ExportsValue InitNodejsVariables() {
             var filename = _analyzer.GetConstant(_filePath);
             var dirName = _analyzer.GetConstant("");
-            var module = _module;
+            var module = _module = new ModuleValue(_filePath, _moduleRecord);
             var exports = new ExportsValue(_filePath, this);
-            module.Add("exports", exports);
+            module.Add("exports", exports.Proxy);
 
-            ModuleValue.EnvironmentRecord.GetOrAddVariable("__dirname").AddTypes(this, dirName);
-            ModuleValue.EnvironmentRecord.GetOrAddVariable("__filename").AddTypes(this, filename);
-            ModuleValue.EnvironmentRecord.GetOrAddVariable("exports").AddTypes(this, exports);
-            ModuleValue.EnvironmentRecord.GetOrAddVariable("module").AddTypes(this, module);
+            EnvironmentRecord.GetOrAddVariable("__dirname").AddTypes(this, dirName.Proxy);
+            EnvironmentRecord.GetOrAddVariable("__filename").AddTypes(this, filename.Proxy);
+            EnvironmentRecord.GetOrAddVariable("exports").AddTypes(this, exports.Proxy);
+            EnvironmentRecord.GetOrAddVariable("module").AddTypes(this, module.Proxy);
+            return exports;
+        }
+
+        public ModuleEnvironmentRecord EnvironmentRecord {
+            get {
+                return _moduleRecord;
+            }
         }
 
         public IGroupableAnalysisProject AnalysisGroup {
@@ -253,8 +275,9 @@ namespace Microsoft.NodejsTools.Analysis {
             get { return _tree; }
         }
 
-        internal ModuleValue ModuleValue {
-            get { return _module; }
+        public ModuleValue GetModule(AnalysisUnit unit) {
+            _moduleDeps.AddDependency(unit);
+            return _module;
         }
 
         public string ModuleName {
@@ -283,6 +306,10 @@ namespace Microsoft.NodejsTools.Analysis {
 
         internal void Enqueue() {
             _unit.Enqueue();
+        }
+
+        internal bool IsVisible(ProjectEntry projectEntry) {
+            return projectEntry == this || _visibleEntries.Contains(projectEntry);
         }
     }
 

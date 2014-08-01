@@ -23,12 +23,16 @@ namespace Microsoft.NodejsTools.Analysis.Values {
     /// </summary>
     [Serializable]
     abstract class NonObjectValue : AnalysisValue, IReferenceableContainer {
+        public NonObjectValue(ProjectEntry projectEntry)
+            : base(projectEntry) {
+        }
+
         public abstract AnalysisValue Prototype {
             get;
         }
 
-        public override Dictionary<string, IAnalysisSet> GetAllMembers() {
-            return Prototype.GetAllMembers();
+        internal override Dictionary<string, IAnalysisSet> GetAllMembers(ProjectEntry accessor) {
+            return Prototype.GetAllMembers(accessor);
         }
 
         public override IAnalysisSet Get(Node node, AnalysisUnit unit, string name, bool addRef = true) {

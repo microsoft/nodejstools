@@ -59,6 +59,7 @@
   <ItemGroup>
     <Compile Include="AnalysisDictionaryTests.cs" />
     <Compile Include="AnalysisFile.cs" />
+    <Compile Include="AnalysisHashSetTests.cs" />
     <Compile Include="AnalysisTests.cs" />
     <Compile Include="FormatterTests.cs" />
     <Compile Include="ParserOffsetTests.cs" />
@@ -68,6 +69,7 @@
     <Compile Include="ScannerTests.cs" />
     <Compile Include="SerializationTests.cs" />
     <Compile Include="SerializedAnalysisTests.cs" />
+    <Compile Include="VisibilityTests.cs" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\..\..\Common\Tests\Utilities\TestUtilities.csproj">

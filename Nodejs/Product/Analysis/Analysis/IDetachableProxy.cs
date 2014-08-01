@@ -13,32 +13,25 @@
  * ***************************************************************************/
 
 using System;
-namespace Microsoft.NodejsTools.Analysis.Values {
-    [Serializable]
-    class NullValue : AnalysisValue {
-        private readonly JsAnalyzer _analyzer;
+using System.Collections.Generic;
+using System.Linq;
+using System.Text;
 
-        public NullValue(JsAnalyzer analyzer)
-            : base(analyzer._builtinEntry) {
-            _analyzer = analyzer;
+namespace Microsoft.NodejsTools.Analysis {
+    interface IDetachableProxy {
+        bool IsAlive {
+            get;
         }
+    }
 
-        public override string Description {
-            get {
-                return "null";
+    public static class DetachableProxy {
+        public static bool IsAlive(object value) {
+            IDetachableProxy detachable = value as IDetachableProxy;
+            if (detachable == null) {
+                return true;
             }
-        }
 
-        public override BuiltinTypeId TypeId {
-            get {
-                return BuiltinTypeId.Null;
-            }
-        }
-
-        public override JsMemberType MemberType {
-            get {
-                return JsMemberType.Null;
-            }
+            return detachable.IsAlive;
         }
     }
 }

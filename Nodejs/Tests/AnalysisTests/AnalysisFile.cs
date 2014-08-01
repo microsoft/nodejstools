@@ -26,7 +26,7 @@ namespace AnalysisTests {
     class AnalysisFile {
         public readonly string Filename, Content;
 
-        public AnalysisFile(string filename, string content) {
+        public AnalysisFile(string filename, string content = "") {
             Filename = filename;
             Content = content;
         }
@@ -80,6 +80,10 @@ namespace AnalysisTests {
             }
 
             return analyzer;
+        }
+
+        public static void Prepare(IJsProjectEntry entry, string code) {
+            Prepare(entry, GetSourceUnit(code));
         }
 
         public static void Prepare(IJsProjectEntry entry, TextReader sourceUnit) {

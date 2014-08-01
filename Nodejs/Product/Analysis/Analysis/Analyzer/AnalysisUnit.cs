@@ -140,7 +140,7 @@ namespace Microsoft.NodejsTools.Analysis {
                             linkedVar.AddReference(node, this);
                         }
                     }
-                    return refs.Types;
+                    return refs.GetTypes(this);
                 }
             }
 
@@ -153,14 +153,6 @@ namespace Microsoft.NodejsTools.Analysis {
 
         public JsAnalyzer Analyzer {
             get { return DeclaringModuleEnvironment.ProjectEntry.Analyzer; }
-        }
-
-        /// <summary>
-        /// Creates an analysis unit in the same scope used for 
-        /// evaluating an expression to get results for.
-        /// </summary>
-        public AnalysisUnit CopyForEval() {
-            return new EvalAnalysisUnit(Ast, Tree, _env);
         }
 
         public void Enqueue() {

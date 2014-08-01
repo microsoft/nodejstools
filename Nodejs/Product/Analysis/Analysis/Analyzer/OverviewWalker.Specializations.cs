@@ -161,7 +161,7 @@ namespace Microsoft.NodejsTools.Analysis.Analyzer {
 
         private static IAnalysisSet ObjectKeysSpecializationImpl(FunctionValue func, Node node, AnalysisUnit unit, IAnalysisSet @this, IAnalysisSet[] args) {
             if (args.Length >= 1) {
-                return unit.Analyzer._arrayFunction._instance;
+                return unit.Analyzer._arrayFunction._instance.Proxy;
             }
             return AnalysisSet.Empty;
         }
@@ -341,12 +341,12 @@ namespace Microsoft.NodejsTools.Analysis.Analyzer {
         private static IAnalysisSet MergeSpecializationImpl(FunctionValue func, Node node, AnalysisUnit unit, IAnalysisSet @this, IAnalysisSet[] args) {
             if (args.Length >= 2) {
                 foreach (var targetValue in args[0]) {
-                    var target = targetValue as ExpandoValue;
+                    var target = targetValue.Value as ExpandoValue;
                     if (target == null) {
                         continue;
                     }
                     foreach (var sourceValue in args[1]) {
-                        var source = sourceValue as ExpandoValue;
+                        var source = sourceValue.Value as ExpandoValue;
                         if (source == null) {
                             continue;
                         }

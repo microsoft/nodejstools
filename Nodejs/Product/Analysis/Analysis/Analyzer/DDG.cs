@@ -174,7 +174,7 @@ namespace Microsoft.NodejsTools.Analysis.Analyzer {
             var variable = node.Variable as Var;
             var lookupVar = node.Variable as ExpressionStatement;
             foreach (var value in coll) {
-                if (value is ExportsValue) {
+                if (value.Value is ExportsValue) {
                     var values = value.GetEnumerationValues(node, _unit);
                     if (values.Count < 20) {
                         Debug.WriteLine(String.Format("Enumerating: {1} {0}", value, values.Count));

@@ -117,9 +117,9 @@ All other strings are considered decimal.", isOptional:true)
             };
 
             // aliases for global object:
-            globalObject.Add("GLOBAL", globalObject);
-            globalObject.Add("global", globalObject);
-            globalObject.Add("root", globalObject);
+            globalObject.Add("GLOBAL", globalObject.Proxy);
+            globalObject.Add("global", globalObject.Proxy);
+            globalObject.Add("root", globalObject.Proxy);
 
             // Node specific stuff:
             //'setImmediate',
@@ -328,14 +328,14 @@ All other strings are considered decimal.", isOptional:true)
                         ),
                     }
                 ),
-                new ReturningFunctionValue(builtinEntry, "isArray", _analyzer._falseInst)
+                new ReturningFunctionValue(builtinEntry, "isArray", _analyzer._falseInst.Proxy)
             };
         }
 
         private static IAnalysisSet ArrayForEach(FunctionValue func, Node node, AnalysisUnit unit, IAnalysisSet @this, IAnalysisSet[] args) {
             if (args.Length >= 1) {
                 foreach (var value in @this) {
-                    ArrayValue arr = value as ArrayValue;
+                    ArrayValue arr = value.Value as ArrayValue;
                     if (arr != null) {
                         for (int i = 0; i < arr.IndexTypes.Length; i++) {
                             foreach (var indexType in arr.IndexTypes) {
@@ -344,7 +344,7 @@ All other strings are considered decimal.", isOptional:true)
                                     unit, 
                                     null, 
                                     new IAnalysisSet[] { 
-                                        indexType.Types, 
+                                        indexType.GetTypes(unit, arr.ProjectEntry), 
                                         AnalysisSet.Empty, 
                                         @this 
                                     }
@@ -354,7 +354,7 @@ All other strings are considered decimal.", isOptional:true)
                     }
                 }
             }
-            return unit.Analyzer._undefined;
+            return unit.Analyzer._undefined.Proxy;
         }
 
         private BuiltinFunctionValue BooleanFunction(out AnalysisValue booleanPrototype) {
@@ -667,7 +667,7 @@ All other strings are considered decimal.", isOptional:true)
         private BuiltinFunctionValue FunctionFunction(out AnalysisValue functionPrototype) {
             var builtinEntry = _analyzer._builtinEntry;
             var prototype = Member("prototype",
-                new ReturningConstructingFunctionValue(builtinEntry, "Empty", _analyzer._undefined, null) {
+                new ReturningConstructingFunctionValue(builtinEntry, "Empty", _analyzer._undefined.Proxy, null) {
                     SpecializedFunction(
                         "apply",
                         ApplyFunction,
@@ -1063,10 +1063,10 @@ on that object, and are not inherited from the object's prototype. The propertie
         private static IAnalysisSet DefineSetter(FunctionValue func, Node node, AnalysisUnit unit, IAnalysisSet @this, IAnalysisSet[] args) {
             if (@this != null && args.Length >= 2) {
                 foreach (var thisVal in @this) {
-                    ExpandoValue expando = thisVal as ExpandoValue;
+                    ExpandoValue expando = thisVal.Value as ExpandoValue;
                     if (expando != null) {
                         foreach (var name in args[0]) {
-                            var nameStr = name.GetConstantValueAsString();
+                            var nameStr = name.Value.GetConstantValueAsString();
                             if (nameStr != null) {
                                 expando.DefineSetter(unit, nameStr, args[1]);
                             }
@@ -1074,16 +1074,16 @@ on that object, and are not inherited from the object's prototype. The propertie
                     }
                 }
             }
-            return unit.Analyzer._undefined;
+            return unit.Analyzer._undefined.Proxy;
         }
 
         private static IAnalysisSet DefineGetter(FunctionValue func, Node node, AnalysisUnit unit, IAnalysisSet @this, IAnalysisSet[] args) {
             if (@this != null && args.Length >= 2) {
                 foreach (var thisVal in @this) {
-                    ExpandoValue expando = thisVal as ExpandoValue;
+                    ExpandoValue expando = thisVal.Value as ExpandoValue;
                     if (expando != null) {
                         foreach (var name in args[0]) {
-                            var nameStr = name.GetConstantValueAsString();
+                            var nameStr = name.Value.GetConstantValueAsString();
                             if (nameStr != null) {
                                 expando.DefineGetter(unit, nameStr, args[1]);
                                 // call the function w/ our this arg...
@@ -1093,20 +1093,20 @@ on that object, and are not inherited from the object's prototype. The propertie
                     }
                 }
             }
-            return unit.Analyzer._undefined;
+            return unit.Analyzer._undefined.Proxy;
         }
 
         private static IAnalysisSet DefineProperty(FunctionValue func, Node node, AnalysisUnit unit, IAnalysisSet @this, IAnalysisSet[] args) {
             // object, name, property desc
             if (args.Length >= 3) {
                 foreach (var obj in args[0]) {
-                    ExpandoValue expando = obj as ExpandoValue;
+                    ExpandoValue expando = obj.Value as ExpandoValue;
                     if (expando != null) {
                         foreach (var name in args[1]) {
-                            string propName = name.GetConstantValueAsString();
+                            string propName = name.Value.GetConstantValueAsString();
                             if (propName != null) {
                                 foreach (var desc in args[2]) {
-                                    expando.AddProperty(node, unit, propName, desc);
+                                    expando.AddProperty(node, unit, propName, desc.Value);
                                 }
                             }
                         }
@@ -1123,10 +1123,10 @@ on that object, and are not inherited from the object's prototype. The propertie
             // object, {propName: {desc}, ...}
             if (args.Length >= 2) {
                 foreach (var obj in args[0]) {
-                    ExpandoValue target = obj as ExpandoValue;
+                    ExpandoValue target = obj.Value as ExpandoValue;
                     if (target != null) {
                         foreach (var properties in args[1]) {
-                            ExpandoValue propsObj = properties as ExpandoValue;
+                            ExpandoValue propsObj = properties.Value as ExpandoValue;
                             if (propsObj != null && propsObj.Descriptors != null) {
                                 foreach (var keyValue in propsObj.Descriptors) {
                                     foreach (var propValue in propsObj.Get(node, unit, keyValue.Key)) {
@@ -1134,7 +1134,7 @@ on that object, and are not inherited from the object's prototype. The propertie
                                             node,
                                             unit,
                                             keyValue.Key,
-                                            propValue
+                                            propValue.Value
                                         );
                                     }
                                 }
@@ -1153,7 +1153,7 @@ on that object, and are not inherited from the object's prototype. The propertie
             IAnalysisSet res = AnalysisSet.Empty;
             if (args.Length > 0) {
                 foreach (var arg in args[0]) {
-                    var moduleName = arg.GetConstantValueAsString();
+                    var moduleName = arg.Value.GetConstantValueAsString();
                     if (moduleName != null) {
                         res = res.Union(
                             unit.Analyzer.Modules.RequireModule(
@@ -1432,7 +1432,7 @@ on that object, and are not inherited from the object's prototype. The propertie
         }
 
         private BuiltinFunctionValue ReturningFunction(string name, AnalysisValue value, string documentation = null, params ParameterResult[] parameters) {
-            return new ReturningFunctionValue(_analyzer._builtinEntry, name, value, documentation, true, parameters);
+            return new ReturningFunctionValue(_analyzer._builtinEntry, name, value.Proxy, documentation, true, parameters);
         }
 
         private BuiltinFunctionValue SpecializedFunction(string name, CallDelegate value, string documentation = null, params ParameterResult[] parameters) {

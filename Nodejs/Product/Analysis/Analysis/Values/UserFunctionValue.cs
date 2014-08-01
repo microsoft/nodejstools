@@ -152,19 +152,19 @@ namespace Microsoft.NodejsTools.Analysis.Values {
                         continue;
                     }
 
-                    if (av.Push()) {
+                    if (av.Value.Push()) {
                         try {
-                            if (!string.IsNullOrWhiteSpace(av.ShortDescription) && seenNames.Add(av.ShortDescription)) {
+                            if (!string.IsNullOrWhiteSpace(av.Value.ShortDescription) && seenNames.Add(av.Value.ShortDescription)) {
                                 if (first) {
                                     result.Append(" -> ");
                                     first = false;
                                 } else {
                                     result.Append(", ");
                                 }
-                                AppendDescription(result, av);
+                                AppendDescription(result, av.Value);
                             }
                         } finally {
-                            av.Pop();
+                            av.Value.Pop();
                         }
                     } else {
                         result.Append("...");
@@ -218,10 +218,10 @@ namespace Microsoft.NodejsTools.Analysis.Values {
                 }).ToArray();
 
                 var parameters = vars
-                    .Select(p => string.Join(" or ", p.TypesNoCopy.Select(av => av.ShortDescription).Where(s => !String.IsNullOrWhiteSpace(s)).OrderBy(s => s).Distinct()))
+                    .Select(p => string.Join(" or ", p.TypesNoCopy.Select(av => av.Value.ShortDescription).Where(s => !String.IsNullOrWhiteSpace(s)).OrderBy(s => s).Distinct()))
                     .ToArray();
 
-                IEnumerable<AnalysisVariable>[] refs = vars.Select(v => VariableTransformer.OtherToVariables.ToVariables(v)).ToArray();
+                IEnumerable<AnalysisVariable>[] refs = vars.Select(v => VariableTransformer.OtherToVariables.ToVariables(_analysisUnit, v)).ToArray();
 
                 ParameterResult[] parameterResults = FunctionObject.ParameterDeclarations == null ?
                     new ParameterResult[0] :
@@ -262,7 +262,7 @@ namespace Microsoft.NodejsTools.Analysis.Values {
                     _analysisUnit.Enqueue();
                 }
                 _analysisUnit.ReturnValue.AddDependency(unit);
-                return _analysisUnit.ReturnValue.Types;
+                return _analysisUnit.ReturnValue.GetTypes(unit, ProjectEntry);
             }
 
             var callArgs = new CallArgs(@this, args, _overflowed == OverflowState.OverflowedOnce);
@@ -275,7 +275,7 @@ namespace Microsoft.NodejsTools.Analysis.Values {
 
             if (!_allCalls.TryGetValue(callArgs, out callInfo)) {
                 if (unit.ForEval) {
-                    return ReturnValue.Types;
+                    return ReturnValue.GetTypes(unit, ProjectEntry);
                 }
 
                 _allCalls[callArgs] = callInfo = new CallInfo(
@@ -299,7 +299,7 @@ namespace Microsoft.NodejsTools.Analysis.Values {
                     if (_allCalls.Count > MaximumCallCount) {
                         _overflowed = OverflowState.OverflowedBigTime;
                         _analysisUnit.ReturnValue.AddDependency(unit);
-                        return _analysisUnit.ReturnValue.Types;
+                        return _analysisUnit.ReturnValue.GetTypes(unit, ProjectEntry);
                     }
                 }
 
@@ -308,7 +308,7 @@ namespace Microsoft.NodejsTools.Analysis.Values {
                 return AnalysisSet.Empty;
             } else {
                 callInfo.ReturnValue.AddDependency(unit);
-                return callInfo.ReturnValue.Types;
+                return callInfo.ReturnValue.GetTypes(unit, ProjectEntry);
             }
         }
 
@@ -447,7 +447,7 @@ namespace Microsoft.NodejsTools.Analysis.Values {
                         }
                         res.Append(argVal.ToString());
                         res.Append(" ");
-                        res.Append(GetComparer().GetHashCode(argVal));
+                        res.Append(GetComparer().GetHashCode(argVal.Value));
                         appended = true;
                     }
                     res.Append("}");
@@ -520,13 +520,13 @@ namespace Microsoft.NodejsTools.Analysis.Values {
                     if (Args.Length > 0) {
                         for (int i = 0; i < Args.Length; i++) {
                             foreach (var value in Args[i]) {
-                                hc ^= comparer.GetHashCode(value);
+                                hc ^= comparer.GetHashCode(value.Value);
                             }
                         }
                     }
                     if (This != null) {
                         foreach (var value in This) {
-                            hc ^= comparer.GetHashCode(value);
+                            hc ^= comparer.GetHashCode(value.Value);
                         }
                     }
 
@@ -586,11 +586,13 @@ namespace Microsoft.NodejsTools.Analysis.Values {
             get {
                 if (_references != null) {
                     foreach (var keyValue in _references) {
-                        foreach (var loc in keyValue.Value.References) {
-                            yield return new KeyValuePair<IProjectEntry, EncodedLocation>(
-                                keyValue.Key,
-                                loc
-                            );
+                        if (keyValue.Value.References != null) {
+                            foreach (var loc in keyValue.Value.References) {
+                                yield return new KeyValuePair<IProjectEntry, EncodedLocation>(
+                                    keyValue.Key,
+                                    loc
+                                );
+                            }
                         }
                     }
                 }

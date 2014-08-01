@@ -16,6 +16,10 @@ using System;
 namespace Microsoft.NodejsTools.Analysis.Values {
     [Serializable]
     class UndefinedValue : AnalysisValue {
+        public UndefinedValue(JsAnalyzer analyzer)
+            : base(analyzer._builtinEntry) {
+        }
+
         public override BuiltinTypeId TypeId {
             get {
                 return BuiltinTypeId.Undefined;

@@ -74,7 +74,7 @@ namespace Microsoft.NodejsTools.Analysis.Analyzer {
                             }
                         }
                     }
-                    return refs.Types;
+                    return refs.GetTypes(_unit);
                 }
             }
 
@@ -84,10 +84,6 @@ namespace Microsoft.NodejsTools.Analysis.Analyzer {
         #endregion
 
         #region Implementation Details
-
-        private ModuleValue GlobalScope {
-            get { return _unit.DeclaringModuleEnvironment.Module; }
-        }
 
         private JsAnalyzer ProjectState {
             get { return _unit.Analyzer; }
@@ -166,7 +162,7 @@ namespace Microsoft.NodejsTools.Analysis.Analyzer {
             var n = (Lookup)node;
             var res = ee.LookupAnalysisSetByName(node, n.Name);
             foreach (var value in res) {
-                value.AddReference(node, ee._unit);
+                value.Value.AddReference(node, ee._unit);
             }
             return res;
         }
@@ -206,7 +202,7 @@ namespace Microsoft.NodejsTools.Analysis.Analyzer {
                 NodeEnvironmentKind.ObjectLiteralValue,
                 node,
                 out value)) {
-                var objectInfo = (ObjectLiteralValue)value;
+                var objectInfo = (ObjectLiteralValue)value.First().Value;
                 if (n.Properties.Count > 50) {
                     // probably some generated object literal, ignore it
                     // for the post part.
@@ -236,7 +232,7 @@ namespace Microsoft.NodejsTools.Analysis.Analyzer {
                 objectInfo.SetIndex(
                     node,
                     ee._unit,
-                    ee.ProjectState.GetConstant(x.Name.Value) ?? AnalysisSet.Empty,
+                    ee.ProjectState.GetConstant(x.Name.Value).Proxy ?? AnalysisSet.Empty,
                     ee.EvaluateMaybeNull(x.Value) ?? AnalysisSet.Empty
                 );
             }
@@ -245,7 +241,7 @@ namespace Microsoft.NodejsTools.Analysis.Analyzer {
         private static IAnalysisSet EvaluateConstant(ExpressionEvaluator ee, Node node) {
             var n = (ConstantWrapper)node;
 
-            return ee.ProjectState.GetConstant(n.Value);
+            return ee.ProjectState.GetConstant(n.Value).Proxy;
         }
 
         private static IAnalysisSet EvaluateConditional(ExpressionEvaluator ee, Node node) {
@@ -271,14 +267,14 @@ namespace Microsoft.NodejsTools.Analysis.Analyzer {
             if (n.IsConstructor) {
                 var targetRefs = ee.Evaluate(n.Function);
                 foreach (var target in targetRefs) {
-                    res = res.Union(target.Construct(node, ee._unit, argTypes));
+                    res = res.Union(target.Value.Construct(node, ee._unit, argTypes));
                 }
             } else {
                 IAnalysisSet @this;
                 IAnalysisSet targetRefs = ee.EvaluateReference(node, n, out @this);
 
                 foreach (var target in targetRefs) {
-                    if (target == ee._unit.Analyzer._requireFunc && n.Arguments.Count == 1) {
+                    if (target.Value == ee._unit.Analyzer._requireFunc && n.Arguments.Count == 1) {
                         // we care a lot about require analysis and people do some pretty
                         // crazy dynamic things for require calls.  If we let our normal
                         // analysis and specialized function handle it we won't get things
@@ -303,10 +299,10 @@ namespace Microsoft.NodejsTools.Analysis.Analyzer {
                 var lhs = ee.EvaluateMaybeNull(binOp.Operand1);
                 var rhs = ee.EvaluateMaybeNull(binOp.Operand2);
                 foreach (var left in lhs) {
-                    var leftStr = left.GetConstantValueAsString();
+                    var leftStr = left.Value.GetConstantValueAsString();
                     if (leftStr != null) {
                         foreach (var right in rhs) {
-                            var rightStr = right.GetConstantValueAsString();
+                            var rightStr = right.Value.GetConstantValueAsString();
                             if (rightStr != null) {
                                 res = res.Union(
                                     ee._unit.Analyzer.Modules.RequireModule(
@@ -361,7 +357,7 @@ namespace Microsoft.NodejsTools.Analysis.Analyzer {
                     IAnalysisSet res = AnalysisSet.Empty;
                     foreach (var expr in operand) {
                         string typeName;
-                        switch (expr.TypeId) {
+                        switch (expr.Value.TypeId) {
                             case BuiltinTypeId.Function: typeName = "function"; break;
                             case BuiltinTypeId.String: typeName = "string"; break;
                             case BuiltinTypeId.Null: typeName = "null"; break;
@@ -370,11 +366,11 @@ namespace Microsoft.NodejsTools.Analysis.Analyzer {
                             case BuiltinTypeId.Boolean: typeName = "boolean"; break;
                             default: typeName = "object"; break;
                         }
-                        res = res.Union(ee.ProjectState.GetConstant(typeName));
+                        res = res.Union(ee.ProjectState.GetConstant(typeName).Proxy);
                     }
                     return res;
                 case JSToken.Void:
-                    return ee._unit.Analyzer._undefined;
+                    return ee._unit.Analyzer._undefined.Proxy;
             }
 
             return operand.UnaryOperation(node, ee._unit, n.OperatorToken);
@@ -481,7 +477,7 @@ namespace Microsoft.NodejsTools.Analysis.Analyzer {
             var func = (FunctionExpression)node;
             EnvironmentRecord funcRec;
             if (ee.Scope.GlobalEnvironment.TryGetNodeEnvironment(func.Function, out funcRec)) {
-                return funcRec.AnalysisValue.SelfSet;
+                return ((FunctionEnvironmentRecord)funcRec).AnalysisValue.SelfSet;
             }
             
             Debug.Assert(ee._unit.ForEval, "Failed to find function record");
@@ -493,11 +489,11 @@ namespace Microsoft.NodejsTools.Analysis.Analyzer {
                 NodeEnvironmentKind.ArrayValue,
                 node, x => {
                 return new ArrayValue(
-                    VariableDef.EmptyArray,
+                    TypedDef.EmptyArray,
                     _unit.ProjectEntry,
                     node
                 ).SelfSet;
-            });
+            }).First().Value;
             var array = (ArrayLiteral)node;
             if (array.Elements.Count >= 50) {
                 // probably some generated object literal, ignore it

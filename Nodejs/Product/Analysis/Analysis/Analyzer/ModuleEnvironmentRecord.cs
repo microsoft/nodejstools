@@ -21,13 +21,11 @@ namespace Microsoft.NodejsTools.Analysis.Analyzer {
     [Serializable]
     sealed class ModuleEnvironmentRecord : DeclarativeEnvironmentRecord {
         private readonly ProjectEntry _projectEntry;
-        private readonly ModuleValue _module;   // the object which corresponds to "module" in the users module
         private readonly Dictionary<Node, EnvironmentRecord> _nodeScopes;
         private readonly Dictionary<NodeEnvironmentKey, IAnalysisSet> _nodeValues;
 
-        public ModuleEnvironmentRecord(ModuleValue module, ProjectEntry projectEntry)
+        public ModuleEnvironmentRecord(ProjectEntry projectEntry)
             : base(null) {
-            _module = module;
             _projectEntry = projectEntry;
             _nodeScopes = new Dictionary<Node, EnvironmentRecord>();
             _nodeValues = new Dictionary<NodeEnvironmentKey, IAnalysisSet>();
@@ -35,18 +33,9 @@ namespace Microsoft.NodejsTools.Analysis.Analyzer {
 
         private ModuleEnvironmentRecord(ModuleEnvironmentRecord scope)
             : base(scope, true) {
-            _module = scope.Module;
             _projectEntry = scope.ProjectEntry;
             _nodeScopes = scope._nodeScopes;
             _nodeValues = scope._nodeValues;
-        }
-
-        public ModuleValue Module { get { return _module; } }
-
-        public override AnalysisValue AnalysisValue {
-            get {
-                return _module;
-            }
         }
 
         public override string Name {

@@ -36,7 +36,7 @@ namespace Microsoft.NodejsTools.Analysis {
 
         public static bool AnyContains(this IEnumerable<IAnalysisSet> source, AnalysisValue value) {
             foreach (var set in source) {
-                if (set.Contains(value)) {
+                if (set.Contains(value.Proxy)) {
                     return true;
                 }
             }

@@ -154,6 +154,11 @@ namespace Microsoft.NodejsTools.Analysis {
             return false;
         }
 
+        public bool TryGetSingleDependency(out SingleDependency dependency) {
+            dependency = _data as SingleDependency;
+            return dependency != null;
+        }
+
 
         [DebuggerBrowsable(DebuggerBrowsableState.Never)]
         public IEnumerable<TValue> DictValues {

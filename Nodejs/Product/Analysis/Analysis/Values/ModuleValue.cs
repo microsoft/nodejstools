@@ -26,10 +26,10 @@ namespace Microsoft.NodejsTools.Analysis.Values {
         private readonly string _name;
         private readonly ModuleEnvironmentRecord _scope;
 
-        public ModuleValue(string moduleName, ProjectEntry projectEntry)
-            : base(projectEntry) {
+        public ModuleValue(string moduleName, ModuleEnvironmentRecord moduleRecord)
+            : base(moduleRecord.ProjectEntry) {
             _name = moduleName;
-            _scope = new ModuleEnvironmentRecord(this, projectEntry);
+            _scope = moduleRecord;
         }
 
         public ModuleEnvironmentRecord EnvironmentRecord {
@@ -78,26 +78,6 @@ namespace Microsoft.NodejsTools.Analysis.Values {
         public override IEnumerable<LocationInfo> Locations {
             get {
                 return new[] { new LocationInfo(ProjectEntry, 1, 1) };
-            }
-        }
-
-        /// <summary>
-        /// Modules are fixed in time, we re-use the same ModuleInfo
-        /// across all instances of the analysis.
-        /// </summary>
-        public override int DeclaringVersion {
-            get {
-                return -1;
-            }
-        }
-
-        /// <summary>
-        /// Modules are fixed in time, we re-use the same ModuleInfo
-        /// across all instances of the analysis.
-        /// </summary>
-        public override IJsProjectEntry DeclaringModule {
-            get {
-                return null;
             }
         }
     }

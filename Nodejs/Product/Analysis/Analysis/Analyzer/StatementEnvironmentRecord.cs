@@ -48,10 +48,6 @@ namespace Microsoft.NodejsTools.Analysis.Analyzer {
             return _endIndex;
         }
 
-        public override AnalysisValue AnalysisValue {
-            get { return null; }
-        }
-
         public int EndIndex {
             set {
                 _endIndex = value;

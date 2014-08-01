@@ -218,7 +218,7 @@ namespace AnalysisDriver {
             );
 
             Log(stats, packageId);
-
+            Console.ReadLine();
             GC.KeepAlive(analyzer);
 
             if (_cleanup) {
@@ -629,6 +629,12 @@ namespace AnalysisDriver {
                     return -200;
                 }
             }
+            for (int i = 0; i < 3; i++) {
+                GC.Collect(2);
+                GC.WaitForPendingFinalizers();
+            }
+            //AnalysisValue.DumpStats();
+            //VariableDef.DumpStats();
             return 0;
         }
 

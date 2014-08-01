@@ -181,6 +181,9 @@ namespace Microsoft.NodejsTools.Analysis {
                     case SerializationType.List:
                         nextValue = DeserializeList(stack, reader);
                         break;
+                    case SerializationType.AnalysisHashSet:
+                        nextValue = DeserializeAnalysisHashSet(stack, reader);
+                        break;
                     case SerializationType.AnalysisDictionary:
                         nextValue = DeserializeAnalysisDictionary(stack, reader);
                         break;
@@ -477,6 +480,20 @@ namespace Microsoft.NodejsTools.Analysis {
             stack.Push(hs.Comparer);
         }
 
+        private static void SerializeAnalysisHashSet(object value, AnalysisSerializer serializer, Stack<object> stack, BinaryWriter writer) {
+            serializer.ReverseMemoize(value);
+
+            var hs = (AnalysisHashSet)value;
+            writer.Write((byte)SerializationType.AnalysisHashSet);
+
+            var items = new List<AnalysisProxy>(hs);
+            writer.Write(items.Count);
+            foreach (var obj in items) {
+                stack.Push(obj);
+            }
+            stack.Push(hs.Comparer);
+        }
+
         private static void SerializeDictionary<TKey, TValue>(object value, AnalysisSerializer serializer, Stack<object> stack, BinaryWriter writer) {
             serializer.ReverseMemoize(value);
 
@@ -678,6 +695,7 @@ namespace Microsoft.NodejsTools.Analysis {
                 { typeof(IndexSpan), SerializeIndexSpan },
                 { typeof(EncodedLocation), SerializeEncodedLocation },
                 { typeof(HashSet<string>), SerializeHashSet<string> },
+                { typeof(AnalysisHashSet), SerializeAnalysisHashSet },
                 { typeof(HashSet<EncodedLocation>), SerializeHashSet<EncodedLocation> },
                 { typeof(AnalysisSetEmptyObject), new SimpleTypeSerializer(SerializationType.EmptyAnalysisSet).Serialize },
                 { typeof(Microsoft.NodejsTools.Parsing.Missing), new SimpleTypeSerializer(SerializationType.MissingValue).Serialize },
@@ -846,6 +864,19 @@ namespace Microsoft.NodejsTools.Analysis {
                 object key = null;
                 stack.Push(new DeserializationFrame(newValue => _postProcess.Add(() => value[(TKey)key] = (TValue)newValue)));
                 stack.Push(new DeserializationFrame(newKey => key = newKey));
+            }
+            return value;
+        }
+
+        private object DeserializeAnalysisHashSet(Stack<DeserializationFrame> stack, BinaryReader reader) {
+            int count = reader.ReadInt32();
+            var comparer = (IEqualityComparer<AnalysisProxy>)DeserializeComparer(reader);
+            var value = new AnalysisHashSet(count, comparer);
+            Memoize(value);
+
+            DeserializationFunc adder = newValue => _postProcess.Add(() => value.Add((AnalysisProxy)newValue));
+            for (int i = 0; i < count; i++) {
+                stack.Push(new DeserializationFrame(adder));
             }
             return value;
         }
@@ -1075,6 +1106,7 @@ namespace Microsoft.NodejsTools.Analysis {
             GlobalValue,
 
             AnalysisDictionary,
+            AnalysisHashSet,
 
             // Variable analysis instances
             StringValue,

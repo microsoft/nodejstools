@@ -50,7 +50,7 @@ namespace Microsoft.NodejsTools.Analysis.Values {
                 // }
                 // this now includes us.
 
-                UserFunctionValue userFunc = obj as UserFunctionValue;
+                UserFunctionValue userFunc = obj.Value as UserFunctionValue;
                 if (userFunc != null) {
                     var env = (FunctionEnvironmentRecord)(userFunc.AnalysisUnit._env);
 

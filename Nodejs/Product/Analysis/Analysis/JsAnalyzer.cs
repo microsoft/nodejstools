@@ -51,7 +51,6 @@ namespace Microsoft.NodejsTools.Analysis {
         internal readonly AnalysisValue _emptyStringValue, _zeroIntValue;
         internal readonly BuiltinFunctionValue _requireFunc;
         private readonly Deque<AnalysisUnit> _queue;
-        internal readonly AnalysisUnit _evalUnit;   // a unit used for evaluating when we don't otherwise have a unit available
         private readonly HashSet<string> _analysisDirs = new HashSet<string>(StringComparer.OrdinalIgnoreCase);
         private AnalysisLimits _limits;
         private static byte[] _serializationVersion;
@@ -60,7 +59,7 @@ namespace Microsoft.NodejsTools.Analysis {
 #endif
 
         public JsAnalyzer(AnalysisLimits limits = null) {
-            _modules = new ModuleTable(this);
+            _modules = new ModuleTable();
             _itemCache = new Dictionary<object, AnalysisValue>();
             _builtinEntry = new ProjectEntry(this, "", null);
 
@@ -71,7 +70,7 @@ namespace Microsoft.NodejsTools.Analysis {
             _nullInst = new NullValue(this);
             _trueInst = new BooleanValue(true, this);
             _falseInst = new BooleanValue(false, this);
-            _undefined = new UndefinedValue();
+            _undefined = new UndefinedValue(this);
 
             _emptyStringValue = GetConstant("");
             _zeroIntValue = GetConstant(0.0);
@@ -96,8 +95,6 @@ namespace Microsoft.NodejsTools.Analysis {
             if (File.Exists(allJson)) {
                 NodejsModuleBuilder.Build(allJson, this);
             }
-
-            _evalUnit = new EvalAnalysisUnit(null, null, new ModuleValue("$global", _builtinEntry).EnvironmentRecord);
         }
 
         #region Public API
@@ -121,7 +118,7 @@ namespace Microsoft.NodejsTools.Analysis {
             var entry = new ProjectEntry(this, filePath, cookie);
 
             Modules.AddModule(filePath, entry);
-
+            
             return entry;
         }
 
@@ -186,8 +183,8 @@ namespace Microsoft.NodejsTools.Analysis {
         public IJsProjectEntry this[string filename] {
             get {
                 ModuleTree tree;
-                if (Modules.TryGetValue(filename, out tree) && tree.Module != null) {
-                    return tree.Module.ProjectEntry;
+                if (Modules.TryGetValue(filename, out tree) && tree.ProjectEntry != null) {
+                    return tree.ProjectEntry;
                 }
                 throw new KeyNotFoundException();
             }
@@ -276,7 +273,7 @@ namespace Microsoft.NodejsTools.Analysis {
             if (typeList == null) {
                 return AnalysisSet.Empty;
             }
-            return AnalysisSet.UnionAll(typeList.Select(GetConstant));
+            return AnalysisSet.UnionAll(typeList.Select(x => GetConstant(x).Proxy));
         }
 
         internal AnalysisValue GetAnalysisValueFromObjectsThrowOnNull(object attr) {

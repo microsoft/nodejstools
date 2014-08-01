@@ -31,18 +31,18 @@ namespace Microsoft.NodejsTools.Analysis.Analyzer {
     /// </summary>
     [Serializable]
     class DependentKeyValue : DependentData<KeyValueDependencyInfo> {
-        private static Dictionary<AnalysisValue, IAnalysisSet> EmptyDict = new Dictionary<AnalysisValue, IAnalysisSet>();
+        private static Dictionary<AnalysisProxy, IAnalysisSet> EmptyDict = new Dictionary<AnalysisProxy, IAnalysisSet>();
         private IAnalysisSet _allValues;
 
         protected override KeyValueDependencyInfo NewDefinition(int version) {
             return new KeyValueDependencyInfo(version);
         }
 
-        public bool AddTypes(AnalysisUnit unit, IEnumerable<AnalysisValue> keyTypes, IEnumerable<AnalysisValue> valueTypes, bool enqueue = true) {
+        public bool AddTypes(AnalysisUnit unit, IAnalysisSet keyTypes, IAnalysisSet valueTypes, bool enqueue = true) {
             return AddTypes(unit.ProjectEntry, unit.Analyzer, keyTypes, valueTypes, enqueue);
         }
 
-        public bool AddTypes(IProjectEntry projectEntry, JsAnalyzer projectState, IEnumerable<AnalysisValue> keyTypes, IEnumerable<AnalysisValue> valueTypes, bool enqueue = true) {
+        public bool AddTypes(ProjectEntry projectEntry, JsAnalyzer projectState, IAnalysisSet keyTypes, IAnalysisSet valueTypes, bool enqueue = true) {
             var dependencies = GetDependentItems(projectEntry);
 
             if (dependencies.KeyValues.Count > projectState.Limits.DictKeyTypes) {
@@ -115,7 +115,7 @@ namespace Microsoft.NodejsTools.Analysis.Analyzer {
         public IAnalysisSet GetValueType(IAnalysisSet keyTypes) {
             var res = AnalysisSet.Empty;
             if (_dependencies.Count != 0) {
-                AnalysisValue ns = keyTypes as AnalysisValue;
+                AnalysisProxy ns = keyTypes as AnalysisProxy;
                 foreach (var keyValue in _dependencies.Values) {
                     IAnalysisSet union;
                     if (ns != null) {
@@ -151,13 +151,14 @@ namespace Microsoft.NodejsTools.Analysis.Analyzer {
             return res ?? AnalysisSet.Empty;
         }
 
-        public Dictionary<AnalysisValue, IAnalysisSet> KeyValueTypes {
+#if FALSE   // Currently unused but could come back...
+        public Dictionary<AnalysisProxy, IAnalysisSet> KeyValueTypes {
             get {
                 if (_dependencies.Count != 0) {
-                    Dictionary<AnalysisValue, IAnalysisSet> res = null;
+                    Dictionary<AnalysisProxy, IAnalysisSet> res = null;
                     foreach (var mod in _dependencies.Values) {
                         if (res == null) {
-                            res = new Dictionary<AnalysisValue, IAnalysisSet>();
+                            res = new Dictionary<AnalysisProxy, IAnalysisSet>();
                             foreach (var keyValue in mod.KeyValues) {
                                 res[keyValue.Key] = keyValue.Value;
                             }
@@ -211,6 +212,7 @@ namespace Microsoft.NodejsTools.Analysis.Analyzer {
             }
             return anyAdded;
         }
+#endif
 
         /// <summary>
         /// Copies all of our key types into the provided VariableDef.

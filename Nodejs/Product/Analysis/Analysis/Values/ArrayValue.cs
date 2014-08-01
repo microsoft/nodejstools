@@ -20,10 +20,10 @@ namespace Microsoft.NodejsTools.Analysis.Values {
     [Serializable]
     class ArrayValue : ObjectValue {
         private IAnalysisSet _unionType;        // all types that have been seen
-        private VariableDef[] _indexTypes;     // types for known indices
+        private TypedDef[] _indexTypes;     // types for known indices
         private readonly Node _node;
 
-        public ArrayValue(VariableDef[] indexTypes, ProjectEntry entry, Node node)
+        public ArrayValue(TypedDef[] indexTypes, ProjectEntry entry, Node node)
             : base(entry, entry.Analyzer._arrayFunction) {
             _indexTypes = indexTypes;
             _node = node;
@@ -49,11 +49,11 @@ namespace Microsoft.NodejsTools.Analysis.Values {
             if (constIndex != null && constIndex.Value < IndexTypes.Length) {
                 // TODO: Warn if outside known index and no appends?
                 IndexTypes[constIndex.Value].AddDependency(unit);
-                return IndexTypes[constIndex.Value].Types;
+                return IndexTypes[constIndex.Value].GetTypes(unit, ProjectEntry);
             }
 
             if (IndexTypes.Length == 0) {
-                IndexTypes = new[] { new VariableDef() };
+                IndexTypes = new[] { new TypedDef() };
             }
 
             IndexTypes[0].AddDependency(unit);
@@ -76,7 +76,7 @@ namespace Microsoft.NodejsTools.Analysis.Values {
             set { _unionType = value; }
         }
 
-        public VariableDef[] IndexTypes {
+        public TypedDef[] IndexTypes {
             get { return _indexTypes; }
             set { _indexTypes = value; }
         }
@@ -101,7 +101,7 @@ namespace Microsoft.NodejsTools.Analysis.Values {
             int? constIndex = null;
             int typeCount = 0;
             foreach (var type in index) {
-                object constValue = type.GetConstantValue();
+                object constValue = type.Value.GetConstantValue();
                 if (constValue != null && constValue is int) {
                     constIndex = (int)constValue;
                 }
@@ -116,7 +116,7 @@ namespace Microsoft.NodejsTools.Analysis.Values {
 
         internal bool AddTypes(AnalysisUnit unit, IAnalysisSet[] types) {
             if (_indexTypes.Length < types.Length) {
-                _indexTypes = _indexTypes.Concat(VariableDef.Generator).Take(types.Length).ToArray();
+                _indexTypes = _indexTypes.Concat(TypedDef.Generator).Take(types.Length).ToArray();
             }
 
             bool added = false;

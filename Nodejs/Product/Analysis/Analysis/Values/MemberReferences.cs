@@ -56,7 +56,6 @@ namespace Microsoft.NodejsTools.Analysis.Values {
         public ReferenceList(IProjectEntry project) {
             Version = project.AnalysisVersion;
             Project = project;
-            References = new HashSet<EncodedLocation>();
         }
 
         public void AddReference(EncodedLocation location) {

@@ -194,9 +194,6 @@ namespace Microsoft.NodejsTools.Analysis.Analyzer {
 
         #endregion
 
-        public abstract AnalysisValue AnalysisValue {
-            get;
-        }
 #if DEBUG
         internal virtual void DumpScope(StringBuilder output, int level) {
             Indent(output, level);
@@ -238,10 +235,10 @@ namespace Microsoft.NodejsTools.Analysis.Analyzer {
             }
         }
 
-        private static string GetDescription(AnalysisValue value) {
-            var res = value.ShortDescription;
+        private static string GetDescription(AnalysisProxy value) {
+            var res = value.Value.ShortDescription;
             if (string.IsNullOrWhiteSpace(res)) {
-                res = value.GetType().FullName;
+                res = value.Value.GetType().FullName;
             }
             return res;
         }

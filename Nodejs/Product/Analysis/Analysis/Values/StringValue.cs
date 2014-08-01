@@ -19,7 +19,8 @@ namespace Microsoft.NodejsTools.Analysis.Values {
         internal readonly string _value;
         private readonly JsAnalyzer _analyzer;
 
-        public StringValue(string value, JsAnalyzer javaScriptAnalyzer) {
+        public StringValue(string value, JsAnalyzer javaScriptAnalyzer)
+            : base(javaScriptAnalyzer._builtinEntry) {
             _value = value;
             _analyzer = javaScriptAnalyzer;
             javaScriptAnalyzer.AnalysisValueCreated(typeof(StringValue));

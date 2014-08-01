@@ -17,20 +17,21 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
 using System.Runtime.CompilerServices;
+using Microsoft.NodejsTools.Analysis.AnalysisSetDetails;
 using Microsoft.NodejsTools.Analysis.Analyzer;
 using Microsoft.NodejsTools.Parsing;
 
 namespace Microsoft.NodejsTools.Analysis {
     [Serializable]
     abstract class DependentData<TStorageType> where TStorageType : DependencyInfo {
-        internal SingleDict<IProjectEntry, TStorageType> _dependencies;
+        internal SingleDict<ProjectEntry, TStorageType> _dependencies;
 
         /// <summary>
         /// Clears old values from old modules.  These old values are values which were assigned from
         /// an out of data analysis.
         /// </summary>
         public void ClearOldValues() {
-            foreach (var module in _dependencies.Keys.ToArray()) {
+            foreach (var module in _dependencies.Keys) {
                 ClearOldValues(module);
             }
         }
@@ -40,7 +41,7 @@ namespace Microsoft.NodejsTools.Analysis {
         /// an out of data analysis.
         /// </summary>
         /// <param name="fromModule"></param>
-        public void ClearOldValues(IProjectEntry fromModule) {
+        public void ClearOldValues(ProjectEntry fromModule) {
             TStorageType deps;
             if (_dependencies.TryGetValue(fromModule, out deps)) {
                 if (deps.Version != fromModule.AnalysisVersion) {
@@ -49,7 +50,7 @@ namespace Microsoft.NodejsTools.Analysis {
             }
         }
 
-        protected TStorageType GetDependentItems(IProjectEntry module) {
+        protected TStorageType GetDependentItems(ProjectEntry module) {
             TStorageType result;
             if (!_dependencies.TryGetValue(module, out result) || result.Version != module.AnalysisVersion) {
                 _dependencies[module] = result = NewDefinition(module.AnalysisVersion);
@@ -98,6 +99,420 @@ namespace Microsoft.NodejsTools.Analysis {
         }
     }
 
+    [Serializable]
+
+    abstract class TypedDef<T> : DependentData<T> where T : TypedDependencyInfo {
+        /// <summary>
+        /// This limit is used to prevent analysis from continuing forever due
+        /// to bugs or unanalyzable code. It is tested in Types and
+        /// TypesNoCopy, where an accurate type count is available without
+        /// requiring extra computation, and variables exceeding the limit are
+        /// added to LockedVariableDefs. AddTypes is a no-op for instances in
+        /// this set.
+        /// </summary>
+        internal const int HARD_TYPE_LIMIT = 1000;
+
+        static readonly ConditionalWeakTable<TypedDef<T>, object> LockedVariableDefs = new ConditionalWeakTable<TypedDef<T>, object>();
+        static readonly object LockedVariableDefsValue = new object();
+
+        protected IAnalysisSet _emptySet = AnalysisSet.Empty;
+
+        /// <summary>
+        /// Marks the current VariableDef as exceeding the limit and not to be
+        /// added to in future. It is virtual to allow subclasses to try and
+        /// 'rescue' the VariableDef, for example, by combining types.
+        /// </summary>
+        protected virtual void ExceedsTypeLimit() {
+            object dummy;
+            var uc = _emptySet.Comparer as UnionComparer;
+            if (uc == null) {
+                MakeUnion(0);
+            } else if (uc.Strength < UnionComparer.MAX_STRENGTH) {
+                MakeUnion(uc.Strength + 1);
+            } else if (!LockedVariableDefs.TryGetValue(this, out dummy)) {
+                Debug.Fail("locking variable defs");
+                LockedVariableDefs.Add(this, LockedVariableDefsValue);
+                // The remainder of this block logs diagnostic information to
+                // allow the VariableDef to be identified.
+                int total = 0;
+                var typeCounts = new Dictionary<string, int>();
+                JsAnalyzer analyzer = null;
+                foreach (var type in TypesNoCopy) {
+                    if (analyzer == null && type.Value.DeclaringModule != null) {
+                        analyzer = type.Value.DeclaringModule.Analysis.ProjectState;
+                    }
+                    var str = type.ToString();
+                    int count;
+                    if (!typeCounts.TryGetValue(str, out count)) {
+                        count = 0;
+                    }
+                    typeCounts[str] = count + 1;
+                    total += 1;
+                }
+                var typeCountList = typeCounts.OrderByDescending(kv => kv.Value).Select(kv => string.Format("{0}x {1}", kv.Value, kv.Key)).ToList();
+                Debug.Write(string.Format("{0} exceeded type limit.\nStack trace:\n{1}\nContents:\n    Count = {2}\n    {3}\n",
+                    GetType().Name,
+                    new StackTrace(true),
+                    total,
+                    string.Join("\n    ", typeCountList)));
+                if (analyzer != null) {
+                    analyzer.Log.ExceedsTypeLimit(GetType().Name, total, string.Join(", ", typeCountList));
+                }
+            }
+        }
+
+#if VARDEF_STATS
+        internal static Dictionary<string, int> _variableDefStats = new Dictionary<string, int>();
+
+        ~TypedDef() {
+            IncStat(String.Format("Type:{0}", GetType().Name));
+            if (_dependencies.Count == 0) {
+                IncStat("NoDeps");
+            } else {
+                IncStat(String.Format("TypeCount_{0:D3}", Types.Count));
+                IncStat(String.Format("DepCount_{0:D3}", _dependencies.Count));
+                IncStat(
+                    String.Format(
+                        "TypeXDepCount_{0:D3},{1:D3}", 
+                        Types.Count, 
+                        _dependencies.Count
+                    )
+                );
+                foreach (var dep in _dependencies.Values) {
+                    IncStat(String.Format("DepUnits_{0:D3}", dep.DependentUnits == null ? 0 : dep.DependentUnits.Count));
+                }
+            }
+        }
+
+        protected static void IncStat(string stat) {
+            if (_variableDefStats.ContainsKey(stat)) {
+                _variableDefStats[stat] += 1;
+            } else {
+                _variableDefStats[stat] = 1;
+            }
+        }
+
+        internal static void DumpStats() {
+            for (int i = 0; i < 3; i++) {
+                GC.Collect(2, GCCollectionMode.Forced);
+                GC.WaitForPendingFinalizers();
+            }
+
+            List<string> values = new List<string>();
+            foreach (var keyValue in _variableDefStats) {
+                values.Add(String.Format("{0}: {1}", keyValue.Key, keyValue.Value));
+            }
+            values.Sort();
+            foreach (var value in values) {
+                Console.WriteLine(value);
+            }
+        }
+#endif
+
+        protected bool CheckTypeCount(IAnalysisSet extraTypes, int typeCount) {
+            // before we go allocating see if it's possible for us to have too
+            // many times at all...
+            if (_dependencies.Count == 0) {
+                return false;
+            }
+
+            int roughCount = 0;
+            if (extraTypes != null) {
+                roughCount += extraTypes.Count;
+            }
+
+            T singleValue;
+            if (_dependencies.TryGetSingleValue(out singleValue)) {
+                roughCount += singleValue.Types.Count;
+            } else {
+                foreach (var info in _dependencies.Values) {
+                    roughCount += info.Types.Count;
+                }
+            }
+
+            if (roughCount < typeCount) {
+                // it's not possible to have too many times, don't allocate & hash.
+                return false;
+            }
+
+            // Use a fast estimate of the number of types we have, since this
+            // function will be called very often.
+            var roughSet = new HashSet<AnalysisProxy>();
+            foreach (var info in _dependencies.Values) {
+                roughSet.UnionWith(info.Types);
+            }
+            if (extraTypes != null) {
+                roughSet.UnionWith(extraTypes);
+            }
+            return roughSet.Count >= typeCount;
+        }
+
+        public bool AddTypes(AnalysisUnit unit, IEnumerable<AnalysisProxy> newTypes, bool enqueue = true) {
+            return AddTypes(unit.ProjectEntry, newTypes, enqueue);
+        }
+
+        // Set checks ensure that the wasChanged result is correct. The checks
+        // are memory intensive, since they perform the add an extra time. The
+        // flag is static but non-const to allow it to be enabled while
+        // debugging.
+#if FULL_VALIDATION || DEBUG
+        private static bool ENABLE_SET_CHECK = false;
+#endif
+
+        public bool AddTypes(ProjectEntry projectEntry, IEnumerable<AnalysisProxy> newTypes, bool enqueue = true) {
+            object dummy;
+            if (LockedVariableDefs.TryGetValue(this, out dummy)) {
+                return false;
+            }
+            
+            bool added = false;
+            foreach (var value in newTypes) {
+                var newTypesEntry = projectEntry;
+
+                var dependencies = GetDependentItems(newTypesEntry);
+
+#if DEBUG || FULL_VALIDATION
+                if (ENABLE_SET_CHECK) {
+                    bool testAdded;
+                    var original = dependencies.ToImmutableTypeSet();
+                    var afterAdded = new AnalysisHashSet(original, original.Comparer).Add(value, out testAdded);
+                    if (afterAdded.Comparer == original.Comparer) {
+                        if (testAdded) {
+                            Validation.Assert(!ObjectComparer.Instance.Equals(afterAdded, original));
+                        } else {
+                            Validation.Assert(ObjectComparer.Instance.Equals(afterAdded, original));
+                        }
+                    }
+                }
+#endif
+
+                if (dependencies.AddType(value)) {
+                    added = true;
+                }
+            }
+            if (added && enqueue) {
+                EnqueueDependents();
+            }
+
+            return added;
+        }
+
+        public IAnalysisSet GetTypes(AnalysisUnit accessor, ProjectEntry declaringScope = null) {
+            bool needsCopy;
+            var res = GetTypesWorker(accessor.ProjectEntry, declaringScope, out needsCopy);
+            if (needsCopy) {
+                res = res.Clone();
+            }
+            return res;
+        }
+
+        /// <summary>
+        /// Returns a possibly mutable hash set of types.  Because the set may be mutable
+        /// you can only use this version if you are directly consuming the set and know
+        /// that this VariableDef will not be mutated while you would be enumerating over
+        /// the resulting set.
+        /// </summary>
+        public IAnalysisSet GetTypesNoCopy(AnalysisUnit accessor, ProjectEntry declaringScope = null) {
+            return GetTypesNoCopy(accessor.ProjectEntry, declaringScope);
+        }
+
+        public IAnalysisSet GetTypesNoCopy(ProjectEntry accessor = null, ProjectEntry declaringScope = null) {
+            bool needsCopy;
+            return GetTypesWorker(accessor, declaringScope, out needsCopy);
+        }
+
+        private IAnalysisSet GetTypesWorker(ProjectEntry accessor, ProjectEntry declaringScope, out bool needsCopy) {
+            needsCopy = false;
+            var res = _emptySet;
+            if (_dependencies.Count != 0) {
+                SingleDict<ProjectEntry, T>.SingleDependency oneDependency;
+                if (_dependencies.TryGetSingleDependency(out oneDependency)) {
+                    if (oneDependency.Value.Types.Count > 0 && IsVisible(accessor, declaringScope, oneDependency.Key)) {
+                        var types = oneDependency.Value.Types;
+                        if (types != null) {
+                            needsCopy = !(types is IImmutableAnalysisSet);
+                            res = types;
+                        }
+                    }
+                } else {
+                    foreach (var kvp in (AnalysisDictionary<ProjectEntry, T>)_dependencies._data) {
+                        if (kvp.Value.Types.Count > 0 && IsVisible(accessor, declaringScope, kvp.Key)) {
+                            res = res.Union(kvp.Value.Types);
+                        }
+                    }
+                }
+            }
+
+            if (res.Count > HARD_TYPE_LIMIT) {
+                ExceedsTypeLimit();
+            }
+
+            return res;
+        }
+
+        private static bool IsVisible(ProjectEntry accessor, ProjectEntry declaringScope, ProjectEntry assigningScope) {
+            if (accessor != null && accessor.IsVisible(assigningScope)) {
+                return true;
+            }
+            if (declaringScope != null && declaringScope.IsVisible(assigningScope)) {
+                return true;
+            }
+            return false;
+        }
+
+        public bool HasTypes {
+            get {
+                if (_dependencies.Count == 0) {
+                    return false;
+                }
+                T oneDependency;
+                if (_dependencies.TryGetSingleValue(out oneDependency)) {
+                    return oneDependency.Types.Count > 0;
+                } else {
+                    foreach (var mod in _dependencies.DictValues) {
+                        if (mod.Types.Count > 0) {
+                            return true;
+                        }
+                    }
+                }
+                return false;
+            }
+        }
+
+        /// <summary>
+        /// Returns a possibly mutable hash set of types.  Because the set may be mutable
+        /// you can only use this version if you are directly consuming the set and know
+        /// that this VariableDef will not be mutated while you would be enumerating over
+        /// the resulting set.
+        /// </summary>
+        public IAnalysisSet TypesNoCopy {
+            get {
+                var res = _emptySet;
+                if (_dependencies.Count != 0) {
+                    T oneDependency;
+                    if (_dependencies.TryGetSingleValue(out oneDependency)) {
+                        res = oneDependency.Types ?? AnalysisSet.Empty;
+                    } else {
+
+                        foreach (var mod in _dependencies.DictValues) {
+                            if (mod.Types.Count > 0) {
+                                res = res.Union(mod.Types);
+                            }
+                        }
+                    }
+                }
+
+                if (res.Count > HARD_TYPE_LIMIT) {
+                    ExceedsTypeLimit();
+                }
+
+                return res;
+            }
+        }
+
+        /// <summary>
+        /// Returns the set of types which currently are stored in the VariableDef.  The
+        /// resulting set will not mutate in the future even if the types in the VariableDef
+        /// change in the future.
+        /// </summary>
+        public IAnalysisSet Types {
+            get {
+                return TypesNoCopy.Clone();
+            }
+        }
+
+        /// <summary>
+        /// Checks to see if a variable still exists.  This depends upon the variable not
+        /// being ephemeral and that we still have valid type information for dependents.
+        /// </summary>
+        public bool VariableStillExists {
+            get {
+                return !IsEphemeral && (_dependencies.Count > 0 || TypesNoCopy.Count > 0);
+            }
+        }
+
+        public virtual bool IsEphemeral {
+            get {
+                return false;
+            }
+        }
+
+        /// <summary>
+        /// If the number of types associated with this variable exceeds a
+        /// given limit, increases the union strength. This will cause more
+        /// types to be combined.
+        /// </summary>
+        /// <param name="typeCount">The number of types at which to increase
+        /// union strength.</param>
+        /// <param name="extraTypes">A set of types that is about to be added.
+        /// The estimated number of types includes these types.</param>
+        /// <returns>True if the type set was modified. This may be safely
+        /// ignored in many cases, since modifications will reenqueue dependent
+        /// units automatically.</returns>
+        internal bool MakeUnionStrongerIfMoreThan(int typeCount, IAnalysisSet extraTypes = null) {
+            if (CheckTypeCount(extraTypes, typeCount)) {
+                return MakeUnionStronger();
+            }
+            return false;
+        }
+
+        internal bool MakeUnionStronger() {
+            var uc = _emptySet.Comparer as UnionComparer;
+            int strength = uc != null ? uc.Strength + 1 : 0;
+            return MakeUnion(strength);
+        }
+
+        internal bool MakeUnion(int strength) {
+            if (strength > UnionStrength) {
+                bool anyChanged = false;
+
+                _emptySet = AnalysisSet.CreateUnion(strength);
+                foreach (var value in _dependencies.Values) {
+                    anyChanged |= value.MakeUnion(strength);
+                }
+
+                if (anyChanged) {
+                    EnqueueDependents();
+                    return true;
+                }
+            }
+            return false;
+        }
+
+        internal int UnionStrength {
+            get {
+                var uc = _emptySet.Comparer as UnionComparer;
+                return uc != null ? uc.Strength : -1;
+            }
+        }
+    }
+
+    [Serializable]
+    class TypedDef : TypedDef<TypedDependencyInfo> {
+        internal static TypedDef[] EmptyArray = new TypedDef[0];
+
+        public TypedDef() {
+        }
+
+        protected override TypedDependencyInfo NewDefinition(int version) {
+            return new TypedDependencyInfo(version, _emptySet);
+        }
+
+        /// <summary>
+        /// Returns an infinite sequence of VariableDef instances. This can be
+        /// used with .Take(x).ToArray() to create an array of x instances.
+        /// </summary>
+        internal static IEnumerable<TypedDef> Generator {
+            get {
+                while (true) {
+                    yield return new TypedDef();
+                }
+            }
+        }
+
+    }
+
+
     /// <summary>
     /// A VariableDef represents a collection of type information and dependencies
     /// upon that type information.  
@@ -130,13 +545,16 @@ namespace Microsoft.NodejsTools.Analysis {
     /// TODO: We should store built-in types not keyed off of the ModuleInfo.
     /// </summary>
     [Serializable]
-    class VariableDef : DependentData<TypedDependencyInfo<AnalysisValue>>, IReferenceable {
+    class VariableDef : TypedDef<ReferenceableDependencyInfo>, IReferenceable {
         internal static VariableDef[] EmptyArray = new VariableDef[0];
 
-        /// <summary>
-        /// Returns an infinite sequence of VariableDef instances. This can be
-        /// used with .Take(x).ToArray() to create an array of x instances.
-        /// </summary>
+#if VARDEF_STATS
+        ~VariableDef() {
+            IncStat(String.Format("References_{0:D3}", References.Count()));
+            IncStat(String.Format("Assignments_{0:D3}", Definitions.Count()));
+        }
+#endif
+
         internal static IEnumerable<VariableDef> Generator {
             get {
                 while (true) {
@@ -145,238 +563,23 @@ namespace Microsoft.NodejsTools.Analysis {
             }
         }
 
-        /// <summary>
-        /// This limit is used to prevent analysis from continuing forever due
-        /// to bugs or unanalyzable code. It is tested in Types and
-        /// TypesNoCopy, where an accurate type count is available without
-        /// requiring extra computation, and variables exceeding the limit are
-        /// added to LockedVariableDefs. AddTypes is a no-op for instances in
-        /// this set.
-        /// </summary>
-        internal const int HARD_TYPE_LIMIT = 1000;
-
-        static readonly ConditionalWeakTable<VariableDef, object> LockedVariableDefs = new ConditionalWeakTable<VariableDef, object>();
-        static readonly object LockedVariableDefsValue = new object();
-
-        private IAnalysisSet _emptySet = AnalysisSet.Empty;
-
-        /// <summary>
-        /// Marks the current VariableDef as exceeding the limit and not to be
-        /// added to in future. It is virtual to allow subclasses to try and
-        /// 'rescue' the VariableDef, for example, by combining types.
-        /// </summary>
-        protected virtual void ExceedsTypeLimit() {
-            object dummy;
-            var uc = _emptySet.Comparer as UnionComparer;
-            if (uc == null) {
-                MakeUnion(0);
-            } else if (uc.Strength < UnionComparer.MAX_STRENGTH) {
-                MakeUnion(uc.Strength + 1);
-            } else if (!LockedVariableDefs.TryGetValue(this, out dummy)) {
-                LockedVariableDefs.Add(this, LockedVariableDefsValue);
-                // The remainder of this block logs diagnostic information to
-                // allow the VariableDef to be identified.
-                int total = 0;
-                var typeCounts = new Dictionary<string, int>();
-                JsAnalyzer analyzer = null;
-                foreach (var type in TypesNoCopy) {
-                    if (analyzer == null && type.DeclaringModule != null) {
-                        analyzer = type.DeclaringModule.Analysis.ProjectState;
-                    }
-                    var str = type.ToString();
-                    int count;
-                    if (!typeCounts.TryGetValue(str, out count)) {
-                        count = 0;
-                    }
-                    typeCounts[str] = count + 1;
-                    total += 1;
-                }
-                var typeCountList = typeCounts.OrderByDescending(kv => kv.Value).Select(kv => string.Format("{0}x {1}", kv.Value, kv.Key)).ToList();
-                Debug.Write(string.Format("{0} exceeded type limit.\nStack trace:\n{1}\nContents:\n    Count = {2}\n    {3}\n",
-                    GetType().Name,
-                    new StackTrace(true),
-                    total,
-                    string.Join("\n    ", typeCountList)));
-                if (analyzer != null) {
-                    analyzer.Log.ExceedsTypeLimit(GetType().Name, total, string.Join(", ", typeCountList));
-                }
-            }
+        protected override ReferenceableDependencyInfo NewDefinition(int version) {
+            return new ReferenceableDependencyInfo(version, _emptySet);
         }
 
-#if VARDEF_STATS
-        internal static Dictionary<string, int> _variableDefStats = new Dictionary<string, int>();
-
-        ~VariableDef() {
-            if (_dependencies.Count == 0) {
-                IncStat("NoDeps");
-            } else {
-                IncStat(String.Format("TypeCount_{0:D3}", Types.Count));
-                IncStat(String.Format("DepCount_{0:D3}", _dependencies.Count));
-                IncStat(
-                    String.Format(
-                        "TypeXDepCount_{0:D3},{1:D3}", 
-                        Types.Count, 
-                        _dependencies.Count
-                    )
-                );
-                IncStat(String.Format("References_{0:D3}", References.Count()));
-                IncStat(String.Format("Assignments_{0:D3}", Definitions.Count()));
-                foreach (var dep in _dependencies.Values) {
-                    IncStat(String.Format("DepUnits_{0:D3}", dep.DependentUnits == null ? 0 : dep.DependentUnits.Count));
-                }
-            }
-        }
-
-        private static void IncStat(string stat) {
-            if (_variableDefStats.ContainsKey(stat)) {
-                _variableDefStats[stat] += 1;
-            } else {
-                _variableDefStats[stat] = 1;
-            }
-        }
-
-        internal static void DumpStats() {
-            for (int i = 0; i < 3; i++) {
-                GC.Collect(2, GCCollectionMode.Forced);
-                GC.WaitForPendingFinalizers();
-            }
-
-            List<string> values = new List<string>();
-            foreach (var keyValue in VariableDef._variableDefStats) {
-                values.Add(String.Format("{0}: {1}", keyValue.Key, keyValue.Value));
-            }
-            values.Sort();
-            foreach (var value in values) {
-                Console.WriteLine(value);
-            }
-        }
-#endif
-
-        protected override TypedDependencyInfo<AnalysisValue> NewDefinition(int version) {
-            return new TypedDependencyInfo<AnalysisValue>(version, _emptySet);
-        }
-
-        protected int EstimateTypeCount(IAnalysisSet extraTypes = null) {
-            // Use a fast estimate of the number of types we have, since this
-            // function will be called very often.
-            var roughSet = new HashSet<AnalysisValue>();
-            foreach (var info in _dependencies.Values) {
-                roughSet.UnionWith(info.Types);
-            }
-            if (extraTypes != null) {
-                roughSet.UnionWith(extraTypes);
-            }
-            return roughSet.Count;
-        }
-
-        public bool AddTypes(AnalysisUnit unit, IEnumerable<AnalysisValue> newTypes, bool enqueue = true) {
-            return AddTypes(unit.ProjectEntry, newTypes, enqueue);
-        }
-
-        // Set checks ensure that the wasChanged result is correct. The checks
-        // are memory intensive, since they perform the add an extra time. The
-        // flag is static but non-const to allow it to be enabled while
-        // debugging.
-#if FULL_VALIDATION || DEBUG
-        private static bool ENABLE_SET_CHECK = false;
-#endif
-
-        public bool AddTypes(IProjectEntry projectEntry, IEnumerable<AnalysisValue> newTypes, bool enqueue = true) {
-            object dummy;
-            if (LockedVariableDefs.TryGetValue(this, out dummy)) {
-                return false;
-            }
-            
-            bool added = false;
-            foreach (var value in newTypes) {
-                var declaringModule = value.DeclaringModule;
-                if (declaringModule == null || declaringModule.AnalysisVersion == value.DeclaringVersion) {
-                    var newTypesEntry = value.DeclaringModule ?? projectEntry;
-
-                    var dependencies = GetDependentItems(newTypesEntry);
-
-#if DEBUG || FULL_VALIDATION
-                    if (ENABLE_SET_CHECK) {
-                        bool testAdded;
-                        var original = dependencies.ToImmutableTypeSet();
-                        var afterAdded = original.Add(value, out testAdded, false);
-                        if (afterAdded.Comparer == original.Comparer) {
-                            if (testAdded) {
-                                Validation.Assert(!ObjectComparer.Instance.Equals(afterAdded, original));
-                            } else {
-                                Validation.Assert(ObjectComparer.Instance.Equals(afterAdded, original));
-                            }
-                        }
-                    }
-#endif
-
-                    if (dependencies.AddType(value)) {
-                        added = true;
-                    }
-                }
-            }
-            if (added && enqueue) {
-                EnqueueDependents();
-            }
-
-            return added;
-        }
-
-        /// <summary>
-        /// Returns a possibly mutable hash set of types.  Because the set may be mutable
-        /// you can only use this version if you are directly consuming the set and know
-        /// that this VariableDef will not be mutated while you would be enumerating over
-        /// the resulting set.
-        /// </summary>
-        public IAnalysisSet TypesNoCopy {
-            get {
-                var res = _emptySet;
-                if (_dependencies.Count != 0) {
-                    TypedDependencyInfo<AnalysisValue> oneDependency;
-                    if (_dependencies.TryGetSingleValue(out oneDependency)) {
-                        res = oneDependency.Types ?? AnalysisSet.Empty;
-                    } else {
-
-                        foreach (var mod in _dependencies.DictValues) {
-                            if (mod.Types.Count > 0) {
-                                res = res.Union(mod.Types);
-                            }
-                        }
-                    }
-                }
-
-                if (res.Count > HARD_TYPE_LIMIT) {
-                    ExceedsTypeLimit();
-                }
-
-                return res;
-            }
-        }
-
-        /// <summary>
-        /// Returns the set of types which currently are stored in the VariableDef.  The
-        /// resulting set will not mutate in the future even if the types in the VariableDef
-        /// change in the future.
-        /// </summary>
-        public IAnalysisSet Types {
-            get {
-                return TypesNoCopy.Clone();
-            }
-        }
-
-        public bool AddReference(Node node, AnalysisUnit unit) {
+        public void AddReference(Node node, AnalysisUnit unit) {
             if (!unit.ForEval) {
                 var deps = GetDependentItems(unit.DeclaringModuleEnvironment.ProjectEntry);
-                return deps.AddReference(new EncodedLocation(unit.Tree, node)) && deps.AddDependentUnit(unit);
+                deps.AddReference(new EncodedLocation(unit.Tree, node));
+                deps.AddDependentUnit(unit);
             }
-            return false;
         }
 
-        public bool AddReference(EncodedLocation location, IProjectEntry module) {
+        public bool AddReference(EncodedLocation location, ProjectEntry module) {
             return GetDependentItems(module).AddReference(location);
         }
 
-        public bool AddAssignment(EncodedLocation location, IProjectEntry entry) {
+        public bool AddAssignment(EncodedLocation location, ProjectEntry entry) {
             return GetDependentItems(entry).AddAssignment(location);
         }
 
@@ -415,98 +618,31 @@ namespace Microsoft.NodejsTools.Analysis {
             }
         }
 
-        public virtual bool IsEphemeral {
-            get {
-                return false;
-            }
-        }
-
-        internal bool CopyTo(VariableDef to) {
-            bool anyChange = false;
+        internal void CopyTo(VariableDef to) {
             Debug.Assert(this != to);
             foreach (var keyValue in _dependencies) {
                 var projEntry = keyValue.Key;
                 var dependencies = keyValue.Value;
 
-                anyChange |= to.AddTypes(projEntry, dependencies.Types, false);
+                to.AddTypes(projEntry, dependencies.Types, false);
                 if (dependencies.DependentUnits != null) {
                     foreach (var unit in dependencies.DependentUnits) {
-                        anyChange |= to.AddDependency(unit);
+                        to.AddDependency(unit);
                     }
                 }
                 if (dependencies._references != null) {
                     foreach (var encodedLoc in dependencies._references) {
-                        anyChange |= to.AddReference(encodedLoc, projEntry);
+                        to.AddReference(encodedLoc, projEntry);
                     }
                 }
                 if (dependencies._assignments != null) {
                     foreach (var assignment in dependencies._assignments) {
-                        anyChange |= to.AddAssignment(assignment, projEntry);
+                        to.AddAssignment(assignment, projEntry);
                     }
                 }
             }
-            return anyChange;
         }
 
-
-        /// <summary>
-        /// Checks to see if a variable still exists.  This depends upon the variable not
-        /// being ephemeral and that we still have valid type information for dependents.
-        /// </summary>
-        public bool VariableStillExists {
-            get {
-                return !IsEphemeral && (_dependencies.Count > 0 || TypesNoCopy.Count > 0);
-            }
-        }
-
-        /// <summary>
-        /// If the number of types associated with this variable exceeds a
-        /// given limit, increases the union strength. This will cause more
-        /// types to be combined.
-        /// </summary>
-        /// <param name="typeCount">The number of types at which to increase
-        /// union strength.</param>
-        /// <param name="extraTypes">A set of types that is about to be added.
-        /// The estimated number of types includes these types.</param>
-        /// <returns>True if the type set was modified. This may be safely
-        /// ignored in many cases, since modifications will reenqueue dependent
-        /// units automatically.</returns>
-        internal bool MakeUnionStrongerIfMoreThan(int typeCount, IAnalysisSet extraTypes = null) {
-            if (EstimateTypeCount(extraTypes) >= typeCount) {
-                return MakeUnionStronger();
-            }
-            return false;
-        }
-
-        internal bool MakeUnionStronger() {
-            var uc = _emptySet.Comparer as UnionComparer;
-            int strength = uc != null ? uc.Strength + 1 : 0;
-            return MakeUnion(strength);
-        }
-
-        internal bool MakeUnion(int strength) {
-            if (strength > UnionStrength) {
-                bool anyChanged = false;
-
-                _emptySet = AnalysisSet.CreateUnion(strength);
-                foreach (var value in _dependencies.Values) {
-                    anyChanged |= value.MakeUnion(strength);
-                }
-
-                if (anyChanged) {
-                    EnqueueDependents();
-                    return true;
-                }
-            }
-            return false;
-        }
-
-        internal int UnionStrength {
-            get {
-                var uc = _emptySet.Comparer as UnionComparer;
-                return uc != null ? uc.Strength : -1;
-            }
-        }
     }
 
     /// <summary>
@@ -519,7 +655,7 @@ namespace Microsoft.NodejsTools.Analysis {
     sealed class EphemeralVariableDef : VariableDef {
         public override bool IsEphemeral {
             get {
-                return TypesNoCopy.Count == 0;
+                return !HasTypes;
             }
         }
     }

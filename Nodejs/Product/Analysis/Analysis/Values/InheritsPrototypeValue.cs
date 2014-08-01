@@ -42,27 +42,27 @@ namespace Microsoft.NodejsTools.Analysis.Values {
         public override IAnalysisSet Get(Node node, AnalysisUnit unit, string name, bool addRef = true) {
             var res = base.Get(node, unit, name, addRef);
             foreach (var value in _prototypes) {
-                if (value.Push()) {
+                if (value.Value.Push()) {
                     try {
                         res = res.Union(value.Get(node, unit, name, addRef));
                     } finally {
-                        value.Pop();
+                        value.Value.Pop();
                     }
                 }
             }
             return res;
         }
 
-        public override Dictionary<string, IAnalysisSet> GetAllMembers() {
-            var res = base.GetAllMembers();
+        internal override Dictionary<string, IAnalysisSet> GetAllMembers(ProjectEntry accessor) {
+            var res = base.GetAllMembers(accessor);
             foreach (var value in _prototypes) {
-                if (value.Push()) {
+                if (value.Value.Push()) {
                     try {
-                        foreach (var keyValue in value.GetAllMembers()) {
+                        foreach (var keyValue in value.Value.GetAllMembers(accessor)) {
                             MergeTypes(res, keyValue.Key, keyValue.Value);
                         }
                     } finally {
-                        value.Pop();
+                        value.Value.Pop();
                     }
                 }
             }

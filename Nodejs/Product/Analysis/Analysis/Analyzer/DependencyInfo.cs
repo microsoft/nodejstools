@@ -19,11 +19,9 @@ using System.Linq;
 namespace Microsoft.NodejsTools.Analysis.Analyzer {
     /// <summary>
     /// contains information about dependencies.  Each DependencyInfo is 
-    /// attached to a VariableRef in a dictionary keyed off of the ProjectEntry.
+    /// attached to a VariableDef in a dictionary keyed off of the ProjectEntry.
     /// 
-    /// Module -> The Module this DependencyInfo object tracks.
-    /// DependentUnits -> What needs to change if this VariableRef is updated.
-    /// Types -> Types that this VariableRef has received from the Module.
+    /// DependentUnits -> What needs to change if this VariableDef is updated.
     /// </summary>
     [Serializable]
     internal class DependencyInfo {
@@ -76,7 +74,7 @@ namespace Microsoft.NodejsTools.Analysis.Analyzer {
 
     [Serializable]
     internal class KeyValueDependencyInfo : DependencyInfo {
-        internal AnalysisDictionary<AnalysisValue, IAnalysisSet> KeyValues = new AnalysisDictionary<AnalysisValue, IAnalysisSet>();
+        internal AnalysisDictionary<AnalysisProxy, IAnalysisSet> KeyValues = new AnalysisDictionary<AnalysisProxy, IAnalysisSet>();
 
         public KeyValueDependencyInfo(int version)
             : base(version) {
@@ -93,16 +91,16 @@ namespace Microsoft.NodejsTools.Analysis.Analyzer {
                 cmp = UnionComparer.Instances[cmp.Strength + 1];
             }
 
-            var matches = new Dictionary<AnalysisValue, List<KeyValuePair<AnalysisValue, IAnalysisSet>>>(cmp);
+            var matches = new Dictionary<AnalysisProxy, List<KeyValuePair<AnalysisProxy, IAnalysisSet>>>(cmp);
             foreach (var keyValue in KeyValues) {
-                List<KeyValuePair<AnalysisValue, IAnalysisSet>> values;
+                List<KeyValuePair<AnalysisProxy, IAnalysisSet>> values;
                 if (!matches.TryGetValue(keyValue.Key, out values)) {
-                    values = matches[keyValue.Key] = new List<KeyValuePair<AnalysisValue, IAnalysisSet>>();
+                    values = matches[keyValue.Key] = new List<KeyValuePair<AnalysisProxy, IAnalysisSet>>();
                 }
                 values.Add(keyValue);
             }
 
-            KeyValues = new AnalysisDictionary<AnalysisValue, IAnalysisSet>(cmp);
+            KeyValues = new AnalysisDictionary<AnalysisProxy, IAnalysisSet>(cmp);
             foreach (var list in matches.Values) {
                 bool dummy;
                 var key = list[0].Key;
@@ -118,10 +116,12 @@ namespace Microsoft.NodejsTools.Analysis.Analyzer {
         }
     }
 
+    /// <summary>
+    /// Types -> Types that the VariableDef has received from the Module.
+    /// </summary>
     [Serializable]
-    internal class TypedDependencyInfo<T> : DependencyInfo where T : AnalysisValue {
+    internal class TypedDependencyInfo : DependencyInfo {
         private IAnalysisSet _types;
-        public ISet<EncodedLocation> _references, _assignments;
 #if FULL_VALIDATION
         internal int _changeCount = 0;
 #endif
@@ -136,7 +136,7 @@ namespace Microsoft.NodejsTools.Analysis.Analyzer {
 
         static bool TAKE_COPIES = false;
 
-        public bool AddType(AnalysisValue ns) {
+        public bool AddType(AnalysisProxy proxy) {
             bool wasChanged;
             IAnalysisSet prev;
             if (TAKE_COPIES) {
@@ -144,7 +144,7 @@ namespace Microsoft.NodejsTools.Analysis.Analyzer {
             } else {
                 prev = _types;
             }
-            _types = prev.Add(ns, out wasChanged);
+            _types = prev.Add(proxy, out wasChanged);
 #if FULL_VALIDATION
             _changeCount += wasChanged ? 1 : 0;
             // The value doesn't mean anything, we just want to know if a variable is being
@@ -168,6 +168,19 @@ namespace Microsoft.NodejsTools.Analysis.Analyzer {
             get {
                 return _types;
             }
+        }
+
+    }
+
+    [Serializable]
+    internal class ReferenceableDependencyInfo : TypedDependencyInfo {
+        public ISet<EncodedLocation> _references, _assignments;
+
+        public ReferenceableDependencyInfo(int version)
+            : base(version) { }
+
+        public ReferenceableDependencyInfo(int version, IAnalysisSet emptySet)
+            : base(version, emptySet) {
         }
 
         public bool AddReference(EncodedLocation location) {

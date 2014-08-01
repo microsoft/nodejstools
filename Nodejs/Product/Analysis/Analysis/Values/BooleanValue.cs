@@ -20,7 +20,8 @@ namespace Microsoft.NodejsTools.Analysis.Values {
         internal readonly bool _value;
         private readonly JsAnalyzer _analyzer;
 
-        public BooleanValue(bool value, JsAnalyzer javaScriptAnalyzer) {
+        public BooleanValue(bool value, JsAnalyzer javaScriptAnalyzer)
+            : base(javaScriptAnalyzer._builtinEntry) {
             _value = value;
             _analyzer = javaScriptAnalyzer;
             javaScriptAnalyzer.AnalysisValueCreated(typeof(BooleanValue));

@@ -32,16 +32,11 @@ namespace Microsoft.NodejsTools.Analysis {
     /// </summary>
     [Serializable]
     class ModuleTable {
-        private readonly JsAnalyzer _analyzer;
         private readonly Dictionary<string, ModuleTree> _modulesByFilename = new Dictionary<string, ModuleTree>(StringComparer.OrdinalIgnoreCase);
         private readonly ModuleTree _modules = new ModuleTree(null, "");
         private readonly object _lock = new object();
         [ThreadStatic]
         private static HashSet<ModuleRecursion> _recursionCheck;
-
-        public ModuleTable(JsAnalyzer analyzer) {
-            _analyzer = analyzer;
-        }
 
         public bool TryGetValue(string name, out ModuleTree moduleTree) {
             lock (_lock) {
@@ -60,8 +55,8 @@ namespace Microsoft.NodejsTools.Analysis {
         }
 
         private static void EnumerateChildren(List<IJsProjectEntry> res, ModuleTree cur) {
-            if (cur.Module != null) {
-                res.Add(cur.Module.ProjectEntry);
+            if (cur.ProjectEntry != null) {
+                res.Add(cur.ProjectEntry);
             }
             foreach (var child in cur.Children.Values) {
                 EnumerateChildren(res, child);
@@ -107,8 +102,89 @@ namespace Microsoft.NodejsTools.Analysis {
 
         public void AddModule(string name, ProjectEntry value) {
             lock (_lock) {
-                GetModuleTree(name).Module = value.ModuleValue;
+                var tree = GetModuleTree(name);
+                tree.ProjectEntry = value;
+
+                // Update visibility..
+                AddVisibility(tree, value, true);
+
                 value._enqueueModuleDependencies = true;
+            }
+        }
+
+        // Visibility rules:
+        // My peers can see my assignments/I can see my peers assignments 
+        //      Everything up to the next node_modules and terminating at child node_modules
+        //      folders is a set of peers.  They can easily require each other using relative
+        //      paths.  We make all of the assignments made by these modules available to
+        //      see by all the other modules.
+        //
+        // My parent and its peers can see my assignments
+        //      A folder which contains node_modules is presumably using those modules.  ANy
+        //      peers within that folder structure can see all of the changes by the children
+        //      in node_modules.
+        private void AddVisibility(ModuleTree tree, ProjectEntry newModule, bool recurse) {
+            newModule._visibleEntries.Add(newModule.Analyzer._builtinEntry);
+
+            // My peers can see my assignments/I can see my peers assignments.  Update
+            // ourselves and our peers so we can see each others writes.
+            var curTree = tree;
+            while (curTree.Parent != null && curTree.Parent.Name != "node_modules") {
+                curTree = curTree.Parent;
+            }
+            AddVisibilityForHierarchy(curTree, newModule);
+
+            // My parent and its peers can see my assignments.  Update existing parents
+            // so they can see the newly added modules writes.
+            if (curTree.Parent != null) {
+                Debug.Assert(curTree.Parent.Name == "node_modules");
+
+                var grandParent = curTree.Parent.Parent;
+                if (grandParent != null) {
+                    while (grandParent.Parent != null && grandParent.Parent.Name != "node_modules") {
+                        grandParent = grandParent.Parent;
+                    }
+                    AddVisibilityForHierarchy(grandParent, newModule, addParent: false, addChild: true);
+                }
+            }
+
+            // My parent and its peers can see my assignments part 2
+            // We need to make sure we can see our children's assignments in case the
+            // child was added before us.
+            AddVisibilityForNewParent(tree.Parent, newModule);
+        }
+
+        /// <summary>
+        /// Makes writes done in children visible to a new parent.
+        /// </summary>
+        private static void AddVisibilityForNewParent(ModuleTree tree, ProjectEntry newModule) {
+            foreach (var child in tree.Children.Values) {
+                if (child.Name == "node_modules") {
+                    AddVisibilityForHierarchy(child, newModule, addParent: true, addChild: false);
+                } else {
+                    AddVisibilityForNewParent(child, newModule);
+                }
+            }
+        }
+
+        /// <summary>
+        /// Adds visibility for the current hierarchy in the specified directions stopping
+        /// at any node_modules folders.
+        /// </summary>
+        private static void AddVisibilityForHierarchy(ModuleTree tree, ProjectEntry newModule, bool addParent = true, bool addChild = true) {
+            foreach (var child in tree.Children.Values) {
+                if (child.ProjectEntry != null) {
+                    if (addChild) {
+                        child.ProjectEntry._visibleEntries.Add(newModule);
+                    }
+                    if (addParent) {
+                        newModule._visibleEntries.Add(child.ProjectEntry);
+                    }
+                }
+
+                if (child.Name != "node_modules") {
+                    AddVisibilityForHierarchy(child, newModule, addParent, addChild);
+                }
             }
         }
 
@@ -176,13 +252,13 @@ namespace Microsoft.NodejsTools.Analysis {
                 ModuleTree nextTree;
                 if (i == components.Length - 1) {
                     nextTree = curTree.GetChild(comp + ".js", unit);
-                    if (nextTree.Module != null) {
+                    if (nextTree.ProjectEntry != null) {
                         return nextTree;
                     }
                 }
 
                 nextTree = curTree.GetChild(comp, unit);
-                if (nextTree.Children.Count > 0 || nextTree.Module != null) {
+                if (nextTree.Children.Count > 0 || nextTree.ProjectEntry != null) {
                     curTree = nextTree;
                     continue;
                 }
@@ -199,13 +275,15 @@ namespace Microsoft.NodejsTools.Analysis {
         /// </summary>
         private IAnalysisSet GetExports(Node node, AnalysisUnit unit, ModuleTree curTree) {
             if (curTree != null) {
-                if (curTree.Module != null) {
-                    var moduleScope = curTree.Module.EnvironmentRecord;
-                    return moduleScope.Module.Get(
-                        node,
-                        unit,
-                        "exports"
-                    );
+                if (curTree.ProjectEntry != null) {
+                    var module = curTree.ProjectEntry.GetModule(unit);
+                    if (module != null) {
+                        return module.Get(
+                            node,
+                            unit,
+                            "exports"
+                        );
+                    }
                 } else if(curTree.Parent != null) {
                     // No ModuleReference, this is a folder, check and see
                     // if we have the default package file (either index.js
@@ -276,7 +354,7 @@ namespace Microsoft.NodejsTools.Analysis {
         public readonly ModuleTree Parent;
         public readonly string Name;
         public readonly Dictionary<string, ModuleTree> Children = new Dictionary<string, ModuleTree>(StringComparer.OrdinalIgnoreCase);
-        private ModuleValue _module;
+        private ProjectEntry _projectEntry;
         private string _defaultPackage = "./index.js";
         DependentData _dependencies = new DependentData();
 
@@ -302,12 +380,12 @@ namespace Microsoft.NodejsTools.Analysis {
             }
         }
 
-        public ModuleValue Module {
+        public ProjectEntry ProjectEntry {
             get {
-                return _module;
+                return _projectEntry;
             }
             set {
-                _module = value;
+                _projectEntry = value;
             }
         }
 
