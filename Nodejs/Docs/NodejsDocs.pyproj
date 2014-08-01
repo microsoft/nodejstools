@@ -157,6 +157,7 @@
     <Content Include="User\Images\npm-install-executing-details.png" />
     <Content Include="User\Images\npm-install-new-package.png" />
     <Content Include="User\Images\npm-interactive-window.png" />
+    <Content Include="User\Images\npm-loading-package-list.png" />
     <Content Include="User\Images\npm-log.png" />
     <Content Include="User\Images\npm-open-command-prompt-here.png" />
     <Content Include="User\Images\npm-package-installed.png" />
