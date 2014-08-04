@@ -84,8 +84,6 @@ namespace Microsoft.NodejsTools {
             _activeSession = null;
         }
 
-        private static HashSet<char> _commitChars = new HashSet<char>("{}[](),:;+-*%&|^~=<>#\\");
-
         public int Exec(ref Guid pguidCmdGroup, uint nCmdID, uint nCmdexecopt, IntPtr pvaIn, IntPtr pvaOut) {
             int hr;
             // disable JavaScript language services auto formatting features, this is because
