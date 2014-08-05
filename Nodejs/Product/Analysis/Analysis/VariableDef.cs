@@ -247,7 +247,7 @@ namespace Microsoft.NodejsTools.Analysis {
             return roughSet.Count >= typeCount;
         }
 
-        public bool AddTypes(AnalysisUnit unit, IEnumerable<AnalysisProxy> newTypes, bool enqueue = true) {
+        public bool AddTypes(AnalysisUnit unit, IAnalysisSet newTypes, bool enqueue = true) {
             return AddTypes(unit.ProjectEntry, newTypes, enqueue);
         }
 
@@ -259,18 +259,17 @@ namespace Microsoft.NodejsTools.Analysis {
         private static bool ENABLE_SET_CHECK = false;
 #endif
 
-        public bool AddTypes(ProjectEntry projectEntry, IEnumerable<AnalysisProxy> newTypes, bool enqueue = true) {
+        public bool AddTypes(ProjectEntry projectEntry, IAnalysisSet newTypes, bool enqueue = true) {
             object dummy;
             if (LockedVariableDefs.TryGetValue(this, out dummy)) {
                 return false;
             }
-            
+
             bool added = false;
-            foreach (var value in newTypes) {
-                var newTypesEntry = projectEntry;
+            if (newTypes.Count > 0) {
+                var dependencies = GetDependentItems(projectEntry);
 
-                var dependencies = GetDependentItems(newTypesEntry);
-
+                foreach (var value in newTypes) {
 #if DEBUG || FULL_VALIDATION
                 if (ENABLE_SET_CHECK) {
                     bool testAdded;
@@ -286,14 +285,15 @@ namespace Microsoft.NodejsTools.Analysis {
                 }
 #endif
 
-                if (dependencies.AddType(value)) {
-                    added = true;
+                    if (dependencies.AddType(value)) {
+                        added = true;
+                    }
                 }
-            }
-            if (added && enqueue) {
-                EnqueueDependents();
-            }
+                if (added && enqueue) {
+                    EnqueueDependents();
+                }
 
+            }
             return added;
         }
 
@@ -369,8 +369,8 @@ namespace Microsoft.NodejsTools.Analysis {
                 if (_dependencies.TryGetSingleValue(out oneDependency)) {
                     return oneDependency.Types.Count > 0;
                 } else {
-                    foreach (var mod in _dependencies.DictValues) {
-                        if (mod.Types.Count > 0) {
+                    foreach (var mod in ((AnalysisDictionary<ProjectEntry, T>)_dependencies._data)) {
+                        if (mod.Value.Types.Count > 0) {
                             return true;
                         }
                     }
@@ -570,7 +570,12 @@ namespace Microsoft.NodejsTools.Analysis {
         public void AddReference(Node node, AnalysisUnit unit) {
             if (!unit.ForEval) {
                 var deps = GetDependentItems(unit.DeclaringModuleEnvironment.ProjectEntry);
-                deps.AddReference(new EncodedLocation(unit.Tree, node));
+                if (!IsEphemeral) {
+                    // Don't add references to ephemeral values...  If they
+                    // gain types we'll re-enqueue and the reference will be
+                    // added then.
+                    deps.AddReference(new EncodedLocation(node));
+                }
                 deps.AddDependentUnit(unit);
             }
         }
@@ -585,18 +590,21 @@ namespace Microsoft.NodejsTools.Analysis {
 
         public bool AddAssignment(Node node, AnalysisUnit unit) {
             if (!unit.ForEval) {
-                return AddAssignment(new EncodedLocation(unit.Tree, node), unit.DeclaringModuleEnvironment.ProjectEntry);
+                return AddAssignment(
+                    new EncodedLocation(node), 
+                    unit.DeclaringModuleEnvironment.ProjectEntry
+                );
             }
             return false;
         }
 
-        public IEnumerable<KeyValuePair<IProjectEntry, EncodedLocation>> References {
+        public IEnumerable<KeyValuePair<ProjectEntry, EncodedLocation>> References {
             get {
                 if (_dependencies.Count != 0) {
                     foreach (var keyValue in _dependencies) {
                         if (keyValue.Value.References != null && keyValue.Key.AnalysisVersion == keyValue.Value.Version) {
                             foreach (var reference in keyValue.Value.References) {
-                                yield return new KeyValuePair<IProjectEntry, EncodedLocation>(keyValue.Key, reference);
+                                yield return new KeyValuePair<ProjectEntry, EncodedLocation>(keyValue.Key, reference);
                             }
                         }
                     }
@@ -604,13 +612,13 @@ namespace Microsoft.NodejsTools.Analysis {
             }
         }
 
-        public IEnumerable<KeyValuePair<IProjectEntry, EncodedLocation>> Definitions {
+        public IEnumerable<KeyValuePair<ProjectEntry, EncodedLocation>> Definitions {
             get {
                 if (_dependencies.Count != 0) {
                     foreach (var keyValue in _dependencies) {
                         if (keyValue.Value.Assignments != null && keyValue.Key.AnalysisVersion == keyValue.Value.Version) {
                             foreach (var reference in keyValue.Value.Assignments) {
-                                yield return new KeyValuePair<IProjectEntry, EncodedLocation>(keyValue.Key, reference);
+                                yield return new KeyValuePair<ProjectEntry, EncodedLocation>(keyValue.Key, reference);
                             }
                         }
                     }

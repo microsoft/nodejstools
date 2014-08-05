@@ -35,7 +35,6 @@ namespace Microsoft.NodejsTools.Parsing
             set
             {
                 _function = value;
-                _function.Parent = this;
                 _function.IsExpression = true;
             }
         }

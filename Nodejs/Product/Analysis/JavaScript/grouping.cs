@@ -32,9 +32,7 @@ namespace Microsoft.NodejsTools.Parsing
             get { return m_operand; }
             set
             {
-                m_operand.ClearParent(this);
                 m_operand = value;
-                m_operand.AssignParent(this);
             }
         }
 

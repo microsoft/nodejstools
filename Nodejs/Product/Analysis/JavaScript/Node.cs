@@ -30,11 +30,6 @@ namespace Microsoft.NodejsTools.Parsing {
         // this is used in the child enumeration for nodes that don't have any children
         private static readonly IEnumerable<Node> s_emptyChildrenCollection = new Node[0];
 
-        /// <summary>
-        /// Gets or sets the parent node of this node in the abstract syntax tree
-        /// </summary>
-        public Node Parent { get; set; }
-
         public IndexSpan Span {
             get;
             set;
@@ -95,17 +90,7 @@ namespace Microsoft.NodejsTools.Parsing {
             Span = Span.UpdateWith(span);
         }
 
-        public JsAst GlobalParent {
-            get {
-                var res = this;
-                while (!(res is JsAst)) {
-                    Debug.Assert(res != null);
-                    res = res.Parent;
-                }
-                return (JsAst)res;
-            }
-        }
-
+        
         internal SourceLocation GetStart(JsAst jsAst) {
             return jsAst.IndexToLocation(Span.Start);
         }
@@ -113,18 +98,14 @@ namespace Microsoft.NodejsTools.Parsing {
         internal SourceLocation GetEnd(JsAst jsAst) {
             return jsAst.IndexToLocation(Span.End);
         }
-
-        public override string ToString() {
-            return String.Format("{0} {1} {2}", GetType().Name, GetStart(GlobalParent), GetEnd(GlobalParent));
-        }
     }
 
     internal static class NodeExtensions {
-        internal static void ClearParent(this Node self, Node parent) {
+        internal static void ClearParent(this Statement self, Statement parent) {
             self.IfNotNull(n => n.Parent = (n.Parent == parent) ? null : n.Parent);
         }
 
-        internal static void AssignParent(this Node self, Node parent) {
+        internal static void AssignParent(this Statement self, Statement parent) {
             self.IfNotNull(n => n.Parent = parent);
         }
     }

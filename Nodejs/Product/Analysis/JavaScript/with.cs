@@ -31,9 +31,7 @@ namespace Microsoft.NodejsTools.Parsing
             get { return m_withObject; }
             set
             {
-                m_withObject.ClearParent(this);
                 m_withObject = value;
-                m_withObject.AssignParent(this);
             }
         }
 

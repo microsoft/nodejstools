@@ -20,10 +20,10 @@ namespace Microsoft.NodejsTools.Analysis.Analyzer {
     }
 
     interface IReferenceable {
-        IEnumerable<KeyValuePair<IProjectEntry, EncodedLocation>> Definitions {
+        IEnumerable<KeyValuePair<ProjectEntry, EncodedLocation>> Definitions {
             get;
         }
-        IEnumerable<KeyValuePair<IProjectEntry, EncodedLocation>> References {
+        IEnumerable<KeyValuePair<ProjectEntry, EncodedLocation>> References {
             get;
         }
     }

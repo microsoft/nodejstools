@@ -32,9 +32,7 @@ namespace Microsoft.NodejsTools.Parsing
             get { return m_operand1; }
             set
             {
-                m_operand1.ClearParent(this);
                 m_operand1 = value;
-                m_operand1.AssignParent(this);
             }
         }
 
@@ -43,9 +41,7 @@ namespace Microsoft.NodejsTools.Parsing
             get { return m_operand2; }
             set
             {
-                m_operand2.ClearParent(this);
                 m_operand2 = value;
-                m_operand2.AssignParent(this);
             }
         }
 

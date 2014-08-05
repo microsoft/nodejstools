@@ -72,7 +72,7 @@ namespace Microsoft.NodejsTools.Analysis.Analyzer {
         internal void EnsureParameters(FunctionAnalysisUnit unit) {
             var astParams = Function.FunctionObject.ParameterDeclarations;
             if (astParams != null) {
-                for (int i = 0; i < astParams.Count; ++i) {
+                for (int i = 0; i < astParams.Length; ++i) {
                     VariableDef param;
                     if (!TryGetVariable(astParams[i].Name, out param)) {
                         param = new LocatedVariableDef(unit.ProjectEntry, astParams[i]);

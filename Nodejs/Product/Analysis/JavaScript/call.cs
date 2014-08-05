@@ -24,27 +24,23 @@ namespace Microsoft.NodejsTools.Parsing
     public sealed class CallNode : Expression
     {
         private Expression m_function;
-        private AstNodeList<Expression> m_arguments;
+        private Expression[] m_arguments;
 
         public Expression Function
         {
             get { return m_function; }
             set
             {
-                m_function.ClearParent(this);
                 m_function = value;
-                m_function.AssignParent(this);
             }
         }
 
-        public AstNodeList<Expression> Arguments
+        public Expression[] Arguments
         {
             get { return m_arguments; }
             set
             {
-                m_arguments.ClearParent(this);
                 m_arguments = value;
-                m_arguments.AssignParent(this);
             }
         }
 
@@ -69,7 +65,9 @@ namespace Microsoft.NodejsTools.Parsing
             if (visitor.Walk(this)) {
                 m_function.Walk(visitor);
                 foreach (var param in m_arguments) {
-                    param.Walk(visitor);
+                    if (param != null) {
+                        param.Walk(visitor);
+                    }
                 }
             }
             visitor.PostWalk(this);
@@ -79,7 +77,14 @@ namespace Microsoft.NodejsTools.Parsing
         {
             get
             {
-                return EnumerateNonNullNodes(Function, Arguments);
+                if (Function != null) {
+                    yield return Function;
+                }
+                foreach (var arg in Arguments) {
+                    if (arg != null) {
+                        yield return arg;
+                    }
+                }
             }
         }
     }

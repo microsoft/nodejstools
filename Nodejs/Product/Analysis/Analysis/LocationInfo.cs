@@ -16,14 +16,14 @@ using System;
 using System.Collections.Generic;
 
 namespace Microsoft.NodejsTools.Analysis {
-    public class LocationInfo : IEquatable<LocationInfo>, ILocationResolver {
+    public class LocationInfo : IEquatable<LocationInfo> {
         private readonly int _line, _column;
-        private readonly IProjectEntry _entry;
+        internal readonly ProjectEntry _entry;
         internal static LocationInfo[] Empty = new LocationInfo[0];
 
         private static readonly IEqualityComparer<LocationInfo> _fullComparer = new FullLocationComparer();
 
-        internal LocationInfo(IProjectEntry entry, int line, int column) {
+        internal LocationInfo(ProjectEntry entry, int line, int column) {
             _entry = entry;
             _line = line;
             _column = column;
@@ -90,13 +90,5 @@ namespace Microsoft.NodejsTools.Analysis {
                 return obj.Line.GetHashCode() ^ obj.Column.GetHashCode() ^ obj.ProjectEntry.GetHashCode();
             }
         }
-
-        #region ILocationResolver Members
-
-        LocationInfo ILocationResolver.ResolveLocation(IProjectEntry project, object location) {
-            return this;
-        }
-
-        #endregion
     }
 }

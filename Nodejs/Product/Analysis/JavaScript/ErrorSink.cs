@@ -22,12 +22,6 @@ namespace Microsoft.NodejsTools.Parsing {
             }
         }
 
-        internal void HandleUndeclaredFunction(string name, IndexSpan span, IndexResolver indexResolver) {
-            if (!HasAlreadySeenErrorFor(name)) {
-                HandleError(JSError.UndeclaredFunction, span, indexResolver);
-            }
-        }
-
         internal void HandleError(JSError errorId, IndexSpan span, IndexResolver resolver, bool forceToError = false) {
             var error = new JScriptException(errorId, span, resolver);
 

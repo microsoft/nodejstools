@@ -57,7 +57,6 @@ namespace Microsoft.NodejsTools.Parsing {
         public virtual bool Walk(WhileNode node) { return true; }
         public virtual bool Walk(WithNode node) { return true; }
         public virtual bool Walk(JsAst jsAst) { return true; }
-        public virtual bool Walk<T>(AstNodeList<T> node) where T : Node { return true; }
         public virtual bool Walk(FunctionExpression functionExpression) { return true; }
         public virtual bool Walk(ExpressionStatement node) { return true; }
         
@@ -103,7 +102,6 @@ namespace Microsoft.NodejsTools.Parsing {
         public virtual void PostWalk(WhileNode node) { }
         public virtual void PostWalk(WithNode node) { }
         public virtual void PostWalk(JsAst jsAst) { }
-        public virtual void PostWalk<T>(AstNodeList<T> node) where T : Node { }
         public virtual void PostWalk(FunctionExpression functionExpression) { }
         public virtual void PostWalk(ExpressionStatement node) { }
     }

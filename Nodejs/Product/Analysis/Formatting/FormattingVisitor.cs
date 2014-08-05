@@ -226,7 +226,7 @@ namespace Microsoft.NodejsTools.Formatting {
 
             // very similar to walking a block w/o a block
             Indent();
-            for (int i = 0; i < node.Cases.Count; i++) {
+            for (int i = 0; i < node.Cases.Length; i++) {
 
                 var caseNode = node.Cases[i];
 
@@ -312,13 +312,13 @@ namespace Microsoft.NodejsTools.Formatting {
                 );
             }
 
-            if (node.ParameterDeclarations.Count > 0) {
+            if (node.ParameterDeclarations.Length > 0) {
                 ReplaceFollowingWhiteSpace(
                     node.ParameterStart + 1,
                     _options.SpaceAfterOpeningAndBeforeClosingNonEmptyParenthesis ? " " : ""
                 );
 
-                for (int i = 1; i < node.ParameterDeclarations.Count; i++) {
+                for (int i = 1; i < node.ParameterDeclarations.Length; i++) {
                     ReplacePreceedingWhiteSpace(node.ParameterDeclarations[i].StartIndex, _options.SpaceAfterComma ? " " : "", _comma);
                 }
 
@@ -498,12 +498,12 @@ namespace Microsoft.NodejsTools.Formatting {
         }
 
         public override bool Walk(ObjectLiteral node) {
-            if (node.Properties.Count == 0) {
+            if (node.Properties.Length == 0) {
                 ReplacePreceedingWhiteSpace(node.EndIndex - 1, "");
             } else {
                 Indent();
                 bool isMultiLine = ContainsLineFeed(node.StartIndex, node.EndIndex);
-                if (node.Properties.Count > 0) {
+                if (node.Properties.Length > 0) {
                     if (isMultiLine) {
                         // multiline block statement, make sure the 1st statement
                         // starts on a new line
@@ -560,7 +560,7 @@ namespace Microsoft.NodejsTools.Formatting {
                 );
             }
 
-            if (node.Arguments != null && node.Arguments.Count > 0) {
+            if (node.Arguments != null && node.Arguments.Length > 0) {
                 ReplacePreceedingWhiteSpace(
                     node.Arguments[0].StartIndex,
                     _options.SpaceAfterOpeningAndBeforeClosingNonEmptyParenthesis ? " " : "",
@@ -569,7 +569,7 @@ namespace Microsoft.NodejsTools.Formatting {
 
                 node.Arguments[0].Walk(this);
 
-                for (int i = 1; i < node.Arguments.Count; i++) {
+                for (int i = 1; i < node.Arguments.Length; i++) {
                     ReplacePreceedingWhiteSpace(
                         node.Arguments[i].StartIndex,
                         _options.SpaceAfterComma ? " " : "",

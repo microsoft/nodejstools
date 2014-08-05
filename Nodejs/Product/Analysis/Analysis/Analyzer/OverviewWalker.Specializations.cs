@@ -474,7 +474,7 @@ namespace Microsoft.NodejsTools.Analysis.Analyzer {
                 }
 
                 var objLit = (ObjectLiteral)node;
-                if (objLit.Properties.Count > 0) {
+                if (objLit.Properties.Length > 0) {
                     return NoMatch;
                 }
 
@@ -491,7 +491,7 @@ namespace Microsoft.NodejsTools.Analysis.Analyzer {
                 }
 
                 var arrLit = (ArrayLiteral)node;
-                if (arrLit.Elements.Count > 0) {
+                if (arrLit.Elements.Length > 0) {
                     return NoMatch;
                 }
 
@@ -775,7 +775,7 @@ namespace Microsoft.NodejsTools.Analysis.Analyzer {
                 }
 
                 CallNode call = (CallNode)node;
-                if (!call.InBrackets || call.Arguments.Count != 1) {
+                if (!call.InBrackets || call.Arguments.Length != 1) {
                     return NoMatch;
                 }
 
@@ -804,7 +804,7 @@ namespace Microsoft.NodejsTools.Analysis.Analyzer {
                 }
 
                 if (Value.IsMatch(state, call.Function)) {
-                    if (call.Arguments.Count != Args.Length) {
+                    if (call.Arguments.Length != Args.Length) {
                         return NoMatch;
                     }
                     for (int i = 0; i < Args.Length; i++) {
@@ -837,7 +837,7 @@ namespace Microsoft.NodejsTools.Analysis.Analyzer {
                 }
 
                 if (Value.IsMatch(state, call.Function)) {
-                    if (call.Arguments.Count != Args.Length) {
+                    if (call.Arguments.Length != Args.Length) {
                         return NoMatch;
                     }
                     for (int i = 0; i < Args.Length; i++) {

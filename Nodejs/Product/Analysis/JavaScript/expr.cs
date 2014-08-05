@@ -19,6 +19,8 @@ using System;
 namespace Microsoft.NodejsTools.Parsing {
     [Serializable]
     public abstract class Expression : Node {
+        public static readonly Expression[] EmptyArray = new Expression[0];
+
         protected Expression(IndexSpan span)
             : base(span) {
         }

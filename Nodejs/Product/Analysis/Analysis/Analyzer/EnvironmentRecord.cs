@@ -168,15 +168,6 @@ namespace Microsoft.NodejsTools.Analysis.Analyzer {
             return value;
         }
 
-        public void SetVariable(Node node, AnalysisUnit unit, string name, IAnalysisSet value, bool addRef = true) {
-            var variable = CreateVariable(node, unit, name, false);
-
-            variable.AddTypes(unit, value);
-            if (addRef) {
-                variable.AddAssignment(node, unit);
-            }
-        }
-
         public abstract VariableDef GetVariable(string name);
         public abstract VariableDef GetVariable(Node node, AnalysisUnit unit, string name, bool addRef = true);
         public abstract VariableDef CreateVariable(Node node, AnalysisUnit unit, string name, bool addRef = true);

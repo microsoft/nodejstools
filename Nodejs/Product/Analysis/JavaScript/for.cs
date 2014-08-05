@@ -43,9 +43,7 @@ namespace Microsoft.NodejsTools.Parsing
             get { return m_condition; }
             set
             {
-                m_condition.ClearParent(this);
                 m_condition = value;
-                m_condition.AssignParent(this);
             }
         }
 
@@ -55,9 +53,7 @@ namespace Microsoft.NodejsTools.Parsing
             get { return m_incrementer; }
             set
             {
-                m_incrementer.ClearParent(this);
                 m_incrementer = value;
-                m_incrementer.AssignParent(this);
             }
         }
 

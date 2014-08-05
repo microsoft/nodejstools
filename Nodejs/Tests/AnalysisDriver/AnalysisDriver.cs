@@ -20,6 +20,7 @@ using System.Linq;
 using System.Text;
 using AnalysisTests;
 using Microsoft.NodejsTools.Analysis;
+using Microsoft.NodejsTools.Analysis.Analyzer;
 using Microsoft.NodejsTools.Npm;
 using Microsoft.VisualBasic.FileIO;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
@@ -30,7 +31,7 @@ namespace AnalysisDriver {
         private readonly string[] _packages;
         private readonly string _packagePath;
         private readonly Random _random;
-        private readonly bool _installMissingPackages, _installAll, _cleanup;
+        private readonly bool _installMissingPackages, _installAll, _cleanup, _wait;
         private readonly INpmController _npmController;
         private readonly TextWriter _logger, _htmlLogger;
         private readonly int? _dumpMembers;
@@ -39,7 +40,7 @@ namespace AnalysisDriver {
         private readonly DependencyType _depType;
         private readonly StringBuilder _jsonResults = new StringBuilder();
 
-        private AnalysisDriver(string[] packages, string packagePath, bool installMissingPackages, bool installAll, DependencyType depType, bool cleanup, Random random, TextWriter logger, TextWriter htmlLogger, int? dumpMembers, bool lowAnalysis, Dictionary<string, RunStats> baselineStats) {
+        private AnalysisDriver(string[] packages, string packagePath, bool installMissingPackages, bool installAll, DependencyType depType, bool cleanup, bool wait, Random random, TextWriter logger, TextWriter htmlLogger, int? dumpMembers, bool lowAnalysis, Dictionary<string, RunStats> baselineStats) {
             _packages = packages;
             _random = random;
             _packagePath = packagePath;
@@ -47,6 +48,7 @@ namespace AnalysisDriver {
             _installAll = installAll;
             _depType = depType;
             _cleanup = cleanup;
+            _wait = wait;
             _logger = logger;
             _htmlLogger = htmlLogger;
             _dumpMembers = dumpMembers;
@@ -73,7 +75,7 @@ namespace AnalysisDriver {
 
         private void WriteCsvHeader() {
             if (_logger != null) {
-                _logger.WriteLine("Modules,Total Completions,2nd level completions,Time (MS),File Count, Working Set (MB), GC Mem (MB),Run Order");
+                _logger.WriteLine("Modules,Total Completions,2nd level completions,Time (MS),File Count, Parse Working Set (MB), Parse GC Mem (MB), Working Set (MB), GC Mem (MB),Run Order");
             }
         }
 
@@ -169,8 +171,21 @@ namespace AnalysisDriver {
             var startingGcMem = GC.GetTotalMemory(true);
             var workingSet = Process.GetCurrentProcess().WorkingSet64;
             var startTime = sw.ElapsedMilliseconds;
+            long parserGcMem = 0;
+            long parserWorkingSet = 0;
             sw.Start();
-            var analyzer = Analysis.Analyze(testDir, _lowAnalysis ? MakeLowAnalysisLimits() : null);
+            var analyzer = Analysis.Analyze(
+                testDir, 
+                _lowAnalysis ? MakeLowAnalysisLimits() : null,
+                () => {
+                    for (int i = 0; i < 3; i++) {
+                        GC.Collect(GC.MaxGeneration);
+                        GC.WaitForPendingFinalizers();
+                    }
+                    parserGcMem = GC.GetTotalMemory(true);
+                    parserWorkingSet = Process.GetCurrentProcess().WorkingSet64;
+                }
+            );
             sw.Stop();
             var endingGcMem = GC.GetTotalMemory(true);
             var endWorkingSet = Process.GetCurrentProcess().WorkingSet64;
@@ -206,19 +221,24 @@ namespace AnalysisDriver {
             var time = sw.ElapsedMilliseconds - startTime;
             int fileCount = analyzer.AllModules.Count();
             var totalWorkingSet = (endWorkingSet - workingSet) / (1024 * 1024);
+            var parserTotalWorkingSet = (parserWorkingSet - workingSet) / (1024 * 1024);
 
             var stats = new RunStats(
                 completionCount,
                 secondLevelCompletionCount,
                 time,
                 fileCount,
+                parserTotalWorkingSet,
+                (parserGcMem - startingGcMem) / ( 1024 * 1024),
                 totalWorkingSet,
                 (endingGcMem - startingGcMem) / (1024 * 1024),
                 runOrder
             );
 
             Log(stats, packageId);
-            Console.ReadLine();
+            if (_wait) {
+                Console.ReadLine();
+            }
             GC.KeepAlive(analyzer);
 
             if (_cleanup) {
@@ -289,17 +309,19 @@ namespace AnalysisDriver {
             public readonly int SecondLevelCompletions;
             public readonly long Time;
             public readonly int FileCount;
-            public readonly long TotalWorkingSet;
-            public readonly long GcMem;
+            public readonly long TotalWorkingSet, ParserTotalWorkingSet;
+            public readonly long GcMem, ParserGcMem;
             public readonly int RunOrder;
 
-            public RunStats(int totalCompletions, int secondLevelCompletions, long time, int fileCount, long totalWorkingSet, long gcMem, int runOrder) {
+            public RunStats(int totalCompletions, int secondLevelCompletions, long time, int fileCount, long parserTotalWorkingSet, long parserGcMem, long totalWorkingSet, long gcMem, int runOrder) {
                 TotalCompletions = totalCompletions;
                 SecondLevelCompletions = secondLevelCompletions;
                 Time = time;
                 FileCount = fileCount;
                 TotalWorkingSet = totalWorkingSet;
                 GcMem = gcMem;
+                ParserGcMem = parserGcMem;
+                ParserTotalWorkingSet = parserTotalWorkingSet;
                 RunOrder = runOrder;
             }
 
@@ -308,13 +330,17 @@ namespace AnalysisDriver {
                 int left = Console.CursorLeft;
                 const string timeFormat = "{0,6} ms ",
                     fileFormat = "{0,4} files ",
-                    workingSetFormat = "{0,4} MB working set, ",
+                    parserWorkingSetFormat = "{0,4} MB parser WS, ",
+                    parserGcFormat = "{0,4} MB parser GC Mem, ",
+                    workingSetFormat = "{0,4} MB WS, ",
                     gcFormat = "{0,4} MB GC Mem, ",
                     totalCompletionFormat = "{0,3} ",
                     secondLevelCompletionFormat = "({0,5}) completions";
 
                 string format = timeFormat +
                     fileFormat.Replace("{0", "{1") +
+                    parserWorkingSetFormat.Replace("{0", "{6") +
+                    parserGcFormat.Replace("{0", "{7") +
                     workingSetFormat.Replace("{0", "{2") +
                     gcFormat.Replace("{0", "{5") +
                     totalCompletionFormat.Replace("{0", "{3") +
@@ -326,7 +352,9 @@ namespace AnalysisDriver {
                     TotalWorkingSet,
                     TotalCompletions,
                     SecondLevelCompletions,
-                    GcMem
+                    GcMem,
+                    ParserTotalWorkingSet,
+                    ParserGcMem
 
                 );
                 if (baseline != null) {
@@ -338,13 +366,17 @@ namespace AnalysisDriver {
                         baseline.TotalWorkingSet,
                         baseline.TotalCompletions,
                         baseline.SecondLevelCompletions,
-                        baseline.GcMem
+                        baseline.GcMem,
+                        baseline.ParserTotalWorkingSet,
+                        baseline.ParserGcMem
                     );
 
                     Console.CursorLeft = Math.Max(1, left - "DIFF: ".Length);
                     Console.Write("DIFF: ");
                     LogDiff(timeFormat, Time - baseline.Time);
                     LogDiff(fileFormat, FileCount - baseline.FileCount);
+                    LogDiff(parserWorkingSetFormat, ParserTotalWorkingSet - baseline.ParserTotalWorkingSet);
+                    LogDiff(parserGcFormat, ParserGcMem - baseline.ParserGcMem);
                     LogDiff(workingSetFormat, TotalWorkingSet - baseline.TotalWorkingSet);
                     LogDiff(gcFormat, GcMem - baseline.GcMem);
                     LogDiff(totalCompletionFormat, TotalCompletions - baseline.TotalCompletions, reversed: true);
@@ -367,12 +399,14 @@ namespace AnalysisDriver {
 
             public string ToCsv(string packageName) {
                 return String.Format(
-                    "\"{0}\",{1},{2},{3},{4},{5},{6},{7}",
+                    "\"{0}\",{1},{2},{3},{4},{5},{6},{7},{8},{9}",
                     packageName,
                     TotalCompletions,
                     SecondLevelCompletions,
                     Time,
                     FileCount,
+                    ParserTotalWorkingSet,
+                    ParserGcMem,
                     TotalWorkingSet,
                     GcMem,
                     RunOrder
@@ -390,9 +424,11 @@ namespace AnalysisDriver {
                             Int32.Parse(columns[2]), // 2nd level completions
                             Int64.Parse(columns[3]), // time
                             Int32.Parse(columns[4]), // file count
-                            Int64.Parse(columns[5]), // working set
-                            Int64.Parse(columns[6]), // GC mem
-                            Int32.Parse(columns[7])  // run order
+                            Int64.Parse(columns[5]), // parser working set
+                            Int64.Parse(columns[6]), // parser GC mem
+                            Int64.Parse(columns[7]), // working set
+                            Int64.Parse(columns[8]), // GC mem
+                            Int32.Parse(columns[9])  // run order
                         )
                     );
                 } catch (FormatException) {
@@ -413,7 +449,7 @@ namespace AnalysisDriver {
             int? seed = null, dumpMembers = null;
             string packagePath = null, logPath = null, htmlLogPath = null, dirRun = null;
             DependencyType depType = DependencyType.Standard;
-            bool installMissingPackages = false, installAll = false, cleanup = true, lowAnalysis = false;
+            bool installMissingPackages = false, installAll = false, cleanup = true, lowAnalysis = false, wait = false;
             Dictionary<string, RunStats> stats = null;
             foreach (var arg in args) {
                 if (arg == "/?" || arg == "--help") {
@@ -427,6 +463,8 @@ namespace AnalysisDriver {
                     lowAnalysis = true;
                 } else if (arg == "/no_cleanup") {
                     cleanup = false;
+                } else if (arg == "/wait") {
+                    wait = true;
                 } else if (arg.StartsWith("/package_list:")) {
                     string filename = arg.Substring("/package_list:".Length);
                     try {
@@ -595,6 +633,7 @@ namespace AnalysisDriver {
                     installAll,
                     depType,
                     cleanup,
+                    wait,
                     random,
                     logger,
                     htmlLogger,
@@ -688,6 +727,7 @@ namespace AnalysisDriver {
             Console.WriteLine("    /install_all                             Install all packages if not installed before");
             Console.WriteLine("                                               analyzing");
             Console.WriteLine("    /no_cleanup                              Don't delete package run directories");
+            Console.WriteLine("    /wait                                    Wait for input before exiting");
             Console.WriteLine();
             Console.WriteLine("  Logging/Reporting:");
             Console.WriteLine("    /log:<log file>                          Write results to CSV style log file");

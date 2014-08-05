@@ -24,7 +24,7 @@ namespace Microsoft.NodejsTools.Analysis.Analyzer {
     /// </summary>
     [Serializable]
     sealed class EvalAnalysisUnit : AnalysisUnit {
-        internal EvalAnalysisUnit(Node ast, JsAst tree, EnvironmentRecord scope)
+        internal EvalAnalysisUnit(Statement ast, JsAst tree, EnvironmentRecord scope)
             : base(ast, tree, scope) {
         }
     }

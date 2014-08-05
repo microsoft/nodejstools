@@ -32,9 +32,7 @@ namespace Microsoft.NodejsTools.Parsing
             get { return m_condition; }
             set
             {
-                m_condition.ClearParent(this);
                 m_condition = value;
-                m_condition.AssignParent(this);
             }
         }
 
@@ -43,9 +41,7 @@ namespace Microsoft.NodejsTools.Parsing
             get { return m_trueExpression; }
             set
             {
-                m_trueExpression.ClearParent(this);
                 m_trueExpression = value;
-                m_trueExpression.AssignParent(this);
             }
         }
 
@@ -54,9 +50,7 @@ namespace Microsoft.NodejsTools.Parsing
             get { return m_falseExpression; }
             set
             {
-                m_falseExpression.ClearParent(this);
                 m_falseExpression = value;
-                m_falseExpression.AssignParent(this);
             }
         }
 

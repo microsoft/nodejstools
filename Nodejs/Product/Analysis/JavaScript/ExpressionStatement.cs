@@ -43,7 +43,6 @@ namespace Microsoft.NodejsTools.Parsing
       set
       {
         _expression = value;
-        _expression.Parent = this;
       }
     }
 

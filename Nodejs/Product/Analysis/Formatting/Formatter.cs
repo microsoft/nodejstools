@@ -115,12 +115,12 @@ namespace Microsoft.NodejsTools.Formatting {
                     // We want to reformat all of the if statements that are nested
                     // so walk up the parent nodes as long as they are all terminated
                     // at the same semicolon.                   
-                    Span = GetTargetNode(node).Span;
+                    Span = GetTargetStatement(node).Span;
                 }
             }
 
-            private static Node GetTargetNode(Node node) {
-                Node targetNode = node;
+            private static Statement GetTargetStatement(Statement node) {
+                Statement targetNode = node;
                 while (targetNode.Parent != null &&
                     targetNode.Parent.EndIndex == node.EndIndex) {
                     if (targetNode.Parent != null && targetNode.Parent.Parent is JsAst) {
@@ -136,7 +136,7 @@ namespace Microsoft.NodejsTools.Formatting {
 
             public override bool Walk(Switch node) {
                 if (_typedChar == '}' && node.EndIndex == _position) {
-                    Span = GetTargetNode(node).Span;
+                    Span = GetTargetStatement(node).Span;
                     return false;
                 }
                 return base.Walk(node);
@@ -146,7 +146,7 @@ namespace Microsoft.NodejsTools.Formatting {
                 if (CheckBlock(node.TryBlock) ||
                     CheckBlock(node.FinallyBlock) ||
                     CheckBlock(node.CatchBlock)) {
-                    Span = GetTargetNode(node).Span;
+                    Span = GetTargetStatement(node).Span;
                     return false;
                 }
                 return base.Walk(node);
@@ -154,7 +154,7 @@ namespace Microsoft.NodejsTools.Formatting {
 
             public override bool Walk(ForIn node) {
                 if (CheckBlock(node.Body)) {
-                    Span = GetTargetNode(node).Span;
+                    Span = GetTargetStatement(node).Span;
                     return false;
                 }
                 return base.Walk(node);
@@ -162,7 +162,7 @@ namespace Microsoft.NodejsTools.Formatting {
 
             public override bool Walk(ForNode node) {
                 if (CheckBlock(node.Body)) {
-                    Span = GetTargetNode(node).Span;
+                    Span = GetTargetStatement(node).Span;
                     return false;
                 }
                 return base.Walk(node);
@@ -170,7 +170,7 @@ namespace Microsoft.NodejsTools.Formatting {
 
             public override bool Walk(WhileNode node) {
                 if (CheckBlock(node.Body)) {
-                    Span = GetTargetNode(node).Span;
+                    Span = GetTargetStatement(node).Span;
                     return false;
                 }
                 return base.Walk(node);
@@ -178,7 +178,7 @@ namespace Microsoft.NodejsTools.Formatting {
 
             public override bool Walk(WithNode node) {
                 if (CheckBlock(node.Body)) {
-                    Span = GetTargetNode(node).Span;
+                    Span = GetTargetStatement(node).Span;
                     return false;
                 }
                 return base.Walk(node);
@@ -186,7 +186,7 @@ namespace Microsoft.NodejsTools.Formatting {
 
             public override bool Walk(Block block) {
                 if (CheckBlock(block)) {
-                    Span = GetTargetNode(block).Span;
+                    Span = GetTargetStatement(block).Span;
                     return false;
                 }
                 return true;
@@ -194,7 +194,7 @@ namespace Microsoft.NodejsTools.Formatting {
 
             public override bool Walk(ObjectLiteral node) {
                 if (_typedChar == '}' && node.EndIndex == _position) {
-                    Span = GetTargetNode(node).Span;
+                    Span = node.Span;
                     return false;
                 }
                 return base.Walk(node);

@@ -40,7 +40,7 @@ namespace Microsoft.NodejsTools.Analysis.Analyzer {
             EnvironmentRecord declScope,
             IJsProjectEntry declEntry
         )
-            : base(function.FunctionObject, null) {
+            : base(function.FunctionObject, declUnit.Tree, null) {
             _declUnit = declUnit;
             Function = function;
 
@@ -56,7 +56,7 @@ namespace Microsoft.NodejsTools.Analysis.Analyzer {
             IJsProjectEntry declEntry,
             EnvironmentRecord scope
         )
-            : base(function.FunctionObject, null) {
+            : base(function.FunctionObject, declUnit.Tree, null) {
             _declUnit = declUnit;
             Function = function;
 
@@ -93,7 +93,7 @@ namespace Microsoft.NodejsTools.Analysis.Analyzer {
         public bool AddArgumentTypes(FunctionEnvironmentRecord funcScope, IAnalysisSet[] arguments, int typeLimit = Int32.MaxValue) {
             bool added = false;
             if (Ast.ParameterDeclarations != null) {
-                for (int i = 0; i < Ast.ParameterDeclarations.Count && i < arguments.Length; i++) {
+                for (int i = 0; i < Ast.ParameterDeclarations.Length && i < arguments.Length; i++) {
                     var variable = funcScope.GetVariable(Ast.ParameterDeclarations[i].Name);
                     if (typeLimit != Int32.MaxValue) {
                         added |= variable.MakeUnionStrongerIfMoreThan(typeLimit, arguments[i]);

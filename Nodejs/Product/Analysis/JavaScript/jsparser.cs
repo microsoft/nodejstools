@@ -1998,7 +1998,7 @@ namespace Microsoft.NodejsTools.Parsing
         {
             IndexSpan switchSpan = _curSpan;
             Node expr = null;
-            AstNodeList<SwitchCase> cases = null;
+            List<SwitchCase> cases = null;
             m_blockType.Add(BlockType.Switch);
             int blockStart = -1;
             try
@@ -2067,7 +2067,7 @@ namespace Microsoft.NodejsTools.Parsing
                 }
 
                 // parse the switch body
-                cases = new AstNodeList<SwitchCase>(CurrentPositionSpan());
+                cases = new List<SwitchCase>();
                 bool defaultStatement = false;
                 m_noSkipTokenSet.Add(NoSkipTokenSet.s_BlockNoSkipTokenSet);
                 try
@@ -2183,7 +2183,7 @@ namespace Microsoft.NodejsTools.Parsing
                                             Statements = statements,
                                             ColonIndex = colonIndex
                                         };
-                                    cases.Append(caseClause);
+                                    cases.Add(caseClause);
                                     throw;
                                 }
                             }
@@ -2200,7 +2200,7 @@ namespace Microsoft.NodejsTools.Parsing
                                     Statements = statements,
                                     ColonIndex = colonIndex
                                 };
-                            cases.Append(caseClause);
+                            cases.Add(caseClause);
                         }
                         finally
                         {
@@ -2217,7 +2217,7 @@ namespace Microsoft.NodejsTools.Parsing
                         exc._partiallyComputedNode = new Switch(switchSpan)
                             {
                                 Expression = (Expression)expr,
-                                Cases = cases,
+                                Cases = ToArray(cases),
                                 BlockStart = blockStart
                             };
                         throw;
@@ -2238,7 +2238,7 @@ namespace Microsoft.NodejsTools.Parsing
             return new Switch(switchSpan)
                 {
                     Expression = (Expression)expr,
-                    Cases = cases,
+                    Cases = ToArray(cases),
                     BlockStart = blockStart
                 };
         }
@@ -2541,7 +2541,7 @@ namespace Microsoft.NodejsTools.Parsing
         private FunctionObject ParseFunction(FunctionType functionType, IndexSpan fncSpan)
         {
             Lookup name = null;
-            AstNodeList<ParameterDeclaration> formalParameters = null;
+            List<ParameterDeclaration> formalParameters = null;
             Block body = null;
             bool inExpression = (functionType == FunctionType.Expression);
             IndexSpan paramsSpan = new IndexSpan();
@@ -2643,7 +2643,7 @@ namespace Microsoft.NodejsTools.Parsing
                 if (_curToken == JSToken.LeftParenthesis)
                 {
                     // create the parameter list
-                    formalParameters = new AstNodeList<ParameterDeclaration>(_curSpan);
+                    formalParameters = new List<ParameterDeclaration>();
                     paramsSpan = _curSpan;
 
                     // skip the open paren
@@ -2690,7 +2690,7 @@ namespace Microsoft.NodejsTools.Parsing
                                         Position = formalParameters.Count
                                     };
                                 paramsSpan = paramsSpan.UpdateWith(_curSpan);
-                                formalParameters.Append(paramDecl);
+                                formalParameters.Add(paramDecl);
                                 GetNextToken();
                             }
 
@@ -2814,7 +2814,7 @@ namespace Microsoft.NodejsTools.Parsing
                                 FunctionType = (inExpression ? FunctionType.Expression : FunctionType.Declaration),
                                 NameSpan = name.IfNotNull(n => n.Span),
                                 Name = name.IfNotNull(n => n.Name),
-                                ParameterDeclarations = formalParameters,
+                                ParameterDeclarations = ToArray(formalParameters),
                                 ParametersSpan = paramsSpan,
                                 Body = body
                             };
@@ -2842,10 +2842,24 @@ namespace Microsoft.NodejsTools.Parsing
                     FunctionType = functionType,
                     NameSpan = name.IfNotNull(n => n.Span),
                     Name = name.IfNotNull(n => n.Name),
-                    ParameterDeclarations = formalParameters,
+                    ParameterDeclarations = ToArray(formalParameters),
                     ParametersSpan = paramsSpan,
                     Body = body
                 };
+        }
+
+        static class EmptyArray<T> {
+            public static readonly T[] Instance = new T[0];
+        }
+
+        private static T[] ToArray<T>(List<T> list) {
+            if (list == null) {
+                return null;
+            }
+            if (list.Count == 0) {
+                return EmptyArray<T>.Instance;
+            }
+            return list.ToArray();
         }
 
 
@@ -3463,7 +3477,7 @@ namespace Microsoft.NodejsTools.Parsing
                 case JSToken.LeftBracket:
                     IndexSpan listSpan = _curSpan;
                     GetNextToken();
-                    AstNodeList<Expression> list = new AstNodeList<Expression>(CurrentPositionSpan());
+                    List<Expression> list = new List<Expression>();
                     while (JSToken.RightBracket != _curToken)
                     {
                         if (JSToken.Comma != _curToken)
@@ -3472,7 +3486,7 @@ namespace Microsoft.NodejsTools.Parsing
                             try
                             {
                                 var expression = ParseExpression(true);
-                                list.Append(expression);
+                                list.Add(expression);
                                 if (JSToken.Comma != _curToken)
                                 {
                                     if (JSToken.RightBracket != _curToken)
@@ -3492,13 +3506,13 @@ namespace Microsoft.NodejsTools.Parsing
                             catch (RecoveryTokenException exc)
                             {
                                 if (exc._partiallyComputedNode != null)
-                                    list.Append((Expression)exc._partiallyComputedNode);
+                                    list.Add((Expression)exc._partiallyComputedNode);
                                 if (IndexOfToken(NoSkipTokenSet.s_ArrayInitNoSkipTokenSet, exc) == -1)
                                 {
                                     listSpan = listSpan.UpdateWith(CurrentPositionSpan());
                                     exc._partiallyComputedNode = new ArrayLiteral(listSpan)
                                         {
-                                            Elements = list
+                                            Elements = ToArray(list)
                                         };
                                     throw;
                                 }
@@ -3516,7 +3530,7 @@ namespace Microsoft.NodejsTools.Parsing
                         else
                         {
                             // comma -- missing array item in the list
-                            list.Append(new ConstantWrapper(Missing.Value, _curSpan));
+                            list.Add(new ConstantWrapper(Missing.Value, _curSpan));
 
                             // skip over the comma
                             GetNextToken();
@@ -3526,14 +3540,14 @@ namespace Microsoft.NodejsTools.Parsing
                             // TECHNICALLY, that puts an extra item into the array for most modern browsers, but not ALL.
                             if (_curToken == JSToken.RightBracket)
                             {
-                                list.Append(new ConstantWrapper(Missing.Value, _curSpan));
+                                list.Add(new ConstantWrapper(Missing.Value, _curSpan));
                             }
                         }
                     }
                     listSpan = listSpan.UpdateWith(_curSpan);
                     ast = new ArrayLiteral(listSpan)
                         {
-                            Elements = list
+                            Elements = ToArray(list)
                         };
                     break;
 
@@ -3577,7 +3591,7 @@ namespace Microsoft.NodejsTools.Parsing
             IndexSpan objSpan = _curSpan;
             GetNextToken();
 
-            var propertyList = new AstNodeList<ObjectLiteralProperty>(CurrentPositionSpan());
+            var propertyList = new List<ObjectLiteralProperty>();
 
             if (JSToken.RightCurly != _curToken) {
                 try {
@@ -3689,7 +3703,7 @@ namespace Microsoft.NodejsTools.Parsing
                                     Value = value
                                 };
 
-                                propertyList.Append(property);
+                                propertyList.Add(property);
 
                                 if (JSToken.RightCurly == _curToken) {
                                     break;
@@ -3722,12 +3736,12 @@ namespace Microsoft.NodejsTools.Parsing
                                         Value = value
                                     };
 
-                                    propertyList.Append(property);
+                                    propertyList.Add(property);
                                 }
 
                                 if (IndexOfToken(NoSkipTokenSet.s_ObjectInitNoSkipTokenSet, exc) == -1) {
                                     exc._partiallyComputedNode = new ObjectLiteral(objSpan) {
-                                        Properties = propertyList
+                                        Properties = ToArray(propertyList)
                                     };
                                     throw;
                                 } else {
@@ -3747,7 +3761,7 @@ namespace Microsoft.NodejsTools.Parsing
             }
             objSpan = objSpan.UpdateWith(_curSpan);
             return new ObjectLiteral(objSpan) {
-                Properties = propertyList
+                Properties = ToArray(propertyList)
             };
         }
 
@@ -3910,28 +3924,25 @@ namespace Microsoft.NodejsTools.Parsing
                     switch (_curToken)
                     {
                         case JSToken.LeftParenthesis:
-                            AstNodeList<Expression> args = null;
-                            RecoveryTokenException callError = null;
+                            List<Expression> args = null;
+                            RecoveryTokenException callError;
                             m_noSkipTokenSet.Add(NoSkipTokenSet.s_ParenToken);
                             try
                             {
-                                args = ParseExpressionList(JSToken.RightParenthesis);
-                            }
-                            catch (RecoveryTokenException exc)
-                            {
-                                args = (AstNodeList<Expression>)exc._partiallyComputedNode;
-                                if (IndexOfToken(NoSkipTokenSet.s_ParenToken, exc) == -1)
-                                    callError = exc; // thrown later on
+                                args = ParseExpressionList(JSToken.RightParenthesis, out callError);
+                                if (callError != null && IndexOfToken(NoSkipTokenSet.s_ParenToken, callError) != -1) {
+                                    callError = null;
+                                }
                             }
                             finally
                             {
                                 m_noSkipTokenSet.Remove(NoSkipTokenSet.s_ParenToken);
                             }
 
-                            expression = new CallNode(expression.Span.CombineWith(args.Span))
+                            expression = new CallNode(expression.Span.CombineWith(_curSpan))
                                 {
                                     Function = expression,
-                                    Arguments = args,
+                                    Arguments = ToArray(args),
                                     InBrackets = false
                                 };
 
@@ -3955,7 +3966,7 @@ namespace Microsoft.NodejsTools.Parsing
 
                         case JSToken.LeftBracket:
                             m_noSkipTokenSet.Add(NoSkipTokenSet.s_BracketToken);
-                            args = new AstNodeList<Expression>(CurrentPositionSpan());
+                            args = new List<Expression>();
                             try
                             {
                                 //
@@ -3973,18 +3984,18 @@ namespace Microsoft.NodejsTools.Parsing
                                 Expression accessor = ParseExpression();
                                 if (accessor != null)
                                 {
-                                    args.Append(accessor);
+                                    args.Add(accessor);
                                 }
                             }
                             catch (RecoveryTokenException exc)
                             {
                                 if (IndexOfToken(NoSkipTokenSet.s_BracketToken, exc) == -1) {
                                     if (exc._partiallyComputedNode != null) {
-                                        args.Append((Expression)exc._partiallyComputedNode);
+                                        args.Add((Expression)exc._partiallyComputedNode);
                                         exc._partiallyComputedNode =
                                            new CallNode(expression.Span.CombineWith(_curSpan)) {
                                                Function = expression,
-                                               Arguments = args,
+                                               Arguments = ToArray(args),
                                                InBrackets = true
                                            };
                                     } else {
@@ -3992,7 +4003,7 @@ namespace Microsoft.NodejsTools.Parsing
                                     }
                                     throw;
                                 } else {
-                                    args.Append((Expression)exc._partiallyComputedNode);
+                                    args.Add((Expression)exc._partiallyComputedNode);
                                 }
                             }
                             finally
@@ -4002,7 +4013,7 @@ namespace Microsoft.NodejsTools.Parsing
                             expression = new CallNode(expression.Span.CombineWith(_curSpan))
                                 {
                                     Function = expression,
-                                    Arguments = args,
+                                    Arguments = ToArray(args),
                                     InBrackets = true
                                 };
 
@@ -4064,7 +4075,7 @@ namespace Microsoft.NodejsTools.Parsing
                                     expression = new CallNode(newSpans[newSpans.Count - 1])
                                         {
                                             Function = expression,
-                                            Arguments = new AstNodeList<Expression>(CurrentPositionSpan())
+                                            Arguments = Expression.EmptyArray
                                         };
                                     ((CallNode)expression).IsConstructor = true;
                                     newSpans.RemoveAt(newSpans.Count - 1);
@@ -4094,11 +4105,12 @@ namespace Microsoft.NodejsTools.Parsing
         //  Given a starting this.currentToken '(' or '[', parse a list of expression separated by
         //  ',' until matching ')' or ']'
         //---------------------------------------------------------------------------------------
-        private AstNodeList<Expression> ParseExpressionList(JSToken terminator)
+        private List<Expression> ParseExpressionList(JSToken terminator, out RecoveryTokenException exception)
         {
+            exception = null;
             IndexSpan listSpan = _curSpan;
             GetNextToken();
-            var list = new AstNodeList<Expression>(listSpan);
+            var list = new List<Expression>();
             try {
                 if (terminator != _curToken) {
                     for (; ; ) {
@@ -4107,12 +4119,12 @@ namespace Microsoft.NodejsTools.Parsing
                             Expression item;
                             if (JSToken.Comma == _curToken) {
                                 item = new ConstantWrapper(Missing.Value, _curSpan);
-                                list.Append(item);
+                                list.Add(item);
                             } else if (terminator == _curToken) {
                                 break;
                             } else {
                                 item = ParseExpression(true);
-                                list.Append(item);
+                                list.Add(item);
                             }
 
                             if (terminator == _curToken) {
@@ -4124,10 +4136,10 @@ namespace Microsoft.NodejsTools.Parsing
                             }
                         } catch (RecoveryTokenException exc) {
                             if (exc._partiallyComputedNode != null)
-                                list.Append((Expression)exc._partiallyComputedNode);
-                            if (IndexOfToken(NoSkipTokenSet.s_ExpressionListNoSkipTokenSet, exc) == -1) {
-                                exc._partiallyComputedNode = list;
-                                throw;
+                                list.Add((Expression)exc._partiallyComputedNode);
+                            if (IndexOfToken(NoSkipTokenSet.s_ExpressionListNoSkipTokenSet, exc) == -1) { 
+                                exception = exc;
+                                break;
                             }
                         } finally {
                             m_noSkipTokenSet.Remove(NoSkipTokenSet.s_ExpressionListNoSkipTokenSet);
@@ -4138,7 +4150,6 @@ namespace Microsoft.NodejsTools.Parsing
             } catch (EndOfFileException) {
                 // return the partially completed list...
             }
-            list.Span = listSpan.UpdateWith(_curSpan);
             return list;
         }
 

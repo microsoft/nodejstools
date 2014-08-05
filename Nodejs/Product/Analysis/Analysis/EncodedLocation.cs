@@ -13,6 +13,7 @@
  * ***************************************************************************/
 
 using System;
+using Microsoft.NodejsTools.Parsing;
 
 namespace Microsoft.NodejsTools.Analysis {
     /// <summary>
@@ -34,20 +35,18 @@ namespace Microsoft.NodejsTools.Analysis {
     /// </summary>
     [Serializable]
     struct EncodedLocation : IEquatable<EncodedLocation> {
-        public readonly ILocationResolver Resolver;
         public readonly object Location;
 
-        public EncodedLocation(ILocationResolver resolver, object location) {
-            Resolver = resolver;
+        public EncodedLocation(LocationInfo location) {
             Location = location;
         }
 
+        public EncodedLocation(Node node) {
+            Location = node;
+        }
+        
         public override int GetHashCode() {
-            if (Location != null) {
-                return Resolver.GetHashCode() ^ Location.GetHashCode();
-            }
-
-            return Resolver.GetHashCode();
+            return Location.GetHashCode();
         }
 
         public override bool Equals(object obj) {
@@ -60,14 +59,26 @@ namespace Microsoft.NodejsTools.Analysis {
         #region IEquatable<EncodedLocation> Members
 
         public bool Equals(EncodedLocation other) {
-            return Resolver == other.Resolver &&
-                Location == other.Location;
+            return Location == other.Location;
         }
 
         #endregion
 
-        public LocationInfo GetLocationInfo(IProjectEntry project) {
-            return Resolver.ResolveLocation(project, Location);
+        public LocationInfo GetLocationInfo(ProjectEntry project) {
+            LocationInfo locInfo = Location as LocationInfo;
+            if (locInfo != null) {
+                return locInfo;
+            }
+            Node node = Location as Node;
+            if (node != null) {
+                var location = project.Tree.IndexToLocation(node.Span.Start);
+                return new LocationInfo(
+                    project,
+                    location.Line,
+                    location.Column
+                );
+            }
+            throw new InvalidOperationException();
         }
     }
 }

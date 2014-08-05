@@ -36,7 +36,7 @@ namespace Microsoft.NodejsTools.Analysis {
         /// <summary>
         /// The AST which will be analyzed when this node is analyzed
         /// </summary>
-        public readonly Node Ast;
+        public readonly Statement Ast;
         public readonly JsAst Tree;
         internal EnvironmentRecord _env;
         private ModuleEnvironmentRecord _declaringModuleEnv;
@@ -56,11 +56,11 @@ namespace Microsoft.NodejsTools.Analysis {
         }
 #endif
 
-        internal AnalysisUnit(Statement ast, EnvironmentRecord environment)
-            : this(ast, (ast != null ? ast.GlobalParent : null), environment) {
+        internal AnalysisUnit(JsAst ast, EnvironmentRecord environment)
+            : this(ast, ast, environment) {
         }
 
-        internal AnalysisUnit(Node ast, JsAst tree, EnvironmentRecord environment) {
+        internal AnalysisUnit(Statement ast, JsAst tree, EnvironmentRecord environment) {
             Ast = ast;
             Tree = tree;
             _env = environment;
@@ -235,7 +235,7 @@ namespace Microsoft.NodejsTools.Analysis {
                 GetHashCode(),
                 Ast != null ? Ast.GetType().Name : "<unknown>",
                 GetType().Name,
-                Ast != null ? Ast.GetStart(Ast.GlobalParent) : SourceLocation.Invalid
+                Ast != null ? Ast.GetStart(ProjectEntry.Tree) : SourceLocation.Invalid
             );
         }
 

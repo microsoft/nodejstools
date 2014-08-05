@@ -13,6 +13,7 @@
  * ***************************************************************************/
 
 using System;
+using System.Diagnostics;
 
 namespace Microsoft.NodejsTools.Parsing
 {
@@ -23,6 +24,11 @@ namespace Microsoft.NodejsTools.Parsing
             : base(span)
         {
         }
+
+        /// <summary>
+        /// Gets or sets the parent node of this node in the abstract syntax tree
+        /// </summary>
+        public Statement Parent { get; set; }
 
         public static Expression GetExpression(Statement statement)
         {
@@ -45,5 +51,21 @@ namespace Microsoft.NodejsTools.Parsing
             return null;
         }
 
+        private JsAst GlobalParent {
+            get {
+                var res = this;
+                while (res != null && !(res is JsAst)) {
+                    res = res.Parent;
+                }
+                return (JsAst)res;
+            }
+        }
+
+        public override string ToString() {
+            if (GlobalParent != null) {
+                return String.Format("{0} {1} {2}", GetType().Name, GetStart(GlobalParent), GetEnd(GlobalParent));
+            }
+            return base.ToString();
+        }
     }
 }

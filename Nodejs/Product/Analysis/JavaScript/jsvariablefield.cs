@@ -42,7 +42,6 @@ namespace Microsoft.NodejsTools.Parsing
     public class JSVariableField
     {
         private Statement _scope;
-        public IndexSpan OriginalSpan { get; set; }
         public string Name { get; private set; }
         public FieldType FieldType { get; set; }
         public JSVariableField OuterField { get; set; }

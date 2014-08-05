@@ -126,10 +126,10 @@ namespace Microsoft.NodejsTools.Analysis.Analyzer {
             // property names we will merge them together into a single ObjectLiteralValue to
             // avoid an explosion in object literals.  We only do this for literals with
             // at least one member defined.
-            if (node.Properties.Count > 0) {
+            if (node.Properties.Length > 0) {
                 // first see if we have a object literal that we should share with...
-                string[] propNames = new string[node.Properties.Count];
-                for (int i = 0; i < node.Properties.Count; i++) {
+                string[] propNames = new string[node.Properties.Length];
+                for (int i = 0; i < node.Properties.Length; i++) {
                     string propName = null;
                     if (node.Properties[i].Name.Value != null) {
                         propName = node.Properties[i].Name.Value.ToString();
@@ -219,7 +219,7 @@ namespace Microsoft.NodejsTools.Analysis.Analyzer {
                 var funcScope = GetFunctionEnvironment(func);
                 scope = funcScope;
 
-                VariableDef[] parameters = new VariableDef[node.ParameterDeclarations != null ? node.ParameterDeclarations.Count : 0];
+                VariableDef[] parameters = new VariableDef[node.ParameterDeclarations != null ? node.ParameterDeclarations.Length : 0];
                 for (int i = 0; i < parameters.Length; i++) {
                     parameters[i] = funcScope.AddLocatedVariable(
                         node.ParameterDeclarations[i].Name,
@@ -301,7 +301,7 @@ namespace Microsoft.NodejsTools.Analysis.Analyzer {
         /// </summary>
         internal static void GetIsInstanceNamesAndExpressions(ref List<KeyValuePair<Lookup, Expression>> names, Expression node) {
             CallNode callExpr = node as CallNode;
-            if (callExpr != null && callExpr.Arguments.Count == 2) {
+            if (callExpr != null && callExpr.Arguments.Length == 2) {
                 Lookup nameExpr = callExpr.Function as Lookup;
                 if (nameExpr != null && nameExpr.Name == "isinstance") {
                     nameExpr = callExpr.Arguments[0] as Lookup;

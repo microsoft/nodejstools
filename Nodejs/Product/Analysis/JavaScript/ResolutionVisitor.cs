@@ -140,59 +140,19 @@ namespace Microsoft.NodejsTools.Parsing
             }
         }
 
-        private static void MakeExpectedGlobal(JSVariableField varField)
-        {
-            // to make this an expected global, we're going to change the type of this field, 
-            // then just keep walking up the outer field references doing the same
-            do
-            {
-                varField.FieldType = FieldType.Global;
-                varField = varField.OuterField;
-            }
-            while (varField != null);
-        }
-
         private void ResolveLookup(ActivationObject scope, Lookup lookup)
         {
             // resolve lookup via the lexical scope
             lookup.VariableField = scope.FindReference(lookup.Name);
             if (lookup.VariableField.FieldType == FieldType.UndefinedGlobal)
             {
-                // couldn't find it.
-                // if the lookup isn't the object of a typeof operator,
-                // then we want to throw an error.
-                var parentUnaryOp = lookup.Parent as UnaryOperator;
-                if (parentUnaryOp != null && parentUnaryOp.OperatorToken == JSToken.TypeOf)
-                {
-                    // this undefined lookup is the target of a typeof operator.
-                    // I think it's safe to assume we're going to use it. Don't throw an error
-                    // and instead add it to the "known" expected globals of the global scope
-                    MakeExpectedGlobal(lookup.VariableField);
-                }
-                else
-                {
-                    // report this undefined reference
-                    _errorSink.ReportUndefined(lookup);
-
-                    // possibly undefined global (but definitely not local).
-                    // see if this is a function or a variable.
-                    var callNode = lookup.Parent as CallNode;
-                    var isFunction = callNode != null && callNode.Function == lookup;
-
-                    if (isFunction) {
-                        _errorSink.HandleUndeclaredFunction(
-                            lookup.Name,
-                            lookup.Span,
-                            _indexResolver
-                        );
-                    } else {
-                        _errorSink.HandleUndeclaredVariable(
-                            lookup.Name,
-                            lookup.Span,
-                            _indexResolver
-                        );
-                    }
-                }
+                
+                    _errorSink.HandleUndeclaredVariable(
+                        lookup.Name,
+                        lookup.Span,
+                        _indexResolver
+                    );
+                    
             }
         }
 
@@ -222,10 +182,7 @@ namespace Microsoft.NodejsTools.Parsing
             if (ghostField == null)
             {
                 // set up a ghost field to keep track of the relationship
-                ghostField = new JSVariableField(FieldType.GhostCatch, catchParameter.Name)
-                {
-                    OriginalSpan = catchParameter.Span
-                };
+                ghostField = new JSVariableField(FieldType.GhostCatch, catchParameter.Name);
 
                 scope.AddField(ghostField);
             }
@@ -267,10 +224,7 @@ namespace Microsoft.NodejsTools.Parsing
             if (ghostField == null)
             {
                 // nothing; good to go. Add a ghosted field to keep track of it.
-                ghostField = new JSVariableField(FieldType.GhostFunction, funcObject.Name)
-                {
-                    OriginalSpan = functionField.OriginalSpan,
-                };
+                ghostField = new JSVariableField(FieldType.GhostFunction, funcObject.Name);
 
                 scope.AddField(ghostField);
             }
@@ -314,7 +268,9 @@ namespace Microsoft.NodejsTools.Parsing
             {
                 if (node.Elements != null)
                 {
-                    node.Elements.Walk(this);
+                    foreach (var element in node.Elements) {
+                        element.Walk(this);
+                    }
                 }
             }
             return false;
@@ -423,7 +379,11 @@ namespace Microsoft.NodejsTools.Parsing
 
                 if (node.Arguments != null)
                 {
-                    node.Arguments.Walk(this);
+                    foreach (var arg in node.Arguments) {
+                        if (arg != null) {
+                            arg.Walk(this);
+                        }
+                    }
                 }
             }
             return false;
@@ -791,7 +751,9 @@ namespace Microsoft.NodejsTools.Parsing
         {
             if (node != null)
             {
-                node.Properties.Walk(this);
+                foreach (var prop in node.Properties) {
+                    prop.Walk(this);
+                }
             }
             return false;
         }
@@ -862,7 +824,9 @@ namespace Microsoft.NodejsTools.Parsing
                 {
                     if (node.Cases != null)
                     {
-                        node.Cases.Walk(this);
+                        foreach (var caseNode in node.Cases) {
+                            caseNode.Walk(this);
+                        }
                     }
                 }
                 finally
@@ -1043,11 +1007,6 @@ namespace Microsoft.NodejsTools.Parsing
         }
 
         public override bool Walk(JsAst jsAst)
-        {
-            return true;
-        }
-
-        public override bool Walk<T>(AstNodeList<T> node)
         {
             return true;
         }

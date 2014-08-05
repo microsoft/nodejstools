@@ -43,36 +43,37 @@ namespace Microsoft.NodejsTools.Analysis.Analyzer {
         }
 
         public bool AddTypes(ProjectEntry projectEntry, JsAnalyzer projectState, IAnalysisSet keyTypes, IAnalysisSet valueTypes, bool enqueue = true) {
-            var dependencies = GetDependentItems(projectEntry);
-
-            if (dependencies.KeyValues.Count > projectState.Limits.DictKeyTypes) {
-                dependencies.MakeUnionStronger();
-            }
-
             bool anyAdded = false;
-            foreach (var key in keyTypes) {
-                IAnalysisSet values;
-                if (!dependencies.KeyValues.TryGetValue(key, out values)) {
-                    values = AnalysisSet.Create(valueTypes);
-                    anyAdded = true;
-                } else {
-                    bool added;
-                    values = values.Union(valueTypes, out added);
-                    anyAdded |= added;
-                }
-                if (anyAdded && values.Count > projectState.Limits.DictValueTypes) {
-                    values = values.AsStrongerUnion();
-                }
-                dependencies.KeyValues[key] = values;
-            }
+            if (keyTypes.Count > 0) {
+                var dependencies = GetDependentItems(projectEntry);
 
-            if (anyAdded) {
-                _allValues = null;
-            }
-            if (anyAdded && enqueue) {
-                EnqueueDependents();
-            }
+                if (dependencies.KeyValues.Count > projectState.Limits.DictKeyTypes) {
+                    dependencies.MakeUnionStronger();
+                }
 
+                foreach (var key in keyTypes) {
+                    IAnalysisSet values;
+                    if (!dependencies.KeyValues.TryGetValue(key, out values)) {
+                        values = AnalysisSet.Create(valueTypes);
+                        anyAdded = true;
+                    } else {
+                        bool added;
+                        values = values.Union(valueTypes, out added);
+                        anyAdded |= added;
+                    }
+                    if (anyAdded && values.Count > projectState.Limits.DictValueTypes) {
+                        values = values.AsStrongerUnion();
+                    }
+                    dependencies.KeyValues[key] = values;
+                }
+
+                if (anyAdded) {
+                    _allValues = null;
+                }
+                if (anyAdded && enqueue) {
+                    EnqueueDependents();
+                }
+            }
             return anyAdded;
         }
 
@@ -212,7 +213,6 @@ namespace Microsoft.NodejsTools.Analysis.Analyzer {
             }
             return anyAdded;
         }
-#endif
 
         /// <summary>
         /// Copies all of our key types into the provided VariableDef.
@@ -247,6 +247,6 @@ namespace Microsoft.NodejsTools.Analysis.Analyzer {
 
             return added;
         }
+#endif
     }
-
 }

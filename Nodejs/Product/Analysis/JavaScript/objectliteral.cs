@@ -23,16 +23,14 @@ namespace Microsoft.NodejsTools.Parsing
     [Serializable]
     public sealed class ObjectLiteral : Expression
     {
-        private AstNodeList<ObjectLiteralProperty> m_properties;
+        private ObjectLiteralProperty[] m_properties;
 
-        public AstNodeList<ObjectLiteralProperty> Properties
+        public ObjectLiteralProperty[] Properties
         {
             get { return m_properties; }
             set
             {
-                m_properties.ClearParent(this);
                 m_properties = value;
-                m_properties.AssignParent(this);
             }
         }
 

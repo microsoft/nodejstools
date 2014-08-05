@@ -123,16 +123,24 @@ namespace Microsoft.NodejsTools.Analysis {
         //      A folder which contains node_modules is presumably using those modules.  ANy
         //      peers within that folder structure can see all of the changes by the children
         //      in node_modules.
+        //
+        // We share hashsets of visible nodes.  They're stored in the ModuleTree and when a
+        // new module is added we assign it's _visibleEntries field to the one shared by all
+        // of it's peers.  We then update the relevant entries with the new values.
         private void AddVisibility(ModuleTree tree, ProjectEntry newModule, bool recurse) {
-            newModule._visibleEntries.Add(newModule.Analyzer._builtinEntry);
-
             // My peers can see my assignments/I can see my peers assignments.  Update
             // ourselves and our peers so we can see each others writes.
             var curTree = tree;
             while (curTree.Parent != null && curTree.Parent.Name != "node_modules") {
                 curTree = curTree.Parent;
             }
-            AddVisibilityForHierarchy(curTree, newModule);
+
+            if (curTree.VisibleEntries == null) {
+                curTree.VisibleEntries = new HashSet<ProjectEntry>();
+                curTree.VisibleEntries.Add(newModule.Analyzer._builtinEntry);
+            }
+            curTree.VisibleEntries.Add(newModule);
+            newModule._visibleEntries = curTree.VisibleEntries;
 
             // My parent and its peers can see my assignments.  Update existing parents
             // so they can see the newly added modules writes.
@@ -144,46 +152,10 @@ namespace Microsoft.NodejsTools.Analysis {
                     while (grandParent.Parent != null && grandParent.Parent.Name != "node_modules") {
                         grandParent = grandParent.Parent;
                     }
-                    AddVisibilityForHierarchy(grandParent, newModule, addParent: false, addChild: true);
-                }
-            }
-
-            // My parent and its peers can see my assignments part 2
-            // We need to make sure we can see our children's assignments in case the
-            // child was added before us.
-            AddVisibilityForNewParent(tree.Parent, newModule);
-        }
-
-        /// <summary>
-        /// Makes writes done in children visible to a new parent.
-        /// </summary>
-        private static void AddVisibilityForNewParent(ModuleTree tree, ProjectEntry newModule) {
-            foreach (var child in tree.Children.Values) {
-                if (child.Name == "node_modules") {
-                    AddVisibilityForHierarchy(child, newModule, addParent: true, addChild: false);
-                } else {
-                    AddVisibilityForNewParent(child, newModule);
-                }
-            }
-        }
-
-        /// <summary>
-        /// Adds visibility for the current hierarchy in the specified directions stopping
-        /// at any node_modules folders.
-        /// </summary>
-        private static void AddVisibilityForHierarchy(ModuleTree tree, ProjectEntry newModule, bool addParent = true, bool addChild = true) {
-            foreach (var child in tree.Children.Values) {
-                if (child.ProjectEntry != null) {
-                    if (addChild) {
-                        child.ProjectEntry._visibleEntries.Add(newModule);
+                    if (grandParent.VisibleEntries == null) {
+                        grandParent.VisibleEntries = new HashSet<ProjectEntry>();
                     }
-                    if (addParent) {
-                        newModule._visibleEntries.Add(child.ProjectEntry);
-                    }
-                }
-
-                if (child.Name != "node_modules") {
-                    AddVisibilityForHierarchy(child, newModule, addParent, addChild);
+                    grandParent.VisibleEntries.Add(newModule);
                 }
             }
         }
@@ -355,6 +327,7 @@ namespace Microsoft.NodejsTools.Analysis {
         public readonly string Name;
         public readonly Dictionary<string, ModuleTree> Children = new Dictionary<string, ModuleTree>(StringComparer.OrdinalIgnoreCase);
         private ProjectEntry _projectEntry;
+        public HashSet<ProjectEntry> VisibleEntries;
         private string _defaultPackage = "./index.js";
         DependentData _dependencies = new DependentData();
 

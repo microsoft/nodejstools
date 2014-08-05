@@ -4529,7 +4529,7 @@ do {
                 Assert.IsFalse(callNode.IsConstructor);
                 Assert.IsFalse(callNode.InBrackets);
 
-                Assert.AreEqual(args.Length, callNode.Arguments.Count);
+                Assert.AreEqual(args.Length, callNode.Arguments.Length);
                 for (int i = 0; i < args.Length; i++) {
                     args[i](callNode.Arguments[i]);
                 }
@@ -4547,7 +4547,7 @@ do {
                 Assert.IsFalse(callNode.IsConstructor);
                 Assert.IsTrue(callNode.InBrackets);
 
-                Assert.AreEqual(args.Length, callNode.Arguments.Count);
+                Assert.AreEqual(args.Length, callNode.Arguments.Length);
                 for (int i = 0; i < args.Length; i++) {
                     args[i](callNode.Arguments[i]);
                 }
@@ -4738,7 +4738,7 @@ do {
 
                 var switchStmt = (Switch)stmt;
                 expr(switchStmt.Expression);
-                Assert.AreEqual(cases.Length, switchStmt.Cases.Count);
+                Assert.AreEqual(cases.Length, switchStmt.Cases.Length);
                 for (int i = 0; i < cases.Length; i++) {
                     cases[i](switchStmt.Cases[i]);
                 }
@@ -4807,7 +4807,7 @@ do {
                 Assert.AreEqual(typeof(ArrayLiteral), expr.GetType());
 
                 var array = (ArrayLiteral)expr;
-                Assert.AreEqual(values.Length, array.Elements.Count);
+                Assert.AreEqual(values.Length, array.Elements.Length);
                 for (int i = 0; i < values.Length; i++) {
                     values[i](array.Elements[i]);
                 }
@@ -4819,7 +4819,7 @@ do {
                 Assert.AreEqual(typeof(ObjectLiteral), expr.GetType());
 
                 var array = (ObjectLiteral)expr;
-                Assert.AreEqual(values.Length, array.Properties.Count);
+                Assert.AreEqual(values.Length, array.Properties.Length);
                 for (int i = 0; i < values.Length; i++) {
                     values[i](array.Properties[i]);
                 }
@@ -4859,8 +4859,8 @@ do {
 
                 body(func.Body);
                 if (func.ParameterDeclarations != null) {
-                    Assert.AreEqual(args.Length, func.ParameterDeclarations.Count);
-                    for (int i = 0; i < func.ParameterDeclarations.Count; i++) {
+                    Assert.AreEqual(args.Length, func.ParameterDeclarations.Length);
+                    for (int i = 0; i < func.ParameterDeclarations.Length; i++) {
                         args[i](func.ParameterDeclarations[i]);
                     }
                 } else {
@@ -4968,12 +4968,21 @@ do {
                 }
             }
 
-            public override bool Walk(ArrayLiteral node) { TestNode(node); TestNode(node.Elements); return base.Walk(node); }
+            private void TestNodes<T>(T[] nodes) where T : Node {
+                if (nodes != null) {
+                    foreach (var node in nodes) {
+                        Assert.IsNotNull(node);
+                        TestNode(node);
+                    }
+                }
+            }
+
+            public override bool Walk(ArrayLiteral node) { TestNode(node); TestNodes(node.Elements); return base.Walk(node); }
             public override bool Walk(BinaryOperator node) { TestNode(node); return base.Walk(node); }
             public override bool Walk(CommaOperator node) { TestNode(node); return base.Walk(node); }
             public override bool Walk(Block node) { TestNode(node); return base.Walk(node); }
             public override bool Walk(Break node) { TestNode(node); return base.Walk(node); }
-            public override bool Walk(CallNode node) { TestNode(node); TestNode(node.Arguments); return base.Walk(node); }
+            public override bool Walk(CallNode node) { TestNode(node); TestNodes(node.Arguments); return base.Walk(node); }
             public override bool Walk(Conditional node) { TestNode(node); return base.Walk(node); }
             public override bool Walk(ConstantWrapper node) { TestNode(node); return base.Walk(node); }
             public override bool Walk(ConstStatement node) { TestNode(node); return base.Walk(node); }
@@ -4984,7 +4993,7 @@ do {
             public override bool Walk(EmptyStatement node) { TestNode(node); return base.Walk(node); }
             public override bool Walk(ForIn node) { TestNode(node); return base.Walk(node); }
             public override bool Walk(ForNode node) { TestNode(node); return base.Walk(node); }
-            public override bool Walk(FunctionObject node) { TestNode(node); TestNode(node.ParameterDeclarations); return base.Walk(node); }
+            public override bool Walk(FunctionObject node) { TestNode(node); TestNodes(node.ParameterDeclarations); return base.Walk(node); }
             public override bool Walk(GetterSetter node) { TestNode(node); return base.Walk(node); }
             public override bool Walk(GroupingOperator node) { TestNode(node); return base.Walk(node); }
             public override bool Walk(IfNode node) { TestNode(node); return base.Walk(node); }
@@ -4992,13 +5001,13 @@ do {
             public override bool Walk(LexicalDeclaration node) { TestNode(node); return base.Walk(node); }
             public override bool Walk(Lookup node) { TestNode(node); return base.Walk(node); }
             public override bool Walk(Member node) { TestNode(node); return base.Walk(node); }
-            public override bool Walk(ObjectLiteral node) { TestNode(node); TestNode(node.Properties); return base.Walk(node); }
+            public override bool Walk(ObjectLiteral node) { TestNode(node); TestNodes(node.Properties); return base.Walk(node); }
             public override bool Walk(ObjectLiteralField node) { TestNode(node); return base.Walk(node); }
             public override bool Walk(ObjectLiteralProperty node) { TestNode(node); return base.Walk(node); }
             public override bool Walk(ParameterDeclaration node) { TestNode(node); return base.Walk(node); }
             public override bool Walk(RegExpLiteral node) { TestNode(node); return base.Walk(node); }
             public override bool Walk(ReturnNode node) { TestNode(node); return base.Walk(node); }
-            public override bool Walk(Switch node) { TestNode(node); TestNode(node.Cases); return base.Walk(node); }
+            public override bool Walk(Switch node) { TestNode(node); TestNodes(node.Cases); return base.Walk(node); }
             public override bool Walk(SwitchCase node) { TestNode(node); return base.Walk(node); }
             public override bool Walk(ThisLiteral node) { TestNode(node); return base.Walk(node); }
             public override bool Walk(ThrowNode node) { TestNode(node); return base.Walk(node); }
@@ -5009,7 +5018,6 @@ do {
             public override bool Walk(WhileNode node) { TestNode(node); return base.Walk(node); }
             public override bool Walk(WithNode node) { TestNode(node); return base.Walk(node); }
             public override bool Walk(JsAst jsAst) { TestNode(jsAst); return base.Walk(jsAst); }
-            public override bool Walk<T>(AstNodeList<T> node) { TestNode(node); return base.Walk(node); }
             public override bool Walk(FunctionExpression functionExpression) { TestNode(functionExpression); return base.Walk(functionExpression); }
             public override bool Walk(ExpressionStatement node) { TestNode(node); return base.Walk(node); }
         }

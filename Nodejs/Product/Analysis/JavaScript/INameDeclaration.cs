@@ -26,7 +26,7 @@ namespace Microsoft.NodejsTools.Parsing
     {
         string Name { get; }
         IndexSpan NameSpan { get; }
-        Node Parent { get; }
+        Statement Parent { get; }
         Expression Initializer { get; }
         JSVariableField VariableField { get; set; }
     }

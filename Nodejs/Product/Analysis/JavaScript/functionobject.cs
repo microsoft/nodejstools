@@ -24,7 +24,7 @@ namespace Microsoft.NodejsTools.Parsing {
     [Serializable]
     public sealed class FunctionObject : Statement, INameDeclaration {
         private Block m_body;
-        private AstNodeList<ParameterDeclaration> m_parameters;
+        private ParameterDeclaration[] m_parameters;
         public FunctionObject(IndexSpan functionSpan)
             : base(functionSpan) {
         }
@@ -38,12 +38,20 @@ namespace Microsoft.NodejsTools.Parsing {
             }
         }
 
-        public AstNodeList<ParameterDeclaration> ParameterDeclarations {
+        public ParameterDeclaration[] ParameterDeclarations {
             get { return m_parameters; }
             set {
-                m_parameters.ClearParent(this);
+                if (value != null) {
+                    foreach (var node in value) {
+                        node.ClearParent(this);
+                    }
+                }
                 m_parameters = value;
-                m_parameters.AssignParent(this);
+                if (value != null) {
+                    foreach (var node in value) {
+                        node.AssignParent(this);
+                    }
+                }
             }
         }
 
@@ -98,7 +106,16 @@ namespace Microsoft.NodejsTools.Parsing {
 
         public override IEnumerable<Node> Children {
             get {
-                return EnumerateNonNullNodes(ParameterDeclarations, Body);
+                if (ParameterDeclarations != null) {
+                    foreach (var decl in ParameterDeclarations) {
+                        if (decl != null) {
+                            yield return decl;
+                        }
+                    }
+                }
+                if (Body != null) {
+                    yield return Body;
+                }
             }
         }
     }

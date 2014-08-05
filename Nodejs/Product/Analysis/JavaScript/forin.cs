@@ -42,9 +42,7 @@ namespace Microsoft.NodejsTools.Parsing
             get { return m_collection; }
             set
             {
-                m_collection.ClearParent(this);
                 m_collection = value;
-                m_collection.AssignParent(this);
             }
         }
 

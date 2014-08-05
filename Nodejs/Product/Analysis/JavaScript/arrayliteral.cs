@@ -24,16 +24,14 @@ namespace Microsoft.NodejsTools.Parsing
     [Serializable]
     public sealed class ArrayLiteral : Expression
     {
-        private AstNodeList<Expression> _elements;
+        private Expression[] _elements;
 
-        public AstNodeList<Expression> Elements 
+        public Expression[] Elements 
         {
             get { return _elements; }
             set
             {
-                _elements.ClearParent(this);
                 _elements = value;
-                _elements.AssignParent(this);
             }
         }
 

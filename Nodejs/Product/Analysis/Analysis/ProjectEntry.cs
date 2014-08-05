@@ -45,7 +45,7 @@ namespace Microsoft.NodejsTools.Analysis {
         private int _updatesPending, _waiters;
         internal bool _enqueueModuleDependencies;
         private readonly List<AnalysisProxy> _proxies = new List<AnalysisProxy>();
-        internal readonly HashSet<ProjectEntry> _visibleEntries = new HashSet<ProjectEntry>();
+        internal HashSet<ProjectEntry> _visibleEntries;
         private readonly DependentData _moduleDeps = new DependentData();
 
         // we expect to have at most 1 waiter on updated project entries, so we attempt to share the event.
@@ -309,7 +309,11 @@ namespace Microsoft.NodejsTools.Analysis {
         }
 
         internal bool IsVisible(ProjectEntry projectEntry) {
-            return projectEntry == this || _visibleEntries.Contains(projectEntry);
+            return projectEntry == this || (_visibleEntries != null && _visibleEntries.Contains(projectEntry));
+        }
+
+        public override string ToString() {
+            return "ProjectEntry: " + _filePath;
         }
     }
 

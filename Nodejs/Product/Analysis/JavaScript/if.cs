@@ -32,9 +32,7 @@ namespace Microsoft.NodejsTools.Parsing
             get { return m_condition; }
             set
             {
-                m_condition.ClearParent(this);
                 m_condition = value;
-                m_condition.AssignParent(this);
             }
         }
 

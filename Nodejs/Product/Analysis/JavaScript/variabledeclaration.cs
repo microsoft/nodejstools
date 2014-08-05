@@ -22,7 +22,7 @@ using System.Text;
 namespace Microsoft.NodejsTools.Parsing
 {
     [Serializable]
-    public sealed class VariableDeclaration : Node, INameDeclaration, INameReference
+    public sealed class VariableDeclaration : Statement, INameDeclaration, INameReference
     {
         private Expression m_initializer;
         public string Identifier { get; set; }
@@ -38,9 +38,7 @@ namespace Microsoft.NodejsTools.Parsing
             get { return m_initializer; }
             set
             {
-                m_initializer.ClearParent(this);
                 m_initializer = value;
-                m_initializer.AssignParent(this);
             }
         }
 

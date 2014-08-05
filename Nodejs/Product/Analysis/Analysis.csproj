@@ -205,7 +205,6 @@
     <Compile Include="Analysis\IAnalysisCookie.cs" />
     <Compile Include="Analysis\IAnalysisVariable.cs" />
     <Compile Include="Analysis\IEnumerableExtensions.cs" />
-    <Compile Include="Analysis\ILocationResolver.cs" />
     <Compile Include="Analysis\IndexSpan.cs" />
     <Compile Include="Analysis\NodejsModuleBuilder.cs" />
     <Compile Include="Analysis\Values\GlobalValue.cs" />
@@ -234,7 +233,6 @@
     <Compile Include="Analysis\SetOfOneEnumerator.cs" />
     <Compile Include="Analysis\SetOfTwo.cs" />
     <Compile Include="Analysis\SingleDict.cs" />
-    <Compile Include="Analysis\SourceLocationResolver.cs" />
     <Compile Include="Analysis\Values\ObjectLiteralValue.cs" />
     <Compile Include="Analysis\Values\PartiallyImmutableBuiltinFunctionValue.cs" />
     <Compile Include="Analysis\Values\PrototypeValue.cs" />
@@ -265,7 +263,6 @@
     <Compile Include="JavaScript\arrayliteral.cs" />
     <Compile Include="JavaScript\CacheDict.cs" />
     <Compile Include="JavaScript\Node.cs" />
-    <Compile Include="JavaScript\astlist.cs" />
     <Compile Include="JavaScript\binaryop.cs" />
     <Compile Include="JavaScript\block.cs" />
     <Compile Include="JavaScript\blockscope.cs" />

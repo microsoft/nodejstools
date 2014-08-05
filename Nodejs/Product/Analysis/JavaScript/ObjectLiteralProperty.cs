@@ -31,9 +31,7 @@ namespace Microsoft.NodejsTools.Parsing
             get { return m_propertyName; }
             set
             {
-                m_propertyName.ClearParent(this);
                 m_propertyName = value;
-                m_propertyName.AssignParent(this);
             }
         }
 
@@ -42,9 +40,7 @@ namespace Microsoft.NodejsTools.Parsing
             get { return m_propertyValue; }
             set
             {
-                m_propertyValue.ClearParent(this);
                 m_propertyValue = value;
-                m_propertyValue.AssignParent(this);
             }
         }
 

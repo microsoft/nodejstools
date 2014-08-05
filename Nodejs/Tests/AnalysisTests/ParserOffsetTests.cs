@@ -712,7 +712,6 @@ let x = 42;",
             public override bool Walk(WhileNode node) { AddNode(node); return true; }
             public override bool Walk(WithNode node) { AddNode(node); return true; }
             public override bool Walk(JsAst jsAst) { return true; }
-            public override bool Walk<T>(AstNodeList<T> node) { AddNode(node); return true; }
             public override bool Walk(FunctionExpression functionExpression) { AddNode(functionExpression); return true; }
             public override bool Walk(ExpressionStatement node) { AddNode(node); return true; }
 

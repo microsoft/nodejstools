@@ -24,27 +24,29 @@ namespace Microsoft.NodejsTools.Parsing
     public sealed class Switch : Statement
     {
         private Expression m_expression;
-        private AstNodeList<SwitchCase> m_cases;
+        private SwitchCase[] m_cases;
 
         public Expression Expression
         {
             get { return m_expression; }
             set
             {
-                m_expression.ClearParent(this);
                 m_expression = value;
-                m_expression.AssignParent(this);
             }
         }
 
-        public AstNodeList<SwitchCase> Cases
+        public SwitchCase[] Cases
         {
             get { return m_cases; }
             set
             {
-                m_cases.ClearParent(this);
+                foreach (var node in value) {
+                    node.ClearParent(this);
+                }
                 m_cases = value;
-                m_cases.AssignParent(this);
+                foreach (var node in value) {
+                    node.AssignParent(this);
+                }
             }
         }
 
@@ -73,9 +75,17 @@ namespace Microsoft.NodejsTools.Parsing
 
         public override IEnumerable<Node> Children
         {
-            get
-            {
-                return EnumerateNonNullNodes(Expression, Cases);
+            get {
+                if (Expression != null) {
+                    yield return Expression;
+                }
+                if (Cases != null) {
+                    foreach (var caseNode in Cases) {
+                        if (caseNode != null) {
+                            yield return caseNode;
+                        }
+                    }
+                }
             }
         }
     }

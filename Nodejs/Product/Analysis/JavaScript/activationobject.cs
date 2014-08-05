@@ -133,10 +133,7 @@ namespace Microsoft.NodejsTools.Parsing
                 if (field == null)
                 {
                     // no collision - create the catch-error field
-                    field = new JSVariableField(FieldType.CatchError, nameDecl.Name)
-                    {
-                        OriginalSpan = nameDecl.NameSpan
-                    };
+                    field = new JSVariableField(FieldType.CatchError, nameDecl.Name);
 
                     this.AddField(field);
                 }
@@ -144,7 +141,7 @@ namespace Microsoft.NodejsTools.Parsing
                 {
                     // it's an error to declare anything in the catch scope with the same name as the
                     // error variable
-                    ErrorSink.HandleError(JSError.DuplicateCatch, field.OriginalSpan, resolutionVisitor._indexResolver, true);
+                    ErrorSink.HandleError(JSError.DuplicateCatch, nameDecl.NameSpan, resolutionVisitor._indexResolver, true);
                 }
             }
             else
@@ -153,7 +150,6 @@ namespace Microsoft.NodejsTools.Parsing
                 {
                     // could be global or local depending on the scope, so let the scope create it.
                     field = this.CreateField(nameDecl.Name);
-                    field.OriginalSpan = nameDecl.NameSpan;
                     
                     // if this field is a constant, mark it now
                     var lexDeclaration = nameDecl.Parent as LexicalDeclaration;

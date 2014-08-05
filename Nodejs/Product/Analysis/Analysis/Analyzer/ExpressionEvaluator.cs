@@ -183,8 +183,8 @@ namespace Microsoft.NodejsTools.Analysis.Analyzer {
         }
 
         private static Expression GetIndexArgument(CallNode n) {
-            if (n.Arguments.Count > 0) {
-                Debug.Assert(n.Arguments.Count == 1);
+            if (n.Arguments.Length > 0) {
+                Debug.Assert(n.Arguments.Length == 1);
                 var comma = n.Arguments[0] as CommaOperator;
                 if (comma != null) {
                     return comma.Expressions[comma.Expressions.Length - 1];
@@ -203,7 +203,7 @@ namespace Microsoft.NodejsTools.Analysis.Analyzer {
                 node,
                 out value)) {
                 var objectInfo = (ObjectLiteralValue)value.First().Value;
-                if (n.Properties.Count > 50) {
+                if (n.Properties.Length > 50) {
                     // probably some generated object literal, ignore it
                     // for the post part.
                     AssignProperty(ee, node, objectInfo, n.Properties.First());
@@ -274,7 +274,7 @@ namespace Microsoft.NodejsTools.Analysis.Analyzer {
                 IAnalysisSet targetRefs = ee.EvaluateReference(node, n, out @this);
 
                 foreach (var target in targetRefs) {
-                    if (target.Value == ee._unit.Analyzer._requireFunc && n.Arguments.Count == 1) {
+                    if (target.Value == ee._unit.Analyzer._requireFunc && n.Arguments.Length == 1) {
                         // we care a lot about require analysis and people do some pretty
                         // crazy dynamic things for require calls.  If we let our normal
                         // analysis and specialized function handle it we won't get things
@@ -330,7 +330,7 @@ namespace Microsoft.NodejsTools.Analysis.Analyzer {
                 @targetRefs = baseValue.Get(node, _unit, member.Name);
             } else {
                 CallNode call = n.Function as CallNode;
-                if (call != null && call.InBrackets && call.Arguments.Count == 1) {
+                if (call != null && call.InBrackets && call.Arguments.Length == 1) {
                     baseValue = Evaluate(call.Arguments[0]);
                     targetRefs = Evaluate(call.Function);
                 } else {
@@ -341,8 +341,8 @@ namespace Microsoft.NodejsTools.Analysis.Analyzer {
             return targetRefs;
         }
 
-        private IAnalysisSet[] Evaluate(AstNodeList<Expression> astNodeList) {
-            var res = new IAnalysisSet[astNodeList.Count];
+        private IAnalysisSet[] Evaluate(Expression[] astNodeList) {
+            var res = new IAnalysisSet[astNodeList.Length];
             for (int i = 0; i < res.Length; i++) {
                 res[i] = Evaluate(astNodeList[i]);
             }
@@ -495,16 +495,16 @@ namespace Microsoft.NodejsTools.Analysis.Analyzer {
                 ).SelfSet;
             }).First().Value;
             var array = (ArrayLiteral)node;
-            if (array.Elements.Count >= 50) {
+            if (array.Elements.Length >= 50) {
                 // probably some generated object literal, ignore it
                 // for the post part.
                 sequence.AddTypes(ee._unit, new[] { Evaluate(array.Elements.First()) });
             } else {
                 var seqItems = ((ArrayLiteral)node).Elements;
-                var indexValues = new IAnalysisSet[seqItems.Count];
+                var indexValues = new IAnalysisSet[seqItems.Length];
 
 
-                for (int i = 0; i < seqItems.Count; i++) {
+                for (int i = 0; i < seqItems.Length; i++) {
                     indexValues[i] = Evaluate(seqItems[i]);
                 }
                 sequence.AddTypes(ee._unit, indexValues);

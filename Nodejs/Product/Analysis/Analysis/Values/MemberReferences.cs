@@ -22,7 +22,7 @@ namespace Microsoft.NodejsTools.Analysis.Values {
     /// A collection of references which are keyd off of project entry.
     /// </summary>
     [Serializable]
-    class ReferenceDict : Dictionary<IProjectEntry, ReferenceList> {
+    class ReferenceDict : Dictionary<ProjectEntry, ReferenceList> {
         public ReferenceList GetReferences(ProjectEntry project) {
             ReferenceList builtinRef;
             if (!TryGetValue(project, out builtinRef) || builtinRef.Version != project.AnalysisVersion) {
@@ -50,10 +50,10 @@ namespace Microsoft.NodejsTools.Analysis.Values {
     [Serializable]
     class ReferenceList : IReferenceable {
         public readonly int Version;
-        public readonly IProjectEntry Project;
+        public readonly ProjectEntry Project;
         public ISet<EncodedLocation> References;
 
-        public ReferenceList(IProjectEntry project) {
+        public ReferenceList(ProjectEntry project) {
             Version = project.AnalysisVersion;
             Project = project;
         }
@@ -64,15 +64,15 @@ namespace Microsoft.NodejsTools.Analysis.Values {
 
         #region IReferenceable Members
 
-        public IEnumerable<KeyValuePair<IProjectEntry, EncodedLocation>> Definitions {
+        public IEnumerable<KeyValuePair<ProjectEntry, EncodedLocation>> Definitions {
             get { yield break; }
         }
 
-        IEnumerable<KeyValuePair<IProjectEntry, EncodedLocation>> IReferenceable.References {
+        IEnumerable<KeyValuePair<ProjectEntry, EncodedLocation>> IReferenceable.References {
             get {
                 if (References != null) {
                     foreach (var location in References) {
-                        yield return new KeyValuePair<IProjectEntry, EncodedLocation>(Project, location);
+                        yield return new KeyValuePair<ProjectEntry, EncodedLocation>(Project, location);
                     }
                 }
             }
@@ -93,11 +93,16 @@ namespace Microsoft.NodejsTools.Analysis.Values {
 
         #region IReferenceable Members
 
-        public IEnumerable<KeyValuePair<IProjectEntry, EncodedLocation>> Definitions {
-            get { yield return new KeyValuePair<IProjectEntry, EncodedLocation>(_location.ProjectEntry, new EncodedLocation(_location, null)); }
+        public IEnumerable<KeyValuePair<ProjectEntry, EncodedLocation>> Definitions {
+            get { 
+                yield return new KeyValuePair<ProjectEntry, EncodedLocation>(
+                    _location._entry, 
+                    new EncodedLocation(_location)
+                ); 
+            }
         }
 
-        IEnumerable<KeyValuePair<IProjectEntry, EncodedLocation>> IReferenceable.References {
+        IEnumerable<KeyValuePair<ProjectEntry, EncodedLocation>> IReferenceable.References {
             get { yield break; }
         }
 

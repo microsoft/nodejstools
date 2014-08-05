@@ -17,7 +17,7 @@ using Microsoft.NodejsTools.Analysis;
 
 namespace Microsoft.NodejsTools.Parsing {
     [Serializable]
-    public class JsAst : Statement, ILocationResolver {
+    public class JsAst : Statement {
         private Block _block;
         private readonly IndexResolver _indexResolver;
 
@@ -40,7 +40,7 @@ namespace Microsoft.NodejsTools.Parsing {
             return _indexResolver.IndexToLocation(index);
         }
 
-        public LocationInfo ResolveLocation(IProjectEntry project, object location) {
+        internal LocationInfo ResolveLocation(ProjectEntry project, object location) {
             var loc = _indexResolver.IndexToLocation(((Node)location).Span.Start);
             return new LocationInfo(
                 project,

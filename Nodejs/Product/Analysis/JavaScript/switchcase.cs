@@ -31,9 +31,7 @@ namespace Microsoft.NodejsTools.Parsing
             get { return m_caseValue; }
             set
             {
-                m_caseValue.ClearParent(this);
                 m_caseValue = value;
-                m_caseValue.AssignParent(this);
             }
         }
 

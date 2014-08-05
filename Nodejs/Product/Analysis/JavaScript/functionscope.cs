@@ -74,7 +74,6 @@ namespace Microsoft.NodejsTools.Parsing
             if (FunctionObject.Name != null) {
                 // add a field for the function expression name so it can be self-referencing.
                 var functionField = this.CreateField(FunctionObject.Name);
-                functionField.OriginalSpan = FunctionObject.NameSpan;
 
                 FunctionObject.VariableField = functionField;
 
@@ -94,10 +93,7 @@ namespace Microsoft.NodejsTools.Parsing
                     if (argumentField == null)
                     {
                         // not already defined -- create a field now
-                        argumentField = new JSArgumentField(FieldType.Argument, parameter.Name, parameter.Position)
-                        {
-                            OriginalSpan = parameter.Span,
-                        };
+                        argumentField = new JSArgumentField(FieldType.Argument, parameter.Name, parameter.Position);
 
                         this.AddField(argumentField);
                     }

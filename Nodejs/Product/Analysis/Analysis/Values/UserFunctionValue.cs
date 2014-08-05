@@ -65,7 +65,7 @@ namespace Microsoft.NodejsTools.Analysis.Values {
         public override IEnumerable<LocationInfo> Locations {
             get {
                 return new[] { 
-                    FunctionObject.GlobalParent.ResolveLocation(ProjectEntry, FunctionObject)
+                    ProjectEntry.Tree.ResolveLocation(ProjectEntry, FunctionObject)
                 };
             }
         }
@@ -127,7 +127,7 @@ namespace Microsoft.NodejsTools.Analysis.Values {
 
         internal void AddParameterString(StringBuilder result) {
             if (FunctionObject.ParameterDeclarations != null) {
-                for (int i = 0; i < FunctionObject.ParameterDeclarations.Count; i++) {
+                for (int i = 0; i < FunctionObject.ParameterDeclarations.Length; i++) {
                     if (i != 0) {
                         result.Append(", ");
                     }
@@ -573,22 +573,22 @@ namespace Microsoft.NodejsTools.Analysis.Values {
             OverflowedBigTime
         }
 
-        public IEnumerable<KeyValuePair<IProjectEntry, EncodedLocation>> Definitions {
+        public IEnumerable<KeyValuePair<ProjectEntry, EncodedLocation>> Definitions {
             get {
-                yield return new KeyValuePair<IProjectEntry, EncodedLocation>(
+                yield return new KeyValuePair<ProjectEntry, EncodedLocation>(
                     ProjectEntry,
-                    new EncodedLocation(_analysisUnit.Tree, _funcObject)
+                    new EncodedLocation(_funcObject)
                 );
             }
         }
 
-        public new IEnumerable<KeyValuePair<IProjectEntry, EncodedLocation>> References {
+        public new IEnumerable<KeyValuePair<ProjectEntry, EncodedLocation>> References {
             get {
                 if (_references != null) {
                     foreach (var keyValue in _references) {
                         if (keyValue.Value.References != null) {
                             foreach (var loc in keyValue.Value.References) {
-                                yield return new KeyValuePair<IProjectEntry, EncodedLocation>(
+                                yield return new KeyValuePair<ProjectEntry, EncodedLocation>(
                                     keyValue.Key,
                                     loc
                                 );

@@ -197,13 +197,16 @@ namespace Microsoft.NodejsTools.Analysis {
                         nextAssign.Assign(new IndexSpan(reader.ReadInt32(), reader.ReadInt32()));
                         continue;
                     case SerializationType.EncodedLocation: {
-                            object resolver = null;
                             var tempNextAssign = nextAssign;
                             stack.Push(new DeserializationFrame(newValue => {
-                                tempNextAssign.Assign(new EncodedLocation((ILocationResolver)resolver, newValue));
-                            }));
-                            stack.Push(new DeserializationFrame(newValue => {
-                                resolver = newValue;
+                                Node node = newValue as Node;
+                                EncodedLocation loc;
+                                if (node != null) {
+                                    loc = new EncodedLocation(node);
+                                } else {
+                                    loc = new EncodedLocation((LocationInfo)newValue);
+                                }
+                                tempNextAssign.Assign(loc);
                             }));
                             continue;
                         }
@@ -603,7 +606,7 @@ namespace Microsoft.NodejsTools.Analysis {
         }
 
         private object DeserializeReferenceDict(Stack<DeserializationFrame> stack, BinaryReader reader) {
-            return DeserializeDictionary<IProjectEntry, ReferenceList>(stack, reader, new ReferenceDict(), reader.ReadInt32());
+            return DeserializeDictionary<ProjectEntry, ReferenceList>(stack, reader, new ReferenceDict(), reader.ReadInt32());
         }
 
         private object DeserializeCallDelegate(BinaryReader reader) {
@@ -670,7 +673,6 @@ namespace Microsoft.NodejsTools.Analysis {
         private static void SerializeEncodedLocation(object value, AnalysisSerializer serializer, Stack<object> stack, BinaryWriter writer) {
             writer.Write((byte)SerializationType.EncodedLocation);
             stack.Push(((EncodedLocation)value).Location);
-            stack.Push(((EncodedLocation)value).Resolver);
         }
 
         private static void SerializeBooleanValue(object value, BinaryWriter writer) {

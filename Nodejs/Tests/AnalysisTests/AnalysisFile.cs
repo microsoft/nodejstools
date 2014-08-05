@@ -38,10 +38,14 @@ namespace AnalysisTests {
 
     static class Analysis {
         public static JsAnalyzer Analyze(params AnalysisFile[] files) {
-            return Analyze(null, files);
+            return Analyze(null, null, files);
         }
 
         public static JsAnalyzer Analyze(AnalysisLimits limits, params AnalysisFile[] files) {
+            return Analyze(limits, null, files);
+        }
+
+        public static JsAnalyzer Analyze(AnalysisLimits limits, Action parseCallback, params AnalysisFile[] files) {
             Dictionary<string, IJsProjectEntry> entries = new Dictionary<string, IJsProjectEntry>();
             var analyzer = new JsAnalyzer(limits);
 
@@ -62,6 +66,10 @@ namespace AnalysisTests {
                         source
                     );
                 }
+            }
+
+            if (parseCallback != null) {
+                parseCallback();
             }
 
             foreach (var file in files) {
@@ -117,7 +125,7 @@ namespace AnalysisTests {
         }
 #endif
 
-        public static JsAnalyzer Analyze(string directory, AnalysisLimits limits = null) {
+        public static JsAnalyzer Analyze(string directory, AnalysisLimits limits = null, Action parseCallback = null) {
             List<AnalysisFile> files = new List<AnalysisFile>();
             foreach (var file in Directory.GetFiles(directory, "*", SearchOption.AllDirectories)) {
                 if (String.Equals(Path.GetExtension(file), ".js", StringComparison.OrdinalIgnoreCase)) {
@@ -138,7 +146,7 @@ namespace AnalysisTests {
                 }
             }
 
-            return Analyze(limits, files.ToArray());
+            return Analyze(limits, parseCallback, files.ToArray());
         }
     }
 }
