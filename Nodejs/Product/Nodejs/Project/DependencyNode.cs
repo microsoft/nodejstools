@@ -14,11 +14,16 @@
 
 using System;
 using System.Collections.Generic;
+using System.ComponentModel;
+using System.Diagnostics;
 using System.Text;
+using System.Windows.Forms;
 using Microsoft.NodejsTools.Npm;
 using Microsoft.VisualStudio;
 using Microsoft.VisualStudio.Shell;
+using Microsoft.VisualStudioTools;
 using Microsoft.VisualStudioTools.Project;
+using VsCommands2K = Microsoft.VisualStudio.VSConstants.VSStd2KCmdID;
 
 namespace Microsoft.NodejsTools.Project {
     internal class DependencyNode : HierarchyNode {
@@ -183,6 +188,12 @@ namespace Microsoft.NodejsTools.Project {
                         result = QueryStatusResult.SUPPORTED | QueryStatusResult.INVISIBLE;
                         return VSConstants.S_OK;
                 }
+            } else if (cmdGroup == Microsoft.VisualStudioTools.Project.VsMenus.guidStandardCommandSet2K) {
+                switch ((VsCommands2K)cmd) {
+                    case CommonConstants.OpenFolderInExplorerCmdId:
+                        result = QueryStatusResult.SUPPORTED | QueryStatusResult.ENABLED;
+                        return VSConstants.S_OK;
+                }
             }
 
             return base.QueryStatusOnNode(cmdGroup, cmd, pCmdText, ref result);
@@ -206,6 +217,25 @@ namespace Microsoft.NodejsTools.Project {
                     case PkgCmdId.cmdidNpmUpdateSingleModule:
                         if (null != _projectNode.ModulesNode) {
                             var t = _projectNode.ModulesNode.UpdateModule(this);
+                        }
+                        return VSConstants.S_OK;
+                }
+            } else if (cmdGroup == Microsoft.VisualStudioTools.Project.VsMenus.guidStandardCommandSet2K) {
+                switch((VsCommands2K)cmd) {
+                    case CommonConstants.OpenFolderInExplorerCmdId:
+                        string path = this.Package.Path;
+                        try {
+                            Process.Start(path);
+                        } catch (Exception ex) {
+                            if (ex is InvalidOperationException || ex is Win32Exception) {
+                                MessageBox.Show(
+                                    String.Format("Path to module does not exist:\n {0}", path),
+                                    SR.ProductName,
+                                    MessageBoxButtons.OK,
+                                    MessageBoxIcon.Error);
+                                return VSConstants.S_FALSE;
+                            }
+                            throw;
                         }
                         return VSConstants.S_OK;
                 }
