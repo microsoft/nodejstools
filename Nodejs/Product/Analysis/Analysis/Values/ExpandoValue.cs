@@ -90,8 +90,14 @@ namespace Microsoft.NodejsTools.Analysis.Values {
                 desc.Values = new EphemeralVariableDef();
             }
 
-            desc.Values.AddDependency(unit);
-            if (addRef) {
+            if (IsMutable(name)) {
+                desc.Values.AddDependency(unit);
+            }
+
+            // Don't add references to ephemeral values...  If they
+            // gain types we'll re-enqueue and the reference will be
+            // added then.
+            if (addRef && !desc.Values.IsEphemeral) {
                 desc.Values.AddReference(node, unit);
             }
 
@@ -109,6 +115,10 @@ namespace Microsoft.NodejsTools.Analysis.Values {
                 }
             }
             return res;
+        }
+
+        public virtual bool IsMutable(string name) {
+            return true;
         }
 
         public override void SetMember(Node node, AnalysisUnit unit, string name, IAnalysisSet value) {
@@ -130,8 +140,12 @@ namespace Microsoft.NodejsTools.Analysis.Values {
 
             VariableDef varRef = GetValuesDef(name);
             varRef.AddAssignment(node, unit);
-            varRef.MakeUnionStrongerIfMoreThan(ProjectState.Limits.InstanceMembers, value);
-            return varRef.AddTypes(unit, value);
+
+            if (IsMutable(name)) {
+                varRef.MakeUnionStrongerIfMoreThan(ProjectState.Limits.InstanceMembers, value);
+                return varRef.AddTypes(unit, value, declaringScope: DeclaringModule);
+            }
+            return false;
         }
 
         public override void DeleteMember(Node node, AnalysisUnit unit, string name) {
@@ -293,7 +307,7 @@ namespace Microsoft.NodejsTools.Analysis.Values {
         /// <summary>
         /// Adds a member from the built-in module.
         /// </summary>
-        public VariableDef Add(string name, IAnalysisSet value) {
+        public virtual VariableDef Add(string name, IAnalysisSet value) {
             PropertyDescriptor desc = GetDescriptor(name);
 
             VariableDef def = desc.Values;
@@ -301,17 +315,10 @@ namespace Microsoft.NodejsTools.Analysis.Values {
                 desc.Values = def = new VariableDef();
             }
 
-            def.AddTypes(ProjectEntry, value);
+            def.AddTypes(ProjectEntry, value, declaringScope: DeclaringModule);
             return def;
         }
-
-        public void Add(string name, VariableDef variable) {
-            PropertyDescriptor desc = GetDescriptor(name);
-
-            Debug.Assert(desc.Values == null);
-            desc.Values = variable;
-        }
-
+        
         public void Add(AnalysisValue value) {
             Add(value.Name, value.SelfSet);
         }
@@ -320,34 +327,38 @@ namespace Microsoft.NodejsTools.Analysis.Values {
             if (!member.IsProperty) {
                 Add(member.Name, member.Value.Proxy);
             } else {
-                PropertyDescriptor desc = GetDescriptor(member.Name);
-
-                VariableDef def = desc.Get;
-                if (def == null) {
-                    desc.Get = def = new VariableDef();
-                }
-
-                def.AddTypes(ProjectState._builtinEntry, new ReturningFunctionValue(ProjectEntry, member.Name, member.Value.Proxy).Proxy);
+                AddProperty(member);
             }
+        }
+
+        public virtual void AddProperty(MemberAddInfo member) {
+            PropertyDescriptor desc = GetDescriptor(member.Name);
+
+            VariableDef def = desc.Get;
+            if (def == null) {
+                desc.Get = def = new VariableDef();
+            }
+
+            def.AddTypes(ProjectState._builtinEntry, new ReturningFunctionValue(ProjectEntry, member.Name, member.Value.Proxy).Proxy);
         }
 
         public void AddProperty(Node node, AnalysisUnit unit, string name, AnalysisValue value) {
             PropertyDescriptor desc = GetDescriptor(name);
 
-            var get = value.Get(node, unit, "get");
+            var get = value.Get(node, unit, "get", false);
             if (get.Count > 0) {
                 if (desc.Get == null) {
                     desc.Get = new VariableDef();
                 }
-                desc.Get.AddTypes(unit, get);
+                desc.Get.AddTypes(unit, get, declaringScope: DeclaringModule);
             }
 
-            var set = value.Get(node, unit, "set");
+            var set = value.Get(node, unit, "set", false);
             if (set.Count > 0) {
                 if (desc.Set == null) {
                     desc.Set = new VariableDef();
                 }
-                desc.Set.AddTypes(unit, set);
+                desc.Set.AddTypes(unit, set, declaringScope: DeclaringModule);
             }
         }
 
@@ -490,7 +501,7 @@ namespace Microsoft.NodejsTools.Analysis.Values {
             if (propDesc.Set == null) {
                 propDesc.Set = new VariableDef();
             }
-            propDesc.Set.AddTypes(unit, analysisSet);
+            propDesc.Set.AddTypes(unit, analysisSet, declaringScope: DeclaringModule);
         }
 
         internal void DefineGetter(AnalysisUnit unit, string nameStr, IAnalysisSet analysisSet) {
@@ -503,7 +514,7 @@ namespace Microsoft.NodejsTools.Analysis.Values {
             if (propDesc.Get == null) {
                 propDesc.Get = new VariableDef();
             }
-            propDesc.Get.AddTypes(unit, analysisSet);
+            propDesc.Get.AddTypes(unit, analysisSet, declaringScope: DeclaringModule);
         }
     }
 

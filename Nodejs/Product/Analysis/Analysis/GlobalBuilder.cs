@@ -203,7 +203,7 @@ All other strings are considered decimal.", isOptional:true)
 
             return new BuiltinFunctionValue(builtinEntry, "Array", createPrototype:false) { 
                 Member("prototype", 
-                    new ObjectValue(builtinEntry) {
+                    new BuiltinObjectValue(builtinEntry) {
                         BuiltinFunction(
                             "concat",
                             "Combines two or more arrays.",
@@ -360,7 +360,7 @@ All other strings are considered decimal.", isOptional:true)
         private BuiltinFunctionValue BooleanFunction(out AnalysisValue booleanPrototype) {
             var builtinEntry = _analyzer._builtinEntry;
             var prototype = Member("prototype",
-                new ObjectValue(builtinEntry) {
+                new BuiltinObjectValue(builtinEntry) {
                     BuiltinFunction("constructor"),
                     ReturningFunction("toString", _analyzer._emptyStringValue),
                     BuiltinFunction("valueOf"),
@@ -377,7 +377,7 @@ All other strings are considered decimal.", isOptional:true)
 
             return new BuiltinFunctionValue(builtinEntry, "Date", createPrototype: false) { 
                 Member("prototype", 
-                    new ObjectValue(builtinEntry) {
+                    new BuiltinObjectValue(builtinEntry) {
                         BuiltinFunction("constructor"),
                         ReturningFunction(
                             "getDate",
@@ -636,7 +636,7 @@ All other strings are considered decimal.", isOptional:true)
 
             return new BuiltinFunctionValue(builtinEntry, "Error", createPrototype: false) { 
                 Member("prototype", 
-                    new ObjectValue(builtinEntry) {
+                    new BuiltinObjectValue(builtinEntry) {
                         BuiltinFunction("constructor"),
                         BuiltinProperty("message", _analyzer._emptyStringValue),
                         BuiltinProperty("name", _analyzer._emptyStringValue),
@@ -653,7 +653,7 @@ All other strings are considered decimal.", isOptional:true)
 
             return new BuiltinFunctionValue(builtinEntry, errorName, createPrototype: false) { 
                 Member("prototype", 
-                    new ObjectValue(builtinEntry) {
+                    new BuiltinObjectValue(builtinEntry) {
                         BuiltinFunction("arguments"),
                         BuiltinFunction("constructor"),
                         BuiltinProperty("name", _analyzer._emptyStringValue),
@@ -716,8 +716,8 @@ The this object of the bound function is associated with the specified object, a
 
             // TODO: Should we see if we have something that we should parse?
             // TODO: Should we have a per-node value for the result of parse?
-            var parseResult = new ObjectValue(builtinEntry);
-            return new ObjectValue(builtinEntry) { 
+            var parseResult = new BuiltinObjectValue(builtinEntry);
+            return new BuiltinObjectValue(builtinEntry) { 
                 ReturningFunction(
                     "parse", 
                     parseResult,
@@ -739,7 +739,7 @@ If a member contains nested objects, the nested objects are transformed before t
             var builtinEntry = _analyzer._builtinEntry;
 
             var doubleResult = _analyzer.GetConstant(0.0);
-            return new ObjectValue(builtinEntry) { 
+            return new BuiltinObjectValue(builtinEntry) { 
                 Member("E", _analyzer.GetConstant(Math.E)),
                 Member("LN10", doubleResult),
                 Member("LN2", doubleResult),
@@ -866,8 +866,8 @@ For example, the absolute value of -5 is the same as the absolute value of 5.",
         private BuiltinFunctionValue NumberFunction(out AnalysisValue numberPrototype) {
             var builtinEntry = _analyzer._builtinEntry;
 
-            var prototype = Member("prototype", 
-                new ObjectValue(builtinEntry) {
+            var prototype = Member("prototype",
+                new BuiltinObjectValue(builtinEntry) {
                     BuiltinFunction("constructor"),
                     ReturningFunction(
                         "toExponential",
@@ -932,7 +932,7 @@ For example, the absolute value of -5 is the same as the absolute value of 5.",
         private BuiltinFunctionValue ObjectFunction(out ObjectValue objectPrototype) {
             var builtinEntry = _analyzer._builtinEntry;
 
-            objectPrototype = new ObjectValue(builtinEntry) {
+            objectPrototype = new BuiltinObjectValue(builtinEntry) {
                 SpecializedFunction(
                     "__defineGetter__",
                     DefineGetter,
@@ -977,7 +977,7 @@ For example, the absolute value of -5 is the same as the absolute value of 5.",
                 ),   
             };
 
-            return new PartiallyImmutableBuiltinFunctionValue(builtinEntry, "Object", _immutableObjectFields, createPrototype: false) { 
+            return new BuiltinFunctionValue(builtinEntry, "Object", createPrototype: false) { 
                 Member("prototype", objectPrototype),
                 BuiltinFunction(
                     "getPrototypeOf",
@@ -1128,12 +1128,12 @@ on that object, and are not inherited from the object's prototype. The propertie
                         foreach (var properties in args[1]) {
                             ExpandoValue propsObj = properties.Value as ExpandoValue;
                             if (propsObj != null && propsObj.Descriptors != null) {
-                                foreach (var keyValue in propsObj.Descriptors) {
-                                    foreach (var propValue in propsObj.Get(node, unit, keyValue.Key)) {
+                                foreach (var propName in propsObj.Descriptors.Keys) {
+                                    foreach (var propValue in propsObj.Get(node, unit, propName)) {
                                         target.AddProperty(
                                             node,
                                             unit,
-                                            keyValue.Key,
+                                            propName,
                                             propValue.Value
                                         );
                                     }
@@ -1174,7 +1174,7 @@ on that object, and are not inherited from the object's prototype. The propertie
 
             return new BuiltinFunctionValue(builtinEntry, "RegExp", createPrototype: false) { 
                 Member("prototype", 
-                    new ObjectValue(builtinEntry) {
+                    new BuiltinObjectValue(builtinEntry) {
                         BuiltinFunction("compile"),   
                         BuiltinFunction("constructor"),   
                         BuiltinFunction(
@@ -1233,8 +1233,8 @@ on that object, and are not inherited from the object's prototype. The propertie
 
         private BuiltinFunctionValue StringFunction(out AnalysisValue stringPrototype) {
             var builtinEntry = _analyzer._builtinEntry;
-            var prototype = Member("prototype", 
-                new ObjectValue(builtinEntry) {
+            var prototype = Member("prototype",
+                new BuiltinObjectValue(builtinEntry) {
                     ReturningFunction(
                         "anchor",
                         _analyzer._emptyStringValue,

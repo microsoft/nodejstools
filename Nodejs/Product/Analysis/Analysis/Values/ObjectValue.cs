@@ -137,7 +137,7 @@ namespace Microsoft.NodejsTools.Analysis.Values {
                     // need to be re-evaluated with the new __proto__ value.
                     foreach (var kvp in Descriptors) {
                         if (kvp.Value.Values != null) {
-                            kvp.Value.Values.EnqueueDependents();
+                            kvp.Value.Values.EnqueueDependents(unit.ProjectEntry, ProjectEntry);
                         }
                     }
                 }

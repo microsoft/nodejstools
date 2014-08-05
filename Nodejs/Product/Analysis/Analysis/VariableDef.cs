@@ -64,14 +64,16 @@ namespace Microsoft.NodejsTools.Analysis {
         /// Enqueues any nodes which depend upon this type into the provided analysis queue for
         /// further analysis.
         /// </summary>
-        public void EnqueueDependents() {
+        public void EnqueueDependents(ProjectEntry assigner = null, ProjectEntry declaringScope = null) {
             bool hasOldValues = false;
             foreach (var keyValue in _dependencies) {
                 if (keyValue.Key.AnalysisVersion == keyValue.Value.Version) {
-                    var val = keyValue.Value;
-                    if (val.DependentUnits != null) {
-                        foreach (var analysisUnit in val.DependentUnits) {
-                            analysisUnit.Enqueue();
+                    if (assigner == null || IsVisible(keyValue.Key, declaringScope, assigner)) {
+                        var val = keyValue.Value;
+                        if (val.DependentUnits != null) {
+                            foreach (var analysisUnit in val.DependentUnits) {
+                                analysisUnit.Enqueue();
+                            }
                         }
                     }
                 } else {
@@ -87,6 +89,16 @@ namespace Microsoft.NodejsTools.Analysis {
         public bool AddDependency(AnalysisUnit unit) {
             if (!unit.ForEval) {
                 return GetDependentItems(unit.DeclaringModuleEnvironment.ProjectEntry).AddDependentUnit(unit);
+            }
+            return false;
+        }
+
+        protected static bool IsVisible(ProjectEntry accessor, ProjectEntry declaringScope, ProjectEntry assigningScope) {
+            if (accessor != null && accessor.IsVisible(assigningScope)) {
+                return true;
+            }
+            if (declaringScope != null && declaringScope.IsVisible(assigningScope)) {
+                return true;
             }
             return false;
         }
@@ -247,8 +259,8 @@ namespace Microsoft.NodejsTools.Analysis {
             return roughSet.Count >= typeCount;
         }
 
-        public bool AddTypes(AnalysisUnit unit, IAnalysisSet newTypes, bool enqueue = true) {
-            return AddTypes(unit.ProjectEntry, newTypes, enqueue);
+        public bool AddTypes(AnalysisUnit unit, IAnalysisSet newTypes, bool enqueue = true, ProjectEntry declaringScope = null) {
+            return AddTypes(unit.ProjectEntry, newTypes, enqueue, declaringScope);
         }
 
         // Set checks ensure that the wasChanged result is correct. The checks
@@ -259,12 +271,12 @@ namespace Microsoft.NodejsTools.Analysis {
         private static bool ENABLE_SET_CHECK = false;
 #endif
 
-        public bool AddTypes(ProjectEntry projectEntry, IAnalysisSet newTypes, bool enqueue = true) {
+        public bool AddTypes(ProjectEntry projectEntry, IAnalysisSet newTypes, bool enqueue = true, ProjectEntry declaringScope = null) {
             object dummy;
             if (LockedVariableDefs.TryGetValue(this, out dummy)) {
                 return false;
             }
-
+            
             bool added = false;
             if (newTypes.Count > 0) {
                 var dependencies = GetDependentItems(projectEntry);
@@ -290,7 +302,7 @@ namespace Microsoft.NodejsTools.Analysis {
                     }
                 }
                 if (added && enqueue) {
-                    EnqueueDependents();
+                    EnqueueDependents(projectEntry, declaringScope);
                 }
 
             }
@@ -348,16 +360,6 @@ namespace Microsoft.NodejsTools.Analysis {
             }
 
             return res;
-        }
-
-        private static bool IsVisible(ProjectEntry accessor, ProjectEntry declaringScope, ProjectEntry assigningScope) {
-            if (accessor != null && accessor.IsVisible(assigningScope)) {
-                return true;
-            }
-            if (declaringScope != null && declaringScope.IsVisible(assigningScope)) {
-                return true;
-            }
-            return false;
         }
 
         public bool HasTypes {

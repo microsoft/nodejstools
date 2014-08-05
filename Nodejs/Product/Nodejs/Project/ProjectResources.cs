@@ -150,6 +150,8 @@ namespace Microsoft.NodejsTools.Project {
         internal const string RequestedVersionRangeNone = "RequestedVersionRangeNone";
         internal const string ScriptArgumentsToolTip = "ScriptArgumentsToolTip";
         internal const string StartBrowserToolTip = "StartBrowserToolTip";
+        internal const string StatusAnalysisSaved = "StatusAnalysisSaved";
+        internal const string StatusAnalysisSaving = "StatusAnalysisSaving";
         internal const string TestFramework = "TestFramework";
         internal const string TestFrameworkDescription = "TestFrameworkDescription";
         internal const string WorkingDirInvalidOrMissing = "WorkingDirInvalidOrMissing";

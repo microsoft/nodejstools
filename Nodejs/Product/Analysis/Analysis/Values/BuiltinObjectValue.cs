@@ -19,10 +19,25 @@ using System.Text;
 
 namespace Microsoft.NodejsTools.Analysis.Values {
     [Serializable]
-    class GlobalValue : BuiltinObjectValue {
-        public GlobalValue(ProjectEntry projectEntry)
-            : base(projectEntry) {
+    class BuiltinObjectValue : ObjectValue {
+        private readonly HashSet<string> _immutableMembers = new HashSet<string>();
+
+        public BuiltinObjectValue(ProjectEntry projectEntry, FunctionValue creator = null, string description = null)
+            : base(projectEntry, creator, description) {
         }
 
+        public override VariableDef Add(string name, IAnalysisSet value) {
+            _immutableMembers.Add(name);
+            return base.Add(name, value);
+        }
+
+        public override void AddProperty(MemberAddInfo member) {
+            _immutableMembers.Add(member.Name);
+            base.AddProperty(member);
+        }
+
+        public override bool IsMutable(string name) {
+            return _immutableMembers.Contains(name);
+        }
     }
 }

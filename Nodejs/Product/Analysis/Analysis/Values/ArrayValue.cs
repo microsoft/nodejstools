@@ -122,7 +122,7 @@ namespace Microsoft.NodejsTools.Analysis.Values {
             bool added = false;
             for (int i = 0; i < types.Length; i++) {
                 added |= _indexTypes[i].MakeUnionStrongerIfMoreThan(ProjectState.Limits.IndexTypes, types[i]);
-                added |= _indexTypes[i].AddTypes(unit, types[i]);
+                added |= _indexTypes[i].AddTypes(unit, types[i], declaringScope: DeclaringModule);
             }
 
             if (added) {

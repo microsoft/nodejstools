@@ -54,7 +54,7 @@ namespace Microsoft.NodejsTools.Analysis.Values {
                 if (userFunc != null) {
                     var env = (FunctionEnvironmentRecord)(userFunc.AnalysisUnit._env);
 
-                    env._this.AddTypes(unit, _instance.SelfSet);
+                    env._this.AddTypes(unit, _instance.SelfSet, declaringScope: DeclaringModule);
                 }
             }
             base.SetMember(node, unit, name, value);

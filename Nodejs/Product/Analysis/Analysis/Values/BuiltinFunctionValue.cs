@@ -31,6 +31,7 @@ namespace Microsoft.NodejsTools.Analysis.Values {
         private readonly string _name;
         private readonly ParameterResult[] _signature;
         private readonly string _documentation;
+        private readonly HashSet<string> _immutableMembers = new HashSet<string>();
 
         public BuiltinFunctionValue(ProjectEntry projectEntry,
             string name,
@@ -48,6 +49,20 @@ namespace Microsoft.NodejsTools.Analysis.Values {
             Add("caller", projectEntry.Analyzer._nullInst.Proxy);
 
             projectEntry.Analyzer.AnalysisValueCreated(typeof(BuiltinFunctionValue));
+        }
+
+        public override VariableDef Add(string name, IAnalysisSet value) {
+            _immutableMembers.Add(name);
+            return base.Add(name, value);
+        }
+
+        public override void AddProperty(MemberAddInfo member) {
+            _immutableMembers.Add(member.Name);
+            base.AddProperty(member);
+        }
+
+        public override bool IsMutable(string name) {
+            return _immutableMembers.Contains(name);
         }
 
         public override IEnumerable<OverloadResult> Overloads {

@@ -207,6 +207,7 @@
     <Compile Include="Analysis\IEnumerableExtensions.cs" />
     <Compile Include="Analysis\IndexSpan.cs" />
     <Compile Include="Analysis\NodejsModuleBuilder.cs" />
+    <Compile Include="Analysis\Values\BuiltinObjectValue.cs" />
     <Compile Include="Analysis\Values\GlobalValue.cs" />
     <Compile Include="Analysis\Values\ImmutableObjectValue.cs" />
     <Compile Include="Analysis\Values\InheritsPrototypeValue.cs" />
@@ -234,7 +235,6 @@
     <Compile Include="Analysis\SetOfTwo.cs" />
     <Compile Include="Analysis\SingleDict.cs" />
     <Compile Include="Analysis\Values\ObjectLiteralValue.cs" />
-    <Compile Include="Analysis\Values\PartiallyImmutableBuiltinFunctionValue.cs" />
     <Compile Include="Analysis\Values\PrototypeValue.cs" />
     <Compile Include="Analysis\Values\SpecializedUserFunctionValue.cs" />
     <Compile Include="Analysis\Values\StringValue.cs" />

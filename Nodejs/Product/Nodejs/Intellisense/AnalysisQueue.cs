@@ -19,6 +19,8 @@ using System.IO;
 using System.Threading;
 using System.Threading.Tasks;
 using Microsoft.NodejsTools.Analysis;
+using Microsoft.NodejsTools.Project;
+using Microsoft.VisualStudio.Shell.Interop;
 
 namespace Microsoft.NodejsTools.Intellisense {
     /// <summary>
@@ -51,13 +53,17 @@ namespace Microsoft.NodejsTools.Intellisense {
                 // must be kept in sync with Serialize
                 _queue = (List<IAnalyzable>[])serializer.Deserialize(stream);
                 _enqueuedGroups = (HashSet<IGroupableAnalysisProject>)serializer.Deserialize(stream);
-                _lastSave = DateTime.Now + TimeSpan.FromMinutes(1);
+                // we're using the cached analysis, don't re-save for another 15 minutes
+                _lastSave = DateTime.Now;
             } else {
                 _queue = new List<IAnalyzable>[PriorityCount];
                 for (int i = 0; i < PriorityCount; i++) {
                     _queue[i] = new List<IAnalyzable>();
                 }
                 _enqueuedGroups = new HashSet<IGroupableAnalysisProject>();
+                // save the analysis once it's ready, but give us a little time to be
+                // initialized and start processing stuff...
+                _lastSave = DateTime.Now - _SaveAnalysisTime + TimeSpan.FromSeconds(10);
             }
 
             _workThread = new Thread(Worker);
@@ -180,6 +186,7 @@ namespace Microsoft.NodejsTools.Intellisense {
                 ((AutoResetEvent)threadStarted).Set();
             }
 
+            bool analyzedAnything = false;
             while (!_cancel.IsCancellationRequested) {
                 IAnalyzable workItem;
 
@@ -189,6 +196,7 @@ namespace Microsoft.NodejsTools.Intellisense {
                     _isAnalyzing = true;
                 }
                 if (workItem != null) {
+                    analyzedAnything = true;
                     var groupable = workItem as IGroupableAnalysisProjectEntry;
                     if (groupable != null) {
                         bool added = _enqueuedGroups.Add(groupable.AnalysisGroup);
@@ -201,9 +209,18 @@ namespace Microsoft.NodejsTools.Intellisense {
                         workItem.Analyze(_cancel.Token);
                     }
                 } else {
-                    if (_lastSave == default(DateTime) || (DateTime.Now - _lastSave) > _SaveAnalysisTime) {
+                    if (analyzedAnything && (DateTime.Now - _lastSave) > _SaveAnalysisTime) {
+                        var statusbar = (IVsStatusbar)NodejsPackage.GetGlobalService(typeof(SVsStatusbar));
+                        if (statusbar != null) {
+                            statusbar.SetText(SR.GetString(SR.StatusAnalysisSaving));
+                        }
+
                         _analyzer.SaveAnalysis();
                         _lastSave = DateTime.Now;
+
+                        if (statusbar != null) {
+                            statusbar.SetText(SR.GetString(SR.StatusAnalysisSaved));
+                        }
                     }
 
                     _isAnalyzing = false;

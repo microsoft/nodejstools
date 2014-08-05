@@ -186,7 +186,7 @@ namespace Microsoft.NodejsTools.Analysis {
 
         private void GenerateGlobal(ObjectValue exports, dynamic klass) {
             string name = FixClassName((string)klass["name"]);
-            ObjectValue value = new ObjectValue(
+            ObjectValue value = new BuiltinObjectValue(
                 exports.ProjectEntry,
                 null,
                 ParseDocumentation((string)klass["desc"])
@@ -212,7 +212,7 @@ namespace Microsoft.NodejsTools.Analysis {
                     value.Add(
                         new MemberAddInfo(
                             propName,
-                            new ObjectValue(
+                            new BuiltinObjectValue(
                                 exports.ProjectEntry
                             ),
                             desc,

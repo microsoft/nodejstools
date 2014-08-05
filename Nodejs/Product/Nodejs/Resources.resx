@@ -520,4 +520,10 @@
   <data name="LongPathNpmDedupDidNotHelp" xml:space="preserve">
     <value>Unfortunately, running 'npm dedup' did not resolve the issue. Please consult the &lt;a href="#help"&gt;documentation&lt;/a&gt; for other potential workarounds.</value>
   </data>
+  <data name="StatusAnalysisSaved" xml:space="preserve">
+    <value>Node.js analysis saved to disk</value>
+  </data>
+  <data name="StatusAnalysisSaving" xml:space="preserve">
+    <value>Saving Node.js analysis to disk...</value>
+  </data>
 </root>
