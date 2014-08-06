@@ -91,6 +91,7 @@ namespace Microsoft.VisualStudioTools.Project {
         internal const string FileOrFolderAlreadyExists = "FileOrFolderAlreadyExists";
         internal const string FileOrFolderCannotBeFound = "FileOrFolderCannotBeFound";
         internal const string FileProperties = "FileProperties";
+        internal const string FolderCannotBeCreatedOnDisk = "FolderCannotBeCreatedOnDisk";
         internal const string FolderName = "FolderName";
         internal const string FolderNameDescription = "FolderNameDescription";
         internal const string FolderPathTooLongShortMessage = "FolderPathTooLongShortMessage";
