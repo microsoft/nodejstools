@@ -136,8 +136,9 @@ class LinkMapper:
         return '[{}]({})'.format(title, self.issue_url_base + number)
 
     def replace_video_links(self, matchobj):
-        video_id = matchobj.group(3)
-        title = matchobj.group(2) or ("YouTube video " + matchobj.group(3))
+        video_id = matchobj.group(2)
+        title = matchobj.group(1) or ("YouTube video " + matchobj.group(2))
+        width = 480 * float(matchobj.group(3) or 1)
 
         thumbnail_filename = 'VideoThumbnails/{}.png'.format(video_id)
         if self.list_outputs_only:
@@ -154,11 +155,11 @@ class LinkMapper:
         PIL.Image.alpha_composite(thumbnail, overlay).save(thumbnail_filename)
 
         return """
-<p style="text-align: center">
+<p>
 <a href="http://www.youtube.com/watch?v={0}" target="_blank" style="display: inline-block">
-<img src="{1}" alt="{2}" border="0" width="480" height="360" />
+<img src="{1}" alt="{2}" border="0" width="{3}"/>
 </a></p>
-               """.format(video_id, thumbnail_filename, title)
+               """.format(video_id, thumbnail_filename, title, width)
 
     @property
     def patterns(self):
@@ -167,8 +168,8 @@ class LinkMapper:
             (r'(?<!`)\[src\:([^\]]+)\]', self.replace_source_links, False),
             (r'(?<!`)\[file\:([^\]]+)\]', self.replace_file_links, False),
             (r'(?<!`)\[wiki\:("([^"]+)"\s*)?([^\]]+)\]', self.replace_wiki_links, False),
-            (r'(?<!`)\[issue\:("([^"]+)"\s*)?([0-9]+)\]', self.replace_issue_links, False),
-            (r'(?<!`)\[video\:("([^"]+)"\s*)?([^\]]+)\]', self.replace_video_links, True),
+            (r'(?<!`)\[issue\:("([^"]+)"\s*)?(\d+)\]', self.replace_issue_links, False),
+            (r'(?<!`)\[video\:(?:"([^"]+)"\s*)?(\w+)\s*(\d+(?:\.\d+)?)?\]', self.replace_video_links, True),
         ]
 
 

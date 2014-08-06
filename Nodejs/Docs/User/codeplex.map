@@ -4,7 +4,7 @@
     "AzureDeployment.html": "c5ba725fcc9e3533839ba98adc783f798326d026d716d53d468f36975aab2456",
     "AzureWebSiteGit.html": "aea1daebf0b7e3a5d653995236403b3e70eaadfca95332efd105e8191d9ab3e1",
     "AzureWebSiteWebDeploy.html": "12feb99a5a3c46ee905d91c9353a6954ae6939f5ab678288f3962cc097c2c56d",
-    "Debugging.html": "3ab24f981beb2483aa61f17584846fa1c2cbd116c9f9770e84dabc48f1ab72a1",
+    "Debugging.html": "a0deaf8bdd667797bcde11228ed8a4503a1f615a499bfe6b5ee20c84bfb31f09",
     "Documentation.html": "67157804175eb60c3eab03a33c27decbadba2ee8016fc7304c2256274af939d4",
     "Editor.html": "09f81f46a7830c86c0e57a8429b073da2551db26c918bc24b26100c57ec11791",
     "Images\\AzureCloudServiceActivityLog.png": "http://www.codeplex.com/Download?ProjectName=nodejstools&DownloadId=760435",
@@ -166,11 +166,12 @@
     "Images\\prof-source.png": "http://www.codeplex.com/Download?ProjectName=nodejstools&DownloadId=760438",
     "Installation.html": "2f0a6d5889f2446a746af16edc386d27bcee2b5026cc6ad359a267dd3b3a2f37",
     "NodeJSOnLinuxOnAzure.html": "d5bf1aed5283543d5a80efe8dcb9a20ffaf566d6a1eb7bbfe5e902963949b050",
-    "Npm.html": "112d19ec6a062adc9ca050ce9b389cc63f0309a5bbc8ce47693a9ce1cf5dd411",
-    "Profiling.html": "f3de84028305b569abaff8f017e5f404baaa8f8dd94f286cac7a0e8d8d7a429e",
+    "Npm.html": "00b021137bcc507a1508740b1f496e379a7f036657e1a0452ab287c6b6638eeb",
+    "Profiling.html": "476b27f6189185e0a77c2376bf9a0f14585aded860965f7d23af38fdf24883d8",
     "Projects.html": "db44eb675ea7014f07b4a373dd5faab6ae6f08d1f71e034ae14b6800b2323263",
-    "TestExplorer.html": "b3a22fdddaa7363f2f624529a0e6fed1d6333a60a20e3661040a5a49b1ced32d",
+    "TestExplorer.html": "77eca9ddbd92b9b5835605c31667d5562c2479ce6ffa25f2427b752c11a92ad1",
     "TestFrameworkExtensibility.html": "a11aa70e42704d46161d1ab03ff6bf9caa58ddb383e60104ea35a91343594792",
     "TypeScript.html": "bd56bd43db284d53cf596fe0da1f7bb4caaf56809fef04718f3f3804e67788db",
-    "UnitTests.html": "3eb73f16fe6ab95b6646d631df3a73d30dd9d04a5220ab1c739cd6ffc1218585"
+    "UnitTests.html": "e684d4318fac41485763ff7c7713a9084fa827e2b531c1e93efeaa24dfe21fe4",
+    "VideoThumbnails\\SaOnGN6byeo.png": "http://www.codeplex.com/Download?ProjectName=nodejstools&DownloadId=887217"
 }

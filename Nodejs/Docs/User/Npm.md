@@ -1,6 +1,17 @@
 ## npm
 
-Looking to avoid not-invented-here syndrome? **npm** allows you to install and manage packages for use in your Node.js apps (among other things). We'll assume you're familiar with basic npm functionality, otherwise check out [npmjs.org](http://npmjs.org) to learn more.
+One of the best things about Node.js is its extensive package ecosystem. **npm** allows you to install and manage packages for use in your Node.js apps (among other things). We'll assume you're familiar with basic npm functionality, otherwise check out [npmjs.org](http://npmjs.org) to learn more.
+
+There are several ways you can work with npm in Node.js Tools for Visual Studio:
+
+1. [```npm``` in the Command Prompt](#npm-in-the-command-prompt) - for running npm the good ol' fashioned way (in cmd.exe)
+2. [```.npm``` in the Node.js Interactive Window](#npm-in-the-nodejs-interactive-window) - for running npm without leaving Visual Studio
+3. [npm install GUI](#browsinginstalling-new-npm-packages-in-the-gui) - for browsing/installing packages from the npm repository
+4. [Solution Explorer](#managing-installed-packages-in-solution-explorer) - for viewing/managing installed packages
+5. [npm log in Output Window](#npm-log-in-output-window) - for viewing the output of npm commands in your Visual Studio session
+
+All of them will work together and synchronize with the project system. Let's take a look.
+[video:"npm in NTVS Walkthrough" SaOnGN6byeo 0.5]
 
 ### npm in the command prompt
 
@@ -16,6 +27,7 @@ If you're addicted to the npm command line interface, you'll feel right at home 
 ```
 > .npm install azure -g
 ```
+
 
 ![Interactive Window](Images/npm-interactive-window.png)
 
@@ -50,6 +62,7 @@ The corresponding npm command is:
 ```
 npm install azure@~0.8 --save-dev
 ```
+
 
 ![Install Packages GUI Options](Images/npm-install-new-package.png)
 
