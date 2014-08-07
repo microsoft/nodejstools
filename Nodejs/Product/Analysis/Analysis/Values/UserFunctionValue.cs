@@ -252,7 +252,26 @@ namespace Microsoft.NodejsTools.Analysis.Values {
         }
 
         public override IAnalysisSet Call(Node node, AnalysisUnit unit, IAnalysisSet @this, IAnalysisSet[] args) {
-            if (_overflowed == OverflowState.OverflowedBigTime) {
+            // if the arguments are complex then we'll do a merged analysis, otherwise we'll analyze
+            // this set of arguments independently.
+            bool skipDeepAnalysis = false;
+            for (int i = 0; i < args.Length; i++) {
+                int argCount = args[i].Count;
+                if (argCount <= 1) {
+                    continue;
+                }
+                foreach (var arg in args) {
+                    if (arg == unit.Analyzer._undefined || arg == unit.Analyzer._nullInst) {
+                        argCount--;
+                    }
+                }
+                if (argCount > 1) {
+                    skipDeepAnalysis = true;
+                    break;
+                }
+            }
+
+            if (skipDeepAnalysis || _overflowed == OverflowState.OverflowedBigTime) {
                 // start merging all arguments into a single call analysis                
                 if (_analysisUnit.AddArgumentTypes(
                     (FunctionEnvironmentRecord)_analysisUnit._env,
