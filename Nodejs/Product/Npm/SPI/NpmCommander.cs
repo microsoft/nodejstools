@@ -71,11 +71,19 @@ namespace Microsoft.NodejsTools.Npm.SPI {
         }
 
         private void RegisterLogEvents(NpmCommand command) {
+            command.CommandStarted += command_CommandStarted;
+            command.OutputLogged += command_OutputLogged;
+            command.CommandCompleted += command_CommandCompleted;
+
             command.ErrorLogged += command_ErrorLogged;
             command.ExceptionLogged += command_ExceptionLogged;
         }
 
         private void UnregisterLogEvents(NpmCommand command) {
+            command.CommandStarted -= command_CommandStarted;
+            command.OutputLogged -= command_OutputLogged;
+            command.CommandCompleted -= command_CommandCompleted;
+
             command.ErrorLogged -= command_ErrorLogged;
             command.ExceptionLogged -= command_ExceptionLogged;
         }
