@@ -308,6 +308,17 @@ namespace Microsoft.NodejsTools.Analysis {
             }
             var ns2 = set as AnalysisSetDetails.AnalysisSetTwoObject;
             if (ns2 != null) {
+                if (ns2.Value1 == null) {
+                    if (ns2.Value2 == null) {
+                        wasChanged = false;
+                        return AnalysisSetEmptyUnion.Instances[comparer.Strength];
+                    }
+                    wasChanged = false;
+                    return new AnalysisSetOneUnion(ns2.Value2, comparer);
+                } else if (ns2.Value2 == null) {
+                    wasChanged = false;
+                    return new AnalysisSetOneUnion(ns2.Value1, comparer);
+                }
                 if (comparer.Equals(ns2.Value1, ns2.Value2)) {
                     bool dummy;
                     return new AnalysisSetDetails.AnalysisSetOneUnion(comparer.MergeTypes(ns2.Value1, ns2.Value2, out dummy), comparer);

@@ -46,7 +46,7 @@ namespace Microsoft.VisualStudioTools.Project.Automation {
 
         public override ProjectItems ProjectItems {
             get {
-                return this.Collection;
+                return new OAProjectItems(Project, Node);
             }
         }
         #endregion
