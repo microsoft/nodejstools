@@ -71,23 +71,11 @@ namespace Microsoft.NodejsTools.Npm.SPI {
         }
 
         private void RegisterLogEvents(NpmCommand command) {
-            if (!(command is NpmSearchCommand)) {
-                command.CommandStarted += command_CommandStarted;
-                command.OutputLogged += command_OutputLogged;
-                command.CommandCompleted += command_CommandCompleted;
-            }
-
             command.ErrorLogged += command_ErrorLogged;
             command.ExceptionLogged += command_ExceptionLogged;
         }
 
         private void UnregisterLogEvents(NpmCommand command) {
-            if (!(command is NpmSearchCommand)) {
-                command.CommandStarted -= command_CommandStarted;
-                command.OutputLogged -= command_OutputLogged;
-                command.CommandCompleted -= command_CommandCompleted;
-            }
-
             command.ErrorLogged -= command_ErrorLogged;
             command.ExceptionLogged -= command_ExceptionLogged;
         }
@@ -171,16 +159,6 @@ namespace Microsoft.NodejsTools.Npm.SPI {
 
         public async Task<bool> UninstallGlobalPackageAsync(string packageName) {
             return await UninstallPackageAsync(packageName, true);
-        }
-
-        public async Task<IList<IPackage>> SearchAsync(string searchText) {
-            _command = new NpmSearchCommand(
-                _npmController.FullPathToRootPackageDirectory,
-                searchText,
-                _npmController.PathToNpm,
-                _npmController.UseFallbackIfNpmNotFound);
-            var success = await DoCommandExecute(false);
-            return success ? (_command as NpmSearchCommand).Results : new List<IPackage>();
         }
 
         public async Task<IPackageCatalog> GetCatalogueAsync(bool forceDownload) {

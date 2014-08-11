@@ -15,9 +15,7 @@
 using System;
 using System.Collections.Generic;
 using System.IO;
-using System.Linq;
 using System.Text;
-using System.Threading.Tasks;
 
 namespace NpmTests {
     /// <summary>
@@ -167,8 +165,8 @@ namespace NpmTests {
 
         #region IDisposable implementation and ancillary methods
 
-        private bool m_Disposed;
-        private string m_ObjectName;
+        private bool _disposed;
+        private string _objectName;
 
         public void Dispose() {
             Dispose(true);
@@ -179,7 +177,7 @@ namespace NpmTests {
         /// Returns a value indicating if this instance has been disposed.
         /// </summary>
         public bool IsDisposed {
-            get { return m_Disposed; }
+            get { return _disposed; }
         }
 
         /// <summary>
@@ -187,8 +185,8 @@ namespace NpmTests {
         /// is the Name property of <see cref="Object.GetType()"/>.
         /// </summary>
         protected string ObjectName {
-            get { return !String.IsNullOrEmpty(m_ObjectName) ? m_ObjectName : GetType().Name; }
-            set { m_ObjectName = value; }
+            get { return !String.IsNullOrEmpty(_objectName) ? _objectName : GetType().Name; }
+            set { _objectName = value; }
         }
 
         /// <summary>
@@ -196,7 +194,7 @@ namespace NpmTests {
         /// </summary>
         /// <exception cref="ObjectDisposedException">This instance has been disposed.</exception>
         protected void CheckDisposed() {
-            if (m_Disposed) {
+            if (_disposed) {
                 throw new ObjectDisposedException(ObjectName);
             }
         }
@@ -482,7 +480,7 @@ namespace NpmTests {
         protected void Dispose(bool disposing) {
             lock (_lock) {
                 if (!IsDisposed) {
-                    m_Disposed = true;
+                    _disposed = true;
                     // delete files we've been told to delete
                     // these are unmanaged resources, so delete the files wherever we're called from
                     foreach (KeyValuePair<string, bool> kvp in _files) {

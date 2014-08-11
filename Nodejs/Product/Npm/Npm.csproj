@@ -93,8 +93,6 @@
     <Compile Include="INpmController.cs" />
     <Compile Include="INpmLogSource.cs" />
     <Compile Include="INpmPathProvider.cs" />
-    <Compile Include="INpmSearchLexer.cs" />
-    <Compile Include="INpmSearchParser.cs" />
     <Compile Include="IPackage.cs" />
     <Compile Include="IPackageCatalog.cs" />
     <Compile Include="IPackageCatalogFilter.cs" />
@@ -116,10 +114,8 @@
     <Compile Include="SPI\GenericNpmCommand.cs" />
     <Compile Include="SPI\NpmSearchRegexComparer.cs" />
     <Compile Include="SPI\NpmSearchFilterStringComparer.cs" />
-    <Compile Include="NpmSearchParserFactory.cs" />
     <Compile Include="PackageCatalogFilterFactory.cs" />
     <Compile Include="PackageComparer.cs" />
-    <Compile Include="PackageEventArgs.cs" />
     <Compile Include="PackageFlags.cs" />
     <Compile Include="PackageJsonException.cs" />
     <Compile Include="PackageJsonFactory.cs" />
@@ -136,7 +132,6 @@
     <Compile Include="SPI\NpmCommander.cs" />
     <Compile Include="SPI\NpmGetCatalogueCommand.cs" />
     <Compile Include="SPI\PackageCatalogFilter.cs" />
-    <Compile Include="TokenEventArgs.cs" />
     <Compile Include="SemverVersion.cs" />
     <Compile Include="SemverVersionFormatException.cs" />
     <Compile Include="SPI\AbstractNodeModules.cs" />
@@ -156,9 +151,6 @@
     <Compile Include="SPI\NpmController.cs" />
     <Compile Include="SPI\NpmInstallCommand.cs" />
     <Compile Include="SPI\NpmLsCommand.cs" />
-    <Compile Include="SPI\NpmSearchCommand.cs" />
-    <Compile Include="SPI\NpmSearchLexer.cs" />
-    <Compile Include="SPI\NpmSearchParser.cs" />
     <Compile Include="SPI\NpmUninstallCommand.cs" />
     <Compile Include="SPI\NpmUpdateCommand.cs" />
     <Compile Include="SPI\Package.cs" />
@@ -170,7 +162,6 @@
     <Compile Include="SPI\RootPackage.cs" />
     <Compile Include="SPI\Script.cs" />
     <Compile Include="SPI\Scripts.cs" />
-    <Compile Include="TokenFlags.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="packages.config" />
@@ -179,8 +170,10 @@
     <EmbeddedResource Include="Resources.resx">
       <Generator>ResXFileCodeGenerator</Generator>
       <LastGenOutput>Resources.Designer.cs</LastGenOutput>
+      <SubType>Designer</SubType>
     </EmbeddedResource>
   </ItemGroup>
+  <ItemGroup />
   <Import Project="..\ProjectAfter.settings" />
   <Import Project="$(SolutionDir)\.nuget\nuget.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 

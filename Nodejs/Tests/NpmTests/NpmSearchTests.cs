@@ -20,6 +20,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using Microsoft.NodejsTools.Npm;
+using Microsoft.NodejsTools.Npm.SPI;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using TestUtilities;
 using TestUtilities.Nodejs;
@@ -29,9 +30,7 @@ namespace NpmTests {
     [TestClass]
     public class NpmSearchTests {
 
-        private const string Filename_Original = "npmsearchfullcatalog.txt";
-        private const string Filename_Npm143 = "npmsearchfullcat_npm143.txt";
-        private const string Filename_Npm144 = "npmsearchfullcat_npm144.txt";
+        private const string FilenameOriginal = "packagecache.json";
 
         [ClassInitialize]
         public static void Init(TestContext context) {
@@ -126,12 +125,10 @@ namespace NpmTests {
             string filename,
             out IDictionary<string, IPackage> byName) {
             IList<IPackage> target = new List<IPackage>();
-            INpmSearchLexer lexer = NpmSearchParserFactory.CreateLexer();
-            INpmSearchParser parser = NpmSearchParserFactory.CreateParser(lexer);
-            parser.Package += (source, args) => target.Add(args.Package);
 
-            using (var reader = GetCatalogueReader(filename)) {
-                lexer.Lex(reader);
+            using (var reader = GetCatalogueReader(filename))
+            {
+                target = Task.Run(() => NpmGetCatalogueCommand.ParseResultsFromReader(reader)).Result;
             }
 
             //  Do this after because package names can be split across multiple
@@ -151,116 +148,28 @@ namespace NpmTests {
         }
 
         [TestMethod, Priority(0)]
-        public void NpmPre143_CheckPackageCount() {
-            IDictionary<string, IPackage> byName;
-            var target = GetTestPackageList(Filename_Original, out byName);
-            Assert.AreEqual(47365, target.Count, "Unexpected package count in catalogue list.");
-        }
-
-        [TestMethod, Priority(0)]
         public void NpmPre143_CheckListAndDictByNameSameSize() {
             IDictionary<string, IPackage> byName;
-            var target = GetTestPackageList(Filename_Original, out byName);
+            var target = GetTestPackageList(FilenameOriginal, out byName);
             Assert.AreEqual(target.Count, byName.Count, "Number of packages should be same in list and dictionary.");
-        }
-
-        [TestMethod, Priority(0)]
-        public void NpmPre143_CheckFirstPackageInCatalog_0() {
-            IDictionary<string, IPackage> byName;
-            var target = GetTestPackageList(Filename_Original, out byName);
-            CheckPackage(
-                target,
-                byName,
-                0,
-                "0",
-                "A levelup plugin that can be used implements conditional updates.",
-                "dominictarr",
-                "2013-02-03 06:26",
-                new SemverVersion(),
-                null);
-        }
-
-        [TestMethod, Priority(0)]
-        public void NpmPre143_CheckLastPackageInCatalog_zzz() {
-            IDictionary<string, IPackage> byName;
-            var target = GetTestPackageList(Filename_Original, out byName);
-            CheckPackage(
-                target,
-                byName,
-                47364,
-                "zzz",
-                "Lightweight REST service container",
-                "avayanis",
-                "2013-03-26 06:15",
-                new SemverVersion(0, 2, 0),
-                null);
-        }
-
-        [TestMethod, Priority(0)]
-        public void NpmPre143_CheckPackageWithBuildPreReleaseInfo() {
-            IDictionary<string, IPackage> byName;
-            var target = GetTestPackageList(Filename_Original, out byName);
-            CheckPackage(
-                target,
-                byName,
-                34413,
-                "psc-cms-js",
-                "js library for Psc CMS (pscheit/psc-cms). shim reposistory for builds.",
-                "pscheit",
-                "2013-09-30 21:53",
-                SemverVersion.Parse("1.3.0-95847e2"),
-                new[] { "cms", "framework" });
-        }
-
-        [TestMethod, Priority(0)]
-        public void NpmPre143_CheckPackageMultipleAuthors() {
-            IDictionary<string, IPackage> byName;
-            var target = GetTestPackageList(Filename_Original, out byName);
-            CheckPackage(
-                target,
-                byName,
-                32499,
-                "passport-wsfed-saml2",
-                "SAML2 Protocol and WS-Fed library",
-                "woloski jfromaniello",
-                "2013-09-06 19:09",
-                SemverVersion.Parse("0.8.1"),
-                new[] { "saml", "wsfed", "passport", "auth0", "azure", "auth", "authn", "authentication", "identity", "adfs" });
-        }
-
-        [TestMethod, Priority(0)]
-        public void NpmPre143_CheckPackageDescriptionContainsEquals() {
-            IDictionary<string, IPackage> byName;
-            var target = GetTestPackageList(Filename_Original, out byName);
-            CheckPackage(
-                target,
-                byName,
-                32254,
-                "particularizable",
-                "particularizable ================ `enumerable` was taken.",
-                "elliottcable",
-                "2013-06-11 22:48",
-                SemverVersion.Parse("1.0.0"),
-                null);
         }
         
         [TestMethod, Priority(0)]
-        public void NpmPre143_CheckPackageAuthorAsEmailAddress() {
+        public void NpmPre143_CheckPackageWithBuildPreReleaseInfo() {
             IDictionary<string, IPackage> byName;
-            var target = GetTestPackageList(Filename_Original, out byName);
-
-            //  Author is email address
+            var target = GetTestPackageList(FilenameOriginal, out byName);
             CheckPackage(
                 target,
                 byName,
-                32705,
-                "pdfkit-memory",
-                "A PDF generation library for Node.js",
-                "trevor@kimenye.com",
-                "2012-04-14 12:47",
-                SemverVersion.Parse("0.0.2"),
-                new[] { "pdf", "writer", "generator", "graphics", "document", "vector" });
+                65900,
+                "psc-cms-js",
+                "js library for Psc CMS (pscheit/psc-cms). shim reposistory for builds.",
+                "Philipp Scheit",
+                "01/07/2014 10:57:58",
+                SemverVersion.Parse("1.3.0-517056d"),
+                new[] { "cms", "framework" });
         }
+
 
         private void CheckSensibleNumberOfNonZeroVersions(ICollection<IPackage> target) {
             int sensibleVersionCount = 0;
@@ -322,324 +231,135 @@ namespace NpmTests {
             }
         }
 
-        private void CheckNonZeroPackageVersionsExist(string testDataFilename) {
+        [TestMethod, Priority(0)]
+        public void CheckNonZeroPackageVersionsExist() {
             IDictionary<string, IPackage> byName;
-            var target = GetTestPackageList(testDataFilename, out byName);
+            var target = GetTestPackageList(FilenameOriginal, out byName);
             CheckSensibleNumberOfNonZeroVersions(target);
         }
 
         [TestMethod, Priority(0)]
-        public void Npm143_CheckNonZeroPackageVersionsExist() {
-            CheckNonZeroPackageVersionsExist(Filename_Npm143);
-        }
-
-        [TestMethod, Priority(0)]
-        public void Npm144_CheckNonZeroPackageVersionsExist() {
-            CheckNonZeroPackageVersionsExist(Filename_Npm144);
-        }
-
-        private void CheckCorrectPackageCount(string testDataFilename, int expectedCount) {
+        public void CheckCorrectPackageCount() {
             IDictionary<string, IPackage> byName;
-            var target = GetTestPackageList(testDataFilename, out byName);
-            Assert.AreEqual(expectedCount, target.Count, "Unexpected package count in catalogue list.");
+            var target = GetTestPackageList(FilenameOriginal, out byName);
+            Assert.AreEqual(89924, target.Count, "Unexpected package count in catalogue list.");
         }
 
         [TestMethod, Priority(0)]
-        public void Npm143_CheckCorrectPackageCount() {
-            CheckCorrectPackageCount(Filename_Npm143, 62068);
-        }
-
-        [TestMethod, Priority(0)]
-        public void Npm144_CheckCorrectPackageCount() {
-            CheckCorrectPackageCount(Filename_Npm144, 62208);
-        }
-
-        private void CheckNoDuplicatePackages(string testDataFilename) {
+        public void CheckNoDuplicatePackages() {
             IDictionary<string, IPackage> byName;
-            var target = GetTestPackageList(testDataFilename, out byName);
+            var target = GetTestPackageList(FilenameOriginal, out byName);
             CheckOnlyOneOfEachPackage(target);
         }
 
         [TestMethod, Priority(0)]
-        public void Npm143_CheckNoDuplicatePackages() {
-            CheckNoDuplicatePackages(Filename_Npm143);
-        }
-
-        [TestMethod, Priority(0)]
-        public void Npm144_CheckNoDuplicatePackages() {
-            CheckNoDuplicatePackages(Filename_Npm144);
-        }
-
-        private void CheckListAndDictByNameSameSize(string testDataFilename) {
+        public void CheckListAndDictByNameSameSize() {
             IDictionary<string, IPackage> byName;
-            var target = GetTestPackageList(testDataFilename, out byName);
+            var target = GetTestPackageList(FilenameOriginal, out byName);
             Assert.AreEqual(target.Count, byName.Count, "Number of packages should be same in list and dictionary.");
         }
-
+        
         [TestMethod, Priority(0)]
-        public void Npm143_CheckListAndDictByNameSameSize() {
-            CheckListAndDictByNameSameSize(Filename_Npm143);
-        }
-
-        [TestMethod, Priority(0)]
-        public void Npm144_CheckListAndDictByNameSameSize() {
-            CheckListAndDictByNameSameSize(Filename_Npm144);
-        }
-
-        [TestMethod, Priority(0)]
-        public void Npm143_CheckFirstPackageInCatalog_007() {
+        public void CheckFirstPackageInCatalog() {
             IDictionary<string, IPackage> byName;
-            var target = GetTestPackageList(Filename_Npm143, out byName);
+            var target = GetTestPackageList(FilenameOriginal, out byName);
             CheckPackage(
                 target,
                 byName,
                 0,
-                "007",
-                "Returns a deep copy of an object with all functions…",
-                "btford",
-                "2013-07-29",
-                new SemverVersion(0, 0, 2),
-                new[] { "testing", "test", "mock", "spy" });
+                "0",
+                null,
+                null,
+                "06/17/2014 06:38:43",
+                new SemverVersion(0, 0, 0),
+                new string[] { });
         }
 
         [TestMethod, Priority(0)]
-        public void Npm143_CheckLastPackageInCatalog_zzz() {
+        public void CheckLastPackageInCatalog_zzz() {
             IDictionary<string, IPackage> byName;
-            var target = GetTestPackageList(Filename_Npm143, out byName);
+            var target = GetTestPackageList(FilenameOriginal, out byName);
             CheckPackage(
                 target,
                 byName,
-                62067,
+                89923,
                 "zzz",
                 "Lightweight REST service container",
-                "avayanis",
-                "2013-11-24",
+                "Andrew Vayanis",
+                "11/24/2013 12:37:25",
                 new SemverVersion(0, 3, 0),
                 null);
         }
 
         [TestMethod, Priority(0)]
-        public void Npm143_CheckPackageTruncatedBuildPreReleaseInfo() {
+        public void CheckPackageEqualsInDescription() {
             IDictionary<string, IPackage> byName;
-            var target = GetTestPackageList(Filename_Npm143, out byName);
-
-            //  Version number with truncated build and/or pre-release info
+            var target = GetTestPackageList(FilenameOriginal, out byName);
             CheckPackage(
                 target,
                 byName,
-                45322,
-                "psc-cms-js",
-                "js library for Psc CMS (pscheit/psc-cms). shim reposistory…",
-                "pscheit",
-                "2014-01-07",
-                SemverVersion.Parse("1.3.0-9584…"),
-                new[] { "cms", "framework" });
-        }
-
-        [TestMethod, Priority(0)]
-        public void Npm143_CheckPackageMultipleAuthorsTruncated() {
-            IDictionary<string, IPackage> byName;
-            var target = GetTestPackageList(Filename_Npm143, out byName);
-
-            //  Multiple authors listed
-            CheckPackage(
-                target,
-                byName,
-                42864,
-                "passport-wsfed-saml2",
-                "SAML2 Protocol and WS-Fed library",
-                "woloski…",
-                "2014-02-25",
-                SemverVersion.Parse("0.8.7"),
-                new[] { "saml", "wsfed", "passport", "auth0", "azure", "auth", "authn", "authentication", "identity", "adfs" });
-        }
-
-        [TestMethod, Priority(0)]
-        public void Npm143_CheckPackageEqualsInDescription() {
-            IDictionary<string, IPackage> byName;
-            var target = GetTestPackageList(Filename_Npm143, out byName);
-            CheckPackage(
-                target,
-                byName,
-                42580,
+                62060,
                 "particularizable",
                 "particularizable ================ `enumerable` was taken.",
-                "elliottcable",
-                "2013-06-11",
+                "ELLIOTTCABLE",
+                "06/11/2013 22:48:35",
                 SemverVersion.Parse("1.0.0"),
                 null);
         }
 
         [TestMethod, Priority(0)]
-        public void Npm143_CheckPackageAuthorAsEmailAddress() {
+        public void CheckPackageNoDescriptionAuthorVersion() {
             IDictionary<string, IPackage> byName;
-            var target = GetTestPackageList(Filename_Npm143, out byName);
-            CheckPackage(
-                target,
-                byName,
-                43119,
-                "pdfkit-memory",
-                "A PDF generation library for Node.js",
-                "trevor@kimenye.com",
-                "2012-04-14",
-                SemverVersion.Parse("0.0.2"),
-                new[] { "pdf", "writer", "generator", "graphics", "document", "vector" });
-        }
+            var target = GetTestPackageList(FilenameOriginal, out byName);
 
-        [TestMethod, Priority(0)]
-        public void Npm143_CheckPackageNoDescriptionAuthorVersion() {
-            IDictionary<string, IPackage> byName;
-            var target = GetTestPackageList(Filename_Npm143, out byName);
-
-            // Packages around and including package with no description, author, or version - I can't believe the npm registry even allows this!
             CheckPackage(
                 target,
                 byName,
-                14,
-                "11zwheat",
-                "Git powered javascript blog.",
-                "sun11",
-                "2012-11-17",
-                SemverVersion.Parse("0.2.6"),
-                null);
-            CheckPackage(
-                target,
-                byName,
-                15,
+                25,
                 "122",
                 null,
                 null,
-                "2014-03-03",
+                "03/03/2014 16:52:16",
                 SemverVersion.Parse("0.0.0"),
-                null);
-            CheckPackage(
-                target,
-                byName,
-                16,
-                "123",
-                "123",
-                "feitian",
-                "2013-12-20",
-                SemverVersion.Parse("0.0.1"),
-                new[] { "123" });
-            CheckPackage(
-                target,
-                byName,
-                17,
-                "127-ssh",
-                "Capture your command not found and tries to ssh",
-                "romainberger",
-                "2013-12-28",
-                SemverVersion.Parse("0.1.2"),
                 null);
         }
 
         [TestMethod, Priority(0)]
-        public void Npm143_CheckPackageNoVersion() {
+        public void CheckPackageNoVersion() {
             IDictionary<string, IPackage> byName;
-            var target = GetTestPackageList(Filename_Npm143, out byName);
+            var target = GetTestPackageList(FilenameOriginal, out byName);
 
-            // No version, but everything else, plus package after
             CheckPackage(
                 target,
                 byName,
-                30,
+                56,
                 "2co",
-                "Module that will provide nodejs adapters for 2checkout API…",
-                "biggora",
-                "2012-04-02",
-                SemverVersion.Parse("0.0.0"),
+                "Module that will provide nodejs adapters for 2checkout API payment gateway",
+                "Aleksej Gordejev",
+                "04/21/2014 14:31:49",
+                SemverVersion.Parse("0.0.4"),
                 new[] { "payments", "2checkout", "adapter", "gateway" });
-            CheckPackage(
-                target,
-                byName,
-                31,
-                "2co-client",
-                "A low-level HTTP client for the 2checkout API",
-                "rakeshpai",
-                "2013-11-06",
-                SemverVersion.Parse("0.0.12"),
-                new[] { "2checkout", "2co", "payment", "payment", "gateway" });
         }
 
         [TestMethod, Priority(0)]
-        public void Npm143_CheckPackageNoDescription() {
+        public void CheckPackageNoDescription() {
             IDictionary<string, IPackage> byName;
-            var target = GetTestPackageList(Filename_Npm143, out byName);
+            var target = GetTestPackageList(FilenameOriginal, out byName);
 
-            // Check packages with and around results with blank description field
             CheckPackage(
                 target,
                 byName,
-                250,
-                "activator",
-                "simple user activation and password reset for nodejs",
-                "deitch",
-                "2013-11-10",
-                SemverVersion.Parse("0.2.8"),
-                new[] { "express", "email", "sms", "activation", "nodejs", "node", "confirmation", "two-step" });
-            CheckPackage(
-                target,
-                byName,
-                251,
+                459,
                 "active-client",
                 null,
-                "s3u",
-                "2011-01-03",
+                "Subbu Allamaraju",
+                "01/03/2011 21:21:12",
                 SemverVersion.Parse("0.1.1"),
                 null);
-            CheckPackage(
-                target,
-                byName,
-                252,
-                "active-golf",
-                null,
-                "sberryman",
-                "2014-02-12",
-                SemverVersion.Parse("0.0.11"),
-                null);
-            CheckPackage(
-                target,
-                byName,
-                253,
-                "active-markdown",
-                "A tool for generating reactive documents from markdown…",
-                "alecperkins",
-                "2013-05-04",
-                SemverVersion.Parse("0.3.2"),
-                null);
-            CheckPackage(
-                target,
-                byName,
-                254,
-                "active-menu",
-                "Facilitates the creation of menus in Node applications.",
-                "persata",
-                "2013-09-22",
-                SemverVersion.Parse("0.1.2"),
-                new[] { "menu", "ui", "express" });
-        }
-
-        [TestMethod, Priority(0)]
-        public void Npm143_CheckPackageWithLongName() {
-            IDictionary<string, IPackage> byName;
-            var target = GetTestPackageList(Filename_Npm143, out byName);
-
-            //  This package's name wraps across two lines
-            CheckPackage(
-                target,
-                byName,
-                2425,
-                "atropa-jasmine-spec-runner-generator-html",
-                "A node module to generate Jasmine Spec Runner html pages.",
-                "kastor",
-                "2013-03-19",
-                SemverVersion.Parse("0.1.0-2"),
-                new[] { "atropa-jasmine-spec-runner-generator-html", "atropa", "utilities", "jasmine", "test" });
         }
 
         private IList<IPackage> GetFilteredPackageList(string filterString) {
-            var catalog = GetTestPackageCatalog(Filename_Original);
+            var catalog = GetTestPackageCatalog(FilenameOriginal);
             var filter = PackageCatalogFilterFactory.Create(catalog);
             return filter.Filter(filterString);
         }

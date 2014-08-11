@@ -23,9 +23,9 @@ namespace Microsoft.NodejsTools.Npm {
     /// </summary>
     public class NodeModuleBuilder {
         private List<IPackage> _dependencies = new List<IPackage>();
-        private StringBuilder _descriptionBuff = new StringBuilder();
-        private StringBuilder _authorBuff = new StringBuilder();
-        private StringBuilder _publishDateTime = new StringBuilder();
+        private readonly StringBuilder _descriptionBuff = new StringBuilder();
+        private readonly StringBuilder _authorBuff = new StringBuilder();
+        private readonly StringBuilder _publishDateTime = new StringBuilder();
         private List<string> _keywords = new List<string>();
 
         public NodeModuleBuilder() {

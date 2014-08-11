@@ -19,12 +19,6 @@ using Microsoft.VisualStudio.TestTools.UnitTesting;
 namespace NpmTests {
     [TestClass]
     public class FileSystemPackageJsonTests : AbstractFilesystemPackageJsonTests {
-        private static void CheckPackage(IPackageJson pkg) {
-            Assert.IsNotNull(pkg, "Package should not be null.");
-            Assert.AreEqual("TestPkg", pkg.Name, "Package name mismatch.");
-            Assert.AreEqual(SemverVersion.Parse("0.1.0"), pkg.Version, "Package version mismatch.");
-        }
-
         [TestMethod, Priority(0)]
         public void TestReadFromFile() {
             var dir = TempFileManager.GetNewTempDirectory();
@@ -38,6 +32,12 @@ namespace NpmTests {
             var dir = TempFileManager.GetNewTempDirectory();
             CreatePackageJson(Path.Combine(dir.FullName, "package.json"), PkgSimple);
             CheckPackage(PackageJsonFactory.Create(new DirectoryPackageJsonSource(dir.FullName)));
+        }
+
+        private static void CheckPackage(IPackageJson pkg) {
+            Assert.IsNotNull(pkg, "Package should not be null.");
+            Assert.AreEqual("TestPkg", pkg.Name, "Package name mismatch.");
+            Assert.AreEqual(SemverVersion.Parse("0.1.0"), pkg.Version, "Package version mismatch.");
         }
     }
 }

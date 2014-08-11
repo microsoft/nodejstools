@@ -47,7 +47,7 @@ namespace Microsoft.NodejsTools.Npm.SPI {
             LastRefreshed = DateTime.MinValue;
         }
 
-        private static List<IPackage> ParseResultsFromReader(TextReader reader) {
+        internal static List<IPackage> ParseResultsFromReader(TextReader reader) {
             var builder = new NodeModuleBuilder();
             var results = new List<IPackage>();
             using (var jsonReader = new Newtonsoft.Json.JsonTextReader(reader)) {
@@ -60,6 +60,11 @@ namespace Microsoft.NodejsTools.Npm.SPI {
                         }
 
                         builder.AppendToDescription((string)module["description"] ?? string.Empty);
+
+                        var time = module["time"];
+                        if (time != null) {
+                            builder.AppendToDate((string)time["modified"]);
+                        }
 
                         var versions = module["versions"];
                         if (versions != null) {

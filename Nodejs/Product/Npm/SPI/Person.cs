@@ -26,21 +26,6 @@ namespace Microsoft.NodejsTools.Npm.SPI {
             + "$",
             RegexOptions.IgnoreCase | RegexOptions.Singleline);
 
-        public Person(dynamic source) {
-            var tok = source as JToken;
-            switch (tok.Type) {
-                case JTokenType.Object:
-                    Name = source.name;
-                    Email = source.email;
-                    Url = source.url;
-                    break;
-
-                default:
-                    InitFromString(source.ToString());
-                    break;
-            }
-        }
-
         public Person(string source) {
             InitFromString(source);
         }
