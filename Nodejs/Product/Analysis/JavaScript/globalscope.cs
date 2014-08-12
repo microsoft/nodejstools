@@ -27,7 +27,7 @@ namespace Microsoft.NodejsTools.Parsing
         private HashSet<string> m_globalFunctions;
         private HashSet<string> m_assumedGlobals;
 
-        internal GlobalScope(Statement node, ErrorSink errorSink)
+        internal GlobalScope(JsAst node, ErrorSink errorSink)
             : base(node, null, errorSink)
         {
             // define the Global object's properties, and methods
@@ -38,6 +38,12 @@ namespace Microsoft.NodejsTools.Parsing
             m_globalFunctions = new HashSet<string>(new[] {
                 "decodeURI", "decodeURIComponent", "encodeURI", "encodeURIComponent", "escape", "eval", "importScripts", "isNaN", "isFinite", "parseFloat", "parseInt", "unescape", "ActiveXObject", "Array", "Boolean", "Date", "Error", "EvalError", "EventSource", "File", "FileList", "FileReader", "Function", "GeckoActiveXObject", "HTMLElement", "Number", "Object", "Proxy", "RangeError", "ReferenceError", "RegExp", "SharedWorker", "String", "SyntaxError", "TypeError", "URIError", "WebSocket", "Worker",
                 "addEventListener", "alert", "attachEvent", "blur", "clearInterval", "clearTimeout", "close", "confirm", "createPopup", "detachEvent", "dispatchEvent", "execScript", "focus", "getComputedStyle", "getSelection", "moveBy", "moveTo", "navigate", "open", "postMessage", "prompt", "removeEventListener", "resizeBy", "resizeTo", "scroll", "scrollBy", "scrollTo", "setActive", "setInterval", "setTimeout", "showModalDialog", "showModelessDialog" });
+        }
+
+        public new JsAst Node {
+            get {
+                return (JsAst)base.Node;
+            }
         }
 
         /// <summary>

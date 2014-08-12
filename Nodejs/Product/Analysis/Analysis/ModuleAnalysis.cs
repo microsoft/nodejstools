@@ -556,7 +556,7 @@ namespace Microsoft.NodejsTools.Analysis {
                                     bool isParam = false;
                                     foreach (var param in funcDef.ParameterDeclarations) {
                                         string paramName = /*param.GetVerbatimImage(_unit.Tree) ??*/ param.Name;
-                                        var nameStart = param.Span.Start;
+                                        var nameStart = param.GetStartIndex(_unit.Tree.LocationResolver);
 
                                         if (index >= nameStart && index <= (nameStart + paramName.Length)) {
                                             curEnv = env;

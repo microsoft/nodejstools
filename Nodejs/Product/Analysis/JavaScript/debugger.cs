@@ -21,7 +21,7 @@ namespace Microsoft.NodejsTools.Parsing
     public sealed class DebuggerNode : Statement
     {
 
-        public DebuggerNode(IndexSpan span)
+        public DebuggerNode(EncodedSpan span)
             : base(span)
         {
         }

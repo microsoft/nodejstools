@@ -33,7 +33,7 @@ namespace Microsoft.NodejsTools.Parsing
         public Expression Initializer { get { return null; } }
 
 
-        public ParameterDeclaration(IndexSpan span)
+        public ParameterDeclaration(EncodedSpan span)
             : base(span)
         {
         }
@@ -48,8 +48,8 @@ namespace Microsoft.NodejsTools.Parsing
         }
 
 
-        public IndexSpan NameSpan {
-            get { return Span; }
+        public IndexSpan GetNameSpan(LocationResolver locationResolver) {
+            return GetSpan(locationResolver);
         }
     }
 }

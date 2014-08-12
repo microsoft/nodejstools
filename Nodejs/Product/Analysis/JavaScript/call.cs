@@ -56,9 +56,8 @@ namespace Microsoft.NodejsTools.Parsing
             set;
         }
 
-        public CallNode(IndexSpan span)
-            : base(span)
-        {
+        public CallNode(EncodedSpan span)
+            : base(span) {
         }
 
         public override void Walk(AstVisitor visitor) {

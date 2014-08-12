@@ -34,7 +34,7 @@ namespace Microsoft.NodejsTools.Parsing
             }
         }
 
-        public DoWhile(IndexSpan span)
+        public DoWhile(EncodedSpan span)
             : base(span)
         {
         }

@@ -35,7 +35,7 @@ namespace Microsoft.NodejsTools.Parsing
             }
         }
 
-        public ArrayLiteral(IndexSpan span)
+        public ArrayLiteral(EncodedSpan span)
             : base(span)
         {
         }

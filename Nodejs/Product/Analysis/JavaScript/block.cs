@@ -23,7 +23,8 @@ namespace Microsoft.NodejsTools.Parsing
     [Serializable]
     public sealed class Block : Statement
     {
-        private List<Statement> m_list;
+        private Statement[] m_list;
+        internal static readonly Statement[] EmptyStatements = new Statement[0];
 
         /// <summary>
         /// Gets a particular statement in the list of statements making up this block
@@ -33,24 +34,17 @@ namespace Microsoft.NodejsTools.Parsing
         public Statement this[int index]
         {
             get { return m_list[index]; }
-            set
-            {
-                m_list[index].ClearParent(this);
-                if (value != null)
-                {
-                    m_list[index] = value;
-                    m_list[index].Parent = this;
-                }
-                else
-                {
-                    m_list.RemoveAt(index);
-                }
-            }
         }
 
-        public IList<Statement> Statements {
+        public Statement[] Statements {
             get {
                 return m_list;
+            }
+            set {
+                foreach (var node in value) {
+                    node.Parent = this;
+                }
+                m_list = value;
             }
         }
 
@@ -60,10 +54,8 @@ namespace Microsoft.NodejsTools.Parsing
         /// </summary>
         public BraceState Braces { get; set; }
 
-        public Block(IndexSpan span)
-            : base(span)
-        {
-            m_list = new List<Statement>();
+        public Block(EncodedSpan span)
+            : base(span) {
         }
 
         public override void Walk(AstVisitor walker) {
@@ -80,7 +72,9 @@ namespace Microsoft.NodejsTools.Parsing
         /// </summary>
         public int Count
         {
-            get { return m_list.Count; }
+            get {
+                return m_list.Length; 
+            }
         }
 
         /// <summary>
@@ -90,20 +84,9 @@ namespace Microsoft.NodejsTools.Parsing
         {
             get
             {
+                if (m_list == null) {
+                }
                 return EnumerateNonNullNodes(m_list);
-            }
-        }
-
-        /// <summary>
-        /// Append the given statement node to the end of the block
-        /// </summary>
-        /// <param name="element">node to add to the block</param>
-        public void Append(Statement element)
-        {
-            if (element != null)
-            {
-                element.Parent = this;
-                m_list.Add(element);
             }
         }
     }

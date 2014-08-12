@@ -21,7 +21,7 @@ namespace Microsoft.NodejsTools.Parsing {
     public abstract class Expression : Node {
         public static readonly Expression[] EmptyArray = new Expression[0];
 
-        protected Expression(IndexSpan span)
+        protected Expression(EncodedSpan span)
             : base(span) {
         }
     }

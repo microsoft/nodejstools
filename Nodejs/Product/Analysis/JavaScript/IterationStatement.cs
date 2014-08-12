@@ -38,7 +38,7 @@ namespace Microsoft.NodejsTools.Parsing
             }
         }
 
-        protected IterationStatement(IndexSpan span)
+        protected IterationStatement(EncodedSpan span)
             : base(span)
         {
         }

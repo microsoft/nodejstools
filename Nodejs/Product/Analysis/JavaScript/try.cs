@@ -96,7 +96,7 @@ namespace Microsoft.NodejsTools.Parsing
             }
         }
 
-        public TryNode(IndexSpan span)
+        public TryNode(EncodedSpan span)
             : base(span)
         {
         }

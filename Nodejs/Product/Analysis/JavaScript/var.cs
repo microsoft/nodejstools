@@ -27,7 +27,7 @@ namespace Microsoft.NodejsTools.Parsing
     [Serializable]
     public sealed class Var : Declaration
     {
-        public Var(IndexSpan span)
+        public Var(EncodedSpan span)
             : base(span)
         {
         }

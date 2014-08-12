@@ -36,7 +36,7 @@ namespace Microsoft.NodejsTools.Formatting {
             using (new DebugTimer("FormatKeyStroke")) {
                 if (ch == ';' || ch == '}') {
                     var ast = new JSParser(code).Parse(new CodeSettings() { AllowShebangLine = true });
-                    var visitor = new RangeVisitor(ch, position);
+                    var visitor = new RangeVisitor(ch, position, ast);
                     ast.Walk(visitor);
                     if (visitor.Span != default(IndexSpan)) {
                         return FilterRange(
@@ -67,11 +67,13 @@ namespace Microsoft.NodejsTools.Formatting {
         class RangeVisitor : AstVisitor {
             private readonly char _typedChar;
             private readonly int _position;
+            private readonly JsAst _tree;
             public IndexSpan Span;
 
-            public RangeVisitor(char typedChar, int position) {
+            public RangeVisitor(char typedChar, int position, JsAst tree) {
                 _typedChar = typedChar;
                 _position = position;
+                _tree = tree;
             }
 
             public override bool Walk(ContinueNode node) {
@@ -110,19 +112,19 @@ namespace Microsoft.NodejsTools.Formatting {
             }
 
             private void CheckStatement(Statement node) {
-                if (_typedChar == ';' && node.EndIndex == _position) {
+                if (_typedChar == ';' && node.GetEndIndex(_tree.LocationResolver) == _position) {
                     // if(1)if(1)if(1)if(1)x+=2;
                     // We want to reformat all of the if statements that are nested
                     // so walk up the parent nodes as long as they are all terminated
                     // at the same semicolon.                   
-                    Span = GetTargetStatement(node).Span;
+                    Span = GetTargetStatement(node).GetSpan(_tree.LocationResolver);
                 }
             }
 
-            private static Statement GetTargetStatement(Statement node) {
+            private Statement GetTargetStatement(Statement node) {
                 Statement targetNode = node;
                 while (targetNode.Parent != null &&
-                    targetNode.Parent.EndIndex == node.EndIndex) {
+                    targetNode.Parent.GetEndIndex(_tree.LocationResolver) == node.GetEndIndex(_tree.LocationResolver)) {
                     if (targetNode.Parent != null && targetNode.Parent.Parent is JsAst) {
                         // https://nodejstools.codeplex.com/workitem/1102
                         // We don't want to reformat the entire document just because someone
@@ -135,8 +137,8 @@ namespace Microsoft.NodejsTools.Formatting {
             }
 
             public override bool Walk(Switch node) {
-                if (_typedChar == '}' && node.EndIndex == _position) {
-                    Span = GetTargetStatement(node).Span;
+                if (_typedChar == '}' && node.GetEndIndex(_tree.LocationResolver) == _position) {
+                    Span = GetTargetStatement(node).GetSpan(_tree.LocationResolver);
                     return false;
                 }
                 return base.Walk(node);
@@ -146,7 +148,7 @@ namespace Microsoft.NodejsTools.Formatting {
                 if (CheckBlock(node.TryBlock) ||
                     CheckBlock(node.FinallyBlock) ||
                     CheckBlock(node.CatchBlock)) {
-                    Span = GetTargetStatement(node).Span;
+                        Span = GetTargetStatement(node).GetSpan(_tree.LocationResolver);
                     return false;
                 }
                 return base.Walk(node);
@@ -154,7 +156,7 @@ namespace Microsoft.NodejsTools.Formatting {
 
             public override bool Walk(ForIn node) {
                 if (CheckBlock(node.Body)) {
-                    Span = GetTargetStatement(node).Span;
+                    Span = GetTargetStatement(node).GetSpan(_tree.LocationResolver);
                     return false;
                 }
                 return base.Walk(node);
@@ -162,7 +164,7 @@ namespace Microsoft.NodejsTools.Formatting {
 
             public override bool Walk(ForNode node) {
                 if (CheckBlock(node.Body)) {
-                    Span = GetTargetStatement(node).Span;
+                    Span = GetTargetStatement(node).GetSpan(_tree.LocationResolver);
                     return false;
                 }
                 return base.Walk(node);
@@ -170,7 +172,7 @@ namespace Microsoft.NodejsTools.Formatting {
 
             public override bool Walk(WhileNode node) {
                 if (CheckBlock(node.Body)) {
-                    Span = GetTargetStatement(node).Span;
+                    Span = GetTargetStatement(node).GetSpan(_tree.LocationResolver);
                     return false;
                 }
                 return base.Walk(node);
@@ -178,7 +180,7 @@ namespace Microsoft.NodejsTools.Formatting {
 
             public override bool Walk(WithNode node) {
                 if (CheckBlock(node.Body)) {
-                    Span = GetTargetStatement(node).Span;
+                    Span = GetTargetStatement(node).GetSpan(_tree.LocationResolver);
                     return false;
                 }
                 return base.Walk(node);
@@ -186,22 +188,25 @@ namespace Microsoft.NodejsTools.Formatting {
 
             public override bool Walk(Block block) {
                 if (CheckBlock(block)) {
-                    Span = GetTargetStatement(block).Span;
+                    Span = GetTargetStatement(block).GetSpan(_tree.LocationResolver);
                     return false;
                 }
                 return true;
             }
 
             public override bool Walk(ObjectLiteral node) {
-                if (_typedChar == '}' && node.EndIndex == _position) {
-                    Span = node.Span;
+                if (_typedChar == '}' && node.GetEndIndex(_tree.LocationResolver) == _position) {
+                    Span = node.GetSpan(_tree.LocationResolver);
                     return false;
                 }
                 return base.Walk(node);
             }
 
             private bool CheckBlock(Block block) {
-                if (_typedChar == '}' && block != null && block.Braces != BraceState.None && block.EndIndex == _position) {
+                if (_typedChar == '}' && 
+                    block != null && 
+                    block.Braces != BraceState.None && 
+                    block.GetEndIndex(_tree.LocationResolver) == _position) {
                     return true;
                 }
                 return false;
@@ -218,7 +223,7 @@ namespace Microsoft.NodejsTools.Formatting {
         }
 
         private static List<Edit> GetEdits(string code, FormattingOptions options, JsAst ast, bool onEnter = false) {
-            var visitor = new FormattingVisitor(code, options, onEnter);
+            var visitor = new FormattingVisitor(code, ast, options, onEnter);
             visitor.Format(ast);
             return visitor.Edits;
         }

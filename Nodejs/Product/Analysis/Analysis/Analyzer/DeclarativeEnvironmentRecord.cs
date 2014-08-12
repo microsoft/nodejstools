@@ -70,7 +70,7 @@ namespace Microsoft.NodejsTools.Analysis.Analyzer {
             if (_node == null) {
                 return 1;
             }
-            return _node.GetStart(ast).Index;
+            return _node.GetStart(ast.LocationResolver).Index;
         }
 
         /// <summary>
@@ -80,7 +80,7 @@ namespace Microsoft.NodejsTools.Analysis.Analyzer {
             if (_node == null) {
                 return int.MaxValue;
             }
-            return _node.GetEnd(ast).Index;
+            return _node.GetEnd(ast.LocationResolver).Index;
         }
 
         public Node Node {

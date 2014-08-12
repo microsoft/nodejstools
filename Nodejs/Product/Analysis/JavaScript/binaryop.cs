@@ -47,7 +47,7 @@ namespace Microsoft.NodejsTools.Parsing
 
         public JSToken OperatorToken { get; set; }
 
-        public BinaryOperator(IndexSpan span)
+        public BinaryOperator(EncodedSpan span)
             : base(span)
         {
         }

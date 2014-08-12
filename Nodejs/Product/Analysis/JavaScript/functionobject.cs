@@ -25,7 +25,7 @@ namespace Microsoft.NodejsTools.Parsing {
     public sealed class FunctionObject : Statement, INameDeclaration {
         private Block m_body;
         private ParameterDeclaration[] m_parameters;
-        public FunctionObject(IndexSpan functionSpan)
+        public FunctionObject(EncodedSpan functionSpan)
             : base(functionSpan) {
         }
 
@@ -69,6 +69,9 @@ namespace Microsoft.NodejsTools.Parsing {
             set;
         }
 
+        public IndexSpan GetNameSpan(LocationResolver resolver) {
+            return NameSpan;
+        }
 
         public IndexSpan ParametersSpan { get; set; }
         public bool IsExpression { get; set; }

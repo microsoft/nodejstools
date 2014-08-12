@@ -20,6 +20,7 @@ using System.Diagnostics;
 using System.Globalization;
 using System.IO;
 using System.Text;
+using Microsoft.NodejsTools.Analysis;
 
 namespace Microsoft.NodejsTools.Parsing {
     /// <summary>
@@ -30,25 +31,33 @@ namespace Microsoft.NodejsTools.Parsing {
         // this is used in the child enumeration for nodes that don't have any children
         private static readonly IEnumerable<Node> s_emptyChildrenCollection = new Node[0];
 
-        public IndexSpan Span {
+        public EncodedSpan EncodedSpan {
             get;
             set;
         }
 
-        protected Node(IndexSpan span) {
-            Span = span;
+        protected Node(EncodedSpan location) {
+            EncodedSpan = location;
         }
 
-        public int StartIndex {
-            get {
-                return Span.Start;
-            }
+        public IndexSpan GetSpan(LocationResolver parent) {
+            return EncodedSpan.GetSpan(parent);
         }
 
-        public int EndIndex {
-            get {
-                return Span.End;
-            }
+        public int GetStartIndex(LocationResolver parent) {
+            return GetSpan(parent).Start;
+        }
+
+        public int GetEndIndex(LocationResolver parent) {
+            return GetSpan(parent).End;
+        }
+
+        internal SourceLocation GetStart(LocationResolver jsAst) {
+            return jsAst.IndexToLocation(GetSpan(jsAst).Start);
+        }
+
+        internal SourceLocation GetEnd(LocationResolver jsAst) {
+            return jsAst.IndexToLocation(GetSpan(jsAst).End);
         }
 
         public static Block ForceToBlock(Statement node) {
@@ -58,8 +67,7 @@ namespace Microsoft.NodejsTools.Parsing {
             if (block == null && node != null) {
                 // it's not a block, so create a new block, append the astnode
                 // and return the block
-                block = new Block(node.Span);
-                block.Append(node);
+                block = new Block(node.EncodedSpan) { Statements = new[] { node } };
             }
 
             return block;
@@ -85,19 +93,6 @@ namespace Microsoft.NodejsTools.Parsing {
         }
 
         public abstract void Walk(AstVisitor walker);
-
-        public void UpdateWith(IndexSpan span) {
-            Span = Span.UpdateWith(span);
-        }
-
-        
-        internal SourceLocation GetStart(JsAst jsAst) {
-            return jsAst.IndexToLocation(Span.Start);
-        }
-
-        internal SourceLocation GetEnd(JsAst jsAst) {
-            return jsAst.IndexToLocation(Span.End);
-        }
     }
 
     internal static class NodeExtensions {

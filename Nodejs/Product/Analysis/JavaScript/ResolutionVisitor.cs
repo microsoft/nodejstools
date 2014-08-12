@@ -36,10 +36,10 @@ namespace Microsoft.NodejsTools.Parsing
         /// <summary>stack to maintain the current variable scope as we traverse the tree</summary>
         private Stack<ActivationObject> m_variableStack;
         private ErrorSink _errorSink;
-        internal readonly IndexResolver _indexResolver;
+        internal readonly LocationResolver _locationResolver;
         private Dictionary<Node, ActivationObject> _scopes = new Dictionary<Node, ActivationObject>();
 
-        private ResolutionVisitor(ActivationObject rootScope, IndexResolver indexResolver, ErrorSink errorSink) {
+        private ResolutionVisitor(ActivationObject rootScope, LocationResolver indexResolver, ErrorSink errorSink) {
             // create the lexical and variable scope stacks and push the root scope onto them
             m_lexicalStack = new Stack<ActivationObject>();
             m_lexicalStack.Push(rootScope);
@@ -47,7 +47,7 @@ namespace Microsoft.NodejsTools.Parsing
             m_variableStack = new Stack<ActivationObject>();
             m_variableStack.Push(rootScope);
 
-            _indexResolver = indexResolver;
+            _locationResolver = indexResolver;
             _errorSink = errorSink;
         }
 
@@ -73,7 +73,7 @@ namespace Microsoft.NodejsTools.Parsing
 
         #endregion
 
-        public static void Apply(Node node, ActivationObject scope, IndexResolver indexResolver, ErrorSink errorSink)
+        public static void Apply(Node node, ActivationObject scope, LocationResolver indexResolver, ErrorSink errorSink)
         {
             if (node != null && scope != null)
             {
@@ -149,8 +149,8 @@ namespace Microsoft.NodejsTools.Parsing
                 
                     _errorSink.HandleUndeclaredVariable(
                         lookup.Name,
-                        lookup.Span,
-                        _indexResolver
+                        lookup.GetSpan(_locationResolver),
+                        _locationResolver
                     );
                     
             }
@@ -206,7 +206,7 @@ namespace Microsoft.NodejsTools.Parsing
                     // in modern browsers, but will bind to this catch variable in older
                     // versions of IE! Definitely a cross-browser difference!
                     // throw a cross-browser issue error.
-                    _errorSink.HandleError(JSError.AmbiguousCatchVar, catchParameter.Span, _indexResolver);
+                    _errorSink.HandleError(JSError.AmbiguousCatchVar, catchParameter.GetSpan(_locationResolver), _locationResolver);
                 }
             }
 
@@ -249,7 +249,11 @@ namespace Microsoft.NodejsTools.Parsing
                     // modern browsers will have the link to the outer field, but older
                     // IE browsers will link to this function expression!
                     // fire a cross-browser error warning
-                    _errorSink.HandleError(JSError.AmbiguousNamedFunctionExpression, funcObject.NameSpan, _indexResolver);
+                    _errorSink.HandleError(
+                        JSError.AmbiguousNamedFunctionExpression,
+                        funcObject.GetNameSpan(_locationResolver), 
+                        _locationResolver
+                    );
                 }
             }
 
@@ -316,7 +320,7 @@ namespace Microsoft.NodejsTools.Parsing
                 {
                     SetScope(
                         node,
-                        new BlockScope(node, CurrentLexicalScope, node.Span, _errorSink)
+                        new BlockScope(node, CurrentLexicalScope, _errorSink)
                         {
                             IsInWithScope = m_withDepth > 0
                         }
@@ -499,7 +503,7 @@ namespace Microsoft.NodejsTools.Parsing
                         // create the scope on the block
                         SetScope(
                             node,
-                            new BlockScope(node, CurrentLexicalScope, node.Span, _errorSink)
+                            new BlockScope(node, CurrentLexicalScope, _errorSink)
                             {
                                 IsInWithScope = m_withDepth > 0
                             }
@@ -548,7 +552,7 @@ namespace Microsoft.NodejsTools.Parsing
                         // create the scope on the block
                         SetScope(
                             node,
-                            new BlockScope(node, CurrentLexicalScope, node.Span, _errorSink)
+                            new BlockScope(node, CurrentLexicalScope, _errorSink)
                             {
                                 IsInWithScope = m_withDepth > 0
                             }
@@ -647,7 +651,7 @@ namespace Microsoft.NodejsTools.Parsing
                         // this is ES6 syntax: a function declaration inside a block scope. Not allowed
                         // in ES5 code, so throw a warning and ghost this function in the outer variable scope 
                         // to make sure that we don't generate any naming collisions.
-                        _errorSink.HandleError(JSError.MisplacedFunctionDeclaration, node.NameSpan, _indexResolver);
+                        _errorSink.HandleError(JSError.MisplacedFunctionDeclaration, node.GetNameSpan(_locationResolver), _locationResolver);
                         CurrentVariableScope.GhostedFunctions.Add(node);
                     }
                 }
@@ -813,7 +817,7 @@ namespace Microsoft.NodejsTools.Parsing
                 // its child switch-case nodes
                 SetScope(
                     node,
-                    new BlockScope(node, CurrentLexicalScope, node.Span, _errorSink)
+                    new BlockScope(node, CurrentLexicalScope, _errorSink)
                     {
                         IsInWithScope = m_withDepth > 0
                     }
@@ -889,7 +893,7 @@ namespace Microsoft.NodejsTools.Parsing
                     // the block itself will push the scope onto the stack and pop it off, so we don't have to.
                     SetScope(
                         node.CatchBlock, 
-                        new CatchScope(node.CatchBlock, CurrentLexicalScope, node.CatchBlock.Span, node.CatchParameter, _errorSink)
+                        new CatchScope(node.CatchBlock, CurrentLexicalScope, node.CatchParameter, _errorSink)
                         {
                             IsInWithScope = m_withDepth > 0
                         }
@@ -982,7 +986,7 @@ namespace Microsoft.NodejsTools.Parsing
                     // the block itself will push the scope onto the stack and pop it off, so we don't have to.
                     SetScope(
                         node.Body, 
-                        new WithScope(node.Body, CurrentLexicalScope, node.Body.Span, _errorSink)
+                        new WithScope(node.Body, CurrentLexicalScope, _errorSink)
                     );
 
                     try

@@ -654,9 +654,15 @@ let x = 42;",
 
         class ParseTreeWalker : AstVisitor {
             public readonly List<NodeInfo> Nodes = new List<NodeInfo>();
+            private readonly JsAst _tree;
+
+            public ParseTreeWalker(JsAst tree) {
+                _tree = tree;
+            }
+
             public static List<NodeInfo> Parse(string code) {
                 var ast = ParseCode(code);
-                var walker = new ParseTreeWalker();
+                var walker = new ParseTreeWalker(ast);
                 ast.Walk(walker);
                 return walker.Nodes;
             }
@@ -668,7 +674,14 @@ let x = 42;",
             }
 
             private void AddNode(Node node, params int[] extraIndicies) {
-                Nodes.Add(new NodeInfo(node.GetType(), node.StartIndex, node.EndIndex, extraIndicies));
+                Nodes.Add(
+                    new NodeInfo(
+                        node.GetType(), 
+                        node.GetStartIndex(_tree.LocationResolver), 
+                        node.GetEndIndex(_tree.LocationResolver), 
+                        extraIndicies
+                    )
+                );
             }
 
             public override bool Walk(ArrayLiteral node) { AddNode(node); return true; }
@@ -687,7 +700,7 @@ let x = 42;",
             public override bool Walk(EmptyStatement node) { AddNode(node); return true; }
             public override bool Walk(ForIn node) { AddNode(node); return true; }
             public override bool Walk(ForNode node) { AddNode(node); return true; }
-            public override bool Walk(FunctionObject node) { AddNode(node, node.NameSpan.Start, node.ParameterStart, node.ParameterEnd); return true; }
+            public override bool Walk(FunctionObject node) { AddNode(node, node.GetNameSpan(_tree.LocationResolver).Start, node.ParameterStart, node.ParameterEnd); return true; }
             public override bool Walk(GetterSetter node) { AddNode(node); return true; }
             public override bool Walk(GroupingOperator node) { AddNode(node); return true; }
             public override bool Walk(IfNode node) { AddNode(node); return true; }

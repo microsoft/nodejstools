@@ -28,7 +28,7 @@ namespace Microsoft.NodejsTools.Parsing
     {
         public JSToken StatementToken { get; set; }
 
-        public LexicalDeclaration(IndexSpan span)
+        public LexicalDeclaration(EncodedSpan span)
             : base(span)
         {
         }

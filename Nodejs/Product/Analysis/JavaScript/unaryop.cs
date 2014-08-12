@@ -38,7 +38,7 @@ namespace Microsoft.NodejsTools.Parsing
         public bool IsPostfix { get; set; }
         
 
-        public UnaryOperator(IndexSpan span)
+        public UnaryOperator(EncodedSpan span)
             : base(span)
         {
         }

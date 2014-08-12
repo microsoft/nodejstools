@@ -29,8 +29,12 @@ namespace Microsoft.NodejsTools.Parsing
         public IndexSpan NameSpan { get; set; }
         public JSVariableField VariableField { get; set; }
 
-        public VariableDeclaration(IndexSpan span)
+        public VariableDeclaration(EncodedSpan span)
             : base(span) {
+        }
+
+        public IndexSpan GetNameSpan(LocationResolver locationResolver) {
+            return NameSpan;
         }
 
         public Expression Initializer

@@ -27,7 +27,7 @@ namespace Microsoft.NodejsTools.Parsing
         public string Label { get; set; }
         public IndexSpan LabelSpan { get; set; }
 
-        public ContinueNode(IndexSpan span)
+        public ContinueNode(EncodedSpan span)
             : base(span)
         {
         }

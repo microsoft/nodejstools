@@ -23,9 +23,8 @@ namespace Microsoft.NodejsTools.Parsing
     [Serializable]
     public class DirectivePrologue : ConstantWrapper
     {
-        public DirectivePrologue(string value, IndexSpan span)
-            : base(value, span)
-        {
+        public DirectivePrologue(string value, EncodedSpan span)
+            : base(value, span) {
             // this is a "use strict" directive if the source context is EXACTLY "use strict"
             // don't consider the quotes so it can be " or ' delimiters
             UseStrict = string.Equals(value, "use strict", StringComparison.Ordinal);

@@ -24,7 +24,7 @@ namespace Microsoft.NodejsTools.Parsing
     [Serializable]
     public class EmptyStatement : Statement
     {
-        public EmptyStatement(IndexSpan context)
+        public EmptyStatement(EncodedSpan context)
             : base(context)
         {
         }

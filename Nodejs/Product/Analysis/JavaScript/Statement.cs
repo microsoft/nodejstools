@@ -20,9 +20,9 @@ namespace Microsoft.NodejsTools.Parsing
     [Serializable]
     public abstract class Statement : Node
     {
-        protected Statement(IndexSpan span)
-            : base(span)
-        {
+        protected Statement(EncodedSpan location)
+            : base(location) {
+            EncodedSpan = location;
         }
 
         /// <summary>
@@ -63,7 +63,7 @@ namespace Microsoft.NodejsTools.Parsing
 
         public override string ToString() {
             if (GlobalParent != null) {
-                return String.Format("{0} {1} {2}", GetType().Name, GetStart(GlobalParent), GetEnd(GlobalParent));
+                return String.Format("{0} {1} {2}", GetType().Name, GetStart(GlobalParent.LocationResolver), GetEnd(GlobalParent.LocationResolver));
             }
             return base.ToString();
         }

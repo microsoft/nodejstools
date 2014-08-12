@@ -35,11 +35,7 @@ namespace Microsoft.NodejsTools.Analysis {
     /// </summary>
     [Serializable]
     struct EncodedLocation : IEquatable<EncodedLocation> {
-        public readonly object Location;
-
-        public EncodedLocation(LocationInfo location) {
-            Location = location;
-        }
+        public readonly Node Location;
 
         public EncodedLocation(Node node) {
             Location = node;
@@ -65,20 +61,13 @@ namespace Microsoft.NodejsTools.Analysis {
         #endregion
 
         public LocationInfo GetLocationInfo(ProjectEntry project) {
-            LocationInfo locInfo = Location as LocationInfo;
-            if (locInfo != null) {
-                return locInfo;
-            }
             Node node = Location as Node;
-            if (node != null) {
-                var location = project.Tree.IndexToLocation(node.Span.Start);
-                return new LocationInfo(
-                    project,
-                    location.Line,
-                    location.Column
-                );
-            }
-            throw new InvalidOperationException();
+            var location = project.Tree.IndexToLocation(node.GetStartIndex(project.Tree.LocationResolver));
+            return new LocationInfo(
+                project,
+                location.Line,
+                location.Column
+            );
         }
     }
 }

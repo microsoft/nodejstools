@@ -49,9 +49,8 @@ namespace Microsoft.NodejsTools.Parsing
 
         public Object Value { get; set; }
 
-        public ConstantWrapper(Object value, IndexSpan span)
-            : base(span)
-        {
+        public ConstantWrapper(Object value, EncodedSpan span)
+            : base(span) {
             Value = value;
         }
 

@@ -21,12 +21,9 @@ namespace Microsoft.NodejsTools.Parsing
 {
     public class BlockScope : ActivationObject
     {
-        private IndexSpan _span;
-
-        public BlockScope(Statement node, ActivationObject parent, IndexSpan span, ErrorSink errorSink)
+        public BlockScope(Statement node, ActivationObject parent, ErrorSink errorSink)
             : base(node, parent, errorSink)
         {
-            _span = span;
         }
 
         #region scope setup methods

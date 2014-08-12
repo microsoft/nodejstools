@@ -39,9 +39,8 @@ namespace Microsoft.NodejsTools.Parsing
         public int NestCount { get; set; }
         public string Label { get; set; }
 
-        public LabeledStatement(IndexSpan span)
-            : base(span)
-        {
+        public LabeledStatement(EncodedSpan span)
+            : base(span) {
         }
 
         public override void Walk(AstVisitor visitor) {

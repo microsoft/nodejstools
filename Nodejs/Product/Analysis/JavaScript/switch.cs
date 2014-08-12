@@ -50,7 +50,7 @@ namespace Microsoft.NodejsTools.Parsing
             }
         }
 
-        public Switch(IndexSpan span)
+        public Switch(EncodedSpan span)
             : base(span)
         {
         }

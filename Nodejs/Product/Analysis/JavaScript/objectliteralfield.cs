@@ -21,7 +21,7 @@ namespace Microsoft.NodejsTools.Parsing
     [Serializable]
     public class ObjectLiteralField : ConstantWrapper
     {
-        public ObjectLiteralField(Object value, IndexSpan span)
+        public ObjectLiteralField(Object value, EncodedSpan span)
             : base(value, span)
         {
         }

@@ -67,6 +67,22 @@ namespace Microsoft.NodejsTools.Parsing
 
         #region public properties
 
+        public Statement Node {
+            get {
+                return _node;
+            }
+        }
+
+        public GlobalScope GlobalScope {
+            get {
+                var curScope = this;
+                while (!(curScope is GlobalScope)) {
+                    curScope = curScope.Parent;
+                }
+                return (GlobalScope)curScope;
+            }
+        }
+
         public bool UseStrict
         {
             get
@@ -141,7 +157,8 @@ namespace Microsoft.NodejsTools.Parsing
                 {
                     // it's an error to declare anything in the catch scope with the same name as the
                     // error variable
-                    ErrorSink.HandleError(JSError.DuplicateCatch, nameDecl.NameSpan, resolutionVisitor._indexResolver, true);
+                    
+                    ErrorSink.HandleError(JSError.DuplicateCatch, nameDecl.GetNameSpan(GlobalScope.Node.LocationResolver), resolutionVisitor._locationResolver, true);
                 }
             }
             else
@@ -163,7 +180,12 @@ namespace Microsoft.NodejsTools.Parsing
                     // lexical declarations with the same name in the same scope.
                     if (nameDecl.Parent is LexicalDeclaration)
                     {
-                        _errorSink.HandleError(JSError.DuplicateLexicalDeclaration, nameDecl.NameSpan, resolutionVisitor._indexResolver, true);
+                        _errorSink.HandleError(
+                            JSError.DuplicateLexicalDeclaration, 
+                            nameDecl.GetNameSpan(GlobalScope.Node.LocationResolver), 
+                            resolutionVisitor._locationResolver, 
+                            true
+                        );
                     }
                 }
             }

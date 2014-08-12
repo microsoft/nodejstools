@@ -21,6 +21,7 @@ using Microsoft.NodejsTools.Parsing;
 namespace Microsoft.NodejsTools.Formatting {
     sealed class FormattingVisitor : AstVisitor {
         private readonly string _code;
+        private readonly JsAst _tree;
         private readonly FormattingOptions _options;
         private readonly List<Edit> _edits = new List<Edit>();
         private readonly List<string> _whitespace = new List<string>();
@@ -34,19 +35,20 @@ namespace Microsoft.NodejsTools.Formatting {
         private static char[] _openParen = new[] { '(' };
         private static char[] _closeBrace = new[] { '}' };
 
-        public FormattingVisitor(string code, FormattingOptions options = null, bool onEnter = false) {
+        public FormattingVisitor(string code, JsAst tree, FormattingOptions options = null, bool onEnter = false) {
             _code = code;
             _options = options ?? new FormattingOptions();
             _onEnter = onEnter;
+            _tree = tree;
         }
 
         public void Format(JsAst ast) {
-            RemoveTrailingWhiteSpace(ast.StartIndex);
+            RemoveTrailingWhiteSpace(ast.GetStartIndex(_tree.LocationResolver));
             WalkStatements(ast, ast.Block.Statements, false);
             if (ast.Block.Count > 0) {
-                FixStatementIndentation(ast.Block[ast.Block.Count - 1].EndIndex, ast.EndIndex);
+                FixStatementIndentation(ast.Block[ast.Block.Count - 1].GetEndIndex(_tree.LocationResolver), ast.GetEndIndex(_tree.LocationResolver));
             }
-            ReplacePreceedingWhiteSpace(ast.EndIndex);
+            ReplacePreceedingWhiteSpace(ast.GetEndIndex(_tree.LocationResolver));
         }
 
         public List<Edit> Edits {
@@ -62,7 +64,7 @@ namespace Microsoft.NodejsTools.Formatting {
 
             if (node.Initializer != null) {
                 ReplacePreceedingWhiteSpace(
-                    node.Initializer.StartIndex,
+                    node.Initializer.GetStartIndex(_tree.LocationResolver),
                     _options.SpaceAfterOpeningAndBeforeClosingNonEmptyParenthesis ? " " : "",
                     _openParen
                 );
@@ -72,7 +74,7 @@ namespace Microsoft.NodejsTools.Formatting {
 
             if (node.Condition != null) {
                 ReplacePreceedingWhiteSpace(
-                    node.Condition.StartIndex,
+                    node.Condition.GetStartIndex(_tree.LocationResolver),
                     _options.SpaceAfterSemiColonInFor ? " " : "",
                     _semicolon
                 );
@@ -80,11 +82,11 @@ namespace Microsoft.NodejsTools.Formatting {
                 node.Condition.Walk(this);
             }
             if (node.Incrementer != null) {
-                ReplacePreceedingWhiteSpace(node.Incrementer.StartIndex, _options.SpaceAfterSemiColonInFor ? " " : "", _semicolon);
+                ReplacePreceedingWhiteSpace(node.Incrementer.GetStartIndex(_tree.LocationResolver), _options.SpaceAfterSemiColonInFor ? " " : "", _semicolon);
                 node.Incrementer.Walk(this);
 
                 ReplaceFollowingWhiteSpace(
-                    node.Incrementer.EndIndex,
+                    node.Incrementer.GetEndIndex(_tree.LocationResolver),
                     _options.SpaceAfterOpeningAndBeforeClosingNonEmptyParenthesis ? " " : ""
                 );
             }
@@ -96,7 +98,7 @@ namespace Microsoft.NodejsTools.Formatting {
         }
 
         private void WalkFlowControlBlockWithOptionalParens(Block block, int previousExpressionEnd, bool inParens) {
-            WalkFlowControlBlockWithOptionalParens(block, ((Statement)block.Parent).StartIndex, previousExpressionEnd, inParens);
+            WalkFlowControlBlockWithOptionalParens(block, ((Statement)block.Parent).GetStartIndex(_tree.LocationResolver), previousExpressionEnd, inParens);
         }
 
         private void WalkFlowControlBlockWithOptionalParens(Block block, int startIndex, int previousExpressionEnd, bool inParens) {
@@ -109,7 +111,7 @@ namespace Microsoft.NodejsTools.Formatting {
                     // vs
                     // if (foo) blah
 
-                    bool multiLine = ContainsLineFeed(previousExpressionEnd, block.StartIndex);
+                    bool multiLine = ContainsLineFeed(previousExpressionEnd, block.GetStartIndex(_tree.LocationResolver));
                     if (multiLine) {
                         // remove trailing whitespace at the end of this line
                         bool followedBySingleLineComment;
@@ -126,7 +128,7 @@ namespace Microsoft.NodejsTools.Formatting {
                         Dedent();
                     }
                 } else {
-                    ReplacePreceedingIncludingNewLines(block.StartIndex, GetFlowControlBraceInsertion(previousExpressionEnd, false));
+                    ReplacePreceedingIncludingNewLines(block.GetStartIndex(_tree.LocationResolver), GetFlowControlBraceInsertion(previousExpressionEnd, false));
 
                     WalkBlock(block);
                 }
@@ -137,30 +139,30 @@ namespace Microsoft.NodejsTools.Formatting {
             ReplaceControlFlowWhiteSpace(node, "for".Length);
 
             ReplacePreceedingWhiteSpace(
-                node.Variable.StartIndex,
+                node.Variable.GetStartIndex(_tree.LocationResolver),
                 _options.SpaceAfterOpeningAndBeforeClosingNonEmptyParenthesis ? " " : "",
                 _openParen
             );
             node.Variable.Walk(this);
 
             ReplaceFollowingWhiteSpace(
-                node.Variable.EndIndex,
+                node.Variable.GetEndIndex(_tree.LocationResolver),
                 " "
             );
 
             ReplacePreceedingWhiteSpace(
-                node.Collection.StartIndex,
+                node.Collection.GetStartIndex(_tree.LocationResolver),
                 " "
             );
 
             node.Collection.Walk(this);
 
             ReplaceFollowingWhiteSpace(
-                node.Collection.EndIndex,
+                node.Collection.GetEndIndex(_tree.LocationResolver),
                 _options.SpaceAfterOpeningAndBeforeClosingNonEmptyParenthesis ? " " : ""
             );
 
-            WalkFlowControlBlockWithOptionalParens(node.Body, node.Collection.EndIndex, true);
+            WalkFlowControlBlockWithOptionalParens(node.Body, node.Collection.GetEndIndex(_tree.LocationResolver), true);
             return false;
         }
 
@@ -170,7 +172,7 @@ namespace Microsoft.NodejsTools.Formatting {
             EnsureSpacesAroundParenthesisedExpression(node.Condition);
 
             if (node.TrueBlock != null) {
-                WalkFlowControlBlockWithOptionalParens(node.TrueBlock, node.Condition.EndIndex, true);
+                WalkFlowControlBlockWithOptionalParens(node.TrueBlock, node.Condition.GetEndIndex(_tree.LocationResolver), true);
             }
             if (node.FalseBlock != null) {
                 ReplacePreceedingWhiteSpaceMaybeMultiline(node.ElseStart);
@@ -180,7 +182,14 @@ namespace Microsoft.NodejsTools.Formatting {
         }
 
         public override bool Walk(TryNode node) {
-            ReplacePreceedingIncludingNewLines(node.TryBlock.StartIndex, GetFlowControlBraceInsertion(node.StartIndex + "try".Length, false));
+            ReplacePreceedingIncludingNewLines(
+                node.TryBlock.GetStartIndex(
+                _tree.LocationResolver), 
+                GetFlowControlBraceInsertion(
+                    node.GetStartIndex(_tree.LocationResolver) + "try".Length, 
+                    false
+                )
+            );
             WalkBlock(node.TryBlock);
             if (node.CatchParameter != null) {
                 if (node.CatchStart != -1) {
@@ -189,17 +198,20 @@ namespace Microsoft.NodejsTools.Formatting {
                 }
 
                 ReplacePreceedingWhiteSpace(
-                    node.CatchParameter.StartIndex,
+                    node.CatchParameter.GetStartIndex(_tree.LocationResolver),
                     _options.SpaceAfterOpeningAndBeforeClosingNonEmptyParenthesis ? " " : "",
                     _openParen
                 );
 
                 ReplaceFollowingWhiteSpace(
-                    node.CatchParameter.EndIndex,
+                    node.CatchParameter.GetEndIndex(_tree.LocationResolver),
                     _options.SpaceAfterOpeningAndBeforeClosingNonEmptyParenthesis ? " " : ""
                 );
 
-                ReplacePreceedingIncludingNewLines(node.CatchBlock.StartIndex, GetFlowControlBraceInsertion(node.CatchParameter.EndIndex, true));
+                ReplacePreceedingIncludingNewLines(
+                    node.CatchBlock.GetStartIndex(_tree.LocationResolver), 
+                    GetFlowControlBraceInsertion(node.CatchParameter.GetEndIndex(_tree.LocationResolver), true)
+                );
                 WalkBlock(node.CatchBlock);
             }
 
@@ -207,7 +219,10 @@ namespace Microsoft.NodejsTools.Formatting {
                 if (node.FinallyStart != -1) {
                     ReplacePreceedingWhiteSpace(node.FinallyStart, " ", _closeBrace);
                 }
-                ReplacePreceedingIncludingNewLines(node.FinallyBlock.StartIndex, GetFlowControlBraceInsertion(node.FinallyStart + "finally".Length, false));
+                ReplacePreceedingIncludingNewLines(
+                    node.FinallyBlock.GetStartIndex(_tree.LocationResolver), 
+                    GetFlowControlBraceInsertion(node.FinallyStart + "finally".Length, false)
+                );
                 WalkBlock(node.FinallyBlock);
             }
             return false;
@@ -219,9 +234,9 @@ namespace Microsoft.NodejsTools.Formatting {
             EnsureSpacesAroundParenthesisedExpression(node.Expression);
             bool isMultiLine = false;
             if (node.BlockStart != -1) {
-                ReplacePreceedingIncludingNewLines(node.BlockStart, GetFlowControlBraceInsertion(node.Expression.EndIndex, true));
+                ReplacePreceedingIncludingNewLines(node.BlockStart, GetFlowControlBraceInsertion(node.Expression.GetEndIndex(_tree.LocationResolver), true));
 
-                isMultiLine = ContainsLineFeed(node.BlockStart, node.EndIndex);
+                isMultiLine = ContainsLineFeed(node.BlockStart, node.GetEndIndex(_tree.LocationResolver));
             }
 
             // very similar to walking a block w/o a block
@@ -231,20 +246,20 @@ namespace Microsoft.NodejsTools.Formatting {
                 var caseNode = node.Cases[i];
 
                 if (i == 0 && isMultiLine) {
-                    EnsureNewLinePreceeding(caseNode.StartIndex);
+                    EnsureNewLinePreceeding(caseNode.GetStartIndex(_tree.LocationResolver));
                 } else {
-                    ReplacePreceedingWhiteSpace(caseNode.StartIndex);
+                    ReplacePreceedingWhiteSpace(caseNode.GetStartIndex(_tree.LocationResolver));
                 }
 
                 if (caseNode.CaseValue != null) {
-                    ReplacePreceedingWhiteSpace(caseNode.CaseValue.StartIndex, " ");
+                    ReplacePreceedingWhiteSpace(caseNode.CaseValue.GetStartIndex(_tree.LocationResolver), " ");
                     caseNode.CaseValue.Walk(this);
-                    ReplaceFollowingWhiteSpace(caseNode.CaseValue.EndIndex, "");
+                    ReplaceFollowingWhiteSpace(caseNode.CaseValue.GetEndIndex(_tree.LocationResolver), "");
                 }
 
                 if (caseNode.ColonIndex != -1 &&
                     caseNode.Statements.Count > 0 &&
-                    ContainsLineFeed(caseNode.ColonIndex, caseNode.Statements[0].StartIndex)) {
+                    ContainsLineFeed(caseNode.ColonIndex, caseNode.Statements[0].GetStartIndex(_tree.LocationResolver))) {
                     ReplaceFollowingWhiteSpace(caseNode.ColonIndex + ":".Length, "");
                 }
 
@@ -264,15 +279,15 @@ namespace Microsoft.NodejsTools.Formatting {
             }
             Dedent();
 
-            ReplacePreceedingWhiteSpace(node.EndIndex - 1);
+            ReplacePreceedingWhiteSpace(node.GetEndIndex(_tree.LocationResolver) - 1);
 
             return false;
         }
 
         public override bool Walk(DoWhile node) {
-            WalkFlowControlBlockWithOptionalParens(node.Body, node.StartIndex + "do".Length, false);
+            WalkFlowControlBlockWithOptionalParens(node.Body, node.GetStartIndex(_tree.LocationResolver) + "do".Length, false);
 
-            ReplaceFollowingWhiteSpace(node.Body.EndIndex, " ");
+            ReplaceFollowingWhiteSpace(node.Body.GetEndIndex(_tree.LocationResolver), " ");
 
             EnsureSpacesAroundParenthesisedExpression(node.Condition);
 
@@ -285,7 +300,7 @@ namespace Microsoft.NodejsTools.Formatting {
             EnsureSpacesAroundParenthesisedExpression(node.Condition);
 
             if (node.Body != null) {
-                WalkFlowControlBlockWithOptionalParens(node.Body, node.Condition.EndIndex, true);
+                WalkFlowControlBlockWithOptionalParens(node.Body, node.Condition.GetEndIndex(_tree.LocationResolver), true);
             }
             return false;
         }
@@ -295,19 +310,19 @@ namespace Microsoft.NodejsTools.Formatting {
 
             EnsureSpacesAroundParenthesisedExpression(node.WithObject);
 
-            WalkFlowControlBlockWithOptionalParens(node.Body, node.WithObject.EndIndex, true);
+            WalkFlowControlBlockWithOptionalParens(node.Body, node.WithObject.GetEndIndex(_tree.LocationResolver), true);
             return false;
         }
 
         public override bool Walk(FunctionObject node) {
             if (node.Name == null) {
                 ReplaceFollowingWhiteSpace(
-                    node.StartIndex + "function".Length,
+                    node.GetStartIndex(_tree.LocationResolver) + "function".Length,
                     _options.SpaceAfterFunctionInAnonymousFunctions ? " " : ""
                 );
             } else {
                 ReplaceFollowingWhiteSpace(
-                    node.NameSpan.End,
+                    node.GetNameSpan(_tree.LocationResolver).End,
                     ""
                 );
             }
@@ -319,7 +334,7 @@ namespace Microsoft.NodejsTools.Formatting {
                 );
 
                 for (int i = 1; i < node.ParameterDeclarations.Length; i++) {
-                    ReplacePreceedingWhiteSpace(node.ParameterDeclarations[i].StartIndex, _options.SpaceAfterComma ? " " : "", _comma);
+                    ReplacePreceedingWhiteSpace(node.ParameterDeclarations[i].GetStartIndex(_tree.LocationResolver), _options.SpaceAfterComma ? " " : "", _comma);
                 }
 
                 ReplacePreceedingWhiteSpace(
@@ -335,7 +350,7 @@ namespace Microsoft.NodejsTools.Formatting {
 
             if (!_onEnter) {
                 ReplacePreceedingIncludingNewLines(
-                    node.Body.StartIndex,
+                    node.Body.GetStartIndex(_tree.LocationResolver),
                     _options.OpenBracesOnNewLineForFunctions || FollowedBySingleLineComment(node.ParameterEnd, false) ?
                         ReplaceWith.InsertNewLineAndIndentation :
                         ReplaceWith.InsertSpace
@@ -359,7 +374,7 @@ namespace Microsoft.NodejsTools.Formatting {
         /// options.
         /// </summary>
         private void ReplaceControlFlowWhiteSpace(Statement node, int keywordLength) {
-            ReplaceFollowingWhiteSpace(node.StartIndex + keywordLength, _options.SpaceAfterKeywordsInControlFlowStatements ? " " : "");
+            ReplaceFollowingWhiteSpace(node.GetStartIndex(_tree.LocationResolver) + keywordLength, _options.SpaceAfterKeywordsInControlFlowStatements ? " " : "");
         }
 
         #endregion
@@ -379,7 +394,7 @@ namespace Microsoft.NodejsTools.Formatting {
                 if (indent) {
                     Indent();
                 }
-                ReplacePreceedingWhiteSpaceMaybeMultiline(node.Statement.StartIndex);
+                ReplacePreceedingWhiteSpaceMaybeMultiline(node.Statement.GetStartIndex(_tree.LocationResolver));
                 node.Statement.Walk(this);
                 if (indent) {
                     Dedent();
@@ -396,14 +411,14 @@ namespace Microsoft.NodejsTools.Formatting {
             // }
             return !(block is Block &&
                 ((Block)block).Braces != BraceState.None &&
-                !ContainsLineFeed(parent.StartIndex, block.StartIndex));
+                !ContainsLineFeed(parent.GetStartIndex(_tree.LocationResolver), block.GetStartIndex(_tree.LocationResolver)));
         }
 
         public override bool Walk(Break node) {
             if (node.Label != null) {
-                ReplaceFollowingWhiteSpace(node.StartIndex + "break".Length, " ");
+                ReplaceFollowingWhiteSpace(node.GetStartIndex(_tree.LocationResolver) + "break".Length, " ");
             }
-            RemoveSemiColonWhiteSpace(node.EndIndex);
+            RemoveSemiColonWhiteSpace(node.GetEndIndex(_tree.LocationResolver));
             return base.Walk(node);
         }
 
@@ -419,19 +434,19 @@ namespace Microsoft.NodejsTools.Formatting {
 
         public override bool Walk(ContinueNode node) {
             if (node.Label != null) {
-                ReplaceFollowingWhiteSpace(node.StartIndex + "continue".Length, " ");
+                ReplaceFollowingWhiteSpace(node.GetStartIndex(_tree.LocationResolver) + "continue".Length, " ");
             }
-            RemoveSemiColonWhiteSpace(node.EndIndex);
+            RemoveSemiColonWhiteSpace(node.GetEndIndex(_tree.LocationResolver));
             return base.Walk(node);
         }
 
         public override bool Walk(DebuggerNode node) {
-            ReplaceFollowingWhiteSpace(node.StartIndex + "debugger".Length, "");
+            ReplaceFollowingWhiteSpace(node.GetStartIndex(_tree.LocationResolver) + "debugger".Length, "");
             return base.Walk(node);
         }
 
         public override bool Walk(Var node) {
-            ReplaceFollowingWhiteSpace(node.StartIndex + "var".Length, " ");
+            ReplaceFollowingWhiteSpace(node.GetStartIndex(_tree.LocationResolver) + "var".Length, " ");
 
             if (node.Count > 0) {
 
@@ -441,7 +456,7 @@ namespace Microsoft.NodejsTools.Formatting {
                 for (int i = 1; i < node.Count; i++) {
                     var curDecl = node[i];
 
-                    ReplacePreceedingWhiteSpaceMaybeMultiline(curDecl.NameSpan.Start);
+                    ReplacePreceedingWhiteSpaceMaybeMultiline(curDecl.GetSpan(_tree.LocationResolver).Start);
 
                     FormatVariableDeclaration(curDecl);
                 }
@@ -451,7 +466,7 @@ namespace Microsoft.NodejsTools.Formatting {
                     // if we have an initializer the whitespace was
                     // cleared between the end of the initializer and the
                     // semicolon
-                    RemoveSemiColonWhiteSpace(node.EndIndex);
+                    RemoveSemiColonWhiteSpace(node.GetEndIndex(_tree.LocationResolver));
                 }
             }
 
@@ -460,24 +475,24 @@ namespace Microsoft.NodejsTools.Formatting {
 
         public override bool Walk(ReturnNode node) {
             if (node.Operand != null) {
-                ReplaceFollowingWhiteSpace(node.StartIndex + "return".Length, " ");
+                ReplaceFollowingWhiteSpace(node.GetStartIndex(_tree.LocationResolver) + "return".Length, " ");
                 node.Operand.Walk(this);
             }
-            RemoveSemiColonWhiteSpace(node.EndIndex);
+            RemoveSemiColonWhiteSpace(node.GetEndIndex(_tree.LocationResolver));
             return false;
         }
 
         public override bool Walk(ExpressionStatement node) {
             node.Expression.Walk(this);
-            RemoveSemiColonWhiteSpace(node.EndIndex);
+            RemoveSemiColonWhiteSpace(node.GetEndIndex(_tree.LocationResolver));
             return false;
         }
 
         public override bool Walk(ThrowNode node) {
             if (node.Operand != null) {
-                ReplaceFollowingWhiteSpace(node.StartIndex + "throw".Length, " ");
+                ReplaceFollowingWhiteSpace(node.GetStartIndex(_tree.LocationResolver) + "throw".Length, " ");
             }
-            RemoveSemiColonWhiteSpace(node.EndIndex);
+            RemoveSemiColonWhiteSpace(node.GetEndIndex(_tree.LocationResolver));
             return base.Walk(node);
         }
 
@@ -487,11 +502,11 @@ namespace Microsoft.NodejsTools.Formatting {
 
         public override bool Walk(ObjectLiteralProperty node) {
             if (node.Name is GetterSetter) {
-                ReplaceFollowingWhiteSpace(node.Name.StartIndex + "get".Length, " ");
+                ReplaceFollowingWhiteSpace(node.Name.GetStartIndex(_tree.LocationResolver) + "get".Length, " ");
                 node.Value.Walk(this);
             } else {
                 node.Name.Walk(this);
-                ReplacePreceedingWhiteSpace(node.Value.StartIndex, " ");
+                ReplacePreceedingWhiteSpace(node.Value.GetStartIndex(_tree.LocationResolver), " ");
                 node.Value.Walk(this);
             }
             return false;
@@ -499,15 +514,15 @@ namespace Microsoft.NodejsTools.Formatting {
 
         public override bool Walk(ObjectLiteral node) {
             if (node.Properties.Length == 0) {
-                ReplacePreceedingWhiteSpace(node.EndIndex - 1, "");
+                ReplacePreceedingWhiteSpace(node.GetEndIndex(_tree.LocationResolver) - 1, "");
             } else {
                 Indent();
-                bool isMultiLine = ContainsLineFeed(node.StartIndex, node.EndIndex);
+                bool isMultiLine = ContainsLineFeed(node.GetStartIndex(_tree.LocationResolver), node.GetEndIndex(_tree.LocationResolver));
                 if (node.Properties.Length > 0) {
                     if (isMultiLine) {
                         // multiline block statement, make sure the 1st statement
                         // starts on a new line
-                        EnsureNewLineFollowing(node.StartIndex + "{".Length);
+                        EnsureNewLineFollowing(node.GetStartIndex(_tree.LocationResolver) + "{".Length);
                     }
 
                     WalkStatements(node, node.Properties, isMultiLine);
@@ -515,9 +530,9 @@ namespace Microsoft.NodejsTools.Formatting {
                 Dedent();
 
                 if (isMultiLine) {
-                    ReplacePreceedingIncludingNewLines(node.EndIndex - 1, ReplaceWith.InsertNewLineAndIndentation);
+                    ReplacePreceedingIncludingNewLines(node.GetEndIndex(_tree.LocationResolver) - 1, ReplaceWith.InsertNewLineAndIndentation);
                 } else {
-                    ReplacePreceedingWhiteSpace(node.EndIndex - 1, " ");
+                    ReplacePreceedingWhiteSpace(node.GetEndIndex(_tree.LocationResolver) - 1, " ");
                 }
             }
             return false;
@@ -525,14 +540,14 @@ namespace Microsoft.NodejsTools.Formatting {
 
         public override bool Walk(GroupingOperator node) {
             ReplaceFollowingWhiteSpace(
-                node.StartIndex + 1,
+                node.GetStartIndex(_tree.LocationResolver) + 1,
                 _options.SpaceAfterOpeningAndBeforeClosingNonEmptyParenthesis ? " " : ""
             );
 
             node.Operand.Walk(this);
 
             ReplacePreceedingWhiteSpace(
-                node.EndIndex - 1,
+                node.GetEndIndex(_tree.LocationResolver) - 1,
                 _options.SpaceAfterOpeningAndBeforeClosingNonEmptyParenthesis ? " " : ""
             );
 
@@ -541,7 +556,7 @@ namespace Microsoft.NodejsTools.Formatting {
 
         public override bool Walk(Member node) {
             node.Root.Walk(this);
-            ReplaceFollowingWhiteSpace(node.Root.EndIndex, "");
+            ReplaceFollowingWhiteSpace(node.Root.GetEndIndex(_tree.LocationResolver), "");
             ReplaceFollowingWhiteSpace(node.NameSpan.Start + 1, "");
             return false;
         }
@@ -550,19 +565,19 @@ namespace Microsoft.NodejsTools.Formatting {
             node.Function.Walk(this);
 
             if (node.IsConstructor) {
-                ReplaceFollowingWhiteSpace(node.StartIndex + "new".Length, " ");
+                ReplaceFollowingWhiteSpace(node.GetStartIndex(_tree.LocationResolver) + "new".Length, " ");
             }
 
             if (!node.InBrackets) {
                 ReplaceFollowingWhiteSpace(
-                    node.Function.EndIndex,
+                    node.Function.GetEndIndex(_tree.LocationResolver),
                     ""
                 );
             }
 
             if (node.Arguments != null && node.Arguments.Length > 0) {
                 ReplacePreceedingWhiteSpace(
-                    node.Arguments[0].StartIndex,
+                    node.Arguments[0].GetStartIndex(_tree.LocationResolver),
                     _options.SpaceAfterOpeningAndBeforeClosingNonEmptyParenthesis ? " " : "",
                     _openParen
                 );
@@ -571,7 +586,7 @@ namespace Microsoft.NodejsTools.Formatting {
 
                 for (int i = 1; i < node.Arguments.Length; i++) {
                     ReplacePreceedingWhiteSpace(
-                        node.Arguments[i].StartIndex,
+                        node.Arguments[i].GetStartIndex(_tree.LocationResolver),
                         _options.SpaceAfterComma ? " " : "",
                         _comma
                     );
@@ -582,7 +597,7 @@ namespace Microsoft.NodejsTools.Formatting {
 
             if (!node.InBrackets) {
                 ReplacePreceedingWhiteSpace(
-                    node.EndIndex - 1,
+                    node.GetEndIndex(_tree.LocationResolver) - 1,
                     _options.SpaceAfterOpeningAndBeforeClosingNonEmptyParenthesis ? " " : ""
                 );
             }
@@ -595,7 +610,7 @@ namespace Microsoft.NodejsTools.Formatting {
                 node.Expressions[0].Walk(this);
 
                 for (int i = 1; i < node.Expressions.Length; i++) {
-                    ReplacePreceedingWhiteSpace(node.Expressions[i].StartIndex, _options.SpaceAfterComma ? " " : "", _comma);
+                    ReplacePreceedingWhiteSpace(node.Expressions[i].GetStartIndex(_tree.LocationResolver), _options.SpaceAfterComma ? " " : "", _comma);
                     node.Expressions[i].Walk(this);
                 }
             }
@@ -607,14 +622,14 @@ namespace Microsoft.NodejsTools.Formatting {
                 if (node.OperatorToken == JSToken.Void ||
                     node.OperatorToken == JSToken.TypeOf ||
                     node.OperatorToken == JSToken.Delete) {
-                    ReplacePreceedingWhiteSpace(node.Operand.StartIndex, " ");
+                        ReplacePreceedingWhiteSpace(node.Operand.GetStartIndex(_tree.LocationResolver), " ");
                 } else {
-                    ReplacePreceedingWhiteSpace(node.Operand.StartIndex, "");
+                    ReplacePreceedingWhiteSpace(node.Operand.GetStartIndex(_tree.LocationResolver), "");
                 }
             }
             node.Operand.Walk(this);
             if (node.IsPostfix) {
-                ReplaceFollowingWhiteSpace(node.Operand.EndIndex, "");
+                ReplaceFollowingWhiteSpace(node.Operand.GetEndIndex(_tree.LocationResolver), "");
             }
             return false;
         }
@@ -623,12 +638,12 @@ namespace Microsoft.NodejsTools.Formatting {
             node.Operand1.Walk(this);
 
             ReplaceFollowingWhiteSpace(
-                node.Operand1.EndIndex,
+                node.Operand1.GetEndIndex(_tree.LocationResolver),
                 _options.SpaceBeforeAndAfterBinaryOperator ? " " : null
             );
 
             ReplacePreceedingWhiteSpace(
-                node.Operand2.StartIndex,
+                node.Operand2.GetStartIndex(_tree.LocationResolver),
                 _options.SpaceBeforeAndAfterBinaryOperator ? " " : null,
                 null,
                 _newlines
@@ -730,19 +745,19 @@ namespace Microsoft.NodejsTools.Formatting {
         private void FormatVariableDeclaration(VariableDeclaration curDecl) {
             if (curDecl.HasInitializer) {
                 ReplaceFollowingWhiteSpace(
-                    curDecl.NameSpan.End,
+                    curDecl.GetNameSpan(_tree.LocationResolver).End,
                     _options.SpaceBeforeAndAfterBinaryOperator ? " " : ""
                 );
 
                 ReplacePreceedingWhiteSpace(
-                    curDecl.Initializer.StartIndex,
+                    curDecl.Initializer.GetStartIndex(_tree.LocationResolver),
                     _options.SpaceBeforeAndAfterBinaryOperator ? " " : ""
                 );
 
                 curDecl.Initializer.Walk(this);
 
                 ReplaceFollowingWhiteSpace(
-                    curDecl.Initializer.EndIndex,
+                    curDecl.Initializer.GetEndIndex(_tree.LocationResolver),
                     ""
                 );
             }
@@ -802,11 +817,11 @@ namespace Microsoft.NodejsTools.Formatting {
         private void WalkBlock(Block block) {
             Debug.Assert(block == null || block.Braces != BraceState.None);
             if (block != null && block.Braces != BraceState.None) {
-                bool isMultiLine = ContainsLineFeed(block.StartIndex, block.EndIndex);
+                bool isMultiLine = ContainsLineFeed(block.GetStartIndex(_tree.LocationResolver), block.GetEndIndex(_tree.LocationResolver));
                 if (block.Count > 0 && isMultiLine) {
                     // multiline block statement, make sure the 1st statement
                     // starts on a new line
-                    EnsureNewLineFollowing(block.StartIndex + "{".Length);
+                    EnsureNewLineFollowing(block.GetStartIndex(_tree.LocationResolver) + "{".Length);
                 }
 
                 var parent = block.Parent;
@@ -818,43 +833,43 @@ namespace Microsoft.NodejsTools.Formatting {
 
                 if (block.Braces == BraceState.StartAndEnd) {
                     if (isMultiLine) {
-                        EnsureNewLinePreceeding(block.EndIndex - 1);
+                        EnsureNewLinePreceeding(block.GetEndIndex(_tree.LocationResolver) - 1);
                     } else {
-                        ReplacePreceedingWhiteSpaceMaybeMultiline(block.EndIndex - 1);
+                        ReplacePreceedingWhiteSpaceMaybeMultiline(block.GetEndIndex(_tree.LocationResolver) - 1);
                     }
                 }
             }
         }
 
         private void WalkStatements(Node node, IEnumerable<Node> stmts, bool isMultiLine) {
-            WalkStatements(node.StartIndex, stmts, isMultiLine);
+            WalkStatements(node.GetStartIndex(_tree.LocationResolver), stmts, isMultiLine);
         }
 
         private void WalkStatements(int startIndex, IEnumerable<Node> stmts, bool isMultiLine) {
             int prevStart = startIndex;
             int i = 0;
             foreach (var curStmt in stmts) {
-                if (i == 0 && isMultiLine && !ContainsLineFeed(startIndex, curStmt.StartIndex)) {
+                if (i == 0 && isMultiLine && !ContainsLineFeed(startIndex, curStmt.GetStartIndex(_tree.LocationResolver))) {
                     // force a newline before the 1st statement begins
-                    ReplacePreceedingWhiteSpace(curStmt.StartIndex, terminators: null);
+                    ReplacePreceedingWhiteSpace(curStmt.GetStartIndex(_tree.LocationResolver), terminators: null);
                 } else {
                     // fix up whitespace for any interleaving blank / comment lines
-                    if (!FixStatementIndentation(prevStart, curStmt.StartIndex)) {
+                    if (!FixStatementIndentation(prevStart, curStmt.GetStartIndex(_tree.LocationResolver))) {
                         if (curStmt is EmptyStatement) {
                             // if (blah); shouldn't get a space...
                             // abort terminators prevents foo;; from getting extra whitespace
-                            ReplacePreceedingWhiteSpace(curStmt.StartIndex, null, abortTerminators: _semicolon);
+                            ReplacePreceedingWhiteSpace(curStmt.GetStartIndex(_tree.LocationResolver), null, abortTerminators: _semicolon);
                         } else {
-                            ReplacePreceedingWhiteSpaceMaybeMultiline(curStmt.StartIndex);
+                            ReplacePreceedingWhiteSpaceMaybeMultiline(curStmt.GetStartIndex(_tree.LocationResolver));
                         }
                     }
                 }
 
                 curStmt.Walk(this);
 
-                RemoveTrailingWhiteSpace(curStmt.EndIndex);
+                RemoveTrailingWhiteSpace(curStmt.GetEndIndex(_tree.LocationResolver));
 
-                prevStart = curStmt.EndIndex;
+                prevStart = curStmt.GetEndIndex(_tree.LocationResolver);
                 i++;
             }
         }
@@ -1114,13 +1129,13 @@ namespace Microsoft.NodejsTools.Formatting {
 
         private void EnsureSpacesAroundParenthesisedExpression(Expression expr) {
             ReplacePreceedingWhiteSpace(
-                expr.StartIndex,
+                expr.GetStartIndex(_tree.LocationResolver),
                 _options.SpaceAfterOpeningAndBeforeClosingNonEmptyParenthesis ? " " : "",
                 _openParen
             );
             expr.Walk(this);
             ReplaceFollowingWhiteSpace(
-                expr.EndIndex,
+                expr.GetEndIndex(_tree.LocationResolver),
                 _options.SpaceAfterOpeningAndBeforeClosingNonEmptyParenthesis ? " " : ""
             );
         }

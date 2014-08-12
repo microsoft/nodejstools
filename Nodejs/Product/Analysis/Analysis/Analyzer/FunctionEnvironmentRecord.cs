@@ -104,7 +104,7 @@ namespace Microsoft.NodejsTools.Analysis.Analyzer {
         }
 
         public override int GetBodyStart(JsAst ast) {
-            return ((FunctionObject)Node).Body.Span.Start;
+            return ((FunctionObject)Node).Body.GetStartIndex(ast.LocationResolver);
         }
 
         public override string Name {

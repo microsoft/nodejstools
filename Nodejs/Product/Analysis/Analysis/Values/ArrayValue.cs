@@ -33,8 +33,8 @@ namespace Microsoft.NodejsTools.Analysis.Values {
         public override string ToString() {
             return String.Format(
                 "Array literal: {0} - {1}\r\n{2}",
-                _node.GetStart(ProjectEntry.Tree),
-                _node.GetEnd(ProjectEntry.Tree),
+                _node.GetStart(ProjectEntry.Tree.LocationResolver),
+                _node.GetEnd(ProjectEntry.Tree.LocationResolver),
                 ProjectEntry.FilePath
             );
         }

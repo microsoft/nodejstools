@@ -36,7 +36,7 @@ namespace Microsoft.NodejsTools.Parsing
             }
         }
 
-        public GroupingOperator(IndexSpan span)
+        public GroupingOperator(EncodedSpan span)
             : base(span)
         {
         }

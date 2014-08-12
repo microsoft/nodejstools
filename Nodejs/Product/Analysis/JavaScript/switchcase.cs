@@ -56,7 +56,7 @@ namespace Microsoft.NodejsTools.Parsing
             set;
         }
 
-        public SwitchCase(IndexSpan span)
+        public SwitchCase(EncodedSpan span)
             : base(span)
         {
         }

@@ -54,7 +54,7 @@ namespace Microsoft.NodejsTools.Parsing
         private bool m_isError;
         private JSError m_errorCode;
         private readonly IndexSpan _span;
-        private readonly IndexResolver _resolver;
+        private readonly LocationResolver _resolver;
         private bool m_canRecover = true;
 
         #endregion
@@ -69,7 +69,7 @@ namespace Microsoft.NodejsTools.Parsing
             SetHResult();
         }
 
-        internal JScriptException(JSError errorNumber, IndexSpan span, IndexResolver resolver) {
+        internal JScriptException(JSError errorNumber, IndexSpan span, LocationResolver resolver) {
             m_valueObject = null;
             _span = span;
             _resolver = resolver;

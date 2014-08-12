@@ -21,9 +21,8 @@ namespace Microsoft.NodejsTools.Parsing
     {
         private FunctionObject _function;
 
-        public FunctionExpression(IndexSpan span)
-            : base(span)
-        {
+        public FunctionExpression(EncodedSpan span)
+            : base(span) {
         }
 
         public FunctionObject Function

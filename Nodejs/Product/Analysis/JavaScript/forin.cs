@@ -46,7 +46,7 @@ namespace Microsoft.NodejsTools.Parsing
             }
         }
 
-        public ForIn(IndexSpan span)
+        public ForIn(EncodedSpan span)
             : base(span)
         {
         }

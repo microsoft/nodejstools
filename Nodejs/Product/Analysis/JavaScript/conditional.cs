@@ -54,7 +54,7 @@ namespace Microsoft.NodejsTools.Parsing
             }
         }
 
-        public Conditional(IndexSpan span)
+        public Conditional(EncodedSpan span)
             : base(span)
         {
         }

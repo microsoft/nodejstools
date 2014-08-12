@@ -37,7 +37,7 @@ namespace Microsoft.NodejsTools.Parsing
         public string Name { get; set; }
         public IndexSpan NameSpan { get; set; }
 
-        public Member(IndexSpan span)
+        public Member(EncodedSpan span)
             : base(span)
         {
         }

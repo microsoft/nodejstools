@@ -758,7 +758,7 @@ namespace Microsoft.NodejsTools.Intellisense {
         internal void ParseBuffers(BufferParser bufferParser, params ITextSnapshot[] snapshots) {
             IProjectEntry entry = bufferParser._currentProjEntry;
 
-            IJsProjectEntry pyProjEntry = entry as IJsProjectEntry;
+            IJsProjectEntry jsProjEntry = entry as IJsProjectEntry;
             List<JsAst> asts = new List<JsAst>();
             foreach (var snapshot in snapshots) {
                 if (snapshot.TextBuffer.Properties.ContainsProperty(NodejsReplEvaluator.InputBeforeReset)) {
@@ -769,7 +769,7 @@ namespace Microsoft.NodejsTools.Intellisense {
                     continue;
                 }
 
-                if (pyProjEntry != null && snapshot.TextBuffer.ContentType.IsOfType(NodejsConstants.Nodejs)) {
+                if (jsProjEntry != null && snapshot.TextBuffer.ContentType.IsOfType(NodejsConstants.Nodejs)) {
                     JsAst ast;
                     CollectingErrorSink errorSink;
 
@@ -795,21 +795,23 @@ namespace Microsoft.NodejsTools.Intellisense {
                 }
             }
 
-            if (pyProjEntry != null) {
+            if (jsProjEntry != null) {
                 if (asts.Count > 0) {
                     JsAst finalAst;
                     if (asts.Count == 1) {
                         finalAst = asts[0];
                     } else {
                         // multiple ASTs, merge them together
-                        var block = new Block(default(IndexSpan));
+                        var block = new Block(default(EncodedSpan));
+                        var statements = new List<Statement>();
                         foreach (var code in asts) {
-                            block.Append(code.Block);
+                            statements.Add(code.Block);
                         }
+                        block.Statements = statements.ToArray();
                         finalAst = asts.Last().CloneWithNewBlock(block);
                     }
 
-                    pyProjEntry.UpdateTree(finalAst, new SnapshotCookie(snapshots[0])); // SnapshotCookie is not entirely right, we should merge the snapshots
+                    jsProjEntry.UpdateTree(finalAst, new SnapshotCookie(snapshots[0])); // SnapshotCookie is not entirely right, we should merge the snapshots
                     if (_analysisLevel != AnalysisLevel.None) {
                         _analysisQueue.Enqueue(entry, AnalysisPriority.High);
                     }
@@ -817,8 +819,8 @@ namespace Microsoft.NodejsTools.Intellisense {
                     // indicate that we are done parsing.
                     JsAst prevTree;
                     IAnalysisCookie prevCookie;
-                    pyProjEntry.GetTreeAndCookie(out prevTree, out prevCookie);
-                    pyProjEntry.UpdateTree(prevTree, prevCookie);
+                    jsProjEntry.GetTreeAndCookie(out prevTree, out prevCookie);
+                    jsProjEntry.UpdateTree(prevTree, prevCookie);
                 }
             }
         }

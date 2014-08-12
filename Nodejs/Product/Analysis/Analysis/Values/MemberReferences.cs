@@ -80,32 +80,4 @@ namespace Microsoft.NodejsTools.Analysis.Values {
 
         #endregion
     }
-
-    /// <summary>
-    /// A list of references as stored for a single project entry.
-    /// </summary>
-    class DefinitionList : IReferenceable {
-        public readonly LocationInfo _location;
-
-        public DefinitionList(LocationInfo location) {
-            _location = location;
-        }
-
-        #region IReferenceable Members
-
-        public IEnumerable<KeyValuePair<ProjectEntry, EncodedLocation>> Definitions {
-            get { 
-                yield return new KeyValuePair<ProjectEntry, EncodedLocation>(
-                    _location._entry, 
-                    new EncodedLocation(_location)
-                ); 
-            }
-        }
-
-        IEnumerable<KeyValuePair<ProjectEntry, EncodedLocation>> IReferenceable.References {
-            get { yield break; }
-        }
-
-        #endregion
-    }
 }

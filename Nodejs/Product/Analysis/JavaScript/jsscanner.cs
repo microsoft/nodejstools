@@ -44,7 +44,7 @@ namespace Microsoft.NodejsTools.Parsing
         private List<int> _newLineLocations;
         private SourceLocation _initialLocation;
         private State _state;
-        internal IndexResolver _indexResolver;
+        internal LocationResolver _locationResolver;
         private int _tokenStartIndex, _tokenEndIndex;
 
         private readonly ErrorSink _errorSink;
@@ -128,9 +128,9 @@ namespace Microsoft.NodejsTools.Parsing
             _state.FirstLine = true;
         }
 
-        internal IndexResolver IndexResolver {
+        public LocationResolver LocationResolver {
             get {
-                return _indexResolver;
+                return _locationResolver;
             }
         }
 
@@ -147,7 +147,7 @@ namespace Microsoft.NodejsTools.Parsing
             _source = source;
             _initialLocation = initialLocation;
             _newLineLocations = new List<int>();
-            _indexResolver = new IndexResolver(_newLineLocations, initialLocation);
+            _locationResolver = new LocationResolver(_newLineLocations, initialLocation);
             _currentPosition = 0;
 
             if (state == null) {
@@ -680,7 +680,7 @@ namespace Microsoft.NodejsTools.Parsing
         
         private TokenWithSpan MakeTokenWithSpan(JSToken token) {
             return new TokenWithSpan(
-                _indexResolver,
+                _locationResolver,
                 _tokenStartIndex + _initialLocation.Index,
                 _tokenEndIndex + _initialLocation.Index,
                 token                
@@ -1795,7 +1795,7 @@ namespace Microsoft.NodejsTools.Parsing
                     _tokenStartIndex + _initialLocation.Index,
                     _tokenEndIndex - _tokenStartIndex
                 ),
-                _indexResolver
+                _locationResolver
             );
             if (error != JSError.OctalLiteralsDeprecated) {
                 errorEx.IsError = true;

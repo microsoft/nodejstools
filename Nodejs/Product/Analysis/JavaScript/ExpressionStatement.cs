@@ -15,42 +15,36 @@
 using System;
 using System.Collections.Generic;
 
-namespace Microsoft.NodejsTools.Parsing
-{
-  [Serializable]
-  public class ExpressionStatement : Statement
-  {
-    private Expression _expression;
+namespace Microsoft.NodejsTools.Parsing {
+    [Serializable]
+    public class ExpressionStatement : Statement {
+        private Expression _expression;
 
-    public ExpressionStatement(IndexSpan span)
-        : base(span)
-    {
-      
-    }
+        public ExpressionStatement(EncodedSpan location)
+            : base(location) {
 
-    public override IEnumerable<Node> Children {
-        get {
-            return new[] { Expression };
+        }
+
+        public override IEnumerable<Node> Children {
+            get {
+                return new[] { Expression };
+            }
+        }
+
+        public Expression Expression {
+            get {
+                return _expression;
+            }
+            set {
+                _expression = value;
+            }
+        }
+
+        public override void Walk(AstVisitor visitor) {
+            if (visitor.Walk(this)) {
+                _expression.Walk(visitor);
+            }
+            visitor.PostWalk(this);
         }
     }
-
-    public Expression Expression
-    {
-      get
-      {
-        return _expression;
-      }
-      set
-      {
-        _expression = value;
-      }
-    }
-
-    public override void Walk(AstVisitor visitor) {
-        if (visitor.Walk(this)) {
-            _expression.Walk(visitor);
-        }
-        visitor.PostWalk(this);
-    }
-  }
 }

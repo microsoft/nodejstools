@@ -31,7 +31,7 @@ namespace Microsoft.NodejsTools.Parsing
         public JSVariableField VariableField { get; internal set; }
         public string Name { get; set; }
 
-        public Lookup(IndexSpan span)
+        public Lookup(EncodedSpan span)
             : base(span)
         {
         }

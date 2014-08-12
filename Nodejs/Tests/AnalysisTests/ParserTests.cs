@@ -1613,6 +1613,7 @@ var i = foo.'abc' else function;";
                     new ErrorInfo(JSError.NoIdentifier, true, new IndexSpan(14, 5))
                 ),
                 CheckBlock(
+                    CheckVar(CheckVarDecl("i", CheckLookup("foo"))),
                     CheckEmptyStmt()
                 )
             );

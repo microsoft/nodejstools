@@ -34,7 +34,7 @@ namespace Microsoft.NodejsTools.Parsing
             }
         }
 
-        public WhileNode(IndexSpan span)
+        public WhileNode(EncodedSpan span)
             : base(span)
         {
         }

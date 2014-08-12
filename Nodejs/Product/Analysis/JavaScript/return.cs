@@ -33,7 +33,7 @@ namespace Microsoft.NodejsTools.Parsing
             }
         }
 
-        public ReturnNode(IndexSpan span)
+        public ReturnNode(EncodedSpan span)
             : base(span)
         {
         }

@@ -16,13 +16,13 @@ namespace Microsoft.NodejsTools.Parsing {
 
         }
 
-        internal void HandleUndeclaredVariable(string name, IndexSpan span, IndexResolver indexResolver) {
+        internal void HandleUndeclaredVariable(string name, IndexSpan span, LocationResolver indexResolver) {
             if (!HasAlreadySeenErrorFor(name)) {
                 HandleError(JSError.UndeclaredVariable, span, indexResolver);
             }
         }
 
-        internal void HandleError(JSError errorId, IndexSpan span, IndexResolver resolver, bool forceToError = false) {
+        internal void HandleError(JSError errorId, IndexSpan span, LocationResolver resolver, bool forceToError = false) {
             var error = new JScriptException(errorId, span, resolver);
 
             if (forceToError) {

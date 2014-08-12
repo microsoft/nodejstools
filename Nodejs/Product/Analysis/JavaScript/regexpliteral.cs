@@ -26,7 +26,7 @@ namespace Microsoft.NodejsTools.Parsing
         public string Pattern { get; set; }
         public string PatternSwitches { get; set; }
 
-        public RegExpLiteral(IndexSpan span)
+        public RegExpLiteral(EncodedSpan span)
             : base(span)
         {
         }

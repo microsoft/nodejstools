@@ -79,7 +79,7 @@ namespace Microsoft.NodejsTools.Analysis.Values {
         public override string ToString() {
             return String.Format("UserFunction {0} {1}\r\n{2}",
                 FunctionObject.Name,
-                FunctionObject.GetStart(ProjectEntry.Tree),
+                FunctionObject.GetStart(ProjectEntry.Tree.LocationResolver),
                 ProjectEntry.FilePath
             );
         }

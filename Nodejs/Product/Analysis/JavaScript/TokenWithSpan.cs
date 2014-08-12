@@ -22,12 +22,12 @@ namespace Microsoft.NodejsTools.Parsing {
     public class TokenWithSpan {
         private readonly int _start, _end;
         private readonly JSToken _token;
-        private readonly IndexResolver _indexResolver;
+        private readonly LocationResolver _indexResolver;
 
         internal TokenWithSpan() {
         }
 
-        internal TokenWithSpan(IndexResolver indexResolver, int start, int end, JSToken token) {
+        internal TokenWithSpan(LocationResolver indexResolver, int start, int end, JSToken token) {
             _token = token;
             _start = start;
             _end = end;

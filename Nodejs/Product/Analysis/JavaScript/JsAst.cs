@@ -13,17 +13,18 @@
  * ***************************************************************************/
 
 using System;
+using System.Collections.Generic;
 using Microsoft.NodejsTools.Analysis;
 
 namespace Microsoft.NodejsTools.Parsing {
     [Serializable]
     public class JsAst : Statement {
         private Block _block;
-        private readonly IndexResolver _indexResolver;
+        private readonly LocationResolver _locationResolver;
 
-        internal JsAst(IndexSpan span, IndexResolver indexResolver)
+        internal JsAst(EncodedSpan span, LocationResolver indexResolver)
             : base(span) {
-            _indexResolver = indexResolver;
+            _locationResolver = indexResolver;
         }
 
         public Block Block {
@@ -37,11 +38,11 @@ namespace Microsoft.NodejsTools.Parsing {
         }
 
         internal SourceLocation IndexToLocation(int index) {
-            return _indexResolver.IndexToLocation(index);
+            return _locationResolver.IndexToLocation(index);
         }
 
         internal LocationInfo ResolveLocation(ProjectEntry project, object location) {
-            var loc = _indexResolver.IndexToLocation(((Node)location).Span.Start);
+            var loc = _locationResolver.IndexToLocation(((Node)location).GetSpan(project.Tree.LocationResolver).Start);
             return new LocationInfo(
                 project,
                 loc.Line,
@@ -49,8 +50,14 @@ namespace Microsoft.NodejsTools.Parsing {
             );
         }
 
+        public LocationResolver LocationResolver {
+            get {
+                return _locationResolver;
+            }
+        }
+
         public JsAst CloneWithNewBlock(Block block) {
-            return new JsAst(Span, _indexResolver) {
+            return new JsAst(EncodedSpan, _locationResolver) {
                 Block = block
             };
         }
@@ -61,5 +68,5 @@ namespace Microsoft.NodejsTools.Parsing {
             }
             visitor.PostWalk(this);
         }
-    }
+   }
 }

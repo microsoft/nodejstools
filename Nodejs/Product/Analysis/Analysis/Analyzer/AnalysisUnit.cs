@@ -235,7 +235,7 @@ namespace Microsoft.NodejsTools.Analysis {
                 GetHashCode(),
                 Ast != null ? Ast.GetType().Name : "<unknown>",
                 GetType().Name,
-                Ast != null ? Ast.GetStart(ProjectEntry.Tree) : SourceLocation.Invalid
+                Ast != null ? Ast.GetStart(ProjectEntry.Tree.LocationResolver) : SourceLocation.Invalid
             );
         }
 

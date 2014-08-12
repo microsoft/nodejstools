@@ -30,7 +30,7 @@ namespace Microsoft.NodejsTools.Parsing
     [Serializable]
     public class ConstStatement : Declaration
     {
-        public ConstStatement(IndexSpan span)
+        public ConstStatement(EncodedSpan span)
             : base(span)
         {
         }

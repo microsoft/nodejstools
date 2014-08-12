@@ -29,14 +29,16 @@ namespace Microsoft.NodejsTools.Analysis.Analyzer {
         private EnvironmentRecord _scope;
         private readonly ProjectEntry _entry;
         private readonly Stack<AnalysisUnit> _analysisStack = new Stack<AnalysisUnit>();
+        private readonly JsAst _tree;
         private AnalysisUnit _curUnit;
         private Block _curSuite;
         private readonly bool _isNested;
 
-        public OverviewWalker(ProjectEntry entry, AnalysisUnit topAnalysis, bool isNested = false) {
+        public OverviewWalker(ProjectEntry entry, AnalysisUnit topAnalysis, JsAst tree, bool isNested = false) {
             _entry = entry;
             _curUnit = topAnalysis;
             _isNested = isNested;
+            _tree = tree;
 
             _scope = topAnalysis.Environment;
         }
@@ -279,7 +281,7 @@ namespace Microsoft.NodejsTools.Analysis.Analyzer {
             StatementEnvironmentRecord prevStmtScope;
 
             if ((prevStmtScope = prevScope as StatementEnvironmentRecord) != null) {
-                prevStmtScope.EndIndex = node.EndIndex;
+                prevStmtScope.EndIndex = node.GetEndIndex(_tree.LocationResolver);
             } else {
                 //declScope.Children.Add(new StatementEnvironmentRecord(node.StartIndex, declScope));
             }
@@ -323,7 +325,7 @@ namespace Microsoft.NodejsTools.Analysis.Analyzer {
                 // because that can be a StatementScope and we would start a new range.
                 var declScope = _scope;
 
-                scope = new DefinitiveAssignmentEnvironmentRecord(node.EndIndex, name, declScope);
+                scope = new DefinitiveAssignmentEnvironmentRecord(node.GetEndIndex(_tree.LocationResolver), name, declScope);
                 
                 declScope.Children.Add(scope);
                 declScope.GlobalEnvironment.AddNodeEnvironment(node, scope);
@@ -351,7 +353,7 @@ namespace Microsoft.NodejsTools.Analysis.Analyzer {
                     var prevScope = declScope.HasChildren ? declScope.Children.Last() : null;
                     StatementEnvironmentRecord prevStmtScope;
                     if ((prevStmtScope = prevScope as StatementEnvironmentRecord) != null) {
-                        prevStmtScope.EndIndex = node.StartIndex;
+                        prevStmtScope.EndIndex = node.GetStartIndex(_tree.LocationResolver);
                     }
 
                     var nameExpr = node.Operand1 as Lookup;
@@ -430,7 +432,7 @@ namespace Microsoft.NodejsTools.Analysis.Analyzer {
                 while (_scope != prevScope) {
                     StatementEnvironmentRecord stmtRec = _scope as StatementEnvironmentRecord;
                     if (stmtRec != null) {
-                        stmtRec.EndIndex = node.EndIndex;
+                        stmtRec.EndIndex = node.GetEndIndex(_tree.LocationResolver);
                     }
                     _scope = _scope.Parent;
                 }

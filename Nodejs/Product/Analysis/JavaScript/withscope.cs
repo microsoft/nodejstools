@@ -20,8 +20,8 @@ namespace Microsoft.NodejsTools.Parsing
 {
     public sealed class WithScope : BlockScope
     {
-        public WithScope(Statement node, ActivationObject parent, IndexSpan span, ErrorSink errorSink)
-            : base(node, parent, span, errorSink)
+        public WithScope(Statement node, ActivationObject parent, ErrorSink errorSink)
+            : base(node, parent, errorSink)
         {
             IsInWithScope = true;
         }

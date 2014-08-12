@@ -46,7 +46,7 @@ namespace Microsoft.NodejsTools.Parsing
             }
         }
 
-        public WithNode(IndexSpan span)
+        public WithNode(EncodedSpan span)
             : base(span)
         {
         }

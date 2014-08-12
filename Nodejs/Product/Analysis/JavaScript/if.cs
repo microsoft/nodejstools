@@ -63,7 +63,7 @@ namespace Microsoft.NodejsTools.Parsing
             set;
         }
 
-        public IfNode(IndexSpan span)
+        public IfNode(EncodedSpan span)
             : base(span)
         {
         }

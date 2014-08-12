@@ -262,6 +262,7 @@
     <Compile Include="JavaScript\activationobject.cs" />
     <Compile Include="JavaScript\arrayliteral.cs" />
     <Compile Include="JavaScript\CacheDict.cs" />
+    <Compile Include="JavaScript\EncodedSpan.cs" />
     <Compile Include="JavaScript\Node.cs" />
     <Compile Include="JavaScript\binaryop.cs" />
     <Compile Include="JavaScript\block.cs" />
@@ -296,7 +297,7 @@
     <Compile Include="JavaScript\grouping.cs" />
     <Compile Include="JavaScript\if.cs" />
     <Compile Include="JavaScript\INameReference.cs" />
-    <Compile Include="JavaScript\IndexResolver.cs" />
+    <Compile Include="JavaScript\LocationResolver.cs" />
     <Compile Include="JavaScript\IterationStatement.cs" />
     <Compile Include="JavaScript\IVisitor.cs" />
     <Compile Include="JavaScript\JsAst.cs" />

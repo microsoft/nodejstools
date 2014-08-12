@@ -124,7 +124,7 @@ using Microsoft.NodejsTools.Parsing;
 [assembly: AnalysisSerializationSupportedType(typeof(Member))]
 [assembly: AnalysisSerializationSupportedType(typeof(Lookup))]
 [assembly: AnalysisSerializationSupportedType(typeof(JSVariableField))]
-[assembly: AnalysisSerializationSupportedType(typeof(IndexResolver))]
+[assembly: AnalysisSerializationSupportedType(typeof(LocationResolver))]
 [assembly: AnalysisSerializationSupportedType(typeof(SourceLocation))]
 [assembly: AnalysisSerializationSupportedType(typeof(ModuleAnalysis))]
 [assembly: AnalysisSerializationSupportedType(typeof(ExpressionStatement))]

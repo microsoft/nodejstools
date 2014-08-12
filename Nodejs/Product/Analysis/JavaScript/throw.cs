@@ -34,7 +34,7 @@ namespace Microsoft.NodejsTools.Parsing
             }
         }
 
-        public ThrowNode(IndexSpan span)
+        public ThrowNode(EncodedSpan span)
             : base(span)
         {
         }

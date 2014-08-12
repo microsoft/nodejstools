@@ -25,7 +25,8 @@ namespace Microsoft.NodejsTools.Parsing
     public interface INameDeclaration
     {
         string Name { get; }
-        IndexSpan NameSpan { get; }
+        IndexSpan GetNameSpan(LocationResolver resolver);
+
         Statement Parent { get; }
         Expression Initializer { get; }
         JSVariableField VariableField { get; set; }

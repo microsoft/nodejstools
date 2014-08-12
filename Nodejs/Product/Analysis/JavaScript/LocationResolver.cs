@@ -17,11 +17,12 @@ using System.Collections.Generic;
 
 namespace Microsoft.NodejsTools.Parsing {
     [Serializable]
-    public class IndexResolver {
+    public class LocationResolver {
         private readonly List<int> _newLineLocations;
         private readonly SourceLocation _initialLocation;
+        internal List<IndexSpan> _spans;
 
-        public IndexResolver(List<int> newLineLocations, SourceLocation initialLocation) {
+        public LocationResolver(List<int> newLineLocations, SourceLocation initialLocation) {
             _newLineLocations = newLineLocations;
             _initialLocation = initialLocation;
         }
@@ -40,5 +41,16 @@ namespace Microsoft.NodejsTools.Parsing {
 
             return new SourceLocation(index + _initialLocation.Index, match + 2 + _initialLocation.Line - 1, index - _newLineLocations[match] + _initialLocation.Column);
         }
+
+        internal int AddSpan(int start, int length) {
+            if (_spans == null) {
+                _spans = new List<IndexSpan>();
+            }
+            int res;
+            res = _spans.Count | unchecked((int)0x80000000);
+            _spans.Add(new IndexSpan(start, length));
+            return res;
+        }
+
     }
 }

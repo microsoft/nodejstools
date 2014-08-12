@@ -200,16 +200,14 @@ namespace Microsoft.NodejsTools.Analysis {
                             var tempNextAssign = nextAssign;
                             stack.Push(new DeserializationFrame(newValue => {
                                 Node node = newValue as Node;
-                                EncodedLocation loc;
-                                if (node != null) {
-                                    loc = new EncodedLocation(node);
-                                } else {
-                                    loc = new EncodedLocation((LocationInfo)newValue);
-                                }
+                                EncodedLocation loc = new EncodedLocation((Node)node);
                                 tempNextAssign.Assign(loc);
                             }));
                             continue;
                         }
+                    case SerializationType.EncodedSpan:
+                        nextAssign.Assign(new EncodedSpan(reader.ReadInt32()));
+                        continue;
                     case SerializationType.True: nextValue = _true; break;
                     case SerializationType.False: nextValue = _false; break;
                     case SerializationType.Double:
@@ -675,6 +673,11 @@ namespace Microsoft.NodejsTools.Analysis {
             stack.Push(((EncodedLocation)value).Location);
         }
 
+        private static void SerializeEncodedSpan(object value, AnalysisSerializer serializer, Stack<object> stack, BinaryWriter writer) {
+            writer.Write((byte)SerializationType.EncodedSpan);
+            writer.Write(((EncodedSpan)value).Span);
+        }
+
         private static void SerializeBooleanValue(object value, BinaryWriter writer) {
             BooleanValue boolean = (BooleanValue)value;
             if (boolean._value) {
@@ -696,6 +699,7 @@ namespace Microsoft.NodejsTools.Analysis {
                 { typeof(long), SerializeLong },
                 { typeof(IndexSpan), SerializeIndexSpan },
                 { typeof(EncodedLocation), SerializeEncodedLocation },
+                { typeof(EncodedSpan), SerializeEncodedSpan },
                 { typeof(HashSet<string>), SerializeHashSet<string> },
                 { typeof(AnalysisHashSet), SerializeAnalysisHashSet },
                 { typeof(HashSet<EncodedLocation>), SerializeHashSet<EncodedLocation> },
@@ -1124,6 +1128,7 @@ namespace Microsoft.NodejsTools.Analysis {
             ObjectEqualityComparer,
             IndexSpan,
             EncodedLocation,
+            EncodedSpan,
         }
 
         delegate void SerializerFunction(object value, AnalysisSerializer serializer, Stack<object> stack, BinaryWriter writer);
