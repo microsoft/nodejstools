@@ -1806,7 +1806,7 @@ namespace Microsoft.NodejsTools.Parsing
         }
 
         private EncodedSpan EncodeCurrentSpan() {
-            return EncodeCurrentSpan();
+            return EncodeSpan(_curSpan);
         }
 
         internal EncodedSpan EncodeSpan(IndexSpan span) {
