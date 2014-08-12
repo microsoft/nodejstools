@@ -927,6 +927,7 @@
     <ZipProject Include="ProjectTemplates\AddWebSiteStarterExpressApp\respond.js" />
     <ZipProject Include="ProjectTemplates\AddWebSiteStarterExpressApp\respond.min.js" />
     <ZipProject Include="ProjectTemplates\AddWebSiteStarterExpressApp\user.js" />
+    <ZipProject Include="ProjectTemplates\AddWebSiteExpressApp\Preview.png" />
     <Content Include="Scripts\Typings\node\node.d.ts">
       <IncludeInVSIX>true</IncludeInVSIX>
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>

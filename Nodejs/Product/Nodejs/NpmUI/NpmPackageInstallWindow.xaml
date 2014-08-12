@@ -12,6 +12,7 @@
     Width="700"
     MinWidth="600"
     WindowStartupLocation="CenterOwner"
+    ShowInTaskbar="False"
     Background="{DynamicResource {x:Static wpf:Controls.BackgroundKey}}"
     ResizeMode="CanResizeWithGrip">
     <!-- Theming -->

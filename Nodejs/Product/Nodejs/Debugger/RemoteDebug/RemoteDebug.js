@@ -28,7 +28,7 @@ var node = null;
 var scriptToDebug = null;
 var passThroughArgs = null;
 
-var debugee = null;
+var debuggee = null;
 var localClientSocket = null;
 var remoteServerSocket = null;
 
@@ -99,8 +99,8 @@ function parseCommandLine() {
     passThroughArgs = process.argv.slice(i + 1);
 }
 
-function ensureDebugeeStarted() {
-    if (debugee == null && (!startDebuggeeOnRemoteConnect || remoteServerSocket)) {
+function ensureDebuggeeStarted() {
+    if (debuggee == null && (!startDebuggeeOnRemoteConnect || remoteServerSocket)) {
         var debugArg = '--debug';
         if (startDebuggeeBrokenAtEntryPoint) {
             debugArg = debugArg + '-brk';
@@ -108,29 +108,29 @@ function ensureDebugeeStarted() {
         var debugArg = debugArg + '=' + localClientPort;
         var spawnArgs = [debugArg, scriptToDebug];
         spawnArgs = spawnArgs.concat(passThroughArgs);
-        debugee = spawn(node, spawnArgs, [], { stdio: 'inherit' });
-        debugee.stdout.on('data', function (data) {
+        debuggee = spawn(node, spawnArgs, [], { stdio: 'inherit' });
+        debuggee.stdout.on('data', function (data) {
             process.stdout.write(data);
         });
-        debugee.stderr.on('data', function (data) {
+        debuggee.stderr.on('data', function (data) {
             process.stderr.write(data);
         });
-        debugee.on('exit', function (code) {
+        debuggee.on('exit', function (code) {
             process.exit();
         });
-        debugee.on('SIGTERM', function (code) {
+        debuggee.on('SIGTERM', function (code) {
             process.exit();
         });
         process.on('SIGTERM', function (code) {
-            debugee.exit();
-            debugee = null;
+            debuggee.exit();
+            debuggee = null;
         });
-        console.log('Debugee started: ' + node + ' ' + debugArg + ' ' + scriptToDebug + ' ' + passThroughArgs);
+        console.log('Debuggee started: ' + node + ' ' + debugArg + ' ' + scriptToDebug + ' ' + passThroughArgs);
     }
 }
 
 function ensureLocalClientSocketConnected() {
-    ensureDebugeeStarted();
+    ensureDebuggeeStarted();
     if (localClientSocket == null) {
         localClientSocket = new net.Socket();
         localClientSocket.on('data', function (data) {
@@ -184,6 +184,6 @@ var remoteServer = net.createServer(function (socket) {
 remoteServer.listen(remoteServerPort, remoteHost);
 console.log('remoteServerSocket listening for connection');
 
-// Ensure debugee started (if not waiting for remote server connection)
-ensureDebugeeStarted();
+// Ensure debuggee started (if not waiting for remote server connection)
+ensureDebuggeeStarted();
 
