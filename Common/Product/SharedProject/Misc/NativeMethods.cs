@@ -901,6 +901,9 @@ namespace Microsoft.VisualStudioTools.Project {
 
         [DllImport("kernel32.dll", CharSet = CharSet.Unicode, SetLastError = true)]
         public static extern bool RemoveDirectory(string lpPathName);
+
+        [DllImport("kernel32.dll", CharSet = CharSet.Unicode, SetLastError = true)]
+        internal static extern bool MoveFile(String src, String dst);
     }
 
 
