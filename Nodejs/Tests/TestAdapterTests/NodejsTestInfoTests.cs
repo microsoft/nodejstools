@@ -18,19 +18,19 @@ namespace TestAdapterTests {
             NodejsTestInfo testInfo = new NodejsTestInfo(testFile, testName, testSuiteName, testFramework);
 
             //Assert
-            string expected = testFile + "::" + testSuiteName + "::" + testName + "::" + testFramework;
+            string expected = testFile + "::" + testName + "::" + testFramework;
             Assert.AreEqual(expected, testInfo.FullyQualifiedName);
             Assert.AreEqual(testName, testInfo.TestName);
             Assert.AreEqual(testFramework, testInfo.TestFramework);
             Assert.AreEqual(testFile, testInfo.ModulePath);
-            Assert.AreEqual(testSuiteName + ":" + testName, testInfo.DisplayName);
+            Assert.AreEqual(testName, testInfo.TestName);
         }
 
         [TestMethod, Priority(0)]
         [ExpectedException(typeof(System.ArgumentException))]
         public void ConstructFromQualifiedName_ThrowOnInValidInput() {
             //Arrange
-            string badDummy = "c:\\dummy.js::dummy::test1";
+            string badDummy = "c:\\dummy.js::dummy::dumm2::test1";
 
             //Act
             NodejsTestInfo testInfo = new NodejsTestInfo(badDummy);

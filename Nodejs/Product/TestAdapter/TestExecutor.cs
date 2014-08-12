@@ -39,10 +39,16 @@ namespace Microsoft.NodejsTools.TestAdapter {
         public static readonly Uri ExecutorUri = new Uri(ExecutorUriString);
         //get from NodeRemoteDebugPortSupplier::PortSupplierId
         private static readonly Guid NodejsRemoteDebugPortSupplierUnsecuredId = new Guid("{9E16F805-5EFC-4CE5-8B67-9AE9B643EF80}");
-                
+
         private readonly ManualResetEvent _cancelRequested = new ManualResetEvent(false);
 
+        private ProcessOutput _nodeProcess;
+        private object _syncObject = new object();
+
         public void Cancel() {
+            //let us just kill the node process there, rather do it late, because VS engine process 
+            //could exit right after this call and our node process will be left running.
+            KillNodeProcess();
             _cancelRequested.Set();
         }
 
@@ -102,6 +108,13 @@ namespace Microsoft.NodejsTools.TestAdapter {
             }
         }
 
+        private void KillNodeProcess() {
+            lock (_syncObject) {
+                if (_nodeProcess != null) {
+                    _nodeProcess.Kill();
+                }
+            }
+        }
         private static int GetFreePort() {
             return Enumerable.Range(new Random().Next(49152, 65536), 60000).Except(
                 from connection in IPGlobalProperties.GetIPGlobalProperties().GetActiveTcpConnections()
@@ -161,29 +174,29 @@ namespace Microsoft.NodejsTools.TestAdapter {
                 frameworkHandle.SendMessage(TestMessageLevel.Error, "Interpreter path does not exist: " + settings.NodeExePath);
                 return;
             }
-            using (var proc = ProcessOutput.Run(
-                                    settings.NodeExePath,
-                                    args,
-                                    workingDir,
-                                    null,
-                                    false,
-                                    null,
-                                    false)) {
-                bool killed = false;
+            lock (_syncObject) {
+                _nodeProcess = ProcessOutput.Run(
+                                        settings.NodeExePath,
+                                        args,
+                                        workingDir,
+                                        null,
+                                        false,
+                                        null,
+                                        false);
 
 #if DEBUG
                 frameworkHandle.SendMessage(TestMessageLevel.Informational, "cd " + workingDir);
-                frameworkHandle.SendMessage(TestMessageLevel.Informational, proc.Arguments);
+                frameworkHandle.SendMessage(TestMessageLevel.Informational, _nodeProcess.Arguments);
 #endif
 
-                proc.Wait(TimeSpan.FromMilliseconds(500));
+                _nodeProcess.Wait(TimeSpan.FromMilliseconds(500));
                 if (runContext.IsBeingDebugged && app != null) {
                     try {
                         //the '#ping=0' is a special flag to tell VS node debugger not to connect to the port,
                         //because a connection carries the consequence of setting off --debug-brk, and breakpoints will be missed.
                         string qualifierUri = string.Format("tcp://localhost:{0}#ping=0", port);
-                        while (!app.AttachToProcess(proc, NodejsRemoteDebugPortSupplierUnsecuredId, qualifierUri)) {
-                            if (proc.Wait(TimeSpan.FromMilliseconds(500))) {
+                        while (!app.AttachToProcess(_nodeProcess, NodejsRemoteDebugPortSupplierUnsecuredId, qualifierUri)) {
+                            if (_nodeProcess.Wait(TimeSpan.FromMilliseconds(500))) {
                                 break;
                             }
                         }
@@ -191,42 +204,39 @@ namespace Microsoft.NodejsTools.TestAdapter {
                     } catch (COMException ex) {
                         frameworkHandle.SendMessage(TestMessageLevel.Error, "Error occurred connecting to debuggee.");
                         frameworkHandle.SendMessage(TestMessageLevel.Error, ex.ToString());
-                        proc.Kill();
-                        killed = true;
+                        KillNodeProcess();
                     }
 #else
                     } catch (COMException) {
                         frameworkHandle.SendMessage(TestMessageLevel.Error, "Error occurred connecting to debuggee.");
-                        proc.Kill();
-                        killed = true;
+                        KillNodeProcess();
                     }
 #endif
                 }
-
-                if (!killed && WaitHandle.WaitAny(new WaitHandle[] { _cancelRequested, proc.WaitHandle }) == 0) {
-                    proc.Kill();
-                    killed = true;
-                } else {
-                    RecordEnd(frameworkHandle, test, testResult,
-                        string.Join(Environment.NewLine, proc.StandardOutputLines),
-                        string.Join(Environment.NewLine, proc.StandardErrorLines),
-                        (proc.ExitCode == 0 && !killed) ? TestOutcome.Passed : TestOutcome.Failed);
-                }
             }
+
+            WaitHandle.WaitAll(new WaitHandle[] { _nodeProcess.WaitHandle });
+
+            bool runCancelled = _cancelRequested.WaitOne(0);
+            RecordEnd(frameworkHandle, test, testResult,
+                string.Join(Environment.NewLine, _nodeProcess.StandardOutputLines),
+                string.Join(Environment.NewLine, _nodeProcess.StandardErrorLines),
+                (!runCancelled && _nodeProcess.ExitCode == 0) ? TestOutcome.Passed : TestOutcome.Failed);
+            _nodeProcess.Dispose();
         }
 
         private NodejsProjectSettings LoadProjectSettings(string projectFile) {
             var buildEngine = new MSBuild.ProjectCollection();
             var proj = buildEngine.LoadProject(projectFile);
-            
+
             var projectRootDir = Path.GetFullPath(Path.Combine(proj.DirectoryPath, proj.GetPropertyValue(CommonConstants.ProjectHome) ?? "."));
 
             NodejsProjectSettings projSettings = new NodejsProjectSettings();
-            
+
             projSettings.ProjectRootDir = projectRootDir;
 
             projSettings.WorkingDir = Path.GetFullPath(Path.Combine(projectRootDir, proj.GetPropertyValue(CommonConstants.WorkingDirectory) ?? "."));
-            
+
             projSettings.NodeExePath = proj.GetPropertyValue(NodejsConstants.NodeExePath);
             if (string.IsNullOrEmpty(projSettings.NodeExePath)) {
                 projSettings.NodeExePath = NodejsTools.Nodejs.NodeExePath;
@@ -259,11 +269,11 @@ namespace Microsoft.NodejsTools.TestAdapter {
 
         class TestReceiver : ITestCaseDiscoverySink {
             public List<TestCase> Tests { get; private set; }
-            
+
             public TestReceiver() {
                 Tests = new List<TestCase>();
             }
-            
+
             public void SendTestCase(TestCase discoveredTest) {
                 Tests.Add(discoveredTest);
             }
@@ -271,15 +281,15 @@ namespace Microsoft.NodejsTools.TestAdapter {
 
         class NodejsProjectSettings {
             public NodejsProjectSettings() {
-                NodeExePath = String.Empty; 
+                NodeExePath = String.Empty;
                 SearchPath = String.Empty;
-                WorkingDir = String.Empty;                
+                WorkingDir = String.Empty;
             }
 
             public string NodeExePath { get; set; }
             public string SearchPath { get; set; }
             public string WorkingDir { get; set; }
-            public string ProjectRootDir { get;set; } 
+            public string ProjectRootDir { get; set; }
         }
     }
 }
