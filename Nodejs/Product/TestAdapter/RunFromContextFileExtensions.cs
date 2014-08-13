@@ -23,7 +23,7 @@ namespace Microsoft.NodejsTools.TestAdapter {
 
         public IEnumerable<string> FileTypes {
             get { 
-                return new[] { NodejsConstants.FileExtension };
+                return new[] { NodejsConstants.JavaScriptExtension };
             }
         }
 

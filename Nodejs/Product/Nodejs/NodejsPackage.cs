@@ -349,7 +349,7 @@ namespace Microsoft.NodejsTools {
         public override bool IsRecognizedFile(string filename) {
             var ext = Path.GetExtension(filename);
 
-            return String.Equals(ext, NodejsConstants.FileExtension, StringComparison.OrdinalIgnoreCase);
+            return String.Equals(ext, NodejsConstants.JavaScriptExtension, StringComparison.OrdinalIgnoreCase);
         }
 
         internal new object GetService(Type serviceType) {

@@ -342,7 +342,7 @@ namespace Microsoft.NodejsTools.Intellisense {
             for (HierarchyNode n = modulesFolder.FirstChild; n != null; n = n.NextSibling) {
                 FileNode file = n as FileNode;
                 if (file != null &&
-                    NodejsConstants.FileExtension.Equals(
+                    NodejsConstants.JavaScriptExtension.Equals(
                         Path.GetExtension(file.Url),
                         StringComparison.OrdinalIgnoreCase
                     )) {

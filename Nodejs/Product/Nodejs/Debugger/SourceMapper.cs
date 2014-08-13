@@ -121,7 +121,7 @@ namespace Microsoft.NodejsTools.Debugger {
                     extension = "";
                 }
 
-                if (!string.Equals(extension, NodejsConstants.FileExtension, StringComparison.OrdinalIgnoreCase)) {
+                if (!string.Equals(extension, NodejsConstants.JavaScriptExtension, StringComparison.OrdinalIgnoreCase)) {
                     string baseFile = fileName.Substring(0, fileName.Length - extension.Length);
                     if (File.Exists(baseFile + ".js") && File.Exists(baseFile + ".js.map")) {
                         // we're using source maps...

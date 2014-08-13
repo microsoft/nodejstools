@@ -167,7 +167,7 @@ namespace Microsoft.NodejsTools.Project {
         internal static bool IsNodejsFile(string strFileName) {
             var ext = Path.GetExtension(strFileName);
 
-            return String.Equals(ext, NodejsConstants.FileExtension, StringComparison.OrdinalIgnoreCase);
+            return String.Equals(ext, NodejsConstants.JavaScriptExtension, StringComparison.OrdinalIgnoreCase);
         }
 
         internal override string GetItemType(string filename) {
@@ -194,7 +194,7 @@ namespace Microsoft.NodejsTools.Project {
 
         public override string[] CodeFileExtensions {
             get {
-                return new[] { NodejsConstants.FileExtension };
+                return new[] { NodejsConstants.JavaScriptExtension };
             }
         }
 
@@ -280,7 +280,7 @@ namespace Microsoft.NodejsTools.Project {
         }
 
         public override bool IsCodeFile(string fileName) {
-            return Path.GetExtension(fileName).Equals(NodejsConstants.FileExtension, StringComparison.OrdinalIgnoreCase);
+            return Path.GetExtension(fileName).Equals(NodejsConstants.JavaScriptExtension, StringComparison.OrdinalIgnoreCase);
         }
 
         public override int InitializeForOuter(string filename, string location, string name, uint flags, ref Guid iid, out IntPtr projectPointer, out int canceled) {

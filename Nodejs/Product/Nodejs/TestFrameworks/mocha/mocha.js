@@ -39,7 +39,12 @@ var find_tests = function (testFile, discoverResultFile, projectFolder) {
 module.exports.find_tests = find_tests;
 
 var run_tests = function (testName, testFile, workingFolder, projectFolder) {
-    var Mocha = new require(projectFolder + '\\node_modules\\mocha');
+    try {
+        var Mocha = new require(projectFolder + '\\node_modules\\mocha');
+    } catch (ex) {
+        console.log("NTVS_ERROR:Failed to find Mocha package.  Mocha must be installed in the project locally.  Mocha can be installed locally with the npm manager via solution explorer or with \".npm install mocha\" via the Node.js interactive window.")
+        return;
+    }
     var mocha = new Mocha();
     //default at 2 sec might be too short (TODO: make it configuable)
     mocha.suite.timeout(30000);

@@ -25,7 +25,7 @@ using Microsoft.VisualStudio.TestPlatform.ObjectModel.Logging;
 using Microsoft.VisualStudioTools;
 
 namespace Microsoft.NodejsTools.TestAdapter {
-    [FileExtension(".njsproj")]
+    [FileExtension(NodejsConstants.NodejsProjectExtension)]
     [DefaultExecutorUri(TestExecutor.ExecutorUriString)]
     class TestDiscoverer : ITestDiscoverer {
         public TestDiscoverer() {
@@ -86,7 +86,7 @@ namespace Microsoft.NodejsTools.TestAdapter {
                                 //We're dealing with TypeScript
                                 //Switch to the underlying js file
                                 fileAbsolutePath = fileAbsolutePath.Substring(0, fileAbsolutePath.Length - 3) + ".js";
-                            } else if (!Path.GetExtension(fileAbsolutePath).Equals(".js", StringComparison.OrdinalIgnoreCase)) {
+                            } else if (!Path.GetExtension(fileAbsolutePath).Equals(NodejsConstants.JavaScriptExtension, StringComparison.OrdinalIgnoreCase)) {
                                 continue;
                             }
 
