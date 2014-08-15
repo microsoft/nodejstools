@@ -102,9 +102,7 @@
     <Compile Include="INodePackageModulesCommands.cs" />
     <Compile Include="ImportWizard.cs" />
     <Compile Include="NpmWizardExtension.cs" />
-    <Compile Include="InnerWorkerRoleWizard.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="OuterWorkerRoleWizard.cs" />
     <Compile Include="UnitTestFileWizard.cs" />
   </ItemGroup>
   <Import Project="..\Nodejs\SharedResources.proj" />

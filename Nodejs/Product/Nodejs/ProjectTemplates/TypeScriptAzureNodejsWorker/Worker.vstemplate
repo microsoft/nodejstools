@@ -2,9 +2,9 @@
   <TemplateData>
     <Name>Blank Azure Node.js Worker Role</Name>
     <Description>An empty Node.js worker role for Microsoft Azure.</Description>
-    <Icon Package="{FE8A8C3D-328A-476D-99F9-2A24B75F8C7F}" ID="407" />
-    <ProjectType>JavaScript</ProjectType>
-    <TemplateID>Microsoft.JavaScript.AzureNodejsWorker</TemplateID>
+    <Icon Package="{FE8A8C3D-328A-476D-99F9-2A24B75F8C7F}" ID="413" />
+    <ProjectType>TypeScript</ProjectType>
+    <TemplateID>Microsoft.TypeScript.AzureNodejsWorker</TemplateID>
     <SortOrder>150</SortOrder>
     <CreateNewFolder>true</CreateNewFolder>
     <DefaultName>NodejsWorker</DefaultName>
@@ -15,8 +15,8 @@
   </TemplateData>
   <TemplateContent>
     <Project File="Worker.njsproj" ReplaceParameters="true">
-      <ProjectItem>server.js</ProjectItem>
-      <ProjectItem OpenInEditor="true">startup.js</ProjectItem>
+      <ProjectItem>server.ts</ProjectItem>
+      <ProjectItem OpenInEditor="true">startup.ts</ProjectItem>
       <ProjectItem>download.ps1</ProjectItem>
       <ProjectItem>setup_worker.cmd</ProjectItem>
       <ProjectItem ReplaceParameters="true">package.json</ProjectItem>
@@ -24,8 +24,4 @@
       <ProjectItem>node.cmd</ProjectItem>
     </Project>
   </TemplateContent>
-  <WizardExtension>
-    <Assembly>Microsoft.NodejsTools.ProjectWizard, Version=1.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</Assembly>
-    <FullClassName>Microsoft.NodejsTools.ProjectWizard.InnerWorkerRoleWizard</FullClassName>
-  </WizardExtension>
 </VSTemplate>

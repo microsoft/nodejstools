@@ -87,6 +87,7 @@
     <Reference Include="WindowsBase" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="AzureTests.cs" />
     <Compile Include="BaselineCompare.cs" />
     <Compile Include="MultiLineCommentTests.cs" />
     <Compile Include="CommentBlockTests.cs" />

@@ -19,9 +19,11 @@ using System.Diagnostics;
 using System.Globalization;
 using System.IO;
 using System.Runtime.InteropServices;
+using System.Text;
 using System.Xml;
 using Microsoft.NodejsTools.Project;
 using Microsoft.VisualStudio;
+using Microsoft.VisualStudio.Azure;
 using Microsoft.VisualStudio.Editor;
 using Microsoft.VisualStudio.OLE.Interop;
 using Microsoft.VisualStudio.Shell;
@@ -29,11 +31,12 @@ using Microsoft.VisualStudio.Shell.Flavor;
 using Microsoft.VisualStudio.Shell.Interop;
 using Microsoft.VisualStudio.Text;
 using Microsoft.VisualStudio.TextManager.Interop;
+using Microsoft.VisualStudioTools;
 using Microsoft.VisualStudioTools.Project;
 
 namespace Microsoft.NodejsTools {
     [Guid("78D985FC-2CA0-4D08-9B6B-35ACD5E5294A")]
-    class NodejsProject : FlavoredProjectBase, IOleCommandTarget, IVsProjectFlavorCfgProvider, IVsProject, IVsProject2 {
+    class NodejsProject : FlavoredProjectBase, IOleCommandTarget, IVsProjectFlavorCfgProvider, IVsProject, IVsProject2, IAzureRoleProject {
         internal IVsProject _innerProject;
         internal IVsProject3 _innerProject3;
         internal NodejsPackage _package;
@@ -326,37 +329,6 @@ namespace Microsoft.NodejsTools {
         }
 
         int IOleCommandTarget.Exec(ref Guid pguidCmdGroup, uint nCmdID, uint nCmdexecopt, IntPtr pvaIn, IntPtr pvaOut) {
-            if (pguidCmdGroup == Guids.WebPackageCommandId) {
-                if (nCmdID == 0x101 /*  EnablePublishToWindowsAzureMenuItem*/) {
-
-                    // We need to forward the command to the web publish package and let it handle it, while
-                    // we listen for the project which is going to get added.  After the command succeds
-                    // we can then go and update the newly added project so that it is setup appropriately for
-                    // Node.js...
-                    using (var listener = new AzureSolutionListener(this)) {
-                        var shell = (IVsShell)((System.IServiceProvider)this).GetService(typeof(SVsShell));
-                        Guid webPublishPackageGuid = Guids.WebPackage;
-                        IVsPackage package;
-
-                        if (ErrorHandler.Succeeded(shell.LoadPackage(ref webPublishPackageGuid, out package))) {
-                            var managedPack = package as IOleCommandTarget;
-                            if (managedPack != null) {
-                                int res = managedPack.Exec(ref pguidCmdGroup, nCmdID, nCmdexecopt, pvaIn, pvaOut);
-                                if (ErrorHandler.Succeeded(res)) {
-                                    // update the users service definition file to include import...
-                                    foreach (var project in listener.OpenedHierarchies) {
-                                        UpdateAzureDeploymentProject(project);
-                                    }
-                                }
-
-
-                                return res;
-                            }
-                        }
-                    }
-                }
-            }
-
             return ((IOleCommandTarget)_menuService).Exec(ref pguidCmdGroup, nCmdID, nCmdexecopt, pvaIn, pvaOut);
         }
 
@@ -439,177 +411,6 @@ namespace Microsoft.NodejsTools {
             return ((IOleCommandTarget)_menuService).QueryStatus(ref pguidCmdGroup, cCmds, prgCmds, pCmdText);
         }
 
-
-        private void UpdateAzureDeploymentProject(IVsHierarchy project) {
-            object projKind;
-            if (!ErrorHandler.Succeeded(project.GetProperty(VSConstants.VSITEMID_ROOT, (int)__VSHPROPID.VSHPROPID_TypeName, out projKind)) ||
-                !(projKind is string) ||
-                (string)projKind != "CloudComputingProjectType") {
-                return;
-            }
-
-            // first try and update the file through the RDT.  If it's open we want to make sure
-            // that VS is aware of the change.
-            // https://nodejstools.codeplex.com/workitem/480
-            IVsRunningDocumentTable rdt = NodejsPackage.GetGlobalService(typeof(SVsRunningDocumentTable)) as IVsRunningDocumentTable;
-            IEnumRunningDocuments enumDocs;
-            ErrorHandler.ThrowOnFailure(rdt.GetRunningDocumentsEnum(out enumDocs));
-            uint[] doc = new uint[1];
-            uint fetched;
-            while (ErrorHandler.Succeeded(enumDocs.Next(1, doc, out fetched)) && fetched == 1) {
-                uint flags;
-                uint readLocks, editLocks, itemid;
-                string filename;
-                IVsHierarchy hierarchy;
-                IntPtr docData;
-
-                ErrorHandler.ThrowOnFailure(
-                    rdt.GetDocumentInfo(
-                        doc[0],
-                        out flags,
-                        out readLocks,
-                        out editLocks,
-                        out filename,
-                        out hierarchy,
-                        out itemid,
-                        out docData
-                    )
-                );
-                try {
-                    if (hierarchy == project && docData != IntPtr.Zero) {
-                        if (String.Equals(Path.GetFileName(filename), "ServiceDefinition.csdef", StringComparison.OrdinalIgnoreCase)) {
-                            var adapterFactory = NodejsPackage.ComponentModel.GetService<IVsEditorAdaptersFactoryService>();
-                            var obj = System.Runtime.InteropServices.Marshal.GetObjectForIUnknown(docData);
-                            var vsTextBuffer = obj as IVsTextBuffer;
-                            if (vsTextBuffer != null) {
-                                var textBuffer = adapterFactory.GetDocumentBuffer(vsTextBuffer);
-                                using (var edit = textBuffer.CreateEdit()) {
-                                    if (textBuffer != null) {
-                                        edit.Replace(
-                                            new Span(0, textBuffer.CurrentSnapshot.Length),
-                                            UpdateServiceDefinition(textBuffer.CurrentSnapshot.GetText())
-                                        );
-                                        edit.Apply();
-                                    }
-
-                                    string newDoc;
-                                    int fCancelled;
-                                    if (ErrorHandler.Succeeded(
-                                        ((IVsPersistDocData)vsTextBuffer).SaveDocData(
-                                            VSSAVEFLAGS.VSSAVE_SilentSave,
-                                            out newDoc,
-                                            out fCancelled
-                                            )
-                                    )) {
-                                        // we've successfully updated the file via the RDT
-                                        return;
-                                    }
-                                }
-                            }
-                        }
-                    }
-                } finally {
-                    if (docData != IntPtr.Zero) {
-                        Marshal.Release(docData);
-                    }
-                }
-            }
-
-            // didn't find the file in the RDT, update it on disk the old fashioned way
-            var dteProject = project.GetProject();
-            var serviceDef = dteProject.ProjectItems.Item("ServiceDefinition.csdef");
-            if (serviceDef != null && serviceDef.FileCount == 1) {
-                string filename = serviceDef.FileNames[0];
-                string tmpFile = filename + ".tmp";
-                File.WriteAllText(tmpFile, UpdateServiceDefinition(File.ReadAllText(filename)));
-                File.Delete(filename);
-                File.Move(tmpFile, filename);
-            }
-        }
-
-        private static string UpdateServiceDefinition(string input) {
-            List<string> elements = new List<string>();
-            XmlWriterSettings settings = new XmlWriterSettings() { Indent = true, IndentChars = " ", NewLineHandling = NewLineHandling.Entitize };
-            var strWriter = new StringWriter();
-            using (var reader = XmlReader.Create(new StringReader(input))) {
-                using (var writer = XmlWriter.Create(strWriter, settings)) {
-                    while (reader.Read()) {
-                        switch (reader.NodeType) {
-                            case XmlNodeType.Element:
-                                // TODO: Switch to the code below when we can successfully install our module...
-                                if (reader.Name == "Imports" &&
-                                        elements.Count == 2 &&
-                                        elements[0] == "ServiceDefinition" &&
-                                        elements[1] == "WebRole") {
-                                    // insert our Imports node
-                                    writer.WriteStartElement("Startup");
-                                    writer.WriteStartElement("Task");
-                                    writer.WriteAttributeString("commandLine", "setup_web.cmd > log.txt");
-                                    writer.WriteAttributeString("executionContext", "elevated");
-                                    writer.WriteAttributeString("taskType", "simple");
-
-                                    writer.WriteStartElement("Environment");
-                                    writer.WriteStartElement("Variable");
-                                    writer.WriteAttributeString("name", "EMULATED");
-                                    writer.WriteStartElement("RoleInstanceValue");
-                                    writer.WriteAttributeString("xpath", "/RoleEnvironment/Deployment/@emulated");
-
-                                    writer.WriteEndElement(); // RoleInstanceValue
-                                    writer.WriteEndElement(); // Variable
-
-                                    writer.WriteStartElement("Variable");
-                                    writer.WriteAttributeString("name", "RUNTIMEID");
-                                    writer.WriteAttributeString("value", "NODE;IISNODE");
-                                    writer.WriteEndElement(); // Variable
-
-                                    writer.WriteStartElement("Variable");
-                                    writer.WriteAttributeString("name", "RUNTIMEURL");
-                                    writer.WriteAttributeString("value", "http://az413943.vo.msecnd.net/node/0.10.21.exe;http://nodertncu.blob.core.windows.net/iisnode/0.1.21.exe");
-                                    writer.WriteEndElement(); // Variable
-
-                                    writer.WriteEndElement(); // Environment
-                                    writer.WriteEndElement(); // Task
-                                    writer.WriteEndElement(); // Startup
-                                }
-                                writer.WriteStartElement(reader.Prefix, reader.Name, reader.NamespaceURI);
-                                writer.WriteAttributes(reader, true);
-
-                                if (!reader.IsEmptyElement) {
-                                    elements.Add(reader.Name);
-                                } else {
-                                    writer.WriteEndElement();
-                                }
-                                break;
-                            case XmlNodeType.Text:
-                                writer.WriteString(reader.Value);
-                                break;
-                            case XmlNodeType.EndElement:
-                                writer.WriteFullEndElement();
-                                elements.RemoveAt(elements.Count - 1);
-                                break;
-                            case XmlNodeType.XmlDeclaration:
-                            case XmlNodeType.ProcessingInstruction:
-                                writer.WriteProcessingInstruction(reader.Name, reader.Value);
-                                break;
-                            case XmlNodeType.SignificantWhitespace:
-                                writer.WriteWhitespace(reader.Value);
-                                break;
-                            case XmlNodeType.Attribute:
-                                writer.WriteAttributes(reader, true);
-                                break;
-                            case XmlNodeType.CDATA:
-                                writer.WriteCData(reader.Value);
-                                break;
-                            case XmlNodeType.Comment:
-                                writer.WriteComment(reader.Value);
-                                break;
-                        }
-                    }
-                }
-            }
-
-            return strWriter.ToString();
-        }
 
         #region IVsProjectFlavorCfgProvider Members
 
@@ -830,5 +631,322 @@ namespace Microsoft.NodejsTools {
 
         #endregion
 
+        public void AddedAsRole(object azureProjectHierarchy, string roleType) {
+            var hier = azureProjectHierarchy as IVsHierarchy;
+
+            if (hier == null) {
+                return;
+            }
+
+            UIThread.Invoke(() => {
+                string caption;
+                object captionObj;
+                if (ErrorHandler.Failed(_innerVsHierarchy.GetProperty(
+                    (uint)VSConstants.VSITEMID.Root,
+                    (int)__VSHPROPID.VSHPROPID_Caption,
+                    out captionObj
+                )) || string.IsNullOrEmpty(caption = captionObj as string)) {
+                    return;
+                }
+
+                UpdateServiceDefinition(
+                    hier,
+                    roleType,
+                    caption,
+                    new ServiceProvider(GetSite())
+                );
+            });
+        }
+
+        private static bool TryGetItemId(object obj, out uint id) {
+            const uint nil = (uint)VSConstants.VSITEMID.Nil;
+            id = obj as uint? ?? nil;
+            if (id == nil) {
+                var asInt = obj as int?;
+                if (asInt.HasValue) {
+                    id = unchecked((uint)asInt.Value);
+                }
+            }
+            return id != nil;
+        }
+
+        /// <summary>
+        /// Updates the ServiceDefinition.csdef file in
+        /// <paramref name="project"/> to include the default startup and
+        /// runtime tasks for Python projects.
+        /// </summary>
+        /// <param name="project">
+        /// The Cloud Service project to update.
+        /// </param>
+        /// <param name="roleType">
+        /// The type of role being added, either "Web" or "Worker".
+        /// </param>
+        /// <param name="projectName">
+        /// The name of the role. This typically matches the Caption property.
+        /// </param>
+        /// <param name="site">
+        /// VS service provider.
+        /// </param>
+        internal static void UpdateServiceDefinition(
+            IVsHierarchy project,
+            string roleType,
+            string projectName,
+            System.IServiceProvider site
+        ) {
+            Utilities.ArgumentNotNull("project", project);
+
+            object obj;
+            ErrorHandler.ThrowOnFailure(project.GetProperty(
+                (uint)VSConstants.VSITEMID.Root,
+                (int)__VSHPROPID.VSHPROPID_FirstChild,
+                out obj
+            ));
+
+            uint id;
+            while (TryGetItemId(obj, out id)) {
+                Guid itemType;
+                string mkDoc;
+
+                if (ErrorHandler.Succeeded(project.GetGuidProperty(id, (int)__VSHPROPID.VSHPROPID_TypeGuid, out itemType)) &&
+                    itemType == VSConstants.GUID_ItemType_PhysicalFile &&
+                    ErrorHandler.Succeeded(project.GetProperty(id, (int)__VSHPROPID.VSHPROPID_Name, out obj)) &&
+                    "ServiceDefinition.csdef".Equals(obj as string, StringComparison.InvariantCultureIgnoreCase) &&
+                    ErrorHandler.Succeeded(project.GetCanonicalName(id, out mkDoc)) &&
+                    !string.IsNullOrEmpty(mkDoc)
+                ) {
+                    // We have found the file
+                    var rdt = site.GetService(typeof(SVsRunningDocumentTable)) as IVsRunningDocumentTable;
+
+                    IVsHierarchy docHier;
+                    uint docId, docCookie;
+                    IntPtr pDocData;
+
+                    bool updateFileOnDisk = true;
+
+                    if (ErrorHandler.Succeeded(rdt.FindAndLockDocument(
+                        (uint)_VSRDTFLAGS.RDT_EditLock,
+                        mkDoc,
+                        out docHier,
+                        out docId,
+                        out pDocData,
+                        out docCookie
+                    ))) {
+                        try {
+                            if (pDocData != IntPtr.Zero) {
+                                try {
+                                    // File is open, so edit it through the document
+                                    UpdateServiceDefinition(
+                                        Marshal.GetObjectForIUnknown(pDocData) as IVsTextLines,
+                                        roleType,
+                                        projectName
+                                    );
+
+                                    ErrorHandler.ThrowOnFailure(rdt.SaveDocuments(
+                                        (uint)__VSRDTSAVEOPTIONS.RDTSAVEOPT_ForceSave,
+                                        docHier,
+                                        docId,
+                                        docCookie
+                                    ));
+
+                                    updateFileOnDisk = false;
+                                } catch (ArgumentException) {
+                                } catch (InvalidOperationException) {
+                                } finally {
+                                    Marshal.Release(pDocData);
+                                }
+                            }
+                        } finally {
+                            ErrorHandler.ThrowOnFailure(rdt.UnlockDocument(
+                                (uint)_VSRDTFLAGS.RDT_Unlock_SaveIfDirty | (uint)_VSRDTFLAGS.RDT_RequestUnlock,
+                                docCookie
+                            ));
+                        }
+                    }
+
+                    if (updateFileOnDisk) {
+                        // File is not open, so edit it on disk
+                        FileStream stream = null;
+                        try {
+                            UpdateServiceDefinition(mkDoc, roleType, projectName);
+                        } finally {
+                            if (stream != null) {
+                                stream.Close();
+                            }
+                        }
+                    }
+
+                    break;
+                }
+
+                if (ErrorHandler.Failed(project.GetProperty(id, (int)__VSHPROPID.VSHPROPID_NextSibling, out obj))) {
+                    break;
+                }
+            }
+        }
+
+        private class StringWriterWithEncoding : StringWriter {
+            private readonly Encoding _encoding;
+
+            public StringWriterWithEncoding(Encoding encoding) {
+                _encoding = encoding;
+            }
+
+            public override Encoding Encoding {
+                get { return _encoding; }
+            }
+        }
+
+        private static void UpdateServiceDefinition(IVsTextLines lines, string roleType, string projectName) {
+            if (lines == null) {
+                throw new ArgumentException("lines");
+            }
+
+            int lastLine, lastIndex;
+            string text;
+
+            ErrorHandler.ThrowOnFailure(lines.GetLastLineIndex(out lastLine, out lastIndex));
+            ErrorHandler.ThrowOnFailure(lines.GetLineText(0, 0, lastLine, lastIndex, out text));
+
+            var doc = new XmlDocument();
+            doc.LoadXml(text);
+
+            UpdateServiceDefinition(doc, roleType, projectName);
+
+            var encoding = Encoding.UTF8;
+
+            var userData = lines as IVsUserData;
+            if (userData != null) {
+                var guid = VSConstants.VsTextBufferUserDataGuid.VsBufferEncodingVSTFF_guid;
+                object data;
+                int cp;
+                if (ErrorHandler.Succeeded(userData.GetData(ref guid, out data)) &&
+                    (cp = (data as int? ?? (int)(data as uint? ?? 0)) & (int)__VSTFF.VSTFF_CPMASK) != 0) {
+                    try {
+                        encoding = Encoding.GetEncoding(cp);
+                    } catch (NotSupportedException) {
+                    } catch (ArgumentException) {
+                    }
+                }
+            }
+
+            var sw = new StringWriterWithEncoding(encoding);
+            doc.Save(XmlWriter.Create(
+                sw,
+                new XmlWriterSettings {
+                    Indent = true,
+                    IndentChars = " ",
+                    NewLineHandling = NewLineHandling.Entitize,
+                    Encoding = encoding
+                }
+            ));
+
+            var sb = sw.GetStringBuilder();
+            var len = sb.Length;
+            var pStr = Marshal.StringToCoTaskMemUni(sb.ToString());
+
+            try {
+                ErrorHandler.ThrowOnFailure(lines.ReplaceLines(0, 0, lastLine, lastIndex, pStr, len, new TextSpan[1]));
+            } finally {
+                Marshal.FreeCoTaskMem(pStr);
+            }
+        }
+
+        private static void UpdateServiceDefinition(string path, string roleType, string projectName) {
+            var doc = new XmlDocument();
+            doc.Load(path);
+
+            UpdateServiceDefinition(doc, roleType, projectName);
+
+            doc.Save(XmlWriter.Create(
+                path,
+                new XmlWriterSettings {
+                    Indent = true,
+                    IndentChars = " ",
+                    NewLineHandling = NewLineHandling.Entitize,
+                    Encoding = Encoding.UTF8
+                }
+            ));
+        }
+
+        /// <summary>
+        /// Modifies the provided XML document to contain the service definition
+        /// nodes needed for the specified project.
+        /// </summary>
+        /// <exception cref="ArgumentException">
+        /// <paramref name="roleType"/> is not one of "Web" or "Worker".
+        /// </exception>
+        /// <exception cref="InvalidOperationException">
+        /// A required element is missing from the document.
+        /// </exception>
+        internal static void UpdateServiceDefinition(XmlDocument doc, string roleType, string projectName) {
+            bool isWeb = roleType == "Web";
+            bool isWorker = roleType == "Worker";
+            if (isWeb == isWorker) {
+                throw new ArgumentException("Unknown role type: " + (roleType ?? "(null)"), "roleType");
+            }
+
+            var nav = doc.CreateNavigator();
+
+            var ns = new XmlNamespaceManager(doc.NameTable);
+            ns.AddNamespace("sd", "http://schemas.microsoft.com/ServiceHosting/2008/10/ServiceDefinition");
+
+            var role = nav.SelectSingleNode(string.Format(
+                "/sd:ServiceDefinition/sd:{0}Role[@name='{1}']", roleType, projectName
+            ), ns);
+
+            if (role == null) {
+                throw new InvalidOperationException("Missing role entry");
+            }
+
+            var startup = role.SelectSingleNode("sd:Startup", ns);
+            if (startup != null) {
+                startup.DeleteSelf();
+            }
+
+            role.AppendChildElement(null, "Startup", null, null);
+            startup = role.SelectSingleNode("sd:Startup", ns);
+            if (startup == null) {
+                throw new InvalidOperationException("Missing Startup entry");
+            }
+
+            startup.ReplaceSelf(string.Format(@"<Startup>
+  <Task commandLine=""setup_{0}.cmd &gt; log.txt"" executionContext=""elevated"" taskType=""simple"">
+    <Environment>
+      <Variable name=""EMULATED"">
+        <RoleInstanceValue xpath=""/RoleEnvironment/Deployment/@emulated"" />
+      </Variable>
+      <Variable name=""RUNTIMEID"" value=""node"" />
+      <Variable name=""RUNTIMEURL"" value=""http://az413943.vo.msecnd.net/node/0.10.21.exe;http://nodertncu.blob.core.windows.net/iisnode/0.1.21.exe"" />
+    </Environment>
+  </Task>
+</Startup>", roleType.ToLowerInvariant()));
+
+            if (isWorker) {
+                var runtime = role.SelectSingleNode("sd:Runtime", ns);
+                if (runtime != null) {
+                    runtime.DeleteSelf();
+                }
+                role.AppendChildElement(null, "Runtime", null, null);
+
+                runtime = role.SelectSingleNode("sd:Runtime", ns);
+                if (startup == null) {
+                    throw new InvalidOperationException("Missing Runtime entry");
+                }
+
+                runtime.ReplaceSelf(@"<Runtime>
+  <Environment>
+    <Variable name=""PORT"">
+      <RoleInstanceValue xpath=""/RoleEnvironment/CurrentInstance/Endpoints/Endpoint[@name='HttpIn']/@port"" />
+    </Variable>
+    <Variable name=""EMULATED"">
+      <RoleInstanceValue xpath=""/RoleEnvironment/Deployment/@emulated"" />
+    </Variable>
+  </Environment>
+  <EntryPoint>
+    <ProgramEntryPoint commandLine=""node.cmd .\server.js"" setReadyOnProcessStart=""true"" />
+  </EntryPoint>
+</Runtime>");
+            }
+        }
     }
 }
