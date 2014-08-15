@@ -1470,4 +1470,13 @@
       </MultiProjectZipProject>
     </ItemGroup>
   </Target>
+  <Target Name="DeployThemePkgdef" AfterTargets="CopyPkgDef" Inputs="Theme\Microsoft.NodejsTools.theme.v$(VSTarget).pkgdef" Outputs="$(OutputPath)Microsoft.NodejsTools.theme.pkgdef">
+    <Copy SourceFiles="Theme\Microsoft.NodejsTools.theme.v$(VSTarget).pkgdef" DestinationFiles="$(OutputPath)Microsoft.NodejsTools.theme.pkgdef" OverwriteReadOnlyFiles="true" />
+    <ItemGroup>
+      <VSIXSourceItem Include="$(OutputPath)Microsoft.NodejsTools.theme.pkgdef">
+        <VSIXSubPath>
+        </VSIXSubPath>
+      </VSIXSourceItem>
+    </ItemGroup>
+  </Target>
 </Project>

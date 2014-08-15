@@ -203,8 +203,9 @@
       <IncludeInVSIX>true</IncludeInVSIX>
       <VSIXSubpath>.</VSIXSubpath>
     </Content>
+    <None Include="Theme\Microsoft.NodejsTools.InteractiveWindow.theme.v11.0.pkgdef" />
+    <None Include="Theme\Microsoft.NodejsTools.InteractiveWindow.theme.v12.0.pkgdef" />
     <None Include="Theme\make_theme_pkgdef.py" />
-    <None Include="Theme\Microsoft.NodejsTools.InteractiveWindow.theme.pkgdef" />
   </ItemGroup>
   <PropertyGroup>
     <UseCodebase>true</UseCodebase>
@@ -223,8 +224,8 @@
   <Target Name="AfterBuild">
   </Target>
   -->
-  <Target Name="DeployThemePkgdef" AfterTargets="CopyPkgDef" Inputs="Theme\Microsoft.NodejsTools.InteractiveWindow.theme.pkgdef" Outputs="$(OutputPath)Microsoft.NodejsTools.InteractiveWindow.theme.pkgdef" Condition="'$(VSTarget)' != '10.0'">
-    <Copy SourceFiles="Theme\Microsoft.NodejsTools.InteractiveWindow.theme.pkgdef" DestinationFiles="$(OutputPath)Microsoft.NodejsTools.InteractiveWindow.theme.pkgdef" OverwriteReadOnlyFiles="true" />
+  <Target Name="DeployThemePkgdef" AfterTargets="CopyPkgDef" Inputs="Theme\Microsoft.NodejsTools.InteractiveWindow.theme.v$(VSTarget).pkgdef" Outputs="$(OutputPath)Microsoft.NodejsTools.InteractiveWindow.theme.pkgdef">
+    <Copy SourceFiles="Theme\Microsoft.NodejsTools.InteractiveWindow.theme.v$(VSTarget).pkgdef" DestinationFiles="$(OutputPath)Microsoft.NodejsTools.InteractiveWindow.theme.pkgdef" OverwriteReadOnlyFiles="true" />
     <ItemGroup>
       <VSIXSourceItem Include="$(OutputPath)Microsoft.NodejsTools.InteractiveWindow.theme.pkgdef">
         <VSIXSubPath>

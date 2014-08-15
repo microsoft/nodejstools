@@ -1,0 +1,15 @@
+<Themes>
+  <Theme Name="High Contrast" GUID="{a5c004b4-2d4b-494e-bf01-45fc492522c7}">
+    <Category Name="Text Editor" GUID="{75A05685-00A8-4DED-BAE5-E7A50BFA929A}">
+      <Color Name="JadeFilterFormatDefinition">
+        <Foreground Type="CT_RAW" Source="FF859DD6" />
+      </Color>
+      <Color Name="JadeIdLiteralFormatDefinition">
+        <Foreground Type="CT_RAW" Source="FF859DD6" />
+      </Color>
+      <Color Name="JadeVariableFormatDefinition">
+        <Foreground Type="CT_RAW" Source="FFFF8080" />
+      </Color>
+    </Category>
+  </Theme>
+</Themes>

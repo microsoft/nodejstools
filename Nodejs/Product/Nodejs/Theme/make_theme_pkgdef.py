@@ -1,7 +1,7 @@
 #! python3.4 -b
 
-THEME_NAME = 'NodejsToolsInteractive'
-THEME_PKGDEF = 'Microsoft.NodejsTools.InteractiveWindow.theme.v{}.0.pkgdef'
+THEME_NAME = 'NodejsTools'
+THEME_PKGDEF = 'Microsoft.NodejsTools.theme.v{}.0.pkgdef'
 
 import struct
 import xml.etree.ElementTree
